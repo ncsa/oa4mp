@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Using the Authorization Header</title>
+    <!--#include virtual="../../head.html" -->
+</head>
+<body class="composite">
+<!--#include virtual="../../header.html" -->
+
+<h2>Using the Authorization Servlet</h2>
+
+<p>OA4MP has an authorization module that is built in. This may be replaced by installations as
+    needed. Part of the specification is that, if this is disabled, the username and information
+    about the client making the delegation request <b>must</b> be shown. This is called
+    <b>client verification</b> and is required by the OAuth protocol. You may have OA4MP
+    do this or disable this as well, though it is encumbant on the installation to show this information.
+    This results in 3 use cases which are discussed below in depth, after the table of attributes.
+</p>
+
+<table border="2">
+    <tbody>
+    <tr>
+        <td>Attribute</td>
+        <td>Required?</td>
+        <td>Default</td>
+        <td>Description</td>
+    </tr>
+    <tr>
+        <td>useHeader</td>
+        <td>N</td>
+        <td>false</td>
+        <td>Valid values are "true" or "false".
+            This flag determines whether or not to enable this facility. Default is to not use this.
+        </td>
+    </tr>
+
+    <tr>
+        <td>requireHeader</td>
+        <td>N</td>
+        <td>false</td>
+        <td>Valid values are "true" or "false". This flag forces the server to use the specified header.
+            Note especially that if this is true and no such header is received then an exception is raised.
+        </td>
+    </tr>
+    <tr>
+        <td>headerFieldName</td>
+        <td>N</td>
+        <td>N/A</td>
+        <td>The name of the header field to use. Generally this is <code>REMOTE_USER</code>, but this must
+            be specified. Other fields are permissible.
+        </td>
+    </tr>
+    <tr>
+        <td>returnDNAsUsername</td>
+        <td>N</td>
+        <td>N/A</td>
+        <td>Valid values are "true" or "false". This flag forces the server to return the DN (distinguished name)
+            on the certificate as the username, as opposed to the usual name of the user. This has nothing to do
+            with enabling the use of the header field.
+        </td>
+    </tr>
+    <tr>
+        <td>convertDNToGlobusID</td>
+        <td>N</td>
+        <td>N/A</td>
+        <td>Standard DN's (Distinguished names) are comma separated. Some versions of Globus, however, require
+            that these be slash delimited. Enabling this option will convert commas to slashes using Globus's
+            own utility for doing this. This means that you must
+            <a href="server/manuals/getting-started.xhml">follow the installation instruction for JGlobus</a> to your Tomcat. Generally
+            this option should rarely, if ever, be needed, so don't just enable it unless you are sure
+            you know what it does and need it.
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<h3>An Example</h3>
+<pre>
+&lt;config&gt;
+   &lt;server name="my-config"&gt;
+      &lt;authorizationServlet useHeader="true" headerFieldName="REMOTE_USER"&gt;
+      &lt;!-- rest of config --&gt;
+   &lt;\server&gt;
+&lt;\config&gt;
+</pre>
+In this case, use of authorization headers is enabled and a header named <code>REMOTE_USER</code>
+will be used. If it is missing though, no exception will be raised. By default, the header field will
+be shown to the user along with client information and the user will be prompted if s/he wishes to continue.
+
+<h3>Use cases</h3>
+There are three main use cases which should be discussed in more depth. The particulars of how to configure
+and authorization module are best dealt with elsewhere and a discussion can be found
+<a href="../manuals/remote-user.xhtml">here</a>.
+<h4>Using the OA4MP authorization module</h4>
+
+<p>This is the default. In this case a logon will be shown to the user who will be prompted for the
+    username and password. Since this page also contains the client information, the verification
+    portion of the protocol is deemed satisfied. We highly recommend customizing the basic OA4MP page
+    for a consistent look and feel in your site.</p>
+
+<h4>Using another authorization module, but using OA4MP's verification page.</h4>
+
+<p>In this case, the username and (possibly) password will be delivered in the header. We generally suggest that
+    standard practice of using the <code>REMOTE_USER</code> header be used. Unless explicitly disabled,
+    the verification page with the displayed username will be shown.</p>
+
+<p>Options that may be configured here to</p>
+<ul>
+    <li>use the header</li>
+    <li>required the header</li>
+    <li>specify the header name</li>
+</ul>
+
+<p>Specifying that the header should be used implies that the header <i>may</i> be present. Since the
+    username may be created also via an extension to the system (see below for details) the lack oof
+    a header field is not an error. However, requiring the header will cause an exception if the header is not found.
+    The default is to assume that the header is the <code>REMOTE_HEADER</code> field, though any field name
+    may be specified.</p>
+
+<h4>Completely replacing the authorization module.</h4>
+
+<p>In this case the server must have some way of performing the client verification. You will need to write a webapp
+    that completely takes over the functions at the <code>authorize</code> endpoint.
+    (found in the <a href="http://grid.ncsa.illinois.edu/myproxy/oauth/apidocs/index.html">javadoc</a>)
+    should then be deployed elsewhere and invoked by your webapp when it has the username and password (if needed).
+    Note that it is up to you to keep access to this servlet safe. We normally suggest that access be restricted to
+    localhost only, so that only your webapp has access to the <code>AuthorizationServlet</code>.
+    The <code>AuthorizationServlet</code> accepts the following call directly:</p>
+<table border="2">
+    <tbody>
+    <tr>
+        <td>Parameter key</td>
+        <td>Parameter values</td>
+        <td>Comment</td>
+    </tr>
+    <tr>
+        <td>oauth_token</td>
+        <td>String</td>
+        <td>This is the token sent to the authorize endpoint as per the specification and identifies this
+            user's delegation request uniquely.
+        </td>
+    </tr>
+    <tr>
+        <td>AuthUserName</td>
+        <td>String</td>
+        <td>The username that will be sent unchanged to MyProxy</td>
+    </tr>
+    <tr>
+        <td>AuthPassword</td>
+        <td>String</td>
+        <td>(Optional) the password the user will require to log in to MyProxy.</td>
+    </tr>
+
+    <tr>
+        <td>lifetime</td>
+        <td>int</td>
+        <td>(Optional) The lifetime for the certificate. The client may request any value in the initial request,
+            but server policies may override this here. If missing, the request sent by the client
+            will be used and if there is none, any defaults will be used.
+        </td>
+    </tr>
+
+    </tbody>
+</table>
+<h3>Customizing the username sent to MyProxy programatically . The UsernameTransformer</h3>
+
+<p>In this case, which e.g. occurs when using <a href="https://shibboleth.net/">Shibboleth</a>,
+    you may create a completely customized handler that will allow you to create virtually any customized
+    username for MyProxy you want from the request. You may also use it to set the username returned in
+    the <code>getCert</code> response. This consists of a interface called UsernameTransformer which has
+    two methods:
+</p>
+<ul>
+    <li>createMyProxyUsername(HttpServletRequest) -- returns the username for MyProxy</li>
+    <li>createReturnedUsername(HttpServletRequest, String) -- returns the username in the getCert response.</li>
+</ul>
+Generally you would implement this as a class and in the ServiceConfigLoader over ride the
+<code>getUsernameTransformer</code>
+<p>
+to return an instance of your transformer. This will be automatically invoked at the approprate time. If either of these
+methods return a null value, then they are simply ignored.</p>
+<!--#include virtual="../../footer.html" -->
+
+</body>
+</html>

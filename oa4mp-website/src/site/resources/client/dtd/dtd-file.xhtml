@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>The OA4MP Client Configuration File DTD</title>
+    <!--#include virtual="../../head.html" -->
+</head>
+<body class="composite">
+<!--#include virtual="../../header.html" -->
+
+<p>This is an annotated DTD for clients using the delegation service.</p>
+<pre>
+&lt;!ELEMENT <a title="OAuth for MyProxy: Client Configuration"
+                                      href="client/configuration/index.xhtml">config</a> (client)*&gt;<br/>
+&lt;!ATTLIST <a href="client/configuration/client-tag.xhtml">client</a>
+     name CDATA #IMPLIED
+     version CDATA #IMPLIED
+     disableDefaultStores CDATA #IMPLIED
+     debug CDATA #IMPLIED&gt;
+&lt;!ELEMENT client (<a title="Parameters" href="client/manuals/parameters.xhtml#tags">id|serviceUri|authorizeUri|callbackUri|lifetime|<span style="background-color: #ff6600;">secret</span>|publicKeyFile|privateKeyFile|skin|enableAssetCleanup|maxAssetLifetime|keypairLifetime</a>|
+    <a href="common/configuration/logging.xhtml">logging</a>|
+    <a href="common/configuration/memory-store.xhtml">memoryStore</a>|
+    <a href="common/configuration/file-store.xhtml">fileStore</a>|
+    <a href="common/configuration/postgres-store.xhtml">postgresql</a>|
+    <a href="common/configuration/mysql-store.xhtml">mysql</a>|
+    <a href="common/configuration/mariadb-store.xhtml">mariadb</a>|
+    <a href="common/configuration/keystore.xhtml">keystore</a>)*&gt;<br/>
+&lt;!ELEMENT id (#PCDATA)&gt;
+&lt;!ELEMENT serviceUri (#PCDATA)&gt;
+&lt;!ELEMENT authorizeUri (#PCDATA)&gt;
+&lt;!ELEMENT callbackUri (#PCDATA)&gt;
+&lt;!ELEMENT showRedirectPage (#PCDATA)&gt;
+&lt;!ELEMENT lifetime (#PCDATA)&gt;
+&lt;!ELEMENT publicKeyFile (#PCDATA)&gt;
+&lt;!ELEMENT privateKeyFile (#PCDATA)&gt;
+&lt;!ELEMENT <span style="background-color: #ff6600;">secret</span> (#PCDATA)&gt;
+&lt;!ELEMENT skin (#PCDATA)&gt;
+&lt;!ELEMENT enableAssetCleanup (#PCDATA)&gt;
+&lt;!ELEMENT maxAssetLifetime (#PCDATA)&gt;
+&lt;!ELEMENT keypairLifetime (#PCDATA)&gt;
+&lt;!ELEMENT <a href="common/configuration/logging.xhtml">logging</a> (#PCDATA)&gt;
+&lt;!ATTLIST logging
+     logFileName CDATA #REQUIRED
+     logName CDATA #IMPLIED
+     logSize CDATA #IMPLIED
+     logFileCount CDATA #IMPLIED
+     debug CDATA #IMPLIED&gt;
+&lt;!ELEMENT assetStore (#PCDATA)&gt;
+&lt;!ELEMENT <a href="common/configuration/memory-store.xhtml">memoryStore</a> (assetStore)*&gt;
+&lt;!ELEMENT <a href="common/configuration/file-store.xhtml">fileStore</a> (assetStore)*&gt;
+&lt;!ATTLIST <a href="common/configuration/file-store.xhtml">fileStore</a>
+     dataPath CDATA #IMPLIED
+     indexPath CDATA #IMPLIED
+     path CDATA #IMPLIED&gt;
+&lt;!ELEMENT <a href="common/configuration/mysql-store.xhtml">mysql</a> (assetStore)*&gt;
+&lt;!ATTLIST <a href="common/configuration/mysql-store.xhtml">mysql</a>
+     password CDATA #REQUIRED
+     port CDATA #IMPLIED
+     host CDATA #IMPLIED
+     username CDATA #REQUIRED
+     schema CDATA #IMPLIED
+     database CDATA #IMPLIED
+     tablename CDATA #IMPLIED
+     tablePrefix CDATA #IMPLIED
+     driver CDATA #IMPLIED&gt;
+&lt;!ELEMENT <a href="common/configuration/mariadb-store.xhtml">mariadb</a> (assetStore)*&gt;
+&lt;!ATTLIST <a href="common/configuration/mariadb-store.xhtml">mariadb</a>
+     password CDATA #REQUIRED
+     port CDATA #IMPLIED
+     host CDATA #IMPLIED
+     username CDATA #REQUIRED
+     schema CDATA #IMPLIED
+     database CDATA #IMPLIED
+     tablename CDATA #IMPLIED
+     tablePrefix CDATA #IMPLIED
+     driver CDATA #IMPLIED&gt;
+
+&lt;!ELEMENT <a href="common/configuration/postgres-store.xhtml">postgresql</a> (assetStore)*&gt;
+&lt;!ATTLIST <a href="common/configuration/postgres-store.xhtml">postgresql</a>
+     password CDATA #REQUIRED
+     username CDATA #REQUIRED
+     port CDATA #IMPLIED
+     schema CDATA #IMPLIED
+     database CDATA #IMPLIED
+     tablename CDATA #IMPLIED
+     tablePrefix CDATA #IMPLIED
+     driver CDATA #IMPLIED&gt;
+&lt;!ELEMENT <a href="common/configuration/keystore.xhtml">keystore</a> (assetStore)*&gt;
+&lt;!ATTLIST <a href="common/configuration/keystore.xhtml">keystore</a>
+     path CDATA #REQUIRED
+     password CDATA #REQUIRED
+     type CDATA #REQUIRED
+     factory CDATA #REQUIRED
+     useJavaKeystore CDATA #IMPLIED&gt;
+</pre>
+<!--#include virtual="../../footer.html" -->
+
+</body>
+</html>

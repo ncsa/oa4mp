@@ -1,0 +1,9 @@
+.gsc-results-wrapper-visible { text-transform: none; }
+
+.gsc-control-cse .gs-spelling, .gsc-control-cse .gs-result .gs-title, .gsc-control-cse .gs-result .gs-title * { vertical-align: baseline; }
+
+.gsc-control-cse .gs-spelling b, .gsc-control-cse .gs-result .gs-title b, .gsc-control-cse .gs-result .gs-title * b { font-weight: bold; }
+
+.gs-webResult div.gs-visibleUrl b, .gs-imageResult div.gs-visibleUrl b, .gs-webResult .gs-snippet b, .gs-imageResult .gs-snippet b, .gs-fileFormatType b { vertical-align: baseline; font-weight: bold; }
+
+.gsc-table-result, .gsc-thumbnail-inside, .gsc-url-top { padding-left: 0 !important; }

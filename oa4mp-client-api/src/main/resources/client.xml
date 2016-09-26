@@ -1,0 +1,10 @@
+<config>
+    <client name="sample">
+        <id>myproxy:oa4mp,2012:/gateway/2579fb235a4c2ec42767b99537f39b08a2</id>
+        <serviceUri>https://www.delegation.org/oauth/</serviceUri>
+        <callbackUri>https://some.client.edu:8443/gateway/simple</callbackUri>
+        <lifetime>864000</lifetime>
+        <publicKeyFile>/path/to/public-key.pem</publicKeyFile>
+        <privateKeyFile>//path/to/private-key.pem</privateKeyFile>
+    </client>
+</config>

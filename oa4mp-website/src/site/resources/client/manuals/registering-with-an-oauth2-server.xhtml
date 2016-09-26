@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Registering a Client With an OAuth 2 Server.</title>
+    <!--#include virtual="../../head.html" -->
+</head>
+<body class="composite">
+<!--#include virtual="../../header.html" -->
+
+<h1>Registering a client with an OAuth 2 server</h1>
+
+<p>Before you can delegate certificates using the OAuth for MyProxy service,
+    you must register your OAuth for MyProxy client. In the course of this you will receive
+    two things:
+</p>
+<ul>
+    <li>a client identifier</li>
+    <li>a client secret</li>
+</ul>
+
+<p>The <b>client identifier</b> is a unique string that is used to identify your client to the
+server. This should be put into your configuration file. Rather than exchange public keys or
+some other method of ensuring that your client is indeed authentic, a <b>client secret</b>
+is generated at run time. This is the only time it actually is shown. The server merely
+stores a hash of this rather than the actual value, consequently you have the only copy.
+    If you lose this, you must register your client again.</p>
+
+<h2>Filling out the registration form</h2>
+
+<p>The default registration form looks like this:</p>
+
+<p><img src="client/images/oauth2-client-registration-1.png"
+        alt="Registration Form Image" width="893" height="624"/></p>
+
+<p>The various fields are as follows:</p>
+<ul>
+    <li><strong>Client Name</strong>: A human readable name for the science gateway (OAuth for MyProxy client) that
+        you are registering. This will be displayed to users and should identify your site.
+    </li>
+    <li><strong>Contact email</strong>: An email address where a human being can be reached for support.</li>
+    <li><strong>Home url</strong>: The main address for your site. This will be displayed to users as part of the
+        authentication process. It is not required to be secure.
+    </li>
+    <li><strong>Refresh token lifetime</strong>: (in seconds). This may be present but only if the server actually supports this
+        feature. If it is available and you leave this blank, then no refresh tokens will be issued for your client.
+    </li>
+    <li><strong>Limited proxy support</strong>. This is mostly needed by servers that are affiliated with Globus. If this is present,
+    you should understand what it does before checking it.</li>
+    <li><strong>Callback URLs</strong>
+          A list of callback URLs, one per line must be registered
+          with the server. Client requests must send one of these and if the callback urls sent
+          does not match one of the registered ones, the
+          client request will be rejected. At this point, no wildcards are accepted.
+        As per thje specification, all of these must be secure.
+      </li>
+</ul>
+
+<p>Fill in the appropriate values. Note that the contact email should be for an actual person, not a generic
+one for an organization since an email will be sent to it once the client has been approved. When you click
+submit you should get a page like this</p>
+
+<p><img src="client/images/oauth2-client-registration-2.png"
+        alt="Succesful Regsitration Image" width="893" height="624"/></p>
+
+<p>The only warning with the secret is to be sure that when you copy and paste it into the configuration file
+that you do not introduce spaces or line breaks. The secret should be a single line. The server administrator
+will get a notice that your client has requested approval and once this has been reviewed, an email will be sent
+to the contact email you gave above.</p>
+<!--#include virtual="../../footer.html" -->
+
+</body>
+</html>

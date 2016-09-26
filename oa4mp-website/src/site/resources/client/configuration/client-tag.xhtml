@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>The Client Tag.</title>
+    <!--#include virtual="../../head.html" -->
+</head>
+<body class="composite">
+<!--#include virtual="../../header.html" -->
+
+<h2>The Client Tag.</h2>
+
+<p>This is the top-level tag for a client configuration. There may be several of these in a single configuration
+    file, all given different names.</p>
+<table style="text-align: left; width: 100%;" border="1" cellspacing="2" cellpadding="2">
+    <tbody>
+    <tr>
+        <td style="vertical-align: top;">Attribute</td>
+        <td style="vertical-align: top;">Required?</td>
+        <td style="vertical-align: top;">Default</td>
+        <td style="vertical-align: top;">Description</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">name</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">(none)</td>
+        <td style="vertical-align: top;">An arbitrary name for this configuration. Multiple configurations in a file are
+            supported.
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">version</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">latest</td>
+        <td style="vertical-align: top;">The version of the configuration file. If omitted, the most current is used.
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">debug</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">"false"</td>
+        <td style="vertical-align: top;">Enable debugging for this service. This will be written to the Tomcat logs and
+            might be rather verbose. Use it only if you need it.
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">disableDefaultStores</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">false</td>
+        <td style="vertical-align: top;">The default behavior is to default
+            to using a memory store if no other store is explicitly set. If set to true, this will make the server throw
+            an exception if there is no store configured.
+        </td>
+    </tr>
+    </tbody>
+</table>
+<p>The <span style="font-weight: bold;">name</span> can be anything. The name of the configuration to use may be
+    specified in the deployment descriptor (web.xml) file. If there is a single configuration in the file, that will be
+    used. If there are multiple configurations and no name is specified, an exception is raised.</p>
+
+<h3>Example 1.</h3>
+<pre>
+&lt;config&gt;
+   &lt;client&gt;
+      &lt;!-- more stuff --&gt;
+   &lt;/client&gt;
+&lt;/config&gt;
+</pre>
+<p>There is a single configuration (so no name is needed) and every configuration default as per the table above
+    will be used. However, the server address and other items must be configured or this will not work.</p>
+
+<h3>Example 2.</h3>
+<pre>
+&lt;config&gt;
+   &lt;client name="organic-test"
+       debug="true"&gt;
+       &lt;!-- more stuff --&gt;
+   &lt;/client&gt;
+   &lt;client name="organic"
+       debug="false"
+       disableDefaultStores="true"&gt;
+       &lt;!-- more stuff --&gt;
+   &lt;/client&gt;
+&lt;/config&gt;
+</pre>
+<p>In this situation there are two client configurations, one for production <i>organic</i> and one for
+    testing <i>organic-test</i>. The production server has turned off debugging and is configured so if
+    storage is not explicitly created, an exception will be thrown. The test server will create in-memory stores
+    as needed and all debugging is enabled.</p>
+<!--#include virtual="../../footer.html" -->
+
+</body>
+</html>

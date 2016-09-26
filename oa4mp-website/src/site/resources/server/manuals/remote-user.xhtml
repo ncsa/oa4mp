@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Rolling Your Own Authentication: REMOTE_USER</title>
+    <!--#include virtual="../../head.html" -->
+</head>
+<body class="composite">
+<!--#include virtual="../../header.html" -->
+
+<h2>Table of Contents</h2>
+
+<p><a href="server/manuals/remote-user.xhtml#Introduction">Introduction</a></p>
+
+<p><a href="server/manuals/remote-user.xhtml#Apache-Based">Apache-Based Authentication</a></p>
+
+<p style="padding-left: 30px;"><a href="server/manuals/remote-user.xhtml#Apache-Basic">Basic Authentication</a></p>
+
+<p style="padding-left: 30px;"><a href="server/manuals/remote-user.xhtml#Shibboleth">Shibboleth</a></p>
+
+<p><a href="server/manuals/remote-user.xhtml#Tomcat">Tomcat-Based Authentication</a></p>
+
+<p><a href="server/manuals/remote-user.xhtml#Troubleshooting">Troubleshooting</a></p>
+
+<p><a href="server/manuals/remote-user.xhtml#Links">Relevant Links</a></p>
+
+<h2 id="Introduction">Introduction</h2>
+
+<p>Oauth for MyProxy (OA4MP) supports Apache- and Tomcat-based authentication. This document provides a walk-through of
+    two Apache methods, basic and Shibboleth, and Tomcat basic authentication. Apache and Tomcat provide a number of
+    other authentication methods, but anything using the REMOTE_USER variable should work with OA4MP.</p>
+
+<p>Since only effectively the user name can be sent to the authorization servlet, <b>another requirement is that
+    the client have a certificate with the Myproxy server so that passwords are not needed.</b>. Said more plainly,
+    if this is enabled and required, no password will be sent to the MyProxy server.</p>
+
+<p>Tomcat can either run standalone, or it can run behind the HTTP server. For the Apache-based methods, it will need to
+    run behind HTTP. For Tomcat-based authentication, it can run standalone.</p>
+
+<h2 id="Apache-Based">Apache-Based Authentication</h2>
+
+<p><a href="server/images/apache-authn.png" rel="attachment wp-att-741"><img
+        class="alignnone size-full wp-image-741" title="oa4mp2"
+        src="server/images/apache-authn.png" alt="" width="270"
+        height="333"/></a></p>
+
+<h3 id="Apache-Basic" title="Apache-Basic">Apache Basic Authentication </h3>
+
+<p>Apache basic authentication is the simplest form of Apache authentication. In this example, we’ll use two modules:
+    proxy_ajp to allow Tomcat and Apache to communicate via the AJP protocol, and auth_basic to protect a location
+    (prompting the user for login and password). </p>
+
+<p><strong>proxy_ajp.conf</strong></p>
+
+<p>Connect Apache to Tomcat using the <a href="http://httpd.apache.org/docs/2.2/mod/mod_proxy_ajp.html">AJP module</a>.
+    You can do this by editing the file /etc/httpd/conf.d/proxy_ajp.conf (or whatever path your OS uses).</p>
+
+<p>This is what the file on our test server looks like: </p>
+<pre>ProxyPass /oauth/authorize ajp://localhost:8009/oauth/authorize</pre>
+<pre>ProxyPass /client ajp://localhost:8009/client</pre>
+<pre>ProxyPass /oauth/initiate ajp://localhost:8009/oauth/initiate</pre>
+<pre>ProxyPass /oauth/token ajp://localhost:8009/oauth/token</pre>
+<pre>ProxyPass /oauth/getcert ajp://localhost:8009/oauth/getcert</pre>
+<p><strong>auth_basic.conf</strong></p>
+
+<p>Now that HTTPD is connected to Tomcat, we need to configure an HTTPD authentication module to protect access. In this
+    example we use the Basic Auth module. On most Linux servers, this file is located at
+    /etc/httpd/conf.d/auth_basic.conf . Here is what we added to use Apache basic authentication to protect the location
+    "/oauth/authorize":</p>
+<pre>  AuthType Basic</pre>
+<pre>  AuthUserFile /var/www/config/validusers</pre>
+<pre>  AuthName "Protected Area"</pre>
+<pre>  require valid-user</pre>
+<p>We used htpasswd to create the file /var/www/config/validusers . Our users are "testuser1" and "testuser2" and this
+    is where the passwords are set. If you need information about how to use "htpasswd," there’s some documentation
+    available at <a href="http://httpd.apache.org/docs/2.2/programs/htpasswd.html">http://httpd.apache.org/docs/2.2/programs/htpasswd.html</a>
+    . Make sure that the password file is readable by Apache.</p>
+
+<p><strong>server-cfg.xml</strong></p>
+
+<p>OA4MP uses the server-cfg.xml file in the designated directory to configure the server. Apache authentication won’t
+    work on port 8443, so in the server-config.xml file, port 8443 will need to be removed from the service address
+    value. For example, </p>
+<pre>service address="https://shibber.ncsa.illinois.edu:8443/oauth" </pre>
+<p>should be changed to</p>
+<pre>service address="https://shibber.ncsa.illinois.edu/oauth"</pre>
+<p>For Apache authentication, we also need to specify a keystore in server-cfg.xml (as part of the "service" element) as
+    a credential for authenticating to the MyProxy server. This is how we have done it on our example server:</p>
+<pre>&lt;service ....&gt;</pre>
+<pre>&lt;keystore path="/var/www/config/hostcred.p12"</pre>
+<pre>          type="pkcs12"</pre>
+<pre>          password="whatever"</pre>
+<pre>          factory="SunX509"</pre>
+<pre>          useJavaKeystore="true"/&gt;</pre>
+<pre>       &lt;/myproxy&gt;</pre>
+<pre>&lt;.... /service&gt;</pre>
+<p>Note: The file hostcred.p12 was using the files hostcert.pem and hostkey.pem in /etc/grid-security. We used the
+    command below to generate it:</p>
+<pre>openssl pkcs12 -export -in /etc/grid-security/hostcert.pem -inkey /etc/grid-security/hostkey.pem -out hostcred.p12</pre>
+<p><strong>client-cfg.xml</strong></p>
+
+<p>Also remove port 8443 from your client-cfg.xml file since you'll be sending your requests directly to Apache.</p>
+
+<p><strong>myproxy-server.config</strong></p>
+
+<p>Edit the myproxy-server.config file on the server where the MyProxy server is to trust the OA4MP installation. Set
+    trusted_retrievers to the DN of the credentials that the OA4MP server will use to authenticate to the MyProxy server
+    (i.e., /var/www/config/hostcred.p12 in the above example).</p>
+
+<p>You can use openssl to view certificate information. For a p12 certificate, you would use the command <span
+        style="font-family: 'courier new', courier;">openssl pkcs12 -info -nodes -in hostcred.p12</span> to see the
+    information for that certificate. The DN is listed in the subject= line of the openssl pkcs12 output.</p>
+
+<p>Below are some sample changes for /etc/myproxy-config on oa4mp-server.example.edu.</p>
+
+<p>Added authorized retrievers:</p>
+<pre>authorized_retrievers "/C=US/O=National Center for Supercomputing Applications/OU=Services</pre>
+<pre>/CN=oa4mp-server.example.edu"</pre>
+<p>Added trusted retrievers: </p>
+<pre>trusted_retrievers "/C=US/O=National Center for Supercomputing Applications/OU=Services</pre>
+<pre>/CN=oa4mp-server.example.edu"</pre>
+<p><strong>grid-mapfile</strong></p>
+
+<p> On shibber, we defined "testuser1" and "testuser2" so our grid-mapfile looked like</p>
+<pre>"/CN=Test User 1" testuser1</pre>
+<pre>"/CN=Test User 2" testuser2</pre>
+<p> The users should correspond to the users defined in the password file that will be used by Apache. The Apache user
+    needs to be mapped to a DN using either the myproxy-server.config certificate_mapfile (as in the example above) or
+    certificate_mapapp settings.</p>
+
+<h3 id="Shibboleth">Authentication with Shibboleth</h3>
+
+<p>Shibboleth authentication also uses Apache. First, you'll need to set up Shibboleth with an appropriate identity
+    provider (IDP). For our example, we used ProtectNetwork.org as our IDP. We had to edit two files,
+    /etc/myproxy/grid-mapfile and /etc/httpd/conf.d/shib2.conf.</p>
+
+<p>We added the identities from the IDP to our grid-mapfile so that the users would be allowed to log in.</p>
+<pre>"/CN=wayward" wayward@idp.protectnetwork.org</pre>
+<pre>"/CN=jbasney" jbasney@idp.protectnetwork.org</pre>
+<p>Below is what we added to our shib2.conf file to protect the Oauth4MP location.</p>
+<pre>&lt;Location /oauth/authorize&gt;</pre>
+<pre>  AuthType shibboleth</pre>
+<pre>  ShibRequestSetting requireSession 1</pre>
+<pre>  ShibUseHeaders On</pre>
+<pre>  require valid-user</pre>
+<pre>&lt;/Location&gt;</pre>
+<h2 id="Tomcat" title="Tomcat">Authentication with Tomcat</h2>
+
+<p>There are many ways to configure Tomcat authentication. For the purpose of this documentation, we’ll illustrate basic
+    authentication, which is the simplest method.</p>
+
+<p>Edit the $CATALINA_HOME/conf/tomcat-users.xml file and the file in $CATALINA_HOME/webapps/oauth/WEB-INF/web.xml .
+    (Not the same web.xml file as in the main Tomcat conf directory).</p>
+
+<p>This is what we added to tomcat-users.xml </p>
+<pre>  &lt;role rolename="testuser"/&gt;</pre>
+<pre>  &lt;user username="testuser1" password="testpassword1" roles="testuser"/&gt;</pre>
+<pre>  &lt;user username="testuser2" password="testpassword2" roles="testuser"/&gt; </pre>
+<p>This is what we added to the web.xml file</p>
+<pre>&lt;security-constraint&gt;</pre>
+<pre>  &lt;web-resource-collection&gt;</pre>
+<pre>    &lt;web-resource-name&gt;OAuth Security&lt;/web-resource-name&gt;</pre>
+<pre>    &lt;url-pattern&gt;/authorize&lt;/url-pattern&gt;</pre>
+<pre>    &lt;http-method&gt;POST&lt;/http-method&gt;</pre>
+<pre>    &lt;http-method&gt;GET&lt;/http-method&gt;</pre>
+<pre>  &lt;/web-resource-collection&gt;</pre>
+<pre>  &lt;auth-constraint&gt;</pre>
+<pre>    &lt;role-name&gt;oa4mp&lt;/role-name&gt;</pre>
+<pre>  &lt;/auth-constraint&gt;</pre>
+<pre>  &lt;user-data-constraint&gt;</pre>
+<pre>  &lt;!-- transport-guarantee can be CONFIDENTIAL, INTEGRAL, or NONE --&gt;</pre>
+<pre>  &lt;transport-guarantee&gt;NONE&lt;/transport-guarantee&gt;</pre>
+<pre>  &lt;/user-data-constraint&gt;</pre>
+<pre>&lt;/security-constraint&gt;</pre>
+<pre>&lt;login-config&gt;</pre>
+<pre>&lt;auth-method&gt;BASIC&lt;/auth-method&gt;</pre>
+<pre>&lt;/login-config&gt;</pre>
+<p id="Troubleshooting">Note that redeploying OA4MP (e.g., a fresh version) may overwrite the web.xml file, so we
+    recommend backing it up somewhere secure.</p>
+
+<h2>Troubleshooting </h2>
+
+<p><strong>MyProxy</strong></p>
+
+<p>Attempt to connect to MyProxy server directly. You can do this using myproxy-logon. The GUI is documented at <a
+        href="http://grid.ncsa.illinois.edu/myproxy/MyProxyLogon/">http://grid.ncsa.illinois.edu/myproxy/MyProxyLogon/</a>
+    . The command line option is documented at <a href="http://grid.ncsa.illinois.edu/myproxy/man/myproxy-logon.1.html">http://grid.ncsa.illinois.edu/myproxy/man/myproxy-logon.1.html</a>
+    . Note that you will need to execute the command as root, e.g. "sudo myproxy-logon -s test.server.com."</p>
+
+<p>Make sure that the serial, grid-mapfile, and certificate files have the appropriate permissions and ownership. On
+    shibber, they are owned by "myproxy." If myproxy can’t read the files, it will fail.</p>
+
+<p>The value in the serial file should be an integer, and the file needs to be writeable by myproxy.</p>
+
+<p>Make sure that certificate_issuer_cert and certificate_issuer_key in the myproxy-server.config file point to valid
+    locations and the certificate is current (not expired).</p>
+
+<p><strong>Configuration</strong></p>
+
+<p>Check firewall configuration on both client and servers. Is it permitting outside connections on the ports that OA4MP
+    is using?</p>
+
+<p>Did the client approval page use the appropriate port? If the application is using port 8443, the client approval
+    needs to be for that port. Likewise, if it's using the default port 80, the client approval also needs to correspond
+    to that.</p>
+
+<p><strong>Apache</strong></p>
+
+<p>Does your password file you are using have appropriate permissions, e.g. readable by Apache?</p>
+
+<p>Is your Apache certificate trusted by your Tomcat installation? Self-signed certs generally are not.</p>
+
+<p><strong>Tomcat</strong></p>
+
+<p>Make sure you’ve told Tomcat to trust your keystore when starting. You can do this by setting CATALINA_OPTS, e.g.</p>
+<pre>export CATALINA_OPTS="-Djavax.net.ssl.trustStore=$HOME/oa4mp/cacerts.jks"</pre>
+<p><strong>General</strong></p>
+
+<p>Make sure you don’t have both Apache and Tomcat authentication enabled at the same time.</p>
+
+<p>Check log files - OA4MP often uses delegation.xml in the OA4MP directory or somewhere in the Tomcat path (bin and/or
+    logs directory). You might also look at the Tomcat log file, which is usually called "catalina.out", the Apache
+    logs, and the system logs. Note: the catalina.out file is likely to contain more information than the
+    localhostXXXX-XX-XX.log files.</p>
+
+<h2 id="Links" title="Links">Relevant Links</h2>
+
+<p>OA4MP Installation Walkthrough:</p>
+
+<p><a href="server/manuals/install-walkthrough.xhtml">http://grid.ncsa.illinois.edu/myproxy/oauth/server/manuals/install-walkthrough.xhtml</a>
+</p>
+
+<p>Official Tomcat documentation</p>
+
+<p><a href="http://tomcat.apache.org/tomcat-6.0-doc/">http://tomcat.apache.org/tomcat-6.0-doc/</a></p>
+
+<!--#include virtual="../../footer.html" -->
+</body>
+</html>

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>OA4MP Client Change Log</title>
+    <!--#include virtual="../../head.html" -->
+</head>
+<body class="composite">
+<!--#include virtual="../../header.html" -->
+
+
+<h1>Client change log</h1>
+
+<p>Here is the log for changes to the OA4MP client.</p>
+<h2>3.2</h2>
+<ul>
+    <li>OAUTH-185: Support for custom scopes and additional claims.</li>
+    <li>OAUTH-186: Improved error handling and validation in client registration form.</li>
+    <li>OAUTH-188: Fixed broken links in the getting-started page.</li>
+    <li>CIL-216: Updated documentation for registration and clarified what the refresh token lifetime field means.</li>
+</ul>
+
+<h2>3.1.1</h2>
+<ul>
+    <li>OAUTH-178: document setting endpoints in the configuration.</li>
+</ul>
+
+<h2>3.0</h2>
+<ul>
+    <li>OAUTH-167: Change keypair default lifetime to 0.</li>
+    <li></li>
+</ul>
+
+<h2>1.2</h2>
+<ul>
+    <li>Updated documentation to accurately reflect OAuth 2 client registration process.</li>
+    <li>OAUTH-150: Added support to configuration for secret element.</li>
+</ul>
+
+<h2>1.1.3</h2>
+<ul>
+    <li>OAUTH-142: Clients can now specify how often to generate a keypair to be used in generating
+    certification requests. Until now, every such request was generated using a fresh keypair. However,
+    if clients are put under very heavy load generating such keypairs can slow response times drastically.
+    It is now configurable how often to re-generate the keypair. The option of setting it to zero
+    will cause a new keypair to be generated every time, as per previous versions. The default is to regenerate
+    the keypair once every 24 hours which should be adequate for all installations.</li>
+    <li>OAUTH-145, OAUTH-146: Session cross-over bug. If a user started to get a certificate repeatedly but
+    did not finish, then JSP would create a new JSESSIONID for each attempt. Subsequent attempts might
+    have returned an incorrect session (browser dependant) which may or may not be valid. This gave extremely intermittent
+    failures that were hard to reproduce. </li>
+    <li>OAUTH-147: Potential cleanup thread failure with a filestore. If a filestore is used and one of the
+    files is corrupted (e.g. due to a system crash at the time of writing it) then the cleanup thread
+    would fail to start. Now such corrupted files are simply logged in catalina.out and ignored otherwise.</li>
+    <li>OAUTH-148: Maria DB support is now implemented.</li>
+</ul>
+
+<h2>1.1.2</h2>
+<ul>
+    <li>OAUTH-128: Java SNI (Server Name Indication) is supported in Java 7 (required for this release of OA4MP)
+    but the underlying Apache SSL libraries did not support it. These have been upgraded.</li>
+    <li>OAUTH-135: Failure in authentication were not displaying the correct message. They should route the user
+       back to the login page for another attempt. </li>
+    <li>OAUTH-137: Documentation for cert lifetime configuration parameter was incorrect and the default of zero
+    has been changed to 12 hours.</li>
+</ul>
+
+
+<h2>1.1.1</h2>
+<ul>
+    <li>Added an FAQ section to the website.</li>
+    <li>OAUTH-105:Added support for file includes to configuration files.</li>
+    <li>OAUTH-105: Added checks to prevent cycles in aliases and files </li>
+    <li>OAUTH-107: An exception is thrown on the client side if the protocol is not https. The fixes a low-level OAuth
+    bug that would happen if the server redirected from http to https.</li>
+    <li>OAUTH-110: All clients may now specify a keystore (or more) to use when connecting to an OA4MP server.</li>
+</ul>
+<h2>1.1</h2>
+<ul>
+    <li>Added support to make showing redirect optional for clients.</li>
+    <li>Added ability to specify pages in the client servlet via configuration. There are three of them. A general error
+        page, a page showing the successful completion of getting a cert and finally a page
+        where the redirect -- if showing the redirct page is enabled -- is located.
+        All of these are paths relative to the web app itself.
+    </li>
+</ul>
+
+<h2>1.0.7</h2>
+Added support to make using log 4j optional. It had been disabled that interfered with some installations.
+
+<h2>1.0.6</h2>
+<ul>
+    <li>Fixed OAUTH-77: Added the ability to override the callback URI on a per request basis</li>
+    <li>Storage support, either via the file system or a database which allows for persistent
+        storage so that delegated credentials may be used in other applications.
+    </li>
+    <li>Improved handling of errors</li>
+    <li>Version number is printed at each server startup.</li>
+    <li>Added support for automatically cleaning up the asset store</li>
+    <li>Many documentation updates to 1.0.6.</li>
+    <li>Added signatures for the lastest downloadable war.</li>
+</ul>
+
+<h2>1.0.5</h2>
+<ul>
+    <li>The sample client now shows the generated private key on the redirect page.</li>
+    <li>Due to limited proxy support being added in the 1.0.5 server, the client now can display a complete certificate
+        chain rather than a single cert.
+    </li>
+</ul>
+<!--#include virtual="../../footer.html" -->
+
+</body>
+</html>

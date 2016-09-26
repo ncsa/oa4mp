@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Testing an OA4MP OIDC server from the command line</title>
+    <!--#include virtual="../../head.html" -->
+
+</head>
+<body class="composite">
+<!--#include virtual="../../header.html" -->
+ <h2>Overview</h2>
+<p>After installing an OA4MP server, or as part of testing one in service, you may want to have a way to monitor
+    the interaction from the command line. There are two ways to do this, either using the
+    <a href="server/manuals/test-client.xhtml">custom command line client</a>
+    or using <a href="http://curl.haxx.se">curl</a>. This document is how to test using
+    curl. This is not quite straightforward
+    and does require some work, but in many cases is well worth the effort. This document describes how to do a complete
+    exchange with a properly configured OA4MP server
+        </p>
+<h2>Prerequisites</h2>
+<p>You should make sure you have a few things at the ready.
+</p>
+<ul>
+    <li>A valid, registered client and its ID</li>
+    <li>The client should not be running, or the client does not exist, meaning that you register a client
+    and use a valid but bogus callback uri. If the callback uri is valid, the server <b>will</b> try to
+    contact it, as per the spec.</li>
+    <li>A url encoder or decoder. I like <a href="http://meyerweb.com/eric/tools/dencoder/">this one.</a></li>
+    <li>A valid certification request. You can create on using openssl, or you can invoke </li>
+    <li>Access to the server from the command line. Depending upon your setup this may require you to be logged in to
+    the server and send everything to localhost.</li>
+        </ul>
+
+<h2>The steps</h2>
+<p>Each of the steps is outlined below along with an example curl call. In <b>each</b> call you will need to supply your
+    own client_id, client_secret and redirect_uri. Other values such as the nonce and state may be left as is.</p>
+<h3>Step 1: The authorization page</h3>
+<p>In this case, you will create a custom url that you will paste into your browser.
+Line breaks are for readability.</p>
+<pre>
+    https://surge.ncsa.illinois.edu/oauth2/authorize?
+    client_id=myproxy%3Aoa4mp%2C2012%3A%2Fclient_id%2F2a3aab4b67ab2354563&amp;
+    redirect_uri=https%3A%2F%2Fashigaru.ncsa.uiuc.edu%3A9443%2Fclient%2Fready&amp;
+    state=qqqqq&amp;
+    response_type=code&amp;
+    scope=openid+edu.uiuc.ncsa.myproxy.getcert&amp;
+    nonce=n-0S6_WzA2Mj
+</pre>
+<h3>Step 2: Get authorized.</h3>
+<p>At this point you should see the authorization page pop up in your browser. Log in. The normal control flow
+is to call back to the redirect URL you provided in the previous step. Since no client should be running there,
+you will get an error. </p>
+<h3>Step 3: Grab the authorization grant (aka code) from the browser location bar.</h3>
+<p>The location bar will have an address like this in it</p>
+<pre>
+    https://ashigaru.ncsa.uiuc.edu:9443/client/ready?
+    code=https%3A%2F%2Fsurge.ncsa.illinois.edu%2Foauth2%2FauthzGrant%2F6d08e01649cb7d766b0c6288333377b1%2F1453837119100&amp;
+    state=qqqqq
+</pre>
+<p>Note that the state passed in initially is returned. You can ignore this. The important thing is the code. This must
+be swapped out for a access token.</p>
+<h3>Step 4:Getting an access token.</h3>
+<p>This requires a little more work since you have to do a POST (as per the spec) using cURL. In this example,
+I am using the <code>-k</code> flag to avoid checking the SSL cert for the server. This may or may not be required for
+your setup and the -d parameter that gloms together the request, allowing it to be entered on multiple lines:</p>
+<pre>
+    curl -k --location -d code=https%3A%2F%2Fsurge.ncsa.illinois.edu%2Foauth2%2FauthzGrant%2F6d08e01649cb7d766b0c6288333377b1%2F1453837119100 \
+    -d client_id=myproxy%3Aoa4mp%2C2012%3A%2Fclient_id%2F2a3aab4b67ab2354563 \
+    -d client_secret=KYuXckx3yilsiwl6Z3934587KSUIF983489_3498drfgn3 \
+    -d redirect_uri=https%3A%2F%2Fashigaru.ncsa.uiuc.edu%3A9443%2Fclient%2Fready \
+    -d grant_type=authorization_code \
+    https://surge.ncsa.illinois.edu/oauth2/token
+</pre>
+<p>Note that the actual endpoint goes at the end of this request. You should get a response like this:</p>
+<pre>
+    {&quot;access_token&quot;:&quot;https://surge.ncsa.illinois.edu/oauth2/accessToken/20c290985f42bf8efb0677b8db67971e/1453837731113&quot;,
+    &quot;refresh_token&quot;:&quot;https://surge.ncsa.illinois.edu/oauth2/refreshToken/49e7fd57565264e2710ddec6d266f84a/1453837731113&quot;,
+    &quot;id_token&quot;:&quot;eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJpc3MiOiJodHRwcz.&quot;,
+    &quot;token_type&quot;:&quot;Bearer&quot;,
+    &quot;expires_in&quot;:900}
+</pre>
+<p>Again, you just need the access_token.</p>
+<h3>Step 5: Use your cert request.</h3>
+<p>It is assumed you generated a cert request before you started. In that case, you need to URLencode the cert request you created and
+send it along in the request (which is just a  GET).</p>
+<pre>
+    curl -k --location
+    &quot;https://surge.ncsa.illinois.edu/oauth2/getcert?
+    access_token=https%3A%2F%2Fsurge.ncsa.illinois.edu%2Foauth2%2FaccessToken%2F20c290985f42bf8efb0677b8db67971e%2F1453837731113&amp;
+    client_id=myproxy%3Aoa4mp%2C2012%3A%2Fclient_id%2F2a3aab4b67ab2354563&amp;
+    client_secret=KYuXckx3yilsiwl6Z3934587KSUIF983489_3498drfgn3&amp;
+    certreq=MIICfzCCAWcCAQAwOjEMMAoGA1UEBhMDVVNBMQswCQYDVQQKEwJPVTELMAkGA12B7lBCgs6hf73A%3D%3D&quot;
+</pre>
+<p>The response is just the certificate.</p>
+<pre>
+    -----BEGIN CERTIFICATE-----
+    MIIEOzCCAyOgAwIBAgIDXB6BMA0GCSqGSIb3DQEBCwUAMIGDMQswCQYDVQQGEwJVUzE4MDYGA1UE
+    ChMvTmF0aW9uYWwgQ2VudGVyIGZvciBTdXBlcmNvbXB1dEb...
+    ...
+</pre>
+<!--#include virtual="../../footer.html" -->
+</body>
+</html>

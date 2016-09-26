@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Scopes</title>
+    <!--#include virtual="../../head.html" -->
+
+</head>
+<body class="composite">
+<!--#include virtual="../../header.html" -->
+<h2>Scopes</h2>
+
+<p>Scope of this document: for client and server, OAuth 2/OIDC only.</p>
+
+<p>OAuth 2 supports custom scopes for servers. The top-level tag is the <code>scopes</code>
+tag and that in turn contains <code>scope</code> tags. These scope tags contain a single scope and
+    support a single attribute:
+</p>
+
+<table style="text-align: left; width: 100%;" border="1" cellspacing="2" cellpadding="2">
+    <tbody>
+    <tr>
+         <td style="vertical-align: top;">Name</td>
+         <td style="vertical-align: top;">Required</td>
+         <td style="vertical-align: top;">Default</td>
+         <td style="vertical-align: top;"></td>
+     </tr>
+    <tr>
+        <td style="vertical-align: top;">enabled</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">true</td>
+        <td style="vertical-align: top;">Enable or disable this scope.</td>
+    </tr>
+    </tbody>
+</table>
+
+<p>The basic supported scopes in OA4MP are </p>
+<ul>
+    <li>openid - this is required in every request. If omitted, the server <b>must reject the request</b></li>
+    <li>email - returns the user's email address, if available.</li>
+    <li>profile - returns information about the user's profile</li>
+    <li>edu.uiuc.ncsa.myproxy.getcert - the server returns a certificate from the getCert endpoint.
+        If the client omits this, then attempts to get
+        a certificate will be rejected. However, requests to the user info endpoint will still be processed.
+    </li>
+</ul>
+<p>
+    The default behavior is that all basic scopes are used. Any other scopes that are specified are added to the
+    list. On the client, this means that these will be requested. On the server, this means that if requested,
+    they will be processed. Specifying a scope on the client that is unknown to a server will make the request
+    fail.
+</p>
+<p>
+    Sometimes, it is necessary to disable a scope. For instance, a specialized instance that only issues certificates
+    against a refresh token should never return any user information. This is the purpose of the enabled flag. Here
+    would be how to effect that.
+</p>
+
+<pre>
+&lt;service name="default" address="https://myservice.org:8443/oauth"&gt;
+   &lt;scopes&gt;
+       &lt;scope enabled="false"&gt;profile&lt;/scope&gt;
+       &lt;scope enabled="false"&gt;email&lt;/scope&gt;
+   &lt;/scopes&gt;
+    &lt;!-- other stuff.. --&gt;
+&lt;/service&gt;
+</pre>
+
+Attempts by a client to request the profile scope would be rejected. Since the getcert scope is not specified, it is
+enabled (you could also simply specify explicitly) so this server will return certificates but only the sub claim (since
+that is required by the openid scope, which is manadatory for OA4MP since it is OIDC compliant.)
+
+<h2>A Server Example</h2>
+
+<pre>
+&lt;service name="default" address="https://myservice.org:8443/oauth"&gt;
+   &lt;scopes&gt;
+       &lt;scope&gt;custom.scope&lt;/scope&gt;
+   &lt;/scopes&gt;
+    &lt;!-- other stuff.. --&gt;
+&lt;/service&gt;
+</pre>
+<p>This informs the server that the scope with tag "custom.scope" should be passed through to whatever custom handler
+has been specified. If this were not configured, the server would reject any request with this scope.</p>
+
+<h2>A Client Example</h2>
+<pre>
+&lt;config&gt;
+   &lt;client name="my-cfg"&gt;
+    &lt;scopes&gt;
+        &lt;scope&gt;custom.scope&lt;/scope&gt;
+    &lt;/scopes&gt;
+        &lt;!-- other stuff.. --&gt;
+&lt;/config&gt;
+</pre>
+The client will include the custom scope in requests to the server. If this is omitted, then the scope is not added
+and whatever claims that are associated with this scope will not be made.
+
+<!--#include virtual="../../footer.html" -->
+</body>
+</html>

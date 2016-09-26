@@ -1,0 +1,183 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <!--
+          NOTE: THIS MUST BE BUILT WITH MAVEN 2. To convert this to a maven 3 project will be
+          quite painful and since it is for internal use only, probably not worth it at this point.
+          Do NOT have the parent of this be the top-level project or it will
+          prevent javadoc creation.
+          -->
+    <groupId>edu.uiuc.ncsa.myproxy</groupId>
+    <!-- The version number reflects the currently released project. -->
+    <version>3.4-SNAPSHOT</version>
+
+    <artifactId>myproxy-website</artifactId>
+    <packaging>jar</packaging>
+    <description>MyProxy Logon website</description>
+    <name>MyProxy Logon</name>
+    <url>http://grid.ncsa.illinois.edu/myproxy/oauth/</url>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+    <licenses>
+        <license>
+            <name>Apache license</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <scm>
+        <developerConnection>scm:svn:https://svn.code.sf.net/p/cilogon/code/trunk/edu.uiuc.ncsa/myproxy
+        </developerConnection>
+        <connection>scm:svn:https://svn.code.sf.net/p/cilogon/code/trunk/edu.uiuc.ncsa/myproxy</connection>
+        <url>https://svn.code.sf.net/p/cilogon/code/trunk/edu.uiuc.ncsa/myproxy</url>
+    </scm>
+    <issueManagement>
+        <system>JIRA</system>
+        <url>https://gateways.atlassian.net/browse/OAUTH</url>
+    </issueManagement>
+    <developers>
+        <developer>
+            <name>Jeff Gaynor</name>
+            <email>gaynor@illinois.edu</email>
+        </developer>
+        <developer>
+            <name>Jim Basney</name>
+            <email>jbasney@illinois.edu</email>
+        </developer>
+        <developer>
+            <name>Wendy Edwards</name>
+            <email>wedwards@illinois.edu</email>
+        </developer>
+    </developers>
+
+    <mailingLists>
+        <mailingList>
+            <name>Science Gateway Security</name>
+            <subscribe>discuss@sciencegatewaysecurity.org</subscribe>
+            <unsubscribe>discuss+unsubscribe@sciencegatewaysecurity.org</unsubscribe>
+            <archive>http://groups.google.com/a/sciencegatewaysecurity.org/group/discuss/?hl=en-US</archive>
+            <post/>
+            <otherArchives/>
+        </mailingList>
+    </mailingLists>
+
+
+    <distributionManagement>
+        <repository>
+            <id>sonatype-nexus-staging</id>
+            <name>sonatype</name>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2
+            </url>
+        </repository>
+        <snapshotRepository>
+            <id>sonatype-nexus-snapshots</id>
+            <name>sonatype</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <uniqueVersion>false</uniqueVersion>
+        </snapshotRepository>
+    </distributionManagement>
+    <dependencies>
+        <dependency>
+            <groupId>edu.uiuc.ncsa.myproxy</groupId>
+            <artifactId>myproxy-logon</artifactId>
+            <version>3.4-SNAPSHOT</version>
+        </dependency>
+    
+    </dependencies>
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.9</version>
+                <configuration>
+                    <aggregate>true</aggregate>
+                    <use>false</use>
+                    <includeDependencySources>true</includeDependencySources>
+
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.10</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>2.6</version>
+                <reportSets>
+                    <reportSet>
+                        <reports><!-- select reports -->
+                            <report>index</report>
+                            <report>dependencies</report>
+                            <report>project-team</report>
+                            <report>mailing-list</report>
+                            <report>cim</report>
+                            <report>issue-tracking</report>
+                            <report>license</report>
+                            <report>scm</report>
+                            <report>continuous-integration</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>2.4</version>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+        </plugins>
+    </reporting>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.2</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>edu.uiuc.ncsa.maven.skin</groupId>
+                        <artifactId>oa4mp-skin</artifactId>
+                        <version>3.4-SNAPSHOT</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.9</version>
+                <configuration>
+                    <aggregate>true</aggregate>
+                    <use>false</use>
+                    <includeDependencySources>true</includeDependencySources>
+                    <dependencySourceIncludes>
+                        <dependencySourceInclude>edu.uiuc.ncsa:*</dependencySourceInclude>
+                    </dependencySourceIncludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.6</version>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

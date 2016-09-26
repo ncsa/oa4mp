@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>The PostgreSQL Configuration</title>
+    <!--#include virtual="../../head.html" -->
+</head>
+<body class="composite">
+<!--#include virtual="../../header.html" -->
+<h2>The PostgreSQL Configuration</h2>
+
+<p>Scope: client and server, all versions.</p>
+
+<p>This configures a <a href="http://www.postgresql.org">PostgreSQL</a> store. There are several options, but most of
+    them are optional. See the document on setting up the database and follow the instructions there before trying to
+    connect with it. Note that there may be many stores for a configuration if each of them, <i>e.g.</i>
+    requires different connection information.</p>
+<table style="text-align: left; width: 100%;" border="1" cellspacing="2" cellpadding="2">
+    <tbody>
+    <tr>
+        <td style="vertical-align: top;">Attribute</td>
+        <td style="vertical-align: top;">Required?</td>
+        <td style="vertical-align: top;">Default</td>
+        <td style="vertical-align: top;">Description</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">username</td>
+        <td style="vertical-align: top;">Y</td>
+        <td style="vertical-align: top;">N/A</td>
+        <td style="vertical-align: top;">The name of the user to use</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">password</td>
+        <td style="vertical-align: top;">Y</td>
+        <td style="vertical-align: top;">N/A</td>
+        <td style="vertical-align: top;">The password for the user</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">host</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">localhost</td>
+        <td style="vertical-align: top;">The host. (localhost)</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">port</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">5432</td>
+        <td style="vertical-align: top;">The port for the connection.</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">driver</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">org.postgresql.Driver</td>
+        <td style="vertical-align: top;">The JDBC driver (current)</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">database</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;"><span style="font-style: italic;">spec</span></td>
+        <td style="vertical-align: top;">The name of the database.</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">schema</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;"><span style="font-style: italic;">spec</span></td>
+        <td style="vertical-align: top;">The schema for the database</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">tablename</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;"><span style="font-style: italic;">spec</span></td>
+        <td style="vertical-align: top;">The name of the table for this.</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">prefix</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">(none)</td>
+        <td style="vertical-align: top;">An optional prefix for the table.</td>
+    </tr>
+    <tr>
+          <td style="vertical-align: top;">useSSL</td>
+          <td style="vertical-align: top;">N</td>
+          <td style="vertical-align: top;">false</td>
+          <td style="vertical-align: top;">Try to connect to the database using SSL support. This presumes you
+          have configured the database to use SSL.</td>
+      </tr>
+    </tbody>
+</table>
+<p><br/> The <span style="font-style: italic;">spec</span> refers to the specification. Defaults are given there and
+    applied.</p>
+
+
+<h2>Getting install scripts.</h2>
+The latest installation scripts for all versions are listed here:
+<ul>
+    <li><a href="http://svn.code.sf.net/p/cilogon/code/tags/latest/server/pg.sql">OA4MP server install script</a></li>
+    <li><a href="http://svn.code.sf.net/p/cilogon/code/tags/latest/server/oauth2-pg.sql">OA4MP OAuth2 server install script</a></li>
+    <li><a href="http://svn.code.sf.net/p/cilogon/code/tags/latest/client/postgres.sql">OA4MP client install script</a></li>
+    <li><a href="http://svn.code.sf.net/p/cilogon/code/tags/latest/client/oauth2-postgres.sql">OA4MP OAuth2 client install script</a></li>
+</ul>
+
+You may just cut and paste them from the file into the command line interface or execute them as scripts. Be sure to
+read the comments since you may want to customize them to fit your installation.
+<h3>Example 1. Simple as it gets.</h3>
+<pre>
+&lt;config&gt;
+   &lt;server address="http://localhost/oauth"&gt;
+      &lt;postgresql username="foo" password="bar" useSSL="true"&gt;
+           &lt;transactions/&gt;
+           &lt;clients/&gt;
+           &lt;clientApprovals/&gt;
+      &lt;/postgresql&gt;
+   &lt;/server&gt;
+&lt;config&gt;
+</pre>
+<p>Dumps everything into postgresql, uses the defaults for myproxy and disables mail notifications. Note that all the
+    defaults for schemas &amp;c. are used. Also notice that the connection will run over SSL.</p>
+
+<h3>Example 2. Multiple stores.</h3>
+
+<p>In this case, there are multiple users who need specific access to stores.</p>
+<pre>
+&lt;config&gt;
+   &lt;server address="https://localhost/oauth"&gt;
+      &lt;postgresql username="client-admin" password="changeme"&gt;
+         &lt;clients/&gt;
+      &lt;/postgresql&gt;
+      &lt;postgresql usernname="approver-admin" password="changeme2"&gt;
+         &lt;clientApprovals/&gt;
+      &lt;/postgresql&gt;
+      &lt;!-- other configuration as needed --&gt;
+   &lt;/server&gt;
+&lt;/config&gt;
+</pre>
+<p>This will put the clients and approvals under two different accounts, neither of which requires SSL. The default MyProxy server is used. Since no
+    store for the transactions are specified, they will reside in memory only.</p>
+
+<p>Example 3. A really fancy one.</p>
+
+<p>if you needed to specify a great deal of specific information about a table, here is how you would do it:</p>
+<pre>
+&lt;postgresql username="foo"
+   password="bar"
+   driver="org.postgresql.Driver"
+   port="4771"
+   schema="atmos"
+   database="oauth"
+   tablename="trans"
+   prefix="ocd"&gt;
+     &lt;transactions/&gt;
+&lt;/postgresql&gt;
+</pre>
+<p>This specifies a (very) non-standard port for PostgreSQL as well as specific information about the database, schema
+    and tablename. This looks in the database named oauth for the table <code>atmos.ocd_trans</code> and puts
+    all transactions there.</p>
+<h2>A Client Example</h2>
+<p>In the next example, a fully functional PostgreSQL client asset store is configured.</p>
+<pre>
+&lt;config&gt;
+    &lt;client name="my-cfg"&gt;
+       &lt;postgresql username="fionna"
+          password="sekret"
+          schema="oa4mp"
+          database="client"&gt;
+          &lt;<a href="client/dtd/asset-store.xhtml">assetStore</a>/&gt;
+       &lt;/postgresql&gt;
+       &lt;!-- other stuff --&gt;
+    &lt;/client&gt;
+&lt;/config&gt;
+</pre>
+This stores the assets in the schema named "oa4mp" in the database named "client" and in the default table
+named "assets"
+<!--#include virtual="../../footer.html" -->
+
+</body>
+</html>

@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+                  http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+         version="2.5">
+
+    <display-name>The MyProxy Delegation Service</display-name>
+
+    <!--
+   Note that this next section is REQUIRED! This prevents anything else but this webapp from
+   accessing the /initiate endpoint. Never expose the /initiate endpoint to the outside world.
+   If you are using Apache, you should also not have the /initiate endpoint referenced in the
+   proxy_ajp file (so no ProxyPass entry). The reason for this endpoint is that it allows
+   a pluggable architecture for replacing the authorization module. If you replace the authorize
+   endpoint with your own module, you authenticate the user, then if that succeeds,
+   pass the user request straight through to the initiate
+   endpoint for processing.
+    -->
+
+  <!--  <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Lockdown_authorized_endpoint</web-resource-name>
+            <url-pattern>/authorized</url-pattern>
+            <http-method>GET</http-method>
+            <http-method>POST</http-method>
+            <http-method>PUT</http-method>
+            <http-method>DELETE</http-method>
+        </web-resource-collection>
+        <auth-constraint/>
+    </security-constraint>-->
+
+    <servlet>
+        <servlet-name>initiate</servlet-name>
+        <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2AuthorizedServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>initiate</servlet-name>
+        <url-pattern>/authorized</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>accessToken</servlet-name>
+        <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2ATServlet</servlet-class>
+        <load-on-startup>0</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>accessToken</servlet-name>
+        <url-pattern>/token</url-pattern>
+    </servlet-mapping>
+
+
+    <servlet>
+        <servlet-name>getCert</servlet-name>
+        <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2CertServlet</servlet-class>
+
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>getCert</servlet-name>
+        <url-pattern>/getcert</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>error</servlet-name>
+        <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.ErrorServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>error</servlet-name>
+        <url-pattern>/error</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>authorize</servlet-name>
+        <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2AuthorizationServer</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>authorize</servlet-name>
+        <url-pattern>/authorize</url-pattern>
+    </servlet-mapping>
+
+
+    <servlet>
+        <servlet-name>clientVetting</servlet-name>
+        <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2RegistrationServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>clientVetting</servlet-name>
+        <url-pattern>/register</url-pattern>
+    </servlet-mapping>
+
+
+    <servlet>
+        <servlet-name>userInfo</servlet-name>
+        <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.UserInfoServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>userInfo</servlet-name>
+        <url-pattern>/userinfo</url-pattern>
+    </servlet-mapping>
+
+
+    <!--
+      The next section should be uncommented if you are running this as a standalone service under Tomcat.
+      This forces all network traffic to run over SSL.  If you are running this under Apache, then you should
+      comment out it.
+      -->
+
+
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>portalSecurity</web-resource-name>
+            <url-pattern>/*</url-pattern>
+            <http-method>GET</http-method>
+            <http-method>POST</http-method>
+        </web-resource-collection>
+        <user-data-constraint>
+            <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+        </user-data-constraint>
+    </security-constraint>
+
+
+    <resource-ref>
+        <description>
+            Resource reference to a factory for javax.mail.Session
+            instances that may be used for sending electronic mail
+            messages, preconfigured to connect to the appropriate
+            SMTP server.
+        </description>
+        <res-ref-name>mail/Session</res-ref-name>
+        <res-type>javax.mail.Session</res-type>
+        <res-auth>Container</res-auth>
+    </resource-ref>
+
+    <listener>
+        <listener-class>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2Bootstrapper</listener-class>
+
+    </listener>
+
+
+    <error-page>
+        <exception-type>edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.TooManyRequestsException</exception-type>
+        <location>/tooManyClientRequests.jsp</location>
+    </error-page>
+
+</web-app>

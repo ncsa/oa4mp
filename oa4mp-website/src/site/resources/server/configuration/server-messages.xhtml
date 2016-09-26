@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>User-Facing Messages</title>
+    <!--#include virtual="../../head.html" -->
+</head>
+<body>
+<!--#include virtual="../../header.html" -->
+
+<h2>User-Facing Messages</h2>
+
+<p>User-facing messages may be configured in the section. At this point the only supported message is what is
+    displayed to a user when his/her authentication fails. This presupposes that the server is using the
+    supplied authorization servlet, of course and if another authorizatiion method is in use (e.g. REMOTE_HEADER)
+    then this will be ignored.</p>
+
+<h3>Example 1.</h3>
+
+<p>Basic configuration with a customized message if authentication fails.</p>
+<pre>
+&lt;config&gt;
+    &lt;service name="main-server"
+                  version="1.0"
+                  address="https://go.teragrid.org/oauth"&gt;
+     &lt;messages&gt;
+         &lt;retryMessage&gt;Authentication Failed! Note: Only members of
+          active projects are able to sign in.&lt;/retryMessage&gt;
+     &lt;/messages&gt;
+   &lt;/service&gt;
+&lt;/config&gt;
+</pre>
+<p>This would be displayed on authorization page if an invalid login were tried. In this case it informs the user that
+    while s/he may try again, if there is no active project associated with this login, it will continue to fail.</p>
+
+<p><img src="../images/authn-fail1.png" alt="Authentication failure" width="844" height="444"/></p>
+<!--#include virtual="../../footer.html" -->
+
+</body>
+</html>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Writing your own loader</title>
+    <!--#include virtual="../../head.html" -->
+</head>
+
+<body class="composite">
+<!--#include virtual="../../header.html" -->
+<h2>Writing your own loader</h2>
+In some cases you might want to extend the functionality of OA4MP. For instance, writing your own
+storage for transactions or username transformer. This involves a few relatively simple steps,
+which are imposed on us by Tomcat's architecture.
+
+<h4>Setup your maven project.</h4>
+You need to check out oa4mp-webapp from svn. This has everything in it you need.
+<h4>Write your extension.</h4>
+In the src/main/java folder you should create the package you want and put the class. Most
+major components of OA4MP are defined as interfaces (such as storage, username transformations)
+and can be simply implemented.
+<h4>Extend OA4MPConfigurationLoader.</h4>
+Specifically, you want to override the method (getter) that returns an instance of your new class. This
+is where the class is instantiated. Note that there will be one copy of this class available at all times,
+so you should plan to not store state between calls.
+<h4>Extend AbstractBootstrapper</h4>
+
+<h4>Specify Your abstract bootstrapper in web.xml</h4>
+<h4>Build your war</h4>
+
+
+<!--#include virtual="../../footer.html" -->
+</body>
+</html>

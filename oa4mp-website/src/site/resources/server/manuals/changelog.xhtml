@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>OAuth for MyProxy Changes</title>
+    <!--#include virtual="../../head.html" -->
+</head>
+<body class="composite">
+<!--#include virtual="../../header.html" -->
+<p>Changes to the OA4MP server by version.</p>
+
+<h3>3.3</h3>
+<ul>
+    <li>CIL-252: Scope handler which queries LDAP for user attributes.</li>
+    <li>CIL-264: Document examples using the cURL command.</li>
+    <li>CIL-268: Added sample OA4MP OIDC configuration to web documentation.</li>
+    <li>CIL-273: LDAP support for OA4MP.</li>
+    <li>CIL-286: Failed client registration not cleaned up. </li>
+    <li>CIL-299: "Max retries exceeded" message from MariaDB connection pool. This was because the
+    method in question was only partially synchronized.</li>
+    <li>CIL-309: Refresh token fixes and improvements.</li>
+    <li>CIL-312: Null pointer exception when parsing URIs. The built-in parser for URIs is rather stupid in certain cases
+    and would throw an NPE when parsing. This is not being handled better to prevent this.</li>
+    <li>CIL-317: exception setting transaction state if use waits to finish exchange until after initial grant has expired and
+    garbage collected.</li>
+    <li>CIL-319: Indicate in DN if the user is from and InCommon or eduGain IDP.</li>
+    <li>CIL-320: DB Service fix to get information to resolve CIL-319.</li>
+    <li>CIL-324: Attempting to send many email notifications at once causes failures.</li>
+    <li>OAUTH-189: Invalid nonce causes reloadof authorization page to fail.</li>
+    <li>OAUTH-191: Defer connecting to MyProxy until the getCert call, if possible.</li>
+    <li>OAUTH-194: OIDC token endpoint should return error with status of 400.</li>
+    <li>OAUTH-196: Documentation needs updating after file name change internally.</li>
+    <li>OAUTH-197: Testing from the command line documentation shows sending the secret to the authorization endpoint, which
+    is not in the specification.</li>
+    <li>OAUTH-198: Pass teh HTTPServletRequest to the basic scope handler. This allows implementors more flexibility.</li>
+    <li>OAUTH-199: Pass HttpServlet request to custom scope handlers.</li>
+    <li>OAUTH-200: Connection pooling does not clean out stale connections.</li>
+    <li>OAUTH-201: Username incorrectly flagged as the primary key for the asset table, causing and error on updates.</li>
+    <li>OAUTH-202: Tomcat 6 is not supported for this release of OA4MP. You must have at least version 7 or higher.</li>
+    <li>OAUTH-206: Refresh token lifetime limited. A logic bug made the lifetime of refresh tokens decrease on refresh,
+    eventually yielding invalid refresh tokens. All refresh tokens now are valid for the full requested time.</li>
+    <li>OAUTH-208: Remove dependeny on one-jar plug in for building executable jars, since it is no longer supported.</li>
+    <li>OAUTH-209: Remove dependency on Google Code's maven repository.</li>
+    <li>Added new <a href="http://grid.ncsa.illinois.edu/myproxy/oauth/server/manuals/test-client.xhtml">command line client</a> for testing purposes.</li>
+</ul>
+<h2>3.2.1</h2>
+<ul>
+    <li>CIL-101: (reopened with an additional parameter for the overloaded myproxy username)</li>
+    <li>CIL-210: Return CILogon specific claims fromthe getUserInfo endpoint.</li>
+    <li>CIL-211: New attributes for the user, affiliation, display name and organizational unit.</li>
+    <li>CIL-227: Refresh token lifetimes should be ignored if not enabled on the server.</li>
+    <li>CIL-231: EPPN and EPTID no longer omitted from X509v3 extension.</li>
+    <li>CIL-234: Fermi National Lab specific distinguished names, along with a configuration option for the server to disable generation of these.</li>
+    <li>CIL-240: update for items from command line not working.</li>
+    <li>CIL-257: Unwanted serial string changes on user updates</li>
+    <li>CIL-258: Allow OGS CA to omit versio number from certification requests since MyProxy accepts these.</li>
+    <li>CIL-260: Allow for restoring archived users from command line.</li>
+    <li>OAUTH-184:Additional claims returned from the getToken endpoint.</li>
+    <li>OAUTH-192: Enabling use of the remote user header from an external authorization module could allow a user to change their name. </li>
+    <li>OAUTH-193: Empty responses to cert request. </li>
+</ul>
+
+<h2>3.2</h2>
+<ul>
+    <li>OAUTH-181: Updated server walkthrough.</li>
+    <li>OAUTH-183: Update documentation for using remote user.</li>
+    <li>OAUTH-184: Plugin capability for additional IODC claims.</li>
+    <li>OAUTH-185: Support for custom scopes and additional claims.</li>
+    <li>OAUTH-188: Fixed broken links in the getting-started page.</li>
+    <li>CIL-194: Searching for MyProxy servers in CILogon now uses standard OA4MP libraries.</li>
+    <li>CIL-196: ServerDN option in configuration now can be over-ridden in the MyProxy tag.</li>
+    <li>CIL-197: Propagating MyProxy changes to CILogon.</li>
+    <li>Added PKCS 7 encoding support to the certificate utility</li>
+</ul>
+<h2>3.1.1</h2>
+<ul>
+    <li>OAUTH-180: Support OIDC servers that do not use a nonce.</li>
+    <li>CIL-101: Add setTransaction state call.</li>
+    <li>CIL-136: Documenting the OAuth 2.0 authorize<b>d</b> servlet.</li>
+    <li>CIL-141: Improve pinging servers</li>
+    <li>CIL-170, CIL-171: Missing log4j properties restored.</li>
+    <li>CIL-172: Multiple LIGO IdPs supported.</li>
+    <li>CIL-173: Fix handling of incorrect password.</li>
+</ul>
+
+<h2>3.1.0</h2>
+<ul>
+    <li>CIL-194: CILogon server only returns cert from last Myproxy server</li>
+    <li>CIL-196: server DN override in myproxy configuration not read.</li>
+</ul>
+<h2>3.1</h2>
+<ul>
+    <li>OAUTH-179: Updated apache http client libraries to 4.4.1 since previous version had
+    <a href="https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-3577">an SSL server hostname validation vulnerability:</a> </li>
+    <li>CIL-169: Mail notifications failing.</li>
+</ul>
+
+<h2>3.0</h2>
+<ul>
+    <li><b>Java 8 support</b>: Due to internal changes to Java, this release requires Java 8 and will not work with previous versions of Java.</li>
+    <li>OAUTH-164: Support for id_tokens in OAuth 2 module</li>
+    <li>OAUTH-165: Passing the skin parameter in with the initial request.</li>
+    <li>OAUTH-168: Making OA4MP for OAuth 2.0 spec. compliant.</li>
+    <li>OAUTH-169: Removed "error url" from the OAuth 2 registration page</li>
+    <li>OAUTH-170: Typo in online documentation. Examples had tags corrected to &lt;service&gt;</li>
+    <li>OAUTH-171: MyProxy Logon now supports setting the socket timeout.</li>
+    <li>OAUTH-172: Expose MyProxy socket timeout in OA4MP configuration.</li>
+    <li>OAUTH-173: Improved error message on session timeout.</li>
+    <li>OAUTH-174: Error handling in OAuth 2 component.</li>
+    <li>OAUTH-175: Possible concurrency issue with MariaDB connections. </li>
+    <li>OAUTH-176: Specify DN (distinguished name) for MyProxy server(s).</li>
+    <li>OAUTH-177: Documentation for the new server DN option.</li>
+</ul>
+
+<h2>1.3</h2>
+<ul>
+    <li>OAUTH-162: Client secret must be sent on access token request but not on authorization request.</li>
+    <li>OAUTH-163: State must be returned in OAuth 2 component with authorization response callback.</li>
+</ul>
+<h2>1.2.1</h2>
+<ul>
+    <li>OAUTH-127: MyProxyLogon website updated to point to current release.</li>
+    <li>OAUTH-129: Sorting entries with the the CLI <b>ls</b> command. Before there was no sorting,
+        now it is done by client ID or date, where applicable.</li>
+    <li>OAUTH-134: Updating documentation on how to run a monitor.</li>
+    <li>OAUTH-154: Removed possible redundant/conflicting maven dependencies.</li>
+    <li>OAUTH-156: Turn off default logging for MyProxyLogon. This permits use of the MyProxyLogon
+    module as a library without getting logging messages to the console (the previous default).</li>
+    <li>OAUTH-157: Client registration page not saving client secret under OAuth 1.0a protocol.</li>
+    <li>OAUTH-158: Updated links on generic client registration page to current documentation.</li>
+    <li>OAUTH-159: Update documentation for this release.</li>
+    <li>OAUTH-160: Regularize and improve version reporting at component (CLI, client, server) startup.</li>
+</ul>
+
+<h2>1.2</h2>
+<ul>
+    <li>OAUTH-131: Improved client registration for OAuth 2 servers. </li>
+    <li>OAUTH-149: Remove support for MyProxyLogon to use SSL version 3. (This mitigates the POODLE attack.)</li>
+    <li>OAUTH-152: Do not show detailed MyProxy error message if authorization fails.</li>
+    <li>OAUTH-153: Improved logging for MyProxy errors and successes.</li>
+    <li>OAUTH-155: Updated documentation to explain new OAuth 2 client registration process.</li>
+</ul>
+<h2>1.1.3</h2>
+<ul>
+    <li>OAUTH-139: CLI might return an incorrect list of items after several updates.</li>
+    <li>OAUTH-140: MyProxy component didn't quite log completely to the configured log file.</li>
+    <li>OAUTH-141: Improved client/server walkthough. This is documentation that permits an administrator
+        to deploy both a client and server locally with a self-signed cert for testing purposes.
+    </li>
+    <li>OAUTH-143: Enabling the Globus DN option should have had better documentation pointing at the
+        server requirements for JGlobus.
+    </li>
+    <li>OAUTH-144: Jetty version was incorrect, causing certain build issues. This was standardized on version
+        6.1.26 to ensure consistent builds.
+    </li>
+    <li>OAUTH-147: Potential cleanup thread failure with a filestore. If a filestore is used and one of the
+        files is corrupted (e.g. due to a system crash at the time of writing it) then the cleanup thread
+        would fail to start. Now such corrupted files are simply logged in catalina.out and ignored otherwise.
+    </li>
+    <li>OAUTH-148: Maria DB support added.</li>
+
+</ul>
+
+<h2>1.1.2</h2>
+<ul>
+    <li>OAUTH-112: Servlet initialization is injected now, decoupling it more from Tomcat startup.</li>
+    <li>OAUTH-113: MyProxy does not handle PAM challenges. The documentation has been updated with a link to the
+        appropriate page
+        on the MyProxy website where this is discussed.
+    </li>
+    <li>OAUTH-117: Server install walkthrough updated and improved to reflect changes (in particular, it now makes us of
+        the resolution of OAUTH-110).
+    </li>
+    <li>OAUTH-118. Build error in maven caused OAuth2 command line tools to issue an NPE in certain cases.</li>
+    <li>OAUTH-119: Loading objects into the CLI that do not have identifiers caused an NPE. This could only arise really
+        if someone directly edited an entry in a text editor (e.g. if the installation was backed by a filestore). In
+        that
+        case it would not be possible to load any objects from that store into the CLI, preventing editing of them.
+    </li>
+    <li>OAUTH-120: The new <b>-component</b> flag allows an administrator to start the CLI with the named component as
+        an
+        argument. E.g. rather than start the CLI and use the approval component, just issue<br/>
+        <code>./oa4mp-cli -component approvals<br/></code>
+    </li>
+    <li>OAUTH-125: "About" and "Overview" links on website were broken.</li>
+    <li>OAUTH-126: Website now lists the version number with the "latest" link.</li>
+    <li>OAUTH-130: Documentation amended to clarify which version of OA4MP (based on OAuth 1.0a or OAuth 2.0)
+        to use.
+    </li>
+    <li>OAUTH-133: Configuration option to convert standard DN to (legacy) Globus identifiers. This is mostly
+        useful for installations that have been using Globus for a very long time.
+    </li>
+    <li>OAUTH-135: Failure in authentication were not displaying the correct message. They should route the user
+        back to the login page for another attempt.
+    </li>
+</ul>
+
+
+<h2>1.1.1</h2>
+<ul>
+    <li>OAUTH-105:Added support for file includes to configuration files.</li>
+    <li>OAUTH-105: Added checks to prevent cycles in aliases and files</li>
+    <li>OAUTH-106: Adding fully qualified host name to client approval notifications.</li>
+</ul>
+
+<h2>1.1</h2>
+<ul>
+    <li>OAUTH-47 Now supports building with maven 3.0+ There was an issue with earlier an pom version
+        that prevented this.
+    </li>
+    <li>Support for OAuth 2 protocol. This includes full server and client support as well as
+        various supported stores (mysql, postgres, files) and admin tools.
+    </li>
+    <li>OAUTH-94: Fix for passthrough of Shibboleth attributes.
+        A <a href="server/manuals/Username-transformations.xhtml">username transformation</a> interface has been
+        created.
+        This will be invoked immediately before the call to MyProxy.
+        Users that wish to customize this may do so by implementing the interface and setting it in the environment
+        at server startup.
+    </li>
+    <li>OAUTH-96: Check for a bad PKCS10 CSR (missing version number which must be set to 0) created by pyOpenSSL is
+        now in place and an informative message is now
+        issued. Earlier the Bouncy Castle code allowed for this, Sun does not.
+    </li>
+    <li>OAUTH-99: Old documentation at Science Gateway Security site removed. Everything is redirected to this site
+        now.
+    </li>
+    <li>OAUTH-102: No username returned with cert in certain cases. Fixed.</li>
+</ul>
+
+<h2>1.0.7</h2>
+<ul>
+    <li>Added support to make using log 4j optional. It had been disabled which interfered with some installations.</li>
+    <li>Fixed bug OAUTH-90.</li>
+    <li>Fixed bug OAUTH-94. This adds a configuration option to
+        <a href="server/configuration/authorization-header.xhtml">return the DN</a> of the user's cert as the username.
+    </li>
+    <li>All new command line tools that allow for managing clients and approvals.</li>
+    <li>Changed client index page to be more up to date.</li>
+    <li><b>Removed</b> all explicit references to Bouncy Castle. This should prevent future jar pollution from
+        incompatible versions. JGlobus still uses this though....<br/>
+    </li>
+    <li>Set mysql and postgres jars to be provided rather than included in the release so that projects that
+        need only a single type of storage are not required to install both of these.
+    </li>
+</ul>
+
+<h2>1.0.6</h2>
+<ul>
+    <li>Version number is now printed to the console whenever the server starts up.</li>
+    <li>Support for authentication using the REMOTE_USER (or any other) header.</li>
+    <li>Improved error handling on the server, especially in cases where the MyProxyLogon client encounters a runtime
+        exception.
+    </li>
+    <li>OAUTH-80: errors resulting from JGlobus broken build will be resolved by their conforming to standard maven
+        practices
+    </li>
+    <li>Fix for OAUTH-83 documentation error in configuring mail addresses</li>
+    <li>OAUTH-84 failure to return a complete certificate chain from MyProxy in a certain case</li>
+    <li>OAUTH-85 failure to configure logging could result in an error. Default is to dump everything into the tomcat
+        logs.
+    </li>
+    <li>Use of new JGlobus release 2.0.5.</li>
+    <li>Bouncy Castle version set to 1.43 to support JGlobus release 2.0.5.</li>
+    <li>Added signatures for the lastest downloadable war.</li>
+</ul>
+<h2>1.0.5</h2>
+<ul>
+    <li>Support for limited proxy generation. Allows the server to generate a public/private keypair and issue a limited
+        proxy. The result is a certificate chain.
+    </li>
+    <li>Deny HTTP header. This sets the HTTP header to "deny" which prevents clickjacking attacks.</li>
+    <li>Added logging support. Standard Java logging is now available and configurable.</li>
+    <li>Default MyProxy server on localhost. If no MyProxy server is specified, one is assumed to be running on
+        localhost.
+    </li>
+    <li>Improved admin tools. In particular, improved the CLI to give more readable messages.</li>
+    <li>Improved SQL install scripts.</li>
+    <li>Links in the documentation to the latest versions of these scripts.</li>
+    <li>More and better documentation.</li>
+</ul>
+<!--#include virtual="../../footer.html" -->
+
+</body>
+</html>

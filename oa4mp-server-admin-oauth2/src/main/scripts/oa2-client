@@ -1,0 +1,34 @@
+# Run the OA4MP client (a command line interface client). This allows you to check the complete
+# lifecycle of getting a cert, refresh tokens and user info from the command line -- almost.
+# Invoke with --help for more information.
+#
+# The next 5 entries completely determine how this operates. Change these to whatever you want if
+# different from the standard install.
+
+OA4MP_ROOT=/opt/oa2
+DEFAULT_CONFIG=$OA4MP_ROOT/etc/admin-cfg.xml
+DEFAULT_TARGET=client
+clientJar=$OA4MP_ROOT/lib/oa2-client.jar
+logFile=$OA4MP_ROOT/var/log/oa2-client.log
+
+# End of user serviceable parts.
+
+if [[  "$1" = "--help" || $# -gt 2 ]];then
+  echo "oa2-client [configName configFile"]
+  echo "Start the OAuth 2 forMyProxy command line client with the"
+  echo "given configuration name in the given configuration file (full path)."
+  echo "No arguments means to use the config named '$DEFAULT_TARGET' in the file  '$DEFAULT_CONFIG'"
+  echo "One argument is assumed to be the configuration name in the default config file."
+  exit 1
+fi
+
+target=${1:-$DEFAULT_TARGET}
+adminCfg=${2:-$DEFAULT_CONFIG}
+
+java  -jar $clientJar   -cfg $adminCfg -name $target -log $logFile -v
+
+if [ $? != 0 ]; then
+  exit 1
+fi
+
+exit 0

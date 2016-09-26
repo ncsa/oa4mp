@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Extending the Server</title>
+    <!--#include virtual="../../head.html" -->
+
+</head>
+<body class="composite">
+<!--#include virtual="../../header.html" -->
+
+<h2>Extending the Server</h2>
+<p>The architecture of the OA4MP server (all versions, both based on OAuth 1.0a and OAuth 2.0)
+    is designed to accommodate extensions. The delegation exchanges should, in
+    general, never be altered since there is a high risk of making the system insecure, so hooks have been added in all
+    the places that should let a developer extend the system as safely as possible. There are two main mechanisms
+    involved. These are</p>
+<ul>
+    <li>Transaction filtering -- intercepting and changing the state of a transaction</li>
+    <li>Presentation -- changing the look and feel of any user-facing servlet.</li>
+</ul>
+<p>These will be discussed in turn. To use this you should check out the most current maven module of oa4mp-webapp and
+    create your own package under src/main/java which will hold any custom classes you need to write. Specifying these
+    in the deployment descriptor should have them compiled and deployed automatically.</p>
+
+<h3>Transaction Filtering</h3>
+
+<p>Internally, the state of the service is kept in a transaction. This has all the information available to the service
+    on each leg of the delegation. Each servlet implements the TransactionFilter interface, which has two methods:</p>
+<pre>
+    public void preprocess(TransactionState t);
+
+    public void postprocess(TransactionState t);
+</pre>
+<p>The lifecycle is straightforward: A request is received by the servlet and parsed. The transaction is retrieved from
+    storage and validity checks are made. Once a token is issued, the preprocess method is called. This allows you to
+    intercept the state of the transaction before anything is written to the output stream. Once the output stream is
+    written, postprocess is invoked. </p>
+
+<p>The transactionState contains the original servlet request and response, any parsed parameters (this may be null) and
+    the currently active transaction. To save a transaction, call it <i>t</i>, you must call the store:</p>
+
+<pre>getTransactionStore().save(t);</pre>
+
+<h3>Presentation</h3>
+
+<p>Servlets that present something to the user implement the presentation interface. This is extremely similar to the
+    transaction filtering above. The difference being that it is assumed you will be customizing the response for any
+    JSP pages, and an additional handleException method that is invoked on any error that lets you control what is
+    displayed to the user. The entire API then is</p>
+<pre>
+    public void prepare(PresentationState p);
+
+    public void present(PresentationState p);
+
+    public void handleException(PresentationState p, Throwable t);
+</pre>
+<p>Transaction filtering is still active, so if you just need some special processing and do not need to change the
+    presentation layer, use that.</p>
+<h4>Table 1: A table the summarizes what each servlet does, and when transaction filtering/presentation is invoked</h4>
+<table border="2">
+    <thead>
+    <tr>
+        <td>Servlet name</td>
+        <td>Purpose</td>
+        <td>Transaction filtering</td>
+        <td>Presentation state</td>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>RegistrationServlet</td>
+        <td>Handles registration request for the service.</td>
+        <td>preprocess:invoked immediately before prepare. Note there is no parameter map or transaction for this, so
+            these are null
+        </td>
+        <td>prepare:invoked before anything else. First call in the servlet</td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td>postprocess:invoked immediately before present. There is no parameter map or transaction either.</td>
+        <td>present:invoked immediately before displaying a page.</td>
+    </tr>
+    <tr>
+        <td>InitServlet</td>
+        <td>Starts the delegation process. Sets initial state and issues a token.</td>
+        <td>preprocess: invoked after the request for a token has been made internally.</td>
+        <td>--</td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td>postprocess: invoked immediately before return, after writing to the output stream.</td>
+        <td>--</td>
+    </tr>
+    <tr>
+        <td>AuthorizationServlet</td>
+        <td>Authentication with MyProxy. The cert is fetched. The user is redirected to the callback url at the end.
+        </td>
+        <td>preprocess:invoked after getting the username and password, immediately before fetching the cert</td>
+        <td>prepare:invoked as soon as the state is determined and the pending transaction has been retrieved. State is
+            set depending upon user action -- see the documentation for state codes if this is of interest.
+        </td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td>postprocess:invoked immediately before invoking present</td>
+        <td>present:invoked immediately before page display. This mostly just forwards to the correct JSP page.</td>
+    </tr>
+    <tr>
+        <td>AccessTokenServlet</td>
+        <td>Issues an access token so the client can retrieve a certificate.</td>
+        <td>preprocess:invoked as soon as the transaction is found to be valid, but before the request is parsed, so the
+            paramter map is null
+        </td>
+        <td>--</td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td>postprocess:invoked after the access token has been issued and the transaction state has been updated. This
+            is the last call in the servlet. The stream has been written at this point.
+        </td>
+        <td>--</td>
+    </tr>
+    <tr>
+        <td>CertServlet</td>
+        <td>Retrieves the certificate that has been previously fetched and returns it to the client.</td>
+        <td>preprocess:invoked after parsing the servlet request since this is needed to retrieve the transaction, but
+            before the response is written
+        </td>
+        <td>--</td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td>postprocess:invoked immediately before returning, after the response stream is written.</td>
+        <td>--</td>
+    </tr>
+    </tbody>
+</table>
+
+<h3>Example: replacing the cert request.</h3>
+
+<p>Sometimes a service need to customize the cert request. Here is a complete example of how to do that in OA4MP OAuth 1.0a.
+    You would want
+    to intercept the request in the AuthorizationServlet, right before the cert is actually retrieved. Simply override
+    the postprocess method:</p>
+<pre>
+<span style="font-family: courier new,courier; font-size: smaller;">
+package my.package;
+
+import edu.uiuc.ncsa.security.util.pkcs.CertUtil;
+import edu.uiuc.ncsa.security.util.pkcs.KeyUtil;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.OA4MPServiceTransaction;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AuthorizationServlet;
+import java.security.KeyPair;
+
+public void MyAuthServlet extends AuthorizationServlet{
+    @Override
+    public void preprocess(transactionState state) throws Throwable{
+       super.preprocess(state); // required to get certain security headers set in response!
+       OA4MPServiceTransaction t = (OA4MPServiceTransaction) state.getTransaction(); // Here is how to use the utilities to create a new cert request
+       KeyPair kp = KeyUtil.generateKeyPair();
+       t.setCertReq(CertUtil.createCertRequest(kp)); // Note that if you will need the keypair later, you will have to store it at this point.
+       // You can use other information, such as the username or lifetime of the cert
+       getTransactionStore().save(t);
+    }
+}
+</span>
+</pre>
+<p>To use this, deploy this in place of the standard AuthorizationServlet in the deployment descriptor (web.xml
+    file).</p>
+<!--#include virtual="../../footer.html" -->
+
+</body>
+</html>

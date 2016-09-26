@@ -1,0 +1,20 @@
+An exception was encountered.
+
+Error Report:
+------------
+Error: ${message}
+Host: ${host}
+Client: ${client}
+Servlet: ${servlet}
+URL: ${url}
+
+
+Cookies:
+-------
+${cookies}
+
+
+Exception:
+---------
+${stacktrace}
+

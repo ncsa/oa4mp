@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Client Troubleshooting Guide</title>
+    <!--#include virtual="../../head.html" -->
+</head>
+<body class="composite">
+<!--#include virtual="../../header.html" -->
+<h2>Troubleshooting</h2>
+This guide has many of the most common problems people encounter when trying to install or configure a
+client.
+<ul>
+    <li><a href="#password-issue">Why isn't my password for MyProxy working. Nothing has changed.</a>
+    </li>
+    <li>
+        <a href="#ssl-issue">I get a host unverified exception trying to connect to the server.</a>
+    </li>
+    <li>
+        <a href="#connection-refused">I get a connection refused exception trying to connect to the server.</a>
+    </li>
+</ul>
+<h5><a id="password-issue">Why isn't my password for MyProxy working. Nothing has changed.</a></h5>
+PAM ("pluggable authentication module") authentication challenge issue.
+Certain authentication methods (such as Two Factor)
+sometimes require a random challenge be answered. MyProxy does not support these challenges. As such,
+you must log in elsewhere and answer the challenge there before you can log in with MyProxy. This
+is documented <a href="http://grid.ncsa.illinois.edu/myproxy/pam.html#limitations">here</a>.
+
+<h5><a id="ssl-issue">I get a host unverified exception trying to connect to the server.</a></h5>
+Host verification is enforced. If a server's name does not match exactly then SSL
+will reject the attempt to connect.This means that the server's certificate is incorrect and the issue lies
+at their end.
+
+<h5><a id="connection-refused">I get a connection refused exception trying to connect to the server.</a></h5>
+"Connection refused" means that your client is not trusted by the server.
+This might be because of several issues, but it all boils down to one thing: your client does not have a certificate
+that the server trusts. If the server has a self-signed cert, then the server administrators must make the client
+aware of this and issue certs appropriately.
+once the client has a certificate, specify it for the client using the <a href="common/configuration/keystore.xhtml">keystore</a>
+configuration.
+<!--#include virtual="../../footer.html" -->
+
+</body>
+</html>

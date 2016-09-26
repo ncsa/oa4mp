@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>edu.uiuc.ncsa.myproxy</groupId>
+        <artifactId>myproxy</artifactId>
+        <version>3.4-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>oa4mp-client-loader-oauth2</artifactId>
+    <name>OAuth 2/Open ID Connect support for the client</name>
+    <packaging>jar</packaging>
+    <dependencies>
+        <dependency>
+            <groupId>edu.uiuc.ncsa.myproxy</groupId>
+            <artifactId>oa4mp-client-test</artifactId>
+            <version>3.4-SNAPSHOT</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>edu.uiuc.ncsa.myproxy</groupId>
+            <artifactId>oa4mp-client-api</artifactId>
+            <version>3.4-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>edu.uiuc.ncsa.security.delegation</groupId>
+            <artifactId>ncsa-security-delegation-common</artifactId>
+            <version>3.4-SNAPSHOT</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>edu.uiuc.ncsa.security</groupId>
+            <artifactId>ncsa-security-core</artifactId>
+            <version>3.4-SNAPSHOT</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>edu.uiuc.ncsa.security</groupId>
+            <artifactId>ncsa-security-util</artifactId>
+            <version>3.4-SNAPSHOT</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>edu.uiuc.ncsa.security</groupId>
+            <artifactId>ncsa-security-servlet</artifactId>
+            <version>3.4-SNAPSHOT</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>edu.uiuc.ncsa.myproxy</groupId>
+            <artifactId>myproxy-logon</artifactId>
+            <version>3.4-SNAPSHOT</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>edu.uiuc.ncsa.security.delegation</groupId>
+            <artifactId>ncsa-security-oauth-2.0</artifactId>
+            <version>3.4-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>2.5</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+       <finalName>client2</finalName>
+    </build>
+</project>

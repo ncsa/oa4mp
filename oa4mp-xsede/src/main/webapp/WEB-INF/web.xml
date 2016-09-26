@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+                  http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+         version="2.5">
+
+<!-- pointless comment to force a n svn commit -->
+
+    <display-name>XSEDE OAuth for MyProxy</display-name>
+    <!--what gets put in the browser's title bar -->
+    <servlet>
+        <servlet-name>initiate</servlet-name>
+        <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.servlet.InitServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>initiate</servlet-name>
+        <url-pattern>/initiate</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>accessToken</servlet-name>
+        <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.servlet.AccessTokenServlet</servlet-class>
+        <load-on-startup>0</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>accessToken</servlet-name>
+        <url-pattern>/token</url-pattern>
+    </servlet-mapping>
+
+
+    <servlet>
+        <servlet-name>getCert</servlet-name>
+        <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.servlet.ACS2Impl</servlet-class>
+
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>getCert</servlet-name>
+        <url-pattern>/getcert</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>error</servlet-name>
+        <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.ErrorServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>error</servlet-name>
+        <url-pattern>/error</url-pattern>
+    </servlet-mapping>
+
+
+    <servlet>
+        <servlet-name>authorize</servlet-name>
+
+        <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.servlet.AbstractAuthorizationServletImpl</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>authorize</servlet-name>
+        <url-pattern>/authorize</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>clientVetting</servlet-name>
+        <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.RegistrationServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>clientVetting</servlet-name>
+        <url-pattern>/register</url-pattern>
+    </servlet-mapping>
+
+    <welcome-file-list>
+        <welcome-file>
+            index.html <!--default file to be displayed at http://foo.com-->
+        </welcome-file>
+
+    </welcome-file-list>
+
+    <resource-ref>
+        <description>
+            Resource reference to a factory for javax.mail.Session
+            instances that may be used for sending electronic mail
+            messages, preconfigured to connect to the appropriate
+            SMTP server.
+        </description>
+        <res-ref-name>mail/Session</res-ref-name>
+        <res-type>javax.mail.Session</res-type>
+        <res-auth>Container</res-auth>
+    </resource-ref>
+
+    <error-page>
+            <exception-type>edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.TooManyRequestsException</exception-type>
+            <location>/tooManyClientRequests.jsp</location>
+        </error-page>
+
+    <listener>
+        <listener-class>edu.uiuc.ncsa.myproxy.oa4mp.loader.OA4MPBootstrapper</listener-class>
+    </listener>
+
+
+</web-app>
+

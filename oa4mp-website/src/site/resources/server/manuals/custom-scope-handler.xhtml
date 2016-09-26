@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Writing a custom scope handler</title>
+    <!--#include virtual="../../head.html" -->
+</head>
+<body class="composite">
+<!--#include virtual="../../header.html" -->
+<h2>A custom scope handler</h2>
+
+<p>If you wish to add support to an OA4MP OIDC server, you may do this by
+    specifying <a href="common/configuration/scopes.xhtml">scopes</a> that
+    are supported in the server configuration file. The client must request these.
+    If you do not specify the additional scopes in the server configuration, then requests for these
+    from a client will cause the server will reject the request. This blurb is about implementing your own handler. </p>
+
+<p>
+    Remember that  if you specify a custom scope handler, it will always be called and replaces the
+    BasicScopeHandler which is the default. Even if you do not have a custom scope, this will let
+    you completely rewrite all claims.
+</p>
+
+<p>The lifecycle of the handler is simple. It is created at server startup and is called whenever
+    needed. This may either be a full implementation of the
+    <a href="http://grid.ncsa.illinois.edu/myproxy/oauth/apidocs/edu/uiuc/ncsa/security/oauth_2_0/server/ScopeHandler.html">ScopeHandler</a>
+    interface or, more easily, an extension of the
+    <a href="http://grid.ncsa.illinois.edu/myproxy/oauth/apidocs/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/servlet/BasicScopeHandler.html">BasicScopeHandler</a>
+    class.
+    In both cases you implement or override the process methods. There are two of these:</p>
+<pre>
+  public UserInfo process(UserInfo userInfo, ServiceTransaction transaction) throws UnsupportedScopeException;
+  public UserInfo process(UserInfo userInfo, HttpServletRequest request, ServiceTransaction transaction) throws UnsupportedScopeException;
+</pre>
+<p>This receives a <a
+        href="http://grid.ncsa.illinois.edu/myproxy/oauth/apidocs/edu/uiuc/ncsa/security/oauth_2_0/UserInfo.html">UserInfo</a>
+    object which has been populated by the server with the default claims. The
+    service transaction has all of the information that the system has on the current user. Simply set whatever
+    values you want returned in the UserInfo object and return that. If you choose the method with the servlet request,
+    then you will be passed the current request, which includes the headers and other information.</p>
+
+<p>Note especially that the UserInfo object has many, many convenience mutators. If you have some specific claims
+    you need to return, simply set them using the put methods or if you need something more
+    exotic, get the underlying JSON object with the getMap call and set the
+    key/value pair directly. The response to the client will take the underlying JSON object and serialize it.</p>
+
+<h3>Loading your custom handler.</h3>
+
+<p>The easiest way to do this is to extends the environment and simply specify the handler. This consists of 4 steps as
+    follows</p>
+<ol>
+    <li><i>Either</i> implement the <a
+            href="http://grid.ncsa.illinois.edu/myproxy/oauth/apidocs/edu/uiuc/ncsa/security/oauth_2_0/server/ScopeHandler.html">ScopeHandler</a>
+        interface, or extend the <a
+                href="http://grid.ncsa.illinois.edu/myproxy/oauth/apidocs/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/servlet/BasicScopeHandler.html">BasicScopeHandler</a>
+    <pre>
+        public class MyScopeHandler extends BasicScopeHandler{
+
+        @Override
+           public UserInfo process(UserInfo userInfo, ServiceTransaction transaction) throws UnsupportedScopeException {
+            // Set whatever you need in the userInfo object then return it
+            return userInfo;
+           }
+        @Override
+            public UserInfo process(UserInfo userInfo, HttpServletRequest request, ServiceTransaction transaction) throws UnsupportedScopeException {
+             // Set whatever you need in the userInfo object then return it
+             return userInfo;
+            }
+        }
+    </pre>
+        This example is functionally equivalent to the BasicScopeHandler. The ServiceTransaction passed in is, in point
+        of fact, an instance of <a
+                href="http://grid.ncsa.illinois.edu/myproxy/oauth/site/apidocs/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/OA2ServiceTransaction.html">OA2ServiceTransaction</a>,
+        so you can see what information is available to the method. Note that not every property in the service
+        transaction
+        will be available. <b>This also means that the current user's name is available in the service transaction.</b>
+        For instance, the user might not have gotten a protected assest (i.e. a certificate) before
+        the call to the userinfo endpoint was made. The transaction also has a getScopes() call. This returns the scopes
+        requested by the user for this specific transaction.
+    </li>
+    <li>Extend <a
+            href="http://grid.ncsa.illinois.edu/myproxy/oauth/apidocs/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/loader/OA2ConfigurationLoader.html">OA2ConfigurationLoader</a>
+        and override <a
+                href="http://grid.ncsa.illinois.edu/myproxy/oauth/apidocs/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/loader/OA2ConfigurationLoader.html#getScopeHandler()">getScopeHandler</a>,
+        e.g.
+    <pre>
+        public class MyConfigurationLoader&lt;T extends OA2SE&gt; extends OA2ConfigurationLoader&lt;T&gt;{
+            public MyLoader(ConfigurationNode node){
+                 super.node();
+            }
+            public myLoader(ConfigurationNode node, MyLoggingFacade logger) {
+                 super(node, logger);
+            }
+
+        @Override
+            public ScopeHandler getScopeHandler() throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+                 scopeHandler = new MyScopeHandler();
+                 scopeHandler.setScopes(getScopes()); // this is a complete list of scopes from the configuration file, if needed.
+            }
+        }
+    </pre>
+    </li>
+    <li>Extend the <a
+            href="http://grid.ncsa.illinois.edu/myproxy/oauth/apidocs/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/loader/OA2Bootstrapper.html">OA42Bootstrapper</a>
+        to point to this, e.g.:
+    <pre>
+        public class MyBootstrapper extends OA2Bootstrapper{
+        @Override
+          public ConfigurationLoader getConfigurationLoader(ConfigurationNode node) throws MyConfigurationException {
+              return new MyLoader(node);
+          }
+        }
+    </pre>
+    </li>
+    <li>In your web.xml file, Point Tomcat at your bootstrapper:
+    <pre>
+        &lt;listener&gt;
+           &lt;listener-class&gt;path.to.MyBootstrapper&lt;/listener-class&gt;
+        &lt;/listener&gt;
+    </pre>
+    </li>
+</ol>
+<p>When the server boots, it should find everything and your handler should be used. </p>
+<!--#include virtual="../../footer.html" -->
+</body>
+</html>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>The Memory Store Configuration</title>
+    <!--#include virtual="../../head.html" -->
+</head>
+<body class="composite">
+<!--#include virtual="../../header.html" -->
+<h2>The Memory Store Configuration.</h2>
+
+<p>Scope: client and server, all versions.</p>
+<p>This will persist items in system memory. This is extremely useful in cases where long-term storage is not required
+    or for a quick testing environment.</p>
+
+<h3>A Server Example</h3>
+
+<p>There are no attributes to configure. A very minimalist example of a server configuration would be</p>
+<pre>
+&lt;config&gt;
+    &lt;service name="default-cfg"&gt;
+    &lt;myproxy host="myproxy.teragrid.org" port="7514"/&gt;
+    &lt;/service&gt;
+&lt;/config&gt;
+</pre>
+
+<p>Would point to a service on localhost and use the given MyProxy service. All information would be stored in memory,
+    and there is no mail notifications enabled, so this is not useful for production, but would allow for a very quick
+    setup and test.</p>
+
+<h3>A Client Example</h3>
+
+An example for a client where assets are to be kept in memory would be
+<pre>
+&lt;config&gt;
+    &lt;client name="my-cfg"&gt;
+       &lt;memoryStore&gt;
+          &lt;<a href="client/dtd/asset-store.xhtml">assetStore</a>/&gt;
+       &lt;/memoryStore&gt;
+       &lt;!-- other stuff --&gt;
+    &lt;/client&gt;
+&lt;/config&gt;
+</pre>
+
+
+<h3>Default Memory Storage</h3>
+
+<p>This is enabled, which means that if a component does not have explicit storage of some sort declared, a memory store
+    will be used. If you wish to disable this feature, you may do so by setting the following flag in your
+    configuration:</p>
+
+For servers:
+<pre>
+    &lt;config&gt;
+    &lt;service name="my-config"
+            disableDefaultStores="true"
+    &gt;
+</pre>
+
+<br/>etc...
+
+For Clients
+
+<pre>
+    &lt;config&gt;
+    &lt;client name="my-config"
+            disableDefaultStores="true"
+    &gt;
+</pre>
+
+<p>It is generally advisable to disable this feature in production environments since if there is a missing storage
+    configuration an error will be generated. If you wish to use a memory store, simply configure one explicity.</p>
+<!--#include virtual="../../footer.html" -->
+
+</body>
+</html>

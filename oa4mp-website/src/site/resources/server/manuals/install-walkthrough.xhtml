@@ -1,0 +1,410 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Sample Server Install Walkthrough</title>
+    <!--#include virtual="../../head.html" -->
+</head>
+<body class="composite">
+<!--#include virtual="../../header.html" -->
+
+<h1>OAuth 1.0a for MyProxy: Installation Walk-through</h1>
+
+<p>The following walk-through illustrates how to locally install, configure, and run an
+    OAuth 1.0a for MyProxy <a href="client/index.xhtml" target="_blank">client</a> and
+    <a href="server/index.xhtml" target="_blank">server</a> as a regular system user.
+    This not how to set it up in a production system or even a standard Tomcat installation.
+    Pay especial attention to the environment variables. You must set them each time manually
+    before you run the client and server.
+</p>
+
+<h2>Prerequisites</h2>
+
+<p>First we set up our Java and MyProxy environments.</p>
+
+<h3>Java and Tomcat</h3>
+
+<p>The OAuth for MyProxy client and server are Java web applications, so first we need to configure our Tomcat web
+    application container.</p>
+
+<p>Confirm that Java is installed:</p>
+<pre>$ java -version
+java version "1.8.0_05"
+</pre>
+<p>Install <a href="https://tomcat.apache.org/" target="_blank">Tomcat</a> 6 or 7:</p>
+<pre>
+$ tar xvfz ~/Downloads/apache-tomcat-6.0.35.tar.gz
+$ cd apache-tomcat-7.0.63
+$ export CATALINA_HOME=`pwd`
+$ export CATALINA_BASE=$CATALINA_HOME
+# start with an empty webapps directory
+$ mv webapps webapps.orig
+$ mkdir webapps
+</pre>
+<p>Next configure <a href="https://tomcat.apache.org/tomcat-6.0-doc/ssl-howto.html" target="_blank">Tomcat SSL</a>. We
+    use a self-signed X 509 certificate in this walk-through, but a production install should use an SSL certificate
+    that will
+    be trusted by web browsers and Java applications by default (i.e., from a commercial certification authority).</p>
+<pre>
+$ mkdir ~/oa4mp
+$ cd ~/oa4mp
+$ keytool -genkeypair -alias tomcat -keyalg RSA -dname "cn=localhost" -keypass changeit -storepass changeit
+$ keytool -exportcert -alias tomcat -storepass changeit -file tomcat.cer
+$ keytool -importcert -v -trustcacerts -alias tomcat -file tomcat.cer -keystore cacerts.jks -keypass changeit -storepass changeit
+$ export CATALINA_OPTS="-Djavax.net.ssl.trustStore=$HOME/oa4mp/cacerts.jks" # trust our self-signed certificate
+$ vi $CATALINA_BASE/conf/server.xml # uncomment the "SSL HTTP/1.1 Connector" entry</pre>
+<p>Next enable Tomcat <a title="OAuth for MyProxy: Email Notifications"
+                         href="server/configuration/server-email.xhtml"
+                         target="_blank">email support</a>:
+
+</p>
+
+<p>
+    The installation of the server requires that Java mail be installed.
+</p>
+<pre>
+$ cd $CATALINA_HOME
+$ unzip ~/Downloads/javamail1_4_5.zip
+$ cp -p javamail-1.4.5/mail.jar lib
+$ vi $CATALINA_HOME/conf/context.xml # add javax.mail.Session Resource configuration
+$ tail -2 $CATALINA_HOME/conf/context.xml
+&lt;Resource name="mail/Session" type="javax.mail.Session" auth="Container"/&gt;
+&lt;/Context&gt;</pre>
+<h3>MyProxy</h3>
+
+<p>The OAuth for MyProxy server acts as a front-end to an existing <a href="http://grid.ncsa.illinois.edu/myproxy"
+                                                                      target="_blank">MyProxy</a> server. The OAuth
+    server can run on the same system as the MyProxy server or they can run on separate systems. To connect securely to
+    the MyProxy server, the OAuth for MyProxy install must include a trusted CA certificates directory (in <code>/etc/grid-security/certificates</code>
+    or <code>$HOME/.globus/certificates</code>). Since we're installing as a regular system user, we use the <code>myproxy-get-trustroots</code>
+    command to create our <code>$HOME/.globus/certificates</code> directory.
+    Alternatively, you can manually setup a <code>$HOME/.globus/certificates</code> directory using a CA distribution
+    from <a href="https://dist.eugridpma.info/distribution/igtf/current/">IGTF</a> or <a
+            href="https://www.xsede.org/security">XSEDE</a> or another trusted source. You will have to do this anyway
+    if your platform does not have a myproxy client available.</p>
+<pre>
+$ myproxy-get-trustroots -s myproxy.example.edu
+Bootstrapping MyProxy server root of trust.
+New trusted MyProxy server: /C=US/O=National Center for Supercomputing Applications/OU=Services/CN=myproxy.example.edu
+New trusted CA (9b95bbf2.0): /C=US/O=National Center for Supercomputing Applications/OU=Certificate Authorities/CN=CACL
+Trust roots have been installed in /Users/username/.globus/certificates/.
+</pre>
+
+<h2>Oauth 1 Server Setup</h2>
+
+<p>Deploy the server webapp:</p>
+<pre>$ cd $CATALINA_HOME/webapps
+$ curl -sO http://svn.code.sf.net/p/cilogon/code/tags/latest/server/oauth.war
+</pre>
+
+<p>Next, <a href="server/configuration/config-index.xhtml">configure the server</a>:</p>
+<pre>$ vi $CATALINA_HOME/conf/web.xml # add oa4mp:server.config.file parameter
+$ tail -9 $CATALINA_HOME/conf/web.xml
+&lt;context-param&gt;
+  &lt;param-name&gt;oa4mp:server.config.file&lt;/param-name&gt;
+  &lt;param-value&gt;/Users/username/oa4mp/server-cfg.xml&lt;/param-value&gt;
+&lt;/context-param&gt;
+
+&lt;context-param&gt;
+    &lt;param-name&gt;oa4mp:server.config.name&lt;/param-name&gt;
+    &lt;param-value&gt;default&lt;/param-value&gt;
+&lt;/context-param&gt;
+
+&lt;/web-app&gt;
+$ mkdir -p ~/oa4mp/storage
+$ vi ~/oa4mp/server-cfg.xml # set myproxy-server hostname, fileStore path, mail config
+$ cat ~/oa4mp/server-cfg.xml # OAuth server on localhost, myproxy-server on myproxy.example.edu
+&lt;config&gt;
+   &lt;service address="https://localhost:8443/oauth" name="default"&gt;
+      &lt;fileStore path="/Users/username/oa4mp/storage"&gt;
+        &lt;clients/&gt;
+        &lt;clientApprovals/&gt;
+      &lt;/fileStore&gt;
+      &lt;myproxy host="myproxy.example.edu" port="7512"/&gt;
+      &lt;mail enabled="true"
+          server="smtp.example.edu"
+          username="username@example.edu"
+          recipients="username@example.edu"&gt;
+          &lt;messageTemplate&gt;/Users/username/oa4mp/message.txt&lt;/messageTemplate&gt;
+          &lt;subjectTemplate&gt;/Users/username/oa4mp/subject.txt&lt;/subjectTemplate&gt;
+      &lt;/mail&gt;
+   &lt;/service&gt;
+&lt;/config&gt;
+$ vi ~/oa4mp/message.txt
+$ cat ~/oa4mp/message.txt
+# A sample template
+A client has requested approval.
+
+Name: ${name}
+Contact email: ${email}
+Home uri: ${homeUri}
+Failure uri:${failureUri}
+Creation time: ${creationTime}
+Generated identifier: ${identifier}
+
+If you approve this request, you should send a notice
+to the contact email and include the generated identifier.
+$ vi ~/oa4mp/subject.txt
+$ cat ~/oa4mp/subject.txt
+Client approval request received for ${name}
+$ $CATALINA_HOME/bin/startup.sh # start up the server
+</pre>
+<h2>Oauth1 Client Setup</h2>
+
+<p>Next, <a href="client/manuals/registering-with-a-server.xhtml">registering the client</a>. The
+    first step is to generate the client keys:</p>
+<pre>$ cd ~/oa4mp
+$ openssl genrsa -out oauth-privkey.pem 2048
+$ chmod 0600 oauth-privkey.pem
+$ openssl rsa -in oauth-privkey.pem -pubout -out oauth-pubkey.pem
+$ openssl pkcs8 -topk8 -in oauth-privkey.pem -nocrypt -out oauth-privkey.pk8
+$ chmod 0600 oauth-privkey.pk8
+</pre>
+<p>Then submit the web form at <a href="https://localhost:8443/oauth/register">https://localhost:8443/oauth/register</a>
+    to register the client and get a client ID. Paste in the contents of <code>~/oa4mp/oauth-pubkey.pem</code> in the
+    "Public Key" field.</p>
+
+<p>Next, <a href="client/configuration/index.xhtml">configure the client</a>, entering
+    the client ID value given as output from the client registration web form:</p>
+<pre>$ vi $CATALINA_HOME/conf/web.xml # add oa4mp:client.config.file parameter
+$ tail -5 $CATALINA_HOME/conf/web.xml
+&lt;context-param&gt;
+  &lt;param-name&gt;oa4mp:client.config.file&lt;/param-name&gt;
+  &lt;param-value&gt;/Users/username/oa4mp/client-cfg.xml&lt;/param-value&gt;
+&lt;/context-param&gt;
+&lt;/web-app&gt;
+$ vi ~/oa4mp/client-cfg.xml
+$ cat ~/oa4mp/client-cfg.xml
+&lt;config&gt;
+&lt;client&gt;
+   &lt;callbackUri&gt;https://localhost:8443/client/ready&lt;/callbackUri&gt;
+   &lt;privateKeyFile&gt;/Users/username/oa4mp/oauth-privkey.pk8&lt;/privateKeyFile&gt;
+   &lt;publicKeyFile&gt;/Users/username/oa4mp/oauth-pubkey.pem&lt;/publicKeyFile&gt;
+   &lt;serviceUri&gt;https://localhost:8443/oauth&lt;/serviceUri&gt;
+   &lt;id&gt;myproxy:oa4mp,2012:/client/21653006d3ffb1344480e06e97207578&lt;/id&gt;
+   &lt;showRedirectPage&gt;true&lt;/showRedirectPage&gt;
+&lt;/client&gt;
+&lt;/config&gt;
+</pre>
+Note that the last option for <a href="client/manuals/parameters.xhtml">showRedirectPage</a> will pause the
+control immediately after
+the first call to the server and display a url for where the client would normally be redirected and
+the user's private key. This is good for testing but should not be used in production servers.
+The default is never to show this page, so simply removing this element will allow for the redirect
+immediately.
+
+
+<h2>Oauth1 Client Approval</h2>
+
+<p>Next we need to <a href="server/manuals/cli.xhtml">approve the client
+    registration request with the command-line tool</a>:</p>
+<pre>$ cd ~/oa4mp
+$ curl -sO http://svn.code.sf.net/p/cilogon/code/tags/latest/server/oa4mp-cli.jar
+$ curl -sO http://svn.code.sf.net/p/cilogon/code/tags/latest/server/oa4mp-cli
+</pre>
+<p>You will probably need to edit oa4mp-cli to make the paths work on your system.
+    You will also need to either create a config file or point it at the server config
+    file that you are already using. We recommend the latter.</p>
+
+<p>
+    Edit oa4mp-cli to point to the right paths for the config file and jar, and make sure
+    that the permission is set to executable. Run the tool, passing in the name of the
+    configuration as a parameter ("default" was the name in our example server
+    configuration).</p>
+<pre>
+$ ./oa4mp-cli default
+oa4mp >use clients
+clients >ls
+  0. (N) myproxy:oa4mp,2012:/client_id/600019ae306de2049a701144df34ccd3 (Test428)
+  clients >approve 0
+    approver[(null)]:admin
+    approve this[n]:y
+    save this approval record [y/n]?y
+    approval saved
+  clients >exit
+  oa4mp >exit
+</pre>
+
+<p>Finally, Deploy the client webapp:</p>
+<pre>$ cd $CATALINA_HOME/webapps
+$ curl -sO http://svn.code.sf.net/p/cilogon/code/tags/latest/client/client.war
+</pre>
+<h2>All Done!</h2>
+
+<p>If everything went well, the example OAuth for MyProxy client should be running at <a
+        href="https://localhost:8443/client/">https://localhost:8443/client/</a>.</p>
+
+<p>In case of trouble, check <code>$CATALINA_HOME/logs</code>. Post questions/comments to the <a
+        href="http://www.sciencegatewaysecurity.org/discussion">discussion mailing list</a>.</p>
+
+<h2>Oauth2/OIDC Server Setup</h2>
+
+<p>Deploy the server webapp:</p>
+<pre>$ cd $CATALINA_HOME/webapps
+$ curl -sO http://svn.code.sf.net/p/cilogon/code/tags/latest/server/oauth2.war
+</pre>
+
+<p>Next, <a href="server/configuration/config-index.xhtml">configure the server</a>.
+    (Note: Oauth1 and Oauth2 need to use different directories for their filestores, because
+    they use different file formats and different approver tools.)</p>
+<pre>$ vi $CATALINA_HOME/conf/web.xml # add oa4mp:server.config.file parameter
+$ tail -9 $CATALINA_HOME/conf/web.xml
+&lt;context-param&gt;
+    &lt;param-name&gt;oa4mp:oauth2.server.config.file&lt;/param-name&gt;
+    &lt;param-value&gt;/Users/username/oa4mp/server2-cfg.xml&lt;/param-value&gt;
+&lt;/context-param&gt;
+
+&lt;context-param&gt;
+    &lt;param-name&gt;oa4mp:oauth2.server.config.name&lt;/param-name&gt;
+    &lt;param-value&gt;server2-config&lt;/param-value&gt;
+&lt;/context-param&gt;
+&lt;/web-app&gt;
+$ mkdir -p ~/oa4mp/storage
+$ vi ~/oa4mp/server-cfg.xml # set myproxy-server hostname, fileStore path, mail config
+$ cat ~/oa4mp/server-cfg.xml # OAuth server on localhost, myproxy-server on myproxy.example.edu
+&lt;config&gt;
+&lt;service address=&quot;https://localhost:8443/oauth2&quot; name=&quot;server2-config&quot;&gt;
+
+&lt;fileStore path=&quot;/Users/username/oa4mp/storage2&quot;&gt;
+  &lt;clients/&gt;
+  &lt;clientApprovals/&gt;
+&lt;/fileStore&gt;
+&lt;myproxy host="myproxy.example.edu" port="7512"/&gt;
+&lt;mail enabled="true"
+      server="smtp.example.edu"
+      username="username@example.edu"
+      recipients="username@example.edu"&gt;
+  &lt;messageTemplate&gt;/Users/username/oa4mp/message.txt&lt;/messageTemplate&gt;
+  &lt;subjectTemplate&gt;/Users/username/oa4mp/subject.txt&lt;/subjectTemplate&gt;
+&lt;/mail&gt;
+&lt;/service&gt;
+&lt;/config&gt;
+$ vi ~/oa4mp/message.txt
+$ cat ~/oa4mp/message.txt
+# A sample template
+A client has requested approval.
+
+Name: ${name}
+Contact email: ${email}
+Home uri: ${homeUri}
+Failure uri:${failureUri}
+Creation time: ${creationTime}
+Generated identifier: ${identifier}
+
+If you approve this request, you should send a notice
+to the contact email and include the generated identifier.
+$ vi ~/oa4mp/subject.txt
+$ cat ~/oa4mp/subject.txt
+Client approval request received for ${name}
+$ $CATALINA_HOME/bin/startup.sh # start up the server
+</pre>
+<h2>Oauth2/OIDC Client Setup</h2>
+
+
+<p>Next, <a href="client/manuals/registering-with-an-oauth2-server.xhtml">registering the client</a>
+    You must submit the web form at <a
+            href="https://localhost:8443/oauth2/register">https://localhost:8443/oauth2/register</a>
+    to register the client and get both a client ID and client secret.</p>
+
+<p>Next, <a href="client/configuration/index.xhtml">configure the client</a>.
+    You must preserve botht he client ID and client secret in the configuration file.
+    Note that the client secret is a single string. Do not add any line breaks or spaces
+    and be aware that some browsers will add these when you copy the secret to the clipboard.
+    A typical example configuration might be
+</p>
+<pre>$ vi $CATALINA_HOME/conf/web.xml # add oa4mp:client.config.file parameter
+$ tail -5 $CATALINA_HOME/conf/web.xml
+&lt;config&gt;
+&lt;client name=&quot;client2-config&quot;&gt;
+   &lt;callbackUri&gt;https://localhost:8443/client2/ready&lt;/callbackUri&gt;
+   &lt;secret&gt;DMfidLiDbA1SfH9in_QoI9tfa48HmOW18ubcOLTPHgMtrJ5G8PnNuq0hQB3E6daRXwSqe9V6O14C7jRwI7KkoM2VSCfTmGrcRJQTRL&lt;/secret&gt;
+   &lt;serviceUri&gt;https://localhost:8443/oauth2&lt;/serviceUri&gt;
+   &lt;authorizeUri&gt;https://localhost:8443/oauth2/authorize&lt;/authorizeUri&gt;
+   &lt;id&gt;myproxy:oa4mp,2012:/client/21653006d3ffb1344480e06e97207578&lt;/id&gt;
+   &lt;showRedirectPage&gt;true&lt;/showRedirectPage&gt;
+&lt;/client&gt;
+&lt;/config&gt;
+</pre>
+Note that the last option for <a href="client/manuals/parameters.xhtml">showRedirectPage</a> will pause the
+control immediately after
+the first call to the server and display a url for where the client would normally be redirected and
+the user's private key. This is good for testing but should not be used in production servers.
+The default is never to show this page, so simply removing this element will allow for the redirect
+immediately.
+<p>Restart Tomcat so the new client configuration takes effect:</p>
+<pre>$ $CATALINA_HOME/bin/shutdown.sh
+$ $CATALINA_HOME/bin/startup.sh
+</pre>
+<h2>Oauth2/OIDC Client Approval</h2>
+
+<p>Next we need to <a href="server/manuals/cli.xhtml">approve the client
+    registration request with the command-line tool</a>:</p>
+<pre>$ cd ~/oa4mp
+$ curl -sO http://svn.code.sf.net/p/cilogon/code/tags/latest/server/oa2-cli.jar
+$ curl -sO http://svn.code.sf.net/p/cilogon/code/tags/latest/server/oa2-cli
+</pre>
+<p>You will probably need to edit oa4mp-cli to make the paths work on your system.
+    You will also need to either create a config file or point it at the server config
+    file that you are already using. We recommend the latter.</p>
+
+<p>
+    Edit oa4mp-cli to point to the right paths for the config file and jar, and make sure
+    that the permission is set to executable. Run the tool, passing in the name of the
+    configuration as a parameter ("server2-config" in the example).</p>
+<pre>
+$ ./oa2-cli server2-config
+oa2 >use clients
+clients >ls
+  0. (N) myproxy:oa4mp,2012:/client_id/600019ae306de2049a701144df34ccd3 (Test428)
+  clients >approve 0
+    approver[(null)]:admin
+    approve this[n]:y
+    save this approval record [y/n]?y
+    approval saved
+  clients >exit
+  oa2 >exit
+</pre>
+<p>Deploy the client webapp:</p>
+<pre>$ cd $CATALINA_HOME/webapps
+$ curl -sO http://svn.code.sf.net/p/cilogon/code/tags/latest/client/client2.war
+</pre>
+<h2>All Done!</h2>
+
+<p>If everything went well, the example OAuth for MyProxy client should be running at <a
+        href="https://localhost:8443/client2/">https://localhost:8443/client2/</a>.</p>
+
+
+<h2>Running Without CATALINA_OPTS</h2>
+This walkthrough will get you up to speed in a hurry. Should you wish to run the server locally regularly, you will
+need to configure the Tomcat SSL connector. Here is a sample:
+<pre>
+&lt;Connector port="8443" protocol="HTTP/1.1" SSLEnabled="true"
+            URIEncoding="UTF-8"
+            maxThreads="150" scheme="https" secure="true"
+            keystoreFile="${user.home}/oa4mp/tomcat.cer"
+            keystorePass="changeit"
+            keystoreType="PKCS12"
+            truststoreFile="${user.home}/certs/cacerts.jks"
+            truststorePass="changeit"
+            truststoreType="JKS"
+            clientAuth="false" sslProtocol="TLS" /&gt;
+</pre>
+
+<p>For the client, you should simply add a keystore section to your client configuration (works with
+    all versions of OA4MP) as described <a href="common/configuration/keystore.xhtml">here</a>. This
+    is the platform independent way to make the client aware of a certificate.
+</p>
+
+<p>This walkthrough assumes unix (CentOS, Unbuntu server). If you wish to try this under Windows or some other
+    more exotic version of unix (such as Solaris) you should bee aware that setting the
+    certs in CATALINA_OPTS will not be read without more tinkering with the
+    Tomcat startup scripts. In that case the easiest thing to do is to
+    simply add a keystore section to your client configuration.</p>
+
+
+<!--#include virtual="../../footer.html" -->
+
+</body>
+</html>

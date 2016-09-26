@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Manually Approving Clients</title>
+    <!--#include virtual="../../head.html" -->
+</head>
+<body class="composite">
+<!--#include virtual="../../header.html" -->
+ <h1>This has been deprecated in favor of new <a href="server/manuals/cli.xhtml">command line tools</a>. At some point it will be removed.</h1>
+<h1>Manually Approving a Client</h1>
+
+<p>There may be times when you need to manage approval for a client. Initially, clients do not have access approved. It
+    may also be the case someday that a client’s security is compromised and you need to disallow all actions with it.
+    This section describes how to manually change the approval of a client. In the initial release of OAuth for MyProxy,
+    there are two methods for approving client request. The first is to use a command line tool that is supplied, the
+    second which only works for mysql-backed stores that directly accesses the database. Administrators are strongly
+    encouraged, if possible, to configure email notifications in all cases.</p>
+
+<h2>Using the CLI (command line interface)</h2>
+
+<p>The CLI allows an administrator to approve or disapprove a client from a the command line, independent of whether the
+    server is running. The two methods are directly, in which the CLI accesses the store and updates it and indirectly,
+    in which the CLI deposits a request that the server picks up. In the indirect case, the server polls a given
+    directory. This is transparent and is taken from the server's configuration. The CLI works with all stores.</p>
+
+<h2>Sample sessions</h2>
+
+<p>The easiest way to run the CLI is to check out the module oa4mp-server-api (see the <a
+        title="Getting started with the OAuth for MyProxy Server"
+        href="server/maunals/getting-started.xhtml">getting
+    started</a> page for how to download it) from svn and build it, then start it from the command line. The build
+    creates <em>two</em> jars, <span style="font-family: arial,helvetica,sans-serif;">oa4mp-approver.jar</span>, which
+    is the actual program, and <span style="font-family: arial,helvetica,sans-serif;">oa4mp-server-api-xxx.jar</span>
+    which is the current build. As with all command line java programs, you need to set the class path
+    (<strong>Note</strong>: This code currently lives in the main trunk of svn. Make sure you have the correct copy. Two
+    samples should suffice. Note that maven will generate its usual informational messages which I am omitting.</p>
+
+<p>Running the jar. There is currently one way to get a jar:</p>
+<ul>
+    <li>download the source code and run it from within maven</li>
+</ul>
+<p><span style="font-family: courier new,courier; font-size: smaller;">&gt; mvn clean install -P approver<br/></span>
+</p>
+
+<p><span style="font-family: courier new,courier; font-size: smaller;">&gt; cd target </span></p>
+
+<p><span style="font-family: courier new,courier; font-size: smaller;">&gt; java -jar oa4mp-approver.jar -cfg /home/ncsa/dev/csd/config/oa4mp-server.xml  -name in-memory</span>
+</p>
+
+<p> This points it to the server config file, <span
+        style="font-family: arial,helvetica,sans-serif;">oa4mp-server.xml</span> and the tells it to invoke the named
+    configuration in that file called <span style="font-family: arial,helvetica,sans-serif;">in-memory</span>. In this
+    case, the configuration file points to a memory store, there will not be any approvals found. You should see the
+    following scroll past:</p>
+
+
+<p><span style="font-family: courier new,courier; font-size: smaller;">logging to file /home/ncsa/dev/main/ncsa-security-all/myproxy/oa4mp-server-api/log.xml</span>
+</p>
+
+<p style="font-family: courier new,courier; font-size: smaller;"><span
+        style="font-family: courier new,courier; font-size: smaller;">(No entries found. You will need to manually enter the id.)</span><br/><span
+        style="font-family: courier new,courier; font-size: smaller;">Enter the number of the client to approve or disapprove, OR, enter an id, starting with a /</span><br/><span
+        style="color: #3366ff;"><strong><span style="font-family: courier new,courier; font-size: smaller;">/myproxy:oa4mp,2012:/client/77be5883050848c7bb45484cb8567c8e</span></strong></span><br/><span
+        style="font-family: courier new,courier; font-size: smaller;">Enter your approver name:</span><br/><span
+        style="color: #3366ff;"><strong><span style="font-family: courier new,courier; font-size: smaller;">jeff</span></strong></span><br/><span
+        style="font-family: courier new,courier; font-size: smaller;">Enter Approve or Deny (A/D)</span><br/><span
+        style="color: #3366ff;"><strong><span
+        style="font-family: courier new,courier; font-size: smaller;">A</span></strong></span><br/><span
+        style="font-family: courier new,courier; font-size: smaller;">Commit changes? (y/n)</span><br/><span
+        style="color: #3366ff;"><strong><span
+        style="font-family: courier new,courier; font-size: smaller;">y</span></strong></span></p>
+
+<p>My responses are in bold-faced. The server <strong><em>must</em></strong> have polling configured or the approval
+    will never be found.</p>
+
+<h3>Example against a file store.</h3>
+<pre>
+&gt; java -cp oa4mp-server-api-1.0.6.jar -jar oa4mp-approver.jar -cfg /home/ncsa/dev/csd/config/oa4mp-server.xml  -name filestore
+logging to file /home/ncsa/dev/main/ncsa-security-all/myproxy/oa4mp-server-api/log.xml
+
+0. (D) myproxy:oa4mp,2012:/client/3af1b61bae834e9e373bbd774535ef43
+1. (A) myproxy:oa4mp,2012:/client/77be5883050848c7bb45484cb8567c8e
+2. (A) myproxy:oa4mp,2012:/client/2ed8e10c4932b284de9fd3d8bdcfc830
+3. (A) myproxy:oa4mp,2012:/client/29d1d2b95a29848f77b22b0af129b611
+Enter the number of the client to approve or disapprove, OR, enter an id, starting with a /
+<strong>0</strong>
+Enter your approver name:
+<strong>jeff</strong>
+Enter Approve or Deny (A/D)
+<strong>A</strong>
+Commit changes? (y/n)
+<strong>y</strong>
+</pre>
+<p>This lists all the approvals in the store and indicates with an A or D if the request has been approved or
+    disapproved. Entering the line number (these are printed on the left) will select the record. You may approve an
+    pending request or disapprove it. Selecting y at the end commits the changes. This also works for any SQL-backed
+    store as well.</p>
+
+
+<h3>Enabling polling on the service.</h3>
+
+<p>To allow for client approval polling in the service, you need to set a polling directory and, if desired a polling
+    interval (default is 60000 ms or 1 minute.) What is polling? simply put, for stores where there is no way to
+    directly notify the server of approvals (such as a memory or file store),
+    polling tells the server to check for new approvals at a
+    given interval in a specific location. This does, however, work for any configured storage method including SQL stores,
+    so this mechanism can be used generally.
+    Attributes are set in the server configuration file.
+    For instance, here is a server configuration with polling enabled and email notifications off:</p>
+
+<pre>
+&lt;config&gt;
+   &lt;server
+        pollingDirectory="/var/www/config/polling"
+        pollingInterval="5000"/&gt;
+   &lt;-- bunch of other stuff --&gt;
+&lt;/config&gt;
+</pre>
+
+<p>which stores all transactions, request and approvals in memory and specifies a MyProxy server other than localhost.
+    The server polls the directory every 5 seconds, (which is very often indeed.) You should have the <i>same</i>
+    polling directory specified for the CLI and the server. The CLI puts the approvals there, and the server
+    eventually reads them.</p>
+
+<p>If no polling directory is given, then polling is disabled.</p>
+
+<h3>Another method, suitable for testing servers only</h3>
+
+<p>This consists of replacing the RegistrationServlet in the web.xml file with the AutoRegistrationServlet. The effect
+    is to <strong><em>automatically approve</em></strong> every client request. This is an inherently insecure system
+    but is of great use when debugging a server deploy. Administrators should feel free to use this but simply revert to
+    the standard servlet when deployment ready.</p>
+
+<h2>Direct approval for Maria DB and MySQL stores.</h2>
+
+<p>The steps for manually toggling the approval bit in the either Maria DB or MySQL stores are as follows.</p>
+<ul>
+    <li>Log onto a machine that can access Maria DB or MySQL</li>
+</ul>
+<p style="padding-left: 60px;" dir="ltr">Note:Both Maria DB and MySQL allows access per host and localhost access should work but any
+    other should not unless specifically configured to do so.</p>
+<ul>
+    <li>Log in as the approver (the default username in the install script is oa4mp-approver) to the databasse on the machine
+        where the database resides:
+    </li>
+</ul>
+<pre style="padding-left: 60px;" dir="ltr">mysql -u oa4mp-approver -p oauth</pre>
+<p style="padding-left: 60px;" dir="ltr">Note:This sets you to use the oauth database and will prompt your for the
+    approver’s password.</p>
+<ul>
+    <li>Update the client’s database entry:</li>
+</ul>
+<pre style="padding-left: 30px;">UPDATE client_approvals set approved=true where oauth_consumer_key=’myproxy:oa4mp,2012:/client/274ab37ef365b7c384a003bc7’;</pre>
+<p>Note the single quotes around the id. You should also identify yourself as the approver (usually this is just you
+    email address):</p>
+<pre dir="ltr">UPDATE client_approvals set approver=’your.name@whatever.org’ where oauth_consumer_key=’myproxy:oa4mp,2012:/client/274ab37ef365b7c384a003bc7’;</pre>
+<p>In a similar way, you could set the approved flag to false and disallow the client from any future actions. You can
+    check that the update took by issuing</p>
+<pre dir="ltr">select * from client_approvals;</pre>
+<p>This will display everything in the database. You could also restrict it to the single entry by issuing</p>
+<pre dir="ltr">select * from client_approvals where oauth_consumer_key=’myproxy:oa4mp,2012:/client/274ab37ef365b7c384a003bc7’;</pre>
+<!--#include virtual="../../footer.html" -->
+
+</body>
+</html>

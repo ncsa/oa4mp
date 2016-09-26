@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Replacing the authorization servlet</title>
+    <!--#include virtual="../../head.html" -->
+</head>
+
+<body class="composite">
+<!--#include virtual="../../header.html" -->
+<h2>Replacing the authorization servlet</h2>
+
+<p>It is also possible to replace the authorization servlet in any version of OA4MP with a customized version.
+    You may then, for instance, use LDAP or Shibboleth for authentication. The protocols require that your
+    module occupy the authorize endpoint. The assumptions then are that</p>
+<ul>
+    <li>Your module will handle the authentication.</li>
+    <li>After a successful authentication, your module will make a callout to another, private endpoint.</li>
+    <li>This private endpoint is tasked to set up all the state and check that the request
+        is valid. Skipping
+        a call to this module means there will be no state for this request and all subsequent attempts to use the
+        service will be rejected.
+    </li>
+    <li>This private endpoint is either protected at the network level (access via Apache) or with a security constraint
+        in Tomcat (Tomcat only servers).
+    </li>
+    <li>Your call to this will follow a mini-protocol, then process the response. Each version of OA4MP has its own
+        details on this.
+    </li>
+</ul>
+
+<h3>Having Tomcat handle security.</h3>
+
+<p>If you have a Tomcat only service, then you must protect this endpoint. A typical security security constraint is the
+    following,
+    which should be added to the deployment descriptor (web.xml file)</p>
+<pre>
+    &lt;security-constraint&gt;
+           &lt;web-resource-collection&gt;
+               &lt;web-resource-name&gt;Lockdown_initiate_endpoint&lt;/web-resource-name&gt;
+               &lt;url-pattern&gt;/authorized&lt;/url-pattern&gt;
+               &lt;http-method&gt;GET&lt;/http-method&gt;
+               &lt;http-method&gt;POST&lt;/http-method&gt;
+               &lt;http-method&gt;PUT&lt;/http-method&gt;
+               &lt;http-method&gt;DELETE&lt;/http-method&gt;
+           &lt;/web-resource-collection&gt;
+           &lt;auth-constraint/&gt;
+       &lt;/security-constraint&gt;
+</pre>
+<p>
+    which will prevent all access to the authorized endpoint except from Tomcat itself. If you access the service from
+    Apache,
+    you will have to limit access to this endpoint at the server level to calls from localhost only. The authorized
+    servlet
+    comes with this security constraint enabled by default since it is better to have the authentication fail if there
+    is
+    any question about the setup.
+</p>
+
+<h2>Accessing the Authorized Servlet for OA4MP under OAuth 1.0a</h2>
+
+<h3>The initial setup</h3>
+Since OA4MP is no longer authorizing the login (e.g. Shibboleth is), you need to
+deploy the correct servlet in your web.xml file, to wit
+<a href="http://grid.ncsa.illinois.edu/myproxy/oauth/apidocs/edu/uiuc/ncsa/myproxy/oa4mp/server/servlet/AuthorizedServlet.html">
+    AuthorizedServlet</a>. So a typical entry would look like
+<pre>
+&lt;servlet&gt;
+       &lt;servlet-name&gt;authorized&lt;/servlet-name&gt;
+       &lt;servlet-class&gt;edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AuthorizedServlet&lt;/servlet-class&gt;
+       &lt;load-on-startup&gt;0&lt;/load-on-startup&gt;
+   &lt;/servlet&gt;
+   &lt;servlet-mapping&gt;
+       &lt;servlet-name&gt;authorized&lt;/servlet-name&gt;
+       &lt;url-pattern&gt;/authorized&lt;/url-pattern&gt;
+   &lt;/servlet-mapping&gt;
+</pre>
+<b>NOTE</b> that the endpoint is <b><i>authorized</i></b> for here. See below for more details on accessing this. In
+effect,
+to be spec. compliant, a mini-API is implemented for this which will now be explained.
+
+<h3>The mini-protocol</h3>
+
+<p>The specification requires that the call to your module has the oauth_token present, which you must pass
+    on to the authorized servlet -- this the internal identifier linking the user to their request.
+    A common method of deployment, e.g for Shibboleth, is to use Apache with ProxyPass for
+    Tomcat and only allow localhost access to Tomcat. Your module can then call Tomcat.
+    The expected request to the server consists of 4 parameters:</p>
+<ul>
+    <li><b>username</b> the username that the user authenticates with</li>
+    <li><b>password</b> the password used</li>
+    <li><b>lifetime</b> the certificate lifetime (in milliseconds)</li>
+    <li><b>oauth_token</b> the token generated in the initial request by the server</li>
+</ul>
+A typical example invocation would be
+<pre>
+localhost://oa4mp.bigstate.edu:8080/authorized?oauth_token=sj38GHTYf24354&amp;username=bob&amp;password=somepassword&amp;lifetime=100000000
+</pre>
+Assuming that your oa4mp instance is deployed at oa4mp.bigstate.edu. It is assumed that all parameters will be url
+escaped.
+The response contains two items
+<ul>
+    <li><b>status</b> a code, "ok" indicating success</li>
+    <li><b>redirect_uri</b> which is the redirect generated by OA4MP. This should be used to redirect the user's browser
+        and is, if you recall, generated from information only OA4MP has in the client's initial request.
+    </li>
+</ul>
+For instance the body of the response contains the following two lines to parse:
+<pre>
+status=ok
+redirect_uri=https%3A%2F%2Fportal.example.edu%2Foauth%2Fready%3Foauth_token%3Dhdk48Djdsa%26oauth_verifier%3Dhfdp7dh39dks9884
+</pre>
+If there is an error, then the first line will not have a status of "ok" and an error should be issued by your module.
+(Don't forget to check the OA4MP logs to find why it failed!)
+
+<h2>Accessing the Authorized Servlet for OA4MP under OAuth 2.0</h2>
+
+<h3>Initial setup</h3>
+
+<p>The servlet used in this case is named <a
+        href="http://grid.ncsa.illinois.edu/myproxy/oauth/apidocs/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/servlet/OA2AuthorizedServlet.html">
+    OA2AuthorizedServlet</a>. So a typical entry would look like</p>
+<pre>
+  &lt;servlet&gt;
+      &lt;servlet-name&gt;authorized&lt;/servlet-name&gt;
+      &lt;servlet-class&gt;edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2AuthorizedServlet&lt;/servlet-class&gt;
+  &lt;/servlet&gt;
+  &lt;servlet-mapping&gt;
+      &lt;servlet-name&gt;authorized&lt;/servlet-name&gt;
+      &lt;url-pattern&gt;/authorized&lt;/url-pattern&gt;
+  &lt;/servlet-mapping&gt;
+</pre>
+<p>Note that the name of this servlet may be altered without changing the protocol. Some installation prefer to call it
+    <code>/init</code> since authorize and authorize<b>d</b> are very similar.</p>
+
+<h3>The mini-protocol</h3>
+
+<p>The very first step in the OAuth 2.0 protocol is that the user goes to the authorize endpoint which will then simply
+    call the end authorized endpoint by passing along verbatim the original request
+    your authorization module received. For instance, if your server got the following request</p>
+<pre>
+https://your.server.edu/oauth2/authorize?state=s0jByyFvSNeoDUZ1GbyRy&amp;nonce=ABC75344A&amp;...
+</pre>
+<p>You do the authorization and once completed successfully, you call the authorized servlet:</p>
+<pre>
+https://localhost/oauth2/authorized?state=s0jByyFvSNeoDUZ1GbyRy&amp;nonce=ABC75344A&amp;...
+</pre>
+<p>All state and error checking will be done for you.
+    You will simply receive the standard response (with HTML status code of 200, since 302 is reserved for error
+    conditions -- see
+    below for more) in JSON of the token and the state (if
+    that was passed in the initial request) -- simply pass this response back to the client in the standard OIDC redirect. For instance</p>
+<pre>
+    {"code":"urn:oauth2:aMQ53UmEtb5cM6WF/ps7wOmYQoJTTKAW9","state":"s0jByyFvSNeoDUZ1GbyRy"}
+</pre>
+<h3>Errors</h3>
+
+<p>The authorized servlet supports all of the same error codes as the standard OAuth 2.0/OIDC specification. This means
+    that there
+    will be an HTML status code of 302 (a redirect) to the callback url that the client supplied (in the request and at
+    registration).
+    This may again be passed along directly
+    to the client which is required to process it. For example, if the above request were invalid and had
+    consequently, failed then if the base url of the error
+    is <code>https://your.client.org/cb</code> your authorize module would get the following redirect, as per the
+    OA4MP/OIDC spec:</p>
+<pre>
+    Location: https://your.client.org/cb?
+      error=invalid_request
+      &amp;error_description=
+        the%20request%20is%20not%20valid%20or%20malformed
+      &amp;state=s0jByyFvSNeoDUZ1GbyRy
+</pre>
+<!--#include virtual="../../footer.html" -->
+</body>
+</html>

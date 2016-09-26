@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>The LDAP module.</title>
+    <!--#include virtual="../../head.html" -->
+
+</head>
+<body class="composite">
+<!--#include virtual="../../header.html" -->
+
+<h2>Introduction</h2>
+
+<p>LDAP (Lightweight Directory Access Protocol) is a vendor-independent protocol for maintaining and accessing
+    a distributed directory service. For OA4MP for OAuth 2.0, there is an optional scope handler that will
+    talk to an LDAP server and in turn let you populate the user information response with data from LDAP.
+    This may be enabled or disabled in the configuration file. If the LDAP service is not available, then
+    this is not treated as a serious error, but is merely logged. If this component is not configured, then
+    it is ignored.
+</p>
+
+<p>
+    Note that there is one attribute for this tag <code>enabled</code> and the rest of the
+    arguments are separate elements. The reason for this is simple: Attributes do not allow
+    for arbitrary text (such as for a password). These are still recorded below in the table
+    since this is an easy tabular format for this.
+</p>
+<table style="text-align: left; width: 50%;" border="1" cellspacing="2" cellpadding="2">
+    <tbody>
+    <tr>
+        <td style="vertical-align: top;">Name</td>
+        <td style="vertical-align: top;">Required</td>
+        <td style="vertical-align: top;">Default</td>
+        <td style="vertical-align: top;"></td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">address</td>
+        <td style="vertical-align: top;">Y</td>
+        <td style="vertical-align: top;"></td>
+        <td style="vertical-align: top;">The fully qualified address for the LDAP server.</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">port</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">636</td>
+        <td style="vertical-align: top;">The port of the LDAP service</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">password</td>
+        <td style="vertical-align: top;">Y</td>
+        <td style="vertical-align: top;"></td>
+        <td style="vertical-align: top;">The password for the LDAP server</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">principal</td>
+        <td style="vertical-align: top;">Y</td>
+        <td style="vertical-align: top;"></td>
+        <td style="vertical-align: top;">The DN of the principal for authenticating the caller to the service.
+            The format of the principal depends on the authentication scheme. If this property is unspecified,
+            the behavior is determined by the service provider.
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">searchBase</td>
+        <td style="vertical-align: top;">Y</td>
+        <td style="vertical-align: top;"></td>
+        <td style="vertical-align: top;">The DN that is the starting point of the search.</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">searchAttributes</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;"></td>
+        <td style="vertical-align: top;">A list of attributes to be returned. This
+            limits the size of the result. Omitting this returns all possible
+            applicable attributes from the server. This consists of a set of
+            &lt;attribute&gt; elements, each of which can take special characters
+            if needed. You may also specify the name that the result is returned under
+            using the returnedAs attribute. See the example below.
+        </td>
+    </tr>
+
+    </tbody>
+</table>
+<!--#include virtual="../../footer.html" -->
+
+<h3>An example</h3>
+<pre>
+    &lt;service name="myconfig&gt;
+    &lt;ldap enabled="true"&gt;
+         &lt;address&gt;ldap.bigstate.edu&lt;/address&gt;
+         &lt;port&gt;636&lt;/port&gt;
+         &lt;password&gt;&lt;![CDATA[asd8&quot;%5*96&lt;&lt;]]&gt;&lt;/password&gt;
+         &lt;principal&gt;&lt;![CDATA[uid=admin_bob,ou=system,o=MESS,dc=foo,dc=baz,dc=org]]&gt;&lt;/principal&gt;
+         &lt;searchBase&gt;&lt;![CDATA[o=MESS,dc=foo,dc=baz,dc=org]]&gt;&lt;/searchBase&gt;
+         &lt;searchAttributes&gt;
+                &lt;attribute&gt;eduPersonOrcid&lt;/attribute&gt;
+                &lt;attribute returnedAs="isMemberOf"&gt;MemberOf&lt;/attribute&gt;
+         &lt;/searchAttributes&gt;
+         &lt;ssl debug="false"
+              useJavaTrustStore="true"&gt;
+              &lt;trustStore&gt;
+                  &lt;path&gt;/opt/oa2/etc/cacerts&lt;/path&gt;
+                  &lt;password&gt;&lt;![CDATA[sdj8956HJf^&amp;$#h]]&gt;&lt;/password&gt;
+                  &lt;type&gt;&lt;PKCS12&gt;&lt;/type&gt;
+              &lt;/trustStore&gt;
+         &lt;/ssl&gt;
+    &lt;/ldap&gt;
+    &lt;/service&gt;
+</pre>
+<p>
+    In this case the server is at the stated address and port. The (security) prinicipal's DN used
+    in authentication is specified as well. The search base is the DN for where to start the search.
+    There will be two search results attributes returned, "eduPersonOrcid" and "memberOf" (these are
+    what is stored in LDAP). The results will however, be returned in the JSON as "eduPersonOrcid" (unchanged) and
+    "isMemberOf" (rather than "memberOf"). In this case,
+    a specific truststore is required for SSL to operate, whose full path and required password is given.
+    The truststore is in PKCS12 format.
+</p>
+</body>
+</html>

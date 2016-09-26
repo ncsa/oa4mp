@@ -1,0 +1,64 @@
+<!ELEMENT config (service)*>
+<!ELEMENT service (myproxy|mysql|postgresql|fileStore|memoryStore|mail|messages)*>
+<!ATTLIST service
+          address CDATA #REQUIRED
+          name CDATA #IMPLIED
+          version CDATA #IMPLIED
+          debug CDATA #IMPLIED>
+<!ELEMENT messages (retryMessage)*>
+<!ELEMENT retryMessage  (#PCDATA)>
+<!ELEMENT keystore (#PCDATA)>
+<!ATTLIST keystore
+          path CDATA #REQUIRED
+          password CDATA #REQUIRED
+          type CDATA #IMPLIED
+          factory CDATA #IMPLIED>
+<!ELEMENT loa (#PCDATA)>
+<!ATTLIST loa
+          name CDATA #REQUIRED
+          port CDATA #REQUIRED>
+<!ELEMENT myproxy (keystore|loa)*>
+<!ATTLIST myproxy
+          host CDATA #REQUIRED
+          port CDATA #REQUIRED>
+<!ELEMENT clients (#PCDATA)>
+<!ELEMENT clientApprovals (#PCDATA)>
+<!ELEMENT transactions (#PCDATA)>
+<!ELEMENT memoryStore (clients|clientApprovals|transactions)*>
+<!ELEMENT fileStore (clients|clientApprovals|transactions)*>
+<!ATTLIST fileStore
+          dataPath CDATA #IMPLIED
+          indexPath CDATA #IMPLIED
+          path CDATA #IMPLIED>
+<!ELEMENT mysql (clients|clientApprovals|transactions)*>
+<!ATTLIST mysql
+          password CDATA #REQUIRED
+          port CDATA #IMPLIED
+          username CDATA #REQUIRED
+          schema CDATA #IMPLIED
+          database CDATA #IMPLIED
+          tablename CDATA #IMPLIED
+          tablePrefix CDATA #IMPLIED
+          driver CDATA #IMPLIED>
+<!ELEMENT postgresql (clients|clientApprovals|transactions)*>
+<!ATTLIST postgresql
+          username CDATA #REQUIRED
+          password CDATA #REQUIRED
+          port CDATA #IMPLIED
+          schema CDATA #IMPLIED
+          database CDATA #IMPLIED
+          tablename CDATA #IMPLIED
+          tablePrefix CDATA #IMPLIED
+          driver CDATA #IMPLIED>
+<!ELEMENT messageTemplate (#PCDATA)>
+<!ELEMENT subjectTemplate (#PCDATA)>
+<!ELEMENT mail (messageTemplate|subjectTemplate)*>
+<!ATTLIST mail
+          enabled CDATA #IMPLIED
+          useSSL CDATA #IMPLIED
+          username CDATA #IMPLIED
+          password CDATA #IMPLIED
+          debug CDATA #IMPLIED
+          server CDATA #IMPLIED
+          port CDATA #IMPLIED
+          recipents CDATA #IMPLIED>

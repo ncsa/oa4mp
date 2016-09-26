@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Monitoring servers.</title>
+    <!--#include virtual="../../head.html" -->
+</head>
+
+<body class="composite">
+<!--#include virtual="../../header.html" -->
+
+<p>
+    A monitor is simply a client which executes the initial call to an OA4MP server. This works solely
+    from the command line -- no web server is needed. This is exactly the analog of the ping command
+    in that it shows the server up and active. Since a full test of the lifecycle requires that the client
+    be able to accept callbacks i.e. be running a web server,
+    it is not possible to test more than the first call. The intent of the monitor is
+    not to show that everything about
+    <a href="http://grid.ncsa.illinois.edu/myproxy/oauth/client/index.xhtml">configuring a client</a> still works.
+</p>
+
+<p>To get a functional monitor, you
+    get the <a href="http://svn.code.sf.net/p/cilogon/code/tags/latest/server/oa4mp-monitor.jar">oa4mp-monitor.jar</a>
+    and the
+    <a href="http://svn.code.sf.net/p/cilogon/code/tags/latest/server/oa4mp-monitor">oa4mp-monitor script</a>.
+    For  <span style="background-color: #ff6600;">OAuth 2.0</span> you would get
+    <a href="http://svn.code.sf.net/p/cilogon/code/tags/latest/server/oa2-monitor.jar">oa2-monitor.jar</a>
+    with the script at <a href="http://svn.code.sf.net/p/cilogon/code/tags/latest/server/oa2-monitor">oa2-monitor</a>
+    The default setup is like any other <a href="http://grid.ncsa.illinois.edu/myproxy/oauth/server/manuals/cli.xhtml">command
+        line tool</a>
+    with an identical directory layout and it will try to use the configuration found in the default location
+    of <code>/opt/oa4mp/etc/admin-cfg.xml</code>.
+</p>
+
+<p>
+    Steps to set up a monitor are
+
+    1. Register it with a server
+    <a href="http://grid.ncsa.illinois.edu/myproxy/oauth/client/manuals/registering-with-a-server.xhtml">OAuth 1.0a based servers</a>
+    or, <a href="http://grid.ncsa.illinois.edu/myproxy/oauth/client/manuals/registering-with-an-oauth2-server.xhtml">
+    <span style="background-color: #ff6600;">OAuth 2.0</span> based servers. </a>
+    be sure to follow any and all instructions in given since the two mehtods of registration are different.
+    <br/><br/>
+    2. Write a configuration file. This should have
+    <a href="http://grid.ncsa.illinois.edu/myproxy/oauth/server/configuration/server-email.xhtml">mail configured</a>.
+    A sample OAuth 1.0a configuration would be
+</p>
+<pre>
+&lt;config&gt;
+   &lt;client name="my-monitor"&gt;
+      &lt;id&gt;myproxy:oa4mp,2012:/your/id/goes/here&lt;/id&gt;
+      &lt;serviceUri&gt;http://your.server.org/oauth/&lt;/serviceUri&gt;
+      &lt;callbackUri&gt;https://your.server.org/client/ready&lt;/callbackUri&gt;
+      &lt;lifetime&gt;864000&lt;/lifetime&gt;
+      &lt;publicKeyFile&gt;/path/to/public-key.pem&lt;/publicKeyFile&gt;
+      &lt;privateKeyFile&gt;/path/to/private-key.pem&lt;/privateKeyFile&gt;
+      &lt;mail enabled="true"
+            useSSL="true"
+            username="your-username"
+            password="your password"
+            debug="false"
+            server="your.mail.server"
+            recipients="email-address.of.recipient"&gt;
+         &lt;messageTemplate&gt;/path/to/monitor-message.template&lt;/messageTemplate&gt;
+         &lt;subjectTemplate&gt;/path/to/monitor-subject.template&lt;/subjectTemplate&gt;
+       &lt;/mail&gt;
+       &lt;logging
+            logFileName="/path/to/logs/oa4mp-monitor.xml"
+            logName="oa4mp"
+            logSize="100000"
+            logFileCount="2"
+            debug="true"/&gt;
+   &lt;/client&gt;
+&lt;/config&gt;
+</pre>
+
+<p>
+    A quick comment about the callback: the server will not get far enough in the delegation request to
+    actually every use this, however, a url that
+    has https as its protocol is a requirement from the server. For <span style="background-color: #ff6600;">OAuth 2.0</span>
+    based servers, the callback supplied <b>must</b> match one of the ones given at registration time or the initial
+    request will be rejected.
+
+    3. Run it once from the command line to see if it works by using the oa4mp-monitor script.
+    <br/><br/>
+    4. Setup a chron job or use monit or whatever tool you prefer to invoke oa4mp-server at some specific interval,
+    e.g. every 5 minutes. The monitor will send an email notification whenever an attempt to contact the server fails.
+</p>
+
+<!--#include virtual="../../footer.html" -->
+</body>
+</html>

@@ -1,0 +1,16 @@
+This blurb tells how to roll and deploy the myproxy logon website.
+
+* Build the myproxy-logon client running mvn clean install.
+
+* Copy the resulting MyProxyLogon.jar from the target directory of the previous step to the src/site directory.
+
+* tar up the src/site directory
+
+* transfer it (e.g. with scp) to the target server (currently this is pkilab2.ncsa.uiuc.edu)
+
+* Make sure you issue kinit and aklog on pkilab2 before trying to do anything or you will get all
+  sorts of permissions errors on afs.
+
+* Untar it into the  target directory (currently /afs/ncsa.uiuc.edu/web/grid.ncsa.uiuc.edu/htdocs/myproxy/MyProxyLogon/)
+
+* Check that the site comes up and that the MyProxyLogon.jar works right.

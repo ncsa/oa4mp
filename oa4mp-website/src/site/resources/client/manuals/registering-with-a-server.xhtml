@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Registering a Client With a Server.</title>
+    <!--#include virtual="../../head.html" -->
+</head>
+<body class="composite">
+<!--#include virtual="../../header.html" -->
+
+<h1>Registering a client with a server</h1>
+
+<p>Before you can delegate certificates using the OAuth 1.0a for MyProxy service,
+    you must register your OAuth for MyProxy client.
+    This requires that you generate a public and private key. You will supply the
+    registration page (normally located at https://whatever.the.server/oauth/register) with your public key and other
+    information.
+</p>
+
+<h2 dir="ltr">Generating public and private key pairs.</h2>
+
+<p>There are several ways to do this, but the easiest is with open ssl. You would issue:</p>
+<pre>
+openssl genrsa -out oauth-privkey.pem 2048
+chmod 0600 oauth-privkey.pem
+openssl rsa -in oauth-privkey.pem -pubout -out oauth-pubkey.pem
+</pre>
+<p>You now have a private and public key pair, which are PEM format. (Privacy Enhanced Mail format is just a pair of
+    headers slapped around a base 64 representation of binary data and is the basic format for all of the keys in
+    this discussion. What goes between the headers inside the PEM format is very different though.) Using your
+    private key with Java require a little more work, since the generated RSA private key is not in a format Java
+    understands. OpenSSL’s default is called PKCS #1, which looks like</p>
+<pre>
+-----BEGIN RSA PRIVATE KEY-----
+stuff...
+-----END RSA PRIVATE KEY-----
+</pre>
+<p>The newer format for this (which is natively supported by Java) is PKCS #8 format. OpenSSL has a utility for
+    conversion and here is how to use it:</p>
+<pre>openssl pkcs8 -topk8 -in oauth-privkey.pem -nocrypt -out oauth-privkey.pk8</pre>
+<p>The resulting file looks like</p>
+<pre>
+-----BEGIN PRIVATE KEY-----
+other stuff...
+-----END PRIVATE KEY-----
+</pre>
+<p>You should set the group to be "tomcat" and set it to be only owner (root) and group readable:</p>
+<pre>chmod 0640 oauth-privkey.pk8</pre>
+<p>The public key is in the X509 public key standard and looks like</p>
+<pre>
+-----BEGIN PUBLIC KEY-----
+more stuff....
+-----END PUBLIC KEY-----
+</pre>
+<h2>Filling out the registration form</h2>
+
+<p>The default registration form looks like this:</p>
+
+<p><img src="client/images/oauth-register.png"
+        alt="Registration Form Image" width="893" height="624"/></p>
+
+<p>The various fields are as follows:</p>
+<ul>
+    <li><strong>Client Name</strong>: A human readable name for the science gateway (OAuth for MyProxy client) that
+        you are registering. This will be displayed to users and should identify your site.
+    </li>
+    <li><strong>Contact email</strong>: An email address where a human being can be reached for support.</li>
+    <li><strong>Home url</strong>: The main address for your site. This will be displayed to users as part of the
+        authentication process.
+    </li>
+    <li><strong>Error url</strong>: A page on your site that provides support information for users in case of a
+        server error. If you have no error page, you can just reuse your home url.
+    </li>
+    <li><strong>Public key</strong>: The X509 standard encoded public key you generated above. Just cut and paste it
+        in.
+    </li>
+</ul>
+
+<h2 dir="ltr">Using your keys</h2>
+
+<p>The Client API will require your private key. The OA4MP server will require your public one. The Client API only
+    needs the native Java object</p>
+
+<p>java.security.PrivateKey</p>
+
+<p>There is a utility called edu.uiuc.ncsa.csd.security.KeyUtil which will read in various formats. Generally the
+    format is to|from PKCS 8 PEM, so to read in a PKCS 8 PEM format key from a file you’d issue</p>
+<pre>FileReader fr = new FileReader(“/path/to/oauth-privkey.pk8”);</pre>
+<pre>PrivateKey pkey = KeyUtil.fromPKCS8PEM(fr);</pre>
+<p>Remember that this utility does not convert between formats generally (so, e.g., reading in a PKCS 1 format file
+    using fromPKCS8PEM will fail). You must use OpenSSL’s utility to do that.</p>
+<!--#include virtual="../../footer.html" -->
+
+</body>
+</html>

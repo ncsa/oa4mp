@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Configuration files</title>
+    <!--#include virtual="../../head.html" -->
+</head>
+<body class="composite">
+<!--#include virtual="../../header.html" -->
+
+<h2>Configuration files and how they work</h2>
+
+<p>All configurations, both client and server work the same. This article documents their commonalities.
+    Features are:</p>
+<ul>
+    <li>XML-based</li>
+    <li>Multiple named configurations supported in a given file</li>
+    <li>Multiple types of storage may be specified</li>
+    <li>Aliases for configurations are allowed.</li>
+    <li>Other configuration files may be included (as of OA4MP 1.1)</li>
+</ul>
+<p><strong>Comment:</strong> ALL tag names are case sensitive in the configuration file -- as per the XML spec,
+    so "fileStore" works, but "filestore" would not, for instance.</p>
+
+
+<h3>Parameters or, how the system finds its files</h3>
+
+<p>There are two things that determine which configuration to use, the file in which it resides and the name
+    of the configuration in that file. These will henceforth be referred to as the <b><i>file parameter</i></b>
+    and <b><i>name parameter</i></b>. To specify parameters you have two options:
+</p>
+    <ol>
+        <li>Specify them as context parameters in the web.xml file for Tomcat.</li>
+        <li>Specify them as command line arguments to the JVM (prepend "-D"). This is much less common.</li>
+    </ol>
+
+<p><b>Tip:</b> It is a very good idea to put your context parameters in the server web.xml (should be
+    located at <code>$CATALINA_HOME/conf/web.xml</code>.) This will allow you to swap out/upgrade versions of
+    OA4MP without having to touch any configuration -- just drop a new version of the war into the right
+    place and restart the server to get an upgrade.
+</p>
+
+<p> Clients and servers as well as different versions of
+    OA4MP have different parameters. The specific of those will be documented elsewhere. However, here
+    is the definitive list for reference</p>
+
+<table border="1">
+    <tr>
+        <th>Component</th>
+        <th>Parameter</th>
+        <th>OAuth 1.0a</th>
+        <th>OAuth 2.0</th>
+    </tr>
+    <tr>
+        <th rowspan="2">client</th>
+        <td>file</td>
+        <td>oa4mp:client.config.file</td>
+        <td>oa4mp:oauth2.client.config.file</td>
+    </tr>
+    <tr>
+        <td>name</td>
+        <td>oa4mp:client.config.name</td>
+        <td>oa4mp:oauth2.client.config.name</td>
+    </tr>
+    <tr>
+        <th rowspan="2">server</th>
+        <td>file</td>
+        <td>oa4mp:server.config.file</td>
+        <td>oa4mp:oauth2.server.config.file</td>
+    </tr>
+    <tr>
+        <td>name</td>
+        <td>oa4mp:server.config.name</td>
+        <td>oa4mp:oauth2.server.config.name</td>
+    </tr>
+</table>
+<h4>A server example for OAuth 1.0a</h4>
+This how the the file and name parameters would be specified in the web.xml file:
+<pre>
+&lt;context-param&gt;
+    &lt;param-name&gt;oa4mp:server.config.file&lt;/param-name&gt;
+    &lt;param-value&gt;/path/to/cfg.xml&lt;/param-value&gt;
+&lt;/context-param&gt;
+
+&lt;context-param&gt;
+    &lt;param-name&gt;oa4mp:server.config.name&lt;/param-name&gt;
+    &lt;param-value&gt;default&lt;/param-value&gt;
+&lt;/context-param&gt;
+</pre>
+
+<p>in this case the server configuration file at /path/to/cfg.xml would be loaded, searched and the configuration
+named "default" would be loaded. For a given version and component, use the appropriate parameter from the table above.</p>
+
+
+<h3>Aliases</h3>
+An <b><i>alias</i></b> is a reference to another named configuration. They are completely analogous to
+file links in unix. Only resolves an alias if it is specifically used. It will also throw an exception
+if a <b>cycle</b> is detected. By that we mean a chain of aliases that resolves to itself. So if
+A refers to B as an alias, and B refers to A, then an exception will occur and
+no configuration will be loaded.
+<h4>A client example using aliases</h4>
+in this example, the name parameter is "default". Inside the configuration file though, there are a couple of
+configurations possible. For instance a production instance and one for debugging. All you would need to switch your
+entire installation is to change what the alias points to here (rather than messing around in Tomcat) and restarting the
+server.
+<pre>
+&lt;config&gt;
+    &lt;client name="default" alias="postgres-cfg"/&gt;
+    &lt;client name="postgres-cfg"&gt;
+        &lt;!-- lots of stuff --&gt;
+    &lt;/client&gt;
+    &lt;client name="debug-cfg"&gt;
+        &lt;!-- lots of other stuff --&gt;
+    &lt;/client&gt;
+&lt;/config&gt;
+</pre>
+
+<h3>Included files.</h3>
+As of OA4MP 1.1, configuration files may now be included in other configuration files. Note that
+<ul>
+    <li>the other files must be completely correct syntactically. So no snippets.</li>
+    <li>there is no limit on the number of files that may be included and referenced files can reference other files.
+    </li>
+    <li>all files are ingested first into what is essentially one large configuration internally. Hierarchies of
+        configurations
+        will not be understood. What distinguishes configurations is their name. If two configurations with the same
+        name are encountered, the result will be unpredictable.
+    </li>
+    <li>aliases are resolved after loading. This allows you to keep you aliases in any included file and they will be
+        resolved.
+    </li>
+    <li>referenced files are loaded exactly once. So if file A refers to file B which refers to A, Both A and B will
+        load but no recursion will take place. An informational message will be written to the logs if this happens.
+        This is not considered a fatal condition.
+    </li>
+</ul>
+<h4>A client example of using files.</h4>
+Reworking the above alias example, this is completely equivalent to
+<pre>
+&lt;config&gt;
+     &lt;file include="/path/to/file.xml"/&gt;
+     &lt;client name="default" alias="postgres-cfg"/&gt;
+&lt;/config&gt;
+</pre>
+and the next file, which is <code>/path/to/file.xml</code> in toto is
+<pre>
+&lt;config&gt;
+    &lt;client name="postgres-cfg"&gt;
+        &lt;!-- lots of stuff --&gt;
+    &lt;/client&gt;
+    &lt;client name="debug-cfg"&gt;
+        &lt;!-- lots of other stuff --&gt;
+    &lt;/client&gt;
+&lt;/config&gt;
+</pre>
+Refer to the first file in your deployment. The second will be loaded for you automatically.
+<!--#include virtual="../../footer.html" -->
+
+</body>
+</html>

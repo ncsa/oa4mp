@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Server configuration DTD</title>
+    <!--#include virtual="../../head.html" -->
+</head>
+<body>
+<!--#include virtual="../../header.html" -->
+
+<p>This page contains the annotated DTD for the service configuration file. To see what something does, click on it.
+    For a note generally on how to use configurations, look <a href="server/configuration/server-configuration-file.xhtml">here</a>.</p>
+
+
+<p><strong>NOTES:</strong> This is for a configuration file and the tag names are case sensitive,
+    so &lt;filestore&gt; and &lt;fileStore&gt; are not the same! Also, note the color
+    of <span style="background-color: #ff6600;">OAuth 2</span> only
+    options!
+</p>
+<pre>
+&lt;!ELEMENT <a href="server/configuration/server-configuration-file.xhtml">config</a> (<a href="server/dtd/server-dtd-service-tag.xhtml">service</a>)*>
+&lt;!ELEMENT <a href="server/dtd/server-dtd-service-tag.xhtml">service</a> (<a href="server/configuration/server-myproxy.xhtml">myproxy</a>|<a
+        href="common/configuration/mysql-store.xhtml">mysql</a>|<a
+        href="common/configuration/mariadb-store.xhtml">mariadb</a>|<a
+        href="common/configuration/postgres-store.xhtml">postgresql</a>|<a
+        href="common/configuration/file-store.xhtml">fileStore</a>|<a href="common/configuration/memory-store.xhtml">memoryStore</a>|<a
+        href="server/configuration/server-email.xhtml">mail</a>|<a
+        title="OAuth for MyProxy: Messages" href="server/configuration/server-messages.xhtml">messages</a>|
+        <a href="common/configuration/logging.xhtml">logging</a>|
+        <a href="server/configurations/authorization-servlet.xhtml">authorizationServlet</a>|
+    <span style="background-color: #ff6600;"><a href="server/configuration/ldap.xhtml">ldap</a></span>)*>
+&lt;!ATTLIST <a href="server/dtd/server-dtd-service-tag.xhtml">service</a>
+    address CDATA #IMPLIED
+    name CDATA #IMPLIED
+    version CDATA #IMPLIED
+    maxAllowedNewClientRequests CDATA #IMPLIED
+    disableDefaultStores CDATA #IMPLIED
+    serverDN CDATA #IMPLIED
+    pingable CDATA #IMPLIED
+    <span style="background-color: #ff6600;">refreshTokenEnabled</span> CDATA #IMPLIED
+    <span style="background-color: #ff6600;">refreshTokenLifetime</span> CDATA #IMPLIED
+    <span style="background-color: #ff6600;">clientSecretLength</span> CDATA #IMPLIED
+    debug CDATA #IMPLIED&gt;
+&lt;!ELEMENT <a href="server/configuration/server-messages.xhtml">messages (retryMessage)</a>*&gt;
+&lt;!ELEMENT <a href="server/configuration/server-messages.xhtml">retryMessage (#PCDATA)</a>&gt;
+&lt;!ELEMENT <a href="server/configuration/server-myproxy.xhtml">myproxy</a> (<a href="common/configuration/keystore.xhtml">keystore</a>)&gt;
+&lt;!ATTLIST <a href="server/configuration/server-myproxy.xhtml">myproxy</a>
+    host CDATA #REQUIRED
+    port CDATA #REQUIRED
+    socketTimeout CDATA #IMPLIED
+    serverDN CDATA #IMPLIED&gt;
+&lt;!ELEMENT <a href="common/configuration/keystore.xhtml">keystore</a> (assetStore)*&gt;
+&lt;!ATTLIST <a href="common/configuration/keystore.xhtml">keystore</a>
+    path CDATA #REQUIRED
+    password CDATA #REQUIRED
+    type CDATA #REQUIRED
+    factory CDATA #REQUIRED
+    useJavaKeystore CDATA #IMPLIED&gt;
+&lt;!ELEMENT <a href="server/dtd/server-dtd-content-tags.xhtml">clients</a>&gt;
+&lt;!ELEMENT <a href="server/dtd/server-dtd-content-tags.xhtml">clientApprovals</a>&gt;
+&lt;!ELEMENT <a href="server/dtd/server-dtd-content-tags.xhtml">transactions</a>&gt;
+&lt;!ATTLIST clients
+    tablename CDATA #IMPLED&gt;
+&lt;!ATTLIST clientApprovals
+    tablename CDATA #IMPLIED&gt;
+&lt;!ATTLIST transactions
+    tablename CDATA #IMPLIED&gt;
+&lt;!ELEMENT memoryStore (clients|clientApprovals|transactions)*&gt;
+&lt;!ELEMENT fileStore (clients|clientApprovals|transactions)*&gt;
+&lt;!ATTLIST fileStore
+    dataPath CDATA #IMPLIED
+    indexPath CDATA #IMPLIED
+    path CDATA #IMPLIED&gt;
+&lt;!ELEMENT mysql (clients|clientApprovals|transactions)*&gt;
+&lt;!ATTLIST mysql
+    password CDATA #REQUIRED
+    port CDATA #IMPLIED
+    host CDATA #IMPLIED
+    username CDATA #REQUIRED
+    schema CDATA #IMPLIED
+    database CDATA #IMPLIED
+    tablename CDATA #IMPLIED
+    tablePrefix CDATA #IMPLIED
+    driver CDATA #IMPLIED&gt;
+&lt;!ELEMENT mariadb (clients|clientApprovals|transactions)*&gt;
+&lt;!ATTLIST mariadb
+    password CDATA #REQUIRED
+    port CDATA #IMPLIED
+    host CDATA #IMPLIED
+    username CDATA #REQUIRED
+    schema CDATA #IMPLIED
+    database CDATA #IMPLIED
+    tablename CDATA #IMPLIED
+    tablePrefix CDATA #IMPLIED
+    driver CDATA #IMPLIED&gt;
+&lt;!ELEMENT postgresql (clients|clientApprovals|transactions)*&gt;
+&lt;!ATTLIST postgresql
+    username CDATA #REQUIRED
+    password CDATA #REQUIRED
+    port CDATA #IMPLIED
+    schema CDATA #IMPLIED
+    database CDATA #IMPLIED
+    tablename CDATA #IMPLIED
+    tablePrefix CDATA #IMPLIED
+    driver CDATA #IMPLIED&gt;
+&lt;!ELEMENT <a href="server/configuration/ldap.xhtml">ldap</a>(address|port|password|principal|searchBase|searchAttributes|ssl)*
+&lt;!ELEMENT ldap (address|port|password|principal|searchBase|searchAttributes|ssl)*&gt;
+&lt;!ATTLIST ldap
+        enabled CDATA #REQUIRED&gt;
+&lt;!ELEMENT address (#PCDATA)&gt;
+&lt;!ELEMENT port (#PCDATA)&gt;
+&lt;!ELEMENT password (#PCDATA)&gt;
+&lt;!ELEMENT principal (#PCDATA)&gt;
+&lt;!ELEMENT searchBase (#PCDATA)&gt;
+&lt;!ELEMENT searchAttributes (attribute)*&gt;
+&lt;!ELEMENT attribute (#PCDATA)&gt;
+&lt;!ELEMENT ssl (trustStore|keystore)*&gt;
+&lt;!ATTLIST ssl
+        debug CDATA #IMPLIED
+        useJavaTrustStore CDATA #IMPLIED&gt;
+&lt;!ELEMENT trustStore (path|password|type)*&gt;
+&lt;!ELEMENT path (#PCDATA)&gt;
+&lt;!ELEMENT password (#PCDATA)&gt;
+&lt;!ELEMENT type (#PCDATA)&gt;
+&lt;!ELEMENT keyStore (path|password|type)*&gt;
+&lt;!ELEMENT path (#PCDATA)&gt;
+&lt;!ELEMENT password (#PCDATA)&gt;
+&lt;!ELEMENT type (#PCDATA)&gt;
+&lt;!ELEMENT<a href="common/configuration/logging.xhtml">ssl</a>(trustStore|keystore)*
+&lt;!ATTLIST debug CDATA #REQUIRED
+        logName CDATA #IMPLIED
+        logSize CDATA #IMPLIED
+        logFileCount CDATA #IMPLIED
+        debug CDATA #IMPLIED>
+&lt;!ELEMENT <a href="common/configuration/logging.xhtml">logging</a>
+&lt;!ATTLIST logFileName CDATA #REQUIRED
+    logName CDATA #IMPLIED
+    logSize CDATA #IMPLIED
+    logFileCount CDATA #IMPLIED
+    debug CDATA #IMPLIED>
+&lt;!ELEMENT messageTemplate (#PCDATA)&gt;
+&lt;!ELEMENT subjectTemplate (#PCDATA)&gt;
+&lt;!ELEMENT <a href="server/configuration/authorization-header.xhtml">authorizationServlet</a> (#PCDATA)&gt;
+&lt;!ATTLIST
+     useHeader CDATA #IMPLIED
+     requireHeader CDATA #IMPLIED
+     headerFieldName CDATA #IMPLIED
+     returnDNAsUsername CDATA #IMPLIED
+     verifyUsername CDATA #IMPLIED
+     showLogon CDATA #IMPLIED&gt;
+&lt;!ELEMENT mail (messageTemplate|subjectTemplate)*&gt;
+&lt;!ATTLIST <a href="server/configuration/server-email.xhtml">mail</a>
+    enabled CDATA #IMPLIED
+    useSSL CDATA #IMPLIED
+    starttls CDATA #IMPLIED
+    username CDATA #IMPLIED
+    password CDATA #IMPLIED
+    debug CDATA #IMPLIED
+    server CDATA #IMPLIED
+    port CDATA #IMPLIED
+    recipents CDATA #IMPLIED&gt;
+&lt;!ELEMENT authorizationServlet (#PCDATA)&gt;
+]&gt;
+</pre>
+<p>A few examples</p>
+
+<h3>Example 1. A quick &amp; dirty configuration for debugging/evaluation.</h3>
+
+<p>Drop the war from the website into your Tomcat webapps directory, then put this into a file called cfg.xml and drop
+    it into the WEB-INF directory. This will</p>
+<ul>
+    <li>put everything (client entries, approvals, transactions) into a memory store, so there will be no persistence
+        between service restarts,
+    </li>
+    <li>not enable email notifications,</li>
+    <li>Turn on debugging to see everything. This might be quite verbose at times.</li>
+    <li>assume that MyProxy is on localhost at port 7512. The assumption is that it is deployed as "oauth" locally in
+        Tomcat. It will, however, allow for testing the entire lifecycle and allowing for very simple evaluation.
+    </li>
+</ul>
+<pre>
+&lt;config&gt;
+   <a href="server/dtd/server-dtd-service-tag.xhtml">service</a> address="http://localhost/oauth"
+            debug="true"/>
+&lt;/config&gt;
+</pre>
+<p>This is very simple and easy to get up and running. This does not give a usable configuration though, since there
+    is no way to store or approve clients since they live only in memory. This useful to show that your installation is
+    correct and that the configuration file itself can be found. Note that on redeploys the cfg.xml file might get
+    over-written. See the <a href="server/configuration/server-configuration-file.xhtml">configuration</a> page for how to specify an
+    alternate location.</p>
+
+<h3>Example 2. Stashing everything in a file store.</h3>
+
+<p>This will store all items into the local file system and use the specified myproxy server.</p>
+<pre>
+&lt;<a href="server/configuration/server-configuration-file.xhtml">config</a>&gt;
+   &lt;<a href="server/dtd/server-dtd-service-tag.xhtml">service</a> address="https://www.bigstate.edu/oauth/">
+        &lt;<a href="server/configuration/server-myproxy.xhtml">myproxy</a> host="myproxy.teragrid.org"
+                 port="7512"/&gt;
+        &lt;fileStore path="/var/www/store"&gt;
+        &lt;transactions/&gt;
+        &lt;clients/&gt;
+        &lt;clientApprovals/&gt;
+   &lt;/fileStore&gt;
+   &lt;/service&gt;
+&lt;/config&gt;
+</pre>
+<h3>Example 3. Enabling email notifications.</h3>
+
+<p>Same as example 2, but with email notifications enabled. This will send out a message whenever a new client registers
+    itself so that an approver will know to review to application.</p>
+<pre>
+&lt;config&gt;
+   &lt;<a href="server/dtd/server-dtd-service-tag.xhtml">service</a> address="https://www.bigstate.edu/oauth/"&gt;
+        &lt;<a href="server/configuration/server-myproxy.xhtml">myproxy</a> host="myproxy.teragrid.org" port="7514"/&gt;
+        &lt;fileStore path="/var/www/store"&gt;
+        &lt;transactions/&gt;
+        &lt;clients/&gt;
+        &lt;clientApprovals/&gt;
+   &lt;/fileStore&gt;
+   &lt;<a href="server/configuration/server-email.xhtml">mail</a>
+        enabled="true"
+        useSSL="true"
+        username="admin@bigstate.edu"
+        password="www"
+        server="fnord.foo.baz"
+        recipents="approvals@bigstate.edu;admin@bigstate.edu"&gt;
+       &lt;messageTemplate&gt;/var/www/config/message.txt&lt;/messageTemplate&gt;
+       &lt;subjectTemplate&gt;/var/www/config/subject.txt&lt;/subjectTemplate&gt;
+    &lt;/mail&gt;
+    &lt;logging logFileName="/var/log/tomcat6/oa4mp.xml"
+             logName="oa4mp"
+             logSize="100000"
+             logFileCount="2"
+             debug="true/&gt;
+      &lt;/service&gt;
+&lt;/config&gt;
+</pre>
+<p>This will enable email, use ssl and login in as the given username. Note that there are two recipients in the
+    (comma-separated) list. A message and subject template are specified.</p>
+
+<h3>Example 4. Using up a database</h3>
+
+<p>In this example, different accounts are required for each component. To keep the size down, no email notifications
+    are enabled here and MyProxy is assumed to be running on localhost.</p>
+<pre>
+&lt;config&gt;
+  &lt;service name="my-config"&gt;
+     &lt;mysql host="my.secret.host.org" username="xup-portal" password="bar"&gt;
+       &lt;transactions/&gt;
+     &lt;/mysql&gt;
+     &lt;mysql username="xup-client" password="bar"&gt;
+         &lt;clients/&gt;
+     &lt;/mysql&gt;
+     &lt;mysql username="xup-approver" password="bar"&gt;
+         &lt;clientApprovals/&gt;
+     &lt;/mysql&gt;
+ &lt;/service&gt;
+&lt;/config&gt;
+</pre>
+<h3>Example 5. Mixed storage.</h3>
+
+<p>Several different types of storage are mixed in the next example. This is just to show how it is done.</p>
+<pre>
+&lt;config&gt;
+  &lt;<a href="server/dtd/server-dtd-service-tag.xhtml">service</a> name="my fancy configuration"
+         version="1.0"
+         address="https://research.bigstate.edu/oauth">
+      &lt;<a href="server/configuration/server-myproxy.xhtml">myproxy</a> host="myproxy.bigstate.edu"
+          port="7512"/&gt;
+      &lt;<a href="common/configuration/mysql-store.xhtml">mysql</a> username="foo"
+          password="bar"&gt;
+         &lt;<a href="server/dtd/server-dtd-content-tags.xhtml">clients</a>/&gt;
+      &lt;/mysql&gt;
+      &lt;<a href="common/configuration/file-store.xhtml">fileStore</a>  path="/path/to/store"&gt;
+         &lt;<a href="server/dtd/server-dtd-content-tags.xhtml">clientApprovals</a>/&gt;
+      &lt;/fileStore&gt;
+      &lt;<a href="common/configuration/memory-store.xhtml">memoryStore</a>&gt;
+         &lt;transactions/&gt;
+      &lt;/memoryStore&gt;
+      &lt;<a href="server/configuration/server-email.xhtml">mail</a> enabled="true"
+         useSSL="true"
+         username="qqq"
+         password="www"
+         server="fnord.foo.baz"
+         port="3321"
+         recipents="tom;dick;harry"&gt;
+         &lt;messageTemplate&gt;/var/www/config/message.txt&lt;/messageTemplate&gt;
+         &lt;subjectTemplate&gt;/var/www/config/subject.txt&lt;/subjectTemplate&gt;
+      &lt;/mail&gt;
+ &lt;/service&gt;
+&lt;/config&gt;
+</pre>
+<!--#include virtual="../../footer.html" -->
+
+</body>
+</html>

@@ -1,0 +1,12 @@
+<!ELEMENT config (client)*>
+<!ELEMENT id (#PCDATA)>
+<!ELEMENT serviceUri (#PCDATA)>
+<!ELEMENT callbackUri (#PCDATA)>
+<!ELEMENT lifetime (#PCDATA)>
+<!ELEMENT publicKeyFile (#PCDATA)>
+<!ELEMENT privateKeyFile (#PCDATA)>
+<!ELEMENT client (id|serviceUri|callbackUri|lifetime|publicKeyFile|privateKeyFile)*>
+<!ATTLIST client
+          name CDATA #IMPLIED
+          version CDATA #IMPLIED
+          debug CDATA #IMPLIED>

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+                  http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+         version="2.5">
+
+    <display-name>OAuth for MyProxy Client</display-name>
+    <!--what gets put in the browser's title bar -->
+
+
+    <servlet>
+        <servlet-name>startRequest</servlet-name>
+        <!--internal name of the servlet-->
+        <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.client.servlet.sample.SimpleStartRequest</servlet-class>
+        <load-on-startup>1</load-on-startup>
+        <!--load as soon as tomcat starts?-->
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>startRequest</servlet-name>
+        <!--the servlet-name above-->
+        <url-pattern>/startRequest</url-pattern>
+        <!--what needs to be in the url, so http://foo.org/client/simple-->
+    </servlet-mapping>
+
+
+    <servlet>
+        <servlet-name>ready</servlet-name>
+        <!--internal name of the servlet-->
+        <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.client.servlet.sample.SimpleReadyServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+        <!--load as soon as tomcat starts?-->
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>ready</servlet-name>
+        <!--the servlet-name above-->
+        <url-pattern>/ready</url-pattern>
+        <!--what needs to be in the url, so http://foo.org/client/simple-->
+    </servlet-mapping>
+
+
+    <welcome-file-list>
+        <welcome-file>
+            index.html <!--default file to be displayed at http://foo.org/client-->
+        </welcome-file>
+
+    </welcome-file-list>
+<!--    <listener>
+        <listener-class>edu.uiuc.ncsa.myproxy.oa4mp.client.loader.ClientBootstrapper</listener-class>
+    </listener>-->
+    <listener>
+        <listener-class>edu.uiuc.ncsa.oa4mp.oauth2.client.OA2ClientBootstrapper</listener-class>
+    </listener>
+
+    <!--
+         Comment the following section if you are accessing this through
+         Apache. This enables security in Tomcat
+    -->
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>clientSecurity</web-resource-name>
+            <url-pattern>/*</url-pattern>
+            <http-method>GET</http-method>
+            <http-method>POST</http-method>
+        </web-resource-collection>
+        <user-data-constraint>
+            <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+        </user-data-constraint>
+    </security-constraint>
+
+    <filter>
+        <filter-name>filter</filter-name>
+        <filter-class>edu.uiuc.ncsa.security.servlet.MyTomcatFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>filter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+
+    <!--
+       New and improved way to specify the XML-based configuration file
+    -->
+    <!--
+    <context-param>
+        <param-name>oa4mp:client.config.file</param-name>
+        <param-value>/path/to/config-file.xml</param-value>
+    </context-param>
+    -->
+
+
+    <!-- (Optional) name of the configuration within the file to load -->
+    <!--
+    <context-param>
+        <param-name>oa4mp:client.config.name</param-name>
+        <param-value>config-name</param-value>
+    </context-param>
+    -->
+
+</web-app>
+

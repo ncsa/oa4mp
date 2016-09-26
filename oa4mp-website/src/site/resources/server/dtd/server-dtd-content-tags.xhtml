@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Content Tags.</title>
+    <!--#include virtual="../../head.html" -->
+</head>
+<body>
+<!--#include virtual="../../header.html" -->
+
+<h2>Content Tags.</h2>
+<p>The content tags (these are <b>not</b> attributes to a tag) specify what is retained
+    in a store. These are</p>
+<table style="text-align: left; width: 1148px; height: 165px;" border="1" cellspacing="2" cellpadding="2">
+    <tbody>
+    <tr>
+        <td style="vertical-align: top;">Name</td>
+        <td style="vertical-align: top;">Description</td>
+        <td style="vertical-align: top;">Tag</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">transactions</td>
+        <td style="vertical-align: top;">Transactions that are pending. These are generally short-lived and should not
+            be persisted for extended periods.
+        </td>
+        <td style="vertical-align: top;">&lt;transactions/&gt;</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">client</td>
+        <td style="vertical-align: top;">Registered clients that the service knows about. These should be persisted</td>
+        <td style="vertical-align: top;">&lt;clients/&gt;</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">clientApprovals</td>
+        <td style="vertical-align: top;">Approvals for clients. These should be persisted.</td>
+        <td style="vertical-align: top;">&lt;clientApprovals/&gt;</td>
+    </tr>
+    </tbody>
+</table>
+<p>There is one optional attribute associated with any content tag and this is "tablename". In cases where the
+    underlying store is an SQL store, you may use this to specify the table name, overriding the default. This attribute
+    is ignored by other stores.</p>
+
+<h3>Example 1.</h3>
+
+<p>This puts the client approvals in a <a href="common/configuration/file-store.xhtml">file store</a></p>
+<pre>
+&lt;config&gt;
+   &lt;service address="localhost"&gt;
+      &lt;fileStore path="/var/www/store"&gt;
+         &lt;clientApprovals/&gt;
+      &lt;/fileStore&gt;
+   &lt;/service&gt;
+&lt;/config&gt;
+</pre>
+<h3>Example 2.</h3>
+
+<p>Specifying the table name:</p>
+<pre>
+&lt;service name="postgres-config"
+         disableDefaultStores="true"&gt;
+    &lt;postgresql username="bob" password="mairzydoats"  schema="math" database="oa4mp"&gt;
+       &lt;transactions tablename="transaction2"/&gt;
+       &lt;clients tablename="gateways"/&gt;
+       &lt;clientApprovals/&gt;
+    &lt;/postgresql&gt;
+    &lt;!-- other stuff --&gt;
+&lt;/service&gt;
+</pre>
+<p>In this example, the default stores are disabled, so if there is some issue with the database configuration, memory
+    stores won't be used, but starting the server will fail. Two of the tables have been created by the administrator
+    with names different than in the default setup.</p>
+<!--#include virtual="../../footer.html" -->
+
+</body>
+</html>

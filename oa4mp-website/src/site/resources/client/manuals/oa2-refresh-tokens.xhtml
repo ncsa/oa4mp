@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Refresh Tokens and User Information</title>
+    <!--#include virtual="../../head.html" -->
+
+</head>
+<body class="composite">
+<!--#include virtual="../../header.html" -->
+<h1>Refresh Tokens</h1>
+Refresh tokens are specific to the OAuth 2 specification and are only available in that version of OA4MP.
+Generally a user needs an access token in order to retrieve a protected asset (such as
+a certificate chain).
+
+<h2>How's it work?</h2>
+After a user authenticates, the client can request an access token. It is the access token that allows a client
+to get a certificate. Access tokens are normally fairly short-lived, on the order of 15 - 20 minutes
+since if one is stolen, a rogue user could (possibly) use it. The problem with this is that
+every time a user wants a certificate, s/he must authenticate. If the client is allowed to retrieve certificates on
+behalf of the user, that is awfully inconvenient.
+<p>Fortunately, there are <b>refresh tokens</b>. A refresh token is given to the client and allows it to
+get an access token. The refresh token includes a lifetime, typically 15 days, though the user can request
+more or less. </p>
+
+<h3>So how do I use it?</h3>
+Generally if you are a user, you don't need to know anything else past this point.
+
+<p>If you are writing to the API though, you need to know the particulars of managing refresh tokens.
+Both tokens (access and refresh) are stored locally as part of the Asset.
+To get another access token,
+you need to submit a refresh token request along with the current refresh token. You will receive a new access token
+back along with a new refresh token, valid for as long as the first. All of this is managed in the
+single <code>getRefreshToken</code> call
+of the API, so you don't need to sweat over the details. Just make this call whenever you need a new access token and
+one will be retrieved.</p>
+
+<h3>An example. </h3>
+Remember that the initial request from the client requires an system-supplied identifier that will be used henceforth.
+The next example creates one and then uses it to retrieve a refresh token.
+
+<pre>
+    OA2ClientEnvironment ce = OA2ClientEnvironmentUtil.load("/path/to/config.xml", "name-of-config");
+    OA2MPService service = new OA2MPService(ce);
+    String id = "my:new:id/42";
+    // Use the webapp to do the authentication. When that is done, you will have
+    // an asset that contains the private key, cert request, access token, refresh token and identifier
+    // So now the scenario is that the client needs to get another certificate. The refresh token
+    // allows this to be done without having the user re-authenticate.
+
+    Asset2 asset = service.refresh(id);
+    service.getCert(asset);
+    // Now you have the new certs. Access them as per usual, e.g.
+    X509Certificate[] cert = asset.getCertificates();
+</pre>
+
+<h1>User Information</h1>
+User information is just information about the user that the server can return. The only basic information that is
+guaranteed is the name the user supplied to log on to MyProxy. Many other bits of information may be supplied by
+a server but this is up to the organization and its policies. The user must logon first via  browser and then the call
+can be made.
+
+<h3>User Info Example</h3>
+
+This example is very similar to the one above in set up:
+<pre>
+    OA2ClientEnvironment ce = OA2ClientEnvironmentUtil.load("/path/to/config.xml", "name-of-config");
+    OA2MPService service = new OA2MPService(ce);
+    String id = "my:new:id/42";
+    // assuming that the user has authenticated by this point
+    UserInfo userInfo = service.getUserInfo(id);
+    userInfo.getName();
+</pre>
+<!--#include virtual="../../footer.html" -->
+
+</body>
+</html>

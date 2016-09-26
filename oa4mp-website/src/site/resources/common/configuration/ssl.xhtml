@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title></title>
+</head>
+<body class="composite">
+<!--#include virtual="../../header.html" -->
+<h2>The SSL Configuration</h2>
+
+<p>
+    <b>Note: The replaces the older keystore-only configuration.</b>
+    It is much better because this allows you to wrap passwords in XML
+    CDATA sections. The older keystore configuration used attributes in the tag which
+    meant that many passwords could not be specified.
+</p>
+
+<p>
+    This element is used by any component that requires a Secure Socket Layer (SSL) connection
+    to server. Typically, a client of another machine (such as an OA4MP server that has a client
+    certificate to use a MyProxy server) will configure the keystore section. A connection
+    to another machine (such as to an LDAP server) requires a trust store. It is beyond the scope of
+    this document to discuss these in detail.
+</p>
+
+<h3>The SSL Element</h3>
+
+<p>
+    This consists of either a truststore or keystore (or both) as needed.
+    Either store is a collection of certificates and certificate chains. OA4MP uses SSL for a variety of
+    things. An OA4MP server is a client to a MyProxy server, or possibly an LDAP server, hence it requires
+    a keystore. An OA4MP client
+    may need a specific truststore to connect to an OA4MP server that has a self-signed cert. These are
+    the frequently occurring examples.
+
+</p>
+<table style="text-align: left; width: 50%;" border="1" cellspacing="2" cellpadding="2">
+    <tbody>
+    <tr>
+        <td style="vertical-align: top;">Name</td>
+        <td style="vertical-align: top;">Required</td>
+        <td style="vertical-align: top;">Default</td>
+        <td style="vertical-align: top;"></td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">debug</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">false</td>
+        <td style="vertical-align: top;">Enabled low-level SSL debugging. This is <i>not</i> the same as enabling
+            debugging for
+            the server and will tell the SSL layer to print out everything it is doing, which is usually a huge amount
+            of information.
+            This is equivalent to setting the Java system property javax.net.debug to true.
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">useJavaTrustStore</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">true</td>
+        <td style="vertical-align: top;">Use the default Java trust store (which normally resides
+            at $JAVA_HOME/lib/security/cacerts) in addition to the one given in the path. If this
+            element is omitted it is the same as setting this option to "true". Generally, if this is disabled then no
+            commercial certificates will be recognized by SSL. This might be useful in certain cases, but
+            should probably be enabled (i.e. omitted) unless you have good reasons otherwise.
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<h3>The Keystore Element</h3>
+
+<p>
+    A keystore provides credentials that allows a client to connect to a server.
+</p>
+<table style="text-align: left; width: 50%;" border="1" cellspacing="2" cellpadding="2">
+    <tbody>
+    <tr>
+        <td style="vertical-align: top;">Name</td>
+        <td style="vertical-align: top;">Required</td>
+        <td style="vertical-align: top;">Default</td>
+        <td style="vertical-align: top;"></td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">type</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">JKS</td>
+        <td style="vertical-align: top;">The type of the keystore, e.g. "PKCS12" or "JKS".</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">password</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">-</td>
+        <td style="vertical-align: top;">The password for the keystore</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">path</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">-</td>
+        <td style="vertical-align: top;">The full local path to the keystore.</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">factory</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">-</td>
+        <td style="vertical-align: top;">The name of the factory, e.g. SunX509, which will be used to create the key
+            manager factory. This creates any key managers. You should generally not need to change this.
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<h3>The Trust Store Element</h3>
+
+<p>
+    A trust store is used to verify credentials from a server.
+</p>
+<table style="text-align: left; width: 50%;" border="1" cellspacing="2" cellpadding="2">
+    <tbody>
+    <tr>
+        <td style="vertical-align: top;">Name</td>
+        <td style="vertical-align: top;">Required</td>
+        <td style="vertical-align: top;">Default</td>
+        <td style="vertical-align: top;"></td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">type</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">JKS</td>
+        <td style="vertical-align: top;">The type of the truststore, e.g. "PKCS12" or "JKS".</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">password</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">-</td>
+        <td style="vertical-align: top;">The password for the trust store.</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">path</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">-</td>
+        <td style="vertical-align: top;">The full local path to the trust store.</td>
+    </tr>
+    </tbody>
+</table>
+<h3>A Server example</h3>
+
+<p>
+    In this example for OAuth 2.0, the server specifies that the MyProxy server and an LDAP server
+    are to be contacted via ssl. LDAP requires a truststore while MyProxy requires a client certificate
+    that it issued be used.
+</p>
+<pre>
+    &lt;service name="myconfig"&gt;
+    &lt;ldap enabled="true"&gt;
+          &lt;ssl debug="false"
+               useJavaTrustStore="true"&gt;
+               &lt;trustStore>
+                   &lt;path&gt;/pt/oa2/etc/config/custom-trust-certs&lt;/path>
+                   &lt;password&gt;&lt;![CDATA[sfdgfdf(*()(*]]&gt;&lt;/password>
+               &lt;/trustStore&gt;
+          &lt;/ssl&gt;
+      &lt;!-- Rest of LDAP config --&gt;
+    &lt;/ldap&gt;
+
+    &lt;myproxy host="myproxy.bigstate.edu" port="7512"&gt;
+         &lt;loa name="http://incommonfederation.org/assurance/silver" port="7514"/&gt;
+         &lt;loa name="openid" port="7516"/&gt;
+         &lt;ssl"&gt;
+             &lt;keystore&gt;
+                  &lt;path&gt;/opt/oa2/etc/config/hostcred.pk12&lt;/path&gt;
+                  &lt;password&gt;&lt;![CDATA[QOFjkhuer73959%&amp;]]&gt;&lt;/password&gt;
+                  &lt;type&gt;PKCS12&lt;/type&gt;
+             &lt;/keystore&gt;
+         &lt;/ssl&gt;
+       &lt;/myproxy&gt;
+    &lt;!-- Rest of config --&gt;
+
+    &lt;/service&gt;
+
+</pre>
+<p>
+    The LDAP configuration uses SSL and the assumed default Java trust store in addition to the customized
+    trusted certificate store. The MyProxy configuration ill use the given keystore that contains exactly
+    the host certificate for the MyProxy server and nothing else.
+
+</p>
+
+<!--#include virtual="../../footer.html" -->
+</body>
+</html>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="MyProxy">
+     <!--
+        Placeholder for getting maven to generate the website.
+     -->
+ <!--   <bannerLeft>
+        <name>Maven</name>
+        <src>http://maven.apache.org/images/apache-maven-project.png</src>
+        <href>http://maven.apache.org/</href>
+    </bannerLeft>-->
+    <bannerLeft>
+         <name>NCSA</name>
+         <src>css/images/ncsalogo_sm-2.gif</src>
+         <href>http://www.ncsa.illinois.edu/</href>
+         <height>40</height>
+     </bannerLeft>
+   <!-- <bannerRight>
+        <src>http://maven.apache.org/images/maven-small.gif</src>
+    </bannerRight>-->
+    <bannerRight>
+        <name>MyProxy</name>
+        <src>css/images/MyProxyWide.gif</src>
+        <href>http://grid.ncsa.illinois.edu/myproxy/</href>
+        <height>40</height>
+       </bannerRight>
+    <version position="right"/>
+    <skin>
+      <groupId>edu.uiuc.ncsa.maven.skin</groupId>
+      <artifactId>oa4mp-skin</artifactId>
+      <version>3.0-SNAPSHOT</version>
+    </skin>
+    <custom>
+
+    </custom>
+
+    <body>
+        <menu name="OAuth for MyProxy">
+            <item name="Overview" href="http://grid.ncsa.illinois.edu/myproxy/oauth/server/index.xhtml"/>
+            <item name="Server" href="server/index.xhtml"/>
+            <item name="Client" href="client/index.xhtml"/>
+            <item name="api docs" href="apidocs/index.html"/>
+        </menu>
+        <menu ref="reports"/>
+    </body>
+</project>

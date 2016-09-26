@@ -1,0 +1,17 @@
+2010-05-19  Jim Basney  <jbasney@ncsa.uiuc.edu>
+
+    * MyProxyLogon.java (version): 1.2 release
+    * Changed ant to use the maven build. Added supporting ant task jar to lib directory.
+    * Added service facade
+    * Moved MyTrustManager to common utilities. Made MyProxy depend on that
+	* MyProxyLogon.java (version): 1.1 release
+	* MyProxyLogonGUI.java (version): 1.1 release
+	* pom.xml: support mvn build as an alternative to ant
+	* MyProxyLogon.java (connect,getKeyManagerFactory,setKeyManagerFactory,getKeyManagers): support client-side SSLSocket certificate-based authentication
+	* MyProxyLogon.java (saveCredentials,saveCredentialsToFile): support saving credentials to any OutputStream
+	* MyProxyLogon.java (getProxyLocation): fix bug in use of System.getProperty("java.io.tmpdir").
+	* MyProxyLogon.java (getAcceptedIssuers): fix file descriptor leak
+
+2007-07-24  Jim Basney  <jbasney@ncsa.uiuc.edu>
+
+	Initial 1.0 release.

@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Storing Delegated Assets</title>
+    <!--#include virtual="../../head.html" -->
+</head>
+<body class="composite">
+<!--#include virtual="../../header.html" -->
+
+<h2>Storing Delegated Assets</h2>
+Once delegation is complete, clients will want to retrieve the private key, certificate chain and
+other items. The OA4MP client comes (as of 1.0.6) with a new storage system for these. Features are
+<ul>
+    <li>Seamless integration. If an asset store is configured, assets are added automatically bythe system</li>
+    <li>Support for file-based as well as SQL-based storage</li>
+    <li>Simple API.</li>
+</ul>
+If you need to access the results elsewhere, such as in another servlet or even in another application
+then persistent storage of results is must. <b>Note</b> that
+if you do not configure storage, then a warning message will be entered in the log and any assets will
+be kept in an in-memory store. If you have no further need of assets, then you can safely ignore this feature.
+<h2>How it works in a Nutshell</h2>
+Each delegation request results in an Asset being created. There are various stores available. These are
+<ul>
+    <li><a href="common/configuration/memory-store.xhtml">memory</a></li>
+    <li><a href="common/configuration/file-store.xhtml">file system</a></li>
+    <li><a href="common/configuration/mysql-store.xhtml">MySQL</a></li>
+    <li><a href="common/configuration/mariadb-store.xhtml">Maria DB</a></li>
+    <li><a href="common/configuration/postgres-store.xhtml">PostgreSQL</a></li>
+</ul>
+
+<h3>New Store Creation</h3>
+To create a new store has different requirements, depending on the store. For an memory only store, you need do
+nothing more that have an entry in the configuration file. Same for a file store. For an SQL-backed
+asset store, you should run either the install script for <a
+        href="http://svn.code.sf.net/p/cilogon/code/tags/latest/client/mysql.sql">mysql, Maria DB</a>
+or <a href="http://svn.code.sf.net/p/cilogon/code/tags/latest/client/postgres.sql">postgreSQL</a>.
+These also presume database administration access to set them up.
+
+<h3>The Asset object</h3>
+Asset stores contain assets. An asset is a java bean populated by various bits of useful information.
+<table style="text-align: left; width: 100%;" border="1" cellspacing="2" cellpadding="2">
+    <tbody title="Asset properties">
+    <tr>
+        <td style="vertical-align: top;">Property name</td>
+        <td style="vertical-align: top;">Mutator</td>
+        <td style="vertical-align: top;">Comment</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">identifier</td>
+        <td style="vertical-align: top;">getIdentifier, setIdentifier</td>
+        <td style="vertical-align: top;">A client generated unique string (this is URI) which identifies this. It will
+            be stored as a cookie in the user's browser and this cookie will later be used to find the correct asset.
+            This is
+            necessary to keep the private key, username and certificates associated with each other. You specify this
+            at the time of the initial request to the OA4MPService.
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">username</td>
+        <td style="vertical-align: top;">getUsername, setUsername</td>
+        <td style="vertical-align: top;">The name the system used when contacting MyProxy. This usually be the
+            name the user supplied at login, although some servers (such as CILogon) use another alias.
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">privateKey</td>
+        <td style="vertical-align: top;">getPrivateKey, setPrivateKey</td>
+        <td style="vertical-align: top;">The private key that the system generated when requesting this certificate.
+            The certificate is useless without this generally.
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">certificates</td>
+        <td style="vertical-align: top;">getCertificates, setCertificates</td>
+        <td style="vertical-align: top;">An <i>array</i> of X509Certificate objects. This is the certificate chain
+            returned
+            from MyProxy. There is always at least one element after a sucessful delegation.
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">redirect</td>
+        <td style="vertical-align: top;">getRedirect, setRedirect</td>
+        <td style="vertical-align: top;">The URI that was returned by the OA4MP server and to which the user was
+            redirected.
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">creationTime</td>
+        <td style="vertical-align: top;">getCreationTime, setCreationTime</td>
+        <td style="vertical-align: top;">The timestamp for when this asset was created. This is used by the
+            automatic cleanup thread, if that facility is enabled or administrators may use this directly if they
+            wish to implement their own aging/cleanup policies.
+        </td>
+    </tr>
+    <tr>
+           <td style="vertical-align: top;">accessToken</td>
+           <td style="vertical-align: top;">getAccessToken, setAccessToken</td>
+           <td style="vertical-align: top;">Get the current access token.  <span style="background-color: #ff6600;">OAuth 2.0</span>
+               assets only.</td>
+       </tr>
+    <tr>
+           <td style="vertical-align: top;">refreshToken</td>
+           <td style="vertical-align: top;">getRefreshToken, setRefreshToken</td>
+           <td style="vertical-align: top;">Get the current refresh token. <span style="background-color: #ff6600;">OAuth 2.0</span>
+               assets only.</td>
+       </tr>
+
+    </tbody>
+</table>
+<h3>Adding assets</h3>
+
+Normally assets are created and managed automatically during delegation. Be sure to wait until delegation has completed
+before attempting to access
+properties or they may not exist yet.
+
+<h3>Asset retrieval and use</h3>
+The ClientEnvironment is created at server startup from the configuration file.
+
+<h3>Creating your own ClientEnvironment</h3>
+Another possible use of the OA4MP client api is as a library to allow other applications to get assets from a store.
+This
+can be done quite simply by populating a client environment from the configuration file and invoking
+its getAssetStore. Rather than hand-crafting an environment, it is best to use the right utility.
+<h5>OAuth 1.0a</h5>
+<pre>
+ClientEnvironmentUtil.load(String configFilePath, String configName)
+</pre>
+<h5>OAuth 2.0</h5>
+<pre>
+OA2ClientEnvironmentUtil.load(String configFilePath, String configName)
+</pre>
+
+which returns a fully functional environment.
+<h4>An example</h4>
+You might specify the oa4mp-client-api as a dependency in another project. Then to get an asset there
+you would do something like this for OAuth 1.0a (again, <span style="background-color: #ff6600;">OAuth 2.0</span>
+        is identical aside from the first line):
+<pre>
+ClientEnvironment ce = ClientEnvironmentUtil.load("/path/to/config", "config-name");
+Asset asset = ce.getAssetStore.get(identifier);
+PrivateKey pKey = asset.getPrivateKey();
+// etc., etc.
+</pre>
+where <code>identifier</code> is the unique identifier that was used when the asset was created.
+
+<h3>Removing old assets</h3>
+There are two ways to do this. You may either simply remove them manually by invoking the <code>remove</code>
+method in the <code>AssetStore</code> or you can enable a worker thread to remove expired ones for you. The benefit
+of using the thread is that it will also garbage collect incomplete assets (such as when a user starts
+a delegation but does not complete it, for whatever reason) and generally keep the store
+cleaner.
+<h5>OAuth 1.0a</h5>
+This is configurable and is enabled by adding the following elements to your configuration:<br/>
+<pre>
+    &lt;enableAssetCleanup&gt;true&lt;/enableAssetCleanup&gt;
+    &lt;maxAssetLifetime&gt;10000&lt;/maxAssetLifetime&gt;
+</pre>
+
+The first enables the cleanup facility (default is no cleanup) and the second specifies, in seconds, the maximum
+age of an asset. Typically this is at least as long as your site policy on the certificate lifetime itself.
+<h5>OAuth 2.0</h5>
+Only a single element is needed in the configuration file.
+<pre>
+    &lt;enableAssetCleanup&gt;true&lt;/enableAssetCleanup&gt;
+</pre>
+This enables automatic asset cleanup. The default is to have no cleanup.
+The lifetime of an asset is determined by the refresh token's stored lifetime, since it is impossible
+to get another access token one the refresh token expires without having the user authenticate. If
+you supply a <pre>maxAssetLifetime</pre> in your configuration, it will be ignored.
+<!--#include virtual="../../footer.html" -->
+
+</body>
+</html>

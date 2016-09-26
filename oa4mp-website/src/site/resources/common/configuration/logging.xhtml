@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Logging</title>
+    <!--#include virtual="../../head.html" -->
+</head>
+<body class="composite">
+<!--#include virtual="../../header.html" -->
+<h2>Logging</h2>
+
+<p>Scope: client and server, all versions.</p>
+
+<table border="2">
+    <tbody>
+    <tr>
+        <td>Attribute</td>
+        <td>Required?</td>
+        <td>Default</td>
+        <td>Description</td>
+    </tr>
+    <tr>
+        <td>logFileName</td>
+        <td>N</td>
+        <td>logging.xml</td>
+        <td>The default file is deposited in the invocation directory. If the entire path is given, that will be used.
+            NOTE: the path must exist or logging will fail to initialize. I.e., no paths are created.
+        </td>
+    </tr>
+    <tr>
+        <td>logName</td>
+        <td>N</td>
+        <td>"oa4mp"</td>
+        <td>The name prepended to each entry in the log file. This is especially useful if several instances of oa4mp
+            are running and you wish to pipe the log messages to a single location.
+        </td>
+    </tr>
+    <tr>
+        <td>logSize</td>
+        <td>N</td>
+        <td>0</td>
+        <td>The maximum size of the file before the system rolls it over. If rotating files is enabled (by setting the
+            logFileCount greater than 1), then logs are rotated. Otherwise, the log file is simply over-written
+        </td>
+    </tr>
+    <tr>
+        <td>logFileCount</td>
+        <td>N</td>
+        <td>1</td>
+        <td>The total number of files to have in the rotation. If the count it less than or equal to 1, then only a
+            single log file is maintained.
+        </td>
+    </tr>
+    <tr>
+        <td>disableLog4j</td>
+        <td></td>
+        <td>true</td>
+        <td>Disable log4j. If you are using log 4 java then set this to "false". Since there are potential conflicts
+            with log4j the default is to set this to "true".
+        </td>
+    </tr>
+    <tr>
+        <td>debug</td>
+        <td>N</td>
+        <td>"false"</td>
+        <td>Enable system-wide debugging. This is equivalent to setting the debug attribute in the service tag.
+            Acceptable values are "true" or "false". Anything other than "true" is interpreted as meaning "false".
+        </td>
+    </tr>
+    </tbody>
+</table>
+<p>Note that not specifying a log file will still cause one to be created. If you are enabling rotation of log files, be
+    advised that the name will be interpreted according to Java's logging standard. This means specifying a log file
+    like "/var/www/logs/mylog.log" would create a sequence of files named mylog.log.0, mylog.log.1, ... with the first
+    of these (*.0) being the current log.</p>
+
+<h3>Server Example.</h3>
+<pre>
+&lt;config&gt;
+    &lt;service name="my-config"&gt;
+       &lt;logging
+          logFileName="/var/www/log/oa4mp.xml"
+          logName="oa4mp"
+          logSize="1000000"
+          logFileCount="2"
+          debug="true"/&gt;
+    &lt;!-- rest of config --&gt;
+    &lt;/service&gt;
+ &lt;/config&gt;
+</pre>
+<p>In this example the log files named "oa4mp.xml.*" are created in the directory "/var/www/log".
+    The maximum size of a single file is 100000 and there will be 2 files in the rotation, numbered 0
+    (active) and 1. In this case, debugging is enabled for the application.
+    All log entries are prepended with the label "oa4mp", so that if multiple applications use the same
+    log file, the entries are qualified.</p>
+
+<h3>Client Example</h3>
+<pre>
+&lt;config&gt;
+    &lt;client name="client-config"&gt;
+       &lt;logging
+          logFileName="/var/www/log/oa4mp.xml"
+          logName="oa4mp"
+          logSize="1000000"
+          logFileCount="2"
+          debug="true"/&gt;
+    &lt;!-- rest of config --&gt;
+    &lt;/client &gt;
+ &lt;/config&gt;
+</pre>
+
+Ditto the description above.
+<!--#include virtual="../../footer.html" -->
+
+</body>
+</html>

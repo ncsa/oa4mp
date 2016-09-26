@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Email Notifications</title>
+    <!--#include virtual="../../head.html" -->
+</head>
+<body class="composite">
+<!--#include virtual="../../header.html" -->
+
+<h1>Email Notifications</h1>
+
+<p>The service can be configured to send email notifications on certain events. This requires that a mail server be
+    specified with a user, password and other connection information as well as templates for messages.</p>
+<table style="text-align: left; width: 1157px; height: 165px;" border="1" cellspacing="2" cellpadding="2">
+    <tbody>
+    <tr>
+        <td style="vertical-align: top;">Attribute</td>
+        <td style="vertical-align: top;">Required?</td>
+        <td style="vertical-align: top;">Default</td>
+        <td style="vertical-align: top;">Description</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">enabled</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">false</td>
+        <td style="vertical-align: top;">enable email notifications.</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">starttls</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">false</td>
+        <td style="vertical-align: top;">
+            <p>Some servers (e.g., gmail) require sending a STARTTLS command in addition to the usual commands.
+                If you get an error involving this, set this flag to "true".</p>
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">useSSL</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">false</td>
+        <td style="vertical-align: top;">Connect to the server via ssl. Implictly sets the port to the standard
+            default.
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">username</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">N/A</td>
+        <td style="vertical-align: top;">The name of the user when authenticating with the server.</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">password</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">N/A</td>
+        <td style="vertical-align: top;">The password of the user when authenticating with the server</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">port</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">25 if no SSL, 465 if SSL.</td>
+        <td style="vertical-align: top;">The port to use. If omitted standard ports will be used.</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">recipients</td>
+        <td style="vertical-align: top;">Y</td>
+        <td style="vertical-align: top;">N/A</td>
+        <td style="vertical-align: top;">A semi-colon (;) separated list of recipients.</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">server</td>
+        <td style="vertical-align: top;">Y</td>
+        <td style="vertical-align: top;">N/A</td>
+        <td style="vertical-align: top;">The server to use.</td>
+    </tr>
+    </tbody>
+</table>
+<h2></h2>
+
+<h2>Configuring Tomcat</h2>
+
+<p>In order to use email notifications with Tomcat, you must globally enable email. This is a <em>feature</em> of Tomcat
+    and can't easily be changed. Fortunately, this is really easy. </p>
+<ol>
+    <li>Download the latest version of java mail from <a title="java mail api jar "
+                                                         href="http://www.oracle.com/technetwork/java/javamail/index-138643.html">here</a>.
+        Drop this jar (typically named mail.jar) into your <code>$CATALINA_HOME/lib</code>
+        directory.
+    </li>
+    <li>Add the following line right before the closing tag of the <code>$CATALINA_HOME/conf/context.xml</code>
+        file:
+    </li>
+</ol>
+<pre> &lt;Resource name="mail/Session" type="javax.mail.Session" auth="Container"/&gt;</pre>
+<p><strong><em><br/>Note you must configure Tomcat even if you are not using email notifications.</em></strong></p>
+
+<p>This is, again, because Tomcat does this globally and there is no way to just have local
+    application control of it. </p>
+
+<h3>Example 1. Using SSL</h3>
+
+<p>This example will set up notifications using SMTP over SSL. Templates (see below) are specified for the message and
+    subject line.</p>
+<pre>
+&lt;config&gt;
+   &lt;server name="default"&gt;
+      &lt;mail
+         enabled="true"
+         useSSL="false"
+         password="mairzy-doats"
+                debug="false"
+      	 server="smtp.super-secure-server.net"
+         recipients="admin@chem.bigstate.edu"&gt;
+         &lt;messageTemplate&gt;/var/www/config/oa4mp-message.template&lt;/messageTemplate&gt;
+         &lt;subjectTemplate&gt;/var/www/config/os4mp-subject.template&lt;/subjectTemplate&gt;
+      &lt;/mail&gt;
+      &lt;!-- rest of configuration &gt;
+   &lt;\server&gt;
+&lt;\config&gt;
+</pre>
+<h2>Templates</h2>
+
+<p>A <span style="font-style: italic;"><span style="font-weight: bold;">template</span></span> is a text file that has
+    tokens of the form ${key} which will be replaced by system supplied values. This allows you customize notifications
+    and include current information from the server. The default information every service notification gets is</p>
+<table style="text-align: left; width: 100%;" border="1" cellspacing="2" cellpadding="2">
+    <tbody>
+    <tr>
+        <td style="vertical-align: top;">Key</td>
+        <td style="vertical-align: top;">Description</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">name</td>
+        <td style="vertical-align: top;">The name supplied by the client</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">email</td>
+        <td style="vertical-align: top;">the contact email address for the client</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">homeUri</td>
+        <td style="vertical-align: top;">the home URI supplied by the client</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">failureUri</td>
+        <td style="vertical-align: top;">the failure URI supplied by the client</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">creationTime</td>
+        <td style="vertical-align: top;">the time of the requiest</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">identifier</td>
+        <td style="vertical-align: top;">the identifier generated by the system for the client</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">publicKey</td>
+        <td style="vertical-align: top;">the public key supplied by the client</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">host</td>
+        <td style="vertical-align: top;">The canonical host name of the server that received the request.</td>
+    </tr>
+    </tbody>
+</table>
+Any line in a template file that starts with a "#" will be ignored.
+<h3>The message template</h3>
+
+<p>This template will be used as the body of every notification. A sample is below.</p>
+<pre>
+# A sample template
+A client has requested approval on ${host}.
+
+Name: ${name}
+Contact email: ${email}
+Home uri: ${homeUri}
+Failure uri:${failureUri}
+Creation time: ${creationTime}
+Generated identifier: ${identifier}
+
+If you approve this request, you should send a notice
+to the contact email and include the generated identifier.</pre>
+
+<h3>The subject template</h3>
+
+<p>This template will be used as the subject of every notification. A sample is below.</p>
+<pre>Client approval request received for "${name}" on ${host}</pre>
+<!--#include virtual="../../footer.html" -->
+
+</body>
+</html>

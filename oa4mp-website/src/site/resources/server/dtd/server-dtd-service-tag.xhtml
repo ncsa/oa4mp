@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>The Service Tag.</title>
+    <!--#include virtual="../../head.html" -->
+</head>
+<body class="composite">
+<!--#include virtual="../../header.html" -->
+
+<h2>The Service Tag.</h2>
+
+<p>This is the top-level tag for a server configuration. There may be several of these in a single configuration
+    file, all given different names.</p>
+<table style="text-align: left; width: 100%;" border="1" cellspacing="2" cellpadding="2">
+    <tbody>
+    <tr>
+        <td style="vertical-align: top;">Attribute</td>
+        <td style="vertical-align: top;">Required?</td>
+        <td style="vertical-align: top;">Default</td>
+        <td style="vertical-align: top;">Description</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">name</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">(none)</td>
+        <td style="vertical-align: top;">An arbitrary name for this configuration. Multiple configurations in a file are
+            supported.
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">version</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">latest</td>
+        <td style="vertical-align: top;">The version of the configuration file. If omitted, the most current is used.
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">address</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">N/A</td>
+        <td style="vertical-align: top;">The address associated with this service. Normally this is not needed unless
+            there is some aliasing used by the host.The host name is taken from the servlet itself and used in
+            constructing urls that point to this server. For instance, if there is a server farm with a given
+            external-facing address which will be resolved to one of the members based on load-balancing, this
+            would be the external-facing address.
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">debug</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">"false"</td>
+        <td style="vertical-align: top;">Enable debugging for this service. This will be written to the Tomcat logs and
+            might be rather verbose. Use it only if you need it.
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">maxAllowedNewClientRequests</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">unlimited</td>
+        <td style="vertical-align: top;">In the registration client, this is the maximum number of pending
+            client requests that the server will permit. Requests received after this limit is met will
+            be rejected. This is to prevent denial of service attacks for thousands of client requests.
+            Since such requests are normally not too frequent, this number can realistically be set low
+            to 10 or 20 with no issue on a production system.
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">refreshTokenLifetime</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">1296000</td>
+        <td style="vertical-align: top;">"<span style="background-color: #ff6600;">OAuth 2</span>
+            specific. This will set a global maximum on the server, in seconds, for how long a refresh token can
+            remain active from issuance. The default is 15 days.
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">maxClientRefreshTokenLifetime</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">33696000</td>
+        <td style="vertical-align: top;">"<span style="background-color: #ff6600;">OAuth 2</span>
+            specific. This will set a global maximum on the server, in seconds, for refresh tokens a client
+            may request at registration. The default is 13 months.
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">refreshTokenEnabled</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">false</td>
+        <td style="vertical-align: top;">"<span style="background-color: #ff6600;">OAuth 2</span>
+            specific. This tells the server to issue refresh tokens. Setting this false means the server will
+            not issue them, nor will clients be allowed to specify them at registration. Setting the
+            value for the refreshTokenLifetime in the configuration will be ignored if the server
+            does not issue refresh tokens.
+        </td>
+    </tr>
+
+    <tr>
+        <td style="vertical-align: top;">clientSecretLength</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">258</td>
+        <td style="vertical-align: top;">"<span style="background-color: #ff6600;">OAuth 2</span>
+            specific. The server generates client secrets of this length in bytes, then displays them
+            to the client in Base64 encoding, which should be returned verbatim to the server. We suggest
+            at least 128 bytes in length and since Base64 encoding will always pad if the byte count is not
+            divisible by three, making it so is good practice.
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">serverDN</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">(none)</td>
+        <td style="vertical-align: top;">A server DN applied to all MyProxy servers. This may also be applied
+            individually in the MyProxy element.
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">disableDefaultStores</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">false</td>
+        <td style="vertical-align: top;">The default server behavior is to default
+            to using a memory store if no other store is explicitly set. If set to true, this will make the server throw
+            an
+            exception if there is no store configured.
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">pingable</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">true</td>
+        <td style="vertical-align: top;">Boolean value. If true, then contacting a server endpoint (HTTP GET) with an
+            argument of "ping"
+            will result in a response with HTTP return code of 204. If false, then an 500 exception will be thrown on
+            the server.
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">enableTwoFactorSupport</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">false</td>
+        <td style="vertical-align: top;">Boolean value. If true, the support for two factor authentication is enabled.
+        </td>
+    </tr>
+
+    </tbody>
+</table>
+<p>The <span style="font-weight: bold;">name</span> can be anything. The name of the configuration to use may be
+    specified in the deployment descriptor (web.xml) file. If there is a single configuration in the file, that will be
+    used. If there are multiple configurations and no name is specified, an exception is raised.</p>
+
+<h3>A Note on using Two Factor Authentication</h3>
+
+<p>Due to the way Two Factor works, this effectively allows you to get only a single certificate once.
+    Because Two Factor generates a one time password that is very short lived (typically only a minute or perhaps 2
+    at the most), it is possible to wait too long before logging in (done when getting the cert) and have this fail.
+    Also, as stated elsewhere and worth repeating that ever so often, Two Factor offers a challenge that requires you to
+    log on to the RSA self-service console (For the NCSA, this is located at <a href="https://otp.ncsa.illinois.edu/">otp</a>)
+    and then exchange the next token. This is impossible to do within the delegation service, so if
+    Two Factor requires this, get certs will fail with an "invalid password" message until further notice.
+</p>
+
+<h3>Example 1.</h3>
+<pre>
+&lt;config&gt;
+   &lt;service address="http://localhost/oauth"&gt;
+      &lt;!-- more stuff --&gt;
+   &lt;/service&gt;
+&lt;/config&gt;
+</pre>
+<p>Specifies that the service is located on localhost. There is a single configuration and every default will be used,
+    including looking for a local MyProxy instance.</p>
+
+<h3>Example 2.</h3>
+<pre>
+&lt;config&gt;
+   &lt;service address="https://chem.bigstate.edu/organic/oauth"
+       name="organic"
+       clientSecretLength="300"
+       maxAllowedNewClientRequests="25"&gt;
+       &lt;!-- more stuff --&gt;
+   &lt;/service&gt;
+   &lt;service address="https://chem.bigstate.edu/polymer/oauth" name="polymer"&gt;
+       &lt;!-- more stuff --&gt;
+   &lt;/service&gt;
+&lt;/config&gt;
+</pre>
+<p>This specifies that there are two delegation services on the given machine and that both configurations reside in
+    this file, <b>or</b> there are two possible configurations available for a single server. Note that in the
+    first one, the number of new client registration is limited to 25 unappproved ones and the client secret
+    is 300 bytes which translates into 400 characters when Base64 encoded. Also, there is some
+    network address translation going on, so that the <code>address</code> tag is explicitly given.</p>
+<!--#include virtual="../../footer.html" -->
+
+</body>
+</html>

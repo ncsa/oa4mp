@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>The OA4MP Client Configuration File.</title>
+    <!--#include virtual="../../head.html" -->
+</head>
+<body class="composite">
+<!--#include virtual="../../header.html" -->
+
+<h2>The OA4MP Client Configuration File.</h2>
+This contains a few examples of client configurations. You should read the main
+<a href="common/configuration/configuration-files.xhtml">configuration document</a>
+first.
+
+<h3>An example OAuth 2.0 client configuration</h3>
+<p>E.g. Let us say you have the following configuration in the file /path/to/cfg.xml:</p>
+<pre>
+&lt;config&gt;
+   &lt;client name="my-config"&gt;
+       &lt;!-- lots of other stuff --&gt;
+   &lt;/client&gt;
+&lt;/config&gt;
+</pre>
+<p>You would need to put the following into your web.xml file:</p>
+<pre>
+&lt;context-param&gt;
+   &lt;param-name&gt;oa4mp:oauth2.client.config.name&lt;/param-name&gt;
+   &lt;param-value&gt;my-config&lt;/param-value&gt;
+&lt;/context-param&gt;</pre>
+
+<pre>
+&lt;context-param&gt;
+   &lt;param-name&gt;oa4mp:oauth2.client.config.file&lt;/param-name&gt;
+   &lt;param-value&gt;/path/to/cfg.xml&lt;/param-value&gt;
+&lt;/context-param&gt;
+</pre>
+
+
+<!--#include virtual="../../footer.html" -->
+
+</body>
+</html>

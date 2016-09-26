@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Setting up email notifications in case of error</title>
+    <!--#include virtual="../../head.html" -->
+</head>
+
+<body class="composite">
+<!--#include virtual="../../header.html" -->
+<h2>Setting up email notifications </h2>
+This will use the email address set in the email notifications
+OA4MP automatically configures a set of listeners internally that will generate email notifications
+whenever an exception is thrown in the server. All you need to do is specify two files, one that contains
+the subject and one that contains the body. The format for these files is very simple.
+<h3>Getting the right servlet context parameters</h3>
+In the deployment descriptor, web.xml, you should specify the fully qualified names of the subject file:
+<pre>
+&lt;context-param&gt;
+      &lt;param-name&gt;oa4mp:server.error.subject&lt;/param-name&gt;
+      &lt;param-value&gt;/var/www/config/errorSubject.template&lt;/param-value&gt;
+  &lt;/context-param&gt;
+</pre>
+The typical contents of such a file would be
+<pre>
+Error caught by ${servletEngine}  on ${host}
+</pre>
+in while the ${servletEngine} (e.g. Tomcat, Jetty) and ${host} would be replaced by their runtime values.
+
+<p>The body of the generated email message is specified in much the same way:</p>
+<pre>
+&lt;context-param&gt;
+      &lt;param-name&gt;oa4mp:server.error.message&lt;/param-name&gt;
+      &lt;param-value&gt;/var/www/config/errorMessage.template&lt;/param-value&gt;
+  &lt;/context-param&gt;
+</pre>
+And a typical example would be
+<pre>
+An exception was encountered.
+
+Error Report:
+------------
+Error: ${message}
+Host: ${host}
+Client: ${client}
+Servlet: ${servlet}
+URL: ${url}
+
+
+Cookies:
+-------
+${cookies}
+
+
+Exception:
+---------
+${stacktrace}
+</pre>
+where the following values hold:<br/>
+<ul>
+    <li>${message} is the message in the stack trace</li>
+    <li>${host} is the name of the server</li>
+    <li>${client} is the identifier of the client that made the request</li>
+    <li>${servlet} is the name of the servlet (e.g. CertServlet) where the exception was encountered</li>
+    <li>${url} is the url of the request</li>
+    <li>${cookies} is a list of every cookie that the servlet has access to</li>
+    <li>${stacktrace} is the full stacktrace of the exception.</li>
+</ul>
+<!--#include virtual="../../footer.html" -->
+</body>
+</html>

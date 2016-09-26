@@ -1,0 +1,61 @@
+   ------
+   Title
+   OAuth for MyProxy
+   ------
+   Author
+   Jim Basney, Jeff Gaynor, Wendy Edwards
+   ------
+   Date
+   April 10 2013
+
+
+OAuth for MyProxy
+
+    OAuth for MyProxy provides an OAuth-compliant REST web interface to the MyProxy service
+    for providing user certificates to science gateways. It eliminates the need for users to disclose their MyProxy
+    passwords to science gateways. Instead, gateway users authenticate to their MyProxy server's OAuth web interface to
+    approve issuance of a certificate by MyProxy to the science gateway they are using.
+
+    OAuth for MyProxy now support a subset of the OAuth 2.0 protocol based on Open ID Connect (OIDC). OIDC
+    specific features will be pointed out as needed. Note that as of release 3.2, OIDC is the preferred way to
+    connect to CILogon and for use by Globus.
+
+Downloads
+
+* OAuth 1.0a
+
+     Stable version. Use this version with CILogon, Globus, and XSEDE.
+
+        * {{{http://svn.code.sf.net/p/cilogon/code/tags/latest/server/oauth.war}oauth-server-latest.war}}  (Version 3.4-SNAPSHOT)
+
+        * {{{http://svn.code.sf.net/p/cilogon/code/tags/latest/client/client.war}oauth-client-latest.war}} (Version 3.4-SNAPSHOT)
+
+* OAuth 2.0
+
+        * {{{http://svn.code.sf.net/p/cilogon/code/tags/latest/server/oauth2.war}oauth2-server-latest.war}} (Version 3.4-SNAPSHOT)
+
+        * {{{http://svn.code.sf.net/p/cilogon/code/tags/latest/client/client2.war}oauth2-client-latest.war}} (Version 3.4-SNAPSHOT)
+
+
+Documentation
+
+        *{{{./server/index.xhtml}Server}}
+
+        *{{{./client/index.xhtml}Client}}
+
+        *{{{https://docs.google.com/document/pub?id=10SC7oSURc-EgxMQjcCS50gz0u2HzDJAFiG5hEHiSdxA}OAuth 1.0a Protocol Specification}}
+
+        *{{{https://docs.google.com/a/cilogon.org/document/d/1cs3peO9FxA81KN-1RC6Z-auEFIwRbJpZ-SFuKbQzS50/edit?usp=sharing} OIDC Protocol Specification}}
+
+        *{{{./server/manuals/install-walkthrough.xhtml}Server Installation Walk-Through}}
+
+
+Related Resources
+
+        *{{{http://www.cilogon.org/portal-delegation}CILogon portal delegation}} Be sure to read here to get the correct endpoints for
+        your client if you are using CILogon.
+
+        * {{{http://security.ncsa.illinois.edu/teragrid-oauth/}TeraGrid OAuth Service Project}}
+
+        * {{{http://grid.ncsa.illinois.edu/myproxy/pam.html#limitations}PAM Authentication issues with MyProxy. Read this if your MyProxy authentication suddenly quits working}}
+

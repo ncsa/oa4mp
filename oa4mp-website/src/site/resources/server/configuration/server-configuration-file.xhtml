@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>The Server Configuration File.</title>
+    <!--#include virtual="../../head.html" -->
+</head>
+<body class="composite">
+<!--#include virtual="../../header.html" -->
+
+<h2>The Server Configuration File.</h2>
+This contains a few examples of server configurations. You should read the main
+<a href="common/configuration/configuration-files.xhtml">configuration document</a>
+first.
+<h3>Example. Specifying an OAuth 2.0 configuration.</h3>
+<p>E.g. Let us say you have the following configuration:</p>
+<pre>
+&lt;config&gt;
+    &lt;service name="<span style="background-color: #ff6600;">my-config</span>">
+    &lt;!-- lots of other stuff --&gt;
+    &lt;/service&gt;
+&lt;/config&gt;
+</pre>
+<p>You would need to put the following into your web.xml file:</p>
+
+<pre>
+&lt;context-param&gt;
+    &lt;param-name&gt;oa4mp:oauth2.server.config.file&lt;/param-name&gt;
+    &lt;param-value&gt;/path/to/cfg.xml&lt;/param-value&gt;
+&lt;/context-param&gt;
+</pre>
+<pre>
+&lt;context-param&gt;
+    &lt;param-name&gt;oa4mp:oauth2.server.config.name&lt;/param-name&gt;
+    &lt;param-value&gt;<span style="background-color: #ff6600;">my-config</span>&lt;/param-value&gt;
+&lt;/context-param&gt;
+</pre>
+
+
+
+<h3>An alias example.</h3>
+
+<p>You may also have several configurations within a file and specify an <em>alias</em> or alternate name. This allows
+    you to very easily switch configurations, keep old ones or have test configurations. To specify a configuration as
+    an alias, you need to specify the name and alias tags:</p>
+<pre>
+&lt;config&gt;
+    &lt;service name="default" alias="new-config"/&gt;
+    &lt;service name="new-config">
+       &lt;!-- whole bunch of stuff for the actual configuration --&gt;
+    &lt;/service&gt;
+
+    &lt;service name="mysql-5.0.2">
+       &lt;!-- complete configuration here --&gt;
+    &lt;/service&gt;
+&lt;/config&gt;
+</pre>
+<p>In the example above, the service would be configured to always use "default" but the configuration is aliased to map
+    this to "new-config". A typical use might be that the service is trying to migrate from mysql 5.0.2 and wants to
+    preserve the old configuration so as to back out as needed. Again, you may have any number of aliases and aliases are
+    transitive, so an alias can refer to another alias and so forth and these will be resolved down the chain.
+    </p>
+
+<h3>Including other configuration files.</h3>
+There is now (as of OA4MP 1.1) the ability to include other configuration files. Note that
+
+<h3>An example. Two configuration files.</h3>
+Reworking the above example, this is completely equivalent to
+<pre>
+&lt;config&gt;
+    &lt;service name="default" alias="new-config"/&gt;
+    &lt;file include="/path/to/server-cfg.xml"/&gt;
+&lt;/config&gt;
+</pre>
+and the file /path/to/server-cfg.xml is below:
+<pre>
+&lt;config&gt;
+    &lt;service name="new-config">
+       &lt;!-- whole bunch of stuff for the actual configuration --&gt;
+    &lt;/service&gt;
+
+    &lt;service name="mysql-5.0.2">
+       &lt;!-- complete configuration here --&gt;
+    &lt;/service&gt;
+&lt;/config&gt;
+</pre>
+
+You only need refer to the first file in your deployment descriptor. The second (and any others) will be loaded
+for you.
+
+<p>A really great use of this is specifying an administrative configuration. This lets you point to your
+    main configuration as well as have other specialized configurations (such a file store for backing up a database,
+    monitoring clients, etc.) You need only have a single server configuration file and refer to that.</p>
+
+<p>Another use of configuration files is if you are running multiple versions of OA4MP. For instance, have
+    a file for OAuth 1.0a-based configuration and one for OAuth2 - based ones. Then have a file that refers to
+    these with aliases for the currently active configurations.</p>
+
+<!--#include virtual="../../footer.html" -->
+
+
+</body>
+</html>

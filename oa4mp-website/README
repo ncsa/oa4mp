@@ -1,0 +1,46 @@
+How to deploy the website.
+
+*************************************
+*   This only builds under maven 2  *
+*************************************
+
+* check in any changes to svn
+
+
+* You *MUST* run
+
+  mvn clean install
+
+  from the ncsa-security-all and myproxy directories first. This is because the javadoc is created
+  that way and installed in your local repository. The website merely references the generated javadoc.
+  If there is no javadoc found you will get errors trying to build this website.
+
+* Make sure you are running maven 2.2+ from this point on/ but not maven 3. Maven changed "doxia" (its
+  internal markup for sites) See the Jira task OAUTH-111 for all the particulars. This will probably require
+  hacking your PATH (at least on unix) so that the maven 2 bin directory is found before the maven 3 one.
+  On my system this is the /usr/share/maven2/bin directory.
+  Check the version by issuing
+
+  mvn -version
+
+* from the oa4mp-website directory issue
+
+   mvn clean site
+
+* tar up the resulting directory in target/site
+
+* transfer it (e.g. with scp) to the target server (currently this is pkilab2.ncsa.uiuc.edu)
+
+* Make sure you issue kinit and aklog on pkilab2 before trying to do anything or you will get all
+  sorts of permissions errors on afs.
+
+* Untar it into the  target directory (currently /afs/ncsa.uiuc.edu/web/grid.ncsa.uiuc.edu/htdocs/myproxy/oauth)
+
+* Be sure that the directory is correct when you unpack it. It is easy to untar this in the wrong place.
+
+Note that the javadoc as well as various maven-generated documents (reports on dependencies, etc.) are
+created each time, so the deployed website is always up to date. Since updates to the live
+website are not in SVN any such changes will be lost in the next deployment. Therefore
+
+-> put all edits/updates under svn control and redeploy. Never update the live site if possible. <-
+

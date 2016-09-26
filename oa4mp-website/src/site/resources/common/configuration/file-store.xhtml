@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>The File Store Configuration.</title>
+    <!--#include virtual="../../head.html" -->
+</head>
+<body class="composite">
+<!--#include virtual="../../header.html" -->
+<h2>The File Store Configuration.</h2>
+<p>Scope: client and server, all versions.</p>
+
+<p>A file store will persist items in a local file system. It requires either</p>
+<ul>
+    <li>A single directory under which any required directories will be created, or</li>
+    <li>two directories, a data directory and an index directory</li>
+</ul>
+
+In both cases the system will manage these in the sense that they will be created as needed along with
+any needed subdirectories.
+
+<table style="text-align: left; width: 100%;" border="1" cellspacing="2" cellpadding="2">
+    <tbody>
+    <tr>
+        <td style="vertical-align: top;">path</td>
+        <td style="vertical-align: top;">Single top-level directory. Any required subdirectories will be made under this
+            one.
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">dataPath</td>
+        <td style="vertical-align: top;">Location of items</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">indexPath</td>
+        <td style="vertical-align: top;">Location of system-built indices.</td>
+    </tr>
+    </tbody>
+</table>
+<p>Again you specify either the <span style="font-weight: bold;">path</span> or both the <span
+        style="font-weight: bold;">dataPath</span> and <span style="font-weight: bold;">indexPath</span>.</p>
+
+<p>A file-based store system is a great, easy way to set up your storage. It require nothing more than the correct
+    permissions. Remember though that you should do the usual administrative tasks of backing it up as needed and
+    protecting it from prying eyes since it will contain sensitive information. Both clients and servers support file stores.</p>
+<h2>Server examples</h2>
+<h3>Example 1.</h3>
+
+<pre>
+&lt;service name="default" address="https://myservice.org:8443/oauth"&gt;
+   &lt;fileStore path="/var/www/storage"&gt;
+      &lt;transactions/&gt;
+      &lt;clients/&gt;
+      &lt;clientApprovals/&gt;
+   &lt;/fileStore&gt;
+&lt;/service&gt;
+</pre>
+<p>This sets up a fully functioning service with local storage and using the default MyProxy service.</p>
+
+<h3>Example 2.</h3>
+
+<p>An alternate version of this would be to specify the data and index paths for each store:</p>
+<pre>
+&lt;service name="default" address="https://myservice.org:8443/oauth"&gt;
+   &lt;fileStore dataPath="/var/www/storage/transactions/data"
+               indexPath="/var/www/storage/transactions/index"&gt;
+      &lt;transactions/&gt;
+   &lt;/fileStore&gt;
+   &lt;fileStore dataPath="/var/www/storage/clients/data"
+               indexPath="/var/www/storage/clients/index"&gt;
+      &lt;clients/&gt;
+   &lt;/fileStore&gt;
+   &lt;fileStore dataPath="/var/www/storage/clientApprovals/data"
+               indexPath="/var/www/storage/clientApprovals/index"&gt;
+      &lt;clientApprovals/&gt;
+   &lt;/fileStore&gt;
+&lt;/service&gt;
+</pre>
+
+    This is equivalent to the first example.
+<h2>Client examples</h2>
+<h3>Using a file store in a client</h3>
+A client file store can be applied to
+<pre>
+&lt;config&gt;
+   &lt;client name="my-cfg"&gt;
+        &lt;fileStore path="/var/www/client/storage"&gt;
+          &lt;<a href="client/dtd/asset-store.xhtml">assetStore</a>&gt;
+        &lt;/fileStore&gt;
+        &lt;!-- other stuff --&gt;
+&lt;/config&gt;
+</pre>
+This makes the asset store in the given directory.
+<!--#include virtual="../../footer.html" -->
+
+</body>
+</html>

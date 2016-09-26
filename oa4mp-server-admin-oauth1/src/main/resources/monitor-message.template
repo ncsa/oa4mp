@@ -1,0 +1,9 @@
+The OA4MP monitor encountered a problem attempting to contact the server at
+
+${name}
+
+The message from the error reads: ${message}
+
+The stacktrace is
+
+${stacktrace}

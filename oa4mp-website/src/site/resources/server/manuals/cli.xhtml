@@ -1,0 +1,405 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Command line tools</title>
+    <!--#include virtual="../../head.html" -->
+
+</head>
+<body class="composite">
+<!--#include virtual="../../header.html" -->
+<h1>Command line tools for OA4MP</h1>
+
+These are a set of programs that are accessible from a CLI
+(command line interface)  allow
+an administrator to do CRUD (Create, Read, Update and Delete) operations on client
+records and approvals. There is also the option to copy a store completely from one
+store to another.
+
+<h2>Getting the tools</h2>
+<h5>OAuth 1.0a</h5>
+The latest version of the Oauth 1.0a command line tool is available at
+<a href="http://svn.code.sf.net/p/cilogon/code/tags/latest/server/oa4mp-cli.jar">oa4mp-cli.jar</a>
+You should also get the script that runs this too,
+<a href="http://svn.code.sf.net/p/cilogon/code/tags/latest/server/oa4mp-cli">oa4mp-cli</a>
+
+<h5>Oauth 2.0</h5>
+The latest version of the Oauth 2.0 command line tool is available at
+<a href="http://svn.code.sf.net/p/cilogon/code/tags/latest/server/oa2-cli.jar">oa2-cli.jar</a>
+You should also get the script that runs this too,
+<a href="http://svn.code.sf.net/p/cilogon/code/tags/latest/server/oa2-cli">oa2-cli</a>
+
+<h2>Configuration</h2>
+The tool uses a standard configuration file exactly like the server. Indeed, you can just
+point the tool at the server configuration file. You will need to supply the name of
+the configuration in the file you want to use. Aliases can be quite handy here. Given the abilities of
+the CLI to do quick copies of the store, it pays to have a backup (file) store configured and
+occasionally simple copy the active store to that. There are many possible uses. It is assumed that
+the tools are installed in a location called $OA4MP_HOME. Normally the default for this is
+<br/><br/>
+OAuth 1.0a: OA4MP_HOME=/opt/oa4mp
+<br/><br/>
+OAuth 2.0: OA4MP_HOME=opt/oa2
+
+<b>Note that we will be discussing the OA4MP tools rather than the OA2 tools in what follows.
+    Everything here works the same if you replace oa4mp-* by oa2-*</b
+        >
+<p>The assumption of the script is that files are in the following directory structure</p>
+<ul>
+    <li><code>$OA4MP_HOME/etc/admin-cfg.xml</code> - the configuration file</li>
+    <li><code>$OA4MP_HOME/lib/oa4mp-cli.jar</code> - the jar containing the CLI</li>
+    <li><code>$OA4MP_HOME/bin/oa4mp-cli</code> - the script for running this. Be sure it is set to be executable.</li>
+</ul>
+The default name of the configuration is assumed to be "default" (no quotes). If you invoke the script with
+no arguments it will use this and the above configuration file.
+
+<h2>Running the CLI</h2>
+Invocation from the command line is usually done with the supplied shell script, oa4mp-cli. The
+invocation syntax is <br/>
+
+<pre>oa4mp-cli [configName configFile]</pre>
+
+You should run this as root and might need to set the script to be
+executable if it is not. If you give neither arguments then defaults are used. Invoke with the argument  "--help"
+for more information. If you give one argument it is assumed to be the configuration name
+in the default configuration file.
+<h2>Command line options for the jar.</h2>
+You should run this from the script, but if you want or need to specify
+invoke the jar directly, the invocation options they are listed here.
+<table style="text-align: left; width: 1157px; height: 165px;" border="1" cellspacing="2" cellpadding="2">
+    <tbody>
+    <tr>
+        <td style="vertical-align: top;">Argument</td>
+        <td style="vertical-align: top;">Value required?</td>
+        <td style="vertical-align: top;">Required?</td>
+        <td style="vertical-align: top;">Description</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">-cfg</td>
+        <td style="vertical-align: top;">Y</td>
+        <td style="vertical-align: top;">Y</td>
+        <td style="vertical-align: top;">The full path to the configuration file.</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">-name</td>
+        <td style="vertical-align: top;">F</td>
+        <td style="vertical-align: top;">F</td>
+        <td style="vertical-align: top;">The name of the configuration within the file. If there is a single configuration
+            in the file, then no name is needed. If there are multiple configurations you must specify which one to use. </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">-log</td>
+        <td style="vertical-align: top;">F</td>
+        <td style="vertical-align: top;">F</td>
+        <td style="vertical-align: top;">The full path log file. If this is not specified then a file named "log.xml"
+        is dumped into the invocation directory.</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">-use</td>
+        <td style="vertical-align: top;">F</td>
+        <td style="vertical-align: top;">F</td>
+        <td style="vertical-align: top;">Specify the component to use. Rather than loading the whole CLI then <b>use</b>-ing
+        a components (such as clients) you may simply specify that here.</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">-v</td>
+        <td style="vertical-align: top;">F</td>
+        <td style="vertical-align: top;">F</td>
+        <td style="vertical-align: top;">No argument. Turns on verbose logging so that much more information is dumped
+        onto the console. This is useful for debugging or just if you want to see what it is up to.</td>
+    </tr>
+</tbody>
+</table>
+<pre>
+    java -jar oa4mp-cli.jar -cfg /path/to/cfg.xml -name myConfig -log /path/to/mylog.xml -use approvals
+</pre>
+This would load the configuration named "myConfig" from the given file, write the log to a file called
+"mylog.xml" and bring up the approvals component.
+
+<h2>Running the tool</h2>
+The CLI consists of utilities for each component that can be used. Once invoked you will see
+the startup banner and prompt:
+<pre>
+[mybox bin]# ./oa4mp-cli
+**********************************************************
+* OA4MP CLI (Command Line Interpreter)                   *
+* Version 3.4-SNAPSHOT                                   *
+* By Jeff Gaynor  NCSA                                   *
+*  (National Center for Supercomputing Applications)     *
+*                                                        *
+* type 'help' for a list of commands                     *
+*      'exit' or 'quit' to end this session.             *
+**********************************************************
+oa4mp >
+</pre>
+If you type "help" You will get
+<pre>
+oa4mp >help
+
+Here are the commands available:
+use
+load
+To get more information on a command type
+
+command --help
+</pre>
+Basic supported commands are
+<ul>
+  <li>use - specify a component to use.</li>
+    <li>load configName [configFile] - load the given named configuration from the current config file. Specify the config file
+    if you need a different one. </li>
+</ul>
+
+To see the help for, say, the use command you would issue
+<pre>
+ oa4mp> use --help
+
+ Choose the component you wish to use.
+ you specify the component as use + name. Supported components are
+ clients - edit client records
+ approvals - edit client approval records
+ copy - copy an entire store.
+
+ e.g.
+
+ use clients
+
+ will call up the client management component.
+ Type 'exit' when you wish to exit the component and return to the main menu
+</pre>
+
+Each of these components; <a href="server/manuals/cli.xhtml#clients">clients</a>,
+<a href="server/manuals/cli.xhtml#approvals">approvals</a>
+and <a href="server/manuals/cli.xhtml#copy">copy</a> is described in detail below. But first, a few preliminary notions.
+
+<h2>Index vs. Unique ID</h2>
+Since most objects have unique identifiers, you can specify these are arguments at any time it makes
+sense to do so by prefixing the id with a forward slash, "/". If there is a list of objects, you can also specify
+the index on the list as the target of the operation. Most components have a command to list everything in the
+active component (the <b>ls</b> command).
+<p>
+After you issue an <code>ls</code> (no arguments) you will
+see a complete list of items in the store. These are numbered on the right hand side. This is the
+item's <b>index</b>. You may then specify the index directly. E.g. to print out a long version of the item
+with index 4 issue<br/><br/>
+<code>ls 4</code>
+<br/><br/>
+Typically you will know the unique identifier for an item and you can enter this if you escape it with a forward
+slash (/). To give the long listing of an object with unique identifier <code>myproxy:oa4mp,2012:/client/a4b78549990</code>
+you would issue<br/><br/>
+<code>ls /myproxy:oa4mp,2012:/client/a4b78549990</code>
+<br/><br/>
+Note that since there is no canonical ordering of objects in a store, you should always issue an
+<code>ls</code> before using the index. It is generally always safer to use the unique identifier.
+
+</p>
+<h3>Options supported in each storage tool.</h3>
+<ul>
+    <li><a href="server/manuals/cli.xhtml#size">size</a> - number of entries in the current component.</li>
+    <li><a href="server/manuals/cli.xhtml#ls">ls [index | /uniqueId]</a> - list all items or the details of a given item</li>
+    <li><a href="server/manuals/cli.xhtml#update">update [index | /uniqueId]</a> - edit the item</li>
+    <li><a href="server/manuals/cli.xhtml#rm">rm [index | /uniqueId]</a> - remove an entry</li>
+    <li><a href="server/manuals/cli.xhtml#create">create [uniqueId]</a> - create a new entry with the optional id.</li>
+</ul>
+Each of these in turn will be discussed in detail.
+
+<h1>Common commands for all storage components.</h1>
+<h4><a name="size">Getting The Number Of Objects In a Component.</a></h4>
+This will print the number of elements in the current storage component. <br/>
+<i>Example.</i> For showing the number of clients in a store
+you would have something like the following
+<pre>
+oa4mp >use clients
+  clients >size
+    Current store has 22 entries
+  clients >exit
+exiting ...
+oa4mp >
+</pre>
+
+<h4><a name="ls">Listing Object or Details of an Object.</a></h4>
+This lists every element in the current component. The default is to sort by
+the given identifier. Clients are sorted by creation date. At this point,
+sorting behavior cannot be changed. Each record is recorded on a single line.
+No argument prints out everything in the store.
+Giving the optional index or unique identifier will
+print a detailed listing of the object.<br/>
+<i>Example.</i> Listing a specific object by unique identifier
+<pre>
+oa4mp >use approvals
+  approvals >ls
+  0. ClientApproval[approved=true, approver=null, id=myproxy:oa4mp,2012:/client/468afcd5f598227e1a0b79e6e94b3506, on Mon Apr 01 11:37:58 CDT 2013]
+  1. ClientApproval[approved=true, approver=auto-approver, id=myproxy:oa4mp,2012:/client/1e4310262889ebdf72b8a7b148acdf2a, on Mon Jul 09 16:21:47 CDT 2012]
+  approvals >
+</pre>
+and now print out the details on number 1:
+<pre>
+  approvals >ls 1
+
+Approver:auto-approver
+  Identifier:myproxy:oa4mp,2012:/client/1e4310262889ebdf72b8a7b148acdf2a
+  Approved at:Mon Jul 09 16:21:47 CDT 2012
+  Is approved? true
+  approvals >
+</pre>
+We could have done the exact same thing by simply using the unique identifier:
+<pre>
+    approvals>ls /myproxy:oa4mp,2012:/client/1e4310262889ebdf72b8a7b148acdf2a
+
+Approver:auto-approver
+  Identifier:myproxy:oa4mp,2012:/client/1e4310262889ebdf72b8a7b148acdf2a
+  Approved at:Mon Jul 09 16:21:47 CDT 2012
+  Is approved? true
+  approvals >
+</pre>
+<p>
+    Another option is the flag <code>-la</code> which will print all the details of <i>every</i>
+    item it applies to. For instance, to get a dump of every approval record in detail issue
+</p>
+    <pre>
+        approvals>ls -la
+    </pre>
+<p>The output is extremely lengthy however it is an easy way to get a text dump of a store. This flag has no
+effect if it is given for a specific id. All that will happen is that details of that id will be printed in full.</p>
+<h4><a name="update">Updating (aka Editing) Objects.</a></h4>
+This will let you update or edit an existing object. The general function is shown below. Current object
+values are shown in [ ]'s and simply hitting return will preserve the current value.
+<br/>
+<i>Example.</i> Edit a client record. In this case we want to make this client use limited proxies.
+<pre>
+    oa4mp >use clients
+      clients >update /myproxy:oa4mp,2012:/client/6eb6ef83dbb89e7212cde073c7e682a4
+      Update the values. A return accepts the existing or default value in []'s
+        enter the identifier[myproxy:oa4mp,2012:/client/6eb6ef83dbb89e7212cde073c7e682a4]:
+        enter the name[Another Ashigaru Gateway]:
+        enter email[jgaynor@ncsa.illinois.edu]:
+        enter error uri[http://ashigaru.ncsa.uiuc.edu:44444/client]:
+        enter home uri[http://ashigaru.ncsa.uiuc.edu:44444/client]:
+</pre>
+Up to this point we have changed nothing and have hit return each time. Now we change the value:
+<pre>
+        does this client require limited proxies?[n]:y
+        enter full path and file name of public key[-----BEGIN PUBLIC KEY----...]:
+         public key entry skipped.
+</pre>
+That finishes the entry for the client. Had we wanted to change the public key, we would have supplied a
+a file with complete path containing it. The system then prints out the entire new object and prompts us to save
+it:
+<pre>
+        here is the complete client:
+      Client name=Another Ashigaru Gateway
+        identifier=myproxy:oa4mp,2012:/client/6eb6ef83dbb89e7212cde073c7e682a4
+        email=jgaynor@ncsa.illinois.edu
+        home uri=http://ashigaru.ncsa.uiuc.edu:44444/client
+        error uri=http://ashigaru.ncsa.uiuc.edu:44444/client
+        limited proxies? true
+        creation timestamp=Thu Jun 28 13:46:31 CDT 2012
+        approved by auto-approver
+        public key:
+      -----BEGIN PUBLIC KEY-----
+    MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAruhBa7EAnm8zDeBhNmuhYLUcij5pSr5r
+    Z6481lhzvs0k+EtCsuDpr4RlcxUlX90uxF7ZsCjMSnk8pPr4e5HPu9lqr3wUb1TJbPbg3hdj/06O
+    sJrOUYddVG5SmkafsCMmn+i5SrYq9vuWRsYVXZM36p/BzBzn4s4r6JqFzRWX71U9YybVCR72AIGi
+    LClW2utUP3Q6axpDgkEXl6CuloGDshr1cMpct2/cpDqj6kpv5oV3WFUDiXf33kwqmBWjmXwCMTSu
+    wAVhUmJNZ48YdnTQcotMURo9j5a1DBk1t2hKj/W7HqwT+TxnLgDu/cVxX5ZJDNTlgMaTbZKOFUhA
+    MMnssQIDAQAB
+    -----END PUBLIC KEY-----
+
+        save [y/n]?y
+        client updated.
+</pre>
+<h4><a name="create">Creating a new object</a></h4>
+To create a new object, you must supply a unique identifier. This does not need to be escaped with a /.
+Once created, you will be given the option of editing it.   You may enter any valid identifier
+as long as it is a valid URI<br/>
+<i>Example.</i> Crreating a new client. This will create a new client with a specified identifier.
+If no identifier were supplied a random one would have been created.
+<pre>
+    clients >create my:new:client
+    Created object with id "my:new:client"
+</pre>
+The object already exists in the store by this point. We will be given the option to edit it
+(equivalent to issuing the update command against its unique id):
+<pre>
+      edit [y/n]?y
+    Update the values. A return accepts the existing or default value in []'s
+      enter the identifier[my:new:client]:
+      enter the name[(null)]:My new client
+      enter email[(null)]:foo@bar.baz
+      enter error uri[(null)]:http://localhost/error
+      enter home uri[(null)]:https:/localhost/home
+      does this client require limited proxies?[n]:n
+      enter full path and file name of public key[(null)]:
+      No file entered. Public key entry skipped
+</pre>
+Now the completed, new client is displayed and we are prompted if we want to keep the changes.
+<pre>
+      here is the complete client:
+    Client name=My new client
+      identifier=my:new:client
+      email=foo@bar.baz
+      home uri=https:/localhost/home
+      error uri=http://localhost/error
+      limited proxies? false
+      creation timestamp=Wed Nov 20 11:54:55 CST 2013
+      no approval record exists.
+      public key:
+      none
+      save [y/n]?y
+      client updated.
+</pre>
+<h4><a name="rm">Removing Objects From the Store.</a></h4>
+Removing an object. This will remove the object completely from the store. In the case of clients you
+do not need to remove the corresponding approval -- it will be done automatically. However, if you remove
+the approval record then the client is in effect unapproved until you re-approve it. To remove the client
+we create with id <code>my:new:client</code> would look like the next
+<br/>
+<i>Example.</i> Removing an object by id
+<pre>
+    clients >rm /my:new:client
+      Removing approval record
+      Done. Client approval with id = my:new:client has been removed from the store
+      removing client record
+    Done. object with id = my:new:client has been removed from the store
+</pre>
+<b>Note</b> The remove command will happily remove objects by index, but remember that the indices of all
+other objects change, so best practice is to only remove by identifier.
+<h1>Invoking the components.</h1>
+
+<h2><a name="clients">Clients</a></h2>
+Invoke as
+<pre>oa4mp> use clients</pre>
+Operations allowed in addition to the standard ones are
+<ul>
+    <li>
+        approve [index | /uniqueID]
+    </li>
+</ul>
+This will prompt you for the information needed to make a new approval for the client with the given id.
+
+<h2><a name="approvals">Approvals</a></h2>
+Invoke as
+<pre>oa4mp> use approvals</pre>
+ There are no extra options beyond the standard ones, however, the <code>create</code> command
+takes the unique id of the client record you are going to approve. Once created, you may enter the
+approval information directly.
+
+<h2><a name="copy">Copy</a></h2>
+Invoke as
+<pre>oa4mp>use copy</pre>
+Supported operation is
+<ul>
+    <li>cp source target [-verify] - copy source to target optionally verifying</li>
+</ul>
+This works over the entire store. It has a single command that will allow you to make a copy
+of one store (the source) that completely replaces another (the target). This is destructive, meaning
+that the every object in the target is deleted, so no merge takes place. If the -verify option is used
+then the two stores are compared once the copy has been completed. Note that this can be very time consuming
+for a large store! However, if there is any question it is at times very useful.
+
+
+<!--#include virtual="../../footer.html" -->
+</body>
+</html>

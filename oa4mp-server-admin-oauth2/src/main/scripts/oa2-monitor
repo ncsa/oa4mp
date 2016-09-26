@@ -1,0 +1,15 @@
+# Invoke the monitor program exactly once to ping the server.
+
+OA4MP_ROOT=/opt/oa2
+monitorJar=$OA4MP_ROOT/lib/oa2-monitor.jar
+adminCfg=$OA4MP_ROOT/etc/admin-cfg.xml
+logFile=$OA4MP_ROOT/var/log/oa2-monitor.log
+
+DEFAULT_TARGET="monitor"
+target=${1:-$DEFAULT_TARGET}
+
+java -jar $monitorJar -cfg $adminCfg -name $target
+
+if [ $? != 0 ]; then
+  exit 1
+fi

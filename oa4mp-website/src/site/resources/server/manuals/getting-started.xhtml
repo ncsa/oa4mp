@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Getting Started with OAuth for MyProxy</title>
+    <!--#include virtual="../../head.html" -->
+</head>
+
+<body class="composite">
+<!--#include virtual="../../header.html" -->
+
+<h1>Overview</h1>
+
+<p>Welcome to OAuth for MyProxy! This is a delegation service for MyProxy. It allows clients to request certificates and
+    users to securely authorize them using the OAuth delegation protocol. Current release is <strong>3.0</strong>.</p>
+
+<h2>Prerequisites</h2>
+<ul>
+    <li>Tomcat 7 or above. This will not work with Tomcat 6 or lower because of internal changes to Java.
+    (In particular, the way JSP is handled.)</li>
+    <li> SSL should be configured and enabled. Either in Apache (if you are deploying Tomcat as pass through) or
+        in Tomcat directly. Note that if you do enable SSL in tomcat, you must un-comment the
+        security constraint block in the web.xml deployment descriptor after you deploy the war.
+    </li>
+    <li>Java 1.8. <strong>Note:</strong> Open JDK is <em>not</em> supported. Only the Oracle/Sun JVM is
+        supported. Note especially that Oracle/Sun Java 1.7 or earlier will not work.
+        This is because of changes to their security APIs.
+    </li>
+    <li>Some form of persistent storage. This may be a file system, MySQL or PostgreSQL.</li>
+    <li>Java mail. This must be configured regardless if notifications are set. Read <a
+            title="OAuth for MyProxy: Email Notifications"
+            href="server/configuration/server-email.xhtml">here</a> for details.
+    </li>
+    <li>Maven 3.0 or above (if building from the source)</li>
+    <li>Possibly either the latest <a href="http://dev.mysql.com/downloads/connector/j/">MySQL
+        connector</a>. <a href="https://downloads.mariadb.org/client-java/+releases/">Maria DB client</a>
+        or <a href="http://jdbc.postgresql.org/download.html">PostgreSQL jar</a>.
+        If you are using one of these systems
+        for storage, install them by dropping them in <code>$CATALINA_HOME/lib</code>. OA4MP used
+        to bundle these in the wars, but since their licences conflicted with those of some of
+        our users, we decided to simply let you supply them. If you are just using file-based storage,
+        then you don't need either of these.
+    </li>
+    <li>Possibly JGlobus. If your server needs to issue limited proxies drop the most recent version
+        of <a href="http://oss.sonatype.org/content/repositories/releases/org/jglobus/jsse/">JGlobus jsse</a>
+        (at least 2.0.6) into <code>$CATALINA_HOME/lib</code> as well as, apparently
+        <a href="http://oss.sonatype.org/content/repositories/releases/org/jglobus/JGlobus-Core/">JGlobus-Core</a>
+        (latest release seems to be 2.0.4)
+        and the Bouncy Castle version that support these. Otherwise, you may omit this. Again, be sure you
+        check for the version of Bouncy Castle that your version of JGlobus uses and use that as well.
+        JGlobus-Core 2.0.4 includes Bouncy Castle classes.
+    </li>
+    <li>(Optional) Apache 2, configured to work with Tomcat.</li>
+</ul>
+<h2>Getting and deploying from the war.</h2>
+
+<p>You may most easily a bare-bones version for testing by downloading the current reference war:</p>
+
+<p><a title="OA4MP service war"
+      href="http://svn.code.sf.net/p/cilogon/code/tags/latest/server/oauth.war">oauth-server-latest.war</a>
+    <br></br>
+    <a title="PGP signature"
+       href="http://svn.code.sf.net/p/cilogon/code/tags/latest/server/oauth.war.asc">(PGP signature)</a>
+</p>
+
+<p>Download this, read to <a title="Server Configuration Reference Manual"
+                             href="server/configuration/config-index.xhtml">configure
+    the deployment</a>, and deploy it to Tomcat. The war, as delivered, cannot be run.You must do some minimal
+    configuration at least before deploying it. </p>
+
+<h2>Using the Maven Repository</h2>
+Fortunately, OA4MP is hosted on the public Sonatype maven repository so that using the code simply requires you
+add the right dependencies. There is no need to configure any repositories. Generally it is suggested that you
+use the pre-compiled war.
+
+<h3>Getting and building the source</h3>
+If you need/want to customize the basic package, you would download the webapp module from
+<a title="oa4mp sources" href="https://svn.code.sf.net/p/cilogon/code/tags/edu.uiuc.ncsa/myproxy-3.4-SNAPSHOT/oa4mp-webapp">source
+    forge</a> by issuing
+<pre>svn export https://svn.code.sf.net/p/cilogon/code/tags/edu.uiuc.ncsa/myproxy-3.4-SNAPSHOT/oa4mp-webapp</pre>
+which has the correct dependencies in it. Build it by issuing
+<pre>mvn clean install</pre>
+and you should end up with a deployable war.
+
+<h3>Writing your own webapp.</h3>
+
+<p>If you decide to write your own webapp, you should use the following module:</p>
+<pre>
+    &lt;dependency&gt;
+        &lt;artifactId&gt;oa4mp-server-oauth1&lt;/artifactId&gt;
+        &lt;groupId&gt;edu.uiuc.ncsa.myproxy&lt;/groupId&gt;
+        &lt;version&gt;3.4-SNAPSHOT&lt;/version&gt;
+    &lt;/dependency&gt;
+</pre>
+<p>which will get the OAuth libraries and give you access to the configuration loader. </p>
+
+
+<h2>Deploying to Apache</h2>
+
+<p>If you need to deploy this to Apache, you need to add the following to the proxy_ajp.conf file (which, e.g., lives
+    under /etc/httpd/conf.d in most unix distributions):</p>
+<pre>ProxyPass /oauth/initiate ajp://localhost:8009/oauth/initiate</pre>
+<pre>ProxyPass /oauth/authorize ajp://localhost:8009/oauth/authorize</pre>
+<pre>ProxyPass /oauth/token ajp://localhost:8009/oauth/token</pre>
+<pre>ProxyPass /oauth/getcert ajp://localhost:8009/oauth/getcert</pre>
+<pre>ProxyPass /oauth/register ajp://localhost:8009/oauth/register</pre>
+<p>These entries allow access to all parts of the process. <strong>Note</strong>: in the WEB-INF/web.xml file there is a
+    section called security-constraint, which controls access to the webapp using Tomcat's SSL. This will conflict with
+    access via Apache, so comment that section out if you are deploying to Apache. It is only needed in stand-alone
+    Tomcat deployments.</p>
+
+<h2>Setting up persistent storage</h2>
+
+<h3>File-based storage</h3>
+
+<p>You may store all information for the service in your local file system. It is important that you restrict access to
+    it and back it up. Specifying the storage location in your configuration file is sufficient, since the system will
+    detect if it exists and create anything it needs.</p>
+
+<h3>MySQL</h3>
+
+<p>In order to use MySQL for persistent storage, you must run the supplied script,
+    <a title="mysql.sql install script" href="http://svn.code.sf.net/p/cilogon/code/tags/latest/server/mysql.sql">mysql.sql</a>
+    to create all of the tables and users before your first use.</p>
+<pre><code>mysql -u username -p &lt; <code>/path/to/file/mysql.sql</code></code></pre>
+<p>(the username is an account (<em>root</em>, e.g.) which has sufficient privileges to create other users) which will
+    prompt you for your password and run the file. If you do not accept the default account names, you must edit this
+    file and replace all occurrences of them manually, as well as setting the passwords. This has to be done because of
+    MySQL's very lousy support for variables. (Should you have to re-run the script, you should manually remove the
+    users and database beforehand. These commands are commented out at the beginning of the file.) </p>
+
+<h3>PostgreSQL</h3>
+
+<p>Most Unix distros have this database installed by default. There is a specific script, <a
+        title="PostGreSQL install script"
+        href="http://svn.code.sf.net/p/cilogon/code/tags/latest/server/pg.sql">pg.sql</a>, that will
+    create all the tables. All you should need to do is set the passwords near the top of the file. Then you would need
+    to log in to the command line psql tool as the user postgres (this is the super user) and from that prompt issue</p>
+<pre>\i /path/to/file/pg.sql</pre>
+<p>The file contains default user, table, database and schema names, which you may change if you see fit (be sure to
+    pass these along in your configuration file!). Again, you only need to edit the values at the top of the file,
+    thanks to PostgreSQL's support for variables.</p>
+<!--#include virtual="../../footer.html" -->
+
+</body>
+</html>

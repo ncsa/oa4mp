@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>OA4MP Client: Getting Started</title>
+    <!--#include virtual="../../head.html" -->
+</head>
+<body class="composite">
+<!--#include virtual="../../header.html" -->
+
+<h1>Overview</h1>
+
+<p>Welcome to OAuth for MyProxy! This describes the client software for the OAuth for MyProxy service. It allows clients
+    to request certificates and users to securely authorize them using the OAuth delegation protocol.</p>
+
+<h2>Prerequisites</h2>
+<ul>
+    <li>Tomcat 6 or 7. SSL should be configured and enabled.</li>
+    <li>Java <b>1.8</b> or above. Only the Oracle VM is officially supported. Do not use OpenJDK. Note that versions previous
+    to Java 1.7 will not work due to internal changes by Sun to their security APIs.</li>
+    <li>(Optional) Maven 3.0+ or higher (only if building from the source)</li>
+    <li>(Optional) Apache 2, configured to work with Tomcat.</li>
+</ul>
+<h2>Getting and deploying from the war.</h2>
+
+<p>You may most easily a bare-bones version for testing by downloading the current reference war:</p>
+<h5>OAuth 1.0a</h5>
+<p><a title="OA4MP client war"
+      href="https://svn.code.sf.net/p/cilogon/code/tags/latest/client/client.war">client.war</a>
+     <br></br>
+      <a title="PGP signature file" href="https://svn.code.sf.net/p/cilogon/code/tags/latest/client/client.war.asc">(PGP signature)</a>
+</p>
+<h5>OAuth 2.0</h5>
+<p><a title="OA4MP client war"
+      href="https://svn.code.sf.net/p/cilogon/code/tags/latest/client/client2.war">client2.war</a>
+     <br></br>
+      <a title="PGP signature file" href="https://svn.code.sf.net/p/cilogon/code/tags/latest/client/client2.war.asc">(PGP signature)</a>
+</p>
+
+For many cases, this is all you need to do.
+
+<p>Save this and deploy it to Tomcat. You may do this in several ways such as dropping the war into the
+    $CATALINA_HOME/webapps directory. The system will not work until you have configured it then registered with an
+    OA4MP server though.</p>
+
+<h2>Using the Maven Repository</h2>
+Fortunately, OA4MP is hosted on the public Sonatype maven repository so that using the code simply requires you
+add the right dependencies. There is no need to configure any repositories. Generally it is suggested that you
+use the pre-compiled war.
+
+<h3>Getting and building the source</h3>
+<h5>OAuth 1.0a</h5>
+If you need/want to customize the basic package, you would download the webapp module from
+<a title="oa4mp oauth 1.0a sources" href="https://svn.code.sf.net/p/cilogon/code/tags/edu.uiuc.ncsa/myproxy-3.4-SNAPSHOT/oa4mp-client-oauth1">source
+        forge</a> by issuing
+<pre>svn export https://svn.code.sf.net/p/cilogon/code/tags/edu.uiuc.ncsa/myproxy-3.4-SNAPSHOT/oa4mp-client-oauth1</pre>
+which has the correct dependencies in it. Build it by issuing
+<pre>mvn clean install</pre>
+and you should end up with a deployable war.
+
+<p>If you decide to write your own webapp, you should use the following module:</p>
+<pre>
+    &lt;dependency&gt;
+        &lt;artifactId&gt;oa4mp-client-oauth1&lt;/artifactId&gt;
+        &lt;groupId&gt;edu.uiuc.ncsa.myproxy&lt;/groupId&gt;
+        &lt;version&gt;3.4-SNAPSHOT&lt;/version&gt;
+    &lt;/dependency&gt;
+</pre>
+
+
+<h5>OAuth 2.0</h5>
+If you need/want to customize the basic package, you would download the webapp module from
+<a title="oa4mp oauth 2.0 sources" href="https://svn.code.sf.net/p/cilogon/code/tags/edu.uiuc.ncsa/myproxy-3.4-SNAPSHOT/oa4mp-client-oauth2">source
+        forge</a> by issuing
+<pre>svn export https://svn.code.sf.net/p/cilogon/code/tags/edu.uiuc.ncsa/myproxy-3.4-SNAPSHOT/oa4mp-client-oauth2</pre>
+which has the correct dependencies in it. Build it by issuing
+<pre>mvn clean install</pre>
+and you should end up with a deployable war.
+<p>If you decide to write your own webapp, you should use the following module:</p>
+<pre>
+    &lt;dependency&gt;
+        &lt;artifactId&gt;oa4mp-client-oauth2&lt;/artifactId&gt;
+        &lt;groupId&gt;edu.uiuc.ncsa.myproxy&lt;/groupId&gt;
+        &lt;version&gt;3.4-SNAPSHOT&lt;/version&gt;
+    &lt;/dependency&gt;
+</pre>
+
+<p>which will get the OAuth libraries and give you access to the configuration loader. </p>
+
+<h2>Deploying to Apache</h2>
+
+<p>If you need to deploy this to Apache, you need to add the following to the <span
+        style="font-family: courier new,courier;">proxy_ajp.conf</span> file (which, e.g., lives under <span
+        style="font-family: courier new,courier;">/etc/httpd/conf.d</span> or perhaps <span
+        style="font-family: courier new,courier;">/etc/apache2/conf.d</span> in most unix distributions):</p>
+<pre>ProxyPass /client/simple ajp://localhost:8009/client/simple</pre>
+<p><strong>Note:</strong>In the WEB-INF/web.xml file there is a section called
+        <b>security-constraint</b>, which controls access to the webapp using Tomcat's SSL. This will conflict with access via Apache,
+    so comment that section out if you are deploying to Apache. It is only needed in stand-alone Tomcat deployments.</p>
+
+<!--#include virtual="../../footer.html" -->
+</body>
+</html>
