@@ -9,7 +9,7 @@
           -->
     <groupId>edu.uiuc.ncsa.myproxy</groupId>
     <!-- The version number reflects the currently released project. -->
-    <version>3.4-SNAPSHOT</version>
+    <version>3.3.0.2</version>
 
     <artifactId>myproxy-website</artifactId>
     <packaging>jar</packaging>
@@ -82,7 +82,7 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>myproxy-logon</artifactId>
-            <version>3.4-SNAPSHOT</version>
+            <version>3.3.0.2</version>
         </dependency>
     
     </dependencies>
@@ -144,7 +144,7 @@
                     <dependency>
                         <groupId>edu.uiuc.ncsa.maven.skin</groupId>
                         <artifactId>oa4mp-skin</artifactId>
-                        <version>3.4-SNAPSHOT</version>
+                        <version>3.3.0.2</version>
                     </dependency>
                 </dependencies>
             </plugin>
@@ -166,7 +166,7 @@
                 <artifactId>maven-gpg-plugin</artifactId>
                 <version>1.6</version>
                 <configuration>
-                    <skip>true</skip>
+                    <skip>false</skip>
                 </configuration>
                 <executions>
                     <execution>
@@ -181,3 +181,7 @@
         </plugins>
     </build>
 </project>
+
+myproxy-logon/pom.xml myproxy-website/pom.xml oa4mp-client-api/pom.xml oa4mp-client-loader-oauth1/pom.xml oa4mp-client-loader-oauth2/pom.xml oa4mp-client-oauth1/pom.xml oa4mp-client-oauth2/pom.xml oa4mp-client-test/pom.xml oa4mp-client-webapp/pom.xml oa4mp-oidc-twofactor/pom.xml oa4mp-server-admin-oauth1/pom.xml oa4mp-server-admin-oauth2/pom.xml oa4mp-server-admin/pom.xml oa4mp-server-api/pom.xml
+
+oa4mp-server-loader-oauth1/pom.xml oa4mp-server-loader-oauth2/pom.xml oa4mp-server-oauth1/pom.xml oa4mp-server-oauth2/pom.xml oa4mp-server-test/pom.xml oa4mp-skin/pom.xml oa4mp-twofactor/pom.xml oa4mp-webapp/pom.xml oa4mp-website/pom.xml oa4mp-website/src/site/apt/index.apt oa4mp-website/src/site/resources/client/manuals/api-reference.xhtml oa4mp-website/src/site/resources/client/manuals/getting-started.xhtml oa4mp-website/src/site/resources/server/manuals/Username-transformations.xhtml oa4mp-website/src/site/resources/server/manuals/cli.xhtml oa4mp-website/src/site/resources/server/manuals/getting-started.xhtml oa4mp-xsede/pom.xml pom.xml
