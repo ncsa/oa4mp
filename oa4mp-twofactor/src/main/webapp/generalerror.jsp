@@ -18,7 +18,7 @@
     //String mailto      = "alerts@cilogon.org";
     String mailto      = "gaynor@illinois.edu";
     String mailsubject = "Error caught by Tomcat on "; // + hostname
-    String mailsmtp    = "smtp.ncsa.uiuc.edu";
+    String mailsmtp    = "localhost";
 
     void sendEmail(String body, String host) {
         Properties props = System.getProperties();

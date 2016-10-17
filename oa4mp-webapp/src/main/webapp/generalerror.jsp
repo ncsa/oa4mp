@@ -17,7 +17,7 @@
     String mailto      = "alerts@cilogon.org";
     String mailsubject = "Error caught by Tomcat on "; // + hostname
     // Fixes CIL-129
-    String mailsmtp    = "smtp.ncsa.uiuc.edu";
+    String mailsmtp    = "localhost";
 
     void sendEmail(String body, String host) {
         Properties props = System.getProperties();

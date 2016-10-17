@@ -26,7 +26,6 @@ import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.delegation.storage.TransactionStore;
 import edu.uiuc.ncsa.security.delegation.storage.impl.BasicTransaction;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
-import edu.uiuc.ncsa.security.servlet.AbstractServlet;
 import edu.uiuc.ncsa.security.servlet.NotificationListener;
 import edu.uiuc.ncsa.security.storage.sql.SQLStore;
 import edu.uiuc.ncsa.security.util.mail.MailUtil;
@@ -46,7 +45,7 @@ import static edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceConstantKeys.CONSUMER_KE
  * <p>Created by Jeff Gaynor<br>
  * on May 17, 2011 at  3:46:53 PM
  */
-public abstract class MyProxyDelegationServlet extends AbstractServlet implements TransactionFilter {
+public abstract class MyProxyDelegationServlet extends EnvServlet implements TransactionFilter {
 
     /**
      * This is called after the response is received so that the system can get the approproate
@@ -80,6 +79,15 @@ public abstract class MyProxyDelegationServlet extends AbstractServlet implement
         return notificationListeners.remove(notificationListener);
     }
 
+    @Override
+    public ServiceEnvironmentImpl loadProperties2() throws IOException {
+        ServiceEnvironmentImpl se2 = super.loadProperties2();
+        if (se2.isPollingEnabled()) {
+                  caThread = se2.getClientApprovalThread();
+              }
+              kpt = new KeyPairPopulationThread(se2.getKeyPairQueue());
+        return se2;
+    }
 
     public static Cleanup<String, BasicTransaction> transactionCleanup;
 
@@ -96,22 +104,7 @@ public abstract class MyProxyDelegationServlet extends AbstractServlet implement
 
     public static KeyPairPopulationThread kpt;
 
-    public ServiceEnvironmentImpl loadProperties2() throws IOException {
-        ServiceEnvironmentImpl se2 = (ServiceEnvironmentImpl) getConfigurationLoader().load();
-        if (se2.isPollingEnabled()) {
-            caThread = se2.getClientApprovalThread();
-        }
-        kpt = new KeyPairPopulationThread(se2.getKeyPairQueue());
-        return se2;
-    }
 
-
-    @Override
-    public void loadEnvironment() throws IOException {
-        if (environment == null) {
-            setEnvironment(loadProperties2());
-        }
-    }
 
 
     protected AGIssuer getAGI() throws IOException {
@@ -187,27 +180,27 @@ public abstract class MyProxyDelegationServlet extends AbstractServlet implement
     }
 
     /**
-     * This will be invoked at init before anything else and should include code to seamlessly upgrade stores from earlier versions.
-     * For instance, if a new column needs to be added to a table. This pre-supposes that the current user has the correct
-     * permissions to alter the table, btw. This also updates the internal flag {@link #storeUpdatesDone} which should be
-     * checks in overrides. If you override this method and call super, let super manage this flag. If it is true, do not
-     * execute your method.
-     */
-    public void storeUpdates() throws IOException, SQLException {
-        if (storeUpdatesDone) return; // run this once
-        storeUpdatesDone = true;
-        processStoreCheck(getTransactionStore());
-        processStoreCheck(getServiceEnvironment().getClientStore());
-        processStoreCheck(getServiceEnvironment().getClientApprovalStore());
-    }
+        * This will be invoked at init before anything else and should include code to seamlessly upgrade stores from earlier versions.
+        * For instance, if a new column needs to be added to a table. This pre-supposes that the current user has the correct
+        * permissions to alter the table, btw. This also updates the internal flag {@link #storeUpdatesDone} which should be
+        * checks in overrides. If you override this method and call super, let super manage this flag. If it is true, do not
+        * execute your method.
+        */
+       public void storeUpdates() throws IOException, SQLException {
+           if (storeUpdatesDone) return; // run this once
+           storeUpdatesDone = true;
+           processStoreCheck(getTransactionStore());
+           processStoreCheck(getServiceEnvironment().getClientStore());
+           processStoreCheck(getServiceEnvironment().getClientApprovalStore());
+       }
 
-    public void processStoreCheck(Store store) throws SQLException {
-        if (store instanceof SQLStore) {
-            ((SQLStore) store).checkColumns();
-        }
-    }
+       public void processStoreCheck(Store store) throws SQLException {
+           if (store instanceof SQLStore) {
+               ((SQLStore) store).checkColumns();
+           }
+       }
 
-    public static boolean storeUpdatesDone = false;
+       public static boolean storeUpdatesDone = false;
 
 
     public static AbstractCLIApprover.ClientApprovalThread caThread = null;

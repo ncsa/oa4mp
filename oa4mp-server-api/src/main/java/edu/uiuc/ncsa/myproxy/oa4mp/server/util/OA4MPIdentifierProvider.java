@@ -12,6 +12,7 @@ public class OA4MPIdentifierProvider extends IdentifierProvider {
     public final static String CLIENT_ID = "client";
     public final static String CLIENT_APPROVAL_ID = "clientApproval";
     public final static String TRANSACTION_ID = "transaction";
+    public final static String PERMISSION_ID = "permission";
 
 
     public OA4MPIdentifierProvider(String scheme, String schemeSpecificPart, String component, boolean useTimestamps) {
