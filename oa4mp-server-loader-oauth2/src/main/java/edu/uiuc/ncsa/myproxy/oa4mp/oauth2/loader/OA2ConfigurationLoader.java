@@ -199,7 +199,10 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
     protected long getRTLifetime() {
         if (rtLifetime < 0) {
             String x = Configurations.getFirstAttribute(cn, REFRESH_TOKEN_LIFETIME);
-            if (x != null) {
+            // Fixes OAUTH-214
+            if (x == null || x.length() == 0) {
+                rtLifetime = REFRESH_TOKEN_LIFETIME_DEFAULT;
+            } else {
                 try {
                     rtLifetime = Long.parseLong(x) * 1000; // The configuration file has this in seconds. Internally this is ms.
                 } catch (Throwable t) {
@@ -212,19 +215,24 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
     }
 
     long maxClientRefreshTokenLifetime = -1L;
-    protected long getMaxClientRefreshTokenLifetime(){
+
+    protected long getMaxClientRefreshTokenLifetime() {
         if (maxClientRefreshTokenLifetime < 0) {
-                  String x = Configurations.getFirstAttribute(cn, MAX_CLIENT_REFRESH_TOKEN_LIFETIME);
-                  if (x != null) {
-                      try {
-                          maxClientRefreshTokenLifetime = Long.parseLong(x) * 1000; // The configuration file has this in seconds. Internally this is ms.
-                      } catch (Throwable t) {
-                          maxClientRefreshTokenLifetime = 13*30*24*3600*1000L; // default of 13 months.
-                      }
-                  }
-              }
-              return maxClientRefreshTokenLifetime;
+            String x = Configurations.getFirstAttribute(cn, MAX_CLIENT_REFRESH_TOKEN_LIFETIME);
+            // Fixes OAUTH-214
+            if (x == null || x.length() == 0) {
+                maxClientRefreshTokenLifetime = 13 * 30 * 24 * 3600 * 1000L; // default of 13 months.
+            } else {
+                try {
+                    maxClientRefreshTokenLifetime = Long.parseLong(x) * 1000; // The configuration file has this in seconds. Internally this is ms.
+                } catch (Throwable t) {
+                    maxClientRefreshTokenLifetime = 13 * 30 * 24 * 3600 * 1000L; // default of 13 months.
+                }
+            }
+        }
+        return maxClientRefreshTokenLifetime;
     }
+
     public boolean isRefreshTokenEnabled() {
         if (refreshTokenEnabled == null) {
             String x = Configurations.getFirstAttribute(cn, REFRESH_TOKEN_ENABLED);
@@ -243,21 +251,22 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
     }
 
     Boolean twoFactorSupportEnabled = null;
-    public boolean isTwoFactorSupportEnabled(){
-     if(twoFactorSupportEnabled == null){
-         String x = Configurations.getFirstAttribute(cn, ENABLE_TWO_FACTOR_SUPPORT);
-         if (x == null) {
-             twoFactorSupportEnabled = Boolean.FALSE;
-         } else {
-             try {
-                 twoFactorSupportEnabled = Boolean.valueOf(x);
-             } catch (Throwable t) {
-                 info("Could not parse two factor enabled attribute. Setting default to false.");
-                 twoFactorSupportEnabled = Boolean.FALSE;
-             }
-         }
 
-     }
+    public boolean isTwoFactorSupportEnabled() {
+        if (twoFactorSupportEnabled == null) {
+            String x = Configurations.getFirstAttribute(cn, ENABLE_TWO_FACTOR_SUPPORT);
+            if (x == null) {
+                twoFactorSupportEnabled = Boolean.FALSE;
+            } else {
+                try {
+                    twoFactorSupportEnabled = Boolean.valueOf(x);
+                } catch (Throwable t) {
+                    info("Could not parse two factor enabled attribute. Setting default to false.");
+                    twoFactorSupportEnabled = Boolean.FALSE;
+                }
+            }
+
+        }
         return twoFactorSupportEnabled;
     }
 
