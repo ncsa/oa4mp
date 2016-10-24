@@ -1,8 +1,7 @@
-package edu.uiuc.ncsa.myproxy.oa4mp.server.storage.filestore;
+package edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.server.OA4MPConfigTags;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.OA4MPServiceTransaction;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.util.TransactionConverter;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.configuration.provider.CfgEvent;
 import edu.uiuc.ncsa.security.delegation.token.TokenForge;

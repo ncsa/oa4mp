@@ -1,8 +1,8 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.storage.filestore.DSFSTransactionStoreProvider;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.util.TransactionConverter;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.DSFSTransactionStoreProvider;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.TransactionConverter;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.delegation.token.TokenForge;
 import org.apache.commons.configuration.tree.ConfigurationNode;

@@ -1,4 +1,4 @@
-package edu.uiuc.ncsa.myproxy.oa4mp.server.storage.keys;
+package edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions;
 
 import edu.uiuc.ncsa.security.delegation.server.storage.support.ServiceTransactionKeys;
 

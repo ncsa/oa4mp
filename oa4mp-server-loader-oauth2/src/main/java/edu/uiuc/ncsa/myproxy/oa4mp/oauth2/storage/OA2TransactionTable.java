@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.server.storage.sql.table.DSTransactionTable;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.DSTransactionTable;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnDescriptorEntry;
 
 import java.sql.Types;

@@ -10,8 +10,10 @@ import edu.uiuc.ncsa.security.util.mail.MailConfigurationTags;
  */
 public interface OA4MPConfigTags extends StorageConfigurationTags, MailConfigurationTags {
     public static final String CLIENTS_STORE = "clients";
-    public static final String TRANSACTIONS_STORE = "transactions";
     public static final String CLIENT_APPROVAL_STORE = "clientApprovals";
+    public static final String ADMIN_CLIENT_STORE = "adminClients";
+    public static final String TRANSACTIONS_STORE = "transactions";
+    public static final String PERMISSION_STORE = "permissions";
 
     public static final String MYPROXY = "myproxy";
     public static final String MYPROXY_PORT = "port";
@@ -21,12 +23,6 @@ public interface OA4MPConfigTags extends StorageConfigurationTags, MailConfigura
     public static final String MYPROXY_LOA_NAME = "name";
     public static final String MYPROXY_LOA_PORT = "port";
     public static final String MYPROXY_SERVER_DN = "serverDN";
-    public static final String SSL_KEYSTORE = "keystore";
-    public static final String SSL_KEYSTORE_PATH = "path";
-    public static final String SSL_KEYSTORE_PASSWORD = "password";
-    public static final String SSL_KEYSTORE_TYPE = "type";
-    public static final String SSL_KEYSTORE_FACTORY = "factory";
-    public static final String SSL_KEYSTORE_USE_JAVA_KEYSTORE = "useJavaKeystore";
     public static final String COMPONENT = "service"; // tag for top-level component of configuration
 
 

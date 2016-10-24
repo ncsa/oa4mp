@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.server.storage.keys.DSTransactionKeys;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.DSTransactionKeys;
 
 /**
  * <p>Created by Jeff Gaynor<br>

@@ -1,5 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.server;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.Permission;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionsStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AuthorizationServletConfig;
@@ -12,11 +14,9 @@ import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.server.issuers.AGIssuer;
 import edu.uiuc.ncsa.security.delegation.server.issuers.ATIssuer;
 import edu.uiuc.ncsa.security.delegation.server.issuers.PAIssuer;
-import edu.uiuc.ncsa.security.delegation.server.storage.AdminClientStore;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApprovalStore;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientStore;
-import edu.uiuc.ncsa.security.delegation.storage.AdminClient;
 import edu.uiuc.ncsa.security.delegation.storage.TransactionStore;
 import edu.uiuc.ncsa.security.delegation.token.TokenForge;
 import edu.uiuc.ncsa.security.servlet.TrivialUsernameTransformer;
@@ -153,7 +153,9 @@ public class ServiceEnvironmentImpl extends MyProxyServiceEnvironment implements
                                   HashMap<String, String> constants,
                                   AuthorizationServletConfig ac,
                                   UsernameTransformer usernameTransformer,
-                                  boolean isPingable) {
+                                  boolean isPingable,
+                                  Provider<PermissionsStore> psp,
+                                  Provider<AdminClientStore> acs) {
         super(logger, mfp, constants);
         this.casp = casp;
         this.csp = csp;
@@ -168,6 +170,8 @@ public class ServiceEnvironmentImpl extends MyProxyServiceEnvironment implements
         this.maxAllowedNewClientRequests = maxAllowedNewClientRequests;
         this.usernameTransformer = usernameTransformer;
         setPingable(isPingable);
+        this.psp = psp;
+        this.acs = acs;
     }
 
     MessagesProvider messagesProvider;
@@ -181,6 +185,7 @@ public class ServiceEnvironmentImpl extends MyProxyServiceEnvironment implements
     protected Provider<PAIssuer> paip;
     protected Provider<TokenForge> tfp;
     protected Provider<PermissionsStore> psp;
+    protected Provider<AdminClientStore> acs;
 
 
     Map<String, String> messages;
@@ -199,11 +204,12 @@ public class ServiceEnvironmentImpl extends MyProxyServiceEnvironment implements
     }
 
     AdminClientStore adminClientStore = null;
-    public AdminClientStore<AdminClient> getAdminClientStore(){
-        if(adminClientStore == null){
 
+    public AdminClientStore<AdminClient> getAdminClientStore() {
+        if (adminClientStore == null) {
+            adminClientStore = acs.get();
         }
-    return adminClientStore;
+        return adminClientStore;
     }
 
     PermissionsStore permissionsStore = null;

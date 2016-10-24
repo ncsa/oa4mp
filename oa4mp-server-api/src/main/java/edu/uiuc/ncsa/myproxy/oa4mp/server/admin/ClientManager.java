@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.server.admin;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironmentImpl;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.Permission;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.ThingFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions.*;
@@ -12,12 +13,16 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.targets.TargetAttribute;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.targets.TargetClient;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.targets.TargetPermission;
 import edu.uiuc.ncsa.security.core.Identifier;
-import edu.uiuc.ncsa.security.core.exceptions.*;
+import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientStore;
-import edu.uiuc.ncsa.security.delegation.storage.AdminClient;
+import edu.uiuc.ncsa.security.delegation.storage.Client;
 import net.sf.json.JSONObject;
 
 /**
+ * Since there are tons of possible subject-action-target combinations, the idea here is to
+ * let polymorphism do all the work rather than some gnarly set of switch statements.
+ * This does require a bit of work creating these {@link edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.Thing}s,
+ * but is much simpler to maintain.
  * <p>Created by Jeff Gaynor<br>
  * on 10/6/16 at  2:31 PM
  */
@@ -59,10 +64,10 @@ public class ClientManager {
      //  getSE().getClientStore().get()
     }
 
-    protected void execute(SubjectAdmin s, ActionExecute a, TargetClient t, JSONObject arg) {
+    protected void execute(AdminClient s, ActionExecute a, Client t, JSONObject arg) {
     }
 
-    protected void execute(SubjectAdmin s, ActionGet a, TargetAttribute t, JSONObject arg) {
+    protected void execute(AdminClient s, ActionGet a, Client t, JSONObject arg) {
     }
 
     protected void execute(SubjectAdmin s, ActionSet a, TargetAttribute t, JSONObject arg) {
@@ -77,6 +82,7 @@ public class ClientManager {
     protected void execute(SubjectAdmin s, ActionRemove a, TargetPermission t, JSONObject arg) {
     }
     protected void execute(SubjectClient s, ActionRemove a, TargetPermission t, JSONObject arg) {
+
     }
 
     protected void execute(SubjectClient s, ActionCreate a, TargetPermission t, JSONObject arg) {

@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: edu.uiuc.ncsa.security:ncsa-security-core:3.4-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/ncsa-security-core/3.4-SNAPSHOT/ncsa-security-core-3.4-20161020.180251-12.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/ncsa-security-core/3.4-SNAPSHOT/ncsa-security-core-3.4-20161020.180251-12-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/ncsa-security-core/3.4-SNAPSHOT/ncsa-security-core-3.4-20161020.180251-12-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

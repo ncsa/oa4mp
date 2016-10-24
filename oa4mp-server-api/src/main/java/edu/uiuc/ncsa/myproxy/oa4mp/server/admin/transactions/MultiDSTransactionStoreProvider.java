@@ -1,4 +1,4 @@
-package edu.uiuc.ncsa.myproxy.oa4mp.server.storage;
+package edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.server.OA4MPServiceTransaction;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
@@ -14,7 +14,10 @@ import org.apache.commons.configuration.tree.ConfigurationNode;
  */
 public class MultiDSTransactionStoreProvider<V extends OA4MPServiceTransaction> extends TransactionStoreProvider<TransactionStore<V>> {
     public MultiDSTransactionStoreProvider(ConfigurationNode config,
-                                           boolean disableDefaultStore, MyLoggingFacade logger, String type, String target,
+                                           boolean disableDefaultStore,
+                                           MyLoggingFacade logger,
+                                           String type,
+                                           String target,
                                            IdentifiableProvider<V> tp) {
         super(config,disableDefaultStore, logger, type, target);
         transactionProvider = tp;

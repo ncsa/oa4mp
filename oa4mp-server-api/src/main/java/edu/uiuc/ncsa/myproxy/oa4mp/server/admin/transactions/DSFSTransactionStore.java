@@ -1,4 +1,4 @@
-package edu.uiuc.ncsa.myproxy.oa4mp.server.storage.filestore;
+package edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.server.OA4MPServiceTransaction;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;

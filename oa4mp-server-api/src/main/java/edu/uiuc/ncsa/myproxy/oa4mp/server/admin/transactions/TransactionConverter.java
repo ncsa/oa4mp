@@ -1,7 +1,6 @@
-package edu.uiuc.ncsa.myproxy.oa4mp.server.util;
+package edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.server.OA4MPServiceTransaction;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.storage.keys.DSTransactionKeys;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;

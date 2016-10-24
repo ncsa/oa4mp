@@ -14,6 +14,8 @@ import java.util.List;
  * on 10/13/16 at  3:58 PM
  */
 public class SQLPermissionStore<V extends Permission> extends SQLStore<V> implements PermissionsStore<V> {
+    public static String DEFAULT_TABLENAME="permissions";
+
     public SQLPermissionStore() {
     }
 

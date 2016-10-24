@@ -1,4 +1,4 @@
-package edu.uiuc.ncsa.myproxy.oa4mp.server.util;
+package edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions;
 
 import edu.uiuc.ncsa.security.core.util.IdentifierProvider;
 
@@ -13,6 +13,7 @@ public class OA4MPIdentifierProvider extends IdentifierProvider {
     public final static String CLIENT_APPROVAL_ID = "clientApproval";
     public final static String TRANSACTION_ID = "transaction";
     public final static String PERMISSION_ID = "permission";
+    public final static String ADMIN_CLIENT_ID = "adminClient";
 
 
     public OA4MPIdentifierProvider(String scheme, String schemeSpecificPart, String component, boolean useTimestamps) {

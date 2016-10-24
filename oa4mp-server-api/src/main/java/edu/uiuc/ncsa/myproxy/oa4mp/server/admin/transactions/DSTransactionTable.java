@@ -1,6 +1,5 @@
-package edu.uiuc.ncsa.myproxy.oa4mp.server.storage.sql.table;
+package edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.server.storage.keys.DSTransactionKeys;
 import edu.uiuc.ncsa.security.delegation.server.storage.support.ServiceTransactionTable;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnDescriptorEntry;
 

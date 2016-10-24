@@ -2,7 +2,6 @@ package edu.uiuc.ncsa.myproxy.oa4mp.server.storage.sql.table;
 
 import edu.uiuc.ncsa.security.delegation.storage.ClientKeys;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnDescriptorEntry;
-import edu.uiuc.ncsa.security.storage.sql.internals.Table;
 
 import static java.sql.Types.*;
 
@@ -10,7 +9,7 @@ import static java.sql.Types.*;
  * <p>Created by Jeff Gaynor<br>
  * on May 24, 2011 at  11:10:02 AM
  */
-public class ClientStoreTable extends Table {
+public class ClientStoreTable extends BaseClientTable {
 
 
     /**
@@ -28,7 +27,6 @@ public class ClientStoreTable extends Table {
     @Override
     public void createColumnDescriptors() {
         super.createColumnDescriptors();
-        getColumnDescriptor().add(new ColumnDescriptorEntry(ct().secret(), LONGVARCHAR));
         getColumnDescriptor().add(new ColumnDescriptorEntry(ct().name(), LONGVARCHAR));
         getColumnDescriptor().add(new ColumnDescriptorEntry(ct().homeURL(), LONGVARCHAR));
         getColumnDescriptor().add(new ColumnDescriptorEntry(ct().errorURL(), LONGVARCHAR));

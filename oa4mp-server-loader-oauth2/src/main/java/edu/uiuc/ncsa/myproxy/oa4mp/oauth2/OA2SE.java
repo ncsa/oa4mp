@@ -3,6 +3,8 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.LDAPConfiguration;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.MyProxyFacadeProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironmentImpl;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientStore;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionsStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AuthorizationServletConfig;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
@@ -45,6 +47,8 @@ public class OA2SE extends ServiceEnvironmentImpl {
                  AuthorizationServletConfig ac,
                  UsernameTransformer usernameTransformer,
                  boolean isPingable,
+                 Provider<PermissionsStore> psp,
+                 Provider<AdminClientStore> acs,
                  int clientSecretLength,
                  Collection<String> scopes,
                  ScopeHandler scopeHandler,
@@ -67,7 +71,9 @@ public class OA2SE extends ServiceEnvironmentImpl {
                 constants,
                 ac,
                 usernameTransformer,
-                isPingable);
+                isPingable,
+                psp,
+                acs);
         if (0 < rtLifetime) {
             this.rtLifetime = rtLifetime;
         }
