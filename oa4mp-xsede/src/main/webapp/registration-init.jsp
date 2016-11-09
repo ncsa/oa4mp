@@ -21,7 +21,7 @@
 
 <html>
 <head>
-    <title>XSEDE User Portal Request for Science Gateway Delegation Access</title>
+    <title>XSEDE OA4MP OAuth 1.0 Client Registration Request</title>
     <link rel="stylesheet" type="text/css" media="all" href="xup.css"/>
     <link rel="icon" href="images/favicon.ico" type="image/x-icon"/>
     <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon"/>
@@ -34,15 +34,16 @@
 
 <div class="floatleftbox">
     <form action="/oauth/register" method="post">
-        <div class="boxheader">Welcome to the XSEDE Science Gateway Delegation Access Request Form</div>
+        <div class="boxheader">Welcome to the XSEDE OAuth 1.0 for MyProxy Client Registration Request Form</div>
 
         <div class="authbox">
-            This page allows you to register your gateway with the XSEDE User Portal
-            for delegation using OAuth. To get your gateway approved for delegation
-            please fill out the form below. Your request will be evaluated for approval. For more information,
-            please make sure you read the
+              This page allows you to register your gateway/client with the XSEDE OAuth for MyProxy
+              service for authentication of a user and delegation of a user certificate using
+              OAuth 1.0. To get your gateway/client approved for authentication and delegation
+              please fill out the form below. Your request will be evaluated for approval. For
+              more information, please make sure you read the
             <a href="http://grid.ncsa.illinois.edu/myproxy/oauth/client/manuals/registering-with-a-server.xhtml"
-               target="_blank">Gateway Registration Document</a>.
+               target="_blank">Gateway/Client Registration Document</a>.
             <p>
             <table>
                 <tr>
