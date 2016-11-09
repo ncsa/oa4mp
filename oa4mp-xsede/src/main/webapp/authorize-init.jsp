@@ -18,7 +18,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-    <title>XSEDE User Portal Delegation Authorization</title>
+    <title>XSEDE OAuth 1.0 Client Authorization</title>
     <link rel="stylesheet" type="text/css" media="all" href="xup.css"/>
     <link rel="icon" href="images/favicon.ico" type="image/x-icon"/>
     <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon"/>
@@ -31,11 +31,11 @@
 </div>
 <br clear="all"/>
 
-<div class="boxheader">Welcome to the XSEDE's  Client Authorization Page</div>
+<div class="boxheader">Welcome to the XSEDE Client Authorization Page</div>
 
 <div class="authbox">
-    <b>Science Gateway Access</b><br>
-    The XSEDE Science Gateway or Service below is requesting access to your XSEDE account. If you approve,
+    <b>Client Access</b><br>
+    The XSEDE Client below is requesting access to your XSEDE account. If you approve,
     please sign in with your XSEDE username and password.<br><br>
     <b>Note</b>: Only members of active XSEDE project allocations will be able to sign in on this page.
     <p>
@@ -46,11 +46,13 @@
                 <td valign="top">
                     <table border=0>
                         <tr valign="top">
-                            <th>Science Gateway Information</th>
+                            <th>CLIENT INFORMATION</th>
                         </tr>
                         <tr>
-                            <td> The XSEDE Science Gateway listed below is requesting access to your
-                                XSEDE account. If you approve, please sign in.
+                            <td> The XSEDE Client listed below is requesting access to your
+                                XSEDE account. If you approve, please sign in with your XSEDE
+                                username and password. For help or clarification on why you are
+                                presented with this screen please contact the XSEDE Help Desk.
                                 <br><br>
                                 <i>Name:</i> ${clientName}
                                 <br>
@@ -62,7 +64,7 @@
                 <td valign="top">
                     <table width="350" cellspacing="0" cellpadding="0" align="right" border="0">
                         <tr>
-                            <th colspan="2">Sign in</th>
+                            <th colspan="2">SIGN IN</th>
                         </tr>
                         <tr>
                             <td>Username</td>

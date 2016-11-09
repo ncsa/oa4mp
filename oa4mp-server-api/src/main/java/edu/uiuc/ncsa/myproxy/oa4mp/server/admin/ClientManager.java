@@ -18,6 +18,9 @@ import edu.uiuc.ncsa.security.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 import net.sf.json.JSONObject;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * Since there are tons of possible subject-action-target combinations, the idea here is to
  * let polymorphism do all the work rather than some gnarly set of switch statements.
@@ -103,6 +106,33 @@ public class ClientManager {
 
     protected void execute(SubjectClient s, ActionRemove a, TargetAttribute t, JSONObject arg) {
     }
+
+    // Attribute calls
+    protected Map<String,Object> get(AdminClient adminClient, Client client, List<String> attributeKeys){return null;}
+    protected void set(AdminClient adminClient, Client client, Map<String,Object> attributes){}
+    protected void remove(AdminClient adminClient, Client client, List<String> attributeKeys){}
+    protected Map<String,Object> get(Client client, List<String> attributeKeys){return null;}
+    protected void set(Client client, Map<String,Object> attributes){}
+    protected void remove(Client client, List<String> attributeKeys){}
+
+    // Permissions calls
+    protected void set(AdminClient adminClient, Client client, Permission permission){}
+    protected Permission get(AdminClient adminClient, Client client){return null;}
+    protected void remove(AdminClient adminClient, Client client, Permission permission){}
+    protected List<AdminClient> getPermissions(Client client){return null;}
+    protected List<Client> getPermissions(AdminClient adminClient){return null;}
+
+    // Client calls
+    protected Client create(AdminClient adminClient, Map<String,Object> attributes){return null;}
+    protected Client create(Map<String, Object> attributes){return null;}
+    protected void remove(Client client){}
+    protected void remove(AdminClient adminClient, Client client){}
+    protected void approve(AdminClient adminClient, Client client, boolean isApproved){}
+    protected void approve(Client client, boolean isApproved){}
+    protected boolean isaApproved(Client client){return false;}
+
+
+
 
 
 }

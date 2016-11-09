@@ -45,7 +45,8 @@
     debug CDATA #IMPLIED&gt;
 &lt;!ELEMENT <a href="server/configuration/server-messages.xhtml">messages (retryMessage)</a>*&gt;
 &lt;!ELEMENT <a href="server/configuration/server-messages.xhtml">retryMessage (#PCDATA)</a>&gt;
-&lt;!ELEMENT <a href="server/configuration/server-myproxy.xhtml">myproxy</a> (<a href="common/configuration/keystore.xhtml">keystore</a>)&gt;
+&lt;!ELEMENT <a href="server/configuration/server-myproxy.xhtml">myproxy</a> (<a href="common/configuration/keystore.xhtml">keystore</a>|
+    <a href="common/configuration/ssl.xhtml">ssl</a>)&gt;
 &lt;!ATTLIST <a href="server/configuration/server-myproxy.xhtml">myproxy</a>
     host CDATA #REQUIRED
     port CDATA #REQUIRED
@@ -106,7 +107,7 @@
     tablePrefix CDATA #IMPLIED
     driver CDATA #IMPLIED&gt;
 &lt;!ELEMENT <a href="server/configuration/ldap.xhtml">ldap</a>(address|port|password|principal|searchBase|searchAttributes|ssl)*
-&lt;!ELEMENT ldap (address|port|password|principal|searchBase|searchAttributes|ssl)*&gt;
+&lt;!ELEMENT ldap (address|port|password|principal|searchBase|searchAttributes|<a href="common/configuration/keystore.xhtml">ssl</a>)*&gt;
 &lt;!ATTLIST ldap
         enabled CDATA #REQUIRED&gt;
 &lt;!ELEMENT address (#PCDATA)&gt;
@@ -116,24 +117,19 @@
 &lt;!ELEMENT searchBase (#PCDATA)&gt;
 &lt;!ELEMENT searchAttributes (attribute)*&gt;
 &lt;!ELEMENT attribute (#PCDATA)&gt;
-&lt;!ELEMENT ssl (trustStore|keystore)*&gt;
-&lt;!ATTLIST ssl
+    &lt;!ELEMENT<a href="common/configuration/ssl.xhtml">ssl</a>(trustStore|keystore)*
         debug CDATA #IMPLIED
+        tlsVersion CDATA #REQUIRED
         useJavaTrustStore CDATA #IMPLIED&gt;
 &lt;!ELEMENT trustStore (path|password|type)*&gt;
 &lt;!ELEMENT path (#PCDATA)&gt;
 &lt;!ELEMENT password (#PCDATA)&gt;
 &lt;!ELEMENT type (#PCDATA)&gt;
-&lt;!ELEMENT keyStore (path|password|type)*&gt;
+&lt;!ELEMENT keyStore (path|password|factory|type)*&gt;
 &lt;!ELEMENT path (#PCDATA)&gt;
 &lt;!ELEMENT password (#PCDATA)&gt;
+&lt;!ELEMENT factory (#PCDATA)&gt;
 &lt;!ELEMENT type (#PCDATA)&gt;
-&lt;!ELEMENT<a href="common/configuration/logging.xhtml">ssl</a>(trustStore|keystore)*
-&lt;!ATTLIST debug CDATA #REQUIRED
-        logName CDATA #IMPLIED
-        logSize CDATA #IMPLIED
-        logFileCount CDATA #IMPLIED
-        debug CDATA #IMPLIED>
 &lt;!ELEMENT <a href="common/configuration/logging.xhtml">logging</a>
 &lt;!ATTLIST logFileName CDATA #REQUIRED
     logName CDATA #IMPLIED
