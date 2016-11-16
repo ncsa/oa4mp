@@ -32,16 +32,18 @@ public class XsedeConfigurationLoader<T extends OA2SE> extends OA2ConfigurationL
             ConfigurationNode username = Configurations.getFirstNode(node, "username".toString());
             ConfigurationNode password = Configurations.getFirstNode(node, "password".toString());
             ConfigurationNode apikey = Configurations.getFirstNode(node, "api-key".toString());
-            ConfigurationNode hash = Configurations.getFirstNode(node, "hash".toString());
+            ConfigurationNode apihash = Configurations.getFirstNode(node, "api-hash".toString());
             ConfigurationNode apiurl = Configurations.getFirstNode(node, "api-url".toString());
-            if (username != null && password != null) {
-                scopeHandler = new XsedeScopeHandler(username.getValue().toString(),
-                               password.getValue().toString(), loggerProvider.get());
-            } else if (apikey != null && hash != null && apiurl != null) {
+            ConfigurationNode apiresource = Configurations.getFirstNode(node, "api-resource".toString());
+            if (apikey != null && apihash != null && apiurl != null && apiresource != null) {
                 scopeHandler = new XsedeScopeHandler(loggerProvider.get(),
                                apikey.getValue().toString(),
-                               hash.getValue().toString(),
-                               apiurl.getValue().toString());
+                               apihash.getValue().toString(),
+                               apiurl.getValue().toString(),
+                               apiresource.getValue().toString());
+            } else if (username != null && password != null) {
+                scopeHandler = new XsedeScopeHandler(username.getValue().toString(),
+                               password.getValue().toString(), loggerProvider.get());
             } else
                 throw new InstantiationException("Couldn't find XUP API authentication credentials");
 
