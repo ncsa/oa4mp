@@ -40,8 +40,9 @@ public class XsedeScopeHandler extends BasicScopeHandler {
     private String OA4MP_USER = "username";
     private String OA4MP_PASSWORD = "password";
     private String OA4MP_API_KEY = "api-key";
-    private String OA4MP_HASH = "hash";
+    private String OA4MP_API_HASH = "hash";
     private String OA4MP_API_URL = "url";
+    private String OA4MP_API_RESOURCE = "resource";
     private String authToken;
     MyLoggingFacade myLogger;
 
@@ -50,16 +51,17 @@ public class XsedeScopeHandler extends BasicScopeHandler {
         OA4MP_USER = Username;
        	OA4MP_PASSWORD = Password;
         OA4MP_API_KEY = null;
-        OA4MP_HASH = null;
+        OA4MP_API_HASH = null;
         myLogger = logger;
         resetAuthToken();
     }
 
-    public XsedeScopeHandler(MyLoggingFacade logger, String ApiKey, String Hash, String ApiURL) {
+    public XsedeScopeHandler(MyLoggingFacade logger, String ApiKey, String ApiHash, String ApiURL, String ApiResource) {
         super();
         OA4MP_API_KEY = ApiKey;
-       	OA4MP_HASH = Hash;
+       	OA4MP_API_HASH = ApiHash;
         OA4MP_API_URL = ApiURL;
+        OA4MP_API_RESOURCE = ApiResource;
         OA4MP_USER = null;
        	OA4MP_PASSWORD = null;
         myLogger = logger;
@@ -76,6 +78,7 @@ public class XsedeScopeHandler extends BasicScopeHandler {
         HttpPost postRequest = new HttpPost(
             "https://api.xsede.org/tokens/v1");
         postRequest.addHeader("accept", "application/json");
+        postRequest.addHeader("Cache-Control", "no-cache");
 
         postRequest.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
         try {
@@ -124,8 +127,9 @@ public class XsedeScopeHandler extends BasicScopeHandler {
             DefaultHttpClient httpClient = new DefaultHttpClient();
             HttpGet getRequest = new HttpGet(OA4MP_API_URL + "/" + subject);
             getRequest.addHeader("accept", "application/json");
+            getRequest.addHeader("Cache-Control", "no-cache");
             getRequest.addHeader("XA-AGENT", "userinfo");
-            getRequest.addHeader("XA-RESOURCE", "test-oa4mp.iu.xsede.org");
+            getRequest.addHeader("XA-RESOURCE", OA4MP_API_RESOURCE);
             getRequest.addHeader("XA-API-KEY", OA4MP_API_KEY);
 
             HttpResponse response = httpClient.execute(getRequest);
@@ -159,6 +163,7 @@ public class XsedeScopeHandler extends BasicScopeHandler {
             DefaultHttpClient httpClient = new DefaultHttpClient();
             HttpGet getRequest = new HttpGet("https://api.xsede.org/profile/v1" + "/" + subject);
             getRequest.addHeader("accept", "application/json");
+            getRequest.addHeader("Cache-Control", "no-cache");
 
             getRequest.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
 
