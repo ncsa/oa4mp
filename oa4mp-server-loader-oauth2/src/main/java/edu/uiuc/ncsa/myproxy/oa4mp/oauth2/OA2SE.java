@@ -1,6 +1,5 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.LDAPConfiguration;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.MyProxyFacadeProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironmentImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientStore;
@@ -16,6 +15,7 @@ import edu.uiuc.ncsa.security.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.security.delegation.storage.TransactionStore;
 import edu.uiuc.ncsa.security.delegation.token.TokenForge;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Scopes;
+import edu.uiuc.ncsa.security.oauth_2_0.server.LDAPConfiguration;
 import edu.uiuc.ncsa.security.oauth_2_0.server.ScopeHandler;
 import edu.uiuc.ncsa.security.servlet.UsernameTransformer;
 import edu.uiuc.ncsa.security.util.mail.MailUtilProvider;
@@ -52,7 +52,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
                  int clientSecretLength,
                  Collection<String> scopes,
                  ScopeHandler scopeHandler,
-                 LDAPConfiguration ldapConfiguration,
+                 LDAPConfiguration ldapConfiguration2,
                  boolean isRefreshTokenEnabled,
                  boolean twoFactorSupportEnabled,
                  long maxClientRefreshTokenLifetime) {
@@ -92,7 +92,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
             logger.info("No refresh token support.");
         }
 
-        this.ldapConfiguration = ldapConfiguration;
+        this.ldapConfiguration2 = ldapConfiguration2;
         this.twoFactorSupportEnabled = twoFactorSupportEnabled;
         this.maxClientRefreshTokenLifetime = maxClientRefreshTokenLifetime;
     }
@@ -159,12 +159,12 @@ public class OA2SE extends ServiceEnvironmentImpl {
     }
 
     public LDAPConfiguration getLdapConfiguration() {
-        return ldapConfiguration;
+        return ldapConfiguration2;
     }
 
-    public void setLdapConfiguration(LDAPConfiguration ldapConfiguration) {
-        this.ldapConfiguration = ldapConfiguration;
+    public void setLdapConfiguration(LDAPConfiguration ldapConfiguration2) {
+        this.ldapConfiguration2 = ldapConfiguration2;
     }
 
-    LDAPConfiguration ldapConfiguration;
+    LDAPConfiguration ldapConfiguration2;
 }

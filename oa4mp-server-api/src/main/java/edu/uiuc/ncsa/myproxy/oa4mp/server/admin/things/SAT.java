@@ -7,6 +7,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things;
  */
 public interface SAT {
     public static final int NO_VALUE = -1;
+      public static final String KEYS_API = "api";
       public static final String SUBJECT_CLIENT = "client";
       public static final int SUBJECT_CLIENT_VALUE = 0;
       public static final String SUBJECT_ADMIN = "admin";
@@ -39,7 +40,7 @@ public interface SAT {
       public static final int KEYS_SUBJECT_VALUE = 200;
       public static final String KEYS_ACTION = "action";
       public static final int KEYS_ACTION_VALUE = 201;
-      public static final String KEYS_TARGET = "target";
+      public static final String KEYS_TARGET = "object";
       public static final int KEYS_TARGET_VALUE = 202;
       public static final String KEYS_ID = "id";
       public static final int KEYS_ID_VALUE = 203;

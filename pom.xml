@@ -68,6 +68,7 @@
         <module>oa4mp-twofactor</module>
         <module>oa4mp-oidc-twofactor</module>
         <module>oa4mp-website</module>
+        <module>oa4mp-co-oidc</module>
         <module>oa4mp-skin</module>
         <module>myproxy-website</module>
     </modules>

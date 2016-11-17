@@ -1,10 +1,9 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.LDAPConfiguration;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.LDAPConfigurationUtil;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.LDAPConfigurationUtil.AttributeEntry;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.oauth_2_0.UserInfo;
+import edu.uiuc.ncsa.security.oauth_2_0.server.LDAPConfiguration;
+import edu.uiuc.ncsa.security.oauth_2_0.server.LDAPConfigurationUtil;
 import edu.uiuc.ncsa.security.oauth_2_0.server.UnsupportedScopeException;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -83,7 +82,7 @@ public class LDAPScopeHandler extends BasicScopeHandler {
             Hashtable<String, String> env = new Hashtable<String, String>();
             env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
             String providerUrl = "ldaps://" + getCfg().getServer();
-            if (getCfg().getPort() != null) {
+            if (0 <=  getCfg().getPort() ) {
                 providerUrl = providerUrl + ":" + getCfg().getPort();
             }
             env.put(Context.PROVIDER_URL, providerUrl);
@@ -123,7 +122,7 @@ public class LDAPScopeHandler extends BasicScopeHandler {
 
     protected JSONObject simpleSearch(LdapContext ctx,
                                       String userID,
-                                      Map<String, AttributeEntry> attributes) throws NamingException {
+                                      Map<String, LDAPConfigurationUtil.AttributeEntry> attributes) throws NamingException {
         if(ctx == null){
             throw new IllegalStateException("Error: No LDAP context");
         }
@@ -150,7 +149,7 @@ public class LDAPScopeHandler extends BasicScopeHandler {
      * @return
      * @throws NamingException
      */
-    protected JSONObject toJSON(Map<String, AttributeEntry> attributes, NamingEnumeration e) throws NamingException {
+    protected JSONObject toJSON(Map<String, LDAPConfigurationUtil.AttributeEntry> attributes, NamingEnumeration e) throws NamingException {
         JSONObject json = new JSONObject();
 
         while (e.hasMore()) {

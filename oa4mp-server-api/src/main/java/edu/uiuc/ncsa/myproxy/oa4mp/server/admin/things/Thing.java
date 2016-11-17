@@ -24,4 +24,11 @@ public  class Thing {
           if(getValue() != null && targetValue == null) return false;
           return getValue().equals(targetValue);
       }
-  }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "[" +
+                "value='" + value + '\'' +
+                ']';
+    }
+}
