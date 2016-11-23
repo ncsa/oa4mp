@@ -1,26 +1,24 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.server.servlet;
 
 import edu.uiuc.ncsa.myproxy.MyProxyServiceFacade;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.*;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.ClientApprovalProvider;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.OA4MPConfigTags;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.OA4MPServiceTransaction;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironmentImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientStoreProviders;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.MultiDSAdminClientStoreProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.MultiDSPermissionStoreProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionStoreProviders;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionsStore;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.DSTransactionProvider;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.*;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.storage.MultiDSClientApprovalStoreProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.storage.MultiDSClientStoreProvider;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.MultiDSTransactionStoreProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.storage.filestore.DSFSClientApprovalStoreProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.storage.filestore.DSFSClientStoreProvider;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.DSFSTransactionStoreProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.storage.sql.provider.DSClientSQLStoreProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.storage.sql.provider.DSSQLClientApprovalStoreProvider;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.DSSQLTransactionStoreProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.AbstractCLIApprover;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.ClientApproverConverter;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.TransactionConverter;
 import edu.uiuc.ncsa.security.core.configuration.Configurations;
 import edu.uiuc.ncsa.security.core.configuration.provider.CfgEvent;
 import edu.uiuc.ncsa.security.core.configuration.provider.TypedProvider;
@@ -281,9 +279,6 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
             mpp.addListener(PermissionStoreProviders.getMariaPS(cn, getMariaDBConnectionPoolProvider()));
             mpp.addListener(PermissionStoreProviders.getPostgresPS(cn, getPgConnectionPoolProvider()));
             mpp.addListener(PermissionStoreProviders.getMysqlPS(cn, getMySQLConnectionPoolProvider()));
-            PermissionsStore acs = (PermissionsStore) mpp.get();
-            System.err.println("Got permission store" + acs.getClass().getSimpleName());
-
         }
         return mpp;
     }

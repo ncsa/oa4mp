@@ -10,6 +10,19 @@ import edu.uiuc.ncsa.security.storage.MemoryStore;
 public class AdminClientMemoryStore<V extends AdminClient> extends MemoryStore<V> implements AdminClientStore<V> {
     public AdminClientMemoryStore(IdentifiableProvider<V> identifiableProvider) {
         super(identifiableProvider);
+        acProvider = identifiableProvider;
+        acConverter = new AdminClientConverter<>(new AdminClientKeys(), identifiableProvider);
+    }
+    public IdentifiableProvider<V> acProvider = null;
+      public AdminClientConverter<V> acConverter = null;
+
+    @Override
+    public AdminClientConverter getACConverter() {
+        return acConverter;
     }
 
+    @Override
+    public IdentifiableProvider getACProvider() {
+        return acProvider;
+    }
 }

@@ -8,6 +8,6 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.SAT;
  */
 public class TargetAttribute extends Target {
     public TargetAttribute() {
-        super(SAT.TARGET_ATTRIBUTE);
+        super(SAT.TYPE_ATTRIBUTE);
     }
 }

@@ -28,6 +28,13 @@
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
+            <artifactId>oa4mp-server-oauth2</artifactId>
+            <version>3.4-SNAPSHOT</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>oa4mp-server-api</artifactId>
             <version>3.4-SNAPSHOT</version>
         </dependency>

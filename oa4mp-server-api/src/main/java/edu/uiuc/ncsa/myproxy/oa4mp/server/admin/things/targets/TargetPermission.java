@@ -8,6 +8,6 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.SAT;
  */
 public class TargetPermission extends Target {
     public TargetPermission() {
-        super(SAT.TARGET_PERMISSION);
+        super(SAT.TYPE_PERMISSION);
     }
 }

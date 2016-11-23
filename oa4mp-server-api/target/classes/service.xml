@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE config SYSTEM "service.dtd">
+<!--
+You should probably use the online dtd rather than the one supplied here with the following DOCTYPE directive:
+
+<!DOCTYPE config PUBLIC "-//OA4MP//DTD version 1.0.2//EN" "http://cilogon.svn.sourceforge.net/viewvc/cilogon/m2-repo/dtd/1.0.2/service.dtd">
+
+If you cannot access this for whatever reason, then certainly refer to the dtd locally or just omit it all together.
+-->
+
+<config>
+ <service name="sample"
+          version="1.0"
+          address="https://localhost:8443/oauth">
+     <myproxy host="myproxy.teragrid.org" port="7514"/>
+     <mysql username="portal" password="bar">
+         <transactions/>
+     </mysql>
+     <mysql username="client" password="bar">
+         <clients/>
+     </mysql>
+     <mysql username="approver" password="bar">
+         <clientApprovals/>
+     </mysql>
+
+     <mail enabled="true"
+	   useSSL="true"
+	   username="you@wherever.edu"
+	   password="bar"
+       debug="false"
+ 	   server="smtp.wherever.edu"
+	   recipents="you@wherever.edu,your-alter-ego@wherever.edu">
+         <messageTemplate>/path/to/xsede-message.template</messageTemplate>
+         <subjectTemplate>/path/to/config/xsede-subject.template</subjectTemplate>
+     </mail>
+ </service>
+</config>

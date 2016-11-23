@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient;
 
+import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
 import edu.uiuc.ncsa.security.storage.sql.SQLStore;
@@ -20,4 +21,13 @@ public class AdminClientSQLStore<V extends AdminClient> extends SQLStore<V> impl
         super(connectionPool, table, identifiableProvider, converter);
     }
 
+    @Override
+    public AdminClientConverter getACConverter() {
+        return (AdminClientConverter) this.converter;
+    }
+
+    @Override
+    public IdentifiableProvider getACProvider() {
+        return (IdentifiableProvider) this.identifiableProvider;
+    }
 }

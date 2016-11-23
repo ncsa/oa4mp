@@ -37,6 +37,39 @@ CREATE TABLE oauth2.clients (
   callback_uri  TEXT
 );
 
+
+CREATE TABLE oauth2.adminClients (
+  admin_id     VARCHAR(255) PRIMARY KEY,
+  name         TEXT,
+  secret       TEXT,
+  email        TEXT,
+  creation_ts  TIMESTAMP,
+  vo           TEXT,
+  issuer       TEXT
+);
+
+CREATE TABLE oauth2.ldap(
+  id            VARCHAR(255) PRIMARY KEY,
+  client_id     VARCHAR(255),
+  ldap          LONGTEXT,
+  UNIQUE INDEX client_id (client_id(255))
+);
+
+
+CREATE TABLE oauth2.permissions (
+  permission_id VARCHAR(255) PRIMARY KEY,
+  admin_id      VARCHAR(255),
+  client_id     VARCHAR(255),
+  can_approve   BOOLEAN,
+  can_create    BOOLEAN,
+  can_read      BOOLEAN,
+  can_remove    BOOLEAN,
+  can_write     BOOLEAN,
+  creation_ts   TIMESTAMP,
+  UNIQUE INDEX admin_id (admin_id(255)),
+  UNIQUE INDEX client_id (client_id(255))
+);
+
 CREATE TABLE oauth2.client_approvals (
   client_id   VARCHAR(255) PRIMARY KEY,
   approver    TEXT,
@@ -77,5 +110,7 @@ GRANT All  ON oauth2.client_approvals TO 'oa4mp-server'@'localhost';
 GRANT ALL ON oauth2.clients TO 'oa4mp-server'@'localhost';
 GRANT ALL ON oauth2.callbacks TO 'oa4mp-server'@'localhost';
 GRANT ALL ON oauth2.transactions TO 'oa4mp-server'@'localhost';
+GRANT ALL ON oauth2.permissions TO 'oa4mp-server'@'localhost';
+GRANT ALL ON oauth2.ldap TO 'oa4mp-server'@'localhost';
 
 commit;

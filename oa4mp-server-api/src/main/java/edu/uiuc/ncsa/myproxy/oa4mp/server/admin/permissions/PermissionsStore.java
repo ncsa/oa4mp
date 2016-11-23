@@ -30,7 +30,7 @@ public interface PermissionsStore<V extends Permission> extends Store<V> {
      * @param clientID
      * @return
      */
-    public Permission get(Identifier adminID, Identifier clientID);
+    public PermissionList get(Identifier adminID, Identifier clientID);
 
     /**
      * Returns whether or not there is an entry for this pair of identifiers. There is at most

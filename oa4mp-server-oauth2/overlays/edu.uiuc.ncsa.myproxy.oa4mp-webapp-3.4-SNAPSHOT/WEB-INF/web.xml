@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+                  http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+         version="2.5">
+
+    <display-name>The MyProxy Delegation Service</display-name>
+    <!--
+    This is a dummy web.xml file! We use maven overlays and each module that uses this one needs
+    to supply its own web.xml. However, maven itself will not build this module unless there is a web.xml
+    in the right place. Therefore, this has nothing in it.
+    -->
+</web-app>

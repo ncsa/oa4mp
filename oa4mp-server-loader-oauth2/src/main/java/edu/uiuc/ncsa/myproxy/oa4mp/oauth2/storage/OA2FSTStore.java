@@ -56,21 +56,6 @@ public class OA2FSTStore<V extends OA2ServiceTransaction> extends DSFSTransactio
         }
     }
 
-/*
-    @Override
-    public boolean delete(String identifier) {
-        V t = (V) loadByIdentifier(identifier);
-        boolean rc = super.delete(identifier);
-        if (t.hasRefreshToken()) {
-            removeIndexEntry(t.getRefreshToken().getToken());
-        }
-        if (t.getUsername() != null) {
-            removeIndexEntry(t.getUsername());
-        }
-        return rc;
-
-    }
-*/
 
     @Override
     public V getByUsername(String username) {

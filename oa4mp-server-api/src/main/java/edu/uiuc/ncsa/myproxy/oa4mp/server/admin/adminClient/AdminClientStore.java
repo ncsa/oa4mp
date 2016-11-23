@@ -7,4 +7,5 @@ import edu.uiuc.ncsa.security.delegation.server.storage.BaseClientStore;
  * on 10/12/16 at  1:20 PM
  */
 public interface AdminClientStore<V extends AdminClient> extends BaseClientStore<V> {
+
 }

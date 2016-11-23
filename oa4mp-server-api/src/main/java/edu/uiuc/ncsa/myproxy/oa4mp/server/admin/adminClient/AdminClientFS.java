@@ -17,5 +17,16 @@ public class AdminClientFS<V extends AdminClient> extends FileStore<V> implement
 
     public AdminClientFS(File storeDirectory, File indexDirectory, IdentifiableProvider<V> identifiableProvider, MapConverter<V> converter) {
         super(storeDirectory, indexDirectory, identifiableProvider, converter);
+
+    }
+
+    @Override
+    public AdminClientConverter getACConverter() {
+        return (AdminClientConverter)this.converter;
+    }
+
+    @Override
+    public IdentifiableProvider getACProvider() {
+        return this.identifiableProvider;
     }
 }

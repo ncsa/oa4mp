@@ -21,6 +21,9 @@
 \set oa4mpClientTable clients
 \set oa4mpClientCallbackTable callbacks
 \set oa4mpApproverTable client_approvals
+\set oa4mpAdminClientTable adminClients
+\set oa4mpPermissionsTable permissions
+\set oa4mpLDAPTable ldaps
 
 
 /*
@@ -54,6 +57,33 @@ create table :oa4mpSchema.:oa4mpClientTable  (
     proxy_limited boolean,
     rt_lifetime bigint,
     creation_ts TIMESTAMP);
+
+create table :oa4mpSchema.:oa4mpPermissionsTable  (
+ permission_id text PRIMARY KEY,
+  admin_id      text,
+  client_id     text,
+  can_approve   BOOLEAN,
+  can_create    BOOLEAN,
+  can_read      BOOLEAN,
+  can_remove    BOOLEAN,
+  can_write     BOOLEAN,
+  creation_ts   TIMESTAMP
+  );
+create table :oa4mpSchema.:oa4mpAdminClientTable  (
+    admin_id  text PRIMARY KEY,
+    name text,
+    email text,
+    secret text,
+    vo text,
+    issuer text,
+    creation_ts TIMESTAMP);
+
+
+create table :oa4mpSchema.:oa4mpLDAPTable (
+    id         text PRIMARY KEY,
+    client_id  text,
+    ldap       text);
+
 
 
 create table :oa4mpSchema.:oa4mpApproverTable(
@@ -97,6 +127,9 @@ GRANT ALL PRIVILEGES ON :oa4mpSchema.:oa4mpTransactionTable TO :oa4mpServerUser;
 GRANT ALL PRIVILEGES ON :oa4mpSchema.:oa4mpApproverTable  TO :oa4mpServerUser;
 GRANT ALL PRIVILEGES ON :oa4mpSchema.:oa4mpClientTable TO :oa4mpServerUser;
 GRANT ALL PRIVILEGES ON :oa4mpSchema.:oa4mpClientCallbackTable TO :oa4mpServerUser;
+GRANT ALL PRIVILEGES ON :oa4mpSchema.:oa4mpAdminClientTable TO :oa4mpServerUser;
+GRANT ALL PRIVILEGES ON :oa4mpSchema.:oa4mpPermissionsTable TO :oa4mpServerUser;
+GRANT ALL PRIVILEGES ON :oa4mpSchema.:oa4mpLDAPTable TO :oa4mpServerUser;
 
 commit;
 

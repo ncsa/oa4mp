@@ -7,6 +7,12 @@ import edu.uiuc.ncsa.security.delegation.storage.BaseClientKeys;
  * on 10/20/16 at  12:53 PM
  */
 public class AdminClientKeys extends BaseClientKeys {
+    public AdminClientKeys() {
+        super();
+        identifier("admin_id");
+        secret("secret");
+    }
+
     String issuer = "issuer";
 
     public String issuer(String... x) {

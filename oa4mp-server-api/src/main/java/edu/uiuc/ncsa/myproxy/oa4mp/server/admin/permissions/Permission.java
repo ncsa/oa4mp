@@ -90,5 +90,16 @@ public class Permission extends IdentifiableImpl {
         this.write = write;
     }
 
-    boolean delete;
+    boolean delete = true;
+
+    @Override
+    public String toString() {
+        String out = getClass().getSimpleName() + "[";
+        out = out + "permission id=" + getIdentifierString() + ",";
+        out = out + "admin id=" + getAdminID() +",";
+        out = out + "client id=" + getClientID() + ",";
+        out = out +  (isApprove()?"a":"") + (isCreate()?"c":"") + (isDelete()?"d":"") + (isRead()?"r":"") + (isWrite()?"w":"") ;
+        out = out + "]";
+        return out;
+    }
 }

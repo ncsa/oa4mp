@@ -1,0 +1,2 @@
+# This is the subject line of a client approval request
+Client approval request received for "${name}" on ${host}

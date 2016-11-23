@@ -8,6 +8,6 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.SAT;
  */
 public class TargetClient extends Target {
     public TargetClient() {
-        super(SAT.TARGET_CLIENT);
+        super(SAT.TYPE);
     }
 }

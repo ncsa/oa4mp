@@ -7,13 +7,18 @@ import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
  * on 10/12/16 at  12:09 PM
  */
 public class PermissionKeys extends SerializationKeys {
-    String adminID = "adminID";
-    String clientID = "clientID";
-    String readable = "readable";
-    String writable = "writeable";
-    String canCreate = "canCreate";
-    String canRemove = "canRemove";
-    String canApprove = "canApprove";
+    public PermissionKeys() {
+        super();
+        identifier("permission_id");
+    }
+
+    String adminID = "admin_id";
+    String clientID = "client_id";
+    String readable = "can_read";
+    String writable = "can_write";
+    String canCreate = "can_create";
+    String canRemove = "can_remove";
+    String canApprove = "can_approve";
 
     public String adminID(String... x) {
         if (0 < x.length) adminID = x[0];
