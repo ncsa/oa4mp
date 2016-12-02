@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.co.servlet;
 
 import edu.uiuc.ncsa.co.ClientManager;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironmentImpl;
+import edu.uiuc.ncsa.co.loader.COSE;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.EnvServlet;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import net.sf.json.JSON;
@@ -28,7 +28,7 @@ public class ClientServlet extends EnvServlet {
 
     public ClientManager getClientManager() {
         if (clientManager == null) {
-            clientManager = new ClientManager((ServiceEnvironmentImpl) getEnvironment());
+            clientManager = new ClientManager((COSE) getEnvironment());
         }
         return clientManager;
     }
@@ -51,14 +51,19 @@ public class ClientServlet extends EnvServlet {
         if (stringBuffer.length() == 0) {
             throw new IllegalArgumentException("Error: There is no content for this request");
         }
-        JSON json = JSONSerializer.toJSON(stringBuffer.toString());
-        System.err.println(json.toString());
-        if (json.isArray()) {
-            getMyLogger().info("Error: Got a JSON array rather than a request:" + json);
+        JSON rawJSON = JSONSerializer.toJSON(stringBuffer.toString());
+
+        System.err.println(rawJSON.toString());
+        if (rawJSON.isArray()) {
+            getMyLogger().info("Error: Got a JSON array rather than a request:" + rawJSON);
             throw new IllegalArgumentException("Error: incorrect argument. Not a valid JSON request");
         }
-        getClientManager().equals(json);
+
+     //   convertToRequest((JSONObject) rawJSON);
+
     }
+
+
 
 
 }

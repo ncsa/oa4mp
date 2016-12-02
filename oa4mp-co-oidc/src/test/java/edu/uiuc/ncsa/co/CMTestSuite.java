@@ -12,10 +12,13 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-        ClientManagerTest.class
+     //   ClientManagerTest.class,
+        AttributeServerTest.class,
+      //  PermissionServerTest.class,
+      //  ClientServerTest.class
 })
 
-public class CMTestSuite  {
+public class CMTestSuite {
     @BeforeClass
     public static void initialize() {
         TestSuiteInitializer testSuiteInitializer = new CMTestSuiteInitializer(new COBootstrapper());

@@ -24,6 +24,7 @@ import edu.uiuc.ncsa.security.core.configuration.Configurations;
 import edu.uiuc.ncsa.security.core.configuration.provider.CfgEvent;
 import edu.uiuc.ncsa.security.core.configuration.provider.TypedProvider;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.IdentifierProvider;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.delegation.server.issuers.AGIssuer;
@@ -32,7 +33,6 @@ import edu.uiuc.ncsa.security.delegation.server.issuers.PAIssuer;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApprovalStore;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.security.delegation.server.storage.impl.ClientApprovalMemoryStore;
-import edu.uiuc.ncsa.security.delegation.server.storage.impl.ClientMemoryStore;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.delegation.storage.ClientApprovalKeys;
 import edu.uiuc.ncsa.security.delegation.storage.TransactionStore;
@@ -282,6 +282,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
     protected ScopeHandler scopeHandler;
 
     public ScopeHandler getScopeHandler() throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+        DebugUtil.dbg(this,"Getting scope handler " + scopeHandler);
         if (scopeHandler == null) {
             // This gets the scopes if any and injects them into the scope handler.
             if (0 < cn.getChildrenCount(SCOPES)) {
@@ -299,15 +300,23 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     info("Scope handler attribute found in configuration, but no value was found for it. Skipping custom loaded scope handling.");
                 }
             }
+
             // no scopes element, so just use the basic handler.
             if (scopeHandler == null) {
+
+                DebugUtil.dbg(this,"No configured Scope handler");
                 if (getLdapConfiguration().isEnabled()) {
+                    DebugUtil.dbg(this,"   LDAP scope handler enabled, creating default");
+
                     scopeHandler = new LDAPScopeHandler();
                 } else {
+                    DebugUtil.dbg(this,"   LDAP scope handler disabled, creating basic");
                     scopeHandler = new BasicScopeHandler();
                 }
             }
             scopeHandler.setScopes(getScopes());
+            DebugUtil.dbg(this, "   Actual scope handler = " + scopeHandler.getClass().getSimpleName());
+
         }
         return scopeHandler;
     }
@@ -388,7 +397,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
 
                 @Override
                 public ClientStore get() {
-                    return new ClientMemoryStore(getClientProvider());
+                    return new OA2ClientMemoryStore(getClientProvider());
                 }
             });
         }

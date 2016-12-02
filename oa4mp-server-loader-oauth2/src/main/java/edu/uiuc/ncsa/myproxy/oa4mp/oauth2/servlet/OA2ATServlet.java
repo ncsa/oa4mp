@@ -213,14 +213,16 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
 
     @Override
     public ServiceTransaction verifyAndGet(IssuerResponse iResponse) throws IOException {
+
         ATIResponse2 atResponse = (ATIResponse2) iResponse;
 
         TransactionStore transactionStore = getTransactionStore();
         BasicIdentifier basicIdentifier = new BasicIdentifier(atResponse.getParameters().get(OA2Constants.AUTHORIZATION_CODE));
+        DebugUtil.dbg(this, "getting transaction for identifier=" + basicIdentifier);
         OA2ServiceTransaction transaction = (OA2ServiceTransaction) transactionStore.get(basicIdentifier);
         if (transaction == null) {
             // Then this request does not correspond to an previous one and must be rejected asap.
-            throw new OA2ATException(OA2Errors.INVALID_REQUEST, "No pending transaction found");
+            throw new OA2ATException(OA2Errors.INVALID_REQUEST, "No pending transaction found for id=" + basicIdentifier);
         }
         if (!transaction.isAuthGrantValid()) {
             String msg = "Error: Attempt to use invalid authorization code.  Request rejected.";
@@ -253,6 +255,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         if (returnScopes) {
             atResponse.setSupportedScopes(targetScopes);
         }
+        DebugUtil.dbg(this,"scope handler=" + oa2SE.getScopeHandler());
         atResponse.setScopeHandler(oa2SE.getScopeHandler()); // so the same scopes in user info are returned here.
         atResponse.setServiceTransaction(transaction);
         // Need to do some checking but for now, just return transaction

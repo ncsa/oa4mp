@@ -129,7 +129,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
         return rtLifetime;
     }
 
-    int clientSecretLength = 258; // default in spec.
+    int clientSecretLength = 64; // default in spec. see OAUTH-215
 
     public int getClientSecretLength() {
         return clientSecretLength;

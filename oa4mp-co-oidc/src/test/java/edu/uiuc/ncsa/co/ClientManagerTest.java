@@ -4,7 +4,6 @@ import edu.uiuc.ncsa.co.ldap.LDAPEntry;
 import edu.uiuc.ncsa.co.ldap.LDAPStore;
 import edu.uiuc.ncsa.co.loader.LDAPConfiguration2;
 import edu.uiuc.ncsa.co.loader.LDAPConfigurationUtil2;
-import edu.uiuc.ncsa.myproxy.oa4mp.TestUtils;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.SAT;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.SATFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.OA4MPIdentifierProvider;
@@ -16,51 +15,19 @@ import edu.uiuc.ncsa.security.delegation.storage.impl.ClientConverter;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Client;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2ClientConverter;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2ClientProvider;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2Scopes;
 import edu.uiuc.ncsa.security.oauth_2_0.server.LDAPConfiguration;
 import edu.uiuc.ncsa.security.oauth_2_0.server.LDAPConfigurationUtil;
 import edu.uiuc.ncsa.security.util.ssl.SSLConfiguration;
-import junit.framework.TestCase;
 import net.sf.json.JSONObject;
-import net.sf.json.util.JSONUtils;
 import org.junit.Test;
-
-import java.util.LinkedList;
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 11/14/16 at  9:32 AM
  */
-public class ClientManagerTest extends TestCase implements SAT {
-    public void testSerialization() throws Exception {
-    }
+public class ClientManagerTest extends DDServerTests implements SAT {
 
-    public void testMemoryStore() throws Exception {
-        CMTestStoreProvider tp2 = (CMTestStoreProvider) TestUtils.getMemoryStoreProvider();
-        testThing(tp2.getClientStore());
-        testSerialization(tp2.getClientStore());
-        testLDAPStore(tp2.getLDAPStore(), tp2.getClientStore());
-        testLDAPStore2(tp2.getLDAPStore(), tp2.getClientStore());
-    }
-
-    public void testFilestore() throws Exception {
-        CMTestStoreProvider tp2 = (CMTestStoreProvider) TestUtils.getFsStoreProvider();
-        testThing(tp2.getClientStore());
-        testSerialization(tp2.getClientStore());
-        testLDAPStore(tp2.getLDAPStore(), tp2.getClientStore());
-        testLDAPStore2(tp2.getLDAPStore(), tp2.getClientStore());
-    }
-
-    public void testMysql() throws Exception {
-        CMTestStoreProvider tp2 = (CMTestStoreProvider) TestUtils.getMySQLStoreProvider();
-        testThing(tp2.getClientStore());
-        testSerialization(tp2.getClientStore());
-        testLDAPStore(tp2.getLDAPStore(), tp2.getClientStore());
-        testLDAPStore2(tp2.getLDAPStore(), tp2.getClientStore());
-    }
-
-    public void testPostgres() throws Exception {
-        CMTestStoreProvider tp2 = (CMTestStoreProvider) TestUtils.getPgStoreProvider();
+    public void testAll(CMTestStoreProvider tp2 ) throws Exception{
         testThing(tp2.getClientStore());
         testSerialization(tp2.getClientStore());
         testLDAPStore(tp2.getLDAPStore(), tp2.getClientStore());
@@ -118,34 +85,12 @@ public class ClientManagerTest extends TestCase implements SAT {
         System.out.println(SATFactory.getMethod(request));
         System.out.println(SATFactory.getType(request));
         System.out.println(SATFactory.getTarget(request));
+        System.out.println(SATFactory.getContent(request));
 
         prettyPrint(request);
     }
 
 
-    public static final String DD = "----------------------------------------------------------------------------";
-
-    public static void x() {
-        System.out.println(DD);
-    }
-
-    private static void prettyPrint(JSONObject api) {
-        String out = JSONUtils.valueToString(api, 1, 0);
-        System.out.println(out);
-        x();
-    }
-
-    protected Client getClient(ClientStore store) {
-        Client c = (Client) store.create();
-        c.setSecret("idufh84057thsdfghwre");
-        c.setProxyLimited(true);
-        c.setHomeUri("https://baz.foo.edu/home");
-        c.setErrorUri("https://baz.foo.edu/home/error");
-        c.setProxyLimited(false);
-        c.setEmail("bob@foo.bar");
-        c.setName("Test client 42");
-        return c;
-    }
 
     @Test
     public void testClient() throws Exception {
@@ -179,34 +124,7 @@ public class ClientManagerTest extends TestCase implements SAT {
 
     }
 
-    private static OA2Client getOa2Client(ClientStore store) {
-        OA2Client c = (OA2Client) store.create();
-        c.setSecret("idufh84057thsdfghwre");
-        c.setProxyLimited(true);
-        c.setHomeUri("https://baz.foo.edu/home");
-        c.setErrorUri("https://baz.foo.edu/home/error");
-        c.setProxyLimited(false);
-        c.setEmail("bob@foo.bar");
-        c.setName("Test client 42");
-        c.setRtLifetime(456767875477L);
 
-        LinkedList<String> callbacks = new LinkedList<>();
-        callbacks.add("https:/baz.foo.edu/client2/ready1");
-        callbacks.add("https:/baz.foo.edu/client2/ready2");
-        c.setCallbackURIs(callbacks);
-        LDAPConfiguration ldapConfiguration = new LDAPConfiguration();
-        ldapConfiguration.setServer("foo.bar.edu");
-        LinkedList<LDAPConfiguration> ldaps = new LinkedList<>();
-        ldaps.add(ldapConfiguration);
-        c.setLdaps(ldaps);
-        LinkedList<String> scopes = new LinkedList<>();
-        scopes.add(OA2Scopes.SCOPE_OPENID);
-        scopes.add(OA2Scopes.SCOPE_EMAIL);
-        scopes.add(OA2Scopes.SCOPE_PROFILE);
-        scopes.add(OA2Scopes.SCOPE_CILOGON_INFO);
-        c.setScopes(scopes);
-        return c;
-    }
 
     @Test
     public void testldapExample() throws Exception {
@@ -249,6 +167,7 @@ public class ClientManagerTest extends TestCase implements SAT {
 
     /**
      * Retrieve a configuration by its client id.
+     *
      * @param ldapStore
      * @param clientStore
      * @throws Exception
@@ -264,5 +183,6 @@ public class ClientManagerTest extends TestCase implements SAT {
         assert ldapEntry.equals(ldapEntry1);
 
     }
+
 
 }

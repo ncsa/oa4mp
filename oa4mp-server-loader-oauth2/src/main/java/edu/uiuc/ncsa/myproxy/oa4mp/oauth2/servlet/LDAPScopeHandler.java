@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.oauth_2_0.UserInfo;
 import edu.uiuc.ncsa.security.oauth_2_0.server.LDAPConfiguration;
@@ -37,11 +38,18 @@ public class LDAPScopeHandler extends BasicScopeHandler {
 
     @Override
     synchronized public UserInfo process(UserInfo userInfo, HttpServletRequest request, ServiceTransaction transaction) throws UnsupportedScopeException {
+        DebugUtil.dbg(this, "Starting LDAP query");
+        DebugUtil.dbg(this, "target host =" + getCfg().getServer());
+
         if (!isLoggedOn()) {
             logon();
         }
+        DebugUtil.dbg(this, "   logged on");
+
         try {
             String searchName = getSearchName(userInfo, request, transaction);
+            DebugUtil.dbg(this, "  search name=" + searchName);
+
             if (searchName != null) {
                 userInfo.getMap().putAll(simpleSearch(context, searchName, getCfg().getSearchAttributes()));
             } else {
@@ -75,14 +83,18 @@ public class LDAPScopeHandler extends BasicScopeHandler {
 
     protected boolean logon() {
         try {
-            System.setProperty("javax.net.ssl.trustStore", getCfg().getSslConfiguration().getTrustrootPath());
-            System.setProperty("javax.net.ssl.trustStorePassword", getCfg().getSslConfiguration().getTrustRootPassword());
+            if (getCfg().getSslConfiguration() != null) {
+                if (getCfg().getSslConfiguration().getKeystore() != null) {
+                    System.setProperty("javax.net.ssl.trustStore", getCfg().getSslConfiguration().getKeystore());
+                    System.setProperty("javax.net.ssl.trustStorePassword", getCfg().getSslConfiguration().getKeystorePassword());
+                }
+            }
 
             // Set up the environment for creating the initial context
             Hashtable<String, String> env = new Hashtable<String, String>();
             env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
             String providerUrl = "ldaps://" + getCfg().getServer();
-            if (0 <=  getCfg().getPort() ) {
+            if (0 <= getCfg().getPort()) {
                 providerUrl = providerUrl + ":" + getCfg().getPort();
             }
             env.put(Context.PROVIDER_URL, providerUrl);
@@ -123,9 +135,10 @@ public class LDAPScopeHandler extends BasicScopeHandler {
     protected JSONObject simpleSearch(LdapContext ctx,
                                       String userID,
                                       Map<String, LDAPConfigurationUtil.AttributeEntry> attributes) throws NamingException {
-        if(ctx == null){
+        if (ctx == null) {
             throw new IllegalStateException("Error: No LDAP context");
         }
+        DebugUtil.dbg(this, "starting simple LDAP search");
         SearchControls ctls = new SearchControls();
         if (attributes == null || attributes.isEmpty()) {
             // return everything if nothing is specified.
@@ -150,6 +163,7 @@ public class LDAPScopeHandler extends BasicScopeHandler {
      * @throws NamingException
      */
     protected JSONObject toJSON(Map<String, LDAPConfigurationUtil.AttributeEntry> attributes, NamingEnumeration e) throws NamingException {
+        DebugUtil.dbg(this, "starting to convert search results to JSON. " + attributes.size() + " results found.");
         JSONObject json = new JSONObject();
 
         while (e.hasMore()) {
@@ -180,7 +194,7 @@ public class LDAPScopeHandler extends BasicScopeHandler {
                 }
             }
         }
-
+        DebugUtil.dbg(this, "LDAP search results=" + json);
         return json;
     }
 

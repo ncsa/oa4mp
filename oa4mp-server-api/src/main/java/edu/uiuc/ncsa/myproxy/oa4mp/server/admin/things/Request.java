@@ -1,6 +1,5 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions.Action;
 import edu.uiuc.ncsa.security.delegation.storage.BaseClient;
 import net.sf.json.JSONObject;
 
@@ -11,11 +10,9 @@ import net.sf.json.JSONObject;
 public class Request {
     BaseClient subject;
     BaseClient target;
-    Action action;
     JSONObject content;
 
-    public Request( BaseClient subject, Action action, BaseClient target,  JSONObject content) {
-        this.action = action;
+    public Request( BaseClient subject, BaseClient target,  JSONObject content) {
         this.content = content;
         this.subject = subject;
         this.target = target;
