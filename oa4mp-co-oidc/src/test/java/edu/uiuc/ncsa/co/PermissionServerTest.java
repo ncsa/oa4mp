@@ -6,7 +6,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.TestUtils;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.Permission;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionList;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions.ActionCreate;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions.ActionAdd;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions.ActionList;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions.ActionRemove;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.types.TypePermission;
@@ -128,7 +128,7 @@ public class PermissionServerTest extends DDServerTests {
         AdminClient adminClient = getAdminClient(tp2.getAdminClientStore());
         OA2Client client = getOa2Client(tp2.getClientStore());
         PermissionServer permissionServer = new PermissionServer(tp2.getCOSE());
-        AddClientRequest req = RequestFactory.createRequest(adminClient, new TypePermission(), new ActionCreate(), client, null);
+        AddClientRequest req = RequestFactory.createRequest(adminClient, new TypePermission(), new ActionAdd(), client, null);
         //AddClientRequest req = new AddClientRequest(adminClient, client);
         AddClientResponse response = (AddClientResponse) permissionServer.process(req);
         PermissionList permissionList = tp2.getPermissionStore().get(adminClient.getIdentifier(), client.getIdentifier());

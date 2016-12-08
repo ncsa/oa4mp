@@ -8,6 +8,7 @@ import edu.uiuc.ncsa.security.delegation.storage.BaseClient;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.delegation.storage.impl.ClientConverter;
 import net.sf.json.JSON;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 /**
@@ -52,7 +53,7 @@ public class SATFactory implements SAT {
         JSONObject api = json.getJSONObject(KEYS_API);
         JSONObject subject = api.getJSONObject(KEYS_SUBJECT);
         if (subject.containsKey(SUBJECT_ADMIN)) {
-            return getACConverter().fromJSON(subject.getJSONObject(SUBJECT_ADMIN));
+            return getACConverter().fromJSON(subject);
         }
 
         if (subject.containsKey(SUBJECT_CLIENT)) {
@@ -88,10 +89,11 @@ public class SATFactory implements SAT {
 
     public static JSON getContent(JSONObject json) {
         JSONObject api = json.getJSONObject(KEYS_API);
-        JSONObject target = api.getJSONObject(KEYS_CONTENT);
-        if(!target.isArray()) return target;
-        return api.getJSONArray(KEYS_CONTENT);
-
+        Object object = api.get(KEYS_CONTENT);
+        if(object == null) return null;
+        if(object instanceof JSONObject){return (JSONObject)object;}
+        if(object instanceof JSONArray){return (JSONArray)object;}
+        throw new IllegalArgumentException("Error: content is not json but of type " + object.getClass().getSimpleName());
     }
     public static int getMethodValue(JSONObject json) {
         JSONObject api = json.getJSONObject(KEYS_API);

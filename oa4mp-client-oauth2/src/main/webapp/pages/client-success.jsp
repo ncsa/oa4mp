@@ -55,6 +55,12 @@
       <p>
         <pre>${userinfo}</pre>
       </div>
+    <li><a href="javascript:unhide('showPrivateKey');">Show/Hide private key</a></li>
+    <div id="showPrivateKey" class="hidden">
+        <p>
+        <pre>${privateKey}</pre>
+    </div>
+
 </ul>
 <form name="input" action="${action}" method="get"/>
 <input type="submit" value="Return to client"/>

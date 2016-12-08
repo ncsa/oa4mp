@@ -2,6 +2,8 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.DSTransactionKeys;
 
+import java.util.List;
+
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 2/28/14 at  5:22 PM
@@ -16,7 +18,6 @@ public class OA2TransactionKeys extends DSTransactionKeys {
     protected String refreshToken = "refresh_token";
     protected String refreshTokenValid = "refresh_token_valid";
     protected String expiresIn = "expires_in";
-    protected String nonce = "nonce";
     protected String scopes = "scopes";
     protected String authTime = "auth_time";
 
@@ -35,10 +36,6 @@ public class OA2TransactionKeys extends DSTransactionKeys {
         return expiresIn;
     }
 
-    public String nonce(String... x) {
-        if (0 < x.length) nonce = x[0];
-        return nonce;
-    }
 
     public String scopes(String... x) {
         if (0 < x.length) scopes = x[0];
@@ -49,4 +46,15 @@ public class OA2TransactionKeys extends DSTransactionKeys {
         return authTime;
     }
 
+    @Override
+    public List<String> allKeys() {
+        List<String> allKeys =  super.allKeys();
+        allKeys.add(refreshToken());
+        allKeys.add(refreshTokenValid());
+        allKeys.add(expiresIn());
+        allKeys.add(scopes());
+        allKeys.add(authTime());
+        return allKeys;
+
+    }
 }

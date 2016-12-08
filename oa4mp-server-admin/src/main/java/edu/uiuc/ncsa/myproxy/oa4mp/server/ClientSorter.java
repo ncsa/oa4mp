@@ -2,7 +2,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.server;
 
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
-import edu.uiuc.ncsa.security.delegation.storage.Client;
+import edu.uiuc.ncsa.security.delegation.storage.BaseClient;
 import edu.uiuc.ncsa.security.util.cli.BasicSorter;
 
 import java.util.ArrayList;
@@ -26,7 +26,7 @@ public class ClientSorter extends BasicSorter {
         TreeMap<String, Identifiable> tm = new TreeMap<>();
 
         for (int i = 0; i < arg.size(); i++) {
-            Client client = (Client) arg.get(i);
+            BaseClient client = (BaseClient) arg.get(i);
             if (sortOnDates) {
                 tm.put(Iso8601.date2String(client.getCreationTS()), client);
             } else if (sortOnIds) {

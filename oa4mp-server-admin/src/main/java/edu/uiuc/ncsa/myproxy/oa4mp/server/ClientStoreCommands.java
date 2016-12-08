@@ -1,17 +1,14 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.server;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.server.testing.BaseClientStoreCommands;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
-import edu.uiuc.ncsa.security.core.util.Iso8601;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApprovalStore;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
-import edu.uiuc.ncsa.security.util.cli.InputLine;
-import edu.uiuc.ncsa.security.util.cli.StoreCommands;
 import edu.uiuc.ncsa.security.util.pkcs.KeyUtil;
 
 import java.io.BufferedReader;
@@ -23,27 +20,11 @@ import java.io.IOException;
  * <p>Created by Jeff Gaynor<br>
  * on 5/21/13 at  4:21 PM
  */
-public class ClientStoreCommands extends StoreCommands {
+public class ClientStoreCommands extends BaseClientStoreCommands{
     public ClientStoreCommands(MyLoggingFacade logger, String defaultIndent, Store clientStore, ClientApprovalStore clientApprovalStore) {
-        super(logger, defaultIndent, clientStore);
-        this.clientApprovalStore = clientApprovalStore;
-        clientApprovalStoreCommands = new ClientApprovalStoreCommands(logger, defaultIndent, clientApprovalStore);
-        setSortable(new ClientSorter());
+        super(logger, defaultIndent, clientStore, clientApprovalStore);
     }
 
-    // used internally to approve records.
-    ClientApprovalStoreCommands clientApprovalStoreCommands = null;
-
-    public ClientApprovalStore getClientApprovalStore() {
-        return clientApprovalStore;
-    }
-
-    public void setClientApprovalStore(ClientApprovalStore clientApprovalStore) {
-        this.clientApprovalStore = clientApprovalStore;
-    }
-
-
-    ClientApprovalStore clientApprovalStore;
 
     public ClientStoreCommands(MyLoggingFacade logger, Store store) {
         super(logger, store);
@@ -56,59 +37,24 @@ public class ClientStoreCommands extends StoreCommands {
     }
 
 
-    @Override
-    protected String format(Identifiable identifiable) {
-        Client client = (Client) identifiable;
-        ClientApproval ca = (ClientApproval) getClientApprovalStore().get(client.getIdentifier());
-        boolean isApproved = ca != null && ca.isApproved();
-        String rc = "(" + (isApproved ? "Y" : "N") + ") " + client.getIdentifier() + " ";
-        String name = (client.getName() == null ? "no name" : client.getName());
-        if (20 < name.length()) {
-            name = name.substring(0, 20) + "...";
-        }
-        rc = rc + "(" + name + ")";
-        rc = rc + " created on " + Iso8601.date2String(client.getCreationTS());
-        return rc;
-    }
+
 
     @Override
     protected void longFormat(Identifiable identifiable) {
+        super.longFormat(identifiable);
         Client client = (Client) identifiable;
-        say("Client name=" + (client.getName() == null ? "(no name)" : client.getName()));
-        sayi("identifier=" + client.getIdentifier());
-        sayi("email=" + client.getEmail());
         sayi("home uri=" + client.getHomeUri());
         sayi("error uri=" + client.getErrorUri());
         sayi("limited proxies? " + client.isProxyLimited());
-        sayi("creation timestamp=" + client.getCreationTS());
-        if (getClientApprovalStore() != null) {
-            ClientApproval clientApproval = (ClientApproval) getClientApprovalStore().get(client.getIdentifier());
-            if (clientApproval == null) {
-                sayi("no approval record exists.");
-            } else {
-                if (clientApproval.isApproved()) {
-                    String approver = "(unknown)";
-                    if (clientApproval.getApprover() != null) {
-                        approver = clientApproval.getApprover();
-                    }
-                    sayi("approved by " + approver);
-                } else {
-                    sayi("not approved");
-                }
-            }
-        }
-
-        if (client.getSecret() == null) {
-            sayi("public key: (none)");
-
-        } else {
-            sayi("public key:");
-            say(client.getSecret());
-        }
     }
 
     @Override
     public void extraUpdates(Identifiable identifiable) {
+        Client client = (Client) identifiable;
+        client.setErrorUri(getInput("enter error uri", client.getErrorUri()));
+        client.setHomeUri(getInput("enter home uri", client.getHomeUri()));
+        client.setProxyLimited(isOk(getInput("does this client require limited proxies?", client.isProxyLimited() ? "y" : "n")));
+
         getPublicKeyFile((Client) identifiable);
     }
 
@@ -212,39 +158,7 @@ public class ClientStoreCommands extends StoreCommands {
         }
     }
 
-    protected void showApproveHelp() {
-        clientApprovalStoreCommands.showApproveHelp();
-    }
 
-    public void approve(InputLine inputLine) {
-        if (showHelp(inputLine)) {
-            showApproveHelp();
-            return;
-        }
-
-        Client client = (Client) findItem(inputLine);
-        ClientApproval ca = null;
-        if (getClientApprovalStore().containsKey(client.getIdentifier())) {
-            ca = (ClientApproval) getClientApprovalStore().get(client.getIdentifier());
-        } else {
-            ca = (ClientApproval) getClientApprovalStore().create();
-            ca.setIdentifier(client.getIdentifier());
-        }
-        // now we have the right approval record for this identifier
-        clientApprovalStoreCommands.approve(ca);
-
-    }
-
-    @Override
-    public void rm(InputLine inputLine) {
-        sayi("Removing approval record");
-        Identifiable x = findItem(inputLine);
-        info("Removing approval record for id=" + x.getIdentifierString());
-        getClientApprovalStore().remove(x.getIdentifier());
-        sayi("Done. Client approval with id = " + x.getIdentifierString() + " has been removed from the store");
-        info("Client record removed for id=" + x.getIdentifierString());
-        super.rm(inputLine);
-    }
 
 
 }

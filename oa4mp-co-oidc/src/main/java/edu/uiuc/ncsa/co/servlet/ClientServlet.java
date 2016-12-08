@@ -1,10 +1,13 @@
 package edu.uiuc.ncsa.co.servlet;
 
-import edu.uiuc.ncsa.co.ClientManager;
+import edu.uiuc.ncsa.co.ManagerFacade;
 import edu.uiuc.ncsa.co.loader.COSE;
+import edu.uiuc.ncsa.co.util.ResponseSerializer;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.EnvServlet;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
+import edu.uiuc.ncsa.security.delegation.services.Response;
 import net.sf.json.JSON;
+import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
 
 import javax.servlet.ServletException;
@@ -26,18 +29,17 @@ public class ClientServlet extends EnvServlet {
         throw new NotImplementedException("Get is not supported by this service");
     }
 
-    public ClientManager getClientManager() {
+    public ManagerFacade getClientManager() {
         if (clientManager == null) {
-            clientManager = new ClientManager((COSE) getEnvironment());
+            clientManager = new ManagerFacade((COSE) getEnvironment());
         }
         return clientManager;
     }
 
-    ClientManager clientManager;
+    ManagerFacade clientManager;
 
     @Override
     protected void doIt(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Throwable {
-        printAllParameters(httpServletRequest);
         BufferedReader br = httpServletRequest.getReader();
         System.err.println("query=" + httpServletRequest.getQueryString());
         StringBuffer stringBuffer = new StringBuffer();
@@ -58,11 +60,28 @@ public class ClientServlet extends EnvServlet {
             getMyLogger().info("Error: Got a JSON array rather than a request:" + rawJSON);
             throw new IllegalArgumentException("Error: incorrect argument. Not a valid JSON request");
         }
+        try {
+            Response response = getClientManager().process((JSONObject) rawJSON);
+            getResponseSerializer().serialize(response, httpServletResponse);
+        }catch(Throwable t){
+            t.printStackTrace();
+            throw t;
+        }
 
-     //   convertToRequest((JSONObject) rawJSON);
 
     }
 
+    protected COSE getCOSE(){
+        return (COSE)getEnvironment();
+    }
+    public ResponseSerializer getResponseSerializer() {
+        if(responseSerializer == null){
+            responseSerializer = new ResponseSerializer(getCOSE());
+        }
+        return responseSerializer;
+    }
+
+    ResponseSerializer responseSerializer = null;
 
 
 

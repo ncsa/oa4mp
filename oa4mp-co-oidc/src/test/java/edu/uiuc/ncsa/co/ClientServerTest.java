@@ -5,10 +5,7 @@ import edu.uiuc.ncsa.co.util.client.*;
 import edu.uiuc.ncsa.co.util.permissions.AddClientRequest;
 import edu.uiuc.ncsa.co.util.permissions.PermissionServer;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions.ActionApprove;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions.ActionCreate;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions.ActionRemove;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions.ActionUnapprove;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions.*;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.types.TypeClient;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.types.TypePermission;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
@@ -94,7 +91,7 @@ public class ClientServerTest extends DDServerTests {
         assert !tp2.getClientStore().containsKey(cc.client.getIdentifier());
 
         // remove the identifier and create it
-        OA2ClientKeys clientKeys = getKeys(tp2);
+        OA2ClientKeys clientKeys = getClientKeys(tp2);
         values.remove(clientKeys.identifier());
         values.remove(clientKeys.creationTS());
         JSONObject json = new JSONObject();
@@ -124,7 +121,7 @@ public class ClientServerTest extends DDServerTests {
 
         AdminClient ac2 = getAdminClient(tp2.getAdminClientStore());
         PermissionServer permissionServer = new PermissionServer(tp2.getCOSE());
-        AddClientRequest addClientRequest = RequestFactory.createRequest(ac2, new TypePermission(), new ActionCreate(), cc.client, null);
+        AddClientRequest addClientRequest = RequestFactory.createRequest(ac2, new TypePermission(), new ActionAdd(), cc.client, null);
         permissionServer.process(addClientRequest);
         assert !tp2.getPermissionStore().get(ac2.getIdentifier(), cc.client.getIdentifier()).isEmpty();
 

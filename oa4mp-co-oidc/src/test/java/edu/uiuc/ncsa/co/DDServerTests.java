@@ -2,7 +2,9 @@ package edu.uiuc.ncsa.co;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.TestUtils;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientConverter;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientStore;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientStoreProviders;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.Permission;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionList;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.OA4MPIdentifierProvider;
@@ -81,6 +83,14 @@ public abstract class DDServerTests extends TestCase {
         return cc;
     }
 
+    protected AdminClientConverter getAdminClientConverter(CMTestStoreProvider tp2) throws Exception {
+        BaseClientConverter bcc = tp2.getAdminClientStore().getACConverter();
+        if (bcc instanceof AdminClientConverter) {
+            return (AdminClientConverter) bcc;
+        }
+
+        return AdminClientStoreProviders.getAdminClientConverter();
+    }
     protected OA2ClientConverter getClientConverter(CMTestStoreProvider tp2) throws Exception {
         BaseClientConverter bcc = tp2.getClientStore().getACConverter();
         if (bcc instanceof OA2ClientConverter) {
@@ -93,7 +103,7 @@ public abstract class DDServerTests extends TestCase {
         return converter;
     }
 
-    protected OA2ClientKeys getKeys(CMTestStoreProvider tp2) throws Exception {
+    protected OA2ClientKeys getClientKeys(CMTestStoreProvider tp2) throws Exception {
         return (OA2ClientKeys) getClientConverter(tp2).getKeys();
     }
 

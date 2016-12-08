@@ -2,6 +2,8 @@ package edu.uiuc.ncsa.myproxy.oa4mp.client.storage;
 
 import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
 
+import java.util.List;
+
 /**
  * Keys used for serialization. In file stores, these are XML tags. In SQL databases, these are column names.
  * <p>Created by Jeff Gaynor<br>
@@ -51,5 +53,15 @@ public class AssetSerializationKeys extends SerializationKeys {
         return creationTime;
     }
 
-
+    @Override
+    public List<String> allKeys() {
+        List<String> allKeys = super.allKeys();
+        allKeys.add(token());
+        allKeys.add(certReq());
+        allKeys.add(certificates());
+        allKeys.add(privateKey());
+        allKeys.add(redirect());
+        allKeys.add(creationTime());
+        return allKeys;
+    }
 }

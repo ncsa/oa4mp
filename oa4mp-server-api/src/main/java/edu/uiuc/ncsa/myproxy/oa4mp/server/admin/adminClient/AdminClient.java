@@ -31,11 +31,30 @@ public class AdminClient extends BaseClient {
 
     @Override
     public boolean equals(Object obj) {
-        if(!(obj instanceof AdminClient)){return false;}
-        AdminClient ac = (AdminClient)obj;
+        if (!(obj instanceof AdminClient)) {
+            return false;
+        }
+        AdminClient ac = (AdminClient) obj;
         if (!checkEquals(getIssuer(), ac.getIssuer())) return false;
         if (!checkEquals(getVirtualOrganization(), ac.getVirtualOrganization())) return false;
 
         return super.equals(obj);
+    }
+
+    @Override
+    public BaseClient clone() {
+        AdminClient ac = new AdminClient(getIdentifier());
+        populateClone(ac);
+        return ac;
+    }
+
+    @Override
+    protected void populateClone(BaseClient client) {
+        AdminClient c = (AdminClient) client;
+        super.populateClone(c);
+        c.setCreationTS(getCreationTS());
+        c.setEmail(getEmail());
+        c.setName(getName());
+        c.setSecret(getSecret());
     }
 }

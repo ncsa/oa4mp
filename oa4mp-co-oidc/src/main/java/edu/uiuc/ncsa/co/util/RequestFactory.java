@@ -3,10 +3,7 @@ package edu.uiuc.ncsa.co.util;
 import edu.uiuc.ncsa.co.util.attributes.AttributeGetRequest;
 import edu.uiuc.ncsa.co.util.attributes.AttributeRemoveRequest;
 import edu.uiuc.ncsa.co.util.attributes.AttributeSetRequest;
-import edu.uiuc.ncsa.co.util.client.ApproveRequest;
-import edu.uiuc.ncsa.co.util.client.CreateRequest;
-import edu.uiuc.ncsa.co.util.client.RemoveRequest;
-import edu.uiuc.ncsa.co.util.client.UnapproveRequest;
+import edu.uiuc.ncsa.co.util.client.*;
 import edu.uiuc.ncsa.co.util.permissions.*;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.SAT;
@@ -17,12 +14,15 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.types.TypeAttribute;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.types.TypeClient;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.types.TypePermission;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.delegation.storage.BaseClient;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Client;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Parameter;
 import java.util.Arrays;
 
 /**
@@ -51,6 +51,39 @@ public class RequestFactory implements SAT {
         }
 
         return req;
+    }
+
+    public static class RequestObject {
+        public AdminClient adminClient;
+        public OA2Client client;
+        public Type type;
+        public Action action;
+        public JSON content;
+    }
+
+    public static AbstractDDRequest createRequest(RequestObject ro){
+        return createRequest((AdminClient)ro.adminClient,
+                ro.type,
+                ro.action,
+                (OA2Client)ro.client,
+                ro.content);
+    }
+
+    public Parameter[] convertObjectsToParameters(Object[] objArray) {
+        Parameter[] paramArray = new Parameter[objArray.length];
+        int i = 0;
+        for (Object obj : objArray) {
+            try {
+                Constructor<Parameter> cons = Parameter.class.getConstructor(obj.getClass());
+                paramArray[i++] = cons.newInstance(obj);
+            } catch (Exception e) {
+                throw new IllegalArgumentException("This method can't handle objects of type: " + obj.getClass(), e);
+            }
+        }
+        return paramArray;
+    }
+    public static AbstractDDRequest createRequest(BaseClient b, Type t, Action a, BaseClient c, JSON x ){
+        throw new NFWException("Error: If this is invoked, it is because Java is not resolving its overloaded classes right.");
     }
 
     /* ***** Attribute requests */
@@ -96,7 +129,7 @@ public class RequestFactory implements SAT {
     /* ***** Permission requests */
 
 
-    public static AddClientRequest createRequest(AdminClient adminClient, TypePermission typeP, ActionCreate acreate, OA2Client client, JSON json) {
+    public static AddClientRequest createRequest(AdminClient adminClient, TypePermission typeP, ActionAdd acreate, OA2Client client, JSON json) {
         return new AddClientRequest(adminClient, client);
     }
 
@@ -126,17 +159,24 @@ public class RequestFactory implements SAT {
     }
 
     public static CreateRequest createRequest(AdminClient adminClient, TypeClient typeClient, ActionCreate actionCreate,
-                                                 OA2Client client, JSON json) {
-    if(json.isArray()){
-        throw new IllegalArgumentException("Error: cannot create a client from a JSON array -- it must be an map (JSON object) of key/value pairs");
-    }
-        return new CreateRequest(adminClient, client, (JSONObject)json);
+                                              OA2Client client, JSON json) {
+        if (json.isArray()) {
+            throw new IllegalArgumentException("Error: cannot create a client from a JSON array -- it must be an map (JSON object) of key/value pairs");
+        }
+        return new CreateRequest(adminClient, client, (JSONObject) json);
     }
 
 
     public static RemoveRequest createRequest(AdminClient adminClient, TypeClient typeClient, ActionRemove actionRemove,
                                               OA2Client client, JSON json) {
-             return new RemoveRequest(adminClient, client);
+        return new RemoveRequest(adminClient, client);
     }
 
+    public static GetRequest createRequest(AdminClient adminClient,
+                                           TypeClient typeClient,
+                                           ActionGet actionGet,
+                                           OA2Client client,
+                                           JSON json){
+        return new GetRequest(adminClient, client);
+    }
 }

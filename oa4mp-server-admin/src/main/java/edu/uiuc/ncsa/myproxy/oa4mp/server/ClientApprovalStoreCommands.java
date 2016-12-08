@@ -67,7 +67,7 @@ public class ClientApprovalStoreCommands extends StoreCommands {
                        return false;
     }
 
-    protected void showApproveHelp() {
+    public void showApproveHelp() {
         say("This will write the correct approval record for a given client. ");
         say("Syntax:\n");
         say("approve [number]\n");
@@ -85,7 +85,7 @@ public class ClientApprovalStoreCommands extends StoreCommands {
         approve(ca);
     }
 
-    protected void approve(ClientApproval ca) {
+    public void approve(ClientApproval ca) {
         info("Starting approval for id=" + ca.getIdentifierString());
         ca.setApprover(getInput("approver", ca.getApprover()));
         ca.setApproved(isOk(getInput("approve this", ca.isApproved() ? "y" : "n")));

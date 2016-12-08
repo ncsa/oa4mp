@@ -29,13 +29,16 @@ public class ClientManagerTest extends DDServerTests implements SAT {
 
     public void testAll(CMTestStoreProvider tp2 ) throws Exception{
         testThing(tp2.getClientStore());
-        testSerialization(tp2.getClientStore());
+        testApproveSerialization(tp2.getClientStore());
+        System.out.println(DD);
+        testGetSerialization(tp2);
+        System.out.println(DD);
         testLDAPStore(tp2.getLDAPStore(), tp2.getClientStore());
         testLDAPStore2(tp2.getLDAPStore(), tp2.getClientStore());
     }
 
     @Test
-    public void testSerialization(ClientStore clientStore) throws Exception {
+    public void testApproveSerialization(ClientStore clientStore) throws Exception {
         JSONObject request = new JSONObject();
         JSONObject requestContent = new JSONObject();
 
@@ -58,6 +61,30 @@ public class ClientManagerTest extends DDServerTests implements SAT {
         prettyPrint(request);
     }
 
+    @Test
+      public void testGetSerialization(CMTestStoreProvider tp2) throws Exception {
+          JSONObject request = new JSONObject();
+          JSONObject requestContent = new JSONObject();
+          CC cc = setupClients(tp2);
+          OA2ClientProvider clientProvider = new OA2ClientProvider(new OA4MPIdentifierProvider(OA4MPIdentifierProvider.CLIENT_ID));
+
+          JSONObject jsonClient = new JSONObject();
+          getAdminClientConverter(tp2).toJSON(cc.adminClient, jsonClient);
+          requestContent.put(KEYS_SUBJECT, jsonClient);
+          JSONObject action = new JSONObject();
+          action.put("type", SAT.TYPE_CLIENT);
+          action.put("method", ACTION_GET);
+
+          requestContent.put(KEYS_ACTION, action);
+
+          JSONObject jsonClient2 = new JSONObject();
+          getClientConverter(tp2).toJSON(cc.client, jsonClient2);
+
+          requestContent.put(KEYS_TARGET, jsonClient2);
+
+          request.put(KEYS_API, requestContent);
+          prettyPrint(request);
+      }
     @Test
     public void testThing(ClientStore clientStore) throws Exception {
         // create a request and use the SATFactory to pull it apart.

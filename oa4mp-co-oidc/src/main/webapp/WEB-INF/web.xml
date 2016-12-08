@@ -31,6 +31,16 @@
     </security-constraint>-->
 
     <servlet>
+          <servlet-name>clientServlet</servlet-name>
+          <servlet-class>edu.uiuc.ncsa.co.servlet.ClientServlet</servlet-class>
+      </servlet>
+      <servlet-mapping>
+          <servlet-name>clientServlet</servlet-name>
+          <url-pattern>/clients</url-pattern>
+      </servlet-mapping>
+
+
+    <servlet>
         <servlet-name>initiate</servlet-name>
         <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2AuthorizedServlet</servlet-class>
     </servlet>
@@ -91,7 +101,7 @@
 
     <servlet>
          <servlet-name>client</servlet-name>
-         <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.ClientServlet</servlet-class>
+         <servlet-class>edu.uiuc.ncsa.co.servlet.ClientServlet</servlet-class>
          <load-on-startup>1</load-on-startup>
      </servlet>
      <servlet-mapping>
@@ -165,7 +175,7 @@
     </resource-ref>
 
     <listener>
-        <listener-class>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2Bootstrapper</listener-class>
+        <listener-class>edu.uiuc.ncsa.co.loader.COBootstrapper</listener-class>
 
     </listener>
 

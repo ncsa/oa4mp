@@ -2,6 +2,8 @@ package edu.uiuc.ncsa.oa4mp.oauth2.client;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.client.storage.AssetSerializationKeys;
 
+import java.util.List;
+
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 3/20/14 at  2:22 PM
@@ -42,6 +44,16 @@ public class OA2AssetSerializationKeys extends AssetSerializationKeys {
         if(0 < x.length) issuedAt = x[0];
         return issuedAt;
     }
-
+    @Override
+    public List<String> allKeys() {
+        List<String> allKeys = super.allKeys();
+        allKeys.add(accessToken());
+        allKeys.add(refreshLifetime());
+        allKeys.add(refreshToken());
+        allKeys.add(state());
+        allKeys.add(nonce());
+        allKeys.add(issuedAt());
+        return allKeys;
+    }
 
 }

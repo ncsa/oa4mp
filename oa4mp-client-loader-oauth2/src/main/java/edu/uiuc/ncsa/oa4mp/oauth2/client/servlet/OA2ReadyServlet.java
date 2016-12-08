@@ -17,6 +17,7 @@ import edu.uiuc.ncsa.security.oauth_2_0.UserInfo;
 import edu.uiuc.ncsa.security.oauth_2_0.client.ATResponse2;
 import edu.uiuc.ncsa.security.servlet.JSPUtil;
 import edu.uiuc.ncsa.security.util.pkcs.CertUtil;
+import edu.uiuc.ncsa.security.util.pkcs.KeyUtil;
 import net.sf.json.util.JSONUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -116,6 +117,13 @@ public class OA2ReadyServlet extends ClientServlet {
                 request.setAttribute("certSubject", cert.getSubjectDN());
                 request.setAttribute("cert", CertUtil.toPEM(assetResponse.getX509Certificates()));
                 request.setAttribute("username", assetResponse.getUsername());
+                // FIX OAUTH-216. Note that this is displayed on the client's success page.
+                if(asset.getPrivateKey() != null) {
+                    request.setAttribute("privateKey", KeyUtil.toPKCS1PEM(asset.getPrivateKey()));
+                }else{
+                    request.setAttribute("privateKey", "(none)");
+                }
+
             }
         } else {
 

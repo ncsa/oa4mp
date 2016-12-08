@@ -30,7 +30,7 @@ public class AttributeServerTest extends DDServerTests {
         CC cc = setupClients(tp2);
 
         AttributeServer attributeServer = new AttributeServer(tp2.getCOSE());
-        OA2ClientKeys keys = getKeys(tp2);
+        OA2ClientKeys keys = getClientKeys(tp2);
         JSONArray array = new JSONArray();
         array.add(keys.scopes());
         array.add(keys.callbackUri());
@@ -53,7 +53,7 @@ public class AttributeServerTest extends DDServerTests {
 
     public void testAttributeServerSet(CMTestStoreProvider tp2) throws Exception {
         CC cc = setupClients(tp2);
-        OA2ClientKeys keys = getKeys(tp2);
+        OA2ClientKeys keys = getClientKeys(tp2);
         AttributeServer attributeServer = new AttributeServer(tp2.getCOSE());
         JSONObject map = new JSONObject();
         String random = getRandom(8);
@@ -72,14 +72,14 @@ public class AttributeServerTest extends DDServerTests {
         assert client.getHomeUri().equals(map.get(keys.homeURL()));
         assert client.getScopes().size() == scopes.size();
         for (String scope : scopes) {
-            assert client.getScopes().contains(scope) : "returned scopes faile to contain " + scope;
+            assert client.getScopes().contains(scope) : "returned scopes failed to contain " + scope;
         }
     }
 
     public void testAttributeServerRemove(CMTestStoreProvider tp2) throws Exception {
         CC cc = setupClients(tp2);
         AttributeServer attributeServer = new AttributeServer(tp2.getCOSE());
-        OA2ClientKeys keys = getKeys(tp2);
+        OA2ClientKeys keys = getClientKeys(tp2);
 
         JSONArray attributes = new JSONArray();
         attributes.add(keys.homeURL());

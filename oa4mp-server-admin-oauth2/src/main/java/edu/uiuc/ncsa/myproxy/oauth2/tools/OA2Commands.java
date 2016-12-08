@@ -10,6 +10,8 @@ import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.core.util.LoggingConfigLoader;
 import edu.uiuc.ncsa.security.util.cli.CLIDriver;
+import edu.uiuc.ncsa.security.util.cli.CommonCommands;
+import edu.uiuc.ncsa.security.util.cli.InputLine;
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -17,6 +19,8 @@ import org.apache.commons.lang.StringUtils;
  * on 4/3/14 at  1:23 PM
  */
 public class OA2Commands extends BaseCommands {
+    public static final String ADMINS="admins";
+
     public OA2Commands(MyLoggingFacade logger) {
         super(logger);
     }
@@ -71,4 +75,26 @@ public class OA2Commands extends BaseCommands {
     public CopyCommands getNewCopyCommands() throws Exception {
         return new CopyCommands(getMyLogger(), new OA2CopyTool(), new OA2CopyToolVerifier(), getConfigFile());
     }
+
+    public OA2AdminClientCommands getAdminClientCommands() throws Exception{
+        return new OA2AdminClientCommands(getMyLogger(), "  ", getOA2SE().getAdminClientStore(), getOA2SE().getClientApprovalStore());
+    }
+    @Override
+      public boolean use(InputLine inputLine) throws Exception {
+          CommonCommands commands = null;
+          if (inputLine.hasArg(ADMINS)) {
+              commands = getAdminClientCommands();
+          }
+          if (commands != null) {
+              CLIDriver cli = new CLIDriver(commands);
+              cli.start();
+              return true;
+          }
+
+          if (super.use(inputLine)) {
+              return true;
+          }
+
+          return false;
+      }
 }

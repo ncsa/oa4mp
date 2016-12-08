@@ -28,7 +28,7 @@ public interface SAT {
     public static final int ACTION_GET_VALUE = 100;
     public static final String ACTION_SET = "set";
     public static final int ACTION_SET_VALUE = 101;
-    public static final String ACTION_REMOVE = "delete";
+    public static final String ACTION_REMOVE = "remove";
     public static final int ACTION_REMOVE_VALUE = 102;
     public static final String ACTION_ADD = "add";
     public static final int ACTION_ADD_VALUE = 103;

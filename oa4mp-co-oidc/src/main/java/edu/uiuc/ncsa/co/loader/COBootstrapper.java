@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.co.loader;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2Bootstrapper;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
+import edu.uiuc.ncsa.security.servlet.Initialization;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
 /**
@@ -15,4 +16,8 @@ public class COBootstrapper extends OA2Bootstrapper {
         return new COLoader(node);
     }
 
+    @Override
+    public Initialization getInitialization() {
+        return new COInitializer();
+    }
 }

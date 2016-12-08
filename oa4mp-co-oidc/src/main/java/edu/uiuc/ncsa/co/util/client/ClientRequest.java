@@ -29,6 +29,9 @@ public class ClientRequest extends AbstractDDRequest {
             if (this instanceof CreateRequest) {
                 return x.create((CreateRequest) this);
             }
+            if(this instanceof GetRequest){
+                return x.get((GetRequest)this);
+            }
             if (this instanceof RemoveRequest) {
                          return x.remove((RemoveRequest) this);
                      }

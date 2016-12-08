@@ -31,7 +31,7 @@ public class AttributeServer extends AbstractDDServer {
     protected AdminClientConverter getACConverter(){return (AdminClientConverter) cose.getAdminClientStore().getACConverter();}
     public AttributeResponse set(AttributeSetRequest request) {
         canWrite(request);
-        OA2Client client = request.getClient();
+        OA2Client client = (OA2Client) getClientStore().get(request.getClient().getIdentifier());
         ColumnMap map = new ColumnMap();
         getClientConverter().toMap(client, map);
         for(String key : request.getAttributes().keySet()){
@@ -48,7 +48,7 @@ public class AttributeServer extends AbstractDDServer {
 
     public AttributeResponse remove(AttributeRemoveRequest request) {
         canWrite(request);
-        OA2Client client = request.getClient();
+        OA2Client client = (OA2Client) getClientStore().get(request.getClient().getIdentifier());
 
         ColumnMap map = new ColumnMap();
         getClientConverter().toMap(client, map);
