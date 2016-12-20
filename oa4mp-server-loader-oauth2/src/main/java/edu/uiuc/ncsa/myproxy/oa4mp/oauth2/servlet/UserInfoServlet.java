@@ -6,11 +6,10 @@ import edu.uiuc.ncsa.security.core.exceptions.InvalidTimestampException;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.server.request.IssuerResponse;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
+import edu.uiuc.ncsa.security.oauth_2_0.OA2Client;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2GeneralError;
-import edu.uiuc.ncsa.security.oauth_2_0.server.UII2;
-import edu.uiuc.ncsa.security.oauth_2_0.server.UIIRequest2;
-import edu.uiuc.ncsa.security.oauth_2_0.server.UIIResponse2;
+import edu.uiuc.ncsa.security.oauth_2_0.server.*;
 import org.apache.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
@@ -64,8 +63,18 @@ public class UserInfoServlet extends MyProxyDelegationServlet {
         UII2 uis = new UII2(oa2SE.getTokenForge(), getServiceEnvironment().getServiceAddress());
         UIIRequest2 uireq = new UIIRequest2(request, at);
         uireq.setUsername(getUsername(transaction));
+        // Now we figure out which scope handler to use.
+        OA2Client oa2Client = (OA2Client) transaction.getClient();
         UIIResponse2 uiresp = (UIIResponse2) uis.process(uireq);
-        oa2SE.getScopeHandler().process(uiresp.getUserInfo(), transaction);
+
+        if((oa2Client.getLdaps() == null) || oa2Client.getLdaps().isEmpty()){
+            oa2SE.getScopeHandler().process(uiresp.getUserInfo(), transaction);
+        }else{
+            for(LDAPConfiguration ldap : oa2Client.getLdaps()){
+                LDAPScopeHandler ldapScopeHandler = new LDAPScopeHandler(ldap, getMyLogger());
+                ldapScopeHandler.process(uiresp.getUserInfo(), transaction);
+            }
+        }
         uiresp.write(response);
     }
 

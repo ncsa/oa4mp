@@ -60,13 +60,6 @@ public class Monitor extends CLITool {
         }
         // From here on down is the older version for servers that do not support the ping command.
 
-/*
-        System.out.println(getClass().getSimpleName() + ".doIt: response=" + response);
-        OA4MPService xService = new OA4MPService(getClientEnvironment());
-        info("Making initial request to service at " + ((AddressableServer) xService.getEnvironment().getDelegationService().getAtServer()).getAddress());
-        OA4MPResponse oa4mpResponse = xService.requestCert();
-        info("got response, redirect uri = " + oa4mpResponse.getRedirect());
-*/
     }
 
     public ClientEnvironment getClientEnvironment() throws Exception {

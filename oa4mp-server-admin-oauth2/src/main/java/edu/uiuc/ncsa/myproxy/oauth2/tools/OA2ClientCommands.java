@@ -42,6 +42,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
         sayi("error uri=" + client.getErrorUri());
         sayi("limited proxies? " + client.isProxyLimited());
         sayi("creation timestamp=" + client.getCreationTS());
+        sayi("issuer=" + client.getIssuer());
         if (getClientApprovalStore() != null) {
             ClientApproval clientApproval = (ClientApproval) getClientApprovalStore().get(client.getIdentifier());
             if (clientApproval == null) {
@@ -106,7 +107,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
                 break;
             }
             // input is not empty.
-            secret = DigestUtils.shaHex(input);
+            secret = DigestUtils.sha1Hex(input);
             client.setSecret(secret);
             askForSecret = false;
         }
@@ -151,6 +152,10 @@ public class OA2ClientCommands extends ClientStoreCommands {
             oa2Client.setCallbackURIs(list);
         }
 
+        String issuer = getInput("enter the issuer (optional)", oa2Client.getIssuer());
+        if(!(issuer == null || issuer.length() == 0)){
+            oa2Client.setIssuer(issuer);
+        }
     }
 
     public OA2ClientCommands(MyLoggingFacade logger, Store store) {

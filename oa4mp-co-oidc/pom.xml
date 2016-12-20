@@ -17,15 +17,15 @@
     </properties>
     <artifactId>oa4mp-co-oidc</artifactId>
     <name>OAuth 2/Open ID Connect support for CO-Manage</name>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
     <dependencies>
-        <dependency>
+      <!--  <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>oa4mp-server-oauth2</artifactId>
             <version>3.4-SNAPSHOT</version>
             <type>war</type>
             <scope>runtime</scope>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>oa4mp-server-oauth2</artifactId>

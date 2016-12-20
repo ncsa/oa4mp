@@ -77,7 +77,7 @@ public class ClientServer extends AbstractDDServer {
             random.nextBytes(bytes);
             secret = Base64.encodeBase64URLSafeString(bytes);
         }
-        String hash = DigestUtils.shaHex(secret);
+        String hash = DigestUtils.sha1Hex(secret);
         values.put(keys.secret(), hash);
 
         getClientStore().getACConverter().fromMap(values, client);

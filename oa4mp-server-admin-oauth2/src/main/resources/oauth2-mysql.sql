@@ -108,7 +108,7 @@ COMMIT;
 
 GRANT All  ON oauth2.client_approvals TO 'oa4mp-server'@'localhost';
 GRANT ALL ON oauth2.clients TO 'oa4mp-server'@'localhost';
-GRANT ALL ON oauth2.callbacks TO 'oa4mp-server'@'localhost';
+GRANT ALL ON oauth2.adminClients TO 'oa4mp-server'@'localhost';
 GRANT ALL ON oauth2.transactions TO 'oa4mp-server'@'localhost';
 GRANT ALL ON oauth2.permissions TO 'oa4mp-server'@'localhost';
 GRANT ALL ON oauth2.ldap TO 'oa4mp-server'@'localhost';

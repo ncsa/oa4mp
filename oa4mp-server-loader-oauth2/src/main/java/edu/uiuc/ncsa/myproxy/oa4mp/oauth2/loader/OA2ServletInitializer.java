@@ -1,11 +1,13 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.LDAPScopeHandlerFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2ExceptionHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RefreshTokenRetentionPolicy;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RefreshTokenStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.OA4MPServletInitializer;
+import edu.uiuc.ncsa.security.oauth_2_0.server.ScopeHandlerFactory;
 import edu.uiuc.ncsa.security.servlet.ExceptionHandler;
 
 import javax.servlet.ServletException;
@@ -32,6 +34,9 @@ public class OA2ServletInitializer extends OA4MPServletInitializer {
             MyProxyDelegationServlet.transactionCleanup.getRetentionPolicies().clear(); // We need a different set of policies than the original one.
             MyProxyDelegationServlet.transactionCleanup.addRetentionPolicy(new RefreshTokenRetentionPolicy((RefreshTokenStore) oa2SE.getTransactionStore()));
             oa2SE.getMyLogger().info("Initialized refresh token cleanup thread");
+        }
+        if(!ScopeHandlerFactory.isFactorySet()){
+            ScopeHandlerFactory.setFactory(new LDAPScopeHandlerFactory());
         }
     }
 

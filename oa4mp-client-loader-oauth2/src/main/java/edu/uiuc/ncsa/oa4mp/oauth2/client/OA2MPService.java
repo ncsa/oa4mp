@@ -235,8 +235,6 @@ public class OA2MPService extends OA4MPService {
         AssetResponse par = new AssetResponse();
         MyX509Certificates myX509Certificate = (MyX509Certificates) daResp.getProtectedAsset();
         par.setX509Certificates(myX509Certificate.getX509Certificates());
-        // OAuth 2/OIDC returns this with the access token.
-//        par.setUsername(daResp.getAdditionalInformation().get("username"));
         postGetCert(a, par);
         a.setCertificates(par.getX509Certificates());
         getEnvironment().getAssetStore().save(a);

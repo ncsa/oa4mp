@@ -14,8 +14,6 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.*;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.storage.MultiDSClientApprovalStoreProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.storage.MultiDSClientStoreProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.storage.filestore.DSFSClientApprovalStoreProvider;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.storage.filestore.DSFSClientStoreProvider;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.storage.sql.provider.DSClientSQLStoreProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.storage.sql.provider.DSSQLClientApprovalStoreProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.AbstractCLIApprover;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.ClientApproverConverter;
@@ -26,10 +24,8 @@ import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApprovalStore;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.security.delegation.server.storage.impl.ClientApprovalMemoryStore;
-import edu.uiuc.ncsa.security.delegation.server.storage.impl.ClientMemoryStore;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.delegation.storage.TransactionStore;
-import edu.uiuc.ncsa.security.delegation.storage.impl.ClientConverter;
 import edu.uiuc.ncsa.security.delegation.storage.impl.TransactionMemoryStore;
 import edu.uiuc.ncsa.security.servlet.TrivialUsernameTransformer;
 import edu.uiuc.ncsa.security.servlet.UsernameTransformer;
@@ -222,39 +218,7 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
     }
 
 
-    protected MultiDSClientStoreProvider getCSP() {
-        if (csp == null) {
-            ClientConverter converter = new ClientConverter(getClientProvider());
-            csp = new MultiDSClientStoreProvider(cn, isDefaultStoreDisabled(), loggerProvider.get(), null, null, getClientProvider());
-
-            csp.addListener(new DSFSClientStoreProvider(cn, converter, getClientProvider()));
-            csp.addListener(new DSClientSQLStoreProvider(getMySQLConnectionPoolProvider(),
-                    OA4MPConfigTags.MYSQL_STORE,
-                    converter, getClientProvider()));
-            csp.addListener(new DSClientSQLStoreProvider(getMariaDBConnectionPoolProvider(),
-                    OA4MPConfigTags.MARIADB_STORE,
-                    converter, getClientProvider()));
-            csp.addListener(new DSClientSQLStoreProvider(getPgConnectionPoolProvider(),
-                    OA4MPConfigTags.POSTGRESQL_STORE,
-                    converter, getClientProvider()));
-            csp.addListener(new TypedProvider<ClientStore>(cn, OA4MPConfigTags.MEMORY_STORE, OA4MPConfigTags.CLIENTS_STORE) {
-
-                @Override
-                public Object componentFound(CfgEvent configurationEvent) {
-                    if (checkEvent(configurationEvent)) {
-                        return get();
-                    }
-                    return null;
-                }
-
-                @Override
-                public ClientStore get() {
-                    return new ClientMemoryStore(getClientProvider());
-                }
-            });
-        }
-        return csp;
-    }
+    protected abstract MultiDSClientStoreProvider getCSP();
 
     protected MultiDSAdminClientStoreProvider getMacp(){
         if(macp == null){

@@ -3,17 +3,25 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.oauth_2_0.UserInfo;
+import edu.uiuc.ncsa.security.oauth_2_0.server.OA2Claims;
 import edu.uiuc.ncsa.security.oauth_2_0.server.ScopeHandler;
 import edu.uiuc.ncsa.security.oauth_2_0.server.UnsupportedScopeException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
+import java.util.HashSet;
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 8/17/15 at  4:10 PM
  */
 public class BasicScopeHandler implements ScopeHandler {
+    public BasicScopeHandler(OA2SE oa2SE) {
+        this.oa2SE = oa2SE;
+    }
+
+    public BasicScopeHandler() {
+    }
 
     /**
      * Optionally, the service environment may be injected into a scope handler to get configuration of
@@ -66,5 +74,22 @@ public class BasicScopeHandler implements ScopeHandler {
     public void setScopes(Collection<String> scopes) {
         this.scopes = scopes;
 
+    }
+
+    /**
+     * returns a (unique) collection of claims.
+     * @return
+     */
+    @Override
+    public Collection<String> getClaims() {
+        HashSet<String> claims = new HashSet<>();
+        claims.add(OA2Claims.ISSUER);
+        claims.add(OA2Claims.SUBJECT);
+        claims.add(OA2Claims.AUDIENCE);
+        claims.add(OA2Claims.ISSUED_AT);
+        claims.add(OA2Claims.EMAIL);
+        claims.add(OA2Claims.EXPIRATION);
+
+        return claims;
     }
 }

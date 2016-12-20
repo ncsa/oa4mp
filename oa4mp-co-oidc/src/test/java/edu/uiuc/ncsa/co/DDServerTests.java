@@ -8,6 +8,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientStoreProv
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.Permission;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionList;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.OA4MPIdentifierProvider;
+import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.delegation.storage.impl.BaseClientConverter;
@@ -63,6 +64,12 @@ public abstract class DDServerTests extends TestCase {
 
     protected CC setupClients(CMTestStoreProvider tp2) throws Exception {
         AdminClient adminClient = getAdminClient(tp2.getAdminClientStore());
+        ClientApproval clientApproval = tp2.getClientApprovalStore().create();
+        clientApproval.setIdentifier(adminClient.getIdentifier());
+        clientApproval.setApproved(true);
+        clientApproval.setApprover("junit");
+        tp2.getClientApprovalStore().save(clientApproval );
+
         OA2Client client = getOa2Client(tp2.getClientStore());
 
         PermissionList permissions = tp2.getPermissionStore().get(adminClient.getIdentifier(), client.getIdentifier());

@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.Permission;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionList;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionsStore;
+import edu.uiuc.ncsa.security.delegation.server.UnapprovedClientException;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApprovalStore;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.security.delegation.services.DoubleDispatchServer;
@@ -58,22 +59,33 @@ public abstract class AbstractDDServer implements DoubleDispatchServer, Server {
     }
 
     protected void canRead(AbstractDDRequest request) {
+        isACApproved(request);
         getPermissions(request).canRead();
     }
 
     protected void canWrite(AbstractDDRequest request) {
+        isACApproved(request);
+
         getPermissions(request).canWrite();
     }
-
+   protected void isACApproved(AbstractDDRequest request){
+      if(!getClientApprovalStore().isApproved(request.adminClient.getIdentifier())){
+          throw new UnapprovedClientException("This client is not approved", request.adminClient);
+      }
+   }
     protected void canApprove(AbstractDDRequest request) {
+
+        isACApproved(request);
         getPermissions(request).canApprove();
     }
 
     protected void canDelete(AbstractDDRequest request) {
+        isACApproved(request);
         getPermissions(request).canDelete();
     }
 
     protected void canCreate(AbstractDDRequest request) {
+        isACApproved(request);
         getPermissions(request).canCreate();
     }
 

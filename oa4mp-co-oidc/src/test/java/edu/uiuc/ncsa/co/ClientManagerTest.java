@@ -2,8 +2,7 @@ package edu.uiuc.ncsa.co;
 
 import edu.uiuc.ncsa.co.ldap.LDAPEntry;
 import edu.uiuc.ncsa.co.ldap.LDAPStore;
-import edu.uiuc.ncsa.co.loader.LDAPConfiguration2;
-import edu.uiuc.ncsa.co.loader.LDAPConfigurationUtil2;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.OA2ClientMemoryStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.SAT;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.SATFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.OA4MPIdentifierProvider;
@@ -35,8 +34,18 @@ public class ClientManagerTest extends DDServerTests implements SAT {
         System.out.println(DD);
         testLDAPStore(tp2.getLDAPStore(), tp2.getClientStore());
         testLDAPStore2(tp2.getLDAPStore(), tp2.getClientStore());
+        testNix(tp2);
     }
+   @Test
+   public void testNix(CMTestStoreProvider tp2) throws Exception{
+       LDAPConfiguration ldap =  tp2.getCOSE().getLdapConfiguration();
+       JSONObject json = LDAPConfigurationUtil.toJSON(ldap);
+       System.out.println("");
+       System.out.println("***LDAP configuration for " + tp2.getCOSE().getClientStore().getClass());
+       prettyPrint(json);
+       System.out.println("");
 
+    }
     @Test
     public void testApproveSerialization(ClientStore clientStore) throws Exception {
         JSONObject request = new JSONObject();
@@ -58,7 +67,6 @@ public class ClientManagerTest extends DDServerTests implements SAT {
         requestContent.put(KEYS_TARGET, jsonClient2);
 
         request.put(KEYS_API, requestContent);
-        prettyPrint(request);
     }
 
     @Test
@@ -83,7 +91,6 @@ public class ClientManagerTest extends DDServerTests implements SAT {
           requestContent.put(KEYS_TARGET, jsonClient2);
 
           request.put(KEYS_API, requestContent);
-          prettyPrint(request);
       }
     @Test
     public void testThing(ClientStore clientStore) throws Exception {
@@ -114,7 +121,6 @@ public class ClientManagerTest extends DDServerTests implements SAT {
         System.out.println(SATFactory.getTarget(request));
         System.out.println(SATFactory.getContent(request));
 
-        prettyPrint(request);
     }
 
 
@@ -128,7 +134,6 @@ public class ClientManagerTest extends DDServerTests implements SAT {
         Client c = getClient(store);
         JSONObject j = new JSONObject();
         converter.toJSON(c, j);
-        prettyPrint(j);
         Client c2 = converter.fromJSON(j);
         assert c2.equals(c);
 
@@ -138,7 +143,7 @@ public class ClientManagerTest extends DDServerTests implements SAT {
     @Test
     public void testOA2Client() throws Exception {
         OA2ClientProvider clientProvider = new OA2ClientProvider(new OA4MPIdentifierProvider(OA4MPIdentifierProvider.CLIENT_ID));
-        ClientMemoryStore store = new ClientMemoryStore(clientProvider);
+        OA2ClientMemoryStore store = new OA2ClientMemoryStore(clientProvider);
         OA2ClientConverter converter = new OA2ClientConverter(clientProvider);
 
         OA2Client c = getOa2Client(store);
@@ -155,16 +160,15 @@ public class ClientManagerTest extends DDServerTests implements SAT {
 
     @Test
     public void testldapExample() throws Exception {
-        LDAPConfiguration2 ldap = createLDAP();
-        JSONObject json = LDAPConfigurationUtil2.toJSON(ldap);
-        prettyPrint(json);
-        LDAPConfiguration ldap2 = LDAPConfigurationUtil2.fromJSON(json);
+        LDAPConfiguration ldap = createLDAP();
+        JSONObject json = LDAPConfigurationUtil.toJSON(ldap);
+        LDAPConfiguration ldap2 = LDAPConfigurationUtil.fromJSON(json);
     }
 
-    protected LDAPConfiguration2 createLDAP() {
-        LDAPConfiguration2 ldap = new LDAPConfiguration2();
+    protected LDAPConfiguration createLDAP() {
+        LDAPConfiguration ldap = new LDAPConfiguration();
         ldap.setServer("foo.bar.edu");
-        ldap.setAuthType(LDAPConfigurationUtil2.LDAP_AUTH_SIMPLE_KEY);
+        ldap.setAuthType(LDAPConfigurationUtil.LDAP_AUTH_SIMPLE_KEY);
         ldap.setContextName("ou=foo/cn=bar" + System.currentTimeMillis());
 
         for (int i = 0; i < 3; i++) {
@@ -177,12 +181,14 @@ public class ClientManagerTest extends DDServerTests implements SAT {
         ssl.setKeystoreType("JKS");
         ssl.setKeystore("/home/ncsa/dev/csd/config/cacerts2");
         ldap.setSslConfiguration(ssl);
+        System.out.println(DD);
+        System.out.println("LDAP from config serializer:");
         return ldap;
     }
 
     public void testLDAPStore(LDAPStore<LDAPEntry> ldapStore, ClientStore clientStore) throws Exception {
         OA2Client oa2Client = (OA2Client) clientStore.create();
-        LDAPConfiguration2 ldap = createLDAP();
+        LDAPConfiguration ldap = createLDAP();
         LDAPEntry ldapEntry = ldapStore.create();
         ldapEntry.setClientID(oa2Client.getIdentifier());
         ldapEntry.setConfiguration(ldap);
@@ -201,7 +207,7 @@ public class ClientManagerTest extends DDServerTests implements SAT {
      */
     public void testLDAPStore2(LDAPStore<LDAPEntry> ldapStore, ClientStore clientStore) throws Exception {
         OA2Client oa2Client = (OA2Client) clientStore.create();
-        LDAPConfiguration2 ldap = createLDAP();
+        LDAPConfiguration ldap = createLDAP();
         LDAPEntry ldapEntry = ldapStore.create();
         ldapEntry.setClientID(oa2Client.getIdentifier());
         ldapEntry.setConfiguration(ldap);

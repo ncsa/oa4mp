@@ -26,7 +26,7 @@ public class MultiDSClientStoreProvider<V extends Client> extends ClientStorePro
         super(config, disableDefaultStore, logger, type, target);
         this.clientProvider = clientProvider;
     }
-    IdentifiableProvider<? extends Client> clientProvider;
+    protected IdentifiableProvider<? extends Client> clientProvider;
 
     @Override
     public ClientStore<V> getDefaultStore() {

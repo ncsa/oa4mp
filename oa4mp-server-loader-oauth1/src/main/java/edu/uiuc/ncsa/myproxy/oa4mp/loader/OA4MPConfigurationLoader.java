@@ -2,8 +2,9 @@ package edu.uiuc.ncsa.myproxy.oa4mp.loader;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceConstantKeys;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironmentImpl;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractConfigurationLoader;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.OA4MPIdentifierProvider;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractConfigurationLoader;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.storage.MultiDSClientStoreProvider;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.delegation.server.issuers.AGIssuer;
@@ -77,13 +78,27 @@ public class OA4MPConfigurationLoader<T extends ServiceEnvironmentImpl> extends 
     }
 
     @Override
+    protected MultiDSClientStoreProvider getCSP() {
+        if (csp == null) {
+            csp = new MultiDSClientStoreProvider(cn, isDefaultStoreDisabled(), loggerProvider.get(), null, null, ClientStoreProviders.getClientProvider());
+            csp.addListener(ClientStoreProviders.getM(cn));
+            csp.addListener(ClientStoreProviders.getFSP(cn));
+            csp.addListener(ClientStoreProviders.getMysqlPS(cn, getMySQLConnectionPoolProvider()));
+            csp.addListener(ClientStoreProviders.getMariaDBPS(cn, getMariaDBConnectionPoolProvider()));
+            csp.addListener(ClientStoreProviders.getPostgresPS(cn, getPgConnectionPoolProvider()));
+        }
+        return csp;
+    }
+
+
+    @Override
     public Provider<PAIssuer> getPAIProvider() {
         return new PAIProvider(getTokenForgeProvider().get(), getServiceAddress());
     }
 
     public OA4MPConfigurationLoader(ConfigurationNode node) {
         super(node);
-   }
+    }
 
     public OA4MPConfigurationLoader(ConfigurationNode node, MyLoggingFacade logger) {
         super(node, logger);
@@ -95,17 +110,17 @@ public class OA4MPConfigurationLoader<T extends ServiceEnvironmentImpl> extends 
         return new OAClientProvider(new OA4MPIdentifierProvider(SCHEME, SCHEME_SPECIFIC_PART, CLIENT_ID, false));
     }
 
-    protected static class OAuthForgeProvider implements Provider<TokenForge>{
-        public TokenForge get(){
+    protected static class OAuthForgeProvider implements Provider<TokenForge> {
+        public TokenForge get() {
             return new OAuthTokenForge("myproxy:oa4mp,2012:oauth1:");
         }
     }
 
-    HashMap<String,String> constants;
+    HashMap<String, String> constants;
 
     @Override
     public HashMap<String, String> getConstants() {
-        if(constants == null){
+        if (constants == null) {
             constants = new HashMap<String, String>();
             // OAuth 1.0a callback constant. This is used to as a key for http request parameters
             constants.put(ServiceConstantKeys.CALLBACK_URI_KEY, OAuthConstants.OAUTH_CALLBACK);
@@ -114,7 +129,7 @@ public class OA4MPConfigurationLoader<T extends ServiceEnvironmentImpl> extends 
             constants.put(ServiceConstantKeys.CERT_REQUEST_KEY, "certreq");
             constants.put(ServiceConstantKeys.CERT_LIFETIME_KEY, "certlifetime");
             constants.put(ServiceConstantKeys.CONSUMER_KEY, OAuthConstants.OAUTH_CONSUMER_KEY);
-         }
+        }
         return constants;
     }
 }

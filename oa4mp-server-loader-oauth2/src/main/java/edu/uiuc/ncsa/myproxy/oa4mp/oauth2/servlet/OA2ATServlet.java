@@ -3,8 +3,10 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RefreshTokenStore;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractAccessTokenServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.IssuerTransactionState;
+import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.InvalidTokenException;
 import edu.uiuc.ncsa.security.core.exceptions.InvalidURIException;
@@ -27,6 +29,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.CLIENT_SECRET;
@@ -62,16 +66,33 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         }
 
         p.put(OA2Constants.CLIENT_ID, st.getClient().getIdentifierString());
-        if (getServiceEnvironment().getServiceAddress() != null) {
-            String x = getServiceEnvironment().getServiceAddress().toString();
-            x = x.substring(0, x.lastIndexOf("/"));
+        OA2SE oa2se = (OA2SE) getServiceEnvironment();
+        List<Identifier> admins = oa2se.getPermissionStore().getAdmins(st.getClient().getIdentifier());
+        String issuer = null;
+        for (Identifier adminID : admins) {
+            AdminClient ac = oa2se.getAdminClientStore().get(adminID);
+            if (ac != null) {
+                if (ac.getIssuer() != null) {
+                    issuer = ac.getIssuer();
+                    break;
+                }
+            }
+        }
+        if (issuer == null) {
+            issuer = ((OA2Client) st.getClient()).getIssuer();
+        }
+
+        if (issuer == null) {
+            if (getServiceEnvironment().getServiceAddress() == null) {
+                throw new NFWException("Error: no service address was found in the configuration.");
+            }
+            issuer = getServiceEnvironment().getServiceAddress().toString();
+            issuer = issuer.substring(0, issuer.lastIndexOf("/"));
             // This is to be the server only, without the path. In the service tag, the complete
             // address + path is given.
-            p.put(OA2Claims.ISSUER, x);
-
-        } else {
-            throw new NFWException("Error: no service address was found in the configuration.");
         }
+        p.put(OA2Claims.ISSUER, issuer);
+
         p.put(OA2Claims.SUBJECT, st.getUsername());
         if (st.hasAuthTime()) {
             // convert the date to a time if needed.
@@ -185,7 +206,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         }
 
         if (t == null || !t.isRefreshTokenValid()) {
-            throw new OA2ATException(OA2Errors.INVALID_REQUEST,"Error: The refresh token is no longer valid.");
+            throw new OA2ATException(OA2Errors.INVALID_REQUEST, "Error: The refresh token is no longer valid.");
         }
         t.setRefreshTokenValid(false); // this way if it fails at some point we know it is invalid.
         AccessToken at = t.getAccessToken();
@@ -255,8 +276,22 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         if (returnScopes) {
             atResponse.setSupportedScopes(targetScopes);
         }
-        DebugUtil.dbg(this,"scope handler=" + oa2SE.getScopeHandler());
-        atResponse.setScopeHandler(oa2SE.getScopeHandler()); // so the same scopes in user info are returned here.
+        OA2Client client = (OA2Client) transaction.getClient();
+        LinkedList<ScopeHandler> scopeHandlers = new LinkedList<>();
+
+        if (client.getLdaps()==null || client.getLdaps().isEmpty()) {
+            DebugUtil.dbg(this, "using default scope handler=");
+            scopeHandlers.add(oa2SE.getScopeHandler());
+        } else {
+            for (LDAPConfiguration cfg : client.getLdaps()) {
+                LDAPScopeHandlerFactoryRequest req = new LDAPScopeHandlerFactoryRequest(getMyLogger(),
+                        cfg, client.getScopes());
+                ScopeHandler scopeHandler = ScopeHandlerFactory.newInstance(req);
+                scopeHandlers.add(scopeHandler);
+            }
+        }
+        atResponse.setScopeHandlers(scopeHandlers); // so the same scopes in user info are returned here.
+
         atResponse.setServiceTransaction(transaction);
         // Need to do some checking but for now, just return transaction
         //return null;

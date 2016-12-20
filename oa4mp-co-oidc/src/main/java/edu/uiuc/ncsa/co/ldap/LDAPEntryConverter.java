@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.co.ldap;
 
-import edu.uiuc.ncsa.co.loader.LDAPConfigurationUtil2;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
+import edu.uiuc.ncsa.security.oauth_2_0.server.LDAPConfigurationUtil;
 import edu.uiuc.ncsa.security.storage.data.ConversionMap;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
@@ -21,7 +21,7 @@ public class LDAPEntryConverter<V extends LDAPEntry> extends MapConverter<V> {
     public V fromMap(ConversionMap<String, Object> map, V v) {
         super.fromMap(map, v);
         v.setClientID(map.getIdentifier(getK().clientID()));
-        LDAPConfigurationUtil2.fromJSON(JSONObject.fromObject(map.getString(getK().ldap())));
+        LDAPConfigurationUtil.fromJSON(JSONObject.fromObject(map.getString(getK().ldap())));
         return v;
     }
 
@@ -29,7 +29,7 @@ public class LDAPEntryConverter<V extends LDAPEntry> extends MapConverter<V> {
     public void toMap(V value, ConversionMap<String, Object> data) {
         super.toMap(value, data);
         data.put(getK().clientID(), value.clientID.toString());
-        JSONObject json = LDAPConfigurationUtil2.toJSON(value.getConfiguration());
+        JSONObject json = LDAPConfigurationUtil.toJSON(value.getConfiguration());
         if(json != null) {
             data.put(getK().ldap(), json.toString());
         }

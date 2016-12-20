@@ -89,7 +89,7 @@ public class AttributeServerTest extends DDServerTests {
         AttributeRemoveRequest req = RequestFactory.createRequest(cc.adminClient, new TypeAttribute(), new ActionRemove(), cc.client, attributes);
         AttributeResponse resp = (AttributeResponse) attributeServer.process(req);
         OA2Client client = (OA2Client) resp.getClient();
-        assert client.getScopes() == null;
+        assert client.getScopes() == null || client.getScopes().isEmpty();
         assert client.getRtLifetime() == 0L;
         assert client.getHomeUri() == null;
         assert client.getEmail() == null;

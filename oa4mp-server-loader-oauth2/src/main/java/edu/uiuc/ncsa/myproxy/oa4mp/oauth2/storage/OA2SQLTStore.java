@@ -28,4 +28,6 @@ public class OA2SQLTStore<V extends OA2ServiceTransaction> extends DSSQLTransact
     public V getByUsername(String username) {
         return getTransaction(username, ((OA2TransactionTable) getTransactionTable()).getByUsernameStatement());
     }
+
+
 }

@@ -308,7 +308,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                 if (getLdapConfiguration().isEnabled()) {
                     DebugUtil.dbg(this,"   LDAP scope handler enabled, creating default");
 
-                    scopeHandler = new LDAPScopeHandler();
+                    scopeHandler = new LDAPScopeHandler(getLdapConfiguration(), myLogger);
                 } else {
                     DebugUtil.dbg(this,"   LDAP scope handler disabled, creating basic");
                     scopeHandler = new BasicScopeHandler();
@@ -368,12 +368,26 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
             return new OA2ServiceTransaction(createNewId(createNewIdentifier));
         }
     }
+     public static class OA2MultiDSClientStoreProvider extends MultiDSClientStoreProvider{
+         public OA2MultiDSClientStoreProvider(ConfigurationNode config, boolean disableDefaultStore, MyLoggingFacade logger) {
+             super(config, disableDefaultStore, logger);
+         }
 
+         public OA2MultiDSClientStoreProvider(ConfigurationNode config, boolean disableDefaultStore, MyLoggingFacade logger, String type, String target, IdentifiableProvider clientProvider) {
+             super(config, disableDefaultStore, logger, type, target, clientProvider);
+         }
+
+         @Override
+         public ClientStore getDefaultStore() {
+             logger.info("Using default in memory client store");
+                 return new OA2ClientMemoryStore(clientProvider);
+         }
+     }
     @Override
     protected MultiDSClientStoreProvider getCSP() {
         if (csp == null) {
             OA2ClientConverter converter = new OA2ClientConverter(getClientProvider());
-            csp = new MultiDSClientStoreProvider(cn, isDefaultStoreDisabled(), loggerProvider.get(), null, null, getClientProvider());
+            csp = new OA2MultiDSClientStoreProvider(cn, isDefaultStoreDisabled(), loggerProvider.get(), null, null, getClientProvider());
 
             csp.addListener(new DSFSClientStoreProvider(cn, converter, getClientProvider()));
             csp.addListener(new OA2ClientSQLStoreProvider(getMySQLConnectionPoolProvider(),

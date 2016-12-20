@@ -13,9 +13,9 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
         ClientManagerTest.class,
-        AttributeServerTest.class,
-        PermissionServerTest.class,
-        ClientServerTest.class
+ //       AttributeServerTest.class,
+  //      PermissionServerTest.class,
+   //     ClientServerTest.class
 })
 
 public class CMTestSuite {
