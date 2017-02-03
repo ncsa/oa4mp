@@ -38,7 +38,8 @@
 
         <div class="authbox">
             This page allows you to register your gateway/client with the XSEDE OAuth for MyProxy service
-            for authentication of a user and delegation of a user certificate using OAuth 2.0 OIDC (OpenID Connect). To get your gateway/client approved for authentication and delegation
+            for authentication of a user and delegation of a user certificate using OAuth 2.0 OIDC (OpenID Connect). To
+            get your gateway/client approved for authentication and delegation
             please fill out the form below. Your request will be evaluated for approval. For more information,
             please make sure you read the
             <a href="http://grid.ncsa.illinois.edu/myproxy/oauth/client/manuals/registering-with-an-oauth2-server.xhtml"
@@ -67,10 +68,30 @@
                     <td>Callback URLs:</td>
                     <td>
                         <textarea id="${callbackURI}" rows="10" cols="80"
-                          name="${callbackURI}">${callbackURIValue}</textarea>
+                                  name="${callbackURI}">${callbackURIValue}</textarea>
 
                     </td>
                 </tr>
+                <tr>
+                    <td>Issuer (optional):</td>
+                    <td><input type="text" size="25" name="${issuer}" value="${issuerValue}"/></td>
+                </tr>
+                <tr>
+                    <td>Scopes:</td>
+                    <td>
+                        <c:forEach items="${scopes}" var="scope">
+                            <input type="checkbox" name="chkScopes" value="${scope}">${scope}&nbsp;
+                        </c:forEach>
+                    </td>
+
+                </tr>
+                <tr>
+                    <td>LDAP configurations (optional):</td>
+                    <td>
+                        <textarea id="${ldap}" rows="5" cols="80" name="${ldap}">${ldapValue}</textarea>
+                    </td>
+                </tr>
+                <tr>
                 <tr>
                     <td><input type="submit" value="submit"/></td>
                 </tr>

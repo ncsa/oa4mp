@@ -42,13 +42,17 @@ import edu.uiuc.ncsa.security.oauth_2_0.server.*;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPoolProvider;
+import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
+import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
 import javax.inject.Provider;
+import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.OA4MPIdentifierProvider.TRANSACTION_ID;
+import static edu.uiuc.ncsa.security.core.configuration.Configurations.*;
 import static edu.uiuc.ncsa.security.core.util.IdentifierProvider.SCHEME;
 import static edu.uiuc.ncsa.security.core.util.IdentifierProvider.SCHEME_SPECIFIC_PART;
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2ConfigTags.*;
@@ -102,7 +106,8 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     getLdapConfiguration(),
                     isRefreshTokenEnabled(),
                     isTwoFactorSupportEnabled(),
-                    getMaxClientRefreshTokenLifetime());
+                    getMaxClientRefreshTokenLifetime(),
+                    getJSONWebKeys());
             if (getScopeHandler() instanceof BasicScopeHandler) {
                 ((BasicScopeHandler) getScopeHandler()).setOa2SE((OA2SE) se);
             }
@@ -127,6 +132,34 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
             constants.put(ServiceConstantKeys.CONSUMER_KEY, OA2Constants.CLIENT_ID);
         }
         return constants;
+    }
+
+    protected JSONWebKeys getJSONWebKeys() {
+        ConfigurationNode node = getFirstNode(cn, "JSONWebKey");
+        if(node == null){
+            warn("Error: No signing keys in the configuration file. Signing is not available");
+            //throw new IllegalStateException();
+            return new JSONWebKeys(null);
+        }
+        String json = getNodeValue(node, "json", null); // if the whole thing is included
+        JSONWebKeys keys = null;
+        try {
+            if (json != null) {
+                keys = JSONWebKeyUtil.fromJSON(json);
+            }
+            String path = getNodeValue(node, "path", null); // points to a file that contains it all
+            if (path != null) {
+                keys = JSONWebKeyUtil.fromJSON(new File(path));
+            }
+        } catch (Throwable t) {
+            throw new GeneralException("Error reading signing keys", t);
+        }
+
+        if(keys == null){
+            throw new IllegalStateException("Error: Could not load signing keys");
+        }
+        keys.setDefaultKeyID(getFirstAttribute(node, "defaultKeyID"));
+        return keys;
     }
 
     @Override
@@ -201,7 +234,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
 
     protected long getRTLifetime() {
         if (rtLifetime < 0) {
-            String x = Configurations.getFirstAttribute(cn, REFRESH_TOKEN_LIFETIME);
+            String x = getFirstAttribute(cn, REFRESH_TOKEN_LIFETIME);
             // Fixes OAUTH-214
             if (x == null || x.length() == 0) {
                 rtLifetime = REFRESH_TOKEN_LIFETIME_DEFAULT;
@@ -221,7 +254,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
 
     protected long getMaxClientRefreshTokenLifetime() {
         if (maxClientRefreshTokenLifetime < 0) {
-            String x = Configurations.getFirstAttribute(cn, MAX_CLIENT_REFRESH_TOKEN_LIFETIME);
+            String x = getFirstAttribute(cn, MAX_CLIENT_REFRESH_TOKEN_LIFETIME);
             // Fixes OAUTH-214
             if (x == null || x.length() == 0) {
                 maxClientRefreshTokenLifetime = 13 * 30 * 24 * 3600 * 1000L; // default of 13 months.
@@ -238,7 +271,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
 
     public boolean isRefreshTokenEnabled() {
         if (refreshTokenEnabled == null) {
-            String x = Configurations.getFirstAttribute(cn, REFRESH_TOKEN_ENABLED);
+            String x = getFirstAttribute(cn, REFRESH_TOKEN_ENABLED);
             if (x == null) {
                 refreshTokenEnabled = Boolean.FALSE;
             } else {
@@ -257,7 +290,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
 
     public boolean isTwoFactorSupportEnabled() {
         if (twoFactorSupportEnabled == null) {
-            String x = Configurations.getFirstAttribute(cn, ENABLE_TWO_FACTOR_SUPPORT);
+            String x = getFirstAttribute(cn, ENABLE_TWO_FACTOR_SUPPORT);
             if (x == null) {
                 twoFactorSupportEnabled = Boolean.FALSE;
             } else {
@@ -282,11 +315,11 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
     protected ScopeHandler scopeHandler;
 
     public ScopeHandler getScopeHandler() throws ClassNotFoundException, IllegalAccessException, InstantiationException {
-        DebugUtil.dbg(this,"Getting scope handler " + scopeHandler);
+        DebugUtil.dbg(this, "Getting scope handler " + scopeHandler);
         if (scopeHandler == null) {
             // This gets the scopes if any and injects them into the scope handler.
             if (0 < cn.getChildrenCount(SCOPES)) {
-                String scopeHandlerName = Configurations.getFirstAttribute(Configurations.getFirstNode(cn, SCOPES), SCOPE_HANDLER);
+                String scopeHandlerName = getFirstAttribute(Configurations.getFirstNode(cn, SCOPES), SCOPE_HANDLER);
                 if (scopeHandlerName != null) {
                     Class<?> k = Class.forName(scopeHandlerName);
                     Object x = k.newInstance();
@@ -304,13 +337,13 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
             // no scopes element, so just use the basic handler.
             if (scopeHandler == null) {
 
-                DebugUtil.dbg(this,"No configured Scope handler");
+                DebugUtil.dbg(this, "No configured Scope handler");
                 if (getLdapConfiguration().isEnabled()) {
-                    DebugUtil.dbg(this,"   LDAP scope handler enabled, creating default");
+                    DebugUtil.dbg(this, "   LDAP scope handler enabled, creating default");
 
                     scopeHandler = new LDAPScopeHandler(getLdapConfiguration(), myLogger);
                 } else {
-                    DebugUtil.dbg(this,"   LDAP scope handler disabled, creating basic");
+                    DebugUtil.dbg(this, "   LDAP scope handler disabled, creating basic");
                     scopeHandler = new BasicScopeHandler();
                 }
             }
@@ -340,7 +373,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
 
     public int getClientSecretLength() {
         if (clientSecretLength < 0) {
-            String x = Configurations.getFirstAttribute(cn, CLIENT_SECRET_LENGTH);
+            String x = getFirstAttribute(cn, CLIENT_SECRET_LENGTH);
             if (x != null) {
                 try {
                     clientSecretLength = Integer.parseInt(x);
@@ -368,21 +401,23 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
             return new OA2ServiceTransaction(createNewId(createNewIdentifier));
         }
     }
-     public static class OA2MultiDSClientStoreProvider extends MultiDSClientStoreProvider{
-         public OA2MultiDSClientStoreProvider(ConfigurationNode config, boolean disableDefaultStore, MyLoggingFacade logger) {
-             super(config, disableDefaultStore, logger);
-         }
 
-         public OA2MultiDSClientStoreProvider(ConfigurationNode config, boolean disableDefaultStore, MyLoggingFacade logger, String type, String target, IdentifiableProvider clientProvider) {
-             super(config, disableDefaultStore, logger, type, target, clientProvider);
-         }
+    public static class OA2MultiDSClientStoreProvider extends MultiDSClientStoreProvider {
+        public OA2MultiDSClientStoreProvider(ConfigurationNode config, boolean disableDefaultStore, MyLoggingFacade logger) {
+            super(config, disableDefaultStore, logger);
+        }
 
-         @Override
-         public ClientStore getDefaultStore() {
-             logger.info("Using default in memory client store");
-                 return new OA2ClientMemoryStore(clientProvider);
-         }
-     }
+        public OA2MultiDSClientStoreProvider(ConfigurationNode config, boolean disableDefaultStore, MyLoggingFacade logger, String type, String target, IdentifiableProvider clientProvider) {
+            super(config, disableDefaultStore, logger, type, target, clientProvider);
+        }
+
+        @Override
+        public ClientStore getDefaultStore() {
+            logger.info("Using default in memory client store");
+            return new OA2ClientMemoryStore(clientProvider);
+        }
+    }
+
     @Override
     protected MultiDSClientStoreProvider getCSP() {
         if (csp == null) {

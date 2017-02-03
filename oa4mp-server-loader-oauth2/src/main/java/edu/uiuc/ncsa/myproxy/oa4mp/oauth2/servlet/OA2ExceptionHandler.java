@@ -69,6 +69,7 @@ public class OA2ExceptionHandler implements ExceptionHandler {
         }
         // The next couple of exceptions can be thrown when there is no client (so the callback uri cannot be verified
         if ((t instanceof UnknownClientException) || (t instanceof UnapprovedClientException)) {
+            t.printStackTrace();
             //  throw (GeneralException) t;
             throw new ServletException(t.getMessage());
             //throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, t.getMessage(), HttpStatus.SC_BAD_REQUEST);

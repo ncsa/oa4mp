@@ -18,26 +18,19 @@
    endpoint for processing.
     -->
 
-  <!--  <security-constraint>
-        <web-resource-collection>
-            <web-resource-name>Lockdown_authorized_endpoint</web-resource-name>
-            <url-pattern>/authorized</url-pattern>
-            <http-method>GET</http-method>
-            <http-method>POST</http-method>
-            <http-method>PUT</http-method>
-            <http-method>DELETE</http-method>
-        </web-resource-collection>
-        <auth-constraint/>
-    </security-constraint>-->
+    <!--  <security-constraint>
+          <web-resource-collection>
+              <web-resource-name>Lockdown_authorized_endpoint</web-resource-name>
+              <url-pattern>/authorized</url-pattern>
+              <http-method>GET</http-method>
+              <http-method>POST</http-method>
+              <http-method>PUT</http-method>
+              <http-method>DELETE</http-method>
+          </web-resource-collection>
+          <auth-constraint/>
+      </security-constraint>-->
 
-    <servlet>
-          <servlet-name>clientServlet</servlet-name>
-          <servlet-class>edu.uiuc.ncsa.co.servlet.ClientServlet</servlet-class>
-      </servlet>
-      <servlet-mapping>
-          <servlet-name>clientServlet</servlet-name>
-          <url-pattern>/clients</url-pattern>
-      </servlet-mapping>
+
 
 
     <servlet>
@@ -98,16 +91,30 @@
         <servlet-name>clientVetting</servlet-name>
         <url-pattern>/register</url-pattern>
     </servlet-mapping>
+    <servlet>
+        <servlet-name>discovery</servlet-name>
+        <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2DiscoveryServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>discovery</servlet-name>
+        <url-pattern>/.well-known/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>discovery</servlet-name>
+        <url-pattern>/certs</url-pattern>
+    </servlet-mapping>
 
     <servlet>
-         <servlet-name>client</servlet-name>
-         <servlet-class>edu.uiuc.ncsa.co.servlet.ClientServlet</servlet-class>
-         <load-on-startup>1</load-on-startup>
-     </servlet>
-     <servlet-mapping>
-         <servlet-name>client</servlet-name>
-         <url-pattern>/client</url-pattern>
-     </servlet-mapping>
+        <servlet-name>client</servlet-name>
+        <servlet-class>edu.uiuc.ncsa.co.servlet.ClientServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>client</servlet-name>
+        <url-pattern>/client</url-pattern>
+    </servlet-mapping>
+
 
     <servlet>
         <servlet-name>userInfo</servlet-name>
@@ -126,41 +133,41 @@
       -->
 
 
-  <!--  <security-constraint>
-        <web-resource-collection>
-            <web-resource-name>portalSecurity</web-resource-name>
-            <url-pattern>/*</url-pattern>
-            <http-method>GET</http-method>
-            <http-method>POST</http-method>
-        </web-resource-collection>
-        <user-data-constraint>
-            <transport-guarantee>CONFIDENTIAL</transport-guarantee>
-        </user-data-constraint>
-    </security-constraint>
--->
+    <!--  <security-constraint>
+          <web-resource-collection>
+              <web-resource-name>portalSecurity</web-resource-name>
+              <url-pattern>/*</url-pattern>
+              <http-method>GET</http-method>
+              <http-method>POST</http-method>
+          </web-resource-collection>
+          <user-data-constraint>
+              <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+          </user-data-constraint>
+      </security-constraint>
+  -->
     <!--
        Uncomment the next section if you are replacing the built-in authorization module with your own.
        Look here for the details: http://grid.ncsa.illinois.edu/myproxy/oauth/server/manuals/remote-user.xhtml
     -->
-<!--   <security-constraint>
-      <web-resource-collection>
-        <web-resource-name>OAuth Security</web-resource-name>
-        <url-pattern>/authorize</url-pattern>
-        <http-method>POST</http-method>
-        <http-method>GET</http-method>
-      </web-resource-collection>
-      <auth-constraint>
-        <role-name>oa4mp-user</role-name>
-      </auth-constraint>
-      <user-data-constraint>
-      &lt;!&ndash; transport-guarantee can be CONFIDENTIAL, INTEGRAL, or NONE &ndash;&gt;
-      <transport-guarantee>NONE</transport-guarantee>
-      </user-data-constraint>
-    </security-constraint>
+    <!--   <security-constraint>
+          <web-resource-collection>
+            <web-resource-name>OAuth Security</web-resource-name>
+            <url-pattern>/authorize</url-pattern>
+            <http-method>POST</http-method>
+            <http-method>GET</http-method>
+          </web-resource-collection>
+          <auth-constraint>
+            <role-name>oa4mp-user</role-name>
+          </auth-constraint>
+          <user-data-constraint>
+          &lt;!&ndash; transport-guarantee can be CONFIDENTIAL, INTEGRAL, or NONE &ndash;&gt;
+          <transport-guarantee>NONE</transport-guarantee>
+          </user-data-constraint>
+        </security-constraint>
 
-    <login-config>
-    <auth-method>BASIC</auth-method>
-    </login-config>-->
+        <login-config>
+        <auth-method>BASIC</auth-method>
+        </login-config>-->
 
     <resource-ref>
         <description>
@@ -179,16 +186,16 @@
 
     </listener>
 
-<!--
-    <error-page>
-        <error-code>404</error-code>
-        <location>/generalerror.jsp</location>
-    </error-page>
+    <!--
+        <error-page>
+            <error-code>404</error-code>
+            <location>/generalerror.jsp</location>
+        </error-page>
 
-    <error-page>
-        <error-code>500</error-code>
-        <location>/generalerror.jsp</location>
-    </error-page>-->
+        <error-page>
+            <error-code>500</error-code>
+            <location>/generalerror.jsp</location>
+        </error-page>-->
 
     <error-page>
         <exception-type>edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.TooManyRequestsException</exception-type>

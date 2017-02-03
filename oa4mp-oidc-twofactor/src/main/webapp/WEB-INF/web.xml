@@ -78,6 +78,19 @@
         <url-pattern>/authorize</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>discovery</servlet-name>
+        <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2DiscoveryServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>discovery</servlet-name>
+        <url-pattern>/.well-known/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>discovery</servlet-name>
+        <url-pattern>/certs</url-pattern>
+    </servlet-mapping>
 
     <servlet>
         <servlet-name>clientVetting</servlet-name>

@@ -5,7 +5,8 @@ package edu.uiuc.ncsa.myproxy.oa4mp.server.servlet;
  * on 12/4/12 at  11:28 AM
  */
 public class AuthorizationServletConfig {
-    public AuthorizationServletConfig(boolean useHeader,
+    public AuthorizationServletConfig(String authorizationURI,
+                                      boolean useHeader,
                                       boolean requireHeader,
                                       String headerFieldName,
                                       boolean returnDnAsUsername,
@@ -19,6 +20,7 @@ public class AuthorizationServletConfig {
         this.showLogon = showLogon;
         this.verifyUsername = verifyUsername;
         this.convertDNToGlobusID = convertDNToGlobusID;
+        this.authorizationURI = authorizationURI;
     }
 
     boolean showLogon;
@@ -44,6 +46,16 @@ public class AuthorizationServletConfig {
     boolean requireHeader;
     String headerFieldName;
     boolean returnDnAsUsername;
+
+    public String getAuthorizationURI() {
+        return authorizationURI;
+    }
+
+    public void setAuthorizationURI(String authorizationURI) {
+        this.authorizationURI = authorizationURI;
+    }
+
+    String authorizationURI;
 
     public boolean isConvertDNToGlobusID() {
         return convertDNToGlobusID;

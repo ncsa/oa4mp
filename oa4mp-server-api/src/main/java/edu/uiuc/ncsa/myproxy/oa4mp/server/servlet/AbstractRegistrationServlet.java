@@ -2,7 +2,6 @@ package edu.uiuc.ncsa.myproxy.oa4mp.server.servlet;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.NewClientEvent;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.NewClientListener;
-import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.RetryException;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.server.request.IssuerResponse;
@@ -271,21 +270,7 @@ public abstract class AbstractRegistrationServlet extends MyProxyDelegationServl
         return client;
     }
 
-    /**
-     * This will approve a client. Supply the approver and client
-     *
-     * @param clientIdentifier
-     * @param approver
-     */
-    public static void approveClient(Identifier clientIdentifier, String approver) throws IOException {
-        ClientApproval clientApproval = getServiceEnvironment().getClientApprovalStore().get(clientIdentifier);
-        if (approver == null) {
-            approver = ""; // so you don't get something ugly in the backend.
-        }
-        clientApproval.setApprover(approver);
-        clientApproval.setApproved(true);
-        getServiceEnvironment().getClientApprovalStore().save(clientApproval);
-    }
+
     // Fixes CIL-286: Send along the client in the exception so it can be removed immediately rather
     // than garbage collected later.
 

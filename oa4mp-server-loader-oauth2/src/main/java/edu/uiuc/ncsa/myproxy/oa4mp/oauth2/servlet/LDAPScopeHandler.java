@@ -43,7 +43,7 @@ public class LDAPScopeHandler extends BasicScopeHandler {
      * Returns the name of the user for whom the search is to be run. The default is to return the name the user used
      * to log in to MyProxy. Otherwise, this takes a key for the user information and returns the value it finds there.
      * Note that if you specify an email, the whole email will be returned. Otherwise, the name will be truncated
-     * at the "@" sign (e.g. liek an eppn).
+     * at the "@" sign (e.g. like an eppn).
      *
      * @param userInfo
      * @param request
@@ -51,7 +51,12 @@ public class LDAPScopeHandler extends BasicScopeHandler {
      * @return
      */
     public String getSearchName(UserInfo userInfo, HttpServletRequest request, ServiceTransaction transaction) {
-
+        JSONObject xxx = LDAPConfigurationUtil.toJSON(getCfg());
+        xxx.getJSONObject("ldap").getJSONObject("ssl").put("keystore","");
+        System.err.println(xxx);
+        if(getCfg().getSearchNameKey() == null){
+            throw new IllegalStateException("Error: no search name specified.");
+        }
         if(getCfg().getSearchNameKey().equals(LDAPConfigurationUtil.SEARCH_NAME_USERNAME)){
             return transaction.getUsername();
         }
@@ -227,6 +232,7 @@ public class LDAPScopeHandler extends BasicScopeHandler {
             System.out.println(entry.getName());
             for (String attribID : attributes.keySet()) {
                 Attribute attribute = a.get(attribID);
+                DebugUtil.dbg(this,"returned LDAP attribute=" + attribute);
                 if (attribute == null) {
                     continue;
                 }

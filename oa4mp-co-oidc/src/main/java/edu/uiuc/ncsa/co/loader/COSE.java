@@ -3,10 +3,12 @@ package edu.uiuc.ncsa.co.loader;
 import edu.uiuc.ncsa.co.ldap.LDAPEntry;
 import edu.uiuc.ncsa.co.ldap.LDAPStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.BasicScopeHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.MyProxyFacadeProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionsStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AuthorizationServletConfig;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.delegation.server.issuers.AGIssuer;
 import edu.uiuc.ncsa.security.delegation.server.issuers.ATIssuer;
@@ -18,6 +20,7 @@ import edu.uiuc.ncsa.security.delegation.token.TokenForge;
 import edu.uiuc.ncsa.security.oauth_2_0.server.LDAPConfiguration;
 import edu.uiuc.ncsa.security.oauth_2_0.server.ScopeHandler;
 import edu.uiuc.ncsa.security.servlet.UsernameTransformer;
+import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import edu.uiuc.ncsa.security.util.mail.MailUtilProvider;
 
 import javax.inject.Provider;
@@ -54,7 +57,8 @@ public class COSE extends OA2SE {
                 boolean isRefreshTokenEnabled,
                 boolean twoFactorSupportEnabled,
                 long maxClientRefreshTokenLifetime,
-                Provider<LDAPStore> mldap) {
+                Provider<LDAPStore> mldap,
+                JSONWebKeys signingKeyPair) {
         super(logger,
                 tsp,
                 csp,
@@ -80,8 +84,13 @@ public class COSE extends OA2SE {
                 ldapConfiguration2,
                 isRefreshTokenEnabled,
                 twoFactorSupportEnabled,
-                maxClientRefreshTokenLifetime);
+                maxClientRefreshTokenLifetime,
+                signingKeyPair);
         this.mldap = mldap;
+        if(scopeHandler instanceof BasicScopeHandler){
+            DebugUtil.dbg(this,"***Setting runtime environment in the scope handler:" + scopeHandler.getClass().getSimpleName());
+            ((BasicScopeHandler)scopeHandler).setOa2SE(this);
+        }
     }
 
     Provider<LDAPStore> mldap;

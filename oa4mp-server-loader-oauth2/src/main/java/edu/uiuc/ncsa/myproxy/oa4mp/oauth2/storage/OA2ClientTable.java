@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.security.oauth_2_0.OA2ClientKeys;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnDescriptorEntry;
 
 import static java.sql.Types.BIGINT;
+import static java.sql.Types.BOOLEAN;
 import static java.sql.Types.LONGVARCHAR;
 
 /**
@@ -25,5 +26,6 @@ public class OA2ClientTable extends ClientStoreTable {
         getColumnDescriptor().add(new ColumnDescriptorEntry(k.rtLifetime(), BIGINT));
         getColumnDescriptor().add(new ColumnDescriptorEntry(k.issuer(), LONGVARCHAR));
         getColumnDescriptor().add(new ColumnDescriptorEntry(k.ldap(), LONGVARCHAR));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(k.signTokens(), BOOLEAN));
     }
 }

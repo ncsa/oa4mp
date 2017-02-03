@@ -4,9 +4,61 @@
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-    <title></title>
+    <title>The Discovery Service</title>
+    <!--#include virtual="../../head.html" -->
 </head>
-<body>
+<body class="composite">
+<!--#include virtual="../../header.html" -->
+<h2>The Discovery Service</h2>
+<p>OA4MP (for OIDC) supports the .well-known endpoint, as per <a href="https://tools.ietf.org/html/rfc5785">RFC 5785</a>
+    and <a href="https://openid.net/specs/openid-connect-discovery-1_0.html">OIDC discovery</a>.
+It should be noted that each instance of OA4MP will have its own location for this which corresponds
+to that instance. This allows for multiple services in a single domain.</p>
 
+<h3>Example</h3>
+<p>If OA4MP is hosted at <code>https://services.bigstate.edu/oauth2</code>, then the discovery page is at
+<code>https://services.bigstate.edu/oauth2/.well-known/openid-configuration</code> and will return a JSON
+object such as </p>
+<pre>
+    {
+     "authorization_endpoint": "https://services.bigstate.edu/oauth2/authorize",
+     "registration_endpoint": "https://services.bigstate.edu/oauth2/register",
+     "token_endpoint": "https://services.bigstate.edu/oauth2/token",
+     "userinfo_endpoint": "https://services.bigstate.edu/oauth2/userinfo",
+     "issuer": "https://services.bigstate.edu/oauth2",
+     "token_endpoint_auth_methods_supported": ["client_secret_post"],
+     "subject_types_supported": ["public"],
+     "scopes_supported":  [
+      "email",
+      "edu.uiuc.ncsa.myproxy.getcert",
+      "openid",
+      "profile",
+      "org.cilogon.userinfo"
+     ],
+     "response_types_supported":  [
+      "code",
+      "token",
+      "id_token"
+     ],
+     "claims_supported":  [
+      "sub",
+      "aud",
+      "iss",
+      "exp",
+      "iat",
+      "email"
+     ],
+     "id_token_signing_alg_values_supported":  [
+      "RS256",
+      "RS384",
+      "RS512"
+     ],
+     "jwks_uri": "https://services.bigstate.edu/oauth2/certs"
+    }
+</pre>
+<p>Clients will parse this and use bits of the information (such as which signing algorithms are supported
+and the location of the public keys). There may be some variation, of course, depending on the server's exact
+configuration.</p>
+<!--#include virtual="../../footer.html" -->
 </body>
 </html>

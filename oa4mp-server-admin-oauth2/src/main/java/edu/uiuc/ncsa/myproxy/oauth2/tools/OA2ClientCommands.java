@@ -42,6 +42,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
         sayi("error uri=" + client.getErrorUri());
         sayi("limited proxies? " + client.isProxyLimited());
         sayi("creation timestamp=" + client.getCreationTS());
+        sayi("sign ID tokens?=" + client.isSignTokens());
         sayi("issuer=" + client.getIssuer());
         if (getClientApprovalStore() != null) {
             ClientApproval clientApproval = (ClientApproval) getClientApprovalStore().get(client.getIdentifier());
@@ -153,9 +154,20 @@ public class OA2ClientCommands extends ClientStoreCommands {
         }
 
         String issuer = getInput("enter the issuer (optional)", oa2Client.getIssuer());
-        if(!(issuer == null || issuer.length() == 0)){
+        if(!isEmpty(issuer)){
             oa2Client.setIssuer(issuer);
         }
+
+        String signTokens = getInput("Enable ID token signing (true/false)?", Boolean.toString(oa2Client.isSignTokens()));
+        if(!isEmpty(signTokens)){
+            try{
+                oa2Client.setSignTokens(Boolean.parseBoolean(signTokens));
+            }catch(Throwable t){
+                // do nothing.
+                sayi("Unknown response of \"" + signTokens + "\". Must be \"true\" or \"false\", ignoring.");
+            }
+        }
+
     }
 
     public OA2ClientCommands(MyLoggingFacade logger, Store store) {

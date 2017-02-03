@@ -78,11 +78,13 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
             boolean verifyUsername = true;
             boolean returnDnAsUsername = false;
             boolean convertDNToGlobusID = false;
+            String authorizationURI = null;
             if (!kids.isEmpty()) {
                 ConfigurationNode sn = (ConfigurationNode) kids.get(0);
                 try {
 
                     // implicitly uses the fact that null (so missing parameter) parses to false.
+                    authorizationURI = getFirstAttribute(sn, OA4MPConfigTags.AUTHORIZATION_SERVLET_URI);
                     useheader = getCfgBoolean(sn, OA4MPConfigTags.AUTHORIZATION_SERVLET_HEADER_USE, useheader);
                     requiredHeader = getCfgBoolean(sn, OA4MPConfigTags.AUTHORIZATION_SERVLET_HEADER_REQUIRE, requiredHeader);
                     headFieldName = getFirstAttribute(sn, OA4MPConfigTags.AUTHORIZATION_SERVLET_HEADER_FIELD_NAME);
@@ -94,7 +96,9 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
                     info("Error loading authorization configuration. Disabling use of headers");
                 }
             }
-            authorizationServletConfig = new AuthorizationServletConfig(useheader,
+            authorizationServletConfig = new AuthorizationServletConfig(
+                    authorizationURI,
+                    useheader,
                     requiredHeader,
                     headFieldName,
                     returnDnAsUsername,

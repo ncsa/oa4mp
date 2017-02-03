@@ -18,6 +18,7 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ include file="assets/includes/start.html" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
     <form action="/oidc2fca/register" method="post">
         <p>NCSA Two Factor OAuth Client Registration Form</p>
@@ -64,6 +65,26 @@
                                name="${callbackURI}">${callbackURIValue}</textarea>
                  </td>
              </tr>
+            <tr>
+                  <td>Issuer (optional):</td>
+                  <td><input type="text" size="25" name="${issuer}" value="${issuerValue}"/></td>
+              </tr>
+              <tr>
+                  <td>Scopes:</td>
+                  <td>
+                      <c:forEach items="${scopes}" var="scope">
+                          <input type="checkbox" name="chkScopes" value="${scope}">${scope}&nbsp;
+                      </c:forEach>
+                  </td>
+
+              </tr>
+              <tr>
+                  <td>LDAP configurations (optional):</td>
+                  <td>
+                      <textarea id="${ldap}" rows="5" cols="80"  name="${ldap}">${ldapValue}</textarea>
+                  </td>
+              </tr>
+              <tr>
              <tr>
                  <td><input type="submit" value="submit"/></td>
              </tr>

@@ -1,9 +1,12 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.server.servlet;
 
+import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
  * This will <i>automatically</i> approve every client request. And is intended
@@ -24,5 +27,21 @@ public class AutoRegistrationServlet extends RegistrationServlet {
         }
         fireNewClientEvent(client);
         return client;
+    }
+
+    /**
+     * This will approve a client. Supply the approver and client
+     *
+     * @param clientIdentifier
+     * @param approver
+     */
+    public static void approveClient(Identifier clientIdentifier, String approver) throws IOException {
+        ClientApproval clientApproval = getServiceEnvironment().getClientApprovalStore().get(clientIdentifier);
+        if (approver == null) {
+            approver = ""; // so you don't get something ugly in the backend.
+        }
+        clientApproval.setApprover(approver);
+        clientApproval.setApproved(true);
+        getServiceEnvironment().getClientApprovalStore().save(clientApproval);
     }
 }

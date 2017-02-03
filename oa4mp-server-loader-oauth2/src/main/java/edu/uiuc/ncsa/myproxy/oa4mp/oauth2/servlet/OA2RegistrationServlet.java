@@ -5,7 +5,12 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractRegistrationServlet;
 import edu.uiuc.ncsa.security.core.exceptions.RetryException;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Client;
+import edu.uiuc.ncsa.security.oauth_2_0.OA2Scopes;
+import edu.uiuc.ncsa.security.oauth_2_0.server.LDAPConfiguration;
+import edu.uiuc.ncsa.security.oauth_2_0.server.LDAPConfigurationUtil;
 import edu.uiuc.ncsa.security.servlet.PresentableState;
+import net.sf.json.JSON;
+import net.sf.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 
@@ -15,6 +20,7 @@ import java.io.BufferedReader;
 import java.io.StringReader;
 import java.net.URI;
 import java.security.SecureRandom;
+import java.util.Collection;
 import java.util.LinkedList;
 
 /**
@@ -27,6 +33,10 @@ public class OA2RegistrationServlet extends AbstractRegistrationServlet {
     public static final String CALLBACK_URI = "callbackURI";
     public static final String REFRESH_TOKEN_LIFETIME = "rtLifetime";
     public static final String REFRESH_TOKEN_FIELD_VISIBLE = "rtFieldVisible";
+    public static final String VO_NAME = "voName";
+    public static final String LDAP_NAME = "ldap";
+    public static final String ISSUER_NAME = "issuer";
+    public static final String SCOPES_NAME = "scopes";
 
     protected OA2SE getOA2SE() {
         return (OA2SE) getServiceEnvironment();
@@ -38,6 +48,12 @@ public class OA2RegistrationServlet extends AbstractRegistrationServlet {
         HttpServletRequest request = state.getRequest();
 
         if (state.getState() == INITIAL_STATE) {
+            String[] scopes = new String[getOA2SE().getScopes().size()];
+            getOA2SE().getScopes().toArray(scopes);
+            request.setAttribute(SCOPES_NAME, scopes);
+            request.setAttribute(VO_NAME, VO_NAME);
+            request.setAttribute(LDAP_NAME, LDAP_NAME);
+            request.setAttribute(ISSUER_NAME, ISSUER_NAME);
             request.setAttribute(CALLBACK_URI, CALLBACK_URI);
             request.setAttribute(getValueTag(CLIENT_CALLBACK_URI), "Put your callbacks here, one per line.");
             request.setAttribute(REFRESH_TOKEN_LIFETIME, REFRESH_TOKEN_LIFETIME);
@@ -49,11 +65,37 @@ public class OA2RegistrationServlet extends AbstractRegistrationServlet {
         }
     }
 
-    @Override
-    protected Client addNewClient(HttpServletRequest request, HttpServletResponse response) throws Throwable {
+    protected Client addNewClient(HttpServletRequest request, HttpServletResponse response, boolean fireClientEvents) throws Throwable {
         OA2Client client = (OA2Client) super.addNewClient(request, response);
         String rawCBs = getRequiredParam(request, CALLBACK_URI, client);
         String rawRTLifetime = getParameter(request, REFRESH_TOKEN_LIFETIME);
+        String[] rawScopes = request.getParameterValues("chkScopes");
+        if (rawScopes != null) {
+            Collection<String> newScopes = new LinkedList<>();
+            boolean hasDefaultScope = false;
+            for (String scope : rawScopes) {
+                if (OA2Scopes.SCOPE_OPENID.equals(scope)) hasDefaultScope = true;
+                newScopes.add(scope);
+            }
+            if (!hasDefaultScope) {
+                newScopes.add(OA2Scopes.SCOPE_OPENID); // has to be there or all requests are rejected.
+            }
+            client.setScopes(newScopes);
+        }
+        String issuer = getParameter(request, ISSUER_NAME);
+        String ldap = getParameter(request, LDAP_NAME);
+        if (!isEmpty(issuer)) {
+            client.setIssuer(issuer);
+        }
+        if (!isEmpty(ldap)) {
+            try {
+                JSON json = JSONObject.fromObject(ldap);
+                Collection<LDAPConfiguration> ldapConfiguration = LDAPConfigurationUtil.fromJSON(json);
+                client.setLdaps(ldapConfiguration);
+            } catch (Throwable t) {
+                warn("Could not parse LDAP string during client registration for \"" + client.getIdentifierString() + "\". Skipping...");
+            }
+        }
         try {
             URI.create(client.getHomeUri());
         } catch (Throwable t) {
@@ -107,8 +149,16 @@ public class OA2RegistrationServlet extends AbstractRegistrationServlet {
         }
         br.close();
         client.setCallbackURIs(uris);
-        fireNewClientEvent(client);
+        client.setSignTokens(true); // part of CIL-359, signing ID tokens.
+        if (fireClientEvents) {
+            fireNewClientEvent(client);
+        }
         return client;
+    }
+
+    @Override
+    protected Client addNewClient(HttpServletRequest request, HttpServletResponse response) throws Throwable {
+        return addNewClient(request, response, true);
     }
 
     /**
@@ -126,7 +176,7 @@ public class OA2RegistrationServlet extends AbstractRegistrationServlet {
             if (state instanceof ClientState) {
                 // we should not store the client secret in the database, just a hash of it.
                 ClientState cState = (ClientState) state;
-                String secret = DigestUtils.shaHex(cState.getClient().getSecret());
+                String secret = DigestUtils.sha1Hex(cState.getClient().getSecret());
                 cState.getClient().setSecret(secret);
                 getServiceEnvironment().getClientStore().save(cState.getClient());
             } else {

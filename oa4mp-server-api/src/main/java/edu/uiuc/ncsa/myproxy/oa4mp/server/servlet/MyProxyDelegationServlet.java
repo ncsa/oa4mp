@@ -15,6 +15,7 @@ import edu.uiuc.ncsa.security.core.cache.CachedObject;
 import edu.uiuc.ncsa.security.core.cache.Cleanup;
 import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.server.UnapprovedClientException;
 import edu.uiuc.ncsa.security.delegation.server.issuers.AGIssuer;
@@ -83,9 +84,9 @@ public abstract class MyProxyDelegationServlet extends EnvServlet implements Tra
     public ServiceEnvironmentImpl loadProperties2() throws IOException {
         ServiceEnvironmentImpl se2 = super.loadProperties2();
         if (se2.isPollingEnabled()) {
-                  caThread = se2.getClientApprovalThread();
-              }
-              kpt = new KeyPairPopulationThread(se2.getKeyPairQueue());
+            caThread = se2.getClientApprovalThread();
+        }
+        kpt = new KeyPairPopulationThread(se2.getKeyPairQueue());
         return se2;
     }
 
@@ -103,8 +104,6 @@ public abstract class MyProxyDelegationServlet extends EnvServlet implements Tra
     public static Cache myproxyConnectionCache;
 
     public static KeyPairPopulationThread kpt;
-
-
 
 
     protected AGIssuer getAGI() throws IOException {
@@ -180,27 +179,27 @@ public abstract class MyProxyDelegationServlet extends EnvServlet implements Tra
     }
 
     /**
-        * This will be invoked at init before anything else and should include code to seamlessly upgrade stores from earlier versions.
-        * For instance, if a new column needs to be added to a table. This pre-supposes that the current user has the correct
-        * permissions to alter the table, btw. This also updates the internal flag {@link #storeUpdatesDone} which should be
-        * checks in overrides. If you override this method and call super, let super manage this flag. If it is true, do not
-        * execute your method.
-        */
-       public void storeUpdates() throws IOException, SQLException {
-           if (storeUpdatesDone) return; // run this once
-           storeUpdatesDone = true;
-           processStoreCheck(getTransactionStore());
-           processStoreCheck(getServiceEnvironment().getClientStore());
-           processStoreCheck(getServiceEnvironment().getClientApprovalStore());
-       }
+     * This will be invoked at init before anything else and should include code to seamlessly upgrade stores from earlier versions.
+     * For instance, if a new column needs to be added to a table. This pre-supposes that the current user has the correct
+     * permissions to alter the table, btw. This also updates the internal flag {@link #storeUpdatesDone} which should be
+     * checks in overrides. If you override this method and call super, let super manage this flag. If it is true, do not
+     * execute your method.
+     */
+    public void storeUpdates() throws IOException, SQLException {
+        if (storeUpdatesDone) return; // run this once
+        storeUpdatesDone = true;
+        processStoreCheck(getTransactionStore());
+        processStoreCheck(getServiceEnvironment().getClientStore());
+        processStoreCheck(getServiceEnvironment().getClientApprovalStore());
+    }
 
-       public void processStoreCheck(Store store) throws SQLException {
-           if (store instanceof SQLStore) {
-               ((SQLStore) store).checkColumns();
-           }
-       }
+    public void processStoreCheck(Store store) throws SQLException {
+        if (store instanceof SQLStore) {
+            ((SQLStore) store).checkColumns();
+        }
+    }
 
-       public static boolean storeUpdatesDone = false;
+    public static boolean storeUpdatesDone = false;
 
 
     public static AbstractCLIApprover.ClientApprovalThread caThread = null;
@@ -231,6 +230,7 @@ public abstract class MyProxyDelegationServlet extends EnvServlet implements Tra
 
     /**
      * Assumes that the client identifier is a parameter in the request.
+     *
      * @param req
      * @return
      */
@@ -246,6 +246,20 @@ public abstract class MyProxyDelegationServlet extends EnvServlet implements Tra
         }
         Client c = getServiceEnvironment().getClientStore().get(identifier);
         if (c == null) {
+            DebugUtil.dbg(this, "client name is " + getServiceEnvironment().getClientStore().getClass().getSimpleName());
+            DebugUtil.dbg(this, "client store is a " + getServiceEnvironment().getClientStore());
+            if (getServiceEnvironment().getClientStore().size() == 0) {
+                System.err.println("NO ENTRIES IN CLIENT STORE");
+            } else {
+                System.err.println("Store contains " + getServiceEnvironment().getClientStore().size() + " entries.");
+            }
+            System.err.println("printing identifiers...");
+
+            for (Identifier x : getServiceEnvironment().getClientStore().keySet()) {
+                System.err.println(x);
+            }
+            System.err.println("done!");
+
             String ww = "The client with identifier \"" + identifier.toString() + "\"  cannot be found.";
             warn(ww + " Client store is " + getServiceEnvironment().getClientStore());
             throw new UnknownClientException(ww + "  Is the value in the client config correct?", identifier);
@@ -354,8 +368,9 @@ public abstract class MyProxyDelegationServlet extends EnvServlet implements Tra
      * along several values this way is there is no way to disambiguate them, e.g. a client id from a client secret.
      * If there is no authorization header or there are no tokens of the stated type, the returned value is an
      * empty list.
+     *
      * @param request
-     * @param type The type of token, e.g. "Bearer" or "Basic"
+     * @param type    The type of token, e.g. "Bearer" or "Basic"
      * @return
      */
     protected List<String> getAuthHeader(HttpServletRequest request, String type) {

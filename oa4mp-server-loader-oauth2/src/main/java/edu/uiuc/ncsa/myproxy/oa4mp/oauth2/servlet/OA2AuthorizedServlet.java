@@ -1,8 +1,10 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.UsernameFindable;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractInitServlet;
+import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.server.request.AGResponse;
@@ -73,7 +75,12 @@ public class OA2AuthorizedServlet extends AbstractInitServlet {
         }
         UsernameFindable ufStore = null;
         String rawIDToken = String.valueOf(httpServletRequest.getParameterMap().get(ID_TOKEN_HINT));
-        JSONObject idToken = IDTokenUtil.readIDToken(rawIDToken);
+        JSONObject idToken = null;
+        try {
+            idToken = IDTokenUtil.verifyAndReadIDToken(rawIDToken, ((OA2SE) getServiceEnvironment()).getJsonWebKeys());
+        } catch (Throwable e) {
+            throw new GeneralException("Error: Cannot read ID token hint", e);
+        }
         String state = httpServletRequest.getParameter(STATE);
         String username = null;
         if (idToken.containsKey(OA2Claims.SUBJECT)) {

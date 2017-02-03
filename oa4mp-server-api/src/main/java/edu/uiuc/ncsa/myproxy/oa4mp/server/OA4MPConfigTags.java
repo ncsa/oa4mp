@@ -27,6 +27,7 @@ public interface OA4MPConfigTags extends StorageConfigurationTags, MailConfigura
 
 
     public static final String AUTHORIZATION_SERVLET = "authorizationServlet"; // The name of the servlet
+    public static final String AUTHORIZATION_SERVLET_URI = "authorizationURI"; // If there is a different authorization uri than the standard, specify it here
     public static final String AUTHORIZATION_SERVLET_HEADER_USE = "useHeader"; // If there is a header present, use it, otherwise ignore it.
     public static final String AUTHORIZATION_SERVLET_HEADER_REQUIRE = "requireHeader"; // Require the header. This will cause an exception to be thrown if there is no header.
     public static final String AUTHORIZATION_SERVLET_HEADER_FIELD_NAME = "headerFieldName"; // The name of the header field to be used for the username, e.g. REMOTE_USER

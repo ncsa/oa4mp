@@ -7,8 +7,8 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.ClientStoreCommands;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.CopyCommands;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
-import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.core.util.LoggingConfigLoader;
+import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.util.cli.CLIDriver;
 import edu.uiuc.ncsa.security.util.cli.CommonCommands;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
@@ -19,7 +19,8 @@ import org.apache.commons.lang.StringUtils;
  * on 4/3/14 at  1:23 PM
  */
 public class OA2Commands extends BaseCommands {
-    public static final String ADMINS="admins";
+    public static final String ADMINS = "admins";
+    public static final String SIGNING = "signing";
 
     public OA2Commands(MyLoggingFacade logger) {
         super(logger);
@@ -38,6 +39,7 @@ public class OA2Commands extends BaseCommands {
     OA2SE getOA2SE() throws Exception {
         return (OA2SE) getServiceEnvironment();
     }
+
     public static void main(String[] args) {
         try {
             OA2Commands oa2Commands = new OA2Commands(null);
@@ -66,7 +68,7 @@ public class OA2Commands extends BaseCommands {
 
     @Override
     public ClientStoreCommands getNewClientStoreCommands() throws Exception {
-        OA2ClientCommands x =  new OA2ClientCommands(getMyLogger(), "  ", getServiceEnvironment().getClientStore(), getServiceEnvironment().getClientApprovalStore());
+        OA2ClientCommands x = new OA2ClientCommands(getMyLogger(), "  ", getServiceEnvironment().getClientStore(), getServiceEnvironment().getClientApprovalStore());
         x.setRefreshTokensEnabled(getOA2SE().isRefreshTokenEnabled());
         return x;
     }
@@ -76,25 +78,29 @@ public class OA2Commands extends BaseCommands {
         return new CopyCommands(getMyLogger(), new OA2CopyTool(), new OA2CopyToolVerifier(), getConfigFile());
     }
 
-    public OA2AdminClientCommands getAdminClientCommands() throws Exception{
+    public OA2AdminClientCommands getAdminClientCommands() throws Exception {
         return new OA2AdminClientCommands(getMyLogger(), "  ", getOA2SE().getAdminClientStore(), getOA2SE().getClientApprovalStore());
     }
+
     @Override
-      public boolean use(InputLine inputLine) throws Exception {
-          CommonCommands commands = null;
-          if (inputLine.hasArg(ADMINS)) {
-              commands = getAdminClientCommands();
-          }
-          if (commands != null) {
-              CLIDriver cli = new CLIDriver(commands);
-              cli.start();
-              return true;
-          }
+    public boolean use(InputLine inputLine) throws Exception {
+        CommonCommands commands = null;
+        if (inputLine.hasArg(ADMINS)) {
+            commands = getAdminClientCommands();
+        }
+        if (inputLine.hasArg(SIGNING)) {
+            commands = new SigningCommands(getOA2SE());
+        }
+        if (commands != null) {
+            CLIDriver cli = new CLIDriver(commands);
+            cli.start();
+            return true;
+        }
 
-          if (super.use(inputLine)) {
-              return true;
-          }
+        if (super.use(inputLine)) {
+            return true;
+        }
 
-          return false;
-      }
+        return false;
+    }
 }

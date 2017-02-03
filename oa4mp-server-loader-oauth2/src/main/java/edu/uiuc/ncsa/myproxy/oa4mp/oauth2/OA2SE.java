@@ -18,6 +18,7 @@ import edu.uiuc.ncsa.security.oauth_2_0.OA2Scopes;
 import edu.uiuc.ncsa.security.oauth_2_0.server.LDAPConfiguration;
 import edu.uiuc.ncsa.security.oauth_2_0.server.ScopeHandler;
 import edu.uiuc.ncsa.security.servlet.UsernameTransformer;
+import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import edu.uiuc.ncsa.security.util.mail.MailUtilProvider;
 
 import javax.inject.Provider;
@@ -55,7 +56,8 @@ public class OA2SE extends ServiceEnvironmentImpl {
                  LDAPConfiguration ldapConfiguration2,
                  boolean isRefreshTokenEnabled,
                  boolean twoFactorSupportEnabled,
-                 long maxClientRefreshTokenLifetime) {
+                 long maxClientRefreshTokenLifetime,
+                 JSONWebKeys jsonWebKeys) {
         super(logger,
                 mfp,
                 tsp,
@@ -95,8 +97,18 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.ldapConfiguration2 = ldapConfiguration2;
         this.twoFactorSupportEnabled = twoFactorSupportEnabled;
         this.maxClientRefreshTokenLifetime = maxClientRefreshTokenLifetime;
+        this.jsonWebKeys = jsonWebKeys;
     }
 
+    public JSONWebKeys getJsonWebKeys() {
+        return jsonWebKeys;
+    }
+
+    public void setJsonWebKeys(JSONWebKeys jsonWebKeys) {
+        this.jsonWebKeys = jsonWebKeys;
+    }
+
+    protected JSONWebKeys jsonWebKeys;
     public boolean isTwoFactorSupportEnabled() {
         return twoFactorSupportEnabled;
     }

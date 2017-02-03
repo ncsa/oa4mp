@@ -45,9 +45,12 @@
        </servlet>
        <servlet-mapping>
            <servlet-name>discovery</servlet-name>
-           <url-pattern>/.well-known</url-pattern>
+           <url-pattern>/.well-known/*</url-pattern>
        </servlet-mapping>
-
+    <servlet-mapping>
+        <servlet-name>discovery</servlet-name>
+        <url-pattern>/certs</url-pattern>
+    </servlet-mapping>
     <servlet>
         <servlet-name>accessToken</servlet-name>
         <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2ATServlet</servlet-class>

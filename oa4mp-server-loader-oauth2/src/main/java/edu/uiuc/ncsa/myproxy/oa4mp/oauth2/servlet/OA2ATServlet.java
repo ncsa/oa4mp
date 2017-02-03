@@ -150,7 +150,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         if (grantType.equals(OA2Constants.AUTHORIZATION_CODE_VALUE)) {
             IssuerTransactionState state = doDelegation(request, response);
             ATIResponse2 atResponse = (ATIResponse2) state.getIssuerResponse();
-
+            atResponse.setSignToken(client.isSignTokens());
+            DebugUtil.dbg(this, "set token signing flag =" + atResponse.isSignToken());
             OA2ServiceTransaction st2 = (OA2ServiceTransaction) state.getTransaction();
             if (!client.isRTLifetimeEnabled() && ((OA2SE) getServiceEnvironment()).isRefreshTokenEnabled()) {
                 // Since this bit of information could be extremely useful if a service decides
@@ -277,24 +278,14 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             atResponse.setSupportedScopes(targetScopes);
         }
         OA2Client client = (OA2Client) transaction.getClient();
-        LinkedList<ScopeHandler> scopeHandlers = new LinkedList<>();
-
-        if (client.getLdaps()==null || client.getLdaps().isEmpty()) {
-            DebugUtil.dbg(this, "using default scope handler=");
-            scopeHandlers.add(oa2SE.getScopeHandler());
-        } else {
-            for (LDAPConfiguration cfg : client.getLdaps()) {
-                LDAPScopeHandlerFactoryRequest req = new LDAPScopeHandlerFactoryRequest(getMyLogger(),
-                        cfg, client.getScopes());
-                ScopeHandler scopeHandler = ScopeHandlerFactory.newInstance(req);
-                scopeHandlers.add(scopeHandler);
-            }
-        }
+        LinkedList<ScopeHandler> scopeHandlers = LDAPScopeHandlerFactory.createScopeHandlers(oa2SE, client);
         atResponse.setScopeHandlers(scopeHandlers); // so the same scopes in user info are returned here.
 
         atResponse.setServiceTransaction(transaction);
+        atResponse.setJsonWebKey(oa2SE.getJsonWebKeys().getDefault());
         // Need to do some checking but for now, just return transaction
         //return null;
         return transaction;
     }
+
 }

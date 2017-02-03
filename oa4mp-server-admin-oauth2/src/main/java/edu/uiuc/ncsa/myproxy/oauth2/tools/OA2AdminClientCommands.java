@@ -50,7 +50,7 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
                    break;
                }
                // input is not empty.
-               secret = DigestUtils.shaHex(input);
+               secret = DigestUtils.sha1Hex(input);
                client.setSecret(secret);
                askForSecret = false;
            }
