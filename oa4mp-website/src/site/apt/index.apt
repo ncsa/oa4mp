@@ -22,20 +22,17 @@ OAuth for MyProxy
 
 Downloads
 
-* OAuth 1.0a
-
-     Stable version. Use this version with CILogon, Globus, and XSEDE.
-
-        * {{{http://svn.code.sf.net/p/cilogon/code/tags/latest/server/oauth.war}oauth-server-latest.war}}  (Version 3.4-SNAPSHOT)
-
-        * {{{http://svn.code.sf.net/p/cilogon/code/tags/latest/client/client.war}oauth-client-latest.war}} (Version 3.4-SNAPSHOT)
-
-* OAuth 2.0
+* OAuth 2.0 (OpenID Connect)
 
         * {{{http://svn.code.sf.net/p/cilogon/code/tags/latest/server/oauth2.war}oauth2-server-latest.war}} (Version 3.4-SNAPSHOT)
 
         * {{{http://svn.code.sf.net/p/cilogon/code/tags/latest/client/client2.war}oauth2-client-latest.war}} (Version 3.4-SNAPSHOT)
 
+* OAuth 1.0a
+
+        * {{{http://svn.code.sf.net/p/cilogon/code/tags/latest/server/oauth.war}oauth-server-latest.war}}  (Version 3.4-SNAPSHOT)
+
+        * {{{http://svn.code.sf.net/p/cilogon/code/tags/latest/client/client.war}oauth-client-latest.war}} (Version 3.4-SNAPSHOT)
 
 Documentation
 
