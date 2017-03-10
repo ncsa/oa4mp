@@ -53,7 +53,6 @@ public class LDAPScopeHandler extends BasicScopeHandler {
     public String getSearchName(UserInfo userInfo, HttpServletRequest request, ServiceTransaction transaction) {
         JSONObject xxx = LDAPConfigurationUtil.toJSON(getCfg());
         xxx.getJSONObject("ldap").getJSONObject("ssl").put("keystore","");
-        System.err.println(xxx);
         if(getCfg().getSearchNameKey() == null){
             throw new IllegalStateException("Error: no search name specified.");
         }

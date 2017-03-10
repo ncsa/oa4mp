@@ -7,7 +7,7 @@
     <parent>
         <groupId>edu.uiuc.ncsa.myproxy</groupId>
         <artifactId>myproxy</artifactId>
-        <version>3.4-SNAPSHOT</version>
+        <version>3.3.0.3</version>
     </parent>
 
     <artifactId>oa4mp-server-api</artifactId>
@@ -23,19 +23,19 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.security.delegation</groupId>
             <artifactId>ncsa-security-delegation-server</artifactId>
-            <version>3.4-SNAPSHOT</version>
+            <version>3.3.0.3</version>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>ncsa-security-core</artifactId>
-            <version>3.4-SNAPSHOT</version>
+            <version>3.3.0.3</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security.delegation</groupId>
             <artifactId>ncsa-security-delegation-common</artifactId>
-            <version>3.4-SNAPSHOT</version>
+            <version>3.3.0.3</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
@@ -47,14 +47,14 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>ncsa-security-util</artifactId>
-            <version>3.4-SNAPSHOT</version>
+            <version>3.3.0.3</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>ncsa-security-servlet</artifactId>
-            <version>3.4-SNAPSHOT</version>
+            <version>3.3.0.3</version>
         </dependency>
         <dependency>
             <groupId>net.sf.json-lib</groupId>
@@ -66,7 +66,7 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>myproxy-logon</artifactId>
-            <version>3.4-SNAPSHOT</version>
+            <version>3.3.0.3</version>
         </dependency>
 
         <dependency>

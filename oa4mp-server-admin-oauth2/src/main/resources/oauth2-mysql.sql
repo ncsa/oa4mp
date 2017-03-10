@@ -107,4 +107,5 @@ GRANT ALL  ON oauth2.adminClients TO 'oa4mp-server'@'localhost';
 GRANT ALL  ON oauth2.transactions TO 'oa4mp-server'@'localhost';
 GRANT ALL  ON oauth2.permissions TO 'oa4mp-server'@'localhost';
 
+
 commit;

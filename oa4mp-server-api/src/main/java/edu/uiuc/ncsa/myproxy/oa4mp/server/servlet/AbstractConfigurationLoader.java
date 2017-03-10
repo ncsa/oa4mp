@@ -234,7 +234,6 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
             macp.addListener(AdminClientStoreProviders.getMysqlACS(cn, getMySQLConnectionPoolProvider()));
             macp.addListener(AdminClientStoreProviders.getPostgresACS(cn, getPgConnectionPoolProvider()));
             AdminClientStore acs = (AdminClientStore) macp.get();
-            System.err.println("Got admin client store" + acs.getClass().getSimpleName());
         }
         return macp;
     }

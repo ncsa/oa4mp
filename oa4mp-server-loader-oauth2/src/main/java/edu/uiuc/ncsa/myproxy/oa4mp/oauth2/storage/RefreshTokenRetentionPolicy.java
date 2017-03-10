@@ -86,8 +86,7 @@ public class RefreshTokenRetentionPolicy implements RetentionPolicy {
             return true;
 
         } catch (InvalidTimestampException its) {
-            its.printStackTrace();
-            debug("returning false - do not retain");
+            debug("returning false - Invalid timestamp exception, do not retain. msg=\"" + its.getMessage() + "\"");
 
             return false;
         }

@@ -7,7 +7,7 @@
     <parent>
         <groupId>edu.uiuc.ncsa.myproxy</groupId>
         <artifactId>myproxy</artifactId>
-        <version>3.4-SNAPSHOT</version>
+        <version>3.3.0.3</version>
     </parent>
 
     <artifactId>oa4mp-client-webapp</artifactId>
@@ -17,7 +17,7 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>ncsa-security-servlet</artifactId>
-            <version>3.4-SNAPSHOT</version>
+            <version>3.3.0.3</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
