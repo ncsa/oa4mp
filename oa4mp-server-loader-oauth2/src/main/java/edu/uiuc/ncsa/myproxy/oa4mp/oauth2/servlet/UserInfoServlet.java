@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.security.core.exceptions.InvalidTimestampException;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.server.request.IssuerResponse;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
@@ -70,7 +71,9 @@ public class UserInfoServlet extends MyProxyDelegationServlet {
         // Now we figure out which scope handler to use.
         OA2Client oa2Client = (OA2Client) transaction.getClient();
         UIIResponse2 uiresp = (UIIResponse2) uis.process(uireq);
-        //uiresp.getUserInfo().put("email","gaynor@illinois.edu");
+        DebugUtil.dbg(this, "REMOVE EPPN from claims");
+
+        uiresp.getUserInfo().put("email","gaynor@illinois.edu");
 
         LinkedList<ScopeHandler> scopeHandlers = LDAPScopeHandlerFactory.createScopeHandlers(oa2SE,oa2Client);
         for(ScopeHandler scopeHandler: scopeHandlers){

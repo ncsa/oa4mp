@@ -33,7 +33,7 @@ public class LDAPScopeHandlerFactory extends ScopeHandlerFactory {
     }
 
     /**
-     * This creates a uniform list of scope handerls for both the access token servlet and the user info servlet.
+     * This creates a uniform list of scope handlers for both the access token servlet and the user info servlet.
      * It will use a common handler if there is one and use the configured factory to create appropriate ones
      * (and populate them with the right runtime environment otherwise.
      * @param oa2SE
