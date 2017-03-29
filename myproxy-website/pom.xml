@@ -15,7 +15,7 @@
     <packaging>jar</packaging>
     <description>MyProxy Logon website</description>
     <name>MyProxy Logon</name>
-    <url>http://grid.ncsa.illinois.edu/myproxy/oauth/</url>
+    <url>http://grid.ncsa.illinois.edu/myproxy/MyProxyLogon/</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -28,14 +28,13 @@
         </license>
     </licenses>
     <scm>
-        <developerConnection>scm:svn:https://svn.code.sf.net/p/cilogon/code/trunk/edu.uiuc.ncsa/myproxy
-        </developerConnection>
-        <connection>scm:svn:https://svn.code.sf.net/p/cilogon/code/trunk/edu.uiuc.ncsa/myproxy</connection>
-        <url>https://svn.code.sf.net/p/cilogon/code/trunk/edu.uiuc.ncsa/myproxy</url>
+        <developerConnection>scm:git:https://github.com/ncsa/OA4MP.git</developerConnection>
+        <connection>scm:git:https://github.com/ncsa/OA4MP.git</connection>
+        <url>https://github.com/ncsa/OA4MP</url>
     </scm>
     <issueManagement>
-        <system>JIRA</system>
-        <url>https://gateways.atlassian.net/browse/OAUTH</url>
+        <system>GitHub</system>
+        <url>https://github.com/ncsa/OA4MP/issues</url>
     </issueManagement>
     <developers>
         <developer>
@@ -46,19 +45,15 @@
             <name>Jim Basney</name>
             <email>jbasney@illinois.edu</email>
         </developer>
-        <developer>
-            <name>Wendy Edwards</name>
-            <email>wedwards@illinois.edu</email>
-        </developer>
     </developers>
 
     <mailingLists>
         <mailingList>
-            <name>Science Gateway Security</name>
-            <subscribe>discuss@sciencegatewaysecurity.org</subscribe>
-            <unsubscribe>discuss+unsubscribe@sciencegatewaysecurity.org</unsubscribe>
-            <archive>http://groups.google.com/a/sciencegatewaysecurity.org/group/discuss/?hl=en-US</archive>
-            <post/>
+            <name>MyProxy User List</name>
+            <subscribe>myproxy-user-request@lists.globus.org?subject=subscribe</subscribe>
+            <unsubscribe>myproxy-user-request@lists.globus.org?subject=unsubscribe</unsubscribe>
+            <archive>http://lists.globus.org/pipermail/myproxy-user/</archive>
+            <post>myproxy-user@lists.globus.org</post>
             <otherArchives/>
         </mailingList>
     </mailingLists>
