@@ -1,0 +1,20 @@
+{
+  "api": {
+    "subject": {
+      "client": {
+        "client_id": "CLIENT_ID",
+        "secret": "CLIENT_SECRET"
+      }
+    },
+    "action": {
+      "type": "attribute",
+      "method": "remove"
+    },
+    "content": [
+      "callback_uri",
+      "home_url",
+      "error_url"
+    ]
+  },
+  "comment": "This example shows how to remove a set of attributes from a given client."
+}

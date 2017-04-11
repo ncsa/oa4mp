@@ -1,0 +1,25 @@
+{
+  "api": {
+    "subject": {
+      "client": {
+        "client_id": "CLIENT_ID",
+        "secret": "CLIENT_SECRET"
+      }
+    },
+    "action": {
+      "type": "attribute",
+      "method": "set"
+    },
+    "content": {
+      "callback_uri": [
+        "https://a.b.c/client/my/ready1",
+        "https://a.b.c/client/my/ready2"
+      ],
+      "scopes": [
+        "openid",
+        "edu.uiuc.ncsa.myproxy.getcert"
+      ]
+    }
+  },
+  "comment": "This example shows how to set attributes for a client"
+}

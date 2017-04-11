@@ -1,0 +1,25 @@
+{
+   "api":{
+      "subject":{
+         "admin":{
+            "admin_id":"ADMIN_ID",
+            "secret":"ADMIN_SECRET"
+         }
+      },
+      "action":{
+         "type":"attribute",
+         "method":"remove"
+      },
+      "object":{
+         "client":{
+            "client_id":"CLIENT_ID"
+         }
+      },
+      "content":[
+         "callback_uri",
+         "home_url",
+         "error_url"
+      ]
+   },
+   "comment":"This example shows how to remove a set of attributes from a given client."
+}

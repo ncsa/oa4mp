@@ -1,0 +1,260 @@
+This is a sample session of how to use the scripts.
+
+Before you can begin:
+---------------------
+
+* Copy the entire set of scripts (everythign in the current directory) to some location of your choice.
+
+* You must have an approved admin client to use admin client (AC) features (such as approving a client). This must
+  be requested from the server you wish to use and approved before you can begin.
+
+* Set the SERVER variable with the address of the client API server you wish to use.
+
+* In the examples below, the command line prompt is a single >.
+
+Remember that every time you submit a command, there are two files, input.json and output.json in the current
+ directory that contain the actual input (after all variables are inserted) and the response from the server.
+
+=======================
+An admin (AC) based session
+-------------------
+In this case, it is assumed that you have an admin client (AC) that has been approved. You must set the following two
+variables (using the export command)
+
+ADMIN_ID
+ADMIN_SECRET
+
+E.g.
+
+export ADMIN_SECRET=sdIasyg7645Ufus98dfhUyiughsdifi55wYHRwuiHIUUH875a
+
+These will be used in all subsequent calls.
+
+** Creating a new client
+
+>./c-run.sh admin-create-client.json
+
+A typical response would be (formatted here for easy reading)
+
+{
+   "status":0,
+   "content":{
+      "client":{
+         "client_id":"myproxy:oa4mp,2012:/client_id/4ad0089bbbc616f054b2e293e83a83bc",
+         "name":"CM test client",
+         "creation_ts":"2017-04-10T16:25:47.299Z",
+         "home_url":"https://a.b.c/client",
+         "error_url":"https://a.b.c/client/error",
+         "proxy_limited":true,
+         "rt_lifetime":0,
+         "callback_uri":[
+            "https://a.b.c/client/ready1",
+            "https://a.b.c/client/ready2"
+         ],
+         "sign_tokens":false,
+         "scopes":[
+            "openid",
+            "profile",
+            "email"
+         ]
+      }
+   },
+   "secret":"qgBMPkPIlaWM8ULk3mkBP9EUzxASXG7XpBkOTLjSoxtyWL1DlUJShcxMp2N35mWi"
+}
+
+You must now set the CLIENT_ID and CLIENT_SECRET variables
+
+export CLIENT_ID=myproxy:oa4mp,2012:/client_id/4ad0089bbbc616f054b2e293e83a83bc
+export CLIENT_SECRET=qgB...
+
+** Approving the new client
+
+Issue
+
+>./c-run.sh admin-client-approve-client.json
+{"status":0}
+
+Which means this succeeded. Check it by getting the client
+
+** Getting a client
+
+> ./c-run.sh admin-get-client-client.json
+
+{
+   "status":0,
+   "content":{
+      "client":{
+         "client_id":"myproxy:oa4mp,2012:/client_id/4ad0089bbbc616f054b2e293e83a83bc",
+         "name":"CM test client",
+         "creation_ts":"2017-04-10T16:25:47.000Z",
+         "home_url":"https://a.b.c/client",
+         "error_url":"https://a.b.c/client/error",
+         "proxy_limited":true,
+         "rt_lifetime":0,
+         "callback_uri":[
+            "https://a.b.c/client/ready1",
+            "https://a.b.c/client/ready2"
+         ],
+         "sign_tokens":false,
+         "scopes":[
+            "openid",
+            "profile",
+            "email"
+         ]
+      }
+   },
+   "approved":true
+}
+
+(Again I clean up the formatting.) Note that the last attribute returned in this case is whether or not
+the client is approved.
+
+** Setting an attribute
+In this case, you need to one or more attributes. The example script sets the callback uris and the scopes.
+
+>./c-run.sh admin-set-attribute-client.json
+{"status":0}
+
+This shows that the change succeeded. NOTE you cannot approve a client by trying to set that attribute
+to true. You must use the script that specifically approves a client. This is necessary so that, for instance
+a client (which can always manage itself) cannot simply approve itself. Let's look at the full client now
+./c-run.sh admin-get-client-client.json
+{
+   "status":0,
+   "content":{
+      "client":{
+         "client_id":"myproxy:oa4mp,2012:/client_id/4ad0089bbbc616f054b2e293e83a83bc",
+         "name":"CM test client",
+         "creation_ts":"2017-04-10T16:25:47.000Z",
+         "home_url":"https://a.b.c/client",
+         "error_url":"https://a.b.c/client/error",
+         "proxy_limited":true,
+         "rt_lifetime":0,
+         "callback_uri":[
+            "https://a.b.c/client/my/other/ready1",
+            "https://a.b.c/client/my/other/ready2"
+         ],
+         "sign_tokens":false,
+         "scopes":[
+            "openid",
+            "profile",
+            "email",
+            "edu.uiuc.ncsa.myproxy.getcert"
+         ]
+      }
+   },
+   "approved":true
+}
+
+And note that indeed, the callbacks have been updated and there is a new scope added, that allows for getting an
+x509 cert.
+
+** Unapprove a client
+You may do this with the unapprove script. Note that if you unapprove a client, all client operations against the server
+will fail for that specific client unitl it is re-approved.
+>./r-cun.sh admin-unapprove-client-client.json
+{"status":0}
+
+You can verify this by getting the client.
+
+** List all clients managed by the current AC
+
+./c-run.sh admin-list-permissions.json
+{
+   "status":0,
+   "content":[
+      "myproxy:oa4mp,2012:/client_id/4ad0089bbbc616f054b2e293e83a83bc",
+      "myproxy:oa4mp,2012:/client_id/471ac281a99f17fe0e2b3d903e7d2096",
+      "myproxy:oa4mp,2012:/client_id/281d202334baeeb26d6a8c81ea74cdf4"
+   ]
+}
+
+** Completely removing a client
+There may be a case where you must remove a client from the system. In that case, there is a call to do that.
+Be advised that this is not un-doable. If you remove a client, you must completely recreate it from scratch
+if you need it again.
+
+>./c-run.sh admin-remove-client-client.json
+{"status":0}
+
+Note that the client does not need to be approved prior to removing it.
+
+** Removing a client from administration
+There may be a time when you do not need to remove a client from the system, but no longer wish to manage
+it with a given AC. Since clients may be managed by multiple ACs and trvially, they can manage themselves.
+In the case, you must amend the permissions for the client.
+
+./c-run.sh admin-remove-permissions-client.json
+{"status":0}
+
+More to the point, an AC cannot simply grant itself administration over an arbitrary client. If you remove an
+AC as manager of a client, then the only way to regain it is to have the client itself request hat the AC manage it.
+This prevents an errant AC from, for instance, granting itself the ability to manage arbitrary clients. Remember that
+if an AC creates a client, by default it can manage that client.
+
+>./c-run.sh admin-remove-attribute-client.json
+{"status":0}
+
+and getting the client shows the correct modification (in the example, the error and home uris are removed as are
+the callbacks):
+
+{
+   "status":0,
+   "content":{
+      "client":{
+         "client_id":"myproxy:oa4mp,2012:/client_id/4ad0089bbbc616f054b2e293e83a83bc",
+         "name":"CM test client",
+         "creation_ts":"2017-04-10T16:25:47.000Z",
+         "proxy_limited":true,
+         "rt_lifetime":0,
+         "sign_tokens":false,
+         "scopes":[
+            "openid",
+            "profile",
+            "email",
+            "edu.uiuc.ncsa.myproxy.getcert"
+         ]
+      }
+   },
+   "approved":true
+}
+
+=======================
+A client based session
+----------------------
+When you create a client (e.g. through this API or through the form on the server), the client has permissions
+to manage itself and nothing else.
+
+** Creating a new client
+You should run the script create-client.json which neither assumes an AC or a client. The result will be the full record
+of the client. NOTE that every standard client is un-approved at creation. You must have an administrator for the site
+approve your client.
+>./c-run.sh create-client.json
+
+(Formatted for easy reading)
+
+{
+   "status":0,
+   "content":{
+      "client":{
+         "client_id":"myproxy:oa4mp,2012:/client_id/4ad0089bbbc616f054b2e293e83a83bc",
+         "name":"CM test client",
+         "creation_ts":"2017-04-10T16:25:47.299Z",
+         "home_url":"https://a.b.c/client",
+         "error_url":"https://a.b.c/client/error",
+         "proxy_limited":true,
+         "rt_lifetime":0,
+         "callback_uri":[
+            "https://a.b.c/client/ready1",
+            "https://a.b.c/client/ready2"
+         ],
+         "sign_tokens":false,
+         "scopes":[
+            "openid",
+            "profile",
+            "email"
+         ]
+      }
+   },
+   "secret":"XU1S4-7u9WU9Ii-9JAe3rJomXI83IWmTqSgr9aK-YnF-OIwEQ1X2P7pYEN2idcCkvMGsarVeR0IuWoaXpKvkfByOpBww5WiBh7eaW6-CkgTMHo3-hbPqupY3kWbTpIim3AZQD-mwVgR-bI7bnr7VJ32ZWLWCCYcaaUfevxysbqmsG_MIkfTEBS_9jQwZlozUynHU4IzE-SigWEYL6tFmHPg__KMVCmsbvl3Ud"
+}

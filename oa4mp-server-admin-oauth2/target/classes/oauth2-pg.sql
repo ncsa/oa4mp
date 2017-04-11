@@ -80,7 +80,7 @@ create table :oa4mpSchema.:oa4mpAdminClientTable  (
 
 
 create table :oa4mpSchema.:oa4mpLDAPTable (
-    id         text PRIMARY KEY
+    id         text PRIMARY KEY,
     client_id  text,
     ldap       text);
 

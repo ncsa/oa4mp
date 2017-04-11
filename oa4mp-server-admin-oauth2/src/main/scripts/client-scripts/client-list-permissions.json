@@ -1,0 +1,10 @@
+{
+  "api": {
+    "subject": {"client": {"client_id": "CLIENT_ID"}},
+    "action": {
+      "type": "permission",
+      "method": "list"
+    }
+  },
+  "comment": "This example shows how to list all of the admins of a given client"
+}

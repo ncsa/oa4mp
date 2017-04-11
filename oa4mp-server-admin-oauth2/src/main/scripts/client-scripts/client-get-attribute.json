@@ -1,0 +1,20 @@
+{
+  "api": {
+    "subject": {
+      "client": {
+        "client_id": "CLIENT_ID",
+        "secret": "CLIENT_SECRET"
+      }
+    },
+    "action": {
+      "type": "attribute",
+      "method": "get"
+    },
+    "content": [
+      "callback_uri",
+      "scopes",
+      "home_url"
+    ]
+  },
+  "comment": "This example shows how to get attributes for a client"
+}

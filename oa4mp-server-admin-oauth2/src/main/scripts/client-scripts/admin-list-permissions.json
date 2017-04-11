@@ -1,0 +1,13 @@
+{"api":
+ {
+  "subject":
+   {"admin":
+     {
+     "admin_id": "ADMIN_ID",
+     "secret": "ADMIN_SECRET"
+     }
+   },
+  "action":{"type": "permission","method": "list"}},
+"comment":"This example shows how to list all of the clients managed by this admin"
+
+}

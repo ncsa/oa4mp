@@ -1,0 +1,15 @@
+{"api":
+ {
+  "subject":
+   {"admin":
+     {
+     "admin_id": "ADMIN_ID",
+     "secret": "ADMIN_SECRET"
+     }
+   },
+  "action":{"type": "client","method": "approve"},
+  "object": {"client":{"client_id":"CLIENT_ID"}}
+ },
+"comment":"This example shows how an admin approves a client"
+
+}

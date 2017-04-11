@@ -33,9 +33,12 @@ CREATE TABLE oauth2.clients (
   email         TEXT,
   proxy_limited BOOLEAN,
   creation_ts   TIMESTAMP,
-  rt_lifetime bigint,
-  callback_uri  TEXT
+  rt_lifetime   bigint,
+  callback_uri  TEXT,
+  sign_tokens   BOOLEAN
 );
+
+
 
 
 CREATE TABLE oauth2.adminClients (
@@ -46,13 +49,6 @@ CREATE TABLE oauth2.adminClients (
   creation_ts  TIMESTAMP,
   vo           TEXT,
   issuer       TEXT
-);
-
-CREATE TABLE oauth2.ldap(
-  id            VARCHAR(255) PRIMARY KEY,
-  client_id     VARCHAR(255),
-  ldap          TEXT,
-  UNIQUE INDEX client_id (client_id(255))
 );
 
 
@@ -98,8 +94,7 @@ CREATE TABLE oauth2.transactions (
   scopes text,
   UNIQUE INDEX verifier (verifier_token(255)),
   UNIQUE INDEX accessToken (access_token(255)),
-  UNIQUE INDEX refreshToken (refresh_token(255)),
-  UNIQUE INDEX username (username(255))
+  UNIQUE INDEX refreshToken (refresh_token(255))
 );
 
 
@@ -107,9 +102,9 @@ COMMIT;
 # Now to grant restricted access. The  tables have to exist before this step
 
 GRANT All  ON oauth2.client_approvals TO 'oa4mp-server'@'localhost';
-GRANT ALL ON oauth2.clients TO 'oa4mp-server'@'localhost';
-GRANT ALL ON oauth2.callbacks TO 'oa4mp-server'@'localhost';
-GRANT ALL ON oauth2.transactions TO 'oa4mp-server'@'localhost';
-GRANT ALL ON oauth2.permissions TO 'oa4mp-server'@'localhost';
+GRANT ALL  ON oauth2.clients TO 'oa4mp-server'@'localhost';
+GRANT ALL  ON oauth2.adminClients TO 'oa4mp-server'@'localhost';
+GRANT ALL  ON oauth2.transactions TO 'oa4mp-server'@'localhost';
+GRANT ALL  ON oauth2.permissions TO 'oa4mp-server'@'localhost';
 
 commit;

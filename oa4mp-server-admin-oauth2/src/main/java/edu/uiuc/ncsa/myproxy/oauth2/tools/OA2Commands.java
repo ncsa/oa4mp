@@ -19,6 +19,7 @@ import org.apache.commons.lang.StringUtils;
  * on 4/3/14 at  1:23 PM
  */
 public class OA2Commands extends BaseCommands {
+    public static final String PERMISSIONS = "permissions";
     public static final String ADMINS = "admins";
     public static final String SIGNING = "signing";
 
@@ -82,6 +83,10 @@ public class OA2Commands extends BaseCommands {
         return new OA2AdminClientCommands(getMyLogger(), "  ", getOA2SE().getAdminClientStore(), getOA2SE().getClientApprovalStore());
     }
 
+    public OA2PermissionCommands getPermissionCommands() throws Exception {
+        return new OA2PermissionCommands(getMyLogger(), "  ", getOA2SE().getPermissionStore());
+    }
+
     @Override
     public boolean use(InputLine inputLine) throws Exception {
         CommonCommands commands = null;
@@ -90,6 +95,9 @@ public class OA2Commands extends BaseCommands {
         }
         if (inputLine.hasArg(SIGNING)) {
             commands = new SigningCommands(getOA2SE());
+        }
+        if (inputLine.hasArg(PERMISSIONS)) {
+            commands = getPermissionCommands();
         }
         if (commands != null) {
             CLIDriver cli = new CLIDriver(commands);
