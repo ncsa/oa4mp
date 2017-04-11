@@ -112,7 +112,7 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>client</servlet-name>
-        <url-pattern>/client</url-pattern>
+        <url-pattern>/clients</url-pattern>
     </servlet-mapping>
 
 

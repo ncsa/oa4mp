@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.co.util;
 
 import edu.uiuc.ncsa.co.loader.COSE;
+import edu.uiuc.ncsa.co.util.attributes.AttributeGetResponse;
 import edu.uiuc.ncsa.co.util.attributes.AttributeResponse;
 import edu.uiuc.ncsa.co.util.client.ClientResponse;
 import edu.uiuc.ncsa.co.util.client.CreateResponse;
@@ -56,6 +57,11 @@ public class ResponseSerializer {
             serialize((ClientResponse) response, servletResponse);
             return;
         }
+
+        if (response instanceof AttributeGetResponse) {
+               serialize((AttributeGetResponse) response, servletResponse);
+               return;
+           }
         if (response instanceof AttributeResponse) {
             serialize((AttributeResponse) response, servletResponse);
             return;
@@ -76,6 +82,21 @@ public class ResponseSerializer {
     protected void serialize(ClientResponse response, HttpServletResponse servletResponse) throws IOException {
         ok(servletResponse);
 
+    }
+    protected void serialize(AttributeGetResponse response, HttpServletResponse servletResponse) throws IOException {
+        PrintWriter pw = servletResponse.getWriter();
+        JSONObject json = new JSONObject();
+        json.put("status", 0);
+        OA2ClientKeys keys = (OA2ClientKeys) cose.getClientStore().getACConverter().getKeys();
+        List<String> allKeys = keys.allKeys();
+        allKeys.remove(keys.secret());
+        OA2Client newClient = (OA2Client) cose.getClientStore().getACConverter().subset(response.getClient(), response.getAttributes());
+        JSONObject jsonClient = new JSONObject();
+        cose.getClientStore().getACConverter().toJSON(newClient, jsonClient);
+        json.put("content", jsonClient);
+        //return json;
+
+        pw.println(json);
     }
 
     protected void serialize(AttributeResponse response, HttpServletResponse servletResponse) throws IOException {

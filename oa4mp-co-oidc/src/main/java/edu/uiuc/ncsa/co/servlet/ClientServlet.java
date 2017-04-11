@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.co.loader.COSE;
 import edu.uiuc.ncsa.co.util.ResponseSerializer;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.EnvServlet;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.delegation.services.Response;
 import net.sf.json.JSON;
 import net.sf.json.JSONObject;
@@ -15,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.sql.SQLException;
 
 /**
  * The client management servlet.
@@ -23,6 +25,13 @@ import java.io.IOException;
  */
 public class ClientServlet extends EnvServlet {
 
+    @Override
+    public void storeUpdates() throws IOException, SQLException {
+        if (storeUpdatesDone) return; // run this once
+        storeUpdatesDone = true;
+        processStoreCheck(getCOSE().getAdminClientStore());
+        processStoreCheck(getCOSE().getPermissionStore());
+    }
 
     @Override
     public void doGet(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws ServletException, IOException {
@@ -41,10 +50,10 @@ public class ClientServlet extends EnvServlet {
     @Override
     protected void doIt(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Throwable {
         BufferedReader br = httpServletRequest.getReader();
-        System.err.println("query=" + httpServletRequest.getQueryString());
+        DebugUtil.dbg(this, "query=" + httpServletRequest.getQueryString());
         StringBuffer stringBuffer = new StringBuffer();
         String line = br.readLine();
-        System.err.println("line=" + line);
+        DebugUtil.dbg(this, "line=" + line);
         while (line != null) {
             stringBuffer.append(line);
             line = br.readLine();
@@ -63,7 +72,7 @@ public class ClientServlet extends EnvServlet {
         try {
             Response response = getClientManager().process((JSONObject) rawJSON);
             getResponseSerializer().serialize(response, httpServletResponse);
-        }catch(Throwable t){
+        } catch (Throwable t) {
             t.printStackTrace();
             throw t;
         }
@@ -71,18 +80,18 @@ public class ClientServlet extends EnvServlet {
 
     }
 
-    protected COSE getCOSE(){
-        return (COSE)getEnvironment();
+    protected COSE getCOSE() {
+        return (COSE) getEnvironment();
     }
+
     public ResponseSerializer getResponseSerializer() {
-        if(responseSerializer == null){
+        if (responseSerializer == null) {
             responseSerializer = new ResponseSerializer(getCOSE());
         }
         return responseSerializer;
     }
 
     ResponseSerializer responseSerializer = null;
-
 
 
 }

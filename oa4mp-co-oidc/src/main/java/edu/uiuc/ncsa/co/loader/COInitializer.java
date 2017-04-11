@@ -30,10 +30,10 @@ public class COInitializer extends OA2ServletInitializer {
         COSE cose = (COSE) getEnvironment();
 
         try {
-                 SATFactory.setAdminClientConverter(AdminClientStoreProviders.getAdminClientConverter());
-                 SATFactory.setClientConverter((ClientConverter<? extends Client>) cose.getClientStore().getACConverter());
-             } catch (Exception e) {
-                 e.printStackTrace();
-             }
+            SATFactory.setAdminClientConverter(AdminClientStoreProviders.getAdminClientConverter());
+            SATFactory.setClientConverter((ClientConverter<? extends Client>) cose.getClientStore().getACConverter());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

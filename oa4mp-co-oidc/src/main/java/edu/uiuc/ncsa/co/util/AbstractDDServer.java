@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.co.loader.COSE;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.Permission;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionException;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionList;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionsStore;
 import edu.uiuc.ncsa.security.delegation.server.UnapprovedClientException;
@@ -59,29 +60,48 @@ public abstract class AbstractDDServer implements DoubleDispatchServer, Server {
     }
 
     protected void canRead(AbstractDDRequest request) {
-        isACApproved(request);
-        getPermissions(request).canRead();
+        if (request.getAdminClient() != null) {
+            isACApproved(request);
+            getPermissions(request).canRead();
+        }
+        if (request.getClient() == null) throw new PermissionException("Missing client.");
     }
 
     protected void canWrite(AbstractDDRequest request) {
-        isACApproved(request);
+        // the contract is that if the subject is an admin, check the permissions.
+        if (request.getAdminClient() != null) {
+            isACApproved(request);
+            getPermissions(request).canWrite();
+        }
+        // if the subject is a client, then the object must be absent or the same
+        if (request.getClient() == null) throw new PermissionException("Missing client.");
 
-        getPermissions(request).canWrite();
     }
-   protected void isACApproved(AbstractDDRequest request){
-      if(!getClientApprovalStore().isApproved(request.adminClient.getIdentifier())){
-          throw new UnapprovedClientException("This client is not approved", request.adminClient);
-      }
-   }
-    protected void canApprove(AbstractDDRequest request) {
 
-        isACApproved(request);
-        getPermissions(request).canApprove();
+    protected void isACApproved(AbstractDDRequest request) {
+        if (!getClientApprovalStore().isApproved(request.adminClient.getIdentifier())) {
+            throw new UnapprovedClientException("This admin client is not approved", request.adminClient);
+        }
+    }
+
+    protected void canApprove(AbstractDDRequest request) {
+        if (request.getAdminClient() != null) {
+
+            isACApproved(request);
+            getPermissions(request).canApprove();
+        }
+        if (request.getClient() == null) throw new PermissionException("Missing client.");
+
     }
 
     protected void canDelete(AbstractDDRequest request) {
-        isACApproved(request);
-        getPermissions(request).canDelete();
+        if (request.getAdminClient() != null) {
+
+            isACApproved(request);
+            getPermissions(request).canDelete();
+        }
+        if (request.getClient() == null) throw new PermissionException("Missing client.");
+
     }
 
     protected void canCreate(AbstractDDRequest request) {

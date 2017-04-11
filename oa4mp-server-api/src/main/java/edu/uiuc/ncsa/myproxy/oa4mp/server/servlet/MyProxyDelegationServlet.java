@@ -9,7 +9,6 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.util.AbstractCLIApprover;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.ExceptionEventNotifier;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.NewClientNotifier;
 import edu.uiuc.ncsa.security.core.Identifier;
-import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.cache.Cache;
 import edu.uiuc.ncsa.security.core.cache.CachedObject;
 import edu.uiuc.ncsa.security.core.cache.Cleanup;
@@ -28,7 +27,6 @@ import edu.uiuc.ncsa.security.delegation.storage.TransactionStore;
 import edu.uiuc.ncsa.security.delegation.storage.impl.BasicTransaction;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.servlet.NotificationListener;
-import edu.uiuc.ncsa.security.storage.sql.SQLStore;
 import edu.uiuc.ncsa.security.util.mail.MailUtil;
 import edu.uiuc.ncsa.security.util.pkcs.KeyPairPopulationThread;
 
@@ -178,13 +176,6 @@ public abstract class MyProxyDelegationServlet extends EnvServlet implements Tra
         notifiersSet = true;
     }
 
-    /**
-     * This will be invoked at init before anything else and should include code to seamlessly upgrade stores from earlier versions.
-     * For instance, if a new column needs to be added to a table. This pre-supposes that the current user has the correct
-     * permissions to alter the table, btw. This also updates the internal flag {@link #storeUpdatesDone} which should be
-     * checks in overrides. If you override this method and call super, let super manage this flag. If it is true, do not
-     * execute your method.
-     */
     public void storeUpdates() throws IOException, SQLException {
         if (storeUpdatesDone) return; // run this once
         storeUpdatesDone = true;
@@ -192,14 +183,6 @@ public abstract class MyProxyDelegationServlet extends EnvServlet implements Tra
         processStoreCheck(getServiceEnvironment().getClientStore());
         processStoreCheck(getServiceEnvironment().getClientApprovalStore());
     }
-
-    public void processStoreCheck(Store store) throws SQLException {
-        if (store instanceof SQLStore) {
-            ((SQLStore) store).checkColumns();
-        }
-    }
-
-    public static boolean storeUpdatesDone = false;
 
 
     public static AbstractCLIApprover.ClientApprovalThread caThread = null;

@@ -136,7 +136,7 @@ public class ManagerFacade {
 
     protected Response process(AdminClient subject, OA2Client target, ActionGet actionGet, JSONObject rawJSON) {
         if (getTypeValue(rawJSON) == TYPE_ATTRIBUTE_VALUE) {
-            return getClientServer().process(RequestFactory.createRequest(subject, new TypeAttribute(), actionGet, target,
+            return getAttributeServer().process(RequestFactory.createRequest(subject, new TypeAttribute(), actionGet, target,
                     SATFactory.getContent(rawJSON)));
         }
 
@@ -211,7 +211,10 @@ public class ManagerFacade {
                 return process(target, subject, new ActionList(), rawJSON);
             case ACTION_SET_VALUE:
                 return process(target, subject, new ActionSet(), rawJSON);
+            case ACTION_REMOVE_VALUE:
+                return process(target, subject, new ActionRemove(), rawJSON);
             case ACTION_UNAPPROVE_VALUE:
+
         }
         throw new NotImplementedException("unrecognized target of action");
 
@@ -250,6 +253,8 @@ public class ManagerFacade {
                 return process((AdminClient) getSubject(rawJSON), rawJSON);
             case SUBJECT_CLIENT_VALUE:
                 return process((OA2Client) getSubject(rawJSON), rawJSON);
+            case SUBJECT_UNKNOWN_VALUE:
+                return process((OA2Client)null, rawJSON);
         }
         throw new IllegalArgumentException("Unknown type.");
 

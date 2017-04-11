@@ -21,8 +21,8 @@ public class AttributeServer extends AbstractDDServer {
 
     public AttributeResponse get(AttributeGetRequest request) {
         canRead(request);
-
-        AttributeResponse response = new AttributeResponse(subset(request.getClient(), request.attributes));
+        OA2Client fullclient = (OA2Client) getClientStore().get(request.getClient().getIdentifier());
+        AttributeGetResponse response = new AttributeGetResponse(subset(fullclient, request.attributes), request.attributes);
         return response;
     }
 

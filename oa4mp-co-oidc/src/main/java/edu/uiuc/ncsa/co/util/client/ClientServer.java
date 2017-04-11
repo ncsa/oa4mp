@@ -85,9 +85,12 @@ public class ClientServer extends AbstractDDServer {
         // client.setIdentifier(clientID); // since this gets scrubbed by the previous method.
         // response requires new client and its actual secret
         // set the permissions for this.
-        PermissionServer permissionServer = new PermissionServer(cose);
-        permissionServer.process(RequestFactory.createRequest(request.getAdminClient(), new TypePermission(), new ActionAdd(), client, null));
-
+        if(request.getAdminClient() != null) {
+            // if there is no admin client, then do not set permissions for it. It is possible for a client to simply
+            // be created and manage itself.
+            PermissionServer permissionServer = new PermissionServer(cose);
+            permissionServer.process(RequestFactory.createRequest(request.getAdminClient(), new TypePermission(), new ActionAdd(), client, null));
+        }
         return new CreateResponse(client, secret);
     }
 

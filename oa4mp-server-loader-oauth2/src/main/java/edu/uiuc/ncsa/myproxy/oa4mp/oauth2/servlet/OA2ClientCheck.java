@@ -33,8 +33,6 @@ public class OA2ClientCheck {
         boolean foundCB = false;
         if(oa2Client.getCallbackURIs() == null){
             throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, "client has not registered any callback URIs", HttpStatus.SC_BAD_REQUEST);
-
-//            throw new GeneralException("Error: client has not registered any callback URIs.");
         }
         for (String uri : oa2Client.getCallbackURIs()) {
             if (uri.equals(redirect)) {
