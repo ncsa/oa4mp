@@ -1,0 +1,19 @@
+{
+  "api": {
+    "subject": {
+      "admin": {
+        "admin_id": "ADMIN_ID",
+        "secret": "ADMIN_SECRET"
+      }
+    },
+    "action": {
+      "type": "attribute",
+      "method": "set"
+    },
+    "content": {
+      "vo": "test:vo/test/123",
+      "issuer":"https://my.org"
+    }
+  },
+  "comment": "This example shows how to set attributes for an admin client"
+}

@@ -44,7 +44,6 @@ A typical response would be (formatted here for easy reading)
          "name":"CM test client",
          "creation_ts":"2017-04-10T16:25:47.299Z",
          "home_url":"https://a.b.c/client",
-         "error_url":"https://a.b.c/client/error",
          "proxy_limited":true,
          "rt_lifetime":0,
          "callback_uri":[
@@ -71,7 +70,7 @@ export CLIENT_SECRET=qgB...
 
 Issue
 
->./c-run.sh admin-client-approve-client.json
+>./c-run.sh admin-approve-client-client.json
 {"status":0}
 
 Which means this succeeded. Check it by getting the client

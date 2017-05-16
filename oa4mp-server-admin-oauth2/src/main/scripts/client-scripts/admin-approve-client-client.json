@@ -8,7 +8,9 @@
      }
    },
   "action":{"type": "client","method": "approve"},
-  "object": {"client":{"client_id":"CLIENT_ID"}}
+  "object": {"client":{"client_id":"CLIENT_ID"}},
+  "content":{"approver":"Jeff"}
+
  },
 "comment":"This example shows how an admin approves a client"
 

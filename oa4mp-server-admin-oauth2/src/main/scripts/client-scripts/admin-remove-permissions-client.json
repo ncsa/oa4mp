@@ -16,5 +16,5 @@
       }
     }
   },
-  "comment": "This example shows how to remove the client from the list of those administered by this admin"
+  "comment": "This example shows how to remove the client from the list of those managed by this admin"
 }

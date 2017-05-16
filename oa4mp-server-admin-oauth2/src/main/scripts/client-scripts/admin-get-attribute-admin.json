@@ -1,0 +1,21 @@
+{
+  "api": {
+    "subject": {
+      "admin": {
+        "admin_id": "ADMIN_ID",
+        "secret": "ADMIN_SECRET"
+      }
+    },
+    "action": {
+      "type": "attribute",
+      "method": "get"
+    },
+    "content": [
+      "email",
+      "name",
+      "issuer",
+      "vo"
+    ]
+  },
+  "comment": "This example shows how to get a set of attributes for an admin client"
+}

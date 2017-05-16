@@ -15,7 +15,6 @@
         "email"
       ],
       "home_url": "https://a.b.c/client",
-      "error_url": "https://a.b.c/client/error",
       "proxy_limited": true,
       "name": "CM test client"
     }

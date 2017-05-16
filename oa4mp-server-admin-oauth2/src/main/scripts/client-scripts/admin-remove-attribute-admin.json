@@ -1,0 +1,19 @@
+{
+   "api":{
+      "subject":{
+         "admin":{
+            "admin_id":"ADMIN_ID",
+            "secret":"ADMIN_SECRET"
+         }
+      },
+      "action":{
+         "type":"attribute",
+         "method":"remove"
+      },
+      "content":[
+         "vo",
+         "issuer"
+      ]
+   },
+   "comment":"This example shows how to remove a set of attributes from a given admin client."
+}
