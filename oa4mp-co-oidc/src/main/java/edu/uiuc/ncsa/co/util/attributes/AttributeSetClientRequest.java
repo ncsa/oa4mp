@@ -9,8 +9,8 @@ import java.util.Map;
  * <p>Created by Jeff Gaynor<br>
  * on 11/30/16 at  3:49 PM
  */
-public class AttributeSetRequest extends AttributeRequest{
-    public AttributeSetRequest(AdminClient adminClient, OA2Client client, Map<String,Object> attributes) {
+public class AttributeSetClientRequest extends AttributeRequest{
+    public AttributeSetClientRequest(AdminClient adminClient, OA2Client client, Map<String, Object> attributes) {
         super(adminClient, client);
         this.attributes = attributes;
     }

@@ -7,8 +7,8 @@ import edu.uiuc.ncsa.security.delegation.storage.Client;
  * <p>Created by Jeff Gaynor<br>
  * on 11/28/16 at  1:39 PM
  */
-public class AttributeResponse implements Response {
-    public AttributeResponse(Client client) {
+public class AttributeClientResponse implements Response {
+    public AttributeClientResponse(Client client) {
         this.client = client;
     }
 
