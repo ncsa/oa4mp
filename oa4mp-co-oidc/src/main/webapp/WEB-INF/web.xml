@@ -18,7 +18,7 @@
    endpoint for processing.
     -->
 
-    <!--  <security-constraint>
+      <security-constraint>
           <web-resource-collection>
               <web-resource-name>Lockdown_authorized_endpoint</web-resource-name>
               <url-pattern>/authorized</url-pattern>
@@ -28,7 +28,7 @@
               <http-method>DELETE</http-method>
           </web-resource-collection>
           <auth-constraint/>
-      </security-constraint>-->
+      </security-constraint>
 
 
 
@@ -168,7 +168,7 @@
         <login-config>
         <auth-method>BASIC</auth-method>
         </login-config>-->
-
+ <!--
     <resource-ref>
         <description>
             Resource reference to a factory for javax.mail.Session
@@ -176,11 +176,11 @@
             messages, preconfigured to connect to the appropriate
             SMTP server.
         </description>
-        <res-ref-name>mail/Session</res-ref-name>
+        <res-ref-name>java:comp/env/mail/Session</res-ref-name>
         <res-type>javax.mail.Session</res-type>
         <res-auth>Container</res-auth>
     </resource-ref>
-
+    -->
     <listener>
         <listener-class>edu.uiuc.ncsa.co.loader.COBootstrapper</listener-class>
 

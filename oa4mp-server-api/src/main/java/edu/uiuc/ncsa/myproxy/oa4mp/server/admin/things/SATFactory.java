@@ -6,7 +6,9 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions.*;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.types.*;
 import edu.uiuc.ncsa.security.delegation.storage.BaseClient;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
+import edu.uiuc.ncsa.security.delegation.storage.ClientKeys;
 import edu.uiuc.ncsa.security.delegation.storage.impl.ClientConverter;
+import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -38,17 +40,24 @@ public class SATFactory implements SAT {
 
 
     public static int getSubjectValue(JSONObject json) {
-            JSONObject api = json.getJSONObject(KEYS_API);
-            JSONObject subject = api.getJSONObject(KEYS_SUBJECT);
-            if (subject.containsKey(SUBJECT_ADMIN)) {
-                return SUBJECT_ADMIN_VALUE;
-            }
+        JSONObject api = json.getJSONObject(KEYS_API);
+        JSONObject subject = api.getJSONObject(KEYS_SUBJECT);
+        if (subject.containsKey(SUBJECT_ADMIN)) {
+            return SUBJECT_ADMIN_VALUE;
+        }
 
-            if (subject.containsKey(SUBJECT_CLIENT)) {
-                return SUBJECT_CLIENT_VALUE;
-            }
-            return SUBJECT_UNKNOWN_VALUE;
+        if (subject.containsKey(SUBJECT_CLIENT)) {
+            return SUBJECT_CLIENT_VALUE;
+        }
+        return SUBJECT_UNKNOWN_VALUE;
     }
+
+    /**
+     * This is the key used in the API for the client secret. Since it is usually different from what is used in the serialization
+     * keys, it must be converted here from that for use.
+     */
+    public static final String CLIENT_SECRET_KEY = "secret";
+
     public static BaseClient getSubject(JSONObject json) {
         JSONObject api = json.getJSONObject(KEYS_API);
         JSONObject subject = api.getJSONObject(KEYS_SUBJECT);
@@ -57,6 +66,13 @@ public class SATFactory implements SAT {
         }
 
         if (subject.containsKey(SUBJECT_CLIENT)) {
+            JSONObject j2 = subject.getJSONObject(SUBJECT_CLIENT);
+            SerializationKeys k1 = getClientConverter().getKeys();
+            String secretKey = ((ClientKeys) k1).secret();
+            if (j2.containsKey(CLIENT_SECRET_KEY)) {
+                j2.put(secretKey, j2.getString(CLIENT_SECRET_KEY));
+                j2.remove(CLIENT_SECRET_KEY);
+            }
             return getClientConverter().fromJSON(subject);
         }
         return null;
@@ -64,37 +80,43 @@ public class SATFactory implements SAT {
 
     public static int getTargetValue(JSONObject json) {
         JSONObject api = json.getJSONObject(KEYS_API);
-              JSONObject target = api.getJSONObject(KEYS_TARGET);
-              if (target.containsKey(SUBJECT_ADMIN)) {
-                   return TARGET_ADMIN_VALUE;
-               }
+        JSONObject target = api.getJSONObject(KEYS_TARGET);
+        if (target.containsKey(SUBJECT_ADMIN)) {
+            return TARGET_ADMIN_VALUE;
+        }
 
-               if (target.containsKey(SUBJECT_CLIENT)) {
-                   return TARGET_CLIENT_VALUE;
-               }
+        if (target.containsKey(SUBJECT_CLIENT)) {
+            return TARGET_CLIENT_VALUE;
+        }
         return TARGET_NO_VALUE;
     }
+
     public static BaseClient getTarget(JSONObject json) {
         JSONObject api = json.getJSONObject(KEYS_API);
         JSONObject target = api.getJSONObject(KEYS_TARGET);
         if (target.containsKey(SUBJECT_ADMIN)) {
-             return getACConverter().fromJSON(target.getJSONObject(SUBJECT_ADMIN));
-         }
+            return getACConverter().fromJSON(target);
+        }
 
-         if (target.containsKey(SUBJECT_CLIENT)) {
-             return getClientConverter().fromJSON(target);
-         }
-         return null;
+        if (target.containsKey(SUBJECT_CLIENT)) {
+            return getClientConverter().fromJSON(target);
+        }
+        return null;
     }
 
     public static JSON getContent(JSONObject json) {
         JSONObject api = json.getJSONObject(KEYS_API);
         Object object = api.get(KEYS_CONTENT);
-        if(object == null) return null;
-        if(object instanceof JSONObject){return (JSONObject)object;}
-        if(object instanceof JSONArray){return (JSONArray)object;}
+        if (object == null) return null;
+        if (object instanceof JSONObject) {
+            return (JSONObject) object;
+        }
+        if (object instanceof JSONArray) {
+            return (JSONArray) object;
+        }
         throw new IllegalArgumentException("Error: content is not json but of type " + object.getClass().getSimpleName());
     }
+
     public static int getMethodValue(JSONObject json) {
         JSONObject api = json.getJSONObject(KEYS_API);
         JSONObject action = api.getJSONObject(KEYS_ACTION);
@@ -139,6 +161,7 @@ public class SATFactory implements SAT {
         return TYPE_UNKNOWN_VALUE;
 
     }
+
     public static Type getType(JSONObject json) {
         JSONObject api = json.getJSONObject(KEYS_API);
         JSONObject action = api.getJSONObject(KEYS_ACTION);

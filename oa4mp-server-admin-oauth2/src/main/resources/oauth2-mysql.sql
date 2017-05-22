@@ -22,6 +22,8 @@ Some useful commands. Lst two list users and will show permissions for a single 
  Show schemas;
  SELECT User FROM mysql.user;
  SHOW GRANTS FOR 'user'@'localhost';
+ Another note: The timestamp fields are given a default value of NULL since under MariaDB the default now is to
+ change the value of any timestamp field on update, effectively rendering all of the "last modified"
  */
 
 CREATE TABLE oauth2.clients (
@@ -32,7 +34,7 @@ CREATE TABLE oauth2.clients (
   error_url     TEXT,
   email         TEXT,
   proxy_limited BOOLEAN,
-  creation_ts   TIMESTAMP,
+  creation_ts   TIMESTAMP DEFAULT NULL,
   rt_lifetime   bigint,
   callback_uri  TEXT,
   sign_tokens   BOOLEAN
@@ -46,13 +48,13 @@ CREATE TABLE oauth2.adminClients (
   name         TEXT,
   secret       TEXT,
   email        TEXT,
-  creation_ts  TIMESTAMP,
+  creation_ts  TIMESTAMP DEFAULT NULL,
   vo           TEXT,
   issuer       TEXT
 );
 
 
-CREATE TABLE oauth2.permissions (
+CREATE TABLE permissions (
   permission_id VARCHAR(255) PRIMARY KEY,
   admin_id      VARCHAR(255),
   client_id     VARCHAR(255),
@@ -61,16 +63,14 @@ CREATE TABLE oauth2.permissions (
   can_read      BOOLEAN,
   can_remove    BOOLEAN,
   can_write     BOOLEAN,
-  creation_ts   TIMESTAMP,
-  UNIQUE INDEX admin_id (admin_id(255)),
-  UNIQUE INDEX client_id (client_id(255))
+  creation_ts   TIMESTAMP DEFAULT NULL
 );
 
 CREATE TABLE oauth2.client_approvals (
   client_id   VARCHAR(255) PRIMARY KEY,
   approver    TEXT,
   approved    BOOLEAN,
-  approval_ts TIMESTAMP
+  approval_ts TIMESTAMP DEFAULT NULL
 );
 
 CREATE TABLE oauth2.transactions (

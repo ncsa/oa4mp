@@ -3,7 +3,7 @@ This is a sample session of how to use the scripts.
 Before you can begin:
 ---------------------
 
-* Copy the entire set of scripts (everythign in the current directory) to some location of your choice.
+* Copy the entire set of scripts (everything in the current directory) to some location of your choice.
 
 * You must have an approved admin client to use admin client (AC) features (such as approving a client). This must
   be requested from the server you wish to use and approved before you can begin.

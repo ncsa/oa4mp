@@ -7,7 +7,6 @@ import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.oauth_2_0.UserInfo;
 import edu.uiuc.ncsa.security.oauth_2_0.server.LDAPConfiguration;
 import edu.uiuc.ncsa.security.oauth_2_0.server.LDAPConfigurationUtil;
-import edu.uiuc.ncsa.security.oauth_2_0.server.OA2Claims;
 import edu.uiuc.ncsa.security.oauth_2_0.server.UnsupportedScopeException;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -55,7 +54,8 @@ public class LDAPScopeHandler extends BasicScopeHandler {
         xxx.getJSONObject("ldap").getJSONObject("ssl").put("keystore","");
         System.err.println(xxx);
         if(getCfg().getSearchNameKey() == null){
-            throw new IllegalStateException("Error: no search name specified.");
+            getMyLogger().warn("No search name given for LDAP query. Using default of username");
+            return transaction.getUsername();
         }
         if(getCfg().getSearchNameKey().equals(LDAPConfigurationUtil.SEARCH_NAME_USERNAME)){
             return transaction.getUsername();
@@ -64,10 +64,12 @@ public class LDAPScopeHandler extends BasicScopeHandler {
             throw new IllegalStateException("Error: no recognized search name key was found. Requested was \"" + getCfg().getSearchNameKey() + "\"");
         }
         String searchName = (String) userInfo.getMap().get(getCfg().getSearchNameKey());
+/*
         if(!getCfg().getSearchNameKey().equals(OA2Claims.EMAIL)) {
-            // This is to look in the NCSA's LDAP handler
+            // Use the name on the email address, not the whole email addrress
             searchName = searchName.substring(0, searchName.indexOf("@")); // take the name from the email
         }
+*/
            return searchName;
     }
 

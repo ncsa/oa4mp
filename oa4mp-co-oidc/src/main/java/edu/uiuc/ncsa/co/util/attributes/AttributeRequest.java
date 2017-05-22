@@ -25,8 +25,8 @@ public abstract class AttributeRequest extends AbstractDDRequest {
                    return attributeServer.get((AttributeGetRequest) this);
                }
 
-               if(this instanceof AttributeSetRequest){
-                   return attributeServer.set((AttributeSetRequest) this);
+               if(this instanceof AttributeSetClientRequest){
+                   return attributeServer.set((AttributeSetClientRequest) this);
                }
 
                if(this instanceof AttributeRemoveRequest){

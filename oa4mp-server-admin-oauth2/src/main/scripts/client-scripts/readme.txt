@@ -6,10 +6,10 @@ This directory contains a full set of scripts to exercise the client management 
 
 Requirements.
 -------------
-These scripts run under linux. In particular, they require some form of bash, set and cUrl. There are no plans
+These scripts run under linux. In particular, they require some form of bash, sed and cUrl. There are no plans
 to port these to any other platform at this time.
 
-The way these scripts work is that there is a driver script, c.sh, that will accept a script containing json.
+The way these scripts work is that there is a driver script, c-run.sh, that will accept a script containing json.
 Various bits of information (detailed below) are replaced in the script from environment variables. The command is
 run and the raw json is printed to the console. This is preferrable since there are many things that may be done
 with the output and we do not want to pre-digest it into something unusable.

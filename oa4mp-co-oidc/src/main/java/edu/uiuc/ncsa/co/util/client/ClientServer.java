@@ -9,9 +9,11 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionList;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions.ActionAdd;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.types.TypePermission;
 import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.delegation.storage.ClientKeys;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Client;
+import edu.uiuc.ncsa.security.oauth_2_0.OA2ClientApprovalKeys;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnMap;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -33,6 +35,8 @@ public class ClientServer extends AbstractDDServer {
         canApprove(request);
         Identifier id = request.getClient().getIdentifier();
         ClientApproval approval = null;
+        OA2ClientApprovalKeys keys = new OA2ClientApprovalKeys();
+
         if (getClientApprovalStore().containsKey(id)) {
             approval = (ClientApproval) getClientApprovalStore().get(id);
         } else {
@@ -40,7 +44,12 @@ public class ClientServer extends AbstractDDServer {
             // approval ID must be the same as the client's
             approval.setIdentifier(id);
         }
-        approval.setApprover(request.getAdminClient().getName());
+        if (request.getAttributes().containsKey(keys.approver())) {
+            approval.setApprover(String.valueOf(request.getAttributes().get(keys.approver())));
+
+        } else {
+            approval.setApprover(request.getAdminClient().getIdentifierString());
+        }
         approval.setApproved(true);
         getClientApprovalStore().save(approval);
         return new ClientResponse();
@@ -49,7 +58,13 @@ public class ClientServer extends AbstractDDServer {
     public ClientResponse unapprove(UnapproveRequest request) {
         canApprove(request);
         ClientApproval approval = (ClientApproval) getClientApprovalStore().get(request.getClient().getIdentifier());
-        approval.setApprover(request.getAdminClient().getName());
+        OA2ClientApprovalKeys keys = new OA2ClientApprovalKeys();
+        if (request.getAttributes().containsKey(keys.approver())) {
+            approval.setApprover(String.valueOf(request.getAttributes().get(keys.approver())));
+
+        } else {
+            approval.setApprover(request.getAdminClient().getIdentifierString());
+        }
         approval.setApproved(false);
         getClientApprovalStore().save(approval);
         return new ClientResponse();
@@ -58,6 +73,10 @@ public class ClientServer extends AbstractDDServer {
     SecureRandom random = new SecureRandom();
 
     public CreateResponse create(CreateRequest request) {
+        if (request.getAdminClient() != null && (request.getAdminClient().getIdentifier() == null || request.getAdminClient().getIdentifierString().length() == 0)) {
+            throw new GeneralException("Error: An admin client was specified, but no identifier for this client was given. Request rejected.");
+        }
+
         //canCreate(request);
         //requires and admin client and hashmap
         ColumnMap values = new ColumnMap();
@@ -85,7 +104,7 @@ public class ClientServer extends AbstractDDServer {
         // client.setIdentifier(clientID); // since this gets scrubbed by the previous method.
         // response requires new client and its actual secret
         // set the permissions for this.
-        if(request.getAdminClient() != null) {
+        if (request.getAdminClient() != null) {
             // if there is no admin client, then do not set permissions for it. It is possible for a client to simply
             // be created and manage itself.
             PermissionServer permissionServer = new PermissionServer(cose);
@@ -120,8 +139,7 @@ public class ClientServer extends AbstractDDServer {
         canRead(request);
         OA2Client client = (OA2Client) getClientStore().get(request.getClient().getIdentifier());
         client.setSecret(""); // do not return the secret or its hash
-        cose.getClientApprovalStore().isApproved(client.getIdentifier());
-        return new GetResponse(client,cose.getClientApprovalStore().isApproved(client.getIdentifier()));
+        return new GetResponse(client, cose.getClientApprovalStore().isApproved(client.getIdentifier()));
     }
 
 }

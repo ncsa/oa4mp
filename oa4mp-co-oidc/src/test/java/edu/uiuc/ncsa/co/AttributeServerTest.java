@@ -38,7 +38,7 @@ public class AttributeServerTest extends DDServerTests {
         array.add(keys.name());
 
         AttributeGetRequest req = RequestFactory.createRequest(cc.adminClient, new TypeAttribute(), new ActionGet(), cc.client, array);
-        AttributeResponse r = (AttributeResponse) attributeServer.process(req);
+        AttributeClientResponse r = (AttributeClientResponse) attributeServer.process(req);
         OA2Client reducedClient = (OA2Client) r.getClient();
         assert reducedClient.getIdentifier().equals(cc.client.getIdentifier());
         assert reducedClient.getScopes() != null;
@@ -64,8 +64,8 @@ public class AttributeServerTest extends DDServerTests {
         map.put(keys.name(), "new name " + random);
         map.put(keys.homeURL(), "https://" + random + "/client");
         map.put(keys.scopes(), scopes);
-        AttributeSetRequest req = RequestFactory.createRequest(cc.adminClient, new TypeAttribute(), new ActionSet(), cc.client, map);
-        AttributeResponse resp = (AttributeResponse) attributeServer.process(req);
+        AttributeSetClientRequest req = RequestFactory.createRequest(cc.adminClient, new TypeAttribute(), new ActionSet(), cc.client, map);
+        AttributeClientResponse resp = (AttributeClientResponse) attributeServer.process(req);
         OA2Client client = (OA2Client) resp.getClient();
         assert client.getName().equals(map.get(keys.name()));
         assert client.getIdentifier().equals(cc.client.getIdentifier());
@@ -87,7 +87,7 @@ public class AttributeServerTest extends DDServerTests {
         attributes.add(keys.rtLifetime());
         attributes.add(keys.scopes());
         AttributeRemoveRequest req = RequestFactory.createRequest(cc.adminClient, new TypeAttribute(), new ActionRemove(), cc.client, attributes);
-        AttributeResponse resp = (AttributeResponse) attributeServer.process(req);
+        AttributeClientResponse resp = (AttributeClientResponse) attributeServer.process(req);
         OA2Client client = (OA2Client) resp.getClient();
         assert client.getScopes() == null || client.getScopes().isEmpty();
         assert client.getRtLifetime() == 0L;

@@ -59,6 +59,22 @@ public abstract class AbstractDDServer implements DoubleDispatchServer, Server {
 
     }
 
+    protected AdminClient subset(AdminClient client, List<String> attributes) {
+        ColumnMap map = new ColumnMap();
+
+        cose.getAdminClientStore().getACConverter().toMap(client, map);
+        ColumnMap reducedMap = new ColumnMap();
+
+        for (String key : attributes) {
+            reducedMap.put(key, map.get(key));
+        }
+        // Have to always include the identifier.
+        reducedMap.put(cose.getClientStore().getACConverter().getKeys().identifier(), client.getIdentifierString());
+        AdminClient x = (AdminClient) cose.getAdminClientStore().getACConverter().fromMap(reducedMap, null);
+        return x;
+
+    }
+
     protected void canRead(AbstractDDRequest request) {
         if (request.getAdminClient() != null) {
             isACApproved(request);

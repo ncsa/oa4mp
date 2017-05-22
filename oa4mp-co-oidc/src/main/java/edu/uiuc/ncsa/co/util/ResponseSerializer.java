@@ -1,16 +1,20 @@
 package edu.uiuc.ncsa.co.util;
 
 import edu.uiuc.ncsa.co.loader.COSE;
-import edu.uiuc.ncsa.co.util.attributes.AttributeGetResponse;
-import edu.uiuc.ncsa.co.util.attributes.AttributeResponse;
+import edu.uiuc.ncsa.co.util.admin.ACGetResponse;
+import edu.uiuc.ncsa.co.util.attributes.AttributeAdminClientResponse;
+import edu.uiuc.ncsa.co.util.attributes.AttributeClientResponse;
+import edu.uiuc.ncsa.co.util.attributes.AttributeGetAdminClientResponse;
+import edu.uiuc.ncsa.co.util.attributes.AttributeGetClientResponse;
 import edu.uiuc.ncsa.co.util.client.ClientResponse;
 import edu.uiuc.ncsa.co.util.client.CreateResponse;
 import edu.uiuc.ncsa.co.util.client.GetResponse;
+import edu.uiuc.ncsa.co.util.permissions.AddClientResponse;
 import edu.uiuc.ncsa.co.util.permissions.ListAdminsResponse;
 import edu.uiuc.ncsa.co.util.permissions.ListClientResponse;
 import edu.uiuc.ncsa.co.util.permissions.PermissionResponse;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.Permission;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientKeys;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.delegation.services.Response;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Client;
@@ -58,21 +62,41 @@ public class ResponseSerializer {
             return;
         }
 
-        if (response instanceof AttributeGetResponse) {
-               serialize((AttributeGetResponse) response, servletResponse);
-               return;
-           }
-        if (response instanceof AttributeResponse) {
-            serialize((AttributeResponse) response, servletResponse);
+        if (response instanceof AttributeGetClientResponse) {
+            serialize((AttributeGetClientResponse) response, servletResponse);
+            return;
+        }
+        if (response instanceof AttributeClientResponse) {
+            serialize((AttributeClientResponse) response, servletResponse);
             return;
         }
 
-        if (response instanceof Permission) {
-               serialize((PermissionResponse) response, servletResponse);
-               return;
-           }
+        if (response instanceof ACGetResponse) {
+            serialize((ACGetResponse) response, servletResponse);
+            return;
+        }
+
+        if (response instanceof AttributeGetAdminClientResponse) {
+            serialize((AttributeGetAdminClientResponse) response, servletResponse);
+            return;
+        }
+
+        if (response instanceof AttributeAdminClientResponse) {
+            serialize((AttributeAdminClientResponse) response, servletResponse);
+            return;
+        }
+        if(response instanceof AddClientResponse){
+            serialize((AddClientResponse)response, servletResponse);
+            return;
+        }
+        if (response instanceof PermissionResponse) {
+            serialize((PermissionResponse) response, servletResponse);
+            return;
+        }
+
         throw new NotImplementedException("Serialization of this response is not implemented yet");
     }
+
     protected void serialize(PermissionResponse response, HttpServletResponse servletResponse) throws IOException {
         ok(servletResponse);
 
@@ -83,7 +107,8 @@ public class ResponseSerializer {
         ok(servletResponse);
 
     }
-    protected void serialize(AttributeGetResponse response, HttpServletResponse servletResponse) throws IOException {
+
+    protected void serialize(AttributeGetClientResponse response, HttpServletResponse servletResponse) throws IOException {
         PrintWriter pw = servletResponse.getWriter();
         JSONObject json = new JSONObject();
         json.put("status", 0);
@@ -99,7 +124,28 @@ public class ResponseSerializer {
         pw.println(json);
     }
 
-    protected void serialize(AttributeResponse response, HttpServletResponse servletResponse) throws IOException {
+
+    protected void serialize(AttributeGetAdminClientResponse response, HttpServletResponse servletResponse) throws IOException {
+        PrintWriter pw = servletResponse.getWriter();
+        JSONObject json = new JSONObject();
+        json.put("status", 0);
+        AdminClientKeys keys = (AdminClientKeys) cose.getAdminClientStore().getACConverter().getKeys();
+        List<String> allKeys = keys.allKeys();
+        allKeys.remove(keys.secret());
+        AdminClient newClient = (AdminClient) cose.getAdminClientStore().getACConverter().subset(response.getAdminClient(), response.getAttributes());
+        JSONObject jsonClient = new JSONObject();
+        cose.getAdminClientStore().getACConverter().toJSON(newClient, jsonClient);
+        json.put("content", jsonClient);
+        //return json;
+
+        pw.println(json);
+    }
+
+    protected void serialize(AttributeClientResponse response, HttpServletResponse servletResponse) throws IOException {
+        ok(servletResponse);
+    }
+
+    protected void serialize(AttributeAdminClientResponse response, HttpServletResponse servletResponse) throws IOException {
         ok(servletResponse);
     }
 
@@ -127,16 +173,16 @@ public class ResponseSerializer {
 
     protected void serialize(ListAdminsResponse response, HttpServletResponse servletResponse) throws IOException {
         JSONArray adminIDs = new JSONArray();
-             if (response.getAdmins() != null) {
-                 for (AdminClient client : response.getAdmins()) {
-                     adminIDs.add(client.getIdentifierString());
-                 }
-             }
-             PrintWriter pw = servletResponse.getWriter();
-             JSONObject json = new JSONObject();
-             json.put("status", 0);
-             json.put("content", adminIDs);
-             pw.println(json);
+        if (response.getAdmins() != null) {
+            for (AdminClient client : response.getAdmins()) {
+                adminIDs.add(client.getIdentifierString());
+            }
+        }
+        PrintWriter pw = servletResponse.getWriter();
+        JSONObject json = new JSONObject();
+        json.put("status", 0);
+        json.put("content", adminIDs);
+        pw.println(json);
     }
 
     protected void serialize(GetResponse response, HttpServletResponse servletResponse) throws IOException {
@@ -150,6 +196,19 @@ public class ResponseSerializer {
         pw.println(json);
 
     }
+
+    protected void serialize(ACGetResponse response, HttpServletResponse servletResponse) throws IOException {
+        PrintWriter pw = servletResponse.getWriter();
+        if (response.getAdminClient() == null) {
+            pw.println("");
+            return;
+        }
+        JSONObject json = acToJSON(response.getAdminClient());
+        json.put("approved", response.isApproved());
+        pw.println(json);
+
+    }
+
 
     private void serializeClient(OA2Client client, HttpServletResponse servletResponse) throws IOException {
         PrintWriter pw = servletResponse.getWriter();
@@ -170,6 +229,19 @@ public class ResponseSerializer {
         OA2Client newClient = (OA2Client) cose.getClientStore().getACConverter().subset(client, allKeys);
         JSONObject jsonClient = new JSONObject();
         cose.getClientStore().getACConverter().toJSON(newClient, jsonClient);
+        json.put("content", jsonClient);
+        return json;
+    }
+
+    private JSONObject acToJSON(AdminClient client) {
+        JSONObject json = new JSONObject();
+        json.put("status", 0);
+        AdminClientKeys keys = (AdminClientKeys) cose.getAdminClientStore().getACConverter().getKeys();
+        List<String> allKeys = keys.allKeys();
+        allKeys.remove(keys.secret());
+        AdminClient newClient = (AdminClient) cose.getAdminClientStore().getACConverter().subset(client, allKeys);
+        JSONObject jsonClient = new JSONObject();
+        cose.getAdminClientStore().getACConverter().toJSON(newClient, jsonClient);
         json.put("content", jsonClient);
         return json;
     }

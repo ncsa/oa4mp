@@ -1,18 +1,16 @@
 package edu.uiuc.ncsa.co.util;
 
+import edu.uiuc.ncsa.co.util.admin.ACGetRequest;
 import edu.uiuc.ncsa.co.util.attributes.AttributeGetRequest;
 import edu.uiuc.ncsa.co.util.attributes.AttributeRemoveRequest;
-import edu.uiuc.ncsa.co.util.attributes.AttributeSetRequest;
+import edu.uiuc.ncsa.co.util.attributes.AttributeSetClientRequest;
 import edu.uiuc.ncsa.co.util.client.*;
 import edu.uiuc.ncsa.co.util.permissions.*;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.SAT;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.SATFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions.*;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.types.Type;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.types.TypeAttribute;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.types.TypeClient;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.types.TypePermission;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.types.*;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.delegation.storage.BaseClient;
@@ -101,7 +99,7 @@ public class RequestFactory implements SAT {
         return new AttributeGetRequest(aSubj, cTarget, Arrays.asList(arrayString));
     }
 
-    public static AttributeSetRequest createRequest(AdminClient aSubj,
+    public static AttributeSetClientRequest createRequest(AdminClient aSubj,
                                                     TypeAttribute typeAttribute,
                                                     ActionSet actionSet,
                                                     OA2Client cTarget,
@@ -109,7 +107,7 @@ public class RequestFactory implements SAT {
         if (content.isArray()) {
             throw new GeneralException("Content must be a map of attributes to set");
         }
-        return new AttributeSetRequest(aSubj, cTarget, (JSONObject) content);
+        return new AttributeSetClientRequest(aSubj, cTarget, (JSONObject) content);
     }
 
     public static AttributeRemoveRequest createRequest(AdminClient aSubj,
@@ -149,13 +147,13 @@ public class RequestFactory implements SAT {
 
     /* ***** Client requests */
     public static ApproveRequest createRequest(AdminClient adminClient, TypeClient typeClient, ActionApprove actionApprove, OA2Client client, JSON json) {
-        return new ApproveRequest(adminClient, client);
+        return new ApproveRequest(adminClient, client, (JSONObject)json);
     }
 
 
     public static UnapproveRequest createRequest(AdminClient adminClient, TypeClient typeClient, ActionUnapprove actionUnapprove,
                                                  OA2Client client, JSON json) {
-        return new UnapproveRequest(adminClient, client);
+        return new UnapproveRequest(adminClient, client, (JSONObject)json);
     }
 
     public static CreateRequest createRequest(AdminClient adminClient, TypeClient typeClient, ActionCreate actionCreate,
@@ -179,4 +177,12 @@ public class RequestFactory implements SAT {
                                            JSON json){
         return new GetRequest(adminClient, client);
     }
+
+    public static ACGetRequest createRequest(AdminClient adminClient,
+                                             TypeAdmin typeClient,
+                                             ActionGet actionGet,
+                                             OA2Client client,
+                                             JSON json){
+          return new ACGetRequest(adminClient);
+      }
 }
