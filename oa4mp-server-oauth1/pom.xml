@@ -149,7 +149,7 @@
                      Generate sequence build number based on:
                      build number and timestamp
                     -->
-                    <format>Build: #{0} ({1,date})</format>
+                    <format>Build: #{0} ({1,date,yyyy-MM-dd'T'HH:mm:ss.SSSXXX})</format>
                     <items>
                         <item>buildNumber\d*</item>
                         <item>timestamp</item>
