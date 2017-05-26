@@ -66,12 +66,14 @@
                                 <manifest>
                                     <addClasspath>true</addClasspath>
                                     <mainClass>edu.uiuc.ncsa.myproxy.oauth2.tools.OA2Commands</mainClass>
+
                                 </manifest>
                             </archive>
                             <descriptorRefs>
                                 <descriptorRef>jar-with-dependencies</descriptorRef>
                             </descriptorRefs>
                             <finalName>oa2-cli</finalName>
+
                         </configuration>
                         <executions>
                             <execution>

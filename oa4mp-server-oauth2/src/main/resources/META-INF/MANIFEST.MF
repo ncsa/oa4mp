@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Created-By: Apache Maven
+Archiver-Version: Plexus Archiver
+Built-By: ${user.name}
+Build-Jdk: ${java.version}
+Build-Time: ${build.time}
+Application-Name: : ${pom.name}
+Application-Version: : ${pom.version}
+Application-Description: ${buildNumber}
