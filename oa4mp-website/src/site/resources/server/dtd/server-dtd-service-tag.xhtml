@@ -45,7 +45,10 @@
             there is some aliasing used by the host.The host name is taken from the servlet itself and used in
             constructing urls that point to this server. For instance, if there is a server farm with a given
             external-facing address which will be resolved to one of the members based on load-balancing, this
-            would be the external-facing address.
+            would be the external-facing address. <br/><b>Note for</b> <span style="background-color: #ff6600;">OAuth 2</span>,
+            the address, if present, the server address (not the full path to the servlet)
+            will be used for the issuer in the claims returned from the server. If this is
+            not set, the default is to attempt to get the current server's address directly and use that.
         </td>
     </tr>
     <tr>

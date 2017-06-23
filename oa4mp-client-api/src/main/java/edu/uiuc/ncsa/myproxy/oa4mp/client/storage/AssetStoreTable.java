@@ -38,4 +38,5 @@ public class AssetStoreTable extends Table {
     public String getByTokenStatement(){
         return "select * from " + getFQTablename() + " where " + ask().token() + "=?";
     }
+
 }

@@ -11,7 +11,7 @@ import static java.sql.Types.LONGVARCHAR;
  * <p>Created by Jeff Gaynor<br>
  * on 10/20/16 at  2:06 PM
  */
-public class BaseClientTable extends Table {
+public  class BaseClientTable extends Table {
     public BaseClientTable(SerializationKeys keys, String schema, String tablenamePrefix, String tablename) {
         super(keys, schema, tablenamePrefix, tablename);
     }
@@ -24,4 +24,6 @@ public class BaseClientTable extends Table {
         super.createColumnDescriptors();
         getColumnDescriptor().add(new ColumnDescriptorEntry(getBKK().secret(), LONGVARCHAR));
     }
+
+
 }

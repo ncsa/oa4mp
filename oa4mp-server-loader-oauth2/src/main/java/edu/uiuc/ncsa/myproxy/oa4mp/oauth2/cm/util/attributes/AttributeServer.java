@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.attributes;
 
-import edu.uiuc.ncsa.co.loader.COSE;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.loader.COSE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.AbstractDDServer;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientConverter;
@@ -22,14 +22,16 @@ public class AttributeServer extends AbstractDDServer {
 
 
     public Response get(AttributeGetRequest request) {
-        if (request.getAdminClient().getIdentifierString() == null || request.getAdminClient().getIdentifierString().length() == 0) {
-            throw new GeneralException("Error: No admin client identifier");
-        }
-
         if (request.getClient() != null) {
             return getClientAttributes(request);
         }
-        return getAdminClientAttributes(request);
+
+        if (request.hasAdminClient()) {
+            return getAdminClientAttributes(request);
+        }
+
+        throw new GeneralException("Error: No admin client");
+
     }
 
     protected AttributeClientResponse getClientAttributes(AttributeGetRequest request) {
@@ -56,13 +58,15 @@ public class AttributeServer extends AbstractDDServer {
     }
 
     public Response set(AttributeSetClientRequest request) {
-        if (request.getAdminClient().getIdentifier() == null || request.getAdminClient().getIdentifierString().length() == 0) {
-            throw new GeneralException("Error: no admin client identifier.");
-        }
-        if (request.getClient() != null) {
+        if (request.hasClient()) {
             return setClientAttribute(request);
         }
-        return setAdminClientAttribute(request);
+
+        if (request.hasAdminClient()) {
+            //throw new GeneralException("Error: no admin client");
+            return setAdminClientAttribute(request);
+        }
+        throw new GeneralException("Error: Neither client nor admin given.");
     }
 
     protected AttributeClientResponse setClientAttribute(AttributeSetClientRequest request) {
@@ -99,14 +103,15 @@ public class AttributeServer extends AbstractDDServer {
     }
 
     public Response remove(AttributeRemoveRequest request) {
-        if (request.getAdminClient().getIdentifierString() == null || request.getAdminClient().getIdentifierString().length() == 0) {
-            throw new GeneralException("Error: No admin client identifier");
-        }
-        if (request.getClient() != null) {
+        if(request.hasClient()){
             return removeClient(request);
         }
+        if (request.hasAdminClient()) {
+            return removeAdminClient(request);
 
-        return removeAdminClient(request);
+        }
+        throw new GeneralException("Error: No admin client or client");
+
     }
 
     /**

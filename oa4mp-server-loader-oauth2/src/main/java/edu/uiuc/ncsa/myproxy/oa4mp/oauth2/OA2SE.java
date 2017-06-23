@@ -57,7 +57,8 @@ public class OA2SE extends ServiceEnvironmentImpl {
                  boolean isRefreshTokenEnabled,
                  boolean twoFactorSupportEnabled,
                  long maxClientRefreshTokenLifetime,
-                 JSONWebKeys jsonWebKeys) {
+                 JSONWebKeys jsonWebKeys,
+                 String issuer) {
         super(logger,
                 mfp,
                 tsp,
@@ -98,8 +99,13 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.twoFactorSupportEnabled = twoFactorSupportEnabled;
         this.maxClientRefreshTokenLifetime = maxClientRefreshTokenLifetime;
         this.jsonWebKeys = jsonWebKeys;
+        this.issuer = issuer;
     }
 
+    String issuer;
+    public String getIssuer(){
+        return issuer;
+    }
     public JSONWebKeys getJsonWebKeys() {
         return jsonWebKeys;
     }

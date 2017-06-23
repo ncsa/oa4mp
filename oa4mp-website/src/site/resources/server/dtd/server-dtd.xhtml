@@ -30,7 +30,9 @@
         title="OAuth for MyProxy: Messages" href="server/configuration/server-messages.xhtml">messages</a>|
         <a href="common/configuration/logging.xhtml">logging</a>|
         <a href="server/configurations/authorization-servlet.xhtml">authorizationServlet</a>|
-    <span style="background-color: #ff6600;"><a href="server/configuration/ldap.xhtml">ldap</a></span>)*>
+    <span style="background-color: #ff6600;"><a href="server/configuration/ldap.xhtml">ldap</a></span>|
+    <span style="background-color: #ff6600;"><a href="server/configuration/signing.xhtml">JSONWebKey</a></span>|
+    )*>
 &lt;!ATTLIST <a href="server/dtd/server-dtd-service-tag.xhtml">service</a>
     address CDATA #IMPLIED
     name CDATA #IMPLIED
@@ -157,7 +159,10 @@
     server CDATA #IMPLIED
     port CDATA #IMPLIED
     recipents CDATA #IMPLIED&gt;
-&lt;!ELEMENT authorizationServlet (#PCDATA)&gt;
+&lt;!ELEMENT <a href="server/configuration/signing.xhtml">JSONWebKey</a> (path)&gt;
+&lt;!ATTLIST
+    defaultKeyID CDATA #IMPLIED&gt;
+&lt;!ELEMENT path (#PCDATA)&gt;
 ]&gt;
 </pre>
 <p>A few examples</p>

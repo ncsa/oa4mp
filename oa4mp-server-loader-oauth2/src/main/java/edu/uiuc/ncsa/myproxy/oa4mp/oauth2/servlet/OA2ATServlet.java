@@ -69,6 +69,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         OA2SE oa2se = (OA2SE) getServiceEnvironment();
         List<Identifier> admins = oa2se.getPermissionStore().getAdmins(st.getClient().getIdentifier());
         String issuer = null;
+        // So in order
+        // 1. get the issuer from the admin client
         for (Identifier adminID : admins) {
             AdminClient ac = oa2se.getAdminClientStore().get(adminID);
             if (ac != null) {
@@ -78,18 +80,15 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
                 }
             }
         }
+        // 2. If the admin client does not have an issuer set, see if the client has one
         if (issuer == null) {
             issuer = ((OA2Client) st.getClient()).getIssuer();
         }
 
+        // 3. If the client does not have one, see if there is a server default to use
+        // The discovery servlet will try to use the server default or construct the issuer
         if (issuer == null) {
-            if (getServiceEnvironment().getServiceAddress() == null) {
-                throw new NFWException("Error: no service address was found in the configuration.");
-            }
-            issuer = getServiceEnvironment().getServiceAddress().toString();
-            issuer = issuer.substring(0, issuer.lastIndexOf("/"));
-            // This is to be the server only, without the path. In the service tag, the complete
-            // address + path is given.
+            issuer = OA2DiscoveryServlet.getIssuer(state.getRequest());
         }
         p.put(OA2Claims.ISSUER, issuer);
 

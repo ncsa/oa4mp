@@ -6,8 +6,6 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.MyProxyServiceEnvironment;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironment;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironmentImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.AbstractCLIApprover;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.util.ExceptionEventNotifier;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.util.NewClientNotifier;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.cache.Cache;
 import edu.uiuc.ncsa.security.core.cache.CachedObject;
@@ -27,12 +25,9 @@ import edu.uiuc.ncsa.security.delegation.storage.TransactionStore;
 import edu.uiuc.ncsa.security.delegation.storage.impl.BasicTransaction;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.servlet.NotificationListener;
-import edu.uiuc.ncsa.security.util.mail.MailUtil;
 import edu.uiuc.ncsa.security.util.pkcs.KeyPairPopulationThread;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
@@ -121,9 +116,8 @@ public abstract class MyProxyDelegationServlet extends EnvServlet implements Tra
         return ((MyProxyServiceEnvironment) getEnvironment()).getMyProxyServices();
     }
 
-    static boolean notifiersSet = false;
 
-    String getTemplate(File filename) throws IOException {
+  /*  String getTemplate(File filename) throws IOException {
 
         String body = "";
         try {
@@ -141,6 +135,8 @@ public abstract class MyProxyDelegationServlet extends EnvServlet implements Tra
 
         return body;
     }
+    static boolean notifiersSet = false;
+
 
     public void setupNotifiers() throws IOException {
         // do this once or you will have a message sent for each listener!
@@ -174,14 +170,26 @@ public abstract class MyProxyDelegationServlet extends EnvServlet implements Tra
         ExceptionEventNotifier exceptionNotifier = new ExceptionEventNotifier(x, getMyLogger());
         addNotificationListener(exceptionNotifier);
         notifiersSet = true;
-    }
+    }*/
 
     public void storeUpdates() throws IOException, SQLException {
         if (storeUpdatesDone) return; // run this once
         storeUpdatesDone = true;
+        realStoreUpdates();
+    }
+
+    /**
+     * If you have store updates that need to get done, put them in this method,
+     * invoking super. Calls to this are managed by the servlet to make sure
+     * nothing get called more than once.
+     * @throws IOException
+     * @throws SQLException
+     */
+    protected void realStoreUpdates() throws IOException, SQLException{
         processStoreCheck(getTransactionStore());
         processStoreCheck(getServiceEnvironment().getClientStore());
         processStoreCheck(getServiceEnvironment().getClientApprovalStore());
+
     }
 
 

@@ -14,6 +14,8 @@
     and <a href="https://openid.net/specs/openid-connect-discovery-1_0.html">OIDC discovery</a>.
 It should be noted that each instance of OA4MP will have its own location for this which corresponds
 to that instance. This allows for multiple services in a single domain.</p>
+<p>You may also use the discovery service to get the public signing keys. This is at the certs endpoint.
+</p>
 
 <h3>Example</h3>
 <p>If OA4MP is hosted at <code>https://services.bigstate.edu/oauth2</code>, then the discovery page is at
@@ -50,7 +52,6 @@ object such as </p>
      ],
      "id_token_signing_alg_values_supported":  [
       "RS256",
-      "RS384",
       "RS512"
      ],
      "jwks_uri": "https://services.bigstate.edu/oauth2/certs"
@@ -59,6 +60,31 @@ object such as </p>
 <p>Clients will parse this and use bits of the information (such as which signing algorithms are supported
 and the location of the public keys). There may be some variation, of course, depending on the server's exact
 configuration.</p>
+<h3>Getting the signing keys</h3>
+
+<p>This would live at jwks_uri address from the discovery service, so you can go to
+<code>https://services.bigstate.edu/oauth2/certs</code> from the above example
+and this will return a JSON WebKey object:
+<pre>
+ {"keys": [
+   {
+   "n": "4x7MbZyiKgD5xnEUOlPugxlUzLdNhbCXJqvrgRNj8w-O2hoHbnbJoA8rppco86LZ1W7WIIeOixw2YncKu5kISxq7lzMa_RNYOghkbeJzhs1PB_rUVkuZyySuLK9I2Q_2nfzlggVgn32JXiGR-u3ZqClGODJ8nh5m-H3eGR7-es2A3abQ4BydXbnAbFTTXMMk0C2w1eM5wgp15ZifdP6zfWkwsTpBYU80dRU1NpyZ2hryBtj6CS2sRKY9U09v-B0WlUL6m9RTDlxeQLwoz89XCe02zAftkTcAEQP56zs8SpUYQX_rVNtdI5KyMiOG8qbuYSt17GYynUB18zgc7sTzQ",
+   "e": "AQAB",
+   "alg": "RS512",
+   "kid": "asdwer34df",
+   "use": "sig",
+   "kty": "RSA"
+  },
+   {
+   "n": "JFsi9rKTZXkiuXBBX2xt4KQx6AgtjzwUkGHNWFEFIpTs2UiRhtTVLNDAU1ocP512uFPb6iQMe6sIdzxntF_bbstHWEtxLsJmqEgObcniI3jcSDtlnxSNuZUUCtNg1jvxxDSOx4yGtTJgQ8JIqhzrDErCG7rqi-gth2oMLtGHtJji9urMuUch42iRI-YoQ7FkFxGlHYZM23U00h0WKilXB5n-zXgoNZC_ALzhKG5dpZh8BsVC_yTrYAP1cCx8kmie8p7Z9V1U42yHiPxSNkIPuLlpXr4xmWLyD7jVm7ppQVQjWjxNlSBrAzjpYF7BMxWd0k8oJnou_1Pa9uK9z396BQ",
+   "e": "AQAB",
+   "alg": "RS256",
+   "kid": "9k0HPG3moXENne",
+   "use": "sig",
+   "kty": "RSA"
+  }
+ ]}
+</pre>
 <!--#include virtual="../../footer.html" -->
 </body>
 </html>

@@ -21,7 +21,7 @@ import org.apache.commons.lang.StringUtils;
 public class OA2Commands extends BaseCommands {
     public static final String PERMISSIONS = "permissions";
     public static final String ADMINS = "admins";
-    public static final String SIGNING = "signing";
+    public static final String KEYS = "keys";
 
     public OA2Commands(MyLoggingFacade logger) {
         super(logger);
@@ -50,6 +50,21 @@ public class OA2Commands extends BaseCommands {
         } catch (Throwable t) {
             t.printStackTrace();
         }
+    }
+
+    @Override
+    public void useHelp() {
+        say("Choose the component you wish to use.");
+        say("you specify the component as use + name. Supported components are");
+        say(CLIENTS + " - edit client records");
+        say(CLIENT_APPROVALS + " - edit client approval records\n");
+        say(COPY + " - copy an entire store.\n");
+        say(KEYS + " - create a set of signing keys.\n");
+        say(PERMISSIONS + " - basic permission management.\n");
+        say(ADMINS + " - create or manage administrative clients.\n");
+        say("e.g.\n\nuse " + CLIENTS + "\n\nwill call up the client management component.");
+        say("Type 'exit' when you wish to exit the component and return to the main menu");
+
     }
 
     @Override
@@ -93,7 +108,7 @@ public class OA2Commands extends BaseCommands {
         if (inputLine.hasArg(ADMINS)) {
             commands = getAdminClientCommands();
         }
-        if (inputLine.hasArg(SIGNING)) {
+        if (inputLine.hasArg(KEYS)) {
             commands = new SigningCommands(getOA2SE());
         }
         if (inputLine.hasArg(PERMISSIONS)) {

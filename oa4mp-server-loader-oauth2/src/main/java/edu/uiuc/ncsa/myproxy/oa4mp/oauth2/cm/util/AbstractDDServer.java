@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util;
 
-import edu.uiuc.ncsa.co.loader.COSE;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.loader.COSE;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.Permission;

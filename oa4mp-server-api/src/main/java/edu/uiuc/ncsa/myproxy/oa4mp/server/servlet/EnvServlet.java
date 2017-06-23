@@ -11,11 +11,11 @@ import java.sql.SQLException;
 /**
  * This servlet loads the environment for all servlets. Any servlet that requires a service environment
  * should extend this.
- *
+ * <p/>
  * <p>Created by Jeff Gaynor<br>
  * on 10/6/16 at  11:43 AM
  */
-public abstract class EnvServlet extends AbstractServlet  {
+public abstract class EnvServlet extends AbstractServlet {
 
     public ServiceEnvironmentImpl loadProperties2() throws IOException {
         ServiceEnvironmentImpl se2 = (ServiceEnvironmentImpl) getConfigurationLoader().load();
@@ -29,6 +29,7 @@ public abstract class EnvServlet extends AbstractServlet  {
             setEnvironment(loadProperties2());
         }
     }
+
     /**
      * This will be invoked at init before anything else and should include code to seamlessly upgrade stores from earlier versions.
      * For instance, if a new column needs to be added to a table. This pre-supposes that the current user has the correct
@@ -40,7 +41,9 @@ public abstract class EnvServlet extends AbstractServlet  {
 
     public void processStoreCheck(Store store) throws SQLException {
         if (store instanceof SQLStore) {
-            ((SQLStore) store).checkColumns();
+            SQLStore sqlStore = (SQLStore) store;
+            sqlStore.checkTable();
+            sqlStore.checkColumns();
         }
     }
 

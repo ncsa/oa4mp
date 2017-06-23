@@ -18,12 +18,19 @@ public abstract class AbstractDDRequest implements Request {
     }
 
 
-
     public AdminClient getAdminClient() {
         return adminClient;
     }
 
     public OA2Client getClient() {
         return client;
+    }
+
+    public boolean hasAdminClient() {
+        return adminClient != null && adminClient.getIdentifier() != null && adminClient.getIdentifierString().length() != 0;
+    }
+
+    public boolean hasClient() {
+        return client != null && client.getIdentifier() != null && client.getIdentifierString().length() != 0;
     }
 }

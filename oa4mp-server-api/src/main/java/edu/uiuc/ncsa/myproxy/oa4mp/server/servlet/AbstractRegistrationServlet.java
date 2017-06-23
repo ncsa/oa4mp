@@ -8,10 +8,7 @@ import edu.uiuc.ncsa.security.delegation.server.request.IssuerResponse;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.delegation.servlet.TransactionState;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
-import edu.uiuc.ncsa.security.servlet.JSPUtil;
-import edu.uiuc.ncsa.security.servlet.NotificationListener;
-import edu.uiuc.ncsa.security.servlet.Presentable;
-import edu.uiuc.ncsa.security.servlet.PresentableState;
+import edu.uiuc.ncsa.security.servlet.*;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -201,6 +198,9 @@ public abstract class AbstractRegistrationServlet extends MyProxyDelegationServl
 
             JSPUtil.fwd(request, response, INIT_PAGE);
         } catch (Throwable t) {
+            if(ServletDebugUtil.isEnabled()){
+                t.printStackTrace();
+            }
             warn("Error registering a new client:" + t.getMessage());
             handleError(pState, t);
         }

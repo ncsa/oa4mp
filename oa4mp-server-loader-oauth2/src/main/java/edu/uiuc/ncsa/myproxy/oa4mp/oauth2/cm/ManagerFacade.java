@@ -91,6 +91,15 @@ public class ManagerFacade {
             DebugUtil.dbg(this, "doIt: no secret, throwing exception.");
             throw new GeneralException("Missing secret");
         }
+        if(client == null){
+            throw new GeneralException("Error: No client found.");
+        }
+        if( client.getSecret() == null){
+            if(!getSE().getClientStore().containsKey(client.getIdentifier())){
+                throw new GeneralException("Error: No such client for identifier \"" + client.getIdentifierString() + "\".");
+            }
+            throw new GeneralException("Error: No secret given for this client.");
+        }
         if (!client.getSecret().equals(DigestUtils.shaHex(rawSecret))) {
             DebugUtil.dbg(this, "doIt: bad secret, throwing exception.");
             throw new GeneralException("Incorrect secret. Unauthorized client.");

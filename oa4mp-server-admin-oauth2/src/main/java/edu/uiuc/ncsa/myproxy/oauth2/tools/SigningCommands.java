@@ -35,7 +35,7 @@ public class SigningCommands extends CommonCommands {
 
     @Override
     public String getPrompt() {
-        return "signing>";
+        return "keys>";
     }
 
     protected void createHelp() {
@@ -53,26 +53,54 @@ public class SigningCommands extends CommonCommands {
         File privateKeyFile = null;
         while (retry) {
             String publicKeyPath = getInput("Give the file path", "");
+            if (publicKeyPath.toLowerCase().equals("exit") || publicKeyPath.toLowerCase().equals("quit")) {
+                return;
+            }
             publicKeyFile = new File(publicKeyPath);
+
             if (publicKeyFile.exists()) {
-                sayi2("The file you gave exists, do you want to over write it? [y/n]");
-                retry = !isOk(readline());
+                if (!publicKeyFile.isFile()) {
+                    sayi("Sorry, but you must supply the name of the file as well (or type 'exit' to exit");
+                } else {
+                    sayi2("The file you gave exists, do you want to over write it? [y/n]");
+                    retry = !isOk(readline());
+                }
             } else {
                 retry = false;
             }
         }
+
         retry = true;
 
         sayi2("create a new set of JSON web keys?[y/n]");
-        if (!isOk(readline())) {
+
+        if (!
+
+                isOk(readline()
+
+                ))
+
+        {
             say("create cancelled.");
             return;
         }
 
         JSONWebKeys keys = new JSONWebKeys(null);
-        keys.put(createJWK("RS256"));
-        keys.put(createJWK("RS384"));
-        keys.put(createJWK("RS512"));
+        keys.put(
+
+                createJWK("RS256")
+
+        );
+        keys.put(
+
+                createJWK("RS384")
+
+        );
+        keys.put(
+
+                createJWK("RS512")
+
+        );
 
 
         FileWriter writer = new FileWriter(publicKeyFile);
@@ -80,8 +108,11 @@ public class SigningCommands extends CommonCommands {
         writer.write(jwks.toString(3));
         writer.flush();
         writer.close();
+
         sayi("JSONweb keys written");
+
         sayi("Done!");
+
     }
 
     SecureRandom random = new SecureRandom();
@@ -89,7 +120,7 @@ public class SigningCommands extends CommonCommands {
     protected JSONWebKey createJWK(String algorithm) throws NoSuchProviderException, NoSuchAlgorithmException {
         byte[] byteArray = new byte[16];
         random.nextBytes(byteArray);
-        String id  = DatatypeConverter.printHexBinary(byteArray);
+        String id = DatatypeConverter.printHexBinary(byteArray);
 
         KeyPair keyPair = KeyUtil.generateKeyPair();
         JSONWebKey webKey = new JSONWebKey();

@@ -29,6 +29,26 @@
             <td>Home URL:</td>
             <td><input type="text" size="25" name="${clientHomeUrl}" value="${clientHomeUrlValue}"/></td>
         </tr>
+        <tr>
+            <td>Callback URLs:</td>
+            <td>
+                    <textarea id="${callbackURI}" rows="5" cols="80"
+                              name="${callbackURI}">${callbackURIValue}</textarea>
+            </td>
+        </tr>
+        <tr>
+            <td>Scopes:</td>
+            <td>
+                <c:forEach items="${scopes}" var="scope">
+                    <input type="checkbox"
+                           name="chkScopes"
+                           value="${scope}"
+                           <c:set var="xxx" scope="session" value="${scope}"/>
+                           <c:if test="${xxx == 'openid'}">checked="checked"</c:if>
+                            >${scope}&nbsp;
+                </c:forEach>
+            </td>
+        </tr>
 
         <tr>
             <td ${rtFieldVisible}>Refresh Token lifetime:</td>
@@ -37,38 +57,14 @@
             </td>
         </tr>
         <tr>
-            <td></td>
-            <td><input type="checkbox" name="${clientProxyLimited}" ${clientProxyLimitedValue} /><span
-                    title="Check this box for delegation of limited proxy certificates for use with Globus Toolkit GridFTP servers. Leave this box unchecked
-                    for delegation of general-use X.509 certificates.">Use Limited Proxy Certificates?</span>
-            </td>
-        </tr>
-
-
-        <tr>
-            <td>Callback URLs:</td>
-            <td>
-                <textarea id="${callbackURI}" rows="5" cols="80"
-                          name="${callbackURI}">${callbackURIValue}</textarea>
-            </td>
-        </tr>
-        <tr>
             <td>Issuer (optional):</td>
             <td><input type="text" size="25" name="${issuer}" value="${issuerValue}"/></td>
         </tr>
         <tr>
-            <td>Scopes:</td>
-            <td>
-                <c:forEach items="${scopes}" var="scope">
-                    <input type="checkbox" name="chkScopes" value="${scope}">${scope}&nbsp;
-                </c:forEach>
-            </td>
-
-        </tr>
-        <tr>
-            <td>LDAP configurations (optional):</td>
-            <td>
-                <textarea id="${ldap}" rows="5" cols="80"  name="${ldap}">${ldapValue}</textarea>
+            <td></td>
+            <td><input type="checkbox" name="${clientProxyLimited}" ${clientProxyLimitedValue} /><span
+                    title="Check this box for delegation of limited proxy certificates for use with Globus Toolkit GridFTP servers. Leave this box unchecked
+                           for delegation of general-use X.509 certificates.">Use Limited Proxy Certificates?</span>
             </td>
         </tr>
         <tr>
@@ -81,5 +77,6 @@
     <input type="hidden" id="status" name="${action}"
            value="${request}"/>
 </form>
+
 </body>
 </html>

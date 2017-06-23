@@ -107,7 +107,8 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     isRefreshTokenEnabled(),
                     isTwoFactorSupportEnabled(),
                     getMaxClientRefreshTokenLifetime(),
-                    getJSONWebKeys());
+                    getJSONWebKeys(),
+                    getIssuer());
             if (getScopeHandler() instanceof BasicScopeHandler) {
                 ((BasicScopeHandler) getScopeHandler()).setOa2SE((OA2SE) se);
             }
@@ -249,7 +250,20 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         return rtLifetime;
 
     }
+   String issuer = null;
+    protected String getIssuer(){
+        if (issuer == null) {
+            String x = getFirstAttribute(cn, ISSUER);
+            // Fixes OAUTH-214
+            if (x == null || x.length() == 0) {
+                return null;
+            } else {
+                issuer = x;
+            }
+        }
+        return issuer;
 
+    }
     long maxClientRefreshTokenLifetime = -1L;
 
     protected long getMaxClientRefreshTokenLifetime() {

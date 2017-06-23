@@ -2,7 +2,6 @@ package edu.uiuc.ncsa.oauth2.test;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.ldap.LDAPStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.loader.COSE;
-import edu.uiuc.ncsa.oauth2.test.TestStoreProvider2;
 
 /**
  * <p>Created by Jeff Gaynor<br>

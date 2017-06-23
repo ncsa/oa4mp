@@ -58,7 +58,8 @@ public class COSE extends OA2SE {
                 boolean twoFactorSupportEnabled,
                 long maxClientRefreshTokenLifetime,
                 Provider<LDAPStore> mldap,
-                JSONWebKeys signingKeyPair) {
+                JSONWebKeys signingKeyPair,
+                String issuer) {
         super(logger,
                 tsp,
                 csp,
@@ -85,7 +86,8 @@ public class COSE extends OA2SE {
                 isRefreshTokenEnabled,
                 twoFactorSupportEnabled,
                 maxClientRefreshTokenLifetime,
-                signingKeyPair);
+                signingKeyPair,
+                issuer);
         this.mldap = mldap;
         if(scopeHandler instanceof BasicScopeHandler){
             DebugUtil.dbg(this,"***Setting runtime environment in the scope handler:" + scopeHandler.getClass().getSimpleName());

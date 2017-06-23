@@ -1,8 +1,5 @@
 package edu.uiuc.ncsa.co;
 
-import edu.uiuc.ncsa.co.loader.COBootstrapper;
-import edu.uiuc.ncsa.oauth2.test.TestSuiteInitializer;
-import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
@@ -12,17 +9,17 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-        ClientManagerTest.class,
- //       AttributeServerTest.class,
-  //      PermissionServerTest.class,
-   //     ClientServerTest.class
+      /*  ClientManagerTest.class,
+        AttributeServerTest.class,
+        PermissionServerTest.class,
+        ClientServerTest.class*/
 })
 
 public class CMTestSuite {
-    @BeforeClass
+  /*  @BeforeClass
     public static void initialize() {
         TestSuiteInitializer testSuiteInitializer = new CMTestSuiteInitializer(new COBootstrapper());
         testSuiteInitializer.init();
-    }
+    }*/
 
 }

@@ -38,4 +38,5 @@ public abstract class AttributeRequest extends AbstractDDRequest {
         throw new NFWException("Incorrect server is invoking this method. Expected an AttributeServer and got a " + server.getClass().getSimpleName());
 
        }
+
 }

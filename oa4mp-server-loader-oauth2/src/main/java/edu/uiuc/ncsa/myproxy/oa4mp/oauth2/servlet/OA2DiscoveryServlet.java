@@ -11,6 +11,7 @@ import net.sf.json.util.JSONUtils;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.PrintWriter;
+import java.net.URI;
 import java.util.Collection;
 
 /**
@@ -46,19 +47,27 @@ public class OA2DiscoveryServlet extends DiscoveryServlet {
         super.doIt(httpServletRequest, httpServletResponse);
     }
 
+    public static String getIssuer(HttpServletRequest request) {
+        OA2SE oa2SE = (OA2SE) getServiceEnvironment();
+
+        if (oa2SE.getIssuer() != null) {
+            return oa2SE.getIssuer();
+        } else {
+            return getRequestURI(request, false); // default --  use server + path
+        }
+    }
+
     @Override
     protected JSONObject setValues(HttpServletRequest request, JSONObject jsonObject) {
         OA2SE oa2SE = (OA2SE) getServiceEnvironment();
 
         String requestURI = getRequestURI(request);
-
+        if(requestURI.endsWith("/")){
+            requestURI = requestURI.substring(0,requestURI.length()-1); // shave off trailing slash
+        }
         JSONObject json = super.setValues(request, jsonObject);
         json.put("jwks_uri", requestURI + "/certs");
-        if(oa2SE.getServiceAddress()!=null) {
-            json.put(ISSUER, oa2SE.getServiceAddress().getScheme() + "://" + oa2SE.getServiceAddress().getHost());
-        }else{
-            json.put(ISSUER, request.getScheme() + "://" + request.getServerName()); // default -- use server host name
-        }
+        json.put(ISSUER, getIssuer(request));
         json.put(TOKEN_ENDPOINT, requestURI + "/token");
         json.put(USERINFO_ENDPOINT, requestURI + "/userinfo");
         json.put("token_endpoint_auth_methods_supported", null);
@@ -82,7 +91,7 @@ public class OA2DiscoveryServlet extends DiscoveryServlet {
         responseTypes.add("id_token");
         json.put("response_types_supported", responseTypes);
         JSONArray claimsSupported = new JSONArray();
-        if(oa2SE.getScopeHandler() != null){
+        if (oa2SE.getScopeHandler() != null) {
             claimsSupported.addAll(oa2SE.getScopeHandler().getClaims());
             json.put("claims_supported", claimsSupported);
         }
@@ -94,40 +103,4 @@ public class OA2DiscoveryServlet extends DiscoveryServlet {
         return json;
     }
 
-
-    /*
-     /*
-     {
-   "userinfo_signing_alg_values_supported":
-     ["RS256", "ES256", "HS256"],
-   "userinfo_encryption_alg_values_supported":
-     ["RSA1_5", "A128KW"],
-   "userinfo_encryption_enc_values_supported":
-     ["A128CBC-HS256", "A128GCM"],
-   ,
-   "id_token_encryption_alg_values_supported":
-     ["RSA1_5", "A128KW"],
-   "id_token_encryption_enc_values_supported":
-     ["A128CBC-HS256", "A128GCM"],
-   "request_object_signing_alg_values_supported":
-     ["none", "RS256", "ES256"],
-   "display_values_supported":
-     ["page", "popup"],
-   "claim_types_supported":
-     ["normal", "distributed"],
-   "claims_supported":
-     ["sub", "iss", "auth_time", "acr",
-      "name", "given_name", "family_name", "nickname",
-      "profile", "picture", "website",
-      "email", "email_verified", "locale", "zoneinfo",
-      "http://example.info/claims/groups"],
-   "claims_parameter_supported":
-     true,
-   "service_documentation":
-     "http://server.example.com/connect/service_documentation.html",
-   "ui_locales_supported":
-     ["en-US", "en-GB", "en-CA", "fr-FR", "fr-CA"]
-  }
-
-     */
 }

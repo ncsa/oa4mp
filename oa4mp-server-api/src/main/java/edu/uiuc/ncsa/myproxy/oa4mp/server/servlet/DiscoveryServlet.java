@@ -41,9 +41,9 @@ public class DiscoveryServlet extends MyProxyDelegationServlet {
             jsonObject = new JSONObject();
         }
         String requestURI = getRequestURI(httpServletRequest);
-        if(!isEmpty(getServiceEnvironment().getAuthorizationServletConfig().getAuthorizationURI())){
+        if (!isEmpty(getServiceEnvironment().getAuthorizationServletConfig().getAuthorizationURI())) {
             jsonObject.put(AUTHORIZATION_ENDPOINT, getServiceEnvironment().getAuthorizationServletConfig().getAuthorizationURI());
-        }else{
+        } else {
             jsonObject.put(AUTHORIZATION_ENDPOINT, requestURI + "/authorize");
         }
         jsonObject.put(REGISTRATION_ENDPOINT, requestURI + "/register");
@@ -63,14 +63,18 @@ public class DiscoveryServlet extends MyProxyDelegationServlet {
         //httpServletRequest.setAttribute(DISCOVERY_CONTENT, out);
         //JSPUtil.fwd(httpServletRequest, httpServletResponse, getDiscoveryPagePath());
     }
-    protected String getRequestURI(HttpServletRequest request) {
-        String requestURI =   request.getScheme() + "://" + request.getServerName() +":"+ request.getServerPort() + "/" + request.getRequestURI();
+    protected static String getRequestURI(HttpServletRequest request, boolean includePort) {
+        String requestURI = request.getScheme() + "://" + request.getServerName() + (includePort?(":" + request.getServerPort()):"")  + request.getRequestURI();
+        //  String requestURI = request.getRequestURI();
         if (requestURI.endsWith("/")) {
             requestURI = requestURI.substring(0, requestURI.length() - 1);
         }
-        if(0 < requestURI.indexOf("/.well-known")){
-            requestURI = requestURI.substring(0,requestURI.indexOf("/.well-known"));
+        if (0 < requestURI.indexOf("/.well-known")) {
+            requestURI = requestURI.substring(0, requestURI.indexOf("/.well-known"));
         }
         return requestURI;
+    }
+    protected static String getRequestURI(HttpServletRequest request) {
+        return getRequestURI(request, true);
     }
 }

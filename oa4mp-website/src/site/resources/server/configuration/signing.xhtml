@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Signing for OIDC</title>
+    <!--#include virtual="../../head.html" -->
+</head>
+
+<body class="composite">
+<!--#include virtual="../../header.html" -->
+<h2>Signing for OIDC</h2>
+
+<p>
+    ID tokens are signed as per the <a href="https://tools.ietf.org/html/rfc7517">JSON Web Key</a> specification.
+    This requires that the server supply public information about its keys so that clients may validate them.
+    The well-known page for the service will give the location of the web key file in the jwks_uri entry.
+    Generally you merely need to set this up on the server and clients will validate the signatures that
+    your server creates. The configuration entry is:
+</p>
+
+
+<table style="text-align: left; width: 50%;" border="1" cellspacing="2" cellpadding="2">
+    <tbody>
+    <tr>
+        <td style="vertical-align: top;">Name</td>
+        <td style="vertical-align: top;">Required</td>
+        <td style="vertical-align: top;">Default</td>
+        <td style="vertical-align: top;"></td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">path</td>
+        <td style="vertical-align: top;">Y</td>
+        <td style="vertical-align: top;">(none)</td>
+        <td style="vertical-align: top;">The full path to the JSON web key file. This is probably best done within
+            CDATA tags to ensure that special characters such as blanks and slashes, are interpreted correctly.
+        </td>
+    </tr>
+    </tbody>
+</table>
+<p>
+    There is one <b><i>required</i></b> attribute and that is <code>defaultKeyID</code> which tells which
+    key should be used for signing.
+</p>
+
+<h3>An example configuration</h3>
+<pre>
+&lt;service name="myInstall"&gt;
+    &lt;!-- other stuff --&gt;
+    &lt;JSONWebKey
+        defaultKeyID="E80281A5CD86D1288B15A9D868586B9B"&gt;
+        &lt;path><![CDATA[/var/www/config/keys.jwks]]>&lt;/path&gt;
+    &lt;/JSONWebKey&gt;
+&lt;/service&gt;
+</pre>
+<p>
+    This sets the path to the file keys.jwks in the given directory. If you do not the defaultKeyID an error will
+    be generated on server startup. Within that file is an entry that has a unique
+    key identifier ("kid"):
+</p>
+<pre>
+{"keys": [
+      {
+      "n": "AIptVWe86psnN3Vr4ovJZF0T0oBqlDMrpX2JcJ3g8UQ5NZG8Fugb5FD8aB6jXU98AS3IIi8ORCVsSb7lUvdFrHoZuOQ74rXrStIBSeXySOv_kSC4gJltMU2ld9sXUVbvLulFLSRoIttstacy8EZ8ULM5PaeNUuiVNQW5weQOWig0xuNhS_5nkn1ujarNitCWhI_RmGAdRjL3uJxahKqm2ZRvxnEO6ajFfb7j13HJuzw9bkGkDVY6LZRbPCCZq57geEwmbgjMN6F3m6CUSvbkvIgqqVzm7GEDlk8J4Jer8tavJ_lkiQ3J1q-CoYr38UFx4Q3s",
+      "e": "AQAB",
+      "alg": "RS384",
+      "kid": "E80281A5CD86D1288B15A9D868586B9B",
+      "use": "sig",
+      "kty": "RSA",
+      "d": "NuCDNB37r8iLPtynMh2D0TZzg_88hG9KyXKjhM1zZuGVNtidwbfD0oMDgrVfXEgBmMC98bEuob7H1iPl371wd9EjCOb2EVyeWHLhnoIl_y0SgmYmAj0Ki8NST2TApwUdzjUwj4SikFOdJmap5UZMUBuMfgqJtSAHixnrcDGlvh0nwt66axV5GEA6gT_gXx0V8JsGRvU5zxMVn8-0Nfeo53ao4sVqO8lwsinPgeEuDpaoTvbNtlGpw5CeYtveZpPgIgYATr6_ke8UNalax8py2zmHyswHX3CzEEuguJUfKEeHBeIyECsfRdM2z6CsDGI-a4fe-VzudYDVMUQ"
+      }]
+}
+</pre>
+<p>There may be several other entries in the file which is why the key identifier is needed. In this case, every ID
+    token will
+    be signed with the RSA key using 384 bits. (Note this example should not be used anywhere. Please see the next
+    section for how
+    to generate keys properly.) Clients may request other strengths which the server may or may not honor.
+    Only the RSA signing algorithm is supported by OA4MP.</p>
+
+<h3>Creating a set of keys at the command line</h3>
+
+<p>The supplied command line tool (<code>oa2-cli</code> in the /opt/oa2/bin directory)
+    has the ability to create a set of key. OA4MP will support RSA signing
+    at 256, 384 and 512 bits. Using the command line tool will create keys for each of these.
+    To use this, you will need to start the tool then <code>use keys</code>:</p>
+<pre>
+    oa2>use keys
+    keys>create
+      Give the file path[]:/var/www/config/keys.jwks
+      create a new set of JSON web keys?[y/n]y
+      JSONweb keys written
+      Done!
+    keys>exit
+    exiting ...
+</pre>
+<p>
+    In this example, you use signing and invoke the create call. This prompts you for the full path (including
+    the file name) and then verifies that you want to create the keys. Note that if you specify an existing file,
+    you will be asked if you want to overwrite it. The resulting file will be in JSON web key format and ready for use.
+    You must specify this file for the server to use.
+</p>
+
+<p>You should be sure that this file is put somewhere that is not public on your system and that the permissions
+    allows tomcat to access it (usually this means at least that the grouop should be set to "tomcat" on unix installs.
+    It should also be read only for all access.
+</p>
+
+
+<!--#include virtual="../../footer.html" -->
+</body>
+</html>

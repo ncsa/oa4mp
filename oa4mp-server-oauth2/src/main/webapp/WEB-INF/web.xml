@@ -51,6 +51,11 @@
         <servlet-name>discovery</servlet-name>
         <url-pattern>/certs</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>discovery</servlet-name>
+        <url-pattern>/client0</url-pattern>
+    </servlet-mapping>
+
     <servlet>
         <servlet-name>accessToken</servlet-name>
         <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2ATServlet</servlet-class>
@@ -103,12 +108,12 @@
 
     <servlet>
          <servlet-name>client</servlet-name>
-         <servlet-class>edu.uiuc.ncsa.co.servlet.ClientServlet</servlet-class>
+         <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.ClientServlet</servlet-class>
          <load-on-startup>1</load-on-startup>
      </servlet>
      <servlet-mapping>
          <servlet-name>client</servlet-name>
-         <url-pattern>/client</url-pattern>
+         <url-pattern>/clients</url-pattern>
      </servlet-mapping>
 
     <servlet>

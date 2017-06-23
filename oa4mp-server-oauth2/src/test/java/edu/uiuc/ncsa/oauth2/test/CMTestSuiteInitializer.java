@@ -3,9 +3,6 @@ package edu.uiuc.ncsa.oauth2.test;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.loader.COLoader;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironment;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractBootstrapper;
-import edu.uiuc.ncsa.oauth2.test.CMTestStoreProvider;
-import edu.uiuc.ncsa.oauth2.test.TestStoreProvider2;
-import edu.uiuc.ncsa.oauth2.test.TestSuiteInitializer;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.TestUtils.findConfigNode;

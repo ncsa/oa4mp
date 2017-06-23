@@ -8,6 +8,7 @@ package edu.uiuc.ncsa.oauth2.test;
 import edu.uiuc.ncsa.myproxy.oa4mp.ServiceConfigTest;
 import edu.uiuc.ncsa.myproxy.oa4mp.aggregate.AGCAStoreTest;
 import edu.uiuc.ncsa.myproxy.oa4mp.aggregate.AGClientTest;
+import edu.uiuc.ncsa.myproxy.oa4mp.aggregate.AGTransactionStoreTest;
 import edu.uiuc.ncsa.myproxy.oa4mp.file.FSCAStoreTest;
 import edu.uiuc.ncsa.myproxy.oa4mp.file.FSClientTest;
 import edu.uiuc.ncsa.myproxy.oa4mp.file.FSTransactionStoreTest;
@@ -17,7 +18,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.memory.MTransactionStoreTest;
 import edu.uiuc.ncsa.myproxy.oa4mp.mysql.MySQLCAStoreTest;
 import edu.uiuc.ncsa.myproxy.oa4mp.mysql.MySQLClientStoreTest;
 import edu.uiuc.ncsa.myproxy.oa4mp.mysql.MySQLTransactionStoreTest;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2Bootstrapper;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.loader.COBootstrapper;
 import edu.uiuc.ncsa.myproxy.oa4mp.postgres.PGCAStoreTest;
 import edu.uiuc.ncsa.myproxy.oa4mp.postgres.PGClientStoreTest;
 import edu.uiuc.ncsa.myproxy.oa4mp.postgres.PGTransactionStoreTest;
@@ -35,10 +36,14 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 
 @Suite.SuiteClasses({
+        ClientManagerTest.class,
+        AttributeServerTest.class,
+        PermissionServerTest.class,
+        ClientServerTest.class,
         TokenTest2.class,
         AGClientTest.class,
         AGCAStoreTest.class,
-        //     AGTransactionStoreTest.class,
+        AGTransactionStoreTest.class,
         FSClientTest.class,
         FSCAStoreTest.class,
         FSTransactionStoreTest.class,
@@ -61,7 +66,9 @@ public class ServiceTestSuite2 extends TestSuite {
 
     @BeforeClass
     public static void initialize() {
-        TestSuiteInitializer testSuiteInitializer = new TestSuiteInitializer(new OA2Bootstrapper());
-        testSuiteInitializer.init();
+    /*    TestSuiteInitializer testSuiteInitializer = new TestSuiteInitializer(new OA2Bootstrapper());
+        testSuiteInitializer.init();*/
+        TestSuiteInitializer testSuiteInitializer = new CMTestSuiteInitializer(new COBootstrapper());
+              testSuiteInitializer.init();
     }
 }

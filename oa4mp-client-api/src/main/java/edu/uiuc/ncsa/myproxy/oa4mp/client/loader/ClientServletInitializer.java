@@ -12,8 +12,10 @@ import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.servlet.AbstractServlet;
 import edu.uiuc.ncsa.security.servlet.ExceptionHandler;
 import edu.uiuc.ncsa.security.servlet.Initialization;
+import edu.uiuc.ncsa.security.storage.sql.SQLStore;
 
 import javax.servlet.ServletException;
+import java.sql.SQLException;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -21,9 +23,10 @@ import javax.servlet.ServletException;
  */
 public class ClientServletInitializer implements Initialization {
     protected ExceptionHandler exceptionHandler;
+
     @Override
     public ExceptionHandler getExceptionHandler() {
-        if((exceptionHandler == null)){
+        if ((exceptionHandler == null)) {
             exceptionHandler = new ClientExceptionHandler((ClientServlet) getServlet(), getEnvironment().getMyLogger());
         }
         return exceptionHandler;
@@ -39,12 +42,21 @@ public class ClientServletInitializer implements Initialization {
 
     @Override
     public void init() throws ServletException {
-        if(hasRun) return;
+        if (hasRun) return;
         hasRun = true; // run it once and only once.
         MyLoggingFacade logger = getEnvironment().getMyLogger();
         ClientEnvironment ce = (ClientEnvironment) getEnvironment();
         // This next bit is a
         if (ce.hasAssetStore()) {
+            if (ce.getAssetStore() instanceof SQLStore) {
+                SQLStore sqlStore = (SQLStore) ce.getAssetStore();
+                try {
+                    sqlStore.checkTable();
+                    sqlStore.checkColumns();
+                } catch (SQLException sqlX) {
+                    logger.warn("Could not update store table:" + sqlX.getMessage());
+                }
+            }
             Cleanup<Identifier, Asset> assetCleanup = ClientServlet.assetCleanup;
             if (ce.isEnableAssetCleanup() && assetCleanup == null) {
                 assetCleanup = new Cleanup<Identifier, Asset>(logger);

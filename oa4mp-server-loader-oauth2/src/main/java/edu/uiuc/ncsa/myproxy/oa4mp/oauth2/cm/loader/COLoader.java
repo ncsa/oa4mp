@@ -66,7 +66,8 @@ public class COLoader extends OA2ConfigurationLoader {
                     isTwoFactorSupportEnabled(),
                     getMaxClientRefreshTokenLifetime(),
                     getMLDAP(),
-                    getJSONWebKeys());
+                    getJSONWebKeys(),
+                    getIssuer());
 
         } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
             throw new GeneralException("Error: Could not create the runtime environment", e);

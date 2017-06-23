@@ -48,9 +48,14 @@ public abstract class BaseClientStoreCommands extends StoreCommands {
     @Override
     protected String format(Identifiable identifiable) {
         BaseClient client = (BaseClient) identifiable;
+        String rc = null;
         ClientApproval ca = (ClientApproval) getClientApprovalStore().get(client.getIdentifier());
-        boolean isApproved = ca != null && ca.isApproved();
-        String rc = "(" + (isApproved ? "Y" : "N") + ") " + client.getIdentifier() + " ";
+        if (ca == null) {
+            rc = "(?) " + client.getIdentifier() + " ";
+        } else {
+            boolean isApproved = ca != null && ca.isApproved();
+            rc = "(" + (isApproved ? "Y" : "N") + ") " + client.getIdentifier() + " ";
+        }
         String name = (client.getName() == null ? "no name" : client.getName());
         if (20 < name.length()) {
             name = name.substring(0, 20) + "...";
@@ -61,105 +66,105 @@ public abstract class BaseClientStoreCommands extends StoreCommands {
     }
 
     @Override
-       protected void longFormat(Identifiable identifiable) {
-           BaseClient client = (BaseClient) identifiable;
-           say("Client name=" + (client.getName() == null ? "(no name)" : client.getName()));
-           sayi("identifier=" + client.getIdentifier());
-           sayi("email=" + client.getEmail());
-           sayi("creation timestamp=" + client.getCreationTS());
-           if (getClientApprovalStore() != null) {
-               ClientApproval clientApproval = (ClientApproval) getClientApprovalStore().get(client.getIdentifier());
-               if (clientApproval == null) {
-                   sayi("no approval record exists.");
-               } else {
-                   if (clientApproval.isApproved()) {
-                       String approver = "(unknown)";
-                       if (clientApproval.getApprover() != null) {
-                           approver = clientApproval.getApprover();
-                       }
-                       sayi("approved by " + approver);
-                   } else {
-                       sayi("not approved");
-                   }
-               }
-           }
+    protected void longFormat(Identifiable identifiable) {
+        BaseClient client = (BaseClient) identifiable;
+        say("Client name=" + (client.getName() == null ? "(no name)" : client.getName()));
+        sayi("identifier=" + client.getIdentifier());
+        sayi("email=" + client.getEmail());
+        sayi("creation timestamp=" + client.getCreationTS());
+        if (getClientApprovalStore() != null) {
+            ClientApproval clientApproval = (ClientApproval) getClientApprovalStore().get(client.getIdentifier());
+            if (clientApproval == null) {
+                sayi("no approval record exists.");
+            } else {
+                if (clientApproval.isApproved()) {
+                    String approver = "(unknown)";
+                    if (clientApproval.getApprover() != null) {
+                        approver = clientApproval.getApprover();
+                    }
+                    sayi("approved by " + approver);
+                } else {
+                    sayi("not approved");
+                }
+            }
+        }
 
-           if (client.getSecret() == null) {
-               sayi("public key: (none)");
+        if (client.getSecret() == null) {
+            sayi("public key: (none)");
 
-           } else {
-               sayi("public key:");
-               say(client.getSecret());
-           }
-       }
+        } else {
+            sayi("public key:");
+            say(client.getSecret());
+        }
+    }
 
 
     protected void showApproveHelp() {
-          clientApprovalStoreCommands.showApproveHelp();
-      }
+        clientApprovalStoreCommands.showApproveHelp();
+    }
 
-      public void approve(InputLine inputLine) {
-          if (showHelp(inputLine)) {
-              showApproveHelp();
-              return;
-          }
+    public void approve(InputLine inputLine) {
+        if (showHelp(inputLine)) {
+            showApproveHelp();
+            return;
+        }
 
-          BaseClient client = (BaseClient) findItem(inputLine);
-          ClientApproval ca = null;
-          if (getClientApprovalStore().containsKey(client.getIdentifier())) {
-              ca = (ClientApproval) getClientApprovalStore().get(client.getIdentifier());
-          } else {
-              ca = (ClientApproval) getClientApprovalStore().create();
-              ca.setIdentifier(client.getIdentifier());
-          }
-          // now we have the right approval record for this identifier
-          clientApprovalStoreCommands.approve(ca);
+        BaseClient client = (BaseClient) findItem(inputLine);
+        ClientApproval ca = null;
+        if (getClientApprovalStore().containsKey(client.getIdentifier())) {
+            ca = (ClientApproval) getClientApprovalStore().get(client.getIdentifier());
+        } else {
+            ca = (ClientApproval) getClientApprovalStore().create();
+            ca.setIdentifier(client.getIdentifier());
+        }
+        // now we have the right approval record for this identifier
+        clientApprovalStoreCommands.approve(ca);
 
-      }
+    }
 
     @Override
-      public boolean update(Identifiable identifiable) {
+    public boolean update(Identifiable identifiable) {
 
-          BaseClient client = (BaseClient) identifiable;
+        BaseClient client = (BaseClient) identifiable;
 
-          String newIdentifier = null;
+        String newIdentifier = null;
 
-          info("Starting client update for id = " + client.getIdentifierString());
-          say("Update the values. A return accepts the existing or default value in []'s");
+        info("Starting client update for id = " + client.getIdentifierString());
+        say("Update the values. A return accepts the existing or default value in []'s");
 
-          newIdentifier = getInput("enter the identifier", client.getIdentifierString());
-          boolean removeCurrentClient = false;
-          Identifier oldID = client.getIdentifier();
+        newIdentifier = getInput("enter the identifier", client.getIdentifierString());
+        boolean removeCurrentClient = false;
+        Identifier oldID = client.getIdentifier();
 
-          // no clean way to do this.
-          client.setName(getInput("enter the name", client.getName()));
-          client.setEmail(getInput("enter email", client.getEmail()));
-          // set file not found message.
-          extraUpdates(client);
-          sayi("here is the complete client:");
-          longFormat(client);
-          if (!newIdentifier.equals(client.getIdentifierString())) {
-              sayi2(" remove client with id=\"" + client.getIdentifier() + "\" [y/n]? ");
-              removeCurrentClient = isOk(readline());
-              client.setIdentifier(BasicIdentifier.newID(newIdentifier));
-          }
-          sayi2("save [y/n]?");
-          if (isOk(readline())) {
-              //getStore().save(client);
-              if (removeCurrentClient) {
-                  info("removing client with id = " + oldID);
-                  getStore().remove(client.getIdentifier());
-                  sayi("client with id " + oldID + " removed. Be sure to save any changes.");
-              }
-              sayi("client updated.");
-              info("Client with id " + client.getIdentifierString() + " saving...");
+        // no clean way to do this.
+        client.setName(getInput("enter the name", client.getName()));
+        client.setEmail(getInput("enter email", client.getEmail()));
+        // set file not found message.
+        extraUpdates(client);
+        sayi("here is the complete client:");
+        longFormat(client);
+        if (!newIdentifier.equals(client.getIdentifierString())) {
+            sayi2(" remove client with id=\"" + client.getIdentifier() + "\" [y/n]? ");
+            removeCurrentClient = isOk(readline());
+            client.setIdentifier(BasicIdentifier.newID(newIdentifier));
+        }
+        sayi2("save [y/n]?");
+        if (isOk(readline())) {
+            //getStore().save(client);
+            if (removeCurrentClient) {
+                info("removing client with id = " + oldID);
+                getStore().remove(client.getIdentifier());
+                sayi("client with id " + oldID + " removed. Be sure to save any changes.");
+            }
+            sayi("client updated.");
+            info("Client with id " + client.getIdentifierString() + " saving...");
 
-              return true;
-          }
-          sayi("client not updated, losing changes...");
-          info("User terminated updates for client with id " + client.getIdentifierString());
-          return false;
-      }
+            return true;
+        }
+        sayi("client not updated, losing changes...");
+        info("User terminated updates for client with id " + client.getIdentifierString());
+        return false;
+    }
 
     @Override
     public void rm(InputLine inputLine) {

@@ -22,17 +22,17 @@
 </ul>
 
 <p>The <b>client identifier</b> is a unique string that is used to identify your client to the
-server. This should be put into your configuration file. Rather than exchange public keys or
-some other method of ensuring that your client is indeed authentic, a <b>client secret</b>
-is generated at run time. This is the only time it actually is shown. The server merely
-stores a hash of this rather than the actual value, consequently you have the only copy.
+    server. This should be put into your configuration file. Rather than exchange public keys or
+    some other method of ensuring that your client is indeed authentic, a <b>client secret</b>
+    is generated at run time. This is the only time it actually is shown. The server merely
+    stores a hash of this rather than the actual value, consequently you have the only copy.
     If you lose this, you must register your client again.</p>
 
 <h2>Filling out the registration form</h2>
 
 <p>The default registration form looks like this:</p>
 
-<p><img src="client/images/oauth2-client-registration-1.png"
+<p><img src="client/images/oauth2-registration-page.png"
         alt="Registration Form Image" width="893" height="624"/></p>
 
 <p>The various fields are as follows:</p>
@@ -44,31 +44,44 @@ stores a hash of this rather than the actual value, consequently you have the on
     <li><strong>Home url</strong>: The main address for your site. This will be displayed to users as part of the
         authentication process. It is not required to be secure.
     </li>
-    <li><strong>Refresh token lifetime</strong>: (in seconds). This may be present but only if the server actually supports this
-        feature. If it is available and you leave this blank, then no refresh tokens will be issued for your client.
-    </li>
-    <li><strong>Limited proxy support</strong>. This is mostly needed by servers that are affiliated with Globus. If this is present,
-    you should understand what it does before checking it.</li>
     <li><strong>Callback URLs</strong>
-          A list of callback URLs, one per line must be registered
-          with the server. Client requests must send one of these and if the callback urls sent
-          does not match one of the registered ones, the
-          client request will be rejected. At this point, no wildcards are accepted.
-        As per thje specification, all of these must be secure.
-      </li>
+        A list of callback URLs, one per line must be registered
+        with the server. Client requests must send one of these and if the callback urls sent
+        does not match one of the registered ones, the
+        client request will be rejected. At this point, no wildcards are accepted.
+        As per the specification, all of these must be secure or the request will be rejected.
+    </li>
+    <li><strong>Scopes</strong>: The scopes that this client would like. Since this is for OIDC, you should always
+        keep the openid scope checked (though if you do not, it will be added anyway). This list is generated from the
+        server
+        (the screen shot is merely an example)
+        and while you may request any of the scopes, these are subject to approval. Be advised that if the client
+        later requests an unapproved scope, this will result in an error.
+    </li>
+    <li><strong>Refresh token lifetime</strong>: (in seconds). This may be present but only if the server actually
+        supports this feature. If it is available and you leave this blank, then no refresh tokens will be issued for your client.
+    </li>
+    <li><strong>Issuer</strong>: The specific issuer for this client. Note that this is not trivial to specify
+        and you should probably read the corresponding server documents on <a href="server/manuals/issuers.xhtml">issuers</a>
+        if you need to.
+    </li>
+    <li><strong>Limited proxy support</strong>. This is mostly needed by servers that are affiliated with Globus. If
+        this is present, you should understand what it does before checking it.
+    </li>
+
 </ul>
 
 <p>Fill in the appropriate values. Note that the contact email should be for an actual person, not a generic
-one for an organization since an email will be sent to it once the client has been approved. When you click
-submit you should get a page like this</p>
+    one for an organization since an email will be sent to it once the client has been approved. When you click
+    submit you should get a page like this</p>
 
 <p><img src="client/images/oauth2-client-registration-2.png"
         alt="Succesful Regsitration Image" width="893" height="624"/></p>
 
 <p>The only warning with the secret is to be sure that when you copy and paste it into the configuration file
-that you do not introduce spaces or line breaks. The secret should be a single line. The server administrator
-will get a notice that your client has requested approval and once this has been reviewed, an email will be sent
-to the contact email you gave above.</p>
+    that you do not introduce spaces or line breaks. The secret should be a single line. The server administrator
+    will get a notice that your client has requested approval and once this has been reviewed, an email will be sent
+    to the contact email you gave above.</p>
 <!--#include virtual="../../footer.html" -->
 
 </body>

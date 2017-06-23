@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Issuers in OA4MP</title>
+    <!--#include virtual="../../head.html" -->
+</head>
+
+<body class="composite">
+<!--#include virtual="../../header.html" -->
+<h2>Issuers in OA4MP</h2>
+
+<p>The <a href="http://openid.net/specs/openid-connect-core-1_0.html">open id connect</a> specification
+    requires an issuer, that is to say, the URL of the server that has created or issued the ID token.
+    This is used in server discovery by taking
+</p>
+<pre>
+ issuer + /.well-known/openid-configuration
+</pre>
+<p>
+    and examining the returned JSON object to get such things as signing keys, scopes supported and possible claims.
+</p>
+
+<p>There is a hierarchy for resolving which issuer will be returned with a request, this is </p>
+<ul>
+    <li>The client explicitly has an issuer set.</li>
+    <li>The administrative client has an issuer set, but the client does not (so all clients administered have this
+        same issuer unless overridden.)
+    </li>
+    <li>The server has a globally set issuer in its configuration.</li>
+    <li>With no issuer set, the default is to use the server address plus the servlet path as found in the HTTP GET
+        request.
+    </li>
+</ul>
+<p>Since servers may, for instance, be part of a load balancing system, the actual machine name for the machine is
+    usually a very poor choice for the issuer. Explicitly setting the issuer means that it must be resolvable
+    by a client for server discovery. This is one reason to set the issuer. Another might be for having specific
+    keys used in signing (the server must have access to these and know to use them, of course),
+    however, the issuer <b>must</b> be resolvable as an web address and respond to server discovery.</p>
+
+
+<!--#include virtual="../../footer.html" -->
+</body>
+</html>

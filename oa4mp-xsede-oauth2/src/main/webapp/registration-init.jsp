@@ -17,6 +17,7 @@
         * request = contents of field with the state of this
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 
 <html>
@@ -73,25 +74,22 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>Issuer (optional):</td>
-                    <td><input type="text" size="25" name="${issuer}" value="${issuerValue}"/></td>
-                </tr>
-                <tr>
                     <td>Scopes:</td>
                     <td>
                         <c:forEach items="${scopes}" var="scope">
-                            <input type="checkbox" name="chkScopes" value="${scope}">${scope}&nbsp;
+                            <input type="checkbox"
+                                   name="chkScopes"
+                                   value="${scope}"
+                                <c:set var="xxx" scope="session" value="${scope}"/>
+                                   <c:if test="${xxx == 'openid'}">checked="checked"</c:if>
+                                    >${scope}&nbsp;
                         </c:forEach>
                     </td>
-
                 </tr>
                 <tr>
-                    <td>LDAP configurations (optional):</td>
-                    <td>
-                        <textarea id="${ldap}" rows="5" cols="80" name="${ldap}">${ldapValue}</textarea>
-                    </td>
+                    <td>Issuer (optional):</td>
+                    <td><input type="text" size="25" name="${issuer}" value="${issuerValue}"/></td>
                 </tr>
-                <tr>
                 <tr>
                     <td><input type="submit" value="submit"/></td>
                 </tr>

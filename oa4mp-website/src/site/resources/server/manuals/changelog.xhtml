@@ -11,23 +11,38 @@
 <!--#include virtual="../../header.html" -->
 <p>Changes to the OA4MP server by version.</p>
 
-<h3>3.4</h3>
+
+
+
+<h2>3.4</h2>
 <ul>
     <li>OAUTH-203: Clients may request supported scopes at registration time. </li>
     <li>OAUTH-212: PEM encodings broken by change to Apache base 64 codec.</li>
-    <li>OAUTH-213: Make TLS version configurable.</li>
+    <li>OAUTH-213: Make TLS version configurable in the SSL configuration.</li>
     <li>OAUTH-217: Added discovery, in a server/.well-known/openid_configuration.</li>
     <li>CIL-339: EPTID mismatch handled as a separate case.</li>
-    <li>CIL-344: Client management API created.</li>
+    <li>CIL-344: Client management API created. Sample scripts created as well.</li>
     <li>CIL-356: Clients may have individual LDAP configurations.</li>
     <li>CIL-359: ID tokens must be signed.</li>
     <li>CIL-371: added claim for cert_subject_dn to be returned for the org.cilogon.userinfo scope.</li>
     <li>CIL-378: Clients with same creation timestamp are not all displayed in CLI.</li>
     <li>CIL-388: Server wars now include more meta information in the META-INF/MANIFEST.MF file about the build.</li>
-    <li>Java object serialization issue: Updated dependecies on Apache commons-collections to 3.2.2.</li>
+    <li>Java object serialization issue: Updated dependencies on Apache commons-collections to 3.2.2.</li>
     <li>Removed legacy unused Java object serialization from backend file store.</li>
-</ul>
-<h3>3.3</h3>
+    </ul>
+<h4>3.4 Release notes</h4>
+<p>
+    Note that in this release of OA4MP there are two new tables that are required if the server uses SQL -based storage.
+    One for admin clients and another for permissions. If the user (i.e., as defined in the configuration file that
+    accesses the data) has create permission in the database, then the tables will be automatically created. If not, then
+    you must create them manually using one of the scripts found <a href="https://github.com/ncsa/OA4MP/tree/master/oa4mp-server-admin-oauth2/src/main/resources">
+    here</a>.
+</p>
+<p>You must also create signing keys for OIDC. This is done with the command line tool</p>
+
+
+
+<h2>3.3</h2>
 <ul>
     <li>CIL-252: Scope handler which queries LDAP for user attributes.</li>
     <li>CIL-264: Document examples using the cURL command.</li>
@@ -40,11 +55,10 @@
     <li>CIL-309: Refresh token fixes and improvements.</li>
     <li>CIL-312: Null pointer exception when parsing URIs. The built-in parser for URIs is rather stupid in certain
         cases
-        and would throw an NPE when parsing. This is not being handled better to prevent this.
+        and would throw an NPE when parsing. This is now being handled better to prevent this.
     </li>
     <li>CIL-317: exception setting transaction state if use waits to finish exchange until after initial grant has
-        expired and
-        garbage collected.
+        expired and garbage collected.
     </li>
     <li>CIL-319: Indicate in DN if the user is from and InCommon or eduGain IDP.</li>
     <li>CIL-320: DB Service fix to get information to resolve CIL-319.</li>

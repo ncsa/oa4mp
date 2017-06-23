@@ -1,5 +1,5 @@
 /*
-   This script will create the tables for a basic oa4mp install. Since MySQL has *no* varaible
+   This script will create the tables for a basic oa4mp install. Since MySQL has *no* variable
    support, everything is hard-coded. if you want something other than the default names and 
    then edit the file.
 */
@@ -34,7 +34,7 @@ CREATE TABLE oauth2.clients (
   error_url     TEXT,
   email         TEXT,
   proxy_limited BOOLEAN,
-  creation_ts   TIMESTAMP DEFAULT NULL,
+  creation_ts   TIMESTAMP,
   rt_lifetime   bigint,
   callback_uri  TEXT,
   sign_tokens   BOOLEAN
@@ -48,7 +48,7 @@ CREATE TABLE oauth2.adminClients (
   name         TEXT,
   secret       TEXT,
   email        TEXT,
-  creation_ts  TIMESTAMP DEFAULT NULL,
+  creation_ts  TIMESTAMP,
   vo           TEXT,
   issuer       TEXT
 );
@@ -63,14 +63,14 @@ CREATE TABLE permissions (
   can_read      BOOLEAN,
   can_remove    BOOLEAN,
   can_write     BOOLEAN,
-  creation_ts   TIMESTAMP DEFAULT NULL
+  creation_ts   TIMESTAMP
 );
 
 CREATE TABLE oauth2.client_approvals (
   client_id   VARCHAR(255) PRIMARY KEY,
   approver    TEXT,
   approved    BOOLEAN,
-  approval_ts TIMESTAMP DEFAULT NULL
+  approval_ts TIMESTAMP
 );
 
 CREATE TABLE oauth2.transactions (

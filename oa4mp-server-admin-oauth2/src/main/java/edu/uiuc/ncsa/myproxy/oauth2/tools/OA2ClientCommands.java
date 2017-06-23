@@ -118,10 +118,10 @@ public class OA2ClientCommands extends ClientStoreCommands {
             // so at this point the server actually allows for refresh tokens
             String NONE = "none";
             String rtString = oa2Client.isRTLifetimeEnabled()?Long.toString(oa2Client.getRtLifetime()/1000) : NONE;
-            String rawLifetime = getInput("enter the refresh lifetime in ", rtString);
+            String rawLifetime = getInput("enter the refresh lifetime in ms.", rtString);
 
             if (rawLifetime == null || rawLifetime.length() == 0 || rawLifetime.toLowerCase().equals(NONE)) {
-                oa2Client.setRtLifetime(Long.MIN_VALUE);
+                oa2Client.setRtLifetime(0);
             } else {
                 try {
                     oa2Client.setRtLifetime(Long.parseLong(rawLifetime));

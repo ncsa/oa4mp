@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.myproxy.MyProxyConnectable;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractAuthorizationServlet;
+import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
@@ -167,6 +168,9 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
     public String createCallback(ServiceTransaction trans, Map<String, String> params) {
 
         String cb = trans.getCallback().toString();
+        if(!cb.toLowerCase().startsWith("https:")){
+            throw new GeneralException("Error: Unsupported callback protocol for \"" + cb + "\". Must be https");
+        }
         String idStr = trans.getIdentifierString();
         try {
             cb = cb + (cb.indexOf("?") == -1 ? "?" : "&") + OA2Constants.AUTHORIZATION_CODE + "=" + URLEncoder.encode(idStr, "UTF-8");

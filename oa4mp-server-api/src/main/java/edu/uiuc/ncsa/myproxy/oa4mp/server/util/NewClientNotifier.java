@@ -8,6 +8,7 @@ import edu.uiuc.ncsa.security.util.mail.MailUtil;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -27,13 +28,9 @@ public class NewClientNotifier extends Notifier implements NewClientListener {
         super(mailUtil, loggingFacade);
     }
 
-    @Override
-    public void fireNewClientEvent(NewClientEvent notificationEvent) {
-        if (!mailUtil.isEnabled()) {
-            return;
-        }
-        Client client = notificationEvent.getClient();
+    protected Map<String,String> getReplacements(Client client) {
         HashMap<String, String> replacements = new HashMap<String, String>();
+
         replacements.put(NAME, client.getName());
         replacements.put(EMAIL, client.getEmail());
         replacements.put(HOME_URI, client.getHomeUri());
@@ -47,6 +44,17 @@ public class NewClientNotifier extends Notifier implements NewClientListener {
             loggingFacade.warn("Error: Could not resolve localhost, so could not put full name into message");
             replacements.put("host", "localhost");
         }
+
+        return replacements;
+    }
+
+    @Override
+    public void fireNewClientEvent(NewClientEvent notificationEvent) {
+        if (!mailUtil.isEnabled()) {
+            return;
+        }
+        Client client = notificationEvent.getClient();
+        Map<String,String> replacements = getReplacements(client);
 
         boolean rc = mailUtil.sendMessage(replacements);
         if (rc) {
