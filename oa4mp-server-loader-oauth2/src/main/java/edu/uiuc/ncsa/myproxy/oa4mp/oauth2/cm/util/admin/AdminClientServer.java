@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.admin;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.loader.COSE;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.AbstractDDServer;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
@@ -10,7 +10,7 @@ import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
  * on 4/17/17 at  10:48 AM
  */
 public class AdminClientServer extends AbstractDDServer {
-    public AdminClientServer(COSE cose) {
+    public AdminClientServer(OA2SE cose) {
         super(cose);
     }
 

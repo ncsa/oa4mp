@@ -2,6 +2,8 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.ldap.LDAPStoreProviderUtil;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.ldap.MultiLDAPStoreProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.BasicScopeHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.LDAPScopeHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.*;
@@ -108,7 +110,8 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     isTwoFactorSupportEnabled(),
                     getMaxClientRefreshTokenLifetime(),
                     getJSONWebKeys(),
-                    getIssuer());
+                    getIssuer(),
+                    getMLDAP());
             if (getScopeHandler() instanceof BasicScopeHandler) {
                 ((BasicScopeHandler) getScopeHandler()).setOa2SE((OA2SE) se);
             }
@@ -135,6 +138,19 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         return constants;
     }
 
+    MultiLDAPStoreProvider mldap = null;
+
+    protected MultiLDAPStoreProvider getMLDAP() {
+        if (mldap == null) {
+            mldap = new MultiLDAPStoreProvider(cn, isDefaultStoreDisabled(), (MyLoggingFacade) loggerProvider.get(), null, null, LDAPStoreProviderUtil.getLdapEntryProvider());
+            mldap.addListener(LDAPStoreProviderUtil.getM(cn));
+            mldap.addListener(LDAPStoreProviderUtil.getFSP(cn));
+            mldap.addListener(LDAPStoreProviderUtil.getMariaDB(cn, getMariaDBConnectionPoolProvider()));
+            mldap.addListener(LDAPStoreProviderUtil.getMysql(cn, getMySQLConnectionPoolProvider()));
+            mldap.addListener(LDAPStoreProviderUtil.getPG(cn, getPgConnectionPoolProvider()));
+        }
+        return mldap;
+    }
     protected JSONWebKeys getJSONWebKeys() {
         ConfigurationNode node = getFirstNode(cn, "JSONWebKey");
         if(node == null){
@@ -351,7 +367,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
             // no scopes element, so just use the basic handler.
             if (scopeHandler == null) {
 
-                DebugUtil.dbg(this, "No configured Scope handler");
+                DebugUtil.dbg(this, "No server-wide configured Scope handler");
                 if (getLdapConfiguration().isEnabled()) {
                     DebugUtil.dbg(this, "   LDAP scope handler enabled, creating default");
 

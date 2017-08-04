@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.security.core.exceptions.InvalidTimestampException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
@@ -14,7 +15,6 @@ import edu.uiuc.ncsa.security.oauth_2_0.server.ScopeHandler;
 import edu.uiuc.ncsa.security.oauth_2_0.server.UII2;
 import edu.uiuc.ncsa.security.oauth_2_0.server.UIIRequest2;
 import edu.uiuc.ncsa.security.oauth_2_0.server.UIIResponse2;
-import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import org.apache.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
@@ -72,13 +72,15 @@ public class UserInfoServlet extends MyProxyDelegationServlet {
         // Now we figure out which scope handler to use.
         OA2Client oa2Client = (OA2Client) transaction.getClient();
         UIIResponse2 uiresp = (UIIResponse2) uis.process(uireq);
-        // FIXME!! REMOVE THE FOLLOWING AT SOME POINT
-        DebugUtil.dbg(this, "REMOVE EPPN from claims");
-        if(ServletDebugUtil.isEnabled()){
-            uiresp.getUserInfo().put("email", "gaynor@illinois.edu");
+        LinkedList<ScopeHandler> scopeHandlers = OA2ATServlet.setupScopeHandlers((OA2ServiceTransaction) transaction, oa2SE);
+        DebugUtil.dbg(this,"Invoking scope handler");
+        if(scopeHandlers==null || scopeHandlers.isEmpty()){
+            DebugUtil.dbg(this," ***** NO SCOPE HANDLERS ");
+
         }
-        LinkedList<ScopeHandler> scopeHandlers = LDAPScopeHandlerFactory.createScopeHandlers(oa2SE, oa2Client);
         for (ScopeHandler scopeHandler : scopeHandlers) {
+            DebugUtil.dbg(this," scope handler=" + scopeHandler.getClass().getSimpleName());
+
             scopeHandler.process(uiresp.getUserInfo(), transaction);
         }
         uiresp.write(response);

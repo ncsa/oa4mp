@@ -21,17 +21,18 @@
 </p>
 <pre>
 &lt;!ELEMENT <a href="server/configuration/server-configuration-file.xhtml">config</a> (<a href="server/dtd/server-dtd-service-tag.xhtml">service</a>)*>
-&lt;!ELEMENT <a href="server/dtd/server-dtd-service-tag.xhtml">service</a> (<a href="server/configuration/server-myproxy.xhtml">myproxy</a>|<a
-        href="common/configuration/mysql-store.xhtml">mysql</a>|<a
-        href="common/configuration/mariadb-store.xhtml">mariadb</a>|<a
-        href="common/configuration/postgres-store.xhtml">postgresql</a>|<a
-        href="common/configuration/file-store.xhtml">fileStore</a>|<a href="common/configuration/memory-store.xhtml">memoryStore</a>|<a
-        href="server/configuration/server-email.xhtml">mail</a>|<a
-        title="OAuth for MyProxy: Messages" href="server/configuration/server-messages.xhtml">messages</a>|
-        <a href="common/configuration/logging.xhtml">logging</a>|
-        <a href="server/configurations/authorization-servlet.xhtml">authorizationServlet</a>|
-    <span style="background-color: #ff6600;"><a href="server/configuration/ldap.xhtml">ldap</a></span>|
-    <span style="background-color: #ff6600;"><a href="server/configuration/signing.xhtml">JSONWebKey</a></span>|
+&lt;!ELEMENT <a href="server/dtd/server-dtd-service-tag.xhtml">service</a> (<a href="server/configuration/server-myproxy.xhtml">myproxy</a>|
+      <a href="common/configuration/mysql-store.xhtml">mysql</a>|
+      <a href="common/configuration/mariadb-store.xhtml">mariadb</a>|
+      <a href="common/configuration/postgres-store.xhtml">postgresql</a>|
+      <a href="common/configuration/file-store.xhtml">fileStore</a>|<a href="common/configuration/memory-store.xhtml">memoryStore</a>|
+      <a href="server/configuration/server-email.xhtml">mail</a>|
+      <a href="common/configuration/scopes.xhtml">scopes</a>|
+      <a href="server/configuration/server-messages.xhtml">messages</a>|
+      <a href="common/configuration/logging.xhtml">logging</a>|
+      <a href="server/configurations/authorization-servlet.xhtml">authorizationServlet</a>|
+      <span style="background-color: #ff6600;"><a href="server/configuration/ldap.xhtml">ldap</a></span>|
+      <span style="background-color: #ff6600;"><a href="server/configuration/signing.xhtml">JSONWebKey</a></span>
     )*>
 &lt;!ATTLIST <a href="server/dtd/server-dtd-service-tag.xhtml">service</a>
     address CDATA #IMPLIED
@@ -163,6 +164,10 @@
 &lt;!ATTLIST
     defaultKeyID CDATA #IMPLIED&gt;
 &lt;!ELEMENT path (#PCDATA)&gt;
+&lt;!ELEMENT <a href="common/configuration/scopes.xhtml">scopes</a>(scope)&gt;
+&lt;!ELEMENT <a href="common/configuration/scopes.xhtml">scope</a>(#PCDATA)&gt;
+&lt;!ATTLIST <a href="common/configuration/scopes.xhtml">scope</a>
+     enabled CDATA #IMPLIED&gt;
 ]&gt;
 </pre>
 <p>A few examples</p>

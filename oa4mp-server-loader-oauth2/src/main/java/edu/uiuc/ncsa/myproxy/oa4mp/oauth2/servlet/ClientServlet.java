@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.ManagerFacade;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.loader.COSE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.ResponseSerializer;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.EnvServlet;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
@@ -29,8 +29,8 @@ public class ClientServlet extends EnvServlet {
     public void storeUpdates() throws IOException, SQLException {
         if (storeUpdatesDone) return; // run this once
         storeUpdatesDone = true;
-        processStoreCheck(getCOSE().getAdminClientStore());
-        processStoreCheck(getCOSE().getPermissionStore());
+        processStoreCheck(getOA2SE().getAdminClientStore());
+        processStoreCheck(getOA2SE().getPermissionStore());
     }
 
     @Override
@@ -40,7 +40,7 @@ public class ClientServlet extends EnvServlet {
 
     public ManagerFacade getClientManager() {
         if (clientManager == null) {
-            clientManager = new ManagerFacade((COSE) getEnvironment());
+            clientManager = new ManagerFacade((OA2SE) getEnvironment());
         }
         return clientManager;
     }
@@ -80,13 +80,13 @@ public class ClientServlet extends EnvServlet {
 
     }
 
-    protected COSE getCOSE() {
-        return (COSE) getEnvironment();
+    protected OA2SE getOA2SE() {
+        return (OA2SE) getEnvironment();
     }
 
     public ResponseSerializer getResponseSerializer() {
         if (responseSerializer == null) {
-            responseSerializer = new ResponseSerializer(getCOSE());
+            responseSerializer = new ResponseSerializer(getOA2SE());
         }
         return responseSerializer;
     }

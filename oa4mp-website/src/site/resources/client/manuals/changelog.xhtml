@@ -14,6 +14,18 @@
 <h1>Client change log</h1>
 
 <p>Here is the log for changes to the OA4MP client.</p>
+
+<h2>3.4</h2>
+<ul>
+    <li>OAUTH-216: Secret key block displayed on OIDC test client page. </li>
+</ul>
+<h4>3.4 Release notes</h4>
+<p>As of version 3.4, all ID tokens for new OIDC clients will be signed. Older clients will still be issued
+    unsigned tokens. If you have an older client, you should upgrade it as soon as is practical and notify
+    the server administrators to start issuing your client signed tokens, since unsigned tokens should be
+    rejected by the new client.
+</p>
+
 <h2>3.3</h2>
 <ul>
     <li>OAUTH-213: Allow for configuration of TLS version in configuration.</li>

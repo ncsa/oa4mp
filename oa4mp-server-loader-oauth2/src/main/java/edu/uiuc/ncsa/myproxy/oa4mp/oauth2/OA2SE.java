@@ -1,11 +1,15 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.ldap.LDAPEntry;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.ldap.LDAPStore;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.BasicScopeHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.MyProxyFacadeProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironmentImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionsStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AuthorizationServletConfig;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.delegation.server.issuers.AGIssuer;
 import edu.uiuc.ncsa.security.delegation.server.issuers.ATIssuer;
@@ -58,7 +62,8 @@ public class OA2SE extends ServiceEnvironmentImpl {
                  boolean twoFactorSupportEnabled,
                  long maxClientRefreshTokenLifetime,
                  JSONWebKeys jsonWebKeys,
-                 String issuer) {
+                 String issuer,
+                 Provider<LDAPStore> mldap) {
         super(logger,
                 mfp,
                 tsp,
@@ -89,9 +94,9 @@ public class OA2SE extends ServiceEnvironmentImpl {
         OA2Scopes.ScopeUtil.setScopes(scopes); //Probably need a better place to do this at some point. Probably.
 
         this.refreshTokenEnabled = isRefreshTokenEnabled;
-        if(this.refreshTokenEnabled){
+        if (this.refreshTokenEnabled) {
             logger.info("Refresh token support enabled");
-        }else{
+        } else {
             logger.info("No refresh token support.");
         }
 
@@ -100,12 +105,19 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.maxClientRefreshTokenLifetime = maxClientRefreshTokenLifetime;
         this.jsonWebKeys = jsonWebKeys;
         this.issuer = issuer;
+        this.mldap = mldap;
+        if (scopeHandler instanceof BasicScopeHandler) {
+            DebugUtil.dbg(this, "***Setting runtime environment in the scope handler:" + scopeHandler.getClass().getSimpleName());
+            ((BasicScopeHandler) scopeHandler).setOa2SE(this);
+        }
     }
 
     String issuer;
-    public String getIssuer(){
+
+    public String getIssuer() {
         return issuer;
     }
+
     public JSONWebKeys getJsonWebKeys() {
         return jsonWebKeys;
     }
@@ -115,6 +127,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
     }
 
     protected JSONWebKeys jsonWebKeys;
+
     public boolean isTwoFactorSupportEnabled() {
         return twoFactorSupportEnabled;
     }
@@ -123,7 +136,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
         return maxClientRefreshTokenLifetime;
     }
 
-    long  maxClientRefreshTokenLifetime = 0L;
+    long maxClientRefreshTokenLifetime = 0L;
 
     boolean twoFactorSupportEnabled = false;
     boolean refreshTokenEnabled = false;
@@ -184,5 +197,16 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.ldapConfiguration2 = ldapConfiguration2;
     }
 
+
     LDAPConfiguration ldapConfiguration2;
+
+    Provider<LDAPStore> mldap;
+    LDAPStore ldapStore = null;
+
+    public LDAPStore<LDAPEntry> getLDAPStore() {
+        if (ldapStore == null) {
+            ldapStore = mldap.get();
+        }
+        return ldapStore;
+    }
 }

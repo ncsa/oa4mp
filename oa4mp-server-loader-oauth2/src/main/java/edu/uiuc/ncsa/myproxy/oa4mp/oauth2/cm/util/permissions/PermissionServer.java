@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.permissions;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.loader.COSE;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.AbstractDDServer;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.Permission;
@@ -17,7 +17,7 @@ import java.util.List;
  * on 12/1/16 at  10:54 AM
  */
 public class PermissionServer extends AbstractDDServer {
-    public PermissionServer(COSE cose) {
+    public PermissionServer(OA2SE cose) {
         super(cose);
     }
 

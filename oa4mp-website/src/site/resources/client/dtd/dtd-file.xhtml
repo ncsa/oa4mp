@@ -19,14 +19,26 @@
      version CDATA #IMPLIED
      disableDefaultStores CDATA #IMPLIED
      debug CDATA #IMPLIED&gt;
-&lt;!ELEMENT client (<a title="Parameters" href="client/manuals/parameters.xhtml#tags">id|serviceUri|authorizeUri|callbackUri|lifetime|<span style="background-color: #ff6600;">secret</span>|publicKeyFile|privateKeyFile|skin|enableAssetCleanup|maxAssetLifetime|keypairLifetime</a>|
+&lt;!ELEMENT client (<a title="Parameters" href="client/manuals/parameters.xhtml#tags">id|
+    serviceUri|
+    authorizeUri|
+    callbackUri|
+    lifetime|
+    <span style="background-color: #ff6600;">secret</span>|
+    publicKeyFile|
+    privateKeyFile|
+    skin|
+    enableAssetCleanup|
+    maxAssetLifetime|
+    keypairLifetime</a>|
     <a href="common/configuration/logging.xhtml">logging</a>|
     <a href="common/configuration/memory-store.xhtml">memoryStore</a>|
     <a href="common/configuration/file-store.xhtml">fileStore</a>|
     <a href="common/configuration/postgres-store.xhtml">postgresql</a>|
     <a href="common/configuration/mysql-store.xhtml">mysql</a>|
     <a href="common/configuration/mariadb-store.xhtml">mariadb</a>|
-    <a href="common/configuration/keystore.xhtml">keystore</a>)*&gt;<br/>
+    <a href="common/configuration/keystore.xhtml">keystore</a>)|
+    <a href="common/configuration/scopes.xhtml">scopes</a>*&gt;<br/>
 &lt;!ELEMENT id (#PCDATA)&gt;
 &lt;!ELEMENT serviceUri (#PCDATA)&gt;
 &lt;!ELEMENT authorizeUri (#PCDATA)&gt;
@@ -76,7 +88,6 @@
      tablename CDATA #IMPLIED
      tablePrefix CDATA #IMPLIED
      driver CDATA #IMPLIED&gt;
-
 &lt;!ELEMENT <a href="common/configuration/postgres-store.xhtml">postgresql</a> (assetStore)*&gt;
 &lt;!ATTLIST <a href="common/configuration/postgres-store.xhtml">postgresql</a>
      password CDATA #REQUIRED
@@ -94,6 +105,11 @@
      type CDATA #REQUIRED
      factory CDATA #REQUIRED
      useJavaKeystore CDATA #IMPLIED&gt;
+&lt;!ELEMENT <a href="common/configuration/scopes.xhtml">scopes</a>(scope)&gt;
+&lt;!ELEMENT <a href="common/configuration/scopes.xhtml">scope</a>(#PCDATA)&gt;
+&lt;!ATTLIST <a href="common/configuration/scopes.xhtml">scope</a>
+     enabled CDATA #IMPLIED&gt;
+]&gt;
 </pre>
 <!--#include virtual="../../footer.html" -->
 

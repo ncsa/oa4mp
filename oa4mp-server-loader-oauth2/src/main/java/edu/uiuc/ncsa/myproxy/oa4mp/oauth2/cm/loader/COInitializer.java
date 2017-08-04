@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.loader;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2ServletInitializer;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2ExceptionHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientStoreProviders;
@@ -27,7 +28,7 @@ public class COInitializer extends OA2ServletInitializer {
     public void init() throws ServletException {
         if (isInitRun) return;
         super.init();
-        COSE cose = (COSE) getEnvironment();
+        OA2SE cose = (OA2SE) getEnvironment();
 
         try {
             SATFactory.setAdminClientConverter(AdminClientStoreProviders.getAdminClientConverter());

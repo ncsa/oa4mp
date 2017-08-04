@@ -127,7 +127,8 @@ public class OA2ExceptionHandler implements ExceptionHandler {
             wrapper.setExceptionEncountered(true);
         }
         String cb = oa2RedirectableError.getCallback().toString();
-        cb = cb + "?" + OA2Constants.ERROR + "=" + oa2RedirectableError.getError() + "&" +
+        boolean hasQM = (0 < cb.indexOf("?")); // CIL-407 FIX
+        cb = cb + (hasQM?"&":"?") + OA2Constants.ERROR + "=" + oa2RedirectableError.getError() + "&" +
                 URLEncoder.encode(OA2Constants.ERROR_DESCRIPTION, "UTF-8") + "=" +
                 URLEncoder.encode(oa2RedirectableError.getDescription(), "UTF-8");
         //CIL-312 fix.

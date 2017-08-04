@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.attributes;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.loader.COSE;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.AbstractDDServer;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientConverter;
@@ -16,7 +16,7 @@ import edu.uiuc.ncsa.security.storage.sql.internals.ColumnMap;
  * on 11/28/16 at  1:31 PM
  */
 public class AttributeServer extends AbstractDDServer {
-    public AttributeServer(COSE cose) {
+    public AttributeServer(OA2SE cose) {
         super(cose);
     }
 

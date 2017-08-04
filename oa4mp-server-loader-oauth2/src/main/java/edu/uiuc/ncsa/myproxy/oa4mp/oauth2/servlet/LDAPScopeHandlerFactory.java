@@ -41,26 +41,30 @@ public class LDAPScopeHandlerFactory extends ScopeHandlerFactory {
      * @return
      */
     public static LinkedList<ScopeHandler> createScopeHandlers(OA2SE oa2SE, OA2Client client) {
+        DebugUtil.dbg(LDAPScopeHandlerFactory.class, "Starting to create LDAPScopeHandlers per client");
              LinkedList<ScopeHandler> scopeHandlers = new LinkedList<>();
 
              if (client.getLdaps()==null || client.getLdaps().isEmpty()) {
-                 DebugUtil.dbg(ScopeHandlerFactory.class, "using default scope handler=");
+                 DebugUtil.dbg(LDAPScopeHandlerFactory.class, "using default scope handler=");
                  if(oa2SE.getScopeHandler() instanceof BasicScopeHandler){
                      BasicScopeHandler bb = (BasicScopeHandler)oa2SE.getScopeHandler();
                      if(bb.getOa2SE() == null){
-                         DebugUtil.dbg(ScopeHandlerFactory.class,"setting scope handler environment #1");
+                         DebugUtil.dbg(LDAPScopeHandlerFactory.class,"setting scope handler environment #1");
                          bb.setOa2SE(oa2SE);
                      }
                  }
                  scopeHandlers.add(oa2SE.getScopeHandler());
              } else {
                  for (LDAPConfiguration cfg : client.getLdaps()) {
+                     DebugUtil.dbg(LDAPScopeHandlerFactory.class,"Got LDAP configuration for server " + cfg.getServer());
                      LDAPScopeHandlerFactoryRequest req = new LDAPScopeHandlerFactoryRequest(oa2SE.getMyLogger(),
                              cfg, client.getScopes());
                      ScopeHandler scopeHandler = ScopeHandlerFactory.newInstance(req);
                      if(scopeHandler instanceof BasicScopeHandler){
+                         DebugUtil.dbg(LDAPScopeHandlerFactory.class, "Scope handler\"" + scopeHandler.getClass().getSimpleName() + "\" is configured.");
+
                          ((BasicScopeHandler)scopeHandler).setOa2SE(oa2SE);
-                         DebugUtil.dbg(ScopeHandlerFactory.class, "setting scope handler environment #2");
+                         DebugUtil.dbg(LDAPScopeHandlerFactory.class, "setting scope handler environment #2");
                      }
                      scopeHandlers.add(scopeHandler);
                  }

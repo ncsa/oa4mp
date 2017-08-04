@@ -1,7 +1,5 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.loader;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.ldap.LDAPStoreProviderUtil;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.ldap.MultiLDAPStoreProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2ConfigurationLoader;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironmentImpl;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
@@ -22,19 +20,7 @@ public class COLoader extends OA2ConfigurationLoader {
     }
 
 
-    MultiLDAPStoreProvider mldap = null;
 
-    protected MultiLDAPStoreProvider getMLDAP() {
-        if (mldap == null) {
-            mldap = new MultiLDAPStoreProvider(cn, isDefaultStoreDisabled(), (MyLoggingFacade) loggerProvider.get(), null, null, LDAPStoreProviderUtil.getLdapEntryProvider());
-            mldap.addListener(LDAPStoreProviderUtil.getM(cn));
-            mldap.addListener(LDAPStoreProviderUtil.getFSP(cn));
-            mldap.addListener(LDAPStoreProviderUtil.getMariaDB(cn, getMariaDBConnectionPoolProvider()));
-            mldap.addListener(LDAPStoreProviderUtil.getMysql(cn, getMySQLConnectionPoolProvider()));
-            mldap.addListener(LDAPStoreProviderUtil.getPG(cn, getPgConnectionPoolProvider()));
-        }
-        return mldap;
-    }
 
     @Override
     public ServiceEnvironmentImpl createInstance() {

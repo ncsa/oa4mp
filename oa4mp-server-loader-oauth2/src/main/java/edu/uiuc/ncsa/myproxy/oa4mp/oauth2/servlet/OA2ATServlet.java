@@ -276,9 +276,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         if (returnScopes) {
             atResponse.setSupportedScopes(targetScopes);
         }
-        OA2Client client = (OA2Client) transaction.getClient();
-        LinkedList<ScopeHandler> scopeHandlers = LDAPScopeHandlerFactory.createScopeHandlers(oa2SE, client);
-        atResponse.setScopeHandlers(scopeHandlers); // so the same scopes in user info are returned here.
+
+        atResponse.setScopeHandlers(setupScopeHandlers(transaction, oa2SE));
 
         atResponse.setServiceTransaction(transaction);
         atResponse.setJsonWebKey(oa2SE.getJsonWebKeys().getDefault());
@@ -287,4 +286,29 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         return transaction;
     }
 
+    public static LinkedList<ScopeHandler> setupScopeHandlers( OA2ServiceTransaction transaction, OA2SE oa2SE) {
+      /*  OA2Client client = (OA2Client) transaction.getClient();
+        DebugUtil.dbg(this, "Getting configured scope handler factory " + LDAPScopeHandlerFactory.getFactory().getClass().getSimpleName());
+        LinkedList<ScopeHandler> scopeHandlers = LDAPScopeHandlerFactory.createScopeHandlers(oa2SE, client);
+        atResponse.setScopeHandlers(scopeHandlers); // so the same scopes in user info are returned here.*/
+        LinkedList<ScopeHandler> scopeHandlers = new LinkedList<>();
+        DebugUtil.dbg(OA2ATServlet.class, "setting up scope handlers");
+        if (oa2SE.getScopeHandler() != null && oa2SE.getScopeHandler().isEnabled()) {
+            DebugUtil.dbg(OA2ATServlet.class, "Adding default scope handler.");
+
+            scopeHandlers.add(oa2SE.getScopeHandler());
+        }
+        ScopeHandlerFactory oldSHF = LDAPScopeHandlerFactory.getFactory();
+        LDAPScopeHandlerFactory.setFactory(new LDAPScopeHandlerFactory());
+
+        OA2Client client = (OA2Client) transaction.getClient();
+        DebugUtil.dbg(OA2ATServlet.class, "Getting configured scope handler factory " + LDAPScopeHandlerFactory.getFactory().getClass().getSimpleName());
+        DebugUtil.dbg(OA2ATServlet.class, "Adding other scope handlers ");
+
+        scopeHandlers.addAll(LDAPScopeHandlerFactory.createScopeHandlers(oa2SE, client));
+        DebugUtil.dbg(OA2ATServlet.class, "Total scope handlers = " + scopeHandlers.size());
+
+        LDAPScopeHandlerFactory.setFactory(oldSHF);
+        return scopeHandlers;
+    }
 }

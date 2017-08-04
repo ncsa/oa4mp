@@ -20,6 +20,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.util.ClientApproverConverter;
 import edu.uiuc.ncsa.security.core.configuration.Configurations;
 import edu.uiuc.ncsa.security.core.configuration.provider.CfgEvent;
 import edu.uiuc.ncsa.security.core.configuration.provider.TypedProvider;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApprovalStore;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientStore;
@@ -234,7 +235,6 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
             macp.addListener(AdminClientStoreProviders.getMysqlACS(cn, getMySQLConnectionPoolProvider()));
             macp.addListener(AdminClientStoreProviders.getPostgresACS(cn, getPgConnectionPoolProvider()));
             AdminClientStore acs = (AdminClientStore) macp.get();
-            System.err.println("Got admin client store" + acs.getClass().getSimpleName());
         }
         return macp;
     }
@@ -392,6 +392,8 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
 
         se2.setServiceAddress(getServiceAddress());
         se2.setDebugOn(Boolean.parseBoolean(Configurations.getFirstAttribute(cn, OA4MPConfigTags.DEBUG)));
+        DebugUtil.setIsEnabled(se2.isDebugOn());
+        se2.info("Debugging is " + (se2.isDebugOn()?"on":"off"));
 
         // part 2. This is done after main config load.
         Object[] polling = loadPolling();

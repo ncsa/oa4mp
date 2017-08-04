@@ -1,15 +1,15 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.loader.COSE;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.admin.ACGetResponse;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.attributes.AttributeAdminClientResponse;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.attributes.AttributeGetClientResponse;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.client.GetResponse;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.permissions.AddClientResponse;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.attributes.AttributeClientResponse;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.attributes.AttributeGetAdminClientResponse;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.attributes.AttributeGetClientResponse;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.client.ClientResponse;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.client.CreateResponse;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.client.GetResponse;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.permissions.AddClientResponse;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.permissions.ListAdminsResponse;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.permissions.ListClientResponse;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.permissions.PermissionResponse;
@@ -32,9 +32,9 @@ import java.util.List;
  * on 12/6/16 at  10:10 AM
  */
 public class ResponseSerializer {
-    COSE cose;
+    OA2SE cose;
 
-    public ResponseSerializer(COSE cose) {
+    public ResponseSerializer(OA2SE cose) {
         this.cose = cose;
     }
 

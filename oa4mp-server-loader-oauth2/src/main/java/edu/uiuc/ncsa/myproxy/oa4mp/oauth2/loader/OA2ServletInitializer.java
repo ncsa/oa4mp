@@ -5,11 +5,15 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.LDAPScopeHandlerFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2ExceptionHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RefreshTokenRetentionPolicy;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RefreshTokenStore;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientStoreProviders;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.SATFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.OA4MPServletInitializer;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.NewClientNotifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.delegation.storage.Client;
+import edu.uiuc.ncsa.security.delegation.storage.impl.ClientConverter;
 import edu.uiuc.ncsa.security.oauth_2_0.server.ScopeHandlerFactory;
 import edu.uiuc.ncsa.security.servlet.ExceptionHandler;
 import edu.uiuc.ncsa.security.util.mail.MailUtil;
@@ -31,9 +35,10 @@ public class OA2ServletInitializer extends OA4MPServletInitializer {
     }
 
     @Override
-    protected NewClientNotifier createNewClientNotifier(MailUtil mailUtil, MyLoggingFacade logger){
-          return new OA2NewClientNotifier(mailUtil, logger);
-      }
+    protected NewClientNotifier createNewClientNotifier(MailUtil mailUtil, MyLoggingFacade logger) {
+        return new OA2NewClientNotifier(mailUtil, logger);
+    }
+
     @Override
     public void init() throws ServletException {
         if (isInitRun) return;
@@ -59,6 +64,12 @@ public class OA2ServletInitializer extends OA4MPServletInitializer {
         }
         if (!ScopeHandlerFactory.isFactorySet()) {
             ScopeHandlerFactory.setFactory(new LDAPScopeHandlerFactory());
+        }
+        try {
+            SATFactory.setAdminClientConverter(AdminClientStoreProviders.getAdminClientConverter());
+            SATFactory.setClientConverter((ClientConverter<? extends Client>) oa2SE.getClientStore().getACConverter());
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

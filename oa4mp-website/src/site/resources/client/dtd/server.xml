@@ -1,0 +1,444 @@
+<!DOCTYPE config [
+        <!ELEMENT config (service)*>
+        <!ELEMENT service (mail|logging|JSONWebKey|authorizationServlet|myproxy|mysql|mariadb|postgresql|fileStore|ldap|scopes|xsedeApi)*>
+        <!ATTLIST service
+                address CDATA #REQUIRED
+                clientSecretLength CDATA #IMPLIED
+                disableDefaultStores CDATA #IMPLIED
+                enableTwoFactorSupport CDATA #IMPLIED
+                issuer CDATA #IMPLIED
+                name CDATA #REQUIRED
+                refreshTokenEnabled CDATA #IMPLIED
+                refreshTokenLifetime CDATA #IMPLIED
+                version CDATA #REQUIRED>
+        <!ELEMENT mail (messageTemplate|subjectTemplate)*>
+        <!ATTLIST mail
+                debug CDATA #IMPLIED
+                enabled CDATA #REQUIRED
+                password CDATA #IMPLIED
+                recipients CDATA #IMPLIED
+                server CDATA #IMPLIED
+                useSSL CDATA #IMPLIED
+                username CDATA #IMPLIED>
+        <!ELEMENT logging (#PCDATA)>
+        <!ATTLIST logging
+                debug CDATA #REQUIRED
+                logFileCount CDATA #REQUIRED
+                logFileName CDATA #REQUIRED
+                logName CDATA #REQUIRED
+                logSize CDATA #REQUIRED>
+        <!ELEMENT JSONWebKey (path)*>
+        <!ATTLIST JSONWebKey
+                defaultKeyID CDATA #REQUIRED>
+        <!ELEMENT path (#PCDATA)>
+        <!ELEMENT authorizationServlet (#PCDATA)>
+        <!ATTLIST authorizationServlet
+                authorizationURI CDATA #IMPLIED
+                headerFieldName CDATA #IMPLIED
+                requireHeader CDATA #IMPLIED
+                useHeader CDATA #IMPLIED>
+        <!ELEMENT myproxy (#PCDATA)>
+        <!ATTLIST myproxy
+                host CDATA #REQUIRED
+                port CDATA #REQUIRED>
+        <!ELEMENT mysql (clients|clientApprovals|transactions|permissions|adminClients|ldap)*>
+        <!ATTLIST mysql
+                username CDATA #REQUIRED
+                password CDATA #REQUIRED
+                schema CDATA #REQUIRED>
+        <!ELEMENT clients (#PCDATA)>
+        <!ELEMENT clientApprovals (#PCDATA)>
+        <!ELEMENT transactions (#PCDATA)>
+        <!ELEMENT permissions (#PCDATA)>
+        <!ELEMENT adminClients (#PCDATA)>
+        <!ELEMENT ldap (address|port|password|principal|searchBase|searchAttributes|ssl|contextName)*>
+        <!ATTLIST ldap
+                authorizationType CDATA #IMPLIED
+                enabled CDATA #IMPLIED>
+        <!ELEMENT messageTemplate (#PCDATA)>
+        <!ELEMENT subjectTemplate (#PCDATA)>
+        <!ELEMENT mariadb (clients|clientApprovals|transactions)*>
+        <!ATTLIST mariadb
+                username CDATA #REQUIRED
+                password CDATA #REQUIRED
+                schema CDATA #REQUIRED>
+        <!ELEMENT postgresql (clients|clientApprovals|transactions|permissions|adminClients|ldap)*>
+        <!ATTLIST postgresql
+                username CDATA #REQUIRED
+                password CDATA #REQUIRED
+                schema CDATA #REQUIRED
+                database CDATA #REQUIRED>
+        <!ELEMENT fileStore (transactions|clients|clientApprovals|permissions|adminClients|ldap)*>
+        <!ATTLIST fileStore
+                path CDATA #REQUIRED>
+        <!ELEMENT address (#PCDATA)>
+        <!ELEMENT port (#PCDATA)>
+        <!ELEMENT password (#PCDATA)>
+        <!ELEMENT principal (#PCDATA)>
+        <!ELEMENT searchBase (#PCDATA)>
+        <!ELEMENT searchAttributes (attribute)*>
+        <!ELEMENT attribute (#PCDATA)>
+        <!ATTLIST attribute
+                returnAsList CDATA #IMPLIED
+                returnName CDATA #IMPLIED>
+        <!ELEMENT ssl (trustStore|trustStorePassword)*>
+        <!ATTLIST ssl
+                debug CDATA #REQUIRED
+                useJavaTrustStore CDATA #IMPLIED>
+        <!ELEMENT trustStore (path|password)*>
+        <!ELEMENT trustStorePassword (#PCDATA)>
+        <!ELEMENT scopes (scope)*>
+        <!ELEMENT scope (#PCDATA)>
+        <!ELEMENT xsedeApi (username|password)*>
+        <!ELEMENT username (#PCDATA)>
+        <!ELEMENT contextName (#PCDATA)>
+        ]>
+<config>
+<!-- OA4MP OAuth 2.0 -->
+
+    <service name="oa4mp.oa2.memory"
+             version="1.0"
+             address="http://localhost:44444/oauth">
+        <mail enabled="false"/>
+    </service>
+
+<service name="oa4mp.oa2.mysql"
+          version="1.0"
+          disableDefaultStores="true"
+          refreshTokenLifetime="1000000"
+          refreshTokenEnabled="true"
+          address="https://ashigaru.ncsa.uiuc.edu:9443/oauth"
+          issuer="https://ashigaru.ncsa.uiuc.edu/oauth2">
+           <logging
+             logFileName="/tmp/oa4mp-oauth2-mysql.xml"
+             logName="oa4mp"
+             logSize="100000"
+             logFileCount="2"
+             debug="true"/>
+     <JSONWebKey defaultKeyID="9k0HPG3moXENne">
+        <path><![CDATA[/home/ncsa/dev/csd/config/keys.jwk]]></path>
+     </JSONWebKey>
+    <authorizationServlet authorizationURI="https://ashigaru.ncsa.uiuc.edu:9443/oauth2/authorize"/>
+
+     <myproxy host="myproxy.xsede.org" port="7512"/>
+        <myproxy host="myproxy.psc.xsede.org" port="7512"/>
+<!-- <ldap enabled="true"
+        authorizationType="simple">
+        <address>registry-beta.cilogon.org</address>
+        <port>636</port>
+        <password><![CDATA[plhrZjK3RtTRXAIbC1L6]]></password>
+        <principal><![CDATA[uid=registry_user,ou=system,o=NANOGrav,dc=cilogon,dc=org]]></principal>
+        <searchBase><![CDATA[ou=people,o=NANOGrav,dc=cilogon,dc=org]]></searchBase>
+        <searchName>email</searchName>
+        <searchAttributes>
+                  <attribute returnName="sub">employeeNumber</attribute>
+                  <attribute returnName="name">sn</attribute>
+                  <attribute returnName="given_name">givenName</attribute>
+
+                  <attribute returnName="family_name">sn</attribute>
+                  <attribute returnName="email">email</attribute>
+                  <attribute returnName="preferred_username">NANOGravPersonMediaWikiUsername</attribute>
+
+           </searchAttributes>
+      </ldap>
+-->
+<!--
+    [sub] => employeeNumber
+    [email] => mail
+    [given_name] => givenName
+    [family_name] => sn
+    [name] => givenName sn
+    [preferred_username] => NANOGravPersonMediaWikiUsername
+-->
+    <mysql  username="oa4mp-server" password="c9SW5SuspuMU" schema="oauth2" >
+
+         <clients/>
+         <clientApprovals/>
+         <transactions/>
+         <permissions/>
+         <adminClients/>
+         <ldap/>
+     </mysql>
+         <mail enabled="true"
+	   useSSL="true"
+	   username="jeff@gaynor.info"
+	   password="te4habuT8ubreqe3asw6wufre66eye8p"
+           debug="false"
+ 	   server="smtpout.secureserver.net"
+	   recipients="gaynor@illinois.edu">
+         <messageTemplate>/home/ncsa/dev/csd/config/oa2-message.template</messageTemplate>
+         <subjectTemplate>/home/ncsa/dev/csd/config/oa2-subject.template</subjectTemplate>
+     </mail>
+ </service>
+
+
+<service name="oa4mp.oa2.mariadb"
+          version="1.0"
+          refreshTokenLifetime="1000000"
+          refreshTokenEnabled="true"
+          disableDefaultStores="true"
+          address="https://ashigaru.ncsa.uiuc.edu:9443/oauth2">
+           <logging
+             logFileName="/tmp/oa4mp-oauth2-mysql.xml"
+             logName="oa4mp"
+             logSize="100000"
+             logFileCount="2"
+             debug="true"/>
+
+        <myproxy host="myproxy.xsede.org" port="7512"/>
+        <myproxy host="myproxy.psc.xsede.org" port="7512"/>
+
+     <mariadb  username="oa4mp-server" password="c9SW5SuspuMU" schema="oauth2" >
+         <clients/>
+         <clientApprovals/>
+         <transactions/>
+     </mariadb>
+     <mail enabled="false"/>
+ </service>
+<service name="oa4mp.oa2.postgres"
+          version="1.0"
+          disableDefaultStores="true"
+          address="http://ashigaru.ncsa.uiuc.edu:44444/oauth">
+           <logging
+             logFileName="/tmp/oa4mp-oauth2-mysql.xml"
+             logName="oa4mp"
+             logSize="100000"
+             logFileCount="2"
+             debug="true"/>
+
+    <myproxy host="myproxy.ncsa.uiuc.edu" port="7512"/>
+     <postgresql username="oa4mp" password="vnlH814i"  schema="oauth2"  database="ncsa" >
+         <clients/>
+         <clientApprovals/>
+         <transactions/>
+         <permissions/>
+         <adminClients/>
+         <ldap/>
+     </postgresql>
+     <mail enabled="false"/>
+ </service>
+
+
+<service name="oa4mp.oa2.backup"
+          version="1.0"
+          refreshTokenLifetime="1000000"
+          address="http://ashigaru.ncsa.uiuc.edu:44444/oauth">
+           <logging
+             logFileName="/tmp/oa4mp-oauth2-fileStore.xml"
+             logName="oa4mp"
+             logSize="100000"
+             logFileCount="2"
+             debug="true"/>
+
+    <myproxy host="myproxy.ncsa.uiuc.edu" port="7512"/>
+    <fileStore path="/tmp/oa2-backup/fileStore">
+         <transactions/><clients/><clientApprovals/>
+     </fileStore>
+     <mail enabled="false"/>
+ </service>
+<service name="oa4mp.oa2.fileStore.tomcat"
+          version="1.0"
+          refreshTokenLifetime="1000000"
+          refreshTokenEnabled="true"
+          clientSecretLength="128"
+          address="https://ashigaru.ncsa.uiuc.edu:9443/oauth">
+           <logging
+             logFileName="/tmp/oa4mp-oauth2-fileStore.xml"
+             logName="oa4mp"
+             logSize="100000"
+             logFileCount="2"
+             debug="true"/>
+  <authorizationServlet useHeader="true"
+                           requireHeader="true"
+                           headerFieldName="REMOTE_USER"/>
+      <myproxy host="myproxy.xsede.org" port="7512"/>
+     <myproxy host="myproxy.psc.xsede.org" port="7512"/>
+     <fileStore path="/home/ncsa/temp/oa4mp2/fileStore">
+         <transactions/><clients/><clientApprovals/>
+     </fileStore>
+     <mail enabled="false"/>
+ </service>
+
+<service name="oa4mp.oa2.fileStore"
+          version="1.0"
+          refreshTokenLifetime="1000000"
+          refreshTokenEnabled="true"
+          clientSecretLength="128"
+          enableTwoFactorSupport="true"
+disableDefaultStores="true"
+          address="https://ashigaru.ncsa.uiuc.edu:9443/oauth">
+           <logging
+             logFileName="/tmp/oa4mp-oauth2-fileStore.xml"
+             logName="oa4mp"
+             logSize="100000"
+             logFileCount="2"
+             debug="tue"/>
+<!--
+      <myproxy host="tfca.ncsa.illinois.edu" port="7512"/>
+-->
+      <myproxy host="myproxy.xsede.org" port="7512"/>
+     <myproxy host="myproxy.psc.xsede.org" port="7512"/>
+
+ <ldap enabled="true"
+        authorizationType="simple">
+        <address>registry-beta.cilogon.org</address>
+        <port>636</port>
+        <password><![CDATA[plhrZjK3RtTRXAIbC1L6]]></password>
+        <principal><![CDATA[uid=registry_user,ou=system,o=NANOGrav,dc=cilogon,dc=org]]></principal>
+        <searchBase><![CDATA[ou=people,o=NANOGrav,dc=cilogon,dc=org]]></searchBase>
+        <searchAttributes>
+                  <attribute returnName="sub">uid</attribute>
+                  <attribute returnName="name">cn</attribute>
+                  <attribute returnName="email">email</attribute>
+                  <attribute returnName="preferred_username">employeeNumber</attribute>
+           </searchAttributes>
+
+        <ssl debug="false">
+          <trustStore>/var/www/config/cacerts2</trustStore>
+          <trustStorePassword><![CDATA[changeit]]></trustStorePassword>
+        </ssl>
+      </ldap>
+
+ <!--     <ldap enabled="true"
+            authorizationType="none">
+           <address>ldap.ncsa.illinois.edu</address>
+           <port>636</port>
+           <searchBase><![CDATA[ou=People,dc=ncsa,dc=illinois,dc=edu]]></searchBase>
+           <searchAttributes>
+                  <attribute returnName="name">cn</attribute>
+                  <attribute>mail</attribute>
+                  <attribute returnName="isMemberOf">memberOf</attribute>
+           </searchAttributes>
+           <ssl debug="false"
+                useJavaTrustStore="true"
+                tlsVersion="1.2">
+                <trustStore>
+                    <path>/home/ncsa/dev/csd/config/cacerts2</path>
+                    <password><![CDATA[changeit]]></password>
+                </trustStore>
+           </ssl>
+      </ldap>
+-->
+
+     <fileStore path="/home/ncsa/temp/oa4mp2/fileStore">
+         <transactions/><clients/><clientApprovals/><permissions/><adminClients/><ldap/>
+     </fileStore>
+ </service>
+
+<service name="xsede:oa2.fileStore"
+          version="1.0"
+          refreshTokenLifetime="1000000"
+          refreshTokenEnabled="true"
+          clientSecretLength="128"
+          enableTwoFactorSupport="true"
+          address="https://ashigaru.ncsa.uiuc.edu:9443/oauth">
+           <logging
+             logFileName="/tmp/oa4mp-oauth2-fileStore.xml"
+             logName="oa4mp"
+             logSize="100000"
+             logFileCount="2"
+             debug="true"/>
+
+      <myproxy host="myproxy.xsede.org" port="7512"/>
+     <myproxy host="myproxy.psc.xsede.org" port="7512"/>
+     <scopes><scope>xsede</scope></scopes>
+     <xsedeApi>
+             <username>oa4mp</username>
+             <password>O8SDRkcP</password>
+     </xsedeApi>
+     <fileStore path="/home/ncsa/temp/oa4mp2/fileStore">
+         <transactions/><clients/><clientApprovals/>
+     </fileStore>
+ </service>
+<service name="oa4mp.oa2.ncsa-ldap"
+          version="1.0"
+          refreshTokenLifetime="1000"
+          refreshTokenEnabled="true"
+          clientSecretLength="128"
+
+          address="https://ashigaru.ncsa.uiuc.edu:9443/oauth2">
+           <logging
+             logFileName="/tmp/oa4mp-oauth2-fileStore.xml"
+             logName="oa4mp"
+             logSize="100000"
+             logFileCount="2"
+             debug="true"/>
+<!-- scope testing
+<scopes>
+   <scope enabled="false">profile</scope>
+   <scope>my.custom.scope</scope>
+</scopes>
+-->
+      <ldap enabled="true"
+            authorizationType="none">
+           <address>ldap.ncsa.illinois.edu</address>
+           <port>636</port>
+           <searchBase><![CDATA[ou=People,dc=ncsa,dc=illinois,dc=edu]]></searchBase>
+           <searchAttributes>
+                  <attribute>cn</attribute>
+                  <attribute>mail</attribute>
+                  <attribute returnName="isMemberOf">memberOf</attribute>
+           </searchAttributes>
+           <ssl debug="false"
+                useJavaTrustStore="true">
+                <trustStore>
+                    <path>/home/ncsa/dev/csd/config/cacerts2</path>
+                    <password><![CDATA[changeit]]></password>
+                </trustStore>
+           </ssl>
+      </ldap>
+      <myproxy host="myproxy.xsede.org" port="7512"/>
+     <myproxy host="myproxy.psc.xsede.org" port="7512"/>
+     <fileStore path="/home/ncsa/temp/oa4mp2/fileStore">
+         <transactions/><clients/><clientApprovals/>
+     </fileStore>
+     <mail enabled="false"/>
+ </service>
+<service name="oa4mp.oa2.ldap"
+          version="1.0"
+          refreshTokenLifetime="1000"
+          refreshTokenEnabled="true"
+          clientSecretLength="128"
+
+          address="https://ashigaru.ncsa.uiuc.edu:9443/oauth">
+           <logging
+             logFileName="/tmp/oa4mp-oauth2-fileStore.xml"
+             logName="oa4mp"
+             logSize="100000"
+             logFileCount="2"
+             debug="true"/>
+<!-- scope testing
+<scopes>
+   <scope enabled="false">profile</scope>
+   <scope>my.custom.scope</scope>
+</scopes>
+-->
+      <ldap enabled="true"
+            authorizationType="simple">
+           <address>co.cilogon.org</address>
+           <port>636</port>
+           <password><![CDATA[pOBxTBGfhc0iua901fHq]]></password>
+           <principal><![CDATA[uid=mess_oidc_query,ou=system,o=MESS,dc=co,dc=cilogon,dc=org]]></principal>
+           <searchBase><![CDATA[o=MESS,dc=co,dc=cilogon,dc=org]]></searchBase>
+           <searchAttributes>
+                  <attribute returnAsList="true">eduPersonOrcid</attribute>
+                  <attribute>isMemberOf</attribute>
+           </searchAttributes>
+           <contextName><![CDATA[ou=People]]></contextName>
+           <ssl debug="false"
+                useJavaTrustStore="true">
+                <trustStore>
+                    <path>/home/ncsa/dev/csd/config/cacerts2</path>
+                    <password><![CDATA[changeit]]></password>
+                </trustStore>
+           </ssl>
+      </ldap>
+      <myproxy host="myproxy.xsede.org" port="7512"/>
+     <myproxy host="myproxy.psc.xsede.org" port="7512"/>
+     <fileStore path="/home/ncsa/temp/oa4mp2/fileStore">
+         <transactions/><clients/><clientApprovals/>
+     </fileStore>
+     <mail enabled="false"/>
+
+</service>
+ </config>

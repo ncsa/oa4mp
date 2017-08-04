@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.loader.COSE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.RequestFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.admin.AdminClientServer;
@@ -29,14 +30,14 @@ import static edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.SATFactory.*;
  */
 public class ManagerFacade {
 
-    public COSE getSE() {
+    public OA2SE getSE() {
         return serviceEnvironment;
     }
 
-    COSE serviceEnvironment;
+    OA2SE serviceEnvironment;
 
 
-    public ManagerFacade(COSE serviceEnvironment) {
+    public ManagerFacade(OA2SE serviceEnvironment) {
         this.serviceEnvironment = serviceEnvironment;
     }
 

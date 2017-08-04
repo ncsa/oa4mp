@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.loader.COSE;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.Permission;
@@ -24,11 +24,11 @@ import java.util.List;
  * on 11/30/16 at  3:19 PM
  */
 public abstract class AbstractDDServer implements DoubleDispatchServer, Server {
-    public AbstractDDServer(COSE cose) {
+    public AbstractDDServer(OA2SE cose) {
         this.cose = cose;
     }
 
-    protected COSE cose;
+    protected OA2SE cose;
 
 
     @Override

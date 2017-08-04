@@ -27,6 +27,9 @@
     <li>CIL-371: added claim for cert_subject_dn to be returned for the org.cilogon.userinfo scope.</li>
     <li>CIL-378: Clients with same creation timestamp are not all displayed in CLI.</li>
     <li>CIL-388: Server wars now include more meta information in the META-INF/MANIFEST.MF file about the build.</li>
+    <li>CIL-396: More client information in email notification at registration for OIDC clients.</li>
+    <li>CIL-404: Errors in the getCert servlet should throw an exception.</li>
+    <li>CIL-405: Default for all new clients at registration is to enable ID token signing.</li>
     <li>Java object serialization issue: Updated dependencies on Apache commons-collections to 3.2.2.</li>
     <li>Removed legacy unused Java object serialization from backend file store.</li>
     </ul>
@@ -84,6 +87,7 @@
     <li>OAUTH-208: Remove dependeny on one-jar plug in for building executable jars, since it is no longer supported.
     </li>
     <li>OAUTH-209: Remove dependency on Google Code's maven repository.</li>
+    <li>OAUTH-215: default secret key length for new OIDC clients set to 512 bytes.</li>
     <li>Added new <a href="http://grid.ncsa.illinois.edu/myproxy/oauth/server/manuals/test-client.xhtml">command line
         client</a> for testing purposes.
     </li>

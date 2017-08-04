@@ -126,7 +126,7 @@ public class OA2CertServlet extends ACS2 {
         PAIResponse2 par = (PAIResponse2) iResponse;
         AccessToken accessToken = par.getAccessToken();
         OA2ServiceTransaction t = (OA2ServiceTransaction) getTransactionStore().get(accessToken);
-        if (t == null) {
+    /*    if (t == null) {
             throw new OA2GeneralError(OA2Errors.INVALID_TOKEN, "Invalid access token. Request refused", HttpStatus.SC_UNAUTHORIZED);
         }
         if (!t.getScopes().contains(OA2Scopes.SCOPE_MYPROXY)) {
@@ -139,6 +139,22 @@ public class OA2CertServlet extends ACS2 {
 
         if (!t.isAccessTokenValid()) {
             throw new OA2GeneralError(OA2Errors.INVALID_TOKEN, "Invalid access token. Request refused", HttpStatus.SC_UNAUTHORIZED);
+        }*/
+        // CIL-404 fix. Throw appropriate exceptions. Do not use the callback mechanism from OAuth for errors since that returns
+        // an HTTP status code of 200 with no other information.
+        if (t == null) {
+            throw new GeneralException("Invalid access token. Request refused");
+        }
+        if (!t.getScopes().contains(OA2Scopes.SCOPE_MYPROXY)) {
+            // Note that this requires a state, but none is sent in the OA4MP cert request.
+            throw new GeneralException("Certificate request is not in scope.");
+        }
+        if (t == null) {
+            throw new GeneralException("No transaction found for access token \"" + accessToken + "\"");
+        }
+
+        if (!t.isAccessTokenValid()) {
+            throw new GeneralException("Invalid access token. Request refused");
         }
         checkClient(t.getClient());
         // Access tokens must be valid in order to get a cert. If the token is invalid, the user must
@@ -179,7 +195,7 @@ public class OA2CertServlet extends ACS2 {
             // After that it will be a regular MyProxyLogon object. Since the password is valid for
             // a very short period (typically only up to a minute or two), the logon can fail if
             // not done promptly by the user.
-            if(mpc.getMyProxyLogon() instanceof MyMyProxyLogon) {
+            if (mpc.getMyProxyLogon() instanceof MyMyProxyLogon) {
                 MyMyProxyLogon myProxyLogon = (MyMyProxyLogon) mpc.getMyProxyLogon();
                 getMyproxyConnectionCache().remove(mpc.getIdentifier());
                 createMPConnection(trans.getIdentifier(), myProxyLogon.getUsername(), myProxyLogon.getPassphrase(), trans.getLifetime());

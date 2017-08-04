@@ -23,6 +23,14 @@ public class BasicScopeHandler implements ScopeHandler {
     public BasicScopeHandler() {
     }
 
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    boolean enabled = true;
+    public boolean isEnabled(){
+        return enabled;
+    }
     /**
      * Optionally, the service environment may be injected into a scope handler to get configuration of
      * components, e.g.

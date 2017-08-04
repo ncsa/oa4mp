@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
+import edu.uiuc.ncsa.security.core.Logable;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
@@ -9,6 +10,7 @@ import edu.uiuc.ncsa.security.oauth_2_0.UserInfo;
 import edu.uiuc.ncsa.security.oauth_2_0.server.LDAPConfiguration;
 import edu.uiuc.ncsa.security.oauth_2_0.server.LDAPConfigurationUtil;
 import edu.uiuc.ncsa.security.oauth_2_0.server.UnsupportedScopeException;
+import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -29,15 +31,22 @@ import java.util.Map;
  * <p>Created by Jeff Gaynor<br>
  * on 4/26/16 at  3:32 PM
  */
-public class LDAPScopeHandler extends BasicScopeHandler {
+public class LDAPScopeHandler extends BasicScopeHandler implements Logable {
 
     public LDAPScopeHandler(LDAPConfiguration ldapConfiguration, MyLoggingFacade myLogger) {
         this.ldapConfiguration = ldapConfiguration;
         this.myLogger = myLogger;
+        if (myLogger != null) {
+            loggingEnabled = true;
+        }
     }
+
+    protected boolean loggingEnabled = false;
 
     public LDAPScopeHandler(OA2SE oa2SE) {
         super(oa2SE);
+        this.myLogger = oa2SE.getMyLogger();
+        loggingEnabled = (this.myLogger!=null);
     }
 
 
@@ -54,13 +63,18 @@ public class LDAPScopeHandler extends BasicScopeHandler {
      */
     public String getSearchName(UserInfo userInfo, HttpServletRequest request, ServiceTransaction transaction) {
         // FIXME!! FOR DEBUGGING ONLY
-        userInfo.getMap().put(getCfg().getSearchNameKey(), "gaynor@illinois.edu");
+
+        if (ServletDebugUtil.isEnabled()) {
+            userInfo.getMap().put(getCfg().getSearchNameKey(), "jgaynor@ncsa.illinois.edu");
+            userInfo.getMap().put("eppn", "jgaynor@ncsa.illinois.edu");
+            //  userInfo.getMap().put("username", "http://cilogon.org/serverA/users/10376");
+            //return "http://cilogon.org/serverA/users/10376";
+        }
         // END debugging hack.
         JSONObject xxx = LDAPConfigurationUtil.toJSON(getCfg());
         xxx.getJSONObject("ldap").getJSONObject("ssl").put("keystore", "");
-        System.err.println(xxx);
         if (getCfg().getSearchNameKey() == null) {
-            getMyLogger().warn("No search name given for LDAP query. Using default of username");
+            warn("No search name given for LDAP query. Using default of username");
             return transaction.getUsername();
         }
         if (getCfg().getSearchNameKey().equals(LDAPConfigurationUtil.SEARCH_NAME_USERNAME)) {
@@ -70,6 +84,16 @@ public class LDAPScopeHandler extends BasicScopeHandler {
             throw new IllegalStateException("Error: no recognized search name key was found. Requested was \"" + getCfg().getSearchNameKey() + "\"");
         }
         String searchName = (String) userInfo.getMap().get(getCfg().getSearchNameKey());
+
+        if (getCfg().getServer().equals("ldap.ncsa.illinois.edu")) {
+            DebugUtil.dbg(this, "Getting search name for NCSA LDAP");
+
+            //searchName = (String) userInfo.getMap().get(CILogonScopeHandler.CILogonClaims.EPPN);
+            searchName = (String) userInfo.getMap().get(getCfg().getSearchNameKey());
+            searchName = searchName.substring(0, searchName.indexOf("@")); // take the name from the eppn
+            // This is to look in the NCSA's LDAP handler
+        }
+
 /*
         if(!getCfg().getSearchNameKey().equals(OA2Claims.EMAIL)) {
             // Use the name on the email address, not the whole email addrress
@@ -82,15 +106,12 @@ public class LDAPScopeHandler extends BasicScopeHandler {
     MyLoggingFacade myLogger = null;
 
     protected MyLoggingFacade getMyLogger() {
-        if (myLogger == null) {
-            myLogger = getOa2SE().getMyLogger();
-        }
         return myLogger;
     }
 
     public void handleException(Throwable throwable) {
         if (throwable instanceof CommunicationException) {
-            getMyLogger().warn("Communication exception talking to LDAP.");
+            warn("Communication exception talking to LDAP.");
 
             return;
         }
@@ -100,9 +121,9 @@ public class LDAPScopeHandler extends BasicScopeHandler {
                     "LDAP server at ${ldap_host}:\n\n${message}\n\n. The operation did not complete.";
             Map<String, String> replacements = new HashMap<>();
             URI address = getOa2SE().getServiceAddress();
-            String x= "localhost";
-            if(address != null){
-                 x = address.getHost();
+            String x = "localhost";
+            if (address != null) {
+                x = address.getHost();
             }
             replacements.put("host", x);
             replacements.put("ldap_host", getCfg().getServer());
@@ -116,8 +137,14 @@ public class LDAPScopeHandler extends BasicScopeHandler {
     }
 
     @Override
+    public boolean isEnabled() {
+        return getCfg().isEnabled();
+    }
+
+    @Override
     synchronized public UserInfo process(UserInfo userInfo, HttpServletRequest request, ServiceTransaction transaction) throws UnsupportedScopeException {
-        if (!getCfg().isEnabled()) {
+        if (!isEnabled()) {
+            DebugUtil.dbg(this, "server=" + getCfg().getServer() + ", is NOT enabled.");
             return userInfo;
         }
 
@@ -134,12 +161,16 @@ public class LDAPScopeHandler extends BasicScopeHandler {
             DebugUtil.dbg(this, "  search name=" + searchName);
 
             if (searchName != null) {
-                userInfo.getMap().putAll(simpleSearch(context, searchName, getCfg().getSearchAttributes()));
+                Map tempMap = simpleSearch(context, searchName, getCfg().getSearchAttributes());
+                DebugUtil.dbg(this,"returned from search:" + tempMap);
+                userInfo.getMap().putAll(tempMap);
             } else {
-                getMyLogger().warn("Null search name encountered for LDAP query. No search performed.");
+                info("No search name encountered for LDAP query. No search performed.");
             }
+            DebugUtil.dbg(this, "user info =" + userInfo.getMap());
+
             context.close();
-        } catch(Throwable throwable){
+        } catch (Throwable throwable) {
             handleException(throwable);
         } finally {
             closeConnection();
@@ -165,16 +196,20 @@ public class LDAPScopeHandler extends BasicScopeHandler {
 
     protected boolean logon() {
         try {
-            if (getCfg().getSslConfiguration() != null) {
-                if (getCfg().getSslConfiguration().getKeystore() != null) {
-                    System.setProperty("javax.net.ssl.trustStore", getCfg().getSslConfiguration().getKeystore());
-                    System.setProperty("javax.net.ssl.trustStorePassword", getCfg().getSslConfiguration().getKeystorePassword());
+        /*    if (getCfg().getSslConfiguration() != null) {
+                if (getCfg().getSslConfiguration().getTrustrootPath() != null) {
+                    System.setProperty("javax.net.ssl.trustStore", getCfg().getSslConfiguration().getTrustrootPath());
+                    System.setProperty("javax.net.ssl.trustStorePassword", getCfg().getSslConfiguration().getTrustRootPassword());
+                    System.setProperty("javax.net.ssl.trustStoreType", getCfg().getSslConfiguration().getTrustRootType());
                 }
-            }
+            }*/
+
 
             // Set up the environment for creating the initial context
             Hashtable<String, String> env = new Hashtable<String, String>();
             env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
+       //     env.put("java.naming.ldap.factory.socket", "edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.LDAPSSLSocketFactory");
+
             String providerUrl = "ldaps://" + getCfg().getServer();
             if (0 <= getCfg().getPort()) {
                 providerUrl = providerUrl + ":" + getCfg().getPort();
@@ -201,15 +236,15 @@ public class LDAPScopeHandler extends BasicScopeHandler {
                 default:
                 case LDAPConfigurationUtil.LDAP_AUTH_UNSPECIFIED_KEY:
             }
-
+             DebugUtil.dbg(this, "LDAP environment is " + env);
             DirContext dirContext = new InitialDirContext(env);
             context = (LdapContext) dirContext.lookup(getCfg().getSearchBase());
             return context != null;
         } catch (Exception e) {
-            if (getMyLogger().isDebugOn()) {
+            if (isDebugOn()) {
                 e.printStackTrace();
             }
-            getMyLogger().error("Error logging into LDAP server", e);
+            error("Error logging into LDAP server", e);
             return false;
         }
     }
@@ -222,6 +257,15 @@ public class LDAPScopeHandler extends BasicScopeHandler {
             claims.add(ae.targetName);
         }
         return claims;
+    }
+
+    // STOP GAP. This should be given in the LDAPConfiguration and is the name of the attribute (e.g. uid, email)
+    // that is used for searching. It's compliment is the searchFilterValue, so
+    // searchFilterAttribute=searchFilterValue
+    //e.g, uid=eppn
+    // The searchFilterValue is supplied in the initial claims.
+    protected String getSearchFilterAttribute() {
+        return "uid";
     }
 
     protected JSONObject simpleSearch(LdapContext ctx,
@@ -239,7 +283,9 @@ public class LDAPScopeHandler extends BasicScopeHandler {
             String[] searchAttributes = attributes.keySet().toArray(new String[]{});
             ctls.setReturningAttributes(searchAttributes);
         }
-        String filter = "(&(uid=" + userID + "))";
+        //ctls.setSearchScope(SearchControls.SUBTREE_SCOPE);
+        String filter = "(&(" + getSearchFilterAttribute() + "=" + userID + "))";
+        DebugUtil.dbg(this, "filter=" + filter);
         NamingEnumeration e = ctx.search(getCfg().getContextName(), filter, ctls);
         return toJSON(attributes, e);
     }
@@ -296,11 +342,88 @@ public class LDAPScopeHandler extends BasicScopeHandler {
             try {
                 context.close();
             } catch (Throwable t) {
-                if (getMyLogger().isDebugOn()) {
+                if (isDebugOn()) {
                     t.printStackTrace();
                 }
-                getMyLogger().info("Exception trying to close LDAP connection: " + t.getMessage());
+                info("Exception trying to close LDAP connection: " + t.getMessage());
             }
         }
+    }
+
+    protected void sayit(String x) {
+        System.out.println(x);
+    }
+
+    @Override
+    public void debug(String x) {
+        if (loggingEnabled) {
+            getMyLogger().debug(x);
+        } else {
+            sayit(x);
+        }
+    }
+
+    @Override
+    public boolean isDebugOn() {
+        if (loggingEnabled) {
+            return getMyLogger().isDebugOn();
+        }
+        return debug;
+    }
+
+    boolean debug = false;
+
+    @Override
+    public void setDebugOn(boolean setOn) {
+        if (loggingEnabled) {
+            getMyLogger().setDebugOn(setOn);
+        }
+        this.debug = setOn;
+    }
+
+    @Override
+    public void info(String x) {
+        if (loggingEnabled) {
+            getMyLogger().info(x);
+        } else {
+            sayit(x);
+        }
+
+    }
+
+    @Override
+    public void warn(String x) {
+        if (loggingEnabled) {
+            getMyLogger().warn(x);
+        } else {
+            sayit(x);
+        }
+
+    }
+
+    public void error(String x, Throwable e) {
+        if (loggingEnabled) {
+            getMyLogger().error(x, e);
+        } else {
+            sayit(x);
+            e.printStackTrace();
+        }
+
+    }
+
+    @Override
+    public void error(String x) {
+        if (loggingEnabled) {
+            getMyLogger().error(x);
+        } else {
+            sayit(x);
+        }
+
+    }
+
+    @Override
+    public String toString() {
+        return "LDAPScopeHandler{" +
+                (ldapConfiguration == null?"(no config)":ldapConfiguration.getServer())+"}";
     }
 }

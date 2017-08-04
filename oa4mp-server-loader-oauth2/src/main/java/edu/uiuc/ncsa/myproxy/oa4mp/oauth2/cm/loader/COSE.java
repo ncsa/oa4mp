@@ -1,14 +1,11 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.loader;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.ldap.LDAPEntry;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.ldap.LDAPStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.BasicScopeHandler;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.ldap.LDAPStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.MyProxyFacadeProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionsStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AuthorizationServletConfig;
-import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.delegation.server.issuers.AGIssuer;
 import edu.uiuc.ncsa.security.delegation.server.issuers.ATIssuer;
@@ -87,21 +84,10 @@ public class COSE extends OA2SE {
                 twoFactorSupportEnabled,
                 maxClientRefreshTokenLifetime,
                 signingKeyPair,
-                issuer);
-        this.mldap = mldap;
-        if(scopeHandler instanceof BasicScopeHandler){
-            DebugUtil.dbg(this,"***Setting runtime environment in the scope handler:" + scopeHandler.getClass().getSimpleName());
-            ((BasicScopeHandler)scopeHandler).setOa2SE(this);
-        }
+                issuer,
+                mldap);
+
     }
 
-    Provider<LDAPStore> mldap;
-    LDAPStore ldapStore = null;
 
-    public LDAPStore<LDAPEntry> getLDAPStore() {
-        if (ldapStore == null) {
-            ldapStore = mldap.get();
-        }
-        return ldapStore;
-    }
 }

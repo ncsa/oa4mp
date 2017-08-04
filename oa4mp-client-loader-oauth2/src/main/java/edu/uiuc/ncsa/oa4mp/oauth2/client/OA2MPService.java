@@ -94,6 +94,9 @@ public class OA2MPService extends OA4MPService {
     protected Map<String, String> getATParameters(Asset asset, AuthorizationGrant ag, Verifier v) {
         Map<String, String> m = super.getATParameters(asset, ag, v);
         OA2Asset a = (OA2Asset) asset;
+        if(a == null){
+            throw new GeneralException("Asset not found. You may need to clear your browser cookies.");
+        }
         m.put(OA2Constants.NONCE, a.getNonce());
         m.put(OA2Constants.STATE, a.getState());
         return m;
