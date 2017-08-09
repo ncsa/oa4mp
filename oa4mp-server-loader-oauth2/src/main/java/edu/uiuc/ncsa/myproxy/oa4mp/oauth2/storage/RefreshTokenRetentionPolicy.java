@@ -4,9 +4,9 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.security.core.cache.RetentionPolicy;
 import edu.uiuc.ncsa.security.core.exceptions.InvalidTimestampException;
 import edu.uiuc.ncsa.security.core.util.DateUtils;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
 
-import java.util.Date;
 import java.util.Map;
 
 /**
@@ -14,7 +14,6 @@ import java.util.Map;
  * on 3/26/14 at  3:39 PM
  */
 public class RefreshTokenRetentionPolicy implements RetentionPolicy {
-    boolean enableDebug = false;
     public RefreshTokenRetentionPolicy(RefreshTokenStore rts) {
         this.rts = rts;
     }
@@ -32,8 +31,7 @@ public class RefreshTokenRetentionPolicy implements RetentionPolicy {
     }
 
     void debug(String x){
-        if(!enableDebug) return;
-        System.err.println(getClass().getSimpleName() + " (" + ( new Date()) + "): " + x);
+       DebugUtil.dbg(this, x);
 
     }
     @Override
@@ -58,20 +56,7 @@ public class RefreshTokenRetentionPolicy implements RetentionPolicy {
 
             return true;
         }
-        // Now we have to check against the timestamp on the original and the expires in flag.
-        /*
-           try {
-            // if there is no max timeout set, then use whatever the default is.
-            if (maxTimeout <= 0) {
-                DateUtils.checkTimestamp(key.toString());
-            } else {
-                DateUtils.checkTimestamp(key.toString(), maxTimeout);
-            }
-            return true;
-        } catch (InvalidTimestampException its) {
-            return false;
-        }
-         */
+
         try {
             if (timeout <= 0) {
                 debug("timeout<=0, checking RT timestamp");
@@ -86,20 +71,9 @@ public class RefreshTokenRetentionPolicy implements RetentionPolicy {
             return true;
 
         } catch (InvalidTimestampException its) {
-            its.printStackTrace();
-            debug("returning false - do not retain");
-
+            DebugUtil.dbg(this.getClass(), "returning false - do not retain", its);
             return false;
         }
-/*
-        Date creationTS = DateUtils.getDate(st2.getRefreshToken().getToken());
-
-
-        if (System.currentTimeMillis() < (creationTS.getTime() + st2.getRefreshTokenLifetime())) {
-            return true;
-        }
-        return false;
-*/
     }
 
     @Override

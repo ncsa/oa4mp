@@ -21,6 +21,7 @@ import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
 import edu.uiuc.ncsa.security.oauth_2_0.*;
 import edu.uiuc.ncsa.security.oauth_2_0.server.*;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import javax.servlet.ServletException;
@@ -127,12 +128,43 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             warn("Error servicing request. No grant type was given. Rejecting request.");
             throw new GeneralException("Error: Could not service request");
         }
-        OA2Client client = (OA2Client) getClient(request);
+        List<String> authHeaders = getAuthHeader(request, "Basic");
+        OA2Client client  = null;
+        String rawSecret = null;
+        if(authHeaders.isEmpty()){
+            // assume that the secret and id are in the request
+            client = (OA2Client) getClient(request);
+            rawSecret = getFirstParameterValue(request, CLIENT_SECRET);
+
+        }else{
+            // assume the client id and secret are in the headers.
+            String header64 = authHeaders.get(0);
+            // semantics are that this is base64.encode(id:secret)
+            byte[] headerBytes = Base64.decodeBase64(header64);
+            if(headerBytes == null || headerBytes.length == 0){
+                DebugUtil.dbg(this, "doIt: no secret, throwing exception.");
+                throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT, "Missing secret");
+            }
+            String header = new String(headerBytes);
+            int lastColonIndex = header.lastIndexOf(":");
+            if(lastColonIndex == -1){
+                // then this is not in the correct format.
+                DebugUtil.dbg(this, "doIt: the authorization header is not in the right format, throwing exception.");
+                throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT, "the authorization header is not in the right format");
+
+            }
+            String id = header.substring(0,lastColonIndex);
+            Identifier identifier = BasicIdentifier.newID(id);
+
+            rawSecret = header.substring(lastColonIndex + 1);
+            client = (OA2Client) getClient(identifier);
+
+        }
         checkClient(client);
 
-        String rawSecret = getFirstParameterValue(request, CLIENT_SECRET);
         // Fix for CIL-332
         if (rawSecret == null) {
+            // check headers.
             DebugUtil.dbg(this, "doIt: no secret, throwing exception.");
             throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT, "Missing secret");
         }
@@ -286,7 +318,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         return transaction;
     }
 
-    public static LinkedList<ScopeHandler> setupScopeHandlers( OA2ServiceTransaction transaction, OA2SE oa2SE) {
+    public static LinkedList<ScopeHandler> setupScopeHandlers(OA2ServiceTransaction transaction, OA2SE oa2SE) {
       /*  OA2Client client = (OA2Client) transaction.getClient();
         DebugUtil.dbg(this, "Getting configured scope handler factory " + LDAPScopeHandlerFactory.getFactory().getClass().getSimpleName());
         LinkedList<ScopeHandler> scopeHandlers = LDAPScopeHandlerFactory.createScopeHandlers(oa2SE, client);
