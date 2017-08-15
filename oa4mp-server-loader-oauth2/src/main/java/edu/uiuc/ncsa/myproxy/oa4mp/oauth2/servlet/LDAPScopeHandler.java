@@ -10,7 +10,6 @@ import edu.uiuc.ncsa.security.oauth_2_0.UserInfo;
 import edu.uiuc.ncsa.security.oauth_2_0.server.LDAPConfiguration;
 import edu.uiuc.ncsa.security.oauth_2_0.server.LDAPConfigurationUtil;
 import edu.uiuc.ncsa.security.oauth_2_0.server.UnsupportedScopeException;
-import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -62,14 +61,13 @@ public class LDAPScopeHandler extends BasicScopeHandler implements Logable {
      * @return
      */
     public String getSearchName(UserInfo userInfo, HttpServletRequest request, ServiceTransaction transaction) {
-        // FIXME!! FOR DEBUGGING ONLY
 
-        if (ServletDebugUtil.isEnabled()) {
+      /*  if (ServletDebugUtil.isEnabled()) {
             userInfo.getMap().put(getCfg().getSearchNameKey(), "jgaynor@ncsa.illinois.edu");
             userInfo.getMap().put("eppn", "jgaynor@ncsa.illinois.edu");
             //  userInfo.getMap().put("username", "http://cilogon.org/serverA/users/10376");
             //return "http://cilogon.org/serverA/users/10376";
-        }
+        }*/
         // END debugging hack.
         JSONObject xxx = LDAPConfigurationUtil.toJSON(getCfg());
         xxx.getJSONObject("ldap").getJSONObject("ssl").put("keystore", "");

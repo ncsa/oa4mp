@@ -32,7 +32,7 @@
         <dependency>
             <artifactId>oa4mp-server-loader-oauth2</artifactId>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
-            <version>3.4-SNAPSHOT</version>
+            <version>3.4</version>
         </dependency>
         <dependency>
             <groupId>jstl</groupId>
@@ -42,7 +42,7 @@
         <dependency>
             <artifactId>oa4mp-server-api</artifactId>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
-            <version>3.4-SNAPSHOT</version>
+            <version>3.4</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -81,7 +81,7 @@
                 <artifactId>maven-gpg-plugin</artifactId>
                 <version>1.6</version>
                 <configuration>
-                    <skip>true</skip>
+                    <skip>false</skip>
                 </configuration>
                 <executions>
                     <execution>

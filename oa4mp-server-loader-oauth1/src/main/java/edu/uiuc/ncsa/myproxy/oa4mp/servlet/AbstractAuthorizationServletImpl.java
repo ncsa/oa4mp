@@ -24,7 +24,6 @@ public class AbstractAuthorizationServletImpl extends AbstractAuthorizationServl
 
     @Override
     public String createCallback(ServiceTransaction trans, Map<String, String> params) {
-        // FIXME!! Basic spec should return extra parameters it does not recognize?
         String cb = trans.getCallback().toString();
         return cb + (cb.indexOf("?") == -1 ? "?" : "&") + OAUTH_TOKEN + "=" + trans.getIdentifierString() + "&" + OAUTH_VERIFIER + "=" + trans.getVerifier().getToken();
     }
