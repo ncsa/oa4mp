@@ -9,6 +9,7 @@ import edu.uiuc.ncsa.security.delegation.services.Response;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Client;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2ClientConverter;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnMap;
+import org.apache.commons.codec.digest.DigestUtils;
 
 /**
  * This server handles various requests for attributes.
@@ -72,12 +73,18 @@ public class AttributeServer extends AbstractDDServer {
     protected AttributeClientResponse setClientAttribute(AttributeSetClientRequest request) {
         canWrite(request);
         OA2Client client = (OA2Client) getClientStore().get(request.getClient().getIdentifier());
+        OA2ClientConverter clientConverter = (OA2ClientConverter)getClientConverter();
         ColumnMap map = new ColumnMap();
-        getClientConverter().toMap(client, map);
+        clientConverter.toMap(client, map);
         for (String key : request.getAttributes().keySet()) {
             // don't let anyone change the identifier.
             if (!key.equals(getClientConverter().getKeys().identifier())) {
                 map.put(key, request.getAttributes().get(key));
+            }
+            if(key.equalsIgnoreCase(clientConverter.getCK2().secret())){
+                // they are changing the secret and we want a hash of this.
+                String secret = DigestUtils.sha1Hex(String.valueOf(request.getAttributes().get(key)));
+                map.put(key,secret);
             }
         }
         OA2Client updatedClient = getClientConverter().fromMap(map, null);

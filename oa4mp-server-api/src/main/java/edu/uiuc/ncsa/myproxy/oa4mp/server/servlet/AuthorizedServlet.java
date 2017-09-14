@@ -129,7 +129,7 @@ abstract    protected ProtocolParameters parseRequest(HttpServletRequest request
             warn("Error: no delegation request found for " + token);
             throw new GeneralException("Error: no delegation request found.");
         }
-        checkClient(trans.getClient());
+        checkClientApproval(trans.getClient());
         return trans;
     }
 

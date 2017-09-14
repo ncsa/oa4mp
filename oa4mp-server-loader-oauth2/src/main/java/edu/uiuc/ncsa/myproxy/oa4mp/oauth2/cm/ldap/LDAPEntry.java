@@ -2,7 +2,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.ldap;
 
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.IdentifiableImpl;
-import edu.uiuc.ncsa.security.oauth_2_0.server.LDAPConfiguration;
+import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
 
 /**
  * <p>Created by Jeff Gaynor<br>

@@ -1,0 +1,9 @@
+{
+  "sub": 1000,
+  "iss": "https://authorization-server.com",
+  "aud": "https://example-app.com",
+  "iat": 1470002703,
+  "exp": 1470009903,
+  "scope": "read write",
+  "comment":"This file contains a set of claims for testing out the SciTokens command line interface."
+}

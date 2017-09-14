@@ -116,62 +116,6 @@ public abstract class MyProxyDelegationServlet extends EnvServlet implements Tra
         return ((MyProxyServiceEnvironment) getEnvironment()).getMyProxyServices();
     }
 
-
-  /*  String getTemplate(File filename) throws IOException {
-
-        String body = "";
-        try {
-            FileInputStream fr = new FileInputStream(filename);
-            StringBuffer sb = new StringBuffer();
-            int z = 0;
-            while ((z = fr.read()) != -1) {
-                sb.append((char) z);
-            }
-            body = sb.toString();
-            fr.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return body;
-    }
-    static boolean notifiersSet = false;
-
-
-    public void setupNotifiers() throws IOException {
-        // do this once or you will have a message sent for each listener!
-        if (notifiersSet) return;
-
-        // debugging this...
-        NewClientNotifier newClientNotifier = new NewClientNotifier(getServiceEnvironment().getMailUtil(), getMyLogger());
-        addNotificationListener(newClientNotifier);
-        MailUtil x = new MailUtil(getServiceEnvironment().getMailUtil().getMailEnvironment());
-        String fName = getServletContext().getInitParameter(ERROR_NOTIFICATION_SUBJECT_KEY);
-        if (fName == null) {
-            info("No error notification subject set. Skipping...");
-            notifiersSet = true;
-            return;
-        } else {
-            info("Set error notification subject to " + fName);
-        }
-        x.setSubjectTemplate(getTemplate(new File(fName)));
-
-        fName = getServletContext().getInitParameter(ERROR_NOTIFICATION_BODY_KEY);
-        if (fName == null) {
-            info("No error notification message body set. Skipping...");
-            notifiersSet = true;
-            return;
-        } else {
-            info("Set error notification message body to " + fName);
-        }
-
-        x.setMessageTemplate(getTemplate(new File(fName)));
-
-        ExceptionEventNotifier exceptionNotifier = new ExceptionEventNotifier(x, getMyLogger());
-        addNotificationListener(exceptionNotifier);
-        notifiersSet = true;
-    }*/
-
     public void storeUpdates() throws IOException, SQLException {
         if (storeUpdatesDone) return; // run this once
         storeUpdatesDone = true;
@@ -255,7 +199,7 @@ public abstract class MyProxyDelegationServlet extends EnvServlet implements Tra
             warn(ww + " Client store is " + getServiceEnvironment().getClientStore());
             throw new UnknownClientException(ww + "  Is the value in the client config correct?", identifier);
         }
-        checkClient(c);
+        checkClientApproval(c);
         return c;
     }
 
@@ -283,7 +227,7 @@ public abstract class MyProxyDelegationServlet extends EnvServlet implements Tra
      *
      * @param client
      */
-    public void checkClient(Client client) {
+    public void checkClientApproval(Client client) {
         if (!getServiceEnvironment().getClientApprovalStore().isApproved(client.getIdentifier())) {
             String ww = "The client with identifier \"" + client.getIdentifier() + "\" has not been approved. Request rejected. Please contact your administrator.";
             warn(ww);

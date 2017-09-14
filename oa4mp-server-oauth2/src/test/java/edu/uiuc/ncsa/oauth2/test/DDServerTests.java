@@ -13,7 +13,7 @@ import edu.uiuc.ncsa.security.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.delegation.storage.impl.BaseClientConverter;
 import edu.uiuc.ncsa.security.oauth_2_0.*;
-import edu.uiuc.ncsa.security.oauth_2_0.server.LDAPConfiguration;
+import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
 import junit.framework.TestCase;
 import net.sf.json.JSONObject;
 import net.sf.json.util.JSONUtils;

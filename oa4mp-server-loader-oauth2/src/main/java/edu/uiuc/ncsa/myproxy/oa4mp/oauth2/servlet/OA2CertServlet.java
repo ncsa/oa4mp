@@ -107,7 +107,9 @@ public class OA2CertServlet extends ACS2 {
         }
         Identifier id = BasicIdentifier.newID(rawID);
         OA2Client client = (OA2Client) getClient(id);
-
+        if(client.isPublicClient()){
+            throw new GeneralException("Error: public clients not supported for this operation.");
+        }
         if (rawSecret == null) {
             throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
                     "Error: No secret. request refused.",
@@ -156,7 +158,7 @@ public class OA2CertServlet extends ACS2 {
         if (!t.isAccessTokenValid()) {
             throw new GeneralException("Invalid access token. Request refused");
         }
-        checkClient(t.getClient());
+        checkClientApproval(t.getClient());
         // Access tokens must be valid in order to get a cert. If the token is invalid, the user must
         // get a valid one using the refresh token.
         checkTimestamp(accessToken.getToken());

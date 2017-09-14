@@ -47,6 +47,14 @@ public abstract class ACS2 extends CRServlet {
 
         if (t.getCertReq() == null) {
             String rawCR = ((String[]) params.get(CONST(ServiceConstantKeys.CERT_REQUEST_KEY)))[0];
+            //CIL-409 fix -- fail immediately if the cert request is missing
+            if(!params.containsKey(CONST(ServiceConstantKeys.CERT_REQUEST_KEY))){
+                throw new GeneralException("Error: Missing cert request parameter.");
+            }
+            // CIL-409 fix
+            if(isEmpty(rawCR)){
+                throw new GeneralException("Error: Empty cert request.");
+            }
             MyPKCS10CertRequest certReq;
             try {
                 certReq = CertUtil.fromStringToCertReq(rawCR);

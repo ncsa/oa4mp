@@ -31,7 +31,14 @@ public class InitServlet extends AbstractInitServlet {
         transaction.setAccessTokenValid(false);
         transaction.setCallback(URI.create(params.get(OAUTH_CALLBACK)));
         MyPKCS10CertRequest certReq = null;
+                // Fix for CIL-409
+        if(!params.containsKey(CERT_REQUEST)){
+            throw new GeneralException("Error: missing cert request parameter.");
+        }
         String rawCR = params.get(CERT_REQUEST);
+        if(isEmpty(rawCR)){
+            throw new GeneralException("Error: empty cert request.");
+        }
         try {
             certReq = CertUtil.fromStringToCertReq(rawCR);
         } catch (Throwable throwable) {

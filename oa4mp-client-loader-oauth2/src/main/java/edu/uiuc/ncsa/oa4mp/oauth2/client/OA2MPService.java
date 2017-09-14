@@ -258,7 +258,7 @@ public class OA2MPService extends OA4MPService {
      *
      * @param identifier
      */
-    public OA2Asset refresh(String identifier) {
+    public RTResponse refresh(String identifier) {
         OA2Asset asset = (OA2Asset) getAssetStore().get(identifier);
         if (asset == null) return null;
         DS2 ds2 = (DS2) getEnvironment().getDelegationService();
@@ -270,7 +270,7 @@ public class OA2MPService extends OA4MPService {
         asset.setRefreshToken(rtResponse.getRefreshToken());
         getAssetStore().remove(asset.getIdentifier()); // clear out
         getAssetStore().save(asset);
-        return asset;
+        return rtResponse;
     }
 
 

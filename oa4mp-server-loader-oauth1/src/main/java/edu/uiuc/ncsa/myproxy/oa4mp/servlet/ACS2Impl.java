@@ -35,7 +35,7 @@ public class ACS2Impl extends ACS2 {
         if (!t.isAccessTokenValid()) {
             throw new GeneralException("Error: invalid access token. Request refused");
         }
-        checkClient(t.getClient());
+        checkClientApproval(t.getClient());
         checkTimestamp(accessToken.getToken());
         return t;
     }

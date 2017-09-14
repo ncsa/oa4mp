@@ -3,10 +3,10 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Client;
-import edu.uiuc.ncsa.security.oauth_2_0.server.LDAPConfiguration;
 import edu.uiuc.ncsa.security.oauth_2_0.server.ScopeHandler;
 import edu.uiuc.ncsa.security.oauth_2_0.server.ScopeHandlerFactory;
 import edu.uiuc.ncsa.security.oauth_2_0.server.ScopeHandlerFactoryRequest;
+import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
 
 import java.util.LinkedList;
 

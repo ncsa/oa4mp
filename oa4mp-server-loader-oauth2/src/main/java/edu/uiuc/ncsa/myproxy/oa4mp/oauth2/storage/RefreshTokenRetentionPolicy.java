@@ -36,12 +36,10 @@ public class RefreshTokenRetentionPolicy implements RetentionPolicy {
     }
     @Override
     public boolean retain(Object key, Object value) {
-        debug("starting .retain method at ");
         OA2ServiceTransaction st2 = (OA2ServiceTransaction) value;
         RefreshToken rt = st2.getRefreshToken();
         long timeout = st2.getRefreshTokenLifetime();
         if (rt == null || rt.getToken() == null) {
-            debug("no RT found, using default AT policy");
             // fall back to looking at the access token timestamp. Failing that, fall back to the creation time from
             // the identifier.
             String  token;
@@ -49,29 +47,20 @@ public class RefreshTokenRetentionPolicy implements RetentionPolicy {
             try {
                 DateUtils.checkTimestamp(token);
             } catch (InvalidTimestampException its) {
-                debug("returning false - do not retain");
                 return false;
             }
-            debug("returning true - retain");
-
             return true;
         }
 
         try {
             if (timeout <= 0) {
-                debug("timeout<=0, checking RT timestamp");
                 DateUtils.checkTimestamp(rt.getToken()); // use default????
-
             } else {
-                debug("0<timeout, checking RT timestamp against timeout=" + timeout);
-
                 DateUtils.checkTimestamp(rt.getToken(), timeout);
             }
-            debug("returning true - retain");
             return true;
 
         } catch (InvalidTimestampException its) {
-            DebugUtil.dbg(this.getClass(), "returning false - do not retain", its);
             return false;
         }
     }

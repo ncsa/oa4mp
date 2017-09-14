@@ -11,19 +11,20 @@
 <!--#include virtual="../../header.html" -->
 <p>Changes to the OA4MP server by version.</p>
 
-
-
+<h2>3.5</h2>
+<ul>
+    <li>CIL-409: Missing cert request in OIDC getcert call causes empty certificate to be returned.</li>
+</ul>
 
 <h2>3.4</h2>
 <ul>
-    <li>OAUTH-203: Clients may request supported scopes at registration time. </li>
+    <li>OAUTH-203: Clients may request supported scopes at registration time.</li>
     <li>OAUTH-212: PEM encodings broken by change to Apache base 64 codec.</li>
     <li>OAUTH-213: Make TLS version configurable in the SSL configuration.</li>
     <li>OAUTH-217: Added discovery, in a server/.well-known/openid_configuration.</li>
     <li>CIL-339: EPTID mismatch handled as a separate case.</li>
     <li>CIL-344: Client management API created. Sample scripts created as well.</li>
     <li>CIL-356: Clients may have individual LDAP configurations.</li>
-    <li>CIL-359: ID tokens must be signed.</li>
     <li>CIL-371: added claim for cert_subject_dn to be returned for the org.cilogon.userinfo scope.</li>
     <li>CIL-378: Clients with same creation timestamp are not all displayed in CLI.</li>
     <li>CIL-388: Server wars now include more meta information in the META-INF/MANIFEST.MF file about the build.</li>
@@ -32,17 +33,31 @@
     <li>CIL-405: Default for all new clients at registration is to enable ID token signing.</li>
     <li>Java object serialization issue: Updated dependencies on Apache commons-collections to 3.2.2.</li>
     <li>Removed legacy unused Java object serialization from backend file store.</li>
-    </ul>
+</ul>
 <h4>3.4 Release notes</h4>
+
 <p>
     Note that in this release of OA4MP there are two new tables that are required if the server uses SQL -based storage.
     One for admin clients and another for permissions. If the user (i.e., as defined in the configuration file that
-    accesses the data) has create permission in the database, then the tables will be automatically created. If not, then
-    you must create them manually using one of the scripts found <a href="https://github.com/ncsa/OA4MP/tree/master/oa4mp-server-admin-oauth2/src/main/resources">
+    accesses the data) has create permission in the database, then the tables will be automatically created. If not,
+    then
+    you must create them manually using one of the scripts found <a
+        href="https://github.com/ncsa/OA4MP/tree/master/oa4mp-server-admin-oauth2/src/main/resources">
     here</a>.
 </p>
-<p>You must also create signing keys for OIDC. This is done with the command line tool</p>
 
+<p>You must also create signing keys for OIDC. This is done with the
+    <a href="http://grid.ncsa.illinois.edu/myproxy/oauth/server/configuration/signing.xhtml">command line tool</a></p>
+
+<p>Signing of ID tokens is now the default on the server. However, since older clients may not support this, the default
+    is to
+    <b>disable</b> signing of ID tokens for all clients. Older OA4MP clients will break if signing is enabled and they
+    are
+    at an earlier version (3.3 and before). Also, some installations of the <a
+            href="https://github.com/pingidentity/mod_auth_openidc">mod_auth_openidc</a>
+    client that cache the .well-known file have been known to break when talking to a 3.4 server. Please upgrade the
+    .well-known file to
+    the latest version on the server.</p>
 
 
 <h2>3.3</h2>
@@ -66,6 +81,7 @@
     <li>CIL-319: Indicate in DN if the user is from and InCommon or eduGain IDP.</li>
     <li>CIL-320: DB Service fix to get information to resolve CIL-319.</li>
     <li>CIL-324: Attempting to send many email notifications at once causes failures.</li>
+    <li>CIL-359: ID tokens must be signed by the server.</li>
     <li>OAUTH-189: Invalid nonce causes reloadof authorization page to fail.</li>
     <li>OAUTH-191: Defer connecting to MyProxy until the getCert call, if possible.</li>
     <li>OAUTH-194: OIDC token endpoint should return error with status of 400.</li>
@@ -74,7 +90,7 @@
         which
         is not in the specification.
     </li>
-    <li>OAUTH-198: Pass teh HTTPServletRequest to the basic scope handler. This allows implementors more flexibility.
+    <li>OAUTH-198: Pass the HTTPServletRequest to the basic scope handler. This allows implementors more flexibility.
     </li>
     <li>OAUTH-199: Pass HttpServlet request to custom scope handlers.</li>
     <li>OAUTH-200: Connection pooling does not clean out stale connections.</li>

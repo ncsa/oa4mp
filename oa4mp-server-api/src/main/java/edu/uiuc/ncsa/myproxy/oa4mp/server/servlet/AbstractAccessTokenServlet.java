@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.server.request.ATRequest;
 import edu.uiuc.ncsa.security.delegation.server.request.ATResponse;
 import edu.uiuc.ncsa.security.delegation.servlet.TransactionState;
+import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.delegation.token.Verifier;
 
@@ -23,23 +24,13 @@ public abstract class AbstractAccessTokenServlet extends MyProxyDelegationServle
         doDelegation(httpServletRequest, httpServletResponse);
     }
 
-    /**
-     * Note that this method does <b>not</b> write the response (using the issuer response). You must
-     * do that in your implementation after you have finished all processing. If we were to do that here,
-     * the response would be written prematurely.
-     * @param httpServletRequest
-     * @param httpServletResponse
-     * @return
-     * @throws Throwable
-     * @throws ServletException
-     */
-    protected IssuerTransactionState doDelegation(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Throwable, ServletException {
+    protected IssuerTransactionState doDelegation(Client client, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Throwable, ServletException {
         printAllParameters(httpServletRequest);
         info("5.a. Starting access token exchange");
         Verifier v = getServiceEnvironment().getTokenForge().getVerifier(httpServletRequest);
         AuthorizationGrant ag = getServiceEnvironment().getTokenForge().getAuthorizationGrant(httpServletRequest);
 
-        ATRequest atRequest = new ATRequest(httpServletRequest, getClient(httpServletRequest));
+        ATRequest atRequest = new ATRequest(httpServletRequest, client);
 
         atRequest.setVerifier(v);
         atRequest.setAuthorizationGrant(ag);
@@ -64,7 +55,7 @@ public abstract class AbstractAccessTokenServlet extends MyProxyDelegationServle
         } catch (GeneralException e) {
             throw new ServletException("Error saving transaction", e);
         }
-      //  atResp.write(httpServletResponse);
+        //  atResp.write(httpServletResponse);
         info("5.b. done with access token exchange with " + cc);
         IssuerTransactionState transactionState = new IssuerTransactionState(httpServletRequest,
                 httpServletResponse,
@@ -73,6 +64,22 @@ public abstract class AbstractAccessTokenServlet extends MyProxyDelegationServle
                 atResp);
         postprocess(transactionState);
         return transactionState;
+    }
+
+
+    /**
+     * Note that this method does <b>not</b> write the response (using the issuer response). You must
+     * do that in your implementation after you have finished all processing. If we were to do that here,
+     * the response would be written prematurely.
+     *
+     * @param httpServletRequest
+     * @param httpServletResponse
+     * @return
+     * @throws Throwable
+     * @throws ServletException
+     */
+    protected IssuerTransactionState doDelegation(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Throwable, ServletException {
+        return doDelegation(getClient(httpServletRequest), httpServletRequest, httpServletResponse);
     }
 
 }

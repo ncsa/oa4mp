@@ -243,7 +243,7 @@ public abstract class AbstractAuthroizationServlet extends CRServlet implements 
             warn("Error: no delegation request found for " + token);
             throw new GeneralException("Error: no delegation request found.");
         }
-        checkClient(trans.getClient());
+        checkClientApproval(trans.getClient());
         return trans;
     }
 

@@ -10,14 +10,18 @@ import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2MPService;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.DateUtils;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.delegation.client.request.RTResponse;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.delegation.token.impl.AuthorizationGrantImpl;
 import edu.uiuc.ncsa.security.oauth_2_0.UserInfo;
 import edu.uiuc.ncsa.security.oauth_2_0.client.ATResponse2;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import edu.uiuc.ncsa.security.util.pkcs.CertUtil;
+import net.sf.json.JSONObject;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -25,6 +29,8 @@ import java.security.SecureRandom;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.StringTokenizer;
+
+import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.ID_TOKEN;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -164,38 +170,40 @@ public class OA2TestCommands extends TestCommands {
 
     OA2Asset dummyAsset;
 
-    protected void saveCertHelp(){
+    protected void saveCertHelp() {
         say("savecert filename");
         say("This will save the cert (be sure to do a getcert call first so you have one) to the");
         say("fully qualified filename");
         say("If there is no cert available, no file will be written, but a message will be printed.");
     }
+
     /**
      * If the state supports this, it will save the current cert to a file. The complete filename must be supplied,
      * including any path.
+     *
      * @param inputLine
      * @throws Exception
      */
-    public void savecert(InputLine inputLine) throws Exception{
-    if(showHelp(inputLine)){
-        saveCertHelp();
-        return;
-    }
-        if(assetResponse == null){
+    public void savecert(InputLine inputLine) throws Exception {
+        if (showHelp(inputLine)) {
+            saveCertHelp();
+            return;
+        }
+        if (assetResponse == null) {
             say("Sorry, but there is no cert to save. Please do a successful getcert call first.");
             return;
         }
         String cert = CertUtil.toPEM(assetResponse.getX509Certificates());
-        if(!inputLine.hasArgs()){
+        if (!inputLine.hasArgs()) {
             say("Sorry. You did not specify a file so the cert cannot be saved.");
             return;
         }
         String fileName = inputLine.getArg(1);
-            FileWriter fileWriter = new FileWriter(fileName);
-            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-            bufferedWriter.write(cert + "\n");
-            bufferedWriter.flush();
-            bufferedWriter.close();
+        FileWriter fileWriter = new FileWriter(fileName);
+        BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+        bufferedWriter.write(cert + "\n");
+        bufferedWriter.flush();
+        bufferedWriter.close();
         say("File \"" + fileName + "\" saved successfully.");
     }
 
@@ -209,6 +217,14 @@ public class OA2TestCommands extends TestCommands {
         }
 
         currentATResponse = getOA2S().getAccessToken(getDummyAsset(), grant);
+        if (inputLine.hasArg(CLAIMS_FLAG)) {
+            JSONObject json = (JSONObject)currentATResponse.getParameters().get(ID_TOKEN);
+            if(json.isEmpty()){
+              say("(no claims found)");
+            }else {
+                say(json.toString(2));
+            }
+        }
         printTokens();
     }
 
@@ -239,21 +255,26 @@ public class OA2TestCommands extends TestCommands {
     }
 
     AssetResponse assetResponse = null;
+
     public void getcert(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
             getCertHelp();
             return;
         }
         assetResponse = getOA2S().getCert(dummyAsset, currentATResponse);
-        if(assetResponse.getUsername()!= null){ say("returned username=" + assetResponse.getUsername());}
+        if (assetResponse.getUsername() != null) {
+            say("returned username=" + assetResponse.getUsername());
+        }
         say("X509Certs:");
         say(CertUtil.toPEM(assetResponse.getX509Certificates()));
 
     }
 
     protected void getRTHelp() {
-        say("getrt: Get a new refresh token. You must have already called getat to have gotten an access token");
+        say("getrt [-claims]:");
+        say("       Get a new refresh token. You must have already called getat to have gotten an access token");
         say("       first. This will print out a summary of the expiration time.");
+        say("       If the "+ CLAIMS_FLAG + " flag is supplied, the id token will be printed");
     }
 
     protected void printTokens() {
@@ -270,23 +291,38 @@ public class OA2TestCommands extends TestCommands {
 
     }
 
+    public static final String CLAIMS_FLAG = "-claims";
+
     public void getrt(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
             getRTHelp();
             return;
         }
 
-        dummyAsset = getOA2S().refresh(dummyAsset.getIdentifier().toString());
+        RTResponse rtResponse = getOA2S().refresh(dummyAsset.getIdentifier().toString());
+        dummyAsset = (OA2Asset) getCe().getAssetStore().get(dummyAsset.getIdentifier().toString());
         // Have to update the AT reponse here every time or no token state is preserved.
         currentATResponse = new ATResponse2(dummyAsset.getAccessToken(), dummyAsset.getRefreshToken());
+        currentATResponse.setParameters(rtResponse.getParameters());
+        if (inputLine.hasArg(CLAIMS_FLAG)) {
+            JSONObject json = JSONObject.fromObject(currentATResponse.getParameters());
+            if(json.isEmpty()){
+              say("(no claims found)");
+            }else {
+                say(json.toString(2));
+            }
+        }
         printTokens();
     }
 
 
     protected void getATHelp() {
-        say("getat: Gets the access token and refresh token (if supported on the server) for a given grant. ");
+        say("getat [-claims]:");
+        say("       Gets the access token and refresh token (if supported on the server) for a given grant. ");
         say("       Your argument is the output from the setgrant call here.");
         say("       A summary of the refresh token and its expiration is printed, if applicable.");
+        say("       If the -"+ CLAIMS_FLAG + " flag is supplied, the id token will be printed");
+
     }
 
     protected void setGrantHelp() {

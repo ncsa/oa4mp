@@ -23,7 +23,7 @@ import java.security.SecureRandom;
  */
 public class SigningCommands extends CommonCommands {
     public SigningCommands(OA2SE oa2se) {
-        super(oa2se.getMyLogger());
+        super(oa2se==null?null:oa2se.getMyLogger());
         this.oa2SE = oa2se;
     }
 
@@ -74,35 +74,16 @@ public class SigningCommands extends CommonCommands {
 
         sayi2("create a new set of JSON web keys?[y/n]");
 
-        if (!
-
-                isOk(readline()
-
-                ))
-
+        if (!isOk(readline()))
         {
             say("create cancelled.");
             return;
         }
 
         JSONWebKeys keys = new JSONWebKeys(null);
-        keys.put(
-
-                createJWK("RS256")
-
-        );
-        keys.put(
-
-                createJWK("RS384")
-
-        );
-        keys.put(
-
-                createJWK("RS512")
-
-        );
-
-
+        keys.put(createJWK("RS256"));
+        keys.put(createJWK("RS384"));
+        keys.put(createJWK("RS512"));
         FileWriter writer = new FileWriter(publicKeyFile);
         JSONObject jwks = JSONWebKeyUtil.toJSON(keys);
         writer.write(jwks.toString(3));

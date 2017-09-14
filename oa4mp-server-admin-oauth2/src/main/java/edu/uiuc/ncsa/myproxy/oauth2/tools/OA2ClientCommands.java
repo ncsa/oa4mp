@@ -45,6 +45,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
         sayi("creation timestamp=" + client.getCreationTS());
         sayi("sign ID tokens?=" + client.isSignTokens());
         sayi("issuer=" + client.getIssuer());
+        sayi("is public?=" + client.isPublicClient());
         if (getClientApprovalStore() != null) {
             ClientApproval clientApproval = (ClientApproval) getClientApprovalStore().get(client.getIdentifier());
             if (clientApproval == null) {
@@ -130,6 +131,33 @@ public class OA2ClientCommands extends ClientStoreCommands {
                 }
             }
         }
+        boolean publicClient = oa2Client.isPublicClient();
+        String rawPC = getInput("is this client public?", Boolean.toString(publicClient));
+        if(rawPC != null && rawPC.toLowerCase().equalsIgnoreCase("y") || rawPC.toLowerCase().equalsIgnoreCase("yes")){
+            rawPC = "true";
+        }
+        try{
+            boolean x = Boolean.parseBoolean(rawPC);
+            oa2Client.setPublicClient(x);
+        }catch(Throwable t){
+            sayi("Sorry, but unable to parse the response of \"" + rawPC +  "\". No change.");
+        }
+
+        String issuer = getInput("enter the issuer (optional)", oa2Client.getIssuer());
+        if(!isEmpty(issuer)){
+            oa2Client.setIssuer(issuer);
+        }
+
+        String signTokens = getInput("Enable ID token signing (true/false)?", Boolean.toString(oa2Client.isSignTokens()));
+        if(!isEmpty(signTokens)){
+            try{
+                oa2Client.setSignTokens(Boolean.parseBoolean(signTokens));
+            }catch(Throwable t){
+                // do nothing.
+                sayi("Unknown response of \"" + signTokens + "\". Must be \"true\" or \"false\", ignoring.");
+            }
+        }
+
 
         String currentUris = null;
         if (oa2Client.getCallbackURIs() != null) {
@@ -165,20 +193,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
             oa2Client.setCallbackURIs(list);
         }
 
-        String issuer = getInput("enter the issuer (optional)", oa2Client.getIssuer());
-        if(!isEmpty(issuer)){
-            oa2Client.setIssuer(issuer);
-        }
 
-        String signTokens = getInput("Enable ID token signing (true/false)?", Boolean.toString(oa2Client.isSignTokens()));
-        if(!isEmpty(signTokens)){
-            try{
-                oa2Client.setSignTokens(Boolean.parseBoolean(signTokens));
-            }catch(Throwable t){
-                // do nothing.
-                sayi("Unknown response of \"" + signTokens + "\". Must be \"true\" or \"false\", ignoring.");
-            }
-        }
 
     }
 

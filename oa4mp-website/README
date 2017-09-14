@@ -29,7 +29,7 @@ How to deploy the website.
 
 * tar up the resulting directory in target/site
 
-* transfer it (e.g. with scp) to the target server (currently this is pkilab2.ncsa.uiuc.edu)
+* transfer it (e.g. with scp) to the target server (currently this is falco.ncsa.uiuc.edu)
 
 * Make sure you issue kinit and aklog on pkilab2 before trying to do anything or you will get all
   sorts of permissions errors on afs.

@@ -16,6 +16,7 @@ import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.server.request.IssuerResponse;
 import edu.uiuc.ncsa.security.delegation.servlet.TransactionState;
+import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.delegation.storage.TransactionStore;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
@@ -34,6 +35,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import static edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceConstantKeys.CONSUMER_KEY;
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.CLIENT_SECRET;
 
 /**
@@ -67,11 +69,16 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         }
 
         p.put(OA2Constants.CLIENT_ID, st.getClient().getIdentifierString());
+        populateClaims(state.getRequest(), p, st);
+    }
+
+    protected Map<String, String> populateClaims(HttpServletRequest request, Map<String, String> p, OA2ServiceTransaction st) {
         OA2SE oa2se = (OA2SE) getServiceEnvironment();
-        List<Identifier> admins = oa2se.getPermissionStore().getAdmins(st.getClient().getIdentifier());
         String issuer = null;
         // So in order
         // 1. get the issuer from the admin client
+        List<Identifier> admins = oa2se.getPermissionStore().getAdmins(st.getClient().getIdentifier());
+
         for (Identifier adminID : admins) {
             AdminClient ac = oa2se.getAdminClientStore().get(adminID);
             if (ac != null) {
@@ -89,7 +96,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         // 3. If the client does not have one, see if there is a server default to use
         // The discovery servlet will try to use the server default or construct the issuer
         if (issuer == null) {
-            issuer = OA2DiscoveryServlet.getIssuer(state.getRequest());
+            issuer = OA2DiscoveryServlet.getIssuer(request);
         }
         p.put(OA2Claims.ISSUER, issuer);
 
@@ -98,8 +105,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             // convert the date to a time if needed.
             p.put(OA2Constants.AUTHORIZATION_TIME, Long.toString(st.getAuthTime().getTime() / 1000));
         }
+        return p;
     }
-
 
     /**
      * The lifetime of the refresh token. This is the non-zero minimum of the client's requested
@@ -128,58 +135,21 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             warn("Error servicing request. No grant type was given. Rejecting request.");
             throw new GeneralException("Error: Could not service request");
         }
-        List<String> authHeaders = getAuthHeader(request, "Basic");
-        OA2Client client  = null;
-        String rawSecret = null;
-        if(authHeaders.isEmpty()){
-            // assume that the secret and id are in the request
-            client = (OA2Client) getClient(request);
-            rawSecret = getFirstParameterValue(request, CLIENT_SECRET);
-
-        }else{
-            // assume the client id and secret are in the headers.
-            String header64 = authHeaders.get(0);
-            // semantics are that this is base64.encode(id:secret)
-            byte[] headerBytes = Base64.decodeBase64(header64);
-            if(headerBytes == null || headerBytes.length == 0){
-                DebugUtil.dbg(this, "doIt: no secret, throwing exception.");
-                throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT, "Missing secret");
-            }
-            String header = new String(headerBytes);
-            int lastColonIndex = header.lastIndexOf(":");
-            if(lastColonIndex == -1){
-                // then this is not in the correct format.
-                DebugUtil.dbg(this, "doIt: the authorization header is not in the right format, throwing exception.");
-                throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT, "the authorization header is not in the right format");
-
-            }
-            String id = header.substring(0,lastColonIndex);
-            Identifier identifier = BasicIdentifier.newID(id);
-
-            rawSecret = header.substring(lastColonIndex + 1);
-            client = (OA2Client) getClient(identifier);
-
-        }
-        checkClient(client);
-
-        // Fix for CIL-332
-        if (rawSecret == null) {
-            // check headers.
-            DebugUtil.dbg(this, "doIt: no secret, throwing exception.");
-            throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT, "Missing secret");
-        }
-        if (!client.getSecret().equals(DigestUtils.shaHex(rawSecret))) {
-            DebugUtil.dbg(this, "doIt: bad secret, throwing exception.");
-            throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT, "Incorrect secret");
-        }
-
+        OA2Client client = (OA2Client) getClient(request);
 
         if (grantType.equals(OA2Constants.REFRESH_TOKEN)) {
-            doRefresh(request, response);
+            String rawSecret = getClientSecret(request);
+            if(!client.isPublicClient()){
+                // if there is a secret, verify it.
+                verifyClientSecret(client, rawSecret);
+            }
+            doRefresh(client, request, response);
             return;
         }
         if (grantType.equals(OA2Constants.AUTHORIZATION_CODE_VALUE)) {
-            IssuerTransactionState state = doDelegation(request, response);
+            // public clients cannot get an access token
+            verifyClientSecret(client, getClientSecret(request));
+            IssuerTransactionState state = doDelegation(client, request, response);
             ATIResponse2 atResponse = (ATIResponse2) state.getIssuerResponse();
             atResponse.setSignToken(client.isSignTokens());
             DebugUtil.dbg(this, "set token signing flag =" + atResponse.isSignToken());
@@ -211,6 +181,113 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         throw new ServletException("Error: Unknown request type.");
     }
 
+    /**
+     * This either peels the secret off the parameter list if it is there or from the headers. It
+     * merely returns the raw string that is the secret. No checking against a client is done.
+     * Also, a null is a perfectly acceptable return value if there is no secret, e.g. the client is public.
+     *
+     * @param request
+     * @return
+     */
+    protected String getClientSecret(HttpServletRequest request) {
+        List<String> authHeaders = getAuthHeader(request, "Basic");
+
+        String rawSecret = null;
+        if (authHeaders.isEmpty()) {
+            DebugUtil.dbg(this, "doIt: no header for authentication, looking at parameters.");
+            rawSecret = getFirstParameterValue(request, CLIENT_SECRET);
+        } else {
+            DebugUtil.dbg(this, "doIt: Got the header.");
+
+            // assume the client id and secret are in the headers.
+            String header64 = authHeaders.get(0);
+            // semantics are that this is base64.encode(id:secret)
+            byte[] headerBytes = Base64.decodeBase64(header64);
+            if (headerBytes == null || headerBytes.length == 0) {
+                DebugUtil.dbg(this, "doIt: no secret, throwing exception.");
+//                throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT, "Missing secret");
+                return null; // no secret
+            }
+            String header = new String(headerBytes);
+            DebugUtil.dbg(this, " received authz header of " + header);
+            int lastColonIndex = header.lastIndexOf(":");
+            if (lastColonIndex == -1) {
+                return null;
+                // then this is not in the correct format.
+
+            }
+            String id = header.substring(0, lastColonIndex);
+            Identifier identifier = BasicIdentifier.newID(id);
+            rawSecret = header.substring(lastColonIndex + 1);
+        }
+
+        return rawSecret;
+    }
+
+    /**
+     * This finds the client identifier either as a parameter or in the authorization header and uses
+     * that to get the client. It will also check if the client has been approved and throw an
+     * exception if that is not the case. You must separately check the secret as needed.
+     *
+     * @param request
+     * @return
+     */
+    @Override
+    public Client getClient(HttpServletRequest request) {
+        // Check is this is in the headers. If not, fall through to checking parameters.
+        List<String> authHeaders = getAuthHeader(request, "Basic");
+        OA2Client client = null;
+        if (authHeaders.isEmpty()) {
+            DebugUtil.dbg(this, "doIt: no header for authentication, looking at parameters.");
+
+            // assume that the secret and id are in the request
+            //client = (OA2Client) getClient(request);
+            Identifier id = BasicIdentifier.newID(request.getParameter(CONST(CONSUMER_KEY)));
+            client = (OA2Client) getClient(id);
+
+        } else {
+            DebugUtil.dbg(this, "doIt: Got the header.");
+
+            // assume the client id and secret are in the headers.
+            String header64 = authHeaders.get(0);
+            // semantics are that this is base64.encode(id:secret)
+            byte[] headerBytes = Base64.decodeBase64(header64);
+            if (headerBytes == null || headerBytes.length == 0) {
+                DebugUtil.dbg(this, "doIt: no secret, throwing exception.");
+                throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT, "Missing secret");
+            }
+            String header = new String(headerBytes);
+            DebugUtil.dbg(this, " received authz header of " + header);
+            int lastColonIndex = header.lastIndexOf(":");
+            if (lastColonIndex == -1) {
+                // then this is not in the correct format.
+                DebugUtil.dbg(this, "doIt: the authorization header is not in the right format, throwing exception.");
+                throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT, "the authorization header is not in the right format");
+
+            }
+            String id = header.substring(0, lastColonIndex);
+            Identifier identifier = BasicIdentifier.newID(id);
+            client = (OA2Client) getClient(identifier);
+        }
+        checkClientApproval(client);
+
+
+        return client;
+    }
+
+    protected void verifyClientSecret(OA2Client client, String rawSecret) {
+        // Fix for CIL-332
+        if (rawSecret == null) {
+            // check headers.
+            DebugUtil.dbg(this, "doIt: no secret, throwing exception.");
+            throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT, "Missing secret");
+        }
+        if (!client.getSecret().equals(DigestUtils.shaHex(rawSecret))) {
+            DebugUtil.dbg(this, "doIt: bad secret, throwing exception.");
+            throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT, "Incorrect secret");
+        }
+
+    }
 
     protected OA2ServiceTransaction getByRT(RefreshToken refreshToken) throws IOException {
         if (refreshToken == null) {
@@ -224,13 +301,11 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         return (OA2TokenForge) getServiceEnvironment().getTokenForge();
     }
 
-    protected TransactionState doRefresh(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    protected TransactionState doRefresh(OA2Client c, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         RefreshToken oldRT = getTF2().getRefreshToken(request.getParameter(OA2Constants.REFRESH_TOKEN));
-        OA2Client c = (OA2Client) getClient(request);
         if (c == null) {
-            throw new InvalidTokenException("Could not find the client associated with geturirefresh token \"" + oldRT + "\"");
+            throw new InvalidTokenException("Could not find the client associated with refresh token \"" + oldRT + "\"");
         }
-        checkClient(c);
 
         OA2ServiceTransaction t = getByRT(oldRT);
         if ((!((OA2SE) getServiceEnvironment()).isRefreshTokenEnabled()) || (!c.isRTLifetimeEnabled())) {
@@ -245,6 +320,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         RTIRequest rtiRequest = new RTIRequest(request, c, at);
         RTI2 rtIsuuer = new RTI2(getTF2(), getServiceEnvironment().getServiceAddress());
         RTIResponse rtiResponse = (RTIResponse) rtIsuuer.process(rtiRequest);
+        rtiResponse.setSignToken(c.isSignTokens());
+        populateClaims(request,rtiResponse.getParameters(), t);
         RefreshToken rt = rtiResponse.getRefreshToken();
         rt.setExpiresIn(computeRefreshLifetime(t));
         t.setRefreshToken(rtiResponse.getRefreshToken());
@@ -253,6 +330,25 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         // At this point, key in the transaction store is the grant, so changing the access token
         // over-writes the current value. This practically invalidates the previous access token.
         getTransactionStore().remove(t.getIdentifier()); // this is necessary to clear any caches.
+        ArrayList<String> targetScopes = new ArrayList<>();
+        OA2SE oa2SE = (OA2SE) getServiceEnvironment();
+
+        boolean returnScopes = false; // set true if something is requested we don't support
+        for (String s : t.getScopes()) {
+            if (oa2SE.getScopes().contains(s)) {
+                targetScopes.add(s);
+            } else {
+                returnScopes = true;
+            }
+        }
+        if (returnScopes) {
+            rtiResponse.setSupportedScopes(targetScopes);
+        }
+
+        rtiResponse.setScopeHandlers(setupScopeHandlers(t, oa2SE));
+
+        rtiResponse.setServiceTransaction(t);
+        rtiResponse.setJsonWebKey(oa2SE.getJsonWebKeys().getDefault());
         getTransactionStore().save(t);
         rtiResponse.write(response);
         IssuerTransactionState state = new IssuerTransactionState(

@@ -1,8 +1,8 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.oauth_2_0.server.LDAPConfiguration;
 import edu.uiuc.ncsa.security.oauth_2_0.server.ScopeHandlerFactoryRequest;
+import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
 
 import java.util.Collection;
 

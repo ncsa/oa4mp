@@ -41,7 +41,6 @@
 <p>You must register the a client with the server as per <a href="http://grid.ncsa.illinois.edu/myproxy/oauth/client/manuals/registering-with-an-oauth2-server.xhtml">this</a>.
 The trick that makes this work, however, is that the callback URL you supply must be invalid, i.e., the callback from the server
 must fail. This will allow you to get the OAuth transaction state.</p>
-<!--#include virtual="../../footer.html" -->
 <h3>Invocation</h3>
 <p>
     The client is called either directly or through the oa2-client script. You need to specify the configuration file name
@@ -50,22 +49,22 @@ must fail. This will allow you to get the OAuth transaction state.</p>
 </p>
 <pre>
     java -jar /opt/oa2/oa2-client.jar -cfg ~/config/clients.xml -name oa4mp2
-    OA4MP Client OAuth 2 configuration loader, version 3.3 startup on Thu Aug 11 13:46:26 CDT 2016
-    client>
+    OA4MP Client OAuth 2 configuration loader, version 3.5-SNAPSHOT startup on Thu Aug 11 13:46:26 CDT 2016
+    client&gt;
 </pre>
 <p>The last line is the prompt. The startup message tell you that the loader found everything and there
 were no issues. You are now ready to start talking to an OA4MP OAuth 2 server.</p>
 <h3>Getting the correct URI</h3>
 <p>Issue the following <b>geturi</b> call:</p>
 <pre>
-    client>geturi
-    https://surge.ncsa.illinois.edu/oauth2/authorize?scope=edu.uiuc.ncsa.myproxy.getcert+openid+profile+email&response_type=code&redirect_uri=https%3A%2F%2Fashigaru.ncsa.uiuc.edu%3A9443%2Fclient%2Fready&state=MUB0Y2wme8FvxTbtwjp6y4xLfR3SbxS4NY6_FqDlM-Q&nonce=udBh62PGMyZaYNa4-vlmfYbNl8MSgb7IO9rBIOkPWcM&prompt=login&client_id=myproxy%3Aoa4mp%2C2012%3A%2Fclient_id%2F2a3aab4b67f3c8d9f3bff4aafb6e236c&skin=dataOne
+    client&gt;geturi
+    https://surge.ncsa.illinois.edu/oauth2/authorize?scope=edu.uiuc.ncsa.myproxy.getcert+openid+profile+email&amp;response_type=code&amp;redirect_uri=https%3A%2F%2Fashigaru.ncsa.uiuc.edu%3A9443%2Fclient%2Fready&amp;state=MUB0Y2wme8FvxTbtwjp6y4xLfR3SbxS4NY6_FqDlM-Q&amp;nonce=udBh62PGMyZaYNa4-vlmfYbNl8MSgb7IO9rBIOkPWcM&amp;prompt=login&amp;client_id=myproxy%3Aoa4mp%2C2012%3A%2Fclient_id%2F2a3aab4b67f3c8d9f3bff4aafb6e236c&amp;skin=dataOne
     </pre>
 <p>The command causes a uri to be generated with the full state for the OIDC request (which is actually hard to make, hence
 the call). As with all calls, you can get a description of what it is and does by supplying
     the argument --help:</p>
 <pre>
-    client>geturi --help
+    client&gt;geturi --help
     Usage: This will create the correct URL to pass to your browser.
            This URL should be pasted exactly into the location bar.
            You must then authenticate. After you authenticate, the
@@ -78,7 +77,7 @@ then next step will fail. What has happened is that the server tries to do the c
 and, of course, there is nothing at the endpoint. You take this callback from the browser's location bar and invoke the
 <b>setgrant</b> call</p>
 <pre>
-    client>setgrant https://ashigaru.ncsa.uiuc.edu:9443/client/ready?code=https%3A%2F%2Fsurge.ncsa.illinois.edu%2Foauth2%2FauthzGrant%2F69423b7a0ff66ba67b6beb777baa4fce%2F1473714031677&state=MUB0Y2wme8FvxTbtwjp6y4xLfR3SbxS4NY6_FqDlM-Q
+    client&gt;setgrant https://ashigaru.ncsa.uiuc.edu:9443/client/ready?code=https%3A%2F%2Fsurge.ncsa.illinois.edu%2Foauth2%2FauthzGrant%2F69423b7a0ff66ba67b6beb777baa4fce%2F1473714031677&amp;state=MUB0Y2wme8FvxTbtwjp6y4xLfR3SbxS4NY6_FqDlM-Q
         grant=https://surge.ncsa.illinois.edu/oauth2/authzGrant/69423b7a0ff66ba67b6beb777baa4fce/1473714031677
 </pre>
 <p>This call will update the internal state of the program. (This is managing a full client instance behind the
@@ -86,7 +85,7 @@ scenes which takes quite some little work, but fortunately, you don't have to do
 that the server issued, mostly so you can see it. Now you are in a position to get an access token. You should issue the
 <b>getat</b> call</p>
 <pre>
-    client>getat
+    client&gt;getat
      access token = https://surge.ncsa.illinois.edu/oauth2/accessToken/6843e396a91fb7e0bbdaa16d911a3f71/1473714329017
     refresh token = https://surge.ncsa.illinois.edu/oauth2/refreshToken/3bb669051069bc68dc04beee9519c3ac/1473714329017
     RT expires in = 1000000000 ms.
@@ -99,7 +98,7 @@ since you have a valid access token. <b>Nota Bene:</b> an access token is valid 
 from the server. Notice though that the refresh token expires far into the future, in this case 1,000,000,000 ms or about
 11.5 days. You may use the <b>getrt</b> call to get a new access token and refresh token:</p>
 <pre>
-    client>getrt
+    client&gt;getrt
      access token = https://surge.ncsa.illinois.edu/oauth2/accessToken/3fa47d0e6cfe4e25d9d256e248ca19ae/1473776351782
     refresh token = https://surge.ncsa.illinois.edu/oauth2/refreshToken/41fb6c4b054dfe034865c77ed0921ee4/1473776351782
     RT expires in = 1000000000 ms.
@@ -108,7 +107,7 @@ from the server. Notice though that the refresh token expires far into the futur
 <p>In any case, as long as you have a valid access token, you may get a certificate or user information. We will do examples of each of these
 in turn. First, the <b>getuserinfo</b> call.</p>
 <pre>
-    client>getuserinfo
+    client&gt;getuserinfo
     user info:
               sub = jgaynor
 </pre>
@@ -116,7 +115,7 @@ in turn. First, the <b>getuserinfo</b> call.</p>
 username (i.e. the name used to authenticate). The <b>getcert</b> call will return a certificate and if the server
     returns the username (which is the same as the subject of the user info call) it will be displayed too:</p>
 <pre>
-    client>getcert
+    client&gt;getcert
     returned username=jgaynor
     X509Certs:
     -----BEGIN CERTIFICATE-----
@@ -146,11 +145,12 @@ username (i.e. the name used to authenticate). The <b>getcert</b> call will retu
 <p>You may cut and paste this or you can save it (PEM encoded) to a file using the
 <b>savecert</b> command:</p>
  <pre>
-     client>savecert /tmp/mycert.pem
+     client&gt;savecert /tmp/mycert.pem
      File "/tmp/mycert.pem" saved successfully.
  </pre>
 <p>It is useful to state that you may keep renewing the refresh token and getting certs. As long
 as you renew the refresh token before it expires, this may be done indefinitely. As long as you have
 a valid access token (such as right after getting a new refresh token) you may get a cert.</p>
+<!--#include virtual="../../footer.html" -->
 </body>
 </html>

@@ -207,7 +207,7 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
                             new ATServer2(createServiceClient(getAccessTokenURI()), getWellKnownURI()),
                             new PAServer2(createServiceClient(getAssetURI())),
                             new UIServer2(createServiceClient(getUIURI())),
-                            new RTServer2(createServiceClient(getAccessTokenURI())) // as per spec, refresh token server is at same endpoint as access token server.
+                            new RTServer2(createServiceClient(getAccessTokenURI()), getWellKnownURI()) // as per spec, refresh token server is at same endpoint as access token server.
                     );
                 }
             };

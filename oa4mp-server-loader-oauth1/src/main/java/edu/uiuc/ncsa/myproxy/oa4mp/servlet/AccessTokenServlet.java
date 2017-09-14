@@ -31,7 +31,7 @@ public class AccessTokenServlet extends AbstractAccessTokenServlet {
         if(transaction == null){
             throw new TransactionNotFoundException("No transaction found for verifier " + verifier);
         }
-        checkClient(transaction.getClient());
+        checkClientApproval(transaction.getClient());
         String cc = "client=" + transaction.getClient().getIdentifierString();
         info("5.a. " + cc);
 

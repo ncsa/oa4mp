@@ -45,7 +45,7 @@ public abstract class AbstractInitServlet extends MyProxyDelegationServlet{
            try {
                String cid = "client=" + client.getIdentifier();
                info("2.a. Starting a new cert request: " + cid);
-               checkClient(client);
+               checkClientApproval(client);
 
                AGResponse agResponse = (AGResponse) getAGI().process(new AGRequest(req, client));
                agResponse.setClient(client);

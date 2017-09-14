@@ -2,8 +2,8 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.oauth_2_0.UserInfo;
-import edu.uiuc.ncsa.security.oauth_2_0.server.LDAPConfiguration;
-import edu.uiuc.ncsa.security.oauth_2_0.server.LDAPConfigurationUtil;
+import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
+import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfigurationUtil;
 import edu.uiuc.ncsa.security.util.ssl.MyTrustManager;
 import edu.uiuc.ncsa.security.util.ssl.SSLConfiguration;
 import edu.uiuc.ncsa.security.util.ssl.SSLConfigurationUtil;
@@ -152,38 +152,6 @@ public class LDAPSSLSocketFactory extends SocketFactory {
             "{\"name\": \"mail\",\"returnAsList\": false,\"returnName\": \"email\"}]," +
             "\"searchName\": \"username\"}}";
 
-    /*
-     <ldap enabled="true"
-        authorizationType="simple">
-        <address>registry-beta.cilogon.org</address>
-        <port>636</port>
-        <password><![CDATA[plhrZjK3RtTRXAIbC1L6]]></password>
-        <principal><![CDATA[uid=registry_user,ou=system,o=NANOGrav,dc=cilogon,dc=org]]></principal>
-        <searchBase><![CDATA[ou=people,o=NANOGrav,dc=cilogon,dc=org]]></searchBase>
-        <searchAttributes>
-                  <attribute returnName="sub">uid</attribute>
-                  <attribute returnName="name">cn</attribute>
-                  <attribute returnName="email">email</attribute>
-                  <attribute returnName="preferred_username">employeeNumber</attribute>
-           </searchAttributes>
-
-        <ssl debug="false">
-          <trustStore>/var/www/config/cacerts2</trustStore>
-          <trustStorePassword><![CDATA[changeit]]></trustStorePassword>
-        </ssl>
-      </ldap>
-
-
-    ldapsearch
-      -LLL
-      -D 'uid=oa4mp_user,ou=system,o=NANOGrav,dc=cilogon,dc=org'
-      -x
-      -w 'b6r6r4PFUGOWOa25WL4q'
-      -H ldaps://registry-test.cilogon.org
-      -b "ou=people,o=NANOGrav,dc=cilogon,dc=org"
-      -v
-
-     */
     public static void main(String[] args) {
         try {
             DebugUtil.dbg(LDAPSSLSocketFactory.class, System.getProperty("java.home") + "/lib/security/cacerts");
