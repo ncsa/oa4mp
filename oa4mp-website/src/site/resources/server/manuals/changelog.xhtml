@@ -13,8 +13,15 @@
 
 <h2>3.5</h2>
 <ul>
+    <li>Support for public clients.</li>
     <li>CIL-409: Missing cert request in OIDC getcert call causes empty certificate to be returned.</li>
+    <li>CIL-414: Bug prevented accurately counting number of pending approvals.</li>
 </ul>
+<h4>Release Notes</h4>
+
+<p>Public clients are supported. It is assumed that the identifier is published publicly so that, for instance
+    a user can get a refresh token and then access tokens. No secret is needed to use a public client, however
+    access by a public client is severely restricted, almost exclusively to the openid scope for a user.</p>
 
 <h2>3.4</h2>
 <ul>

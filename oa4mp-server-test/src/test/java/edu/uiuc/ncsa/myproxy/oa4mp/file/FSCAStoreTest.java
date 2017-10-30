@@ -15,6 +15,7 @@ import edu.uiuc.ncsa.security.storage.FileStore;
 import java.io.File;
 
 /**
+ * @deprecated
  * <p>Created by Jeff Gaynor<br>
  * on 5/4/12 at  2:58 PM
  */

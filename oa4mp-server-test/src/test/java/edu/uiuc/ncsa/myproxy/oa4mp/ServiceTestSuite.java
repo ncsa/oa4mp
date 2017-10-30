@@ -17,10 +17,10 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-        TokenTest.class,
-        TransactionStoreTest.class,
-        ClientStoreTest.class,
-        ServiceConfigTest.class
+    //    TokenTest.class,
+   //     TransactionStoreTest.class,
+    //    ClientStoreTest.class,
+      //  ServiceConfigTest.class
 })
 public class ServiceTestSuite extends TestSuite {
     @BeforeClass

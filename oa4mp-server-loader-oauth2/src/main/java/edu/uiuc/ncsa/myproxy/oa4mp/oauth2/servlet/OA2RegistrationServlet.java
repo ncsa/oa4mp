@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractRegistrationServlet;
 import edu.uiuc.ncsa.security.core.exceptions.RetryException;
+import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Client;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Scopes;
@@ -150,6 +151,11 @@ public class OA2RegistrationServlet extends AbstractRegistrationServlet {
         br.close();
         client.setCallbackURIs(uris);
         client.setSignTokens(true); // part of CIL-359, signing ID tokens.
+        // CIL-414 makes the approval record here so that we can get an accurate count later.
+        ClientApproval approval = (ClientApproval) getOA2SE().getClientApprovalStore().create();
+        approval.setApproved(false);
+        approval.setIdentifier(client.getIdentifier());
+        getOA2SE().getClientApprovalStore().save(approval);
         if (fireClientEvents) {
             fireNewClientEvent(client);
         }

@@ -5,25 +5,9 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth1;
  * on 3/13/12 at  3:10 PM
  */
 
-import edu.uiuc.ncsa.myproxy.oa4mp.ServiceConfigTest;
-import edu.uiuc.ncsa.myproxy.oa4mp.TestStoreProvider;
-import edu.uiuc.ncsa.myproxy.oa4mp.TestUtils;
-import edu.uiuc.ncsa.myproxy.oa4mp.TokenTest;
-import edu.uiuc.ncsa.myproxy.oa4mp.aggregate.AGCAStoreTest;
-import edu.uiuc.ncsa.myproxy.oa4mp.aggregate.AGClientTest;
-import edu.uiuc.ncsa.myproxy.oa4mp.file.FSCAStoreTest;
-import edu.uiuc.ncsa.myproxy.oa4mp.file.FSClientTest;
-import edu.uiuc.ncsa.myproxy.oa4mp.file.FSTransactionStoreTest;
+import edu.uiuc.ncsa.myproxy.oa4mp.*;
 import edu.uiuc.ncsa.myproxy.oa4mp.loader.OA4MPBootstrapper;
 import edu.uiuc.ncsa.myproxy.oa4mp.loader.OA4MPConfigurationLoader;
-import edu.uiuc.ncsa.myproxy.oa4mp.memory.MCAStoreTest;
-import edu.uiuc.ncsa.myproxy.oa4mp.memory.MClientStoreTest;
-import edu.uiuc.ncsa.myproxy.oa4mp.memory.MTransactionStoreTest;
-import edu.uiuc.ncsa.myproxy.oa4mp.mysql.MySQLCAStoreTest;
-import edu.uiuc.ncsa.myproxy.oa4mp.mysql.MySQLClientStoreTest;
-import edu.uiuc.ncsa.myproxy.oa4mp.mysql.MySQLTransactionStoreTest;
-import edu.uiuc.ncsa.myproxy.oa4mp.postgres.PGCAStoreTest;
-import edu.uiuc.ncsa.myproxy.oa4mp.postgres.PGClientStoreTest;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironment;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
 import edu.uiuc.ncsa.security.delegation.server.storage.*;
@@ -50,37 +34,30 @@ NOTE: the tests below are commented out so this runs from the command line with 
 which includes CILogon.
  */
 @Suite.SuiteClasses({
+        NewCAStoreTest.class,
+        NewClientStoreTest.class,
+        NewTransactionTest.class,
         TokenTest.class,
-        AGClientTest.class,
-        AGCAStoreTest.class,
-   //     AGTransactionStoreTest.class,
-        FSClientTest.class,
-        FSCAStoreTest.class,
-        FSTransactionStoreTest.class,
-        MClientStoreTest.class,
-        MCAStoreTest.class,
-        MTransactionStoreTest.class,
-        MySQLClientStoreTest.class,
-        MySQLCAStoreTest.class,
-        MySQLTransactionStoreTest.class,
-        PGClientStoreTest.class,
-        PGCAStoreTest.class,
-   //     PGTransactionStoreTest.class,
         FileStoreTest.class,
         ServiceConfigTest.class
 })
 public class ServiceTestSuite extends TestSuite {
+
     @BeforeClass
     public static void initialize() {
+        TestSuiteInitializer tsi = new TestSuiteInitializer(new OA4MPBootstrapper());
+        tsi.init();
+/*
         TestUtils.setBootstrapper(new OA4MPBootstrapper());
         setupMemoryTests();
         setupFSTests();
         setupMySQLTests();
         setupPGTests();
         setupAGTests();
+*/
     }
 
-    protected static void setupMemoryTests() {
+  /*  protected static void setupMemoryTests() {
         TestUtils.setMemoryStoreProvider(new TestStoreProvider() {
             OA4MPConfigurationLoader loader;
 
@@ -94,8 +71,8 @@ public class ServiceTestSuite extends TestSuite {
 
         });
     }
-
-     public static void setupH2Tests(){
+*/
+/*     public static void setupH2Tests(){
             TestUtils.setH2StoreProvider(new TestStoreProvider() {
                   OA4MPConfigurationLoader loader;
 
@@ -124,8 +101,9 @@ public class ServiceTestSuite extends TestSuite {
         // derby tests are in memory only. This creates the databases.
         //  /home/ncsa/dev/main/ncsa-security-all/myproxy/oa4mp-webapp/src/main/resources/derby.sql
 
-       }
+       }*/
 
+/*
     protected static void setupFSTests() {
         TestUtils.setFsStoreProvider(new TestStoreProvider() {
             OA4MPConfigurationLoader loader;
@@ -140,6 +118,8 @@ public class ServiceTestSuite extends TestSuite {
         });
     }
 
+*/
+/*
     public static void setupMySQLTests() {
         TestUtils.setMySQLStoreProvider((new TestStoreProvider() {
             OA4MPConfigurationLoader loader;
@@ -167,15 +147,21 @@ public class ServiceTestSuite extends TestSuite {
             }
         }));
     }
+*/
 
     public static class AGTestStoreProvider extends TestStoreProvider {
-        // Default environment is the filestore test. change as needed.
+
         OA4MPConfigurationLoader loader;
+        String configName;
+
+        public AGTestStoreProvider(String aggregateStoreConfigName) {
+                         configName = aggregateStoreConfigName;
+        }
 
         @Override
         public ConfigurationLoader<? extends ServiceEnvironment> getConfigLoader() {
             if (loader == null) {
-                loader = new OA4MPConfigurationLoader(findConfigNode("oa4mp.oa1.fileStore"));
+                loader = new OA4MPConfigurationLoader(findConfigNode(configName));
             }
             return loader;
         }
@@ -222,9 +208,11 @@ public class ServiceTestSuite extends TestSuite {
             return transactionStore;
         }
     }
+/*
 
     // Invoke this one last since it has dependencies on all the others.
     public static void setupAGTests() {
         TestUtils.setAgStoreProvider(new AGTestStoreProvider());
     }
+    */
 }

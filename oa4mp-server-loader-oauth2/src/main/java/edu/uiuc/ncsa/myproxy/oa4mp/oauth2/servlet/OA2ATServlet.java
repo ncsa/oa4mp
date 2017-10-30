@@ -7,10 +7,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractAccessTokenServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.IssuerTransactionState;
 import edu.uiuc.ncsa.security.core.Identifier;
-import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
-import edu.uiuc.ncsa.security.core.exceptions.InvalidTokenException;
-import edu.uiuc.ncsa.security.core.exceptions.InvalidURIException;
-import edu.uiuc.ncsa.security.core.exceptions.NFWException;
+import edu.uiuc.ncsa.security.core.exceptions.*;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
@@ -35,7 +32,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import static edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceConstantKeys.CONSUMER_KEY;
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.CLIENT_SECRET;
 
 /**
@@ -130,6 +126,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
 
     @Override
     protected void doIt(HttpServletRequest request, HttpServletResponse response) throws Throwable {
+        printAllParameters(request);
         String grantType = getFirstParameterValue(request, OA2Constants.GRANT_TYPE);
         if (grantType == null) {
             warn("Error servicing request. No grant type was given. Rejecting request.");
@@ -139,7 +136,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
 
         if (grantType.equals(OA2Constants.REFRESH_TOKEN)) {
             String rawSecret = getClientSecret(request);
-            if(!client.isPublicClient()){
+            if (!client.isPublicClient()) {
                 // if there is a secret, verify it.
                 verifyClientSecret(client, rawSecret);
             }
@@ -148,37 +145,44 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         }
         if (grantType.equals(OA2Constants.AUTHORIZATION_CODE_VALUE)) {
             // public clients cannot get an access token
-            verifyClientSecret(client, getClientSecret(request));
-            IssuerTransactionState state = doDelegation(client, request, response);
+            IssuerTransactionState state = doAT(request, response, client);
             ATIResponse2 atResponse = (ATIResponse2) state.getIssuerResponse();
-            atResponse.setSignToken(client.isSignTokens());
-            DebugUtil.dbg(this, "set token signing flag =" + atResponse.isSignToken());
-            OA2ServiceTransaction st2 = (OA2ServiceTransaction) state.getTransaction();
-            if (!client.isRTLifetimeEnabled() && ((OA2SE) getServiceEnvironment()).isRefreshTokenEnabled()) {
-                // Since this bit of information could be extremely useful if a service decides
-                // eto start issuing refresh tokens after
-                // clients have been registered, it should be logged.
-                info("Refresh tokens are disabled for client " + client.getIdentifierString() + ", but enabled on the server. No refresh token will be madeg.");
-            }
-            if (client.isRTLifetimeEnabled() && ((OA2SE) getServiceEnvironment()).isRefreshTokenEnabled()) {
 
-                RefreshToken rt = atResponse.getRefreshToken();
-                st2.setRefreshToken(rt);
-                // First pass through the system should have the system default as the refresh token lifetime.
-                st2.setRefreshTokenLifetime(((OA2SE) getServiceEnvironment()).getRefreshTokenLifetime());
-                rt.setExpiresIn(computeRefreshLifetime(st2));
-                st2.setRefreshTokenValid(true);
-            } else {
-                // Do not return a refresh token.
-                atResponse.setRefreshToken(null);
-            }
-
-            getTransactionStore().save(st2);
             atResponse.write(response);
             return;
         }
         warn("Error: grant type was not recognized. Request rejected.");
         throw new ServletException("Error: Unknown request type.");
+    }
+
+    protected IssuerTransactionState doAT(HttpServletRequest request, HttpServletResponse response, OA2Client client) throws Throwable {
+        verifyClientSecret(client, getClientSecret(request));
+        IssuerTransactionState state = doDelegation(client, request, response);
+        ATIResponse2 atResponse = (ATIResponse2) state.getIssuerResponse();
+        atResponse.setSignToken(client.isSignTokens());
+        DebugUtil.dbg(this, "set token signing flag =" + atResponse.isSignToken());
+        OA2ServiceTransaction st2 = (OA2ServiceTransaction) state.getTransaction();
+        if (!client.isRTLifetimeEnabled() && ((OA2SE) getServiceEnvironment()).isRefreshTokenEnabled()) {
+            // Since this bit of information could be extremely useful if a service decides
+            // eto start issuing refresh tokens after
+            // clients have been registered, it should be logged.
+            info("Refresh tokens are disabled for client " + client.getIdentifierString() + ", but enabled on the server. No refresh token will be madeg.");
+        }
+        if (client.isRTLifetimeEnabled() && ((OA2SE) getServiceEnvironment()).isRefreshTokenEnabled()) {
+
+            RefreshToken rt = atResponse.getRefreshToken();
+            st2.setRefreshToken(rt);
+            // First pass through the system should have the system default as the refresh token lifetime.
+            st2.setRefreshTokenLifetime(((OA2SE) getServiceEnvironment()).getRefreshTokenLifetime());
+            rt.setExpiresIn(computeRefreshLifetime(st2));
+            st2.setRefreshTokenValid(true);
+        } else {
+            // Do not return a refresh token.
+            atResponse.setRefreshToken(null);
+        }
+
+        getTransactionStore().save(st2);
+        return state;
     }
 
     /**
@@ -190,7 +194,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
      * @return
      */
     protected String getClientSecret(HttpServletRequest request) {
-        List<String> authHeaders = getAuthHeader(request, "Basic");
+        List<String> authHeaders = HeaderUtils.getAuthHeader(request, "Basic");
 
         String rawSecret = null;
         if (authHeaders.isEmpty()) {
@@ -235,40 +239,27 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
     @Override
     public Client getClient(HttpServletRequest request) {
         // Check is this is in the headers. If not, fall through to checking parameters.
-        List<String> authHeaders = getAuthHeader(request, "Basic");
         OA2Client client = null;
-        if (authHeaders.isEmpty()) {
-            DebugUtil.dbg(this, "doIt: no header for authentication, looking at parameters.");
-
-            // assume that the secret and id are in the request
-            //client = (OA2Client) getClient(request);
-            Identifier id = BasicIdentifier.newID(request.getParameter(CONST(CONSUMER_KEY)));
-            client = (OA2Client) getClient(id);
-
+        Identifier paramID = HeaderUtils.getIDFromParameters(request);
+        Identifier headerID = HeaderUtils.getIDFromHeaders(request);
+        // we have to check that if we get both of these they refer to the same client, so someone
+        // cannot hijack the session
+        if (paramID == null) {
+            if (headerID == null) {
+                throw new UnknownClientException("Error: no client identifier given");
+            }
+            client = (OA2Client) getClient(headerID);
         } else {
-            DebugUtil.dbg(this, "doIt: Got the header.");
-
-            // assume the client id and secret are in the headers.
-            String header64 = authHeaders.get(0);
-            // semantics are that this is base64.encode(id:secret)
-            byte[] headerBytes = Base64.decodeBase64(header64);
-            if (headerBytes == null || headerBytes.length == 0) {
-                DebugUtil.dbg(this, "doIt: no secret, throwing exception.");
-                throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT, "Missing secret");
+            if (headerID == null) {
+                client = (OA2Client) getClient(paramID);
+            } else {
+                if (!paramID.equals(headerID)) {
+                    throw new UnknownClientException("Error: Too many client identifiers. Cannot resolve client");
+                }
+                client = (OA2Client) getClient(paramID); // doesn't matter which id we use since they are equal.
             }
-            String header = new String(headerBytes);
-            DebugUtil.dbg(this, " received authz header of " + header);
-            int lastColonIndex = header.lastIndexOf(":");
-            if (lastColonIndex == -1) {
-                // then this is not in the correct format.
-                DebugUtil.dbg(this, "doIt: the authorization header is not in the right format, throwing exception.");
-                throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT, "the authorization header is not in the right format");
-
-            }
-            String id = header.substring(0, lastColonIndex);
-            Identifier identifier = BasicIdentifier.newID(id);
-            client = (OA2Client) getClient(identifier);
         }
+
         checkClientApproval(client);
 
 
@@ -321,7 +312,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         RTI2 rtIsuuer = new RTI2(getTF2(), getServiceEnvironment().getServiceAddress());
         RTIResponse rtiResponse = (RTIResponse) rtIsuuer.process(rtiRequest);
         rtiResponse.setSignToken(c.isSignTokens());
-        populateClaims(request,rtiResponse.getParameters(), t);
+        populateClaims(request, rtiResponse.getParameters(), t);
         RefreshToken rt = rtiResponse.getRefreshToken();
         rt.setExpiresIn(computeRefreshLifetime(t));
         t.setRefreshToken(rtiResponse.getRefreshToken());

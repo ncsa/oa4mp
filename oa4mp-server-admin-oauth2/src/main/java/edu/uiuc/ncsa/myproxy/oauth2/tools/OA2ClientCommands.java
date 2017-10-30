@@ -7,6 +7,10 @@ import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApprovalStore;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Client;
+import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfigurationUtil;
+import net.sf.json.JSON;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.net.URI;
@@ -19,7 +23,10 @@ import java.util.StringTokenizer;
  * on 4/3/14 at  3:24 PM
  */
 public class OA2ClientCommands extends ClientStoreCommands {
-    public OA2ClientCommands(MyLoggingFacade logger, String defaultIndent, Store clientStore, ClientApprovalStore clientApprovalStore) {
+    public OA2ClientCommands(MyLoggingFacade logger,
+                             String defaultIndent,
+                             Store clientStore,
+                             ClientApprovalStore clientApprovalStore) {
         super(logger, defaultIndent, clientStore, clientApprovalStore);
     }
 
@@ -33,6 +40,15 @@ public class OA2ClientCommands extends ClientStoreCommands {
 
     boolean refreshTokensEnabled;
 
+    public Collection<String> getSupportedScopes() {
+        return supportedScopes;
+    }
+
+    public void setSupportedScopes(Collection<String> supportedScopes) {
+        this.supportedScopes = supportedScopes;
+    }
+
+    Collection<String> supportedScopes = null;
     @Override
     protected void longFormat(Identifiable identifiable) {
         OA2Client client = (OA2Client) identifiable;
@@ -47,9 +63,16 @@ public class OA2ClientCommands extends ClientStoreCommands {
         sayi("issuer=" + client.getIssuer());
         sayi("is public?=" + client.isPublicClient());
         if (getClientApprovalStore() != null) {
-            ClientApproval clientApproval = (ClientApproval) getClientApprovalStore().get(client.getIdentifier());
+            ClientApproval clientApproval  = null;
+            try {
+                clientApproval = (ClientApproval) getClientApprovalStore().get(client.getIdentifier());
+            }catch(Throwable t){
+                // do nothing. If there is no approval record, this is equivalent to saying it is not approved.
+            }
             if (clientApproval == null) {
-                sayi("no approval record exists.");
+           //     sayi("no approval record exists.");
+                sayi("not approved");
+
             } else {
                 if (clientApproval.isApproved()) {
                     String approver = "(unknown)";
@@ -78,8 +101,23 @@ public class OA2ClientCommands extends ClientStoreCommands {
                 sayi("      " + x);
             }
         }
+        Collection<String> scopes = client.getScopes();
+        if(scopes == null){
+            sayi("scopes: (none)");
+        }else{
+            sayi("scopes" + (scopes.isEmpty() ? ":(none)" : ":"));
+            for (String x : scopes) {
+                sayi("      " + x);
+            }
+        }
         if (isRefreshTokensEnabled()) {
             sayi("refresh lifetime (sec): " + (client.isRTLifetimeEnabled() ? (client.getRtLifetime() / 1000) : "none"));
+        }
+        if(client.getLdaps()== null || client.getLdaps().isEmpty()){
+            sayi("ldap:(none configured.)");
+        }else{
+           sayi("LDAPS:" );
+            LDAPConfigurationUtil.toJSON(client.getLdaps());
         }
     }
 
@@ -158,7 +196,35 @@ public class OA2ClientCommands extends ClientStoreCommands {
             }
         }
 
+        String currentScopes = null;
+        if(oa2Client.getScopes() != null){
+            boolean firstPass = true;
+            for (String x : oa2Client.getScopes()) {
+                if (firstPass) {
+                    firstPass = false;
+                    currentScopes = x;
+                } else {
+                    currentScopes = currentScopes+ "," + x;
+                }
+            }
+        }
+        String scopes = getInput("enter a comma separated list of scopes. Scopes to this server will be rejected.", currentScopes);
 
+        if (!(scopes==null || scopes.isEmpty())) {
+            LinkedList<String> list = new LinkedList<>();
+            StringTokenizer stringTokenizer = new StringTokenizer(scopes, ",");
+            while (stringTokenizer.hasMoreTokens()) {
+                String raw = stringTokenizer.nextToken().trim();
+                if(getSupportedScopes().contains(raw)){
+                    list.add(raw);
+                }else{
+                    say("Unknown scope \"" + raw + "\" rejected.");
+                }
+            }
+            oa2Client.setScopes(list);
+        }
+
+        // Now do much the same for the list of callback URIs
         String currentUris = null;
         if (oa2Client.getCallbackURIs() != null) {
             boolean firstPass = true;
@@ -173,7 +239,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
         }
         String uris = getInput("enter a comma separated list of callback uris. These must start with https or they will be ignored.", currentUris);
 
-        if (!isEmpty(uris)) {
+        if (!uris.isEmpty()) {
             LinkedList<String> list = new LinkedList<>();
             StringTokenizer stringTokenizer = new StringTokenizer(uris, ",");
             while (stringTokenizer.hasMoreTokens()) {
@@ -192,8 +258,32 @@ public class OA2ClientCommands extends ClientStoreCommands {
             }
             oa2Client.setCallbackURIs(list);
         }
-
-
+        String currentLDAPs = null;
+        if(client.getLdaps() == null || client.getLdaps().isEmpty()){
+         currentLDAPs = "";
+        }   else{
+            currentLDAPs = LDAPConfigurationUtil.toJSON(client.getLdaps()).toString();
+        }
+      String ldaps = getInput("Enter a valid JSON object or array for the ldap configuration(s).", currentLDAPs);
+        if(!ldaps.isEmpty()){
+            // try to parse it as a single LDAP entry
+            JSON json = null;
+            try{
+                JSONArray array = JSONArray.fromObject(ldaps);
+                json = array;
+            }catch(Throwable t){
+                // ok, so that is not an array, try a singleton
+                try {
+                    JSONObject jsonObject = JSONObject.fromObject(ldaps);
+                    json = jsonObject;
+                }catch(Throwable tt){
+                    sayi("Sorry, could not parse JSON");
+                }
+             if(json != null){
+                 client.setLdaps(LDAPConfigurationUtil.fromJSON(json));
+             }
+            }
+        }
 
     }
 

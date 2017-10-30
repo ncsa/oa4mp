@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oauth2.tools;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
+import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.util.cli.CommonCommands;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
@@ -23,7 +24,7 @@ import java.security.SecureRandom;
  */
 public class SigningCommands extends CommonCommands {
     public SigningCommands(OA2SE oa2se) {
-        super(oa2se==null?null:oa2se.getMyLogger());
+        super(oa2se == null ? null : oa2se.getMyLogger());
         this.oa2SE = oa2se;
     }
 
@@ -39,7 +40,9 @@ public class SigningCommands extends CommonCommands {
     }
 
     protected void createHelp() {
-        say("create: This will allow you to create a completely new set of JSON web keys and write it to a file");
+        say("create [path]: This will allow you to create a completely new set of JSON web keys and write it to a file");
+        say("       If the path is given, the keys will be written. If the path is not given then you will be");
+        say("       prompted for one. This will not overwrite an existing file.");
     }
 
     public void create(InputLine inputLine) throws Exception {
@@ -50,7 +53,15 @@ public class SigningCommands extends CommonCommands {
         //PublicKey publicKey = KeyUtil.g
         boolean retry = true;
         File publicKeyFile = null;
-        File privateKeyFile = null;
+        boolean isInteractive = true;
+
+        if(1 < inputLine.size()){
+            publicKeyFile = new File(inputLine.getArg(1));
+        }
+        if(publicKeyFile == null && isBatchMode()){
+            throw new GeneralException("No full path to the file given.");
+        }
+
         while (retry) {
             String publicKeyPath = getInput("Give the file path", "");
             if (publicKeyPath.toLowerCase().equals("exit") || publicKeyPath.toLowerCase().equals("quit")) {
@@ -74,12 +85,10 @@ public class SigningCommands extends CommonCommands {
 
         sayi2("create a new set of JSON web keys?[y/n]");
 
-        if (!isOk(readline()))
-        {
+        if (!isOk(readline())) {
             say("create cancelled.");
             return;
         }
-
         JSONWebKeys keys = new JSONWebKeys(null);
         keys.put(createJWK("RS256"));
         keys.put(createJWK("RS384"));
@@ -90,9 +99,10 @@ public class SigningCommands extends CommonCommands {
         writer.flush();
         writer.close();
 
-        sayi("JSONweb keys written");
-
-        sayi("Done!");
+        if (isInteractive) {
+            sayi("JSONweb keys written");
+            sayi("Done!");
+        }
 
     }
 

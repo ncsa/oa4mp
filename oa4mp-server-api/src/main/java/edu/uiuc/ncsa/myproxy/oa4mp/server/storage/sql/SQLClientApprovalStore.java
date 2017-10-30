@@ -45,7 +45,7 @@ public class SQLClientApprovalStore extends SQLStore<ClientApproval> implements 
        int count = 0;
 
               String query = "Select " + getTable().getPrimaryKeyColumnName() + " from " + getTable().getFQTablename()
-                      + " where " + getCAT().ca().approved() + "=true ";
+                      + " where " + getCAT().ca().approved() + "=false ";
               Connection c = getConnection();
               try {
                   PreparedStatement stmt = c.prepareStatement(query);

@@ -117,4 +117,8 @@ public class OA2ClientEnvironment extends ClientEnvironment {
         }
         return client;
     }
+
+    public void setScopes(Collection<String> scopes) {
+        this.scopes = scopes;
+    }
 }

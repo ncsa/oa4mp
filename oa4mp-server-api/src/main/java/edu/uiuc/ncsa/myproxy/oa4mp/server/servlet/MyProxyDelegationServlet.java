@@ -170,6 +170,9 @@ public abstract class MyProxyDelegationServlet extends EnvServlet implements Tra
      * @return
      */
     public Client getClient(HttpServletRequest req) {
+        if(req.getParameter(CONST(CONSUMER_KEY)) == null){
+            throw new UnknownClientException("Error: no client identifier has been supplied. Have you registered this client with the service?");
+        }
         Identifier id = BasicIdentifier.newID(req.getParameter(CONST(CONSUMER_KEY)));
         return getClient(id);
     }
@@ -297,38 +300,4 @@ public abstract class MyProxyDelegationServlet extends EnvServlet implements Tra
         System.out.println(getClass().getSimpleName() + ": " + x);
     }
 
-    /**
-     * This gets the tokens from the authorization header. There are several types and it is possible to have several
-     * values passed in, so this returns an array of string rather than a single value. A downside with passing
-     * along several values this way is there is no way to disambiguate them, e.g. a client id from a client secret.
-     * If there is no authorization header or there are no tokens of the stated type, the returned value is an
-     * empty list.
-     *
-     * @param request
-     * @param type    The type of token, e.g. "Bearer" or "Basic"
-     * @return
-     */
-    protected List<String> getAuthHeader(HttpServletRequest request, String type) {
-        Enumeration enumeration = request.getHeaders("authorization");
-        ArrayList<String> out = new ArrayList<>();
-        while (enumeration.hasMoreElements()) {
-            Object obj = enumeration.nextElement();
-            if (obj != null) {
-                String rawToken = obj.toString();
-                if (rawToken == null || 0 == rawToken.length()) {
-                    // if there is no bearer token in the authorization header, it must be a parameter in the request.
-                    // do nothing. No value
-                } else {
-                    // This next check is making sure that the type of token requested was sent.
-                    //
-                    if (rawToken.startsWith(type)) { // note the single space after the type
-                        rawToken = rawToken.substring(rawToken.indexOf(" ") + 1);
-                        out.add(rawToken);
-                    }
-                }
-
-            }
-        }
-        return out;
-    }
 }

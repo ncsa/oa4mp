@@ -109,6 +109,11 @@ public class ClientServer extends AbstractDDServer {
             PermissionServer permissionServer = new PermissionServer(cose);
             permissionServer.process(RequestFactory.createRequest(request.getAdminClient(), new TypePermission(), new ActionAdd(), client, null));
         }
+        // CIL-414 Make sure an approval record is created here so we can accurately track how many approvals are pending
+        ClientApproval approval = (ClientApproval) getClientApprovalStore().create();
+        approval.setApproved(false);
+        approval.setIdentifier(client.getIdentifier());
+        getClientApprovalStore().save(approval);
         return new CreateResponse(client, secret);
     }
 

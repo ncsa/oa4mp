@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.ACS2;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractAuthorizationServlet.MyMyProxyLogon;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.server.request.IssuerResponse;
@@ -44,7 +45,7 @@ public class OA2CertServlet extends ACS2 {
             // this just means that the access token was not sent as a parameter. It
             // might have been sent as a bearer token.
         }
-        List<String> bearerTokens = getAuthHeader(request, "Bearer");
+        List<String> bearerTokens = HeaderUtils.getAuthHeader(request, "Bearer");
         if (bearerTokens.isEmpty()) {
             throw new GeneralException("Error: no access token");
         }
@@ -66,8 +67,8 @@ public class OA2CertServlet extends ACS2 {
     public Client getClient(HttpServletRequest req) {
         String rawID = req.getParameter(CONST(CONSUMER_KEY));
         String rawSecret = getFirstParameterValue(req, CLIENT_SECRET);
-        // According to the spec. this must be in anBasic Authz header if it is not sent as parameter
-        List<String> basicTokens = getAuthHeader(req, "Basic");
+        // According to the spec. this must be in a Basic Authz header if it is not sent as parameter
+        List<String> basicTokens = HeaderUtils.getAuthHeader(req, "Basic");
         if (2 < basicTokens.size()) {
             // too many tokens to unscramble
             throw new OA2GeneralError(OA2Errors.INVALID_TOKEN, "Error: Too many authorization tokens.", HttpStatus.SC_UNAUTHORIZED);
@@ -101,9 +102,7 @@ public class OA2CertServlet extends ACS2 {
             }
         }
         if (rawID == null) {
-            throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, "Error: No client id.", HttpStatus.SC_BAD_REQUEST);
-
-            //throw new UnknownClientException("No client id");
+            throw new UnknownClientException("No client id");
         }
         Identifier id = BasicIdentifier.newID(rawID);
         OA2Client client = (OA2Client) getClient(id);
@@ -111,14 +110,10 @@ public class OA2CertServlet extends ACS2 {
             throw new GeneralException("Error: public clients not supported for this operation.");
         }
         if (rawSecret == null) {
-            throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
-                    "Error: No secret. request refused.",
-                    HttpStatus.SC_BAD_REQUEST);
+            throw new GeneralException("Error: No secret. request refused.");
         }
         if (!client.getSecret().equals(DigestUtils.shaHex(rawSecret))) {
-            throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
-                    "Error: Secret is incorrect. request refused.",
-                    HttpStatus.SC_BAD_REQUEST);
+            throw new GeneralException("Error: Secret is incorrect. request refused.");
 
         }
         return client;
@@ -128,20 +123,6 @@ public class OA2CertServlet extends ACS2 {
         PAIResponse2 par = (PAIResponse2) iResponse;
         AccessToken accessToken = par.getAccessToken();
         OA2ServiceTransaction t = (OA2ServiceTransaction) getTransactionStore().get(accessToken);
-    /*    if (t == null) {
-            throw new OA2GeneralError(OA2Errors.INVALID_TOKEN, "Invalid access token. Request refused", HttpStatus.SC_UNAUTHORIZED);
-        }
-        if (!t.getScopes().contains(OA2Scopes.SCOPE_MYPROXY)) {
-            // Note that this requires a state, but none is sent in the OA4MP cert request.
-            throw new OA2GeneralError(OA2Errors.INVALID_SCOPE, "Certificate request is not in scope.", HttpStatus.SC_FORBIDDEN);
-        }
-        if (t == null) {
-            throw new OA2GeneralError(OA2Errors.INVALID_TOKEN, "No transaction found for access token \"" + accessToken + "\"", HttpStatus.SC_UNAUTHORIZED);
-        }
-
-        if (!t.isAccessTokenValid()) {
-            throw new OA2GeneralError(OA2Errors.INVALID_TOKEN, "Invalid access token. Request refused", HttpStatus.SC_UNAUTHORIZED);
-        }*/
         // CIL-404 fix. Throw appropriate exceptions. Do not use the callback mechanism from OAuth for errors since that returns
         // an HTTP status code of 200 with no other information.
         if (t == null) {

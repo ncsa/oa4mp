@@ -34,7 +34,7 @@ public class OA2AuthorizedServlet extends AbstractInitServlet {
 
     @Override
     protected void doIt(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Throwable {
-        //printAllParameters(httpServletRequest);
+        printAllParameters(httpServletRequest);
         String callback = httpServletRequest.getParameter(OA2Constants.REDIRECT_URI);
         if (httpServletRequest.getParameterMap().containsKey(OA2Constants.REQUEST_URI)) {
             throw new OA2RedirectableError(OA2Errors.REQUEST_URI_NOT_SUPPORTED,
@@ -77,7 +77,7 @@ public class OA2AuthorizedServlet extends AbstractInitServlet {
         String rawIDToken = String.valueOf(httpServletRequest.getParameterMap().get(ID_TOKEN_HINT));
         JSONObject idToken = null;
         try {
-            idToken = IDTokenUtil.verifyAndReadIDToken(rawIDToken, ((OA2SE) getServiceEnvironment()).getJsonWebKeys());
+            idToken = JWTUtil.verifyAndReadJWT(rawIDToken, ((OA2SE) getServiceEnvironment()).getJsonWebKeys());
         } catch (Throwable e) {
             throw new GeneralException("Error: Cannot read ID token hint", e);
         }
@@ -157,28 +157,9 @@ public class OA2AuthorizedServlet extends AbstractInitServlet {
         }
 
 
-        String rawScopes = params.get(SCOPE);
-        if (rawScopes == null || rawScopes.length() == 0) {
-            throw new OA2RedirectableError(OA2Errors.INVALID_SCOPE, "Missing scopes parameter.", state, givenRedirect);
-        }
-
-        StringTokenizer stringTokenizer = new StringTokenizer(rawScopes);
-        ArrayList<String> scopes = new ArrayList<>();
-        boolean hasOpenIDScope = false;
-        while (stringTokenizer.hasMoreTokens()) {
-            String x = stringTokenizer.nextToken();
-            if (!OA2Scopes.ScopeUtil.hasScope(x)) {
-                throw new OA2RedirectableError(OA2Errors.INVALID_SCOPE, "Unrecognized scope \"" + x + "\"", state, givenRedirect);
-            }
-            if (x.equals(OA2Scopes.SCOPE_OPENID)) hasOpenIDScope = true;
-            scopes.add(x);
-        }
-
-
-        if (!hasOpenIDScope)
-            throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST, "Scopes must contain openid", state, givenRedirect);
-
         OA2ServiceTransaction st = createNewTransaction(agResponse.getGrant());
+        ArrayList<String> scopes = resolveScopes(st, params, state, givenRedirect);
+
         st.setScopes(scopes);
         st.setAuthGrantValid(false);
         st.setAccessTokenValid(false);
@@ -203,6 +184,30 @@ public class OA2AuthorizedServlet extends AbstractInitServlet {
         }
 
         return st;
+    }
+
+    protected ArrayList<String> resolveScopes(OA2ServiceTransaction st, Map<String, String> params, String state, String givenRedirect) {
+        String rawScopes = params.get(SCOPE);
+        if (rawScopes == null || rawScopes.length() == 0) {
+            throw new OA2RedirectableError(OA2Errors.INVALID_SCOPE, "Missing scopes parameter.", state, givenRedirect);
+        }
+
+        StringTokenizer stringTokenizer = new StringTokenizer(rawScopes);
+        ArrayList<String> scopes = new ArrayList<>();
+        boolean hasOpenIDScope = false;
+        while (stringTokenizer.hasMoreTokens()) {
+            String x = stringTokenizer.nextToken();
+            if (!OA2Scopes.ScopeUtil.hasScope(x)) {
+                throw new OA2RedirectableError(OA2Errors.INVALID_SCOPE, "Unrecognized scope \"" + x + "\"", state, givenRedirect);
+            }
+            if (x.equals(OA2Scopes.SCOPE_OPENID)) hasOpenIDScope = true;
+            scopes.add(x);
+        }
+
+
+        if (!hasOpenIDScope)
+            throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST, "Scopes must contain openid", state, givenRedirect);
+        return scopes;
     }
 
     protected OA2ServiceTransaction createNewTransaction(AuthorizationGrant grant) {

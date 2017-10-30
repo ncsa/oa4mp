@@ -4,6 +4,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 /**
+ * @deprecated These test have been folded into the main test suite.
  * <p>Created by Jeff Gaynor<br>
  * on 11/17/16 at  3:31 PM
  */

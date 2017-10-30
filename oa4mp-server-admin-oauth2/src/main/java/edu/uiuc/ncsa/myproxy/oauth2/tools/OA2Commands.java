@@ -86,6 +86,7 @@ public class OA2Commands extends BaseCommands {
     public ClientStoreCommands getNewClientStoreCommands() throws Exception {
         OA2ClientCommands x = new OA2ClientCommands(getMyLogger(), "  ", getServiceEnvironment().getClientStore(), getServiceEnvironment().getClientApprovalStore());
         x.setRefreshTokensEnabled(getOA2SE().isRefreshTokenEnabled());
+        x.setSupportedScopes(getOA2SE().getScopes());
         return x;
     }
 

@@ -11,6 +11,7 @@ import org.junit.Test;
 import java.util.Date;
 
 /**
+ * @deprecated
  * <p>Created by Jeff Gaynor<br>
  * on 5/4/12 at  2:51 PM
  */

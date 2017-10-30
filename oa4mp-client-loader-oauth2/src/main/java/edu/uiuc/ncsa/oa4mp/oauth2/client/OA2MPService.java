@@ -1,6 +1,9 @@
 package edu.uiuc.ncsa.oa4mp.oauth2.client;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.client.*;
+import edu.uiuc.ncsa.myproxy.oa4mp.client.Asset;
+import edu.uiuc.ncsa.myproxy.oa4mp.client.AssetResponse;
+import edu.uiuc.ncsa.myproxy.oa4mp.client.ClientEnvironment;
+import edu.uiuc.ncsa.myproxy.oa4mp.client.OA4MPService;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.delegation.client.request.*;
@@ -9,7 +12,6 @@ import edu.uiuc.ncsa.security.delegation.token.MyX509Certificates;
 import edu.uiuc.ncsa.security.delegation.token.Verifier;
 import edu.uiuc.ncsa.security.oauth_2_0.NonceHerder;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2Scopes;
 import edu.uiuc.ncsa.security.oauth_2_0.UserInfo;
 import edu.uiuc.ncsa.security.oauth_2_0.client.ATResponse2;
 import edu.uiuc.ncsa.security.oauth_2_0.client.DS2;
@@ -116,13 +118,13 @@ public class OA2MPService extends OA4MPService {
     public String getRequestedScopes() {
         if (requestedScopes == null) {
             boolean firstPass = true;
-            String[] basicScopes = OA2Scopes.basicScopes;
+       //     String[] basicScopes = OA2Scopes.basicScopes;
             Collection<String> targetScopes = new HashSet<>();
             Collection<String> scopeList = ((OA2ClientEnvironment) getEnvironment()).getScopes();
             targetScopes.addAll(scopeList);
-            for (String x : basicScopes) {
+         /*   for (String x : basicScopes) {
                 targetScopes.add(x);
-            }
+            }*/
             requestedScopes = "";
             for (String scope : targetScopes) {
                 if (firstPass) {

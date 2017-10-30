@@ -105,7 +105,7 @@ public class TestUtils {
                 } catch (MyConfigurationException cx) {
                     cx.printStackTrace();
                     // plan B, maybe it's in the deployment itself? try to get as a resource
-                    URL url = TransactionStoreTest.class.getResource(fileName);
+                    URL url = TestUtils.class.getResource(fileName);
                     if (url == null) {
                         throw new MyConfigurationException("Error:No configuration found. for \"" + fileName + "\"");
                     }
