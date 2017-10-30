@@ -17,12 +17,12 @@
         <dependency>
             <artifactId>oa4mp-server-loader-oauth1</artifactId>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
-            <version>3.5-SNAPSHOT</version>
+            <version>3.5</version>
         </dependency>
         <dependency>
             <artifactId>oa4mp-server-api</artifactId>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
-            <version>3.5-SNAPSHOT</version>
+            <version>3.5</version>
         </dependency>
     </dependencies>
     <build>
@@ -55,7 +55,7 @@
                 <artifactId>maven-gpg-plugin</artifactId>
                 <version>1.6</version>
                 <configuration>
-                    <skip>true</skip>
+                    <skip>false</skip>
                 </configuration>
                 <executions>
                     <execution>
