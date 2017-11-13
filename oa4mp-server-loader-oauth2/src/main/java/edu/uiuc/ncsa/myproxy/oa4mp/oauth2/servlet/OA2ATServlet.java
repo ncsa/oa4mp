@@ -19,13 +19,13 @@ import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
 import edu.uiuc.ncsa.security.oauth_2_0.*;
 import edu.uiuc.ncsa.security.oauth_2_0.server.*;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -194,35 +194,19 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
      * @return
      */
     protected String getClientSecret(HttpServletRequest request) {
-        List<String> authHeaders = HeaderUtils.getAuthHeader(request, "Basic");
-
         String rawSecret = null;
-        if (authHeaders.isEmpty()) {
+        if (HeaderUtils.hasBasicHeader(request)) {
+            DebugUtil.dbg(this, "doIt: Got the header.");
+            try {
+                rawSecret = HeaderUtils.getSecretFromHeaders(request);
+            } catch (UnsupportedEncodingException e) {
+                throw new NFWException("Error: internal use of UTF-8 encoding failed");
+            }
+
+        } else {
             DebugUtil.dbg(this, "doIt: no header for authentication, looking at parameters.");
             rawSecret = getFirstParameterValue(request, CLIENT_SECRET);
-        } else {
-            DebugUtil.dbg(this, "doIt: Got the header.");
 
-            // assume the client id and secret are in the headers.
-            String header64 = authHeaders.get(0);
-            // semantics are that this is base64.encode(id:secret)
-            byte[] headerBytes = Base64.decodeBase64(header64);
-            if (headerBytes == null || headerBytes.length == 0) {
-                DebugUtil.dbg(this, "doIt: no secret, throwing exception.");
-//                throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT, "Missing secret");
-                return null; // no secret
-            }
-            String header = new String(headerBytes);
-            DebugUtil.dbg(this, " received authz header of " + header);
-            int lastColonIndex = header.lastIndexOf(":");
-            if (lastColonIndex == -1) {
-                return null;
-                // then this is not in the correct format.
-
-            }
-            String id = header.substring(0, lastColonIndex);
-            Identifier identifier = BasicIdentifier.newID(id);
-            rawSecret = header.substring(lastColonIndex + 1);
         }
 
         return rawSecret;
@@ -241,7 +225,12 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         // Check is this is in the headers. If not, fall through to checking parameters.
         OA2Client client = null;
         Identifier paramID = HeaderUtils.getIDFromParameters(request);
-        Identifier headerID = HeaderUtils.getIDFromHeaders(request);
+        Identifier headerID = null;
+        try {
+            headerID = HeaderUtils.getIDFromHeaders(request);
+        } catch (UnsupportedEncodingException e) {
+            throw new NFWException("Error: internal use of UTF-8 encoding failed");
+        }
         // we have to check that if we get both of these they refer to the same client, so someone
         // cannot hijack the session
         if (paramID == null) {
