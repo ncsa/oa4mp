@@ -34,7 +34,7 @@ public class ClientStoreUtil extends ServerCLI {
                     inLine = readline().trim().toLowerCase();
                     tryAgain = inLine.equals("y");
                 }
-            }else{
+            } else {
                 tryAgain = false;
             }
         } // end input loop.
@@ -81,8 +81,22 @@ public class ClientStoreUtil extends ServerCLI {
         for (Object key : keys) {
             boolean isApproved = false;
             ClientApproval ca = (ClientApproval) cas.get(key);
-            if (ca != null) {
+            if (ca == null) {
+                // create a new one
+                ca = (ClientApproval) cas.create();
+                ca.setStatus(ClientApproval.Status.NONE);
+                ca.setApproved(false);
+                cas.save(ca);
+            } else {
                 isApproved = ca.isApproved();
+                if(isApproved && ca.getStatus() != ClientApproval.Status.APPROVED){
+                    ca.setStatus(ClientApproval.Status.APPROVED);
+                }
+            }
+            ClientApproval.Status status = ca.getStatus();
+            String printableStatus = "?";
+            if (status.equals(ClientApproval.Status.NONE)) {
+
             }
             Identifiable x = (Identifiable) getStore().get(key);
             linkedList.add(x);

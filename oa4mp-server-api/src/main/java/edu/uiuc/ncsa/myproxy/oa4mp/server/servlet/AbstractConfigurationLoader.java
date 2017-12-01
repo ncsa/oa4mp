@@ -5,9 +5,6 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.ClientApprovalProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.OA4MPConfigTags;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.OA4MPServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironmentImpl;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientStore;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientStoreProviders;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.MultiDSAdminClientStoreProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.MultiDSPermissionStoreProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionStoreProviders;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.*;
@@ -54,7 +51,6 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
     protected MultiDSClientApprovalStoreProvider casp;
     protected MailUtilProvider mup = null;
     protected MultiDSPermissionStoreProvider mpp;
-    protected MultiDSAdminClientStoreProvider macp;
     protected ServiceEnvironmentImpl.MessagesProvider messagesProvider = null;
 
     boolean getCfgBoolean(ConfigurationNode sn, String tagName, boolean defaultValue) {
@@ -225,19 +221,6 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
 
     protected abstract MultiDSClientStoreProvider getCSP();
 
-    protected MultiDSAdminClientStoreProvider getMacp(){
-        if(macp == null){
-              macp = new MultiDSAdminClientStoreProvider(cn, isDefaultStoreDisabled(), loggerProvider.get(),null, null,
-                      AdminClientStoreProviders.getAdminClientProvider());
-            macp.addListener(AdminClientStoreProviders.getACMP(cn));
-            macp.addListener(AdminClientStoreProviders.getACFSP(cn));
-            macp.addListener(AdminClientStoreProviders.getMariaACS(cn, getMariaDBConnectionPoolProvider()));
-            macp.addListener(AdminClientStoreProviders.getMysqlACS(cn, getMySQLConnectionPoolProvider()));
-            macp.addListener(AdminClientStoreProviders.getPostgresACS(cn, getPgConnectionPoolProvider()));
-            AdminClientStore acs = (AdminClientStore) macp.get();
-        }
-        return macp;
-    }
     protected MultiDSPermissionStoreProvider getMpp() {
         if (mpp == null) {
             mpp = new MultiDSPermissionStoreProvider(cn, isDefaultStoreDisabled(), loggerProvider.get(),
@@ -321,8 +304,7 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
                 getAuthorizationServletConfig(),
                 getUsernameTransformer(),
                 getPingable(),
-                getMpp(),
-                getMacp());
+                getMpp());
     }
 
     protected boolean getPingable() {

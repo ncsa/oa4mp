@@ -30,6 +30,13 @@ public class ClientApproverConverter<V extends ClientApproval> extends MapConver
         ca.setApproved(map.getBoolean(getCAKeys().approved()));
         ca.setApprover(map.getString(getCAKeys().approver()));
         ca.setApprovalTimestamp(map.getDate(getCAKeys().approvalTS()));
+        String status = map.getString(getCAKeys().status());
+        if(status == null){
+            ca.setStatus(ClientApproval.Status.NONE);
+        }else {
+            ClientApproval.Status status1 = ClientApproval.Status.resolveByStatusValue(status);
+            ca.setStatus(status1);
+        }
         return ca;
     }
 
@@ -42,5 +49,10 @@ public class ClientApproverConverter<V extends ClientApproval> extends MapConver
         }
         map.put(getCAKeys().approvalTS(), value.getApprovalTimestamp());
         map.put(getCAKeys().approved(), value.isApproved());
+        if(value.getStatus() == null){
+            map.put(getCAKeys().status(), ClientApproval.Status.NONE);
+        }else {
+            map.put(getCAKeys().status(), value.getStatus().getStatus());
+        }
     }
 }

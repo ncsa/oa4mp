@@ -31,6 +31,7 @@ public class ClientApprovalStoreCommands extends StoreCommands {
         say("Identifier:" + clientApproval.getIdentifierString());
         say("Approved at:" + clientApproval.getApprovalTimestamp());
         say("Is approved? " + clientApproval.isApproved());
+        say("Status:" + clientApproval.getStatus());
 
     }
 
@@ -38,8 +39,20 @@ public class ClientApprovalStoreCommands extends StoreCommands {
     protected String format(Identifiable identifiable) {
         if (identifiable == null) return "(null)";
         ClientApproval ca = (ClientApproval) identifiable;
-        String x = "(" + (ca.isApproved() ? "Y" : "N") + ") " + ca.getIdentifierString();
-        if (ca.isApproved()) {
+        String statusString = "?";
+        switch (ca.getStatus()) {
+            case APPROVED:
+                statusString = "A";
+                break;
+            case DENIED:
+            case REVOKED:
+                statusString = "D";
+                break;
+            case PENDING:
+            case NONE:
+        }
+        String x = "(" + statusString + ") " + ca.getIdentifierString();
+        if (ca.isApproved() || ca.getStatus() == ClientApproval.Status.APPROVED) {
             x = x + " by \"" + ca.getApprover() + "\" on " + ca.getApprovalTimestamp();
         }
         return x;
@@ -56,7 +69,25 @@ public class ClientApprovalStoreCommands extends StoreCommands {
         info("Starting update for client approval id=" + identifiable.getIdentifierString());
         sayi("Enter the information for the client approval");
         clientApproval.setApprover(getInput("name of the approver", clientApproval.getApprover()));
-        clientApproval.setApproved(isOk(getInput("set approved?", clientApproval.isApproved() ? "y" : "n")));
+        boolean isapproved = isOk(getInput("set approved?", clientApproval.isApproved() ? "y" : "n"));
+        if (isapproved) {
+            clientApproval.setApproved(true);
+            clientApproval.setStatus(ClientApproval.Status.APPROVED);
+        } else {
+            clientApproval.setApproved(false);
+            switch (clientApproval.getStatus()) {
+                case NONE:
+                case PENDING:
+                    clientApproval.setStatus(ClientApproval.Status.DENIED);
+                    break;
+                case APPROVED:
+                    clientApproval.setStatus(ClientApproval.Status.REVOKED);
+                    break;
+                case REVOKED:
+                case DENIED:
+                    // no change in either case.
+            }
+        }
         sayi("save changes [y/n]?");
         if (isOk(readline())) {
             say(clientApproval.toString());
@@ -64,7 +95,7 @@ public class ClientApprovalStoreCommands extends StoreCommands {
         }
         sayi("save cancelled");
         info("Approval update cancelled for id=" + clientApproval.getIdentifierString());
-                       return false;
+        return false;
     }
 
     public void showApproveHelp() {
@@ -88,7 +119,29 @@ public class ClientApprovalStoreCommands extends StoreCommands {
     public void approve(ClientApproval ca) {
         info("Starting approval for id=" + ca.getIdentifierString());
         ca.setApprover(getInput("approver", ca.getApprover()));
-        ca.setApproved(isOk(getInput("approve this", ca.isApproved() ? "y" : "n")));
+        //ca.setApproved(isOk(getInput("approve this", ca.isApproved() ? "y" : "n")));
+
+        boolean isapproved = isOk(getInput("set approved?", ca.isApproved() ? "y" : "n"));
+        if (isapproved) {
+            ca.setApproved(true);
+            ca.setStatus(ClientApproval.Status.APPROVED);
+        } else {
+            ca.setApproved(false);
+            switch (ca.getStatus()) {
+                case NONE:
+                case PENDING:
+                    ca.setStatus(ClientApproval.Status.DENIED);
+                    break;
+                case APPROVED:
+                    ca.setStatus(ClientApproval.Status.REVOKED);
+                    break;
+                case REVOKED:
+                case DENIED:
+                    // no change in either case.
+            }
+        }
+
+
         sayi2("save this approval record [y/n]?");
         if (isOk(readline())) {
             getStore().save(ca);

@@ -1,5 +1,5 @@
 /*
-   This script will create the tables for a basic oa4mp install. Since MySQL has *no* varaible
+   This script will create the tables for a basic oa4mp install. Since MySQL has *no* variable
    support, everything is hard-coded. if you want something other than the default names and 
    then edit the file.
 */
@@ -22,6 +22,8 @@ Some useful commands. Lst two list users and will show permissions for a single 
  Show schemas;
  SELECT User FROM mysql.user;
  SHOW GRANTS FOR 'user'@'localhost';
+ Another note: The timestamp fields are given a default value of NULL since under MariaDB the default now is to
+ change the value of any timestamp field on update, effectively rendering all of the "last modified"
  */
 
 CREATE TABLE oauth2.clients (
@@ -52,7 +54,7 @@ CREATE TABLE oauth2.adminClients (
 );
 
 
-CREATE TABLE oauth2.permissions (
+CREATE TABLE permissions (
   permission_id VARCHAR(255) PRIMARY KEY,
   admin_id      VARCHAR(255),
   client_id     VARCHAR(255),
@@ -61,9 +63,7 @@ CREATE TABLE oauth2.permissions (
   can_read      BOOLEAN,
   can_remove    BOOLEAN,
   can_write     BOOLEAN,
-  creation_ts   TIMESTAMP,
-  UNIQUE INDEX admin_id (admin_id(255)),
-  UNIQUE INDEX client_id (client_id(255))
+  creation_ts   TIMESTAMP
 );
 
 CREATE TABLE oauth2.client_approvals (

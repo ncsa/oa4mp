@@ -33,5 +33,6 @@ public class ClientApprovalTable extends Table {
         getColumnDescriptor().add(new ColumnDescriptorEntry(ca().approver(), LONGVARCHAR));
         getColumnDescriptor().add(new ColumnDescriptorEntry(ca().approvalTS(), TIMESTAMP));
         getColumnDescriptor().add(new ColumnDescriptorEntry(ca().approved(), BOOLEAN));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(ca().status(), LONGVARCHAR));
     }
 }

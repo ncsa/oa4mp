@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.ldap.LDAPStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.BasicScopeHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.MyProxyFacadeProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironmentImpl;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionsStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AuthorizationServletConfig;
@@ -80,8 +81,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
                 ac,
                 usernameTransformer,
                 isPingable,
-                psp,
-                acs);
+                psp);
         if (0 < rtLifetime) {
             this.rtLifetime = rtLifetime;
         }
@@ -110,8 +110,19 @@ public class OA2SE extends ServiceEnvironmentImpl {
             DebugUtil.dbg(this, "***Setting runtime environment in the scope handler:" + scopeHandler.getClass().getSimpleName());
             ((BasicScopeHandler) scopeHandler).setOa2SE(this);
         }
+        this.acs = acs;
     }
 
+    protected Provider<AdminClientStore> acs;
+
+    AdminClientStore adminClientStore = null;
+
+      public AdminClientStore<AdminClient> getAdminClientStore() {
+          if (adminClientStore == null) {
+              adminClientStore = acs.get();
+          }
+          return adminClientStore;
+      }
     String issuer;
 
     public String getIssuer() {

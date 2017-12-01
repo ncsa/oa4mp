@@ -31,7 +31,7 @@ How to deploy the website.
 
 * transfer it (e.g. with scp) to the target server (currently this is falco.ncsa.uiuc.edu)
 
-* Make sure you issue kinit and aklog on pkilab2 before trying to do anything or you will get all
+* Make sure you issue kinit and aklog on falco before trying to do anything or you will get all
   sorts of permissions errors on afs.
 
 * Untar it into the  target directory (currently /afs/ncsa.uiuc.edu/web/grid.ncsa.uiuc.edu/htdocs/myproxy/oauth)

@@ -11,6 +11,9 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.ClientApprovalProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.OA4MPConfigTags;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceConstantKeys;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironmentImpl;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientStore;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientStoreProviders;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.MultiDSAdminClientStoreProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.DSTransactionProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.OA4MPIdentifierProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractConfigurationLoader;
@@ -143,6 +146,21 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         return constants;
     }
 
+    protected MultiDSAdminClientStoreProvider macp;
+
+    protected MultiDSAdminClientStoreProvider getMacp(){
+        if(macp == null){
+              macp = new MultiDSAdminClientStoreProvider(cn, isDefaultStoreDisabled(), loggerProvider.get(),null, null,
+                      AdminClientStoreProviders.getAdminClientProvider());
+            macp.addListener(AdminClientStoreProviders.getACMP(cn));
+            macp.addListener(AdminClientStoreProviders.getACFSP(cn));
+            macp.addListener(AdminClientStoreProviders.getMariaACS(cn, getMariaDBConnectionPoolProvider()));
+            macp.addListener(AdminClientStoreProviders.getMysqlACS(cn, getMySQLConnectionPoolProvider()));
+            macp.addListener(AdminClientStoreProviders.getPostgresACS(cn, getPgConnectionPoolProvider()));
+            AdminClientStore acs = (AdminClientStore) macp.get();
+        }
+        return macp;
+    }
     MultiLDAPStoreProvider mldap = null;
 
     protected MultiLDAPStoreProvider getMLDAP() {

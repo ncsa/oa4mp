@@ -159,9 +159,15 @@ public abstract class AbstractRegistrationServlet extends MyProxyDelegationServl
         int state = getState(request);
         // Addresses
         if (state == INITIAL_STATE) {
-            if (getServiceEnvironment().getMaxAllowedNewClientRequests() <= getServiceEnvironment().getClientApprovalStore().getUnapprovedCount()) {
+            if (getServiceEnvironment().getMaxAllowedNewClientRequests() <= getServiceEnvironment().getClientApprovalStore().getPendingCount()) {
                 //   throw new TooManyRequestsException("Error: Max number of new client requests reached. Request rejected.");
-                log("Too many client approvals pending. Max allowed unapproved is: " + getServiceEnvironment().getMaxAllowedNewClientRequests());
+                log("Too many client approvals pending. Max allowed unapproved count is " + getServiceEnvironment().getMaxAllowedNewClientRequests());
+                // Fixes CIL-414, CIL-426 (send email notification), CIL-427
+
+                getServiceEnvironment().getMailUtil().sendMessage("Too many pending approvals",
+                        request.getServerName() + " has too many pending client approval requests outstanding. " +
+                                "The server is configured for a limit of " + getServiceEnvironment().getMaxAllowedNewClientRequests() +  " and"
+                        + " there are " + getServiceEnvironment().getClientApprovalStore().getPendingCount() + " pending approvals in the store.",null);
                 JSPUtil.fwd(request, response, "/tooManyClientRequests.jsp");
                 // Fixes OAUTH-90 bug.
                 return;

@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2ATException;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
@@ -9,6 +10,8 @@ import edu.uiuc.ncsa.security.servlet.AbstractServlet;
 import org.apache.commons.codec.binary.Base64;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -58,6 +61,9 @@ public class HeaderUtils {
         return out;
     }
 
+    public static boolean hasBasicHeader(HttpServletRequest request){
+        return getBasicHeader(request)!=null;
+    }
     public static String getBasicHeader(HttpServletRequest request) {
         List<String> authHeaders = getAuthHeader(request, "Basic");
         if (authHeaders.isEmpty()) {
@@ -76,15 +82,18 @@ public class HeaderUtils {
 
     }
 
-    public static Identifier getIDFromHeaders(HttpServletRequest request) {
+    public static int ID_INDEX = 0;
+    public static int SECRET_INDEX = 1;
 
-
+    // Fix for CIL-430:
+    public static String[] getCredentialsFromHeaders(HttpServletRequest request) throws UnsupportedEncodingException {
+        String[] out = new String[2];
         // assume the client id and secret are in the headers.
         String header64 = getBasicHeader(request);
-        if(header64 == null){
+        if (header64 == null) {
             return null;
         }
-        // semantics are that this is base64.encode(id:secret)
+        // semantics are that this is base64.encode(URLEncode(id):URLEncode(secret))
         byte[] headerBytes = Base64.decodeBase64(header64);
         if (headerBytes == null || headerBytes.length == 0) {
             //       DebugUtil.dbg(this, "doIt: no secret, throwing exception.");
@@ -99,8 +108,29 @@ public class HeaderUtils {
             throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT, "the authorization header is not in the right format");
 
         }
-        String id = header.substring(0, lastColonIndex);
-        return BasicIdentifier.newID(id);
+
+        // semantics are that this is base64.encode(id:secret)
+
+        DebugUtil.dbg(HeaderUtils.class, " received authz header of " + header);
+        String id = URLDecoder.decode(header.substring(0,lastColonIndex), "UTF-8");
+        out[ID_INDEX] = id;
+
+        String rawSecret = URLDecoder.decode(header.substring(lastColonIndex + 1), "UTF-8");
+
+        out[SECRET_INDEX] = rawSecret;
+
+        return out;
+    }
+
+    public static String getSecretFromHeaders(HttpServletRequest request) throws UnsupportedEncodingException {
+        return getCredentialsFromHeaders(request)[SECRET_INDEX];
+    }
+    public static Identifier getIDFromHeaders(HttpServletRequest request) throws UnsupportedEncodingException {
+        String[] creds = getCredentialsFromHeaders(request);
+        if(creds == null || creds.length == 0){
+            return null;
+        }
+        return BasicIdentifier.newID(creds[ID_INDEX]);
 
     }
 

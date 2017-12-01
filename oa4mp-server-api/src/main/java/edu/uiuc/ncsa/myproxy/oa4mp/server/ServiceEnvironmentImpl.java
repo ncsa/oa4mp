@@ -154,8 +154,7 @@ public class ServiceEnvironmentImpl extends MyProxyServiceEnvironment implements
                                   AuthorizationServletConfig ac,
                                   UsernameTransformer usernameTransformer,
                                   boolean isPingable,
-                                  Provider<PermissionsStore> psp,
-                                  Provider<AdminClientStore> acs) {
+                                  Provider<PermissionsStore> psp) {
         super(logger, mfp, constants);
         this.casp = casp;
         this.csp = csp;
@@ -171,7 +170,6 @@ public class ServiceEnvironmentImpl extends MyProxyServiceEnvironment implements
         this.usernameTransformer = usernameTransformer;
         setPingable(isPingable);
         this.psp = psp;
-        this.acs = acs;
     }
 
     MessagesProvider messagesProvider;
@@ -185,7 +183,6 @@ public class ServiceEnvironmentImpl extends MyProxyServiceEnvironment implements
     protected Provider<PAIssuer> paip;
     protected Provider<TokenForge> tfp;
     protected Provider<PermissionsStore> psp;
-    protected Provider<AdminClientStore> acs;
 
 
     Map<String, String> messages;
@@ -203,14 +200,7 @@ public class ServiceEnvironmentImpl extends MyProxyServiceEnvironment implements
         return messages;
     }
 
-    AdminClientStore adminClientStore = null;
 
-    public AdminClientStore<AdminClient> getAdminClientStore() {
-        if (adminClientStore == null) {
-            adminClientStore = acs.get();
-        }
-        return adminClientStore;
-    }
 
     PermissionsStore permissionsStore = null;
 

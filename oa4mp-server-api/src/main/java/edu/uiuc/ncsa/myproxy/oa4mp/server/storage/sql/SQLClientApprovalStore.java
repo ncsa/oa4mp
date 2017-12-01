@@ -21,7 +21,7 @@ import java.sql.SQLException;
  * on May 26, 2011 at  9:39:26 AM
  */
 public class SQLClientApprovalStore extends SQLStore<ClientApproval> implements ClientApprovalStore<ClientApproval> {
-     public static final String DEFAULT_TABLENAME = "client_approvals";
+    public static final String DEFAULT_TABLENAME = "client_approvals";
 
     public SQLClientApprovalStore(ConnectionPool connectionPool,
                                   Table table,
@@ -30,9 +30,10 @@ public class SQLClientApprovalStore extends SQLStore<ClientApproval> implements 
         super(connectionPool, table, identifiableProvider, converter);
     }
 
-    ClientApprovalTable getCAT(){
+    ClientApprovalTable getCAT() {
         return (ClientApprovalTable) getTable();
     }
+
     @Override
     public boolean isApproved(Identifier identifier) {
         ClientApproval c = get(identifier);
@@ -42,26 +43,51 @@ public class SQLClientApprovalStore extends SQLStore<ClientApproval> implements 
 
     @Override
     public int getUnapprovedCount() {
-       int count = 0;
+        int count = 0;
 
-              String query = "Select " + getTable().getPrimaryKeyColumnName() + " from " + getTable().getFQTablename()
-                      + " where " + getCAT().ca().approved() + "=false ";
-              Connection c = getConnection();
-              try {
-                  PreparedStatement stmt = c.prepareStatement(query);
-                  stmt.execute();
-                  ResultSet rs = stmt.getResultSet();
-                  while (rs.next()) {
-                     count++;
-                  }
-                  rs.close();
-                  stmt.close();
-              } catch (SQLException e) {
-                  destroyConnection(c);
-                  throw new GeneralException("Error getting the user ids", e);
-              } finally {
-                  releaseConnection(c);
-              }
+        String query = "Select " + getTable().getPrimaryKeyColumnName() + " from " + getTable().getFQTablename()
+                + " where " + getCAT().ca().approved() + "=false ";
+        Connection c = getConnection();
+        try {
+            PreparedStatement stmt = c.prepareStatement(query);
+            stmt.execute();
+            ResultSet rs = stmt.getResultSet();
+            while (rs.next()) {
+                count++;
+            }
+            rs.close();
+            stmt.close();
+        } catch (SQLException e) {
+            destroyConnection(c);
+            throw new GeneralException("Error getting the user ids", e);
+        } finally {
+            releaseConnection(c);
+        }
+        return count;
+    }
+
+    @Override
+    public int getPendingCount() {
+        int count = 0;
+
+        String query = "Select " + getTable().getPrimaryKeyColumnName() + " from " + getTable().getFQTablename()
+                + " where " + getCAT().ca().approved() + "=false ";
+        Connection c = getConnection();
+        try {
+            PreparedStatement stmt = c.prepareStatement(query);
+            stmt.execute();
+            ResultSet rs = stmt.getResultSet();
+            while (rs.next()) {
+                count++;
+            }
+            rs.close();
+            stmt.close();
+        } catch (SQLException e) {
+            destroyConnection(c);
+            throw new GeneralException("Error getting the user ids", e);
+        } finally {
+            releaseConnection(c);
+        }
         return count;
     }
 }

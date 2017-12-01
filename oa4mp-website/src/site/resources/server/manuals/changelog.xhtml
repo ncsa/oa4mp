@@ -11,11 +11,19 @@
 <!--#include virtual="../../header.html" -->
 <p>Changes to the OA4MP server by version.</p>
 
+<h2>3.5.1</h2>
+<ul>
+    <li>CIL-430: Credentials sent in authorization header are to be URL encoded.</li>
+    <li></li>
+</ul>
+
 <h2>3.5</h2>
 <ul>
     <li>Support for public clients.</li>
     <li>CIL-409: Missing cert request in OIDC getcert call causes empty certificate to be returned.</li>
     <li>CIL-414: Bug prevented accurately counting number of pending approvals.</li>
+    <li>CIL-426: Send admins an email when there are too many pending approvals.</li>
+    <li>CIL-427: Improve handling of approvals so that unapproved, pending and revoked approvals can be tracked.</li>
 </ul>
 <h4>Release Notes</h4>
 
