@@ -56,7 +56,8 @@ public class COSE extends OA2SE {
                 long maxClientRefreshTokenLifetime,
                 Provider<LDAPStore> mldap,
                 JSONWebKeys signingKeyPair,
-                String issuer) {
+                String issuer,
+                boolean isUtilServletEnabled) {
         super(logger,
                 tsp,
                 csp,
@@ -85,7 +86,8 @@ public class COSE extends OA2SE {
                 maxClientRefreshTokenLifetime,
                 signingKeyPair,
                 issuer,
-                mldap);
+                mldap,
+                isUtilServletEnabled);
 
     }
 

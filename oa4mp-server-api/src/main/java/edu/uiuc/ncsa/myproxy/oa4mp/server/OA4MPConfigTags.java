@@ -24,18 +24,19 @@ public interface OA4MPConfigTags extends StorageConfigurationTags, MailConfigura
     public static final String MYPROXY_LOA_PORT = "port";
     public static final String MYPROXY_SERVER_DN = "serverDN";
     public static final String COMPONENT = "service"; // tag for top-level component of configuration
-
-
     public static final String AUTHORIZATION_SERVLET = "authorizationServlet"; // The name of the servlet
+
+
     public static final String AUTHORIZATION_SERVLET_URI = "authorizationURI"; // If there is a different authorization uri than the standard, specify it here
     public static final String AUTHORIZATION_SERVLET_HEADER_USE = "useHeader"; // If there is a header present, use it, otherwise ignore it.
     public static final String AUTHORIZATION_SERVLET_HEADER_REQUIRE = "requireHeader"; // Require the header. This will cause an exception to be thrown if there is no header.
     public static final String AUTHORIZATION_SERVLET_HEADER_FIELD_NAME = "headerFieldName"; // The name of the header field to be used for the username, e.g. REMOTE_USER
-	public static final String AUTHORIZATION_SERVLET_RETURN_DN_AS_USERNAME = "returnDnAsUsername"; // Use the first certificate's DN as the username that is returned to the OAuth client
-	public static final String AUTHORIZATION_SERVLET_SHOW_LOGON = "showLogon"; // show the username and password prompt.
-	public static final String AUTHORIZATION_SERVLET_VERIFY_USERNAME = "verifyUsername"; // Show the logon with only the username for verification (required by OAuth spec).
-	public static final String CONVERT_DN_TO_GLOBUS_ID = "convertDNToGlobusID"; // Convert a spec compliant DN (comma delimited) to Globus format (slash delimited)
+    public static final String AUTHORIZATION_SERVLET_RETURN_DN_AS_USERNAME = "returnDnAsUsername"; // Use the first certificate's DN as the username that is returned to the OAuth client
+    public static final String AUTHORIZATION_SERVLET_SHOW_LOGON = "showLogon"; // show the username and password prompt.
+    public static final String AUTHORIZATION_SERVLET_VERIFY_USERNAME = "verifyUsername"; // Show the logon with only the username for verification (required by OAuth spec).
+    public static final String CONVERT_DN_TO_GLOBUS_ID = "convertDNToGlobusID"; // Convert a spec compliant DN (comma delimited) to Globus format (slash delimited)
     public static final String MAX_ALLOWED_NEW_CLIENT_REQUESTS = "maxAllowedNewClientRequests"; // The name of the header field to be used for the username, e.g. REMOTE_USER
+    public static final String ENABLE_UTIL_SERVLET = "enableUtilServlet"; // attribute tag for enabling the util servlet
 
 
 /*

@@ -10,6 +10,7 @@ import edu.uiuc.ncsa.security.oauth_2_0.server.UnsupportedScopeException;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Map;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -75,13 +76,27 @@ public class BasicScopeHandler implements ScopeHandler {
      */
     @Override
     public UserInfo process(UserInfo userInfo, HttpServletRequest request, ServiceTransaction transaction) throws UnsupportedScopeException {
+        Map<String,Object> claims =userInfo.getMap();
+        claims = getClaimsHandler().process(claims);
+        userInfo.setMap(claims);
         return userInfo;
     }
 
+    public ClaimsHandler getClaimsHandler() {
+        if(claimsHandler == null){
+            claimsHandler = new ClaimsHandler();
+        }
+        return claimsHandler;
+    }
+
+    public void setClaimsHandler(ClaimsHandler claimsHandler) {
+        this.claimsHandler = claimsHandler;
+    }
+
+    ClaimsHandler claimsHandler;
     @Override
     public void setScopes(Collection<String> scopes) {
         this.scopes = scopes;
-
     }
 
     /**

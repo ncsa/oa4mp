@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.StringTokenizer;
 
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.ID_TOKEN;
+import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.RAW_ID_TOKEN;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -41,7 +42,7 @@ public class OA2TestCommands extends TestCommands {
         super(logger, ce);
     }
 
-    OA2MPService service;
+    protected OA2MPService service;
 
     protected OA2MPService getOA2S() {
         return (OA2MPService) getService();
@@ -151,6 +152,8 @@ public class OA2TestCommands extends TestCommands {
         assetResponse = null;
         currentATResponse = null;
         grant = null;
+        rawIdToken = null;
+        claims = null;
 
         canGetCert = false;
         canGetGrant = false;
@@ -207,6 +210,52 @@ public class OA2TestCommands extends TestCommands {
         say("File \"" + fileName + "\" saved successfully.");
     }
 
+    String rawIdToken = null;
+
+    protected void showRawTokenHelp() {
+        sayi("showRawToken - This will show the raw id token, i.e., the JWT. ");
+        sayi("               If you wish to see the contents of this JWT");
+        sayi("               you should probably invoke showClaims instead.");
+    }
+
+    public void showrawtoken(InputLine inputLine) throws Exception {
+        if (grant == null || showHelp(inputLine)) {
+            getATHelp();
+            return;
+        }
+
+        if (rawIdToken == null) {
+            sayi("No id token.");
+            return;
+        }
+        if (rawIdToken.length() == 0) {
+            sayi("Empty id token");
+            return;
+        }
+        sayi(rawIdToken);
+    }
+
+    JSONObject claims = null;
+
+    public void showclaims(InputLine inputLine) throws Exception {
+        if (grant == null || showHelp(inputLine)) {
+            showClaimsHelp();
+            return;
+        }
+        if (claims == null || claims.isEmpty()) {
+            say("(no claims found)");
+        } else {
+            say(claims.toString(2));
+        }
+
+    }
+
+    protected void showClaimsHelp() {
+        sayi("showClaims - This will show the most recent set of claims. You must get an access token");
+        sayi("             before this is set.");
+        sayi("             You may also see the raw version of this (simply the JWT) by calling showRawToken.");
+    }
+
     public void getat(InputLine inputLine) throws Exception {
        /* if(!canGetAT){
             say("Sorry, but you have not gotten a grant yet here, so you cannot get an access token.");
@@ -217,12 +266,19 @@ public class OA2TestCommands extends TestCommands {
         }
 
         currentATResponse = getOA2S().getAccessToken(getDummyAsset(), grant);
+        Object x = currentATResponse.getParameters().get(RAW_ID_TOKEN);
+        if (x == null) {
+            x = "";
+        } else {
+            rawIdToken = x.toString();
+        }
+        claims = (JSONObject) currentATResponse.getParameters().get(ID_TOKEN);
         if (inputLine.hasArg(CLAIMS_FLAG)) {
-            JSONObject json = (JSONObject)currentATResponse.getParameters().get(ID_TOKEN);
-            if(json.isEmpty()){
-              say("(no claims found)");
-            }else {
-                say(json.toString(2));
+
+            if (claims.isEmpty()) {
+                say("(no claims found)");
+            } else {
+                say(claims.toString(2));
             }
         }
         printTokens();
@@ -274,7 +330,7 @@ public class OA2TestCommands extends TestCommands {
         say("getrt [-claims]:");
         say("       Get a new refresh token. You must have already called getat to have gotten an access token");
         say("       first. This will print out a summary of the expiration time.");
-        say("       If the "+ CLAIMS_FLAG + " flag is supplied, the id token will be printed");
+        say("       If the " + CLAIMS_FLAG + " flag is supplied, the id token will be printed");
     }
 
     protected void printTokens() {
@@ -306,9 +362,9 @@ public class OA2TestCommands extends TestCommands {
         currentATResponse.setParameters(rtResponse.getParameters());
         if (inputLine.hasArg(CLAIMS_FLAG)) {
             JSONObject json = JSONObject.fromObject(currentATResponse.getParameters());
-            if(json.isEmpty()){
-              say("(no claims found)");
-            }else {
+            if (json.isEmpty()) {
+                say("(no claims found)");
+            } else {
                 say(json.toString(2));
             }
         }
@@ -321,7 +377,7 @@ public class OA2TestCommands extends TestCommands {
         say("       Gets the access token and refresh token (if supported on the server) for a given grant. ");
         say("       Your argument is the output from the setgrant call here.");
         say("       A summary of the refresh token and its expiration is printed, if applicable.");
-        say("       If the -"+ CLAIMS_FLAG + " flag is supplied, the id token will be printed");
+        say("       If the -" + CLAIMS_FLAG + " flag is supplied, the id token will be printed");
 
     }
 

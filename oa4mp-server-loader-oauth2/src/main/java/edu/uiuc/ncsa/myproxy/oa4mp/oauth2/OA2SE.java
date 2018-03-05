@@ -64,7 +64,8 @@ public class OA2SE extends ServiceEnvironmentImpl {
                  long maxClientRefreshTokenLifetime,
                  JSONWebKeys jsonWebKeys,
                  String issuer,
-                 Provider<LDAPStore> mldap) {
+                 Provider<LDAPStore> mldap,
+                 boolean utilServletEnabled) {
         super(logger,
                 mfp,
                 tsp,
@@ -111,6 +112,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
             ((BasicScopeHandler) scopeHandler).setOa2SE(this);
         }
         this.acs = acs;
+        this.utilServletEnabled = utilServletEnabled;
     }
 
     protected Provider<AdminClientStore> acs;
@@ -123,6 +125,18 @@ public class OA2SE extends ServiceEnvironmentImpl {
           }
           return adminClientStore;
       }
+
+    public boolean isUtilServletEnabled() {
+        return utilServletEnabled;
+    }
+
+    public void setUtilServletEnabled(boolean utilServletEnabled) {
+        this.utilServletEnabled = utilServletEnabled;
+    }
+
+    boolean utilServletEnabled = true;
+
+
     String issuer;
 
     public String getIssuer() {

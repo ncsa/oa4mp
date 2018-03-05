@@ -158,6 +158,7 @@ public class OA2AuthorizedServlet extends AbstractInitServlet {
 
 
         OA2ServiceTransaction st = createNewTransaction(agResponse.getGrant());
+        info("Created new unsaved transaction with id=" + st.getIdentifierString());
         ArrayList<String> scopes = resolveScopes(st, params, state, givenRedirect);
 
         st.setScopes(scopes);
@@ -206,7 +207,7 @@ public class OA2AuthorizedServlet extends AbstractInitServlet {
 
 
         if (!hasOpenIDScope)
-            throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST, "Scopes must contain openid", state, givenRedirect);
+            throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST, "Scopes must contain " + OA2Scopes.SCOPE_OPENID, state, givenRedirect);
         return scopes;
     }
 

@@ -124,14 +124,20 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
 
     }
 
-    @Override
-    protected void doIt(HttpServletRequest request, HttpServletResponse response) throws Throwable {
-        printAllParameters(request);
-        String grantType = getFirstParameterValue(request, OA2Constants.GRANT_TYPE);
-        if (grantType == null) {
-            warn("Error servicing request. No grant type was given. Rejecting request.");
-            throw new GeneralException("Error: Could not service request");
-        }
+    /**
+     * Contains the tests for executing a request based on its grant type. over-ride this as needed by writing your
+     * code then calling super. Return <code>true</code> is the request is serviced and false otherwise.
+     * This is invoked in the {@link #doIt(HttpServletRequest, HttpServletResponse)} method. If a grant is given'
+     * that is not supported in this method, the servlet should reject the request, as per the OAuth 2 spec.
+     *
+     * @param request
+     * @param response
+     * @throws Throwable
+     */
+    protected boolean executeByGrant(String grantType,
+                                  HttpServletRequest request,
+                                  HttpServletResponse response) throws Throwable {
+
         OA2Client client = (OA2Client) getClient(request);
 
         if (grantType.equals(OA2Constants.REFRESH_TOKEN)) {
@@ -141,7 +147,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
                 verifyClientSecret(client, rawSecret);
             }
             doRefresh(client, request, response);
-            return;
+            return true;
         }
         if (grantType.equals(OA2Constants.AUTHORIZATION_CODE_VALUE)) {
             // public clients cannot get an access token
@@ -149,7 +155,22 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             ATIResponse2 atResponse = (ATIResponse2) state.getIssuerResponse();
 
             atResponse.write(response);
-            return;
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    protected void doIt(HttpServletRequest request, HttpServletResponse response) throws Throwable {
+        printAllParameters(request);
+        String grantType = getFirstParameterValue(request, OA2Constants.GRANT_TYPE);
+        if (isEmpty(grantType)) {
+            warn("Error servicing request. No grant type was given. Rejecting request.");
+            throw new GeneralException("Error: Could not service request");
+        }
+        if(executeByGrant(grantType,request,response)){
+            return ;
         }
         warn("Error: grant type was not recognized. Request rejected.");
         throw new ServletException("Error: Unknown request type.");

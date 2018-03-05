@@ -172,7 +172,7 @@ public class ClientManagerTest extends DDServerTests implements SAT {
         ldap.setContextName("ou=foo/cn=bar" + System.currentTimeMillis());
 
         for (int i = 0; i < 3; i++) {
-            LDAPConfigurationUtil.AttributeEntry ae = new LDAPConfigurationUtil.AttributeEntry("source" + i, "target" + i, (i % 2 == 0));
+            LDAPConfigurationUtil.AttributeEntry ae = new LDAPConfigurationUtil.AttributeEntry("source" + i, "target" + i, (i % 2 == 0), false);
             ldap.getSearchAttributes().put(ae.sourceName, ae);
 
         }

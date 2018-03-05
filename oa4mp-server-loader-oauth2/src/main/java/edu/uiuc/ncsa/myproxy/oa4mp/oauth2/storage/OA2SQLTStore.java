@@ -24,6 +24,9 @@ public class OA2SQLTStore<V extends OA2ServiceTransaction> extends DSSQLTransact
         return getTransaction(refreshToken.getToken(), ((OA2TransactionTable) getTransactionTable()).getByRefreshTokenStatement());
     }
 
+    public V getByRefreshToken(RefreshToken refreshToken) {
+         return getTransaction(refreshToken.getToken(), ((OA2TransactionTable) getTransactionTable()).getByRefreshTokenStatement());
+     }
     @Override
     public V getByUsername(String username) {
         return getTransaction(username, ((OA2TransactionTable) getTransactionTable()).getByUsernameStatement());

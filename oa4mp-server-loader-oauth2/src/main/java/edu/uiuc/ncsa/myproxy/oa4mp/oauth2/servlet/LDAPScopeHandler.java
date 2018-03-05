@@ -1,8 +1,10 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.scopeHandlers.Groups;
 import edu.uiuc.ncsa.security.core.Logable;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
@@ -42,6 +44,19 @@ public class LDAPScopeHandler extends BasicScopeHandler implements Logable {
 
     protected boolean loggingEnabled = false;
 
+    protected GroupHandler groupHandler = null;
+
+    public GroupHandler getGroupHandler() {
+        if(groupHandler == null){
+            groupHandler = new GroupHandler(); // default
+        }
+        return groupHandler;
+    }
+
+    public void setGroupHandler(GroupHandler groupHandler) {
+        this.groupHandler = groupHandler;
+    }
+
     public LDAPScopeHandler(OA2SE oa2SE) {
         super(oa2SE);
         this.myLogger = oa2SE.getMyLogger();
@@ -62,15 +77,17 @@ public class LDAPScopeHandler extends BasicScopeHandler implements Logable {
      */
     public String getSearchName(UserInfo userInfo, HttpServletRequest request, ServiceTransaction transaction) {
         // FIXME!! FOR DEBUGGING ONLY
-/*
+        // This allows me to access the NCSA LDAP server for debugging, if the client is configured
+        // correctly too.
+        // Comment out the conditional block for any release!
 
-        if (ServletDebugUtil.isEnabled()) {
+   /*     if (ServletDebugUtil.isEnabled()) {
             userInfo.getMap().put(getCfg().getSearchNameKey(), "jgaynor@ncsa.illinois.edu");
             userInfo.getMap().put("eppn", "jgaynor@ncsa.illinois.edu");
             //  userInfo.getMap().put("username", "http://cilogon.org/serverA/users/10376");
             //return "http://cilogon.org/serverA/users/10376";
-        }
-*/
+        }*/
+
         // END debugging hack.
         JSONObject xxx = LDAPConfigurationUtil.toJSON(getCfg());
         xxx.getJSONObject("ldap").getJSONObject("ssl").put("keystore", "");
@@ -197,15 +214,6 @@ public class LDAPScopeHandler extends BasicScopeHandler implements Logable {
 
     protected boolean logon() {
         try {
-        /*    if (getCfg().getSslConfiguration() != null) {
-                if (getCfg().getSslConfiguration().getTrustrootPath() != null) {
-                    System.setProperty("javax.net.ssl.trustStore", getCfg().getSslConfiguration().getTrustrootPath());
-                    System.setProperty("javax.net.ssl.trustStorePassword", getCfg().getSslConfiguration().getTrustRootPassword());
-                    System.setProperty("javax.net.ssl.trustStoreType", getCfg().getSslConfiguration().getTrustRootType());
-                }
-            }*/
-
-
             // Set up the environment for creating the initial context
             Hashtable<String, String> env = new Hashtable<String, String>();
             env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
@@ -315,22 +323,31 @@ public class LDAPScopeHandler extends BasicScopeHandler implements Logable {
                 if (attribute == null) {
                     continue;
                 }
-                if (attribute.size() == 1) {
-                    // Single-valued attributes are recorded as simple values
-                    if (attributes.get(attribID).isList) {
-                        JSONArray jsonAttribs = new JSONArray();
-                        jsonAttribs.add(attribute.get(0));
-                        json.put(attributes.get(attribID).targetName, jsonAttribs);
-                    } else {
-                        json.put(attributes.get(attribID).targetName, attribute.get(0));
-                    }
-                } else {
-                    // Multi-valued attributes are recorded as arrays.
+                if (attributes.get(attribID).isGroup) {
                     JSONArray jsonAttribs = new JSONArray();
-                    for (int i = 0; i < attribute.size(); i++) {
-                        jsonAttribs.add(attribute.get(i));
+                                          for (int i = 0; i < attribute.size(); i++) {
+                                              jsonAttribs.add(attribute.get(i));
+                                          }
+                    Groups groups =getGroupHandler().parse(jsonAttribs);
+                    json.put(attributes.get(attribID).targetName, groups.toJSON());
+                } else {
+                    if (attribute.size() == 1) {
+                        // Single-valued attributes are recorded as simple values
+                        if (attributes.get(attribID).isList) {
+                            JSONArray jsonAttribs = new JSONArray();
+                            jsonAttribs.add(attribute.get(0));
+                            json.put(attributes.get(attribID).targetName, jsonAttribs);
+                        } else {
+                            json.put(attributes.get(attribID).targetName, attribute.get(0));
+                        }
+                    } else {
+                        // Multi-valued attributes are recorded as arrays.
+                        JSONArray jsonAttribs = new JSONArray();
+                        for (int i = 0; i < attribute.size(); i++) {
+                            jsonAttribs.add(attribute.get(i));
+                        }
+                        json.put(attributes.get(attribID).targetName, jsonAttribs);
                     }
-                    json.put(attributes.get(attribID).targetName, jsonAttribs);
                 }
             }
         }
@@ -426,5 +443,56 @@ public class LDAPScopeHandler extends BasicScopeHandler implements Logable {
     public String toString() {
         return "LDAPScopeHandler{" +
                 (ldapConfiguration == null?"(no config)":ldapConfiguration.getServer())+"}";
+    }
+
+    public static void main(String[] args){
+        try {
+            String rawLdap = "{\"ldap\":{\"failOnError\":\"false\",\"address\":\"ldap.ncsa.illinois.edu\",\"port\":636,\"enabled\":\"true\",\"authorizationType\":\"none\",\"searchName\":\"eppn\",\"searchAttributes\":[{\"name\":\"mail\",\"returnAsList\":false,\"returnName\":\"mail\"},{\"name\":\"cn\",\"returnAsList\":false,\"returnName\":\"name\"},{\"name\":\"memberOf\",\"returnAsList\":false,\"returnName\":\"isMemberOf\"}],\"searchBase\":\"ou=People,dc=ncsa,dc=illinois,dc=edu\",\"contextName\":\"\",\"ssl\":{\"tlsVersion\":\"TLS\",\"useJavaTrustStore\":true}}}";
+            String rawLdap2 = "{\"ldap\": {\n" +
+                    "  \"address\": \"registry-test.cilogon.org\",\n" +
+                    "  \"port\": 636,\n" +
+                    "  \"enabled\": true,\n" +
+                    "  \"authorizationType\": \"simple\",\n" +
+                    "  \"failOnError\": false,\n" +
+                    "  \"notifyOnFail\": false,\n" +
+                    "  \"password\": \"Eavjofoop4gikpecUzbooljorUryikwu\",\n" +
+                    "  \"principal\": \"uid=oa4mp_user,ou=system,o=ImPACT,dc=cilogon,dc=org\",\n" +
+                    "  \"searchAttributes\":   [\n" +
+                    "        {\n" +
+                    "      \"name\": \"isMemberOf\",\n" +
+                    "      \"returnAsList\": true,\n" +
+                    "      \"returnName\": \"isMemberOf\"\n" +
+                    "    },\n" +
+                    "        {\n" +
+                    "      \"name\": \"employeeNumber\",\n" +
+                    "      \"returnAsList\": false,\n" +
+                    "      \"returnName\": \"employeeNumber\"\n" +
+                    "    }\n" +
+                    "  ],\n" +
+                    "  \"searchBase\": \"ou=people,o=ImPACT,dc=cilogon,dc=org\",\n" +
+                    "  \"searchName\": \"username\",\n" +
+                    "  \"contextName\": \"\",\n" +
+                    "  \"ssl\":   {\n" +
+                    "    \"keystore\": {},\n" +
+                    "    \"useJavaTrustStore\": true,\n" +
+                    "    \"password\": \"changeit\",\n" +
+                    "    \"type\": \"jks\"\n" +
+                    "  }\n" +
+                    "}}";
+            DebugUtil.setIsEnabled(true);
+            ServiceTransaction st = new ServiceTransaction(BasicIdentifier.newID("foo"));
+            st.setUsername("jbasney@ncsa.illinois.edu");
+            JSONObject json = JSONObject.fromObject(rawLdap2);
+            System.out.println(json.toString(2));
+            LDAPConfiguration cfg = LDAPConfigurationUtil.fromJSON(json);
+            LDAPScopeHandler sh = new LDAPScopeHandler(cfg, null);
+            UserInfo ui = new UserInfo();
+            ui.getMap().put("username", "jbasney@ncsa.illinois.edu");
+            UserInfo ui2 = sh.process(ui, st);
+            System.out.println("Result of LDAP query:");
+            System.out.println(ui2.getMap());
+        }catch(Throwable t){
+            t.printStackTrace();
+        }
     }
 }

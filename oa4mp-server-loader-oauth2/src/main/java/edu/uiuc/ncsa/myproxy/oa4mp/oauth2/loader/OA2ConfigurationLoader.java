@@ -119,7 +119,8 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     getMaxClientRefreshTokenLifetime(),
                     getJSONWebKeys(),
                     getIssuer(),
-                    getMLDAP());
+                    getMLDAP(),
+                    isUtilServerEnabled());
             if (getScopeHandler() instanceof BasicScopeHandler) {
                 ((BasicScopeHandler) getScopeHandler()).setOa2SE((OA2SE) se);
             }
@@ -146,6 +147,20 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         return constants;
     }
 
+    Boolean utilServerEnabled = null;
+    protected Boolean isUtilServerEnabled(){
+        if(utilServerEnabled == null){
+            try {
+                utilServerEnabled = Boolean.parseBoolean(getFirstAttribute(cn, OA4MPConfigTags.ENABLE_UTIL_SERVLET));
+            }catch(Throwable t){
+                // use default which is to enable. We let this be null to trigger pulling the value, if any, out of the
+                // the configuration
+                utilServerEnabled = Boolean.TRUE;
+            }
+        }
+        return utilServerEnabled;
+
+    }
     protected MultiDSAdminClientStoreProvider macp;
 
     protected MultiDSAdminClientStoreProvider getMacp(){

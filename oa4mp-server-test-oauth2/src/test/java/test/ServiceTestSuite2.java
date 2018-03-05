@@ -11,6 +11,8 @@ import edu.uiuc.ncsa.myproxy.oa4mp.NewTransactionTest;
 import edu.uiuc.ncsa.myproxy.oa4mp.ServiceConfigTest;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.loader.COBootstrapper;
 import edu.uiuc.ncsa.security.delegation.storage.FileStoreTest;
+import edu.uiuc.ncsa.security.util.JFunctorFactoryTests;
+import edu.uiuc.ncsa.security.util.JFunctorTest;
 import junit.framework.TestSuite;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
@@ -24,6 +26,8 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 
 @Suite.SuiteClasses({
+        JFunctorTest.class,
+        JFunctorFactoryTests.class,
         NewCAStoreTest.class,
         NewClientStoreTest.class,
         NewTransactionTest.class,

@@ -52,6 +52,8 @@ public abstract class AbstractInitServlet extends MyProxyDelegationServlet{
                ServiceTransaction transaction = verifyAndGet(agResponse);
                transaction.setClient(client);
                getTransactionStore().save(transaction);
+               info("Saved new transaction with id=" + transaction.getIdentifierString());
+
                Map<String, String> params = agResponse.getParameters();
 
                preprocess(new TransactionState(req, resp, params, transaction));
