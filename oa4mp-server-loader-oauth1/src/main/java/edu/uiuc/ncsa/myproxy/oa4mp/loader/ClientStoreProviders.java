@@ -26,8 +26,6 @@ import javax.inject.Provider;
 import java.io.File;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.OA4MPIdentifierProvider.CLIENT_ID;
-import static edu.uiuc.ncsa.security.core.util.IdentifierProvider.SCHEME;
-import static edu.uiuc.ncsa.security.core.util.IdentifierProvider.SCHEME_SPECIFIC_PART;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -36,7 +34,7 @@ import static edu.uiuc.ncsa.security.core.util.IdentifierProvider.SCHEME_SPECIFI
 public class ClientStoreProviders {
     public static IdentifiableProviderImpl<? extends Client> getClientProvider() {
         if (clientProvider == null) {
-            clientProvider = new OAClientProvider(new OA4MPIdentifierProvider(SCHEME, SCHEME_SPECIFIC_PART, CLIENT_ID, false));
+            clientProvider = new OAClientProvider(new OA4MPIdentifierProvider(CLIENT_ID, false));
         }
         return clientProvider;
     }

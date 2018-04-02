@@ -13,7 +13,7 @@ import edu.uiuc.ncsa.security.oauth_2_0.OA2Client;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2GeneralError;
-import edu.uiuc.ncsa.security.oauth_2_0.server.ScopeHandler;
+import edu.uiuc.ncsa.security.oauth_2_0.server.ClaimSource;
 import edu.uiuc.ncsa.security.oauth_2_0.server.UII2;
 import edu.uiuc.ncsa.security.oauth_2_0.server.UIIRequest2;
 import edu.uiuc.ncsa.security.oauth_2_0.server.UIIResponse2;
@@ -59,16 +59,15 @@ public class UserInfoServlet extends MyProxyDelegationServlet {
         uireq.setUsername(getUsername(transaction));
         // Now we figure out which scope handler to use.
         UIIResponse2 uiresp = (UIIResponse2) uis.process(uireq);
-        LinkedList<ScopeHandler> scopeHandlers = OA2ATServlet.setupScopeHandlers((OA2ServiceTransaction) transaction, oa2SE);
+        LinkedList<ClaimSource> claimSources = OA2ATServlet.setupScopeHandlers((OA2ServiceTransaction) transaction, oa2SE);
         DebugUtil.dbg(this, "Invoking scope handler");
-        if (scopeHandlers == null || scopeHandlers.isEmpty()) {
+        if (claimSources == null || claimSources.isEmpty()) {
             DebugUtil.dbg(this, " ***** NO SCOPE HANDLERS ");
 
         }
-        for (ScopeHandler scopeHandler : scopeHandlers) {
-            DebugUtil.dbg(this, " scope handler=" + scopeHandler.getClass().getSimpleName());
-
-            scopeHandler.process(uiresp.getUserInfo(), transaction);
+        for (ClaimSource claimSource: claimSources) {
+            DebugUtil.dbg(this, " scope handler=" + claimSource.getClass().getSimpleName());
+            claimSource.process(uiresp.getUserInfo(), transaction);
         }
         uiresp.write(response);
     }

@@ -107,7 +107,7 @@ public class OA4MPConfigurationLoader<T extends ServiceEnvironmentImpl> extends 
     @Override
     public IdentifiableProvider<? extends Client> getClientProvider() {
         // Do *not* use timestamps when making these, since this would be redundant.
-        return new OAClientProvider(new OA4MPIdentifierProvider(SCHEME, SCHEME_SPECIFIC_PART, CLIENT_ID, false));
+        return new OAClientProvider(new OA4MPIdentifierProvider(CLIENT_ID, false));
     }
 
     protected static class OAuthForgeProvider implements Provider<TokenForge> {

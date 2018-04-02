@@ -171,9 +171,9 @@ public class LDAPSSLSocketFactory extends SocketFactory {
             getSslConfiguration().setTrustRootType("JKS");
             getSslConfiguration().setTrustRootPassword("changeit");
             getSslConfiguration().setTrustRootPath("/home/ncsa/temp/java-certs/cacerts2");
-            LDAPScopeHandler x = new LDAPScopeHandler(ldapConfiguration, null);
+            LDAPClaimsSource x = new LDAPClaimsSource(ldapConfiguration, null);
             LDAPSSLSocketFactory.setLdapConfiguration(ldapConfiguration);
-            x.logon();
+            x.createConnection();
             UserInfo userInfo = new UserInfo();
             userInfo.getMap().putAll(x.simpleSearch(x.context, "http://cilogon.org/serverA/users/10376", ldapConfiguration.getSearchAttributes()));
             System.out.println(userInfo);

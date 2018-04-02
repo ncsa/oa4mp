@@ -4,13 +4,24 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.scopeHandlers.GroupElement;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.scopeHandlers.Groups;
 import net.sf.json.JSONArray;
 
-import java.util.StringTokenizer;
+import javax.naming.NamingException;
+import javax.naming.ldap.LdapContext;
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 3/1/18 at  4:48 PM
  */
 public class NCSAGroupHandler extends GroupHandler {
+    public NCSAGroupHandler(LDAPClaimsSource claimsSource) {
+        this.claimsSource = claimsSource;
+    }
+
+    LDAPClaimsSource claimsSource;
+
+    public NCSAGroupHandler(LdapContext ctx) {
+        this.ctx = ctx;
+    }
+
     /**
      * The form of an LDAP record is cn=group,buncha stuff.
      *
@@ -22,17 +33,53 @@ public class NCSAGroupHandler extends GroupHandler {
         Groups groups = new Groups();
         for (Object x : jsonArray) {
             if (x instanceof String) {
-                StringTokenizer st = new StringTokenizer(x.toString(), ",");
-                while (st.hasMoreTokens()) {
-                    String nextToken = st.nextToken();
-                    if (nextToken.startsWith("cn=")) {
-                        nextToken = nextToken.substring(3);
-                        GroupElement g = new GroupElement(nextToken);
-                        groups.put(g);
+                String xx = (String) x;
+                int start = xx.indexOf("cn=");
+                if (start != -1) {
+                    int end = xx.indexOf(",", start);
+                    String groupName = xx.substring(start + 3, end);
+                    int gid = 0;
+                    try {
+                        gid = getGroupID(groupName);
+                    } catch (NamingException e) {
+                        e.printStackTrace();
                     }
+                    GroupElement g = null;
+                    if (gid == -1) {
+                        // no gid
+                        g = new GroupElement(groupName);
+                    } else {
+                        g = new GroupElement(groupName, gid);
+                    }
+                    groups.put(g);
                 }
+
             }
         }
         return groups;
+    }
+
+    LdapContext ctx;
+    public synchronized int getGroupID(String groupName) throws NamingException {
+        try {
+            return LDAPClaimsSource.getGid(claimsSource.getCfg(), groupName);
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
+        return -1;
+/*
+        int gid = -1;
+        LdapContext ctx = claimsSource.createConnection();
+        SearchControls ctls = new SearchControls();
+        ctls.setReturningAttributes(new String[]{"gidNumber"});
+        String filter = "(&(cn=" + groupName + "))";
+        DebugUtil.dbg(this, "filter=" + filter);
+        NamingEnumeration e = ctx.search(claimsSource.getCfg().getContextName(), filter, ctls);
+
+        if (ctx != null) {
+            ctx.close();
+        }
+        return -1;
+*/
     }
 }

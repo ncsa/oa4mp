@@ -1,12 +1,11 @@
 package org.xsede.oa4mp;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.BasicClaimsSourceImpl;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -18,23 +17,18 @@ import javax.json.Json;
 import javax.json.JsonReader;
 import javax.json.JsonObject;
 
-import org.apache.http.util.EntityUtils;
-
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.BasicScopeHandler;
 import edu.uiuc.ncsa.security.oauth_2_0.UserInfo;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.oauth_2_0.server.UnsupportedScopeException;
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2Scopes.SCOPE_PROFILE;
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2Scopes.SCOPE_EMAIL;
 
-import java.util.logging.Logger;
-
 /**
- * XsedeScopeHandler
+ * XsedeClaimsSource
  *
  */
-public class XsedeScopeHandler extends BasicScopeHandler { 
+public class XsedeClaimsSource extends BasicClaimsSourceImpl {
     public static final String SCOPE_XSEDE = "xsede";
 
     private String OA4MP_USER = "username";
@@ -46,7 +40,7 @@ public class XsedeScopeHandler extends BasicScopeHandler {
     private String authToken;
     MyLoggingFacade myLogger;
 
-    public XsedeScopeHandler(String Username, String Password, MyLoggingFacade logger) {
+    public XsedeClaimsSource(String Username, String Password, MyLoggingFacade logger) {
         super();
         OA4MP_USER = Username;
        	OA4MP_PASSWORD = Password;
@@ -56,7 +50,7 @@ public class XsedeScopeHandler extends BasicScopeHandler {
         resetAuthToken();
     }
 
-    public XsedeScopeHandler(MyLoggingFacade logger, String ApiKey, String ApiHash, String ApiURL, String ApiResource) {
+    public XsedeClaimsSource(MyLoggingFacade logger, String ApiKey, String ApiHash, String ApiURL, String ApiResource) {
         super();
         OA4MP_API_KEY = ApiKey;
        	OA4MP_API_HASH = ApiHash;

@@ -20,9 +20,11 @@ public class OA4MPIdentifierProvider extends IdentifierProvider {
         super(scheme, schemeSpecificPart, component, useTimestamps);
     }
 
-    public OA4MPIdentifierProvider(String component) {
-        super(SCHEME, SCHEME_SPECIFIC_PART, component, true);
+    public OA4MPIdentifierProvider(String component, boolean useTimestamps) {
+        super(component, useTimestamps);
     }
-
+    public OA4MPIdentifierProvider(String component) {
+        super(component, true);
+    }
 
 }

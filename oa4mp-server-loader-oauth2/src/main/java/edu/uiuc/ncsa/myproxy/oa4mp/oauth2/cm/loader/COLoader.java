@@ -25,6 +25,7 @@ public class COLoader extends OA2ConfigurationLoader {
     @Override
     public ServiceEnvironmentImpl createInstance() {
         try {
+            initialize();
             return new COSE((MyLoggingFacade) loggerProvider.get(),
                     getTransactionStoreProvider(),
                     getClientStoreProvider(),
@@ -46,7 +47,7 @@ public class COLoader extends OA2ConfigurationLoader {
                     getMacp(),
                     getClientSecretLength(),
                     getScopes(),
-                    getScopeHandler(),
+                    getClaimSource(),
                     getLdapConfiguration(),
                     isRefreshTokenEnabled(),
                     isTwoFactorSupportEnabled(),

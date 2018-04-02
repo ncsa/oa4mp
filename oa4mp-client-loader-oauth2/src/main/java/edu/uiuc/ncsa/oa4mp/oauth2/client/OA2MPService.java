@@ -39,6 +39,7 @@ import static edu.uiuc.ncsa.security.delegation.client.AbstractClientEnvironment
  */
 public class OA2MPService extends OA4MPService {
     private static final boolean MANUAL_TEST = false;
+
     @Override
     public void preGetCert(Asset asset, Map parameters) {
         super.preGetCert(asset, parameters);
@@ -96,7 +97,7 @@ public class OA2MPService extends OA4MPService {
     protected Map<String, String> getATParameters(Asset asset, AuthorizationGrant ag, Verifier v) {
         Map<String, String> m = super.getATParameters(asset, ag, v);
         OA2Asset a = (OA2Asset) asset;
-        if(a == null){
+        if (a == null) {
             throw new GeneralException("Asset not found. You may need to clear your browser cookies.");
         }
         m.put(OA2Constants.NONCE, a.getNonce());
@@ -104,7 +105,7 @@ public class OA2MPService extends OA4MPService {
         return m;
     }
 
-    protected String requestedScopes;
+    //  protected String requestedScopes;
 
     /**
      * Override this if you need to request custom scopes (i.e. those not in the basic OA4MP specification) for a server.
@@ -116,23 +117,17 @@ public class OA2MPService extends OA4MPService {
      * @return
      */
     public String getRequestedScopes() {
-        if (requestedScopes == null) {
-            boolean firstPass = true;
-       //     String[] basicScopes = OA2Scopes.basicScopes;
-            Collection<String> targetScopes = new HashSet<>();
-            Collection<String> scopeList = ((OA2ClientEnvironment) getEnvironment()).getScopes();
-            targetScopes.addAll(scopeList);
-         /*   for (String x : basicScopes) {
-                targetScopes.add(x);
-            }*/
-            requestedScopes = "";
-            for (String scope : targetScopes) {
-                if (firstPass) {
-                    requestedScopes = scope;
-                    firstPass = false;
-                } else {
-                    requestedScopes = requestedScopes + " " + scope;
-                }
+        boolean firstPass = true;
+        String requestedScopes = "";
+        Collection<String> targetScopes = new HashSet<>();
+        Collection<String> scopeList = ((OA2ClientEnvironment) getEnvironment()).getScopes();
+        targetScopes.addAll(scopeList);
+        for (String scope : targetScopes) {
+            if (firstPass) {
+                requestedScopes = scope;
+                firstPass = false;
+            } else {
+                requestedScopes = requestedScopes + " " + scope;
             }
         }
         return requestedScopes;
@@ -183,7 +178,7 @@ public class OA2MPService extends OA4MPService {
         ATResponse2 atResponse2 = (ATResponse2) getEnvironment().getDelegationService().getAT(dar);
         asset.setIssuedAt((Date) atResponse2.getParameters().get(OA2Claims.ISSUED_AT));
         asset.setUsername((String) atResponse2.getParameters().get(OA2Claims.SUBJECT));
-        if(!NonceHerder.hasNonce((String) atResponse2.getParameters().get(OA2Constants.NONCE))){
+        if (!NonceHerder.hasNonce((String) atResponse2.getParameters().get(OA2Constants.NONCE))) {
             throw new InvalidNonceException("Unknown nonce.");
         }
         NonceHerder.removeNonce((String) atResponse2.getParameters().get(OA2Constants.NONCE)); // prevent replay attacks.
@@ -199,18 +194,19 @@ public class OA2MPService extends OA4MPService {
      * This should only be invoked during a manual test by setting the MANUAL_TEST flag to true. it will print out
      * interim results from the getCert call which can then be cut and pasted into a curl call. This is intended to be
      * a low-level debugging aid and if this test flag is enabled, then the client will be unable to actually get a cert.
+     *
      * @param a
      * @param m1
      * @return
      */
-    protected AssetResponse manualTest(OA2Asset a, Map<String,String> m1){
+    protected AssetResponse manualTest(OA2Asset a, Map<String, String> m1) {
         try {
             System.err.println(getClass().getSimpleName() + ".getAccessToken: Returned parameters");
             System.err.println("access token=" + URLEncoder.encode(a.getAccessToken().getToken(), "UTF-8") + "");
-            System.err.println("&client_id=" + URLEncoder.encode(getEnvironment().getClient().getIdentifierString(),"UTF-8") + "");
+            System.err.println("&client_id=" + URLEncoder.encode(getEnvironment().getClient().getIdentifierString(), "UTF-8") + "");
             System.err.println("&client_secret=" + URLEncoder.encode(getEnvironment().getClient().getSecret(), "UTF-8") + "");
-            System.err.println("&"+CERT_REQUEST_KEY + "=" + URLEncoder.encode(m1.get(CERT_REQUEST_KEY),"UTF-8") + "");
-        }catch(Throwable t){
+            System.err.println("&" + CERT_REQUEST_KEY + "=" + URLEncoder.encode(m1.get(CERT_REQUEST_KEY), "UTF-8") + "");
+        } catch (Throwable t) {
             System.err.println(getClass().getSimpleName() + ".getCert: attempt to get response parameters failed.");
             t.printStackTrace();
         }
@@ -234,7 +230,9 @@ public class OA2MPService extends OA4MPService {
         Map<String, String> m1 = getAssetParameters(a);
 
         preGetCert(a, m1);
-        if(MANUAL_TEST) {return manualTest(a,m1);}
+        if (MANUAL_TEST) {
+            return manualTest(a, m1);
+        }
         DelegatedAssetResponse daResp = getEnvironment().getDelegationService().getCert(atResponse2, getEnvironment().getClient(), m1);
 
         AssetResponse par = new AssetResponse();

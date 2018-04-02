@@ -2,7 +2,7 @@ package edu.uiuc.ncsa.myproxy.loader;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2ConfigurationLoader;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.oauth_2_0.server.ScopeHandler;
+import edu.uiuc.ncsa.security.oauth_2_0.server.ClaimSource;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
 /**
@@ -19,7 +19,7 @@ public class OIDC2FAConfigLoader extends OA2ConfigurationLoader{
     }
 
     @Override
-    public ScopeHandler getScopeHandler() throws ClassNotFoundException, IllegalAccessException, InstantiationException {
-        return super.getScopeHandler();
+    public ClaimSource getClaimSource() throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+        return super.getClaimSource();
     }
 }

@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.scopeHandlers;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.BasicScopeHandler;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.BasicClaimsSourceImpl;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.oauth_2_0.UserInfo;
@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletRequest;
  * <p>Created by Jeff Gaynor<br>
  * on 3/15/17 at  2:41 PM
  */
-public class HTTPHeaderScopeHandler extends BasicScopeHandler {
+public class HTTPHeaderClaimsSource extends BasicClaimsSourceImpl {
 
     @Override
     public UserInfo process(UserInfo userInfo, HttpServletRequest request, ServiceTransaction transaction) throws UnsupportedScopeException {

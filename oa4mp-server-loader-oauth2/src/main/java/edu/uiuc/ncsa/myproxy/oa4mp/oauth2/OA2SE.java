@@ -2,7 +2,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.ldap.LDAPEntry;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.ldap.LDAPStore;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.BasicScopeHandler;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.BasicClaimsSourceImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.MyProxyFacadeProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironmentImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
@@ -20,7 +20,7 @@ import edu.uiuc.ncsa.security.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.security.delegation.storage.TransactionStore;
 import edu.uiuc.ncsa.security.delegation.token.TokenForge;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Scopes;
-import edu.uiuc.ncsa.security.oauth_2_0.server.ScopeHandler;
+import edu.uiuc.ncsa.security.oauth_2_0.server.ClaimSource;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
 import edu.uiuc.ncsa.security.servlet.UsernameTransformer;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
@@ -57,7 +57,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
                  Provider<AdminClientStore> acs,
                  int clientSecretLength,
                  Collection<String> scopes,
-                 ScopeHandler scopeHandler,
+                 ClaimSource claimSource,
                  LDAPConfiguration ldapConfiguration2,
                  boolean isRefreshTokenEnabled,
                  boolean twoFactorSupportEnabled,
@@ -91,7 +91,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
         }
         this.clientSecretLength = clientSecretLength;
         this.scopes = scopes;
-        this.scopeHandler = scopeHandler;
+        this.claimSource = claimSource;
         OA2Scopes.ScopeUtil.setScopes(scopes); //Probably need a better place to do this at some point. Probably.
 
         this.refreshTokenEnabled = isRefreshTokenEnabled;
@@ -107,9 +107,9 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.jsonWebKeys = jsonWebKeys;
         this.issuer = issuer;
         this.mldap = mldap;
-        if (scopeHandler instanceof BasicScopeHandler) {
-            DebugUtil.dbg(this, "***Setting runtime environment in the scope handler:" + scopeHandler.getClass().getSimpleName());
-            ((BasicScopeHandler) scopeHandler).setOa2SE(this);
+        if (claimSource instanceof BasicClaimsSourceImpl) {
+            DebugUtil.dbg(this, "***Setting runtime environment in the scope handler:" + claimSource.getClass().getSimpleName());
+            ((BasicClaimsSourceImpl) claimSource).setOa2SE(this);
         }
         this.acs = acs;
         this.utilServletEnabled = utilServletEnabled;
@@ -191,7 +191,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
         return clientSecretLength;
     }
 
-    protected ScopeHandler scopeHandler;
+    protected ClaimSource claimSource;
     Collection<String> scopes;
 
     public Collection<String> getScopes() {
@@ -202,16 +202,16 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.scopes = scopes;
     }
 
-    public ScopeHandler getScopeHandler() {
-        return scopeHandler;
+    public ClaimSource getClaimSource() {
+        return claimSource;
     }
 
-    public void setScopeHandler(ScopeHandler scopeHandler) {
-        this.scopeHandler = scopeHandler;
+    public void setClaimSource(ClaimSource claimSource) {
+        this.claimSource = claimSource;
     }
 
     public boolean hasScopeHandler() {
-        return scopeHandler != null;
+        return claimSource != null;
     }
 
     public LDAPConfiguration getLdapConfiguration() {

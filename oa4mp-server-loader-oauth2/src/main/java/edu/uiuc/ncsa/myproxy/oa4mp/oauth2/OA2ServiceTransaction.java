@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowStates;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.OA4MPServiceTransaction;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
@@ -20,6 +21,20 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction {
 
     public OA2ServiceTransaction(Identifier identifier) {
         super(identifier);
+    }
+
+
+     FlowStates flowStates;
+
+    public FlowStates getFlowStates() {
+        if(flowStates == null){
+            flowStates = new FlowStates();
+        }
+        return flowStates;
+    }
+
+    public void setFlowStates(FlowStates flowStates) {
+        this.flowStates = flowStates;
     }
 
     RefreshToken refreshToken;

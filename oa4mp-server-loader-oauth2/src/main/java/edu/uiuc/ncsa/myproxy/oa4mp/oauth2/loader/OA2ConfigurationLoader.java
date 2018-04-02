@@ -4,8 +4,8 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.ldap.LDAPStoreProviderUtil;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.ldap.MultiLDAPStoreProvider;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.BasicScopeHandler;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.LDAPScopeHandler;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.BasicClaimsSourceImpl;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.LDAPClaimsSource;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.*;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.ClientApprovalProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.OA4MPConfigTags;
@@ -45,8 +45,8 @@ import edu.uiuc.ncsa.security.delegation.token.TokenForge;
 import edu.uiuc.ncsa.security.oauth_2_0.*;
 import edu.uiuc.ncsa.security.oauth_2_0.server.AGI2;
 import edu.uiuc.ncsa.security.oauth_2_0.server.ATI2;
+import edu.uiuc.ncsa.security.oauth_2_0.server.ClaimSource;
 import edu.uiuc.ncsa.security.oauth_2_0.server.PAI2;
-import edu.uiuc.ncsa.security.oauth_2_0.server.ScopeHandler;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfigurationUtil;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
@@ -63,8 +63,6 @@ import java.util.HashMap;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.OA4MPIdentifierProvider.TRANSACTION_ID;
 import static edu.uiuc.ncsa.security.core.configuration.Configurations.*;
-import static edu.uiuc.ncsa.security.core.util.IdentifierProvider.SCHEME;
-import static edu.uiuc.ncsa.security.core.util.IdentifierProvider.SCHEME_SPECIFIC_PART;
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2ConfigTags.*;
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.*;
 
@@ -91,6 +89,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
     @Override
     public T createInstance() {
         try {
+            initialize();
             T se = (T) new OA2SE(loggerProvider.get(),
                     getTransactionStoreProvider(),
                     getClientStoreProvider(),
@@ -112,7 +111,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     getMacp(),
                     getClientSecretLength(),
                     getScopes(),
-                    getScopeHandler(),
+                    getClaimSource(),
                     getLdapConfiguration(),
                     isRefreshTokenEnabled(),
                     isTwoFactorSupportEnabled(),
@@ -121,8 +120,8 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     getIssuer(),
                     getMLDAP(),
                     isUtilServerEnabled());
-            if (getScopeHandler() instanceof BasicScopeHandler) {
-                ((BasicScopeHandler) getScopeHandler()).setOa2SE((OA2SE) se);
+            if (getClaimSource() instanceof BasicClaimsSourceImpl) {
+                ((BasicClaimsSourceImpl) getClaimSource()).setOa2SE((OA2SE) se);
             }
             return se;
         } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
@@ -380,46 +379,46 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
 
     Boolean refreshTokenEnabled = null;
     Collection<String> scopes = null;
-    protected ScopeHandler scopeHandler;
+    protected ClaimSource claimSource;
 
-    public ScopeHandler getScopeHandler() throws ClassNotFoundException, IllegalAccessException, InstantiationException {
-        DebugUtil.dbg(this, "Getting scope handler " + scopeHandler);
-        if (scopeHandler == null) {
+    public ClaimSource getClaimSource() throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+        DebugUtil.dbg(this, "Getting scope handler " + claimSource);
+        if (claimSource == null) {
             // This gets the scopes if any and injects them into the scope handler.
             if (0 < cn.getChildrenCount(SCOPES)) {
                 String scopeHandlerName = getFirstAttribute(Configurations.getFirstNode(cn, SCOPES), SCOPE_HANDLER);
                 if (scopeHandlerName != null) {
                     Class<?> k = Class.forName(scopeHandlerName);
                     Object x = k.newInstance();
-                    if (!(x instanceof ScopeHandler)) {
+                    if (!(x instanceof ClaimSource)) {
                         throw new GeneralException("The scope handler specified by the class name \"" +
                                 scopeHandlerName + "\" does not extend the ScopeHandler " +
                                 "interface and therefore cannot be used to handle scopes.");
                     }
-                    scopeHandler = (ScopeHandler) x;
+                    claimSource = (ClaimSource) x;
                 } else {
                     info("Scope handler attribute found in configuration, but no value was found for it. Skipping custom loaded scope handling.");
                 }
             }
 
             // no scopes element, so just use the basic handler.
-            if (scopeHandler == null) {
+            if (claimSource == null) {
 
                 DebugUtil.dbg(this, "No server-wide configured Scope handler");
                 if (getLdapConfiguration().isEnabled()) {
                     DebugUtil.dbg(this, "   LDAP scope handler enabled, creating default");
 
-                    scopeHandler = new LDAPScopeHandler(getLdapConfiguration(), myLogger);
+                    claimSource = new LDAPClaimsSource(getLdapConfiguration(), myLogger);
                 } else {
                     DebugUtil.dbg(this, "   LDAP scope handler disabled, creating basic");
-                    scopeHandler = new BasicScopeHandler();
+                    claimSource = new BasicClaimsSourceImpl();
                 }
             }
-            scopeHandler.setScopes(getScopes());
-            DebugUtil.dbg(this, "   Actual scope handler = " + scopeHandler.getClass().getSimpleName());
+            claimSource.setScopes(getScopes());
+            DebugUtil.dbg(this, "   Actual scope handler = " + claimSource.getClass().getSimpleName());
 
         }
-        return scopeHandler;
+        return claimSource;
     }
 
     LDAPConfiguration ldapConfiguration;
@@ -581,7 +580,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
 
     @Override
     protected Provider<TransactionStore> getTSP() {
-        IdentifiableProvider tp = new ST2Provider(new OA4MPIdentifierProvider(SCHEME, SCHEME_SPECIFIC_PART, TRANSACTION_ID, false));
+        IdentifiableProvider tp = new ST2Provider(new OA4MPIdentifierProvider(TRANSACTION_ID, false));
         OA2TransactionKeys keys = new OA2TransactionKeys();
         OA2TConverter<OA2ServiceTransaction> tc = new OA2TConverter<OA2ServiceTransaction>(keys, tp, getTokenForgeProvider().get(), getClientStoreProvider().get());
         return getTSP(tp, tc);
@@ -626,7 +625,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
 
     @Override
     public IdentifiableProvider<? extends Client> getClientProvider() {
-        return new OA2ClientProvider(new OA4MPIdentifierProvider(SCHEME, SCHEME_SPECIFIC_PART, OA2Constants.CLIENT_ID, false));
+        return new OA2ClientProvider(new OA4MPIdentifierProvider(OA2Constants.CLIENT_ID, false));
     }
 
     @Override

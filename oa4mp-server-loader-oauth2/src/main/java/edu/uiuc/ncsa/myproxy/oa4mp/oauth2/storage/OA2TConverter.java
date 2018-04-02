@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowStates;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.TransactionConverter;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientStore;
@@ -10,6 +11,7 @@ import edu.uiuc.ncsa.security.delegation.token.TokenForge;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2TokenForge;
 import edu.uiuc.ncsa.security.storage.data.ConversionMap;
 import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
 
 import java.util.Collection;
@@ -48,12 +50,17 @@ public class OA2TConverter<V extends OA2ServiceTransaction> extends TransactionC
         st.setCallback(map.getURI(getTCK().callbackUri()));
         st.setNonce(map.getString(getTCK().nonce()));
         if (map.get(getTCK().scopes()) != null) {
-            net.sf.json.JSONArray json = (net.sf.json.JSONArray) JSONSerializer.toJSON(map.get(getTCK().scopes()));
+            net.sf.json.JSONArray json = (JSONArray) JSONSerializer.toJSON(map.get(getTCK().scopes()));
             Collection<String> zzz = (Collection<String>) JSONSerializer.toJava(json);
             st.setScopes(zzz);
         }
-        if(map.get(getTCK().authTime()) != null){
+        if (map.get(getTCK().authTime()) != null) {
             st.setAuthTime(map.getDate(getTCK().authTime));
+        }
+        if (map.get(getTCK().flowStates()) != null) {
+            st.setFlowStates(new FlowStates((JSONObject) JSONSerializer.toJSON(map.get(getTCK().flowStates()))));
+        } else {
+            st.setFlowStates(new FlowStates());
         }
         return st;
     }
@@ -80,9 +87,10 @@ public class OA2TConverter<V extends OA2ServiceTransaction> extends TransactionC
             jsonArray.add(s);
         }
         map.put(getTCK().scopes(), jsonArray.toString());
-        if(t.hasAuthTime()){
+        if (t.hasAuthTime()) {
             map.put(getTCK().authTime(), t.getAuthTime());
         }
+        map.put(getTCK().flowStates(), t.getFlowStates().toJSON().toString());
     }
 
 }

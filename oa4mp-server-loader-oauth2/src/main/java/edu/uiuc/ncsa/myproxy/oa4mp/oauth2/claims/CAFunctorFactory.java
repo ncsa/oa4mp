@@ -1,11 +1,15 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.*;
 import edu.uiuc.ncsa.security.util.configuration.TemplateUtil;
 import edu.uiuc.ncsa.security.util.functor.JFunctor;
 import edu.uiuc.ncsa.security.util.functor.JFunctorFactory;
 import net.sf.json.JSONObject;
 
-import java.util.HashMap;
+import java.util.Map;
+
+import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.FunctorClaimsType.*;
+import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowType.GET_CERT;
 
 /**
  * A Claims Aware functor factory. This will replace templates with their values
@@ -14,11 +18,13 @@ import java.util.HashMap;
  * on 3/1/18 at  10:09 AM
  */
 public class CAFunctorFactory extends JFunctorFactory {
-    public CAFunctorFactory(HashMap<String, String> claims) {
+    public CAFunctorFactory(Map<String, Object> claims) {
         this.claims = claims;
     }
 
-    HashMap<String, String> claims;
+
+    protected Map<String, Object> claims;
+
 
     public boolean hasClaims() {
         return claims != null;
@@ -36,14 +42,35 @@ public class CAFunctorFactory extends JFunctorFactory {
             // already got one.
             return ff;
         }
-        if (rawJson.containsKey("exclude")) {
+        if (hasEnum(rawJson, EXCLUDE)) {
             ff = new jExclude(claims);
         }
-        if (rawJson.containsKey("$include")) {
+        if (hasEnum(rawJson, INCLUDE)) {
             ff = new jInclude(claims);
         }
-        if (rawJson.containsKey("$set")) {
+        if (hasEnum(rawJson, SET)) {
             ff = new jSet(claims);
+        }
+        if (hasEnum(rawJson, FlowType.ACCEPT_REQUESTS)) {
+            ff = new jAcceptRequests();
+        }
+        if (hasEnum(rawJson, FlowType.ACCESS_TOKEN)) {
+            ff = new jAccessToken();
+        }
+
+        if (hasEnum(rawJson, GET_CERT)) {
+            ff = new jGetCert();
+        }
+
+        if (hasEnum(rawJson, FlowType.ID_TOKEN)) {
+            ff = new jIDToken();
+        }
+        if (hasEnum(rawJson, FlowType.REFRESH_TOKEN)) {
+            ff = new jRefreshToken();
+        }
+
+        if (hasEnum(rawJson, FlowType.USER_INFO)) {
+            ff = new jUserInfo();
         }
         return ff;
     }

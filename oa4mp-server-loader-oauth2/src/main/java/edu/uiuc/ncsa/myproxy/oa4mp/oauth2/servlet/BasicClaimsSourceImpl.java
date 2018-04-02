@@ -2,10 +2,12 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
+import edu.uiuc.ncsa.security.oauth_2_0.OA2Client;
 import edu.uiuc.ncsa.security.oauth_2_0.UserInfo;
+import edu.uiuc.ncsa.security.oauth_2_0.server.ClaimSource;
 import edu.uiuc.ncsa.security.oauth_2_0.server.OA2Claims;
-import edu.uiuc.ncsa.security.oauth_2_0.server.ScopeHandler;
 import edu.uiuc.ncsa.security.oauth_2_0.server.UnsupportedScopeException;
+import net.sf.json.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
@@ -16,12 +18,12 @@ import java.util.Map;
  * <p>Created by Jeff Gaynor<br>
  * on 8/17/15 at  4:10 PM
  */
-public class BasicScopeHandler implements ScopeHandler {
-    public BasicScopeHandler(OA2SE oa2SE) {
+public class BasicClaimsSourceImpl implements ClaimSource {
+    public BasicClaimsSourceImpl(OA2SE oa2SE) {
         this.oa2SE = oa2SE;
     }
 
-    public BasicScopeHandler() {
+    public BasicClaimsSourceImpl() {
     }
 
     public void setEnabled(boolean enabled) {
@@ -76,24 +78,23 @@ public class BasicScopeHandler implements ScopeHandler {
      */
     @Override
     public UserInfo process(UserInfo userInfo, HttpServletRequest request, ServiceTransaction transaction) throws UnsupportedScopeException {
-        Map<String,Object> claims =userInfo.getMap();
-        claims = getClaimsHandler().process(claims);
-        userInfo.setMap(claims);
+        if(claimsProcessor != null) {
+            Map<String,Object> claims =userInfo.getMap();
+            claims = getClaimsHandler(((OA2Client)transaction.getClient()).getClaimsConfig()).process(claims);
+            userInfo.setMap(claims);
+        }
         return userInfo;
     }
 
-    public ClaimsHandler getClaimsHandler() {
-        if(claimsHandler == null){
-            claimsHandler = new ClaimsHandler();
+    public ClaimsProcessor getClaimsHandler(JSONObject config) {
+        if(claimsProcessor == null){
+            claimsProcessor = new ClaimsProcessor(config);
         }
-        return claimsHandler;
+        return claimsProcessor;
     }
 
-    public void setClaimsHandler(ClaimsHandler claimsHandler) {
-        this.claimsHandler = claimsHandler;
-    }
 
-    ClaimsHandler claimsHandler;
+    ClaimsProcessor claimsProcessor;
     @Override
     public void setScopes(Collection<String> scopes) {
         this.scopes = scopes;

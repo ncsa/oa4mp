@@ -8,6 +8,7 @@ import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
+import edu.uiuc.ncsa.security.oauth_2_0.OA2Client;
 import edu.uiuc.ncsa.security.oauth_2_0.UserInfo;
 import edu.uiuc.ncsa.security.oauth_2_0.server.UnsupportedScopeException;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
@@ -32,9 +33,9 @@ import java.util.Map;
  * <p>Created by Jeff Gaynor<br>
  * on 4/26/16 at  3:32 PM
  */
-public class LDAPScopeHandler extends BasicScopeHandler implements Logable {
+public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
 
-    public LDAPScopeHandler(LDAPConfiguration ldapConfiguration, MyLoggingFacade myLogger) {
+    public LDAPClaimsSource(LDAPConfiguration ldapConfiguration, MyLoggingFacade myLogger) {
         this.ldapConfiguration = ldapConfiguration;
         this.myLogger = myLogger;
         if (myLogger != null) {
@@ -47,7 +48,7 @@ public class LDAPScopeHandler extends BasicScopeHandler implements Logable {
     protected GroupHandler groupHandler = null;
 
     public GroupHandler getGroupHandler() {
-        if(groupHandler == null){
+        if (groupHandler == null) {
             groupHandler = new GroupHandler(); // default
         }
         return groupHandler;
@@ -57,10 +58,10 @@ public class LDAPScopeHandler extends BasicScopeHandler implements Logable {
         this.groupHandler = groupHandler;
     }
 
-    public LDAPScopeHandler(OA2SE oa2SE) {
+    public LDAPClaimsSource(OA2SE oa2SE) {
         super(oa2SE);
         this.myLogger = oa2SE.getMyLogger();
-        loggingEnabled = (this.myLogger!=null);
+        loggingEnabled = (this.myLogger != null);
     }
 
 
@@ -103,7 +104,7 @@ public class LDAPScopeHandler extends BasicScopeHandler implements Logable {
         }
         String searchName = (String) userInfo.getMap().get(getCfg().getSearchNameKey());
 
-        if (getCfg().getServer().equals("ldap.ncsa.illinois.edu")) {
+        if (isNCSA()) {
             DebugUtil.dbg(this, "Getting search name for NCSA LDAP");
 
             //searchName = (String) userInfo.getMap().get(CILogonScopeHandler.CILogonClaims.EPPN);
@@ -121,6 +122,9 @@ public class LDAPScopeHandler extends BasicScopeHandler implements Logable {
         return searchName;
     }
 
+    protected boolean isNCSA(){
+        return getCfg().getServer().equals("ldap.ncsa.illinois.edu");
+    }
     MyLoggingFacade myLogger = null;
 
     protected MyLoggingFacade getMyLogger() {
@@ -154,6 +158,12 @@ public class LDAPScopeHandler extends BasicScopeHandler implements Logable {
 
     }
 
+    protected Groups processNCSAGroups() {
+        Groups groups = new Groups();
+
+        return groups;
+    }
+
     @Override
     public boolean isEnabled() {
         return getCfg().isEnabled();
@@ -172,7 +182,7 @@ public class LDAPScopeHandler extends BasicScopeHandler implements Logable {
         if (!isLoggedOn()) {
             logon();
         }
-        DebugUtil.dbg(this, "   logged on");
+        DebugUtil.dbg(this, "   logged on? " + isLoggedOn());
         DebugUtil.dbg(this, "Claims=" + getClaims());
         try {
             String searchName = getSearchName(userInfo, request, transaction);
@@ -180,13 +190,15 @@ public class LDAPScopeHandler extends BasicScopeHandler implements Logable {
 
             if (searchName != null) {
                 Map tempMap = simpleSearch(context, searchName, getCfg().getSearchAttributes());
-                DebugUtil.dbg(this,"returned from search:" + tempMap);
+                DebugUtil.dbg(this, "returned from search:" + tempMap);
                 userInfo.getMap().putAll(tempMap);
             } else {
                 info("No search name encountered for LDAP query. No search performed.");
             }
             DebugUtil.dbg(this, "user info =" + userInfo.getMap());
-
+            Map<String, Object> claims = userInfo.getMap();
+            claims = getClaimsHandler(((OA2Client) transaction.getClient()).getClaimsConfig()).process(claims);
+            userInfo.setMap(claims);
             context.close();
         } catch (Throwable throwable) {
             handleException(throwable);
@@ -212,49 +224,58 @@ public class LDAPScopeHandler extends BasicScopeHandler implements Logable {
         return ldapConfiguration;
     }
 
-    protected boolean logon() {
+
+    public boolean logon() {
+        context = createConnection();
+        return context != null;
+
+    }
+
+    public Hashtable<String, String> createEnv(LDAPConfiguration cfg) {
+        Hashtable<String, String> env = new Hashtable<String, String>();
+        env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
+        String providerUrl = "ldaps://" + cfg.getServer();
+        if (0 <= cfg.getPort()) {
+            providerUrl = providerUrl + ":" + cfg.getPort();
+        }
+        env.put(Context.PROVIDER_URL, providerUrl);
+        switch (cfg.getAuthType()) {
+            case LDAPConfigurationUtil.LDAP_AUTH_NONE_KEY:
+                env.put(Context.SECURITY_AUTHENTICATION, LDAPConfigurationUtil.LDAP_AUTH_NONE);
+                env.put(Context.SECURITY_PROTOCOL, "ssl");
+
+                break;
+            case LDAPConfigurationUtil.LDAP_AUTH_SIMPLE_KEY:
+                env.put(Context.SECURITY_AUTHENTICATION, LDAPConfigurationUtil.LDAP_AUTH_SIMPLE);
+                env.put(Context.SECURITY_PRINCIPAL, cfg.getSecurityPrincipal());
+                env.put(Context.SECURITY_CREDENTIALS, cfg.getPassword());
+                env.put(Context.SECURITY_PROTOCOL, "ssl");
+                break;
+            case LDAPConfigurationUtil.LDAP_AUTH_STRONG_KEY:
+                env.put(Context.SECURITY_AUTHENTICATION, LDAPConfigurationUtil.LDAP_AUTH_STRONG);
+                env.put(Context.SECURITY_PRINCIPAL, cfg.getSecurityPrincipal());
+                env.put(Context.SECURITY_CREDENTIALS, cfg.getPassword());
+                env.put(Context.SECURITY_PROTOCOL, "ssl");
+                break;
+            default:
+            case LDAPConfigurationUtil.LDAP_AUTH_UNSPECIFIED_KEY:
+        }
+        DebugUtil.dbg(this, "LDAP environment is " + env);
+        return env;
+    }
+
+    public LdapContext createConnection() {
         try {
             // Set up the environment for creating the initial context
-            Hashtable<String, String> env = new Hashtable<String, String>();
-            env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-       //     env.put("java.naming.ldap.factory.socket", "edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.LDAPSSLSocketFactory");
 
-            String providerUrl = "ldaps://" + getCfg().getServer();
-            if (0 <= getCfg().getPort()) {
-                providerUrl = providerUrl + ":" + getCfg().getPort();
-            }
-            env.put(Context.PROVIDER_URL, providerUrl);
-            switch (getCfg().getAuthType()) {
-                case LDAPConfigurationUtil.LDAP_AUTH_NONE_KEY:
-                    env.put(Context.SECURITY_AUTHENTICATION, LDAPConfigurationUtil.LDAP_AUTH_NONE);
-                    env.put(Context.SECURITY_PROTOCOL, "ssl");
-
-                    break;
-                case LDAPConfigurationUtil.LDAP_AUTH_SIMPLE_KEY:
-                    env.put(Context.SECURITY_AUTHENTICATION, LDAPConfigurationUtil.LDAP_AUTH_SIMPLE);
-                    env.put(Context.SECURITY_PRINCIPAL, getCfg().getSecurityPrincipal());
-                    env.put(Context.SECURITY_CREDENTIALS, getCfg().getPassword());
-                    env.put(Context.SECURITY_PROTOCOL, "ssl");
-                    break;
-                case LDAPConfigurationUtil.LDAP_AUTH_STRONG_KEY:
-                    env.put(Context.SECURITY_AUTHENTICATION, LDAPConfigurationUtil.LDAP_AUTH_STRONG);
-                    env.put(Context.SECURITY_PRINCIPAL, getCfg().getSecurityPrincipal());
-                    env.put(Context.SECURITY_CREDENTIALS, getCfg().getPassword());
-                    env.put(Context.SECURITY_PROTOCOL, "ssl");
-                    break;
-                default:
-                case LDAPConfigurationUtil.LDAP_AUTH_UNSPECIFIED_KEY:
-            }
-             DebugUtil.dbg(this, "LDAP environment is " + env);
-            DirContext dirContext = new InitialDirContext(env);
-            context = (LdapContext) dirContext.lookup(getCfg().getSearchBase());
-            return context != null;
+            DirContext dirContext = new InitialDirContext(createEnv(getCfg()));
+            return (LdapContext) dirContext.lookup(getCfg().getSearchBase());
         } catch (Exception e) {
             if (isDebugOn()) {
                 e.printStackTrace();
             }
             error("Error logging into LDAP server", e);
-            return false;
+            return null;
         }
     }
 
@@ -316,7 +337,6 @@ public class LDAPScopeHandler extends BasicScopeHandler implements Logable {
         while (e.hasMore()) {
             SearchResult entry = (SearchResult) e.next();
             Attributes a = entry.getAttributes();
-            System.out.println(entry.getName());
             for (String attribID : attributes.keySet()) {
                 Attribute attribute = a.get(attribID);
                 DebugUtil.dbg(this, "returned LDAP attribute=" + attribute);
@@ -325,10 +345,16 @@ public class LDAPScopeHandler extends BasicScopeHandler implements Logable {
                 }
                 if (attributes.get(attribID).isGroup) {
                     JSONArray jsonAttribs = new JSONArray();
-                                          for (int i = 0; i < attribute.size(); i++) {
-                                              jsonAttribs.add(attribute.get(i));
-                                          }
-                    Groups groups =getGroupHandler().parse(jsonAttribs);
+                    for (int i = 0; i < attribute.size(); i++) {
+                        jsonAttribs.add(attribute.get(i));
+                    }
+                    GroupHandler gg = null;
+                    if (isNCSA()) {
+                        gg = new NCSAGroupHandler(this);
+                    } else {
+                        gg = getGroupHandler();
+                    }
+                    Groups groups = gg.parse(jsonAttribs);
                     json.put(attributes.get(attribID).targetName, groups.toJSON());
                 } else {
                     if (attribute.size() == 1) {
@@ -441,13 +467,32 @@ public class LDAPScopeHandler extends BasicScopeHandler implements Logable {
 
     @Override
     public String toString() {
-        return "LDAPScopeHandler{" +
-                (ldapConfiguration == null?"(no config)":ldapConfiguration.getServer())+"}";
+        return "LDAPClaimsSource{" +
+                (ldapConfiguration == null ? "(no config)" : ldapConfiguration.getServer()) + "}";
     }
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
         try {
-            String rawLdap = "{\"ldap\":{\"failOnError\":\"false\",\"address\":\"ldap.ncsa.illinois.edu\",\"port\":636,\"enabled\":\"true\",\"authorizationType\":\"none\",\"searchName\":\"eppn\",\"searchAttributes\":[{\"name\":\"mail\",\"returnAsList\":false,\"returnName\":\"mail\"},{\"name\":\"cn\",\"returnAsList\":false,\"returnName\":\"name\"},{\"name\":\"memberOf\",\"returnAsList\":false,\"returnName\":\"isMemberOf\"}],\"searchBase\":\"ou=People,dc=ncsa,dc=illinois,dc=edu\",\"contextName\":\"\",\"ssl\":{\"tlsVersion\":\"TLS\",\"useJavaTrustStore\":true}}}";
+            String rawLdap = "{\"ldap\":{\"failOnError\":\"false\"," +
+                    "\"address\":\"ldap.ncsa.illinois.edu\"," +
+                    "\"port\":636," +
+                    "\"enabled\":\"true\"," +
+                    "\"authorizationType\":\"none\"," +
+                    "\"searchName\":\"eppn\"," +
+                    "\"searchAttributes\":[{" +
+                    "\"name\":\"mail\"," +
+                    "\"returnAsList\":false," +
+                    "\"returnName\":\"mail\"}," +
+                    "{\"name\":\"cn\"," +
+                    "\"returnAsList\":false," +
+                    "\"returnName\":\"name\"}," +
+                    "{\"name\":\"memberOf\"," +
+                    "\"returnAsList\":false," +
+                    "\"isGroup\":true," +
+                    "\"returnName\":\"isMemberOf\"}]," +
+                    "\"searchBase\":\"ou=People,dc=ncsa,dc=illinois,dc=edu\"," +
+                    "\"contextName\":\"\"," +
+                    "\"ssl\":{\"tlsVersion\":\"TLS\",\"useJavaTrustStore\":true}}}";
             String rawLdap2 = "{\"ldap\": {\n" +
                     "  \"address\": \"registry-test.cilogon.org\",\n" +
                     "  \"port\": 636,\n" +
@@ -482,17 +527,46 @@ public class LDAPScopeHandler extends BasicScopeHandler implements Logable {
             DebugUtil.setIsEnabled(true);
             ServiceTransaction st = new ServiceTransaction(BasicIdentifier.newID("foo"));
             st.setUsername("jbasney@ncsa.illinois.edu");
-            JSONObject json = JSONObject.fromObject(rawLdap2);
-            System.out.println(json.toString(2));
+            JSONObject json = JSONObject.fromObject(rawLdap);
             LDAPConfiguration cfg = LDAPConfigurationUtil.fromJSON(json);
-            LDAPScopeHandler sh = new LDAPScopeHandler(cfg, null);
+            LDAPClaimsSource claimsSource = new LDAPClaimsSource(cfg, null);
             UserInfo ui = new UserInfo();
             ui.getMap().put("username", "jbasney@ncsa.illinois.edu");
-            UserInfo ui2 = sh.process(ui, st);
+            ui.getMap().put("eppn", "jbasney@ncsa.illinois.edu");
+            UserInfo ui2 = claimsSource.process(ui, st);
             System.out.println("Result of LDAP query:");
             System.out.println(ui2.getMap());
-        }catch(Throwable t){
+         //   getGid(cfg, "lsst_users");
+        } catch (Throwable t) {
             t.printStackTrace();
+
         }
+    }
+
+    public static int getGid(LDAPConfiguration cfg2, String groupName) throws Throwable {
+        LDAPConfiguration cfg = cfg2.clone();
+        cfg.setSearchBase("ou=Groups,dc=ncsa,dc=illinois,dc=edu");
+        LDAPClaimsSource claimsSource = new LDAPClaimsSource(cfg, null);
+        DirContext dirContext = new InitialDirContext(claimsSource.createEnv(cfg));
+        LdapContext ctx = (LdapContext) dirContext.lookup(cfg.getSearchBase());
+        SearchControls ctls = new SearchControls();
+        ctls.setReturningAttributes(new String[]{"gidNumber"});
+        String filter = "(&(cn=" + groupName + "))";
+        NamingEnumeration e = ctx.search(cfg.getContextName(), filter, ctls);
+        while (e.hasMoreElements()) {
+            SearchResult entry = (SearchResult) e.next();
+            Attributes a = entry.getAttributes();
+
+            Attribute attribute = a.get("gidNumber");
+            if (attribute == null) {
+                continue;
+            }
+            String xxx = String.valueOf(attribute.get(0));
+            if (xxx != null && !xxx.isEmpty()) {
+                ctx.close();
+                return Integer.parseInt(xxx);
+            }
+        }
+        return -1;
     }
 }

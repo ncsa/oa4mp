@@ -11,7 +11,6 @@ import net.sf.json.util.JSONUtils;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.PrintWriter;
-import java.net.URI;
 import java.util.Collection;
 
 /**
@@ -91,8 +90,8 @@ public class OA2DiscoveryServlet extends DiscoveryServlet {
         responseTypes.add("id_token");
         json.put("response_types_supported", responseTypes);
         JSONArray claimsSupported = new JSONArray();
-        if (oa2SE.getScopeHandler() != null) {
-            claimsSupported.addAll(oa2SE.getScopeHandler().getClaims());
+        if (oa2SE.getClaimSource() != null) {
+            claimsSupported.addAll(oa2SE.getClaimSource().getClaims());
             json.put("claims_supported", claimsSupported);
         }
         JSONArray signingAlgs = new JSONArray();

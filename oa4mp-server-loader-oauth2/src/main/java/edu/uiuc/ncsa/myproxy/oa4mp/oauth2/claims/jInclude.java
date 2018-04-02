@@ -2,9 +2,11 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
 
 import edu.uiuc.ncsa.security.util.functor.JFunctor;
 
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+
+import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.FunctorClaimsType.INCLUDE;
 
 /**
  * This will include only the list of claims in the final claims object.
@@ -12,8 +14,8 @@ import java.util.Set;
  * on 3/1/18 at  12:11 PM
  */
 public class jInclude extends ClaimFunctor {
-    public jInclude(HashMap<String, String> claims) {
-        super("$include", claims);
+    public jInclude(Map<String, Object> claims) {
+        super(INCLUDE, claims);
     }
 
     @Override

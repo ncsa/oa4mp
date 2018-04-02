@@ -18,6 +18,7 @@ import edu.uiuc.ncsa.security.core.configuration.Configurations;
 import edu.uiuc.ncsa.security.core.configuration.provider.CfgEvent;
 import edu.uiuc.ncsa.security.core.configuration.provider.TypedProvider;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
+import edu.uiuc.ncsa.security.core.util.IdentifierProvider;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApprovalStore;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientStore;
@@ -104,6 +105,24 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
                     convertDNToGlobusID);
         }
         return authorizationServletConfig;
+    }
+
+    /**
+     * This has things that need to be executed before other code, e.g. setting up schemes for creating identifiers.
+     *
+     * @throws Exception
+     */
+    protected void initialize() {
+        String scheme = Configurations.getFirstAttribute(cn, OA4MPConfigTags.ID_SCHEME);
+        if (scheme == null && !scheme.isEmpty()) {
+            IdentifierProvider.setScheme(scheme);
+        }
+        // scheme specific part
+        String spp = Configurations.getFirstAttribute(cn, OA4MPConfigTags.ID_SPP);
+        if (spp != null && !spp.isEmpty()) {
+            IdentifierProvider.setSchemeSpecificPart(spp);
+        }
+
     }
 
     protected AuthorizationServletConfig authorizationServletConfig;
@@ -287,7 +306,7 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
 
     @Override
     public T createInstance() {
-
+        initialize();
         return (T) new ServiceEnvironmentImpl(loggerProvider.get(),
                 getMyProxyFacadeProvider(),
                 getTransactionStoreProvider(),
@@ -375,7 +394,7 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
         se2.setServiceAddress(getServiceAddress());
         se2.setDebugOn(Boolean.parseBoolean(Configurations.getFirstAttribute(cn, OA4MPConfigTags.DEBUG)));
         DebugUtil.setIsEnabled(se2.isDebugOn());
-        se2.info("Debugging is " + (se2.isDebugOn()?"on":"off"));
+        se2.info("Debugging is " + (se2.isDebugOn() ? "on" : "off"));
 
         // part 2. This is done after main config load.
         Object[] polling = loadPolling();

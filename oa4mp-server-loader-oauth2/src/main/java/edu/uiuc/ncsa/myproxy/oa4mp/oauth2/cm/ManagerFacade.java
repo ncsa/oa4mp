@@ -1,7 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.loader.COSE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.RequestFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.admin.AdminClientServer;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.attributes.AttributeServer;
@@ -107,6 +106,18 @@ public class ManagerFacade {
         }
     }
     protected Response process(OA2Client oa2Client, JSONObject rawJSON) {
+        throw new edu.uiuc.ncsa.security.core.exceptions.IllegalAccessException("Error: access for standard clients is not allowed");
+        // Fix for CIL-460.
+        // note that what follows works perfectly well, but allows standard clients full access to the management API
+        // which gives them the ability to change their scopes and other types of access.
+        // At this point we have deicded that is a security risk.
+
+        /*******************************/
+        /*                             *
+        /*        KEEP THIS            *
+        /*                             *
+        /*******************************/
+/*
         checkClientSecret(oa2Client.getSecret(), (OA2Client)getSE().getClientStore().get(oa2Client.getIdentifier()));
 
         switch (getTargetValue(rawJSON)) {
@@ -120,6 +131,7 @@ public class ManagerFacade {
 
         }
         throw new NotImplementedException("unrecognized target of action");
+*/
     }
 
     protected Response process(OA2Client subject, OA2Client target, JSONObject rawJSON) {

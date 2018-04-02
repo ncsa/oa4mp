@@ -187,6 +187,16 @@ public class OA2AuthorizedServlet extends AbstractInitServlet {
         return st;
     }
 
+    /**
+     * This method will take the scopes that the client sends in its request and inspect the scopes that it is allowed
+     * to request. The result will be a list of permitted scopes. This is also where omitting the openid scope
+     * causes the request to be rejected.
+     * @param st
+     * @param params
+     * @param state
+     * @param givenRedirect
+     * @return
+     */
     protected ArrayList<String> resolveScopes(OA2ServiceTransaction st, Map<String, String> params, String state, String givenRedirect) {
         String rawScopes = params.get(SCOPE);
         if (rawScopes == null || rawScopes.length() == 0) {

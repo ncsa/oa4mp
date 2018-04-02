@@ -2,16 +2,21 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
 
 import edu.uiuc.ncsa.security.util.functor.JFunctor;
 
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
+
+import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.FunctorClaimsType.EXCLUDE;
 
 /**
+  * This will omit the claims. You may give any list of claim names (rather than values) you wish. If
+  * a claim is not present, then nothing is done, i.e., the contract is to ensure that the stated claims
+  * are not returned so there is no error if the claim fails to exist in the first place.
  * <p>Created by Jeff Gaynor<br>
  * on 3/1/18 at  12:50 PM
  */
 public class jExclude extends ClaimFunctor {
-    public jExclude(HashMap<String, String> claims) {
-        super("$exclude", claims);
+    public jExclude(Map<String, Object> claims) {
+        super(EXCLUDE, claims);
     }
 
     @Override
