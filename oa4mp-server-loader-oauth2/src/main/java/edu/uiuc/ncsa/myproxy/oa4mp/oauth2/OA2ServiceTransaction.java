@@ -5,6 +5,8 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.OA4MPServiceTransaction;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
+import edu.uiuc.ncsa.security.oauth_2_0.OA2Client;
+import net.sf.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,6 +17,11 @@ import java.util.Date;
  * on 2/28/14 at  1:46 PM
  */
 public class OA2ServiceTransaction extends OA4MPServiceTransaction {
+    public String FLOW_STATE_KEY = "flow_state";
+    public String STATE_KEY = "state";
+    public String STATE_COMMENT_KEY = "comment";
+    public String CLAIMS_KEY = "claims";
+
     public OA2ServiceTransaction(AuthorizationGrant ag) {
         super(ag);
     }
@@ -23,27 +30,63 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction {
         super(identifier);
     }
 
+    /**
+     * Convenience cast.
+     *
+     * @return
+     */
+    public OA2Client getOA2Client() {
+        return (OA2Client) getClient();
+    }
 
-     FlowStates flowStates;
 
     public FlowStates getFlowStates() {
-        if(flowStates == null){
-            flowStates = new FlowStates();
+        JSONObject fs = getState().getJSONObject(FLOW_STATE_KEY);
+        FlowStates flowStates = new FlowStates();
+        if (fs == null) {
+            return flowStates;
+        }
+        if (!(fs == null || fs.isEmpty())) {
+            flowStates.fromJSON(fs);
         }
         return flowStates;
     }
 
+    public void setState(JSONObject state) {
+        this.state = state;
+    }
+
+    public JSONObject getState() {
+        if (state == null) {
+            state = new JSONObject();
+            state.put(STATE_COMMENT_KEY, "State for object id \"" + getAuthorizationGrant().getToken() + "\"");
+        }
+        return state;
+    }
+
+    JSONObject state;
+
     public void setFlowStates(FlowStates flowStates) {
-        this.flowStates = flowStates;
+        getState().put(FLOW_STATE_KEY, flowStates.toJSON());
+    }
+
+
+    public JSONObject getClaims() {
+        return getState().getJSONObject(CLAIMS_KEY);
+    }
+
+    public void setClaims(JSONObject claims) {
+        getState().put(CLAIMS_KEY, claims);
     }
 
     RefreshToken refreshToken;
     long refreshTokenLifetime = 0L;
     String nonce;
 
-     public boolean hasAuthTime(){
-         return authTime != null;
-     }
+    public boolean hasAuthTime() {
+        return authTime != null;
+    }
+
     public Date getAuthTime() {
         return authTime;
     }
@@ -56,7 +99,7 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction {
 
 
     public Collection<String> getScopes() {
-        if(scopes == null){
+        if (scopes == null) {
             scopes = new ArrayList<>();
         }
         return scopes;
@@ -114,8 +157,8 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction {
     @Override
     public String toString() {
         String x = super.toString();
-        x = x.substring(0,x.length()-1);
-        x = x + ",refresh token="+getRefreshToken() + "]";
+        x = x.substring(0, x.length() - 1);
+        x = x + ",refresh token=" + getRefreshToken() + "]";
         return x;
     }
 

@@ -1,24 +1,29 @@
-package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
+package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2Client;
 import edu.uiuc.ncsa.security.oauth_2_0.UserInfo;
-import edu.uiuc.ncsa.security.oauth_2_0.server.ClaimSource;
-import edu.uiuc.ncsa.security.oauth_2_0.server.OA2Claims;
+import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
+import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
 import edu.uiuc.ncsa.security.oauth_2_0.server.UnsupportedScopeException;
-import net.sf.json.JSONObject;
+import edu.uiuc.ncsa.security.oauth_2_0.server.config.JSONConfig;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Map;
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 8/17/15 at  4:10 PM
  */
 public class BasicClaimsSourceImpl implements ClaimSource {
+
+
+    @Override
+    public void setConfiguration(JSONConfig configuration) {
+        // does nothing.
+    }
+
     public BasicClaimsSourceImpl(OA2SE oa2SE) {
         this.oa2SE = oa2SE;
     }
@@ -78,23 +83,10 @@ public class BasicClaimsSourceImpl implements ClaimSource {
      */
     @Override
     public UserInfo process(UserInfo userInfo, HttpServletRequest request, ServiceTransaction transaction) throws UnsupportedScopeException {
-        if(claimsProcessor != null) {
-            Map<String,Object> claims =userInfo.getMap();
-            claims = getClaimsHandler(((OA2Client)transaction.getClient()).getClaimsConfig()).process(claims);
-            userInfo.setMap(claims);
-        }
         return userInfo;
     }
 
-    public ClaimsProcessor getClaimsHandler(JSONObject config) {
-        if(claimsProcessor == null){
-            claimsProcessor = new ClaimsProcessor(config);
-        }
-        return claimsProcessor;
-    }
 
-
-    ClaimsProcessor claimsProcessor;
     @Override
     public void setScopes(Collection<String> scopes) {
         this.scopes = scopes;

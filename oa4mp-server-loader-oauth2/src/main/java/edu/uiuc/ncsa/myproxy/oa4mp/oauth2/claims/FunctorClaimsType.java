@@ -10,7 +10,8 @@ public enum FunctorClaimsType implements FunctorType {
     SET("$set"),
     INCLUDE("$include"),
     EXCLUDE("$exclude"),
-    REMOVE("$remove");
+    REMOVE("$remove"),
+    IS_MEMBER_OF("$isiMemberOf");
 
     FunctorClaimsType(String value) {
         this.value = value;

@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.LDAPClaimsSource;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.oauth_2_0.UserInfo;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;

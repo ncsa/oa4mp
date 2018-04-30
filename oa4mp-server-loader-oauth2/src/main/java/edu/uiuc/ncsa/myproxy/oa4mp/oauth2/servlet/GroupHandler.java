@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.scopeHandlers.GroupElement;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.scopeHandlers.Groups;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.GroupElement;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.Groups;
 import net.sf.json.JSONArray;
 
 /**

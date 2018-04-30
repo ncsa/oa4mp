@@ -14,7 +14,7 @@ import edu.uiuc.ncsa.security.delegation.server.storage.ClientApprovalStore;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.security.delegation.storage.TransactionStore;
 import edu.uiuc.ncsa.security.delegation.token.TokenForge;
-import edu.uiuc.ncsa.security.oauth_2_0.server.ClaimSource;
+import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
 import edu.uiuc.ncsa.security.servlet.UsernameTransformer;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;

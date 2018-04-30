@@ -43,11 +43,11 @@ public class NewCAStoreTest extends TestBase {
         testApprovalCycle(TestUtils.getPgStoreProvider().getClientStore(), TestUtils.getPgStoreProvider().getClientApprovalStore());
     }
 
-    public void testAG() throws Exception {
+  /*  public void testAG() throws Exception {
         testApprovalStore(TestUtils.getAgStoreProvider().getClientStore(), TestUtils.getAgStoreProvider().getClientApprovalStore());
         testApprovalCycle(TestUtils.getAgStoreProvider().getClientStore(), TestUtils.getAgStoreProvider().getClientApprovalStore());
 
-    }
+    }*/
 
     public void testApprovalStore(ClientStore clientStore,
                                   ClientApprovalStore caStore) throws Exception {

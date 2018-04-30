@@ -114,7 +114,7 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
      */
     protected void initialize() {
         String scheme = Configurations.getFirstAttribute(cn, OA4MPConfigTags.ID_SCHEME);
-        if (scheme == null && !scheme.isEmpty()) {
+        if (scheme != null && !scheme.isEmpty()) {
             IdentifierProvider.setScheme(scheme);
         }
         // scheme specific part

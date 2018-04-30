@@ -20,6 +20,10 @@ public enum FlowType implements FunctorType {
     GET_CERT("$get_cert"),
     GET_CLAIMS("$get_claims"),
     /**
+     * This sets the claim source.
+     */
+    SET_CLAIM_SOURCE("$set_claim_source"),
+    /**
      * Allows for accepting requests. If this is set to false, then any attempt to access the
      * system generates an exception. It effectively is the same as setting all other state
      * variables to false.

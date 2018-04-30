@@ -10,7 +10,7 @@
 <html>
 <head><title>Simple client error page</title></head>
 <body>
-<H2>There was a problem getting the cert.</H2>
+<H2>There was a problem completing this request.</H2>
 
 Check the server logs...
 

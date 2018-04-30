@@ -16,7 +16,7 @@ import edu.uiuc.ncsa.security.oauth_2_0.UserInfo;
 import edu.uiuc.ncsa.security.oauth_2_0.client.ATResponse2;
 import edu.uiuc.ncsa.security.oauth_2_0.client.DS2;
 import edu.uiuc.ncsa.security.oauth_2_0.server.InvalidNonceException;
-import edu.uiuc.ncsa.security.oauth_2_0.server.OA2Claims;
+import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
 import edu.uiuc.ncsa.security.util.pkcs.CertUtil;
 import edu.uiuc.ncsa.security.util.pkcs.KeyUtil;
 import edu.uiuc.ncsa.security.util.pkcs.MyPKCS10CertRequest;

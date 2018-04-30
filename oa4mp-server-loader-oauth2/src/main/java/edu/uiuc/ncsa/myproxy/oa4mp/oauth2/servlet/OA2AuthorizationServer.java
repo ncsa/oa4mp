@@ -5,14 +5,18 @@ import edu.uiuc.ncsa.myproxy.MPSingleConnectionProvider;
 import edu.uiuc.ncsa.myproxy.MyProxyConnectable;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.OA2ClaimsUtil;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.OA2FunctorFactory;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowStates;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientConfiguration;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientConfigurationFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractAuthorizationServlet;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2GeneralError;
+import edu.uiuc.ncsa.security.oauth_2_0.*;
+import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.servlet.JSPUtil;
 import edu.uiuc.ncsa.security.servlet.PresentableState;
 import net.sf.json.JSONObject;
@@ -28,6 +32,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.security.GeneralSecurityException;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 
@@ -128,8 +133,69 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
             request.setAttribute("state", state);
         }
         super.doIt(request, response);
+
     }
 
+
+    protected void handleClaims(HttpServletRequest httpServletRequest,
+                                 OA2ServiceTransaction transaction) throws Throwable {
+
+         // Need to find the sources
+         OA2Client client = transaction.getOA2Client();
+         if (client.isPublicClient()) {
+             // Public clients do not get claims.
+             return;
+         }
+         OA2SE oa2se = (OA2SE) getServiceEnvironment();
+         // set up functor factory with no claims since we have none yet.
+ //        Map<String, Object> claims = new HashMap<>();
+         UserInfo userInfo = new UserInfo();
+
+         if (oa2se.getClaimSource().isEnabled()) {
+             // allow the server to pre-populate the claims. This invokes the global claims handler for the server
+             // to allow, e.g. pulling user information out of HTTp headers.
+             oa2se.getClaimSource().process(userInfo, httpServletRequest, transaction);
+         }
+         if (client.getConfig() == null || client.getConfig().isEmpty()) {
+             // no configuration for this client means do nothing here.
+             return;
+         }
+         // so this client has a specific configuration that is to be invoked.
+         OA2FunctorFactory functorFactory = new OA2FunctorFactory(userInfo.getMap());
+         OA2ClientConfigurationFactory<OA2ClientConfiguration> ff = new OA2ClientConfigurationFactory(functorFactory);
+
+         OA2ClientConfiguration oa2CC = ff.newInstance(client.getConfig());
+         oa2CC.executeRuntime();
+         FlowStates flowStates = new FlowStates(oa2CC.getRuntime().getFunctorMap());
+         // save everything up to this point since there are no guarantees that processing will continue.
+         getTransactionStore().save(transaction);
+         if (flowStates.getClaims) {
+             ff.createClaimSource(oa2CC,client.getConfig());
+             // the runtime forbids processing claims for this request, so exit
+             List<ClaimSource> claimsSources = oa2CC.getClaimSource();
+             if (oa2CC.hasClaimSource()) {
+                 // so there is
+                 for (int i = 0; i < claimsSources.size(); i++) {
+                     claimsSources.get(i).process(userInfo, httpServletRequest, transaction);
+                     System.err.println(userInfo.getMap());
+                 }
+             }
+             if (oa2CC.hasClaimsProcessing()) {
+                 ff.setupClaimsProcessing(oa2CC, client.getConfig());
+                 oa2CC.executeProcessing();
+             }
+         }
+         // Now we have to set up the claims sources and process the results
+
+         // update everything
+         JSONObject states = new JSONObject();
+         states.put("state", "state object for id=" + transaction.getIdentifier());
+         states.put("flowState", flowStates.toJSON().toString());
+         JSONObject jsonClaims = new JSONObject();
+         jsonClaims.putAll(userInfo.getMap());
+         states.put("claims", jsonClaims.toString());
+         transaction.setState(states);
+     }
     @Override
     public void prepare(PresentableState state) throws Throwable {
         super.prepare(state);
@@ -162,6 +228,10 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
             st2.setRefreshTokenLifetime(0L);
         }
         super.createRedirect(request, response, trans);
+        // At this point, all authentication has been done, everything is set up and th enet stop in the flow is the
+        // redirect back to the client.
+        OA2ClaimsUtil claimsUtil = new OA2ClaimsUtil((OA2SE) getServiceEnvironment(), st2);
+        claimsUtil.createClaims(request);
     }
 
     @Override

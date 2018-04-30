@@ -2,6 +2,7 @@ package test;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.ldap.LDAPEntry;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.ldap.LDAPStore;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.OA2ClientConverter;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.OA2ClientMemoryStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.SAT;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.SATFactory;
@@ -12,7 +13,6 @@ import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.delegation.storage.ClientProvider;
 import edu.uiuc.ncsa.security.delegation.storage.impl.ClientConverter;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Client;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2ClientConverter;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2ClientProvider;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfigurationUtil;

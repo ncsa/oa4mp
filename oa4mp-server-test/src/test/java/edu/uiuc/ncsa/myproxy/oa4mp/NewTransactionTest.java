@@ -42,11 +42,11 @@ public class NewTransactionTest extends TestBase {
                 TestUtils.getPgStoreProvider().getClientStore());
     }
 
-    public void testAG() throws Exception {
+  /*  public void testAG() throws Exception {
         testServiceTransaction(TestUtils.getAgStoreProvider().getTransactionStore(),
                 TestUtils.getAgStoreProvider().getTokenForge(),
                 TestUtils.getAgStoreProvider().getClientStore());
-    }
+    }*/
 
     protected AuthorizationGrant newAG(TokenForge tokenForge, String... x) {
         AuthorizationGrant ag = tokenForge.getAuthorizationGrant(x);

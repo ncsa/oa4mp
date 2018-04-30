@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.ClaimSourceFactoryImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RefreshTokenStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractAccessTokenServlet;
@@ -18,8 +19,15 @@ import edu.uiuc.ncsa.security.delegation.storage.TransactionStore;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
 import edu.uiuc.ncsa.security.oauth_2_0.*;
-import edu.uiuc.ncsa.security.oauth_2_0.server.*;
+import edu.uiuc.ncsa.security.oauth_2_0.server.ATIResponse2;
+import edu.uiuc.ncsa.security.oauth_2_0.server.RTI2;
+import edu.uiuc.ncsa.security.oauth_2_0.server.RTIRequest;
+import edu.uiuc.ncsa.security.oauth_2_0.server.RTIResponse;
+import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
+import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSourceFactory;
+import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.http.HttpStatus;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -135,8 +143,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
      * @throws Throwable
      */
     protected boolean executeByGrant(String grantType,
-                                  HttpServletRequest request,
-                                  HttpServletResponse response) throws Throwable {
+                                     HttpServletRequest request,
+                                     HttpServletResponse response) throws Throwable {
 
         OA2Client client = (OA2Client) getClient(request);
 
@@ -153,7 +161,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             // public clients cannot get an access token
             IssuerTransactionState state = doAT(request, response, client);
             ATIResponse2 atResponse = (ATIResponse2) state.getIssuerResponse();
-
+            OA2ServiceTransaction t = (OA2ServiceTransaction)state.getTransaction();
+            atResponse.setClaims(t.getClaims());
             atResponse.write(response);
             return true;
         }
@@ -169,8 +178,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             warn("Error servicing request. No grant type was given. Rejecting request.");
             throw new GeneralException("Error: Could not service request");
         }
-        if(executeByGrant(grantType,request,response)){
-            return ;
+        if (executeByGrant(grantType, request, response)) {
+            return;
         }
         warn("Error: grant type was not recognized. Request rejected.");
         throw new ServletException("Error: Unknown request type.");
@@ -181,8 +190,12 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         IssuerTransactionState state = doDelegation(client, request, response);
         ATIResponse2 atResponse = (ATIResponse2) state.getIssuerResponse();
         atResponse.setSignToken(client.isSignTokens());
-        DebugUtil.dbg(this, "set token signing flag =" + atResponse.isSignToken());
         OA2ServiceTransaction st2 = (OA2ServiceTransaction) state.getTransaction();
+        if(!st2.getFlowStates().acceptRequests || !st2.getFlowStates().accessToken){
+            throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "getting access token denied", HttpStatus.SC_UNAUTHORIZED);
+        }
+        atResponse.setClaims(st2.getClaims());
+        DebugUtil.dbg(this, "set token signing flag =" + atResponse.isSignToken());
         if (!client.isRTLifetimeEnabled() && ((OA2SE) getServiceEnvironment()).isRefreshTokenEnabled()) {
             // Since this bit of information could be extremely useful if a service decides
             // eto start issuing refresh tokens after
@@ -310,6 +323,10 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         }
 
         OA2ServiceTransaction t = getByRT(oldRT);
+        if(!t.getFlowStates().acceptRequests || !t.getFlowStates().refreshToken){
+            throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "refresh token access denied", HttpStatus.SC_UNAUTHORIZED);
+
+        }
         if ((!((OA2SE) getServiceEnvironment()).isRefreshTokenEnabled()) || (!c.isRTLifetimeEnabled())) {
             throw new OA2ATException(OA2Errors.REQUEST_NOT_SUPPORTED, "Refresh tokens are not supported on this server");
         }
@@ -323,6 +340,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         RTI2 rtIsuuer = new RTI2(getTF2(), getServiceEnvironment().getServiceAddress());
         RTIResponse rtiResponse = (RTIResponse) rtIsuuer.process(rtiRequest);
         rtiResponse.setSignToken(c.isSignTokens());
+        rtiResponse.setClaims(t.getClaims());
         populateClaims(request, rtiResponse.getParameters(), t);
         RefreshToken rt = rtiResponse.getRefreshToken();
         rt.setExpiresIn(computeRefreshLifetime(t));
@@ -347,10 +365,11 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             rtiResponse.setSupportedScopes(targetScopes);
         }
 
-        rtiResponse.setScopeHandlers(setupScopeHandlers(t, oa2SE));
+        //    rtiResponse.setClaimSources(setupClaimSources(t, oa2SE));
 
         rtiResponse.setServiceTransaction(t);
         rtiResponse.setJsonWebKey(oa2SE.getJsonWebKeys().getDefault());
+        rtiResponse.setClaims(t.getClaims());
         getTransactionStore().save(t);
         rtiResponse.write(response);
         IssuerTransactionState state = new IssuerTransactionState(
@@ -407,38 +426,35 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             atResponse.setSupportedScopes(targetScopes);
         }
 
-        atResponse.setScopeHandlers(setupScopeHandlers(transaction, oa2SE));
+        //      atResponse.setClaimSources(setupClaimSources(transaction, oa2SE));
 
         atResponse.setServiceTransaction(transaction);
         atResponse.setJsonWebKey(oa2SE.getJsonWebKeys().getDefault());
+        atResponse.setClaims(transaction.getClaims());
         // Need to do some checking but for now, just return transaction
         //return null;
         return transaction;
     }
 
-    public static LinkedList<ClaimSource> setupScopeHandlers(OA2ServiceTransaction transaction, OA2SE oa2SE) {
-      /*  OA2Client client = (OA2Client) transaction.getClient();
-        DebugUtil.dbg(this, "Getting configured scope handler factory " + LDAPClaimSourceFactory.getFactory().getClass().getSimpleName());
-        LinkedList<ScopeHandler> scopeHandlers = LDAPClaimSourceFactory.createScopeHandlers(oa2SE, client);
-        atResponse.setScopeHandlers(scopeHandlers); // so the same scopes in user info are returned here.*/
+    public static LinkedList<ClaimSource> setupClaimSources(OA2ServiceTransaction transaction, OA2SE oa2SE) {
         LinkedList<ClaimSource> scopeHandlers = new LinkedList<>();
-        DebugUtil.dbg(OA2ATServlet.class, "setting up scope handlers");
+        DebugUtil.dbg(OA2ATServlet.class, "setting up claim sources");
         if (oa2SE.getClaimSource() != null && oa2SE.getClaimSource().isEnabled()) {
-            DebugUtil.dbg(OA2ATServlet.class, "Adding default scope handler.");
+            DebugUtil.dbg(OA2ATServlet.class, "Adding default claim source.");
 
             scopeHandlers.add(oa2SE.getClaimSource());
         }
-        ClaimSourceFactory oldSHF = LDAPClaimSourceFactory.getFactory();
-        LDAPClaimSourceFactory.setFactory(new LDAPClaimSourceFactory());
+        ClaimSourceFactory oldSHF = ClaimSourceFactoryImpl.getFactory();
+        ClaimSourceFactoryImpl.setFactory(new ClaimSourceFactoryImpl());
 
         OA2Client client = (OA2Client) transaction.getClient();
-        DebugUtil.dbg(OA2ATServlet.class, "Getting configured scope handler factory " + LDAPClaimSourceFactory.getFactory().getClass().getSimpleName());
-        DebugUtil.dbg(OA2ATServlet.class, "Adding other scope handlers ");
+        DebugUtil.dbg(OA2ATServlet.class, "Getting configured claim source factory " + ClaimSourceFactoryImpl.getFactory().getClass().getSimpleName());
+        DebugUtil.dbg(OA2ATServlet.class, "Adding other claim sources");
 
-        scopeHandlers.addAll(LDAPClaimSourceFactory.createScopeHandlers(oa2SE, client));
-        DebugUtil.dbg(OA2ATServlet.class, "Total scope handlers = " + scopeHandlers.size());
+        scopeHandlers.addAll(ClaimSourceFactoryImpl.createClaimSources(oa2SE, client));
+        DebugUtil.dbg(OA2ATServlet.class, "Total claim source count = " + scopeHandlers.size());
 
-        LDAPClaimSourceFactory.setFactory(oldSHF);
+        ClaimSourceFactoryImpl.setFactory(oldSHF);
         return scopeHandlers;
     }
 }

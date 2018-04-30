@@ -3,7 +3,7 @@ package org.xsede.oa4mp;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.BasicClaimsSourceImpl;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.BasicClaimsSourceImpl;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;

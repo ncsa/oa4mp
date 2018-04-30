@@ -130,7 +130,7 @@ public class OA2ReadyServlet extends ClientServlet {
             request.setAttribute("certSubject", "(no cert requested)");
         }
         if (ui != null) {
-            String output = JSONUtils.valueToString(ui.toJSon(), 4, 2);
+            String output = JSONUtils.valueToString(ui.toJSon(), 1, 0);
             request.setAttribute("userinfo", output);
         } else {
             request.setAttribute("userinfo", "no user info returned.");

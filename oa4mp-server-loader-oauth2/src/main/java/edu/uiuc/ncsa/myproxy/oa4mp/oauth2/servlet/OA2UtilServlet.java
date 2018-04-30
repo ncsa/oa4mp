@@ -16,7 +16,7 @@ import java.sql.SQLException;
 import java.util.StringTokenizer;
 
 /**
- * A servlet to allow for certain utilities, such as chccking if claims contain a given value.
+ * A servlet to allow for certain utilities, such as checking if claims contain a given value.
  * <p>Created by Jeff Gaynor<br>
  * on 1/4/18 at  11:19 AM
  */

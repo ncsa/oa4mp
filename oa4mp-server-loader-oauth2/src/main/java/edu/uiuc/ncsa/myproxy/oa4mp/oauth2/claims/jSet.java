@@ -7,7 +7,10 @@ import java.util.Map;
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.FunctorClaimsType.SET;
 
 /**
- * Sets a claim to a specified value.
+ * Sets a claim to a specified value. Note that this will <b>create</b> a claim if none exists.
+ * That claim will then be returned. If you do not want to return it, you should invoke the
+ * $remove functor on it. Note that if there are no claims, then they cannot be set and
+ * nothing happens.
  * <p>Created by Jeff Gaynor<br>
  * on 3/1/18 at  12:03 PM
  */
@@ -18,10 +21,10 @@ public class jSet extends ClaimFunctor {
 
     @Override
     public Object execute() {
-        String claim = String.valueOf(getArgs().get(0));
-        if(!claims.containsKey(claim)){
+        if(claims == null){
             return null;
         }
+        String claim = String.valueOf(getArgs().get(0));
         Object obj = getArgs().get(1);
         String newValue = null;
         if(obj instanceof JFunctor){
@@ -31,7 +34,10 @@ public class jSet extends ClaimFunctor {
         }else{
            newValue = String.valueOf(obj);
         }
-        claims.put(claim, newValue);
+        if(claims!=null) {
+            claims.put(claim, newValue);
+        }
+        executed = true;
         return newValue;
     }
 }

@@ -25,11 +25,11 @@ public class NewClientStoreTest extends TestBase {
         testBasic(TestUtils.getPgStoreProvider().getClientStore());
     }
 
-    public void testAG() throws Exception {
+  /*  public void testAG() throws Exception {
         testBasic(TestUtils.getAgStoreProvider().getClientStore());
     }
 
-
+*/
     public void testBasic(ClientStore clientStore) throws Exception {
         Client client = (Client) clientStore.create();
         System.out.println("New client ID = " + client.getIdentifier());

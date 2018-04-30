@@ -1,7 +1,8 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.scopeHandlers.GroupElement;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.scopeHandlers.Groups;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.LDAPClaimsSource;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.GroupElement;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.Groups;
 import net.sf.json.JSONArray;
 
 import javax.naming.NamingException;
@@ -67,19 +68,5 @@ public class NCSAGroupHandler extends GroupHandler {
             throwable.printStackTrace();
         }
         return -1;
-/*
-        int gid = -1;
-        LdapContext ctx = claimsSource.createConnection();
-        SearchControls ctls = new SearchControls();
-        ctls.setReturningAttributes(new String[]{"gidNumber"});
-        String filter = "(&(cn=" + groupName + "))";
-        DebugUtil.dbg(this, "filter=" + filter);
-        NamingEnumeration e = ctx.search(claimsSource.getCfg().getContextName(), filter, ctls);
-
-        if (ctx != null) {
-            ctx.close();
-        }
-        return -1;
-*/
     }
 }

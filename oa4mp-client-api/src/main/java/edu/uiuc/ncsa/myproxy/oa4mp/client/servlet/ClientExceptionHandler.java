@@ -45,7 +45,12 @@ public class ClientExceptionHandler implements ExceptionHandler {
         clientServlet.error("Exception while trying to get cert. message:" + t.getMessage());
 
         if (t instanceof RuntimeException) {
-            request.setAttribute("action", clientServlet.getServletContext().getContextPath());
+            String path = clientServlet.getServletContext().getContextPath();
+            if(!path.endsWith("/")){
+                // normalize it
+                path = path + "/";
+            }
+            request.setAttribute("action", path);
             request.setAttribute("message", t.getMessage());
             JSPUtil.fwd(request, response, clientServlet.getCE().getErrorPagePath());
             return;

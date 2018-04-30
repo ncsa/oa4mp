@@ -163,6 +163,9 @@ public class OA2CertServlet extends ACS2 {
         }
 */
         OA2ServiceTransaction st = (OA2ServiceTransaction) trans;
+        if(!st.getFlowStates().acceptRequests || !st.getFlowStates().getCert){
+            throw new GeneralException("getCert access denied");
+        }
         OA2SE oa2SE = (OA2SE) getServiceEnvironment();
         if (!oa2SE.isTwoFactorSupportEnabled()) {
             checkMPConnection(st);

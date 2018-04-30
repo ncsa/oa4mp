@@ -1,16 +1,17 @@
-package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
+package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.scopeHandlers.Groups;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.GroupHandler;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.NCSAGroupHandler;
 import edu.uiuc.ncsa.security.core.Logable;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2Client;
 import edu.uiuc.ncsa.security.oauth_2_0.UserInfo;
 import edu.uiuc.ncsa.security.oauth_2_0.server.UnsupportedScopeException;
+import edu.uiuc.ncsa.security.oauth_2_0.server.config.JSONConfig;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfigurationUtil;
 import net.sf.json.JSONArray;
@@ -34,6 +35,13 @@ import java.util.Map;
  * on 4/26/16 at  3:32 PM
  */
 public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
+    public LDAPClaimsSource() {
+    }
+
+    @Override
+    public void setConfiguration(JSONConfig configuration) {
+        this.ldapConfiguration = (LDAPConfiguration)configuration;
+    }
 
     public LDAPClaimsSource(LDAPConfiguration ldapConfiguration, MyLoggingFacade myLogger) {
         this.ldapConfiguration = ldapConfiguration;
@@ -77,19 +85,6 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
      * @return
      */
     public String getSearchName(UserInfo userInfo, HttpServletRequest request, ServiceTransaction transaction) {
-        // FIXME!! FOR DEBUGGING ONLY
-        // This allows me to access the NCSA LDAP server for debugging, if the client is configured
-        // correctly too.
-        // Comment out the conditional block for any release!
-
-   /*     if (ServletDebugUtil.isEnabled()) {
-            userInfo.getMap().put(getCfg().getSearchNameKey(), "jgaynor@ncsa.illinois.edu");
-            userInfo.getMap().put("eppn", "jgaynor@ncsa.illinois.edu");
-            //  userInfo.getMap().put("username", "http://cilogon.org/serverA/users/10376");
-            //return "http://cilogon.org/serverA/users/10376";
-        }*/
-
-        // END debugging hack.
         JSONObject xxx = LDAPConfigurationUtil.toJSON(getCfg());
         xxx.getJSONObject("ldap").getJSONObject("ssl").put("keystore", "");
         if (getCfg().getSearchNameKey() == null) {
@@ -103,22 +98,6 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
             throw new IllegalStateException("Error: no recognized search name key was found. Requested was \"" + getCfg().getSearchNameKey() + "\"");
         }
         String searchName = (String) userInfo.getMap().get(getCfg().getSearchNameKey());
-
-        if (isNCSA()) {
-            DebugUtil.dbg(this, "Getting search name for NCSA LDAP");
-
-            //searchName = (String) userInfo.getMap().get(CILogonScopeHandler.CILogonClaims.EPPN);
-            searchName = (String) userInfo.getMap().get(getCfg().getSearchNameKey());
-            searchName = searchName.substring(0, searchName.indexOf("@")); // take the name from the eppn
-            // This is to look in the NCSA's LDAP handler
-        }
-
-/*
-        if(!getCfg().getSearchNameKey().equals(OA2Claims.EMAIL)) {
-            // Use the name on the email address, not the whole email addrress
-            searchName = searchName.substring(0, searchName.indexOf("@")); // take the name from the email
-        }
-*/
         return searchName;
     }
 
@@ -196,9 +175,9 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
                 info("No search name encountered for LDAP query. No search performed.");
             }
             DebugUtil.dbg(this, "user info =" + userInfo.getMap());
-            Map<String, Object> claims = userInfo.getMap();
-            claims = getClaimsHandler(((OA2Client) transaction.getClient()).getClaimsConfig()).process(claims);
-            userInfo.setMap(claims);
+       //     Map<String, Object> claims = userInfo.getMap();
+     //       claims = getClaimsHandler(((OA2Client) transaction.getClient()).getClaimsConfig()).process(claims);
+         //   userInfo.setMap(claims);
             context.close();
         } catch (Throwable throwable) {
             handleException(throwable);
@@ -213,11 +192,11 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
         return context != null;
     }
 
-    LdapContext context;
+    public LdapContext context;
 
     LDAPConfiguration ldapConfiguration = null;
 
-    protected LDAPConfiguration getCfg() {
+    public LDAPConfiguration getCfg() {
         if (ldapConfiguration == null) {
             ldapConfiguration = getOa2SE().getLdapConfiguration();
         }
@@ -298,9 +277,9 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
         return "uid";
     }
 
-    protected JSONObject simpleSearch(LdapContext ctx,
-                                      String userID,
-                                      Map<String, LDAPConfigurationUtil.AttributeEntry> attributes) throws NamingException {
+    public JSONObject simpleSearch(LdapContext ctx,
+                                   String userID,
+                                   Map<String, LDAPConfigurationUtil.AttributeEntry> attributes) throws NamingException {
         if (ctx == null) {
             throw new IllegalStateException("Error: Could not create the LDAP context");
         }
@@ -395,7 +374,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
     }
 
     protected void sayit(String x) {
-        System.out.println(x);
+        System.err.println(x);
     }
 
     @Override

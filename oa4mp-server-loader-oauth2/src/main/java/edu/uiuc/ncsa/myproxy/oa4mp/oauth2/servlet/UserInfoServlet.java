@@ -4,28 +4,27 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.security.core.exceptions.InvalidTimestampException;
-import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.server.request.IssuerResponse;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2Client;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2GeneralError;
-import edu.uiuc.ncsa.security.oauth_2_0.server.ClaimSource;
 import edu.uiuc.ncsa.security.oauth_2_0.server.UII2;
 import edu.uiuc.ncsa.security.oauth_2_0.server.UIIRequest2;
 import edu.uiuc.ncsa.security.oauth_2_0.server.UIIResponse2;
+import net.sf.json.JSONObject;
 import org.apache.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
-import java.util.LinkedList;
 
 import static edu.uiuc.ncsa.security.core.util.DateUtils.checkTimestamp;
+import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.*;
+import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.EXPIRATION;
+import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.ISSUED_AT;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -38,8 +37,12 @@ public class UserInfoServlet extends MyProxyDelegationServlet {
         // Bearer oa4mp:...
 
         AccessToken at = getAT(request);
-        ServiceTransaction transaction = (ServiceTransaction) getTransactionStore().get(at);
-        if (((OA2Client) transaction.getClient()).isPublicClient()) {
+        OA2ServiceTransaction transaction = (OA2ServiceTransaction) getTransactionStore().get(at);
+        // check that
+        if(!transaction.getFlowStates().userInfo){
+            throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "user info access denied", HttpStatus.SC_UNAUTHORIZED);
+        }
+        if (transaction.getOA2Client().isPublicClient()) {
             throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, "public client not authorized to access user information", HttpStatus.SC_UNAUTHORIZED);
         }
         if (transaction == null) {
@@ -57,21 +60,27 @@ public class UserInfoServlet extends MyProxyDelegationServlet {
         UII2 uis = new UII2(oa2SE.getTokenForge(), getServiceEnvironment().getServiceAddress());
         UIIRequest2 uireq = new UIIRequest2(request, at);
         uireq.setUsername(getUsername(transaction));
-        // Now we figure out which scope handler to use.
         UIIResponse2 uiresp = (UIIResponse2) uis.process(uireq);
-        LinkedList<ClaimSource> claimSources = OA2ATServlet.setupScopeHandlers((OA2ServiceTransaction) transaction, oa2SE);
-        DebugUtil.dbg(this, "Invoking scope handler");
-        if (claimSources == null || claimSources.isEmpty()) {
-            DebugUtil.dbg(this, " ***** NO SCOPE HANDLERS ");
-
-        }
-        for (ClaimSource claimSource: claimSources) {
-            DebugUtil.dbg(this, " scope handler=" + claimSource.getClass().getSimpleName());
-            claimSource.process(uiresp.getUserInfo(), transaction);
-        }
+        // add the claims we have stored.
+        uiresp.getUserInfo().getMap().putAll(stripClaims(transaction.getClaims()));
         uiresp.write(response);
     }
 
+    /**
+     * This strips out claims that should not be returned, such as the nonce, but are part of the original
+     * id token.
+     * @param json
+     * @return
+     */
+    protected JSONObject stripClaims(JSONObject json){
+        JSONObject r = new JSONObject();
+        r.putAll(json);// new json object so we don't lose information and so we don't get concurrent update error
+        String[] x = new String[]{ISSUED_AT, NONCE,EXPIRATION,EXPIRES_IN,AUTHORIZATION_TIME};
+        for(String y : x){
+            r.remove(y);
+        }
+        return r;
+    }
     /**
      * Override this if needed.
      *
@@ -90,7 +99,7 @@ public class UserInfoServlet extends MyProxyDelegationServlet {
     protected String getRawAT(HttpServletRequest request){
         String rawAT = null;
              String headerAT = HeaderUtils.getBearerAuthHeader(request);
-             String paramAT = getFirstParameterValue(request, OA2Constants.ACCESS_TOKEN);
+             String paramAT = getFirstParameterValue(request, ACCESS_TOKEN);
 
              if (paramAT == null) {
                  if (headerAT == null) {

@@ -9,7 +9,8 @@ import java.util.Set;
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.FunctorClaimsType.INCLUDE;
 
 /**
- * This will include only the list of claims in the final claims object.
+ * This will include <b>only</b> the list of claims in the final claims object.
+ * Always invoke this last in any sequence of claims.
  * <p>Created by Jeff Gaynor<br>
  * on 3/1/18 at  12:11 PM
  */
@@ -20,6 +21,9 @@ public class jInclude extends ClaimFunctor {
 
     @Override
     public Object execute() {
+        if(claims == null){
+            return null;
+        }
         HashSet<String> newClaims = new HashSet<>();
         for (int i = 0; i < getArgs().size(); i++) {
             Object obj = getArgs().get(i);

@@ -17,11 +17,10 @@ import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowType.GET_CERT;
  * <p>Created by Jeff Gaynor<br>
  * on 3/1/18 at  10:09 AM
  */
-public class CAFunctorFactory extends JFunctorFactory {
-    public CAFunctorFactory(Map<String, Object> claims) {
+public class OA2FunctorFactory extends JFunctorFactory {
+    public OA2FunctorFactory(Map<String, Object> claims) {
         this.claims = claims;
     }
-
 
     protected Map<String, Object> claims;
 
@@ -41,6 +40,9 @@ public class CAFunctorFactory extends JFunctorFactory {
         if (ff != null) {
             // already got one.
             return ff;
+        }
+        if (hasEnum(rawJson, IS_MEMBER_OF)) {
+            ff = new jIsMemberOf(claims);
         }
         if (hasEnum(rawJson, EXCLUDE)) {
             ff = new jExclude(claims);
@@ -71,6 +73,9 @@ public class CAFunctorFactory extends JFunctorFactory {
 
         if (hasEnum(rawJson, FlowType.USER_INFO)) {
             ff = new jUserInfo();
+        }
+        if (hasEnum(rawJson, FlowType.SET_CLAIM_SOURCE)) {
+            ff = new jSetClaimSource();
         }
         return ff;
     }

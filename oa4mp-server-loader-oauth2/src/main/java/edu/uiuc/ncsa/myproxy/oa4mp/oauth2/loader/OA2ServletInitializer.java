@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.LDAPClaimSourceFactory;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.ClaimSourceFactoryImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2ExceptionHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RefreshTokenRetentionPolicy;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RefreshTokenStore;
@@ -14,7 +14,7 @@ import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.delegation.storage.impl.ClientConverter;
-import edu.uiuc.ncsa.security.oauth_2_0.server.ClaimSourceFactory;
+import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSourceFactory;
 import edu.uiuc.ncsa.security.servlet.ExceptionHandler;
 import edu.uiuc.ncsa.security.util.mail.MailUtil;
 
@@ -63,7 +63,7 @@ public class OA2ServletInitializer extends OA4MPServletInitializer {
             oa2SE.getMyLogger().info("Initialized refresh token cleanup thread");
         }
         if (!ClaimSourceFactory.isFactorySet()) {
-            ClaimSourceFactory.setFactory(new LDAPClaimSourceFactory());
+            ClaimSourceFactory.setFactory(new ClaimSourceFactoryImpl());
         }
         try {
             SATFactory.setAdminClientConverter(AdminClientStoreProviders.getAdminClientConverter());

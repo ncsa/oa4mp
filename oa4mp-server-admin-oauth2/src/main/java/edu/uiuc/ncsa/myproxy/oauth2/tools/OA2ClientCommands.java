@@ -8,6 +8,7 @@ import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApprovalStore;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Client;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfigurationUtil;
+import edu.uiuc.ncsa.security.util.cli.ExitException;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -19,6 +20,7 @@ import java.util.LinkedList;
 import java.util.StringTokenizer;
 
 import static edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval.Status.APPROVED;
+import static edu.uiuc.ncsa.security.util.cli.CLIDriver.EXIT_COMMAND;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -140,9 +142,17 @@ public class OA2ClientCommands extends ClientStoreCommands {
             sayi("ldap:(none configured.)");
         } else {
             sayi("LDAPS:");
-            LDAPConfigurationUtil.toJSON(client.getLdaps());
+            say(LDAPConfigurationUtil.toJSON(client.getLdaps()).toString(2));
+
+        }
+        if (client.getConfig() == null || client.getConfig().isEmpty()) {
+            sayi("config:(none)");
+        } else {
+            sayi("config:");
+            sayi(client.getConfig().toString(2));
         }
     }
+
 
     /**
      * In this case, the secret has to be gotten and processed into a hash,
@@ -281,33 +291,77 @@ public class OA2ClientCommands extends ClientStoreCommands {
             }
             oa2Client.setCallbackURIs(list);
         }
-        String currentLDAPs = null;
+        JSON currentLDAPs = null;
         if (client.getLdaps() == null || client.getLdaps().isEmpty()) {
-            currentLDAPs = "";
+            currentLDAPs = null;
         } else {
-            currentLDAPs = LDAPConfigurationUtil.toJSON(client.getLdaps()).toString();
+            currentLDAPs = LDAPConfigurationUtil.toJSON(client.getLdaps());
         }
-        String ldaps = getInput("Enter a valid JSON object or array for the ldap configuration(s).", currentLDAPs);
-        if (!ldaps.isEmpty()) {
-            // try to parse it as a single LDAP entry
-            JSON json = null;
+        JSONArray newLDAPS = (JSONArray) inputJSON(currentLDAPs, "ldap configuration", true);
+        if (newLDAPS != null && !newLDAPS.isEmpty()) {
+            client.setLdaps(LDAPConfigurationUtil.fromJSON(newLDAPS));
+        }
+
+        JSONObject newConfig = (JSONObject) inputJSON(client.getConfig(), "client configuration");
+        if (newConfig != null && !newConfig.isEmpty()) {
+            client.setConfig(newConfig);
+        }
+    }
+
+    protected JSON inputJSON(JSON oldJSON, String componentName) {
+        return inputJSON(oldJSON, componentName, false);
+    }
+
+    /**
+     * Allows for entering a new JSON object. This permits multi-line entry so formatted JSON can be cut and pasted
+     * into the command line (as long as there are no blank lines). This will validate the JSON, print out a message and
+     * check that you want to keep the new JSON. Note that you cannot overwrite the value of a configuration at this point
+     * mostly as a safety feature. So hitting return or /exit will have the same effect of keeping the current value.
+     *
+     * @param oldJSON
+     * @return null if the input is terminated (so retain the old object)
+     */
+    protected JSON inputJSON(JSON oldJSON, String componentName, boolean isArray) {
+        if (oldJSON == null) {
+            sayi("no current value for " + componentName);
+        } else {
+            sayi("current value for " + componentName + ":");
+            say(oldJSON.toString(2));
+        }
+        sayi("Enter new JSON value. An empty line terminates input. Entering a line with " + EXIT_COMMAND + " will terminate input too.");
+        String rawJSON = "";
+        boolean redo = true;
+        while (redo) {
             try {
-                JSONArray array = JSONArray.fromObject(ldaps);
-                json = array;
+                String inLine = readline();
+                while (!isEmpty(inLine)) {
+                    rawJSON = rawJSON + inLine;
+                    inLine = readline();
+                }
+            } catch (ExitException x) {
+                // ok, so user terminated input. This ends the whole thing
+                return null;
+            }
+            // if the user just hits return with no input, do nothing. This lets them skip over unchanged entries.
+            if(rawJSON.isEmpty()){
+                return null;
+            }
+            try {
+                JSON json = null;
+                if (isArray) {
+                    json = JSONArray.fromObject(rawJSON);
+                } else {
+                    json = JSONObject.fromObject(rawJSON);
+                }
+                sayi("Success! JSON is valid.");
+                return json;
             } catch (Throwable t) {
-                // ok, so that is not an array, try a singleton
-                try {
-                    JSONObject jsonObject = JSONObject.fromObject(ldaps);
-                    json = jsonObject;
-                } catch (Throwable tt) {
-                    sayi("Sorry, could not parse JSON");
-                }
-                if (json != null) {
-                    client.setLdaps(LDAPConfigurationUtil.fromJSON(json));
-                }
+                sayi("uh-oh... It seems this was not a valid JSON object. The parser message reads:\"" + t.getMessage() + "\"");
+                redo = isOk(getInput("Try to re-enter this?","true"));
             }
         }
 
+        return null;
     }
 
     public OA2ClientCommands(MyLoggingFacade logger, Store store) {

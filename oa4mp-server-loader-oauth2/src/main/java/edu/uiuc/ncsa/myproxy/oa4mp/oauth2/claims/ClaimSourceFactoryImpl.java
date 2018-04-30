@@ -1,11 +1,11 @@
-package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
+package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Client;
-import edu.uiuc.ncsa.security.oauth_2_0.server.ClaimSource;
-import edu.uiuc.ncsa.security.oauth_2_0.server.ClaimSourceFactory;
-import edu.uiuc.ncsa.security.oauth_2_0.server.ClaimSourceFactoryRequest;
+import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
+import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSourceFactory;
+import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSourceFactoryRequest;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
 
 import java.util.LinkedList;
@@ -14,9 +14,9 @@ import java.util.LinkedList;
  * <p>Created by Jeff Gaynor<br>
  * on 12/16/16 at  3:08 PM
  */
-public class LDAPClaimSourceFactory extends ClaimSourceFactory{
+public class ClaimSourceFactoryImpl extends ClaimSourceFactory{
 
-    public LDAPClaimSourceFactory() {
+    public ClaimSourceFactoryImpl() {
     }
 
     @Override
@@ -40,31 +40,31 @@ public class LDAPClaimSourceFactory extends ClaimSourceFactory{
      * @param client
      * @return
      */
-    public static LinkedList<ClaimSource> createScopeHandlers(OA2SE oa2SE, OA2Client client) {
-        DebugUtil.dbg(LDAPClaimSourceFactory.class, "Starting to create LDAPScopeHandlers per client");
+    public static LinkedList<ClaimSource> createClaimSources(OA2SE oa2SE, OA2Client client) {
+        DebugUtil.dbg(ClaimSourceFactoryImpl.class, "Starting to create LDAPScopeHandlers per client");
              LinkedList<ClaimSource> scopeHandlers = new LinkedList<>();
 
              if (client.getLdaps()==null || client.getLdaps().isEmpty()) {
-                 DebugUtil.dbg(LDAPClaimSourceFactory.class, "using default scope handler=");
+                 DebugUtil.dbg(ClaimSourceFactoryImpl.class, "using default scope handler=");
                  if(oa2SE.getClaimSource() instanceof BasicClaimsSourceImpl){
                      BasicClaimsSourceImpl bb = (BasicClaimsSourceImpl)oa2SE.getClaimSource();
                      if(bb.getOa2SE() == null){
-                         DebugUtil.dbg(LDAPClaimSourceFactory.class,"setting scope handler environment #1");
+                         DebugUtil.dbg(ClaimSourceFactoryImpl.class,"setting scope handler environment #1");
                          bb.setOa2SE(oa2SE);
                      }
                  }
                  scopeHandlers.add(oa2SE.getClaimSource());
              } else {
                  for (LDAPConfiguration cfg : client.getLdaps()) {
-                     DebugUtil.dbg(LDAPClaimSourceFactory.class,"Got LDAP configuration for server " + cfg.getServer());
+                     DebugUtil.dbg(ClaimSourceFactoryImpl.class,"Got LDAP configuration for server " + cfg.getServer());
                      LDAPClaimSourceFactoryRequest req = new LDAPClaimSourceFactoryRequest(oa2SE.getMyLogger(),
                              cfg, client.getScopes());
                      ClaimSource claimSource = ClaimSourceFactory.newInstance(req);
                      if(claimSource instanceof BasicClaimsSourceImpl){
-                         DebugUtil.dbg(LDAPClaimSourceFactory.class, "Scope handler\"" + claimSource.getClass().getSimpleName() + "\" is configured.");
+                         DebugUtil.dbg(ClaimSourceFactoryImpl.class, "Scope handler\"" + claimSource.getClass().getSimpleName() + "\" is configured.");
 
                          ((BasicClaimsSourceImpl)claimSource).setOa2SE(oa2SE);
-                         DebugUtil.dbg(LDAPClaimSourceFactory.class, "setting scope handler environment #2");
+                         DebugUtil.dbg(ClaimSourceFactoryImpl.class, "setting scope handler environment #2");
                      }
                      scopeHandlers.add(claimSource);
                  }

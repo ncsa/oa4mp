@@ -2,7 +2,7 @@ package edu.uiuc.ncsa.myproxy.loader;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2ConfigurationLoader;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.oauth_2_0.server.ClaimSource;
+import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
 /**

@@ -20,16 +20,16 @@ public class OA2TransactionKeys extends DSTransactionKeys {
     protected String expiresIn = "expires_in";
     protected String scopes = "scopes";
     protected String authTime = "auth_time";
-    protected String flowStates = "flow_states";
+    protected String states = "states";
 
     public String refreshToken(String... x) {
         if (0 < x.length) refreshToken = x[0];
         return refreshToken;
     }
 
-    public String flowStates(String... x) {
-        if (0 < x.length) flowStates= x[0];
-        return flowStates;
+    public String states(String... x) {
+        if (0 < x.length) states= x[0];
+        return states;
     }
 
     public String refreshTokenValid(String... x) {
@@ -60,7 +60,7 @@ public class OA2TransactionKeys extends DSTransactionKeys {
         allKeys.add(expiresIn());
         allKeys.add(scopes());
         allKeys.add(authTime());
-        allKeys.add(flowStates());
+        allKeys.add(states());
         return allKeys;
 
     }

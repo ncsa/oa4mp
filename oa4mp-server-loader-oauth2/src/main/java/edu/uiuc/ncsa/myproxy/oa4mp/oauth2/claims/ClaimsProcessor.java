@@ -1,12 +1,12 @@
-package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
+package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.CAFunctorFactory;
+import edu.uiuc.ncsa.security.oauth_2_0.OA2Client;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.util.functor.LogicBlock;
+import edu.uiuc.ncsa.security.util.functor.LogicBlocks;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,13 +16,16 @@ import java.util.Map;
  */
 
 public class ClaimsProcessor {
+    /**
+     * This configuration is part of the client and can be accessed by {@link OA2Client#getConfig()}
+     */
     protected JSONObject config;
 
     public ClaimsProcessor(JSONObject config) {
         this.config = config;
     }
 
-    protected List<LogicBlock> logicBlocks;
+    protected LogicBlocks<? extends LogicBlock> logicBlocks;
 
     public Map<String, Object> process(Map<String, Object> claims) {
         ServletDebugUtil.dbg(this, "starting processing");
@@ -34,12 +37,7 @@ public class ClaimsProcessor {
 
         logicBlocks = createLogicBlocks(config, claims);
         ServletDebugUtil.dbg(this, "created " + logicBlocks.size() + " logic blocks.");
-
-        for (LogicBlock logicBlock : logicBlocks) {
-            ServletDebugUtil.dbg(this, "currently evaluting logic block " + logicBlock.toString());
-            logicBlock.execute();
-            ServletDebugUtil.dbg(this, "logic block results = " + logicBlock.getResults());
-        }
+        logicBlocks.execute();
         executed = true;
         ServletDebugUtil.dbg(this, "Finished processing, returned claims are");
         ServletDebugUtil.dbg(this, claims.toString());
@@ -56,9 +54,9 @@ public class ClaimsProcessor {
      * @param configuration
      * @return
      */
-    protected List<LogicBlock> createLogicBlocks(JSONObject configuration, Map<String, Object> claims){
+    protected LogicBlocks<? extends LogicBlock> createLogicBlocks(JSONObject configuration, Map<String, Object> claims){
         ServletDebugUtil.dbg(this, "config:\n\n" + config.toString(2));
-        CAFunctorFactory functorFactory = new CAFunctorFactory(claims);
+        OA2FunctorFactory functorFactory = new OA2FunctorFactory(claims);
 
         JSONArray jsonArray = new JSONArray();
         jsonArray.add(config);

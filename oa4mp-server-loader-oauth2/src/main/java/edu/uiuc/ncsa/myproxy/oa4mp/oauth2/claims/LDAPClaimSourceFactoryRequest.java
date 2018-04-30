@@ -1,7 +1,7 @@
-package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
+package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
 
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.oauth_2_0.server.ClaimSourceFactoryRequest;
+import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSourceFactoryRequest;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
 
 import java.util.Collection;

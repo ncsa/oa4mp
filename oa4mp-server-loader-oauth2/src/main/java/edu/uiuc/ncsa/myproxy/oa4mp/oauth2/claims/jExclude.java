@@ -8,9 +8,11 @@ import java.util.Map;
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.FunctorClaimsType.EXCLUDE;
 
 /**
-  * This will omit the claims. You may give any list of claim names (rather than values) you wish. If
-  * a claim is not present, then nothing is done, i.e., the contract is to ensure that the stated claims
-  * are not returned so there is no error if the claim fails to exist in the first place.
+ * This will omit the claims. You may give any list of claim names (rather than values) you wish. If
+ * a claim is not present, then nothing is done, i.e., the contract is to ensure that the stated claims
+ * are not returned so there is no error if the claim fails to exist in the first place.
+ * Always invoke this last in any sequence of claims, lest you remove a claim you are trying to change, e.g.
+ * <p/>
  * <p>Created by Jeff Gaynor<br>
  * on 3/1/18 at  12:50 PM
  */
@@ -21,6 +23,9 @@ public class jExclude extends ClaimFunctor {
 
     @Override
     public Object execute() {
+        if (claims == null) {
+            return null;
+        }
         HashSet<String> newClaims = new HashSet<>();
         for (int i = 0; i < getArgs().size(); i++) {
             Object obj = getArgs().get(i);

@@ -48,33 +48,6 @@ public abstract class AuthorizedServlet extends CRServlet {
      * @return
      */
 abstract    protected ProtocolParameters parseRequest(HttpServletRequest request) throws ServletException;
-    //{
-      /*  ProtocolParameters p = new ProtocolParameters();
-        String ag = request.getParameter(CONST(TOKEN_KEY));
-        ServiceTransaction trans = null;
-        say("starting request for token =" + ag);
-        if (ag == null) {
-            throw new GeneralException("Error: Invalid request -- no token. Request rejected.");
-        }
-        p.userId = request.getParameter(AUTHORIZATION_USER_NAME_KEY);
-        p.password = request.getParameter(AUTHORIZATION_PASSWORD_KEY);
-        String xUsername = getServiceEnvironment().getUsernameTransformer().createMyProxyUsername(request);
-        if (xUsername != null) {
-            p.userId = xUsername;
-        }
-
-        String lifetimeS = request.getParameter(AUTHORIZATION_CERT_LIFETIME_KEY);
-        p.lifetime = trans.getLifetime();
-        if (lifetimeS != null && 0 < lifetimeS.length()) {
-            try {
-                p.lifetime = Long.parseLong(lifetimeS);
-            } catch (Throwable t) {
-                // do nothing
-            }
-        }
-
-        return p;*/
-    //}
 
     @Override
     protected void doIt(HttpServletRequest request, HttpServletResponse response) throws Throwable {

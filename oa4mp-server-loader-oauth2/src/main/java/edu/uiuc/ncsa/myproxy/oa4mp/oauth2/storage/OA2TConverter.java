@@ -1,7 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowStates;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.TransactionConverter;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientStore;
@@ -57,10 +56,10 @@ public class OA2TConverter<V extends OA2ServiceTransaction> extends TransactionC
         if (map.get(getTCK().authTime()) != null) {
             st.setAuthTime(map.getDate(getTCK().authTime));
         }
-        if (map.get(getTCK().flowStates()) != null) {
-            st.setFlowStates(new FlowStates((JSONObject) JSONSerializer.toJSON(map.get(getTCK().flowStates()))));
+        if (map.get(getTCK().states()) != null) {
+            st.setState((JSONObject) JSONSerializer.toJSON(map.get(getTCK().states())));
         } else {
-            st.setFlowStates(new FlowStates());
+            st.setState(new JSONObject());
         }
         return st;
     }
@@ -90,7 +89,8 @@ public class OA2TConverter<V extends OA2ServiceTransaction> extends TransactionC
         if (t.hasAuthTime()) {
             map.put(getTCK().authTime(), t.getAuthTime());
         }
-        map.put(getTCK().flowStates(), t.getFlowStates().toJSON().toString());
+   //     map.put(getTCK().flowStates(), t.getFlowStates().toJSON().toString());
+        map.put(getTCK().states(), t.getState().toString());
     }
 
 }

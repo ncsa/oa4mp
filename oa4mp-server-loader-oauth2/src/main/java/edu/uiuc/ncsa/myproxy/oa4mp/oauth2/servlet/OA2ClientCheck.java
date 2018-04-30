@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Client;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2GeneralError;
+import net.sf.json.JSONObject;
 import org.apache.http.HttpStatus;
 
 /**
@@ -47,5 +48,7 @@ public class OA2ClientCheck {
             //throw new GeneralException("Error: The given redirect is not valid for this client");
         }
     }
+
+
 
 }

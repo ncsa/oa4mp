@@ -6,7 +6,7 @@ import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
 import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2RefreshTokenImpl;
-import edu.uiuc.ncsa.security.oauth_2_0.server.OA2Claims;
+import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
 import edu.uiuc.ncsa.security.storage.data.ConversionMap;
 import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
 import edu.uiuc.ncsa.security.util.pkcs.CertUtil;

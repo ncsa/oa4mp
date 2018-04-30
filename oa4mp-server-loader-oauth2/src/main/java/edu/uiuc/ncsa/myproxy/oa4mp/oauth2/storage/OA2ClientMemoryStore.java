@@ -4,7 +4,6 @@ import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.delegation.server.storage.impl.ClientMemoryStore;
 import edu.uiuc.ncsa.security.delegation.storage.impl.BaseClientConverter;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Client;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2ClientConverter;
 
 /**
  * <p>Created by Jeff Gaynor<br>

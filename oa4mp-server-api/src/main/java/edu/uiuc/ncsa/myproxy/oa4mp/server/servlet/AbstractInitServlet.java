@@ -39,7 +39,7 @@ public abstract class AbstractInitServlet extends MyProxyDelegationServlet{
         * @throws java.io.IOException
         * @throws javax.servlet.ServletException
         */
-       protected void doDelegation(HttpServletRequest req, HttpServletResponse resp) throws Throwable {
+       protected ServiceTransaction doDelegation(HttpServletRequest req, HttpServletResponse resp) throws Throwable {
            Client client = getClient(req);
 
            try {
@@ -63,6 +63,7 @@ public abstract class AbstractInitServlet extends MyProxyDelegationServlet{
                info("2.b finished initial request for token =\"" + transaction.getIdentifierString() + "\".");
 
                postprocess(new IssuerTransactionState(req, resp, params, transaction, agResponse));
+               return transaction;
            }
            catch (Throwable t) {
                if (t instanceof UnapprovedClientException ) {

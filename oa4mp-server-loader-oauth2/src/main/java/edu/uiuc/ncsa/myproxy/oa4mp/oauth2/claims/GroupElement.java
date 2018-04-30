@@ -1,4 +1,4 @@
-package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.scopeHandlers;
+package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
 
 import net.sf.json.JSONObject;
 

@@ -11,7 +11,7 @@ import edu.uiuc.ncsa.security.delegation.server.request.AGResponse;
 import edu.uiuc.ncsa.security.delegation.server.request.IssuerResponse;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.oauth_2_0.*;
-import edu.uiuc.ncsa.security.oauth_2_0.server.OA2Claims;
+import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
 import net.sf.json.JSONObject;
 import org.apache.http.HttpStatus;
 
@@ -56,8 +56,10 @@ public class OA2AuthorizedServlet extends AbstractInitServlet {
                     callback);
         }
         if (CheckIdTokenHint(httpServletRequest, httpServletResponse, callback)) return;
-        super.doIt(httpServletRequest, httpServletResponse);
+        super.doDelegation(httpServletRequest, httpServletResponse);
     }
+
+
 
     /**
      * In this case, a previous request to the token endpoint returned an ID token. If this is sent to
@@ -139,7 +141,7 @@ public class OA2AuthorizedServlet extends AbstractInitServlet {
         String rawSecret = params.get(CLIENT_SECRET);
         if (rawSecret != null) {
             info("Client is sending secret in initial request. Though not forbidden by the protocol this is discouraged.");
-            if(!agResponse.getClient().getSecret().equals(rawSecret)){
+            if (!agResponse.getClient().getSecret().equals(rawSecret)) {
                 info("And for what it is worth, the client sent along an incorrect secret too...");
             }
         }
@@ -169,9 +171,9 @@ public class OA2AuthorizedServlet extends AbstractInitServlet {
         st.setNonce(nonce);
         // We can't support this because the spec says we must re-authenticate the user. We should have to track this
         // in all subsequent attempts. Since all requests have an expiration date, this parameter is redundant in any case.
-         if(agResponse.getParameters().containsKey(OA2Constants.MAX_AGE)){
-             throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST, "The " + OA2Constants.MAX_AGE +" parameter is not supported at this time.", state, givenRedirect);
-         }
+        if (agResponse.getParameters().containsKey(OA2Constants.MAX_AGE)) {
+            throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST, "The " + OA2Constants.MAX_AGE + " parameter is not supported at this time.", state, givenRedirect);
+        }
 
         // Store the callback the user needs to use for this request, since the spec allows for many.
         // and now check for a bunch of stuff that might fail.
@@ -191,6 +193,7 @@ public class OA2AuthorizedServlet extends AbstractInitServlet {
      * This method will take the scopes that the client sends in its request and inspect the scopes that it is allowed
      * to request. The result will be a list of permitted scopes. This is also where omitting the openid scope
      * causes the request to be rejected.
+     *
      * @param st
      * @param params
      * @param state
