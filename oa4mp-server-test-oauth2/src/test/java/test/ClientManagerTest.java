@@ -1,7 +1,5 @@
 package test;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.ldap.LDAPEntry;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.ldap.LDAPStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.OA2ClientConverter;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.OA2ClientMemoryStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.SAT;
@@ -32,8 +30,6 @@ public class ClientManagerTest extends DDServerTests implements SAT {
         System.out.println(DD);
         testGetSerialization(tp2);
         System.out.println(DD);
-   //     testLDAPStore(tp2.getLDAPStore(), tp2.getClientStore());
-   //     testLDAPStore2(tp2.getLDAPStore(), tp2.getClientStore());
         testNix(tp2);
     }
    @Test
@@ -186,36 +182,6 @@ public class ClientManagerTest extends DDServerTests implements SAT {
         return ldap;
     }
 
-    public void testLDAPStore(LDAPStore<LDAPEntry> ldapStore, ClientStore clientStore) throws Exception {
-        OA2Client oa2Client = (OA2Client) clientStore.create();
-        LDAPConfiguration ldap = createLDAP();
-        LDAPEntry ldapEntry = ldapStore.create();
-        ldapEntry.setClientID(oa2Client.getIdentifier());
-        ldapEntry.setConfiguration(ldap);
-        ldapStore.save(ldapEntry);
-        LDAPEntry ldapEntry1 = ldapStore.get(ldapEntry.getIdentifier());
-        assert ldapEntry.equals(ldapEntry1);
-
-    }
-
-    /**
-     * Retrieve a configuration by its client id.
-     *
-     * @param ldapStore
-     * @param clientStore
-     * @throws Exception
-     */
-    public void testLDAPStore2(LDAPStore<LDAPEntry> ldapStore, ClientStore clientStore) throws Exception {
-        OA2Client oa2Client = (OA2Client) clientStore.create();
-        LDAPConfiguration ldap = createLDAP();
-        LDAPEntry ldapEntry = ldapStore.create();
-        ldapEntry.setClientID(oa2Client.getIdentifier());
-        ldapEntry.setConfiguration(ldap);
-        ldapStore.save(ldapEntry);
-        LDAPEntry ldapEntry1 = ldapStore.getByClientID(ldapEntry.getClientID());
-        assert ldapEntry.equals(ldapEntry1);
-
-    }
 
 
 }

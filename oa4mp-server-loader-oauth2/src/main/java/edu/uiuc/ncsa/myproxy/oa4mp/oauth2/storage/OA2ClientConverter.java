@@ -62,7 +62,7 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
                 } else {
                     JSONArray array = (JSONArray) temp;
                     if (array.size() != 1) {
-                        throw new GeneralException("Error: multiple lpd LDAP configurations encountered for id \"" + otherV.getIdentifierString() + "\". Convert manually.");
+                        throw new GeneralException("Error: multiple LDAP configurations encountered for id \"" + otherV.getIdentifierString() + "\". Convert manually.");
                     }
                     ldap = (JSONObject) array.get(0);
 
@@ -72,11 +72,18 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         }
         JSONObject cfg = null;
         if (map.containsKey(getCK2().cfg())) {
-            cfg = JSONObject.fromObject(map.getString(getCK2().cfg()));
+            String rawCfg = map.getString(getCK2().cfg());
+            if(rawCfg != null && !rawCfg.isEmpty()) {
+                cfg = JSONObject.fromObject(map.getString(getCK2().cfg()));
+            }
             //otherV.setConfig(JSONObject.fromObject(map.getString(getCK2().cfg())));
         }
         if (ldap == null) {
             // nix to do. Set the configuration object if it exists
+            if(cfg == null){
+                // so by this point, no configuration has been found either.
+                cfg = new JSONObject();
+            }
             OA2ClientConfigurationUtil.setSaved(cfg, true);
 
 
@@ -87,6 +94,13 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
             }
             OA2ClientConfigurationUtil.convertToNewConfiguration(ldap, cfg);
             OA2ClientConfigurationUtil.setSaved(cfg, false);
+            // NOTE!! This next set of statement takes an existing LDAP and puts it back into the
+            // configuration. This effectively updates the name (if needed) to ensure that conversion is
+            // properly made to the new version, 4.0. If you remove this, you will delete the old LDAP
+            // entries from the client. We will want to do this at some point.
+            JSONArray ldaps = new JSONArray();
+            ldaps.add(ldap);
+            otherV.setLdaps(LDAPConfigurationUtil.fromJSON(ldaps));
         }
         if (cfg != null) {
             otherV.setConfig(cfg);

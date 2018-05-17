@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows;
 
+import edu.uiuc.ncsa.security.util.functor.JFunctor;
 import edu.uiuc.ncsa.security.util.functor.JFunctorImpl;
 
 /**
@@ -19,9 +20,25 @@ public class jSetClaimSource extends JFunctorImpl {
     }
 
 
+    /**
+     * Really since this just conveys its arguments for other functors to use, nothing executes here, but the arguments are
+     * replaced if they evaluate..
+     * @return
+     */
     @Override
     public Object execute() {
+        if(executed) return result;
+        for(int i =0 ; i < getArgs().size(); i++){
+            Object object = getArgs().get(i);
+            if(object instanceof JFunctor){
+                Object rr = ((JFunctor)object).execute();
+                if(rr != null){
+                    getArgs().set(i, rr.toString());
+                }
+            }
+        }
         executed = true;
-        return null;
+        result = null;
+        return result;
     }
 }

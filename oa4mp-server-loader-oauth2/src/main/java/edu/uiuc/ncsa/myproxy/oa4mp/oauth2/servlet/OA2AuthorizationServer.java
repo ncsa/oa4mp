@@ -17,7 +17,6 @@ import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.oauth_2_0.*;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
-import edu.uiuc.ncsa.security.servlet.JSPUtil;
 import edu.uiuc.ncsa.security.servlet.PresentableState;
 import net.sf.json.JSONObject;
 
@@ -109,6 +108,9 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
         boolean exceptionEncountered = false;
     }
 
+    protected OA2AuthorizedServletUtil getInitUtil(){
+        return new OA2AuthorizedServletUtil(this);
+    }
 
     @Override
     protected void doIt(HttpServletRequest request, HttpServletResponse response) throws Throwable {
@@ -116,10 +118,12 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
 
         //printAllParameters(request);
         if (map.containsKey(OA2Constants.RESPONSE_TYPE)) {
-            // Probably means this is an initial request. Pass it along to the init servlet to
+            // Probably means this is an initial request. Pass it along to the init util to
             // unscramble it.
             MyHttpServletResponseWrapper wrapper = new MyHttpServletResponseWrapper(response);
-            JSPUtil.fwd(request, wrapper, AUTHORIZED_ENDPOINT);
+            OA2AuthorizedServletUtil init = getInitUtil();
+            init.doDelegation(request, wrapper);
+           // JSPUtil.fwd(request, wrapper, AUTHORIZED_ENDPOINT);
             if (wrapper.isExceptionEncountered()) {
                 throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, wrapper.toString(), wrapper.getStatus());
             } // something happened someplace else and the exception was handled.

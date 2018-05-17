@@ -30,14 +30,14 @@
         <auth-constraint/>
     </security-constraint>-->
 
-    <servlet>
+<!--    <servlet>
         <servlet-name>initiate</servlet-name>
         <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2AuthorizedServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>initiate</servlet-name>
         <url-pattern>/authorized</url-pattern>
-    </servlet-mapping>
+    </servlet-mapping>-->
 
     <servlet>
            <servlet-name>discovery</servlet-name>

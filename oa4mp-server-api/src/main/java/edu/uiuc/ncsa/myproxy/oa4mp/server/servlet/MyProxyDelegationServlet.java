@@ -99,7 +99,7 @@ public abstract class MyProxyDelegationServlet extends EnvServlet implements Tra
     public static KeyPairPopulationThread kpt;
 
 
-    protected AGIssuer getAGI() throws IOException {
+    public AGIssuer getAGI() throws IOException {
         return getServiceEnvironment().getAgIssuer();
     }
 
@@ -159,7 +159,7 @@ public abstract class MyProxyDelegationServlet extends EnvServlet implements Tra
         }
     }
 
-    protected TransactionStore getTransactionStore() throws IOException {
+    public TransactionStore getTransactionStore() throws IOException {
         return getServiceEnvironment().getTransactionStore();
     }
 

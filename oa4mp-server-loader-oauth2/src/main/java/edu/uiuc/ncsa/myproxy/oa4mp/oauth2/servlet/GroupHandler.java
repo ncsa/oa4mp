@@ -13,7 +13,7 @@ import net.sf.json.JSONArray;
 public class GroupHandler {
     /**
      * The most basic incarnation. This assumes that the raw JSON is just an array of
-     * group names with no special structure.
+     * group names (e.g. ["grp0","grp1",...])  with no special structure.
      * @param jsonArray
      * @return
      */

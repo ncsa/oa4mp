@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.GroupHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.NCSAGroupHandler;
 import edu.uiuc.ncsa.security.core.Logable;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
@@ -40,7 +41,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
 
     @Override
     public void setConfiguration(JSONConfig configuration) {
-        this.ldapConfiguration = (LDAPConfiguration)configuration;
+        this.ldapConfiguration = (LDAPConfiguration) configuration;
     }
 
     public LDAPClaimsSource(LDAPConfiguration ldapConfiguration, MyLoggingFacade myLogger) {
@@ -101,9 +102,10 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
         return searchName;
     }
 
-    protected boolean isNCSA(){
+    protected boolean isNCSA() {
         return getCfg().getServer().equals("ldap.ncsa.illinois.edu");
     }
+
     MyLoggingFacade myLogger = null;
 
     protected MyLoggingFacade getMyLogger() {
@@ -175,9 +177,9 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
                 info("No search name encountered for LDAP query. No search performed.");
             }
             DebugUtil.dbg(this, "user info =" + userInfo.getMap());
-       //     Map<String, Object> claims = userInfo.getMap();
-     //       claims = getClaimsHandler(((OA2Client) transaction.getClient()).getClaimsConfig()).process(claims);
-         //   userInfo.setMap(claims);
+            //     Map<String, Object> claims = userInfo.getMap();
+            //       claims = getClaimsHandler(((OA2Client) transaction.getClient()).getClaimsConfig()).process(claims);
+            //   userInfo.setMap(claims);
             context.close();
         } catch (Throwable throwable) {
             handleException(throwable);
@@ -296,7 +298,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
         String filter = "(&(" + getSearchFilterAttribute() + "=" + userID + "))";
         DebugUtil.dbg(this, "filter=" + filter);
         NamingEnumeration e = ctx.search(getCfg().getContextName(), filter, ctls);
-        return toJSON(attributes, e);
+        return toJSON(attributes, e, userID);
     }
 
     /**
@@ -309,7 +311,10 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
      * @return
      * @throws NamingException
      */
-    protected JSONObject toJSON(Map<String, LDAPConfigurationUtil.AttributeEntry> attributes, NamingEnumeration e) throws NamingException {
+    protected JSONObject toJSON(Map<String,
+            LDAPConfigurationUtil.AttributeEntry> attributes,
+                                NamingEnumeration e,
+                                String userName) throws NamingException {
         DebugUtil.dbg(this, "starting to convert search results to JSON. " + attributes.size() + " results found.");
         JSONObject json = new JSONObject();
 
@@ -329,7 +334,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
                     }
                     GroupHandler gg = null;
                     if (isNCSA()) {
-                        gg = new NCSAGroupHandler(this);
+                        gg = new NCSAGroupHandler(this,userName);
                     } else {
                         gg = getGroupHandler();
                     }
@@ -515,14 +520,70 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
             UserInfo ui2 = claimsSource.process(ui, st);
             System.out.println("Result of LDAP query:");
             System.out.println(ui2.getMap());
-         //   getGid(cfg, "lsst_users");
+            //   getGid(cfg, "lsst_users");
         } catch (Throwable t) {
             t.printStackTrace();
 
         }
     }
 
-    public static int getGid(LDAPConfiguration cfg2, String groupName) throws Throwable {
+
+    public static Groups get_NEW_Gid(LDAPConfiguration cfg2, String username) throws Throwable {
+        LDAPConfiguration cfg = cfg2.clone();
+        cfg.setSearchBase("ou=Groups,dc=ncsa,dc=illinois,dc=edu");
+        LDAPClaimsSource claimsSource = new LDAPClaimsSource(cfg, null);
+        DirContext dirContext = new InitialDirContext(claimsSource.createEnv(cfg));
+        LdapContext ctx = (LdapContext) dirContext.lookup(cfg.getSearchBase());
+        SearchControls ctls = new SearchControls();
+        ctls.setReturningAttributes(new String[]{"cn", "gidNumber"});
+        String filter = "(&(uniqueMember=uid=" + username + ",ou=People,dc=ncsa,dc=illinois,dc=edu))";
+        NamingEnumeration e = ctx.search(cfg.getContextName(), filter, ctls);
+        Groups groups = new Groups();
+        while (e.hasMoreElements()) {
+            SearchResult entry = (SearchResult) e.next();
+            Attributes a = entry.getAttributes();
+            GroupElement groupElement = convertToEntry(a);
+            groups.put(groupElement);
+        }
+        ctx.close();
+        return groups;
+    }
+
+    protected static GroupElement convertToEntry(Attributes a) throws NamingException {
+        JSONObject json = new JSONObject();
+        Attribute attribute = a.get("gidNumber");
+
+        int gid = -1;
+        if (attribute != null) {
+            String xxx = String.valueOf(attribute.get(0));
+            if (xxx != null && !xxx.isEmpty()) {
+                gid = Integer.parseInt(xxx);
+            }
+
+        }
+        if (-1 < gid) {
+            json.put("id", gid);
+        }
+        attribute = a.get("cn");
+        String id = attribute.getID() + ":"; // standard format
+
+        String groupName = attribute.toString().substring(id.length()).trim();
+        if(groupName.isEmpty()){
+            throw new NFWException("Error: The group name somehow was empty. This implies the LDAP entry has changed or is incorrect");
+        }
+        GroupElement g = null;
+        if (gid == -1) {
+            // no gid
+            g = new GroupElement(groupName);
+        } else {
+            g = new GroupElement(groupName, gid);
+        }
+
+        return g;
+
+    }
+
+    public static int get_OLD_Gid(LDAPConfiguration cfg2, String groupName) throws Throwable {
         LDAPConfiguration cfg = cfg2.clone();
         cfg.setSearchBase("ou=Groups,dc=ncsa,dc=illinois,dc=edu");
         LDAPClaimsSource claimsSource = new LDAPClaimsSource(cfg, null);

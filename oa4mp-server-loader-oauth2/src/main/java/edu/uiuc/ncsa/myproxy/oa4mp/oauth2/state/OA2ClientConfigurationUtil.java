@@ -2,14 +2,18 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.jSetClaimSource;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.ClientConfigurationUtil;
-import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfigurationUtil;
-import edu.uiuc.ncsa.security.util.functor.FunctorTypeImpl;
-import edu.uiuc.ncsa.security.util.functor.logic.jTrue;
+import edu.uiuc.ncsa.security.util.functor.JFunctorFactory;
+import edu.uiuc.ncsa.security.util.functor.LogicBlock;
+import edu.uiuc.ncsa.security.util.functor.LogicBlocks;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
+import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Map;
+
+import static edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfigurationUtil.CONFIGURATION_NAME_KEY;
+import static edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfigurationUtil.LDAP_TAG;
 
 /**
  * This helps work with the configuration for a client. The basic format is
@@ -76,15 +80,15 @@ public class OA2ClientConfigurationUtil extends ClientConfigurationUtil {
 
     }
 
-    static public String getComment(JSONObject cfg){
-        if(cfg.containsKey(CONFIG_KEY)){
+    static public String getComment(JSONObject cfg) {
+        if (cfg.containsKey(CONFIG_KEY)) {
             return cfg.getString(CONFIG_KEY);
         }
         return "";
     }
 
-    public static void setComment(JSONObject cfg, String comment){
-          cfg.put(CONFIG_KEY, comment);
+    public static void setComment(JSONObject cfg, String comment) {
+        cfg.put(CONFIG_KEY, comment);
     }
 
     /**
@@ -156,64 +160,94 @@ public class OA2ClientConfigurationUtil extends ClientConfigurationUtil {
 
     /**
      * This will take the old LDAP object and convert it to the new configuration format. It does this by
-     * breating a new entry with a distinguished name. If that exists in the new config,
+     * creating a new entry with a distinguished name. If that exists in the new config,
      * then it is assumed that this has been done.
-     *
+     * <p/>
      * To migrate an old claim source configuration (only LDAP was explicitly supported you must either)<br/>
      * <ul>
-     *     <li>let this run (it will be invoked automatically)</li>
-     *     <li>explicitly migrate the old configuration by hand and set up a corresponding conditional.</li>
+     * <li>let this run (it will be invoked automatically)</li>
+     * <li>explicitly migrate the old configuration by hand and set up a corresponding conditional.</li>
      * </ul>
+     *
      * @param oldLDAP the raw JSON of the old LDAP configuration in the store. Delete this from the store when done!
-     * @param config the new configuration object
+     * @param config  the new configuration object
      * @return
      */
     public static JSONObject convertToNewConfiguration(JSONObject oldLDAP, JSONObject config) {
         JSONArray claimSources = getClaimSourceConfigurations(config);
+        JSONObject content = oldLDAP.getJSONObject(LDAP_TAG);
+
         boolean containsOldLDAP = false;
-        for (int i = 0; i < claimSources.size(); i++) {
-            try {
-                JSONObject obj = claimSources.getJSONObject(i);
-                containsOldLDAP = containsOldLDAP || obj.containsKey(LDAPConfigurationUtil.CONFIGURATION_NAME_KEY);
-            } catch (Throwable t) {
-                // If this fails, we don't care.
+
+        if (content.containsKey(CONFIGURATION_NAME_KEY)) {
+            String oldLDAPName = content.getString(CONFIGURATION_NAME_KEY);
+
+            // the old LDAP config contains a name, so we check if it is in the current list of thse
+            for (int i = 0; i < claimSources.size(); i++) {
+                try {
+                    JSONObject obj = claimSources.getJSONObject(i);
+                    JSONObject currentContent = obj.getJSONObject(LDAP_TAG);
+                    if (currentContent.getString(CONFIGURATION_NAME_KEY).equals(oldLDAPName)) {
+                        containsOldLDAP = true;
+                        break;
+                    }
+                } catch (Throwable t) {
+                    // If this fails, we don't care.
+                }
             }
-        }
-        if (!containsOldLDAP) {
-            JSONObject content = oldLDAP.getJSONObject(LDAPConfigurationUtil.LDAP_TAG);
-            content.put(LDAPConfigurationUtil.CONFIGURATION_NAME_KEY, OLD_LDAP_CONFIG_NAME);
-            // have to do this since JSON libraries clones things and we need to make sure this is updated.
-            oldLDAP.put(LDAPConfigurationUtil.LDAP_TAG, content);
+            if (!containsOldLDAP) {
+                // Add it to the list of configurations.
+                claimSources.add(oldLDAP);
+                // update the set of claims sources in the configuration.
+                setClaimSourcesConfigurations(config, claimSources);
+                JSONArray rt = getRuntime(config);
+                if (rt == null || rt.isEmpty()) {
+                    createDefaultRuntime(config, oldLDAPName);
+                }
+            }
+
+        } else {
+            // the current content has no key. Then we create a new key and include it.
+            SecureRandom secureRandom = new SecureRandom();
+            long newValue = secureRandom.nextLong();
+            String newName = Long.toHexString(newValue);
+            content.put(CONFIGURATION_NAME_KEY, newName);
+            oldLDAP.put(LDAP_TAG, content);
             claimSources.add(oldLDAP);
             setClaimSourcesConfigurations(config, claimSources);
-            JSONObject ifBlock = new JSONObject();
+            createDefaultRuntime(config, newName);
 
-            jTrue jTrue = new jTrue();
-            ifBlock.put(FunctorTypeImpl.IF.getValue(), jTrue.toJSON());
-
-            JSONObject thenBlock = new JSONObject();
-
-            jSetClaimSource jSetClaimSource = new jSetClaimSource();
-            jSetClaimSource.addArg(OA2ClientConfigurationFactory.LDAP_DEFAULT);
-            jSetClaimSource.addArg(OLD_LDAP_CONFIG_NAME);
-
-            ifBlock.put(FunctorTypeImpl.THEN.getValue(), jSetClaimSource.toJSON());
-            // this creates the correct ifBlock.
-            JSONArray runtime = getRuntime(config);
-            runtime.add(ifBlock);
-            setRuntime(config, runtime);
         }
+
         return config;
 
     }
-   public static boolean isSaved(JSONObject config){
-       if(config.containsKey(SAVED_KEY)){
-           return config.getBoolean(SAVED_KEY);
-       }
 
-       return true;
-   }
-    public static void setSaved(JSONObject config, boolean value){
+    protected static void createDefaultRuntime(JSONObject config, String newName) {
+        JSONArray array = new JSONArray();
+        JFunctorFactory ff = new JFunctorFactory();
+        jSetClaimSource jSetClaimSource = new jSetClaimSource();
+        jSetClaimSource.addArg(OA2ClientConfigurationFactory.LDAP_DEFAULT);
+        jSetClaimSource.addArg(newName);
+        array.add(jSetClaimSource.toJSON());
+        LogicBlocks<? extends LogicBlock> defaultLBs = ff.createLogicBlock(array);
+        // there should be one and we need it.
+        LogicBlock lb = defaultLBs.get(0);
+        JSONArray runtime = getRuntime(config);
+        JSONObject ifBlock = JSONObject.fromObject(lb.toString());
+        runtime.add(ifBlock);
+        setRuntime(config, runtime);
+    }
+
+    public static boolean isSaved(JSONObject config) {
+        if (config.containsKey(SAVED_KEY)) {
+            return config.getBoolean(SAVED_KEY);
+        }
+
+        return true;
+    }
+
+    public static void setSaved(JSONObject config, boolean value) {
         config.put(SAVED_KEY, value);
     }
 }
