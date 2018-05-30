@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.admin.AdminClientServer;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.attributes.AttributeServer;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.client.ClientServer;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.permissions.PermissionServer;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.SATFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions.*;
@@ -17,7 +18,6 @@ import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.delegation.services.Response;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2Client;
 import net.sf.json.JSONObject;
 import org.apache.commons.codec.digest.DigestUtils;
 

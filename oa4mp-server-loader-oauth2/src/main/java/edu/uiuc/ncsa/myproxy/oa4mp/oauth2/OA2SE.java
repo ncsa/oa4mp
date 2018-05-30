@@ -1,7 +1,5 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.ldap.LDAPEntry;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.ldap.LDAPStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.BasicClaimsSourceImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.MyProxyFacadeProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironmentImpl;
@@ -64,7 +62,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
                  long maxClientRefreshTokenLifetime,
                  JSONWebKeys jsonWebKeys,
                  String issuer,
-                 Provider<LDAPStore> mldap,
+              //   Provider<LDAPStore> mldap,
                  boolean utilServletEnabled) {
         super(logger,
                 mfp,
@@ -106,7 +104,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.maxClientRefreshTokenLifetime = maxClientRefreshTokenLifetime;
         this.jsonWebKeys = jsonWebKeys;
         this.issuer = issuer;
-        this.mldap = mldap;
+     //   this.mldap = mldap;
         if (claimSource instanceof BasicClaimsSourceImpl) {
             DebugUtil.dbg(this, "***Setting runtime environment in the scope handler:" + claimSource.getClass().getSimpleName());
             ((BasicClaimsSourceImpl) claimSource).setOa2SE(this);
@@ -225,13 +223,4 @@ public class OA2SE extends ServiceEnvironmentImpl {
 
     LDAPConfiguration ldapConfiguration2;
 
-    Provider<LDAPStore> mldap;
-    LDAPStore ldapStore = null;
-
-    public LDAPStore<LDAPEntry> getLDAPStore() {
-        if (ldapStore == null) {
-            ldapStore = mldap.get();
-        }
-        return ldapStore;
-    }
 }

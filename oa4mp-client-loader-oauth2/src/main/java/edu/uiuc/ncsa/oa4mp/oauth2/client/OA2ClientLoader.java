@@ -12,7 +12,6 @@ import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.delegation.client.DelegationService;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.delegation.token.TokenForge;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2Client;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2ConfigurationLoaderUtils;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2TokenForge;
@@ -183,7 +182,7 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
         Provider<Client> clientProvider = new Provider<Client>() {
             @Override
             public Client get() {
-                return new OA2Client(BasicIdentifier.newID(getId()));
+                return new Client(BasicIdentifier.newID(getId()));
             }
         };
 

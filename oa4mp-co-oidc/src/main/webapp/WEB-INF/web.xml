@@ -7,40 +7,7 @@
 
     <display-name>The MyProxy Delegation Service</display-name>
 
-    <!--
-   Note that this next section is REQUIRED! This prevents anything else but this webapp from
-   accessing the /initiate endpoint. Never expose the /initiate endpoint to the outside world.
-   If you are using Apache, you should also not have the /initiate endpoint referenced in the
-   proxy_ajp file (so no ProxyPass entry). The reason for this endpoint is that it allows
-   a pluggable architecture for replacing the authorization module. If you replace the authorize
-   endpoint with your own module, you authenticate the user, then if that succeeds,
-   pass the user request straight through to the initiate
-   endpoint for processing.
-    -->
 
-      <security-constraint>
-          <web-resource-collection>
-              <web-resource-name>Lockdown_authorized_endpoint</web-resource-name>
-              <url-pattern>/authorized</url-pattern>
-              <http-method>GET</http-method>
-              <http-method>POST</http-method>
-              <http-method>PUT</http-method>
-              <http-method>DELETE</http-method>
-          </web-resource-collection>
-          <auth-constraint/>
-      </security-constraint>
-
-
-
-
-    <servlet>
-        <servlet-name>initiate</servlet-name>
-        <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2AuthorizedServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>initiate</servlet-name>
-        <url-pattern>/authorized</url-pattern>
-    </servlet-mapping>
 
     <servlet>
         <servlet-name>accessToken</servlet-name>

@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.ClaimSourceFactoryImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RefreshTokenStore;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractAccessTokenServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.IssuerTransactionState;
@@ -161,7 +162,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             // public clients cannot get an access token
             IssuerTransactionState state = doAT(request, response, client);
             ATIResponse2 atResponse = (ATIResponse2) state.getIssuerResponse();
-            OA2ServiceTransaction t = (OA2ServiceTransaction)state.getTransaction();
+            OA2ServiceTransaction t = (OA2ServiceTransaction) state.getTransaction();
             atResponse.setClaims(t.getClaims());
             atResponse.write(response);
             return true;
@@ -191,7 +192,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         ATIResponse2 atResponse = (ATIResponse2) state.getIssuerResponse();
         atResponse.setSignToken(client.isSignTokens());
         OA2ServiceTransaction st2 = (OA2ServiceTransaction) state.getTransaction();
-        if(!st2.getFlowStates().acceptRequests || !st2.getFlowStates().accessToken){
+        if (!st2.getFlowStates().acceptRequests || !st2.getFlowStates().accessToken) {
             throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "getting access token denied", HttpStatus.SC_UNAUTHORIZED);
         }
         atResponse.setClaims(st2.getClaims());
@@ -323,7 +324,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         }
 
         OA2ServiceTransaction t = getByRT(oldRT);
-        if(!t.getFlowStates().acceptRequests || !t.getFlowStates().refreshToken){
+        if (!t.getFlowStates().acceptRequests || !t.getFlowStates().refreshToken) {
             throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "refresh token access denied", HttpStatus.SC_UNAUTHORIZED);
 
         }
@@ -400,12 +401,25 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             throw new GeneralException(msg);
         }
 
-        URI uri = URI.create(atResponse.getParameters().get(OA2Constants.REDIRECT_URI));
-        if (!transaction.getCallback().equals(uri)) {
-            String msg = "Attempt to use alternate redirect uri rejected.";
-            warn(msg);
-            throw new OA2ATException(OA2Errors.INVALID_REQUEST, msg);
-
+        boolean uriOmittedOK = false;
+        if (!atResponse.getParameters().containsKey(OA2Constants.REDIRECT_URI)) {
+            // OK, the spec states that if we get to this point (so the redirect URI has been verified) a client with a
+            // **single** registered redirect uri **MAY** be omitted. It seems that various python libraries do not
+            // send it in this case, so we have the option to accept or reject the request.
+            if (((OA2Client) transaction.getClient()).getCallbackURIs().size() == 1) {
+                uriOmittedOK = true;
+            } else {
+                throw new GeneralException("Error: No redirect URI. Request rejected.");
+            }
+        }
+        if (!uriOmittedOK) {
+            // so if the URI is sent, verify it
+            URI uri = URI.create(atResponse.getParameters().get(OA2Constants.REDIRECT_URI));
+            if (!transaction.getCallback().equals(uri)) {
+                String msg = "Attempt to use alternate redirect uri rejected.";
+                warn(msg);
+                throw new OA2ATException(OA2Errors.INVALID_REQUEST, msg);
+            }
         }
         /* Now we have to determine which scopes to return
            The spec says we don't have to return anything if the requested scopes are the same as the

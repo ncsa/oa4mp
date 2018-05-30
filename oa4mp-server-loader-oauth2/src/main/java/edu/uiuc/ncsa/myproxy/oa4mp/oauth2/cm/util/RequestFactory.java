@@ -1,11 +1,12 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.attributes.AttributeGetRequest;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.client.*;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.permissions.*;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.admin.ACGetRequest;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.attributes.AttributeGetRequest;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.attributes.AttributeRemoveRequest;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.attributes.AttributeSetClientRequest;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.client.*;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.permissions.*;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.SAT;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.SATFactory;
@@ -14,7 +15,6 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.types.*;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.delegation.storage.BaseClient;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2Client;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;

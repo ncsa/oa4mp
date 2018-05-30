@@ -2,12 +2,12 @@ package test;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.RequestFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.attributes.*;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientKeys;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions.ActionGet;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions.ActionRemove;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions.ActionSet;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.types.TypeAttribute;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2Client;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2ClientKeys;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Scopes;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;

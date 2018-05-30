@@ -6,9 +6,9 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowStates;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2DiscoveryServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientConfiguration;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientConfigurationFactory;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.security.core.Identifier;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2Client;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2GeneralError;
 import edu.uiuc.ncsa.security.oauth_2_0.UserInfo;
@@ -149,6 +149,10 @@ public class OA2ClaimsUtil extends ClaimsUtil {
         if (flowStates.getClaims) {
             ff.createClaimSource(oa2CC, client.getConfig());
             // the runtime forbids processing claims for this request, so exit
+            if (oa2CC.hasPreProcessing()) {
+                          ff.setupPostProcessing(oa2CC, client.getConfig());
+                          oa2CC.executePreProcessing();
+                      }
             List<ClaimSource> claimsSources = oa2CC.getClaimSource();
             if (oa2CC.hasClaimSource()) {
                 // so there is
@@ -157,15 +161,15 @@ public class OA2ClaimsUtil extends ClaimsUtil {
                     System.err.println(userInfo.getMap());
                 }
             }
-            if (oa2CC.hasClaimsProcessing()) {
-                ff.setupClaimsProcessing(oa2CC, client.getConfig());
-                oa2CC.executeProcessing();
+            if (oa2CC.hasPostProcessing()) {
+                ff.setupPostProcessing(oa2CC, client.getConfig());
+                oa2CC.executePostProcessing();
             }
         }
         // Now we have to set up the claims sources and process the results
         // last thing is to check that the flow states did not change as a result of claims processing
         // e.g. that the user membership in a group changes access
-        flowStates.setValues(oa2CC.getProcessing().getFunctorMap());
+        flowStates.setValues(oa2CC.getPostProcessing().getFunctorMap());
 
         // update everything
         transaction.setFlowStates(flowStates);

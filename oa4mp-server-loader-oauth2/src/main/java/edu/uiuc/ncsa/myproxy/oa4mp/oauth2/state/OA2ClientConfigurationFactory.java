@@ -1,10 +1,10 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.BasicClaimsSourceImpl;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.HTTPHeaderClaimsSource;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.LDAPClaimsSource;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowType;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.jSetClaimSource;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.HTTPHeaderClaimsSource;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.BasicClaimsSourceImpl;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.LDAPClaimsSource;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.ClientConfigurationFactory;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.JSONConfig;
@@ -47,10 +47,22 @@ public class OA2ClientConfigurationFactory<V extends OA2ClientConfiguration> ext
      * @param cc
      */
     public void createClaimSource(V cc, JSONObject json) {
-        cc.setClaimsProcessing(functorFactory.createLogicBlock(OA2ClientConfigurationUtil.getClaimsProcessing(json)));
+        cc.setPreProcessing(functorFactory.createLogicBlock(OA2ClientConfigurationUtil.getClaimsPreProcessing(json)));
+        cc.setPostProcessing(functorFactory.createLogicBlock(OA2ClientConfigurationUtil.getClaimsPostProcessing(json)));
+        // Now to get the claim sources. These can be in either the runtime or the pre-processor
         LinkedList<ClaimSource> claimSources = new LinkedList<>();
-        boolean hasClaims = false;
-        for (LogicBlock logicBlock : cc.getRuntime()) {
+        extractClaimsSource(cc.getPreProcessing(), json, claimSources);
+        extractClaimsSource(cc.getRuntime(), json, claimSources);
+        if (claimSources.isEmpty()) {
+            claimSources.add(new BasicClaimsSourceImpl());
+        }
+        cc.setClaimSource(claimSources);
+    }
+
+    public void extractClaimsSource(LogicBlocks<? extends LogicBlock> logicBlocks,
+                                    JSONObject json,
+                                    LinkedList<ClaimSource> claimSources) {
+        for (LogicBlock logicBlock : logicBlocks) {
 
             logicBlock.execute();
             jThen consequent = null;
@@ -70,14 +82,9 @@ public class OA2ClientConfigurationFactory<V extends OA2ClientConfiguration> ext
                     String configurationName = (String) jSetClaimSource.getArgs().get(1);
                     ClaimSource claimSource = setupClaimSource(alias, configurationName, json);
                     claimSources.add(claimSource);
-                    hasClaims = true;
                 }
             }
         }
-        if (!hasClaims) {
-            claimSources.add(new BasicClaimsSourceImpl());
-        }
-        cc.setClaimSource(claimSources);
     }
 
     public static final String LDAP_DEFAULT = "LDAP";
@@ -142,11 +149,20 @@ public class OA2ClientConfigurationFactory<V extends OA2ClientConfiguration> ext
 
     }
 
-    public void setupClaimsProcessing(V cc, JSONObject json) {
-        JSONArray array = OA2ClientConfigurationUtil.getClaimsProcessing(json);
-        LogicBlocks<? extends LogicBlock> bloxx;
-        bloxx = functorFactory.createLogicBlock(array);
-        cc.setClaimsProcessing(bloxx);
+    public void setupPreProcessing(V cc, JSONObject json) {
+        JSONArray array = OA2ClientConfigurationUtil.getClaimsPreProcessing(json);
+        LogicBlocks<? extends LogicBlock> preProcessing;
+        preProcessing = functorFactory.createLogicBlock(array);
+        cc.setPreProcessing(preProcessing);
+
+    }
+
+    public void setupPostProcessing(V cc, JSONObject json) {
+
+        JSONArray array = OA2ClientConfigurationUtil.getClaimsPostProcessing(json);
+        LogicBlocks<? extends LogicBlock> postProcessing;
+        postProcessing = functorFactory.createLogicBlock(array);
+        cc.setPostProcessing(postProcessing);
     }
 
     @Override

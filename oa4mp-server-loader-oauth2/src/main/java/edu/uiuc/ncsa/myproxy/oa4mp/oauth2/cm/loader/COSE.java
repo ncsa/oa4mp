@@ -1,7 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.loader;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.ldap.LDAPStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.MyProxyFacadeProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionsStore;
@@ -54,7 +53,7 @@ public class COSE extends OA2SE {
                 boolean isRefreshTokenEnabled,
                 boolean twoFactorSupportEnabled,
                 long maxClientRefreshTokenLifetime,
-                Provider<LDAPStore> mldap,
+             //   Provider<LDAPStore> mldap,
                 JSONWebKeys signingKeyPair,
                 String issuer,
                 boolean isUtilServletEnabled) {
@@ -86,7 +85,7 @@ public class COSE extends OA2SE {
                 maxClientRefreshTokenLifetime,
                 signingKeyPair,
                 issuer,
-                mldap,
+            //    mldap,
                 isUtilServletEnabled);
 
     }

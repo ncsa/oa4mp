@@ -52,7 +52,7 @@ public class COLoader extends OA2ConfigurationLoader {
                     isRefreshTokenEnabled(),
                     isTwoFactorSupportEnabled(),
                     getMaxClientRefreshTokenLifetime(),
-                    getMLDAP(),
+                  //  getMLDAP(),
                     getJSONWebKeys(),
                     getIssuer(),
                     isUtilServerEnabled());

@@ -23,9 +23,6 @@ import static edu.uiuc.ncsa.security.core.util.DateUtils.checkTimestamp;
  * on 2/13/14 at  3:24 PM
  */
 public abstract class AuthorizedServlet extends CRServlet {
-    public static final String AUTHORIZATION_USER_NAME_KEY = "userName";
-    public static final String AUTHORIZATION_PASSWORD_KEY = "password";
-    public static final String AUTHORIZATION_CERT_LIFETIME_KEY = "lifetime";
     public static final String STATUS_KEY = "status";
     public static final String STATUS_OK = "ok";
     public static final String REDIRECT_URL_KEY = "redirect_url";

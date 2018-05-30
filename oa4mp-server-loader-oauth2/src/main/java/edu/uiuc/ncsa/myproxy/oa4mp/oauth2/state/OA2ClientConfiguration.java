@@ -16,26 +16,45 @@ public class OA2ClientConfiguration extends ClientConfiguration {
         super();
     }
 
-    LogicBlocks<? extends LogicBlock> claimsProcessing;
+    LogicBlocks<? extends LogicBlock> postProcessing;
+    LogicBlocks<? extends LogicBlock> preProcessing;
 
-    public void setClaimsProcessing(LogicBlocks<? extends LogicBlock> claimsProcessing) {
-        this.claimsProcessing = claimsProcessing;
+    public void setPostProcessing(LogicBlocks<? extends LogicBlock> postProcessing) {
+        this.postProcessing = postProcessing;
+    }
+    public void setPreProcessing(LogicBlocks<? extends LogicBlock> preProcessing) {
+           this.preProcessing = preProcessing;
+       }
+    public LogicBlocks<? extends LogicBlock> getPreProcessing() {
+        return preProcessing;
+    }
+    public LogicBlocks<? extends LogicBlock> getPostProcessing() {
+        return postProcessing;
     }
 
-    public LogicBlocks<? extends LogicBlock> getProcessing() {
-        return claimsProcessing;
-    }
-
-    public boolean executeProcessing() {
-        if (claimsProcessing != null) {
-            claimsProcessing.execute();
+    public boolean executePostProcessing() {
+        if (postProcessing != null) {
+            postProcessing.execute();
             return true;
         }
         return false;
     }
 
-    public boolean hasClaimsProcessing(){
-        return claimsProcessing!=null & !claimsProcessing.isEmpty();
+    public boolean executePreProcessing() {
+        if (preProcessing != null) {
+            preProcessing.execute();
+            return true;
+        }
+        return false;
+    }
+
+
+
+    public boolean hasPostProcessing(){
+        return postProcessing !=null & !postProcessing.isEmpty();
+    }
+    public boolean hasPreProcessing(){
+        return preProcessing !=null & !preProcessing.isEmpty();
     }
     public void setClaimSource(List<ClaimSource> claimSource) {
         this.claimSource = claimSource;

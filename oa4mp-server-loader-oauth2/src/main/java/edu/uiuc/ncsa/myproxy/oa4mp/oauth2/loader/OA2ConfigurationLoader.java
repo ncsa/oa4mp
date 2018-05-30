@@ -2,11 +2,11 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.ldap.LDAPStoreProviderUtil;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.ldap.MultiLDAPStoreProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.BasicClaimsSourceImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.LDAPClaimsSource;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.*;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientConverter;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.ClientApprovalProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.OA4MPConfigTags;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceConstantKeys;
@@ -42,11 +42,13 @@ import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.delegation.storage.ClientApprovalKeys;
 import edu.uiuc.ncsa.security.delegation.storage.TransactionStore;
 import edu.uiuc.ncsa.security.delegation.token.TokenForge;
-import edu.uiuc.ncsa.security.oauth_2_0.*;
+import edu.uiuc.ncsa.security.oauth_2_0.OA2ConfigurationLoaderUtils;
+import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
+import edu.uiuc.ncsa.security.oauth_2_0.OA2TokenForge;
 import edu.uiuc.ncsa.security.oauth_2_0.server.AGI2;
 import edu.uiuc.ncsa.security.oauth_2_0.server.ATI2;
-import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.oauth_2_0.server.PAI2;
+import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfigurationUtil;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
@@ -118,7 +120,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     getMaxClientRefreshTokenLifetime(),
                     getJSONWebKeys(),
                     getIssuer(),
-                    getMLDAP(),
+                   // getMLDAP(),
                     isUtilServerEnabled());
             if (getClaimSource() instanceof BasicClaimsSourceImpl) {
                 ((BasicClaimsSourceImpl) getClaimSource()).setOa2SE((OA2SE) se);
@@ -175,7 +177,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         }
         return macp;
     }
-    MultiLDAPStoreProvider mldap = null;
+/*    MultiLDAPStoreProvider mldap = null;
 
     protected MultiLDAPStoreProvider getMLDAP() {
         if (mldap == null) {
@@ -187,7 +189,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
             mldap.addListener(LDAPStoreProviderUtil.getPG(cn, getPgConnectionPoolProvider()));
         }
         return mldap;
-    }
+    }*/
     protected JSONWebKeys getJSONWebKeys() {
         ConfigurationNode node = getFirstNode(cn, "JSONWebKey");
         if(node == null){

@@ -1,6 +1,5 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
 
-import edu.uiuc.ncsa.security.oauth_2_0.OA2Client;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.util.functor.LogicBlock;
 import edu.uiuc.ncsa.security.util.functor.LogicBlocks;
@@ -17,7 +16,7 @@ import java.util.Map;
 
 public class ClaimsProcessor {
     /**
-     * This configuration is part of the client and can be accessed by {@link OA2Client#getConfig()}
+     * This configuration is part of the client and can be accessed by {@link edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client#getConfig()}
      */
     protected JSONObject config;
 

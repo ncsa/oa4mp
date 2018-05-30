@@ -40,7 +40,8 @@ public class OA2ClientConfigurationUtil extends ClientConfigurationUtil {
     public static final String CONFIG_KEY = "config";
     public static final String CLAIMS_KEY = "claims";
     public static final String CLAIM_SOURCES_KEY = "sources";
-    public static final String CLAIM_PROCESSING_KEY = "processing";
+    public static final String CLAIM_POST_PROCESSING_KEY = "postProcessing";
+    public static final String CLAIM_PRE_PROCESSING_KEY = "preProcessing";
     public static final String CLAIM_SOURCE_CONFIG_KEY = "sourceConfig";
     public static final String SAVED_KEY = "isSaved";
     /**
@@ -139,6 +140,32 @@ public class OA2ClientConfigurationUtil extends ClientConfigurationUtil {
 
     }
 
+    public static boolean hasClaimPreProcessor(JSONObject config){
+        return hasClaimsThingy(config, CLAIM_PRE_PROCESSING_KEY);
+    }
+
+    public static boolean hasClaimPostProcessor(JSONObject config){
+        return hasClaimsThingy(config, CLAIM_POST_PROCESSING_KEY);
+    }
+
+    public static boolean hasClaimSources(JSONObject config){
+        return hasClaimsThingy(config, CLAIM_SOURCES_KEY);
+    }
+    public static boolean hasClaimSourceConfigurations(JSONObject config){
+        return hasClaimsThingy(config, CLAIM_SOURCE_CONFIG_KEY);
+    }
+
+
+
+    protected static boolean hasClaimsThingy(JSONObject config, String key){
+        JSONObject claims;
+        if (config.containsKey(CLAIMS_KEY)) {
+            claims = config.getJSONObject(CLAIMS_KEY);
+        } else {
+            claims = new JSONObject();
+        }
+        return claims.containsKey(key);
+    }
 
     public static JSONArray getClaimSourceConfigurations(JSONObject config) {
         return getClaimsThingy(config, CLAIM_SOURCE_CONFIG_KEY);
@@ -148,15 +175,22 @@ public class OA2ClientConfigurationUtil extends ClientConfigurationUtil {
         setClaimsThingy(config, CLAIM_SOURCE_CONFIG_KEY, sourceConfigs);
     }
 
-    public static JSONArray getClaimsProcessing(JSONObject config) {
-        return getClaimsThingy(config, CLAIM_PROCESSING_KEY);
+    public static JSONArray getClaimsPostProcessing(JSONObject config) {
+        return getClaimsThingy(config, CLAIM_POST_PROCESSING_KEY);
     }
 
-    public static void setClaimsProcessing(JSONObject config, JSONArray processing) {
-        setClaimsThingy(config, CLAIM_PROCESSING_KEY, processing);
+    public static void setClaimsPostProcessing(JSONObject config, JSONArray processing) {
+        setClaimsThingy(config, CLAIM_POST_PROCESSING_KEY, processing);
     }
 
-    public static final String OLD_LDAP_CONFIG_NAME = "original_config";
+
+    public static JSONArray getClaimsPreProcessing(JSONObject config) {
+         return getClaimsThingy(config, CLAIM_PRE_PROCESSING_KEY);
+     }
+
+     public static void setClaimsPreProcessing(JSONObject config, JSONArray processing) {
+         setClaimsThingy(config, CLAIM_PRE_PROCESSING_KEY, processing);
+     }
 
     /**
      * This will take the old LDAP object and convert it to the new configuration format. It does this by
@@ -202,7 +236,7 @@ public class OA2ClientConfigurationUtil extends ClientConfigurationUtil {
                 setClaimSourcesConfigurations(config, claimSources);
                 JSONArray rt = getRuntime(config);
                 if (rt == null || rt.isEmpty()) {
-                    createDefaultRuntime(config, oldLDAPName);
+                    createDefaultPreProcessor(config, oldLDAPName);
                 }
             }
 
@@ -215,7 +249,7 @@ public class OA2ClientConfigurationUtil extends ClientConfigurationUtil {
             oldLDAP.put(LDAP_TAG, content);
             claimSources.add(oldLDAP);
             setClaimSourcesConfigurations(config, claimSources);
-            createDefaultRuntime(config, newName);
+            createDefaultPreProcessor(config, newName);
 
         }
 
@@ -223,7 +257,7 @@ public class OA2ClientConfigurationUtil extends ClientConfigurationUtil {
 
     }
 
-    protected static void createDefaultRuntime(JSONObject config, String newName) {
+    protected static void createDefaultPreProcessor(JSONObject config, String newName) {
         JSONArray array = new JSONArray();
         JFunctorFactory ff = new JFunctorFactory();
         jSetClaimSource jSetClaimSource = new jSetClaimSource();
@@ -236,7 +270,7 @@ public class OA2ClientConfigurationUtil extends ClientConfigurationUtil {
         JSONArray runtime = getRuntime(config);
         JSONObject ifBlock = JSONObject.fromObject(lb.toString());
         runtime.add(ifBlock);
-        setRuntime(config, runtime);
+        setClaimsPreProcessing(config, runtime);
     }
 
     public static boolean isSaved(JSONObject config) {

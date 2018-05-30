@@ -119,7 +119,9 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
         }
         // scheme specific part
         String spp = Configurations.getFirstAttribute(cn, OA4MPConfigTags.ID_SPP);
-        if (spp != null && !spp.isEmpty()) {
+        if (spp != null) {
+            // If this is omitted in the configuration, then a null value results, so use the default.
+            // It is possible to suppress this component by passing in an empty string.
             IdentifierProvider.setSchemeSpecificPart(spp);
         }
 

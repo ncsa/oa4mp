@@ -10,12 +10,16 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.OA2FunctorFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowStates;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientConfiguration;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientConfigurationFactory;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractAuthorizationServlet;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
-import edu.uiuc.ncsa.security.oauth_2_0.*;
+import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
+import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
+import edu.uiuc.ncsa.security.oauth_2_0.OA2GeneralError;
+import edu.uiuc.ncsa.security.oauth_2_0.UserInfo;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.servlet.PresentableState;
 import net.sf.json.JSONObject;
@@ -108,7 +112,7 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
         boolean exceptionEncountered = false;
     }
 
-    protected OA2AuthorizedServletUtil getInitUtil(){
+    protected OA2AuthorizedServletUtil getInitUtil() {
         return new OA2AuthorizedServletUtil(this);
     }
 
@@ -118,12 +122,12 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
 
         //printAllParameters(request);
         if (map.containsKey(OA2Constants.RESPONSE_TYPE)) {
-            // Probably means this is an initial request. Pass it along to the init util to
+            // Means this is an initial request. Pass it along to the init util to
             // unscramble it.
             MyHttpServletResponseWrapper wrapper = new MyHttpServletResponseWrapper(response);
             OA2AuthorizedServletUtil init = getInitUtil();
+//              JSPUtil.fwd(request, wrapper, AUTHORIZED_ENDPOINT);
             init.doDelegation(request, wrapper);
-           // JSPUtil.fwd(request, wrapper, AUTHORIZED_ENDPOINT);
             if (wrapper.isExceptionEncountered()) {
                 throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, wrapper.toString(), wrapper.getStatus());
             } // something happened someplace else and the exception was handled.
@@ -142,64 +146,69 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
 
 
     protected void handleClaims(HttpServletRequest httpServletRequest,
-                                 OA2ServiceTransaction transaction) throws Throwable {
+                                OA2ServiceTransaction transaction) throws Throwable {
 
-         // Need to find the sources
-         OA2Client client = transaction.getOA2Client();
-         if (client.isPublicClient()) {
-             // Public clients do not get claims.
-             return;
-         }
-         OA2SE oa2se = (OA2SE) getServiceEnvironment();
-         // set up functor factory with no claims since we have none yet.
- //        Map<String, Object> claims = new HashMap<>();
-         UserInfo userInfo = new UserInfo();
+        // Need to find the sources
+        OA2Client client = transaction.getOA2Client();
+        if (client.isPublicClient()) {
+            // Public clients do not get claims.
+            return;
+        }
+        OA2SE oa2se = (OA2SE) getServiceEnvironment();
+        // set up functor factory with no claims since we have none yet.
+        //        Map<String, Object> claims = new HashMap<>();
+        UserInfo userInfo = new UserInfo();
 
-         if (oa2se.getClaimSource().isEnabled()) {
-             // allow the server to pre-populate the claims. This invokes the global claims handler for the server
-             // to allow, e.g. pulling user information out of HTTp headers.
-             oa2se.getClaimSource().process(userInfo, httpServletRequest, transaction);
-         }
-         if (client.getConfig() == null || client.getConfig().isEmpty()) {
-             // no configuration for this client means do nothing here.
-             return;
-         }
-         // so this client has a specific configuration that is to be invoked.
-         OA2FunctorFactory functorFactory = new OA2FunctorFactory(userInfo.getMap());
-         OA2ClientConfigurationFactory<OA2ClientConfiguration> ff = new OA2ClientConfigurationFactory(functorFactory);
+        if (oa2se.getClaimSource().isEnabled()) {
+            // allow the server to pre-populate the claims. This invokes the global claims handler for the server
+            // to allow, e.g. pulling user information out of HTTp headers.
+            oa2se.getClaimSource().process(userInfo, httpServletRequest, transaction);
+        }
+        if (client.getConfig() == null || client.getConfig().isEmpty()) {
+            // no configuration for this client means do nothing here.
+            return;
+        }
+        // so this client has a specific configuration that is to be invoked.
+        OA2FunctorFactory functorFactory = new OA2FunctorFactory(userInfo.getMap());
+        OA2ClientConfigurationFactory<OA2ClientConfiguration> ff = new OA2ClientConfigurationFactory(functorFactory);
 
-         OA2ClientConfiguration oa2CC = ff.newInstance(client.getConfig());
-         oa2CC.executeRuntime();
-         FlowStates flowStates = new FlowStates(oa2CC.getRuntime().getFunctorMap());
-         // save everything up to this point since there are no guarantees that processing will continue.
-         getTransactionStore().save(transaction);
-         if (flowStates.getClaims) {
-             ff.createClaimSource(oa2CC,client.getConfig());
-             // the runtime forbids processing claims for this request, so exit
-             List<ClaimSource> claimsSources = oa2CC.getClaimSource();
-             if (oa2CC.hasClaimSource()) {
-                 // so there is
-                 for (int i = 0; i < claimsSources.size(); i++) {
-                     claimsSources.get(i).process(userInfo, httpServletRequest, transaction);
-                     System.err.println(userInfo.getMap());
-                 }
-             }
-             if (oa2CC.hasClaimsProcessing()) {
-                 ff.setupClaimsProcessing(oa2CC, client.getConfig());
-                 oa2CC.executeProcessing();
-             }
-         }
-         // Now we have to set up the claims sources and process the results
+        OA2ClientConfiguration oa2CC = ff.newInstance(client.getConfig());
+        oa2CC.executeRuntime();
+        FlowStates flowStates = new FlowStates(oa2CC.getRuntime().getFunctorMap());
+        // save everything up to this point since there are no guarantees that processing will continue.
+        getTransactionStore().save(transaction);
+        if (flowStates.getClaims) {
+            ff.createClaimSource(oa2CC, client.getConfig());
+            // the runtime forbids processing claims for this request, so exit
+            if (oa2CC.hasPreProcessing()) {
+                ff.setupPreProcessing(oa2CC, client.getConfig());
+                oa2CC.executePreProcessing();
+            }
+            List<ClaimSource> claimsSources = oa2CC.getClaimSource();
+            if (oa2CC.hasClaimSource()) {
+                // so there is
+                for (int i = 0; i < claimsSources.size(); i++) {
+                    claimsSources.get(i).process(userInfo, httpServletRequest, transaction);
+                    System.err.println(userInfo.getMap());
+                }
+            }
+            if (oa2CC.hasPostProcessing()) {
+                ff.setupPostProcessing(oa2CC, client.getConfig());
+                oa2CC.executePostProcessing();
+            }
+        }
+        // Now we have to set up the claims sources and process the results
 
-         // update everything
-         JSONObject states = new JSONObject();
-         states.put("state", "state object for id=" + transaction.getIdentifier());
-         states.put("flowState", flowStates.toJSON().toString());
-         JSONObject jsonClaims = new JSONObject();
-         jsonClaims.putAll(userInfo.getMap());
-         states.put("claims", jsonClaims.toString());
-         transaction.setState(states);
-     }
+        // update everything
+        JSONObject states = new JSONObject();
+        states.put("state", "state object for id=" + transaction.getIdentifier());
+        states.put("flowState", flowStates.toJSON().toString());
+        JSONObject jsonClaims = new JSONObject();
+        jsonClaims.putAll(userInfo.getMap());
+        states.put("claims", jsonClaims.toString());
+        transaction.setState(states);
+    }
+
     @Override
     public void prepare(PresentableState state) throws Throwable {
         super.prepare(state);
@@ -242,7 +251,7 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
     public String createCallback(ServiceTransaction trans, Map<String, String> params) {
 
         String cb = trans.getCallback().toString();
-        if(!cb.toLowerCase().startsWith("https:")){
+        if (!cb.toLowerCase().startsWith("https:")) {
             throw new GeneralException("Error: Unsupported callback protocol for \"" + cb + "\". Must be https");
         }
         String idStr = trans.getIdentifierString();
@@ -271,18 +280,17 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
     }
 
 
-
     @Override
     protected void setupMPConnection(ServiceTransaction trans, String username, String password) throws GeneralSecurityException {
         if (((OA2SE) getServiceEnvironment()).isTwoFactorSupportEnabled()) {
-         // Stash username and password in an bogus MyProxy logon instance.
+            // Stash username and password in an bogus MyProxy logon instance.
             MyMyProxyLogon myProxyLogon = new MyMyProxyLogon();
             myProxyLogon.setUsername(username);
             myProxyLogon.setPassphrase(password);
             MyProxyConnectable mpc = new MPSingleConnectionProvider.MyProxyLogonConnection(myProxyLogon);
             mpc.setIdentifier(trans.getIdentifier());
             getMyproxyConnectionCache().add(mpc);
-        }else{
+        } else {
             createMPConnection(trans.getIdentifier(), username, password, trans.getLifetime());
             if (hasMPConnection(trans.getIdentifier())) {
                 getMPConnection(trans.getIdentifier()).close();

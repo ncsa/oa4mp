@@ -1,8 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.ldap;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.server.OA4MPConfigTags;
-import edu.uiuc.ncsa.security.core.configuration.provider.CfgEvent;
-import edu.uiuc.ncsa.security.core.configuration.provider.TypedProvider;
 import edu.uiuc.ncsa.security.storage.FSProvider;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPoolProvider;
@@ -69,7 +67,7 @@ public class LDAPStoreProviderUtil {
         }
     }
 
-
+/*
     public static MemoryLDAPStoreProvider<? extends LDAPStore> getM(ConfigurationNode node) {
         return new MemoryLDAPStoreProvider<>(node);
     }
@@ -88,7 +86,7 @@ public class LDAPStoreProviderUtil {
         public LDAPMemoryStore get() {
             return new LDAPMemoryStore(getLdapEntryProvider());
         }
-    }
+    }*/
 
     public static SQLLDAPStoreProvider getMariaDB(ConfigurationNode node, ConnectionPoolProvider<? extends ConnectionPool> cpp) {
         return new SQLLDAPStoreProvider(node, OA4MPConfigTags.MARIADB_STORE, cpp);

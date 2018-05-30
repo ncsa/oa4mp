@@ -65,7 +65,7 @@ public class ClientConfigurationTest extends TestBase {
 
         // add the parts to the configuration
         setClaimSources(cfg, claimSources);
-        setClaimsProcessing(cfg, claimProcessing);
+        setClaimsPostProcessing(cfg, claimProcessing);
         setClaimSourcesConfigurations(cfg, claimConfigs);
         setRuntime(cfg, logic);
         return cfg;
@@ -254,9 +254,9 @@ public class ClientConfigurationTest extends TestBase {
         ff = new OA2ClientConfigurationFactory(new OA2FunctorFactory(claims));
         clientConfiguration = ff.newInstance(cfg);
         clientConfiguration.executeRuntime();
-        ff.setupClaimsProcessing(clientConfiguration, cfg);
+        ff.setupPostProcessing(clientConfiguration, cfg);
 
-        clientConfiguration.executeProcessing();
+        clientConfiguration.executePostProcessing();
         assert claims.get(AUDIENCE).toString().equals(newAud) : "Expected audience =\"" + newAud + "\" but got \"" + claims.get(AUDIENCE) + "\"";
 
         assert claims.containsKey(MY_CLAIM);
@@ -265,7 +265,7 @@ public class ClientConfigurationTest extends TestBase {
         assert !claims.containsKey(MY_CLAIM2);
         // test puts in an exlcuded claim. This is not used until much later, when the claims are written.
         // This just verifies that the system got the list and is handling it right up to this point.
-        for(LogicBlock lb: clientConfiguration.getProcessing()){
+        for(LogicBlock lb: clientConfiguration.getPostProcessing()){
             assert lb.getThenBlock().getFunctorMap().containsKey(FunctorClaimsType.EXCLUDE.getValue());
         }
 
@@ -295,9 +295,9 @@ public class ClientConfigurationTest extends TestBase {
            ff = new OA2ClientConfigurationFactory(new OA2FunctorFactory(claims));
            clientConfiguration = ff.newInstance(cfg);
            clientConfiguration.executeRuntime();
-           ff.setupClaimsProcessing(clientConfiguration, cfg);
+           ff.setupPostProcessing(clientConfiguration, cfg);
 
-           clientConfiguration.executeProcessing();
+           clientConfiguration.executePostProcessing();
            assert claims.get(AUDIENCE).toString().equals(newAud) : "Expected audience =\"" + newAud + "\" but got \"" + claims.get(AUDIENCE) + "\"";
 
            assert claims.containsKey(MY_CLAIM);
@@ -306,7 +306,7 @@ public class ClientConfigurationTest extends TestBase {
            assert !claims.containsKey(MY_CLAIM2);
            // test puts in an exlcuded claim. This is not used until much later, when the claims are written.
            // This just verifies that the system got the list and is handling it right up to this point.
-           for(LogicBlock lb: clientConfiguration.getProcessing()){
+           for(LogicBlock lb: clientConfiguration.getPostProcessing()){
                assert lb.getThenBlock().getFunctorMap().containsKey(FunctorClaimsType.EXCLUDE.getValue());
            }
 

@@ -1,12 +1,9 @@
-package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage;
+package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.server.storage.sql.table.ClientStoreTable;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2ClientKeys;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnDescriptorEntry;
 
-import static java.sql.Types.BIGINT;
-import static java.sql.Types.BOOLEAN;
-import static java.sql.Types.LONGVARCHAR;
+import static java.sql.Types.*;
 
 /**
  * <p>Created by Jeff Gaynor<br>

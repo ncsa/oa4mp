@@ -2,8 +2,8 @@ package test;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.*;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.jAccessToken;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2Client;
 import edu.uiuc.ncsa.security.util.JFunctorTest;
 import edu.uiuc.ncsa.security.util.functor.JFunctor;
 import edu.uiuc.ncsa.security.util.functor.LogicBlock;
@@ -318,14 +318,7 @@ public class OA2FunctorTests extends JFunctorTest {
         String rawConfig = "{\"config\":\"testforurgeclient\",\"id_token\":{\"$if\":{\"$match\":[\"${idp}\",\"https://idp.ncsa.illinois.edu/idp/shibboleth\"]},\"$then\":{\"$set\":[\"sub\",\"${eppn}\"]}}}";
         OA2Client client = new OA2Client(BasicIdentifier.newID("test:client:42"));
         client.setConfig(JSONObject.fromObject(rawConfig));
-      /*  ClaimsProcessor ch = new ClaimsProcessor(client.getClaimsConfig());
-        DebugUtil.setIsEnabled(true);
-        Map<String, Object> claims3 = ch.process(claims2);
-        System.out.println("\n*** CIL2 claims handler test");
-        System.out.println(claims3);
-        System.out.println("\n*** done. Returned claims:");
-        assert claims3.get("sub").equals(claims2.get("eppn"));
-   */
+
     }
 }
 

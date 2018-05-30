@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.Permission;
@@ -14,7 +15,6 @@ import edu.uiuc.ncsa.security.delegation.services.DoubleDispatchServer;
 import edu.uiuc.ncsa.security.delegation.services.Request;
 import edu.uiuc.ncsa.security.delegation.services.Response;
 import edu.uiuc.ncsa.security.delegation.services.Server;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2Client;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnMap;
 
 import java.util.List;

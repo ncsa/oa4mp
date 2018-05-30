@@ -4,6 +4,9 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.AbstractDDServer;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.RequestFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.permissions.PermissionServer;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientApprovalKeys;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientKeys;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.Permission;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionList;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions.ActionAdd;
@@ -11,9 +14,6 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.types.TypePermission;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
-import edu.uiuc.ncsa.security.delegation.storage.ClientKeys;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2Client;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2ClientApprovalKeys;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnMap;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -80,8 +80,7 @@ public class ClientServer extends AbstractDDServer {
         //requires and admin client and hashmap
         ColumnMap values = new ColumnMap();
         values.putAll(request.getAttributes());
-        // values.putAll(); // add all the values passed in
-        ClientKeys keys = (ClientKeys) getClientStore().getACConverter().getKeys();
+        OA2ClientKeys keys = (OA2ClientKeys) getClientStore().getACConverter().getKeys();
         OA2Client client = (OA2Client) getClientStore().create();
         values.put(keys.identifier(), client.getIdentifier());
         values.put(keys.creationTS(), client.getCreationTS());
@@ -90,13 +89,14 @@ public class ClientServer extends AbstractDDServer {
             // if the secret is supplied, just store its hash
             secret = (String) values.get(keys.secret());
         } else {
-            // no secret means to create one.
+            // no secret  = create one, return it later.
             byte[] bytes = new byte[cose.getClientSecretLength()];
             random.nextBytes(bytes);
             secret = Base64.encodeBase64URLSafeString(bytes);
         }
         String hash = DigestUtils.sha1Hex(secret);
         values.put(keys.secret(), hash);
+
 
         getClientStore().getACConverter().fromMap(values, client);
         getClientStore().save(client);
