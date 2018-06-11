@@ -2,11 +2,13 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.OA2ClaimsUtil;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.UsernameFindable;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.IssuerTransactionState;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.server.UnapprovedClientException;
 import edu.uiuc.ncsa.security.delegation.server.request.AGRequest;
@@ -46,14 +48,16 @@ public class OA2AuthorizedServletUtil {
 
 
     /**
-     * Main entry point for this class. Call this.
+     * Main entry point for this class. Call this. It does <b>not</b> do claims processing. That is done in the
+     * {@link OA2AuthorizationServer#createRedirect(HttpServletRequest, HttpServletResponse, ServiceTransaction)}
+     * which is the last possible point to do it.
      *
      * @param req
      * @param resp
      * @return
      * @throws Throwable
      */
-    public ServiceTransaction doDelegation(HttpServletRequest req, HttpServletResponse resp) throws Throwable {
+    public OA2ServiceTransaction doDelegation(HttpServletRequest req, HttpServletResponse resp) throws Throwable {
         Client client = servlet.getClient(req);
 
         try {
@@ -63,7 +67,7 @@ public class OA2AuthorizedServletUtil {
 
             AGResponse agResponse = (AGResponse) servlet.getAGI().process(new AGRequest(req, client));
             agResponse.setClient(client);
-            ServiceTransaction transaction = verifyAndGet(agResponse);
+            OA2ServiceTransaction transaction = (OA2ServiceTransaction) verifyAndGet(agResponse);
             transaction.setClient(client);
             servlet.getTransactionStore().save(transaction);
             info("Saved new transaction with id=" + transaction.getIdentifierString());
@@ -86,7 +90,18 @@ public class OA2AuthorizedServletUtil {
         }
     }
 
-    protected void doIt(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Throwable {
+    /**
+     * Note the at thentry point for this is the {@link #doIt(HttpServletRequest, HttpServletResponse)} method
+     * if authorization is done elsewhere (so the assumption is that authorization has already happened),
+     * vs. the doDelegation call that is invoked by the OA4MP Authorize servlet. The difference is
+     * that the two paths will invoke the {@link OA2ClaimsUtil} at different points.
+     *
+     * @param httpServletRequest
+     * @param httpServletResponse
+     * @return
+     * @throws Throwable
+     */
+    protected OA2ServiceTransaction doIt(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Throwable {
         printAllParameters(httpServletRequest);
         String callback = httpServletRequest.getParameter(OA2Constants.REDIRECT_URI);
         if (httpServletRequest.getParameterMap().containsKey(OA2Constants.REQUEST_URI)) {
@@ -108,8 +123,17 @@ public class OA2AuthorizedServletUtil {
                     httpServletRequest.getParameter(OA2Constants.STATE),
                     callback);
         }
-        if (CheckIdTokenHint(httpServletRequest, httpServletResponse, callback)) return;
-        doDelegation(httpServletRequest, httpServletResponse);
+        OA2ServiceTransaction t = CheckIdTokenHint(httpServletRequest, httpServletResponse, callback);
+        if (t != null) {
+            return t;
+        }
+        t = doDelegation(httpServletRequest, httpServletResponse);
+        OA2ClaimsUtil claimsUtil = new OA2ClaimsUtil((OA2SE) servlet.getServiceEnvironment(), t);
+        DebugUtil.dbg(this, "starting to process claims:" );
+        claimsUtil.createBasicClaims(httpServletRequest);
+      //  servlet.getTransactionStore().save(t); // save the claims.
+        DebugUtil.dbg(this, "done with claims, transaction saved, claims = " + t.getClaims());
+        return t;
     }
 
     /**
@@ -122,9 +146,9 @@ public class OA2AuthorizedServletUtil {
      * @param callback
      * @return
      */
-    protected boolean CheckIdTokenHint(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, String callback) {
+    protected OA2ServiceTransaction CheckIdTokenHint(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, String callback) {
         if (!httpServletRequest.getParameterMap().containsKey(ID_TOKEN_HINT)) {
-            return false;
+            return null;
         }
         UsernameFindable ufStore = null;
         String rawIDToken = String.valueOf(httpServletRequest.getParameterMap().get(ID_TOKEN_HINT));
@@ -160,7 +184,7 @@ public class OA2AuthorizedServletUtil {
                 }
                 httpServletResponse.setStatus(HttpStatus.SC_OK);
                 // The spec does not state that anything is returned, just a positive response.
-                return true;
+                return t;
 
             }
 

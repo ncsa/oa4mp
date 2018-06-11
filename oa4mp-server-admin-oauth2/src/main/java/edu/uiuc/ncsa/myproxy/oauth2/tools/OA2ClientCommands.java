@@ -141,7 +141,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
         if (client.getLdaps() == null || client.getLdaps().isEmpty()) {
             sayi("ldap:(none configured.)");
         } else {
-            sayi("LDAPS:");
+            sayi("LDAPS (warning-deprecated, use the config instead):");
             say(LDAPConfigurationUtil.toJSON(client.getLdaps()).toString(2));
 
         }

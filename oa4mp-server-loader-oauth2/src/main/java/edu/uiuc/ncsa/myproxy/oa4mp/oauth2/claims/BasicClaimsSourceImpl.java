@@ -3,10 +3,12 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.oauth_2_0.UserInfo;
+import edu.uiuc.ncsa.security.oauth_2_0.server.UnsupportedScopeException;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
-import edu.uiuc.ncsa.security.oauth_2_0.server.UnsupportedScopeException;
-import edu.uiuc.ncsa.security.oauth_2_0.server.config.JSONConfig;
+import edu.uiuc.ncsa.security.oauth_2_0.server.config.JSONClaimSourceConfig;
+import edu.uiuc.ncsa.security.util.functor.LogicBlocks;
+import net.sf.json.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
@@ -18,10 +20,20 @@ import java.util.HashSet;
  */
 public class BasicClaimsSourceImpl implements ClaimSource {
 
+    JSONClaimSourceConfig configuration = null;
+    @Override
+    public void setConfiguration(JSONClaimSourceConfig configuration) {
+                                   this.configuration = configuration;
+    }
 
     @Override
-    public void setConfiguration(JSONConfig configuration) {
-        // does nothing.
+    public JSONClaimSourceConfig getConfiguration() {
+        return configuration;
+    }
+
+    @Override
+    public boolean hasConfiguration() {
+        return configuration != null;
     }
 
     public BasicClaimsSourceImpl(OA2SE oa2SE) {
@@ -63,27 +75,53 @@ public class BasicClaimsSourceImpl implements ClaimSource {
     /**
      * At the most basic level, this just returns the {@link UserInfo} object passed to it. Override as you deem fit.
      *
-     * @param userInfo
+     * @param claims
      * @param transaction
      * @return
      * @throws UnsupportedScopeException
      */
     @Override
-    public UserInfo process(UserInfo userInfo, ServiceTransaction transaction) throws UnsupportedScopeException {
-        return process(userInfo, null, transaction);
+    public JSONObject process(JSONObject claims, ServiceTransaction transaction) throws UnsupportedScopeException {
+        return process(claims, null, transaction);
     }
 
     /**
      * This also just returns the {@link UserInfo} object passed in.
-     * @param userInfo
+     * @param claims
      * @param request
      * @param transaction
      * @return
      * @throws UnsupportedScopeException
      */
     @Override
-    public UserInfo process(UserInfo userInfo, HttpServletRequest request, ServiceTransaction transaction) throws UnsupportedScopeException {
-        return userInfo;
+    public JSONObject process(JSONObject claims, HttpServletRequest request, ServiceTransaction transaction) throws UnsupportedScopeException {
+        if(hasConfiguration() && getConfiguration().getPreProcessing()!= null){
+                 OA2FunctorFactory ff = new OA2FunctorFactory(claims);
+                 preProcessor = ff.createLogicBlock(getConfiguration().getPreProcessing());
+                 preProcessor.execute();
+
+             }
+        realProcessing(claims, request, transaction);
+        if(hasConfiguration() && getConfiguration().getPostProcessing()!= null){
+            OA2FunctorFactory ff = new OA2FunctorFactory(claims);
+            postProcessor = ff.createLogicBlock(getConfiguration().getPostProcessing());
+            postProcessor.execute();
+        }
+        return claims;
+    }
+
+    /**
+     * This is the actual place to put your code that only processes the claim source. The {@link #process(JSONObject, HttpServletRequest, ServiceTransaction)}
+     * calls wrap this and invoke the pre/post processor for you.
+     * @param claims
+     * @param request
+     * @param transaction
+     * @return
+     * @throws UnsupportedScopeException
+     */
+    protected JSONObject realProcessing(JSONObject claims, HttpServletRequest request, ServiceTransaction transaction) throws UnsupportedScopeException {
+        return claims;
+
     }
 
 
@@ -107,5 +145,24 @@ public class BasicClaimsSourceImpl implements ClaimSource {
         claims.add(OA2Claims.EXPIRATION);
 
         return claims;
+    }
+
+
+    @Override
+    public boolean isRunAtAuthorization() {
+        return false;
+    }
+
+    LogicBlocks preProcessor = null;
+    LogicBlocks postProcessor = null;
+
+    @Override
+    public LogicBlocks getPostProcessor() {
+        return postProcessor;
+    }
+
+    @Override
+    public LogicBlocks getPreProcessor() {
+        return preProcessor;
     }
 }

@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.jSetClaimSource;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.ClientConfigurationUtil;
+import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.util.functor.JFunctorFactory;
 import edu.uiuc.ncsa.security.util.functor.LogicBlock;
 import edu.uiuc.ncsa.security.util.functor.LogicBlocks;
@@ -40,8 +41,7 @@ public class OA2ClientConfigurationUtil extends ClientConfigurationUtil {
     public static final String CONFIG_KEY = "config";
     public static final String CLAIMS_KEY = "claims";
     public static final String CLAIM_SOURCES_KEY = "sources";
-    public static final String CLAIM_POST_PROCESSING_KEY = "postProcessing";
-    public static final String CLAIM_PRE_PROCESSING_KEY = "preProcessing";
+
     public static final String CLAIM_SOURCE_CONFIG_KEY = "sourceConfig";
     public static final String SAVED_KEY = "isSaved";
     /**
@@ -140,24 +140,24 @@ public class OA2ClientConfigurationUtil extends ClientConfigurationUtil {
 
     }
 
-    public static boolean hasClaimPreProcessor(JSONObject config){
+    public static boolean hasClaimPreProcessor(JSONObject config) {
         return hasClaimsThingy(config, CLAIM_PRE_PROCESSING_KEY);
     }
 
-    public static boolean hasClaimPostProcessor(JSONObject config){
+    public static boolean hasClaimPostProcessor(JSONObject config) {
         return hasClaimsThingy(config, CLAIM_POST_PROCESSING_KEY);
     }
 
-    public static boolean hasClaimSources(JSONObject config){
+    public static boolean hasClaimSources(JSONObject config) {
         return hasClaimsThingy(config, CLAIM_SOURCES_KEY);
     }
-    public static boolean hasClaimSourceConfigurations(JSONObject config){
+
+    public static boolean hasClaimSourceConfigurations(JSONObject config) {
         return hasClaimsThingy(config, CLAIM_SOURCE_CONFIG_KEY);
     }
 
 
-
-    protected static boolean hasClaimsThingy(JSONObject config, String key){
+    protected static boolean hasClaimsThingy(JSONObject config, String key) {
         JSONObject claims;
         if (config.containsKey(CLAIMS_KEY)) {
             claims = config.getJSONObject(CLAIMS_KEY);
@@ -185,12 +185,12 @@ public class OA2ClientConfigurationUtil extends ClientConfigurationUtil {
 
 
     public static JSONArray getClaimsPreProcessing(JSONObject config) {
-         return getClaimsThingy(config, CLAIM_PRE_PROCESSING_KEY);
-     }
+        return getClaimsThingy(config, CLAIM_PRE_PROCESSING_KEY);
+    }
 
-     public static void setClaimsPreProcessing(JSONObject config, JSONArray processing) {
-         setClaimsThingy(config, CLAIM_PRE_PROCESSING_KEY, processing);
-     }
+    public static void setClaimsPreProcessing(JSONObject config, JSONArray processing) {
+        setClaimsThingy(config, CLAIM_PRE_PROCESSING_KEY, processing);
+    }
 
     /**
      * This will take the old LDAP object and convert it to the new configuration format. It does this by
@@ -230,12 +230,14 @@ public class OA2ClientConfigurationUtil extends ClientConfigurationUtil {
                 }
             }
             if (!containsOldLDAP) {
+                ServletDebugUtil.dbg(OA2ClientConfigurationUtil.class, "This does not contain the existing LDAP. Adding it.");
+
                 // Add it to the list of configurations.
                 claimSources.add(oldLDAP);
                 // update the set of claims sources in the configuration.
                 setClaimSourcesConfigurations(config, claimSources);
-                JSONArray rt = getRuntime(config);
-                if (rt == null || rt.isEmpty()) {
+                if (!hasClaimPreProcessor(config) && !hasRuntime(config)) {
+                    ServletDebugUtil.dbg(OA2ClientConfigurationUtil.class, "Claim sources does not include old LDAP. No runtime/pre-processor, so creating default.");
                     createDefaultPreProcessor(config, oldLDAPName);
                 }
             }
@@ -249,7 +251,13 @@ public class OA2ClientConfigurationUtil extends ClientConfigurationUtil {
             oldLDAP.put(LDAP_TAG, content);
             claimSources.add(oldLDAP);
             setClaimSourcesConfigurations(config, claimSources);
-            createDefaultPreProcessor(config, newName);
+            // Finally, if there is NO claims pre-processor (which would set the source to use
+            // then create one. Otherwise leave any existing new configuration intact.
+            ServletDebugUtil.dbg(OA2ClientConfigurationUtil.class, "Done creating new Claim source with id = " + newName + ". Create default processor?" +
+                    (!OA2ClientConfigurationUtil.hasClaimPreProcessor(config) && !hasRuntime(config)));
+            if (!hasClaimPreProcessor(config) && !hasRuntime(config)) {
+                createDefaultPreProcessor(config, newName);
+            }
 
         }
 

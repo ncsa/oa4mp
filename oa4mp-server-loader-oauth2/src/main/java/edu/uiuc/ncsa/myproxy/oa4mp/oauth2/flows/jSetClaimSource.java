@@ -8,7 +8,7 @@ import edu.uiuc.ncsa.security.util.functor.JFunctorImpl;
  *    <pre>{"$set_claim_source":[alias, cfg_name]}</pre>
  *  Where
  *  <ul>
- *      <li>alias=the alias of the class name. Thsi is a claim source that will be instantiated</li>
+ *      <li>alias=the alias of the class name. This is a claim source that will be instantiated</li>
  *      <li>cfg_name = the name of the configuration specified in the claims sources. </li>
  *  </ul>
  * <p>Created by Jeff Gaynor<br>

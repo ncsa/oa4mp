@@ -77,6 +77,9 @@ public class OA2FunctorFactory extends JFunctorFactory {
         if (hasEnum(rawJson, FlowType.SET_CLAIM_SOURCE)) {
             ff = new jSetClaimSource();
         }
+        if (hasEnum(rawJson, FlowType.GET_CLAIMS)) {
+              ff = new jGetClaims();
+          }
         return ff;
     }
 }

@@ -9,11 +9,10 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientConfigurationFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2GeneralError;
-import edu.uiuc.ncsa.security.oauth_2_0.UserInfo;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
-import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimsUtil;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
 import net.sf.json.JSONObject;
 import org.apache.http.HttpStatus;
@@ -29,7 +28,7 @@ import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.*;
  * <p>Created by Jeff Gaynor<br>
  * on 4/24/18 at  11:13 AM
  */
-public class OA2ClaimsUtil extends ClaimsUtil {
+public class OA2ClaimsUtil {
     OA2ServiceTransaction transaction;
     OA2SE oa2se;
 
@@ -38,30 +37,20 @@ public class OA2ClaimsUtil extends ClaimsUtil {
         this.transaction = transaction;
     }
 
-    @Override
-    public JSONObject createClaims(HttpServletRequest request) throws Throwable {
-        JSONObject claims = new JSONObject();
 
+    public JSONObject createBasicClaims(HttpServletRequest request) throws Throwable {
         if (transaction.getOA2Client().isPublicClient()) {
             // Public clients do not get claims.
-            return claims;
+            return new JSONObject();
         }
-        claims = createBasicClaims(request, claims);
-        claims = createSpecialClaims(request, claims);
-        return claims;
-    }
 
-    /**
-     * This peels the claims off the request (such as the nonce) and the client configuration.
-     *
-     * @param request
-     * @param claims
-     * @return
-     */
+        JSONObject claims = transaction.getClaims();
+        if (claims == null) {
+            claims = new JSONObject();
+            claims.put("foo", "bar");
+        }
 
-    @Override
-    protected JSONObject createBasicClaims(HttpServletRequest request, JSONObject claims) throws Throwable {
-
+        DebugUtil.dbg(this, "Starting to process basic claims");
         String issuer = null;
         // So in order
         // 1. get the issuer from the admin client
@@ -103,81 +92,198 @@ public class OA2ClaimsUtil extends ClaimsUtil {
         claims.put(AUDIENCE, transaction.getClient().getIdentifierString());
         claims.put(EXPIRATION, System.currentTimeMillis() / 1000 + 15 * 60); // expiration is in SECONDS from the epoch.
         claims.put(ISSUED_AT, System.currentTimeMillis() / 1000); // issued at = current time in seconds.
-        UserInfo userInfo = new UserInfo();
-        userInfo.setMap(claims);
-        if (oa2se.getClaimSource().isEnabled()) {
+        transaction.setClaims(claims);
+        DebugUtil.dbg(this, "Done with basic claims = " + claims);
+        DebugUtil.dbg(this, "Starting to process server default claims");
+
+        if (oa2se != null && oa2se.getClaimSource() != null && oa2se.getClaimSource().isEnabled() && oa2se.getClaimSource().isRunAtAuthorization()) {
+            DebugUtil.dbg(this, "Service environment has a claims source enabled=" + oa2se.getClaimSource());
+
             // allow the server to pre-populate the claims. This invokes the global claims handler for the server
             // to allow, e.g. pulling user information out of HTTp headers.
-            oa2se.getClaimSource().process(userInfo, request, transaction);
+            oa2se.getClaimSource().process(claims, request, transaction);
+        } else {
+            DebugUtil.dbg(this, "Service environment has a claims no source enabled during authorization");
         }
-        return (JSONObject) userInfo.getMap();
-    }
 
-    @Override
-    protected JSONObject createSpecialClaims(HttpServletRequest httpServletRequest, JSONObject claims) throws Throwable {
-        OA2Client client = transaction.getOA2Client();
+        DebugUtil.dbg(this, "Starting to process Client runtime and sources at authorization.");
 
-        // set up functor factory with no claims since we have none yet.
-        //        Map<String, Object> claims = new HashMap<>();
-        UserInfo userInfo = new UserInfo();
-        userInfo.setMap(claims);
+        OA2Client client = getOA2Client();
+
 
         if (client.getConfig() == null || client.getConfig().isEmpty()) {
             // no configuration for this client means do nothing here.
             return claims;
         }
         // so this client has a specific configuration that is to be invoked.
-        OA2FunctorFactory functorFactory = new OA2FunctorFactory(userInfo.getMap());
-        OA2ClientConfigurationFactory<OA2ClientConfiguration> ff = new OA2ClientConfigurationFactory(functorFactory);
-
-        OA2ClientConfiguration oa2CC = ff.newInstance(client.getConfig());
-        if(!oa2CC.isSaved()){
+        if (!getCC().isSaved()) {
+            getCC().setSaved(true); // do this so it ends up in storage as saved, otherwise it gets saved every time.
             // This means that the configuration was updated on load and needs to be saved.
             oa2se.getClientStore().save(client);
-            oa2CC.setSaved(true);
         }
-        oa2CC.executeRuntime();
-        FlowStates flowStates = new FlowStates(oa2CC.getRuntime().getFunctorMap());
+        DebugUtil.dbg(this, "executing runtime");
+
+        getCC().executeRuntime();
+        DebugUtil.dbg(this, "processing flows");
+
+        FlowStates flowStates = new FlowStates(getCC().getRuntime().getFunctorMap());
         transaction.setFlowStates(flowStates);
-        // save it at this point because the flow states might, e.g. prohibit access to the entire system
-        // and that has to be preserved against future access attempts.
-        oa2se.getTransactionStore().save(transaction);
-        // save everything up to this point since there are no guarantees that processing will continue:
-        if(!flowStates.acceptRequests){
-            throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "access denied", HttpStatus.SC_UNAUTHORIZED);
-        }
         if (flowStates.getClaims) {
+            DebugUtil.dbg(this, "Doing preprocessing");
+            DebugUtil.dbg(this, "Claims allowed, creating sources from configuration");
+            OA2ClientConfigurationFactory<OA2ClientConfiguration> ff = new OA2ClientConfigurationFactory(getFF());
+            OA2ClientConfiguration oa2CC = getCC();
+
             ff.createClaimSource(oa2CC, client.getConfig());
             // the runtime forbids processing claims for this request, so exit
-            if (oa2CC.hasPreProcessing()) {
-                          ff.setupPostProcessing(oa2CC, client.getConfig());
-                          oa2CC.executePreProcessing();
-                      }
+            doPreProcessing();
             List<ClaimSource> claimsSources = oa2CC.getClaimSource();
             if (oa2CC.hasClaimSource()) {
                 // so there is
                 for (int i = 0; i < claimsSources.size(); i++) {
-                    claimsSources.get(i).process(userInfo, httpServletRequest, transaction);
-                    System.err.println(userInfo.getMap());
+                    ClaimSource claimSource = claimsSources.get(i);
+                    if (claimSource.isRunAtAuthorization())
+                        claimSource.process(claims, request, transaction);
+                    if(claimSource.getPostProcessor()!=null) {
+                        flowStates.updateValues(claimSource.getPostProcessor().getFunctorMap());
+                    }
+                    if(!flowStates.acceptRequests){
+                        // This practically means that the come situation has arisen whereby the user is
+                        // immediately banned from access -- e.g. they were found to be on a blacklist.
+                        transaction.setClaims(claims);
+                        transaction.setFlowStates(flowStates);
+                        oa2se.getTransactionStore().save(transaction);
+                        throw new OA2GeneralError("access denied", "access denied", HttpStatus.SC_UNAUTHORIZED);
+                    }
+                    DebugUtil.dbg(this, "user info for claim source #" + claimSource + " = " + claims);
                 }
             }
-            if (oa2CC.hasPostProcessing()) {
-                ff.setupPostProcessing(oa2CC, client.getConfig());
-                oa2CC.executePostProcessing();
-            }
+
         }
+        // save it at this point because the flow states might, e.g. prohibit access to the entire system
+        // and that has to be preserved against future access attempts.
+        transaction.setClaims(claims);
+        transaction.setFlowStates(flowStates);
+        oa2se.getTransactionStore().save(transaction);
+        return claims;
+    }
+
+    protected OA2Client getOA2Client() {
+        return transaction.getOA2Client();
+    }
+
+    OA2ClientConfiguration cc = null;
+
+    OA2FunctorFactory ff = null;
+
+    protected OA2FunctorFactory getFF() {
+        if (ff == null) {
+            ff = new OA2FunctorFactory(transaction.getClaims());
+
+        }
+        return ff;
+    }
+
+    protected OA2ClientConfiguration getCC() {
+        if (cc == null && null != getOA2Client().getConfig()) {
+
+            OA2FunctorFactory functorFactory = getFF();
+            OA2ClientConfigurationFactory<OA2ClientConfiguration> ff = new OA2ClientConfigurationFactory(functorFactory);
+
+            cc = ff.newInstance(getOA2Client().getConfig());
+        }
+        return cc;
+    }
+
+    public JSONObject createSpecialClaims() throws Throwable {
+        if (transaction.getOA2Client().isPublicClient()) {
+            // Public clients do not get claims.
+            return new JSONObject();
+        }
+
+        JSONObject claims = transaction.getClaims();
+        if (claims == null) {
+            claims = new JSONObject();
+        }
+        FlowStates flowStates = transaction.getFlowStates();
+        // save everything up to this point since there are no guarantees that processing will continue:
+        if (!flowStates.acceptRequests) {
+            throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "access denied", HttpStatus.SC_UNAUTHORIZED);
+        }
+        OA2Client client = getOA2Client();
+
+        if (client.getConfig() == null || client.getConfig().isEmpty()) {
+            // no configuration for this client means do nothing here.
+            return claims;
+        }
+        // so this client has a specific configuration that is to be invoked.
+        OA2ClientConfiguration oa2CC = getCC();
+
+        DebugUtil.dbg(this, "BEFORE invoking claim sources, claims are = " + claims);
+        if (flowStates.getClaims) {
+            DebugUtil.dbg(this, "Claims allowed, creating sources from configuration");
+            OA2ClientConfigurationFactory<OA2ClientConfiguration> ff = new OA2ClientConfigurationFactory(getFF());
+
+            ff.createClaimSource(oa2CC, client.getConfig());
+            // the runtime forbids processing claims for this request, so exit
+            List<ClaimSource> claimsSources = oa2CC.getClaimSource();
+            if (oa2CC.hasClaimSource()) {
+                // so there is
+                for (int i = 0; i < claimsSources.size(); i++) {
+                    ClaimSource claimSource = claimsSources.get(i);
+                    if (!claimSource.isRunAtAuthorization()) {
+                        claimSource.process(claims, transaction);
+                        DebugUtil.dbg(this, "After invoking claim source, new claims = " + claims);
+                    }
+                }
+            }
+
+        }
+        DebugUtil.dbg(this, "Ready for post-processing");
+        doPostProcessing();
         // Now we have to set up the claims sources and process the results
         // last thing is to check that the flow states did not change as a result of claims processing
         // e.g. that the user membership in a group changes access
-        flowStates.setValues(oa2CC.getPostProcessing().getFunctorMap());
+        flowStates.updateValues(oa2CC.getPostProcessing().getFunctorMap());
 
         // update everything
         transaction.setFlowStates(flowStates);
-        JSONObject jsonClaims = new JSONObject();
-        jsonClaims.putAll(userInfo.getMap());
-        transaction.setClaims(jsonClaims);
+        transaction.setClaims(claims);// since the JSON library tends to clone things and they go missing, just set it again.
         oa2se.getTransactionStore().save(transaction);
-        return jsonClaims;
+        DebugUtil.dbg(this, "Done with special claims=" + claims);
+
+        return claims;
     }
 
+    /**
+     * This is the post-processing after <b>ALL</b> the claim sources have run, should there be any. It is different
+     * from the per-source processing.
+     *
+     * @throws Throwable
+     */
+    public void doPostProcessing() throws Throwable {
+        if (getCC().hasPostProcessing()) {
+            OA2ClientConfigurationFactory<OA2ClientConfiguration> ff = new OA2ClientConfigurationFactory(getFF());
+            ff.setupPostProcessing(getCC(), getOA2Client().getConfig());
+            getCC().executePostProcessing();
+        }
+
+
+    }
+
+    /**
+     * This is the pre-processing before <b>ALL</b> the claim sources have run, should there be any. It is different
+     * from the per-source processing.
+     *
+     * @throws Throwable
+     */
+
+    public void doPreProcessing() throws Throwable {
+        if (getCC().hasPreProcessing()) {
+            OA2ClientConfigurationFactory<OA2ClientConfiguration> ff = new OA2ClientConfigurationFactory(getFF());
+            ff.setupPreProcessing(getCC(), getOA2Client().getConfig());
+            getCC().executePreProcessing();
+        }
+
+    }
 }

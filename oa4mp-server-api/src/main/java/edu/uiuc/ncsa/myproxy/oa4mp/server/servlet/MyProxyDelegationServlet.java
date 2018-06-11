@@ -25,6 +25,7 @@ import edu.uiuc.ncsa.security.delegation.storage.TransactionStore;
 import edu.uiuc.ncsa.security.delegation.storage.impl.BasicTransaction;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.servlet.NotificationListener;
+import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.util.pkcs.KeyPairPopulationThread;
 
 import javax.servlet.http.HttpServletRequest;
@@ -130,6 +131,7 @@ public abstract class MyProxyDelegationServlet extends EnvServlet implements Tra
      * @throws SQLException
      */
     protected void realStoreUpdates() throws IOException, SQLException{
+        ServletDebugUtil.dbg(this, "starting store updates");
         processStoreCheck(getTransactionStore());
         processStoreCheck(getServiceEnvironment().getClientStore());
         processStoreCheck(getServiceEnvironment().getClientApprovalStore());

@@ -72,6 +72,9 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction {
 
 
     public JSONObject getClaims() {
+        if(!getState().containsKey(CLAIMS_KEY)){
+            return new JSONObject();
+        }
         return getState().getJSONObject(CLAIMS_KEY);
     }
 

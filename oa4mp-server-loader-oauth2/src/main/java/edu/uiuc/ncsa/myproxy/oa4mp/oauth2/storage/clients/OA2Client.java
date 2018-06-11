@@ -148,7 +148,9 @@ public class OA2Client extends Client {
     public JSONObject getConfig() {
         return config;
     }
-
+    public boolean hasConfig(){
+        return config != null;
+    }
     public void setConfig(JSONObject config) {
         this.config = config;
     }

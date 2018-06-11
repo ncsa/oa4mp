@@ -2,10 +2,10 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientConfigurationUtil;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
-import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.delegation.storage.impl.ClientConverter;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfigurationUtil;
+import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.storage.data.ConversionMap;
 import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
 import net.sf.json.JSON;
@@ -53,8 +53,10 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
             otherV.setSignTokens(map.getBoolean(getCK2().signTokens()));
         }
         JSONObject ldap = null;
-        if (map.containsKey(getCK2().ldap()) && map.get(getCK2().ldap())!=null) {
+        String zzz = map.getString(getCK2().ldap());
+        if (map.containsKey(getCK2().ldap()) && !(zzz ==null ||  zzz.isEmpty())) {
             // make sure we don't try to JSON deserialize a null object either...
+            // Lots to go wrong before we even get our hands on this.
             JSON temp = JSONSerializer.toJSON(map.get(getCK2().ldap()));
 
             if(!temp.isEmpty()) {
@@ -63,7 +65,8 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
                 } else {
                     JSONArray array = (JSONArray) temp;
                     if (array.size() != 1) {
-                        throw new GeneralException("Error: multiple LDAP configurations encountered for id \"" + otherV.getIdentifierString() + "\". Convert manually.");
+                        ServletDebugUtil.dbg(this,"Got " + array.size() + " LDAP configurations. Using first one only...");
+                    //    throw new GeneralException("Error: multiple LDAP configurations encountered for id \"" + otherV.getIdentifierString() + "\". Convert manually.");
                     }
                     ldap = (JSONObject) array.get(0);
 

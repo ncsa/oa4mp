@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.ClaimSourceFactoryImpl;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.OA2ClaimsUtil;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RefreshTokenStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
@@ -195,6 +196,9 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         if (!st2.getFlowStates().acceptRequests || !st2.getFlowStates().accessToken) {
             throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "getting access token denied", HttpStatus.SC_UNAUTHORIZED);
         }
+        OA2ClaimsUtil claimsUtil = new OA2ClaimsUtil((OA2SE) getServiceEnvironment(), st2);
+        claimsUtil.createSpecialClaims();
+
         atResponse.setClaims(st2.getClaims());
         DebugUtil.dbg(this, "set token signing flag =" + atResponse.isSignToken());
         if (!client.isRTLifetimeEnabled() && ((OA2SE) getServiceEnvironment()).isRefreshTokenEnabled()) {

@@ -5,9 +5,10 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.HTTPHeaderClaimsSource;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.LDAPClaimsSource;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowType;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.jSetClaimSource;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.ClientConfigurationFactory;
-import edu.uiuc.ncsa.security.oauth_2_0.server.config.JSONConfig;
+import edu.uiuc.ncsa.security.oauth_2_0.server.config.JSONClaimSourceConfig;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfigurationUtil;
 import edu.uiuc.ncsa.security.util.functor.JFunctor;
@@ -90,9 +91,9 @@ public class OA2ClientConfigurationFactory<V extends OA2ClientConfiguration> ext
     public static final String LDAP_DEFAULT = "LDAP";
     public static final String HEADER_DEFAULT = "HEADER";
 
-    protected Map<String, JSONConfig> getClaimSourceConfigurations(JSONObject jsonObject) {
+    protected Map<String, JSONClaimSourceConfig> getClaimSourceConfigurations(JSONObject jsonObject) {
         JSONArray array = OA2ClientConfigurationUtil.getClaimSourceConfigurations(jsonObject);
-        Map<String, JSONConfig> configs = new HashMap<>();
+        Map<String, JSONClaimSourceConfig> configs = new HashMap<>();
 
         for (int i = 0; i < array.size(); i++) {
             JSONObject json = array.getJSONObject(i);
@@ -106,7 +107,7 @@ public class OA2ClientConfigurationFactory<V extends OA2ClientConfiguration> ext
 
 
     /**
-     * Setup the claim sources from the configuration given the alias of the source to use and the name fo the configuration
+     * Setup the claim sources from the configuration given the alias of the source to use and the name of the configuration
      * to use.
      *
      * @param alias
@@ -119,9 +120,10 @@ public class OA2ClientConfigurationFactory<V extends OA2ClientConfiguration> ext
         /*
         TODO - handle edge cases of no name/alias and single configuration.
          */
-        Map<String, JSONConfig> configs = getClaimSourceConfigurations(json);
-        JSONConfig config = configs.get(configName);
+        Map<String, JSONClaimSourceConfig> configs = getClaimSourceConfigurations(json);
+        JSONClaimSourceConfig config = configs.get(configName);
         if (alias.equals(LDAP_DEFAULT)) {
+            DebugUtil.dbg(this, "Setting Claim Source to LDAP as per configuration");
             LDAPClaimsSource x = new LDAPClaimsSource((LDAPConfiguration) config, null);
             return x;
         }

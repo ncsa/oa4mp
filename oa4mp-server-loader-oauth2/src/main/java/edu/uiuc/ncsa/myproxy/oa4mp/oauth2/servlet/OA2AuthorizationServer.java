@@ -6,11 +6,6 @@ import edu.uiuc.ncsa.myproxy.MyProxyConnectable;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.OA2ClaimsUtil;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.OA2FunctorFactory;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowStates;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientConfiguration;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientConfigurationFactory;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractAuthorizationServlet;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
@@ -19,8 +14,6 @@ import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2GeneralError;
-import edu.uiuc.ncsa.security.oauth_2_0.UserInfo;
-import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.servlet.PresentableState;
 import net.sf.json.JSONObject;
 
@@ -35,7 +28,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.security.GeneralSecurityException;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 
@@ -118,9 +110,10 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
 
     @Override
     protected void doIt(HttpServletRequest request, HttpServletResponse response) throws Throwable {
+        printAllParameters(request);
+
         Map<String, String> map = getFirstParameters(request);
 
-        //printAllParameters(request);
         if (map.containsKey(OA2Constants.RESPONSE_TYPE)) {
             // Means this is an initial request. Pass it along to the init util to
             // unscramble it.
@@ -143,6 +136,7 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
         super.doIt(request, response);
 
     }
+/*
 
 
     protected void handleClaims(HttpServletRequest httpServletRequest,
@@ -208,6 +202,7 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
         states.put("claims", jsonClaims.toString());
         transaction.setState(states);
     }
+*/
 
     @Override
     public void prepare(PresentableState state) throws Throwable {
@@ -241,10 +236,10 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
             st2.setRefreshTokenLifetime(0L);
         }
         super.createRedirect(request, response, trans);
-        // At this point, all authentication has been done, everything is set up and th enet stop in the flow is the
+        // At this point, all authentication has been done, everything is set up and the next stop in the flow is the
         // redirect back to the client.
         OA2ClaimsUtil claimsUtil = new OA2ClaimsUtil((OA2SE) getServiceEnvironment(), st2);
-        claimsUtil.createClaims(request);
+        claimsUtil.createBasicClaims(request);
     }
 
     @Override

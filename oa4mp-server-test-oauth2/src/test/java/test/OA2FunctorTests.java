@@ -135,8 +135,109 @@ public class OA2FunctorTests extends JFunctorTest {
         return claims;
     }
 
+
+    @Test
+    public void testNestedLB() throws Exception {
+        Map<String, Object> claims = createClaims();
+        claims.put("eppn", "jgaynor@ncsa.illinois.edu");
+
+        OA2FunctorFactory functorFactory = new OA2FunctorFactory(claims);
+        JSONObject jsonObject = new JSONObject();
+        JSONArray array = new JSONArray();
+        JSONObject ifBlock1 = new JSONObject();
+
+        jContains jContains = new jContains();
+        jContains.addArg("foo");
+        jContains.addArg("zfoo");
+        ifBlock1.put("$if", jContains.toJSON());
+
+        JSONObject ifBlock2 = new JSONObject();
+        jEndsWith jEndsWith2 = new jEndsWith();
+        jEndsWith2.addArg("${eppn}");
+        jEndsWith2.addArg("@ncsa.illinois.edu");
+
+        JSONObject ifBlock3 = new JSONObject();
+        jEndsWith jEndsWith3 = new jEndsWith();
+        jEndsWith3.addArg("${eppn}");
+        jEndsWith3.addArg("@illinois.edu");
+
+
+
+        jIf jIf1 = new jIf();
+        jContains = new jContains();
+        jContains.addArg("foo");
+        jContains.addArg("zfoo");
+        jIf1.addArg(jContains);
+
+        jThen jThen1 = new jThen();
+
+
+        jIf jIf2 = new jIf();
+        jEndsWith2 = new jEndsWith();
+        jEndsWith2.addArg("${eppn}");
+        jEndsWith2.addArg("@ncsa.illinois.edu");
+        jIf2.addArg(jEndsWith2);
+        jThen jThen2 = new jThen();
+        jSet jSet2 = new jSet(claims);
+        jSet2.addArg("eppn");
+        jSet2.addArg("A");
+        jThen2.addArg(jSet2);
+
+        jIf jIf3 = new jIf();
+        jEndsWith3 = new jEndsWith();
+        jEndsWith3.addArg("${eppn}");
+        jEndsWith3.addArg("@illinois.edu");
+        jIf3.addArg(jEndsWith3);
+        jThen jThen3 = new jThen();
+        jSet jSet3 = new jSet(claims);
+        jSet3.addArg("eppn");
+        jSet3.addArg("B");
+        jThen3.addArg(jSet3);
+
+        jThen1.addArg(jIf2);
+        jThen1.addArg(jIf3);
+
+        LogicBlock lb = new LogicBlock(jIf1, jThen1, null);
+
+        System.out.println("=== nested claims ===");
+        System.out.println(lb.toJSON());
+
+    }
+   @Test
+   public void testLB2() throws Exception{
+       String rawJSON = "{\n" +
+               "  \"$if\": [\n" +
+               "    {\n" +
+               "      \"$contains\": [\n" +
+               "        \"foo\",\n" +
+               "        \"zfoo\"\n" +
+               "      ]\n" +
+               "    }\n" +
+               "  ],\n" +
+               "  \"$then\": [\n" +
+               "    {\n" +
+               "      \"$if\": [{\"$endsWith\": [\"${eppn}\",\"@ncsa.illinois.edu\"]}],\n" +
+               "      \"$then\":[{\"$set\":[\"eppn\",\"A\"]}]\n" +
+               "    },\n" +
+               "    {\n" +
+               "      \"$if\": [{\"$endsWith\": [\"${eppn}\",\"@illinois.edu\"]}],\n" +
+               "      \"$then\":[{\"$set\":[\"eppn\",\"B\"]}]\n" +
+               "    }\n" +
+               "  ]\n" +
+               "}";
+       Map<String, Object> claims = createClaims();
+       claims.put("eppn", "jgaynor@ncsa.illinois.edu");
+       OA2FunctorFactory functorFactory = new OA2FunctorFactory(claims);
+
+
+       LogicBlock logicBlock = new LogicBlock(functorFactory, JSONObject.fromObject(rawJSON));
+       System.out.println("\n===== nested logic block #2 ===== ");
+       System.out.println(logicBlock.toJSON());
+       logicBlock.execute();
+   }
+
     /**
-     * This tests the logic block creation logic.
+     * This tests the logic block creation logic but with claims
      *
      * @return
      * @throws Exception

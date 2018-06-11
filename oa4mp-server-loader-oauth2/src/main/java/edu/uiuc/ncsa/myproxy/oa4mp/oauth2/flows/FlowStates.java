@@ -19,10 +19,15 @@ public class FlowStates {
 
     public FlowStates(FunctorMap functorMap) {
         super();
-        setValues(functorMap);
+        updateValues(functorMap);
     }
 
-    public void setValues(FunctorMap functorMap) {
+    /**
+     * The contract for this method is that the values of this object (default is all true) will be
+     * updated based on the functor map. Unless the values are explicitly changed, they remain.
+     * @param functorMap
+     */
+    public void updateValues(FunctorMap functorMap) {
         acceptRequests = findValue(functorMap, ACCEPT_REQUESTS, acceptRequests);
         accessToken = findValue(functorMap, ACCESS_TOKEN, accessToken);
         getCert = findValue(functorMap, GET_CERT, getCert);
