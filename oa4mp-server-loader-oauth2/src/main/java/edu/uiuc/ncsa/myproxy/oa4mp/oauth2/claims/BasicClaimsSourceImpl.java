@@ -1,6 +1,8 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowStates;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.oauth_2_0.UserInfo;
 import edu.uiuc.ncsa.security.oauth_2_0.server.UnsupportedScopeException;
@@ -21,9 +23,10 @@ import java.util.HashSet;
 public class BasicClaimsSourceImpl implements ClaimSource {
 
     JSONClaimSourceConfig configuration = null;
+
     @Override
     public void setConfiguration(JSONClaimSourceConfig configuration) {
-                                   this.configuration = configuration;
+        this.configuration = configuration;
     }
 
     @Override
@@ -48,12 +51,15 @@ public class BasicClaimsSourceImpl implements ClaimSource {
     }
 
     boolean enabled = true;
-    public boolean isEnabled(){
+
+    public boolean isEnabled() {
         return enabled;
     }
+
     /**
      * Optionally, the service environment may be injected into a scope handler to get configuration of
      * components, e.g.
+     *
      * @return
      */
     public OA2SE getOa2SE() {
@@ -87,6 +93,7 @@ public class BasicClaimsSourceImpl implements ClaimSource {
 
     /**
      * This also just returns the {@link UserInfo} object passed in.
+     *
      * @param claims
      * @param request
      * @param transaction
@@ -95,17 +102,26 @@ public class BasicClaimsSourceImpl implements ClaimSource {
      */
     @Override
     public JSONObject process(JSONObject claims, HttpServletRequest request, ServiceTransaction transaction) throws UnsupportedScopeException {
-        if(hasConfiguration() && getConfiguration().getPreProcessing()!= null){
-                 OA2FunctorFactory ff = new OA2FunctorFactory(claims);
-                 preProcessor = ff.createLogicBlock(getConfiguration().getPreProcessing());
-                 preProcessor.execute();
+        OA2ServiceTransaction t = (OA2ServiceTransaction) transaction;
+        if (hasConfiguration() && getConfiguration().getPreProcessing() != null) {
+            OA2FunctorFactory ff = new OA2FunctorFactory(claims);
+            preProcessor = ff.createLogicBlock(getConfiguration().getPreProcessing());
+            preProcessor.execute();
+            // since the flow state maps to  part of a JSON object, we have to get the object, then reset it.
+            FlowStates f = t.getFlowStates();
+            f.updateValues(preProcessor.getFunctorMap());
+            t.setFlowStates(f);
 
-             }
-        realProcessing(claims, request, transaction);
-        if(hasConfiguration() && getConfiguration().getPostProcessing()!= null){
+
+        }
+        realProcessing(claims, request, t);
+        if (hasConfiguration() && getConfiguration().getPostProcessing() != null) {
             OA2FunctorFactory ff = new OA2FunctorFactory(claims);
             postProcessor = ff.createLogicBlock(getConfiguration().getPostProcessing());
             postProcessor.execute();
+            FlowStates f = t.getFlowStates();
+            f.updateValues(postProcessor.getFunctorMap());
+            t.setFlowStates(f);
         }
         return claims;
     }
@@ -113,6 +129,7 @@ public class BasicClaimsSourceImpl implements ClaimSource {
     /**
      * This is the actual place to put your code that only processes the claim source. The {@link #process(JSONObject, HttpServletRequest, ServiceTransaction)}
      * calls wrap this and invoke the pre/post processor for you.
+     *
      * @param claims
      * @param request
      * @param transaction
@@ -132,6 +149,7 @@ public class BasicClaimsSourceImpl implements ClaimSource {
 
     /**
      * returns a (unique) collection of claims.
+     *
      * @return
      */
     @Override

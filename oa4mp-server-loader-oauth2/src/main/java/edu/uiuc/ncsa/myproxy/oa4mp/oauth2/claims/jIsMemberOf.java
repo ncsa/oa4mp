@@ -1,7 +1,9 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
 
+import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
 import edu.uiuc.ncsa.security.util.functor.JFunctor;
+import net.sf.json.JSONArray;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -25,8 +27,18 @@ public class jIsMemberOf extends ClaimFunctor {
 
     @Override
     public Object execute() {
-        if (claims.containsKey(OA2Claims.IS_MEMBER_OF) && (claims.get(OA2Claims.IS_MEMBER_OF) instanceof Groups)) {
-            Groups groups = (Groups) claims.get(OA2Claims.IS_MEMBER_OF);
+        if (claims.containsKey(OA2Claims.IS_MEMBER_OF)) {
+            Groups groups = null;
+            if(claims.get(OA2Claims.IS_MEMBER_OF)instanceof JSONArray){
+                groups = new Groups();
+                groups.fromJSON((JSONArray)claims.get(OA2Claims.IS_MEMBER_OF));
+            }
+            if(claims.get(OA2Claims.IS_MEMBER_OF)instanceof Groups){
+                groups = (Groups)claims.get(OA2Claims.IS_MEMBER_OF);
+            }
+            if(groups == null){
+                throw new NFWException("Error: unrecognized group structure in claims");
+            }
             boolean isMemberOfAll = true;
             ArrayList<String> targetList = new ArrayList<>();
             for (Object object : getArgs()) {

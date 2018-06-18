@@ -194,7 +194,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         atResponse.setSignToken(client.isSignTokens());
         OA2ServiceTransaction st2 = (OA2ServiceTransaction) state.getTransaction();
         if (!st2.getFlowStates().acceptRequests || !st2.getFlowStates().accessToken) {
-            throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "getting access token denied", HttpStatus.SC_UNAUTHORIZED);
+            throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "access denied", HttpStatus.SC_UNAUTHORIZED);
         }
         OA2ClaimsUtil claimsUtil = new OA2ClaimsUtil((OA2SE) getServiceEnvironment(), st2);
         claimsUtil.createSpecialClaims();

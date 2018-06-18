@@ -153,7 +153,7 @@ public class OA2ClaimsUtil {
                         transaction.setClaims(claims);
                         transaction.setFlowStates(flowStates);
                         oa2se.getTransactionStore().save(transaction);
-                        throw new OA2GeneralError("access denied", "access denied", HttpStatus.SC_UNAUTHORIZED);
+                        throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "access denied", HttpStatus.SC_UNAUTHORIZED);
                     }
                     DebugUtil.dbg(this, "user info for claim source #" + claimSource + " = " + claims);
                 }
@@ -239,11 +239,13 @@ public class OA2ClaimsUtil {
             }
 
         }
+        // these might have changed in the course of executing the claim source.
         DebugUtil.dbg(this, "Ready for post-processing");
         doPostProcessing();
         // Now we have to set up the claims sources and process the results
         // last thing is to check that the flow states did not change as a result of claims processing
         // e.g. that the user membership in a group changes access
+        flowStates = transaction.getFlowStates();
         flowStates.updateValues(oa2CC.getPostProcessing().getFunctorMap());
 
         // update everything
@@ -251,7 +253,13 @@ public class OA2ClaimsUtil {
         transaction.setClaims(claims);// since the JSON library tends to clone things and they go missing, just set it again.
         oa2se.getTransactionStore().save(transaction);
         DebugUtil.dbg(this, "Done with special claims=" + claims);
+        // After post-processing it is possible that this user should be forbidden access, e.g. they are not in the correct group.
+        // This is the first place we can check. If they are not allowed to make further requests, an access denied exception is thrown.
+        if(!flowStates.acceptRequests){
+            DebugUtil.dbg(this, "Access denied for user name =" + transaction.getUsername());
 
+            throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "access denied", HttpStatus.SC_UNAUTHORIZED);
+        }
         return claims;
     }
 

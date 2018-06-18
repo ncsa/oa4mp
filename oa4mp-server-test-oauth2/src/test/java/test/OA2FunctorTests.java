@@ -42,6 +42,7 @@ public class OA2FunctorTests extends JFunctorTest {
         jMatch jMatch1 = (jMatch) factory.fromJSON(jMatch.toJSON());
         jMatch1.execute();
         assert jMatch1.getBooleanResult();
+        assert reTestIt(jMatch1,factory).getBooleanResult();
 
         jContains jContains = new jContains();
         jContains.addArg("${" + SUBJECT + "}"); //needle;
@@ -49,33 +50,60 @@ public class OA2FunctorTests extends JFunctorTest {
         jContains jContains1 = (jContains) factory.fromJSON(jContains.toJSON());
         jContains1.execute();
         assert jContains1.getBooleanResult();
+        assert reTestIt(jContains1, factory).getBooleanResult();
     }
 
 
     @Test
     public void testIncludeClaims() throws Exception {
         Map<String, Object> claims = createClaims();
+        // Make sure the two sets of claims are independent so the tests don't interfere with each other,
+        Map<String, Object> claims2 = new HashMap<>();
+        claims2.putAll(claims);
+
+        OA2FunctorFactory ff = new OA2FunctorFactory(claims2);
         jInclude jInclude = new jInclude(claims);
         jInclude.addArg(ISSUER);
         jInclude.addArg(SUBJECT);
         jInclude.execute();
+        jInclude x = (jInclude) reTestIt(jInclude, ff);
+
         claims = jInclude.getClaims();
         assert claims.containsKey(ISSUER);
         assert claims.containsKey(SUBJECT);
         assert !claims.containsKey(IDP_CLAIM);
         assert !claims.containsKey(AUDIENCE);
-        System.out.println(claims);
+
+        claims = x.getClaims();
+        assert claims.containsKey(ISSUER);
+        assert claims.containsKey(SUBJECT);
+        assert !claims.containsKey(IDP_CLAIM);
+        assert !claims.containsKey(AUDIENCE);
+
 
     }
 
     @Test
     public void testExcludeClaims() throws Exception {
         Map<String, Object> claims = createClaims();
+        Map<String, Object> claims2 = new HashMap<>();
+        claims2.putAll(claims);
+
+        OA2FunctorFactory ff = new OA2FunctorFactory(claims2);
         jExclude jExclude = new jExclude(claims);
         jExclude.addArg(ISSUER);
         jExclude.addArg(SUBJECT);
         jExclude.execute();
+        jExclude x = (jExclude)reTestIt(jExclude, ff);
+
         claims = jExclude.getClaims();
+        assert !claims.containsKey(ISSUER);
+        assert !claims.containsKey(SUBJECT);
+        assert claims.containsKey(IDP_CLAIM);
+        assert claims.containsKey(AUDIENCE);
+
+
+        claims = x.getClaims();
         assert !claims.containsKey(ISSUER);
         assert !claims.containsKey(SUBJECT);
         assert claims.containsKey(IDP_CLAIM);
@@ -86,12 +114,14 @@ public class OA2FunctorTests extends JFunctorTest {
     @Test
     public void testIsMemberOf() throws Exception {
         Map<String, Object> claims = createClaims();
+        OA2FunctorFactory ff = new OA2FunctorFactory(claims);
         jIsMemberOf jIsMemberOf = new jIsMemberOf(claims);
         jIsMemberOf.addArg(GROUP_NAME + "0");
         jIsMemberOf.addArg(GROUP_NAME + "2");
         jIsMemberOf.addArg(GROUP_NAME + "4");
         jIsMemberOf.execute();
         assert jIsMemberOf.getBooleanResult();
+        assert reTestIt(jIsMemberOf,ff).getBooleanResult();
         // redo so it fails
         jIsMemberOf = new jIsMemberOf(claims);
         jIsMemberOf.addArg(GROUP_NAME + "0");
@@ -99,9 +129,12 @@ public class OA2FunctorTests extends JFunctorTest {
         jIsMemberOf.addArg(GROUP_NAME + "4");
         jIsMemberOf.addArg("my-bad-group-name");
         jIsMemberOf.execute();
-        assert !jIsMemberOf.getBooleanResult();
 
+        assert !jIsMemberOf.getBooleanResult();
+        assert !reTestIt(jIsMemberOf,ff).getBooleanResult();
     }
+
+
 
     @Test
     public void testAccessToken() throws Exception {
@@ -162,7 +195,6 @@ public class OA2FunctorTests extends JFunctorTest {
         jEndsWith3.addArg("@illinois.edu");
 
 
-
         jIf jIf1 = new jIf();
         jContains = new jContains();
         jContains.addArg("foo");
@@ -197,44 +229,43 @@ public class OA2FunctorTests extends JFunctorTest {
         jThen1.addArg(jIf2);
         jThen1.addArg(jIf3);
 
-        LogicBlock lb = new LogicBlock(jIf1, jThen1, null);
+        LogicBlock lb = new LogicBlock(functorFactory,jIf1, jThen1, null);
 
-        System.out.println("=== nested claims ===");
-        System.out.println(lb.toJSON());
 
     }
-   @Test
-   public void testLB2() throws Exception{
-       String rawJSON = "{\n" +
-               "  \"$if\": [\n" +
-               "    {\n" +
-               "      \"$contains\": [\n" +
-               "        \"foo\",\n" +
-               "        \"zfoo\"\n" +
-               "      ]\n" +
-               "    }\n" +
-               "  ],\n" +
-               "  \"$then\": [\n" +
-               "    {\n" +
-               "      \"$if\": [{\"$endsWith\": [\"${eppn}\",\"@ncsa.illinois.edu\"]}],\n" +
-               "      \"$then\":[{\"$set\":[\"eppn\",\"A\"]}]\n" +
-               "    },\n" +
-               "    {\n" +
-               "      \"$if\": [{\"$endsWith\": [\"${eppn}\",\"@illinois.edu\"]}],\n" +
-               "      \"$then\":[{\"$set\":[\"eppn\",\"B\"]}]\n" +
-               "    }\n" +
-               "  ]\n" +
-               "}";
-       Map<String, Object> claims = createClaims();
-       claims.put("eppn", "jgaynor@ncsa.illinois.edu");
-       OA2FunctorFactory functorFactory = new OA2FunctorFactory(claims);
+
+    @Test
+    public void testLB2() throws Exception {
+        String rawJSON = "{\n" +
+                "  \"$if\": [\n" +
+                "    {\n" +
+                "      \"$contains\": [\n" +
+                "        \"foo\",\n" +
+                "        \"zfoo\"\n" +
+                "      ]\n" +
+                "    }\n" +
+                "  ],\n" +
+                "  \"$then\": [\n" +
+                "    {\n" +
+                "      \"$if\": [{\"$endsWith\": [\"${eppn}\",\"@ncsa.illinois.edu\"]}],\n" +
+                "      \"$then\":[{\"$set\":[\"eppn\",\"A\"]}]\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"$if\": [{\"$endsWith\": [\"${eppn}\",\"@illinois.edu\"]}],\n" +
+                "      \"$then\":[{\"$set\":[\"eppn\",\"B\"]}]\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}";
+        Map<String, Object> claims = createClaims();
+        claims.put("eppn", "jgaynor@ncsa.illinois.edu");
+        OA2FunctorFactory functorFactory = new OA2FunctorFactory(claims);
 
 
-       LogicBlock logicBlock = new LogicBlock(functorFactory, JSONObject.fromObject(rawJSON));
-       System.out.println("\n===== nested logic block #2 ===== ");
-       System.out.println(logicBlock.toJSON());
-       logicBlock.execute();
-   }
+        LogicBlock logicBlock = new LogicBlock(functorFactory, JSONObject.fromObject(rawJSON));
+        System.out.println("\n===== nested logic block #2 ===== ");
+        System.out.println(logicBlock.toJSON());
+        logicBlock.execute();
+    }
 
     /**
      * This tests the logic block creation logic but with claims
@@ -259,15 +290,12 @@ public class OA2FunctorTests extends JFunctorTest {
         set.addArg(AUDIENCE);
         String newAudience = "new-aud-" + getRandomString();
         set.addArg(newAudience);
-        System.out.println("jSet=" + set.toJSON());
         ifBlock.put("$then", set.toJSON());
         array.add(ifBlock);
-        System.out.println(array.toString(2));
 
         LogicBlocks<? extends LogicBlock> bloxx = functorFactory.createLogicBlock(array);
         assert bloxx.size() == 1;
         bloxx.execute();
-        System.out.println(bloxx.get(0).getResults());
 
         assert claims.get(AUDIENCE).toString().equals(newAudience);
     }
@@ -283,7 +311,6 @@ public class OA2FunctorTests extends JFunctorTest {
     @Test
     public void testLBClaimsIntegrity() throws Exception {
         Map<String, Object> claims = createClaims();
-        System.out.println("Before, claims = " + claims);
 
         OA2FunctorFactory functorFactory = new OA2FunctorFactory(claims);
         JSONObject jsonObject = new JSONObject();
@@ -306,12 +333,10 @@ public class OA2FunctorTests extends JFunctorTest {
         setCommands.add(set.toJSON());
         ifBlock.put("$then", setCommands);
         array.add(ifBlock);
-        System.out.println(array.toString(2));
 
         LogicBlocks<? extends LogicBlock> bloxx = functorFactory.createLogicBlock(array);
         assert bloxx.size() == 1;
         bloxx.execute();
-        System.out.println("After, claims = " + claims);
 
         assert claims.get(AUDIENCE).toString().equals(targetValue) : "Should have been \"" + targetValue + "\" and got \"" + claims.get("aud") + "\"";
     }
@@ -342,12 +367,10 @@ public class OA2FunctorTests extends JFunctorTest {
         set.addArg("${" + AUDIENCE + "}--" + newAudience);
         ifBlock.put("$then", set.toJSON());
         array.add(ifBlock);
-        System.out.println(array.toString(2));
 
         LogicBlocks<? extends LogicBlock> bloxx = functorFactory.createLogicBlock(array);
         assert bloxx.size() == 1;
         bloxx.execute();
-        System.out.println(bloxx.get(0).getResults());
 
         assert claims.get(AUDIENCE).toString().equals(targetValue) : "Should have been \"" + targetValue + "\" and got \"" + claims.get("aud") + "\"";
     }
@@ -368,11 +391,24 @@ public class OA2FunctorTests extends JFunctorTest {
         jThen.addArg(jSet);
         json.put(ifBlock.getName(), jMatch.toJSON());
         json.put(jThen.getName(), jSet.toJSON());
-        System.out.println(json.toString(2));
-        System.out.println(ifBlock.toJSON());
-        System.out.println(jThen.toJSON());
 
 
+    }
+
+    @Test
+    public void testHasClaim() throws Exception {
+        Map<String, Object> claims = createClaims();
+        OA2FunctorFactory ff = new OA2FunctorFactory(claims);
+        String testClaim = IDP_CLAIM;
+        jHasClaim hasClaim = new jHasClaim(claims);
+        hasClaim.addArg(IDP_CLAIM);
+        hasClaim.execute();
+        assert hasClaim.getBooleanResult();
+        assert reTestIt(hasClaim,ff).getBooleanResult();
+        hasClaim.reset();
+        hasClaim.addArg("foo");
+        hasClaim.execute();
+        assert !reTestIt(hasClaim, ff).getBooleanResult();
     }
 
     /**
@@ -383,21 +419,51 @@ public class OA2FunctorTests extends JFunctorTest {
      */
     @Test
     public void testSet() throws Exception {
-
         Map<String, Object> claims = createClaims();
+        Map<String, Object> claims2 = new HashMap<>();
+        claims2.putAll(claims);
+
+        OA2FunctorFactory ff = new OA2FunctorFactory(claims2);
         jSet jSet = new jSet(claims);
         String eppn = "foo@bar.baz";
         jSet.addArg(SUBJECT);
         jSet.addArg(eppn);
         jSet.execute();
+        jSet x = (jSet) reTestIt(jSet, ff);
         assert claims.get(SUBJECT).equals(eppn);
+        assert claims2.get(SUBJECT).equals(eppn);
         // now create a completely new claim and set its value
         jSet = new jSet(claims);
         jSet.addArg("blarg");
         jSet.addArg(eppn);
         jSet.execute();
-        assert claims.get("blarg").equals(eppn);
+        x = (jSet) reTestIt(jSet, ff);
 
+        assert claims.get("blarg").equals(eppn);
+        assert claims2.get("blarg").equals(eppn);
+
+    }
+
+    /**
+     * Test the getting a claim works.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testGet() throws Exception {
+
+        Map<String, Object> claims = createClaims();
+        OA2FunctorFactory ff = new OA2FunctorFactory(claims);
+        jGet jGet = new jGet(claims);
+        jGet.execute();
+        // no args returns an empty string.
+        assert jGet.getStringResult().equals("");
+        assert reTestIt(jGet,ff).getStringResult().equals("");
+        jGet.reset();
+        jGet.addArg(SUBJECT);
+        jGet.execute();
+        assert jGet.getStringResult().equals(claims.get(SUBJECT));
+        assert reTestIt(jGet,ff).getStringResult().equals(claims.get(SUBJECT));
     }
 
     @Test
@@ -420,6 +486,123 @@ public class OA2FunctorTests extends JFunctorTest {
         OA2Client client = new OA2Client(BasicIdentifier.newID("test:client:42"));
         client.setConfig(JSONObject.fromObject(rawConfig));
 
+    }
+
+    /**
+     * Since setting VO person for various clients is hard, this is a test to show that the logic works and
+     * to make sure it keeps working.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testVoPersonTest() throws Exception {
+          /*
+          if defined(eppn) then return eppn;
+          if defined(eptid) then return eptid;
+          if (idp = "http://orcid.org/oauth/authorize") then return oidc (replacing "^http://" with "^https://");
+          if (idp = "http://google.com/accounts/o8/id") then return oidc+"@"+"accounts.google.com";
+          if (idp = "http://github.com/login/oauth/authorize") then return oidc+"@"+"github.com";
+           */
+            VOP_eppn();
+        VOP_eptid();
+        VOP_orcid();
+        VOP_google();
+        VOP_github();
+    }
+
+
+    protected void VOP_eppn() throws Exception {
+        Map<String, Object> claims = doLSSTTest("eppn", EPPN, NCSA_IDP);
+        assert claims.containsKey(VOPersonKey);
+        assert claims.get(VOPersonKey).equals(EPPN);
+    }
+
+    protected void VOP_eptid() throws Exception {
+        Map<String, Object> claims = doLSSTTest("eptid", EPTID,NCSA_IDP);
+        assert claims.containsKey(VOPersonKey);
+        assert claims.get(VOPersonKey).equals(EPTID);
+
+    }
+
+    protected void VOP_orcid() throws Exception {
+        Map<String, Object> claims = doLSSTTest("oidc", orcid,ORCID_IDP);
+        assert claims.containsKey(VOPersonKey);
+        assert claims.get(VOPersonKey).equals(orcid.replace("http://","https://"));
+    }
+
+    protected void VOP_github() throws Exception {
+        Map<String, Object> claims =  doLSSTTest("oidc", oidc,GITHUB_IDP);
+        assert claims.containsKey(VOPersonKey);
+        assert claims.get(VOPersonKey).equals(oidc+"@github.com");
+
+    }
+
+    protected void VOP_google() throws Exception {
+        Map<String, Object> claims =  doLSSTTest("oidc", oidc,GOOGLE_IDP);
+        assert claims.containsKey(VOPersonKey);
+        assert claims.get(VOPersonKey).equals(oidc+"@accounts.google.com");
+    }
+
+    String oidc = "oidc-" + getRandomString();// type of oidc id from google, github
+    String orcid = "http://orcid.org/1234-5678-8765-4321"; // type from orcid
+    String EPPN = "bob@bigstate.edu";
+    String EPTID = "bob@random.stuff.eptid";
+    String VOPersonKey = "voPersonExternalID";
+    String GOOGLE_IDP = "http://google.com/accounts/o8/id";
+    String GITHUB_IDP = "http://github.com/login/oauth/authorize";
+    String ORCID_IDP = "http://orcid.org/oauth/authorize";
+    String NCSA_IDP = "https://ncsa/blah/blah/woof/woof";
+
+    /**
+     * Key = claim name, value = claim value. This tests against those.
+     *
+     * @param key
+     * @param value
+     * @throws Exception
+     */
+
+    protected Map<String, Object> doLSSTTest(String key, String value, String idp) throws Exception {
+        Map<String, Object> claims2 = createClaims();
+        claims2.put(key, value);
+        claims2.put("idp", idp);
+
+        OA2FunctorFactory ff = new OA2FunctorFactory(claims2);
+
+        jXOr jXOr = new jXOr();
+        jXOr.addArg(createLB(ff,
+                "{\"$hasClaim\":[\"eppn\"]}",
+                "{\"$set\":[\"" + VOPersonKey + "\",{\"$get\":[\"eppn\"]}]}"));
+        jXOr.addArg(createLB(ff,
+                "{\"$hasClaim\":[\"eptid\"]}",
+                "{\"$set\":[\"" + VOPersonKey + "\",{\"$get\":[\"eptid\"]}]}"));
+        jXOr.addArg(createLB(ff,
+                "{\"$equals\":[{\"$get\":[\"idp\"]},\"" + GITHUB_IDP + "\"]}",
+                "{\"$set\":[\"" + VOPersonKey + "\",{\"$concat\":[{\"$get\":[\"oidc\"]},\"@github.com\"]}]}"));
+        jXOr.addArg(createLB(ff,
+                "{\"$equals\":[{\"$get\":[\"idp\"]},\"" + GOOGLE_IDP + "\"]}",
+                "{\"$set\":[\"" + VOPersonKey + "\",{\"$concat\":[{\"$get\":[\"oidc\"]},\"@accounts.google.com\"]}]}"));
+        jXOr.addArg(createLB(ff,
+                "{\"$equals\":[{\"$get\":[\"idp\"]},\"" + ORCID_IDP + "\"]}",
+                "{\"$set\":[\"" + VOPersonKey + "\",{\"$replace\":[{\"$get\":[\"oidc\"]},\"http://\",\"https://\"]}]}"));
+
+        jXOr.execute();
+        if(key.equals("eppn")) {
+            // just print out one of them
+            System.out.println("\n=================\nVO person test conditional:");
+            System.out.println(jXOr.toJSON().toString(1));
+        }
+         return claims2;
+    }
+
+    private LogicBlock createLB(OA2FunctorFactory ff, String rawIf, String rawThen) {
+        jIf eppnIf = new jIf();
+        JFunctor eppnExists =  ff.create(rawIf);
+        eppnIf.addArg(eppnExists);
+
+        JFunctor setFromEPPN =  ff.create(rawThen);
+        jThen eppnThen = new jThen();
+        eppnThen.addArg(setFromEPPN);
+        return new LogicBlock(ff,eppnIf, eppnThen);
     }
 }
 

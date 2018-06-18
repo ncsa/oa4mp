@@ -136,73 +136,7 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
         super.doIt(request, response);
 
     }
-/*
 
-
-    protected void handleClaims(HttpServletRequest httpServletRequest,
-                                OA2ServiceTransaction transaction) throws Throwable {
-
-        // Need to find the sources
-        OA2Client client = transaction.getOA2Client();
-        if (client.isPublicClient()) {
-            // Public clients do not get claims.
-            return;
-        }
-        OA2SE oa2se = (OA2SE) getServiceEnvironment();
-        // set up functor factory with no claims since we have none yet.
-        //        Map<String, Object> claims = new HashMap<>();
-        UserInfo userInfo = new UserInfo();
-
-        if (oa2se.getClaimSource().isEnabled()) {
-            // allow the server to pre-populate the claims. This invokes the global claims handler for the server
-            // to allow, e.g. pulling user information out of HTTp headers.
-            oa2se.getClaimSource().process(userInfo, httpServletRequest, transaction);
-        }
-        if (client.getConfig() == null || client.getConfig().isEmpty()) {
-            // no configuration for this client means do nothing here.
-            return;
-        }
-        // so this client has a specific configuration that is to be invoked.
-        OA2FunctorFactory functorFactory = new OA2FunctorFactory(userInfo.getMap());
-        OA2ClientConfigurationFactory<OA2ClientConfiguration> ff = new OA2ClientConfigurationFactory(functorFactory);
-
-        OA2ClientConfiguration oa2CC = ff.newInstance(client.getConfig());
-        oa2CC.executeRuntime();
-        FlowStates flowStates = new FlowStates(oa2CC.getRuntime().getFunctorMap());
-        // save everything up to this point since there are no guarantees that processing will continue.
-        getTransactionStore().save(transaction);
-        if (flowStates.getClaims) {
-            ff.createClaimSource(oa2CC, client.getConfig());
-            // the runtime forbids processing claims for this request, so exit
-            if (oa2CC.hasPreProcessing()) {
-                ff.setupPreProcessing(oa2CC, client.getConfig());
-                oa2CC.executePreProcessing();
-            }
-            List<ClaimSource> claimsSources = oa2CC.getClaimSource();
-            if (oa2CC.hasClaimSource()) {
-                // so there is
-                for (int i = 0; i < claimsSources.size(); i++) {
-                    claimsSources.get(i).process(userInfo, httpServletRequest, transaction);
-                    System.err.println(userInfo.getMap());
-                }
-            }
-            if (oa2CC.hasPostProcessing()) {
-                ff.setupPostProcessing(oa2CC, client.getConfig());
-                oa2CC.executePostProcessing();
-            }
-        }
-        // Now we have to set up the claims sources and process the results
-
-        // update everything
-        JSONObject states = new JSONObject();
-        states.put("state", "state object for id=" + transaction.getIdentifier());
-        states.put("flowState", flowStates.toJSON().toString());
-        JSONObject jsonClaims = new JSONObject();
-        jsonClaims.putAll(userInfo.getMap());
-        states.put("claims", jsonClaims.toString());
-        transaction.setState(states);
-    }
-*/
 
     @Override
     public void prepare(PresentableState state) throws Throwable {

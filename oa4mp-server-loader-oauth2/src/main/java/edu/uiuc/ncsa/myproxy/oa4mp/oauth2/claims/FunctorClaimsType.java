@@ -8,10 +8,12 @@ import edu.uiuc.ncsa.security.util.functor.FunctorType;
  */
 public enum FunctorClaimsType implements FunctorType {
     SET("$set"),
+    GET("$get"),
     INCLUDE("$include"),
     EXCLUDE("$exclude"),
     REMOVE("$remove"),
-    IS_MEMBER_OF("$isiMemberOf");
+    HAS_CLAIM("$hasClaim"),
+    IS_MEMBER_OF("$isMemberOf");
 
     FunctorClaimsType(String value) {
         this.value = value;

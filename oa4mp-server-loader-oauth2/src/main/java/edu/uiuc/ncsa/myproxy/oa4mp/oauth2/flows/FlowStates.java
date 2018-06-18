@@ -38,9 +38,9 @@ public class FlowStates {
     }
 
     protected boolean findValue(FunctorMap functorMap, FlowType type, boolean previousValue) {
-        if (functorMap.containsKey(type)) {
-            JFunctor jf = functorMap.get(type).get(0);
-            return Boolean.parseBoolean((String) jf.getResult());
+        if (functorMap.containsKey(type.getValue())) {
+            JFunctor jf = functorMap.get(type.getValue()).get(0);
+            return  (Boolean)jf.getResult();
         }
         return previousValue; //default
     }

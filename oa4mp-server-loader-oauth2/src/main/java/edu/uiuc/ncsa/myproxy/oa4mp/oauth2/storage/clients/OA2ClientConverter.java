@@ -82,7 +82,7 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
             }
             //otherV.setConfig(JSONObject.fromObject(map.getString(getCK2().cfg())));
         }
-        if (ldap == null) {
+        if (ldap == null || ldap.isEmpty()) {
             // nix to do. Set the configuration object if it exists
             if(cfg == null){
                 // so by this point, no configuration has been found either.
@@ -97,7 +97,6 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
                 OA2ClientConfigurationUtil.setComment(cfg, "Created by converter from old LDAP entry");
             }
             OA2ClientConfigurationUtil.convertToNewConfiguration(ldap, cfg);
-            OA2ClientConfigurationUtil.setSaved(cfg, false);
             // NOTE!! This next set of statement takes an existing LDAP and puts it back into the
             // configuration. This effectively updates the name (if needed) to ensure that conversion is
             // properly made to the new version, 4.0. If you remove this, you will delete the old LDAP

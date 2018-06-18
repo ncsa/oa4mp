@@ -47,11 +47,17 @@ public class OA2FunctorFactory extends JFunctorFactory {
         if (hasEnum(rawJson, EXCLUDE)) {
             ff = new jExclude(claims);
         }
+        if (hasEnum(rawJson, HAS_CLAIM)) {
+            ff = new jHasClaim(claims);
+        }
         if (hasEnum(rawJson, INCLUDE)) {
             ff = new jInclude(claims);
         }
         if (hasEnum(rawJson, SET)) {
             ff = new jSet(claims);
+        }
+        if (hasEnum(rawJson, GET)) {
+            ff = new jGet(claims);
         }
         if (hasEnum(rawJson, FlowType.ACCEPT_REQUESTS)) {
             ff = new jAcceptRequests();
@@ -78,8 +84,8 @@ public class OA2FunctorFactory extends JFunctorFactory {
             ff = new jSetClaimSource();
         }
         if (hasEnum(rawJson, FlowType.GET_CLAIMS)) {
-              ff = new jGetClaims();
-          }
+            ff = new jGetClaims();
+        }
         return ff;
     }
 }

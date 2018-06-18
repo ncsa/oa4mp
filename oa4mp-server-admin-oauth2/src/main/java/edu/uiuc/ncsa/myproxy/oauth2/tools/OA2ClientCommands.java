@@ -20,6 +20,7 @@ import java.util.LinkedList;
 import java.util.StringTokenizer;
 
 import static edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval.Status.APPROVED;
+import static edu.uiuc.ncsa.security.util.cli.CLIDriver.CLEAR_COMMAND;
 import static edu.uiuc.ncsa.security.util.cli.CLIDriver.EXIT_COMMAND;
 
 /**
@@ -298,12 +299,12 @@ public class OA2ClientCommands extends ClientStoreCommands {
             currentLDAPs = LDAPConfigurationUtil.toJSON(client.getLdaps());
         }
         JSONArray newLDAPS = (JSONArray) inputJSON(currentLDAPs, "ldap configuration", true);
-        if (newLDAPS != null && !newLDAPS.isEmpty()) {
+        if (newLDAPS != null ) {
             client.setLdaps(LDAPConfigurationUtil.fromJSON(newLDAPS));
         }
 
         JSONObject newConfig = (JSONObject) inputJSON(client.getConfig(), "client configuration");
-        if (newConfig != null && !newConfig.isEmpty()) {
+        if (newConfig != null ) {
             client.setConfig(newConfig);
         }
     }
@@ -328,13 +329,20 @@ public class OA2ClientCommands extends ClientStoreCommands {
             sayi("current value for " + componentName + ":");
             say(oldJSON.toString(2));
         }
-        sayi("Enter new JSON value. An empty line terminates input. Entering a line with " + EXIT_COMMAND + " will terminate input too.");
+        sayi("Enter new JSON value. An empty line terminates input. Entering a line with " + EXIT_COMMAND + " will terminate input too.\n Hitting " + CLEAR_COMMAND + " will clear the contents of this.");
         String rawJSON = "";
         boolean redo = true;
         while (redo) {
             try {
                 String inLine = readline();
                 while (!isEmpty(inLine)) {
+                    if (inLine.equals(CLEAR_COMMAND)) {
+                        if (isArray) {
+                            return new JSONArray();
+                        } else {
+                            return new JSONObject();
+                        }
+                    }
                     rawJSON = rawJSON + inLine;
                     inLine = readline();
                 }
@@ -343,7 +351,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
                 return null;
             }
             // if the user just hits return with no input, do nothing. This lets them skip over unchanged entries.
-            if(rawJSON.isEmpty()){
+            if (rawJSON.isEmpty()) {
                 return null;
             }
             try {
@@ -357,7 +365,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
                 return json;
             } catch (Throwable t) {
                 sayi("uh-oh... It seems this was not a valid JSON object. The parser message reads:\"" + t.getMessage() + "\"");
-                redo = isOk(getInput("Try to re-enter this?","true"));
+                redo = isOk(getInput("Try to re-enter this?", "true"));
             }
         }
 
