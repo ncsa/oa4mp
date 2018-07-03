@@ -4,7 +4,6 @@ import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.util.IdentifiableProviderImpl;
 import edu.uiuc.ncsa.security.delegation.server.storage.impl.FSClientStore;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
-import edu.uiuc.ncsa.security.delegation.storage.impl.BaseClientConverter;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
 import java.io.File;
@@ -27,10 +26,6 @@ public class DSFSClientStore extends FSClientStore<Client> {
         super(storeDirectory, indexDirectory, idp, cp);
     }
 
-    @Override
-    public BaseClientConverter getACConverter() {
-        return (BaseClientConverter) converter;
-    }
 
     @Override
     public IdentifiableProvider getACProvider() {

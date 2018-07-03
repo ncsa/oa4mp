@@ -1,11 +1,14 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.OA2FunctorFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.jSetClaimSource;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.ClientConfigurationUtil;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
-import edu.uiuc.ncsa.security.util.functor.JFunctorFactory;
+import edu.uiuc.ncsa.security.util.functor.FunctorTypeImpl;
 import edu.uiuc.ncsa.security.util.functor.LogicBlock;
 import edu.uiuc.ncsa.security.util.functor.LogicBlocks;
+import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -128,7 +131,29 @@ public class OA2ClientConfigurationUtil extends ClientConfigurationUtil {
         return new JSONArray();
     }
 
-    protected static void setClaimsThingy(JSONObject config, String key, JSONArray thingy) {
+    protected static JSONObject getClaimsProcessor(JSONObject config, String key) {
+        DebugUtil.dbg(OA2ClientConfigurationUtil.class, ".getClaimsProcessor: key=" + key);
+        if (!config.containsKey(CLAIMS_KEY)) {
+            DebugUtil.dbg(OA2ClientConfigurationUtil.class, ".getClaimsProcessor: NO CLAIMS");
+            return new JSONObject();
+        }
+        JSONObject claims = config.getJSONObject(CLAIMS_KEY);
+        Object obj = claims.get(key);
+        DebugUtil.dbg(OA2ClientConfigurationUtil.class, ".getClaimsProcessor: raw claims=" + obj);
+
+        if (obj instanceof JSONArray) {
+            JSONObject j = new JSONObject();
+            j.put(FunctorTypeImpl.OR.getValue(), obj);
+            return j;
+        }
+        if (obj instanceof JSONObject) {
+            return (JSONObject) obj;
+        }
+        return new JSONObject();
+    }
+
+
+    protected static void setClaimsThingy(JSONObject config, String key, JSON thingy) {
         JSONObject claims;
         if (config.containsKey(CLAIMS_KEY)) {
             claims = config.getJSONObject(CLAIMS_KEY);
@@ -175,20 +200,20 @@ public class OA2ClientConfigurationUtil extends ClientConfigurationUtil {
         setClaimsThingy(config, CLAIM_SOURCE_CONFIG_KEY, sourceConfigs);
     }
 
-    public static JSONArray getClaimsPostProcessing(JSONObject config) {
-        return getClaimsThingy(config, CLAIM_POST_PROCESSING_KEY);
+    public static JSONObject getClaimsPostProcessing(JSONObject config) {
+        return getClaimsProcessor(config, CLAIM_POST_PROCESSING_KEY);
     }
 
-    public static void setClaimsPostProcessing(JSONObject config, JSONArray processing) {
+    public static void setClaimsPostProcessing(JSONObject config, JSONObject processing) {
         setClaimsThingy(config, CLAIM_POST_PROCESSING_KEY, processing);
     }
 
 
-    public static JSONArray getClaimsPreProcessing(JSONObject config) {
-        return getClaimsThingy(config, CLAIM_PRE_PROCESSING_KEY);
+    public static JSONObject getClaimsPreProcessing(JSONObject config) {
+        return getClaimsProcessor(config, CLAIM_PRE_PROCESSING_KEY);
     }
 
-    public static void setClaimsPreProcessing(JSONObject config, JSONArray processing) {
+    public static void setClaimsPreProcessing(JSONObject config, JSONObject processing) {
         setClaimsThingy(config, CLAIM_PRE_PROCESSING_KEY, processing);
     }
 
@@ -213,7 +238,7 @@ public class OA2ClientConfigurationUtil extends ClientConfigurationUtil {
 
         boolean containsOldLDAP = false;
 
-        if (content.containsKey(CONFIGURATION_NAME_KEY)) {
+        if (content.containsKey(CONFIGURATION_NAME_KEY) && !content.getString(CONFIGURATION_NAME_KEY).isEmpty()) {
             String oldLDAPName = content.getString(CONFIGURATION_NAME_KEY);
 
             // the old LDAP config contains a name, so we check if it is in the current list of thse
@@ -269,18 +294,33 @@ public class OA2ClientConfigurationUtil extends ClientConfigurationUtil {
 
     protected static void createDefaultPreProcessor(JSONObject config, String newName) {
         JSONArray array = new JSONArray();
-        JFunctorFactory ff = new JFunctorFactory();
+        JSONObject emptyClaims = new JSONObject();
+        OA2FunctorFactory ff = new OA2FunctorFactory(emptyClaims); // need the factory, but there are no claims at this point.
         jSetClaimSource jSetClaimSource = new jSetClaimSource();
         jSetClaimSource.addArg(OA2ClientConfigurationFactory.LDAP_DEFAULT);
         jSetClaimSource.addArg(newName);
         array.add(jSetClaimSource.toJSON());
-        LogicBlocks<? extends LogicBlock> defaultLBs = ff.createLogicBlock(array);
+        JSONObject j = new JSONObject();
+        j.put(FunctorTypeImpl.OR.getValue(), array);
+        LogicBlocks<? extends LogicBlock> defaultLBs = ff.createLogicBlock(j);
+        setClaimsPreProcessing(config, defaultLBs.toJSON());
+
         // there should be one and we need it.
-        LogicBlock lb = defaultLBs.get(0);
-        JSONArray runtime = getRuntime(config);
+       /* LogicBlock lb = defaultLBs.get(0);
         JSONObject ifBlock = JSONObject.fromObject(lb.toString());
-        runtime.add(ifBlock);
-        setClaimsPreProcessing(config, runtime);
+
+        if(hasRuntime(config)){
+
+        }else{
+            JSONObject runtime = new JSONObject();
+            runtime.put(FunctorTypeImpl.OR.getValue(), )
+
+        }
+        JSONArray runtimeArray = getRuntimeArg(config);
+
+        runtimeArray.add(ifBlock);
+        runtime.
+        setClaimsPreProcessing(config, runtime);*/
     }
 
     public static boolean isSaved(JSONObject config) {

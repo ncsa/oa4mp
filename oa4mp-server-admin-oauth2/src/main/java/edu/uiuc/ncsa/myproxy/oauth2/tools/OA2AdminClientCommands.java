@@ -18,50 +18,59 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
     }
 
     @Override
-       public String getName() {
-           return "  admins";
-       }
+    public String getName() {
+        return "  admins";
+    }
 
 
     @Override
-      protected void longFormat(Identifiable identifiable) {
+    protected void longFormat(Identifiable identifiable) {
         super.longFormat(identifiable);
-          AdminClient client = (AdminClient) identifiable;
-          sayi("issuer=" + client.getIssuer());
-          sayi("vo=" + client.getVirtualOrganization());
-      }
+        AdminClient client = (AdminClient) identifiable;
+        sayi("issuer=" + client.getIssuer());
+        sayi("vo=" + client.getVirtualOrganization());
+    }
 
     @Override
-       public void extraUpdates(Identifiable identifiable) {
+    public void extraUpdates(Identifiable identifiable) {
         AdminClient client = (AdminClient) identifiable;
-           String secret = client.getSecret();
-           String input;
-           boolean askForSecret = true;
+        String secret = client.getSecret();
+        String input;
+        boolean askForSecret = true;
 
 
-           while (askForSecret) {
-               input = getInput("enter a new secret or return to skip.", secret);
-               if (isEmpty(input)) {
-                   sayi("Nothing entered. Client secret entry skipped.");
-                   break;
-               }
-               if (input.equals(secret)) {
-                   sayi(" Client secret entry skipped.");
-                   break;
-               }
-               // input is not empty.
-               secret = DigestUtils.sha1Hex(input);
-               client.setSecret(secret);
-               askForSecret = false;
-           }
+        while (askForSecret) {
+            input = getInput("enter a new secret or return to skip.", secret);
+            if (isEmpty(input)) {
+                sayi("Nothing entered. Client secret entry skipped.");
+                break;
+            }
+            if (input.equals(secret)) {
+                sayi(" Client secret entry skipped.");
+                break;
+            }
+            // input is not empty.
+            secret = DigestUtils.sha1Hex(input);
+            client.setSecret(secret);
+            askForSecret = false;
+        }
         String issuer = getInput("Give the issuer", client.getIssuer());
-        if(!isEmpty(issuer)){
+        if (!isEmpty(issuer)) {
             client.setIssuer(issuer);
         }
         String vo = getInput("Give the VO", client.getVirtualOrganization());
-        if(!isEmpty(vo)){
+        if (!isEmpty(vo)) {
             client.setVirtualOrganization(vo);
         }
 
-       }
+    }
+
+
+    @Override
+    protected void showDeserializeHelp() {
+        super.showDeserializeHelp();
+        say("NOTE that for clients, the assumption is that you are supplying the hashed secret, not the actual secret.");
+        say("If you need to create a hash of a secret, invoke the create_hash method on the secret");
+    }
+
 }

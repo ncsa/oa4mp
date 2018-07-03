@@ -152,7 +152,11 @@ public class ClientManagerTest extends DDServerTests implements SAT {
 
     }
 
-
+    /**
+     * This checks that the test-created LDAP configuration can be serialzed to and from JSON. If this
+     * fails then other tests will fail but the reason might not be obvious.
+     * @throws Exception
+     */
 
     @Test
     public void testldapExample() throws Exception {

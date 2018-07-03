@@ -97,7 +97,9 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
             return transaction.getUsername();
         }
         if (!claims.containsKey(getCfg().getSearchNameKey()) || claims.get(getCfg().getSearchNameKey()) == null) {
-            throw new IllegalStateException("Error: no recognized search name key was found. Requested was \"" + getCfg().getSearchNameKey() + "\"");
+            String message = "Error: no recognized search name key was found. Requested was \"" + getCfg().getSearchNameKey() + "\"";
+            getMyLogger().warn(message);
+            throw new IllegalStateException(message);
         }
         String searchName = (String) claims.get(getCfg().getSearchNameKey());
         DebugUtil.dbg(this, "returning search name=" + searchName);

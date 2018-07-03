@@ -37,14 +37,6 @@ public class DSFSClientStoreProvider extends FSProvider<DSFSClientStore> impleme
         } else {
             System.err.println("Store contains " + store.size() + " entries.");
         }
-      /*  System.err.println("printing identifiers...");
-
-        for (Identifier x : store.keySet()) {
-            System.err.println(x);
-            System.err.println(store.get(x));
-        }
-        System.err.println("done!");*/
-
         return store;
     }
 }

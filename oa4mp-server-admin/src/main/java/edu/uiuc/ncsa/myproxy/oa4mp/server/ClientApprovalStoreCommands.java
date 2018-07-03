@@ -4,14 +4,15 @@ import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
+import edu.uiuc.ncsa.security.delegation.server.storage.ClientApprovalStore;
+import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
-import edu.uiuc.ncsa.security.util.cli.StoreCommands;
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 5/22/13 at  1:51 PM
  */
-public class ClientApprovalStoreCommands extends StoreCommands {
+public class ClientApprovalStoreCommands extends StoreCommands2 {
     @Override
     public void extraUpdates(Identifiable identifiable) {
     }
@@ -151,5 +152,11 @@ public class ClientApprovalStoreCommands extends StoreCommands {
         }
         sayi("approval was not saved.");
         info("Approval cancelled for id=" + ca.getIdentifierString());
+    }
+
+
+    @Override
+    protected MapConverter getConverter() {
+        return ((ClientApprovalStore) getStore()).getConverter();
     }
 }

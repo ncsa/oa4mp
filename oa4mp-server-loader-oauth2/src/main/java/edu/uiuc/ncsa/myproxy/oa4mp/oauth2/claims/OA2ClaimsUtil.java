@@ -270,10 +270,15 @@ public class OA2ClaimsUtil {
      * @throws Throwable
      */
     public void doPostProcessing() throws Throwable {
+        DebugUtil.dbg(this, ".doPostProcessing: has post-processing?" + getCC().hasPostProcessing());
         if (getCC().hasPostProcessing()) {
+            DebugUtil.dbg(this, ".doPostProcessing: has post-processing?" + getCC().getPostProcessing());
+
             OA2ClientConfigurationFactory<OA2ClientConfiguration> ff = new OA2ClientConfigurationFactory(getFF());
             ff.setupPostProcessing(getCC(), getOA2Client().getConfig());
             getCC().executePostProcessing();
+            DebugUtil.dbg(this, ".doPostProcessing: executed post-processing, functor map=" + getCC().getPostProcessing().getFunctorMap());
+
         }
 
 

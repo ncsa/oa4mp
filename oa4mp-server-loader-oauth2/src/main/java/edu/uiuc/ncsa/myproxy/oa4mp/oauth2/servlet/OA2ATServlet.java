@@ -205,7 +205,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             // Since this bit of information could be extremely useful if a service decides
             // eto start issuing refresh tokens after
             // clients have been registered, it should be logged.
-            info("Refresh tokens are disabled for client " + client.getIdentifierString() + ", but enabled on the server. No refresh token will be madeg.");
+            info("Refresh tokens are disabled for client " + client.getIdentifierString() + ", but enabled on the server. No refresh token will be made.");
         }
         if (client.isRTLifetimeEnabled() && ((OA2SE) getServiceEnvironment()).isRefreshTokenEnabled()) {
 

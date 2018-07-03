@@ -3,6 +3,7 @@ package test;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.RequestFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.attributes.*;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientConverter;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientKeys;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions.ActionGet;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions.ActionRemove;
@@ -47,7 +48,7 @@ public class AttributeServerTest extends DDServerTests {
         assert reducedClient.getName().equals(cc.client.getName());
 
         JSONObject json = new JSONObject();
-        tp2.getClientStore().getACConverter().toJSON(r.getClient(), json);
+        ((OA2ClientConverter)tp2.getClientStore().getConverter()).toJSON((OA2Client) r.getClient(), json);
         System.out.println(json);
     }
 

@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
 
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
+import edu.uiuc.ncsa.security.util.functor.FunctorTypeImpl;
 import edu.uiuc.ncsa.security.util.functor.LogicBlock;
 import edu.uiuc.ncsa.security.util.functor.LogicBlocks;
 import net.sf.json.JSONArray;
@@ -59,9 +60,11 @@ public class ClaimsProcessor {
 
         JSONArray jsonArray = new JSONArray();
         jsonArray.add(config);
-        ServletDebugUtil.dbg(this, "created JSON array:\n\n" + jsonArray.toString(2));
+        JSONObject j = new JSONObject();
+        j.put(FunctorTypeImpl.OR.getValue(), jsonArray);
+        ServletDebugUtil.dbg(this, "created logic blocks:\n\n" + j.toString(2));
 
-        return functorFactory.createLogicBlock(jsonArray);
+        return functorFactory.createLogicBlock(j);
 
     }
     protected boolean executed = false;

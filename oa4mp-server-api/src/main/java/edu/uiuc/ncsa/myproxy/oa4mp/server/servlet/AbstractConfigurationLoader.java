@@ -13,6 +13,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.storage.MultiDSClientStoreProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.storage.filestore.DSFSClientApprovalStoreProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.storage.sql.provider.DSSQLClientApprovalStoreProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.AbstractCLIApprover;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.util.ClientApprovalMemoryStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.ClientApproverConverter;
 import edu.uiuc.ncsa.security.core.configuration.Configurations;
 import edu.uiuc.ncsa.security.core.configuration.provider.CfgEvent;
@@ -22,7 +23,6 @@ import edu.uiuc.ncsa.security.core.util.IdentifierProvider;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApprovalStore;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientStore;
-import edu.uiuc.ncsa.security.delegation.server.storage.impl.ClientApprovalMemoryStore;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.delegation.storage.TransactionStore;
 import edu.uiuc.ncsa.security.delegation.storage.impl.TransactionMemoryStore;
@@ -259,7 +259,7 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
         if (casp == null) {
             casp = new MultiDSClientApprovalStoreProvider(cn, isDefaultStoreDisabled(), loggerProvider.get());
             final ClientApprovalProvider caProvider = new ClientApprovalProvider();
-            ClientApproverConverter cp = new ClientApproverConverter(caProvider);
+            final ClientApproverConverter cp = new ClientApproverConverter(caProvider);
             casp.addListener(new DSFSClientApprovalStoreProvider(cn, cp));
             casp.addListener(new DSSQLClientApprovalStoreProvider(cn, getMySQLConnectionPoolProvider(), OA4MPConfigTags.MYSQL_STORE, cp));
             casp.addListener(new DSSQLClientApprovalStoreProvider(cn, getMariaDBConnectionPoolProvider(), OA4MPConfigTags.MARIADB_STORE, cp));
@@ -278,7 +278,7 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
 
                 @Override
                 public ClientApprovalStore get() {
-                    return new ClientApprovalMemoryStore(caProvider);
+                    return new ClientApprovalMemoryStore(caProvider, cp);
                 }
             });
         }

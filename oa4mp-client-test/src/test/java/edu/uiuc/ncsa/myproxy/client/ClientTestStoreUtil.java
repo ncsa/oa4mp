@@ -106,7 +106,7 @@ public class ClientTestStoreUtil {
                 "localhost",
                 5432,
                 "org.postgresql.Driver",
-                false);
+                false, "");
         return new ConnectionPool(x);
     }
 
@@ -124,7 +124,7 @@ public class ClientTestStoreUtil {
                 "localhost",
                 3306,
                 "com.mysql.jdbc.Driver",
-                false);
+                false,"");
         return new ConnectionPool(x);
     }
 

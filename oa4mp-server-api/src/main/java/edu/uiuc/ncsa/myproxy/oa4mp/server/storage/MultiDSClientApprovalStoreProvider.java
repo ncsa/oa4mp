@@ -1,11 +1,12 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.server.storage;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.server.ClientApprovalProvider;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.util.ClientApprovalMemoryStore;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.util.ClientApproverConverter;
 import edu.uiuc.ncsa.security.core.configuration.provider.MultiTypeProvider;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApprovalStore;
-import edu.uiuc.ncsa.security.delegation.server.storage.impl.ClientApprovalMemoryStore;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
 /**
@@ -28,7 +29,9 @@ public class MultiDSClientApprovalStoreProvider<V extends ClientApproval> extend
     @Override
     public ClientApprovalStore getDefaultStore() {
         logger.info("using default in-memory client approval store.");
-        return  new ClientApprovalMemoryStore<ClientApproval>(new ClientApprovalProvider());
+        ClientApprovalProvider caProvider = new ClientApprovalProvider();
+        ClientApproverConverter cap = new ClientApproverConverter(caProvider);
+        return  new ClientApprovalMemoryStore<ClientApproval>(caProvider, cap);
     }
 
 }

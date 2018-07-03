@@ -3,7 +3,6 @@ package edu.uiuc.ncsa.myproxy.oa4mp.server.storage.sql;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
-import edu.uiuc.ncsa.security.delegation.storage.impl.BaseClientConverter;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
 import edu.uiuc.ncsa.security.storage.sql.SQLStore;
@@ -26,11 +25,6 @@ public class SQLClientStore<V extends Client> extends SQLStore<V> implements Cli
                           MapConverter converter
                           ) {
         super(connectionPool, table, idp, converter);
-    }
-
-    @Override
-    public BaseClientConverter getACConverter() {
-        return (BaseClientConverter) converter;
     }
 
     @Override

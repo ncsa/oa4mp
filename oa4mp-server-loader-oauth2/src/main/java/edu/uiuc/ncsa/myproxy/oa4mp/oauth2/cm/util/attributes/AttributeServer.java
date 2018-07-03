@@ -51,11 +51,11 @@ public class AttributeServer extends AbstractDDServer {
     }
 
     protected OA2ClientConverter getClientConverter() {
-        return (OA2ClientConverter) cose.getClientStore().getACConverter();
+        return (OA2ClientConverter) cose.getClientStore().getConverter();
     }
 
     protected AdminClientConverter getACConverter() {
-        return (AdminClientConverter) cose.getAdminClientStore().getACConverter();
+        return (AdminClientConverter) cose.getAdminClientStore().getConverter();
     }
 
     public Response set(AttributeSetClientRequest request) {

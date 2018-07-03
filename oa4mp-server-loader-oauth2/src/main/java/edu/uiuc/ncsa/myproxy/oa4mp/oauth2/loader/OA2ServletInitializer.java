@@ -67,7 +67,7 @@ public class OA2ServletInitializer extends OA4MPServletInitializer {
         }
         try {
             SATFactory.setAdminClientConverter(AdminClientStoreProviders.getAdminClientConverter());
-            SATFactory.setClientConverter((ClientConverter<? extends Client>) oa2SE.getClientStore().getACConverter());
+            SATFactory.setClientConverter((ClientConverter<? extends Client>) oa2SE.getClientStore().getConverter());
         } catch (Exception e) {
             e.printStackTrace();
         }

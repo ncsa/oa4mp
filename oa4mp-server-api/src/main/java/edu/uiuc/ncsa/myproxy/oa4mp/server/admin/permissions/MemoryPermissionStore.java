@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.storage.MemoryStore;
+import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -203,5 +204,11 @@ public class MemoryPermissionStore<V extends Permission> extends MemoryStore<V> 
 
         }
         return super.remove(key);
+    }
+
+    @Override
+    public MapConverter<V> getConverter() {
+        PermissionKeys key = new PermissionKeys();
+        return new PermissionConverter<>(key, identifiableProvider);
     }
 }

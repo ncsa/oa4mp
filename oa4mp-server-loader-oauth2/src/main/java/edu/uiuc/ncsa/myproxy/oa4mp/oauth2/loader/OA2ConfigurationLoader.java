@@ -22,6 +22,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.storage.MultiDSClientStoreProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.storage.filestore.DSFSClientApprovalStoreProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.storage.filestore.DSFSClientStoreProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.storage.sql.provider.DSSQLClientApprovalStoreProvider;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.util.ClientApprovalMemoryStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.ClientApproverConverter;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.Identifier;
@@ -37,7 +38,6 @@ import edu.uiuc.ncsa.security.delegation.server.issuers.ATIssuer;
 import edu.uiuc.ncsa.security.delegation.server.issuers.PAIssuer;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApprovalStore;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientStore;
-import edu.uiuc.ncsa.security.delegation.server.storage.impl.ClientApprovalMemoryStore;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.delegation.storage.ClientApprovalKeys;
 import edu.uiuc.ncsa.security.delegation.storage.TransactionStore;
@@ -250,7 +250,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
             final ClientApprovalProvider caProvider = new ClientApprovalProvider();
             ClientApprovalKeys caKeys = new ClientApprovalKeys();
             caKeys.identifier("client_id");
-            ClientApproverConverter cp = new ClientApproverConverter(caKeys, caProvider);
+           final ClientApproverConverter cp = new ClientApproverConverter(caKeys, caProvider);
             casp.addListener(new DSFSClientApprovalStoreProvider(cn, cp));
             casp.addListener(new DSSQLClientApprovalStoreProvider(cn, getMySQLConnectionPoolProvider(), OA4MPConfigTags.MYSQL_STORE, cp));
             casp.addListener(new DSSQLClientApprovalStoreProvider(cn, getMariaDBConnectionPoolProvider(), OA4MPConfigTags.MARIADB_STORE, cp));
@@ -268,7 +268,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
 
                 @Override
                 public ClientApprovalStore get() {
-                    return new ClientApprovalMemoryStore(caProvider);
+                    return new ClientApprovalMemoryStore(caProvider,cp);
                 }
             });
         }

@@ -83,7 +83,7 @@ public class TestSuiteInitializer extends AbstractTestSuiteInitializer{
 
         try {
             SATFactory.setAdminClientConverter(AdminClientStoreProviders.getAdminClientConverter());
-            SATFactory.setClientConverter((ClientConverter<? extends Client>) fsp.getClientStore().getACConverter());
+            SATFactory.setClientConverter((ClientConverter<? extends Client>) fsp.getClientStore().getConverter());
         } catch (Exception e) {
             e.printStackTrace();
         }

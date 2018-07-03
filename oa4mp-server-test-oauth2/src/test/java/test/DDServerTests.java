@@ -95,7 +95,7 @@ public abstract class DDServerTests extends TestCase {
     }
 
     protected AdminClientConverter getAdminClientConverter(CMTestStoreProvider tp2) throws Exception {
-        BaseClientConverter bcc = tp2.getAdminClientStore().getACConverter();
+        BaseClientConverter bcc = (BaseClientConverter)tp2.getAdminClientStore().getConverter();
         if (bcc instanceof AdminClientConverter) {
             return (AdminClientConverter) bcc;
         }
@@ -103,7 +103,7 @@ public abstract class DDServerTests extends TestCase {
         return AdminClientStoreProviders.getAdminClientConverter();
     }
     protected OA2ClientConverter getClientConverter(CMTestStoreProvider tp2) throws Exception {
-        BaseClientConverter bcc = tp2.getClientStore().getACConverter();
+        BaseClientConverter bcc = (BaseClientConverter)tp2.getClientStore().getConverter();
         if (bcc instanceof OA2ClientConverter) {
             return (OA2ClientConverter) bcc;
         }

@@ -49,6 +49,25 @@
         </td>
     </tr>
     <tr>
+        <td style="vertical-align: top;">pollingDirectory</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">N/A</td>
+        <td style="vertical-align: top;">This enables polling for client approvals. The meaning of this is
+            that if there is a command line interface (CLI) which approves a client, a specific file is written
+            to this directory which will be read at intervals by the server, telling it that a new approval has been
+            written. This is because once a client configuration is loaded, it stays in memory. To disable this feature,
+            do not set this.  Note that the CLI should use the same configuration as the server.
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">pollingInterval</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">N/A</td>
+        <td style="vertical-align: top;">How frequently the polling directory will be accessed for new approvals.
+            Note that this is ignored if polling is not enabled.
+        </td>
+    </tr>
+    <tr>
         <td style="vertical-align: top;">debug</td>
         <td style="vertical-align: top;">N</td>
         <td style="vertical-align: top;">"false"</td>
@@ -144,33 +163,33 @@
         </td>
     </tr>
     <tr>
-          <td style="vertical-align: top;">issuer</td>
-          <td style="vertical-align: top;">N</td>
-          <td style="vertical-align: top;">(none)</td>
-          <td style="vertical-align: top;"><span style="background-color: #ff6600;">OAuth 2</span> specific.
-              The global default for the issuer. That is to say, this will be returned in the claims to the
-              client. Note that this may be overridden by an administrative client or the client itself.
-          </td>
-      </tr>
+        <td style="vertical-align: top;">issuer</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">(none)</td>
+        <td style="vertical-align: top;"><span style="background-color: #ff6600;">OAuth 2</span> specific.
+            The global default for the issuer. That is to say, this will be returned in the claims to the
+            client. Note that this may be overridden by an administrative client or the client itself.
+        </td>
+    </tr>
     <tr>
-          <td style="vertical-align: top;">scheme</td>
-          <td style="vertical-align: top;">N</td>
-          <td style="vertical-align: top;">myproxy</td>
-          <td style="vertical-align: top;">This sets the scheme for all identifiers (such as client ids) that are
-              created by the system. The format of an identifier is <br/>
-              scheme:specificPart:...<br/>
-              the default (as of version 4.0 still) is myproxy:oa4mp,2012:... After this is a hierarchical
-              name for the component.
-          </td>
-      </tr>
+        <td style="vertical-align: top;">scheme</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">myproxy</td>
+        <td style="vertical-align: top;">This sets the scheme for all identifiers (such as client ids) that are
+            created by the system. The format of an identifier is <br/>
+            scheme:specificPart:...<br/>
+            the default (as of version 4.0 still) is myproxy:oa4mp,2012:... After this is a hierarchical
+            name for the component.
+        </td>
+    </tr>
     <tr>
-          <td style="vertical-align: top;">schemeSpecificPart</td>
-          <td style="vertical-align: top;">N</td>
-          <td style="vertical-align: top;">oa4mp,2012</td>
-          <td style="vertical-align: top;">This sets the scheme specific part for the identifiers. Note that if this is
-              omitted then the default is used. If you wish to suppress this, set it equal to "".
-          </td>
-      </tr>
+        <td style="vertical-align: top;">schemeSpecificPart</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">oa4mp,2012</td>
+        <td style="vertical-align: top;">This sets the scheme specific part for the identifiers. Note that if this is
+            omitted then the default is used. If you wish to suppress this, set it equal to "".
+        </td>
+    </tr>
     </tbody>
 </table>
 <p>The <span style="font-weight: bold;">name</span> can be anything. The name of the configuration to use may be
@@ -220,12 +239,13 @@
     first one, the number of new client registration is limited to 25 unappproved ones and the client secret
     is 300 bytes which translates into 400 characters when Base64 encoded. Also, there is some
     network address translation going on, so that the <code>address</code> tag is explicitly given.</p>
-    <p>This also specifies that the client identifiers are of the form </p>
-    <pre>cern:/client_id/...</pre>
-    <p>where the scheme has been set to "cern" but the scheme specific part (SPP) is to be omitted. Note that if the
-        SPP were omitted, then the default would be used and the resulting id would be
-    </p>
-   <pre>cern:oa4mp,2012:/client_id/....</pre>
+
+<p>This also specifies that the client identifiers are of the form </p>
+<pre>cern:/client_id/...</pre>
+<p>where the scheme has been set to "cern" but the scheme specific part (SPP) is to be omitted. Note that if the
+    SPP were omitted, then the default would be used and the resulting id would be
+</p>
+<pre>cern:oa4mp,2012:/client_id/....</pre>
 <!--#include virtual="../../footer.html" -->
 
 </body>

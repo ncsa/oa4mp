@@ -32,7 +32,7 @@ public class COInitializer extends OA2ServletInitializer {
 
         try {
             SATFactory.setAdminClientConverter(AdminClientStoreProviders.getAdminClientConverter());
-            SATFactory.setClientConverter((ClientConverter<? extends Client>) cose.getClientStore().getACConverter());
+            SATFactory.setClientConverter((ClientConverter<? extends Client>) cose.getClientStore().getConverter());
         } catch (Exception e) {
             e.printStackTrace();
         }

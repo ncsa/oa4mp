@@ -152,18 +152,18 @@ public class OA2ClientConfigurationFactory<V extends OA2ClientConfiguration> ext
     }
 
     public void setupPreProcessing(V cc, JSONObject json) {
-        JSONArray array = OA2ClientConfigurationUtil.getClaimsPreProcessing(json);
+        JSONObject jsonObject = OA2ClientConfigurationUtil.getClaimsPreProcessing(json);
         LogicBlocks<? extends LogicBlock> preProcessing;
-        preProcessing = functorFactory.createLogicBlock(array);
+        preProcessing = functorFactory.createLogicBlock(jsonObject);
         cc.setPreProcessing(preProcessing);
 
     }
 
     public void setupPostProcessing(V cc, JSONObject json) {
 
-        JSONArray array = OA2ClientConfigurationUtil.getClaimsPostProcessing(json);
+        JSONObject jsonObject = OA2ClientConfigurationUtil.getClaimsPostProcessing(json);
         LogicBlocks<? extends LogicBlock> postProcessing;
-        postProcessing = functorFactory.createLogicBlock(array);
+        postProcessing = functorFactory.createLogicBlock(jsonObject);
         cc.setPostProcessing(postProcessing);
     }
 

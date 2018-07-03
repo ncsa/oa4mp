@@ -13,6 +13,7 @@ import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfigurationUtil;
 import edu.uiuc.ncsa.security.util.TestBase;
+import edu.uiuc.ncsa.security.util.functor.FunctorTypeImpl;
 import edu.uiuc.ncsa.security.util.functor.LogicBlock;
 import edu.uiuc.ncsa.security.util.functor.logic.jContains;
 import net.sf.json.JSONArray;
@@ -49,7 +50,7 @@ public class ClientConfigurationTest extends TestBase {
         JSONArray claimSources = setupSources();
 
         // Add some claim processing logic
-        JSONArray claimProcessing = setupProcessing(oldAudience, newAudience);
+        JSONObject claimProcessing = setupProcessing(oldAudience, newAudience);
 
         // Add in the configurations for claims
         JSONArray claimConfigs = new JSONArray();
@@ -61,7 +62,7 @@ public class ClientConfigurationTest extends TestBase {
         ldap.setName("LDAP2");
         System.out.println(LDAPConfigurationUtil.toJSON(ldap));
         claimConfigs.add(LDAPConfigurationUtil.toJSON(ldap));
-        JSONArray logic = setupRuntime(customClaim);
+        JSONObject logic = setupRuntime(customClaim);
 
         // add the parts to the configuration
         setClaimSources(cfg, claimSources);
@@ -103,7 +104,7 @@ public class ClientConfigurationTest extends TestBase {
         return OA2FunctorTests.createClaims();
     }
 
-    protected JSONArray setupProcessing(String oldAud, String newAud) {
+    protected JSONObject setupProcessing(String oldAud, String newAud) {
         JSONArray array = new JSONArray();
         Map<String, Object> claims = createClaims();
         claims.put(AUDIENCE, oldAud);
@@ -125,7 +126,9 @@ public class ClientConfigurationTest extends TestBase {
         ifBlock.put("$then", thenArray);
         array.add(ifBlock);
 
-        return array;
+        JSONObject j = new JSONObject();
+        j.put(FunctorTypeImpl.OR.getValue(), array);
+        return j;
     }
 
     /*
@@ -133,7 +136,7 @@ public class ClientConfigurationTest extends TestBase {
     In this way claims may be created before processing. This facility effectively allows for setting and
      using variables.
      */
-    protected JSONArray setupRuntime(String myClaim) {
+    protected JSONObject setupRuntime(String myClaim) {
         JSONArray array = new JSONArray();
         JSONObject ifBlock = new JSONObject();
 
@@ -157,7 +160,9 @@ public class ClientConfigurationTest extends TestBase {
         set.addArg(myClaim);
         ifBlock.put("$then", thenArray);
         array.add(ifBlock);
-        return array;
+        JSONObject j = new JSONObject();
+        j.put(FunctorTypeImpl.OR.getValue(), array);
+        return j;
     }
 
     protected LDAPConfiguration getLDAP(){

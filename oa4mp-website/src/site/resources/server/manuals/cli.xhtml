@@ -202,6 +202,8 @@ Note that since there is no canonical ordering of objects in a store, you should
     <li><a href="server/manuals/cli.xhtml#update">update [index | /uniqueId]</a> - edit the item</li>
     <li><a href="server/manuals/cli.xhtml#rm">rm [index | /uniqueId]</a> - remove an entry</li>
     <li><a href="server/manuals/cli.xhtml#create">create [uniqueId]</a> - create a new entry with the optional id.</li>
+    <li><a href="server/manuals/cli.xhtml#serialize">serialize [-file path] uniqueId</a> - serialize, i.e. store the object in XML format to the file. Omitting the file dumps it to the command line</li>
+    <li><a href="server/manuals/cli.xhtml#deserialize">deserialize [-new] -file path</a> - deserialize i.e. read in the object from a file. The -new flag tells whether the object is new or not. If new and the id is in use, the operation will fail.</li>
 </ul>
 Each of these in turn will be discussed in detail.
 
@@ -366,6 +368,63 @@ we create with id <code>my:new:client</code> would look like the next
 </pre>
 <b>Note</b> The remove command will happily remove objects by index, but remember that the indices of all
 other objects change, so best practice is to only remove by identifier.
+
+<h4><a name="serialize">Storing objects on disk</a></h4>
+<pre>
+    serialize [-file path] index
+</pre>
+<p>A common enough task is to want to do a considerable amount of editing which the direct CLI is not so well suited for, e.g.
+twiddling extensive lists of callbacks. This is always component specific, so
+    you  must use a comnponent for this to be available.  You may serialize any object to disk in XML format, edit it with
+any standard text editor and then simply read it back in with the deserialize command. The basic syntax is</p>
+In this case, the index is as per any other component. The file is optional in the sense that if it is omitted, the result
+will be dumped at the command line. The file will be overwritten, so make sure you have it right.  <br/>
+<i>Example.</i> Serializing a client.
+<pre>
+    cli> use clients
+      clients> serialize -file /path/to/my/client.xml /client:sdfsdf:erg98540j034/456eythw456
+    done!
+</pre>
+Firing up a text editor shows the file which starts to look like this:
+<pre>
+    &lt;?xml version="1.0" encoding="UTF-8" standalone="no"?&gt;
+    &lt;!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd"&gt;
+    &lt;properties&gt;
+    &lt;entry key="name"&gt;Updated Test client 42&lt;/entry&gt;
+    &lt;entry key="sign_tokens"&gt;true&lt;/entry&gt;
+    &lt;entry key="creation_ts"&gt;2018-06-28T13:06:28.000Z&lt;/entry&gt;
+    &lt;entry key="public_key"&gt;j75OY1FoPf1AzW5v9KDqTkxrslD1VQhQ5wdVfqUu7pO7SRoMtEwRXqBdFFtNfwmX0Z4l4vbiVRYpq9zGtoMKYw&lt;/entry&gt;
+    &lt;entry key="rt_lifetime"&gt;456767875477&lt;/entry&gt;
+    &lt;entry key="public_client"&gt;false&lt;/entry&gt;
+    &lt;entry key="client_id"&gt;testScheme:oa4md,2018:/client_id/756a9e899981a4cf93f97f40a9da345a&lt;/entry&gt;
+    &lt;entry key="home_url"&gt;https://baz.foo.edu/H2w3GevCrOU/home&lt;/entry&gt;
+    &lt;entry key="cfg"&gt;{
+      "config": "updated by converter from old LDAP entry",
+      "claims": {
+        "sourceConfig": [
+          {
+     ... lots more
+</pre>
+Note that the format is very simple. A key is given (you cannot change these) and then the value is given as the contents
+of the element.
+
+<h4><a name="deserialize">Reading objects from disk</a></h4>
+<pre>
+    deserialize [-new] -file path
+</pre>
+<p>This will read an object from a file. This is always component specific, so
+    you  must use a comnponent for this to be available. You may specify it as being new, which will also tell the system to create
+a new identifier for it or it will reject the object if an existing identifier exists. <b><i>NOTE:</i></b> This will
+replace the object, not just update a few attributes. This means that if you just want change the value of an
+attribute, you have to do it manually.</p>
+<i>Example</i> Deserializing a file
+<pre>
+    clients> deserialize -file /path/to/my/file
+    done!
+</pre>
+<p>This will take the given file and replace the contents. A not uncommon use is to serialize a file, edit it and issue
+deserialization commands against it repeatedly as you debug it.</p>
+
 <h1>Invoking the components.</h1>
 
 <h2><a name="clients">Clients</a></h2>
@@ -376,8 +435,12 @@ Operations allowed in addition to the standard ones are
     <li>
         approve [index | /uniqueID]
     </li>
+    <li>create_hash [string | -file path]</li>
 </ul>
-This will prompt you for the information needed to make a new approval for the client with the given id.
+The first will prompt you for the information needed to make a new approval for the client with the given id.
+The second is used to create a hash for a secret that you supply. This is
+needed for OAuth2/OIDC clients since we store a hash and not the secret. You may either specify a file containing
+the secret or type in manually at the command line.
 
 <h2><a name="approvals">Approvals</a></h2>
 Invoke as

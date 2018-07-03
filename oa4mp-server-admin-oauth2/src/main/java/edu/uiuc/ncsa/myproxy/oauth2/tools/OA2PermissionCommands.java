@@ -1,18 +1,19 @@
 package edu.uiuc.ncsa.myproxy.oauth2.tools;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.server.StoreCommands2;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.Permission;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionsStore;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.util.cli.StoreCommands;
+import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 4/7/17 at  3:11 PM
  */
-public class OA2PermissionCommands extends StoreCommands {
+public class OA2PermissionCommands extends StoreCommands2 {
     public OA2PermissionCommands(MyLoggingFacade logger, String defaultIndent, Store store) {
         super(logger, defaultIndent, store);
     }
@@ -96,4 +97,10 @@ public class OA2PermissionCommands extends StoreCommands {
         sayi("can create?=" + p.isCreate());
 
     }
+
+    @Override
+    protected MapConverter getConverter() {
+        return ((PermissionsStore)getStore()).getConverter();
+    }
+
 }

@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowStates;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.oauth_2_0.UserInfo;
 import edu.uiuc.ncsa.security.oauth_2_0.server.UnsupportedScopeException;
@@ -117,8 +118,10 @@ public class BasicClaimsSourceImpl implements ClaimSource {
         realProcessing(claims, request, t);
         if (hasConfiguration() && getConfiguration().getPostProcessing() != null) {
             OA2FunctorFactory ff = new OA2FunctorFactory(claims);
+            DebugUtil.dbg(this, "claims before post-processing=" + claims);
             postProcessor = ff.createLogicBlock(getConfiguration().getPostProcessing());
             postProcessor.execute();
+            DebugUtil.dbg(this, "claims after post-processing=" + claims);
             FlowStates f = t.getFlowStates();
             f.updateValues(postProcessor.getFunctorMap());
             t.setFlowStates(f);

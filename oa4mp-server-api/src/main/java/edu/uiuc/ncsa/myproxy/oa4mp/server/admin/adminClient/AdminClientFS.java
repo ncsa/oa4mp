@@ -20,10 +20,6 @@ public class AdminClientFS<V extends AdminClient> extends FileStore<V> implement
 
     }
 
-    @Override
-    public AdminClientConverter getACConverter() {
-        return (AdminClientConverter)this.converter;
-    }
 
     @Override
     public IdentifiableProvider getACProvider() {

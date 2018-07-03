@@ -2,24 +2,31 @@ package edu.uiuc.ncsa.myproxy.oa4mp.server.testing;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.server.ClientApprovalStoreCommands;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.ClientSorter;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.StoreCommands2;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.delegation.server.storage.BaseClientStore;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApprovalStore;
 import edu.uiuc.ncsa.security.delegation.storage.BaseClient;
+import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
-import edu.uiuc.ncsa.security.util.cli.StoreCommands;
+import org.apache.commons.codec.digest.DigestUtils;
+
+import java.io.FileReader;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Commands for a base client store. This is the super class to several variations of clients.
  * <p>Created by Jeff Gaynor<br>
  * on 12/8/16 at  1:03 PM
  */
-public abstract class BaseClientStoreCommands extends StoreCommands {
+public abstract class BaseClientStoreCommands extends StoreCommands2 {
     public BaseClientStoreCommands(MyLoggingFacade logger, String defaultIndent, Store clientStore, ClientApprovalStore clientApprovalStore) {
         super(logger, defaultIndent, clientStore);
         this.clientApprovalStore = clientApprovalStore;
@@ -42,14 +49,80 @@ public abstract class BaseClientStoreCommands extends StoreCommands {
         this.clientApprovalStore = clientApprovalStore;
     }
 
+    protected void showCreateHashHelp() {
+        say("create_hash string | -file path");
+        say("This will create a hash of the given string which is suitable for storing in the database.");
+        say("If you specify a file, the entire content will be hashed.");
+        say("Note that if there are emebedded blanks, you should enclose the entire argument in double quotes");
+        say("E.g. \n\ncreate_hash my pass word");
+        say("would just has \"word\", and to get the whole string you should enter" );
+        say("create_hash \"my pass word\"");
+    }
+
+    public void create_hash(InputLine inputLine) {
+        if (showHelp(inputLine)) {
+            showCreateHashHelp();
+            return;
+        }
+
+        String secret = null;
+        if (inputLine.hasArg("-file")) {
+            try {
+                FileReader fis = new FileReader(inputLine.getArg(1 + inputLine.indexOf("-file")));
+                StringBuffer sb = new StringBuffer();
+                int i;
+                while ((i = fis.read()) != -1) {
+                    sb.append((char) i);
+                }
+                fis.close();
+                secret = sb.toString();
+            } catch (Throwable t) {
+                say("Error: could not read file: " + t.getMessage());
+                return;
+            }
+        } else {
+            secret = inputLine.getLastArg();
+        }
+        say("creating hash of " + secret);
+        say(DigestUtils.sha1Hex(secret));
+    }
+
+    @Override
+    protected List<Identifiable> listAll(boolean useLongFormat, String otherFlags) {
+        loadAllEntries();
+
+        if (allEntries.isEmpty()) {
+            say("(no entries found)");
+            return allEntries;
+        }
+        List<ClientApproval> approvals = getClientApprovalStore().getAll();
+        HashMap<Identifier, ClientApproval> approvalMap = new HashMap<>();
+        for (ClientApproval a : approvals) {
+            approvalMap.put(a.getIdentifier(), a);
+        }
+
+        int i = 0;
+        getSortable().setState(otherFlags);
+        allEntries = getSortable().sort(allEntries);
+        for (Identifiable x : allEntries) {
+            ClientApproval tempA = approvalMap.get(x.getIdentifier());
+            if (tempA == null) {
+                tempA = new ClientApproval(x.getIdentifier());
+                tempA.setStatus(ClientApproval.Status.NONE);
+            }
+            if (useLongFormat) {
+                longFormat((BaseClient) x, tempA);
+            } else {
+                say((i++) + ". " + format((BaseClient) x, tempA));
+            }
+        }
+        return allEntries;
+    }
 
     ClientApprovalStore clientApprovalStore;
 
-    @Override
-    protected String format(Identifiable identifiable) {
-        BaseClient client = (BaseClient) identifiable;
+    protected String format(BaseClient client, ClientApproval ca) {
         String rc = null;
-        ClientApproval ca = (ClientApproval) getClientApprovalStore().get(client.getIdentifier());
         if (ca == null) {
             rc = "(?) " + client.getIdentifier() + " ";
         } else {
@@ -63,29 +136,32 @@ public abstract class BaseClientStoreCommands extends StoreCommands {
         rc = rc + "(" + name + ")";
         rc = rc + " created on " + Iso8601.date2String(client.getCreationTS());
         return rc;
+
     }
 
     @Override
-    protected void longFormat(Identifiable identifiable) {
+    protected String format(Identifiable identifiable) {
         BaseClient client = (BaseClient) identifiable;
+        ClientApproval ca = (ClientApproval) getClientApprovalStore().get(client.getIdentifier());
+        return format(client, ca);
+    }
+
+    protected void longFormat(BaseClient client, ClientApproval clientApproval) {
         say("Client name=" + (client.getName() == null ? "(no name)" : client.getName()));
         sayi("identifier=" + client.getIdentifier());
         sayi("email=" + client.getEmail());
         sayi("creation timestamp=" + client.getCreationTS());
-        if (getClientApprovalStore() != null) {
-            ClientApproval clientApproval = (ClientApproval) getClientApprovalStore().get(client.getIdentifier());
-            if (clientApproval == null) {
-                sayi("no approval record exists.");
-            } else {
-                if (clientApproval.isApproved()) {
-                    String approver = "(unknown)";
-                    if (clientApproval.getApprover() != null) {
-                        approver = clientApproval.getApprover();
-                    }
-                    sayi("approved by " + approver);
-                } else {
-                    sayi("not approved");
+        if (clientApproval == null) {
+            sayi("no approval record exists.");
+        } else {
+            if (clientApproval.isApproved()) {
+                String approver = "(unknown)";
+                if (clientApproval.getApprover() != null) {
+                    approver = clientApproval.getApprover();
                 }
+                sayi("approved by " + approver);
+            } else {
+                sayi("not approved");
             }
         }
 
@@ -96,6 +172,19 @@ public abstract class BaseClientStoreCommands extends StoreCommands {
             sayi("public key:");
             say(client.getSecret());
         }
+
+    }
+
+
+    @Override
+    protected void longFormat(Identifiable identifiable) {
+        BaseClient client = (BaseClient) identifiable;
+        ClientApproval clientApproval = null;
+        if (getClientApprovalStore() != null) {
+            clientApproval = (ClientApproval) getClientApprovalStore().get(client.getIdentifier());
+        }
+        longFormat(client, clientApproval);
+
     }
 
 
@@ -177,4 +266,9 @@ public abstract class BaseClientStoreCommands extends StoreCommands {
         super.rm(inputLine);
     }
 
+
+    @Override
+    protected MapConverter getConverter() {
+        return ((BaseClientStore) getStore()).getConverter();
+    }
 }

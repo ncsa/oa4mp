@@ -73,6 +73,15 @@
         <td style="vertical-align: top;">An optional prefix for the table.</td>
     </tr>
     <tr>
+           <td style="vertical-align: top;">parameters</td>
+           <td style="vertical-align: top;">N</td>
+           <td style="vertical-align: top;">(none)</td>
+           <td style="vertical-align: top;">An optional extra set of parameters to pass to the JDBC driver. This is of the form
+               key0=value0&amp;key1=value1&amp;key2=value2... Note that each key/value pair is separated with an ampersand.
+               Note that OA4MP does all connections using UTF8 so that parameter is always added.
+           </td>
+       </tr>
+    <tr>
           <td style="vertical-align: top;">useSSL</td>
           <td style="vertical-align: top;">N</td>
           <td style="vertical-align: top;">false</td>
@@ -103,7 +112,8 @@ read the comments since you may want to customize them to fit your installation.
           password="bar"
           schema="atmos"
           database="climate"
-          useSSL="true"&gt;
+          useSSL="true"
+          parameters="parameters="useJDBCCompliantTimezoneShift=true&amp;amp;useLegacyDatetimeCode=false&amp;amp;serverTimezone=America/Chicago""&gt;
          &lt;transactions/&gt;
       &lt;/mysql&gt;
       &lt;!-- other stuff --&gt;
@@ -112,7 +122,9 @@ read the comments since you may want to customize them to fit your installation.
 </pre>
 
 In this example, there is a mysql store for the transactions only which uses the given username and password to
-connect over SSL.
+connect over SSL. A set of parameters is passed in to fix a bug whereby the system timezone is incorrectly gotten
+from the operating system, so it must be specifically set for all connections. Note that in the configuration file that
+the ampersand is written out as &amp;amp;.
 
 
 <h3>Example 2.</h3>

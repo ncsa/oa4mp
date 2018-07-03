@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApprovalStore;
+import edu.uiuc.ncsa.security.delegation.storage.BaseClient;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfigurationUtil;
 import edu.uiuc.ncsa.security.util.cli.ExitException;
 import net.sf.json.JSON;
@@ -56,7 +57,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
     Collection<String> supportedScopes = null;
 
     @Override
-    protected void longFormat(Identifiable identifiable) {
+    protected void longFormat(BaseClient identifiable, ClientApproval clientApproval) {
         OA2Client client = (OA2Client) identifiable;
         say("Client name=" + (client.getName() == null ? "(no name)" : client.getName()));
         sayi("identifier=" + client.getIdentifier());
@@ -68,50 +69,41 @@ public class OA2ClientCommands extends ClientStoreCommands {
         sayi("sign ID tokens?=" + client.isSignTokens());
         sayi("issuer=" + client.getIssuer());
         sayi("is public?=" + client.isPublicClient());
-        if (getClientApprovalStore() != null) {
-            ClientApproval clientApproval = null;
-            try {
-                clientApproval = (ClientApproval) getClientApprovalStore().get(client.getIdentifier());
+        if (clientApproval == null) {
+            // if it is missing, then create on and mark it pending.
+            clientApproval = (ClientApproval) getClientApprovalStore().create();
+            clientApproval.setIdentifier(client.getIdentifier()); // or it won't associate it with the client...
+            clientApproval.setStatus(ClientApproval.Status.PENDING);
+            clientApproval.setApproved(false);
+            getClientApprovalStore().save(clientApproval);
+            //     sayi("no approval record exists.");
 
-            } catch (Throwable t) {
-                // do nothing. If there is no approval record, this is equivalent to saying it is not approved.
-            }
-            if (clientApproval == null) {
-                // if it is missing, then create on and mark it pending.
-                clientApproval = (ClientApproval) getClientApprovalStore().create();
-                clientApproval.setIdentifier(client.getIdentifier()); // or it won't associate it with the client...
-                clientApproval.setStatus(ClientApproval.Status.PENDING);
-                clientApproval.setApproved(false);
-                getClientApprovalStore().save(clientApproval);
-                //     sayi("no approval record exists.");
+        }
 
-            }
+        if (clientApproval.isApproved() && clientApproval.getStatus() != APPROVED) {
+            clientApproval.setStatus(APPROVED);
+        }
+        switch (clientApproval.getStatus()) {
+            case APPROVED:
+                String approver = "(unknown)";
+                if (clientApproval.getApprover() != null) {
+                    approver = clientApproval.getApprover();
+                }
+                sayi("status=approved by " + approver);
+                break;
+            case NONE:
+                sayi("status=none");
+                break;
+            case PENDING:
+                sayi("status=pending");
+                break;
+            case DENIED:
+                sayi("status=approval denied");
+                break;
+            case REVOKED:
+                sayi("status=revoked");
 
-            if (clientApproval.isApproved() && clientApproval.getStatus() != APPROVED) {
-                clientApproval.setStatus(APPROVED);
-            }
-            switch (clientApproval.getStatus()) {
-                case APPROVED:
-                    String approver = "(unknown)";
-                    if (clientApproval.getApprover() != null) {
-                        approver = clientApproval.getApprover();
-                    }
-                    sayi("status=approved by " + approver);
-                    break;
-                case NONE:
-                    sayi("status=none");
-                    break;
-                case PENDING:
-                    sayi("status=pending");
-                    break;
-                case DENIED:
-                    sayi("status=approval denied");
-                    break;
-                case REVOKED:
-                    sayi("status=revoked");
-
-            }
-        } //end of approvals.
+        }
         if (client.getSecret() == null) {
             sayi("client secret: (none)");
 
@@ -299,12 +291,12 @@ public class OA2ClientCommands extends ClientStoreCommands {
             currentLDAPs = LDAPConfigurationUtil.toJSON(client.getLdaps());
         }
         JSONArray newLDAPS = (JSONArray) inputJSON(currentLDAPs, "ldap configuration", true);
-        if (newLDAPS != null ) {
+        if (newLDAPS != null) {
             client.setLdaps(LDAPConfigurationUtil.fromJSON(newLDAPS));
         }
 
         JSONObject newConfig = (JSONObject) inputJSON(client.getConfig(), "client configuration");
-        if (newConfig != null ) {
+        if (newConfig != null) {
             client.setConfig(newConfig);
         }
     }
@@ -370,6 +362,13 @@ public class OA2ClientCommands extends ClientStoreCommands {
         }
 
         return null;
+    }
+
+    @Override
+    protected void showDeserializeHelp() {
+        super.showDeserializeHelp();
+        say("NOTE that for clients, the assumption is that you are supplying the hashed secret, not the actual secret.");
+        say("If you need to create a hash of a secret, invoke the create_hash method on the secret");
     }
 
     public OA2ClientCommands(MyLoggingFacade logger, Store store) {

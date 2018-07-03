@@ -14,8 +14,10 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.permissions.ListAdminsResponse
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.permissions.ListClientResponse;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.permissions.PermissionResponse;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientConverter;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientKeys;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientConverter;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientKeys;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.delegation.services.Response;
@@ -110,14 +112,15 @@ public class ResponseSerializer {
 
     protected void serialize(AttributeGetClientResponse response, HttpServletResponse servletResponse) throws IOException {
         PrintWriter pw = servletResponse.getWriter();
+        OA2ClientConverter clientConverter = (OA2ClientConverter)cose.getClientStore().getConverter();
         JSONObject json = new JSONObject();
         json.put("status", 0);
-        OA2ClientKeys keys = (OA2ClientKeys) cose.getClientStore().getACConverter().getKeys();
+        OA2ClientKeys keys = (OA2ClientKeys) clientConverter.getKeys();
         List<String> allKeys = keys.allKeys();
         allKeys.remove(keys.secret());
-        OA2Client newClient = (OA2Client) cose.getClientStore().getACConverter().subset(response.getClient(), response.getAttributes());
+        OA2Client newClient = (OA2Client) clientConverter.subset(response.getClient(), response.getAttributes());
         JSONObject jsonClient = new JSONObject();
-        cose.getClientStore().getACConverter().toJSON(newClient, jsonClient);
+        clientConverter.toJSON(newClient, jsonClient);
         json.put("content", jsonClient);
         //return json;
 
@@ -128,13 +131,14 @@ public class ResponseSerializer {
     protected void serialize(AttributeGetAdminClientResponse response, HttpServletResponse servletResponse) throws IOException {
         PrintWriter pw = servletResponse.getWriter();
         JSONObject json = new JSONObject();
+        AdminClientConverter adminClientConverter = (AdminClientConverter)cose.getAdminClientStore().getConverter();
         json.put("status", 0);
-        AdminClientKeys keys = (AdminClientKeys) cose.getAdminClientStore().getACConverter().getKeys();
+        AdminClientKeys keys = (AdminClientKeys) adminClientConverter.getKeys();
         List<String> allKeys = keys.allKeys();
         allKeys.remove(keys.secret());
-        AdminClient newClient = (AdminClient) cose.getAdminClientStore().getACConverter().subset(response.getAdminClient(), response.getAttributes());
+        AdminClient newClient = (AdminClient) adminClientConverter.subset(response.getAdminClient(), response.getAttributes());
         JSONObject jsonClient = new JSONObject();
-        cose.getAdminClientStore().getACConverter().toJSON(newClient, jsonClient);
+        adminClientConverter.toJSON(newClient, jsonClient);
         json.put("content", jsonClient);
         //return json;
 
@@ -223,12 +227,14 @@ public class ResponseSerializer {
     private JSONObject clientToJSON(OA2Client client) {
         JSONObject json = new JSONObject();
         json.put("status", 0);
-        OA2ClientKeys keys = (OA2ClientKeys) cose.getClientStore().getACConverter().getKeys();
+        OA2ClientConverter clientConverter = (OA2ClientConverter)cose.getClientStore().getConverter();
+
+        OA2ClientKeys keys = (OA2ClientKeys) clientConverter.getKeys();
         List<String> allKeys = keys.allKeys();
         allKeys.remove(keys.secret());
-        OA2Client newClient = (OA2Client) cose.getClientStore().getACConverter().subset(client, allKeys);
+        OA2Client newClient = (OA2Client) clientConverter.subset(client, allKeys);
         JSONObject jsonClient = new JSONObject();
-        cose.getClientStore().getACConverter().toJSON(newClient, jsonClient);
+        clientConverter.toJSON(newClient, jsonClient);
         json.put("content", jsonClient);
         return json;
     }
@@ -236,12 +242,13 @@ public class ResponseSerializer {
     private JSONObject acToJSON(AdminClient client) {
         JSONObject json = new JSONObject();
         json.put("status", 0);
-        AdminClientKeys keys = (AdminClientKeys) cose.getAdminClientStore().getACConverter().getKeys();
+        AdminClientConverter adminClientConverter = (AdminClientConverter)cose.getAdminClientStore().getConverter();
+        AdminClientKeys keys = (AdminClientKeys) adminClientConverter.getKeys();
         List<String> allKeys = keys.allKeys();
         allKeys.remove(keys.secret());
-        AdminClient newClient = (AdminClient) cose.getAdminClientStore().getACConverter().subset(client, allKeys);
+        AdminClient newClient = (AdminClient) adminClientConverter.subset(client, allKeys);
         JSONObject jsonClient = new JSONObject();
-        cose.getAdminClientStore().getACConverter().toJSON(newClient, jsonClient);
+        adminClientConverter.toJSON(newClient, jsonClient);
         json.put("content", jsonClient);
         return json;
     }
