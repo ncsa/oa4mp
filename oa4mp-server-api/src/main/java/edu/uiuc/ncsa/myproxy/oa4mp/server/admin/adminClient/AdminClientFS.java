@@ -20,6 +20,10 @@ public class AdminClientFS<V extends AdminClient> extends FileStore<V> implement
 
     }
 
+    @Override
+    public MapConverter<V> getMapConverter() {
+        return converter;
+    }
 
     @Override
     public IdentifiableProvider getACProvider() {

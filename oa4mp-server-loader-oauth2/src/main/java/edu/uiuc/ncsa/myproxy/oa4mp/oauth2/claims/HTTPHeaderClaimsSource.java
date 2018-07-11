@@ -16,16 +16,29 @@ import java.util.Enumeration;
 public class HTTPHeaderClaimsSource extends BasicClaimsSourceImpl {
     public String caput = "OIDC_CLAIM_";
 
+    public String getCaput() {
+        return caput;
+    }
 
+    public void setCaput(String caput) {
+        this.caput = caput;
+    }
 
     @Override
     protected JSONObject realProcessing(JSONObject claims, HttpServletRequest request, ServiceTransaction transaction) throws UnsupportedScopeException {
         Enumeration headerNames = request.getHeaderNames();
+        String caput = getCaput();
+        if(caput == null ){
+            caput = ""; // default is empty caput.
+        }
         int caputLength = caput.length();
         while (headerNames.hasMoreElements()) {
             String name = headerNames.nextElement().toString();
             DebugUtil.dbg(this, "processing claim " + name);
-
+            /*
+            The resulting claim is without the caput, so if the caput is "OIDC_CLAIM_" and the header has a field named "OIDC_CLAIM_idp"
+            the resulting claim would be called "idp"
+             */
             if (name.startsWith(caput)) {
                 String key = name.substring(caputLength);
                 String value =request.getHeader(name);

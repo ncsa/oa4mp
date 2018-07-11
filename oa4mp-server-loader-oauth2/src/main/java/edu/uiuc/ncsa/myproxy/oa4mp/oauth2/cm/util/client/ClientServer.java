@@ -80,7 +80,7 @@ public class ClientServer extends AbstractDDServer {
         //requires and admin client and hashmap
         ColumnMap values = new ColumnMap();
         values.putAll(request.getAttributes());
-        OA2ClientKeys keys = (OA2ClientKeys) getClientStore().getConverter().getKeys();
+        OA2ClientKeys keys = (OA2ClientKeys) getClientStore().getMapConverter().getKeys();
         OA2Client client = (OA2Client) getClientStore().create();
         values.put(keys.identifier(), client.getIdentifier());
         values.put(keys.creationTS(), client.getCreationTS());
@@ -98,7 +98,7 @@ public class ClientServer extends AbstractDDServer {
         values.put(keys.secret(), hash);
 
 
-        getClientStore().getConverter().fromMap(values, client);
+        getClientStore().getMapConverter().fromMap(values, client);
         getClientStore().save(client);
         // client.setIdentifier(clientID); // since this gets scrubbed by the previous method.
         // response requires new client and its actual secret

@@ -30,7 +30,6 @@ public abstract class StoreCommands2 extends StoreCommands {
      *
      * @return
      */
-    protected abstract MapConverter getConverter();
 
     @Override
     public void deserialize(InputLine inputLine) {
@@ -46,7 +45,7 @@ public abstract class StoreCommands2 extends StoreCommands {
                 XMLMap map = new XMLMap();
                 map.fromXML(is);
                 is.close();
-                Identifiable x = getConverter().fromMap(map);
+                Identifiable x = getStore().getXMLConverter().fromMap(map, null);
                 if (isNew) {
                     if (getStore().containsKey(x.getIdentifier())) {
                         say("Error! The object with identifier \"" + x.getIdentifierString() + "\" already exists and you specified the item was new. Aborting.");
@@ -86,7 +85,7 @@ public abstract class StoreCommands2 extends StoreCommands {
             return;
         }
         XMLMap c = new XMLMap();
-        getConverter().toMap(x, c);
+        getStore().getXMLConverter().toMap(x, c);
         OutputStream os = System.out;
         boolean hasFile = false;
         if (inputLine.hasArg("-file")) {

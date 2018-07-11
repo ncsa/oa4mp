@@ -49,18 +49,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
 
     protected boolean loggingEnabled = false;
 
-    protected GroupHandler groupHandler = null;
 
-    public GroupHandler getGroupHandler() {
-        if (groupHandler == null) {
-            groupHandler = new GroupHandler(); // default
-        }
-        return groupHandler;
-    }
-
-    public void setGroupHandler(GroupHandler groupHandler) {
-        this.groupHandler = groupHandler;
-    }
 
     public LDAPClaimsSource(OA2SE oa2SE) {
         super(oa2SE);

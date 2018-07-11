@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.ldap;
 
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.XMLConverter;
 import edu.uiuc.ncsa.security.storage.MemoryStore;
 
 import java.util.HashMap;
@@ -43,5 +44,10 @@ public class LDAPMemoryStore<V extends LDAPEntry> extends MemoryStore<V> impleme
             clientIDMap.remove(x.getClientID());
         }
         return super.remove(key);
+    }
+
+    @Override
+    public XMLConverter<V> getXMLConverter() {
+        return new LDAPEntryConverter<>(new LDAPEntryKeys(), identifiableProvider);
     }
 }

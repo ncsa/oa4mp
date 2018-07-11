@@ -48,7 +48,7 @@ public class AttributeServerTest extends DDServerTests {
         assert reducedClient.getName().equals(cc.client.getName());
 
         JSONObject json = new JSONObject();
-        ((OA2ClientConverter)tp2.getClientStore().getConverter()).toJSON((OA2Client) r.getClient(), json);
+        ((OA2ClientConverter)tp2.getClientStore().getMapConverter()).toJSON((OA2Client) r.getClient(), json);
         System.out.println(json);
     }
 

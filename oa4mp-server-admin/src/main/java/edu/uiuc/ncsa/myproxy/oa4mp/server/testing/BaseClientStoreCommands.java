@@ -9,11 +9,9 @@ import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.delegation.server.storage.BaseClientStore;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApprovalStore;
 import edu.uiuc.ncsa.security.delegation.storage.BaseClient;
-import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import org.apache.commons.codec.digest.DigestUtils;
 
@@ -264,11 +262,5 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
         sayi("Done. Client approval with id = " + x.getIdentifierString() + " has been removed from the store");
         info("Client record removed for id=" + x.getIdentifierString());
         super.rm(inputLine);
-    }
-
-
-    @Override
-    protected MapConverter getConverter() {
-        return ((BaseClientStore) getStore()).getConverter();
     }
 }

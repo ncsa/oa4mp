@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.server.util;
 
 import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.XMLConverter;
 import edu.uiuc.ncsa.security.core.util.IdentifiableProviderImpl;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApprovalStore;
@@ -52,7 +53,7 @@ public class ClientApprovalMemoryStore<V extends ClientApproval> extends MemoryS
     }
 
     @Override
-    public MapConverter getConverter() {
+    public XMLConverter<V> getXMLConverter() {
         return converter;
     }
 }

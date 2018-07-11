@@ -21,6 +21,10 @@ public class AdminClientSQLStore<V extends AdminClient> extends SQLStore<V> impl
         super(connectionPool, table, identifiableProvider, converter);
     }
 
+    @Override
+    public MapConverter<V> getMapConverter() {
+        return converter;
+    }
 
     @Override
     public IdentifiableProvider getACProvider() {

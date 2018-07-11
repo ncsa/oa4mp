@@ -46,15 +46,15 @@ public abstract class AbstractDDServer implements DoubleDispatchServer, Server {
     protected OA2Client subset(OA2Client client, List<String> attributes) {
         ColumnMap map = new ColumnMap();
 
-        cose.getClientStore().getConverter().toMap(client, map);
+        cose.getClientStore().getXMLConverter().toMap(client, map);
         ColumnMap reducedMap = new ColumnMap();
 
         for (String key : attributes) {
             reducedMap.put(key, map.get(key));
         }
         // Have to always include the identifier.
-        reducedMap.put(cose.getClientStore().getConverter().getKeys().identifier(), client.getIdentifierString());
-        OA2Client x = (OA2Client) cose.getClientStore().getConverter().fromMap(reducedMap, null);
+        reducedMap.put(cose.getClientStore().getMapConverter().getKeys().identifier(), client.getIdentifierString());
+        OA2Client x = (OA2Client) cose.getClientStore().getMapConverter().fromMap(reducedMap, null);
         return x;
 
     }
@@ -62,15 +62,15 @@ public abstract class AbstractDDServer implements DoubleDispatchServer, Server {
     protected AdminClient subset(AdminClient client, List<String> attributes) {
         ColumnMap map = new ColumnMap();
 
-        cose.getAdminClientStore().getConverter().toMap(client, map);
+        cose.getAdminClientStore().getMapConverter().toMap(client, map);
         ColumnMap reducedMap = new ColumnMap();
 
         for (String key : attributes) {
             reducedMap.put(key, map.get(key));
         }
         // Have to always include the identifier.
-        reducedMap.put(cose.getClientStore().getConverter().getKeys().identifier(), client.getIdentifierString());
-        AdminClient x = (AdminClient) cose.getAdminClientStore().getConverter().fromMap(reducedMap, null);
+        reducedMap.put(cose.getClientStore().getMapConverter().getKeys().identifier(), client.getIdentifierString());
+        AdminClient x = (AdminClient) cose.getAdminClientStore().getMapConverter().fromMap(reducedMap, null);
         return x;
 
     }

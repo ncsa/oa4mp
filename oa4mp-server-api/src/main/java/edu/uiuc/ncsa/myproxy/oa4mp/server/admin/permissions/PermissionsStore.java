@@ -2,7 +2,6 @@ package edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions;
 
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
-import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
 import java.util.List;
 
@@ -42,5 +41,4 @@ public interface PermissionsStore<V extends Permission> extends Store<V> {
      */
     public boolean hasEntry(Identifier adminID, Identifier clientID);
 
-    public MapConverter<V> getConverter();
 }

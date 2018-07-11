@@ -31,4 +31,9 @@ public class SQLClientStore<V extends Client> extends SQLStore<V> implements Cli
     public IdentifiableProvider getACProvider() {
         return (IdentifiableProvider) identifiableProvider;
     }
+
+    @Override
+    public MapConverter<V> getMapConverter(){
+        return converter;
+    }
 }

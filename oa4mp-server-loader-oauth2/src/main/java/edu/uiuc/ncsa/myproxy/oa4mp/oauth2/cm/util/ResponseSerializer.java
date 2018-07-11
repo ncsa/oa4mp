@@ -112,7 +112,7 @@ public class ResponseSerializer {
 
     protected void serialize(AttributeGetClientResponse response, HttpServletResponse servletResponse) throws IOException {
         PrintWriter pw = servletResponse.getWriter();
-        OA2ClientConverter clientConverter = (OA2ClientConverter)cose.getClientStore().getConverter();
+        OA2ClientConverter clientConverter = (OA2ClientConverter)cose.getClientStore().getMapConverter();
         JSONObject json = new JSONObject();
         json.put("status", 0);
         OA2ClientKeys keys = (OA2ClientKeys) clientConverter.getKeys();
@@ -131,7 +131,7 @@ public class ResponseSerializer {
     protected void serialize(AttributeGetAdminClientResponse response, HttpServletResponse servletResponse) throws IOException {
         PrintWriter pw = servletResponse.getWriter();
         JSONObject json = new JSONObject();
-        AdminClientConverter adminClientConverter = (AdminClientConverter)cose.getAdminClientStore().getConverter();
+        AdminClientConverter adminClientConverter = (AdminClientConverter)cose.getAdminClientStore().getMapConverter();
         json.put("status", 0);
         AdminClientKeys keys = (AdminClientKeys) adminClientConverter.getKeys();
         List<String> allKeys = keys.allKeys();
@@ -227,7 +227,7 @@ public class ResponseSerializer {
     private JSONObject clientToJSON(OA2Client client) {
         JSONObject json = new JSONObject();
         json.put("status", 0);
-        OA2ClientConverter clientConverter = (OA2ClientConverter)cose.getClientStore().getConverter();
+        OA2ClientConverter clientConverter = (OA2ClientConverter)cose.getClientStore().getMapConverter();
 
         OA2ClientKeys keys = (OA2ClientKeys) clientConverter.getKeys();
         List<String> allKeys = keys.allKeys();
@@ -242,7 +242,7 @@ public class ResponseSerializer {
     private JSONObject acToJSON(AdminClient client) {
         JSONObject json = new JSONObject();
         json.put("status", 0);
-        AdminClientConverter adminClientConverter = (AdminClientConverter)cose.getAdminClientStore().getConverter();
+        AdminClientConverter adminClientConverter = (AdminClientConverter)cose.getAdminClientStore().getMapConverter();
         AdminClientKeys keys = (AdminClientKeys) adminClientConverter.getKeys();
         List<String> allKeys = keys.allKeys();
         allKeys.remove(keys.secret());

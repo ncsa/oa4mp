@@ -733,7 +733,7 @@ public class OA2FunctorTests extends JFunctorTest {
             "      }\n" +
             "    ],\n" +
             "    \"postProcessing\": {\n" +
-            "      \"$or\": [\n" +
+            "      \"$xor\": [\n" +
             "        {\n" +
             "          \"$if\": [{\"$hasClaim\": [\"eppn\"]}],\n" +
             "          \"$then\": [\n" +
@@ -835,7 +835,7 @@ public class OA2FunctorTests extends JFunctorTest {
     @Test
     public void testLBXOr() throws Throwable {
         String rawJSON = "{\"config\":\"LSST client configuration, created by JeffGaynor 6/19/2018\",\"claims\":{\"sourceConfig\":[{\"ldap\":{\"preProcessing\":[{\"$if\":[{\"$match\":[\"${idp}\",\"https://idp.ncsa.illinois.edu/idp/shibboleth\"]}],\"$then\":[{\"$set\":[\"foo\",{\"$drop\":[\"@ncsa.illinois.edu\",\"${eppn}\"]}]}],\"$else\":[{\"$get_claims\":[\"$false\"]}]}],\"postProcessing\":[{\"$if\":[{\"$match\":[\"${idp}\",\"https://idp.ncsa.illinois.edu/idp/shibboleth\"]}],\"$then\":[{\"$set\":[\"sub\",{\"$get\":[\"eppn\"]}]},{\"$exclude\":[\"foo\"]}]}],\"failOnError\":\"false\",\"address\":\"ldap.ncsa.illinois.edu\",\"port\":636,\"enabled\":\"true\",\"authorizationType\":\"none\",\"searchName\":\"foo\",\"searchAttributes\":[{\"name\":\"mail\",\"returnAsList\":false,\"returnName\":\"email\"},{\"name\":\"uid\",\"returnAsList\":false,\"returnName\":\"uid\"},{\"name\":\"uidNumber\",\"returnAsList\":false,\"returnName\":\"uidNumber\"},{\"name\":\"cn\",\"returnAsList\":false,\"returnName\":\"name\"},{\"name\":\"memberOf\",\"isGroup\":true,\"returnAsList\":false,\"returnName\":\"isMemberOf\"}],\"searchBase\":\"ou=People,dc=ncsa,dc=illinois,dc=edu\",\"contextName\":\"\",\"ssl\":{\"tlsVersion\":\"TLS\",\"useJavaTrustStore\":true},\"name\":\"3258ed63b62d1a78\"}}],\"preProcessing\":[{\"$if\":[\"$true\"],\"$then\":[{\"$set_claim_source\":[\"LDAP\",\"3258ed63b62d1a78\"]}]}]}," +
-                "\"postProcessing\":{\"$or\":[{\"$if\":[{\"$hasClaim\":[\"eppn\"]}],\"$then\":[{\"$set\":[\"voPersonExternalID\",{\"$get\":[\"eppn\"]}]}]},{\"$if\":[{\"$hasClaim\":[\"eptid\"]}],\"$then\":[{\"$set\":[\"voPersonExternalID\",{\"$get\":[\"eptid\"]}]}]},{\"$if\":[{\"$equals\":[{\"$get\":[\"idp\"]},\"http://github.com/login/oauth/authorize\"]}],\"$then\":[{\"$set\":[\"voPersonExternalID\",{\"$concat\":[{\"$get\":[\"oidc\"]},\"@github.com\"]}]}]},{\"$if\":[{\"$equals\":[{\"$get\":[\"idp\"]},\"http://google.com/accounts/o8/id\"]}],\"$then\":[{\"$set\":[\"voPersonExternalID\",{\"$concat\":[{\"$get\":[\"oidc\"]},\"@accounts.google.com\"]}]}]},{\"$if\":[{\"$equals\":[{\"$get\":[\"idp\"]},\"http://orcid.org/oauth/authorize\"]}],\"$then\":[{\"$set\":[\"voPersonExternalID\",{\"$replace\":[{\"$get\":[\"oidc\"]},\"http://\",\"https://\"]}]}]}]}," +
+                "\"postProcessing\":{\"$xor\":[{\"$if\":[{\"$hasClaim\":[\"eppn\"]}],\"$then\":[{\"$set\":[\"voPersonExternalID\",{\"$get\":[\"eppn\"]}]}]},{\"$if\":[{\"$hasClaim\":[\"eptid\"]}],\"$then\":[{\"$set\":[\"voPersonExternalID\",{\"$get\":[\"eptid\"]}]}]},{\"$if\":[{\"$equals\":[{\"$get\":[\"idp\"]},\"http://github.com/login/oauth/authorize\"]}],\"$then\":[{\"$set\":[\"voPersonExternalID\",{\"$concat\":[{\"$get\":[\"oidc\"]},\"@github.com\"]}]}]},{\"$if\":[{\"$equals\":[{\"$get\":[\"idp\"]},\"http://google.com/accounts/o8/id\"]}],\"$then\":[{\"$set\":[\"voPersonExternalID\",{\"$concat\":[{\"$get\":[\"oidc\"]},\"@accounts.google.com\"]}]}]},{\"$if\":[{\"$equals\":[{\"$get\":[\"idp\"]},\"http://orcid.org/oauth/authorize\"]}],\"$then\":[{\"$set\":[\"voPersonExternalID\",{\"$replace\":[{\"$get\":[\"oidc\"]},\"http://\",\"https://\"]}]}]}]}," +
                 "\"isSaved\":false}";
 
         JSONObject cfg = JSONObject.fromObject(rawJSON2);
@@ -844,7 +844,8 @@ public class OA2FunctorTests extends JFunctorTest {
         JSONObject claims = createClaims();
         // Put something in there so the test can work.
          claims.put(IDP_CLAIM, "http://google.com/accounts/o8/id");
-         claims.put("oidc", getRandomString());
+        String randomString  = getRandomString();
+         claims.put("oidc", randomString);
 
         OA2FunctorFactory functorFactory = new OA2FunctorFactory(claims);
         OA2ClientConfigurationFactory ff = new OA2ClientConfigurationFactory(functorFactory);
@@ -857,11 +858,12 @@ public class OA2FunctorTests extends JFunctorTest {
 
         //LDAPClaimsSource claimsSource = new LDAPClaimsSource(ldapConfiguration, null);
         LogicBlocks postProcessor = functorFactory.createLogicBlock(postProcessing);
-        assert postProcessor instanceof ORLogicBlocks;
+        assert postProcessor instanceof XORLogicBlocks;
         postProcessor.execute();
         assert (boolean) postProcessor.getResult();
         System.out.println("============= functor map from OR");
         assert claims.containsKey(VOPersonKey);
+        assert claims.getString(VOPersonKey).equals(randomString + "@accounts.google.com");
         System.out.println(VOPersonKey + "=" + claims.get(VOPersonKey));
     }
 }

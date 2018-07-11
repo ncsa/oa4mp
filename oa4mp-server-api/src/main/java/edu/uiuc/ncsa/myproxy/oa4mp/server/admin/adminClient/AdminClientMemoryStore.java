@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient;
 
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
+import edu.uiuc.ncsa.security.core.XMLConverter;
 import edu.uiuc.ncsa.security.storage.MemoryStore;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
@@ -18,7 +19,10 @@ public class AdminClientMemoryStore<V extends AdminClient> extends MemoryStore<V
       public AdminClientConverter<V> acConverter = null;
 
     @Override
-    public MapConverter getConverter() {
+    public XMLConverter<V> getXMLConverter() {
+        return acConverter;
+    }
+    public MapConverter<V> getMapConverter() {
         return acConverter;
     }
 

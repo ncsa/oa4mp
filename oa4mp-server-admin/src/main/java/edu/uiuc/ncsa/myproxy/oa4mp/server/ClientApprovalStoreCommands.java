@@ -153,10 +153,4 @@ public class ClientApprovalStoreCommands extends StoreCommands2 {
         sayi("approval was not saved.");
         info("Approval cancelled for id=" + ca.getIdentifierString());
     }
-
-
-    @Override
-    protected MapConverter getConverter() {
-        return ((ClientApprovalStore) getStore()).getConverter();
-    }
 }

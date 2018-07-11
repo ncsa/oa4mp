@@ -17,7 +17,7 @@ public class OA2ClientMemoryStore<V extends OA2Client> extends ClientMemoryStore
     }
 
     @Override
-    public MapConverter getConverter() {
+    public MapConverter getMapConverter() {
         return new OA2ClientConverter(this.identifiableProvider);
     }
 }

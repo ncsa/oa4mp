@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.client.storage;
 import edu.uiuc.ncsa.myproxy.oa4mp.client.Asset;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.XMLConverter;
 import edu.uiuc.ncsa.security.storage.MemoryStore;
 
 import java.util.HashMap;
@@ -43,6 +44,11 @@ public class MemoryAssetStore extends MemoryStore<Asset> implements AssetStore {
         if(value.getToken() != null){
             putByToken(value);
         }
+    }
+
+    @Override
+    public XMLConverter<Asset> getXMLConverter() {
+        return new AssetConverter(new AssetSerializationKeys(), identifiableProvider);
     }
 }
 

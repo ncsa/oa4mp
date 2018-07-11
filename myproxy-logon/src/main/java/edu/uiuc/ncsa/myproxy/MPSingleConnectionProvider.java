@@ -151,7 +151,7 @@ public class MPSingleConnectionProvider<T extends MyProxyConnectable> implements
                 certList.addAll(myProxyLogon.getCertificates());
                 return certList;
             } catch (Throwable e) {
-                throw new GeneralException("Error: getting certs from myproxy", e);
+                throw new GeneralException("Error: getting certs from myproxy \"" + e.getMessage() + "\"", e);
             }
 
         }

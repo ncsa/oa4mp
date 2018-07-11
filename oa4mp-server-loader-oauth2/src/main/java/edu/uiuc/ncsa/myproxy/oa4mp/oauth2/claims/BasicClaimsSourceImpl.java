@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowStates;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.GroupHandler;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.oauth_2_0.UserInfo;
@@ -129,6 +130,19 @@ public class BasicClaimsSourceImpl implements ClaimSource {
         return claims;
     }
 
+
+    protected GroupHandler groupHandler = null;
+
+     public GroupHandler getGroupHandler() {
+         if (groupHandler == null) {
+             groupHandler = new GroupHandler(); // default
+         }
+         return groupHandler;
+     }
+
+     public void setGroupHandler(GroupHandler groupHandler) {
+         this.groupHandler = groupHandler;
+     }
     /**
      * This is the actual place to put your code that only processes the claim source. The {@link #process(JSONObject, HttpServletRequest, ServiceTransaction)}
      * calls wrap this and invoke the pre/post processor for you.

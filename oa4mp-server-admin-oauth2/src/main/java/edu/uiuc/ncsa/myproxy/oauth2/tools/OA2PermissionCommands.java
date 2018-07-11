@@ -97,10 +97,4 @@ public class OA2PermissionCommands extends StoreCommands2 {
         sayi("can create?=" + p.isCreate());
 
     }
-
-    @Override
-    protected MapConverter getConverter() {
-        return ((PermissionsStore)getStore()).getConverter();
-    }
-
 }
