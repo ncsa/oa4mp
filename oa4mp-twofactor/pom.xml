@@ -32,12 +32,12 @@
         <dependency>
             <artifactId>oa4mp-server-loader-oauth1</artifactId>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
-            <version>3.6-SNAPSHOT</version>
+            <version>4.0</version>
         </dependency>
         <dependency>
             <artifactId>oa4mp-server-api</artifactId>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
-            <version>3.6-SNAPSHOT</version>
+            <version>4.0</version>
         </dependency>
     </dependencies>
     <build>
