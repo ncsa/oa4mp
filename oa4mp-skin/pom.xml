@@ -5,10 +5,10 @@
     <parent>
          <groupId>edu.uiuc.ncsa.myproxy</groupId>
          <artifactId>myproxy</artifactId>
-         <version>3.6-SNAPSHOT</version>
+         <version>4.1-SNAPSHOT</version>
      </parent>
 
-    <version>3.6-SNAPSHOT</version>
+    <version>4.1-SNAPSHOT</version>
 
     <artifactId>oa4mp-skin</artifactId>
     <packaging>jar</packaging>
