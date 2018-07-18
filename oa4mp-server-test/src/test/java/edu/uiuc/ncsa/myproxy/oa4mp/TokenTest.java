@@ -10,7 +10,7 @@ import org.junit.Test;
  */
 public class TokenTest extends TestBase {
 
-    public TestStoreProvider getTSProvider() {
+    public TestStoreProviderInterface getTSProvider() {
         return TestUtils.getMemoryStoreProvider();
     }
 

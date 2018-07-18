@@ -8,6 +8,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.client.storage.*;
 import edu.uiuc.ncsa.security.core.configuration.provider.CfgEvent;
 import edu.uiuc.ncsa.security.core.configuration.provider.TypedProvider;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.delegation.client.DelegationService;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
@@ -221,4 +222,8 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
     protected URI getAuthzURI() {
         return createServiceURI(getCfgValue(ClientXMLTags.AUTHORIZE_TOKEN_URI), getCfgValue(ClientXMLTags.BASE_URI), AUTHORIZE_ENDPOINT);
     }
+    @Override
+      public HashMap<String, String> getConstants() {
+          throw new NotImplementedException("Error: This method is not implemented.");
+      }
 }

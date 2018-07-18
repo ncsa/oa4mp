@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.client.ClientXMLTags;
 import edu.uiuc.ncsa.myproxy.oa4mp.client.OA4MPServiceProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.client.storage.AssetProvider;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
+import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.delegation.client.DelegationService;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
@@ -216,6 +217,8 @@ public class ClientLoader<T extends ClientEnvironment> extends AbstractClientLoa
               return dsp;
           }
 
-
-
+    @Override
+    public HashMap<String, String> getConstants() {
+        throw new NotImplementedException("Error: This method is not implemented.");
+    }
 }

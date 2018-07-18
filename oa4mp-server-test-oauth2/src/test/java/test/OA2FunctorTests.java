@@ -54,6 +54,21 @@ public class OA2FunctorTests extends JFunctorTest {
         assert reTestIt(jContains1, factory).getBooleanResult();
     }
 
+    @Test
+      public void testRenameClaim() throws Exception {
+        Map<String, Object> claims = createClaims();
+        String value = (String) claims.get(AUDIENCE);
+        jRename rename = new jRename(claims);
+        String newName = "foo";
+        rename.addArg(AUDIENCE);
+        rename.addArg(newName);
+        OA2FunctorFactory ff = new OA2FunctorFactory(claims);
+        rename = (jRename) reTestIt(rename, ff); // also test that the factory knows about this.
+
+        assert !rename.getClaims().containsKey(AUDIENCE);
+        assert rename.getClaims().containsKey(newName);
+        assert rename.getClaims().get(newName).equals(value);
+    }
 
     @Test
     public void testIncludeClaims() throws Exception {
@@ -153,6 +168,11 @@ public class OA2FunctorTests extends JFunctorTest {
      */
     public static String GROUP_NAME = "test-group-";
 
+    /**
+     * A basic set of claims, issuer, audience, subject, idp and a group with elements test-group-0,test-group-1,...,,
+     * test-group-4.
+     * @return
+     */
     protected static JSONObject createClaims() {
         JSONObject claims = new JSONObject();
         claims.put(ISSUER, getRandomString());
@@ -263,8 +283,6 @@ public class OA2FunctorTests extends JFunctorTest {
 
 
         LogicBlock logicBlock = new LogicBlock(functorFactory, JSONObject.fromObject(rawJSON));
-        System.out.println("\n===== nested logic block #2 ===== ");
-        System.out.println(logicBlock.toJSON());
         logicBlock.execute();
     }
 
@@ -556,15 +574,15 @@ public class OA2FunctorTests extends JFunctorTest {
         assert claims.get(VOPersonKey).equals(oidc + "@accounts.google.com");
     }
 
-    String oidc = "oidc-" + getRandomString();// type of oidc id from google, github
-    String orcid = "http://orcid.org/1234-5678-8765-4321"; // type from orcid
-    String EPPN = "bob@bigstate.edu";
-    String EPTID = "bob@random.stuff.eptid";
-    String VOPersonKey = "voPersonExternalID";
-    String GOOGLE_IDP = "http://google.com/accounts/o8/id";
-    String GITHUB_IDP = "http://github.com/login/oauth/authorize";
-    String ORCID_IDP = "http://orcid.org/oauth/authorize";
-    String NCSA_IDP = "https://ncsa/blah/blah/woof/woof";
+    public static String oidc = "oidc-" + getRandomString();// type of oidc id from google, github
+    public static String orcid = "http://orcid.org/1234-5678-8765-4321"; // type from orcid
+    public static String EPPN = "bob@bigstate.edu";
+    public static String EPTID = "bob@random.stuff.eptid";
+    public static String VOPersonKey = "voPersonExternalID";
+    public static String GOOGLE_IDP = "http://google.com/accounts/o8/id";
+    public static String GITHUB_IDP = "http://github.com/login/oauth/authorize";
+    public static String ORCID_IDP = "http://orcid.org/oauth/authorize";
+    public static String NCSA_IDP = "https://ncsa/blah/blah/woof/woof";
 
     /**
      * Key = claim name, value = claim value. This tests against those.
@@ -580,11 +598,11 @@ public class OA2FunctorTests extends JFunctorTest {
         claims2.put("idp", idp);
         jXOr jXOr = createXOR(claims2);
         jXOr.execute();
-        if (key.equals("eppn")) {
+       /* if (key.equals("eppn")) {
             // just print out one of them
             System.out.println("\n=================\nVO person test conditional:");
             System.out.println(jXOr.toJSON().toString(1));
-        }
+        }*/
         return claims2;
     }
 
@@ -839,7 +857,6 @@ public class OA2FunctorTests extends JFunctorTest {
                 "\"isSaved\":false}";
 
         JSONObject cfg = JSONObject.fromObject(rawJSON2);
-        System.out.println(cfg.toString(0));
         // make a fake transaction so this is testable in jUnit.
         JSONObject claims = createClaims();
         // Put something in there so the test can work.
@@ -851,7 +868,6 @@ public class OA2FunctorTests extends JFunctorTest {
         OA2ClientConfigurationFactory ff = new OA2ClientConfigurationFactory(functorFactory);
         OA2ClientConfiguration clientConfiguration = ff.newInstance(cfg);
         ff.createClaimSource(clientConfiguration, cfg);
-        System.out.println(clientConfiguration);
 
         JSONObject postProcessing = OA2ClientConfigurationUtil.getClaimsPostProcessing(cfg);
         //JSONObject postProcessing = cfg.getJSONObject("postProcessing");
@@ -861,10 +877,8 @@ public class OA2FunctorTests extends JFunctorTest {
         assert postProcessor instanceof XORLogicBlocks;
         postProcessor.execute();
         assert (boolean) postProcessor.getResult();
-        System.out.println("============= functor map from OR");
         assert claims.containsKey(VOPersonKey);
         assert claims.getString(VOPersonKey).equals(randomString + "@accounts.google.com");
-        System.out.println(VOPersonKey + "=" + claims.get(VOPersonKey));
     }
 }
 

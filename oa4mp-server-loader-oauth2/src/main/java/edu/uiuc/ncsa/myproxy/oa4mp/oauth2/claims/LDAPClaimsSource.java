@@ -339,6 +339,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
                     if (attribute.size() == 1) {
                         // Single-valued attributes are recorded as simple values
                         if (attributes.get(attribID).isList) {
+                            // Convert a single value to a JSON array.
                             JSONArray jsonAttribs = new JSONArray();
                             jsonAttribs.add(attribute.get(0));
                             json.put(attributes.get(attribID).targetName, jsonAttribs);

@@ -1,13 +1,13 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.file;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.CAStoreTest;
-import edu.uiuc.ncsa.myproxy.oa4mp.TestStoreProvider;
+import edu.uiuc.ncsa.myproxy.oa4mp.TestStoreProviderInterface;
 import edu.uiuc.ncsa.myproxy.oa4mp.TestUtils;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.ClientApprovalProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.storage.filestore.DSFSClientApprovalStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.ClientApproverConverter;
-import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
 import edu.uiuc.ncsa.security.core.exceptions.FilePermissionsException;
+import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.delegation.server.storage.impl.FSClientApprovalStore;
 import edu.uiuc.ncsa.security.storage.FileStore;
@@ -26,7 +26,7 @@ public class FSCAStoreTest extends CAStoreTest {
     }
 
     @Override
-    public TestStoreProvider getTSProvider() {
+    public TestStoreProviderInterface getTSProvider() {
         return TestUtils.getFsStoreProvider();
     }
 

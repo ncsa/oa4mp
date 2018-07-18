@@ -13,7 +13,8 @@ public enum FunctorClaimsType implements FunctorType {
     EXCLUDE("$exclude"),
     REMOVE("$remove"),
     HAS_CLAIM("$hasClaim"),
-    IS_MEMBER_OF("$isMemberOf");
+    IS_MEMBER_OF("$isMemberOf"),
+    RENAME("$rename");
 
     FunctorClaimsType(String value) {
         this.value = value;

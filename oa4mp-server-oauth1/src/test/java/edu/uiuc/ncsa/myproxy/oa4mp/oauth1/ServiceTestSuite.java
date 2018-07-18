@@ -47,107 +47,7 @@ public class ServiceTestSuite extends TestSuite {
     public static void initialize() {
         TestSuiteInitializer tsi = new TestSuiteInitializer(new OA4MPBootstrapper());
         tsi.init();
-/*
-        TestUtils.setBootstrapper(new OA4MPBootstrapper());
-        setupMemoryTests();
-        setupFSTests();
-        setupMySQLTests();
-        setupPGTests();
-        setupAGTests();
-*/
     }
-
-  /*  protected static void setupMemoryTests() {
-        TestUtils.setMemoryStoreProvider(new TestStoreProvider() {
-            OA4MPConfigurationLoader loader;
-
-            @Override
-            public ConfigurationLoader<? extends ServiceEnvironment> getConfigLoader() {
-                if (loader == null) {
-                    loader = new OA4MPConfigurationLoader(findConfigNode("oa4mp.oa1.memory"));
-                }
-                return loader;
-            }
-
-        });
-    }
-*/
-/*     public static void setupH2Tests(){
-            TestUtils.setH2StoreProvider(new TestStoreProvider() {
-                  OA4MPConfigurationLoader loader;
-
-            @Override
-            public ConfigurationLoader<? extends ServiceEnvironment> getConfigLoader() {
-                if (loader == null) {
-                    loader = new OA4MPConfigurationLoader(findConfigNode("h2"));
-                }
-                return loader;
-            }
-            });
-
-       }
-    public static void setupDerbyTests(){
-            TestUtils.setDerbyStoreProvider(new TestStoreProvider() {
-                  OA4MPConfigurationLoader loader;
-
-            @Override
-            public ConfigurationLoader<? extends ServiceEnvironment> getConfigLoader() {
-                if (loader == null) {
-                    loader = new OA4MPConfigurationLoader(findConfigNode("derby"));
-                }
-                return loader;
-            }
-            });
-        // derby tests are in memory only. This creates the databases.
-        //  /home/ncsa/dev/main/ncsa-security-all/myproxy/oa4mp-webapp/src/main/resources/derby.sql
-
-       }*/
-
-/*
-    protected static void setupFSTests() {
-        TestUtils.setFsStoreProvider(new TestStoreProvider() {
-            OA4MPConfigurationLoader loader;
-
-            @Override
-            public ConfigurationLoader<? extends ServiceEnvironment> getConfigLoader() {
-                if (loader == null) {
-                    loader = new OA4MPConfigurationLoader(findConfigNode("oa4mp.oa1.fileStore"));
-                }
-                return loader;
-            }
-        });
-    }
-
-*/
-/*
-    public static void setupMySQLTests() {
-        TestUtils.setMySQLStoreProvider((new TestStoreProvider() {
-            OA4MPConfigurationLoader loader;
-
-            @Override
-            public ConfigurationLoader<? extends ServiceEnvironment> getConfigLoader() {
-                if (loader == null) {
-                    loader = new OA4MPConfigurationLoader(findConfigNode("oa4mp.oa1.mysql"));
-                }
-                return loader;
-            }
-        }));
-    }
-
-    public static void setupPGTests() {
-        TestUtils.setPgStoreProvider((new TestStoreProvider() {
-            OA4MPConfigurationLoader loader;
-
-            @Override
-            public ConfigurationLoader<? extends ServiceEnvironment> getConfigLoader() {
-                if (loader == null) {
-                    loader = new OA4MPConfigurationLoader(findConfigNode("oa4mp.oa1.postgres"));
-                }
-                return loader;
-            }
-        }));
-    }
-*/
 
     public static class AGTestStoreProvider extends TestStoreProvider {
 
@@ -161,7 +61,7 @@ public class ServiceTestSuite extends TestSuite {
         @Override
         public ConfigurationLoader<? extends ServiceEnvironment> getConfigLoader() {
             if (loader == null) {
-                loader = new OA4MPConfigurationLoader(findConfigNode(configName));
+                loader = new OA4MPConfigurationLoader(findConfigNode(null, configName));
             }
             return loader;
         }
@@ -208,11 +108,5 @@ public class ServiceTestSuite extends TestSuite {
             return transactionStore;
         }
     }
-/*
 
-    // Invoke this one last since it has dependencies on all the others.
-    public static void setupAGTests() {
-        TestUtils.setAgStoreProvider(new AGTestStoreProvider());
-    }
-    */
 }

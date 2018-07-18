@@ -32,7 +32,7 @@ public class TestSuiteInitializer extends AbstractTestSuiteInitializer {
             @Override
             public ConfigurationLoader<? extends ServiceEnvironment> getConfigLoader() {
                 if (loader == null) {
-                    loader = new OA4MPConfigurationLoader(findConfigNode(namedNode));
+                    loader = new OA4MPConfigurationLoader(findConfigNode(null, namedNode));
                 }
                 return loader;
             }

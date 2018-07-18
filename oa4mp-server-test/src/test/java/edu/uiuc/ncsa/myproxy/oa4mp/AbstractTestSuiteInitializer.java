@@ -24,7 +24,7 @@ public abstract class AbstractTestSuiteInitializer {
 
     AbstractBootstrapper bootstrapper = null;
 
-    public abstract TestStoreProvider getTSP(final String namedNode);
+    public abstract TestStoreProviderInterface getTSP(final String namedNode);
 
     public abstract String getFileStoreConfigName();
 

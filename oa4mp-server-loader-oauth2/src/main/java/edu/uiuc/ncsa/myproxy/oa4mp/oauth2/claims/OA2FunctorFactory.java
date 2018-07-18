@@ -4,7 +4,6 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.*;
 import edu.uiuc.ncsa.security.util.configuration.TemplateUtil;
 import edu.uiuc.ncsa.security.util.functor.JFunctor;
 import edu.uiuc.ncsa.security.util.functor.JFunctorFactory;
-import net.sf.json.JSONObject;
 
 import java.util.Map;
 
@@ -35,57 +34,59 @@ public class OA2FunctorFactory extends JFunctorFactory {
     }
 
     @Override
-    protected JFunctor figureOutFunctor(JSONObject rawJson) {
-        JFunctor ff = super.figureOutFunctor(rawJson);
-        if (ff != null) {
-            // already got one.
-            return ff;
+    public JFunctor lookUpFunctor(String name) {
+        JFunctor functor= super.lookUpFunctor(name);
+        if(functor != null){
+            return functor;
         }
-        if (hasEnum(rawJson, IS_MEMBER_OF)) {
-            ff = new jIsMemberOf(claims);
-        }
-        if (hasEnum(rawJson, EXCLUDE)) {
-            ff = new jExclude(claims);
-        }
-        if (hasEnum(rawJson, HAS_CLAIM)) {
-            ff = new jHasClaim(claims);
-        }
-        if (hasEnum(rawJson, INCLUDE)) {
-            ff = new jInclude(claims);
-        }
-        if (hasEnum(rawJson, SET)) {
-            ff = new jSet(claims);
-        }
-        if (hasEnum(rawJson, GET)) {
-            ff = new jGet(claims);
-        }
-        if (hasEnum(rawJson, FlowType.ACCEPT_REQUESTS)) {
-            ff = new jAcceptRequests();
-        }
-        if (hasEnum(rawJson, FlowType.ACCESS_TOKEN)) {
-            ff = new jAccessToken();
-        }
+        if (name.equals(IS_MEMBER_OF.getValue())) {
+                  return new jIsMemberOf(claims);
+              }
+              if (name.equals(EXCLUDE.getValue())) {
+                  return new jExclude(claims);
+              }
+              if (name.equals(HAS_CLAIM.getValue())) {
+                  return new jHasClaim(claims);
+              }
+              if (name.equals(INCLUDE.getValue())) {
+                  return new jInclude(claims);
+              }
+              if (name.equals(RENAME.getValue())) {
+                  return new jRename(claims);
+              }
+              if (name.equals(SET.getValue())) {
+                  return new jSet(claims);
+              }
+              if (name.equals(GET.getValue())) {
+                  return new jGet(claims);
+              }
+              if (name.equals(FlowType.ACCEPT_REQUESTS.getValue())) {
+                  return new jAcceptRequests();
+              }
+              if (name.equals(FlowType.ACCESS_TOKEN.getValue())) {
+                  return new jAccessToken();
+              }
 
-        if (hasEnum(rawJson, GET_CERT)) {
-            ff = new jGetCert();
-        }
+              if (name.equals(GET_CERT.getValue())) {
+                  return new jGetCert();
+              }
 
-        if (hasEnum(rawJson, FlowType.ID_TOKEN)) {
-            ff = new jIDToken();
-        }
-        if (hasEnum(rawJson, FlowType.REFRESH_TOKEN)) {
-            ff = new jRefreshToken();
-        }
+              if (name.equals(FlowType.ID_TOKEN.getValue())) {
+                  return new jIDToken();
+              }
+              if (name.equals(FlowType.REFRESH_TOKEN.getValue())) {
+                  return new jRefreshToken();
+              }
 
-        if (hasEnum(rawJson, FlowType.USER_INFO)) {
-            ff = new jUserInfo();
-        }
-        if (hasEnum(rawJson, FlowType.SET_CLAIM_SOURCE)) {
-            ff = new jSetClaimSource();
-        }
-        if (hasEnum(rawJson, FlowType.GET_CLAIMS)) {
-            ff = new jGetClaims();
-        }
-        return ff;
+              if (name.equals(FlowType.USER_INFO.getValue())) {
+                  return new jUserInfo();
+              }
+              if (name.equals(FlowType.SET_CLAIM_SOURCE.getValue())) {
+                  return new jSetClaimSource();
+              }
+              if (name.equals(FlowType.GET_CLAIMS.getValue())) {
+                  return new jGetClaims();
+              }
+        return null;
     }
 }
