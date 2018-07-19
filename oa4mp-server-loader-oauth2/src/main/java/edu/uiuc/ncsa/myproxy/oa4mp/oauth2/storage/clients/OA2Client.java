@@ -161,10 +161,14 @@ public class OA2Client extends Client {
     public String toString() {
         String x = super.toString();
         x = x.substring(0, x.lastIndexOf("]"));
-        x = x + "scopes=" + ((getScopes() == null) ? "[]" : getScopes().toString()) + ",";
-        x = x + "callbacks=" + (getCallbackURIs() == null ? "[]" : getCallbackURIs().toString()) + ",";
-        x = x + "refresh token lifetime=" + getRtLifetime();
-        x = x + "sign ID tokens?=" + isSignTokens();
+        x = x + "scopes=" + ((getScopes() == null) ? "[]" : getScopes().toString()) ;
+        x = x + ",callbacks=" + (getCallbackURIs() == null ? "[]" : getCallbackURIs().toString()) ;
+        x = x + ",refresh token lifetime=" + getRtLifetime();
+        x = x + ",issuer=" + getIssuer();
+        x = x + ",is public?=" + isPublicClient();
+        x = x + ",rt lifetime=" + getRtLifetime();
+        x = x + ",rt lifetime enabled?=" + isRTLifetimeEnabled();
+        x = x + ",sign ID tokens?=" + isSignTokens();
         return x + "]";
     }
 

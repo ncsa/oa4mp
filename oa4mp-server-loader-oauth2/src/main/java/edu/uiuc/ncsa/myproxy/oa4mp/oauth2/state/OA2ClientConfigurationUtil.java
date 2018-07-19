@@ -131,12 +131,14 @@ public class OA2ClientConfigurationUtil extends ClientConfigurationUtil {
         return new JSONArray();
     }
 
+
     protected static JSONObject getClaimsProcessor(JSONObject config, String key) {
         DebugUtil.dbg(OA2ClientConfigurationUtil.class, ".getClaimsProcessor: key=" + key);
         if (!config.containsKey(CLAIMS_KEY)) {
             DebugUtil.dbg(OA2ClientConfigurationUtil.class, ".getClaimsProcessor: NO CLAIMS");
             return new JSONObject();
         }
+
         JSONObject claims = config.getJSONObject(CLAIMS_KEY);
         Object obj = claims.get(key);
         DebugUtil.dbg(OA2ClientConfigurationUtil.class, ".getClaimsProcessor: raw claims=" + obj);

@@ -39,10 +39,6 @@ public class OA2ClaimsUtil {
 
 
     public JSONObject createBasicClaims(HttpServletRequest request) throws Throwable {
-        if (transaction.getOA2Client().isPublicClient()) {
-            // Public clients do not get claims.
-            return new JSONObject();
-        }
 
         JSONObject claims = transaction.getClaims();
         if (claims == null) {
@@ -93,7 +89,13 @@ public class OA2ClaimsUtil {
         claims.put(EXPIRATION, System.currentTimeMillis() / 1000 + 15 * 60); // expiration is in SECONDS from the epoch.
         claims.put(ISSUED_AT, System.currentTimeMillis() / 1000); // issued at = current time in seconds.
         transaction.setClaims(claims);
+
         DebugUtil.dbg(this, "Done with basic claims = " + claims);
+        if (transaction.getOA2Client().isPublicClient()) {
+            // Public clients do not get claims.
+            return claims;
+        }
+
         DebugUtil.dbg(this, "Starting to process server default claims");
 
         if (oa2se != null && oa2se.getClaimSource() != null && oa2se.getClaimSource().isEnabled() && oa2se.getClaimSource().isRunAtAuthorization()) {
@@ -144,10 +146,10 @@ public class OA2ClaimsUtil {
                     ClaimSource claimSource = claimsSources.get(i);
                     if (claimSource.isRunAtAuthorization())
                         claimSource.process(claims, request, transaction);
-                    if(claimSource.getPostProcessor()!=null) {
+                    if (claimSource.getPostProcessor() != null) {
                         flowStates.updateValues(claimSource.getPostProcessor().getFunctorMap());
                     }
-                    if(!flowStates.acceptRequests){
+                    if (!flowStates.acceptRequests) {
                         // This practically means that the come situation has arisen whereby the user is
                         // immediately banned from access -- e.g. they were found to be on a blacklist.
                         transaction.setClaims(claims);
@@ -196,15 +198,16 @@ public class OA2ClaimsUtil {
     }
 
     public JSONObject createSpecialClaims() throws Throwable {
-        if (transaction.getOA2Client().isPublicClient()) {
-            // Public clients do not get claims.
-            return new JSONObject();
-        }
 
         JSONObject claims = transaction.getClaims();
         if (claims == null) {
             claims = new JSONObject();
         }
+        if (transaction.getOA2Client().isPublicClient()) {
+            // Public clients do not get claims, just a basic set of things to pass validation.
+            return claims;
+        }
+
         FlowStates flowStates = transaction.getFlowStates();
         // save everything up to this point since there are no guarantees that processing will continue:
         if (!flowStates.acceptRequests) {
@@ -255,7 +258,7 @@ public class OA2ClaimsUtil {
         DebugUtil.dbg(this, "Done with special claims=" + claims);
         // After post-processing it is possible that this user should be forbidden access, e.g. they are not in the correct group.
         // This is the first place we can check. If they are not allowed to make further requests, an access denied exception is thrown.
-        if(!flowStates.acceptRequests){
+        if (!flowStates.acceptRequests) {
             DebugUtil.dbg(this, "Access denied for user name =" + transaction.getUsername());
 
             throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "access denied", HttpStatus.SC_UNAUTHORIZED);
