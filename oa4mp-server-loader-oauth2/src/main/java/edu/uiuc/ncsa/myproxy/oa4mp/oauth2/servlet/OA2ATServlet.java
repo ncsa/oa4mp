@@ -6,7 +6,6 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.ClaimSourceFactoryImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.OA2ClaimsUtil;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RefreshTokenStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractAccessTokenServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.IssuerTransactionState;
 import edu.uiuc.ncsa.security.core.Identifier;
@@ -27,7 +26,6 @@ import edu.uiuc.ncsa.security.oauth_2_0.server.RTIRequest;
 import edu.uiuc.ncsa.security.oauth_2_0.server.RTIResponse;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSourceFactory;
-import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.http.HttpStatus;
 
@@ -39,7 +37,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.CLIENT_SECRET;
@@ -80,6 +77,12 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
 
     protected Map<String, String> populateClaims(HttpServletRequest request, Map<String, String> p, OA2ServiceTransaction st) {
         OA2SE oa2se = (OA2SE) getServiceEnvironment();
+        OA2ClaimsUtil claimsUtil = new OA2ClaimsUtil(oa2se, st);
+        // Every time there is a refresh, you must reinitialize the claims to have the right timestamps or
+        // clients that verify the claims will fail.
+        st.setClaims(claimsUtil.initializeClaims(request, st.getClaims()));
+        return st.getClaims();
+/*
         String issuer = null;
         // So in order
         // 1. get the issuer from the admin client
@@ -112,6 +115,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             p.put(OA2Constants.AUTHORIZATION_TIME, Long.toString(st.getAuthTime().getTime() / 1000));
         }
         return p;
+*/
     }
 
     /**

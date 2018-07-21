@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.OA2ClaimsUtil;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.UsernameFindable;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.IssuerTransactionState;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
@@ -28,9 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.StringTokenizer;
+import java.util.*;
 
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.*;
 
@@ -129,9 +128,9 @@ public class OA2AuthorizedServletUtil {
         }
         t = doDelegation(httpServletRequest, httpServletResponse);
         OA2ClaimsUtil claimsUtil = new OA2ClaimsUtil((OA2SE) servlet.getServiceEnvironment(), t);
-        DebugUtil.dbg(this, "starting to process claims:" );
+        DebugUtil.dbg(this, "starting to process claims:");
         claimsUtil.createBasicClaims(httpServletRequest);
-      //  servlet.getTransactionStore().save(t); // save the claims.
+        //  servlet.getTransactionStore().save(t); // save the claims.
         DebugUtil.dbg(this, "done with claims, transaction saved, claims = " + t.getClaims());
         return t;
     }
@@ -234,8 +233,9 @@ public class OA2AuthorizedServletUtil {
 
 
         OA2ServiceTransaction st = createNewTransaction(agResponse.getGrant());
+        st.setClient(agResponse.getClient());
         info("Created new unsaved transaction with id=" + st.getIdentifierString());
-        ArrayList<String> scopes = resolveScopes(st, params, state, givenRedirect);
+        Collection<String> scopes = resolveScopes(st, params, state, givenRedirect);
 
         st.setScopes(scopes);
         st.setAuthGrantValid(false);
@@ -278,14 +278,19 @@ public class OA2AuthorizedServletUtil {
      * @param givenRedirect
      * @return
      */
-    protected ArrayList<String> resolveScopes(OA2ServiceTransaction st, Map<String, String> params, String state, String givenRedirect) {
+    protected Collection<String> resolveScopes(OA2ServiceTransaction st, Map<String, String> params, String state, String givenRedirect) {
         String rawScopes = params.get(SCOPE);
+
+        DebugUtil.dbg(this, ".resolveScopes: stored client scopes =" + ((OA2Client) st.getClient()).getScopes());
+        DebugUtil.dbg(this, ".resolveScopes: passed in scopes =" + rawScopes);
+        DebugUtil.dbg(this, ".resolveScopes: Scope util =" + OA2Scopes.ScopeUtil.getScopes());
+        DebugUtil.dbg(this, ".resolveScopes: server scopes=" + ((OA2SE) MyProxyDelegationServlet.getServiceEnvironment()).getScopes());
         if (rawScopes == null || rawScopes.length() == 0) {
             throw new OA2RedirectableError(OA2Errors.INVALID_SCOPE, "Missing scopes parameter.", state, givenRedirect);
         }
 
         StringTokenizer stringTokenizer = new StringTokenizer(rawScopes);
-        ArrayList<String> scopes = new ArrayList<>();
+        Collection<String> scopes = new ArrayList<>();
         boolean hasOpenIDScope = false;
         while (stringTokenizer.hasMoreTokens()) {
             String x = stringTokenizer.nextToken();
@@ -295,11 +300,31 @@ public class OA2AuthorizedServletUtil {
             if (x.equals(OA2Scopes.SCOPE_OPENID)) hasOpenIDScope = true;
             scopes.add(x);
         }
+        Collection<String> storedClientScopes = ((OA2Client) st.getClient()).getScopes();
+        scopes = intersection(OA2Scopes.ScopeUtil.getScopes(), intersection(scopes, storedClientScopes));
+        DebugUtil.dbg(this, ".resolveScopes: after resolution=" + scopes);
 
 
         if (!hasOpenIDScope)
             throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST, "Scopes must contain " + OA2Scopes.SCOPE_OPENID, state, givenRedirect);
         return scopes;
+    }
+
+    /**
+     * Utility call to return the intersection of two lists of strings.
+     *
+     * @param x
+     * @param y
+     * @return
+     */
+    protected Collection<String> intersection(Collection<String> x, Collection<String> y) {
+        ArrayList<String> output = new ArrayList<>();
+        for (String val : x) {
+            if (y.contains(val)) {
+                output.add(val);
+            }
+        }
+        return output;
     }
 
     /**

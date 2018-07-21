@@ -360,8 +360,9 @@ public class OA2TestCommands extends TestCommands {
         // Have to update the AT reponse here every time or no token state is preserved.
         currentATResponse = new ATResponse2(dummyAsset.getAccessToken(), dummyAsset.getRefreshToken());
         currentATResponse.setParameters(rtResponse.getParameters());
+        JSONObject json = JSONObject.fromObject(currentATResponse.getParameters());
+        claims = json;
         if (inputLine.hasArg(CLAIMS_FLAG)) {
-            JSONObject json = JSONObject.fromObject(currentATResponse.getParameters());
             if (json.isEmpty()) {
                 say("(no claims found)");
             } else {

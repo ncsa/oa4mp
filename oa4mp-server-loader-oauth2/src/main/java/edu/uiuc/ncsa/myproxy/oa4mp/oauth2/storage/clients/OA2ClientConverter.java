@@ -96,6 +96,8 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
                 cfg = new JSONObject();
                 OA2ClientConfigurationUtil.setComment(cfg, "Created by converter from old LDAP entry");
             }
+            ServletDebugUtil.dbg(this,"starting to convert client with id=" + otherV.getIdentifierString());
+
             OA2ClientConfigurationUtil.convertToNewConfiguration(ldap, cfg);
             // NOTE!! This next set of statement takes an existing LDAP and puts it back into the
             // configuration. This effectively updates the name (if needed) to ensure that conversion is

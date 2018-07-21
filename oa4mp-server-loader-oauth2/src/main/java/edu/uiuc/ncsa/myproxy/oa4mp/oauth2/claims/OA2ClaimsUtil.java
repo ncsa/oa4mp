@@ -14,6 +14,7 @@ import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2GeneralError;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
+import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import net.sf.json.JSONObject;
 import org.apache.http.HttpStatus;
 
@@ -37,14 +38,14 @@ public class OA2ClaimsUtil {
         this.transaction = transaction;
     }
 
-
-    public JSONObject createBasicClaims(HttpServletRequest request) throws Throwable {
-
-        JSONObject claims = transaction.getClaims();
-        if (claims == null) {
-            claims = new JSONObject();
-            claims.put("foo", "bar");
-        }
+    /**
+     * This method puts the required information into a claims
+     *
+     * @param claims
+     * @return
+     * @throws Throwable
+     */
+    public JSONObject initializeClaims(HttpServletRequest request, JSONObject claims)  {
 
         DebugUtil.dbg(this, "Starting to process basic claims");
         String issuer = null;
@@ -88,11 +89,31 @@ public class OA2ClaimsUtil {
         claims.put(AUDIENCE, transaction.getClient().getIdentifierString());
         claims.put(EXPIRATION, System.currentTimeMillis() / 1000 + 15 * 60); // expiration is in SECONDS from the epoch.
         claims.put(ISSUED_AT, System.currentTimeMillis() / 1000); // issued at = current time in seconds.
-        transaction.setClaims(claims);
 
+        return claims;
+    }
+
+    public JSONObject createBasicClaims(HttpServletRequest request) throws Throwable {
+        JSONObject claims = transaction.getClaims();
+        if (claims == null) {
+            claims = new JSONObject();
+        }
+        claims = initializeClaims(request, claims);
+        transaction.setClaims(claims);
+        OA2Client client = getOA2Client();
+
+        if (!getCC().isSaved()) {
+            ServletDebugUtil.dbg(this, "Saving updated client " + client.getIdentifierString());
+            getCC().setSaved(true); // do this so it ends up in storage as saved, otherwise it gets saved every time.
+            // This means that the configuration was updated on load and needs to be saved.
+            oa2se.getClientStore().save(client);
+        }else{
+            ServletDebugUtil.dbg(this, "*NOT* saving updated client " + client.getIdentifierString());
+        }
         DebugUtil.dbg(this, "Done with basic claims = " + claims);
         if (transaction.getOA2Client().isPublicClient()) {
-            // Public clients do not get claims.
+            // Public clients do not get more than basic claims.
+            oa2se.getTransactionStore().save(transaction);
             return claims;
         }
 
@@ -110,7 +131,6 @@ public class OA2ClaimsUtil {
 
         DebugUtil.dbg(this, "Starting to process Client runtime and sources at authorization.");
 
-        OA2Client client = getOA2Client();
 
 
         if (client.getConfig() == null || client.getConfig().isEmpty()) {
@@ -118,11 +138,7 @@ public class OA2ClaimsUtil {
             return claims;
         }
         // so this client has a specific configuration that is to be invoked.
-        if (!getCC().isSaved()) {
-            getCC().setSaved(true); // do this so it ends up in storage as saved, otherwise it gets saved every time.
-            // This means that the configuration was updated on load and needs to be saved.
-            oa2se.getClientStore().save(client);
-        }
+
         DebugUtil.dbg(this, "executing runtime");
 
         getCC().executeRuntime();

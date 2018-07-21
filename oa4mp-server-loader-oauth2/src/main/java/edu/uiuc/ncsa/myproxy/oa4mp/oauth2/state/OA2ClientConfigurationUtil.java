@@ -276,6 +276,7 @@ public class OA2ClientConfigurationUtil extends ClientConfigurationUtil {
             long newValue = secureRandom.nextLong();
             String newName = Long.toHexString(newValue);
             content.put(CONFIGURATION_NAME_KEY, newName);
+            ServletDebugUtil.dbg(OA2ClientConfigurationUtil.class, ".convertToNewConfig: old LDAP size =" + oldLDAP.size() + ", keyset = " + oldLDAP.keySet());
             oldLDAP.put(LDAP_TAG, content);
             claimSources.add(oldLDAP);
             setClaimSourcesConfigurations(config, claimSources);
