@@ -91,7 +91,9 @@ public class OA2RegistrationServlet extends AbstractRegistrationServlet {
         if (!isEmpty(ldap)) {
             try {
                 JSON json = JSONObject.fromObject(ldap);
-                Collection<LDAPConfiguration> ldapConfiguration = LDAPConfigurationUtil.fromJSON(json);
+                LDAPConfigurationUtil ldapConfigurationUtil = new LDAPConfigurationUtil();
+
+                Collection<LDAPConfiguration> ldapConfiguration = ldapConfigurationUtil.fromJSON(json);
                 client.setLdaps(ldapConfiguration);
             } catch (Throwable t) {
                 warn("Could not parse LDAP string during client registration for \"" + client.getIdentifierString() + "\". Skipping...");

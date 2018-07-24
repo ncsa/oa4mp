@@ -65,7 +65,9 @@ public class ClaimSourceFactoryImpl extends ClaimSourceFactory {
             for (int i = 0; i < configs.size(); i++) {
                 JSONObject current = configs.getJSONObject(i);
                 try {
-                    LDAPConfiguration cfg = LDAPConfigurationUtil.fromJSON(current);
+                    LDAPConfigurationUtil ldapConfigurationUtil = new LDAPConfigurationUtil();
+
+                    LDAPConfiguration cfg = ldapConfigurationUtil.fromJSON(current);
                     DebugUtil.dbg(ClaimSourceFactoryImpl.class, "Got LDAP configuration for server " + cfg.getServer());
                     LDAPClaimSourceFactoryRequest req = new LDAPClaimSourceFactoryRequest(oa2SE.getMyLogger(),
                             cfg, client.getScopes());

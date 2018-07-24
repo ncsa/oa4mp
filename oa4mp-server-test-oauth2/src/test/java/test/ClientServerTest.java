@@ -1,5 +1,7 @@
 package test;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.TestStoreProviderInterface;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.RequestFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.client.*;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.permissions.AddClientRequest;
@@ -26,7 +28,7 @@ import java.util.Map;
  */
 public class ClientServerTest extends DDServerTests {
     @Override
-    public void testAll(CMTestStoreProvider tp2) throws Exception {
+    public void testAll(TestStoreProviderInterface tp2) throws Exception {
         testApprove(tp2);
         testUnapprove(tp2);
         testCreate(tp2);
@@ -34,21 +36,21 @@ public class ClientServerTest extends DDServerTests {
         testRemove(tp2);
     }
 
-    public void testApprove(CMTestStoreProvider tp2) throws Exception {
+    public void testApprove(TestStoreProviderInterface tp2) throws Exception {
         CC cc = setupClients(tp2);
         ApproveRequest req = RequestFactory.createRequest(cc.adminClient, new TypeClient(), new ActionApprove(), cc.client, null);
-        ClientServer server = new ClientServer(tp2.getCOSE());
+        ClientServer server = new ClientServer((OA2SE)tp2.getSE());
         ClientResponse resp = (ClientResponse) server.process(req);
         ClientApproval approval = tp2.getClientApprovalStore().get(cc.client.getIdentifier());
         assert approval != null : "No approval found";
         assert approval.isApproved();
     }
 
-    public void testUnapprove(CMTestStoreProvider tp2) throws Exception {
+    public void testUnapprove(TestStoreProviderInterface tp2) throws Exception {
         CC cc = setupClients(tp2);
         // approve it first.
         ApproveRequest req0 = RequestFactory.createRequest(cc.adminClient, new TypeClient(), new ActionApprove(), cc.client, null);
-        ClientServer server = new ClientServer(tp2.getCOSE());
+        ClientServer server = new ClientServer((OA2SE)tp2.getSE());
         ClientResponse resp0 = (ClientResponse) server.process(req0);
 
 
@@ -83,7 +85,7 @@ public class ClientServerTest extends DDServerTests {
 
     }
 
-    public void testCreate(CMTestStoreProvider tp2) throws Exception {
+    public void testCreate(TestStoreProviderInterface tp2) throws Exception {
         // only needs an admin client and map.
         CC cc = setupClients(tp2);
         OA2ClientConverter converter = getClientConverter(tp2);
@@ -100,7 +102,7 @@ public class ClientServerTest extends DDServerTests {
         json.putAll(values);
 
         CreateRequest req = RequestFactory.createRequest(cc.adminClient, new TypeClient(), new ActionCreate(), null, json);
-        ClientServer server = new ClientServer(tp2.getCOSE());
+        ClientServer server = new ClientServer((OA2SE)tp2.getSE());
         CreateResponse resp = (CreateResponse) server.process(req);
         OA2Client newClient = resp.getClient();
         assert tp2.getClientStore().containsKey(newClient.getIdentifier());
@@ -112,7 +114,7 @@ public class ClientServerTest extends DDServerTests {
     }
 
 
-    public void testCreatePublicClient(CMTestStoreProvider tp2) throws Exception {
+    public void testCreatePublicClient(TestStoreProviderInterface tp2) throws Exception {
         // only needs an admin client and map.
         CC cc = setupClients(tp2);
         cc.client.setPublicClient(true);
@@ -132,7 +134,7 @@ public class ClientServerTest extends DDServerTests {
         json.putAll(values);
 
         CreateRequest req = RequestFactory.createRequest(cc.adminClient, new TypeClient(), new ActionCreate(), null, json);
-        ClientServer server = new ClientServer(tp2.getCOSE());
+        ClientServer server = new ClientServer((OA2SE)tp2.getSE());
         CreateResponse resp = (CreateResponse) server.process(req);
         OA2Client newClient = resp.getClient();
         assert tp2.getClientStore().containsKey(newClient.getIdentifier());
@@ -144,10 +146,10 @@ public class ClientServerTest extends DDServerTests {
     }
 
 
-    public void testRemove(CMTestStoreProvider tp2) throws Exception {
+    public void testRemove(TestStoreProviderInterface tp2) throws Exception {
         CC cc = setupClients(tp2);
         // so approve this
-        ClientServer server = new ClientServer(tp2.getCOSE());
+        ClientServer server = new ClientServer((OA2SE)tp2.getSE());
         ApproveRequest approveRequest = RequestFactory.createRequest(cc.adminClient, new TypeClient(), new ActionApprove(), cc.client, null);
         server.process(approveRequest);
         assert tp2.getClientApprovalStore().containsKey(cc.client.getIdentifier());
@@ -155,7 +157,7 @@ public class ClientServerTest extends DDServerTests {
         assert !tp2.getPermissionStore().get(cc.adminClient.getIdentifier(), cc.client.getIdentifier()).isEmpty();
 
         AdminClient ac2 = getAdminClient(tp2.getAdminClientStore());
-        PermissionServer permissionServer = new PermissionServer(tp2.getCOSE());
+        PermissionServer permissionServer = new PermissionServer((OA2SE)tp2.getSE());
         AddClientRequest addClientRequest = RequestFactory.createRequest(ac2, new TypePermission(), new ActionAdd(), cc.client, null);
         permissionServer.process(addClientRequest);
         assert !tp2.getPermissionStore().get(ac2.getIdentifier(), cc.client.getIdentifier()).isEmpty();

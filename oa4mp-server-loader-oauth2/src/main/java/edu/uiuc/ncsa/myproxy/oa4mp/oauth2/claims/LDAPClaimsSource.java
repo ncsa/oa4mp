@@ -74,7 +74,8 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
      */
     public String getSearchName(JSONObject claims, HttpServletRequest request, ServiceTransaction transaction) {
         DebugUtil.dbg(this, "starting to get search name");
-        JSONObject xxx = LDAPConfigurationUtil.toJSON(getCfg());
+        LDAPConfigurationUtil ldapConfigurationUtil = new LDAPConfigurationUtil();
+        JSONObject xxx = ldapConfigurationUtil.toJSON(getCfg());
         xxx.getJSONObject("ldap").getJSONObject("ssl").put("keystore", "");
         if (getCfg().getSearchNameKey() == null) {
             DebugUtil.dbg(this, "No search name given for LDAP query. Using default of username " + transaction.getUsername());
@@ -508,7 +509,8 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
             ServiceTransaction st = new ServiceTransaction(BasicIdentifier.newID("foo"));
             st.setUsername("jbasney@ncsa.illinois.edu");
             JSONObject json = JSONObject.fromObject(rawLdap);
-            LDAPConfiguration cfg = LDAPConfigurationUtil.fromJSON(json);
+            LDAPConfigurationUtil ldapConfigurationUtil = new LDAPConfigurationUtil();
+            LDAPConfiguration cfg = ldapConfigurationUtil.fromJSON(json);
             LDAPClaimsSource claimsSource = new LDAPClaimsSource(cfg, null);
             JSONObject claims = new JSONObject();
             claims.put("username", "jbasney@ncsa.illinois.edu");

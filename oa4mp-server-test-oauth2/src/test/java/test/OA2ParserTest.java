@@ -20,13 +20,14 @@ import static test.OA2FunctorTests.createClaims;
  * on 7/17/18 at  8:40 AM
  */
 public class OA2ParserTest extends FunctorParserTest {
+
     protected OA2FunctorFactory createOA2FF(Map<String, Object> claims) {
         return (OA2FunctorFactory) createFunctorFactory(claims);
     }
 
     @Override
     protected JFunctorFactory createFunctorFactory(Object claims) {
-        return new OA2FunctorFactory((Map<String, Object>) claims);
+        return new OA2FunctorFactory((Map<String, Object>) claims, OA2FunctorTests.createScopes());
     }
 
     /**

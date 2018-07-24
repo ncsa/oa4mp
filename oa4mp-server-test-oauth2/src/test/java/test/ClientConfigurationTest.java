@@ -57,11 +57,11 @@ public class ClientConfigurationTest extends TestBase {
 
         // Add configuration for a source. Here an LDAP.
         LDAPConfiguration ldap =getLDAP();
-        JSONObject ldap2 = LDAPConfigurationUtil.toJSON(ldap);
-        ldap = LDAPConfigurationUtil.fromJSON(ldap2);
+        JSONObject ldap2 = ldapConfigurationUtil.toJSON(ldap);
+        ldap = ldapConfigurationUtil.fromJSON(ldap2);
         ldap.setName("LDAP2");
-        System.out.println(LDAPConfigurationUtil.toJSON(ldap));
-        claimConfigs.add(LDAPConfigurationUtil.toJSON(ldap));
+        System.out.println(ldapConfigurationUtil.toJSON(ldap));
+        claimConfigs.add(ldapConfigurationUtil.toJSON(ldap));
         JSONObject logic = setupRuntime(customClaim);
 
         // add the parts to the configuration
@@ -71,6 +71,8 @@ public class ClientConfigurationTest extends TestBase {
         setRuntime(cfg, logic);
         return cfg;
     }
+
+    LDAPConfigurationUtil ldapConfigurationUtil = new LDAPConfigurationUtil();
 
     protected static String MY_CLAIM = "myClaim"; // key for custom claim in testing
     protected static String MY_CLAIM2 = "myClaim2"; // key for custom claim in testing
@@ -201,7 +203,7 @@ public class ClientConfigurationTest extends TestBase {
                 "    \"type\": \"jks\"\n" +
                 "  }\n" +
                 "}}";
-        return LDAPConfigurationUtil.fromJSON(JSONObject.fromObject(raw));
+        return ldapConfigurationUtil.fromJSON(JSONObject.fromObject(raw));
     }
     /**
      * This sets up the claims from the configuration and verifies they exist as they should.
@@ -220,7 +222,7 @@ public class ClientConfigurationTest extends TestBase {
         System.out.println("new aud=" + newAud);
         JSONObject cfg = createConfiguration(myClaim, oldAud, newAud);
 
-        OA2ClientConfigurationFactory<OA2ClientConfiguration> ff = new OA2ClientConfigurationFactory(new OA2FunctorFactory(null));
+        OA2ClientConfigurationFactory<OA2ClientConfiguration> ff = new OA2ClientConfigurationFactory(new OA2FunctorFactory(null, null));
         OA2ClientConfiguration clientConfiguration = ff.newInstance(cfg);
         assert clientConfiguration.executeRuntime();
         ff.createClaimSource(clientConfiguration, cfg);
@@ -248,7 +250,7 @@ public class ClientConfigurationTest extends TestBase {
         JSONObject cfg = createConfiguration(myClaim, oldAud, newAud);
         System.out.println(cfg.toString(2));
 
-        OA2ClientConfigurationFactory<OA2ClientConfiguration> ff = new OA2ClientConfigurationFactory(new OA2FunctorFactory(null));
+        OA2ClientConfigurationFactory<OA2ClientConfiguration> ff = new OA2ClientConfigurationFactory(new OA2FunctorFactory(null, null));
         OA2ClientConfiguration clientConfiguration = ff.newInstance(cfg);
         clientConfiguration.executeRuntime();
         ff.createClaimSource(clientConfiguration, cfg);
@@ -256,7 +258,7 @@ public class ClientConfigurationTest extends TestBase {
         // claims do not exist until the sources have been run (??)
         Map<String, Object> claims = createClaims();
 
-        ff = new OA2ClientConfigurationFactory(new OA2FunctorFactory(claims));
+        ff = new OA2ClientConfigurationFactory(new OA2FunctorFactory(claims, OA2FunctorTests.createScopes()));
         clientConfiguration = ff.newInstance(cfg);
         clientConfiguration.executeRuntime();
         ff.setupPostProcessing(clientConfiguration, cfg);
@@ -289,7 +291,7 @@ public class ClientConfigurationTest extends TestBase {
            JSONObject cfg = createConfiguration(myClaim, oldAud, newAud);
            System.out.println(cfg.toString(2));
 
-           OA2ClientConfigurationFactory<OA2ClientConfiguration> ff = new OA2ClientConfigurationFactory(new OA2FunctorFactory(null));
+           OA2ClientConfigurationFactory<OA2ClientConfiguration> ff = new OA2ClientConfigurationFactory(new OA2FunctorFactory(null, null));
            OA2ClientConfiguration clientConfiguration = ff.newInstance(cfg);
            clientConfiguration.executeRuntime();
            ff.createClaimSource(clientConfiguration, cfg);
@@ -297,7 +299,7 @@ public class ClientConfigurationTest extends TestBase {
            // claims do not exist until the sources have been run (??)
            Map<String, Object> claims = createClaims();
 
-           ff = new OA2ClientConfigurationFactory(new OA2FunctorFactory(claims));
+           ff = new OA2ClientConfigurationFactory(new OA2FunctorFactory(claims, OA2FunctorTests.createScopes()));
            clientConfiguration = ff.newInstance(cfg);
            clientConfiguration.executeRuntime();
            ff.setupPostProcessing(clientConfiguration, cfg);

@@ -90,7 +90,7 @@ public class OA2AuthorizedServletUtil {
     }
 
     /**
-     * Note the at thentry point for this is the {@link #doIt(HttpServletRequest, HttpServletResponse)} method
+     * Note the at the entry point for this is the {@link #doIt(HttpServletRequest, HttpServletResponse)} method
      * if authorization is done elsewhere (so the assumption is that authorization has already happened),
      * vs. the doDelegation call that is invoked by the OA4MP Authorize servlet. The difference is
      * that the two paths will invoke the {@link OA2ClaimsUtil} at different points.
@@ -129,7 +129,7 @@ public class OA2AuthorizedServletUtil {
         t = doDelegation(httpServletRequest, httpServletResponse);
         OA2ClaimsUtil claimsUtil = new OA2ClaimsUtil((OA2SE) servlet.getServiceEnvironment(), t);
         DebugUtil.dbg(this, "starting to process claims:");
-        claimsUtil.createBasicClaims(httpServletRequest);
+        claimsUtil.createBasicClaims(httpServletRequest,t);
         //  servlet.getTransactionStore().save(t); // save the claims.
         DebugUtil.dbg(this, "done with claims, transaction saved, claims = " + t.getClaims());
         return t;

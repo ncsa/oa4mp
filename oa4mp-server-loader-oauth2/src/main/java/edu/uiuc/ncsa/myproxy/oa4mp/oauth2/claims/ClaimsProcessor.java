@@ -54,9 +54,10 @@ public class ClaimsProcessor {
      * @param configuration
      * @return
      */
-    protected LogicBlocks<? extends LogicBlock> createLogicBlocks(JSONObject configuration, Map<String, Object> claims){
+    protected LogicBlocks<? extends LogicBlock> createLogicBlocks(JSONObject configuration,
+                                                                  Map<String, Object> claims){
         ServletDebugUtil.dbg(this, "config:\n\n" + config.toString(2));
-        OA2FunctorFactory functorFactory = new OA2FunctorFactory(claims);
+        OA2FunctorFactory functorFactory = new OA2FunctorFactory(claims, null);
 
         JSONArray jsonArray = new JSONArray();
         jsonArray.add(config);

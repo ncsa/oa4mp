@@ -13,10 +13,12 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import static edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfigurationUtil.CONFIGURATION_NAME_KEY;
+import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSourceConfigurationUtil.ID_TAG;
 import static edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfigurationUtil.LDAP_TAG;
 
 /**
@@ -240,15 +242,15 @@ public class OA2ClientConfigurationUtil extends ClientConfigurationUtil {
 
         boolean containsOldLDAP = false;
 
-        if (content.containsKey(CONFIGURATION_NAME_KEY) && !content.getString(CONFIGURATION_NAME_KEY).isEmpty()) {
-            String oldLDAPName = content.getString(CONFIGURATION_NAME_KEY);
+        if (content.containsKey(ID_TAG) && !content.getString(ID_TAG).isEmpty()) {
+            String oldLDAPName = content.getString(ID_TAG);
 
             // the old LDAP config contains a name, so we check if it is in the current list of thse
             for (int i = 0; i < claimSources.size(); i++) {
                 try {
                     JSONObject obj = claimSources.getJSONObject(i);
                     JSONObject currentContent = obj.getJSONObject(LDAP_TAG);
-                    if (currentContent.getString(CONFIGURATION_NAME_KEY).equals(oldLDAPName)) {
+                    if (currentContent.getString(ID_TAG).equals(oldLDAPName)) {
                         containsOldLDAP = true;
                         break;
                     }
@@ -275,7 +277,7 @@ public class OA2ClientConfigurationUtil extends ClientConfigurationUtil {
             SecureRandom secureRandom = new SecureRandom();
             long newValue = secureRandom.nextLong();
             String newName = Long.toHexString(newValue);
-            content.put(CONFIGURATION_NAME_KEY, newName);
+            content.put(ID_TAG, newName);
             ServletDebugUtil.dbg(OA2ClientConfigurationUtil.class, ".convertToNewConfig: old LDAP size =" + oldLDAP.size() + ", keyset = " + oldLDAP.keySet());
             oldLDAP.put(LDAP_TAG, content);
             claimSources.add(oldLDAP);
@@ -298,7 +300,8 @@ public class OA2ClientConfigurationUtil extends ClientConfigurationUtil {
     protected static void createDefaultPreProcessor(JSONObject config, String newName) {
         JSONArray array = new JSONArray();
         JSONObject emptyClaims = new JSONObject();
-        OA2FunctorFactory ff = new OA2FunctorFactory(emptyClaims); // need the factory, but there are no claims at this point.
+        Collection<String> emptyScopes= new ArrayList();
+        OA2FunctorFactory ff = new OA2FunctorFactory(emptyClaims, emptyScopes); // need the factory, but there are no claims or scopes at this point.
         jSetClaimSource jSetClaimSource = new jSetClaimSource();
         jSetClaimSource.addArg(OA2ClientConfigurationFactory.LDAP_DEFAULT);
         jSetClaimSource.addArg(newName);

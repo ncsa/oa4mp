@@ -1,6 +1,8 @@
 package test;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.TestStoreProviderInterface;
 import edu.uiuc.ncsa.myproxy.oa4mp.TestUtils;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.RequestFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.permissions.*;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
@@ -22,7 +24,7 @@ import java.util.List;
  */
 public class PermissionServerTest extends DDServerTests {
     @Override
-    public void testAll(CMTestStoreProvider tp2) throws Exception {
+    public void testAll(TestStoreProviderInterface tp2) throws Exception {
         testGetAdmins(tp2);
         testGetClients(tp2);
         addClient(tp2);
@@ -30,22 +32,22 @@ public class PermissionServerTest extends DDServerTests {
     }
 
     public void testMemoryStore() throws Exception {
-        testAll((CMTestStoreProvider) TestUtils.getMemoryStoreProvider());
+        testAll( TestUtils.getMemoryStoreProvider());
     }
 
     public void testFilestore() throws Exception {
-        testAll((CMTestStoreProvider) TestUtils.getFsStoreProvider());
+        testAll( TestUtils.getFsStoreProvider());
     }
 
     public void testMysql() throws Exception {
-        testAll((CMTestStoreProvider) TestUtils.getMySQLStoreProvider());
+        testAll( TestUtils.getMySQLStoreProvider());
     }
 
     public void testPostgres() throws Exception {
-        testAll((CMTestStoreProvider) TestUtils.getPgStoreProvider());
+        testAll( TestUtils.getPgStoreProvider());
     }
 
-    public void testGetAdmins(CMTestStoreProvider tp2) throws Exception {
+    public void testGetAdmins(TestStoreProviderInterface tp2) throws Exception {
         int clientCount = 4;
         CC cc = setupClients(tp2);
         List<AdminClient> admins = new LinkedList<>();
@@ -68,7 +70,7 @@ public class PermissionServerTest extends DDServerTests {
         for (AdminClient ac : admins) {
             adminIDs.add(ac.getIdentifier());
         }
-        PermissionServer permissionServer = new PermissionServer(tp2.getCOSE());
+        PermissionServer permissionServer = new PermissionServer((OA2SE)tp2.getSE());
         //ListAdminsRequest req = new ListAdminsRequest(cc.adminClient, cc.client);
         ListAdminsRequest req = (ListAdminsRequest) RequestFactory.createRequest(null, new TypePermission(), new ActionList(), cc.client, null);
         ListAdminsResponse resp = (ListAdminsResponse) permissionServer.process(req);
@@ -83,7 +85,7 @@ public class PermissionServerTest extends DDServerTests {
 
     }
 
-    public void testGetClients(CMTestStoreProvider tp2) throws Exception {
+    public void testGetClients(TestStoreProviderInterface tp2) throws Exception {
         int clientCount = 4;
         CC cc = setupClients(tp2);
         List<OA2Client> clients = new LinkedList<>();
@@ -106,7 +108,7 @@ public class PermissionServerTest extends DDServerTests {
         for (OA2Client ac : clients) {
             clientIDs.add(ac.getIdentifier());
         }
-        PermissionServer permissionServer = new PermissionServer(tp2.getCOSE());
+        PermissionServer permissionServer = new PermissionServer((OA2SE)tp2.getSE());
         ListClientsRequest req = (ListClientsRequest) RequestFactory.createRequest(cc.adminClient, new TypePermission(), new ActionList(), null, null);
         ListClientResponse resp = (ListClientResponse) permissionServer.process(req);
         // so add a bunch of admins for a single client and check that they all come back.
@@ -124,10 +126,10 @@ public class PermissionServerTest extends DDServerTests {
      * @param tp2
      * @throws Exception
      */
-    public void addClient(CMTestStoreProvider tp2) throws Exception {
+    public void addClient(TestStoreProviderInterface tp2) throws Exception {
         AdminClient adminClient = getAdminClient(tp2.getAdminClientStore());
         OA2Client client = getOa2Client(tp2.getClientStore());
-        PermissionServer permissionServer = new PermissionServer(tp2.getCOSE());
+        PermissionServer permissionServer = new PermissionServer((OA2SE)tp2.getSE());
         AddClientRequest req = RequestFactory.createRequest(adminClient, new TypePermission(), new ActionAdd(), client, null);
         //AddClientRequest req = new AddClientRequest(adminClient, client);
         AddClientResponse response = (AddClientResponse) permissionServer.process(req);
@@ -143,10 +145,10 @@ public class PermissionServerTest extends DDServerTests {
         }
     }
 
-    public void removeClient(CMTestStoreProvider tp2) throws Exception{
+    public void removeClient(TestStoreProviderInterface tp2) throws Exception{
         CC cc = setupClients(tp2);
         RemoveClientRequest req = RequestFactory.createRequest(cc.adminClient, new TypePermission(), new ActionRemove(), cc.client, null);
-        PermissionServer permissionServer = new PermissionServer(tp2.getCOSE());
+        PermissionServer permissionServer = new PermissionServer((OA2SE)tp2.getSE());
         PermissionResponse resp = (PermissionResponse) permissionServer.process(req);
         assert tp2.getPermissionStore().get(cc.adminClient.getIdentifier(), cc.client.getIdentifier()).isEmpty();
 

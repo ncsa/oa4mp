@@ -1,5 +1,7 @@
 package test;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.TestStoreProviderInterface;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.OA2ClientMemoryStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientConverter;
@@ -24,7 +26,7 @@ import org.junit.Test;
  */
 public class ClientManagerTest extends DDServerTests implements SAT {
 
-    public void testAll(CMTestStoreProvider tp2 ) throws Exception{
+    public void testAll(TestStoreProviderInterface tp2 ) throws Exception{
         testThing(tp2.getClientStore());
         testApproveSerialization(tp2.getClientStore());
         System.out.println(DD);
@@ -33,11 +35,13 @@ public class ClientManagerTest extends DDServerTests implements SAT {
         testNix(tp2);
     }
    @Test
-   public void testNix(CMTestStoreProvider tp2) throws Exception{
-       LDAPConfiguration ldap =  tp2.getCOSE().getLdapConfiguration();
-       JSONObject json = LDAPConfigurationUtil.toJSON(ldap);
+   public void testNix(TestStoreProviderInterface tp2) throws Exception{
+       LDAPConfiguration ldap =  ((OA2SE)tp2.getSE()).getLdapConfiguration();
+       LDAPConfigurationUtil ldapConfigurationUtil = new LDAPConfigurationUtil();
+
+       JSONObject json = ldapConfigurationUtil.toJSON(ldap);
        System.out.println("");
-       System.out.println("***LDAP configuration for " + tp2.getCOSE().getClientStore().getClass());
+       System.out.println("***LDAP configuration for " + ((OA2SE)tp2.getSE()).getClientStore().getClass());
        prettyPrint(json);
        System.out.println("");
 
@@ -66,7 +70,7 @@ public class ClientManagerTest extends DDServerTests implements SAT {
     }
 
     @Test
-      public void testGetSerialization(CMTestStoreProvider tp2) throws Exception {
+      public void testGetSerialization(TestStoreProviderInterface tp2) throws Exception {
           JSONObject request = new JSONObject();
           JSONObject requestContent = new JSONObject();
           DDServerTests.CC cc = setupClients(tp2);
@@ -161,8 +165,10 @@ public class ClientManagerTest extends DDServerTests implements SAT {
     @Test
     public void testldapExample() throws Exception {
         LDAPConfiguration ldap = createLDAP();
-        JSONObject json = LDAPConfigurationUtil.toJSON(ldap);
-        LDAPConfiguration ldap2 = LDAPConfigurationUtil.fromJSON(json);
+        LDAPConfigurationUtil ldapConfigurationUtil = new LDAPConfigurationUtil();
+
+        JSONObject json = ldapConfigurationUtil.toJSON(ldap);
+        LDAPConfiguration ldap2 = ldapConfigurationUtil.fromJSON(json);
     }
 
     protected LDAPConfiguration createLDAP() {

@@ -1,5 +1,7 @@
 package test;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.TestStoreProviderInterface;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.RequestFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.attributes.*;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
@@ -21,16 +23,16 @@ import java.util.LinkedList;
  * on 12/1/16 at  10:43 AM
  */
 public class AttributeServerTest extends DDServerTests {
-    public void testAll(CMTestStoreProvider tp2) throws Exception {
+    public void testAll(TestStoreProviderInterface tp2) throws Exception {
         testAttributeServerGet(tp2);
         testAttributeServerSet(tp2);
         testAttributeServerRemove(tp2);
     }
 
-    public void testAttributeServerGet(CMTestStoreProvider tp2) throws Exception {
+    public void testAttributeServerGet(TestStoreProviderInterface tp2) throws Exception {
         CC cc = setupClients(tp2);
 
-        AttributeServer attributeServer = new AttributeServer(tp2.getCOSE());
+        AttributeServer attributeServer = new AttributeServer((OA2SE)tp2.getSE());
         OA2ClientKeys keys = getClientKeys(tp2);
         JSONArray array = new JSONArray();
         array.add(keys.scopes());
@@ -52,10 +54,10 @@ public class AttributeServerTest extends DDServerTests {
         System.out.println(json);
     }
 
-    public void testAttributeServerSet(CMTestStoreProvider tp2) throws Exception {
+    public void testAttributeServerSet(TestStoreProviderInterface tp2) throws Exception {
         CC cc = setupClients(tp2);
         OA2ClientKeys keys = getClientKeys(tp2);
-        AttributeServer attributeServer = new AttributeServer(tp2.getCOSE());
+        AttributeServer attributeServer = new AttributeServer((OA2SE)tp2.getSE());
         JSONObject map = new JSONObject();
         String random = getRandom(8);
         LinkedList<String> scopes = new LinkedList<>();
@@ -77,9 +79,9 @@ public class AttributeServerTest extends DDServerTests {
         }
     }
 
-    public void testAttributeServerRemove(CMTestStoreProvider tp2) throws Exception {
+    public void testAttributeServerRemove(TestStoreProviderInterface tp2) throws Exception {
         CC cc = setupClients(tp2);
-        AttributeServer attributeServer = new AttributeServer(tp2.getCOSE());
+        AttributeServer attributeServer = new AttributeServer((OA2SE)tp2.getSE());
         OA2ClientKeys keys = getClientKeys(tp2);
 
         JSONArray attributes = new JSONArray();

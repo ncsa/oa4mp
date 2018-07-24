@@ -9,6 +9,7 @@ import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.oauth_2_0.UserInfo;
 import edu.uiuc.ncsa.security.oauth_2_0.server.UnsupportedScopeException;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
+import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSourceConfiguration;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.JSONClaimSourceConfig;
 import edu.uiuc.ncsa.security.util.functor.LogicBlocks;
@@ -24,21 +25,36 @@ import java.util.HashSet;
  */
 public class BasicClaimsSourceImpl implements ClaimSource {
 
-    JSONClaimSourceConfig configuration = null;
+    ClaimSourceConfiguration configuration = null;
 
     @Override
-    public void setConfiguration(JSONClaimSourceConfig configuration) {
+    public void setConfiguration(ClaimSourceConfiguration configuration) {
         this.configuration = configuration;
     }
 
     @Override
-    public JSONClaimSourceConfig getConfiguration() {
+    public ClaimSourceConfiguration getConfiguration() {
         return configuration;
     }
 
     @Override
     public boolean hasConfiguration() {
         return configuration != null;
+    }
+
+    public boolean hasJSONPreProcessoor(){
+        if(getConfiguration() instanceof JSONClaimSourceConfig){
+            return ((JSONClaimSourceConfig)getConfiguration()).getJSONPreProcessing()!=null;
+
+        }
+        return false;
+    }
+    public boolean hasJSONPostProcessoor(){
+        if(getConfiguration() instanceof JSONClaimSourceConfig){
+            return ((JSONClaimSourceConfig)getConfiguration()).getJSONPostProcessing()!=null;
+
+        }
+        return false;
     }
 
     public BasicClaimsSourceImpl(OA2SE oa2SE) {
@@ -48,14 +64,9 @@ public class BasicClaimsSourceImpl implements ClaimSource {
     public BasicClaimsSourceImpl() {
     }
 
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
-
-    boolean enabled = true;
 
     public boolean isEnabled() {
-        return enabled;
+        return getConfiguration().isEnabled();
     }
 
     /**
@@ -105,9 +116,9 @@ public class BasicClaimsSourceImpl implements ClaimSource {
     @Override
     public JSONObject process(JSONObject claims, HttpServletRequest request, ServiceTransaction transaction) throws UnsupportedScopeException {
         OA2ServiceTransaction t = (OA2ServiceTransaction) transaction;
-        if (hasConfiguration() && getConfiguration().getPreProcessing() != null) {
-            OA2FunctorFactory ff = new OA2FunctorFactory(claims);
-            preProcessor = ff.createLogicBlock(getConfiguration().getPreProcessing());
+        if (hasConfiguration() && hasJSONPreProcessoor()) {
+            OA2FunctorFactory ff = new OA2FunctorFactory(claims, t.getScopes());
+            preProcessor = ff.createLogicBlock(((JSONClaimSourceConfig)getConfiguration()).getJSONPreProcessing());
             preProcessor.execute();
             // since the flow state maps to  part of a JSON object, we have to get the object, then reset it.
             FlowStates f = t.getFlowStates();
@@ -117,10 +128,10 @@ public class BasicClaimsSourceImpl implements ClaimSource {
 
         }
         realProcessing(claims, request, t);
-        if (hasConfiguration() && getConfiguration().getPostProcessing() != null) {
-            OA2FunctorFactory ff = new OA2FunctorFactory(claims);
+        if (hasConfiguration() && hasJSONPostProcessoor()) {
+            OA2FunctorFactory ff = new OA2FunctorFactory(claims, t.getScopes());
             DebugUtil.dbg(this, "claims before post-processing=" + claims);
-            postProcessor = ff.createLogicBlock(getConfiguration().getPostProcessing());
+            postProcessor = ff.createLogicBlock(((JSONClaimSourceConfig)getConfiguration()).getJSONPostProcessing());
             postProcessor.execute();
             DebugUtil.dbg(this, "claims after post-processing=" + claims);
             FlowStates f = t.getFlowStates();

@@ -105,7 +105,8 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
             // entries from the client. We will want to do this at some point.
             JSONArray ldaps = new JSONArray();
             ldaps.add(ldap);
-            otherV.setLdaps(LDAPConfigurationUtil.fromJSON(ldaps));
+
+            otherV.setLdaps(getLdapConfigurationUtil().fromJSON(ldaps));
         }
         if (cfg != null) {
             otherV.setConfig(cfg);
@@ -113,11 +114,21 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         return otherV;
     }
 
+    public LDAPConfigurationUtil getLdapConfigurationUtil() {
+        if(ldapConfigurationUtil == null){
+            ldapConfigurationUtil = new LDAPConfigurationUtil();
+        }
+        return ldapConfigurationUtil;
+    }
+
+    LDAPConfigurationUtil ldapConfigurationUtil;
+
     protected Collection<LDAPConfiguration> mapToLDAPS(ConversionMap<String, Object> map, String key) {
         JSONObject json = new JSONObject();
         JSON j = JSONSerializer.toJSON(map.get(key));
         json.put("ldap", j);
-        return LDAPConfigurationUtil.fromJSON(j);
+
+        return getLdapConfigurationUtil().fromJSON(j);
     }
 
     protected Collection<String> jsonArrayToCollection(ConversionMap<String, Object> map, String key) {
@@ -155,7 +166,7 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
             map.put(getCK2().scopes(), scopes.toString());
         }
         if (client.getLdaps() != null && !client.getLdaps().isEmpty()) {
-            map.put(getCK2().ldap(), LDAPConfigurationUtil.toJSON(client.getLdaps()).toString());
+            map.put(getCK2().ldap(), getLdapConfigurationUtil().toJSON(client.getLdaps()).toString());
         }
         if (client.getConfig() != null && !client.getConfig().isEmpty()) {
             map.put(getCK2().cfg(), client.getConfig().toString());
@@ -184,7 +195,7 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         }
         JSON ldaps = (JSON) getJsonUtil().getJSONValue(json, getCK2().ldap());
         if (ldaps != null) {
-            v.setLdaps(LDAPConfigurationUtil.fromJSON(ldaps));
+            v.setLdaps(getLdapConfigurationUtil().fromJSON(ldaps));
         }
         JSONObject config = (JSONObject) getJsonUtil().getJSONValue(json, getCK2().cfg());
         if (config != null) {
@@ -224,7 +235,7 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         }
 
         if (client.getLdaps() != null && !client.getLdaps().isEmpty()) {
-            getJsonUtil().setJSONValue(json, getCK2().ldap(), LDAPConfigurationUtil.toJSON(client.getLdaps()));
+            getJsonUtil().setJSONValue(json, getCK2().ldap(), getLdapConfigurationUtil().toJSON(client.getLdaps()));
         }
 
     }

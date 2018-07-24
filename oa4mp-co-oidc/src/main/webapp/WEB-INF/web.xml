@@ -149,7 +149,7 @@
     </resource-ref>
     -->
     <listener>
-        <listener-class>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.loader.COBootstrapper</listener-class>
+        <listener-class>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2Bootstrapper</listener-class>
 
     </listener>
 

@@ -62,7 +62,6 @@ public class OA2SE extends ServiceEnvironmentImpl {
                  long maxClientRefreshTokenLifetime,
                  JSONWebKeys jsonWebKeys,
                  String issuer,
-              //   Provider<LDAPStore> mldap,
                  boolean utilServletEnabled) {
         super(logger,
                 mfp,

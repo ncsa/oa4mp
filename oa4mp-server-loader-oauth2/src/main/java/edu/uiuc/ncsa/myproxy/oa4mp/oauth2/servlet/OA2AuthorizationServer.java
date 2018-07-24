@@ -173,7 +173,7 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
         // At this point, all authentication has been done, everything is set up and the next stop in the flow is the
         // redirect back to the client.
         OA2ClaimsUtil claimsUtil = new OA2ClaimsUtil((OA2SE) getServiceEnvironment(), st2);
-        claimsUtil.createBasicClaims(request);
+        claimsUtil.createBasicClaims(request, (OA2ServiceTransaction) trans);
     }
 
     @Override

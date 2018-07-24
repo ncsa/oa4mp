@@ -45,7 +45,8 @@ public class OA2NewClientNotifier extends NewClientNotifier {
             replacements.put(LDAP_CONFIGURATION, "(none)");
 
         } else {
-            replacements.put(LDAP_CONFIGURATION, LDAPConfigurationUtil.toJSON(oa2Client.getLdaps()).toString(2));
+            LDAPConfigurationUtil ldapConfigurationUtil = new LDAPConfigurationUtil();
+            replacements.put(LDAP_CONFIGURATION, ldapConfigurationUtil.toJSON(oa2Client.getLdaps()).toString(2));
         }
         if (oa2Client.getIssuer() == null) {
             replacements.put(ISSUER, "(none)");

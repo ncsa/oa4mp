@@ -97,8 +97,10 @@ public class OA2ClientConfigurationFactory<V extends OA2ClientConfiguration> ext
 
         for (int i = 0; i < array.size(); i++) {
             JSONObject json = array.getJSONObject(i);
-            if (LDAPConfigurationUtil.isLDAPCOnfig(json)) {
-                LDAPConfiguration c = LDAPConfigurationUtil.fromJSON(json);
+            LDAPConfigurationUtil ldapConfigurationUtil = new LDAPConfigurationUtil();
+
+            if (ldapConfigurationUtil.isLDAPCOnfig(json)) {
+                LDAPConfiguration c = ldapConfigurationUtil.fromJSON(json);
                 configs.put(c.getName(), c);
             }
         }

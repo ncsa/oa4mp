@@ -12,6 +12,10 @@
 <p>Changes to the OA4MP server by version.</p>
 
 <h2>4.0</h2>
+<p>
+    This is a major upgrade and rewrite of the OA4MP system and is the result of a great deal of feedback and
+    experience.
+</p>
 <ul>
     <li>CIL-408: OAuth 1 command line client should not look for admin client stores on startup.</li>
     <li>CIL-422: Restrict access based on group membership.</li>
@@ -28,10 +32,14 @@
     <li>Support for <a href="https://docs.google.com/document/d/14Q4DHU_u9GaVvVFQNHDpWTB33vRTYuN8yBpytzNq4O8/edit#heading=h.q4bop06zsrb9">functors</a> in client configurations. </li>
 </ul>
 
-Many updates, including the introduction of functor-based scripting. There is also a document relating to CIL-436 and a <a href="https://docs.google.com/document/d/1iwnNDZ0l0nNrqCaB41vjLb_tQRjtJUe8xpf469oT84o/edit">JWT token parsing endpoint</a>.
+<p>Many updates, including the introduction of functor-based scripting. There is also a document relating to CIL-436 and
+    a <a href="https://docs.google.com/document/d/1iwnNDZ0l0nNrqCaB41vjLb_tQRjtJUe8xpf469oT84o/edit">JWT token parsing endpoint</a>.
 The major change is allowing for a full scripting language to configure client behaviors. This is what effectively solved
 most of the above issues.
-
+</p>
+<p>The command line interface (CLI) now supports exporting and importing records from a file with the serialize and deserialize
+commands. For SQL stores, there is also a new search function that allows for limited but very useful searches. Most of the unit
+    tests have been improved or rewritten.</p>
 <h2>3.5.1</h2>
 <ul>
     <li>CIL-430: Credentials sent in authorization header are to be URL encoded.</li>

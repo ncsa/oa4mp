@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientConfigurationFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientConfigurationUtil;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
+import edu.uiuc.ncsa.security.oauth_2_0.OA2Scopes;
 import edu.uiuc.ncsa.security.util.JFunctorTest;
 import edu.uiuc.ncsa.security.util.functor.*;
 import edu.uiuc.ncsa.security.util.functor.logic.*;
@@ -14,6 +15,8 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,11 +27,22 @@ import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.*;
  * on 3/1/18 at  11:26 AM
  */
 public class OA2FunctorTests extends JFunctorTest {
+    /**
+     * Creates a general collection of scopes. This is just to initialize the factory correctly.
+     * @return
+     */
+     public static Collection<String> createScopes(){
+         Collection<String> scopes = new ArrayList();
+         for(String scope : OA2Scopes.basicScopes){
+             scopes.add(scope);
+         }
+         return scopes;
+     }
 
     @Test
     public void testClaims() throws Exception {
         Map<String, Object> claims = createClaims();
-        OA2FunctorFactory factory = new OA2FunctorFactory(claims);
+        OA2FunctorFactory factory = new OA2FunctorFactory(claims,createScopes());
         // create some functors, turn into JSON then have the factory re-create them and do the
         // replacements
         jExists jExists = new jExists();
@@ -62,7 +76,7 @@ public class OA2FunctorTests extends JFunctorTest {
         String newName = "foo";
         rename.addArg(AUDIENCE);
         rename.addArg(newName);
-        OA2FunctorFactory ff = new OA2FunctorFactory(claims);
+        OA2FunctorFactory ff = new OA2FunctorFactory(claims,createScopes());
         rename = (jRename) reTestIt(rename, ff); // also test that the factory knows about this.
 
         assert !rename.getClaims().containsKey(AUDIENCE);
@@ -77,7 +91,7 @@ public class OA2FunctorTests extends JFunctorTest {
         Map<String, Object> claims2 = new HashMap<>();
         claims2.putAll(claims);
 
-        OA2FunctorFactory ff = new OA2FunctorFactory(claims2);
+        OA2FunctorFactory ff = new OA2FunctorFactory(claims2,createScopes());
         jInclude jInclude = new jInclude(claims);
         jInclude.addArg(ISSUER);
         jInclude.addArg(SUBJECT);
@@ -105,7 +119,7 @@ public class OA2FunctorTests extends JFunctorTest {
         Map<String, Object> claims2 = new HashMap<>();
         claims2.putAll(claims);
 
-        OA2FunctorFactory ff = new OA2FunctorFactory(claims2);
+        OA2FunctorFactory ff = new OA2FunctorFactory(claims2,createScopes());
         jExclude jExclude = new jExclude(claims);
         jExclude.addArg(ISSUER);
         jExclude.addArg(SUBJECT);
@@ -130,7 +144,7 @@ public class OA2FunctorTests extends JFunctorTest {
     @Test
     public void testIsMemberOf() throws Exception {
         Map<String, Object> claims = createClaims();
-        OA2FunctorFactory ff = new OA2FunctorFactory(claims);
+        OA2FunctorFactory ff = new OA2FunctorFactory(claims,createScopes());
         jIsMemberOf jIsMemberOf = new jIsMemberOf(claims);
         jIsMemberOf.addArg(GROUP_NAME + "0");
         jIsMemberOf.addArg(GROUP_NAME + "2");
@@ -154,7 +168,7 @@ public class OA2FunctorTests extends JFunctorTest {
     @Test
     public void testAccessToken() throws Exception {
         Map<String, Object> claims = createClaims();
-        OA2FunctorFactory ff = new OA2FunctorFactory(claims);
+        OA2FunctorFactory ff = new OA2FunctorFactory(claims,createScopes());
         String rawJson = "{\"$access_token\":[\"$true\"]}";
         JFunctor jf = ff.fromJSON(JSONObject.fromObject(rawJson));
         assert jf instanceof jAccessToken;
@@ -195,7 +209,7 @@ public class OA2FunctorTests extends JFunctorTest {
         Map<String, Object> claims = createClaims();
         claims.put("eppn", "jgaynor@ncsa.illinois.edu");
 
-        OA2FunctorFactory functorFactory = new OA2FunctorFactory(claims);
+        OA2FunctorFactory functorFactory = new OA2FunctorFactory(claims,createScopes());
         JSONObject jsonObject = new JSONObject();
         JSONArray array = new JSONArray();
         JSONObject ifBlock1 = new JSONObject();
@@ -279,7 +293,7 @@ public class OA2FunctorTests extends JFunctorTest {
                 "}";
         Map<String, Object> claims = createClaims();
         claims.put("eppn", "jgaynor@ncsa.illinois.edu");
-        OA2FunctorFactory functorFactory = new OA2FunctorFactory(claims);
+        OA2FunctorFactory functorFactory = new OA2FunctorFactory(claims,createScopes());
 
 
         LogicBlock logicBlock = new LogicBlock(functorFactory, JSONObject.fromObject(rawJSON));
@@ -295,7 +309,7 @@ public class OA2FunctorTests extends JFunctorTest {
     @Test
     public void testLBCreation2() throws Exception {
         Map<String, Object> claims = createClaims();
-        OA2FunctorFactory functorFactory = new OA2FunctorFactory(claims);
+        OA2FunctorFactory functorFactory = new OA2FunctorFactory(claims,createScopes());
         JSONObject jsonObject = new JSONObject();
         JSONArray array = new JSONArray();
         JSONObject ifBlock = new JSONObject();
@@ -333,7 +347,7 @@ public class OA2FunctorTests extends JFunctorTest {
     public void testLBClaimsIntegrity() throws Exception {
         Map<String, Object> claims = createClaims();
 
-        OA2FunctorFactory functorFactory = new OA2FunctorFactory(claims);
+        OA2FunctorFactory functorFactory = new OA2FunctorFactory(claims,createScopes());
         JSONObject jsonObject = new JSONObject();
         JSONArray array = new JSONArray();
         JSONObject ifBlock = new JSONObject();
@@ -374,7 +388,7 @@ public class OA2FunctorTests extends JFunctorTest {
     @Test
     public void testLBClaimsReplacement() throws Exception {
         Map<String, Object> claims = createClaims();
-        OA2FunctorFactory functorFactory = new OA2FunctorFactory(claims);
+        OA2FunctorFactory functorFactory = new OA2FunctorFactory(claims,createScopes());
         JSONObject jsonObject = new JSONObject();
         JSONArray array = new JSONArray();
         JSONObject ifBlock = new JSONObject();
@@ -424,7 +438,7 @@ public class OA2FunctorTests extends JFunctorTest {
     @Test
     public void testHasClaim() throws Exception {
         Map<String, Object> claims = createClaims();
-        OA2FunctorFactory ff = new OA2FunctorFactory(claims);
+        OA2FunctorFactory ff = new OA2FunctorFactory(claims,createScopes());
         String testClaim = IDP_CLAIM;
         jHasClaim hasClaim = new jHasClaim(claims);
         hasClaim.addArg(IDP_CLAIM);
@@ -449,7 +463,7 @@ public class OA2FunctorTests extends JFunctorTest {
         Map<String, Object> claims2 = new HashMap<>();
         claims2.putAll(claims);
 
-        OA2FunctorFactory ff = new OA2FunctorFactory(claims2);
+        OA2FunctorFactory ff = new OA2FunctorFactory(claims2,createScopes());
         jSet jSet = new jSet(claims);
         String eppn = "foo@bar.baz";
         jSet.addArg(SUBJECT);
@@ -479,7 +493,7 @@ public class OA2FunctorTests extends JFunctorTest {
     public void testGet() throws Exception {
 
         Map<String, Object> claims = createClaims();
-        OA2FunctorFactory ff = new OA2FunctorFactory(claims);
+        OA2FunctorFactory ff = new OA2FunctorFactory(claims,createScopes());
         jGet jGet = new jGet(claims);
         jGet.execute();
         // no args returns an empty string.
@@ -607,7 +621,7 @@ public class OA2FunctorTests extends JFunctorTest {
     }
 
     protected jXOr createXOR(Map<String, Object> claims2) {
-        OA2FunctorFactory ff = new OA2FunctorFactory(claims2);
+        OA2FunctorFactory ff = new OA2FunctorFactory(claims2,createScopes());
 
         jXOr jXOr = new jXOr();
         jXOr.addArg(createLB(ff,
@@ -864,7 +878,7 @@ public class OA2FunctorTests extends JFunctorTest {
         String randomString  = getRandomString();
          claims.put("oidc", randomString);
 
-        OA2FunctorFactory functorFactory = new OA2FunctorFactory(claims);
+        OA2FunctorFactory functorFactory = new OA2FunctorFactory(claims,createScopes());
         OA2ClientConfigurationFactory ff = new OA2ClientConfigurationFactory(functorFactory);
         OA2ClientConfiguration clientConfiguration = ff.newInstance(cfg);
         ff.createClaimSource(clientConfiguration, cfg);
@@ -879,6 +893,27 @@ public class OA2FunctorTests extends JFunctorTest {
         assert (boolean) postProcessor.getResult();
         assert claims.containsKey(VOPersonKey);
         assert claims.getString(VOPersonKey).equals(randomString + "@accounts.google.com");
+    }
+
+    @Test
+    public void testScopeFunctor() throws Exception{
+        Collection<String> scopes = new ArrayList<>();
+        scopes.add(OA2Scopes.SCOPE_OPENID);
+        scopes.add(OA2Scopes.SCOPE_EMAIL);
+        String raw = "{\"$hasScope\":[\""+ OA2Scopes.SCOPE_OPENID + "\"]";
+        JSONObject claims = createClaims();
+
+        OA2FunctorFactory functorFactory = new OA2FunctorFactory(claims,scopes);
+        jhasScope hasScope = (jhasScope) functorFactory.create(raw);
+        hasScope.execute();
+        assert hasScope.getBooleanResult();
+
+        raw = "{\"$hasScope\":[\""+ OA2Scopes.SCOPE_MYPROXY + "\"]";
+        hasScope = (jhasScope) functorFactory.create(raw);
+        hasScope.execute();
+        assert !hasScope.getBooleanResult();
+
+
     }
 }
 

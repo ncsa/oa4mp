@@ -26,6 +26,7 @@ import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 
 /**
+ * A factory that creats SSL sockets as required by LDAP.
  * <p>Created by Jeff Gaynor<br>
  * on 7/13/17 at  11:02 AM
  */
@@ -160,8 +161,9 @@ public class LDAPSSLSocketFactory extends SocketFactory {
           //  System.setProperty("javax.net.debug", "ssl");
 
             JSONObject json = JSONObject.fromObject(ldap);
+            LDAPConfigurationUtil ldapConfigurationUtil = new LDAPConfigurationUtil();
 
-            LDAPConfiguration ldapConfiguration = LDAPConfigurationUtil.fromJSON(json);
+            LDAPConfiguration ldapConfiguration = ldapConfigurationUtil.fromJSON(json);
             setLdapConfiguration(ldapConfiguration);
              ldapConfiguration.setContextName("");
             getSslConfiguration().setTlsVersion(SSLConfigurationUtil.TLS_1_2);

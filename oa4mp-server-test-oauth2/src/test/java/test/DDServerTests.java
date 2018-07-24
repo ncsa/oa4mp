@@ -1,5 +1,6 @@
 package test;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.TestStoreProviderInterface;
 import edu.uiuc.ncsa.myproxy.oa4mp.TestUtils;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientConverter;
@@ -31,22 +32,22 @@ import java.util.LinkedList;
  * on 12/1/16 at  1:06 PM
  */
 public abstract class DDServerTests extends TestCase {
-    public abstract void testAll(CMTestStoreProvider tp2) throws Exception;
+    public abstract void testAll(TestStoreProviderInterface tp2) throws Exception;
 
     public void testMemoryStore() throws Exception {
-        testAll((CMTestStoreProvider) TestUtils.getMemoryStoreProvider());
+        testAll( TestUtils.getMemoryStoreProvider());
     }
 
     public void testFilestore() throws Exception {
-        testAll((CMTestStoreProvider) TestUtils.getFsStoreProvider());
+        testAll( TestUtils.getFsStoreProvider());
     }
 
     public void testMysql() throws Exception {
-        testAll((CMTestStoreProvider) TestUtils.getMySQLStoreProvider());
+        testAll( TestUtils.getMySQLStoreProvider());
     }
 
     public void testPostgres() throws Exception {
-        testAll((CMTestStoreProvider) TestUtils.getPgStoreProvider());
+        testAll( TestUtils.getPgStoreProvider());
     }
 
     public static class CC {
@@ -66,7 +67,7 @@ public abstract class DDServerTests extends TestCase {
         return Base64.encodeBase64URLSafeString(bytes);
     }
 
-    protected CC setupClients(CMTestStoreProvider tp2) throws Exception {
+    protected CC setupClients(TestStoreProviderInterface tp2) throws Exception {
         AdminClient adminClient = getAdminClient(tp2.getAdminClientStore());
         ClientApproval clientApproval = tp2.getClientApprovalStore().create();
         clientApproval.setIdentifier(adminClient.getIdentifier());
@@ -94,7 +95,7 @@ public abstract class DDServerTests extends TestCase {
         return cc;
     }
 
-    protected AdminClientConverter getAdminClientConverter(CMTestStoreProvider tp2) throws Exception {
+    protected AdminClientConverter getAdminClientConverter(TestStoreProviderInterface tp2) throws Exception {
         BaseClientConverter bcc = (BaseClientConverter)tp2.getAdminClientStore().getMapConverter();
         if (bcc instanceof AdminClientConverter) {
             return (AdminClientConverter) bcc;
@@ -102,7 +103,7 @@ public abstract class DDServerTests extends TestCase {
 
         return AdminClientStoreProviders.getAdminClientConverter();
     }
-    protected OA2ClientConverter getClientConverter(CMTestStoreProvider tp2) throws Exception {
+    protected OA2ClientConverter getClientConverter(TestStoreProviderInterface tp2) throws Exception {
         BaseClientConverter bcc = (BaseClientConverter)tp2.getClientStore().getMapConverter();
         if (bcc instanceof OA2ClientConverter) {
             return (OA2ClientConverter) bcc;
@@ -114,7 +115,7 @@ public abstract class DDServerTests extends TestCase {
         return converter;
     }
 
-    protected OA2ClientKeys getClientKeys(CMTestStoreProvider tp2) throws Exception {
+    protected OA2ClientKeys getClientKeys(TestStoreProviderInterface tp2) throws Exception {
         return (OA2ClientKeys) getClientConverter(tp2).getKeys();
     }
 

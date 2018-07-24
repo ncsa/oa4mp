@@ -12,6 +12,7 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2GeneralError;
+import edu.uiuc.ncsa.security.oauth_2_0.OA2Scopes;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
@@ -39,7 +40,10 @@ public class OA2ClaimsUtil {
     }
 
     /**
-     * This method puts the required information into a claims
+     * This method puts the required information into a claims. Use this on claims again whenever a
+     * request for claims is made, so the timestamps etc. are current. Some clients use this information,
+     * for better for work, as accounting information on the access or refresh token and these clients
+     * will break if the timestamps are not updated (e.g. kubernetes).
      *
      * @param claims
      * @return
@@ -93,12 +97,22 @@ public class OA2ClaimsUtil {
         return claims;
     }
 
-    public JSONObject createBasicClaims(HttpServletRequest request) throws Throwable {
+    /**
+     * Creates the most basic claim object for this.
+     * @param request
+     * @return
+     * @throws Throwable
+     */
+    public JSONObject createBasicClaims(HttpServletRequest request, OA2ServiceTransaction t) throws Throwable {
         JSONObject claims = transaction.getClaims();
         if (claims == null) {
             claims = new JSONObject();
         }
+        if(!t.getScopes().contains(OA2Scopes.SCOPE_OPENID)){
+            throw new OA2GeneralError(OA2Errors.INVALID_SCOPE, "invalid scope: no open id scope", HttpStatus.SC_UNAUTHORIZED);
+        }
         claims = initializeClaims(request, claims);
+        // claims are initialized and basic oidc scope (the subject) is included,
         transaction.setClaims(claims);
         OA2Client client = getOA2Client();
 
@@ -196,7 +210,7 @@ public class OA2ClaimsUtil {
 
     protected OA2FunctorFactory getFF() {
         if (ff == null) {
-            ff = new OA2FunctorFactory(transaction.getClaims());
+            ff = new OA2FunctorFactory(transaction.getClaims(), transaction.getScopes());
 
         }
         return ff;

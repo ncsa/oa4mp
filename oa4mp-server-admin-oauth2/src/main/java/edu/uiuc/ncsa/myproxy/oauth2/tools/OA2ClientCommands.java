@@ -135,7 +135,9 @@ public class OA2ClientCommands extends ClientStoreCommands {
             sayi("ldap:(none configured.)");
         } else {
             sayi("LDAPS (warning-deprecated, use the config instead):");
-            say(LDAPConfigurationUtil.toJSON(client.getLdaps()).toString(2));
+            LDAPConfigurationUtil ldapConfigurationUtil = new LDAPConfigurationUtil();
+
+            say(ldapConfigurationUtil.toJSON(client.getLdaps()).toString(2));
 
         }
         if (client.getConfig() == null || client.getConfig().isEmpty()) {
@@ -285,14 +287,16 @@ public class OA2ClientCommands extends ClientStoreCommands {
             oa2Client.setCallbackURIs(list);
         }
         JSON currentLDAPs = null;
+        LDAPConfigurationUtil ldapConfigurationUtil = new LDAPConfigurationUtil();
+
         if (client.getLdaps() == null || client.getLdaps().isEmpty()) {
             currentLDAPs = null;
         } else {
-            currentLDAPs = LDAPConfigurationUtil.toJSON(client.getLdaps());
+            currentLDAPs = ldapConfigurationUtil.toJSON(client.getLdaps());
         }
         JSONArray newLDAPS = (JSONArray) inputJSON(currentLDAPs, "ldap configuration", true);
         if (newLDAPS != null) {
-            client.setLdaps(LDAPConfigurationUtil.fromJSON(newLDAPS));
+            client.setLdaps(ldapConfigurationUtil.fromJSON(newLDAPS));
         }
 
         JSONObject newConfig = (JSONObject) inputJSON(client.getConfig(), "client configuration");

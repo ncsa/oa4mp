@@ -9,7 +9,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.NewCAStoreTest;
 import edu.uiuc.ncsa.myproxy.oa4mp.NewClientStoreTest;
 import edu.uiuc.ncsa.myproxy.oa4mp.NewTransactionTest;
 import edu.uiuc.ncsa.myproxy.oa4mp.ServiceConfigTest;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.loader.COBootstrapper;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2Bootstrapper;
 import edu.uiuc.ncsa.security.delegation.storage.FileStoreTest;
 import edu.uiuc.ncsa.security.util.JFunctorFactoryTests;
 import edu.uiuc.ncsa.security.util.JFunctorTest;
@@ -47,9 +47,7 @@ public class ServiceTestSuite2 extends TestSuite {
 
     @BeforeClass
     public static void initialize() {
-    /*    TestSuiteInitializer testSuiteInitializer = new TestSuiteInitializer(new OA2Bootstrapper());
-        testSuiteInitializer.init();*/
-        TestSuiteInitializer testSuiteInitializer = new CMTestSuiteInitializer(new COBootstrapper());
+        TestSuiteInitializer testSuiteInitializer = new TestSuiteInitializer(new OA2Bootstrapper());
         testSuiteInitializer.init();
     }
 }

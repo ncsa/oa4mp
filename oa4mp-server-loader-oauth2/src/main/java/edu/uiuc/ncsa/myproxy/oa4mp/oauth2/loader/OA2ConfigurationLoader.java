@@ -177,19 +177,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         }
         return macp;
     }
-/*    MultiLDAPStoreProvider mldap = null;
 
-    protected MultiLDAPStoreProvider getMLDAP() {
-        if (mldap == null) {
-            mldap = new MultiLDAPStoreProvider(cn, isDefaultStoreDisabled(), (MyLoggingFacade) loggerProvider.get(), null, null, LDAPStoreProviderUtil.getLdapEntryProvider());
-            mldap.addListener(LDAPStoreProviderUtil.getM(cn));
-            mldap.addListener(LDAPStoreProviderUtil.getFSP(cn));
-            mldap.addListener(LDAPStoreProviderUtil.getMariaDB(cn, getMariaDBConnectionPoolProvider()));
-            mldap.addListener(LDAPStoreProviderUtil.getMysql(cn, getMySQLConnectionPoolProvider()));
-            mldap.addListener(LDAPStoreProviderUtil.getPG(cn, getPgConnectionPoolProvider()));
-        }
-        return mldap;
-    }*/
     protected JSONWebKeys getJSONWebKeys() {
         ConfigurationNode node = getFirstNode(cn, "JSONWebKey");
         if(node == null){
@@ -409,7 +397,6 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                 DebugUtil.dbg(this, "No server-wide configured Scope handler");
                 if (getLdapConfiguration().isEnabled()) {
                     DebugUtil.dbg(this, "   LDAP scope handler enabled, creating default");
-
                     claimSource = new LDAPClaimsSource(getLdapConfiguration(), myLogger);
                 } else {
                     DebugUtil.dbg(this, "   LDAP scope handler disabled, creating basic");
@@ -427,7 +414,8 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
 
     protected LDAPConfiguration getLdapConfiguration() {
         if (ldapConfiguration == null) {
-            ldapConfiguration = LDAPConfigurationUtil.getLdapConfiguration(myLogger, cn);
+            LDAPConfigurationUtil ldapConfigurationUtil = new LDAPConfigurationUtil();
+            ldapConfiguration = ldapConfigurationUtil.getLdapConfiguration(myLogger, cn);
         }
         return ldapConfiguration;
 
