@@ -33,7 +33,7 @@ public class NCSAGroupHandler extends GroupHandler {
     @Override
     public Groups parse(JSONArray jsonArray) {
         try {
-            return LDAPClaimsSource.get_NEW_Gid(claimsSource.getCfg(), userName);
+            return LDAPClaimsSource.get_NEW_Gid(claimsSource.getLDAPCfg(), userName);
         } catch (Throwable throwable) {
             throwable.printStackTrace();
         }

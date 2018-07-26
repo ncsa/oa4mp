@@ -25,20 +25,28 @@ import static edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfigurationUt
  * This helps work with the configuration for a client. The basic format is
  * <pre>
  *    {"config":"comment",
- *      "claims":[{a0,z0},{a1,z1},{a2,z2}]
- *      "runtime":[...]
+ *      "claims":{
+ *         "runtime":[...],
+ *         "sources:[{"alias":"A","className":"B"},...],
+ *         "sourcesConfig":[{config1,...}],
+ *         "preProcessing":[],
+ *         "postProcessing":[]
+ *      }
  *    }*
  * </pre>
  * Where a0,a1,... is one of
  * <ul>
- * <li>sources= list of aliases and class names</li>
+ * <li>sources= list of aliases and class names, </li>
  * <li>sourceConfig = configurations corresponding to the sources</li>
- * <li>processing = directives to run <b>after</b> the claims have been obtained</li>
+ * <li>preProcessing = directives to run <b>before</b> the claims have been obtained</li>
+ * <li>postProcessing = directives to run <b>after</b> the claims have been obtained</li>
  * </ul>
  * and
  * <pre>
  *     runtime = directives to run before any processing. E.g. A condition to determine if claims are to be gotten.
  * </pre>
+ * The sourcesConfig-urations are a list of configurations for the claim sources. This allows for multiple configurations
+ * to be used (e,g. depending on the IDP,  specific LDAP claim sources will be invoked.)
  * <p>Created by Jeff Gaynor<br>
  * on 4/12/18 at  8:16 AM
  */
@@ -143,7 +151,7 @@ public class OA2ClientConfigurationUtil extends ClientConfigurationUtil {
 
         JSONObject claims = config.getJSONObject(CLAIMS_KEY);
         Object obj = claims.get(key);
-        DebugUtil.dbg(OA2ClientConfigurationUtil.class, ".getClaimsProcessor: raw claims=" + obj);
+        DebugUtil.dbg(OA2ClientConfigurationUtil.class, ".getClaimsProcessor: JSON configuration object for this key=" + obj);
 
         if (obj instanceof JSONArray) {
             JSONObject j = new JSONObject();
@@ -241,6 +249,8 @@ public class OA2ClientConfigurationUtil extends ClientConfigurationUtil {
         JSONObject content = oldLDAP.getJSONObject(LDAP_TAG);
 
         boolean containsOldLDAP = false;
+        // now to figure out the id. Sometime people use the name field instead.
+
 
         if (content.containsKey(ID_TAG) && !content.getString(ID_TAG).isEmpty()) {
             String oldLDAPName = content.getString(ID_TAG);
@@ -310,23 +320,6 @@ public class OA2ClientConfigurationUtil extends ClientConfigurationUtil {
         j.put(FunctorTypeImpl.OR.getValue(), array);
         LogicBlocks<? extends LogicBlock> defaultLBs = ff.createLogicBlock(j);
         setClaimsPreProcessing(config, defaultLBs.toJSON());
-
-        // there should be one and we need it.
-       /* LogicBlock lb = defaultLBs.get(0);
-        JSONObject ifBlock = JSONObject.fromObject(lb.toString());
-
-        if(hasRuntime(config)){
-
-        }else{
-            JSONObject runtime = new JSONObject();
-            runtime.put(FunctorTypeImpl.OR.getValue(), )
-
-        }
-        JSONArray runtimeArray = getRuntimeArg(config);
-
-        runtimeArray.add(ifBlock);
-        runtime.
-        setClaimsPreProcessing(config, runtime);*/
     }
 
     public static boolean isSaved(JSONObject config) {

@@ -40,16 +40,45 @@ public class OA2ClaimsUtil {
     }
 
     /**
+     * <b><i>ONLY reset the accounting information (timestamps etc.) </i></b>
+     *
+     * @param request
+     * @param claims
+     * @return
+     */
+    public JSONObject setAccountingInformation(HttpServletRequest request, JSONObject claims) {
+        DebugUtil.dbg(this, "Starting to process basic claims");
+        if (transaction.hasAuthTime()) {
+            // convert the date to a time if needed.
+            claims.put(AUTHORIZATION_TIME, Long.toString(transaction.getAuthTime().getTime() / 1000));
+        }
+        claims.put(EXPIRATION, System.currentTimeMillis() / 1000 + 15 * 60); // expiration is in SECONDS from the epoch.
+        claims.put(ISSUED_AT, System.currentTimeMillis() / 1000); // issued at = current time in seconds.
+        if (transaction.hasAuthTime()) {
+            // convert the date to a time if needed.
+            claims.put(AUTHORIZATION_TIME, Long.toString(transaction.getAuthTime().getTime() / 1000));
+        }
+        if (transaction.getNonce() != null && 0 < transaction.getNonce().length()) {
+            claims.put(NONCE, transaction.getNonce());
+        }
+        return claims;
+    }
+
+    /**
      * This method puts the required information into a claims. Use this on claims again whenever a
      * request for claims is made, so the timestamps etc. are current. Some clients use this information,
      * for better for work, as accounting information on the access or refresh token and these clients
-     * will break if the timestamps are not updated (e.g. kubernetes).
+     * will break if the timestamps are not updated (e.g. kubernetes). <br/>
+     *
+     * Note that if you call this after processing, claim sources etc. you will overwrite anything
+     * you have done. Generally if you need to reset the timestamps, you should call
+     * {@link #setAccountingInformation(HttpServletRequest, JSONObject)} instead.
      *
      * @param claims
      * @return
      * @throws Throwable
      */
-    public JSONObject initializeClaims(HttpServletRequest request, JSONObject claims)  {
+    public JSONObject initializeClaims(HttpServletRequest request, JSONObject claims) {
 
         DebugUtil.dbg(this, "Starting to process basic claims");
         String issuer = null;
@@ -77,28 +106,15 @@ public class OA2ClaimsUtil {
             issuer = OA2DiscoveryServlet.getIssuer(request);
         }
         claims.put(OA2Claims.ISSUER, issuer);
-
         claims.put(OA2Claims.SUBJECT, transaction.getUsername());
-        if (transaction.hasAuthTime()) {
-            // convert the date to a time if needed.
-            claims.put(AUTHORIZATION_TIME, Long.toString(transaction.getAuthTime().getTime() / 1000));
-        }
-        if (transaction.getNonce() != null && 0 < transaction.getNonce().length()) {
-            claims.put(NONCE, transaction.getNonce());
-        }
-        if (transaction.hasAuthTime()) {
-            // convert the date to a time if needed.
-            claims.put(AUTHORIZATION_TIME, Long.toString(transaction.getAuthTime().getTime() / 1000));
-        }
         claims.put(AUDIENCE, transaction.getClient().getIdentifierString());
-        claims.put(EXPIRATION, System.currentTimeMillis() / 1000 + 15 * 60); // expiration is in SECONDS from the epoch.
-        claims.put(ISSUED_AT, System.currentTimeMillis() / 1000); // issued at = current time in seconds.
-
-        return claims;
+        // now set all the timestamps and such.
+        return setAccountingInformation(request, claims);
     }
 
     /**
      * Creates the most basic claim object for this.
+     *
      * @param request
      * @return
      * @throws Throwable
@@ -108,7 +124,7 @@ public class OA2ClaimsUtil {
         if (claims == null) {
             claims = new JSONObject();
         }
-        if(!t.getScopes().contains(OA2Scopes.SCOPE_OPENID)){
+        if (!t.getScopes().contains(OA2Scopes.SCOPE_OPENID)) {
             throw new OA2GeneralError(OA2Errors.INVALID_SCOPE, "invalid scope: no open id scope", HttpStatus.SC_UNAUTHORIZED);
         }
         claims = initializeClaims(request, claims);
@@ -121,7 +137,7 @@ public class OA2ClaimsUtil {
             getCC().setSaved(true); // do this so it ends up in storage as saved, otherwise it gets saved every time.
             // This means that the configuration was updated on load and needs to be saved.
             oa2se.getClientStore().save(client);
-        }else{
+        } else {
             ServletDebugUtil.dbg(this, "*NOT* saving updated client " + client.getIdentifierString());
         }
         DebugUtil.dbg(this, "Done with basic claims = " + claims);
@@ -144,7 +160,6 @@ public class OA2ClaimsUtil {
         }
 
         DebugUtil.dbg(this, "Starting to process Client runtime and sources at authorization.");
-
 
 
         if (client.getConfig() == null || client.getConfig().isEmpty()) {
@@ -265,6 +280,13 @@ public class OA2ClaimsUtil {
                 for (int i = 0; i < claimsSources.size(); i++) {
                     ClaimSource claimSource = claimsSources.get(i);
                     if (!claimSource.isRunAtAuthorization()) {
+                        if (claimSource instanceof BasicClaimsSourceImpl) {
+                            // since the claim sources were just made, set the environment if it has not been set yet.
+                            BasicClaimsSourceImpl b = (BasicClaimsSourceImpl) claimSource;
+                            if (b.getOa2SE() == null) {
+                                b.setOa2SE(oa2se);
+                            }
+                        }
                         claimSource.process(claims, transaction);
                         DebugUtil.dbg(this, "After invoking claim source, new claims = " + claims);
                     }
@@ -289,8 +311,7 @@ public class OA2ClaimsUtil {
         // After post-processing it is possible that this user should be forbidden access, e.g. they are not in the correct group.
         // This is the first place we can check. If they are not allowed to make further requests, an access denied exception is thrown.
         if (!flowStates.acceptRequests) {
-            DebugUtil.dbg(this, "Access denied for user name =" + transaction.getUsername());
-
+            DebugUtil.dbg(this, "Access denied for user name = " + transaction.getUsername());
             throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "access denied", HttpStatus.SC_UNAUTHORIZED);
         }
         return claims;

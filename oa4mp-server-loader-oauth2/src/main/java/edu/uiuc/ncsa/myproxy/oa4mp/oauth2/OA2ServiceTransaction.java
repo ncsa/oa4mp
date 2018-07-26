@@ -100,7 +100,12 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction {
 
     Date authTime = null;
 
-
+    /**
+     * The <b><i>resolved</i></b> scopes for this transaction. This means that the intersection of the client's allowed
+     * scopes, the client's requested scopes and the scopes enabled on the server are placed here. This should be passed
+     * to anything that needs the scopes (e.g. a {@link edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource}.
+     * @return
+     */
     public Collection<String> getScopes() {
         if (scopes == null) {
             scopes = new ArrayList<>();

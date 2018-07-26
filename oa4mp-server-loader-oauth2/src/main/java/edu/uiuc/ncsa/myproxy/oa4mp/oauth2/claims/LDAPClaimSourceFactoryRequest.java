@@ -12,13 +12,11 @@ import java.util.Collection;
  */
 public class LDAPClaimSourceFactoryRequest extends ClaimSourceFactoryRequest{
     public LDAPConfiguration getLdapConfiguration() {
-        return ldapConfiguration;
+        return (LDAPConfiguration)getConfiguration();
     }
 
-    LDAPConfiguration ldapConfiguration;
     public LDAPClaimSourceFactoryRequest(MyLoggingFacade logger, LDAPConfiguration ldap, Collection<String> scopes) {
-        super(logger, scopes);
-        ldapConfiguration = ldap;
+        super(logger, ldap, scopes);
     }
 
 

@@ -66,7 +66,7 @@ public abstract class StoreCommands2 extends StoreCommands {
                 }
                 say("done!");
             } catch (Throwable e) {
-                say("warning, could not find file at path " + inputLine.getArg(inputLine.indexOf("-file")));
+                say("warning, could not find file at path \"" + inputLine.getNextArgFor("-file") + "\", " + e.getMessage());
             }
         } else {
             say("Missing file argument. Cannot deserialize.");

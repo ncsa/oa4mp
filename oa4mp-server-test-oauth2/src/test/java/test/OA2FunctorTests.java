@@ -8,6 +8,8 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientConfigurationUtil;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Scopes;
+import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSourceConfiguration;
+import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSourceConfigurationUtil;
 import edu.uiuc.ncsa.security.util.JFunctorTest;
 import edu.uiuc.ncsa.security.util.functor.*;
 import edu.uiuc.ncsa.security.util.functor.logic.*;
@@ -900,7 +902,7 @@ public class OA2FunctorTests extends JFunctorTest {
         Collection<String> scopes = new ArrayList<>();
         scopes.add(OA2Scopes.SCOPE_OPENID);
         scopes.add(OA2Scopes.SCOPE_EMAIL);
-        String raw = "{\"$hasScope\":[\""+ OA2Scopes.SCOPE_OPENID + "\"]";
+        String raw = "{\"$hasScope\":[\""+ OA2Scopes.SCOPE_OPENID + "\"]}";
         JSONObject claims = createClaims();
 
         OA2FunctorFactory functorFactory = new OA2FunctorFactory(claims,scopes);
@@ -908,12 +910,245 @@ public class OA2FunctorTests extends JFunctorTest {
         hasScope.execute();
         assert hasScope.getBooleanResult();
 
-        raw = "{\"$hasScope\":[\""+ OA2Scopes.SCOPE_MYPROXY + "\"]";
+        raw = "{\"$hasScope\":[\""+ OA2Scopes.SCOPE_MYPROXY + "\"]}";
         hasScope = (jhasScope) functorFactory.create(raw);
         hasScope.execute();
         assert !hasScope.getBooleanResult();
 
 
+    }
+
+
+    String rawJSON3="{\n" +
+               "  \"config\": \"LSST client configuration, created by JeffGaynor 6/19/2018\",\n" +
+               "  \"claims\": {\n" +
+               "    \"sourceConfig\": [\n" +
+               "      {\n" +
+               "        \"default\": {\n" +
+               "          \"preProcessing\": [\n" +
+               "            {\n" +
+               "              \"$if\": [\n" +
+               "                {\n" +
+               "                  \"$match\": [\n" +
+               "                    \"${idp}\",\n" +
+               "                    \"https://idp.ncsa.illinois.edu/idp/shibboleth\"\n" +
+               "                  ]\n" +
+               "                }\n" +
+               "              ],\n" +
+               "              \"$then\": [\n" +
+               "                {\n" +
+               "                  \"$set\": [\n" +
+               "                    \"foo\",\n" +
+               "                    {\n" +
+               "                      \"$drop\": [\n" +
+               "                        \"@ncsa.illinois.edu\",\n" +
+               "                        \"${eppn}\"\n" +
+               "                      ]\n" +
+               "                    }\n" +
+               "                  ]\n" +
+               "                }\n" +
+               "              ],\n" +
+               "              \"$else\": [{\"$get_claims\": [\"$false\"]}]\n" +
+               "            }\n" +
+               "          ],\n" +
+               "          \"postProcessing\": [\n" +
+               "            {\n" +
+               "              \"$if\": [\n" +
+               "                {\n" +
+               "                  \"$match\": [\n" +
+               "                    \"${idp}\",\n" +
+               "                    \"https://idp.ncsa.illinois.edu/idp/shibboleth\"\n" +
+               "                  ]\n" +
+               "                }\n" +
+               "              ],\n" +
+               "              \"$then\": [\n" +
+               "                {\n" +
+               "                  \"$set\": [\n" +
+               "                    \"sub\",\n" +
+               "                    {\"$get\": [\"eppn\"]}\n" +
+               "                  ]\n" +
+               "                },\n" +
+               "                {\"$exclude\": [\"foo\"]}\n" +
+               "              ]\n" +
+               "            }\n" +
+               "          ],\n" +
+               "          \"failOnError\": \"false\",\n" +
+               "          \"address\": \"ldap.ncsa.illinois.edu\",\n" +
+               "          \"port\": 636,\n" +
+               "          \"enabled\": \"true\",\n" +
+               "          \"authorizationType\": \"none\",\n" +
+               "          \"searchName\": \"foo\",\n" +
+               "          \"searchAttributes\": [\n" +
+               "            {\n" +
+               "              \"name\": \"mail\",\n" +
+               "              \"returnAsList\": false,\n" +
+               "              \"returnName\": \"email\"\n" +
+               "            },\n" +
+               "            {\n" +
+               "              \"name\": \"uid\",\n" +
+               "              \"returnAsList\": false,\n" +
+               "              \"returnName\": \"uid\"\n" +
+               "            },\n" +
+               "            {\n" +
+               "              \"name\": \"uidNumber\",\n" +
+               "              \"returnAsList\": false,\n" +
+               "              \"returnName\": \"uidNumber\"\n" +
+               "            },\n" +
+               "            {\n" +
+               "              \"name\": \"cn\",\n" +
+               "              \"returnAsList\": false,\n" +
+               "              \"returnName\": \"name\"\n" +
+               "            },\n" +
+               "            {\n" +
+               "              \"name\": \"memberOf\",\n" +
+               "              \"isGroup\": true,\n" +
+               "              \"returnAsList\": false,\n" +
+               "              \"returnName\": \"isMemberOf\"\n" +
+               "            }\n" +
+               "          ],\n" +
+               "          \"searchBase\": \"ou=People,dc=ncsa,dc=illinois,dc=edu\",\n" +
+               "          \"contextName\": \"\",\n" +
+               "          \"ssl\": {\n" +
+               "            \"tlsVersion\": \"TLS\",\n" +
+               "            \"useJavaTrustStore\": true\n" +
+               "          },\n" +
+               "          \"name\": \"3258ed63b62d1a78\",\n" +
+               "          \"id\": \"62d1a78\"\n" +
+               "        }\n" +
+               "      }\n" +
+               "    ],\n" +
+               "    \"preProcessing\": [\n" +
+               "      {\n" +
+               "        \"$if\": [\"$true\"],\n" +
+               "        \"$then\": [\n" +
+               "          {\n" +
+               "            \"$set_claim_source\": [\n" +
+               "              \"LDAP\",\n" +
+               "              \"3258ed63b62d1a78\"\n" +
+               "            ]\n" +
+               "          }\n" +
+               "        ]\n" +
+               "      }\n" +
+               "    ],\n" +
+               "    \"postProcessing\": {\n" +
+               "      \"$xor\": [\n" +
+               "        {\n" +
+               "          \"$if\": [{\"$hasClaim\": [\"eppn\"]}],\n" +
+               "          \"$then\": [\n" +
+               "            {\n" +
+               "              \"$set\": [\n" +
+               "                \"voPersonExternalID\",\n" +
+               "                {\"$get\": [\"eppn\"]}\n" +
+               "              ]\n" +
+               "            }\n" +
+               "          ]\n" +
+               "        },\n" +
+               "        {\n" +
+               "          \"$if\": [{\"$hasClaim\": [\"eptid\"]}],\n" +
+               "          \"$then\": [\n" +
+               "            {\n" +
+               "              \"$set\": [\n" +
+               "                \"voPersonExternalID\",\n" +
+               "                {\"$get\": [\"eptid\"]}\n" +
+               "              ]\n" +
+               "            }\n" +
+               "          ]\n" +
+               "        },\n" +
+               "        {\n" +
+               "          \"$if\": [\n" +
+               "            {\n" +
+               "              \"$equals\": [\n" +
+               "                {\"$get\": [\"idp\"]},\n" +
+               "                \"http://github.com/login/oauth/authorize\"\n" +
+               "              ]\n" +
+               "            }\n" +
+               "          ],\n" +
+               "          \"$then\": [\n" +
+               "            {\n" +
+               "              \"$set\": [\n" +
+               "                \"voPersonExternalID\",\n" +
+               "                {\n" +
+               "                  \"$concat\": [\n" +
+               "                    {\"$get\": [\"oidc\"]},\n" +
+               "                    \"@github.com\"\n" +
+               "                  ]\n" +
+               "                }\n" +
+               "              ]\n" +
+               "            }\n" +
+               "          ]\n" +
+               "        },\n" +
+               "        {\n" +
+               "          \"$if\": [\n" +
+               "            {\n" +
+               "              \"$equals\": [\n" +
+               "                {\"$get\": [\"idp\"]},\n" +
+               "                \"http://google.com/accounts/o8/id\"\n" +
+               "              ]\n" +
+               "            }\n" +
+               "          ],\n" +
+               "          \"$then\": [\n" +
+               "            {\n" +
+               "              \"$set\": [\n" +
+               "                \"voPersonExternalID\",\n" +
+               "                {\n" +
+               "                  \"$concat\": [\n" +
+               "                    {\"$get\": [\"oidc\"]},\n" +
+               "                    \"@accounts.google.com\"\n" +
+               "                  ]\n" +
+               "                }\n" +
+               "              ]\n" +
+               "            }\n" +
+               "          ]\n" +
+               "        },\n" +
+               "        {\n" +
+               "          \"$if\": [\n" +
+               "            {\n" +
+               "              \"$equals\": [\n" +
+               "                {\"$get\": [\"idp\"]},\n" +
+               "                \"http://orcid.org/oauth/authorize\"\n" +
+               "              ]\n" +
+               "            }\n" +
+               "          ],\n" +
+               "          \"$then\": [\n" +
+               "            {\n" +
+               "              \"$set\": [\n" +
+               "                \"voPersonExternalID\",\n" +
+               "                {\n" +
+               "                  \"$replace\": [\n" +
+               "                    {\"$get\": [\"oidc\"]},\n" +
+               "                    \"http://\",\n" +
+               "                    \"https://\"\n" +
+               "                  ]\n" +
+               "                }\n" +
+               "              ]\n" +
+               "            }\n" +
+               "          ]\n" +
+               "        }\n" +
+               "      ]\n" +
+               "    }\n" +
+               "  },\n" +
+               "  \"isSaved\": false\n" +
+               "}\n";
+
+    /**
+     * Tests that this will make a configuration correctly if the correct node is handed in.
+     * @throws Exception
+     */
+    @Test
+    public void testConfigUtil() throws Exception{
+        ClaimSourceConfigurationUtil util = new ClaimSourceConfigurationUtil();
+        JSONObject json = JSONObject.fromObject(rawJSON3);
+        JSONObject claims = json.getJSONObject("claims");
+        JSONArray cfgArray = claims.getJSONArray("sourceConfig");
+        ClaimSourceConfiguration cfg = util.fromJSON(null, cfgArray.getJSONObject(0));
+        assert cfg.isEnabled();
+        assert cfg.getId().equals("62d1a78");
+        assert cfg.getName().equals("3258ed63b62d1a78");
+        assert !cfg.isFailOnError();
+        assert !cfg.isNotifyOnFail();
+        assert cfg.hasJSONPreProcessing();
+        assert cfg.hasJSONPostProcessing();
+        assert cfg.getProperty("address").equals("ldap.ncsa.illinois.edu");
     }
 }
 

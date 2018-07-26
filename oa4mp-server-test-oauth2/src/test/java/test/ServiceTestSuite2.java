@@ -28,6 +28,7 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
         JFunctorTest.class,
         OA2ParserTest.class,
+        OA2FunctorTests.class,
         JFunctorFactoryTests.class,
         NewCAStoreTest.class,
         NewClientStoreTest.class,

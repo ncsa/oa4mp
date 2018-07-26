@@ -64,7 +64,7 @@ public class UserInfoServlet extends MyProxyDelegationServlet {
         UIIResponse2 uiresp = (UIIResponse2) uis.process(uireq);
         // add the claims we have stored.
         OA2ClaimsUtil claimsUtil = new OA2ClaimsUtil(oa2SE,transaction );
-        transaction.setClaims(claimsUtil.initializeClaims(request, transaction.getClaims()));
+        transaction.setClaims(claimsUtil.setAccountingInformation(request, transaction.getClaims()));
         getTransactionStore().save(transaction);
         uiresp.getUserInfo().getMap().putAll(stripClaims(transaction.getClaims()));
         uiresp.write(response);
