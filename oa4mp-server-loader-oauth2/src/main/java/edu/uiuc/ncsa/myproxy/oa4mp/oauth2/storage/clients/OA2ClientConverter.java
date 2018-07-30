@@ -92,13 +92,17 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
 
 
         } else {
-            if (cfg == null) {
+            // This next block was to convert to new format, but the monitor which pings the system regularly
+            // just ended up filling up the logs (since it would get the client, but then not do anything after
+            // the initial call, hence never saving the changes.
+            // Seriously not worth it do have this here.
+          /*  if (cfg == null) {
                 cfg = new JSONObject();
                 OA2ClientConfigurationUtil.setComment(cfg, "Created by converter from old LDAP entry");
-            }
-            ServletDebugUtil.dbg(this,"starting to convert client with id=" + otherV.getIdentifierString());
+                ServletDebugUtil.dbg(this,"starting to convert client with id=" + otherV.getIdentifierString());
+                OA2ClientConfigurationUtil.convertToNewConfiguration(ldap, cfg);
+            }*/
 
-            OA2ClientConfigurationUtil.convertToNewConfiguration(ldap, cfg);
             // NOTE!! This next set of statement takes an existing LDAP and puts it back into the
             // configuration. This effectively updates the name (if needed) to ensure that conversion is
             // properly made to the new version, 4.0. If you remove this, you will delete the old LDAP

@@ -37,6 +37,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
 
 
     public LDAPClaimsSource(LDAPConfiguration ldapConfiguration, MyLoggingFacade myLogger) {
+        super();
         if (ldapConfiguration == null) {
             throw new IllegalArgumentException("Error: null ldap config");
         }
@@ -75,30 +76,30 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
     public String getSearchName(JSONObject claims, HttpServletRequest request, ServiceTransaction transaction) {
         DebugUtil.dbg(this, "starting to get search name");
         LDAPConfigurationUtil ldapConfigurationUtil = new LDAPConfigurationUtil();
-        JSONObject xxx = ldapConfigurationUtil.toJSON(getCfg());
+        JSONObject xxx = ldapConfigurationUtil.toJSON(getLDAPCfg());
         xxx.getJSONObject("ldap").getJSONObject("ssl").put("keystore", "");
-        if (getCfg().getSearchNameKey() == null) {
+        if (getLDAPCfg().getSearchNameKey() == null) {
             DebugUtil.dbg(this, "No search name given for LDAP query. Using default of username " + transaction.getUsername());
 
             warn("No search name given for LDAP query. Using default of username");
             return transaction.getUsername();
         }
-        if (getCfg().getSearchNameKey().equals(LDAPConfigurationUtil.SEARCH_NAME_USERNAME)) {
+        if (getLDAPCfg().getSearchNameKey().equals(LDAPConfigurationUtil.SEARCH_NAME_USERNAME)) {
             return transaction.getUsername();
         }
-        if (!claims.containsKey(getCfg().getSearchNameKey()) || claims.get(getCfg().getSearchNameKey()) == null) {
-            String message = "Error: no recognized search name key was found. Requested was \"" + getCfg().getSearchNameKey() + "\"";
+        if (!claims.containsKey(getLDAPCfg().getSearchNameKey()) || claims.get(getLDAPCfg().getSearchNameKey()) == null) {
+            String message = "Error: no recognized search name key was found. Requested was \"" + getLDAPCfg().getSearchNameKey() + "\"";
             getMyLogger().warn(message);
             throw new IllegalStateException(message);
         }
-        String searchName = (String) claims.get(getCfg().getSearchNameKey());
+        String searchName = (String) claims.get(getLDAPCfg().getSearchNameKey());
         DebugUtil.dbg(this, "returning search name=" + searchName);
 
         return searchName;
     }
 
     protected boolean isNCSA() {
-        return getCfg().getServer().equals("ldap.ncsa.illinois.edu");
+        return getLDAPCfg().getServer().equals("ldap.ncsa.illinois.edu");
     }
 
     MyLoggingFacade myLogger = null;
@@ -113,7 +114,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
 
             return;
         }
-        if (getCfg().isFailOnError()) {
+        if (getLDAPCfg().isFailOnError()) {
             String subjectTemplate = "Error on ${host} contacting LDAP server";
             String messageTemplate = "The following error message was received attempting to contact the " +
                     "LDAP server at ${ldap_host}:\n\n${message}\n\n. The operation did not complete.";
@@ -124,9 +125,9 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
                 x = address.getHost();
             }
             replacements.put("host", x);
-            replacements.put("ldap_host", getCfg().getServer());
+            replacements.put("ldap_host", getLDAPCfg().getServer());
             replacements.put("message", throwable.getMessage());
-            if (getCfg().isNotifyOnFail()) {
+            if (getLDAPCfg().isNotifyOnFail()) {
                 getOa2SE().getMailUtil().sendMessage(subjectTemplate, messageTemplate, replacements);
             }
             throw new GeneralException("Error: Could not communicate with LDAP server. \"" + throwable.getMessage() + "\"");
@@ -142,18 +143,21 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
 
     @Override
     public boolean isEnabled() {
-        return getCfg().isEnabled();
+        if(getConfiguration() == null){
+            return false; // for an LDAP source, no configuration should mean this does nto run.
+        }
+        return super.isEnabled();
     }
 
     @Override
     protected JSONObject realProcessing(JSONObject claims, HttpServletRequest request, ServiceTransaction transaction) throws UnsupportedScopeException {
         if (!isEnabled()) {
-            DebugUtil.dbg(this, "server=" + getCfg().getServer() + ", is NOT enabled.");
+            DebugUtil.dbg(this, "server=" + getLDAPCfg().getServer() + ", is NOT enabled.");
             return claims;
         }
 
         DebugUtil.dbg(this, "Starting LDAP query!");
-        DebugUtil.dbg(this, "target host =" + getCfg().getServer());
+        DebugUtil.dbg(this, "target host =" + getLDAPCfg().getServer());
 
         if (!isLoggedOn()) {
             logon();
@@ -165,7 +169,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
             DebugUtil.dbg(this, "  search name=" + searchName);
 
             if (searchName != null) {
-                Map tempMap = simpleSearch(context, searchName, getCfg().getSearchAttributes());
+                Map tempMap = simpleSearch(context, searchName, getLDAPCfg().getSearchAttributes());
                 DebugUtil.dbg(this, "returned from search:" + tempMap);
                 claims.putAll(tempMap);
             } else {
@@ -194,7 +198,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
      * Convenience to cast the configuration to the right class.
      * @return
      */
-    public LDAPConfiguration getCfg() {
+    public LDAPConfiguration getLDAPCfg() {
         return (LDAPConfiguration) getConfiguration();
     }
 
@@ -242,8 +246,8 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
         try {
             // Set up the environment for creating the initial context
 
-            DirContext dirContext = new InitialDirContext(createEnv(getCfg()));
-            return (LdapContext) dirContext.lookup(getCfg().getSearchBase());
+            DirContext dirContext = new InitialDirContext(createEnv(getLDAPCfg()));
+            return (LdapContext) dirContext.lookup(getLDAPCfg().getSearchBase());
         } catch (Exception e) {
             if (isDebugOn()) {
                 e.printStackTrace();
@@ -256,8 +260,8 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
     @Override
     public Collection<String> getClaims() {
         Collection<String> claims = super.getClaims();
-        for (String key : getCfg().getSearchAttributes().keySet()) {
-            LDAPConfigurationUtil.AttributeEntry ae = getCfg().getSearchAttributes().get(key);
+        for (String key : getLDAPCfg().getSearchAttributes().keySet()) {
+            LDAPConfigurationUtil.AttributeEntry ae = getLDAPCfg().getSearchAttributes().get(key);
             claims.add(ae.targetName);
         }
         return claims;
@@ -290,7 +294,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
         //ctls.setSearchScope(SearchControls.SUBTREE_SCOPE);
         String filter = "(&(" + getSearchFilterAttribute() + "=" + userID + "))";
         DebugUtil.dbg(this, "filter=" + filter);
-        NamingEnumeration e = ctx.search(getCfg().getContextName(), filter, ctls);
+        NamingEnumeration e = ctx.search(getLDAPCfg().getContextName(), filter, ctls);
         return toJSON(attributes, e, userID);
     }
 

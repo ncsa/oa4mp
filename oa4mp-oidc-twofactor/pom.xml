@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.sonatype.oss</groupId>
         <artifactId>oss-parent</artifactId>
-        <version>7</version>
+        <version>9</version>
     </parent>
     <groupId>edu.uiuc.ncsa.myproxy</groupId>
     <artifactId>oa4mp-oidc-twofactor</artifactId>
@@ -137,9 +137,6 @@
                 </executions>
 
                 <configuration>
-                    <manifest>
-                        <addClasspath>true</addClasspath>
-                    </manifest>
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>

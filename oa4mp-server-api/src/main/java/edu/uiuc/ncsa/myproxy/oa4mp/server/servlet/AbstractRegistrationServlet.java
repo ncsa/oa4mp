@@ -194,7 +194,7 @@ public abstract class AbstractRegistrationServlet extends MyProxyDelegationServl
 
             }
             request.setAttribute(CLIENT_NAME, CLIENT_NAME);
-            // Nest commands reset the state on the form so the contents are processed.
+            // Next commands reset the state on the form so the contents are processed.
             request.setAttribute(CLIENT_ACTION_KEY, CLIENT_ACTION_KEY);
             request.setAttribute(CLIENT_ACTION_REQUEST_VALUE, CLIENT_ACTION_REQUEST_VALUE);
             request.setAttribute("actionToTake", request.getContextPath() + "/register");
@@ -212,6 +212,11 @@ public abstract class AbstractRegistrationServlet extends MyProxyDelegationServl
         }
     }
 
+    /**
+     * Sets the parameters from the request so they can be passed back.
+     * @param request
+     * @param r
+     */
     protected void setRetryParameters(HttpServletRequest request, RetryException r) {
         for (Object p : request.getParameterMap().keySet()) {
             if (p != null) {

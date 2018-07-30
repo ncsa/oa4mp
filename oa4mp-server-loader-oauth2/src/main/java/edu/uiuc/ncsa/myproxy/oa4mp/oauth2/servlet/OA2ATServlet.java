@@ -80,42 +80,9 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         OA2ClaimsUtil claimsUtil = new OA2ClaimsUtil(oa2se, st);
         // Every time there is a refresh, you must reinitialize the claims to have the right timestamps or
         // clients that verify the claims will fail.
-        st.setClaims(claimsUtil.initializeClaims(request, st.getClaims()));
+        st.setClaims(claimsUtil.setAccountingInformation(request, st.getClaims()));
         return st.getClaims();
-/*
-        String issuer = null;
-        // So in order
-        // 1. get the issuer from the admin client
-        List<Identifier> admins = oa2se.getPermissionStore().getAdmins(st.getClient().getIdentifier());
 
-        for (Identifier adminID : admins) {
-            AdminClient ac = oa2se.getAdminClientStore().get(adminID);
-            if (ac != null) {
-                if (ac.getIssuer() != null) {
-                    issuer = ac.getIssuer();
-                    break;
-                }
-            }
-        }
-        // 2. If the admin client does not have an issuer set, see if the client has one
-        if (issuer == null) {
-            issuer = ((OA2Client) st.getClient()).getIssuer();
-        }
-
-        // 3. If the client does not have one, see if there is a server default to use
-        // The discovery servlet will try to use the server default or construct the issuer
-        if (issuer == null) {
-            issuer = OA2DiscoveryServlet.getIssuer(request);
-        }
-        p.put(OA2Claims.ISSUER, issuer);
-
-        p.put(OA2Claims.SUBJECT, st.getUsername());
-        if (st.hasAuthTime()) {
-            // convert the date to a time if needed.
-            p.put(OA2Constants.AUTHORIZATION_TIME, Long.toString(st.getAuthTime().getTime() / 1000));
-        }
-        return p;
-*/
     }
 
     /**
@@ -473,7 +440,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         DebugUtil.dbg(OA2ATServlet.class, "Getting configured claim source factory " + ClaimSourceFactoryImpl.getFactory().getClass().getSimpleName());
         DebugUtil.dbg(OA2ATServlet.class, "Adding other claim sources");
 
-        scopeHandlers.addAll(ClaimSourceFactoryImpl.createClaimSources(oa2SE, client));
+        scopeHandlers.addAll(ClaimSourceFactoryImpl.createClaimSources(oa2SE, transaction));
         DebugUtil.dbg(OA2ATServlet.class, "Total claim source count = " + scopeHandlers.size());
 
         ClaimSourceFactoryImpl.setFactory(oldSHF);
