@@ -140,7 +140,7 @@ public class OA2ClaimsUtil {
         } else {
             ServletDebugUtil.dbg(this, "*NOT* saving updated client " + client.getIdentifierString());
         }
-        DebugUtil.dbg(this, "Done with basic claims = " + claims);
+        DebugUtil.dbg(this, "Done with basic claims = " + claims.toString(1));
         if (transaction.getOA2Client().isPublicClient()) {
             // Public clients do not get more than basic claims.
             oa2se.getTransactionStore().save(transaction);
@@ -202,7 +202,7 @@ public class OA2ClaimsUtil {
                         oa2se.getTransactionStore().save(transaction);
                         throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "access denied", HttpStatus.SC_UNAUTHORIZED);
                     }
-                    DebugUtil.dbg(this, "user info for claim source #" + claimSource + " = " + claims);
+                    DebugUtil.dbg(this, "user info for claim source #" + claimSource + " = " + claims.toString(1));
                 }
             }
 
@@ -267,7 +267,7 @@ public class OA2ClaimsUtil {
         // so this client has a specific configuration that is to be invoked.
         OA2ClientConfiguration oa2CC = getCC();
 
-        DebugUtil.dbg(this, "BEFORE invoking claim sources, claims are = " + claims);
+        DebugUtil.dbg(this, "BEFORE invoking claim sources, claims are = " + claims.toString(1));
         if (flowStates.getClaims) {
             DebugUtil.dbg(this, "Claims allowed, creating sources from configuration");
             OA2ClientConfigurationFactory<OA2ClientConfiguration> ff = new OA2ClientConfigurationFactory(getFF());
@@ -288,7 +288,7 @@ public class OA2ClaimsUtil {
                             }
                         }
                         claimSource.process(claims, transaction);
-                        DebugUtil.dbg(this, "After invoking claim source, new claims = " + claims);
+                        DebugUtil.dbg(this, "After invoking claim source, new claims = " + claims.toString(1));
                     }
                 }
             }
@@ -307,7 +307,7 @@ public class OA2ClaimsUtil {
         transaction.setFlowStates(flowStates);
         transaction.setClaims(claims);// since the JSON library tends to clone things and they go missing, just set it again.
         oa2se.getTransactionStore().save(transaction);
-        DebugUtil.dbg(this, "Done with special claims=" + claims);
+        DebugUtil.dbg(this, "Done with special claims=" + claims.toString(1));
         // After post-processing it is possible that this user should be forbidden access, e.g. they are not in the correct group.
         // This is the first place we can check. If they are not allowed to make further requests, an access denied exception is thrown.
         if (!flowStates.acceptRequests) {

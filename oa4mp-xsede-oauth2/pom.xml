@@ -201,9 +201,6 @@
                 </executions>
 
                 <configuration>
-                    <manifest>
-                        <addClasspath>true</addClasspath>
-                    </manifest>
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>

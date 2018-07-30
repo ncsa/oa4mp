@@ -202,5 +202,10 @@ public class OA2RegistrationServlet extends AbstractRegistrationServlet {
         } else {
             request.setAttribute(REFRESH_TOKEN_FIELD_VISIBLE, " style=\"display: none;\""); // it's not
         }
+        // reset the scopes or they won't display.
+        // Partial fix for CIL-498 This won't pick up on
+        String[] scopes = new String[getOA2SE().getScopes().size()];
+        getOA2SE().getScopes().toArray(scopes);
+        request.setAttribute(SCOPES_NAME, scopes);
     }
 }

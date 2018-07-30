@@ -29,7 +29,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
+import java.util.StringTokenizer;
 
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.*;
 
@@ -129,7 +132,7 @@ public class OA2AuthorizedServletUtil {
         t = doDelegation(httpServletRequest, httpServletResponse);
         OA2ClaimsUtil claimsUtil = new OA2ClaimsUtil((OA2SE) servlet.getServiceEnvironment(), t);
         DebugUtil.dbg(this, "starting to process claims:");
-        claimsUtil.createBasicClaims(httpServletRequest,t);
+        claimsUtil.createBasicClaims(httpServletRequest, t);
         //  servlet.getTransactionStore().save(t); // save the claims.
         DebugUtil.dbg(this, "done with claims, transaction saved, claims = " + t.getClaims());
         return t;
@@ -288,9 +291,21 @@ public class OA2AuthorizedServletUtil {
         if (rawScopes == null || rawScopes.length() == 0) {
             throw new OA2RedirectableError(OA2Errors.INVALID_SCOPE, "Missing scopes parameter.", state, givenRedirect);
         }
-
-        StringTokenizer stringTokenizer = new StringTokenizer(rawScopes);
         Collection<String> scopes = new ArrayList<>();
+
+        OA2Client oa2Client = (OA2Client) st.getClient();
+        if (oa2Client.isPublicClient()) {
+            if(!oa2Client.getScopes().contains(OA2Scopes.SCOPE_OPENID)){
+                throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST, "Scopes must contain " + OA2Scopes.SCOPE_OPENID, state, givenRedirect);
+            }
+            // only allowed scope, regardless of what is requested.
+            // This also covers the case of a client made with a full set of scopes, then
+            // converted to a public client but the stored scopes are not updated.
+            scopes.add(OA2Scopes.SCOPE_OPENID);
+            DebugUtil.dbg(this, ".resolveScopes: after resolution=" + scopes);
+            return scopes;
+        }
+        StringTokenizer stringTokenizer = new StringTokenizer(rawScopes);
         boolean hasOpenIDScope = false;
         while (stringTokenizer.hasMoreTokens()) {
             String x = stringTokenizer.nextToken();
@@ -300,8 +315,9 @@ public class OA2AuthorizedServletUtil {
             if (x.equals(OA2Scopes.SCOPE_OPENID)) hasOpenIDScope = true;
             scopes.add(x);
         }
-        Collection<String> storedClientScopes = ((OA2Client) st.getClient()).getScopes();
+        Collection<String> storedClientScopes = oa2Client.getScopes();
         scopes = intersection(OA2Scopes.ScopeUtil.getScopes(), intersection(scopes, storedClientScopes));
+
         DebugUtil.dbg(this, ".resolveScopes: after resolution=" + scopes);
 
 
@@ -309,6 +325,7 @@ public class OA2AuthorizedServletUtil {
             throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST, "Scopes must contain " + OA2Scopes.SCOPE_OPENID, state, givenRedirect);
         return scopes;
     }
+
 
     /**
      * Utility call to return the intersection of two lists of strings.

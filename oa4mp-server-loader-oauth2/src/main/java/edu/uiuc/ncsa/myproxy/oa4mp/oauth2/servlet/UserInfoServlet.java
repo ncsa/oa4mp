@@ -43,9 +43,9 @@ public class UserInfoServlet extends MyProxyDelegationServlet {
         if(!transaction.getFlowStates().userInfo){
             throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "user info access denied", HttpStatus.SC_UNAUTHORIZED);
         }
-        if (transaction.getOA2Client().isPublicClient()) {
+      /*  if (transaction.getOA2Client().isPublicClient()) {
             throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, "public client not authorized to access user information", HttpStatus.SC_UNAUTHORIZED);
-        }
+        }*/
         if (transaction == null) {
             throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, "no transaction for the access token was found.", HttpStatus.SC_BAD_REQUEST);
         }

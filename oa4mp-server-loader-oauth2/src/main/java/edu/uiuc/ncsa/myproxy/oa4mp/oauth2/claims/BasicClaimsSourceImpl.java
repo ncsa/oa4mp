@@ -130,10 +130,10 @@ public class BasicClaimsSourceImpl implements ClaimSource {
         realProcessing(claims, request, t);
         if (hasConfiguration() && hasJSONPostProcessoor()) {
             OA2FunctorFactory ff = new OA2FunctorFactory(claims, t.getScopes());
-            DebugUtil.dbg(this, "claims before post-processing=" + claims);
-            postProcessor = ff.createLogicBlock(((JSONClaimSourceConfig)getConfiguration()).getJSONPostProcessing());
+            DebugUtil.dbg(this, "claims before post-processing=" + claims.toString(1));
+            postProcessor = ff.createLogicBlock((getConfiguration()).getJSONPostProcessing());
             postProcessor.execute();
-            DebugUtil.dbg(this, "claims after post-processing=" + claims);
+            DebugUtil.dbg(this, "claims after post-processing=" + claims.toString(1));
             FlowStates f = t.getFlowStates();
             f.updateValues(postProcessor.getFunctorMap());
             t.setFlowStates(f);
