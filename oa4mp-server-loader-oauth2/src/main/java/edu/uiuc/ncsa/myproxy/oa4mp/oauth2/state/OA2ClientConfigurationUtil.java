@@ -56,7 +56,6 @@ public class OA2ClientConfigurationUtil extends ClientConfigurationUtil {
     public static final String CLAIM_SOURCES_KEY = "sources";
 
     public static final String CLAIM_SOURCE_CONFIG_KEY = "sourceConfig";
-    public static final String SAVED_KEY = "isSaved";
     /**
      * Note that this cannot be the reserved word "class" since the JSON library will attempt to
      * resolve it to a class and do squirrelly things with it if it finds one.
@@ -94,16 +93,7 @@ public class OA2ClientConfigurationUtil extends ClientConfigurationUtil {
 
     }
 
-    static public String getComment(JSONObject cfg) {
-        if (cfg.containsKey(CONFIG_KEY)) {
-            return cfg.getString(CONFIG_KEY);
-        }
-        return "";
-    }
 
-    public static void setComment(JSONObject cfg, String comment) {
-        cfg.put(CONFIG_KEY, comment);
-    }
 
     /**
      * Method to pull the sources from the array of {"alias":A,"className":B} objects
@@ -166,42 +156,28 @@ public class OA2ClientConfigurationUtil extends ClientConfigurationUtil {
 
 
     protected static void setClaimsThingy(JSONObject config, String key, JSON thingy) {
-        JSONObject claims;
-        if (config.containsKey(CLAIMS_KEY)) {
-            claims = config.getJSONObject(CLAIMS_KEY);
-        } else {
-            claims = new JSONObject();
-        }
-        claims.put(key, thingy);
-        config.put(CLAIMS_KEY, claims);
-
+       setThingy(CLAIMS_KEY, config, key, thingy);
     }
 
     public static boolean hasClaimPreProcessor(JSONObject config) {
-        return hasClaimsThingy(config, CLAIM_PRE_PROCESSING_KEY);
+        return hasClaimsThingy(CLAIM_PRE_PROCESSING_KEY, config);
     }
 
     public static boolean hasClaimPostProcessor(JSONObject config) {
-        return hasClaimsThingy(config, CLAIM_POST_PROCESSING_KEY);
+        return hasClaimsThingy(CLAIM_POST_PROCESSING_KEY, config);
     }
 
     public static boolean hasClaimSources(JSONObject config) {
-        return hasClaimsThingy(config, CLAIM_SOURCES_KEY);
+        return hasClaimsThingy(CLAIM_SOURCES_KEY, config);
     }
 
     public static boolean hasClaimSourceConfigurations(JSONObject config) {
-        return hasClaimsThingy(config, CLAIM_SOURCE_CONFIG_KEY);
+        return hasClaimsThingy(CLAIM_SOURCE_CONFIG_KEY, config);
     }
 
 
-    protected static boolean hasClaimsThingy(JSONObject config, String key) {
-        JSONObject claims;
-        if (config.containsKey(CLAIMS_KEY)) {
-            claims = config.getJSONObject(CLAIMS_KEY);
-        } else {
-            claims = new JSONObject();
-        }
-        return claims.containsKey(key);
+    protected static boolean hasClaimsThingy(String key, JSONObject config) {
+      return hasThingy(CLAIMS_KEY, key, config);
     }
 
     public static JSONArray getClaimSourceConfigurations(JSONObject config) {
@@ -322,15 +298,4 @@ public class OA2ClientConfigurationUtil extends ClientConfigurationUtil {
         setClaimsPreProcessing(config, defaultLBs.toJSON());
     }
 
-    public static boolean isSaved(JSONObject config) {
-        if (config.containsKey(SAVED_KEY)) {
-            return config.getBoolean(SAVED_KEY);
-        }
-
-        return true;
-    }
-
-    public static void setSaved(JSONObject config, boolean value) {
-        config.put(SAVED_KEY, value);
-    }
 }

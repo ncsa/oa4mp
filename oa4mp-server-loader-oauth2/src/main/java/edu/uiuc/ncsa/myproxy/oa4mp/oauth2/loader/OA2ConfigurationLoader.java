@@ -49,6 +49,7 @@ import edu.uiuc.ncsa.security.oauth_2_0.server.AGI2;
 import edu.uiuc.ncsa.security.oauth_2_0.server.ATI2;
 import edu.uiuc.ncsa.security.oauth_2_0.server.PAI2;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
+import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSourceConfiguration;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfigurationUtil;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
@@ -120,7 +121,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     getMaxClientRefreshTokenLifetime(),
                     getJSONWebKeys(),
                     getIssuer(),
-                   // getMLDAP(),
+                    // getMLDAP(),
                     isUtilServerEnabled());
             if (getClaimSource() instanceof BasicClaimsSourceImpl) {
                 ((BasicClaimsSourceImpl) getClaimSource()).setOa2SE((OA2SE) se);
@@ -149,11 +150,12 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
     }
 
     Boolean utilServerEnabled = null;
-    protected Boolean isUtilServerEnabled(){
-        if(utilServerEnabled == null){
+
+    protected Boolean isUtilServerEnabled() {
+        if (utilServerEnabled == null) {
             try {
                 utilServerEnabled = Boolean.parseBoolean(getFirstAttribute(cn, OA4MPConfigTags.ENABLE_UTIL_SERVLET));
-            }catch(Throwable t){
+            } catch (Throwable t) {
                 // use default which is to enable. We let this be null to trigger pulling the value, if any, out of the
                 // the configuration
                 utilServerEnabled = Boolean.TRUE;
@@ -162,12 +164,13 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         return utilServerEnabled;
 
     }
+
     protected MultiDSAdminClientStoreProvider macp;
 
-    protected MultiDSAdminClientStoreProvider getMacp(){
-        if(macp == null){
-              macp = new MultiDSAdminClientStoreProvider(cn, isDefaultStoreDisabled(), loggerProvider.get(),null, null,
-                      AdminClientStoreProviders.getAdminClientProvider());
+    protected MultiDSAdminClientStoreProvider getMacp() {
+        if (macp == null) {
+            macp = new MultiDSAdminClientStoreProvider(cn, isDefaultStoreDisabled(), loggerProvider.get(), null, null,
+                    AdminClientStoreProviders.getAdminClientProvider());
             macp.addListener(AdminClientStoreProviders.getACMP(cn));
             macp.addListener(AdminClientStoreProviders.getACFSP(cn));
             macp.addListener(AdminClientStoreProviders.getMariaACS(cn, getMariaDBConnectionPoolProvider()));
@@ -180,7 +183,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
 
     protected JSONWebKeys getJSONWebKeys() {
         ConfigurationNode node = getFirstNode(cn, "JSONWebKey");
-        if(node == null){
+        if (node == null) {
             warn("Error: No signing keys in the configuration file. Signing is not available");
             //throw new IllegalStateException();
             return new JSONWebKeys(null);
@@ -199,7 +202,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
             throw new GeneralException("Error reading signing keys", t);
         }
 
-        if(keys == null){
+        if (keys == null) {
             throw new IllegalStateException("Error: Could not load signing keys");
         }
         keys.setDefaultKeyID(getFirstAttribute(node, "defaultKeyID"));
@@ -238,7 +241,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
             final ClientApprovalProvider caProvider = new ClientApprovalProvider();
             ClientApprovalKeys caKeys = new ClientApprovalKeys();
             caKeys.identifier("client_id");
-           final ClientApproverConverter cp = new ClientApproverConverter(caKeys, caProvider);
+            final ClientApproverConverter cp = new ClientApproverConverter(caKeys, caProvider);
             casp.addListener(new DSFSClientApprovalStoreProvider(cn, cp));
             casp.addListener(new DSSQLClientApprovalStoreProvider(cn, getMySQLConnectionPoolProvider(), OA4MPConfigTags.MYSQL_STORE, cp));
             casp.addListener(new DSSQLClientApprovalStoreProvider(cn, getMariaDBConnectionPoolProvider(), OA4MPConfigTags.MARIADB_STORE, cp));
@@ -256,7 +259,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
 
                 @Override
                 public ClientApprovalStore get() {
-                    return new ClientApprovalMemoryStore(caProvider,cp);
+                    return new ClientApprovalMemoryStore(caProvider, cp);
                 }
             });
         }
@@ -293,8 +296,10 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         return rtLifetime;
 
     }
-   String issuer = null;
-    protected String getIssuer(){
+
+    String issuer = null;
+
+    protected String getIssuer() {
         if (issuer == null) {
             String x = getFirstAttribute(cn, ISSUER);
             // Fixes OAUTH-214
@@ -307,6 +312,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         return issuer;
 
     }
+
     long maxClientRefreshTokenLifetime = -1L;
 
     protected long getMaxClientRefreshTokenLifetime() {
@@ -400,7 +406,10 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     claimSource = new LDAPClaimsSource(getLdapConfiguration(), myLogger);
                 } else {
                     DebugUtil.dbg(this, "   LDAP scope handler disabled, creating basic");
+                    ClaimSourceConfiguration claimSourceConfiguration = new ClaimSourceConfiguration();
+                    claimSourceConfiguration.setEnabled(false);
                     claimSource = new BasicClaimsSourceImpl();
+                    claimSource.setConfiguration(claimSourceConfiguration);
                 }
             }
             claimSource.setScopes(getScopes());

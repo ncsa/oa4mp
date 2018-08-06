@@ -44,8 +44,8 @@ public class OA2Commands extends BaseCommands {
     public static void main(String[] args) {
         try {
             OA2Commands oa2Commands = new OA2Commands(null);
-            oa2Commands.start(args);
-            CLIDriver cli = new CLIDriver(oa2Commands);
+            oa2Commands.start(args); // read the command line options and such to set the state
+            CLIDriver cli = new CLIDriver(oa2Commands); // actually run the driver that parses commands and passes them along
             cli.start();
         } catch (Throwable t) {
             t.printStackTrace();

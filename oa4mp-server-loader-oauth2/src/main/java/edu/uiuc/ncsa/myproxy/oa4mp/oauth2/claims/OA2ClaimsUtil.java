@@ -31,7 +31,7 @@ import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.*;
  * on 4/24/18 at  11:13 AM
  */
 public class OA2ClaimsUtil {
-    OA2ServiceTransaction transaction;
+   protected OA2ServiceTransaction transaction;
     OA2SE oa2se;
 
     public OA2ClaimsUtil(OA2SE oa2se, OA2ServiceTransaction transaction) {

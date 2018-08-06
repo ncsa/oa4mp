@@ -82,7 +82,9 @@ public class OA2ClientConfigurationFactory<V extends OA2ClientConfiguration> ext
                     String alias = (String) jSetClaimSource.getArgs().get(0);
                     String configurationName = (String) jSetClaimSource.getArgs().get(1);
                     ClaimSource claimSource = setupClaimSource(alias, configurationName, json);
-                    claimSources.add(claimSource);
+                    if(claimSource != null) {
+                        claimSources.add(claimSource);
+                    }
                 }
             }
         }
@@ -142,11 +144,16 @@ public class OA2ClientConfigurationFactory<V extends OA2ClientConfiguration> ext
             String x = sources.get(alias).className;
             claimSource = (ClaimSource) Class.forName(x).newInstance();
             claimSource.setConfiguration(config);
+            // If finding the class fails for any reason, return a null. Other components should check for a null and
+            // discard it if there is one.
         } catch (InstantiationException e) {
+            claimSource = null;
             e.printStackTrace();
         } catch (IllegalAccessException e) {
+            claimSource = null;
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
+            claimSource = null;
             e.printStackTrace();
         }
         return claimSource;

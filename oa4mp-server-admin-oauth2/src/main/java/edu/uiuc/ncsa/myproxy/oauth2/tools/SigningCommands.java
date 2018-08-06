@@ -55,19 +55,22 @@ public class SigningCommands extends CommonCommands {
         File publicKeyFile = null;
         boolean isInteractive = true;
 
-        if(1 < inputLine.size()){
+        if (1 < inputLine.size()) {
             publicKeyFile = new File(inputLine.getArg(1));
         }
-        if(publicKeyFile == null && isBatchMode()){
+        if (publicKeyFile == null && isBatchMode()) {
             throw new GeneralException("No full path to the file given.");
         }
 
         while (retry) {
-            String publicKeyPath = getInput("Give the file path", "");
-            if (publicKeyPath.toLowerCase().equals("exit") || publicKeyPath.toLowerCase().equals("quit")) {
-                return;
+            if (publicKeyFile == null) {
+                String publicKeyPath =getInput("Give the file path", "");
+                if (publicKeyPath.toLowerCase().equals("exit") || publicKeyPath.toLowerCase().equals("quit")) {
+                    return;
+                }
+                publicKeyFile = new File(publicKeyPath);
             }
-            publicKeyFile = new File(publicKeyPath);
+
 
             if (publicKeyFile.exists()) {
                 if (!publicKeyFile.isFile()) {
@@ -80,8 +83,6 @@ public class SigningCommands extends CommonCommands {
                 retry = false;
             }
         }
-
-        retry = true;
 
         sayi2("create a new set of JSON web keys?[y/n]");
 
