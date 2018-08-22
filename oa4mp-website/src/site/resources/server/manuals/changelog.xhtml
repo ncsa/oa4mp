@@ -11,23 +11,30 @@
 <!--#include virtual="../../header.html" -->
 <p>Changes to the OA4MP server by version.</p>
 
-<h2>4.0</h2>
+<h2>4.0.1</h2>
 <p>
     This is a major upgrade and rewrite of the OA4MP system and is the result of a great deal of feedback and
     experience.
 </p>
 <ul>
+    <li>CIL-332: Error responses should be JSON format with HHTP status 400.</li>
+    <li>CIL-365: Setting scope = org.cilogon.userinfo should return an oidc claim if there is one.</li>
     <li>CIL-408: OAuth 1 command line client should not look for admin client stores on startup.</li>
+    <li>CIL-417: Set subject claim to EPPN in certain cases</li>
     <li>CIL-422: Restrict access based on group membership.</li>
-    <li>CIL-425: setting the subject claim, sub, to eppn</li>
+    <li>CIL-425: More flexible scope handling</li>
     <li>CIL-435: Return group number with group information</li>
-    <li>CIL-436: LSST isMemberOf validation endpoint</li>
+    <li>CIL-436: LSST isMemberOf validation endpoint. See the doc <a href="https://docs.google.com/document/d/1iwnNDZ0l0nNrqCaB41vjLb_tQRjtJUe8xpf469oT84o/edit#">here</a></li>
     <li>CIL-443: CILogon isMemberOf should parse the NCSA's LDAP information into a standard format</li>
     <li>CIL-448: Odd claims from surge. This requires checking eppn by domain and restricting access accordingly.</li>
     <li>CIL-460: Admin service rejects attempts by clients to update themselves.</li>
     <li>CIL-462: Get acr claim and return in id token</li>
     <li>CIL-464: Allow for customizing identifier scheme via configuration. </li>
     <li>CIL-467: Eliminate init endpoint for OIDC version. </li>
+    <li>CIL-477: Set voPersonExternalID. This may be done with server-side scripting now.</li>
+    <li>CIL-479: Issue isMemberOf claim based on IDP and SAML attributes.</li>
+    <li>CIL-494: Allow public clients to access user information endpoint. The response is trivial since they are only allowed the openid scope.</li>
+    <li>CIL-498: After error on cleitn registration page, no scopes displayed.</li>
     <li>github #10: Allow CLI to edit scopes</li>
     <li>Support for <a href="https://docs.google.com/document/d/14Q4DHU_u9GaVvVFQNHDpWTB33vRTYuN8yBpytzNq4O8/edit#heading=h.q4bop06zsrb9">functors</a> in client configurations. </li>
 </ul>

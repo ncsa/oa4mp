@@ -14,11 +14,13 @@
 <h2>Introduction</h2>
 
 <p>LDAP (Lightweight Directory Access Protocol) is a vendor-independent protocol for maintaining and accessing
-    a distributed directory service. For OA4MP for OAuth 2.0, there is an optional scope handler that will
+    a distributed directory service. For OA4MP for OAuth 2.0, there is an optional claim source that will
     talk to an LDAP server and in turn let you populate the user information response with data from LDAP.
     This may be enabled or disabled in the configuration file. If the LDAP service is not available, then
     this is not treated as a serious error, but is merely logged. If this component is not configured, then
-    it is ignored.
+    it is ignored. Note that this applies to <b>every</b> call made to the server before any other configured claim
+    sources for clients are invoked. This permits initially populating the claims with whatever the server deems is
+    standard information.
 </p>
 
 <p>
