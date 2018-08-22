@@ -186,21 +186,13 @@ public abstract class MyProxyDelegationServlet extends EnvServlet implements Tra
         }
         Client c = getServiceEnvironment().getClientStore().get(identifier);
         if (c == null) {
-            DebugUtil.dbg(this, "client name is " + getServiceEnvironment().getClientStore().getClass().getSimpleName());
-            DebugUtil.dbg(this, "client store is a " + getServiceEnvironment().getClientStore());
             if (getServiceEnvironment().getClientStore().size() == 0) {
-                System.err.println("NO ENTRIES IN CLIENT STORE");
-            } else {
-                System.err.println("Store contains " + getServiceEnvironment().getClientStore().size() + " entries.");
+                // This tries to show if, perhpas, the wrong store wa loaded by printing out a little information about it.
+                DebugUtil.dbg(this,"CLIENT STORE HAS NO ENTRIES!");
+                DebugUtil.dbg(this, "client name is " + getServiceEnvironment().getClientStore().getClass().getSimpleName());
+                DebugUtil.dbg(this, "client store is a " + getServiceEnvironment().getClientStore());
             }
-            System.err.println("printing identifiers...");
-
-            for (Identifier x : getServiceEnvironment().getClientStore().keySet()) {
-                System.err.println(x);
-            }
-            System.err.println("done!");
-
-            String ww = "The client with identifier \"" + identifier.toString() + "\"  cannot be found.";
+            String ww = "Unknown client: \"" + identifier.toString() + "\"  cannot be found.";
             warn(ww + " Client store is " + getServiceEnvironment().getClientStore());
             throw new UnknownClientException(ww + "  Is the value in the client config correct?", identifier);
         }

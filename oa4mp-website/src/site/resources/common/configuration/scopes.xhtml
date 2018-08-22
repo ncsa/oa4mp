@@ -41,6 +41,8 @@ tag and that in turn contains <code>scope</code> tags. These scope tags contain 
     <li>openid - this is required in every request. If omitted, the server <b>must reject the request</b></li>
     <li>email - returns the user's email address, if available.</li>
     <li>profile - returns information about the user's profile</li>
+    <li>org.cilogon.userinfo - This returns all enabled inforation about the user from the service and allows
+    access to the user information endpoint. </li>
     <li>edu.uiuc.ncsa.myproxy.getcert - the server returns a certificate from the getCert endpoint.
         If the client omits this, then attempts to get
         a certificate will be rejected. However, requests to the user info endpoint will still be processed.

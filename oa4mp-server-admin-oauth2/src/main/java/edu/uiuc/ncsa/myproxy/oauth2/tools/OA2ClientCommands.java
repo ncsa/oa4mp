@@ -62,9 +62,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
         say("Client name=" + (client.getName() == null ? "(no name)" : client.getName()));
         sayi("identifier=" + client.getIdentifier());
         sayi("email=" + client.getEmail());
-        sayi("home uri=" + client.getHomeUri());
-        sayi("error uri=" + client.getErrorUri());
-        sayi("limited proxies? " + client.isProxyLimited());
+        // Fix for CIL-501 -- removed showing home and error uris here since they are also show by the super class.
         sayi("creation timestamp=" + client.getCreationTS());
         sayi("sign ID tokens?=" + client.isSignTokens());
         sayi("issuer=" + client.getIssuer());
