@@ -1,0 +1,52 @@
+{
+  "config": "Created by converter from old LDAP entry",
+  "claims": {
+    "sourceConfig": [
+      {
+        "ldap": {
+          "enabled": true,
+          "name": "c82f7d6053c464ea",
+          "failOnError": false,
+          "notifyOnFail": false,
+          "address": "ldap-test.cilogon.org",
+          "port": 636,
+          "authorizationType": "simple",
+          "password": "once upon a midnight weary...",
+          "principal": "uid=readonly_user,ou=system,o=ImPACT,o=CO,dc=cilogon,dc=org",
+          "searchAttributes": [
+            {
+              "name": "isMemberOf",
+              "returnAsList": false,
+              "returnName": "isMemberOf"
+            }
+          ],
+          "searchBase": "ou=people,o=ImPACT,o=CO,dc=cilogon,dc=org",
+          "searchName": "username",
+          "contextName": "",
+          "ssl": {
+            "keystore": {},
+            "useJavaTrustStore": true,
+            "password": "changeit",
+            "type": "jks"
+          }
+        }
+      }
+    ],
+    "preProcessing": {
+      "logicBlock": [
+        {
+          "$if": [{"$true": []}],
+          "$then": [
+            {
+              "$set_claim_source": [
+                "LDAP",
+                "c82f7d6053c464ea"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "isSaved": false
+}

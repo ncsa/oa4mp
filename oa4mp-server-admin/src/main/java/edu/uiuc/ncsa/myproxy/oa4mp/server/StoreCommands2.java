@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.security.storage.XMLMap;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
+import edu.uiuc.ncsa.security.util.cli.LineEditor;
 import edu.uiuc.ncsa.security.util.cli.StoreCommands;
 
 import java.io.*;
@@ -160,10 +161,10 @@ public abstract class StoreCommands2 extends StoreCommands {
                 say("Sorry, but the key \"" + key + "\" is not a known key for this component.");
                 return;
             }
-            List<Identifiable> values =null;
+            List<Identifiable> values = null;
             try {
                 values = getStore().search(key, inputLine.getLastArg(), inputLine.hasArg(REGEX_FLAG));
-            }catch(Throwable t){
+            } catch (Throwable t) {
                 say("Sorry, that didn't work:" + t.getMessage());
                 return;
             }
@@ -181,10 +182,42 @@ public abstract class StoreCommands2 extends StoreCommands {
                     say(format(identifiable));
                 }
             }
-            say("\ngot " + values.size() + " match" + (values.size()==1?".":"es."));
+            say("\ngot " + values.size() + " match" + (values.size() == 1 ? "." : "es."));
         } else {
             say("Sorry, you must specify a key for the search. Try typing \nsearch " + LIST_KEYS_FLAG + "\n for all available keys");
         }
 
     }
+
+    @Override
+    public void edit(InputLine inputLine) {
+        Identifiable x = findItem(inputLine);
+        XMLMap c = new XMLMap();
+        getStore().getXMLConverter().toMap(x, c);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            c.toXML(baos);
+            baos.close();
+            String raw = new String(baos.toString("UTF-8"));
+            LineEditor lineEditor = new LineEditor(raw);
+            lineEditor.execute();
+            String rc = getInput("save (y/n)?", "y");
+            if (rc.equals("y")) {
+                byte[] bytes = lineEditor.bufferToString().getBytes("UTF-8");
+                XMLMap map = new XMLMap();
+                ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+                map.fromXML(bais);
+                bais.close();
+                Identifiable identifiable = getStore().getXMLConverter().fromMap(map, null);
+                getStore().save(identifiable);
+            }else{
+                say("changes ignored.");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
+    }
+
 }

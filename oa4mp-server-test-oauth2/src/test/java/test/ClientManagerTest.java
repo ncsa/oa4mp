@@ -123,7 +123,9 @@ public class ClientManagerTest extends DDServerTests implements SAT {
 
     }
 
-
+      /*
+      Generic client test
+       */
 
     @Test
     public void testClient() throws Exception {

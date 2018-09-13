@@ -167,6 +167,9 @@ public abstract class DDServerTests extends TestCase {
         c.setEmail("bob@" + random + ".foo.bar");
         c.setName("Test client " + random);
         c.setRtLifetime(456767875477L);
+        JSONObject cfg = new JSONObject();
+        cfg.put("version",getRandom());
+        c.setConfig(cfg);
 
         LinkedList<String> callbacks = new LinkedList<>();
         callbacks.add("https:/baz.foo.edu/client2/" + random + "/ready1");

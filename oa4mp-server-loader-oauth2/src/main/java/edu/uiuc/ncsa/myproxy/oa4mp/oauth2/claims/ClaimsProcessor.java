@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.security.util.functor.LogicBlocks;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -49,6 +50,9 @@ public class ClaimsProcessor {
         return executed;
     }
 
+    protected OA2FunctorFactory createFunctorFactory(Map<String, Object> claims, Collection<String> scopes){
+        return new OA2FunctorFactory(claims, scopes);
+    }
     /**
      * create the logic blocks for this configuration. It also configures the factory
      * @param configuration
@@ -57,7 +61,7 @@ public class ClaimsProcessor {
     protected LogicBlocks<? extends LogicBlock> createLogicBlocks(JSONObject configuration,
                                                                   Map<String, Object> claims){
         ServletDebugUtil.dbg(this, "config:\n\n" + config.toString(2));
-        OA2FunctorFactory functorFactory = new OA2FunctorFactory(claims, null);
+        OA2FunctorFactory functorFactory = createFunctorFactory(claims, null);
 
         JSONArray jsonArray = new JSONArray();
         jsonArray.add(config);

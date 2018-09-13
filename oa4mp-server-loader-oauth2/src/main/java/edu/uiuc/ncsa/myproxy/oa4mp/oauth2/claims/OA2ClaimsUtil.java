@@ -31,7 +31,7 @@ import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.*;
  * on 4/24/18 at  11:13 AM
  */
 public class OA2ClaimsUtil {
-   protected OA2ServiceTransaction transaction;
+    protected OA2ServiceTransaction transaction;
     OA2SE oa2se;
 
     public OA2ClaimsUtil(OA2SE oa2se, OA2ServiceTransaction transaction) {
@@ -69,7 +69,7 @@ public class OA2ClaimsUtil {
      * request for claims is made, so the timestamps etc. are current. Some clients use this information,
      * for better for work, as accounting information on the access or refresh token and these clients
      * will break if the timestamps are not updated (e.g. kubernetes). <br/>
-     *
+     * <p/>
      * Note that if you call this after processing, claim sources etc. you will overwrite anything
      * you have done. Generally if you need to reset the timestamps, you should call
      * {@link #setAccountingInformation(HttpServletRequest, JSONObject)} instead.
@@ -113,6 +113,20 @@ public class OA2ClaimsUtil {
     }
 
     /**
+     * Use this to check for any requires scopes that the request must have. It is usually best to check these in the
+     * transaction since they have been normalized there, but the request is supplied too for completeness.
+     *
+     * @param request
+     * @param t
+     * @throws Throwable
+     */
+    protected void checkRequiredScopes(HttpServletRequest request, OA2ServiceTransaction t) throws Throwable {
+        if (oa2se.isOIDCEnabled() && !t.getScopes().contains(OA2Scopes.SCOPE_OPENID)) {
+            throw new OA2GeneralError(OA2Errors.INVALID_SCOPE, "invalid scope: no open id scope", HttpStatus.SC_UNAUTHORIZED);
+        }
+    }
+
+    /**
      * Creates the most basic claim object for this.
      *
      * @param request
@@ -124,14 +138,11 @@ public class OA2ClaimsUtil {
         if (claims == null) {
             claims = new JSONObject();
         }
-        if (!t.getScopes().contains(OA2Scopes.SCOPE_OPENID)) {
-            throw new OA2GeneralError(OA2Errors.INVALID_SCOPE, "invalid scope: no open id scope", HttpStatus.SC_UNAUTHORIZED);
-        }
         claims = initializeClaims(request, claims);
         // claims are initialized and basic oidc scope (the subject) is included,
         transaction.setClaims(claims);
         OA2Client client = getOA2Client();
-
+        checkRequiredScopes(request, t);
         if (!getCC().isSaved()) {
             ServletDebugUtil.dbg(this, "Saving updated client " + client.getIdentifierString());
             getCC().setSaved(true); // do this so it ends up in storage as saved, otherwise it gets saved every time.

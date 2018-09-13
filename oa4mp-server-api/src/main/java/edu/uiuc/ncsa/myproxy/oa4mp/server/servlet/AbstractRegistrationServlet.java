@@ -250,8 +250,10 @@ public abstract class AbstractRegistrationServlet extends MyProxyDelegationServl
 
     String emailPattern = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$";
 
-    protected Client addNewClient(HttpServletRequest request, HttpServletResponse response) throws Throwable {
-        // Assumption is that the request is in good order and we just have to pull stuff off it.
+
+
+    protected Client setupNewClient(HttpServletRequest request, HttpServletResponse response) throws Throwable {
+         // Assumption is that the request is in good order and we just have to pull stuff off it.
         Client client = getServiceEnvironment().getClientStore().create();
         info("creating entry for client=" + client.getIdentifierString());
         // Fill in as much info as we can before parsing public key.
@@ -275,10 +277,16 @@ public abstract class AbstractRegistrationServlet extends MyProxyDelegationServl
         clientApproval.setApproved(false);
 
         info("done with client registration, client=" + client.getIdentifierString());
-        // Fix for CIL-169: the last thing that should be done after this is over-ridden is to fire a new client event:
-        //            fireNewClientEvent(client);
-        // Failure to do so will turn off the ability to email new client registrations!
         return client;
+    }
+    protected Client addNewClient(HttpServletRequest request, HttpServletResponse response) throws Throwable {
+        // Fix for CIL-169: the last thing that should be done after this is over-ridden is to fire a new client event:
+                //            fireNewClientEvent(client);
+                // Failure to do so will turn off the ability to email new client registrations!
+        // So invoke setupNewClient to create one, have your call over-ride this and fire the event,
+
+       return setupNewClient(request,response);
+
     }
 
 

@@ -110,6 +110,10 @@ public class ClientServerTest extends DDServerTests {
         OA2Client oldClient = (OA2Client) cc.client;
         oldClient.setIdentifier(newClient.getIdentifier());
         oldClient.setSecret(newClient.getSecret());
+        // Make sure cfg is correct.
+        JSONObject cfg1 = oldClient.getConfig();
+        JSONObject cfg2 = newClient.getConfig();
+        assert cfg1.getString("version").equals(cfg2.getString("version")) : "Configurations do not match in OA2 clients";
         assert oldClient.equals(newClient);
     }
 

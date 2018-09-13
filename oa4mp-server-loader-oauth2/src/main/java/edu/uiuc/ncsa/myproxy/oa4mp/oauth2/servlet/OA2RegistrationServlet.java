@@ -66,8 +66,8 @@ public class OA2RegistrationServlet extends AbstractRegistrationServlet {
         }
     }
 
-    protected Client addNewClient(HttpServletRequest request, HttpServletResponse response, boolean fireClientEvents) throws Throwable {
-        OA2Client client = (OA2Client) super.addNewClient(request, response);
+    protected Client setupNewClient(HttpServletRequest request, HttpServletResponse response) throws Throwable {
+        OA2Client client = (OA2Client) super.setupNewClient(request, response);
         String rawCBs = getRequiredParam(request, CALLBACK_URI, client);
         String rawRTLifetime = getParameter(request, REFRESH_TOKEN_LIFETIME);
         String[] rawScopes = request.getParameterValues("chkScopes");
@@ -158,6 +158,12 @@ public class OA2RegistrationServlet extends AbstractRegistrationServlet {
         approval.setApproved(false);
         approval.setIdentifier(client.getIdentifier());
         getOA2SE().getClientApprovalStore().save(approval);
+        return client;
+    }
+
+    protected Client addNewClient(HttpServletRequest request, HttpServletResponse response, boolean fireClientEvents) throws Throwable {
+        OA2Client client = (OA2Client) setupNewClient(request, response);
+
         if (fireClientEvents) {
             fireNewClientEvent(client);
         }

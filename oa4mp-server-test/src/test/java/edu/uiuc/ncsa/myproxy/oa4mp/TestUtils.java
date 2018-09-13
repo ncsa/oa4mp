@@ -7,8 +7,12 @@ import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.server.OA4MPConfigTags.COMPONENT;
 
@@ -95,8 +99,9 @@ public class TestUtils {
         }
         return getBootstrapper().getOa4mpConfigFileKey();
     }
+
     public static ConfigurationNode findConfigNode(String configName) {
-                 return     findConfigNode(null, configName);
+        return findConfigNode(null, configName);
     }
 
 
@@ -168,5 +173,45 @@ public class TestUtils {
 
     public static void setH2StoreProvider(TestStoreProviderInterface h2) {
         h2StoreProvider = h2;
+    }
+
+    public static void main(final String[] args){
+        try {
+            //Build command
+            List<String> commands = new ArrayList<String>();
+            commands.add("/bin/cat");
+            //Add arguments
+            commands.add("/home/ncsa/test.txt");
+            System.out.println(commands);
+
+            //Run macro on target
+            ProcessBuilder pb = new ProcessBuilder(commands);
+            pb.directory(new File("/home/ncsa"));
+            pb.redirectErrorStream(true);
+            Process process = pb.start();
+
+            //Read output
+            StringBuilder out = new StringBuilder();
+            BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String line = null, previous = null;
+            while ((line = br.readLine()) != null)
+                if (!line.equals(previous)) {
+                    previous = line;
+                    out.append(line).append('\n');
+                    System.out.println(line);
+                }
+            //Check result
+            if (process.waitFor() == 0) {
+                System.out.println("Success!");
+                System.exit(0);
+            }
+
+            //Abnormal termination: Log command parameters and output and throw ExecutionException
+            System.err.println(commands);
+            System.err.println(out.toString());
+            System.exit(1);
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
     }
 }

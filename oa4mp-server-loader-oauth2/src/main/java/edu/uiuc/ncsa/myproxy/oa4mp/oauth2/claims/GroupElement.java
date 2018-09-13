@@ -53,4 +53,12 @@ public class GroupElement {
             setId(json.getInt("id"));
         }
     }
+
+    @Override
+    public String toString() {
+        return "GroupElement{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }

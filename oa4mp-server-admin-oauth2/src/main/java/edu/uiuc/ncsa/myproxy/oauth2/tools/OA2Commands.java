@@ -96,7 +96,10 @@ public class OA2Commands extends BaseCommands {
     }
 
     public OA2AdminClientCommands getAdminClientCommands() throws Exception {
-        return new OA2AdminClientCommands(getMyLogger(), "  ", getOA2SE().getAdminClientStore(), getOA2SE().getClientApprovalStore());
+        return new OA2AdminClientCommands(getMyLogger(), "  ",
+                getOA2SE().getAdminClientStore(),
+                getOA2SE().getClientApprovalStore(),
+                getOA2SE().getPermissionStore());
     }
 
     public OA2PermissionCommands getPermissionCommands() throws Exception {

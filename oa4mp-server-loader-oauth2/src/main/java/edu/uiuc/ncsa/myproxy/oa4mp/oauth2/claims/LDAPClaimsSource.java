@@ -13,6 +13,7 @@ import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.oauth_2_0.server.UnsupportedScopeException;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfigurationUtil;
+import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -51,10 +52,9 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
     protected boolean loggingEnabled = false;
 
 
-
     public LDAPClaimsSource(OA2SE oa2SE) {
         super(oa2SE);
-        if(oa2SE == null){
+        if (oa2SE == null) {
             throw new IllegalArgumentException("Error: null service env");
         }
         this.myLogger = oa2SE.getMyLogger();
@@ -99,7 +99,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
     }
 
     protected boolean isNCSA() {
-        return getLDAPCfg().getServer().equals("ldap.ncsa.illinois.edu");
+        return getLDAPCfg().getServer().endsWith(".ncsa.illinois.edu");
     }
 
     MyLoggingFacade myLogger = null;
@@ -143,7 +143,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
 
     @Override
     public boolean isEnabled() {
-        if(getConfiguration() == null){
+        if (getConfiguration() == null) {
             return false; // for an LDAP source, no configuration should mean this does nto run.
         }
         return super.isEnabled();
@@ -196,6 +196,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
 
     /**
      * Convenience to cast the configuration to the right class.
+     *
      * @return
      */
     public LDAPConfiguration getLDAPCfg() {
@@ -267,13 +268,14 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
         return claims;
     }
 
-    // STOP GAP. This should be given in the LDAPConfiguration and is the name of the attribute (e.g. uid, email)
+    // This is given in the LDAPConfiguration and is the name of the attribute (e.g. uid, email)
     // that is used for searching. It's compliment is the searchFilterValue, so
     // searchFilterAttribute=searchFilterValue
     //e.g, uid=eppn
     // The searchFilterValue is supplied in the initial claims.
     protected String getSearchFilterAttribute() {
-        return "uid";
+        ServletDebugUtil.dbg(this, "search attribute in LDAP is " + getLDAPCfg().getSearchFilterAttribute());
+        return getLDAPCfg().getSearchFilterAttribute();
     }
 
     public JSONObject simpleSearch(LdapContext ctx,
@@ -533,18 +535,25 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
     public static Groups get_NEW_Gid(LDAPConfiguration cfg2, String username) throws Throwable {
         LDAPConfiguration cfg = cfg2.clone();
         cfg.setSearchBase("ou=Groups,dc=ncsa,dc=illinois,dc=edu");
+        ServletDebugUtil.dbg(LDAPClaimsSource.class, "LDAP search is: " + cfg.getSearchFilterAttribute() + "=" + username);
         LDAPClaimsSource claimsSource = new LDAPClaimsSource(cfg, null);
         DirContext dirContext = new InitialDirContext(claimsSource.createEnv(cfg));
         LdapContext ctx = (LdapContext) dirContext.lookup(cfg.getSearchBase());
         SearchControls ctls = new SearchControls();
         ctls.setReturningAttributes(new String[]{"cn", "gidNumber"});
-        String filter = "(&(uniqueMember=uid=" + username + ",ou=People,dc=ncsa,dc=illinois,dc=edu))";
+        String filter = "(&(uniqueMember=" + cfg.getSearchFilterAttribute() + "=" + username + ",ou=People,dc=ncsa,dc=illinois,dc=edu))";
+        ServletDebugUtil.dbg(LDAPClaimsSource.class, "LDAP filter=" + filter);
+
         NamingEnumeration e = ctx.search(cfg.getContextName(), filter, ctls);
         Groups groups = new Groups();
+        ServletDebugUtil.dbg(LDAPClaimsSource.class, "Starting to process groups. Has elements? " + e.hasMoreElements() );
+
         while (e.hasMoreElements()) {
             SearchResult entry = (SearchResult) e.next();
             Attributes a = entry.getAttributes();
             GroupElement groupElement = convertToEntry(a);
+            ServletDebugUtil.dbg(LDAPClaimsSource.class, "Added group element = " + groupElement);
+
             groups.put(groupElement);
         }
         ctx.close();
