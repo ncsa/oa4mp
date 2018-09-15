@@ -10,6 +10,12 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Enumeration;
 
 /**
+ * This is for the specific case that claims are passed through the headers. Each starts with the caput
+ * and every claim with this caput is processed and added. E.g.
+ * <pre>
+ *     OIDC_CLAIM_sub
+ * </pre>
+ * sets the "sub" claim.
  * <p>Created by Jeff Gaynor<br>
  * on 3/15/17 at  2:41 PM
  */
@@ -24,11 +30,13 @@ public class HTTPHeaderClaimsSource extends BasicClaimsSourceImpl {
         this.caput = caput;
     }
 
+
     @Override
     protected JSONObject realProcessing(JSONObject claims, HttpServletRequest request, ServiceTransaction transaction) throws UnsupportedScopeException {
+        DebugUtil.dbg(this,"Omit list = " + getOmitList());
         Enumeration headerNames = request.getHeaderNames();
         String caput = getCaput();
-        if(caput == null ){
+        if (caput == null) {
             caput = ""; // default is empty caput.
         }
         int caputLength = caput.length();
@@ -41,9 +49,13 @@ public class HTTPHeaderClaimsSource extends BasicClaimsSourceImpl {
              */
             if (name.startsWith(caput)) {
                 String key = name.substring(caputLength);
-                String value =request.getHeader(name);
-                DebugUtil.dbg(this, "adding claim " + key + "=" + value);
-                claims.put(key,value );
+                String value = request.getHeader(name);
+                if (!getOmitList().contains(key)) {
+                    DebugUtil.dbg(this, "adding claim " + key + "=" + value);
+                    claims.put(key, value);
+                }else{
+                    DebugUtil.dbg(this, "OMITTING claim " + key + "=" + value + ", as per omit list");
+                }
             }
         }
         return super.realProcessing(claims, request, transaction);

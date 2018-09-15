@@ -275,7 +275,11 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
     // The searchFilterValue is supplied in the initial claims.
     protected String getSearchFilterAttribute() {
         ServletDebugUtil.dbg(this, "search attribute in LDAP is " + getLDAPCfg().getSearchFilterAttribute());
-        return getLDAPCfg().getSearchFilterAttribute();
+        if(getLDAPCfg().getSearchFilterAttribute() == null){
+            return LDAPConfigurationUtil.SEARCH_FILTER_ATTRIBUTE_DEFAULT; // default
+        }else {
+            return getLDAPCfg().getSearchFilterAttribute();
+        }
     }
 
     public JSONObject simpleSearch(LdapContext ctx,

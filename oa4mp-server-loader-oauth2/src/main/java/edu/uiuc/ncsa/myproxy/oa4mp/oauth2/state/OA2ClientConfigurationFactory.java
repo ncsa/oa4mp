@@ -7,8 +7,9 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowType;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.jSetClaimSource;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
+import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSourceConfiguration;
+import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSourceConfigurationUtil;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.ClientConfigurationFactory;
-import edu.uiuc.ncsa.security.oauth_2_0.server.config.JSONClaimSourceConfig;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfigurationUtil;
 import edu.uiuc.ncsa.security.util.functor.JFunctor;
@@ -82,7 +83,7 @@ public class OA2ClientConfigurationFactory<V extends OA2ClientConfiguration> ext
                     String alias = (String) jSetClaimSource.getArgs().get(0);
                     String configurationName = (String) jSetClaimSource.getArgs().get(1);
                     ClaimSource claimSource = setupClaimSource(alias, configurationName, json);
-                    if(claimSource != null) {
+                    if (claimSource != null) {
                         claimSources.add(claimSource);
                     }
                 }
@@ -93,17 +94,37 @@ public class OA2ClientConfigurationFactory<V extends OA2ClientConfiguration> ext
     public static final String LDAP_DEFAULT = "LDAP";
     public static final String HEADER_DEFAULT = "HEADER";
 
-    protected Map<String, JSONClaimSourceConfig> getClaimSourceConfigurations(JSONObject jsonObject) {
-        JSONArray array = OA2ClientConfigurationUtil.getClaimSourceConfigurations(jsonObject);
-        Map<String, JSONClaimSourceConfig> configs = new HashMap<>();
+    protected Map<String, ClaimSourceConfiguration> getClaimSourceConfigurations(JSONObject jsonObject) {
+        DebugUtil.dbg(this, "Starting claim source configuration.");
 
+        JSONArray array = OA2ClientConfigurationUtil.getClaimSourceConfigurations(jsonObject);
+        Map<String, ClaimSourceConfiguration> configs = new HashMap<>();
+        ClaimSourceConfigurationUtil claimSourceConfigurationUtil = new ClaimSourceConfigurationUtil(); // for defaults
+        LDAPConfigurationUtil ldapConfigurationUtil = new LDAPConfigurationUtil();
         for (int i = 0; i < array.size(); i++) {
             JSONObject json = array.getJSONObject(i);
-            LDAPConfigurationUtil ldapConfigurationUtil = new LDAPConfigurationUtil();
-
+            DebugUtil.dbg(this, "json type = " + json.getClass().getCanonicalName());
+            if (claimSourceConfigurationUtil.isInstanceOf(json)) {
+                DebugUtil.dbg(this, "This is a configuration object");
+                ClaimSourceConfiguration claimSourceConfiguration = new ClaimSourceConfiguration();
+                claimSourceConfigurationUtil.fromJSON(claimSourceConfiguration, json);
+                DebugUtil.dbg(this, ".getClaimsSourceConfigurations: putting configuration object name=" +
+                        claimSourceConfiguration.getName() + ", id=" + claimSourceConfiguration.getId());
+                String key = claimSourceConfiguration.getId();
+                // use the ID to locate the item, not the name. The name should generally only be used for display
+                if (key == null || key.length() == 0) {
+                    key = claimSourceConfiguration.getName();
+                }
+                configs.put(key, claimSourceConfiguration);
+            }
             if (ldapConfigurationUtil.isLDAPCOnfig(json)) {
                 LDAPConfiguration c = ldapConfigurationUtil.fromJSON(json);
-                configs.put(c.getName(), c);
+                String key = c.getId();
+                // use the ID to locate the item, not the name. The name should generally only be used for display
+                if (key == null || key.length() == 0) {
+                    key = c.getName();
+                }
+                configs.put(key, c);
             }
         }
         return configs;
@@ -120,18 +141,24 @@ public class OA2ClientConfigurationFactory<V extends OA2ClientConfiguration> ext
      * @return
      */
     protected ClaimSource setupClaimSource(String alias, String configName, JSONObject json) {
+        DebugUtil.dbg(this, ".setupClaimSource. alias=" + alias + ", configName=" + configName + ", json=" + (json==null?"none":json.toString(2)));
+
         Map<String, OA2ClientConfigurationUtil.SourceEntry> sources = OA2ClientConfigurationUtil.toSourcesMap(json);
         /*
         TODO - handle edge cases of no name/alias and single configuration.
          */
-        Map<String, JSONClaimSourceConfig> configs = getClaimSourceConfigurations(json);
-        JSONClaimSourceConfig config = configs.get(configName);
+        Map<String, ClaimSourceConfiguration> configs = getClaimSourceConfigurations(json);
+
+        ClaimSourceConfiguration config = configs.get(configName);
+        DebugUtil.dbg(this, "configuration found from config name=" + config.toString());
         if (alias.equals(LDAP_DEFAULT)) {
             DebugUtil.dbg(this, "Setting Claim Source to LDAP as per configuration");
             LDAPClaimsSource x = new LDAPClaimsSource((LDAPConfiguration) config, null);
             return x;
         }
+
         if (alias.equals(HEADER_DEFAULT)) {
+            DebugUtil.dbg(this, "Setting up header default.");
             ClaimSource source = new HTTPHeaderClaimsSource();
             source.setConfiguration(config);
         }

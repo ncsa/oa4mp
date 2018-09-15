@@ -18,12 +18,34 @@ import net.sf.json.JSONObject;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 8/17/15 at  4:10 PM
  */
 public class BasicClaimsSourceImpl implements ClaimSource {
+
+    /**
+     * This is the list of claims from the headers to omit. In other words, this module will reject these out of hand
+     * and never return them in a claims object. This is extremely useful in not having existing claims being over-written
+     * (which can happen if something like mod_auth_openidc is acting as an intermediary and adding spurious claims.)
+     *
+     * @return
+     */
+    public List<String> getOmitList() {
+        if (hasConfiguration()) {
+            return getConfiguration().getOmitList();
+        } else {
+            return new LinkedList<>();
+        }
+    }
+
+    public void setOmitList(List<String> omitList) {
+        getConfiguration().setOmitList(omitList);
+    }
+
 
     ClaimSourceConfiguration configuration = null;
 
@@ -42,16 +64,17 @@ public class BasicClaimsSourceImpl implements ClaimSource {
         return configuration != null;
     }
 
-    public boolean hasJSONPreProcessoor(){
-        if(getConfiguration() instanceof JSONClaimSourceConfig){
-            return ((JSONClaimSourceConfig)getConfiguration()).getJSONPreProcessing()!=null;
+    public boolean hasJSONPreProcessoor() {
+        if (getConfiguration() instanceof JSONClaimSourceConfig) {
+            return ((JSONClaimSourceConfig) getConfiguration()).getJSONPreProcessing() != null;
 
         }
         return false;
     }
-    public boolean hasJSONPostProcessoor(){
-        if(getConfiguration() instanceof JSONClaimSourceConfig){
-            return ((JSONClaimSourceConfig)getConfiguration()).getJSONPostProcessing()!=null;
+
+    public boolean hasJSONPostProcessoor() {
+        if (getConfiguration() instanceof JSONClaimSourceConfig) {
+            return ((JSONClaimSourceConfig) getConfiguration()).getJSONPostProcessing() != null;
 
         }
         return false;
@@ -118,7 +141,7 @@ public class BasicClaimsSourceImpl implements ClaimSource {
         OA2ServiceTransaction t = (OA2ServiceTransaction) transaction;
         if (hasConfiguration() && hasJSONPreProcessoor()) {
             OA2FunctorFactory ff = new OA2FunctorFactory(claims, t.getScopes());
-            preProcessor = ff.createLogicBlock(((JSONClaimSourceConfig)getConfiguration()).getJSONPreProcessing());
+            preProcessor = ff.createLogicBlock(((JSONClaimSourceConfig) getConfiguration()).getJSONPreProcessing());
             preProcessor.execute();
             // since the flow state maps to  part of a JSON object, we have to get the object, then reset it.
             FlowStates f = t.getFlowStates();
@@ -144,16 +167,17 @@ public class BasicClaimsSourceImpl implements ClaimSource {
 
     protected GroupHandler groupHandler = null;
 
-     public GroupHandler getGroupHandler() {
-         if (groupHandler == null) {
-             groupHandler = new GroupHandler(); // default
-         }
-         return groupHandler;
-     }
+    public GroupHandler getGroupHandler() {
+        if (groupHandler == null) {
+            groupHandler = new GroupHandler(); // default
+        }
+        return groupHandler;
+    }
 
-     public void setGroupHandler(GroupHandler groupHandler) {
-         this.groupHandler = groupHandler;
-     }
+    public void setGroupHandler(GroupHandler groupHandler) {
+        this.groupHandler = groupHandler;
+    }
+
     /**
      * This is the actual place to put your code that only processes the claim source. The {@link #process(JSONObject, HttpServletRequest, ServiceTransaction)}
      * calls wrap this and invoke the pre/post processor for you.

@@ -45,6 +45,7 @@ public abstract class StoreCommands2 extends StoreCommands {
         if (inputLine.hasArg("-file")) {
             try {
                 is = new FileInputStream(inputLine.getNextArgFor("-file"));
+
                 XMLMap map = new XMLMap();
                 map.fromXML(is);
                 is.close();
