@@ -299,11 +299,12 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         }
 
         OA2ServiceTransaction t = getByRT(oldRT);
+        OA2SE oa2SE = (OA2SE) getServiceEnvironment();
         if (!t.getFlowStates().acceptRequests || !t.getFlowStates().refreshToken) {
             throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "refresh token access denied", HttpStatus.SC_UNAUTHORIZED);
 
         }
-        if ((!((OA2SE) getServiceEnvironment()).isRefreshTokenEnabled()) || (!c.isRTLifetimeEnabled())) {
+        if ((!(oa2SE).isRefreshTokenEnabled()) || (!c.isRTLifetimeEnabled())) {
             throw new OA2ATException(OA2Errors.REQUEST_NOT_SUPPORTED, "Refresh tokens are not supported on this server");
         }
 
@@ -312,7 +313,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         }
         t.setRefreshTokenValid(false); // this way if it fails at some point we know it is invalid.
         AccessToken at = t.getAccessToken();
-        RTIRequest rtiRequest = new RTIRequest(request, c, at);
+        RTIRequest rtiRequest = new RTIRequest(request, c, at, oa2SE.isOIDCEnabled());
         RTI2 rtIsuuer = new RTI2(getTF2(), getServiceEnvironment().getServiceAddress());
         RTIResponse rtiResponse = (RTIResponse) rtIsuuer.process(rtiRequest);
         rtiResponse.setSignToken(c.isSignTokens());
@@ -327,7 +328,6 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         // over-writes the current value. This practically invalidates the previous access token.
         getTransactionStore().remove(t.getIdentifier()); // this is necessary to clear any caches.
         ArrayList<String> targetScopes = new ArrayList<>();
-        OA2SE oa2SE = (OA2SE) getServiceEnvironment();
 
         boolean returnScopes = false; // set true if something is requested we don't support
         for (String s : t.getScopes()) {

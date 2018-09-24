@@ -27,7 +27,6 @@ public class ClientExceptionHandler implements ExceptionHandler {
         this.logger = logger;
         this.clientServlet = clientServlet;
     }
-
     @Override
     public void handleException(Throwable t, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         t.printStackTrace();
@@ -45,16 +44,21 @@ public class ClientExceptionHandler implements ExceptionHandler {
         clientServlet.error("Exception while trying to get cert. message:" + t.getMessage());
 
         if (t instanceof RuntimeException) {
-            String path = clientServlet.getServletContext().getContextPath();
-            if(!path.endsWith("/")){
-                // normalize it
-                path = path + "/";
-            }
+            String path = getNormalizedContextPath();
             request.setAttribute("action", path);
             request.setAttribute("message", t.getMessage());
             JSPUtil.fwd(request, response, clientServlet.getCE().getErrorPagePath());
             return;
         }
         throw new ServletException("Error", t);
+    }
+
+    protected String getNormalizedContextPath() {
+        String path = clientServlet.getServletContext().getContextPath();
+        if(!path.endsWith("/")){
+            // normalize it
+            path = path + "/";
+        }
+        return path;
     }
 }

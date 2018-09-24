@@ -11,6 +11,20 @@
 <!--#include virtual="../../header.html" -->
 <p>Changes to the OA4MP server by version.</p>
 
+<h2>4.1-SNAPSHOT</h2>
+<ul>
+    <li>CIL-491: Public clients get a trivial ID token when they get an access token. This allows certain services
+        like kubernetes  to heck the timestamps and the ID token.</li>
+    <li>CIL-499: Check that certain claims are present before returning them. This prevents an unruly script
+    from creating an unsuable claims object.</li>
+    <li>CIL-501: CLI displays multiple attributes when fully listing a client.</li>
+    <li>CIL-505: (in the DB service) Return a better error message if a request times out. </li>
+    <li>CIL-508: CLI should be able to list all clients for a given admin. In the admin module, this is the
+    list_clients command.</li>
+    <li>CIL-513: HTTP headers claim source should be configurable to ignore certain returned claims, since in a proxying
+    situation, these may be for the proxy, not for the requesting client.</li>
+</ul>
+
 <h2>4.0.1</h2>
 <p>
     This is a major upgrade and rewrite of the OA4MP system and is the result of a great deal of feedback and

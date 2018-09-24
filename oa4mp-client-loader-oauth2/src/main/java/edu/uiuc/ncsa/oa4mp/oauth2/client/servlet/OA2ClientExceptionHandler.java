@@ -63,7 +63,8 @@ public class OA2ClientExceptionHandler extends ClientExceptionHandler {
             request.setAttribute(OA2Constants.ERROR, t.getClass().getSimpleName());
             request.setAttribute(OA2Constants.ERROR_DESCRIPTION, t.getMessage());
         }
-        request.setAttribute("action", request.getContextPath());  // sets return action on error page to this web app.
+
+        request.setAttribute("action", getNormalizedContextPath());  // sets return action on error page to this web app.
         JSPUtil.fwd(request, response, clientServlet.getCE().getErrorPagePath());
     }
 

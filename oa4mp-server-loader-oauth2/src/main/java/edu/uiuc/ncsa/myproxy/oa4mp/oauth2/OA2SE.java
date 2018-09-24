@@ -62,7 +62,8 @@ public class OA2SE extends ServiceEnvironmentImpl {
                  long maxClientRefreshTokenLifetime,
                  JSONWebKeys jsonWebKeys,
                  String issuer,
-                 boolean utilServletEnabled) {
+                 boolean utilServletEnabled,
+                 boolean oidcEnabled) {
         super(logger,
                 mfp,
                 tsp,
@@ -110,6 +111,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
         }
         this.acs = acs;
         this.utilServletEnabled = utilServletEnabled;
+        this.oidcEnabled = oidcEnabled;
     }
 
     protected Provider<AdminClientStore> acs;
@@ -228,6 +230,8 @@ public class OA2SE extends ServiceEnvironmentImpl {
      * @return
      */
    public boolean isOIDCEnabled(){
-       return true;
+       return oidcEnabled;
    }
+
+    boolean oidcEnabled = true;
 }

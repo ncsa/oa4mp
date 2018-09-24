@@ -122,7 +122,8 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     getJSONWebKeys(),
                     getIssuer(),
                     // getMLDAP(),
-                    isUtilServerEnabled());
+                    isUtilServerEnabled(),
+                    isOIDCEnabled());
             if (getClaimSource() instanceof BasicClaimsSourceImpl) {
                 ((BasicClaimsSourceImpl) getClaimSource()).setOa2SE((OA2SE) se);
             }
@@ -215,7 +216,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
             return new Provider<AGIssuer>() {
                 @Override
                 public AGIssuer get() {
-                    return new AGI2(getTokenForgeProvider().get(), getServiceAddress());
+                    return new AGI2(getTokenForgeProvider().get(), getServiceAddress(), isOIDCEnabled());
                 }
             };
         }
@@ -331,6 +332,24 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         }
         return maxClientRefreshTokenLifetime;
     }
+    Boolean oidcEnabled = null;
+    public boolean isOIDCEnabled(){
+                if(oidcEnabled == null){
+                    String x = getFirstAttribute(cn, REFRESH_TOKEN_ENABLED);
+                 if(x == null){
+                     oidcEnabled = Boolean.TRUE; // default.
+                 }else{
+                 try{
+                    oidcEnabled = Boolean.valueOf(x);
+                 }catch(Throwable t){
+                     info("COuld not parse OIDC enabled flag, setting default to true");
+                     oidcEnabled = Boolean.TRUE;
+                 }
+                 }
+                }
+        return oidcEnabled;
+    }
+
 
     public boolean isRefreshTokenEnabled() {
         if (refreshTokenEnabled == null) {
@@ -606,7 +625,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         return new Provider<ATIssuer>() {
             @Override
             public ATIssuer get() {
-                return new ATI2(getTokenForgeProvider().get(), getServiceAddress());
+                return new ATI2(getTokenForgeProvider().get(), getServiceAddress(),isOIDCEnabled());
             }
         };
     }
@@ -616,7 +635,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         return new Provider<PAIssuer>() {
             @Override
             public PAIssuer get() {
-                return new PAI2(getTokenForgeProvider().get(), getServiceAddress());
+                return new PAI2(getTokenForgeProvider().get(), getServiceAddress(),isOIDCEnabled());
             }
         };
     }
@@ -631,4 +650,5 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
     public String getVersionString() {
         return "OAuth 2 for MyProxy, version " + VERSION_NUMBER;
     }
+
 }

@@ -316,6 +316,7 @@ public class OA2ClaimsUtil {
 
         // update everything
         transaction.setFlowStates(flowStates);
+        checkRequiredClaims(claims);
         transaction.setClaims(claims);// since the JSON library tends to clone things and they go missing, just set it again.
         oa2se.getTransactionStore().save(transaction);
         DebugUtil.dbg(this, "Done with special claims=" + claims.toString(1));
@@ -328,6 +329,32 @@ public class OA2ClaimsUtil {
         return claims;
     }
 
+    protected void checkClaim(JSONObject claims, String claimKey){
+        if(claims.containsKey(claimKey)){
+             if(isEmpty(claims.getString(claimKey))){
+                 DebugUtil.dbg(this, "Missing \"" + claimKey+ "\" claim= " );
+                 throw new OA2GeneralError(OA2Errors.SERVER_ERROR, "Missing " + claimKey + " claim", HttpStatus.SC_INTERNAL_SERVER_ERROR);
+             }
+        }else{
+            throw new OA2GeneralError(OA2Errors.SERVER_ERROR, "Missing " + claimKey + " claim", HttpStatus.SC_INTERNAL_SERVER_ERROR);
+        }
+
+    }
+
+    /**
+     * For CIL-499. It is possible to remove key claims with functors and return unusable claims objects. This method
+     * will check that claims that <b>must</b> be present are there or will raise a server-side exception.
+     * @param claims
+     */
+    protected void checkRequiredClaims(JSONObject claims){
+        // only required one by the spec.
+        if(oa2se.isOIDCEnabled()) {
+            checkClaim(claims, SUBJECT);
+        }
+    }
+    protected boolean isEmpty(String x){
+        return x!=null && 0 < x.length();
+    }
     /**
      * This is the post-processing after <b>ALL</b> the claim sources have run, should there be any. It is different
      * from the per-source processing.

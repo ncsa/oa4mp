@@ -93,7 +93,7 @@ create table :oa4mpSchema.:oa4mpApproverTable(
     approval_ts TIMESTAMP);
 
 create table :oa4mpSchema.:oa4mpTransactionTable  (
-create table transactions  (
+create table cilogon2.transactions  (
    temp_token text primary key,
    temp_token_valid boolean,
    callback_uri text,

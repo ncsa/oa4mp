@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.TransactionConverter;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
@@ -82,8 +83,19 @@ public class OA2TConverter<V extends OA2ServiceTransaction> extends TransactionC
             return;
         }
         JSONArray jsonArray = new JSONArray();
-        for (String s : t.getScopes()) {
-            jsonArray.add(s);
+        // OK, so in some weird cases the content of the scopes can be a thing called a MorphDynaBean in the JSON
+        // library. This is a known issue that sometimes it returns these, so we have to do a test and convert
+        // or we can get a very unhelpful class cast exception. This is really bizarre since the type of
+        // the scopes is a Collection<String>, so the fact that it can contain DynaBeans at all is become of some
+        /// weirdness with erasure in the JSON library that they should not be doing.
+        for (Object s : t.getScopes()) {
+            if(DebugUtil.isEnabled()){
+                if(!(s instanceof String)){
+                    DebugUtil.dbg(this,"Erasure error. A String was expected, but an object of class " + s.getClass().getCanonicalName() + " was found instead.");
+                    DebugUtil.dbg(this, "Value of the class=\"" + s + "\"");
+                }
+            }
+                jsonArray.add(s.toString());
         }
         map.put(getTCK().scopes(), jsonArray.toString());
         if (t.hasAuthTime()) {

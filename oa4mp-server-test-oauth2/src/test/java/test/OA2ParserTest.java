@@ -4,16 +4,18 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.FunctorClaimsType;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.OA2FunctorFactory;
 import edu.uiuc.ncsa.security.util.FunctorParserTest;
 import edu.uiuc.ncsa.security.util.functor.JFunctorFactory;
-import edu.uiuc.ncsa.security.util.functor.parser.event.EDLBSHandler;
-import edu.uiuc.ncsa.security.util.functor.parser.event.EventDrivenFunctorHandler;
-import edu.uiuc.ncsa.security.util.functor.parser.event.EventDrivenLogicBlockHandler;
+import edu.uiuc.ncsa.security.util.functor.parser.AbstractHandler;
 import edu.uiuc.ncsa.security.util.functor.parser.event.EventDrivenParser;
+import edu.uiuc.ncsa.security.util.functor.parser.event.FunctorHandler;
+import edu.uiuc.ncsa.security.util.functor.parser.event.ParserUtil;
+import edu.uiuc.ncsa.security.util.functor.parser.event.SwitchHandler;
 import org.junit.Test;
 
+import java.io.FileReader;
+import java.util.List;
 import java.util.Map;
 
-import static test.OA2FunctorTests.GROUP_NAME;
-import static test.OA2FunctorTests.createClaims;
+import static test.OA2FunctorTests.*;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -41,14 +43,9 @@ public class OA2ParserTest extends FunctorParserTest {
         Map<String, Object> claims = createClaims();
         OA2FunctorFactory ff = createOA2FF(claims);
         String testString = "isMemberOf(\"" + GROUP_NAME + "2\")";
-        EventDrivenParser eventDrivenParser = new EventDrivenParser();
-        EventDrivenFunctorHandler eventDrivenFunctorHandler = new EventDrivenFunctorHandler(ff);
-        eventDrivenParser.addParenthesisListener(eventDrivenFunctorHandler);
-        eventDrivenParser.addDoubleQuoteListener(eventDrivenFunctorHandler);
-        eventDrivenParser.addCommaListener(eventDrivenFunctorHandler);
-        eventDrivenParser.parse(testString);
-        eventDrivenFunctorHandler.getFunctor().execute();
-        assert (Boolean) eventDrivenFunctorHandler.getFunctor().getResult();
+        EventDrivenParser eventDrivenParser = new EventDrivenParser(ff);
+        FunctorHandler functorHandler = (FunctorHandler) eventDrivenParser.parse(testString);
+        assert (Boolean) functorHandler.getFResult();
 
 
     }
@@ -85,30 +82,22 @@ public class OA2ParserTest extends FunctorParserTest {
         Map<String, Object> claims = createClaims();
         claims.put("eppn", "jgaynor@ncsa.illinois.edu");
 
-        EventDrivenParser parser = new EventDrivenParser();
         JFunctorFactory functorFactory = createFunctorFactory(claims);
-        EventDrivenFunctorHandler fh = new EventDrivenFunctorHandler(functorFactory);
-        EventDrivenLogicBlockHandler lbh = new EventDrivenLogicBlockHandler(fh, functorFactory);
-        EDLBSHandler eh = new EDLBSHandler(lbh, functorFactory);
-        parser.addBraceListener(eh);
-        parser.addCommaListener(eh);
-        parser.parse(testString);
-        eh.getLogicBlocks().execute();
-        System.out.println(eh.getLogicBlocks().getFunctorMap());
-        System.out.println(claims);
+        EventDrivenParser parser = new EventDrivenParser(functorFactory);
+        SwitchHandler switchHandler = (SwitchHandler) parser.parse(testString);
         assert claims.get("eppn").equals("test:eppn/1");
-        assert eh.getLogicBlocks().getFunctorMap().containsKey(FunctorClaimsType.SET.getValue());
+        assert switchHandler.getLogicBlocks().getFunctorMap().containsKey(FunctorClaimsType.SET.getValue());
 
 
     }
 
     @Test
-    public void testLSST() throws Exception{
-        assert doLSST(OA2FunctorTests.EPPN,null,null,null).equals(OA2FunctorTests.EPPN);
-        assert doLSST(null,OA2FunctorTests.EPTID,null,null).equals(OA2FunctorTests.EPTID);
-        assert doLSST(null,null,OA2FunctorTests.oidc,OA2FunctorTests.GITHUB_IDP).equals(OA2FunctorTests.oidc +"@github.com");
-        assert doLSST(null,null,OA2FunctorTests.oidc,OA2FunctorTests.GOOGLE_IDP).equals(OA2FunctorTests.oidc +"@accounts.google.com");
-        assert doLSST(null,null,OA2FunctorTests.orcid,OA2FunctorTests.ORCID_IDP).equals(OA2FunctorTests.orcid.replace("http://", "https://"));
+    public void testLSST() throws Exception {
+        assert doLSST(OA2FunctorTests.EPPN, null, null, null).equals(OA2FunctorTests.EPPN);
+        assert doLSST(null, OA2FunctorTests.EPTID, null, null).equals(OA2FunctorTests.EPTID);
+        assert doLSST(null, null, OA2FunctorTests.oidc, OA2FunctorTests.GITHUB_IDP).equals(OA2FunctorTests.oidc + "@github.com");
+        assert doLSST(null, null, OA2FunctorTests.oidc, OA2FunctorTests.GOOGLE_IDP).equals(OA2FunctorTests.oidc + "@accounts.google.com");
+        assert doLSST(null, null, OA2FunctorTests.orcid, OA2FunctorTests.ORCID_IDP).equals(OA2FunctorTests.orcid.replace("http://", "https://"));
     }
 
     protected String doLSST(String eppn, String eptid, String oidc, String idp) {
@@ -134,19 +123,37 @@ public class OA2ParserTest extends FunctorParserTest {
             claims.put("idp", idp);
         }
 
-        EventDrivenParser parser = new EventDrivenParser();
         JFunctorFactory functorFactory = createFunctorFactory(claims);
-        EventDrivenFunctorHandler fh = new EventDrivenFunctorHandler(functorFactory);
-        EventDrivenLogicBlockHandler lbh = new EventDrivenLogicBlockHandler(fh, functorFactory);
-        EDLBSHandler eh = new EDLBSHandler(lbh, functorFactory);
-        parser.addBraceListener(eh);
-        parser.addCommaListener(eh);
-        parser.parse(testString);
-        eh.getLogicBlocks().execute();
-        System.out.println(eh.getLogicBlocks().getFunctorMap());
-        System.out.println(claims);
-        System.out.println("voPersonExternalID= " + claims.get("voPersonExternalID").toString());
+        EventDrivenParser parser = new EventDrivenParser(functorFactory);
+        SwitchHandler switchHandler = (SwitchHandler) parser.parse(testString);
         return claims.get("voPersonExternalID").toString();
+
+    }
+
+    @Test
+    public void testVOPersonScript() throws Exception {
+        String fileName = "/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/vop-test.cmd";
+        FileReader fileReader = new FileReader(fileName);
+        try {
+            List<String> commands = ParserUtil.processInput(fileReader);
+            Map<String, Object> claims = createClaims();
+            JFunctorFactory functorFactory = createFunctorFactory(claims);
+            functorFactory.setVerboseOn(true);
+            EventDrivenParser parser = new EventDrivenParser(functorFactory);
+            AbstractHandler abstractHandler = null;
+            for (String command : commands) {
+                abstractHandler = parser.parse(command, functorFactory.getEnvironment());
+            }
+            // The script is set up so that the last thing to execute is setting the voPersonExternalID claim
+            // to being the eppn as per the script.:
+            assert abstractHandler.getHandlerType() == AbstractHandler.SWITCH_TYPE;
+            SwitchHandler switchHandler = (SwitchHandler) abstractHandler;
+            System.out.println("# of consequents = " + switchHandler.getLogicBlocks().getConsequents().size());
+            assert claims.containsKey(VOPersonKey);
+            assert claims.get(VOPersonKey).equals(claims.get("eppn"));
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
 
     }
 
@@ -169,18 +176,13 @@ public class OA2ParserTest extends FunctorParserTest {
         Map<String, Object> claims = createClaims();
         claims.put("eppn", "jgaynor@ncsa.illinois.edu");
 
-        EventDrivenParser parser = new EventDrivenParser();
         JFunctorFactory functorFactory = createFunctorFactory(claims);
-        EventDrivenFunctorHandler fh = new EventDrivenFunctorHandler(functorFactory);
-        EventDrivenLogicBlockHandler lbh = new EventDrivenLogicBlockHandler(fh, functorFactory);
-        EDLBSHandler eh = new EDLBSHandler(lbh, functorFactory);
-        parser.addBraceListener(eh);
-        parser.addCommaListener(eh);
-        parser.parse(testString);
-        eh.getLogicBlocks().execute();
-        System.out.println(eh.getLogicBlocks().getFunctorMap());
-        System.out.println(claims);
+        EventDrivenParser parser = new EventDrivenParser(functorFactory);
+        AbstractHandler abstractHandler = parser.parse(testString);
+        assert abstractHandler.getHandlerType() == AbstractHandler.SWITCH_TYPE;
+
+        SwitchHandler switchHandler = (SwitchHandler) abstractHandler;
         assert claims.get("voPersonExternalID").equals("jgaynor@ncsa.illinois.edu");
-        assert eh.getLogicBlocks().getFunctorMap().containsKey(FunctorClaimsType.SET.getValue());
+        assert switchHandler.getLogicBlocks().getFunctorMap().containsKey(FunctorClaimsType.SET.getValue());
     }
 }
