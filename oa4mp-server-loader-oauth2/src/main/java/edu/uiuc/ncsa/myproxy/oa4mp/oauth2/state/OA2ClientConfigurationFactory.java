@@ -15,8 +15,8 @@ import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfigurationUtil;
 import edu.uiuc.ncsa.security.util.functor.JFunctor;
 import edu.uiuc.ncsa.security.util.functor.JFunctorFactory;
 import edu.uiuc.ncsa.security.util.functor.LogicBlock;
-import edu.uiuc.ncsa.security.util.functor.LogicBlocks;
 import edu.uiuc.ncsa.security.util.functor.logic.jThen;
+import edu.uiuc.ncsa.security.util.functor.parser.Script;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -49,8 +49,10 @@ public class OA2ClientConfigurationFactory<V extends OA2ClientConfiguration> ext
      * @param cc
      */
     public void createClaimSource(V cc, JSONObject json) {
-        cc.setPreProcessing(functorFactory.createLogicBlock(OA2ClientConfigurationUtil.getClaimsPreProcessing(json)));
-        cc.setPostProcessing(functorFactory.createLogicBlock(OA2ClientConfigurationUtil.getClaimsPostProcessing(json)));
+        cc.setPreProcessing(new Script(functorFactory, OA2ClientConfigurationUtil.getClaimsPreProcessing(json)));
+        cc.setPostProcessing(new Script(functorFactory, OA2ClientConfigurationUtil.getClaimsPostProcessing(json)));
+        //cc.setPreProcessing(functorFactory.createLogicBlock(OA2ClientConfigurationUtil.getClaimsPreProcessing(json)));
+        //cc.setPostProcessing(functorFactory.createLogicBlock(OA2ClientConfigurationUtil.getClaimsPostProcessing(json)));
         // Now to get the claim sources. These can be in either the runtime or the pre-processor
         LinkedList<ClaimSource> claimSources = new LinkedList<>();
         extractClaimsSource(cc.getPreProcessing(), json, claimSources);
@@ -61,30 +63,46 @@ public class OA2ClientConfigurationFactory<V extends OA2ClientConfiguration> ext
         cc.setClaimSource(claimSources);
     }
 
-    public void extractClaimsSource(LogicBlocks<? extends LogicBlock> logicBlocks,
+    public void extractClaimsSource(Script script,
                                     JSONObject json,
                                     LinkedList<ClaimSource> claimSources) {
-        for (LogicBlock logicBlock : logicBlocks) {
+        script.execute();
+        if (script.hasHandlers()) {
+            List<JFunctor> sources = script.getFunctorMap().get(FlowType.SET_CLAIM_SOURCE.getValue());
+            for (JFunctor source : sources) {
+                jSetClaimSource jSetClaimSource = (jSetClaimSource) source;
 
-            logicBlock.execute();
-            jThen consequent = null;
-            if (logicBlock.isIfTrue()) {
-                consequent = logicBlock.getThenBlock();
-            } else {
-                consequent = logicBlock.getElseBlock();
+                String alias = (String) jSetClaimSource.getArgs().get(0);
+                String configurationName = (String) jSetClaimSource.getArgs().get(1);
+                ClaimSource claimSource = setupClaimSource(alias, configurationName, json);
+                if (claimSource != null) {
+                    claimSources.add(claimSource);
+                }
             }
-            // note that an if block with no explicit else will result in a null consequent, therefore, if the
-            // else block is null, do not try to figure out a specialized claim source.
-            if (consequent != null && consequent.getFunctorMap().containsKey(FlowType.SET_CLAIM_SOURCE.getValue())) {
-                List<JFunctor> sources = consequent.getFunctorMap().get(FlowType.SET_CLAIM_SOURCE.getValue());
-                for (JFunctor source : sources) {
-                    jSetClaimSource jSetClaimSource = (jSetClaimSource) source;
+        }
+        if (script.hasLogicBlocks()) {
 
-                    String alias = (String) jSetClaimSource.getArgs().get(0);
-                    String configurationName = (String) jSetClaimSource.getArgs().get(1);
-                    ClaimSource claimSource = setupClaimSource(alias, configurationName, json);
-                    if (claimSource != null) {
-                        claimSources.add(claimSource);
+
+            for (LogicBlock logicBlock : script.getLogicBlocks()) {
+                jThen consequent = null;
+                if (logicBlock.isIfTrue()) {
+                    consequent = logicBlock.getThenBlock();
+                } else {
+                    consequent = logicBlock.getElseBlock();
+                }
+                // note that an if block with no explicit else will result in a null consequent, therefore, if the
+                // else block is null, do not try to figure out a specialized claim source.
+                if (consequent != null && consequent.getFunctorMap().containsKey(FlowType.SET_CLAIM_SOURCE.getValue())) {
+                    List<JFunctor> sources = consequent.getFunctorMap().get(FlowType.SET_CLAIM_SOURCE.getValue());
+                    for (JFunctor source : sources) {
+                        jSetClaimSource jSetClaimSource = (jSetClaimSource) source;
+
+                        String alias = (String) jSetClaimSource.getArgs().get(0);
+                        String configurationName = (String) jSetClaimSource.getArgs().get(1);
+                        ClaimSource claimSource = setupClaimSource(alias, configurationName, json);
+                        if (claimSource != null) {
+                            claimSources.add(claimSource);
+                        }
                     }
                 }
             }
@@ -141,7 +159,7 @@ public class OA2ClientConfigurationFactory<V extends OA2ClientConfiguration> ext
      * @return
      */
     protected ClaimSource setupClaimSource(String alias, String configName, JSONObject json) {
-        DebugUtil.dbg(this, ".setupClaimSource. alias=" + alias + ", configName=" + configName + ", json=" + (json==null?"none":json.toString(2)));
+        DebugUtil.dbg(this, ".setupClaimSource. alias=" + alias + ", configName=" + configName + ", json=" + (json == null ? "none" : json.toString(2)));
 
         Map<String, OA2ClientConfigurationUtil.SourceEntry> sources = OA2ClientConfigurationUtil.toSourcesMap(json);
         /*
@@ -188,18 +206,21 @@ public class OA2ClientConfigurationFactory<V extends OA2ClientConfiguration> ext
     }
 
     public void setupPreProcessing(V cc, JSONObject json) {
-        JSONObject jsonObject = OA2ClientConfigurationUtil.getClaimsPreProcessing(json);
-        LogicBlocks<? extends LogicBlock> preProcessing;
-        preProcessing = functorFactory.createLogicBlock(jsonObject);
+        Script preProcessing = new Script(functorFactory, OA2ClientConfigurationUtil.getClaimsPreProcessing(json));
+        // JSONObject jsonObject = OA2ClientConfigurationUtil.getClaimsPreProcessing(json);
+        //LogicBlocks<? extends LogicBlock> preProcessing;
+        //preProcessing = functorFactory.createLogicBlock(jsonObject);
         cc.setPreProcessing(preProcessing);
 
     }
 
     public void setupPostProcessing(V cc, JSONObject json) {
-
+        Script postProcessing = new Script(functorFactory, OA2ClientConfigurationUtil.getClaimsPostProcessing(json));
+/*
         JSONObject jsonObject = OA2ClientConfigurationUtil.getClaimsPostProcessing(json);
         LogicBlocks<? extends LogicBlock> postProcessing;
         postProcessing = functorFactory.createLogicBlock(jsonObject);
+*/
         cc.setPostProcessing(postProcessing);
     }
 

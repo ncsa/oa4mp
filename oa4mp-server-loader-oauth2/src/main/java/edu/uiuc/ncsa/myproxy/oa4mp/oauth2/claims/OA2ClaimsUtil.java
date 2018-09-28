@@ -353,7 +353,7 @@ public class OA2ClaimsUtil {
         }
     }
     protected boolean isEmpty(String x){
-        return x!=null && 0 < x.length();
+        return x==null || 0 == x.length();
     }
     /**
      * This is the post-processing after <b>ALL</b> the claim sources have run, should there be any. It is different

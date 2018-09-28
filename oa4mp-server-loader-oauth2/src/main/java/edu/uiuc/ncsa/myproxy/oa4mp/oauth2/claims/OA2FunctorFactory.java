@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.security.util.functor.JFunctor;
 import edu.uiuc.ncsa.security.util.functor.JFunctorFactory;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.FunctorClaimsType.*;
@@ -25,6 +26,15 @@ public class OA2FunctorFactory extends JFunctorFactory {
 
     protected Map<String, Object> claims;
 
+    @Override
+    public Map<String, String> getReplacementTemplates() {
+        HashMap<String,String> templates = new HashMap<>();
+        templates.putAll(getEnvironment());
+        for(String key : claims.keySet()){
+            templates.put(key, claims.get(key).toString());
+        }
+        return templates;
+    }
 
     public boolean hasClaims() {
         return claims != null;

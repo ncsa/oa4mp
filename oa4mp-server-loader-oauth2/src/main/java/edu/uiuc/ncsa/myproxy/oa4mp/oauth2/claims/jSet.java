@@ -24,6 +24,9 @@ public class jSet extends ClaimFunctor {
         if(claims == null){
             return null;
         }
+        if(getArgs().size() !=2){
+            throw new IllegalArgumentException("Error: Expected 2 arguments and got " + getArgs().size() + ": " + getArgs());
+        }
         String claim = String.valueOf(getArgs().get(0));
         Object obj = getArgs().get(1);
         String newValue = null;

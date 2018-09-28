@@ -1,12 +1,7 @@
 package test;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.FunctorClaimsType;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.OA2FunctorFactory;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.jExclude;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.jSet;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.*;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.jSetClaimSource;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.HTTPHeaderClaimsSource;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.LDAPClaimsSource;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientConfiguration;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientConfigurationFactory;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
@@ -14,12 +9,14 @@ import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfigurationUtil;
 import edu.uiuc.ncsa.security.util.TestBase;
 import edu.uiuc.ncsa.security.util.functor.FunctorTypeImpl;
-import edu.uiuc.ncsa.security.util.functor.LogicBlock;
 import edu.uiuc.ncsa.security.util.functor.logic.jContains;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.junit.Test;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,7 +53,7 @@ public class ClientConfigurationTest extends TestBase {
         JSONArray claimConfigs = new JSONArray();
 
         // Add configuration for a source. Here an LDAP.
-        LDAPConfiguration ldap =getLDAP();
+        LDAPConfiguration ldap = getLDAP();
         JSONObject ldap2 = ldapConfigurationUtil.toJSON(ldap);
         ldap = ldapConfigurationUtil.fromJSON(ldap2);
         ldap.setName("LDAP2");
@@ -167,8 +164,8 @@ public class ClientConfigurationTest extends TestBase {
         return j;
     }
 
-    protected LDAPConfiguration getLDAP(){
-        String raw="{\"ldap\": {\n" +
+    protected LDAPConfiguration getLDAP() {
+        String raw = "{\"ldap\": {\n" +
                 "  \"address\": \"ldap.ncsa.illinois.edu\",\n" +
                 "  \"port\": 636,\n" +
                 "  \"enabled\": true,\n" +
@@ -205,6 +202,7 @@ public class ClientConfigurationTest extends TestBase {
                 "}}";
         return ldapConfigurationUtil.fromJSON(JSONObject.fromObject(raw));
     }
+
     /**
      * This sets up the claims from the configuration and verifies they exist as they should.
      *
@@ -272,50 +270,77 @@ public class ClientConfigurationTest extends TestBase {
         assert !claims.containsKey(MY_CLAIM2);
         // test puts in an exlcuded claim. This is not used until much later, when the claims are written.
         // This just verifies that the system got the list and is handling it right up to this point.
-        for(LogicBlock lb: clientConfiguration.getPostProcessing()){
-            assert lb.getThenBlock().getFunctorMap().containsKey(FunctorClaimsType.EXCLUDE.getValue());
-        }
+        assert clientConfiguration.getPostProcessing().getFunctorMap().containsKey(FunctorClaimsType.EXCLUDE.getValue());
 
     }
 
     @Test
-       public void testInclude() throws Throwable {
-           String r = Long.toHexString(System.currentTimeMillis());
-           String myClaim = "my-claim-" + r;
-           String oldAud = "old-aud-" + r;
-           String newAud = "new-aud-" + r;
-           System.out.println("my claim=" + myClaim);
-           System.out.println("old aud=" + oldAud);
-           System.out.println("new aud=" + newAud);
+    public void testInclude() throws Throwable {
+        String r = Long.toHexString(System.currentTimeMillis());
+        String myClaim = "my-claim-" + r;
+        String oldAud = "old-aud-" + r;
+        String newAud = "new-aud-" + r;
+        System.out.println("my claim=" + myClaim);
+        System.out.println("old aud=" + oldAud);
+        System.out.println("new aud=" + newAud);
 
-           JSONObject cfg = createConfiguration(myClaim, oldAud, newAud);
-           System.out.println(cfg.toString(2));
+        JSONObject cfg = createConfiguration(myClaim, oldAud, newAud);
+        System.out.println(cfg.toString(2));
 
-           OA2ClientConfigurationFactory<OA2ClientConfiguration> ff = new OA2ClientConfigurationFactory(new OA2FunctorFactory(null, null));
-           OA2ClientConfiguration clientConfiguration = ff.newInstance(cfg);
-           clientConfiguration.executeRuntime();
-           ff.createClaimSource(clientConfiguration, cfg);
+        OA2ClientConfigurationFactory<OA2ClientConfiguration> ff = new OA2ClientConfigurationFactory(new OA2FunctorFactory(null, null));
+        OA2ClientConfiguration clientConfiguration = ff.newInstance(cfg);
+        clientConfiguration.executeRuntime();
+        ff.createClaimSource(clientConfiguration, cfg);
 
-           // claims do not exist until the sources have been run (??)
-           Map<String, Object> claims = createClaims();
+        // claims do not exist until the sources have been run (??)
+        Map<String, Object> claims = createClaims();
 
-           ff = new OA2ClientConfigurationFactory(new OA2FunctorFactory(claims, OA2FunctorTests.createScopes()));
-           clientConfiguration = ff.newInstance(cfg);
-           clientConfiguration.executeRuntime();
-           ff.setupPostProcessing(clientConfiguration, cfg);
+        ff = new OA2ClientConfigurationFactory(new OA2FunctorFactory(claims, OA2FunctorTests.createScopes()));
+        clientConfiguration = ff.newInstance(cfg);
+        clientConfiguration.executeRuntime();
+        ff.setupPostProcessing(clientConfiguration, cfg);
 
-           clientConfiguration.executePostProcessing();
-           assert claims.get(AUDIENCE).toString().equals(newAud) : "Expected audience =\"" + newAud + "\" but got \"" + claims.get(AUDIENCE) + "\"";
+        clientConfiguration.executePostProcessing();
+        assert claims.get(AUDIENCE).toString().equals(newAud) : "Expected audience =\"" + newAud + "\" but got \"" + claims.get(AUDIENCE) + "\"";
 
-           assert claims.containsKey(MY_CLAIM);
-           assert claims.get(MY_CLAIM).equals(myClaim);
-           // check that the next claim was removed.
-           assert !claims.containsKey(MY_CLAIM2);
-           // test puts in an exlcuded claim. This is not used until much later, when the claims are written.
-           // This just verifies that the system got the list and is handling it right up to this point.
-           for(LogicBlock lb: clientConfiguration.getPostProcessing()){
-               assert lb.getThenBlock().getFunctorMap().containsKey(FunctorClaimsType.EXCLUDE.getValue());
-           }
+        assert claims.containsKey(MY_CLAIM);
+        assert claims.get(MY_CLAIM).equals(myClaim);
+        // check that the next claim was removed.
+        assert !claims.containsKey(MY_CLAIM2);
+        // test puts in an exlcuded claim. This is not used until much later, when the claims are written.
+        // This just verifies that the system got the list and is handling it right up to this point.
+        assert clientConfiguration.getPostProcessing().getFunctorMap().containsKey(FunctorClaimsType.EXCLUDE.getValue());
 
-       }
+    }
+
+
+    @Test
+    public void testNewScripting() throws Exception {
+        File testFile = new File("/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-admin-oauth2/src/main/resources/script-test.json");
+        if (!testFile.exists()) {
+            System.out.println("Could not find test file for scripting. Skipping test...");
+            return;
+        }
+        FileReader fr = new FileReader(testFile);
+        BufferedReader br = new BufferedReader(fr);
+        String linein = br.readLine();
+        String raw = "";
+        while (linein != null) {
+            raw = raw + linein + "\n";
+            linein = br.readLine();
+        }
+
+        OA2FunctorFactory functorFactory = new OA2FunctorFactory(null, null);
+        functorFactory.setVerboseOn(true); // enables output in scripts.
+        OA2ClientConfigurationFactory<OA2ClientConfiguration> ff = new OA2ClientConfigurationFactory(functorFactory);
+        JSONObject cfg = JSONObject.fromObject(raw);
+        OA2ClientConfiguration clientConfiguration = ff.newInstance(cfg);
+        ff.createClaimSource(clientConfiguration, cfg);
+        List<ClaimSource> cc = clientConfiguration.getClaimSource();
+        System.out.println(cc);
+        assert cc.get(0) instanceof LDAPClaimsSource;
+        assert clientConfiguration.hasPreProcessing();
+        assert clientConfiguration.getPreProcessing().hasHandlers();
+
+    }
 }

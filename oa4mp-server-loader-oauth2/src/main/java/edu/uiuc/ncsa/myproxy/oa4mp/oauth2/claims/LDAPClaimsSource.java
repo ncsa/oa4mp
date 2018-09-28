@@ -35,7 +35,8 @@ import java.util.Map;
  * on 4/26/16 at  3:32 PM
  */
 public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
-
+    public LDAPClaimsSource() {
+    }
 
     public LDAPClaimsSource(LDAPConfiguration ldapConfiguration, MyLoggingFacade myLogger) {
         super();

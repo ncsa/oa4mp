@@ -2,8 +2,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state;
 
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.ClientConfiguration;
-import edu.uiuc.ncsa.security.util.functor.LogicBlock;
-import edu.uiuc.ncsa.security.util.functor.LogicBlocks;
+import edu.uiuc.ncsa.security.util.functor.parser.Script;
 
 import java.util.List;
 
@@ -16,19 +15,19 @@ public class OA2ClientConfiguration extends ClientConfiguration {
         super();
     }
 
-    LogicBlocks<? extends LogicBlock> postProcessing;
-    LogicBlocks<? extends LogicBlock> preProcessing;
+    Script postProcessing;
+    Script preProcessing;
 
-    public void setPostProcessing(LogicBlocks<? extends LogicBlock> postProcessing) {
+    public void setPostProcessing(Script postProcessing) {
         this.postProcessing = postProcessing;
     }
-    public void setPreProcessing(LogicBlocks<? extends LogicBlock> preProcessing) {
+    public void setPreProcessing(Script preProcessing) {
            this.preProcessing = preProcessing;
        }
-    public LogicBlocks<? extends LogicBlock> getPreProcessing() {
+    public Script getPreProcessing() {
         return preProcessing;
     }
-    public LogicBlocks<? extends LogicBlock> getPostProcessing() {
+    public Script getPostProcessing() {
         return postProcessing;
     }
 
@@ -51,10 +50,10 @@ public class OA2ClientConfiguration extends ClientConfiguration {
 
 
     public boolean hasPostProcessing(){
-        return postProcessing !=null & !postProcessing.isEmpty();
+        return postProcessing !=null;
     }
     public boolean hasPreProcessing(){
-        return preProcessing !=null & !preProcessing.isEmpty();
+        return preProcessing !=null ;
     }
     public void setClaimSource(List<ClaimSource> claimSource) {
         this.claimSource = claimSource;

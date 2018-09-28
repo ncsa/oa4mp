@@ -5,14 +5,13 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.OA2FunctorFactory;
 import edu.uiuc.ncsa.security.util.FunctorParserTest;
 import edu.uiuc.ncsa.security.util.functor.JFunctorFactory;
 import edu.uiuc.ncsa.security.util.functor.parser.AbstractHandler;
+import edu.uiuc.ncsa.security.util.functor.parser.Script;
 import edu.uiuc.ncsa.security.util.functor.parser.event.EventDrivenParser;
 import edu.uiuc.ncsa.security.util.functor.parser.event.FunctorHandler;
-import edu.uiuc.ncsa.security.util.functor.parser.event.ParserUtil;
 import edu.uiuc.ncsa.security.util.functor.parser.event.SwitchHandler;
 import org.junit.Test;
 
 import java.io.FileReader;
-import java.util.List;
 import java.util.Map;
 
 import static test.OA2FunctorTests.*;
@@ -42,7 +41,7 @@ public class OA2ParserTest extends FunctorParserTest {
     public void testIsMemberOf() throws Exception {
         Map<String, Object> claims = createClaims();
         OA2FunctorFactory ff = createOA2FF(claims);
-        String testString = "isMemberOf(\"" + GROUP_NAME + "2\")";
+        String testString = "isMemberOf('" + GROUP_NAME + "2')";
         EventDrivenParser eventDrivenParser = new EventDrivenParser(ff);
         FunctorHandler functorHandler = (FunctorHandler) eventDrivenParser.parse(testString);
         assert (Boolean) functorHandler.getFResult();
@@ -63,19 +62,19 @@ public class OA2ParserTest extends FunctorParserTest {
                 " or{" +
                 "   if[" +
                 "      and(" +
-                "          endsWith(get(\"eppn\"),\"@ncsa.illinois.edu\")," +
-                "         contains(\"foo\",\"zfoo\")" +
+                "          endsWith(get('eppn'),'@ncsa.illinois.edu')," +
+                "         contains('foo','zfoo')" +
                 "        )" +
                 "     ]then[" +
-                "      set(\"eppn\",\"test:eppn/1\")" +
+                "      set('eppn','test:eppn/1')" +
                 "     ]," +
                 "   if[" +
                 "    and(" +
-                "        contains(\"foo\",\"zfoo\")," +
-                "       endsWith(get(\"eppn\"),\"@illinois.edu\")" +
+                "        contains('foo','zfoo')," +
+                "       endsWith(get('eppn'),'@illinois.edu')" +
                 "      )" +
                 "    ]then[" +
-                "  set(\"eppn\",\"test:eppn/2\")" +
+                "  set('eppn','test:eppn/2')" +
                 "   ]" +
                 " }";
         // All this should result in the string "pq"
@@ -102,11 +101,11 @@ public class OA2ParserTest extends FunctorParserTest {
 
     protected String doLSST(String eppn, String eptid, String oidc, String idp) {
         String testString = "xor{" +
-                "if[hasClaim(\"eppn\")]then[set(\"voPersonExternalID\",get(\"eppn\"))]," +
-                "if[hasClaim(\"eptid\")]then[set(\"voPersonExternalID\",get(\"eptid\"))]," +
-                "if[equals(get(\"idp\"),\"http://github.com/login/oauth/authorize\")]then[set(\"voPersonExternalID\",concat(get(\"oidc\"),\"@github.com\"))]," +
-                "if[equals(get(\"idp\"),\"http://google.com/accounts/o8/id\")]then[set(\"voPersonExternalID\",concat(get(\"oidc\"),\"@accounts.google.com\"))]," +
-                "if[equals(get(\"idp\"),\"http://orcid.org/oauth/authorize\")]then[set(\"voPersonExternalID\",replace(get(\"oidc\"),\"http://\",\"https://\"))]" +
+                "if[hasClaim('eppn')]then[set('voPersonExternalID',get('eppn'))]," +
+                "if[hasClaim('eptid')]then[set('voPersonExternalID',get('eptid'))]," +
+                "if[equals(get('idp'),'http://github.com/login/oauth/authorize')]then[set('voPersonExternalID',concat(get('oidc'),'@github.com'))]," +
+                "if[equals(get('idp'),'http://google.com/accounts/o8/id')]then[set('voPersonExternalID',concat(get('oidc'),'@accounts.google.com'))]," +
+                "if[equals(get('idp'),'http://orcid.org/oauth/authorize')]then[set('voPersonExternalID',replace(get('oidc'),'http://','https://'))]" +
                 "}";
 
         Map<String, Object> claims = createClaims();
@@ -134,43 +133,29 @@ public class OA2ParserTest extends FunctorParserTest {
     public void testVOPersonScript() throws Exception {
         String fileName = "/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/vop-test.cmd";
         FileReader fileReader = new FileReader(fileName);
-        try {
-            List<String> commands = ParserUtil.processInput(fileReader);
             Map<String, Object> claims = createClaims();
             JFunctorFactory functorFactory = createFunctorFactory(claims);
             functorFactory.setVerboseOn(true);
-            EventDrivenParser parser = new EventDrivenParser(functorFactory);
-            AbstractHandler abstractHandler = null;
-            for (String command : commands) {
-                abstractHandler = parser.parse(command, functorFactory.getEnvironment());
-            }
-            // The script is set up so that the last thing to execute is setting the voPersonExternalID claim
-            // to being the eppn as per the script.:
-            assert abstractHandler.getHandlerType() == AbstractHandler.SWITCH_TYPE;
-            SwitchHandler switchHandler = (SwitchHandler) abstractHandler;
-            System.out.println("# of consequents = " + switchHandler.getLogicBlocks().getConsequents().size());
+            Script script = new Script(functorFactory);
+            script.execute(fileReader);
             assert claims.containsKey(VOPersonKey);
             assert claims.get(VOPersonKey).equals(claims.get("eppn"));
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-        }
-
     }
 
     @Test
     public void testVOPerson() throws Exception {
-        String rawJSON = ":{\"$or\":[{\"$if\":[{\"$hasClaim\":[\"eppn\"]}],\"$then\":[{\"$set\":[\"voPersonExternalID\",{\"$get\":[\"eppn\"]}]}]},{\"$if\":[{\"$hasClaim\":[\"eptid\"]}],\"$then\":[{\"$set\":[\"voPersonExternalID\",{\"$get\":[\"eptid\"]}]}]}," +
-                "{\"$if\":[{\"$equals\":[{\"$get\":[\"idp\"]},\"http://github.com/login/oauth/authorize\"]}]," +
-                "\"$then\":[{\"$set\":[\"voPersonExternalID\"," +
-                "{\"$concat\":[{\"$get\":[\"oidc\"]},\"@github.com\"]}]}]},{\"$if\":[{\"$equals\":[{\"$get\":[\"idp\"]}," +
-                "\"http://google.com/accounts/o8/id\"]}],\"$then\":[{\"$set\":[\"voPersonExternalID\",{\"$concat\":[{\"$get\":[\"oidc\"]},\"@accounts.google.com\"]}]}]},{\"$if\":[{\"$equals\":" +
-                "[{\"$get\":[\"idp\"]},\"http://orcid.org/oauth/authorize\"]}],\"$then\":[{\"$set\":[\"voPersonExternalID\",{\"$replace\":[{\"$get\":[\"oidc\"]},\"http://\",\"https://\"]}]}]}]}";
+        String rawJSON = ":{'$or':[{'$if':[{'$hasClaim':['eppn']}],'$then':[{'$set':['voPersonExternalID',{'$get':['eppn']}]}]},{'$if':[{'$hasClaim':['eptid']}],'$then':[{'$set':['voPersonExternalID',{'$get':['eptid']}]}]}," +
+                "{'$if':[{'$equals':[{'$get':['idp']},'http://github.com/login/oauth/authorize']}]," +
+                "'$then':[{'$set':['voPersonExternalID'," +
+                "{'$concat':[{'$get':['oidc']},'@github.com']}]}]},{'$if':[{'$equals':[{'$get':['idp']}," +
+                "'http://google.com/accounts/o8/id']}],'$then':[{'$set':['voPersonExternalID',{'$concat':[{'$get':['oidc']},'@accounts.google.com']}]}]},{'$if':[{'$equals':" +
+                "[{'$get':['idp']},'http://orcid.org/oauth/authorize']}],'$then':[{'$set':['voPersonExternalID',{'$replace':[{'$get':['oidc']},'http://','https://']}]}]}]}";
         String testString = "xor{" +
-                "if[hasClaim(\"eppn\")]then[set(\"voPersonExternalID\",get(\"eppn\"))]," +
-                "if[hasClaim(\"eptid\")]then[set(\"voPersonExternalID\",get(\"eptid\"))]," +
-                "if[equals(get(\"idp\"),\"http://github.com/login/oauth/authorize\")]then[set(\"voPersonExternalID\",concat(get(\"oidc\"),\"@github.com\"))]," +
-                "if[equals(get(\"idp\"),\"http://google.com/accounts/o8/id\")]then[set(\"voPersonExternalID\",concat(get(\"oidc\"),\"@accounts.google.com\"))]," +
-                "if[equals(get(\"idp\"),\"http://orcid.org/oauth/authorize\")]then[set(\"voPersonExternalID\",replace(get(\"oidc\"),\"http://\",\"https://\"))]" +
+                "if[hasClaim('eppn')]then[set('voPersonExternalID',get('eppn'))]," +
+                "if[hasClaim('eptid')]then[set('voPersonExternalID',get('eptid'))]," +
+                "if[equals(get('idp'),'http://github.com/login/oauth/authorize')]then[set('voPersonExternalID',concat(get('oidc'),'@github.com'))]," +
+                "if[equals(get('idp'),'http://google.com/accounts/o8/id')]then[set('voPersonExternalID',concat(get('oidc'),'@accounts.google.com'))]," +
+                "if[equals(get('idp'),'http://orcid.org/oauth/authorize')]then[set('voPersonExternalID',replace(get('oidc'),'http://','https://'))]" +
                 "}";
 
         Map<String, Object> claims = createClaims();

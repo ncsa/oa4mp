@@ -12,7 +12,7 @@ import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSourceConfiguration;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.JSONClaimSourceConfig;
-import edu.uiuc.ncsa.security.util.functor.LogicBlocks;
+import edu.uiuc.ncsa.security.util.functor.parser.Script;
 import net.sf.json.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
@@ -140,8 +140,11 @@ public class BasicClaimsSourceImpl implements ClaimSource {
     public JSONObject process(JSONObject claims, HttpServletRequest request, ServiceTransaction transaction) throws UnsupportedScopeException {
         OA2ServiceTransaction t = (OA2ServiceTransaction) transaction;
         if (hasConfiguration() && hasJSONPreProcessoor()) {
+            DebugUtil.dbg(this, "claims before pre-processing=" + claims.toString(1));
+
             OA2FunctorFactory ff = new OA2FunctorFactory(claims, t.getScopes());
-            preProcessor = ff.createLogicBlock(((JSONClaimSourceConfig) getConfiguration()).getJSONPreProcessing());
+            preProcessor = new Script(ff, getConfiguration().getJSONPreProcessing());
+            //preProcessor = ff.createLogicBlock(((JSONClaimSourceConfig) getConfiguration()).getJSONPreProcessing());
             preProcessor.execute();
             // since the flow state maps to  part of a JSON object, we have to get the object, then reset it.
             FlowStates f = t.getFlowStates();
@@ -154,7 +157,8 @@ public class BasicClaimsSourceImpl implements ClaimSource {
         if (hasConfiguration() && hasJSONPostProcessoor()) {
             OA2FunctorFactory ff = new OA2FunctorFactory(claims, t.getScopes());
             DebugUtil.dbg(this, "claims before post-processing=" + claims.toString(1));
-            postProcessor = ff.createLogicBlock((getConfiguration()).getJSONPostProcessing());
+            postProcessor = new Script(ff, getConfiguration().getJSONPostProcessing());
+            //postProcessor = ff.createLogicBlock((getConfiguration()).getJSONPostProcessing());
             postProcessor.execute();
             DebugUtil.dbg(this, "claims after post-processing=" + claims.toString(1));
             FlowStates f = t.getFlowStates();
@@ -223,16 +227,16 @@ public class BasicClaimsSourceImpl implements ClaimSource {
         return false;
     }
 
-    LogicBlocks preProcessor = null;
-    LogicBlocks postProcessor = null;
+    Script preProcessor = null;
+    Script postProcessor = null;
 
     @Override
-    public LogicBlocks getPostProcessor() {
+    public Script getPostProcessor() {
         return postProcessor;
     }
 
     @Override
-    public LogicBlocks getPreProcessor() {
+    public Script getPreProcessor() {
         return preProcessor;
     }
 }

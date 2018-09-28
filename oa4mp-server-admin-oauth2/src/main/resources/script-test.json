@@ -1,0 +1,106 @@
+{
+  "config": "Test configuration that contains new scripting notation 9/24/2018",
+  "claims": {
+    "sourceConfig": [
+      {
+        "ldap": {
+          "preProcessing": {
+            "script": [
+              "setEnv('vo','voPersonExternalID');",
+              "getEnv('github','http://github.com/login/oauth/authorize');",
+              "getEnv('google','http://google.com/accounts/o8/id');",
+              "getEnv('orcid','http://orcid.org/oauth/authorize');",
+              "xor{",
+              "    if[hasClaim('eppn')]then[set('${vo}',get('eppn'))],",
+              "    if[hasClaim('eptid')]then[set('${vo}',get('eptid'))],",
+              "    if[equals(get('idp'),'${github}')]then[set('${vo}',concat(get('oidc'),'@github.com'))],",
+              "    if[equals(get('idp'),'${google}')]then[set('${vo}',concat(get('oidc'),'@accounts.google.com'))],",
+              "   if[equals(get('idp'),'${orcid}')]then[set('${vo}',replace(get('oidc'),'http://','https://'))]",
+              "};"
+            ],
+            "version": "1.0"
+          },
+          "failOnError": "false",
+          "address": "ldap-test2.ncsa.illinois.edu",
+          "port": 636,
+          "enabled": "true",
+          "authorizationType": "none",
+          "searchName": "voPersonExternalID",
+          "searchFilterAttribute": "voPersonExternalID",
+          "searchAttributes": [
+            {
+              "name": "uid",
+              "returnAsList": false,
+              "returnName": "uid"
+            }
+          ],
+          "searchBase": "ou=People,dc=ncsa,dc=illinois,dc=edu",
+          "contextName": "",
+          "ssl": {
+            "tlsVersion": "TLS",
+            "useJavaTrustStore": true
+          },
+          "id": "3258ed63b62d1a78"
+        }
+      },
+      {
+        "ldap": {
+          "id": "58a170bfe4a59c05",
+          "name": "58a170bfe4a59c05",
+          "address": "ldap-test2.ncsa.illinois.edu",
+          "port": 636,
+          "enabled": true,
+          "authorizationType": "none",
+          "failOnError": false,
+          "notifyOnFail": false,
+          "searchAttributes": [
+            {
+              "name": "mail",
+              "returnAsList": false,
+              "returnName": "email"
+            },
+            {
+              "name": "cn",
+              "returnAsList": false,
+              "returnName": "name"
+            },
+            {
+              "name": "uidNumber",
+              "returnAsList": false,
+              "returnName": "uidNumber"
+            },
+            {
+              "name": "uid",
+              "returnAsList": false,
+              "returnName": "uid"
+            },
+            {
+              "name": "memberOf",
+              "isGroup": true,
+              "returnAsList": false,
+              "returnName": "isMemberOf"
+            }
+          ],
+          "searchBase": "ou=People,dc=ncsa,dc=illinois,dc=edu",
+          "searchName": "uid",
+          "searchFilterAttribute": "uid",
+          "contextName": "",
+          "ssl": {
+            "keystore": {},
+            "tlsVersion": "TLS",
+            "useJavaTrustStore": true,
+            "password": "changeit",
+            "type": "jks"
+          }
+        }
+      }
+    ],
+    "preProcessing": {
+      "script": [
+        "set_claim_source('LDAP','3258ed63b62d1a78');",
+        "set_claim_source('LDAP','58a170bfe4a59c05');"
+      ]
+    }
+  },
+  "isSaved": true
+}
