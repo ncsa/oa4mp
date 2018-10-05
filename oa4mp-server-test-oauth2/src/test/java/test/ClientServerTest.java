@@ -44,6 +44,8 @@ public class ClientServerTest extends DDServerTests {
         ClientApproval approval = tp2.getClientApprovalStore().get(cc.client.getIdentifier());
         assert approval != null : "No approval found";
         assert approval.isApproved();
+        cleanupCC(cc, tp2);
+
     }
 
     public void testUnapprove(TestStoreProviderInterface tp2) throws Exception {
@@ -59,6 +61,7 @@ public class ClientServerTest extends DDServerTests {
         ClientApproval approval = tp2.getClientApprovalStore().get(cc.client.getIdentifier());
         assert approval != null : "No approval found";
         assert !approval.isApproved();
+        cleanupCC(cc,tp2);
     }
 
     /**
@@ -85,6 +88,11 @@ public class ClientServerTest extends DDServerTests {
 
     }
 
+    /**
+     * This also tests that the new cfg attribute of the client is set.
+     * @param tp2
+     * @throws Exception
+     */
     public void testCreate(TestStoreProviderInterface tp2) throws Exception {
         // only needs an admin client and map.
         CC cc = setupClients(tp2);
@@ -115,6 +123,8 @@ public class ClientServerTest extends DDServerTests {
         JSONObject cfg2 = newClient.getConfig();
         assert cfg1.getString("version").equals(cfg2.getString("version")) : "Configurations do not match in OA2 clients";
         assert oldClient.equals(newClient);
+        cleanupCC(cc,tp2);
+
     }
 
 
@@ -147,6 +157,8 @@ public class ClientServerTest extends DDServerTests {
         oldClient.setIdentifier(newClient.getIdentifier());
         oldClient.setSecret(newClient.getSecret());
         assert oldClient.equals(newClient);
+        cleanupCC(cc,tp2);
+
     }
 
 
@@ -176,6 +188,7 @@ public class ClientServerTest extends DDServerTests {
         assert tp2.getPermissionStore().get(cc.adminClient.getIdentifier(), cc.client.getIdentifier()).isEmpty();
         assert tp2.getPermissionStore().get(ac2.getIdentifier(), cc.client.getIdentifier()).isEmpty();
 
+        cleanupCC(cc,tp2);
 
     }
 }

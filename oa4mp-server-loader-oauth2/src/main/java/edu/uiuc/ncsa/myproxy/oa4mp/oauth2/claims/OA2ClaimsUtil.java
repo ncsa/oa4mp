@@ -15,7 +15,6 @@ import edu.uiuc.ncsa.security.oauth_2_0.OA2GeneralError;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Scopes;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
-import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import net.sf.json.JSONObject;
 import org.apache.http.HttpStatus;
 
@@ -31,6 +30,11 @@ import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.*;
  * on 4/24/18 at  11:13 AM
  */
 public class OA2ClaimsUtil {
+    /*
+    ONly enable this if you want to see everything. Lots of output.
+     */
+    boolean deepDebugOn = false;
+
     protected OA2ServiceTransaction transaction;
     OA2SE oa2se;
 
@@ -47,7 +51,7 @@ public class OA2ClaimsUtil {
      * @return
      */
     public JSONObject setAccountingInformation(HttpServletRequest request, JSONObject claims) {
-        DebugUtil.dbg(this, "Starting to process basic claims");
+        dbg(this, "Starting to process basic claims");
         if (transaction.hasAuthTime()) {
             // convert the date to a time if needed.
             claims.put(AUTHORIZATION_TIME, Long.toString(transaction.getAuthTime().getTime() / 1000));
@@ -80,7 +84,7 @@ public class OA2ClaimsUtil {
      */
     public JSONObject initializeClaims(HttpServletRequest request, JSONObject claims) {
 
-        DebugUtil.dbg(this, "Starting to process basic claims");
+        dbg(this, "Starting to process basic claims");
         String issuer = null;
         // So in order
         // 1. get the issuer from the admin client
@@ -144,21 +148,21 @@ public class OA2ClaimsUtil {
         OA2Client client = getOA2Client();
         checkRequiredScopes(request, t);
         if (!getCC().isSaved()) {
-            ServletDebugUtil.dbg(this, "Saving updated client " + client.getIdentifierString());
+      dbg(this, "Saving updated client " + client.getIdentifierString());
             getCC().setSaved(true); // do this so it ends up in storage as saved, otherwise it gets saved every time.
             // This means that the configuration was updated on load and needs to be saved.
             oa2se.getClientStore().save(client);
         } else {
-            ServletDebugUtil.dbg(this, "*NOT* saving updated client " + client.getIdentifierString());
+     dbg(this, "*NOT* saving updated client " + client.getIdentifierString());
         }
-        DebugUtil.dbg(this, "Done with basic claims = " + claims.toString(1));
+     dbg(this, "Done with basic claims = " + claims.toString(1));
         if (transaction.getOA2Client().isPublicClient()) {
             // Public clients do not get more than basic claims.
             oa2se.getTransactionStore().save(transaction);
             return claims;
         }
 
-        DebugUtil.dbg(this, "Starting to process server default claims");
+     dbg(this, "Starting to process server default claims");
 
         if (oa2se != null && oa2se.getClaimSource() != null && oa2se.getClaimSource().isEnabled() && oa2se.getClaimSource().isRunAtAuthorization()) {
             DebugUtil.dbg(this, "Service environment has a claims source enabled=" + oa2se.getClaimSource());
@@ -167,10 +171,10 @@ public class OA2ClaimsUtil {
             // to allow, e.g. pulling user information out of HTTp headers.
             oa2se.getClaimSource().process(claims, request, transaction);
         } else {
-            DebugUtil.dbg(this, "Service environment has a claims no source enabled during authorization");
+    dbg(this, "Service environment has a claims no source enabled during authorization");
         }
 
-        DebugUtil.dbg(this, "Starting to process Client runtime and sources at authorization.");
+      dbg(this, "Starting to process Client runtime and sources at authorization.");
 
 
         if (client.getConfig() == null || client.getConfig().isEmpty()) {
@@ -179,16 +183,16 @@ public class OA2ClaimsUtil {
         }
         // so this client has a specific configuration that is to be invoked.
 
-        DebugUtil.dbg(this, "executing runtime");
+   dbg(this, "executing runtime");
 
         getCC().executeRuntime();
-        DebugUtil.dbg(this, "processing flows");
+        dbg(this, "processing flows");
 
         FlowStates flowStates = new FlowStates(getCC().getRuntime().getFunctorMap());
         transaction.setFlowStates(flowStates);
         if (flowStates.getClaims) {
-            DebugUtil.dbg(this, "Doing preprocessing");
-            DebugUtil.dbg(this, "Claims allowed, creating sources from configuration");
+    dbg(this, "Doing preprocessing");
+     dbg(this, "Claims allowed, creating sources from configuration");
             OA2ClientConfigurationFactory<OA2ClientConfiguration> ff = new OA2ClientConfigurationFactory(getFF());
             OA2ClientConfiguration oa2CC = getCC();
 
@@ -213,7 +217,7 @@ public class OA2ClaimsUtil {
                         oa2se.getTransactionStore().save(transaction);
                         throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "access denied", HttpStatus.SC_UNAUTHORIZED);
                     }
-                    DebugUtil.dbg(this, "user info for claim source #" + claimSource + " = " + claims.toString(1));
+     dbg(this, "user info for claim source #" + claimSource + " = " + claims.toString(1));
                 }
             }
 
@@ -278,7 +282,7 @@ public class OA2ClaimsUtil {
         // so this client has a specific configuration that is to be invoked.
         OA2ClientConfiguration oa2CC = getCC();
 
-        DebugUtil.dbg(this, "BEFORE invoking claim sources, claims are = " + claims.toString(1));
+  dbg(this, "BEFORE invoking claim sources, claims are = " + claims.toString(1));
         if (flowStates.getClaims) {
             DebugUtil.dbg(this, "Claims allowed, creating sources from configuration");
             OA2ClientConfigurationFactory<OA2ClientConfiguration> ff = new OA2ClientConfigurationFactory(getFF());
@@ -299,14 +303,14 @@ public class OA2ClaimsUtil {
                             }
                         }
                         claimSource.process(claims, transaction);
-                        DebugUtil.dbg(this, "After invoking claim source, new claims = " + claims.toString(1));
+                        dbg(this, "After invoking claim source, new claims = " + claims.toString(1));
                     }
                 }
             }
 
         }
         // these might have changed in the course of executing the claim source.
-        DebugUtil.dbg(this, "Ready for post-processing");
+   dbg(this, "Ready for post-processing");
         doPostProcessing();
         // Now we have to set up the claims sources and process the results
         // last thing is to check that the flow states did not change as a result of claims processing
@@ -319,11 +323,11 @@ public class OA2ClaimsUtil {
         checkRequiredClaims(claims);
         transaction.setClaims(claims);// since the JSON library tends to clone things and they go missing, just set it again.
         oa2se.getTransactionStore().save(transaction);
-        DebugUtil.dbg(this, "Done with special claims=" + claims.toString(1));
+        dbg(this, "Done with special claims=" + claims.toString(1));
         // After post-processing it is possible that this user should be forbidden access, e.g. they are not in the correct group.
         // This is the first place we can check. If they are not allowed to make further requests, an access denied exception is thrown.
         if (!flowStates.acceptRequests) {
-            DebugUtil.dbg(this, "Access denied for user name = " + transaction.getUsername());
+   dbg(this, "Access denied for user name = " + transaction.getUsername());
             throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "access denied", HttpStatus.SC_UNAUTHORIZED);
         }
         return claims;
@@ -332,7 +336,7 @@ public class OA2ClaimsUtil {
     protected void checkClaim(JSONObject claims, String claimKey){
         if(claims.containsKey(claimKey)){
              if(isEmpty(claims.getString(claimKey))){
-                 DebugUtil.dbg(this, "Missing \"" + claimKey+ "\" claim= " );
+      //           DebugUtil.dbg(this, "Missing \"" + claimKey+ "\" claim= " );
                  throw new OA2GeneralError(OA2Errors.SERVER_ERROR, "Missing " + claimKey + " claim", HttpStatus.SC_INTERNAL_SERVER_ERROR);
              }
         }else{
@@ -362,15 +366,14 @@ public class OA2ClaimsUtil {
      * @throws Throwable
      */
     public void doPostProcessing() throws Throwable {
-        DebugUtil.dbg(this, ".doPostProcessing: has post-processing?" + getCC().hasPostProcessing());
+           dbg(this, ".doPostProcessing: has post-processing?" + getCC().hasPostProcessing());
         if (getCC().hasPostProcessing()) {
             DebugUtil.dbg(this, ".doPostProcessing: has post-processing?" + getCC().getPostProcessing());
 
             OA2ClientConfigurationFactory<OA2ClientConfiguration> ff = new OA2ClientConfigurationFactory(getFF());
             ff.setupPostProcessing(getCC(), getOA2Client().getConfig());
             getCC().executePostProcessing();
-            DebugUtil.dbg(this, ".doPostProcessing: executed post-processing, functor map=" + getCC().getPostProcessing().getFunctorMap());
-
+            dbg(this, ".doPostProcessing: executed post-processing, functor map=" + getCC().getPostProcessing().getFunctorMap());
         }
 
 
@@ -390,5 +393,11 @@ public class OA2ClaimsUtil {
             getCC().executePreProcessing();
         }
 
+    }
+
+    protected void dbg(Object c, String x){
+          if(deepDebugOn){
+              DebugUtil.dbg(c,x);
+          }
     }
 }

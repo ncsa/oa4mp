@@ -81,6 +81,7 @@ public class PermissionServerTest extends DDServerTests {
         for (AdminClient x : returnedACs) {
             assert adminIDs.contains(x.getIdentifier());
         }
+        cleanupCC(cc,tp2);
 
 
     }
@@ -118,6 +119,8 @@ public class PermissionServerTest extends DDServerTests {
         for (OA2Client x : returnedACs) {
             assert clientIDs.contains(x.getIdentifier());
         }
+        cleanupCC(cc,tp2);
+
     }
 
     /**
@@ -151,6 +154,7 @@ public class PermissionServerTest extends DDServerTests {
         PermissionServer permissionServer = new PermissionServer((OA2SE)tp2.getSE());
         PermissionResponse resp = (PermissionResponse) permissionServer.process(req);
         assert tp2.getPermissionStore().get(cc.adminClient.getIdentifier(), cc.client.getIdentifier()).isEmpty();
+        cleanupCC(cc,tp2);
 
     }
 }

@@ -23,6 +23,7 @@ public class NewClientNotifier extends Notifier implements NewClientListener {
     public static final String CREATION_TIME = "creationTime";
     public static final String IDENTIFIER = "identifier";
     public static final String LIMITED_PROXY = "limitedProxy";
+    public static final String REPLY_TO = "reply-to";
 
     public NewClientNotifier(MailUtil mailUtil, MyLoggingFacade loggingFacade) {
         super(mailUtil, loggingFacade);
@@ -38,6 +39,7 @@ public class NewClientNotifier extends Notifier implements NewClientListener {
         replacements.put(CREATION_TIME, client.getCreationTS().toString());
         replacements.put(IDENTIFIER, client.getIdentifierString());
         replacements.put(LIMITED_PROXY, Boolean.toString(client.isProxyLimited()));
+        replacements.put(REPLY_TO, client.getEmail());
         try {
             replacements.put("host", InetAddress.getLocalHost().getCanonicalHostName());
         } catch (UnknownHostException e) {

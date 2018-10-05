@@ -1,10 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.server;
 
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.util.cli.CLIDriver;
-import edu.uiuc.ncsa.security.util.cli.CommonCommands;
-import edu.uiuc.ncsa.security.util.cli.ConfigurableCommandsImpl;
-import edu.uiuc.ncsa.security.util.cli.InputLine;
+import edu.uiuc.ncsa.security.util.cli.*;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -15,6 +12,7 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl {
     public static final String CLIENTS = "clients";
     public static final String CLIENT_APPROVALS = "approvals";
     public static final String COPY = "copy";
+    public String PARSER_COMMAND = "parser";
 
 
     public abstract void about();
@@ -64,6 +62,9 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl {
         if (inputLine.hasArg(COPY)) {
             commands = getNewCopyCommands();
         }
+        if (inputLine.hasArg(PARSER_COMMAND)) {
+            commands = getNewParserCommands();
+        }
         if (commands != null) {
             CLIDriver cli = new CLIDriver(commands);
             cli.start();
@@ -79,11 +80,17 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl {
 
 
     protected boolean hasComponent(String componentName) {
-        return componentName.equals(CLIENTS) || componentName.equals(CLIENT_APPROVALS) || componentName.equals(COPY);
+        return componentName.equals(CLIENTS) ||
+                componentName.equals(CLIENT_APPROVALS) ||
+                componentName.equals(COPY)||
+                componentName.equals(PARSER_COMMAND);
     }
 
     protected void runComponent(String componentName) throws Exception {
         CommonCommands commonCommands = null;
+        if (componentName.equals(PARSER_COMMAND)) {
+            commonCommands = getNewParserCommands();
+        }
         if (componentName.equals(CLIENTS)) {
             commonCommands = getNewClientStoreCommands();
         }
@@ -100,6 +107,9 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl {
         }
     }
 
+    public ParserCommands getNewParserCommands() throws Exception {
+        return new ParserCommands(getMyLogger());
+    }
 
     protected boolean executeComponent() throws Exception {
         if (hasOption(USE_COMPONENT_OPTION, USE_COMPONENT_LONG_OPTION)) {
@@ -124,6 +134,7 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl {
         say(CLIENTS + " - edit client records");
         say(CLIENT_APPROVALS + " - edit client approval records\n");
         say(COPY + " - copy an entire store.\n");
+        say(PARSER_COMMAND+ " - debug/use/try out the parser for scripting.\n");
         say("e.g.\n\nuse " + CLIENTS + "\n\nwill call up the client management component.");
         say("Type 'exit' when you wish to exit the component and return to the main menu");
     }

@@ -41,6 +41,7 @@ public class OA4MPCommands extends BaseCommands {
         say(padLineWithBlanks("*", width)+"*");
         say(padLineWithBlanks("* type 'help' for a list of commands", width) + "*");
         say(padLineWithBlanks("*      'exit' or 'quit' to end this session.", width) + "*");
+        say(padLineWithBlanks("*      '/h' to print the command history, /r to repeat the last command.", width) + "*");
         say(stars);
     }
 

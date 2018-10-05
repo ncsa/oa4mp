@@ -54,19 +54,19 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         }
         JSONObject ldap = null;
         String zzz = map.getString(getCK2().ldap());
-        if (map.containsKey(getCK2().ldap()) && !(zzz ==null ||  zzz.isEmpty())) {
+        if (map.containsKey(getCK2().ldap()) && !(zzz == null || zzz.isEmpty())) {
             // make sure we don't try to JSON deserialize a null object either...
             // Lots to go wrong before we even get our hands on this.
             JSON temp = JSONSerializer.toJSON(map.get(getCK2().ldap()));
 
-            if(!temp.isEmpty()) {
+            if (!temp.isEmpty()) {
                 if (!temp.isArray()) {
                     ldap = (JSONObject) temp;
                 } else {
                     JSONArray array = (JSONArray) temp;
                     if (array.size() != 1) {
-                        ServletDebugUtil.dbg(this,"Got " + array.size() + " LDAP configurations. Using first one only...");
-                    //    throw new GeneralException("Error: multiple LDAP configurations encountered for id \"" + otherV.getIdentifierString() + "\". Convert manually.");
+                        ServletDebugUtil.dbg(this, "Got " + array.size() + " LDAP configurations. Using first one only...");
+                        //    throw new GeneralException("Error: multiple LDAP configurations encountered for id \"" + otherV.getIdentifierString() + "\". Convert manually.");
                     }
                     ldap = (JSONObject) array.get(0);
 
@@ -77,14 +77,14 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         JSONObject cfg = null;
         if (map.containsKey(getCK2().cfg())) {
             String rawCfg = map.getString(getCK2().cfg());
-            if(rawCfg != null && !rawCfg.isEmpty()) {
+            if (rawCfg != null && !rawCfg.isEmpty()) {
                 cfg = JSONObject.fromObject(map.getString(getCK2().cfg()));
             }
             //otherV.setConfig(JSONObject.fromObject(map.getString(getCK2().cfg())));
         }
         if (ldap == null || ldap.isEmpty()) {
             // nix to do. Set the configuration object if it exists
-            if(cfg == null){
+            if (cfg == null) {
                 // so by this point, no configuration has been found either.
                 cfg = new JSONObject();
             }
@@ -119,7 +119,7 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
     }
 
     public LDAPConfigurationUtil getLdapConfigurationUtil() {
-        if(ldapConfigurationUtil == null){
+        if (ldapConfigurationUtil == null) {
             ldapConfigurationUtil = new LDAPConfigurationUtil();
         }
         return ldapConfigurationUtil;
@@ -173,7 +173,7 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
             map.put(getCK2().ldap(), getLdapConfigurationUtil().toJSON(client.getLdaps()).toString());
         }
         if (client.getConfig() != null && !client.getConfig().isEmpty()) {
-            map.put(getCK2().cfg(), client.getConfig().toString());
+            map.put(getCK2().cfg(), client.getConfig().toString(1)); // make it pretty at least...
         }
     }
 
@@ -222,7 +222,10 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
             getJsonUtil().setJSONValue(json, getCK2().callbackUri(), callbacks);
         }
         JSONArray scopes = new JSONArray();
-
+        // Fix CIL-519: converter must serialize configuration object in toJSON call
+        if (client.getConfig() != null && !client.getConfig().isEmpty()) {
+            json.put(getCK2().cfg(), client.getConfig());
+        }
         Collection<String> scopeList = client.getScopes();
 
         if (client.getIssuer() != null) {

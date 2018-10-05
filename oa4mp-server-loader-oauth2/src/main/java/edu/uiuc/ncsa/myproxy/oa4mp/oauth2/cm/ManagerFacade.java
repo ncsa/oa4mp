@@ -17,7 +17,9 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.types.TypePermission;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
+import edu.uiuc.ncsa.security.delegation.server.storage.BaseClientStore;
 import edu.uiuc.ncsa.security.delegation.services.Response;
+import edu.uiuc.ncsa.security.delegation.storage.BaseClient;
 import net.sf.json.JSONObject;
 import org.apache.commons.codec.digest.DigestUtils;
 
@@ -75,6 +77,7 @@ public class ManagerFacade {
     }
 
     protected Response process(AdminClient adminClient, JSONObject rawJSON) {
+        checkAdminClientSecret(adminClient);
         switch (getTargetValue(rawJSON)) {
             case TARGET_ADMIN_VALUE:
                 return process(adminClient, (AdminClient) getTarget(rawJSON), rawJSON);
@@ -86,31 +89,65 @@ public class ManagerFacade {
         throw new NotImplementedException("unrecognized target of action");
     }
 
-    protected void checkClientSecret(String rawSecret, OA2Client client){
+    /**
+     * ***************************
+     */
+      /*                             *
+      /*        KEEP THIS            *
+      /*                             *
+      /*******************************/
+    protected void checkOA2ClientSecret(OA2Client client) {
+        checkClientSecret(client, getSE().getClientStore());
+    }
+
+    protected void checkAdminClientSecret(AdminClient client) {
+        checkClientSecret(client, getSE().getAdminClientStore());
+
+    }
+
+    /**
+     * This takes the client created from the JSON that came in the request and goes
+     * to the correct store, grabs the client with that ID stashed there and then checks that
+     * the secrets match. This means that the argument's secret is the actual secret and the
+     * stored client's secret is a hash of it.
+     *
+     * @param client
+     * @param store
+     */
+    protected void checkClientSecret(BaseClient client, BaseClientStore store) {
+        if (client == null) {
+            throw new GeneralException("Error: No client found.");
+        }
+        String rawSecret = client.getSecret();
         if (rawSecret == null || rawSecret.length() == 0) {
             DebugUtil.dbg(this, "doIt: no secret, throwing exception.");
             throw new GeneralException("Missing secret");
         }
-        if(client == null){
-            throw new GeneralException("Error: No client found.");
-        }
-        if( client.getSecret() == null){
-            if(!getSE().getClientStore().containsKey(client.getIdentifier())){
-                throw new GeneralException("Error: No such client for identifier \"" + client.getIdentifierString() + "\".");
-            }
+
+
+        if (client.getSecret() == null || client.getSecret().isEmpty()) {
             throw new GeneralException("Error: No secret given for this client.");
+
         }
-        if (!client.getSecret().equals(DigestUtils.shaHex(rawSecret))) {
+
+        if (!store.containsKey(client.getIdentifier())) {
+            throw new GeneralException("Error: No such client for identifier \"" + client.getIdentifierString() + "\".");
+        }
+        BaseClient storedClient = (BaseClient) store.get(client.getIdentifier());
+
+
+        if (!storedClient.getSecret().equals(DigestUtils.shaHex(rawSecret))) {
             DebugUtil.dbg(this, "doIt: bad secret, throwing exception.");
             throw new GeneralException("Incorrect secret. Unauthorized client.");
         }
     }
+
     protected Response process(OA2Client oa2Client, JSONObject rawJSON) {
         throw new edu.uiuc.ncsa.security.core.exceptions.IllegalAccessException("Error: access for standard clients is not allowed");
         // Fix for CIL-460.
         // note that what follows works perfectly well, but allows standard clients full access to the management API
         // which gives them the ability to change their scopes and other types of access.
-        // At this point we have deicded that is a security risk.
+        // At this point we have decided that is a security risk.
 
         /*******************************/
         /*                             *
@@ -118,7 +155,9 @@ public class ManagerFacade {
         /*                             *
         /*******************************/
 /*
-        checkClientSecret(oa2Client.getSecret(), (OA2Client)getSE().getClientStore().get(oa2Client.getIdentifier()));
+        checkOA2ClientSecret(oa2Client.getSecret(),
+                (OA2Client) getSE().getClientStore().get(oa2Client.getIdentifier()),
+                getSE().getClientStore());
 
         switch (getTargetValue(rawJSON)) {
             case TARGET_ADMIN_VALUE:

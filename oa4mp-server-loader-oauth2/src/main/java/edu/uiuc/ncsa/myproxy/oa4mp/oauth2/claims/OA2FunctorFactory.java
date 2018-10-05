@@ -28,10 +28,12 @@ public class OA2FunctorFactory extends JFunctorFactory {
 
     @Override
     public Map<String, String> getReplacementTemplates() {
-        HashMap<String,String> templates = new HashMap<>();
+        HashMap<String, String> templates = new HashMap<>();
         templates.putAll(getEnvironment());
-        for(String key : claims.keySet()){
-            templates.put(key, claims.get(key).toString());
+        if (claims != null) {
+            for (String key : claims.keySet()) {
+                templates.put(key, claims.get(key).toString());
+            }
         }
         return templates;
     }
@@ -64,8 +66,8 @@ public class OA2FunctorFactory extends JFunctorFactory {
             return new jExclude(claims);
         }
         if (name.equals(HAS_SCOPE.getValue())) {
-                   return new jhasScope(getScopes());
-               }
+            return new jhasScope(getScopes());
+        }
         if (name.equals(HAS_CLAIM.getValue())) {
             return new jHasClaim(claims);
         }

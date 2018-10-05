@@ -52,6 +52,7 @@ public class AttributeServerTest extends DDServerTests {
         JSONObject json = new JSONObject();
         ((OA2ClientConverter)tp2.getClientStore().getMapConverter()).toJSON((OA2Client) r.getClient(), json);
         System.out.println(json);
+        cleanupCC(cc,tp2);
     }
 
     public void testAttributeServerSet(TestStoreProviderInterface tp2) throws Exception {
@@ -77,6 +78,7 @@ public class AttributeServerTest extends DDServerTests {
         for (String scope : scopes) {
             assert client.getScopes().contains(scope) : "returned scopes failed to contain " + scope;
         }
+        cleanupCC(cc, tp2);
     }
 
     public void testAttributeServerRemove(TestStoreProviderInterface tp2) throws Exception {
@@ -96,5 +98,6 @@ public class AttributeServerTest extends DDServerTests {
         assert client.getRtLifetime() == 0L;
         assert client.getHomeUri() == null;
         assert client.getEmail() == null;
+        cleanupCC(cc,tp2);
     }
 }

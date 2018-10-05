@@ -15,6 +15,7 @@
         "https://a.b.c/client/ready1",
         "https://a.b.c/client/ready2"
       ],
+      "cfg":{"version":"test-version"},
       "scopes": [
         "openid",
         "profile",

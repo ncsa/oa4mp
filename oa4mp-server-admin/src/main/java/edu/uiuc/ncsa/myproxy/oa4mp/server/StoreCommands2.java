@@ -68,7 +68,7 @@ public abstract class StoreCommands2 extends StoreCommands {
                 }
                 say("done!");
             } catch (Throwable e) {
-                say("warning, could not find file at path \"" + inputLine.getNextArgFor("-file") + "\", " + e.getMessage());
+                say("warning, load file at path \"" + inputLine.getNextArgFor("-file") + "\": " + e.getMessage());
             }
         } else {
             say("Missing file argument. Cannot deserialize.");
@@ -97,7 +97,7 @@ public abstract class StoreCommands2 extends StoreCommands {
                 os = new FileOutputStream(inputLine.getNextArgFor("-file"));
                 hasFile = true;
             } catch (FileNotFoundException e) {
-                say("warning, could not find file at path " + inputLine.getArg(inputLine.indexOf("-file")));
+                say("warning, could not find file in argument \"" + inputLine.getNextArgFor("-file"));
             }
         }
         try {

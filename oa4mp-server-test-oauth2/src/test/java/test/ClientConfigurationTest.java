@@ -131,7 +131,7 @@ public class ClientConfigurationTest extends TestBase {
     }
 
     /*
-    This creates n if block for the runtime. It will set a claim source and it will set a custom claim.
+    This creates an if block for the runtime. It will set a claim source and it will set a custom claim.
     In this way claims may be created before processing. This facility effectively allows for setting and
      using variables.
      */
@@ -227,7 +227,7 @@ public class ClientConfigurationTest extends TestBase {
         List<ClaimSource> cc = clientConfiguration.getClaimSource();
         System.out.println(cc);
         assert cc.get(0) instanceof LDAPClaimsSource;
-
+         LDAPClaimsSource ldapClaimsSource = (LDAPClaimsSource) cc.get(0);
     }
     // TODO -- Need a test for setting up a processor,
     // * enabling/disabling based on claims

@@ -1,7 +1,5 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
 
-import edu.uiuc.ncsa.security.core.util.DebugUtil;
-
 import java.util.Map;
 
 /**
@@ -27,8 +25,6 @@ public class jGet extends ClaimFunctor {
         if(executed){
             return result;
         }
-        DebugUtil.dbg(this,"args =" + getArgs());
-
         if(claims == null ||
                 getArgs().size() == 0 || // no args
                 getArgs().get(0) == null || //the elements are null;
@@ -39,10 +35,8 @@ public class jGet extends ClaimFunctor {
         }
 
         result =  claims.get(getArgs().get(0));
-        DebugUtil.dbg(this,"result =" + result);
         if(result == null){
             result = "";
-            DebugUtil.dbg(this," returning =" + result);
         }
         executed = true;
         return result;

@@ -10,6 +10,7 @@ import edu.uiuc.ncsa.security.delegation.services.Response;
 import net.sf.json.JSON;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
+import org.apache.http.HttpStatus;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -46,6 +47,28 @@ public class ClientServlet extends EnvServlet {
     }
 
     ManagerFacade clientManager;
+
+    @Override
+    public void doPost(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws ServletException, IOException {
+        try {
+            // The super class rejects anything that does not have an encoding type of
+            // application/x-www-form-urlencoded
+            // We want this servlet to understand only application/json, so we
+            // test for that instead.
+
+            //   printAllParameters(httpServletRequest);
+            if (doPing(httpServletRequest, httpServletResponse)) return;
+            System.err.println("ENCODING is of type " + httpServletRequest.getContentType());
+            // TODO Probably should parse the encoding type. 'application/json; charset=UTF-8' would be standard.
+            if (!httpServletRequest.getContentType().contains("application/json")) {
+                httpServletResponse.setStatus(HttpStatus.SC_UNSUPPORTED_MEDIA_TYPE);
+                throw new ServletException("Error: Unsupported encoding of \"" + httpServletRequest.getContentType() + "\" for body of POST. Request rejected.");
+            }
+            doIt(httpServletRequest, httpServletResponse);
+        } catch (Throwable t) {
+            handleException(t, httpServletRequest, httpServletResponse);
+        }
+    }
 
     @Override
     protected void doIt(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Throwable {

@@ -3,9 +3,9 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.BasicClaimsSourceImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.HTTPHeaderClaimsSource;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.LDAPClaimsSource;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.NCSALDAPClaimSource;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowType;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.jSetClaimSource;
-import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSourceConfiguration;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSourceConfigurationUtil;
@@ -68,15 +68,20 @@ public class OA2ClientConfigurationFactory<V extends OA2ClientConfiguration> ext
                                     LinkedList<ClaimSource> claimSources) {
         script.execute();
         if (script.hasHandlers()) {
-            List<JFunctor> sources = script.getFunctorMap().get(FlowType.SET_CLAIM_SOURCE.getValue());
-            for (JFunctor source : sources) {
-                jSetClaimSource jSetClaimSource = (jSetClaimSource) source;
 
-                String alias = (String) jSetClaimSource.getArgs().get(0);
-                String configurationName = (String) jSetClaimSource.getArgs().get(1);
-                ClaimSource claimSource = setupClaimSource(alias, configurationName, json);
-                if (claimSource != null) {
-                    claimSources.add(claimSource);
+            List<JFunctor> sources = script.getFunctorMap().get(FlowType.SET_CLAIM_SOURCE.getValue());
+            // This is perfectly possible if the claim sources are defined by a conditional and that is not met.
+            // Then there are no claim sources and only the most basic claim source is used.
+            if (sources != null) {
+                for (JFunctor source : sources) {
+                    jSetClaimSource jSetClaimSource = (jSetClaimSource) source;
+
+                    String alias = (String) jSetClaimSource.getArgs().get(0);
+                    String configurationName = (String) jSetClaimSource.getArgs().get(1);
+                    ClaimSource claimSource = setupClaimSource(alias, configurationName, json);
+                    if (claimSource != null) {
+                        claimSources.add(claimSource);
+                    }
                 }
             }
         }
@@ -109,25 +114,20 @@ public class OA2ClientConfigurationFactory<V extends OA2ClientConfiguration> ext
         }
     }
 
-    public static final String LDAP_DEFAULT = "LDAP";
-    public static final String HEADER_DEFAULT = "HEADER";
+    public static final String LDAP_DEFAULT = "LDAP"; // header for the basic LDAP
+    public static final String HEADER_DEFAULT = "HEADER"; // alias for the header claim source
+    public static final String NCSA_DEFAULT = "ncsa-default"; // alias for the NCSA default LDAP claim source
 
     protected Map<String, ClaimSourceConfiguration> getClaimSourceConfigurations(JSONObject jsonObject) {
-        DebugUtil.dbg(this, "Starting claim source configuration.");
-
         JSONArray array = OA2ClientConfigurationUtil.getClaimSourceConfigurations(jsonObject);
         Map<String, ClaimSourceConfiguration> configs = new HashMap<>();
         ClaimSourceConfigurationUtil claimSourceConfigurationUtil = new ClaimSourceConfigurationUtil(); // for defaults
         LDAPConfigurationUtil ldapConfigurationUtil = new LDAPConfigurationUtil();
         for (int i = 0; i < array.size(); i++) {
             JSONObject json = array.getJSONObject(i);
-            DebugUtil.dbg(this, "json type = " + json.getClass().getCanonicalName());
             if (claimSourceConfigurationUtil.isInstanceOf(json)) {
-                DebugUtil.dbg(this, "This is a configuration object");
                 ClaimSourceConfiguration claimSourceConfiguration = new ClaimSourceConfiguration();
                 claimSourceConfigurationUtil.fromJSON(claimSourceConfiguration, json);
-                DebugUtil.dbg(this, ".getClaimsSourceConfigurations: putting configuration object name=" +
-                        claimSourceConfiguration.getName() + ", id=" + claimSourceConfiguration.getId());
                 String key = claimSourceConfiguration.getId();
                 // use the ID to locate the item, not the name. The name should generally only be used for display
                 if (key == null || key.length() == 0) {
@@ -159,24 +159,29 @@ public class OA2ClientConfigurationFactory<V extends OA2ClientConfiguration> ext
      * @return
      */
     protected ClaimSource setupClaimSource(String alias, String configName, JSONObject json) {
-        DebugUtil.dbg(this, ".setupClaimSource. alias=" + alias + ", configName=" + configName + ", json=" + (json == null ? "none" : json.toString(2)));
-
+        if (alias.equals(NCSA_DEFAULT)) {
+            // This overloads the set_claim_source. The alias is the name of the processor, the configName
+            // is actually the search name key (like uid) that LDAP uses to do the search.
+            // It is up to the configuration to set the search name key to this as a claims
+            // before the claim source gets invoked.
+            NCSALDAPClaimSource x = new NCSALDAPClaimSource(configName);
+            return x;
+        }
         Map<String, OA2ClientConfigurationUtil.SourceEntry> sources = OA2ClientConfigurationUtil.toSourcesMap(json);
         /*
-        TODO - handle edge cases of no name/alias and single configuration.
+        TODO - handle edge case of no name/alias and single configuration.
          */
         Map<String, ClaimSourceConfiguration> configs = getClaimSourceConfigurations(json);
 
+
         ClaimSourceConfiguration config = configs.get(configName);
-        DebugUtil.dbg(this, "configuration found from config name=" + config.toString());
+
         if (alias.equals(LDAP_DEFAULT)) {
-            DebugUtil.dbg(this, "Setting Claim Source to LDAP as per configuration");
             LDAPClaimsSource x = new LDAPClaimsSource((LDAPConfiguration) config, null);
             return x;
         }
 
         if (alias.equals(HEADER_DEFAULT)) {
-            DebugUtil.dbg(this, "Setting up header default.");
             ClaimSource source = new HTTPHeaderClaimsSource();
             source.setConfiguration(config);
         }
@@ -207,20 +212,11 @@ public class OA2ClientConfigurationFactory<V extends OA2ClientConfiguration> ext
 
     public void setupPreProcessing(V cc, JSONObject json) {
         Script preProcessing = new Script(functorFactory, OA2ClientConfigurationUtil.getClaimsPreProcessing(json));
-        // JSONObject jsonObject = OA2ClientConfigurationUtil.getClaimsPreProcessing(json);
-        //LogicBlocks<? extends LogicBlock> preProcessing;
-        //preProcessing = functorFactory.createLogicBlock(jsonObject);
         cc.setPreProcessing(preProcessing);
-
     }
 
     public void setupPostProcessing(V cc, JSONObject json) {
         Script postProcessing = new Script(functorFactory, OA2ClientConfigurationUtil.getClaimsPostProcessing(json));
-/*
-        JSONObject jsonObject = OA2ClientConfigurationUtil.getClaimsPostProcessing(json);
-        LogicBlocks<? extends LogicBlock> postProcessing;
-        postProcessing = functorFactory.createLogicBlock(jsonObject);
-*/
         cc.setPostProcessing(postProcessing);
     }
 

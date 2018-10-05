@@ -97,7 +97,6 @@ public class ClientServer extends AbstractDDServer {
         String hash = DigestUtils.sha1Hex(secret);
         values.put(keys.secret(), hash);
 
-
         getClientStore().getMapConverter().fromMap(values, client);
         getClientStore().save(client);
         // client.setIdentifier(clientID); // since this gets scrubbed by the previous method.

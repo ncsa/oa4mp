@@ -6,7 +6,6 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.NCSAGroupHandler;
 import edu.uiuc.ncsa.security.core.Logable;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
-import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
@@ -25,10 +24,7 @@ import javax.naming.directory.*;
 import javax.naming.ldap.LdapContext;
 import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -75,13 +71,11 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
      * @return
      */
     public String getSearchName(JSONObject claims, HttpServletRequest request, ServiceTransaction transaction) {
-        DebugUtil.dbg(this, "starting to get search name");
+        DebugUtil.dbg(this, claims.toString(2));
         LDAPConfigurationUtil ldapConfigurationUtil = new LDAPConfigurationUtil();
         JSONObject xxx = ldapConfigurationUtil.toJSON(getLDAPCfg());
         xxx.getJSONObject("ldap").getJSONObject("ssl").put("keystore", "");
         if (getLDAPCfg().getSearchNameKey() == null) {
-            DebugUtil.dbg(this, "No search name given for LDAP query. Using default of username " + transaction.getUsername());
-
             warn("No search name given for LDAP query. Using default of username");
             return transaction.getUsername();
         }
@@ -94,8 +88,6 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
             throw new IllegalStateException(message);
         }
         String searchName = (String) claims.get(getLDAPCfg().getSearchNameKey());
-        DebugUtil.dbg(this, "returning search name=" + searchName);
-
         return searchName;
     }
 
@@ -153,30 +145,20 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
     @Override
     protected JSONObject realProcessing(JSONObject claims, HttpServletRequest request, ServiceTransaction transaction) throws UnsupportedScopeException {
         if (!isEnabled()) {
-            DebugUtil.dbg(this, "server=" + getLDAPCfg().getServer() + ", is NOT enabled.");
             return claims;
         }
-
-        DebugUtil.dbg(this, "Starting LDAP query!");
-        DebugUtil.dbg(this, "target host =" + getLDAPCfg().getServer());
 
         if (!isLoggedOn()) {
             logon();
         }
-        DebugUtil.dbg(this, "   logged on? " + isLoggedOn());
-        DebugUtil.dbg(this, "Claims =" + getClaims());
         try {
             String searchName = getSearchName(claims, request, transaction);
-            DebugUtil.dbg(this, "  search name=" + searchName);
-
             if (searchName != null) {
                 Map tempMap = simpleSearch(context, searchName, getLDAPCfg().getSearchAttributes());
-                DebugUtil.dbg(this, "returned from search:" + tempMap);
                 claims.putAll(tempMap);
             } else {
                 info("No search name encountered for LDAP query. No search performed.");
             }
-            DebugUtil.dbg(this, "claims =" + claims);
             context.close();
         } catch (Throwable throwable) {
             DebugUtil.dbg(this, "Error getting search name \"" + throwable.getMessage() + "\"", throwable);
@@ -211,10 +193,10 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
 
     }
 
-    public Hashtable<String, String> createEnv(LDAPConfiguration cfg) {
+    public Hashtable<String, String> createEnv(String host, LDAPConfiguration cfg) {
         Hashtable<String, String> env = new Hashtable<String, String>();
         env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-        String providerUrl = "ldaps://" + cfg.getServer();
+        String providerUrl = "ldaps://" + host.trim();
         if (0 <= cfg.getPort()) {
             providerUrl = providerUrl + ":" + cfg.getPort();
         }
@@ -240,23 +222,27 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
             default:
             case LDAPConfigurationUtil.LDAP_AUTH_UNSPECIFIED_KEY:
         }
-        DebugUtil.dbg(this, "LDAP environment is " + env);
         return env;
     }
 
     public LdapContext createConnection() {
-        try {
-            // Set up the environment for creating the initial context
+        // Set up the environment for creating the initial context
+        StringTokenizer stringTokenizer = new StringTokenizer(getLDAPCfg().getServer(), ",");
+        Throwable lastException;
 
-            DirContext dirContext = new InitialDirContext(createEnv(getLDAPCfg()));
-            return (LdapContext) dirContext.lookup(getLDAPCfg().getSearchBase());
-        } catch (Exception e) {
-            if (isDebugOn()) {
-                e.printStackTrace();
+        DirContext dirContext = null;
+        while (stringTokenizer.hasMoreTokens()) {
+            try {
+                dirContext = new InitialDirContext(createEnv(stringTokenizer.nextToken(), getLDAPCfg()));
+                return (LdapContext) dirContext.lookup(getLDAPCfg().getSearchBase());
+
+            } catch (Throwable e) {
+                // Do nothing. Allow for errors.
+                ServletDebugUtil.dbg(this,"failed to get LDAP directory context",e);
+
             }
-            error("Error logging into LDAP server", e);
-            return null;
         }
+        return null;
     }
 
     @Override
@@ -276,9 +262,9 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
     // The searchFilterValue is supplied in the initial claims.
     protected String getSearchFilterAttribute() {
         ServletDebugUtil.dbg(this, "search attribute in LDAP is " + getLDAPCfg().getSearchFilterAttribute());
-        if(getLDAPCfg().getSearchFilterAttribute() == null){
+        if (getLDAPCfg().getSearchFilterAttribute() == null) {
             return LDAPConfigurationUtil.SEARCH_FILTER_ATTRIBUTE_DEFAULT; // default
-        }else {
+        } else {
             return getLDAPCfg().getSearchFilterAttribute();
         }
     }
@@ -289,7 +275,6 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
         if (ctx == null) {
             throw new IllegalStateException("Error: Could not create the LDAP context");
         }
-        DebugUtil.dbg(this, "starting simple LDAP search");
         SearchControls ctls = new SearchControls();
         if (attributes == null || attributes.isEmpty()) {
             // return everything if nothing is specified.
@@ -298,9 +283,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
             String[] searchAttributes = attributes.keySet().toArray(new String[]{});
             ctls.setReturningAttributes(searchAttributes);
         }
-        //ctls.setSearchScope(SearchControls.SUBTREE_SCOPE);
         String filter = "(&(" + getSearchFilterAttribute() + "=" + userID + "))";
-        DebugUtil.dbg(this, "filter=" + filter);
         NamingEnumeration e = ctx.search(getLDAPCfg().getContextName(), filter, ctls);
         return toJSON(attributes, e, userID);
     }
@@ -319,7 +302,6 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
             LDAPConfigurationUtil.AttributeEntry> attributes,
                                 NamingEnumeration e,
                                 String userName) throws NamingException {
-        DebugUtil.dbg(this, "starting to convert search results to JSON. " + attributes.size() + " results requested.");
         JSONObject json = new JSONObject();
         if (!e.hasMoreElements()) {
             DebugUtil.dbg(this, "LDAP SEARCH RESULT IS EMPTY");
@@ -328,9 +310,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
             SearchResult entry = (SearchResult) e.next();
             Attributes a = entry.getAttributes();
             for (String attribID : attributes.keySet()) {
-                DebugUtil.dbg(this, "returned LDAP attrib ID=" + attribID);
                 Attribute attribute = a.get(attribID);
-                DebugUtil.dbg(this, "returned LDAP attribute=" + attribute);
                 if (attribute == null) {
                     continue;
                 }
@@ -369,7 +349,6 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
                 }
             }
         }
-        DebugUtil.dbg(this, "LDAP search results=" + json);
         return json;
     }
 
@@ -463,101 +442,39 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
                 (configuration == null ? "(no config)" : configuration.getName()) + "}";
     }
 
-    public static void main(String[] args) {
-        try {
-            String rawLdap = "{\"ldap\":{\"failOnError\":\"false\"," +
-                    "\"address\":\"ldap.ncsa.illinois.edu\"," +
-                    "\"port\":636," +
-                    "\"enabled\":\"true\"," +
-                    "\"authorizationType\":\"none\"," +
-                    "\"searchName\":\"eppn\"," +
-                    "\"searchAttributes\":[{" +
-                    "\"name\":\"mail\"," +
-                    "\"returnAsList\":false," +
-                    "\"returnName\":\"mail\"}," +
-                    "{\"name\":\"cn\"," +
-                    "\"returnAsList\":false," +
-                    "\"returnName\":\"name\"}," +
-                    "{\"name\":\"memberOf\"," +
-                    "\"returnAsList\":false," +
-                    "\"isGroup\":true," +
-                    "\"returnName\":\"isMemberOf\"}]," +
-                    "\"searchBase\":\"ou=People,dc=ncsa,dc=illinois,dc=edu\"," +
-                    "\"contextName\":\"\"," +
-                    "\"ssl\":{\"tlsVersion\":\"TLS\",\"useJavaTrustStore\":true}}}";
-            String rawLdap2 = "{\"ldap\": {\n" +
-                    "  \"address\": \"registry-test.cilogon.org\",\n" +
-                    "  \"port\": 636,\n" +
-                    "  \"enabled\": true,\n" +
-                    "  \"authorizationType\": \"simple\",\n" +
-                    "  \"failOnError\": false,\n" +
-                    "  \"notifyOnFail\": false,\n" +
-                    "  \"password\": \"Eavjofoop4gikpecUzbooljorUryikwu\",\n" +
-                    "  \"principal\": \"uid=oa4mp_user,ou=system,o=ImPACT,dc=cilogon,dc=org\",\n" +
-                    "  \"searchAttributes\":   [\n" +
-                    "        {\n" +
-                    "      \"name\": \"isMemberOf\",\n" +
-                    "      \"returnAsList\": true,\n" +
-                    "      \"returnName\": \"isMemberOf\"\n" +
-                    "    },\n" +
-                    "        {\n" +
-                    "      \"name\": \"employeeNumber\",\n" +
-                    "      \"returnAsList\": false,\n" +
-                    "      \"returnName\": \"employeeNumber\"\n" +
-                    "    }\n" +
-                    "  ],\n" +
-                    "  \"searchBase\": \"ou=people,o=ImPACT,dc=cilogon,dc=org\",\n" +
-                    "  \"searchName\": \"username\",\n" +
-                    "  \"contextName\": \"\",\n" +
-                    "  \"ssl\":   {\n" +
-                    "    \"keystore\": {},\n" +
-                    "    \"useJavaTrustStore\": true,\n" +
-                    "    \"password\": \"changeit\",\n" +
-                    "    \"type\": \"jks\"\n" +
-                    "  }\n" +
-                    "}}";
-            DebugUtil.setIsEnabled(true);
-            ServiceTransaction st = new ServiceTransaction(BasicIdentifier.newID("foo"));
-            st.setUsername("jbasney@ncsa.illinois.edu");
-            JSONObject json = JSONObject.fromObject(rawLdap);
-            LDAPConfigurationUtil ldapConfigurationUtil = new LDAPConfigurationUtil();
-            LDAPConfiguration cfg = ldapConfigurationUtil.fromJSON(json);
-            LDAPClaimsSource claimsSource = new LDAPClaimsSource(cfg, null);
-            JSONObject claims = new JSONObject();
-            claims.put("username", "jbasney@ncsa.illinois.edu");
-            claims.put("eppn", "jbasney@ncsa.illinois.edu");
-            JSONObject ui2 = claimsSource.process(claims, st);
-            System.out.println("Result of LDAP query:");
-            System.out.println(ui2);
-            //   getGid(cfg, "lsst_users");
-        } catch (Throwable t) {
-            t.printStackTrace();
-
-        }
-    }
-
 
     public static Groups get_NEW_Gid(LDAPConfiguration cfg2, String username) throws Throwable {
         LDAPConfiguration cfg = cfg2.clone();
         cfg.setSearchBase("ou=Groups,dc=ncsa,dc=illinois,dc=edu");
-        ServletDebugUtil.dbg(LDAPClaimsSource.class, "LDAP search is: " + cfg.getSearchFilterAttribute() + "=" + username);
+        // ServletDebugUtil.dbg(LDAPClaimsSource.class, "LDAP search is: " + cfg.getSearchFilterAttribute() + "=" + username);
         LDAPClaimsSource claimsSource = new LDAPClaimsSource(cfg, null);
-        DirContext dirContext = new InitialDirContext(claimsSource.createEnv(cfg));
+        StringTokenizer stringTokenizer = new StringTokenizer(cfg.getServer(), ",");
+        DirContext dirContext = null;
+        while (stringTokenizer.hasMoreTokens()) {
+            try {
+                dirContext = new InitialDirContext(claimsSource.createEnv(stringTokenizer.nextToken(), cfg));
+            }catch(Throwable t){
+                // go until one works. If we have run out of tokens, then throw the exception.
+                 if(!stringTokenizer.hasMoreTokens()){
+                     throw t;
+                 }
+            }
+        }
         LdapContext ctx = (LdapContext) dirContext.lookup(cfg.getSearchBase());
         SearchControls ctls = new SearchControls();
         ctls.setReturningAttributes(new String[]{"cn", "gidNumber"});
         String filter = "(&(uniqueMember=" + cfg.getSearchFilterAttribute() + "=" + username + ",ou=People,dc=ncsa,dc=illinois,dc=edu))";
-        ServletDebugUtil.dbg(LDAPClaimsSource.class, "LDAP filter=" + filter);
+        // ServletDebugUtil.dbg(LDAPClaimsSource.class, "LDAP filter=" + filter);
 
         NamingEnumeration e = ctx.search(cfg.getContextName(), filter, ctls);
         Groups groups = new Groups();
-        ServletDebugUtil.dbg(LDAPClaimsSource.class, "Starting to process groups. Has elements? " + e.hasMoreElements() );
+        // ServletDebugUtil.dbg(LDAPClaimsSource.class, "Starting to process groups. Has elements? " + e.hasMoreElements() );
 
         while (e.hasMoreElements()) {
             SearchResult entry = (SearchResult) e.next();
             Attributes a = entry.getAttributes();
             GroupElement groupElement = convertToEntry(a);
-            ServletDebugUtil.dbg(LDAPClaimsSource.class, "Added group element = " + groupElement);
+            //   ServletDebugUtil.dbg(LDAPClaimsSource.class, "Added group element = " + groupElement);
 
             groups.put(groupElement);
         }
@@ -598,7 +515,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
         return g;
 
     }
-
+/*
     public static int get_OLD_Gid(LDAPConfiguration cfg2, String groupName) throws Throwable {
         LDAPConfiguration cfg = cfg2.clone();
         cfg.setSearchBase("ou=Groups,dc=ncsa,dc=illinois,dc=edu");
@@ -624,6 +541,6 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
             }
         }
         return -1;
-    }
+    }*/
 
 }

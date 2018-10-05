@@ -9,6 +9,9 @@ Requirements.
 These scripts run under linux. In particular, they require some form of bash, sed and cUrl. There are no plans
 to port these to any other platform at this time.
 
+**NOTE** You must have an OA4MP server running to do this! AND you must have the /clients endpoint
+enabled (it is by default).
+
 The way these scripts work is that there is a driver script, c-run.sh, that will accept a script containing json.
 Various bits of information (detailed below) are replaced in the script from environment variables. The command is
 run and the raw json is printed to the console. This is preferrable since there are many things that may be done

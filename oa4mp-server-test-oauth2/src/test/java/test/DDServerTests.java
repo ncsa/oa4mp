@@ -35,19 +35,19 @@ public abstract class DDServerTests extends TestCase {
     public abstract void testAll(TestStoreProviderInterface tp2) throws Exception;
 
     public void testMemoryStore() throws Exception {
-        testAll( TestUtils.getMemoryStoreProvider());
+        testAll(TestUtils.getMemoryStoreProvider());
     }
 
     public void testFilestore() throws Exception {
-        testAll( TestUtils.getFsStoreProvider());
+        testAll(TestUtils.getFsStoreProvider());
     }
 
     public void testMysql() throws Exception {
-        testAll( TestUtils.getMySQLStoreProvider());
+        testAll(TestUtils.getMySQLStoreProvider());
     }
 
     public void testPostgres() throws Exception {
-        testAll( TestUtils.getPgStoreProvider());
+        testAll(TestUtils.getPgStoreProvider());
     }
 
     public static class CC {
@@ -67,13 +67,25 @@ public abstract class DDServerTests extends TestCase {
         return Base64.encodeBase64URLSafeString(bytes);
     }
 
+    /**
+     * Thsi will take a test store provider and create a {@link test.DDServerTests.CC} (configured clients) object.
+     * That contains an admin client and an associated pre-approved client for it. It has set the permissions as well
+     * so that admin client can perform operations on the client. Note that the client is not pre-populated with
+     * any information, but there is an approval record for it (approver is "junit").<br/>
+     * Every timne you call this you should balance it with a call to {@link #cleanupCC(CC, TestStoreProviderInterface)}.
+     * Typically this is one fo the very first calls in a test, cleanup is the very last.
+     *
+     * @param tp2
+     * @return
+     * @throws Exception
+     */
     protected CC setupClients(TestStoreProviderInterface tp2) throws Exception {
         AdminClient adminClient = getAdminClient(tp2.getAdminClientStore());
         ClientApproval clientApproval = tp2.getClientApprovalStore().create();
         clientApproval.setIdentifier(adminClient.getIdentifier());
         clientApproval.setApproved(true);
         clientApproval.setApprover("junit");
-        tp2.getClientApprovalStore().save(clientApproval );
+        tp2.getClientApprovalStore().save(clientApproval);
 
         OA2Client client = getOa2Client(tp2.getClientStore());
 
@@ -95,16 +107,61 @@ public abstract class DDServerTests extends TestCase {
         return cc;
     }
 
+    /**
+     * Clean up a configured clients object at the end of test.  Typically every time you call {@link #setupClients(TestStoreProviderInterface)}
+     * you should call this or you will accumulate a ton of various clients and permissions that can only be removed by
+     * twiddling the database directly.<br/>
+     * This tries to be very robust and aggressive when removing things in the assumption that the admin and client
+     * exist only rfor the duration of a specific test. Since the test state is unknown (e.g. You may have tested
+     * deleting the client so that fails) this only spits out messages noting what did not work, rather than failing.
+     *
+     * @param cc
+     * @param tp2
+     */
+    protected void cleanupCC(CC cc, TestStoreProviderInterface tp2) {
+        try {
+            // get rid of permissions
+            PermissionList pList = tp2.getPermissionStore().get(cc.adminClient.getIdentifier(), cc.client.getIdentifier());
+            for (Permission p : pList) {
+                tp2.getPermissionStore().remove(p.getIdentifier());
+            }
+        } catch (Throwable t) {
+            System.out.println("NOTE: Could not remove permissions for client \"" + cc.client.getIdentifierString() + "\" and admin \"" + cc.adminClient.getIdentifierString() + "\"," +
+                    ":" + t.getMessage());
+        }
+        try {
+            // remove the approval
+            tp2.getClientApprovalStore().remove(cc.client.getIdentifier());
+        } catch (Throwable t) {
+            System.out.println("NOTE: remove client approval for \"" + cc.client.getIdentifierString() + "\" and admin \"" + cc.adminClient.getIdentifierString() + "\"," +
+                    ":" + t.getMessage());
+        }
+        try {
+            // remove the client
+            tp2.getClientStore().remove(cc.client.getIdentifier());
+        } catch (Throwable t) {
+            System.out.println("NOTE: Could not remove client with id \"" + cc.client.getIdentifierString() + "\" and admin \"" + cc.adminClient.getIdentifierString() + "\"," +
+                    ":" + t.getMessage());
+        }
+        try {
+            // remove the admin.
+            tp2.getAdminClientStore().remove(cc.adminClient.getIdentifier());
+        } catch (Throwable t) {
+            System.out.println("NOTE: Could not remove admin client \"" + cc.adminClient.getIdentifierString() + "\"," + ":" + t.getMessage());
+        }
+    }
+
     protected AdminClientConverter getAdminClientConverter(TestStoreProviderInterface tp2) throws Exception {
-        BaseClientConverter bcc = (BaseClientConverter)tp2.getAdminClientStore().getMapConverter();
+        BaseClientConverter bcc = (BaseClientConverter) tp2.getAdminClientStore().getMapConverter();
         if (bcc instanceof AdminClientConverter) {
             return (AdminClientConverter) bcc;
         }
 
         return AdminClientStoreProviders.getAdminClientConverter();
     }
+
     protected OA2ClientConverter getClientConverter(TestStoreProviderInterface tp2) throws Exception {
-        BaseClientConverter bcc = (BaseClientConverter)tp2.getClientStore().getMapConverter();
+        BaseClientConverter bcc = (BaseClientConverter) tp2.getClientStore().getMapConverter();
         if (bcc instanceof OA2ClientConverter) {
             return (OA2ClientConverter) bcc;
         }
@@ -168,7 +225,7 @@ public abstract class DDServerTests extends TestCase {
         c.setName("Test client " + random);
         c.setRtLifetime(456767875477L);
         JSONObject cfg = new JSONObject();
-        cfg.put("version",getRandom());
+        cfg.put("version", getRandom());
         c.setConfig(cfg);
 
         LinkedList<String> callbacks = new LinkedList<>();

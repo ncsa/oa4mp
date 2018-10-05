@@ -1,0 +1,18 @@
+{
+  "config": "Syngenta (sprout) client configuration 7/23/2018 ",
+  "isSaved": false,
+  "runtime":{"script":[
+        "set('eppn':,'jgaynor@ncsa.illinois.edu');",
+        "set('idp','https://idp.ncsa.illinois.edu/idp/shibboleth');",
+        "if[",
+        "    equals(get('idp'),'https://idp.ncsa.illinois.edu/idp/shibboleth')",
+        "  ]then[",
+        "    set_claim_source('ncsa-default','uid')",
+        "];"
+      ]},
+  "claims": {
+    "postProcessing": {"script":[
+      "set('sub',get('eppn'));"
+    ]}
+  }
+}

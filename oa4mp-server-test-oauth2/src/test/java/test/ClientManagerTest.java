@@ -91,6 +91,7 @@ public class ClientManagerTest extends DDServerTests implements SAT {
           requestContent.put(KEYS_TARGET, jsonClient2);
 
           request.put(KEYS_API, requestContent);
+        cleanupCC(cc, tp2);
       }
     @Test
     public void testThing(ClientStore clientStore) throws Exception {
