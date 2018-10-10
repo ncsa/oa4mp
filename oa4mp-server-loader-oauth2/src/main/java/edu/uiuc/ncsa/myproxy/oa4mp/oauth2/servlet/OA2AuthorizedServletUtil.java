@@ -129,9 +129,11 @@ public class OA2AuthorizedServletUtil {
         if (t != null) {
             return t;
         }
+        ServletDebugUtil.dbg(this, "Starting doDelegation");
         t = doDelegation(httpServletRequest, httpServletResponse);
+        ServletDebugUtil.dbg(this, "Starting done with doDelegation, creating claim util");
         OA2ClaimsUtil claimsUtil = new OA2ClaimsUtil((OA2SE) servlet.getServiceEnvironment(), t);
-        DebugUtil.dbg(this, "starting to process claims:");
+        DebugUtil.dbg(this, "starting to process claims, creating basic claims:");
         claimsUtil.createBasicClaims(httpServletRequest, t);
         //  servlet.getTransactionStore().save(t); // save the claims.
         DebugUtil.dbg(this, "done with claims, transaction saved, claims = " + t.getClaims());

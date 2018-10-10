@@ -8,6 +8,7 @@ import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.delegation.client.DelegationService;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.delegation.token.TokenForge;
+import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 
 import javax.inject.Provider;
 import java.net.URI;
@@ -31,7 +32,8 @@ public class OA2ClientEnvironment extends ClientEnvironment {
                                 boolean showRedirectPage,
                                 String errorPagePath,
                                 String redirectPagePath,
-                                String successPagePath) {
+                                String successPagePath,
+                                boolean oidcEnabled) {
         super(accessTokenUri,
                 authorizationUri,
                 callback,
@@ -43,6 +45,8 @@ public class OA2ClientEnvironment extends ClientEnvironment {
                 tokenForge,
                 assetStore, showRedirectPage,
                 errorPagePath, redirectPagePath, successPagePath);
+        ServletDebugUtil.dbg(this, "oidcEnabled?" + oidcEnabled);
+        this.oidcEnabled = oidcEnabled;
     }
 
     public OA2ClientEnvironment(MyLoggingFacade logger, Map<String, String> constants,
@@ -68,7 +72,8 @@ public class OA2ClientEnvironment extends ClientEnvironment {
                                 String successPagePath,
                                 String secret,
                                 Collection<String> scopes,
-                                String wellKnownURI) {
+                                String wellKnownURI,
+                                boolean oidcEnabled) {
         super(logger,
                 constants,
                 accessTokenUri,
@@ -96,6 +101,7 @@ public class OA2ClientEnvironment extends ClientEnvironment {
         this.secret = secret;
         this.scopes = scopes;
         this.wellKnownURI = wellKnownURI;
+        this.oidcEnabled = oidcEnabled;
     }
     Collection<String> scopes = null;
     public Collection<String> getScopes(){
@@ -118,6 +124,10 @@ public class OA2ClientEnvironment extends ClientEnvironment {
         return client;
     }
 
+    boolean oidcEnabled = true;
+    public boolean isOidcEnabled(){
+        return oidcEnabled;
+    }
     public void setScopes(Collection<String> scopes) {
         this.scopes = scopes;
     }

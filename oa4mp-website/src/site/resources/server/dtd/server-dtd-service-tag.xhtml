@@ -119,12 +119,11 @@
     <tr>
         <td style="vertical-align: top;">clientSecretLength</td>
         <td style="vertical-align: top;">N</td>
-        <td style="vertical-align: top;">258</td>
+        <td style="vertical-align: top;">64</td>
         <td style="vertical-align: top;">"<span style="background-color: #ff6600;">OAuth 2</span>
             specific. The server generates client secrets of this length in bytes, then displays them
-            to the client in Base64 encoding, which should be returned verbatim to the server. We suggest
-            at least 128 bytes in length and since Base64 encoding will always pad if the byte count is not
-            divisible by three, making it so is good practice.
+            to the client in Base64 encoding, which should be returned verbatim to the server. Note that
+            the returned secret is URL safe encoded as well.
         </td>
     </tr>
     <tr>

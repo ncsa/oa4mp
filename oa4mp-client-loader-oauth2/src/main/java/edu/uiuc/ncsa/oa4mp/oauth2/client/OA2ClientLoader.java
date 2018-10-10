@@ -88,7 +88,8 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
                     getSuccessPagePath(),
                     getSecret(),
                     getScopes(),
-                    getWellKnownURI()
+                    getWellKnownURI(),
+                    isOIDCEnabled()
             );
         } catch (Throwable e) {
             throw new GeneralException("Unable to create client environment", e);
@@ -111,6 +112,18 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
         }
         return wellKnownURI;
 
+    }
+
+    Boolean oidcEnabled = null;
+    public boolean isOIDCEnabled(){
+        if(oidcEnabled == null){
+              try{
+                  oidcEnabled = Boolean.parseBoolean(getCfgValue(ClientXMLTags.OIDC_ENABLED));
+              }catch(Throwable t){
+                 oidcEnabled = Boolean.TRUE; // default
+              }
+        }
+        return oidcEnabled;
     }
     @Override
     protected Provider<AssetStore> getAssetStoreProvider() {
@@ -204,10 +217,10 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
                 @Override
                 public DelegationService get() {
                     return new DS2(new AGServer2(createServiceClient(getAuthzURI())), // as per spec, request for AG comes through authz endpoint.
-                            new ATServer2(createServiceClient(getAccessTokenURI()), getWellKnownURI()),
+                            new ATServer2(createServiceClient(getAccessTokenURI()), getWellKnownURI(),isOIDCEnabled()),
                             new PAServer2(createServiceClient(getAssetURI())),
                             new UIServer2(createServiceClient(getUIURI())),
-                            new RTServer2(createServiceClient(getAccessTokenURI()), getWellKnownURI()) // as per spec, refresh token server is at same endpoint as access token server.
+                            new RTServer2(createServiceClient(getAccessTokenURI()), getWellKnownURI(),isOIDCEnabled()) // as per spec, refresh token server is at same endpoint as access token server.
                     );
                 }
             };

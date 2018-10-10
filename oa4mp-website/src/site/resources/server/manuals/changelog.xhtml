@@ -14,15 +14,18 @@
 <h2>4.1-SNAPSHOT</h2>
 <ul>
     <li>CIL-491: Public clients get a trivial ID token when they get an access token. This allows certain services
-        like kubernetes  to heck the timestamps and the ID token.</li>
+        like kubernetes  to check the timestamps and the ID token.</li>
     <li>CIL-499: Check that certain claims are present before returning them. This prevents an unruly script
     from creating an unsuable claims object.</li>
     <li>CIL-501: CLI displays multiple attributes when fully listing a client.</li>
     <li>CIL-505: (in the DB service) Return a better error message if a request times out. </li>
     <li>CIL-508: CLI should be able to list all clients for a given admin. In the admin module, this is the
     list_clients command.</li>
+    <li>CIL-512: Support for LIGO Robot DNs added</li>
     <li>CIL-513: HTTP headers claim source should be configurable to ignore certain returned claims, since in a proxying
     situation, these may be for the proxy, not for the requesting client.</li>
+    <li>CIL-517: Requests to the service using POST should be refused unless the encoding is only form URL.</li>
+    <li>CIL-519: CL=lient Management should return an uploaded cfg object when querying the client's attributes.</li>
 </ul>
 
 <h2>4.0.1</h2>

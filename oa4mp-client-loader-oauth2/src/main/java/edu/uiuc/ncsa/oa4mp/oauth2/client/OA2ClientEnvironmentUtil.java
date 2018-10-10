@@ -12,7 +12,8 @@ import java.io.File;
  */
 public class OA2ClientEnvironmentUtil {
     public static OA2ClientEnvironment load(File configFile, String configName) throws Exception{
-        return (OA2ClientEnvironment) new OA2ClientLoader(ConfigUtil.findConfiguration(configFile.getAbsolutePath(), configName, ClientXMLTags.COMPONENT)).load();
+        return (OA2ClientEnvironment) new OA2ClientLoader(ConfigUtil.findConfiguration(configFile.getAbsolutePath(),
+                configName, ClientXMLTags.COMPONENT)).load();
     }
 
     /**

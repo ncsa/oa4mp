@@ -62,8 +62,10 @@ public class OA2Commands extends BaseCommands {
         say(KEYS + " - create a set of signing keys.\n");
         say(PERMISSIONS + " - basic permission management.\n");
         say(ADMINS + " - create or manage administrative clients.\n");
+        say(PARSER_COMMAND + " - write/debug scripts from the command line.\n");
         say("e.g.\n\nuse " + CLIENTS + "\n\nwill call up the client management component.");
         say("Type 'exit' when you wish to exit the component and return to the main menu");
+        say(" --> and /h prints your command history, /r runs the last command");
 
     }
 

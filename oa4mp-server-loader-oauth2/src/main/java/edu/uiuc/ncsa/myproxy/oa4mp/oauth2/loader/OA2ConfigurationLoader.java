@@ -335,7 +335,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
     Boolean oidcEnabled = null;
     public boolean isOIDCEnabled(){
                 if(oidcEnabled == null){
-                    String x = getFirstAttribute(cn, REFRESH_TOKEN_ENABLED);
+                    String x = getFirstAttribute(cn, OIDC_SUPPORT_ENABLED);
                  if(x == null){
                      oidcEnabled = Boolean.TRUE; // default.
                  }else{

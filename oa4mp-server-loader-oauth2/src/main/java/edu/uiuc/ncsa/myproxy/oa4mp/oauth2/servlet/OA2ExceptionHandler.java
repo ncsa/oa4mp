@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.security.delegation.server.ExceptionWrapper;
 import edu.uiuc.ncsa.security.delegation.server.UnapprovedClientException;
 import edu.uiuc.ncsa.security.oauth_2_0.*;
 import edu.uiuc.ncsa.security.servlet.ExceptionHandler;
+import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import net.sf.json.JSONObject;
 import org.apache.http.HttpStatus;
 
@@ -36,6 +37,7 @@ public class OA2ExceptionHandler implements ExceptionHandler {
 
     @Override
     public void handleException(Throwable t, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        ServletDebugUtil.dbg(this,"Error", t);
         if (t instanceof ExceptionWrapper) {
             // In this case we are getting this as a response after a forward to another servlet and have to unpack it.
             t = t.getCause();
