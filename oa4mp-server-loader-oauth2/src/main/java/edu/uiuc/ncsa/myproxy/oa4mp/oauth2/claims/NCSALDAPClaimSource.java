@@ -20,9 +20,9 @@ public class NCSALDAPClaimSource extends LDAPClaimsSource {
         super();
         init();
         if (searchNameKey != null && !searchNameKey.isEmpty()) {
-            getLDAPCfg().setSearchNameKey(searchNameKey);
+            getLDAPCfg().setSearchFilterAttribute(searchNameKey);
         } else {
-            getLDAPCfg().setSearchNameKey(OA2Claims.SUBJECT);
+            getLDAPCfg().setSearchFilterAttribute(OA2Claims.SUBJECT);
         }
 
     }

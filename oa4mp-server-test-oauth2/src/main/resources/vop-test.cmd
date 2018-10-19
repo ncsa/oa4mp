@@ -1,4 +1,5 @@
 # A test for the voPersonExternalID configuration script.
+# This is completly self-contained and can just be run. It checks the syntax of the calls.
 # The format of a script is that each comment starts with a #
 # An input line ends with a ; (so it may span several lines of text)
 # There is an environment for the script for its duration. You may set and get stored values.

@@ -166,6 +166,8 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
         } finally {
             closeConnection();
         }
+        ServletDebugUtil.dbg(this, "claims=" + claims);
+
         return claims;
     }
 
