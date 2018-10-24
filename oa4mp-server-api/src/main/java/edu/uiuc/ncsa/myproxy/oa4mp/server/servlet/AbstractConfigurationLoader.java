@@ -394,8 +394,18 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
         // now peel off the service address
 
         se2.setServiceAddress(getServiceAddress());
-        se2.setDebugOn(Boolean.parseBoolean(Configurations.getFirstAttribute(cn, OA4MPConfigTags.DEBUG)));
-        DebugUtil.setIsEnabled(se2.isDebugOn());
+        String rawDebug = Configurations.getFirstAttribute(cn, OA4MPConfigTags.DEBUG);
+        try{
+            if(rawDebug == null || rawDebug.isEmpty()){
+                DebugUtil.setDebugLevel(DebugUtil.DEBUG_LEVEL_OFF);
+            }else {
+                DebugUtil.setDebugLevel(rawDebug);
+            }
+        }catch(Throwable t){
+            // ok, so that didn't work, fall back to the old way
+            DebugUtil.setIsEnabled(Boolean.parseBoolean(rawDebug));
+        }
+        se2.setDebugOn(DebugUtil.isEnabled());
         se2.info("Debugging is " + (se2.isDebugOn() ? "on" : "off"));
 
         // part 2. This is done after main config load.
