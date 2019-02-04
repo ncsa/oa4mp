@@ -1,0 +1,14 @@
+{
+  "config": "LSST client configuration, created by Jeff Gaynor 10/26/2018",
+  "claims": {
+    "preProcessing": {"script":[
+      "if[",
+      "    equals(get('idp'),'https://idp.ncsa.illinois.edu/idp/shibboleth')",
+      "]then[",
+      "    set('sub',get('eppn')),",
+      "    set_claim_source('ncsa-default','sub')",
+      "];"
+        ]}
+  },
+  "isSaved": false
+}

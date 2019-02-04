@@ -1,0 +1,59 @@
+{
+  "config": [
+    "Configuration that contains new scripting notation 9/24/2018",
+    "This is currently deployed on production for LSST clients to link users, setting voPersonExternalID",
+    "then searching ldap-test2 for this value."
+  ],
+  "claims": {
+    "sourceConfig": [
+      {
+        "ldap": {
+          "preProcessing": {
+            "script": [
+              "setEnv('vo','voPersonExternalID');",
+              "setEnv('github','http://github.com/login/oauth/authorize');",
+              "setEnv('google','http://google.com/accounts/o8/id');",
+              "setEnv('orcid','http://orcid.org/oauth/authorize');",
+              "xor{",
+              "    if[hasClaim('eppn')]then[set('${vo}',get('eppn'))],",
+              "    if[hasClaim('eptid')]then[set('${vo}',get('eptid'))],",
+              "    if[equals(get('idp'),'${github}')]then[set('${vo}',concat(get('oidc'),'@github.com'))],",
+              "    if[equals(get('idp'),'${google}')]then[set('${vo}',concat(get('oidc'),'@accounts.google.com'))],",
+              "   if[equals(get('idp'),'${orcid}')]then[set('${vo}',replace(get('oidc'),'http://','https://'))]",
+              "};"
+            ],
+            "version": "1.0"
+          },
+          "failOnError": "false",
+          "address": "ldap.ncsa.illinois.edu",
+          "port": 636,
+          "enabled": "true",
+          "authorizationType": "none",
+          "searchName": "voPersonExternalID",
+          "searchFilterAttribute": "voPersonExternalID",
+          "searchAttributes": [
+            {
+              "name": "uid",
+              "returnAsList": false,
+              "returnName": "uid"
+            }
+          ],
+          "searchBase": "ou=People,dc=ncsa,dc=illinois,dc=edu",
+          "contextName": "",
+          "ssl": {
+            "tlsVersion": "TLS",
+            "useJavaTrustStore": true
+          },
+          "id": "3258ed63b62d1a78"
+        }
+      }
+    ],
+    "preProcessing": {
+      "script": [
+        "set_claim_source('LDAP','3258ed63b62d1a78');",
+        "set_claim_source('ncsa-default','uid');"
+      ]
+    }
+  },
+  "isSaved": true
+}

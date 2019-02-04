@@ -73,10 +73,10 @@ public class ClientServlet extends EnvServlet {
     @Override
     protected void doIt(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Throwable {
         BufferedReader br = httpServletRequest.getReader();
-        DebugUtil.dbg(this, "query=" + httpServletRequest.getQueryString());
+        DebugUtil.trace(this, "query=" + httpServletRequest.getQueryString());
         StringBuffer stringBuffer = new StringBuffer();
         String line = br.readLine();
-        DebugUtil.dbg(this, "line=" + line);
+        DebugUtil.trace(this, "line=" + line);
         while (line != null) {
             stringBuffer.append(line);
             line = br.readLine();
@@ -87,7 +87,7 @@ public class ClientServlet extends EnvServlet {
         }
         JSON rawJSON = JSONSerializer.toJSON(stringBuffer.toString());
 
-        System.err.println(rawJSON.toString());
+        DebugUtil.trace(this, rawJSON.toString());
         if (rawJSON.isArray()) {
             getMyLogger().info("Error: Got a JSON array rather than a request:" + rawJSON);
             throw new IllegalArgumentException("Error: incorrect argument. Not a valid JSON request");

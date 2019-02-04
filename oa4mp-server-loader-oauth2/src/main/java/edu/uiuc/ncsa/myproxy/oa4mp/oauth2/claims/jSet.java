@@ -22,7 +22,7 @@ public class jSet extends ClaimFunctor {
     @Override
     public Object execute() {
         if(claims == null){
-            return null;
+            return "";
         }
         if(getArgs().size() !=2){
             throw new IllegalArgumentException("Error: Expected 2 arguments and got " + getArgs().size() + ": " + getArgs());
@@ -40,6 +40,7 @@ public class jSet extends ClaimFunctor {
         if(claims!=null) {
             claims.put(claim, newValue);
         }
+        result = newValue; // or having this in lists of commands throws an NPE. Return something.
         executed = true;
         return newValue;
     }

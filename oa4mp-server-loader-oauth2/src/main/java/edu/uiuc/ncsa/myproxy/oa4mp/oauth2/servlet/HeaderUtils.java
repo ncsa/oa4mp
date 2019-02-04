@@ -2,7 +2,6 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
-import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2ATException;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
@@ -17,6 +16,7 @@ import java.util.Enumeration;
 import java.util.List;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceConstantKeys.CONSUMER_KEY;
+import static edu.uiuc.ncsa.security.core.util.DebugUtil.trace;
 
 /**
  * Utilities for dealing with getting tokens that may be either sent as parameters
@@ -61,9 +61,10 @@ public class HeaderUtils {
         return out;
     }
 
-    public static boolean hasBasicHeader(HttpServletRequest request){
-        return getBasicHeader(request)!=null;
+    public static boolean hasBasicHeader(HttpServletRequest request) {
+        return getBasicHeader(request) != null;
     }
+
     public static String getBasicHeader(HttpServletRequest request) {
         List<String> authHeaders = getAuthHeader(request, "Basic");
         if (authHeaders.isEmpty()) {
@@ -85,14 +86,20 @@ public class HeaderUtils {
     public static int ID_INDEX = 0;
     public static int SECRET_INDEX = 1;
 
-    // Fix for CIL-430:
-    public static String[] getCredentialsFromHeaders(HttpServletRequest request) throws UnsupportedEncodingException {
-        String[] out = new String[2];
+    public static String[] getCredentialsFromHeaders(HttpServletRequest request, String type) throws UnsupportedEncodingException {
         // assume the client id and secret are in the headers.
-        String header64 = getBasicHeader(request);
-        if (header64 == null) {
-            return null;
+        String header64 = null;
+        if (type.equals("Basic")) {
+            header64 = getBasicHeader(request);
         }
+        if (type.equals("Bearer")) {
+            header64 = getBearerAuthHeader(request);
+        }
+        if (header64 == null) {
+            throw new IllegalArgumentException("Error: Unknown auth type.");
+        }
+        String[] out = new String[2];
+
         // semantics are that this is base64.encode(URLEncode(id):URLEncode(secret))
         byte[] headerBytes = Base64.decodeBase64(header64);
         if (headerBytes == null || headerBytes.length == 0) {
@@ -111,8 +118,8 @@ public class HeaderUtils {
 
         // semantics are that this is base64.encode(id:secret)
 
-        DebugUtil.dbg(HeaderUtils.class, " received authz header of " + header);
-        String id = URLDecoder.decode(header.substring(0,lastColonIndex), "UTF-8");
+        trace(HeaderUtils.class, " received authz header of " + header);
+        String id = URLDecoder.decode(header.substring(0, lastColonIndex), "UTF-8");
         out[ID_INDEX] = id;
 
         String rawSecret = URLDecoder.decode(header.substring(lastColonIndex + 1), "UTF-8");
@@ -120,14 +127,21 @@ public class HeaderUtils {
         out[SECRET_INDEX] = rawSecret;
 
         return out;
+
+
+    }
+
+    public static String[] getCredentialsFromHeaders(HttpServletRequest request) throws UnsupportedEncodingException {
+        return getCredentialsFromHeaders(request, "Basic"); // default
     }
 
     public static String getSecretFromHeaders(HttpServletRequest request) throws UnsupportedEncodingException {
         return getCredentialsFromHeaders(request)[SECRET_INDEX];
     }
+
     public static Identifier getIDFromHeaders(HttpServletRequest request) throws UnsupportedEncodingException {
         String[] creds = getCredentialsFromHeaders(request);
-        if(creds == null || creds.length == 0){
+        if (creds == null || creds.length == 0) {
             return null;
         }
         return BasicIdentifier.newID(creds[ID_INDEX]);
@@ -159,3 +173,4 @@ public class HeaderUtils {
     }
 
 }
+// Fix for CIL-430:

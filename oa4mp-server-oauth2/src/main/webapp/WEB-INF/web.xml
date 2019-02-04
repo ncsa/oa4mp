@@ -45,6 +45,16 @@
     </servlet-mapping>
 
     <servlet>
+            <servlet-name>oidc-cm</servlet-name>
+            <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.oidc_cm.OIDCCMServlet</servlet-class>
+        </servlet>
+        <servlet-mapping>
+            <servlet-name>oidc-cm</servlet-name>
+            <url-pattern>/oidc-cm</url-pattern>
+        </servlet-mapping>
+
+
+    <servlet>
         <servlet-name>getCert</servlet-name>
         <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2CertServlet</servlet-class>
 

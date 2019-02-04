@@ -107,9 +107,7 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl {
         }
     }
 
-    public ParserCommands getNewParserCommands() throws Exception {
-        return new ParserCommands(getMyLogger());
-    }
+    public abstract ParserCommands getNewParserCommands() throws Exception ;
 
     protected boolean executeComponent() throws Exception {
         if (hasOption(USE_COMPONENT_OPTION, USE_COMPONENT_LONG_OPTION)) {

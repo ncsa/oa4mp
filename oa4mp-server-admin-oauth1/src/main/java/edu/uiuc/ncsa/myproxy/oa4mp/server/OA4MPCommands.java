@@ -3,9 +3,11 @@ package edu.uiuc.ncsa.myproxy.oa4mp.server;
 import edu.uiuc.ncsa.myproxy.oa4mp.loader.OA4MPConfigurationLoader;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
-import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.core.util.LoggingConfigLoader;
+import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.util.cli.CLIDriver;
+import edu.uiuc.ncsa.security.util.cli.ParserCommands;
+import edu.uiuc.ncsa.security.util.functor.JFunctorFactory;
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -28,7 +30,11 @@ public class OA4MPCommands extends BaseCommands {
         return "oa4mp >";
     }
 
-
+    @Override
+    public ParserCommands getNewParserCommands() throws Exception {
+        JFunctorFactory ff = new JFunctorFactory(true);
+        return new ParserCommands(getMyLogger(), ff);
+    }
 
     public void about() {
         int width = 60;

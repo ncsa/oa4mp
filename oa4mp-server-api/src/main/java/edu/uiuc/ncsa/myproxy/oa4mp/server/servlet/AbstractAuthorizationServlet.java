@@ -78,27 +78,34 @@ public abstract class AbstractAuthorizationServlet extends CRServlet implements 
             case AUTHORIZATION_ACTION_START:
                 info("3.a. Starting authorization for grant =" + aState.getTransaction().getIdentifierString());
                 //Mess of information for the form
-                HttpServletRequest request = state.getRequest();
-
-                request.setAttribute(AUTHORIZATION_USER_NAME_KEY, AUTHORIZATION_USER_NAME_KEY);
-                request.setAttribute(AUTHORIZATION_PASSWORD_KEY, AUTHORIZATION_PASSWORD_KEY);
-                request.setAttribute(AUTHORIZATION_ACTION_KEY, AUTHORIZATION_ACTION_KEY);
-                request.setAttribute("actionOk", AUTHORIZATION_ACTION_OK_VALUE);
-                request.setAttribute("authorizationGrant", aState.getTransaction().getIdentifierString());
-                request.setAttribute("tokenKey", CONST(TOKEN_KEY));
-                // OAuth 2.0 specific values that must be preserved.
-                request.setAttribute("stateKey", "state");
-                request.setAttribute("authorizationState", getParam(aState.getRequest(), "state"));
-                // HTML escape it to guard against HTML injection attacks. Addresses issue OAUTH-87.
-                // If you aren't sure whether a form is secure against HTML injection attacks, paste the following into it:
-                // ><script>alert('CSS Vulnerable')</script><b a=a     a></a><script>alert('CSS Vulnerable')</script>     \'><script>alert%28\'CSS Vulnerable\'%29</script><
-                // and get the form to re-display. If it is vulnerable, a popup saying so will appear.
-
-                request.setAttribute("clientHome", escapeHtml(aState.getTransaction().getClient().getHomeUri()));
-                request.setAttribute("clientName", escapeHtml(aState.getTransaction().getClient().getName()));
-                request.setAttribute("actionToTake", request.getContextPath() + "/authorize");
+                setClientRequestAttributes(aState);
                 return;
         }
+    }
+
+    protected void setClientRequestAttributes(AuthorizedState aState) {
+        HttpServletRequest request = aState.getRequest();
+        request.setAttribute(AUTHORIZATION_USER_NAME_KEY, AUTHORIZATION_USER_NAME_KEY);
+        request.setAttribute(AUTHORIZATION_PASSWORD_KEY, AUTHORIZATION_PASSWORD_KEY);
+        request.setAttribute(AUTHORIZATION_ACTION_KEY, AUTHORIZATION_ACTION_KEY);
+        request.setAttribute("actionOk", AUTHORIZATION_ACTION_OK_VALUE);
+        request.setAttribute("authorizationGrant", aState.getTransaction().getIdentifierString());
+        request.setAttribute("tokenKey", CONST(TOKEN_KEY));
+        // OAuth 2.0 specific values that must be preserved.
+        request.setAttribute("stateKey", "state");
+        request.setAttribute("authorizationState", getParam(aState.getRequest(), "state"));
+        /* HTML escape it to guard against HTML injection attacks. Addresses issue OAUTH-87.
+         If you aren't sure whether a form is secure against HTML injection attacks, paste the following into it:
+
+         <script>alert('CSS Vulnerable')</script><b a=a     a></a>
+         <script>alert('CSS Vulnerable')</script>     \'>
+         <script>alert%28\'CSS Vulnerable\'%29</script>
+
+         and get the form to re-display. If it is vulnerable, a popup saying so will appear.
+        */
+        request.setAttribute("clientHome", escapeHtml(aState.getTransaction().getClient().getHomeUri()));
+        request.setAttribute("clientName", escapeHtml(aState.getTransaction().getClient().getName()));
+        request.setAttribute("actionToTake", request.getContextPath() + "/authorize");
     }
 
     public static String INITIAL_PAGE = "/authorize-init.jsp";
@@ -311,12 +318,15 @@ public abstract class AbstractAuthorizationServlet extends CRServlet implements 
 
     public static class MyMyProxyLogon extends MyProxyLogon {
 
-        public String getPassphrase(){return passphrase;}
+        public String getPassphrase() {
+            return passphrase;
+        }
 
         @Override
         public String toString() {
             return getClass().getSimpleName() + "[host=" + getHost() + ", port=" + getPort() + ", for username=" + getUsername() + "]";
         }
     }
-    abstract protected void  setupMPConnection(ServiceTransaction trans, String username, String password) throws GeneralSecurityException ;
+
+    abstract protected void setupMPConnection(ServiceTransaction trans, String username, String password) throws GeneralSecurityException;
 }

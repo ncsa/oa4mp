@@ -51,6 +51,8 @@ please sign in with your username and password.
                             <i>Name:</i> ${clientName}
                             <br>
                             <i>URL:</i> ${clientHome}
+                            <br>
+                            <i>Requested Scopes:</i> ${clientScopes}
                         </td>
                     </tr>
                 </table>

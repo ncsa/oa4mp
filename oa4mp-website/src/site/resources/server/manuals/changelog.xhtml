@@ -13,6 +13,13 @@
 
 <h2>4.2-SNAPSHOT</h2>
 <ul>
+    <li>Added supoort for turning on/off OIDC abilities in the configuration file with the OIDCEnabled flag.</li>
+</ul>
+
+<h2>4.1.1</h2>
+
+<ul>
+    <li>CIL-476: Allow for setting reply-to header in email notifications</li>
     <li>CIL-491: Public clients get a trivial ID token when they get an access token. This allows certain services
         like kubernetes  to check the timestamps and the ID token.</li>
     <li>CIL-499: Check that certain claims are present before returning them. This prevents an unruly script
@@ -25,7 +32,7 @@
     <li>CIL-513: HTTP headers claim source should be configurable to ignore certain returned claims, since in a proxying
     situation, these may be for the proxy, not for the requesting client.</li>
     <li>CIL-517: Requests to the service using POST should be refused unless the encoding is only form URL.</li>
-    <li>CIL-519: CL=lient Management should return an uploaded cfg object when querying the client's attributes.</li>
+    <li>CIL-519: Client Management should return an uploaded cfg object when querying the client's attributes.</li>
 </ul>
 
 <h2>4.0.1</h2>
@@ -34,7 +41,7 @@
     experience.
 </p>
 <ul>
-    <li>CIL-332: Error responses should be JSON format with HHTP status 400.</li>
+    <li>CIL-332: Error esponses should be JSON format with HHTP status 400.</li>
     <li>CIL-365: Setting scope = org.cilogon.userinfo should return an oidc claim if there is one.</li>
     <li>CIL-408: OAuth 1 command line client should not look for admin client stores on startup.</li>
     <li>CIL-417: Set subject claim to EPPN in certain cases</li>

@@ -30,6 +30,8 @@ import java.security.GeneralSecurityException;
 import java.util.Date;
 import java.util.Map;
 
+import static org.apache.commons.lang.StringEscapeUtils.escapeHtml;
+
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -44,6 +46,24 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
     public String AUTHORIZATION_REFRESH_TOKEN_LIFETIME_KEY = "AuthRTL";
     public String AUTHORIZED_ENDPOINT = "/authorized";
     public String AUTHORIZATION_REFRESH_TOKEN_LIFETIME_VALUE = "rtLifetime";
+
+    protected String scopesToString(OA2ServiceTransaction t){
+        String scopeString = "";
+        for(String x : t.getScopes()){
+            scopeString = scopeString + x + " ";
+        }
+        return scopeString;
+
+    }
+    @Override
+    protected void setClientRequestAttributes(AuthorizedState aState) {
+        super.setClientRequestAttributes(aState);
+        HttpServletRequest request = aState.getRequest();
+
+        OA2ServiceTransaction t = (OA2ServiceTransaction) aState.getTransaction();
+        request.setAttribute("clientScopes", escapeHtml(scopesToString(t)));
+
+    }
 
     /**
      * This class is needed to pass information between servlets, where one servlet
@@ -68,6 +88,7 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
                 setExceptionEncountered(true);
             }
         }
+
 
         public int getStatus() {
             return internalStatus;

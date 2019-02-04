@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oauth2.tools;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.OA2FunctorFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2ConfigurationLoader;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.BaseCommands;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.ClientStoreCommands;
@@ -12,7 +13,11 @@ import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.util.cli.CLIDriver;
 import edu.uiuc.ncsa.security.util.cli.CommonCommands;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
+import edu.uiuc.ncsa.security.util.cli.ParserCommands;
 import org.apache.commons.lang.StringUtils;
+
+import java.util.HashMap;
+import java.util.LinkedList;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -35,6 +40,13 @@ public class OA2Commands extends BaseCommands {
     @Override
     public ConfigurationLoader<? extends AbstractEnvironment> getLoader() {
         return new OA2ConfigurationLoader<>(getConfigurationNode(), getMyLogger());
+    }
+
+    @Override
+    public ParserCommands getNewParserCommands() throws Exception {
+        OA2FunctorFactory ff = new OA2FunctorFactory(new HashMap<String, Object>(), new LinkedList<String>());
+        ff.setVerboseOn(true);
+        return new ParserCommands(getMyLogger(), ff);
     }
 
     OA2SE getOA2SE() throws Exception {

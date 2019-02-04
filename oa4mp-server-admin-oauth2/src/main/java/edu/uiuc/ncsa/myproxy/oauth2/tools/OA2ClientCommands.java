@@ -10,6 +10,7 @@ import edu.uiuc.ncsa.security.delegation.server.storage.ClientApprovalStore;
 import edu.uiuc.ncsa.security.delegation.storage.BaseClient;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfigurationUtil;
 import edu.uiuc.ncsa.security.util.cli.ExitException;
+import edu.uiuc.ncsa.security.util.cli.InputLine;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -18,6 +19,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import java.net.URI;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import static edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval.Status.APPROVED;
@@ -146,6 +148,113 @@ public class OA2ClientCommands extends ClientStoreCommands {
         }
     }
 
+    protected void showCBHelp() {
+        say("cb -add [cb1, cb2,...] index =  add a list of callbacks to the given list of callbacks. If no list is given, you will be prompted");
+        say("cb -list /index = list the callbacks for a given client");
+        say("cb -rm [cb1, cb2,...] /index = remove the given callbacks from the client.");
+        say("Note that you must supply a list of callbacks");
+        say("\nE.g. to add a a few callbacks you would invoke");
+        say("cb -add https://foo1, https://foo2,https://foo3 /oa4mp:client/id/234234234234");
+        say("\nThis adds the three urls to the current list for the client with the given id.");
+    }
+
+
+    public void cb(InputLine inputLine) {
+        if (showHelp(inputLine)) {
+            showCBHelp();
+            return;
+        }
+        boolean gotOne = false;
+        OA2Client client = (OA2Client) findItem(inputLine);
+        if (inputLine.hasArg("-add")) {
+            gotOne = true;
+            Collection<String> cbs = getCBS(inputLine);
+            // form is that the last argument is the index, so there has to be at least
+            processDBAdd(client, cbs);
+            return;
+        }
+        if (inputLine.hasArg("-rm")) {
+            gotOne = true;
+            Collection<String> cbs = getCBS(inputLine);
+            removeCB(client, cbs);
+            return;
+        }
+        if (inputLine.hasArg("-list")) {
+            gotOne = true;
+            say("list of callbacks for this client:");
+            for (String x : client.getCallbackURIs()) {
+                say("  " + x);
+            }
+            return;
+        }
+        if (!gotOne) {
+            say("Sorry, no command found. Show help for this topic if you need to.");
+        }
+    }
+
+    protected void removeCB(OA2Client client, Collection<String> cbs) {
+        if (cbs.isEmpty()) {
+            //    say("Enter callbacks to remove. A blank line ends input");
+            say("nothing to remove");
+
+        }
+        client.getCallbackURIs().remove(cbs);
+        String response = getInput("Save?(y/n", "n");
+        if (response.equals("y")) {
+            getStore().save(client);
+            say("done.");
+        } else {
+            say("not saved.");
+        }
+    }
+
+    protected Collection<String> getCBS(InputLine inputLine) {
+        Collection<String> cbs = new LinkedList<>();
+        List<String> allArgs = inputLine.getArgs();
+        // have to pull off the arguments. The input line looks like e.g.
+        // -add A,B, C,  D,E  /index
+        // where we need to normalize it to A,B,C,D,E and then split it, inspect each one as a URL
+        String newCBs = "";
+        for (int i = 1; i < allArgs.size() - 1; i++) {
+            newCBs = newCBs + allArgs.get(i).trim();
+        }
+        if (!newCBs.isEmpty()) {
+            StringTokenizer st = new StringTokenizer(newCBs, ",");
+            while (st.hasMoreTokens()) {
+                String nextToken = st.nextToken();
+                try {
+                    URI tempURI = URI.create(nextToken);
+                    if (!tempURI.getScheme().equals("https")) {
+                        say("Sorry but the protocol for \"" + nextToken + "\" is not supported. It must be https. Rejected.");
+                    } else {
+                        cbs.add(nextToken);
+                    }
+                } catch (Throwable t) {
+                    say("Sorry but \"" + nextToken + "\" is not a valid URL. Skipped.");
+                }
+            }
+        }
+        return cbs;
+    }
+
+    protected void processDBAdd(OA2Client client, Collection<String> newArgs) {
+        if (newArgs.isEmpty()) {
+         //   say("No callbacks, please enter them as a comma separated list. Empty line ends input.");
+          //  String line = readline();
+            say("No callbacks to add.");
+            return;
+        } else {
+            client.getCallbackURIs().addAll(newArgs);
+
+        }
+        String response = getInput("Save changes?(y/n)", "n");
+        if (response.equals("y")) {
+            getStore().save(client);
+            say("Saved.");
+        } else {
+            say("not saved.");
+        }
+    }
 
     /**
      * In this case, the secret has to be gotten and processed into a hash,

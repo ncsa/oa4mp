@@ -1,0 +1,78 @@
+{
+"config": "Minimal NCSA LDAP access",
+"claims":   {
+  "sourceConfig": [{"ldap":     {
+    "preProcessing": [      {
+      "$if": [{"$match":         [
+        "${idp}",
+        "https://idp.ncsa.illinois.edu/idp/shibboleth"
+      ]}],
+      "$then": [{"$set":         [
+        "foo",
+        {"$drop":           [
+          "@ncsa.illinois.edu",
+          "${eppn}"
+        ]}
+      ]}],
+      "$else": [{"$get_claims": ["$false"]}]
+    }],
+    "postProcessing": [      {
+      "$if": [{"$match":         [
+        "${idp}",
+        "https://idp.ncsa.illinois.edu/idp/shibboleth"
+      ]}],
+      "$then": [{"$exclude": ["foo"]}]
+    }],
+    "enabled": true,
+    "failOnError": false,
+    "notifyOnFail": false,
+    "address": "ldap.ncsa.illinois.edu",
+    "port": 636,
+    "authorizationType": "none",
+    "searchAttributes":       [
+              {
+        "name": "mail",
+        "returnAsList": false,
+        "returnName": "email"
+      },
+              {
+        "name": "cn",
+        "returnAsList": false,
+        "returnName": "name"
+      },
+              {
+        "name": "memberOf",
+        "isGroup": true,
+        "returnAsList": false,
+        "returnName": "isMemberOf"
+      },
+              {
+        "name": "uid",
+        "returnAsList": false,
+        "returnName": "uid"
+      },
+              {
+        "name": "uidNumber",
+        "returnAsList": false,
+        "returnName": "uidNumber"
+      }
+    ],
+    "searchBase": "ou=People,dc=ncsa,dc=illinois,dc=edu",
+    "searchName": "foo",
+    "contextName": "",
+    "ssl":       {
+      "tlsVersion": "TLS",
+      "useJavaTrustStore": true
+    },
+    "name": "2f98a0298b27c2d8"
+  }}],
+  "preProcessing": [    {
+    "$if": ["$true"],
+    "$then": [{"$set_claim_source":       [
+      "LDAP",
+      "2f98a0298b27c2d8"
+    ]}]
+  }]
+},
+"isSaved": true
+}

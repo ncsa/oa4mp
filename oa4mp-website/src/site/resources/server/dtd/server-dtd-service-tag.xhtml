@@ -60,6 +60,16 @@
         </td>
     </tr>
     <tr>
+           <td style="vertical-align: top;">OIDCEnabled</td>
+           <td style="vertical-align: top;">N</td>
+           <td style="vertical-align: top;">true</td>
+           <td style="vertical-align: top;"><span style="background-color: #ff6600;">OAuth 2</span>
+               This toggles OIDC support for the service. If true, then required claims (such as sibject) will be
+               checked for and ID tokens will be generated. Also, any request that does not contain the scope of <b>openid</b>
+               will be rejected. Note that if false, the service is OAuth 2.0 compliant, but not OIDC compliant.
+           </td>
+       </tr>
+    <tr>
         <td style="vertical-align: top;">pollingInterval</td>
         <td style="vertical-align: top;">N</td>
         <td style="vertical-align: top;">N/A</td>
@@ -90,7 +100,7 @@
         <td style="vertical-align: top;">refreshTokenLifetime</td>
         <td style="vertical-align: top;">N</td>
         <td style="vertical-align: top;">1296000</td>
-        <td style="vertical-align: top;">"<span style="background-color: #ff6600;">OAuth 2</span>
+        <td style="vertical-align: top;"><span style="background-color: #ff6600;">OAuth 2</span>
             specific. This will set a global maximum on the server, in seconds, for how long a refresh token can
             remain active from issuance. The default is 15 days.
         </td>
@@ -108,7 +118,7 @@
         <td style="vertical-align: top;">refreshTokenEnabled</td>
         <td style="vertical-align: top;">N</td>
         <td style="vertical-align: top;">false</td>
-        <td style="vertical-align: top;">"<span style="background-color: #ff6600;">OAuth 2</span>
+        <td style="vertical-align: top;"><span style="background-color: #ff6600;">OAuth 2</span>
             specific. This tells the server to issue refresh tokens. Setting this false means the server will
             not issue them, nor will clients be allowed to specify them at registration. Setting the
             value for the refreshTokenLifetime in the configuration will be ignored if the server
@@ -120,7 +130,7 @@
         <td style="vertical-align: top;">clientSecretLength</td>
         <td style="vertical-align: top;">N</td>
         <td style="vertical-align: top;">64</td>
-        <td style="vertical-align: top;">"<span style="background-color: #ff6600;">OAuth 2</span>
+        <td style="vertical-align: top;"><span style="background-color: #ff6600;">OAuth 2</span>
             specific. The server generates client secrets of this length in bytes, then displays them
             to the client in Base64 encoding, which should be returned verbatim to the server. Note that
             the returned secret is URL safe encoded as well.
