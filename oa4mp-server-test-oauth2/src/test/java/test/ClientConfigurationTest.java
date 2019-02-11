@@ -12,11 +12,13 @@ import edu.uiuc.ncsa.security.util.functor.FunctorTypeImpl;
 import edu.uiuc.ncsa.security.util.functor.logic.jContains;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import net.sf.json.util.JSONUtils;
 import org.junit.Test;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.StringBufferInputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -227,7 +229,7 @@ public class ClientConfigurationTest extends TestBase {
         List<ClaimSource> cc = clientConfiguration.getClaimSource();
         System.out.println(cc);
         assert cc.get(0) instanceof LDAPClaimsSource;
-         LDAPClaimsSource ldapClaimsSource = (LDAPClaimsSource) cc.get(0);
+        LDAPClaimsSource ldapClaimsSource = (LDAPClaimsSource) cc.get(0);
     }
     // TODO -- Need a test for setting up a processor,
     // * enabling/disabling based on claims
@@ -342,5 +344,24 @@ public class ClientConfigurationTest extends TestBase {
         assert clientConfiguration.hasPreProcessing();
         assert clientConfiguration.getPreProcessing().hasHandlers();
 
+    }
+
+    /**
+     * At issue is that we need to support UTF 8 and this needs to be handled correctly
+     * by the JSON. So we have some non-ASCII characters.  Typically these are starting to show
+     * up in configurations, so we test for them here.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testUTF8() throws Exception {
+        JSONObject json = new JSONObject();
+        json.put("first", "フル―リテリ―");
+        json.put("last", "フル―リ");
+        json.put("idp_name", "Nationales Zentrum für Supercomputing-Anwendungen");
+        String output = JSONUtils.valueToString(json, 1, 0);
+        System.out.println(output);
+        StringBufferInputStream sbi = new StringBufferInputStream(json.toString());
+        
     }
 }

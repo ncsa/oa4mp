@@ -4,7 +4,6 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.OA2FunctorFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.jSetClaimSource;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.ClientConfigurationUtil;
-import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.util.functor.FunctorTypeImpl;
 import edu.uiuc.ncsa.security.util.functor.LogicBlock;
 import edu.uiuc.ncsa.security.util.functor.LogicBlocks;
@@ -133,15 +132,20 @@ public class OA2ClientConfigurationUtil extends ClientConfigurationUtil {
 
 
     protected static JSONObject getClaimsProcessor(JSONObject config, String key) {
-        DebugUtil.dbg(OA2ClientConfigurationUtil.class, ".getClaimsProcessor: key=" + key);
+        String dbgName = "getClaimsProcessor";
+        if(config.containsKey(ID_TAG)){
+            dbgName = dbgName + "(" + config.getString(ID_TAG) + ")";
+        }
+        dbgName = dbgName + ":";
+        DebugUtil.trace(OA2ClientConfigurationUtil.class, dbgName + " key=" + key);
         if (!config.containsKey(CLAIMS_KEY)) {
-            DebugUtil.dbg(OA2ClientConfigurationUtil.class, ".getClaimsProcessor: NO CLAIMS");
+            DebugUtil.trace(OA2ClientConfigurationUtil.class, dbgName + " NO CLAIMS");
             return new JSONObject();
         }
 
         JSONObject claims = config.getJSONObject(CLAIMS_KEY);
         Object obj = claims.get(key);
-        DebugUtil.dbg(OA2ClientConfigurationUtil.class, ".getClaimsProcessor: JSON configuration object for this key=" + obj);
+        DebugUtil.trace(OA2ClientConfigurationUtil.class, dbgName + "JSON configuration object for this key=" + obj);
 
         if (obj instanceof JSONArray) {
             JSONObject j = new JSONObject();
@@ -245,7 +249,7 @@ public class OA2ClientConfigurationUtil extends ClientConfigurationUtil {
                 }
             }
             if (!containsOldLDAP) {
-                ServletDebugUtil.dbg(OA2ClientConfigurationUtil.class, "This does not contain the existing LDAP. Adding it.");
+                DebugUtil.trace(OA2ClientConfigurationUtil.class, "This does not contain the existing LDAP. Adding it.");
 
                 // Add it to the list of configurations.
                 claimSources.add(oldLDAP);
@@ -253,7 +257,7 @@ public class OA2ClientConfigurationUtil extends ClientConfigurationUtil {
                 // update the set of claims sources in the configuration.
                 setClaimSourcesConfigurations(config, claimSources);
                 if (!hasClaimPreProcessor(config) && !hasRuntime(config)) {
-                    ServletDebugUtil.dbg(OA2ClientConfigurationUtil.class, "Claim sources does not include old LDAP. No runtime/pre-processor, so creating default.");
+                    DebugUtil.trace(OA2ClientConfigurationUtil.class, "Claim sources does not include old LDAP. No runtime/pre-processor, so creating default.");
                     createDefaultPreProcessor(config, oldLDAPName);
                 }
             }
@@ -264,14 +268,14 @@ public class OA2ClientConfigurationUtil extends ClientConfigurationUtil {
             long newValue = secureRandom.nextLong();
             String newName = Long.toHexString(newValue);
             content.put(ID_TAG, newName);
-            ServletDebugUtil.dbg(OA2ClientConfigurationUtil.class, ".convertToNewConfig: old LDAP size =" + oldLDAP.size() + ", keyset = " + oldLDAP.keySet());
+            DebugUtil.trace(OA2ClientConfigurationUtil.class, ".convertToNewConfig: old LDAP size =" + oldLDAP.size() + ", keyset = " + oldLDAP.keySet());
             oldLDAP.put(LDAP_TAG, content);
             claimSources.add(oldLDAP);
             setClaimSourcesConfigurations(config, claimSources);
             setSaved(config, false);
             // Finally, if there is NO claims pre-processor (which would set the source to use
             // then create one. Otherwise leave any existing new configuration intact.
-            ServletDebugUtil.dbg(OA2ClientConfigurationUtil.class, "Done creating new Claim source with id = " + newName + ". Create default processor?" +
+            DebugUtil.trace(OA2ClientConfigurationUtil.class, "Done creating new Claim source with id = " + newName + ". Create default processor?" +
                     (!OA2ClientConfigurationUtil.hasClaimPreProcessor(config) && !hasRuntime(config)));
             if (!hasClaimPreProcessor(config) && !hasRuntime(config)) {
                 createDefaultPreProcessor(config, newName);

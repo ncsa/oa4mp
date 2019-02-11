@@ -1,0 +1,19 @@
+{
+ "config": [
+   "Scripting test configuration 10/3/2018",
+   "This is the case that if the IDP is the NCSA, It sets the search  name from the eppn,",
+   "then the standard set of claims is created and returned.",
+   "Also, the sub is set to being the eppn rather than the internal identifier (e.g. cilogon uid).",
+   "Omit the postProcessing if you want do not want to reset the sub claim"
+ ],
+ "isSaved": true,
+ "runtime": {"script":  [
+   "set('uid',drop('${eppn}','@illinois.edu'));",
+   "if[",
+  "    equals(get('idp'),'https://idp.ncsa.illinois.edu/idp/shibboleth')",
+  "  ]then[",
+  "    set_claim_source('ncsa-default','uid')",
+  "];"
+ ]},
+ "claims": {"postProcessing": {"script": ["set('sub',get('eppn'));"]}}
+}

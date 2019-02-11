@@ -33,7 +33,7 @@ public class OA2ClaimsUtil {
     /*
     ONly enable this if you want to see everything. Lots of output.
      */
-    boolean deepDebugOn = false;
+    boolean deepDebugOn = true;
 
     protected OA2ServiceTransaction transaction;
     OA2SE oa2se;

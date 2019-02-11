@@ -86,20 +86,14 @@ public class HeaderUtils {
     public static int ID_INDEX = 0;
     public static int SECRET_INDEX = 1;
 
-    public static String[] getCredentialsFromHeaders(HttpServletRequest request, String type) throws UnsupportedEncodingException {
-        // assume the client id and secret are in the headers.
-        String header64 = null;
-        if (type.equals("Basic")) {
-            header64 = getBasicHeader(request);
-        }
-        if (type.equals("Bearer")) {
-            header64 = getBearerAuthHeader(request);
-        }
-        if (header64 == null) {
-            throw new IllegalArgumentException("Error: Unknown auth type.");
-        }
+    // Fix for CIL-430:
+    public static String[] getCredentialsFromHeaders(HttpServletRequest request) throws UnsupportedEncodingException {
         String[] out = new String[2];
-
+        // assume the client id and secret are in the headers.
+        String header64 = getBasicHeader(request);
+        if (header64 == null) {
+            return null;
+        }
         // semantics are that this is base64.encode(URLEncode(id):URLEncode(secret))
         byte[] headerBytes = Base64.decodeBase64(header64);
         if (headerBytes == null || headerBytes.length == 0) {
@@ -127,18 +121,11 @@ public class HeaderUtils {
         out[SECRET_INDEX] = rawSecret;
 
         return out;
-
-
-    }
-
-    public static String[] getCredentialsFromHeaders(HttpServletRequest request) throws UnsupportedEncodingException {
-        return getCredentialsFromHeaders(request, "Basic"); // default
     }
 
     public static String getSecretFromHeaders(HttpServletRequest request) throws UnsupportedEncodingException {
         return getCredentialsFromHeaders(request)[SECRET_INDEX];
     }
-
     public static Identifier getIDFromHeaders(HttpServletRequest request) throws UnsupportedEncodingException {
         String[] creds = getCredentialsFromHeaders(request);
         if (creds == null || creds.length == 0) {

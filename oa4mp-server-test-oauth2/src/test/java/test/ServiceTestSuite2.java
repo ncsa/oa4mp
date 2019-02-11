@@ -26,6 +26,7 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 
 @Suite.SuiteClasses({
+        ClientConfigurationTest.class,
         JFunctorTest.class,
         OA2ParserTest.class,
         OA2FunctorTests.class,

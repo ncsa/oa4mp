@@ -144,6 +144,9 @@ public class OA2ReadyServlet extends ClientServlet {
         }
         request.setAttribute("action", contextPath);
         info("2.a. Completely finished with delegation.");
+
+
+        response.setCharacterEncoding("UTF-8");
         JSPUtil.fwd(request, response, getCE().getSuccessPagePath());
         return;
     }

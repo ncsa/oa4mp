@@ -71,19 +71,22 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
      * @return
      */
     public String getSearchName(JSONObject claims, HttpServletRequest request, ServiceTransaction transaction) {
-        DebugUtil.dbg(this, claims.toString(2));
+        String dbgname = ".getSearchName(id=" + getLDAPCfg().getId() + "):";
+        DebugUtil.trace(this, dbgname);
         LDAPConfigurationUtil ldapConfigurationUtil = new LDAPConfigurationUtil();
         JSONObject xxx = ldapConfigurationUtil.toJSON(getLDAPCfg());
         xxx.getJSONObject("ldap").getJSONObject("ssl").put("keystore", "");
         if (getLDAPCfg().getSearchNameKey() == null) {
-            warn("No search name given for LDAP query. Using default of username");
+            warn(dbgname + "No search name given for LDAP query. Using default of username");
             return transaction.getUsername();
         }
         if (getLDAPCfg().getSearchNameKey().equals(LDAPConfigurationUtil.SEARCH_NAME_USERNAME)) {
+            DebugUtil.trace(this, dbgname+" searching using the username");
             return transaction.getUsername();
         }
         if (!claims.containsKey(getLDAPCfg().getSearchNameKey()) || claims.get(getLDAPCfg().getSearchNameKey()) == null) {
-            String message = "Error: no recognized search name key was found. Requested was \"" + getLDAPCfg().getSearchNameKey() + "\"";
+            String message = "Error: no recognized search name key was found in the claims for config with id=" + getLDAPCfg().getId() +
+                    ". Requested was \"" + getLDAPCfg().getSearchNameKey() + "\"";
             getMyLogger().warn(message);
             throw new IllegalStateException(message);
         }
@@ -123,7 +126,8 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
             if (getLDAPCfg().isNotifyOnFail()) {
                 getOa2SE().getMailUtil().sendMessage(subjectTemplate, messageTemplate, replacements);
             }
-            throw new GeneralException("Error: Could not communicate with LDAP server. \"" + throwable.getMessage() + "\"");
+
+            throw new GeneralException("Error: Could not communicate with LDAP server. \"" + (throwable.getMessage()==null?"(no message)": throwable.getMessage())  + "\"");
         }
 
     }
@@ -144,7 +148,12 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
 
     @Override
     protected JSONObject realProcessing(JSONObject claims, HttpServletRequest request, ServiceTransaction transaction) throws UnsupportedScopeException {
+        String name="realProcessing(id=" + getLDAPCfg().getId() + "):" ;
+
+        DebugUtil.trace(this,name + " preparing to do processing.");
+        DebugUtil.trace(this,name + " initial claims = " + claims);
         if (!isEnabled()) {
+            DebugUtil.trace(this,name + " Claims source not enabled." );
             return claims;
         }
 
@@ -153,6 +162,8 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
         }
         try {
             String searchName = getSearchName(claims, request, transaction);
+            DebugUtil.trace(this,name + " search name=" + searchName);
+
             if (searchName != null) {
                 Map tempMap = simpleSearch(context, searchName, getLDAPCfg().getSearchAttributes());
                 claims.putAll(tempMap);
@@ -161,12 +172,12 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
             }
             context.close();
         } catch (Throwable throwable) {
-            DebugUtil.dbg(this, "Error getting search name \"" + throwable.getMessage() + "\"", throwable);
+            DebugUtil.dbg(this, name + " Error getting search name \"" + throwable.getMessage() + "\"", throwable);
             handleException(throwable);
         } finally {
             closeConnection();
         }
-        ServletDebugUtil.dbg(this, "claims=" + claims);
+        ServletDebugUtil.trace(this, name + " claims=" + claims);
 
         return claims;
     }
