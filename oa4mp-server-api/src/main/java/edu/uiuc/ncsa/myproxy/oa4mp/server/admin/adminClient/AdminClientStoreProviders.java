@@ -14,6 +14,8 @@ import org.apache.commons.configuration.tree.ConfigurationNode;
 import java.io.File;
 
 /**
+ * This assembles the various providers for admin client stores (memory, file, various types of SQL).
+ * This reduces the clutter in the configuration loder immensely and is generally of no interst there.
  * <p>Created by Jeff Gaynor<br>
  * on 10/20/16 at  12:50 PM
  */

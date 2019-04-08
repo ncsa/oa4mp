@@ -77,8 +77,7 @@ public class OIDCCMServlet extends EnvServlet {
 
     @Override
     protected void doIt(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Throwable {
-        //String[] credentials = HeaderUtils.getCredentialsFromHeaders(httpServletRequest, "Bearer");
-        String[] credentials = new String[2]; // THIS BBREAKS THIS SERVLET but lets us get CILogon working for the momement...
+        String[] credentials = HeaderUtils.getCredentialsFromHeaders(httpServletRequest, "Bearer");
         // need to verify that this is an admin client.
         Identifier acID = BasicIdentifier.newID(credentials[HeaderUtils.ID_INDEX]);
         if (!getOA2SE().getAdminClientStore().containsKey(acID)) {

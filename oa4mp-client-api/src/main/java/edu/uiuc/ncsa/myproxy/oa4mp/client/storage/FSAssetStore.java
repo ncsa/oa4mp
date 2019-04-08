@@ -56,15 +56,4 @@ public class FSAssetStore extends FileStore<Asset> implements AssetStore {
         realSave(false, asset); // just save this which updates the index.
     }
 
-/*
-    @Override
-    public boolean delete(String identifier) {
-        Asset t = (Asset) loadByIdentifier(identifier);
-        boolean rc = super.delete(identifier);
-        if (t.getToken() != null) {
-            removeIndexEntry(t.getToken().toString());
-        }
-        return rc;
-    }
-*/
 }

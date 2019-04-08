@@ -64,4 +64,6 @@ public class OA2Asset extends Asset {
     public void setRefreshToken(RefreshToken refreshToken) {
         this.refreshToken = refreshToken;
     }
+
+
 }

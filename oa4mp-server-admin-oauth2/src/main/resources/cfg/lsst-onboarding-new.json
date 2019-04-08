@@ -1,0 +1,72 @@
+{
+  "config": [
+    "Configuration that contains new scripting notation 2/25/2019 for LSST onboarding",
+    "This is used by the client at https://identity.lsst.org",
+    "and is deployed on production for LSST clients to link users, setting voPersonExternalID"
+  ],
+  "claims": {
+    "sourceConfig": [
+      {
+        "ldap": {
+          "preProcessing": {
+            "script": [
+              "# Set some variables to keep the verbosity down. These are mostly the IDPs.",
+              "# Note that this must run only before the first LDAP query.",
+              "setEnv('vo','voPersonExternalID');",
+              "setEnv('github','http://github.com/login/oauth/authorize');",
+              "setEnv('google','http://google.com/accounts/o8/id');",
+              "setEnv('orcid','http://orcid.org/oauth/authorize');",
+              "setEnv('ncsa','https://idp.ncsa.illinois.edu/idp/shibboleth');",
+              "#  Now figure out which IDP was used and set voPersonExternalID so it may be searched for.",
+              "xor{",
+              "    if[equals(get('idp'),'${github}')]then[set('${vo}',concat(get('oidc'),'@github.com'))],",
+              "    if[equals(get('idp'),'${google}')]then[set('${vo}',concat(get('oidc'),'@accounts.google.com'))],",
+              "    if[equals(get('idp'),'${orcid}')]then[set('${vo}',replace(get('oidc'),'http://','https://'))],",
+              "    if[hasClaim('eppn')]then[set('${vo}',get('eppn'))],",
+              "    if[hasClaim('eptid')]then[set('${vo}',get('eptid'))]",
+              "};"
+            ],
+            "version": "1.0"
+          },
+          "failOnError": "true",
+        
+          "enabled": "true",
+          "authorizationType": "none",
+          "searchName": "voPersonExternalID",
+          "searchFilterAttribute": "voPersonExternalID",
+          "searchAttributes": [
+            {
+              "name": "uid",
+              "returnAsList": false,
+              "returnName": "uid"
+            }
+          ],
+          "searchBase": "ou=People,dc=ncsa,dc=illinois,dc=edu",
+          "contextName": "",
+          "ssl": {
+            "tlsVersion": "TLS",
+            "useJavaTrustStore": true
+          },
+          "id": "3258ed63b62d1a78"
+        }
+      }
+    ],
+    "preProcessing": {
+      "script": [
+        "setEnv('vo','voPersonExternalID');",
+        "setEnv('ncsa','https://idp.ncsa.illinois.edu/idp/shibboleth');",
+        "# if the IDP is NCSA, just set the uid and do the second LDAP search, otherwise, search first on voPersonExternalID to set it.",
+        "if[",
+        "equals(get('idp'),'${ncsa}')",
+        "]then[",
+        "set('uid',drop('@ncsa.illinois.edu',get('eppn'))),",
+        "set('${vo}',get('eppn'))",
+        "]else[",
+        "set_claim_source('LDAP','3258ed63b62d1a78')",
+        "];",
+        "set_claim_source('ncsa-default','uid');"
+      ]
+    }
+  },
+  "isSaved": true
+}

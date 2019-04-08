@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.security.oauth_2_0.OA2ATException;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
 import edu.uiuc.ncsa.security.servlet.AbstractServlet;
+import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import org.apache.commons.codec.binary.Base64;
 
 import javax.servlet.http.HttpServletRequest;
@@ -38,10 +39,17 @@ public class HeaderUtils {
      * @return
      */
     public static List<String> getAuthHeader(HttpServletRequest request, String type) {
+
+        ServletDebugUtil.printAllParameters(HeaderUtils.class, request);
+        ServletDebugUtil.trace(HeaderUtils.class, "getAuthHeader: Getting type \"" + type + "\"");
         Enumeration enumeration = request.getHeaders("authorization");
+        ServletDebugUtil.trace(HeaderUtils.class, "getAuthHeader: Header enumeration = \"" + enumeration + "\"");
+
         ArrayList<String> out = new ArrayList<>();
         while (enumeration.hasMoreElements()) {
             Object obj = enumeration.nextElement();
+            ServletDebugUtil.trace(HeaderUtils.class, "getAuthHeader: Processing header = \"" + obj + "\"");
+
             if (obj != null) {
                 String rawToken = obj.toString();
                 if (rawToken == null || 0 == rawToken.length()) {
@@ -58,6 +66,8 @@ public class HeaderUtils {
 
             }
         }
+        ServletDebugUtil.trace(HeaderUtils.class, "getAuthHeader: Returning  = \"" + out + "\"");
+
         return out;
     }
 
@@ -67,6 +77,7 @@ public class HeaderUtils {
 
     public static String getBasicHeader(HttpServletRequest request) {
         List<String> authHeaders = getAuthHeader(request, "Basic");
+        ServletDebugUtil.trace(HeaderUtils.class, "getBasicHeader: returned auth headers = \"" + authHeaders + "\"");
         if (authHeaders.isEmpty()) {
             return null;
         }
@@ -86,14 +97,22 @@ public class HeaderUtils {
     public static int ID_INDEX = 0;
     public static int SECRET_INDEX = 1;
 
-    // Fix for CIL-430:
-    public static String[] getCredentialsFromHeaders(HttpServletRequest request) throws UnsupportedEncodingException {
-        String[] out = new String[2];
+    public static String[] getCredentialsFromHeaders(HttpServletRequest request, String type) throws UnsupportedEncodingException {
+        ServletDebugUtil.trace(HeaderUtils.class, "getCredentialsFromHeaders: type = \"" + type + "\"");
+        type = type.trim();
         // assume the client id and secret are in the headers.
-        String header64 = getBasicHeader(request);
-        if (header64 == null) {
-            return null;
+        String header64 = null;
+        if (type.equals("Basic")) {
+            header64 = getBasicHeader(request);
         }
+        if (type.equals("Bearer")) {
+            header64 = getBearerAuthHeader(request);
+        }
+        if (header64 == null) {
+            throw new IllegalArgumentException("Error: Unknown auth type.");
+        }
+        String[] out = new String[2];
+
         // semantics are that this is base64.encode(URLEncode(id):URLEncode(secret))
         byte[] headerBytes = Base64.decodeBase64(header64);
         if (headerBytes == null || headerBytes.length == 0) {
@@ -119,13 +138,21 @@ public class HeaderUtils {
         String rawSecret = URLDecoder.decode(header.substring(lastColonIndex + 1), "UTF-8");
 
         out[SECRET_INDEX] = rawSecret;
+        ServletDebugUtil.trace(HeaderUtils.class, "getCredentialsFromHeaders: returning  " + out);
 
         return out;
+
+
+    }
+
+    public static String[] getCredentialsFromHeaders(HttpServletRequest request) throws UnsupportedEncodingException {
+        return getCredentialsFromHeaders(request, "Basic"); // default
     }
 
     public static String getSecretFromHeaders(HttpServletRequest request) throws UnsupportedEncodingException {
         return getCredentialsFromHeaders(request)[SECRET_INDEX];
     }
+
     public static Identifier getIDFromHeaders(HttpServletRequest request) throws UnsupportedEncodingException {
         String[] creds = getCredentialsFromHeaders(request);
         if (creds == null || creds.length == 0) {
@@ -160,4 +187,3 @@ public class HeaderUtils {
     }
 
 }
-// Fix for CIL-430:

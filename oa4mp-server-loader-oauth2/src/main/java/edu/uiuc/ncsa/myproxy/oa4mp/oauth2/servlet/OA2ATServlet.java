@@ -26,6 +26,8 @@ import edu.uiuc.ncsa.security.oauth_2_0.server.RTIRequest;
 import edu.uiuc.ncsa.security.oauth_2_0.server.RTIResponse;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSourceFactory;
+import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
+import net.sf.json.JSONObject;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.http.HttpStatus;
 
@@ -168,7 +170,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "access denied", HttpStatus.SC_UNAUTHORIZED);
         }
         OA2ClaimsUtil claimsUtil = new OA2ClaimsUtil((OA2SE) getServiceEnvironment(), st2);
-        claimsUtil.createSpecialClaims();
+        claimsUtil.processClaims();
 
         atResponse.setClaims(st2.getClaims());
         DebugUtil.dbg(this, "set token signing flag =" + atResponse.isSignToken());
@@ -241,6 +243,9 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             headerID = HeaderUtils.getIDFromHeaders(request);
         } catch (UnsupportedEncodingException e) {
             throw new NFWException("Error: internal use of UTF-8 encoding failed");
+        }catch(Throwable tt){
+            ServletDebugUtil.trace(this.getClass(), "Got an exception checking for the header. " +
+                    "This is usually benign:\"" + tt.getMessage() + "\"");
         }
         // we have to check that if we get both of these they refer to the same client, so someone
         // cannot hijack the session
@@ -317,7 +322,28 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         RTI2 rtIsuuer = new RTI2(getTF2(), getServiceEnvironment().getServiceAddress());
         RTIResponse rtiResponse = (RTIResponse) rtIsuuer.process(rtiRequest);
         rtiResponse.setSignToken(c.isSignTokens());
-        rtiResponse.setClaims(t.getClaims());
+        // Note for CIL-525: Here is where we need to recompute the claims. If a request comes in for a new
+        // refresh token, it has to be checked against the recomputed claims. Use case is that a very long-lived
+        // refresh token is issued, a user is no longer associated with a group and her access is revoked, then
+        // attempts to get another refresh token (e.g. by some automated service everyone forgot was running) should fail.
+        // Which claims to recompute? All of them? It is possible that there are several sources that need to be taken in to
+        // account that may not be available, e.g. if there are shibboleth headers as in initial source...
+        // Executive decision is to re-run the sources from after the bootstrap. The assumption with bootstrap sources
+        // is that they exist only for the initialization.
+
+        /* AT SOME POINT it may be a good idea to be able to specify which claims sources are used on refresh, but
+           that requries some extra logic in the claims sources as well as awareness of where in the flow this happens,
+           so that is not easy
+        */
+        JSONObject claims = t.getClaims();
+        OA2ClaimsUtil claimsUtil = new OA2ClaimsUtil(oa2SE, t);
+        try {
+            claims = claimsUtil.processClaims();
+            t.setClaims(claims);
+        } catch (Throwable throwable) {
+            ServletDebugUtil.warn(this,"Unable to update claims on token refresh: \"" + throwable.getMessage() + "\"");
+        }
+        rtiResponse.setClaims(claims);
         populateClaims(request, rtiResponse.getParameters(), t);
         RefreshToken rt = rtiResponse.getRefreshToken();
         rt.setExpiresIn(computeRefreshLifetime(t));

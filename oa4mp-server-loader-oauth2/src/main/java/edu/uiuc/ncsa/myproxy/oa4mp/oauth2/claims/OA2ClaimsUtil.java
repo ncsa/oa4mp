@@ -131,13 +131,18 @@ public class OA2ClaimsUtil {
     }
 
     /**
-     * Creates the most basic claim object for this.
+     * Creates the most basic claim object for this. These are claims that are common (e.g., set the openid
+     * claim if this supports OIDC). This is the minimal set of claims for this service and is, e.g.
+     * all that is returned to public clients. This also run the sources that are to run at initialization.
+     * The assumption is that the initial sources can only be run exactly once during the first leg of the
+     * OAuth transaction. These contain mutable information about the user from, say, Shibboleth headers or other
+     * sources that will not be available later.
      *
      * @param request
      * @return
      * @throws Throwable
      */
-    public JSONObject createBasicClaims(HttpServletRequest request, OA2ServiceTransaction t) throws Throwable {
+    public JSONObject processAuthorizationClaims(HttpServletRequest request, OA2ServiceTransaction t) throws Throwable {
         JSONObject claims = transaction.getClaims();
         if (claims == null) {
             claims = new JSONObject();
@@ -257,7 +262,12 @@ public class OA2ClaimsUtil {
         return cc;
     }
 
-    public JSONObject createSpecialClaims() throws Throwable {
+    /**
+     * Gets the claims that are not done at authorization time.
+     * @return
+     * @throws Throwable
+     */
+    public JSONObject processClaims() throws Throwable {
 
         JSONObject claims = transaction.getClaims();
         if (claims == null) {
@@ -397,7 +407,7 @@ public class OA2ClaimsUtil {
 
     protected void dbg(Object c, String x){
           if(deepDebugOn){
-              DebugUtil.dbg(c,x);
+              DebugUtil.trace(c,x);
           }
     }
 }

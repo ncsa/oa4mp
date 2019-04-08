@@ -64,7 +64,7 @@ public class OA2AuthorizedServletUtil {
 
         try {
             String cid = "client=" + client.getIdentifier();
-            info("2.a. Starting a new cert request: " + cid);
+            DebugUtil.info(this, "2.a. Starting a new cert request: " + cid);
             servlet.checkClientApproval(client);
 
             AGResponse agResponse = (AGResponse) servlet.getAGI().process(new AGRequest(req, client));
@@ -72,21 +72,21 @@ public class OA2AuthorizedServletUtil {
             OA2ServiceTransaction transaction = (OA2ServiceTransaction) verifyAndGet(agResponse);
             transaction.setClient(client);
             servlet.getTransactionStore().save(transaction);
-            info("Saved new transaction with id=" + transaction.getIdentifierString());
+            DebugUtil.info(this,"Saved new transaction with id=" + transaction.getIdentifierString());
 
             Map<String, String> params = agResponse.getParameters();
 
             preprocess(new TransactionState(req, resp, params, transaction));
-            debug("saved transaction for " + cid + ", trans id=" + transaction.getIdentifierString());
+            DebugUtil.trace(this, "saved transaction for " + cid + ", trans id=" + transaction.getIdentifierString());
 
             agResponse.write(resp);
-            info("2.b finished initial request for token =\"" + transaction.getIdentifierString() + "\".");
+            DebugUtil.info(this,"2.b finished initial request for token =\"" + transaction.getIdentifierString() + "\".");
 
             postprocess(new IssuerTransactionState(req, resp, params, transaction, agResponse));
             return transaction;
         } catch (Throwable t) {
             if (t instanceof UnapprovedClientException) {
-                warn("Unapproved client: " + client.getIdentifierString());
+                DebugUtil.warn(this, "Unapproved client: " + client.getIdentifierString());
             }
             throw t;
         }
@@ -104,7 +104,7 @@ public class OA2AuthorizedServletUtil {
      * @throws Throwable
      */
     protected OA2ServiceTransaction doIt(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Throwable {
-        printAllParameters(httpServletRequest);
+        ServletDebugUtil.printAllParameters(this.getClass(), httpServletRequest);
         String callback = httpServletRequest.getParameter(OA2Constants.REDIRECT_URI);
         if (httpServletRequest.getParameterMap().containsKey(OA2Constants.REQUEST_URI)) {
             throw new OA2RedirectableError(OA2Errors.REQUEST_URI_NOT_SUPPORTED,
@@ -129,14 +129,14 @@ public class OA2AuthorizedServletUtil {
         if (t != null) {
             return t;
         }
-        ServletDebugUtil.dbg(this, "Starting doDelegation");
+        ServletDebugUtil.trace(this, "Starting doDelegation");
         t = doDelegation(httpServletRequest, httpServletResponse);
-        ServletDebugUtil.dbg(this, "Starting done with doDelegation, creating claim util");
+        ServletDebugUtil.trace(this, "Starting done with doDelegation, creating claim util");
         OA2ClaimsUtil claimsUtil = new OA2ClaimsUtil((OA2SE) servlet.getServiceEnvironment(), t);
-        DebugUtil.dbg(this, "starting to process claims, creating basic claims:");
-        claimsUtil.createBasicClaims(httpServletRequest, t);
+        DebugUtil.trace(this, "starting to process claims, creating basic claims:");
+        claimsUtil.processAuthorizationClaims(httpServletRequest, t);
         //  servlet.getTransactionStore().save(t); // save the claims.
-        DebugUtil.dbg(this, "done with claims, transaction saved, claims = " + t.getClaims());
+        DebugUtil.trace(this, "done with claims, transaction saved, claims = " + t.getClaims());
         return t;
     }
 
@@ -218,15 +218,15 @@ public class OA2AuthorizedServletUtil {
 
         String rawSecret = params.get(CLIENT_SECRET);
         if (rawSecret != null) {
-            info("Client is sending secret in initial request. Though not forbidden by the protocol this is discouraged.");
+            DebugUtil.info(this,"Client is sending secret in initial request. Though not forbidden by the protocol this is discouraged.");
             if (!agResponse.getClient().getSecret().equals(rawSecret)) {
-                info("And for what it is worth, the client sent along an incorrect secret too...");
+                DebugUtil.info(this,"And for what it is worth, the client sent along an incorrect secret too...");
             }
         }
         String nonce = params.get(NONCE);
         // FIX for OAUTH-180. Server must support clients that do not use a nonce. Just log it and rock on.
         if (nonce == null || nonce.length() == 0) {
-            info("No nonce in initial request for " + ((AGResponse) iResponse).getClient().getIdentifierString());
+            DebugUtil.info(this,"No nonce in initial request for " + ((AGResponse) iResponse).getClient().getIdentifierString());
         } else {
             NonceHerder.putNonce(nonce); // Don't check it, just store it and return it later.
         }
@@ -239,7 +239,7 @@ public class OA2AuthorizedServletUtil {
 
         OA2ServiceTransaction st = createNewTransaction(agResponse.getGrant());
         st.setClient(agResponse.getClient());
-        info("Created new unsaved transaction with id=" + st.getIdentifierString());
+        DebugUtil.info(this,"Created new unsaved transaction with id=" + st.getIdentifierString());
         Collection<String> scopes = resolveScopes(st, params, state, givenRedirect);
 
         st.setScopes(scopes);
@@ -286,10 +286,10 @@ public class OA2AuthorizedServletUtil {
     protected Collection<String> resolveScopes(OA2ServiceTransaction st, Map<String, String> params, String state, String givenRedirect) {
         String rawScopes = params.get(SCOPE);
 
-        DebugUtil.dbg(this, ".resolveScopes: stored client scopes =" + ((OA2Client) st.getClient()).getScopes());
-        DebugUtil.dbg(this, ".resolveScopes: passed in scopes =" + rawScopes);
-        DebugUtil.dbg(this, ".resolveScopes: Scope util =" + OA2Scopes.ScopeUtil.getScopes());
-        DebugUtil.dbg(this, ".resolveScopes: server scopes=" + ((OA2SE) MyProxyDelegationServlet.getServiceEnvironment()).getScopes());
+        DebugUtil.trace(this, ".resolveScopes: stored client scopes =" + ((OA2Client) st.getClient()).getScopes());
+        DebugUtil.trace(this, ".resolveScopes: passed in scopes =" + rawScopes);
+        DebugUtil.trace(this, ".resolveScopes: Scope util =" + OA2Scopes.ScopeUtil.getScopes());
+        DebugUtil.trace(this, ".resolveScopes: server scopes=" + ((OA2SE) MyProxyDelegationServlet.getServiceEnvironment()).getScopes());
         if (rawScopes == null || rawScopes.length() == 0) {
             throw new OA2RedirectableError(OA2Errors.INVALID_SCOPE, "Missing scopes parameter.", state, givenRedirect);
         }
@@ -304,7 +304,7 @@ public class OA2AuthorizedServletUtil {
             // This also covers the case of a client made with a full set of scopes, then
             // converted to a public client but the stored scopes are not updated.
             scopes.add(OA2Scopes.SCOPE_OPENID);
-            DebugUtil.dbg(this, ".resolveScopes: after resolution=" + scopes);
+            DebugUtil.trace(this, ".resolveScopes: after resolution=" + scopes);
             return scopes;
         }
         StringTokenizer stringTokenizer = new StringTokenizer(rawScopes);
@@ -320,7 +320,7 @@ public class OA2AuthorizedServletUtil {
         Collection<String> storedClientScopes = oa2Client.getScopes();
         scopes = intersection(OA2Scopes.ScopeUtil.getScopes(), intersection(scopes, storedClientScopes));
 
-        DebugUtil.dbg(this, ".resolveScopes: after resolution=" + scopes);
+        DebugUtil.trace(this, ".resolveScopes: after resolution=" + scopes);
 
 
         if (!hasOpenIDScope)
@@ -381,17 +381,8 @@ public class OA2AuthorizedServletUtil {
     /* *********
    Boiler plated code to make this work.
   */
-    protected void info(String x) {
-        servlet.info(x);
-    }
 
-    protected void debug(String x) {
-        servlet.debug(x);
-    }
 
-    protected void warn(String x) {
-        servlet.warn(x);
-    }
 
 
     public void preprocess(TransactionState state) throws Throwable {
@@ -401,9 +392,7 @@ public class OA2AuthorizedServletUtil {
     public void postprocess(TransactionState state) throws Throwable {
     }
 
-    protected void printAllParameters(HttpServletRequest request) {
-        ServletDebugUtil.printAllParameters(this.getClass(), request);
-    }
+
 
     /* *******
     End boiler-plate

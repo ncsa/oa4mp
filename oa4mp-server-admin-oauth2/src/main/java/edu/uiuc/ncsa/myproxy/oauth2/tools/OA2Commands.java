@@ -27,6 +27,7 @@ public class OA2Commands extends BaseCommands {
     public static final String PERMISSIONS = "permissions";
     public static final String ADMINS = "admins";
     public static final String KEYS = "keys";
+    public static final String JSON = "json";
 
     public OA2Commands(MyLoggingFacade logger) {
         super(logger);
@@ -75,6 +76,7 @@ public class OA2Commands extends BaseCommands {
         say(PERMISSIONS + " - basic permission management.\n");
         say(ADMINS + " - create or manage administrative clients.\n");
         say(PARSER_COMMAND + " - write/debug scripts from the command line.\n");
+        say(JSON + " - enter JSON snippets to be used by the system in client configurations.\n");
         say("e.g.\n\nuse " + CLIENTS + "\n\nwill call up the client management component.");
         say("Type 'exit' when you wish to exit the component and return to the main menu");
         say(" --> and /h prints your command history, /r runs the last command");
@@ -120,6 +122,9 @@ public class OA2Commands extends BaseCommands {
         return new OA2PermissionCommands(getMyLogger(), "  ", getOA2SE().getPermissionStore());
     }
 
+    public JSONStoreCommands getJSONStoreCommands() throws Exception{
+        return new JSONStoreCommands(getMyLogger(), "  ", getOA2SE().getJSONStore());
+    }
     @Override
     public boolean use(InputLine inputLine) throws Exception {
         CommonCommands commands = null;
@@ -131,6 +136,9 @@ public class OA2Commands extends BaseCommands {
         }
         if (inputLine.hasArg(PERMISSIONS)) {
             commands = getPermissionCommands();
+        }
+        if(inputLine.hasArg(JSON)){
+            commands = getJSONStoreCommands();
         }
         if (commands != null) {
             CLIDriver cli = new CLIDriver(commands);

@@ -3,7 +3,7 @@
     "Minimal NCSA access 1/29/2019"
   ],
   "isSaved": false,
-  "runtime":{"script":["set_claim_source('ncsa-default','eppn');"],
+  "runtime":{"script":["set_claim_source('ncsa-default','uid');"]
   },
   "claims": {
     "preProcessing": {

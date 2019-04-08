@@ -21,6 +21,8 @@ import edu.uiuc.ncsa.security.oauth_2_0.OA2Scopes;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
 import edu.uiuc.ncsa.security.servlet.UsernameTransformer;
+import edu.uiuc.ncsa.security.util.json.JSONEntry;
+import edu.uiuc.ncsa.security.util.json.JSONStore;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import edu.uiuc.ncsa.security.util.mail.MailUtilProvider;
 
@@ -63,7 +65,8 @@ public class OA2SE extends ServiceEnvironmentImpl {
                  JSONWebKeys jsonWebKeys,
                  String issuer,
                  boolean utilServletEnabled,
-                 boolean oidcEnabled) {
+                 boolean oidcEnabled,
+                 Provider<JSONStore> jsonStoreProvider) {
         super(logger,
                 mfp,
                 tsp,
@@ -104,7 +107,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.maxClientRefreshTokenLifetime = maxClientRefreshTokenLifetime;
         this.jsonWebKeys = jsonWebKeys;
         this.issuer = issuer;
-     //   this.mldap = mldap;
+        //   this.mldap = mldap;
         if (claimSource instanceof BasicClaimsSourceImpl) {
             DebugUtil.dbg(this, "***Setting runtime environment in the scope handler:" + claimSource.getClass().getSimpleName());
             ((BasicClaimsSourceImpl) claimSource).setOa2SE(this);
@@ -112,18 +115,29 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.acs = acs;
         this.utilServletEnabled = utilServletEnabled;
         this.oidcEnabled = oidcEnabled;
+        this.jsonStoreProvider = jsonStoreProvider;
+    }
+
+    protected Provider<JSONStore> jsonStoreProvider;
+    JSONStore<? extends JSONEntry> jsonStore;
+
+    public JSONStore<? extends JSONEntry> getJSONStore() {
+        if (jsonStore == null) {
+            jsonStore = jsonStoreProvider.get();
+        }
+        return jsonStore;
     }
 
     protected Provider<AdminClientStore> acs;
 
     AdminClientStore adminClientStore = null;
 
-      public AdminClientStore<AdminClient> getAdminClientStore() {
-          if (adminClientStore == null) {
-              adminClientStore = acs.get();
-          }
-          return adminClientStore;
-      }
+    public AdminClientStore<AdminClient> getAdminClientStore() {
+        if (adminClientStore == null) {
+            adminClientStore = acs.get();
+        }
+        return adminClientStore;
+    }
 
     public boolean isUtilServletEnabled() {
         return utilServletEnabled;
@@ -225,13 +239,15 @@ public class OA2SE extends ServiceEnvironmentImpl {
     LDAPConfiguration ldapConfiguration2;
 
     // TODO make this configurable.
+
     /**
      * Returns <code>true</code> if this server has OIDC support enabled.
+     *
      * @return
      */
-   public boolean isOIDCEnabled(){
-       return oidcEnabled;
-   }
+    public boolean isOIDCEnabled() {
+        return oidcEnabled;
+    }
 
     boolean oidcEnabled = true;
 }

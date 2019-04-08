@@ -33,6 +33,7 @@ public abstract class AbstractRegistrationServlet extends MyProxyDelegationServl
     public static final String CLIENT_EMAIL = "clientEmail";
     public static final String CLIENT_CALLBACK_URI = "callbackURI";
     public static final String CLIENT_PROXY_LIMITED = "clientProxyLimited";
+    public static final String CLIENT_IS_PUBLIC = "clientIsPublic";
     public static final String CLIENT_ACTION_KEY = "action";
     public static final String CLIENT_ACTION_REQUEST_VALUE = "request";
 
@@ -67,6 +68,7 @@ public abstract class AbstractRegistrationServlet extends MyProxyDelegationServl
                 request.setAttribute(CLIENT_ERROR_URL, CLIENT_ERROR_URL);
                 request.setAttribute(CLIENT_EMAIL, CLIENT_EMAIL);
                 request.setAttribute(CLIENT_PROXY_LIMITED, CLIENT_PROXY_LIMITED);
+                request.setAttribute(CLIENT_IS_PUBLIC, CLIENT_IS_PUBLIC);
 
 
                 request.setAttribute(CLIENT_ACTION_KEY, CLIENT_ACTION_KEY);
@@ -270,6 +272,7 @@ public abstract class AbstractRegistrationServlet extends MyProxyDelegationServl
         client.setEmail(x);
 
         client.setProxyLimited(getBooleanParam(request, CLIENT_PROXY_LIMITED));
+
 
         getServiceEnvironment().getClientStore().save(client);
         info("Adding approval record for client=" + client.getIdentifierString());

@@ -40,6 +40,7 @@ public interface ClientXMLTags extends StorageConfigurationTags{
     public static final String REDIRECT_PAGE_PATH = "redirectPagePath";
     public static final String SUCCESS_PAGE_PATH = "successPagePath";
     public static final String OIDC_ENABLED = "OIDCEnabled";
+    public static final String SHOW_ID_TOKEN = "showIDToken";
     /**
      * Tag identifying the asset store.
      */

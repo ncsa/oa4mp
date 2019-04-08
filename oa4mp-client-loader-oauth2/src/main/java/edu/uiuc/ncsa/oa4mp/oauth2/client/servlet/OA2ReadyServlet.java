@@ -10,15 +10,17 @@ import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.delegation.token.impl.AuthorizationGrantImpl;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2RedirectableError;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2Scopes;
-import edu.uiuc.ncsa.security.oauth_2_0.UserInfo;
+import edu.uiuc.ncsa.security.oauth_2_0.*;
 import edu.uiuc.ncsa.security.oauth_2_0.client.ATResponse2;
+import edu.uiuc.ncsa.security.oauth_2_0.client.ATServer2;
 import edu.uiuc.ncsa.security.servlet.JSPUtil;
+import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
+import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import edu.uiuc.ncsa.security.util.pkcs.CertUtil;
 import edu.uiuc.ncsa.security.util.pkcs.KeyUtil;
+import net.sf.json.JSONObject;
 import net.sf.json.util.JSONUtils;
+import org.apache.commons.codec.binary.Base64;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -57,6 +59,7 @@ public class OA2ReadyServlet extends ClientServlet {
             return;
         }
         info("2.a Token found.");
+        OA2ClientEnvironment oa2ce = (OA2ClientEnvironment) getCE();
 
         AuthorizationGrant grant = new AuthorizationGrantImpl(URI.create(token));
         info("2.a. Getting the cert(s) from the service");
@@ -70,9 +73,9 @@ public class OA2ReadyServlet extends ClientServlet {
         }
         AssetResponse assetResponse = null;
         OA2MPService oa2MPService = (OA2MPService) getOA4MPService();
-
+        String rawAT = null;
         UserInfo ui = null;
-        boolean getCerts = ((OA2ClientEnvironment) getCE()).getScopes().contains(OA2Scopes.SCOPE_MYPROXY);
+        boolean getCerts = (oa2ce).getScopes().contains(OA2Scopes.SCOPE_MYPROXY);
         if (identifier == null) {
             // Since this is a demo servlet, we don't blow up if there is no identifier found, just can't save anything.
             String msg = "Error: no cookie found. Cannot save certificates";
@@ -80,6 +83,7 @@ public class OA2ReadyServlet extends ClientServlet {
             debug("No cookie found");
             //if(asset == null) asset = new OA2Asset(BasicIdentifier.newID())
             ATResponse2 atResponse2 = oa2MPService.getAccessToken(asset, grant);
+            rawAT = atResponse2.getAccessToken().getToken(); // save it here since we have it
             ui = oa2MPService.getUserInfo(atResponse2.getAccessToken().toString());
             if (getCerts) {
                 assetResponse = oa2MPService.getCert(asset, atResponse2);
@@ -94,6 +98,8 @@ public class OA2ReadyServlet extends ClientServlet {
                 throw new IllegalArgumentException("Error: The state returned by the server is invalid.");
             }
             ATResponse2 atResponse2 = oa2MPService.getAccessToken(asset, grant);
+            rawAT = atResponse2.getAccessToken().getToken(); // save it here since we have it
+
             //  ui = oa2MPService.getUserInfo(atResponse2.getAccessToken().getToken());
             ui = oa2MPService.getUserInfo(identifier);
             if (getCerts) {
@@ -103,7 +109,16 @@ public class OA2ReadyServlet extends ClientServlet {
             //assetResponse = getOA4MPService().getCert(token, null, BasicIdentifier.newID(identifier));
         }
         // The work in this call
+        if (oa2ce.isShowIDToken()) {
+            ATServer2 atServer2 = (ATServer2) oa2ce.getDelegationService().getAtServer();
 
+            JSONWebKeys jsonWebKeys = atServer2.getJsonWebKeys();
+
+            // So this client is to show the information for the ID Token. Since this is extra, we have to recover it.
+            ATServer2.IDTokenEntry tokenEntry = ATServer2.getIDTokenStore().get(rawAT);
+            setJWTInfo(request, tokenEntry.rawToken, jsonWebKeys);
+
+        }
         // Again, we take the first returned cert to peel off some information to display. This
         // just proves we got a response.
 
@@ -118,23 +133,22 @@ public class OA2ReadyServlet extends ClientServlet {
                 request.setAttribute("cert", CertUtil.toPEM(assetResponse.getX509Certificates()));
                 request.setAttribute("username", assetResponse.getUsername());
                 // FIX OAUTH-216. Note that this is displayed on the client's success page.
-                if(asset.getPrivateKey() != null) {
+                if (asset.getPrivateKey() != null) {
                     request.setAttribute("privateKey", KeyUtil.toPKCS1PEM(asset.getPrivateKey()));
-                }else{
+                } else {
                     request.setAttribute("privateKey", "(none)");
                 }
 
             }
         } else {
-
             request.setAttribute("certSubject", "(no cert requested)");
         }
+
         if (ui != null) {
             String output = JSONUtils.valueToString(ui.toJSon(), 1, 0);
             request.setAttribute("userinfo", output);
         } else {
             request.setAttribute("userinfo", "no user info returned.");
-
         }
         // Fix in cases where the server request passes through Apache before going to Tomcat.
 
@@ -151,4 +165,26 @@ public class OA2ReadyServlet extends ClientServlet {
         return;
     }
 
+    protected void setJWTInfo(HttpServletRequest request, String rawJWT, JSONWebKeys jsonWebKeys) {
+        if (rawJWT == null || rawJWT.isEmpty()) {
+            request.setAttribute("id_token", "(none)");
+        } else {
+            String[] atParts = JWTUtil.decat(rawJWT);
+            String h = atParts[JWTUtil.HEADER_INDEX];
+            JSONObject header = null;
+
+            String p = atParts[JWTUtil.PAYLOAD_INDEX];
+            header = JSONObject.fromObject(new String(Base64.decodeBase64(h)));
+
+            JSONObject payload = JSONObject.fromObject(new String(Base64.decodeBase64(p)));
+            request.setAttribute("id_token", rawJWT);
+            request.setAttribute("id_payload", payload.toString(2));
+
+            request.setAttribute("id_header", header.toString(2));
+            JSONWebKey webKey = jsonWebKeys.get(header.get(JWTUtil.KEY_ID));
+            String keyPEM = KeyUtil.toX509PEM(webKey.publicKey);
+            request.setAttribute("id_public_key", keyPEM);
+
+        }
+    }
 }

@@ -20,6 +20,8 @@ import java.util.Map;
  * on 11/25/13 at  4:23 PM
  */
 public class OA2ClientEnvironment extends ClientEnvironment {
+
+    
     public OA2ClientEnvironment(URI accessTokenUri,
                                 URI authorizationUri,
                                 URI callback,
@@ -33,7 +35,8 @@ public class OA2ClientEnvironment extends ClientEnvironment {
                                 String errorPagePath,
                                 String redirectPagePath,
                                 String successPagePath,
-                                boolean oidcEnabled) {
+                                boolean oidcEnabled,
+                                boolean showIDToken) {
         super(accessTokenUri,
                 authorizationUri,
                 callback,
@@ -47,6 +50,7 @@ public class OA2ClientEnvironment extends ClientEnvironment {
                 errorPagePath, redirectPagePath, successPagePath);
         ServletDebugUtil.dbg(this, "oidcEnabled?" + oidcEnabled);
         this.oidcEnabled = oidcEnabled;
+        this.showIDToken = showIDToken;
     }
 
     public OA2ClientEnvironment(MyLoggingFacade logger, Map<String, String> constants,
@@ -73,7 +77,8 @@ public class OA2ClientEnvironment extends ClientEnvironment {
                                 String secret,
                                 Collection<String> scopes,
                                 String wellKnownURI,
-                                boolean oidcEnabled) {
+                                boolean oidcEnabled,
+                                boolean showIDToken) {
         super(logger,
                 constants,
                 accessTokenUri,
@@ -97,11 +102,13 @@ public class OA2ClientEnvironment extends ClientEnvironment {
                 showRedirectPage,
                 errorPagePath,
                 redirectPagePath,
-                successPagePath);
+                successPagePath
+                );
         this.secret = secret;
         this.scopes = scopes;
         this.wellKnownURI = wellKnownURI;
         this.oidcEnabled = oidcEnabled;
+        this.showIDToken = showIDToken;
     }
     Collection<String> scopes = null;
     public Collection<String> getScopes(){
@@ -131,4 +138,15 @@ public class OA2ClientEnvironment extends ClientEnvironment {
     public void setScopes(Collection<String> scopes) {
         this.scopes = scopes;
     }
+
+    /**
+     * If the user enables showing the ID token, then information to be displayed on the success page will be
+     * put in to the response.
+     * @return
+     */
+    public boolean isShowIDToken() {
+        return showIDToken;
+    }
+
+    boolean showIDToken = false;
 }

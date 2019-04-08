@@ -170,4 +170,9 @@ public class OA2ParserTest extends FunctorParserTest {
         assert claims.get("voPersonExternalID").equals("jgaynor@ncsa.illinois.edu");
         assert switchHandler.getLogicBlocks().getFunctorMap().containsKey(FunctorClaimsType.SET.getValue());
     }
+
+    @Test
+    public void testJSONReplacement() throws Exception{
+        
+    }
 }

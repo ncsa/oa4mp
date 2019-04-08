@@ -43,9 +43,9 @@
                     <input type="checkbox"
                            name="chkScopes"
                            value="${scope}"
-                           <c:set var="xxx" scope="session" value="${scope}"/>
+                        <c:set var="xxx" scope="session" value="${scope}"/>
                            <c:if test="${xxx == 'openid'}">checked="checked"</c:if>
-                            >${scope}&nbsp;
+                    >${scope}&nbsp;
                 </c:forEach>
             </td>
         </tr>
@@ -65,6 +65,13 @@
             <td><input type="checkbox" name="${clientProxyLimited}" ${clientProxyLimitedValue} /><span
                     title="Check this box for delegation of limited proxy certificates for use with Globus Toolkit GridFTP servers. Leave this box unchecked
                            for delegation of general-use X.509 certificates.">Use Limited Proxy Certificates?</span>
+            </td>
+        </tr>
+        <tr>
+            <td></td>
+            <td><input type="checkbox" name="${clientIsPublic}" ${clientIsPublicValue} /><span
+                    title="Check this box if the client is to be public, i.e., limited access, no certificates allowed and no secret needed.
+                          If you are not sure what this is, do not check it or ask for help.">Is this client public? In that case the only allowed scope is openid.</span>
             </td>
         </tr>
         <tr>

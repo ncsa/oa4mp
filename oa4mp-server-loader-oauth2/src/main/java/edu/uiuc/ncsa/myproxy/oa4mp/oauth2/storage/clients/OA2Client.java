@@ -37,12 +37,15 @@ public class OA2Client extends Client {
         client.setIssuer(getIssuer());
         client.setSignTokens(isSignTokens());
     }
-    public boolean isPublicClient(){
-       return publicClient;
+
+    public boolean isPublicClient() {
+        return publicClient;
     }
-    public void setPublicClient(boolean publicClient){
+
+    public void setPublicClient(boolean publicClient) {
         this.publicClient = publicClient;
     }
+
     protected boolean publicClient = false;
 
     public boolean isSignTokens() {
@@ -90,10 +93,11 @@ public class OA2Client extends Client {
 
     /**
      * This returns whether or not this client is configured to return refresh tokens.
+     *
      * @return
      */
     public boolean isRTLifetimeEnabled() {
-        return 0 < rtLifetime ;
+        return 0 < rtLifetime;
     }
 
     public Collection<String> getScopes() {
@@ -128,10 +132,10 @@ public class OA2Client extends Client {
      *             "processing":[JSON]}
      * }
      * </pre>
-     *
+     * <p>
      * JSON may be either a single JSON object or an array of them. If a single, it is
      * converted to an array of a single object before processing.
-     *
+     * <p>
      * JSON may be a logic block  (which consists of various JSON functors.
      *
      * <pre>
@@ -141,16 +145,19 @@ public class OA2Client extends Client {
      *   "$else":"other actions"
      * }
      * </pre>
-     *
+     * <p>
      * conditionals, actions and other actions are JSON objects or arrays of them as well. Note that the conditional must be a functor that evaluates to a logical value.
+     *
      * @return
      */
     public JSONObject getConfig() {
         return config;
     }
-    public boolean hasConfig(){
+
+    public boolean hasConfig() {
         return config != null;
     }
+
     public void setConfig(JSONObject config) {
         this.config = config;
     }
@@ -161,8 +168,8 @@ public class OA2Client extends Client {
     public String toString() {
         String x = super.toString();
         x = x.substring(0, x.lastIndexOf("]"));
-        x = x + "scopes=" + ((getScopes() == null) ? "[]" : getScopes().toString()) ;
-        x = x + ",callbacks=" + (getCallbackURIs() == null ? "[]" : getCallbackURIs().toString()) ;
+        x = x + "scopes=" + ((getScopes() == null) ? "[]" : getScopes().toString());
+        x = x + ",callbacks=" + (getCallbackURIs() == null ? "[]" : getCallbackURIs().toString());
         x = x + ",refresh token lifetime=" + getRtLifetime();
         x = x + ",issuer=" + getIssuer();
         x = x + ",is public?=" + isPublicClient();
@@ -174,22 +181,22 @@ public class OA2Client extends Client {
 
     @Override
     public boolean equals(Object obj) {
-        if(!(obj instanceof OA2Client)) return false;
-        OA2Client c = (OA2Client)obj;
+        if (!(obj instanceof OA2Client)) return false;
+        OA2Client c = (OA2Client) obj;
         if (getRtLifetime() != c.getRtLifetime()) return false;
         if (!checkEquals(getIssuer(), c.getIssuer())) return false;
 
         if (getScopes().size() != c.getScopes().size()) return false;
-        for(String x : getScopes()){
-            if(!c.getScopes().contains(x)) return false;
+        for (String x : getScopes()) {
+            if (!c.getScopes().contains(x)) return false;
         }
 
-        if(getCallbackURIs().size() != c.getCallbackURIs().size()) return false;
-        for(String x : getCallbackURIs()){
-            if(!c.getCallbackURIs().contains(x)) return false;
+        if (getCallbackURIs().size() != c.getCallbackURIs().size()) return false;
+        for (String x : getCallbackURIs()) {
+            if (!c.getCallbackURIs().contains(x)) return false;
         }
-        if(isSignTokens() != c.isSignTokens()) return false;
-        if(isPublicClient() != c.isPublicClient()) return false;
+        if (isSignTokens() != c.isSignTokens()) return false;
+        if (isPublicClient() != c.isPublicClient()) return false;
         // note that at this point neither the LDAP ro configuration are checked for equality since there
         // is no well defined way to tell when two JSON object describe the same information.
         return super.equals(obj);

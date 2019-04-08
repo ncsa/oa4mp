@@ -46,12 +46,14 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
     }
 
     protected Collection<String> scopes = null;
+
     public Collection<String> getScopes() throws IllegalAccessException, InstantiationException, ClassNotFoundException {
-        if(scopes == null){
-            scopes =  OA2ConfigurationLoaderUtils.getScopes(cn);
+        if (scopes == null) {
+            scopes = OA2ConfigurationLoaderUtils.getScopes(cn);
         }
         return scopes;
     }
+
     /**
      * Factory method. Override this to create the actual instance as needed.
      *
@@ -89,7 +91,8 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
                     getSecret(),
                     getScopes(),
                     getWellKnownURI(),
-                    isOIDCEnabled()
+                    isOIDCEnabled(),
+                    isShowIDToken()
             );
         } catch (Throwable e) {
             throw new GeneralException("Unable to create client environment", e);
@@ -97,34 +100,51 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
     }
 
     AssetProvider assetProvider = null;
+
     @Override
     public AssetProvider getAssetProvider() {
-        if(assetProvider == null){
+        if (assetProvider == null) {
             assetProvider = new OA2AssetProvider();
         }
         return assetProvider;
     }
 
     String wellKnownURI = null;
-    public String getWellKnownURI(){
-        if(wellKnownURI == null){
-             wellKnownURI = getCfgValue("wellKnownUri");
+
+    public String getWellKnownURI() {
+        if (wellKnownURI == null) {
+            wellKnownURI = getCfgValue("wellKnownUri");
         }
         return wellKnownURI;
 
     }
 
+    Boolean showIDToken = null;
+
+    public boolean isShowIDToken() {
+        if (showIDToken == null) {
+            try {
+                showIDToken = Boolean.parseBoolean(getCfgValue(ClientXMLTags.SHOW_ID_TOKEN));
+            } catch (Throwable t) {
+                showIDToken = Boolean.FALSE;
+            }
+        }
+        return showIDToken;
+    }
+
     Boolean oidcEnabled = null;
-    public boolean isOIDCEnabled(){
-        if(oidcEnabled == null){
-              try{
-                  oidcEnabled = Boolean.parseBoolean(getCfgValue(ClientXMLTags.OIDC_ENABLED));
-              }catch(Throwable t){
-                 oidcEnabled = Boolean.TRUE; // default
-              }
+
+    public boolean isOIDCEnabled() {
+        if (oidcEnabled == null) {
+            try {
+                oidcEnabled = Boolean.parseBoolean(getCfgValue(ClientXMLTags.OIDC_ENABLED));
+            } catch (Throwable t) {
+                oidcEnabled = Boolean.TRUE; // default
+            }
         }
         return oidcEnabled;
     }
+
     @Override
     protected Provider<AssetStore> getAssetStoreProvider() {
         if (assetStoreProvider == null) {
@@ -138,7 +158,7 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
             masp.addListener(new OA2SQLAssetStoreProvider(cn, ClientXMLTags.MYSQL_STORE, getMySQLConnectionPoolProvider(),
                     getAssetProvider(), assetConverter));
             masp.addListener(new OA2SQLAssetStoreProvider(cn, ClientXMLTags.MARIADB_STORE, getMariaDBConnectionPoolProvider(),
-                                getAssetProvider(), assetConverter));
+                    getAssetProvider(), assetConverter));
             // and a memory store, So only if one is requested it is available.
             masp.addListener(new TypedProvider<MemoryAssetStore>(cn, ClientXMLTags.MEMORY_STORE, ClientXMLTags.ASSET_STORE) {
                 @Override
@@ -217,10 +237,10 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
                 @Override
                 public DelegationService get() {
                     return new DS2(new AGServer2(createServiceClient(getAuthzURI())), // as per spec, request for AG comes through authz endpoint.
-                            new ATServer2(createServiceClient(getAccessTokenURI()), getWellKnownURI(),isOIDCEnabled()),
+                            new ATServer2(createServiceClient(getAccessTokenURI()), getWellKnownURI(), isOIDCEnabled()),
                             new PAServer2(createServiceClient(getAssetURI())),
                             new UIServer2(createServiceClient(getUIURI())),
-                            new RTServer2(createServiceClient(getAccessTokenURI()), getWellKnownURI(),isOIDCEnabled()) // as per spec, refresh token server is at same endpoint as access token server.
+                            new RTServer2(createServiceClient(getAccessTokenURI()), getWellKnownURI(), isOIDCEnabled()) // as per spec, refresh token server is at same endpoint as access token server.
                     );
                 }
             };
@@ -235,8 +255,9 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
     protected URI getAuthzURI() {
         return createServiceURI(getCfgValue(ClientXMLTags.AUTHORIZE_TOKEN_URI), getCfgValue(ClientXMLTags.BASE_URI), AUTHORIZE_ENDPOINT);
     }
+
     @Override
-      public HashMap<String, String> getConstants() {
-          throw new NotImplementedException("Error: This method is not implemented.");
-      }
+    public HashMap<String, String> getConstants() {
+        throw new NotImplementedException("Error: This method is not implemented.");
+    }
 }

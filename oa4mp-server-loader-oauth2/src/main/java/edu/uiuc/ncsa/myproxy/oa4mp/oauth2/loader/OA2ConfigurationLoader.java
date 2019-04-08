@@ -4,6 +4,8 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.BasicClaimsSourceImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.LDAPClaimsSource;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.json.JSONStoreProviders;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.json.MultiJSONStoreProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.*;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientConverter;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientProvider;
@@ -123,7 +125,8 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     getIssuer(),
                     // getMLDAP(),
                     isUtilServerEnabled(),
-                    isOIDCEnabled());
+                    isOIDCEnabled(),
+                    getMultiJSONStoreProvider());
             if (getClaimSource() instanceof BasicClaimsSourceImpl) {
                 ((BasicClaimsSourceImpl) getClaimSource()).setOa2SE((OA2SE) se);
             }
@@ -165,12 +168,36 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         return utilServerEnabled;
 
     }
+    public MultiJSONStoreProvider getMultiJSONStoreProvider() {
+        if(multiJSONStoreProvider == null){
+
+            multiJSONStoreProvider = new MultiJSONStoreProvider(cn,
+                    isDefaultStoreDisabled(),
+                    loggerProvider.get(),
+                    null,
+                    null);
+            multiJSONStoreProvider.addListener(JSONStoreProviders.getJSMSP(cn));
+            multiJSONStoreProvider.addListener(JSONStoreProviders.getJSFSP(cn));
+            multiJSONStoreProvider.addListener(JSONStoreProviders.getMariaJS(cn, getMariaDBConnectionPoolProvider()));
+            multiJSONStoreProvider.addListener(JSONStoreProviders.getMySQLJS(cn, getMySQLConnectionPoolProvider()));
+            multiJSONStoreProvider.addListener(JSONStoreProviders.getPostgresJS(cn, getPgConnectionPoolProvider()));
+
+        }
+        return multiJSONStoreProvider;
+    }
+
+    protected MultiJSONStoreProvider multiJSONStoreProvider ;
+
 
     protected MultiDSAdminClientStoreProvider macp;
 
     protected MultiDSAdminClientStoreProvider getMacp() {
         if (macp == null) {
-            macp = new MultiDSAdminClientStoreProvider(cn, isDefaultStoreDisabled(), loggerProvider.get(), null, null,
+            macp = new MultiDSAdminClientStoreProvider(cn,
+                    isDefaultStoreDisabled(),
+                    loggerProvider.get(),
+                    null,
+                    null,
                     AdminClientStoreProviders.getAdminClientProvider());
             macp.addListener(AdminClientStoreProviders.getACMP(cn));
             macp.addListener(AdminClientStoreProviders.getACFSP(cn));
@@ -234,6 +261,8 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
     public Provider<ClientStore> getClientStoreProvider() {
         return getCSP();
     }
+
+
 
     @Override
     protected MultiDSClientApprovalStoreProvider getCASP() {

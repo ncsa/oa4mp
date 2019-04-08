@@ -16,6 +16,7 @@ public class OA2AssetSerializationKeys extends AssetSerializationKeys {
         return accessToken;
     }
 
+
     String refreshToken  = "refresh_token";
     public String refreshToken(String... x){
         if(0 < x.length) refreshToken = x[0];

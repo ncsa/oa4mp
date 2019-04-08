@@ -2,8 +2,8 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.*;
 import edu.uiuc.ncsa.security.util.configuration.TemplateUtil;
-import edu.uiuc.ncsa.security.util.functor.JFunctor;
 import edu.uiuc.ncsa.security.util.functor.JFunctorFactory;
+import edu.uiuc.ncsa.security.util.functor.JMetaMetaFunctor;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -54,8 +54,8 @@ public class OA2FunctorFactory extends JFunctorFactory {
     }
 
     @Override
-    public JFunctor lookUpFunctor(String name) {
-        JFunctor functor = super.lookUpFunctor(name);
+    public JMetaMetaFunctor lookUpFunctor(String name) {
+        JMetaMetaFunctor functor = super.lookUpFunctor(name);
         if (functor != null) {
             return functor;
         }
