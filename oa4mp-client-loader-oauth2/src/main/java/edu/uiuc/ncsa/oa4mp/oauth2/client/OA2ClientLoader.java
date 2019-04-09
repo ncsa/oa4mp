@@ -255,7 +255,9 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
     protected URI getAuthzURI() {
         return createServiceURI(getCfgValue(ClientXMLTags.AUTHORIZE_TOKEN_URI), getCfgValue(ClientXMLTags.BASE_URI), AUTHORIZE_ENDPOINT);
     }
-
+    protected URI getRevocationURI() {
+        return createServiceURI(getCfgValue(ClientXMLTags.REVOCATION_URI), getCfgValue(ClientXMLTags.BASE_URI), AUTHORIZE_ENDPOINT);
+    }
     @Override
     public HashMap<String, String> getConstants() {
         throw new NotImplementedException("Error: This method is not implemented.");

@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.server.request.IssuerResponse;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.delegation.servlet.TransactionState;
+import edu.uiuc.ncsa.security.delegation.storage.BaseClient;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.servlet.*;
 
@@ -88,17 +89,26 @@ public abstract class AbstractRegistrationServlet extends MyProxyDelegationServl
      * The page to display to the client for the initial request.
      */
     public static String INIT_PAGE = "/registration-init.jsp";
+    protected String getInitPage(){
+        return INIT_PAGE;
+    }
 
     /**
      * The name of a JSP page to display in  case of errors. The default is "registration-error.jsp".
      */
     public static String ERROR_PAGE = "/registration-error.jsp";
+    protected String getErrorPage(){
+        return ERROR_PAGE;
+    }
 
     /**
      * If the registration works, this is the page to display to the user afterwards.
      */
 
     public static String OK_PAGE = "/registration-ok.jsp";
+    protected String getOKPage(){
+        return OK_PAGE;
+    }
 
 
     public void present(PresentableState state) throws Throwable {
@@ -106,13 +116,13 @@ public abstract class AbstractRegistrationServlet extends MyProxyDelegationServl
 
         switch (state.getState()) {
             case INITIAL_STATE:
-                JSPUtil.fwd(state.getRequest(), state.getResponse(), INIT_PAGE);
+                JSPUtil.fwd(state.getRequest(), state.getResponse(), getInitPage());
                 break;
             case REQUEST_STATE:
                 if (state instanceof ClientState) {
                     ClientState cState = (ClientState) state;
                     state.getRequest().setAttribute("client", cState.getClient());
-                    JSPUtil.fwd(state.getRequest(), state.getResponse(), OK_PAGE);
+                    JSPUtil.fwd(state.getRequest(), state.getResponse(), getOKPage());
                 } else {
                     throw new IllegalStateException("Error: An instance of ClientState was expected, but got an instance of \"" + state.getClass().getName() + "\"");
                 }
@@ -124,34 +134,36 @@ public abstract class AbstractRegistrationServlet extends MyProxyDelegationServl
 
     public void handleError(PresentableState state, Throwable t) throws IOException, ServletException {
         state.getResponse().setHeader("X-Frame-Options", "DENY");
-        JSPUtil.handleException(t, state.getRequest(), state.getResponse(), ERROR_PAGE);
+        JSPUtil.handleException(t, state.getRequest(), state.getResponse(), getErrorPage());
     }
 
     protected static class ClientState extends PresentationState {
         ClientState(int state,
                     HttpServletRequest request,
                     HttpServletResponse response,
-                    Client client) {
+                    BaseClient client) {
             super(state, request, response);
             this.client = client;
         }
 
-        public Client getClient() {
+        public BaseClient getClient() {
             return client;
         }
 
-        Client client;
+        BaseClient client;
     }
 
     /**
      * For a key (e.g. clientName) the associated form value is usually name+"Value" (e.g. clientNameValue).
      * This method creates these value tags.
+     *
      * @param key
      * @return
      */
-    protected String getValueTag(String key){
-        return key+"Value";
+    protected String getValueTag(String key) {
+        return key + "Value";
     }
+
     @Override
     protected void doIt(HttpServletRequest request, HttpServletResponse response) throws Throwable {
         if (!request.isSecure()) {
@@ -168,8 +180,8 @@ public abstract class AbstractRegistrationServlet extends MyProxyDelegationServl
 
                 getServiceEnvironment().getMailUtil().sendMessage("Too many pending approvals",
                         request.getServerName() + " has too many pending client approval requests outstanding. " +
-                                "The server is configured for a limit of " + getServiceEnvironment().getMaxAllowedNewClientRequests() +  " and"
-                        + " there are " + getServiceEnvironment().getClientApprovalStore().getPendingCount() + " pending approvals in the store.",null);
+                                "The server is configured for a limit of " + getServiceEnvironment().getMaxAllowedNewClientRequests() + " and"
+                                + " there are " + getServiceEnvironment().getClientApprovalStore().getPendingCount() + " pending approvals in the store.", null);
                 JSPUtil.fwd(request, response, "/tooManyClientRequests.jsp");
                 // Fixes OAUTH-90 bug.
                 return;
@@ -180,16 +192,16 @@ public abstract class AbstractRegistrationServlet extends MyProxyDelegationServl
         try {
             prepare(pState);
             if (state == REQUEST_STATE) {
-                Client client = addNewClient(request, response);
+                BaseClient client = addNewClient(request, response);
                 // Fix for OAUTH-157 bug. Always save any updates to the client
-                getServiceEnvironment().getClientStore().save(client);
+                save(client);
                 pState = new ClientState(state, request, response, client);
             }
             present(pState);
         } catch (ClientRegistrationRetryException r) {
             getServiceEnvironment().getClientStore().remove(r.getClient().getIdentifier());
             setRetryParameters(request, r);
-            if ((request.getAttribute(getValueTag(CLIENT_PROXY_LIMITED))!= null) && request.getAttribute(getValueTag(CLIENT_PROXY_LIMITED)).equals("on")) {
+            if ((request.getAttribute(getValueTag(CLIENT_PROXY_LIMITED)) != null) && request.getAttribute(getValueTag(CLIENT_PROXY_LIMITED)).equals("on")) {
                 request.setAttribute(getValueTag(CLIENT_PROXY_LIMITED), "checked"); // so this is checked
             } else {
                 request.removeAttribute(getValueTag(CLIENT_PROXY_LIMITED)); // so this is unchecked
@@ -204,9 +216,9 @@ public abstract class AbstractRegistrationServlet extends MyProxyDelegationServl
 
             request.setAttribute("retryMessage", r.getMessage());
 
-            JSPUtil.fwd(request, response, INIT_PAGE);
+            JSPUtil.fwd(request, response, getInitPage());
         } catch (Throwable t) {
-            if(ServletDebugUtil.isEnabled()){
+            if (ServletDebugUtil.isEnabled()) {
                 t.printStackTrace();
             }
             warn("Error registering a new client:" + t.getMessage());
@@ -214,8 +226,12 @@ public abstract class AbstractRegistrationServlet extends MyProxyDelegationServl
         }
     }
 
+    protected void save(BaseClient client){
+        getServiceEnvironment().getClientStore().save((Client)client);
+    }
     /**
      * Sets the parameters from the request so they can be passed back.
+     *
      * @param request
      * @param r
      */
@@ -233,7 +249,7 @@ public abstract class AbstractRegistrationServlet extends MyProxyDelegationServl
         return req.getParameter(key);
     }
 
-    protected String getRequiredParam(HttpServletRequest req, String key, Client client) {
+    protected String getRequiredParam(HttpServletRequest req, String key, BaseClient client) {
         String x = getParameter(req, key);
         if (x == null || x.length() == 0) {
             throw new ClientRegistrationRetryException("Error: missing value for " + key, null, client);
@@ -250,12 +266,12 @@ public abstract class AbstractRegistrationServlet extends MyProxyDelegationServl
 
     }
 
-    String emailPattern = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$";
+    protected String emailPattern = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$";
 
 
 
-    protected Client setupNewClient(HttpServletRequest request, HttpServletResponse response) throws Throwable {
-         // Assumption is that the request is in good order and we just have to pull stuff off it.
+    protected BaseClient setupNewClient(HttpServletRequest request, HttpServletResponse response) throws Throwable {
+        // Assumption is that the request is in good order and we just have to pull stuff off it.
         Client client = getServiceEnvironment().getClientStore().create();
         info("creating entry for client=" + client.getIdentifierString());
         // Fill in as much info as we can before parsing public key.
@@ -282,13 +298,14 @@ public abstract class AbstractRegistrationServlet extends MyProxyDelegationServl
         info("done with client registration, client=" + client.getIdentifierString());
         return client;
     }
-    protected Client addNewClient(HttpServletRequest request, HttpServletResponse response) throws Throwable {
+
+    protected BaseClient addNewClient(HttpServletRequest request, HttpServletResponse response) throws Throwable {
         // Fix for CIL-169: the last thing that should be done after this is over-ridden is to fire a new client event:
-                //            fireNewClientEvent(client);
-                // Failure to do so will turn off the ability to email new client registrations!
+        //            fireNewClientEvent(client);
+        // Failure to do so will turn off the ability to email new client registrations!
         // So invoke setupNewClient to create one, have your call over-ride this and fire the event,
 
-       return setupNewClient(request,response);
+        return setupNewClient(request, response);
 
     }
 
@@ -297,15 +314,15 @@ public abstract class AbstractRegistrationServlet extends MyProxyDelegationServl
     // than garbage collected later.
 
     public static class ClientRegistrationRetryException extends RetryException {
-        public Client getClient() {
+        public BaseClient getClient() {
             return client;
         }
 
-        Client client;
+        BaseClient client;
 
-        public ClientRegistrationRetryException(String message, Throwable cause, Client client) {
+        public ClientRegistrationRetryException(String message, Throwable cause, BaseClient client) {
             super(message, cause);
             this.client = client;
         }
     }
-  }
+}

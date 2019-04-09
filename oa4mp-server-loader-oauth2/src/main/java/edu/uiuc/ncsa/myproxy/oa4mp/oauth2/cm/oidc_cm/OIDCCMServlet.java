@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.HeaderUtils;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientConfigurationUtil;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientKeys;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.EnvServlet;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
@@ -82,6 +83,16 @@ public class OIDCCMServlet extends EnvServlet {
         Identifier acID = BasicIdentifier.newID(credentials[HeaderUtils.ID_INDEX]);
         if (!getOA2SE().getAdminClientStore().containsKey(acID)) {
             throw new GeneralException("Error: the given id of \"" + acID + "\" is not recognized as an admin client.");
+        }
+        AdminClient adminClient = getOA2SE().getAdminClientStore().get(acID);
+        String adminSecret = credentials[HeaderUtils.SECRET_INDEX];
+        if (adminSecret == null || adminSecret.isEmpty()) {
+            throw new GeneralException("Error: missing secret.");
+        }
+
+        String hashedSecret = DigestUtils.sha1Hex(adminSecret);
+        if(!adminClient.getSecret().equals(hashedSecret)){
+            throw new IllegalAccessException("error: client and secret do not match");
         }
         BufferedReader br = httpServletRequest.getReader();
         DebugUtil.trace(this, "query=" + httpServletRequest.getQueryString());

@@ -125,7 +125,7 @@ public class OA2RegistrationServlet extends AbstractRegistrationServlet {
                     // do nix...
                     rtLifetimeOK = false;
                 }
-                if (!rtLifetimeOK) {
+                if (!rtLifetimeOK) {                                                                    
                     info("Client requested illegal value for refresh token lifetime at registration of \"" + rawRTLifetime + "\"");
                 }
             }
