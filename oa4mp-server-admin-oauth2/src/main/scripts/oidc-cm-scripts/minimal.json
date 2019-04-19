@@ -1,0 +1,5 @@
+{
+   "comment":"This is a the minimal request object required for creation: a set of URIs and a name",
+   "redirect_uris":["https://client.example.org/callback"],
+   "client_name": "My Example"
+  }
