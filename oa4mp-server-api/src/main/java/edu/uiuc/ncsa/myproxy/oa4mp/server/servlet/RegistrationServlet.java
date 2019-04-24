@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 public class RegistrationServlet extends AbstractRegistrationServlet {
     @Override
     protected Client addNewClient(HttpServletRequest request, HttpServletResponse response) throws Throwable {
-        Client client = super.addNewClient(request, response);
+        Client client = (Client)super.addNewClient(request, response);
         client.setSecret(getRequiredParam(request, CLIENT_PUBLIC_KEY, client));
         String x = getRequiredParam(request, CLIENT_ERROR_URL, client);
         if(!x.toLowerCase().startsWith("https")){

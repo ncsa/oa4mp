@@ -14,6 +14,7 @@ import edu.uiuc.ncsa.security.oauth_2_0.*;
 import edu.uiuc.ncsa.security.oauth_2_0.client.ATResponse2;
 import edu.uiuc.ncsa.security.oauth_2_0.client.ATServer2;
 import edu.uiuc.ncsa.security.servlet.JSPUtil;
+import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import edu.uiuc.ncsa.security.util.pkcs.CertUtil;
@@ -108,15 +109,28 @@ public class OA2ReadyServlet extends ClientServlet {
             // The general case is to do the call with the identifier if you want the asset store managed.
             //assetResponse = getOA4MPService().getCert(token, null, BasicIdentifier.newID(identifier));
         }
-        // The work in this call
-        if (oa2ce.isShowIDToken()) {
+        ServletDebugUtil.trace(this,"show ID token? " + oa2ce.isShowIDToken());
+        // Now to display the id token. This only exists if this is an OIDC server, so that is a requirement here.
+        if (oa2ce.isOidcEnabled() && oa2ce.isShowIDToken()) {
+
             ATServer2 atServer2 = (ATServer2) oa2ce.getDelegationService().getAtServer();
 
             JSONWebKeys jsonWebKeys = atServer2.getJsonWebKeys();
-
+            ServletDebugUtil.trace(this, "JSON webkeys = " + jsonWebKeys);
             // So this client is to show the information for the ID Token. Since this is extra, we have to recover it.
+
+            ServletDebugUtil.trace(this, "ID Token store = " + ATServer2.getIDTokenStore());
+            ServletDebugUtil.trace(this, "ID Token store size = "  + ATServer2.getIDTokenStore().size());
+            ServletDebugUtil.trace(this, "ID Token store contains key \"" + rawAT + "\"? " + ATServer2.getIDTokenStore().containsKey(rawAT));
+
+
             ATServer2.IDTokenEntry tokenEntry = ATServer2.getIDTokenStore().get(rawAT);
+            ServletDebugUtil.trace(this, "TokenEntry = " + tokenEntry);
+
             setJWTInfo(request, tokenEntry.rawToken, jsonWebKeys);
+
+        }else{
+            setJWTInfo(request, null, null); // sets the fields to "(none)"
 
         }
         // Again, we take the first returned cert to peel off some information to display. This

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Dynamic Client Registration</title>
+    <!--#include virtual="../../head.html" -->
+
+</head>
+<body class="composite">
+<!--#include virtual="../../header.html" -->
+<h1>Dynamic Client Registration</h1>
+<p>The <a href="https://openid.net/specs/openid-connect-registration-1_0.html">dynamic client registration</a> specification
+is supported in OA4MP as of version 4.2. This means that a trusted administrative client can dynamically
+create regular clients for use with an OA4MP system.  If you have not done so already, you should
+read the section on
+<a href="server/manuals/administrative-clients.xhtml">administrative clients </a>.
+</p>
+
+<p>To dynamically register a client you need to make a call to the supported service
+endpoint, typically <code>../oauth2/register</code></p>
+
+<!--#include virtual="../../footer.html" -->
+</body>
+</html>

@@ -255,8 +255,18 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
 
     @Override
     public void rm(InputLine inputLine) {
-        sayi("Removing approval record");
+
         Identifiable x = findItem(inputLine);
+        BaseClient baseClient = (BaseClient)x;
+        sayi("Removal of client named \"" + baseClient.getName()+"\"");
+        sayi("   with id=\"" + baseClient.getIdentifierString() + "\"");
+        String response = getInput("Are you sure you want to remove this client?(y/n)", "n");
+        if(!response.equals("y")){
+            sayi("aborted...");
+            return;
+        }
+        
+        sayi("Removing approval record");
         info("Removing approval record for id=" + x.getIdentifierString());
         getClientApprovalStore().remove(x.getIdentifier());
         sayi("Done. Client approval with id = " + x.getIdentifierString() + " has been removed from the store");

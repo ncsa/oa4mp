@@ -84,6 +84,16 @@
 
 
     <servlet>
+        <servlet-name>admin-register</servlet-name>
+        <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2AdminRegistrationServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>admin-register</servlet-name>
+        <url-pattern>/admin-register</url-pattern>
+    </servlet-mapping>
+
+
+    <servlet>
         <servlet-name>clientVetting</servlet-name>
         <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2RegistrationServlet</servlet-class>
         <load-on-startup>1</load-on-startup>

@@ -192,6 +192,8 @@ public class OA2ClientCommands extends ClientStoreCommands {
         }
     }
 
+
+
     protected void removeCB(OA2Client client, Collection<String> cbs) {
         if (cbs.isEmpty()) {
             //    say("Enter callbacks to remove. A blank line ends input");
@@ -199,7 +201,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
 
         }
         client.getCallbackURIs().remove(cbs);
-        String response = getInput("Save?(y/n", "n");
+        String response = getInput("Save?(y/n)", "n");
         if (response.equals("y")) {
             getStore().save(client);
             say("done.");
@@ -292,13 +294,13 @@ public class OA2ClientCommands extends ClientStoreCommands {
             // so at this point the server actually allows for refresh tokens
             String NONE = "none";
             String rtString = oa2Client.isRTLifetimeEnabled() ? Long.toString(oa2Client.getRtLifetime() / 1000) : NONE;
-            String rawLifetime = getInput("enter the refresh lifetime in ms.", rtString);
+            String rawLifetime = getInput("enter the refresh lifetime in sec.", rtString);
 
             if (rawLifetime == null || rawLifetime.length() == 0 || rawLifetime.toLowerCase().equals(NONE)) {
                 oa2Client.setRtLifetime(0);
             } else {
                 try {
-                    oa2Client.setRtLifetime(Long.parseLong(rawLifetime));
+                    oa2Client.setRtLifetime(Long.parseLong(rawLifetime)*1000L);
                 } catch (Throwable t) {
                     sayi("Sorry but \"" + rawLifetime + "\" is not a valid number. No change.");
                 }

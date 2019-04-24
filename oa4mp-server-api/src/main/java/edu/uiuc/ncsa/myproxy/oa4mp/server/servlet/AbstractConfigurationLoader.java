@@ -387,6 +387,7 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
         return new TrivialUsernameTransformer();
     }
 
+
     @Override
     public T load() {
         info("loading configuration.");
@@ -394,17 +395,7 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
         // now peel off the service address
 
         se2.setServiceAddress(getServiceAddress());
-        String rawDebug = Configurations.getFirstAttribute(cn, OA4MPConfigTags.DEBUG);
-        try{
-            if(rawDebug == null || rawDebug.isEmpty()){
-                DebugUtil.setDebugLevel(DebugUtil.DEBUG_LEVEL_OFF);
-            }else {
-                DebugUtil.setDebugLevel(rawDebug);
-            }
-        }catch(Throwable t){
-            // ok, so that didn't work, fall back to the old way
-            DebugUtil.setIsEnabled(Boolean.parseBoolean(rawDebug));
-        }
+        loadDebug();
         se2.setDebugOn(DebugUtil.isEnabled());
         se2.info("Debugging is " + (se2.isDebugOn() ? "on" : "off"));
 

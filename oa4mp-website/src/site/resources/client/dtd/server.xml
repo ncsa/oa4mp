@@ -49,6 +49,7 @@
         <!ELEMENT clients (#PCDATA)>
         <!ELEMENT clientApprovals (#PCDATA)>
         <!ELEMENT transactions (#PCDATA)>
+        <!ELEMENT OIDCEnabled (#PCDATA)>
         <!ELEMENT permissions (#PCDATA)>
         <!ELEMENT adminClients (#PCDATA)>
         <!ELEMENT ldap (address|port|password|principal|searchBase|searchAttributes|ssl|contextName)*>

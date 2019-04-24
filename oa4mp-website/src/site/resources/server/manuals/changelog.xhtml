@@ -14,6 +14,19 @@
 <h2>4.2-SNAPSHOT</h2>
 <ul>
     <li>Added supoort for turning on/off OIDC abilities in the configuration file with the OIDCEnabled flag.</li>
+    <li>CIL-467:Eliminate init endpoint (this was very specific to CILogon). </li>
+    <li>CIL-490: Added a check box on the client registration form to allow marking a client as public. Note that
+    this will automatically set the scopes to only "openid".</li>
+    <li>CIL-506: Support for the OAuth dynamic client registration specification is added.</li>
+    <li>CIL-515:demo client will now show the id token and information about it</li>
+    <li>CIL-532: eduPersonEntitlement support. Generally all additional attributes that Shibboleth sends are now
+    returned as claims unless specifically omitted.</li>
+    <li>CIL-535: configuration snippets are now stored and may be accessed generally in other client configurationd.
+        This allows for the practical inheritance of configurations.</li>
+    <li>CIL-545:Accept a wider range of redirects during client registration.
+        Redirect URIs may be to any domain if the scheme is https. If the scheme is http then only redirects to localhost
+    or a reserved private range such as 192.168.x.x are allowed. If the scheme is not http or https, any domain is allowed.
+    This last feature is needed for mobile device support.</li>
 </ul>
 
 <h2>4.1.1</h2>

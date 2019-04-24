@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Administrative Clients</title>
+    <!--#include virtual="../../head.html" -->
+
+</head>
+<body class="composite">
+<!--#include virtual="../../header.html" -->
+
+<h1>Administrative Clients</h1>
+<p>An administrative client in OA4MP is a client that is authorized to create standard clients. A standard
+OAuth client (which gets tokens, etc.) Administrative clients can be requested via a specific endpoint,
+usually <code>../oauth2/admin-client</code>. It should be stressed that administrative clients are
+not part of any OAuth standard and are therefore outside the requirements for standard OAuth clients.</p>
+
+<p>The most ocmmon use of an administrative client is the dynamic registration of standard clients. This
+allows an institution to create customized clients each with their own configuration for open
+    authorization. An example would be a <a href="https://www.cilogon.org/comanage">COManage instance</a>
+    which could set up a specific client for use by every virtual organization it creates. 
+</p>
+
+<!--#include virtual="../../footer.html" -->
+</body>
+</html>

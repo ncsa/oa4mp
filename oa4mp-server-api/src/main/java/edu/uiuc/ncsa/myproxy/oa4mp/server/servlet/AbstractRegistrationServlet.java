@@ -74,7 +74,8 @@ public abstract class AbstractRegistrationServlet extends MyProxyDelegationServl
 
                 request.setAttribute(CLIENT_ACTION_KEY, CLIENT_ACTION_KEY);
                 request.setAttribute(CLIENT_ACTION_REQUEST_VALUE, CLIENT_ACTION_REQUEST_VALUE);
-                request.setAttribute("actionToTake", request.getContextPath() + "/register");
+                System.out.println("context path = " + request.getContextPath() + ", servlet path =" + request.getServletPath() + ", request utl = " + request.getRequestURL()); 
+                request.setAttribute("actionToTake", request.getContextPath() + request.getServletPath());
                 break;
             case REQUEST_STATE:
                 // nothing to do.

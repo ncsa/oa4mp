@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.client.storage.AssetProvider;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.delegation.client.DelegationService;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.delegation.token.TokenForge;
@@ -126,7 +127,6 @@ public class ClientLoader<T extends ClientEnvironment> extends AbstractClientLoa
 
     @Override
     public T createInstance() {
-
         Provider<TokenForge> tokenForgeProvider = new Provider<TokenForge>() {
             @Override
             public TokenForge get() {
@@ -151,7 +151,11 @@ public class ClientLoader<T extends ClientEnvironment> extends AbstractClientLoa
         constants.put(ClientEnvironment.TOKEN, OAuth.OAUTH_TOKEN);
         constants.put(ClientEnvironment.VERIFIER, OAuth.OAUTH_VERIFIER);
 
-        return createInstance(tokenForgeProvider, clientProvider, constants);
+        T t =  createInstance(tokenForgeProvider, clientProvider, constants);
+        loadDebug();
+
+        t.setDebugOn(DebugUtil.isEnabled());
+        return t;
     }
 
     protected PrivateKey checkPrivateKey() throws IOException {

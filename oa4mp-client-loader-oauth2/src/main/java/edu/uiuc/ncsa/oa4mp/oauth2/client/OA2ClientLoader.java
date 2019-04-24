@@ -10,6 +10,7 @@ import edu.uiuc.ncsa.security.core.configuration.provider.TypedProvider;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.delegation.client.DelegationService;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.delegation.token.TokenForge;
@@ -136,10 +137,13 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
 
     public boolean isOIDCEnabled() {
         if (oidcEnabled == null) {
+            oidcEnabled = Boolean.TRUE; // default
+            String content = getCfgValue(ClientXMLTags.OIDC_ENABLED);
             try {
-                oidcEnabled = Boolean.parseBoolean(getCfgValue(ClientXMLTags.OIDC_ENABLED));
+                oidcEnabled = Boolean.parseBoolean(content);
             } catch (Throwable t) {
-                oidcEnabled = Boolean.TRUE; // default
+                // do nothing. Rock on
+                myLogger.warn("Unable to parse " + ClientXMLTags.OIDC_ENABLED + " element content of \"" + content + "\". Using default of true.");
             }
         }
         return oidcEnabled;
@@ -227,7 +231,10 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
         constants.put(ClientEnvironment.TOKEN, OA2Constants.ACCESS_TOKEN);
         constants.put(ClientEnvironment.TOKEN, OA2Constants.AUTHORIZATION_CODE);
         // no verifier in this protocol.
-        return createInstance(tokenForgeProvider, clientProvider, constants);
+        T t = createInstance(tokenForgeProvider, clientProvider, constants);
+        loadDebug();
+        t.setDebugOn(DebugUtil.isEnabled());
+        return t;
     }
 
     @Override

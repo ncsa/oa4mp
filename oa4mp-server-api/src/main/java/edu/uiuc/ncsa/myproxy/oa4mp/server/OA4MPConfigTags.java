@@ -56,7 +56,6 @@ public interface OA4MPConfigTags extends StorageConfigurationTags, MailConfigura
     public static final String ID_SCHEME = "scheme";
     public static final String ID_SPP = "schemeSpecificPart";
 
-    public static final String DEBUG = "debug";
     public static final String USERS = "users";
     public static final String ARCHIVED_USERS = "archivedUsers";
     public static final String IDENTITY_PROVIDERS = "identityProviders";

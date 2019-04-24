@@ -137,6 +137,9 @@ public class OA2RegistrationServlet extends AbstractRegistrationServlet {
         if (rawIsPublic != null) {
             try {
                 client.setPublicClient(rawIsPublic.equals("on"));
+                LinkedList<String> publicScopes = new LinkedList<>();
+                publicScopes.add(OA2Scopes.SCOPE_OPENID); // all that is allowed
+                client.setScopes(publicScopes);
             } catch (Throwable t) {
                 // do nothing. Then this is not a public client.
             }
@@ -360,7 +363,8 @@ public class OA2RegistrationServlet extends AbstractRegistrationServlet {
                 ClientState cState = (ClientState) state;
                 String secret = DigestUtils.sha1Hex(cState.getClient().getSecret());
                 cState.getClient().setSecret(secret);
-                getServiceEnvironment().getClientStore().save(cState.getClient());
+                save(cState.getClient());
+                //getServiceEnvironment().getClientStore().save(cState.getClient());
             } else {
                 throw new IllegalStateException("Error: An instance of ClientState was expected, but got an instance of \"" + state.getClass().getName() + "\"");
             }
