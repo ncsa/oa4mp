@@ -13,6 +13,7 @@ import edu.uiuc.ncsa.security.core.cache.Cleanup;
 import edu.uiuc.ncsa.security.core.cache.ValidTimestampPolicy;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.servlet.AbstractServlet;
 import edu.uiuc.ncsa.security.servlet.ExceptionHandler;
@@ -24,6 +25,7 @@ import javax.servlet.ServletException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URI;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -123,6 +125,13 @@ public class OA4MPServletInitializer implements Initialization {
         isInitRun = true;
 
         MyProxyDelegationServlet mps = (MyProxyDelegationServlet) getServlet();
+        // Partial solution to CIL-355. This at least sets the host for the debug utilities
+        // Full solution requires a good deal most tweaking of the logging including
+        // determining if log4j is in use and configuring that.
+        URI serviceAddress = mps.getServiceEnvironment().getServiceAddress();
+        if(serviceAddress != null){
+            DebugUtil.host = serviceAddress.getHost();
+        }
         try {
             //mps.storeUpdates();
             mps.processStoreCheck(mps.getTransactionStore());
