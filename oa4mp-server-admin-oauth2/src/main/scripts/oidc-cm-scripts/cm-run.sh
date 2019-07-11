@@ -21,7 +21,7 @@
 #
 # response is a JSON object with the id and secret.
 
-export SERVER=https://polod.ncsa.illinois.edu/oauth2/oidc-cm
+export SERVER=https://cilogon.org/oauth2/oidc-cm
 export ADMIN_ID=put-your-id-here
 export ADMIN_SECRET=put-your-secret-here
 
