@@ -93,7 +93,8 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
                     getScopes(),
                     getWellKnownURI(),
                     isOIDCEnabled(),
-                    isShowIDToken()
+                    isShowIDToken(),
+                    isUseBasicAuth()
             );
         } catch (Throwable e) {
             throw new GeneralException("Unable to create client environment", e);
@@ -237,6 +238,29 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
         return t;
     }
 
+    Boolean useBasicAuth = null;
+
+    /**
+     * For calls the client makes to the service, use HTTP Basic Authorization rather than passing in the
+     * credentials as parameters. Both should be supported, but some other services might only allow for this.
+     *
+     * @return
+     */
+    public Boolean isUseBasicAuth() {
+        if (useBasicAuth == null) {
+            try {
+                useBasicAuth = Boolean.parseBoolean(getCfgValue(ClientXMLTags.USE_HTTP_BASIC_AUTHORIZATIION));
+            } catch (Throwable t) {
+                useBasicAuth = Boolean.FALSE;
+            }
+        }
+        return useBasicAuth;
+    }
+
+    public void setUseBasicAuth(Boolean useBasicAuth) {
+        this.useBasicAuth = useBasicAuth;
+    }
+
     @Override
     protected Provider<DelegationService> getDSP() {
         if (dsp == null) {
@@ -244,7 +268,10 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
                 @Override
                 public DelegationService get() {
                     return new DS2(new AGServer2(createServiceClient(getAuthzURI())), // as per spec, request for AG comes through authz endpoint.
-                            new ATServer2(createServiceClient(getAccessTokenURI()), getWellKnownURI(), isOIDCEnabled()),
+                            new ATServer2(createServiceClient(getAccessTokenURI()),
+                                    getWellKnownURI(),
+                                    isOIDCEnabled(),
+                                    isUseBasicAuth()),
                             new PAServer2(createServiceClient(getAssetURI())),
                             new UIServer2(createServiceClient(getUIURI())),
                             new RTServer2(createServiceClient(getAccessTokenURI()), getWellKnownURI(), isOIDCEnabled()) // as per spec, refresh token server is at same endpoint as access token server.
@@ -262,9 +289,11 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
     protected URI getAuthzURI() {
         return createServiceURI(getCfgValue(ClientXMLTags.AUTHORIZE_TOKEN_URI), getCfgValue(ClientXMLTags.BASE_URI), AUTHORIZE_ENDPOINT);
     }
+
     protected URI getRevocationURI() {
         return createServiceURI(getCfgValue(ClientXMLTags.REVOCATION_URI), getCfgValue(ClientXMLTags.BASE_URI), AUTHORIZE_ENDPOINT);
     }
+
     @Override
     public HashMap<String, String> getConstants() {
         throw new NotImplementedException("Error: This method is not implemented.");

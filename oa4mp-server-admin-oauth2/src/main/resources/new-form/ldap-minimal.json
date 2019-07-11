@@ -1,0 +1,31 @@
+{"ldap": {
+    "failOnError": "true",
+    "address": "ldap.ncsa.illinois.edu",
+    "port": 636,
+    "enabled": "true",
+    "authorizationType": "none",
+    "searchName": "uid",
+    "searchFilterAttribute": "uid",
+    "searchAttributes": [
+      {
+        "name": "uid",
+        "returnAsList": false,
+        "returnName": "uid"
+      },
+      {
+            "name": "isMemberOf",
+            "isGroup": true,
+            "returnAsList": false,
+            "returnName": "isMemberOf"
+           }
+    ],
+    "searchBase": "ou=People,dc=ncsa,dc=illinois,dc=edu",
+    "contextName": "",
+    "ssl": {
+      "tlsVersion": "TLS",
+      "useJavaTrustStore": true
+    },
+    "id": "3258ed63b62d1a78"
+  },
+  "#store_id":"urn:store:/minimal-ldap"
+}

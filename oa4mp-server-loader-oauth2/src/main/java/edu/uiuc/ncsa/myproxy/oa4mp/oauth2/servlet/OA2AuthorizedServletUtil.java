@@ -213,7 +213,7 @@ public class OA2AuthorizedServletUtil {
         }
         //Spec says that the redirect must match one of the ones stored and if not, the request is rejected.
         String givenRedirect = params.get(REDIRECT_URI);
-        OA2ClientCheck.check(agResponse.getClient(), givenRedirect);
+        OA2ClientUtils.check(agResponse.getClient(), givenRedirect);
         // by this point it has been verified that the redirect uri is valid.
 
         String rawSecret = params.get(CLIENT_SECRET);

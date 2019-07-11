@@ -10,7 +10,6 @@ import edu.uiuc.ncsa.security.oauth_2_0.OA2Scopes;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfigurationUtil;
 import edu.uiuc.ncsa.security.servlet.PresentableState;
-import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import net.sf.json.JSON;
 import net.sf.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
@@ -25,7 +24,6 @@ import java.net.URI;
 import java.security.SecureRandom;
 import java.util.Collection;
 import java.util.LinkedList;
-import java.util.StringTokenizer;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -158,7 +156,7 @@ public class OA2RegistrationServlet extends AbstractRegistrationServlet {
             client.setSecret(secret64);
         }
 
-        LinkedList<String> uris = createCallbacks(client, rawCBs);
+        LinkedList<String> uris = OA2ClientUtils.createCallbacksForWebUI(client, rawCBs);
         //LinkedList<String> uris = newCreateCallbacks(rawCBs);
         client.setCallbackURIs(uris);
         client.setSignTokens(true); // part of CIL-359, signing ID tokens.
@@ -185,152 +183,6 @@ public class OA2RegistrationServlet extends AbstractRegistrationServlet {
         return uris;
     }
 
-    private LinkedList<String> createCallbacks(OA2Client client, String rawCBs) throws IOException {
-        BufferedReader br = new BufferedReader(new StringReader(rawCBs));
-        String x = br.readLine();
-        LinkedList<String> uris = new LinkedList<>();
-        LinkedList<String> dudUris = new LinkedList<>();
-        while (x != null) {
-            // Fix for CIL-545. Allowing a wider range of redirect URIs to support devices such as smart phones.
-            // How it works: Either the protocol is not http/https in which case it is allowed
-            // but if it is http, only localhost is permitted. Any https works.
-            try {
-                URI temp = URI.create(x);
-                String host = temp.getHost();
-                String scheme = temp.getScheme();
-                ServletDebugUtil.trace(this.getClass(), "setupNewClient, processing callback \"" + x + "\"");
-
-                if (scheme != null && scheme.toLowerCase().equals("https")) {
-                    // any https works
-                    uris.add(x);
-                } else {
-                    if (isPrivate(host, scheme)) {
-                        uris.add(x);
-                    } else {
-                        if (temp.getAuthority() == null || temp.getAuthority().isEmpty()) {
-                            /*
-                            Finally, if it does not have an authority, then it is probably
-                            an intention for another (probably mobile) device (so in that case,
-                            the browser on the device has the table associating schemes with
-                            specific applications. When it sees a uri with this scheme, it
-                            invokes the associated application and hands it the URI. This allows
-                            the browser to do a redirect to an application. The requirement is that there is a scheme, but
-                            there is no authority:
-                             E.g. https://bob@foo.com/blah/woof
-                             has authority of "//bob@foo.com/"
-
-                             An example of what this block allows (or should) is a uri like
-
-                             com.example.app:/oauth2redirect/example-provider
-
-                             which has a scheme, no authority and a path.
-                             */
-                            uris.add(x);
-                        } else {
-                            dudUris.add(x);
-                        }
-                    }
-                }
-
-            } catch (IllegalArgumentException urisx) {
-                dudUris.add(x);
-            }
-
-        /*  Old stuff before CIL-545
-           if (!x.toLowerCase().startsWith("https:")) {
-                warn("Attempt to add bad callback uri for client " + client.getIdentifierString());
-                throw new ClientRegistrationRetryException("The callback \"" + x + "\" is not secure.", null, client);
-            }
-            URI.create(x); // passes here means it is a uri. All we want this to do is throw an exception if needed.
-
-            uris.add(x);*/
-            x = br.readLine();
-        }
-        if (0 < dudUris.size()) {
-            String xx = "</br>";
-            boolean isOne = dudUris.size() == 1;
-            for (String y : dudUris) {
-                xx = xx + y + "</br>";
-            }
-            warn("Attempt to add bad callback uris for client " + client.getIdentifierString());
-            String helpfulMessage = "The callback" + (isOne ? " " : "s ") + xx + (isOne ? "is" : "are") + " not valid.";
-            throw new ClientRegistrationRetryException(helpfulMessage, null, client);
-
-        }
-        br.close();
-        return uris;
-    }
-
-    protected int[] toQuad(String address) {
-        StringTokenizer stringTokenizer = new StringTokenizer(address, ".");
-        if (!stringTokenizer.hasMoreTokens()) {
-            return null;
-        }
-        int[] quad = new int[4];
-
-        for (int i = 0; i < 4; i++) {
-            if (!stringTokenizer.hasMoreTokens()) {
-                return null;
-            }
-            String raw = stringTokenizer.nextToken();
-            try {
-                quad[i] = Integer.parseInt(raw);
-                if (!(0 <= quad[i] && quad[i] <= 255)) {
-                    return null;
-                }
-            } catch (NumberFormatException nfx) {
-                return null;
-            }
-        }
-        if (stringTokenizer.hasMoreTokens()) {
-            return null;
-        }
-        return quad;
-
-    }
-
-    protected boolean isOnPrivateNetwork(String address) {
-        String regex = "\\b\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\b";
-        if (!address.matches(regex)) {
-            return false;
-        }
-        int[] quad = toQuad(address);
-        if (quad == null) {
-            return false;
-        }
-        if (quad[0] == 10) {
-            return true;
-        }
-        if (quad[0] == 192 && quad[1] == 168) return true;
-        if (quad[0] == 172 && (16 <= quad[1] && quad[1] <= 31)) return true;
-        if (quad[0] == 127 && quad[1] == 0 && quad[2] == 0 && quad[3] == 1) return true;
-
-        // This just checked that it is a dotted quad address. We could have used InetAddress which
-        // only checks a valid dotted quad for format, **but** might also do an actual address lookup
-        // if there is a question, so that really doesn't help.
-
-        // now we have to check that address in the range 172.16.x.x to 172.31.x.x are included.
-        // Do the easy ones first.
-        return false;
-    }
-
-    protected boolean isPrivate(String host, String scheme) {
-        if (host != null && isOnPrivateNetwork(host)) {
-            // scheme does not matter in this case since it is a private network.
-            // note that this also catches the loopback address of 127.0.0.1 
-            return true;
-        }
-        if (scheme != null && scheme.toLowerCase().equals("http")) {
-            // only localhost works for http
-            if (host.toLowerCase().equals("localhost") ||
-                    host.equals("[::1]")) {
-                return true;
-            }
-        }
-
-
-        return false;
-    }
 
     protected Client addNewClient(HttpServletRequest request, HttpServletResponse response, boolean fireClientEvents) throws Throwable {
         OA2Client client = (OA2Client) setupNewClient(request, response);

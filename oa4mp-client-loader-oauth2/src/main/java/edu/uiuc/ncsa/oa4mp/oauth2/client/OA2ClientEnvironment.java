@@ -36,7 +36,8 @@ public class OA2ClientEnvironment extends ClientEnvironment {
                                 String redirectPagePath,
                                 String successPagePath,
                                 boolean oidcEnabled,
-                                boolean showIDToken) {
+                                boolean showIDToken,
+                                boolean useBasicAuth) {
         super(accessTokenUri,
                 authorizationUri,
                 callback,
@@ -51,6 +52,7 @@ public class OA2ClientEnvironment extends ClientEnvironment {
         ServletDebugUtil.dbg(this, "oidcEnabled?" + oidcEnabled);
         this.oidcEnabled = oidcEnabled;
         this.showIDToken = showIDToken;
+        this.useBasicAuth = useBasicAuth;
     }
 
     public OA2ClientEnvironment(MyLoggingFacade logger, Map<String, String> constants,
@@ -78,7 +80,8 @@ public class OA2ClientEnvironment extends ClientEnvironment {
                                 Collection<String> scopes,
                                 String wellKnownURI,
                                 boolean oidcEnabled,
-                                boolean showIDToken) {
+                                boolean showIDToken,
+                                boolean useBasicAuth) {
         super(logger,
                 constants,
                 accessTokenUri,
@@ -109,7 +112,15 @@ public class OA2ClientEnvironment extends ClientEnvironment {
         this.wellKnownURI = wellKnownURI;
         this.oidcEnabled = oidcEnabled;
         this.showIDToken = showIDToken;
+        this.useBasicAuth = useBasicAuth;
     }
+
+    public boolean isUseBasicAuth() {
+        return useBasicAuth;
+    }
+
+    boolean useBasicAuth = false;
+
     Collection<String> scopes = null;
     public Collection<String> getScopes(){
         return scopes;

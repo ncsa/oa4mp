@@ -1,0 +1,10 @@
+{
+   "comment":"This is a basic example from the specification to test if a client has been created correctly",
+   "application_type": "web",
+   "redirect_uris":
+     ["http://localhost/callback"],
+   "client_name": "Jeff test",
+  "scope":"openid email profile",
+  "client_id":"oidc:jeff/client",
+  "client_secret":"my_totally_cool_secret"   
+  }

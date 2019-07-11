@@ -55,6 +55,11 @@ public class OIDCCMServlet extends EnvServlet {
     }
 
     @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        super.doDelete(req, resp);
+    }
+
+    @Override
     public void doPost(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws ServletException, IOException {
         try {
             // The super class rejects anything that does not have an encoding type of

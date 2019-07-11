@@ -9,6 +9,7 @@ import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2Asset;
 import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2MPService;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.DateUtils;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.delegation.client.request.RTResponse;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
@@ -34,6 +35,12 @@ import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.ID_TOKEN;
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.RAW_ID_TOKEN;
 
 /**
+ * A command line client. Invoke help as needed, but the basic operation is to create the initial
+ * request url using the {@link #geturi(InputLine)} call, paste it in your browser, authenticate
+ * (since this is an OIDC client, you must pass through a browser at some point). The call back should
+ * fail, so you copy the attempted callback from the service using the {@link #setgrant(InputLine)}
+ * call. You can then do whatever you needed (get an access token, get refresh tokens if the server supports it)
+ * inspect id tokens and such.
  * <p>Created by Jeff Gaynor<br>
  * on 5/11/16 at  2:57 PM
  */
@@ -86,6 +93,7 @@ public class OA2TestCommands extends TestCommands {
         }
         Identifier id = AssetStoreUtil.createID();
         OA4MPResponse resp = getService().requestCert(id);
+        DebugUtil.dbg(this, "client id = " + getCe().getClientId());
         dummyAsset = (OA2Asset) getCe().getAssetStore().get(id.toString());
         say(resp.getRedirect().toString());
     }
@@ -264,7 +272,7 @@ public class OA2TestCommands extends TestCommands {
             getATHelp();
             return;
         }
-
+        DebugUtil.dbg(this, "Getting AT, grant=" + grant);
         currentATResponse = getOA2S().getAccessToken(getDummyAsset(), grant);
         Object x = currentATResponse.getParameters().get(RAW_ID_TOKEN);
         if (x == null) {
@@ -376,7 +384,7 @@ public class OA2TestCommands extends TestCommands {
     protected void getATHelp() {
         say("getat [-claims]:");
         say("       Gets the access token and refresh token (if supported on the server) for a given grant. ");
-        say("       Your argument is the output from the setgrant call here.");
+        say("       Your must have already set the grant with the setgrant call.");
         say("       A summary of the refresh token and its expiration is printed, if applicable.");
         say("       If the -" + CLAIMS_FLAG + " flag is supplied, the id token will be printed");
 

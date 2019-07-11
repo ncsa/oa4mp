@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.server.util;
 
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.delegation.storage.BaseClient;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.servlet.Notifier;
 import edu.uiuc.ncsa.security.util.mail.MailUtil;
@@ -29,17 +30,21 @@ public class NewClientNotifier extends Notifier implements NewClientListener {
         super(mailUtil, loggingFacade);
     }
 
-    protected Map<String,String> getReplacements(Client client) {
+    protected Map<String,String> getReplacements(BaseClient client) {
         HashMap<String, String> replacements = new HashMap<String, String>();
 
         replacements.put(NAME, client.getName());
         replacements.put(EMAIL, client.getEmail());
-        replacements.put(HOME_URI, client.getHomeUri());
-        replacements.put(FAILURE_URI, client.getErrorUri());
         replacements.put(CREATION_TIME, client.getCreationTS().toString());
         replacements.put(IDENTIFIER, client.getIdentifierString());
-        replacements.put(LIMITED_PROXY, Boolean.toString(client.isProxyLimited()));
         replacements.put(REPLY_TO, client.getEmail());
+        // couple of special cases
+        if(client instanceof Client){
+            Client client2 = (Client)client;
+            replacements.put(HOME_URI, client2.getHomeUri());
+            replacements.put(FAILURE_URI, client2.getErrorUri());
+            replacements.put(LIMITED_PROXY, Boolean.toString(client2.isProxyLimited()));
+        }
         try {
             replacements.put("host", InetAddress.getLocalHost().getCanonicalHostName());
         } catch (UnknownHostException e) {
@@ -55,7 +60,7 @@ public class NewClientNotifier extends Notifier implements NewClientListener {
         if (!mailUtil.isEnabled()) {
             return;
         }
-        Client client = notificationEvent.getClient();
+        BaseClient client = notificationEvent.getClient();
         Map<String,String> replacements = getReplacements(client);
 
         boolean rc = mailUtil.sendMessage(replacements);

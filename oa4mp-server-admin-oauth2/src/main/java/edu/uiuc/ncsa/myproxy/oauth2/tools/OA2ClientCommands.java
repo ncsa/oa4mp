@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oauth2.tools;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2ClientUtils;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.ClientStoreCommands;
 import edu.uiuc.ncsa.security.core.Identifiable;
@@ -16,6 +17,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.codec.digest.DigestUtils;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -377,23 +379,43 @@ public class OA2ClientCommands extends ClientStoreCommands {
         String uris = getInput("enter a comma separated list of callback uris. These must start with https or they will be ignored.", currentUris);
 
         if (!uris.isEmpty()) {
-            LinkedList<String> list = new LinkedList<>();
             StringTokenizer stringTokenizer = new StringTokenizer(uris, ",");
+            LinkedList<String> rawCBs = new LinkedList<>();
             while (stringTokenizer.hasMoreTokens()) {
-                String raw = stringTokenizer.nextToken().trim();
+                rawCBs.add(stringTokenizer.nextToken().trim());
+/*
                 try {
                     URI uri = URI.create(raw);
-                    if (uri.getScheme().toLowerCase().equals("https")) {
+                //    if (uri.getScheme().toLowerCase().equals("https")) {
                         list.add(raw);
-                    } else {
-                        sayi("\"" + raw + "\" rejected -- illegal protocol");
-                    }
+                 //   } else {
+                 //   }
                 } catch (Throwable t) {
                     // do nothing. Just ignore illegal uris.
                     sayi("\"" + raw + "\" rejected -- illegal uri");
                 }
+*/
             }
-            oa2Client.setCallbackURIs(list);
+            LinkedList<String> dudURIs = new LinkedList<>();
+            List<String> foundURIs = null;
+            try {
+            foundURIs =    OA2ClientUtils.createCallbacks(rawCBs, dudURIs);
+            }catch(IOException iox){
+                say("Sorry, there was an error processing the uris:\"" + iox.getMessage() + "\"");
+                return;
+            }
+            if(0 < dudURIs.size()){
+                say(dudURIs.size() + " uris rejected:");
+                for(String dud : dudURIs){
+                    say("  " + dud);
+                }
+            }
+            if(foundURIs == null){
+                // This ***should** be impossible.
+                say("There was an error processing the URIs");
+                return;
+            }
+            oa2Client.setCallbackURIs(foundURIs);
         }
         JSON currentLDAPs = null;
         LDAPConfigurationUtil ldapConfigurationUtil = new LDAPConfigurationUtil();

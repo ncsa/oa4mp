@@ -1,0 +1,17 @@
+{
+ "config": [
+   "XSEDE Configuration 6/7/2019",
+   "This is a configuration for the registered XSEDE client to get information from the",
+   "registry-test LDAP server."
+ ],
+ "isSaved": true,
+ "runtime": {"script":  [
+   "# set('uid',drop('${eppn}','@illinois.edu'));",
+   "if[",
+  "    equals(get('idp'),'https://idp.xsede.org/idp/shibboleth')",
+  "  ]then[",
+  "    set_claim_source('urn:store:/minimal-ldap','uid')",
+  "];"
+ ]},
+ "claims": {"postProcessing": {"script": ["set('sub',get('eppn'));"]}}
+}

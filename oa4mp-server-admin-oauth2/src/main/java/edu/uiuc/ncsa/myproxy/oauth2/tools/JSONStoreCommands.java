@@ -2,29 +2,44 @@ package edu.uiuc.ncsa.myproxy.oauth2.tools;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.server.StoreCommands2;
 import edu.uiuc.ncsa.security.core.Identifiable;
+import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.util.cli.InputLine;
 import edu.uiuc.ncsa.security.util.cli.LineEditor;
+import edu.uiuc.ncsa.security.util.json.Ingester;
 import edu.uiuc.ncsa.security.util.json.JSONEntry;
+import edu.uiuc.ncsa.security.util.json.JSONStore;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * A utility to manage a store of JSON snippets.
  * <p>Created by Jeff Gaynor<br>
  * on 2/21/19 at  7:33 PM
  */
 public class JSONStoreCommands extends StoreCommands2 {
+    protected JSONStore<JSONEntry> getJStore() {
+        return (JSONStore<JSONEntry>) getStore();
+    }
+
     public JSONStoreCommands(MyLoggingFacade logger, String defaultIndent, Store store) {
         super(logger, defaultIndent, store);
     }
 
-    public JSONStoreCommands(MyLoggingFacade logger, Store store) {
-        super(logger, store);
+    Ingester ingester = null;
+
+    public Ingester getIngester() {
+        if (ingester == null) {
+            ingester = new Ingester((getJStore()));
+        }
+        return ingester;
     }
 
     @Override
@@ -46,7 +61,7 @@ public class JSONStoreCommands extends StoreCommands2 {
             }
 
         } else {
-             rawContent = getFromEditor("");
+            rawContent = getFromEditor("");
         }
         jsonEntry.setType(JSONEntry.TYPE_PROCEDURE);
         jsonEntry.setRawContent(rawContent);
@@ -87,11 +102,11 @@ public class JSONStoreCommands extends StoreCommands2 {
             bufferedReader.close();
             return lines.toString();
         } catch (FileNotFoundException e) {
-            if(isDebugOn()) {
+            if (isDebugOn()) {
                 e.printStackTrace();
             }
         } catch (IOException e) {
-            if(isDebugOn()) {
+            if (isDebugOn()) {
                 e.printStackTrace();
             }
         }
@@ -124,10 +139,75 @@ public class JSONStoreCommands extends StoreCommands2 {
             jsonEntry.setType(JSONEntry.TYPE_JSON_ARRAY);
         }
         jsonEntry.setRawContent(rawContent);
-
+        getStore().save(jsonEntry);
         return true;
     }
+    protected void ingesterHelp(){
+            say("ingest -file path -safe");
+            say("      This will ingest a file. To ingest means that the file, which may contain");
+            say("      either a single JSON object or an array of them, will be checked for a");
+            say("      " + Ingester.STORE_ID_TAG + " tag. If present the value associated with this");
+            say("      tag will be used as the id of the object. Note that the tag must be at the top level");
+            say("      of the object. The tag will not be retained in the stored object's JSON.");
+            say("      The default is to overwrite any existing entries in the store. You may specify ");
+            say("      the -safe flag which will not overwrite existing entries.");
+            say("      Note that if the file is a directory, then every file with a suffix of .json will be ingested");
+            say("      You will be prompted though before ingesting a directory.");
+    }
+    /**
+     * Ingest a file directly. The identifier can be included in the JSON and it will be used.
+     * @param inputLine
+     */
 
+    public void ingest(InputLine inputLine){
+        String fileName = inputLine.getNextArgFor("-file");
+        boolean safeModeOff = !inputLine.hasArg("-safe");
+        say("safe mode off = " + safeModeOff);
+        if(showHelp(inputLine)){
+            ingesterHelp();
+            return;
+        }
+        if(fileName == null){
+            say("Sorry, no file");
+            return;
+        }
+        File file = new File(fileName);
+        List<File> files = new ArrayList<>();
+        if(file.isDirectory()){
+            String resp = getInput("Process whole directory? Files ending in .json will be ingested", "y");
+            if(resp.equals("y") ){
+                FileFilter fileFilter = new FileFilter() {
+                    @Override
+                    public boolean accept(File pathname) {
+                        if(!pathname.isDirectory()) {
+                            return pathname.getName().endsWith(".json");
+                        }
+                        return false;
+                    }
+                };
+                File[] fileList = file.listFiles(fileFilter);
+                for(File f : fileList){
+                    files.add(f);
+                }
+            }
+        }else{
+            files.add(file);
+        }
+
+        int totalCount = 0;
+        List<Identifier> ids = new ArrayList<>();
+        for(File f : files){
+            totalCount++;
+            try {
+                 ids.addAll(getIngester().ingest(f, safeModeOff));
+            } catch (IOException e) {
+                say("failed to import " + f.getName() + ", message:\"" + e.getMessage() + "\"");
+                e.printStackTrace();
+            }
+
+        }
+        say("ingested " + ids.size() + " objects from " + totalCount + " files.");
+    }
     @Override
     public boolean update(Identifiable identifiable) {
         info("Starting JSON update for id = " + identifiable.getIdentifierString());
@@ -154,7 +234,6 @@ public class JSONStoreCommands extends StoreCommands2 {
         }
         return false; // default is to bail and do nothing.
     }
-
 
     @Override
     public void extraUpdates(Identifiable identifiable) {

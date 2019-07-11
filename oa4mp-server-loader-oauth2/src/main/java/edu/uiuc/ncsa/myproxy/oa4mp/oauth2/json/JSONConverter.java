@@ -5,7 +5,6 @@ import edu.uiuc.ncsa.security.storage.data.ConversionMap;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
 import edu.uiuc.ncsa.security.util.json.JSONEntry;
-import net.sf.json.JSON;
 
 import java.util.Date;
 
@@ -26,18 +25,11 @@ public class JSONConverter<V extends JSONEntry> extends MapConverter<V> {
     public void toMap(V jsonEntry, ConversionMap<String, Object> map) {
         super.toMap(jsonEntry, map);
         map.put(getJsonStoreKeys().type(), jsonEntry.getType());
-        if (map.containsKey(getJsonStoreKeys().content())) {
-            Object obj = map.get(getJsonStoreKeys().content());
-            if (obj instanceof JSON) {
-                map.put(getJsonStoreKeys().content(), ((JSON) obj).toString(1));
-            }
+        if (jsonEntry.getRawContent() != null) {
+            map.put(getJsonStoreKeys().content(), jsonEntry.getRawContent());
         }
-        if (map.containsKey(getJsonStoreKeys().creationTimpestamp())) {
-            map.put(getJsonStoreKeys().creationTimpestamp(), jsonEntry.getCreationTimestamp());
-
-        } else {
-            map.put(getJsonStoreKeys().creationTimpestamp(), new Date());
-        }
+        map.put(getJsonStoreKeys().creationTimpestamp(), jsonEntry.getCreationTimestamp());
+        map.put(getJsonStoreKeys().lastModified(), jsonEntry.getLastModified());
     }
 
     @Override

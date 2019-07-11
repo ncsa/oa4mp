@@ -63,7 +63,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             throw new InvalidURIException("Invalid redirect URI \"" + givenRedirect + "\"", t);
         }
         //Spec says that the redirect must match one of the ones stored and if not, the request is rejected.
-        OA2ClientCheck.check(st.getClient(), givenRedirect);
+        OA2ClientUtils.check(st.getClient(), givenRedirect);
         // Store the callback the user needs to use for this request, since the spec allows for many.
 
         // If there is a nonce in the initial request, it must be returned as part of the access token

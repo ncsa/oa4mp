@@ -66,6 +66,13 @@ public class OA2AdminRegistrationServlet extends AbstractRegistrationServlet {
     }
 
     @Override
+    protected BaseClient addNewClient(HttpServletRequest request, HttpServletResponse response) throws Throwable {
+        AdminClient client = (AdminClient) setupNewClient(request, response);
+        fireNewClientEvent(client);
+        return client;
+    }
+
+    @Override
     protected void save(BaseClient client) {
         ((OA2SE) getServiceEnvironment()).getAdminClientStore().save((AdminClient) client);
     }

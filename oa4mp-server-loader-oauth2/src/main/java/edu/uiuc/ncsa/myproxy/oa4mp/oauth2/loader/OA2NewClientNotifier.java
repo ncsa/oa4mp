@@ -1,9 +1,11 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.util.NewClientEvent;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.NewClientNotifier;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.delegation.storage.Client;
+import edu.uiuc.ncsa.security.delegation.storage.BaseClient;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfigurationUtil;
 import edu.uiuc.ncsa.security.util.mail.MailUtil;
 
@@ -28,8 +30,13 @@ public class OA2NewClientNotifier extends NewClientNotifier {
     }
 
     @Override
-    protected Map<String, String> getReplacements(Client client) {
+    protected Map<String, String> getReplacements(BaseClient client) {
         Map<String, String> replacements = super.getReplacements(client);
+        if (client instanceof AdminClient) {
+            // Unfortunately, since the servlet has a single new client notifier we have to check
+            // for the instance here and not do anything unless its an OA2Client
+            return replacements;
+        }
         OA2Client oa2Client = (OA2Client) client;
         replacements.remove(FAILURE_URI); // don't need for OA2 clients.
         replacements.put(SCOPES, String.valueOf(oa2Client.getScopes()));
@@ -41,7 +48,7 @@ public class OA2NewClientNotifier extends NewClientNotifier {
             replacements.put(REFRESH_LIFETIME, "n/a");
         }
         replacements.put(SIGN_TOKEN_OK, Boolean.toString(oa2Client.isSignTokens()));
-        if(oa2Client.getLdaps() == null || oa2Client.getLdaps().isEmpty()){
+        if (oa2Client.getLdaps() == null || oa2Client.getLdaps().isEmpty()) {
             replacements.put(LDAP_CONFIGURATION, "(none)");
 
         } else {
@@ -56,5 +63,38 @@ public class OA2NewClientNotifier extends NewClientNotifier {
         return replacements;
     }
 
+    @Override
+    public void fireNewClientEvent(NewClientEvent notificationEvent) {
+        if (!mailUtil.isEnabled()) {
+            return;
+        }
+        BaseClient client = notificationEvent.getClient();
+        Map<String, String> replacements = getReplacements(client);
+
+        boolean rc = false;
+        if (client instanceof AdminClient) {
+            String subject = "New administrative client registration on ${host}";
+            String body = "A new administrative client has requested approved on ${host}\n\n"
+                    + "If you approve this request, you should send a notice\n" +
+                    "to the contact email and include the generated identifier.\n" +
+                    "Please review all of the information below prior to approval.\n\n" +
+                    "Generated identifier: ${identifier}\n" +
+                    "Creation time: ${creationTime}\n" +
+                    "\n" +
+                    "Name: ${name}\n" +
+                    "Contact email: ${email}";
+            rc = mailUtil.sendMessage(subject, body, replacements);
+
+        } else {
+            rc = mailUtil.sendMessage(replacements);
+
+        }
+        if (rc) {
+            loggingFacade.info("sending email notification for client " + client.getIdentifierString());
+        } else {
+            loggingFacade.info("failure sending email notification for client " + client.getIdentifierString());
+        }
+
+    }
 
 }
