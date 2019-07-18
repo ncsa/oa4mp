@@ -16,15 +16,17 @@ public class DSFSTransactionStore<V extends OA4MPServiceTransaction> extends FST
     public DSFSTransactionStore(File file,
                                 IdentifiableProvider<V> idp,
                                 TokenForge tokenForge,
-                                MapConverter<V> cp) {
-        super(file, idp, tokenForge, cp);
+                                MapConverter<V> cp,
+                                boolean removeEmptyFiles) {
+        super(file, idp, tokenForge, cp, removeEmptyFiles);
     }
 
     public DSFSTransactionStore(File storeDirectory,
                                 File indexDirectory,
                                 IdentifiableProvider<V> idp,
                                 TokenForge tokenForge,
-                                MapConverter<V> cp) {
-        super(storeDirectory, indexDirectory, idp, tokenForge, cp);                                                                 }
+                                MapConverter<V> cp,
+                                boolean removeEmptyFiles) {
+        super(storeDirectory, indexDirectory, idp, tokenForge, cp, removeEmptyFiles);                                                                 }
 
 }

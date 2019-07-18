@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.security.delegation.server.issuers.PAIssuer;
 import edu.uiuc.ncsa.security.delegation.server.request.PARequest;
 import edu.uiuc.ncsa.security.delegation.server.request.PAResponse;
 import edu.uiuc.ncsa.security.delegation.servlet.TransactionState;
+import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.util.pkcs.CertUtil;
 import edu.uiuc.ncsa.security.util.pkcs.MyPKCS10CertRequest;
 
@@ -17,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Abstract cert servlet.
+ * Cert servlet, version 2.
  * <p>Created by Jeff Gaynor<br>
  * on 2/7/14 at  1:22 PM
  */
@@ -34,11 +35,13 @@ public abstract class ACS2 extends CRServlet {
 
     protected void doDelegation(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Throwable {
         info("6.a. Starting to process cert request");
-        PARequest paRequest = new PARequest(httpServletRequest, getClient(httpServletRequest));
+        AccessToken accessToken = getAccessToken(httpServletRequest);
+        ServiceTransaction serviceTransaction = (ServiceTransaction) getTransactionStore().get(accessToken);
+        PARequest paRequest = new PARequest(httpServletRequest, serviceTransaction);
         String statusString = "client = " + paRequest.getClient().getIdentifier();
         // The next call will pull the access token off of any parameters. The result may be null if there is
         // no access token.
-        paRequest.setAccessToken(getAccessToken(httpServletRequest));
+        paRequest.setAccessToken(accessToken);
 
         PAResponse paResponse = (PAResponse) getPAI().process(paRequest);
         debug("6.a. " + statusString);

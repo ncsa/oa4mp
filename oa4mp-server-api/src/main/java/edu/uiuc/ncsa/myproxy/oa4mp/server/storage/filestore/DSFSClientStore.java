@@ -15,15 +15,17 @@ import java.io.File;
 public class DSFSClientStore extends FSClientStore<Client> {
     public DSFSClientStore(File f,
                            IdentifiableProviderImpl<Client> idp,
-                           MapConverter<Client> cp) {
-        super(f, idp, cp);
+                           MapConverter<Client> cp,
+                           boolean removeEmptyFiles) {
+        super(f, idp, cp, removeEmptyFiles);
     }
 
     public DSFSClientStore(File storeDirectory,
                            File indexDirectory,
                            IdentifiableProviderImpl<Client> idp,
-                           MapConverter<Client> cp) {
-        super(storeDirectory, indexDirectory, idp, cp);
+                           MapConverter<Client> cp,
+                           boolean removeEmptyFiles) {
+        super(storeDirectory, indexDirectory, idp, cp, removeEmptyFiles);
     }
 
 

@@ -14,12 +14,19 @@ import java.util.List;
  * on 10/11/16 at  1:57 PM
  */
 public class PermissionFileStore<V extends Permission> extends FileStore<V> implements PermissionsStore<V> {
-    public PermissionFileStore(File directory, IdentifiableProvider<V> idp, MapConverter<V> cp) {
-        super(directory, idp, cp);
+    public PermissionFileStore(File directory,
+                               IdentifiableProvider<V> idp,
+                               MapConverter<V> cp,
+                               boolean removeEmptyFiles) {
+        super(directory, idp, cp, removeEmptyFiles);
     }
 
-    public PermissionFileStore(File storeDirectory, File indexDirectory, IdentifiableProvider<V> identifiableProvider, MapConverter<V> converter) {
-        super(storeDirectory, indexDirectory, identifiableProvider, converter);
+    public PermissionFileStore(File storeDirectory,
+                               File indexDirectory,
+                               IdentifiableProvider<V> identifiableProvider,
+                               MapConverter<V> converter,
+                               boolean removeEmptyFiles) {
+        super(storeDirectory, indexDirectory, identifiableProvider, converter, removeEmptyFiles);
     }
 
     @Override

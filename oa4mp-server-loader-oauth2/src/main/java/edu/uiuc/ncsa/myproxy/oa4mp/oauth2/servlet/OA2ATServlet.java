@@ -318,7 +318,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         }
         t.setRefreshTokenValid(false); // this way if it fails at some point we know it is invalid.
         AccessToken at = t.getAccessToken();
-        RTIRequest rtiRequest = new RTIRequest(request, c, at, oa2SE.isOIDCEnabled());
+        RTIRequest rtiRequest = new RTIRequest(request, t, at, oa2SE.isOIDCEnabled());
         RTI2 rtIsuuer = new RTI2(getTF2(), getServiceEnvironment().getServiceAddress());
         RTIResponse rtiResponse = (RTIResponse) rtIsuuer.process(rtiRequest);
         rtiResponse.setSignToken(c.isSignTokens());

@@ -14,15 +14,17 @@ import java.io.File;
 public class DSFSClientApprovalStore extends FSClientApprovalStore<ClientApproval> {
     public DSFSClientApprovalStore(File file,
                                    IdentifiableProviderImpl<ClientApproval> idp,
-                                   MapConverter<ClientApproval> cp) {
-        super(file, idp, cp);
+                                   MapConverter<ClientApproval> cp,
+                                   boolean removeEmptyFiles) {
+        super(file, idp, cp, removeEmptyFiles);
     }
 
     public DSFSClientApprovalStore(File storeDirectory,
                                    File indexDirectory,
                                    IdentifiableProviderImpl<ClientApproval> idp,
-                                   MapConverter<ClientApproval> cp) {
-        super(storeDirectory, indexDirectory, idp, cp);
+                                   MapConverter<ClientApproval> cp,
+                                   boolean removeEmptyFiles) {
+        super(storeDirectory, indexDirectory, idp, cp, removeEmptyFiles);
     }
 
 }

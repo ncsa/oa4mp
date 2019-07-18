@@ -30,7 +30,7 @@ public abstract class AbstractCertServlet extends MyProxyDelegationServlet {
 
     protected void doDelegation(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Throwable {
         info("6.a. Starting to process cert request");
-        PARequest paRequest = new PARequest(httpServletRequest, getClient(httpServletRequest));
+        PARequest paRequest = new PARequest(httpServletRequest, getTransactionByGrantID(httpServletRequest));
         String cc = "client = " + paRequest.getClient().getIdentifier();
         paRequest.setAccessToken(getServiceEnvironment().getTokenForge().getAccessToken(httpServletRequest));
 

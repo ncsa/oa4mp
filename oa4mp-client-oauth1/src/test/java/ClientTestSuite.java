@@ -30,7 +30,7 @@ public class ClientTestSuite extends TestSuite {
         AssetConverter ac = new AssetConverter(keys, ap);
         ClientTestStoreUtil.setMemoryStore(new MemoryAssetStore(ap));
 
-        ClientTestStoreUtil.setFileStore(new FSAssetStore(ClientTestStoreUtil.createTempDir(), ap, ac));
+        ClientTestStoreUtil.setFileStore(new FSAssetStore(ClientTestStoreUtil.createTempDir(), ap, ac, true));
         ClientTestStoreUtil.setPostgresStore(ClientTestStoreUtil.setupPGStore(databaseName, schema, ap, ac, table));
         ClientTestStoreUtil.setMysqlStore(ClientTestStoreUtil.setupMySQLStore(databaseName, schema, ap, ac, table));
 

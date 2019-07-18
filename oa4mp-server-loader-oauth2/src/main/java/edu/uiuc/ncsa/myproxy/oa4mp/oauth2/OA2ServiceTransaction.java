@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.OA4MPServiceTransaction;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
+import edu.uiuc.ncsa.security.oauth_2_0.server.OA2TransactionScopes;
 import net.sf.json.JSONObject;
 
 import java.util.ArrayList;
@@ -16,7 +17,7 @@ import java.util.Date;
  * <p>Created by Jeff Gaynor<br>
  * on 2/28/14 at  1:46 PM
  */
-public class OA2ServiceTransaction extends OA4MPServiceTransaction {
+public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA2TransactionScopes {
     public String FLOW_STATE_KEY = "flow_state";
     public String STATE_KEY = "state";
     public String STATE_COMMENT_KEY = "comment";
@@ -71,6 +72,7 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction {
     }
 
 
+    @Override
     public JSONObject getClaims() {
         if(!getState().containsKey(CLAIMS_KEY)){
             return new JSONObject();
@@ -106,6 +108,7 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction {
      * to anything that needs the scopes (e.g. a {@link edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource}.
      * @return
      */
+    @Override
     public Collection<String> getScopes() {
         if (scopes == null) {
             scopes = new ArrayList<>();

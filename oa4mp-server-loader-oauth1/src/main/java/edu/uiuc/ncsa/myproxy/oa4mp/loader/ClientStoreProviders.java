@@ -66,8 +66,8 @@ public class ClientStoreProviders {
         Provider<? extends Client> clientProvider;
 
         @Override
-        protected DSFSClientStore produce(File dataPath, File indexPath) {
-            return new DSFSClientStore(dataPath, indexPath, (IdentifiableProviderImpl<Client>) clientProvider, converter);
+        protected DSFSClientStore produce(File dataPath, File indexPath, boolean removeEmptyFiles) {
+            return new DSFSClientStore(dataPath, indexPath, (IdentifiableProviderImpl<Client>) clientProvider, converter, removeEmptyFiles);
         }
     }
 

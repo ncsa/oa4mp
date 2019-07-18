@@ -23,7 +23,7 @@ public class InitServlet extends AbstractInitServlet {
     public ServiceTransaction verifyAndGet(IssuerResponse iResponse) throws IOException {
         AGResponse agResponse = (AGResponse) iResponse;
         Map<String, String> params = agResponse.getParameters();
-        ServiceTransaction transaction = newTransaction();
+        ServiceTransaction transaction = agResponse.getServiceTransaction();
         transaction.setAuthorizationGrant(agResponse.getGrant());
         debug("creating transaction for trans id=" + transaction.getIdentifierString());
 

@@ -66,11 +66,11 @@ public class OA2AuthorizedServletUtil {
             String cid = "client=" + client.getIdentifier();
             DebugUtil.info(this, "2.a. Starting a new cert request: " + cid);
             servlet.checkClientApproval(client);
-
-            AGResponse agResponse = (AGResponse) servlet.getAGI().process(new AGRequest(req, client));
-            agResponse.setClient(client);
-            OA2ServiceTransaction transaction = (OA2ServiceTransaction) verifyAndGet(agResponse);
+            AGResponse agResponse = (AGResponse) servlet.getAGI().process(new AGRequest(req, null));
+            OA2ServiceTransaction transaction = createNewTransaction(agResponse.getGrant());
+            agResponse.setServiceTransaction(transaction);
             transaction.setClient(client);
+            transaction = (OA2ServiceTransaction) verifyAndGet(agResponse);
             servlet.getTransactionStore().save(transaction);
             DebugUtil.info(this,"Saved new transaction with id=" + transaction.getIdentifierString());
 
@@ -211,22 +211,25 @@ public class OA2AuthorizedServletUtil {
         if (params.containsKey(STATE)) {
             state = params.get(STATE);
         }
+        OA2ServiceTransaction st = (OA2ServiceTransaction) agResponse.getServiceTransaction();
+
         //Spec says that the redirect must match one of the ones stored and if not, the request is rejected.
         String givenRedirect = params.get(REDIRECT_URI);
-        OA2ClientUtils.check(agResponse.getClient(), givenRedirect);
+        OA2Client client = st.getOA2Client();
+        OA2ClientUtils.check(client, givenRedirect);
         // by this point it has been verified that the redirect uri is valid.
 
         String rawSecret = params.get(CLIENT_SECRET);
         if (rawSecret != null) {
             DebugUtil.info(this,"Client is sending secret in initial request. Though not forbidden by the protocol this is discouraged.");
-            if (!agResponse.getClient().getSecret().equals(rawSecret)) {
+            if (!client.getSecret().equals(rawSecret)) {
                 DebugUtil.info(this,"And for what it is worth, the client sent along an incorrect secret too...");
             }
         }
         String nonce = params.get(NONCE);
         // FIX for OAUTH-180. Server must support clients that do not use a nonce. Just log it and rock on.
         if (nonce == null || nonce.length() == 0) {
-            DebugUtil.info(this,"No nonce in initial request for " + ((AGResponse) iResponse).getClient().getIdentifierString());
+            DebugUtil.info(this,"No nonce in initial request for " + client.getIdentifierString());
         } else {
             NonceHerder.putNonce(nonce); // Don't check it, just store it and return it later.
         }
@@ -237,8 +240,8 @@ public class OA2AuthorizedServletUtil {
         }
 
 
-        OA2ServiceTransaction st = createNewTransaction(agResponse.getGrant());
-        st.setClient(agResponse.getClient());
+        //OA2ServiceTransaction st = createNewTransaction(agResponse.getGrant());
+        //st.setClient(agResponse.getClient());
         DebugUtil.info(this,"Created new unsaved transaction with id=" + st.getIdentifierString());
         Collection<String> scopes = resolveScopes(st, params, state, givenRedirect);
 

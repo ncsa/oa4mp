@@ -11,12 +11,19 @@ import java.io.File;
  * on 10/20/16 at  12:51 PM
  */
 public class AdminClientFS<V extends AdminClient> extends FileStore<V> implements AdminClientStore<V> {
-    public AdminClientFS(File directory, IdentifiableProvider<V> idp, MapConverter<V> cp) {
-        super(directory, idp, cp);
+    public AdminClientFS(File directory,
+                         IdentifiableProvider<V> idp,
+                         MapConverter<V> cp,
+                         boolean removeEmptyFiles) {
+        super(directory, idp, cp, removeEmptyFiles);
     }
 
-    public AdminClientFS(File storeDirectory, File indexDirectory, IdentifiableProvider<V> identifiableProvider, MapConverter<V> converter) {
-        super(storeDirectory, indexDirectory, identifiableProvider, converter);
+    public AdminClientFS(File storeDirectory,
+                         File indexDirectory,
+                         IdentifiableProvider<V> identifiableProvider,
+                         MapConverter<V> converter,
+                         boolean removeEmptyFiles) {
+        super(storeDirectory, indexDirectory, identifiableProvider, converter, removeEmptyFiles);
 
     }
 

@@ -80,9 +80,12 @@
     <tr>
         <td style="vertical-align: top;">debug</td>
         <td style="vertical-align: top;">N</td>
-        <td style="vertical-align: top;">"false"</td>
+        <td style="vertical-align: top;">"warn"</td>
         <td style="vertical-align: top;">Enable debugging for this service. This will be written to the Tomcat logs and
-            might be rather verbose. Use it only if you need it.
+            might be rather verbose. Use it only if you need it. The levels supported are (in order of
+            increasin verbosity) "off", "info", "warn", "error", "severe", "trace". Setting debug to
+            "trace" will dump out virtually everything and give a running account of the operation of the
+            service. This may be very, very large.
         </td>
     </tr>
     <tr>

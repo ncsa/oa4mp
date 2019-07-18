@@ -15,12 +15,19 @@ import java.io.IOException;
  * on 1/28/13 at  1:14 PM
  */
 public class FSAssetStore extends FileStore<Asset> implements AssetStore {
-    public FSAssetStore(File file, IdentifiableProvider idp, MapConverter cp) {
-        super(file, idp, cp);
+    public FSAssetStore(File file,
+                        IdentifiableProvider idp,
+                        MapConverter cp,
+                        boolean removeEmptyFiles) {
+        super(file, idp, cp, removeEmptyFiles);
     }
 
-    public FSAssetStore(File storeDirectory, File indexDirectory, IdentifiableProvider identifiableProvider, MapConverter converter) {
-        super(storeDirectory, indexDirectory, identifiableProvider, converter);
+    public FSAssetStore(File storeDirectory,
+                        File indexDirectory,
+                        IdentifiableProvider identifiableProvider,
+                        MapConverter converter,
+                        boolean removeEmptyFiles) {
+        super(storeDirectory, indexDirectory, identifiableProvider, converter, removeEmptyFiles);
     }
 
     @Override

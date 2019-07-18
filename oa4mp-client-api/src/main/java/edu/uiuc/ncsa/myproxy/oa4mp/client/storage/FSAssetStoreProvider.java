@@ -29,7 +29,7 @@ public class FSAssetStoreProvider extends FSProvider<FSAssetStore> {
        }
 
        @Override
-       protected FSAssetStore produce(File dataPath, File indexPath) {
-           return new FSAssetStore(dataPath, indexPath, assetProvider, converter);
+       protected FSAssetStore produce(File dataPath, File indexPath, boolean removeEmptyFiles) {
+           return new FSAssetStore(dataPath, indexPath, assetProvider, converter, removeEmptyFiles);
        }
 }

@@ -20,8 +20,9 @@ public class OA2FSTStore<V extends OA2ServiceTransaction> extends DSFSTransactio
     public OA2FSTStore(File storeDirectory, File indexDirectory,
                        IdentifiableProvider<V> idp,
                        TokenForge tokenForge,
-                       MapConverter<V> cp) {
-        super(storeDirectory, indexDirectory, idp, tokenForge, cp);
+                       MapConverter<V> cp,
+                       boolean removeEmptyFiles) {
+        super(storeDirectory, indexDirectory, idp, tokenForge, cp, removeEmptyFiles);
     }
 
     @Override

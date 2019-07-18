@@ -66,8 +66,8 @@ public class AdminClientStoreProviders {
 
 
         @Override
-        protected AdminClientFS produce(File dataPath, File indexPath) {
-            return new AdminClientFS(dataPath, indexPath, getAdminClientProvider(), getAdminClientConverter());
+        protected AdminClientFS produce(File dataPath, File indexPath, boolean removeEmptyFiles) {
+            return new AdminClientFS(dataPath, indexPath, getAdminClientProvider(), getAdminClientConverter(), removeEmptyFiles);
         }
 
     }

@@ -41,16 +41,16 @@ public abstract class AbstractInitServlet extends MyProxyDelegationServlet{
         */
        protected ServiceTransaction doDelegation(HttpServletRequest req, HttpServletResponse resp) throws Throwable {
            Client client = getClient(req);
-
+            ServiceTransaction transaction = newTransaction();
+           transaction.setClient(client);
            try {
                String cid = "client=" + client.getIdentifier();
                info("2.a. Starting a new cert request: " + cid);
                checkClientApproval(client);
 
-               AGResponse agResponse = (AGResponse) getAGI().process(new AGRequest(req, client));
-               agResponse.setClient(client);
-               ServiceTransaction transaction = verifyAndGet(agResponse);
-               transaction.setClient(client);
+               AGResponse agResponse = (AGResponse) getAGI().process(new AGRequest(req, transaction));
+               agResponse.setServiceTransaction(transaction);
+               transaction = verifyAndGet(agResponse);
                getTransactionStore().save(transaction);
                info("Saved new transaction with id=" + transaction.getIdentifierString());
 

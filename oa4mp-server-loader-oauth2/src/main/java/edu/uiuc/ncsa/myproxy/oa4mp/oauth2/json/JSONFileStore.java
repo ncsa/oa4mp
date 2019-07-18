@@ -14,8 +14,11 @@ import java.util.Date;
  * on 2/20/19 at  10:13 AM
  */
 public class JSONFileStore<V extends JSONEntry> extends FileStore<V> implements JSONStore<V> {
-    public JSONFileStore(File storeDirectory, File indexDirectory, IdentifiableProvider<V> identifiableProvider, MapConverter<V> converter) {
-        super(storeDirectory, indexDirectory, identifiableProvider, converter);
+    public JSONFileStore(File storeDirectory,
+                         File indexDirectory,
+                         IdentifiableProvider<V> identifiableProvider,
+                         MapConverter<V> converter, boolean removeEmptyFiles) {
+        super(storeDirectory, indexDirectory, identifiableProvider, converter, removeEmptyFiles);
     }
 
     @Override

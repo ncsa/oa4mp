@@ -9,6 +9,7 @@ import edu.uiuc.ncsa.security.delegation.servlet.TransactionState;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.delegation.token.Verifier;
+import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -29,15 +30,20 @@ public abstract class AbstractAccessTokenServlet extends MyProxyDelegationServle
         info("5.a. Starting access token exchange");
         Verifier v = getServiceEnvironment().getTokenForge().getVerifier(httpServletRequest);
         AuthorizationGrant ag = getServiceEnvironment().getTokenForge().getAuthorizationGrant(httpServletRequest);
-
-        ATRequest atRequest = new ATRequest(httpServletRequest, client);
+        ServiceTransaction transaction = getServiceEnvironment().getTransactionStore().get(ag);
+        if(transaction == null){
+            String message = "No transaction found for grant \"" + ag  +"\"";
+            ServletDebugUtil.trace(this,message);
+            throw new ServletException("No transaction found for grant \"" + ag  +"\"");
+        }
+        ATRequest atRequest = new ATRequest(httpServletRequest, transaction);
 
         atRequest.setVerifier(v);
         atRequest.setAuthorizationGrant(ag);
         atRequest.setExpiresIn(DateUtils.MAX_TIMEOUT); // FIXME!! make this configurable??
         ATResponse atResp = (ATResponse) getATI().process(atRequest);
 
-        ServiceTransaction transaction = verifyAndGet(atResp);
+        transaction = verifyAndGet(atResp);
         String cc = "client=" + transaction.getClient();
         info("5.a. got access token " + cc);
 

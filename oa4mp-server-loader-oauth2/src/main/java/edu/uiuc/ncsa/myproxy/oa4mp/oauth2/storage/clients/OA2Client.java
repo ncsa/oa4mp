@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.delegation.storage.BaseClient;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
+import edu.uiuc.ncsa.security.oauth_2_0.server.OA2ClientScopes;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
 import net.sf.json.JSONObject;
 
@@ -17,7 +18,7 @@ import static edu.uiuc.ncsa.security.core.util.BeanUtils.checkEquals;
  * <p>Created by Jeff Gaynor<br>
  * on 3/14/14 at  11:04 AM
  */
-public class OA2Client extends Client {
+public class OA2Client extends Client implements OA2ClientScopes {
     @Override
     public OA2Client clone() {
         OA2Client client = new OA2Client(getIdentifier());

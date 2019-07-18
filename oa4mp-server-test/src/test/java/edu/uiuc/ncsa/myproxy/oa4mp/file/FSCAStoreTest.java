@@ -42,7 +42,7 @@ public class FSCAStoreTest extends CAStoreTest {
         final ClientApprovalProvider caProvider = new ClientApprovalProvider();
         try {
             // Make sure that if someone creates a bad one, it blows up in the constructor.
-             x = new FSClientApprovalStore(null, null, null, null) {
+             x = new FSClientApprovalStore(null, null, null, null, true) {
                        @Override
                        public Object put(Object key, Object value) {
                            return null;
@@ -53,7 +53,7 @@ public class FSCAStoreTest extends CAStoreTest {
         } catch (MyConfigurationException xx) {
             assert true;
         }
-        x = new DSFSClientApprovalStore(storeDirectory, indexDirectory,  caProvider,  new ClientApproverConverter(caProvider));
+        x = new DSFSClientApprovalStore(storeDirectory, indexDirectory,  caProvider,  new ClientApproverConverter(caProvider), true);
         try {
             x.create(); // should bomb here.
             assert false;

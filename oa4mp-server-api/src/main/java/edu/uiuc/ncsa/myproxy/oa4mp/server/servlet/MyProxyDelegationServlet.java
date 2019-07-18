@@ -172,14 +172,25 @@ public abstract class MyProxyDelegationServlet extends EnvServlet implements Tra
      * @return
      */
     public Client getClient(HttpServletRequest req) {
-        if(req.getParameter(CONST(CONSUMER_KEY)) == null){
-            throw new UnknownClientException("Error: no client identifier has been supplied. Have you registered this client with the service?");
-        }
-        Identifier id = BasicIdentifier.newID(req.getParameter(CONST(CONSUMER_KEY)));
-        return getClient(id);
+        return getClient(getGrantIDFromRequest(req));
     }
 
+    protected ServiceTransaction getTransactionByGrantID(HttpServletRequest request) throws IOException {
+        Identifier id = getGrantIDFromRequest(request);
+        ServletDebugUtil.trace(this, "getting transaction from id \"" + id + "\"");
+        ServiceTransaction t= (ServiceTransaction) getTransactionStore().get(id);
+        ServletDebugUtil.trace(this, "got transaction \"" + t + "\"");
 
+        return t;
+    }
+    
+   protected Identifier getGrantIDFromRequest(HttpServletRequest req){
+       if(req.getParameter(CONST(CONSUMER_KEY)) == null){
+           throw new UnknownClientException("Error: no client identifier has been supplied. Have you registered this client with the service?");
+       }
+       return BasicIdentifier.newID(req.getParameter(CONST(CONSUMER_KEY)));
+
+   }
     public Client getClient(Identifier identifier) {
         if (identifier == null) {
             throw new UnknownClientException("no client id");
