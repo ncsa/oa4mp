@@ -1,7 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.RequestFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.admin.AdminClientServer;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.attributes.AttributeServer;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.client.ClientServer;
@@ -23,6 +22,7 @@ import edu.uiuc.ncsa.security.delegation.storage.BaseClient;
 import net.sf.json.JSONObject;
 import org.apache.commons.codec.digest.DigestUtils;
 
+import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.RequestFactory.createRequest;
 import static edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.SATFactory.*;
 
 /**
@@ -185,7 +185,7 @@ public class ManagerFacade {
 
     protected Response process(AdminClient subject, OA2Client target, ActionAdd actionAdd, JSONObject rawJSON) {
         if (getTypeValue(rawJSON) == TYPE_PERMISSION_VALUE) {
-            return getPermissionServer().process(RequestFactory.createRequest(subject,
+            return getPermissionServer().process(createRequest(subject,
                     new TypePermission(),
                     actionAdd, target,
                     SATFactory.getContent(rawJSON)
@@ -198,7 +198,7 @@ public class ManagerFacade {
 
     protected Response process(AdminClient subject, OA2Client target, ActionApprove actionApprove, JSONObject rawJSON) {
         if (getTypeValue(rawJSON) == TYPE_CLIENT_VALUE) {
-            return getClientServer().process(RequestFactory.createRequest(subject, new TypeClient(), actionApprove, target,
+            return getClientServer().process(createRequest(subject, new TypeClient(), actionApprove, target,
                     SATFactory.getContent(rawJSON)));
         }
         throw new IllegalArgumentException("Unknown type.");
@@ -206,8 +206,12 @@ public class ManagerFacade {
 
     protected Response process(AdminClient subject, OA2Client target, ActionCreate actionCreate, JSONObject rawJSON) {
         if (getTypeValue(rawJSON) == TYPE_CLIENT_VALUE) {
-            return getClientServer().process(RequestFactory.createRequest(subject, new TypeClient(), actionCreate, target,
-                    SATFactory.getContent(rawJSON)));
+            return getClientServer().process(createRequest(subject,
+                    new TypeClient(),
+                    actionCreate,
+                    target,
+                    SATFactory.getContent(rawJSON))
+            );
 
         }
 
@@ -222,21 +226,21 @@ public class ManagerFacade {
 
     protected Response process(AdminClient subject, OA2Client target, ActionGet actionGet, JSONObject rawJSON) {
         if (getTypeValue(rawJSON) == TYPE_ATTRIBUTE_VALUE) {
-            return getAttributeServer().process(RequestFactory.createRequest(subject, new TypeAttribute(), actionGet, target,
+            return getAttributeServer().process(createRequest(subject, new TypeAttribute(), actionGet, target,
                     SATFactory.getContent(rawJSON)));
         }
 
         if (getTypeValue(rawJSON) == TYPE_CLIENT_VALUE) {
-            return getClientServer().process(RequestFactory.createRequest(subject, new TypeClient(), actionGet, target,
+            return getClientServer().process(createRequest(subject, new TypeClient(), actionGet, target,
                     SATFactory.getContent(rawJSON)));
         }
 
         if (getTypeValue(rawJSON) == TYPE_ADMIN_VALUE) {
-            return getAdminClientServer().process(RequestFactory.createRequest(subject, new TypeAdmin(), actionGet, target,
+            return getAdminClientServer().process(createRequest(subject, new TypeAdmin(), actionGet, target,
                     SATFactory.getContent(rawJSON)));
         }
         if (getTypeValue(rawJSON) == TYPE_PERMISSION_VALUE) {
-            return getPermissionServer().process(RequestFactory.createRequest(subject, new TypeClient(), actionGet, target,
+            return getPermissionServer().process(createRequest(subject, new TypeClient(), actionGet, target,
                     SATFactory.getContent(rawJSON)));
         }
         throw new IllegalArgumentException("Unknown type.");
@@ -244,7 +248,7 @@ public class ManagerFacade {
 
     protected Response process(AdminClient subject, OA2Client target, ActionList actionList, JSONObject rawJSON) {
         if (getTypeValue(rawJSON) == TYPE_PERMISSION_VALUE) {
-            return getPermissionServer().process(RequestFactory.createRequest(subject, new TypePermission(), actionList, target,
+            return getPermissionServer().process(createRequest(subject, new TypePermission(), actionList, target,
                     SATFactory.getContent(rawJSON)));
         }
 
@@ -254,7 +258,7 @@ public class ManagerFacade {
 
     protected Response process(AdminClient subject, OA2Client target, ActionSet actionSet, JSONObject rawJSON) {
         if (getTypeValue(rawJSON) == TYPE_ATTRIBUTE_VALUE) {
-            return getAttributeServer().process(RequestFactory.createRequest(subject, new TypeAttribute(), actionSet, target,
+            return getAttributeServer().process(createRequest(subject, new TypeAttribute(), actionSet, target,
                     SATFactory.getContent(rawJSON)));
         }
         throw new IllegalArgumentException("Unknown type.");
@@ -263,15 +267,15 @@ public class ManagerFacade {
 
     protected Response process(AdminClient subject, OA2Client target, ActionRemove actionRemove, JSONObject rawJSON) {
         if (getTypeValue(rawJSON) == TYPE_ATTRIBUTE_VALUE) {
-            return getAttributeServer().process(RequestFactory.createRequest(subject, new TypeAttribute(), actionRemove, target,
+            return getAttributeServer().process(createRequest(subject, new TypeAttribute(), actionRemove, target,
                     SATFactory.getContent(rawJSON)));
         }
         if (getTypeValue(rawJSON) == TYPE_CLIENT_VALUE) {
-            return getClientServer().process(RequestFactory.createRequest(subject, new TypeClient(), actionRemove, target,
+            return getClientServer().process(createRequest(subject, new TypeClient(), actionRemove, target,
                     SATFactory.getContent(rawJSON)));
         }
         if (getTypeValue(rawJSON) == TYPE_PERMISSION_VALUE) {
-            return getPermissionServer().process(RequestFactory.createRequest(subject, new TypePermission(), actionRemove, target,
+            return getPermissionServer().process(createRequest(subject, new TypePermission(), actionRemove, target,
                     SATFactory.getContent(rawJSON)));
         }
 
@@ -281,7 +285,7 @@ public class ManagerFacade {
 
     protected Response process(AdminClient subject, OA2Client target, ActionUnapprove actionUnapprove, JSONObject rawJSON) {
         if (getTypeValue(rawJSON) == TYPE_CLIENT_VALUE) {
-            return getClientServer().process(RequestFactory.createRequest(subject, new TypeClient(), actionUnapprove, target,
+            return getClientServer().process(createRequest(subject, new TypeClient(), actionUnapprove, target,
                     SATFactory.getContent(rawJSON)));
         }
         throw new IllegalArgumentException("Unknown type.");

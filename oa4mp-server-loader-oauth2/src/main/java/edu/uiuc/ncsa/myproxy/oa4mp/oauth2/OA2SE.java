@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.BasicClaimsSourceImpl;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.CMConfigs;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.MyProxyFacadeProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironmentImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
@@ -66,7 +67,8 @@ public class OA2SE extends ServiceEnvironmentImpl {
                  String issuer,
                  boolean utilServletEnabled,
                  boolean oidcEnabled,
-                 Provider<JSONStore> jsonStoreProvider) {
+                 Provider<JSONStore> jsonStoreProvider,
+                 CMConfigs cmConfigs) {
         super(logger,
                 mfp,
                 tsp,
@@ -116,6 +118,13 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.utilServletEnabled = utilServletEnabled;
         this.oidcEnabled = oidcEnabled;
         this.jsonStoreProvider = jsonStoreProvider;
+        this.cmConfigs = cmConfigs;
+    }
+
+    CMConfigs cmConfigs = null;
+
+    public CMConfigs getCmConfigs() {
+        return cmConfigs;
     }
 
     protected Provider<JSONStore> jsonStoreProvider;

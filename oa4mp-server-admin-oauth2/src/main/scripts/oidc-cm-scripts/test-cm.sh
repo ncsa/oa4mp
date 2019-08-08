@@ -20,11 +20,13 @@
 #
 # response is a JSON object with the id and secret.
 
-DEFAULT_SERVER=https://locahost/oauth2/oidc-cm
+# This next is for debugging and sets the environment
+
+# DEFAULT_SERVER=https://locahost/oauth2/oidc-cm
 # export SERVER=http://localhost:44444/oauth2/oidc-cm
-export SERVER=https://polod.ncsa.illinois.edu/oauth2/oidc-cm
-export ADMIN_ID=polod:test-client
-export ADMIN_SECRET="mairzy doats and dozey doats"
+#export SERVER=https://polod.ncsa.illinois.edu/oauth2/oidc-cm
+#export ADMIN_ID=polod:test-client
+#export ADMIN_SECRET="mairzy doats and dozey doats"
 # On my private install...
 # export ADMIN_ID=my:adminclient/42
 # export ADMIN_SECRET="baby shark do do do-do do"

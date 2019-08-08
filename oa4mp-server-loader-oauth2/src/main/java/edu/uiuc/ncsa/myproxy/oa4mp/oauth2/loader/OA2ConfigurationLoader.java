@@ -4,6 +4,9 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.BasicClaimsSourceImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.LDAPClaimsSource;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.CMConfig;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.CMConfigs;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.ClientManagementConstants;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.json.JSONStoreProviders;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.json.MultiJSONStoreProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.*;
@@ -54,6 +57,7 @@ import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSourceConfiguration;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfigurationUtil;
+import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPoolProvider;
@@ -63,8 +67,10 @@ import org.apache.commons.configuration.tree.ConfigurationNode;
 
 import javax.inject.Provider;
 import java.io.File;
+import java.net.URI;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.OA4MPIdentifierProvider.TRANSACTION_ID;
 import static edu.uiuc.ncsa.security.core.configuration.Configurations.*;
@@ -126,7 +132,8 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     // getMLDAP(),
                     isUtilServerEnabled(),
                     isOIDCEnabled(),
-                    getMultiJSONStoreProvider());
+                    getMultiJSONStoreProvider(),
+                    getCmConfigs());
             if (getClaimSource() instanceof BasicClaimsSourceImpl) {
                 ((BasicClaimsSourceImpl) getClaimSource()).setOa2SE((OA2SE) se);
             }
@@ -168,8 +175,81 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         return utilServerEnabled;
 
     }
+
+    protected CMConfigs createDefaultCMConfig() {
+        CMConfigs cmConfigs = new CMConfigs();
+        String serverAddress = getServiceAddress().toString();
+        if (!serverAddress.endsWith("/")) {
+            serverAddress = serverAddress + "/";
+        }
+        CMConfig tempCfg = new CMConfig(ClientManagementConstants.OA4MP_VALUE,
+                URI.create(serverAddress + ClientManagementConstants.DEFAULT_OA4MP_ENDPOINT),
+                true);
+        cmConfigs.put(tempCfg);
+        tempCfg = new CMConfig(ClientManagementConstants.RFC_7591_VALUE,
+                URI.create(serverAddress + ClientManagementConstants.DEFAULT_RFC7591_ENDPOINT),
+                true);
+        cmConfigs.put(tempCfg);
+        tempCfg = new CMConfig(ClientManagementConstants.RFC_7592_VALUE,
+                URI.create(serverAddress + ClientManagementConstants.DEFAULT_RFC7591_ENDPOINT),
+                true);
+
+        cmConfigs.put(tempCfg);
+        return cmConfigs;
+    }
+
+    /*
+    A typical entry we are parsing looks like this
+
+     <clientManagement>
+        <api protocol="rfc7951" enable="true" endpoint="oidc-cm" url="full URL"/>
+        <api protocol="rfc7952" enable="true" endpoint="oidc-cm" url="full URL"/>
+        <api protocol="oa4mp" enable="true"  url="https://foo.bar/oauth2/clients"/>
+     </clientManagement>
+
+     Note that EITHER the endpoint is given or the url is given. The configuration object
+     only has URLs and they are resolved here from the server address.
+     */
+    public CMConfigs getCmConfigs() {
+        if (cmConfigs == null) {
+            List kids = cn.getChildren(ClientManagementConstants.CLIENT_MANAGEMENT_TAG);
+            if (kids == null || kids.isEmpty()) {
+                cmConfigs = createDefaultCMConfig();
+                return cmConfigs; // missing element (which is fine)  so jump out...
+            }
+            String serverAddress = getServiceAddress().toString();
+            // need to loop through all kids.
+            for (Object object : kids) {
+                ConfigurationNode sn = (ConfigurationNode) object;
+                if (sn.getName().equals(ClientManagementConstants.API_TAG)) {
+                    try {
+                        CMConfig cfg = CMConfigs.createConfigEntry(
+                                getFirstAttribute(sn, ClientManagementConstants.PROTOCOL_ATTRIBUTE),
+                                serverAddress,
+                                getFirstAttribute(sn, ClientManagementConstants.ENDPOINT_ATTRIBUTE),
+                                getFirstAttribute(sn, ClientManagementConstants.FULL_URL_ATTRIBUTE),
+                                getFirstAttribute(sn, ClientManagementConstants.ENDPOINT_ATTRIBUTE)
+                        );
+                        cmConfigs.put(cfg);
+                    }catch(Throwable t){
+                        ServletDebugUtil.warn(this,  "error loading client management api entry \"" + t.getMessage() + "\"");
+                    }
+                }
+            }
+            if(cmConfigs.isEmpty()){
+                cmConfigs = createDefaultCMConfig();
+                ServletDebugUtil.warn(this, "Warning: none of the entries in the client managment element parsed. Using defaults...");
+
+            }
+
+        }
+        return cmConfigs;
+    }
+
+    CMConfigs cmConfigs;
+
     public MultiJSONStoreProvider getMultiJSONStoreProvider() {
-        if(multiJSONStoreProvider == null){
+        if (multiJSONStoreProvider == null) {
 
             multiJSONStoreProvider = new MultiJSONStoreProvider(cn,
                     isDefaultStoreDisabled(),
@@ -186,7 +266,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         return multiJSONStoreProvider;
     }
 
-    protected MultiJSONStoreProvider multiJSONStoreProvider ;
+    protected MultiJSONStoreProvider multiJSONStoreProvider;
 
 
     protected MultiDSAdminClientStoreProvider macp;
@@ -261,7 +341,6 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
     public Provider<ClientStore> getClientStoreProvider() {
         return getCSP();
     }
-
 
 
     @Override
@@ -361,21 +440,23 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         }
         return maxClientRefreshTokenLifetime;
     }
+
     Boolean oidcEnabled = null;
-    public boolean isOIDCEnabled(){
-                if(oidcEnabled == null){
-                    String x = getFirstAttribute(cn, OIDC_SUPPORT_ENABLED);
-                 if(x == null){
-                     oidcEnabled = Boolean.TRUE; // default.
-                 }else{
-                 try{
+
+    public boolean isOIDCEnabled() {
+        if (oidcEnabled == null) {
+            String x = getFirstAttribute(cn, OIDC_SUPPORT_ENABLED);
+            if (x == null) {
+                oidcEnabled = Boolean.TRUE; // default.
+            } else {
+                try {
                     oidcEnabled = Boolean.valueOf(x);
-                 }catch(Throwable t){
-                     info("COuld not parse OIDC enabled flag, setting default to true");
-                     oidcEnabled = Boolean.TRUE;
-                 }
-                 }
+                } catch (Throwable t) {
+                    info("COuld not parse OIDC enabled flag, setting default to true");
+                    oidcEnabled = Boolean.TRUE;
                 }
+            }
+        }
         return oidcEnabled;
     }
 
@@ -654,7 +735,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         return new Provider<ATIssuer>() {
             @Override
             public ATIssuer get() {
-                return new ATI2(getTokenForgeProvider().get(), getServiceAddress(),isOIDCEnabled());
+                return new ATI2(getTokenForgeProvider().get(), getServiceAddress(), isOIDCEnabled());
             }
         };
     }
@@ -664,7 +745,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         return new Provider<PAIssuer>() {
             @Override
             public PAIssuer get() {
-                return new PAI2(getTokenForgeProvider().get(), getServiceAddress(),isOIDCEnabled());
+                return new PAI2(getTokenForgeProvider().get(), getServiceAddress(), isOIDCEnabled());
             }
         };
     }

@@ -1,0 +1,5 @@
+{"redirect_uris":
+    ["https://client.example.org/callback",
+     "https://client.example.org/callback2"],
+  "client_name":"New Test name"
+}
