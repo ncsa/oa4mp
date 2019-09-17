@@ -19,6 +19,8 @@ import java.util.Vector;
 import static edu.uiuc.ncsa.security.util.cli.CommonCommands.BATCH_MODE_FLAG;
 
 /**
+ * Top-level class for the JWT and JWK command line utilities. This lets you create keys, create id tokens
+ * sign them, verify them etc. 
  * <p>Created by Jeff Gaynor<br>
  * on 5/6/19 at  2:37 PM
  */
@@ -116,16 +118,11 @@ public class JWKCLI extends ConfigurableCommandsImpl {
 
          // In order of importance for command line flags.
 
-         if (argLine.hasArg(SHORT_HELP_FLAG) || argLine.hasArg(LONG_HELP_FLAG)) {
-             JWKCLI jwkcli = new JWKCLI(null); // no logging, just grab the help and exit;
-             jwkcli.useHelp();
-             return;
-         }
 
          boolean isVerbose = argLine.hasArg(SHORT_VERBOSE_FLAG) || argLine.hasArg(LONG_VERBOSE_FLAG);
          // again, a batch file means every line in the file is a separate comamand, aside from comments
          boolean hasBatchFile = argLine.hasArg(JWKUtilCommands.BATCH_FILE_MODE_FLAG);
-         // Batch mode means that the command line is interpreted as a single command. This execeuts one command, batch mode does many.
+         // Batch mode means that the command line is interpreted as a single command. This executes one command, batch mode does many.
          boolean isBatchMode = argLine.hasArg(JWKUtilCommands.BATCH_MODE_FLAG);
         boolean isNoOuput = (argLine.hasArg(SHORT_NO_OUTPUT_FLAG) || argLine.hasArg(LONG_NO_OUTPUT_FLAG));
 
@@ -137,32 +134,42 @@ public class JWKCLI extends ConfigurableCommandsImpl {
              myLoggingFacade = loggerProvider.get(); // if verbose
          }
 
-         JWKCLI sciTokensCLI = new JWKCLI(myLoggingFacade);
-         sciTokensCLI.useHelp();
-         JWKUtilCommands sciTokensCommands = new JWKUtilCommands(myLoggingFacade);
-         sciTokensCommands.setVerbose(isVerbose);
-         sciTokensCommands.setPrintOuput(!isNoOuput);
+         JWKCLI jwkcli = new JWKCLI(myLoggingFacade);
+         if(!(isBatchMode || hasBatchFile)) {
+             // if not batch mode, print startup banner && help.
+             jwkcli.useHelp();
+         }
+         JWKUtilCommands jwkUtilCommands = new JWKUtilCommands(myLoggingFacade);
+         jwkUtilCommands.setVerbose(isVerbose);
+         jwkUtilCommands.setPrintOuput(!isNoOuput);
          try {
-             CLIDriver cli = new CLIDriver(sciTokensCommands);
+             CLIDriver cli = new CLIDriver(jwkUtilCommands);
              // Easy case -- no arguments, so just start.
              if (args == null || args.length == 0) {
-                 sciTokensCLI.about();
+                 jwkcli.about();
                  cli.start();
                  return;
              }
-             sciTokensCommands.setBatchMode(false);
-             if (argLine.hasArg(JWKUtilCommands.BATCH_FILE_MODE_FLAG)) {
-                 sciTokensCLI.processBatchFile(argLine.getNextArgFor(JWKUtilCommands.BATCH_FILE_MODE_FLAG), cli);
+             jwkUtilCommands.setBatchMode(false);
+             if (hasBatchFile) {
+                 jwkcli.processBatchFile(argLine.getNextArgFor(JWKUtilCommands.BATCH_FILE_MODE_FLAG), cli);
                  return;
              }
-             if (argLine.hasArg(BATCH_MODE_FLAG)) {
-                 sciTokensCLI.processBatchModeCommand(cli, args);
+             if (isBatchMode) {
+                 jwkcli.processBatchModeCommand(cli, args);
+                 return;
              }
              // alternately, parse the arguments
+             // check for help first
+             if (argLine.hasArg(SHORT_HELP_FLAG) || argLine.hasArg(LONG_HELP_FLAG)) {
+                 jwkcli.useHelp();
+                 return;
+             }
+
              String cmdLine = args[0];
              for (int i = 1; i < args.length; i++) {
                  if (args[i].equals(BATCH_MODE_FLAG)) {
-                     sciTokensCommands.setBatchMode(true);
+                     jwkUtilCommands.setBatchMode(true);
                  } else {
                      // don't keep the batch flag in the final arguments.
                      cmdLine = cmdLine + " " + args[i];
@@ -171,7 +178,8 @@ public class JWKCLI extends ConfigurableCommandsImpl {
              cli.execute(cmdLine);
 
          } catch (Throwable t) {
-             if (sciTokensCommands.isBatchMode()) {
+             
+             if (jwkUtilCommands.isBatch()) {
                  System.exit(1);
              }
              t.printStackTrace();
@@ -189,17 +197,17 @@ public class JWKCLI extends ConfigurableCommandsImpl {
      }
 
      protected void processBatchModeCommand(CLIDriver cli, String[] args) throws Exception {
-         JWKUtilCommands sciTokensCommands = getJWKCommands(cli);
-         if (sciTokensCommands == null) {
+         JWKUtilCommands jwkCommands = getJWKCommands(cli);
+         if (jwkCommands == null) {
              throw new NFWException("Error: No JWKUtilCommands configured, hence no logging.");
          }
-         sciTokensCommands.setBatchMode(true);
+         jwkCommands.setBatchMode(true);
          // need to tease out the intended line to execute. The arg line looks like
-         // sciTokens -batch A B C
+         // jwkutil -batch A B C
          // so we need to drop the name of the function and the -batch flag.
          String cmdLine = "";
          for (String arg : args) {
-             if (!arg.equals(DUMMY_FUNCTION) && !arg.equals(JWKUtilCommands.BATCH_FILE_MODE_FLAG)) {
+             if (!arg.equals(DUMMY_FUNCTION) && !arg.equals(JWKUtilCommands.BATCH_FILE_MODE_FLAG) && !arg.equals(JWKUtilCommands.BATCH_MODE_FLAG)) {
 
                  cmdLine = cmdLine + " " + arg;
              }
@@ -224,11 +232,11 @@ public class JWKCLI extends ConfigurableCommandsImpl {
          }
          FileReader fis = new FileReader(file);
          List<String> commands = ParserUtil.processInput(fis);
-         JWKUtilCommands sciTokensCommands = getJWKCommands(cli);
-         if (sciTokensCommands == null) {
+         JWKUtilCommands jwkCommands = getJWKCommands(cli);
+         if (jwkCommands == null) {
              throw new NFWException("Error: No JWKUtilCommands configured, hence no logging.");
          }
-         sciTokensCommands.setBatchMode(true);
+         jwkCommands.setBatchMode(true);
 
          for(String command : commands){
              try {
@@ -236,20 +244,20 @@ public class JWKCLI extends ConfigurableCommandsImpl {
                         switch (rc) {
                             // Hint: The colons in the messages line up (more or less) so that the log file is very easily readable at a glance.
                             case CLIDriver.ABNORMAL_RC:
-                                    sciTokensCommands.error("Error: \"" +  command + "\"");
+                                    jwkCommands.error("Error: \"" +  command + "\"");
                                 break;
                             case CLIDriver.HELP_RC:
-                                    sciTokensCommands.info("  Help: invoked.");
+                                    jwkCommands.info("  Help: invoked.");
                                 break;
                             case CLIDriver.OK_RC:
                             default:
-                                if(sciTokensCommands.isVerbose()){
-                                    sciTokensCommands.info("    ok: \"" + command+ "\"");
+                                if(jwkCommands.isVerbose()){
+                                    jwkCommands.info("    ok: \"" + command+ "\"");
                                 }
                         }
 
                     } catch (Throwable t) {
-                        sciTokensCommands.error(t, "Error executing batch file command \"" + command + "\"");
+                        jwkCommands.error(t, "Error executing batch file command \"" + command + "\"");
                     }
 
          }

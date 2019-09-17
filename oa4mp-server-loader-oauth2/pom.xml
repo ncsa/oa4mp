@@ -15,6 +15,12 @@
     <packaging>jar</packaging>
     <dependencies>
         <dependency>
+            <groupId>javax.activation</groupId>
+            <artifactId>javax.activation-api</artifactId>
+            <version>1.2.0</version>
+        </dependency>
+
+        <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>oa4mp-server-api</artifactId>
             <version>4.2-SNAPSHOT</version>

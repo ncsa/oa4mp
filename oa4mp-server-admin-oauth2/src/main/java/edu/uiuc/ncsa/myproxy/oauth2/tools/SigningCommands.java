@@ -17,6 +17,7 @@ import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
+import java.util.Base64;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -64,7 +65,7 @@ public class SigningCommands extends CommonCommands {
 
         while (retry) {
             if (publicKeyFile == null) {
-                String publicKeyPath =getInput("Give the file path", "");
+                String publicKeyPath = getInput("Give the file path", "");
                 if (publicKeyPath.toLowerCase().equals("exit") || publicKeyPath.toLowerCase().equals("quit")) {
                     return;
                 }
@@ -76,37 +77,82 @@ public class SigningCommands extends CommonCommands {
                 if (!publicKeyFile.isFile()) {
                     sayi("Sorry, but you must supply the name of the file as well (or type 'exit' to exit");
                 } else {
-                    sayi2("The file you gave exists, do you want to over write it? [y/n]");
-                    retry = !isOk(readline());
+                    if(!isBatchMode()) {
+                        sayi2("The file you gave exists, do you want to over write it? [y/n]");
+                        retry = !isOk(readline());
+                    }
                 }
             } else {
                 retry = false;
             }
         }
+        if (!isBatchMode()) {
+            sayi2("create a new set of JSON web keys?[y/n]");
+            if (!isOk(readline())) {
+                     say("create cancelled.");
+                     return;
+                 }
 
-        sayi2("create a new set of JSON web keys?[y/n]");
-
-        if (!isOk(readline())) {
-            say("create cancelled.");
-            return;
         }
-        JSONWebKeys keys = new JSONWebKeys(null);
-        keys.put(createJWK("RS256"));
-        keys.put(createJWK("RS384"));
-        keys.put(createJWK("RS512"));
+
+        JSONWebKeys keys = createJsonWebKeys();
         FileWriter writer = new FileWriter(publicKeyFile);
         JSONObject jwks = JSONWebKeyUtil.toJSON(keys);
-        writer.write(jwks.toString(3));
+        writer.write(jwks.toString(2));
         writer.flush();
         writer.close();
 
-        if (isInteractive) {
+        if (!isBatchMode()) {
             sayi("JSONweb keys written");
             sayi("Done!");
         }
 
     }
 
+    public JSONWebKeys createJsonWebKeys() throws NoSuchProviderException, NoSuchAlgorithmException {
+        JSONWebKeys keys = new JSONWebKeys(null);
+        keys.put(createJWK("RS256"));
+        keys.put(createJWK("RS384"));
+        keys.put(createJWK("RS512"));
+        return keys;
+    }
+
+    protected int defaultSymmetricKeyLength = 256;
+    protected String SYMMETRIC_KEY_ARG = "-length";
+
+    protected void showSymmetricKeyHelp() {
+        say("createSymmetricKey [" + SYMMETRIC_KEY_ARG + " len] This will create a key for use as a symmetric key, i.e., this will produce");
+        say("   a base 64 encoded sequence of random bytes to be used as a symmetric key for");
+        say("   the given length. If no length is included, the default of " + defaultSymmetricKeyLength + "bytes is used.");
+    }
+
+    public void create_symmetric_key(InputLine inputLine) {
+        if (showHelp(inputLine)) {
+            showSymmetricKeyHelp();
+            return;
+        }
+
+        int length = defaultSymmetricKeyLength;
+        if (inputLine.hasArg(SYMMETRIC_KEY_ARG)) {
+            try {
+                length = Integer.parseInt(inputLine.getNextArgFor(SYMMETRIC_KEY_ARG));
+            } catch (Throwable t) {
+                // rock on
+            }
+        }
+        byte[] array = new byte[length];
+        random.nextBytes(array);
+        if (!isBatchMode()) {
+            say("Base encoded key of length " + length);
+        }
+        say(Base64.getEncoder().encodeToString(array));
+    }
+
+    /**
+     * <b>NOTE</b> that good practice is to set the secure random source to something truly random
+     * by setting the  java.security.egd property for the JVM. On unix systems this would look like
+     * <code>java -Djava.security.egd=file:/dev/urandom</code>
+     */
     SecureRandom random = new SecureRandom();
 
     protected JSONWebKey createJWK(String algorithm) throws NoSuchProviderException, NoSuchAlgorithmException {
