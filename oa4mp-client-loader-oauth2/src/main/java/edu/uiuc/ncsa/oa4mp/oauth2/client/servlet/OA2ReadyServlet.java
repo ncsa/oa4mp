@@ -63,7 +63,7 @@ public class OA2ReadyServlet extends ClientServlet {
         OA2ClientEnvironment oa2ce = (OA2ClientEnvironment) getCE();
 
         AuthorizationGrant grant = new AuthorizationGrantImpl(URI.create(token));
-        info("2.a. Getting the cert(s) from the service");
+        info("2.a. Getting the token from the service");
         String identifier = clearCookie(request, response);
         OA2Asset asset = null;
         if (identifier == null) {
@@ -104,6 +104,8 @@ public class OA2ReadyServlet extends ClientServlet {
             //  ui = oa2MPService.getUserInfo(atResponse2.getAccessToken().getToken());
             ui = oa2MPService.getUserInfo(identifier);
             if (getCerts) {
+                info("2.b. Certs requested, retrieving...");
+
                 assetResponse = oa2MPService.getCert(asset, atResponse2);
             }
             // The general case is to do the call with the identifier if you want the asset store managed.
@@ -136,7 +138,6 @@ public class OA2ReadyServlet extends ClientServlet {
         // Again, we take the first returned cert to peel off some information to display. This
         // just proves we got a response.
 
-        info("2.b. Done! Displaying success page.");
         if (getCerts) {
             if (assetResponse.getX509Certificates() == null) {
                 request.setAttribute("certSubject", "(no cert returned)");
@@ -157,6 +158,7 @@ public class OA2ReadyServlet extends ClientServlet {
         } else {
             request.setAttribute("certSubject", "(no cert requested)");
         }
+        info("2.b. Done! Displaying success page.");
 
         if (ui != null) {
             String output = JSONUtils.valueToString(ui.toJSon(), 1, 0);

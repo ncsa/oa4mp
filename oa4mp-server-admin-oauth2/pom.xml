@@ -20,6 +20,7 @@
             <artifactId>oa4mp-client-loader-oauth2</artifactId>
             <version>4.2-SNAPSHOT</version>
         </dependency>
+
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>oa4mp-server-admin</artifactId>
@@ -34,6 +35,21 @@
             <groupId>edu.uiuc.ncsa.security.delegation</groupId>
             <artifactId>ncsa-security-oauth-2.0</artifactId>
             <version>4.2-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-core</artifactId>
+            <version>2.3.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>2.3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+            <version>2.3.1</version>
         </dependency>
         <dependency>
             <groupId>org.mariadb.jdbc</groupId>
@@ -226,37 +242,37 @@
         </profile>
 
         <profile>
-                  <id>jwt</id>
-                  <build>
-                      <plugins>
-                          <plugin>
-                              <artifactId>maven-assembly-plugin</artifactId>
-                              <configuration>
-                                  <archive>
-                                      <manifest>
-                                          <addClasspath>true</addClasspath>
-                                          <mainClass>edu.uiuc.ncsa.myproxy.oauth2.tools.JWKCLI</mainClass>
-                                      </manifest>
-                                  </archive>
-                                  <descriptorRefs>
-                                      <descriptorRef>jar-with-dependencies</descriptorRef>
-                                  </descriptorRefs>
-                                  <finalName>jwt</finalName>
-                              </configuration>
-                              <executions>
-                                  <execution>
-                                      <id>make-my-jar-with-dependencies</id>
-                                      <phase>package</phase>
-                                      <goals>
-                                          <goal>single</goal>
-                                      </goals>
-                                  </execution>
-                              </executions>
-                          </plugin>
-                      </plugins>
+            <id>jwt</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <configuration>
+                            <archive>
+                                <manifest>
+                                    <addClasspath>true</addClasspath>
+                                    <mainClass>edu.uiuc.ncsa.myproxy.oauth2.tools.JWKCLI</mainClass>
+                                </manifest>
+                            </archive>
+                            <descriptorRefs>
+                                <descriptorRef>jar-with-dependencies</descriptorRef>
+                            </descriptorRefs>
+                            <finalName>jwt</finalName>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>make-my-jar-with-dependencies</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
 
-                  </build>
-              </profile>
+            </build>
+        </profile>
     </profiles>
     <pluginRepositories>
         <pluginRepository>
