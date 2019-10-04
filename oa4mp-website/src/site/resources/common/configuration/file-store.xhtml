@@ -37,7 +37,13 @@ any needed subdirectories.
         <td style="vertical-align: top;">indexPath</td>
         <td style="vertical-align: top;">Location of system-built indices.</td>
     </tr>
+    <tr>
+           <td style="vertical-align: top;">removeEmptyFiles</td>
+           <td style="vertical-align: top;">Remove any empty files in the store. The default is <b>true</b> meaning that empty files will
+           be deleted if found in the file store. </td>
+       </tr>
     </tbody>
+
 </table>
 <p>Again you specify either the <span style="font-weight: bold;">path</span> or both the <span
         style="font-weight: bold;">dataPath</span> and <span style="font-weight: bold;">indexPath</span>.</p>
@@ -86,13 +92,14 @@ A client file store can be applied to
 <pre>
 &lt;config&gt;
    &lt;client name="my-cfg"&gt;
-        &lt;fileStore path="/var/www/client/storage"&gt;
+        &lt;fileStore path="/var/www/client/storage"
+                 removeEmptyFiles="false"&gt;
           &lt;<a href="client/dtd/asset-store.xhtml">assetStore</a>&gt;
         &lt;/fileStore&gt;
         &lt;!-- other stuff --&gt;
 &lt;/config&gt;
 </pre>
-This makes the asset store in the given directory.
+This makes the asset store in the given directory. This will not remove empty files in the archive when it finds them.
 <!--#include virtual="../../footer.html" -->
 
 </body>

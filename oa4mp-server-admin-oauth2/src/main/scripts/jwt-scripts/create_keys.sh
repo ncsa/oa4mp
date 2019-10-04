@@ -9,7 +9,7 @@ if [ -z "$JWT_JAR" ]; then
 fi
 
 
-java -jar $JWT_JAR -batch create_keys "$@"
+java -jar $JWT_JAR create_keys -log $JWT_LOG -batch  "$@"
 
 if [ $? != 0 ]; then
   exit 1

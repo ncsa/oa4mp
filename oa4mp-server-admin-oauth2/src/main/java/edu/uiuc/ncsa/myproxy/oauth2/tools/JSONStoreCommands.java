@@ -303,4 +303,14 @@ public class JSONStoreCommands extends StoreCommands2 {
         array.addAll(lines);
         return array;
     }
+
+   /* @Override
+    protected void addEntry(Identifiable identifiable, JSON json) {
+
+    }
+
+    @Override
+    protected void removeEntry(Identifiable identifiable, JSON json) {
+
+    }*/
 }

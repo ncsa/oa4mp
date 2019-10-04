@@ -7,7 +7,7 @@ if [ -z "$JWT_JAR" ]; then
   JWT_JAR=jwt.jar
 fi
 
-java -jar $JWT_JAR -batch generate_token "$@"
+java -jar $JWT_JAR generate_token -log $JWT_LOG -batch  "$@"
 
 if [ $? != 0 ]; then
   exit 1

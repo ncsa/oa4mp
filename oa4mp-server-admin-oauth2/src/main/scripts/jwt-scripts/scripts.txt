@@ -1,0 +1,11 @@
+This tells how to work with scripts. A script is simply a sequence of commands that could
+be entered manually. The format of the commands is very simple.
+
+** Every line that starts with a hash (#) is a comment and is ignored
+** Every command may span multiple lines and is terminated with a semicolon (;)
+
+There are a few simple examples.
+
+ex_hello_world.cmd = a basic hello world example
+ex_create_keys.cmd = A file that will create a set of keys and print them to the console
+ex_print_token.cmd = This has a signed JWT and will print it to the console.

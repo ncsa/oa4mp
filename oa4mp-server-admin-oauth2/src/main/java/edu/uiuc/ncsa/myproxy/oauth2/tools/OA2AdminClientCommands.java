@@ -11,6 +11,7 @@ import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApprovalStore;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
+import net.sf.json.JSON;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.util.List;
@@ -144,4 +145,13 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
         say("If you need to create a hash of a secret, invoke the create_hash method on the secret");
     }
 
+    @Override
+    protected void addEntry(Identifiable identifiable, JSON json) {
+
+    }
+
+    @Override
+    protected void removeEntry(Identifiable identifiable, JSON json) {
+
+    }
 }

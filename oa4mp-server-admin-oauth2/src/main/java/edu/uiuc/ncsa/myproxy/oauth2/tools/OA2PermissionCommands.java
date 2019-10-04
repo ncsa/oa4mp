@@ -8,6 +8,9 @@ import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
+import net.sf.json.JSONObject;
+
+import java.util.HashMap;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -66,15 +69,15 @@ public class OA2PermissionCommands extends StoreCommands2 {
         if (!isEmpty(input)) {
             p.setAdminID(BasicIdentifier.newID(input));
         }
-        input=getInput("set all permissions (y/n):", "y");
-        if(!isEmpty(input)){
-            if(input.toLowerCase().equals("y")){
+        input = getInput("set all permissions (y/n):", "y");
+        if (!isEmpty(input)) {
+            if (input.toLowerCase().equals("y")) {
                 p.setApprove(true);
                 p.setCreate(true);
                 p.setDelete(true);
                 p.setRead(true);
                 p.setWrite(true);
-            }else{
+            } else {
                 p.setApprove(false);
                 p.setCreate(false);
                 p.setDelete(false);
@@ -95,6 +98,25 @@ public class OA2PermissionCommands extends StoreCommands2 {
         sayi("can write?=" + p.isWrite());
         sayi("can delete?=" + p.isDelete());
         sayi("can create?=" + p.isCreate());
+
+    }
+
+    @Override
+    protected void addEntry(Identifiable identifiable, JSONObject json) {
+
+    }
+
+    @Override
+    protected void removeEntry(Identifiable identifiable, JSONObject json) {
+        HashMap<String, Object> map = new HashMap();
+        getPStore().getXMLConverter().toMap(identifiable, map);
+        MapConverter mc = (MapConverter) getPStore().getXMLConverter();
+        json.remove(mc.keys.identifier()); // don't let it change the identifier
+        for(Object key : json.keySet()){
+            map.remove(key);
+        }
+        Permission p = (Permission) mc.fromMap(map, identifiable);
+        getPStore().save(p);
 
     }
 }

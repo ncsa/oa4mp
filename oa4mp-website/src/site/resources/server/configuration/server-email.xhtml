@@ -98,7 +98,10 @@
 
 <p>This is, again, because Tomcat does this globally and there is no way to just have local
     application control of it. </p>
-
+<h2>Note about upgrading from Java 8 to another version. </h2>
+<p>After Java 8, certain classes in the Java activation framework were removed from the standard distribution.
+Much as the requirement that the Java Mail jar has to be deployed globally in Tomcat, you must add in the
+    <a href="https://mvnrepository.com/artifact/javax.activation/javax.activation-api/1.2.0">activation framework java</a></p>
 <h3>Example 1. Using SSL</h3>
 
 <p>This example will set up notifications using SMTP over SSL. Templates (see below) are specified for the message and

@@ -422,7 +422,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
                 throw new OA2ATException(OA2Errors.INVALID_REQUEST, msg);
             }
         }
-        /* Now we have to determine which scopes to return
+        /*
+         CIL-586 fix: Now we have to determine which scopes to return
            The spec says we don't have to return anything if the requested scopes are the same as the
            supported scopes. Otherwise, return what scopes *are* supported.
          */

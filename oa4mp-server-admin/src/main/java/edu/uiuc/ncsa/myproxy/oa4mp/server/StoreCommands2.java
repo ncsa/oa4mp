@@ -2,16 +2,20 @@ package edu.uiuc.ncsa.myproxy.oa4mp.server;
 
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Store;
+import edu.uiuc.ncsa.security.core.XMLConverter;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.storage.XMLMap;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
+import edu.uiuc.ncsa.security.util.cli.CommandLineTokenizer;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import edu.uiuc.ncsa.security.util.cli.LineEditor;
 import edu.uiuc.ncsa.security.util.cli.StoreCommands;
+import net.sf.json.JSONObject;
 
 import java.io.*;
 import java.util.List;
+import java.util.Vector;
 
 /**
  * This class exists because we cannot quite get the dependencies right otherwise. Mostly it is to have access
@@ -113,21 +117,21 @@ public abstract class StoreCommands2 extends StoreCommands {
     }
 
     protected void showSearchHelp() {
-        say("Searches the current component for all entries satisfying the condition. You may also specify that the ");
-        say("condition is a regular expression rather than using simple equality");
         say("search -key key [-regex|-la -size] [-listKeys] condition");
-        say("Invoking this with the -listkeys flag prints out all the keys for this store. Omit that for searches.");
-        say("-key = the name of the key to be searched for");
-        say("-regex (optional) attempt to interpret the conditional as a regular expression");
-        say("-la (optional) print the result in long format.");
-        say("-size (optional) print *only* the number of results.");
-        say("\nE.g.\n");
-        say("search -key client_id -regex \".*07028.*\"");
-        say("\n(In the clients components) This would find the clients whose identifiers contain the string 07028");
-        say("\nE.g.\n");
-        say("search -key email -regex \".*bigstate\\.edu.*\"");
-        say("\n(in the clients or user component) This would match all email addresses from that institution bigstate.edu. \n");
-        say("Note that the period must be escaped for a regex.");
+        sayi("Searches the current component for all entries satisfying the condition. You may also specify that the ");
+        sayi("condition is a regular expression rather than using simple equality");
+        sayi("Invoking this with the -listkeys flag prints out all the keys for this store. Omit that for searches.");
+        sayi("-key = the name of the key to be searched for");
+        sayi("-regex (optional) attempt to interpret the conditional as a regular expression");
+        sayi("-la (optional) print the result in long format.");
+        sayi("-size (optional) print *only* the number of results.");
+        sayi("\nE.g.\n");
+        sayi("search -key client_id -regex \".*07028.*\"");
+        sayi("\n(In the clients components) This would find the clients whose identifiers contain the string 07028");
+        sayi("\nE.g.\n");
+        sayi("search -key email -regex \".*bigstate\\.edu.*\"");
+        sayi("\n(in the clients or user component) This would match all email addresses from that institution bigstate.edu. \n");
+        sayi("Note that the period must be escaped for a regex.");
 
     }
 
@@ -191,6 +195,120 @@ public abstract class StoreCommands2 extends StoreCommands {
     }
 
     @Override
+    protected void showUpdateHelp() {
+        say("update [" + UPDATE_ADD_FLAG + " | " + UPDATE_REMOVE_FLAG + " -remove ] " +
+                "[" + UPDATE_KEY_FLAG + " key "+ UPDATE_VALUE_FLAG + " value | " +
+                UPDATE_JSON_FLAG + " value] index\n");
+        sayi("where the index is the index in the list command.");
+        sayi("Optionally you may set a specific value for a key within the object. ");
+        sayi("You may also specify that, if the value is a list, to simply add to its list");
+        sayi("E.g.");
+        sayi("update " + UPDATE_REMOVE_FLAG + " " + UPDATE_KEY_FLAG + " lifetime /foo:bar");
+        sayi("would find the object with id foo:bar and remove the value of the key 'lifetime'");
+        sayi("E.g.");
+        sayi("update " + UPDATE_ADD_FLAG + " " +  UPDATE_JSON_FLAG + " '{\"fnord\":[\"blarf0\",\"blarf1\"]}' /foo:bar");
+        sayi("(Note the single quotes around the raw JSON)");
+        sayi("This would add the given entries to the array named fnord");
+        sayi("Generally JSON is a better way to set multiple values, since the other method is simply ");
+        sayi("a way to set an individual value. ");
+        sayi("E.g.");
+        sayi("update  " + UPDATE_JSON_FLAG + " '{\"fnord\":[\"blarf0\",\"blarf1\"]}' /foo:bar");
+        sayi("In this case, without the " + UPDATE_ADD_FLAG + ", the values for the array named fnord would be replaced.");
+        sayi("Any existing values would be lost.");
+        say("See also list_keys");
+    }
+
+    String UPDATE_ADD_FLAG = "-add";
+    String UPDATE_REMOVE_FLAG = "-remove";
+    String UPDATE_KEY_FLAG = "-key";
+    String UPDATE_VALUE_FLAG = "-value";
+    String UPDATE_JSON_FLAG = "-json";
+
+    @Override
+    public void update(InputLine inputLine) {
+        if (showHelp(inputLine)) {
+            showUpdateHelp();
+            return;
+        }
+        if (inputLine.size() == 2) { // line is [func_name, arg0, arg1, ...] so this means a single argument. Assume its an index.
+            super.update(inputLine);
+            return;
+        }
+        // new stuff. The assumption is that the user is trying to update something.
+        boolean addFlag = inputLine.hasArg(UPDATE_ADD_FLAG);
+        boolean removeFlag = inputLine.hasArg(UPDATE_REMOVE_FLAG);
+        boolean jsonFlag = inputLine.hasArg(UPDATE_JSON_FLAG);
+        String key = inputLine.getNextArgFor(UPDATE_KEY_FLAG);
+        String value = inputLine.getNextArgFor(UPDATE_VALUE_FLAG);
+        Identifiable identifiable = findItem(inputLine);
+        if (identifiable == null) {
+            say("no entry for \"" + identifiable.getIdentifierString() + "\" found.");
+            return;
+        }
+        if (addFlag && removeFlag) {
+            say("Error: You cannot add and remove a value the same time");
+            return;
+        }
+        if (jsonFlag) {
+            JSONObject json = getJSONArg(inputLine);
+            if (addFlag) {
+                addEntry(identifiable, json);
+            }
+            if (removeFlag) {
+                removeEntry(identifiable, json);
+            }
+              return;
+        }
+
+        if (addFlag) {
+            addEntry(identifiable, inputLine.getNextArgFor(UPDATE_KEY_FLAG), inputLine.getNextArgFor(UPDATE_VALUE_FLAG));
+        }
+        if(removeFlag){
+            removeEntry(identifiable, inputLine.getNextArgFor(UPDATE_KEY_FLAG), inputLine.getNextArgFor(UPDATE_VALUE_FLAG));
+
+        }
+
+    }
+
+
+    protected void addEntry(Identifiable identifiable, String key, String value) {
+        JSONObject json = new JSONObject();
+        json.put(key, value);
+        addEntry(identifiable, json);
+    }
+
+   protected abstract void addEntry(Identifiable identifiable, JSONObject json);
+
+    protected abstract void removeEntry(Identifiable identifiable, JSONObject json);
+
+    protected void removeEntry(Identifiable identifiable, String key, String value) {
+        JSONObject json = new JSONObject();
+        json.put(key, value);
+        removeEntry(identifiable, json);
+    }
+
+
+    public void list_keys(InputLine inputLine) throws Exception {
+        if (showHelp(inputLine)) {
+            showListKeysHelp();
+            return;
+        }
+        XMLConverter xmlConverter = getStore().getXMLConverter();
+        if (xmlConverter instanceof MapConverter) {
+            MapConverter mc = (MapConverter) xmlConverter;
+            for (String key : mc.getKeys().allKeys()) {
+                say(key);
+            }
+
+        }
+    }
+
+    protected void showListKeysHelp() {
+        say("list_keys");
+        sayi("This lists the keys of the current store.");
+    }
+
+    @Override
     public void edit(InputLine inputLine) {
         Identifiable x = findItem(inputLine);
         XMLMap c = new XMLMap();
@@ -211,7 +329,7 @@ public abstract class StoreCommands2 extends StoreCommands {
                 bais.close();
                 Identifiable identifiable = getStore().getXMLConverter().fromMap(map, null);
                 getStore().save(identifiable);
-            }else{
+            } else {
                 say("changes ignored.");
             }
         } catch (IOException e) {
@@ -220,5 +338,27 @@ public abstract class StoreCommands2 extends StoreCommands {
             throwable.printStackTrace();
         }
     }
+     protected JSONObject getJSONArg(InputLine inputLine){
+         String[] args2 = inputLine.argsToStringArray();
+         String raw2 = "";
+         for(int i = 0; i < args2.length -1 ; i++){
+              raw2 = raw2+args2[i];
+         }
+         int start = raw2.indexOf("'");
+         int end = raw2.lastIndexOf("'");
+         String rawJSON = raw2.substring(start+1, end);
+         try{
+              return JSONObject.fromObject(rawJSON);
+         }catch(Throwable t){
+             return new JSONObject();
+         }
+     }
+    public static void main(String[] args){
+        CommandLineTokenizer CLT = new CommandLineTokenizer();
+        String raw = "update -add -json '{\"fnord\":[\"blarf0\",\"blarf1\"]}' /foo:bar";
 
+        Vector v = CLT.tokenize(raw);
+        System.out.println(v);
+        InputLine inputLine = new InputLine(v);
+    }
 }

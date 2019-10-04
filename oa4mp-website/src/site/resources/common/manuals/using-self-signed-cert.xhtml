@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Using self-signed certs in Tomcat.</title>
+    <!--#include virtual="../../head.html" -->
+</head>
+<body class="composite">
+<!--#include virtual="../../header.html" -->
+<h1>Using a self-signed cert in Tomcat</h1>
+<p>A pretty common scenario is to set up a test server and client and getting a cert from a third party
+can be expensive and time-consuming. You can, of course, sign your own cert. Be aware that this will
+restrict others unless they make an exception in their browser when connecting to your site. It
+is not reccomended for production server, but is awfully handy for testing.</p>
+<p>Why do this? The OAuth exchange happens in <b>two</b> stages. First, the user comes in with a browser.
+At that point the user must accept an exception if your Tomcat has a self-signed cert. Once the user
+log in, a redirect is made to the client, which fires up its own SSL connection and has only a basic set
+of certs available. Anything else (the analog of the exception in the browser) must be manually configured.
+The practical problem with that is that Java has a very bad way to do it, either by restricting the JVM
+to using your cert only or requiring you to manufacture your own version of a trust store. This is the reason
+that there is a way to set this in the client configuration.</p>
+<h2>Creating a self-signed cert</h2>
+<p>It is pretty easy to create on of these. The easiest path is probably to use the Java keytool and issue
+the following command:</p>
+<pre>
+    keytool -genkey -keyalg RSA -alias selfsigned -keystore localhost-keystore.jks -storepass password -validity 365 -keysize 2048
+</pre>
+<p>where you set the name of the keystore and the password (with the -storepass flag). The validity refers to the
+number of days, so this will create a cert that is valid for a year. You would then need to fill in some prompts
+that will be given to you. This is all quite straightforward. These are all for making the CN (Common Name).
+One tip is to just hit return and use the same password for the keystore as for the cert. You can then check that
+    it worked by issuing</p>
+<pre>
+    keytool -list -storepass password -keystore localhost-keystore.jks
+</pre>
+
+<h2>Setting the keystore in Tomcat.</h2>
+<p>I assume you are using just Tomcat and have created a JKS (Java Keystore) that contains your cert for your server. Add an &lt;ssl&gt; block to your
+    client configuration that points to this store, so if you have something like this in the Tomcat server.xml file:</p>
+<pre>
+    &lt;Connector port="9443"
+               protocol="HTTP/1.1"
+               SSLEnabled="true"
+               maxThreads="150"
+               scheme="https"
+               secure="true"
+               URIEncoding="UTF-8"
+               keystoreFile="${user.home}/certs/localhost-keystore.jks"
+               keystorePass="your_password"
+               keystoreType="JKS"
+               clientAuth="false" sslProtocol="TLS &gt;
+</pre>
+<p>It is also possible to set a trust store here. Normally the truststore (set of trusted certs) that is the default
+one shipped with your version of Java is more than sufficient.</p>
+<h2>Using the certs with your OA4MP client</h2>
+
+<p>In your client configuration you would just point to this same keystore:</p>
+<pre>
+&lt;client name="your-client-config-name"
+      &lt;!-- other stuff!!--&gt;
+     >
+     &lt;ssl useJavaTrustStore="true"&gt;
+        &lt;trustStore&gt;
+           &lt;path&gt;/home/ncsa/certs/localhost-keystore.jks&lt;/path&gt;
+           &lt;password&gt;&lt;![CDATA[your_password]]&gt;&lt;/password&gt;
+           &lt;type&gt;JKS&lt;/type&gt;
+        &lt;/trustStore&gt;
+      &lt;/ssl&gt;
+   &lt;!-- more stuff --&gt;
+&lt;/client&gt;
+</pre>
+<p>
+That should do it. I prefer to put passwords in a CDATA tag since that means you can use special characters
+and not have to worry about them. There is an older way to do this in OA4MP that is still supported
+which is inferior because the password is an attribute and this prevented many passwords from being used.
+You can also use a PKCS12 store if you have that. In that case, the type is PKCS12.
+</p>
+
+<!--#include virtual="../../footer.html" -->
+</body>
+</html>

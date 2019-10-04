@@ -13,7 +13,28 @@
 
 <h2>4.2-SNAPSHOT</h2>
 <ul>
-    <li>Added supoort for turning on/off OIDC abilities in the configuration file with the OIDCEnabled flag.</li>
+    <li>CIL-352: CILogon previous subject issue. In some cases in CILogon, the country should be US and is not archived this way when updating.
+        This really is just a minor annoyance.</li>
+    <li>CIL-493: Extra scopes that have not been approved for a client are ignored, as per the spec.</li>
+    <li>CIL-503: Creating a new user results in a serial string with the same index.</li>
+    <li>CIL-518: Remove zero length files. This now has a flag to enable/disable this in the configuration.
+        It is only an issue if a server is using file storage. Look at the file store documentation to learn more.</li>
+    <li>CIL-566: Fire email for admin client registration. <b>NOTE:</b> the reason this failed at one point was because of an upgrade from Java 8 to Java 11. Please
+    see the email configuration documentation for the details of getting this to work. Basically you need to include
+    on more file.</li>
+    <li>CIL-570: Better return codes when creating a transaction fails. </li>
+    <li>CIL-575: List of failure codes from create transaction failure.</li>
+    <li>CIL-576: The CLI should use the same logic as the registration form for callback URLs. This means allowing for
+    calls to http://localhost, e.g.</li>
+    <li>CIL-579: Log changes to clients in the system logs. </li>
+    <li>CIL-586: return list of scopes if different from what is requested. As per the spec. if a client requests a set of scopes
+        but the server does not honor any of them, a list of what the server will honor is returned.</li>
+    <li></li>
+</ul>
+
+<h2>4.2</h2>
+<ul>
+    <li>Added support for turning on/off OIDC abilities in the configuration file with the OIDCEnabled flag.</li>
     <li>CIL-467:Eliminate init endpoint (this was very specific to CILogon). </li>
     <li>CIL-490: Added a check box on the client registration form to allow marking a client as public. Note that
     this will automatically set the scopes to only "openid".</li>
