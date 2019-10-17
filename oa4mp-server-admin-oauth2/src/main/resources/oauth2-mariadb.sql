@@ -32,17 +32,18 @@ Some useful commands. Lst two list users and will show permissions for a single 
  */
 
 CREATE TABLE oauth2.clients (
-  client_id     VARCHAR(255) PRIMARY KEY,
-  public_key    TEXT,
-  name          TEXT,
-  home_url      TEXT,
-  error_url     TEXT,
-  email         TEXT,
-  proxy_limited BOOLEAN,
-  creation_ts   TIMESTAMP DEFAULT NULL,
-  rt_lifetime   bigint,
-  callback_uri  TEXT,
-  sign_tokens   BOOLEAN
+  client_id          VARCHAR(255) PRIMARY KEY,
+  public_key         TEXT,
+  name               TEXT,
+  home_url           TEXT,
+  error_url          TEXT,
+  email              TEXT,
+  proxy_limited      BOOLEAN,
+  creation_ts        TIMESTAMP DEFAULT NULL,
+  last_modified_ts   TIMESTAMP DEFAULT NULL,
+  rt_lifetime        bigint,
+  callback_uri       TEXT,
+  sign_tokens        BOOLEAN
 );
 
 

@@ -10,7 +10,7 @@ import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApprovalStore;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.util.pkcs.KeyUtil;
-import net.sf.json.JSON;
+import net.sf.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -158,12 +158,13 @@ public class ClientStoreCommands extends BaseClientStoreCommands {
     }
 
     @Override
-    protected void addEntry(Identifiable identifiable, JSON json) {
-        
+    protected void addEntry(Identifiable identifiable, JSONObject json) {
+
     }
 
     @Override
-    protected void removeEntry(Identifiable identifiable, JSON json) {
+    protected void removeEntry(Identifiable identifiable, JSONObject json) {
 
     }
+
 }

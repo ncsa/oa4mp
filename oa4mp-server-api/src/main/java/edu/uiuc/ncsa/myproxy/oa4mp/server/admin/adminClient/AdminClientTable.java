@@ -25,6 +25,5 @@ public class AdminClientTable extends BaseClientTable {
         getColumnDescriptor().add(new ColumnDescriptorEntry(ak().vo(), Types.LONGVARCHAR));
         getColumnDescriptor().add(new ColumnDescriptorEntry(ak().email(), Types.LONGVARCHAR));
         getColumnDescriptor().add(new ColumnDescriptorEntry(ak().creationTS(), Types.TIMESTAMP));
-
     }
 }

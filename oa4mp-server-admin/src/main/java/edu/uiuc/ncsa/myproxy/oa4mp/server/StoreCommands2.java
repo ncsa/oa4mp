@@ -277,6 +277,12 @@ public abstract class StoreCommands2 extends StoreCommands {
         addEntry(identifiable, json);
     }
 
+    /**
+     * Proposed changes to store to allow for adding updates and removing them via batch files.
+     * At this point this is considered experimental.
+     * @param identifiable
+     * @param json
+     */
    protected abstract void addEntry(Identifiable identifiable, JSONObject json);
 
     protected abstract void removeEntry(Identifiable identifiable, JSONObject json);
@@ -361,4 +367,6 @@ public abstract class StoreCommands2 extends StoreCommands {
         System.out.println(v);
         InputLine inputLine = new InputLine(v);
     }
+
+
 }

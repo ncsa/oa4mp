@@ -5,6 +5,8 @@ import edu.uiuc.ncsa.security.core.XMLConverter;
 import edu.uiuc.ncsa.security.storage.MemoryStore;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
+import java.util.Date;
+
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 10/20/16 at  12:48 PM
@@ -29,5 +31,11 @@ public class AdminClientMemoryStore<V extends AdminClient> extends MemoryStore<V
     @Override
     public IdentifiableProvider getACProvider() {
         return acProvider;
+    }
+
+    @Override
+    protected void realSave(V value) {
+        value.setLastModifiedTS(new java.sql.Timestamp(new Date().getTime()));
+        super.realSave(value);
     }
 }

@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.security.storage.FileStore;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
 import java.io.File;
+import java.util.Date;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -35,5 +36,11 @@ public class AdminClientFS<V extends AdminClient> extends FileStore<V> implement
     @Override
     public IdentifiableProvider getACProvider() {
         return this.identifiableProvider;
+    }
+
+    @Override
+    public void realSave(boolean checkExists, V t) {
+        t.setLastModifiedTS(new java.sql.Timestamp(new Date().getTime()));
+        super.realSave(checkExists, t);
     }
 }

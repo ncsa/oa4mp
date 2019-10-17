@@ -9,6 +9,7 @@ import edu.uiuc.ncsa.security.storage.sql.SQLStore;
 import edu.uiuc.ncsa.security.storage.sql.internals.Table;
 
 import javax.inject.Provider;
+import java.util.Date;
 
 
 /**
@@ -35,5 +36,11 @@ public class SQLClientStore<V extends Client> extends SQLStore<V> implements Cli
     @Override
     public MapConverter<V> getMapConverter(){
         return converter;
+    }
+
+    @Override
+    public void save(V value) {
+        value.setLastModifiedTS(new java.sql.Timestamp(new Date().getTime()));
+        super.save(value);
     }
 }

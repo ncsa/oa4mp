@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.security.storage.sql.internals.ColumnDescriptorEntry;
 import edu.uiuc.ncsa.security.storage.sql.internals.Table;
 
 import static java.sql.Types.LONGVARCHAR;
+import static java.sql.Types.TIMESTAMP;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -23,6 +24,9 @@ public  class BaseClientTable extends Table {
        public void createColumnDescriptors() {
         super.createColumnDescriptors();
         getColumnDescriptor().add(new ColumnDescriptorEntry(getBKK().secret(), LONGVARCHAR));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(getBKK().creationTS(), TIMESTAMP));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(getBKK().lastModifiedTS(), TIMESTAMP));
+
     }
 
 

@@ -31,7 +31,6 @@ public class ClientStoreTable extends BaseClientTable {
         getColumnDescriptor().add(new ColumnDescriptorEntry(ct().homeURL(), LONGVARCHAR));
         getColumnDescriptor().add(new ColumnDescriptorEntry(ct().errorURL(), LONGVARCHAR));
         getColumnDescriptor().add(new ColumnDescriptorEntry(ct().email(), LONGVARCHAR));
-        getColumnDescriptor().add(new ColumnDescriptorEntry(ct().creationTS(), TIMESTAMP));
         getColumnDescriptor().add(new ColumnDescriptorEntry(ct().proxyLimited(), BOOLEAN));
     }
 }

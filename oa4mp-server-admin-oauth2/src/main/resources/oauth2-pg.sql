@@ -56,6 +56,7 @@ create table :oa4mpSchema.:oa4mpClientTable  (
     callback_uri text,
     proxy_limited boolean,
     rt_lifetime bigint,
+    last_modified_ts TIMESTAMP,
     creation_ts TIMESTAMP);
 
 create table :oa4mpSchema.:oa4mpPermissionsTable  (

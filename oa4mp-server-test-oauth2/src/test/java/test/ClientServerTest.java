@@ -106,6 +106,7 @@ public class ClientServerTest extends DDServerTests {
         OA2ClientKeys clientKeys = getClientKeys(tp2);
         values.remove(clientKeys.identifier());
         values.remove(clientKeys.creationTS());
+        values.remove(clientKeys.lastModifiedTS());
         JSONObject json = new JSONObject();
         json.putAll(values);
 

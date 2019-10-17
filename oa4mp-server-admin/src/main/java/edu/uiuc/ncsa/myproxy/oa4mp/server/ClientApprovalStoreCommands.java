@@ -5,7 +5,7 @@ import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
-import net.sf.json.JSON;
+import net.sf.json.JSONObject;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -154,12 +154,12 @@ public class ClientApprovalStoreCommands extends StoreCommands2 {
     }
 
     @Override
-    protected void addEntry(Identifiable identifiable, JSON json) {
-
+    protected void addEntry(Identifiable identifiable, JSONObject json) {
+        
     }
 
     @Override
-    protected void removeEntry(Identifiable identifiable, JSON json) {
+    protected void removeEntry(Identifiable identifiable, JSONObject json) {
 
     }
 }

@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.security.storage.sql.SQLStore;
 import edu.uiuc.ncsa.security.storage.sql.internals.Table;
 
 import javax.inject.Provider;
+import java.util.Date;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -29,5 +30,11 @@ public class AdminClientSQLStore<V extends AdminClient> extends SQLStore<V> impl
     @Override
     public IdentifiableProvider getACProvider() {
         return (IdentifiableProvider) this.identifiableProvider;
+    }
+
+    @Override
+    public void save(V value) {
+        value.setLastModifiedTS(new java.sql.Timestamp(new Date().getTime()));
+        super.save(value);
     }
 }

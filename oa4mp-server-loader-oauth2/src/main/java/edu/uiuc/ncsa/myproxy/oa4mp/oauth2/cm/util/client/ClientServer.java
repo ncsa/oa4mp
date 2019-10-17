@@ -84,6 +84,7 @@ public class ClientServer extends AbstractDDServer {
         OA2Client client = (OA2Client) getClientStore().create();
         values.put(keys.identifier(), client.getIdentifier());
         values.put(keys.creationTS(), client.getCreationTS());
+        values.put(keys.lastModifiedTS(), client.getLastModifiedTS());
         String secret = null;
         if (values.containsKey(keys.secret())) {
             // if the secret is supplied, just store its hash
