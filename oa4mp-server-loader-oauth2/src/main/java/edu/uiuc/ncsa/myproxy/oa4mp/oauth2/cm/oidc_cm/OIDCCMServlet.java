@@ -42,9 +42,9 @@ import java.util.List;
 /**
  * Note that in all of these calls, the assumption is that an admin client has been requested and
  * approved out of band. The identifier and secret of that are used to make the bearer token that
- * allows access to the calls in this API. This implments both RFC 7591 and part of RFC 7592.
+ * allows access to the calls in this API. This implements both RFC 7591 and part of RFC 7592.
  * Mostly we do not allow the setting of client secrets via tha API and since we do not store them
- * (only a hash of them) we cannot return them. If a secret is lost, tje only option is to register a new
+ * (only a hash of them) we cannot return them. If a secret is lost, the only option is to register a new
  * client. RFC 7592 is not intended to become a specification since ther eis too much variance in how
  * this can operate.
  * <p>Created by Jeff Gaynor<br>
@@ -74,6 +74,7 @@ public class OIDCCMServlet extends EnvServlet {
      */
     @Override
     public void doGet(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws ServletException, IOException {
+        printAllParameters(httpServletRequest);
         if (doPing(httpServletRequest, httpServletResponse)) return;
         if (!getOA2SE().getCmConfigs().hasRFC7591Config()) {
             throw new IllegalAccessError("Error: RFC 7591 not supported on this server. Request rejected.");
@@ -142,14 +143,23 @@ public class OIDCCMServlet extends EnvServlet {
      */
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        printAllParameters(req);
         if (!getOA2SE().getCmConfigs().hasRFC7592Config()) {
             throw new IllegalAccessError("Error: RFC 7592 not supported on this server. Request rejected.");
         }
 
         try {
-            super.doDelete(req, resp); // Check that it does not violate the protocol to start with.
             AdminClient adminClient = getAndCheckAdminClient(req);
-            OA2Client client = getClient(req);
+            String rawID = req.getParameter(OA2Constants.CLIENT_ID);
+            if(rawID == null || rawID.isEmpty()){
+                throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, "Missing client id", HttpStatus.SC_BAD_REQUEST);
+            }
+            OA2Client client = (OA2Client) getOA2SE().getClientStore().get(BasicIdentifier.newID(rawID));
+            if(client == null){
+                // Then this client does not exist on this server. Spec. says this is all fine and good
+                resp.setStatus(HttpStatus.SC_NO_CONTENT);
+                return;
+            }
             checkAdminPermission(adminClient, client);
 
             // remove it from the store, then remove it from the approvals.

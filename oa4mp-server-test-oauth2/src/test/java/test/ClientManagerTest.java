@@ -21,6 +21,7 @@ import net.sf.json.JSONObject;
 import org.junit.Test;
 
 /**
+ * This tests the client management protocol for OA4MP, not RFC 7591/7592.
  * <p>Created by Jeff Gaynor<br>
  * on 11/14/16 at  9:32 AM
  */
@@ -160,7 +161,7 @@ public class ClientManagerTest extends DDServerTests implements SAT {
     }
 
     /**
-     * This checks that the test-created LDAP configuration can be serialzed to and from JSON. If this
+     * This checks that the test-created LDAP configuration can be serialized to and from JSON. If this
      * fails then other tests will fail but the reason might not be obvious.
      * @throws Exception
      */

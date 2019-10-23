@@ -11,8 +11,7 @@
 
 source ./cm-setenv.sh
 
-echo $REGISTRATION_URI
-curl -k -X GET -H "Authorization: Bearer $(echo -n $ADMIN_ID:$ADMIN_SECRET | base64)"  $REGISTRATION_URI> output.json
+curl -k -X GET -H "Authorization: Bearer $BEARER_TOKEN"  $REGISTRATION_URI> output.json
 cat output.json
 
 

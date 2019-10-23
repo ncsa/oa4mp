@@ -149,6 +149,7 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
         sayi("identifier=" + client.getIdentifier());
         sayi("email=" + client.getEmail());
         sayi("creation timestamp=" + client.getCreationTS());
+        sayi("last modified timestamp=" + client.getLastModifiedTS());
         if (clientApproval == null) {
             sayi("no approval record exists.");
         } else {

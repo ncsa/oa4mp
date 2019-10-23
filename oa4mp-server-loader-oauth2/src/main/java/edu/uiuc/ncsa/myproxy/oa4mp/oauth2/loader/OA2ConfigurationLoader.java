@@ -190,6 +190,8 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                 URI.create(serverAddress + ClientManagementConstants.DEFAULT_RFC7591_ENDPOINT),
                 true);
         cmConfigs.put(tempCfg);
+        // NOTE there is no difference in endpoints for RFC 7591 and 7592! The question is if
+        // the client management protocol endpoint also supports RFC 7592.
         tempCfg = new CMConfig(ClientManagementConstants.RFC_7592_VALUE,
                 URI.create(serverAddress + ClientManagementConstants.DEFAULT_RFC7591_ENDPOINT),
                 true);
@@ -202,13 +204,18 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
     A typical entry we are parsing looks like this
 
      <clientManagement>
-        <api protocol="rfc7951" enable="true" endpoint="oidc-cm" url="full URL"/>
-        <api protocol="rfc7952" enable="true" endpoint="oidc-cm" url="full URL"/>
+        <api protocol="rfc7951" enable="true" endpoint="oidc-cm"/>
+        <api protocol="rfc7952" enable="true" endpoint="oidc-cm"/>
         <api protocol="oa4mp" enable="true"  url="https://foo.bar/oauth2/clients"/>
      </clientManagement>
 
-     Note that EITHER the endpoint is given or the url is given. The configuration object
+     Note that EITHER the endpoint is given (and the full url is then constructed here)
+     or the url is given. Giving the url has right of way. The configuration object
      only has URLs and they are resolved here from the server address.
+
+     In this example, the endpoints for the RFCs are constructed but the native OA4MP endpoint
+     is explicitly given. These ar eneeded since responses must include an actual address for
+     clients to come to for future updates, etc. 
      */
     public CMConfigs getCmConfigs() {
         if (cmConfigs == null) {

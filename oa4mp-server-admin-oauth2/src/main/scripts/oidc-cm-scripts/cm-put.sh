@@ -15,10 +15,9 @@
 # client_name and some redirect_uri entries. If you use the minimum, you will get a minimal client,
 # e.g. the only scope will be openid, if the server supports OIDC.
 
-
 source ./cm-setenv.sh
 
-curl -k -X PUT -H "Authorization: Bearer $(echo -n $ADMIN_ID:$ADMIN_SECRET | base64)" -H "Content-Type: application/json; charset=UTF-8" --data @$1 $REGISTRATION_URI > output.json
+curl -k -X PUT -H "Authorization: Bearer $BEARER_TOKEN" -H "Content-Type: application/json; charset=UTF-8" --data @$1 $REGISTRATION_URI > output.json
 cat output.json
 
 

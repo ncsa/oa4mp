@@ -23,6 +23,9 @@ import java.util.Date;
 import java.util.Map;
 
 /**
+ * Tests for the OA4MP client management API. These test the request framework i.e. that
+ * generating various types of requests all are resolved properly and work as expected.)
+ * This does not test RFC 7591/7592.
  * <p>Created by Jeff Gaynor<br>
  * on 12/2/16 at  11:25 AM
  */

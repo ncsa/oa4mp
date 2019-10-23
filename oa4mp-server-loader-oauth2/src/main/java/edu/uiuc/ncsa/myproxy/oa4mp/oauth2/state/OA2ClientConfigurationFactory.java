@@ -1,9 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.BasicClaimsSourceImpl;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.HTTPHeaderClaimsSource;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.LDAPClaimsSource;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.NCSALDAPClaimSource;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.*;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowType;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.jSetClaimSource;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
@@ -117,6 +114,7 @@ public class OA2ClientConfigurationFactory<V extends OA2ClientConfiguration> ext
     public static final String LDAP_DEFAULT = "LDAP"; // header for the basic LDAP
     public static final String HEADER_DEFAULT = "HEADER"; // alias for the header claim source
     public static final String NCSA_DEFAULT = "ncsa-default"; // alias for the NCSA default LDAP claim source
+    public static final String FILE_SYSTEM_DEFAULT = "file-system-default"; // alias for the file system claim source
 
     protected Map<String, ClaimSourceConfiguration> getClaimSourceConfigurations(JSONObject jsonObject) {
         JSONArray array = OA2ClientConfigurationUtil.getClaimSourceConfigurations(jsonObject);
@@ -177,13 +175,14 @@ public class OA2ClientConfigurationFactory<V extends OA2ClientConfiguration> ext
         ClaimSourceConfiguration config = configs.get(configName);
 
         if (alias.equals(LDAP_DEFAULT)) {
-            LDAPClaimsSource x = new LDAPClaimsSource((LDAPConfiguration) config, null);
-            return x;
+            return new LDAPClaimsSource((LDAPConfiguration) config, null);
         }
 
         if (alias.equals(HEADER_DEFAULT)) {
-            ClaimSource source = new HTTPHeaderClaimsSource();
-            source.setConfiguration(config);
+            return  new HTTPHeaderClaimsSource(config);
+        }
+        if(alias.equals(FILE_SYSTEM_DEFAULT)){
+            return  new FSClaimSource(config);
         }
         if (!sources.containsKey(alias)) {
             throw new IllegalArgumentException("Error:\"" + alias + "\" has not been registered as a claim source");

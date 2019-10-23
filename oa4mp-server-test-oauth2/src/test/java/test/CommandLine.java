@@ -4,6 +4,8 @@ import java.net.URI;
 import java.net.URLEncoder;
 
 /**
+ * Debug class to test things out fast.
+ * 
  * <p>Created by Jeff Gaynor<br>
  * on 3/7/18 at  2:45 PM
  */

@@ -1,5 +1,5 @@
 # A script that performs a cURL call to an OA4MP server that has the client management API enabled on it.
-# You MUST regsiter and have approved an admin client for this to work.  This script sets all the headers and such
+# You MUST register and have approved an admin client for this to work.  This script sets all the headers and such
 # you need to do and monitors the response.
 #
 # HOW THIS WORKS

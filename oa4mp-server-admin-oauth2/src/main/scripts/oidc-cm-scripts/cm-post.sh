@@ -15,7 +15,8 @@
 
 source ./cm-setenv.sh
 
-curl -k -X POST -H "Authorization: Bearer $(echo -n $ADMIN_ID:$ADMIN_SECRET | base64)" -H "Content-Type: application/json; charset=UTF-8" --data @$1 $SERVER > output.json
+
+curl -k -X POST -H "Authorization: Bearer $BEARER_TOKEN" -H "Content-Type: application/json; charset=UTF-8" --data @$1 $SERVER > output.json
 cat output.json
 
 

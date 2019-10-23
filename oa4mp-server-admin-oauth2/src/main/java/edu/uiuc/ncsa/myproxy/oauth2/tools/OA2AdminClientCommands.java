@@ -41,8 +41,11 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
     protected void longFormat(Identifiable identifiable) {
         super.longFormat(identifiable);
         AdminClient client = (AdminClient) identifiable;
+        sayi("creation timestamp=" + client.getCreationTS());
+        sayi("last modified timestamp=" + client.getLastModifiedTS());
         sayi("issuer=" + client.getIssuer());
         sayi("vo=" + client.getVirtualOrganization());
+
     }
 
     @Override

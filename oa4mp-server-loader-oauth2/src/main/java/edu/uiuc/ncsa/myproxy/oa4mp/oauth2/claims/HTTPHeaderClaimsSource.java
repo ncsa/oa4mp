@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.oauth_2_0.server.UnsupportedScopeException;
+import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSourceConfiguration;
 import net.sf.json.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
@@ -20,6 +21,10 @@ import java.util.Enumeration;
  * on 3/15/17 at  2:41 PM
  */
 public class HTTPHeaderClaimsSource extends BasicClaimsSourceImpl {
+    public HTTPHeaderClaimsSource(ClaimSourceConfiguration configuration) {
+        setConfiguration(configuration);
+    }
+
     public String caput = "OIDC_CLAIM_";
 
     public String getCaput() {
@@ -33,7 +38,7 @@ public class HTTPHeaderClaimsSource extends BasicClaimsSourceImpl {
 
     @Override
     protected JSONObject realProcessing(JSONObject claims, HttpServletRequest request, ServiceTransaction transaction) throws UnsupportedScopeException {
-        DebugUtil.dbg(this,"Omit list = " + getOmitList());
+        DebugUtil.trace(this,"Omit list = " + getOmitList());
         Enumeration headerNames = request.getHeaderNames();
         String caput = getCaput();
         if (caput == null) {

@@ -140,6 +140,10 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
         if (oidcEnabled == null) {
             oidcEnabled = Boolean.TRUE; // default
             String content = getCfgValue(ClientXMLTags.OIDC_ENABLED);
+            if(content == null || content.isEmpty()){
+                // use default
+               return oidcEnabled;
+            }
             try {
                 oidcEnabled = Boolean.parseBoolean(content);
             } catch (Throwable t) {

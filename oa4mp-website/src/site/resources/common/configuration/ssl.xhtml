@@ -151,6 +151,17 @@
         <td style="vertical-align: top;">-</td>
         <td style="vertical-align: top;">The full local path to the trust store.</td>
     </tr>
+    <tr>
+          <td style="vertical-align: top;">certDN</td>
+          <td style="vertical-align: top;">N</td>
+          <td style="vertical-align: top;">-</td>
+          <td style="vertical-align: top;">The Distinguished Name (DN) to be used when connecting to a server.
+          In this case, the Common Name (CN) is gotten from the server's certificate and checked against this for
+          host name verification. A common situation is that you have a self-signed certificate (for your OA4MP server)
+              with common name of localhost and you must supply the certs to connect to that from your client
+          to get an access token, user info etc., Since the lookup for the machine usually does not return "localhost"
+          you can set this to have the value of CN=localhost and manually use that. </td>
+      </tr>
     </tbody>
 </table>
 <h3>A Server example</h3>
@@ -168,6 +179,7 @@
                &lt;trustStore>
                    &lt;path&gt;/pt/oa2/etc/config/custom-trust-certs&lt;/path>
                    &lt;password&gt;&lt;![CDATA[sfdgfdf(*()(*]]&gt;&lt;/password>
+                   &lt;certDN&gt;&lt;![CDATA[CN=localhost]]&gt;&lt;/certDN>
                &lt;/trustStore&gt;
           &lt;/ssl&gt;
       &lt;!-- Rest of LDAP config --&gt;
@@ -191,7 +203,10 @@
 </pre>
 <p>
     The LDAP configuration uses SSL and the assumed default Java trust store in addition to the customized
-    trusted certificate store. The MyProxy configuration ill use the given keystore that contains exactly
+    trusted certificate store. The LDAP server is located on the localhost and the name of the
+    machine was not resolving to localhost. Rather than hack DNS, the client is told to accept a common
+    name of localhost when connecting to this particular server.
+    The MyProxy configuration will use the given keystore that contains exactly
     the host certificate for the MyProxy server and nothing else.
 
 </p>

@@ -183,7 +183,8 @@ public class BasicClaimsSourceImpl implements ClaimSource {
 
     /**
      * This is the actual place to put your code that only processes the claim source. The {@link #process(JSONObject, HttpServletRequest, ServiceTransaction)}
-     * calls wrap this and invoke the pre/post processor for you.
+     * calls wrap this and invoke the pre/post processor for you. Your code should take whatever metadata is for the user
+     * and add it to the claims object.
      *
      * @param claims
      * @param request

@@ -1,0 +1,14 @@
+{
+  "comment":[
+    "This JSON file contains meta data for testing user refresh tokens. The information will be changed in",
+    "the course of running the tests then changed back."
+  ],
+  "user123" : {"eppn":""},
+  "jgaynor":{"eppn":"test-eppn@foo.bar",
+    "isMemberOf":  [
+     {"name": "org_ici","id": 1282},
+     {"name": "all_ncsa_employe","id": 1097},
+     {"name": "jira-users","id": 1363}
+    ]
+      }
+}

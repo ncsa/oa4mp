@@ -68,6 +68,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
         sayi("email=" + client.getEmail());
         // Fix for CIL-501 -- removed showing home and error uris here since they are also show by the super class.
         sayi("creation timestamp=" + client.getCreationTS());
+        sayi("last modified timestamp=" + client.getLastModifiedTS());
         sayi("sign ID tokens?=" + client.isSignTokens());
         sayi("issuer=" + client.getIssuer());
         sayi("is public?=" + client.isPublicClient());

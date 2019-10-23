@@ -112,6 +112,18 @@
 </pre>
 
 Ditto the description above.
+
+<h3>Logging is not working at all. Why?</h3>
+<p>
+    If you have configured logging and are getting no output, a common reason for this is having a
+    global logging properties file, typically in <code>${catalina.base}/conf/logging.properties</code>,
+    which overrides the web app settings. A less common issue (and far more maddening) can arise when
+    using Log4j and a properties file in an included library (i.e. embedded in a jar file)
+    overrides your logging properties. This
+    can be hard to track down but a good trick is to diasble log 4 java and see if that helps. The
+    worst offender in this category are some third party libraries in Globus
+    for enabling limited proxy support,  and log 4 java might not be usable in those cases.
+</p>
 <!--#include virtual="../../footer.html" -->
 
 </body>
