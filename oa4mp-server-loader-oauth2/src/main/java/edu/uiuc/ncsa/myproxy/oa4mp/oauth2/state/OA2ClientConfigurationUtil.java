@@ -148,13 +148,19 @@ public class OA2ClientConfigurationUtil extends ClientConfigurationUtil {
         DebugUtil.trace(OA2ClientConfigurationUtil.class, dbgName + "JSON configuration object for this key=" + obj);
 
         if (obj instanceof JSONArray) {
+            DebugUtil.trace(OA2ClientConfigurationUtil.class, "object is a JSON Array");
             JSONObject j = new JSONObject();
             j.put(FunctorTypeImpl.OR.getValue(), obj);
             return j;
         }
         if (obj instanceof JSONObject) {
+            DebugUtil.trace(OA2ClientConfigurationUtil.class, "Got a JSON object.");
+
             return (JSONObject) obj;
         }
+        DebugUtil.trace(OA2ClientConfigurationUtil.class, "object found is \"" + obj + "\"");
+        DebugUtil.trace(OA2ClientConfigurationUtil.class, "Object not recognized, returning empty object.");
+
         return new JSONObject();
     }
 

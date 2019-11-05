@@ -1,6 +1,6 @@
 {"ldap": {
     "failOnError": "true",
-    "address": "ldap.ncsa.illinois.edu",
+    "address": "ldap1.ncsa.illinois.edu",
     "port": 636,
     "enabled": "true",
     "authorizationType": "none",

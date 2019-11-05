@@ -91,11 +91,19 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
             throw new IllegalStateException(message);
         }
         String searchName = (String) claims.get(getLDAPCfg().getSearchNameKey());
+        if(searchName == null || searchName.isEmpty()){
+            // If the configuration file has an error, this will be the one place it shows first.
+            // Best to trap it here and fail rather than have LDAP do the query (which it will and
+            // return nothing) and inexplicably have no result.
+            ServletDebugUtil.error(this, "Error: no search name found for LDAP query.");
+            throw new IllegalArgumentException("Error: no search name found for LDAP query.");
+        }
         return searchName;
     }
 
     protected boolean isNCSA() {
-        return getLDAPCfg().getServer().endsWith(".ncsa.illinois.edu");
+        ServletDebugUtil.trace(this, "checking if is NCSA LDAP claims source for \"" + currentServerAddress + "\"");
+        return currentServerAddress.endsWith(".ncsa.illinois.edu");
     }
 
     MyLoggingFacade myLogger = null;
@@ -105,9 +113,10 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
     }
 
     public void handleException(Throwable throwable) {
+        ServletDebugUtil.error(this,"Error accessiong LDAP", throwable);
+
         if (throwable instanceof CommunicationException) {
             warn("Communication exception talking to LDAP.");
-
             return;
         }
         if (getLDAPCfg().isFailOnError()) {
@@ -238,6 +247,10 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
         return env;
     }
 
+    /**
+     * This is needed later when checking which address was successful.
+     */
+   String currentServerAddress = null;
     public LdapContext createConnection() {
         // Set up the environment for creating the initial context
         StringTokenizer stringTokenizer = new StringTokenizer(getLDAPCfg().getServer(), ",");
@@ -246,12 +259,14 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
         DirContext dirContext = null;
         while (stringTokenizer.hasMoreTokens()) {
             try {
-                dirContext = new InitialDirContext(createEnv(stringTokenizer.nextToken(), getLDAPCfg()));
+                currentServerAddress = stringTokenizer.nextToken();
+                dirContext = new InitialDirContext(createEnv(currentServerAddress, getLDAPCfg()));
+                ServletDebugUtil.trace(this, "Found LDAP server for address=\"" + currentServerAddress +"\"");
                 return (LdapContext) dirContext.lookup(getLDAPCfg().getSearchBase());
 
             } catch (Throwable e) {
                 // Do nothing. Allow for errors.
-                ServletDebugUtil.dbg(this,"failed to get LDAP directory context",e);
+                ServletDebugUtil.dbg(this,"failed to get any LDAP directory context",e);
 
             }
         }
@@ -288,6 +303,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
         if (ctx == null) {
             throw new IllegalStateException("Error: Could not create the LDAP context");
         }
+
         SearchControls ctls = new SearchControls();
         if (attributes == null || attributes.isEmpty()) {
             // return everything if nothing is specified.

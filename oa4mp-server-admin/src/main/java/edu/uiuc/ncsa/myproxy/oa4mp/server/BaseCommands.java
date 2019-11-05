@@ -67,6 +67,7 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl {
         }
         if (commands != null) {
             CLIDriver cli = new CLIDriver(commands);
+            cli.setEnv(getGlobalEnv());
             cli.start();
             return true;
         }

@@ -294,7 +294,7 @@ public class OA2ClaimsUtil {
 
   dbg(this, "BEFORE invoking claim sources, claims are = " + claims.toString(1));
         if (flowStates.getClaims) {
-            DebugUtil.dbg(this, "Claims allowed, creating sources from configuration");
+            DebugUtil.trace(this, "Claims allowed, creating sources from configuration");
             OA2ClientConfigurationFactory<OA2ClientConfiguration> ff = new OA2ClientConfigurationFactory(getFF());
 
             ff.createClaimSource(oa2CC, client.getConfig());
@@ -312,8 +312,9 @@ public class OA2ClaimsUtil {
                                 b.setOa2SE(oa2se);
                             }
                         }
+                        DebugUtil.trace(this, "Before invoking claim source, new claims = " + claims.toString(1));
                         claimSource.process(claims, transaction);
-                        dbg(this, "After invoking claim source, new claims = " + claims.toString(1));
+                        DebugUtil.trace(this, "After invoking claim source, new claims = " + claims.toString(1));
                     }
                 }
             }

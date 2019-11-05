@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfigurationUtil;
+import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import net.sf.json.JSONObject;
 
 /**
@@ -18,13 +19,14 @@ public class NCSALDAPClaimSource extends LDAPClaimsSource {
 
     public NCSALDAPClaimSource(String searchNameKey) {
         super();
+        ServletDebugUtil.trace(this, "In constructor.");
         init();
         if (searchNameKey != null && !searchNameKey.isEmpty()) {
             getLDAPCfg().setSearchFilterAttribute(searchNameKey);
         } else {
             getLDAPCfg().setSearchFilterAttribute(OA2Claims.SUBJECT);
         }
-
+       ServletDebugUtil.trace(this, "Set the search filter attribute =\"" + getLDAPCfg().getSearchFilterAttribute() + "\".");
     }
 
     public NCSALDAPClaimSource(LDAPConfiguration ldapConfiguration, MyLoggingFacade myLogger) {
@@ -39,7 +41,7 @@ public class NCSALDAPClaimSource extends LDAPClaimsSource {
             "        \"ldap\": {\n" +
             "          \"id\": \"ncsa-default\",\n" +
             "          \"name\": \"ncsa-default\",\n" +
-            "          \"address\": \"ldap.ncsa.illinois.edu\",\n" +
+            "          \"address\": \"ldap1.ncsa.illinois.edu,ldap2.ncsa.illinois.edu\",\n" +
             "          \"port\": 636,\n" +
             "          \"enabled\": true,\n" +
             "          \"authorizationType\": \"none\",\n" +
@@ -81,8 +83,8 @@ public class NCSALDAPClaimSource extends LDAPClaimsSource {
             "            \"keystore\": {},\n" +
             "            \"tlsVersion\": \"TLS\",\n" +
             "            \"useJavaTrustStore\": true,\n" +
-            "            \"password\": \"changeit\",\n" +
-            "            \"type\": \"jks\"\n" +
+            //"            \"password\": \"changeit\",\n" +
+            //"            \"type\": \"jks\"\n" +
             "          }\n" +
             "        }\n" +
             "      }";
@@ -91,6 +93,7 @@ public class NCSALDAPClaimSource extends LDAPClaimsSource {
         LDAPConfigurationUtil util = new LDAPConfigurationUtil();
         JSONObject cfg = JSONObject.fromObject(rawConfig);
         LDAPConfiguration x = util.fromJSON(cfg);
+        ServletDebugUtil.trace(this, "In init(). Setting configuration");
         setConfiguration(x);
     }
 }

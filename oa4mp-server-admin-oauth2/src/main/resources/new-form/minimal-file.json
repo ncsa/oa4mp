@@ -1,0 +1,19 @@
+{
+ "config":  [
+  "Configuration that contains new scripting notation 9/24/2018",
+  "This uses a file-backed store for users. It is stored in /home/ncsa/dev/csd/config/backup/354c-file.xml",
+  "This may be used in testing."
+ ],
+ "claims":  {
+  "sourceConfig": [{"default":   {
+   "failOnError": "true",
+   "enabled": true,
+   "filePath": "/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/test-claims.json",
+   "id": "ed63b62d1a78"
+  }}],
+  "preProcessing": {"script":   [
+   "set_claim_source('file-system-default','ed63b62d1a78');"
+  ]}
+ },
+ "isSaved": true
+}

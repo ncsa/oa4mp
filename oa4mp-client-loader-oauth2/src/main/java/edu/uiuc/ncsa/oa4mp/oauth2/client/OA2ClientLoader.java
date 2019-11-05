@@ -18,6 +18,7 @@ import edu.uiuc.ncsa.security.oauth_2_0.OA2ConfigurationLoaderUtils;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2TokenForge;
 import edu.uiuc.ncsa.security.oauth_2_0.client.*;
+import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
 import javax.inject.Provider;
@@ -123,6 +124,11 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
 
     Boolean showIDToken = null;
 
+    /**
+     * An option for the (demo) client that specifies that the user should be shown the ID token at some point.
+     * Default is <code>false</code>
+     * @return
+     */
     public boolean isShowIDToken() {
         if (showIDToken == null) {
             try {
@@ -130,6 +136,7 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
             } catch (Throwable t) {
                 showIDToken = Boolean.FALSE;
             }
+            ServletDebugUtil.trace(this, "setting " + ClientXMLTags.SHOW_ID_TOKEN + " to " + showIDToken);
         }
         return showIDToken;
     }

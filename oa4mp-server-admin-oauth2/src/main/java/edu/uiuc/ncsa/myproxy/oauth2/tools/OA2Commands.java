@@ -142,6 +142,7 @@ public class OA2Commands extends BaseCommands {
         }
         if (commands != null) {
             CLIDriver cli = new CLIDriver(commands);
+            cli.setEnv(getGlobalEnv());
             cli.start();
             return true;
         }

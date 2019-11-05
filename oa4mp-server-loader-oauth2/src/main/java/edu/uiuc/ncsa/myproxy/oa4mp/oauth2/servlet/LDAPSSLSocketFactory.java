@@ -1,14 +1,8 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.LDAPClaimsSource;
-import edu.uiuc.ncsa.security.core.util.DebugUtil;
-import edu.uiuc.ncsa.security.oauth_2_0.UserInfo;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
-import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfigurationUtil;
 import edu.uiuc.ncsa.security.util.ssl.MyTrustManager;
 import edu.uiuc.ncsa.security.util.ssl.SSLConfiguration;
-import edu.uiuc.ncsa.security.util.ssl.SSLConfigurationUtil;
-import net.sf.json.JSONObject;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 
 import javax.net.SocketFactory;
@@ -154,36 +148,6 @@ public class LDAPSSLSocketFactory extends SocketFactory {
             "{\"name\": \"mail\",\"returnAsList\": false,\"returnName\": \"email\"}]," +
             "\"searchName\": \"username\"}}";
 
-    public static void main(String[] args) {
-        try {
-            DebugUtil.dbg(LDAPSSLSocketFactory.class, System.getProperty("java.home") + "/lib/security/cacerts");
-            DebugUtil.setIsEnabled(true);
-          //  System.setProperty("javax.net.debug", "ssl");
 
-            JSONObject json = JSONObject.fromObject(ldap);
-            LDAPConfigurationUtil ldapConfigurationUtil = new LDAPConfigurationUtil();
-
-            LDAPConfiguration ldapConfiguration = ldapConfigurationUtil.fromJSON(json);
-            setLdapConfiguration(ldapConfiguration);
-             ldapConfiguration.setContextName("");
-            getSslConfiguration().setTlsVersion(SSLConfigurationUtil.TLS_1_2);
-            getSslConfiguration().setUseDefaultJavaTrustStore(false);
-            getSslConfiguration().setKeystoreType("JKS");
-            getSslConfiguration().setKeystorePassword("changeit");
-            getSslConfiguration().setKeystore("/home/ncsa/temp/java-certs/cacerts2");
-            getSslConfiguration().setTrustRootType("JKS");
-            getSslConfiguration().setTrustRootPassword("changeit");
-            getSslConfiguration().setTrustRootPath("/home/ncsa/temp/java-certs/cacerts2");
-            LDAPClaimsSource x = new LDAPClaimsSource(ldapConfiguration, null);
-            LDAPSSLSocketFactory.setLdapConfiguration(ldapConfiguration);
-            x.createConnection();
-            UserInfo userInfo = new UserInfo();
-            userInfo.getMap().putAll(x.simpleSearch(x.context, "http://cilogon.org/serverA/users/10376", ldapConfiguration.getSearchAttributes()));
-            System.out.println(userInfo);
-
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-    }
 
 }

@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.servlet.Bootstrapper;
 import edu.uiuc.ncsa.security.servlet.ServletConfigUtil;
+import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.util.configuration.ConfigUtil;
 
 import javax.servlet.ServletContext;
@@ -80,13 +81,18 @@ public abstract class AbstractClientBootstrapper extends Bootstrapper {
     @Override
     public ConfigurationLoader getConfigurationLoader(ServletContext servletContext) throws Exception {
         MyLoggingFacade logger = new MyLoggingFacade(getClass().getSimpleName());
+        String cfgName=servletContext.getInitParameter(getOa4mpConfigNameKey());
+        String fileName= servletContext.getInitParameter(getOa4mpConfigFileKey());
+        ServletDebugUtil.trace(this, "Attempting to load configuration \"" + cfgName + "\" from file \"" + fileName + "\"");
         logger.info("Starting to load configuration");
         try {
             ConfigurationLoader x = getConfigurationLoader(
                     ServletConfigUtil.findConfigurationNode(servletContext, getOa4mpConfigFileKey(), getOa4mpConfigNameKey(), ClientXMLTags.COMPONENT));
-            logger.info("Loaded configuration named " + servletContext.getInitParameter(getOa4mpConfigNameKey()) + " from file " + servletContext.getInitParameter(getOa4mpConfigFileKey()));
+            logger.info("Loaded configuration named " + cfgName + " from file " + fileName);
             return x;
         } catch (MyConfigurationException ce) {
+            ServletDebugUtil.trace(this, "Did not find a configuration via the servlet context.");
+
             logger.info("Did not find a configuration via the servlet context:" + ce.getMessage());
         }
 
@@ -99,6 +105,7 @@ public abstract class AbstractClientBootstrapper extends Bootstrapper {
         }
 
         MyConfigurationException cx = new MyConfigurationException("Error: No configuration found anyplace. OA4MP client startup aborted!");
+        ServletDebugUtil.error(this, "Failed to find any configuration.", cx);
         logger.error(cx);
         throw cx;
     }

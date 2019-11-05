@@ -1,19 +1,27 @@
 {
- "config": [
-   "Scripting test configuration 10/3/2018",
-   "This is the case that if the IDP is the NCSA, It sets the search  name from the eppn,",
-   "then the standard set of claims is created and returned.",
-   "Also, the sub is set to being the eppn rather than the internal identifier (e.g. cilogon uid).",
-   "Omit the postProcessing if you want do not want to reset the sub claim"
+ "config":  [
+  "Configuration that contains new scripting notation 10/31/2019",
+  "This uses the default ncsa LDAP. The assumption is that this is the only LDAP spource needed",
+   "It is stored locally in /home/ncsa/dev/csd/config/backup/354c-ncsa.xml",
+  "This is used to help debug changes to the default as well and sets a few claims to help"
  ],
- "isSaved": true,
- "runtime": {"script":  [
-   "set('uid',drop('${eppn}','@illinois.edu'));",
-   "if[",
-  "    equals(get('idp'),'https://idp.ncsa.illinois.edu/idp/shibboleth')",
-  "  ]then[",
-  "    set_claim_source('ncsa-default','uid')",
-  "];"
- ]},
- "claims": {"postProcessing": {"script": ["set('sub',get('eppn'));"]}}
+ "claims":  {
+   "comment":[
+     "The way this works is that this preprocessing block is run before claims are gotten every time",
+     "This sets the uid from the eppn and sets the claim source if the IDP is NCSA.",
+     "Note that this could have a postProcessing",
+     "block that would remove the uid or perhaps set the subject claim too."
+   ],
+
+  "preProcessing": {"script":   [
+    "if[",
+     "   equals('${idp},'https://idp.ncsa.illinois.edu/idp/shibboleth');",
+     "]then[",
+     "   set('uid',drop('@ncsa.illinois.edu','${eppn}'));",
+     "   set_claim_source('ncsa-default','uid');",
+     "];"
+
+  ]}
+ },
+ "isSaved": true
 }

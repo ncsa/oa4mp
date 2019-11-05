@@ -11,23 +11,29 @@ import edu.uiuc.ncsa.myproxy.oa4mp.NewTransactionTest;
 import edu.uiuc.ncsa.myproxy.oa4mp.ServiceConfigTest;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2Bootstrapper;
 import edu.uiuc.ncsa.security.delegation.storage.FileStoreTest;
-import edu.uiuc.ncsa.security.util.JFunctorFactoryTests;
-import edu.uiuc.ncsa.security.util.JFunctorTest;
+import edu.uiuc.ncsa.security.util.*;
+import edu.uiuc.ncsa.security.util.cache.CacheTest;
 import junit.framework.TestSuite;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
-
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on Nov 27, 2010 at  1:28:14 PM
  */
 @RunWith(Suite.class)
+// start with legacy tests from the security library so we make sure these work.
+
+// Then start the tests for OA4MP proper.
 
 @Suite.SuiteClasses({
-        ClientConfigurationTest.class,
+        TemplateTest.class,
+        CacheTest.class,
+        EditorTest.class,
+        JSONPreprocessorTest.class,
         JFunctorTest.class,
+        ClientConfigurationTest.class,
         OA2ParserTest.class,
         OA2FunctorTests.class,
         JFunctorFactoryTests.class,
@@ -53,3 +59,6 @@ public class ServiceTestSuite2 extends TestSuite {
         testSuiteInitializer.init();
     }
 }
+
+
+
