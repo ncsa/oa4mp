@@ -78,6 +78,11 @@ public class MemoryPermissionStore<V extends Permission> extends MemoryStore<V> 
     }
 
     @Override
+    public int getClientCount(Identifier adminID) {
+        return getClients(adminID).size();
+    }
+
+    @Override
     public PermissionList get(Identifier adminID, Identifier clientID) {
         List<IDTriple> clients = adminMap.get(adminID);
 

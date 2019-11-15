@@ -1,0 +1,11 @@
+{
+  "comment":"This is an example for a complete Custos admin client create request as of 11/8/2019",
+  "client_name":"Sample Custos client",
+  "redirect_uris": [
+     "https://client.example.org/callback",
+     "https://client.example.org/callback2"
+   ],
+  "scope": ["openid", "email", "profile", "org.cilogon.userinfo"],
+  "client_uri" :"http://uri/for/client",
+  "contacts":["single email"]
+}

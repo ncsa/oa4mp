@@ -19,6 +19,7 @@ import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2RegistrationServlet.
  * on 4/9/19 at  1:39 PM
  */
 public class OA2AdminRegistrationServlet extends AbstractRegistrationServlet {
+
     @Override
     protected String getInitPage() {
         return "admin-client-registration-init.jsp";

@@ -41,4 +41,5 @@ public interface PermissionsStore<V extends Permission> extends Store<V> {
      */
     public boolean hasEntry(Identifier adminID, Identifier clientID);
 
+    public int getClientCount(Identifier adminID);
 }

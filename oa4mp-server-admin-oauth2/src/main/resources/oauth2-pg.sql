@@ -77,6 +77,7 @@ create table :oa4mpSchema.:oa4mpAdminClientTable  (
     secret text,
     vo text,
     issuer text,
+    max_clients integer,
     creation_ts TIMESTAMP);
 
 

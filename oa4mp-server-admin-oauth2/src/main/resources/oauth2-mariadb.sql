@@ -56,6 +56,7 @@ CREATE TABLE oauth2.adminClients (
   email        TEXT,
   creation_ts  TIMESTAMP DEFAULT NULL,
   vo           TEXT,
+  max_clients  BIGINT,
   issuer       TEXT
 );
 

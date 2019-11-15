@@ -75,7 +75,9 @@ public class ClientServer extends AbstractDDServer {
         if (request.getAdminClient() != null && (request.getAdminClient().getIdentifier() == null || request.getAdminClient().getIdentifierString().length() == 0)) {
             throw new GeneralException("Error: An admin client was specified, but no identifier for this client was given. Request rejected.");
         }
-
+        if(request.getAdminClient().getMaxClients() < getPermissionStore().getClientCount(request.getAdminClient().getIdentifier())){
+            throw new GeneralException("Error: The number of clients this admin can create, " + request.getAdminClient().getMaxClients() + ", has been exceeded.");
+        }
         //canCreate(request);
         //requires and admin client and hashmap
         ColumnMap values = new ColumnMap();

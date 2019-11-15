@@ -165,10 +165,10 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
         }
 
         if (client.getSecret() == null) {
-            sayi("public key: (none)");
+            sayi("secret : (none)");
 
         } else {
-            sayi("public key:");
+            sayi("secret:");
             say(client.getSecret());
         }
 

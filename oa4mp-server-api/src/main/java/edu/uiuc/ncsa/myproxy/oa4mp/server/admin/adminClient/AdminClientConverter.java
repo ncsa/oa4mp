@@ -30,6 +30,13 @@ public class AdminClientConverter<V extends AdminClient> extends BaseClientConve
         V v = super.fromJSON(json);
         v.setIssuer(getJsonUtil().getJSONValueString(json, getACK().issuer()));
         v.setVirtualOrganization(getJsonUtil().getJSONValueString(json, getACK().vo()));
+        // implies that this might be a legacy admin client and has a database entry that is null
+        // rather than an integer. In that case, set it to the default.
+        if(!json.containsKey(getACK().maxClients()) || json.get(getACK().maxClients()) == null){
+            v.setMaxClients(AdminClient.DEFAULT_MAX_NUMBER_OF_OIDC_CLIENTS);
+        }else{
+            v.setMaxClients(getJsonUtil().getJSONValueInt(json, getACK().maxClients()));
+        }
         return v;
     }
 
@@ -38,6 +45,13 @@ public class AdminClientConverter<V extends AdminClient> extends BaseClientConve
         V value = super.fromMap(map, v);
         value.setVirtualOrganization(map.getString(getACK().vo()));
         value.setIssuer(map.getString(getACK().issuer()));
+        // implies that this might be a legacy admin client and has a database entry that is null
+        // rather than an integer. In that case, set it to the default.
+        if(!map.containsKey(getACK().maxClients()) || map.get(getACK().maxClients()) == null){
+            value.setMaxClients(AdminClient.DEFAULT_MAX_NUMBER_OF_OIDC_CLIENTS);
+        }else {
+            value.setMaxClients(map.getInteger(getACK().maxClients()));
+        }
         return value;
     }
 
@@ -46,13 +60,14 @@ public class AdminClientConverter<V extends AdminClient> extends BaseClientConve
         super.toJSON(client, json);
         getJsonUtil().setJSONValue(json, getACK().vo(), client.getVirtualOrganization());
         getJsonUtil().setJSONValue(json, getACK().issuer(), client.getIssuer());
-
+        getJsonUtil().setJSONValue(json, getACK().maxClients(), client.getMaxClients());
     }
 
     @Override
     public void toMap(V client, ConversionMap<String, Object> map) {
         map.put(getACK().issuer(), client.getIssuer());
         map.put(getACK().vo(), client.getVirtualOrganization());
+        map.put(getACK().maxClients(), client.getMaxClients());
         super.toMap(client, map);
     }
 }

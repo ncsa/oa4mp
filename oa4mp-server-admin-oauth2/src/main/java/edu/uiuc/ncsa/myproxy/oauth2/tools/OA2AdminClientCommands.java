@@ -41,11 +41,9 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
     protected void longFormat(Identifiable identifiable) {
         super.longFormat(identifiable);
         AdminClient client = (AdminClient) identifiable;
-        sayi("creation timestamp=" + client.getCreationTS());
-        sayi("last modified timestamp=" + client.getLastModifiedTS());
         sayi("issuer=" + client.getIssuer());
         sayi("vo=" + client.getVirtualOrganization());
-
+        sayi("max clients=" + client.getMaxClients());
     }
 
     @Override
@@ -57,7 +55,7 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
 
 
         while (askForSecret) {
-            input = getInput("enter a new secret or return to skip.", secret);
+            input = getInput("enter a new secret (this will be hashed, not stored) or return to skip.", secret);
             if (isEmpty(input)) {
                 sayi("Nothing entered. Client secret entry skipped.");
                 break;
@@ -79,12 +77,16 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
         if (!isEmpty(vo)) {
             client.setVirtualOrganization(vo);
         }
+        String max = getInput("Enter new maximum number of clients allowed", Integer.toString(client.getMaxClients()));
+        if(!isEmpty(max)){
+            client.setMaxClients(Integer.parseInt(max));
+        }
 
     }
 
     protected void showListClientsHelp() {
         say("list_clients id|index - list all the clients this administrator manages");
-        say("                       This also lists if the client with the given id has been approved.");
+        say("                        This also lists if the client with the given id has been approved.");
     }
 
     // For CIL-508
@@ -105,8 +107,28 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
         for (Identifier identifier : clients) {
             say("(" + (getClientApprovalStore().isApproved(identifier)?"Y":"N") + ") " + identifier);
         }
-
+       say(clients.size() + " total clients");
     }
+
+    protected void showCountClientsHelp() {
+        say("count_clients id|index - Count the number of clients this administrator manages");
+        say("                       For databases, this call is more efficient that getting all the clients and counting them.");
+    }
+
+
+    public void count_clients(InputLine inputLine) throws Exception{
+           if (showHelp(inputLine)) {
+               showCountClientsHelp();
+               return;
+           }
+           AdminClient adminClient = (AdminClient) findItem(inputLine);
+           if (adminClient == null) {
+               say("Sorry, there is no admin client for this identifier.");
+               return;
+           }
+           say("This admin client manages " + permissionsStore.getClientCount(adminClient.getIdentifier()) + " out of " + adminClient.getMaxClients() + ".");
+       }
+
 
 
     protected void showListAdminsHelp(){
@@ -139,6 +161,7 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
             AdminClient adminClient = (AdminClient)getStore().get(id);
             say(format(adminClient, (ClientApproval) getClientApprovalStore().get(adminClient.getIdentifier())));
         }
+        say(admins.size() + " admin clients");
 
     }
     @Override

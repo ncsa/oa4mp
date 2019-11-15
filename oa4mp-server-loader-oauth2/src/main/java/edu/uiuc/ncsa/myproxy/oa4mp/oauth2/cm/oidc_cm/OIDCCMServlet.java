@@ -20,6 +20,7 @@ import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2GeneralError;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Scopes;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.ClientConfigurationUtil;
+import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -151,11 +152,11 @@ public class OIDCCMServlet extends EnvServlet {
         try {
             AdminClient adminClient = getAndCheckAdminClient(req);
             String rawID = req.getParameter(OA2Constants.CLIENT_ID);
-            if(rawID == null || rawID.isEmpty()){
+            if (rawID == null || rawID.isEmpty()) {
                 throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, "Missing client id", HttpStatus.SC_BAD_REQUEST);
             }
             OA2Client client = (OA2Client) getOA2SE().getClientStore().get(BasicIdentifier.newID(rawID));
-            if(client == null){
+            if (client == null) {
                 // Then this client does not exist on this server. Spec. says this is all fine and good
                 resp.setStatus(HttpStatus.SC_NO_CONTENT);
                 return;
@@ -179,26 +180,28 @@ public class OIDCCMServlet extends EnvServlet {
     /**
      * Checks that this client exists on the system and that if it exists, the admin client actually
      * owns it.
+     *
      * @param adminClient
      * @param client
      */
-    protected void checkAdminPermission(AdminClient adminClient, OA2Client client){
-        if(client == null){
-                 throw new OA2GeneralError(OA2Errors.UNAUTHORIZED_CLIENT,
-                         "unknown client",
-                         HttpStatus.SC_UNAUTHORIZED // as per spec
-                 );
-             }
-             // now we check that this admin owns this client
-             List<Identifier> clientList = getOA2SE().getPermissionStore().getClients(adminClient.getIdentifier());
-             if(!clientList.contains(client.getIdentifier())){
-                     throw new OA2GeneralError(OA2Errors.ACCESS_DENIED,
-                             "access denied",
-                             HttpStatus.SC_FORBIDDEN // as per spec.
-                     );
-             }
+    protected void checkAdminPermission(AdminClient adminClient, OA2Client client) {
+        if (client == null) {
+            throw new OA2GeneralError(OA2Errors.UNAUTHORIZED_CLIENT,
+                    "unknown client",
+                    HttpStatus.SC_UNAUTHORIZED // as per spec
+            );
+        }
+        // now we check that this admin owns this client
+        List<Identifier> clientList = getOA2SE().getPermissionStore().getClients(adminClient.getIdentifier());
+        if (!clientList.contains(client.getIdentifier())) {
+            throw new OA2GeneralError(OA2Errors.ACCESS_DENIED,
+                    "access denied",
+                    HttpStatus.SC_FORBIDDEN // as per spec.
+            );
+        }
 
     }
+
     /**
      * Update a client. Note that as per the specification, all values that are sent over-write existing
      * values and omitted values are taken to mean the stored value is unset.
@@ -228,7 +231,7 @@ public class OIDCCMServlet extends EnvServlet {
             }
             JSONObject jsonRequest = (JSONObject) rawJSON;
 
-            if(jsonRequest.size() == 0){
+            if (jsonRequest.size() == 0) {
                 // Playing nice here. If they upload an empty object, the net effect is going to be to zero out
                 // everything for this client except the id. The assumption is they don't want to do that.
                 getMyLogger().info("Error: Got an empty JSON object. Request rejected.");
@@ -236,10 +239,10 @@ public class OIDCCMServlet extends EnvServlet {
                         "invalid request", HttpStatus.SC_BAD_REQUEST);
             }
             //have to check that certain key/values are excluded from the update.
-            if(jsonRequest.containsKey(OIDCCMConstants.REGISTRATION_ACCESS_TOKEN) ||
-            jsonRequest.containsKey(OIDCCMConstants.CLIENT_SECRET_EXPIRES_AT) ||
-            jsonRequest.containsKey(OIDCCMConstants.CLIENT_SECRET_EXPIRES_AT) ||
-            jsonRequest.containsKey(OIDCCMConstants.CLIENT_ID_ISSUED_AT)){
+            if (jsonRequest.containsKey(OIDCCMConstants.REGISTRATION_ACCESS_TOKEN) ||
+                    jsonRequest.containsKey(OIDCCMConstants.CLIENT_SECRET_EXPIRES_AT) ||
+                    jsonRequest.containsKey(OIDCCMConstants.CLIENT_SECRET_EXPIRES_AT) ||
+                    jsonRequest.containsKey(OIDCCMConstants.CLIENT_ID_ISSUED_AT)) {
                 throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
                         "invalid parameter",
                         HttpStatus.SC_BAD_REQUEST);
@@ -269,23 +272,23 @@ public class OIDCCMServlet extends EnvServlet {
                     );
                 }
             }
-                // so we create a new client, set the secret and id, then update that. This way if
-                // this fails we can just back out.
-                OA2Client newClient = (OA2Client) getOA2SE().getClientStore().create();
-                newClient.setIdentifier(client.getIdentifier());
-                newClient.setSecret(client.getSecret());
-                newClient.setConfig(client.getConfig());
-                try {
-                    newClient = updateClient(newClient, jsonRequest, resp);
-                    getOA2SE().getClientStore().save(newClient);
+            // so we create a new client, set the secret and id, then update that. This way if
+            // this fails we can just back out.
+            OA2Client newClient = (OA2Client) getOA2SE().getClientStore().create();
+            newClient.setIdentifier(client.getIdentifier());
+            newClient.setSecret(client.getSecret());
+            newClient.setConfig(client.getConfig());
+            try {
+                newClient = updateClient(newClient, jsonRequest, resp);
+                getOA2SE().getClientStore().save(newClient);
 
-                } catch (Throwable t) {
-                    // back out of it
-                    warn("Error attempting to update client \"" + client.getIdentifierString() + "\". " +
-                            "Message = \"" + t.getMessage() + "\". Request is rejected");
-                   // resp.setStatus(HttpStatus.SC_BAD_REQUEST);
-                    handleException(t,req,resp);
-                }
+            } catch (Throwable t) {
+                // back out of it
+                warn("Error attempting to update client \"" + client.getIdentifierString() + "\". " +
+                        "Message = \"" + t.getMessage() + "\". Request is rejected");
+                // resp.setStatus(HttpStatus.SC_BAD_REQUEST);
+                handleException(t, req, resp);
+            }
         } catch (Throwable t) {
             handleException(t, req, resp);
         }
@@ -332,6 +335,7 @@ public class OIDCCMServlet extends EnvServlet {
     /**
      * Pulls the id and secret from the header then verifies the secret and if it passes,
      * returns the client.
+     *
      * @param request
      * @return
      * @throws Throwable
@@ -348,10 +352,13 @@ public class OIDCCMServlet extends EnvServlet {
         if (adminSecret == null || adminSecret.isEmpty()) {
             throw new GeneralException("Error: missing secret.");
         }
-
+        if (!getOA2SE().getClientApprovalStore().isApproved(acID)) {
+            ServletDebugUtil.trace(this, "Admin client \"" + acID + "\" is not approved.");
+            throw new GeneralException("error: This admin client has not been approved.");
+        }
         String hashedSecret = DigestUtils.sha1Hex(adminSecret);
         if (!adminClient.getSecret().equals(hashedSecret)) {
-            throw new IllegalAccessException("error: client and secret do not match");
+            throw new GeneralException("error: client and secret do not match");
         }
         return adminClient;
     }
@@ -363,7 +370,10 @@ public class OIDCCMServlet extends EnvServlet {
         AdminClient adminClient = getAndCheckAdminClient(httpServletRequest);
         // Now that we have the admin client (so we can do this request), we read the payload:
         JSON rawJSON = getPayload(httpServletRequest);
-
+        if ( adminClient.getMaxClients() < getOA2SE().getPermissionStore().getClientCount(adminClient.getIdentifier()) ) {
+            getMyLogger().info("Error: Max client count of " + adminClient.getMaxClients() + " exceeded.");
+            throw new GeneralException("Error: Max client count of " + adminClient.getMaxClients() + " exceeded.");
+        }
         DebugUtil.trace(this, rawJSON.toString());
         if (rawJSON.isArray()) {
             getMyLogger().info("Error: Got a JSON array rather than a request:" + rawJSON);
@@ -494,6 +504,14 @@ public class OIDCCMServlet extends EnvServlet {
         }
         client.setName(jsonRequest.getString(OIDCCMConstants.CLIENT_NAME));
         jsonRequest.remove(OIDCCMConstants.CLIENT_NAME);
+        if (jsonRequest.containsKey(OIDCCMConstants.CLIENT_URI)) {
+            // The client **should** have this but it not requred,
+            client.setHomeUri(jsonRequest.getString(OIDCCMConstants.CLIENT_URI));
+            jsonRequest.remove(OIDCCMConstants.CLIENT_URI);
+        } else {
+            client.setHomeUri(""); // not great, but...
+        }
+
         client.setSignTokens(true); // always for us.
         if (!jsonRequest.containsKey(OA2Constants.SCOPE)) {
             // no scopes and this is an OIDC server implies just the openid scope and this is a public client
@@ -517,6 +535,17 @@ public class OIDCCMServlet extends EnvServlet {
         if (config == null) {
             // Just in case there is no config.
             config = new JSONObject();
+        }
+        if (jsonRequest.containsKey(OIDCCMConstants.CONTACTS)) {
+            // This is a set of strings thjat are typically email addresses.
+            // Todo: Really check these and allow for multiple values
+            // Todo: This takes only the very first.
+            JSONArray emails = jsonRequest.getJSONArray(OIDCCMConstants.CONTACTS);
+            ServletDebugUtil.info(this, "Multiple contacts addresses found " + emails + "\n Only the first is used currently.");
+            if (!emails.isEmpty()) {
+                client.setEmail(emails.getString(0));
+            }
+            jsonRequest.remove(OIDCCMConstants.CONTACTS);
         }
         OA2ClientConfigurationUtil.setExtraAttributes(config, jsonRequest);
         client.setConfig(config);

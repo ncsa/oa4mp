@@ -56,6 +56,11 @@ public class PermissionFileStore<V extends Permission> extends FileStore<V> impl
     }
 
     @Override
+    public int getClientCount(Identifier adminID) {
+        return getClients(adminID).size();
+    }
+
+    @Override
     public PermissionList get(Identifier adminID, Identifier clientID) {
         PermissionList permissions = new PermissionList();
          for(Permission p: values()){

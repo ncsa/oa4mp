@@ -86,33 +86,38 @@ public class OA2ClientUtils {
 
     /**
      * This takes a list of callbacks and checks policies for each of them. This does the actual work for checking
+     *
      * @param rawCBs
      * @param dudUris -- this is a list of any URIs that are rejected. The caller may do with them what they will.
      * @return
      * @throws IOException
      */
     public static LinkedList<String> createCallbacks(List<String> rawCBs,
-                                                     List<String>dudUris) throws IOException {
+                                                     List<String> dudUris) throws IOException {
         LinkedList<String> uris = new LinkedList<>();
 
-        for(String x : rawCBs) {
-                  // Fix for CIL-545. Allowing a wider range of redirect URIs to support devices such as smart phones.
-                  // How it works: Either the protocol is not http/https in which case it is allowed
-                  // but if it is http, only localhost is permitted. Any https works.
-                  try {
-                      URI temp = URI.create(x);
-                      String host = temp.getHost();
-                      String scheme = temp.getScheme();
-                      ServletDebugUtil.trace(OA2ClientUtils.class, "createCallbacks, processing callback \"" + x + "\"");
+        for (String x : rawCBs) {
+            // Fix for CIL-609 -- don't add empty strings or white space.
+            if (x == null || x.isEmpty() || x.trim().isEmpty()) {
+                continue;
+            }
+            // Fix for CIL-545. Allowing a wider range of redirect URIs to support devices such as smart phones.
+            // How it works: Either the protocol is not http/https in which case it is allowed
+            // but if it is http, only localhost is permitted. Any https works.
+            try {
+                URI temp = URI.create(x);
+                String host = temp.getHost();
+                String scheme = temp.getScheme();
+                ServletDebugUtil.trace(OA2ClientUtils.class, "createCallbacks, processing callback \"" + x + "\"");
 
-                      if (scheme != null && scheme.toLowerCase().equals("https")) {
-                          // any https works
-                          uris.add(x);
-                      } else {
-                          if (isPrivate(host, scheme)) {
-                              uris.add(x);
-                          } else {
-                              if (temp.getAuthority() == null || temp.getAuthority().isEmpty()) {
+                if (scheme != null && scheme.toLowerCase().equals("https")) {
+                    // any https works
+                    uris.add(x);
+                } else {
+                    if (isPrivate(host, scheme)) {
+                        uris.add(x);
+                    } else {
+                        if (temp.getAuthority() == null || temp.getAuthority().isEmpty()) {
                                   /*
                                   Finally, if it does not have an authority, then it is probably
                                   an intention for another (probably mobile) device (so in that case,
@@ -130,16 +135,16 @@ public class OA2ClientUtils {
 
                                    which has a scheme, no authority and a path.
                                    */
-                                  uris.add(x);
-                              } else {
-                                  dudUris.add(x);
-                              }
-                          }
-                      }
+                            uris.add(x);
+                        } else {
+                            dudUris.add(x);
+                        }
+                    }
+                }
 
-                  } catch (IllegalArgumentException urisx) {
-                      dudUris.add(x);
-                  }
+            } catch (IllegalArgumentException urisx) {
+                dudUris.add(x);
+            }
 
               /*  Old stuff before CIL-545
                  if (!x.toLowerCase().startsWith("https:")) {
@@ -149,13 +154,14 @@ public class OA2ClientUtils {
                   URI.create(x); // passes here means it is a uri. All we want this to do is throw an exception if needed.
 
                   uris.add(x);*/
-              }
-              return uris;
+        }
+        return uris;
     }
 
     /**
      * This is for use with the web interface. The string in this case is the contents of a textbox that has
      * one callback per line. Each callback is processed.
+     *
      * @param client
      * @param rawCBs
      * @return
@@ -169,12 +175,12 @@ public class OA2ClientUtils {
         LinkedList<String> uris = new LinkedList<>();
         LinkedList<String> dudUris = new LinkedList<>();
 
-        while(x != null){
+        while (x != null) {
             uris.add(x);
             x = br.readLine();
         }
         br.close();
-        LinkedList<String> foundURIs =  createCallbacks(uris,dudUris);
+        LinkedList<String> foundURIs = createCallbacks(uris, dudUris);
         if (0 < dudUris.size()) {
             String xx = "</br>";
             boolean isOne = dudUris.size() == 1;

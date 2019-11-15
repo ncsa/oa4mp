@@ -63,6 +63,33 @@ public class SQLPermissionStore<V extends Permission> extends SQLStore<V> implem
     }
 
     @Override
+    public int getClientCount(Identifier adminID) {
+        ArrayList<Identifier> clients = new ArrayList<>();
+          if(adminID == null) return 0;
+
+            Connection c = getConnection();
+            PermissionKeys permissionKeys = new PermissionKeys();
+            try {
+                PreparedStatement stmt = c.prepareStatement("select COUNT(*)  from " +
+                        getTable().getFQTablename() + " where " +permissionKeys.adminID() + "=?");
+                stmt.setString(1, adminID.toString());
+                stmt.execute();// just execute() since executeQuery(x) would throw an exception regardless of content per JDBC spec.
+
+                ResultSet rs = stmt.getResultSet();
+                rs.next();
+                int totalClients = rs.getInt(1);
+                rs.close();
+                stmt.close();
+                return totalClients;
+            } catch (SQLException e) {
+                destroyConnection(c);
+                throw new GeneralException("Error: could not get database object", e);
+            } finally {
+                releaseConnection(c);
+            }
+    }
+
+    @Override
     public List<Identifier> getClients(Identifier adminID) {
         ArrayList<Identifier> clients = new ArrayList<>();
         if(adminID == null) return clients;
