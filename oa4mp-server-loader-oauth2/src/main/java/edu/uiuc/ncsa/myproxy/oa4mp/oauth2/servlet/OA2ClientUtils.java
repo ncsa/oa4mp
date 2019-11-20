@@ -69,6 +69,14 @@ public class OA2ClientUtils {
 
     }
 
+    public static class NoScopesError extends OA2GeneralError {
+
+           public NoScopesError(String error, String description, int httpStatus) {
+               super(error, description, httpStatus);
+           }
+
+       }
+
     public static class NoRegisteredRedirectError extends OA2GeneralError {
 
         public NoRegisteredRedirectError(String error, String description, int httpStatus) {

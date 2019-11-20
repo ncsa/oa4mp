@@ -244,7 +244,6 @@ public class OA2AuthorizedServletUtil {
         //st.setClient(agResponse.getClient());
         DebugUtil.info(this,"Created new unsaved transaction with id=" + st.getIdentifierString());
         Collection<String> scopes = resolveScopes(st, params, state, givenRedirect);
-
         st.setScopes(scopes);
         st.setAuthGrantValid(false);
         st.setAccessTokenValid(false);
