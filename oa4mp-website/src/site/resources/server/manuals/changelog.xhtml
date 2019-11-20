@@ -19,6 +19,8 @@
     <li>CIL-503: Creating a new user results in a serial string with the same index.</li>
     <li>CIL-518: Remove zero length files. This now has a flag to enable/disable this in the configuration.
         It is only an issue if a server is using file storage. Look at the file store documentation to learn more.</li>
+    <li>CIL-525: Added a file-based claim source in addition to claim sources from LDAP, headers and such. This allows server
+        to manage either all their claims or have a repository for very specific ones.</li>
     <li>CIL-566: Fire email for admin client registration. <b>NOTE:</b> the reason this failed at one point was because of an upgrade from Java 8 to Java 11. Please
     see the email configuration documentation for the details of getting this to work. Basically you need to include
     on more file.</li>
