@@ -4,7 +4,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.client.AssetResponse;
 import edu.uiuc.ncsa.myproxy.oa4mp.client.ClientEnvironment;
 import edu.uiuc.ncsa.myproxy.oa4mp.client.OA4MPResponse;
 import edu.uiuc.ncsa.myproxy.oa4mp.client.storage.AssetStoreUtil;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.testing.TestCommands;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.testing.CLCCommands;
 import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2Asset;
 import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2MPService;
 import edu.uiuc.ncsa.security.core.Identifier;
@@ -44,8 +44,8 @@ import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.RAW_ID_TOKEN;
  * <p>Created by Jeff Gaynor<br>
  * on 5/11/16 at  2:57 PM
  */
-public class OA2TestCommands extends TestCommands {
-    public OA2TestCommands(MyLoggingFacade logger, ClientEnvironment ce) {
+public class OA2CLCCommands extends CLCCommands {
+    public OA2CLCCommands(MyLoggingFacade logger, ClientEnvironment ce) {
         super(logger, ce);
     }
 

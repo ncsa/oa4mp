@@ -89,7 +89,6 @@ public class OA4MPServletInitializer implements Initialization {
          MyProxyDelegationServlet mps = (MyProxyDelegationServlet) getServlet();
          ServiceEnvironmentImpl env = (ServiceEnvironmentImpl) getEnvironment();
          MyLoggingFacade logger = env.getMyLogger();
-         // debugging this...
          NewClientNotifier newClientNotifier = createNewClientNotifier(env.getMailUtil(), logger);
          MyProxyDelegationServlet.addNotificationListener(newClientNotifier);
          MailUtil x = new MailUtil(env.getMailUtil().getMailEnvironment());

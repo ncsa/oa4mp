@@ -12,15 +12,29 @@
 <!--#include virtual="../../header.html" -->
 
 <h1>Administrative Clients</h1>
-<p>An administrative client in OA4MP is a client that is authorized to create standard clients. A standard
-OAuth client (which gets tokens, etc.) Administrative clients can be requested via a specific endpoint,
-usually <code>../oauth2/admin-client</code>. It should be stressed that administrative clients are
-not part of any OAuth standard and are therefore outside the requirements for standard OAuth clients.</p>
+<p>An administrative client in OA4MP is a client that is authorized to create standard OAuth 2 clients. A standard
+    OAuth client is one which gets tokens, etc. Administrative clients can be requested via a specific endpoint,
+    usually <code>../oauth2/admin-client</code>. It should be stressed that administrative clients are
+    not part of any OAuth standard and are therefore outside the requirements for standard OAuth clients. The
+    default registration screen looks like this:</p>
+<p><img src="server/images/admin-registration.png"
+        alt="Admin Registration Form Image" width="893" height="624"/></p>
 
-<p>The most ocmmon use of an administrative client is the dynamic registration of standard clients. This
-allows an institution to create customized clients each with their own configuration for open
+<p>Note that once this is submitted, it must be approved. Once your admin client has been approved, you may then
+    create standard clients which are automatically approved on creation. </p>
+
+<p>The most common use of an administrative client is the dynamic registration of standard clients. There
+    are two general methods for this, the first is the native OA4MP client management protocol
+    and the second is an implementation of RFCs 7591 and 7592 allowing for dynmaic client
+    registration. The OA4MP protocol preceeded the RFCs by quite a while and both are generally
+    supported on any standard OA4MP server. An advantage of the OA4MP protocol is that clients
+    may specify additional configuration for native OA4MP tools, such as scripting for custom claim sources,
+    which generic OIDC clients do not have.</p>
+
+<p>Admin clients
+    allows an institution to create customized clients each with their own configuration for open
     authorization. An example would be a <a href="https://www.cilogon.org/comanage">COManage instance</a>
-    which could set up a specific client for use by every virtual organization it creates. 
+    which could set up (a) specific client(s) for use by every virtual organization it creates.
 </p>
 
 <!--#include virtual="../../footer.html" -->

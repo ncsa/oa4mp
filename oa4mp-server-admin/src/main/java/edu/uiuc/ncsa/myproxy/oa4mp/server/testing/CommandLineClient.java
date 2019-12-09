@@ -11,12 +11,12 @@ import edu.uiuc.ncsa.security.util.cli.ConfigurableCommandsImpl;
  * <p>Created by Jeff Gaynor<br>
  * on 5/11/16 at  10:34 AM
  */
-public abstract class CLITester extends ConfigurableCommandsImpl {
+public abstract class CommandLineClient extends ConfigurableCommandsImpl {
     ClientEnvironment getCE() throws Exception {
         return (ClientEnvironment) getEnvironment();
     }
 
-    public CLITester(MyLoggingFacade logger) {
+    public CommandLineClient(MyLoggingFacade logger) {
         super(logger);
     }
 

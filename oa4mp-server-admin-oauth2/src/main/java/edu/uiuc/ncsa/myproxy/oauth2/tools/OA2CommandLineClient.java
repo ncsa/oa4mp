@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oauth2.tools;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.client.ClientEnvironment;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.testing.CLITester;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.testing.CommandLineClient;
 import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2ClientLoader;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
@@ -15,8 +15,8 @@ import org.apache.commons.lang.StringUtils;
  * <p>Created by Jeff Gaynor<br>
  * on 5/11/16 at  2:51 PM
  */
-public class OA2Tester extends CLITester {
-    public OA2Tester(MyLoggingFacade logger) {
+public class OA2CommandLineClient extends CommandLineClient {
+    public OA2CommandLineClient(MyLoggingFacade logger) {
         super(logger);
     }
 
@@ -27,9 +27,9 @@ public class OA2Tester extends CLITester {
 
     public static void main(String[] args) {
         try {
-            OA2Tester testCommands = new OA2Tester(null);
+            OA2CommandLineClient testCommands = new OA2CommandLineClient(null);
             testCommands.start(args);
-            OA2TestCommands usc = new OA2TestCommands(testCommands.getMyLogger(), (ClientEnvironment) testCommands.getEnvironment());
+            OA2CLCCommands usc = new OA2CLCCommands(testCommands.getMyLogger(), (ClientEnvironment) testCommands.getEnvironment());
 
             CLIDriver cli = new CLIDriver(usc);
             cli.start();
@@ -50,7 +50,7 @@ public class OA2Tester extends CLITester {
             int width = 60;
             String stars = StringUtils.rightPad("", width + 1, "*");
             say(stars);
-            say(padLineWithBlanks("* OA4MP2 OAuth 2/OIDC command line test client", width) + "*");
+            say(padLineWithBlanks("* OA4MP OAuth 2/OIDC command line client", width) + "*");
             say(padLineWithBlanks("* Version " + LoggingConfigLoader.VERSION_NUMBER, width) + "*");
             say(padLineWithBlanks("* By Jeff Gaynor  NCSA", width) + "*");
             say(padLineWithBlanks("*  (National Center for Supercomputing Applications)", width) + "*");
@@ -64,7 +64,7 @@ public class OA2Tester extends CLITester {
     public boolean use(InputLine inputLine) throws Exception {
         String indent = "  ";
             if (inputLine.hasArg("test")) {
-                OA2TestCommands usc = new OA2TestCommands(getMyLogger(), (ClientEnvironment) getEnvironment());
+                OA2CLCCommands usc = new OA2CLCCommands(getMyLogger(), (ClientEnvironment) getEnvironment());
                 CLIDriver cli = new CLIDriver(usc);
                 cli.start();
                 return true;

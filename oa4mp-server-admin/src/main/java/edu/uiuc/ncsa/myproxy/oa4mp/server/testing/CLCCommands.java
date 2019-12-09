@@ -6,11 +6,12 @@ import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.util.cli.CommonCommands;
 
 /**
+ * Top level class for command line client commands.
  * <p>Created by Jeff Gaynor<br>
  * on 5/11/16 at  1:35 PM
  */
-public abstract class TestCommands extends CommonCommands {
-    public TestCommands(MyLoggingFacade logger, ClientEnvironment ce) {
+public abstract class CLCCommands extends CommonCommands {
+    public CLCCommands(MyLoggingFacade logger, ClientEnvironment ce) {
         super(logger);
         this.ce = ce;
     }

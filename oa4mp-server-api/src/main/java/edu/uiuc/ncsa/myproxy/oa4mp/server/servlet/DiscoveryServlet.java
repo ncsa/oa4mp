@@ -46,7 +46,11 @@ public class DiscoveryServlet extends MyProxyDelegationServlet {
         } else {
             jsonObject.put(AUTHORIZATION_ENDPOINT, requestURI + "/authorize");
         }
-        jsonObject.put(REGISTRATION_ENDPOINT, requestURI + "/register");
+        // The next line points to the native OA4MP registration protocol
+        //jsonObject.put(REGISTRATION_ENDPOINT, requestURI + "/register");
+        // The next line points to the RFC 7591/7592 protocol.
+        // Should be the same as in ClientManagementConstants.DEFAULT_RFC7591_ENDPOINT
+        jsonObject.put(REGISTRATION_ENDPOINT, requestURI + "/oidc-cm" );
         return jsonObject;
     }
 
