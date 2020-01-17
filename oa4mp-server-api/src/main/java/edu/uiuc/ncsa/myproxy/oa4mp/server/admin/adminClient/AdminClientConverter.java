@@ -32,10 +32,14 @@ public class AdminClientConverter<V extends AdminClient> extends BaseClientConve
         v.setVirtualOrganization(getJsonUtil().getJSONValueString(json, getACK().vo()));
         // implies that this might be a legacy admin client and has a database entry that is null
         // rather than an integer. In that case, set it to the default.
-        if(!json.containsKey(getACK().maxClients()) || json.get(getACK().maxClients()) == null){
+        if (!json.containsKey(getACK().maxClients()) || json.get(getACK().maxClients()) == null) {
             v.setMaxClients(AdminClient.DEFAULT_MAX_NUMBER_OF_OIDC_CLIENTS);
-        }else{
+        } else {
             v.setMaxClients(getJsonUtil().getJSONValueInt(json, getACK().maxClients()));
+        }
+        JSONObject config = (JSONObject) getJsonUtil().getJSONValue(json, getACK().config());
+        if (config != null) {
+            v.setConfig(config);
         }
         return v;
     }
@@ -47,10 +51,18 @@ public class AdminClientConverter<V extends AdminClient> extends BaseClientConve
         value.setIssuer(map.getString(getACK().issuer()));
         // implies that this might be a legacy admin client and has a database entry that is null
         // rather than an integer. In that case, set it to the default.
-        if(!map.containsKey(getACK().maxClients()) || map.get(getACK().maxClients()) == null){
+        if (!map.containsKey(getACK().maxClients()) || map.get(getACK().maxClients()) == null) {
             value.setMaxClients(AdminClient.DEFAULT_MAX_NUMBER_OF_OIDC_CLIENTS);
-        }else {
+        } else {
             value.setMaxClients(map.getInteger(getACK().maxClients()));
+        }
+        if (map.containsKey(getACK().config())) {
+            String rawCfg = map.getString(getACK().config());
+            if (rawCfg != null && !rawCfg.isEmpty()) {
+                v.setConfig(JSONObject.fromObject(map.getString(getACK().config())));
+            } else {
+                v.setConfig(new JSONObject());
+            }
         }
         return value;
     }
@@ -61,6 +73,9 @@ public class AdminClientConverter<V extends AdminClient> extends BaseClientConve
         getJsonUtil().setJSONValue(json, getACK().vo(), client.getVirtualOrganization());
         getJsonUtil().setJSONValue(json, getACK().issuer(), client.getIssuer());
         getJsonUtil().setJSONValue(json, getACK().maxClients(), client.getMaxClients());
+        if (client.getConfig() != null && !client.getConfig().isEmpty()) {
+            json.put(getACK().config(), client.getConfig());
+        }
     }
 
     @Override
@@ -68,6 +83,9 @@ public class AdminClientConverter<V extends AdminClient> extends BaseClientConve
         map.put(getACK().issuer(), client.getIssuer());
         map.put(getACK().vo(), client.getVirtualOrganization());
         map.put(getACK().maxClients(), client.getMaxClients());
+        if (client.getConfig() != null && !client.getConfig().isEmpty()) {
+            map.put(getACK().config(), client.getConfig().toString(1)); // make it pretty at least...
+        }
         super.toMap(client, map);
     }
 }

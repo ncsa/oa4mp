@@ -24,6 +24,10 @@ public class HTTPHeaderClaimsSource extends BasicClaimsSourceImpl {
     public HTTPHeaderClaimsSource(ClaimSourceConfiguration configuration) {
         setConfiguration(configuration);
     }
+    // needed for contract creating claim sources from configuration files (no arg constructor required, config injected.)
+    public HTTPHeaderClaimsSource() {
+        super();
+    }
 
     public String caput = "OIDC_CLAIM_";
 

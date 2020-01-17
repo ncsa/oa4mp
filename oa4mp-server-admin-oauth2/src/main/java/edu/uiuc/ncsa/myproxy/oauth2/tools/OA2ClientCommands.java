@@ -437,69 +437,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
         }
     }
 
-    protected JSON inputJSON(JSON oldJSON, String componentName) {
-        return inputJSON(oldJSON, componentName, false);
-    }
 
-    /**
-     * Allows for entering a new JSON object. This permits multi-line entry so formatted JSON can be cut and pasted
-     * into the command line (as long as there are no blank lines). This will validate the JSON, print out a message and
-     * check that you want to keep the new JSON. Note that you cannot overwrite the value of a configuration at this point
-     * mostly as a safety feature. So hitting return or /exit will have the same effect of keeping the current value.
-     *
-     * @param oldJSON
-     * @return null if the input is terminated (so retain the old object)
-     */
-    protected JSON inputJSON(JSON oldJSON, String componentName, boolean isArray) {
-        if (oldJSON == null) {
-            sayi("no current value for " + componentName);
-        } else {
-            sayi("current value for " + componentName + ":");
-            say(oldJSON.toString(2));
-        }
-        sayi("Enter new JSON value. An empty line terminates input. Entering a line with " + EXIT_COMMAND +
-                " will terminate input too.\n Hitting " + CLEAR_BUFFER_COMMAND+ " will clear the contents of this.");
-        String rawJSON = "";
-        boolean redo = true;
-        while (redo) {
-            try {
-                String inLine = readline();
-                while (!isEmpty(inLine)) {
-                    if (inLine.equals(CLEAR_BUFFER_COMMAND)) {
-                        if (isArray) {
-                            return new JSONArray();
-                        } else {
-                            return new JSONObject();
-                        }
-                    }
-                    rawJSON = rawJSON + inLine;
-                    inLine = readline();
-                }
-            } catch (ExitException x) {
-                // ok, so user terminated input. This ends the whole thing
-                return null;
-            }
-            // if the user just hits return with no input, do nothing. This lets them skip over unchanged entries.
-            if (rawJSON.isEmpty()) {
-                return null;
-            }
-            try {
-                JSON json = null;
-                if (isArray) {
-                    json = JSONArray.fromObject(rawJSON);
-                } else {
-                    json = JSONObject.fromObject(rawJSON);
-                }
-                sayi("Success! JSON is valid.");
-                return json;
-            } catch (Throwable t) {
-                sayi("uh-oh... It seems this was not a valid JSON object. The parser message reads:\"" + t.getMessage() + "\"");
-                redo = isOk(getInput("Try to re-enter this?", "true"));
-            }
-        }
-
-        return null;
-    }
 
     @Override
     protected void showDeserializeHelp() {

@@ -82,6 +82,11 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
             client.setMaxClients(Integer.parseInt(max));
         }
 
+        JSONObject newConfig = (JSONObject) inputJSON(client.getConfig(), "client configuration");
+           if (newConfig != null) {
+               client.setConfig(newConfig);
+           }
+
     }
 
     protected void showListClientsHelp() {

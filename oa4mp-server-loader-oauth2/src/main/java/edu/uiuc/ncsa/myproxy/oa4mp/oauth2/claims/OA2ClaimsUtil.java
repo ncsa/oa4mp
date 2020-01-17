@@ -153,21 +153,21 @@ public class OA2ClaimsUtil {
         OA2Client client = getOA2Client();
         checkRequiredScopes(request, t);
         if (!getCC().isSaved()) {
-      dbg(this, "Saving updated client " + client.getIdentifierString());
+            dbg(this, "Saving updated client " + client.getIdentifierString());
             getCC().setSaved(true); // do this so it ends up in storage as saved, otherwise it gets saved every time.
             // This means that the configuration was updated on load and needs to be saved.
             oa2se.getClientStore().save(client);
         } else {
-     dbg(this, "*NOT* saving updated client " + client.getIdentifierString());
+            dbg(this, "*NOT* saving updated client " + client.getIdentifierString());
         }
-     dbg(this, "Done with basic claims = " + claims.toString(1));
+        dbg(this, "Done with basic claims = " + claims.toString(1));
         if (transaction.getOA2Client().isPublicClient()) {
             // Public clients do not get more than basic claims.
             oa2se.getTransactionStore().save(transaction);
             return claims;
         }
 
-     dbg(this, "Starting to process server default claims");
+        dbg(this, "Starting to process server default claims");
 
         if (oa2se != null && oa2se.getClaimSource() != null && oa2se.getClaimSource().isEnabled() && oa2se.getClaimSource().isRunAtAuthorization()) {
             DebugUtil.dbg(this, "Service environment has a claims source enabled=" + oa2se.getClaimSource());
@@ -176,10 +176,10 @@ public class OA2ClaimsUtil {
             // to allow, e.g. pulling user information out of HTTp headers.
             oa2se.getClaimSource().process(claims, request, transaction);
         } else {
-    dbg(this, "Service environment has a claims no source enabled during authorization");
+            dbg(this, "Service environment has a claims no source enabled during authorization");
         }
 
-      dbg(this, "Starting to process Client runtime and sources at authorization.");
+        dbg(this, "Starting to process Client runtime and sources at authorization.");
 
 
         if (client.getConfig() == null || client.getConfig().isEmpty()) {
@@ -188,22 +188,27 @@ public class OA2ClaimsUtil {
         }
         // so this client has a specific configuration that is to be invoked.
 
-   dbg(this, "executing runtime");
-
+        dbg(this, "executing runtime");
+        // The MAJOR difference with the Runtime vs. global claims processing is that the Runtime is ALWAYS
+        // executed even if there are no claims. So the Runtime can and should be used to do things that are
+        // not done in claims processing.
         getCC().executeRuntime();
         dbg(this, "processing flows");
 
         FlowStates flowStates = new FlowStates(getCC().getRuntime().getFunctorMap());
         transaction.setFlowStates(flowStates);
         if (flowStates.getClaims) {
-    dbg(this, "Doing preprocessing");
-     dbg(this, "Claims allowed, creating sources from configuration");
+            dbg(this, "Doing preprocessing");
+            dbg(this, "Claims allowed, creating sources from configuration");
             OA2ClientConfigurationFactory<OA2ClientConfiguration> ff = new OA2ClientConfigurationFactory(getFF());
             OA2ClientConfiguration oa2CC = getCC();
 
             ff.createClaimSource(oa2CC, client.getConfig());
-            // the runtime forbids processing claims for this request, so exit
-            doPreProcessing();
+            // Run pre-processing before ANY claim source is evaluated. This allows for effectively setting up
+            //global state against which the claim sources may be run. Note that each claim source may also do pre and post-processing
+            // aloowing very fine grained control.
+            // GLobalPostProcessing is done at the end of all claims as clean up.
+            doGlobalPreProcessing();
             List<ClaimSource> claimsSources = oa2CC.getClaimSource();
             if (oa2CC.hasClaimSource()) {
                 // so there is
@@ -222,7 +227,7 @@ public class OA2ClaimsUtil {
                         oa2se.getTransactionStore().save(transaction);
                         throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "access denied", HttpStatus.SC_UNAUTHORIZED);
                     }
-     dbg(this, "user info for claim source #" + claimSource + " = " + claims.toString(1));
+                    dbg(this, "user info for claim source #" + claimSource + " = " + claims.toString(1));
                 }
             }
 
@@ -264,6 +269,7 @@ public class OA2ClaimsUtil {
 
     /**
      * Gets the claims that are not done at authorization time.
+     *
      * @return
      * @throws Throwable
      */
@@ -292,7 +298,7 @@ public class OA2ClaimsUtil {
         // so this client has a specific configuration that is to be invoked.
         OA2ClientConfiguration oa2CC = getCC();
 
-  dbg(this, "BEFORE invoking claim sources, claims are = " + claims.toString(1));
+        dbg(this, "BEFORE invoking claim sources, claims are = " + claims.toString(1));
         if (flowStates.getClaims) {
             DebugUtil.trace(this, "Claims allowed, creating sources from configuration");
             OA2ClientConfigurationFactory<OA2ClientConfiguration> ff = new OA2ClientConfigurationFactory(getFF());
@@ -321,8 +327,8 @@ public class OA2ClaimsUtil {
 
         }
         // these might have changed in the course of executing the claim source.
-   dbg(this, "Ready for post-processing");
-        doPostProcessing();
+        dbg(this, "Ready for post-processing");
+        doGlobalPostProcessing();
         // Now we have to set up the claims sources and process the results
         // last thing is to check that the flow states did not change as a result of claims processing
         // e.g. that the user membership in a group changes access
@@ -338,19 +344,19 @@ public class OA2ClaimsUtil {
         // After post-processing it is possible that this user should be forbidden access, e.g. they are not in the correct group.
         // This is the first place we can check. If they are not allowed to make further requests, an access denied exception is thrown.
         if (!flowStates.acceptRequests) {
-   dbg(this, "Access denied for user name = " + transaction.getUsername());
+            dbg(this, "Access denied for user name = " + transaction.getUsername());
             throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "access denied", HttpStatus.SC_UNAUTHORIZED);
         }
         return claims;
     }
 
-    protected void checkClaim(JSONObject claims, String claimKey){
-        if(claims.containsKey(claimKey)){
-             if(isEmpty(claims.getString(claimKey))){
-      //           DebugUtil.dbg(this, "Missing \"" + claimKey+ "\" claim= " );
-                 throw new OA2GeneralError(OA2Errors.SERVER_ERROR, "Missing " + claimKey + " claim", HttpStatus.SC_INTERNAL_SERVER_ERROR);
-             }
-        }else{
+    protected void checkClaim(JSONObject claims, String claimKey) {
+        if (claims.containsKey(claimKey)) {
+            if (isEmpty(claims.getString(claimKey))) {
+                //           DebugUtil.dbg(this, "Missing \"" + claimKey+ "\" claim= " );
+                throw new OA2GeneralError(OA2Errors.SERVER_ERROR, "Missing " + claimKey + " claim", HttpStatus.SC_INTERNAL_SERVER_ERROR);
+            }
+        } else {
             throw new OA2GeneralError(OA2Errors.SERVER_ERROR, "Missing " + claimKey + " claim", HttpStatus.SC_INTERNAL_SERVER_ERROR);
         }
 
@@ -359,25 +365,29 @@ public class OA2ClaimsUtil {
     /**
      * For CIL-499. It is possible to remove key claims with functors and return unusable claims objects. This method
      * will check that claims that <b>must</b> be present are there or will raise a server-side exception.
+     *
      * @param claims
      */
-    protected void checkRequiredClaims(JSONObject claims){
+    protected void checkRequiredClaims(JSONObject claims) {
         // only required one by the spec.
-        if(oa2se.isOIDCEnabled()) {
+        if (oa2se.isOIDCEnabled()) {
             checkClaim(claims, SUBJECT);
         }
     }
-    protected boolean isEmpty(String x){
-        return x==null || 0 == x.length();
+
+    protected boolean isEmpty(String x) {
+        return x == null || 0 == x.length();
     }
+
     /**
      * This is the post-processing after <b>ALL</b> the claim sources have run, should there be any. It is different
-     * from the per-source processing.
+     * from the per-source processing. This is invoked after the very last claim source has been processed (typically right
+     * before the id token is created, e.g.)
      *
      * @throws Throwable
      */
-    public void doPostProcessing() throws Throwable {
-           dbg(this, ".doPostProcessing: has post-processing?" + getCC().hasPostProcessing());
+    public void doGlobalPostProcessing() throws Throwable {
+        dbg(this, ".doPostProcessing: has post-processing?" + getCC().hasPostProcessing());
         if (getCC().hasPostProcessing()) {
             DebugUtil.dbg(this, ".doPostProcessing: has post-processing?" + getCC().getPostProcessing());
 
@@ -392,12 +402,12 @@ public class OA2ClaimsUtil {
 
     /**
      * This is the pre-processing before <b>ALL</b> the claim sources have run, should there be any. It is different
-     * from the per-source processing.
+     * from the per-source processing. This is invoked before the authorization claims are processed.
      *
      * @throws Throwable
      */
 
-    public void doPreProcessing() throws Throwable {
+    public void doGlobalPreProcessing() throws Throwable {
         if (getCC().hasPreProcessing()) {
             OA2ClientConfigurationFactory<OA2ClientConfiguration> ff = new OA2ClientConfigurationFactory(getFF());
             ff.setupPreProcessing(getCC(), getOA2Client().getConfig());
@@ -406,9 +416,9 @@ public class OA2ClaimsUtil {
 
     }
 
-    protected void dbg(Object c, String x){
-          if(deepDebugOn){
-              DebugUtil.trace(c,x);
-          }
+    protected void dbg(Object c, String x) {
+        if (deepDebugOn) {
+            DebugUtil.trace(c, x);
+        }
     }
 }

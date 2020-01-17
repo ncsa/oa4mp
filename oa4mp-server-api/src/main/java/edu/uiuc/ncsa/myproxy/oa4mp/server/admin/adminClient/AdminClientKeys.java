@@ -16,6 +16,12 @@ public class AdminClientKeys extends BaseClientKeys {
     }
     String maxClients = "max_clients";
     String issuer = "issuer";
+    String config = "config";
+
+    public String config(String... x) {
+           if (0 < x.length) config= x[0];
+           return config;
+       }
 
     public String maxClients(String... x) {
            if (0 < x.length) maxClients= x[0];

@@ -1,3 +1,18 @@
+{
+  "config": [
+    "Minimal NCSA access 1/29/2019"
+  ],
+  "isSaved": false,
+  "runtime":{"script":["set_claim_source('ncsa-default','uid');"]
+  },
+  "claims": {
+    "preProcessing": {
+      "script": ["set('uid',drop(${eppn},'@ncsa.illinois.edu'));"]
+    }
+  }
+}
+
+
 {"ldap": {
   "comment" : "This example is of an LDAP configuration, not a full client configuration. It has an id, which must be referenced to use it.",
     "failOnError": "true",

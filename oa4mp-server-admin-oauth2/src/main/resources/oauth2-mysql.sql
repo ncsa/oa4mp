@@ -38,7 +38,8 @@ CREATE TABLE oauth2.clients (
   last_modified_ts   TIMESTAMP,
   rt_lifetime        bigint,
   callback_uri       TEXT,
-  sign_tokens        BOOLEAN
+  sign_tokens        BOOLEAN,
+  cfg                TEXT
 );
 
 
@@ -52,7 +53,8 @@ CREATE TABLE oauth2.adminClients (
   creation_ts  TIMESTAMP,
   vo           TEXT,
   max_clients  BIGINT,
-  issuer       TEXT
+  issuer       TEXT,
+  config       TEXT
 );
 
 
