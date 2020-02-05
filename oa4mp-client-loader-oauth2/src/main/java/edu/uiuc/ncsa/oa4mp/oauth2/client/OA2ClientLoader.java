@@ -282,6 +282,7 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
                             new ATServer2(createServiceClient(getAccessTokenURI()),
                                     getWellKnownURI(),
                                     isOIDCEnabled(),
+                                    getMaxAssetLifetime(),
                                     isUseBasicAuth()),
                             new PAServer2(createServiceClient(getAssetURI())),
                             new UIServer2(createServiceClient(getUIURI())),

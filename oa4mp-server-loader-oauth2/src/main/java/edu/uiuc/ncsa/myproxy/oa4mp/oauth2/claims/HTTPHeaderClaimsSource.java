@@ -29,11 +29,7 @@ public class HTTPHeaderClaimsSource extends BasicClaimsSourceImpl {
         super();
     }
 
-    /**
-     * Needed for instantiation by introspection. 
-     */
-    public HTTPHeaderClaimsSource() {
-    }
+
 
     public String caput = "OIDC_CLAIM_";
 

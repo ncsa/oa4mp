@@ -18,7 +18,8 @@ import net.sf.json.JSONObject;
 import java.io.FileInputStream;
 import java.util.Collection;
 
-import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientConfigurationUtil.*;
+import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientFunctorScriptsUtil.*;
+import static edu.uiuc.ncsa.security.oauth_2_0.server.scripts.ClientJSONConfigUtil.getComment;
 
 /**
  * This will read a client configuration and inject it in to the UI.

@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>edu.uiuc.ncsa.myproxy</groupId>
     <artifactId>myproxy</artifactId>
-    <version>4.3</version>
+    <version>4.4-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Open Authorization for MyProxy</name>
     <description>Open Authorization (OAuth) client and server code for MyProxy</description>

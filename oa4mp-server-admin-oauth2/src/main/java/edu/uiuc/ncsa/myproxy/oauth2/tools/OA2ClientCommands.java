@@ -457,14 +457,14 @@ public class OA2ClientCommands extends ClientStoreCommands {
             sayi("current value for " + componentName + ":");
             say(oldJSON.toString(2));
         }
-        sayi("Enter new JSON value. An empty line terminates input. Entering a line with " + EXIT_COMMAND + " will terminate input too.\n Hitting " + CLEAR_COMMAND + " will clear the contents of this.");
+        sayi("Enter new JSON value. An empty line terminates input. Entering a line with " + EXIT_COMMAND + " will terminate input too.\n Hitting " + CLEAR_BUFFER_COMMAND + " will clear the contents of this.");
         String rawJSON = "";
         boolean redo = true;
         while (redo) {
             try {
                 String inLine = readline();
                 while (!isEmpty(inLine)) {
-                    if (inLine.equals(CLEAR_COMMAND)) {
+                    if (inLine.equals(CLEAR_BUFFER_COMMAND)) {
                         if (isArray) {
                             return new JSONArray();
                         } else {
