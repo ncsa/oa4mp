@@ -2,9 +2,9 @@ package test;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.*;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.jAccessToken;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientConfiguration;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientConfigurationFactory;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientConfigurationUtil;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientFunctorScripts;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientFunctorScriptsFactory;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientFunctorScriptsUtil;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Scopes;
@@ -881,11 +881,11 @@ public class OA2FunctorTests extends JFunctorTest {
          claims.put("oidc", randomString);
 
         OA2FunctorFactory functorFactory = new OA2FunctorFactory(claims,createScopes());
-        OA2ClientConfigurationFactory ff = new OA2ClientConfigurationFactory(functorFactory);
-        OA2ClientConfiguration clientConfiguration = ff.newInstance(cfg);
+        OA2ClientFunctorScriptsFactory ff = new OA2ClientFunctorScriptsFactory(functorFactory);
+        OA2ClientFunctorScripts clientConfiguration = ff.newInstance(cfg);
         ff.createClaimSource(clientConfiguration, cfg);
 
-        JSONObject postProcessing = OA2ClientConfigurationUtil.getClaimsPostProcessing(cfg);
+        JSONObject postProcessing = OA2ClientFunctorScriptsUtil.getClaimsPostProcessing(cfg);
         //JSONObject postProcessing = cfg.getJSONObject("postProcessing");
 
         //LDAPClaimsSource claimsSource = new LDAPClaimsSource(ldapConfiguration, null);

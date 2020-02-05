@@ -4,8 +4,8 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowStates;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2DiscoveryServlet;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientConfiguration;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientConfigurationFactory;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientFunctorScripts;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientFunctorScriptsFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.security.core.Identifier;
@@ -198,8 +198,8 @@ public class OA2ClaimsUtil {
         if (flowStates.getClaims) {
     dbg(this, "Doing preprocessing");
      dbg(this, "Claims allowed, creating sources from configuration");
-            OA2ClientConfigurationFactory<OA2ClientConfiguration> ff = new OA2ClientConfigurationFactory(getFF());
-            OA2ClientConfiguration oa2CC = getCC();
+            OA2ClientFunctorScriptsFactory<OA2ClientFunctorScripts> ff = new OA2ClientFunctorScriptsFactory(getFF());
+            OA2ClientFunctorScripts oa2CC = getCC();
 
             ff.createClaimSource(oa2CC, client.getConfig());
             // the runtime forbids processing claims for this request, so exit
@@ -239,7 +239,7 @@ public class OA2ClaimsUtil {
         return transaction.getOA2Client();
     }
 
-    OA2ClientConfiguration cc = null;
+    OA2ClientFunctorScripts cc = null;
 
     OA2FunctorFactory ff = null;
 
@@ -251,11 +251,11 @@ public class OA2ClaimsUtil {
         return ff;
     }
 
-    protected OA2ClientConfiguration getCC() {
+    protected OA2ClientFunctorScripts getCC() {
         if (cc == null && null != getOA2Client().getConfig()) {
 
             OA2FunctorFactory functorFactory = getFF();
-            OA2ClientConfigurationFactory<OA2ClientConfiguration> ff = new OA2ClientConfigurationFactory(functorFactory);
+            OA2ClientFunctorScriptsFactory<OA2ClientFunctorScripts> ff = new OA2ClientFunctorScriptsFactory(functorFactory);
 
             cc = ff.newInstance(getOA2Client().getConfig());
         }
@@ -290,12 +290,12 @@ public class OA2ClaimsUtil {
             return claims;
         }
         // so this client has a specific configuration that is to be invoked.
-        OA2ClientConfiguration oa2CC = getCC();
+        OA2ClientFunctorScripts oa2CC = getCC();
 
   dbg(this, "BEFORE invoking claim sources, claims are = " + claims.toString(1));
         if (flowStates.getClaims) {
             DebugUtil.trace(this, "Claims allowed, creating sources from configuration");
-            OA2ClientConfigurationFactory<OA2ClientConfiguration> ff = new OA2ClientConfigurationFactory(getFF());
+            OA2ClientFunctorScriptsFactory<OA2ClientFunctorScripts> ff = new OA2ClientFunctorScriptsFactory(getFF());
 
             ff.createClaimSource(oa2CC, client.getConfig());
             // the runtime forbids processing claims for this request, so exit
@@ -381,7 +381,7 @@ public class OA2ClaimsUtil {
         if (getCC().hasPostProcessing()) {
             DebugUtil.dbg(this, ".doPostProcessing: has post-processing?" + getCC().getPostProcessing());
 
-            OA2ClientConfigurationFactory<OA2ClientConfiguration> ff = new OA2ClientConfigurationFactory(getFF());
+            OA2ClientFunctorScriptsFactory<OA2ClientFunctorScripts> ff = new OA2ClientFunctorScriptsFactory(getFF());
             ff.setupPostProcessing(getCC(), getOA2Client().getConfig());
             getCC().executePostProcessing();
             dbg(this, ".doPostProcessing: executed post-processing, functor map=" + getCC().getPostProcessing().getFunctorMap());
@@ -399,7 +399,7 @@ public class OA2ClaimsUtil {
 
     public void doPreProcessing() throws Throwable {
         if (getCC().hasPreProcessing()) {
-            OA2ClientConfigurationFactory<OA2ClientConfiguration> ff = new OA2ClientConfigurationFactory(getFF());
+            OA2ClientFunctorScriptsFactory<OA2ClientFunctorScripts> ff = new OA2ClientFunctorScriptsFactory(getFF());
             ff.setupPreProcessing(getCC(), getOA2Client().getConfig());
             getCC().executePreProcessing();
         }

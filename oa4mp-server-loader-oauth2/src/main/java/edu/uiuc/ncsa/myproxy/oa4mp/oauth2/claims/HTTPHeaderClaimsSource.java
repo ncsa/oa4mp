@@ -25,6 +25,12 @@ public class HTTPHeaderClaimsSource extends BasicClaimsSourceImpl {
         setConfiguration(configuration);
     }
 
+    /**
+     * Needed for instantiation by introspection. 
+     */
+    public HTTPHeaderClaimsSource() {
+    }
+
     public String caput = "OIDC_CLAIM_";
 
     public String getCaput() {
@@ -38,7 +44,7 @@ public class HTTPHeaderClaimsSource extends BasicClaimsSourceImpl {
 
     @Override
     protected JSONObject realProcessing(JSONObject claims, HttpServletRequest request, ServiceTransaction transaction) throws UnsupportedScopeException {
-        DebugUtil.trace(this,"Omit list = " + getOmitList());
+        DebugUtil.trace(this, "Omit list = " + getOmitList());
         Enumeration headerNames = request.getHeaderNames();
         String caput = getCaput();
         if (caput == null) {
@@ -58,7 +64,7 @@ public class HTTPHeaderClaimsSource extends BasicClaimsSourceImpl {
                 if (!getOmitList().contains(key)) {
                     DebugUtil.dbg(this, "adding claim " + key + "=" + value);
                     claims.put(key, value);
-                }else{
+                } else {
                     DebugUtil.dbg(this, "OMITTING claim " + key + "=" + value + ", as per omit list");
                 }
             }

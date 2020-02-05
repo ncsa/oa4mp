@@ -2,7 +2,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientConfigurationUtil;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientFunctorScriptsUtil;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.*;
@@ -51,7 +51,7 @@ public class ClaimSourceFactoryImpl extends ClaimSourceFactory {
         DebugUtil.dbg(ClaimSourceFactoryImpl.class, "Starting to create LDAPScopeHandlers per client");
         LinkedList<ClaimSource> claimSources = new LinkedList<>();
         JSONObject jsonConfig = ((OA2Client)transaction.getClient()).getConfig();
-        if (!OA2ClientConfigurationUtil.hasClaimSourceConfigurations(jsonConfig)) {
+        if (!OA2ClientFunctorScriptsUtil.hasClaimSourceConfigurations(jsonConfig)) {
             DebugUtil.dbg(ClaimSourceFactoryImpl.class, "using default scope handler=");
             if (oa2SE.getClaimSource() instanceof BasicClaimsSourceImpl) {
                 BasicClaimsSourceImpl bb = (BasicClaimsSourceImpl) oa2SE.getClaimSource();
@@ -62,7 +62,7 @@ public class ClaimSourceFactoryImpl extends ClaimSourceFactory {
             }
             claimSources.add(oa2SE.getClaimSource());
         } else {
-            JSONArray configs = OA2ClientConfigurationUtil.getClaimSourceConfigurations(jsonConfig);
+            JSONArray configs = OA2ClientFunctorScriptsUtil.getClaimSourceConfigurations(jsonConfig);
 
             for (int i = 0; i < configs.size(); i++) {
                 JSONObject current = configs.getJSONObject(i);

@@ -5,7 +5,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.permissions.AddClientRequest;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.permissions.PermissionServer;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.permissions.RemoveClientRequest;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.HeaderUtils;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientConfigurationUtil;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientFunctorScriptsUtil;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientKeys;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
@@ -19,7 +19,7 @@ import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2GeneralError;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Scopes;
-import edu.uiuc.ncsa.security.oauth_2_0.server.config.ClientConfigurationUtil;
+import edu.uiuc.ncsa.security.oauth_2_0.server.scripts.ClientJSONConfigUtil;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
@@ -129,7 +129,7 @@ public class OIDCCMServlet extends EnvServlet {
         json.put("email", client.getEmail());
         // This is in seconds since the epoch
         json.put(OIDCCMConstants.CLIENT_ID_ISSUED_AT, client.getCreationTS().getTime() / 1000);
-        json.putAll(ClientConfigurationUtil.getExtraAttributes(client.getConfig()));
+        json.putAll(ClientJSONConfigUtil.getExtraAttributes(client.getConfig()));
         return json;
     }
 
@@ -547,7 +547,7 @@ public class OIDCCMServlet extends EnvServlet {
             }
             jsonRequest.remove(OIDCCMConstants.CONTACTS);
         }
-        OA2ClientConfigurationUtil.setExtraAttributes(config, jsonRequest);
+        OA2ClientFunctorScriptsUtil.setExtraAttributes(config, jsonRequest);
         client.setConfig(config);
         return client;
 

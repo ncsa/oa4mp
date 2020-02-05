@@ -6,9 +6,9 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.jSetClaimSource;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSourceConfiguration;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSourceConfigurationUtil;
-import edu.uiuc.ncsa.security.oauth_2_0.server.config.ClientConfigurationFactory;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfigurationUtil;
+import edu.uiuc.ncsa.security.oauth_2_0.server.scripts.functor.ClientFunctorScriptsFactory;
 import edu.uiuc.ncsa.security.util.functor.JFunctor;
 import edu.uiuc.ncsa.security.util.functor.JFunctorFactory;
 import edu.uiuc.ncsa.security.util.functor.LogicBlock;
@@ -26,15 +26,15 @@ import java.util.Map;
  * <p>Created by Jeff Gaynor<br>
  * on 4/17/18 at  2:51 PM
  */
-public class OA2ClientConfigurationFactory<V extends OA2ClientConfiguration> extends ClientConfigurationFactory<V> {
-    public OA2ClientConfigurationFactory(JFunctorFactory functorFactory) {
+public class OA2ClientFunctorScriptsFactory<V extends OA2ClientFunctorScripts> extends ClientFunctorScriptsFactory<V> {
+    public OA2ClientFunctorScriptsFactory(JFunctorFactory functorFactory) {
         super(functorFactory);
     }
 
     @Override
     public V newInstance(JSONObject json) {
         V v = super.newInstance(json);
-        v.setSaved(OA2ClientConfigurationUtil.isSaved(json));
+        v.setSaved(OA2ClientFunctorScriptsUtil.isSaved(json));
         return v;
     }
 
@@ -46,14 +46,12 @@ public class OA2ClientConfigurationFactory<V extends OA2ClientConfiguration> ext
      * @param cc
      */
     public void createClaimSource(V cc, JSONObject json) {
-        cc.setPreProcessing(new Script(functorFactory, OA2ClientConfigurationUtil.getClaimsPreProcessing(json)));
-        cc.setPostProcessing(new Script(functorFactory, OA2ClientConfigurationUtil.getClaimsPostProcessing(json)));
-        //cc.setPreProcessing(functorFactory.createLogicBlock(OA2ClientConfigurationUtil.getClaimsPreProcessing(json)));
-        //cc.setPostProcessing(functorFactory.createLogicBlock(OA2ClientConfigurationUtil.getClaimsPostProcessing(json)));
+        cc.setPreProcessing(new Script(functorFactory, OA2ClientFunctorScriptsUtil.getClaimsPreProcessing(json)));
+        cc.setPostProcessing(new Script(functorFactory, OA2ClientFunctorScriptsUtil.getClaimsPostProcessing(json)));
         // Now to get the claim sources. These can be in either the runtime or the pre-processor
         LinkedList<ClaimSource> claimSources = new LinkedList<>();
         extractClaimsSource(cc.getPreProcessing(), json, claimSources);
-        extractClaimsSource(cc.getRuntime(), json, claimSources);
+        extractClaimsSource( cc.getRuntime(), json, claimSources);
         if (claimSources.isEmpty()) {
             claimSources.add(new BasicClaimsSourceImpl());
         }
@@ -117,7 +115,7 @@ public class OA2ClientConfigurationFactory<V extends OA2ClientConfiguration> ext
     public static final String FILE_SYSTEM_DEFAULT = "file-system-default"; // alias for the file system claim source
 
     protected Map<String, ClaimSourceConfiguration> getClaimSourceConfigurations(JSONObject jsonObject) {
-        JSONArray array = OA2ClientConfigurationUtil.getClaimSourceConfigurations(jsonObject);
+        JSONArray array = OA2ClientFunctorScriptsUtil.getClaimSourceConfigurations(jsonObject);
         Map<String, ClaimSourceConfiguration> configs = new HashMap<>();
         ClaimSourceConfigurationUtil claimSourceConfigurationUtil = new ClaimSourceConfigurationUtil(); // for defaults
         LDAPConfigurationUtil ldapConfigurationUtil = new LDAPConfigurationUtil();
@@ -165,7 +163,7 @@ public class OA2ClientConfigurationFactory<V extends OA2ClientConfiguration> ext
             NCSALDAPClaimSource x = new NCSALDAPClaimSource(configName);
             return x;
         }
-        Map<String, OA2ClientConfigurationUtil.SourceEntry> sources = OA2ClientConfigurationUtil.toSourcesMap(json);
+        Map<String, OA2ClientFunctorScriptsUtil.SourceEntry> sources = OA2ClientFunctorScriptsUtil.toSourcesMap(json);
         /*
         TODO - handle edge case of no name/alias and single configuration.
          */
@@ -210,17 +208,17 @@ public class OA2ClientConfigurationFactory<V extends OA2ClientConfiguration> ext
     }
 
     public void setupPreProcessing(V cc, JSONObject json) {
-        Script preProcessing = new Script(functorFactory, OA2ClientConfigurationUtil.getClaimsPreProcessing(json));
+        Script preProcessing = new Script(functorFactory, OA2ClientFunctorScriptsUtil.getClaimsPreProcessing(json));
         cc.setPreProcessing(preProcessing);
     }
 
     public void setupPostProcessing(V cc, JSONObject json) {
-        Script postProcessing = new Script(functorFactory, OA2ClientConfigurationUtil.getClaimsPostProcessing(json));
+        Script postProcessing = new Script(functorFactory, OA2ClientFunctorScriptsUtil.getClaimsPostProcessing(json));
         cc.setPostProcessing(postProcessing);
     }
 
     @Override
     public V get() {
-        return (V) new OA2ClientConfiguration();
+        return (V) new OA2ClientFunctorScripts();
     }
 }

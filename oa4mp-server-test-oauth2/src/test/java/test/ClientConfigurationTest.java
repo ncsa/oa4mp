@@ -2,8 +2,8 @@ package test;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.*;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.jSetClaimSource;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientConfiguration;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientConfigurationFactory;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientFunctorScripts;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientFunctorScriptsFactory;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfigurationUtil;
@@ -23,8 +23,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientConfigurationUtil.*;
+import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientFunctorScriptsUtil.*;
 import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.AUDIENCE;
+import static edu.uiuc.ncsa.security.oauth_2_0.server.config.ClientConfigurationUtil.setRuntime;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -77,7 +78,7 @@ public class ClientConfigurationTest extends TestBase {
     protected static String MY_CLAIM2 = "myClaim2"; // key for custom claim in testing
 
     /*
-    sets up a bunch of randome source and two good ones, LDAP2 and HTTP
+    sets up a bunch of random source and two good ones, LDAP2 and HTTP
      */
     private JSONArray setupSources() {
         JSONArray claimSources = new JSONArray();
@@ -222,8 +223,8 @@ public class ClientConfigurationTest extends TestBase {
         System.out.println("new aud=" + newAud);
         JSONObject cfg = createConfiguration(myClaim, oldAud, newAud);
 
-        OA2ClientConfigurationFactory<OA2ClientConfiguration> ff = new OA2ClientConfigurationFactory(new OA2FunctorFactory(null, null));
-        OA2ClientConfiguration clientConfiguration = ff.newInstance(cfg);
+        OA2ClientFunctorScriptsFactory<OA2ClientFunctorScripts> ff = new OA2ClientFunctorScriptsFactory(new OA2FunctorFactory(null, null));
+        OA2ClientFunctorScripts clientConfiguration = ff.newInstance(cfg);
         assert clientConfiguration.executeRuntime();
         ff.createClaimSource(clientConfiguration, cfg);
         List<ClaimSource> cc = clientConfiguration.getClaimSource();
@@ -250,15 +251,15 @@ public class ClientConfigurationTest extends TestBase {
         JSONObject cfg = createConfiguration(myClaim, oldAud, newAud);
         System.out.println(cfg.toString(2));
 
-        OA2ClientConfigurationFactory<OA2ClientConfiguration> ff = new OA2ClientConfigurationFactory(new OA2FunctorFactory(null, null));
-        OA2ClientConfiguration clientConfiguration = ff.newInstance(cfg);
+        OA2ClientFunctorScriptsFactory<OA2ClientFunctorScripts> ff = new OA2ClientFunctorScriptsFactory(new OA2FunctorFactory(null, null));
+        OA2ClientFunctorScripts clientConfiguration = ff.newInstance(cfg);
         clientConfiguration.executeRuntime();
         ff.createClaimSource(clientConfiguration, cfg);
 
         // claims do not exist until the sources have been run (??)
         Map<String, Object> claims = createClaims();
 
-        ff = new OA2ClientConfigurationFactory(new OA2FunctorFactory(claims, OA2FunctorTests.createScopes()));
+        ff = new OA2ClientFunctorScriptsFactory(new OA2FunctorFactory(claims, OA2FunctorTests.createScopes()));
         clientConfiguration = ff.newInstance(cfg);
         clientConfiguration.executeRuntime();
         ff.setupPostProcessing(clientConfiguration, cfg);
@@ -289,15 +290,15 @@ public class ClientConfigurationTest extends TestBase {
         JSONObject cfg = createConfiguration(myClaim, oldAud, newAud);
         System.out.println(cfg.toString(2));
 
-        OA2ClientConfigurationFactory<OA2ClientConfiguration> ff = new OA2ClientConfigurationFactory(new OA2FunctorFactory(null, null));
-        OA2ClientConfiguration clientConfiguration = ff.newInstance(cfg);
+        OA2ClientFunctorScriptsFactory<OA2ClientFunctorScripts> ff = new OA2ClientFunctorScriptsFactory(new OA2FunctorFactory(null, null));
+        OA2ClientFunctorScripts clientConfiguration = ff.newInstance(cfg);
         clientConfiguration.executeRuntime();
         ff.createClaimSource(clientConfiguration, cfg);
 
         // claims do not exist until the sources have been run (??)
         Map<String, Object> claims = createClaims();
 
-        ff = new OA2ClientConfigurationFactory(new OA2FunctorFactory(claims, OA2FunctorTests.createScopes()));
+        ff = new OA2ClientFunctorScriptsFactory(new OA2FunctorFactory(claims, OA2FunctorTests.createScopes()));
         clientConfiguration = ff.newInstance(cfg);
         clientConfiguration.executeRuntime();
         ff.setupPostProcessing(clientConfiguration, cfg);
@@ -334,9 +335,9 @@ public class ClientConfigurationTest extends TestBase {
 
         OA2FunctorFactory functorFactory = new OA2FunctorFactory(null, null);
         functorFactory.setVerboseOn(true); // enables output in scripts.
-        OA2ClientConfigurationFactory<OA2ClientConfiguration> ff = new OA2ClientConfigurationFactory(functorFactory);
+        OA2ClientFunctorScriptsFactory<OA2ClientFunctorScripts> ff = new OA2ClientFunctorScriptsFactory(functorFactory);
         JSONObject cfg = JSONObject.fromObject(raw);
-        OA2ClientConfiguration clientConfiguration = ff.newInstance(cfg);
+        OA2ClientFunctorScripts clientConfiguration = ff.newInstance(cfg);
         ff.createClaimSource(clientConfiguration, cfg);
         List<ClaimSource> cc = clientConfiguration.getClaimSource();
         System.out.println(cc);

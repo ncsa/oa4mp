@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state;
 
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
-import edu.uiuc.ncsa.security.oauth_2_0.server.config.ClientConfiguration;
+import edu.uiuc.ncsa.security.oauth_2_0.server.scripts.functor.ClientFunctorScripts;
 import edu.uiuc.ncsa.security.util.functor.parser.Script;
 
 import java.util.List;
@@ -10,8 +10,8 @@ import java.util.List;
  * <p>Created by Jeff Gaynor<br>
  * on 4/16/18 at  4:29 PM
  */
-public class OA2ClientConfiguration extends ClientConfiguration {
-    public OA2ClientConfiguration() {
+public class OA2ClientFunctorScripts extends ClientFunctorScripts {
+    public OA2ClientFunctorScripts() {
         super();
     }
 
@@ -77,4 +77,9 @@ public class OA2ClientConfiguration extends ClientConfiguration {
     }
 
     boolean saved=true;
+
+    @Override
+    public boolean executeRuntime() {
+       return  super.executeRuntime();
+    }
 }
