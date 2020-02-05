@@ -3,7 +3,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.OA2FunctorFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.jSetClaimSource;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
-import edu.uiuc.ncsa.security.oauth_2_0.server.config.ClientConfigurationUtil;
+import edu.uiuc.ncsa.security.oauth_2_0.server.scripts.functor.ClientFunctorScriptsUtil;
 import edu.uiuc.ncsa.security.util.functor.FunctorTypeImpl;
 import edu.uiuc.ncsa.security.util.functor.LogicBlock;
 import edu.uiuc.ncsa.security.util.functor.LogicBlocks;
@@ -33,7 +33,7 @@ import static edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfigurationUt
  *      }
  *    }*
  * </pre>
- * Where a0,a1,... is one of
+ * Where
  * <ul>
  * <li>sources= list of aliases and class names, </li>
  * <li>sourceConfig = configurations corresponding to the sources</li>
@@ -49,7 +49,7 @@ import static edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfigurationUt
  * <p>Created by Jeff Gaynor<br>
  * on 4/12/18 at  8:16 AM
  */
-public class OA2ClientConfigurationUtil extends ClientConfigurationUtil {
+public class OA2ClientFunctorScriptsUtil extends ClientFunctorScriptsUtil {
     public static final String CONFIG_KEY = "config";
     public static final String CLAIMS_KEY = "claims";
     public static final String CLAIM_SOURCES_KEY = "sources";
@@ -61,9 +61,6 @@ public class OA2ClientConfigurationUtil extends ClientConfigurationUtil {
      */
     public static final String CLAIM_SOURCE_CLASSNAME_KEY = "className";
     public static final String CLAIM_SOURCE_ALIAS_KEY = "alias";
-       /*
-       This lets me create a completely valid configuration of some complexity for testing.
-        */
 
 
     public static class SourceEntry {
@@ -137,29 +134,29 @@ public class OA2ClientConfigurationUtil extends ClientConfigurationUtil {
             dbgName = dbgName + "(" + config.getString(ID_TAG) + ")";
         }
         dbgName = dbgName + ":";
-        DebugUtil.trace(OA2ClientConfigurationUtil.class, dbgName + " key=" + key);
+        DebugUtil.trace(OA2ClientFunctorScriptsUtil.class, dbgName + " key=" + key);
         if (!config.containsKey(CLAIMS_KEY)) {
-            DebugUtil.trace(OA2ClientConfigurationUtil.class, dbgName + " NO CLAIMS");
+            DebugUtil.trace(OA2ClientFunctorScriptsUtil.class, dbgName + " NO CLAIMS");
             return new JSONObject();
         }
 
         JSONObject claims = config.getJSONObject(CLAIMS_KEY);
         Object obj = claims.get(key);
-        DebugUtil.trace(OA2ClientConfigurationUtil.class, dbgName + "JSON configuration object for this key=" + obj);
+        DebugUtil.trace(OA2ClientFunctorScriptsUtil.class, dbgName + "JSON configuration object for this key=" + obj);
 
         if (obj instanceof JSONArray) {
-            DebugUtil.trace(OA2ClientConfigurationUtil.class, "object is a JSON Array");
+            DebugUtil.trace(OA2ClientFunctorScriptsUtil.class, "object is a JSON Array");
             JSONObject j = new JSONObject();
             j.put(FunctorTypeImpl.OR.getValue(), obj);
             return j;
         }
         if (obj instanceof JSONObject) {
-            DebugUtil.trace(OA2ClientConfigurationUtil.class, "Got a JSON object.");
+            DebugUtil.trace(OA2ClientFunctorScriptsUtil.class, "Got a JSON object.");
 
             return (JSONObject) obj;
         }
-        DebugUtil.trace(OA2ClientConfigurationUtil.class, "object found is \"" + obj + "\"");
-        DebugUtil.trace(OA2ClientConfigurationUtil.class, "Object not recognized, returning empty object.");
+        DebugUtil.trace(OA2ClientFunctorScriptsUtil.class, "object found is \"" + obj + "\"");
+        DebugUtil.trace(OA2ClientFunctorScriptsUtil.class, "Object not recognized, returning empty object.");
 
         return new JSONObject();
     }
@@ -255,7 +252,7 @@ public class OA2ClientConfigurationUtil extends ClientConfigurationUtil {
                 }
             }
             if (!containsOldLDAP) {
-                DebugUtil.trace(OA2ClientConfigurationUtil.class, "This does not contain the existing LDAP. Adding it.");
+                DebugUtil.trace(OA2ClientFunctorScriptsUtil.class, "This does not contain the existing LDAP. Adding it.");
 
                 // Add it to the list of configurations.
                 claimSources.add(oldLDAP);
@@ -263,7 +260,7 @@ public class OA2ClientConfigurationUtil extends ClientConfigurationUtil {
                 // update the set of claims sources in the configuration.
                 setClaimSourcesConfigurations(config, claimSources);
                 if (!hasClaimPreProcessor(config) && !hasRuntime(config)) {
-                    DebugUtil.trace(OA2ClientConfigurationUtil.class, "Claim sources does not include old LDAP. No runtime/pre-processor, so creating default.");
+                    DebugUtil.trace(OA2ClientFunctorScriptsUtil.class, "Claim sources does not include old LDAP. No runtime/pre-processor, so creating default.");
                     createDefaultPreProcessor(config, oldLDAPName);
                 }
             }
@@ -274,15 +271,15 @@ public class OA2ClientConfigurationUtil extends ClientConfigurationUtil {
             long newValue = secureRandom.nextLong();
             String newName = Long.toHexString(newValue);
             content.put(ID_TAG, newName);
-            DebugUtil.trace(OA2ClientConfigurationUtil.class, ".convertToNewConfig: old LDAP size =" + oldLDAP.size() + ", keyset = " + oldLDAP.keySet());
+            DebugUtil.trace(OA2ClientFunctorScriptsUtil.class, ".convertToNewConfig: old LDAP size =" + oldLDAP.size() + ", keyset = " + oldLDAP.keySet());
             oldLDAP.put(LDAP_TAG, content);
             claimSources.add(oldLDAP);
             setClaimSourcesConfigurations(config, claimSources);
             setSaved(config, false);
             // Finally, if there is NO claims pre-processor (which would set the source to use
             // then create one. Otherwise leave any existing new configuration intact.
-            DebugUtil.trace(OA2ClientConfigurationUtil.class, "Done creating new Claim source with id = " + newName + ". Create default processor?" +
-                    (!OA2ClientConfigurationUtil.hasClaimPreProcessor(config) && !hasRuntime(config)));
+            DebugUtil.trace(OA2ClientFunctorScriptsUtil.class, "Done creating new Claim source with id = " + newName + ". Create default processor?" +
+                    (!OA2ClientFunctorScriptsUtil.hasClaimPreProcessor(config) && !hasRuntime(config)));
             if (!hasClaimPreProcessor(config) && !hasRuntime(config)) {
                 createDefaultPreProcessor(config, newName);
             }
@@ -299,7 +296,7 @@ public class OA2ClientConfigurationUtil extends ClientConfigurationUtil {
         Collection<String> emptyScopes= new ArrayList();
         OA2FunctorFactory ff = new OA2FunctorFactory(emptyClaims, emptyScopes); // need the factory, but there are no claims or scopes at this point.
         jSetClaimSource jSetClaimSource = new jSetClaimSource();
-        jSetClaimSource.addArg(OA2ClientConfigurationFactory.LDAP_DEFAULT);
+        jSetClaimSource.addArg(OA2ClientFunctorScriptsFactory.LDAP_DEFAULT);
         jSetClaimSource.addArg(newName);
         array.add(jSetClaimSource.toJSON());
         JSONObject j = new JSONObject();

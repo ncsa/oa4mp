@@ -14,6 +14,7 @@ import java.util.Map;
  * After the claims have been created, processing can be applied to them as per configuration.
  * <p>Created by Jeff Gaynor<br>
  * on 3/2/18 at  3:12 PM
+ * @deprecated Use {@link OA2ClaimsUtil} instead
  */
 
 public class ClaimsProcessor {
@@ -29,19 +30,19 @@ public class ClaimsProcessor {
     protected LogicBlocks<? extends LogicBlock> logicBlocks;
 
     public Map<String, Object> process(Map<String, Object> claims) {
-        ServletDebugUtil.dbg(this, "starting processing");
+        ServletDebugUtil.trace(this, "starting processing");
 
         if(config == null || config.isEmpty()){
-            ServletDebugUtil.dbg(this, "NO configuration, returning.");
+            ServletDebugUtil.trace(this, "NO configuration, returning.");
             return claims;
         }
 
         logicBlocks = createLogicBlocks(config, claims);
-        ServletDebugUtil.dbg(this, "created " + logicBlocks.size() + " logic blocks.");
+        ServletDebugUtil.trace(this, "created " + logicBlocks.size() + " logic blocks.");
         logicBlocks.execute();
         executed = true;
-        ServletDebugUtil.dbg(this, "Finished processing, returned claims are");
-        ServletDebugUtil.dbg(this, claims.toString());
+        ServletDebugUtil.trace(this, "Finished processing, returned claims are");
+        ServletDebugUtil.trace(this, claims.toString());
 
         return claims;
     }
@@ -60,14 +61,14 @@ public class ClaimsProcessor {
      */
     protected LogicBlocks<? extends LogicBlock> createLogicBlocks(JSONObject configuration,
                                                                   Map<String, Object> claims){
-        ServletDebugUtil.dbg(this, "config:\n\n" + config.toString(2));
+        ServletDebugUtil.trace(this, "config:\n\n" + config.toString(2));
         OA2FunctorFactory functorFactory = createFunctorFactory(claims, null);
 
         JSONArray jsonArray = new JSONArray();
         jsonArray.add(config);
         JSONObject j = new JSONObject();
         j.put(FunctorTypeImpl.OR.getValue(), jsonArray);
-        ServletDebugUtil.dbg(this, "created logic blocks:\n\n" + j.toString(2));
+        ServletDebugUtil.trace(this, "created logic blocks:\n\n" + j.toString(2));
 
         return functorFactory.createLogicBlock(j);
 

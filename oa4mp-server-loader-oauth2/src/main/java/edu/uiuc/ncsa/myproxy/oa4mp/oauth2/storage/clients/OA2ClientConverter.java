@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientConfigurationUtil;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientFunctorScriptsUtil;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.delegation.storage.impl.ClientConverter;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
@@ -88,7 +88,7 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
                 // so by this point, no configuration has been found either.
                 cfg = new JSONObject();
             }
-            OA2ClientConfigurationUtil.setSaved(cfg, true);
+            OA2ClientFunctorScriptsUtil.setSaved(cfg, true);
 
 
         } else {
@@ -98,9 +98,9 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
             // Seriously not worth it do have this here.
           /*  if (cfg == null) {
                 cfg = new JSONObject();
-                OA2ClientConfigurationUtil.setComment(cfg, "Created by converter from old LDAP entry");
+                OA2ClientFunctorScriptsUtil.setComment(cfg, "Created by converter from old LDAP entry");
                 ServletDebugUtil.dbg(this,"starting to convert client with id=" + otherV.getIdentifierString());
-                OA2ClientConfigurationUtil.convertToNewConfiguration(ldap, cfg);
+                OA2ClientFunctorScriptsUtil.convertToNewConfiguration(ldap, cfg);
             }*/
 
             // NOTE!! This next set of statement takes an existing LDAP and puts it back into the

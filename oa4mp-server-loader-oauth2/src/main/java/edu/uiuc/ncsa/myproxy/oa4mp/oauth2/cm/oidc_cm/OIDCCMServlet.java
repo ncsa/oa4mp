@@ -5,7 +5,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.permissions.AddClientRequest;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.permissions.PermissionServer;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.permissions.RemoveClientRequest;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.HeaderUtils;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientConfigurationUtil;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientFunctorScriptsUtil;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientKeys;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
@@ -19,8 +19,7 @@ import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2GeneralError;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Scopes;
-import edu.uiuc.ncsa.security.oauth_2_0.server.config.ClientConfigurationUtil;
-import edu.uiuc.ncsa.security.servlet.JSPUtil;
+import edu.uiuc.ncsa.security.oauth_2_0.server.scripts.ClientJSONConfigUtil;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
@@ -297,8 +296,6 @@ public class OIDCCMServlet extends EnvServlet {
 
     @Override
     public void doPost(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws ServletException, IOException {
-        ServletDebugUtil.printAllParameters(this.getClass(), httpServletRequest);
-
         if (!getOA2SE().getCmConfigs().hasRFC7591Config()) {
             throw new IllegalAccessError("Error: RFC 7591 not supported on this server. Request rejected.");
         }
@@ -368,17 +365,22 @@ public class OIDCCMServlet extends EnvServlet {
 
     PermissionServer permissionServer = null;
 
-    /**
-     *
-     * @param req
-     * @param resp
-     * @throws Throwable
-     */
-    protected OA2Client createOIDCClient(JSONObject rawJSON,
-                                         JSONObject resp,
-                                         HttpServletRequest req,
-                                         HttpServletResponse httpServletResponse) throws Throwable{
+    @Override
+    protected void doIt(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Throwable {
+        AdminClient adminClient = getAndCheckAdminClient(httpServletRequest);
+        // Now that we have the admin client (so we can do this request), we read the payload:
+        JSON rawJSON = getPayload(httpServletRequest);
+        if ( adminClient.getMaxClients() < getOA2SE().getPermissionStore().getClientCount(adminClient.getIdentifier()) ) {
+            getMyLogger().info("Error: Max client count of " + adminClient.getMaxClients() + " exceeded.");
+            throw new GeneralException("Error: Max client count of " + adminClient.getMaxClients() + " exceeded.");
+        }
+        DebugUtil.trace(this, rawJSON.toString());
+        if (rawJSON.isArray()) {
+            getMyLogger().info("Error: Got a JSON array rather than a request:" + rawJSON);
+            throw new IllegalArgumentException("Error: incorrect argument. Not a valid JSON request");
+        }
         OA2Client client = processRegistrationRequest((JSONObject) rawJSON, httpServletResponse);
+        JSONObject resp = new JSONObject(); // The response object.
         resp.put(OIDCCMConstants.client_id, client.getIdentifierString());
         resp.put(OIDCCMConstants.CLIENT_SECRET, client.getSecret());
         // Now make a hash of the secret and store it.
@@ -390,44 +392,11 @@ public class OIDCCMServlet extends EnvServlet {
         // Next, we have to construct the registration URI by adding in the client ID.
         // Spec says we can add parameters here, but not elsewhere.
         resp.put(OIDCCMConstants.REGISTRATION_CLIENT_URI, registrationURI + "?" + OA2Constants.CLIENT_ID + "=" + client.getIdentifierString());
+        ;
+
         getOA2SE().getClientStore().save(client);
-        
-      return client;
-    }
 
-    protected void processOIDCClient(JSONObject rawJSON,
-                                     JSONObject resp,
-                                     HttpServletRequest request,
-                                     HttpServletResponse response) throws Throwable{
-        if (getOA2SE().getMaxAllowedNewClientRequests() <= getOA2SE().getClientApprovalStore().getPendingCount()) {
-            //   throw new TooManyRequestsException("Error: Max number of new client requests reached. Request rejected.");
-            log("Too many client approvals pending. Max allowed unapproved count is " + getOA2SE().getMaxAllowedNewClientRequests());
-            // Fixes CIL-414, CIL-426 (send email notification), CIL-427
-
-            getOA2SE().getMailUtil().sendMessage("Too many pending approvals",
-                    request.getServerName() + " has too many pending client approval requests outstanding. " +
-                            "The server is configured for a limit of " + getOA2SE().getMaxAllowedNewClientRequests() + " and"
-                    + " there are " + getOA2SE().getClientApprovalStore().getPendingCount() + " pending approvals in the store.", null);
-            JSPUtil.fwd(request, response, "/tooManyClientRequests.jsp");
-            // Fixes OAUTH-90 bug.
-            return;
-        }
-
-        createOIDCClient(rawJSON, resp, request, response);
-
-    }
-    protected void processAdminClient(AdminClient adminClient,
-                                      JSONObject rawJSON,
-                                      JSONObject resp,
-                                      HttpServletRequest httpServletRequest,
-                                      HttpServletResponse httpServletResponse) throws Throwable{
-        if (adminClient.getMaxClients() < getOA2SE().getPermissionStore().getClientCount(adminClient.getIdentifier()) ) {
-             getMyLogger().info("Error: Max client count of " + adminClient.getMaxClients() + " exceeded.");
-             throw new GeneralException("Error: Max client count of " + adminClient.getMaxClients() + " exceeded.");
-         }
-
-
-        OA2Client client = createOIDCClient(rawJSON, resp, httpServletRequest, httpServletResponse);
+        // this adds the client to the list of clients managed by the admin
         AddClientRequest addClientRequest = new AddClientRequest(adminClient, client);
         getPermissionServer().addClient(addClientRequest);
 
@@ -439,43 +408,6 @@ public class OIDCCMServlet extends EnvServlet {
         approval.setStatus(ClientApproval.Status.APPROVED);
         getOA2SE().getClientApprovalStore().save(approval);
 
-
-        }
-    @Override
-    protected void doIt(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Throwable {
-        boolean isAdminRequest = false;
-        AdminClient adminClient = null;
-        try{
-            adminClient = getAndCheckAdminClient(httpServletRequest);
-            ServletDebugUtil.trace(this, "Got admin client with id=\"" + adminClient.getIdentifierString() + "\"");
-            isAdminRequest = true;
-        }catch (Throwable t){
-            // we *used* to throw this exception. Now we attempt to porcess the request as if it is a standard
-            // OA client. This means it won't be approved and no updates of any sort are allowed.
-            ServletDebugUtil.trace(this, "No admin client for this request, processing as standard request.");
-
-        }
-
-        // Now  we read the payload:
-        JSON rawJSON = getPayload(httpServletRequest);// if it is not valid JSON, this will fail and throw an exception
-        ServletDebugUtil.trace(this,"payload=" + rawJSON);
-        if (rawJSON.isArray()) {
-            getMyLogger().info("Error: Got a JSON array rather than a request:" + rawJSON);
-            throw new IllegalArgumentException("Error: incorrect argument. Not a valid JSON request");
-        }
-        JSONObject resp = new JSONObject(); // The response object. This has the secret, client id, etc.
-
-        if(isAdminRequest){
-              processAdminClient(adminClient, (JSONObject)rawJSON, resp, httpServletRequest,httpServletResponse);
-        }else{
-            processOIDCClient((JSONObject) rawJSON, resp, httpServletRequest,httpServletResponse);
-
-        }
-
-        // this adds the client to the list of clients managed by the admin
-        // the resp object here is the payload returned to the requester. Don't write anything to the
-        // servlet response unless it gets to here or they will get a false positive (e.g. an error code
-        // *and* a resonable looking payload that their client was created).
         writeOK(httpServletResponse, resp);
     }
 
