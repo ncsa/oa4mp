@@ -30,13 +30,7 @@ public class AdminClientConverter<V extends AdminClient> extends BaseClientConve
         V v = super.fromJSON(json);
         v.setIssuer(getJsonUtil().getJSONValueString(json, getACK().issuer()));
         v.setVirtualOrganization(getJsonUtil().getJSONValueString(json, getACK().vo()));
-        // implies that this might be a legacy admin client and has a database entry that is null
-        // rather than an integer. In that case, set it to the default.
-        if (!json.containsKey(getACK().maxClients()) || json.get(getACK().maxClients()) == null) {
-            v.setMaxClients(AdminClient.DEFAULT_MAX_NUMBER_OF_OIDC_CLIENTS);
-        } else {
-            v.setMaxClients(getJsonUtil().getJSONValueInt(json, getACK().maxClients()));
-        }
+        v.setMaxClients(getJsonUtil().getJSONValueInt(json, getACK().maxClients()));
         JSONObject config = (JSONObject) getJsonUtil().getJSONValue(json, getACK().config());
         if (config != null) {
             v.setConfig(config);

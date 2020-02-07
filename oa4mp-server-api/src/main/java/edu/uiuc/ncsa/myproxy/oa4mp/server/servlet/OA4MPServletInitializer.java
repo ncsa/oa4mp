@@ -79,44 +79,46 @@ public class OA4MPServletInitializer implements Initialization {
 
     static boolean notifiersSet = false;
 
-    protected NewClientNotifier createNewClientNotifier(MailUtil mailUtil, MyLoggingFacade logger){
+    protected NewClientNotifier createNewClientNotifier(MailUtil mailUtil, MyLoggingFacade logger) {
         return new NewClientNotifier(mailUtil, logger);
     }
 
-     public void setupNotifiers() throws IOException {
-         // do this once or you will have a message sent for each listener!
-         if (notifiersSet) return;
-         MyProxyDelegationServlet mps = (MyProxyDelegationServlet) getServlet();
-         ServiceEnvironmentImpl env = (ServiceEnvironmentImpl) getEnvironment();
-         MyLoggingFacade logger = env.getMyLogger();
-         NewClientNotifier newClientNotifier = createNewClientNotifier(env.getMailUtil(), logger);
-         MyProxyDelegationServlet.addNotificationListener(newClientNotifier);
-         MailUtil x = new MailUtil(env.getMailUtil().getMailEnvironment());
-         String fName = mps.getServletContext().getInitParameter(ERROR_NOTIFICATION_SUBJECT_KEY);
-         if (fName == null) {
-             logger.info("No error notification subject set. Skipping...");
-             notifiersSet = true;
-             return;
-         } else {
-             logger.info("Set error notification subject to " + fName);
-         }
-         x.setSubjectTemplate(getTemplate(new File(fName)));
+    public void setupNotifiers() throws IOException {
+        // do this once or you will have a message sent for each listener!
+        if (notifiersSet) return;
+        MyProxyDelegationServlet mps = (MyProxyDelegationServlet) getServlet();
+        ServiceEnvironmentImpl env = (ServiceEnvironmentImpl) getEnvironment();
+        MyLoggingFacade logger = env.getMyLogger();
+        NewClientNotifier newClientNotifier = createNewClientNotifier(env.getMailUtil(), logger);
+        MyProxyDelegationServlet.addNotificationListener(newClientNotifier);
+        String fName = mps.getServletContext().getInitParameter(ERROR_NOTIFICATION_SUBJECT_KEY);
+        if (fName == null) {
+            logger.info("No error notification subject set. Skipping...");
+            notifiersSet = true;
+            return;
+        } else {
+            logger.info("Set error notification subject to " + fName);
+        }
+        MailUtil x = new MailUtil(env.getMailUtil().getMailEnvironment());
+        if (x.isEnabled()) {
+            // don't set stuff up unless this is enabled.
+            x.setSubjectTemplate(getTemplate(new File(fName)));
+            x.setMessageTemplate(getTemplate(new File(fName)));
+        }
+        fName = mps.getServletContext().getInitParameter(ERROR_NOTIFICATION_BODY_KEY);
+        if (fName == null) {
+            logger.info("No error notification message body set. Skipping...");
+            notifiersSet = true;
+            return;
+        } else {
+            logger.info("Set error notification message body to " + fName);
+        }
 
-         fName = mps.getServletContext().getInitParameter(ERROR_NOTIFICATION_BODY_KEY);
-         if (fName == null) {
-             logger.info("No error notification message body set. Skipping...");
-             notifiersSet = true;
-             return;
-         } else {
-             logger.info("Set error notification message body to " + fName);
-         }
 
-         x.setMessageTemplate(getTemplate(new File(fName)));
-
-         ExceptionEventNotifier exceptionNotifier = new ExceptionEventNotifier(x, logger);
-         MyProxyDelegationServlet.addNotificationListener(exceptionNotifier);
-         notifiersSet = true;
-     }
+        ExceptionEventNotifier exceptionNotifier = new ExceptionEventNotifier(x, logger);
+        MyProxyDelegationServlet.addNotificationListener(exceptionNotifier);
+        notifiersSet = true;
+    }
 
     @Override
     public void init() throws ServletException {
@@ -128,7 +130,7 @@ public class OA4MPServletInitializer implements Initialization {
         // Full solution requires a good deal most tweaking of the logging including
         // determining if log4j is in use and configuring that.
         URI serviceAddress = mps.getServiceEnvironment().getServiceAddress();
-        if(serviceAddress != null){
+        if (serviceAddress != null) {
             DebugUtil.host = serviceAddress.getHost();
         }
         try {

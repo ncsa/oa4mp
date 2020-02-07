@@ -1,7 +1,5 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows;
 
-import edu.uiuc.ncsa.security.util.functor.JFunctor;
-import edu.uiuc.ncsa.security.util.functor.logic.FunctorMap;
 import net.sf.json.JSONObject;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowType.*;
@@ -17,33 +15,14 @@ public class FlowStates {
         fromJSON(json);
     }
 
+/*
     public FlowStates(FunctorMap functorMap) {
         super();
         updateValues(functorMap);
     }
+*/
 
-    /**
-     * The contract for this method is that the values of this object (default is all true) will be
-     * updated based on the functor map. Unless the values are explicitly changed, they remain.
-     * @param functorMap
-     */
-    public void updateValues(FunctorMap functorMap) {
-        acceptRequests = findValue(functorMap, ACCEPT_REQUESTS, acceptRequests);
-        accessToken = findValue(functorMap, ACCESS_TOKEN, accessToken);
-        getCert = findValue(functorMap, GET_CERT, getCert);
-        getClaims = findValue(functorMap, GET_CLAIMS, getClaims);
-        idToken = findValue(functorMap, ID_TOKEN, idToken);
-        refreshToken = findValue(functorMap, REFRESH_TOKEN, refreshToken);
-        userInfo = findValue(functorMap, USER_INFO, userInfo);
-    }
 
-    protected boolean findValue(FunctorMap functorMap, FlowType type, boolean previousValue) {
-        if (functorMap.containsKey(type.getValue())) {
-            JFunctor jf = functorMap.get(type.getValue()).get(0);
-            return  (Boolean)jf.getResult();
-        }
-        return previousValue; //default
-    }
 
     public FlowStates() {
     }

@@ -32,10 +32,14 @@ CREATE TABLE oauth2.clients (
   name               TEXT,
   home_url           TEXT,
   error_url          TEXT,
+  issuer             TEXT,
+  ldap               TEXT,
   email              TEXT,
+  scopes             TEXT,
   proxy_limited      BOOLEAN,
-  creation_ts        TIMESTAMP,
-  last_modified_ts   TIMESTAMP,
+  public_client      BOOLEAN,
+  creation_ts        timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  last_modified_ts   timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   rt_lifetime        bigint,
   callback_uri       TEXT,
   sign_tokens        BOOLEAN,
@@ -46,15 +50,16 @@ CREATE TABLE oauth2.clients (
 
 
 CREATE TABLE oauth2.adminClients (
-  admin_id     VARCHAR(255) PRIMARY KEY,
-  name         TEXT,
-  secret       TEXT,
-  email        TEXT,
-  creation_ts  TIMESTAMP,
-  vo           TEXT,
-  max_clients  BIGINT,
-  issuer       TEXT,
-  config       TEXT
+  admin_id          VARCHAR(255) PRIMARY KEY,
+  name              TEXT,
+  secret            TEXT,
+  email             TEXT,
+  creation_ts        timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  last_modified_ts   timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  vo                TEXT,
+  max_clients       BIGINT,
+  issuer            TEXT,
+  config            TEXT
 );
 
 
@@ -74,6 +79,7 @@ CREATE TABLE oauth2.client_approvals (
   client_id   VARCHAR(255) PRIMARY KEY,
   approver    TEXT,
   approved    BOOLEAN,
+  status      TEXT,
   approval_ts TIMESTAMP
 );
 
@@ -89,6 +95,7 @@ CREATE TABLE oauth2.transactions (
   refresh_token       TEXT,
   refresh_token_valid BOOLEAN,
   expires_in          BIGINT,
+  states              TEXT,
   certificate         TEXT,
   username            TEXT,
   myproxyUsername     TEXT,

@@ -222,8 +222,8 @@ public class ClientConfigurationTest extends TestBase {
         System.out.println("new aud=" + newAud);
         JSONObject cfg = createConfiguration(myClaim, oldAud, newAud);
 
-        OA2ClientFunctorScriptsFactory<OA2ClientFunctorScripts> ff = new OA2ClientFunctorScriptsFactory(new OA2FunctorFactory(null, null));
-        OA2ClientFunctorScripts clientConfiguration = ff.newInstance(cfg);
+        OA2ClientFunctorScriptsFactory<OA2ClientFunctorScripts> ff = new OA2ClientFunctorScriptsFactory(cfg, new OA2FunctorFactory(null, null));
+        OA2ClientFunctorScripts clientConfiguration = ff.newInstance();
         assert clientConfiguration.executeRuntime();
         ff.createClaimSource(clientConfiguration, cfg);
         List<ClaimSource> cc = clientConfiguration.getClaimSource();
@@ -250,16 +250,16 @@ public class ClientConfigurationTest extends TestBase {
         JSONObject cfg = createConfiguration(myClaim, oldAud, newAud);
         System.out.println(cfg.toString(2));
 
-        OA2ClientFunctorScriptsFactory<OA2ClientFunctorScripts> ff = new OA2ClientFunctorScriptsFactory(new OA2FunctorFactory(null, null));
-        OA2ClientFunctorScripts clientConfiguration = ff.newInstance(cfg);
+        OA2ClientFunctorScriptsFactory<OA2ClientFunctorScripts> ff = new OA2ClientFunctorScriptsFactory(cfg, new OA2FunctorFactory(null, null));
+        OA2ClientFunctorScripts clientConfiguration = ff.newInstance();
         clientConfiguration.executeRuntime();
         ff.createClaimSource(clientConfiguration, cfg);
 
         // claims do not exist until the sources have been run (??)
         Map<String, Object> claims = createClaims();
 
-        ff = new OA2ClientFunctorScriptsFactory(new OA2FunctorFactory(claims, OA2FunctorTests.createScopes()));
-        clientConfiguration = ff.newInstance(cfg);
+        ff = new OA2ClientFunctorScriptsFactory(cfg, new OA2FunctorFactory(claims, OA2FunctorTests.createScopes()));
+        clientConfiguration = ff.newInstance();
         clientConfiguration.executeRuntime();
         ff.setupPostProcessing(clientConfiguration, cfg);
 
@@ -289,16 +289,16 @@ public class ClientConfigurationTest extends TestBase {
         JSONObject cfg = createConfiguration(myClaim, oldAud, newAud);
         System.out.println(cfg.toString(2));
 
-        OA2ClientFunctorScriptsFactory<OA2ClientFunctorScripts> ff = new OA2ClientFunctorScriptsFactory(new OA2FunctorFactory(null, null));
-        OA2ClientFunctorScripts clientConfiguration = ff.newInstance(cfg);
+        OA2ClientFunctorScriptsFactory<OA2ClientFunctorScripts> ff = new OA2ClientFunctorScriptsFactory(cfg, new OA2FunctorFactory(null, null));
+        OA2ClientFunctorScripts clientConfiguration = ff.newInstance();
         clientConfiguration.executeRuntime();
         ff.createClaimSource(clientConfiguration, cfg);
 
         // claims do not exist until the sources have been run (??)
         Map<String, Object> claims = createClaims();
 
-        ff = new OA2ClientFunctorScriptsFactory(new OA2FunctorFactory(claims, OA2FunctorTests.createScopes()));
-        clientConfiguration = ff.newInstance(cfg);
+        ff = new OA2ClientFunctorScriptsFactory(cfg, new OA2FunctorFactory(claims, OA2FunctorTests.createScopes()));
+        clientConfiguration = ff.newInstance();
         clientConfiguration.executeRuntime();
         ff.setupPostProcessing(clientConfiguration, cfg);
 
@@ -334,9 +334,9 @@ public class ClientConfigurationTest extends TestBase {
 
         OA2FunctorFactory functorFactory = new OA2FunctorFactory(null, null);
         functorFactory.setVerboseOn(true); // enables output in scripts.
-        OA2ClientFunctorScriptsFactory<OA2ClientFunctorScripts> ff = new OA2ClientFunctorScriptsFactory(functorFactory);
         JSONObject cfg = JSONObject.fromObject(raw);
-        OA2ClientFunctorScripts clientConfiguration = ff.newInstance(cfg);
+        OA2ClientFunctorScriptsFactory<OA2ClientFunctorScripts> ff = new OA2ClientFunctorScriptsFactory(cfg, functorFactory);
+        OA2ClientFunctorScripts clientConfiguration = ff.newInstance();
         ff.createClaimSource(clientConfiguration, cfg);
         List<ClaimSource> cc = clientConfiguration.getClaimSource();
         System.out.println(cc);

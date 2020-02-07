@@ -134,7 +134,7 @@ public class OA2AuthorizedServletUtil {
         ServletDebugUtil.trace(this, "Starting done with doDelegation, creating claim util");
         OA2ClaimsUtil claimsUtil = new OA2ClaimsUtil((OA2SE) servlet.getServiceEnvironment(), t);
         DebugUtil.trace(this, "starting to process claims, creating basic claims:");
-        claimsUtil.processAuthorizationClaims(httpServletRequest, t);
+        claimsUtil.processAuthorizationClaims(httpServletRequest);
         //  servlet.getTransactionStore().save(t); // save the claims.
         DebugUtil.trace(this, "done with claims, transaction saved, claims = " + t.getClaims());
         return t;

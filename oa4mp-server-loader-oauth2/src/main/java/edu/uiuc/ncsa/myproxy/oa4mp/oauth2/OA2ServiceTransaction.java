@@ -22,6 +22,7 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
     public String STATE_KEY = "state";
     public String STATE_COMMENT_KEY = "comment";
     public String CLAIMS_KEY = "claims";
+    public String SCRIPT_STATE_KEY = "script_state";
 
     public OA2ServiceTransaction(AuthorizationGrant ag) {
         super(ag);
@@ -57,6 +58,7 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         this.state = state;
     }
 
+    // This is used to store the flow states AND the claims in between calls.
     public JSONObject getState() {
         if (state == null) {
             state = new JSONObject();
@@ -71,10 +73,27 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         getState().put(FLOW_STATE_KEY, flowStates.toJSON());
     }
 
+    /**
+     * Script engines have the option to save their state between calls too. The argument is a (probably base 64 encoded)
+     * string that will be returned on request. 
+     * @param scriptState
+     */
+    public void setScriptState(String scriptState) {
+        if(scriptState!= null && !scriptState.isEmpty()) {
+            getState().put(SCRIPT_STATE_KEY, scriptState);
+        }
+    }
+
+    public String getScriptState() {
+        if (getState().containsKey(SCRIPT_STATE_KEY)) {
+            return getState().getString(SCRIPT_STATE_KEY);
+        }
+        return "";
+    }
 
     @Override
     public JSONObject getClaims() {
-        if(!getState().containsKey(CLAIMS_KEY)){
+        if (!getState().containsKey(CLAIMS_KEY)) {
             return new JSONObject();
         }
         return getState().getJSONObject(CLAIMS_KEY);
@@ -106,6 +125,7 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
      * The <b><i>resolved</i></b> scopes for this transaction. This means that the intersection of the client's allowed
      * scopes, the client's requested scopes and the scopes enabled on the server are placed here. This should be passed
      * to anything that needs the scopes (e.g. a {@link edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource}.
+     *
      * @return
      */
     @Override

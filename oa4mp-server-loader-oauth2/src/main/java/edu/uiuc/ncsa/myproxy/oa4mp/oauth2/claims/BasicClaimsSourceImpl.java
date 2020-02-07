@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowStates;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.functor.FunctorRuntimeEngine;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.GroupHandler;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.oauth_2_0.UserInfo;
@@ -139,15 +140,12 @@ public class BasicClaimsSourceImpl implements ClaimSource {
     public JSONObject process(JSONObject claims, HttpServletRequest request, ServiceTransaction transaction) throws UnsupportedScopeException {
         OA2ServiceTransaction t = (OA2ServiceTransaction) transaction;
         if (hasConfiguration() && hasJSONPreProcessoor()) {
-          //  DebugUtil.dbg(this, "claims before pre-processing=" + claims.toString(1));
-
             OA2FunctorFactory ff = new OA2FunctorFactory(claims, t.getScopes());
             preProcessor = new Script(ff, getConfiguration().getJSONPreProcessing());
-            //preProcessor = ff.createLogicBlock(((JSONClaimSourceConfig) getConfiguration()).getJSONPreProcessing());
             preProcessor.execute();
             // since the flow state maps to  part of a JSON object, we have to get the object, then reset it.
             FlowStates f = t.getFlowStates();
-            f.updateValues(preProcessor.getFunctorMap());
+            FunctorRuntimeEngine.updateFSValues(f, postProcessor.getFunctorMap());
             t.setFlowStates(f);
 
 
@@ -157,11 +155,10 @@ public class BasicClaimsSourceImpl implements ClaimSource {
             OA2FunctorFactory ff = new OA2FunctorFactory(claims, t.getScopes());
           //  DebugUtil.dbg(this, "claims before post-processing=" + claims.toString(1));
             postProcessor = new Script(ff, getConfiguration().getJSONPostProcessing());
-            //postProcessor = ff.createLogicBlock((getConfiguration()).getJSONPostProcessing());
             postProcessor.execute();
           //  DebugUtil.dbg(this, "claims after post-processing=" + claims.toString(1));
             FlowStates f = t.getFlowStates();
-            f.updateValues(postProcessor.getFunctorMap());
+            FunctorRuntimeEngine.updateFSValues(f, postProcessor.getFunctorMap());
             t.setFlowStates(f);
         }
         return claims;

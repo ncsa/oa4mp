@@ -881,8 +881,8 @@ public class OA2FunctorTests extends JFunctorTest {
          claims.put("oidc", randomString);
 
         OA2FunctorFactory functorFactory = new OA2FunctorFactory(claims,createScopes());
-        OA2ClientFunctorScriptsFactory ff = new OA2ClientFunctorScriptsFactory(functorFactory);
-        OA2ClientFunctorScripts clientConfiguration = ff.newInstance(cfg);
+        OA2ClientFunctorScriptsFactory ff = new OA2ClientFunctorScriptsFactory(cfg,functorFactory);
+        OA2ClientFunctorScripts clientConfiguration = (OA2ClientFunctorScripts) ff.newInstance();
         ff.createClaimSource(clientConfiguration, cfg);
 
         JSONObject postProcessing = OA2ClientFunctorScriptsUtil.getClaimsPostProcessing(cfg);

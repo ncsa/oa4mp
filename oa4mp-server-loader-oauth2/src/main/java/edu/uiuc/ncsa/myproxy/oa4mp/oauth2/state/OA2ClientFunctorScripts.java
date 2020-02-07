@@ -68,8 +68,13 @@ public class OA2ClientFunctorScripts extends ClientFunctorScripts {
         return claimSource;
     }
 
+    /**
+     * This is antiquated and is being changed to just return true. The machinery this was to support
+     * has been replaced. Just save the configuration like any other.
+     * @return
+     */
     public boolean isSaved() {
-        return saved;
+        return true;
     }
 
     public void setSaved(boolean saved) {

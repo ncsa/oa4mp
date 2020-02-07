@@ -27,20 +27,14 @@ import java.util.Map;
  * on 4/17/18 at  2:51 PM
  */
 public class OA2ClientFunctorScriptsFactory<V extends OA2ClientFunctorScripts> extends ClientFunctorScriptsFactory<V> {
-    public OA2ClientFunctorScriptsFactory(JFunctorFactory functorFactory) {
-        super(functorFactory);
+    public OA2ClientFunctorScriptsFactory(JSONObject config, JFunctorFactory functorFactory) {
+        super(config, functorFactory);
     }
 
-    @Override
-    public V newInstance(JSONObject json) {
-        V v = super.newInstance(json);
-        v.setSaved(OA2ClientFunctorScriptsUtil.isSaved(json));
-        return v;
-    }
 
     /**
      * Create the claims sources from the configuration runtime information and set it in the configuration.
-     * You must do this before using the sources.
+     * You must do this before using the sources. Response is never null
      *
      * @param json
      * @param cc
@@ -51,7 +45,7 @@ public class OA2ClientFunctorScriptsFactory<V extends OA2ClientFunctorScripts> e
         // Now to get the claim sources. These can be in either the runtime or the pre-processor
         LinkedList<ClaimSource> claimSources = new LinkedList<>();
         extractClaimsSource(cc.getPreProcessing(), json, claimSources);
-        extractClaimsSource( cc.getRuntime(), json, claimSources);
+        extractClaimsSource(cc.getRuntime(), json, claimSources);
         if (claimSources.isEmpty()) {
             claimSources.add(new BasicClaimsSourceImpl());
         }
@@ -177,10 +171,10 @@ public class OA2ClientFunctorScriptsFactory<V extends OA2ClientFunctorScripts> e
         }
 
         if (alias.equals(HEADER_DEFAULT)) {
-            return  new HTTPHeaderClaimsSource(config);
+            return new HTTPHeaderClaimsSource(config);
         }
-        if(alias.equals(FILE_SYSTEM_DEFAULT)){
-            return  new FSClaimSource(config);
+        if (alias.equals(FILE_SYSTEM_DEFAULT)) {
+            return new FSClaimSource(config);
         }
         if (!sources.containsKey(alias)) {
             throw new IllegalArgumentException("Error:\"" + alias + "\" has not been registered as a claim source");
@@ -216,6 +210,7 @@ public class OA2ClientFunctorScriptsFactory<V extends OA2ClientFunctorScripts> e
         Script postProcessing = new Script(functorFactory, OA2ClientFunctorScriptsUtil.getClaimsPostProcessing(json));
         cc.setPostProcessing(postProcessing);
     }
+
 
     @Override
     public V get() {
