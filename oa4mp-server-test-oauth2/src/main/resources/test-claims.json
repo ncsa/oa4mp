@@ -4,11 +4,35 @@
     "the course of running the tests then changed back."
   ],
   "user123" : {"eppn":""},
-  "jgaynor":{"eppn":"test-eppn@foo.bar",
+  "jgaynor":{
+    "eppn":"test-eppn@foo.bar",
     "isMemberOf":  [
      {"name": "org_ici","id": 1282},
      {"name": "all_ncsa_employe","id": 1097},
      {"name": "jira-users","id": 1363}
     ]
-      }
+      },
+  "jeff":{
+      "isMemberOf":  [
+        {"name": "org_ici","id": 1282},
+        {"name": "list_apcs","id": 1898},
+        {"name": "all_ncsa_employe","id": 1097},
+        {"name": "jira-users"},
+        {"name": "lsst_users","id": 1363},
+        {"name": "iam_sec_testing","id": 1342}
+      ],
+    "email": "gaynor@illinois.edu",
+      "given_name": "Jeffrey",
+      "family_name": "Gaynor",
+      "cert_subject_dn": "/DC=org/DC=cilogon/C=US/O=National Center for Supercomputing Applications/CN=Jeffrey Gaynor T173053",
+      "idp": "https://idp.ncsa.illinois.edu/idp/shibboleth",
+      "idp_name": "National Center for Supercomputing Applications",
+      "eppn": "jgaynor@ncsa.illinois.edu",
+      "eptid": "https://idp.ncsa.illinois.edu/idp/shibboleth!https://cilogon.org/shibboleth!i65P3o9qFNjrpS4z6+WI7Dir/4I=",
+      "affiliation": "staff@ncsa.illinois.edu;employee@ncsa.illinois.edu;member@ncsa.illinois.edu",
+      "name": "Jeffrey Gaynor",
+      "acr": "https://refeds.org/profile/mfa",
+      "uid": "jgaynor",
+      "uidNumber": "25939"
+     }
 }

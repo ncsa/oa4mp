@@ -3,10 +3,12 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowStates;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.functor.FunctorRuntimeEngine;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2DiscoveryServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2GeneralError;
@@ -169,7 +171,7 @@ public class OA2ClaimsUtil {
                 HashMap<String, Object> map = new HashMap<>();
                 map.put(SRE_REQ_CLAIMS, transaction.getClaims());
                 map.put(SRE_REQ_SCOPES, transaction.getScopes());
-                map.put(SRE_REQ_FLOW_STATES, transaction.getFlowStates().toJSON()); // so its a map
+                map.put(SRE_REQ_FLOW_STATES, transaction.getFlowStates()); // so its a map
                 return map;
             }
 
@@ -211,21 +213,22 @@ public class OA2ClaimsUtil {
     }
 
     protected List<ClaimSource> handleSREResponse(ScriptRunResponse scriptRunResponse, List<ClaimSource> currentSources) {
-        if (scriptRunResponse.getReturnCode() == ScriptRunResponse.RC_OK) {
-
-            transaction.setClaims((JSONObject) scriptRunResponse.getReturnedValues().get(SRE_REQ_CLAIMS));
-            transaction.setFlowStates((FlowStates) scriptRunResponse.getReturnedValues().get(SRE_REQ_FLOW_STATES));
-            if (currentSources != null) {
-                // If the current sources is null, then
-                List<ClaimSource> temp = (List<ClaimSource>) scriptRunResponse.getReturnedValues().get(SRE_REQ_CLAIM_SOURCES);
-                if (temp != null && !temp.isEmpty()) {
-                    return currentSources;
+        switch (scriptRunResponse.getReturnCode()) {
+            case ScriptRunResponse.RC_OK:
+                transaction.setClaims((JSONObject) scriptRunResponse.getReturnedValues().get(SRE_REQ_CLAIMS));
+                transaction.setFlowStates((FlowStates) scriptRunResponse.getReturnedValues().get(SRE_REQ_FLOW_STATES));
+                if (scriptRunResponse.getReturnedValues().containsKey(SRE_REQ_CLAIM_SOURCES)) {
+                    // don't return the original since the script may have completely changed it.
+                    return (List<ClaimSource>) scriptRunResponse.getReturnedValues().get(SRE_REQ_CLAIM_SOURCES);
                 }
-                return temp;
-            }
+                return currentSources;
+
+            case ScriptRunResponse.RC_NOT_RUN:
+                return currentSources;
+
         }
-        // HANDLE other return codes!
-        return null;
+
+        throw new NotImplementedException("Error: other functor runtime reponses not implemented yet.");
     }
 
     /**
@@ -252,14 +255,7 @@ public class OA2ClaimsUtil {
         transaction.setClaims(claims);
         OA2Client client = getOA2Client();
         checkRequiredScopes(transaction);
-       /* if (!getCC().isSaved()) {
-            dbg(this, "Saving updated client " + client.getIdentifierString());
-            getCC().setSaved(true); // do this so it ends up in storage as saved, otherwise it gets saved every time.
-            // This means that the configuration was updated on load and needs to be saved.
-            oa2se.getClientStore().save(client);
-        } else {
-            dbg(this, "*NOT* saving updated client " + client.getIdentifierString());
-        }*/
+
         dbg(this, "Done with basic claims = " + claims.toString(1));
         if (transaction.getOA2Client().isPublicClient()) {
             // Public clients do not get more than basic claims.
@@ -291,12 +287,13 @@ public class OA2ClaimsUtil {
         dbg(this, "executing runtime");
         FlowStates flowStates = new FlowStates();
         transaction.setFlowStates(flowStates);
+        ScriptRuntimeEngine sre = new FunctorRuntimeEngine(getOA2Client().getConfig());
+        setScriptRuntimeEngine(sre);
         // Execute the init phase, if there is one in the config.
         ScriptRunRequest scriptRunRequest = newSRR(transaction, SRE_EXEC_INIT);
         claimsSources = handleSREResponse(getScriptRuntimeEngine().run(scriptRunRequest), claimsSources);
 
         // This is out of band and might just be setting up state for later.
-        // getCC().executeRuntime();
         dbg(this, "processing flows");
         if (flowStates.getClaims) {
             dbg(this, "Doing preprocessing");
@@ -304,27 +301,14 @@ public class OA2ClaimsUtil {
             // Execute scripts for pre-authorization phase.
             scriptRunRequest = newSRR(transaction, SRE_PRE_AUTH);
             claimsSources = handleSREResponse(getScriptRuntimeEngine().run(scriptRunRequest), claimsSources);
-            // need to put in handling cases where return code from SRE is not 1.
 
-            //OA2ClientFunctorScriptsFactory<OA2ClientFunctorScripts> ff = new OA2ClientFunctorScriptsFactory(getFF());
-            //OA2ClientFunctorScripts oa2CC = getCC();
-
-            //ff.createClaimSource(oa2CC, client.getConfig());
-            // the runtime forbids processing claims for this request, so exit
-            //   doPreProcessing();
-            //List<ClaimSource> claimsSources = oa2CC.getClaimSource();
             if (!claimsSources.isEmpty()) {
                 // so there is
                 for (int i = 0; i < claimsSources.size(); i++) {
                     ClaimSource claimSource = claimsSources.get(i);
                     if (claimSource.isRunAtAuthorization())
                         claimSource.process(claims, request, transaction);
-                    // In our new, general approach to scripting we cannot allow just mucking around in the
-                    // guts of a post processor in case something happened.
-                    // The way to change the flow states is to put it in the post_auth call.
-                    /*if (claimSource.getPostProcessor() != null) {
-                        flowStates.updateValues(claimSource.getPostProcessor().getFunctorMap());
-                    }*/
+
                     // keep this in case this was set earlier.
                     if (!flowStates.acceptRequests) {
                         // This practically means that the come situation has arisen whereby the user is
@@ -343,6 +327,7 @@ public class OA2ClaimsUtil {
         transaction.setFlowStates(flowStates);
         // Execute scripts for post authorization phase..
         scriptRunRequest = newSRR(transaction, SRE_POST_AUTH);
+        // updating claim sources at this point is not done.
         handleSREResponse(getScriptRuntimeEngine().run(scriptRunRequest));
         transaction.setScriptState(getScriptRuntimeEngine().serializeState());
         // save it at this point because the flow states might, e.g. prohibit access to the entire system
@@ -389,8 +374,9 @@ public class OA2ClaimsUtil {
             return claims;
         }
         List<ClaimSource> claimsSources = new ArrayList<>();
-        // so this client has a specific configuration that is to be invoked.
-        //OA2ClientFunctorScripts oa2CC = getCC();
+        // Note that a new instance of this class is made for each leg of the flow, so no state is persisted.
+        ScriptRuntimeEngine sre = new FunctorRuntimeEngine(getOA2Client().getConfig());
+        setScriptRuntimeEngine(sre);
         getScriptRuntimeEngine().deserializeState(transaction.getScriptState()); // put the state back the way it was
 
         ScriptRunRequest scriptRunRequest = newSRR(transaction, SRE_PRE_AT);
@@ -399,10 +385,6 @@ public class OA2ClaimsUtil {
         dbg(this, "BEFORE invoking claim sources, claims are = " + claims.toString(1));
         if (flowStates.getClaims) {
             DebugUtil.trace(this, "Claims allowed, creating sources from configuration");
-        //    OA2ClientFunctorScriptsFactory<OA2ClientFunctorScripts> ff = new OA2ClientFunctorScriptsFactory<>(getFF());
-
-            //  ff.createClaimSource(oa2CC, client.getConfig());
-            //List<ClaimSource> claimsSources = oa2CC.getClaimSource();
             if (!claimsSources.isEmpty()) {
                 // so there is
                 for (int i = 0; i < claimsSources.size(); i++) {
@@ -428,13 +410,7 @@ public class OA2ClaimsUtil {
         scriptRunRequest = newSRR(transaction, SRE_POST_AT);
         handleSREResponse(getScriptRuntimeEngine().run(scriptRunRequest));
 
-//        doPostProcessing();
-        // Now we have to set up the claims sources and process the results
-        // last thing is to check that the flow states did not change as a result of claims processing
-        // e.g. that the user membership in a group changes access
         flowStates = transaction.getFlowStates();
-        //     flowStates.updateValues(oa2CC.getPostProcessing().getFunctorMap());
-
         // update everything
         transaction.setFlowStates(flowStates);
         checkRequiredClaims(claims);
@@ -540,7 +516,6 @@ public class OA2ClaimsUtil {
 
     }
 */
-
     protected void dbg(Object c, String x) {
         if (deepDebugOn) {
             DebugUtil.trace(c, x);

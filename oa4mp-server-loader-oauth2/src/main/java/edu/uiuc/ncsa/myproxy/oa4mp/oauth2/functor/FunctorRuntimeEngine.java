@@ -5,7 +5,6 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowStates;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowType;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientFunctorScripts;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientFunctorScriptsFactory;
-import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.util.functor.JFunctor;
 import edu.uiuc.ncsa.security.util.functor.logic.FunctorMap;
@@ -37,11 +36,117 @@ public class FunctorRuntimeEngine extends ScriptRuntimeEngine {
                 return doInit(request);
             case SRE_PRE_AUTH:
                 return doPreAuth(request);
+            case SRE_POST_AT:
+                return doPostAT(request);
+            case SRE_POST_AUTH:
+                return noOpSRR();
             case SRE_PRE_AT:
+                // Functors don't support these really. This is just a hook to get the claim sources.
                 return doPreAT(request);
-            default:
-                throw new NotImplementedException("Error: not implemented for action " + request.getAction());
+
         }
+        return noOpSRR();
+    }
+
+    private ScriptRunResponse doPreAT(ScriptRunRequest request) {
+        // NOTE for functors, the correct thing to do here is reget the claims sources since they
+        // Don't actually have a script tag for this. They just reget the claims sources
+        // which are assumed to be set in ONE location (runtime or preprocessing only).
+
+        OA2FunctorFactory functorFactory = getFF((Map) request.getArgs().get(SRE_REQ_CLAIMS),
+                (List) request.getArgs().get(SRE_REQ_SCOPES));
+        OA2ClientFunctorScriptsFactory<OA2ClientFunctorScripts> ff = getScriptFactory(functorFactory);
+        OA2ClientFunctorScripts cc = ff.newInstance();
+        ff.createClaimSource(cc, config);   // can't check for them until they are created
+
+        if (cc.hasClaimSource()) {
+            return createSRR(request, cc.getClaimSource());
+        } else {
+            return createSRR(request, new ArrayList<>());
+        }
+    }
+
+
+    protected OA2ClientFunctorScriptsFactory<OA2ClientFunctorScripts> getScriptFactory(OA2FunctorFactory ff) {
+        return new OA2ClientFunctorScriptsFactory<>(config, ff);
+    }
+
+    // This class does not actually have any state to serialize.
+    public String serializeState() {
+        return "";
+    }
+
+    //  JSONObject config;
+
+    public void deserializeState(String state) {
+        // no op, because functors are stateless (which is one of their ultimate shortcomings...)
+    }
+
+
+    private ScriptRunResponse doPostAT(ScriptRunRequest request) {
+        OA2FunctorFactory functorFactory = getFF((Map) request.getArgs().get(SRE_REQ_CLAIMS),
+                (List) request.getArgs().get(SRE_REQ_SCOPES));
+        OA2ClientFunctorScriptsFactory<OA2ClientFunctorScripts> ff = getScriptFactory(functorFactory);
+        OA2ClientFunctorScripts cc = ff.newInstance();
+
+        if (cc.hasPostProcessing()) {
+            trace(this, ".doPostProcessing: has post-processing?" + cc.getPostProcessing());
+            ff.setupPostProcessing(cc, config);
+            cc.executePostProcessing();
+            ff.createClaimSource(cc, config);
+            FlowStates flowStates = (FlowStates) request.getArgs().get(SRE_REQ_FLOW_STATES);
+            updateFSValues(flowStates, cc.getPostProcessing().getFunctorMap());
+
+            trace(this, ".doPostProcessing: executed post-processing, functor map=" + cc.getPostProcessing().getFunctorMap());
+            return createSRR(request, cc.getClaimSource());
+        }
+        return noOpSRR(); // no claim sources
+    }
+
+    private ScriptRunResponse doPreAuth(ScriptRunRequest request) {
+        OA2FunctorFactory functorFactory = getFF((Map) request.getArgs().get(SRE_REQ_CLAIMS),
+                (List) request.getArgs().get(SRE_REQ_SCOPES));
+        OA2ClientFunctorScriptsFactory<OA2ClientFunctorScripts> ff = getScriptFactory(functorFactory);
+        OA2ClientFunctorScripts cc = ff.newInstance();
+
+        if (cc.hasPreProcessing()) {
+            ff.setupPreProcessing(cc, config);
+            cc.executePreProcessing();
+            FlowStates flowStates = (FlowStates) request.getArgs().get(SRE_REQ_FLOW_STATES);
+            updateFSValues(flowStates, cc.getPreProcessing().getFunctorMap());
+            // Check if we should be returning these as per request.
+            if (cc.hasClaimSource()) {
+                ff.createClaimSource(cc, config);
+                return createSRR(request, cc.getClaimSource());
+            } else {
+                return createSRR(request, new ArrayList<>());
+            }
+        }
+        return noOpSRR();
+
+    }
+
+    private ScriptRunResponse doInit(ScriptRunRequest request) {
+        OA2FunctorFactory functorFactory = getFF((Map) request.getArgs().get(SRE_REQ_CLAIMS),
+                (List) request.getArgs().get(SRE_REQ_SCOPES));
+        OA2ClientFunctorScriptsFactory<OA2ClientFunctorScripts> ff = getScriptFactory(functorFactory);
+        OA2ClientFunctorScripts cc = ff.newInstance();
+
+        cc.executeRuntime();
+        FlowStates flowStates = (FlowStates) request.getArgs().get(SRE_REQ_FLOW_STATES);
+        updateFSValues(flowStates, cc.getRuntime().getFunctorMap());
+        ff.createClaimSource(cc, config);
+
+        if (request.returnArgs()) {
+            Map outMap = new HashMap();
+            outMap.putAll(request.getArgs());
+        }
+        return createSRR(request, cc.getClaimSource());
+
+    }
+
+    protected ScriptRunResponse noOpSRR() {
+        return new ScriptRunResponse(null, null, ScriptRunResponse.RC_NOT_RUN);
     }
 
     protected ScriptRunResponse createSRR(ScriptRunRequest scriptRunRequest) {
@@ -70,78 +175,6 @@ public class FunctorRuntimeEngine extends ScriptRuntimeEngine {
         return new ScriptRunResponse("", respMap, ScriptRunResponse.RC_OK);
     }
 
-    private ScriptRunResponse doPreAT(ScriptRunRequest request) {
-        OA2FunctorFactory functorFactory = getFF((Map) request.getArgs().get(SRE_REQ_CLAIMS),
-                (List) request.getArgs().get(SRE_REQ_SCOPES));
-        OA2ClientFunctorScriptsFactory<OA2ClientFunctorScripts> ff = getScriptFactory(functorFactory);
-        OA2ClientFunctorScripts cc = ff.newInstance();
-
-        if (cc.hasPostProcessing()) {
-            trace(this, ".doPostProcessing: has post-processing?" + cc.getPostProcessing());
-            ff.setupPostProcessing(cc, config);
-            cc.executePostProcessing();
-            ff.createClaimSource(cc, config);
-            FlowStates flowStates = (FlowStates) request.getArgs().get(SRE_REQ_FLOW_STATES);
-            updateFSValues(flowStates, cc.getPostProcessing().getFunctorMap());
-
-            trace(this, ".doPostProcessing: executed post-processing, functor map=" + cc.getPostProcessing().getFunctorMap());
-            return createSRR(request, cc.getClaimSource());
-        }
-        return createSRR(request); // no claim sources
-    }
-
-    private ScriptRunResponse doPreAuth(ScriptRunRequest request) {
-        OA2FunctorFactory functorFactory = getFF((Map) request.getArgs().get(SRE_REQ_CLAIMS),
-                (List) request.getArgs().get(SRE_REQ_SCOPES));
-        OA2ClientFunctorScriptsFactory<OA2ClientFunctorScripts> ff = getScriptFactory(functorFactory);
-        OA2ClientFunctorScripts cc = ff.newInstance();
-
-        if (cc.hasPreProcessing()) {
-            ff.setupPreProcessing(cc, config);
-            cc.executePreProcessing();
-            FlowStates flowStates = (FlowStates) request.getArgs().get(SRE_REQ_FLOW_STATES);
-            updateFSValues(flowStates, cc.getPreProcessing().getFunctorMap());
-            // Check if we should be returning these as per request.
-            ff.createClaimSource(cc, config);
-            return createSRR(request, cc.getClaimSource());
-        }
-        return createSRR(request);
-    }
-
-    protected OA2ClientFunctorScriptsFactory<OA2ClientFunctorScripts> getScriptFactory(OA2FunctorFactory ff) {
-        return new OA2ClientFunctorScriptsFactory<>(config, ff);
-    }
-
-    // This class does not actually have any state to serialize.
-    public String serializeState() {
-        return "";
-    }
-
-    //  JSONObject config;
-
-    public void deserializeState(String state) {
-        // no op, because functors are stateless (which is one of their ultimate shortcomings...)
-    }
-
-    private ScriptRunResponse doInit(ScriptRunRequest request) {
-        OA2FunctorFactory functorFactory = getFF((Map) request.getArgs().get(SRE_REQ_CLAIMS),
-                (List) request.getArgs().get(SRE_REQ_SCOPES));
-        OA2ClientFunctorScriptsFactory<OA2ClientFunctorScripts> ff = getScriptFactory(functorFactory);
-        OA2ClientFunctorScripts cc = ff.newInstance();
-
-        cc.executeRuntime();
-        FlowStates flowStates = (FlowStates) request.getArgs().get(SRE_REQ_FLOW_STATES);
-        updateFSValues(flowStates, cc.getRuntime().getFunctorMap());
-        ff.createClaimSource(cc, config);
-
-        if (request.returnArgs()) {
-            Map outMap = new HashMap();
-            outMap.putAll(request.getArgs());
-        }
-        return createSRR(request, cc.getClaimSource());
-
-    }
-
     public FunctorRuntimeEngine(JSONObject config) {
         super(config);
     }
@@ -160,7 +193,7 @@ public class FunctorRuntimeEngine extends ScriptRuntimeEngine {
      * {@link ClaimSource}s can have embedded functor scripts that may update claims and the flow.
      * This was because there was not an actual set of control structures for functors that allowed
      * for state to be shared, etc. Net effect is that that has to remain. With the arrival of QDL,
-     * there is never a need to have the claim source itself invoke some sort of processing. 
+     * there is never a need to have the claim source itself invoke some sort of processing.
      *
      * @param functorMap
      */
