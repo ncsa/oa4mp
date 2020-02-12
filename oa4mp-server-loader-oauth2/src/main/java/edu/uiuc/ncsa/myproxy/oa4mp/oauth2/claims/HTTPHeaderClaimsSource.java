@@ -1,7 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
 
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
-import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.oauth_2_0.server.UnsupportedScopeException;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSourceConfiguration;
@@ -9,6 +8,8 @@ import net.sf.json.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Enumeration;
+
+import static edu.uiuc.ncsa.security.core.util.DebugUtil.trace;
 
 /**
  * This is for the specific case that claims are passed through the headers. Each starts with the caput
@@ -21,6 +22,11 @@ import java.util.Enumeration;
  * on 3/15/17 at  2:41 PM
  */
 public class HTTPHeaderClaimsSource extends BasicClaimsSourceImpl {
+    /**
+     * Name of the property that contains the prefix used by this source. The default is OIDC_CLAIM_
+     * if this is not set. 
+     */
+    public static final String PREFIX_KEY = "prefix";
     public HTTPHeaderClaimsSource(ClaimSourceConfiguration configuration) {
         setConfiguration(configuration);
     }
@@ -44,7 +50,11 @@ public class HTTPHeaderClaimsSource extends BasicClaimsSourceImpl {
 
     @Override
     protected JSONObject realProcessing(JSONObject claims, HttpServletRequest request, ServiceTransaction transaction) throws UnsupportedScopeException {
-        DebugUtil.trace(this, "Omit list = " + getOmitList());
+        String prefix = (String) getConfiguration().getProperty(PREFIX_KEY);
+        if(prefix != null ){
+            caput = prefix; // caput may be empty
+        }
+        trace(this, "Omit list = " + getOmitList());
         Enumeration headerNames = request.getHeaderNames();
         String caput = getCaput();
         if (caput == null) {
@@ -53,7 +63,7 @@ public class HTTPHeaderClaimsSource extends BasicClaimsSourceImpl {
         int caputLength = caput.length();
         while (headerNames.hasMoreElements()) {
             String name = headerNames.nextElement().toString();
-            DebugUtil.dbg(this, "processing claim " + name);
+            trace(this, "processing claim " + name);
             /*
             The resulting claim is without the caput, so if the caput is "OIDC_CLAIM_" and the header has a field named "OIDC_CLAIM_idp"
             the resulting claim would be called "idp"
@@ -62,10 +72,10 @@ public class HTTPHeaderClaimsSource extends BasicClaimsSourceImpl {
                 String key = name.substring(caputLength);
                 String value = request.getHeader(name);
                 if (!getOmitList().contains(key)) {
-                    DebugUtil.dbg(this, "adding claim " + key + "=" + value);
+                    trace(this, "adding claim " + key + "=" + value);
                     claims.put(key, value);
                 } else {
-                    DebugUtil.dbg(this, "OMITTING claim " + key + "=" + value + ", as per omit list");
+                    trace(this, "OMITTING claim " + key + "=" + value + ", as per omit list");
                 }
             }
         }

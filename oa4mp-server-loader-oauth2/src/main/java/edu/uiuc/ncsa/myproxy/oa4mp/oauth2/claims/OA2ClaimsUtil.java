@@ -8,6 +8,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2DiscoveryServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
@@ -22,6 +23,7 @@ import net.sf.json.JSONObject;
 import org.apache.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -160,7 +162,8 @@ public class OA2ClaimsUtil {
     }
 
     /**
-     * creates new {@link ScriptRunRequest} with the basic information.
+     * creates new {@link ScriptRunRequest} with the basic information. This sends along the current claims, scopes
+     * flow states and claim sources then harvests them <i>in toto</i> from the response.
      *
      * @return
      */
@@ -172,6 +175,11 @@ public class OA2ClaimsUtil {
                 map.put(SRE_REQ_CLAIMS, transaction.getClaims());
                 map.put(SRE_REQ_SCOPES, transaction.getScopes());
                 map.put(SRE_REQ_FLOW_STATES, transaction.getFlowStates()); // so its a map
+                try {
+                    map.put(SRE_REQ_CLAIM_SOURCES, transaction.getClaimSources(oa2se)); // so its a map
+                } catch (IOException| ClassNotFoundException e) {
+                    throw new GeneralException("Error: Could not get the claim sources from the transaction", e);
+                }
                 return map;
             }
 
@@ -189,12 +197,12 @@ public class OA2ClaimsUtil {
 
             @Override
             public String getResponseArgName() {
-                return SRE_REQ_CLAIM_SOURCES;
+                return "";
             }
 
             @Override
             public boolean hasReturnedValue() {
-                return true;
+                return false;
             }
         };
         return initReq;
@@ -208,23 +216,22 @@ public class OA2ClaimsUtil {
      * @param scriptRunResponse
      * @return
      */
-    protected List<ClaimSource> handleSREResponse(ScriptRunResponse scriptRunResponse) {
-        return handleSREResponse(scriptRunResponse, null);
+    protected void handleSREResponse(ScriptRunResponse scriptRunResponse) throws IOException {
+        handleSREResponse(scriptRunResponse, null);
     }
 
-    protected List<ClaimSource> handleSREResponse(ScriptRunResponse scriptRunResponse, List<ClaimSource> currentSources) {
+    protected void handleSREResponse(ScriptRunResponse scriptRunResponse, List<ClaimSource> currentSources) throws IOException {
         switch (scriptRunResponse.getReturnCode()) {
             case ScriptRunResponse.RC_OK:
+                // Note that the returned values from a script are very unlikely to be the same object we sent
+                // even if the contents are the same, since scripts may have to change these in to other data structures
+                // to make them accessible to their machinery, then convert them back.
                 transaction.setClaims((JSONObject) scriptRunResponse.getReturnedValues().get(SRE_REQ_CLAIMS));
                 transaction.setFlowStates((FlowStates) scriptRunResponse.getReturnedValues().get(SRE_REQ_FLOW_STATES));
-                if (scriptRunResponse.getReturnedValues().containsKey(SRE_REQ_CLAIM_SOURCES)) {
-                    // don't return the original since the script may have completely changed it.
-                    return (List<ClaimSource>) scriptRunResponse.getReturnedValues().get(SRE_REQ_CLAIM_SOURCES);
-                }
-                return currentSources;
+                transaction.setClaimsSources((List<ClaimSource>) scriptRunResponse.getReturnedValues().get(SRE_REQ_CLAIM_SOURCES));
 
             case ScriptRunResponse.RC_NOT_RUN:
-                return currentSources;
+                return;
 
         }
 
@@ -291,7 +298,10 @@ public class OA2ClaimsUtil {
         setScriptRuntimeEngine(sre);
         // Execute the init phase, if there is one in the config.
         ScriptRunRequest scriptRunRequest = newSRR(transaction, SRE_EXEC_INIT);
-        claimsSources = handleSREResponse(getScriptRuntimeEngine().run(scriptRunRequest), claimsSources);
+        handleSREResponse(getScriptRuntimeEngine().run(scriptRunRequest), claimsSources);
+        flowStates = transaction.getFlowStates();
+        claimsSources = transaction.getClaimSources(oa2se);
+        claims = transaction.getClaims();
 
         // This is out of band and might just be setting up state for later.
         dbg(this, "processing flows");
@@ -300,7 +310,7 @@ public class OA2ClaimsUtil {
             dbg(this, "Claims allowed, creating sources from configuration");
             // Execute scripts for pre-authorization phase.
             scriptRunRequest = newSRR(transaction, SRE_PRE_AUTH);
-            claimsSources = handleSREResponse(getScriptRuntimeEngine().run(scriptRunRequest), claimsSources);
+            handleSREResponse(getScriptRuntimeEngine().run(scriptRunRequest), claimsSources);
 
             if (!claimsSources.isEmpty()) {
                 // so there is
@@ -330,10 +340,11 @@ public class OA2ClaimsUtil {
         // updating claim sources at this point is not done.
         handleSREResponse(getScriptRuntimeEngine().run(scriptRunRequest));
         transaction.setScriptState(getScriptRuntimeEngine().serializeState());
+
         // save it at this point because the flow states might, e.g. prohibit access to the entire system
         // and that has to be preserved against future access attempts.
         oa2se.getTransactionStore().save(transaction);
-        return claims;
+        return transaction.getClaims();
     }
 
     protected OA2Client getOA2Client() {
@@ -380,8 +391,10 @@ public class OA2ClaimsUtil {
         getScriptRuntimeEngine().deserializeState(transaction.getScriptState()); // put the state back the way it was
 
         ScriptRunRequest scriptRunRequest = newSRR(transaction, SRE_PRE_AT);
-        claimsSources = handleSREResponse(getScriptRuntimeEngine().run(scriptRunRequest), claimsSources);
-
+        handleSREResponse(getScriptRuntimeEngine().run(scriptRunRequest), claimsSources);
+        flowStates = transaction.getFlowStates();
+        claimsSources = transaction.getClaimSources(oa2se);
+        claims = transaction.getClaims();
         dbg(this, "BEFORE invoking claim sources, claims are = " + claims.toString(1));
         if (flowStates.getClaims) {
             DebugUtil.trace(this, "Claims allowed, creating sources from configuration");
@@ -409,12 +422,11 @@ public class OA2ClaimsUtil {
         dbg(this, "Ready for post-processing");
         scriptRunRequest = newSRR(transaction, SRE_POST_AT);
         handleSREResponse(getScriptRuntimeEngine().run(scriptRunRequest));
-
+        claims = transaction.getClaims();
         flowStates = transaction.getFlowStates();
+
         // update everything
-        transaction.setFlowStates(flowStates);
         checkRequiredClaims(claims);
-        transaction.setClaims(claims);// since the JSON library tends to clone things and they go missing, just set it again.
         oa2se.getTransactionStore().save(transaction);
         dbg(this, "Done with special claims=" + claims.toString(1));
         // After post-processing it is possible that this user should be forbidden access, e.g. they are not in the correct group.
@@ -423,7 +435,7 @@ public class OA2ClaimsUtil {
             dbg(this, "Access denied for user name = " + transaction.getUsername());
             throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "access denied", HttpStatus.SC_UNAUTHORIZED);
         }
-        return claims;
+        return transaction.getClaims();
     }
 
     protected void checkClaim(JSONObject claims, String claimKey) {
@@ -455,67 +467,6 @@ public class OA2ClaimsUtil {
         return x == null || 0 == x.length();
     }
 
-    // =========================================
- /*   OA2ClientFunctorScripts cc = null;
-
-    OA2FunctorFactory ff = null;
-
-    protected OA2FunctorFactory getFF() {
-        if (ff == null) {
-            ff = new OA2FunctorFactory(transaction.getClaims(), transaction.getScopes());
-
-        }
-        return ff;
-    }
-
-    protected OA2ClientFunctorScripts getCC() {
-        if (cc == null && null != getOA2Client().getConfig()) {
-
-            OA2FunctorFactory functorFactory = getFF();
-            OA2ClientFunctorScriptsFactory<OA2ClientFunctorScripts> ff = new OA2ClientFunctorScriptsFactory<>(functorFactory);
-
-            cc = ff.newInstance(getOA2Client().getConfig());
-        }
-        return cc;
-    }
-*/
-    /**
-     * This is the post-processing after <b>ALL</b> the claim sources have run, should there be any. It is different
-     * from the per-source processing.
-     *
-     * @throws Throwable
-     */
- /*   public void doPostProcessing() throws Throwable {
-        dbg(this, ".doPostProcessing: has post-processing?" + getCC().hasPostProcessing());
-        if (getCC().hasPostProcessing()) {
-            DebugUtil.dbg(this, ".doPostProcessing: has post-processing?" + getCC().getPostProcessing());
-
-            OA2ClientFunctorScriptsFactory<OA2ClientFunctorScripts> ff = new OA2ClientFunctorScriptsFactory<>(getFF());
-            ff.setupPostProcessing(getCC(), getOA2Client().getConfig());
-            getCC().executePostProcessing();
-            dbg(this, ".doPostProcessing: executed post-processing, functor map=" + getCC().getPostProcessing().getFunctorMap());
-        }
-
-
-    }*/
-
-    /**
-     * This is the pre-processing before <b>ALL</b> the claim sources have run, should there be any. It is different
-     * from the per-source processing.
-     *
-     * @throws Throwable
-     */
-
-/*
-    public void doPreProcessing() throws Throwable {
-        if (getCC().hasPreProcessing()) {
-            OA2ClientFunctorScriptsFactory<OA2ClientFunctorScripts> ff = new OA2ClientFunctorScriptsFactory(getFF());
-            ff.setupPreProcessing(getCC(), getOA2Client().getConfig());
-            getCC().executePreProcessing();
-        }
-
-    }
-*/
     protected void dbg(Object c, String x) {
         if (deepDebugOn) {
             DebugUtil.trace(c, x);

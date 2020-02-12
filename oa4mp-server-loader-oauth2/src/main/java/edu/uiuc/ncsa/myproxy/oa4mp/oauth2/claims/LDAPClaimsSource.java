@@ -75,7 +75,9 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
         DebugUtil.trace(this, dbgname);
         LDAPConfigurationUtil ldapConfigurationUtil = new LDAPConfigurationUtil();
         JSONObject xxx = ldapConfigurationUtil.toJSON(getLDAPCfg());
-        xxx.getJSONObject("ldap").getJSONObject("ssl").put("keystore", "");
+        if(xxx.getJSONObject("ldap").containsKey("ssl")) {
+            xxx.getJSONObject("ldap").getJSONObject("ssl").put("keystore", "");
+        }
         if (getLDAPCfg().getSearchNameKey() == null) {
             warn(dbgname + "No search name given for LDAP query. Using default of username");
             return transaction.getUsername();
@@ -304,16 +306,16 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
             throw new IllegalStateException("Error: Could not create the LDAP context");
         }
 
-        SearchControls ctls = new SearchControls();
+        SearchControls searchControls = new SearchControls();
         if (attributes == null || attributes.isEmpty()) {
             // return everything if nothing is specified.
-            ctls.setReturningAttributes(null);
+            searchControls.setReturningAttributes(null);
         } else {
             String[] searchAttributes = attributes.keySet().toArray(new String[]{});
-            ctls.setReturningAttributes(searchAttributes);
+            searchControls.setReturningAttributes(searchAttributes);
         }
         String filter = "(&(" + getSearchFilterAttribute() + "=" + userID + "))";
-        NamingEnumeration e = ctx.search(getLDAPCfg().getContextName(), filter, ctls);
+        NamingEnumeration e = ctx.search(getLDAPCfg().getContextName(), filter, searchControls);
         return toJSON(attributes, e, userID);
     }
 
@@ -335,6 +337,11 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
         if (!e.hasMoreElements()) {
             DebugUtil.dbg(this, "LDAP SEARCH RESULT IS EMPTY");
         }
+        if(attributes.isEmpty()){
+          // no attribute specified means return everything
+          return doEmptyAttrs(e);
+        }
+
         while (e.hasMoreElements()) {
             SearchResult entry = (SearchResult) e.next();
             Attributes a = entry.getAttributes();
@@ -379,6 +386,30 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
             }
         }
         return json;
+    }
+
+    /**
+     * In this case, the configuration specified no attributes and this should be interpreted as just getting everything.
+     * @param e
+     * @return
+     */
+    private JSONObject doEmptyAttrs(NamingEnumeration e) throws NamingException{
+          JSONObject all = new JSONObject();
+        while (e.hasMoreElements()) {
+            SearchResult entry = (SearchResult) e.next();
+            Attributes attributes = entry.getAttributes();
+            NamingEnumeration aNE = attributes.getAll();
+            while(aNE.hasMoreElements()){
+               Attribute attribute = (Attribute) aNE.next();
+               JSONArray array = new JSONArray();
+               for(int i = 0; i < attribute.size(); i++){
+                   array.add(attribute.get(i));
+               }
+               all.put(attribute.getID(), array);
+            }
+
+        }
+        return all;
     }
 
     protected void closeConnection() {
@@ -490,12 +521,12 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
             }
         }
         LdapContext ctx = (LdapContext) dirContext.lookup(cfg.getSearchBase());
-        SearchControls ctls = new SearchControls();
-        ctls.setReturningAttributes(new String[]{"cn", "gidNumber"});
+        SearchControls searchControls = new SearchControls();
+        searchControls.setReturningAttributes(new String[]{"cn", "gidNumber"});
         String filter = "(&(uniqueMember=" + cfg.getSearchFilterAttribute() + "=" + username + ",ou=People,dc=ncsa,dc=illinois,dc=edu))";
         // ServletDebugUtil.dbg(LDAPClaimsSource.class, "LDAP filter=" + filter);
 
-        NamingEnumeration e = ctx.search(cfg.getContextName(), filter, ctls);
+        NamingEnumeration e = ctx.search(cfg.getContextName(), filter, searchControls);
         Groups groups = new Groups();
         // ServletDebugUtil.dbg(LDAPClaimsSource.class, "Starting to process groups. Has elements? " + e.hasMoreElements() );
 
@@ -544,32 +575,5 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
         return g;
 
     }
-/*
-    public static int get_OLD_Gid(LDAPConfiguration cfg2, String groupName) throws Throwable {
-        LDAPConfiguration cfg = cfg2.clone();
-        cfg.setSearchBase("ou=Groups,dc=ncsa,dc=illinois,dc=edu");
-        LDAPClaimsSource claimsSource = new LDAPClaimsSource(cfg, null);
-        DirContext dirContext = new InitialDirContext(claimsSource.createEnv(cfg));
-        LdapContext ctx = (LdapContext) dirContext.lookup(cfg.getSearchBase());
-        SearchControls ctls = new SearchControls();
-        ctls.setReturningAttributes(new String[]{"gidNumber"});
-        String filter = "(&(cn=" + groupName + "))";
-        NamingEnumeration e = ctx.search(cfg.getContextName(), filter, ctls);
-        while (e.hasMoreElements()) {
-            SearchResult entry = (SearchResult) e.next();
-            Attributes a = entry.getAttributes();
-
-            Attribute attribute = a.get("gidNumber");
-            if (attribute == null) {
-                continue;
-            }
-            String xxx = String.valueOf(attribute.get(0));
-            if (xxx != null && !xxx.isEmpty()) {
-                ctx.close();
-                return Integer.parseInt(xxx);
-            }
-        }
-        return -1;
-    }*/
 
 }

@@ -74,7 +74,8 @@
         <module>oa4mp-server-test-oauth2</module>
         <module>oa4mp-skin</module>
         <module>myproxy-website</module>
-        <module>oa4mp-gui</module>
+	<module>oa4mp-gui</module>
+	<module>oa4mp-qdl</module>
     </modules>
     <dependencies>
         <dependency>

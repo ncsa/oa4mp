@@ -106,7 +106,7 @@ public class BasicClaimsSourceImpl implements ClaimSource {
         this.oa2SE = oa2SE;
     }
 
-    OA2SE oa2SE;
+    transient  OA2SE oa2SE; // do NOT serialize this. Ever.
     Collection<String> scopes;
 
     @Override
@@ -236,4 +236,5 @@ public class BasicClaimsSourceImpl implements ClaimSource {
     public Script getPreProcessor() {
         return preProcessor;
     }
+
 }

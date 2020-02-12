@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.BasicClaimsSourceImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowStates;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.OA4MPServiceTransaction;
@@ -7,11 +8,15 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
 import edu.uiuc.ncsa.security.oauth_2_0.server.OA2TransactionScopes;
+import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import net.sf.json.JSONObject;
+import org.apache.commons.codec.binary.Base64;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -19,6 +24,7 @@ import java.util.Date;
  */
 public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA2TransactionScopes {
     public String FLOW_STATE_KEY = "flow_state";
+    public String CLAIMS_SOURCES_STATE_KEY = "claims_sources";
     public String STATE_KEY = "state";
     public String STATE_COMMENT_KEY = "comment";
     public String CLAIMS_KEY = "claims";
@@ -58,7 +64,7 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         this.state = state;
     }
 
-    // This is used to store the flow states AND the claims in between calls.
+    // This is used to store the flow states, claim sources AND the claims in between calls.
     public JSONObject getState() {
         if (state == null) {
             state = new JSONObject();
@@ -73,13 +79,61 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         getState().put(FLOW_STATE_KEY, flowStates.toJSON());
     }
 
+    public void setClaimsSources(List<ClaimSource> sources) throws IOException {
+        /*
+           At this point, serializing the sources to JSON is a daunting task in general, since
+           turning them in to JSON, e.g., requires figuring out JSON serializations for
+           things like the Java LDAP library, which is massive and I have no control over.
+           Since the objects here
+           exist for only the duration of the transaction, there should never be a deserialization issue.
+           AND it has been said that roughly half of all Java security bugs relate to object serialization.
+           This is probably true, except that this when object are serialized, sent over a network and
+           intercepted -- nothing internal to the serialized object prevents tinkering.
+           These object go straight to a database, never to see the light of day, so security
+           is not an issue here. 
+        */
+        if(sources== null || sources.isEmpty()){
+            return;
+        }
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ObjectOutputStream out = new ObjectOutputStream(baos);
+        out.writeObject(sources);
+        out.flush();
+        out.close();
+        String s = Base64.encodeBase64URLSafeString(baos.toByteArray());
+        getState().put(CLAIMS_SOURCES_STATE_KEY, s);
+    }
+
+
+    public List<ClaimSource> getClaimSources(OA2SE oa2SE) throws IOException, ClassNotFoundException {
+        if(!getState().containsKey(CLAIMS_SOURCES_STATE_KEY)){
+            return new ArrayList<>();
+        }
+        String state = getState().getString(CLAIMS_SOURCES_STATE_KEY);
+        byte[] bytes = Base64.decodeBase64(state);
+        ByteArrayInputStream baos = new ByteArrayInputStream(bytes);
+        ObjectInputStream in = new ObjectInputStream(baos);
+
+        // Method for deserialization of object
+        Object object =  in.readObject();
+        List<ClaimSource> sources = (List<ClaimSource>) object;
+        for(ClaimSource source: sources){
+            if(source instanceof BasicClaimsSourceImpl){
+                ((BasicClaimsSourceImpl)source).setOa2SE(oa2SE);
+            }
+        }
+        in.close();
+        return sources;
+    }
+
     /**
      * Script engines have the option to save their state between calls too. The argument is a (probably base 64 encoded)
-     * string that will be returned on request. 
+     * string that will be returned on request.
+     *
      * @param scriptState
      */
     public void setScriptState(String scriptState) {
-        if(scriptState!= null && !scriptState.isEmpty()) {
+        if (scriptState != null && !scriptState.isEmpty()) {
             getState().put(SCRIPT_STATE_KEY, scriptState);
         }
     }

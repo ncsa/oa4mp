@@ -14,15 +14,26 @@ import net.sf.json.JSONObject;
  * on 10/5/18 at  12:32 PM
  */
 public class NCSALDAPClaimSource extends LDAPClaimsSource {
+    public static final String DEFAULT_SEACH_NAME = "uid";
+
+    /**
+     * No arg constructor is needed for invocation by reflection. 
+     */
     public NCSALDAPClaimSource() {
     }
 
-    public NCSALDAPClaimSource(String searchNameKey) {
+    /**
+     * NOTE that his uses the search filter attribute (like uid) and if it is missing will default to using the
+     * sub claim.
+     * @param searchFilterAttribute
+     */
+
+    public NCSALDAPClaimSource(String searchFilterAttribute) {
         super();
         ServletDebugUtil.trace(this, "In constructor.");
         init();
-        if (searchNameKey != null && !searchNameKey.isEmpty()) {
-            getLDAPCfg().setSearchFilterAttribute(searchNameKey);
+        if (searchFilterAttribute != null && !searchFilterAttribute.isEmpty()) {
+            getLDAPCfg().setSearchFilterAttribute(searchFilterAttribute);
         } else {
             getLDAPCfg().setSearchFilterAttribute(OA2Claims.SUBJECT);
         }
@@ -32,6 +43,8 @@ public class NCSALDAPClaimSource extends LDAPClaimsSource {
     public NCSALDAPClaimSource(LDAPConfiguration ldapConfiguration, MyLoggingFacade myLogger) {
         super(ldapConfiguration, myLogger);
     }
+
+
 
     public NCSALDAPClaimSource(OA2SE oa2SE) {
         super(oa2SE);
