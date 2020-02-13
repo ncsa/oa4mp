@@ -2,7 +2,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state;
 
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.oauth_2_0.server.scripts.functor.ClientFunctorScripts;
-import edu.uiuc.ncsa.security.util.functor.parser.Script;
+import edu.uiuc.ncsa.security.util.functor.parser.FunctorScript;
 
 import java.util.List;
 
@@ -15,19 +15,19 @@ public class OA2ClientFunctorScripts extends ClientFunctorScripts {
         super();
     }
 
-    Script postProcessing;
-    Script preProcessing;
+    FunctorScript postProcessing;
+    FunctorScript preProcessing;
 
-    public void setPostProcessing(Script postProcessing) {
+    public void setPostProcessing(FunctorScript postProcessing) {
         this.postProcessing = postProcessing;
     }
-    public void setPreProcessing(Script preProcessing) {
+    public void setPreProcessing(FunctorScript preProcessing) {
            this.preProcessing = preProcessing;
        }
-    public Script getPreProcessing() {
+    public FunctorScript getPreProcessing() {
         return preProcessing;
     }
-    public Script getPostProcessing() {
+    public FunctorScript getPostProcessing() {
         return postProcessing;
     }
 

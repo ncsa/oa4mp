@@ -93,7 +93,7 @@ public class OA2CLCCommands extends CLCCommands {
         }
         Identifier id = AssetStoreUtil.createID();
         OA4MPResponse resp = getService().requestCert(id);
-        DebugUtil.dbg(this, "client id = " + getCe().getClientId());
+        DebugUtil.trace(this, "client id = " + getCe().getClientId());
         dummyAsset = (OA2Asset) getCe().getAssetStore().get(id.toString());
         say(resp.getRedirect().toString());
     }
@@ -272,7 +272,7 @@ public class OA2CLCCommands extends CLCCommands {
             getATHelp();
             return;
         }
-        DebugUtil.dbg(this, "Getting AT, grant=" + grant);
+        DebugUtil.trace(this, "Getting AT, grant=" + grant);
         currentATResponse = getOA2S().getAccessToken(getDummyAsset(), grant);
         Object x = currentATResponse.getParameters().get(RAW_ID_TOKEN);
         if (x == null) {

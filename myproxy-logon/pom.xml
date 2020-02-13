@@ -54,6 +54,12 @@
             <groupId>edu.uiuc.ncsa.security</groupId>
             <version>4.4-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.10</version>
+            <scope>compile</scope>
+        </dependency>
 
     </dependencies>
     <pluginRepositories>

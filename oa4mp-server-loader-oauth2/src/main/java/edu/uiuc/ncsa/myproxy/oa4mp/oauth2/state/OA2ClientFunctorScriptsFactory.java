@@ -13,7 +13,7 @@ import edu.uiuc.ncsa.security.util.functor.JFunctor;
 import edu.uiuc.ncsa.security.util.functor.JFunctorFactory;
 import edu.uiuc.ncsa.security.util.functor.LogicBlock;
 import edu.uiuc.ncsa.security.util.functor.logic.jThen;
-import edu.uiuc.ncsa.security.util.functor.parser.Script;
+import edu.uiuc.ncsa.security.util.functor.parser.FunctorScript;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -40,8 +40,8 @@ public class OA2ClientFunctorScriptsFactory<V extends OA2ClientFunctorScripts> e
      * @param cc
      */
     public void createClaimSource(V cc, JSONObject json) {
-        cc.setPreProcessing(new Script(functorFactory, OA2ClientFunctorScriptsUtil.getClaimsPreProcessing(json)));
-        cc.setPostProcessing(new Script(functorFactory, OA2ClientFunctorScriptsUtil.getClaimsPostProcessing(json)));
+        cc.setPreProcessing(new FunctorScript(functorFactory, OA2ClientFunctorScriptsUtil.getClaimsPreProcessing(json)));
+        cc.setPostProcessing(new FunctorScript(functorFactory, OA2ClientFunctorScriptsUtil.getClaimsPostProcessing(json)));
         // Now to get the claim sources. These can be in either the runtime or the pre-processor
         LinkedList<ClaimSource> claimSources = new LinkedList<>();
         extractClaimsSource(cc.getPreProcessing(), json, claimSources);
@@ -52,7 +52,7 @@ public class OA2ClientFunctorScriptsFactory<V extends OA2ClientFunctorScripts> e
         cc.setClaimSource(claimSources);
     }
 
-    public void extractClaimsSource(Script script,
+    public void extractClaimsSource(FunctorScript script,
                                     JSONObject json,
                                     LinkedList<ClaimSource> claimSources) {
         script.execute();
@@ -202,12 +202,12 @@ public class OA2ClientFunctorScriptsFactory<V extends OA2ClientFunctorScripts> e
     }
 
     public void setupPreProcessing(V cc, JSONObject json) {
-        Script preProcessing = new Script(functorFactory, OA2ClientFunctorScriptsUtil.getClaimsPreProcessing(json));
+        FunctorScript preProcessing = new FunctorScript(functorFactory, OA2ClientFunctorScriptsUtil.getClaimsPreProcessing(json));
         cc.setPreProcessing(preProcessing);
     }
 
     public void setupPostProcessing(V cc, JSONObject json) {
-        Script postProcessing = new Script(functorFactory, OA2ClientFunctorScriptsUtil.getClaimsPostProcessing(json));
+        FunctorScript postProcessing = new FunctorScript(functorFactory, OA2ClientFunctorScriptsUtil.getClaimsPostProcessing(json));
         cc.setPostProcessing(postProcessing);
     }
 

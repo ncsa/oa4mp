@@ -12,7 +12,7 @@ import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSourceConfiguration;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.JSONClaimSourceConfig;
-import edu.uiuc.ncsa.security.util.functor.parser.Script;
+import edu.uiuc.ncsa.security.util.functor.parser.FunctorScript;
 import net.sf.json.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
@@ -141,7 +141,7 @@ public class BasicClaimsSourceImpl implements ClaimSource {
         OA2ServiceTransaction t = (OA2ServiceTransaction) transaction;
         if (hasConfiguration() && hasJSONPreProcessoor()) {
             OA2FunctorFactory ff = new OA2FunctorFactory(claims, t.getScopes());
-            preProcessor = new Script(ff, getConfiguration().getJSONPreProcessing());
+            preProcessor = new FunctorScript(ff, getConfiguration().getJSONPreProcessing());
             preProcessor.execute();
             // since the flow state maps to  part of a JSON object, we have to get the object, then reset it.
             FlowStates f = t.getFlowStates();
@@ -154,7 +154,7 @@ public class BasicClaimsSourceImpl implements ClaimSource {
         if (hasConfiguration() && hasJSONPostProcessoor()) {
             OA2FunctorFactory ff = new OA2FunctorFactory(claims, t.getScopes());
           //  DebugUtil.dbg(this, "claims before post-processing=" + claims.toString(1));
-            postProcessor = new Script(ff, getConfiguration().getJSONPostProcessing());
+            postProcessor = new FunctorScript(ff, getConfiguration().getJSONPostProcessing());
             postProcessor.execute();
           //  DebugUtil.dbg(this, "claims after post-processing=" + claims.toString(1));
             FlowStates f = t.getFlowStates();
@@ -224,16 +224,16 @@ public class BasicClaimsSourceImpl implements ClaimSource {
         return false;
     }
 
-    Script preProcessor = null;
-    Script postProcessor = null;
+    FunctorScript preProcessor = null;
+    FunctorScript postProcessor = null;
 
     @Override
-    public Script getPostProcessor() {
+    public FunctorScript getPostProcessor() {
         return postProcessor;
     }
 
     @Override
-    public Script getPreProcessor() {
+    public FunctorScript getPreProcessor() {
         return preProcessor;
     }
 

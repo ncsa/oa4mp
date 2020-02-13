@@ -70,7 +70,8 @@
  -->
         <module>oa4mp-xsede-oauth2</module>
         <module>oa4mp-website</module>
-        <module>oa4mp-co-oidc</module>
+   <!--     <module>oa4mp-co-oidc</module>
+   -->
         <module>oa4mp-server-test-oauth2</module>
         <module>oa4mp-skin</module>
         <module>myproxy-website</module>

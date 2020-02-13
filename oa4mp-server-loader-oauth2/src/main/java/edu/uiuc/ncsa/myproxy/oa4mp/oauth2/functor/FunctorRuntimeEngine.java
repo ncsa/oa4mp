@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowStates;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowType;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientFunctorScripts;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientFunctorScriptsFactory;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ScriptRuntimeEngineFactory;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.util.functor.JFunctor;
 import edu.uiuc.ncsa.security.util.functor.logic.FunctorMap;
@@ -146,7 +147,7 @@ public class FunctorRuntimeEngine extends ScriptRuntimeEngine {
     }
 
     protected ScriptRunResponse noOpSRR() {
-        return new ScriptRunResponse(null, null, ScriptRunResponse.RC_NOT_RUN);
+        return ScriptRuntimeEngineFactory.NoOpRuntimeEngine.srr;
     }
 
     protected ScriptRunResponse createSRR(ScriptRunRequest scriptRunRequest) {
@@ -172,7 +173,7 @@ public class FunctorRuntimeEngine extends ScriptRuntimeEngine {
             respMap.put(SRE_REQ_CLAIM_SOURCES, claimSources);
         }
         //runResponse.
-        return new ScriptRunResponse("", respMap, ScriptRunResponse.RC_OK);
+        return new ScriptRunResponse("ok", respMap, ScriptRunResponse.RC_OK);
     }
 
     public FunctorRuntimeEngine(JSONObject config) {

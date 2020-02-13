@@ -1,4 +1,4 @@
-package edu.uiuc.ncsa.oa2.qdl;
+package edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims;
 
 /**
  * The constants for creating claim sources so that they are centralized.

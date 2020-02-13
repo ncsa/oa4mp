@@ -1,5 +1,9 @@
-package edu.uiuc.ncsa.oa2.qdl;
+package edu.uiuc.ncsa.myproxy.oa4mp.qdl;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims.ClaimsSourceTester;
+import edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims.CreateSourceConfig;
+import edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims.NewTemplate;
+import edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims.OA2Module;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
 import edu.uiuc.ncsa.qdl.extensions.QDLLoader;
 import edu.uiuc.ncsa.qdl.module.Module;

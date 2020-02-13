@@ -1,4 +1,4 @@
-package edu.uiuc.ncsa.oa2.qdl;
+package edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.FSClaimSource;
@@ -8,8 +8,6 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.NCSALDAPClaimSource;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
 import edu.uiuc.ncsa.qdl.util.StemVariable;
 import edu.uiuc.ncsa.security.core.Identifier;
-import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSourceConfiguration;
-import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
 import net.sf.json.JSONObject;
 
 import java.util.ArrayList;
@@ -65,17 +63,11 @@ public class ClaimsSourceTester implements QDLFunction, CSConstants {
     }
 
     protected StemVariable doNCSA(StemVariable arg, String username) {
+        NCSALDAPClaimSource ncsaldapClaimSource = (NCSALDAPClaimSource) ConfigtoCS.convert(arg);
         OA2ServiceTransaction t = new OA2ServiceTransaction((Identifier) null);
         t.setUsername(username);
         JSONObject protoClaims = new JSONObject();
         protoClaims.put(NCSALDAPClaimSource.DEFAULT_SEACH_NAME, username);
-        String searchName;
-        if(arg.containsKey(CS_LDAP_SEARCH_NAME)){
-            searchName = arg.getString(CS_LDAP_SEARCH_NAME);
-        }else{
-            searchName = NCSALDAPClaimSource.DEFAULT_SEACH_NAME;
-        }
-        NCSALDAPClaimSource ncsaldapClaimSource = new NCSALDAPClaimSource(NCSALDAPClaimSource.DEFAULT_SEACH_NAME);
 
         JSONObject j =ncsaldapClaimSource.process(protoClaims, t);
         StemVariable output = new StemVariable();
@@ -84,10 +76,7 @@ public class ClaimsSourceTester implements QDLFunction, CSConstants {
     }
 
     public StemVariable doHeaders(StemVariable arg, String username, StemVariable headers) {
-        ClaimSourceConfiguration cfg = ClaimSourceConfigConverter.convert(arg);
-
-        HTTPHeaderClaimsSource httpHeaderClaimsSource = new HTTPHeaderClaimsSource();
-        httpHeaderClaimsSource.setConfiguration(cfg);
+        HTTPHeaderClaimsSource httpHeaderClaimsSource = (HTTPHeaderClaimsSource)ConfigtoCS.convert(arg);
 
         OA2ServiceTransaction t = new OA2ServiceTransaction((Identifier) null);
         t.setUsername(username);
@@ -102,13 +91,9 @@ public class ClaimsSourceTester implements QDLFunction, CSConstants {
     }
 
     private StemVariable doLDAP(StemVariable arg, String username) {
-        // CreateSourceConfig csc = new CreateSourceConfig();
-        //StemVariable out = (StemVariable) csc.evaluate(new Object[]{arg});
-        LDAPConfiguration ldapCfg = (LDAPConfiguration) ClaimSourceConfigConverter.convert(arg);
-        LDAPClaimsSource ldapClaimsSource = new LDAPClaimsSource();
+        LDAPClaimsSource ldapClaimsSource = (LDAPClaimsSource)ConfigtoCS.convert(arg);
         OA2ServiceTransaction t = new OA2ServiceTransaction((Identifier) null);
         t.setUsername(username);
-        ldapClaimsSource.setConfiguration(ldapCfg);
         JSONObject protoClaims = new JSONObject();
         protoClaims.put(arg.getString(CS_LDAP_SEARCH_NAME), username);
         JSONObject j = ldapClaimsSource.process(protoClaims, t);
@@ -119,8 +104,7 @@ public class ClaimsSourceTester implements QDLFunction, CSConstants {
 
 
     protected StemVariable doFS(StemVariable arg, String username) {
-        ClaimSourceConfiguration cfg = ClaimSourceConfigConverter.convert(arg);
-        FSClaimSource fsClaimSource = new FSClaimSource(cfg);
+        FSClaimSource fsClaimSource = (FSClaimSource) ConfigtoCS.convert(arg);
         OA2ServiceTransaction t = new OA2ServiceTransaction((Identifier) null);
         t.setUsername(username);
         JSONObject claims = fsClaimSource.process(new JSONObject(), t);

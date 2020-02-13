@@ -3,8 +3,8 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowStates;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.functor.FunctorRuntimeEngine;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2DiscoveryServlet;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ScriptRuntimeEngineFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.security.core.Identifier;
@@ -294,7 +294,7 @@ public class OA2ClaimsUtil {
         dbg(this, "executing runtime");
         FlowStates flowStates = new FlowStates();
         transaction.setFlowStates(flowStates);
-        ScriptRuntimeEngine sre = new FunctorRuntimeEngine(getOA2Client().getConfig());
+        ScriptRuntimeEngine sre = ScriptRuntimeEngineFactory.createRTE(getOA2Client().getConfig());
         setScriptRuntimeEngine(sre);
         // Execute the init phase, if there is one in the config.
         ScriptRunRequest scriptRunRequest = newSRR(transaction, SRE_EXEC_INIT);
@@ -386,7 +386,7 @@ public class OA2ClaimsUtil {
         }
         List<ClaimSource> claimsSources = new ArrayList<>();
         // Note that a new instance of this class is made for each leg of the flow, so no state is persisted.
-        ScriptRuntimeEngine sre = new FunctorRuntimeEngine(getOA2Client().getConfig());
+        ScriptRuntimeEngine sre = ScriptRuntimeEngineFactory.createRTE(getOA2Client().getConfig());
         setScriptRuntimeEngine(sre);
         getScriptRuntimeEngine().deserializeState(transaction.getScriptState()); // put the state back the way it was
 

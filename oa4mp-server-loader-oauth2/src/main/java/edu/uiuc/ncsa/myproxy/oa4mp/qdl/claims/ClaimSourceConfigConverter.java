@@ -1,4 +1,4 @@
-package edu.uiuc.ncsa.oa2.qdl;
+package edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.FSClaimSource;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.HTTPHeaderClaimsSource;

@@ -5,7 +5,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.OA2FunctorFactory;
 import edu.uiuc.ncsa.security.util.FunctorParserTest;
 import edu.uiuc.ncsa.security.util.functor.JFunctorFactory;
 import edu.uiuc.ncsa.security.util.functor.parser.AbstractHandler;
-import edu.uiuc.ncsa.security.util.functor.parser.Script;
+import edu.uiuc.ncsa.security.util.functor.parser.FunctorScript;
 import edu.uiuc.ncsa.security.util.functor.parser.event.EventDrivenParser;
 import edu.uiuc.ncsa.security.util.functor.parser.event.FunctorHandler;
 import edu.uiuc.ncsa.security.util.functor.parser.event.SwitchHandler;
@@ -136,7 +136,7 @@ public class OA2ParserTest extends FunctorParserTest {
             Map<String, Object> claims = createClaims();
             JFunctorFactory functorFactory = createFunctorFactory(claims);
             functorFactory.setVerboseOn(true);
-            Script script = new Script(functorFactory);
+            FunctorScript script = new FunctorScript(functorFactory);
             script.execute(fileReader);
             assert claims.containsKey(VOPersonKey);
             assert claims.get(VOPersonKey).equals(claims.get("eppn"));

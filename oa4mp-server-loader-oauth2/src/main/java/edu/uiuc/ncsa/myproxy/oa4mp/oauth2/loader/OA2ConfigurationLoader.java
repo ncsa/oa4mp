@@ -514,7 +514,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
     protected ClaimSource claimSource;
 
     public ClaimSource getClaimSource() throws ClassNotFoundException, IllegalAccessException, InstantiationException {
-        DebugUtil.dbg(this, "Getting scope handler " + claimSource);
+        DebugUtil.trace(this, "Getting scope handler " + claimSource);
         if (claimSource == null) {
             // This gets the scopes if any and injects them into the scope handler.
             if (0 < cn.getChildrenCount(SCOPES)) {
@@ -536,12 +536,12 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
             // no scopes element, so just use the basic handler.
             if (claimSource == null) {
 
-                DebugUtil.dbg(this, "No server-wide configured Scope handler");
+                DebugUtil.trace(this, "No server-wide configured Scope handler");
                 if (getLdapConfiguration().isEnabled()) {
-                    DebugUtil.dbg(this, "   LDAP scope handler enabled, creating default");
+                    DebugUtil.trace(this, "   LDAP scope handler enabled, creating default");
                     claimSource = new LDAPClaimsSource(getLdapConfiguration(), myLogger);
                 } else {
-                    DebugUtil.dbg(this, "   LDAP scope handler disabled, creating basic");
+                    DebugUtil.trace(this, "   LDAP scope handler disabled, creating basic");
                     ClaimSourceConfiguration claimSourceConfiguration = new ClaimSourceConfiguration();
                     claimSourceConfiguration.setEnabled(false);
                     claimSource = new BasicClaimsSourceImpl();
@@ -549,7 +549,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                 }
             }
             claimSource.setScopes(getScopes());
-            DebugUtil.dbg(this, "   Actual scope handler = " + claimSource.getClass().getSimpleName());
+            DebugUtil.trace(this, "   Actual scope handler = " + claimSource.getClass().getSimpleName());
 
         }
         return claimSource;
