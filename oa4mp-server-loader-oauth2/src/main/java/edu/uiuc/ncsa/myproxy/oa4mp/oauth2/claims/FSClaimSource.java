@@ -29,12 +29,22 @@ public class FSClaimSource extends BasicClaimsSourceImpl {
      * the claims for this source.
      */
     public static String FILE_PATH_KEY = "filePath";
+    /**
+     * This is the name of the key in the claims to use. E.g. setting this to "sub" means the sub claim is used.
+     * It defaults to the username in the transaction if not set.
+     */
+
+    public static String FILE_CLAIM_KEY = "claimKey";
+
+
 
     /*
     The test file contains a JSON object of properties, e.g. of the form
     {"userid123":{"foo":"bar","eppn":"fnord@blarg.edu"}}
     In this case, there is exactly one entry for the user with username "userid123" and the two claims
-    will be included in the claims object.
+    will be included in the claims object.<br/><br/>
+    There is, of course, no reason you cannot have a file with things like group entries in it and search for those
+    as long as you can identify a claim to use (which can also mean setting one and later removing it).
      */
     @Override
     protected JSONObject realProcessing(JSONObject claims, HttpServletRequest request, ServiceTransaction transaction) throws UnsupportedScopeException {
@@ -66,7 +76,12 @@ public class FSClaimSource extends BasicClaimsSourceImpl {
             throw new GeneralException(e);
         }
         JSONObject jsonObject = JSONObject.fromObject(rawJSON);
-        JSONObject json = jsonObject.getJSONObject(transaction.getUsername());
+        JSONObject json;
+        if(getConfiguration().getProperty(FILE_CLAIM_KEY)== null ){
+            json = jsonObject.getJSONObject(transaction.getUsername());
+        }else{
+            json = jsonObject.getJSONObject((String) claims.get(getConfiguration().getProperty(FILE_CLAIM_KEY)));
+        }
         claims.putAll(json);
         return super.realProcessing(claims, request, transaction);
     }

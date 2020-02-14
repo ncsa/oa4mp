@@ -1,10 +1,10 @@
-package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
+package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.functor.claims;
 
 import edu.uiuc.ncsa.security.util.functor.JFunctor;
 
 import java.util.Map;
 
-import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.FunctorClaimsType.SET;
+import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.functor.claims.FunctorClaimsType.SET;
 
 /**
  * Sets a claim to a specified value. Note that this will <b>create</b> a claim if none exists.

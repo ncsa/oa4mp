@@ -22,7 +22,10 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.OA2ClaimsUtil.*;
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowType.*;
@@ -60,10 +63,9 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine {
         for (int i = 0; i < array.size(); i++) {
             QDLScript qdlScript = Scripts.fromJSON(array.getJSONObject(i));
             scriptSet.add(qdlScript);
-            library.put(QDL_VIRTUAL_FILE_SYSTEM_SCHEME + qdlScript.getProperties().getString("name"), qdlScript);
+            library.put(QDL_VIRTUAL_FILE_SYSTEM_SCHEME + qdlScript.getProperties().getString(Scripts.ID), qdlScript);
         }
         setScriptSet(scriptSet);
-        ImportManager namespaceResolver = ImportManager.getResolver();
         SymbolTableImpl symbolTable = new SymbolTableImpl();
         SymbolStack stack = new SymbolStack();
         stack.addParent(symbolTable);
@@ -171,9 +173,13 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine {
         List<String> scopes = (List<String>) req.getArgs().get(SRE_REQ_SCOPES);
         state.getSymbolStack().setValue(SCOPES_VAR, toStem(scopes));
 
-
-        //   List<ClaimSource> sources = (List<ClaimSource>) req.getArgs().get(SRE_REQ_CLAIM_SOURCES);
-        state.getSymbolStack().setValue(CLAIM_SOURCES_VAR, new StemVariable());
+        StemVariable sources = new StemVariable();
+        int i = 0;
+        for(ClaimSource source : (List<ClaimSource>) req.getArgs().get(SRE_REQ_CLAIM_SOURCES)){
+            sources.put(i + ".", ConfigtoCS.convert(source));
+            i++;
+        }
+        state.getSymbolStack().setValue(CLAIM_SOURCES_VAR,sources);
     }
 
     public StemVariable toStem(List<String> scopes) {

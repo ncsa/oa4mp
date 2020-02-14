@@ -32,6 +32,7 @@ public interface CSConstants {
     File based claim sources
      */
     public String CS_FILE_FILE_PATH = "file_path";
+    public String CS_FILE_CLAIM_KEY = "claim_key";
 
     /*
     HTTP headers based claim sources
@@ -43,15 +44,16 @@ public interface CSConstants {
      */
     public String CS_LDAP_AUTHZ_TYPE = "authz_type";
     public String CS_LDAP_CONTEXT_NAME = "context";
-    public String CS_LDAP_GROUP_NAMES = "group_names";
+    public String CS_LDAP_SEARCH_ATTRIBUTES = "search_attributes."; // attributes in LDAP to get.
+    public String CS_LDAP_GROUP_NAMES = "group_names."; // search attributes that are groups
+    public String CS_LDAP_RENAME = "rename."; // new names of returned attributes, stem.old_name := new_name
+    public String CS_LDAP_LISTS = "list."; // attributes that should be returned as lists
     public String CS_LDAP_PASSWORD = "password";
     public String CS_LDAP_PORT = "port";
-    public String CS_LDAP_SEARCH_ATTRIBUTES = "search_attributes";
-    public String CS_LDAP_SEARCH_FILTER_ATTRIBUTE = "search_filter_attribute";
+    public String CS_LDAP_SEARCH_FILTER_ATTRIBUTE = "claim_name"; // the name of the claim to look up and get
     public String CS_LDAP_SEARCH_BASE = "search_base";
     public String CS_LDAP_SEARCH_NAME = "search_name";
     public String CS_LDAP_SERVER_ADDRESS = "address";
     public String CS_LDAP_SECURITY_PRINCIPAL = "username";
-
 
 }

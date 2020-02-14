@@ -1,7 +1,9 @@
 package edu.uiuc.ncsa.myproxy.oauth2.tools;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2ClientUtils;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ScriptingConstants;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
+import edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.QDLJSONConfigUtil;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.ClientStoreCommands;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Store;
@@ -12,6 +14,7 @@ import edu.uiuc.ncsa.security.delegation.storage.BaseClient;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfigurationUtil;
 import edu.uiuc.ncsa.security.util.cli.ExitException;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
+import edu.uiuc.ncsa.security.util.cli.LineEditor;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -196,7 +199,6 @@ public class OA2ClientCommands extends ClientStoreCommands {
     }
 
 
-
     protected void removeCB(OA2Client client, Collection<String> cbs) {
         if (cbs.isEmpty()) {
             //    say("Enter callbacks to remove. A blank line ends input");
@@ -244,8 +246,8 @@ public class OA2ClientCommands extends ClientStoreCommands {
 
     protected void processDBAdd(OA2Client client, Collection<String> newArgs) {
         if (newArgs.isEmpty()) {
-         //   say("No callbacks, please enter them as a comma separated list. Empty line ends input.");
-          //  String line = readline();
+            //   say("No callbacks, please enter them as a comma separated list. Empty line ends input.");
+            //  String line = readline();
             say("No callbacks to add.");
             return;
         } else {
@@ -303,7 +305,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
                 oa2Client.setRtLifetime(0);
             } else {
                 try {
-                    oa2Client.setRtLifetime(Long.parseLong(rawLifetime)*1000L);
+                    oa2Client.setRtLifetime(Long.parseLong(rawLifetime) * 1000L);
                 } catch (Throwable t) {
                     sayi("Sorry but \"" + rawLifetime + "\" is not a valid number. No change.");
                 }
@@ -384,34 +386,23 @@ public class OA2ClientCommands extends ClientStoreCommands {
             LinkedList<String> rawCBs = new LinkedList<>();
             while (stringTokenizer.hasMoreTokens()) {
                 rawCBs.add(stringTokenizer.nextToken().trim());
-/*
-                try {
-                    URI uri = URI.create(raw);
-                //    if (uri.getScheme().toLowerCase().equals("https")) {
-                        list.add(raw);
-                 //   } else {
-                 //   }
-                } catch (Throwable t) {
-                    // do nothing. Just ignore illegal uris.
-                    sayi("\"" + raw + "\" rejected -- illegal uri");
-                }
-*/
+
             }
             LinkedList<String> dudURIs = new LinkedList<>();
             List<String> foundURIs = null;
             try {
-            foundURIs =    OA2ClientUtils.createCallbacks(rawCBs, dudURIs);
-            }catch(IOException iox){
+                foundURIs = OA2ClientUtils.createCallbacks(rawCBs, dudURIs);
+            } catch (IOException iox) {
                 say("Sorry, there was an error processing the uris:\"" + iox.getMessage() + "\"");
                 return;
             }
-            if(0 < dudURIs.size()){
+            if (0 < dudURIs.size()) {
                 say(dudURIs.size() + " uris rejected:");
-                for(String dud : dudURIs){
+                for (String dud : dudURIs) {
                     say("  " + dud);
                 }
             }
-            if(foundURIs == null){
+            if (foundURIs == null) {
                 // This ***should** be impossible.
                 say("There was an error processing the URIs");
                 return;
@@ -422,19 +413,80 @@ public class OA2ClientCommands extends ClientStoreCommands {
         LDAPConfigurationUtil ldapConfigurationUtil = new LDAPConfigurationUtil();
 
         if (client.getLdaps() == null || client.getLdaps().isEmpty()) {
-            currentLDAPs = null;
+//            currentLDAPs = null;
         } else {
+            // moving this here. If there are older LDAP configurations you can edit them, but can't add new ones.
+            // These are officially not supported any longer.
             currentLDAPs = ldapConfigurationUtil.toJSON(client.getLdaps());
-        }
-        JSONArray newLDAPS = (JSONArray) inputJSON(currentLDAPs, "ldap configuration", true);
-        if (newLDAPS != null) {
-            client.setLdaps(ldapConfigurationUtil.fromJSON(newLDAPS));
-        }
+            JSONArray newLDAPS = (JSONArray) inputJSON(currentLDAPs, "ldap configuration", true);
+            if (newLDAPS != null) {
+                client.setLdaps(ldapConfigurationUtil.fromJSON(newLDAPS));
+            }
 
-        JSONObject newConfig = (JSONObject) inputJSON(client.getConfig(), "client configuration");
-        if (newConfig != null) {
-            client.setConfig(newConfig);
         }
+        boolean loadQDL = getInput("Load a QDL script or add JSON? (q/j)", "j").equalsIgnoreCase("q");
+        if (loadQDL) {
+           client.setConfig(loadQDLScript(client));
+        } else {
+            JSONObject newConfig = (JSONObject) inputJSON(client.getConfig(), "client configuration");
+            if (newConfig != null) {
+                client.setConfig(newConfig);
+            }
+        }
+    }
+
+    protected JSONObject loadQDLScript(OA2Client client) {
+
+        say("select one of the following ways to do this:");
+        say("d - load a directory of scripts (advanced!)");
+        say("e - edit a script");
+        say("f - read a script from a file");
+        say("p - paste a JSON configuration");
+//        say("w - start the QDL workspace and use that.");
+        String option = readline().trim().toLowerCase();
+        switch (option) {
+            case "d":
+                say("Sorry, that is not quite ready");
+                break;
+            case "e":
+                say("Enter the phase for this script. Phases are: " + ScriptingConstants.phases);
+                String execPhase = readline().trim();
+                StringBuffer stringBuffer = new StringBuffer();
+                LineEditor lineEditor = new LineEditor(stringBuffer);
+                try {
+                    lineEditor.execute();
+                    if (!lineEditor.isSaved()) {
+                        String inLine = getInput("Did you want to save the buffer? (y/n):", "y");
+                        if (inLine.equals("y")) {
+                            return QDLJSONConfigUtil.createCfgFromString(lineEditor.bufferToString(), execPhase);
+                        }
+                    }
+                } catch (Throwable t) {
+                    say("well, that didn't work:" + t.getMessage());
+                }
+                break;
+            case "f":
+                say("Enter the name of a QDL script. Generally if the name is the same as the execution phase");
+                say("You don't have to do anything else");
+                say("phases are: " + ScriptingConstants.phases);
+                say("So a file named " + ScriptingConstants.SRE_EXEC_INIT + ".qdl would be automatically run at initialization.");
+                String fileName = getInput("Enter the file name", "");
+                if (fileName.equals("")) {
+                    say("Sorry, you did not enter a valid file name");
+                }
+                try {
+                    return QDLJSONConfigUtil.createCfg(fileName);
+                } catch (Throwable throwable) {
+                    say("sorry, that didn't work:" + throwable.getMessage());
+                }
+            case "p":
+                return (JSONObject) inputJSON(client.getConfig(), "QDL script");
+
+            default:
+                say("sorry, i didn't understand that.");
+        }
+       return new JSONObject();
+
     }
 
     protected JSON inputJSON(JSON oldJSON, String componentName) {

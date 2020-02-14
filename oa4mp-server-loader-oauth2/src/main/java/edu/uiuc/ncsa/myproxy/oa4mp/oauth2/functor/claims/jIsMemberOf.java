@@ -1,5 +1,6 @@
-package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
+package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.functor.claims;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.Groups;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
 import edu.uiuc.ncsa.security.util.functor.JFunctor;
@@ -8,7 +9,7 @@ import net.sf.json.JSONArray;
 import java.util.ArrayList;
 import java.util.Map;
 
-import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.FunctorClaimsType.IS_MEMBER_OF;
+import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.functor.claims.FunctorClaimsType.IS_MEMBER_OF;
 
 /**
  * This will check that the user is a member of ever listed group. This accesses the

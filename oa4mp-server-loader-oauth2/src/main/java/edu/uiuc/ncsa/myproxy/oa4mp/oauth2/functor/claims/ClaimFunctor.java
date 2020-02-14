@@ -1,4 +1,4 @@
-package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
+package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.functor.claims;
 
 import edu.uiuc.ncsa.security.util.functor.FunctorType;
 import edu.uiuc.ncsa.security.util.functor.JFunctorImpl;

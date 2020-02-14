@@ -14,6 +14,23 @@ import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
  * on 2/12/20 at  11:30 AM
  */
 public class ConfigtoCS implements CSConstants {
+    public static StemVariable convert(ClaimSource source) {
+        if(source instanceof FSClaimSource){
+            return ClaimSourceConfigConverter.convert(source, CSConstants.CS_TYPE_FILE);
+        }
+        if(source instanceof HTTPHeaderClaimsSource){
+            return ClaimSourceConfigConverter.convert(source, CSConstants.CS_TYPE_HEADERS);
+        }
+        if(source instanceof NCSALDAPClaimSource){
+            return ClaimSourceConfigConverter.convert(source, CSConstants.CS_TYPE_NCSA);
+        }
+
+        if(source instanceof LDAPClaimsSource){
+            return ClaimSourceConfigConverter.convert(source, CSConstants.CS_TYPE_LDAP);
+        }
+
+        throw new IllegalArgumentException("Error: Unknown claims source type");
+    }
     public static ClaimSource convert(StemVariable arg) {
         switch (arg.getString(CS_DEFAULT_TYPE)) {
             case CS_TYPE_FILE:

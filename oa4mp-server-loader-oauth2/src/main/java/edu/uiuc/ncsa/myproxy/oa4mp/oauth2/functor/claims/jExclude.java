@@ -1,11 +1,11 @@
-package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
+package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.functor.claims;
 
 import edu.uiuc.ncsa.security.util.functor.JFunctor;
 
 import java.util.HashSet;
 import java.util.Map;
 
-import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.FunctorClaimsType.EXCLUDE;
+import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.functor.claims.FunctorClaimsType.EXCLUDE;
 
 /**
  * This will omit the claims. You may give any list of claim names (rather than values) you wish. If

@@ -1,4 +1,4 @@
-package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
+package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.functor.claims;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.*;
 import edu.uiuc.ncsa.security.util.configuration.TemplateUtil;
@@ -9,8 +9,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.FunctorClaimsType.*;
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowType.GET_CERT;
+import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.functor.claims.FunctorClaimsType.*;
 
 /**
  * A Claims Aware functor factory. This will replace templates with their values

@@ -23,17 +23,18 @@ public class NCSALDAPClaimSource extends LDAPClaimsSource {
     }
 
     /**
-     * NOTE that his uses the search filter attribute (like uid) and if it is missing will default to using the
+     * NOTE that his uses the search filter attribute == the name of the claim to look up and
+     * search on (like sub, uid) and if it is missing will default to using the
      * sub claim.
-     * @param searchFilterAttribute
+     * @param claimName
      */
 
-    public NCSALDAPClaimSource(String searchFilterAttribute) {
+    public NCSALDAPClaimSource(String claimName) {
         super();
         ServletDebugUtil.trace(this, "In constructor.");
         init();
-        if (searchFilterAttribute != null && !searchFilterAttribute.isEmpty()) {
-            getLDAPCfg().setSearchFilterAttribute(searchFilterAttribute);
+        if (claimName != null && !claimName.isEmpty()) {
+            getLDAPCfg().setSearchFilterAttribute(claimName);
         } else {
             getLDAPCfg().setSearchFilterAttribute(OA2Claims.SUBJECT);
         }

@@ -1,4 +1,4 @@
-package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
+package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.functor.claims;
 
 import edu.uiuc.ncsa.security.util.functor.JFunctor;
 
@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.FunctorClaimsType.INCLUDE;
+import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.functor.claims.FunctorClaimsType.INCLUDE;
 
 /**
  * This will include <b>only</b> the list of claims in the final claims object.

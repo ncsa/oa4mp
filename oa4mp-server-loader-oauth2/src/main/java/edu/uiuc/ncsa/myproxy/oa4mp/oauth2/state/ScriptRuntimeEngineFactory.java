@@ -19,7 +19,7 @@ public class ScriptRuntimeEngineFactory {
         if(config.containsKey("config")){
             return new FunctorRuntimeEngine(config);
         }
-        return new NoOpRuntimeEngine(null);
+        return null;
     }
 
 
