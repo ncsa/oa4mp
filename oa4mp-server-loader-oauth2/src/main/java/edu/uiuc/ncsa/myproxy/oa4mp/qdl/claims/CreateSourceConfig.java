@@ -22,8 +22,8 @@ public class CreateSourceConfig implements QDLFunction, CSConstants {
     }
 
     @Override
-    public int getArgCount() {
-        return 1;
+    public int[] getArgCount() {
+        return new int[]{1};
     }
 
     @Override

@@ -24,8 +24,8 @@ public class ClaimsSourceTester implements QDLFunction, CSConstants {
     }
 
     @Override
-    public int getArgCount() {
-        return 2;
+    public int[] getArgCount() {
+        return new int[]{2};
     }
 
     @Override

@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.security.delegation.storage.BaseClient;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.oauth_2_0.server.OA2ClientScopes;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
+import edu.uiuc.ncsa.security.oauth_2_0.server.scripts.ClientJSONConfigUtil;
 import net.sf.json.JSONObject;
 
 import java.util.Collection;
@@ -120,6 +121,26 @@ public class OA2Client extends Client implements OA2ClientScopes {
     }
 
     Collection<LDAPConfiguration> ldaps;
+    String extendedAttributesKey = "extendedAttributesEnabled";
+
+    /**
+     * Extended attributes refers to allowing the client pass in NS qualified additional parameters
+     * in the request. Normally, these are ignored (as per spec). However, we can accept additional
+     * parameters (as per spec too), so if this is set to true, then those prefixed correctly will
+     * be added to the transaction for later processing. The default is false for this option.
+     * @return
+     */
+    public boolean hasExtendedAttributeSupport(){
+        if(!hasConfig()) return false; // default
+        return ClientJSONConfigUtil.getExtraAttributes(getConfig()).containsKey(extendedAttributesKey);
+    }
+    public void setExtendedAttributeSupport(boolean b){
+        if(!hasConfig()){
+            JSONObject cfg = new JSONObject();
+            setConfig(cfg);
+        }
+         ClientJSONConfigUtil.getExtraAttributes(getConfig()).put(extendedAttributesKey, b);
+    }
 
     /**
      * The JSON configuration object.
@@ -130,13 +151,19 @@ public class OA2Client extends Client implements OA2ClientScopes {
      *   "claims":{"sources":[JSON],
      *             "logic":[JSON],
      *             "source_config":[JSON],
-     *             "processing":[JSON]}
+     *             "processing":[JSON]},
+     *    "qdl":{...},
+     *    "isSaved":true|false,
+     *    "extraAttributes":{"extendedAttributesEnabled":true|false}
      * }
      * </pre>
      * <p>
+     *     See the {@link edu.uiuc.ncsa.security.oauth_2_0.server.scripts.ClientJSONConfigUtil}
      * JSON may be either a single JSON object or an array of them. If a single, it is
      * converted to an array of a single object before processing.
      * <p>
+     * As of now (version 4.3), the claims block which is simple functor scripting is
+     * deprecated in favor of the new qdl block.
      * JSON may be a logic block  (which consists of various JSON functors.
      *
      * <pre>
@@ -147,7 +174,8 @@ public class OA2Client extends Client implements OA2ClientScopes {
      * }
      * </pre>
      * <p>
-     * conditionals, actions and other actions are JSON objects or arrays of them as well. Note that the conditional must be a functor that evaluates to a logical value.
+     * conditionals, actions and other actions are JSON objects or arrays of them as well.
+     * Note that the conditional must be a functor that evaluates to a logical value.
      *
      * @return
      */
@@ -198,8 +226,9 @@ public class OA2Client extends Client implements OA2ClientScopes {
         }
         if (isSignTokens() != c.isSignTokens()) return false;
         if (isPublicClient() != c.isPublicClient()) return false;
-        // note that at this point neither the LDAP ro configuration are checked for equality since there
-        // is no well defined way to tell when two JSON object describe the same information.
+        // note that at this point neither the LDAP nor configuration are checked for equality since there
+        // is no well defined way to tell when two JSON object describe the same information -- serialization
+        // is even inconsistent by different libraries.
         return super.equals(obj);
     }
 

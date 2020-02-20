@@ -3,7 +3,9 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.ClaimSourceFactoryImpl;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.IDTokenHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.OA2ClaimsUtil;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ScriptRuntimeEngineFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RefreshTokenStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractAccessTokenServlet;
@@ -20,6 +22,7 @@ import edu.uiuc.ncsa.security.delegation.storage.TransactionStore;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
 import edu.uiuc.ncsa.security.oauth_2_0.*;
+import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTRunner;
 import edu.uiuc.ncsa.security.oauth_2_0.server.ATIResponse2;
 import edu.uiuc.ncsa.security.oauth_2_0.server.RTI2;
 import edu.uiuc.ncsa.security.oauth_2_0.server.RTIRequest;
@@ -27,7 +30,6 @@ import edu.uiuc.ncsa.security.oauth_2_0.server.RTIResponse;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSourceFactory;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
-import net.sf.json.JSONObject;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.http.HttpStatus;
 
@@ -74,7 +76,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         }
 
         p.put(OA2Constants.CLIENT_ID, st.getClient().getIdentifierString());
-        populateClaims(state.getRequest(), p, st);
+        //    populateClaims(state.getRequest(), p, st);
     }
 
     protected Map<String, String> populateClaims(HttpServletRequest request, Map<String, String> p, OA2ServiceTransaction st) {
@@ -95,16 +97,19 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
      * @return
      */
     protected long computeRefreshLifetime(OA2ServiceTransaction st2) {
-        OA2Client client = (OA2Client) st2.getClient();
-        long lifetime = Math.max(st2.getRefreshTokenLifetime(), client.getRtLifetime());
-
         OA2SE oa2SE = (OA2SE) getServiceEnvironment();
         if (oa2SE.getRefreshTokenLifetime() <= 0) {
             throw new NFWException("Internal error: the server-wide default for the refresh token lifetime has not been set.");
         }
-        lifetime = Math.min(lifetime, oa2SE.getRefreshTokenLifetime());
-        return lifetime;
-
+        OA2Client client = (OA2Client) st2.getClient();
+        long lifetime = client.getRtLifetime();
+        if(0 < st2.getRefreshTokenLifetime()) {
+            // IF they specified a refresh token lifetime in the request, take the minimum of that
+            // and whatever they client is allowed.
+            lifetime = Math.min(st2.getRefreshTokenLifetime(), lifetime);
+        }
+        // Now take the minimum of what the server allows.
+        return Math.min(lifetime, oa2SE.getRefreshTokenLifetime());
     }
 
     /**
@@ -169,11 +174,16 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         if (!st2.getFlowStates().acceptRequests || !st2.getFlowStates().accessToken) {
             throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "access denied", HttpStatus.SC_UNAUTHORIZED);
         }
+        JWTRunner jwtRunner = new JWTRunner(st2, ScriptRuntimeEngineFactory.createRTE(st2.getOA2Client().getConfig()));
+        IDTokenHandler idTokenHandler = new IDTokenHandler((OA2SE) getServiceEnvironment(),
+                st2);
+        jwtRunner.addHandler(idTokenHandler);
+        jwtRunner.doTokenClaims();
         OA2ClaimsUtil claimsUtil = new OA2ClaimsUtil((OA2SE) getServiceEnvironment(), st2);
-        claimsUtil.processClaims();
+        // claimsUtil.processClaims();
 
         atResponse.setClaims(st2.getClaims());
-        DebugUtil.dbg(this, "set token signing flag =" + atResponse.isSignToken());
+        DebugUtil.trace(this, "set token signing flag =" + atResponse.isSignToken());
         if (!client.isRTLifetimeEnabled() && ((OA2SE) getServiceEnvironment()).isRefreshTokenEnabled()) {
             // Since this bit of information could be extremely useful if a service decides
             // eto start issuing refresh tokens after
@@ -209,7 +219,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         String rawSecret = null;
         // Fix for CIL-430. Check the header and decode as needed.
         if (HeaderUtils.hasBasicHeader(request)) {
-            DebugUtil.dbg(this, "doIt: Got the header.");
+            DebugUtil.trace(this, "doIt: Got the header.");
             try {
                 rawSecret = HeaderUtils.getSecretFromHeaders(request);
             } catch (UnsupportedEncodingException e) {
@@ -217,7 +227,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             }
 
         } else {
-            DebugUtil.dbg(this, "doIt: no header for authentication, looking at parameters.");
+            DebugUtil.trace(this, "doIt: no header for authentication, looking at parameters.");
             rawSecret = getFirstParameterValue(request, CLIENT_SECRET);
 
         }
@@ -243,7 +253,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             headerID = HeaderUtils.getIDFromHeaders(request);
         } catch (UnsupportedEncodingException e) {
             throw new NFWException("Error: internal use of UTF-8 encoding failed");
-        }catch(Throwable tt){
+        } catch (Throwable tt) {
             ServletDebugUtil.trace(this.getClass(), "Got an exception checking for the header. " +
                     "This is usually benign:\"" + tt.getMessage() + "\"");
         }
@@ -275,11 +285,11 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         // Fix for CIL-332
         if (rawSecret == null) {
             // check headers.
-            DebugUtil.dbg(this, "doIt: no secret, throwing exception.");
+            DebugUtil.trace(this, "doIt: no secret, throwing exception.");
             throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT, "Missing secret");
         }
         if (!client.getSecret().equals(DigestUtils.shaHex(rawSecret))) {
-            DebugUtil.dbg(this, "doIt: bad secret, throwing exception.");
+            DebugUtil.trace(this, "doIt: bad secret, throwing exception.");
             throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT, "Incorrect secret");
         }
 
@@ -331,20 +341,25 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         // Executive decision is to re-run the sources from after the bootstrap. The assumption with bootstrap sources
         // is that they exist only for the initialization.
 
-        /* AT SOME POINT it may be a good idea to be able to specify which claims sources are used on refresh, but
-           that requries some extra logic in the claims sources as well as awareness of where in the flow this happens,
-           so that is not easy
-        */
-        JSONObject claims = t.getClaims();
+
+        JWTRunner jwtRunner = new JWTRunner(t, ScriptRuntimeEngineFactory.createRTE(t.getOA2Client().getConfig()));
+        IDTokenHandler idTokenHandler = new IDTokenHandler((OA2SE) getServiceEnvironment(), t);
+        jwtRunner.addHandler(idTokenHandler);
+        try {
+            jwtRunner.doRefreshClaims();
+        } catch (Throwable throwable) {
+            ServletDebugUtil.warn(this, "Unable to update claims on token refresh: \"" + throwable.getMessage() + "\"");
+        }
+        /*JSONObject claims = t.getClaims();
         OA2ClaimsUtil claimsUtil = new OA2ClaimsUtil(oa2SE, t);
         try {
             claims = claimsUtil.processClaims();
             t.setClaims(claims);
         } catch (Throwable throwable) {
             ServletDebugUtil.warn(this,"Unable to update claims on token refresh: \"" + throwable.getMessage() + "\"");
-        }
-        rtiResponse.setClaims(claims);
-        populateClaims(request, rtiResponse.getParameters(), t);
+        }*/
+        rtiResponse.setClaims(t.getClaims());
+        //  populateClaims(request, rtiResponse.getParameters(), t);
         RefreshToken rt = rtiResponse.getRefreshToken();
         rt.setExpiresIn(computeRefreshLifetime(t));
         t.setRefreshToken(rtiResponse.getRefreshToken());
@@ -367,8 +382,6 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             rtiResponse.setSupportedScopes(targetScopes);
         }
 
-        //    rtiResponse.setClaimSources(setupClaimSources(t, oa2SE));
-
         rtiResponse.setServiceTransaction(t);
         rtiResponse.setJsonWebKey(oa2SE.getJsonWebKeys().getDefault());
         rtiResponse.setClaims(t.getClaims());
@@ -390,7 +403,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
 
         TransactionStore transactionStore = getTransactionStore();
         BasicIdentifier basicIdentifier = new BasicIdentifier(atResponse.getParameters().get(OA2Constants.AUTHORIZATION_CODE));
-        DebugUtil.dbg(this, "getting transaction for identifier=" + basicIdentifier);
+        DebugUtil.trace(this, "getting transaction for identifier=" + basicIdentifier);
         OA2ServiceTransaction transaction = (OA2ServiceTransaction) transactionStore.get(basicIdentifier);
         if (transaction == null) {
             // Then this request does not correspond to an previous one and must be rejected asap.
@@ -454,9 +467,9 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
 
     public static LinkedList<ClaimSource> setupClaimSources(OA2ServiceTransaction transaction, OA2SE oa2SE) {
         LinkedList<ClaimSource> scopeHandlers = new LinkedList<>();
-        DebugUtil.dbg(OA2ATServlet.class, "setting up claim sources");
+        DebugUtil.trace(OA2ATServlet.class, "setting up claim sources");
         if (oa2SE.getClaimSource() != null && oa2SE.getClaimSource().isEnabled()) {
-            DebugUtil.dbg(OA2ATServlet.class, "Adding default claim source.");
+            DebugUtil.trace(OA2ATServlet.class, "Adding default claim source.");
 
             scopeHandlers.add(oa2SE.getClaimSource());
         }
@@ -464,11 +477,11 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         ClaimSourceFactoryImpl.setFactory(new ClaimSourceFactoryImpl());
 
         OA2Client client = (OA2Client) transaction.getClient();
-        DebugUtil.dbg(OA2ATServlet.class, "Getting configured claim source factory " + ClaimSourceFactoryImpl.getFactory().getClass().getSimpleName());
-        DebugUtil.dbg(OA2ATServlet.class, "Adding other claim sources");
+        DebugUtil.trace(OA2ATServlet.class, "Getting configured claim source factory " + ClaimSourceFactoryImpl.getFactory().getClass().getSimpleName());
+        DebugUtil.trace(OA2ATServlet.class, "Adding other claim sources");
 
         scopeHandlers.addAll(ClaimSourceFactoryImpl.createClaimSources(oa2SE, transaction));
-        DebugUtil.dbg(OA2ATServlet.class, "Total claim source count = " + scopeHandlers.size());
+        DebugUtil.trace(OA2ATServlet.class, "Total claim source count = " + scopeHandlers.size());
 
         ClaimSourceFactoryImpl.setFactory(oldSHF);
         return scopeHandlers;

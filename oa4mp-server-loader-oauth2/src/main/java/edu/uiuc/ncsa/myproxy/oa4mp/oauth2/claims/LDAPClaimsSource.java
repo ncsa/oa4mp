@@ -198,7 +198,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
         return context != null;
     }
 
-    public LdapContext context;
+    transient protected LdapContext context = null;
 
 
     /**

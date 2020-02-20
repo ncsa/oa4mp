@@ -122,7 +122,25 @@
         <url-pattern>/userinfo</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+         <servlet-name>revoke</servlet-name>
+         <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC7009</servlet-class>
+         <load-on-startup>0</load-on-startup>
+     </servlet>
+     <servlet-mapping>
+         <servlet-name>revoke</servlet-name>
+         <url-pattern>/revoke</url-pattern>
+     </servlet-mapping>
 
+    <servlet>
+         <servlet-name>introspect</servlet-name>
+         <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC7662</servlet-class>
+         <load-on-startup>0</load-on-startup>
+     </servlet>
+     <servlet-mapping>
+         <servlet-name>introspect</servlet-name>
+         <url-pattern>/introspect</url-pattern>
+     </servlet-mapping>
     <!--
       The next section should be uncommented if you are running this as a standalone service under Tomcat.
       This forces all network traffic to run over SSL.  If you are running this under Apache, then you should

@@ -1,7 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oauth2.tools;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2ClientUtils;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ScriptingConstants;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.QDLJSONConfigUtil;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.ClientStoreCommands;
@@ -11,6 +10,7 @@ import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApprovalStore;
 import edu.uiuc.ncsa.security.delegation.storage.BaseClient;
+import edu.uiuc.ncsa.security.oauth_2_0.jwt.ScriptingConstants;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfigurationUtil;
 import edu.uiuc.ncsa.security.util.cli.ExitException;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
@@ -449,7 +449,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
                 say("Sorry, that is not quite ready");
                 break;
             case "e":
-                say("Enter the phase for this script. Phases are: " + ScriptingConstants.phases);
+                say("Enter the phase for this script. Phases are: " + ScriptingConstants.SRE_PHASES);
                 String execPhase = readline().trim();
                 StringBuffer stringBuffer = new StringBuffer();
                 LineEditor lineEditor = new LineEditor(stringBuffer);
@@ -468,7 +468,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
             case "f":
                 say("Enter the name of a QDL script. Generally if the name is the same as the execution phase");
                 say("You don't have to do anything else");
-                say("phases are: " + ScriptingConstants.phases);
+                say("phases are: " + ScriptingConstants.SRE_PHASES);
                 say("So a file named " + ScriptingConstants.SRE_EXEC_INIT + ".qdl would be automatically run at initialization.");
                 String fileName = getInput("Enter the file name", "");
                 if (fileName.equals("")) {

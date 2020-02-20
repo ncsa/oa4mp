@@ -18,8 +18,8 @@ public class NewTemplate implements QDLFunction, CSConstants {
     }
 
     @Override
-    public int getArgCount() {
-        return 1;
+    public int[] getArgCount() {
+        return new int[]{1};
     }
 
     public static String REQUIRED_TEMPLATE = "**";

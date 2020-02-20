@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowStates;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowStates2;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
 import net.sf.json.JSONObject;
 
@@ -12,15 +12,15 @@ import net.sf.json.JSONObject;
 public class TransactionState {
     public static String STATE_TAG = "state";
     public static String FLOW_STATE_TAG = "flow_state";
-    public FlowStates getFlowStates() {
+    public FlowStates2 getFlowStates() {
         return flowStates;
     }
 
-    public void setFlowStates(FlowStates flowStates) {
+    public void setFlowStates(FlowStates2 flowStates) {
         this.flowStates = flowStates;
     }
 
-    FlowStates flowStates;
+    FlowStates2 flowStates;
 
     /**
      * The ID token once it has been created.

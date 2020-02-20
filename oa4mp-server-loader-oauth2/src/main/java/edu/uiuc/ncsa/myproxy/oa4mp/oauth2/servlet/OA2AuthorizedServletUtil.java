@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.OA2ClaimsUtil;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ExtendedParameters;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.UsernameFindable;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.IssuerTransactionState;
@@ -16,7 +17,6 @@ import edu.uiuc.ncsa.security.delegation.server.request.AGRequest;
 import edu.uiuc.ncsa.security.delegation.server.request.AGResponse;
 import edu.uiuc.ncsa.security.delegation.server.request.IssuerResponse;
 import edu.uiuc.ncsa.security.delegation.servlet.TransactionState;
-import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.oauth_2_0.*;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
@@ -60,7 +60,7 @@ public class OA2AuthorizedServletUtil {
      * @throws Throwable
      */
     public OA2ServiceTransaction doDelegation(HttpServletRequest req, HttpServletResponse resp) throws Throwable {
-        Client client = servlet.getClient(req);
+        OA2Client client = (OA2Client) servlet.getClient(req);
 
         try {
             String cid = "client=" + client.getIdentifier();
@@ -68,6 +68,13 @@ public class OA2AuthorizedServletUtil {
             servlet.checkClientApproval(client);
             AGResponse agResponse = (AGResponse) servlet.getAGI().process(new AGRequest(req, null));
             OA2ServiceTransaction transaction = createNewTransaction(agResponse.getGrant());
+            if(client.hasExtendedAttributeSupport()){
+                ExtendedParameters xp = new ExtendedParameters();
+                JSONObject extAttr = xp.snoopHeaders(req.getParameterMap());
+                if(extAttr!= null && !extAttr.isEmpty()){
+                    transaction.setExtendedAttributes(extAttr.getJSONArray(ExtendedParameters.EXTENDED_ATTRIBUTES_KEY));
+                }
+            }
             agResponse.setServiceTransaction(transaction);
             transaction.setClient(client);
             transaction = (OA2ServiceTransaction) verifyAndGet(agResponse);
@@ -225,6 +232,16 @@ public class OA2AuthorizedServletUtil {
             if (!client.getSecret().equals(rawSecret)) {
                 DebugUtil.info(this,"And for what it is worth, the client sent along an incorrect secret too...");
             }
+        }
+        String rawRefreshLifetime = params.get(REFRESH_LIFETIME);
+        if(rawRefreshLifetime != null && !rawRefreshLifetime.isEmpty()){
+            try{
+                long rt = Long.parseLong(rawRefreshLifetime);
+                st.setRefreshTokenLifetime(rt);
+            }catch(Throwable t){
+                // do nothing.
+            }
+
         }
         String nonce = params.get(NONCE);
         // FIX for OAUTH-180. Server must support clients that do not use a nonce. Just log it and rock on.

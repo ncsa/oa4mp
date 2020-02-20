@@ -31,13 +31,15 @@ public enum FlowType implements FunctorType {
     ACCEPT_REQUESTS("$accept_requests");
 
     FlowType(String value) {
-           this.value = value;
-       }
+        this.value = value;
+    }
 
-       String value;
+    String value;
 
-       @Override
-       public String getValue() {
-           return value;
-       }
+    @Override
+    public String getValue() {
+        return value;
+    }
 }
+
+

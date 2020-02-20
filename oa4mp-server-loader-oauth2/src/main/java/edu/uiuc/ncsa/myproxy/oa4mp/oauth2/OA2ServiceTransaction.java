@@ -1,14 +1,17 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.BasicClaimsSourceImpl;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowStates;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowStates2;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.OA4MPServiceTransaction;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
+import edu.uiuc.ncsa.security.oauth_2_0.jwt.FlowStates;
 import edu.uiuc.ncsa.security.oauth_2_0.server.OA2TransactionScopes;
+import edu.uiuc.ncsa.security.oauth_2_0.server.OIDCServiceTransactionInterface;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
 
@@ -18,11 +21,13 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ExtendedParameters.EXTENDED_ATTRIBUTES_KEY;
+
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 2/28/14 at  1:46 PM
  */
-public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA2TransactionScopes {
+public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA2TransactionScopes, OIDCServiceTransactionInterface {
     public String FLOW_STATE_KEY = "flow_state";
     public String CLAIMS_SOURCES_STATE_KEY = "claims_sources";
     public String STATE_KEY = "state";
@@ -48,9 +53,10 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
     }
 
 
-    public FlowStates getFlowStates() {
+    @Override
+    public FlowStates2 getFlowStates() {
         JSONObject fs = getState().getJSONObject(FLOW_STATE_KEY);
-        FlowStates flowStates = new FlowStates();
+        FlowStates2 flowStates = new FlowStates2();
         if (fs == null) {
             return flowStates;
         }
@@ -73,8 +79,23 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         return state;
     }
 
+    public JSONArray getExtendedAttributes(){
+        if(!getState().containsKey(EXTENDED_ATTRIBUTES_KEY)){
+            return new JSONArray();
+        }
+
+        return getState().getJSONArray(EXTENDED_ATTRIBUTES_KEY);
+    }
+    public void setExtendedAttributes(JSONArray jsonArray){
+        // Again the format of the objet from the extended parameters parsing is {"extendedAttributes":[]}
+        // and we store the array with that key, not the entire object.
+        if(!jsonArray.isEmpty()){
+            getState().put(EXTENDED_ATTRIBUTES_KEY, jsonArray);
+        }
+    }
     JSONObject state;
 
+    @Override
     public void setFlowStates(FlowStates flowStates) {
         getState().put(FLOW_STATE_KEY, flowStates.toJSON());
     }
@@ -190,6 +211,7 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         return scopes;
     }
 
+    @Override
     public void setScopes(Collection<String> scopes) {
         this.scopes = scopes;
     }

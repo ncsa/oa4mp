@@ -391,7 +391,6 @@ public class OIDCCMServlet extends EnvServlet {
         // Next, we have to construct the registration URI by adding in the client ID.
         // Spec says we can add parameters here, but not elsewhere.
         resp.put(OIDCCMConstants.REGISTRATION_CLIENT_URI, registrationURI + "?" + OA2Constants.CLIENT_ID + "=" + client.getIdentifierString());
-        ;
 
         getOA2SE().getClientStore().save(client);
 

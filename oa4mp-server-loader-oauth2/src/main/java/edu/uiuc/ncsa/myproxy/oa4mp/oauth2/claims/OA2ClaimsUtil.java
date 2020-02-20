@@ -2,10 +2,9 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowStates;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowStates2;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2DiscoveryServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ScriptRuntimeEngineFactory;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ScriptingConstants;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.security.core.Identifier;
@@ -15,6 +14,7 @@ import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2GeneralError;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Scopes;
+import edu.uiuc.ncsa.security.oauth_2_0.jwt.ScriptingConstants;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRunRequest;
@@ -211,7 +211,7 @@ public class OA2ClaimsUtil implements ScriptingConstants {
                 // even if the contents are the same, since scripts may have to change these in to other data structures
                 // to make them accessible to their machinery, then convert them back.
                 transaction.setClaims((JSONObject) scriptRunResponse.getReturnedValues().get(SRE_REQ_CLAIMS));
-                transaction.setFlowStates((FlowStates) scriptRunResponse.getReturnedValues().get(SRE_REQ_FLOW_STATES));
+                transaction.setFlowStates((FlowStates2) scriptRunResponse.getReturnedValues().get(SRE_REQ_FLOW_STATES));
                 transaction.setClaimsSources((List<ClaimSource>) scriptRunResponse.getReturnedValues().get(SRE_REQ_CLAIM_SOURCES));
 
             case ScriptRunResponse.RC_NOT_RUN:
@@ -276,7 +276,7 @@ public class OA2ClaimsUtil implements ScriptingConstants {
         // so this client has a specific configuration that is to be invoked.
 
         dbg(this, "executing runtime");
-        FlowStates flowStates = new FlowStates();
+        FlowStates2 flowStates = new FlowStates2();
         transaction.setFlowStates(flowStates);
         List<ClaimSource> claimsSources = new ArrayList<>();
 
@@ -367,7 +367,7 @@ public class OA2ClaimsUtil implements ScriptingConstants {
             return claims;
         }
 
-        FlowStates flowStates = transaction.getFlowStates();
+        FlowStates2 flowStates = transaction.getFlowStates();
         // save everything up to this point since there are no guarantees that processing will continue:
         if (!flowStates.acceptRequests) {
             throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "access denied", HttpStatus.SC_UNAUTHORIZED);

@@ -2,7 +2,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowStates;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowStates2;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.functor.FunctorRuntimeEngine;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.functor.claims.OA2FunctorFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.GroupHandler;
@@ -145,7 +145,7 @@ public class BasicClaimsSourceImpl implements ClaimSource {
             preProcessor = new FunctorScript(ff, getConfiguration().getJSONPreProcessing());
             preProcessor.execute();
             // since the flow state maps to  part of a JSON object, we have to get the object, then reset it.
-            FlowStates f = t.getFlowStates();
+            FlowStates2 f = t.getFlowStates();
             FunctorRuntimeEngine.updateFSValues(f, postProcessor.getFunctorMap());
             t.setFlowStates(f);
 
@@ -158,7 +158,7 @@ public class BasicClaimsSourceImpl implements ClaimSource {
             postProcessor = new FunctorScript(ff, getConfiguration().getJSONPostProcessing());
             postProcessor.execute();
           //  DebugUtil.dbg(this, "claims after post-processing=" + claims.toString(1));
-            FlowStates f = t.getFlowStates();
+            FlowStates2 f = t.getFlowStates();
             FunctorRuntimeEngine.updateFSValues(f, postProcessor.getFunctorMap());
             t.setFlowStates(f);
         }

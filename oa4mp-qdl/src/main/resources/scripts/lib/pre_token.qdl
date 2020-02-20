@@ -1,0 +1,4 @@
+claims.pre_token := 'ok';
+//load_module('modules/my_module.qdl');
+//import('my:/loader/test');
+//claims.imported_string := 'imported string = ' + loader#my_string;

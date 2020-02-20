@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.functor;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowStates2;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.functor.claims.OA2FunctorFactory;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowStates;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowType;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientFunctorScripts;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientFunctorScriptsFactory;
@@ -95,7 +95,7 @@ public class FunctorRuntimeEngine extends ScriptRuntimeEngine {
             ff.setupPostProcessing(cc, config);
             cc.executePostProcessing();
             ff.createClaimSource(cc, config);
-            FlowStates flowStates = (FlowStates) request.getArgs().get(SRE_REQ_FLOW_STATES);
+            FlowStates2 flowStates = (FlowStates2) request.getArgs().get(SRE_REQ_FLOW_STATES);
             updateFSValues(flowStates, cc.getPostProcessing().getFunctorMap());
 
             trace(this, ".doPostProcessing: executed post-processing, functor map=" + cc.getPostProcessing().getFunctorMap());
@@ -113,7 +113,7 @@ public class FunctorRuntimeEngine extends ScriptRuntimeEngine {
         if (cc.hasPreProcessing()) {
             ff.setupPreProcessing(cc, config);
             cc.executePreProcessing();
-            FlowStates flowStates = (FlowStates) request.getArgs().get(SRE_REQ_FLOW_STATES);
+            FlowStates2 flowStates = (FlowStates2) request.getArgs().get(SRE_REQ_FLOW_STATES);
             updateFSValues(flowStates, cc.getPreProcessing().getFunctorMap());
             // Check if we should be returning these as per request.
             if (cc.hasClaimSource()) {
@@ -134,7 +134,7 @@ public class FunctorRuntimeEngine extends ScriptRuntimeEngine {
         OA2ClientFunctorScripts cc = ff.newInstance();
 
         cc.executeRuntime();
-        FlowStates flowStates = (FlowStates) request.getArgs().get(SRE_REQ_FLOW_STATES);
+        FlowStates2 flowStates = (FlowStates2) request.getArgs().get(SRE_REQ_FLOW_STATES);
         updateFSValues(flowStates, cc.getRuntime().getFunctorMap());
         ff.createClaimSource(cc, config);
 
@@ -198,7 +198,7 @@ public class FunctorRuntimeEngine extends ScriptRuntimeEngine {
      *
      * @param functorMap
      */
-    public static void updateFSValues(FlowStates f, FunctorMap functorMap) {
+    public static void updateFSValues(FlowStates2 f, FunctorMap functorMap) {
         f.acceptRequests = findFSValue(functorMap, ACCEPT_REQUESTS, f.acceptRequests);
         f.accessToken = findFSValue(functorMap, ACCESS_TOKEN, f.accessToken);
         f.getCert = findFSValue(functorMap, GET_CERT, f.getCert);

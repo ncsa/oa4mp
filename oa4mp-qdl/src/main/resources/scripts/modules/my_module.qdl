@@ -1,0 +1,10 @@
+module[
+    'my:/loader/test','loader'
+  ]body[
+    define[
+        my_echo(x)
+     ]body[
+        say('my echo:' + x);
+     ]; // end define
+     my_string := 'mairzey doats';
+]; //end module

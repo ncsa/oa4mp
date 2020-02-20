@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowStates;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowStates2;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowType;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ScriptRuntimeEngineFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.qdl.OA2QDLLoader;
@@ -11,7 +11,6 @@ import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.module.ModuleMap;
 import edu.uiuc.ncsa.qdl.scripting.QDLScript;
-import edu.uiuc.ncsa.qdl.scripting.QDLScriptLibrary;
 import edu.uiuc.ncsa.qdl.scripting.Scripts;
 import edu.uiuc.ncsa.qdl.state.*;
 import edu.uiuc.ncsa.qdl.statements.FunctionTable;
@@ -35,7 +34,7 @@ import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowType.*;
  * on 2/12/20 at  9:29 AM
  */
 public class QDLRuntimeEngine extends ScriptRuntimeEngine {
-    public static String CONFIG_TAG = "config2";
+    public static String CONFIG_TAG = "qdl";
     public static String SCRIPTS_TAG = "scripts";
     public static String QDL_VIRTUAL_FILE_SYSTEM_SCHEME = "qdl-vfs:";
 
@@ -49,21 +48,21 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine {
      * The structure of the configuration file (for backwards compatibility) is
      * <pre>
      *     {"config":[comments],
-     *       "config2" : {"scripts" : [{"script":{...}}, {"script":{...}},...]}
+     *       "qdl" : {"scripts" : [{"script":{...}}, {"script":{...}},...]}
      *      }
      *
      * </pre>
-     * The assumption is that this is handed the config2 object and can start pulling it apart at
+     * The assumption is that this is handed the qdl config object and can start pulling it apart at
      * that level.
      */
     protected void init() {
         JSONArray array = config.getJSONArray(SCRIPTS_TAG);
-        QDLScriptLibrary library = new QDLScriptLibrary(QDL_VIRTUAL_FILE_SYSTEM_SCHEME);
+        // QDLScriptLibrary library = new QDLScriptLibrary(QDL_VIRTUAL_FILE_SYSTEM_SCHEME);
         ScriptSet<QDLScript> scriptSet = new ScriptSet<>();
         for (int i = 0; i < array.size(); i++) {
             QDLScript qdlScript = Scripts.fromJSON(array.getJSONObject(i));
             scriptSet.add(qdlScript);
-            library.put(QDL_VIRTUAL_FILE_SYSTEM_SCHEME + qdlScript.getProperties().getString(Scripts.ID), qdlScript);
+            //      library.put(QDL_VIRTUAL_FILE_SYSTEM_SCHEME + qdlScript.getProperties().getString(Scripts.ID), qdlScript);
         }
         setScriptSet(scriptSet);
         SymbolTableImpl symbolTable = new SymbolTableImpl();
@@ -75,10 +74,11 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine {
                 MetaEvaluator.getInstance(),
                 new FunctionTable(),
                 new ModuleMap(),
-                false);// workspace is never in server mode
+                true);// enable server mode.
 
 
-        state.addScriptProvider(library); // This means that the set of scripts in the config file now is in a virtual file system
+        //  state.addScriptProvider(library); // This means
+        //  that the set of scripts in the config file now is in a virtual file system
         // add the modules
         OA2QDLLoader loader = new OA2QDLLoader();
         for (Module m : loader.load()) {
@@ -133,6 +133,12 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine {
             case SRE_PRE_AT:
                 s = getScriptSet().get(Scripts.EXEC_PHASE, SRE_PRE_AT);
                 break;
+            case SRE_PRE_REFRESH:
+                s = getScriptSet().get(Scripts.EXEC_PHASE, SRE_PRE_REFRESH);
+                break;
+            case SRE_POST_REFRESH:
+                s = getScriptSet().get(Scripts.EXEC_PHASE, SRE_POST_REFRESH);
+                break;
         }
         if (s == null) {
             return noOpSRR();
@@ -160,7 +166,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine {
      * @param req
      */
     protected void setupState(ScriptRunRequest req) {
-        FlowStates flowStates = (FlowStates) req.getArgs().get(SRE_REQ_FLOW_STATES);
+        FlowStates2 flowStates = (FlowStates2) req.getArgs().get(SRE_REQ_FLOW_STATES);
         state.getSymbolStack().setValue(FLOW_STATE_VAR, toStem(flowStates));
 
         JSONObject claims = (JSONObject) req.getArgs().get(SRE_REQ_CLAIMS);
@@ -175,16 +181,16 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine {
 
         StemVariable sources = new StemVariable();
         int i = 0;
-        for(ClaimSource source : (List<ClaimSource>) req.getArgs().get(SRE_REQ_CLAIM_SOURCES)){
+        for (ClaimSource source : (List<ClaimSource>) req.getArgs().get(SRE_REQ_CLAIM_SOURCES)) {
             sources.put(i + ".", ConfigtoCS.convert(source));
             i++;
         }
-        state.getSymbolStack().setValue(CLAIM_SOURCES_VAR,sources);
+        state.getSymbolStack().setValue(CLAIM_SOURCES_VAR, sources);
     }
 
     public StemVariable toStem(List<String> scopes) {
         StemVariable scopeStem = new StemVariable();
-        for(int i = 0; i < scopes.size(); i++){
+        for (int i = 0; i < scopes.size(); i++) {
             String index = Integer.toString(i);
             scopeStem.put(index, scopes.get(i));
         }
@@ -203,7 +209,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine {
         ArrayList<ClaimSource> claimSources = new ArrayList<>();
 
         for (int i = 0; i < stemVariable.size(); i++) {
-            String index = Integer.toString(i)+"."; // make sure its a stem
+            String index = Integer.toString(i) + "."; // make sure its a stem
             // if they added extra stuff, skip it. 
             if (stemVariable.containsKey(index)) {
                 StemVariable cfg = (StemVariable) stemVariable.get(index);
@@ -213,7 +219,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine {
         return claimSources;
     }
 
-    public StemVariable toStem(FlowStates flowStates) {
+    public StemVariable toStem(FlowStates2 flowStates) {
         StemVariable stemVariable = new StemVariable();
         stemVariable.put(getGTName(ACCEPT_REQUESTS), flowStates.acceptRequests);
         stemVariable.put(getGTName(ACCESS_TOKEN), flowStates.accessToken);
@@ -230,8 +236,8 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine {
         return type.getValue().substring(1); // chop off lead "$"
     }
 
-    public FlowStates toFS(StemVariable stem) {
-        FlowStates f = new FlowStates();
+    public FlowStates2 toFS(StemVariable stem) {
+        FlowStates2 f = new FlowStates2();
         f.acceptRequests = stem.getBoolean(getGTName(ACCEPT_REQUESTS));
         f.accessToken = stem.getBoolean(getGTName(ACCESS_TOKEN));
         f.getCert = stem.getBoolean(getGTName(GET_CERT));

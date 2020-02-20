@@ -1,0 +1,3 @@
+claims.post_auth := 'ok';
+//text := read_file('other-lib/text-file.txt');
+//claims.got_text := text;

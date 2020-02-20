@@ -24,7 +24,6 @@ public abstract class AbstractCertServlet extends MyProxyDelegationServlet {
     @Override
     protected void doIt(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Throwable {
         doDelegation(httpServletRequest, httpServletResponse);
-
     }
 
 
