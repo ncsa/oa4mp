@@ -21,7 +21,13 @@ import java.util.*;
  * on 2/10/20 at  3:10 PM
  */
 public class ClaimSourceConfigConverter implements CSConstants {
-
+    /**
+     * Takes a {@link ClaimSource}, grabs it configuration and turns it in to a stem
+     * varaible. This is used to pass back configurations to scripts.
+     * @param claimsSource
+     * @param type
+     * @return
+     */
     public static StemVariable convert(ClaimSource claimsSource, String type) {
         StemVariable stem = new StemVariable();
         ClaimSourceConfiguration cfg = claimsSource.getConfiguration();
@@ -90,6 +96,9 @@ public class ClaimSourceConfigConverter implements CSConstants {
                             listStem.addList(isList);
                             stem.put(CS_LDAP_LISTS, listStem);
                         }
+                        if(renames.size() != 0){
+                             stem.put(CS_LDAP_RENAME, renames);
+                        }
                     }
 
                 }
@@ -100,6 +109,12 @@ public class ClaimSourceConfigConverter implements CSConstants {
         return stem;
     }
 
+    /**
+     * Takes a stem variable of the configuration and returns a {@link ClaimSourceConfiguration}
+     * object.
+     * @param arg
+     * @return
+     */
     public static ClaimSourceConfiguration convert(StemVariable arg) {
         ClaimSourceConfiguration cfg = null;
         HashMap<String, Object> xp = new HashMap<>();
@@ -155,6 +170,10 @@ public class ClaimSourceConfigConverter implements CSConstants {
                     } else {
                         groups = new ArrayList();
                     }
+                    StemVariable renames = null;
+                    if(arg.containsKey(CS_LDAP_RENAME)){
+                        renames = (StemVariable) arg.get(CS_LDAP_RENAME);
+                    }
                     if (arg.containsKey(CS_LDAP_LISTS)) {
                         StemVariable listNames = (StemVariable) arg.get(CS_LDAP_LISTS);
                         lists = listNames.values();
@@ -168,9 +187,14 @@ public class ClaimSourceConfigConverter implements CSConstants {
                         if (isList && isGroup) {
                             throw new IllegalArgumentException("You cannot have a \"" + attrName + "\" be both a group and a list. ");
                         }
-
+                        String rename = attrName;
+                        if(renames != null){
+                            if(renames.containsKey(attrName)){
+                                rename = renames.getString(attrName);
+                            }
+                        }
                         LDAPConfigurationUtil.AttributeEntry attributeEntry =
-                                new LDAPConfigurationUtil.AttributeEntry(attrName, attrName, isList, isGroup);
+                                new LDAPConfigurationUtil.AttributeEntry(attrName, rename, isList, isGroup);
                         attrs.put(attrName, attributeEntry);
                     }
                     ldapCfg.setSearchAttributes(attrs);

@@ -126,6 +126,8 @@ public class IDTokenHandler implements PayloadHandler {
 
     @Override
     public void setAccountingInformation() {
+        claims = getClaims();
+
         trace(this, "Starting to set the accounting information for the claims");
         if (transaction.hasAuthTime()) {
             // convert the date to a time if needed.
@@ -172,7 +174,7 @@ public class IDTokenHandler implements PayloadHandler {
     @Override
     public void checkClaims() throws Throwable {
         if (oa2se.isOIDCEnabled()) {
-            checkClaim(claims, SUBJECT);
+            checkClaim(getClaims(), SUBJECT);
         }
     }
 
@@ -211,7 +213,7 @@ public class IDTokenHandler implements PayloadHandler {
         // only required one by the spec. and only if the server is OIDC.
 
         if (oa2se.isOIDCEnabled()) {
-            checkClaim(claims, SUBJECT);
+            checkClaim(getClaims(), SUBJECT);
         }
 
     }

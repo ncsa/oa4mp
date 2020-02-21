@@ -42,18 +42,18 @@ public interface CSConstants {
     /*
     LDAP based claim sources
      */
-    public String CS_LDAP_AUTHZ_TYPE = "authz_type";
-    public String CS_LDAP_CONTEXT_NAME = "context";
-    public String CS_LDAP_SEARCH_ATTRIBUTES = "search_attributes."; // attributes in LDAP to get.
-    public String CS_LDAP_GROUP_NAMES = "group_names."; // search attributes that are groups
-    public String CS_LDAP_RENAME = "rename."; // new names of returned attributes, stem.old_name := new_name
-    public String CS_LDAP_LISTS = "list."; // attributes that should be returned as lists
-    public String CS_LDAP_PASSWORD = "password";
-    public String CS_LDAP_PORT = "port";
-    public String CS_LDAP_SEARCH_FILTER_ATTRIBUTE = "claim_name"; // the name of the claim to look up and get
-    public String CS_LDAP_SEARCH_BASE = "search_base";
-    public String CS_LDAP_SEARCH_NAME = "search_name";
-    public String CS_LDAP_SERVER_ADDRESS = "address";
-    public String CS_LDAP_SECURITY_PRINCIPAL = "username";
+    String CS_LDAP_SEARCH_NAME = "claim_name"; // The name of the claim to use. If not present in the claims, an exception is thrown
+    String CS_LDAP_SEARCH_FILTER_ATTRIBUTE = "ldap_name"; // the name of the attribute in LDAP to search on.
+    String CS_LDAP_SERVER_ADDRESS = "address"; // required
+    String CS_LDAP_SEARCH_BASE = "search_base"; // The path in LDAP to start the search.
+    String CS_LDAP_AUTHZ_TYPE = "auth_type"; // Must be none, simple or strong.
+    String CS_LDAP_SECURITY_PRINCIPAL = "username"; // only needed if authz type is simple or strong
+    String CS_LDAP_PASSWORD = "password"; // Ditto username.
+    String CS_LDAP_PORT = "port"; // This can be omitted. we always use SSL, so it defaults to 636
+    String CS_LDAP_SEARCH_ATTRIBUTES = "search_attributes."; // attributes in LDAP to get. Omitting means get ALL of them
+    String CS_LDAP_GROUP_NAMES = "groups."; // search attributes that are parsed in to groups
+    String CS_LDAP_RENAME = "rename."; // new names of returned attributes, stem.old_name := new_name
+    String CS_LDAP_LISTS = "lists."; // attributes that should be returned as lists, i.e. multi-valued rather than first one found
+    String CS_LDAP_CONTEXT_NAME = "context"; // the name of the LDAP context or object to search. Very necessary when you need it. Defaults to "".
 
 }

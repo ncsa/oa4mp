@@ -6,12 +6,17 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.HTTPHeaderClaimsSource;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.LDAPClaimsSource;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.NCSALDAPClaimSource;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
+import edu.uiuc.ncsa.qdl.util.StemEntry;
+import edu.uiuc.ncsa.qdl.util.StemList;
 import edu.uiuc.ncsa.qdl.util.StemVariable;
 import edu.uiuc.ncsa.security.core.Identifier;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static edu.uiuc.ncsa.qdl.util.StemVariable.STEM_INDEX_MARKER;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -69,14 +74,14 @@ public class ClaimsSourceTester implements QDLFunction, CSConstants {
         JSONObject protoClaims = new JSONObject();
         protoClaims.put(NCSALDAPClaimSource.DEFAULT_SEACH_NAME, username);
 
-        JSONObject j =ncsaldapClaimSource.process(protoClaims, t);
+        JSONObject j = ncsaldapClaimSource.process(protoClaims, t);
         StemVariable output = new StemVariable();
         output.fromJSON(j);
         return output;
     }
 
     public StemVariable doHeaders(StemVariable arg, String username, StemVariable headers) {
-        HTTPHeaderClaimsSource httpHeaderClaimsSource = (HTTPHeaderClaimsSource)ConfigtoCS.convert(arg);
+        HTTPHeaderClaimsSource httpHeaderClaimsSource = (HTTPHeaderClaimsSource) ConfigtoCS.convert(arg);
 
         OA2ServiceTransaction t = new OA2ServiceTransaction((Identifier) null);
         t.setUsername(username);
@@ -91,17 +96,52 @@ public class ClaimsSourceTester implements QDLFunction, CSConstants {
     }
 
     private StemVariable doLDAP(StemVariable arg, String username) {
-        LDAPClaimsSource ldapClaimsSource = (LDAPClaimsSource)ConfigtoCS.convert(arg);
+        LDAPClaimsSource ldapClaimsSource = (LDAPClaimsSource) ConfigtoCS.convert(arg);
         OA2ServiceTransaction t = new OA2ServiceTransaction((Identifier) null);
         t.setUsername(username);
         JSONObject protoClaims = new JSONObject();
         protoClaims.put(arg.getString(CS_LDAP_SEARCH_NAME), username);
         JSONObject j = ldapClaimsSource.process(protoClaims, t);
-        StemVariable output = new StemVariable();
-        output.fromJSON(j);
+        StemVariable output = claimsToStem(j);
         return output;
     }
 
+    /**
+     * It is a bit hard to convert from stems to claims, so this does it.
+     *
+     * @param claims
+     * @return
+     */
+    protected StemVariable claimsToStem(JSONObject claims) {
+        StemVariable out = new StemVariable();
+        for (Object k : claims.keySet()) {
+            String key = k.toString();
+            Object obj = claims.get(k);
+            if (obj instanceof JSONObject) {
+                out.put(k + STEM_INDEX_MARKER, claimsToStem((JSONObject) obj));
+            } else {
+                if (obj instanceof JSONArray) {
+                    JSONArray array = (JSONArray) obj;
+                    // turn in to stemList
+                    StemList<StemEntry> sl = new StemList<>();
+                    for (int i = 0; i < array.size(); i++) {
+                        Object obj1 = array.get(i);
+                        StemVariable out1 = null;
+                        if (obj1 instanceof JSONObject) {
+                            out1 = claimsToStem((JSONObject) obj1);
+                            sl.append(out1);
+                        } else {
+                            sl.append(array.get(i));
+                        }
+                    }
+                    out.put(key + STEM_INDEX_MARKER, sl);
+                } else {
+                    out.put(key, obj.toString());
+                }
+            }
+        }
+        return out;
+    }
 
     protected StemVariable doFS(StemVariable arg, String username) {
         FSClaimSource fsClaimSource = (FSClaimSource) ConfigtoCS.convert(arg);
@@ -130,8 +170,8 @@ public class ClaimsSourceTester implements QDLFunction, CSConstants {
 
         ClaimsSourceTester cst = new ClaimsSourceTester();
         StemVariable claims = (StemVariable) cst.evaluate(new Object[]{mystem, "jeff"});
+        System.out.println("File claim source configuration:");
         System.out.println(claims.toJSON().toString(2));
-
     }
 
     protected static void testLDAP2() {
@@ -178,13 +218,15 @@ public class ClaimsSourceTester implements QDLFunction, CSConstants {
 
         ClaimsSourceTester cst = new ClaimsSourceTester();
         StemVariable claims = (StemVariable) cst.evaluate(new Object[]{mystem, "jgaynor"});
-        System.out.println(claims.toJSON().toString(2));
+        System.out.println(claims.toString(2));
 
     }
 
     public static void main(String[] args) {
+        System.out.println("Testing File System claims");
         testFS();
-        //  testLDAP();
+        System.out.println("Testing LDAP claims");
+        testLDAP();
     }
 
     @Override

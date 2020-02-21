@@ -1,0 +1,58 @@
+"setEnv('vo','voPersonExternalID');",
+  "setEnv('ncsa','https://idp.ncsa.illinois.edu/idp/shibboleth');",
+  "# if the IDP is NCSA, just set the uid and do the second LDAP search, otherwise, search first on voPersonExternalID to set it.",
+  "if[",
+  "equals(get('idp'),'${ncsa}')",
+  "]then[",
+  "set('uid',drop('@ncsa.illinois.edu',get('eppn'))),",
+  "set('${vo}',get('eppn'))",
+  "]else[",
+  "set_claim_source('LDAP','3258ed63b62d1a78')",
+  "];",
+  "set_claim_source('ncsa-default','uid');"
+
+//
+
+   "setEnv('github','http://github.com/login/oauth/authorize');",
+      "setEnv('google','http://google.com/accounts/o8/id');",
+      "setEnv('orcid','http://orcid.org/oauth/authorize');",
+      "setEnv('ncsa','https://idp.ncsa.illinois.edu/idp/shibboleth');",
+      "#  Now figure out which IDP was used and set voPersonExternalID so it may be searched for.",
+      "xor{",
+      "    if[equals(get('idp'),'${github}')]then[set('${vo}',concat(get('oidc'),'@github.com'))],",
+      "    if[equals(get('idp'),'${google}')]then[set('${vo}',concat(get('oidc'),'@accounts.google.com'))],",
+      "   if[equals(get('idp'),'${orcid}')]then[set('${vo}',replace(get('oidc'),'http://','https://'))]",
+      "};"
+
+vo:='voPersonExternalID';
+idp.ncsa := 'https://idp.ncsa.illinois.edu/idp/shibboleth';
+idp.google := 'http://google.com/accounts/o8/id';
+idp.orcid := 'http://orcid.org/oauth/authorize';
+idp.github := 'http://github.com/login/oauth/authorize';
+claim_sources. := null;
+
+// in pre_auth
+if[
+    claims.idp == idp.ncsa
+  ]then[
+    claims.uid := claims.eppn - '@ncsa.illinois.edu';
+    claims.voPersonExternalID := claims.eppn;
+  ]else[
+     // If this is not the NCSA IDP, do a search on their voPersonExternalID
+     // to set their uid, then feed their uid to LDAP.
+     // Note that in this project, the only allowed IDPs are NCSA and these!
+     v := null;
+     switch[
+        if[claims.idp == idp.github]then[v:=claims.oidc+'@github.com';];
+        if[claims.idp == idp.google]then[v:=claims.oidc+'@accounts.google.com';];
+        if[claims.idp == idp.orcid ]then[v:=replace(claims.oidc,'http://', 'https://');];
+     ]; //end switch
+     claims.voPersonExternalID := v;
+     f. := new_template('ncsa');
+     f.search_filter_attribute := 'voPersonExternalID';
+     f.search_attributes.0 := 'uid'; // return the uid from the search as a claim
+     list_append(claim_sources., create_source(f.));
+  ]; // end if
+f. := new_template('ncsa');
+f.search_filter_attribute := 'uid';
+list_append(claim_sources., create_source(f.));
