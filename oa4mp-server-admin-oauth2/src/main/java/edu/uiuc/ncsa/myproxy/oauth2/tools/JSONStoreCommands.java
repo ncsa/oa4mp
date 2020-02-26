@@ -304,13 +304,5 @@ public class JSONStoreCommands extends StoreCommands2 {
         return array;
     }
 
-    @Override
-    protected void addEntry(Identifiable identifiable, JSONObject json) {
-        
-    }
 
-    @Override
-    protected void removeEntry(Identifiable identifiable, JSONObject json) {
-
-    }
 }

@@ -2,6 +2,8 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
 
 import net.sf.json.JSONObject;
 
+import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.Groups.*;
+
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 3/1/18 at  4:11 PM
@@ -40,25 +42,25 @@ public class GroupElement {
 
     public JSONObject toJSON() {
         JSONObject json = new JSONObject();
-        json.put("name", getName());
+        json.put(GROUP_ENTRY_NAME, getName());
         if (-1 < id) {
-            json.put("id", getId());
+            json.put(GROUP_ENTRY_ID, getId());
         }
         return json;
     }
 
     public void fromJSON(JSONObject json) {
-        setName(json.getString("name"));
-        if (json.containsKey("id")) {
-            setId(json.getInt("id"));
+        setName(json.getString(GROUP_ENTRY_NAME));
+        if (json.containsKey(GROUP_ENTRY_ID)) {
+            setId(json.getInt(GROUP_ENTRY_ID));
         }
     }
 
     @Override
     public String toString() {
         return "GroupElement{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
+                GROUP_ENTRY_ID + "=" + id +
+                ", " + GROUP_ENTRY_NAME+"='" + name + '\'' +
                 '}';
     }
 }

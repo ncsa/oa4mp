@@ -101,12 +101,8 @@ public class OA2PermissionCommands extends StoreCommands2 {
 
     }
 
-    @Override
-    protected void addEntry(Identifiable identifiable, JSONObject json) {
 
-    }
 
-    @Override
     protected void removeEntry(Identifiable identifiable, JSONObject json) {
         HashMap<String, Object> map = new HashMap();
         getPStore().getXMLConverter().toMap(identifiable, map);

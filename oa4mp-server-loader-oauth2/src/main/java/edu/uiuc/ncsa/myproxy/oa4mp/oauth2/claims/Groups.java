@@ -12,6 +12,8 @@ import java.util.HashMap;
  * on 3/1/18 at  4:11 PM
  */
 public class Groups extends HashMap<String, GroupElement> {
+    public static String GROUP_ENTRY_NAME = "name";
+    public static String GROUP_ENTRY_ID = "id";
     public void put(GroupElement groupElement) {
         super.put(groupElement.getName(), groupElement);
     }

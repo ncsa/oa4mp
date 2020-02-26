@@ -12,9 +12,10 @@ import edu.uiuc.ncsa.security.delegation.server.storage.ClientApprovalStore;
 import edu.uiuc.ncsa.security.delegation.storage.BaseClient;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.ScriptingConstants;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfigurationUtil;
+import edu.uiuc.ncsa.security.util.cli.CLIDriver;
 import edu.uiuc.ncsa.security.util.cli.ExitException;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
-import edu.uiuc.ncsa.security.util.cli.LineEditor;
+import edu.uiuc.ncsa.security.util.scripting.ScriptSet;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -426,7 +427,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
         }
         boolean loadQDL = getInput("Load a QDL script or add JSON? (q/j)", "j").equalsIgnoreCase("q");
         if (loadQDL) {
-           client.setConfig(loadQDLScript(client));
+            client.setConfig(loadQDLScript(client));
         } else {
             JSONObject newConfig = (JSONObject) inputJSON(client.getConfig(), "client configuration");
             if (newConfig != null) {
@@ -438,18 +439,23 @@ public class OA2ClientCommands extends ClientStoreCommands {
     protected JSONObject loadQDLScript(OA2Client client) {
 
         say("select one of the following ways to do this:");
-        say("d - load a directory of scripts (advanced!)");
+        //  say("d - load a directory of scripts (advanced!)");
         say("e - edit a script");
         say("f - read a script from a file");
         say("p - paste a JSON configuration");
-//        say("w - start the QDL workspace and use that.");
+//        say("w - start the QDL workspace");
         String option = readline().trim().toLowerCase();
         switch (option) {
             case "d":
                 say("Sorry, that is not quite ready");
                 break;
             case "e":
-                say("Enter the phase for this script. Phases are: " + ScriptingConstants.SRE_PHASES);
+                ScriptSet scriptSet = QDLJSONConfigUtil.readScriptSet(client.getConfig());
+                QDLCLICommands qdlcliCommands = new QDLCLICommands(logger, scriptSet);
+                CLIDriver driver = new CLIDriver(qdlcliCommands);
+                driver.start();
+                return QDLJSONConfigUtil.scriptSetToJSON(qdlcliCommands.getScriptSet());
+/*                say("Enter the phase for this script. Phases are: " + Arrays.toString(ScriptingConstants.SRE_PHASES));
                 String execPhase = readline().trim();
                 StringBuffer stringBuffer = new StringBuffer();
                 LineEditor lineEditor = new LineEditor(stringBuffer);
@@ -465,7 +471,10 @@ public class OA2ClientCommands extends ClientStoreCommands {
                     say("well, that didn't work:" + t.getMessage());
                 }
                 break;
+                */
             case "f":
+
+
                 say("Enter the name of a QDL script. Generally if the name is the same as the execution phase");
                 say("You don't have to do anything else");
                 say("phases are: " + ScriptingConstants.SRE_PHASES);
@@ -479,18 +488,30 @@ public class OA2ClientCommands extends ClientStoreCommands {
                 } catch (Throwable throwable) {
                     say("sorry, that didn't work:" + throwable.getMessage());
                 }
+
+                break;
             case "p":
                 return (JSONObject) inputJSON(client.getConfig(), "QDL script");
-
+          /*  case "w":
+                QDLWorkspace workspace = new QDLWorkspace(new WorkspaceCommands()));
+                String args[] = new String[]{"-ext \"edu.uiuc.ncsa.myproxy.oa4mp.qdl.OA2QDLLoader\""};
+                workspace.main(args);
+*/
             default:
                 say("sorry, i didn't understand that.");
         }
-       return new JSONObject();
+        return new JSONObject();
 
     }
 
     protected JSON inputJSON(JSON oldJSON, String componentName) {
         return inputJSON(oldJSON, componentName, false);
+    }
+
+    @Override
+    public void update(InputLine inputLine) {
+
+        super.update(inputLine);
     }
 
     /**

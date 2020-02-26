@@ -1,9 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.qdl;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims.ClaimsSourceTester;
-import edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims.CreateSourceConfig;
-import edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims.NewTemplate;
-import edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims.OA2Module;
+import edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims.*;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
 import edu.uiuc.ncsa.qdl.extensions.QDLLoader;
 import edu.uiuc.ncsa.qdl.module.Module;
@@ -26,6 +23,7 @@ public class OA2QDLLoader implements QDLLoader {
         funcs.add(new ClaimsSourceTester());
         funcs.add(new CreateSourceConfig());
         funcs.add(new NewTemplate());
+        funcs.add(new IsInGroup());
         oa2Module.addFunctions(funcs);
         ArrayList<Module> modules = new ArrayList<>();
         modules.add(oa2Module);

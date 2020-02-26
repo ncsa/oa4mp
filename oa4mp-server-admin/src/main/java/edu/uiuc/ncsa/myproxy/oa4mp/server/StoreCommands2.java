@@ -7,15 +7,20 @@ import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.storage.XMLMap;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
-import edu.uiuc.ncsa.security.util.cli.CommandLineTokenizer;
-import edu.uiuc.ncsa.security.util.cli.InputLine;
-import edu.uiuc.ncsa.security.util.cli.LineEditor;
-import edu.uiuc.ncsa.security.util.cli.StoreCommands;
+import edu.uiuc.ncsa.security.util.cli.*;
+import net.sf.json.JSON;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import net.sf.json.JSONSerializer;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 import java.util.Vector;
+
+import static edu.uiuc.ncsa.security.util.cli.CLIDriver.CLEAR_BUFFER_COMMAND;
+import static edu.uiuc.ncsa.security.util.cli.CLIDriver.EXIT_COMMAND;
 
 /**
  * This class exists because we cannot quite get the dependencies right otherwise. Mostly it is to have access
@@ -195,104 +200,481 @@ public abstract class StoreCommands2 extends StoreCommands {
     }
 
     @Override
+    protected void showLSHelp() {
+        say("ls [-l | -la] | [" + KEY_FLAG + " key | " + KEYS_FLAG + " array] [id]");
+        sayi("Lists information about the contents of the store, an entry and individual values of the entry.");
+        sayi("When listing multiple entries, tools will use the most numbers from the most recent call to this.");
+        say("E.g.");
+        sayi("ls -la");
+        sayi("Prints out the long form of *every* object in this store. This may be simply huge");
+        say("E.g.");
+        sayi("ls");
+        sayi("Prints out the short form of *every* object in this store. This may also be huge.");
+        sayi("If you are using this to find things, you probably want to look at the search command");
+        say("E.g.");
+        sayi("ls -la /foo:bar");
+        sayi("Prints a long format for the entry with id foo:bar");
+        say("E.g.");
+        sayi("ls -key id /foo:bar");
+        sayi(">   foo:bar");
+        sayi("Prints out the identifier for the object with identifier foo:bar");
+        sayi("");
+        sayi("You may also supply a list of keys in an array of the form [key0,key1,...].");
+        say("E.g.");
+        sayi("ls -json [id,callback_uris,create_ts] /foo:bar");
+        sayi("would print the id, callback_uri and create_ts properties for the object with id");
+        sayi("foo:bar. ");
+        sayi("\nSee also list_keys, search");
+    }
+
+    @Override
+    protected void showRMHelp() {
+        say("rm [" + KEY_FLAG + " | " + KEYS_FLAG + " list] id");
+        sayi("Remove a property from this the object with the given value.");
+        sayi("If you supply a list, all of the properties in the list will be removed");
+        sayi("No list of keys means to remove the entire object from the store (!)");
+        say("E.g.");
+        sayi("rm " + KEY_FLAG + " error_uri /foo:bar");
+        sayi("Removes the value of the property 'error_uri' from the object with id foo:bar");
+        say("E.g.");
+        sayi("rm /foo:bar");
+        sayi("removes the object with id foo:bar completely from the store");
+        say("E.g.");
+        sayi("rm " + KEYS_FLAG + " [error_uri,home_uri] /foo:bar");
+        sayi("removes the values of the properties error_uri and home_uri from the object with id");
+        sayi("equal to foo:bar");
+
+    }
+
+    /**
+     * Called if there is additional clean up needed. For instance, removing a client
+     * requires removing its approval record.
+     *
+     * @param identifiable
+     */
+    protected void rmCleanup(Identifiable identifiable) {
+    }
+
+    @Override
+    public void rm(InputLine inputLine) {
+        if (showHelp(inputLine)) {
+            showRMHelp();
+            return;
+        }
+        Identifiable identifiable = findItem(inputLine);
+
+        // if the request does not have new stuff, do old stuff.
+        if (!inputLine.hasArg(KEY_FLAG) && !inputLine.hasArg(KEYS_FLAG)) {
+            super.rm(inputLine);
+            rmCleanup(identifiable);
+            return;
+        }
+        if (inputLine.hasArg(KEYS_FLAG)) {
+            List<String> array = getKeysList(inputLine);
+
+            if (array == null) {
+                say("sorry, but this requires a list for this option.");
+                return;
+            }
+            if (identifiable == null) {
+                say("sorry, I could not find that object. Check your id.");
+                return;
+            }
+            removeEntries(identifiable, array);
+        }
+        if (inputLine.hasArg(KEY_FLAG)) {
+            if (identifiable == null) {
+                say("sorry, I could not find that object. Check your id.");
+                return;
+            }
+
+            removeEntry(identifiable, inputLine.getNextArgFor(KEY_FLAG));
+        }
+        rmCleanup(identifiable);
+    }
+
+    @Override
+    public void ls(InputLine inputLine) {
+        if (showHelp(inputLine)) {
+            showLSHelp();
+            return;
+        }
+        if (!inputLine.hasArg(KEY_FLAG) && !inputLine.hasArg(KEYS_FLAG)) {
+            super.ls(inputLine);
+            return;
+        }
+        if (inputLine.hasArg(KEYS_FLAG)) {
+            List<String> array = getKeysList(inputLine);
+
+            if (array == null) {
+                say("sorry, but this requires a list for this option.");
+                return;
+            }
+            Identifiable identifiable = findItem(inputLine);
+            if (identifiable == null) {
+                say("sorry, I could not find that object. Check your id.");
+                return;
+            }
+
+            showEntries(identifiable, array);
+            return;
+        }
+        if (inputLine.hasArg(KEY_FLAG)) {
+            Identifiable identifiable = findItem(inputLine);
+            if (identifiable == null) {
+                say("sorry, I could not find that object. Check your id.");
+                return;
+            }
+            showEntry(identifiable, inputLine.getNextArgFor(KEY_FLAG));
+        }
+    }
+
+    @Override
     protected void showUpdateHelp() {
-        say("update [" + UPDATE_ADD_FLAG + " | " + UPDATE_REMOVE_FLAG + " -remove ] " +
-                "[" + UPDATE_KEY_FLAG + " key "+ UPDATE_VALUE_FLAG + " value | " +
-                UPDATE_JSON_FLAG + " value] index\n");
+        say("update [" + KEY_FLAG + " key " + VALUE_FLAG + " value | " +
+                KEYS_FLAG + " array] index\n");
         sayi("where the index is the index in the list command.");
-        sayi("Optionally you may set a specific value for a key within the object. ");
-        sayi("You may also specify that, if the value is a list, to simply add to its list");
-        sayi("E.g.");
-        sayi("update " + UPDATE_REMOVE_FLAG + " " + UPDATE_KEY_FLAG + " lifetime /foo:bar");
-        sayi("would find the object with id foo:bar and remove the value of the key 'lifetime'");
-        sayi("E.g.");
-        sayi("update " + UPDATE_ADD_FLAG + " " +  UPDATE_JSON_FLAG + " '{\"fnord\":[\"blarf0\",\"blarf1\"]}' /foo:bar");
-        sayi("(Note the single quotes around the raw JSON)");
-        sayi("This would add the given entries to the array named fnord");
-        sayi("Generally JSON is a better way to set multiple values, since the other method is simply ");
-        sayi("a way to set an individual value. ");
-        sayi("E.g.");
-        sayi("update  " + UPDATE_JSON_FLAG + " '{\"fnord\":[\"blarf0\",\"blarf1\"]}' /foo:bar");
-        sayi("In this case, without the " + UPDATE_ADD_FLAG + ", the values for the array named fnord would be replaced.");
-        sayi("Any existing values would be lost.");
+        sayi("This has two modes, you may either specify a single key value OR you may specify an array of keys");
+        sayi("of the form [key0,key1,...]. (The list_keys command will tell what the keys are.)");
+        sayi("The " + KEYS_FLAG + " will act on all the keys supplied.");
+        say("E.g.");
+        sayi("update " + KEY_FLAG + " name " + VALUE_FLAG + " \"My client\" /foo:bar");
+        sayi("This changes the value of the 'name' attribute to 'My client' for the object with id 'foo:bar'");
+        sayi("Note that no prompting is done! The value will be updated.");
+        say("E.g.");
+        sayi("update " + KEYS_FLAG + " [name,callback_uri] /foo:bar");
+        sayi("This would prompt to update the values for the 'name' and 'callback_uri' properties");
+        sayi("of the object with id 'foo:bar'");
+        sayi("A few notes. If the value of the property is a JSON object, yo can edit it.");
+        sayi("If the value of the property is an array, then you may add a value, delete a value,");
+        sayi("replace the entire contents (new entries are comma separated) or simple clear the .");
+        sayi("entire list of entries.");
         say("See also list_keys");
     }
 
-    String UPDATE_ADD_FLAG = "-add";
-    String UPDATE_REMOVE_FLAG = "-remove";
-    String UPDATE_KEY_FLAG = "-key";
-    String UPDATE_VALUE_FLAG = "-value";
-    String UPDATE_JSON_FLAG = "-json";
+
+    String KEY_FLAG = "-key";
+    String VALUE_FLAG = "-value";
+    String KEYS_FLAG = "-keys";
 
     @Override
     public void update(InputLine inputLine) {
+
         if (showHelp(inputLine)) {
             showUpdateHelp();
             return;
         }
-        if (inputLine.size() == 2) { // line is [func_name, arg0, arg1, ...] so this means a single argument. Assume its an index.
+        if (!inputLine.hasArg(KEY_FLAG) && !inputLine.hasArg(KEYS_FLAG)) {
             super.update(inputLine);
             return;
         }
-        // new stuff. The assumption is that the user is trying to update something.
-        boolean addFlag = inputLine.hasArg(UPDATE_ADD_FLAG);
-        boolean removeFlag = inputLine.hasArg(UPDATE_REMOVE_FLAG);
-        boolean jsonFlag = inputLine.hasArg(UPDATE_JSON_FLAG);
-        String key = inputLine.getNextArgFor(UPDATE_KEY_FLAG);
-        String value = inputLine.getNextArgFor(UPDATE_VALUE_FLAG);
+
         Identifiable identifiable = findItem(inputLine);
         if (identifiable == null) {
-            say("no entry for \"" + identifiable.getIdentifierString() + "\" found.");
+            say("sorry, I could not find that object. Check your id.");
             return;
         }
-        if (addFlag && removeFlag) {
-            say("Error: You cannot add and remove a value the same time");
-            return;
-        }
-        if (jsonFlag) {
-            JSONObject json = getJSONArg(inputLine);
-            if (addFlag) {
-                addEntry(identifiable, json);
+        XMLMap map = toXMLMap(identifiable);
+        boolean gotOne = false;
+
+        if (inputLine.hasArg(KEY_FLAG)) {
+            String key = inputLine.getNextArgFor(KEY_FLAG);
+            if (!hasKey(key)) {
+                say("sorry, but \"" + key + "\" is not a recognized attribute.");
+                return;
             }
-            if (removeFlag) {
-                removeEntry(identifiable, json);
+            if (inputLine.hasArg(VALUE_FLAG)) {
+                map.put(key, inputLine.getNextArgFor(VALUE_FLAG));
+                gotOne = true;
+            } else {
+                gotOne = updateSingleValue(map, key);
             }
-              return;
         }
 
-        if (addFlag) {
-            addEntry(identifiable, inputLine.getNextArgFor(UPDATE_KEY_FLAG), inputLine.getNextArgFor(UPDATE_VALUE_FLAG));
+        if (inputLine.hasArg(KEYS_FLAG)) {
+            List<String> keys = getKeysList(inputLine);
+            for (String k : keys) {
+                gotOne = gotOne || updateSingleValue(map, k);
+            }
         }
-        if(removeFlag){
-            removeEntry(identifiable, inputLine.getNextArgFor(UPDATE_KEY_FLAG), inputLine.getNextArgFor(UPDATE_VALUE_FLAG));
 
+        if (gotOne) {
+            getStore().save(fromXMLMap(map));
         }
 
     }
 
+    protected JSONArray updateSingleValue(String key, JSONArray currentValue) {
+        say("current value=" + currentValue);
+        String action = getInput("Add, clear, delete or replace?(a/c/d/r)", "a").toLowerCase();
+        if (action.equals("r")) {
+            say("Enter the new elements with commas between them");
+        }
+        String newValue = getInput("New value", "");
+        switch (action) {
+            case "a":
+                // Append a value to the list
+                currentValue.add(newValue);
+                return currentValue;
+            case "c":
+                // clear the entire contents
+                currentValue.clear();
+                return currentValue;
+            case "d":
+                // delete a single value in the list
+                currentValue.remove(newValue);
+                return currentValue;
+            case "r":
+                // replace the entire contents.
+                currentValue.clear();
+                if (newValue.equals("")) {
+                    return currentValue;
+                }
+                StringTokenizer st = new StringTokenizer(newValue, ",");
+                while (st.hasMoreElements()) {
+                    currentValue.add(st.nextToken());
+                }
+                return currentValue;
+        }
+        say("sorry, I did not understand what you want to do.");
+        return null;
+    }
 
-    protected void addEntry(Identifiable identifiable, String key, String value) {
-        JSONObject json = new JSONObject();
-        json.put(key, value);
-        addEntry(identifiable, json);
+    protected boolean updateSingleValue(XMLMap map, String key) {
+        String currentValue = map.getString(key);
+        JSON json = null;
+        try {
+            json = JSONSerializer.toJSON(currentValue);
+            if (json instanceof JSONObject) {
+                JSONObject newJSON = inputJSON((JSONObject) json, key);
+                if (newJSON != null) {
+                    map.put(key, newJSON.toString());
+                    return true;
+                }
+                return false;
+            }
+            if (json instanceof JSONArray) {
+                JSONArray newArray = updateSingleValue(key, (JSONArray) json);
+                // really hard to tell if the array is updated in the general case.
+                // so just always save it.
+                if (newArray != null) {
+                    map.put(key, newArray.toString());
+                    return true;
+                }
+                return false;
+
+            }
+        } catch (Throwable t) {
+            // ok, it's not JSON
+        }
+        String newValue = getInput("Enter new value[" + currentValue + "]", currentValue);
+        if (!newValue.equals(currentValue)) {
+            map.put(key, newValue);
+            return true;
+        }
+
+        return false;
+    }
+
+
+    /**
+     * Allows for entering a new JSON object. This permits multi-line entry so formatted JSON can be cut and pasted
+     * into the command line (as long as there are no blank lines). This will validate the JSON, print out a message and
+     * check that you want to keep the new JSON. Note that you cannot overwrite the value of a configuration at this point
+     * mostly as a safety feature. So hitting return or /exit will have the same effect of keeping the current value.
+     *
+     * @param oldJSON
+     * @return null if the input is terminated (so retain the old object)
+     */
+    protected JSONObject inputJSON(JSONObject oldJSON, String key) {
+        if (oldJSON == null) {
+            sayi("no current value for " + key);
+        } else {
+            sayi("current value for " + key + ":");
+            say(oldJSON.toString(1));
+        }
+        sayi("Enter new JSON value. An empty line terminates input. Entering a line with " + EXIT_COMMAND + " will terminate input too.\n Hitting " + CLEAR_BUFFER_COMMAND + " will clear the contents of this.");
+        String rawJSON = "";
+        boolean redo = true;
+        while (redo) {
+            try {
+                String inLine = readline();
+                while (!isEmpty(inLine)) {
+                    if (inLine.equals(CLEAR_BUFFER_COMMAND)) {
+                        return new JSONObject();
+                    }
+                    rawJSON = rawJSON + inLine;
+                    inLine = readline();
+                }
+            } catch (ExitException x) {
+                // ok, so user terminated input. This ends the whole thing
+                return null;
+            }
+            // if the user just hits return with no input, do nothing. This lets them skip over unchanged entries.
+            if (rawJSON.isEmpty()) {
+                return null;
+            }
+            try {
+                JSONObject json = null;
+                json = JSONObject.fromObject(rawJSON);
+                sayi("Success! JSON is valid.");
+                return json;
+            } catch (Throwable t) {
+                sayi("uh-oh... It seems this was not a valid JSON object. The parser message reads:\"" + t.getMessage() + "\"");
+                redo = isOk(getInput("Try to re-enter this?", "true"));
+            }
+        }
+
+        return null;
     }
 
     /**
-     * Proposed changes to store to allow for adding updates and removing them via batch files.
-     * At this point this is considered experimental.
+     * Once an object is found in the store, convert it to JSON so that the properties may be
+     * accessed in a canonical way. This lets us take any identifiable object and manipulate its
+     * properties without knowing anything else about it.
+     *
      * @param identifiable
-     * @param json
+     * @return
      */
-   protected abstract void addEntry(Identifiable identifiable, JSONObject json);
-
-    protected abstract void removeEntry(Identifiable identifiable, JSONObject json);
-
-    protected void removeEntry(Identifiable identifiable, String key, String value) {
-        JSONObject json = new JSONObject();
-        json.put(key, value);
-        removeEntry(identifiable, json);
+    protected XMLMap toXMLMap(Identifiable identifiable) {
+        Identifiable x = (Identifiable) getStore().get(identifiable.getIdentifier());
+        XMLMap map = new XMLMap();
+        MapConverter mapConverter = (MapConverter) getStore().getXMLConverter();
+        mapConverter.toMap(x, map);
+        return map;
     }
 
+    /**
+     * Take the <b>updated</b> values for the object and return a new, updated object.
+     * This does not store it, so you have to do that if you want to keep the changes.
+     *
+     * @param map
+     */
+    protected Identifiable fromXMLMap(XMLMap map) {
+
+        Identifiable identifiable = getStore().create();
+        MapConverter mapConverter = (MapConverter) getStore().getXMLConverter();
+        mapConverter.fromMap(map, identifiable);
+        return identifiable;
+    }
+
+    /**
+     * Add to an existing entry.
+     *
+     * @param identifiable
+     * @param jjj
+     */
+    protected void addEntry(Identifiable identifiable, JSON jjj) {
+        if (!(jjj instanceof JSONObject)) {
+            say("sorry, but that is not a valid JSON object for this operation.");
+            return;
+        }
+        JSONObject json = (JSONObject) jjj;
+        XMLMap object = toXMLMap(identifiable);
+        for (Object k : json.keySet()) {
+            String key = k.toString();
+            Object newValue = json.get(key);
+            if (hasKey(key)) {
+                Object currentValue = object.containsValue(k);
+                if (currentValue == null) {
+                    object.put(key, newValue);
+                } else {
+                    if (currentValue instanceof JSONArray) {
+                        ((JSONArray) currentValue).add(newValue);
+                    } else {
+                        object.put(key, newValue);
+                    }
+                }
+            } else {
+                say("sorry, but \"" + key + "\" is not a recognized key. Skipping...");
+            }
+        }
+        getStore().save(fromXMLMap(object));
+    }
+
+    protected void addEntry(Identifiable identifiable, String key, String value) {
+        XMLMap object = toXMLMap(identifiable);
+        if (hasKey(key)) {
+            Object currentValue = object.get(key);
+            if (currentValue == null) {
+                object.put(key, value);
+            } else {
+                if (currentValue instanceof JSONArray) {
+                    ((JSONArray) currentValue).add(value);
+                } else {
+                    object.put(key, value);
+                }
+            }
+        } else {
+            say("sorry, but \"" + key + "\" is not a recognized key. Skipping...");
+
+        }
+        getStore().save(fromXMLMap(object));
+    }
+
+
+    protected void removeEntries(Identifiable identifiable, List<String> keys) {
+        XMLMap object = toXMLMap(identifiable);
+        boolean gotOne = false;
+        for (String key : keys) {
+            if (hasKey(key)) {
+                if (object.containsKey(key)) {
+                    object.remove(key);
+                    gotOne = true;
+                }
+            }
+        }
+        if (gotOne) {
+            getStore().save(fromXMLMap(object));
+        }
+
+    }
+
+    protected void removeEntry(Identifiable identifiable, String key) {
+        XMLMap object = toXMLMap(identifiable);
+
+        if (hasKey(key)) {
+            if (object.containsKey(key)) {
+
+                object.remove(key);
+                getStore().save(fromXMLMap(object));
+            }
+        }
+    }
+
+
+    protected void showEntries(Identifiable identifiable, List<String> array) {
+        XMLMap object = toXMLMap(identifiable);
+        for (String key : array) {
+            if (hasKey(key)) {
+                say(key + "=" + object.get(key));
+            }
+        }
+    }
+
+    protected void showEntry(Identifiable identifiable, String key) {
+        if (hasKey(key)) {
+            XMLMap object = toXMLMap(identifiable);
+            if (object.containsKey(key)) {
+                say(key + "=" + object.get(key));
+            } else {
+                say("(no value)");
+            }
+        } else {
+            say("sorry, but \"" + key + "\" is not a recognized key. Skipping...");
+
+        }
+
+    }
+
+    protected boolean hasKey(String key) {
+        XMLConverter xmlConverter = getStore().getXMLConverter();
+        if (xmlConverter instanceof MapConverter) {
+            MapConverter mc = (MapConverter) xmlConverter;
+            return mc.getKeys().allKeys().contains(key);
+        }
+        return false;
+    }
 
     public void list_keys(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
@@ -305,7 +687,6 @@ public abstract class StoreCommands2 extends StoreCommands {
             for (String key : mc.getKeys().allKeys()) {
                 say(key);
             }
-
         }
     }
 
@@ -344,22 +725,33 @@ public abstract class StoreCommands2 extends StoreCommands {
             throwable.printStackTrace();
         }
     }
-     protected JSONObject getJSONArg(InputLine inputLine){
-         String[] args2 = inputLine.argsToStringArray();
-         String raw2 = "";
-         for(int i = 0; i < args2.length -1 ; i++){
-              raw2 = raw2+args2[i];
-         }
-         int start = raw2.indexOf("'");
-         int end = raw2.lastIndexOf("'");
-         String rawJSON = raw2.substring(start+1, end);
-         try{
-              return JSONObject.fromObject(rawJSON);
-         }catch(Throwable t){
-             return new JSONObject();
-         }
-     }
-    public static void main(String[] args){
+
+
+    String LIST_START_DELIMITER = "[";
+    String LIST_END_DELIMITER = "]";
+    String LIST_SEPARATOR = ",";
+
+    protected List<String> getKeysList(InputLine inputLine) {
+        List<String> list = new ArrayList<>();
+        String rawLine = inputLine.getOriginalLine();
+        if (rawLine == null || rawLine.isEmpty()) {
+            return list;
+        }
+        int startListIndex = rawLine.indexOf(LIST_START_DELIMITER);
+        int endListIndex = rawLine.indexOf(LIST_END_DELIMITER);
+        if (startListIndex == -1 || endListIndex == -1) {
+            return list;
+        }
+        String rawList = rawLine.substring(startListIndex + 1, endListIndex);
+        StringTokenizer st = new StringTokenizer(rawList, LIST_SEPARATOR);
+        while (st.hasMoreElements()) {
+            list.add(st.nextToken().trim());
+        }
+
+        return list;
+    }
+
+    public static void main(String[] args) {
         CommandLineTokenizer CLT = new CommandLineTokenizer();
         String raw = "update -add -json '{\"fnord\":[\"blarf0\",\"blarf1\"]}' /foo:bar";
 

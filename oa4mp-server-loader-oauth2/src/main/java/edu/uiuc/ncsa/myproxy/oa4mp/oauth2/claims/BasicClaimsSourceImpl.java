@@ -65,7 +65,7 @@ public class BasicClaimsSourceImpl implements ClaimSource {
         return configuration != null;
     }
 
-    public boolean hasJSONPreProcessoor() {
+    public boolean hasJSONPreProcessor() {
         if (getConfiguration() instanceof JSONClaimSourceConfig) {
             return ((JSONClaimSourceConfig) getConfiguration()).getJSONPreProcessing() != null;
 
@@ -73,7 +73,7 @@ public class BasicClaimsSourceImpl implements ClaimSource {
         return false;
     }
 
-    public boolean hasJSONPostProcessoor() {
+    public boolean hasJSONPostProcessor() {
         if (getConfiguration() instanceof JSONClaimSourceConfig) {
             return ((JSONClaimSourceConfig) getConfiguration()).getJSONPostProcessing() != null;
 
@@ -140,7 +140,13 @@ public class BasicClaimsSourceImpl implements ClaimSource {
     @Override
     public JSONObject process(JSONObject claims, HttpServletRequest request, ServiceTransaction transaction) throws UnsupportedScopeException {
         OA2ServiceTransaction t = (OA2ServiceTransaction) transaction;
-        if (hasConfiguration() && hasJSONPreProcessoor()) {
+        // NOTE This runs functor pre and post processors if they are in the source configuration.
+        // The older version of scripting that used functors (which is quite primitive) did not
+        // actually have a way to save its state nor good control of its execution flow, hence
+        // pre and post processors were needed. If you remove these, you will probably break every older
+        // configuration, so until nobody is using the old scripting, these must remain.
+
+        if (hasConfiguration() && hasJSONPreProcessor()) {
             OA2FunctorFactory ff = new OA2FunctorFactory(claims, t.getScopes());
             preProcessor = new FunctorScript(ff, getConfiguration().getJSONPreProcessing());
             preProcessor.execute();
@@ -148,11 +154,11 @@ public class BasicClaimsSourceImpl implements ClaimSource {
             FlowStates2 f = t.getFlowStates();
             FunctorRuntimeEngine.updateFSValues(f, postProcessor.getFunctorMap());
             t.setFlowStates(f);
-
-
         }
-        realProcessing(claims, request, t);
-        if (hasConfiguration() && hasJSONPostProcessoor()) {
+
+        realProcessing(claims, request, t); // actual work here
+
+        if (hasConfiguration() && hasJSONPostProcessor()) {
             OA2FunctorFactory ff = new OA2FunctorFactory(claims, t.getScopes());
           //  DebugUtil.dbg(this, "claims before post-processing=" + claims.toString(1));
             postProcessor = new FunctorScript(ff, getConfiguration().getJSONPostProcessing());

@@ -194,7 +194,7 @@ public class CreateSourceConfig implements QDLFunction, CSConstants {
             "            },\n" +
             "            {\n" +
             "              \"name\": \"memberOf\",\n" +
-            "              \"isGroup\": true,\n" +
+            "              \"IsInGroup\": true,\n" +
             "              \"returnAsList\": false,\n" +
             "              \"returnName\": \"isMemberOf\"\n" +
             "            }\n" +

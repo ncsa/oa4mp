@@ -176,15 +176,6 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
         say("If you need to create a hash of a secret, invoke the create_hash method on the secret");
     }
 
-    @Override
-    protected void addEntry(Identifiable identifiable, JSONObject json) {
-        
-    }
-
-    @Override
-    protected void removeEntry(Identifiable identifiable, JSONObject json) {
-
-    }
 
 
 }

@@ -197,7 +197,6 @@ public class IDTokenHandler implements PayloadHandler {
     public JSONObject execute(ClaimSource source, JSONObject claims) throws Throwable {
         if (transaction.getOA2Client().isPublicClient()) {
             // Public clients do not get more than basic claims.
-            //  oa2se.getTransactionStore().save(transaction);
             return claims;
         }
 
@@ -211,11 +210,9 @@ public class IDTokenHandler implements PayloadHandler {
     @Override
     public void finish() throws Throwable {
         // only required one by the spec. and only if the server is OIDC.
-
         if (oa2se.isOIDCEnabled()) {
             checkClaim(getClaims(), SUBJECT);
         }
-
     }
 
     @Override

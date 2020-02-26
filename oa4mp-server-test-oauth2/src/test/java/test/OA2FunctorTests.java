@@ -739,7 +739,7 @@ public class OA2FunctorTests extends JFunctorTest {
             "            },\n" +
             "            {\n" +
             "              \"name\": \"memberOf\",\n" +
-            "              \"isGroup\": true,\n" +
+            "              \"IsInGroup\": true,\n" +
             "              \"returnAsList\": false,\n" +
             "              \"returnName\": \"isMemberOf\"\n" +
             "            }\n" +
@@ -869,7 +869,7 @@ public class OA2FunctorTests extends JFunctorTest {
 
     @Test
     public void testLBXOr() throws Throwable {
-        String rawJSON = "{\"config\":\"LSST client configuration, created by JeffGaynor 6/19/2018\",\"claims\":{\"sourceConfig\":[{\"ldap\":{\"preProcessing\":[{\"$if\":[{\"$match\":[\"${idp}\",\"https://idp.ncsa.illinois.edu/idp/shibboleth\"]}],\"$then\":[{\"$set\":[\"foo\",{\"$drop\":[\"@ncsa.illinois.edu\",\"${eppn}\"]}]}],\"$else\":[{\"$get_claims\":[\"$false\"]}]}],\"postProcessing\":[{\"$if\":[{\"$match\":[\"${idp}\",\"https://idp.ncsa.illinois.edu/idp/shibboleth\"]}],\"$then\":[{\"$set\":[\"sub\",{\"$get\":[\"eppn\"]}]},{\"$exclude\":[\"foo\"]}]}],\"failOnError\":\"false\",\"address\":\"ldap.ncsa.illinois.edu\",\"port\":636,\"enabled\":\"true\",\"authorizationType\":\"none\",\"searchName\":\"foo\",\"searchAttributes\":[{\"name\":\"mail\",\"returnAsList\":false,\"returnName\":\"email\"},{\"name\":\"uid\",\"returnAsList\":false,\"returnName\":\"uid\"},{\"name\":\"uidNumber\",\"returnAsList\":false,\"returnName\":\"uidNumber\"},{\"name\":\"cn\",\"returnAsList\":false,\"returnName\":\"name\"},{\"name\":\"memberOf\",\"isGroup\":true,\"returnAsList\":false,\"returnName\":\"isMemberOf\"}],\"searchBase\":\"ou=People,dc=ncsa,dc=illinois,dc=edu\",\"contextName\":\"\",\"ssl\":{\"tlsVersion\":\"TLS\",\"useJavaTrustStore\":true},\"name\":\"3258ed63b62d1a78\"}}],\"preProcessing\":[{\"$if\":[\"$true\"],\"$then\":[{\"$set_claim_source\":[\"LDAP\",\"3258ed63b62d1a78\"]}]}]}," +
+        String rawJSON = "{\"config\":\"LSST client configuration, created by JeffGaynor 6/19/2018\",\"claims\":{\"sourceConfig\":[{\"ldap\":{\"preProcessing\":[{\"$if\":[{\"$match\":[\"${idp}\",\"https://idp.ncsa.illinois.edu/idp/shibboleth\"]}],\"$then\":[{\"$set\":[\"foo\",{\"$drop\":[\"@ncsa.illinois.edu\",\"${eppn}\"]}]}],\"$else\":[{\"$get_claims\":[\"$false\"]}]}],\"postProcessing\":[{\"$if\":[{\"$match\":[\"${idp}\",\"https://idp.ncsa.illinois.edu/idp/shibboleth\"]}],\"$then\":[{\"$set\":[\"sub\",{\"$get\":[\"eppn\"]}]},{\"$exclude\":[\"foo\"]}]}],\"failOnError\":\"false\",\"address\":\"ldap.ncsa.illinois.edu\",\"port\":636,\"enabled\":\"true\",\"authorizationType\":\"none\",\"searchName\":\"foo\",\"searchAttributes\":[{\"name\":\"mail\",\"returnAsList\":false,\"returnName\":\"email\"},{\"name\":\"uid\",\"returnAsList\":false,\"returnName\":\"uid\"},{\"name\":\"uidNumber\",\"returnAsList\":false,\"returnName\":\"uidNumber\"},{\"name\":\"cn\",\"returnAsList\":false,\"returnName\":\"name\"},{\"name\":\"memberOf\",\"IsInGroup\":true,\"returnAsList\":false,\"returnName\":\"isMemberOf\"}],\"searchBase\":\"ou=People,dc=ncsa,dc=illinois,dc=edu\",\"contextName\":\"\",\"ssl\":{\"tlsVersion\":\"TLS\",\"useJavaTrustStore\":true},\"name\":\"3258ed63b62d1a78\"}}],\"preProcessing\":[{\"$if\":[\"$true\"],\"$then\":[{\"$set_claim_source\":[\"LDAP\",\"3258ed63b62d1a78\"]}]}]}," +
                 "\"postProcessing\":{\"$xor\":[{\"$if\":[{\"$hasClaim\":[\"eppn\"]}],\"$then\":[{\"$set\":[\"voPersonExternalID\",{\"$get\":[\"eppn\"]}]}]},{\"$if\":[{\"$hasClaim\":[\"eptid\"]}],\"$then\":[{\"$set\":[\"voPersonExternalID\",{\"$get\":[\"eptid\"]}]}]},{\"$if\":[{\"$equals\":[{\"$get\":[\"idp\"]},\"http://github.com/login/oauth/authorize\"]}],\"$then\":[{\"$set\":[\"voPersonExternalID\",{\"$concat\":[{\"$get\":[\"oidc\"]},\"@github.com\"]}]}]},{\"$if\":[{\"$equals\":[{\"$get\":[\"idp\"]},\"http://google.com/accounts/o8/id\"]}],\"$then\":[{\"$set\":[\"voPersonExternalID\",{\"$concat\":[{\"$get\":[\"oidc\"]},\"@accounts.google.com\"]}]}]},{\"$if\":[{\"$equals\":[{\"$get\":[\"idp\"]},\"http://orcid.org/oauth/authorize\"]}],\"$then\":[{\"$set\":[\"voPersonExternalID\",{\"$replace\":[{\"$get\":[\"oidc\"]},\"http://\",\"https://\"]}]}]}]}," +
                 "\"isSaved\":false}";
 
@@ -1002,7 +1002,7 @@ public class OA2FunctorTests extends JFunctorTest {
                "            },\n" +
                "            {\n" +
                "              \"name\": \"memberOf\",\n" +
-               "              \"isGroup\": true,\n" +
+               "              \"IsInGroup\": true,\n" +
                "              \"returnAsList\": false,\n" +
                "              \"returnName\": \"isMemberOf\"\n" +
                "            }\n" +

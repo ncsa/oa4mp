@@ -324,6 +324,18 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
     }
 
     @Override
+    protected void rmCleanup(Identifiable x) {
+      if(!getStore().containsKey(x.getIdentifier())){
+          sayi("Removing approval record");
+          info("Removing approval record for id=" + x.getIdentifierString());
+          getClientApprovalStore().remove(x.getIdentifier());
+          sayi("Done. Client approval with id = " + x.getIdentifierString() + " has been removed from the store");
+          info("Client record removed for id=" + x.getIdentifierString());
+      }
+    }
+
+/*
+    @Override
     public void rm(InputLine inputLine) {
 
         Identifiable x = findItem(inputLine);
@@ -335,7 +347,7 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
             sayi("aborted...");
             return;
         }
-        
+
         sayi("Removing approval record");
         info("Removing approval record for id=" + x.getIdentifierString());
         getClientApprovalStore().remove(x.getIdentifier());
@@ -343,4 +355,5 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
         info("Client record removed for id=" + x.getIdentifierString());
         super.rm(inputLine);
     }
+*/
 }

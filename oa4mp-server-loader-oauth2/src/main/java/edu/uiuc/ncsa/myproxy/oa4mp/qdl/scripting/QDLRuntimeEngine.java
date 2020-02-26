@@ -10,14 +10,17 @@ import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.module.ModuleMap;
-import edu.uiuc.ncsa.qdl.scripting.QDLScript;
 import edu.uiuc.ncsa.qdl.scripting.Scripts;
 import edu.uiuc.ncsa.qdl.state.*;
 import edu.uiuc.ncsa.qdl.statements.FunctionTable;
 import edu.uiuc.ncsa.qdl.util.StemVariable;
+import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
-import edu.uiuc.ncsa.security.util.scripting.*;
-import net.sf.json.JSONArray;
+import edu.uiuc.ncsa.security.util.scripting.ScriptInterface;
+import edu.uiuc.ncsa.security.util.scripting.ScriptRunRequest;
+import edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse;
+import edu.uiuc.ncsa.security.util.scripting.ScriptRuntimeEngine;
+import net.sf.json.JSON;
 import net.sf.json.JSONObject;
 
 import java.io.IOException;
@@ -56,15 +59,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine {
      * that level.
      */
     protected void init() {
-        JSONArray array = config.getJSONArray(SCRIPTS_TAG);
-        // QDLScriptLibrary library = new QDLScriptLibrary(QDL_VIRTUAL_FILE_SYSTEM_SCHEME);
-        ScriptSet<QDLScript> scriptSet = new ScriptSet<>();
-        for (int i = 0; i < array.size(); i++) {
-            QDLScript qdlScript = Scripts.fromJSON(array.getJSONObject(i));
-            scriptSet.add(qdlScript);
-            //      library.put(QDL_VIRTUAL_FILE_SYSTEM_SCHEME + qdlScript.getProperties().getString(Scripts.ID), qdlScript);
-        }
-        setScriptSet(scriptSet);
+        setScriptSet(QDLJSONConfigUtil.readScriptSet(config));
         SymbolTableImpl symbolTable = new SymbolTableImpl();
         SymbolStack stack = new SymbolStack();
         stack.addParent(symbolTable);
@@ -154,11 +149,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine {
     protected String SCOPES_VAR = "scopes.";
     protected String CLAIM_SOURCES_VAR = "claim_sources.";
 
-    protected StemVariable mapToStem(Map map) {
-        StemVariable stemVariable = new StemVariable();
-        stemVariable.putAll(map);
-        return stemVariable;
-    }
+
 
     /**
      * This injects the values in the request in to the current state so they are available.
@@ -171,9 +162,8 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine {
 
         JSONObject claims = (JSONObject) req.getArgs().get(SRE_REQ_CLAIMS);
         StemVariable claimStem = new StemVariable();
-        if (claims != null) {
-            claimStem.putAll(claims);
-        }
+        claimStem.fromJSON(claims);
+        System.out.println("claim stem:" + claimStem.toString(1));
         state.getSymbolStack().setValue(CLAIMS_VAR, claimStem);
 
         List<String> scopes = (List<String>) req.getArgs().get(SRE_REQ_SCOPES);
@@ -260,9 +250,12 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine {
         respMap.put(SRE_REQ_FLOW_STATES, toFS(flowStem));
         respMap.put(SRE_REQ_CLAIM_SOURCES, toSources((StemVariable) state.getValue(CLAIM_SOURCES_VAR)));
         respMap.put(SRE_REQ_SCOPES, toScopes((StemVariable) state.getValue(SCOPES_VAR)));
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.putAll((StemVariable) state.getValue(CLAIMS_VAR));
-        respMap.put(SRE_REQ_CLAIMS, jsonObject);
+        StemVariable stemClaims = (StemVariable) state.getValue(CLAIMS_VAR);
+        JSON j = stemClaims.toJSON();
+        if(j.isArray()){
+            throw new NFWException("Internal error: The returned claims object was not a JSON Object.");
+        }
+        respMap.put(SRE_REQ_CLAIMS, j);
         //runResponse.
         return new ScriptRunResponse("ok", respMap, ScriptRunResponse.RC_OK);
     }

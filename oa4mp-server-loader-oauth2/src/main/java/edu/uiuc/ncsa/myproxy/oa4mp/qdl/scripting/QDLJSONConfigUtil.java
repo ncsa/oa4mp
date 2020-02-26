@@ -4,11 +4,14 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.OA2ClaimsUtil;
 import edu.uiuc.ncsa.qdl.scripting.FileEntries;
 import edu.uiuc.ncsa.qdl.scripting.JSONScriptUtil;
 import edu.uiuc.ncsa.qdl.scripting.QDLScript;
+import edu.uiuc.ncsa.qdl.scripting.Scripts;
 import edu.uiuc.ncsa.qdl.util.FileUtil;
 import edu.uiuc.ncsa.qdl.util.QDLVersion;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.ScriptingConstants;
+import edu.uiuc.ncsa.security.util.scripting.ScriptSet;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import java.io.File;
@@ -16,6 +19,7 @@ import java.io.StringReader;
 import java.util.Date;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.QDLRuntimeEngine.CONFIG_TAG;
+import static edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.QDLRuntimeEngine.SCRIPTS_TAG;
 import static edu.uiuc.ncsa.qdl.scripting.Scripts.*;
 
 /**
@@ -23,6 +27,37 @@ import static edu.uiuc.ncsa.qdl.scripting.Scripts.*;
  * on 2/12/20 at  3:21 PM
  */
 public class QDLJSONConfigUtil implements ScriptingConstants {
+
+    public static JSONObject scriptSetToJSON(ScriptSet<? extends QDLScript> scriptSet) {
+        JSONObject scripts = JSONScriptUtil.createConfig();
+        for (QDLScript s : scriptSet.getScripts()) {
+            JSONScriptUtil.addScript(scripts, s);
+        }
+        JSONObject config = new JSONObject();
+        config.put(CONFIG_TAG, scripts);
+        return config;
+    }
+
+    /**
+     * This assumes that the configuration is the scripts tag, not the entire configuration.
+     * I.e. the thing passed in is the entry here:
+     * <pre>
+     *     {"qdl":{"scripts":[...]}}
+     * </pre>
+     * @param config
+     * @return
+     */
+    public static ScriptSet readScriptSet(JSONObject config) {
+        JSONArray array = config.getJSONArray(SCRIPTS_TAG);
+        // QDLScriptLibrary library = new QDLScriptLibrary(QDL_VIRTUAL_FILE_SYSTEM_SCHEME);
+        ScriptSet<QDLScript> scriptSet = new ScriptSet<>();
+        for (int i = 0; i < array.size(); i++) {
+            QDLScript qdlScript = Scripts.fromJSON(array.getJSONObject(i));
+            scriptSet.add(qdlScript);
+        }
+        return scriptSet;
+    }
+
     /**
      * Creates a script from a file. Note that this takes a convenience approach:
      * If the file name is the same as one of the execute phases, the phase is
@@ -55,6 +90,7 @@ public class QDLJSONConfigUtil implements ScriptingConstants {
         xp.put(LANG_VERSION, QDLVersion.VERSION);
         xp.put(SCRIPT_VERSION, "1.0");
         xp.put(CREATE_TIME, Iso8601.date2String(new Date()));
+        xp.put(LAST_MODIFIED, Iso8601.date2String(new Date()));
         QDLScript qdlScript = new QDLScript(new StringReader(rawScript), xp);
         JSONObject scripts = JSONScriptUtil.createConfig();
         JSONScriptUtil.addScript(scripts, qdlScript);
@@ -94,8 +130,8 @@ public class QDLJSONConfigUtil implements ScriptingConstants {
 
         String script = FileUtil.readFileAsString(absolutePath);
         XProperties xp = new XProperties();
-        String scriptName = absolutePath.substring(absolutePath.lastIndexOf(File.separator)+1); // drop extension
-        scriptName = scriptName.substring(0,scriptName.lastIndexOf("."));
+        String scriptName = absolutePath.substring(absolutePath.lastIndexOf(File.separator) + 1); // drop extension
+        scriptName = scriptName.substring(0, scriptName.lastIndexOf("."));
         switch (scriptName) {
             case SRE_EXEC_INIT:
                 xp.put(EXEC_PHASE, OA2ClaimsUtil.SRE_EXEC_INIT);
@@ -206,8 +242,8 @@ public class QDLJSONConfigUtil implements ScriptingConstants {
         script.append("f. := new_template('ncsa');\n");
         script.append("claim_sources.0. := create_source(f.);\n");
         XProperties xp = new XProperties();
-        xp.put(EXEC_PHASE, OA2ClaimsUtil.SRE_EXEC_INIT);
-        xp.put(ID, SRE_EXEC_INIT + QDLVersion.DEFAULT_FILE_EXTENSION);
+        xp.put(EXEC_PHASE, OA2ClaimsUtil.SRE_PRE_AUTH);
+        xp.put(ID, SRE_PRE_AUTH + QDLVersion.DEFAULT_FILE_EXTENSION);
         xp.put(LANGUAGE, "qdl");
         xp.put(LANG_VERSION, "1.0");
         xp.put(SCRIPT_VERSION, "1.0");
@@ -216,11 +252,16 @@ public class QDLJSONConfigUtil implements ScriptingConstants {
         JSONScriptUtil.addScript(scripts, qdlScript);
 
         script = new StringBuffer();
-        script.append("say(claim_sources.);");
-        script.append("say(flow_states.);");
+        script.append("if[");
+        script.append("  in_group(claims.isMemberOf., 'all_users')");
+        script.append("]then[");
+        script.append("  claims.check := 'in group';");
+        script.append("]else[");
+        script.append("  claims.check := 'not in group';");
+        script.append("]; //end if");
         xp = new XProperties();
-        xp.put(EXEC_PHASE, OA2ClaimsUtil.SRE_PRE_AT);
-        xp.put(ID, SRE_PRE_AT + QDLVersion.DEFAULT_FILE_EXTENSION);
+        xp.put(EXEC_PHASE, OA2ClaimsUtil.SRE_POST_AT);
+        xp.put(ID, SRE_POST_AT + QDLVersion.DEFAULT_FILE_EXTENSION);
         xp.put(LANGUAGE, "qdl");
         xp.put(LANG_VERSION, "1.0");
         xp.put(SCRIPT_VERSION, "1.0");
@@ -291,7 +332,7 @@ public class QDLJSONConfigUtil implements ScriptingConstants {
     }
 
     public static void main(String[] args) {
-        testLoadDir();
+        // testLoadDir();
         createNCSA();
     }
 }

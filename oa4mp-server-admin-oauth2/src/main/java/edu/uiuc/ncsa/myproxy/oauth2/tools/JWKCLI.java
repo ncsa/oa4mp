@@ -31,7 +31,6 @@ public class JWKCLI extends ConfigurableCommandsImpl {
     }
 
 
-
     public void about() {
         int width = 60;
         String stars = StringUtils.rightPad("", width + 1, "*");
@@ -216,7 +215,7 @@ public class JWKCLI extends ConfigurableCommandsImpl {
         arg.removeSwitch(JWKUtilCommands.BATCH_FILE_MODE_FLAG);
         arg.removeSwitch(JWKUtilCommands.BATCH_FILE_MODE_FLAG);
         arg.removeSwitch(DUMMY_FUNCTION);
-      cli.execute(arg.argsToVector());
+        cli.execute(arg);
     }
 
     protected void batchFileHelp() {
@@ -258,7 +257,7 @@ public class JWKCLI extends ConfigurableCommandsImpl {
 
         for (String command : commands) {
             try {
-                if(cli.hasEnv()){
+                if (cli.hasEnv()) {
                     command = TemplateUtil.replaceAll(command, cli.getEnv());
                 }
                 int rc = cli.execute(command);

@@ -62,7 +62,7 @@ public class LdapConfig {
                 },
                 {
                   "name": "memberOf",
-                  "isGroup": true,
+                  "IsInGroup": true,
                   "returnAsList": false,
                   "returnName": "isMemberOf"
                 }
