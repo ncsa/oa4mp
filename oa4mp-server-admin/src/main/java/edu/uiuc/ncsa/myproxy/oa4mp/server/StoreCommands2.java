@@ -201,7 +201,7 @@ public abstract class StoreCommands2 extends StoreCommands {
 
     @Override
     protected void showLSHelp() {
-        say("ls [-l | -la] | [" + KEY_FLAG + " key | " + KEYS_FLAG + " array] [id]");
+        say("ls [-l | -la] | [" + KEY_FLAG + " key | " + KEYS_FLAG + " array] id");
         sayi("Lists information about the contents of the store, an entry and individual values of the entry.");
         sayi("When listing multiple entries, tools will use the most numbers from the most recent call to this.");
         say("E.g.");
@@ -345,7 +345,7 @@ public abstract class StoreCommands2 extends StoreCommands {
         sayi("update " + KEYS_FLAG + " [name,callback_uri] /foo:bar");
         sayi("This would prompt to update the values for the 'name' and 'callback_uri' properties");
         sayi("of the object with id 'foo:bar'");
-        sayi("A few notes. If the value of the property is a JSON object, yo can edit it.");
+        sayi("A few notes. If the value of the property is a JSON object, you can edit it.");
         sayi("If the value of the property is an array, then you may add a value, delete a value,");
         sayi("replace the entire contents (new entries are comma separated) or simple clear the .");
         sayi("entire list of entries.");

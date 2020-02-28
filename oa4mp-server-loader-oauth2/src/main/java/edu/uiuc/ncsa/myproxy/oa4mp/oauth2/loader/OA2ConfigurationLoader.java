@@ -29,6 +29,9 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.storage.filestore.DSFSClientStoreProvi
 import edu.uiuc.ncsa.myproxy.oa4mp.server.storage.sql.provider.DSSQLClientApprovalStoreProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.ClientApprovalMemoryStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.ClientApproverConverter;
+import edu.uiuc.ncsa.qdl.config.QDLConfigurationConstants;
+import edu.uiuc.ncsa.qdl.config.QDLConfigurationLoader;
+import edu.uiuc.ncsa.qdl.config.QDLEnvironment;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.configuration.Configurations;
@@ -133,7 +136,8 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     isUtilServerEnabled(),
                     isOIDCEnabled(),
                     getMultiJSONStoreProvider(),
-                    getCmConfigs());
+                    getCmConfigs(),
+                    getQDLEnvironment());
             if (getClaimSource() instanceof BasicClaimsSourceImpl) {
                 ((BasicClaimsSourceImpl) getClaimSource()).setOa2SE((OA2SE) se);
             }
@@ -141,6 +145,15 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
             throw new GeneralException("Error: Could not create the runtime environment", e);
         }
+    }
+
+    protected QDLEnvironment getQDLEnvironment() {
+        ConfigurationNode node = getFirstNode(cn, QDLConfigurationConstants.CONFIG_TAG_NAME);
+        if (node == null) {
+            return new QDLEnvironment();// no op. This is disabled.
+        }
+        QDLConfigurationLoader loader = new QDLConfigurationLoader(node,loggerProvider.get());
+        return loader.load();
     }
 
     HashMap<String, String> constants;
@@ -238,12 +251,12 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                                 getFirstAttribute(sn, ClientManagementConstants.ENDPOINT_ATTRIBUTE)
                         );
                         cmConfigs.put(cfg);
-                    }catch(Throwable t){
-                        ServletDebugUtil.warn(this,  "error loading client management api entry \"" + t.getMessage() + "\"");
+                    } catch (Throwable t) {
+                        ServletDebugUtil.warn(this, "error loading client management api entry \"" + t.getMessage() + "\"");
                     }
                 }
             }
-            if(cmConfigs.isEmpty()){
+            if (cmConfigs.isEmpty()) {
                 cmConfigs = createDefaultCMConfig();
                 ServletDebugUtil.warn(this, "Warning: none of the entries in the client managment element parsed. Using defaults...");
 

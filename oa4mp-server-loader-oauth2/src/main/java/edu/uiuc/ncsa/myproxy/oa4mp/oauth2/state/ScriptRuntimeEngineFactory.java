@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.functor.FunctorRuntimeEngine;
 import edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.QDLRuntimeEngine;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRunRequest;
@@ -12,9 +13,9 @@ import net.sf.json.JSONObject;
  * on 2/12/20 at  1:36 PM
  */
 public class ScriptRuntimeEngineFactory {
-    public static ScriptRuntimeEngine createRTE(JSONObject config){
+    public static ScriptRuntimeEngine createRTE(OA2SE oa2SE, JSONObject config){
         if(config.containsKey(QDLRuntimeEngine.CONFIG_TAG)){
-            return new QDLRuntimeEngine(config.getJSONObject(QDLRuntimeEngine.CONFIG_TAG));
+            return new QDLRuntimeEngine(oa2SE.getQDLEnvironment(), config.getJSONObject(QDLRuntimeEngine.CONFIG_TAG));
         }
         if(config.containsKey("config")){
             return new FunctorRuntimeEngine(config);

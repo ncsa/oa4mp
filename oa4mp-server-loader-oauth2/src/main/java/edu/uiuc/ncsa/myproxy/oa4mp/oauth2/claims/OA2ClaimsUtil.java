@@ -54,7 +54,7 @@ public class OA2ClaimsUtil implements ScriptingConstants {
 
     public ScriptRuntimeEngine getScriptRuntimeEngine() {
         if (scriptRuntimeEngine == null) {
-            scriptRuntimeEngine = ScriptRuntimeEngineFactory.createRTE(getOA2Client().getConfig());
+            scriptRuntimeEngine = ScriptRuntimeEngineFactory.createRTE(oa2se, getOA2Client().getConfig());
         }
         return scriptRuntimeEngine;
     }

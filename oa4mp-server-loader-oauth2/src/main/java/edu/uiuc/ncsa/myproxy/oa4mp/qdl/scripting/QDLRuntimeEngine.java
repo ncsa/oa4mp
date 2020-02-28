@@ -3,15 +3,18 @@ package edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowStates2;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowType;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ScriptRuntimeEngineFactory;
-import edu.uiuc.ncsa.myproxy.oa4mp.qdl.OA2QDLLoader;
 import edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims.ConfigtoCS;
+import edu.uiuc.ncsa.qdl.config.QDLConfigurationLoaderUtils;
+import edu.uiuc.ncsa.qdl.config.QDLEnvironment;
 import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
-import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.module.ModuleMap;
 import edu.uiuc.ncsa.qdl.scripting.Scripts;
-import edu.uiuc.ncsa.qdl.state.*;
+import edu.uiuc.ncsa.qdl.state.ImportManager;
+import edu.uiuc.ncsa.qdl.state.State;
+import edu.uiuc.ncsa.qdl.state.StateUtils;
+import edu.uiuc.ncsa.qdl.state.SymbolStack;
 import edu.uiuc.ncsa.qdl.statements.FunctionTable;
 import edu.uiuc.ncsa.qdl.util.StemVariable;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
@@ -39,14 +42,14 @@ import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowType.*;
 public class QDLRuntimeEngine extends ScriptRuntimeEngine {
     public static String CONFIG_TAG = "qdl";
     public static String SCRIPTS_TAG = "scripts";
-    public static String QDL_VIRTUAL_FILE_SYSTEM_SCHEME = "qdl-vfs:";
 
-
-    public QDLRuntimeEngine(JSONObject config) {
+    public QDLRuntimeEngine(QDLEnvironment qe, JSONObject config) {
         super(config);
+        this.qe = qe;
         init();
     }
 
+    QDLEnvironment qe;
     /**
      * The structure of the configuration file (for backwards compatibility) is
      * <pre>
@@ -60,9 +63,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine {
      */
     protected void init() {
         setScriptSet(QDLJSONConfigUtil.readScriptSet(config));
-        SymbolTableImpl symbolTable = new SymbolTableImpl();
         SymbolStack stack = new SymbolStack();
-        stack.addParent(symbolTable);
         state = new State(ImportManager.getResolver(),
                 stack,
                 new OpEvaluator(),
@@ -70,16 +71,24 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine {
                 new FunctionTable(),
                 new ModuleMap(),
                 true);// enable server mode.
-
+        if(qe != null && qe.isEnabled()) {
+            try {
+                QDLConfigurationLoaderUtils.setupVFS(qe, state);
+                QDLConfigurationLoaderUtils.setupModules(qe, state);
+                QDLConfigurationLoaderUtils.runBootScript(qe, state);
+            } catch (Throwable throwable) {
+                throwable.printStackTrace();
+            }
+        }
 
         //  state.addScriptProvider(library); // This means
         //  that the set of scripts in the config file now is in a virtual file system
         // add the modules
-        OA2QDLLoader loader = new OA2QDLLoader();
+       /* OA2QDLLoader loader = new OA2QDLLoader();
         for (Module m : loader.load()) {
             state.addModule(m); // done!
             state.getImportedModules().addImport(m.getNamespace(), m.getAlias());
-        }
+        }*/
     }
 
     @Override

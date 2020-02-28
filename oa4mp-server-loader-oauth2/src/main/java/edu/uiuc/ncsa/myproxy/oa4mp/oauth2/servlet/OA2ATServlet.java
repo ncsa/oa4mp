@@ -170,32 +170,33 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         IssuerTransactionState state = doDelegation(client, request, response);
         ATIResponse2 atResponse = (ATIResponse2) state.getIssuerResponse();
         atResponse.setSignToken(client.isSignTokens());
+        OA2SE oa2SE = (OA2SE) getServiceEnvironment();
+
         OA2ServiceTransaction st2 = (OA2ServiceTransaction) state.getTransaction();
         if (!st2.getFlowStates().acceptRequests || !st2.getFlowStates().accessToken) {
             throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "access denied", HttpStatus.SC_UNAUTHORIZED);
         }
-        JWTRunner jwtRunner = new JWTRunner(st2, ScriptRuntimeEngineFactory.createRTE(st2.getOA2Client().getConfig()));
-        IDTokenHandler idTokenHandler = new IDTokenHandler((OA2SE) getServiceEnvironment(),
-                st2);
+        JWTRunner jwtRunner = new JWTRunner(st2, ScriptRuntimeEngineFactory.createRTE(oa2SE, st2.getOA2Client().getConfig()));
+        IDTokenHandler idTokenHandler = new IDTokenHandler(oa2SE,st2);
         jwtRunner.addHandler(idTokenHandler);
         jwtRunner.doTokenClaims();
-        OA2ClaimsUtil claimsUtil = new OA2ClaimsUtil((OA2SE) getServiceEnvironment(), st2);
+        OA2ClaimsUtil claimsUtil = new OA2ClaimsUtil(oa2SE, st2);
         // claimsUtil.processClaims();
 
         atResponse.setClaims(st2.getClaims());
         DebugUtil.trace(this, "set token signing flag =" + atResponse.isSignToken());
-        if (!client.isRTLifetimeEnabled() && ((OA2SE) getServiceEnvironment()).isRefreshTokenEnabled()) {
+        if (!client.isRTLifetimeEnabled() && oa2SE.isRefreshTokenEnabled()) {
             // Since this bit of information could be extremely useful if a service decides
             // eto start issuing refresh tokens after
             // clients have been registered, it should be logged.
             info("Refresh tokens are disabled for client " + client.getIdentifierString() + ", but enabled on the server. No refresh token will be made.");
         }
-        if (client.isRTLifetimeEnabled() && ((OA2SE) getServiceEnvironment()).isRefreshTokenEnabled()) {
+        if (client.isRTLifetimeEnabled() && oa2SE.isRefreshTokenEnabled()) {
 
             RefreshToken rt = atResponse.getRefreshToken();
             st2.setRefreshToken(rt);
             // First pass through the system should have the system default as the refresh token lifetime.
-            st2.setRefreshTokenLifetime(((OA2SE) getServiceEnvironment()).getRefreshTokenLifetime());
+            st2.setRefreshTokenLifetime(oa2SE.getRefreshTokenLifetime());
             rt.setExpiresIn(computeRefreshLifetime(st2));
             st2.setRefreshTokenValid(true);
         } else {
@@ -342,7 +343,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         // is that they exist only for the initialization.
 
 
-        JWTRunner jwtRunner = new JWTRunner(t, ScriptRuntimeEngineFactory.createRTE(t.getOA2Client().getConfig()));
+        JWTRunner jwtRunner = new JWTRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2SE, t.getOA2Client().getConfig()));
         IDTokenHandler idTokenHandler = new IDTokenHandler((OA2SE) getServiceEnvironment(), t);
         jwtRunner.addHandler(idTokenHandler);
         try {

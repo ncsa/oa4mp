@@ -8,6 +8,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionsStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AuthorizationServletConfig;
+import edu.uiuc.ncsa.qdl.config.QDLEnvironment;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
@@ -68,7 +69,8 @@ public class OA2SE extends ServiceEnvironmentImpl {
                  boolean utilServletEnabled,
                  boolean oidcEnabled,
                  Provider<JSONStore> jsonStoreProvider,
-                 CMConfigs cmConfigs) {
+                 CMConfigs cmConfigs,
+                 QDLEnvironment qdlEnvironment) {
         super(logger,
                 mfp,
                 tsp,
@@ -119,8 +121,18 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.oidcEnabled = oidcEnabled;
         this.jsonStoreProvider = jsonStoreProvider;
         this.cmConfigs = cmConfigs;
+        this.qdlEnvironment = qdlEnvironment;
     }
 
+    public QDLEnvironment getQDLEnvironment() {
+        return qdlEnvironment;
+    }
+
+    public void setQDLEnvironment(QDLEnvironment qdlEnvironment) {
+        this.qdlEnvironment = qdlEnvironment;
+    }
+
+    QDLEnvironment qdlEnvironment;
     CMConfigs cmConfigs = null;
 
     public CMConfigs getCmConfigs() {

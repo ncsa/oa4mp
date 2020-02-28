@@ -146,11 +146,7 @@ public class OA2CLCCommands extends CLCCommands {
             }
         }
     }
- /*     public void revoke(InputLine inputLine){
-        if(inputLine.hasArg("-rt")){
 
-        }
-      }*/
     public OA2Asset getDummyAsset() {
         return dummyAsset;
     }
