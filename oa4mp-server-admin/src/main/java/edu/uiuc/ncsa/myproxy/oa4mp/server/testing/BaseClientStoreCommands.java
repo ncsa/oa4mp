@@ -57,6 +57,8 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
          return inputJSON(oldJSON, componentName, false);
      }
 
+
+
      /**
       * Allows for entering a new JSON object. This permits multi-line entry so formatted JSON can be cut and pasted
       * into the command line (as long as there are no blank lines). This will validate the JSON, print out a message and

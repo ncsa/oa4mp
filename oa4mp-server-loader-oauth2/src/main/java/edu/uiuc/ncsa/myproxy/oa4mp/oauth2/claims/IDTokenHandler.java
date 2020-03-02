@@ -23,8 +23,7 @@ import java.util.List;
 import static edu.uiuc.ncsa.security.core.util.DebugUtil.trace;
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.AUTHORIZATION_TIME;
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.NONCE;
-import static edu.uiuc.ncsa.security.oauth_2_0.jwt.ScriptingConstants.SRE_REQ_CLAIMS;
-import static edu.uiuc.ncsa.security.oauth_2_0.jwt.ScriptingConstants.SRE_REQ_CLAIM_SOURCES;
+import static edu.uiuc.ncsa.security.oauth_2_0.jwt.ScriptingConstants.*;
 import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.*;
 
 /**
@@ -102,7 +101,7 @@ public class IDTokenHandler implements PayloadHandler {
         claims.put(OA2Claims.ISSUER, issuer);
         claims.put(OA2Claims.SUBJECT, transaction.getUsername());
         claims.put(AUDIENCE, transaction.getClient().getIdentifierString());
-        claims.put(OA2Constants.ID_TOKEN_IDENTIFIER, ((OA2TokenForge)oa2se.getTokenForge()).getIDToken().getToken());
+        claims.put(OA2Constants.ID_TOKEN_IDENTIFIER, ((OA2TokenForge) oa2se.getTokenForge()).getIDToken().getToken());
         // now set all the timestamps and such.
         setAccountingInformation();
         checkRequiredScopes(transaction);
@@ -154,6 +153,7 @@ public class IDTokenHandler implements PayloadHandler {
     public void addRequestState(ScriptRunRequest req) throws Throwable {
         req.getArgs().put(SRE_REQ_CLAIMS, getClaims());
         req.getArgs().put(SRE_REQ_CLAIM_SOURCES, getSources()); // so its a map
+        req.getArgs().put(SRE_REQ_EXTENDED_ATTRIBUTES, getExtendedAttributes()); // so its a map
     }
 
     @Override
@@ -165,6 +165,7 @@ public class IDTokenHandler implements PayloadHandler {
                 // to make them accessible to their machinery, then convert them back.
                 claims = (JSONObject) resp.getReturnedValues().get(SRE_REQ_CLAIMS);
                 sources = (List<ClaimSource>) resp.getReturnedValues().get(SRE_REQ_CLAIM_SOURCES);
+                extendedAttributes = (JSONObject) resp.getReturnedValues().get(SRE_REQ_EXTENDED_ATTRIBUTES);
             case ScriptRunResponse.RC_NOT_RUN:
                 return;
 
@@ -232,6 +233,15 @@ public class IDTokenHandler implements PayloadHandler {
             claims = transaction.getClaims();
         }
         return claims;
+    }
+
+    JSONObject extendedAttributes = null;
+
+    public JSONObject getExtendedAttributes() {
+        if (extendedAttributes == null) {
+            extendedAttributes = transaction.getExtendedAttributes();
+        }
+        return extendedAttributes;
     }
 
     /**

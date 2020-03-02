@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state;
 
+import edu.uiuc.ncsa.qdl.util.StemVariable;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -35,7 +36,7 @@ public class ExtendedParameters {
      * @return
      */
     public JSONObject toJSON(String rawKey, String[] rawValues) {
-        String ns = rawKey.substring(0,rawKey.indexOf(PREFIX_DELIMITER));
+        String ns = rawKey.substring(0, rawKey.indexOf(PREFIX_DELIMITER));
         if (ns.isEmpty()) {
             return null;
         }
@@ -70,19 +71,16 @@ public class ExtendedParameters {
      * This does the grunt work of looking through the headers and pulling out the extended attributes.
      * The format of the extended attributes is
      * <pre>
-     * {"extendedAttributes":[
-     *     {"NS0":[
-     *        {"key0_0":[values]},
-     *        {"key0_1":[values]},...
-     *        ]
-     *     },
-     *     {"NS1":[
-     *         {"key1_0":[values]},
-     *         {"key1_1":[values]},...
-     *         ]
-     *      },
-     *   ]
-     * }
+     *     {"NS0":
+     *        {"key0_0":[values],
+     *        "key0_1":[values],...
+     *        },
+     *     "NS1":
+     *         {"key1_0":[values],
+     *         "key1_1":[values],...
+     *         },
+     *      ... more entries
+     *   }
      * </pre>
      * where
      * <ul>
@@ -95,55 +93,62 @@ public class ExtendedParameters {
      * @return
      */
     public JSONObject snoopHeaders(Map<String, String[]> pmap) {
-        JSONArray cilogonArray = null;
-        JSONArray oa4mpArray = null;
-        JSONArray thisArray = null;
+        JSONObject cilogonEntry = null;
+        JSONObject oa4mpEntry = null;
         for (String key : pmap.keySet()) {
             String[] values = pmap.get(key);
-            JSONObject j = toJSON(key, values);
+            JSONObject j = toJSON(key, values); // return {NS:{key:[]}}
             if (j != null) {
                 if (j.containsKey(CILOGON_NS)) {
-                    if (cilogonArray == null) {
-                        cilogonArray = new JSONArray();
+                    if (cilogonEntry == null) {
+                        cilogonEntry = new JSONObject();
                     }
-                    cilogonArray.add(j.getJSONObject(CILOGON_NS));
+                    flattenJSON(CILOGON_NS, cilogonEntry, j);
                 }
                 if (j.containsKey(OA4MP_NS)) {
-                    if (oa4mpArray == null) {
-                        oa4mpArray = new JSONArray();
+                    if (oa4mpEntry == null) {
+                        oa4mpEntry = new JSONObject();
                     }
-                    oa4mpArray.add(j.getJSONObject(OA4MP_NS));
+                    flattenJSON(OA4MP_NS, oa4mpEntry, j);
                 }
             }
         }
-        JSONArray entry = new JSONArray();
-        if (cilogonArray != null && !cilogonArray.isEmpty()) {
-            JSONObject centry = new JSONObject();
-            centry.put(CILOGON_NS, cilogonArray);
-            entry.add(centry);
+        JSONObject entry = new JSONObject();
+        if (cilogonEntry != null && !cilogonEntry.isEmpty()) {
+            entry.put(CILOGON_NS, cilogonEntry);
         }
-        if (oa4mpArray != null && !oa4mpArray.isEmpty()) {
-            JSONObject oentry = new JSONObject();
-            oentry.put(OA4MP_NS, oa4mpArray);
-            entry.add(oentry);
+        if (oa4mpEntry != null && !oa4mpEntry.isEmpty()) {
+            entry.put(OA4MP_NS, oa4mpEntry);
         }
-        JSONObject output = new JSONObject();
 
         if (entry.isEmpty()) {
-            return output;
+            return new JSONObject();
         }
-        output.put(EXTENDED_ATTRIBUTES_KEY, entry);
-        return output;
+        return entry;
 
     }
-    public static void main(String[] args){
+
+    protected void flattenJSON(String namespace, JSONObject cilogonEntry, JSONObject j) {
+        JSONObject jo = j.getJSONObject(namespace);
+        // flatten it to an object
+        for (Object kk : jo.keySet()) {
+            cilogonEntry.put(kk, jo.get(kk));
+        }
+    }
+
+    public static void main(String[] args) {
         HashMap<String, String[]> pmap = new HashMap<>();
-        pmap.put(CILOGON_NS + ":role", new String[]{"a","b"});
-        pmap.put(CILOGON_NS + ":role2", new String[]{"c","d"});
+        pmap.put(CILOGON_NS + ":role", new String[]{"a", "b"});
+        pmap.put(CILOGON_NS + ":role2", new String[]{"c", "d"});
         pmap.put(CILOGON_NS + ":role3", new String[]{"e"});
         pmap.put(OA4MP_NS + ":role1", new String[]{"A", "B", "C"});
         pmap.put(OA4MP_NS + ":foo", new String[]{"D", "E", "F"});
         ExtendedParameters xp = new ExtendedParameters();
-        System.out.println(xp.snoopHeaders(pmap).toString(2));
+        JSONObject jsonObject = xp.snoopHeaders(pmap);
+
+        System.out.println(jsonObject.toString(2));
+        StemVariable stemVariable = new StemVariable();
+        stemVariable.fromJSON(jsonObject);
+        System.out.println(stemVariable.toString(2));
     }
 }

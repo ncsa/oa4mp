@@ -4,6 +4,8 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2ClientUtils;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.QDLJSONConfigUtil;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.ClientStoreCommands;
+import edu.uiuc.ncsa.qdl.scripting.JSONScriptUtil;
+import edu.uiuc.ncsa.qdl.scripting.Scripts;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
@@ -13,7 +15,6 @@ import edu.uiuc.ncsa.security.delegation.storage.BaseClient;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.ScriptingConstants;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfigurationUtil;
 import edu.uiuc.ncsa.security.util.cli.CLIDriver;
-import edu.uiuc.ncsa.security.util.cli.ExitException;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import edu.uiuc.ncsa.security.util.scripting.ScriptSet;
 import net.sf.json.JSON;
@@ -28,9 +29,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import static edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.QDLRuntimeEngine.CONFIG_TAG;
+import static edu.uiuc.ncsa.qdl.scripting.JSONScriptUtil.SCRIPTS_TAG;
 import static edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval.Status.APPROVED;
-import static edu.uiuc.ncsa.security.util.cli.CLIDriver.CLEAR_BUFFER_COMMAND;
-import static edu.uiuc.ncsa.security.util.cli.CLIDriver.EXIT_COMMAND;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -425,9 +426,14 @@ public class OA2ClientCommands extends ClientStoreCommands {
             }
 
         }
-        boolean loadQDL = getInput("Load a QDL script or add JSON? (q/j)", "j").equalsIgnoreCase("q");
+        boolean loadQDL = getInput("Load only a QDL script or edit the JSON? (q/j)", "j").equalsIgnoreCase("q");
         if (loadQDL) {
-            client.setConfig(loadQDLScript(client));
+            JSONObject oldCfg = client.getConfig();
+            JSONObject qdlcfg = loadQDLScript(oldCfg);
+            if (qdlcfg == null) {
+                // do nothing
+            }
+
         } else {
             JSONObject newConfig = (JSONObject) inputJSON(client.getConfig(), "client configuration");
             if (newConfig != null) {
@@ -436,45 +442,37 @@ public class OA2ClientCommands extends ClientStoreCommands {
         }
     }
 
-    protected JSONObject loadQDLScript(OA2Client client) {
+    @Override
+    protected boolean supportsQDL() {
+        return true;
+    }
 
+
+    @Override
+    protected JSONObject loadQDLScript(JSONObject currentConfig) {
+       /* The configuration is the entire qdl object , i.e.
+          {"qdl":{"scripts":[...]}}
+        */
         say("select one of the following ways to do this:");
         //  say("d - load a directory of scripts (advanced!)");
-        say("e - edit a script");
+        say("e - edit a script with the line editor");
         say("f - read a script from a file");
-        say("p - paste a JSON configuration");
+        say("p - paste a QDL configuration");
 //        say("w - start the QDL workspace");
         String option = readline().trim().toLowerCase();
+        JSONObject result = null;
         switch (option) {
-            case "d":
+          /*  case "d":
                 say("Sorry, that is not quite ready");
-                break;
+                break;*/
             case "e":
-                ScriptSet scriptSet = QDLJSONConfigUtil.readScriptSet(client.getConfig());
+                ScriptSet scriptSet = QDLJSONConfigUtil.readScriptSet(currentConfig);
                 QDLCLICommands qdlcliCommands = new QDLCLICommands(logger, scriptSet);
                 CLIDriver driver = new CLIDriver(qdlcliCommands);
                 driver.start();
-                return QDLJSONConfigUtil.scriptSetToJSON(qdlcliCommands.getScriptSet());
-/*                say("Enter the phase for this script. Phases are: " + Arrays.toString(ScriptingConstants.SRE_PHASES));
-                String execPhase = readline().trim();
-                StringBuffer stringBuffer = new StringBuffer();
-                LineEditor lineEditor = new LineEditor(stringBuffer);
-                try {
-                    lineEditor.execute();
-                    if (!lineEditor.isSaved()) {
-                        String inLine = getInput("Did you want to save the buffer? (y/n):", "y");
-                        if (inLine.equals("y")) {
-                            return QDLJSONConfigUtil.createCfgFromString(lineEditor.bufferToString(), execPhase);
-                        }
-                    }
-                } catch (Throwable t) {
-                    say("well, that didn't work:" + t.getMessage());
-                }
+                result = QDLJSONConfigUtil.scriptSetToJSON(qdlcliCommands.getScriptSet());
                 break;
-                */
             case "f":
-
-
                 say("Enter the name of a QDL script. Generally if the name is the same as the execution phase");
                 say("You don't have to do anything else");
                 say("phases are: " + ScriptingConstants.SRE_PHASES);
@@ -484,14 +482,18 @@ public class OA2ClientCommands extends ClientStoreCommands {
                     say("Sorry, you did not enter a valid file name");
                 }
                 try {
-                    return QDLJSONConfigUtil.createCfg(fileName);
+                    // This creates a completely new configuration with only this script in it.
+                    result = QDLJSONConfigUtil.createCfg(fileName);
                 } catch (Throwable throwable) {
                     say("sorry, that didn't work:" + throwable.getMessage());
+                    return null;
                 }
 
                 break;
             case "p":
-                return (JSONObject) inputJSON(client.getConfig(), "QDL script");
+                result = inputJSON(currentConfig, "QDL script"); // This shows the QDL tag, which is probably better
+                break;
+            //return  inputJSON(currentConfig.getJSONObject(QDLRuntimeEngine.CONFIG_TAG), "QDL script");
           /*  case "w":
                 QDLWorkspace workspace = new QDLWorkspace(new WorkspaceCommands()));
                 String args[] = new String[]{"-ext \"edu.uiuc.ncsa.myproxy.oa4mp.qdl.OA2QDLLoader\""};
@@ -499,79 +501,50 @@ public class OA2ClientCommands extends ClientStoreCommands {
 */
             default:
                 say("sorry, i didn't understand that.");
-        }
-        return new JSONObject();
-
-    }
-
-    protected JSON inputJSON(JSON oldJSON, String componentName) {
-        return inputJSON(oldJSON, componentName, false);
-    }
-
-    @Override
-    public void update(InputLine inputLine) {
-
-        super.update(inputLine);
-    }
-
-    /**
-     * Allows for entering a new JSON object. This permits multi-line entry so formatted JSON can be cut and pasted
-     * into the command line (as long as there are no blank lines). This will validate the JSON, print out a message and
-     * check that you want to keep the new JSON. Note that you cannot overwrite the value of a configuration at this point
-     * mostly as a safety feature. So hitting return or /exit will have the same effect of keeping the current value.
-     *
-     * @param oldJSON
-     * @return null if the input is terminated (so retain the old object)
-     */
-    protected JSON inputJSON(JSON oldJSON, String componentName, boolean isArray) {
-        if (oldJSON == null) {
-            sayi("no current value for " + componentName);
-        } else {
-            sayi("current value for " + componentName + ":");
-            say(oldJSON.toString(2));
-        }
-        sayi("Enter new JSON value. An empty line terminates input. Entering a line with " + EXIT_COMMAND + " will terminate input too.\n Hitting " + CLEAR_BUFFER_COMMAND + " will clear the contents of this.");
-        String rawJSON = "";
-        boolean redo = true;
-        while (redo) {
-            try {
-                String inLine = readline();
-                while (!isEmpty(inLine)) {
-                    if (inLine.equals(CLEAR_BUFFER_COMMAND)) {
-                        if (isArray) {
-                            return new JSONArray();
-                        } else {
-                            return new JSONObject();
-                        }
-                    }
-                    rawJSON = rawJSON + inLine;
-                    inLine = readline();
-                }
-            } catch (ExitException x) {
-                // ok, so user terminated input. This ends the whole thing
                 return null;
-            }
-            // if the user just hits return with no input, do nothing. This lets them skip over unchanged entries.
-            if (rawJSON.isEmpty()) {
-                return null;
-            }
-            try {
-                JSON json = null;
-                if (isArray) {
-                    json = JSONArray.fromObject(rawJSON);
-                } else {
-                    json = JSONObject.fromObject(rawJSON);
-                }
-                sayi("Success! JSON is valid.");
-                return json;
-            } catch (Throwable t) {
-                sayi("uh-oh... It seems this was not a valid JSON object. The parser message reads:\"" + t.getMessage() + "\"");
-                redo = isOk(getInput("Try to re-enter this?", "true"));
-            }
+        }
+        // If nothing happened, just return the original.
+        if (result == null) {
+            return currentConfig;
         }
 
-        return null;
+            /*
+            Now we process the result.
+            They can
+            * add a  single script, replaces  one or add if new
+            * add a scripts object, replaces whole thing
+            * paste a whole QDL configuration, replaces whole thing
+            This MUST return a complete QDL configuration objeft like
+            {"qdl":{.. lots of stuff ...}}
+            This is called in StoreCommands2 and all it will do is replace the entry in toto.
+            All decisions about what goes where are done here.
+            And don't forget that the JSON library we use tends to makes tons of copies of things,
+            so updating requires we reset the values. You canot just get a JSON component and alter it.
+             */
+        if (result.containsKey(Scripts.SCRIPT)) {
+            // They entered a single script. Add it
+            JSONObject scripts = currentConfig.getJSONObject(CONFIG_TAG);
+            // {"scripts":[]}
+           scripts = JSONScriptUtil.addScript(scripts, result);
+            // So we have a single scripts entry. There may be others in the config, so don't change them
+            currentConfig.put(CONFIG_TAG, scripts);
+        }
+        if (result.containsKey(SCRIPTS_TAG)) {
+
+            // replace entire scripts entry.
+            currentConfig.put(CONFIG_TAG, result);
+
+        }
+        if (result.containsKey(CONFIG_TAG)) {
+            // integrate it
+            currentConfig.put(CONFIG_TAG, result.getJSONObject(CONFIG_TAG));
+        }
+
+
+        return currentConfig;
+
     }
+
 
     @Override
     protected void showDeserializeHelp() {

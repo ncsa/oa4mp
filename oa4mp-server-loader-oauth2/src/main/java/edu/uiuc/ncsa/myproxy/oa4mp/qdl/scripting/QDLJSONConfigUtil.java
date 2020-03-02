@@ -27,7 +27,20 @@ import static edu.uiuc.ncsa.qdl.scripting.Scripts.*;
  * on 2/12/20 at  3:21 PM
  */
 public class QDLJSONConfigUtil implements ScriptingConstants {
-
+    /**
+     * Takes a list
+     *  of @link QDLScript} objects and turns it in to a QDL configuration,
+     *  i.e. this gets  <br/><br/>
+     * {script, script,...}<br/><br/>
+     * and returns a new JSON object consisting of<br/>
+     * <pre>
+     * {"qdl":{"scripts":[...]}}
+     * </pre>
+     * turning the list of scripts in to the JSON array.
+     *
+     * @param scriptSet
+     * @return
+     */
     public static JSONObject scriptSetToJSON(ScriptSet<? extends QDLScript> scriptSet) {
         JSONObject scripts = JSONScriptUtil.createConfig();
         for (QDLScript s : scriptSet.getScripts()) {
@@ -44,6 +57,8 @@ public class QDLJSONConfigUtil implements ScriptingConstants {
      * <pre>
      *     {"qdl":{"scripts":[...]}}
      * </pre>
+     * This returns the [...] array of script objects as a list of {@link QDLScript} objects
+     *
      * @param config
      * @return
      */
@@ -62,7 +77,7 @@ public class QDLJSONConfigUtil implements ScriptingConstants {
      * Creates a script from a file. Note that this takes a convenience approach:
      * If the file name is the same as one of the execute phases, the phase is
      * set to that and you are done. If not, you must set it later if needed.
-     *
+     * See also {@link #createCfg(JSONObject, String)} which does the actual work.
      * @param fileName
      * @return
      * @throws Throwable
@@ -74,8 +89,11 @@ public class QDLJSONConfigUtil implements ScriptingConstants {
 
 
     /**
-     * NOTE that this creates the JSONObject, but does not hve a file, so it creates a file name
-     * that is the execution phase.
+     * NOTE that this creates the JSONObject from a string, but does not have a file, so it creates a file name
+     * that is the execution phase. This takes a line which is the actual script and a phase then
+     * creates a {@link QDLScript} from it, which is turned in to a complete JSON configuration.
+     * <br/><br/>
+
      *
      * @param rawScript
      * @return
@@ -102,19 +120,26 @@ public class QDLJSONConfigUtil implements ScriptingConstants {
     /**
      * This creates a simple script with no path information, just the name for the file and
      * will add it to the {@link JSONObject} argument
-     *
-     * @param jsonObject
+     * <br/><br/>
+     * So this read a file, creates a {@link QDLScript} from its contents and adds it to the
+     * current list of scripts. 
+     * @param currentConfig
      * @param filePath
      * @return
      * @throws Throwable
      */
-    public static JSONObject createCfg(JSONObject jsonObject, String filePath) throws Throwable {
+    public static JSONObject createCfg(JSONObject currentConfig, String filePath) throws Throwable {
         String fileName = filePath.substring(filePath.lastIndexOf(File.pathSeparator));
         QDLScript qdlScript = createCfg(fileName, filePath);
-        JSONObject scripts = JSONScriptUtil.createConfig();
+        JSONObject scripts = null;
+        if(currentConfig.containsKey(CONFIG_TAG)){
+            scripts = currentConfig.getJSONObject(CONFIG_TAG); // so we add to it
+        }else {
+            scripts = JSONScriptUtil.createConfig();
+        }
         JSONScriptUtil.addScript(scripts, qdlScript);
-        jsonObject.put(CONFIG_TAG, scripts);
-        return jsonObject;
+        currentConfig.put(CONFIG_TAG, scripts);
+        return currentConfig;
 
     }
 
@@ -158,17 +183,22 @@ public class QDLJSONConfigUtil implements ScriptingConstants {
                 // no automatic phase given. Have to get it
                 xp.put(EXEC_PHASE, OA2ClaimsUtil.SRE_NO_EXEC_PHASE);
         }
-
+       File f = new File(absolutePath);
+        Date createTS = new Date();
+                  createTS.setTime(f.lastModified());
         xp.put(ID, relativePath);
         xp.put(LANGUAGE, QDLVersion.LANGUAGE_NAME);
         xp.put(LANG_VERSION, QDLVersion.VERSION);
         xp.put(SCRIPT_VERSION, "1.0");
-        xp.put(CREATE_TIME, Iso8601.date2String(new Date()));
+        xp.put(CREATE_TIME, Iso8601.date2String(createTS));
+        xp.put(LAST_MODIFIED, Iso8601.date2String(createTS));
+        xp.put("length", f.length());
         QDLScript qdlScript = new QDLScript(new StringReader(script), xp);
         return qdlScript;
     }
 
     /**
+     * <h1>NOTE This is under development and should not be used yet!</h1>
      * This will take a given directory and read <b><i>EVERYTHING</i></b> in it and return
      * a JSON representation of it. The scripting facility will treat this as a library and
      * when evaluating it, will create a virtual file system (VFS) against which you may make calls.
@@ -249,7 +279,7 @@ public class QDLJSONConfigUtil implements ScriptingConstants {
         xp.put(SCRIPT_VERSION, "1.0");
         QDLScript qdlScript = new QDLScript(new StringReader(script.toString()), xp);
         JSONObject scripts = JSONScriptUtil.createConfig();
-        JSONScriptUtil.addScript(scripts, qdlScript);
+       scripts =  JSONScriptUtil.addScript(scripts, qdlScript);
 
         script = new StringBuffer();
         script.append("if[");
@@ -266,7 +296,7 @@ public class QDLJSONConfigUtil implements ScriptingConstants {
         xp.put(LANG_VERSION, "1.0");
         xp.put(SCRIPT_VERSION, "1.0");
         qdlScript = new QDLScript(new StringReader(script.toString()), xp);
-        JSONScriptUtil.addScript(scripts, qdlScript);
+       scripts =  JSONScriptUtil.addScript(scripts, qdlScript);
 
         JSONObject jsonObject = new JSONObject();
 
@@ -333,6 +363,6 @@ public class QDLJSONConfigUtil implements ScriptingConstants {
 
     public static void main(String[] args) {
         // testLoadDir();
-        createNCSA();
+       System.out.println(createNCSA().toString(1));
     }
 }

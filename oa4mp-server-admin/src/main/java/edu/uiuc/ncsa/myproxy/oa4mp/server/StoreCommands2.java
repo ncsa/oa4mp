@@ -440,40 +440,78 @@ public abstract class StoreCommands2 extends StoreCommands {
         return null;
     }
 
+    protected boolean supportsQDL() {
+        return false;
+    }
+
+    /**
+     * The contract is that this gets the entire current config and updates <i>exactly</i>
+     * the bits relating to QDL. This is then saved elsewhere.
+     * @param currentConfig
+     * @return
+     */
+    protected JSONObject loadQDLScript(JSONObject currentConfig) {
+        return currentConfig; // do nothing.
+    }
+
     protected boolean updateSingleValue(XMLMap map, String key) {
         String currentValue = map.getString(key);
         JSON json = null;
         try {
             json = JSONSerializer.toJSON(currentValue);
-            if (json instanceof JSONObject) {
-                JSONObject newJSON = inputJSON((JSONObject) json, key);
-                if (newJSON != null) {
-                    map.put(key, newJSON.toString());
-                    return true;
-                }
-                return false;
-            }
-            if (json instanceof JSONArray) {
-                JSONArray newArray = updateSingleValue(key, (JSONArray) json);
-                // really hard to tell if the array is updated in the general case.
-                // so just always save it.
-                if (newArray != null) {
-                    map.put(key, newArray.toString());
-                    return true;
-                }
-                return false;
-
-            }
         } catch (Throwable t) {
             // ok, it's not JSON
         }
-        String newValue = getInput("Enter new value[" + currentValue + "]", currentValue);
-        if (!newValue.equals(currentValue)) {
+        if (json == null) {
+            // This handles every other value type...
+            String newValue = getInput("Enter new value[" + currentValue + "]", currentValue);
+            if (newValue.equals(currentValue)) {
+                return false;
+            }
             map.put(key, newValue);
             return true;
         }
+        if (json != null && (json instanceof JSONObject)) {
+            if (supportsQDL()) {
+                boolean loadQDL = getInput("Load only a QDL script or edit the full config? (q/f)", "f").equalsIgnoreCase("q");
+                if (loadQDL) {
+                    JSONObject oldCfg = (JSONObject) json;
+                    JSONObject qdlcfg = loadQDLScript(oldCfg);
+                  
+                    if (qdlcfg == null) {
+                        return false;
+                    } // they cancelled out of it
 
-        return false;
+                    map.put(key, oldCfg.toString());
+                    return true;
+                } else {
+                    JSONObject newConfig = (JSONObject) inputJSON((JSONObject) json, "client configuration");
+                    if (newConfig == null) {
+                        return false;
+                    } // user cancelled
+                    map.put(key, newConfig.toString());
+                    return true;
+                }
+            } else {
+                JSONObject newJSON = inputJSON((JSONObject) json, key);
+                if (newJSON == null) {
+                    return false;
+                } // user cancelled
+                map.put(key, newJSON.toString());
+                return true;
+            }
+        }
+        if (json != null && (json instanceof JSONArray)) {
+            JSONArray newArray = updateSingleValue(key, (JSONArray) json);
+            // really hard to tell if the array is updated in the general case.
+            // so just always save it.
+            if (newArray == null) {
+                return false;
+            }
+            map.put(key, newArray.toString());
+            return true;
+        }
+      return false; // Just in case, do nothing.
     }
 
 

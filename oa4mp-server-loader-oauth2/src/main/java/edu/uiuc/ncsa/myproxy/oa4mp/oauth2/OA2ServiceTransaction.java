@@ -11,7 +11,6 @@ import edu.uiuc.ncsa.security.oauth_2_0.jwt.FlowStates;
 import edu.uiuc.ncsa.security.oauth_2_0.server.OA2TransactionScopes;
 import edu.uiuc.ncsa.security.oauth_2_0.server.OIDCServiceTransactionInterface;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
-import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
 
@@ -79,18 +78,23 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         return state;
     }
 
-    public JSONArray getExtendedAttributes(){
+    public JSONObject getExtendedAttributes(){
         if(!getState().containsKey(EXTENDED_ATTRIBUTES_KEY)){
-            return new JSONArray();
+            return new JSONObject();
         }
 
-        return getState().getJSONArray(EXTENDED_ATTRIBUTES_KEY);
+        return getState().getJSONObject(EXTENDED_ATTRIBUTES_KEY);
     }
-    public void setExtendedAttributes(JSONArray jsonArray){
-        // Again the format of the objet from the extended parameters parsing is {"extendedAttributes":[]}
+    public void setExtendedAttributes(JSONObject jsonObject){
+        // Again the format of the object from the extended parameters parsing is {"extendedAttributes":[]}
         // and we store the array with that key, not the entire object.
-        if(!jsonArray.isEmpty()){
-            getState().put(EXTENDED_ATTRIBUTES_KEY, jsonArray);
+        if(jsonObject.containsKey(EXTENDED_ATTRIBUTES_KEY)){
+
+        }else{
+            if(!jsonObject.isEmpty()){
+                getState().put(EXTENDED_ATTRIBUTES_KEY, jsonObject);
+            }
+
         }
     }
     JSONObject state;

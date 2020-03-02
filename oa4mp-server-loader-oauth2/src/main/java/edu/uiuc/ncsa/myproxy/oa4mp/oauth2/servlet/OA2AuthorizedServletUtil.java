@@ -72,7 +72,7 @@ public class OA2AuthorizedServletUtil {
                 ExtendedParameters xp = new ExtendedParameters();
                 JSONObject extAttr = xp.snoopHeaders(req.getParameterMap());
                 if(extAttr!= null && !extAttr.isEmpty()){
-                    transaction.setExtendedAttributes(extAttr.getJSONArray(ExtendedParameters.EXTENDED_ATTRIBUTES_KEY));
+                    transaction.setExtendedAttributes(extAttr);
                 }
             }
             agResponse.setServiceTransaction(transaction);
