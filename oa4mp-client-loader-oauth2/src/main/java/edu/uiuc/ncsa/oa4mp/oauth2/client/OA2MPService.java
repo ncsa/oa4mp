@@ -11,7 +11,6 @@ import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.delegation.token.MyX509Certificates;
 import edu.uiuc.ncsa.security.delegation.token.Verifier;
 import edu.uiuc.ncsa.security.oauth_2_0.NonceHerder;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.UserInfo;
 import edu.uiuc.ncsa.security.oauth_2_0.client.ATResponse2;
 import edu.uiuc.ncsa.security.oauth_2_0.client.DS2;
@@ -32,6 +31,7 @@ import java.util.Map;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.client.ClientEnvironment.CALLBACK_URI_KEY;
 import static edu.uiuc.ncsa.security.delegation.client.AbstractClientEnvironment.CERT_REQUEST_KEY;
+import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.*;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -100,8 +100,8 @@ public class OA2MPService extends OA4MPService {
         if (a == null) {
             throw new GeneralException("Asset not found. You may need to clear your browser cookies.");
         }
-        m.put(OA2Constants.NONCE, a.getNonce());
-        m.put(OA2Constants.STATE, a.getState());
+        m.put(NONCE, a.getNonce());
+        m.put(STATE, a.getState());
         return m;
     }
 
@@ -110,7 +110,8 @@ public class OA2MPService extends OA4MPService {
     /**
      * Override this if you need to request custom scopes (i.e. those not in the basic OA4MP specification) for a server.
      * This returns a blank delimited list of scopes, e.g. "openid email profile". Note that if you
-     * override this method, the openid scope must always be included or the server will refuse to service the request.
+     * override this method, and the server id OIDC, then the openid scope must always
+     * be included or the server will refuse to service the request.
      * The basic operation is to take the basic scopes for the OA4MP OIDC spec and add any that are specified in the
      * configuration file in the "scopes" element.
      *
@@ -146,13 +147,13 @@ public class OA2MPService extends OA4MPService {
         // Next is for testing exception handling on the server. This creates an unsupported request which should fail everytime.
         //parameters.put(OA2Constants.REQUEST, "My_request");
 
-        parameters.put(OA2Constants.RESPONSE_TYPE, OA2Constants.AUTHORIZATION_CODE);
+        parameters.put(RESPONSE_TYPE, AUTHORIZATION_CODE);
         //parameters.put(OA2Constants.CLIENT_ID, delegationRequest.getClient().getIdentifierString());
-        parameters.put(OA2Constants.SCOPE, getRequestedScopes());
+        parameters.put(SCOPE, getRequestedScopes());
         //parameters.put(OA2Constants.REDIRECT_URI, delegationRequest.getParameters().get(OA2Constants.REDIRECT_URI));
-        parameters.put(OA2Constants.STATE, a.getState()); // random state is ok.
-        parameters.put(OA2Constants.NONCE, a.getNonce());
-        parameters.put(OA2Constants.PROMPT, OA2Constants.PROMPT_LOGIN);
+        parameters.put(STATE, a.getState()); // random state is ok.
+        parameters.put(NONCE, a.getNonce());
+        parameters.put(PROMPT, PROMPT_LOGIN);
     }
 
 /*
@@ -178,10 +179,10 @@ public class OA2MPService extends OA4MPService {
         ATResponse2 atResponse2 = (ATResponse2) getEnvironment().getDelegationService().getAT(dar);
         asset.setIssuedAt((Date) atResponse2.getParameters().get(OA2Claims.ISSUED_AT));
         asset.setUsername((String) atResponse2.getParameters().get(OA2Claims.SUBJECT));
-        if (!NonceHerder.hasNonce((String) atResponse2.getParameters().get(OA2Constants.NONCE))) {
+        if (!NonceHerder.hasNonce((String) atResponse2.getParameters().get(NONCE))) {
             throw new InvalidNonceException("Unknown nonce.");
         }
-        NonceHerder.removeNonce((String) atResponse2.getParameters().get(OA2Constants.NONCE)); // prevent replay attacks.
+        NonceHerder.removeNonce((String) atResponse2.getParameters().get(NONCE)); // prevent replay attacks.
 
         asset.setAccessToken(atResponse2.getAccessToken());
         asset.setRefreshToken(atResponse2.getRefreshToken());

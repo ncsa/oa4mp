@@ -68,6 +68,13 @@ public class OA2AuthorizedServletUtil {
             servlet.checkClientApproval(client);
             AGResponse agResponse = (AGResponse) servlet.getAGI().process(new AGRequest(req, null));
             OA2ServiceTransaction transaction = createNewTransaction(agResponse.getGrant());
+            /*
+            Fixes CIL-644
+            Extended attribute support means that a client may send fully qualifies (FQ) request parameters
+            e.g. of the form oa4mp:/req/role and these will be stashed for later processing
+            (most likely by a script, so we can avoid server changes). Nothing is done with these here, they
+            are stashed and forwarded at the correct time.
+             */
             if(client.hasExtendedAttributeSupport()){
                 ExtendedParameters xp = new ExtendedParameters();
                 JSONObject extAttr = xp.snoopHeaders(req.getParameterMap());
@@ -283,6 +290,9 @@ public class OA2AuthorizedServletUtil {
         if (params.containsKey(REQUEST_URI)) {
             throw new OA2RedirectableError(OA2Errors.REQUEST_URI_NOT_SUPPORTED, "The \"request_uri\" parameter is not supported on this server", state, givenRedirect);
         }
+        if(params.containsKey(RESPONSE_MODE)){
+               st.setResponseMode(params.get(RESPONSE_MODE));
+        }
 
         return st;
     }
@@ -315,6 +325,7 @@ public class OA2AuthorizedServletUtil {
         Collection<String> scopes = new ArrayList<>();
 
         OA2Client oa2Client = (OA2Client) st.getClient();
+        // Fixes github issue 8, support for public clients: https://github.com/ncsa/OA4MP/issues/8
         if (oa2Client.isPublicClient()) {
             if(!oa2Client.getScopes().contains(OA2Scopes.SCOPE_OPENID)){
                 throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST, "Scopes must contain " + OA2Scopes.SCOPE_OPENID, state, givenRedirect);
@@ -401,18 +412,12 @@ public class OA2AuthorizedServletUtil {
    Boiler plated code to make this work.
   */
 
-
-
-
     public void preprocess(TransactionState state) throws Throwable {
         state.getResponse().setHeader("X-Frame-Options", "DENY");
     }
 
     public void postprocess(TransactionState state) throws Throwable {
     }
-
-
-
     /* *******
     End boiler-plate
      */

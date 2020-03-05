@@ -208,6 +208,7 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
     @Override
     public String createCallback(ServiceTransaction trans, Map<String, String> params) {
         String cb = trans.getCallback().toString();
+        OA2ServiceTransaction st = (OA2ServiceTransaction)trans;
         /*
         CIL-545: The checking for valid callbacks is done at registration time. No checking should be done
         any place else since we must support a much wider range of these (e.g. for mobile devices). 
@@ -216,9 +217,17 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
       if (!cb.toLowerCase().startsWith("https:")) {
             throw new GeneralException("Error: Unsupported callback protocol for \"" + cb + "\". Must be https");
         }*/
-        String idStr = trans.getIdentifierString();
+
+        String idStr = st.getIdentifierString();
+        // Fixes GitHub OA4MP issue 5, support multiple response modes.
+        String responseDelimiter = "?"; // default
+        if(st.hasResponseMode()){
+            if(st.getResponseMode().equals(OA2Constants.RESPONSE_MODE_FRAGMENT)){
+                responseDelimiter = "#";
+            }
+        }
         try {
-            cb = cb + (cb.indexOf("?") == -1 ? "?" : "&") + OA2Constants.AUTHORIZATION_CODE + "=" + URLEncoder.encode(idStr, "UTF-8");
+            cb = cb + (cb.indexOf(responseDelimiter) == -1 ? responseDelimiter : "&") + OA2Constants.AUTHORIZATION_CODE + "=" + URLEncoder.encode(idStr, "UTF-8");
             if (params.containsKey(OA2Constants.STATE)) {
                 cb = cb + "&" + OA2Constants.STATE + "=" + URLEncoder.encode(params.get(OA2Constants.STATE), "UTF-8");
             }

@@ -11,6 +11,60 @@
 <!--#include virtual="../../header.html" -->
 <p>Changes to the OA4MP server by version.</p>
 
+<h2>4.4</h2>
+<ul>
+    <li><a href="https://github.com/ncsa/OA4MP/issues/5">Github issue 5</a>: Support <a href="https://openid.net/specs/oauth-v2-multiple-response-types-1_0.html#ResponseModes">multiple response modes</a>
+    I.e., the callback may optionally have its authorization response parameters encoded as a fragment, not a query.</li>
+    <li><a href="https://github.com/ncsa/OA4MP/issues/8">Github issue 8</a>: support for public clients</li>
+    <li><a href="https://github.com/ncsa/OA4MP/issues/13">Github issue 13</a>, CIL-646: Implement <a href="https://tools.ietf.org/html/rfc7009.">rfc 7009</a>
+    for token revocation.</li>
+    <li><a href="https://github.com/ncsa/OA4MP/issues/15">Github issue 15</a>: OA4MP may be turned in to an OIDC compliant
+        service by setting the <a href="server/dtd/server-dtd-service-tag.xhtml">OIDCEnabled flag</a></li>
+    <li><a href="https://github.com/ncsa/OA4MP/issues/19">Github issue 19</a>:Added QDL support.</li>
+    <li>CIL-540:(CIlogon only) Relax requirements for user attributes. as long as a user is only requesting a scope
+        of openid (so no certs or extended information such as groups) and has an idp and an identifier CILogon will accept
+        the user. </li>
+    <li>CIL-639:Allow users to specify roles. In particular now, OA4MP will accept certain scoped additional request parameters
+    and, depending on the client, act upon them.</li>
+    <li>CIL-646: Support token introspection. There is now an /introspect endpoint available. First cut is very, very
+    basic and merely allows for a client to query if a given access token is valid. Since we are moving to self-describing
+    tokens it is unclear if we should support the other operations which are basically reading the token back to a service.</li>
+    <li>CIL-648: Recheck claims at token refresh. There is also scripting support now for this.</li>
+    <li>CIL-666: Command Line Interface improvements.</li>
+</ul>
+<h3>Command Line Interface Enhancements</h3>
+<p>The command line improvements allow for specifying a single property of something and updating it. The syntax is</p>
+<pre>
+    use X  // The component
+    update -key property_name id // you will be prompted for the value(s)
+
+    OR
+
+    update -key property_name -value new_value id
+</pre>
+
+<p>where X is a component (e.g. "clients") and the key is a property name. In the first case, (no value specified)
+you will be prompted for the value (or values if multiple). In the second case, you may simply specify the value directly.
+In the case of multi-valied items (such as the callbacks for a client) you may also specify if you want to add a value
+to the current values or remove it, more fully</p>
+<pre>
+    update [-add | -remove] -key property_name [-value new_value] id
+</pre>
+You may list the property names for the component X at any time using the list_keys command. Also, this ability extends to
+listing properties:
+<pre>
+    ls -key callback_uri id
+</pre>
+or removing a single property:
+<pre>
+    rm -key limited_proxies id
+</pre>
+<p>Finally, remember that --help is you friend so e.g.</p>
+<pre>
+    update --help
+</pre>
+<p>will print out a lot of information and examples.</p>
+
 <h2>4.3</h2>
 <ul>
     <li>CIL-352: CILogon previous subject issue. In some cases in CILogon, the country should be US and is not archived this way when updating.

@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.OA4MPServiceTransaction;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
+import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.FlowStates;
 import edu.uiuc.ncsa.security.oauth_2_0.server.OA2TransactionScopes;
 import edu.uiuc.ncsa.security.oauth_2_0.server.OIDCServiceTransactionInterface;
@@ -78,25 +79,27 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         return state;
     }
 
-    public JSONObject getExtendedAttributes(){
-        if(!getState().containsKey(EXTENDED_ATTRIBUTES_KEY)){
+    public JSONObject getExtendedAttributes() {
+        if (!getState().containsKey(EXTENDED_ATTRIBUTES_KEY)) {
             return new JSONObject();
         }
 
         return getState().getJSONObject(EXTENDED_ATTRIBUTES_KEY);
     }
-    public void setExtendedAttributes(JSONObject jsonObject){
+
+    public void setExtendedAttributes(JSONObject jsonObject) {
         // Again the format of the object from the extended parameters parsing is {"extendedAttributes":[]}
         // and we store the array with that key, not the entire object.
-        if(jsonObject.containsKey(EXTENDED_ATTRIBUTES_KEY)){
+        if (jsonObject.containsKey(EXTENDED_ATTRIBUTES_KEY)) {
 
-        }else{
-            if(!jsonObject.isEmpty()){
+        } else {
+            if (!jsonObject.isEmpty()) {
                 getState().put(EXTENDED_ATTRIBUTES_KEY, jsonObject);
             }
 
         }
     }
+
     JSONObject state;
 
     @Override
@@ -117,7 +120,7 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
            These object go straight to a database, never to see the light of day, so security
            is not an issue here. 
         */
-        if(sources== null || sources.isEmpty()){
+        if (sources == null || sources.isEmpty()) {
             return;
         }
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -131,7 +134,7 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
 
 
     public List<ClaimSource> getClaimSources(OA2SE oa2SE) throws IOException, ClassNotFoundException {
-        if(!getState().containsKey(CLAIMS_SOURCES_STATE_KEY)){
+        if (!getState().containsKey(CLAIMS_SOURCES_STATE_KEY)) {
             return new ArrayList<>();
         }
         String state = getState().getString(CLAIMS_SOURCES_STATE_KEY);
@@ -140,11 +143,11 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         ObjectInputStream in = new ObjectInputStream(baos);
 
         // Method for deserialization of object
-        Object object =  in.readObject();
+        Object object = in.readObject();
         List<ClaimSource> sources = (List<ClaimSource>) object;
-        for(ClaimSource source: sources){
-            if(source instanceof BasicClaimsSourceImpl){
-                ((BasicClaimsSourceImpl)source).setOa2SE(oa2SE);
+        for (ClaimSource source : sources) {
+            if (source instanceof BasicClaimsSourceImpl) {
+                ((BasicClaimsSourceImpl) source).setOa2SE(oa2SE);
             }
         }
         in.close();
@@ -180,6 +183,20 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
 
     public void setClaims(JSONObject claims) {
         getState().put(CLAIMS_KEY, claims);
+    }
+
+    String RESPONSE_MODE_KEY = OA2Constants.RESPONSE_MODE;
+
+    public String getResponseMode() {
+        return getState().getString(RESPONSE_MODE_KEY);
+    }
+
+    public void setResponseMode(String mode) {
+        getState().put(RESPONSE_MODE_KEY, mode);
+    }
+
+    public boolean hasResponseMode() {
+        return getState().containsKey(RESPONSE_MODE_KEY);
     }
 
     RefreshToken refreshToken;
