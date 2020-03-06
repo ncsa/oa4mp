@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.OA2ClaimsUtil;
-import edu.uiuc.ncsa.qdl.scripting.FileEntries;
+import edu.uiuc.ncsa.qdl.vfs.FileEntries;
 import edu.uiuc.ncsa.qdl.scripting.JSONScriptUtil;
 import edu.uiuc.ncsa.qdl.scripting.QDLScript;
 import edu.uiuc.ncsa.qdl.scripting.Scripts;

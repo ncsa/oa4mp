@@ -66,7 +66,9 @@ public class ExtendedParameters {
         }
         return false;
     }
-
+    protected boolean isExtendedAttribute(String x){
+             return 0 < x.indexOf(PREFIX_DELIMITER);
+    }
     /**
      * This does the grunt work of looking through the headers and pulling out the extended attributes.
      * The format of the extended attributes is
@@ -96,6 +98,9 @@ public class ExtendedParameters {
         JSONObject cilogonEntry = null;
         JSONObject oa4mpEntry = null;
         for (String key : pmap.keySet()) {
+            if(!isExtendedAttribute(key)){
+                continue;
+            }
             String[] values = pmap.get(key);
             JSONObject j = toJSON(key, values); // return {NS:{key:[]}}
             if (j != null) {

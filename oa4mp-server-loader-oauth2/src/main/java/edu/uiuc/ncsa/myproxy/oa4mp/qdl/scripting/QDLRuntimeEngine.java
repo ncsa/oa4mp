@@ -80,15 +80,6 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine {
                 throwable.printStackTrace();
             }
         }
-
-        //  state.addScriptProvider(library); // This means
-        //  that the set of scripts in the config file now is in a virtual file system
-        // add the modules
-       /* OA2QDLLoader loader = new OA2QDLLoader();
-        for (Module m : loader.load()) {
-            state.addModule(m); // done!
-            state.getImportedModules().addImport(m.getNamespace(), m.getAlias());
-        }*/
     }
 
     @Override

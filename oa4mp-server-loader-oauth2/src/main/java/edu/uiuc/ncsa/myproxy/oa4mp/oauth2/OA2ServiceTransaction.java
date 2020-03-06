@@ -91,7 +91,8 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         // Again the format of the object from the extended parameters parsing is {"extendedAttributes":[]}
         // and we store the array with that key, not the entire object.
         if (jsonObject.containsKey(EXTENDED_ATTRIBUTES_KEY)) {
-
+            // The thing is at the wrong level. Make sure we put it at the right one.
+            getState().put(EXTENDED_ATTRIBUTES_KEY, jsonObject.getJSONObject(EXTENDED_ATTRIBUTES_KEY));
         } else {
             if (!jsonObject.isEmpty()) {
                 getState().put(EXTENDED_ATTRIBUTES_KEY, jsonObject);
