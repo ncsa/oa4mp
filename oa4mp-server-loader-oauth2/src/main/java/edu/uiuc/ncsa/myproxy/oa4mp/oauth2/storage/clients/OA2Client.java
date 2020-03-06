@@ -128,6 +128,15 @@ public class OA2Client extends Client implements OA2ClientScopes {
      * in the request. Normally, these are ignored (as per spec). However, we can accept additional
      * parameters (as per spec too), so if this is set to true, then those prefixed correctly will
      * be added to the transaction for later processing. The default is false for this option.
+     * <h3>Note</h3>
+     * These reside in the JSON configuration as part of a separate extra attributes object.
+     * So in the configuration you should have something like
+     * <pre>
+     *     {"cfg":["comments"],
+     *       "extraAttributes":{"extendedAttributesEnabled":true},
+     *       ... other stuff.
+     *     }
+     * </pre>
      * @return
      */
     public boolean hasExtendedAttributeSupport(){
