@@ -86,10 +86,9 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.9</version>
+                <version>3.1.1</version>
                 <configuration>
                     <aggregate>true</aggregate>
-                    <use>false</use>
                     <includeDependencySources>true</includeDependencySources>
 
                 </configuration>
@@ -97,7 +96,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.10</version>
+                <version>3.1.1</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -146,10 +145,9 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.9</version>
+                <version>3.1.1</version>
                 <configuration>
                     <aggregate>true</aggregate>
-                    <use>false</use>
                     <includeDependencySources>true</includeDependencySources>
                     <dependencySourceIncludes>
                         <dependencySourceInclude>edu.uiuc.ncsa:*</dependencySourceInclude>

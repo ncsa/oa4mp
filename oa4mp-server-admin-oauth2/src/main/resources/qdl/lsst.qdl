@@ -1,3 +1,5 @@
+/*
+Original script for functors -- here for reference while I debug, should be deleted at some point.
 "setEnv('vo','voPersonExternalID');",
   "setEnv('ncsa','https://idp.ncsa.illinois.edu/idp/shibboleth');",
   "# if the IDP is NCSA, just set the uid and do the second LDAP search, otherwise, search first on voPersonExternalID to set it.",
@@ -11,7 +13,6 @@
   "];",
   "set_claim_source('ncsa-default','uid');"
 
-//
 
    "setEnv('github','http://github.com/login/oauth/authorize');",
       "setEnv('google','http://google.com/accounts/o8/id');",
@@ -23,13 +24,13 @@
       "    if[equals(get('idp'),'${google}')]then[set('${vo}',concat(get('oidc'),'@accounts.google.com'))],",
       "   if[equals(get('idp'),'${orcid}')]then[set('${vo}',replace(get('oidc'),'http://','https://'))]",
       "};"
-
+*/
+// Some constants for later.
 vo:='voPersonExternalID';
 idp.ncsa := 'https://idp.ncsa.illinois.edu/idp/shibboleth';
 idp.google := 'http://google.com/accounts/o8/id';
 idp.orcid := 'http://orcid.org/oauth/authorize';
 idp.github := 'http://github.com/login/oauth/authorize';
-claim_sources. := null;
 
 // in pre_auth
 if[

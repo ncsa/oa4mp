@@ -13,6 +13,11 @@
     <artifactId>oa4mp-client-api</artifactId>
     <name>OAuth for MyProxy client API.</name>
     <packaging>jar</packaging>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <additionalparam>-Xdoclint:none</additionalparam>
+        <maven.javadoc.skip>true</maven.javadoc.skip>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>edu.uiuc.ncsa.security.delegation</groupId>

@@ -13,6 +13,11 @@
     <artifactId>oa4mp-server-loader-oauth1</artifactId>
     <name>OAuth for MyProxy 1.0a support.</name>
     <packaging>jar</packaging>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <additionalparam>-Xdoclint:none</additionalparam>
+        <maven.javadoc.skip>true</maven.javadoc.skip>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>

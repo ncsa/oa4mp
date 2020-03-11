@@ -144,10 +144,10 @@ public class ExtendedParameters {
     public static void main(String[] args) {
         HashMap<String, String[]> pmap = new HashMap<>();
         pmap.put(CILOGON_NS + ":role", new String[]{"a", "b"});
-        pmap.put(CILOGON_NS + ":role2", new String[]{"c", "d"});
-        pmap.put(CILOGON_NS + ":role3", new String[]{"e"});
-        pmap.put(OA4MP_NS + ":role1", new String[]{"A", "B", "C"});
-        pmap.put(OA4MP_NS + ":foo", new String[]{"D", "E", "F"});
+        pmap.put(CILOGON_NS + ":roles/access", new String[]{"c", "d"});
+        pmap.put(CILOGON_NS + ":roles/no_access", new String[]{"e"});
+        pmap.put(OA4MP_NS + ":/roles/", new String[]{"A", "B", "C"});
+        pmap.put(OA4MP_NS + ":/idt/lifetime", new String[]{"100000000"});
         ExtendedParameters xp = new ExtendedParameters();
         JSONObject jsonObject = xp.snoopHeaders(pmap);
 

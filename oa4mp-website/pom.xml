@@ -23,7 +23,6 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <additionalparam>-Xdoclint:none</additionalparam>
-
     </properties>
     <licenses>
         <license>
@@ -175,43 +174,43 @@
             <artifactId>ncsa-security-oauth-2.0</artifactId>
             <version>4.4-SNAPSHOT</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.apache.velocity</groupId>
+            <artifactId>velocity</artifactId>
+            <version>1.7</version>
+        </dependency>
     </dependencies>
     <reporting>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.9</version>
+                <version>3.1.1</version>
+                
                 <configuration>
                     <aggregate>true</aggregate>
-                    <use>false</use>
                     <includeDependencySources>true</includeDependencySources>
-
+                    <failOnError>false</failOnError>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.10</version>
+                <version>3.1.1</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-project-info-reports-plugin</artifactId>
-                <version>2.7</version>
+                <version>3.0.0</version>
                 <reportSets>
                     <reportSet>
                         <reports><!-- select reports -->
                             <report>index</report>
                             <report>dependencies</report>
-                            <report>project-team</report>
-                            <report>mailing-list</report>
                             <report>summary</report>
-                            <report>cim</report>
-                            <report>issue-tracking</report>
-                            <report>license</report>
+                            <report>mailing-lists</report>
+                            <report>licenses</report>
                             <report>scm</report>
-                            <report>continuous-integration</report>
                         </reports>
                     </reportSet>
                 </reportSets>
@@ -231,7 +230,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
-                <version>3.2</version>
+                <version>3.8.2</version>
                 <dependencies>
                     <dependency>
                         <groupId>edu.uiuc.ncsa.maven.skin</groupId>
@@ -243,10 +242,9 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.9</version>
+                <version>3.1.1</version>
                 <configuration>
                     <aggregate>true</aggregate>
-                    <use>false</use>
                     <includeDependencySources>true</includeDependencySources>
                     <dependencySourceIncludes>
                         <dependencySourceInclude>edu.uiuc.ncsa:*</dependencySourceInclude>

@@ -13,6 +13,11 @@
     <artifactId>oa4mp-server-api</artifactId>
     <name>OAuth for MyProxy server API.</name>
     <packaging>jar</packaging>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <additionalparam>-Xdoclint:none</additionalparam>
+        <maven.javadoc.skip>true</maven.javadoc.skip>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>org.jglobus</groupId>

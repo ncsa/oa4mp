@@ -13,6 +13,11 @@
     <version>4.4-SNAPSHOT</version>
     <name>MyProxy Logon</name>
     <packaging>jar</packaging>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <additionalparam>-Xdoclint:none</additionalparam>
+        <maven.javadoc.skip>true</maven.javadoc.skip>
+    </properties>
     <build>
         <plugins>
             <plugin>
