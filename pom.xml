@@ -12,6 +12,10 @@
     <artifactId>myproxy</artifactId>
     <version>4.4-SNAPSHOT</version>
     <packaging>pom</packaging>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <additionalparam>-Xdoclint:none</additionalparam>
+    </properties>
     <name>Open Authorization for MyProxy</name>
     <description>Open Authorization (OAuth) client and server code for MyProxy</description>
     <url>http://grid.ncsa.illinois.edu/myproxy/oauth</url>
@@ -34,11 +38,7 @@
             <email>gaynor@illinois.edu</email>
         </developer>
     </developers>
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <additionalparam>-Xdoclint:none</additionalparam>
-    </properties>
-
+  
     <issueManagement>
         <system>Jira</system>
         <url>https://gateways.atlassian.net/browse/OAUTH</url>
@@ -63,20 +63,20 @@
         <module>oa4mp-client-test</module>
         <module>oa4mp-webapp</module>
         <module>oa4mp-server-admin</module>
- <!--
-        <module>oa4mp-xsede</module>
-        <module>oa4mp-twofactor</module>
-        <module>oa4mp-oidc-twofactor</module>
- -->
+        <!--
+               <module>oa4mp-xsede</module>
+               <module>oa4mp-twofactor</module>
+               <module>oa4mp-oidc-twofactor</module>
+        -->
         <module>oa4mp-xsede-oauth2</module>
         <module>oa4mp-website</module>
-   <!--     <module>oa4mp-co-oidc</module>
-   -->
+        <!--     <module>oa4mp-co-oidc</module>
+        -->
         <module>oa4mp-server-test-oauth2</module>
         <module>oa4mp-skin</module>
         <module>myproxy-website</module>
-	<module>oa4mp-gui</module>
-	<module>oa4mp-qdl</module>
+        <module>oa4mp-gui</module>
+        <module>oa4mp-qdl</module>
     </modules>
     <dependencies>
         <dependency>

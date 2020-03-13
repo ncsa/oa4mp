@@ -6,9 +6,9 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.HTTPHeaderClaimsSource;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.LDAPClaimsSource;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.NCSALDAPClaimSource;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
-import edu.uiuc.ncsa.qdl.util.StemEntry;
-import edu.uiuc.ncsa.qdl.util.StemList;
-import edu.uiuc.ncsa.qdl.util.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.StemEntry;
+import edu.uiuc.ncsa.qdl.variables.StemList;
+import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -16,7 +16,7 @@ import net.sf.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-import static edu.uiuc.ncsa.qdl.util.StemVariable.STEM_INDEX_MARKER;
+import static edu.uiuc.ncsa.qdl.variables.StemVariable.STEM_INDEX_MARKER;
 
 /**
  * <p>Created by Jeff Gaynor<br>

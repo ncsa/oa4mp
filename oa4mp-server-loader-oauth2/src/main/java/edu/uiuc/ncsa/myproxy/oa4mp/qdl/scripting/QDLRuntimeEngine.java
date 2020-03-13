@@ -16,7 +16,7 @@ import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.StateUtils;
 import edu.uiuc.ncsa.qdl.state.SymbolStack;
 import edu.uiuc.ncsa.qdl.statements.FunctionTable;
-import edu.uiuc.ncsa.qdl.util.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.util.scripting.ScriptInterface;
@@ -71,6 +71,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine {
                 new FunctionTable(),
                 new ModuleMap(),
                 true);// enable server mode.
+        state.getOpEvaluator().setNumericDigits(qe.getNumericDigits());
         if(qe != null && qe.isEnabled()) {
             try {
                 QDLConfigurationLoaderUtils.setupVFS(qe, state);

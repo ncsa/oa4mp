@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims;
 
-import edu.uiuc.ncsa.qdl.util.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import org.apache.commons.collections.iterators.IteratorEnumeration;
 
 import javax.servlet.*;
