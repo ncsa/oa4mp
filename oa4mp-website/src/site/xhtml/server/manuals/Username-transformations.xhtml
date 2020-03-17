@@ -11,6 +11,7 @@
 <body class="composite">
 <!--#include virtual="../../header.html" -->
 <h2>Username Transformations</h2>
+
 As of version 1.1.1, OA4MP has a facility for transforming the username sent to
 the MyProxy server. This functionality is similar for the OAuth 2.0 version as well.
 This is a special
@@ -25,10 +26,10 @@ In order to use your class, you must extend the class loader and point your
 installation to that. This consists of four steps.
 
 <ol>
-    <li><i>Either</i> implement the <a href="http://grid.ncsa.illinois.edu/myproxy/oauth/apidocs/edu/uiuc/ncsa/security/servlet/UsernameTransformer.html">UsernameTransformer</a>
-    interface, or extend the <a href="http://grid.ncsa.illinois.edu/myproxy/oauth/apidocs/edu/uiuc/ncsa/security/servlet/TrivialUsernameTransformer.html">TrivialUsernameTransformer</a></li>
-    <li>Extend <a href="http://grid.ncsa.illinois.edu/myproxy/oauth/apidocs/edu/uiuc/ncsa/myproxy/oa4mp/loader/OA4MPConfigurationLoader.html">OA4MPConfigurationLoader</a>
-    and override <a href="http://grid.ncsa.illinois.edu/myproxy/oauth/apidocs/edu/uiuc/ncsa/myproxy/oa4mp/server/servlet/ServerConfigurationLoader.html#createInstance()">createInstance</a>,
+    <li><i>Either</i> implement the <a href="../../apidocs/edu/uiuc/ncsa/security/servlet/UsernameTransformer.html">UsernameTransformer</a>
+    interface, or extend the <a href="../../apidocs/edu/uiuc/ncsa/security/servlet/TrivialUsernameTransformer.html">TrivialUsernameTransformer</a></li>
+    <li>Extend <a href="../../apidocs/edu/uiuc/ncsa/myproxy/oa4mp/loader/OA4MPConfigurationLoader.html">OA4MPConfigurationLoader</a>
+    and override <a href="../../apidocs/edu/uiuc/ncsa/myproxy/oa4mp/server/servlet/ServerConfigurationLoader.html#createInstance()">createInstance</a>,
     e.g.
     <pre>
         public class MyLoader&lt;T extends ServiceEnvironmentImpl&gt; extends OA4MPConfigurationLoader&lt;T&gt;{
@@ -46,7 +47,7 @@ installation to that. This consists of four steps.
              }
         }
     </pre></li>
-    <li>Extend the <a href="http://grid.ncsa.illinois.edu/myproxy/oauth/apidocs/edu/uiuc/ncsa/myproxy/oa4mp/loader/OA4MPBootstrapper.html">OA4MPBootstrapper</a>
+    <li>Extend the <a href="../../apidocs/edu/uiuc/ncsa/myproxy/oa4mp/loader/OA4MPBootstrapper.html">OA4MPBootstrapper</a>
         to point to this, e.g.:
     <pre>
         public class MyBootstrapper extends OA4MPBootstrapper{

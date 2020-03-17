@@ -13,13 +13,13 @@
 <p>This is an annotated DTD for clients using the delegation service.</p>
 <pre>
 &lt;!ELEMENT <a title="OAuth for MyProxy: Client Configuration"
-                                      href="client/configuration/index.xhtml">config</a> (client)*&gt;<br/>
-&lt;!ATTLIST <a href="client/configuration/client-tag.xhtml">client</a>
+                                      href="client/configuration/index.html">config</a> (client)*&gt;<br/>
+&lt;!ATTLIST <a href="client/configuration/client-tag.html">client</a>
      name CDATA #IMPLIED
      version CDATA #IMPLIED
      disableDefaultStores CDATA #IMPLIED
      debug CDATA #IMPLIED&gt;
-&lt;!ELEMENT client (<a title="Parameters" href="client/manuals/parameters.xhtml#tags">id|
+&lt;!ELEMENT client (<a title="Parameters" href="client/manuals/parameters.html#tags">id|
     serviceUri|
     authorizeUri|
     callbackUri|
@@ -31,14 +31,14 @@
     enableAssetCleanup|
     maxAssetLifetime|
     keypairLifetime</a>|
-    <a href="common/configuration/logging.xhtml">logging</a>|
-    <a href="common/configuration/memory-store.xhtml">memoryStore</a>|
-    <a href="common/configuration/file-store.xhtml">fileStore</a>|
-    <a href="common/configuration/postgres-store.xhtml">postgresql</a>|
-    <a href="common/configuration/mysql-store.xhtml">mysql</a>|
-    <a href="common/configuration/mariadb-store.xhtml">mariadb</a>|
-    <a href="common/configuration/keystore.xhtml">keystore</a>)|
-    <a href="common/configuration/scopes.xhtml">scopes</a>*&gt;<br/>
+    <a href="../../common/configuration/logging.html">logging</a>|
+    <a href="../../common/configuration/memory-store.html">memoryStore</a>|
+    <a href="../../common/configuration/file-store.html">fileStore</a>|
+    <a href="../../common/configuration/postgres-store.html">postgresql</a>|
+    <a href="../../common/configuration/mysql-store.html">mysql</a>|
+    <a href="../../common/configuration/mariadb-store.html">mariadb</a>|
+    <a href="../../common/configuration/keystore.html">keystore</a>)|
+    <a href="../../common/configuration/scopes.html">scopes</a>*&gt;<br/>
 &lt;!ELEMENT id (#PCDATA)&gt;
 &lt;!ELEMENT serviceUri (#PCDATA)&gt;
 &lt;!ELEMENT authorizeUri (#PCDATA)&gt;
@@ -53,7 +53,7 @@
 &lt;!ELEMENT enableAssetCleanup (#PCDATA)&gt;
 &lt;!ELEMENT maxAssetLifetime (#PCDATA)&gt;
 &lt;!ELEMENT keypairLifetime (#PCDATA)&gt;
-&lt;!ELEMENT <a href="common/configuration/logging.xhtml">logging</a> (#PCDATA)&gt;
+&lt;!ELEMENT <a href="../../common/configuration/logging.html">logging</a> (#PCDATA)&gt;
 &lt;!ATTLIST logging
      logFileName CDATA #REQUIRED
      logName CDATA #IMPLIED
@@ -61,14 +61,14 @@
      logFileCount CDATA #IMPLIED
      debug CDATA #IMPLIED&gt;
 &lt;!ELEMENT assetStore (#PCDATA)&gt;
-&lt;!ELEMENT <a href="common/configuration/memory-store.xhtml">memoryStore</a> (assetStore)*&gt;
-&lt;!ELEMENT <a href="common/configuration/file-store.xhtml">fileStore</a> (assetStore)*&gt;
-&lt;!ATTLIST <a href="common/configuration/file-store.xhtml">fileStore</a>
+&lt;!ELEMENT <a href="../../common/configuration/memory-store.html">memoryStore</a> (assetStore)*&gt;
+&lt;!ELEMENT <a href="../../common/configuration/file-store.html">fileStore</a> (assetStore)*&gt;
+&lt;!ATTLIST <a href="../../common/configuration/file-store.html">fileStore</a>
      dataPath CDATA #IMPLIED
      indexPath CDATA #IMPLIED
      path CDATA #IMPLIED&gt;
-&lt;!ELEMENT <a href="common/configuration/mysql-store.xhtml">mysql</a> (assetStore)*&gt;
-&lt;!ATTLIST <a href="common/configuration/mysql-store.xhtml">mysql</a>
+&lt;!ELEMENT <a href="../../common/configuration/mysql-store.html">mysql</a> (assetStore)*&gt;
+&lt;!ATTLIST <a href="../../common/configuration/mysql-store.html">mysql</a>
      password CDATA #REQUIRED
      port CDATA #IMPLIED
      host CDATA #IMPLIED
@@ -78,8 +78,8 @@
      tablename CDATA #IMPLIED
      tablePrefix CDATA #IMPLIED
      driver CDATA #IMPLIED&gt;
-&lt;!ELEMENT <a href="common/configuration/mariadb-store.xhtml">mariadb</a> (assetStore)*&gt;
-&lt;!ATTLIST <a href="common/configuration/mariadb-store.xhtml">mariadb</a>
+&lt;!ELEMENT <a href="../../common/configuration/mariadb-store.html">mariadb</a> (assetStore)*&gt;
+&lt;!ATTLIST <a href="../../common/configuration/mariadb-store.html">mariadb</a>
      password CDATA #REQUIRED
      port CDATA #IMPLIED
      host CDATA #IMPLIED
@@ -89,8 +89,8 @@
      tablename CDATA #IMPLIED
      tablePrefix CDATA #IMPLIED
      driver CDATA #IMPLIED&gt;
-&lt;!ELEMENT <a href="common/configuration/postgres-store.xhtml">postgresql</a> (assetStore)*&gt;
-&lt;!ATTLIST <a href="common/configuration/postgres-store.xhtml">postgresql</a>
+&lt;!ELEMENT <a href="../../common/configuration/postgres-store.html">postgresql</a> (assetStore)*&gt;
+&lt;!ATTLIST <a href="../../common/configuration/postgres-store.html">postgresql</a>
      password CDATA #REQUIRED
      username CDATA #REQUIRED
      port CDATA #IMPLIED
@@ -99,16 +99,16 @@
      tablename CDATA #IMPLIED
      tablePrefix CDATA #IMPLIED
      driver CDATA #IMPLIED&gt;
-&lt;!ELEMENT <a href="common/configuration/keystore.xhtml">keystore</a> (assetStore)*&gt;
-&lt;!ATTLIST <a href="common/configuration/keystore.xhtml">keystore</a>
+&lt;!ELEMENT <a href="../../common/configuration/keystore.html">keystore</a> (assetStore)*&gt;
+&lt;!ATTLIST <a href="../../common/configuration/keystore.html">keystore</a>
      path CDATA #REQUIRED
      password CDATA #REQUIRED
      type CDATA #REQUIRED
      factory CDATA #REQUIRED
      useJavaKeystore CDATA #IMPLIED&gt;
-&lt;!ELEMENT <a href="common/configuration/scopes.xhtml">scopes</a>(scope)&gt;
-&lt;!ELEMENT <a href="common/configuration/scopes.xhtml">scope</a>(#PCDATA)&gt;
-&lt;!ATTLIST <a href="common/configuration/scopes.xhtml">scope</a>
+&lt;!ELEMENT <a href="../../common/configuration/scopes.html">scopes</a>(scope)&gt;
+&lt;!ELEMENT <a href="../../common/configuration/scopes.html">scope</a>(#PCDATA)&gt;
+&lt;!ATTLIST <a href="../../common/configuration/scopes.html">scope</a>
      enabled CDATA #IMPLIED&gt;
 ]&gt;
 </pre>

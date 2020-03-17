@@ -263,11 +263,20 @@ public class OA2CLCCommands extends CLCCommands {
         sayi("             before this is set.");
         sayi("             You may also see the raw version of this (simply the JWT) by calling showRawToken.");
     }
+    protected void showRevokeHelp(){
+        say("revoke -at | -rt = revoke either the access token of the refresh token");
+    }
+    public void revoke(InputLine inputLine) throws Exception{
+        if (grant == null || showHelp(inputLine)) {
+            showRevokeHelp();
+            return;
+        }
+        boolean revokeAT = inputLine.hasArg("-at");
+        boolean revokeRT = inputLine.hasArg("-rt");
 
+
+    }
     public void getat(InputLine inputLine) throws Exception {
-       /* if(!canGetAT){
-            say("Sorry, but you have not gotten a grant yet here, so you cannot get an access token.");
-        }*/
         if (grant == null || showHelp(inputLine)) {
             getATHelp();
             return;

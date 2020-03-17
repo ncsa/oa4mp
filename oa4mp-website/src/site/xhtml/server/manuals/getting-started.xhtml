@@ -31,7 +31,7 @@
     <li>Some form of persistent storage. This may be a file system, MySQL or PostgreSQL.</li>
     <li>Java mail. This must be configured regardless if notifications are set. Read <a
             title="OAuth for MyProxy: Email Notifications"
-            href="server/configuration/server-email.xhtml">here</a> for details.
+            href="../configuration/server-email.html">here</a> for details.
     </li>
     <li>Maven 3.0 or above (if building from the source)</li>
     <li>Possibly either the latest <a href="http://dev.mysql.com/downloads/connector/j/">MySQL
@@ -59,14 +59,14 @@
 <p>You may most easily a bare-bones version for testing by downloading the current reference war:</p>
 
 <p><a title="OA4MP service war"
-      href="http://svn.code.sf.net/p/cilogon/code/tags/latest/server/oauth.war">oauth-server-latest.war</a>
+      href="https://github.com/ncsa/OA4MP/releases/latest/oauth.war">oauth-server-latest.war</a>
     <br></br>
     <a title="PGP signature"
-       href="http://svn.code.sf.net/p/cilogon/code/tags/latest/server/oauth.war.asc">(PGP signature)</a>
+       href="https://github.com/ncsa/OA4MP/releases/latest/oauth.war.asc">(PGP signature)</a>
 </p>
 
 <p>Download this, read to <a title="Server Configuration Reference Manual"
-                             href="server/configuration/config-index.xhtml">configure
+                             href="../configuration/config-index.html">configure
     the deployment</a>, and deploy it to Tomcat. The war, as delivered, cannot be run.You must do some minimal
     configuration at least before deploying it. </p>
 
@@ -121,7 +121,7 @@ and you should end up with a deployable war.
 <h3>MySQL</h3>
 
 <p>In order to use MySQL for persistent storage, you must run the supplied script,
-    <a title="mysql.sql install script" href="http://svn.code.sf.net/p/cilogon/code/tags/latest/server/mysql.sql">mysql.sql</a>
+    <a title="mysql.sql install script" href="https://github.com/ncsa/OA4MP/releases/latest/mysql.sql">mysql.sql</a>
     to create all of the tables and users before your first use.</p>
 <pre><code>mysql -u username -p &lt; <code>/path/to/file/mysql.sql</code></code></pre>
 <p>(the username is an account (<em>root</em>, e.g.) which has sufficient privileges to create other users) which will
@@ -134,7 +134,7 @@ and you should end up with a deployable war.
 
 <p>Most Unix distros have this database installed by default. There is a specific script, <a
         title="PostGreSQL install script"
-        href="http://svn.code.sf.net/p/cilogon/code/tags/latest/server/pg.sql">pg.sql</a>, that will
+        href="https://github.com/ncsa/OA4MP/releases/latest/pg.sql">pg.sql</a>, that will
     create all the tables. All you should need to do is set the passwords near the top of the file. Then you would need
     to log in to the command line psql tool as the user postgres (this is the super user) and from that prompt issue</p>
 <pre>\i /path/to/file/pg.sql</pre>

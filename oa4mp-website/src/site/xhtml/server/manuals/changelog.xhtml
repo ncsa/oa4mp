@@ -19,7 +19,7 @@
     <li><a href="https://github.com/ncsa/OA4MP/issues/13">Github issue 13</a>, CIL-646: Implement <a href="https://tools.ietf.org/html/rfc7009.">rfc 7009</a>
     for token revocation.</li>
     <li><a href="https://github.com/ncsa/OA4MP/issues/15">Github issue 15</a>: OA4MP may be turned in to an OIDC compliant
-        service by setting the <a href="server/dtd/server-dtd-service-tag.xhtml">OIDCEnabled flag</a></li>
+        service by setting the <a href="server/dtd/server-dtd-service-tag.html">OIDCEnabled flag</a></li>
     <li><a href="https://github.com/ncsa/OA4MP/issues/19">Github issue 19</a>:Added QDL support.</li>
     <li>CIL-540:(CIlogon only) Relax requirements for user attributes. as long as a user is only requesting a scope
         of openid (so no certs or extended information such as groups) and has an idp and an identifier CILogon will accept
@@ -66,7 +66,7 @@ or removing a single property:
 <p>will print out a lot of information and examples. Similarly for rm and ls. </p>
 
 <h2>4.3</h2>
-<p>Release date 2019-20-11.</p>
+<p>Release date 2019-11-20.</p>
 
 <ul>
     <li>CIL-352: CILogon previous subject issue. In some cases in CILogon, the country should be US and is not archived this way when updating.
@@ -97,7 +97,7 @@ or removing a single property:
 file (either a Java properties file or a JSON object in a file) and from the command line. </p>
 
 <h2>4.2</h2>
-<p>Release date 2019-15-05.</p>
+<p>Release date 2019-05-15.</p>
 
 <ul>
     <li>Added support for turning on/off OIDC abilities in the configuration file with the OIDCEnabled flag.</li>
@@ -117,7 +117,7 @@ file (either a Java properties file or a JSON object in a file) and from the com
 </ul>
 
 <h2>4.1.1</h2>
-<p>Release date 2018-29-10.</p>
+<p>Release date 2018-10-29.</p>
 
 <ul>
     <li>CIL-476: Allow for setting reply-to header in email notifications</li>
@@ -179,7 +179,7 @@ commands. For SQL stores, there is also a new search function that allows for li
 </ul>
 
 <h2>3.5</h2>
-<p>Released 2017-29-11.</p>
+<p>Release date 2017-11-29.</p>
 <ul>
     <li>Support for public clients.</li>
     <li>CIL-409: Missing cert request in OIDC getcert call causes empty certificate to be returned.</li>
@@ -194,7 +194,7 @@ commands. For SQL stores, there is also a new search function that allows for li
     access by a public client is severely restricted, almost exclusively to the openid scope for a user.</p>
 
 <h2>3.4</h2>
-<p>Release date 2017-28-08.</p>
+<p>Release date 2017-08-28.</p>
 <ul>
     <li>OAUTH-203: Clients may request supported scopes at registration time.</li>
     <li>OAUTH-212: PEM encodings broken by change to Apache base 64 codec.</li>
@@ -225,7 +225,7 @@ commands. For SQL stores, there is also a new search function that allows for li
 </p>
 
 <p>You must also create signing keys for OIDC. This is done with the
-    <a href="http://grid.ncsa.illinois.edu/myproxy/oauth/server/configuration/signing.xhtml">command line tool</a></p>
+    <a href="http://grid.ncsa.illinois.edu/myproxy/oauth/server/configuration/signing.html">command line tool</a></p>
 
 <p>Signing of ID tokens is now the default on the server. However, since older clients may not support this, the default
     is to
@@ -239,7 +239,7 @@ commands. For SQL stores, there is also a new search function that allows for li
 
 
 <h2>3.3</h2>
-<p>Release date 2016-22-09.</p>
+<p>Release date 2016-09-22.</p>
 
 <ul>
     <li>CIL-252: Scope handler which queries LDAP for user attributes.</li>
@@ -284,12 +284,12 @@ commands. For SQL stores, there is also a new search function that allows for li
     </li>
     <li>OAUTH-209: Remove dependency on Google Code's maven repository.</li>
     <li>OAUTH-215: default secret key length for new OIDC clients set to 512 bytes.</li>
-    <li>Added new <a href="http://grid.ncsa.illinois.edu/myproxy/oauth/server/manuals/test-client.xhtml">command line
+    <li>Added new <a href="test-client.html">command line
         client</a> for testing purposes.
     </li>
 </ul>
 <h2>3.2.1</h2>
-<p>Release date 2016-28-01.</p>
+<p>Release date 2016-01-28.</p>
 
 <ul>
     <li>CIL-101: (reopened with an additional parameter for the overloaded myproxy username)</li>
@@ -312,7 +312,7 @@ commands. For SQL stores, there is also a new search function that allows for li
 </ul>
 
 <h2>3.2</h2>
-<p>Release date 2015-14-09.</p>
+<p>Release date 2015-09-14.</p>
 <ul>
     <li>OAUTH-181: Updated server walkthrough.</li>
     <li>OAUTH-183: Update documentation for using remote user.</li>
@@ -336,11 +336,13 @@ commands. For SQL stores, there is also a new search function that allows for li
 </ul>
 
 <h2>3.1.0</h2>
+<p>Release date 2016-20-01.</p>
 <ul>
     <li>CIL-194: CILogon server only returns cert from last Myproxy server</li>
     <li>CIL-196: server DN override in myproxy configuration not read.</li>
 </ul>
 <h2>3.1</h2>
+<p>Release date 2015-06-18</p>
 <ul>
     <li>OAUTH-179: Updated apache http client libraries to 4.4.1 since previous version had
         <a href="https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-3577">an SSL server hostname validation
@@ -349,7 +351,7 @@ commands. For SQL stores, there is also a new search function that allows for li
 </ul>
 
 <h2>3.0</h2>
-<p>Release date 2015-08-04.</p>
+<p>Release date 2015-04-08.</p>
 
 <ul>
     <li><b>Java 8 support</b>: Due to internal changes to Java, this release requires Java 8 and will not work with
@@ -375,7 +377,7 @@ commands. For SQL stores, there is also a new search function that allows for li
     <li>OAUTH-163: State must be returned in OAuth 2 component with authorization response callback.</li>
 </ul>
 <h2>1.2.1</h2>
-<p>Release date 2014-11-04.</p>
+<p>Release date 2014-04-11.</p>
 
 <ul>
     <li>OAUTH-127: MyProxyLogon website updated to point to current release.</li>
@@ -394,7 +396,7 @@ commands. For SQL stores, there is also a new search function that allows for li
 </ul>
 
 <h2>1.2</h2>
-<p>Release date 2014-29-10.</p>
+<p>Release date 2014-10-29.</p>
 
 <ul>
     <li>OAUTH-131: Improved client registration for OAuth 2 servers.</li>
@@ -405,7 +407,7 @@ commands. For SQL stores, there is also a new search function that allows for li
 </ul>
 
 <h2>1.1.3</h2>
-<p>Release date 2014-30-09.</p>
+<p>Release date 2014-09-30.</p>
 
 <ul>
     <li>OAUTH-139: CLI might return an incorrect list of items after several updates.</li>
@@ -428,7 +430,7 @@ commands. For SQL stores, there is also a new search function that allows for li
 </ul>
 
 <h2>1.1.2</h2>
-<p>Release date 2014-31-07.</p>
+<p>Release date 2014-07-31.</p>
 
 <ul>
     <li>OAUTH-112: Servlet initialization is injected now, decoupling it more from Tomcat startup.</li>
@@ -480,7 +482,7 @@ commands. For SQL stores, there is also a new search function that allows for li
         various supported stores (mysql, postgres, files) and admin tools.
     </li>
     <li>OAUTH-94: Fix for passthrough of Shibboleth attributes.
-        A <a href="server/manuals/Username-transformations.xhtml">username transformation</a> interface has been
+        A <a href="Username-transformations.html">username transformation</a> interface has been
         created.
         This will be invoked immediately before the call to MyProxy.
         Users that wish to customize this may do so by implementing the interface and setting it in the environment
@@ -497,11 +499,12 @@ commands. For SQL stores, there is also a new search function that allows for li
 </ul>
 
 <h2>1.0.7</h2>
+<p>Release date 2013-08-16.</p>
 <ul>
     <li>Added support to make using log 4j optional. It had been disabled which interfered with some installations.</li>
     <li>Fixed bug OAUTH-90.</li>
     <li>Fixed bug OAUTH-94. This adds a configuration option to
-        <a href="server/configuration/authorization-header.xhtml">return the DN</a> of the user's cert as the username.
+        <a href="authorization-header.html">return the DN</a> of the user's cert as the username.
     </li>
     <li>All new command line tools that allow for managing clients and approvals.</li>
     <li>Changed client index page to be more up to date.</li>
@@ -514,6 +517,7 @@ commands. For SQL stores, there is also a new search function that allows for li
 </ul>
 
 <h2>1.0.6</h2>
+<p>Release date 2012-08-31</p>
 <ul>
     <li>Version number is now printed to the console whenever the server starts up.</li>
     <li>Support for authentication using the REMOTE_USER (or any other) header.</li>

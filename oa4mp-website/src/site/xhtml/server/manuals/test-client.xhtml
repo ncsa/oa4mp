@@ -12,38 +12,60 @@
 <!--#include virtual="../../header.html" -->
 <h2>The Command Line Test Client</h2>
 <p>New to version 3.3 of OA4MP for OIDC is a command line client. This allows you to register a client with a server
-    and issue commands to the server to get access tokens, refresh tokens, user information and certs (assuming the server
+    and issue commands to the server to get access tokens, refresh tokens, user information and certs (assuming the
+    server
     supports these). The only caveats are
-        </p>
+</p>
 <ul>
-    <li>You must register a client with the server. This must not have a functional callback. </li>
+    <li>You must register a client with the server. This must not have a functional callback.</li>
     <li>You must manually cut and paste after authentication. This cannot be altered without changing the
-    security model for OA4MP.</li>
+        security model for OA4MP.
+    </li>
 </ul>
+<h2>Get the latest release</h2>
+<p>You can get the latest release
+    <a href="https://github.com/ncsa/OA4MP/releases/latest/oa2-client.jar">oa2-client.jar</a>
+    and the corresponding script to run it too <a href="https://github.com/ncsa/OA4MP/releases/latest/oa2-client">oa2-client</a>
+</p>
 <h2>What it is</h2>
 <p>This command line utility allows you to issue commands against the server and view responses.
     Talking to a server requires some complex state generation and management. The client
     does all of this for you. The supported commands are
 
-        </p>
+</p>
 <ul>
     <li><b>clear</b> -- clear the current state and start over</li>
     <li><b>exit</b> -- end the session and shut down the client.</li>
-    <li><b>geturi</b> -- this creates the URI (not trivial as it requires a lot of parameters) that you copy and paste in to your browser.</li>
-    <li><b>setgrant</b>-- This is invoked on the callback uri from the server. It will grab the state information and manage it.</li>
-    <li><b>getat</b> -- Get an access token. You may also get a refresh token at this time if the server supports this.</li>
+    <li><b>geturi</b> -- this creates the URI (not trivial as it requires a lot of parameters) that you copy and paste
+        in to your browser.
+    </li>
+    <li><b>setgrant</b>-- This is invoked on the callback uri from the server. It will grab the state information and
+        manage it.
+    </li>
+    <li><b>getat</b> -- Get an access token. You may also get a refresh token at this time if the server supports this.
+    </li>
     <li><b>getuserinfo</b> -- use the current access token to get the user's information</li>
     <li><b>getcert</b> -- get a certificate</li>
     <li><b>savecert</b> -- save the certificate to a file in PEM format</li>
     <li><b>getrt</b> -- get the next refresh token</li>
 </ul>
+<p>And here is the executive summary of the steps</p>
+<ol>
+    <li><b>geturi</b> -- cut the result, paste it in your brower, authenticate</li>
+    <li>Get an error -- your redirect won't work. Great, but the url from the address box in your browser</li>
+    <li>issue <b>setgrant</b> using the callback you jus copied</li>
+    <li>issue <b>getat</b> This gets a access token, prints out stuff and lets you look at the id token, refresh token etc.</li>
+</ol>
 <h3>Setup</h3>
-<p>You must register the a client with the server as per <a href="http://grid.ncsa.illinois.edu/myproxy/oauth/client/manuals/registering-with-an-oauth2-server.xhtml">this</a>.
-The trick that makes this work, however, is that the callback URL you supply must be invalid, i.e., the callback from the server
-must fail. This will allow you to get the OAuth transaction state.</p>
+<p>You must register the a client with the server as per <a
+        href="../../client/manuals/registering-with-an-oauth2-server.html">this</a>.
+    The trick that makes this work, however, is that the callback URL you supply must be invalid, i.e., the callback
+    from the server
+    must fail. This will allow you to get the OAuth transaction state.</p>
 <h3>Invocation</h3>
 <p>
-    The client is called either directly or through the oa2-client script. You need to specify the configuration file name
+    The client is called either directly or through the oa2-client script. You need to specify the configuration file
+    name
     and the name of the configuration.
 
 </p>
@@ -53,15 +75,16 @@ must fail. This will allow you to get the OAuth transaction state.</p>
     client&gt;
 </pre>
 <p>The last line is the prompt. The startup message tell you that the loader found everything and there
-were no issues. You are now ready to start talking to an OA4MP OAuth 2 server.</p>
+    were no issues. You are now ready to start talking to an OA4MP OAuth 2 server.</p>
 <h3>Getting the correct URI</h3>
 <p>Issue the following <b>geturi</b> call:</p>
 <pre>
     client&gt;geturi
     https://surge.ncsa.illinois.edu/oauth2/authorize?scope=edu.uiuc.ncsa.myproxy.getcert+openid+profile+email&amp;response_type=code&amp;redirect_uri=https%3A%2F%2Fashigaru.ncsa.uiuc.edu%3A9443%2Fclient%2Fready&amp;state=MUB0Y2wme8FvxTbtwjp6y4xLfR3SbxS4NY6_FqDlM-Q&amp;nonce=udBh62PGMyZaYNa4-vlmfYbNl8MSgb7IO9rBIOkPWcM&amp;prompt=login&amp;client_id=myproxy%3Aoa4mp%2C2012%3A%2Fclient_id%2F2a3aab4b67f3c8d9f3bff4aafb6e236c&amp;skin=dataOne
     </pre>
-<p>The command causes a uri to be generated with the full state for the OIDC request (which is actually hard to make, hence
-the call). As with all calls, you can get a description of what it is and does by supplying
+<p>The command causes a uri to be generated with the full state for the OIDC request (which is actually hard to make,
+    hence
+    the call). As with all calls, you can get a description of what it is and does by supplying
     the argument --help:</p>
 <pre>
     client&gt;geturi --help
@@ -73,17 +96,20 @@ the call). As with all calls, you can get a description of what it is and does b
            Next Step: You should invoke setgrant with the callback uri from the server
 </pre>
 <p>You <b>must</b> cut and paste this into your browser. You will then complete the authorization there and
-then next step will fail. What has happened is that the server tries to do the callback to the supplied (bogus) URI
-and, of course, there is nothing at the endpoint. You take this callback from the browser's location bar and invoke the
-<b>setgrant</b> call</p>
+    then next step will fail. What has happened is that the server tries to do the callback to the supplied (bogus) URI
+    and, of course, there is nothing at the endpoint. You take this callback from the browser's location bar and invoke
+    the
+    <b>setgrant</b> call</p>
 <pre>
     client&gt;setgrant https://ashigaru.ncsa.uiuc.edu:9443/client/ready?code=https%3A%2F%2Fsurge.ncsa.illinois.edu%2Foauth2%2FauthzGrant%2F69423b7a0ff66ba67b6beb777baa4fce%2F1473714031677&amp;state=MUB0Y2wme8FvxTbtwjp6y4xLfR3SbxS4NY6_FqDlM-Q
         grant=https://surge.ncsa.illinois.edu/oauth2/authzGrant/69423b7a0ff66ba67b6beb777baa4fce/1473714031677
 </pre>
 <p>This call will update the internal state of the program. (This is managing a full client instance behind the
-scenes which takes quite some little work, but fortunately, you don't have to do any of that.) It prints out the grant
-that the server issued, mostly so you can see it. Now you are in a position to get an access token. You should issue the
-<b>getat</b> call</p>
+    scenes which takes quite some little work, but fortunately, you don't have to do any of that.) It prints out the
+    grant
+    that the server issued, mostly so you can see it. Now you are in a position to get an access token. You should issue
+    the
+    <b>getat</b> call</p>
 <pre>
     client&gt;getat
      access token = https://surge.ncsa.illinois.edu/oauth2/accessToken/6843e396a91fb7e0bbdaa16d911a3f71/1473714329017
@@ -92,11 +118,13 @@ that the server issued, mostly so you can see it. Now you are in a position to g
        expires at Sat Sep 24 05:52:09 CDT 2016
     </pre>
 <p>This gets the access token from the server as well as any refresh token. It then prints out a small summary of these.
-(And it updates the internal state of the client, of course.) There are various things you can do at this point.
-since you have a valid access token. <b>Nota Bene:</b> an access token is valid for a short time -- server default is about
-15 minutes. If you attempt to use the access token after that to get, say, a certificate, then you will get an error
-from the server. Notice though that the refresh token expires far into the future, in this case 1,000,000,000 ms or about
-11.5 days. You may use the <b>getrt</b> call to get a new access token and refresh token:</p>
+    (And it updates the internal state of the client, of course.) There are various things you can do at this point.
+    since you have a valid access token. <b>Nota Bene:</b> an access token is valid for a short time -- server default
+    is about
+    15 minutes. If you attempt to use the access token after that to get, say, a certificate, then you will get an error
+    from the server. Notice though that the refresh token expires far into the future, in this case 1,000,000,000 ms or
+    about
+    11.5 days. You may use the <b>getrt</b> call to get a new access token and refresh token:</p>
 <pre>
     client&gt;getrt
      access token = https://surge.ncsa.illinois.edu/oauth2/accessToken/3fa47d0e6cfe4e25d9d256e248ca19ae/1473776351782
@@ -104,15 +132,17 @@ from the server. Notice though that the refresh token expires far into the futur
     RT expires in = 1000000000 ms.
        expires at Sat Sep 24 23:05:51 CDT 2016
 </pre>
-<p>In any case, as long as you have a valid access token, you may get a certificate or user information. We will do examples of each of these
-in turn. First, the <b>getuserinfo</b> call.</p>
+<p>In any case, as long as you have a valid access token, you may get a certificate or user information. We will do
+    examples of each of these
+    in turn. First, the <b>getuserinfo</b> call.</p>
 <pre>
     client&gt;getuserinfo
     user info:
               sub = jgaynor
 </pre>
-<p>In this case the test server we are using is configured for the absolute minimum of information. It merely returns the
-username (i.e. the name used to authenticate). The <b>getcert</b> call will return a certificate and if the server
+<p>In this case the test server we are using is configured for the absolute minimum of information. It merely returns
+    the
+    username (i.e. the name used to authenticate). The <b>getcert</b> call will return a certificate and if the server
     returns the username (which is the same as the subject of the user info call) it will be displayed too:</p>
 <pre>
     client&gt;getcert
@@ -143,14 +173,14 @@ username (i.e. the name used to authenticate). The <b>getcert</b> call will retu
 
 </pre>
 <p>You may cut and paste this or you can save it (PEM encoded) to a file using the
-<b>savecert</b> command:</p>
- <pre>
+    <b>savecert</b> command:</p>
+<pre>
      client&gt;savecert /tmp/mycert.pem
      File "/tmp/mycert.pem" saved successfully.
  </pre>
 <p>It is useful to state that you may keep renewing the refresh token and getting certs. As long
-as you renew the refresh token before it expires, this may be done indefinitely. As long as you have
-a valid access token (such as right after getting a new refresh token) you may get a cert.</p>
+    as you renew the refresh token before it expires, this may be done indefinitely. As long as you have
+    a valid access token (such as right after getting a new refresh token) you may get a cert.</p>
 <!--#include virtual="../../footer.html" -->
 </body>
 </html>

@@ -35,9 +35,9 @@
 
     <body>
         <menu name="OAuth for MyProxy">
-            <item name="Overview" href="http://grid.ncsa.illinois.edu/myproxy/oauth/server/index.xhtml"/>
-            <item name="Server" href="server/index.xhtml"/>
-            <item name="Client" href="client/index.xhtml"/>
+            <item name="Overview" href="server/index.html"/>
+            <item name="Server" href="server/index.html"/>
+            <item name="Client" href="client/index.html"/>
             <item name="api docs" href="apidocs/index.html"/>
         </menu>
         <menu ref="reports"/>

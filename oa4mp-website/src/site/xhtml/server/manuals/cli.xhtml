@@ -24,12 +24,14 @@ The latest version of the Oauth 1.0a command line tool is available at
 <a href="http://svn.code.sf.net/p/cilogon/code/tags/latest/server/oa4mp-cli.jar">oa4mp-cli.jar</a>
 You should also get the script that runs this too,
 <a href="http://svn.code.sf.net/p/cilogon/code/tags/latest/server/oa4mp-cli">oa4mp-cli</a>
+<p>NOTE that OAuth 1 is no longer being updated!! It is kept for those services still seeking to
+smoothly transition to OAuth 2.</p>
 
 <h5>Oauth 2.0</h5>
 The latest version of the Oauth 2.0 command line tool is available at
-<a href="http://svn.code.sf.net/p/cilogon/code/tags/latest/server/oa2-cli.jar">oa2-cli.jar</a>
+<a href="https://github.com/ncsa/OA4MP/releases/latest/oa2-cli.jar">oa2-cli.jar</a>
 You should also get the script that runs this too,
-<a href="http://svn.code.sf.net/p/cilogon/code/tags/latest/server/oa2-cli">oa2-cli</a>
+<a href="https://github.com/ncsa/OA4MP/releases/latest/oa2-cli">oa2-cli</a>
 
 <h2>Configuration</h2>
 The tool uses a standard configuration file exactly like the server. Indeed, you can just
@@ -170,9 +172,9 @@ To see the help for, say, the use command you would issue
  Type 'exit' when you wish to exit the component and return to the main menu
 </pre>
 
-Each of these components; <a href="server/manuals/cli.xhtml#clients">clients</a>,
-<a href="server/manuals/cli.xhtml#approvals">approvals</a>
-and <a href="server/manuals/cli.xhtml#copy">copy</a> is described in detail below. But first, a few preliminary notions.
+Each of these components; <a href="cli.html#clients">clients</a>,
+<a href="cli.html#approvals">approvals</a>
+and <a href="cli.html#copy">copy</a> is described in detail below. But first, a few preliminary notions.
 
 <h2>Index vs. Unique ID</h2>
 Since most objects have unique identifiers, you can specify these are arguments at any time it makes
@@ -197,16 +199,17 @@ Note that since there is no canonical ordering of objects in a store, you should
 </p>
 <h3>Options supported in each storage tool.</h3>
 <ul>
-    <li><a href="server/manuals/cli.xhtml#size">size</a> - number of entries in the current component.</li>
-    <li><a href="server/manuals/cli.xhtml#ls">ls [index | /uniqueId]</a> - list all items or the details of a given item</li>
-    <li><a href="server/manuals/cli.xhtml#update">update [index | /uniqueId]</a> - edit the item</li>
-    <li><a href="server/manuals/cli.xhtml#rm">rm [index | /uniqueId]</a> - remove an entry</li>
-    <li><a href="server/manuals/cli.xhtml#create">create [uniqueId]</a> - create a new entry with the optional id.</li>
-    <li><a href="server/manuals/cli.xhtml#serialize">serialize [-file path] uniqueId</a> - serialize, i.e. store the object in XML format to the file. Omitting the file dumps it to the command line</li>
-    <li><a href="server/manuals/cli.xhtml#deserialize">deserialize [-new] -file path</a> - deserialize i.e. read in the object from a file. The -new flag tells whether the object is new or not. If new and the id is in use, the operation will fail.</li>
+    <li><a href="cli.html#size">size</a> - number of entries in the current component.</li>
+    <li><a href="cli.html#ls">ls [index | /uniqueId]</a> - list all items or the details of a given item</li>
+    <li><a href="cli.html#update">update [index | /uniqueId]</a> - edit the item</li>
+    <li><a href="cli.html#rm">rm [index | /uniqueId]</a> - remove an entry</li>
+    <li><a href="cli.html#create">create [uniqueId]</a> - create a new entry with the optional id.</li>
+    <li><a href="cli.html#serialize">serialize [-file path] uniqueId</a> - serialize, i.e. store the object in XML format to the file. Omitting the file dumps it to the command line</li>
+    <li><a href="cli.html#deserialize">deserialize [-new] -file path</a> - deserialize i.e. read in the object from a file. The -new flag tells whether the object is new or not. If new and the id is in use, the operation will fail.</li>
 </ul>
 Each of these in turn will be discussed in detail.
-
+<!-- comment about name in the a tag. This is illegal in XHTML but these files will be converted to HTML
+     as part of the maven site command processing. So leave them or linking won't happen. -->
 <h1>Common commands for all storage components.</h1>
 <h4><a name="size">Getting The Number Of Objects In a Component.</a></h4>
 This will print the number of elements in the current storage component. <br/>
