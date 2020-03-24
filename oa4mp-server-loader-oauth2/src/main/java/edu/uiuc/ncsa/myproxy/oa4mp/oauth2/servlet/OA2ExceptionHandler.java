@@ -37,7 +37,7 @@ public class OA2ExceptionHandler implements ExceptionHandler {
 
     @Override
     public void handleException(Throwable t, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        ServletDebugUtil.dbg(this,"Error", t);
+        ServletDebugUtil.trace(this,"Error", t);
         if (t instanceof ExceptionWrapper) {
             // In this case we are getting this as a response after a forward to another servlet and have to unpack it.
             t = t.getCause();
@@ -54,7 +54,6 @@ public class OA2ExceptionHandler implements ExceptionHandler {
             response.setStatus(500);
             throw (ServletException) t;
         }
-        ;
 
         if (t instanceof OA2GeneralError) {
             handleOA2Error((OA2GeneralError) t, response);
@@ -69,15 +68,10 @@ public class OA2ExceptionHandler implements ExceptionHandler {
             handleOA2Error((OA2RedirectableError) t, response);
             return;
         }
-        // The next couple of exceptions can be thrown when there is no client (so the callback uri cannot be verified
+        // The next couple of exceptions can be thrown when there is no client (so the callback uri cannot be verified)
         if ((t instanceof UnknownClientException) || (t instanceof UnapprovedClientException)) {
             t.printStackTrace();
-            //  throw (GeneralException) t;
             throw new ServletException(t.getMessage());
-            //throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, t.getMessage(), HttpStatus.SC_BAD_REQUEST);
-            //handleOA2Error(new OA2GeneralError(OA2Errors.INVALID_REQUEST, t.getMessage(), HttpStatus.SC_BAD_REQUEST), response);
-            //  return;
-
         }
         if (t instanceof GeneralException) {
             handleOA2Error(new OA2GeneralError(OA2Errors.SERVER_ERROR, t.getMessage(), HttpStatus.SC_INTERNAL_SERVER_ERROR), response);
@@ -116,7 +110,6 @@ public class OA2ExceptionHandler implements ExceptionHandler {
         // Fixes OAUTH-174, better handling of errors on the server side, making it all spec. compliant.
         if (oa2RedirectableError.getCallback() == null) {
             // Except here, since there is no callback possible if it is not included in the first place.
-            //    throw new IllegalStateException("No callback has been specified in the request. Cannot process error notification.");
             // Convert to a general error
             handleOA2Error(new OA2GeneralError(oa2RedirectableError), response);
             return;
