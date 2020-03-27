@@ -347,8 +347,8 @@ public abstract class StoreCommands2 extends StoreCommands {
         sayi("of the object with id 'foo:bar'");
         sayi("A few notes. If the value of the property is a JSON object, you can edit it.");
         sayi("If the value of the property is an array, then you may add a value, delete a value,");
-        sayi("replace the entire contents (new entries are comma separated) or simple clear the .");
-        sayi("entire list of entries.");
+        sayi("replace the entire contents (new entries are comma separated) or simply clear the .");
+        sayi("entire list of entries. You may also back out of the update request.");
         say("See also list_keys");
     }
 
@@ -406,7 +406,10 @@ public abstract class StoreCommands2 extends StoreCommands {
 
     protected JSONArray updateSingleValue(String key, JSONArray currentValue) {
         say("current value=" + currentValue);
-        String action = getInput("Add, clear, delete or replace?(a/c/d/r)", "a").toLowerCase();
+        String action = getInput("Add, clear, delete, replace or exit?(a/c/d/r/x)", "a").toLowerCase();
+        if(action.equals("x")){
+            return null; // do nothing.
+        }
         if (action.equals("r")) {
             say("Enter the new elements with commas between them");
         }
@@ -435,6 +438,7 @@ public abstract class StoreCommands2 extends StoreCommands {
                     currentValue.add(st.nextToken());
                 }
                 return currentValue;
+
         }
         say("sorry, I did not understand what you want to do.");
         return null;
