@@ -224,7 +224,8 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         JSONArray scopes = new JSONArray();
         // Fix CIL-519: converter must serialize configuration object in toJSON call
         if (client.getConfig() != null && !client.getConfig().isEmpty()) {
-            json.put(getCK2().cfg(), client.getConfig());
+            //json.put(getCK2().cfg(), client.getConfig());
+            getJsonUtil().setJSONValue(json, getCK2().cfg(), client.getConfig());
         }
         Collection<String> scopeList = client.getScopes();
 

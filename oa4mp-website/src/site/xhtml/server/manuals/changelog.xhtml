@@ -21,6 +21,7 @@
     <li><a href="https://github.com/ncsa/OA4MP/issues/15">Github issue 15</a>: OA4MP may be turned in to an OIDC compliant
         service by setting the <a href="server/dtd/server-dtd-service-tag.html">OIDCEnabled flag</a></li>
     <li><a href="https://github.com/ncsa/OA4MP/issues/19">Github issue 19</a>:Added QDL support.</li>
+    <li>CIL-525: More refresh token tests</li>
     <li>CIL-540:(CIlogon only) Relax requirements for user attributes. as long as a user is only requesting a scope
         of openid (so no certs or extended information such as groups) and has an idp and an identifier CILogon will accept
         the user. </li>
@@ -30,6 +31,7 @@
     basic and merely allows for a client to query if a given access token is valid. Since we are moving to self-describing
     tokens it is unclear if we should support the other operations which are basically reading the token back to a service.</li>
     <li>CIL-648: Recheck claims at token refresh. There is also scripting support now for this.</li>
+    <li>CIL-649: Support pairwise id and subject id (in CILogon).</li>
     <li>CIL-666: Command Line Interface improvements.</li>
 </ul>
 <h3>Command Line Interface Enhancements</h3>

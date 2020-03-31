@@ -1,54 +1,5 @@
 import('oa2:/qdl/oidc/claims');
-  cfg. := new_template('ldap');
-  cfg.address := 'ldap1.ncsa.illinois.edu,ldap2.ncsa.illinois.edu';
-  cfg.search_filter_attribute := 'uid';
-  cfg.search_base := 'ou=People,dc=ncsa,dc=illinois,dc=edu';
-  cfg.search_name := 'uid';
-  cfg.authz_type := 'none';
-  cfg2. := create_source(cfg.);
-  claims. := test_source(create_source(cfg.), 'jgaynor');
-  say('***** LDAP Test');
-  say(claims., true);
-  
-  f. := new_template('file');
-  f.file_path := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/test-claims.json';
-  f2. := create_source(f.);
-  file_claims. := test_source(f. , 'jeff');
-  say('***** File Test');
-  say(file_claims., true);
+import('oa2:/qdl/oidc/client/manage');
 
-headers.OIDC__sub := 'http://cilogon.org/serverT/users/173048';
-headers.OIDC__idp_name := 'National Center for Supercomputing Applications';
-headers.OIDC__eppn := 'jgaynor@ncsa.illinois.edu';
-headers.OIDC__cert_subject_dn := '/DC=org/DC=cilogon/C=US/O=National Center for Supercomputing Applications/CN=Jeffrey Gaynor T17963';
-headers.OIDC__eptid := 'https://idp.ncsa.illinois.edu/idp/shibboleth!https://cilogon.org/shibboleth!i65P3o9qFNjrpS4z6+WI7Dir/4I=';
-headers.OIDC__iss := 'https://cilogon.org';
-headers.OIDC__given_name := 'Jeffrey';
-headers.OIDC__aud := 'myproxy:oa4mp,2012:/client_id/7e864a3c25400ca701df4900d490257f3';
-headers.OIDC__acr := 'https://refeds.org/profile/mfa';
-headers.OIDC__idp := 'https://idp.ncsa.illinois.edu/idp/shibboleth';
-headers.OIDC__affiliation := 'staff@ncsa.illinois.edu;employee@ncsa.illinois.edu;member@ncsa.illinois.edu';
-headers.OIDC__name := 'Jeffrey Gaynor';
-headers.OIDC__family_name := 'Gaynor';
-headers.OIDC__email := 'gaynor@illinois.edu';
-headers.OIDC__auth_time := '1581461958';
-headers.OIDC__exp := '1581462859';
-headers.OIDC__iat := '1581461959';
-headers.OIDC__nonce := 'stW3-mkHk70ERlIx2vwasSWXkjXjLEsTUqTrouxcJZY';
 
-h. := new_template('http');
-h.prefix := 'OIDC__';
-h2. := create_source(h.);
-h2.headers. := headers.;
-h_claims. := test_source(h2., 'jgaynor');
-say('***** HTTP Headers Test');
 
-say(h_claims., true);
-
-ncsa. := new_template('ncsa');
-ncsa2. := create_source(ncsa.);
-// Note that there is an option to set the search_name to something other than uid...
-ncsa_claims. := test_source(ncsa2., 'jgaynor');
-say('***** NCSA LDAP Test');
-
-say(ncsa_claims., true);

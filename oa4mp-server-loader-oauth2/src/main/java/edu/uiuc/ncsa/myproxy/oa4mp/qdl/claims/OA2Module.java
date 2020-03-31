@@ -9,10 +9,6 @@ import java.net.URI;
  * on 2/10/20 at  5:49 AM
  */
 public class OA2Module extends JavaModule {
-    @Override
-     public boolean isExternal() {
-         return true;
-     }
 
     public OA2Module(URI namespace, String alias) {
         super(namespace, alias);

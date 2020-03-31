@@ -4,7 +4,6 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.security.core.cache.RetentionPolicy;
 import edu.uiuc.ncsa.security.core.exceptions.InvalidTimestampException;
 import edu.uiuc.ncsa.security.core.util.DateUtils;
-import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
 
 import java.util.Map;
@@ -30,10 +29,6 @@ public class RefreshTokenRetentionPolicy implements RetentionPolicy {
         return true;
     }
 
-    void debug(String x){
-       DebugUtil.dbg(this, x);
-
-    }
     @Override
     public boolean retain(Object key, Object value) {
         OA2ServiceTransaction st2 = (OA2ServiceTransaction) value;

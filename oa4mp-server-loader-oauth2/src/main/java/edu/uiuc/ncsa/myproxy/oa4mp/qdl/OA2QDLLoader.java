@@ -1,6 +1,8 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.qdl;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims.*;
+import edu.uiuc.ncsa.myproxy.oa4mp.qdl.cm.ClientCommands;
+import edu.uiuc.ncsa.myproxy.oa4mp.qdl.cm.ClientManagementModule;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
 import edu.uiuc.ncsa.qdl.extensions.QDLLoader;
 import edu.uiuc.ncsa.qdl.module.Module;
@@ -27,6 +29,20 @@ public class OA2QDLLoader implements QDLLoader {
         oa2Module.addFunctions(funcs);
         ArrayList<Module> modules = new ArrayList<>();
         modules.add(oa2Module);
+
+        ClientManagementModule cmm = new ClientManagementModule(URI.create("oa2:/qdl/oidc/client/manage"), "cm");
+        ClientCommands cc = new ClientCommands();
+         funcs = new ArrayList<>();
+         funcs.add(cc.new InitMethod());
+         funcs.add(cc.new ReadClient());
+         funcs.add(cc.new SaveClient());
+         funcs.add(cc.new Search());
+         funcs.add(cc.new Remove());
+         funcs.add(cc.new Size());
+         funcs.add(cc.new Keys());
+         funcs.add(cc.new Approve());
+         cmm.addFunctions(funcs);
+         modules.add(cmm);
         return modules;
     }
 }
