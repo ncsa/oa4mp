@@ -154,10 +154,7 @@ public class ClaimsSourceTester implements QDLFunction, CSConstants {
 
     }
 
-    @Override
-    public QDLFunction getInstance() {
-        return this;
-    }
+
 
     protected static void testFS() {
         StemVariable mystem = new StemVariable();

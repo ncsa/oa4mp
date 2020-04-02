@@ -122,6 +122,18 @@
             <version>4.4-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>edu.uiuc.ncsa.security</groupId>
+            <artifactId>ncsa-qdl</artifactId>
+            <version>1.0-QDL-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>edu.uiuc.ncsa.security</groupId>
+            <artifactId>ncsa-qdl</artifactId>
+            <version>1.0-QDL-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <build>

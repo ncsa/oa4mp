@@ -117,10 +117,6 @@ public class CreateSourceConfig implements QDLFunction, CSConstants {
         setValue(arg, output, CS_DEFAULT_ID, CS_DEFAULT_ID_VALUE);
     }
 
-    @Override
-    public QDLFunction getInstance() {
-        return this;
-    }
 
     @Override
     public List<String> getDocumentation() {

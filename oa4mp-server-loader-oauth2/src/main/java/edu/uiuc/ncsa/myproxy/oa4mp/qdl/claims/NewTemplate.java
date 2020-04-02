@@ -7,7 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Creates a template for a given type. This has asterisks where the required values are.
+ * Creates a template for a given type of claim sourse.
+ * This has asterisks where the required values are.
  * <p>Created by Jeff Gaynor<br>
  * on 2/11/20 at  12:29 PM
  */
@@ -58,10 +59,6 @@ public class NewTemplate implements QDLFunction, CSConstants {
         throw new IllegalArgumentException("Error: unknown configuration type \"" + type + "\".");
     }
 
-    @Override
-    public QDLFunction getInstance() {
-        return this;
-    }
 
     @Override
     public List<String> getDocumentation() {

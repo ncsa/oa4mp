@@ -51,10 +51,6 @@ public class IsInGroup implements QDLFunction {
         return Boolean.FALSE;
     }
 
-    @Override
-    public QDLFunction getInstance() {
-        return this;
-    }
 
     @Override
     public List<String> getDocumentation() {

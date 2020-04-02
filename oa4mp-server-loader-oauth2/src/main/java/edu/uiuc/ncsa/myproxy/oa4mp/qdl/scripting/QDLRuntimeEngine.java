@@ -70,6 +70,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine {
                 MetaEvaluator.getInstance(),
                 new FunctionTable(),
                 new ModuleMap(),
+                null, // no logging at least for now
                 true);// enable server mode.
         state.getOpEvaluator().setNumericDigits(qe.getNumericDigits());
         if(qe != null && qe.isEnabled()) {

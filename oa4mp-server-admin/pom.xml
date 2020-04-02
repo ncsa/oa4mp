@@ -48,7 +48,7 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>ncsa-qdl</artifactId>
-            <version>4.4-SNAPSHOT</version>
+            <version>1.0-QDL-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

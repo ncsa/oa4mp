@@ -12,6 +12,7 @@ import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
+import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.util.configuration.ConfigUtil;
 import net.sf.json.JSON;
@@ -26,10 +27,18 @@ import java.util.List;
  * on 3/31/20 at  11:07 AM
  */
 public class ClientCommands {
-    OA2Client currentClient;
+    public MyLoggingFacade getLogger() {
+        return logger;
+    }
+
+    public void setLogger(MyLoggingFacade logger) {
+        this.logger = logger;
+    }
+
+    MyLoggingFacade logger = null;
 
     public ConfigurationLoader<? extends AbstractEnvironment> getLoader() {
-        return new OA2ConfigurationLoader<OA2SE>(getConfigurationNode(), null);
+        return new OA2ConfigurationLoader<OA2SE>(getConfigurationNode(), getLogger());
     }
 
     public ConfigurationNode getConfigurationNode() {
@@ -84,10 +93,6 @@ public class ClientCommands {
             return true;
         }
 
-        @Override
-        public QDLFunction getInstance() {
-            return this;
-        }
 
         @Override
         public List<String> getDocumentation() {
@@ -122,10 +127,6 @@ public class ClientCommands {
             }
         }
 
-        @Override
-        public QDLFunction getInstance() {
-            return this;
-        }
 
         @Override
         public List<String> getDocumentation() {
@@ -203,10 +204,6 @@ public class ClientCommands {
             return Boolean.TRUE;
         }
 
-        @Override
-        public QDLFunction getInstance() {
-            return this;
-        }
 
         @Override
         public List<String> getDocumentation() {
@@ -253,11 +250,6 @@ public class ClientCommands {
         }
 
         @Override
-        public QDLFunction getInstance() {
-            return this;
-        }
-
-        @Override
         public List<String> getDocumentation() {
             List<String> doxx = new ArrayList<>();
             doxx.add(getName() + "(key, regex) -  search for all clients with the given key whose values satisfy the regex.");
@@ -290,10 +282,6 @@ public class ClientCommands {
             }
         }
 
-        @Override
-        public QDLFunction getInstance() {
-            return this;
-        }
 
         @Override
         public List<String> getDocumentation() {
@@ -329,10 +317,6 @@ public class ClientCommands {
             return Boolean.TRUE;
         }
 
-        @Override
-        public QDLFunction getInstance() {
-            return this;
-        }
 
         @Override
         public List<String> getDocumentation() {
@@ -372,10 +356,6 @@ public class ClientCommands {
             return stemVariable;
         }
 
-        @Override
-        public QDLFunction getInstance() {
-            return this;
-        }
 
         @Override
         public List<String> getDocumentation() {
@@ -437,10 +417,6 @@ public class ClientCommands {
             return Boolean.FALSE;
         }
 
-        @Override
-        public QDLFunction getInstance() {
-            return this;
-        }
 
         @Override
         public List<String> getDocumentation() {
