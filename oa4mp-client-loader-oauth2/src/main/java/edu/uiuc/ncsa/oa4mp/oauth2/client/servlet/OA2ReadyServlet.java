@@ -87,7 +87,12 @@ public class OA2ReadyServlet extends ClientServlet {
             rawAT = atResponse2.getAccessToken().getToken(); // save it here since we have it
             ui = oa2MPService.getUserInfo(atResponse2.getAccessToken().toString());
             if (getCerts) {
-                assetResponse = oa2MPService.getCert(asset, atResponse2);
+                try {
+                    assetResponse = oa2MPService.getCert(asset, atResponse2);
+                }catch(Throwable t){
+                    // Then no cert.
+                    getCerts = false;
+                }
             }
         } else {
             asset = (OA2Asset) getCE().getAssetStore().get(identifier);
@@ -156,7 +161,7 @@ public class OA2ReadyServlet extends ClientServlet {
 
             }
         } else {
-            request.setAttribute("certSubject", "(no cert requested)");
+            request.setAttribute("certSubject", "(no cert)");
         }
         info("2.b. Done! Displaying success page.");
 

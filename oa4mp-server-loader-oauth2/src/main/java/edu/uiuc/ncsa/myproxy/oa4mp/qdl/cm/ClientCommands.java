@@ -19,6 +19,7 @@ import net.sf.json.JSON;
 import net.sf.json.JSONObject;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +27,7 @@ import java.util.List;
  * <p>Created by Jeff Gaynor<br>
  * on 3/31/20 at  11:07 AM
  */
-public class ClientCommands {
+public class ClientCommands implements Serializable {
     public MyLoggingFacade getLogger() {
         return logger;
     }

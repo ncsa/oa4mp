@@ -67,6 +67,7 @@ public abstract class CRServlet extends MyProxyDelegationServlet {
                 localCertRequest = CertUtil.createCertRequest(keyPair);
             } catch (GeneralSecurityException e) {
                 error("3.b. " + e.getMessage());
+                throw new GeneralException("Error: Could not create cert request:" + e.getMessage());
             }
 
         }
@@ -124,11 +125,10 @@ public abstract class CRServlet extends MyProxyDelegationServlet {
      * @param localCertRequest
      * @param statusString
      * @return
-     * @throws GeneralSecurityException
      */
     protected LinkedList<X509Certificate> getX509Certificates(ServiceTransaction transaction,
                                                               MyPKCS10CertRequest localCertRequest,
-                                                              String statusString) throws GeneralSecurityException {
+                                                              String statusString)  {
 
         MyProxyConnectable mpc = getMPConnection(transaction);
         mpc.setLifetime(transaction.getLifetime());

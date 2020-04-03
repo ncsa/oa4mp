@@ -177,6 +177,25 @@ public class IDTokenHandler implements PayloadHandler {
         if (oa2se.isOIDCEnabled()) {
             checkClaim(getClaims(), SUBJECT);
         }
+        // Remove empty claims. One should not assert empty claims.
+        // Get the keys to remove then remove them or you get a concurrent modification exception.
+        ArrayList<String> keysToRemove = new ArrayList<>();
+        for (Object key : claims.keySet()) {
+            if (key == null) {
+                keysToRemove.add(null);
+            }
+            String k = key.toString();
+            if (k.isEmpty()) {
+                keysToRemove.add("");
+            }
+            if (claims.get(key) == null || claims.getString(k).isEmpty()) {
+                keysToRemove.add(k);
+            }
+        }
+        for (String key : keysToRemove) {
+            DebugUtil.trace(this, "Removed empty claim \"" + key + "\"");
+            claims.remove(key);
+        }
     }
 
     List<ClaimSource> sources = null;

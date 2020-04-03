@@ -6,7 +6,6 @@ import edu.uiuc.ncsa.myproxy.MyProxyConnectable;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.IDTokenHandler;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.OA2ClaimsUtil;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ScriptRuntimeEngineFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractAuthorizationServlet;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
@@ -201,7 +200,7 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
         IDTokenHandler idTokenHandler = new IDTokenHandler(oa2SE,st2,request);
         jwtRunner.addHandler(idTokenHandler);
         jwtRunner.doAuthClaims();
-        OA2ClaimsUtil claimsUtil = new OA2ClaimsUtil(oa2SE, st2);
+      //  OA2ClaimsUtil claimsUtil = new OA2ClaimsUtil(oa2SE, st2);
         //claimsUtil.processAuthorizationClaims(request);
     }
 

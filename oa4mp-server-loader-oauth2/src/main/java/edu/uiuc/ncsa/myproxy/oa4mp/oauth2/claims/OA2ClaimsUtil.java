@@ -433,7 +433,7 @@ public class OA2ClaimsUtil implements ScriptingConstants {
         return transaction.getClaims();
     }
 
-    protected void checkClaim(JSONObject claims, String claimKey) {
+    protected void checkRequiredClaim(JSONObject claims, String claimKey) {
         if (claims.containsKey(claimKey)) {
             if (isEmpty(claims.getString(claimKey))) {
                 //           DebugUtil.trace(this, "Missing \"" + claimKey+ "\" claim= " );
@@ -448,14 +448,33 @@ public class OA2ClaimsUtil implements ScriptingConstants {
     /**
      * For CIL-499. It is possible to remove key claims with functors and return unusable claims objects. This method
      * will check that claims that <b>must</b> be present are there or will raise a server-side exception.
+     * CIL-540 Do not return empty claims either.
      *
      * @param claims
      */
     protected void checkRequiredClaims(JSONObject claims) {
         // only required one by the spec.
         if (oa2se.isOIDCEnabled()) {
-            checkClaim(claims, SUBJECT);
+            checkRequiredClaim(claims, SUBJECT);
         }
+        // Remove empty claims. One should not assert empty claims.
+        for (Object key : claims.keySet()) {
+
+            if (key == null) {
+                DebugUtil.error(this,"Null claim key encountered.");
+                claims.remove(null);
+            }
+            String k = key.toString();
+            if (k.isEmpty()) {
+                DebugUtil.error(this,"Empty claim key encountered.");
+                claims.remove(key);
+            }
+            if (claims.get(key) == null || claims.getString(k).isEmpty()) {
+                DebugUtil.trace(this,"Removed empty claim \"" + key + "\"");
+                claims.remove(key);
+            }
+        }
+
     }
 
     protected boolean isEmpty(String x) {

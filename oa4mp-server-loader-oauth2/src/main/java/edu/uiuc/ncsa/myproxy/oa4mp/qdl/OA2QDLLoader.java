@@ -1,7 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.qdl;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims.OA2Module;
-import edu.uiuc.ncsa.myproxy.oa4mp.qdl.cm.ClientManagementModule;
 import edu.uiuc.ncsa.qdl.extensions.QDLLoader;
 import edu.uiuc.ncsa.qdl.module.Module;
 
@@ -19,7 +18,7 @@ public class OA2QDLLoader implements QDLLoader {
     public List<Module> load() {
         ArrayList<Module> modules = new ArrayList<>();
         modules.add(new OA2Module().newInstance(null));
-        modules.add(new ClientManagementModule().newInstance(null));
+   //     modules.add(new ClientManagementModule().newInstance(null));
         return modules;
     }
 }

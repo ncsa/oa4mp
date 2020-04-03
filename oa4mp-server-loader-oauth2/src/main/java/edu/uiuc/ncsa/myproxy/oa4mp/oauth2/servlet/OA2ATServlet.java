@@ -180,7 +180,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         IDTokenHandler idTokenHandler = new IDTokenHandler(oa2SE,st2);
         jwtRunner.addHandler(idTokenHandler);
         jwtRunner.doTokenClaims();
-        OA2ClaimsUtil claimsUtil = new OA2ClaimsUtil(oa2SE, st2);
+       // OA2ClaimsUtil claimsUtil = new OA2ClaimsUtil(oa2SE, st2);
         // claimsUtil.processClaims();
 
         atResponse.setClaims(st2.getClaims());
