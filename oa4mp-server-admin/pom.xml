@@ -7,7 +7,7 @@
     <parent>
         <groupId>edu.uiuc.ncsa.myproxy</groupId>
         <artifactId>myproxy</artifactId>
-        <version>4.4-SNAPSHOT</version>
+        <version>4.4</version>
     </parent>
 
     <artifactId>oa4mp-server-admin</artifactId>
@@ -22,23 +22,23 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>oa4mp-server-api</artifactId>
-            <version>4.4-SNAPSHOT</version>
+            <version>4.4</version>
         </dependency>
         <!-- Need this for the monitor -->
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>oa4mp-client-loader-oauth1</artifactId>
-            <version>4.4-SNAPSHOT</version>
+            <version>4.4</version>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>oa4mp-server-loader-oauth1</artifactId>
-            <version>4.4-SNAPSHOT</version>
+            <version>4.4</version>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security.delegation</groupId>
             <artifactId>ncsa-security-oauth-1.0a</artifactId>
-            <version>4.4-SNAPSHOT</version>
+            <version>4.4</version>
         </dependency>
         <dependency>
             <groupId>javax.mail</groupId>
@@ -48,7 +48,7 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>ncsa-qdl</artifactId>
-            <version>1.0-QDL-SNAPSHOT</version>
+            <version>1.0</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
