@@ -15,7 +15,14 @@ import net.sf.json.JSONObject;
 public class ScriptRuntimeEngineFactory {
     public static ScriptRuntimeEngine createRTE(OA2SE oa2SE, JSONObject config){
         if(config.containsKey(QDLRuntimeEngine.CONFIG_TAG)){
-            return new QDLRuntimeEngine(oa2SE.getQDLEnvironment(), config.getJSONObject(QDLRuntimeEngine.CONFIG_TAG));
+            if(oa2SE.getQDLEnvironment() == null || !oa2SE.getQDLEnvironment().isEnabled()){
+                oa2SE.getMyLogger().warn("**********************************");
+                oa2SE.getMyLogger().warn("QDL scripting detected, but no QDL runtime engine has been configured.");
+                oa2SE.getMyLogger().warn("No QDL scripts will be run.");
+                oa2SE.getMyLogger().warn("**********************************");
+            }else {
+                return new QDLRuntimeEngine(oa2SE.getQDLEnvironment(), config.getJSONObject(QDLRuntimeEngine.CONFIG_TAG));
+            }
         }
         if(config.containsKey("config")){
             return new FunctorRuntimeEngine(config);

@@ -122,6 +122,8 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
             return;
         }
         if (getLDAPCfg().isFailOnError()) {
+            String message = (throwable instanceof NullPointerException)?"(null pointer)": throwable.getMessage();
+            getMyLogger().warn("Could not get LDAP information:" + message);
             String subjectTemplate = "Error on ${host} contacting LDAP server";
             String messageTemplate = "The following error message was received attempting to contact the " +
                     "LDAP server at ${ldap_host}:\n\n${message}\n\n. The operation did not complete.";

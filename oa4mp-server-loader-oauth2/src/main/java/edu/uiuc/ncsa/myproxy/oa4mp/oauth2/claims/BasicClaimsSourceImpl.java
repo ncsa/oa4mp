@@ -152,7 +152,7 @@ public class BasicClaimsSourceImpl implements ClaimSource {
             preProcessor.execute();
             // since the flow state maps to  part of a JSON object, we have to get the object, then reset it.
             FlowStates2 f = t.getFlowStates();
-            FunctorRuntimeEngine.updateFSValues(f, postProcessor.getFunctorMap());
+            FunctorRuntimeEngine.updateFSValues(f, preProcessor.getFunctorMap());
             t.setFlowStates(f);
         }
 
