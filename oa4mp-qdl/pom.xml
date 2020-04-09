@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>edu.uiuc.ncsa.myproxy</groupId>
+        <artifactId>myproxy</artifactId>
+        <version>4.5-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>oa4mp-qdl</artifactId>
+    <name>OA4MP QD Language extensions</name>
+    <packaging>jar</packaging>
+    <dependencies>
+        <dependency>
+            <groupId>javax.activation</groupId>
+            <artifactId>javax.activation-api</artifactId>
+            <version>1.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>edu.uiuc.ncsa.security</groupId>
+            <artifactId>ncsa-qdl</artifactId>
+            <version>1.1-QDL-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>edu.uiuc.ncsa.security</groupId>
+            <artifactId>ncsa-qdl</artifactId>
+	    <version>1.1-QDL-SNAPSHOT</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+
+
+        <dependency>
+            <groupId>edu.uiuc.ncsa.security</groupId>
+            <artifactId>ncsa-security-core</artifactId>
+            <version>4.4</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>edu.uiuc.ncsa.security</groupId>
+            <artifactId>ncsa-security-util</artifactId>
+            <version>4.4</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <artifactId>oa4mp-server-admin-oauth2</artifactId>
+            <groupId>edu.uiuc.ncsa.myproxy</groupId>
+            <version>4.5-SNAPSHOT</version>
+        </dependency>
+
+    </dependencies>
+<profiles>
+    <profile>
+              <id>qdl</id>
+              <build>
+                  <plugins>
+                      <plugin>
+                          <artifactId>maven-assembly-plugin</artifactId>
+                          <configuration>
+                              <archive>
+                                  <manifest>
+                                      <addClasspath>true</addClasspath>
+                                      <mainClass>edu.uiuc.ncsa.qdl.workspace.QDLWorkspace</mainClass>
+                                  </manifest>
+                              </archive>
+                              <descriptorRefs>
+                                  <descriptorRef>jar-with-dependencies</descriptorRef>
+                              </descriptorRefs>
+                              <finalName>oa2-qdl</finalName>
+                          </configuration>
+                          <executions>
+                              <execution>
+                                  <id>make-my-jar-with-dependencies</id>
+                                  <phase>package</phase>
+                                  <goals>
+                                      <goal>single</goal>
+                                  </goals>
+                              </execution>
+                          </executions>
+                      </plugin>
+                  </plugins>
+
+              </build>
+          </profile>
+</profiles>
+    <build>
+        
+ <!--       <plugins>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.14.1</version>
+                <configuration>
+                    <excludes>
+                        <exclude>**/*Test.java</exclude>
+                    </excludes>
+                    <includes>
+                        <include>**/*Suite.java</include>
+                    </includes>
+                    <forkMode>perTest</forkMode>
+                </configuration>
+            </plugin>
+        </plugins>-->
+        <finalName>oa4mp-qdl</finalName>
+    </build>
+</project>

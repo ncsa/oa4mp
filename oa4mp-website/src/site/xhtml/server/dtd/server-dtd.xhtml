@@ -20,8 +20,8 @@
     options!
 </p>
 <pre>
-&lt;!ELEMENT <a href="server/configuration/server-configuration-file.html">config</a> (<a href="server/dtd/server-dtd-service-tag.html">service</a>)*>
-&lt;!ELEMENT <a href="server/dtd/server-dtd-service-tag.html">service</a> (<a href="server/configuration/server-myproxy.html">myproxy</a>|
+&lt;!ELEMENT <a href="../configuration/server-configuration-file.html">config</a> (<a href="server-dtd-service-tag.html">service</a>)*>
+&lt;!ELEMENT <a href="server-dtd-service-tag.html">service</a> (<a href="../configuration/server-myproxy.html">myproxy</a>|
       <a href="../../common/configuration/mysql-store.html">mysql</a>|
       <a href="../../common/configuration/mariadb-store.html">mariadb</a>|
       <a href="../../common/configuration/postgres-store.html">postgresql</a>|
@@ -34,7 +34,7 @@
       <span style="background-color: #ff6600;"><a href="server/configuration/ldap.html">ldap</a></span>|
       <span style="background-color: #ff6600;"><a href="server/configuration/signing.html">JSONWebKey</a></span>
     )*>
-&lt;!ATTLIST <a href="server/dtd/server-dtd-service-tag.html">service</a>
+&lt;!ATTLIST <a href="server-dtd-service-tag.html">service</a>
     address CDATA #IMPLIED
     name CDATA #IMPLIED
     version CDATA #IMPLIED

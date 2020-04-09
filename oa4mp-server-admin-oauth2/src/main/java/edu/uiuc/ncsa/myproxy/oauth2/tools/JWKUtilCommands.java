@@ -77,7 +77,7 @@ public class JWKUtilCommands extends CommonCommands {
             return;
         }
         // Fingers and toes cases
-        // #1 no arguments, create the keys and dump to st out
+        // #1 no arguments, create the keys and dump to std out
         if (!inputLine.hasArgs()) {
             SigningCommands sg = new SigningCommands(null);
             sg.setBatchMode(isBatchMode());

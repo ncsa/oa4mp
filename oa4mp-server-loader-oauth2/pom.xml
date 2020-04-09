@@ -117,12 +117,6 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>edu.uiuc.ncsa.myproxy</groupId>
-            <artifactId>oa4mp-qdl</artifactId>
-            <version>4.5-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>ncsa-qdl</artifactId>
             <version>1.1-QDL-SNAPSHOT</version>

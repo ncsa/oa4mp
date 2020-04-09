@@ -1,4 +1,4 @@
-package edu.uiuc.ncsa.myproxy.oa4mp.qdl.cm;
+package edu.uiuc.ncsa.oa2.qdl;
 
 
 import edu.uiuc.ncsa.qdl.extensions.JavaModule;

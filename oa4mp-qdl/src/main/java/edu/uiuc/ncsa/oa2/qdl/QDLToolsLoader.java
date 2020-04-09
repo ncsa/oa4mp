@@ -1,6 +1,5 @@
-package edu.uiuc.ncsa.myproxy.oa4mp.qdl;
+package edu.uiuc.ncsa.oa2.qdl;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims.OA2Module;
 import edu.uiuc.ncsa.qdl.extensions.QDLLoader;
 import edu.uiuc.ncsa.qdl.module.Module;
 
@@ -13,12 +12,12 @@ import java.util.List;
  * <p>Created by Jeff Gaynor<br>
  * on 2/11/20 at  7:05 AM
  */
-public class OA2QDLLoader implements QDLLoader {
+public class QDLToolsLoader implements QDLLoader {
     @Override
     public List<Module> load() {
         ArrayList<Module> modules = new ArrayList<>();
-        modules.add(new OA2Module().newInstance(null));
-  //      modules.add(new ClientManagementModule().newInstance(null));
+        modules.add(new JWTModule().newInstance(null));
+        modules.add(new ClientManagementModule().newInstance(null));
         return modules;
     }
 }
