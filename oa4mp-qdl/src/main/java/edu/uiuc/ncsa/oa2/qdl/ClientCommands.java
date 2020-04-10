@@ -36,7 +36,10 @@ public class ClientCommands implements Serializable {
         this.logger = logger;
     }
 
-    MyLoggingFacade logger = null;
+    transient MyLoggingFacade logger = null;
+    transient  ConfigurationNode configurationNode;
+    transient OA2SE environment = null;
+
 
     public ConfigurationLoader<? extends AbstractEnvironment> getLoader() {
         return new OA2ConfigurationLoader<OA2SE>(getConfigurationNode(), getLogger());
@@ -50,7 +53,6 @@ public class ClientCommands implements Serializable {
         this.configurationNode = configurationNode;
     }
 
-    ConfigurationNode configurationNode;
 
     public OA2SE getEnvironment() throws Exception {
         if (environment == null) {
@@ -59,7 +61,6 @@ public class ClientCommands implements Serializable {
         return environment;
     }
 
-    OA2SE environment = null;
     boolean initCalled = false;
 
     protected void init(String configFile, String cfgName) {
@@ -375,17 +376,18 @@ public class ClientCommands implements Serializable {
 
         @Override
         public int[] getArgCount() {
-            return new int[]{1,2};
+            return new int[]{1, 2};
         }
+
         //     cm#init('${cfg_file}', '${cfg_name}')
-             //  q. := cm#search('client_id', '.*23.*')
+        //  q. := cm#search('client_id', '.*23.*')
         //   cm#approve(q.0.client_id)
         @Override
         public Object evaluate(Object[] objects) {
             if (!initCalled) {
                 throw new IllegalStateException("Error: You must call init before calling this function");
             }
-            
+
             Identifier id = BasicIdentifier.newID(objects[0].toString());
 
             Boolean toApprove = null;
@@ -428,4 +430,5 @@ public class ClientCommands implements Serializable {
             return doxx;
         }
     }
+
 }

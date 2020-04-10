@@ -13,11 +13,15 @@ import net.sf.json.JSONObject;
 import javax.xml.bind.DatatypeConverter;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -77,7 +81,7 @@ public class SigningCommands extends CommonCommands {
                 if (!publicKeyFile.isFile()) {
                     sayi("Sorry, but you must supply the name of the file as well (or type 'exit' to exit");
                 } else {
-                    if(!isBatchMode()) {
+                    if (!isBatchMode()) {
                         sayi2("The file you gave exists, do you want to over write it? [y/n]");
                         retry = !isOk(readline());
                     }
@@ -89,9 +93,9 @@ public class SigningCommands extends CommonCommands {
         if (!isBatchMode()) {
             sayi2("create a new set of JSON web keys?[y/n]");
             if (!isOk(readline())) {
-                     say("create cancelled.");
-                     return;
-                 }
+                say("create cancelled.");
+                return;
+            }
 
         }
 
@@ -119,14 +123,20 @@ public class SigningCommands extends CommonCommands {
 
     protected int defaultSymmetricKeyLength = 256;
     protected String SYMMETRIC_KEY_ARG = "-length";
+    protected String SYMMETRIC_KEY_COUNT_ARG = "-count";
+    protected String SYMMETRIC_KEY_FILE_ARG = "-out";
 
     protected void showSymmetricKeyHelp() {
-        say("createSymmetricKey [" + SYMMETRIC_KEY_ARG + " len] This will create a key for use as a symmetric key, i.e., this will produce");
+        say("createSymmetricKey [" + SYMMETRIC_KEY_ARG + " len + | " + SYMMETRIC_KEY_COUNT_ARG + "count] " +
+                "This will create a key for use as a symmetric key, i.e., this will produce");
         say("   a base 64 encoded sequence of random bytes to be used as a symmetric key for");
-        say("   the given length. If no length is included, the default of " + defaultSymmetricKeyLength + "bytes is used.");
+        say("   the given length. If no length is included, the default of " + defaultSymmetricKeyLength + " bytes is used.");
+        say("   If the " + SYMMETRIC_KEY_COUNT_ARG + " is given, this will produce that many keys");
+        say("   If the " + SYMMETRIC_KEY_FILE_ARG + " is given, this will write the keys to the given file, one per line.");
+
     }
 
-    public void create_symmetric_key(InputLine inputLine) {
+    public void create_symmetric_keys(InputLine inputLine) {
         if (showHelp(inputLine)) {
             showSymmetricKeyHelp();
             return;
@@ -140,12 +150,52 @@ public class SigningCommands extends CommonCommands {
                 // rock on
             }
         }
-        byte[] array = new byte[length];
-        random.nextBytes(array);
-        if (!isBatchMode()) {
-            say("Base encoded key of length " + length);
+        int count = 1;
+        if (inputLine.hasArg(SYMMETRIC_KEY_COUNT_ARG)) {
+            try {
+                count = Integer.parseInt(inputLine.getNextArgFor(SYMMETRIC_KEY_COUNT_ARG));
+            } catch (Throwable t) {
+                // rock on
+            }
         }
-        say(Base64.getEncoder().encodeToString(array));
+        File targetFile = null;
+        if (inputLine.hasArg(SYMMETRIC_KEY_FILE_ARG)) {
+            try {
+                targetFile  = new File(inputLine.getNextArgFor(SYMMETRIC_KEY_FILE_ARG));
+            } catch (Throwable t) {
+                // rock on
+            }
+        }
+
+        byte[] array = null;
+        if (!isBatchMode() && targetFile== null) {
+            say(count + " base 64 encoded key" + (count == 1 ? "" : "s") + " with length of " + length + " bytes:\n");
+        }
+        List<String> keys = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            array = new byte[length];
+
+            random.nextBytes(array);
+            String output = Base64.getEncoder().encodeToString(array);
+
+            while (output.endsWith("=")) {
+                output = output.substring(0, output.length() - 2);
+            }
+            if(targetFile != null){
+                keys.add(output);
+            }else {
+                say(output);
+            }
+
+        }
+        if(targetFile != null){
+            try {
+                Files.write(targetFile.toPath(), keys);
+                say("Done. Wrote " + count + " key" + (count==1?"":"s") + " to " + targetFile);
+            } catch (IOException e) {
+                say("Could not write keys to " + targetFile + ":" + e.getMessage());
+            }
+        }
     }
 
     /**

@@ -39,7 +39,7 @@ public class JWTCommands implements Serializable {
         this.logger = logger;
     }
 
-    MyLoggingFacade logger = null;
+    transient MyLoggingFacade logger = null;
 
     public SigningCommands getSigningCommands() {
         if (signingCommands == null) {
@@ -413,10 +413,10 @@ public class JWTCommands implements Serializable {
         String rawJSON = "{\n" +
                 "  \"iss\": \"https://test.cilogon.org\",\n" +
                 "  \"sub\": \"http://cilogon.org/serverT/users/17048\",\n" +
-                "  \"aud\": \"myproxy:oa4mp,2012:/client_id/10d798441270aa6e199f9afaab8\",\n" +
-                "  \"auth_time\": \"1586292128\",\n" +
-                "  \"exp\": 1586293028,\n" +
-                "  \"iat\": 1586292128,\n" +
+                "  \"aud\": \"myproxy:oa4mp,2012:/client_id/910d7984412870aa6e199f9afrab8\",\n" +
+                "  \"auth_time\": \""+ (System.currentTimeMillis()/1000) + "\",\n" +
+                "  \"exp\": "+ (3600*24*11 + System.currentTimeMillis()/1000) + ",\n" +
+                "  \"iat\": "+ (System.currentTimeMillis()/1000) + ",\n" +
                 "  \"nonce\": \"R72KPZ4Pwo9nPd9z1qCA04hBALMC-yVGUOGyTn-miHo\",\n" +
                 "  \"email\": \"bob@bigstate.edu\",\n" +
                 "  \"given_name\": \"Robert\",\n" +

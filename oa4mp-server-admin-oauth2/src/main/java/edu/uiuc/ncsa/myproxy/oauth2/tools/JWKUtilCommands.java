@@ -134,6 +134,11 @@ public class JWKUtilCommands extends CommonCommands {
 
     }
 
+    public void create_symmetric_keys(InputLine inputLine){
+        SigningCommands signingCommands = new SigningCommands(null);
+        signingCommands.create_symmetric_keys(inputLine);
+    }
+
     JSONWebKeys keys = null;
 
     String wellKnown = null;
