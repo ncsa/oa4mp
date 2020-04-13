@@ -78,7 +78,7 @@ public class JWTCommands implements Serializable {
             }
             try {
                 jwks = getSigningCommands().createJsonWebKeys();
-                if (jwks.hasDefaultKey()) {
+                if (!jwks.hasDefaultKey()) {
                     for (String id : jwks.keySet()) {
                         if ("RS256".equals(jwks.get(id).algorithm)) {
                             jwks.setDefaultKeyID(id);
@@ -197,6 +197,44 @@ public class JWTCommands implements Serializable {
         }
     }
 
+    public class DefaultKey implements QDLFunction{
+        @Override
+        public String getName() {
+            return "default_key";
+        }
+
+        @Override
+        public int[] getArgCount() {
+            return new int[]{0,1};
+        }
+
+        @Override
+        public Object evaluate(Object[] objects) {
+            if(jwks == null || jwks.isEmpty() ){
+                return "";
+            }
+            if(objects.length == 0){
+                return jwks.getDefaultKeyID();
+            }
+            // so we have one.
+            String newId = objects[0].toString();
+            if(!jwks.containsKey(newId)){
+               throw new IllegalArgumentException("Error: There is no such key in the collection.");
+            }
+            String oldID = jwks.getDefaultKeyID();
+            jwks.setDefaultKeyID(newId);
+            return oldID;
+        }
+
+        @Override
+        public List<String> getDocumentation() {
+            List<String> docs = new ArrayList<>();
+            docs.add(getName() + "([new_id]) get or set the default key used for signatures.");
+            docs.add("  With no arguments, this returns the current default key.");
+            docs.add("  A single argument that sets the new default ID will return any previous one.");
+            return docs;
+        }
+    }
     public class CreateJWT implements QDLFunction {
         @Override
         public String getName() {

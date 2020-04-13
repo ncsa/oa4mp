@@ -152,7 +152,9 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         if (node == null) {
             return new QDLEnvironment();// no op. This is disabled.
         }
-        QDLConfigurationLoader loader = new QDLConfigurationLoader(node,loggerProvider.get());
+        // Note that the first argument is the name fo the file. In server mode this won't be available anyway
+        // and is optional.
+        QDLConfigurationLoader loader = new QDLConfigurationLoader("(none)", node,loggerProvider.get());
         return loader.load();
     }
 
