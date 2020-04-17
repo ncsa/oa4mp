@@ -121,10 +121,10 @@ public class SigningCommands extends CommonCommands {
         return keys;
     }
 
-    protected int defaultSymmetricKeyLength = 256;
-    protected String SYMMETRIC_KEY_ARG = "-length";
-    protected String SYMMETRIC_KEY_COUNT_ARG = "-count";
-    protected String SYMMETRIC_KEY_FILE_ARG = "-out";
+    public int defaultSymmetricKeyLength = 256;
+    public String SYMMETRIC_KEY_ARG = "-length";
+    public String SYMMETRIC_KEY_COUNT_ARG = "-count";
+    public String SYMMETRIC_KEY_FILE_ARG = "-out";
 
     protected void showSymmetricKeyHelp() {
         say("createSymmetricKey [" + SYMMETRIC_KEY_ARG + " len + | " + SYMMETRIC_KEY_COUNT_ARG + "count] " +

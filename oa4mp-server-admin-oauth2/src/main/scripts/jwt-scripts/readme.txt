@@ -58,6 +58,7 @@ all run in batch mode.
 
 create_keys.sh = creates a set of standard RSA keys (both public and private parts) at various strengths.
    Output is JSON Web Key format.
+create_symmetric_keys.sh = creates a set of symmetric keys
 create_token.sh = takes a token and simply creates the signature -- no claims added.
 generate_token = takes a set of claims and adds all of the standard expirations, possibly a JTI and so forth.
 log.sh = prints out the tail of the current log file.

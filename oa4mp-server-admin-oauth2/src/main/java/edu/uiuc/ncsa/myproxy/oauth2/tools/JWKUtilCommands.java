@@ -68,8 +68,6 @@ public class JWKUtilCommands extends CommonCommands {
     }
 
 
-
-
     public void create_keys(InputLine inputLine) throws Exception {
         // Intercept the help request here since the one in the signing utility is a bit different.
         if (showHelp(inputLine)) {
@@ -134,8 +132,26 @@ public class JWKUtilCommands extends CommonCommands {
 
     }
 
-    public void create_symmetric_keys(InputLine inputLine){
+    protected void showSymmetricKeyHelp(SigningCommands signingCommands) {
+        say("create_symmetric_keys [" + signingCommands.SYMMETRIC_KEY_ARG + " len + | " +
+                signingCommands.SYMMETRIC_KEY_COUNT_ARG + " count | " + signingCommands.SYMMETRIC_KEY_FILE_ARG +
+                " fileName] ");
+        say("This will create a key for use as a symmetric key, i.e., this will produce");
+        say("   a base 64 encoded sequence of random bytes to be used as a symmetric key for");
+        say("   the given length. If no length is included, the default of " +
+                signingCommands.defaultSymmetricKeyLength + " bytes is used.");
+        say("   If the " + signingCommands.SYMMETRIC_KEY_COUNT_ARG + " is given, this will produce that many keys");
+        say("   If the " + signingCommands.SYMMETRIC_KEY_FILE_ARG + " is given, this will write the keys to the given file, one per line.");
+
+    }
+
+    public void create_symmetric_keys(InputLine inputLine) {
         SigningCommands signingCommands = new SigningCommands(null);
+
+        if (showHelp(inputLine)) {
+            showSymmetricKeyHelp(signingCommands);
+            return;
+        }
         signingCommands.create_symmetric_keys(inputLine);
     }
 
@@ -227,8 +243,6 @@ public class JWKUtilCommands extends CommonCommands {
     }
 
 
-
-
     protected void listKeysHelp() {
         say("list_keys [" + showAllKeys + " file]:This will list all the public keys in the key file in pem format.");
         say("           Each key will be preceeded by its unique ID in the key file.");
@@ -305,7 +319,6 @@ public class JWKUtilCommands extends CommonCommands {
         fileWriter.flush();
         fileWriter.close();
     }
-
 
 
     public void list_keys(InputLine inputLine) throws Exception {
@@ -706,7 +719,6 @@ public class JWKUtilCommands extends CommonCommands {
     }
 
 
-
     protected String LIFETIME_FLAG = "-lifetime";
     protected String JTI_FLAG = "-jti";
     protected String PRINT_CLAIMS_FLAG = "-print_claims";
@@ -771,7 +783,6 @@ public class JWKUtilCommands extends CommonCommands {
             say(signedToken);
         }
     }
-
 
 
     protected void printTokenHelp() {
@@ -978,7 +989,7 @@ public class JWKUtilCommands extends CommonCommands {
     }
 
     public void base64(InputLine inputLine) throws Exception {
-        if(showHelp(inputLine)){
+        if (showHelp(inputLine)) {
             base64Help();
             return;
         }

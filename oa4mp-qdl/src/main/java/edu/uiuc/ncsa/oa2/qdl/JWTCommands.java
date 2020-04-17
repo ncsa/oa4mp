@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.oa2.qdl;
 
 import edu.uiuc.ncsa.myproxy.oauth2.tools.SigningCommands;
+import edu.uiuc.ncsa.qdl.evaluate.IOEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
 import edu.uiuc.ncsa.qdl.extensions.QDLVariable;
@@ -17,7 +18,9 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.URI;
 import java.nio.file.Files;
+import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 /**
@@ -197,7 +200,90 @@ public class JWTCommands implements Serializable {
         }
     }
 
-    public class DefaultKey implements QDLFunction{
+    SecureRandom random = new SecureRandom();
+
+    public class SymmKeys implements QDLFunction {
+        @Override
+        public String getName() {
+            return "create_skeys";
+        }
+
+        @Override
+        public int[] getArgCount() {
+            return new int[]{0, 1, 2};
+        }
+
+        int defaultLength = 32;
+
+        @Override
+        public Object evaluate(Object[] objects) {
+            List<String> sKeys = null;
+            int count = 1;
+            int length = defaultLength;
+            switch (objects.length) {
+                case 0:
+                    break;
+                case 1:
+                    if (!(objects[0] instanceof Long)) {
+                        throw new IllegalArgumentException("Error: The first argument must be an integer");
+                    }
+                    Long lCount = (Long) objects[0];
+                    count = lCount.intValue();
+                    break;
+                case 2:
+                    if (!(objects[0] instanceof Long)) {
+                        throw new IllegalArgumentException("Error: The first argument must be an integer");
+                    }
+                     lCount = (Long) objects[0];
+                    count = lCount.intValue();
+                    if (!(objects[1] instanceof Long)) {
+                        throw new IllegalArgumentException("Error: The second argument must be an integer");
+                    }
+                    Long lLength = (Long)objects[1];
+                    length = lLength.intValue();
+                    break;
+            }
+            sKeys = createKeys(count, length);
+            if(count == 1){
+                return sKeys.get(0);
+            }
+            List<Object> dummy = new ArrayList<>();
+            dummy.addAll(sKeys); // how to cast a list of strings to a list of objects.
+            StemVariable stemVariable = new StemVariable();
+            stemVariable.addList(dummy);
+            return stemVariable;
+        }
+
+        protected List<String> createKeys(int count, int length) {
+            List<String> sKeys = new ArrayList<>();
+            for (int i = 0; i < count; i++) {
+
+                byte[] array = new byte[length];
+
+                random.nextBytes(array);
+                String output = Base64.getEncoder().encodeToString(array);
+
+                while (output.endsWith("=")) {
+                    output = output.substring(0, output.length() - 2);
+                }
+                sKeys.add(output);
+            }
+            return sKeys;
+        }
+
+        @Override
+        public List<String> getDocumentation() {
+            List<String> docs = new ArrayList<>();
+            docs.add(getName() + "([count[,length]]) - creates symmetric keys.");
+            docs.add(getName() + "() - creates a single symmetric key.");
+            docs.add(getName() + "(count) - create a stem list with this number. Default length is " + defaultLength + " bytes.");
+            docs.add(getName() + "(count, length) - creates count keys of the given length (in bytes, not characters)");
+            docs.add("To save these to a file, use the " + IOEvaluator.IO_WRITE_FILE + " command.");
+            return docs;
+        }
+    }
+
+    public class DefaultKey implements QDLFunction {
         @Override
         public String getName() {
             return "default_key";
@@ -205,21 +291,21 @@ public class JWTCommands implements Serializable {
 
         @Override
         public int[] getArgCount() {
-            return new int[]{0,1};
+            return new int[]{0, 1};
         }
 
         @Override
         public Object evaluate(Object[] objects) {
-            if(jwks == null || jwks.isEmpty() ){
+            if (jwks == null || jwks.isEmpty()) {
                 return "";
             }
-            if(objects.length == 0){
+            if (objects.length == 0) {
                 return jwks.getDefaultKeyID();
             }
             // so we have one.
             String newId = objects[0].toString();
-            if(!jwks.containsKey(newId)){
-               throw new IllegalArgumentException("Error: There is no such key in the collection.");
+            if (!jwks.containsKey(newId)) {
+                throw new IllegalArgumentException("Error: There is no such key in the collection.");
             }
             String oldID = jwks.getDefaultKeyID();
             jwks.setDefaultKeyID(newId);
@@ -235,6 +321,7 @@ public class JWTCommands implements Serializable {
             return docs;
         }
     }
+
     public class CreateJWT implements QDLFunction {
         @Override
         public String getName() {
@@ -452,9 +539,9 @@ public class JWTCommands implements Serializable {
                 "  \"iss\": \"https://test.cilogon.org\",\n" +
                 "  \"sub\": \"http://cilogon.org/serverT/users/17048\",\n" +
                 "  \"aud\": \"myproxy:oa4mp,2012:/client_id/910d7984412870aa6e199f9afrab8\",\n" +
-                "  \"auth_time\": \""+ (System.currentTimeMillis()/1000) + "\",\n" +
-                "  \"exp\": "+ (3600*24*11 + System.currentTimeMillis()/1000) + ",\n" +
-                "  \"iat\": "+ (System.currentTimeMillis()/1000) + ",\n" +
+                "  \"auth_time\": \"" + (System.currentTimeMillis() / 1000) + "\",\n" +
+                "  \"exp\": " + (3600 * 24 * 11 + System.currentTimeMillis() / 1000) + ",\n" +
+                "  \"iat\": " + (System.currentTimeMillis() / 1000) + ",\n" +
                 "  \"nonce\": \"R72KPZ4Pwo9nPd9z1qCA04hBALMC-yVGUOGyTn-miHo\",\n" +
                 "  \"email\": \"bob@bigstate.edu\",\n" +
                 "  \"given_name\": \"Robert\",\n" +
