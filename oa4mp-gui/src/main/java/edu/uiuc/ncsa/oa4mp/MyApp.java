@@ -5,7 +5,6 @@ import javax.swing.*;
 /**
  * Insert the type's description here.
  * Creation date: (12/20/2019 %r)
- * @author: 
  */
 public class MyApp {
 	private JFrame ivjJFrame1 = null;
