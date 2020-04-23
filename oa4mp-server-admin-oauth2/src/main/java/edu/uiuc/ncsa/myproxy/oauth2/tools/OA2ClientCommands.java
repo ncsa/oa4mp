@@ -9,9 +9,7 @@ import edu.uiuc.ncsa.qdl.scripting.Scripts;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApprovalStore;
-import edu.uiuc.ncsa.security.delegation.storage.BaseClient;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.ScriptingConstants;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfigurationUtil;
 import edu.uiuc.ncsa.security.util.cli.CLIDriver;
@@ -31,7 +29,6 @@ import java.util.StringTokenizer;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.QDLRuntimeEngine.CONFIG_TAG;
 import static edu.uiuc.ncsa.qdl.scripting.JSONScriptUtil.SCRIPTS_TAG;
-import static edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval.Status.APPROVED;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -65,97 +62,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
 
     Collection<String> supportedScopes = null;
 
-    @Override
-    protected void longFormat(BaseClient identifiable, ClientApproval clientApproval) {
-        OA2Client client = (OA2Client) identifiable;
-        say("Client name=" + (client.getName() == null ? "(no name)" : client.getName()));
-        sayi("identifier=" + client.getIdentifier());
-        sayi("email=" + client.getEmail());
-        // Fix for CIL-501 -- removed showing home and error uris here since they are also show by the super class.
-        sayi("creation timestamp=" + client.getCreationTS());
-        sayi("last modified timestamp=" + client.getLastModifiedTS());
-        sayi("sign ID tokens?=" + client.isSignTokens());
-        sayi("issuer=" + client.getIssuer());
-        sayi("is public?=" + client.isPublicClient());
-        if (clientApproval == null) {
-            // if it is missing, then create on and mark it pending.
-            clientApproval = (ClientApproval) getClientApprovalStore().create();
-            clientApproval.setIdentifier(client.getIdentifier()); // or it won't associate it with the client...
-            clientApproval.setStatus(ClientApproval.Status.PENDING);
-            clientApproval.setApproved(false);
-            getClientApprovalStore().save(clientApproval);
-            //     sayi("no approval record exists.");
-
-        }
-
-        if (clientApproval.isApproved() && clientApproval.getStatus() != APPROVED) {
-            clientApproval.setStatus(APPROVED);
-        }
-        switch (clientApproval.getStatus()) {
-            case APPROVED:
-                String approver = "(unknown)";
-                if (clientApproval.getApprover() != null) {
-                    approver = clientApproval.getApprover();
-                }
-                sayi("status=approved by " + approver);
-                break;
-            case NONE:
-                sayi("status=none");
-                break;
-            case PENDING:
-                sayi("status=pending");
-                break;
-            case DENIED:
-                sayi("status=approval denied");
-                break;
-            case REVOKED:
-                sayi("status=revoked");
-
-        }
-        if (client.getSecret() == null) {
-            sayi("client secret: (none)");
-
-        } else {
-            sayi("client secret (hash):" + client.getSecret());
-        }
-        Collection<String> uris = client.getCallbackURIs();
-        if (uris == null) {
-            sayi("callback uris: (none)");
-        } else {
-            sayi("callback uris" + (uris.isEmpty() ? ":(none)" : ":"));
-            for (String x : uris) {
-                sayi("      " + x);
-            }
-        }
-        Collection<String> scopes = client.getScopes();
-        if (scopes == null) {
-            sayi("scopes: (none)");
-        } else {
-            sayi("scopes" + (scopes.isEmpty() ? ":(none)" : ":"));
-            for (String x : scopes) {
-                sayi("      " + x);
-            }
-        }
-        if (isRefreshTokensEnabled()) {
-            sayi("refresh lifetime (sec): " + (client.isRTLifetimeEnabled() ? (client.getRtLifetime() / 1000) : "none"));
-        }
-        if (client.getLdaps() == null || client.getLdaps().isEmpty()) {
-            sayi("ldap:(none configured.)");
-        } else {
-            sayi("LDAPS (warning-deprecated, use the config instead):");
-            LDAPConfigurationUtil ldapConfigurationUtil = new LDAPConfigurationUtil();
-
-            say(ldapConfigurationUtil.toJSON(client.getLdaps()).toString(2));
-
-        }
-        if (client.getConfig() == null || client.getConfig().isEmpty()) {
-            sayi("config:(none)");
-        } else {
-            sayi("config:");
-            sayi(client.getConfig().toString(2));
-        }
-    }
-
+ 
     protected void showCBHelp() {
         say("cb -add [cb1, cb2,...] index =  add a list of callbacks to the given list of callbacks. If no list is given, you will be prompted");
         say("cb -list /index = list the callbacks for a given client");

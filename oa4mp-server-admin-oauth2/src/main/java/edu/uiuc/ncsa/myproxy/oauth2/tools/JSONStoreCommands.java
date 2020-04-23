@@ -21,6 +21,7 @@ import java.util.List;
 
 /**
  * A utility to manage a store of JSON snippets.
+ * @deprecated 
  * <p>Created by Jeff Gaynor<br>
  * on 2/21/19 at  7:33 PM
  */
@@ -248,7 +249,7 @@ public class JSONStoreCommands extends StoreCommands2 {
         return je.getIdentifier() + " created at " + je.getCreationTimestamp() + ". ";
     }
 
-    @Override
+ /*   @Override
     protected void longFormat(Identifiable identifiable) {
         JSONEntry je = (JSONEntry) identifiable;
         say("id=" + je.getIdentifier());
@@ -269,7 +270,7 @@ public class JSONStoreCommands extends StoreCommands2 {
             for (String p : proc)
                 say(p);
         }
-    }
+    }*/
 
     /**
      * Takes the lines of a file and turns it in to a JSON object.

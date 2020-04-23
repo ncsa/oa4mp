@@ -37,14 +37,7 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
 
     PermissionsStore permissionsStore;
 
-    @Override
-    protected void longFormat(Identifiable identifiable) {
-        super.longFormat(identifiable);
-        AdminClient client = (AdminClient) identifiable;
-        sayi("issuer=" + client.getIssuer());
-        sayi("vo=" + client.getVirtualOrganization());
-        sayi("max clients=" + client.getMaxClients());
-    }
+
 
     @Override
     public void extraUpdates(Identifiable identifiable) {

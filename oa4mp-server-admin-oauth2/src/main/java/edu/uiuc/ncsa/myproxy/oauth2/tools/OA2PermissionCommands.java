@@ -88,7 +88,7 @@ public class OA2PermissionCommands extends StoreCommands2 {
         return false;
     }
 
-    @Override
+/*    @Override
     protected void longFormat(Identifiable identifiable) {
         Permission p = (Permission) identifiable;
         sayi("client id=" + p.getClientID());
@@ -99,7 +99,7 @@ public class OA2PermissionCommands extends StoreCommands2 {
         sayi("can delete?=" + p.isDelete());
         sayi("can create?=" + p.isCreate());
 
-    }
+    }*/
 
 
 

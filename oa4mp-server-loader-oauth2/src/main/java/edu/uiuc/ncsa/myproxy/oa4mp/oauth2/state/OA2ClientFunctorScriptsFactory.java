@@ -197,6 +197,7 @@ public class OA2ClientFunctorScriptsFactory<V extends OA2ClientFunctorScripts> e
             claimSource = null;
             e.printStackTrace();
         }
+        
         return claimSource;
 
     }

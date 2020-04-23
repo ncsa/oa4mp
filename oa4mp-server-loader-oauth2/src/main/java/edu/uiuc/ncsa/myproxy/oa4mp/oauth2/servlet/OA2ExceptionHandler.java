@@ -37,7 +37,12 @@ public class OA2ExceptionHandler implements ExceptionHandler {
 
     @Override
     public void handleException(Throwable t, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        ServletDebugUtil.trace(this,"Error", t);
+        ServletDebugUtil.trace(this, "Error", t);
+        if ((t instanceof NullPointerException)) {
+            getLogger().error("Null pointer", t);
+            t = new OA2GeneralError(OA2Errors.SERVER_ERROR, "Null pointer", HttpStatus.SC_INTERNAL_SERVER_ERROR);
+        }
+
         if (t instanceof ExceptionWrapper) {
             // In this case we are getting this as a response after a forward to another servlet and have to unpack it.
             t = t.getCause();
@@ -60,8 +65,8 @@ public class OA2ExceptionHandler implements ExceptionHandler {
             return;
         }
 
-        if(t instanceof OA2ATException){
-            handleOA2Error((OA2ATException)t, response);
+        if (t instanceof OA2ATException) {
+            handleOA2Error((OA2ATException) t, response);
             return;
         }
         if (t instanceof OA2RedirectableError) {
@@ -123,7 +128,7 @@ public class OA2ExceptionHandler implements ExceptionHandler {
         }
         String cb = oa2RedirectableError.getCallback().toString();
         boolean hasQM = (0 < cb.indexOf("?")); // CIL-407 FIX
-        cb = cb + (hasQM?"&":"?") + OA2Constants.ERROR + "=" + oa2RedirectableError.getError() + "&" +
+        cb = cb + (hasQM ? "&" : "?") + OA2Constants.ERROR + "=" + oa2RedirectableError.getError() + "&" +
                 URLEncoder.encode(OA2Constants.ERROR_DESCRIPTION, "UTF-8") + "=" +
                 URLEncoder.encode(oa2RedirectableError.getDescription(), "UTF-8");
         //CIL-312 fix.

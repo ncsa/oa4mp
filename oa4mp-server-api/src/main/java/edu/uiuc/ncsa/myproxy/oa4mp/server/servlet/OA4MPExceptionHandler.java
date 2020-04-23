@@ -36,6 +36,10 @@ public class OA4MPExceptionHandler implements ExceptionHandler {
 
     @Override
     public void handleException(Throwable t, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        if((t instanceof NullPointerException)){
+            getLogger().error("Null pointer", t);
+            throw new GeneralException("Error: Null pointer encountered.");
+        }
         // these get kicked back to the client asap, since we can't really say much else.
         if ((t instanceof UnknownClientException) || t instanceof UnapprovedClientException) {
             throw (GeneralException) t;

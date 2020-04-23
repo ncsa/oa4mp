@@ -173,7 +173,7 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
             map.put(getCK2().ldap(), getLdapConfigurationUtil().toJSON(client.getLdaps()).toString());
         }
         if (client.getConfig() != null && !client.getConfig().isEmpty()) {
-            map.put(getCK2().cfg(), client.getConfig().toString(1)); // make it pretty at least...
+            map.put(getCK2().cfg(), client.getConfig().toString()); // make it pretty at least...
         }
     }
 

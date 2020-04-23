@@ -49,21 +49,21 @@ public class OA2ReadyServlet extends ClientServlet {
         // (so it is the portal that actually is invoking this method after the authorization
         // step.) The token and verifier are peeled off and used
         // to complete the request.
-        info("2.a. Getting token and verifier.");
+        info("2.a.0 Getting token and verifier.");
         String token = request.getParameter(CONST(ClientEnvironment.TOKEN));
         String state = request.getParameter(OA2Constants.STATE);
         if (token == null) {
-            warn("2.a. The token is " + (token == null ? "null" : token) + ".");
+            warn("2.a.1 The token is " + (token == null ? "null" : token) + ".");
             GeneralException ge = new GeneralException("Error: This servlet requires parameters for the token and possibly verifier.");
             request.setAttribute("exception", ge);
             JSPUtil.fwd(request, response, getCE().getErrorPagePath());
             return;
         }
-        info("2.a Token found.");
+        info("2.a.2 Token found.");
         OA2ClientEnvironment oa2ce = (OA2ClientEnvironment) getCE();
 
         AuthorizationGrant grant = new AuthorizationGrantImpl(URI.create(token));
-        info("2.a. Getting the token from the service");
+        info("2.a.3 Getting the token from the service");
         String identifier = clearCookie(request, response);
         OA2Asset asset = null;
         if (identifier == null) {
@@ -77,6 +77,8 @@ public class OA2ReadyServlet extends ClientServlet {
         String rawAT = null;
         UserInfo ui = null;
         boolean getCerts = (oa2ce).getScopes().contains(OA2Scopes.SCOPE_MYPROXY);
+        boolean gotCertX = false;
+        String certXMessage = null;
         if (identifier == null) {
             // Since this is a demo servlet, we don't blow up if there is no identifier found, just can't save anything.
             String msg = "Error: no cookie found. Cannot save certificates";
@@ -89,7 +91,7 @@ public class OA2ReadyServlet extends ClientServlet {
             if (getCerts) {
                 try {
                     assetResponse = oa2MPService.getCert(asset, atResponse2);
-                }catch(Throwable t){
+                } catch (Throwable t) {
                     // Then no cert.
                     getCerts = false;
                 }
@@ -109,14 +111,20 @@ public class OA2ReadyServlet extends ClientServlet {
             //  ui = oa2MPService.getUserInfo(atResponse2.getAccessToken().getToken());
             ui = oa2MPService.getUserInfo(identifier);
             if (getCerts) {
-                info("2.b. Certs requested, retrieving...");
+                info("2.b.0 Certs requested, retrieving...");
+                try {
+                    assetResponse = oa2MPService.getCert(asset, atResponse2);
+                } catch (Throwable t) {
+                    info("2.b.1 Error getting cert: " + t.getMessage());
 
-                assetResponse = oa2MPService.getCert(asset, atResponse2);
+                    gotCertX = true;
+                    certXMessage = t.getMessage();
+                }
             }
             // The general case is to do the call with the identifier if you want the asset store managed.
             //assetResponse = getOA4MPService().getCert(token, null, BasicIdentifier.newID(identifier));
         }
-        ServletDebugUtil.trace(this,"show ID token? " + oa2ce.isShowIDToken());
+        ServletDebugUtil.trace(this, "show ID token? " + oa2ce.isShowIDToken());
         // Now to display the id token. This only exists if this is an OIDC server, so that is a requirement here.
         if (oa2ce.isOidcEnabled() && oa2ce.isShowIDToken()) {
 
@@ -127,7 +135,7 @@ public class OA2ReadyServlet extends ClientServlet {
             // So this client is to show the information for the ID Token. Since this is extra, we have to recover it.
 
             ServletDebugUtil.trace(this, "ID Token store = " + ATServer2.getIDTokenStore());
-            ServletDebugUtil.trace(this, "ID Token store size = "  + ATServer2.getIDTokenStore().size());
+            ServletDebugUtil.trace(this, "ID Token store size = " + ATServer2.getIDTokenStore().size());
             ServletDebugUtil.trace(this, "ID Token store contains key \"" + rawAT + "\"? " + ATServer2.getIDTokenStore().containsKey(rawAT));
 
 
@@ -136,7 +144,7 @@ public class OA2ReadyServlet extends ClientServlet {
 
             setJWTInfo(request, tokenEntry.rawToken, jsonWebKeys);
 
-        }else{
+        } else {
             setJWTInfo(request, null, null); // sets the fields to "(none)"
 
         }
@@ -144,26 +152,30 @@ public class OA2ReadyServlet extends ClientServlet {
         // just proves we got a response.
 
         if (getCerts) {
-            if (assetResponse.getX509Certificates() == null) {
-                request.setAttribute("certSubject", "(no cert returned)");
+            if (gotCertX) {
+                request.setAttribute("certSubject", "There was a problem getting the cert:" + certXMessage);
             } else {
-                X509Certificate cert = assetResponse.getX509Certificates()[0];
-                // Rest of this is putting up something for the user to see
-                request.setAttribute("certSubject", cert.getSubjectDN());
-                request.setAttribute("cert", CertUtil.toPEM(assetResponse.getX509Certificates()));
-                request.setAttribute("username", assetResponse.getUsername());
-                // FIX OAUTH-216. Note that this is displayed on the client's success page.
-                if (asset.getPrivateKey() != null) {
-                    request.setAttribute("privateKey", KeyUtil.toPKCS1PEM(asset.getPrivateKey()));
+                if (assetResponse.getX509Certificates() == null) {
+                    request.setAttribute("certSubject", "(no cert returned)");
                 } else {
-                    request.setAttribute("privateKey", "(none)");
+                    X509Certificate cert = assetResponse.getX509Certificates()[0];
+                    // Rest of this is putting up something for the user to see
+                    request.setAttribute("certSubject", cert.getSubjectDN());
+                    request.setAttribute("cert", CertUtil.toPEM(assetResponse.getX509Certificates()));
+                    request.setAttribute("username", assetResponse.getUsername());
+                    // FIX OAUTH-216. Note that this is displayed on the client's success page.
+                    if (asset.getPrivateKey() != null) {
+                        request.setAttribute("privateKey", KeyUtil.toPKCS1PEM(asset.getPrivateKey()));
+                    } else {
+                        request.setAttribute("privateKey", "(none)");
+                    }
                 }
-
             }
+
         } else {
             request.setAttribute("certSubject", "(no cert)");
         }
-        info("2.b. Done! Displaying success page.");
+        info("2.b.2 Done! Displaying success page.");
 
         if (ui != null) {
             String output = JSONUtils.valueToString(ui.toJSon(), 1, 0);
@@ -178,7 +190,7 @@ public class OA2ReadyServlet extends ClientServlet {
             contextPath = contextPath + "/";
         }
         request.setAttribute("action", contextPath);
-        info("2.a. Completely finished with delegation.");
+        info("2.b.3 Completely finished with delegation.");
 
 
         response.setCharacterEncoding("UTF-8");

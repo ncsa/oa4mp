@@ -11,8 +11,8 @@
 <!--#include virtual="../../header.html" -->
 <p>Changes to the OA4MP server by version.</p>
 
-<h2>4.4.0</h2>
-<p>Release date 2020-04-14.</p>
+<h2>4.4.1</h2>
+<p>Release date 2020-04-23.</p>
 
 <ul>
     <li><a href="https://github.com/ncsa/OA4MP/issues/5">Github issue 5</a>: Support <a href="https://openid.net/specs/oauth-v2-multiple-response-types-1_0.html#ResponseModes">multiple response modes</a>
@@ -34,40 +34,10 @@
     tokens it is unclear if we should support the other operations which are basically reading the token back to a service.</li>
     <li>CIL-648: Recheck claims at token refresh. There is also scripting support now for this.</li>
     <li>CIL-649: Support pairwise id and subject id (in CILogon).</li>
-    <li>CIL-666: Command Line Interface improvements.</li>
+    <li>CIL-666: Command Line Interface improvements. Please see the <a href="cli.html">cli manual</a> for details.</li>
+    <li>CIL-695: issuing the rm command in the CLI should prompt.</li>
+    <li>CIL-693: Claim sources created via introspection need to have their state injected.</li>
 </ul>
-<h3>Command Line Interface Enhancements</h3>
-<p>The command line improvements allow for specifying a single property of something and updating it. The syntax is</p>
-<pre>
-    use X  // The component
-    update -key property_name id // you will be prompted for the value(s)
-
-    OR
-
-    update -key property_name -value new_value id
-</pre>
-
-<p>where X is a component (e.g. "clients") and the key is a property name. In the first case, (no value specified)
-you will be prompted for the value (or values if multiple). In the second case, you may simply specify the value directly.
-In the case of multi-valied items (such as the callbacks for a client) you may also specify if you want to add a value
-to the current values or remove it, more fully</p>
-<pre>
-    update [-add | -remove] -key property_name [-value new_value] id
-</pre>
-You may list the property names for the component X at any time using the list_keys command. Also, this ability extends to
-listing properties:
-<pre>
-    ls -key callback_uri id
-</pre>
-or removing a single property:
-<pre>
-    rm -key limited_proxies id
-</pre>
-<p>Finally, remember that --help is you friend so e.g.</p>
-<pre>
-    update --help
-</pre>
-<p>will print out a lot of information and examples. Similarly for rm and ls. </p>
 
 <h2>4.3</h2>
 <p>Release date 2019-11-20.</p>

@@ -137,7 +137,11 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     isOIDCEnabled(),
                     getMultiJSONStoreProvider(),
                     getCmConfigs(),
-                    getQDLEnvironment());
+                    getQDLEnvironment(),
+                    isScitokenEnabled(),
+                    isRFC8693Enabled(),
+                    isWLCGEnabled());
+
             if (getClaimSource() instanceof BasicClaimsSourceImpl) {
                 ((BasicClaimsSourceImpl) getClaimSource()).setOa2SE((OA2SE) se);
             }
@@ -188,9 +192,49 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
             }
         }
         return utilServerEnabled;
-
     }
+    Boolean rfc8693Enabled = null;
+    protected Boolean isRFC8693Enabled() {
+           if (rfc8693Enabled == null) {
+               try {
+                   rfc8693Enabled = Boolean.parseBoolean(getFirstAttribute(cn, OA4MPConfigTags.ENABLE_RFC8693_SUPPORT));
+               } catch (Throwable t) {
+                   // use default which is to disabled. We let this be null to trigger pulling the value, if any, out of the
+                   // the configuration
+                   rfc8693Enabled = Boolean.TRUE;
+               }
+           }
+           return rfc8693Enabled;
+       }
 
+    Boolean scitokenEnabled = null;
+
+    protected Boolean isScitokenEnabled() {
+        if (scitokenEnabled == null) {
+            try {
+                scitokenEnabled = Boolean.parseBoolean(getFirstAttribute(cn, OA4MPConfigTags.ENABLE_SCITOKEN_SUPPORT));
+            } catch (Throwable t) {
+                // use default which is to disabled. We let this be null to trigger pulling the value, if any, out of the
+                // the configuration
+                scitokenEnabled = Boolean.FALSE;
+            }
+        }
+        return scitokenEnabled;
+    }
+    Boolean wlcgEnabled = null;
+
+    protected Boolean isWLCGEnabled() {
+        if (wlcgEnabled == null) {
+            try {
+                wlcgEnabled = Boolean.parseBoolean(getFirstAttribute(cn, OA4MPConfigTags.ENABLE_WLCG_SUPPORT));
+            } catch (Throwable t) {
+                // use default which is to disabled. We let this be null to trigger pulling the value, if any, out of the
+                // the configuration
+                wlcgEnabled = Boolean.FALSE;
+            }
+        }
+        return wlcgEnabled;
+    }
     protected CMConfigs createDefaultCMConfig() {
         CMConfigs cmConfigs = new CMConfigs();
         String serverAddress = getServiceAddress().toString();

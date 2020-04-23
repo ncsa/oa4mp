@@ -42,11 +42,15 @@ public class ClientExceptionHandler implements ExceptionHandler {
 
         }
         clientServlet.error("Exception while trying to get cert. message:" + t.getMessage());
+        String message = t.getMessage();
+        if((t instanceof NullPointerException)){
+            message = "null pointer";
+         }
 
         if (t instanceof RuntimeException) {
             String path = getNormalizedContextPath();
             request.setAttribute("action", path);
-            request.setAttribute("message", t.getMessage());
+            request.setAttribute("message", message);
             JSPUtil.fwd(request, response, clientServlet.getCE().getErrorPagePath());
             return;
         }

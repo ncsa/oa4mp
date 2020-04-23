@@ -38,6 +38,9 @@ public interface OA4MPConfigTags extends StorageConfigurationTags, MailConfigura
     public static final String CONVERT_DN_TO_GLOBUS_ID = "convertDNToGlobusID"; // Convert a spec compliant DN (comma delimited) to Globus format (slash delimited)
     public static final String MAX_ALLOWED_NEW_CLIENT_REQUESTS = "maxAllowedNewClientRequests"; // The name of the header field to be used for the username, e.g. REMOTE_USER
     public static final String ENABLE_UTIL_SERVLET = "enableUtilServlet"; // attribute tag for enabling the util servlet
+    public static final String ENABLE_SCITOKEN_SUPPORT = "enableScitokens"; // attribute tag for enabling scitokens support
+    public static final String ENABLE_WLCG_SUPPORT = "enableWLCG"; // attribute tag for enabling WLCG support
+    public static final String ENABLE_RFC8693_SUPPORT = "enableTokenExchange"; //
 
 
 /*

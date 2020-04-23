@@ -74,12 +74,13 @@ public class OA2ClientKeys extends ClientKeys {
     public List<String> allKeys() {
         List<String> allKeys = super.allKeys();
         allKeys.add(callbackUri());
-        allKeys.add(rtLifetime());
-        allKeys.add(scopes());
+        allKeys.add(cfg());
         allKeys.add(issuer());
         allKeys.add(ldap());
+        allKeys.add(publicClient());
+        allKeys.add(rtLifetime());
+        allKeys.add(scopes());
         allKeys.add(signTokens());
-        allKeys.add(cfg());
         return allKeys;
     }
 }

@@ -2,6 +2,8 @@ package edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions;
 
 import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
 
+import java.util.List;
+
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 10/12/16 at  12:09 PM
@@ -54,4 +56,16 @@ public class PermissionKeys extends SerializationKeys {
         return canApprove;
     }
 
+    @Override
+    public List<String> allKeys() {
+        List<String> allKeys = super.allKeys();
+        allKeys.add(adminID());
+        allKeys.add(canApprove());
+        allKeys.add(canCreate());
+        allKeys.add(canRemove());
+        allKeys.add(clientID());
+        allKeys.add(readable());
+        allKeys.add(writeable());
+        return allKeys;
+    }
 }

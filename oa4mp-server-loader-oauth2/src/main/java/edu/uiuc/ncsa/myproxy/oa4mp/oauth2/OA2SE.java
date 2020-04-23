@@ -70,7 +70,10 @@ public class OA2SE extends ServiceEnvironmentImpl {
                  boolean oidcEnabled,
                  Provider<JSONStore> jsonStoreProvider,
                  CMConfigs cmConfigs,
-                 QDLEnvironment qdlEnvironment) {
+                 QDLEnvironment qdlEnvironment,
+                 boolean isScitokenEnabled,
+                 boolean rfc8693Enabled,
+                 boolean wlcgEnabled) {
         super(logger,
                 mfp,
                 tsp,
@@ -113,7 +116,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.issuer = issuer;
         //   this.mldap = mldap;
         if (claimSource instanceof BasicClaimsSourceImpl) {
-            DebugUtil.dbg(this, "***Setting runtime environment in the scope handler:" + claimSource.getClass().getSimpleName());
+            DebugUtil.trace(this, "***Setting runtime environment in the scope handler:" + claimSource.getClass().getSimpleName());
             ((BasicClaimsSourceImpl) claimSource).setOa2SE(this);
         }
         this.acs = acs;
@@ -122,6 +125,9 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.jsonStoreProvider = jsonStoreProvider;
         this.cmConfigs = cmConfigs;
         this.qdlEnvironment = qdlEnvironment;
+        this.scitokensEnabled = isScitokenEnabled;
+        this.rfc8693Enabled = rfc8693Enabled;
+        this.wlcgEnabled = wlcgEnabled;
     }
 
     public QDLEnvironment getQDLEnvironment() {
@@ -147,6 +153,32 @@ public class OA2SE extends ServiceEnvironmentImpl {
             jsonStore = jsonStoreProvider.get();
         }
         return jsonStore;
+    }
+
+    public boolean isRfc8693Enabled() {
+        return rfc8693Enabled;
+    }
+
+    public void setRfc8693Enabled(boolean rfc8693Enabled) {
+        this.rfc8693Enabled = rfc8693Enabled;
+    }
+
+    boolean rfc8693Enabled = false;
+
+    boolean scitokensEnabled = false;
+
+    public boolean isScitokensEnabled() {
+        return scitokensEnabled;
+    }
+
+    public void setScitokensEnabled(boolean scitokensEnabled) {
+        this.scitokensEnabled = scitokensEnabled;
+    }
+
+    boolean wlcgEnabled = false;
+
+    public boolean isWlcgEnabled() {
+        return wlcgEnabled;
     }
 
     protected Provider<AdminClientStore> acs;

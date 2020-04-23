@@ -43,6 +43,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Map;
 
+import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.TokenExchangeConstants.TOKEN_EXCHANGE_GRANT_TYPE;
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.CLIENT_SECRET;
 
 /**
@@ -127,6 +128,13 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
                                      HttpServletResponse response) throws Throwable {
 
         OA2Client client = (OA2Client) getClient(request);
+        OA2SE oa2SE = (OA2SE)getServiceEnvironment();
+        if (oa2SE.isRfc8693Enabled() && grantType.equals(TOKEN_EXCHANGE_GRANT_TYPE)) {
+            // RFC8693 support - token exchange
+            doRFC8693(client, request, response);
+            return true;
+         }
+
 
         if (grantType.equals(OA2Constants.REFRESH_TOKEN)) {
             String rawSecret = getClientSecret(request);
@@ -148,6 +156,13 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         }
 
         return false;
+    }
+
+    private void doRFC8693(OA2Client client,
+                           HttpServletRequest request,
+                           HttpServletResponse response) {
+        printAllParameters(request);
+
     }
 
     @Override

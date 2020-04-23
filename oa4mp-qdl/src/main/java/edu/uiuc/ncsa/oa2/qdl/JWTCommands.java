@@ -61,34 +61,44 @@ public class JWTCommands implements Serializable {
 
     transient SigningCommands signingCommands = null;
     transient JSONWebKeyUtil jsonWebKeyUtil = null;
-
+    protected String CREATE_KEYS_NAME = "create_keys";
     public class CreateJWK implements QDLFunction {
         @Override
         public String getName() {
-            return "create_keys";
+            return CREATE_KEYS_NAME;
         }
 
         @Override
         public int[] getArgCount() {
-            return new int[]{0, 1};
+            return new int[]{0, 1, 2};
         }
 
         @Override
         public Object evaluate(Object[] objects) {
             File target = null;
-            if (objects.length == 1) {
+            Boolean useNewkeys = true;
+            if (0 < objects.length ) {
                 target = new File(objects[0].toString());
             }
+            if(1 < objects.length){
+                if(!(objects[1] instanceof Boolean)){
+                    throw new IllegalArgumentException("Error: " + getName() + " requires a boolean as its second argument.");
+                }
+                useNewkeys = (Boolean)objects[1];
+            }
             try {
-                jwks = getSigningCommands().createJsonWebKeys();
-                if (!jwks.hasDefaultKey()) {
-                    for (String id : jwks.keySet()) {
-                        if ("RS256".equals(jwks.get(id).algorithm)) {
-                            jwks.setDefaultKeyID(id);
+                JSONWebKeys  newKeys = getSigningCommands().createJsonWebKeys();
+                if(useNewkeys){
+                    jwks = newKeys;
+                }
+                if (!newKeys.hasDefaultKey()) {
+                    for (String id : newKeys.keySet()) {
+                        if ("RS256".equals(newKeys.get(id).algorithm)) {
+                            newKeys.setDefaultKeyID(id);
                         }
                     }
                 }
-                JSONObject jsonObject = getJsonWebKeyUtil().toJSON(jwks);
+                JSONObject jsonObject = getJsonWebKeyUtil().toJSON(newKeys);
                 if (target == null) {
                     return true;
                 }
@@ -103,10 +113,21 @@ public class JWTCommands implements Serializable {
         }
 
         @Override
-        public List<String> getDocumentation() {
+        public List<String> getDocumentation(int argCount) {
             List<String> doc = new ArrayList<>();
-            doc.add(getName() + "([file_name]) - create a set of JSON WebKeys and sets the current set of web keys.");
-            doc.add("If you specify a file, then the result will be written there, otherwise this will return the keys as a stem.");
+            switch(argCount){
+                case 1:
+                    doc.add(getName() + "() - create a set of JSON WebKeys and sets the current set of web keys.");
+                    break;
+                case 2:
+                    doc.add(getName() + "(file_name) - create a set of JSON WebKeys, sets this to the current set and writes them to the given file.");
+                case 3:
+                    doc.add(getName() + "(file_name, true|false) - create a set of JSON WebKeys, writes them to the given file.");
+                    doc.add("If the second argument is true, the current active set of keys is replaced.");
+
+            }
+            doc.add("If setting the current set of keys,  the default key will use RS256.");
+            doc.add("See also: default_key");
             return doc;
         }
     }
@@ -117,10 +138,11 @@ public class JWTCommands implements Serializable {
         Files.write(target.toPath(), arrayList);
     }
 
+    protected String LOAD_KEYS_NAME = "load_keys";
     public class LoadJWK implements QDLFunction {
         @Override
         public String getName() {
-            return "load_keys";
+            return LOAD_KEYS_NAME;
         }
 
         @Override
@@ -154,17 +176,18 @@ public class JWTCommands implements Serializable {
         }
 
         @Override
-        public List<String> getDocumentation() {
+        public List<String> getDocumentation(int argCount) {
             List<String> docs = new ArrayList<>();
             docs.add(getName() + "(file_name) - loads the keys file in to the current session.");
             return docs;
         }
     }
 
+    protected String SAVE_KEYS_NAME = "save_keys";
     public class SaveKeys implements QDLFunction {
         @Override
         public String getName() {
-            return "save_keys";
+            return SAVE_KEYS_NAME;
         }
 
         @Override
@@ -193,7 +216,7 @@ public class JWTCommands implements Serializable {
         }
 
         @Override
-        public List<String> getDocumentation() {
+        public List<String> getDocumentation(int argCount) {
             List<String> docs = new ArrayList<>();
             docs.add(getName() + "(file_name) - saves the keys from current session to the given file.");
             return docs;
@@ -272,21 +295,28 @@ public class JWTCommands implements Serializable {
         }
 
         @Override
-        public List<String> getDocumentation() {
+        public List<String> getDocumentation(int argCount) {
             List<String> docs = new ArrayList<>();
-            docs.add(getName() + "([count[,length]]) - creates symmetric keys.");
-            docs.add(getName() + "() - creates a single symmetric key.");
-            docs.add(getName() + "(count) - create a stem list with this number. Default length is " + defaultLength + " bytes.");
-            docs.add(getName() + "(count, length) - creates count keys of the given length (in bytes, not characters)");
+            switch (argCount){
+                case 0:
+                    docs.add(getName() + "() - creates a single symmetric key.");
+                    break;
+                case 1:
+                    docs.add(getName() + "(count) - create a stem list with this number. Default length is " + defaultLength + " bytes.");
+                    break;
+                case 2:
+                    docs.add(getName() + "(count, length) - creates count keys of the " +
+                            "given length (in bytes, not characters)");
+            }
             docs.add("To save these to a file, use the " + IOEvaluator.IO_WRITE_FILE + " command.");
             return docs;
         }
     }
-
+     protected String DEFAULT_KEY_NAME = "default_key";
     public class DefaultKey implements QDLFunction {
         @Override
         public String getName() {
-            return "default_key";
+            return DEFAULT_KEY_NAME;
         }
 
         @Override
@@ -313,19 +343,25 @@ public class JWTCommands implements Serializable {
         }
 
         @Override
-        public List<String> getDocumentation() {
+        public List<String> getDocumentation(int argCount) {
             List<String> docs = new ArrayList<>();
-            docs.add(getName() + "([new_id]) get or set the default key used for signatures.");
-            docs.add("  With no arguments, this returns the current default key.");
-            docs.add("  A single argument that sets the new default ID will return any previous one.");
+            switch (argCount){
+                case 0:
+                    docs.add(getName() + "() get the current default key used for signatures.");
+                    break;
+                case 1:
+                    docs.add(getName() + "(new_id)  set the current default key used for signatures.");
+            }
             return docs;
         }
     }
 
+    protected String CREATE_JWT_NAME = "create_jwt";
+
     public class CreateJWT implements QDLFunction {
         @Override
         public String getName() {
-            return "create_jwt";
+            return CREATE_JWT_NAME;
         }
 
         @Override
@@ -361,19 +397,29 @@ public class JWTCommands implements Serializable {
         }
 
         @Override
-        public List<String> getDocumentation() {
+        public List<String> getDocumentation(int argCount) {
             List<String> docs = new ArrayList<>();
-            docs.add(getName() + "(arg[,id]) takes a stem variable (the claims) and returns a signed JSON WEb Token (JWT).");
-            docs.add("If an id is supplied, that will be used, otherwise the default id for the set of web keys will be used.");
+            switch(argCount){
+                case 1:
+                    docs.add(getName() + "(arg) takes a stem variable (the claims) and creates a signed JSON Web Token (JWT)");
+                    docs.add("using the default id.");
+
+                    break;
+                case 2:
+                    docs.add(getName() + "(arg,id) takes a stem variable (the claims) and creates a signed JSON Web Token (JWT)");
+                    docs.add("using the given id from the current set of keys.");
+
+            }
             docs.add("This returned  signed JWT is  a string.");
+            docs.add("See also: " + CREATE_KEYS_NAME + ", " + DEFAULT_KEY_NAME + ", " + KEY_INFO_NAME);
             return docs;
         }
     }
-
+        protected String KEY_INFO_NAME = "key_info";
     public class KeyInfo implements QDLFunction {
         @Override
         public String getName() {
-            return "key_info";
+            return KEY_INFO_NAME;
         }
 
         @Override
@@ -402,17 +448,19 @@ public class JWTCommands implements Serializable {
         }
 
         @Override
-        public List<String> getDocumentation() {
+        public List<String> getDocumentation(int argCount) {
             List<String> docs = new ArrayList<>();
             docs.add(getName() + "() - return a stem variable consisting of the ids (as keys) and the algorithms (as the values).");
+            docs.add("See also:" + DEFAULT_KEY_NAME);
             return docs;
         }
     }
 
+    protected String VERIFY_JWT_NAME = "verify_jwt";
     public class VerifyJWT implements QDLFunction {
         @Override
         public String getName() {
-            return "verify_jwt";
+            return VERIFY_JWT_NAME;
         }
 
         @Override
@@ -448,20 +496,26 @@ public class JWTCommands implements Serializable {
         }
 
         @Override
-        public List<String> getDocumentation() {
+        public List<String> getDocumentation(int argCount) {
             List<String> docs = new ArrayList<>();
-            docs.add(getName() + "(jwt[,url]) - This will decode the jwt and verify the signature.");
-            docs.add("The header (part of the JWT) has a keyt id, if this is not in the current jwks, then");
-            docs.add("e.g., it is at the well-known url for a service, yo may supply that, the key will be retrieved");
-            docs.add("before being verified. If the signature is not valid, an error is raised.");
+            switch(argCount){
+                case 1:
+                    docs.add(getName() + "(jwt) - This will decode the jwt and verify the signature, using the current set of keys.");
+                    break;
+                case 2:
+                    docs.add(getName() + "(jwt, url) - This will decode the jwt and verify the signature using the");
+                    docs.add("well-known url for a service and the (public) key there.");
+            }
+            docs.add("If the signature is not valid, an error is raised.");
+            docs.add("See also:" + DEFAULT_KEY_NAME + ", " + CREATE_KEYS_NAME);
             return docs;
         }
     }
-
+    protected String GET_HEADER_NAME = "get_header";
     public class GetHeader implements QDLFunction {
         @Override
         public String getName() {
-            return "get_header";
+            return GET_HEADER_NAME;
         }
 
         @Override
@@ -480,18 +534,20 @@ public class JWTCommands implements Serializable {
         }
 
         @Override
-        public List<String> getDocumentation() {
+        public List<String> getDocumentation(int argCount) {
             List<String> docs = new ArrayList<>();
             docs.add(getName() + "(arg) takes a JWT and returns the header as a stem. This does no verification.");
+            docs.add("See also:" + GET_PAYLOAD_NAME);
             return docs;
 
         }
     }
+    protected String GET_PAYLOAD_NAME = "get_payload";
 
     public class GetPayload implements QDLFunction {
         @Override
         public String getName() {
-            return "get_payload";
+            return GET_PAYLOAD_NAME;
         }
 
         @Override
@@ -510,9 +566,10 @@ public class JWTCommands implements Serializable {
         }
 
         @Override
-        public List<String> getDocumentation() {
+        public List<String> getDocumentation(int argCount) {
             List<String> docs = new ArrayList<>();
             docs.add(getName() + "(arg) takes a JWT and returns the payload as a stem. This does no verification.");
+            docs.add("See also:" + GET_HEADER_NAME);
             return docs;
 
         }

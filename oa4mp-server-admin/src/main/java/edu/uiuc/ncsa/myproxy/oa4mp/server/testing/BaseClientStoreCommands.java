@@ -23,6 +23,7 @@ import java.io.FileReader;
 import java.util.HashMap;
 import java.util.List;
 
+import static edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval.Status.APPROVED;
 import static edu.uiuc.ncsa.security.util.cli.CLIDriver.CLEAR_BUFFER_COMMAND;
 import static edu.uiuc.ncsa.security.util.cli.CLIDriver.EXIT_COMMAND;
 
@@ -53,78 +54,79 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
     public void setClientApprovalStore(ClientApprovalStore clientApprovalStore) {
         this.clientApprovalStore = clientApprovalStore;
     }
+
     protected JSON inputJSON(JSON oldJSON, String componentName) {
-         return inputJSON(oldJSON, componentName, false);
-     }
+        return inputJSON(oldJSON, componentName, false);
+    }
 
 
+    /**
+     * Allows for entering a new JSON object. This permits multi-line entry so formatted JSON can be cut and pasted
+     * into the command line (as long as there are no blank lines). This will validate the JSON, print out a message and
+     * check that you want to keep the new JSON. Note that you cannot overwrite the value of a configuration at this point
+     * mostly as a safety feature. So hitting return or /exit will have the same effect of keeping the current value.
+     *
+     * @param oldJSON
+     * @return null if the input is terminated (so retain the old object)
+     */
+    protected JSON inputJSON(JSON oldJSON, String componentName, boolean isArray) {
+        if (oldJSON == null) {
+            sayi("no current value for " + componentName);
+        } else {
+            sayi("current value for " + componentName + ":");
+            say(oldJSON.toString(2));
+        }
+        sayi("Enter new JSON value. An empty line terminates input. Entering a line with " + EXIT_COMMAND +
+                " will terminate input too.\n Hitting " + CLEAR_BUFFER_COMMAND + " will clear the contents of this.");
+        String rawJSON = "";
+        boolean redo = true;
+        while (redo) {
+            try {
+                String inLine = readline();
+                while (!isEmpty(inLine)) {
+                    if (inLine.equals(CLEAR_BUFFER_COMMAND)) {
+                        if (isArray) {
+                            return new JSONArray();
+                        } else {
+                            return new JSONObject();
+                        }
+                    }
+                    rawJSON = rawJSON + inLine;
+                    inLine = readline();
+                }
+            } catch (ExitException x) {
+                // ok, so user terminated input. This ends the whole thing
+                return null;
+            }
+            // if the user just hits return with no input, do nothing. This lets them skip over unchanged entries.
+            if (rawJSON.isEmpty()) {
+                return null;
+            }
+            try {
+                JSON json = null;
+                if (isArray) {
+                    json = JSONArray.fromObject(rawJSON);
+                } else {
+                    json = JSONObject.fromObject(rawJSON);
+                }
+                sayi("Success! JSON is valid.");
+                return json;
+            } catch (Throwable t) {
+                sayi("uh-oh... It seems this was not a valid JSON object. The parser message reads:\"" + t.getMessage() + "\"");
+                redo = isOk(getInput("Try to re-enter this?", "true"));
+            }
+        }
 
-     /**
-      * Allows for entering a new JSON object. This permits multi-line entry so formatted JSON can be cut and pasted
-      * into the command line (as long as there are no blank lines). This will validate the JSON, print out a message and
-      * check that you want to keep the new JSON. Note that you cannot overwrite the value of a configuration at this point
-      * mostly as a safety feature. So hitting return or /exit will have the same effect of keeping the current value.
-      *
-      * @param oldJSON
-      * @return null if the input is terminated (so retain the old object)
-      */
-     protected JSON inputJSON(JSON oldJSON, String componentName, boolean isArray) {
-         if (oldJSON == null) {
-             sayi("no current value for " + componentName);
-         } else {
-             sayi("current value for " + componentName + ":");
-             say(oldJSON.toString(2));
-         }
-         sayi("Enter new JSON value. An empty line terminates input. Entering a line with " + EXIT_COMMAND +
-                 " will terminate input too.\n Hitting " + CLEAR_BUFFER_COMMAND+ " will clear the contents of this.");
-         String rawJSON = "";
-         boolean redo = true;
-         while (redo) {
-             try {
-                 String inLine = readline();
-                 while (!isEmpty(inLine)) {
-                     if (inLine.equals(CLEAR_BUFFER_COMMAND)) {
-                         if (isArray) {
-                             return new JSONArray();
-                         } else {
-                             return new JSONObject();
-                         }
-                     }
-                     rawJSON = rawJSON + inLine;
-                     inLine = readline();
-                 }
-             } catch (ExitException x) {
-                 // ok, so user terminated input. This ends the whole thing
-                 return null;
-             }
-             // if the user just hits return with no input, do nothing. This lets them skip over unchanged entries.
-             if (rawJSON.isEmpty()) {
-                 return null;
-             }
-             try {
-                 JSON json = null;
-                 if (isArray) {
-                     json = JSONArray.fromObject(rawJSON);
-                 } else {
-                     json = JSONObject.fromObject(rawJSON);
-                 }
-                 sayi("Success! JSON is valid.");
-                 return json;
-             } catch (Throwable t) {
-                 sayi("uh-oh... It seems this was not a valid JSON object. The parser message reads:\"" + t.getMessage() + "\"");
-                 redo = isOk(getInput("Try to re-enter this?", "true"));
-             }
-         }
+        return null;
+    }
 
-         return null;
-     }
     protected void showCreateHashHelp() {
         say("create_hash string | -file path");
         say("This will create a hash of the given string which is suitable for storing in the database.");
         say("If you specify a file, the entire content will be hashed.");
         say("Note that if there are emebedded blanks, you should enclose the entire argument in double quotes");
         say("E.g. \n\ncreate_hash my pass word");
-        say("would just has \"word\", and to get the whole string you should enter" );
+        say("would just has \"word\", and to get the whole string you should enter");
         say("create_hash \"my pass word\"");
     }
 
@@ -180,10 +182,12 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
                 tempA.setStatus(ClientApproval.Status.NONE);
             }
             if (useLongFormat) {
+                if(i != 0){say("-----");}
                 longFormat((BaseClient) x, tempA);
             } else {
-                say((i++) + ". " + format((BaseClient) x, tempA));
+                say(i + ". " + format((BaseClient) x, tempA));
             }
+            i++;
         }
         return allEntries;
     }
@@ -215,38 +219,49 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
         return format(client, ca);
     }
 
-    protected void longFormat(BaseClient client, ClientApproval clientApproval) {
-        say("Client name=" + (client.getName() == null ? "(no name)" : client.getName()));
-        sayi("identifier=" + client.getIdentifier());
-        sayi("email=" + client.getEmail());
-        sayi("creation timestamp=" + client.getCreationTS());
-        sayi("last modified timestamp=" + client.getLastModifiedTS());
+    protected int longFormat(BaseClient client, ClientApproval clientApproval) {
+        int width = super.longFormat(client);
+
         if (clientApproval == null) {
-            sayi("no approval record exists.");
-        } else {
-            if (clientApproval.isApproved()) {
+            // if it is missing, then create on and mark it pending.
+            clientApproval = (ClientApproval) getClientApprovalStore().create();
+            clientApproval.setIdentifier(client.getIdentifier()); // or it won't associate it with the client...
+            clientApproval.setStatus(ClientApproval.Status.PENDING);
+            clientApproval.setApproved(false);
+            getClientApprovalStore().save(clientApproval);
+            //     sayi("no approval record exists.");
+
+        }
+
+        if (clientApproval.isApproved() && clientApproval.getStatus() != APPROVED) {
+            clientApproval.setStatus(APPROVED);
+        }
+        switch (clientApproval.getStatus()) {
+            case APPROVED:
                 String approver = "(unknown)";
                 if (clientApproval.getApprover() != null) {
                     approver = clientApproval.getApprover();
                 }
-                sayi("approved by " + approver);
-            } else {
-                sayi("not approved");
-            }
+                sayi(formatLongLine("approved by", approver, width));
+                break;
+            case NONE:
+                sayi(formatLongLine("status", "none", width));
+                break;
+            case PENDING:
+                sayi(formatLongLine("status", "pending", width));
+                break;
+            case DENIED:
+                sayi(formatLongLine("status", "approval denied", width));
+                break;
+            case REVOKED:
+                sayi(formatLongLine("status", "revoked", width));
+
         }
-
-        if (client.getSecret() == null) {
-            sayi("secret : (none)");
-
-        } else {
-            sayi("secret:");
-            say(client.getSecret());
-        }
-
+        return width;
     }
 
 
-    @Override
+/*    @Override
     protected void longFormat(Identifiable identifiable) {
         BaseClient client = (BaseClient) identifiable;
         ClientApproval clientApproval = null;
@@ -255,7 +270,7 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
         }
         longFormat(client, clientApproval);
 
-    }
+    }*/
 
 
     protected void showApproveHelp() {
@@ -327,13 +342,13 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
 
     @Override
     protected void rmCleanup(Identifiable x) {
-      if(!getStore().containsKey(x.getIdentifier())){
-          sayi("Removing approval record");
-          info("Removing approval record for id=" + x.getIdentifierString());
-          getClientApprovalStore().remove(x.getIdentifier());
-          sayi("Done. Client approval with id = " + x.getIdentifierString() + " has been removed from the store");
-          info("Client record removed for id=" + x.getIdentifierString());
-      }
+        if (!getStore().containsKey(x.getIdentifier())) {
+            sayi("Removing approval record");
+            info("Removing approval record for id=" + x.getIdentifierString());
+            getClientApprovalStore().remove(x.getIdentifier());
+            sayi("Done. Client approval with id = " + x.getIdentifierString() + " has been removed from the store");
+            info("Client record removed for id=" + x.getIdentifierString());
+        }
     }
 
 

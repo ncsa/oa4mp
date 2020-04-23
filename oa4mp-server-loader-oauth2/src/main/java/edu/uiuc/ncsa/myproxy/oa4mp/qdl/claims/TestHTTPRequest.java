@@ -12,7 +12,8 @@ import java.security.Principal;
 import java.util.*;
 
 /**
- * A class that has exactly on purpose and that is to test the http header source.
+ * A class that has exactly one purpose and that is to test the http header source.
+ * Pretty much all methods are empty and it is otherwise (purposely) useless.
  * <p>Created by Jeff Gaynor<br>
  * on 2/11/20 at  4:37 PM
  */

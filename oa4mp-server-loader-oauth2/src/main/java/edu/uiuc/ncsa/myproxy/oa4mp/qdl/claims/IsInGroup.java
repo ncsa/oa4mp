@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.Groups.GROUP_ENTRY_NAME;
@@ -53,7 +54,9 @@ public class IsInGroup implements QDLFunction {
 
 
     @Override
-    public List<String> getDocumentation() {
-        return null;
+    public List<String> getDocumentation(int argCount) {
+        List<String> docs = new ArrayList<>();
+        docs.add(getName() + "(groups., group_name) - checks if a group_name is in the given set of groups.");
+        return docs;
     }
 }

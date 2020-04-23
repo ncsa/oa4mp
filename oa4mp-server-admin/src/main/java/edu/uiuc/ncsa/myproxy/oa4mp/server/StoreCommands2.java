@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.XMLConverter;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.XMLMap;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
@@ -14,11 +15,10 @@ import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.StringTokenizer;
-import java.util.Vector;
+import java.util.*;
 
+import static edu.uiuc.ncsa.security.core.util.StringUtils.RJustify;
+import static edu.uiuc.ncsa.security.core.util.StringUtils.truncate;
 import static edu.uiuc.ncsa.security.util.cli.CLIDriver.CLEAR_BUFFER_COMMAND;
 import static edu.uiuc.ncsa.security.util.cli.CLIDriver.EXIT_COMMAND;
 
@@ -86,19 +86,47 @@ public abstract class StoreCommands2 extends StoreCommands {
 
     }
 
+
+    protected int longFormat(Identifiable identifiable) {
+        XMLMap map = new XMLMap();
+        getStore().getXMLConverter().toMap(identifiable, map);
+
+        TreeMap<String, Object> tMap = new TreeMap<>();
+        tMap.putAll(map);
+        int width = 0;
+        for (String key : tMap.keySet()) {
+            width = Math.max(width, key.length());
+        }
+        // Use the order of the tmap (so its sorted) but the XMLMap has information we need to get these.
+        for (String key : tMap.keySet()) {
+            String v = map.getString(key);
+            // Suppress null entries. Record empty ones.
+            if (!StringUtils.isTrivial(v)) {
+                say(formatLongLine(key, v, width));
+            }
+        }
+        return width;
+    }
+
+    /**
+     * Gets a consistent look and feel. If you have to override {@link #longFormat(Identifiable)}
+     * and add your own entries, use this.
+     *
+     * @param leftSide
+     * @param rightSide
+     * @param width
+     * @return
+     */
+    protected String formatLongLine(String leftSide, String rightSide, int width) {
+        return RJustify(leftSide, width) + " : " + truncate(rightSide);
+    }
+
     @Override
     public void serialize(InputLine inputLine) {
         if (showHelp(inputLine)) {
             showSerializeHelp();
             return;
         }
-        Identifiable x = findItem(inputLine);
-        if (x == null) {
-            say("Object not found");
-            return;
-        }
-        XMLMap c = new XMLMap();
-        getStore().getXMLConverter().toMap(x, c);
         OutputStream os = System.out;
         boolean hasFile = false;
         if (inputLine.hasArg("-file")) {
@@ -108,7 +136,17 @@ public abstract class StoreCommands2 extends StoreCommands {
             } catch (FileNotFoundException e) {
                 say("warning, could not find file in argument \"" + inputLine.getNextArgFor("-file"));
             }
+            inputLine.removeSwitchAndValue("-file");
         }
+
+        Identifiable x = findItem(inputLine);
+        if (x == null) {
+            say("Object not found");
+            return;
+        }
+        XMLMap c = new XMLMap();
+        getStore().getXMLConverter().toMap(x, c);
+
         try {
             c.toXML(os);
             if (hasFile) {
@@ -262,7 +300,10 @@ public abstract class StoreCommands2 extends StoreCommands {
             return;
         }
         Identifiable identifiable = findItem(inputLine);
-
+        if (identifiable == null) {
+            say("Object not found");
+            return;
+        }
         // if the request does not have new stuff, do old stuff.
         if (!inputLine.hasArg(KEY_FLAG) && !inputLine.hasArg(KEYS_FLAG)) {
             super.rm(inputLine);
@@ -290,7 +331,7 @@ public abstract class StoreCommands2 extends StoreCommands {
 
             removeEntry(identifiable, inputLine.getNextArgFor(KEY_FLAG));
         }
-        rmCleanup(identifiable);
+        //    rmCleanup(identifiable);
     }
 
     @Override
@@ -299,6 +340,7 @@ public abstract class StoreCommands2 extends StoreCommands {
             showLSHelp();
             return;
         }
+
         if (!inputLine.hasArg(KEY_FLAG) && !inputLine.hasArg(KEYS_FLAG)) {
             super.ls(inputLine);
             return;
@@ -327,6 +369,7 @@ public abstract class StoreCommands2 extends StoreCommands {
             }
             showEntry(identifiable, inputLine.getNextArgFor(KEY_FLAG));
         }
+
     }
 
     @Override
@@ -334,7 +377,8 @@ public abstract class StoreCommands2 extends StoreCommands {
         say("update [" + KEY_FLAG + " key " + VALUE_FLAG + " value | " +
                 KEYS_FLAG + " array] index\n");
         sayi("where the index is the index in the list command.");
-        sayi("This has two modes, you may either specify a single key value OR you may specify an array of keys");
+        sayi("This has three modes. Just an id will prompt you for every value to update.");
+        say("Alternately, you may either specify a single key + value OR you may specify an array of keys");
         sayi("of the form [key0,key1,...]. (The list_keys command will tell what the keys are.)");
         sayi("The " + KEYS_FLAG + " will act on all the keys supplied.");
         say("E.g.");
@@ -369,32 +413,56 @@ public abstract class StoreCommands2 extends StoreCommands {
             return;
         }
 
-        Identifiable identifiable = findItem(inputLine);
-        if (identifiable == null) {
-            say("sorry, I could not find that object. Check your id.");
-            return;
-        }
-        XMLMap map = toXMLMap(identifiable);
+        Identifiable identifiable = null;
+        XMLMap map = null;
+        // Since the value can be anything --like a path to a file. e.g. /tmp/foo or
+        // an integer, we *have* to remove arguments until we can see what the
+        // actual id is.
         boolean gotOne = false;
-
+        String key = null;
+        String value = null;
         if (inputLine.hasArg(KEY_FLAG)) {
-            String key = inputLine.getNextArgFor(KEY_FLAG);
+            key = inputLine.getNextArgFor(KEY_FLAG);
             if (!hasKey(key)) {
                 say("sorry, but \"" + key + "\" is not a recognized attribute.");
                 return;
             }
+            inputLine.removeSwitchAndValue(KEY_FLAG);
             if (inputLine.hasArg(VALUE_FLAG)) {
-                map.put(key, inputLine.getNextArgFor(VALUE_FLAG));
-                gotOne = true;
-            } else {
+                value = inputLine.getNextArgFor(VALUE_FLAG);
+                inputLine.removeSwitchAndValue(VALUE_FLAG);
+            }
+            identifiable = findItem(inputLine);
+            if (identifiable == null) {
+                say("sorry, I could not find that object. Check your id.");
+                return;
+            }
+            map = toXMLMap(identifiable);
+            if (value == null) {
                 gotOne = updateSingleValue(map, key);
+            } else {
+                map.put(key, value);
+                gotOne = true;
             }
         }
+        if (inputLine.hasArg(VALUE_FLAG)) {
+            say("Malformed update request. If you specify a value, you must specify a single key.");
+            return;
+        }
+
 
         if (inputLine.hasArg(KEYS_FLAG)) {
             List<String> keys = getKeysList(inputLine);
+            inputLine.removeSwitchAndValue(KEYS_FLAG);
+            identifiable = findItem(inputLine);
+            if (identifiable == null) {
+                say("sorry, I could not find that object. Check your id.");
+                return;
+            }
+            map = toXMLMap(identifiable);
+
             for (String k : keys) {
-                gotOne = gotOne || updateSingleValue(map, k);
+                gotOne = updateSingleValue(map, k) || gotOne; // order matters!
             }
         }
 
@@ -407,13 +475,18 @@ public abstract class StoreCommands2 extends StoreCommands {
     protected JSONArray updateSingleValue(String key, JSONArray currentValue) {
         say("current value=" + currentValue);
         String action = getInput("Add, clear, delete, replace or exit?(a/c/d/r/x)", "a").toLowerCase();
-        if(action.equals("x")){
+        if (action.equals("x")) {
             return null; // do nothing.
         }
         if (action.equals("r")) {
             say("Enter the new elements with commas between them");
         }
-        String newValue = getInput("New value", "");
+        String newValue = null;
+        if (action.equals("d")) {
+            newValue = getInput("Value to remove", "");
+        } else {
+            newValue = getInput("New value", "");
+        }
         switch (action) {
             case "a":
                 // Append a value to the list
@@ -451,6 +524,7 @@ public abstract class StoreCommands2 extends StoreCommands {
     /**
      * The contract is that this gets the entire current config and updates <i>exactly</i>
      * the bits relating to QDL. This is then saved elsewhere.
+     *
      * @param currentConfig
      * @return
      */
@@ -468,7 +542,7 @@ public abstract class StoreCommands2 extends StoreCommands {
         }
         if (json == null) {
             // This handles every other value type...
-            String newValue = getInput("Enter new value[" + currentValue + "]", currentValue);
+            String newValue = getInput("Enter new value for " + key + " ", currentValue);
             if (newValue.equals(currentValue)) {
                 return false;
             }
@@ -481,7 +555,7 @@ public abstract class StoreCommands2 extends StoreCommands {
                 if (loadQDL) {
                     JSONObject oldCfg = (JSONObject) json;
                     JSONObject qdlcfg = loadQDLScript(oldCfg);
-                  
+
                     if (qdlcfg == null) {
                         return false;
                     } // they cancelled out of it
@@ -493,7 +567,7 @@ public abstract class StoreCommands2 extends StoreCommands {
                     if (newConfig == null) {
                         return false;
                     } // user cancelled
-                    map.put(key, newConfig.toString());
+                    map.put(key, newConfig);
                     return true;
                 }
             } else {
@@ -501,7 +575,7 @@ public abstract class StoreCommands2 extends StoreCommands {
                 if (newJSON == null) {
                     return false;
                 } // user cancelled
-                map.put(key, newJSON.toString());
+                map.put(key, newJSON);
                 return true;
             }
         }
@@ -512,10 +586,10 @@ public abstract class StoreCommands2 extends StoreCommands {
             if (newArray == null) {
                 return false;
             }
-            map.put(key, newArray.toString());
+            map.put(key, newArray);
             return true;
         }
-      return false; // Just in case, do nothing.
+        return false; // Just in case, do nothing.
     }
 
 
@@ -674,12 +748,12 @@ public abstract class StoreCommands2 extends StoreCommands {
 
     protected void removeEntry(Identifiable identifiable, String key) {
         XMLMap object = toXMLMap(identifiable);
-
         if (hasKey(key)) {
             if (object.containsKey(key)) {
-
                 object.remove(key);
                 getStore().save(fromXMLMap(object));
+            } else {
+                say("key \"" + key + "\" not found for this object.");
             }
         }
     }
@@ -698,7 +772,14 @@ public abstract class StoreCommands2 extends StoreCommands {
         if (hasKey(key)) {
             XMLMap object = toXMLMap(identifiable);
             if (object.containsKey(key)) {
-                say(key + "=" + object.get(key));
+                Object v = object.get(key);
+                try {
+                    JSON json = JSONSerializer.toJSON(v);
+                    say(key + ":\n" + json.toString(1));
+
+                } catch (Throwable t) {
+                    say(key + "=" + object.get(key));
+                }
             } else {
                 say("(no value)");
             }
@@ -726,7 +807,10 @@ public abstract class StoreCommands2 extends StoreCommands {
         XMLConverter xmlConverter = getStore().getXMLConverter();
         if (xmlConverter instanceof MapConverter) {
             MapConverter mc = (MapConverter) xmlConverter;
-            for (String key : mc.getKeys().allKeys()) {
+            TreeSet<String> kk = new TreeSet<>();
+            kk.addAll(mc.getKeys().allKeys());
+            // print them in order.
+            for (String key : kk) {
                 say(key);
             }
         }

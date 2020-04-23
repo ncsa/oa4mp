@@ -38,15 +38,6 @@ public class ClientStoreCommands extends BaseClientStoreCommands {
 
 
     @Override
-    protected void longFormat(Identifiable identifiable) {
-        super.longFormat(identifiable);
-        Client client = (Client) identifiable;
-        sayi("home uri=" + client.getHomeUri());
-        sayi("error uri=" + client.getErrorUri());
-        sayi("limited proxies? " + client.isProxyLimited());
-    }
-
-    @Override
     public void extraUpdates(Identifiable identifiable) {
         Client client = (Client) identifiable;
         client.setErrorUri(getInput("enter error uri", client.getErrorUri()));
@@ -155,7 +146,6 @@ public class ClientStoreCommands extends BaseClientStoreCommands {
             }
         }
     }
-
 
 
 }

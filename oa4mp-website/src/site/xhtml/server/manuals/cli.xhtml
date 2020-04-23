@@ -127,18 +127,18 @@ the startup banner and prompt:
 [mybox bin]# ./oa4mp-cli
 **********************************************************
 * OA4MP CLI (Command Line Interpreter)                   *
-* Version 4.0.1                                          *
+* Version 4.5-SNAPSHOT                                          *
 * By Jeff Gaynor  NCSA                                   *
 *  (National Center for Supercomputing Applications)     *
 *                                                        *
 * type 'help' for a list of commands                     *
 *      'exit' or 'quit' to end this session.             *
 **********************************************************
-oa4mp >
+oa2>
 </pre>
-If you type "help" You will get
+If you type "--help" You will get
 <pre>
-oa4mp >help
+oa2>--help
 
 Here are the commands available:
 use
@@ -156,7 +156,7 @@ Basic supported commands are
 
 To see the help for, say, the use command you would issue
 <pre>
- oa4mp> use --help
+ oa2> use --help
 
  Choose the component you wish to use.
  you specify the component as use + name. Supported components are
@@ -179,8 +179,8 @@ and <a href="cli.html#copy">copy</a> is described in detail below. But first, a 
 <h2>Index vs. Unique ID</h2>
 Since most objects have unique identifiers, you can specify these are arguments at any time it makes
 sense to do so by prefixing the id with a forward slash, "/". If there is a list of objects, you can also specify
-the index on the list as the target of the operation. Most components have a command to list everything in the
-active component (the <b>ls</b> command).
+the index on the list as the target of the operation. The <b>ls</b> command will  list everything in the
+active component.
 <p>
 After you issue an <code>ls</code> (no arguments) you will
 see a complete list of items in the store. These are numbered on the right hand side. This is the
@@ -197,6 +197,26 @@ Note that since there is no canonical ordering of objects in a store, you should
 <code>ls</code> before using the index. It is generally always safer to use the unique identifier.
 
 </p>
+<h3>Setting a default id</h3>
+<p>If you are working on a single item in the store, you may sinple set a default id to be used for all
+operations with the </p>
+<pre>
+    set_id id
+</pre>
+<p>command. Related is the <b>get_id</b> to display the current id and the <b>clear_id</b>
+to clear it. If you have an default id set, you do not need to specify one.</p>
+<pre>
+    oa2>set_id foo:bar/34456
+    oa2>ls -l
+  name : My test thing
+    id : foo:bar/34456
+</pre>
+<p>In this case, the details (long form) for the listing of the object are displayed. Had you issued</p>
+<pre>
+    ls -l /fnord:46456
+</pre>
+<p>The long form for this object would be displayed, since the final argument overrides the default. </p>
+
 <h3>Options supported in each storage tool.</h3>
 <ul>
     <li><a href="cli.html#size">size</a> - number of entries in the current component.</li>
@@ -207,6 +227,7 @@ Note that since there is no canonical ordering of objects in a store, you should
     <li><a href="cli.html#serialize">serialize [-file path] uniqueId</a> - serialize, i.e. store the object in XML format to the file. Omitting the file dumps it to the command line</li>
     <li><a href="cli.html#deserialize">deserialize [-new] -file path</a> - deserialize i.e. read in the object from a file. The -new flag tells whether the object is new or not. If new and the id is in use, the operation will fail.</li>
 </ul>
+
 Each of these in turn will be discussed in detail.
 <!-- comment about name in the a tag. This is illegal in XHTML but these files will be converted to HTML
      as part of the maven site command processing. So leave them or linking won't happen. -->
@@ -216,113 +237,109 @@ This will print the number of elements in the current storage component. <br/>
 <i>Example.</i> For showing the number of clients in a store
 you would have something like the following
 <pre>
-oa4mp >use clients
+oa2>use clients
   clients >size
     Current store has 22 entries
   clients >exit
 exiting ...
-oa4mp >
+oa2>
 </pre>
 
 <h4><a name="ls">Listing Object or Details of an Object.</a></h4>
-This lists every element in the current component. The default is to sort by
-the given identifier. Clients are sorted by creation date. At this point,
+<pre>
+    ls [-l | -a | -la | -al] [id]
+</pre>
+<p>This lists every element in the current component. The default is to sort by
+the given identifier, except clients which are sorted by creation date. At this point,
 sorting behavior cannot be changed. Each record is recorded on a single line.
 No argument prints out everything in the store.
 Giving the optional index or unique identifier will
-print a detailed listing of the object.<br/>
+    print a detailed listing of the object. Here are the command line switches that this understands:</p>>
+<ul>
+    <li>-l = long form of the listing</li>
+    <li>-a = list <b><i>ALL</i></b> the elements in the store. Default is short form</li>
+    <li>-la or -al = long form of all objects in the store. This may be immense. It may be useful for getting a text dump.</li>
+</ul>
 <i>Example.</i> Listing a specific object by unique identifier
 <pre>
 oa4mp >use approvals
   approvals >ls
-  0. ClientApproval[approved=true, approver=null, id=myproxy:oa4mp,2012:/client/468afcd5f598227e1a0b79e6e94b3506, on Mon Apr 01 11:37:58 CDT 2013]
-  1. ClientApproval[approved=true, approver=auto-approver, id=myproxy:oa4mp,2012:/client/1e4310262889ebdf72b8a7b148acdf2a, on Mon Jul 09 16:21:47 CDT 2012]
+    0. (?) myproxy:oa4mp,2012:/adminClient/1105e0486abc6cab6d2450893d9394f6/1586446927641 by "junit" on 2020-04-09 10:42:08.0
+    1. (?) myproxy:oa4mp,2012:/adminClient/11daaae5d58ec7e5ba6bb88189fc3bb8/1586446926819 by "junit" on 2020-04-09 10:42:07.0
+    2. (?) myproxy:oa4mp,2012:/adminClient/131d41a607efa5be7cd611f56d1060c6/1581113647370 by "junit" on 2020-02-07 16:14:07.0
+    3. (?) myproxy:oa4mp,2012:/adminClient/1332c1e8775d827e66e77c5c4c47d23f/1581513221096 by "junit" on 2020-02-12 07:13:41.0
   approvals >
 </pre>
-and now print out the details on number 1:
+<p>By default (no arguments) it prints out the short form of every item in the store.
+    To now print out the details on number 1:</p>>
 <pre>
-  approvals >ls 1
-
-Approver:auto-approver
-  Identifier:myproxy:oa4mp,2012:/client/1e4310262889ebdf72b8a7b148acdf2a
-  Approved at:Mon Jul 09 16:21:47 CDT 2012
-  Is approved? true
-  approvals >
-</pre>
+    approvals >ls -l 2
+    approval_ts : 2020-02-07 16:14:07.0
+       approved : true
+       approver : junit
+      client_id : myproxy:oa4mp,2012:/adminClient/131d41a607efa5be7cd611f56d1060c6/1581113647370
+         status : none</pre>
 We could have done the exact same thing by simply using the unique identifier:
 <pre>
-    approvals>ls /myproxy:oa4mp,2012:/client/1e4310262889ebdf72b8a7b148acdf2a
-
-Approver:auto-approver
-  Identifier:myproxy:oa4mp,2012:/client/1e4310262889ebdf72b8a7b148acdf2a
-  Approved at:Mon Jul 09 16:21:47 CDT 2012
-  Is approved? true
-  approvals >
+    approvals>ls -l /myproxy:oa4mp,2012:/adminClient/131d41a607efa5be7cd611f56d1060c6/1581113647370
 </pre>
-<p>
-    Another option is the flag <code>-la</code> which will print all the details of <i>every</i>
-    item it applies to. For instance, to get a dump of every approval record in detail issue
-</p>
-    <pre>
-        approvals>ls -la
-    </pre>
-<p>The output is extremely lengthy however it is an easy way to get a text dump of a store. This flag has no
-effect if it is given for a specific id. All that will happen is that details of that id will be printed in full.</p>
+
 <h4><a name="update">Updating (aka Editing) Objects.</a></h4>
-This will let you update or edit an existing object. The general function is shown below. Current object
+<pre>
+    update [-key k [-value v]] [-keys [k0,k1,...] [id]
+</pre>
+This will let you update or edit an existing object or the properties in one.
+If you supply no argument except an id, you will be sequentially prompted for <i>every</i>
+property of the object.
+The general function is shown below. Current object
 values are shown in [ ]'s and simply hitting return will preserve the current value.
 <br/>
 <i>Example.</i> Edit a client record. In this case we want to make this client use limited proxies.
 <pre>
-    oa4mp >use clients
-      clients >update /myproxy:oa4mp,2012:/client/6eb6ef83dbb89e7212cde073c7e682a4
-      Update the values. A return accepts the existing or default value in []'s
-        enter the identifier[myproxy:oa4mp,2012:/client/6eb6ef83dbb89e7212cde073c7e682a4]:
-        enter the name[Another Ashigaru Gateway]:
-        enter email[jgaynor@ncsa.illinois.edu]:
-        enter error uri[http://ashigaru.ncsa.uiuc.edu:44444/client]:
-        enter home uri[http://ashigaru.ncsa.uiuc.edu:44444/client]:
+    clients >set_id testScheme:oa4md,2018:/client_id/79d0237f26f56ee831b033b7eec5865d
+    clients >ls -l
+        callback_uri : ["https:/baz.foo.edu/client2/7Vgs2kO-sF4/ready1","https:/baz.foo.edu/client2/7Vgs2kO-sF4/ready2"]
+                 cfg : {"version":"aOfSNXcKu7VU3qPqc_lnvQ"}
+           client_id : testScheme:oa4md,2018:/client_id/79d0237f26f56ee831b033b7eec5865d
+         creation_ts : 2020-04-10 08:42:33.0
+               email : bob@7Vgs2kO-sF4.foo.bar
+           error_url : https://baz.foo.edu/home/7Vgs2kO-sF4/error
+            home_url : https://baz.foo.edu/7Vgs2kO-sF4/home
+    last_modified_ts : 2020-04-10 08:42:33.0
+                ldap : [{"ldap":{"id":"","name":"","enabled":false,"failOnError":false,"notifyOnFail":false,"address":"foo.bar.edu","port":-...
+                name : Test client 7Vgs2kO-sF4
+       proxy_limited : false
+       public_client : false
+          public_key : t37mvHp25SkDRQqZ1mx74TiC4qIn_TRtgh5PA9P8VcTORzfJD1cKngU9yiXHMjdTNqYbaoa8vfyNWx0LfQ652A
+         rt_lifetime : 456767875477
+              scopes : ["openid","email","profile","org.cilogon.userinfo"]
+         sign_tokens : true
+    clients >
 </pre>
-Up to this point we have changed nothing and have hit return each time. Now we change the value:
+<p>Let's change the name:</p>
 <pre>
-        does this client require limited proxies?[n]:y
-        enter full path and file name of public key[-----BEGIN PUBLIC KEY----...]:
-         public key entry skipped.
+    update -key name -value "My other test client"
 </pre>
-That finishes the entry for the client. Had we wanted to change the public key, we would have supplied a
-a file with complete path containing it. The system then prints out the entire new object and prompts us to save
-it:
+<p>and let's look at the value directly</p>
 <pre>
-        here is the complete client:
-    Client name=Another Ashigaru Gateway
-        identifier=myproxy:oa4mp,2012:/client/6eb6ef83dbb89e7212cde073c7e682a4
-        email=jgaynor@ncsa.illinois.edu
-        home uri=http://ashigaru.ncsa.uiuc.edu:44444/client
-        error uri=http://ashigaru.ncsa.uiuc.edu:44444/client
-        limited proxies? true
-        creation timestamp=Thu Jun 28 13:46:31 CDT 2012
-        approved by auto-approver
-        public key:
-      -----BEGIN PUBLIC KEY-----
-    MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAruhBa7EAnm8zDeBhNmuhYLUcij5pSr5r
-    Z6481lhzvs0k+EtCsuDpr4RlcxUlX90uxF7ZsCjMSnk8pPr4e5HPu9lqr3wUb1TJbPbg3hdj/06O
-    sJrOUYddVG5SmkafsCMmn+i5SrYq9vuWRsYVXZM36p/BzBzn4s4r6JqFzRWX71U9YybVCR72AIGi
-    LClW2utUP3Q6axpDgkEXl6CuloGDshr1cMpct2/cpDqj6kpv5oV3WFUDiXf33kwqmBWjmXwCMTSu
-    wAVhUmJNZ48YdnTQcotMURo9j5a1DBk1t2hKj/W7HqwT+TxnLgDu/cVxX5ZJDNTlgMaTbZKOFUhA
-    MMnssQIDAQAB
-    -----END PUBLIC KEY-----
+    clients>ls -key name
+    My other test client
+</pre>
+<p>You can also update several properties at once by nassing in a list:</p>
+<pre>
+    clients>update -keys [sign_tokens,name]
+</pre>
+<p>and you will be prompted in turn for each.</p>
 
-        save [y/n]?y
-        client updated.
-</pre>
 <h4><a name="create">Creating a new object</a></h4>
 To create a new object, you must supply a unique identifier. This does not need to be escaped with a /.
 Once created, you will be given the option of editing it.   You may enter any valid identifier
 as long as it is a valid URI<br/>
-<i>Example.</i> Crreating a new client. This will create a new client with a specified identifier.
+<i>Example.</i> Crreating a new admin client. This will create a new admin
+client with a specified identifier.
 If no identifier were supplied a random one would have been created.
 <pre>
-    clients >create my:new:client
+    admins>create my:new:client
     Created object with id "my:new:client"
 </pre>
 The object already exists in the store by this point. We will be given the option to edit it
@@ -331,50 +348,58 @@ The object already exists in the store by this point. We will be given the optio
       edit [y/n]?y
     Update the values. A return accepts the existing or default value in []'s
       enter the identifier[my:new:client]:
-      enter the name[(null)]:My new client
-      enter email[(null)]:foo@bar.baz
-      enter error uri[(null)]:http://localhost/error
-      enter home uri[(null)]:https:/localhost/home
-      does this client require limited proxies?[n]:n
-      enter full path and file name of public key[(null)]:
-      No file entered. Public key entry skipped
 </pre>
+<p>and you will be prompted for several more bits of information.
 Now the completed, new client is displayed and we are prompted if we want to keep the changes.
+Rather than drag you through each update, here is the finished client.</p>
 <pre>
-      here is the complete client:
-    Client name=My new client
-      identifier=my:new:client
-      email=foo@bar.baz
-      home uri=https:/localhost/home
-      error uri=http://localhost/error
-      limited proxies? false
-      creation timestamp=Wed Nov 20 11:54:55 CST 2013
-      no approval record exists.
-      public key:
-      none
-      save [y/n]?y
-      client updated.
+    here is the complete client:
+          admin_id : foo:bar
+       creation_ts : Thu Apr 23 17:19:36 CDT 2020
+             email : bob@foo.bar
+  last_modified_ts : 2020-04-23 17:19:36.752
+       max_clients : 50
+              name : My client
+            secret : 126a1356375daf2951e4c8660a098f7264579853
+    save [y/n]?y
+    client updated.
+
 </pre>
 <h4><a name="rm">Removing Objects From the Store.</a></h4>
-Removing an object. This will remove the object completely from the store. In the case of clients you
+<pre>
+    rm [-key k] [id]
+</pre>
+<p>This will remove <i>either</i>  the value in a property <b>or</b> the entire client.
+If you specify a key, only thatproperty will be affected. If you specify the id of an object,
+you will be prompted to continue.</p>
+<p> <i>Removing an object.</i> This will remove the object completely from the store. In the case of clients you
 do not need to remove the corresponding approval -- it will be done automatically. However, if you remove
-the approval record then the client is in effect unapproved until you re-approve it. To remove the client
-we create with id <code>my:new:client</code> would look like the next
-<br/>
+the approval record then the client is in effect unapproved until you re-approve it. To remove an admin client
+    would look like the next
+</p>>
 <i>Example.</i> Removing an object by id
 <pre>
-    clients >rm /my:new:client
+    admins>rm /myproxy:oa4mp,2012:/adminClient/13be753b6e816c801e212f0f1cff9d81/1587161772297
+      Are you sure you want to remove this client(y/n)[n]:y
+    Done. object with id = myproxy:oa4mp,2012:/adminClient/13be753b6e816c801e212f0f1cff9d81/1587161772297 has been removed from the store.
       Removing approval record
-      Done. Client approval with id = my:new:client has been removed from the store
-      removing client record
-    Done. object with id = my:new:client has been removed from the store
+      Done. Client approval with id = myproxy:oa4mp,2012:/adminClient/13be753b6e816c801e212f0f1cff9d81/1587161772297 has been removed from the store</pre>
+<p><b>Note</b> The remove command will happily remove objects by index, but remember that the indices of all
+other objects change, so best practice is to only remove by identifier.</p>
+<p>Finally, to remove a value, if we had th following value</p>
+<pre>
+    admins>ls -key vo
+    https://myorg.bigstate.edu
 </pre>
-<b>Note</b> The remove command will happily remove objects by index, but remember that the indices of all
-other objects change, so best practice is to only remove by identifier.
+<p>we could removed it by issuing</p>
+<pre>
+    admins>rm -key vo
+</pre>
+<p>Note that unlike for properties there is no prompt.</p>
 
 <h4><a name="serialize">Storing objects on disk</a></h4>
 <pre>
-    serialize [-file path] index
+    serialize [-file path] [id]
 </pre>
 <p>A common enough task is to want to do a considerable amount of editing which the direct CLI is not so well suited for, e.g.
 twiddling extensive lists of callbacks. This is always component specific, so
@@ -415,7 +440,8 @@ of the element.
 <pre>
     deserialize [-new] -file path
 </pre>
-<p>This will read an object from a file. This is always component specific, so
+<p>This will read an object from a file. This argument is required.
+    This is always component specific, so
     you  must use a comnponent for this to be available. You may specify it as being new, which will also tell the system to create
 a new identifier for it or it will reject the object if an existing identifier exists. <b><i>NOTE:</i></b> This will
 replace the object, not just update a few attributes. This means that if you just want change the value of an
@@ -432,7 +458,7 @@ deserialization commands against it repeatedly as you debug it.</p>
 
 <h2><a name="clients">Clients</a></h2>
 Invoke as
-<pre>oa4mp> use clients</pre>
+<pre>oa2> use clients</pre>
 Operations allowed in addition to the standard ones are
 <ul>
     <li>
@@ -447,14 +473,14 @@ the secret or type in manually at the command line.
 
 <h2><a name="approvals">Approvals</a></h2>
 Invoke as
-<pre>oa4mp> use approvals</pre>
+<pre>oa2> use approvals</pre>
  There are no extra options beyond the standard ones, however, the <code>create</code> command
 takes the unique id of the client record you are going to approve. Once created, you may enter the
 approval information directly.
 
 <h2><a name="copy">Copy</a></h2>
 Invoke as
-<pre>oa4mp>use copy</pre>
+<pre>oa2>use copy</pre>
 Supported operation is
 <ul>
     <li>cp source target [-verify] - copy source to target optionally verifying</li>

@@ -119,9 +119,9 @@ public class CreateSourceConfig implements QDLFunction, CSConstants {
 
 
     @Override
-    public List<String> getDocumentation() {
+    public List<String> getDocumentation(int argCount) {
         ArrayList<String> docs = new ArrayList<>();
-        docs.add("Usage: " + getName() + "(your_values.) -- creates a claim source configuration");
+        docs.add(getName() + "(your_values.) -- creates a claim source configuration");
         docs.add("The argument at the least should have a type. The result is a configuration (as a stem)");
         docs.add("with all the required configuration (which may be quite a bit more than your specific values");
         return docs;

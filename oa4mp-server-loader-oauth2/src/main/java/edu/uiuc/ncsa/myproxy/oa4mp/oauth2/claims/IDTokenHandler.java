@@ -8,7 +8,6 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.oauth_2_0.*;
-import edu.uiuc.ncsa.security.oauth_2_0.jwt.PayloadHandler;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRunRequest;
@@ -30,39 +29,16 @@ import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.*;
  * <p>Created by Jeff Gaynor<br>
  * on 2/16/20 at  6:51 AM
  */
-public class IDTokenHandler implements PayloadHandler {
-    protected OA2SE oa2se;
-    protected OA2ServiceTransaction transaction;
-    protected JSONObject claims;
+public class IDTokenHandler extends AbstractPayloadHandler {
     protected String issuer;
-    protected HttpServletRequest request;
-
-    /**
-     * Create the instance for the authorization phase, while there is an {@link HttpServletRequest} with possible
-     * headers that need to be processed.
-     *
-     * @param oa2se
-     * @param transaction
-     * @param request
-     */
 
     public IDTokenHandler(OA2SE oa2se, OA2ServiceTransaction transaction, HttpServletRequest request) {
-        this.oa2se = oa2se;
-        this.transaction = transaction;
-        this.request = request;
+        super(oa2se,transaction,request);
         setIssuer(request);
-        claims = new JSONObject();
     }
 
-    /**
-     * For creating an instance after the authorization phase.
-     *
-     * @param oa2se
-     * @param transaction
-     */
     public IDTokenHandler(OA2SE oa2se, OA2ServiceTransaction transaction) {
-        this.oa2se = oa2se;
-        this.transaction = transaction;
+        super(oa2se,transaction);
     }
 
 
@@ -144,10 +120,6 @@ public class IDTokenHandler implements PayloadHandler {
     }
 
 
-    @Override
-    public void refresh() throws Throwable {
-
-    }
 
     @Override
     public void addRequestState(ScriptRunRequest req) throws Throwable {
@@ -213,16 +185,6 @@ public class IDTokenHandler implements PayloadHandler {
     }
 
 
-    @Override
-    public JSONObject execute(ClaimSource source, JSONObject claims) throws Throwable {
-        if (transaction.getOA2Client().isPublicClient()) {
-            // Public clients do not get more than basic claims.
-            return claims;
-        }
-
-        return source.process(claims, transaction);
-    }
-
     /**
      * For CIL-499. It is possible to remove key claims with functors and return unusable claims objects. This method
      * will check that claims that <b>must</b> be present are there or will raise a server-side exception.
@@ -246,22 +208,7 @@ public class IDTokenHandler implements PayloadHandler {
         }
     }
 
-    @Override
-    public JSONObject getClaims() {
-        if (claims == null) {
-            claims = transaction.getClaims();
-        }
-        return claims;
-    }
 
-    JSONObject extendedAttributes = null;
-
-    public JSONObject getExtendedAttributes() {
-        if (extendedAttributes == null) {
-            extendedAttributes = transaction.getExtendedAttributes();
-        }
-        return extendedAttributes;
-    }
 
     /**
      * Use this to check for any requires scopes that the request must have. It is usually best to check these in the
@@ -287,8 +234,5 @@ public class IDTokenHandler implements PayloadHandler {
         }
     }
 
-    protected boolean isEmpty(String x) {
-        return x == null || 0 == x.length();
-    }
 
 }

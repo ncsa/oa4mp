@@ -37,7 +37,7 @@ public class ClientCommands implements Serializable {
     }
 
     transient MyLoggingFacade logger = null;
-    transient  ConfigurationNode configurationNode;
+    transient ConfigurationNode configurationNode;
     transient OA2SE environment = null;
 
 
@@ -63,6 +63,12 @@ public class ClientCommands implements Serializable {
 
     boolean initCalled = false;
 
+    protected void checkInit() {
+        if (!initCalled) {
+            throw new IllegalStateException("Error: You must call init before calling this function");
+        }
+    }
+
     protected void init(String configFile, String cfgName) {
 
         try {
@@ -76,12 +82,17 @@ public class ClientCommands implements Serializable {
         initCalled = true;
     }
 
+
     //  cm#init('/home/ncsa/dev/csd/config/servers.xml', 'localhost:oa4mp.oa2.mariadb')
     //    cm#read('ashigaru:command.line2');
+    protected String INIT_NAME = "init";
+
+    protected String checkInitMessage = "Be sure you have called the " + INIT_NAME + " function first or this will fail.";
+
     public class InitMethod implements QDLFunction {
         @Override
         public String getName() {
-            return "init";
+            return INIT_NAME;
         }
 
         @Override
@@ -97,7 +108,7 @@ public class ClientCommands implements Serializable {
 
 
         @Override
-        public List<String> getDocumentation() {
+        public List<String> getDocumentation(int argCount) {
             List<String> doxx = new ArrayList<>();
             doxx.add(getName() + "(file, name) - reads the configuration file and then loads the configuration with the given name. ");
             doxx.add("This must be called before any other function.");
@@ -105,10 +116,12 @@ public class ClientCommands implements Serializable {
         }
     }
 
+    protected String READ_NAME = "read";
+
     public class ReadClient implements QDLFunction {
         @Override
         public String getName() {
-            return "read";
+            return READ_NAME;
         }
 
         @Override
@@ -118,10 +131,8 @@ public class ClientCommands implements Serializable {
 
         @Override
         public Object evaluate(Object[] objects) {
+            checkInit();
             try {
-                if (!initCalled) {
-                    throw new IllegalStateException("Error: You must call init before calling this function");
-                }
                 OA2Client client = (OA2Client) getEnvironment().getClientStore().get(BasicIdentifier.newID(objects[0].toString()));
                 return toStem(client);
             } catch (Throwable t) {
@@ -131,10 +142,10 @@ public class ClientCommands implements Serializable {
 
 
         @Override
-        public List<String> getDocumentation() {
+        public List<String> getDocumentation(int argCount) {
             List<String> doxx = new ArrayList<>();
             doxx.add(getName() + "(id) - read the client with the given identifier. This will return a stem representation of the client. ");
-            doxx.add("Be sure you have called the init function first or this will fail.");
+            doxx.add(checkInitMessage);
             return doxx;
         }
     }
@@ -158,10 +169,12 @@ public class ClientCommands implements Serializable {
         return output;
     }
 
+    protected String SAVE_NAME = "save";
+
     public class SaveClient implements QDLFunction {
         @Override
         public String getName() {
-            return "save";
+            return SAVE_NAME;
         }
 
         @Override
@@ -174,10 +187,7 @@ public class ClientCommands implements Serializable {
         // cm#save(client.)
         @Override
         public Object evaluate(Object[] objects) {
-            if (!initCalled) {
-                throw new IllegalStateException("Error: You must call init before calling this function");
-            }
-
+            checkInit();
             if (!(objects[0] instanceof StemVariable)) {
                 throw new IllegalArgumentException("Error: The argument must be a stem variable");
             }
@@ -208,18 +218,20 @@ public class ClientCommands implements Serializable {
 
 
         @Override
-        public List<String> getDocumentation() {
+        public List<String> getDocumentation(int argCount) {
             List<String> doxx = new ArrayList<>();
             doxx.add(getName() + "(client.) - save the client. This returns true if the operation succeeds.");
-            doxx.add("Be sure you have called the init function first or this will fail.");
+            doxx.add(checkInitMessage);
             return doxx;
         }
     }
 
+    protected String SEARCH_NAME = "search";
+
     public class Search implements QDLFunction {
         @Override
         public String getName() {
-            return "search";
+            return SEARCH_NAME;
         }
 
         @Override
@@ -229,10 +241,7 @@ public class ClientCommands implements Serializable {
 
         @Override
         public Object evaluate(Object[] objects) {
-            if (!initCalled) {
-                throw new IllegalStateException("Error: You must call init before calling this function");
-            }
-
+            checkInit();
             String key = objects[0].toString();
             String regex = objects[1].toString();
             int index = 0;
@@ -240,9 +249,9 @@ public class ClientCommands implements Serializable {
 
             try {
                 List<OA2Client> clients = getEnvironment().getClientStore().search(key, regex, true);
+                // make it in to a list
                 for (OA2Client c : clients) {
-                    output.put(index + ".", toStem(c));
-                    index++;
+                    output.put(index++ + ".", toStem(c));
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -252,18 +261,20 @@ public class ClientCommands implements Serializable {
         }
 
         @Override
-        public List<String> getDocumentation() {
+        public List<String> getDocumentation(int argCount) {
             List<String> doxx = new ArrayList<>();
             doxx.add(getName() + "(key, regex) -  search for all clients with the given key whose values satisfy the regex.");
-            doxx.add("Be sure you have called the init function first or this will fail.");
+            doxx.add(checkInitMessage);
             return doxx;
         }
     }
 
+    protected String SIZE_NAME = "size";
+
     public class Size implements QDLFunction {
         @Override
         public String getName() {
-            return "size";
+            return SIZE_NAME;
         }
 
         @Override
@@ -273,10 +284,7 @@ public class ClientCommands implements Serializable {
 
         @Override
         public Object evaluate(Object[] objects) {
-            if (!initCalled) {
-                throw new IllegalStateException("Error: You must call init before calling this function");
-            }
-
+            checkInit();
             try {
                 return new Long(getEnvironment().getClientStore().size());
             } catch (Exception e) {
@@ -286,18 +294,20 @@ public class ClientCommands implements Serializable {
 
 
         @Override
-        public List<String> getDocumentation() {
+        public List<String> getDocumentation(int argCount) {
             List<String> doxx = new ArrayList<>();
             doxx.add(getName() + "() - returns a count of how many clients there are in this store.");
-            doxx.add("Be sure you have called the init function first or this will fail.");
+            doxx.add(checkInitMessage);
             return doxx;
         }
     }
 
+    protected String REMOVE_NAME = "remove";
+
     public class Remove implements QDLFunction {
         @Override
         public String getName() {
-            return "remove";
+            return REMOVE_NAME;
         }
 
         @Override
@@ -307,9 +317,7 @@ public class ClientCommands implements Serializable {
 
         @Override
         public Object evaluate(Object[] objects) {
-            if (!initCalled) {
-                throw new IllegalStateException("Error: You must call init before calling this function");
-            }
+            checkInit();
             try {
                 Identifier id = BasicIdentifier.newID(objects[0].toString());
                 getEnvironment().getClientStore().remove(id);
@@ -321,18 +329,20 @@ public class ClientCommands implements Serializable {
 
 
         @Override
-        public List<String> getDocumentation() {
+        public List<String> getDocumentation(int argCount) {
             List<String> doxx = new ArrayList<>();
-            doxx.add(getName() + "(id) - remove the client with the figen identifier. Returns true if this worked.");
-            doxx.add("Be sure you have called the init function first or this will fail.");
+            doxx.add(getName() + "(id) - remove the client with the given identifier. Returns true if this worked.");
+            doxx.add(checkInitMessage);
             return doxx;
         }
     }
 
+    protected String KEYS_NAME = "keys";
+
     public class Keys implements QDLFunction {
         @Override
         public String getName() {
-            return "keys";
+            return KEYS_NAME;
         }
 
         @Override
@@ -342,9 +352,7 @@ public class ClientCommands implements Serializable {
 
         @Override
         public Object evaluate(Object[] objects) {
-            if (!initCalled) {
-                throw new IllegalStateException("Error: You must call init before calling this function");
-            }
+            checkInit();
             OA2ClientConverter cc = null;
             try {
                 cc = (OA2ClientConverter) getEnvironment().getClientStore().getMapConverter();
@@ -360,18 +368,20 @@ public class ClientCommands implements Serializable {
 
 
         @Override
-        public List<String> getDocumentation() {
+        public List<String> getDocumentation(int argCount) {
             List<String> doxx = new ArrayList<>();
             doxx.add(getName() + "() - list the keys (names of properties) for clients.");
-            doxx.add("Be sure you have called the init function first or this will fail.");
+            doxx.add(checkInitMessage);
             return doxx;
         }
     }
 
+    protected String APPROVE_NAME = "approve";
+
     public class Approve implements QDLFunction {
         @Override
         public String getName() {
-            return "approve";
+            return APPROVE_NAME;
         }
 
         @Override
@@ -384,9 +394,7 @@ public class ClientCommands implements Serializable {
         //   cm#approve(q.0.client_id)
         @Override
         public Object evaluate(Object[] objects) {
-            if (!initCalled) {
-                throw new IllegalStateException("Error: You must call init before calling this function");
-            }
+            checkInit();
 
             Identifier id = BasicIdentifier.newID(objects[0].toString());
 
@@ -422,11 +430,17 @@ public class ClientCommands implements Serializable {
 
 
         @Override
-        public List<String> getDocumentation() {
+        public List<String> getDocumentation(int argCount) {
             List<String> doxx = new ArrayList<>();
-            doxx.add(getName() + "(id[,true|false) -  If one argument, this will return if the client is approved. " +
-                    "Otherwise, supply whether or not to approve this client. The returned value is the previous value.");
-            doxx.add("Be sure you have called the init function first or this will fail.");
+            switch (argCount) {
+                case 1:
+                    doxx.add(getName() + "(id) -  This will return if the client is approved. ");
+                    break;
+                case 2:
+                    doxx.add(getName() + "(id,true|false) -   Whether to approve or disapprove a client.");
+                    doxx.add("NOTE: This returns the *previous* state before the change.");
+            }
+            doxx.add(checkInitMessage);
             return doxx;
         }
     }

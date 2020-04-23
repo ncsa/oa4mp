@@ -43,7 +43,9 @@ public class AdminClientKeys extends BaseClientKeys {
     @Override
     public List<String> allKeys() {
         List<String> allKeys =  super.allKeys();
+        allKeys.add(config());
         allKeys.add(issuer());
+        allKeys.add(maxClients());
         allKeys.add(vo());
         return allKeys;
     }

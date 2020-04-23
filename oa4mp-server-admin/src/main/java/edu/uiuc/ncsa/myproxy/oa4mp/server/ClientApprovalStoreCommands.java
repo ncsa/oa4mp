@@ -23,7 +23,7 @@ public class ClientApprovalStoreCommands extends StoreCommands2 {
         super(logger, store);
     }
 
-    @Override
+/*    @Override
     protected void longFormat(Identifiable identifiable) {
         ClientApproval clientApproval = (ClientApproval) identifiable;
         say("\nApprover:" + clientApproval.getApprover());
@@ -32,7 +32,7 @@ public class ClientApprovalStoreCommands extends StoreCommands2 {
         say("Is approved? " + clientApproval.isApproved());
         say("Status:" + clientApproval.getStatus());
 
-    }
+    }*/
 
     @Override
     protected String format(Identifiable identifiable) {

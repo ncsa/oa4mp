@@ -61,7 +61,7 @@ public class NewTemplate implements QDLFunction, CSConstants {
 
 
     @Override
-    public List<String> getDocumentation() {
+    public List<String> getDocumentation(int argCount) {
         ArrayList<String> doc = new ArrayList<>();
         doc.add(getName() + "(type) creates a template with the minimum required arguments for a source of this type.");
         doc.add("Generally you use this, then call create_source to add all the other required values before either");

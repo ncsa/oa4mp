@@ -227,14 +227,10 @@ public class ClaimsSourceTester implements QDLFunction, CSConstants {
     }
 
     @Override
-    public List<String> getDocumentation() {
+    public List<String> getDocumentation(int argCount) {
         ArrayList<String> docs = new ArrayList<>();
         docs.add(getName() + "(config., user_name) -- test a given claims configuration, returning a stem of claims");
         docs.add("Note that this is dependent on several factors, e.g. if you are testing LDAP, you may need to be on a VPN");
-        docs.add("");
-        docs.add("");
-        docs.add("");
-        docs.add("");
         return docs;
     }
 
