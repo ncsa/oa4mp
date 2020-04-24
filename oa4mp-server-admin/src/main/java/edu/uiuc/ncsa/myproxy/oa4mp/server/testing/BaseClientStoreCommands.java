@@ -219,6 +219,14 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
         return format(client, ca);
     }
 
+    @Override
+    protected int longFormat(Identifiable identifiable) {
+        BaseClient client = (BaseClient) identifiable;
+        ClientApproval ca = (ClientApproval) getClientApprovalStore().get(client.getIdentifier());
+        return longFormat(client, ca);
+    }
+
+
     protected int longFormat(BaseClient client, ClientApproval clientApproval) {
         int width = super.longFormat(client);
 
@@ -242,19 +250,19 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
                 if (clientApproval.getApprover() != null) {
                     approver = clientApproval.getApprover();
                 }
-                sayi(formatLongLine("approved by", approver, width));
+                say(formatLongLine("approved by", approver, width));
                 break;
             case NONE:
-                sayi(formatLongLine("status", "none", width));
+                say(formatLongLine("status", "none", width));
                 break;
             case PENDING:
-                sayi(formatLongLine("status", "pending", width));
+                say(formatLongLine("status", "pending", width));
                 break;
             case DENIED:
-                sayi(formatLongLine("status", "approval denied", width));
+                say(formatLongLine("status", "approval denied", width));
                 break;
             case REVOKED:
-                sayi(formatLongLine("status", "revoked", width));
+                say(formatLongLine("status", "revoked", width));
 
         }
         return width;
