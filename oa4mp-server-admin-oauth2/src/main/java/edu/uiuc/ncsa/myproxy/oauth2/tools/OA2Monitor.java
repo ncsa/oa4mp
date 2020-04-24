@@ -11,22 +11,6 @@ import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
  */
 public class OA2Monitor extends Monitor {
 
-/*
-    @Override
-    public void doIt() throws Exception {
-        OA2MPService xService = new OA2MPService(getClientEnvironment());
-        info("Making initial request to service at " + ((AddressableServer) xService.getEnvironment().getDelegationService().getAtServer()).getAddress());
-        Identifier assetID = BasicIdentifier.randomID();
-        OA2Asset asset = new OA2Asset(assetID);
-        AuthorizationGrant ag = new AuthorizationGrantImpl(assetID.getUri());
-        try {
-            xService.getAccessToken(asset, ag);
-            System.exit(1); // this must fail since there is no previous call to the server and no error uri available in the monitor.
-        }catch(GeneralException x){
-            getMyLogger().error("Attempted to contact server and got an expected exception", x);
-        }
-    }
-*/
 
 
     @Override

@@ -155,6 +155,8 @@
                         <configuration>
                             <!-- Java 8 specific or empty javadoc tags make the build fail -->
                             <additionalparam>-Xdoclint:none</additionalparam>
+                            <javadocVersion>1.5</javadocVersion>
+
                         </configuration>
 
                     </execution>
