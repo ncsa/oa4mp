@@ -1,4 +1,8 @@
 /*
+This is for linking identities. It assumes that the voPersonExternalID is already in
+LDAP and will do a search there for it. If found, then it will do a second LDAP query
+for the user's NCSA-specific information.
+------
 Original script for functors -- here for reference while I debug, should be deleted at some point.
 "setEnv('vo','voPersonExternalID');",
   "setEnv('ncsa','https://idp.ncsa.illinois.edu/idp/shibboleth');",
@@ -24,6 +28,8 @@ Original script for functors -- here for reference while I debug, should be dele
       "    if[equals(get('idp'),'${google}')]then[set('${vo}',concat(get('oidc'),'@accounts.google.com'))],",
       "   if[equals(get('idp'),'${orcid}')]then[set('${vo}',replace(get('oidc'),'http://','https://'))]",
       "};"
+------
+
 */
 // Some constants for later.
 vo:='voPersonExternalID';

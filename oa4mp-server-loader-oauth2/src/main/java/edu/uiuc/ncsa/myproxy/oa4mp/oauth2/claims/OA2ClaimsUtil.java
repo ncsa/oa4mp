@@ -70,6 +70,7 @@ public class OA2ClaimsUtil implements ScriptingConstants {
      * @return
      */
     public JSONObject setAccountingInformation(HttpServletRequest request, JSONObject claims) {
+
         dbg(this, "Starting to process basic claims");
         if (transaction.hasAuthTime()) {
             // convert the date to a time if needed.

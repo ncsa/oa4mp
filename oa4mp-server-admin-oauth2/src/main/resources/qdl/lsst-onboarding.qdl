@@ -1,0 +1,60 @@
+/*
+   This  IS NOT DONE! DO NOT USE. Needs debugged.
+   This pair of scripts is for LSST's onboarding. It returns the user's claims
+   if their IDP is NCSA but in any case, sets voPersonExternalID and asserts it
+   as a claim. Once on-boarded (there are specific clients for this the user has
+   to visit first) then the user si directed to clients that link the identity
+   (and use the lsst-linking.qdl scripting).
+*/
+// General constants
+vo:='voPersonExternalID';
+idp.ncsa := 'https://idp.ncsa.illinois.edu/idp/shibboleth';
+idp.google := 'http://google.com/accounts/o8/id';
+idp.orcid := 'http://orcid.org/oauth/authorize';
+idp.github := 'http://github.com/login/oauth/authorize';
+
+// run in pre_token
+if[
+    claims.idp == idp.ncsa
+  ]then[
+    f. := new_template('ncsa');
+    claims.foo := claims.eppn - '@illinois.edu;
+    f.search_filter_attribute := 'foo';
+    f.search_attributes.0 := 'uid'; // return the uid from the search as a claim
+    list_append(claim_sources., create_source(f.));
+];
+
+// run in post_token
+v := null;
+if[is_defined(claims.foo)]then[remove(claims.foo);];
+if[
+    is_defined(claims.eppn)
+]then[
+     v:=claims.eppn
+]else[
+    if[
+      is_defined(claims.eptid)
+    ]then[
+       v:=claims.eptid;
+    ];
+];
+
+if[
+   claims.idp == idp.github
+ ]then[
+    v:=claims.oidc+'@github.com';
+ ];
+
+if[
+  claims.idp == idp.google
+  ]then[
+    v:=claims.oidc+'@accounts.google.com';
+  ];
+
+if[
+   claims.idp == idp.orcid
+  ]then[
+    v:=replace(claims.oidc,'http://', 'https://');
+  ];
+
+if[ v!= null]then[claims.vo := v;];

@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.functor.claims.OA2FunctorFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.jSetClaimSource;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.functor.claims.OA2FunctorFactory;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.oauth_2_0.server.scripts.functor.ClientFunctorScriptsUtil;
 import edu.uiuc.ncsa.security.util.functor.FunctorTypeImpl;
@@ -130,6 +130,7 @@ public class OA2ClientFunctorScriptsUtil extends ClientFunctorScriptsUtil {
 
     protected static JSONObject getClaimsProcessor(JSONObject config, String key) {
         String dbgName = "getClaimsProcessor";
+
         if(config.containsKey(ID_TAG)){
             dbgName = dbgName + "(" + config.getString(ID_TAG) + ")";
         }
