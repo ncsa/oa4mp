@@ -89,7 +89,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
         if (!claims.containsKey(getLDAPCfg().getSearchNameKey()) || claims.get(getLDAPCfg().getSearchNameKey()) == null) {
             String message = "Error: no recognized search name key was found in the claims for config with id=" + getLDAPCfg().getId() +
                     ". Requested was \"" + getLDAPCfg().getSearchNameKey() + "\"";
-            getMyLogger().warn(message);
+            DebugUtil.trace(this, message);
             throw new IllegalStateException(message);
         }
         String searchName = (String) claims.get(getLDAPCfg().getSearchNameKey());
@@ -97,7 +97,6 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
             // If the configuration file has an error, this will be the one place it shows first.
             // Best to trap it here and fail rather than have LDAP do the query (which it will and
             // return nothing) and inexplicably have no result.
-            ServletDebugUtil.error(this, "Error: no search name found for LDAP query.");
             throw new IllegalArgumentException("Error: no search name found for LDAP query.");
         }
         return searchName;
@@ -115,7 +114,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
     }
 
     public void handleException(Throwable throwable) {
-        ServletDebugUtil.error(this,"Error accessiong LDAP", throwable);
+        ServletDebugUtil.error(this,"Error accessing LDAP", throwable);
 
         if (throwable instanceof CommunicationException) {
             warn("Communication exception talking to LDAP.");
@@ -185,7 +184,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
             }
             context.close();
         } catch (Throwable throwable) {
-            DebugUtil.dbg(this, name + " Error getting search name \"" + throwable.getMessage() + "\"", throwable);
+            DebugUtil.trace(this, name + " Error getting search name \"" + throwable.getMessage() + "\"", throwable);
             handleException(throwable);
         } finally {
             closeConnection();
@@ -270,7 +269,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
 
             } catch (Throwable e) {
                 // Do nothing. Allow for errors.
-                ServletDebugUtil.dbg(this,"failed to get any LDAP directory context",e);
+                ServletDebugUtil.trace(this,"failed to get any LDAP directory context",e);
 
             }
         }
@@ -293,7 +292,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
     //e.g, uid=eppn
     // The searchFilterValue is supplied in the initial claims.
     protected String getSearchFilterAttribute() {
-        ServletDebugUtil.dbg(this, "search attribute in LDAP is " + getLDAPCfg().getSearchFilterAttribute());
+        ServletDebugUtil.trace(this, "search attribute in LDAP is " + getLDAPCfg().getSearchFilterAttribute());
         if (getLDAPCfg().getSearchFilterAttribute() == null) {
             return LDAPConfigurationUtil.SEARCH_FILTER_ATTRIBUTE_DEFAULT; // default
         } else {
@@ -345,7 +344,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
                                 String userName) throws NamingException {
         JSONObject json = new JSONObject();
         if (!e.hasMoreElements()) {
-            DebugUtil.dbg(this, "LDAP SEARCH RESULT IS EMPTY");
+            DebugUtil.trace(this, "LDAP SEARCH RESULT IS EMPTY");
         }
         if(attributes.isEmpty()){
           // no attribute specified means return everything
@@ -516,7 +515,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
     public static Groups get_NEW_Gid(LDAPConfiguration cfg2, String username) throws Throwable {
         LDAPConfiguration cfg = cfg2.clone();
         cfg.setSearchBase("ou=Groups,dc=ncsa,dc=illinois,dc=edu");
-        // ServletDebugUtil.dbg(LDAPClaimsSource.class, "LDAP search is: " + cfg.getSearchFilterAttribute() + "=" + username);
+        // ServletDebugUtil.trace(LDAPClaimsSource.class, "LDAP search is: " + cfg.getSearchFilterAttribute() + "=" + username);
         LDAPClaimsSource claimsSource = new LDAPClaimsSource(cfg, null);
         StringTokenizer stringTokenizer = new StringTokenizer(cfg.getServer(), ",");
         DirContext dirContext = null;
@@ -534,17 +533,17 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
         SearchControls searchControls = new SearchControls();
         searchControls.setReturningAttributes(new String[]{"cn", "gidNumber"});
         String filter = "(&(uniqueMember=" + cfg.getSearchFilterAttribute() + "=" + username + ",ou=People,dc=ncsa,dc=illinois,dc=edu))";
-        // ServletDebugUtil.dbg(LDAPClaimsSource.class, "LDAP filter=" + filter);
+        // ServletDebugUtil.trace(LDAPClaimsSource.class, "LDAP filter=" + filter);
 
         NamingEnumeration e = ctx.search(cfg.getContextName(), filter, searchControls);
         Groups groups = new Groups();
-        // ServletDebugUtil.dbg(LDAPClaimsSource.class, "Starting to process groups. Has elements? " + e.hasMoreElements() );
+        // ServletDebugUtil.trace(LDAPClaimsSource.class, "Starting to process groups. Has elements? " + e.hasMoreElements() );
 
         while (e.hasMoreElements()) {
             SearchResult entry = (SearchResult) e.next();
             Attributes a = entry.getAttributes();
             GroupElement groupElement = convertToEntry(a);
-            //   ServletDebugUtil.dbg(LDAPClaimsSource.class, "Added group element = " + groupElement);
+            //   ServletDebugUtil.trace(LDAPClaimsSource.class, "Added group element = " + groupElement);
 
             groups.put(groupElement);
         }

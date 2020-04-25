@@ -131,7 +131,7 @@ public abstract class MyProxyDelegationServlet extends EnvServlet implements Tra
      * @throws SQLException
      */
     protected void realStoreUpdates() throws IOException, SQLException{
-        ServletDebugUtil.dbg(this, "starting store updates");
+        ServletDebugUtil.trace(this, "starting store updates");
         processStoreCheck(getTransactionStore());
         processStoreCheck(getServiceEnvironment().getClientStore());
         processStoreCheck(getServiceEnvironment().getClientApprovalStore());
@@ -199,9 +199,9 @@ public abstract class MyProxyDelegationServlet extends EnvServlet implements Tra
         if (c == null) {
             if (getServiceEnvironment().getClientStore().size() == 0) {
                 // This tries to show if, perhpas, the wrong store wa loaded by printing out a little information about it.
-                DebugUtil.dbg(this,"CLIENT STORE HAS NO ENTRIES!");
-                DebugUtil.dbg(this, "client name is " + getServiceEnvironment().getClientStore().getClass().getSimpleName());
-                DebugUtil.dbg(this, "client store is a " + getServiceEnvironment().getClientStore());
+                DebugUtil.trace(this,"CLIENT STORE HAS NO ENTRIES!");
+                DebugUtil.trace(this, "client name is " + getServiceEnvironment().getClientStore().getClass().getSimpleName());
+                DebugUtil.trace(this, "client store is a " + getServiceEnvironment().getClientStore());
             }
             String ww = "Unknown client: \"" + identifier.toString() + "\"  cannot be found.";
             warn(ww + " Client store is " + getServiceEnvironment().getClientStore());

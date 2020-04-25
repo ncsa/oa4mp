@@ -26,7 +26,7 @@ public class ClaimSourceFactoryImpl extends ClaimSourceFactory {
     @Override
     public ClaimSource create(ClaimSourceFactoryRequest request) {
         if (request instanceof LDAPClaimSourceFactoryRequest) {
-            ServletDebugUtil.dbg(this, ".create: request = " + request);
+            ServletDebugUtil.trace(this, ".create: request = " + request);
             LDAPClaimSourceFactoryRequest req = (LDAPClaimSourceFactoryRequest) request;
             LDAPClaimsSource h = new LDAPClaimsSource(req.getLdapConfiguration(), req.getLogger());
             h.setScopes(req.getScopes());
@@ -48,15 +48,15 @@ public class ClaimSourceFactoryImpl extends ClaimSourceFactory {
      * @return
      */
     public static LinkedList<ClaimSource> createClaimSources(OA2SE oa2SE, OA2ServiceTransaction transaction) {
-        DebugUtil.dbg(ClaimSourceFactoryImpl.class, "Starting to create LDAPScopeHandlers per client");
+        DebugUtil.trace(ClaimSourceFactoryImpl.class, "Starting to create LDAPScopeHandlers per client");
         LinkedList<ClaimSource> claimSources = new LinkedList<>();
         JSONObject jsonConfig = ((OA2Client)transaction.getClient()).getConfig();
         if (!OA2ClientFunctorScriptsUtil.hasClaimSourceConfigurations(jsonConfig)) {
-            DebugUtil.dbg(ClaimSourceFactoryImpl.class, "using default scope handler=");
+            DebugUtil.trace(ClaimSourceFactoryImpl.class, "using default scope handler=");
             if (oa2SE.getClaimSource() instanceof BasicClaimsSourceImpl) {
                 BasicClaimsSourceImpl bb = (BasicClaimsSourceImpl) oa2SE.getClaimSource();
                 if (bb.getOa2SE() == null) {
-                    DebugUtil.dbg(ClaimSourceFactoryImpl.class, "setting scope handler environment #1");
+                    DebugUtil.trace(ClaimSourceFactoryImpl.class, "setting scope handler environment #1");
                     bb.setOa2SE(oa2SE);
                 }
             }
@@ -98,11 +98,11 @@ public class ClaimSourceFactoryImpl extends ClaimSourceFactory {
                                                       OA2ServiceTransaction transaction) {
 
         ClaimSourceConfiguration cfg = claimSourceConfigurationUtil.fromJSON(null, json);
-        DebugUtil.dbg(ClaimSourceFactoryImpl.class, "Got default configuration for server id=" + cfg.getId() + ", name=" + cfg.getName());
+        DebugUtil.trace(ClaimSourceFactoryImpl.class, "Got default configuration for server id=" + cfg.getId() + ", name=" + cfg.getName());
         ClaimSourceFactoryRequest req = new ClaimSourceFactoryRequest(oa2SE.getMyLogger(), cfg, transaction.getScopes());
         ClaimSource claimSource = ClaimSourceFactory.newInstance(req);
-        DebugUtil.dbg(ClaimSourceFactoryImpl.class, "creating claim source, claims Source=  " + claimSource);
-        DebugUtil.dbg(ClaimSourceFactoryImpl.class, "  , OA2SE  " + oa2SE);
+        DebugUtil.trace(ClaimSourceFactoryImpl.class, "creating claim source, claims Source=  " + claimSource);
+        DebugUtil.trace(ClaimSourceFactoryImpl.class, "  , OA2SE  " + oa2SE);
         if (claimSource instanceof BasicClaimsSourceImpl) {
             ((BasicClaimsSourceImpl) claimSource).setOa2SE(oa2SE);
         }
@@ -114,15 +114,15 @@ public class ClaimSourceFactoryImpl extends ClaimSourceFactory {
                                                    OA2SE oa2SE,
                                                    OA2ServiceTransaction transaction) {
         LDAPConfiguration cfg = ldapConfigurationUtil.fromJSON(json);
-        DebugUtil.dbg(ClaimSourceFactoryImpl.class, "Got LDAP configuration for server " + cfg.getServer());
+        DebugUtil.trace(ClaimSourceFactoryImpl.class, "Got LDAP configuration for server " + cfg.getServer());
         LDAPClaimSourceFactoryRequest req = new LDAPClaimSourceFactoryRequest(oa2SE.getMyLogger(),
                 cfg, transaction.getScopes());
         ClaimSource claimSource = ClaimSourceFactory.newInstance(req);
         if (claimSource instanceof BasicClaimsSourceImpl) {
-            DebugUtil.dbg(ClaimSourceFactoryImpl.class, "Scope handler\"" + claimSource.getClass().getSimpleName() + "\" is configured.");
+            DebugUtil.trace(ClaimSourceFactoryImpl.class, "Scope handler\"" + claimSource.getClass().getSimpleName() + "\" is configured.");
 
             ((BasicClaimsSourceImpl) claimSource).setOa2SE(oa2SE);
-            DebugUtil.dbg(ClaimSourceFactoryImpl.class, "setting scope handler environment #2");
+            DebugUtil.trace(ClaimSourceFactoryImpl.class, "setting scope handler environment #2");
         }
         return claimSource;
     }

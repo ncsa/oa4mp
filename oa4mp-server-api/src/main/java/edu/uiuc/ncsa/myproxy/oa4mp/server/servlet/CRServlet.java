@@ -166,7 +166,7 @@ public abstract class CRServlet extends MyProxyDelegationServlet {
                                                     String loa) throws GeneralSecurityException {
         MPConnectionProvider facades = new MPConnectionProvider(getMyLogger(), MyProxyDelegationServlet.getServiceEnvironment().getMyProxyServices());
         MyProxyConnectable mpc = facades.findConnection(identifier, userName, password, loa, lifetime);
-        DebugUtil.dbg(this,((MPSingleConnectionProvider.MyProxyLogonConnection)mpc).getMyProxyLogon().toString());
+        DebugUtil.trace(this,((MPSingleConnectionProvider.MyProxyLogonConnection)mpc).getMyProxyLogon().toString());
         getMyproxyConnectionCache().add( mpc);
         return mpc;
     }

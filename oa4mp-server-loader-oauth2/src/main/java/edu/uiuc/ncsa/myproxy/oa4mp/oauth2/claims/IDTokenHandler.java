@@ -33,12 +33,12 @@ public class IDTokenHandler extends AbstractPayloadHandler {
     protected String issuer;
 
     public IDTokenHandler(OA2SE oa2se, OA2ServiceTransaction transaction, HttpServletRequest request) {
-        super(oa2se,transaction,request);
+        super(oa2se, transaction, request);
         setIssuer(request);
     }
 
     public IDTokenHandler(OA2SE oa2se, OA2ServiceTransaction transaction) {
-        super(oa2se,transaction);
+        super(oa2se, transaction);
     }
 
 
@@ -69,15 +69,19 @@ public class IDTokenHandler extends AbstractPayloadHandler {
         }
 
     }
-      void addDebugClaims(){
-           claims.put("eppn","jgaynor@illinois.edu");
-           claims.put("idp","https://idp.ncsa.illinois.edu/idp/shibboleth");
-      }
+
+    void addDebugClaims() {
+        //getClaims().put("eppn", "jgaynor@illinois.edu");
+        //getClaims().put("idp", "https://idp.ncsa.illinois.edu/idp/shibboleth");
+        getClaims().put("idp","http://orcid.org/oauth/authorize");
+        getClaims().put("oidc","43455756756");
+    }
+
     @Override
     public void init() throws Throwable {
         claims = getClaims();
         trace(this, "Starting to process basic claims");
-  //      addDebugClaims();
+              addDebugClaims();
         claims.put(OA2Claims.ISSUER, issuer);
         claims.put(OA2Claims.SUBJECT, transaction.getUsername());
         claims.put(AUDIENCE, transaction.getClient().getIdentifierString());
@@ -104,25 +108,25 @@ public class IDTokenHandler extends AbstractPayloadHandler {
     }
 
     @Override
-    public void setAccountingInformation() {
-        claims = getClaims();
-
-        trace(this, "Starting to set the accounting information for the claims");
-        if (transaction.hasAuthTime()) {
-            // convert the date to a time if needed.
-            claims.put(AUTHORIZATION_TIME, Long.toString(transaction.getAuthTime().getTime() / 1000));
-        }
-        claims.put(EXPIRATION, System.currentTimeMillis() / 1000 + 15 * 60); // expiration is in SECONDS from the epoch.
-        claims.put(ISSUED_AT, System.currentTimeMillis() / 1000); // issued at = current time in seconds.
-        if (transaction.hasAuthTime()) {
-            // convert the date to a time if needed.
-            claims.put(AUTHORIZATION_TIME, Long.toString(transaction.getAuthTime().getTime() / 1000));
-        }
-        if (transaction.getNonce() != null && 0 < transaction.getNonce().length()) {
-            claims.put(NONCE, transaction.getNonce());
-        }
+    public void refreshAccountingInformation() {
+        trace(this, "Refreshing the accounting information for the claims");
+        getClaims().put(EXPIRATION, System.currentTimeMillis() / 1000 + 15 * 60); // expiration is in SECONDS from the epoch.
+        getClaims().put(ISSUED_AT, System.currentTimeMillis() / 1000); // issued at = current time in seconds.
     }
 
+
+    @Override
+    public void setAccountingInformation() {
+        trace(this, "Setting the accounting information for the claims");
+        if (transaction.getNonce() != null && 0 < transaction.getNonce().length()) {
+            getClaims().put(NONCE, transaction.getNonce());
+        }
+        if (transaction.hasAuthTime()) {
+            // convert the date to a time if needed.
+            getClaims().put(AUTHORIZATION_TIME, Long.toString(transaction.getAuthTime().getTime() / 1000));
+        }
+        refreshAccountingInformation();
+    }
 
 
     @Override
@@ -211,7 +215,6 @@ public class IDTokenHandler extends AbstractPayloadHandler {
             trace(this, "In saveState: either env or transaction null. Nothing saved.");
         }
     }
-
 
 
     /**

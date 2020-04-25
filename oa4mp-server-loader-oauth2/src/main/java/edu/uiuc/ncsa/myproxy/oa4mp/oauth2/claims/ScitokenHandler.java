@@ -103,4 +103,9 @@ public class ScitokenHandler extends AbstractPayloadHandler {
     public void setAccountingInformation() {
 
     }
+
+    @Override
+    public void refreshAccountingInformation() {
+
+    }
 }

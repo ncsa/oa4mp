@@ -151,11 +151,11 @@ public class TestUtils {
                 // try to find a specified configuration.
                 String cfgName = System.getProperty(getBootstrapper().getOa4mpConfigNameKey());
                 if (cfgName == null) {
-                    DebugUtil.dbg(TestUtils.class, "no name for a configuration given");
+                    DebugUtil.trace(TestUtils.class, "no name for a configuration given");
                     cn = cfg.configurationAt(COMPONENT).getRootNode();
 
                 } else {
-                    DebugUtil.dbg(TestUtils.class, "getting named configuration \"" + cfgName + "\"");
+                    DebugUtil.trace(TestUtils.class, "getting named configuration \"" + cfgName + "\"");
                     cn = Configurations.getConfig(cfg, COMPONENT, cfgName);
                 }
 
@@ -166,7 +166,7 @@ public class TestUtils {
         } catch (Exception x) {
             MyConfigurationException ex = new MyConfigurationException("Error loading configuration with " +
                     "name \"" + configName + "\" from file \"" + fileName + "\".", x);
-            DebugUtil.dbg(TestUtils.class, ex.getMessage(), ex);
+            DebugUtil.trace(TestUtils.class, ex.getMessage(), ex);
             throw ex;
         }
     }

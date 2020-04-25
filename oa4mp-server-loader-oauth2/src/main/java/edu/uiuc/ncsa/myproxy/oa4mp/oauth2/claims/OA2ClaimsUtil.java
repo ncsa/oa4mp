@@ -35,6 +35,10 @@ import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.NONCE;
 import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.*;
 
 /**
+ * This used to be the main claims processing engine until scripting was improved
+ * in version 4.4.
+ * If you are using it, there is probably something wrong.
+ * @deprecated 
  * <p>Created by Jeff Gaynor<br>
  * on 4/24/18 at  11:13 AM
  */

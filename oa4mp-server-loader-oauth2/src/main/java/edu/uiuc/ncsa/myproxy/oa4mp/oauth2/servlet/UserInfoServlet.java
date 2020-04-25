@@ -2,7 +2,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.OA2ClaimsUtil;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.IDTokenHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.security.core.exceptions.InvalidTimestampException;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
@@ -62,9 +62,8 @@ public class UserInfoServlet extends MyProxyDelegationServlet {
         UIIRequest2 uireq = new UIIRequest2(request, at);
         uireq.setUsername(getUsername(transaction));
         UIIResponse2 uiresp = (UIIResponse2) uis.process(uireq);
-        // add the claims we have stored.
-        OA2ClaimsUtil claimsUtil = new OA2ClaimsUtil(oa2SE,transaction );
-        transaction.setClaims(claimsUtil.setAccountingInformation(request, transaction.getClaims()));
+        IDTokenHandler idTokenHandler = new IDTokenHandler(oa2SE, transaction);
+        idTokenHandler.refreshAccountingInformation();
         getTransactionStore().save(transaction);
         uiresp.getUserInfo().getMap().putAll(stripClaims(transaction.getClaims()));
         uiresp.write(response);

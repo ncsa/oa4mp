@@ -1,11 +1,12 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.functor;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowStates2;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.functor.claims.OA2FunctorFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowType;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.functor.claims.OA2FunctorFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientFunctorScripts;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientFunctorScriptsFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ScriptRuntimeEngineFactory;
+import edu.uiuc.ncsa.security.oauth_2_0.jwt.ScriptingConstants;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.util.functor.JFunctor;
 import edu.uiuc.ncsa.security.util.functor.logic.FunctorMap;
@@ -19,7 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.OA2ClaimsUtil.*;
+//import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.OA2ClaimsUtil.*;
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowType.*;
 import static edu.uiuc.ncsa.security.core.util.DebugUtil.trace;
 
@@ -27,7 +28,7 @@ import static edu.uiuc.ncsa.security.core.util.DebugUtil.trace;
  * <p>Created by Jeff Gaynor<br>
  * on 2/6/20 at  2:04 PM
  */
-public class FunctorRuntimeEngine extends ScriptRuntimeEngine {
+public class FunctorRuntimeEngine extends ScriptRuntimeEngine implements ScriptingConstants {
 
 
     @Override

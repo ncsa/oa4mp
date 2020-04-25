@@ -116,15 +116,15 @@ public class HeaderUtils {
         // semantics are that this is base64.encode(URLEncode(id):URLEncode(secret))
         byte[] headerBytes = Base64.decodeBase64(header64);
         if (headerBytes == null || headerBytes.length == 0) {
-            //       DebugUtil.dbg(this, "doIt: no secret, throwing exception.");
+            //       DebugUtil.trace(this, "doIt: no secret, throwing exception.");
             throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT, "Missing secret");
         }
         String header = new String(headerBytes);
-        //    DebugUtil.dbg(this, " received authz header of " + header);
+        //    DebugUtil.trace(this, " received authz header of " + header);
         int lastColonIndex = header.lastIndexOf(":");
         if (lastColonIndex == -1) {
             // then this is not in the correct format.
-            //      DebugUtil.dbg(this, "doIt: the authorization header is not in the right format, throwing exception.");
+            //      DebugUtil.trace(this, "doIt: the authorization header is not in the right format, throwing exception.");
             throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT, "the authorization header is not in the right format");
 
         }
@@ -172,7 +172,7 @@ public class HeaderUtils {
 
     public static Identifier getIDFromParameters(HttpServletRequest request) {
         Identifier paramID = null;
-        //DebugUtil.dbg(this, "doIt: no header for authentication, looking at parameters.");
+        //DebugUtil.trace(this, "doIt: no header for authentication, looking at parameters.");
 
         // assume that the secret and id are in the request
         String rawID = request.getParameter(AbstractServlet.CONST(CONSUMER_KEY));

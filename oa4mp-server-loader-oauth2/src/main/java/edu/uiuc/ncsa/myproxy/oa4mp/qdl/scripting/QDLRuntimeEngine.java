@@ -18,6 +18,7 @@ import edu.uiuc.ncsa.qdl.state.SymbolStack;
 import edu.uiuc.ncsa.qdl.statements.FunctionTable;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
+import edu.uiuc.ncsa.security.oauth_2_0.jwt.ScriptingConstants;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.util.scripting.ScriptInterface;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRunRequest;
@@ -32,14 +33,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.OA2ClaimsUtil.*;
+//import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.OA2ClaimsUtil.*;
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowType.*;
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 2/12/20 at  9:29 AM
  */
-public class QDLRuntimeEngine extends ScriptRuntimeEngine {
+public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingConstants {
     public static String CONFIG_TAG = "qdl";
     public static String SCRIPTS_TAG = "scripts";
 

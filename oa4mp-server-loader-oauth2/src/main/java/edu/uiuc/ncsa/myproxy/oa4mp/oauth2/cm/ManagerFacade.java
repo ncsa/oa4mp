@@ -120,7 +120,7 @@ public class ManagerFacade {
         }
         String rawSecret = client.getSecret();
         if (rawSecret == null || rawSecret.length() == 0) {
-            DebugUtil.dbg(this, "doIt: no secret, throwing exception.");
+            DebugUtil.trace(this, "doIt: no secret, throwing exception.");
             throw new GeneralException("Missing secret");
         }
 
@@ -137,7 +137,7 @@ public class ManagerFacade {
 
 
         if (!storedClient.getSecret().equals(DigestUtils.shaHex(rawSecret))) {
-            DebugUtil.dbg(this, "doIt: bad secret, throwing exception.");
+            DebugUtil.trace(this, "doIt: bad secret, throwing exception.");
             throw new GeneralException("Incorrect secret. Unauthorized client.");
         }
     }

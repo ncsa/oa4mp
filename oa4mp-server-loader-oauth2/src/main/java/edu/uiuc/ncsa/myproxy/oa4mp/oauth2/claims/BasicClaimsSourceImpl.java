@@ -170,13 +170,11 @@ public class BasicClaimsSourceImpl implements ClaimSource {
             DebugUtil.trace(this, "in postP cfg name=:" + getConfiguration().getName() + ", id=" + getConfiguration().getId());
 
             OA2FunctorFactory ff = new OA2FunctorFactory(claims, t.getScopes());
-            //  DebugUtil.dbg(this, "claims before post-processing=" + claims.toString(1));
             postProcessor = new FunctorScript(ff, getConfiguration().getJSONPostProcessing());
             DebugUtil.trace(this, "postP before X=:" + postProcessor);
 
             postProcessor.execute();
             DebugUtil.trace(this, "postP after X=:" + postProcessor);
-            //  DebugUtil.dbg(this, "claims after post-processing=" + claims.toString(1));
             FlowStates2 f = t.getFlowStates();
             FunctorRuntimeEngine.updateFSValues(f, postProcessor.getFunctorMap());
             t.setFlowStates(f);

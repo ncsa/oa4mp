@@ -4,7 +4,6 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.ClaimSourceFactoryImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.IDTokenHandler;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.OA2ClaimsUtil;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ScriptRuntimeEngineFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RefreshTokenStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
@@ -77,18 +76,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         }
 
         p.put(OA2Constants.CLIENT_ID, st.getClient().getIdentifierString());
-        //    populateClaims(state.getRequest(), p, st);
     }
 
-    protected Map<String, String> populateClaims(HttpServletRequest request, Map<String, String> p, OA2ServiceTransaction st) {
-        OA2SE oa2se = (OA2SE) getServiceEnvironment();
-        OA2ClaimsUtil claimsUtil = new OA2ClaimsUtil(oa2se, st);
-        // Every time there is a refresh, you must reinitialize the claims to have the right timestamps or
-        // clients that verify the claims will fail.
-        st.setClaims(claimsUtil.setAccountingInformation(request, st.getClaims()));
-        return st.getClaims();
-
-    }
 
     /**
      * The lifetime of the refresh token. This is the non-zero minimum of the client's requested

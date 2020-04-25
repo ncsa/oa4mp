@@ -1,12 +1,12 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.OA2ClaimsUtil;
-import edu.uiuc.ncsa.qdl.vfs.FileEntries;
+
 import edu.uiuc.ncsa.qdl.scripting.JSONScriptUtil;
 import edu.uiuc.ncsa.qdl.scripting.QDLScript;
 import edu.uiuc.ncsa.qdl.scripting.Scripts;
 import edu.uiuc.ncsa.qdl.util.FileUtil;
 import edu.uiuc.ncsa.qdl.util.QDLVersion;
+import edu.uiuc.ncsa.qdl.vfs.FileEntries;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.ScriptingConstants;
@@ -159,29 +159,29 @@ public class QDLJSONConfigUtil implements ScriptingConstants {
         scriptName = scriptName.substring(0, scriptName.lastIndexOf("."));
         switch (scriptName) {
             case SRE_EXEC_INIT:
-                xp.put(EXEC_PHASE, OA2ClaimsUtil.SRE_EXEC_INIT);
+                xp.put(EXEC_PHASE, SRE_EXEC_INIT);
                 break;
             case SRE_PRE_AUTH:
-                xp.put(EXEC_PHASE, OA2ClaimsUtil.SRE_PRE_AUTH);
+                xp.put(EXEC_PHASE, SRE_PRE_AUTH);
                 break;
             case SRE_POST_AUTH:
-                xp.put(EXEC_PHASE, OA2ClaimsUtil.SRE_POST_AUTH);
+                xp.put(EXEC_PHASE, SRE_POST_AUTH);
                 break;
             case SRE_PRE_AT:
-                xp.put(EXEC_PHASE, OA2ClaimsUtil.SRE_PRE_AT);
+                xp.put(EXEC_PHASE, SRE_PRE_AT);
                 break;
             case SRE_POST_AT:
-                xp.put(EXEC_PHASE, OA2ClaimsUtil.SRE_POST_AT);
+                xp.put(EXEC_PHASE, SRE_POST_AT);
                 break;
             case SRE_PRE_REFRESH:
-                xp.put(EXEC_PHASE, OA2ClaimsUtil.SRE_PRE_REFRESH);
+                xp.put(EXEC_PHASE, SRE_PRE_REFRESH);
                 break;
             case SRE_POST_REFRESH:
-                xp.put(EXEC_PHASE, OA2ClaimsUtil.SRE_POST_REFRESH);
+                xp.put(EXEC_PHASE, SRE_POST_REFRESH);
                 break;
             default:
                 // no automatic phase given. Have to get it
-                xp.put(EXEC_PHASE, OA2ClaimsUtil.SRE_NO_EXEC_PHASE);
+                xp.put(EXEC_PHASE, SRE_NO_EXEC_PHASE);
         }
        File f = new File(absolutePath);
         Date createTS = new Date();
@@ -272,7 +272,7 @@ public class QDLJSONConfigUtil implements ScriptingConstants {
         script.append("f. := new_template('ncsa');\n");
         script.append("claim_sources.0. := create_source(f.);\n");
         XProperties xp = new XProperties();
-        xp.put(EXEC_PHASE, OA2ClaimsUtil.SRE_PRE_AUTH);
+        xp.put(EXEC_PHASE, SRE_PRE_AUTH);
         xp.put(ID, SRE_PRE_AUTH + QDLVersion.DEFAULT_FILE_EXTENSION);
         xp.put(LANGUAGE, "qdl");
         xp.put(LANG_VERSION, "1.0");
@@ -290,7 +290,7 @@ public class QDLJSONConfigUtil implements ScriptingConstants {
         script.append("  claims.check := 'not in group';");
         script.append("]; //end if");
         xp = new XProperties();
-        xp.put(EXEC_PHASE, OA2ClaimsUtil.SRE_POST_AT);
+        xp.put(EXEC_PHASE, SRE_POST_AT);
         xp.put(ID, SRE_POST_AT + QDLVersion.DEFAULT_FILE_EXTENSION);
         xp.put(LANGUAGE, "qdl");
         xp.put(LANG_VERSION, "1.0");
@@ -320,7 +320,7 @@ public class QDLJSONConfigUtil implements ScriptingConstants {
         script.append("f.file_path := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/test-claims.json';\n");
         script.append("claim_sources.0. := create_source(f.);\n");
         XProperties xp = new XProperties();
-        xp.put(EXEC_PHASE, OA2ClaimsUtil.SRE_EXEC_INIT);
+        xp.put(EXEC_PHASE, SRE_EXEC_INIT);
         xp.put(ID, SRE_EXEC_INIT + QDLVersion.DEFAULT_FILE_EXTENSION);
         xp.put(LANGUAGE, "qdl");
         xp.put(LANG_VERSION, "1.0");
@@ -333,7 +333,7 @@ public class QDLJSONConfigUtil implements ScriptingConstants {
         script.append("say(claim_sources.);");
         script.append("say(flow_states.);");
         xp = new XProperties();
-        xp.put(EXEC_PHASE, OA2ClaimsUtil.SRE_PRE_AT);
+        xp.put(EXEC_PHASE, SRE_PRE_AT);
         xp.put(ID, SRE_PRE_AT + QDLVersion.DEFAULT_FILE_EXTENSION);
         xp.put(LANGUAGE, "qdl");
         xp.put(LANG_VERSION, "1.0");

@@ -2,8 +2,9 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.OA2ClaimsUtil;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.IDTokenHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ExtendedParameters;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ScriptRuntimeEngineFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.UsernameFindable;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.IssuerTransactionState;
@@ -19,6 +20,7 @@ import edu.uiuc.ncsa.security.delegation.server.request.IssuerResponse;
 import edu.uiuc.ncsa.security.delegation.servlet.TransactionState;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.oauth_2_0.*;
+import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTRunner;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import net.sf.json.JSONObject;
@@ -75,10 +77,10 @@ public class OA2AuthorizedServletUtil {
             (most likely by a script, so we can avoid server changes). Nothing is done with these here, they
             are stashed and forwarded at the correct time.
              */
-            if(client.hasExtendedAttributeSupport()){
+            if (client.hasExtendedAttributeSupport()) {
                 ExtendedParameters xp = new ExtendedParameters();
                 JSONObject extAttr = xp.snoopHeaders(req.getParameterMap());
-                if(extAttr!= null && !extAttr.isEmpty()){
+                if (extAttr != null && !extAttr.isEmpty()) {
                     transaction.setExtendedAttributes(extAttr);
                 }
             }
@@ -86,7 +88,7 @@ public class OA2AuthorizedServletUtil {
             transaction.setClient(client);
             transaction = (OA2ServiceTransaction) verifyAndGet(agResponse);
             servlet.getTransactionStore().save(transaction);
-            DebugUtil.info(this,"Saved new transaction with id=" + transaction.getIdentifierString());
+            DebugUtil.info(this, "Saved new transaction with id=" + transaction.getIdentifierString());
 
             Map<String, String> params = agResponse.getParameters();
 
@@ -94,7 +96,7 @@ public class OA2AuthorizedServletUtil {
             DebugUtil.trace(this, "saved transaction for " + cid + ", trans id=" + transaction.getIdentifierString());
 
             agResponse.write(resp);
-            DebugUtil.info(this,"2.b finished initial request for token =\"" + transaction.getIdentifierString() + "\".");
+            DebugUtil.info(this, "2.b finished initial request for token =\"" + transaction.getIdentifierString() + "\".");
 
             postprocess(new IssuerTransactionState(req, resp, params, transaction, agResponse));
             return transaction;
@@ -110,7 +112,7 @@ public class OA2AuthorizedServletUtil {
      * Note the at the entry point for this is the {@link #doIt(HttpServletRequest, HttpServletResponse)} method
      * if authorization is done elsewhere (so the assumption is that authorization has already happened),
      * vs. the doDelegation call that is invoked by the OA4MP Authorize servlet. The difference is
-     * that the two paths will invoke the {@link OA2ClaimsUtil} at different points.
+     * that the two paths will invoke the claims processing at different points.
      *
      * @param httpServletRequest
      * @param httpServletResponse
@@ -145,10 +147,17 @@ public class OA2AuthorizedServletUtil {
         }
         ServletDebugUtil.trace(this, "Starting doDelegation");
         t = doDelegation(httpServletRequest, httpServletResponse);
+        OA2SE oa2SE = (OA2SE) MyProxyDelegationServlet.getServiceEnvironment();
         ServletDebugUtil.trace(this, "Starting done with doDelegation, creating claim util");
-        OA2ClaimsUtil claimsUtil = new OA2ClaimsUtil((OA2SE) servlet.getServiceEnvironment(), t);
+        JWTRunner jwtRunner = new JWTRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2SE, t.getOA2Client().getConfig()));
+        IDTokenHandler idTokenHandler = new IDTokenHandler(oa2SE, t, httpServletRequest);
+        jwtRunner.addHandler(idTokenHandler);
+
         DebugUtil.trace(this, "starting to process claims, creating basic claims:");
-        claimsUtil.processAuthorizationClaims(httpServletRequest);
+        jwtRunner.doAuthClaims();
+
+//        OA2ClaimsUtil claimsUtil = new OA2ClaimsUtil((OA2SE) servlet.getServiceEnvironment(), t);
+//        claimsUtil.processAuthorizationClaims(httpServletRequest);
         //  servlet.getTransactionStore().save(t); // save the claims.
         DebugUtil.trace(this, "done with claims, transaction saved, claims = " + t.getClaims());
         return t;
@@ -235,17 +244,17 @@ public class OA2AuthorizedServletUtil {
 
         String rawSecret = params.get(CLIENT_SECRET);
         if (rawSecret != null) {
-            DebugUtil.info(this,"Client is sending secret in initial request. Though not forbidden by the protocol this is discouraged.");
+            DebugUtil.info(this, "Client is sending secret in initial request. Though not forbidden by the protocol this is discouraged.");
             if (!client.getSecret().equals(rawSecret)) {
-                DebugUtil.info(this,"And for what it is worth, the client sent along an incorrect secret too...");
+                DebugUtil.info(this, "And for what it is worth, the client sent along an incorrect secret too...");
             }
         }
         String rawRefreshLifetime = params.get(REFRESH_LIFETIME);
-        if(rawRefreshLifetime != null && !rawRefreshLifetime.isEmpty()){
-            try{
+        if (rawRefreshLifetime != null && !rawRefreshLifetime.isEmpty()) {
+            try {
                 long rt = Long.parseLong(rawRefreshLifetime);
                 st.setRefreshTokenLifetime(rt);
-            }catch(Throwable t){
+            } catch (Throwable t) {
                 // do nothing.
             }
 
@@ -253,7 +262,7 @@ public class OA2AuthorizedServletUtil {
         String nonce = params.get(NONCE);
         // FIX for OAUTH-180. Server must support clients that do not use a nonce. Just log it and rock on.
         if (nonce == null || nonce.length() == 0) {
-            DebugUtil.info(this,"No nonce in initial request for " + client.getIdentifierString());
+            DebugUtil.info(this, "No nonce in initial request for " + client.getIdentifierString());
         } else {
             NonceHerder.putNonce(nonce); // Don't check it, just store it and return it later.
         }
@@ -266,7 +275,7 @@ public class OA2AuthorizedServletUtil {
 
         //OA2ServiceTransaction st = createNewTransaction(agResponse.getGrant());
         //st.setClient(agResponse.getClient());
-        DebugUtil.info(this,"Created new unsaved transaction with id=" + st.getIdentifierString());
+        DebugUtil.info(this, "Created new unsaved transaction with id=" + st.getIdentifierString());
         Collection<String> scopes = resolveScopes(st, params, state, givenRedirect);
         st.setScopes(scopes);
         st.setAuthGrantValid(false);
@@ -290,8 +299,8 @@ public class OA2AuthorizedServletUtil {
         if (params.containsKey(REQUEST_URI)) {
             throw new OA2RedirectableError(OA2Errors.REQUEST_URI_NOT_SUPPORTED, "The \"request_uri\" parameter is not supported on this server", state, givenRedirect);
         }
-        if(params.containsKey(RESPONSE_MODE)){
-               st.setResponseMode(params.get(RESPONSE_MODE));
+        if (params.containsKey(RESPONSE_MODE)) {
+            st.setResponseMode(params.get(RESPONSE_MODE));
         }
 
         return st;
@@ -327,7 +336,7 @@ public class OA2AuthorizedServletUtil {
         OA2Client oa2Client = (OA2Client) st.getClient();
         // Fixes github issue 8, support for public clients: https://github.com/ncsa/OA4MP/issues/8
         if (oa2Client.isPublicClient()) {
-            if(!oa2Client.getScopes().contains(OA2Scopes.SCOPE_OPENID)){
+            if (!oa2Client.getScopes().contains(OA2Scopes.SCOPE_OPENID)) {
                 throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST, "Scopes must contain " + OA2Scopes.SCOPE_OPENID, state, givenRedirect);
             }
             // only allowed scope, regardless of what is requested.

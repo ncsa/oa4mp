@@ -65,7 +65,7 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
                 } else {
                     JSONArray array = (JSONArray) temp;
                     if (array.size() != 1) {
-                        ServletDebugUtil.dbg(this, "Got " + array.size() + " LDAP configurations. Using first one only...");
+                        ServletDebugUtil.trace(this, "Got " + array.size() + " LDAP configurations. Using first one only...");
                         //    throw new GeneralException("Error: multiple LDAP configurations encountered for id \"" + otherV.getIdentifierString() + "\". Convert manually.");
                     }
                     ldap = (JSONObject) array.get(0);
@@ -99,7 +99,7 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
           /*  if (cfg == null) {
                 cfg = new JSONObject();
                 OA2ClientFunctorScriptsUtil.setComment(cfg, "Created by converter from old LDAP entry");
-                ServletDebugUtil.dbg(this,"starting to convert client with id=" + otherV.getIdentifierString());
+                ServletDebugUtil.trace(this,"starting to convert client with id=" + otherV.getIdentifierString());
                 OA2ClientFunctorScriptsUtil.convertToNewConfiguration(ldap, cfg);
             }*/
 
