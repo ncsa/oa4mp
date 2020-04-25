@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowStates2;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.functor.FunctorRuntimeEngine;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.functor.claims.OA2FunctorFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.GroupHandler;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.oauth_2_0.UserInfo;
 import edu.uiuc.ncsa.security.oauth_2_0.server.UnsupportedScopeException;
@@ -107,7 +108,7 @@ public class BasicClaimsSourceImpl implements ClaimSource {
         this.oa2SE = oa2SE;
     }
 
-    transient  OA2SE oa2SE; // do NOT serialize this. Ever.
+    transient OA2SE oa2SE; // do NOT serialize this. Ever.
     Collection<String> scopes;
 
     @Override
@@ -145,29 +146,43 @@ public class BasicClaimsSourceImpl implements ClaimSource {
         // actually have a way to save its state nor good control of its execution flow, hence
         // pre and post processors were needed. If you remove these, you will probably break every older
         // configuration, so until nobody is using the old scripting, these must remain.
-
+        DebugUtil.trace(this, "Before preP claims:" + claims);
+        DebugUtil.trace(this, "Before preP has config:" + hasConfiguration());
         if (hasConfiguration() && hasJSONPreProcessor()) {
+            DebugUtil.trace(this, "in preP cfg name=:" + getConfiguration().getName() + ", id=" + getConfiguration().getId());
+
             OA2FunctorFactory ff = new OA2FunctorFactory(claims, t.getScopes());
             preProcessor = new FunctorScript(ff, getConfiguration().getJSONPreProcessing());
+            DebugUtil.trace(this, "PreP before X=:" + preProcessor);
             preProcessor.execute();
+            DebugUtil.trace(this, "PreP after X=:" + preProcessor);
+
             // since the flow state maps to  part of a JSON object, we have to get the object, then reset it.
             FlowStates2 f = t.getFlowStates();
             FunctorRuntimeEngine.updateFSValues(f, preProcessor.getFunctorMap());
             t.setFlowStates(f);
         }
-
+        DebugUtil.trace(this, "starting real processing");
         realProcessing(claims, request, t); // actual work here
+        DebugUtil.trace(this, "done real processing, claims=" + claims);
 
         if (hasConfiguration() && hasJSONPostProcessor()) {
+            DebugUtil.trace(this, "in postP cfg name=:" + getConfiguration().getName() + ", id=" + getConfiguration().getId());
+
             OA2FunctorFactory ff = new OA2FunctorFactory(claims, t.getScopes());
-          //  DebugUtil.dbg(this, "claims before post-processing=" + claims.toString(1));
+            //  DebugUtil.dbg(this, "claims before post-processing=" + claims.toString(1));
             postProcessor = new FunctorScript(ff, getConfiguration().getJSONPostProcessing());
+            DebugUtil.trace(this, "postP before X=:" + postProcessor);
+
             postProcessor.execute();
-          //  DebugUtil.dbg(this, "claims after post-processing=" + claims.toString(1));
+            DebugUtil.trace(this, "postP after X=:" + postProcessor);
+            //  DebugUtil.dbg(this, "claims after post-processing=" + claims.toString(1));
             FlowStates2 f = t.getFlowStates();
             FunctorRuntimeEngine.updateFSValues(f, postProcessor.getFunctorMap());
             t.setFlowStates(f);
         }
+        DebugUtil.trace(this,"returned claims=:" + claims );
+
         return claims;
     }
 

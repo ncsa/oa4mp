@@ -69,11 +69,15 @@ public class IDTokenHandler extends AbstractPayloadHandler {
         }
 
     }
-
+      void addDebugClaims(){
+           claims.put("eppn","jgaynor@illinois.edu");
+           claims.put("idp","https://idp.ncsa.illinois.edu/idp/shibboleth");
+      }
     @Override
     public void init() throws Throwable {
         claims = getClaims();
         trace(this, "Starting to process basic claims");
+  //      addDebugClaims();
         claims.put(OA2Claims.ISSUER, issuer);
         claims.put(OA2Claims.SUBJECT, transaction.getUsername());
         claims.put(AUDIENCE, transaction.getClient().getIdentifierString());

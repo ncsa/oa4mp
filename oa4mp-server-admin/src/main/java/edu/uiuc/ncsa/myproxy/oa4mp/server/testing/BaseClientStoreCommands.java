@@ -222,11 +222,8 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
     @Override
     protected int longFormat(Identifiable identifiable) {
         BaseClient client = (BaseClient) identifiable;
-        ClientApproval clientApproval = null;
-        if (getClientApprovalStore() != null) {
-            clientApproval = (ClientApproval) getClientApprovalStore().get(client.getIdentifier());
-        }
-        return longFormat(client, clientApproval);
+        ClientApproval ca = (ClientApproval) getClientApprovalStore().get(client.getIdentifier());
+        return longFormat(client, ca);
     }
 
 

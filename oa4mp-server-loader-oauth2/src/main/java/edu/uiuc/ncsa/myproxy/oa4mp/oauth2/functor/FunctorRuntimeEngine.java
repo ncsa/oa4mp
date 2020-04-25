@@ -89,12 +89,12 @@ public class FunctorRuntimeEngine extends ScriptRuntimeEngine {
                 (List) request.getArgs().get(SRE_REQ_SCOPES));
         OA2ClientFunctorScriptsFactory<OA2ClientFunctorScripts> ff = getScriptFactory(functorFactory);
         OA2ClientFunctorScripts cc = ff.newInstance();
+        ff.createClaimSource(cc, config);
 
         if (cc.hasPostProcessing()) {
             trace(this, ".doPostProcessing: has post-processing?" + cc.getPostProcessing());
             ff.setupPostProcessing(cc, config);
             cc.executePostProcessing();
-            ff.createClaimSource(cc, config);
             FlowStates2 flowStates = (FlowStates2) request.getArgs().get(SRE_REQ_FLOW_STATES);
             updateFSValues(flowStates, cc.getPostProcessing().getFunctorMap());
 
@@ -109,10 +109,14 @@ public class FunctorRuntimeEngine extends ScriptRuntimeEngine {
                 (List) request.getArgs().get(SRE_REQ_SCOPES));
         OA2ClientFunctorScriptsFactory<OA2ClientFunctorScripts> ff = getScriptFactory(functorFactory);
         OA2ClientFunctorScripts cc = ff.newInstance();
+        ff.createClaimSource(cc, config);
 
+        trace(this, ".doPreAuth: has pre-processing?" + cc.hasPreProcessing());
         if (cc.hasPreProcessing()) {
+            trace(this, ".doPreAuth: starting pre-processing");
             ff.setupPreProcessing(cc, config);
             cc.executePreProcessing();
+            trace(this, ".doPreAuth: done pre-processing" + cc);
             FlowStates2 flowStates = (FlowStates2) request.getArgs().get(SRE_REQ_FLOW_STATES);
             updateFSValues(flowStates, cc.getPreProcessing().getFunctorMap());
             // Check if we should be returning these as per request.
@@ -134,6 +138,7 @@ public class FunctorRuntimeEngine extends ScriptRuntimeEngine {
         OA2ClientFunctorScripts cc = ff.newInstance();
 
         cc.executeRuntime();
+
         FlowStates2 flowStates = (FlowStates2) request.getArgs().get(SRE_REQ_FLOW_STATES);
         updateFSValues(flowStates, cc.getRuntime().getFunctorMap());
         ff.createClaimSource(cc, config);
