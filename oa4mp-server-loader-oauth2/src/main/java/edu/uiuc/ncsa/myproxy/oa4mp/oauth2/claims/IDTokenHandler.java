@@ -74,10 +74,10 @@ public class IDTokenHandler extends AbstractPayloadHandler {
      * This lets you turn on or off claims that can emulate coming in from other IDPs with
      *  any information you want. Simply add a call to it in the {@link #init()} method.
      *  Be sure to turn it off before release since it will put a large ugly warning message in
-     *  the claims.
+     *  the claims. Look in OA2FunctorTests for more examples.
      */
     void addDebugClaims() {
-        // Keep the nex two line no matter what, that way you don't leave it in test mode
+        // Keep the next two line no matter what, that way you don't leave it in test mode
         // since the claims will tell you.
         getClaims().put("DEBUG","If you see this, the server is in test mode!");
         DebugUtil.info(this, "addDebugClaims: Testing claims added. ");
@@ -85,20 +85,21 @@ public class IDTokenHandler extends AbstractPayloadHandler {
         // Uncomment the pair of these you need.
 
         // NCSA IDP
-        //getClaims().put("eppn", "jgaynor@illinois.edu");
         //getClaims().put("idp", "https://idp.ncsa.illinois.edu/idp/shibboleth");
+        //getClaims().put("eppn", "jgaynor@illinois.edu");
+        //getClaims().put("eptid", "jgaynor@rndom3453.eptid");
 
         // ORCID IDP
         getClaims().put("idp","http://orcid.org/oauth/authorize");
-        getClaims().put("oidc","https://orcid.org/5437-7582-1853-4673");
+        getClaims().put("oidc","http://orcid.org/5437-7582-1853-4673");
 
         // GITHub IDP
         //getClaims().put("idp","http://github.com/login/oauth/authorize");
-       // getClaims().put("oidc","43455756756");
+       // getClaims().put("oidc","oidc-43455756756");
         
        // Google IDP
         //getClaims().put("idp","http://google.com/accounts/o8/id");
-       // getClaims().put("oidc","43455756756");
+       // getClaims().put("oidc","oidc-43455756756");
 
     }
 
@@ -106,7 +107,7 @@ public class IDTokenHandler extends AbstractPayloadHandler {
     public void init() throws Throwable {
         claims = getClaims();
         trace(this, "Starting to process basic claims");
-        addDebugClaims();
+        //addDebugClaims();
         claims.put(OA2Claims.ISSUER, issuer);
         claims.put(OA2Claims.SUBJECT, transaction.getUsername());
         claims.put(AUDIENCE, transaction.getClient().getIdentifierString());
