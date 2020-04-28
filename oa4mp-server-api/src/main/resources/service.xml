@@ -3,7 +3,7 @@
 <!--
 You should probably use the online dtd rather than the one supplied here with the following DOCTYPE directive:
 
-<!DOCTYPE config PUBLIC "-//OA4MP//DTD version 1.1-QDL-SNAPSHOT//EN" "http://cilogon.svn.sourceforge.net/viewvc/cilogon/m2-repo/dtd/1.1-QDL-SNAPSHOT/service.dtd">
+<!DOCTYPE config PUBLIC "-//OA4MP//DTD version 1.0.2//EN" "http://cilogon.svn.sourceforge.net/viewvc/cilogon/m2-repo/dtd/1.0.2/service.dtd">
 
 If you cannot access this for whatever reason, then certainly refer to the dtd locally or just omit it all together.
 -->
