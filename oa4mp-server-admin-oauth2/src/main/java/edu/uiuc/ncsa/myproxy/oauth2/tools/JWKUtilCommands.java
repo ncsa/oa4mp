@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oauth2.tools;
 
+import edu.uiuc.ncsa.qdl.util.FileUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.oauth_2_0.JWTUtil;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
@@ -48,22 +49,21 @@ public class JWKUtilCommands extends CommonCommands {
 
     protected void createKeysHelps() {
         say("create_keys [" + CL_INPUT_FILE_FLAG + " set_of_keys " + CL_IS_PUBLIC_FLAG + "] | [" + CL_IS_PRIVATE_FLAG + "] " + CL_OUTPUT_FILE_FLAG + " file");
-        say("  Create a set of RSA JSON Web keys and store them in the given file");
-        say("  There are several modes of operation. If you do not specify an output file, then the keys are written ");
-        say("  to the command line.");
-        say("  Interactive mode:");
-        say("     E.g.");
-        say("     create_keys " + CL_OUTPUT_FILE_FLAG + " keys.jwk");
-        say("         This will create a set of key pairs with random ids and store the result in the file kwys.jwk");
-        say("");
-        say("     create_keys");
-        say("          with no arguments, a full set of keys will be created and printed to the command line.");
-        say("  Batch mode:");
-        say("     ");
-        say("     You can also take a set of keys and extract the set of public keys. Various JWT toolkits require this.");
-        say("     create_keys " + CL_IS_PUBLIC_FLAG + " " + CL_INPUT_FILE_FLAG + " keys.jwk " + CL_OUTPUT_FILE_FLAG + "  pub_keys.jwk");
-        say("          This will take the full set of keys in keys.jwk extract the public keys and place the result in pub_keys.jwk");
-        say("          Note: including the -public flag implies the -in argument is given and an error will result if it is not found");
+        sayi("Create a set of RSA JSON Web keys and store them in the given file");
+        sayi("There are several modes of operation. If you do not specify an output file, then the keys are written ");
+        sayi("to the command line.");
+        sayi("Interactive mode:");
+        sayi("   E.g.");
+        sayi("   create_keys " + CL_OUTPUT_FILE_FLAG + " keys.jwk");
+        sayi("       This will create a set of key pairs with random ids and store the result in the file kwys.jwk");
+        sayi("   create_keys");
+        sayi("        with no arguments, a full set of keys will be created and printed to the command line.");
+        sayi("   ");
+        sayi("Batch mode:");
+        sayi("   You can also take a set of keys and extract the set of public keys. Various JWT toolkits require this.");
+        sayi("   create_keys " + CL_IS_PUBLIC_FLAG + " " + CL_INPUT_FILE_FLAG + " keys.jwk " + CL_OUTPUT_FILE_FLAG + "  pub_keys.jwk");
+        sayi("        This will take the full set of keys in keys.jwk extract the public keys and place the result in pub_keys.jwk");
+        sayi("        Note: including the -public flag implies the -in argument is given and an error will result if it is not found");
         say("See also create_public_keys");
     }
 
@@ -116,12 +116,13 @@ public class JWKUtilCommands extends CommonCommands {
 
     private void addKeysHelps() {
         say("add_keys [" + CL_INPUT_FILE_FLAG + " in_file " + CL_OUTPUT_FILE_FLAG + " out_file]");
-        say("Generates a new set of private keys and adds them to an existing key store.");
-        say("If " + CL_INPUT_FILE_FLAG + " is specified, then that is used as the existing set, otherwise ");
-        say("the current set of keys is used. ");
-        say("If " + CL_OUTPUT_FILE_FLAG + " is specified, the result is written to that file.");
+        sayi("Generates a new set of private keys and adds them to an existing key store.");
+        sayi("If " + CL_INPUT_FILE_FLAG + " is specified, then that is used as the existing set, otherwise ");
+        sayi("the current set of keys is used. ");
+        sayi("If " + CL_OUTPUT_FILE_FLAG + " is specified, the result is written to that file.");
         say("See also, create_keys, set_keys");
     }
+
 
     public void create_keys(InputLine inputLine) throws Exception {
         // Intercept the help request here since the one in the signing utility is a bit different.
@@ -191,12 +192,12 @@ public class JWKUtilCommands extends CommonCommands {
         say("create_symmetric_keys [" + signingCommands.SYMMETRIC_KEY_ARG + " len + | " +
                 signingCommands.SYMMETRIC_KEY_COUNT_ARG + " count | " + signingCommands.SYMMETRIC_KEY_FILE_ARG +
                 " fileName] ");
-        say("This will create a key for use as a symmetric key, i.e., this will produce");
-        say("   a base 64 encoded sequence of random bytes to be used as a symmetric key for");
-        say("   the given length. If no length is included, the default of " +
+        sayi("This will create a key for use as a symmetric key, i.e., this will produce");
+        sayi("a base 64 encoded sequence of random bytes to be used as a symmetric key for");
+        sayi("the given length. If no length is included, the default of " +
                 signingCommands.defaultSymmetricKeyLength + " bytes is used.");
-        say("   If the " + signingCommands.SYMMETRIC_KEY_COUNT_ARG + " is given, this will produce that many keys");
-        say("   If the " + signingCommands.SYMMETRIC_KEY_FILE_ARG + " is given, this will write the keys to the given file, one per line.");
+        sayi("If the " + signingCommands.SYMMETRIC_KEY_COUNT_ARG + " is given, this will produce that many keys");
+        sayi("If the " + signingCommands.SYMMETRIC_KEY_FILE_ARG + " is given, this will write the keys to the given file, one per line.");
 
     }
 
@@ -228,20 +229,20 @@ public class JWKUtilCommands extends CommonCommands {
 
     protected void printWellKnownHelp() {
         say("print_well_known: Prints the well-known URL that has been set.");
-        say("                  Note that you set it in the set_keys call if you supply its URL");
-        say("                  The well-known URL resides on a server and has the public keys listed");
-        say("                  While you can validate a signature against it, you cannot create one since");
-        say("                  the private key is never available through the well-knwon file.");
+        sayi("Note that you set it in the set_keys call if you supply its URL");
+        sayi("The well-known URL resides on a server and has the public keys listed");
+        sayi("While you can validate a signature against it, you cannot create one since");
+        sayi("the private key is never available through the well-knwon file.");
         say("Related: set_keys, validate_token");
     }
 
 
     protected void setKeysHelp() {
         say("set_keys: [" + CL_INPUT_FILE_FLAG + " filename | " + CL_WELL_KNOWN_FLAG + " uri]");
-        say("          Set the keys used for signing and validation in this session.");
-        say("          Either supplied a fully qualified path to the file or a uri. If you pass nothing");
-        say("          you will be prompted for a file. You can invoke this at any to change the keys.");
-        say("  Related: create_keys, set_default_id");
+        sayi("Set the keys used for signing and validation in this session.");
+        sayi("Either supplied a fully qualified path to the file or a uri. If you pass nothing");
+        sayi("you will be prompted for a file. You can invoke this at any to change the keys.");
+        say("See also: create_keys, set_default_id");
     }
 
     /**
@@ -299,13 +300,14 @@ public class JWKUtilCommands extends CommonCommands {
 
 
     protected void listKeysHelp() {
-        say("list_keys [" + showAllKeys + " file]:This will list all the public keys in the key file in pem format.");
-        say("           Each key will be preceeded by its unique ID in the key file.");
-        say("           You may invoke this with no argument, in which case the default key file");
-        say("           as set in the set_keys command will be used, or you can supply a fully qualified");
-        say("           path to a JSON web key file that will be used.");
-        say("           If you supply the " + showAllKeys + " flag then the private key in PKCS 8 format will be shown");
-        say("           too. Note the default is to not show the private key.");
+        say("list_keys [" + showAllKeys + " " + CL_INPUT_FILE_FLAG + " file]:This will list all the public keys " +
+                "in the key file in pem format.");
+        sayi("Each key will be preceeded by its unique ID in the key file.");
+        sayi("You may invoke this with no argument, in which case the default key file");
+        sayi("as set in the set_keys command will be used, or you can supply a fully qualified");
+        sayi("path to a JSON web key file that will be used.");
+        sayi("If you supply the " + showAllKeys + " flag then the private key in PKCS 8 format will be shown");
+        sayi("too. Note the default is to not show the private key.");
         say("  Related: set_keys, create_keys, print_public_keys (prints in JSON format)");
     }
 
@@ -313,8 +315,8 @@ public class JWKUtilCommands extends CommonCommands {
 
     protected void printPublicKeysHelp() {
         say("print_public_keys [file]: This will print the public keys only for a key set.");
-        say("                          Note that if no file is supplied the current key set is used.");
-        say("                          The result is JSON formatted. If you need PEM format use list_keys instead.");
+        sayi("Note that if no file is supplied the current key set is used.");
+        sayi("The result is JSON formatted. If you need PEM format use list_keys instead.");
     }
 
     /**
@@ -340,24 +342,59 @@ public class JWKUtilCommands extends CommonCommands {
         say(zzz.toString(2));
     }
 
+    public String BASE64_FLAG = "-b64";
+
+    protected void createPublicKeysHelp() {
+        say("create_public_keys [" + BASE64_FLAG + "] [" + CL_INPUT_FILE_FLAG + " in_file] [" + CL_OUTPUT_FILE_FLAG + " out_file]");
+        sayi("Take a set of private keys and extract the public keys.");
+        sayi("If there is no input file, the current set of keys is used.");
+        sayi("If the " + CL_OUTPUT_FILE_FLAG + " switch is given, the result will be written to the file.");
+        sayi("If there is no output file specified, then the keys are printed at the console.");
+        sayi("If the " + BASE64_FLAG + " flag is used, then the entire contents is base 64 encoded before");
+        sayi("being displayed or written to the file.");
+        say("See also: create_keys, base64");
+
+
+    }
+
     public void create_public_keys(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
-            printPublicKeysHelp();
+            createPublicKeysHelp();
             return;
         }
+        boolean hasInputFile = inputLine.hasArg(CL_INPUT_FILE_FLAG);
+        boolean hasOutputFile = inputLine.hasArg(CL_OUTPUT_FILE_FLAG);
+        boolean doB64 = inputLine.hasArg(BASE64_FLAG);
+
+
         JSONWebKeys localKeys = null;
-        if (inputLine.hasArgs()) {
-            File publicKeyFile = new File(inputLine.getArg(1));
+        if (hasInputFile) {
+            File publicKeyFile = new File(inputLine.getNextArgFor(CL_INPUT_FILE_FLAG));
             localKeys = readKeys(publicKeyFile);
 
         } else {
+            if (keys == null) {
+                say("Sorry, there is no set of active keys and no input file was specified. Exiting....");
+                return;
+            }
             localKeys = keys;
         }
+
         JSONWebKeys targetKeys = JSONWebKeyUtil.makePublic(localKeys);
         JSONObject zzz = JSONWebKeyUtil.toJSON(targetKeys);
-
-        say(zzz.toString(2));
-
+        String finalOutput = zzz.toString(2);
+        if (doB64) {
+            finalOutput = Base64.encodeBase64String(finalOutput.getBytes());
+        }
+        if (hasOutputFile) {
+            try {
+                FileUtil.writeStringToFile(inputLine.getNextArgFor(CL_OUTPUT_FILE_FLAG), finalOutput);
+            } catch (Throwable iox) {
+                say("uh-oh... Could not write to the output file:" + iox.getMessage());
+            }
+        } else {
+            say(finalOutput);
+        }
     }
 
     /**
@@ -382,18 +419,17 @@ public class JWKUtilCommands extends CommonCommands {
             return;
         }
         boolean showPrivateKeys = inputLine.hasArg(showAllKeys);
-
+            boolean hasInputFile = inputLine.hasArg(CL_INPUT_FILE_FLAG);
         JSONWebKeys localKeys = null;
-        if (showPrivateKeys && 1 == inputLine.size()) {
+        if (showPrivateKeys && !hasInputFile) {
             // try to use the defined keys
             if (keys == null || keys.isEmpty()) {
-                say("Sorry, there are no keys specified. Either use setkeys or specify a key file.");
+                say("Sorry, there are no keys specified. Either use set_keys or specify a key file.");
                 return;
             }
-
             localKeys = keys;
         } else {
-            File publicKeyFile = new File(inputLine.getLastArg());
+            File publicKeyFile = new File(inputLine.getNextArgFor(CL_INPUT_FILE_FLAG));
             localKeys = readKeys(publicKeyFile);
         }
         boolean hasDefault = localKeys.hasDefaultKey();
@@ -401,8 +437,13 @@ public class JWKUtilCommands extends CommonCommands {
         if (hasDefault) {
             defaultKey = localKeys.getDefaultKeyID();
         }
-
+      boolean isFirst = true;
         for (String key : localKeys.keySet()) {
+            if(isFirst){
+                isFirst = false;
+            }else{
+                say(""); // blank line between keys.
+            }
             if (hasDefault) {
                 if (key.equals(defaultKey)) {
                     say("key id=" + key + " (default)");
@@ -423,12 +464,11 @@ public class JWKUtilCommands extends CommonCommands {
 
     protected void printCreateClaimsHelp() {
         say("create_claims: Prompt the user for key/value pairs and build a claims object. ");
-        say("               This will write the object to a file for future use.");
-        say("               Note: You may input JSON objects as values as well. There are various");
-        say("               places (such as creating a token) that requires a set of claims. This command");
-        say("               lets you create one.");
-        say("");
-        say("Related: create_token, parse_claims");
+        sayi("This will write the object to a file for future use.");
+        sayi("Note: You may input JSON objects as values as well. There are various");
+        sayi("places (such as creating a token) that requires a set of claims. This command");
+        sayi("lets you create one.");
+        say("See also: create_token, parse_claims");
     }
 
     /**
@@ -516,9 +556,10 @@ public class JWKUtilCommands extends CommonCommands {
 
     protected void printSetDefaultIDHelp() {
         say("set_default_id [keyid]: This will set the default key id to be used for all signing and verification.");
-        say("                        If this is not set, you will be prompted each time for an id.");
-        say("                        Remember that a set of web keys does not have a default. If you import.");
-        say("                        a set, you should set one as default.");
+        sayi("If this is not set, you will be prompted each time for an id.");
+        sayi("Remember that a set of web keys does not have a default. If you import.");
+        sayi("a set, you should set one as default.");
+        say("See also: print_default_id");
     }
 
     public void set_default_id(InputLine inputLine) throws Exception {
@@ -541,7 +582,7 @@ public class JWKUtilCommands extends CommonCommands {
 
     protected void printPrintDefaultIDHelp() {
         say("print_default_id: This will print the current default key id that is to be used for all signing and verification.");
-        say("Related: set_default_id");
+        say("See also: set_default_id");
     }
 
     public void print_default_id(InputLine inputLine) throws Exception {
@@ -557,13 +598,13 @@ public class JWKUtilCommands extends CommonCommands {
     }
 
     protected void printParseClaimsHelp() {
-        say("parse_claims [filename]");
-        say("           Read a file and print out if it parses as JSON.");
-        say("           If the filename is omitted, you will be prompted for it.");
-        say("           Note that this will try to give some limited feedback in syntax errors.");
-        say("           The intent is that if you have written a file with claims, this lets you");
-        say("           validate the JSON before using it.");
-        say("Related: create_claims");
+        say("parse_claims [" + CL_INPUT_FILE_FLAG + " filename]");
+        sayi("Read a file and print out if it parses as JSON.");
+        sayi("If the filename is omitted, you will be prompted for it.");
+        sayi("Note that this will try to give some limited feedback in syntax errors.");
+        sayi("The intent is that if you have written a file with claims, this lets you");
+        sayi("validate the JSON before using it.");
+        say("See also: create_claims");
     }
 
     /**
@@ -577,9 +618,10 @@ public class JWKUtilCommands extends CommonCommands {
             printParseClaimsHelp();
             return;
         }
+        boolean hasInputFile = inputLine.hasArg(CL_INPUT_FILE_FLAG);
         String filename = null;
-        if (1 < inputLine.size()) {
-            filename = inputLine.getArg(1);
+        if (hasInputFile) {
+            filename = inputLine.getNextArgFor(CL_INPUT_FILE_FLAG);
         } else {
             filename = getInput("Enter full path to the claims file.");
             if (isEmpty(filename)) {
@@ -632,30 +674,30 @@ public class JWKUtilCommands extends CommonCommands {
     protected void createTokenHelp() {
         say("create_token " + CL_INPUT_FILE_FLAG + " claims " +
                 "[" + CL_KEY_FILE_FLAG + " keyfile " + CL_KEY_ID_FLAG + " id " + CL_OUTPUT_FILE_FLAG + " outputFile]");
-        say("   Interactive mode:                                                                     ");
-        say("      This will take the current keys (uses default) and a file containing a JSON");
-        say("      format set of claims. It will then sign the claims with the right headers etc.");
-        say("      and optionally print out the resulting JWT to the console. Any of the arguments omitted ");
-        say("      will cause you to be prompted. NOTE that this only signs the token! If you need to generate");
-        say("      accounting information like the timestamps, please use generate_token instead");
-        say("      If you have already set the key and keyid these will be used.");
-        say("      If the output file is given, the token will be written there instead.");
-        say("");
-        say("   Batch mode:");
-        say("      Creates a token from a set of claims, then signs it using the key with the given id.            ");
-        say("      Writes the output to either the target file or prints it at the command line if no output       ");
-        say("      file is specified.                                                                              ");
-        say("      E.g.                                                                                            ");
-        say("      create_token " + CL_KEY_FILE_FLAG + " keys.jwk " + CL_KEY_ID_FLAG + " ABC123 " + CL_INPUT_FILE_FLAG +
+        sayi("Interactive mode:                                                                     ");
+        sayi("   This will take the current keys (uses default) and a file containing a JSON");
+        sayi("   format set of claims. It will then sign the claims with the right headers etc.");
+        sayi("   and optionally print out the resulting JWT to the console. Any of the arguments omitted ");
+        sayi("   will cause you to be prompted. NOTE that this only signs the token! If you need to generate");
+        sayi("   accounting information like the timestamps, please use generate_token instead");
+        sayi("   If you have already set the key and keyid these will be used.");
+        sayi("   If the output file is given, the token will be written there instead.");
+        sayi("");
+        sayi("Batch mode:");
+        sayi("   Creates a token from a set of claims, then signs it using the key with the given id.            ");
+        sayi("   Writes the output to either the target file or prints it at the command line if no output       ");
+        sayi("   file is specified.                                                                              ");
+        sayi("   E.g.                                                                                            ");
+        sayi("   create_token " + CL_KEY_FILE_FLAG + " keys.jwk " + CL_KEY_ID_FLAG + " ABC123 " + CL_INPUT_FILE_FLAG +
                 " my_claims.txt " + CL_OUTPUT_FILE_FLAG + " my_token.jwt");
-        say("        Will read the keys in the file keys.jwk, select the one with id ABC123 then                   ");
-        say("        read in the my_claims.txt file (assumed to be a set of claims in JSON format)                 ");
-        say("        and create the header and signature. It will then place the result into the file my_token.jwt ");
-        say("                                                                                                      ");
-        say("      create_token " + CL_WELL_KNOWN_FLAG + " https://fnord.baz/.well-known " + CL_KEY_ID_FLAG +
+        sayi("  Will read the keys in the file keys.jwk, select the one with id ABC123 then                   ");
+        sayi("  read in the my_claims.txt file (assumed to be a set of claims in JSON format)                 ");
+        sayi("  and create the header and signature. It will then place the result into the file my_token.jwt ");
+        sayi("                                                                                                ");
+        sayi("create_token " + CL_WELL_KNOWN_FLAG + " https://fnord.baz/.well-known " + CL_KEY_ID_FLAG +
                 " CAFEBEEF " + CL_INPUT_FILE_FLAG + " my_claims.txt           ");
-        say("         This will read the well-known file, parse it for the keys, load the keys, find the key       ");
-        say("         with id CAFEBEEF read in the claims file then print the resulting token to the command line. ");
+        sayi("This will read the well-known file, parse it for the keys, load the keys, find the key       ");
+        sayi("with id CAFEBEEF read in the claims file then print the resulting token to the command line. ");
         say("Related: generate_token, set_keys, set_default_id, print_token, verify_token");
     }
 
@@ -754,23 +796,23 @@ public class JWKUtilCommands extends CommonCommands {
         say("generate_token " +
                 CL_INPUT_FILE_FLAG + "  claims " +
                 CL_KEY_FILE_FLAG + " keyFile " +
-                LIFETIME_FLAG + "  lifetime " +
-                JTI_FLAG + " " +
-                PRINT_CLAIMS_FLAG + " " +
                 CL_KEY_ID_FLAG + " keyId " +
-                CL_OUTPUT_FILE_FLAG + " outFile");
-        say("    Generate a token from the claims. This includes adding in the current time and using the lifetime (if given)");
-        say("    to create the token. A JTI will also be created. ");
-        say("    The meaning of the various optional flags is as follows");
-        say("    " + LIFETIME_FLAG + " (optional) Specifies the lifetime in seconds for this token. The default is " + DEFAULT_LIFETIME + " seconds.");
-        say("    " + JTI_FLAG + " (optional) If specified, generate a unique identifier for this id token. You may also just");
-        say("         put one in the claims file if you need it immutable.");
-        say("    " + PRINT_CLAIMS_FLAG + " (optional) If specified, this will print out the generated claims (not token!) to the command line.");
-        say("        Note: not specifying an output file will print the resulting token.");
-        say("    " + CL_INPUT_FILE_FLAG + " (required) The text file of a JSON object that has the claims.");
-        say("    " + CL_KEY_FILE_FLAG + " (required) + The JWK format file containing the keys. This must contain a private key.");
-        say("    " + CL_KEY_ID_FLAG + " (required) The id in the key file of the key to use.");
-        say("    " + CL_OUTPUT_FILE_FLAG + " (optional) The file to which the resulting token is written. Omitting this dumps it to the command line.");
+                "[" + JTI_FLAG + " | " +
+                PRINT_CLAIMS_FLAG + " | " +
+                LIFETIME_FLAG + "  lifetime | " +
+                CL_OUTPUT_FILE_FLAG + " outFile]");
+        sayi("Generate a token from the claims. This includes adding in the current time and using the lifetime (if given)");
+        sayi("to create the token. A JTI will also be created. ");
+        sayi("The meaning of the various optional flags is as follows");
+        sayi(CL_INPUT_FILE_FLAG + " (required) The text file of a JSON object that has the claims.");
+        sayi(CL_KEY_FILE_FLAG + " (required) + The JWK format file containing the keys. This must contain a private key.");
+        sayi(CL_KEY_ID_FLAG + " (required) The id in the key file of the key to use.");
+        sayi(JTI_FLAG + " (optional) If specified, generate a unique identifier for this id token. You may also just");
+        sayi("    put one in the claims file if you need it immutable.");
+        sayi(PRINT_CLAIMS_FLAG + " (optional) If specified, this will print out the generated claims (not token!) to the command line.");
+        sayi(LIFETIME_FLAG + " (optional) Specifies the lifetime in seconds for this token. The default is " + DEFAULT_LIFETIME + " seconds.");
+        sayi("    Note: not specifying an output file will print the resulting token.");
+        sayi(CL_OUTPUT_FILE_FLAG + " (optional) The file to which the resulting token is written. Omitting this dumps it to the command line.");
     }
 
 
@@ -784,7 +826,7 @@ public class JWKUtilCommands extends CommonCommands {
     a big integer, we could encode it with a radix of 16 (turning it into a hex number) or in this case, use a radix of
     36 which uses all 26 letters of the alphabet and digits. This makes it much more compact.
     If you really need to, you reconstruct this with the (String,int) constructor for BigInteger.
-    (Being a Math guy this seemed natural, but I decided to stick a note here to explain it.)
+    (Being a Math guy this just seemed natural, but I decided to stick a note here to explain it.)
      */
     protected int JTI_RADIX = 36;
 
@@ -842,11 +884,11 @@ public class JWKUtilCommands extends CommonCommands {
 
     protected void printTokenHelp() {
         say("print_token: [" + CL_INPUT_FILE_FLAG + " file | token] Print the given token's header and payload, doing no verification.");
-        say("    Interactive mode:");
-        say("        If you omit the argument, it will print the last token generated by the create_token call.");
-        say("        If there is no last token, that will be shown too. ");
-        say("    Batch mode:");
-        say("        Print the token specified by the file or given at the command line.");
+        sayi("Interactive mode:");
+        sayi("    If you omit the argument, it will print the last token generated by the create_token call.");
+        sayi("    If there is no last token, that will be shown too. ");
+        sayi("Batch mode:");
+        sayi("    Print the token specified by the file or given at the command line.");
         say("Related: create_token");
     }
 
@@ -879,10 +921,10 @@ public class JWKUtilCommands extends CommonCommands {
 
     protected void printListKeyIDs() {
         say("list_key_ids [filename]");
-        say("                List the unique key ids in the file");
-        say("                If you do not supply an argument, the globally set keys will be used");
-        say("                If there is no default set of keys, you will be prompted for a file");
-        say("      related: set_keys, set_default_id");
+        sayi("List the unique key ids in the file");
+        sayi("If you do not supply an argument, the globally set keys will be used");
+        sayi("If there is no default set of keys, you will be prompted for a file");
+        say("See also: set_keys, set_default_id");
     }
 
     public void list_key_ids(InputLine inputLine) throws Exception {
@@ -921,29 +963,29 @@ public class JWKUtilCommands extends CommonCommands {
 
     protected void printValidateTokenHelp() {
         say("validate_token [" + CL_WELL_KNOWN_FLAG + " url | " + CL_KEY_FILE_FLAG + " file " + CL_INPUT_FILE_FLAG + " filename  | token]");
-        say("    Interactive mode:                                                                                                            ");
-        say("         This will take a token and check the signature. It will also print out the payload");
-        say("         and header information.");
-        say("         The validation is against the current set of keys or against a URL specified with the");
-        say("         -wellKnown flag. You can also point to a key file (file with JSON web keys in it) with");
-        say("         the -keyFile flag.");
-        say("         You may supply either the token itself or specify with the -file flag that this is in a file.");
-        say("     Batch mode:");
-        say("          This will verify a given jwt given either a set of keys or a well-known url (from which the key will            ");
-        say("          be extracted. You may either specify the token in a file or as the final argument.                              ");
-        say("          This will result in a return code of 1 if the token is valid or 0 if not.                                       ");
-        say("          E.g.s                                                                                                          ");
-        say("          validate_token " + CL_WELL_KNOWN_FLAG + " https://foo.bar/.well-known " + CL_INPUT_FILE_FLAG + " my_token.jwt                                         ");
-        say("             This will read the keys in the well-known file and read the token in the file                                ");
-        say("                                                                                                                       ");
-        say("          validate_token " + CL_WELL_KNOWN_FLAG + "https://foo.bar/.well-known -v " + CL_INPUT_FILE_FLAG + " my_token.jwt                                      ");
-        say("             Identical behavior to the first example but note the -v flag: This causes any information about              ");
-        say("             the token to be printed. Normally this is not used except for trying to debug issues.                        ");
-        say("                                              ");
-        say("          validate_token " + CL_KEY_FILE_FLAG + "  keys.jwk eyJ...........                                                                    ");
-        say("             This will read in the keys from the give file and the assumption is that the last argument is the token itself");
-        say("             Note that in this example the token is truncated so it fits here.                                     ");
-        say("Related: create_token");
+        sayi("Interactive mode:                                                                                                            ");
+        sayi("    This will take a token and check the signature. It will also print out the payload");
+        sayi("    and header information.");
+        sayi("    The validation is against the current set of keys or against a URL specified with the");
+        sayi("    -wellKnown flag. You can also point to a key file (file with JSON web keys in it) with");
+        sayi("    the -keyFile flag.");
+        sayi("    You may supply either the token itself or specify with the -file flag that this is in a file.");
+        sayi(" Batch mode:");
+        sayi("    This will verify a given jwt given either a set of keys or a well-known url (from which the key will            ");
+        sayi("    be extracted. You may either specify the token in a file or as the final argument.                              ");
+        sayi("    This will result in a return code of 1 if the token is valid or 0 if not.                                       ");
+        sayi("    E.g.s                                                                                                          ");
+        sayi("    validate_token " + CL_WELL_KNOWN_FLAG + " https://foo.bar/.well-known " + CL_INPUT_FILE_FLAG + " my_token.jwt                                         ");
+        sayi("       This will read the keys in the well-known file and read the token in the file                                ");
+        sayi("                                                                                                                 ");
+        sayi("    validate_token " + CL_WELL_KNOWN_FLAG + "https://foo.bar/.well-known -v " + CL_INPUT_FILE_FLAG + " my_token.jwt                                      ");
+        sayi("       Identical behavior to the first example but note the -v flag: This causes any information about              ");
+        sayi("       the token to be printed. Normally this is not used except for trying to debug issues.                        ");
+        sayi("                                        ");
+        sayi("    validate_token " + CL_KEY_FILE_FLAG + "  keys.jwk eyJ...........                                                                    ");
+        sayi("       This will read in the keys from the give file and the assumption is that the last argument is the token itself");
+        sayi("       Note that in this example the token is truncated so it fits here.                                     ");
+        say("See also: create_token");
     }
 
     public void validate_token(InputLine inputLine) throws Exception {
@@ -1034,13 +1076,13 @@ public class JWKUtilCommands extends CommonCommands {
 
     protected void base64Help() {
         say("base64 " + base64Encode + " | " + base64Dencode + " " + base64Bytes + " " + CL_INPUT_FILE_FLAG + " in_file " + CL_OUTPUT_FILE_FLAG + " out_file | arg");
-        say("  This will encode or decode a base 64 arg. ");
-        say("  You may specify which input or output. If none is given, then the assumption is that the input is the arg");
-        say("  and the output is to the terminal.");
-        say("   " + base64Dencode + ": the input is base64 encoded, output is plain text");
-        say("   " + base64Encode + ": the input is plain text, output is base 64 encoded.");
-        say("   " + base64Bytes + " treat the output as bytes. Generally this implies you have specified an output file.");
-        say("   Note: i the output is binary, you should specify a file as the target since otherwise you get gibbersih.");
+        sayi("This will encode or decode a base 64 arg. ");
+        sayi("You may specify which input or output. If none is given, then the assumption is that the input is the arg");
+        sayi("and the output is to the terminal.");
+        sayi(base64Dencode + ": the input is base64 encoded, output is plain text");
+        sayi(base64Encode + ": the input is plain text, output is base 64 encoded.");
+        sayi(base64Bytes + " treat the output as bytes. Generally this implies you have specified an output file.");
+        sayi("Note: i the output is binary, you should specify a file as the target since otherwise you get gibbersih.");
     }
 
     public void base64(InputLine inputLine) throws Exception {
@@ -1089,7 +1131,5 @@ public class JWKUtilCommands extends CommonCommands {
                 return;
             }
         }
-
-
     }
 }
