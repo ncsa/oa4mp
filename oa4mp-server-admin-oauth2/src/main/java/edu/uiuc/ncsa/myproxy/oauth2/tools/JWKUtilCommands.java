@@ -67,6 +67,61 @@ public class JWKUtilCommands extends CommonCommands {
         say("See also create_public_keys");
     }
 
+    /**
+     * Generate and add keys to an existing key set. If the key set is empty or missing, it will be created.
+     * Note that this generates full sets of keys. If a file is specified, then that will be updated rather than
+     * the currently active set of keys.
+     *
+     * @param inputLine
+     * @throws Exception
+     */
+    public void add_keys(InputLine inputLine) throws Exception {
+        if (showHelp(inputLine)) {
+            addKeysHelps();
+            return;
+        }
+        boolean hasInputFile = inputLine.hasArg(CL_INPUT_FILE_FLAG);
+        boolean hasOutputFile = inputLine.hasArg(CL_OUTPUT_FILE_FLAG);
+        boolean isPublic = inputLine.hasArg(CL_IS_PUBLIC_FLAG);
+        // if this is set, they got confused and should be prompted.
+        if (isPublic) {
+            say("warning: This will create a new set of public and private keys. ");
+            if (!"y".equalsIgnoreCase(getInput("Do you want to continue?[y/n]"))) {
+                say("aborted...");
+                return;
+            }
+        }
+        JSONWebKeys sourceKeys = this.keys;
+        if (hasInputFile) {
+            String contents = readFile(inputLine.getNextArgFor(CL_INPUT_FILE_FLAG));
+            sourceKeys = JSONWebKeyUtil.fromJSON(contents);
+        }
+
+        SigningCommands sg = new SigningCommands(null);
+        JSONWebKeys keys = sg.createJsonWebKeys();
+        JSONObject jwks = JSONWebKeyUtil.toJSON(keys);
+        // While really unlikely that there would be a key collision, having one could be catastrophic
+        // for users. Therefore, only add keys if there are no clashes.
+        for (String x : keys.keySet()) {
+            if (!sourceKeys.containsKey(x)) {
+                sourceKeys.put(keys.get(x));
+            }
+        }
+        if (hasOutputFile) {
+            writeFile(inputLine.getNextArgFor(CL_OUTPUT_FILE_FLAG), JSONWebKeyUtil.toJSON(sourceKeys).toString(2));
+        }
+        say("done!");
+
+    }
+
+    private void addKeysHelps() {
+        say("add_keys [" + CL_INPUT_FILE_FLAG + " in_file " + CL_OUTPUT_FILE_FLAG + " out_file]");
+        say("Generates a new set of private keys and adds them to an existing key store.");
+        say("If " + CL_INPUT_FILE_FLAG + " is specified, then that is used as the existing set, otherwise ");
+        say("the current set of keys is used. ");
+        say("If " + CL_OUTPUT_FILE_FLAG + " is specified, the result is written to that file.");
+        say("See also, create_keys, set_keys");
+    }
 
     public void create_keys(InputLine inputLine) throws Exception {
         // Intercept the help request here since the one in the signing utility is a bit different.

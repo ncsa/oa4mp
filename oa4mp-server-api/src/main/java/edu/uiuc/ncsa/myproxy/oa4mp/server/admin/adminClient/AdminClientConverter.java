@@ -53,9 +53,9 @@ public class AdminClientConverter<V extends AdminClient> extends BaseClientConve
         if (map.containsKey(getACK().config())) {
             String rawCfg = map.getString(getACK().config());
             if (rawCfg != null && !rawCfg.isEmpty()) {
-                v.setConfig(JSONObject.fromObject(map.getString(getACK().config())));
+                value.setConfig(JSONObject.fromObject(map.getString(getACK().config())));
             } else {
-                v.setConfig(new JSONObject());
+                value.setConfig(new JSONObject());
             }
         }
         return value;

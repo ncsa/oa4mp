@@ -139,12 +139,13 @@ public class OA2ClientCommands extends ClientStoreCommands {
             while (st.hasMoreTokens()) {
                 String nextToken = st.nextToken();
                 try {
+                    // This exists to verify that the entered value is a URI, naught else.
                     URI tempURI = URI.create(nextToken);
-                    if (!tempURI.getScheme().equals("https")) {
+                  /*  if (!tempURI.getScheme().equals("https")) {
                         say("Sorry but the protocol for \"" + nextToken + "\" is not supported. It must be https. Rejected.");
-                    } else {
+                    } else {*/
                         cbs.add(nextToken);
-                    }
+                    //}
                 } catch (Throwable t) {
                     say("Sorry but \"" + nextToken + "\" is not a valid URL. Skipped.");
                 }

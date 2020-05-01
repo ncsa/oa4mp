@@ -239,9 +239,10 @@ public abstract class StoreCommands2 extends StoreCommands {
 
     @Override
     protected void showLSHelp() {
-        say("ls [-l | -la] | [" + KEY_FLAG + " key | " + KEYS_FLAG + " array] id");
+        say("ls [-l | -la | -al | -a] | [" + KEY_FLAG + " key | " + KEYS_FLAG + " array] id");
         sayi("Lists information about the contents of the store, an entry and individual values of the entry.");
         sayi("When listing multiple entries, tools will use the most numbers from the most recent call to this.");
+        sayi("NOTE: any time you have and \"a\" in the flags, it will print ALL the store entries.");
         say("E.g.");
         sayi("ls -la");
         sayi("Prints out the long form of *every* object in this store. This may be simply huge");
@@ -250,16 +251,16 @@ public abstract class StoreCommands2 extends StoreCommands {
         sayi("Prints out the short form of *every* object in this store. This may also be huge.");
         sayi("If you are using this to find things, you probably want to look at the search command");
         say("E.g.");
-        sayi("ls -la /foo:bar");
+        sayi("ls -l /foo:bar");
         sayi("Prints a long format for the entry with id foo:bar");
         say("E.g.");
         sayi("ls -key id /foo:bar");
         sayi(">   foo:bar");
-        sayi("Prints out the identifier for the object with identifier foo:bar");
+        sayi("Prints out the id property for the object with identifier foo:bar");
         sayi("");
         sayi("You may also supply a list of keys in an array of the form [key0,key1,...].");
         say("E.g.");
-        sayi("ls -json [id,callback_uris,create_ts] /foo:bar");
+        sayi("ls -keys [id,callback_uris,create_ts] /foo:bar");
         sayi("would print the id, callback_uri and create_ts properties for the object with id");
         sayi("foo:bar. ");
         sayi("\nSee also list_keys, search");

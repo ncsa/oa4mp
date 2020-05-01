@@ -1,6 +1,8 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.server;
 
 import edu.uiuc.ncsa.myproxy.MyProxyServiceFacade;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AuthorizationServletConfig;
 import edu.uiuc.ncsa.security.core.Logable;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
@@ -104,11 +106,17 @@ public interface ServiceEnvironment extends Logable {
     PAIssuer getPaIssuer();
 
     /**
-     * Returns the current client store.
+     * Returns the current {@link ClientStore}.
      *
      * @return
      */
     ClientStore<Client> getClientStore();
+
+    /**
+     * Returns the {@link AdminClientStore}.
+     * @return
+     */
+    AdminClientStore<AdminClient> getAdminClientStore();
 
     /**
      * returns the client approval store.

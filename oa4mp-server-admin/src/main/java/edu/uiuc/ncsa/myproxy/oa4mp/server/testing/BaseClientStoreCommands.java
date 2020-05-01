@@ -154,7 +154,7 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
         } else {
             secret = inputLine.getLastArg();
         }
-        say("creating hash of " + secret);
+        say("creating hash of \"" + secret + "\"");
         say(DigestUtils.sha1Hex(secret));
     }
 

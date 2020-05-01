@@ -31,7 +31,7 @@ import java.util.Arrays;
 public class RequestFactory implements SAT {
     public static AbstractDDRequest convertToRequest(JSONObject json) {
         AbstractDDRequest req = null;
-        BaseClient client = SATFactory.getSubject(json);
+      //  BaseClient client = SATFactory.getSubject(json);
         Action action = SATFactory.getMethod(json);
         if (action instanceof MissingAction) {
             throw new GeneralException("Error: no valid method found");

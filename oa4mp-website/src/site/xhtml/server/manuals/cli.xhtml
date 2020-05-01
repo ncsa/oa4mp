@@ -471,6 +471,20 @@ The second is used to create a hash for a secret that you supply. This is
 needed for OAuth2/OIDC clients since we store a hash and not the secret. You may either specify a file containing
 the secret or type in manually at the command line.
 
+<h3>An example for setting the password</h3>
+<p>This sets the password for the client with id <code>foo:/bar</code>. Thanks to historical reasons,
+    the secret has the key <code>public_key</code>. Its current secret is
+    <code>7fd560c4169d4ed6cf08acc87d54aed28b6b92ac</code></p>
+<pre>
+clients>create_hash "my secret password"
+ creating hash of my secret password
+  ca90213b8b911f48a180abf8002934658bf63828
+clients>update -key public_key /foo:/bar
+Enter new value for public_key [7fd560c4169d4ed6cf08acc87d54aed28b6b92ac]:ca90213b8b911f48a180abf8002934658bf63828
+clients>
+</pre>
+<p>If you list the client, you will see the updated secret.</p>
+
 <h2><a name="approvals">Approvals</a></h2>
 Invoke as
 <pre>oa2> use approvals</pre>

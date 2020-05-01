@@ -9,6 +9,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.util.AbstractCLIApprover;
 import edu.uiuc.ncsa.security.core.configuration.Configurations;
 import edu.uiuc.ncsa.security.core.configuration.provider.CfgEvent;
 import edu.uiuc.ncsa.security.core.configuration.provider.HierarchicalConfigProvider;
+import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.server.issuers.AGIssuer;
@@ -43,7 +44,7 @@ import static edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractAuthorizationSe
  * <p>Created by Jeff Gaynor<br>
  * on 1/9/12 at  4:08 PM
  */
-public class ServiceEnvironmentImpl extends MyProxyServiceEnvironment implements ServiceEnvironment {
+public  class ServiceEnvironmentImpl extends MyProxyServiceEnvironment implements ServiceEnvironment {
 
     public KeyPairQueue getKeyPairQueue() {
         return kpq;
@@ -286,4 +287,8 @@ public class ServiceEnvironmentImpl extends MyProxyServiceEnvironment implements
         this.usernameTransformer = usernameTransformer;
     }
 
+    @Override
+    public AdminClientStore<AdminClient> getAdminClientStore() {
+        throw new NotImplementedException("No admin client store in legacy code");
+    }
 }

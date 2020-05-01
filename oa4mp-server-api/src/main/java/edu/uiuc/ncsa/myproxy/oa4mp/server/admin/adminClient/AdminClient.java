@@ -136,4 +136,14 @@ public class AdminClient extends BaseClient {
         c.setSecret(getSecret());
         c.setMaxClients(getMaxClients());
     }
+
+    @Override
+    public String toString() {
+        return "AdminClient{" +
+                "virtualOrganization='" + virtualOrganization + '\'' +
+                ", issuer='" + issuer + '\'' +
+                ", maxClients=" + maxClients +
+                ", config=" + config +
+                '}';
+    }
 }

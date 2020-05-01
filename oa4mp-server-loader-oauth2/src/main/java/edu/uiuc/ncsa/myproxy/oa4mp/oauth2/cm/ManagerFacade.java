@@ -78,6 +78,9 @@ public class ManagerFacade {
 
     protected Response process(AdminClient adminClient, JSONObject rawJSON) {
         checkAdminClientSecret(adminClient);
+        // up to this point, the admin client is just an id + the secret that was passed in
+        // it is empty. Now we replace it with the real one:
+        adminClient = getSE().getAdminClientStore().get(adminClient.getIdentifier());
         switch (getTargetValue(rawJSON)) {
             case TARGET_ADMIN_VALUE:
                 return process(adminClient, (AdminClient) getTarget(rawJSON), rawJSON);
@@ -143,6 +146,12 @@ public class ManagerFacade {
     }
 
     protected Response process(OA2Client oa2Client, JSONObject rawJSON) {
+   /*     if(getMethodValue(rawJSON) == ACTION_CREATE_VALUE && getTargetValue(rawJSON) == TARGET_NO_VALUE){
+            // We will allow an anonymous client create request -- this is identical to using the web form
+            // All other client operations are forbidden.
+            return process((AdminClient) null, oa2Client, new ActionCreate(), rawJSON);
+        }*/
+        
         throw new edu.uiuc.ncsa.security.core.exceptions.IllegalAccessException("Error: access for standard clients is not allowed");
         // Fix for CIL-460.
         // note that what follows works perfectly well, but allows standard clients full access to the management API
@@ -154,12 +163,12 @@ public class ManagerFacade {
         /*        KEEP THIS            *
         /*                             *
         /*******************************/
-/*
-        checkOA2ClientSecret(oa2Client.getSecret(),
+
+     /*   checkOA2ClientSecret(oa2Client.getSecret(),
                 (OA2Client) getSE().getClientStore().get(oa2Client.getIdentifier()),
                 getSE().getClientStore());
 
-        switch (getTargetValue(rawJSON)) {
+      /*  switch (getTargetValue(rawJSON)) {
             case TARGET_ADMIN_VALUE:
                 return process(oa2Client, (AdminClient) getTarget(rawJSON), rawJSON);
 
@@ -349,9 +358,9 @@ public class ManagerFacade {
     public Response process(JSONObject rawJSON) {
         switch (getSubjectValue(rawJSON)) {
             case SUBJECT_ADMIN_VALUE:
-                return process((AdminClient) getSubject(rawJSON), rawJSON);
+                return process((AdminClient) getSubject(rawJSON, getSE()), rawJSON);
             case SUBJECT_CLIENT_VALUE:
-                return process((OA2Client) getSubject(rawJSON), rawJSON);
+                return process((OA2Client) getSubject(rawJSON, getSE()), rawJSON);
             case SUBJECT_UNKNOWN_VALUE:
                 return process((OA2Client) null, rawJSON);
         }
