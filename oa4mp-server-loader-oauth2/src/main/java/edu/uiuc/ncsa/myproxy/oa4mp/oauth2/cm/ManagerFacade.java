@@ -358,9 +358,9 @@ public class ManagerFacade {
     public Response process(JSONObject rawJSON) {
         switch (getSubjectValue(rawJSON)) {
             case SUBJECT_ADMIN_VALUE:
-                return process((AdminClient) getSubject(rawJSON, getSE()), rawJSON);
+                return process((AdminClient) getSubject(rawJSON), rawJSON);
             case SUBJECT_CLIENT_VALUE:
-                return process((OA2Client) getSubject(rawJSON, getSE()), rawJSON);
+                return process((OA2Client) getSubject(rawJSON), rawJSON);
             case SUBJECT_UNKNOWN_VALUE:
                 return process((OA2Client) null, rawJSON);
         }

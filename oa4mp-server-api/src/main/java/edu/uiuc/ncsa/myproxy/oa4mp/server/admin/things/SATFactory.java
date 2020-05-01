@@ -1,6 +1,5 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironment;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientConverter;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions.*;
@@ -59,7 +58,7 @@ public class SATFactory implements SAT {
      */
     public static final String CLIENT_SECRET_KEY = "secret";
 
-    public static BaseClient getSubject(JSONObject json, ServiceEnvironment serviceEnvironment) {
+    public static BaseClient getSubject(JSONObject json) {
         JSONObject api = json.getJSONObject(KEYS_API);
         JSONObject subject = api.getJSONObject(KEYS_SUBJECT);
         if (subject.containsKey(SUBJECT_ADMIN)) {

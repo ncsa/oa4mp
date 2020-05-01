@@ -37,12 +37,13 @@ public class ClientServerTest extends DDServerTests {
         testCreate(tp2);
         testCreatePublicClient(tp2);
         testRemove(tp2);
+        CIL698(tp2);
     }
 
     public void testApprove(TestStoreProviderInterface tp2) throws Exception {
         CC cc = setupClients(tp2);
         ApproveRequest req = RequestFactory.createRequest(cc.adminClient, new TypeClient(), new ActionApprove(), cc.client, null);
-        ClientServer server = new ClientServer((OA2SE)tp2.getSE());
+        ClientServer server = new ClientServer((OA2SE) tp2.getSE());
         ClientResponse resp = (ClientResponse) server.process(req);
         ClientApproval approval = tp2.getClientApprovalStore().get(cc.client.getIdentifier());
         assert approval != null : "No approval found";
@@ -55,7 +56,7 @@ public class ClientServerTest extends DDServerTests {
         CC cc = setupClients(tp2);
         // approve it first.
         ApproveRequest req0 = RequestFactory.createRequest(cc.adminClient, new TypeClient(), new ActionApprove(), cc.client, null);
-        ClientServer server = new ClientServer((OA2SE)tp2.getSE());
+        ClientServer server = new ClientServer((OA2SE) tp2.getSE());
         ClientResponse resp0 = (ClientResponse) server.process(req0);
 
 
@@ -64,7 +65,7 @@ public class ClientServerTest extends DDServerTests {
         ClientApproval approval = tp2.getClientApprovalStore().get(cc.client.getIdentifier());
         assert approval != null : "No approval found";
         assert !approval.isApproved();
-        cleanupCC(cc,tp2);
+        cleanupCC(cc, tp2);
     }
 
     /**
@@ -92,7 +93,40 @@ public class ClientServerTest extends DDServerTests {
     }
 
     /**
+     * Bug introduced in 4.1.1: Trying to limit making too many clients resulted in a limit
+     * of a single client being creatable. This will create several as a check.
+     *
+     * @param tp2
+     * @throws Exception
+     */
+    public void CIL698(TestStoreProviderInterface tp2) throws Exception {
+        int numberOfClients = 5;
+        CC cc = setupClients(tp2);
+        OA2ClientConverter converter = getClientConverter(tp2);
+        ColumnMap values = new ColumnMap();
+        converter.toMap(cc.client, values);
+        tp2.getClientStore().remove(cc.client.getIdentifier());
+        assert !tp2.getClientStore().containsKey(cc.client.getIdentifier());
+
+        // remove the identifier and create it
+        OA2ClientKeys clientKeys = getClientKeys(tp2);
+        values.remove(clientKeys.identifier());
+        values.remove(clientKeys.creationTS());
+        values.remove(clientKeys.lastModifiedTS());
+        JSONObject json = new JSONObject();
+        json.putAll(values);
+        for(int i =0; i< numberOfClients; i++) {
+            CreateRequest req = RequestFactory.createRequest(cc.adminClient, new TypeClient(), new ActionCreate(), null, json);
+            ClientServer server = new ClientServer((OA2SE) tp2.getSE());
+            CreateResponse resp = (CreateResponse) server.process(req);
+            OA2Client newClient = resp.getClient();
+            assert tp2.getClientStore().containsKey(newClient.getIdentifier());
+        }
+    }
+
+    /**
      * This also tests that the new cfg attribute of the client is set.
+     *
      * @param tp2
      * @throws Exception
      */
@@ -114,7 +148,7 @@ public class ClientServerTest extends DDServerTests {
         json.putAll(values);
 
         CreateRequest req = RequestFactory.createRequest(cc.adminClient, new TypeClient(), new ActionCreate(), null, json);
-        ClientServer server = new ClientServer((OA2SE)tp2.getSE());
+        ClientServer server = new ClientServer((OA2SE) tp2.getSE());
         CreateResponse resp = (CreateResponse) server.process(req);
         OA2Client newClient = resp.getClient();
         assert tp2.getClientStore().containsKey(newClient.getIdentifier());
@@ -127,7 +161,7 @@ public class ClientServerTest extends DDServerTests {
         JSONObject cfg2 = newClient.getConfig();
         assert cfg1.getString("version").equals(cfg2.getString("version")) : "Configurations do not match in OA2 clients";
         assert oldClient.equals(newClient);
-        cleanupCC(cc,tp2);
+        cleanupCC(cc, tp2);
 
     }
 
@@ -152,7 +186,7 @@ public class ClientServerTest extends DDServerTests {
         json.putAll(values);
 
         CreateRequest req = RequestFactory.createRequest(cc.adminClient, new TypeClient(), new ActionCreate(), null, json);
-        ClientServer server = new ClientServer((OA2SE)tp2.getSE());
+        ClientServer server = new ClientServer((OA2SE) tp2.getSE());
         CreateResponse resp = (CreateResponse) server.process(req);
         OA2Client newClient = resp.getClient();
         assert tp2.getClientStore().containsKey(newClient.getIdentifier());
@@ -161,7 +195,7 @@ public class ClientServerTest extends DDServerTests {
         oldClient.setIdentifier(newClient.getIdentifier());
         oldClient.setSecret(newClient.getSecret());
         assert oldClient.equals(newClient);
-        cleanupCC(cc,tp2);
+        cleanupCC(cc, tp2);
 
     }
 
@@ -169,7 +203,7 @@ public class ClientServerTest extends DDServerTests {
     public void testRemove(TestStoreProviderInterface tp2) throws Exception {
         CC cc = setupClients(tp2);
         // so approve this
-        ClientServer server = new ClientServer((OA2SE)tp2.getSE());
+        ClientServer server = new ClientServer((OA2SE) tp2.getSE());
         ApproveRequest approveRequest = RequestFactory.createRequest(cc.adminClient, new TypeClient(), new ActionApprove(), cc.client, null);
         server.process(approveRequest);
         assert tp2.getClientApprovalStore().containsKey(cc.client.getIdentifier());
@@ -177,7 +211,7 @@ public class ClientServerTest extends DDServerTests {
         assert !tp2.getPermissionStore().get(cc.adminClient.getIdentifier(), cc.client.getIdentifier()).isEmpty();
 
         AdminClient ac2 = getAdminClient(tp2.getAdminClientStore());
-        PermissionServer permissionServer = new PermissionServer((OA2SE)tp2.getSE());
+        PermissionServer permissionServer = new PermissionServer((OA2SE) tp2.getSE());
         AddClientRequest addClientRequest = RequestFactory.createRequest(ac2, new TypePermission(), new ActionAdd(), cc.client, null);
         permissionServer.process(addClientRequest);
         assert !tp2.getPermissionStore().get(ac2.getIdentifier(), cc.client.getIdentifier()).isEmpty();
@@ -192,7 +226,7 @@ public class ClientServerTest extends DDServerTests {
         assert tp2.getPermissionStore().get(cc.adminClient.getIdentifier(), cc.client.getIdentifier()).isEmpty();
         assert tp2.getPermissionStore().get(ac2.getIdentifier(), cc.client.getIdentifier()).isEmpty();
 
-        cleanupCC(cc,tp2);
+        cleanupCC(cc, tp2);
 
     }
 }
