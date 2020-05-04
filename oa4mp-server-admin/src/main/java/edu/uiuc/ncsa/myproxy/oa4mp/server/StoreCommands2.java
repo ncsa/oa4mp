@@ -17,8 +17,7 @@ import net.sf.json.JSONSerializer;
 import java.io.*;
 import java.util.*;
 
-import static edu.uiuc.ncsa.security.core.util.StringUtils.RJustify;
-import static edu.uiuc.ncsa.security.core.util.StringUtils.truncate;
+import static edu.uiuc.ncsa.security.core.util.StringUtils.*;
 import static edu.uiuc.ncsa.security.util.cli.CLIDriver.CLEAR_BUFFER_COMMAND;
 import static edu.uiuc.ncsa.security.util.cli.CLIDriver.EXIT_COMMAND;
 
@@ -86,8 +85,13 @@ public abstract class StoreCommands2 extends StoreCommands {
 
     }
 
-
+    @Override
     protected int longFormat(Identifiable identifiable) {
+        return longFormat(identifiable, false);
+
+    }
+
+    protected int longFormat(Identifiable identifiable, boolean isVerbose) {
         XMLMap map = new XMLMap();
         getStore().getXMLConverter().toMap(identifiable, map);
 
@@ -102,11 +106,13 @@ public abstract class StoreCommands2 extends StoreCommands {
             String v = map.getString(key);
             // Suppress null entries. Record empty ones.
             if (!StringUtils.isTrivial(v)) {
-                say(formatLongLine(key, v, width));
+                say(formatLongLine(key, v, width, isVerbose));
             }
         }
         return width;
     }
+
+    int display_width = 120;
 
     /**
      * Gets a consistent look and feel. If you have to override {@link #longFormat(Identifiable)}
@@ -114,11 +120,33 @@ public abstract class StoreCommands2 extends StoreCommands {
      *
      * @param leftSide
      * @param rightSide
-     * @param width
+     * @param leftColumWidth
      * @return
      */
-    protected String formatLongLine(String leftSide, String rightSide, int width) {
-        return RJustify(leftSide, width) + " : " + truncate(rightSide);
+    protected String formatLongLine(String leftSide, String rightSide, int leftColumWidth, boolean isVerbose) {
+        int dd = defaultIndent.length() + 3; // the default indent plus the " : " in the middle
+        int realWidth = display_width - dd;
+        if(rightSide.length() + leftColumWidth + 1 <= realWidth){
+            return RJustify(leftSide, leftColumWidth) + " : " + rightSide;
+        }
+        if(isVerbose){
+
+            List<String> flowedtext = StringUtils.wrap(0,StringUtils.toList(rightSide), realWidth - leftColumWidth);
+            StringBuffer stringBuffer = new StringBuffer();
+            stringBuffer.append(RJustify(leftSide,leftColumWidth) + " : " + flowedtext.get(0) + "\n");
+            boolean isFirstLine = true;
+            for(int i = 1; i < flowedtext.size(); i++){
+                if(isFirstLine){
+                    isFirstLine = false;
+                    stringBuffer.append(StringUtils.getBlanks(dd + leftColumWidth) + flowedtext.get(i) );
+                }else {
+                    stringBuffer.append("\n" + StringUtils.getBlanks(dd + leftColumWidth) + flowedtext.get(i) );
+                }
+            }
+            return stringBuffer.toString();
+
+        }
+        return RJustify(leftSide, leftColumWidth) + " : " + truncate(rightSide);
     }
 
     @Override
@@ -239,20 +267,24 @@ public abstract class StoreCommands2 extends StoreCommands {
 
     @Override
     protected void showLSHelp() {
-        say("ls [-l | -la | -al | -a] | [" + KEY_FLAG + " key | " + KEYS_FLAG + " array] id");
+        say("ls [" + LONG_LIST_COMMAND + "  | " + VERBOSE_COMMAND + " | " + ALL_LIST_COMMAND + "] | [" + KEY_FLAG + " key | " + KEYS_FLAG + " array] id");
         sayi("Lists information about the contents of the store, an entry and individual values of the entry.");
         sayi("When listing multiple entries, tools will use the most numbers from the most recent call to this.");
-        sayi("NOTE: any time you have and \"a\" in the flags, it will print ALL the store entries.");
+        sayi("A long listing is tabular and will shorten entries that are too long, ending them with " + ELLIPSIS);
+        sayi("A verbose command will format every bit of every entry within the margins.");
         say("E.g.");
-        sayi("ls -la");
+        sayi("ls " + LONG_LIST_COMMAND + "  " + ALL_LIST_COMMAND);
         sayi("Prints out the long form of *every* object in this store. This may be simply huge");
         say("E.g.");
         sayi("ls");
         sayi("Prints out the short form of *every* object in this store. This may also be huge.");
         sayi("If you are using this to find things, you probably want to look at the search command");
         say("E.g.");
-        sayi("ls -l /foo:bar");
+        sayi("ls " + LONG_LIST_COMMAND + "  /foo:bar");
         sayi("Prints a long format for the entry with id foo:bar");
+        say("E.g.");
+        sayi("ls + " + VERBOSE_COMMAND + "/foo:bar");
+        sayi("prints out a verbose listing of the entry with id foo:bar.");
         say("E.g.");
         sayi("ls -key id /foo:bar");
         sayi(">   foo:bar");

@@ -141,14 +141,14 @@ public class OA2Client extends Client implements OA2ClientScopes {
      */
     public boolean hasExtendedAttributeSupport(){
         if(!hasConfig()) return false; // default
-        return ClientJSONConfigUtil.getExtraAttributes(getConfig()).containsKey(extendedAttributesKey);
+        return ClientJSONConfigUtil.getExtendedAttributes(getConfig()).containsKey(extendedAttributesKey);
     }
     public void setExtendedAttributeSupport(boolean b){
         if(!hasConfig()){
             JSONObject cfg = new JSONObject();
             setConfig(cfg);
         }
-         ClientJSONConfigUtil.getExtraAttributes(getConfig()).put(extendedAttributesKey, b);
+         ClientJSONConfigUtil.getExtendedAttributes(getConfig()).put(extendedAttributesKey, b);
     }
 
     /**

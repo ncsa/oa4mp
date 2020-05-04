@@ -73,15 +73,15 @@ public class OA2ClientFunctorScripts extends ClientFunctorScripts {
      * has been replaced. Just save the configuration like any other.
      * @return
      */
-    public boolean isSaved() {
+ /*   public boolean isSaved() {
         return true;
-    }
+    }*/
 
-    public void setSaved(boolean saved) {
+/*    public void setSaved(boolean saved) {
         this.saved = saved;
-    }
+    }*/
 
-    boolean saved=true;
+  //  boolean saved=true;
 
     @Override
     public boolean executeRuntime() {

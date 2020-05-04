@@ -1,0 +1,23 @@
+{
+  "comment": "This is an example to show how to send extra attributes, here the cfg parameter",
+  "application_type": "web",
+  "redirect_uris": [
+    "http://localhost/callback"
+  ],
+  "grant_types": ["authorization_code"],
+  "client_name": "Jeff test",
+  "scope":     "openid email profile",
+  "contacts": [
+         "bob@sbigstate.edu"
+     ],
+  "extra_attribute1": "some extra attribute",
+  "extra_attribute2": "my totally cool secret thingie",
+  "cfg": {
+    "qdl": ["a","b"],
+    "claims": {
+      "sourceConfig": {"foo": "bar"},
+      "postProcessor": {"fnord":"postP"},
+      "preProcessor": {"fnord2":"preP"}
+    }
+  }
+}

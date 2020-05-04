@@ -1,6 +1,5 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientFunctorScriptsUtil;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.delegation.storage.impl.ClientConverter;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
@@ -88,7 +87,7 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
                 // so by this point, no configuration has been found either.
                 cfg = new JSONObject();
             }
-            OA2ClientFunctorScriptsUtil.setSaved(cfg, true);
+   //         OA2ClientFunctorScriptsUtil.setSaved(cfg, true);
 
 
         } else {

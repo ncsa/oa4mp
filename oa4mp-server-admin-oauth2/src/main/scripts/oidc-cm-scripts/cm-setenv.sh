@@ -16,7 +16,6 @@
 # do this since it is easy to get the escaping wrong.
 
 # Next line is for debugging. Just remove it if it is here and set your own values above.
-source /home/ncsa/dev/csd/config/cm-setenv.sh
-
+source /home/ncsa/dev/csd/config/oidc-cm-setenv.sh
 
 export BEARER_TOKEN=$(echo -n $ADMIN_ID:$ADMIN_SECRET | base64 -w 0)

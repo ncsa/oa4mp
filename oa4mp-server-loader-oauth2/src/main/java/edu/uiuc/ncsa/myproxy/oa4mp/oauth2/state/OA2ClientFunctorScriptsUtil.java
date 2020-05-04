@@ -257,7 +257,7 @@ public class OA2ClientFunctorScriptsUtil extends ClientFunctorScriptsUtil {
 
                 // Add it to the list of configurations.
                 claimSources.add(oldLDAP);
-                setSaved(config, false);
+            //    setSaved(config, false);
                 // update the set of claims sources in the configuration.
                 setClaimSourcesConfigurations(config, claimSources);
                 if (!hasClaimPreProcessor(config) && !hasRuntime(config)) {
@@ -276,7 +276,7 @@ public class OA2ClientFunctorScriptsUtil extends ClientFunctorScriptsUtil {
             oldLDAP.put(LDAP_TAG, content);
             claimSources.add(oldLDAP);
             setClaimSourcesConfigurations(config, claimSources);
-            setSaved(config, false);
+        //    setSaved(config, false);
             // Finally, if there is NO claims pre-processor (which would set the source to use
             // then create one. Otherwise leave any existing new configuration intact.
             DebugUtil.trace(OA2ClientFunctorScriptsUtil.class, "Done creating new Claim source with id = " + newName + ". Create default processor?" +

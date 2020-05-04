@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import net.sf.json.JSONSerializer;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -66,9 +67,11 @@ public class ExtendedParameters {
         }
         return false;
     }
-    protected boolean isExtendedAttribute(String x){
-             return 0 < x.indexOf(PREFIX_DELIMITER);
+
+    protected boolean isExtendedAttribute(String x) {
+        return 0 < x.indexOf(PREFIX_DELIMITER);
     }
+
     /**
      * This does the grunt work of looking through the headers and pulling out the extended attributes.
      * The format of the extended attributes is
@@ -98,7 +101,7 @@ public class ExtendedParameters {
         JSONObject cilogonEntry = null;
         JSONObject oa4mpEntry = null;
         for (String key : pmap.keySet()) {
-            if(!isExtendedAttribute(key)){
+            if (!isExtendedAttribute(key)) {
                 continue;
             }
             String[] values = pmap.get(key);
@@ -155,5 +158,162 @@ public class ExtendedParameters {
         StemVariable stemVariable = new StemVariable();
         stemVariable.fromJSON(jsonObject);
         System.out.println(stemVariable.toString(2));
+        // Now an integrity check for the existing configuration.
+        JSONObject jsonObject2 = (JSONObject) JSONSerializer.toJSON(rawJ);
+        JSONObject cmExtra = (JSONObject) JSONSerializer.toJSON(cmextra);
+
+   //     JSONObject cleanConfig = new JSONObject();
+//        ClientJSONConfigUtil.setCMExtraAttributes(cleanConfig, cmExtra);
+        //ClientJSONConfigUtil.setExtendedAttributes(cleanConfig, xp.);
+
     }
+    static String rawJ = "{\n" +
+
+            " \"config\": \"LSST client configuration, created by Jeff Gaynor 6/19/2018\",\n" +
+            " \"claims\":  {\n" +
+            "  \"sourceConfig\": [{\"ldap\":   {\n" +
+            "   \"preProcessing\": [   {\n" +
+            "    \"$if\": [{\"$match\":     [\n" +
+            "     \"${idp}\",\n" +
+            "     \"https://idp.ncsa.illinois.edu/idp/shibboleth\"\n" +
+            "    ]}],\n" +
+            "    \"$then\": [{\"$set\":     [\n" +
+            "     \"foo\",\n" +
+            "     {\"$drop\":      [\n" +
+            "      \"@ncsa.illinois.edu\",\n" +
+            "      \"${eppn}\"\n" +
+            "     ]}\n" +
+            "    ]}],\n" +
+            "    \"$else\": [{\"$get_claims\": [\"$false\"]}]\n" +
+            "   }],\n" +
+            "   \"postProcessing\": [   {\n" +
+            "    \"$if\": [{\"$match\":     [\n" +
+            "     \"${idp}\",\n" +
+            "     \"https://idp.ncsa.illinois.edu/idp/shibboleth\"\n" +
+            "    ]}],\n" +
+            "    \"$then\":     [\n" +
+            "     {\"$set\":      [\n" +
+            "      \"sub\",\n" +
+            "      {\"$get\": [\"eppn\"]}\n" +
+            "     ]},\n" +
+            "     {\"$exclude\": [\"foo\"]}\n" +
+            "    ]\n" +
+            "   }],\n" +
+            "   \"failOnError\": \"false\",\n" +
+            "   \"address\": \"ldap1.ncsa.illinois.edu, ldap2.ncsa.illinois.edu\",\n" +
+            "   \"port\": 636,\n" +
+            "   \"enabled\": \"true\",\n" +
+            "   \"authorizationType\": \"none\",\n" +
+            "   \"searchName\": \"foo\",\n" +
+            "   \"searchAttributes\":    [\n" +
+            "        {\n" +
+            "     \"name\": \"mail\",\n" +
+            "     \"returnAsList\": false,\n" +
+            "     \"returnName\": \"email\"\n" +
+            "    },\n" +
+            "        {\n" +
+            "     \"name\": \"uid\",\n" +
+            "     \"returnAsList\": false,\n" +
+            "     \"returnName\": \"uid\"\n" +
+            "    },\n" +
+            "        {\n" +
+            "     \"name\": \"uid\",\n" +
+            "     \"returnAsList\": false,\n" +
+            "     \"returnName\": \"uid\"\n" +
+            "    },\n" +
+            "        {\n" +
+            "     \"name\": \"uidNumber\",\n" +
+            "     \"returnAsList\": false,\n" +
+            "     \"returnName\": \"uidNumber\"\n" +
+            "    },\n" +
+            "        {\n" +
+            "     \"name\": \"cn\",\n" +
+            "     \"returnAsList\": false,\n" +
+            "     \"returnName\": \"name\"\n" +
+            "    },\n" +
+            "        {\n" +
+            "     \"name\": \"memberOf\",\n" +
+            "     \"isGroup\": true,\n" +
+            "     \"returnAsList\": false,\n" +
+            "     \"returnName\": \"isMemberOf\"\n" +
+            "    }\n" +
+            "   ],\n" +
+            "   \"searchBase\": \"ou=People,dc=ncsa,dc=illinois,dc=edu\",\n" +
+            "   \"contextName\": \"\",\n" +
+            "   \"ssl\":    {\n" +
+            "    \"tlsVersion\": \"TLS\",\n" +
+            "    \"useJavaTrustStore\": true\n" +
+            "   },\n" +
+            "   \"name\": \"3258ed63b62d1a78\"\n" +
+            "  }}],\n" +
+            "  \"preProcessing\": [  {\n" +
+            "   \"$if\": [\"$true\"],\n" +
+            "   \"$then\": [{\"$set_claim_source\":    [\n" +
+            "    \"LDAP\",\n" +
+            "    \"3258ed63b62d1a78\"\n" +
+            "   ]}]\n" +
+            "  }],\n" +
+            "  \"postProcessing\": {\"$xor\":   [\n" +
+            "      {\n" +
+            "    \"$if\": [{\"$hasClaim\": [\"eppn\"]}],\n" +
+            "    \"$then\": [{\"$set\":     [\n" +
+            "     \"voPersonExternalID\",\n" +
+            "     {\"$get\": [\"eppn\"]}\n" +
+            "    ]}]\n" +
+            "   },\n" +
+            "      {\n" +
+            "    \"$if\": [{\"$hasClaim\": [\"eptid\"]}],\n" +
+            "    \"$then\": [{\"$set\":     [\n" +
+            "     \"voPersonExternalID\",\n" +
+            "     {\"$get\": [\"eptid\"]}\n" +
+            "    ]}]\n" +
+            "   },\n" +
+            "      {\n" +
+            "    \"$if\": [{\"$equals\":     [\n" +
+            "     {\"$get\": [\"idp\"]},\n" +
+            "     \"http://github.com/login/oauth/authorize\"\n" +
+            "    ]}],\n" +
+            "    \"$then\": [{\"$set\":     [\n" +
+            "     \"voPersonExternalID\",\n" +
+            "     {\"$concat\":      [\n" +
+            "      {\"$get\": [\"oidc\"]},\n" +
+            "      \"@github.com\"\n" +
+            "     ]}\n" +
+            "    ]}]\n" +
+            "   },\n" +
+            "      {\n" +
+            "    \"$if\": [{\"$equals\":     [\n" +
+            "     {\"$get\": [\"idp\"]},\n" +
+            "     \"http://google.com/accounts/o8/id\"\n" +
+            "    ]}],\n" +
+            "    \"$then\": [{\"$set\":     [\n" +
+            "     \"voPersonExternalID\",\n" +
+            "     {\"$concat\":      [\n" +
+            "      {\"$get\": [\"oidc\"]},\n" +
+            "      \"@accounts.google.com\"\n" +
+            "     ]}\n" +
+            "    ]}]\n" +
+            "   },\n" +
+            "      {\n" +
+            "    \"$if\": [{\"$equals\":     [\n" +
+            "     {\"$get\": [\"idp\"]},\n" +
+            "     \"http://orcid.org/oauth/authorize\"\n" +
+            "    ]}],\n" +
+            "    \"$then\": [{\"$set\":     [\n" +
+            "     \"voPersonExternalID\",\n" +
+            "     {\"$replace\":      [\n" +
+            "      {\"$get\": [\"oidc\"]},\n" +
+            "      \"http://\",\n" +
+            "      \"https://\"\n" +
+            "     ]}\n" +
+            "    ]}]\n" +
+            "   }\n" +
+            "  ]}\n" +
+            " },\n" +
+            " \"isSaved\": true\n" +
+            "}";
+
+    static String cmextra = "{\"client_id\":\"oidc:jeff/client\",\n" +
+            "  \"client_secret\":\"my_totally_cool_secret\",\n" +
+            "  \"cfg\": {\"isSaved\": true,\"qdl\": [\"a\",\"b\"]}}\n";
 }

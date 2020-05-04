@@ -34,6 +34,8 @@ public class ClientApprovalStoreCommands extends StoreCommands2 {
 
     }*/
 
+  
+
     @Override
     protected String format(Identifiable identifiable) {
         if (identifiable == null) return "(null)";

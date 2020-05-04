@@ -183,7 +183,7 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
             }
             if (useLongFormat) {
                 if(i != 0){say("-----");}
-                longFormat((BaseClient) x, tempA);
+                longFormat((BaseClient) x, tempA, false);
             } else {
                 say(i + ". " + format((BaseClient) x, tempA));
             }
@@ -220,15 +220,15 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
     }
 
     @Override
-    protected int longFormat(Identifiable identifiable) {
+    protected int longFormat(Identifiable identifiable, boolean isVerbose) {
         BaseClient client = (BaseClient) identifiable;
         ClientApproval ca = (ClientApproval) getClientApprovalStore().get(client.getIdentifier());
-        return longFormat(client, ca);
+        return longFormat(client, ca, isVerbose);
     }
 
 
-    protected int longFormat(BaseClient client, ClientApproval clientApproval) {
-        int width = super.longFormat(client);
+    protected int longFormat(BaseClient client, ClientApproval clientApproval, boolean isVerbose) {
+        int width = super.longFormat(client,isVerbose);
 
         if (clientApproval == null) {
             // if it is missing, then create on and mark it pending.
@@ -250,19 +250,19 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
                 if (clientApproval.getApprover() != null) {
                     approver = clientApproval.getApprover();
                 }
-                say(formatLongLine("approved by", approver, width));
+                say(formatLongLine("approved by", approver, width,isVerbose));
                 break;
             case NONE:
-                say(formatLongLine("status", "none", width));
+                say(formatLongLine("status", "none", width,isVerbose));
                 break;
             case PENDING:
-                say(formatLongLine("status", "pending", width));
+                say(formatLongLine("status", "pending", width,isVerbose));
                 break;
             case DENIED:
-                say(formatLongLine("status", "approval denied", width));
+                say(formatLongLine("status", "approval denied", width,isVerbose));
                 break;
             case REVOKED:
-                say(formatLongLine("status", "revoked", width));
+                say(formatLongLine("status", "revoked", width,isVerbose));
 
         }
         return width;

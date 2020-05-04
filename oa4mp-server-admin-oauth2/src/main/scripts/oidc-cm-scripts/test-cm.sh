@@ -16,21 +16,10 @@
 # output.json the response from the server. This is printed out after this script is run, so you get to see the output at the command
 # line.
 # E.g.
-# ./c-run2.sh create.json
+# ./test-cm.sh create.json
 #
 # response is a JSON object with the id and secret.
 
-# This next is for debugging and sets the environment
-
-# DEFAULT_SERVER=https://locahost/oauth2/oidc-cm
-# export SERVER=http://localhost:44444/oauth2/oidc-cm
-#export SERVER=https://polod.ncsa.illinois.edu/oauth2/oidc-cm
-#export ADMIN_ID=polod:test-client
-#export ADMIN_SECRET="mairzy doats and dozey doats"
-# On my private install...
-# export ADMIN_ID=my:adminclient/42
-# export ADMIN_SECRET="baby shark do do do-do do"
-# Encoded token is base 64 encoded ADMIN_ID:ADMIN_SECRET
 
 curl -k -X POST -H "Authorization: Bearer $(echo -n $ADMIN_ID:$ADMIN_SECRET | base64)" -H "Content-Type: application/json; charset=UTF-8" --data @$1 $SERVER > output.json
 cat output.json

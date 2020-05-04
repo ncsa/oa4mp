@@ -36,6 +36,10 @@ public class ClientStoreCommands extends BaseClientStoreCommands {
         return "  clients";
     }
 
+    @Override
+    protected int longFormat(Identifiable identifiable) {
+        return longFormat(identifiable, false);
+    }
 
     @Override
     public void extraUpdates(Identifiable identifiable) {

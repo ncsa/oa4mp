@@ -11,15 +11,34 @@
 <body class="composite">
 <!--#include virtual="../../header.html" -->
 <h1>Dynamic Client Registration</h1>
-<p>The <a href="https://openid.net/specs/openid-connect-registration-1_0.html">dynamic client registration</a> specification
-is supported in OA4MP as of version 4.2. This means that a trusted administrative client can dynamically
-create regular clients for use with an OA4MP system.  If you have not done so already, you should
-read the section on
-<a href="administrative-clients.html">administrative clients </a>.
+<p>The <a href="https://openid.net/specs/openid-connect-registration-1_0.html">dynamic client registration</a>
+    specification
+    is supported in OA4MP as of version 4.2. This means that a trusted administrative client can dynamically
+    create regular clients for use with an OA4MP system. If you have not done so already, you should
+    read the section on
+    <a href="administrative-clients.html">administrative clients </a>.
 </p>
 
+<h2>How's it work?</h2>
+<p>
+    We do not support registrations for a simple client to this endpoint. For that you should go
+    to <code>../oauth2/register</code>. Your request will then be seen by the adminstrator(s)
+    and once approved, you will be notified. This facility is to allow for a site manager who
+    must manage several OAuth clients to do so without having to resort to a vetting process.
+    We get the admin and the the admin can take it from there.
+</p>
+<p>The two specifications that are behind this are <a href="https://tools.ietf.org/html/rfc7591">RFC 7591</a>
+    and <a href="https://tools.ietf.org/html/rfc7592">RFC 7592</a>. The flow is that you register an
+    administrative client. This is initially not approved and any operation you try will fail
+    with a message to that effect. We get an notification and once the admin client is approved,
+    it may be used.</p>
+<p>
+    We do not support registrations for a simple client to this endpoint. For that you should go
+    to <code>../oauth2/register</code>. Your request will then be seen by the adminstrator(s)
+    and once approved, you will be notified. The way this works is that
+</p>
 <p>To dynamically register a client you need to make a call to the supported service
-endpoint, typically <code>../oauth2/register</code></p>
+    endpoint, typically <code>../oauth2/oidc-cm</code>. </p>
 
 <!--#include virtual="../../footer.html" -->
 </body>

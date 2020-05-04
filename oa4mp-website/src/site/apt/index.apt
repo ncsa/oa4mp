@@ -24,15 +24,15 @@ Downloads
 
 * OAuth 2.0 (OpenID Connect)
 
-        * {{{https://github.com/ncsa/OA4MP/releases/tag/v4.3}oauth2-server-latest.war}} (Version 4.4.1)
+        * {{{https://github.com/ncsa/OA4MP/releases/tag/v4.3}oauth2-server-latest.war}} (Version 4.5-SNAPSHOT)
 
-        * {{{https://github.com/ncsa/OA4MP/releases/tag/v4.3}oauth2-client-latest.war}} (Version 4.4.1)
+        * {{{https://github.com/ncsa/OA4MP/releases/tag/v4.3}oauth2-client-latest.war}} (Version 4.5-SNAPSHOT)
 
 * OAuth 1.0a
 
-        * {{{https://github.com/ncsa/OA4MP/releases/tag/v4.3}oauth-server-latest.war}}  (Version 4.4.1)
+        * {{{https://github.com/ncsa/OA4MP/releases/tag/v4.3}oauth-server-latest.war}}  (Version 4.5-SNAPSHOT)
 
-        * {{{https://github.com/ncsa/OA4MP/releases/tag/v4.3}oauth-client-latest.war}} (Version 4.4.1)
+        * {{{https://github.com/ncsa/OA4MP/releases/tag/v4.3}oauth-client-latest.war}} (Version 4.5-SNAPSHOT)
 
 Documentation
 

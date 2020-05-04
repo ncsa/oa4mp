@@ -1,6 +1,6 @@
 # DEFAULT_SERVER=https://locahost/oauth2/clients
 # For debugging uncomment the next line
-# source ~/dev/csd/config/cm-setenv.sh
+source ~/dev/csd/config/cm-setenv.sh
 #
 # Set the following:
 #ADMIN_ID=

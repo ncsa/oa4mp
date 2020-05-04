@@ -18,7 +18,6 @@ import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2GeneralError;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Scopes;
-import edu.uiuc.ncsa.security.oauth_2_0.server.scripts.ClientJSONConfigUtil;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
@@ -38,6 +37,7 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.StringTokenizer;
 
 /**
  * Note that in all of these calls, the assumption is that an admin client has been requested and
@@ -81,7 +81,7 @@ public class OIDCCMServlet extends EnvServlet {
         }
 
         try {
-            AdminClient adminClient = getAndCheckAdminClient(httpServletRequest);
+            getAndCheckAdminClient(httpServletRequest); // Need this to verify admin client.
             String rawID = getFirstParameterValue(httpServletRequest, OA2Constants.CLIENT_ID);
             if (rawID == null || rawID.isEmpty()) {
                 throw new GeneralException("Missing client id. Cannot process request");
@@ -128,7 +128,9 @@ public class OIDCCMServlet extends EnvServlet {
         json.put("email", client.getEmail());
         // This is in seconds since the epoch
         json.put(OIDCCMConstants.CLIENT_ID_ISSUED_AT, client.getCreationTS().getTime() / 1000);
-        json.putAll(ClientJSONConfigUtil.getExtraAttributes(client.getConfig()));
+        if (client.getConfig() != null && !client.getConfig().isEmpty()) {
+            json.put("cfg", client.getConfig());
+        }
         return json;
     }
 
@@ -250,7 +252,7 @@ public class OIDCCMServlet extends EnvServlet {
                 // the only thing that we are concerned with is is client is attempting to increase their
                 // scopes. The are permitted to reduce them.
                 boolean rejectRequest = false;
-                JSONArray newScopes = jsonRequest.getJSONArray(OA2Constants.SCOPE);
+                JSONArray newScopes = toJA(jsonRequest,OA2Constants.SCOPE);
                 Collection<String> oldScopes = client.getScopes();
                 if (oldScopes.size() < newScopes.size()) {
                     rejectRequest = true;
@@ -369,7 +371,7 @@ public class OIDCCMServlet extends EnvServlet {
         AdminClient adminClient = getAndCheckAdminClient(httpServletRequest);
         // Now that we have the admin client (so we can do this request), we read the payload:
         JSON rawJSON = getPayload(httpServletRequest);
-        if ( adminClient.getMaxClients() < getOA2SE().getPermissionStore().getClientCount(adminClient.getIdentifier()) ) {
+        if (adminClient.getMaxClients() < getOA2SE().getPermissionStore().getClientCount(adminClient.getIdentifier())) {
             getMyLogger().info("Error: Max client count of " + adminClient.getMaxClients() + " exceeded.");
             throw new GeneralException("Error: Max client count of " + adminClient.getMaxClients() + " exceeded.");
         }
@@ -471,7 +473,7 @@ public class OIDCCMServlet extends EnvServlet {
         if (jsonRequest.containsKey(OIDCCMConstants.GRANT_TYPES)) {
             // no grant type implies only authorization_code, not refresh_token. This is because the spec. allows for
             // implicit grants (which we do not) which forbid refresh_tokens.
-            JSONArray grantTypes = jsonRequest.getJSONArray(OIDCCMConstants.GRANT_TYPES);
+            JSONArray grantTypes = toJA(jsonRequest,OIDCCMConstants.GRANT_TYPES);
             // If the refresh token is requested, then the rtLifetime may be specified. if not, use server default.
             if (grantTypes.contains(OA2Constants.REFRESH_TOKEN)) {
                 if (jsonRequest.containsKey(keys.rtLifetime())) {
@@ -519,7 +521,7 @@ public class OIDCCMServlet extends EnvServlet {
             }
             // alternately, no scopes are set/required.
         } else {
-            client.setScopes(jsonRequest.getJSONArray(OA2Constants.SCOPE));
+            client.setScopes(toJA(jsonRequest, OA2Constants.SCOPE));
         }
         jsonRequest.remove(OA2Constants.SCOPE);
         byte[] bytes = new byte[getOA2SE().getClientSecretLength()];
@@ -545,10 +547,37 @@ public class OIDCCMServlet extends EnvServlet {
             }
             jsonRequest.remove(OIDCCMConstants.CONTACTS);
         }
-        ClientJSONConfigUtil.setExtraAttributes(config, jsonRequest);
-        client.setConfig(config);
+        if (jsonRequest.containsKey("cfg")) {
+            JSONObject jsonObject = jsonRequest.getJSONObject("cfg");
+            jsonRequest.remove("cfg");
+            jsonObject.putAll(jsonRequest);
+            client.setConfig(jsonObject);
+        }
         return client;
 
+    }
+
+    /**
+     * Some attribute scan come over the wire as either arrays of string or as blank delimited strings,
+     * e.g. scopes and grant types. Just figure it out and hand back the array
+     *
+     * @param obj
+     * @param key
+     * @return
+     */
+    protected JSONArray toJA(JSONObject obj, String key) {
+        try {
+            return obj.getJSONArray(key);
+        } catch (Throwable t) {
+            // so they did not send along a JSON array. Other option is a string
+            String rawScopes = obj.getString(key);
+            StringTokenizer st = new StringTokenizer(rawScopes, " ");
+            JSONArray jsonArray = new JSONArray();
+            while (st.hasMoreTokens()) {
+                jsonArray.add(st.nextToken());
+            }
+            return jsonArray;
+        }
     }
 
     protected OA2Client processRegistrationRequest(JSONObject jsonRequest, HttpServletResponse httpResponse) {

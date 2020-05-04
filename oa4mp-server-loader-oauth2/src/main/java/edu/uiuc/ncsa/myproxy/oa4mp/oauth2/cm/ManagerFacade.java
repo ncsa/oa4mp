@@ -80,6 +80,7 @@ public class ManagerFacade {
         checkAdminClientSecret(adminClient);
         // up to this point, the admin client is just an id + the secret that was passed in
         // it is empty. Now we replace it with the real one:
+        // CIL-698 fix:
         adminClient = getSE().getAdminClientStore().get(adminClient.getIdentifier());
         switch (getTargetValue(rawJSON)) {
             case TARGET_ADMIN_VALUE:
