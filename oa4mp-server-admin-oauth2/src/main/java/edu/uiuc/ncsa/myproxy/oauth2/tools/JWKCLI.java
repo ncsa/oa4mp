@@ -45,6 +45,10 @@ public class JWKCLI extends ConfigurableCommandsImpl {
         say(stars);
     }
 
+    @Override
+    public void print_help(InputLine inputLine) throws Exception{
+    say("Need to write help.");
+    }
 
     @Override
     public ConfigurationLoader<? extends AbstractEnvironment> getLoader() {

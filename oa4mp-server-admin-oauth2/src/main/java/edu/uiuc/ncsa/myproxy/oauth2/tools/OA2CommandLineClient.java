@@ -38,6 +38,11 @@ public class OA2CommandLineClient extends CommandLineClient {
         }
     }
 
+    @Override
+    public void print_help(InputLine inputLine) throws Exception{
+        say("Need to write help");
+    }
+
     public void start(String[] args) throws Exception {
         if (!getOptions(args)) {
             say("Warning: no configuration file specified. type in 'load --help' to see how to load one.");
@@ -46,29 +51,30 @@ public class OA2CommandLineClient extends CommandLineClient {
         initialize();
 
     }
-    public void about(){
-            int width = 60;
-            String stars = StringUtils.rightPad("", width + 1, "*");
-            say(stars);
-            say(padLineWithBlanks("* OA4MP OAuth 2/OIDC command line client", width) + "*");
-            say(padLineWithBlanks("* Version " + LoggingConfigLoader.VERSION_NUMBER, width) + "*");
-            say(padLineWithBlanks("* By Jeff Gaynor  NCSA", width) + "*");
-            say(padLineWithBlanks("*  (National Center for Supercomputing Applications)", width) + "*");
-            say(padLineWithBlanks("*", width) + "*");
-            say(padLineWithBlanks("* type 'help' for a list of commands", width) + "*");
-            say(padLineWithBlanks("*      'exit' or 'quit' to end this session.", width) + "*");
-            say(stars);
+
+    public void about() {
+        int width = 60;
+        String stars = StringUtils.rightPad("", width + 1, "*");
+        say(stars);
+        say(padLineWithBlanks("* OA4MP OAuth 2/OIDC command line client", width) + "*");
+        say(padLineWithBlanks("* Version " + LoggingConfigLoader.VERSION_NUMBER, width) + "*");
+        say(padLineWithBlanks("* By Jeff Gaynor  NCSA", width) + "*");
+        say(padLineWithBlanks("*  (National Center for Supercomputing Applications)", width) + "*");
+        say(padLineWithBlanks("*", width) + "*");
+        say(padLineWithBlanks("* type 'help' for a list of commands", width) + "*");
+        say(padLineWithBlanks("*      'exit' or 'quit' to end this session.", width) + "*");
+        say(stars);
     }
 
     @Override
     public boolean use(InputLine inputLine) throws Exception {
         String indent = "  ";
-            if (inputLine.hasArg("test")) {
-                OA2CLCCommands usc = new OA2CLCCommands(getMyLogger(), (ClientEnvironment) getEnvironment());
-                CLIDriver cli = new CLIDriver(usc);
-                cli.start();
-                return true;
-            }
+        if (inputLine.hasArg("test")) {
+            OA2CLCCommands usc = new OA2CLCCommands(getMyLogger(), (ClientEnvironment) getEnvironment());
+            CLIDriver cli = new CLIDriver(usc);
+            cli.start();
+            return true;
+        }
         return false;
     }
 }

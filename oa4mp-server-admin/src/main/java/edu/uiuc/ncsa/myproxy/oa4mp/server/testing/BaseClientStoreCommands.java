@@ -59,6 +59,12 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
         return inputJSON(oldJSON, componentName, false);
     }
 
+    @Override
+    public void print_help(InputLine inputLine) throws Exception {
+        super.print_help(inputLine);
+        say("--Utilities:");
+        sayi("create_hash = create the hash of a password.");
+    }
 
     /**
      * Allows for entering a new JSON object. This permits multi-line entry so formatted JSON can be cut and pasted
@@ -229,7 +235,7 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
 
     protected int longFormat(BaseClient client, ClientApproval clientApproval, boolean isVerbose) {
         int width = super.longFormat(client,isVerbose);
-
+        width = width - Math.max(0,indentWidth()); // since it is added in the long format
         if (clientApproval == null) {
             // if it is missing, then create on and mark it pending.
             clientApproval = (ClientApproval) getClientApprovalStore().create();

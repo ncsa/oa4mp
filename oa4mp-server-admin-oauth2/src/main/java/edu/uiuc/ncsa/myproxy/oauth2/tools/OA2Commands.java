@@ -44,6 +44,11 @@ public class OA2Commands extends BaseCommands {
     }
 
     @Override
+    public void print_help(InputLine inputLine) throws Exception{
+           say("Need to write help");
+    }
+
+    @Override
     public ParserCommands getNewParserCommands() throws Exception {
         OA2FunctorFactory ff = new OA2FunctorFactory(new HashMap<String, Object>(), new LinkedList<String>());
         ff.setVerboseOn(true);
@@ -97,13 +102,18 @@ public class OA2Commands extends BaseCommands {
         say(padLineWithBlanks("*      'exit' or 'quit' to end this session.", width) + "*");
         say(stars);
     }
-
+    OA2ClientCommands oa2ClientCommands = null;
     @Override
     public ClientStoreCommands getNewClientStoreCommands() throws Exception {
-        OA2ClientCommands x = new OA2ClientCommands(getMyLogger(), "  ", getServiceEnvironment().getClientStore(), getServiceEnvironment().getClientApprovalStore());
-        x.setRefreshTokensEnabled(getOA2SE().isRefreshTokenEnabled());
-        x.setSupportedScopes(getOA2SE().getScopes());
-        return x;
+        if(oa2ClientCommands == null) {
+            oa2ClientCommands = new OA2ClientCommands(getMyLogger(),
+                    "  ",
+                    getServiceEnvironment().getClientStore(),
+                    getServiceEnvironment().getClientApprovalStore());
+            oa2ClientCommands.setRefreshTokensEnabled(getOA2SE().isRefreshTokenEnabled());
+            oa2ClientCommands.setSupportedScopes(getOA2SE().getScopes());
+        }
+        return oa2ClientCommands;
     }
 
     @Override
@@ -111,20 +121,26 @@ public class OA2Commands extends BaseCommands {
         return new CopyCommands(getMyLogger(), new OA2CopyTool(), new OA2CopyToolVerifier(), getConfigFile());
     }
 
+    OA2AdminClientCommands oa2AdminClientCommands = null;
     public OA2AdminClientCommands getAdminClientCommands() throws Exception {
-        return new OA2AdminClientCommands(getMyLogger(), "  ",
-                getOA2SE().getAdminClientStore(),
-                getOA2SE().getClientApprovalStore(),
-                getOA2SE().getPermissionStore());
+        if(oa2AdminClientCommands == null) {
+            oa2AdminClientCommands =  new OA2AdminClientCommands(getMyLogger(),
+                    "  ",
+                    getOA2SE().getAdminClientStore(),
+                    getOA2SE().getClientApprovalStore(),
+                    getOA2SE().getPermissionStore());
+        }
+        return  oa2AdminClientCommands;
     }
 
+    OA2PermissionCommands oa2PermissionCommands = null;
     public OA2PermissionCommands getPermissionCommands() throws Exception {
-        return new OA2PermissionCommands(getMyLogger(), "  ", getOA2SE().getPermissionStore());
+        if(oa2PermissionCommands == null) {
+            oa2PermissionCommands =  new OA2PermissionCommands(getMyLogger(), "  ", getOA2SE().getPermissionStore());
+        }
+        return oa2PermissionCommands;
     }
 
-/*    public JSONStoreCommands getJSONStoreCommands() throws Exception{
-        return new JSONStoreCommands(getMyLogger(), "  ", getOA2SE().getJSONStore());
-    }*/
     @Override
     public boolean use(InputLine inputLine) throws Exception {
         CommonCommands commands = null;
@@ -137,9 +153,6 @@ public class OA2Commands extends BaseCommands {
         if (inputLine.hasArg(PERMISSIONS)) {
             commands = getPermissionCommands();
         }
-/*        if(inputLine.hasArg(JSON)){
-            commands = getJSONStoreCommands();
-        }*/
         if (commands != null) {
             CLIDriver cli = new CLIDriver(commands);
             cli.setEnv(getGlobalEnv());

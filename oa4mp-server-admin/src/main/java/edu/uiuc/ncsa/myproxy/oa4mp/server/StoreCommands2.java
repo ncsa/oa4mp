@@ -101,6 +101,7 @@ public abstract class StoreCommands2 extends StoreCommands {
         for (String key : tMap.keySet()) {
             width = Math.max(width, key.length());
         }
+
         // Use the order of the tmap (so its sorted) but the XMLMap has information we need to get these.
         for (String key : tMap.keySet()) {
             String v = map.getString(key);
@@ -124,23 +125,23 @@ public abstract class StoreCommands2 extends StoreCommands {
      * @return
      */
     protected String formatLongLine(String leftSide, String rightSide, int leftColumWidth, boolean isVerbose) {
-        int dd = defaultIndent.length() + 3; // the default indent plus the " : " in the middle
+        int dd = indentWidth() + 3; // the default indent plus the " : " in the middle
         int realWidth = display_width - dd;
-        if(rightSide.length() + leftColumWidth + 1 <= realWidth){
+        if (rightSide.length() + leftColumWidth + 1 <= realWidth) {
             return RJustify(leftSide, leftColumWidth) + " : " + rightSide;
         }
-        if(isVerbose){
+        if (isVerbose) {
 
-            List<String> flowedtext = StringUtils.wrap(0,StringUtils.toList(rightSide), realWidth - leftColumWidth);
+            List<String> flowedtext = StringUtils.wrap(0, StringUtils.toList(rightSide), realWidth - leftColumWidth);
             StringBuffer stringBuffer = new StringBuffer();
-            stringBuffer.append(RJustify(leftSide,leftColumWidth) + " : " + flowedtext.get(0) + "\n");
+            stringBuffer.append(RJustify(leftSide, leftColumWidth) + " : " + flowedtext.get(0) + "\n");
             boolean isFirstLine = true;
-            for(int i = 1; i < flowedtext.size(); i++){
-                if(isFirstLine){
+            for (int i = 1; i < flowedtext.size(); i++) {
+                if (isFirstLine) {
                     isFirstLine = false;
-                    stringBuffer.append(StringUtils.getBlanks(dd + leftColumWidth) + flowedtext.get(i) );
-                }else {
-                    stringBuffer.append("\n" + StringUtils.getBlanks(dd + leftColumWidth) + flowedtext.get(i) );
+                    stringBuffer.append(StringUtils.getBlanks(dd + leftColumWidth) + flowedtext.get(i));
+                } else {
+                    stringBuffer.append("\n" + StringUtils.getBlanks(dd + leftColumWidth) + flowedtext.get(i));
                 }
             }
             return stringBuffer.toString();
@@ -283,16 +284,16 @@ public abstract class StoreCommands2 extends StoreCommands {
         sayi("ls " + LONG_LIST_COMMAND + "  /foo:bar");
         sayi("Prints a long format for the entry with id foo:bar");
         say("E.g.");
-        sayi("ls + " + VERBOSE_COMMAND + "/foo:bar");
+        sayi("ls " + VERBOSE_COMMAND + " /foo:bar");
         sayi("prints out a verbose listing of the entry with id foo:bar.");
         say("E.g.");
-        sayi("ls -key id /foo:bar");
+        sayi("ls " + KEY_FLAG + " id /foo:bar");
         sayi(">   foo:bar");
         sayi("Prints out the id property for the object with identifier foo:bar");
         sayi("");
         sayi("You may also supply a list of keys in an array of the form [key0,key1,...].");
         say("E.g.");
-        sayi("ls -keys [id,callback_uris,create_ts] /foo:bar");
+        sayi("ls " + KEYS_FLAG + " [id,callback_uris,create_ts] /foo:bar");
         sayi("would print the id, callback_uri and create_ts properties for the object with id");
         sayi("foo:bar. ");
         sayi("\nSee also list_keys, search");
@@ -391,7 +392,7 @@ public abstract class StoreCommands2 extends StoreCommands {
                 return;
             }
 
-            showEntries(identifiable, array);
+            showEntries(identifiable, array, inputLine.hasArg(VERBOSE_COMMAND));
             return;
         }
         if (inputLine.hasArg(KEY_FLAG)) {
@@ -400,7 +401,7 @@ public abstract class StoreCommands2 extends StoreCommands {
                 say("sorry, I could not find that object. Check your id.");
                 return;
             }
-            showEntry(identifiable, inputLine.getNextArgFor(KEY_FLAG));
+            showEntry(identifiable, inputLine.getNextArgFor(KEY_FLAG), inputLine.hasArg(VERBOSE_COMMAND));
         }
 
     }
@@ -792,16 +793,25 @@ public abstract class StoreCommands2 extends StoreCommands {
     }
 
 
-    protected void showEntries(Identifiable identifiable, List<String> array) {
+    protected void showEntries(Identifiable identifiable, List<String> keys, boolean isVerbose) {
         XMLMap object = toXMLMap(identifiable);
-        for (String key : array) {
-            if (hasKey(key)) {
-                say(key + "=" + object.get(key));
+        int leftWidth = 0;
+        TreeMap<String, String> tMap = new TreeMap<>();
+        for (String x : keys) {
+            leftWidth = Math.max(leftWidth, x.length());
+            tMap.put(x, object.getString(x));
+        }
+
+        for (String key : tMap.keySet()) {
+            String v = tMap.get(key);
+            // Suppress null entries. Record empty ones.
+            if (!StringUtils.isTrivial(v)) {
+                say(formatLongLine(key, v, leftWidth, isVerbose));
             }
         }
-    }
+ }
 
-    protected void showEntry(Identifiable identifiable, String key) {
+    protected void showEntry(Identifiable identifiable, String key, boolean isVerbose) {
         if (hasKey(key)) {
             XMLMap object = toXMLMap(identifiable);
             if (object.containsKey(key)) {
@@ -811,7 +821,7 @@ public abstract class StoreCommands2 extends StoreCommands {
                     say(key + ":\n" + json.toString(1));
 
                 } catch (Throwable t) {
-                    say(key + "=" + object.get(key));
+                    say(key + " :\n" + object.get(key));
                 }
             } else {
                 say("(no value)");

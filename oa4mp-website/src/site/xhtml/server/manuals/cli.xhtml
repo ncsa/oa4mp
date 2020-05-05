@@ -247,7 +247,7 @@ oa2>
 
 <h4><a name="ls">Listing Object or Details of an Object.</a></h4>
 <pre>
-    ls [-l | -a | -la | -al] [id]
+    ls [-l | -E | -v] | [-key key] | [-keys [key1,key2,...] ] [id]
 </pre>
 <p>This lists every element in the current component. The default is to sort by
 the given identifier, except clients which are sorted by creation date. At this point,
@@ -256,9 +256,9 @@ No argument prints out everything in the store.
 Giving the optional index or unique identifier will
     print a detailed listing of the object. Here are the command line switches that this understands:</p>>
 <ul>
-    <li>-l = long form of the listing</li>
-    <li>-a = list <b><i>ALL</i></b> the elements in the store. Default is short form</li>
-    <li>-la or -al = long form of all objects in the store. This may be immense. It may be useful for getting a text dump.</li>
+    <li>-l = long form of the listing. This means that entries longer than a line are truncated.</li>
+    <li>-E = list <b><i>ALL</i></b> the elements in the store. Default is short form</li>
+    <li>-v = verbose form of the listing. Entries longer than a line will be wrapped.</li>
 </ul>
 <i>Example.</i> Listing a specific object by unique identifier
 <pre>
@@ -278,11 +278,51 @@ oa4mp >use approvals
        approved : true
        approver : junit
       client_id : myproxy:oa4mp,2012:/adminClient/131d41a607efa5be7cd611f56d1060c6/1581113647370
+     public_key : k0CPPSzW0Wv5lIZWnEX5yEAOjJTZn838wSrwa-Wh6xF4Vvi4MnBJ7eQuz0QLorDoKYtLEW6LV-u7sC...
          status : none</pre>
 We could have done the exact same thing by simply using the unique identifier:
 <pre>
     approvals>ls -l /myproxy:oa4mp,2012:/adminClient/131d41a607efa5be7cd611f56d1060c6/1581113647370
 </pre>
+And finally, here is what a verbose version looks like for a client (we set the id first so we don't have
+to keep typing it in.)
+<pre>
+  clients> set_id oa4mp:/client_id/52d39e92ab5347c880fa19f3b9cb4204
+  clients> ls -v
+    callback_uri : ["https://client.example.org/callback","https://client.example.org/callback2"]
+             cfg : {"new":"config"}
+       client_id : oa4mp:/client_id/52d39e92ab5347c880fa19f3b9cb4204
+     creation_ts : 2020-05-04 13:47:41.0
+last_modified_ts : 2020-05-04 13:48:21.0
+            name : New Test name
+   proxy_limited : false
+   public_client : true
+      public_key : ZOq88bMz4wIxYDbqfPPSzW0Wv5lIZWnEX5yEAOjJTZn838wSrwa-Wh6xF4Vvi4MnBJ7eQuz0QLorDoKYt
+                   LEW6LV-u7sCbhEb3koXnysQE8dKnf4ykJoiCKsuIrMisYTXgnN2n76-q3qXzGB87TkPQbDav_U7Ql6K9q
+                   -f-G9coKpU2d4CTMx8vcXL2aYy1_XvkV1yZva1M0fHUFIqPRyZPrWapiTqeEzoXk2sJVzByDJgLp7psBa
+                   ghosJfkqVTDQX_M17FBLYXZv7M
+     rt_lifetime : 0
+          scopes : ["openid"]
+     sign_tokens : true
+     approved by : my:adminclient/42
+</pre>
+<h3>Other forms of ls</h3>
+<p>You may also print out a single key with the -key switch and the name of the key (list_keys will
+list what's available). You may also make a custom listing by specifying which keys you want to display. Using
+the above example with the id already set:</p>
+<pre>
+    clients>ls -key cfg
+   cfg:
+ {"new": "config"}
+</pre>
+and to list the name, creation time and refresh token lifetime:
+<pre>
+    clients>ls -keys [name,creation_ts,rt_lifetime]
+   creation_ts : 2020-05-04 13:47:41.0
+          name : New Test name
+   rt_lifetime : 0
+</pre>
+<p>One last note is that the keys are always sorted in any listing and the default for single keys is the verbose form.</p>
 
 <h4><a name="update">Updating (aka Editing) Objects.</a></h4>
 <pre>

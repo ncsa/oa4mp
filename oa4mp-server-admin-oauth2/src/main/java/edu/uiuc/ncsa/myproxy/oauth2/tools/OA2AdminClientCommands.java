@@ -37,7 +37,14 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
 
     PermissionsStore permissionsStore;
 
-
+    @Override
+    public void print_help(InputLine inputLine) throws Exception {
+        super.print_help(inputLine);
+        say("--Admin specific commands:");
+        sayi("count_clients = How many clients does a given admin manage?");
+        sayi("list_admins = who administers a client?");
+        sayi("list_clients = list the clients for a specific admin");
+    }
 
     @Override
     public void extraUpdates(Identifiable identifiable) {

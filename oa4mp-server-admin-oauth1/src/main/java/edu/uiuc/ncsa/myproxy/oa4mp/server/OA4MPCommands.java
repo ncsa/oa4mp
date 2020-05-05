@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
 import edu.uiuc.ncsa.security.core.util.LoggingConfigLoader;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.util.cli.CLIDriver;
+import edu.uiuc.ncsa.security.util.cli.InputLine;
 import edu.uiuc.ncsa.security.util.cli.ParserCommands;
 import edu.uiuc.ncsa.security.util.functor.JFunctorFactory;
 import org.apache.commons.lang.StringUtils;
@@ -69,10 +70,9 @@ public class OA4MPCommands extends BaseCommands {
     }
 
 
-
-
-
-
+    public void print_help(InputLine inputLine) throws Exception{
+      say("No help available...");
+    }
 
     public ClientStoreCommands getNewClientStoreCommands() throws Exception {
         return new ClientStoreCommands(getMyLogger(), "  ", getServiceEnvironment().getClientStore(), getServiceEnvironment().getClientApprovalStore());
