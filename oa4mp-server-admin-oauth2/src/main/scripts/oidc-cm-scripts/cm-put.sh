@@ -1,6 +1,8 @@
 # A script that performs a cURL call to an OA4MP server that has the client management API enabled on it.
 # This performs a HTTP PUT to the registration endpoint, updating all values for the client.
+#########
 # Note that any values missing will be deleted from the information for the server!
+#########
 # You MUST register and have approved an admin client for this to work.  This script sets all the headers and such
 # you need to do and monitors the response.
 #

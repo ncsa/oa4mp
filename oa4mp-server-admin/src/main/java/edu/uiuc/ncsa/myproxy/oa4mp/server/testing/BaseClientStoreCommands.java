@@ -235,7 +235,6 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
 
     protected int longFormat(BaseClient client, ClientApproval clientApproval, boolean isVerbose) {
         int width = super.longFormat(client,isVerbose);
-        width = width - Math.max(0,indentWidth()); // since it is added in the long format
         if (clientApproval == null) {
             // if it is missing, then create on and mark it pending.
             clientApproval = (ClientApproval) getClientApprovalStore().create();
@@ -243,8 +242,6 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
             clientApproval.setStatus(ClientApproval.Status.PENDING);
             clientApproval.setApproved(false);
             getClientApprovalStore().save(clientApproval);
-            //     sayi("no approval record exists.");
-
         }
 
         if (clientApproval.isApproved() && clientApproval.getStatus() != APPROVED) {

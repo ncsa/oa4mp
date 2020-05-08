@@ -105,10 +105,16 @@ public abstract class StoreCommands2 extends StoreCommands {
         // Use the order of the tmap (so its sorted) but the XMLMap has information we need to get these.
         for (String key : tMap.keySet()) {
             String v = map.getString(key);
-            // Suppress null entries. Record empty ones.
-            if (!StringUtils.isTrivial(v)) {
+            if(!StringUtils.isTrivial(v)) {
+                try {
+                    JSON json = JSONSerializer.toJSON(v);
+                    v = json.toString(1);
+                } catch (Throwable t) {
+
+                }
                 say(formatLongLine(key, v, width, isVerbose));
             }
+
         }
         return width;
     }
@@ -127,14 +133,17 @@ public abstract class StoreCommands2 extends StoreCommands {
     protected String formatLongLine(String leftSide, String rightSide, int leftColumWidth, boolean isVerbose) {
         int dd = indentWidth() + 3; // the default indent plus the " : " in the middle
         int realWidth = display_width - dd;
-        if (rightSide.length() + leftColumWidth + 1 <= realWidth) {
+        boolean shortLine = rightSide.length() + leftColumWidth + 1 <= realWidth;
+/*        if (rightSide.length() + leftColumWidth + 1 <= realWidth) {
             return RJustify(leftSide, leftColumWidth) + " : " + rightSide;
-        }
+        }*/
         if (isVerbose) {
 
             List<String> flowedtext = StringUtils.wrap(0, StringUtils.toList(rightSide), realWidth - leftColumWidth);
+
+
             StringBuffer stringBuffer = new StringBuffer();
-            stringBuffer.append(RJustify(leftSide, leftColumWidth) + " : " + flowedtext.get(0) + "\n");
+            stringBuffer.append(RJustify(leftSide, leftColumWidth) + " : " + flowedtext.get(0) + ((flowedtext.size() <= 1 && shortLine)?"":"\n"));
             boolean isFirstLine = true;
             for (int i = 1; i < flowedtext.size(); i++) {
                 if (isFirstLine) {
@@ -809,7 +818,7 @@ public abstract class StoreCommands2 extends StoreCommands {
                 say(formatLongLine(key, v, leftWidth, isVerbose));
             }
         }
- }
+    }
 
     protected void showEntry(Identifiable identifiable, String key, boolean isVerbose) {
         if (hasKey(key)) {
