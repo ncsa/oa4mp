@@ -76,10 +76,26 @@ and ids, to be generated on the server.
   "comment":"This is a the minimal request object required for creation: a set of URIs and a name"
 }
 
-A few things to note about the response. We do NOT return the secret since, once more, we only store a hash of try {
+A few things to note about the response. We do NOT return the secret since, once more, we only store a hash of
 and do not have it. Also, the first example did not specify any scopes and (since this request is to an OIDC server)
 only the openid scope is issued. If the OA4MP server is not configured to be OIDC compliant, no scopes will be returned.
 Finally, the comment (and any other unknown parameters) in the request are ignored, but preserved and returned.
+
+************************************************************
+Comment on uploading cfg elements and extra attributes.
+************************************************************
+If you upload any attributes that are not known to the spec, they will be put in an attribute we manage named "cfg".
+If you are uploading a client configuration to do LDAP queries or what not, then that goes in the "cfg"
+attribute. There is an example of this in the supplied create-extra.json file. This specifies the "cfg"
+element and there are two extra attributes as well,  "extra_attribute1" and  "extra_attribute2".
+
+Note that if you create a client using this example, the cfg is returned with  "extra_attribute1" and  "extra_attribute2"
+included in it. Generally, just put everything in the "cfg" attribute.
+
+A final caveat about sending "cfg" (or for that matter anything) is that as per the spec, missing attributes
+in the PUT will delete the attributes on the server (!) Be sure you send everything, expecially the "cfg".
+When in doubt, it never hurt to go a GET and use twiddle that.
+
 
 **A PUT example -- updating a client
 
@@ -88,8 +104,7 @@ There is a minimal example JSON object to demonstrate this called update.json
 >export REGISTRATION_URI="https://..."
 >./cm-put.sh update.json
 
-Not there is no response. If you issue another GET you would see the following, showing that the name and redirect uri list
-have been updated:
+The response is identical to issuing a GET:
 
 {
  "registration_client_uri":"https://dev.cilogon.org/oauth2/oidc-cm?client_id=oa4mp:/client_id/3da958ee9bf53cf4183302c890f4f517",
@@ -100,6 +115,17 @@ have been updated:
  "scope":["openid"],
  "client_id_issued_at":1571350405
 }
+
+****************************************
+A comment on secrets, old and new
+****************************************
+If the update contains the client secret, then, as per the spec,  it will be verified and
+if it does not match what is on the server, the request will be
+rejected. If you do not send a secret, then no heck is made.
+
+If you lose the secret there is no way to really issue a new one except to re-register the client. In
+that case you will get an entirely new id for this client.
+
 
 **A DELETE example -- removing a client
 

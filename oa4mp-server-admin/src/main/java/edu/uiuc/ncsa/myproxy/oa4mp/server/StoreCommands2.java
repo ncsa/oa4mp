@@ -134,13 +134,9 @@ public abstract class StoreCommands2 extends StoreCommands {
         int dd = indentWidth() + 3; // the default indent plus the " : " in the middle
         int realWidth = display_width - dd;
         boolean shortLine = rightSide.length() + leftColumWidth + 1 <= realWidth;
-/*        if (rightSide.length() + leftColumWidth + 1 <= realWidth) {
-            return RJustify(leftSide, leftColumWidth) + " : " + rightSide;
-        }*/
         if (isVerbose) {
 
             List<String> flowedtext = StringUtils.wrap(0, StringUtils.toList(rightSide), realWidth - leftColumWidth);
-
 
             StringBuffer stringBuffer = new StringBuffer();
             stringBuffer.append(RJustify(leftSide, leftColumWidth) + " : " + flowedtext.get(0) + ((flowedtext.size() <= 1 && shortLine)?"":"\n"));
@@ -156,7 +152,7 @@ public abstract class StoreCommands2 extends StoreCommands {
             return stringBuffer.toString();
 
         }
-        return RJustify(leftSide, leftColumWidth) + " : " + truncate(rightSide);
+        return RJustify(leftSide, leftColumWidth) + " : " + truncate(rightSide.replace("\n","").replace("\r",""));
     }
 
     @Override

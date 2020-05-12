@@ -78,9 +78,10 @@ public class ManagerFacade {
 
     protected Response process(AdminClient adminClient, JSONObject rawJSON) {
         checkAdminClientSecret(adminClient);
-        // up to this point, the admin client is just an id + the secret that was passed in
-        // it is empty. Now we replace it with the real one:
         // CIL-698 fix:
+        // Up to this point, the admin client is just an id + the secret that was passed in
+        // So we could check the credentials. If it gets to here, it is valid.
+        // Since the passed in adminClient is otherwise empty, we now we replace it with the real one:
         adminClient = getSE().getAdminClientStore().get(adminClient.getIdentifier());
         switch (getTargetValue(rawJSON)) {
             case TARGET_ADMIN_VALUE:

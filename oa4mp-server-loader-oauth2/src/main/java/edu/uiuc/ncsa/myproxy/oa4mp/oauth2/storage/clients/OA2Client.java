@@ -1,15 +1,19 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients;
 
 import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.delegation.storage.BaseClient;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
+import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.server.OA2ClientScopes;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
-import edu.uiuc.ncsa.security.oauth_2_0.server.scripts.ClientJSONConfigUtil;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
 
 import static edu.uiuc.ncsa.security.core.util.BeanUtils.checkEquals;
 
@@ -121,7 +125,31 @@ public class OA2Client extends Client implements OA2ClientScopes {
     }
 
     Collection<LDAPConfiguration> ldaps;
-    String extendedAttributesKey = "extendedAttributesEnabled";
+    String extendedAttributesEnabledKey = "extendedAttributesEnabled";
+    public String EXTENDED_ATTRIBUTES = "extended_attributes";
+    protected String xoauth_attributes = "xoauth_attributes";
+    protected String oa4mp_attributes = "oa4mp_attributes";
+
+    protected JSONObject getNamedAttributes(String name) {
+        if (getExtendedAttributes().containsKey(name)) {
+            return getExtendedAttributes().getJSONObject(name);
+        }
+        JSONObject jsonObject = new JSONObject();
+        getExtendedAttributes().put(name, jsonObject);
+        return getExtendedAttributes().getJSONObject(name); // Because the JSON library copies the values, it does not pass by reference!
+    }
+
+    protected void setNamedAttributes(String name, JSONObject jsonObject) {
+        getExtendedAttributes().put(name, jsonObject);
+    }
+
+    protected JSONObject getOA4MPAttributes() {
+        return getNamedAttributes(oa4mp_attributes);
+    }
+
+    protected JSONObject getXOAuthExtendedAttributes() {
+        return getNamedAttributes(xoauth_attributes);
+    }
 
     /**
      * Extended attributes refers to allowing the client pass in NS qualified additional parameters
@@ -137,18 +165,65 @@ public class OA2Client extends Client implements OA2ClientScopes {
      *       ... other stuff.
      *     }
      * </pre>
+     *
      * @return
      */
-    public boolean hasExtendedAttributeSupport(){
-        if(!hasConfig()) return false; // default
-        return ClientJSONConfigUtil.getExtendedAttributes(getConfig()).containsKey(extendedAttributesKey);
-    }
-    public void setExtendedAttributeSupport(boolean b){
-        if(!hasConfig()){
-            JSONObject cfg = new JSONObject();
-            setConfig(cfg);
+    public boolean hasExtendedAttributeSupport() {
+        Boolean b = (Boolean) getNamedProperty(oa4mp_attributes, extendedAttributesEnabledKey);
+        if (b == null) {
+            return false;
         }
-         ClientJSONConfigUtil.getExtendedAttributes(getConfig()).put(extendedAttributesKey, b);
+        return b;
+    }
+
+    public void setExtendedAttributeSupport(boolean b) {
+        setNamedProperty(oa4mp_attributes, extendedAttributesEnabledKey, b);
+    }
+
+    protected Object getNamedProperty(String component, String key) {
+        if (getNamedAttributes(component).containsKey(key)) {
+            return getNamedAttributes(component).get(key);
+        }
+        return null;
+    }
+
+    protected void setNamedProperty(String component, String key, Object property) {
+        getNamedAttributes(component).put(key, property);  // warning the JSON library we use copies objects rather than setting them.
+    }
+
+    protected List<String> getNamedList(String component, String key) {
+        if (getNamedAttributes(component).containsKey(key)) {
+            return getNamedAttributes(component).getJSONArray(key);
+        }
+        return new JSONArray();
+
+    }
+
+    protected void setNamedList(String component, String key, List<String> list) {
+        JSONArray ja = null;
+        if (list instanceof JSONArray) {
+            ja = (JSONArray) list;
+        } else {
+            ja = new JSONArray();
+            ja.addAll(list);
+        }
+        getNamedAttributes(component).put(key, ja);
+    }
+
+    public List<String> getGrantTypes() {
+        return getNamedList(xoauth_attributes, OA2Constants.GRANT_TYPE);
+    }
+
+    public void setGrantTypes(List<String> grantTypes) {
+        setNamedList(xoauth_attributes, OA2Constants.GRANT_TYPE, grantTypes);
+    }
+
+    public List<String> getResponseTypes() {
+        return getNamedList(xoauth_attributes, OA2Constants.RESPONSE_TYPE);
+    }
+
+    public void setResponseTypes(List<String> responseTypes) {
+        setNamedList(xoauth_attributes, OA2Constants.RESPONSE_TYPE, responseTypes);
     }
 
     /**
@@ -167,7 +242,7 @@ public class OA2Client extends Client implements OA2ClientScopes {
      * }
      * </pre>
      * <p>
-     *     See the {@link edu.uiuc.ncsa.security.oauth_2_0.server.scripts.ClientJSONConfigUtil}
+     * See the {@link edu.uiuc.ncsa.security.oauth_2_0.server.scripts.ClientJSONConfigUtil}
      * JSON may be either a single JSON object or an array of them. If a single, it is
      * converted to an array of a single object before processing.
      * <p>
@@ -201,6 +276,45 @@ public class OA2Client extends Client implements OA2ClientScopes {
     }
 
     protected JSONObject config;
+
+    /**
+     * Extended attributes base call. The {@link #getConfig()} gets user-facing configuration, like scripts
+     * and maybe other things not related to OAuth. Extended attributes  are for
+     * core configuration such as more grant types
+     * and such that come from specifications and are generally not open to change. The reason for this is
+     * simple: as OA4MP evolves, more and more attributes must be managed and rather than keep adding more
+     * database columns (and also have to update other store types too, with all the management that implies),
+     * just have a central place
+     * and leave all logic for them otherwise in software.   Setters and getters are added to this class which
+     * store their information in a JSON blob.
+     * <h2>Structure</h2>
+     * The structure is a flat list of attributes as:
+     * <pre>
+     *     {
+     *      "xoauth_attributes":{"grant_type":[....},  <-- attributes for OAuth
+     *      "oa4mp_attributes":{"foo":"bar",...}       <-- attributes relating to OA4MP
+     *     ... etc
+     *     }
+     * </pre>
+     *
+     * @return
+     */
+    protected JSONObject getExtendedAttributes() {
+        if (extended_attributes == null) {
+            extended_attributes = new JSONObject();
+        }
+        return extended_attributes;
+    }
+
+    protected void setExtendedAttributes(JSONObject eas) {
+        this.extended_attributes = eas;
+    }
+
+    protected JSONObject extended_attributes;
+
+    protected boolean hasExtendedAttributes() {
+        return extended_attributes != null;
+    }
 
     @Override
     public String toString() {
@@ -241,6 +355,19 @@ public class OA2Client extends Client implements OA2ClientScopes {
         return super.equals(obj);
     }
 
+    public static void main(String[] args) {
+        OA2Client client = new OA2Client(BasicIdentifier.randomID()); // just need one
+        client.setExtendedAttributeSupport(true);
+        List<String> gt = new ArrayList<>();
+        gt.add("gt_foo");
+        gt.add("gt_bar");
+        client.setGrantTypes(gt);
+        List<String> rst = new ArrayList<>();
+        rst.add("rst_1");
+        rst.add("rst_2");
+        client.setResponseTypes(rst);
+        System.out.println(client.getExtendedAttributes().toString(2));
+    }
 
 }
 

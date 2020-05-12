@@ -1,0 +1,41 @@
+{
+  "client_name": "OA4MP extra attributes test - update",
+  "client_id":"oa4mp:/client_id/37ca7791fc3d870c2b3fed059178ab32",
+  "redirect_uris": [
+    "http://localhost/callback",
+    "https://localhost/callback2"
+  ],
+  "grant_types": [
+    "authorization_code",
+    "refresh_token"
+  ],
+  "scope": [
+    "openid",
+    "email",
+    "profile"
+  ],
+  "contacts": ["bob.smith@bigstate.edu"],
+  "cfg": {
+    "qdl": [
+      "a",
+      "b"
+    ],
+    "claims": {
+      "sourceConfig": {
+        "foo": "bar1"
+      },
+      "postProcessor": {
+        "fnord": "postP2"
+      },
+      "preProcessor": {
+        "fnord2": "preP3"
+      }
+    },
+    "comment": [
+      "This is an example to show how to send extra attributes, here the cfg parameter.",
+      "Note that this will generate another secret since none is supplied."],
+    "extra_attribute1": "some extra attribute"
+  },
+  "extra_attribute2": "my totally cool secret thingie",
+  "extra_attribute3": "My third attribute"
+}

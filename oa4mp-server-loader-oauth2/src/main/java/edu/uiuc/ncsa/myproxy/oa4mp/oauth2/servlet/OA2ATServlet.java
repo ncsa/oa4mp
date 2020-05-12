@@ -13,6 +13,7 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.*;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.server.request.IssuerResponse;
 import edu.uiuc.ncsa.security.delegation.servlet.TransactionState;
@@ -44,6 +45,7 @@ import java.util.Map;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.TokenExchangeConstants.TOKEN_EXCHANGE_GRANT_TYPE;
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.CLIENT_SECRET;
+import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.GRANT_TYPE;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -171,6 +173,16 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
 
     protected IssuerTransactionState doAT(HttpServletRequest request, HttpServletResponse response, OA2Client client) throws Throwable {
         verifyClientSecret(client, getClientSecret(request));
+        String grant_type = request.getParameter(GRANT_TYPE);
+        // Note that at this point we only support authorization_code[+ refresh_token] as our only grant_types
+        // If we include the implicit flow in the future, we must retool this section with the logic for that.
+        // Mostly this will include the fact that we implicitly assume that no set grant types for the
+        // client means authorization_code.
+        ServletDebugUtil.info(this, "grant type = " + request.getParameter(GRANT_TYPE));
+        if(StringUtils.isTrivial(grant_type) || grant_type.equals(OA2Constants.AUTHORIZATION_CODE)){
+            throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,"missing or invalid grant_type", HttpStatus.SC_BAD_REQUEST);
+        }
+        // OAuth 2. spec., section 4.1.3 states that the grant type must be included and it must be code.
         IssuerTransactionState state = doDelegation(client, request, response);
         ATIResponse2 atResponse = (ATIResponse2) state.getIssuerResponse();
         atResponse.setSignToken(client.isSignTokens());

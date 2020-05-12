@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients;
 
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.delegation.storage.impl.ClientConverter;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfigurationUtil;
@@ -73,6 +74,12 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
 
             }
         }
+        if (map.containsKey(getCK2().ea())) {
+            String rawCfg = map.getString(getCK2().ea());
+            if (!StringUtils.isTrivial(rawCfg)) {
+                otherV.setExtendedAttributes(JSONObject.fromObject(rawCfg));
+            }
+        }
         JSONObject cfg = null;
         if (map.containsKey(getCK2().cfg())) {
             String rawCfg = map.getString(getCK2().cfg());
@@ -81,13 +88,14 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
             }
             //otherV.setConfig(JSONObject.fromObject(map.getString(getCK2().cfg())));
         }
+
         if (ldap == null || ldap.isEmpty()) {
             // nix to do. Set the configuration object if it exists
             if (cfg == null) {
                 // so by this point, no configuration has been found either.
                 cfg = new JSONObject();
             }
-   //         OA2ClientFunctorScriptsUtil.setSaved(cfg, true);
+            //         OA2ClientFunctorScriptsUtil.setSaved(cfg, true);
 
 
         } else {
@@ -174,6 +182,9 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         if (client.getConfig() != null && !client.getConfig().isEmpty()) {
             map.put(getCK2().cfg(), client.getConfig().toString()); // make it pretty at least...
         }
+        if (client.getExtendedAttributes() != null && !client.getExtendedAttributes().isEmpty()) {
+            map.put(getCK2().ea(), client.getExtendedAttributes().toString());
+        }
     }
 
     @Override
@@ -204,6 +215,7 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         if (config != null) {
             v.setConfig(config);
         }
+         v.setExtendedAttributes(json.getJSONObject(getCK2().ea()));
 
         return v;
     }
@@ -243,6 +255,10 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
 
         if (client.getLdaps() != null && !client.getLdaps().isEmpty()) {
             getJsonUtil().setJSONValue(json, getCK2().ldap(), getLdapConfigurationUtil().toJSON(client.getLdaps()));
+        }
+        
+        if(client.getExtendedAttributes() != null && !client.getExtendedAttributes().isEmpty()){
+            getJsonUtil().setJSONValue(json, getCK2().ea(), client.getExtendedAttributes());
         }
 
     }

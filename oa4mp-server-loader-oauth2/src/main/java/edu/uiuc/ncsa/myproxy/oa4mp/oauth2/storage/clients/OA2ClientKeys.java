@@ -20,7 +20,9 @@ public class OA2ClientKeys extends ClientKeys {
     String rtLifetime = "rt_lifetime";
     String scopes = "scopes";
     String ldap = "ldap";
+
     String config = "cfg";
+    String extended_attributes = "extended_attributes";
     String signTokens="sign_tokens";
     String publicClient="public_client";
 
@@ -28,6 +30,11 @@ public class OA2ClientKeys extends ClientKeys {
          if (0 < x.length) issuer= x[0];
          return issuer;
      }
+
+    public String ea(String... x) {
+        if (0 < x.length) extended_attributes = x[0];
+        return extended_attributes;
+    }
 
     public String publicClient(String... x) {
         if (0 < x.length) publicClient= x[0];

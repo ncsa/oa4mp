@@ -141,6 +141,10 @@ public class OA2AuthorizedServletUtil {
                     httpServletRequest.getParameter(OA2Constants.STATE),
                     callback);
         }
+
+        if(!httpServletRequest.getParameter(RESPONSE_TYPE).equals(RESPONSE_TYPE_CODE)){
+            throw new OA2GeneralError(OA2Errors.UNSUPPORTED_RESPONSE_TYPE, "unsupported reponse type", HttpStatus.SC_BAD_REQUEST);
+        }
         OA2ServiceTransaction t = CheckIdTokenHint(httpServletRequest, httpServletResponse, callback);
         if (t != null) {
             return t;

@@ -62,7 +62,8 @@ create table :oa4mpSchema.:oa4mpClientTable  (
     scopes              text,
     public_client       boolean,
     sign_tokens         boolean,
-    cfg                 text);
+    cfg                 text,
+    extended_attributes text);
 
 create table :oa4mpSchema.:oa4mpPermissionsTable  (
  permission_id text PRIMARY KEY,

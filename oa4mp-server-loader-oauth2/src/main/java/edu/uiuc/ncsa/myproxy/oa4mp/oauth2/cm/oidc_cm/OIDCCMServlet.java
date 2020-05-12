@@ -39,6 +39,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.oidc_cm.OIDCCMConstants.CLIENT_ID;
+import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.oidc_cm.OIDCCMConstants.CLIENT_SECRET;
+
 /**
  * Note that in all of these calls, the assumption is that an admin client has been requested and
  * approved out of band. The identifier and secret of that are used to make the bearer token that
@@ -93,7 +96,17 @@ public class OIDCCMServlet extends EnvServlet {
                         "no such client",
                         HttpStatus.SC_BAD_REQUEST);
             }
+            // One major different is that we have an email that we store and this has to be
+            // converted to a contacts array or we run the risk of inadvertantly losing this.
+
             JSONObject json = toJSONObject(client);
+            OA2ClientKeys clientKeys = (OA2ClientKeys) getOA2SE().getClientStore().getMapConverter().getKeys();
+            if (json.containsKey(clientKeys.email())) {
+                JSONArray jsonArray = new JSONArray();
+                jsonArray.add(json.get(clientKeys.email()));
+                json.remove(clientKeys.email());
+                json.put(OIDCCMConstants.CONTACTS, jsonArray);
+            }
             writeOK(httpServletResponse, json); //send it back with an ok.
         } catch (Throwable t) {
             handleException(t, httpServletRequest, httpServletResponse);
@@ -252,7 +265,7 @@ public class OIDCCMServlet extends EnvServlet {
                 // the only thing that we are concerned with is is client is attempting to increase their
                 // scopes. The are permitted to reduce them.
                 boolean rejectRequest = false;
-                JSONArray newScopes = toJA(jsonRequest,OA2Constants.SCOPE);
+                JSONArray newScopes = toJA(jsonRequest, OA2Constants.SCOPE);
                 Collection<String> oldScopes = client.getScopes();
                 if (oldScopes.size() < newScopes.size()) {
                     rejectRequest = true;
@@ -276,12 +289,30 @@ public class OIDCCMServlet extends EnvServlet {
             // so we create a new client, set the secret and id, then update that. This way if
             // this fails we can just back out.
             OA2Client newClient = (OA2Client) getOA2SE().getClientStore().create();
+            boolean generateNewSecret = false;
+            if(jsonRequest.containsKey(CLIENT_SECRET)){
+                // then we have to check this is a valid client. If this is missing, then
+                // we are being requested to generate a new secret.
+                String hashedSecret = DigestUtils.sha1Hex(jsonRequest.getString(CLIENT_SECRET));
+                if(!hashedSecret.equals(client.getSecret())){
+                    throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, "client id does not match", HttpStatus.SC_FORBIDDEN);
+                }
+                newClient.setSecret(client.getSecret());  // it matches, send it along.
+            }else{
+                generateNewSecret = true;
+                newClient.setSecret("");
+            }
+            // Make sure these are missing so we don't get them stashed someplace.
+            jsonRequest.remove(CLIENT_SECRET);
+            jsonRequest.remove(CLIENT_ID);
+
             newClient.setIdentifier(client.getIdentifier());
-            newClient.setSecret(client.getSecret());
             newClient.setConfig(client.getConfig());
             try {
-                newClient = updateClient(newClient, jsonRequest, resp);
+                newClient = updateClient(newClient,generateNewSecret,  jsonRequest, resp);
+
                 getOA2SE().getClientStore().save(newClient);
+           //     writeOK(resp, resp);
 
             } catch (Throwable t) {
                 // back out of it
@@ -381,18 +412,19 @@ public class OIDCCMServlet extends EnvServlet {
             throw new IllegalArgumentException("Error: incorrect argument. Not a valid JSON request");
         }
         OA2Client client = processRegistrationRequest((JSONObject) rawJSON, httpServletResponse);
-        JSONObject resp = new JSONObject(); // The response object.
-        resp.put(OIDCCMConstants.client_id, client.getIdentifierString());
-        resp.put(OIDCCMConstants.CLIENT_SECRET, client.getSecret());
+        JSONObject jsonResp = new JSONObject(); // The response object.
+        jsonResp.put(CLIENT_ID, client.getIdentifierString());
+        jsonResp.put(CLIENT_SECRET, client.getSecret());
+        String hashedSecret = DigestUtils.sha1Hex(client.getSecret());
         // Now make a hash of the secret and store it.
-        resp.put(OIDCCMConstants.CLIENT_ID_ISSUED_AT, client.getCreationTS().getTime() / 1000);
+        jsonResp.put(OIDCCMConstants.CLIENT_ID_ISSUED_AT, client.getCreationTS().getTime() / 1000);
         String secret = DigestUtils.sha1Hex(client.getSecret());
         client.setSecret(secret);
-        resp.put(OIDCCMConstants.CLIENT_SECRET_EXPIRES_AT, 0L);
+        jsonResp.put(OIDCCMConstants.CLIENT_SECRET_EXPIRES_AT, 0L);
         String registrationURI = getOA2SE().getCmConfigs().getRFC7591Config().uri.toString();
         // Next, we have to construct the registration URI by adding in the client ID.
         // Spec says we can add parameters here, but not elsewhere.
-        resp.put(OIDCCMConstants.REGISTRATION_CLIENT_URI, registrationURI + "?" + OA2Constants.CLIENT_ID + "=" + client.getIdentifierString());
+        jsonResp.put(OIDCCMConstants.REGISTRATION_CLIENT_URI, registrationURI + "?" + OA2Constants.CLIENT_ID + "=" + client.getIdentifierString());
 
         getOA2SE().getClientStore().save(client);
 
@@ -408,7 +440,7 @@ public class OIDCCMServlet extends EnvServlet {
         approval.setStatus(ClientApproval.Status.APPROVED);
         getOA2SE().getClientApprovalStore().save(approval);
 
-        writeOK(httpServletResponse, resp);
+        writeOK(httpServletResponse, jsonResp);
     }
 
     private void writeOK(HttpServletResponse httpServletResponse, JSONObject resp) throws IOException {
@@ -451,7 +483,10 @@ public class OIDCCMServlet extends EnvServlet {
         return (OA2Client) getOA2SE().getClientStore().get(BasicIdentifier.newID(rawID));
     }
 
-    protected OA2Client updateClient(OA2Client client, JSONObject jsonRequest, HttpServletResponse httpResponse) {
+    protected OA2Client updateClient(OA2Client client,
+                                     boolean generateNewSecret,
+                                     JSONObject jsonRequest,
+                                     HttpServletResponse httpResponse) {
         OA2ClientKeys keys = new OA2ClientKeys();
 
         /*
@@ -471,9 +506,10 @@ public class OIDCCMServlet extends EnvServlet {
 
         jsonRequest.remove(OIDCCMConstants.APPLICATION_TYPE);
         if (jsonRequest.containsKey(OIDCCMConstants.GRANT_TYPES)) {
-            // no grant type implies only authorization_code, not refresh_token. This is because the spec. allows for
+            // no grant type implies only authorization_code (as per RFC 7591, section2),
+            // not refresh_token. This is because the spec. allows for
             // implicit grants (which we do not) which forbid refresh_tokens.
-            JSONArray grantTypes = toJA(jsonRequest,OIDCCMConstants.GRANT_TYPES);
+            JSONArray grantTypes = toJA(jsonRequest, OIDCCMConstants.GRANT_TYPES);
             // If the refresh token is requested, then the rtLifetime may be specified. if not, use server default.
             if (grantTypes.contains(OA2Constants.REFRESH_TOKEN)) {
                 if (jsonRequest.containsKey(keys.rtLifetime())) {
@@ -524,18 +560,13 @@ public class OIDCCMServlet extends EnvServlet {
             client.setScopes(toJA(jsonRequest, OA2Constants.SCOPE));
         }
         jsonRequest.remove(OA2Constants.SCOPE);
-        byte[] bytes = new byte[getOA2SE().getClientSecretLength()];
-        random.nextBytes(bytes);
-        String secret64 = Base64.encodeBase64URLSafeString(bytes);
-        // we have to return this to the client registration ok page and store a hash of it internally
-        // so we don't have a copy of it any place but the client.
-        // After this is displayed the secret is actually hashed and stored.
-        client.setSecret(secret64);
-        JSONObject config = client.getConfig();
-        if (config == null) {
-            // Just in case there is no config.
-            config = new JSONObject();
+        if(generateNewSecret) {
+            byte[] bytes = new byte[getOA2SE().getClientSecretLength()];
+            random.nextBytes(bytes);
+            String secret64 = Base64.encodeBase64URLSafeString(bytes);
+            client.setSecret(secret64);
         }
+
         if (jsonRequest.containsKey(OIDCCMConstants.CONTACTS)) {
             // This is a set of strings thjat are typically email addresses.
             // Todo: Really check these and allow for multiple values
@@ -547,6 +578,7 @@ public class OIDCCMServlet extends EnvServlet {
             }
             jsonRequest.remove(OIDCCMConstants.CONTACTS);
         }
+        //CIL-703
         if (jsonRequest.containsKey("cfg")) {
             JSONObject jsonObject = jsonRequest.getJSONObject("cfg");
             jsonRequest.remove("cfg");
@@ -582,7 +614,7 @@ public class OIDCCMServlet extends EnvServlet {
 
     protected OA2Client processRegistrationRequest(JSONObject jsonRequest, HttpServletResponse httpResponse) {
         OA2Client client = (OA2Client) getOA2SE().getClientStore().create();
-        return updateClient(client, jsonRequest, httpResponse);
+        return updateClient(client, true, jsonRequest, httpResponse);
     }
 
     SecureRandom random = new SecureRandom();

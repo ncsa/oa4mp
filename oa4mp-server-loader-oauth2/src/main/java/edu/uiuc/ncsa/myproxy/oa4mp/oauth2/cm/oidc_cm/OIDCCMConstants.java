@@ -10,7 +10,11 @@ public interface OIDCCMConstants {
      */
     public static final String REDIRECT_URIS = "redirect_uris";
     /**
-     * <b>OPTIONAL</b>. JSON array containing a list of the OAuth 2.0 response_type values that the Client is declaring that it will restrict itself to using. If omitted, the default is that the Client will use only the code Response Type.
+     * <b>OPTIONAL</b>. JSON array containing a list of the OAuth 2.0 response_type values that the
+     * Client is declaring that it will restrict itself to using. If omitted, the default is that the Client
+     * will use only the code Response Type.
+     * <br/><br/>
+     * See also <a href="https://tools.ietf.org/html/rfc7591#section-2.1">the spec</a>.
      */
     public static final String RESPONSE_TYPES = "response_types";
     /**
@@ -21,43 +25,98 @@ public interface OIDCCMConstants {
      * <li><b>refresh_token</b>: The Refresh Token Grant Type described in OAuth 2.0 Section 6.</li>
      * </ul>
      * <p>
-     * The following table lists the correspondence between response_type values that the Client will use and grant_type values that MUST be included in the registered grant_types list:
+     * Refresh token  only modifies the behavior of authorization_code.
+     * It has no meaning by itself.
+     * </p>
      * <p>
-     *
+     * The following table encapsulates this <a href="https://medium.com/@darutk/diagrams-of-all-the-openid-connect-flows-6968e3990660">summary</a>
+     * for the correspondence between response_type values that the client will
+     * use and grant_type values that MUST be included in the registered grant_types list:
+     * <p>
      *
      * <table style="width:100%">
      * <tr>
      * <th>response_type</th>
      * <th>grant_type</th>
+     * <th>end point</th>
+     * <th>Note</th>
      * </tr>
      * <tr>
      * <td>code</td>
      * <td>authorization_code</td>
+     * <td>authz, token</td>
+     * <td>openid scope present = issue id token. Otherwise, no id token</td>
+     * </tr>
+     * <tr>
+     * <td>token</td>
+     * <td>implicit</td>
+     * <td>authz only</td>
+     * <td>only access token issued, never id token.</td>
      * </tr>
      * <tr>
      * <td>id_token</td>
      * <td>implicit</td>
+     * <td>authz only</td>
+     * <td>issue an id token.</td>
      * </tr>
      * <tr>
      * <td>token  id_token</td>
      * <td>implicit</td>
+     * <td>authz only</td>
+     * <td>both an access token and an id token are issued. <b>NOTE</b>
+     * this also means the <a href="http://openid.net/specs/openid-connect-core-1_0.html#ImplicitIDToken">at_hash</a> must be
+     * calculated and embedded in the id token!</td>
      * </tr>
      * <tr>
      * <td>code  id_token</td>
      * <td>authorization_code, implicit</td>
+     * <td>authz, token</td>
+     * <td>Both an access token and an id token are issued rom the token endpoint. The authz endpoint issues an id token
+     * as well and these two id tokens <a href="http://openid.net/specs/openid-connect-core-1_0.html#HybridIDToken2">are not the same!</a>
+     * In particular, the id token from the authz endpoint has a <a href="http://openid.net/specs/openid-connect-core-1_0.html#HybridIDToken">hash of the code</a>
+     * vs. a hash of the access token when issued from the token endpoint. </td>
      * </tr>
      * <tr>
      * <td>code  token</td>
      * <td>authorization_code, implicit</td>
+     * <td>authz, token</td>
+     * <td>Each endpoint returns an access token. The one from the authz endpoint is bound by
+     * <a href="http://openid.net/specs/openid-connect-core-1_0.html#HybridAccessToken2">this requirement</a>.
+     * Additionally, only if the scope is openid  does the token endpoint return an id_token.</td>
      * </tr>
      * <tr>
      * <td>code token id_token</td>
      * <td>authorization_code, implicit</td>
+     * <td>authz, token</td>
+     * <td>access tokens issued from both endpoints, as are id tokens. As expected, hashes of the respective token or code
+     * are embedded as per <a href="http://openid.net/specs/openid-connect-core-1_0.html#HybridAccessToken2">access tokens</a>
+     * and <a href="http://openid.net/specs/openid-connect-core-1_0.html#HybridIDToken">id tokens</a>.</td>
      * </tr>
-     *
+     * <tr>
+     * <td>none</td>
+     * <td>authorization_code, implicit</td>
+     * <td>authz only</td>
+     * <td>Nothing is returned. This basically just returns a succesful response if the user could log in, but nothing else.</td>
+     * </tr>
      * </table>
      * <p>
      * If omitted, the default is that the Client will use only the authorization_code Grant Type.
+     * <br/>
+     * See <a href="https://tools.ietf.org/html/rfc7591#section-2.1">the spec</a>.
+     * <pre>
+     * +-----------------------------------------------+-------------------+
+     * | grant_types value includes:                   | response_types    |
+     * |                                               | value includes:   |
+     * +-----------------------------------------------+-------------------+
+     * | authorization_code                            | code              |
+     * | implicit                                      | token             |
+     * | password                                      | (none)            |
+     * | client_credentials                            | (none)            |
+     * | refresh_token                                 | (none)            |
+     * | urn:ietf:params:oauth:grant-type:jwt-bearer   | (none)            |
+     * | urn:ietf:params:oauth:grant-type:saml2-bearer | (none)            |
+     * +-----------------------------------------------+-------------------+
+     * </pre>
      *
      * </p>
      */
@@ -284,34 +343,34 @@ public interface OIDCCMConstants {
      * <b>REQUIRED</b>. Unique Client Identifier. It MUST NOT be currently valid for any other registered Client.
      */
 
-    public static final String client_id = "client_id";
+    public static final String CLIENT_ID = "client_id";
     /**
-     * <b>OPTIONAL</b>. Client Secret. The same Client Secret value MUST NOT be assigned to multiple Clients. This value is 
-     * used by Confidential Clients to authenticate to the Token Endpoint, as described in Section 2.3.1 of OAuth 2.0, 
-     * and for the derivation of symmetric encryption key values, as described in Section 10.2 of 
-     * OpenID Connect Core 1.0 [OpenID.Core]. It is not needed for Clients selecting a token_endpoint_auth_method of 
+     * <b>OPTIONAL</b>. Client Secret. The same Client Secret value MUST NOT be assigned to multiple Clients. This value is
+     * used by Confidential Clients to authenticate to the Token Endpoint, as described in Section 2.3.1 of OAuth 2.0,
+     * and for the derivation of symmetric encryption key values, as described in Section 10.2 of
+     * OpenID Connect Core 1.0 [OpenID.Core]. It is not needed for Clients selecting a token_endpoint_auth_method of
      * private_key_jwt unless symmetric encryption will be used.
      */
     public static final String CLIENT_SECRET = "client_secret";
     /**
-     * <b>OPTIONAL</b>. Registration Access Token that can be used at the Client Configuration Endpoint to perform subsequent 
+     * <b>OPTIONAL</b>. Registration Access Token that can be used at the Client Configuration Endpoint to perform subsequent
      * operations upon the Client registration.
      */
     public static final String REGISTRATION_ACCESS_TOKEN = "registration_access_token";
     /**
-     * <b>OPTIONAL</b>. Location of the Client Configuration Endpoint where the Registration Access Token can be used to 
-     * perform subsequent operations upon the resulting Client registration. Implementations MUST either return both 
+     * <b>OPTIONAL</b>. Location of the Client Configuration Endpoint where the Registration Access Token can be used to
+     * perform subsequent operations upon the resulting Client registration. Implementations MUST either return both
      * a Client Configuration Endpoint and a Registration Access Token or neither of them.
      */
     public static final String REGISTRATION_CLIENT_URI = "registration_client_uri";
     /**
-     * <b>OPTIONAL</b>. Time at which the Client Identifier was issued. Its value is a JSON number representing the number 
+     * <b>OPTIONAL</b>. Time at which the Client Identifier was issued. Its value is a JSON number representing the number
      * of seconds from 1970-01-01T0:0:0Z as measured in UTC until the date/time.
      */
     public static final String CLIENT_ID_ISSUED_AT = "client_id_issued_at";
     /**
-     * <b>REQUIRED</b> if client_secret is issued. Time at which the client_secret will expire or 0 if it will not expire. 
-     * Its value is a JSON number representing the number of seconds from 1970-01-01T0:0:0Z as measured 
+     * <b>REQUIRED</b> if client_secret is issued. Time at which the client_secret will expire or 0 if it will not expire.
+     * Its value is a JSON number representing the number of seconds from 1970-01-01T0:0:0Z as measured
      * in UTC until the date/time.
      */
     public static final String CLIENT_SECRET_EXPIRES_AT = "client_secret_expires_at";

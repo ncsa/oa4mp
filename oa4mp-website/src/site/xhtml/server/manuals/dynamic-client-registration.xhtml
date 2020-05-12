@@ -18,27 +18,48 @@
     read the section on
     <a href="administrative-clients.html">administrative clients </a>.
 </p>
+<p><b>Note:</b> When we refer to a client we mean an OAuth 2 client and otherwise any other will be qualified such
+    as "admin client".</p>
 
 <h2>How's it work?</h2>
 <p>
-    We do not support registrations for a simple client to this endpoint. For that you should go
-    to <code>../oauth2/register</code>. Your request will then be seen by the adminstrator(s)
-    and once approved, you will be notified. This facility is to allow for a site manager who
-    must manage several OAuth clients to do so without having to resort to a vetting process.
-    We get the admin and the the admin can take it from there.
+    If you are not an administrator and just need a client,  you should go
+    to <code>../oauth2/register</code>. Your request will then be seen by the site adminstrator(s)
+    and once approved, you will be notified. The facilities described in this document allow
+    for a trusted (after vetting, of course) site manager who
+    must manage several OAuth clients to do so without having to resort to the usual vetting process.
 </p>
+<h3>How to become an admin</h3>
+<p>You must register an administrative client as per <a href="administrative-clients.xhtml">here</a>.</p>
+
+<h3>Implemented specifications here.</h3>
+
 <p>The two specifications that are behind this are <a href="https://tools.ietf.org/html/rfc7591">RFC 7591</a>
     and <a href="https://tools.ietf.org/html/rfc7592">RFC 7592</a>. The flow is that you register an
     administrative client. This is initially not approved and any operation you try will fail
     with a message to that effect. We get an notification and once the admin client is approved,
-    it may be used.</p>
-<p>
-    We do not support registrations for a simple client to this endpoint. For that you should go
-    to <code>../oauth2/register</code>. Your request will then be seen by the adminstrator(s)
-    and once approved, you will be notified. The way this works is that
-</p>
+    it may be used. All calls then create regular (not admin!) clients for use with OA4MP.
+     </p>
+
+<p>The RFCs specify a REST-ful API for clients, so that</p>
+
+<ul>
+    <li><b>POST</b> creates a new client</li>
+    <li><b>GET</b> lists what the server knows about this client</li>
+    <li><b>PUT</b> will update the client</li>
+    <li><b>DELETE</b> will remove the client and all of its information from the server</li>
+</ul>
+
+<h3>The toolkit</h3>
+<p>Included with the latest release on <a href="https://github.com/ncsa/OA4MP">GitHub</a>
+    are a suite of associated command line scripts in oidc-cm-scripts.tar aka the <b><i>toolkit</i></b>
+    which contains a complete but minimal functional toolkit. There are basic scripts for each
+    method as well as several examples for using each.</p>
+
 <p>To dynamically register a client you need to make a call to the supported service
-    endpoint, typically <code>../oauth2/oidc-cm</code>. </p>
+    endpoint, typically <code>../oauth2/oidc-cm</code> with the appropriate HTTP method
+    and payload. The specification should not be repeated here but the toolkit has a tutorial
+    and many examples. There is also a very detailed <a href="https://github.com/ncsa/OA4MP/blob/master/oa4mp-server-admin-oauth2/src/main/scripts/oidc-cm-scripts/readme.txt">readme.txt</a> in the toolkit</p>
 
 <!--#include virtual="../../footer.html" -->
 </body>
