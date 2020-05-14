@@ -1,11 +1,17 @@
 {
-  "comment": "This is an example to show how to send extra attributes, here the cfg parameter. See the readme.txt for more.",
+  "comment": ["This is an example to show how to send extra attributes, here the cfg parameter.",
+    "See the readme.txt for more."
+    ],
   "application_type": "web",
   "redirect_uris": [
     "http://localhost/callback"
   ],
   "grant_types": [
     "authorization_code"
+  ],
+  "response_types": [
+    "code",
+    "id_token"
   ],
   "client_name": "OA4MP extra attributes test - creation",
   "scope": "openid email profile",

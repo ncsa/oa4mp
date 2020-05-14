@@ -39,8 +39,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.oidc_cm.OIDCCMConstants.CLIENT_ID;
-import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.oidc_cm.OIDCCMConstants.CLIENT_SECRET;
+import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.oidc_cm.OIDCCMConstants.*;
 
 /**
  * Note that in all of these calls, the assumption is that an admin client has been requested and
@@ -124,13 +123,25 @@ public class OIDCCMServlet extends EnvServlet {
         JSONArray cbs = new JSONArray();
         cbs.addAll(client.getCallbackURIs());
         json.put(OIDCCMConstants.REDIRECT_URIS, cbs);
-        JSONArray grants = new JSONArray();
-        grants.add(OA2Constants.AUTHORIZATION_CODE_VALUE);
-        if (client.isRTLifetimeEnabled()) {
-            grants.add(OA2Constants.REFRESH_TOKEN);
-        }
 
-        json.put(OIDCCMConstants.GRANT_TYPES, grants);
+        if (client.getGrantTypes().isEmpty()) {
+            /*JSONArray grants = new JSONArray();
+            grants.add(OA2Constants.GRANT_TYPE_AUTHORIZATION_CODE);
+            if (client.isRTLifetimeEnabled()) {
+                grants.add(OA2Constants.REFRESH_TOKEN);
+            }*/
+        } else {
+            json.put(OIDCCMConstants.GRANT_TYPES, client.getGrantTypes());
+        }
+        if (!client.getResponseTypes().isEmpty()) {
+
+            json.put(RESPONSE_TYPES, client.getResponseTypes());
+        }
+        if (client.getRtLifetime() != 0) {
+            OA2ClientKeys clientKeys = (OA2ClientKeys) getOA2SE().getClientStore().getMapConverter().getKeys();
+
+            json.put(clientKeys.rtLifetime(), client.getResponseTypes());
+        }
         JSONArray scopes = new JSONArray();
         scopes.addAll(client.getScopes());
         json.put(OA2Constants.SCOPE, scopes);
@@ -290,17 +301,14 @@ public class OIDCCMServlet extends EnvServlet {
             // this fails we can just back out.
             OA2Client newClient = (OA2Client) getOA2SE().getClientStore().create();
             boolean generateNewSecret = false;
-            if(jsonRequest.containsKey(CLIENT_SECRET)){
+            if (jsonRequest.containsKey(CLIENT_SECRET)) {
                 // then we have to check this is a valid client. If this is missing, then
                 // we are being requested to generate a new secret.
                 String hashedSecret = DigestUtils.sha1Hex(jsonRequest.getString(CLIENT_SECRET));
-                if(!hashedSecret.equals(client.getSecret())){
+                if (!hashedSecret.equals(client.getSecret())) {
                     throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, "client id does not match", HttpStatus.SC_FORBIDDEN);
                 }
                 newClient.setSecret(client.getSecret());  // it matches, send it along.
-            }else{
-                generateNewSecret = true;
-                newClient.setSecret("");
             }
             // Make sure these are missing so we don't get them stashed someplace.
             jsonRequest.remove(CLIENT_SECRET);
@@ -309,10 +317,11 @@ public class OIDCCMServlet extends EnvServlet {
             newClient.setIdentifier(client.getIdentifier());
             newClient.setConfig(client.getConfig());
             try {
-                newClient = updateClient(newClient,generateNewSecret,  jsonRequest, resp);
+                newClient = updateClient(newClient, jsonRequest, false, resp);
 
                 getOA2SE().getClientStore().save(newClient);
-           //     writeOK(resp, resp);
+                writeOK(resp, toJSONObject(newClient ));
+                //     writeOK(resp, resp);
 
             } catch (Throwable t) {
                 // back out of it
@@ -484,8 +493,8 @@ public class OIDCCMServlet extends EnvServlet {
     }
 
     protected OA2Client updateClient(OA2Client client,
-                                     boolean generateNewSecret,
                                      JSONObject jsonRequest,
+                                     boolean generateSecret,
                                      HttpServletResponse httpResponse) {
         OA2ClientKeys keys = new OA2ClientKeys();
 
@@ -505,26 +514,10 @@ public class OIDCCMServlet extends EnvServlet {
         }
 
         jsonRequest.remove(OIDCCMConstants.APPLICATION_TYPE);
-        if (jsonRequest.containsKey(OIDCCMConstants.GRANT_TYPES)) {
-            // no grant type implies only authorization_code (as per RFC 7591, section2),
-            // not refresh_token. This is because the spec. allows for
-            // implicit grants (which we do not) which forbid refresh_tokens.
-            JSONArray grantTypes = toJA(jsonRequest, OIDCCMConstants.GRANT_TYPES);
-            // If the refresh token is requested, then the rtLifetime may be specified. if not, use server default.
-            if (grantTypes.contains(OA2Constants.REFRESH_TOKEN)) {
-                if (jsonRequest.containsKey(keys.rtLifetime())) {
-                    client.setRtLifetime(jsonRequest.getLong(keys.rtLifetime()));
-                } else {
-                    // check if there is no RT lifetime specified, set it to the server max.
-                    client.setRtLifetime(getOA2SE().getMaxClientRefreshTokenLifetime());
-                }
-            }
-        } else {
-            // disable refresh tokens.
-            client.setRtLifetime(0L);
-        }
+        handleGrants(client, jsonRequest, keys);
+        handleResponseTypes(client, jsonRequest, keys);
 
-        jsonRequest.remove(OIDCCMConstants.GRANT_TYPES);
+
         if (!jsonRequest.containsKey(OIDCCMConstants.REDIRECT_URIS)) {
             throw new OA2GeneralError("Error: Required parameter \"" + OIDCCMConstants.REDIRECT_URIS + "\" missing.",
                     OA2Errors.INVALID_REQUEST,
@@ -560,13 +553,12 @@ public class OIDCCMServlet extends EnvServlet {
             client.setScopes(toJA(jsonRequest, OA2Constants.SCOPE));
         }
         jsonRequest.remove(OA2Constants.SCOPE);
-        if(generateNewSecret) {
+        if(generateSecret) {
             byte[] bytes = new byte[getOA2SE().getClientSecretLength()];
             random.nextBytes(bytes);
             String secret64 = Base64.encodeBase64URLSafeString(bytes);
             client.setSecret(secret64);
         }
-
         if (jsonRequest.containsKey(OIDCCMConstants.CONTACTS)) {
             // This is a set of strings thjat are typically email addresses.
             // Todo: Really check these and allow for multiple values
@@ -586,6 +578,102 @@ public class OIDCCMServlet extends EnvServlet {
             client.setConfig(jsonObject);
         }
         return client;
+
+    }
+
+    /**
+     * TL;DR: we support the grant types for the authorization_code flow so only code and id_token.
+     * We explicitly reject every other response_type at this point, in particular, we reject
+     * the value of "token" which is only for the implicit flow.
+     *
+     * @param client
+     * @param jsonRequest
+     * @param keys
+     */
+    protected void handleResponseTypes(OA2Client client, JSONObject jsonRequest, OA2ClientKeys keys) {
+        if (jsonRequest.containsKey(RESPONSE_TYPES)) {
+            JSONArray responseTypes = toJA(jsonRequest, RESPONSE_TYPES);
+            if (!responseTypes.contains(OA2Constants.RESPONSE_TYPE_CODE)) {
+                throw new OA2GeneralError(OA2Errors.UNSUPPORTED_RESPONSE_TYPE,
+                        "unsupported response type",
+                        HttpStatus.SC_BAD_REQUEST);
+            }
+            if (responseTypes.contains(OA2Constants.RESPONSE_TYPE_TOKEN)) {
+                // This is required for implicit flow, which we do not support.
+                throw new OA2GeneralError(OA2Errors.UNSUPPORTED_RESPONSE_TYPE,
+                        "unsupported response type",
+                        HttpStatus.SC_BAD_REQUEST);
+
+            }
+            if (1 < responseTypes.size() && !checkJAEntry(responseTypes, OA2Constants.RESPONSE_TYPE_ID_TOKEN)) {
+                throw new OA2GeneralError(OA2Errors.UNSUPPORTED_RESPONSE_TYPE,
+                        "unsupported response type",
+                        HttpStatus.SC_BAD_REQUEST);
+
+            }
+            client.setResponseTypes(responseTypes);
+        } else {
+
+        }
+        jsonRequest.remove(RESPONSE_TYPES);
+    }
+
+    /**
+     * JSONArray does not check its contains sanely against strings at times.
+     *
+     * @param jsonArray
+     * @param entry
+     * @return
+     */
+    protected boolean checkJAEntry(JSONArray jsonArray, String entry) {
+        for (int i = 0; i < jsonArray.size(); i++) {
+            if (jsonArray.getString(i).equals(entry)) return true;
+        }
+        return false;
+    }
+
+    protected void handleGrants(OA2Client client, JSONObject jsonRequest, OA2ClientKeys keys) {
+        if (jsonRequest.containsKey(OIDCCMConstants.GRANT_TYPES)) {
+            // no grant type implies only authorization_code (as per RFC 7591, section2),
+            // not refresh_token. This is because the spec. allows for
+            // implicit grants (which we do not) which forbid refresh_tokens.
+            JSONArray grantTypes = toJA(jsonRequest, OIDCCMConstants.GRANT_TYPES);
+            boolean requestedRT = false;
+            switch (grantTypes.size()) {
+                case 0:
+                    // implicit case is authorization code
+                    grantTypes.add(OA2Constants.GRANT_TYPE_AUTHORIZATION_CODE);
+                    break;
+                case 1:
+                    if (!grantTypes.getString(0).equals(OA2Constants.GRANT_TYPE_AUTHORIZATION_CODE)) {
+                        throw new OA2GeneralError(OA2Errors.REQUEST_NOT_SUPPORTED, "unsupported grant type", HttpStatus.SC_BAD_REQUEST);
+                    }
+                    break;
+                case 2:
+                    if (checkJAEntry(grantTypes, OA2Constants.GRANT_TYPE_AUTHORIZATION_CODE) && checkJAEntry(grantTypes, OA2Constants.GRANT_TYPE_REFRESH_TOKEN)) {
+                        requestedRT = true;
+                    } else {
+                        throw new OA2GeneralError(OA2Errors.REQUEST_NOT_SUPPORTED, "unsupported grant type", HttpStatus.SC_BAD_REQUEST);
+                    }
+                    break;
+                default:
+                    throw new OA2GeneralError(OA2Errors.REQUEST_NOT_SUPPORTED, "unsupported grant type", HttpStatus.SC_BAD_REQUEST);
+            }
+            client.setGrantTypes(grantTypes);
+            // If the refresh token is requested, then the rtLifetime may be specified. if not, use server default.
+            if (requestedRT) {
+                if (jsonRequest.containsKey(keys.rtLifetime())) {
+                    client.setRtLifetime(jsonRequest.getLong(keys.rtLifetime()));
+                } else {
+                    // check if there is no RT lifetime specified, set it to the server max.
+                    client.setRtLifetime(getOA2SE().getMaxClientRefreshTokenLifetime());
+                }
+            }
+        } else {
+            // disable refresh tokens.
+            client.setRtLifetime(0L);
+        }
+        jsonRequest.remove(GRANT_TYPES);
 
     }
 
@@ -614,7 +702,7 @@ public class OIDCCMServlet extends EnvServlet {
 
     protected OA2Client processRegistrationRequest(JSONObject jsonRequest, HttpServletResponse httpResponse) {
         OA2Client client = (OA2Client) getOA2SE().getClientStore().create();
-        return updateClient(client, true, jsonRequest, httpResponse);
+        return updateClient(client, jsonRequest, true, httpResponse);
     }
 
     SecureRandom random = new SecureRandom();

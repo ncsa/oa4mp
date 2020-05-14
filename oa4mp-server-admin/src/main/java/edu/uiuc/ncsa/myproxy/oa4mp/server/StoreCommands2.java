@@ -273,21 +273,21 @@ public abstract class StoreCommands2 extends StoreCommands {
 
     @Override
     protected void showLSHelp() {
-        say("ls [" + LONG_LIST_COMMAND + "  | " + VERBOSE_COMMAND + " | " + ALL_LIST_COMMAND + "] | [" + KEY_FLAG + " key | " + KEYS_FLAG + " array] id");
+        say("ls [" + LINE_LIST_COMMAND + "  | " + VERBOSE_COMMAND + " | " + ALL_LIST_COMMAND + "] | [" + KEY_FLAG + " key | " + KEYS_FLAG + " array] id");
         sayi("Lists information about the contents of the store, an entry and individual values of the entry.");
         sayi("When listing multiple entries, tools will use the most numbers from the most recent call to this.");
-        sayi("A long listing is tabular and will shorten entries that are too long, ending them with " + ELLIPSIS);
+        sayi("A line listing is tabular and will shorten entries that are too long, ending them with " + ELLIPSIS);
         sayi("A verbose command will format every bit of every entry within the margins.");
         say("E.g.");
-        sayi("ls " + LONG_LIST_COMMAND + "  " + ALL_LIST_COMMAND);
-        sayi("Prints out the long form of *every* object in this store. This may be simply huge");
+        sayi("ls " + LINE_LIST_COMMAND + "  " + ALL_LIST_COMMAND);
+        sayi("Prints out the line form of *every* object in this store. This may be simply huge");
         say("E.g.");
         sayi("ls");
         sayi("Prints out the short form of *every* object in this store. This may also be huge.");
         sayi("If you are using this to find things, you probably want to look at the search command");
         say("E.g.");
-        sayi("ls " + LONG_LIST_COMMAND + "  /foo:bar");
-        sayi("Prints a long format for the entry with id foo:bar");
+        sayi("ls " + LINE_LIST_COMMAND + "  /foo:bar");
+        sayi("Prints a line format for the entry with id foo:bar");
         say("E.g.");
         sayi("ls " + VERBOSE_COMMAND + " /foo:bar");
         sayi("prints out a verbose listing of the entry with id foo:bar.");

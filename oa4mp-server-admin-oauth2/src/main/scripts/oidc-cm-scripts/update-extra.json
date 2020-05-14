@@ -6,8 +6,8 @@
     "https://localhost/callback2"
   ],
   "grant_types": [
-    "authorization_code",
-    "refresh_token"
+    "authorization_code"
+
   ],
   "scope": [
     "openid",
