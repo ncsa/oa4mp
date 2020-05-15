@@ -72,35 +72,36 @@ public class ClientServlet extends EnvServlet {
 
     @Override
     protected void doIt(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Throwable {
-        BufferedReader br = httpServletRequest.getReader();
-        DebugUtil.trace(this, "query=" + httpServletRequest.getQueryString());
-        StringBuffer stringBuffer = new StringBuffer();
-        String line = br.readLine();
-        DebugUtil.trace(this, "line=" + line);
-        while (line != null) {
-            stringBuffer.append(line);
-            line = br.readLine();
-        }
-        br.close();
-        if (stringBuffer.length() == 0) {
-            throw new IllegalArgumentException("Error: There is no content for this request");
-        }
-        JSON rawJSON = JSONSerializer.toJSON(stringBuffer.toString());
-
-        DebugUtil.trace(this, rawJSON.toString());
-        if (rawJSON.isArray()) {
-            getMyLogger().info("Error: Got a JSON array rather than a request:" + rawJSON);
-            throw new IllegalArgumentException("Error: incorrect argument. Not a valid JSON request");
-        }
         try {
-            Response response = getClientManager().process((JSONObject) rawJSON);
-            getResponseSerializer().serialize(response, httpServletResponse);
-        } catch (Throwable t) {
-            t.printStackTrace();
-            throw t;
+            BufferedReader br = httpServletRequest.getReader();
+            DebugUtil.trace(this, "query=" + httpServletRequest.getQueryString());
+            StringBuffer stringBuffer = new StringBuffer();
+            String line = br.readLine();
+            DebugUtil.trace(this, "line=" + line);
+            while (line != null) {
+                stringBuffer.append(line);
+                line = br.readLine();
+            }
+            br.close();
+            if (stringBuffer.length() == 0) {
+                throw new IllegalArgumentException("Error: There is no content for this request");
+            }
+            JSON rawJSON = null;
+            try {
+                rawJSON = JSONSerializer.toJSON(stringBuffer.toString());
+            } catch (Throwable t) {
+                throw new IllegalArgumentException("Error: There was a problem parsing the JSON: " + t.getMessage());
+            }
+            DebugUtil.trace(this, rawJSON.toString());
+            if (rawJSON.isArray()) {
+                getMyLogger().info("Error: Got a JSON array rather than a request:" + rawJSON);
+                throw new IllegalArgumentException("Error: incorrect argument. Not a valid JSON request");
+            }
+                Response response = getClientManager().process((JSONObject) rawJSON);
+                getResponseSerializer().serialize(response, httpServletResponse);
+        }catch(Throwable t){
+            handleException(t, httpServletRequest, httpServletResponse);
         }
-
-
     }
 
     protected OA2SE getOA2SE() {

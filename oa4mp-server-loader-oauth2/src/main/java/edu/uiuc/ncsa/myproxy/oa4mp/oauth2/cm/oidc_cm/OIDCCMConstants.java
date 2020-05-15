@@ -16,6 +16,24 @@ public interface OIDCCMConstants {
      * <br/><br/>
      * See also <a href="https://tools.ietf.org/html/rfc7591#section-2.1">the spec</a>.
      */
+
+    /*
+     Note from me to Terry that finally summarized this
+     ---
+     You cited the OIDC spec and my point is that we are no longer requiring all clients to be OIDC.
+     I refer to https://medium.com/@darutk/diagrams-of-all-the-openid-connect-flows-6968e3990660 aka
+     "code flows summary" Here is my understanding:
+
+     OIDC = openid scope
+     response_type = ["code"]   ==> authorization code flow,  id token returned from token endpoint.
+     response_type=["id_token"] ==> implicit flow, no token endpoint, id token returned from authorization end point
+     
+     Non-OIDC = no openid scope
+     response_type=["code"] ==> authorization code flow, no id token, section 1 code flows summary
+     response_type=["code", "id_token"]  ==> authorization code flow, requests an id token from the token endpoint, section 5 code flows summary
+     response_type=["id_token",...] means implicit flow, id_token issed at authorization endpoint, Section 3 code flows summary.
+
+     */
     public static final String RESPONSE_TYPES = "response_types";
     /**
      * <b>OPTIONAL</b>. JSON array containing a list of the OAuth 2.0 Grant Types that the Client is declaring that it will restrict itself to using. The Grant Type values used by OpenID Connect are:

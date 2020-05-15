@@ -1,6 +1,5 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
-import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.delegation.server.ExceptionWrapper;
@@ -78,10 +77,13 @@ public class OA2ExceptionHandler implements ExceptionHandler {
             t.printStackTrace();
             throw new ServletException(t.getMessage());
         }
-        if (t instanceof GeneralException) {
+        // This handles every other type of exception.
+//        if (t instanceof GeneralException) {
             handleOA2Error(new OA2GeneralError(OA2Errors.SERVER_ERROR, t.getMessage(), HttpStatus.SC_INTERNAL_SERVER_ERROR), response);
-            return;
-        }
+    //        return;
+  //      }
+
+
     }
 
     protected String encode(String x) throws UnsupportedEncodingException {

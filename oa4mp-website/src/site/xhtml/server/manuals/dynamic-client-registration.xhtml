@@ -23,7 +23,7 @@
 
 <h2>How's it work?</h2>
 <p>
-    If you are not an administrator and just need a client,  you should go
+    If you are not an administrator and just need a client, you should go
     to <code>../oauth2/register</code>. Your request will then be seen by the site adminstrator(s)
     and once approved, you will be notified. The facilities described in this document allow
     for a trusted (after vetting, of course) site manager who
@@ -39,7 +39,7 @@
     administrative client. This is initially not approved and any operation you try will fail
     with a message to that effect. We get an notification and once the admin client is approved,
     it may be used. All calls then create regular (not admin!) clients for use with OA4MP.
-     </p>
+</p>
 
 <p>The RFCs specify a REST-ful API for clients, so that</p>
 
@@ -63,6 +63,89 @@
     <a href="https://github.com/ncsa/OA4MP/blob/master/oa4mp-server-admin-oauth2/src/main/scripts/oidc-cm-scripts/readme.txt">readme.txt</a>
     in the toolkit.</p>
 
+<h3>Notes on Legal Requests</h3>
+<p>What values can be sent and are accepted?</p>
+<table>
+    <caption>Valid values</caption>
+    <tr>
+        <th>Parameter</th>
+        <th>Required?</th>
+        <th>Values</th>
+        <th>Comments</th>
+    </tr>
+    <tr align="left" valign="top">
+        <td>grant_type</td>
+        <td>N</td>
+        <td>Either a JSON array of blank delimited list which may contain
+            <br/>authorization_code (default),
+            <br/>refresh_token
+            <br/>urn:ietf:params:grant_type:token_exchange (for token exchange)
+        </td>
+        <td>If omitted, the assumption is authorization_code. If the refresh token lifetime (rt_lifetime) is specified,
+            then
+            refresh_token is added to the list of accepted grants.
+        </td>
+    </tr>
+    <tr align="left" valign="top">
+        <td>response_type</td>
+        <td>N</td>
+        <td>code (default), id_token.</td>
+        <td>Response types the client <i>may</i> support. If a requested response_type is not on this list, it should be
+            rejected.
+            Note that the initial request always must have the type "code." The others are used at other points
+            and sent along in those requests, e.g. getting a refresh token requires you send "refresh_token" to the
+            token endpoint.
+        </td>
+    </tr>
+    <tr align="left" valign="top">
+        <td>contacts</td>
+        <td>N</td>
+        <td>A list or string</td>
+        <td>This should contain the valid email for a <b>person</b> to contact in case there is an issue with the
+            client. You should assume that if you are going to be contacted at this address it will only be
+            because of some dire issue. Supplying a generic institutional email is useless.
+            The spec. allows for multiples but we only support a single (at this writing) so only the first will be
+            used if a list is sent.
+        </td>
+    </tr>
+    <tr align="left" valign="top">
+        <td>scope</td>
+        <td>N</td>
+        <td>Either a JSON array or blank delimited list of scopes</td>
+        <td>If you wish to use OIDC, you must at least supply a scope of openid. All supported scopes
+            are <br/>
+            openid<br/>
+            email<br/>
+            profile<br/>
+            org.cilogon.userinfo<br/>
+            edu.uiuc.ncsa.myproxy.getcert<br/>
+            Note that
+            the getcert scope requires you be able to get X509 certs via a MyProxy server, so only specify that if
+            you really need it.
+        </td>
+    </tr>
+    <tr align="left" valign="top">
+        <td>rt_lifetime</td>
+        <td>N</td>
+        <td>A integer (in seconds)</td>
+        <td><b>(OA4MP specific!!)</b> If you request a grant_type of refresh_token, this specifies the maximum lifetime,
+            in seconds, that
+            it will be valid. Normally this is set for a very long time, as in weeks if not months. If this is omitted
+            or set to 0 (zero) then no refresh tokens will be created.
+        </td>
+    </tr>
+    <tr align="left" valign="top">
+        <td>cfg</td>
+        <td>N</td>
+        <td>A JSON object</td>
+        <td><b>(OA4MP specific!!)</b>This is a configuration that includes scripting for gettign and processing
+            additional claims.
+            Generally you do not need one of these unless you have a very, very specific requirement. If you
+            send attributes that do not fall within the spec., they will be put in this object for you.
+            Generally if you do not know you need it and know what it does, you can safely ignore it.
+        </td>
+    </tr>
+</table>
 <!--#include virtual="../../footer.html" -->
 </body>
 </html>

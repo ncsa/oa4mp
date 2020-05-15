@@ -138,26 +138,34 @@ the response will be the same as if you deleted and existing client. All this ca
 on the server.
 
 ** Cookbook for running the supplied scripts.
-Once the toolkit is unpacked cd to its directory.
+
+Once the toolkit is unpacked cd to its directory. Every time you run a command , a file named input.json with
+your argument is created and the response is stored in output.json.
+
 0. Register an admin client and get it approved.
+
 1. Edit the cm-setenv.sh script. Set the following (these lines are commented out, so uncomment and set the values
    a. SERVER = the server where you registered your admin client
    b. ADMIN_ID = the identifier you got at registration.
    c. ADMIN_SECRET = the secret you got at registration.
 
    Everything should now run out of th current directory without change.
+
 2. Edit any create scripts. Templates are
    a. create.json = basic template with a lot of properties set.
    b. minimal.json = the actual minimal JSON blob you can use and successfully create a client
    c. create2.json = another minimal example, with scopes and email
    d. create-extra.json = A more complete example with grant types and such.
 
-   Hence forth, it is assumed your JSON is included in my-confg.json
+   Henceforth, it is assumed your JSON is included in my-confg.json
+
 3. Issue
 
    ./cm-post.sh my-confg.json
 
-   to create your client
+   to create your client. Be sure to read and handle the response, which is also stored in
+   output.json.
+
 4. You have two options with set the REGISTRATION_URI in the cm-setenv.sh script OR issue
 
    export REGISTRATION_URI=....
@@ -165,6 +173,7 @@ Once the toolkit is unpacked cd to its directory.
    which only makes it available in the current session. If you have a lot of clients, then you
    probably want to reset it as needed (so you aren't just trying to update same one over and
    over), but if you have only one, then by all means set it.
+
 5. From this point forward, you may issue
    ./cm-get.sh = gets the current client
    ./cm-post-sh my-config.json = update the current client to have the values in this file

@@ -1,4 +1,4 @@
-# DEFAULT_SERVER=https://locahost/oauth2/clients
+# DEFAULT_SERVER=https://localhost/oauth2/clients
 # For debugging uncomment the next line
 source ~/dev/csd/config/cm-setenv.sh
 #
@@ -6,7 +6,7 @@ source ~/dev/csd/config/cm-setenv.sh
 #ADMIN_ID=
 #ADMIN_SECRET=
 #
-# And after creating a client, set the client infor here.
+# And after creating a client, set the client info here.
 #
 #CLIENT_ID=
 #CLIENT_SECRET=

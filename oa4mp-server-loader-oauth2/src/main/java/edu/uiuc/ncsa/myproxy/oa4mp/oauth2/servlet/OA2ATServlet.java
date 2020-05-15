@@ -13,7 +13,6 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.*;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
-import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.server.request.IssuerResponse;
 import edu.uiuc.ncsa.security.delegation.servlet.TransactionState;
@@ -43,9 +42,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Map;
 
-import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.TokenExchangeConstants.TOKEN_EXCHANGE_GRANT_TYPE;
+import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8693Constants.GRANT_TYPE_TOKEN_EXCHANGE;
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.CLIENT_SECRET;
-import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.GRANT_TYPE;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -120,14 +118,16 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
 
         OA2Client client = (OA2Client) getClient(request);
         OA2SE oa2SE = (OA2SE)getServiceEnvironment();
-        if (oa2SE.isRfc8693Enabled() && grantType.equals(TOKEN_EXCHANGE_GRANT_TYPE)) {
+        if (oa2SE.isRfc8693Enabled() && grantType.equals(GRANT_TYPE_TOKEN_EXCHANGE)) {
+            // Grants are checked in the doIt method
+
             // RFC8693 support - token exchange
             doRFC8693(client, request, response);
             return true;
          }
 
 
-        if (grantType.equals(OA2Constants.REFRESH_TOKEN)) {
+        if (grantType.equals(OA2Constants.GRANT_TYPE_REFRESH_TOKEN)) {
             String rawSecret = getClientSecret(request);
             if (!client.isPublicClient()) {
                 // if there is a secret, verify it.
@@ -136,7 +136,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             doRefresh(client, request, response);
             return true;
         }
-        if (grantType.equals(OA2Constants.AUTHORIZATION_CODE_VALUE)) {
+        if (grantType.equals(OA2Constants.GRANT_TYPE_AUTHORIZATION_CODE)) {
+            // OAuth 2. spec., section 4.1.3 states that the grant type must be included and it must be code.
             // public clients cannot get an access token
             IssuerTransactionState state = doAT(request, response, client);
             ATIResponse2 atResponse = (ATIResponse2) state.getIssuerResponse();
@@ -153,6 +154,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
                            HttpServletRequest request,
                            HttpServletResponse response) {
         printAllParameters(request);
+        // https://tools.ietf.org/html/rfc8693
 
     }
 
@@ -167,22 +169,13 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         if (executeByGrant(grantType, request, response)) {
             return;
         }
-        warn("Error: grant type was not recognized. Request rejected.");
-        throw new ServletException("Error: Unknown request type.");
+        warn("Error: grant type +\"" + grantType + "\" was not recognized. Request rejected.");
+        throw new OA2GeneralError(OA2Errors.REQUEST_NOT_SUPPORTED,"unsupported grant type.", HttpStatus.SC_BAD_REQUEST);
     }
 
     protected IssuerTransactionState doAT(HttpServletRequest request, HttpServletResponse response, OA2Client client) throws Throwable {
+        // Grants are checked in the doIt method
         verifyClientSecret(client, getClientSecret(request));
-        String grant_type = request.getParameter(GRANT_TYPE);
-        // Note that at this point we only support authorization_code[+ refresh_token] as our only grant_types
-        // If we include the implicit flow in the future, we must retool this section with the logic for that.
-        // Mostly this will include the fact that we implicitly assume that no set grant types for the
-        // client means authorization_code.
-        ServletDebugUtil.info(this, "grant type = " + request.getParameter(GRANT_TYPE));
-        if(StringUtils.isTrivial(grant_type) || grant_type.equals(OA2Constants.AUTHORIZATION_CODE)){
-            throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,"missing or invalid grant_type", HttpStatus.SC_BAD_REQUEST);
-        }
-        // OAuth 2. spec., section 4.1.3 states that the grant type must be included and it must be code.
         IssuerTransactionState state = doDelegation(client, request, response);
         ATIResponse2 atResponse = (ATIResponse2) state.getIssuerResponse();
         atResponse.setSignToken(client.isSignTokens());
@@ -196,8 +189,6 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         IDTokenHandler idTokenHandler = new IDTokenHandler(oa2SE,st2);
         jwtRunner.addHandler(idTokenHandler);
         jwtRunner.doTokenClaims();
-       // OA2ClaimsUtil claimsUtil = new OA2ClaimsUtil(oa2SE, st2);
-        // claimsUtil.processClaims();
 
         atResponse.setClaims(st2.getClaims());
         DebugUtil.trace(this, "set token signing flag =" + atResponse.isSignToken());
@@ -325,6 +316,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
     }
 
     protected TransactionState doRefresh(OA2Client c, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        // Grants are checked in the doIt method
+
         RefreshToken oldRT = getTF2().getRefreshToken(request.getParameter(OA2Constants.REFRESH_TOKEN));
         if (c == null) {
             throw new InvalidTokenException("Could not find the client associated with refresh token \"" + oldRT + "\"");
@@ -346,9 +339,10 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         t.setRefreshTokenValid(false); // this way if it fails at some point we know it is invalid.
         AccessToken at = t.getAccessToken();
         RTIRequest rtiRequest = new RTIRequest(request, t, at, oa2SE.isOIDCEnabled());
-        RTI2 rtIsuuer = new RTI2(getTF2(), getServiceEnvironment().getServiceAddress());
-        RTIResponse rtiResponse = (RTIResponse) rtIsuuer.process(rtiRequest);
+        RTI2 rtIssuer = new RTI2(getTF2(), getServiceEnvironment().getServiceAddress());
+        RTIResponse rtiResponse = (RTIResponse) rtIssuer.process(rtiRequest);
         rtiResponse.setSignToken(c.isSignTokens());
+
         // Note for CIL-525: Here is where we need to recompute the claims. If a request comes in for a new
         // refresh token, it has to be checked against the recomputed claims. Use case is that a very long-lived
         // refresh token is issued, a user is no longer associated with a group and her access is revoked, then
@@ -367,16 +361,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         } catch (Throwable throwable) {
             ServletDebugUtil.warn(this, "Unable to update claims on token refresh: \"" + throwable.getMessage() + "\"");
         }
-        /*JSONObject claims = t.getClaims();
-        OA2ClaimsUtil claimsUtil = new OA2ClaimsUtil(oa2SE, t);
-        try {
-            claims = claimsUtil.processClaims();
-            t.setClaims(claims);
-        } catch (Throwable throwable) {
-            ServletDebugUtil.warn(this,"Unable to update claims on token refresh: \"" + throwable.getMessage() + "\"");
-        }*/
         rtiResponse.setClaims(t.getClaims());
-        //  populateClaims(request, rtiResponse.getParameters(), t);
         RefreshToken rt = rtiResponse.getRefreshToken();
         rt.setExpiresIn(computeRefreshLifetime(t));
         t.setRefreshToken(rtiResponse.getRefreshToken());

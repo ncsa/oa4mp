@@ -88,6 +88,7 @@ public class OA2ClientKeys extends ClientKeys {
         allKeys.add(rtLifetime());
         allKeys.add(scopes());
         allKeys.add(signTokens());
+        allKeys.add(ea());
         return allKeys;
     }
 }

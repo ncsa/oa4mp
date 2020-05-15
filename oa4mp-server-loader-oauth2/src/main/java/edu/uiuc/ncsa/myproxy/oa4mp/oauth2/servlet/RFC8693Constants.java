@@ -3,12 +3,13 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
 
 /**
+ * Constants for RFC 8693: The token exchange endpoint
  * <p>Created by Jeff Gaynor<br>
  * on 9/26/17 at  3:20 PM
  */
-public interface TokenExchangeConstants extends OA2Constants {
+public interface RFC8693Constants extends OA2Constants {
     String IETF_CAPUT = "urn:ietf:params:"; // Should never change.
-    String TOKEN_EXCHANGE_GRANT_TYPE = IETF_CAPUT + "grant_type:token_exchange";
+    String GRANT_TYPE_TOKEN_EXCHANGE = IETF_CAPUT + "grant_type:token_exchange";
     String ACCESS_TOKEN_TYPE = IETF_CAPUT + "token_type:access_token";
     String REFRESH_TOKEN_TYPE = IETF_CAPUT + "token_type:refresh_token";
     String ID_TOKEN_TYPE = IETF_CAPUT + "oauth:token-type:id_token";
