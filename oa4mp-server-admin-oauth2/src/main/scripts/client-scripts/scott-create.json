@@ -1,0 +1,24 @@
+{"api":
+  {"subject":
+    {"admin":
+      {"admin_id":"cilogon:/adminClient/3d5c35481b9199b2b1bd155fbc4f95f6/1565784906426",
+       "secret":"V_oISx4X2FkvHkD4FhkoTTsYyA_XlHpDM1i0Ak9tvDD3HlawrTdChYrvr_LGpai08VumZgqkVuENQMmO4nqQEw"
+      }
+    },
+   "action":
+    {"type":"attribute",
+     "method":"get"
+    },
+   "object":
+    {"client":
+      {"client_id":"cilogon:/client_id/520199f634205d7643f91e6fc03abaac" }
+    },
+   "content":
+    [
+      "name",
+      "cfg",
+      "scopes",
+      "callback_uri"
+    ]
+  }
+}

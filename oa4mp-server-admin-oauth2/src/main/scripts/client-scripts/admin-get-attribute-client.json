@@ -16,6 +16,7 @@
       }
     },
     "content": [
+      "cfg",
       "callback_uri",
       "scopes",
       "home_url"

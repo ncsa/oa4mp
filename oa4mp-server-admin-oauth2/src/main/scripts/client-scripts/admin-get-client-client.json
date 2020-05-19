@@ -14,7 +14,14 @@
       "client": {
         "client_id": "CLIENT_ID"
       }
-    }
+    },
+    "content":
+     [
+       "name",
+       "cfg",
+       "scopes",
+       "callback_uri"
+     ]
   },
   "comment": "This example shows how to get a client and all of its attributes."
 }

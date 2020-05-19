@@ -9,10 +9,7 @@ import edu.uiuc.ncsa.security.storage.XMLMap;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
 import edu.uiuc.ncsa.security.util.cli.*;
-import net.sf.json.JSON;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import net.sf.json.JSONSerializer;
+import net.sf.json.*;
 
 import java.io.*;
 import java.util.*;
@@ -573,12 +570,20 @@ public abstract class StoreCommands2 extends StoreCommands {
 
     protected boolean updateSingleValue(XMLMap map, String key) {
         String currentValue = map.getString(key);
+
         JSON json = null;
-        try {
-            json = JSONSerializer.toJSON(currentValue);
-        } catch (Throwable t) {
-            // ok, it's not JSON
+        if(currentValue != null) {
+            // edge case to avoid  a &^*%@! JSON null object.
+            // JSONNull means parsing a null into a JSON object that bombs everyplace like a regular null.,
+            // i.e,. every operation throws the equivalent of an NPE.
+            // They just do it so they have a typed null of type JSON...
+            try {
+                json = JSONSerializer.toJSON(currentValue);
+            } catch (Throwable t) {
+                // ok, it's not JSON
+            }
         }
+
         if (json == null) {
             // This handles every other value type...
             String newValue = getInput("Enter new value for " + key + " ", currentValue);
@@ -588,7 +593,7 @@ public abstract class StoreCommands2 extends StoreCommands {
             map.put(key, newValue);
             return true;
         }
-        if (json != null && (json instanceof JSONObject)) {
+        if (json != null   && (json instanceof JSONObject)) {
             if (supportsQDL()) {
                 boolean loadQDL = getInput("Load only a QDL script or edit the full config? (q/f)", "f").equalsIgnoreCase("q");
                 if (loadQDL) {

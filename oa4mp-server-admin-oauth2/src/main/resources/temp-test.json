@@ -1,0 +1,70 @@
+{
+    "content": {
+        "client": {
+            "callback_uri": [
+                "https://sp-test.scgvm.net/oidc"
+            ],
+            "cfg": {
+                "claims": {
+                    "preProcessing": [
+                        {
+                            "$if": [
+                                "$true"
+                            ],
+                            "$then": [
+                                {
+                                    "$set_claim_source": [
+                                        "LDAP",
+                                        "03145c7c3e50f9602f484925003ab837c1306d16"
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "sourceConfig": [
+                        {
+                            "ldap": {
+                                "address": "ldap-test.cilogon.org",
+                                "authorizationType": "simple",
+                                "enabled": "true",
+                                "id": "03145c7c3e50f9602f484925003ab837c1306d16",
+                                "password": "958L9GJF5atVhixvP9vf",
+                                "port": 636,
+                                "principal": "uid=oa4mp_user,ou=system,o=MESS,o=CO,dc=cilogon,dc=org",
+                                "searchAttributes": [
+                                    {
+                                        "name": "givenName",
+                                        "returnAsList": "false",
+                                        "returnName": "given_name"
+                                    },
+                                    {
+                                        "name": "sn",
+                                        "returnAsList": "false",
+                                        "returnName": "family_name"
+                                    }
+                                ],
+                                "searchBase": "ou=people,o=MESS,o=CO,dc=cilogon,dc=org",
+                                "searchName": "username"
+                            }
+                        }
+                    ]
+                },
+                "config": "Created by COmanage Oa4mpClient Plugin",
+                "isSaved": true
+            },
+            "client_id": "cilogon:/client_id/520199f634205d7643f91e6fc03abaac",
+            "name": "MESS Test",
+            "proxy_limited": false,
+            "public_client": false,
+            "rt_lifetime": 0,
+            "scopes": [
+                "openid",
+                "profile",
+                "email",
+                "org.cilogon.userinfo"
+            ],
+            "sign_tokens": true
+        }
+    },
+    "status": 0
+}

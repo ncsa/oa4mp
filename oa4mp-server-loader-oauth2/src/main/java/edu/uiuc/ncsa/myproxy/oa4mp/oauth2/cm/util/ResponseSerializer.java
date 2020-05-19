@@ -87,8 +87,8 @@ public class ResponseSerializer {
             serialize((AttributeAdminClientResponse) response, servletResponse);
             return;
         }
-        if(response instanceof AddClientResponse){
-            serialize((AddClientResponse)response, servletResponse);
+        if (response instanceof AddClientResponse) {
+            serialize((AddClientResponse) response, servletResponse);
             return;
         }
         if (response instanceof PermissionResponse) {
@@ -112,7 +112,7 @@ public class ResponseSerializer {
 
     protected void serialize(AttributeGetClientResponse response, HttpServletResponse servletResponse) throws IOException {
         PrintWriter pw = servletResponse.getWriter();
-        OA2ClientConverter clientConverter = (OA2ClientConverter)cose.getClientStore().getMapConverter();
+        OA2ClientConverter clientConverter = (OA2ClientConverter) cose.getClientStore().getMapConverter();
         JSONObject json = new JSONObject();
         json.put("status", 0);
         OA2ClientKeys keys = (OA2ClientKeys) clientConverter.getKeys();
@@ -121,6 +121,12 @@ public class ResponseSerializer {
         OA2Client newClient = (OA2Client) clientConverter.subset(response.getClient(), response.getAttributes());
         JSONObject jsonClient = new JSONObject();
         clientConverter.toJSON(newClient, jsonClient);
+        if (jsonClient.getJSONObject(clientConverter.getJSONComponentName()).containsKey(keys.cfg())) {
+            // clientConverter.getJSONComponentName() <--> "client"
+            // keys.cfg() <--> "cfg"
+            jsonClient.put(keys.cfg(), jsonClient.getJSONObject(clientConverter.getJSONComponentName()).getJSONObject(keys.cfg()));
+            jsonClient.getJSONObject(clientConverter.getJSONComponentName()).remove(keys.cfg());
+        }
         json.put("content", jsonClient);
         //return json;
 
@@ -131,7 +137,7 @@ public class ResponseSerializer {
     protected void serialize(AttributeGetAdminClientResponse response, HttpServletResponse servletResponse) throws IOException {
         PrintWriter pw = servletResponse.getWriter();
         JSONObject json = new JSONObject();
-        AdminClientConverter adminClientConverter = (AdminClientConverter)cose.getAdminClientStore().getMapConverter();
+        AdminClientConverter adminClientConverter = (AdminClientConverter) cose.getAdminClientStore().getMapConverter();
         json.put("status", 0);
         AdminClientKeys keys = (AdminClientKeys) adminClientConverter.getKeys();
         List<String> allKeys = keys.allKeys();
@@ -227,7 +233,7 @@ public class ResponseSerializer {
     private JSONObject clientToJSON(OA2Client client) {
         JSONObject json = new JSONObject();
         json.put("status", 0);
-        OA2ClientConverter clientConverter = (OA2ClientConverter)cose.getClientStore().getMapConverter();
+        OA2ClientConverter clientConverter = (OA2ClientConverter) cose.getClientStore().getMapConverter();
 
         OA2ClientKeys keys = (OA2ClientKeys) clientConverter.getKeys();
         List<String> allKeys = keys.allKeys();
@@ -235,6 +241,32 @@ public class ResponseSerializer {
         OA2Client newClient = (OA2Client) clientConverter.subset(client, allKeys);
         JSONObject jsonClient = new JSONObject();
         clientConverter.toJSON(newClient, jsonClient);
+        /* This would return the cfg as part of the client, so
+          {
+              "content": {
+                  "client": {
+                     "client_id": "cilogon:/client_id/520199f634205d7643f91e6fc03abaac",
+                      "cfg": {...},...
+
+           Which is inarguably correct because it allows for each client to have a unique. cfg.
+           Older version (<= 4.3) assumed a global cfg like
+
+           {
+                         "content": {
+                            "cfg": {...},...
+                             "client": {
+                                "client_id": "cilogon:/client_id/520199f634205d7643f91e6fc03abaac",
+
+            which allowed for uploading a bunch of clients and using the same cfg for them all.
+            Unfortunately, there is one user for this and this improvement breaks their code.
+            (and since they only upload a single client ever at a time, the point is moot)
+          */
+        if (jsonClient.getJSONObject(clientConverter.getJSONComponentName()).containsKey(keys.cfg())) {
+            // clientConverter.getJSONComponentName() <--> "client"
+            // keys.cfg() <--> "cfg"
+            jsonClient.put(keys.cfg(), jsonClient.getJSONObject(clientConverter.getJSONComponentName()).getJSONObject(keys.cfg()));
+            jsonClient.getJSONObject(clientConverter.getJSONComponentName()).remove(keys.cfg());
+        }
         json.put("content", jsonClient);
         return json;
     }
@@ -242,7 +274,7 @@ public class ResponseSerializer {
     private JSONObject acToJSON(AdminClient client) {
         JSONObject json = new JSONObject();
         json.put("status", 0);
-        AdminClientConverter adminClientConverter = (AdminClientConverter)cose.getAdminClientStore().getMapConverter();
+        AdminClientConverter adminClientConverter = (AdminClientConverter) cose.getAdminClientStore().getMapConverter();
         AdminClientKeys keys = (AdminClientKeys) adminClientConverter.getKeys();
         List<String> allKeys = keys.allKeys();
         allKeys.remove(keys.secret());
