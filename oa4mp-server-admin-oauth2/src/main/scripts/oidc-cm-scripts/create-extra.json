@@ -15,7 +15,7 @@
     "id_token"
   ],
   "client_name": "OA4MP extra attributes test - creation",
-  "scope": "openid email profile",
+  "scope": "openid email",
   "contacts": [
     "bob@bigstate.edu"
   ],
