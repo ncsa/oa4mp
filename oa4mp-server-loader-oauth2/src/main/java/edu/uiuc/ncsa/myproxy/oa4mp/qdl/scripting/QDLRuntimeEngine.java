@@ -10,6 +10,7 @@ import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.module.ModuleMap;
+import edu.uiuc.ncsa.qdl.scripting.AnotherJSONUtil;
 import edu.uiuc.ncsa.qdl.scripting.Scripts;
 import edu.uiuc.ncsa.qdl.state.ImportManager;
 import edu.uiuc.ncsa.qdl.state.State;
@@ -33,7 +34,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-//import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.OA2ClaimsUtil.*;
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowType.*;
 
 /**
@@ -49,7 +49,8 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         this.qe = qe;
         init();
     }
-
+    // {"qdl": { "code": ["claims.debug:='test';"], "xmd": {"exec_phase": "pre_auth"}}}
+    // {"qdl": { "run": "vfs#/scripts/test0.qdl", "xmd": {"exec_phase": "pre_auth"}}}
     QDLEnvironment qe;
     /**
      * The structure of the configuration file (for backwards compatibility) is
@@ -63,7 +64,8 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
      * that level.
      */
     protected void init() {
-        setScriptSet(QDLJSONConfigUtil.readScriptSet(config));
+//        setScriptSet(QDLJSONConfigUtil.readScriptSet(config));  // <- old way
+        setScriptSet(AnotherJSONUtil.createScripts(config)); // <- new way
         SymbolStack stack = new SymbolStack();
         state = new State(ImportManager.getResolver(),
                 stack,
@@ -141,7 +143,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         if (s == null) {
             return noOpSRR();
         }
-
+     //
         setupState(request);
         s.execute(state);
         return createSRR();
@@ -166,7 +168,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         JSONObject claims = (JSONObject) req.getArgs().get(SRE_REQ_CLAIMS);
         StemVariable claimStem = new StemVariable();
         claimStem.fromJSON(claims);
-        System.out.println("claim stem:" + claimStem.toString(1));
+    //    System.out.println("claim stem:" + claimStem.toString(1));
         state.getSymbolStack().setValue(CLAIMS_VAR, claimStem);
 
         List<String> scopes = (List<String>) req.getArgs().get(SRE_REQ_SCOPES);
