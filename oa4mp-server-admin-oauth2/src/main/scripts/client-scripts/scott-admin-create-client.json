@@ -1,0 +1,76 @@
+{
+  "api": {
+    "subject": {
+      "admin": {
+        "admin_id": "ADMIN_ID",
+        "secret": "ADMIN_SECRET"
+      }
+    },
+    "action": {
+      "type": "client",
+      "method": "create"
+    },
+    "content": {
+      "callback_uri": [
+        "https://a.b.c/client/ready1",
+        "https://a.b.c/client/ready2"
+      ],
+      "cfg": {
+        "config": "Created by COmanage Oa4mpClient Plugin",
+        "claims": {
+          "sourceConfig": [
+            {
+              "ldap": {
+                "id": "03145c7c3e50f9602f484925003ab837c1306d16",
+                "enabled": "true",
+                "authorizationType": "simple",
+                "address": "ldap-test.cilogon.org",
+                "port": 636,
+                "principal": "uid=oa4mp_user,ou=system,o=MESS,o=CO,dc=cilogon,dc=org",
+                "password": "958L9GJF5atVhixvP9vf",
+                "searchBase": "ou=people,o=MESS,o=CO,dc=cilogon,dc=org",
+                "searchName": "username",
+                "searchAttributes": [
+                  {
+                    "name": "givenName",
+                    "returnName": "given_name",
+                    "returnAsList": "false"
+                  },
+                  {
+                    "name": "sn",
+                    "returnName": "family_name",
+                    "returnAsList": "false"
+                  }
+                ]
+              }
+            }
+          ],
+          "preProcessing": [
+            {
+              "$if": [
+                "$true"
+              ],
+              "$then": [
+                {
+                  "$set_claim_source": [
+                    "LDAP",
+                    "03145c7c3e50f9602f484925003ab837c1306d16"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "scopes": [
+        "openid",
+        "profile",
+        "email"
+      ],
+      "home_url": "https://a.b.c/client",
+      "proxy_limited": true,
+      "name": "SCOTT MESS test client"
+    }
+  },
+  "comment": "This example shows how to create a completely new client. Note that the admin will automatically be granted management access."
+}
