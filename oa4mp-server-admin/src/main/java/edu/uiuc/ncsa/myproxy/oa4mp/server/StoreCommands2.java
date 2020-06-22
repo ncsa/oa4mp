@@ -330,7 +330,7 @@ public abstract class StoreCommands2 extends StoreCommands {
     }
 
     @Override
-    public void rm(InputLine inputLine) {
+    public void rm(InputLine inputLine) throws IOException {
         if (showHelp(inputLine)) {
             showRMHelp();
             return;
@@ -438,7 +438,7 @@ public abstract class StoreCommands2 extends StoreCommands {
     String KEYS_FLAG = "-keys";
 
     @Override
-    public void update(InputLine inputLine) {
+    public void update(InputLine inputLine) throws IOException {
 
         if (showHelp(inputLine)) {
             showUpdateHelp();
@@ -508,7 +508,7 @@ public abstract class StoreCommands2 extends StoreCommands {
 
     }
 
-    protected JSONArray updateSingleValue(String key, JSONArray currentValue) {
+    protected JSONArray updateSingleValue(String key, JSONArray currentValue) throws IOException {
         say("current value=" + currentValue);
         String action = getInput("Add, clear, delete, replace or exit?(a/c/d/r/x)", "a").toLowerCase();
         if (action.equals("x")) {
@@ -564,11 +564,11 @@ public abstract class StoreCommands2 extends StoreCommands {
      * @param currentConfig
      * @return
      */
-    protected JSONObject loadQDLScript(JSONObject currentConfig) {
+    protected JSONObject loadQDLScript(JSONObject currentConfig) throws IOException {
         return currentConfig; // do nothing.
     }
 
-    protected boolean updateSingleValue(XMLMap map, String key) {
+    protected boolean updateSingleValue(XMLMap map, String key) throws IOException {
         String currentValue = map.getString(key);
 
         JSON json = null;
@@ -646,7 +646,7 @@ public abstract class StoreCommands2 extends StoreCommands {
      * @param oldJSON
      * @return null if the input is terminated (so retain the old object)
      */
-    protected JSONObject inputJSON(JSONObject oldJSON, String key) {
+    protected JSONObject inputJSON(JSONObject oldJSON, String key) throws IOException {
         if (oldJSON == null) {
             sayi("no current value for " + key);
         } else {

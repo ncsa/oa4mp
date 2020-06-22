@@ -129,6 +129,7 @@ public class OA2Client extends Client implements OA2ClientScopes {
     public String EXTENDED_ATTRIBUTES = "extended_attributes";
     protected String xoauth_attributes = "xoauth_attributes";
     protected String oa4mp_attributes = "oa4mp_attributes";
+    protected String oidc_cm_attributes = "oidc-cm_attributes";
 
     protected JSONObject getNamedAttributes(String name) {
         if (getExtendedAttributes().containsKey(name)) {
@@ -143,6 +144,19 @@ public class OA2Client extends Client implements OA2ClientScopes {
         getExtendedAttributes().put(name, jsonObject);
     }
 
+    public boolean hasOIDC_CM_Attributes() {
+          return getNamedAttributes(oidc_cm_attributes) != null && !getNamedAttributes(oidc_cm_attributes).isEmpty();
+    }
+    public JSONObject getOIDC_CM_Attributes() {
+        return getNamedAttributes(oidc_cm_attributes);
+    }
+
+    public void setOIDC_CM_attributes(JSONObject attr) {
+        setNamedAttributes(oidc_cm_attributes, attr);
+    }
+     public void removeOIDC_CM_Attributes(){
+            getExtendedAttributes().remove(oidc_cm_attributes);
+     }
     protected JSONObject getOA4MPAttributes() {
         return getNamedAttributes(oa4mp_attributes);
     }
@@ -293,6 +307,7 @@ public class OA2Client extends Client implements OA2ClientScopes {
      *     {
      *      "xoauth_attributes":{"grant_type":[....},  <-- attributes for OAuth
      *      "oa4mp_attributes":{"foo":"bar",...}       <-- attributes relating to OA4MP
+     *      "oidc-cm":{"x":"y",...}                    <-- extra attributes from the RFC7951
      *     ... etc
      *     }
      * </pre>

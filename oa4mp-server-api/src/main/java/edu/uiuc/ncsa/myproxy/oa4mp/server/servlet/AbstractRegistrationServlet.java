@@ -212,7 +212,9 @@ public abstract class AbstractRegistrationServlet extends MyProxyDelegationServl
             // Next commands reset the state on the form so the contents are processed.
             request.setAttribute(CLIENT_ACTION_KEY, CLIENT_ACTION_KEY);
             request.setAttribute(CLIENT_ACTION_REQUEST_VALUE, CLIENT_ACTION_REQUEST_VALUE);
-            request.setAttribute("actionToTake", request.getContextPath() + "/register");
+            //request.setAttribute("actionToTake", request.getContextPath() + "/register");
+            // Don't hard-code /register in case they deploy it elsewhere.
+            request.setAttribute("actionToTake", request.getContextPath() + request.getServletPath());
 
 
             request.setAttribute("retryMessage", r.getMessage());

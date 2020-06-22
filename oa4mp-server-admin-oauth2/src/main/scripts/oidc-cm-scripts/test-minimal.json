@@ -1,0 +1,8 @@
+{
+   "comment":"This is a the minimal request object required for creation: a set of URIs and a name",
+   "redirect_uris":["https://client.example.org/callback"],
+   "client_name": "My Example",
+   "cfg": {"property0": "value0", "property1": "value1", "comment": "cfg comment"},
+   "test_attr0": "test_value0",
+   "test_attr1": ["test1_0", "test1_1"]
+  }

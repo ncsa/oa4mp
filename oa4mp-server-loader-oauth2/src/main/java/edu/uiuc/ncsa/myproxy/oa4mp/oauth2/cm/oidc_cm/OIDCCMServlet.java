@@ -18,7 +18,6 @@ import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2GeneralError;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2Scopes;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
@@ -35,10 +34,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.sql.SQLException;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.StringTokenizer;
+import java.util.*;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.oidc_cm.OIDCCMConstants.*;
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8693Constants.GRANT_TYPE_TOKEN_EXCHANGE;
@@ -101,19 +97,19 @@ public class OIDCCMServlet extends EnvServlet {
             // converted to a contacts array or we run the risk of inadvertantly losing this.
 
             JSONObject json = toJSONObject(client);
-            OA2ClientKeys clientKeys = (OA2ClientKeys) getOA2SE().getClientStore().getMapConverter().getKeys();
-            if (json.containsKey(clientKeys.email())) {
-                JSONArray jsonArray = new JSONArray();
-                jsonArray.add(json.get(clientKeys.email()));
-                json.remove(clientKeys.email());
-                json.put(OIDCCMConstants.CONTACTS, jsonArray);
-            }
+
             writeOK(httpServletResponse, json); //send it back with an ok.
         } catch (Throwable t) {
             handleException(t, httpServletRequest, httpServletResponse);
         }
     }
 
+    /**
+     * Take a client and turn it in to a response object. This is used by both GET do PUT (which is supposed
+     * to return the same output as GET when done with its updates)
+     * @param client
+     * @return
+     */
     protected JSONObject toJSONObject(OA2Client client) {
         JSONObject json = new JSONObject();
         String registrationURI = getOA2SE().getCmConfigs().getRFC7591Config().uri.toString();
@@ -156,6 +152,19 @@ public class OIDCCMServlet extends EnvServlet {
         json.put(OIDCCMConstants.CLIENT_ID_ISSUED_AT, client.getCreationTS().getTime() / 1000);
         if (client.getConfig() != null && !client.getConfig().isEmpty()) {
             json.put("cfg", client.getConfig());
+        }
+        OA2ClientKeys clientKeys = (OA2ClientKeys) getOA2SE().getClientStore().getMapConverter().getKeys();
+        if (json.containsKey(clientKeys.email())) {
+            JSONArray jsonArray = new JSONArray();
+            jsonArray.add(json.get(clientKeys.email()));
+            json.remove(clientKeys.email());
+            json.put(OIDCCMConstants.CONTACTS, jsonArray);
+        }
+        if (client.hasOIDC_CM_Attributes()) {
+            // add them back
+            for (Object key : client.getOIDC_CM_Attributes().keySet()) {
+                json.put(key, client.getOIDC_CM_Attributes().get(key));
+            }
         }
         return json;
     }
@@ -280,17 +289,20 @@ public class OIDCCMServlet extends EnvServlet {
                 boolean rejectRequest = false;
                 JSONArray newScopes = toJA(jsonRequest, OA2Constants.SCOPE);
                 Collection<String> oldScopes = client.getScopes();
-                if (oldScopes.size() < newScopes.size()) {
-                    rejectRequest = true;
-                } else {
-                    for (Object x : newScopes) {
-                        String scope = x.toString();
-                        if (!oldScopes.contains(scope)) {
-                            // then this is not in the list, request is rejected
-                            rejectRequest = true;
-                            break;
-                        }
+                Collection<String> newScopeList = new HashSet<>();
+                // Fix for CIL-725 Allow admin clients to alter scopes as desired.
+                // NOTE as long as this admin-only access this is ok. Otherwise the
+                // previous version the only permits a reduction in scopes is allowed.
+                Collection<String> supportedScopes = getOA2SE().getScopes();
+
+                for (Object x : newScopes) {
+                    String scope = x.toString();
+                    if (!supportedScopes.contains(scope)) {
+                        // then this is not in the list, request is rejected
+                        rejectRequest = true;
+                        break;
                     }
+                    newScopeList.add(scope);
                 }
                 if (rejectRequest) {
                     throw new OA2GeneralError(OA2Errors.INVALID_SCOPE,
@@ -298,6 +310,7 @@ public class OIDCCMServlet extends EnvServlet {
                             HttpStatus.SC_FORBIDDEN // as per spec, section RFC 7592 section 2.2
                     );
                 }
+                client.setScopes(newScopeList);
             }
             // so we create a new client, set the secret and id, then update that. This way if
             // this fails we can just back out.
@@ -542,15 +555,30 @@ public class OIDCCMServlet extends EnvServlet {
         } else {
             client.setHomeUri(""); // not great, but...
         }
-
+         if(jsonRequest.containsKey(TOKEN_ENDPOINT_AUTH_METHOD)){
+             // not required, but if present, we support exactly two options.
+             JSONArray jsonArray = toJA(jsonRequest, TOKEN_ENDPOINT_AUTH_METHOD);
+             if(!jsonArray.contains(OA2Constants.TOKEN_ENDPOINT_AUTH_POST) &&
+                     !jsonArray.contains(OA2Constants.TOKEN_ENDPOINT_AUTH_BASIC)){
+                 throw new OA2GeneralError(OA2Errors.INVALID_REQUEST_OBJECT, "unsupported token endpoint authorization method", HttpStatus.SC_BAD_REQUEST);
+             }
+         }
         client.setSignTokens(true); // always for us.
         if (!jsonRequest.containsKey(OA2Constants.SCOPE)) {
+            client.setScopes(new ArrayList<>()); // zeros it out
+            // NOTE We no longer require that a client set scopes. If the server is OIDC aware
+            // then that should just mean it accepts the openid scope and if missing
+            // does not return much (like no subject or id token), For some clients
+            // that just want an access token, that is fine.
+
+            // ---------- old stuff. Keep for a bit.
             // no scopes and this is an OIDC server implies just the openid scope and this is a public client
+           /*
             if (getOA2SE().isOIDCEnabled()) {
                 client.getScopes().add(OA2Scopes.SCOPE_OPENID);
                 client.setPublicClient(true);
             }
-            // alternately, no scopes are set/required.
+            */
         } else {
             client.setScopes(toJA(jsonRequest, OA2Constants.SCOPE));
         }
@@ -566,7 +594,7 @@ public class OIDCCMServlet extends EnvServlet {
             // Todo: Really check these and allow for multiple values
             // Todo: This takes only the very first.
             JSONArray emails = toJA(jsonRequest, OIDCCMConstants.CONTACTS);
-             //= jsonRequest.getJSONArray(OIDCCMConstants.CONTACTS);
+            //= jsonRequest.getJSONArray(OIDCCMConstants.CONTACTS);
             ServletDebugUtil.info(this, "Multiple contacts addresses found " + emails + "\n Only the first is used currently.");
             if (!emails.isEmpty()) {
                 client.setEmail(emails.getString(0));
@@ -577,8 +605,15 @@ public class OIDCCMServlet extends EnvServlet {
         if (jsonRequest.containsKey("cfg")) {
             JSONObject jsonObject = jsonRequest.getJSONObject("cfg");
             jsonRequest.remove("cfg");
-            jsonObject.putAll(jsonRequest);
             client.setConfig(jsonObject);
+        } else {
+            // CIL-735 if not config object, remove it. 
+            client.setConfig(null);
+        }
+        // Fix for CIL-734: now handle everything else left over
+        client.removeOIDC_CM_Attributes();
+        if (!jsonRequest.isEmpty()) {
+            client.setOIDC_CM_attributes(jsonRequest);
         }
         return client;
 
@@ -616,7 +651,7 @@ public class OIDCCMServlet extends EnvServlet {
             }
             client.setResponseTypes(responseTypes);
         } else {
-           // Maybe add in defaults at some point if omitted? Now this works since we only have a single flow.
+            // Maybe add in defaults at some point if omitted? Now this works since we only have a single flow.
         }
         jsonRequest.remove(RESPONSE_TYPES);
     }
@@ -641,7 +676,7 @@ public class OIDCCMServlet extends EnvServlet {
             for (int j = 0; j < supportedGrants.length; j++) {
                 oneOK = oneOK || StringUtils.equals(proposedGrants.getString(i), supportedGrants[j]);
             }
-            if(!oneOK) return false;
+            if (!oneOK) return false;
         }
         return true;
     }
@@ -651,6 +686,7 @@ public class OIDCCMServlet extends EnvServlet {
             // no grant type implies only authorization_code (as per RFC 7591, section2),
             // not refresh_token. This is because the spec. allows for
             // implicit grants (which we do not) which forbid refresh_tokens.
+            // Fixes CIL-701
             JSONArray grantTypes = toJA(jsonRequest, OIDCCMConstants.GRANT_TYPES);
             String[] supportedGrants = new String[]{OA2Constants.GRANT_TYPE_AUTHORIZATION_CODE,
                     OA2Constants.GRANT_TYPE_REFRESH_TOKEN, GRANT_TYPE_TOKEN_EXCHANGE};

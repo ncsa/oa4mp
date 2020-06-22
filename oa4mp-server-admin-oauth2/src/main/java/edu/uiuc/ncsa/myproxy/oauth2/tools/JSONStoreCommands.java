@@ -48,7 +48,7 @@ public class JSONStoreCommands extends StoreCommands2 {
         return "json";
     }
 
-    protected boolean updateProcedure(JSONEntry jsonEntry) {
+    protected boolean updateProcedure(JSONEntry jsonEntry) throws IOException {
         String response = getInput("Did you want to import the JSON from a file? (y/n)", "n");
         String rawContent = "";
         if (response.equals("y")) {
@@ -69,7 +69,7 @@ public class JSONStoreCommands extends StoreCommands2 {
         return true;
     }
 
-    protected String getFromEditor(String raw) {
+    protected String getFromEditor(String raw) throws IOException {
         LineEditor lineEditor = new LineEditor(raw);
         try {
             lineEditor.execute();
@@ -115,7 +115,7 @@ public class JSONStoreCommands extends StoreCommands2 {
         return null;
     }
 
-    protected boolean updateJSON(JSONEntry jsonEntry) {
+    protected boolean updateJSON(JSONEntry jsonEntry) throws IOException {
         String response = getInput("Did you want to import the JSON from a file? (y/n)", "n");
         String rawContent = "";
         JSON newJSON = null;
@@ -160,7 +160,7 @@ public class JSONStoreCommands extends StoreCommands2 {
      * @param inputLine
      */
 
-    public void ingest(InputLine inputLine){
+    public void ingest(InputLine inputLine) throws IOException {
         String fileName = inputLine.getNextArgFor("-file");
         boolean safeModeOff = !inputLine.hasArg("-safe");
         say("safe mode off = " + safeModeOff);
@@ -210,7 +210,7 @@ public class JSONStoreCommands extends StoreCommands2 {
         say("ingested " + ids.size() + " objects from " + totalCount + " files.");
     }
     @Override
-    public boolean update(Identifiable identifiable) {
+    public boolean update(Identifiable identifiable) throws IOException {
         info("Starting JSON update for id = " + identifiable.getIdentifierString());
         say("Update the values. A return accepts the existing or default value in []'s");
 
@@ -220,8 +220,7 @@ public class JSONStoreCommands extends StoreCommands2 {
 
         boolean removeCurrentObject = false;
         if (!newIdentifier.equals(jsonEntry.getIdentifierString())) {
-            sayi2(" remove json object with id=\"" + jsonEntry.getIdentifier() + "\" [y/n]? ");
-            removeCurrentObject = isOk(readline());
+            removeCurrentObject = isOk(readline(" remove json object with id=\"" + jsonEntry.getIdentifier() + "\" [y/n]? "));
             jsonEntry.setIdentifier(BasicIdentifier.newID(newIdentifier));
         }
 

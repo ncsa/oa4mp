@@ -20,6 +20,7 @@ import net.sf.json.JSONObject;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
@@ -55,7 +56,7 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
         this.clientApprovalStore = clientApprovalStore;
     }
 
-    protected JSON inputJSON(JSON oldJSON, String componentName) {
+    protected JSON inputJSON(JSON oldJSON, String componentName) throws IOException {
         return inputJSON(oldJSON, componentName, false);
     }
 
@@ -75,7 +76,7 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
      * @param oldJSON
      * @return null if the input is terminated (so retain the old object)
      */
-    protected JSON inputJSON(JSON oldJSON, String componentName, boolean isArray) {
+    protected JSON inputJSON(JSON oldJSON, String componentName, boolean isArray) throws IOException {
         if (oldJSON == null) {
             sayi("no current value for " + componentName);
         } else {
@@ -288,7 +289,7 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
         clientApprovalStoreCommands.showApproveHelp();
     }
 
-    public void approve(InputLine inputLine) {
+    public void approve(InputLine inputLine) throws IOException {
         if (showHelp(inputLine)) {
             showApproveHelp();
             return;
@@ -308,7 +309,7 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
     }
 
     @Override
-    public boolean update(Identifiable identifiable) {
+    public boolean update(Identifiable identifiable) throws IOException {
 
         BaseClient client = (BaseClient) identifiable;
 
@@ -329,12 +330,12 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
         sayi("here is the complete client:");
         longFormat(client);
         if (!newIdentifier.equals(client.getIdentifierString())) {
-            sayi2(" remove client with id=\"" + client.getIdentifier() + "\" [y/n]? ");
-            removeCurrentClient = isOk(readline());
+          //  sayi2(" remove client with id=\"" + client.getIdentifier() + "\" [y/n]? ");
+            removeCurrentClient = isOk(readline(" remove client with id=\"" + client.getIdentifier() + "\" [y/n]? "));
             client.setIdentifier(BasicIdentifier.newID(newIdentifier));
         }
-        sayi2("save [y/n]?");
-        if (isOk(readline())) {
+      //  sayi2("save [y/n]?");
+        if (isOk(readline("save [y/n]?"))) {
             //getStore().save(client);
             if (removeCurrentClient) {
                 info("removing client with id = " + oldID);

@@ -42,7 +42,7 @@ public class ClientStoreCommands extends BaseClientStoreCommands {
     }
 
     @Override
-    public void extraUpdates(Identifiable identifiable) {
+    public void extraUpdates(Identifiable identifiable) throws IOException{
         Client client = (Client) identifiable;
         client.setErrorUri(getInput("enter error uri", client.getErrorUri()));
         client.setHomeUri(getInput("enter home uri", client.getHomeUri()));
@@ -52,7 +52,7 @@ public class ClientStoreCommands extends BaseClientStoreCommands {
     }
 
     @Override
-    public boolean update(Identifiable identifiable) {
+    public boolean update(Identifiable identifiable) throws IOException {
 
         Client client = (Client) identifiable;
 
@@ -76,12 +76,12 @@ public class ClientStoreCommands extends BaseClientStoreCommands {
         sayi("here is the complete client:");
         longFormat(client);
         if (!newIdentifier.equals(client.getIdentifierString())) {
-            sayi2(" remove client with id=\"" + client.getIdentifier() + "\" [y/n]? ");
-            removeCurrentClient = isOk(readline());
+            //sayi2(" remove client with id=\"" + client.getIdentifier() + "\" [y/n]? ");
+            removeCurrentClient = isOk(readline(" remove client with id=\"" + client.getIdentifier() + "\" [y/n]? "));
             client.setIdentifier(BasicIdentifier.newID(newIdentifier));
         }
-        sayi2("save [y/n]?");
-        if (isOk(readline())) {
+        //sayi2("save [y/n]?");
+        if (isOk(readline("save [y/n]?"))) {
             //getStore().save(client);
             if (removeCurrentClient) {
                 info("removing client with id = " + oldID);
@@ -98,7 +98,7 @@ public class ClientStoreCommands extends BaseClientStoreCommands {
         return false;
     }
 
-    protected void getPublicKeyFile(Client client) {
+    protected void getPublicKeyFile(Client client) throws IOException {
         String input;
         String fileNotFoundMessage = INDENT + "...uh-oh, I can't find that file. Please enter it again";
         String secret = client.getSecret();

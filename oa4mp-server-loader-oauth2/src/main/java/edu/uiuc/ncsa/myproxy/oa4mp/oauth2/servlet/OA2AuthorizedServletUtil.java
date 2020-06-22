@@ -397,7 +397,7 @@ public class OA2AuthorizedServletUtil {
     protected void checkPrompts(Map<String, String> map) {
         if (!map.containsKey(PROMPT)) return;  //nix to do
         String prompts = map.get(PROMPT);
-        // now we have tos ee what is in it.
+        // now we have to see what is in it.
         StringTokenizer st = new StringTokenizer(prompts);
         ArrayList<String> prompt = new ArrayList<>();
 
@@ -413,10 +413,14 @@ public class OA2AuthorizedServletUtil {
         }
 
         if (prompt.contains(PROMPT_LOGIN)) return;
+        // CIL-737 fix: accept select_account
+        if (prompt.contains(PROMPT_SELECT_ACCOUNT)) return;
 
         // At this point there is neither a "none" or a "login" and we don's support anything else.
 
-        throw new OA2RedirectableError(OA2Errors.LOGIN_REQUIRED, "You must specify \"login\" as an option", map.get(OA2Constants.STATE));
+        throw new OA2RedirectableError(OA2Errors.LOGIN_REQUIRED,
+                "Only " + PROMPT + "=" + PROMPT_LOGIN + " or " + PROMPT_SELECT_ACCOUNT +
+                        " are supported on this server.", map.get(OA2Constants.STATE));
 
 
     }

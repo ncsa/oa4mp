@@ -6,6 +6,8 @@ import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 
+import java.io.IOException;
+
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 5/22/13 at  1:51 PM
@@ -65,7 +67,7 @@ public class ClientApprovalStoreCommands extends StoreCommands2 {
     }
 
     @Override
-    public boolean update(Identifiable identifiable) {
+    public boolean update(Identifiable identifiable) throws IOException {
         ClientApproval clientApproval = (ClientApproval) identifiable;
         info("Starting update for client approval id=" + identifiable.getIdentifierString());
         sayi("Enter the information for the client approval");
@@ -107,7 +109,7 @@ public class ClientApprovalStoreCommands extends StoreCommands2 {
         say("If you do not supply the number, then the list of clients will be displayed and you may choose then");
     }
 
-    public void approve(InputLine inputLine) {
+    public void approve(InputLine inputLine) throws IOException {
         if (showHelp(inputLine)) {
             showApproveHelp();
             return;
@@ -117,7 +119,7 @@ public class ClientApprovalStoreCommands extends StoreCommands2 {
         approve(ca);
     }
 
-    public void approve(ClientApproval ca) {
+    public void approve(ClientApproval ca) throws IOException {
         info("Starting approval for id=" + ca.getIdentifierString());
         ca.setApprover(getInput("approver", ca.getApprover()));
         //ca.setApproved(isOk(getInput("approve this", ca.isApproved() ? "y" : "n")));
@@ -143,8 +145,7 @@ public class ClientApprovalStoreCommands extends StoreCommands2 {
         }
 
 
-        sayi2("save this approval record [y/n]?");
-        if (isOk(readline())) {
+        if (isOk(readline("save this approval record [y/n]?"))) {
             getStore().save(ca);
             sayi("approval saved");
             info("Approval for id = " + ca.getIdentifierString() + " saved");

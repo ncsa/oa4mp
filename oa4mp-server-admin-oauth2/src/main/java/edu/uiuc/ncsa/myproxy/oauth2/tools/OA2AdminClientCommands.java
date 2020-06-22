@@ -14,6 +14,7 @@ import edu.uiuc.ncsa.security.util.cli.InputLine;
 import net.sf.json.JSONObject;
 import org.apache.commons.codec.digest.DigestUtils;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -47,7 +48,7 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
     }
 
     @Override
-    public void extraUpdates(Identifiable identifiable) {
+    public void extraUpdates(Identifiable identifiable) throws IOException {
         AdminClient client = (AdminClient) identifiable;
         String secret = client.getSecret();
         String input;

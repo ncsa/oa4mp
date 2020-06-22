@@ -20,12 +20,15 @@ public class AdminClient extends BaseClient {
      *  created admin clients.
      */
     public static int DEFAULT_MAX_NUMBER_OF_OIDC_CLIENTS = 50;
-    // Stored as a boolean in the config. Must be true to be treated as a root
-    public static String ROOT_USER_KEY = "root";
+
     /**
      * Store in the config for this user. This will be used for secure communication.
      */
     public static String PUBLIC_KEY_KEY = "public_key";
+/*
+    // Proposed to allow for more latitude for some admin clients. Not really needed.
+    // Stored as a boolean in the config. Must be true to be treated as a root
+    public static String ROOT_USER_KEY = "root";
     public boolean isRootUser(){
         if(hasConfig()){
            return getConfig().getBoolean(ROOT_USER_KEY);
@@ -35,6 +38,7 @@ public class AdminClient extends BaseClient {
     public void setRootUser(boolean isRootUser){
         getConfig().put(ROOT_USER_KEY, isRootUser);
     }
+*/
     public PublicKey getPublicKey() throws InvalidKeySpecException, NoSuchAlgorithmException {
         // The stored format of the public key is x509 public key format that is base64 encoded. This make sure that there
         // can be no issues with charsets or munged characters.

@@ -79,7 +79,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
     }
 
 
-    public void cb(InputLine inputLine) {
+    public void cb(InputLine inputLine) throws IOException {
         if (showHelp(inputLine)) {
             showCBHelp();
             return;
@@ -113,7 +113,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
     }
 
 
-    protected void removeCB(OA2Client client, Collection<String> cbs) {
+    protected void removeCB(OA2Client client, Collection<String> cbs) throws IOException {
         if (cbs.isEmpty()) {
             //    say("Enter callbacks to remove. A blank line ends input");
             say("nothing to remove");
@@ -159,7 +159,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
         return cbs;
     }
 
-    protected void processDBAdd(OA2Client client, Collection<String> newArgs) {
+    protected void processDBAdd(OA2Client client, Collection<String> newArgs) throws IOException {
         if (newArgs.isEmpty()) {
             //   say("No callbacks, please enter them as a comma separated list. Empty line ends input.");
             //  String line = readline();
@@ -187,7 +187,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
      * @param identifiable
      */
     @Override
-    public void extraUpdates(Identifiable identifiable) {
+    public void extraUpdates(Identifiable identifiable) throws IOException {
         OA2Client client = (OA2Client) identifiable;
         String secret = client.getSecret();
         String input;
@@ -362,7 +362,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
 
 
     @Override
-    protected JSONObject loadQDLScript(JSONObject currentConfig) {
+    protected JSONObject loadQDLScript(JSONObject currentConfig) throws IOException {
        /* The configuration is the entire qdl object , i.e.
           {"qdl":{"scripts":[...]}}
         */

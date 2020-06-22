@@ -16,10 +16,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
+import java.io.*;
 import java.math.BigInteger;
 import java.net.URI;
 import java.security.SecureRandom;
@@ -536,15 +533,14 @@ public class JWKUtilCommands extends CommonCommands {
     }
 
 
-    protected boolean getBooleanInput(String prompt) {
+    protected boolean getBooleanInput(String prompt) throws IOException {
         String x = getInput(prompt, "y");
         if (x.equalsIgnoreCase("y") || x.equalsIgnoreCase("yes") || x.equalsIgnoreCase("true")) return true;
         return false;
     }
 
-    protected String getInput(String prompt) {
-        sayi2(prompt + ":");
-        String inLine = readline();
+    protected String getInput(String prompt) throws IOException {
+        String inLine = readline(prompt + ":");
         if (isEmpty(inLine)) {
             return null; // no input. User hit a return
         }

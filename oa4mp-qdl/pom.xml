@@ -72,8 +72,8 @@
                             <archive>
                                 <manifest>
                                     <addClasspath>true</addClasspath>
-                                    <!--<mainClass>edu.uiuc.ncsa.qdl.workspace.QDLWorkspace</mainClass>-->
-                                    <mainClass>edu.uiuc.ncsa.qdl.gui.QDLGUIWorkspace</mainClass>
+                                    <mainClass>edu.uiuc.ncsa.qdl.workspace.QDLWorkspace</mainClass>
+                                    <!--<mainClass>edu.uiuc.ncsa.qdl.gui.QDLGUIWorkspace</mainClass> -->
                                 </manifest>
                                 <manifestEntries>
                                     <application-version>${pom.version}</application-version>

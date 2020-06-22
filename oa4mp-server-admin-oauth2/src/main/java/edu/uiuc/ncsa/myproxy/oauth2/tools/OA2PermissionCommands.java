@@ -10,6 +10,7 @@ import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import net.sf.json.JSONObject;
 
+import java.io.IOException;
 import java.util.HashMap;
 
 /**
@@ -47,7 +48,7 @@ public class OA2PermissionCommands extends StoreCommands2 {
     }
 
     @Override
-    public boolean update(Identifiable identifiable) {
+    public boolean update(Identifiable identifiable) throws IOException {
         Permission p = (Permission) identifiable;
         String input;
         if (p.getClientID() == null) {

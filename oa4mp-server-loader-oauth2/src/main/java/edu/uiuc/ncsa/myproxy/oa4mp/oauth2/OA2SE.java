@@ -260,6 +260,10 @@ public class OA2SE extends ServiceEnvironmentImpl {
     protected ClaimSource claimSource;
     Collection<String> scopes;
 
+    /**
+     * The scopes this server currently supports.
+     * @return
+     */
     public Collection<String> getScopes() {
         return scopes;
     }

@@ -82,8 +82,7 @@ public class SigningCommands extends CommonCommands {
                     sayi("Sorry, but you must supply the name of the file as well (or type 'exit' to exit");
                 } else {
                     if (!isBatchMode()) {
-                        sayi2("The file you gave exists, do you want to over write it? [y/n]");
-                        retry = !isOk(readline());
+                        retry = !isOk(readline("The file you gave exists, do you want to over write it? [y/n]"));
                     }
                 }
             } else {
@@ -91,8 +90,7 @@ public class SigningCommands extends CommonCommands {
             }
         }
         if (!isBatchMode()) {
-            sayi2("create a new set of JSON web keys?[y/n]");
-            if (!isOk(readline())) {
+            if (!isOk(readline("create a new set of JSON web keys?[y/n]"))) {
                 say("create cancelled.");
                 return;
             }

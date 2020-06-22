@@ -73,6 +73,7 @@ public class OA2DiscoveryServlet extends DiscoveryServlet {
 
         JSONArray tokenEndpointAuthSupported = new JSONArray();
         tokenEndpointAuthSupported.add("client_secret_post");
+        tokenEndpointAuthSupported.add("client_secret_basic");
         json.put("token_endpoint_auth_methods_supported", tokenEndpointAuthSupported);
         JSONArray subjectTypes = new JSONArray();
         subjectTypes.add("public");

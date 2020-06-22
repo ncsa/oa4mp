@@ -1,0 +1,6 @@
+{
+   "redirect_uris":["https://client.example.org/callback"],
+   "client_name": "My Example",
+  "token_endpoint_auth_method": "client_secret_basic",
+  "scope": "openid email profile"
+  }

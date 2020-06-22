@@ -58,8 +58,8 @@ public class CopyCommands extends CommonCommands {
         }
         sayi("Verification is " + (verify ? "on" : "off"));
         info("Copy tool, verifications " + (verify ? "on" : "off"));
-        sayi2("Are you sure you want to copy  " + source + " to " + target + ", erasing the current contents of " + target + "? [y|n]");
-        if (!isOk(readline())) {
+        String p = "Are you sure you want to copy  " + source + " to " + target + ", erasing the current contents of " + target + "? [y|n]";
+        if (!isOk(readline(p))) {
             sayi("User cancelled. aborting copy with no changes.");
             info("User aborted copy.");
             return;
