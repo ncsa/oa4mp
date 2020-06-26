@@ -56,6 +56,11 @@ public abstract class AbstractPayloadHandler implements PayloadHandler {
 
     JSONObject extendedAttributes = null;
 
+    /**
+     * Gets the extended attributes from the current transaction. See {@link OA2ServiceTransaction#getExtendedAttributes()}
+     * for more.
+     * @return
+     */
     public JSONObject getExtendedAttributes() {
         if (extendedAttributes == null) {
             extendedAttributes = transaction.getExtendedAttributes();

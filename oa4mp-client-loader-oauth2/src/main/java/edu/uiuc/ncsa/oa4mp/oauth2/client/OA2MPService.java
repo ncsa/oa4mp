@@ -7,27 +7,32 @@ import edu.uiuc.ncsa.myproxy.oa4mp.client.OA4MPService;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.delegation.client.request.*;
-import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
-import edu.uiuc.ncsa.security.delegation.token.MyX509Certificates;
-import edu.uiuc.ncsa.security.delegation.token.Verifier;
+import edu.uiuc.ncsa.security.delegation.storage.Client;
+import edu.uiuc.ncsa.security.delegation.token.*;
+import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
 import edu.uiuc.ncsa.security.oauth_2_0.NonceHerder;
+import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
+import edu.uiuc.ncsa.security.oauth_2_0.OA2RefreshTokenImpl;
 import edu.uiuc.ncsa.security.oauth_2_0.UserInfo;
 import edu.uiuc.ncsa.security.oauth_2_0.client.ATResponse2;
+import edu.uiuc.ncsa.security.oauth_2_0.client.ATServer2;
 import edu.uiuc.ncsa.security.oauth_2_0.client.DS2;
+import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTUtil2;
 import edu.uiuc.ncsa.security.oauth_2_0.server.InvalidNonceException;
+import edu.uiuc.ncsa.security.oauth_2_0.server.RFC8693Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
+import edu.uiuc.ncsa.security.servlet.ServiceClient;
+import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import edu.uiuc.ncsa.security.util.pkcs.CertUtil;
 import edu.uiuc.ncsa.security.util.pkcs.KeyUtil;
 import edu.uiuc.ncsa.security.util.pkcs.MyPKCS10CertRequest;
 import edu.uiuc.ncsa.security.util.pkcs.PEMFormatUtil;
 import net.sf.json.JSONObject;
 
+import java.net.URI;
 import java.net.URLEncoder;
 import java.security.KeyPair;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.client.ClientEnvironment.CALLBACK_URI_KEY;
 import static edu.uiuc.ncsa.security.delegation.client.AbstractClientEnvironment.CERT_REQUEST_KEY;
@@ -309,5 +314,68 @@ public class OA2MPService extends OA4MPService {
         return OA2Asset;
     }
 
+    /*
+    Starting here is support for RFC 8693, token exchange
+     */
+    public JSONObject exchangeRefreshToken(OA2Asset asset, RefreshToken refreshToken) {
+        HashMap<String, String> parameterMap = new HashMap<>();
+        parameterMap.put("subject_token_type", RFC8693Constants.REFRESH_TOKEN_TYPE);
+        parameterMap.put("subject_token", refreshToken.getToken());
+        return exchangeIt(asset, parameterMap);
+    }
+    
+    public JSONObject exchangeAccessToken(OA2Asset asset, AccessToken accessToken) {
+        HashMap<String, String> parameterMap = new HashMap<>();
+        parameterMap.put("subject_token", accessToken.getToken());
+        parameterMap.put("subject_token_type", RFC8693Constants.ACCESS_TOKEN_TYPE);
+        return exchangeIt(asset, parameterMap);
+    }
+
+    /**
+     * Actual workhorse. Takes the token and the type then does the exchange.
+     * @param asset
+     * @param parameterMap
+     * @return
+     */
+     protected JSONObject exchangeIt(OA2Asset asset, HashMap<String, String> parameterMap){
+         ServiceClient serviceClient = getServiceClient();
+         parameterMap.put(OA2Constants.GRANT_TYPE, RFC8693Constants.GRANT_TYPE_TOKEN_EXCHANGE);
+         Client client = getEnvironment().getClient();
+         String rawResponse = serviceClient.getRawResponse(parameterMap, client.getIdentifierString(), client.getSecret());
+
+         System.out.println("raw response = " + rawResponse);
+         JSONObject json = JSONObject.fromObject(rawResponse);
+         updateAsset(asset, json);
+         String rawToken = json.getString(OA2Constants.ACCESS_TOKEN);
+         JSONWebKeys keys = JWTUtil2.getJsonWebKeys(serviceClient, ((OA2ClientEnvironment) getEnvironment()).getWellKnownURI());
+         JSONObject j = null;
+         try {
+             // See if its a SciToken
+             j= JWTUtil2.verifyAndReadJWT(rawToken, keys);
+         }catch(Throwable t){
+             j = new JSONObject();
+             j.put(OA2Constants.ACCESS_TOKEN, rawToken);
+         }
+         return j;
+
+     }
+
+
+    public ServiceClient getServiceClient() {
+        ATServer2 atServer2 = (ATServer2) getEnvironment().getDelegationService().getAtServer();
+        return atServer2.getServiceClient();
+    }
+    protected void updateAsset(OA2Asset asset, JSONObject claims) {
+        String rt = claims.getString(OA2Constants.REFRESH_TOKEN);
+        if (rt != null && !rt.isEmpty()) {
+            RefreshToken refreshToken = new OA2RefreshTokenImpl(URI.create(rt));
+            asset.setRefreshToken(refreshToken);
+        }
+        // reset access token to returned value and stash it
+        String at = claims.getString(OA2Constants.ACCESS_TOKEN);
+        AccessTokenImpl accessToken = new AccessTokenImpl(URI.create(at));
+        asset.setAccessToken(accessToken);
+        getEnvironment().getAssetStore().save(asset);
+    }
 
 }

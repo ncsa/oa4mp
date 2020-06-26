@@ -26,6 +26,11 @@ import static edu.uiuc.ncsa.qdl.scripting.Scripts.*;
  * <p>Created by Jeff Gaynor<br>
  * on 2/12/20 at  3:21 PM
  */
+/*
+  NOTE This is older. The new way to do this is documented in qdl_server_scripts.odt
+  and the utility edu.uiuc.ncsa.qdl.scripting.AnotherJSONUtil
+  This will be deprecated and removed at some point!
+ */
 public class QDLJSONConfigUtil implements ScriptingConstants {
     /**
      * Takes a list

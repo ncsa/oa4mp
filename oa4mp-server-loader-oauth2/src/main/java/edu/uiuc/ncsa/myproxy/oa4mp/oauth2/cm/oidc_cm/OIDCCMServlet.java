@@ -37,7 +37,7 @@ import java.sql.SQLException;
 import java.util.*;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.oidc_cm.OIDCCMConstants.*;
-import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8693Constants.GRANT_TYPE_TOKEN_EXCHANGE;
+import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8693Constants2.GRANT_TYPE_TOKEN_EXCHANGE;
 
 /**
  * Note that in all of these calls, the assumption is that an admin client has been requested and

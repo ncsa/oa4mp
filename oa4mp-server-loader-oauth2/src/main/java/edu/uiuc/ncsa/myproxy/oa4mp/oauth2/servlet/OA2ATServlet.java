@@ -28,7 +28,10 @@ import edu.uiuc.ncsa.security.oauth_2_0.server.RTIRequest;
 import edu.uiuc.ncsa.security.oauth_2_0.server.RTIResponse;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSourceFactory;
+import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
+import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
+import net.sf.json.JSONObject;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.http.HttpStatus;
 
@@ -36,14 +39,14 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 
-import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8693Constants.GRANT_TYPE_TOKEN_EXCHANGE;
+import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8693Constants2.*;
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.CLIENT_SECRET;
+import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.JWT_ID;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -93,7 +96,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         }
         OA2Client client = (OA2Client) st2.getClient();
         long lifetime = client.getRtLifetime();
-        if(0 < st2.getRefreshTokenLifetime()) {
+        if (0 < st2.getRefreshTokenLifetime()) {
             // IF they specified a refresh token lifetime in the request, take the minimum of that
             // and whatever they client is allowed.
             lifetime = Math.min(st2.getRefreshTokenLifetime(), lifetime);
@@ -117,14 +120,14 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
                                      HttpServletResponse response) throws Throwable {
 
         OA2Client client = (OA2Client) getClient(request);
-        OA2SE oa2SE = (OA2SE)getServiceEnvironment();
+        OA2SE oa2SE = (OA2SE) getServiceEnvironment();
         if (oa2SE.isRfc8693Enabled() && grantType.equals(GRANT_TYPE_TOKEN_EXCHANGE)) {
             // Grants are checked in the doIt method
 
             // RFC8693 support - token exchange
             doRFC8693(client, request, response);
             return true;
-         }
+        }
 
 
         if (grantType.equals(OA2Constants.GRANT_TYPE_REFRESH_TOKEN)) {
@@ -152,10 +155,157 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
 
     private void doRFC8693(OA2Client client,
                            HttpServletRequest request,
-                           HttpServletResponse response) {
+                           HttpServletResponse response) throws IOException {
         printAllParameters(request);
         // https://tools.ietf.org/html/rfc8693
 
+        String subjectToken = getFirstParameterValue(request, SUBJECT_TOKEN);
+        if (subjectToken == null) {
+            throw new GeneralException("Error: missing subject token");
+        }
+        // And now do the spec stuff for the actor token
+        String actorToken = getFirstParameterValue(request, ACTOR_TOKEN);
+        String actorTokenType = getFirstParameterValue(request, ACTOR_TOKEN_TYPE);
+        // We don't support the actor token, and the spec says that we can ignore it
+        // *but* if it is missing and the actor token type is there, reject the request
+        if ((actorToken == null && actorTokenType != null)) {
+            throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, "invalid request, no actor token type is allowed", HttpStatus.SC_BAD_REQUEST);
+        }
+        AccessToken accessToken = null;
+        RefreshToken refreshToken = null;
+        JSONObject sciTokens = null;
+        OA2ServiceTransaction t = null;
+        OA2SE oa2se = (OA2SE) getServiceEnvironment();
+        OA2TokenForge tokenForge = ((OA2TokenForge) getServiceEnvironment().getTokenForge());
+        JSONWebKeys keys = ((OA2SE) getServiceEnvironment()).getJsonWebKeys();
+        String subjectTokenType = getFirstParameterValue(request, SUBJECT_TOKEN_TYPE);
+        if (subjectTokenType == null) {
+            throw new GeneralException("Error: missing subject token type");
+        }
+        /*
+        These can come as multiple space delimited string and as multiple parameters, so it is possible to get
+        arrays of arrays of these and they have to be regularized to a single list for processing.
+        NOTE: These are ignored for regular access tokens. For SciTokens we *should* allow exchanging
+        a token for a weaker one. Need to figure out what weaker means though.
+         */
+        Collection<String> audience = convertToList(request, AUDIENCE);
+        Collection<String> scopes = convertToList(request, OA2Constants.SCOPE);
+        Collection<String> resources = convertToList(request, RESOURCE);
+         boolean isSciToken = false;
+        if (subjectTokenType.equals(ACCESS_TOKEN_TYPE)) {
+            // So we have an access token. Try to interpret it first as a SciToken then if that fails as a
+            // standard OA4MP access token:
+            try {
+                sciTokens = JWTUtil.verifyAndReadJWT(subjectToken, keys);
+                accessToken = tokenForge.getAccessToken(sciTokens.getString(JWT_ID));
+            } catch (Throwable tt) {
+                // didn't work, so now we assume it is a SciToken and verify then parse it
+                accessToken = oa2se.getTokenForge().getAccessToken(subjectToken);
+            }
+            t = (OA2ServiceTransaction) getTransactionStore().get(accessToken);
+
+        }
+        if (subjectTokenType.equals(REFRESH_TOKEN_TYPE)) {
+            // Handle the refresh token case.
+            try {
+                refreshToken = tokenForge.getRefreshToken(subjectToken);
+                RefreshTokenStore zzz = (RefreshTokenStore) getTransactionStore();
+                t = zzz.get(refreshToken);
+            } catch (Throwable tt) {
+                throw new GeneralException("Error: Could not get a refresh token:" + tt.getMessage());
+            }
+        }
+        if (t == null) {
+            throw new GeneralException("Error: no pending transaction found.");
+        }
+
+        HashMap<String, String> parameters = new HashMap<>();
+        parameters.put(OA2Claims.SUBJECT, t.getUsername());
+        parameters.put(JWTUtil.KEY_ID, keys.getDefaultKeyID());
+        accessToken = tokenForge.getAccessToken();
+        t.setAccessToken(accessToken);
+        JSONObject claims = new JSONObject();
+        claims.put(OA2Constants.ACCESS_TOKEN, accessToken.getToken()); // Required.
+        OA2Client oa2Client = (OA2Client) t.getClient();
+        // only return a refresh token if the server is configured to do so and the client is too.
+        if (oa2Client.isRTLifetimeEnabled() && oa2se.isRefreshTokenEnabled()) {
+            refreshToken = tokenForge.getRefreshToken();
+            t.setRefreshToken(refreshToken);
+            claims.put(OA2Constants.REFRESH_TOKEN, refreshToken.getToken()); // Optional
+        }
+        /*
+        About the token type. We return access_token. It is also possible to return a type of
+        jwt. We do not do that because that also implies we are supporting
+
+        https://tools.ietf.org/html/rfc7523
+
+        which we do not. SciTokens are a type of access token and that is where we leave it for now.
+        We may also issue a refresh token, but since the issued token type is single-valued,
+        we don't return a token type of refresh_token.
+         */
+        claims.put(ISSUED_TOKEN_TYPE, ACCESS_TOKEN_TYPE); // Required. This is the type of token issued (mostly access tokens). Must be as per TX spec.
+        claims.put(OA2Constants.TOKEN_TYPE, TOKEN_TYPE_BEARER); // Required. This is how the issued token can be used, mostly. BY RFC 6750 spec.
+        claims.put(OA2Constants.EXPIRES_IN, Long.toString(Long.valueOf(System.currentTimeMillis() / 1000L + 900L))); // Optional
+        // TODO -- figure out scopes for SciTokens. These are optional if they are the same as the scope parameter (or parameter omitted).
+        // Issue is that OIDC client scopes do not alter the access token. SciToken scopes, however, do.
+        // handle OIDC clients:
+        if (client.isOIDCClient() && 0<scopes.size()) {
+            // OIDC client
+            Collection<String> newScopes = OA2AuthorizedServletUtil.intersection(scopes, client.getScopes());
+            if (newScopes.size() != client.getScopes().size()) {
+                // Have to return the scopes
+                if (!newScopes.contains(OA2Scopes.SCOPE_OPENID)) {
+                    newScopes.add(OA2Scopes.SCOPE_OPENID);
+                }
+                String outscopes = "";
+                boolean firstPass = true;
+                for (String x : newScopes) {
+                    outscopes = outscopes + x;
+                    if (firstPass) {
+                        firstPass = false;
+                        outscopes = x;
+                    } else {
+                        outscopes = outscopes + " " + x;
+                    }
+                }
+                // Set it to the restricted set of scopes???
+                client.setScopes(newScopes);
+                claims.put(OA2Constants.SCOPE, outscopes);
+            }
+        }
+        t.setClaims(claims); // now stash it for future use.
+        getTransactionStore().save(t);
+        PrintWriter osw = response.getWriter();
+        claims.write(osw);
+        osw.flush();
+        osw.close();
+
+
+    }
+
+    /**
+     * Convert a string or list of strings to a list of them. This is for lists of space delimited values
+     * The spec allows for multiple value which in practice can also mean that a client makes the request with
+     * multiple parameters, so we have to snoop for those and for space delimited string inside of those.
+     * This is used by RFC 8693.
+     *
+     * @param req
+     * @param parameterName
+     * @return
+     */
+    protected List<String> convertToList(HttpServletRequest req, String parameterName) {
+        ArrayList<String> out = new ArrayList<>();
+        String[] rawValues = req.getParameterValues(parameterName);
+        if (rawValues == null) {
+            return out;
+        }
+        for (String v : rawValues) {
+            StringTokenizer st = new StringTokenizer(v);
+            while (st.hasMoreTokens()) {
+                out.add(st.nextToken());
+            }
+        }
+        return out;
     }
 
     @Override
@@ -170,7 +320,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             return;
         }
         warn("Error: grant type +\"" + grantType + "\" was not recognized. Request rejected.");
-        throw new OA2GeneralError(OA2Errors.REQUEST_NOT_SUPPORTED,"unsupported grant type.", HttpStatus.SC_BAD_REQUEST);
+        throw new OA2GeneralError(OA2Errors.REQUEST_NOT_SUPPORTED, "unsupported grant type.", HttpStatus.SC_BAD_REQUEST);
     }
 
     protected IssuerTransactionState doAT(HttpServletRequest request, HttpServletResponse response, OA2Client client) throws Throwable {
@@ -186,7 +336,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "access denied", HttpStatus.SC_UNAUTHORIZED);
         }
         JWTRunner jwtRunner = new JWTRunner(st2, ScriptRuntimeEngineFactory.createRTE(oa2SE, st2.getOA2Client().getConfig()));
-        IDTokenHandler idTokenHandler = new IDTokenHandler(oa2SE,st2);
+        IDTokenHandler idTokenHandler = new IDTokenHandler(oa2SE, st2);
         jwtRunner.addHandler(idTokenHandler);
         jwtRunner.doTokenClaims();
 
@@ -296,6 +446,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             DebugUtil.trace(this, "doIt: no secret, throwing exception.");
             throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT, "Missing secret");
         }
+        // TODO -- replace next call with sha1Hex(rawSecret)? Need to know side effects first!
         if (!client.getSecret().equals(DigestUtils.shaHex(rawSecret))) {
             DebugUtil.trace(this, "doIt: bad secret, throwing exception.");
             throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT, "Incorrect secret");

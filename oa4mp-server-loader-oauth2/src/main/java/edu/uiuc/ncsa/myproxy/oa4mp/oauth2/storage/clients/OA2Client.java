@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.delegation.storage.BaseClient;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
+import edu.uiuc.ncsa.security.oauth_2_0.OA2Scopes;
 import edu.uiuc.ncsa.security.oauth_2_0.server.OA2ClientScopes;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
 import net.sf.json.JSONArray;
@@ -48,6 +49,9 @@ public class OA2Client extends Client implements OA2ClientScopes {
         return publicClient;
     }
 
+    public boolean isOIDCClient(){
+        return getScopes().contains(OA2Scopes.SCOPE_OPENID);
+    }
     public void setPublicClient(boolean publicClient) {
         this.publicClient = publicClient;
     }

@@ -12,7 +12,9 @@ import edu.uiuc.ncsa.security.core.util.DateUtils;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.delegation.client.request.RTResponse;
+import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
+import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
 import edu.uiuc.ncsa.security.delegation.token.impl.AuthorizationGrantImpl;
 import edu.uiuc.ncsa.security.oauth_2_0.UserInfo;
 import edu.uiuc.ncsa.security.oauth_2_0.client.ATResponse2;
@@ -20,6 +22,10 @@ import edu.uiuc.ncsa.security.util.cli.InputLine;
 import edu.uiuc.ncsa.security.util.pkcs.CertUtil;
 import net.sf.json.JSONObject;
 
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.UnsupportedEncodingException;
@@ -65,11 +71,12 @@ public class OA2CLCCommands extends CLCCommands {
 
     public void getURIHelp() {
         say("Usage: This will create the correct URL to pass to your browser.");
-        say("       This URL should be pasted exactly into the location bar.");
-        say("       You must then authenticate. After you authenticate, the");
-        say("       service will attempt a call back to a client endpoint which will");
-        say("       fail (this is the hook that lets us do this manually).");
-        say("       Next Step: You should invoke setgrant with the callback uri from the server.");
+        say("   This will put this in to the clipboard if possible.");
+        say("   This URL should be pasted exactly into the location bar.");
+        say("   You must then authenticate. After you authenticate, the");
+        say("   service will attempt a call back to a client endpoint which will");
+        say("   fail (this is the hook that lets us do this manually).");
+        say("   Next Step: You should invoke setgrant with the callback uri from the server.");
 
     }
 
@@ -95,6 +102,12 @@ public class OA2CLCCommands extends CLCCommands {
         OA4MPResponse resp = getService().requestCert(id);
         DebugUtil.trace(this, "client id = " + getCe().getClientId());
         dummyAsset = (OA2Asset) getCe().getAssetStore().get(id.toString());
+        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+        if (clipboard != null) {
+            StringSelection data = new StringSelection(resp.getRedirect().toString());
+            clipboard.setContents(data, data);
+            say("URL copied to clipboard:");
+        }
         say(resp.getRedirect().toString());
     }
 
@@ -125,11 +138,19 @@ public class OA2CLCCommands extends CLCCommands {
     AuthorizationGrant grant;
 
     public void setgrant(InputLine inputLine) throws Exception {
-        if (inputLine.size() != 2 || showHelp(inputLine)) {
+        if (showHelp(inputLine)) {
             setGrantHelp();
             return;
         }
-        String x = inputLine.getArg(1); // zero-th element is the name of this function. 1st is the actual argument.
+        String x = null;
+        if (inputLine.size() == 1) {
+            // no arg. get it from the clipboard
+            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+            x = (String) clipboard.getData(DataFlavor.stringFlavor);
+        } else {
+
+            x = inputLine.getArg(1); // zero-th element is the name of this function. 1st is the actual argument.
+        }
         // now we parse this.
         if (!x.startsWith(getCe().getCallback().toString())) {
             say("The callback in the configuration does not match that in the argument you gave");
@@ -182,10 +203,10 @@ public class OA2CLCCommands extends CLCCommands {
     OA2Asset dummyAsset;
 
     protected void saveCertHelp() {
-        say("savecert filename");
-        say("This will save the cert (be sure to do a getcert call first so you have one) to the");
-        say("fully qualified filename");
-        say("If there is no cert available, no file will be written, but a message will be printed.");
+        say("savecert filename:");
+        say("   This will save the cert (be sure to do a getcert call first so you have one) to the");
+        say("   fully qualified filename");
+        say("   If there is no cert available, no file will be written, but a message will be printed.");
     }
 
     /**
@@ -221,9 +242,10 @@ public class OA2CLCCommands extends CLCCommands {
     String rawIdToken = null;
 
     protected void showRawTokenHelp() {
-        sayi("showRawToken - This will show the raw id token, i.e., the JWT. ");
-        sayi("               If you wish to see the contents of this JWT");
-        sayi("               you should probably invoke showClaims instead.");
+        sayi("showRawToken:");
+        say("    This will show the raw id token, i.e., the JWT. ");
+        sayi("   If you wish to see the contents of this JWT");
+        sayi("   you should probably invoke showClaims instead.");
     }
 
     public void showrawtoken(InputLine inputLine) throws Exception {
@@ -259,14 +281,17 @@ public class OA2CLCCommands extends CLCCommands {
     }
 
     protected void showClaimsHelp() {
-        sayi("showClaims - This will show the most recent set of claims. You must get an access token");
-        sayi("             before this is set.");
-        sayi("             You may also see the raw version of this (simply the JWT) by calling showRawToken.");
+        sayi("showClaims");
+        say("    This will show the most recent set of claims. You must get an access token");
+        sayi("   before this is set.");
+        sayi("   You may also see the raw version of this (simply the JWT) by calling showRawToken.");
     }
-    protected void showRevokeHelp(){
+
+    protected void showRevokeHelp() {
         say("revoke -at | -rt = revoke either the access token of the refresh token");
     }
-    public void revoke(InputLine inputLine) throws Exception{
+
+    public void revoke(InputLine inputLine) throws Exception {
         if (grant == null || showHelp(inputLine)) {
             showRevokeHelp();
             return;
@@ -276,6 +301,7 @@ public class OA2CLCCommands extends CLCCommands {
 
 
     }
+
     public void getat(InputLine inputLine) throws Exception {
         if (grant == null || showHelp(inputLine)) {
             getATHelp();
@@ -304,13 +330,16 @@ public class OA2CLCCommands extends CLCCommands {
     ATResponse2 currentATResponse;
 
     protected void getCertHelp() {
-        say("getcert: This will get the requested cert chain from the server.");
+        say("getcert");
+        say("   This will get the requested cert chain from the server.");
     }
 
     protected void getUIHelp() {
-        say("getuserinfo: This will get the user info from the server. You must have already authenticated");
-        say("             *and* gotten a valid access token by this point. Just a list of these it printed.");
-        say("             What is returned is dependant upon what the server supports.");
+        say("getuserinfo");
+        say("   This will get the user info from the server. You must have already authenticated");
+        say("   *and* gotten a valid access token by this point. Just a list of these it printed.");
+        say("   What is returned is dependant upon what the server supports.");
+        say("   If possible this will be put in to the clipboard for easy access.");
     }
 
     public void getuserinfo(InputLine inputLine) throws Exception {
@@ -345,9 +374,9 @@ public class OA2CLCCommands extends CLCCommands {
 
     protected void getRTHelp() {
         say("getrt [-claims]:");
-        say("       Get a new refresh token. You must have already called getat to have gotten an access token");
-        say("       first. This will print out a summary of the expiration time.");
-        say("       If the " + CLAIMS_FLAG + " flag is supplied, the id token will be printed");
+        say("   Get a new refresh token. You must have already called getat to have gotten an access token");
+        say("   first. This will print out a summary of the expiration time.");
+        say("   If the " + CLAIMS_FLAG + " flag is supplied, the id token will be printed");
     }
 
     protected void printTokens() {
@@ -392,17 +421,60 @@ public class OA2CLCCommands extends CLCCommands {
 
     protected void getATHelp() {
         say("getat [-claims]:");
-        say("       Gets the access token and refresh token (if supported on the server) for a given grant. ");
-        say("       Your must have already set the grant with the setgrant call.");
-        say("       A summary of the refresh token and its expiration is printed, if applicable.");
-        say("       If the -" + CLAIMS_FLAG + " flag is supplied, the id token will be printed");
+        say("   Gets the access token and refresh token (if supported on the server) for a given grant. ");
+        say("   Your must have already set the grant with the setgrant call.");
+        say("   A summary of the refresh token and its expiration is printed, if applicable.");
+        say("   If the -" + CLAIMS_FLAG + " flag is supplied, the id token will be printed");
 
     }
 
     protected void setGrantHelp() {
-        say("setgrant: The assumption is that you use geturi to get the correct authorization uri and have ");
-        say("          logged in. Your browser *should* have a call back to your client. Cut and paste that");
-        say("          as the argument to this call. This will return a string with the grant in it. You can use");
-        say("          that to get an access token.");
+        say("setgrant [callback]:");
+        say("   The assumption is that you use geturi to get the correct authorization uri and have ");
+        say("   logged in. Your browser *should* have a call back to your client.");
+        say("   Copy that to the clipboard. If you call this with no argument, then the clipboard is read.");
+        say("   Otherwise paste the callback ");
+        say("   as the argument to this call. This will return a string with the grant in it. You can use");
+        say("   that to get an access token.");
+    }
+
+    protected void exchangeHelp() {
+        sayi("exchange [-at|-rt]");
+        sayi("   This will exchange the current access token (so you need to have gotten that far first)");
+        sayi("   for a secure token. The response will contain other information that will be displayed.");
+        sayi("   If there is no parameter, the current access token is used for the exchange");
+        sayi("   Otherwise you may specify -at to exchange the access token or -rt to exchange using the refresh token.");
+    }
+
+    JSONObject sciToken = null;
+
+    public void exchange(InputLine inputLine) throws Exception {
+        if (showHelp(inputLine)) {
+            exchangeHelp();
+            return;
+        }
+        boolean didIt = false;
+        if (1 == inputLine.size() || inputLine.hasArg("-at")) {
+            didIt = true;
+            AccessToken at = getDummyAsset().getAccessToken();
+            JSONObject response = getService().exchangeAccessToken(getDummyAsset(), at);
+            sciToken = response;
+
+            sayi(response.toString(2));
+        }
+        if (inputLine.hasArg("-rt")) {
+            didIt = true;
+            RefreshToken rt = getDummyAsset().getRefreshToken();
+            JSONObject response = getService().exchangeRefreshToken(getDummyAsset(), rt);
+            sciToken = response;
+
+            sayi(response.toString(2));
+        }
+        if (!didIt) {
+            sayi("Sorry, argument not understood");
+            exchangeHelp();
+        }
+
+
     }
 }

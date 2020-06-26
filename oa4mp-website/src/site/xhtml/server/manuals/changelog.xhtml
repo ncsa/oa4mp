@@ -10,7 +10,28 @@
 <body class="composite">
 <!--#include virtual="../../header.html" -->
 <p>Changes to the OA4MP server by version.</p>
- <h2>4.4.3</h2>
+<h2>5.0</h2>
+<ul>
+    <li>CIL-708, CIL-689: Verify RFC 8693 (token exchange endpoint) compliance.</li>
+    <li>CIL-720: Update dynamic client registration webpage to list required parameters.</li>
+    <li>CIL-725: (RFC 7592) Allow admin clients to set the scopes of clients they administer.</li>
+    <li>CIL-729: Limited support for ISO 6429. This affects command line clients and utilities only.</li>
+    <li>CIL-737: Allow for prompt = select_login. Henceforth we accept all standard prompts except "none" and
+        "consent".
+    </li>
+    <li>CIL-739: Restrict to absolute URIs callbacks only.</li>
+
+</ul>
+
+<h2>4.4.4</h2>
+<p>Release date 2020-06-22</p>
+<ul>
+    <li>CIL-733: (RFC 7591/7592) token_endpoint_auth_method missing on GET</li>
+    <li>CIL-734: (RFC 7591/7592) client metadate returned inside cfg object</li>
+    <li>CIL-735: (RFC 7591/7592) cannot delete cfg object</li>
+</ul>
+
+<h2>4.4.3</h2>
 <p>Release date 2020-05-29</p>
 <ul>
     <li>CIL-683: CLI should update issuer for admin clients when asked to do so.</li>
@@ -18,27 +39,42 @@
     <li>CIL-685: CLI should ask for confirmation when deleting objects.</li>
     <li>CIL-701: Incorrect grant type should return status code of 400.</li>
 </ul>
+
+
 <h2>4.4.1</h2>
 <p>Release date 2020-04-23.</p>
 
 <ul>
-    <li><a href="https://github.com/ncsa/OA4MP/issues/5">Github issue 5</a>: Support <a href="https://openid.net/specs/oauth-v2-multiple-response-types-1_0.html#ResponseModes">multiple response modes</a>
-    I.e., the callback may optionally have its authorization response parameters encoded as a fragment, not a query.</li>
+    <li><a href="https://github.com/ncsa/OA4MP/issues/5">Github issue 5</a>: Support <a
+            href="https://openid.net/specs/oauth-v2-multiple-response-types-1_0.html#ResponseModes">multiple response
+        modes</a>
+        I.e., the callback may optionally have its authorization response parameters encoded as a fragment, not a query.
+    </li>
     <li><a href="https://github.com/ncsa/OA4MP/issues/8">Github issue 8</a>: support for public clients</li>
-    <li><a href="https://github.com/ncsa/OA4MP/issues/13">Github issue 13</a>, CIL-646: Implement <a href="https://tools.ietf.org/html/rfc7009.">rfc 7009</a>
-    for token revocation.</li>
-    <li><a href="https://github.com/ncsa/OA4MP/issues/15">Github issue 15</a>: OA4MP may be turned in to an OIDC compliant
+    <li><a href="https://github.com/ncsa/OA4MP/issues/13">Github issue 13</a>, CIL-646: Implement <a
+            href="https://tools.ietf.org/html/rfc7009.">rfc 7009</a>
+        for token revocation.
+    </li>
+    <li><a href="https://github.com/ncsa/OA4MP/issues/15">Github issue 15</a>: OA4MP may be turned in to an OIDC
+        compliant
         service by setting the <a href="server/dtd/server-dtd-service-tag.html">OIDCEnabled flag</a></li>
     <li><a href="https://github.com/ncsa/OA4MP/issues/19">Github issue 19</a>:Added QDL support.</li>
     <li>CIL-525: More refresh token tests</li>
     <li>CIL-540:(CIlogon only) Relax requirements for user attributes. as long as a user is only requesting a scope
-        of openid (so no certs or extended information such as groups) and has an idp and an identifier CILogon will accept
-        the user. </li>
-    <li>CIL-639:Allow users to specify roles. In particular now, OA4MP will accept certain scoped additional request parameters
-    and, depending on the client, act upon them.</li>
+        of openid (so no certs or extended information such as groups) and has an idp and an identifier CILogon will
+        accept
+        the user.
+    </li>
+    <li>CIL-639:Allow users to specify roles. In particular now, OA4MP will accept certain scoped additional request
+        parameters
+        and, depending on the client, act upon them.
+    </li>
     <li>CIL-646: Support token introspection. There is now an /introspect endpoint available. First cut is very, very
-    basic and merely allows for a client to query if a given access token is valid. Since we are moving to self-describing
-    tokens it is unclear if we should support the other operations which are basically reading the token back to a service.</li>
+        basic and merely allows for a client to query if a given access token is valid. Since we are moving to
+        self-describing
+        tokens it is unclear if we should support the other operations which are basically reading the token back to a
+        service.
+    </li>
     <li>CIL-648: Recheck claims at token refresh. There is also scripting support now for this.</li>
     <li>CIL-649: Support pairwise id and subject id (in CILogon).</li>
     <li>CIL-666: Command Line Interface improvements. Please see the <a href="cli.html">cli manual</a> for details.</li>
@@ -50,51 +86,68 @@
 <p>Release date 2019-11-20.</p>
 
 <ul>
-    <li>CIL-352: CILogon previous subject issue. In some cases in CILogon, the country should be US and is not archived this way when updating.
-        This really is just a minor annoyance.</li>
+    <li>CIL-352: CILogon previous subject issue. In some cases in CILogon, the country should be US and is not archived
+        this way when updating.
+        This really is just a minor annoyance.
+    </li>
     <li>CIL-493: Extra scopes that have not been approved for a client are ignored, as per the spec.</li>
     <li>CIL-503: Creating a new user results in a serial string with the same index.</li>
     <li>CIL-518: Remove zero length files. This now has a flag to enable/disable this in the configuration.
-        It is only an issue if a server is using file storage. Look at the file store documentation to learn more.</li>
-    <li>CIL-525: Added a file-based claim source in addition to claim sources from LDAP, headers and such. This allows server
-        to manage either all their claims or have a repository for very specific ones.</li>
-    <li>CIL-566: Fire email for admin client registration. <b>NOTE:</b> the reason this failed at one point was because of an upgrade from Java 8 to Java 11. Please
-    see the email configuration documentation for the details of getting this to work. Basically you need to include
-    on more file.</li>
+        It is only an issue if a server is using file storage. Look at the file store documentation to learn more.
+    </li>
+    <li>CIL-525: Added a file-based claim source in addition to claim sources from LDAP, headers and such. This allows
+        server
+        to manage either all their claims or have a repository for very specific ones.
+    </li>
+    <li>CIL-566: Fire email for admin client registration. <b>NOTE:</b> the reason this failed at one point was because
+        of an upgrade from Java 8 to Java 11. Please
+        see the email configuration documentation for the details of getting this to work. Basically you need to include
+        on more file.
+    </li>
     <li>CIL-567: Support for RFC 7592, updating and removing client information.</li>
-    <li>CIL-570: Better return codes when creating a transaction fails. </li>
+    <li>CIL-570: Better return codes when creating a transaction fails.</li>
     <li>CIL-575: List of failure codes from create transaction failure.</li>
     <li>CIL-576: The CLI should use the same logic as the registration form for callback URLs. This means allowing for
-    calls to http://localhost, e.g.</li>
+        calls to http://localhost, e.g.
+    </li>
     <li>CIL-579: Last modified date added to all clients. When a client is saved, this is updated. Note that this will
-    update database tables autoamtically.</li>
-    <li>CIL-586: return list of scopes if different from what is requested. As per the spec. if a client requests a set of scopes
-        but the server does not honor any of them, a list of what the server will honor is returned.</li>
+        update database tables autoamtically.
+    </li>
+    <li>CIL-586: return list of scopes if different from what is requested. As per the spec. if a client requests a set
+        of scopes
+        but the server does not honor any of them, a list of what the server will honor is returned.
+    </li>
     <li>CIL-609: remove blank lines in callback uri list when registering a new client.</li>
     <li>CIL-612: Limit number of OAuth clients than an admin can register.</li>
     <li></li>
 </ul>
-<p>Other things to note in this release is the the CLI now supports setting  environment variables both in a
-file (either a Java properties file or a JSON object in a file) and from the command line. </p>
+<p>Other things to note in this release is the the CLI now supports setting environment variables both in a
+    file (either a Java properties file or a JSON object in a file) and from the command line. </p>
 
 <h2>4.2</h2>
 <p>Release date 2019-05-15.</p>
 
 <ul>
     <li>Added support for turning on/off OIDC abilities in the configuration file with the OIDCEnabled flag.</li>
-    <li>CIL-467:Eliminate init endpoint (this was very specific to CILogon). </li>
+    <li>CIL-467:Eliminate init endpoint (this was very specific to CILogon).</li>
     <li>CIL-490: Added a check box on the client registration form to allow marking a client as public. Note that
-    this will automatically set the scopes to only "openid".</li>
+        this will automatically set the scopes to only "openid".
+    </li>
     <li>CIL-506: Support for the OAuth dynamic client registration specification is added.</li>
     <li>CIL-515:demo client will now show the id token and information about it</li>
     <li>CIL-532: eduPersonEntitlement support. Generally all additional attributes that Shibboleth sends are now
-    returned as claims unless specifically omitted.</li>
+        returned as claims unless specifically omitted.
+    </li>
     <li>CIL-535: configuration snippets are now stored and may be accessed generally in other client configurationd.
-        This allows for the practical inheritance of configurations.</li>
+        This allows for the practical inheritance of configurations.
+    </li>
     <li>CIL-545:Accept a wider range of redirects during client registration.
-        Redirect URIs may be to any domain if the scheme is https. If the scheme is http then only redirects to localhost
-    or a reserved private range such as 192.168.x.x are allowed. If the scheme is not http or https, any domain is allowed.
-    This last feature is needed for mobile device support.</li>
+        Redirect URIs may be to any domain if the scheme is https. If the scheme is http then only redirects to
+        localhost
+        or a reserved private range such as 192.168.x.x are allowed. If the scheme is not http or https, any domain is
+        allowed.
+        This last feature is needed for mobile device support.
+    </li>
 </ul>
 
 <h2>4.1.1</h2>
@@ -103,16 +156,20 @@ file (either a Java properties file or a JSON object in a file) and from the com
 <ul>
     <li>CIL-476: Allow for setting reply-to header in email notifications</li>
     <li>CIL-491: Public clients get a trivial ID token when they get an access token. This allows certain services
-        like kubernetes  to check the timestamps and the ID token.</li>
+        like kubernetes to check the timestamps and the ID token.
+    </li>
     <li>CIL-499: Check that certain claims are present before returning them. This prevents an unruly script
-    from creating an unsuable claims object.</li>
+        from creating an unsuable claims object.
+    </li>
     <li>CIL-501: CLI displays multiple attributes when fully listing a client.</li>
-    <li>CIL-505: (in the DB service) Return a better error message if a request times out. </li>
+    <li>CIL-505: (in the DB service) Return a better error message if a request times out.</li>
     <li>CIL-508: CLI should be able to list all clients for a given admin. In the admin module, this is the
-    list_clients command.</li>
+        list_clients command.
+    </li>
     <li>CIL-512: Support for LIGO Robot DNs added</li>
     <li>CIL-513: HTTP headers claim source should be configurable to ignore certain returned claims, since in a proxying
-    situation, these may be for the proxy, not for the requesting client.</li>
+        situation, these may be for the proxy, not for the requesting client.
+    </li>
     <li>CIL-517: Requests to the service using POST should be refused unless the encoding is only form URL.</li>
     <li>CIL-519: Client Management should return an uploaded cfg object when querying the client's attributes.</li>
 </ul>
@@ -130,28 +187,38 @@ file (either a Java properties file or a JSON object in a file) and from the com
     <li>CIL-422: Restrict access based on group membership.</li>
     <li>CIL-425: More flexible scope handling</li>
     <li>CIL-435: Return group number with group information</li>
-    <li>CIL-436: LSST isMemberOf validation endpoint. See the doc <a href="https://docs.google.com/document/d/1iwnNDZ0l0nNrqCaB41vjLb_tQRjtJUe8xpf469oT84o/edit#">here</a></li>
+    <li>CIL-436: LSST isMemberOf validation endpoint. See the doc <a
+            href="https://docs.google.com/document/d/1iwnNDZ0l0nNrqCaB41vjLb_tQRjtJUe8xpf469oT84o/edit#">here</a></li>
     <li>CIL-443: CILogon isMemberOf should parse the NCSA's LDAP information into a standard format</li>
     <li>CIL-448: Odd claims from surge. This requires checking eppn by domain and restricting access accordingly.</li>
     <li>CIL-460: Admin service rejects attempts by clients to update themselves.</li>
     <li>CIL-462: Get acr claim and return in id token</li>
-    <li>CIL-464: Allow for customizing identifier scheme via configuration. </li>
-    <li>CIL-467: Eliminate init endpoint for OIDC version. </li>
+    <li>CIL-464: Allow for customizing identifier scheme via configuration.</li>
+    <li>CIL-467: Eliminate init endpoint for OIDC version.</li>
     <li>CIL-477: Set voPersonExternalID. This may be done with server-side scripting now.</li>
     <li>CIL-479: Issue isMemberOf claim based on IDP and SAML attributes.</li>
-    <li>CIL-494: Allow public clients to access user information endpoint. The response is trivial since they are only allowed the openid scope.</li>
+    <li>CIL-494: Allow public clients to access user information endpoint. The response is trivial since they are only
+        allowed the openid scope.
+    </li>
     <li>CIL-498: After error on cleitn registration page, no scopes displayed.</li>
     <li>github #10: Allow CLI to edit scopes</li>
-    <li>Support for <a href="https://docs.google.com/document/d/14Q4DHU_u9GaVvVFQNHDpWTB33vRTYuN8yBpytzNq4O8/edit#heading=h.q4bop06zsrb9">functors</a> in client configurations. </li>
+    <li>Support for <a
+            href="https://docs.google.com/document/d/14Q4DHU_u9GaVvVFQNHDpWTB33vRTYuN8yBpytzNq4O8/edit#heading=h.q4bop06zsrb9">functors</a>
+        in client configurations.
+    </li>
 </ul>
 
 <p>Many updates, including the introduction of functor-based scripting. There is also a document relating to CIL-436 and
-    a <a href="https://docs.google.com/document/d/1iwnNDZ0l0nNrqCaB41vjLb_tQRjtJUe8xpf469oT84o/edit">JWT token parsing endpoint</a>.
-The major change is allowing for a full scripting language to configure client behaviors. This is what effectively solved
-most of the above issues.
+    a <a href="https://docs.google.com/document/d/1iwnNDZ0l0nNrqCaB41vjLb_tQRjtJUe8xpf469oT84o/edit">JWT token parsing
+        endpoint</a>.
+    The major change is allowing for a full scripting language to configure client behaviors. This is what effectively
+    solved
+    most of the above issues.
 </p>
-<p>The command line interface (CLI) now supports exporting and importing records from a file with the serialize and deserialize
-commands. For SQL stores, there is also a new search function that allows for limited but very useful searches. Most of the unit
+<p>The command line interface (CLI) now supports exporting and importing records from a file with the serialize and
+    deserialize
+    commands. For SQL stores, there is also a new search function that allows for limited but very useful searches. Most
+    of the unit
     tests have been improved or rewritten.</p>
 <h2>3.5.1</h2>
 <ul>

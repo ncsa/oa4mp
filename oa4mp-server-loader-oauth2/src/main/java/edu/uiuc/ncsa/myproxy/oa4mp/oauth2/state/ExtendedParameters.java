@@ -73,8 +73,13 @@ public class ExtendedParameters {
     }
 
     /**
-     * This does the grunt work of looking through the headers and pulling out the extended attributes.
-     * The format of the extended attributes is
+     * This does the grunt work of looking through parameters and pulling out the extended attributes.
+     * The basic format of an entry is
+     * <pre>
+     *     NS:/path=value0[,value1,...]
+     * </pre>
+     *
+     * These parse into the extended attributes as
      * <pre>
      *     {"NS0":
      *        {"key0_0":[values],
@@ -93,11 +98,15 @@ public class ExtendedParameters {
      *     <li>The key is of the form NS:key and there may be several keys. There may be arbitrarily many</li>
      *     <li>The values of each key is assumed to be a string array.</li>
      * </ul>
+     * For example
+     * <pre>
+     *     cilogon:roles/access=a,b --> {"cilogon":{"roles/access":["a","b"]}}
+     * </pre>
      *
      * @param pmap -- map of parameters from e.g. a servlet request
      * @return
      */
-    public JSONObject snoopHeaders(Map<String, String[]> pmap) {
+    public JSONObject snoopParameters(Map<String, String[]> pmap) {
         JSONObject cilogonEntry = null;
         JSONObject oa4mpEntry = null;
         for (String key : pmap.keySet()) {
@@ -152,7 +161,7 @@ public class ExtendedParameters {
         pmap.put(OA4MP_NS + ":/roles/", new String[]{"A", "B", "C"});
         pmap.put(OA4MP_NS + ":/idt/lifetime", new String[]{"100000000"});
         ExtendedParameters xp = new ExtendedParameters();
-        JSONObject jsonObject = xp.snoopHeaders(pmap);
+        JSONObject jsonObject = xp.snoopParameters(pmap);
 
         System.out.println(jsonObject.toString(2));
         StemVariable stemVariable = new StemVariable();

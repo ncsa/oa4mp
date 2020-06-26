@@ -79,7 +79,8 @@ public class OA2AuthorizedServletUtil {
              */
             if (client.hasExtendedAttributeSupport()) {
                 ExtendedParameters xp = new ExtendedParameters();
-                JSONObject extAttr = xp.snoopHeaders(req.getParameterMap());
+                // Take the parameters and parse them into configuration objects,
+                JSONObject extAttr = xp.snoopParameters(req.getParameterMap());
                 if (extAttr != null && !extAttr.isEmpty()) {
                     transaction.setExtendedAttributes(extAttr);
                 }
@@ -379,7 +380,7 @@ public class OA2AuthorizedServletUtil {
      * @param y
      * @return
      */
-    protected Collection<String> intersection(Collection<String> x, Collection<String> y) {
+    protected static Collection<String> intersection(Collection<String> x, Collection<String> y) {
         ArrayList<String> output = new ArrayList<>();
         for (String val : x) {
             if (y.contains(val)) {

@@ -74,6 +74,25 @@
         <th>Comments</th>
     </tr>
     <tr align="left" valign="top">
+         <td>name</td>
+         <td>Y</td>
+         <td>The human readable name for this client, to be displayed on the consent screen.</td>
+         <td>Note that the RFC's do not require this, but OA4MP does.</td>
+     </tr>
+    <tr align="left" valign="top">
+         <td>callback_uri</td>
+         <td>Y</td>
+         <td>A JSON array of callback uris.</td>
+         <td>You must have at least one callback uri. Note that the OAuth spec. requires that this be checked
+         <i>as a string</i> against requests to the server that include it. No checking is done to resolve the address,
+         so it is a bad idea to, e.g. have a raw IP address. By the same token, you can include parameters and such,
+         but if they vary at all in the requests, then the request will be rejected. If you need to have some form of
+         state management for each request, you should send the
+             <a href="https://openid.net/specs/openid-connect-core-1_0.html#ImplicitAuthRequest">state parameter</a>
+             in the initial request. This is
+         guaranteed to be returned to you unchanged as a parameter in the callback.</td>
+     </tr>
+    <tr align="left" valign="top">
         <td>grant_type</td>
         <td>N</td>
         <td>Either a JSON array of blank delimited list which may contain

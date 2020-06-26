@@ -114,6 +114,10 @@ public class OA2ClientUtils {
             // but if it is http, only localhost is permitted. Any https works.
             try {
                 URI temp = URI.create(x);
+                // Fix for CIL-739, accept only absolute URIs
+                if(!temp.isAbsolute()){
+                    throw new IllegalArgumentException("Error: uri \"" + temp + "\" is not absolute.");
+                }
                 String host = temp.getHost();
                 String scheme = temp.getScheme();
                 ServletDebugUtil.trace(OA2ClientUtils.class, "createCallbacks, processing callback \"" + x + "\"");
