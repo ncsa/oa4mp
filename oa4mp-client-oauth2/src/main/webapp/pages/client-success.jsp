@@ -60,6 +60,38 @@
         <p>
         <pre>${privateKey}</pre>
     </div>
+<li><a href="javascript:unhide('showAT');">Show/Hide Access Token</a> </li>
+       <div id="showAT" class="hidden">
+           <table border="1">
+               <tr>
+                   <td>Token</td>
+                   <td>
+                       <pre>${at_accessToken}</pre>
+                   </td>
+               </tr>
+               <tr>
+                   <td>Header</td>
+                   <td>
+                       <pre>${at_header}</pre>
+                   </td>
+               </tr>
+               <tr>
+                   <td>Payload</td>
+                   <td>
+                       <pre>${at_payload}</pre>
+                   </td>
+               </tr>
+               <tr>
+                   <td>Public key</td>
+                   <td><pre>${at_public_key}</pre></td>
+               </tr>
+
+               <tr>
+                   <td>Verified?</td>
+                   <td><b>${at_verified}</b></td>
+               </tr>
+           </table>
+       </div>
 
 </ul>
 <form name="input" action="${action}" method="get"/>

@@ -164,7 +164,7 @@ public class OA2ClaimsUtil implements ScriptingConstants {
             @Override
             public Map<String, Object> getArgs() {
                 HashMap<String, Object> map = new HashMap<>();
-                map.put(SRE_REQ_CLAIMS, transaction.getClaims());
+                map.put(SRE_REQ_CLAIMS, transaction.getUserMetaData());
                 map.put(SRE_REQ_SCOPES, transaction.getScopes());
                 map.put(SRE_REQ_FLOW_STATES, transaction.getFlowStates()); // so its a map
                 try {
@@ -215,7 +215,7 @@ public class OA2ClaimsUtil implements ScriptingConstants {
                 // Note that the returned values from a script are very unlikely to be the same object we sent
                 // even if the contents are the same, since scripts may have to change these in to other data structures
                 // to make them accessible to their machinery, then convert them back.
-                transaction.setClaims((JSONObject) scriptRunResponse.getReturnedValues().get(SRE_REQ_CLAIMS));
+                transaction.setUserMetaData((JSONObject) scriptRunResponse.getReturnedValues().get(SRE_REQ_CLAIMS));
                 transaction.setFlowStates((FlowStates2) scriptRunResponse.getReturnedValues().get(SRE_REQ_FLOW_STATES));
                 transaction.setClaimsSources((List<ClaimSource>) scriptRunResponse.getReturnedValues().get(SRE_REQ_CLAIM_SOURCES));
 
@@ -241,14 +241,14 @@ public class OA2ClaimsUtil implements ScriptingConstants {
      * @throws Throwable
      */
     public JSONObject processAuthorizationClaims(HttpServletRequest request) throws Throwable {
-        JSONObject claims = transaction.getClaims();
+        JSONObject claims = transaction.getUserMetaData();
         if (claims == null) {
             claims = new JSONObject();
         }
         claims = initializeClaims(request, claims);
 
         // claims are initialized and basic oidc scope (the subject) is included,
-        transaction.setClaims(claims);
+        transaction.setUserMetaData(claims);
         OA2Client client = getOA2Client();
         checkRequiredScopes(transaction);
 
@@ -292,7 +292,7 @@ public class OA2ClaimsUtil implements ScriptingConstants {
             handleSREResponse(getScriptRuntimeEngine().run(scriptRunRequest));
             flowStates = transaction.getFlowStates();
             claimsSources = transaction.getClaimSources(oa2se);
-            claims = transaction.getClaims();
+            claims = transaction.getUserMetaData();
         }
 
         // This is out of band and might just be setting up state for later.
@@ -306,7 +306,7 @@ public class OA2ClaimsUtil implements ScriptingConstants {
                 handleSREResponse(getScriptRuntimeEngine().run(scriptRunRequest));
                 flowStates = transaction.getFlowStates();
                 claimsSources = transaction.getClaimSources(oa2se);
-                claims = transaction.getClaims();
+                claims = transaction.getUserMetaData();
             }
             if (!claimsSources.isEmpty()) {
                 // so there is
@@ -319,7 +319,7 @@ public class OA2ClaimsUtil implements ScriptingConstants {
                     if (!flowStates.acceptRequests) {
                         // This practically means that the come situation has arisen whereby the user is
                         // immediately banned from access -- e.g. they were found to be on a blacklist.
-                        transaction.setClaims(claims);
+                        transaction.setUserMetaData(claims);
                         transaction.setFlowStates(flowStates);
                         oa2se.getTransactionStore().save(transaction);
                         throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "access denied", HttpStatus.SC_UNAUTHORIZED);
@@ -329,7 +329,7 @@ public class OA2ClaimsUtil implements ScriptingConstants {
             }
 
         }
-        transaction.setClaims(claims);
+        transaction.setUserMetaData(claims);
         transaction.setFlowStates(flowStates);
         // Execute scripts for post authorization phase..
         if (getScriptRuntimeEngine() != null) {
@@ -343,7 +343,7 @@ public class OA2ClaimsUtil implements ScriptingConstants {
         // save it at this point because the flow states might, e.g. prohibit access to the entire system
         // and that has to be preserved against future access attempts.
         oa2se.getTransactionStore().save(transaction);
-        return transaction.getClaims();
+        return transaction.getUserMetaData();
     }
 
     protected OA2Client getOA2Client() {
@@ -363,7 +363,7 @@ public class OA2ClaimsUtil implements ScriptingConstants {
      */
     public JSONObject processClaims() throws Throwable {
 
-        JSONObject claims = transaction.getClaims();
+        JSONObject claims = transaction.getUserMetaData();
         if (claims == null) {
             claims = new JSONObject();
         }
@@ -392,7 +392,7 @@ public class OA2ClaimsUtil implements ScriptingConstants {
             handleSREResponse(getScriptRuntimeEngine().run(scriptRunRequest));
             flowStates = transaction.getFlowStates();
             claimsSources = transaction.getClaimSources(oa2se);
-            claims = transaction.getClaims();
+            claims = transaction.getUserMetaData();
         }
         dbg(this, "BEFORE invoking claim sources, claims are = " + claims.toString(1));
         if (flowStates.getClaims) {
@@ -422,7 +422,7 @@ public class OA2ClaimsUtil implements ScriptingConstants {
         if (getScriptRuntimeEngine() != null) {
             scriptRunRequest = newSRR(transaction, SRE_POST_AT);
             handleSREResponse(getScriptRuntimeEngine().run(scriptRunRequest));
-            claims = transaction.getClaims();
+            claims = transaction.getUserMetaData();
             flowStates = transaction.getFlowStates();
         }
         // update everything
@@ -435,7 +435,7 @@ public class OA2ClaimsUtil implements ScriptingConstants {
             dbg(this, "Access denied for user name = " + transaction.getUsername());
             throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "access denied", HttpStatus.SC_UNAUTHORIZED);
         }
-        return transaction.getClaims();
+        return transaction.getUserMetaData();
     }
 
     protected void checkRequiredClaim(JSONObject claims, String claimKey) {

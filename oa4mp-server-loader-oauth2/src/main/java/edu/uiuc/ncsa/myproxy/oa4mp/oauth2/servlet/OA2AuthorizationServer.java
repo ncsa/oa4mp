@@ -5,7 +5,6 @@ import edu.uiuc.ncsa.myproxy.MPSingleConnectionProvider;
 import edu.uiuc.ncsa.myproxy.MyProxyConnectable;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.IDTokenHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ScriptRuntimeEngineFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractAuthorizationServlet;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
@@ -48,14 +47,15 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
     public String AUTHORIZED_ENDPOINT = "/authorized";
     public String AUTHORIZATION_REFRESH_TOKEN_LIFETIME_VALUE = "rtLifetime";
 
-    protected String scopesToString(OA2ServiceTransaction t){
+    protected String scopesToString(OA2ServiceTransaction t) {
         String scopeString = "";
-        for(String x : t.getScopes()){
+        for (String x : t.getScopes()) {
             scopeString = scopeString + x + " ";
         }
         return scopeString;
 
     }
+
     @Override
     protected void setClientRequestAttributes(AuthorizedState aState) {
         super.setClientRequestAttributes(aState);
@@ -196,16 +196,24 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
         super.createRedirect(request, response, trans);
         // At this point, all authentication has been done, everything is set up and the next stop in the flow is the
         // redirect back to the client.
-            JWTRunner jwtRunner = new JWTRunner(st2, ScriptRuntimeEngineFactory.createRTE(oa2SE, st2.getOA2Client().getConfig()));
-            IDTokenHandler idTokenHandler = new IDTokenHandler(oa2SE, st2, request);
-            jwtRunner.addHandler(idTokenHandler);
-            jwtRunner.doAuthClaims();
+        JWTRunner jwtRunner = new JWTRunner(st2, ScriptRuntimeEngineFactory.createRTE(oa2SE, st2.getOA2Client().getConfig()));
+        OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, st2, request);
+
+/*
+        IDTokenHandler idTokenHandler = new IDTokenHandler(new IDTokenHandlerConfig(
+                ((OA2Client) st2.getClient()).getIDTokenConfig(),
+                oa2SE,
+                st2,
+                request));
+        jwtRunner.addHandler(idTokenHandler);
+*/
+        jwtRunner.doAuthClaims();
     }
 
     @Override
     public String createCallback(ServiceTransaction trans, Map<String, String> params) {
         String cb = trans.getCallback().toString();
-        OA2ServiceTransaction st = (OA2ServiceTransaction)trans;
+        OA2ServiceTransaction st = (OA2ServiceTransaction) trans;
         /*
         CIL-545: The checking for valid callbacks is done at registration time. No checking should be done
         any place else since we must support a much wider range of these (e.g. for mobile devices). 
@@ -218,8 +226,8 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
         String idStr = st.getIdentifierString();
         // Fixes GitHub OA4MP issue 5, support multiple response modes.
         String responseDelimiter = "?"; // default
-        if(st.hasResponseMode()){
-            if(st.getResponseMode().equals(OA2Constants.RESPONSE_MODE_FRAGMENT)){
+        if (st.hasResponseMode()) {
+            if (st.getResponseMode().equals(OA2Constants.RESPONSE_MODE_FRAGMENT)) {
                 responseDelimiter = "#";
             }
         }

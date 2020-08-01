@@ -30,7 +30,7 @@ public class OA2CommandLineClient extends CommandLineClient {
             OA2CommandLineClient testCommands = new OA2CommandLineClient(null);
             testCommands.start(args);
             OA2CLCCommands usc = new OA2CLCCommands(testCommands.getMyLogger(), (ClientEnvironment) testCommands.getEnvironment());
-
+            usc.setConfigFile(testCommands.getConfigFile());
             CLIDriver cli = new CLIDriver(usc);
             cli.start();
         } catch (Exception e) {

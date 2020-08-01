@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.ClaimSourceFactoryImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.IDTokenHandler;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.IDTokenHandlerConfig;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ScriptRuntimeEngineFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RefreshTokenStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
@@ -145,7 +146,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             IssuerTransactionState state = doAT(request, response, client);
             ATIResponse2 atResponse = (ATIResponse2) state.getIssuerResponse();
             OA2ServiceTransaction t = (OA2ServiceTransaction) state.getTransaction();
-            atResponse.setClaims(t.getClaims());
+            atResponse.setClaims(t.getUserMetaData());
             atResponse.write(response);
             return true;
         }
@@ -191,7 +192,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         Collection<String> audience = convertToList(request, AUDIENCE);
         Collection<String> scopes = convertToList(request, OA2Constants.SCOPE);
         Collection<String> resources = convertToList(request, RESOURCE);
-         boolean isSciToken = false;
+        boolean isSciToken = false;
         if (subjectTokenType.equals(ACCESS_TOKEN_TYPE)) {
             // So we have an access token. Try to interpret it first as a SciToken then if that fails as a
             // standard OA4MP access token:
@@ -249,7 +250,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         // TODO -- figure out scopes for SciTokens. These are optional if they are the same as the scope parameter (or parameter omitted).
         // Issue is that OIDC client scopes do not alter the access token. SciToken scopes, however, do.
         // handle OIDC clients:
-        if (client.isOIDCClient() && 0<scopes.size()) {
+        if (client.isOIDCClient() && 0 < scopes.size()) {
             // OIDC client
             Collection<String> newScopes = OA2AuthorizedServletUtil.intersection(scopes, client.getScopes());
             if (newScopes.size() != client.getScopes().size()) {
@@ -273,7 +274,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
                 claims.put(OA2Constants.SCOPE, outscopes);
             }
         }
-        t.setClaims(claims); // now stash it for future use.
+        t.setUserMetaData(claims); // now stash it for future use.
         getTransactionStore().save(t);
         PrintWriter osw = response.getWriter();
         claims.write(osw);
@@ -335,12 +336,16 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         if (!st2.getFlowStates().acceptRequests || !st2.getFlowStates().accessToken) {
             throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "access denied", HttpStatus.SC_UNAUTHORIZED);
         }
+        st2.setAccessToken(atResponse.getAccessToken()); // needed if there are handlers later.
         JWTRunner jwtRunner = new JWTRunner(st2, ScriptRuntimeEngineFactory.createRTE(oa2SE, st2.getOA2Client().getConfig()));
-        IDTokenHandler idTokenHandler = new IDTokenHandler(oa2SE, st2);
-        jwtRunner.addHandler(idTokenHandler);
+        OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, st2, request);
         jwtRunner.doTokenClaims();
-
-        atResponse.setClaims(st2.getClaims());
+        if (jwtRunner.hasATHandler()) {
+            AccessToken newAT = jwtRunner.getAccessTokenHandler().getSignedAT(oa2SE.getJsonWebKeys().getDefault());
+            atResponse.setAccessToken(newAT );
+            DebugUtil.trace(this, "Returned AT from handler:" + newAT + ", for claims " + st2.getATData().toString(2));
+        }
+        atResponse.setClaims(st2.getUserMetaData());
         DebugUtil.trace(this, "set token signing flag =" + atResponse.isSignToken());
         if (!client.isRTLifetimeEnabled() && oa2SE.isRefreshTokenEnabled()) {
             // Since this bit of information could be extremely useful if a service decides
@@ -505,14 +510,17 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
 
 
         JWTRunner jwtRunner = new JWTRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2SE, t.getOA2Client().getConfig()));
-        IDTokenHandler idTokenHandler = new IDTokenHandler((OA2SE) getServiceEnvironment(), t);
+        IDTokenHandler idTokenHandler = new IDTokenHandler(new IDTokenHandlerConfig(
+                ((OA2Client) t.getClient()).getIDTokenConfig(),
+
+                (OA2SE) getServiceEnvironment(), t, null));
         jwtRunner.addHandler(idTokenHandler);
         try {
             jwtRunner.doRefreshClaims();
         } catch (Throwable throwable) {
             ServletDebugUtil.warn(this, "Unable to update claims on token refresh: \"" + throwable.getMessage() + "\"");
         }
-        rtiResponse.setClaims(t.getClaims());
+        rtiResponse.setClaims(t.getUserMetaData());
         RefreshToken rt = rtiResponse.getRefreshToken();
         rt.setExpiresIn(computeRefreshLifetime(t));
         t.setRefreshToken(rtiResponse.getRefreshToken());
@@ -537,7 +545,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
 
         rtiResponse.setServiceTransaction(t);
         rtiResponse.setJsonWebKey(oa2SE.getJsonWebKeys().getDefault());
-        rtiResponse.setClaims(t.getClaims());
+        rtiResponse.setClaims(t.getUserMetaData());
         getTransactionStore().save(t);
         rtiResponse.write(response);
         IssuerTransactionState state = new IssuerTransactionState(
@@ -612,7 +620,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
 
         atResponse.setServiceTransaction(transaction);
         atResponse.setJsonWebKey(oa2SE.getJsonWebKeys().getDefault());
-        atResponse.setClaims(transaction.getClaims());
+        atResponse.setClaims(transaction.getUserMetaData());
         // Need to do some checking but for now, just return transaction
         //return null;
         return transaction;

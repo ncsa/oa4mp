@@ -1,6 +1,5 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2DiscoveryServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
@@ -32,13 +31,11 @@ import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.*;
 public class IDTokenHandler extends AbstractPayloadHandler {
     protected String issuer;
 
-    public IDTokenHandler(OA2SE oa2se, OA2ServiceTransaction transaction, HttpServletRequest request) {
-        super(oa2se, transaction, request);
-        setIssuer(request);
-    }
-
-    public IDTokenHandler(OA2SE oa2se, OA2ServiceTransaction transaction) {
-        super(oa2se, transaction);
+    public IDTokenHandler(IDTokenHandlerConfig payloadHandlerConfig) {
+        super(payloadHandlerConfig);
+        if (payloadHandlerConfig.getRequest() != null) {
+            setIssuer(payloadHandlerConfig.getRequest());
+        }
     }
 
 
@@ -70,16 +67,22 @@ public class IDTokenHandler extends AbstractPayloadHandler {
 
     }
 
+    boolean IDP_DEBUG_ON = true;
+
     /**
+     * *****************
+     * KEEP THIS!   *
+     * *****************
      * This lets you turn on or off claims that can emulate coming in from other IDPs with
-     *  any information you want. Simply add a call to it in the {@link #init()} method.
-     *  Be sure to turn it off before release since it will put a large ugly warning message in
-     *  the claims. Look in OA2FunctorTests for more examples.
+     * any information you want. Simply add a call to it in the {@link #init()} method.
+     * Be sure to turn it off before release since it will put a large ugly warning message in
+     * the claims. Look in OA2FunctorTests for more examples.
      */
     void addDebugClaims() {
         // Keep the next two line no matter what, that way you don't leave it in test mode
         // since the claims will tell you.
-        getClaims().put("DEBUG","If you see this, the server is in test mode!");
+//        getClaims().put("DEBUG", "If you see this, the server is in test mode. Tell the admin ASAP!");
+
         DebugUtil.info(this, "addDebugClaims: Testing claims added. ");
 
         // Uncomment the pair of these you need.
@@ -90,26 +93,57 @@ public class IDTokenHandler extends AbstractPayloadHandler {
         //getClaims().put("eptid", "jgaynor@rndom3453.eptid");
 
         // ORCID IDP
-        getClaims().put("idp","http://orcid.org/oauth/authorize");
-        getClaims().put("oidc","http://orcid.org/5437-7582-1853-4673");
+        // getClaims().put("idp", "http://orcid.org/oauth/authorize");
+        // getClaims().put("oidc", "httpAnoth://orcid.org/5437-7582-1853-4673");
+
+        //FNAL (FermiLab) testing.
+        /* *******************
+             Note that his has to match the kludge in the OA2ClientUtils or it won't work right.
+         *********************/
+        boolean jeffTest =
+                transaction.getUsername().equals("http://cilogon.org/serverD/users/55") // me via NCSA IDP on polod
+                ||
+                transaction.getUsername().equals("http://cilogon.org/serverA/users/16316"); // me via Google IDP, cilogon.org email on poloc
+
+        boolean jimTest =
+                transaction.getUsername().equals("http://cilogon.org/serverD/users/65") // jim Basney NCSA IDP on polod
+                ||
+                transaction.getUsername().equals("http://cilogon.org/serverT/users/37233"); // jim Basney NCSA IDP on poloc
+
+
+        DebugUtil.trace(this, "In add debug claims. Username = " + transaction.getUsername() +
+                ", myproxy username = " + transaction.getMyproxyUsername());
+        if (jimTest || jeffTest) {
+            getClaims().put("DEBUG", "If you see this message, the server is in test mode!");
+            getClaims().put("idp", "https://idp.fnal.gov/idp/shibboleth");
+            getClaims().put("eppn", (jimTest ? "jbasney" : "jgaynor") + "@fnal.gov");
+            DebugUtil.trace(this, "set debug claims for FNAL testing...");
+        }
+
 
         // GITHub IDP
         //getClaims().put("idp","http://github.com/login/oauth/authorize");
-       // getClaims().put("oidc","oidc-43455756756");
-        
-       // Google IDP
+        // getClaims().put("oidc","oidc-43455756756");
+
+        // Google IDP
         //getClaims().put("idp","http://google.com/accounts/o8/id");
-       // getClaims().put("oidc","oidc-43455756756");
+        // getClaims().put("oidc","oidc-43455756756");
 
     }
+    // Enables IDP debugging for testing. Only have it set true for a specific test since it will override
+    // the IDP information and identity for every request!!!
+
 
     @Override
     public void init() throws Throwable {
         claims = getClaims();
         trace(this, "Starting to process basic claims");
-        //addDebugClaims();
+        if (IDP_DEBUG_ON) {
+            addDebugClaims();
+        }
         claims.put(OA2Claims.ISSUER, issuer);
         claims.put(OA2Claims.SUBJECT, transaction.getUsername());
+
         claims.put(AUDIENCE, transaction.getClient().getIdentifierString());
         claims.put(OA2Constants.ID_TOKEN_IDENTIFIER, ((OA2TokenForge) oa2se.getTokenForge()).getIDToken().getToken());
         // now set all the timestamps and such.
@@ -234,7 +268,7 @@ public class IDTokenHandler extends AbstractPayloadHandler {
     @Override
     public void saveState() throws Throwable {
         if (transaction != null && oa2se != null) {
-            transaction.setClaims(getClaims());
+            transaction.setUserMetaData(getClaims());
             transaction.setClaimsSources(getSources());
             oa2se.getTransactionStore().save(transaction);
         } else {
@@ -265,6 +299,15 @@ public class IDTokenHandler extends AbstractPayloadHandler {
         } else {
             throw new OA2GeneralError(OA2Errors.SERVER_ERROR, "Missing " + claimKey + " claim", HttpStatus.SC_INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @Override
+    public JSONObject execute(ClaimSource source, JSONObject claims) throws Throwable {
+        if (transaction.getOA2Client().isPublicClient()) {
+            // Public clients do not get more than basic claims.
+            return claims;
+        }
+        return super.execute(source, claims);
     }
 
 

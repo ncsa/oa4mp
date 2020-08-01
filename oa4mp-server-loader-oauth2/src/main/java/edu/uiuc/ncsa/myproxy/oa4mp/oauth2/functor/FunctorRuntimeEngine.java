@@ -30,7 +30,7 @@ import static edu.uiuc.ncsa.security.core.util.DebugUtil.trace;
  */
 public class FunctorRuntimeEngine extends ScriptRuntimeEngine implements ScriptingConstants {
 
-
+    JSONObject config;
     @Override
     public ScriptRunResponse run(ScriptRunRequest request) {
         switch (request.getAction()) {
@@ -183,7 +183,8 @@ public class FunctorRuntimeEngine extends ScriptRuntimeEngine implements Scripti
     }
 
     public FunctorRuntimeEngine(JSONObject config) {
-        super(config);
+        this.config = config;
+        setInitialized(true);
     }
 
 

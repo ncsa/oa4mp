@@ -2,8 +2,12 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
+import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTUtil2;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.PayloadHandler;
+import edu.uiuc.ncsa.security.oauth_2_0.jwt.PayloadHandlerConfig;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
+import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import net.sf.json.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,38 +22,34 @@ public abstract class AbstractPayloadHandler implements PayloadHandler {
     protected JSONObject claims;
     protected HttpServletRequest request;
 
+    public AbstractPayloadHandlerConfig getPhCfg() {
+        return phCfg;
+    }
+
+
+
+    AbstractPayloadHandlerConfig phCfg;
+
     /**
      * Create the instance for the authorization phase, while there is an {@link HttpServletRequest} with possible
      * headers that need to be processed.
      *
-     * @param oa2se
-     * @param transaction
-     * @param request
+     * @param payloadHandlerConfig
      */
 
-    public AbstractPayloadHandler(OA2SE oa2se, OA2ServiceTransaction transaction, HttpServletRequest request) {
-        this(oa2se, transaction);
-        this.request = request;
-        claims = new JSONObject();
+    public AbstractPayloadHandler(AbstractPayloadHandlerConfig payloadHandlerConfig) {
+        phCfg = payloadHandlerConfig;
+        oa2se = phCfg.getOa2se();
+        transaction = phCfg.getTransaction();
+        request = phCfg.getRequest();
+     //   claims = new JSONObject();
+        claims = null; // use lazy initialization
     }
-
-    /**
-     * For creating an instance after the authorization phase.
-     *
-     * @param oa2se
-     * @param transaction
-     */
-
-    public AbstractPayloadHandler(OA2SE oa2se, OA2ServiceTransaction transaction) {
-        this.oa2se = oa2se;
-        this.transaction = transaction;
-    }
-
 
     @Override
     public JSONObject getClaims() {
         if (claims == null) {
-            claims = transaction.getClaims();
+            claims = transaction.getUserMetaData();
         }
         return claims;
     }
@@ -59,6 +59,7 @@ public abstract class AbstractPayloadHandler implements PayloadHandler {
     /**
      * Gets the extended attributes from the current transaction. See {@link OA2ServiceTransaction#getExtendedAttributes()}
      * for more.
+     *
      * @return
      */
     public JSONObject getExtendedAttributes() {
@@ -74,20 +75,37 @@ public abstract class AbstractPayloadHandler implements PayloadHandler {
 
     @Override
     public JSONObject execute(ClaimSource source, JSONObject claims) throws Throwable {
-        if (transaction.getOA2Client().isPublicClient()) {
-            // Public clients do not get more than basic claims.
-            return claims;
-        }
+
         // Fix for CIL-693:
         // Inject current state here!
-         if(source instanceof BasicClaimsSourceImpl){
-             ((BasicClaimsSourceImpl)source).setOa2SE(oa2se);
-         }
+        if (source instanceof BasicClaimsSourceImpl) {
+            ((BasicClaimsSourceImpl) source).setOa2SE(oa2se);
+        }
         return source.process(claims, transaction);
     }
+
     @Override
     public void refresh() throws Throwable {
 
     }
 
+    @Override
+    public void setPhCfg(PayloadHandlerConfig phCfg) {
+        this.phCfg = (AbstractPayloadHandlerConfig) phCfg;
+    }
+
+    @Override
+    public String getToken(JSONWebKey key) {
+        if(getClaims() == null || getClaims().isEmpty()){
+            return "";
+        }
+        try {
+            return JWTUtil2.createJWT(getClaims(), key);
+        } catch (Throwable e) {
+            if(e instanceof RuntimeException){
+                throw (RuntimeException)e;
+            }
+            throw new GeneralException("Could not create signed token", e);
+        }
+    }
 }

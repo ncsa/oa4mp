@@ -10,7 +10,6 @@ import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.module.ModuleMap;
-import edu.uiuc.ncsa.qdl.scripting.AnotherJSONUtil;
 import edu.uiuc.ncsa.qdl.scripting.Scripts;
 import edu.uiuc.ncsa.qdl.state.ImportManager;
 import edu.uiuc.ncsa.qdl.state.State;
@@ -44,14 +43,31 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
     public static String CONFIG_TAG = "qdl";
     public static String SCRIPTS_TAG = "scripts";
 
-    public QDLRuntimeEngine(QDLEnvironment qe, JSONObject config) {
-        super(config);
+    public QDLRuntimeEngine(QDLEnvironment qe) {
         this.qe = qe;
         init();
+        setInitialized(false);
+
     }
+
+    public QDLRuntimeEngine(QDLEnvironment qe, JSONObject config) {
+        this.qe = qe;
+        init();
+        setInitialized(true);
+    }
+
+    public QDLEnvironment getQE() {
+        return qe;
+    }
+
+    public void setQE(QDLEnvironment qe) {
+        this.qe = qe;
+    }
+
     // {"qdl": { "code": ["claims.debug:='test';"], "xmd": {"exec_phase": "pre_auth"}}}
     // {"qdl": { "run": "vfs#/scripts/test0.qdl", "xmd": {"exec_phase": "pre_auth"}}}
     QDLEnvironment qe;
+
     /**
      * The structure of the configuration file (for backwards compatibility) is
      * <pre>
@@ -65,7 +81,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
      */
     protected void init() {
 //        setScriptSet(QDLJSONConfigUtil.readScriptSet(config));  // <- old way
-        setScriptSet(AnotherJSONUtil.createScripts(config)); // <- new way
+        //setScriptSet(AnotherJSONUtil.createScripts(config)); // <- new way
         SymbolStack stack = new SymbolStack();
         state = new State(ImportManager.getResolver(),
                 stack,
@@ -76,7 +92,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
                 null, // no logging at least for now
                 true);// enable server mode.
         state.getOpEvaluator().setNumericDigits(qe.getNumericDigits());
-        if(qe != null && qe.isEnabled()) {
+        if (qe != null && qe.isEnabled()) {
             try {
                 QDLConfigurationLoaderUtils.setupVFS(qe, state);
                 QDLConfigurationLoaderUtils.setupModules(qe, state);
@@ -113,37 +129,43 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         }
     }
 
+    // Idiom. If no scripts at all, then just return null;
+    protected ScriptInterface getScript(String phase) {
+        if (getScriptSet() == null) return null;
+        return getScriptSet().get(Scripts.EXEC_PHASE, phase);
+    }
+
     @Override
     public ScriptRunResponse run(ScriptRunRequest request) {
         ScriptInterface s = null;
 
         switch (request.getAction()) {
             case SRE_EXEC_INIT:
-                s = getScriptSet().get(Scripts.EXEC_PHASE, SRE_EXEC_INIT);
+                s = getScript(SRE_EXEC_INIT);
                 break;
             case SRE_PRE_AUTH:
-                s = getScriptSet().get(Scripts.EXEC_PHASE, SRE_PRE_AUTH);
+                s = getScript(SRE_PRE_AUTH);
                 break;
             case SRE_POST_AT:
-                s = getScriptSet().get(Scripts.EXEC_PHASE, SRE_POST_AT);
+                s = getScript(SRE_POST_AT);
                 break;
             case SRE_POST_AUTH:
-                s = getScriptSet().get(Scripts.EXEC_PHASE, SRE_POST_AUTH);
+                s = getScript(SRE_POST_AUTH);
                 break;
             case SRE_PRE_AT:
-                s = getScriptSet().get(Scripts.EXEC_PHASE, SRE_PRE_AT);
+                s = getScript(SRE_PRE_AT);
                 break;
             case SRE_PRE_REFRESH:
-                s = getScriptSet().get(Scripts.EXEC_PHASE, SRE_PRE_REFRESH);
+                s = getScript(SRE_PRE_REFRESH);
                 break;
             case SRE_POST_REFRESH:
-                s = getScriptSet().get(Scripts.EXEC_PHASE, SRE_POST_REFRESH);
+                s = getScript(SRE_POST_REFRESH);
                 break;
         }
         if (s == null) {
             return noOpSRR();
         }
-     //
+        //
         setupState(request);
         s.execute(state);
         return createSRR();
@@ -151,9 +173,9 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
 
     protected String FLOW_STATE_VAR = "flow_states.";
     protected String CLAIMS_VAR = "claims.";
+    protected String ACCESS_TOKEN_VAR = "access_token.";
     protected String SCOPES_VAR = "scopes.";
     protected String CLAIM_SOURCES_VAR = "claim_sources.";
-
 
 
     /**
@@ -168,9 +190,15 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         JSONObject claims = (JSONObject) req.getArgs().get(SRE_REQ_CLAIMS);
         StemVariable claimStem = new StemVariable();
         claimStem.fromJSON(claims);
-    //    System.out.println("claim stem:" + claimStem.toString(1));
         state.getSymbolStack().setValue(CLAIMS_VAR, claimStem);
 
+        if (req.getArgs().containsKey(SRE_REQ_ACCESS_TOKEN)) {
+            JSONObject at = (JSONObject) req.getArgs().get(SRE_REQ_ACCESS_TOKEN);
+            StemVariable atStem = new StemVariable();
+            atStem.fromJSON(at);
+            state.getSymbolStack().setValue(ACCESS_TOKEN_VAR, atStem);
+
+        }
         List<String> scopes = (List<String>) req.getArgs().get(SRE_REQ_SCOPES);
         state.getSymbolStack().setValue(SCOPES_VAR, toStem(scopes));
 
@@ -257,7 +285,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         respMap.put(SRE_REQ_SCOPES, toScopes((StemVariable) state.getValue(SCOPES_VAR)));
         StemVariable stemClaims = (StemVariable) state.getValue(CLAIMS_VAR);
         JSON j = stemClaims.toJSON();
-        if(j.isArray()){
+        if (j.isArray()) {
             throw new NFWException("Internal error: The returned claims object was not a JSON Object.");
         }
         respMap.put(SRE_REQ_CLAIMS, j);

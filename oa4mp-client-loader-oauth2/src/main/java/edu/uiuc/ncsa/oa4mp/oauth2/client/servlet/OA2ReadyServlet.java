@@ -7,12 +7,16 @@ import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2Asset;
 import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2ClientEnvironment;
 import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2MPService;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
+import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.delegation.token.impl.AuthorizationGrantImpl;
 import edu.uiuc.ncsa.security.oauth_2_0.*;
 import edu.uiuc.ncsa.security.oauth_2_0.client.ATResponse2;
 import edu.uiuc.ncsa.security.oauth_2_0.client.ATServer2;
+import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTUtil2;
 import edu.uiuc.ncsa.security.servlet.JSPUtil;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
@@ -75,6 +79,7 @@ public class OA2ReadyServlet extends ClientServlet {
         AssetResponse assetResponse = null;
         OA2MPService oa2MPService = (OA2MPService) getOA4MPService();
         String rawAT = null;
+        AccessToken accessToken;
         UserInfo ui = null;
         boolean getCerts = (oa2ce).getScopes().contains(OA2Scopes.SCOPE_MYPROXY);
         boolean gotCertX = false;
@@ -86,7 +91,8 @@ public class OA2ReadyServlet extends ClientServlet {
             debug("No cookie found");
             //if(asset == null) asset = new OA2Asset(BasicIdentifier.newID())
             ATResponse2 atResponse2 = oa2MPService.getAccessToken(asset, grant);
-            rawAT = atResponse2.getAccessToken().getToken(); // save it here since we have it
+            accessToken = atResponse2.getAccessToken();
+            rawAT = accessToken.getToken(); // save it here since we have it
             ui = oa2MPService.getUserInfo(atResponse2.getAccessToken().toString());
             if (getCerts) {
                 try {
@@ -106,7 +112,8 @@ public class OA2ReadyServlet extends ClientServlet {
                 throw new IllegalArgumentException("Error: The state returned by the server is invalid.");
             }
             ATResponse2 atResponse2 = oa2MPService.getAccessToken(asset, grant);
-            rawAT = atResponse2.getAccessToken().getToken(); // save it here since we have it
+            accessToken = atResponse2.getAccessToken();
+            rawAT = accessToken.getToken(); // save it here since we have it
 
             //  ui = oa2MPService.getUserInfo(atResponse2.getAccessToken().getToken());
             ui = oa2MPService.getUserInfo(identifier);
@@ -124,6 +131,8 @@ public class OA2ReadyServlet extends ClientServlet {
             // The general case is to do the call with the identifier if you want the asset store managed.
             //assetResponse = getOA4MPService().getCert(token, null, BasicIdentifier.newID(identifier));
         }
+            setATInfo(request, accessToken);
+
         ServletDebugUtil.trace(this, "show ID token? " + oa2ce.isShowIDToken());
         // Now to display the id token. This only exists if this is an OIDC server, so that is a requirement here.
         if (oa2ce.isOidcEnabled() && oa2ce.isShowIDToken()) {
@@ -142,12 +151,13 @@ public class OA2ReadyServlet extends ClientServlet {
             ATServer2.IDTokenEntry tokenEntry = ATServer2.getIDTokenStore().get(rawAT);
             ServletDebugUtil.trace(this, "TokenEntry = " + tokenEntry);
 
-            setJWTInfo(request, tokenEntry.rawToken, jsonWebKeys);
+            setIDTInfo(request, tokenEntry.rawToken, jsonWebKeys);
 
         } else {
-            setJWTInfo(request, null, null); // sets the fields to "(none)"
+            setIDTInfo(request, null, null); // sets the fields to "(none)"
 
         }
+        setATInfo(request, accessToken);
         // Again, we take the first returned cert to peel off some information to display. This
         // just proves we got a response.
 
@@ -198,7 +208,14 @@ public class OA2ReadyServlet extends ClientServlet {
         return;
     }
 
-    protected void setJWTInfo(HttpServletRequest request, String rawJWT, JSONWebKeys jsonWebKeys) {
+    /**
+     * Set the attributes for the id token.
+     *
+     * @param request
+     * @param rawJWT
+     * @param jsonWebKeys
+     */
+    protected void setIDTInfo(HttpServletRequest request, String rawJWT, JSONWebKeys jsonWebKeys) {
         if (rawJWT == null || rawJWT.isEmpty()) {
             request.setAttribute("id_token", "(none)");
         } else {
@@ -210,14 +227,69 @@ public class OA2ReadyServlet extends ClientServlet {
             header = JSONObject.fromObject(new String(Base64.decodeBase64(h)));
 
             JSONObject payload = JSONObject.fromObject(new String(Base64.decodeBase64(p)));
-            request.setAttribute("id_token", rawJWT);
+            request.setAttribute("id_token", rawJWT); //token should not be wrapped
             request.setAttribute("id_payload", payload.toString(2));
 
             request.setAttribute("id_header", header.toString(2));
             JSONWebKey webKey = jsonWebKeys.get(header.get(JWTUtil.KEY_ID));
             String keyPEM = KeyUtil.toX509PEM(webKey.publicKey);
-            request.setAttribute("id_public_key", keyPEM);
+            request.setAttribute("id_public_key", StringUtils.wrap(keyPEM, 80));
 
         }
+    }
+
+    protected void setATInfo(HttpServletRequest request, AccessToken accessToken) {
+        info("2.b. Formatting access token.");
+        String rawAT = accessToken.getToken();
+        if (rawAT == null || rawAT.length() == 0) {
+            throw new NFWException("Error: no access token returned.");
+        }
+
+        OA2ClientEnvironment oa2ce = (OA2ClientEnvironment) getEnvironment();
+        ATServer2 atServer2 = (ATServer2) oa2ce.getDelegationService().getAtServer();
+        JSONWebKeys jsonWebKeys = atServer2.getJsonWebKeys(); // This fetches it from wherever it is
+
+        boolean isVerified = false;
+        boolean isSciToken = false;
+        try {
+            JSONObject scitoken = JWTUtil2.verifyAndReadJWT(rawAT, jsonWebKeys);
+            request.setAttribute("at_payload", scitoken.toString(2));
+            isVerified = true;
+            isSciToken = true;
+        } catch (Throwable t) {
+            request.setAttribute("at_payload", rawAT);
+            isSciToken = false;
+        }
+        if(isSciToken) {
+                    int width = 80;
+
+                    request.setAttribute("accessToken", StringUtils.wrap(rawAT, width));
+                    String[] atParts = JWTUtil2.decat(rawAT);
+                    String h = atParts[JWTUtil2.HEADER_INDEX];
+                    JSONObject header = null;
+
+                    String p = atParts[JWTUtil2.PAYLOAD_INDEX];
+                    try {
+                        header = JSONObject.fromObject(new String(Base64.decodeBase64(h)));
+                        request.setAttribute("at_accessToken", rawAT);
+                        request.setAttribute("at_accessToken2", StringUtils.wrap(rawAT, width)); // line wrapped version
+                        request.setAttribute("at_header", header.toString(2));
+                        request.setAttribute("at_verified", Boolean.toString(isVerified));
+                        JSONWebKey webKey = jsonWebKeys.get(header.get(JWTUtil.KEY_ID));
+                        String keyPEM = KeyUtil.toX509PEM(webKey.publicKey);
+                        request.setAttribute("at_public_key", keyPEM);
+
+                    } catch (Throwable t) {
+                        getMyLogger().warn("Error decoding header from response", t);
+                        System.err.println("Returned raw AT=" + rawAT);
+                    }
+                }else{
+                    // The server is not configured to return a SciToken at the first step, so just print this out.
+                         request.setAttribute("at_accessToken", rawAT);
+                         request.setAttribute("at_accessToken2", StringUtils.wrap(rawAT, 80));
+                         request.setAttribute("at_header", "(none)");
+                         request.setAttribute("at_verified", "(n/a)");
+                         request.setAttribute("at_public_key", "(n/a)");
+                }
     }
 }

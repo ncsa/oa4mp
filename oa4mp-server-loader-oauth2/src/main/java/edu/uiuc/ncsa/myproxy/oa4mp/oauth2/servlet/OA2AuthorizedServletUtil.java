@@ -2,16 +2,17 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.IDTokenHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ExtendedParameters;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ScriptRuntimeEngineFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.UsernameFindable;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.SciTokenClientConfig;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.IssuerTransactionState;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.server.UnapprovedClientException;
 import edu.uiuc.ncsa.security.delegation.server.request.AGRequest;
@@ -21,6 +22,7 @@ import edu.uiuc.ncsa.security.delegation.servlet.TransactionState;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.oauth_2_0.*;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTRunner;
+import edu.uiuc.ncsa.security.oauth_2_0.server.RFC8693Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import net.sf.json.JSONObject;
@@ -31,10 +33,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
-import java.util.StringTokenizer;
+import java.util.*;
 
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.*;
 
@@ -88,6 +87,7 @@ public class OA2AuthorizedServletUtil {
             agResponse.setServiceTransaction(transaction);
             transaction.setClient(client);
             transaction = (OA2ServiceTransaction) verifyAndGet(agResponse);
+            transaction.setAuthTime(new Date()); // have to set the time to now.
             servlet.getTransactionStore().save(transaction);
             DebugUtil.info(this, "Saved new transaction with id=" + transaction.getIdentifierString());
 
@@ -143,7 +143,7 @@ public class OA2AuthorizedServletUtil {
                     callback);
         }
 
-        if(!httpServletRequest.getParameter(RESPONSE_TYPE).equals(RESPONSE_TYPE_CODE)){
+        if (!httpServletRequest.getParameter(RESPONSE_TYPE).equals(RESPONSE_TYPE_CODE)) {
             throw new OA2GeneralError(OA2Errors.UNSUPPORTED_RESPONSE_TYPE, "unsupported reponse type", HttpStatus.SC_BAD_REQUEST);
         }
         OA2ServiceTransaction t = CheckIdTokenHint(httpServletRequest, httpServletResponse, callback);
@@ -155,16 +155,12 @@ public class OA2AuthorizedServletUtil {
         OA2SE oa2SE = (OA2SE) MyProxyDelegationServlet.getServiceEnvironment();
         ServletDebugUtil.trace(this, "Starting done with doDelegation, creating claim util");
         JWTRunner jwtRunner = new JWTRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2SE, t.getOA2Client().getConfig()));
-        IDTokenHandler idTokenHandler = new IDTokenHandler(oa2SE, t, httpServletRequest);
-        jwtRunner.addHandler(idTokenHandler);
+        OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, t, httpServletRequest);
 
         DebugUtil.trace(this, "starting to process claims, creating basic claims:");
         jwtRunner.doAuthClaims();
 
-//        OA2ClaimsUtil claimsUtil = new OA2ClaimsUtil((OA2SE) servlet.getServiceEnvironment(), t);
-//        claimsUtil.processAuthorizationClaims(httpServletRequest);
-        //  servlet.getTransactionStore().save(t); // save the claims.
-        DebugUtil.trace(this, "done with claims, transaction saved, claims = " + t.getClaims());
+        DebugUtil.trace(this, "done with claims, transaction saved, claims = " + t.getUserMetaData());
         return t;
     }
 
@@ -307,7 +303,7 @@ public class OA2AuthorizedServletUtil {
         if (params.containsKey(RESPONSE_MODE)) {
             st.setResponseMode(params.get(RESPONSE_MODE));
         }
-
+        // NOTE that the audience is set in the postprocess call. Might move it here...
         return st;
     }
 
@@ -433,10 +429,50 @@ public class OA2AuthorizedServletUtil {
     public void preprocess(TransactionState state) throws Throwable {
         state.getResponse().setHeader("X-Frame-Options", "DENY");
     }
-
-    public void postprocess(TransactionState state) throws Throwable {
-    }
     /* *******
     End boiler-plate
      */
+
+    public void postprocess(TransactionState state) throws Throwable {
+        OA2ServiceTransaction t = (OA2ServiceTransaction) state.getTransaction();
+        // For sciTokens. Note that WLCG might use these too at some point.
+        // Internally we call it audience (since the aud claim is returned),
+        // but the difference is that a resource is a list of URIs and the audience is
+        // a list of logical names or URIs. Generally we encourage people to just use
+        // the audience parameter.
+        String rawAudience = state.getRequest().getParameter(RFC8693Constants.RESOURCE);
+        if (StringUtils.isTrivial(rawAudience)) {
+            rawAudience = state.getRequest().getParameter(RFC8693Constants.AUDIENCE);
+            if (StringUtils.isTrivial(rawAudience)) {
+                return; // nothing to do.
+            }
+        }
+        ServletDebugUtil.trace(this, "raw audience = " + rawAudience);
+        if (rawAudience == null || rawAudience.isEmpty()) {
+            rawAudience = ""; // this throws it in to the case of no requested audience. If this is missing and there is
+            // a single registered template, just implicitly accept they are the same and continue.
+        }
+        StringTokenizer stringTokenizer = new StringTokenizer(rawAudience, " ");
+        LinkedList<String> audience = new LinkedList<>();
+        while (stringTokenizer.hasMoreElements()) {
+            audience.add(stringTokenizer.nextToken().trim());
+        }
+        if (audience.size() == 0) {
+            // try to special case it
+            OA2Client client = (OA2Client) t.getClient();
+            SciTokenClientConfig stCfg = client.getSciTokensConfig();
+
+            if (stCfg.getAuthorizationTemplates().size() == 1) {
+                // Special case. They have configured exactly one audience claim, so they may omit it and we
+                // will pull it out of their configuration and supply it. They do not need to
+                // send it along in the request. This fails if they ever configure a second template though (as it should).
+                audience.add(stCfg.getAuthorizationTemplates().keySet().iterator().next());
+            } else {
+                throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, "missing audience request", HttpStatus.SC_BAD_REQUEST);
+            }
+        }
+        t.setAudience(audience);
+        servlet.getTransactionStore().save(t);
+
+    }
 }

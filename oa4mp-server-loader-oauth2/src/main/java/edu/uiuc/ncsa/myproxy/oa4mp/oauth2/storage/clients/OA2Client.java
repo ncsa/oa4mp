@@ -1,5 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.IDTokenClientConfig;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.SciTokenClientConfig;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.delegation.storage.BaseClient;
@@ -49,9 +51,10 @@ public class OA2Client extends Client implements OA2ClientScopes {
         return publicClient;
     }
 
-    public boolean isOIDCClient(){
+    public boolean isOIDCClient() {
         return getScopes().contains(OA2Scopes.SCOPE_OPENID);
     }
+
     public void setPublicClient(boolean publicClient) {
         this.publicClient = publicClient;
     }
@@ -134,6 +137,42 @@ public class OA2Client extends Client implements OA2ClientScopes {
     protected String xoauth_attributes = "xoauth_attributes";
     protected String oa4mp_attributes = "oa4mp_attributes";
     protected String oidc_cm_attributes = "oidc-cm_attributes";
+    protected String SCI_TOKENS_KEY = "sci_token";
+    protected String WLCG_TOKENS_KEY = "wlcg_token";
+    protected String ID_TOKENS_KEY = "id_token";
+
+    public boolean hasSciTokenConfig() {
+        return getConfig().containsKey(SCI_TOKENS_KEY);
+    }
+
+    public SciTokenClientConfig getSciTokensConfig() {
+        SciTokenClientConfig sciTokenConfig = new SciTokenClientConfig(); // empty
+
+        if (hasSciTokenConfig()) {
+            sciTokenConfig.fromJSON(getConfig().getJSONObject(SCI_TOKENS_KEY));
+        }
+        return sciTokenConfig;
+    }
+
+    public void setSciTokensConfig(SciTokenClientConfig sciTokensConfig) {
+        getConfig().put(SCI_TOKENS_KEY, sciTokensConfig.toJSON());
+    }
+
+    public boolean hasIDTokenConfig() {
+        return getConfig().containsKey(ID_TOKENS_KEY);
+    }
+
+    public IDTokenClientConfig getIDTokenConfig() {
+        IDTokenClientConfig c = new IDTokenClientConfig();
+        if (hasIDTokenConfig()) {
+            c.fromJSON(getConfig().getJSONObject(ID_TOKENS_KEY));
+        }
+        return c;
+    }
+
+    public void setIDTokenConfig(IDTokenClientConfig idTokenClientConfig) {
+        getConfig().put(ID_TOKENS_KEY, idTokenClientConfig);
+    }
 
     protected JSONObject getNamedAttributes(String name) {
         if (getExtendedAttributes().containsKey(name)) {
@@ -149,8 +188,9 @@ public class OA2Client extends Client implements OA2ClientScopes {
     }
 
     public boolean hasOIDC_CM_Attributes() {
-          return getNamedAttributes(oidc_cm_attributes) != null && !getNamedAttributes(oidc_cm_attributes).isEmpty();
+        return getNamedAttributes(oidc_cm_attributes) != null && !getNamedAttributes(oidc_cm_attributes).isEmpty();
     }
+
     public JSONObject getOIDC_CM_Attributes() {
         return getNamedAttributes(oidc_cm_attributes);
     }
@@ -158,9 +198,11 @@ public class OA2Client extends Client implements OA2ClientScopes {
     public void setOIDC_CM_attributes(JSONObject attr) {
         setNamedAttributes(oidc_cm_attributes, attr);
     }
-     public void removeOIDC_CM_Attributes(){
-            getExtendedAttributes().remove(oidc_cm_attributes);
-     }
+
+    public void removeOIDC_CM_Attributes() {
+        getExtendedAttributes().remove(oidc_cm_attributes);
+    }
+
     protected JSONObject getOA4MPAttributes() {
         return getNamedAttributes(oa4mp_attributes);
     }
@@ -254,11 +296,15 @@ public class OA2Client extends Client implements OA2ClientScopes {
      *             "logic":[JSON],
      *             "source_config":[JSON],
      *             "processing":[JSON]},
-     *    "qdl":{...},
+     *    "sci_tokens":{"usernameClaimKey":"value", "templates":[...], "qdl":{...}},
+     *    "id_tokens":{"qdl":{...}},
+     *    "wlcg_token":{"qdl":{...}},
      *    "isSaved":true|false,
      *    "extraAttributes":{"extendedAttributesEnabled":true|false}
      * }
      * </pre>
+     * <p>Note that the "claims" entry is deprecated and mostly refers to the old JFunctor scripting. Don't use in new
+     * configurations. The isSaved entry too relates to JFunctors and is ignored by all other components.</p>
      * <p>
      * See the {@link edu.uiuc.ncsa.security.oauth_2_0.server.scripts.ClientJSONConfigUtil}
      * JSON may be either a single JSON object or an array of them. If a single, it is

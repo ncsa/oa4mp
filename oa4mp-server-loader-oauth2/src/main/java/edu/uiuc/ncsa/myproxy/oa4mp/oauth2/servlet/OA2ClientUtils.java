@@ -1,14 +1,26 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.IDTokenClientConfig;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.IDTokenHandler;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.IDTokenHandlerConfig;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.SciTokensHandlerConfig;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.ScitokenHandler;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.WLCGTokenHandler;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.WLCGTokenHandlerConfig;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractRegistrationServlet;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2GeneralError;
+import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTRunner;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import org.apache.http.HttpStatus;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
@@ -71,11 +83,11 @@ public class OA2ClientUtils {
 
     public static class NoScopesError extends OA2GeneralError {
 
-           public NoScopesError(String error, String description, int httpStatus) {
-               super(error, description, httpStatus);
-           }
+        public NoScopesError(String error, String description, int httpStatus) {
+            super(error, description, httpStatus);
+        }
 
-       }
+    }
 
     public static class NoRegisteredRedirectError extends OA2GeneralError {
 
@@ -115,7 +127,7 @@ public class OA2ClientUtils {
             try {
                 URI temp = URI.create(x);
                 // Fix for CIL-739, accept only absolute URIs
-                if(!temp.isAbsolute()){
+                if (!temp.isAbsolute()) {
                     throw new IllegalArgumentException("Error: uri \"" + temp + "\" is not absolute.");
                 }
                 String host = temp.getHost();
@@ -279,4 +291,68 @@ public class OA2ClientUtils {
         return false;
     }
 
+    public static void setupHandlers(JWTRunner jwtRunner, OA2SE oa2SE, OA2ServiceTransaction transaction, HttpServletRequest req) throws Throwable {
+        DebugUtil.trace(OA2ClientUtils.class, "Setting up handlers");
+        OA2Client client = (OA2Client) transaction.getClient();
+        IDTokenHandlerConfig idthCfg = null;
+        if (client.hasIDTokenConfig()) {
+            DebugUtil.trace(OA2ClientUtils.class, "Found new configuration.");
+            idthCfg = new IDTokenHandlerConfig(
+                    client.getIDTokenConfig(),
+                    oa2SE,
+                    transaction,
+                    req);
+        } else {
+            // Legacy case. Functors have no config, but need a handler to get the init and accounting information.
+            DebugUtil.trace(OA2ClientUtils.class, "Found legacy configuration.");
+
+            idthCfg = new IDTokenHandlerConfig(
+                    new IDTokenClientConfig(),
+                    oa2SE,
+                    transaction,
+                    req);
+        }
+        IDTokenHandler idTokenHandler = new IDTokenHandler(idthCfg);
+        jwtRunner.addHandler(idTokenHandler);
+
+        // KLUDGE for FNAL in the short term.
+        boolean jeffTest =
+                transaction.getUsername().equals("http://cilogon.org/serverD/users/55") // me via NCSA IDP on polod
+                        ||
+                        transaction.getUsername().equals("http://cilogon.org/serverA/users/16316"); // me via Google IDP, cilogon.org email on poloc
+
+        boolean jimTest =
+                transaction.getUsername().equals("http://cilogon.org/serverD/users/65") // jim Basney NCSA IDP on polod
+                        ||
+                        transaction.getUsername().equals("http://cilogon.org/serverT/users/37233"); // jim Basney NCSA IDP on poloc
+
+        if ((transaction.getUserMetaData().containsKey("idp") &&
+                transaction.getUserMetaData().getString("idp").equals("https://idp.fnal.gov/idp/shibboleth"))
+                ||  jeffTest || jimTest) {
+            DebugUtil.trace(OA2ClientUtils.class, "Setting up WLCG ACCESS TOKEN");
+
+            WLCGTokenHandlerConfig xx = new WLCGTokenHandlerConfig(client.getSciTokensConfig(),
+                    oa2SE, transaction, req);
+            WLCGTokenHandler hh = new WLCGTokenHandler(xx);
+            // KLUDGE! This is to make sure that it initializes. Since we are restricting this to a single
+            // IDP which has not been set in the normal init phase, we have to be sure this
+            // executeslea
+            hh.init();
+            hh.setAccountingInformation();
+            jwtRunner.setAccessTokenHandler(hh);
+        } else {
+            DebugUtil.trace(OA2ClientUtils.class, "NO WLCG ACCESS TOKEN");
+            //     DebugUtil.trace(OA2ClientUtils.class, "idp=" + transaction.getUserMetaData().getString("idp"));
+        }
+        if (client.hasSciTokenConfig()) {
+            SciTokensHandlerConfig st = new SciTokensHandlerConfig(
+                    client.getSciTokensConfig(),
+                    oa2SE,
+                    transaction,
+                    req);
+            ScitokenHandler sth = new ScitokenHandler(st);
+            jwtRunner.setAccessTokenHandler(sth);
+        }
+
+    }
 }

@@ -34,6 +34,7 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
     public String STATE_COMMENT_KEY = "comment";
     public String CLAIMS_KEY = "claims";
     public String SCRIPT_STATE_KEY = "script_state";
+    public String AUDIENCE_KEY = "audience";
 
     public OA2ServiceTransaction(AuthorizationGrant ag) {
         super(ag);
@@ -66,6 +67,21 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         return flowStates;
     }
 
+    /**
+     * Clients may send an audience which is used by some components (notable SciTokens) but
+     * is generally optional.
+     * @return
+     */
+    public List<String> getAudience(){
+        if(getState().containsKey(AUDIENCE_KEY)){
+            return getState().getJSONArray(AUDIENCE_KEY);
+        }
+        return null;
+    }
+    public void setAudience(List<String> audience){
+        getState().put(AUDIENCE_KEY, audience);
+    }
+
     public void setState(JSONObject state) {
         this.state = state;
     }
@@ -79,6 +95,10 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         return state;
     }
 
+    /**
+     * Extended attributes are sent over the wire as specific requests.
+     * @return
+     */
     public JSONObject getExtendedAttributes() {
         if (!getState().containsKey(EXTENDED_ATTRIBUTES_KEY)) {
             return new JSONObject();
@@ -175,15 +195,27 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
     }
 
     @Override
-    public JSONObject getClaims() {
+    public JSONObject getUserMetaData() {
         if (!getState().containsKey(CLAIMS_KEY)) {
             return new JSONObject();
         }
         return getState().getJSONObject(CLAIMS_KEY);
     }
 
-    public void setClaims(JSONObject claims) {
+
+    public void setUserMetaData(JSONObject claims) {
         getState().put(CLAIMS_KEY, claims);
+    }
+
+    String AT_DATA_KEY = "at_data";
+    public JSONObject getATData(){
+        if (!getState().containsKey(AT_DATA_KEY)) {
+            return new JSONObject();
+        }
+        return getState().getJSONObject(AT_DATA_KEY);
+    }
+    public void setATData(JSONObject atData){
+        getState().put(AT_DATA_KEY, atData);
     }
 
     String RESPONSE_MODE_KEY = OA2Constants.RESPONSE_MODE;

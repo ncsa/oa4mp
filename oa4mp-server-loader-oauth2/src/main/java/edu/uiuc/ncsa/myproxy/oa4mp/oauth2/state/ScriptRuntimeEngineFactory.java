@@ -14,26 +14,29 @@ import net.sf.json.JSONObject;
  */
 public class ScriptRuntimeEngineFactory {
     public static ScriptRuntimeEngine createRTE(OA2SE oa2SE, JSONObject config){
-        if(config.containsKey(QDLRuntimeEngine.CONFIG_TAG)){
+        // note: No QDL tag means no scripting for QDL even if there is an environment configured.
+        // This is because there is nothing to execute so no reason to incur the overhead of creating it.
+        if(config.containsKey(OA2ClientFunctorScriptsUtil.CLAIMS_KEY)){
+            return new FunctorRuntimeEngine(config);
+        }
+
+  //      if(config.containsKey(QDLRuntimeEngine.CONFIG_TAG)){
             if(oa2SE.getQDLEnvironment() == null || !oa2SE.getQDLEnvironment().isEnabled()){
                 oa2SE.getMyLogger().warn("**********************************");
                 oa2SE.getMyLogger().warn("QDL scripting detected, but no QDL runtime engine has been configured.");
                 oa2SE.getMyLogger().warn("No QDL scripts will be run.");
                 oa2SE.getMyLogger().warn("**********************************");
             }else {
-                return new QDLRuntimeEngine(oa2SE.getQDLEnvironment(), config.getJSONObject(QDLRuntimeEngine.CONFIG_TAG));
+                return new QDLRuntimeEngine(oa2SE.getQDLEnvironment());
             }
-        }
-        if(config.containsKey("config")){
-            return new FunctorRuntimeEngine(config);
-        }
+   //     }
         return null;
     }
 
 
     public static class NoOpRuntimeEngine extends ScriptRuntimeEngine{
-        public NoOpRuntimeEngine(JSONObject config) {
-            super(config);
+        public NoOpRuntimeEngine() {
+            
         }
 
         @Override

@@ -2,10 +2,13 @@ package edu.uiuc.ncsa.myproxy.oauth2.tools;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.client.AssetResponse;
 import edu.uiuc.ncsa.myproxy.oa4mp.client.ClientEnvironment;
+import edu.uiuc.ncsa.myproxy.oa4mp.client.ClientXMLTags;
 import edu.uiuc.ncsa.myproxy.oa4mp.client.OA4MPResponse;
 import edu.uiuc.ncsa.myproxy.oa4mp.client.storage.AssetStoreUtil;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.testing.CLCCommands;
 import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2Asset;
+import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2ClientEnvironment;
+import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2ClientLoader;
 import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2MPService;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.DateUtils;
@@ -16,11 +19,16 @@ import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
 import edu.uiuc.ncsa.security.delegation.token.impl.AuthorizationGrantImpl;
+import edu.uiuc.ncsa.security.oauth_2_0.JWTUtil;
 import edu.uiuc.ncsa.security.oauth_2_0.UserInfo;
 import edu.uiuc.ncsa.security.oauth_2_0.client.ATResponse2;
+import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTUtil2;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
+import edu.uiuc.ncsa.security.util.configuration.ConfigUtil;
+import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import edu.uiuc.ncsa.security.util.pkcs.CertUtil;
 import net.sf.json.JSONObject;
+import org.apache.commons.configuration.tree.ConfigurationNode;
 
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
@@ -55,6 +63,15 @@ public class OA2CLCCommands extends CLCCommands {
         super(logger, ce);
     }
 
+    public String getConfigFile() {
+        return configFile;
+    }
+
+    public void setConfigFile(String configFile) {
+        this.configFile = configFile;
+    }
+
+    String configFile;
     protected OA2MPService service;
 
     protected OA2MPService getOA2S() {
@@ -70,13 +87,17 @@ public class OA2CLCCommands extends CLCCommands {
     }
 
     public void getURIHelp() {
-        say("Usage: This will create the correct URL to pass to your browser.");
-        say("   This will put this in to the clipboard if possible.");
-        say("   This URL should be pasted exactly into the location bar.");
-        say("   You must then authenticate. After you authenticate, the");
-        say("   service will attempt a call back to a client endpoint which will");
-        say("   fail (this is the hook that lets us do this manually).");
-        say("   Next Step: You should invoke setgrant with the callback uri from the server.");
+        say("seturi | geturi [" + CLIENT_CFG_NAME_KEY + " config_name]");
+        say("Usage: This will create the correct URL. If possible, it will put it in the clipboard.");
+        sayi("if no argument is given, then the default name for the client's configuration is used");
+        sayi("If the name is given, the configuration is re-read and the named configuration is set to the current one.");
+        sayi("This lets you test several clients in quick succession if needed.");
+        sayi("This will put this in to the clipboard if possible.");
+        sayi("This URL should be pasted exactly into the location bar.");
+        sayi("You must then authenticate. After you authenticate, the");
+        sayi("service will attempt a call back to a client endpoint which will");
+        sayi("fail (this is the hook that lets us do this manually).");
+        sayi("Next Step: You should invoke setgrant with the callback uri from the server.");
 
     }
 
@@ -85,6 +106,12 @@ public class OA2CLCCommands extends CLCCommands {
     protected String getRandomString() {
         long ll = secureRandom.nextLong();
         return Long.toHexString(ll);
+    }
+
+    String CLIENT_CFG_NAME_KEY = "-name";
+
+    public void seturi(InputLine inputLine) throws Exception {
+            geturi(inputLine);
     }
 
     /**
@@ -97,6 +124,19 @@ public class OA2CLCCommands extends CLCCommands {
         if (showHelp(inputLine)) {
             getURIHelp();
             return;
+        }
+        if (inputLine.hasArg(CLIENT_CFG_NAME_KEY)) {
+            String name = inputLine.getNextArgFor(CLIENT_CFG_NAME_KEY);
+            say("...loading configuration named \"" + name + "\"");
+            try {
+                ConfigurationNode node = ConfigUtil.findConfiguration(getConfigFile(),
+                        name,
+                        ClientXMLTags.COMPONENT);
+                OA2ClientLoader loader = new OA2ClientLoader(node);
+                service = new OA2MPService(loader.load());
+            } catch (Throwable t) {
+                say("Sorry, I could not find the configuration with id =\"" + name + "\":" + t.getMessage());
+            }
         }
         Identifier id = AssetStoreUtil.createID();
         OA4MPResponse resp = getService().requestCert(id);
@@ -136,6 +176,10 @@ public class OA2CLCCommands extends CLCCommands {
     }
 
     AuthorizationGrant grant;
+
+    public void getgrant(InputLine inputLine) throws Exception {
+        setgrant(inputLine);
+    }
 
     public void setgrant(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
@@ -325,6 +369,7 @@ public class OA2CLCCommands extends CLCCommands {
             }
         }
         printTokens();
+
     }
 
     ATResponse2 currentATResponse;
@@ -381,7 +426,19 @@ public class OA2CLCCommands extends CLCCommands {
 
     protected void printTokens() {
         if (dummyAsset.getAccessToken() != null) {
-            say(" access token = " + dummyAsset.getAccessToken().getToken());
+            // If the access token is a jwt
+            AccessToken accessToken = getDummyAsset().getAccessToken();
+            JSONWebKeys keys = JWTUtil2.getJsonWebKeys(getService().getServiceClient(), ((OA2ClientEnvironment) getService().getEnvironment()).getWellKnownURI());
+              boolean isJWT = false;
+            try {
+                JSONObject json = JWTUtil.verifyAndReadJWT(accessToken.getToken(), keys);
+                sayi("Access token is a JWT:");
+                say(json.toString(1));
+                isJWT = true;
+            } catch (Throwable t) {
+                // do nothing.
+            }
+            say((isJWT?"raw ":"") + "access token = " + dummyAsset.getAccessToken().getToken());
         }
         if (dummyAsset.getRefreshToken() != null) {
             say("refresh token = " + dummyAsset.getRefreshToken().getToken());
@@ -429,7 +486,7 @@ public class OA2CLCCommands extends CLCCommands {
     }
 
     protected void setGrantHelp() {
-        say("setgrant [callback]:");
+        say("[g|s]etgrant [callback]:");
         say("   The assumption is that you use geturi to get the correct authorization uri and have ");
         say("   logged in. Your browser *should* have a call back to your client.");
         say("   Copy that to the clipboard. If you call this with no argument, then the clipboard is read.");

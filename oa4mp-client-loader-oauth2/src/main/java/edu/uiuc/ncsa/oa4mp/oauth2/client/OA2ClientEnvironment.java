@@ -160,4 +160,5 @@ public class OA2ClientEnvironment extends ClientEnvironment {
     }
 
     boolean showIDToken = false;
+
 }

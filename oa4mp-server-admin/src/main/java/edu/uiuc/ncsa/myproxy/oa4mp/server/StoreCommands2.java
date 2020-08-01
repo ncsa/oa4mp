@@ -191,7 +191,7 @@ public abstract class StoreCommands2 extends StoreCommands {
     }
 
     protected void showSearchHelp() {
-        say("search -key key [-regex|-la -size] [-listKeys] condition");
+        say("search -key key [-regex|-la -size] [-listKeys] [-v] condition");
         sayi("Searches the current component for all entries satisfying the condition. You may also specify that the ");
         sayi("condition is a regular expression rather than using simple equality");
         sayi("Invoking this with the -listkeys flag prints out all the keys for this store. Omit that for searches.");
@@ -199,6 +199,7 @@ public abstract class StoreCommands2 extends StoreCommands {
         sayi("-regex (optional) attempt to interpret the conditional as a regular expression");
         sayi("-la (optional) print the result in long format.");
         sayi("-size (optional) print *only* the number of results.");
+        sayi("-v (optional) show stack traces. Only use this if you really need it.");
         sayi("\nE.g.\n");
         sayi("search -key client_id -regex \".*07028.*\"");
         sayi("\n(In the clients components) This would find the clients whose identifiers contain the string 07028");
@@ -222,7 +223,7 @@ public abstract class StoreCommands2 extends StoreCommands {
             return;
         }
         SerializationKeys keys = ((MapConverter) getStore().getXMLConverter()).getKeys();
-
+        boolean showStackTraces = inputLine.hasArg("-v");
         if (inputLine.hasArg(LIST_KEYS_FLAG)) {
             if (getStore().getXMLConverter() instanceof MapConverter) {
                 say("keys");
@@ -244,6 +245,9 @@ public abstract class StoreCommands2 extends StoreCommands {
             try {
                 values = getStore().search(key, inputLine.getLastArg(), inputLine.hasArg(REGEX_FLAG));
             } catch (Throwable t) {
+                if(showStackTraces){
+                    t.printStackTrace();
+                }
                 say("Sorry, that didn't work:" + t.getMessage());
                 return;
             }
