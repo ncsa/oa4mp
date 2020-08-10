@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
 
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.oauth_2_0.server.UnsupportedScopeException;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSourceConfiguration;
@@ -35,8 +36,36 @@ public class FSClaimSource extends BasicClaimsSourceImpl {
      */
 
     public static String FILE_CLAIM_KEY = "claimKey";
+    /**
+     * Boolean-valued claim. If  a user is not found, return a default record. This is useful if, e.g., this source contains
+     * a set of capabilites that are applied to more or less every user with a few exception.
+     */
+    public static String USE_DEFAULT_KEY = "useDefault";
 
+    /**
+     * The id in the file that contains the default set of claims. Not that this is ignored unless
+     * {@link #USE_DEFAULT_KEY} is set.
+     */
+    public static String DEFAULT_CLAIM_KEY = "defaultClaim";
 
+    Boolean useDefaultClaims = null;
+
+    public boolean isUseDefaultClaims() {
+        if (useDefaultClaims == null) {
+            Object rawX = getConfiguration().getProperty(USE_DEFAULT_KEY);
+            if (rawX == null) return false; // default
+            String rawS = rawX.toString();
+            if (StringUtils.isTrivial(rawS)) return false;
+            useDefaultClaims = Boolean.parseBoolean(rawS);
+        }
+        return useDefaultClaims;
+    }
+
+     public String getDefaultClaimName(){
+         Object raw =  getConfiguration().getProperty(DEFAULT_CLAIM_KEY);
+         if(raw == null) return null;
+         return raw.toString();
+     }
 
     /*
     The test file contains a JSON object of properties, e.g. of the form
@@ -77,10 +106,18 @@ public class FSClaimSource extends BasicClaimsSourceImpl {
         }
         JSONObject jsonObject = JSONObject.fromObject(rawJSON);
         JSONObject json;
-        if(getConfiguration().getProperty(FILE_CLAIM_KEY)== null ){
+        if (getConfiguration().getProperty(FILE_CLAIM_KEY) == null) {
             json = jsonObject.getJSONObject(transaction.getUsername());
-        }else{
+        } else {
             json = jsonObject.getJSONObject((String) claims.get(getConfiguration().getProperty(FILE_CLAIM_KEY)));
+        }
+        if(isUseDefaultClaims() && (json == null || json.isEmpty())){
+            if(getDefaultClaimName() == null){
+                throw new GeneralException("ERROR: \"" + DEFAULT_CLAIM_KEY + "\" has not been set.");
+            }
+            if(jsonObject.containsKey(getDefaultClaimName())){
+                json = jsonObject.getJSONObject(getDefaultClaimName());
+            }
         }
         claims.putAll(json);
         return super.realProcessing(claims, request, transaction);

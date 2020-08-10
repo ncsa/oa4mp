@@ -22,10 +22,10 @@ import static edu.uiuc.ncsa.qdl.variables.StemVariable.STEM_INDEX_MARKER;
  * <p>Created by Jeff Gaynor<br>
  * on 2/10/20 at  10:18 AM
  */
-public class ClaimsSourceTester implements QDLFunction, CSConstants {
+public class ClaimsSourceGetter implements QDLFunction, CSConstants {
     @Override
     public String getName() {
-        return "test_source";
+        return "get_claims";
     }
 
     @Override
@@ -165,7 +165,7 @@ public class ClaimsSourceTester implements QDLFunction, CSConstants {
         System.out.println(out.toJSON().toString(2));
 
 
-        ClaimsSourceTester cst = new ClaimsSourceTester();
+        ClaimsSourceGetter cst = new ClaimsSourceGetter();
         StemVariable claims = (StemVariable) cst.evaluate(new Object[]{mystem, "jeff"});
         System.out.println("File claim source configuration:");
         System.out.println(claims.toJSON().toString(2));
@@ -183,7 +183,7 @@ public class ClaimsSourceTester implements QDLFunction, CSConstants {
         CreateSourceConfig createSourceConfig = new CreateSourceConfig();
         StemVariable cfg = (StemVariable) createSourceConfig.evaluate(new Object[]{mystem});
 
-        ClaimsSourceTester cst = new ClaimsSourceTester();
+        ClaimsSourceGetter cst = new ClaimsSourceGetter();
         StemVariable claims = (StemVariable) cst.evaluate(new Object[]{cfg, "jgaynor"});
         System.out.println(claims.toJSON().toString(2));
 
@@ -213,7 +213,7 @@ public class ClaimsSourceTester implements QDLFunction, CSConstants {
         mystem.put(CS_LDAP_SEARCH_ATTRIBUTES, sa);
         mystem.put(CS_LDAP_GROUP_NAMES, groupNames);
 
-        ClaimsSourceTester cst = new ClaimsSourceTester();
+        ClaimsSourceGetter cst = new ClaimsSourceGetter();
         StemVariable claims = (StemVariable) cst.evaluate(new Object[]{mystem, "jgaynor"});
         System.out.println(claims.toString(2));
 

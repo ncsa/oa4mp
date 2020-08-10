@@ -123,8 +123,16 @@ If the update contains the client secret, then, as per the spec,  it will be ver
 if it does not match what is on the server, the request will be
 rejected. If you do not send a secret, then no check is made.
 
-If you lose the secret there is no way to really issue a new one except to re-register the client. In
-that case you will get an entirely new id for this client.
+If you lose the secret or want to change it, there is no way to really issue a new one except to
+re-register the client. In that case you will get an entirely new id for this client.
+
+** Public clients
+A public client has a scope of openid only and no password. These are assumed to be
+public, meaning that they are distributed as parts of other systems (like kubernetes)
+and a large number of users can have near anonymous access with them. If you try
+to add scopes to a public client, this will be rejected outright because of the public nature -- you
+really don't want to change a public client over to something else. In that case, register a new client
+with the scopes you want.
 
 
 **A DELETE example -- removing a client

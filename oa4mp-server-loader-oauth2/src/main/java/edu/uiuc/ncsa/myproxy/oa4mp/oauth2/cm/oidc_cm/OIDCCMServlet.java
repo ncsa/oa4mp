@@ -18,6 +18,7 @@ import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2GeneralError;
+import edu.uiuc.ncsa.security.oauth_2_0.OA2Scopes;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
@@ -38,6 +39,7 @@ import java.util.*;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.oidc_cm.OIDCCMConstants.*;
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8693Constants2.GRANT_TYPE_TOKEN_EXCHANGE;
+import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.REFRESH_LIFETIME;
 
 /**
  * Note that in all of these calls, the assumption is that an admin client has been requested and
@@ -139,6 +141,10 @@ public class OIDCCMServlet extends EnvServlet {
             OA2ClientKeys clientKeys = (OA2ClientKeys) getOA2SE().getClientStore().getMapConverter().getKeys();
 
             json.put(clientKeys.rtLifetime(), client.getResponseTypes());
+            // Stored in ms., sent/received in sec. Convert to seconds.
+            json.put(REFRESH_LIFETIME, client.getRtLifetime()/1000);
+        }else{
+            json.put(REFRESH_LIFETIME, 0L);
         }
         JSONArray scopes = new JSONArray();
         scopes.addAll(client.getScopes());
@@ -277,22 +283,29 @@ public class OIDCCMServlet extends EnvServlet {
             //have to check that certain key/values are excluded from the update.
             if (jsonRequest.containsKey(OIDCCMConstants.REGISTRATION_ACCESS_TOKEN) ||
                     jsonRequest.containsKey(OIDCCMConstants.CLIENT_SECRET_EXPIRES_AT) ||
-                    jsonRequest.containsKey(OIDCCMConstants.CLIENT_SECRET_EXPIRES_AT) ||
                     jsonRequest.containsKey(OIDCCMConstants.CLIENT_ID_ISSUED_AT)) {
                 throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
                         "invalid parameter",
                         HttpStatus.SC_BAD_REQUEST);
             }
             if (jsonRequest.containsKey(OA2Constants.SCOPE)) {
-                // the only thing that we are concerned with is is client is attempting to increase their
-                // scopes. The are permitted to reduce them.
                 boolean rejectRequest = false;
                 JSONArray newScopes = toJA(jsonRequest, OA2Constants.SCOPE);
                 Collection<String> oldScopes = client.getScopes();
+                if(oldScopes.size() == 1 && oldScopes.contains(OA2Scopes.SCOPE_OPENID)){
+                    // Fix for CIL-775
+                      // This is a public client. they are allowed to re-assert it
+                    if(!(newScopes.size() == 1 && newScopes.contains(OA2Scopes.SCOPE_OPENID))){
+                        throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
+                                "Cannot increase scope of public client.",
+                                HttpStatus.SC_BAD_REQUEST);
+                    }
+                }
                 Collection<String> newScopeList = new HashSet<>();
                 // Fix for CIL-725 Allow admin clients to alter scopes as desired.
                 // NOTE as long as this admin-only access this is ok. Otherwise the
                 // previous version the only permits a reduction in scopes is allowed.
+                // We do reject a scope if it is not on the supported list for this server
                 Collection<String> supportedScopes = getOA2SE().getScopes();
 
                 for (Object x : newScopes) {
@@ -323,8 +336,11 @@ public class OIDCCMServlet extends EnvServlet {
                 if (!hashedSecret.equals(client.getSecret())) {
                     throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, "client id does not match", HttpStatus.SC_FORBIDDEN);
                 }
-                newClient.setSecret(client.getSecret());  // it matches, send it along.
             }
+            // Fix for CIL-778.
+            // Make sure that the newClient (scratch copy in case we bail)  always has the secret
+            // or this effectively resets it to null (!!) and disables any subsequent attempt to use it.
+            newClient.setSecret(client.getSecret());
             // Make sure these are missing so we don't get them stashed someplace.
             jsonRequest.remove(CLIENT_SECRET);
             jsonRequest.remove(CLIENT_ID);
@@ -333,11 +349,8 @@ public class OIDCCMServlet extends EnvServlet {
             newClient.setConfig(client.getConfig());
             try {
                 newClient = updateClient(newClient, jsonRequest, false, resp);
-
                 getOA2SE().getClientStore().save(newClient);
                 writeOK(resp, toJSONObject(newClient));
-                //     writeOK(resp, resp);
-
             } catch (Throwable t) {
                 // back out of it
                 warn("Error attempting to update client \"" + client.getIdentifierString() + "\". " +
@@ -609,6 +622,11 @@ public class OIDCCMServlet extends EnvServlet {
         } else {
             // CIL-735 if not config object, remove it. 
             client.setConfig(null);
+        }
+        if(jsonRequest.containsKey(REFRESH_LIFETIME)){
+            // NOTE this is sent in seconds but is recorded as ms., so convert to milliseconds here.
+            client.setRtLifetime(jsonRequest.getLong(REFRESH_LIFETIME)*1000);
+            jsonRequest.remove(REFRESH_LIFETIME);
         }
         // Fix for CIL-734: now handle everything else left over
         client.removeOIDC_CM_Attributes();

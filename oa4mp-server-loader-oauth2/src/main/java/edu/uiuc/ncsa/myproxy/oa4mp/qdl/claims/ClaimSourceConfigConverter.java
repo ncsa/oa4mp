@@ -37,9 +37,14 @@ public class ClaimSourceConfigConverter implements CSConstants {
 
         switch (type) {
             case CS_TYPE_FILE:
+                FSClaimSource fsClaimSource = (FSClaimSource) claimsSource;
                 stem.put(CS_FILE_FILE_PATH, cfg.getProperty(FSClaimSource.FILE_PATH_KEY));
                 if (cfg.getProperty(FSClaimSource.FILE_CLAIM_KEY) != null) {
                     stem.put(CS_FILE_CLAIM_KEY, cfg.getProperty(FSClaimSource.FILE_CLAIM_KEY));
+                }
+                stem.put(CS_USE_DEFAULT_KEY, fsClaimSource.isUseDefaultClaims());
+                if(fsClaimSource.getDefaultClaimName() != null){
+                    stem.put(CS_DEFAULT_CLAIM_NAME_KEY, fsClaimSource.getDefaultClaimName());
                 }
                 break;
             case CS_TYPE_HEADERS:
@@ -126,6 +131,12 @@ public class ClaimSourceConfigConverter implements CSConstants {
                 xp.put(FSClaimSource.FILE_PATH_KEY, arg.getString(CS_FILE_FILE_PATH)); //  wee bit of translation
                 if (arg.containsKey(CS_FILE_CLAIM_KEY)) {
                     xp.put(FSClaimSource.FILE_CLAIM_KEY, arg.getString(CS_FILE_CLAIM_KEY));
+                }
+                if(arg.containsKey(CS_USE_DEFAULT_KEY)){
+                    xp.put(FSClaimSource.USE_DEFAULT_KEY, arg.getBoolean(CS_USE_DEFAULT_KEY));
+                }
+                if(arg.containsKey(CS_DEFAULT_CLAIM_NAME_KEY)){
+                    xp.put(FSClaimSource.DEFAULT_CLAIM_KEY, arg.getString(CS_DEFAULT_CLAIM_NAME_KEY));
                 }
                 cfg.setProperties(xp);
                 return cfg;

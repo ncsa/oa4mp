@@ -40,6 +40,9 @@ public class JWTModule extends JavaModule {
         jwtModule.addFunctions(funcs);
         vars = new ArrayList<>();
         vars.add(jwtCommands.new TestClaims());
+        vars.add(jwtCommands.new TestScopes());
+        vars.add(jwtCommands.new TestAudience());
+        vars.add(jwtCommands.new TestXAs());
         jwtModule.addVariables(vars);
         if (state != null) {
             jwtModule.init(state);

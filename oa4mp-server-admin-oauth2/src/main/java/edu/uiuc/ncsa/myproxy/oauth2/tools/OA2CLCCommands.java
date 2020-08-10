@@ -18,11 +18,13 @@ import edu.uiuc.ncsa.security.delegation.client.request.RTResponse;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
+import edu.uiuc.ncsa.security.delegation.token.Token;
 import edu.uiuc.ncsa.security.delegation.token.impl.AuthorizationGrantImpl;
 import edu.uiuc.ncsa.security.oauth_2_0.JWTUtil;
 import edu.uiuc.ncsa.security.oauth_2_0.UserInfo;
 import edu.uiuc.ncsa.security.oauth_2_0.client.ATResponse2;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTUtil2;
+import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import edu.uiuc.ncsa.security.util.configuration.ConfigUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
@@ -111,7 +113,7 @@ public class OA2CLCCommands extends CLCCommands {
     String CLIENT_CFG_NAME_KEY = "-name";
 
     public void seturi(InputLine inputLine) throws Exception {
-            geturi(inputLine);
+        geturi(inputLine);
     }
 
     /**
@@ -424,28 +426,51 @@ public class OA2CLCCommands extends CLCCommands {
         say("   If the " + CLAIMS_FLAG + " flag is supplied, the id token will be printed");
     }
 
+    protected JSONObject resolveFromToken(Token token) {
+        JSONWebKeys keys = JWTUtil2.getJsonWebKeys(getService().getServiceClient(), ((OA2ClientEnvironment) getService().getEnvironment()).getWellKnownURI());
+        try {
+            JSONObject json = JWTUtil.verifyAndReadJWT(token.getToken(), keys);
+
+            return json;
+        } catch (Throwable t) {
+            // do nothing.
+        }
+        return null;
+
+    }
+
     protected void printTokens() {
         if (dummyAsset.getAccessToken() != null) {
             // If the access token is a jwt
-            AccessToken accessToken = getDummyAsset().getAccessToken();
-            JSONWebKeys keys = JWTUtil2.getJsonWebKeys(getService().getServiceClient(), ((OA2ClientEnvironment) getService().getEnvironment()).getWellKnownURI());
-              boolean isJWT = false;
-            try {
-                JSONObject json = JWTUtil.verifyAndReadJWT(accessToken.getToken(), keys);
-                sayi("Access token is a JWT:");
-                say(json.toString(1));
-                isJWT = true;
-            } catch (Throwable t) {
-                // do nothing.
+            JSONObject token = resolveFromToken(getDummyAsset().getAccessToken());
+            if(token == null){
+                say( "default access token = " + dummyAsset.getAccessToken().getToken());
+            }else{
+                sayi("JWT access token:" + token.toString(1));
+
             }
-            say((isJWT?"raw ":"") + "access token = " + dummyAsset.getAccessToken().getToken());
         }
+
         if (dummyAsset.getRefreshToken() != null) {
-            say("refresh token = " + dummyAsset.getRefreshToken().getToken());
-            say("RT expires in = " + dummyAsset.getRefreshToken().getExpiresIn() + " ms.");
-            Date startDate = DateUtils.getDate(dummyAsset.getRefreshToken().getToken());
-            startDate.setTime(startDate.getTime() + dummyAsset.getRefreshToken().getExpiresIn());
-            say("   expires at " + startDate);
+
+            JSONObject token = resolveFromToken(getDummyAsset().getRefreshToken());
+            if(token == null){
+                say("default refresh token = " + dummyAsset.getRefreshToken().getToken());
+                say("RT expires in = " + dummyAsset.getRefreshToken().getExpiresIn() + " ms.");
+                Date startDate = DateUtils.getDate(dummyAsset.getRefreshToken().getToken());
+                startDate.setTime(startDate.getTime() + dummyAsset.getRefreshToken().getExpiresIn());
+                say("   expires at " + startDate);
+
+            }else{
+                say("JWT refresh token = " + token.toString(1));
+                if(token.containsKey(OA2Claims.EXPIRATION)){
+                    Date d = new Date();
+                    d.setTime(token.getLong(OA2Claims.EXPIRATION)*1000L);
+                    getDummyAsset().getRefreshToken().setExpiresIn(d.getTime() - System.currentTimeMillis());
+                    say("RT expires in = " + getDummyAsset().getRefreshToken().getExpiresIn() + " ms.");
+                }
+            }
+
         }
 
     }

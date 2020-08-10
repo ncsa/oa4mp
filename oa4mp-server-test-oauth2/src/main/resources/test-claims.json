@@ -4,6 +4,7 @@
     "the course of running the tests then changed back."
   ],
   "user123" : {"eppn":""},
+  "fnal_user" : {"capabilites":["storage.read:/store", "storage.write:/store/data", "compute.create:/"]},
   "jgaynor":{
     "eppn":"test-eppn@foo.bar",
     "isMemberOf":  [

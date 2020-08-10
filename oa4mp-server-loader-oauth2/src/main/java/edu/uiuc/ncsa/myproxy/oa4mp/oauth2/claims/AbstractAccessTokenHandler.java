@@ -50,22 +50,9 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
     @Override
     public void init() throws Throwable {
         // set some standard claims.
-        JSONObject wlcg = getAtData();
         if (getAtData().isEmpty()) {
-            //     wlcg.put(SUBJECT, transaction.getUserMetaData().getString("eppn"));
-            wlcg.put(NOT_VALID_BEFORE, (System.currentTimeMillis() - 5000L) / 1000L); // not before is 5 minutes before current
-            wlcg.put(ISSUER, oa2se.getIssuer());
-            wlcg.put(EXPIRATION, System.currentTimeMillis() / 1000L + 900L);
-            wlcg.put(ISSUED_AT, System.currentTimeMillis() / 1000L);
-            if (transaction.getAccessToken() != null) {
-                wlcg.put(JWT_ID, transaction.getAccessToken().getToken());
-            }
+            setAccountingInformation();
         }
-        // Make sure it's set.
-        if (!wlcg.containsKey(JWT_ID) && transaction.getAccessToken() != null) {
-            wlcg.put(JWT_ID, transaction.getAccessToken().getToken());
-        }
-        setAtData(wlcg); // since if it was empty, then no such object has been set in the transaction.
     }
 
     @Override
@@ -101,6 +88,9 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
      */
     @Override
     public AccessToken getSignedAT(JSONWebKey key) {
+        if (key == null) {
+            throw new IllegalArgumentException("Error: A null JSON web key was encountered");
+        }
         if (getAtData().isEmpty()) return null;
         try {
             String at = JWTUtil2.createJWT(getAtData(), key);
@@ -114,8 +104,6 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
             e.printStackTrace();
             throw new GeneralException("Could not create signed token", e);
         }
-
-
     }
 
     @Override
@@ -129,12 +117,22 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
 
     @Override
     public void setAccountingInformation() {
+        JSONObject atData = getAtData();
+
+        atData.put(NOT_VALID_BEFORE, (System.currentTimeMillis() - 5000L) / 1000L); // not before is 5 minutes before current
+        atData.put(ISSUER, oa2se.getIssuer());
+        atData.put(EXPIRATION, System.currentTimeMillis() / 1000L + 900L);
+        atData.put(ISSUED_AT, System.currentTimeMillis() / 1000L);
+        if (transaction.getAccessToken() != null) {
+            atData.put(JWT_ID, transaction.getAccessToken().getToken());
+        }
+        setAtData(atData);
 
     }
 
     @Override
     public void refreshAccountingInformation() {
-
+        setAccountingInformation();
     }
 
     public AccessToken getAccessToken() {

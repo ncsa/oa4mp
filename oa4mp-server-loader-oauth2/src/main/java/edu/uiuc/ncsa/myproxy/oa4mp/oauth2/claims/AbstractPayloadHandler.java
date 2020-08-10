@@ -75,7 +75,10 @@ public abstract class AbstractPayloadHandler implements PayloadHandler {
 
     @Override
     public JSONObject execute(ClaimSource source, JSONObject claims) throws Throwable {
-
+        // If this is disabled, return the claims unaltered -- do not execute.
+        if(!source.isEnabled()){
+            return claims;
+        }
         // Fix for CIL-693:
         // Inject current state here!
         if (source instanceof BasicClaimsSourceImpl) {

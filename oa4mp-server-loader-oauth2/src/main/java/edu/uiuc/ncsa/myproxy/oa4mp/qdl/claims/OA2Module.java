@@ -25,7 +25,7 @@ public class OA2Module extends JavaModule {
     public Module newInstance(State state) {
         OA2Module oa2Module = new OA2Module(URI.create("oa2:/qdl/oidc/claims"), "claims");
         ArrayList<QDLFunction> funcs = new ArrayList<>();
-        funcs.add(new ClaimsSourceTester());
+        funcs.add(new ClaimsSourceGetter());
         funcs.add(new CreateSourceConfig());
         funcs.add(new NewTemplate());
         funcs.add(new IsInGroup());

@@ -1,5 +1,9 @@
 {
-  "comment": "This is a basic example from the specification to test if a client has been created correctly",
+  "comment": [
+    "This is a basic example from the specification to test if a client has been created correctly",
+    "Note that this also includes a refresh token lifetime parameter (rt_lifetime). Omitting this disables refresh tokens.",
+    "The lifetime is in seconds."
+    ],
   "redirect_uris": [
     "http://localhost/callback"
   ],
@@ -7,5 +11,6 @@
   "scope": "openid email profile",
   "contacts": [
     "your.email@here.org"
-  ]
+  ],
+  "rt_lifetime" :2592000
 }

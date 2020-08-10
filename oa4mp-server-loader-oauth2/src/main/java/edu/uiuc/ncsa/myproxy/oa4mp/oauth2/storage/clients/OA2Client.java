@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.IDTokenClientConfig;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.RefreshTokenClientConfig;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.SciTokenClientConfig;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
@@ -138,6 +139,7 @@ public class OA2Client extends Client implements OA2ClientScopes {
     protected String oa4mp_attributes = "oa4mp_attributes";
     protected String oidc_cm_attributes = "oidc-cm_attributes";
     protected String SCI_TOKENS_KEY = "sci_token";
+    protected String REFRESH_TOKENS_KEY = "refresh_token";
     protected String WLCG_TOKENS_KEY = "wlcg_token";
     protected String ID_TOKENS_KEY = "id_token";
 
@@ -156,6 +158,25 @@ public class OA2Client extends Client implements OA2ClientScopes {
 
     public void setSciTokensConfig(SciTokenClientConfig sciTokensConfig) {
         getConfig().put(SCI_TOKENS_KEY, sciTokensConfig.toJSON());
+    }
+
+
+    // Refresh token & config
+    public void setRefreshTokensConfig(RefreshTokenClientConfig sciTokensConfig) {
+        getConfig().put(SCI_TOKENS_KEY, sciTokensConfig.toJSON());
+    }
+
+    public boolean hasRefreshTokenConfig() {
+        return getConfig().containsKey(REFRESH_TOKENS_KEY);
+    }
+
+    public RefreshTokenClientConfig getRefreshTokensConfig() {
+        RefreshTokenClientConfig refreshTokenClientConfig = new RefreshTokenClientConfig(); // empty
+
+        if (hasRefreshTokenConfig()) {
+            refreshTokenClientConfig.fromJSON(getConfig().getJSONObject(REFRESH_TOKENS_KEY));
+        }
+        return refreshTokenClientConfig;
     }
 
     public boolean hasIDTokenConfig() {

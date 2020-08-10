@@ -1,6 +1,5 @@
 {
   "client_name": "OA4MP extra attributes test - update",
-  "client_id":"oa4mp:/client_id/37ca7791fc3d870c2b3fed059178ab32",
   "redirect_uris": [
     "http://localhost/callback",
     "https://localhost/callback2"
@@ -32,10 +31,11 @@
       }
     },
     "comment": [
-      "This is an example to show how to send extra attributes, here the cfg parameter.",
-      "Note that this will generate another secret since none is supplied."],
+      "This is an example to show how to send extra attributes, and a cfg parameter.",
+      "The refresh lifetime (in seconds) is also updated."],
     "extra_attribute1": "some extra attribute"
   },
+  "rt_lifetime": 1000000,
   "extra_attribute2": "my totally cool secret thingie",
   "extra_attribute3": "My third attribute"
 }

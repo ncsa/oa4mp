@@ -23,9 +23,9 @@ public abstract class AbstractClientConfig {
     }
     public  JSONObject toJSON(){
         JSONObject c = new JSONObject();
-        if(!getScriptSet().isEmpty()){
+      /*  if(!getScriptSet().isEmpty()){
             //c.put("qdl":)
-        }
+        }*/
         return c;
     }
     public  ScriptSet getScriptSet(){

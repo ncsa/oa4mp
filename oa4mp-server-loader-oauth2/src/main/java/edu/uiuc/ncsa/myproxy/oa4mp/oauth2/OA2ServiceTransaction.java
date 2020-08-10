@@ -207,7 +207,8 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         getState().put(CLAIMS_KEY, claims);
     }
 
-    String AT_DATA_KEY = "at_data";
+    String AT_DATA_KEY = "at_data"; // access token contents
+
     public JSONObject getATData(){
         if (!getState().containsKey(AT_DATA_KEY)) {
             return new JSONObject();
@@ -216,6 +217,19 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
     }
     public void setATData(JSONObject atData){
         getState().put(AT_DATA_KEY, atData);
+    }
+
+    String RT_DATA_KEY = "rt_data"; // refresh token contents
+
+    public void setRTData(JSONObject rtData){
+        getState().put(RT_DATA_KEY, rtData);
+    }
+
+    public JSONObject getRTData(){
+        if (!getState().containsKey(RT_DATA_KEY)) {
+            return new JSONObject();
+        }
+        return getState().getJSONObject(RT_DATA_KEY);
     }
 
     String RESPONSE_MODE_KEY = OA2Constants.RESPONSE_MODE;

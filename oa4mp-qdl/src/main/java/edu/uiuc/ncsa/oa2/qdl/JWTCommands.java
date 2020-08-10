@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.oa2.qdl;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ExtendedParameters;
 import edu.uiuc.ncsa.myproxy.oauth2.tools.SigningCommands;
 import edu.uiuc.ncsa.qdl.evaluate.IOEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
@@ -21,7 +22,10 @@ import java.nio.file.Files;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
+
+import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ExtendedParameters.OA4MP_NS;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -62,6 +66,7 @@ public class JWTCommands implements Serializable {
     transient SigningCommands signingCommands = null;
     transient JSONWebKeyUtil jsonWebKeyUtil = null;
     protected String CREATE_KEYS_NAME = "create_keys";
+
     public class CreateJWK implements QDLFunction {
         @Override
         public String getName() {
@@ -77,18 +82,18 @@ public class JWTCommands implements Serializable {
         public Object evaluate(Object[] objects) {
             File target = null;
             Boolean useNewkeys = true;
-            if (0 < objects.length ) {
+            if (0 < objects.length) {
                 target = new File(objects[0].toString());
             }
-            if(1 < objects.length){
-                if(!(objects[1] instanceof Boolean)){
+            if (1 < objects.length) {
+                if (!(objects[1] instanceof Boolean)) {
                     throw new IllegalArgumentException("Error: " + getName() + " requires a boolean as its second argument.");
                 }
-                useNewkeys = (Boolean)objects[1];
+                useNewkeys = (Boolean) objects[1];
             }
             try {
-                JSONWebKeys  newKeys = getSigningCommands().createJsonWebKeys();
-                if(useNewkeys){
+                JSONWebKeys newKeys = getSigningCommands().createJsonWebKeys();
+                if (useNewkeys) {
                     jwks = newKeys;
                 }
                 if (!newKeys.hasDefaultKey()) {
@@ -115,7 +120,7 @@ public class JWTCommands implements Serializable {
         @Override
         public List<String> getDocumentation(int argCount) {
             List<String> doc = new ArrayList<>();
-            switch(argCount){
+            switch (argCount) {
                 case 1:
                     doc.add(getName() + "() - create a set of JSON WebKeys and sets the current set of web keys.");
                     break;
@@ -139,6 +144,7 @@ public class JWTCommands implements Serializable {
     }
 
     protected String LOAD_KEYS_NAME = "load_keys";
+
     public class LoadJWK implements QDLFunction {
         @Override
         public String getName() {
@@ -184,6 +190,7 @@ public class JWTCommands implements Serializable {
     }
 
     protected String SAVE_KEYS_NAME = "save_keys";
+
     public class SaveKeys implements QDLFunction {
         @Override
         public String getName() {
@@ -257,17 +264,17 @@ public class JWTCommands implements Serializable {
                     if (!(objects[0] instanceof Long)) {
                         throw new IllegalArgumentException("Error: The first argument must be an integer");
                     }
-                     lCount = (Long) objects[0];
+                    lCount = (Long) objects[0];
                     count = lCount.intValue();
                     if (!(objects[1] instanceof Long)) {
                         throw new IllegalArgumentException("Error: The second argument must be an integer");
                     }
-                    Long lLength = (Long)objects[1];
+                    Long lLength = (Long) objects[1];
                     length = lLength.intValue();
                     break;
             }
             sKeys = createKeys(count, length);
-            if(count == 1){
+            if (count == 1) {
                 return sKeys.get(0);
             }
             List<Object> dummy = new ArrayList<>();
@@ -297,7 +304,7 @@ public class JWTCommands implements Serializable {
         @Override
         public List<String> getDocumentation(int argCount) {
             List<String> docs = new ArrayList<>();
-            switch (argCount){
+            switch (argCount) {
                 case 0:
                     docs.add(getName() + "() - creates a single symmetric key.");
                     break;
@@ -312,7 +319,9 @@ public class JWTCommands implements Serializable {
             return docs;
         }
     }
-     protected String DEFAULT_KEY_NAME = "default_key";
+
+    protected String DEFAULT_KEY_NAME = "default_key";
+
     public class DefaultKey implements QDLFunction {
         @Override
         public String getName() {
@@ -345,7 +354,7 @@ public class JWTCommands implements Serializable {
         @Override
         public List<String> getDocumentation(int argCount) {
             List<String> docs = new ArrayList<>();
-            switch (argCount){
+            switch (argCount) {
                 case 0:
                     docs.add(getName() + "() get the current default key used for signatures.");
                     break;
@@ -399,7 +408,7 @@ public class JWTCommands implements Serializable {
         @Override
         public List<String> getDocumentation(int argCount) {
             List<String> docs = new ArrayList<>();
-            switch(argCount){
+            switch (argCount) {
                 case 1:
                     docs.add(getName() + "(arg) takes a stem variable (the claims) and creates a signed JSON Web Token (JWT)");
                     docs.add("using the default id.");
@@ -415,7 +424,9 @@ public class JWTCommands implements Serializable {
             return docs;
         }
     }
-        protected String KEY_INFO_NAME = "key_info";
+
+    protected String KEY_INFO_NAME = "key_info";
+
     public class KeyInfo implements QDLFunction {
         @Override
         public String getName() {
@@ -457,6 +468,7 @@ public class JWTCommands implements Serializable {
     }
 
     protected String VERIFY_JWT_NAME = "verify_jwt";
+
     public class VerifyJWT implements QDLFunction {
         @Override
         public String getName() {
@@ -498,7 +510,7 @@ public class JWTCommands implements Serializable {
         @Override
         public List<String> getDocumentation(int argCount) {
             List<String> docs = new ArrayList<>();
-            switch(argCount){
+            switch (argCount) {
                 case 1:
                     docs.add(getName() + "(jwt) - This will decode the jwt and verify the signature, using the current set of keys.");
                     break;
@@ -511,7 +523,9 @@ public class JWTCommands implements Serializable {
             return docs;
         }
     }
+
     protected String GET_HEADER_NAME = "get_header";
+
     public class GetHeader implements QDLFunction {
         @Override
         public String getName() {
@@ -542,6 +556,7 @@ public class JWTCommands implements Serializable {
 
         }
     }
+
     protected String GET_PAYLOAD_NAME = "get_payload";
 
     public class GetPayload implements QDLFunction {
@@ -573,6 +588,80 @@ public class JWTCommands implements Serializable {
             return docs;
 
         }
+    }
+
+    /**
+     * A list of scopes for testing.
+     */
+    public class TestScopes implements QDLVariable {
+        @Override
+        public String getName() {
+            return "test_scopes.";
+        }
+
+        StemVariable stemVariable = null;
+
+        @Override
+        public Object getValue() {
+            if (stemVariable == null) {
+                stemVariable = new StemVariable();
+                List<Object> scopes = new ArrayList<>();
+                scopes.add("wlcg");
+                scopes.add("compute.exec:/");
+                scopes.add("compute.create:/");
+                scopes.add("storage.write:/store/data");
+                scopes.add("storage.read:/store ");
+                stemVariable.addList(scopes);
+            }
+            return stemVariable;
+        }
+    }
+
+    public class TestXAs implements QDLVariable {
+        @Override
+        public String getName() {
+            return "test_xas.";
+        }
+
+        StemVariable stemVariable = null;
+
+        @Override
+        public Object getValue() {
+            if (stemVariable == null) {
+                stemVariable = new StemVariable();
+                HashMap<String, String[]> pmap = new HashMap<>();
+                pmap.put(OA4MP_NS + ":/roles/", new String[]{"A", "B", "C"});
+                pmap.put(OA4MP_NS + ":/tokens/id/lifetime", new String[]{"100000000"});
+                pmap.put(OA4MP_NS + ":/tokens/access/lifetime", new String[]{"500000"});
+                ExtendedParameters xp = new ExtendedParameters();
+                JSONObject jsonObject = xp.snoopParameters(pmap);
+                stemVariable.fromJSON(jsonObject);
+            }
+            return stemVariable;
+        }
+    }
+
+
+    public class TestAudience implements QDLVariable {
+        @Override
+        public String getName() {
+            return "test_audience.";
+        }
+
+        StemVariable stemVariable = null;
+
+        @Override
+        public Object getValue() {
+            if (stemVariable == null) {
+                stemVariable = new StemVariable();
+                List<Object> audience = new ArrayList<>();
+                audience.add("https://foo.edu/bar");
+                audience.add("https://foo.edu/baz");
+                stemVariable.addList(audience);
+            }
+            return stemVariable;
+        }
+
     }
 
     public class TestClaims implements QDLVariable {

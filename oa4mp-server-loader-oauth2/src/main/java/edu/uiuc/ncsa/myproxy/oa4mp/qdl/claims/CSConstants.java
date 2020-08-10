@@ -33,6 +33,8 @@ public interface CSConstants {
      */
     public String CS_FILE_FILE_PATH = "file_path";
     public String CS_FILE_CLAIM_KEY = "claim_key";
+    public String CS_USE_DEFAULT_KEY = "use_default";
+    public String CS_DEFAULT_CLAIM_NAME_KEY = "default_claim";
 
     /*
     HTTP headers based claim sources

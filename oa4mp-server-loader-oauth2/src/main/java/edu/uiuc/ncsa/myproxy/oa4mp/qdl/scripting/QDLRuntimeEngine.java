@@ -175,6 +175,8 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
     protected String CLAIMS_VAR = "claims.";
     protected String ACCESS_TOKEN_VAR = "access_token.";
     protected String SCOPES_VAR = "scopes.";
+    protected String EXTENDED_ATTRIBUTES_VAR = "xas.";
+    protected String AUDIENCE_VAR = "audience.";
     protected String CLAIM_SOURCES_VAR = "claim_sources.";
 
 
@@ -200,7 +202,29 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
 
         }
         List<String> scopes = (List<String>) req.getArgs().get(SRE_REQ_SCOPES);
-        state.getSymbolStack().setValue(SCOPES_VAR, toStem(scopes));
+        if(scopes != null && !scopes.isEmpty()) {
+            // It is possible for a minimal OAuth 2 client to have no scopes.
+            state.getSymbolStack().setValue(SCOPES_VAR, toStem(scopes));
+        }else{
+            state.getSymbolStack().setValue(SCOPES_VAR, new StemVariable());
+
+        }
+
+        List<String> audience = (List<String>) req.getArgs().get(SRE_REQ_AUDIENCE);
+        if(audience != null && !audience.isEmpty()) {
+            state.getSymbolStack().setValue(AUDIENCE_VAR, toStem(audience));
+        }else{
+            state.getSymbolStack().setValue(AUDIENCE_VAR, new StemVariable());
+        }
+
+        Object eas = req.getArgs().get(SRE_REQ_EXTENDED_ATTRIBUTES);
+        if (eas != null && (eas instanceof JSONObject)) {
+            StemVariable eaStem = new StemVariable();
+            eaStem.fromJSON((JSONObject) eas);
+            state.getSymbolStack().setValue(EXTENDED_ATTRIBUTES_VAR, eaStem);
+        }else{
+            state.getSymbolStack().setValue(EXTENDED_ATTRIBUTES_VAR, new StemVariable());
+        }
 
         StemVariable sources = new StemVariable();
         int i = 0;
@@ -283,6 +307,8 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         respMap.put(SRE_REQ_FLOW_STATES, toFS(flowStem));
         respMap.put(SRE_REQ_CLAIM_SOURCES, toSources((StemVariable) state.getValue(CLAIM_SOURCES_VAR)));
         respMap.put(SRE_REQ_SCOPES, toScopes((StemVariable) state.getValue(SCOPES_VAR)));
+        respMap.put(SRE_REQ_EXTENDED_ATTRIBUTES, ((StemVariable) state.getValue(EXTENDED_ATTRIBUTES_VAR)).toJSON());
+        respMap.put(SRE_REQ_AUDIENCE, toScopes((StemVariable) state.getValue(AUDIENCE_VAR)));
         StemVariable stemClaims = (StemVariable) state.getValue(CLAIMS_VAR);
         JSON j = stemClaims.toJSON();
         if (j.isArray()) {

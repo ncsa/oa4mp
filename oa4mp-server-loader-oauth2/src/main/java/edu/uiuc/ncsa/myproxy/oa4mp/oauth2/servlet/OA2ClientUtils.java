@@ -6,10 +6,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.IDTokenClientConfig;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.IDTokenHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.IDTokenHandlerConfig;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.SciTokensHandlerConfig;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.ScitokenHandler;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.WLCGTokenHandler;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.WLCGTokenHandlerConfig;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.*;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractRegistrationServlet;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
@@ -328,7 +325,7 @@ public class OA2ClientUtils {
 
         if ((transaction.getUserMetaData().containsKey("idp") &&
                 transaction.getUserMetaData().getString("idp").equals("https://idp.fnal.gov/idp/shibboleth"))
-                ||  jeffTest || jimTest) {
+                ||  jeffTest || jimTest ) {
             DebugUtil.trace(OA2ClientUtils.class, "Setting up WLCG ACCESS TOKEN");
 
             WLCGTokenHandlerConfig xx = new WLCGTokenHandlerConfig(client.getSciTokensConfig(),
@@ -340,6 +337,17 @@ public class OA2ClientUtils {
             hh.init();
             hh.setAccountingInformation();
             jwtRunner.setAccessTokenHandler(hh);
+
+            // Now for a refresh token handler
+            RefreshTokenHandlerConfig rtcfg = new RefreshTokenHandlerConfig(client.getRefreshTokensConfig(),
+                    oa2SE,
+                    transaction,
+                    req);
+            transaction.setRefreshTokenLifetime(30L*24*3600*1000); // 30 days in ms.
+            BasicRefreshTokenHandler basicRefreshTokenHandler = new BasicRefreshTokenHandler(rtcfg);
+            basicRefreshTokenHandler.init();
+            basicRefreshTokenHandler.setAccountingInformation();
+            jwtRunner.setRefreshTokenHandler(basicRefreshTokenHandler);
         } else {
             DebugUtil.trace(OA2ClientUtils.class, "NO WLCG ACCESS TOKEN");
             //     DebugUtil.trace(OA2ClientUtils.class, "idp=" + transaction.getUserMetaData().getString("idp"));

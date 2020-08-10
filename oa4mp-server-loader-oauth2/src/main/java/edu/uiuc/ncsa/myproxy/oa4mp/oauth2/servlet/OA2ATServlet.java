@@ -3,8 +3,6 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.ClaimSourceFactoryImpl;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.IDTokenHandler;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.IDTokenHandlerConfig;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ScriptRuntimeEngineFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RefreshTokenStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
@@ -14,6 +12,7 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.*;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.server.request.IssuerResponse;
 import edu.uiuc.ncsa.security.delegation.servlet.TransactionState;
@@ -23,10 +22,8 @@ import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
 import edu.uiuc.ncsa.security.oauth_2_0.*;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTRunner;
-import edu.uiuc.ncsa.security.oauth_2_0.server.ATIResponse2;
-import edu.uiuc.ncsa.security.oauth_2_0.server.RTI2;
-import edu.uiuc.ncsa.security.oauth_2_0.server.RTIRequest;
-import edu.uiuc.ncsa.security.oauth_2_0.server.RTIResponse;
+import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTUtil2;
+import edu.uiuc.ncsa.security.oauth_2_0.server.*;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSourceFactory;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
@@ -36,7 +33,6 @@ import net.sf.json.JSONObject;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.http.HttpStatus;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -337,9 +333,17 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "access denied", HttpStatus.SC_UNAUTHORIZED);
         }
         st2.setAccessToken(atResponse.getAccessToken()); // needed if there are handlers later.
+        st2.setRefreshToken(atResponse.getRefreshToken()); // ditto. Might be null.
         JWTRunner jwtRunner = new JWTRunner(st2, ScriptRuntimeEngineFactory.createRTE(oa2SE, st2.getOA2Client().getConfig()));
         OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, st2, request);
         jwtRunner.doTokenClaims();
+        setupTokens(client, atResponse, oa2SE, st2, jwtRunner);
+
+        getTransactionStore().save(st2);
+        return state;
+    }
+
+    private void setupTokens(OA2Client client, IDTokenResponse atResponse, OA2SE oa2SE, OA2ServiceTransaction st2, JWTRunner jwtRunner) {
         if (jwtRunner.hasATHandler()) {
             AccessToken newAT = jwtRunner.getAccessTokenHandler().getSignedAT(oa2SE.getJsonWebKeys().getDefault());
             atResponse.setAccessToken(newAT );
@@ -361,13 +365,15 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             st2.setRefreshTokenLifetime(oa2SE.getRefreshTokenLifetime());
             rt.setExpiresIn(computeRefreshLifetime(st2));
             st2.setRefreshTokenValid(true);
+            if(jwtRunner.hasRTHandler()){
+                RefreshToken newRT = jwtRunner.getRefreshTokenHandler().getSignedRT(null); // unsigned, for now
+                atResponse.setRefreshToken(newRT);
+                DebugUtil.trace(this, "Returned RT from handler:" + newRT + ", for claims " + st2.getRTData().toString(2));
+            }
         } else {
             // Do not return a refresh token.
             atResponse.setRefreshToken(null);
         }
-
-        getTransactionStore().save(st2);
-        return state;
     }
 
     /**
@@ -447,11 +453,18 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
     protected void verifyClientSecret(OA2Client client, String rawSecret) {
         // Fix for CIL-332
         if (rawSecret == null) {
-            // check headers.
             DebugUtil.trace(this, "doIt: no secret, throwing exception.");
             throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT, "Missing secret");
         }
         // TODO -- replace next call with sha1Hex(rawSecret)? Need to know side effects first!
+        if(StringUtils.isTrivial(client.getSecret())){
+            // Since clients can be administered by others now, we are finding that they sometimes
+            // may change their scopes. If a client is public, there is no secret, but if
+            // a client later is updated to have different scopes, then trying to use it for other
+            // purposes gets an NPE here. Tell them when they use their client next rather
+            // than blowing up with an NPE.
+            throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT, "Client has no configured secret");
+        }
         if (!client.getSecret().equals(DigestUtils.shaHex(rawSecret))) {
             DebugUtil.trace(this, "doIt: bad secret, throwing exception.");
             throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT, "Incorrect secret");
@@ -464,6 +477,16 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             throw new GeneralException("Error: null refresh token encountered.");
         }
         RefreshTokenStore rts = (RefreshTokenStore) getTransactionStore();
+        try{
+            JSONObject jsonObject = JWTUtil2.verifyAndReadJWT(refreshToken.getToken(), ((OA2SE)getServiceEnvironment()).getJsonWebKeys());
+             if(jsonObject.containsKey(JWT_ID)) {
+                 refreshToken = new OA2RefreshTokenImpl(URI.create(jsonObject.getString(JWT_ID)));
+             }else{
+                 throw new IllegalStateException("Error: Refresh token is a JWT, but has no " + JWT_ID + " claim.");
+             }
+        }catch(Throwable t){
+
+        }
         return rts.get(refreshToken);
     }
 
@@ -471,16 +494,24 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         return (OA2TokenForge) getServiceEnvironment().getTokenForge();
     }
 
-    protected TransactionState doRefresh(OA2Client c, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    protected TransactionState doRefresh(OA2Client c, HttpServletRequest request, HttpServletResponse response) throws Throwable {
         // Grants are checked in the doIt method
 
         RefreshToken oldRT = getTF2().getRefreshToken(request.getParameter(OA2Constants.REFRESH_TOKEN));
         if (c == null) {
             throw new InvalidTokenException("Could not find the client associated with refresh token \"" + oldRT + "\"");
         }
-
-        OA2ServiceTransaction t = getByRT(oldRT);
+         // Check if its a token or JWT
         OA2SE oa2SE = (OA2SE) getServiceEnvironment();
+
+        try {
+            JSONObject json = JWTUtil2.verifyAndReadJWT(oldRT.getToken(), oa2SE.getJsonWebKeys());
+            oldRT = ((OA2TokenForge)oa2SE.getTokenForge()).getRefreshToken(json.getString(JWT_ID));
+        }catch(Throwable t){
+             // do nothing, this means that the token is not a JWT which is fine too
+        }
+        
+        OA2ServiceTransaction t = getByRT(oldRT);
         if (!t.getFlowStates().acceptRequests || !t.getFlowStates().refreshToken) {
             throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "refresh token access denied", HttpStatus.SC_UNAUTHORIZED);
 
@@ -508,24 +539,22 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         // Executive decision is to re-run the sources from after the bootstrap. The assumption with bootstrap sources
         // is that they exist only for the initialization.
 
-
+        t.setAccessToken(rtiResponse.getAccessToken());
+        t.setRefreshToken(rtiResponse.getRefreshToken());
         JWTRunner jwtRunner = new JWTRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2SE, t.getOA2Client().getConfig()));
-        IDTokenHandler idTokenHandler = new IDTokenHandler(new IDTokenHandlerConfig(
-                ((OA2Client) t.getClient()).getIDTokenConfig(),
-
-                (OA2SE) getServiceEnvironment(), t, null));
-        jwtRunner.addHandler(idTokenHandler);
+        OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, t, request);
         try {
             jwtRunner.doRefreshClaims();
         } catch (Throwable throwable) {
             ServletDebugUtil.warn(this, "Unable to update claims on token refresh: \"" + throwable.getMessage() + "\"");
         }
-        rtiResponse.setClaims(t.getUserMetaData());
+        setupTokens(c, rtiResponse, oa2SE, t, jwtRunner);
+      /*  rtiResponse.setClaims(t.getUserMetaData());
         RefreshToken rt = rtiResponse.getRefreshToken();
         rt.setExpiresIn(computeRefreshLifetime(t));
         t.setRefreshToken(rtiResponse.getRefreshToken());
         t.setRefreshTokenValid(true);
-        t.setAccessToken(rtiResponse.getAccessToken());
+        t.setAccessToken(rtiResponse.getAccessToken());*/
         // At this point, key in the transaction store is the grant, so changing the access token
         // over-writes the current value. This practically invalidates the previous access token.
         getTransactionStore().remove(t.getIdentifier()); // this is necessary to clear any caches.
@@ -571,9 +600,9 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             throw new OA2ATException(OA2Errors.INVALID_REQUEST, "No pending transaction found for id=" + basicIdentifier);
         }
         if (!transaction.isAuthGrantValid()) {
-            String msg = "Error: Attempt to use invalid authorization code.  Request rejected.";
+            String msg = "Error: Attempt to use invalid authorization code \"" + basicIdentifier + "\".  Request rejected.";
             warn(msg);
-            throw new GeneralException(msg);
+            throw new OA2ATException(OA2Errors.INVALID_REQUEST, msg);
         }
 
         boolean uriOmittedOK = false;
