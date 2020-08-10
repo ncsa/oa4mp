@@ -73,12 +73,21 @@ public abstract class AbstractPayloadHandler implements PayloadHandler {
             // Public clients do not get more than basic claims.
             return claims;
         }
+        // If this is disabled, return the claims unaltered -- do not execute.
+        if(!source.isEnabled()){
+            return claims;
+        }
         // Fix for CIL-693:
         // Inject current state here!
          if(source instanceof BasicClaimsSourceImpl){
              ((BasicClaimsSourceImpl)source).setOa2SE(oa2se);
          }
-        return source.process(claims, transaction);
+         if(request == null){
+             return source.process(claims, transaction);
+         }else{
+
+             return source.process(claims, request, transaction);
+         }
     }
     @Override
     public void refresh() throws Throwable {
