@@ -79,12 +79,20 @@ public abstract class AbstractPayloadHandler implements PayloadHandler {
         if(!source.isEnabled()){
             return claims;
         }
+        if(!source.isEnabled()){
+            return claims; // do nothing if the source is enabled.
+        }
         // Fix for CIL-693:
         // Inject current state here!
         if (source instanceof BasicClaimsSourceImpl) {
             ((BasicClaimsSourceImpl) source).setOa2SE(oa2se);
         }
-        return source.process(claims, transaction);
+        // For those handlers that may require the http servlet request, pass it along.
+        if(request == null){
+              return source.process(claims, transaction);
+          }else{
+              return source.process(claims, request, transaction);
+          }
     }
 
     @Override
