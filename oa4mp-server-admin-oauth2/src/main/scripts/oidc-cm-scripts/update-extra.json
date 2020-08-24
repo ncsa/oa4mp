@@ -9,6 +9,7 @@
     "authorization_code"
 
   ],
+  "rt_lifetime": 1000000,
   "scope": [
     "openid",
     "email",
