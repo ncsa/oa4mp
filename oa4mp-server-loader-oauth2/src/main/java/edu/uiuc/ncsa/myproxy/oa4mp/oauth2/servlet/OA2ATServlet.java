@@ -266,7 +266,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
                     }
                 }
                 // Set it to the restricted set of scopes???
-                client.setScopes(newScopes);
+                //  client.setScopes(newScopes);
                 claims.put(OA2Constants.SCOPE, outscopes);
             }
         }

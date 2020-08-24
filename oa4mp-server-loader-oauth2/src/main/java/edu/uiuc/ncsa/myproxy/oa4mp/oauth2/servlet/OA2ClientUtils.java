@@ -338,16 +338,19 @@ public class OA2ClientUtils {
             hh.setAccountingInformation();
             jwtRunner.setAccessTokenHandler(hh);
 
+            transaction.setRefreshTokenLifetime(30L*24*3600*1000); // 30 days in ms.
+
             // Now for a refresh token handler
+/*
             RefreshTokenHandlerConfig rtcfg = new RefreshTokenHandlerConfig(client.getRefreshTokensConfig(),
                     oa2SE,
                     transaction,
                     req);
-            transaction.setRefreshTokenLifetime(30L*24*3600*1000); // 30 days in ms.
             BasicRefreshTokenHandler basicRefreshTokenHandler = new BasicRefreshTokenHandler(rtcfg);
             basicRefreshTokenHandler.init();
             basicRefreshTokenHandler.setAccountingInformation();
             jwtRunner.setRefreshTokenHandler(basicRefreshTokenHandler);
+*/
         } else {
             DebugUtil.trace(OA2ClientUtils.class, "NO WLCG ACCESS TOKEN");
             //     DebugUtil.trace(OA2ClientUtils.class, "idp=" + transaction.getUserMetaData().getString("idp"));
