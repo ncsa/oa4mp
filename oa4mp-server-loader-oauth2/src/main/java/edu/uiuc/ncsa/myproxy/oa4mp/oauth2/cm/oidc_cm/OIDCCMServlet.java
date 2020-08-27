@@ -40,6 +40,7 @@ import java.util.*;
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.oidc_cm.OIDCCMConstants.*;
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8693Constants.GRANT_TYPE_TOKEN_EXCHANGE;
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.REFRESH_LIFETIME;
+import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.TOKEN_ENDPOINT_AUTH_NONE;
 
 /**
  * Note that in all of these calls, the assumption is that an admin client has been requested and
@@ -109,6 +110,7 @@ public class OIDCCMServlet extends EnvServlet {
     /**
      * Take a client and turn it in to a response object. This is used by both GET do PUT (which is supposed
      * to return the same output as GET when done with its updates)
+     *
      * @param client
      * @return
      */
@@ -137,13 +139,16 @@ public class OIDCCMServlet extends EnvServlet {
 
             json.put(RESPONSE_TYPES, client.getResponseTypes());
         }
+        if(client.isPublicClient()){
+            json.put(TOKEN_ENDPOINT_AUTH_METHOD, TOKEN_ENDPOINT_AUTH_NONE);
+        }
         if (client.getRtLifetime() != 0) {
             OA2ClientKeys clientKeys = (OA2ClientKeys) getOA2SE().getClientStore().getMapConverter().getKeys();
 
             json.put(clientKeys.rtLifetime(), client.getResponseTypes());
             // Stored in ms., sent/received in sec. Convert to seconds.
-            json.put(REFRESH_LIFETIME, client.getRtLifetime()/1000);
-        }else{
+            json.put(REFRESH_LIFETIME, client.getRtLifetime() / 1000);
+        } else {
             json.put(REFRESH_LIFETIME, 0L);
         }
         JSONArray scopes = new JSONArray();
@@ -255,10 +260,11 @@ public class OIDCCMServlet extends EnvServlet {
      */
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        printAllParameters(req);
+
         if (!getOA2SE().getCmConfigs().hasRFC7592Config()) {
             throw new IllegalAccessError("Error: RFC 7592 not supported on this server. Request rejected.");
         }
-
         try {
             AdminClient adminClient = getAndCheckAdminClient(req);
             OA2Client client = getClient(req);
@@ -295,14 +301,17 @@ public class OIDCCMServlet extends EnvServlet {
                 boolean rejectRequest = false;
                 JSONArray newScopes = toJA(jsonRequest, OA2Constants.SCOPE);
                 Collection<String> oldScopes = client.getScopes();
-                if(oldScopes.size() == 1 && oldScopes.contains(OA2Scopes.SCOPE_OPENID)){
-                    // Fix for CIL-775
-                      // This is a public client. they are allowed to re-assert it
-                    if(!(newScopes.size() == 1 && newScopes.contains(OA2Scopes.SCOPE_OPENID))){
-                        throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
-                                "Cannot increase scope of public client.",
-                                HttpStatus.SC_BAD_REQUEST);
+                // Fix for CIL-775
+                if(client.isPublicClient()){
+                    if (oldScopes.size() == 1 && oldScopes.contains(OA2Scopes.SCOPE_OPENID)) {
+                        // This is a public client. they are allowed to re-assert it
+                        if (!(newScopes.size() == 1 && newScopes.contains(OA2Scopes.SCOPE_OPENID))) {
+                            throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
+                                    "Cannot increase scope of public client.",
+                                    HttpStatus.SC_BAD_REQUEST);
+                        }
                     }
+
                 }
                 Collection<String> newScopeList = new HashSet<>();
                 // Fix for CIL-725 Allow admin clients to alter scopes as desired.
@@ -457,13 +466,17 @@ public class OIDCCMServlet extends EnvServlet {
         OA2Client client = processRegistrationRequest((JSONObject) rawJSON, httpServletResponse);
         JSONObject jsonResp = new JSONObject(); // The response object.
         jsonResp.put(CLIENT_ID, client.getIdentifierString());
-        jsonResp.put(CLIENT_SECRET, client.getSecret());
-        String hashedSecret = DigestUtils.sha1Hex(client.getSecret());
-        // Now make a hash of the secret and store it.
-        jsonResp.put(OIDCCMConstants.CLIENT_ID_ISSUED_AT, client.getCreationTS().getTime() / 1000);
-        String secret = DigestUtils.sha1Hex(client.getSecret());
-        client.setSecret(secret);
-        jsonResp.put(OIDCCMConstants.CLIENT_SECRET_EXPIRES_AT, 0L);
+        if(!StringUtils.isTrivial(client.getSecret())) {
+            
+            jsonResp.put(CLIENT_SECRET, client.getSecret());
+            String hashedSecret = DigestUtils.sha1Hex(client.getSecret());
+            // Now make a hash of the secret and store it.
+            jsonResp.put(OIDCCMConstants.CLIENT_ID_ISSUED_AT, client.getCreationTS().getTime() / 1000);
+            String secret = DigestUtils.sha1Hex(client.getSecret());
+            client.setSecret(secret);
+            jsonResp.put(OIDCCMConstants.CLIENT_SECRET_EXPIRES_AT, 0L);
+
+        }
         String registrationURI = getOA2SE().getCmConfigs().getRFC7591Config().uri.toString();
         // Next, we have to construct the registration URI by adding in the client ID.
         // Spec says we can add parameters here, but not elsewhere.
@@ -528,7 +541,7 @@ public class OIDCCMServlet extends EnvServlet {
 
     protected OA2Client updateClient(OA2Client client,
                                      JSONObject jsonRequest,
-                                     boolean generateSecret,
+                                     boolean newClient,
                                      HttpServletResponse httpResponse) {
         OA2ClientKeys keys = new OA2ClientKeys();
 
@@ -574,15 +587,46 @@ public class OIDCCMServlet extends EnvServlet {
         } else {
             client.setHomeUri(""); // not great, but...
         }
-         if(jsonRequest.containsKey(TOKEN_ENDPOINT_AUTH_METHOD)){
-             // not required, but if present, we support exactly two options.
-             JSONArray jsonArray = toJA(jsonRequest, TOKEN_ENDPOINT_AUTH_METHOD);
-             if(!jsonArray.contains(OA2Constants.TOKEN_ENDPOINT_AUTH_POST) &&
-                     !jsonArray.contains(OA2Constants.TOKEN_ENDPOINT_AUTH_BASIC)){
-                 throw new OA2GeneralError(OA2Errors.INVALID_REQUEST_OBJECT, "unsupported token endpoint authorization method", HttpStatus.SC_BAD_REQUEST);
-             }
-         }
-        client.setSignTokens(true); // always for us.
+        if (jsonRequest.containsKey(TOKEN_ENDPOINT_AUTH_METHOD)) {
+            // not required, but if present, we support exactly two nontrivial options.
+            JSONArray jsonArray = toJA(jsonRequest, TOKEN_ENDPOINT_AUTH_METHOD);
+            boolean gotSupportedAuthMethod = false;
+            if (jsonArray.contains(OA2Constants.TOKEN_ENDPOINT_AUTH_NONE)) {
+                if(!newClient && !client.isPublicClient()){
+                    throw new OA2GeneralError(OA2Errors.INVALID_REQUEST_OBJECT,
+                            "cannot change from a confidential to a public client",
+                            HttpStatus.SC_BAD_REQUEST);
+
+                }
+                gotSupportedAuthMethod = true;
+                client.setPublicClient(true);
+            } else {
+
+                if (jsonArray.contains(OA2Constants.TOKEN_ENDPOINT_AUTH_POST) ||
+                        jsonArray.contains(OA2Constants.TOKEN_ENDPOINT_AUTH_BASIC)) {
+                    if(!newClient && client.isPublicClient()){
+                        // Only if this is already true do we throw an exception.
+                        // This means it was public (=no secret) and now they want
+                        // a secret.  We don't re-issue secrets. They have to register a new client
+                        // to get a secret.
+                        throw new OA2GeneralError(OA2Errors.INVALID_REQUEST_OBJECT,
+                                "cannot change from a public to a confidential client",
+                                HttpStatus.SC_BAD_REQUEST);
+
+                    }
+                    gotSupportedAuthMethod = true;
+                    client.setPublicClient(false);
+                    client.setSignTokens(true); // always for us.
+                }
+
+            }
+            if (!gotSupportedAuthMethod) {
+                throw new OA2GeneralError(OA2Errors.INVALID_REQUEST_OBJECT,
+                        "unsupported token endpoint authorization method",
+                        HttpStatus.SC_BAD_REQUEST);
+            }
+            jsonRequest.remove(TOKEN_ENDPOINT_AUTH_METHOD);
+        }
         if (!jsonRequest.containsKey(OA2Constants.SCOPE)) {
             client.setScopes(new ArrayList<>()); // zeros it out
             // NOTE We no longer require that a client set scopes. If the server is OIDC aware
@@ -602,11 +646,17 @@ public class OIDCCMServlet extends EnvServlet {
             client.setScopes(toJA(jsonRequest, OA2Constants.SCOPE));
         }
         jsonRequest.remove(OA2Constants.SCOPE);
-        if (generateSecret) {
-            byte[] bytes = new byte[getOA2SE().getClientSecretLength()];
-            random.nextBytes(bytes);
-            String secret64 = Base64.encodeBase64URLSafeString(bytes);
-            client.setSecret(secret64);
+        // Only generate a secret if allowed (the flag denotes that it is ok to generate one here)
+        // and if the client is not public <==> the auth method is "none"
+        if (newClient ) {
+            if(client.isPublicClient()){
+                client.setSecret("");
+            }else {
+                byte[] bytes = new byte[getOA2SE().getClientSecretLength()];
+                random.nextBytes(bytes);
+                String secret64 = Base64.encodeBase64URLSafeString(bytes);
+                client.setSecret(secret64);
+            }
         }
         if (jsonRequest.containsKey(OIDCCMConstants.CONTACTS)) {
             // This is a set of strings thjat are typically email addresses.
@@ -621,6 +671,7 @@ public class OIDCCMServlet extends EnvServlet {
             jsonRequest.remove(OIDCCMConstants.CONTACTS);
         }
         //CIL-703
+
         if (jsonRequest.containsKey("cfg")) {
             JSONObject jsonObject = jsonRequest.getJSONObject("cfg");
             jsonRequest.remove("cfg");
@@ -629,9 +680,9 @@ public class OIDCCMServlet extends EnvServlet {
             // CIL-735 if not config object, remove it. 
             client.setConfig(null);
         }
-        if(jsonRequest.containsKey(REFRESH_LIFETIME)){
+        if (jsonRequest.containsKey(REFRESH_LIFETIME)) {
             // NOTE this is sent in seconds but is recorded as ms., so convert to milliseconds here.
-            client.setRtLifetime(jsonRequest.getLong(REFRESH_LIFETIME)*1000);
+            client.setRtLifetime(jsonRequest.getLong(REFRESH_LIFETIME) * 1000);
             jsonRequest.remove(REFRESH_LIFETIME);
         }
         // Fix for CIL-734: now handle everything else left over

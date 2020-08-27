@@ -1,0 +1,12 @@
+{
+  "comment": "This is a basic example from the specification to test creating a public client",
+  "redirect_uris": [
+    "http://localhost/callback"
+  ],
+  "client_name": "A public test client",
+  "scope": "openid",
+  "token_endpoint_auth_method": "none",
+  "contacts": [
+    "your.email@here.org"
+  ]
+}

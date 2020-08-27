@@ -241,7 +241,7 @@ public class OA2Client extends Client implements OA2ClientScopes {
     }
 
     /**
-     * The JSON configuration object.
+     * The (really old) JSON configuration object.
      * The format is as follows:
      * <pre>
      * {

@@ -1,0 +1,17 @@
+{
+  "redirect_uris": [
+    "https://registry-dev.skoranda.scgvm.net/secure/redirect0"
+  ],
+  "token_endpoint_auth_method": "client_secret_basic",
+  "grant_types": [
+    "authorization_code"
+  ],
+  "response_types": "code",
+  "client_name": "Scott Koranda Dev Registry",
+  "client_uri": "https://cilogon.org",
+  "scope": "openid",
+  "contacts": [
+    "skoranda@sphericalcowgroup.com"
+  ],
+  "comment": "Testing by Scott Koranda"
+}
