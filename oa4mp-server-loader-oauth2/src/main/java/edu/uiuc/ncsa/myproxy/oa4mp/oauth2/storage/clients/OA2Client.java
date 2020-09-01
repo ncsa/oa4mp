@@ -1,8 +1,9 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.IDTokenClientConfig;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.RefreshTokenClientConfig;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.SciTokenClientConfig;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.AccessTokenConfig;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.RefreshTokenConfig;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.SciTokenConfig;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.delegation.storage.BaseClient;
@@ -134,12 +135,12 @@ public class OA2Client extends Client implements OA2ClientScopes {
 
     Collection<LDAPConfiguration> ldaps;
     String extendedAttributesEnabledKey = "extendedAttributesEnabled";
-    public String EXTENDED_ATTRIBUTES = "extended_attributes";
     protected String xoauth_attributes = "xoauth_attributes";
     protected String oa4mp_attributes = "oa4mp_attributes";
     protected String oidc_cm_attributes = "oidc-cm_attributes";
     protected String SCI_TOKENS_KEY = "sci_token";
-    protected String REFRESH_TOKENS_KEY = "refresh_token";
+    protected String ACCESS_TOKENS_KEY = "access_tokens";
+    protected String REFRESH_TOKENS_KEY = "refresh_tokens";
     protected String WLCG_TOKENS_KEY = "wlcg_token";
     protected String ID_TOKENS_KEY = "id_token";
 
@@ -147,8 +148,21 @@ public class OA2Client extends Client implements OA2ClientScopes {
         return getConfig().containsKey(SCI_TOKENS_KEY);
     }
 
-    public SciTokenClientConfig getSciTokensConfig() {
-        SciTokenClientConfig sciTokenConfig = new SciTokenClientConfig(); // empty
+    public boolean hasAccessTokenConfig() {
+        return getConfig().containsKey(ACCESS_TOKENS_KEY);
+    }
+
+    public AccessTokenConfig getAccessTokensConfig() {
+        AccessTokenConfig atConfig = new AccessTokenConfig(); // empty
+
+        if (hasAccessTokenConfig()) {
+            atConfig.fromJSON(getConfig().getJSONObject(ACCESS_TOKENS_KEY));
+        }
+        return atConfig;
+
+    }
+    public SciTokenConfig getSciTokensConfig() {
+        SciTokenConfig sciTokenConfig = new SciTokenConfig(); // empty
 
         if (hasSciTokenConfig()) {
             sciTokenConfig.fromJSON(getConfig().getJSONObject(SCI_TOKENS_KEY));
@@ -156,13 +170,13 @@ public class OA2Client extends Client implements OA2ClientScopes {
         return sciTokenConfig;
     }
 
-    public void setSciTokensConfig(SciTokenClientConfig sciTokensConfig) {
+    public void setSciTokensConfig(SciTokenConfig sciTokensConfig) {
         getConfig().put(SCI_TOKENS_KEY, sciTokensConfig.toJSON());
     }
 
 
     // Refresh token & config
-    public void setRefreshTokensConfig(RefreshTokenClientConfig sciTokensConfig) {
+    public void setRefreshTokensConfig(RefreshTokenConfig sciTokensConfig) {
         getConfig().put(SCI_TOKENS_KEY, sciTokensConfig.toJSON());
     }
 
@@ -170,8 +184,8 @@ public class OA2Client extends Client implements OA2ClientScopes {
         return getConfig().containsKey(REFRESH_TOKENS_KEY);
     }
 
-    public RefreshTokenClientConfig getRefreshTokensConfig() {
-        RefreshTokenClientConfig refreshTokenClientConfig = new RefreshTokenClientConfig(); // empty
+    public RefreshTokenConfig getRefreshTokensConfig() {
+        RefreshTokenConfig refreshTokenClientConfig = new RefreshTokenConfig(); // empty
 
         if (hasRefreshTokenConfig()) {
             refreshTokenClientConfig.fromJSON(getConfig().getJSONObject(REFRESH_TOKENS_KEY));
@@ -320,8 +334,7 @@ public class OA2Client extends Client implements OA2ClientScopes {
      *    "sci_tokens":{"usernameClaimKey":"value", "templates":[...], "qdl":{...}},
      *    "id_tokens":{"qdl":{...}},
      *    "wlcg_token":{"qdl":{...}},
-     *    "isSaved":true|false,
-     *    "extraAttributes":{"extendedAttributesEnabled":true|false}
+     *    "isSaved":true|false
      * }
      * </pre>
      * <p>Note that the "claims" entry is deprecated and mostly refers to the old JFunctor scripting. Don't use in new
@@ -351,7 +364,6 @@ public class OA2Client extends Client implements OA2ClientScopes {
     public JSONObject getConfig() {
         return config;
     }
-
     public boolean hasConfig() {
         return config != null;
     }
@@ -378,7 +390,7 @@ public class OA2Client extends Client implements OA2ClientScopes {
      *     {
      *      "xoauth_attributes":{"grant_type":[....},  <-- attributes for OAuth
      *      "oa4mp_attributes":{"foo":"bar",...}       <-- attributes relating to OA4MP
-     *      "oidc-cm":{"x":"y",...}                    <-- extra attributes from the RFC7951
+     *      "oidc-cm":{"x":"y",...}                    <-- unused attributes RFC7951, so we have them
      *     ... etc
      *     }
      * </pre>

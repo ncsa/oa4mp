@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.AbstractClientConfig;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.AbstractPayloadConfig;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -13,12 +13,10 @@ import java.util.List;
  * <p>Created by Jeff Gaynor<br>
  * on 7/28/20 at  7:51 AM
  */
-public class AccessTokenClientConfig extends AbstractClientConfig {
+public class AccessTokenConfig extends AbstractPayloadConfig {
     public static String LIFETIME_KEY = "lifetime";
     public static String SUBJECT_KEY = "subject";
     public static String ISSUER_KEY = "issuer";
-    public static String TYPE_KEY = "type";
-    public static String VERSIONS_KEY = "versions";
     public static String AUDIENCE_KEY = "audience";
     public static String TEMPLATES_KEY = "templates";
 
@@ -26,8 +24,6 @@ public class AccessTokenClientConfig extends AbstractClientConfig {
     Long lifetime;
     String issuer;
     String subject;
-    String type;
-    List<String> versions;
     List<String> audience;
     List<AuthorizationPath> paths;
 
@@ -44,14 +40,7 @@ public class AccessTokenClientConfig extends AbstractClientConfig {
         if (jsonObject.containsKey(SUBJECT_KEY)) {
             subject = jsonObject.getString(SUBJECT_KEY);
         }
-        if (jsonObject.containsKey(TYPE_KEY)) {
-            type = jsonObject.getString(TYPE_KEY);
-        } else {
-            throw new IllegalStateException("Error: Missing type for access token handler configuration");
-        }
-        if (jsonObject.containsKey(VERSIONS_KEY)) {
-            versions = jsonObject.getJSONArray(VERSIONS_KEY);
-        }
+
         if (jsonObject.containsKey(AUDIENCE_KEY)) {
             audience = jsonObject.getJSONArray(AUDIENCE_KEY);
         }
@@ -75,13 +64,7 @@ public class AccessTokenClientConfig extends AbstractClientConfig {
         if (subject != null) {
             json.put(SUBJECT_KEY, subject);
         }
-        if (type != null) {
-            json.put(TYPE_KEY, type);
 
-        }
-        if (versions != null) {
-            json.put(VERSIONS_KEY, versions);
-        }
         if (paths != null) {
             JSONArray array = new JSONArray();
             for(AuthorizationPath ap: paths){
@@ -122,21 +105,7 @@ public class AccessTokenClientConfig extends AbstractClientConfig {
         this.subject = subject;
     }
 
-    public String getType() {
-        return type;
-    }
 
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public List<String> getVersions() {
-        return versions;
-    }
-
-    public void setVersions(List<String> versions) {
-        this.versions = versions;
-    }
 
     public List<String> getAudience() {
         return audience;
@@ -155,8 +124,9 @@ public class AccessTokenClientConfig extends AbstractClientConfig {
     }
 
     public static void main(String[] args) {
-        AccessTokenClientConfig acc = new AccessTokenClientConfig();
-        acc.setType("wlcg");
+        AccessTokenConfig acc = new AccessTokenConfig();
+        acc.setId(Long.toString(System.currentTimeMillis(), 16));
+        acc.setType("scitoken");
         acc.setSubject("${eppn}");
         acc.setIssuer("https://cilogon.org/fnal");
         acc.setLifetime(3600 * 24 * 11 * 1000L);// 11 days in ms
@@ -179,7 +149,7 @@ public class AccessTokenClientConfig extends AbstractClientConfig {
         //  at.put(new AuthorizationTemplate("compute.create", ""));
         System.out.println(acc.toJSON().toString(1));
 
-        AccessTokenClientConfig acc2 = new AccessTokenClientConfig();
+        AccessTokenConfig acc2 = new AccessTokenConfig();
         acc2.fromJSON(acc.toJSON());
         System.out.println(acc2.toJSON().toString(1));
 

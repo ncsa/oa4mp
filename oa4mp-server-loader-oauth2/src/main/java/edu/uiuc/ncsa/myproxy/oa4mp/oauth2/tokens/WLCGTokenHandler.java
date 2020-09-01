@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.AbstractAccessTokenHandler;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.AbstractPayloadHandlerConfig;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.PayloadHandlerConfigImpl;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRunRequest;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse;
@@ -16,7 +16,7 @@ import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.*;
 public class WLCGTokenHandler extends AbstractAccessTokenHandler implements WLCGConstants {
     public static String DEFAULT_AUDIENCE = "https://wlcg.cern.ch/jwt/v1/any";
 
-    public WLCGTokenHandler(AbstractPayloadHandlerConfig cfg) {
+    public WLCGTokenHandler(PayloadHandlerConfigImpl cfg) {
         super(cfg);
     }
 

@@ -22,13 +22,13 @@ public abstract class AbstractPayloadHandler implements PayloadHandler {
     protected JSONObject claims;
     protected HttpServletRequest request;
 
-    public AbstractPayloadHandlerConfig getPhCfg() {
+    public PayloadHandlerConfigImpl getPhCfg() {
         return phCfg;
     }
 
 
 
-    AbstractPayloadHandlerConfig phCfg;
+    PayloadHandlerConfigImpl phCfg;
 
     /**
      * Create the instance for the authorization phase, while there is an {@link HttpServletRequest} with possible
@@ -37,7 +37,7 @@ public abstract class AbstractPayloadHandler implements PayloadHandler {
      * @param payloadHandlerConfig
      */
 
-    public AbstractPayloadHandler(AbstractPayloadHandlerConfig payloadHandlerConfig) {
+    public AbstractPayloadHandler(PayloadHandlerConfigImpl payloadHandlerConfig) {
         phCfg = payloadHandlerConfig;
         oa2se = phCfg.getOa2se();
         transaction = phCfg.getTransaction();
@@ -102,7 +102,7 @@ public abstract class AbstractPayloadHandler implements PayloadHandler {
 
     @Override
     public void setPhCfg(PayloadHandlerConfig phCfg) {
-        this.phCfg = (AbstractPayloadHandlerConfig) phCfg;
+        this.phCfg = (PayloadHandlerConfigImpl) phCfg;
     }
 
     @Override

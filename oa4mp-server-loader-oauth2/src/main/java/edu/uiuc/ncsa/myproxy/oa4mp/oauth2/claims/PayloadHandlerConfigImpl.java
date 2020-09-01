@@ -8,29 +8,31 @@ import edu.uiuc.ncsa.security.util.scripting.ScriptSet;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * Marker interface
+ * The configuration for the payload handler (id token, various access tokens). This is the state
+ * the handler needs to operate (current transaction, environment) as opposed to the functionality
+ * for making tokens (in {@link }
  * <p>Created by Jeff Gaynor<br>
  * on 6/30/20 at  10:53 AM
  */
-public abstract class AbstractPayloadHandlerConfig implements PayloadHandlerConfig {
+public  class PayloadHandlerConfigImpl implements PayloadHandlerConfig {
     OA2SE oa2se;
     OA2ServiceTransaction transaction;
     HttpServletRequest request;
 
-    public AbstractClientConfig getClientConfig() {
+    public AbstractPayloadConfig getPayloadConfig() {
         return clientConfig;
     }
 
-    public void setClientConfig(AbstractClientConfig clientConfig) {
+    public void setClientConfig(AbstractPayloadConfig clientConfig) {
         this.clientConfig = clientConfig;
     }
 
-    AbstractClientConfig clientConfig;
+    AbstractPayloadConfig clientConfig;
 
-    public AbstractPayloadHandlerConfig(AbstractClientConfig abstractClientConfig,
-                                        OA2SE oa2se,
-                                        OA2ServiceTransaction transaction,
-                                        HttpServletRequest request) {
+    public PayloadHandlerConfigImpl(AbstractPayloadConfig abstractClientConfig,
+                                    OA2SE oa2se,
+                                    OA2ServiceTransaction transaction,
+                                    HttpServletRequest request) {
         clientConfig = abstractClientConfig;
         this.oa2se = oa2se;
         this.transaction = transaction;

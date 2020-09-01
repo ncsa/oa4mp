@@ -31,7 +31,7 @@ import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.*;
 public class IDTokenHandler extends AbstractPayloadHandler {
     protected String issuer;
 
-    public IDTokenHandler(IDTokenHandlerConfig payloadHandlerConfig) {
+    public IDTokenHandler(PayloadHandlerConfigImpl payloadHandlerConfig) {
         super(payloadHandlerConfig);
         if (payloadHandlerConfig.getRequest() != null) {
             setIssuer(payloadHandlerConfig.getRequest());

@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.AbstractPayloadHandler;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.AbstractPayloadHandlerConfig;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.PayloadHandlerConfigImpl;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
@@ -26,7 +26,7 @@ import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.*;
  * on 8/5/20 at  9:18 AM
  */
 public class BasicRefreshTokenHandler extends AbstractPayloadHandler implements RefreshTokenHandlerInterface {
-    public BasicRefreshTokenHandler(AbstractPayloadHandlerConfig payloadHandlerConfig) {
+    public BasicRefreshTokenHandler(PayloadHandlerConfigImpl payloadHandlerConfig) {
         super(payloadHandlerConfig);
     }
 

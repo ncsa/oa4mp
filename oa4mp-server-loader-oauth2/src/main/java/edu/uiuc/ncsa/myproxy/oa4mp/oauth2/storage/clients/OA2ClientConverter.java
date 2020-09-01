@@ -1,5 +1,8 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients;
 
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+import com.typesafe.config.ConfigRenderOptions;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.delegation.storage.impl.ClientConverter;
@@ -13,6 +16,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
 
+import java.io.StringReader;
 import java.util.Collection;
 
 /**
@@ -84,7 +88,13 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         if (map.containsKey(getCK2().cfg())) {
             String rawCfg = map.getString(getCK2().cfg());
             if (rawCfg != null && !rawCfg.isEmpty()) {
-                cfg = JSONObject.fromObject(map.getString(getCK2().cfg()));
+            //    cfg = JSONObject.fromObject(map.getString(getCK2().cfg()));
+                // Extra hoop allows us to process HOCON format in addition to JSON.
+                StringReader stringReader = new StringReader(map.getString(getCK2().cfg()));
+                Config conf = ConfigFactory.parseReader(stringReader);
+                String rawJSON = conf.root().render(ConfigRenderOptions.concise());
+                cfg = JSONObject.fromObject(rawJSON);
+
             }
             //otherV.setConfig(JSONObject.fromObject(map.getString(getCK2().cfg())));
         }

@@ -2,8 +2,8 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.PayloadHandlerConfigImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.IDTokenHandler;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.IDTokenHandlerConfig;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.security.core.exceptions.InvalidTimestampException;
@@ -66,7 +66,7 @@ public class UserInfoServlet extends MyProxyDelegationServlet {
         uireq.setUsername(getUsername(transaction));
         UIIResponse2 uiresp = (UIIResponse2) uis.process(uireq);
         // creates the token handler just to get the updated accounting information.
-        IDTokenHandler idTokenHandler = new IDTokenHandler(new IDTokenHandlerConfig(
+        IDTokenHandler idTokenHandler = new IDTokenHandler(new PayloadHandlerConfigImpl(
                 ((OA2Client) transaction.getClient()).getIDTokenConfig(),
                 oa2SE,
                 transaction,

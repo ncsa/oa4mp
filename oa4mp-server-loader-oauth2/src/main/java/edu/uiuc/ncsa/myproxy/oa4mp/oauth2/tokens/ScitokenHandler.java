@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.AbstractAccessTokenHandler;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.PayloadHandlerConfigImpl;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRunRequest;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse;
@@ -13,26 +14,18 @@ import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.SUBJECT;
  * on 4/21/20 at  4:55 PM
  */
 public class ScitokenHandler extends AbstractAccessTokenHandler {
+    public ScitokenHandler(PayloadHandlerConfigImpl payloadHandlerConfig) {
+        super(payloadHandlerConfig);
+    }
+
     String ST_SCOPE = "scope";
     String ST_CLIENT_IDENTIFIER = "cid";
 
     String VERSION_2_0 = "2.0";
 
-    protected SciTokenClientConfig getsthCfg() {
-        return ((SciTokensHandlerConfig) getPhCfg()).getSciTokenConfig();
-    }
-
-    public ScitokenHandler(SciTokensHandlerConfig sciTokensHandlerConfig) {
-        super(sciTokensHandlerConfig);
-    }
-
-
-    public AuthorizationTemplates getTemplates() {
-        return getsthCfg().getAuthorizationTemplates();
-    }
 
     public String getUsernameClaimKey() {
-        return getsthCfg().getUsernameClaimKey();
+        return ((SciTokenConfig)getPhCfg().getPayloadConfig()).getUsernameClaimKey();
     }
 
     /**

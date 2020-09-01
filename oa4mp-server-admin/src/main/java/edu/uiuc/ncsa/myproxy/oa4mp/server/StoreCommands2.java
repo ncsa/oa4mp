@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.server;
 
+import edu.uiuc.ncsa.qdl.util.FileUtil;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.XMLConverter;
@@ -9,7 +10,10 @@ import edu.uiuc.ncsa.security.storage.XMLMap;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
 import edu.uiuc.ncsa.security.util.cli.*;
-import net.sf.json.*;
+import net.sf.json.JSON;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import net.sf.json.JSONSerializer;
 
 import java.io.*;
 import java.util.*;
@@ -25,6 +29,11 @@ import static edu.uiuc.ncsa.security.util.cli.CLIDriver.EXIT_COMMAND;
  * on 7/2/18 at  10:06 AM
  */
 public abstract class StoreCommands2 extends StoreCommands {
+
+    public static final String FILE_FLAG = "-file";
+    public static final String UPDATE_FLAG = "-update";
+    public static final String SHORT_UPDATE_FLAG = "-u";
+
     public StoreCommands2(MyLoggingFacade logger, String defaultIndent, Store store) {
         super(logger, defaultIndent, store);
     }
@@ -32,6 +41,26 @@ public abstract class StoreCommands2 extends StoreCommands {
     public StoreCommands2(MyLoggingFacade logger, Store store) {
         super(logger, store);
     }
+    protected void showSerializeHelp() {
+        say("serializes an object and either shows it on the command line or put it in a file. Cf. deserialize.");
+        say("serialize  [-file path] index");
+        say("Serializes the object with the given index. (Note that the index must be the last argument!) " +
+                "It will print it to the command line or save it to the given file,");
+        say("overwriting the contents of the file.");
+    }
+
+    protected void showDeserializeHelp() {
+        say("Deserializes an object into the currnet store overwriting the contents. Cf. serialize.");
+        say("deserialize  [-new] -file path [" + SHORT_UPDATE_FLAG + "|" + UPDATE_FLAG + "]");
+        say("Deserializes the object in the given file. This replaces the object with the given index in the store.");
+        say("The response will give the identifier of the object created.");
+        say("If the -new flag is used, it is assumed that the object should be new. This means that if there is an existing object");
+        say("with that identifier the operation will fail. If there is no identifier, one will be created.");
+        say("Omitting the -new flag means that any object will be overwritten and if needed, a new identifier will be created");
+        say("If the  " + UPDATE_FLAG + " or " + SHORT_UPDATE_FLAG + " is used, the existing object is simply updated");
+        say("Note that an object cannot be new and updated at the same time.");
+    }
+
 
     /**
      * Get the {@link MapConverter} for the store.
@@ -47,39 +76,63 @@ public abstract class StoreCommands2 extends StoreCommands {
         }
         InputStream is;
         boolean isNew = inputLine.hasArg("-new");
-        if (inputLine.hasArg("-file")) {
-            try {
-                is = new FileInputStream(inputLine.getNextArgFor("-file"));
-
-                XMLMap map = new XMLMap();
-                map.fromXML(is);
-                is.close();
-                Identifiable x = getStore().getXMLConverter().fromMap(map, null);
-                if (isNew) {
-                    if (getStore().containsKey(x.getIdentifier())) {
-                        say("Error! The object with identifier \"" + x.getIdentifierString() + "\" already exists and you specified the item was new. Aborting.");
-                        return;
-                    }
-                } else {
-                    if (x.getIdentifier() == null) {
-                        //handles the case where this is new and needs an identifier created. Only way to get
-                        // a new unused identifier reliably is to have the store create a new entry then we update that.
-                        Identifiable c = getStore().create();
-                        x.setIdentifier(c.getIdentifier());
-                        say("Created identifier \"" + c.getIdentifierString() + "\".");
-                    }
-                    // second case, overwrite whatever.
-                    getStore().save(x);
-                }
-                say("done!");
-            } catch (Throwable e) {
-                say("warning, load file at path \"" + inputLine.getNextArgFor("-file") + "\": " + e.getMessage());
-            }
-        } else {
+        boolean isUpdate = inputLine.hasArg(SHORT_UPDATE_FLAG) || inputLine.hasArg(UPDATE_FLAG);
+        if (isNew && isUpdate) {
+            say("Sorry. You have asked me to make a new item and update an existing one.");
+            return;
+        }
+        if (!inputLine.hasArg(FILE_FLAG)) {
             say("Missing file argument. Cannot deserialize.");
             return;
         }
+        try {
+            is = new FileInputStream(inputLine.getNextArgFor(FILE_FLAG));
 
+            XMLMap map = new XMLMap();
+            map.fromXML(is);
+            is.close();
+            // x contains the object that is now of the correct type.
+            Identifiable x = getStore().getXMLConverter().fromMap(map, null);
+            if (isNew) {
+                if (getStore().containsKey(x.getIdentifier())) {
+                    say("Error! The object with identifier \"" + x.getIdentifierString() + "\" already exists and you specified the item was new. Aborting.");
+                    return;
+                }
+                getStore().save(x);
+                return;
+            }
+            if (isUpdate) {
+                if (!getStore().containsKey(x.getIdentifier())) {
+                    say("Error! The object with identifier \"" + x.getIdentifierString() + "\" does not exist and therefore cannot be updated.  Aborting.");
+                    return;
+                }
+                // Get the current one
+                Identifiable oldVersion = (Identifiable) getStore().get(x.getIdentifier());
+                XMLMap oldValues = new XMLMap();
+                getStore().getXMLConverter().toMap(oldVersion, oldValues);
+                for (String key : map.keySet()) {
+                    oldValues.put(key, map.get(key));
+
+                }
+                Identifiable updated = getStore().getXMLConverter().fromMap(oldValues, null);
+                getStore().save(updated);
+
+                return;
+            }
+            if (x.getIdentifier() == null) {
+                //handles the case where this is new and needs an identifier created. Only way to get
+                // a new unused identifier reliably is to have the store create a new entry then we update that.
+                Identifiable c = getStore().create();
+                x.setIdentifier(c.getIdentifier());
+                say("Created identifier \"" + c.getIdentifierString() + "\".");
+            }
+            // second case, overwrite whatever.
+            getStore().save(x);
+
+            say("done!");
+        } catch (Throwable e) {
+            say("warning, load file at path \"" + inputLine.getNextArgFor(FILE_FLAG) + "\": " + e.getMessage());
+        }
     }
 
     @Override
@@ -102,7 +155,7 @@ public abstract class StoreCommands2 extends StoreCommands {
         // Use the order of the tmap (so its sorted) but the XMLMap has information we need to get these.
         for (String key : tMap.keySet()) {
             String v = map.getString(key);
-            if(!StringUtils.isTrivial(v)) {
+            if (!StringUtils.isTrivial(v)) {
                 try {
                     JSON json = JSONSerializer.toJSON(v);
                     v = json.toString(1);
@@ -136,7 +189,7 @@ public abstract class StoreCommands2 extends StoreCommands {
             List<String> flowedtext = StringUtils.wrap(0, StringUtils.toList(rightSide), realWidth - leftColumWidth);
 
             StringBuffer stringBuffer = new StringBuffer();
-            stringBuffer.append(RJustify(leftSide, leftColumWidth) + " : " + flowedtext.get(0) + ((flowedtext.size() <= 1 && shortLine)?"":"\n"));
+            stringBuffer.append(RJustify(leftSide, leftColumWidth) + " : " + flowedtext.get(0) + ((flowedtext.size() <= 1 && shortLine) ? "" : "\n"));
             boolean isFirstLine = true;
             for (int i = 1; i < flowedtext.size(); i++) {
                 if (isFirstLine) {
@@ -149,7 +202,7 @@ public abstract class StoreCommands2 extends StoreCommands {
             return stringBuffer.toString();
 
         }
-        return RJustify(leftSide, leftColumWidth) + " : " + truncate(rightSide.replace("\n","").replace("\r",""));
+        return RJustify(leftSide, leftColumWidth) + " : " + truncate(rightSide.replace("\n", "").replace("\r", ""));
     }
 
     @Override
@@ -160,14 +213,14 @@ public abstract class StoreCommands2 extends StoreCommands {
         }
         OutputStream os = System.out;
         boolean hasFile = false;
-        if (inputLine.hasArg("-file")) {
+        if (inputLine.hasArg(FILE_FLAG)) {
             try {
-                os = new FileOutputStream(inputLine.getNextArgFor("-file"));
+                os = new FileOutputStream(inputLine.getNextArgFor(FILE_FLAG));
                 hasFile = true;
             } catch (FileNotFoundException e) {
-                say("warning, could not find file in argument \"" + inputLine.getNextArgFor("-file"));
+                say("warning, could not find file in argument \"" + inputLine.getNextArgFor(FILE_FLAG));
             }
-            inputLine.removeSwitchAndValue("-file");
+            inputLine.removeSwitchAndValue(FILE_FLAG);
         }
 
         Identifiable x = findItem(inputLine);
@@ -175,8 +228,27 @@ public abstract class StoreCommands2 extends StoreCommands {
             say("Object not found");
             return;
         }
+
+
         XMLMap c = new XMLMap();
         getStore().getXMLConverter().toMap(x, c);
+
+        if (inputLine.hasArg(KEYS_FLAG)) {
+            List<String> keys = getKeysList(inputLine);
+            inputLine.removeSwitchAndValue(KEYS_FLAG);
+            // c now contains all the fields. We remove anything
+            XMLMap subset = new XMLMap();
+            // put in the identifier
+            MapConverter mc = (MapConverter) getStore().getXMLConverter();
+
+           subset.put(mc.getKeys().identifier(), x.getIdentifierString());
+           for(String key : keys){
+               if(c.containsKey(key)){
+                   subset.put(key, c.get(key));
+               }
+           }
+           c = subset; // set it to the right variable to get serialized.
+        }
 
         try {
             c.toXML(os);
@@ -245,7 +317,7 @@ public abstract class StoreCommands2 extends StoreCommands {
             try {
                 values = getStore().search(key, inputLine.getLastArg(), inputLine.hasArg(REGEX_FLAG));
             } catch (Throwable t) {
-                if(showStackTraces){
+                if (showStackTraces) {
                     t.printStackTrace();
                 }
                 say("Sorry, that didn't work:" + t.getMessage());
@@ -414,13 +486,19 @@ public abstract class StoreCommands2 extends StoreCommands {
 
     @Override
     protected void showUpdateHelp() {
-        say("update [" + KEY_FLAG + " key " + VALUE_FLAG + " value | " +
-                KEYS_FLAG + " array] index\n");
+        say("update [" + KEY_FLAG + " key [" + VALUE_FLAG + " value | " + FILE_FLAG + " file_path " + JSON_FLAG + "]]" +
+                "[" + KEYS_FLAG + " array] index\n");
         sayi("where the index is the index in the list command.");
         sayi("This has three modes. Just an id will prompt you for every value to update.");
         say("Alternately, you may either specify a single key + value OR you may specify an array of keys");
         sayi("of the form [key0,key1,...]. (The list_keys command will tell what the keys are.)");
         sayi("The " + KEYS_FLAG + " will act on all the keys supplied.");
+        say("E.g.");
+        sayi("update /foo:bar");
+        sayi("no arguments means to interactively ask for every attribute. /foo:bar is the identifier for this object.");
+        say("E.g.");
+        sayi("update -key cfg -file /path/to/file /foo:bar");
+        sayi("read the contents of the file (as a string) into the attribute");
         say("E.g.");
         sayi("update " + KEY_FLAG + " name " + VALUE_FLAG + " \"My client\" /foo:bar");
         sayi("This changes the value of the 'name' attribute to 'My client' for the object with id 'foo:bar'");
@@ -448,11 +526,17 @@ public abstract class StoreCommands2 extends StoreCommands {
             showUpdateHelp();
             return;
         }
+        if (inputLine.hasArg(VALUE_FLAG) && inputLine.hasArg(FILE_FLAG)) {
+            say("Sorry, you have specified both a value and a file for the value.");
+            return;
+        }
         if (!inputLine.hasArg(KEY_FLAG) && !inputLine.hasArg(KEYS_FLAG)) {
             super.update(inputLine);
             return;
         }
 
+        boolean hasFileFlag = inputLine.hasArg(FILE_FLAG);
+        boolean hasJSONFalg = inputLine.hasArg(JSON_FLAG);
         Identifiable identifiable = null;
         XMLMap map = null;
         // Since the value can be anything --like a path to a file. e.g. /tmp/foo or
@@ -471,6 +555,16 @@ public abstract class StoreCommands2 extends StoreCommands {
             if (inputLine.hasArg(VALUE_FLAG)) {
                 value = inputLine.getNextArgFor(VALUE_FLAG);
                 inputLine.removeSwitchAndValue(VALUE_FLAG);
+            }
+            if (hasFileFlag) {
+                try {
+                    value = FileUtil.readFileAsString(inputLine.getNextArgFor(FILE_FLAG));
+                } catch (Throwable throwable) {
+                    say("Sorry, but I could not seem to read the file named \"" + inputLine.getNextArgFor(FILE_FLAG) + "\"");
+                    return;
+                }
+                inputLine.removeSwitchAndValue(FILE_FLAG);
+
             }
             identifiable = findItem(inputLine);
             if (identifiable == null) {
@@ -576,7 +670,7 @@ public abstract class StoreCommands2 extends StoreCommands {
         String currentValue = map.getString(key);
 
         JSON json = null;
-        if(currentValue != null) {
+        if (currentValue != null) {
             // edge case to avoid  a &^*%@! JSON null object.
             // JSONNull means parsing a null into a JSON object that bombs everyplace like a regular null.,
             // i.e,. every operation throws the equivalent of an NPE.
@@ -597,7 +691,7 @@ public abstract class StoreCommands2 extends StoreCommands {
             map.put(key, newValue);
             return true;
         }
-        if (json != null   && (json instanceof JSONObject)) {
+        if (json != null && (json instanceof JSONObject)) {
             if (supportsQDL()) {
                 boolean loadQDL = getInput("Load only a QDL script or edit the full config? (q/f)", "f").equalsIgnoreCase("q");
                 if (loadQDL) {
@@ -933,6 +1027,8 @@ public abstract class StoreCommands2 extends StoreCommands {
 
         return list;
     }
+
+    String JSON_FLAG = "-json";
 
     public static void main(String[] args) {
         CommandLineTokenizer CLT = new CommandLineTokenizer();

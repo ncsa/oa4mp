@@ -2,11 +2,12 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.PayloadHandlerConfigImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.IDTokenClientConfig;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.IDTokenHandler;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.IDTokenHandlerConfig;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.*;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.ScitokenHandler;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.WLCGTokenHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractRegistrationServlet;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
@@ -291,10 +292,10 @@ public class OA2ClientUtils {
     public static void setupHandlers(JWTRunner jwtRunner, OA2SE oa2SE, OA2ServiceTransaction transaction, HttpServletRequest req) throws Throwable {
         DebugUtil.trace(OA2ClientUtils.class, "Setting up handlers");
         OA2Client client = (OA2Client) transaction.getClient();
-        IDTokenHandlerConfig idthCfg = null;
+        PayloadHandlerConfigImpl idthCfg = null;
         if (client.hasIDTokenConfig()) {
             DebugUtil.trace(OA2ClientUtils.class, "Found new configuration.");
-            idthCfg = new IDTokenHandlerConfig(
+            idthCfg = new PayloadHandlerConfigImpl(
                     client.getIDTokenConfig(),
                     oa2SE,
                     transaction,
@@ -303,7 +304,7 @@ public class OA2ClientUtils {
             // Legacy case. Functors have no config, but need a handler to get the init and accounting information.
             DebugUtil.trace(OA2ClientUtils.class, "Found legacy configuration.");
 
-            idthCfg = new IDTokenHandlerConfig(
+            idthCfg = new PayloadHandlerConfigImpl(
                     new IDTokenClientConfig(),
                     oa2SE,
                     transaction,
@@ -328,7 +329,7 @@ public class OA2ClientUtils {
                 ||  jeffTest || jimTest ) {
             DebugUtil.trace(OA2ClientUtils.class, "Setting up WLCG ACCESS TOKEN");
 
-            WLCGTokenHandlerConfig xx = new WLCGTokenHandlerConfig(client.getSciTokensConfig(),
+            PayloadHandlerConfigImpl xx = new PayloadHandlerConfigImpl(client.getAccessTokensConfig(),
                     oa2SE, transaction, req);
             WLCGTokenHandler hh = new WLCGTokenHandler(xx);
             // KLUDGE! This is to make sure that it initializes. Since we are restricting this to a single
@@ -356,7 +357,7 @@ public class OA2ClientUtils {
             //     DebugUtil.trace(OA2ClientUtils.class, "idp=" + transaction.getUserMetaData().getString("idp"));
         }
         if (client.hasSciTokenConfig()) {
-            SciTokensHandlerConfig st = new SciTokensHandlerConfig(
+            PayloadHandlerConfigImpl st = new PayloadHandlerConfigImpl(
                     client.getSciTokensConfig(),
                     oa2SE,
                     transaction,

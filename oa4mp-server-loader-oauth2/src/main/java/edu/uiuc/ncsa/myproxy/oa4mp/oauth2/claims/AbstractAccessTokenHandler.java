@@ -28,7 +28,7 @@ import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.*;
 public class AbstractAccessTokenHandler extends AbstractPayloadHandler implements AccessTokenHandlerInterface {
     AccessToken accessToken;
 
-    public AbstractAccessTokenHandler(AbstractPayloadHandlerConfig payloadHandlerConfig) {
+    public AbstractAccessTokenHandler(PayloadHandlerConfigImpl payloadHandlerConfig) {
         super(payloadHandlerConfig);
     }
 
