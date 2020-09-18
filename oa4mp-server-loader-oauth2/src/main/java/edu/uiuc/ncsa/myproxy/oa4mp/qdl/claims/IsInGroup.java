@@ -28,11 +28,29 @@ public class IsInGroup implements QDLFunction {
         // First argument is a stem of groups. This is a list that has
         // stem elements of the form stem.name and stem.id. The name is the
         // name of the group.
-        if (!(objects[0] instanceof StemVariable)) {
+
+        // Much better checks here. Exceptions are very helpful in debugging, but hits
+        // a lot of edge cases (empty list, e.g.)
+        if (objects == null) {
+          //  throw new IllegalArgumentException("Error: no arguments for " + getName());
+            return Boolean.FALSE;
+        }
+        if (objects.length != 2) {
+            throw new IllegalArgumentException("Error: This function requires two arguments, a stem and a string.");
+        }
+
+        if (objects[0]==null) {
+            return Boolean.FALSE;
+        }
+        if(!(objects[0] instanceof StemVariable)){
+            // This indicates that something wrong was passed, so flag it as a bona fide error.
             throw new IllegalArgumentException("Error: The first argument of " + getName() + " must be a stem list of groups.");
         }
         StemVariable groups = (StemVariable) objects[0];
-        if (!(objects[1] instanceof String)) {
+        if(groups.size() == 0){
+            return Boolean.FALSE;
+        }
+        if (objects[1] == null | !(objects[1] instanceof String)) {
             throw new IllegalArgumentException("Error: The second argument of " + getName() + " must be a string.");
         }
         String name = (String) objects[1];

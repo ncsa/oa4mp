@@ -1,5 +1,8 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.server;
 
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+import com.typesafe.config.ConfigRenderOptions;
 import edu.uiuc.ncsa.qdl.util.FileUtil;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Store;
@@ -761,7 +764,7 @@ public abstract class StoreCommands2 extends StoreCommands {
                     if (inLine.equals(CLEAR_BUFFER_COMMAND)) {
                         return new JSONObject();
                     }
-                    rawJSON = rawJSON + inLine;
+                    rawJSON = rawJSON + inLine + "\n";
                     inLine = readline();
                 }
             } catch (ExitException x) {
@@ -774,7 +777,11 @@ public abstract class StoreCommands2 extends StoreCommands {
             }
             try {
                 JSONObject json = null;
-                json = JSONObject.fromObject(rawJSON);
+                // Old was the following line.
+                //json = JSONObject.fromObject(rawJSON);
+                // new allows for HOCON at command line.
+                Config config = ConfigFactory.parseString(rawJSON);
+                json = JSONObject.fromObject(config.root().render(ConfigRenderOptions.concise()));
                 sayi("Success! JSON is valid.");
                 return json;
             } catch (Throwable t) {

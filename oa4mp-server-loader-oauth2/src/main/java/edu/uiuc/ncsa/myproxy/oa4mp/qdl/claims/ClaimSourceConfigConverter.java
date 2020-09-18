@@ -63,7 +63,8 @@ public class ClaimSourceConfigConverter implements CSConstants {
                 stem.put(CS_LDAP_SEARCH_NAME, cfg2.getSearchNameKey());
                 stem.put(CS_LDAP_SERVER_ADDRESS, cfg2.getServer());
                 stem.put(CS_LDAP_CONTEXT_NAME, cfg2.getContextName());
-                stem.put(CS_LDAP_PORT, cfg2.getPort());
+                stem.put(CS_LDAP_ADDITIONAL_FILTER, cfg2.getAdditionalFilter());
+                stem.put(CS_LDAP_PORT, new Long(cfg2.getPort()));
                 stem.put(CS_LDAP_AUTHZ_TYPE, cUtil.getAuthName(cfg2.getAuthType()));
                 if (cfg2.getAuthType() == LDAPConfigurationUtil.LDAP_AUTH_SIMPLE_KEY) {
                     stem.put(CS_LDAP_PASSWORD, cfg2.getPassword());
@@ -140,13 +141,22 @@ public class ClaimSourceConfigConverter implements CSConstants {
                 }
                 cfg.setProperties(xp);
                 return cfg;
-            case CS_TYPE_LDAP:
+            case CS_TYPE_LDAP:                                            
 
                 LDAPConfiguration ldapCfg = new LDAPConfiguration();
                 LDAPConfigurationUtil cUtil = new LDAPConfigurationUtil();
                 ldapCfg.setSearchNameKey(arg.getString(CS_LDAP_SEARCH_NAME));
                 ldapCfg.setServer(arg.getString(CS_LDAP_SERVER_ADDRESS));
-                ldapCfg.setEnabled(arg.getBoolean(CS_DEFAULT_IS_ENABLED));
+                if(arg.containsKey(CS_DEFAULT_IS_ENABLED)) {
+                    ldapCfg.setEnabled(arg.getBoolean(CS_DEFAULT_IS_ENABLED));
+                }else{
+                    ldapCfg.setEnabled(true);
+                }
+                if(arg.containsKey(CS_LDAP_ADDITIONAL_FILTER)){
+                    ldapCfg.setAdditionalFilter(arg.getString(CS_LDAP_ADDITIONAL_FILTER));
+                }else{
+                    ldapCfg.setAdditionalFilter("");
+                }
                 if (arg.containsKey(CS_LDAP_CONTEXT_NAME)) {
                     ldapCfg.setContextName(arg.getString(CS_LDAP_CONTEXT_NAME));
                 } else {

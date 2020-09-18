@@ -1,11 +1,12 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.AbstractPayloadConfig;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.IDTokenClientConfig;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.AccessTokenConfig;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.RefreshTokenConfig;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.SciTokenConfig;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.delegation.storage.BaseClient;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
@@ -21,6 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static edu.uiuc.ncsa.security.core.util.BeanUtils.checkEquals;
+import static edu.uiuc.ncsa.security.util.json.MyJPathUtil.*;
 
 /**
  * OAuth2 Open ID connect protocol requires that sites register callback uris and that incoming requests
@@ -45,6 +47,7 @@ public class OA2Client extends Client implements OA2ClientScopes {
         client.setScopes(getScopes());
         client.setLdaps(getLdaps());
         client.setConfig(getConfig());
+        client.setRawConfig(getRawConfig());
         client.setIssuer(getIssuer());
         client.setSignTokens(isSignTokens());
     }
@@ -138,75 +141,67 @@ public class OA2Client extends Client implements OA2ClientScopes {
     protected String xoauth_attributes = "xoauth_attributes";
     protected String oa4mp_attributes = "oa4mp_attributes";
     protected String oidc_cm_attributes = "oidc-cm_attributes";
-    protected String SCI_TOKENS_KEY = "sci_token";
-    protected String ACCESS_TOKENS_KEY = "access_tokens";
-    protected String REFRESH_TOKENS_KEY = "refresh_tokens";
+    protected String TOKENS_KEY = "/tokens";
+    protected String ACCESS_TOKENS_KEY = "access";
+    protected String REFRESH_TOKENS_KEY = "refresh";
     protected String WLCG_TOKENS_KEY = "wlcg_token";
-    protected String ID_TOKENS_KEY = "id_token";
+    protected String ID_TOKENS_KEY = "identity";
 
-    public boolean hasSciTokenConfig() {
-        return getConfig().containsKey(SCI_TOKENS_KEY);
+    protected boolean hasPayloadConfig(String root, String path) {
+        return containsKey(getConfig(), root, path);
     }
 
+    protected AbstractPayloadConfig setupPayloadConfig(AbstractPayloadConfig pc, String root, String path) {
+        if (hasPayloadConfig(root, path)) {
+            pc.fromJSON(getJSONObject(getConfig(), root, path));
+        }
+        return pc;
+    }
+
+    protected void setPayloadConfig(AbstractPayloadConfig apc, String root, String path){
+        set(apc.toJSON(), root, path);
+    }
     public boolean hasAccessTokenConfig() {
-        return getConfig().containsKey(ACCESS_TOKENS_KEY);
+        return hasPayloadConfig(TOKENS_KEY, ACCESS_TOKENS_KEY);
     }
 
     public AccessTokenConfig getAccessTokensConfig() {
         AccessTokenConfig atConfig = new AccessTokenConfig(); // empty
-
-        if (hasAccessTokenConfig()) {
-            atConfig.fromJSON(getConfig().getJSONObject(ACCESS_TOKENS_KEY));
-        }
-        return atConfig;
-
-    }
-    public SciTokenConfig getSciTokensConfig() {
-        SciTokenConfig sciTokenConfig = new SciTokenConfig(); // empty
-
-        if (hasSciTokenConfig()) {
-            sciTokenConfig.fromJSON(getConfig().getJSONObject(SCI_TOKENS_KEY));
-        }
-        return sciTokenConfig;
+        return (AccessTokenConfig) setupPayloadConfig(atConfig, TOKENS_KEY, ACCESS_TOKENS_KEY);
     }
 
-    public void setSciTokensConfig(SciTokenConfig sciTokensConfig) {
-        getConfig().put(SCI_TOKENS_KEY, sciTokensConfig.toJSON());
+    public void setAccessToken(AccessTokenConfig cfg) {
+        //set(getConfig(), TOKENS_KEY, ACCESS_TOKENS_KEY, cfg.toJSON());
+        setPayloadConfig(cfg, TOKENS_KEY, ACCESS_TOKENS_KEY);
     }
 
 
     // Refresh token & config
-    public void setRefreshTokensConfig(RefreshTokenConfig sciTokensConfig) {
-        getConfig().put(SCI_TOKENS_KEY, sciTokensConfig.toJSON());
+    public void setRefreshTokensConfig(RefreshTokenConfig refreshTokenConfig) {
+        setPayloadConfig(refreshTokenConfig, TOKENS_KEY, REFRESH_TOKENS_KEY);
     }
 
     public boolean hasRefreshTokenConfig() {
-        return getConfig().containsKey(REFRESH_TOKENS_KEY);
+        return hasPayloadConfig(TOKENS_KEY, REFRESH_TOKENS_KEY);
     }
 
     public RefreshTokenConfig getRefreshTokensConfig() {
         RefreshTokenConfig refreshTokenClientConfig = new RefreshTokenConfig(); // empty
+        return (RefreshTokenConfig) setupPayloadConfig(refreshTokenClientConfig, TOKENS_KEY, REFRESH_TOKENS_KEY);
 
-        if (hasRefreshTokenConfig()) {
-            refreshTokenClientConfig.fromJSON(getConfig().getJSONObject(REFRESH_TOKENS_KEY));
-        }
-        return refreshTokenClientConfig;
     }
 
     public boolean hasIDTokenConfig() {
-        return getConfig().containsKey(ID_TOKENS_KEY);
+        return hasPayloadConfig(TOKENS_KEY, ID_TOKENS_KEY);
     }
 
     public IDTokenClientConfig getIDTokenConfig() {
         IDTokenClientConfig c = new IDTokenClientConfig();
-        if (hasIDTokenConfig()) {
-            c.fromJSON(getConfig().getJSONObject(ID_TOKENS_KEY));
-        }
-        return c;
+        return (IDTokenClientConfig) setupPayloadConfig(c, TOKENS_KEY, ID_TOKENS_KEY);
     }
 
     public void setIDTokenConfig(IDTokenClientConfig idTokenClientConfig) {
-        getConfig().put(ID_TOKENS_KEY, idTokenClientConfig);
+        setPayloadConfig(idTokenClientConfig, TOKENS_KEY, ID_TOKENS_KEY);
     }
 
     protected JSONObject getNamedAttributes(String name) {
@@ -362,17 +357,30 @@ public class OA2Client extends Client implements OA2ClientScopes {
      * @return
      */
     public JSONObject getConfig() {
-        return config;
+        if (jsonConfig == null && !StringUtils.isTrivial(config)) {
+            throw new IllegalStateException("Error: JSON configuration was not initialized.");
+        }
+        return jsonConfig;
     }
+
     public boolean hasConfig() {
         return config != null;
     }
 
     public void setConfig(JSONObject config) {
-        this.config = config;
+        this.jsonConfig = config;
     }
 
-    protected JSONObject config;
+    protected String config;
+    protected JSONObject jsonConfig;
+
+    public void setRawConfig(String rawConfig) {
+        config = rawConfig;
+    }
+
+    public String getRawConfig() {
+        return config;
+    }
 
     /**
      * Extended attributes base call. The {@link #getConfig()} gets user-facing configuration, like scripts

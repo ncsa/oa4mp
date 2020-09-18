@@ -315,13 +315,14 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
             String[] searchAttributes = attributes.keySet().toArray(new String[]{});
             searchControls.setReturningAttributes(searchAttributes);
         }
-        String filter = "(&(" + getSearchFilterAttribute() + "=" + userID + "))";
+        String filter = "(&(" + getSearchFilterAttribute() + "=" + userID + ")" + getLDAPCfg().getAdditionalFilter() + ")";
         String contextName = getLDAPCfg().getContextName();
         if(contextName == null){
             // You could use this with the search base but that gets complicated. We lookup the context
             // using the search base elsewhere so there is nothing usually for this parameter to do
             // in cases where this has to be set, the search base has been found which simplifies this
             // value quite a bit.
+
             contextName = ""; // MUST be set or the query will fail. This is the default
         }
         NamingEnumeration e = ctx.search(contextName, filter, searchControls);

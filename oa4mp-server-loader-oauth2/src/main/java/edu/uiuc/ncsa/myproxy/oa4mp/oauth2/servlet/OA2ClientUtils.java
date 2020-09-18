@@ -2,10 +2,13 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.PayloadHandlerConfigImpl;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.AbstractAccessTokenHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.IDTokenClientConfig;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.IDTokenHandler;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.PayloadHandlerConfigImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.BasicRefreshTokenHandler;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.SciTokenConstants;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.ScitokenHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.WLCGTokenHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractRegistrationServlet;
@@ -294,7 +297,7 @@ public class OA2ClientUtils {
         OA2Client client = (OA2Client) transaction.getClient();
         PayloadHandlerConfigImpl idthCfg = null;
         if (client.hasIDTokenConfig()) {
-            DebugUtil.trace(OA2ClientUtils.class, "Found new configuration.");
+            ServletDebugUtil.trace(OA2ClientUtils.class, "has id token config, creating handler");
             idthCfg = new PayloadHandlerConfigImpl(
                     client.getIDTokenConfig(),
                     oa2SE,
@@ -302,10 +305,10 @@ public class OA2ClientUtils {
                     req);
         } else {
             // Legacy case. Functors have no config, but need a handler to get the init and accounting information.
-            DebugUtil.trace(OA2ClientUtils.class, "Found legacy configuration.");
+            DebugUtil.trace(OA2ClientUtils.class, "Found legacy id token configuration.");
 
             idthCfg = new PayloadHandlerConfigImpl(
-                    new IDTokenClientConfig(),
+                    new IDTokenClientConfig(),  // here is the trick: An empty object triggers a hunt for functors.
                     oa2SE,
                     transaction,
                     req);
@@ -313,58 +316,37 @@ public class OA2ClientUtils {
         IDTokenHandler idTokenHandler = new IDTokenHandler(idthCfg);
         jwtRunner.addHandler(idTokenHandler);
 
-        // KLUDGE for FNAL in the short term.
-        boolean jeffTest =
-                transaction.getUsername().equals("http://cilogon.org/serverD/users/55") // me via NCSA IDP on polod
-                        ||
-                        transaction.getUsername().equals("http://cilogon.org/serverA/users/16316"); // me via Google IDP, cilogon.org email on poloc
-
-        boolean jimTest =
-                transaction.getUsername().equals("http://cilogon.org/serverD/users/65") // jim Basney NCSA IDP on polod
-                        ||
-                        transaction.getUsername().equals("http://cilogon.org/serverT/users/37233"); // jim Basney NCSA IDP on poloc
-
-        if ((transaction.getUserMetaData().containsKey("idp") &&
-                transaction.getUserMetaData().getString("idp").equals("https://idp.fnal.gov/idp/shibboleth"))
-                ||  jeffTest || jimTest ) {
-            DebugUtil.trace(OA2ClientUtils.class, "Setting up WLCG ACCESS TOKEN");
-
-            PayloadHandlerConfigImpl xx = new PayloadHandlerConfigImpl(client.getAccessTokensConfig(),
-                    oa2SE, transaction, req);
-            WLCGTokenHandler hh = new WLCGTokenHandler(xx);
-            // KLUDGE! This is to make sure that it initializes. Since we are restricting this to a single
-            // IDP which has not been set in the normal init phase, we have to be sure this
-            // executeslea
-            hh.init();
-            hh.setAccountingInformation();
-            jwtRunner.setAccessTokenHandler(hh);
-
-            transaction.setRefreshTokenLifetime(30L*24*3600*1000); // 30 days in ms.
-
-            // Now for a refresh token handler
-/*
-            RefreshTokenHandlerConfig rtcfg = new RefreshTokenHandlerConfig(client.getRefreshTokensConfig(),
-                    oa2SE,
-                    transaction,
-                    req);
-            BasicRefreshTokenHandler basicRefreshTokenHandler = new BasicRefreshTokenHandler(rtcfg);
-            basicRefreshTokenHandler.init();
-            basicRefreshTokenHandler.setAccountingInformation();
-            jwtRunner.setRefreshTokenHandler(basicRefreshTokenHandler);
-*/
-        } else {
-            DebugUtil.trace(OA2ClientUtils.class, "NO WLCG ACCESS TOKEN");
-            //     DebugUtil.trace(OA2ClientUtils.class, "idp=" + transaction.getUserMetaData().getString("idp"));
-        }
-        if (client.hasSciTokenConfig()) {
+        if (client.hasAccessTokenConfig()) {
+            ServletDebugUtil.trace(OA2ClientUtils.class, "has access token config, creating handler, type="
+                    + client.getAccessTokensConfig().getType());
             PayloadHandlerConfigImpl st = new PayloadHandlerConfigImpl(
-                    client.getSciTokensConfig(),
+                    client.getAccessTokensConfig(),
                     oa2SE,
                     transaction,
                     req);
-            ScitokenHandler sth = new ScitokenHandler(st);
+            AbstractAccessTokenHandler sth = null;
+            switch (client.getAccessTokensConfig().getType()) {
+                case WLCGTokenHandler.WLCG_TAG:
+                    sth = new WLCGTokenHandler(st);
+                    break;
+                case SciTokenConstants.SCI_TOKEN_TAG:
+                    sth = new ScitokenHandler(st);
+                    break;
+                default:
+                    sth = new AbstractAccessTokenHandler(st);
+            }
             jwtRunner.setAccessTokenHandler(sth);
         }
+        if (client.hasRefreshTokenConfig()) {
+            ServletDebugUtil.trace(OA2ClientUtils.class, "has refresh token config, creating handler");
 
+            PayloadHandlerConfigImpl st = new PayloadHandlerConfigImpl(
+                    client.getRefreshTokensConfig(),
+                    oa2SE,
+                    transaction,
+                    req);
+            BasicRefreshTokenHandler rth = new BasicRefreshTokenHandler(st);
+            jwtRunner.setRefreshTokenHandler(rth);
+        }
     }
 }

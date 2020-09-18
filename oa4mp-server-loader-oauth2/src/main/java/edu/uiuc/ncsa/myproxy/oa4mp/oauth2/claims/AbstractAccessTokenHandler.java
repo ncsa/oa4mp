@@ -16,7 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static edu.uiuc.ncsa.security.core.util.DebugUtil.trace;
-import static edu.uiuc.ncsa.security.oauth_2_0.jwt.ScriptingConstants.SRE_REQ_ACCESS_TOKEN;
+import static edu.uiuc.ncsa.security.oauth_2_0.jwt.ScriptingConstants.*;
+import static edu.uiuc.ncsa.security.oauth_2_0.jwt.ScriptingConstants.SRE_REQ_EXTENDED_ATTRIBUTES;
 import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.*;
 
 /**
@@ -26,7 +27,6 @@ import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.*;
  * on 7/21/20 at  2:50 PM
  */
 public class AbstractAccessTokenHandler extends AbstractPayloadHandler implements AccessTokenHandlerInterface {
-    AccessToken accessToken;
 
     public AbstractAccessTokenHandler(PayloadHandlerConfigImpl payloadHandlerConfig) {
         super(payloadHandlerConfig);
@@ -40,9 +40,14 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
      * @return
      */
     public JSONObject getAtData() {
-        return transaction.getATData();
+        if(atData == null){
+
+            atData = transaction.getATData();
+        }
+        return atData;
     }
 
+    JSONObject atData;
     public void setAtData(JSONObject atData) {
         transaction.setATData(atData);
     }
@@ -62,13 +67,26 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
 
     @Override
     public void handleResponse(ScriptRunResponse resp) throws Throwable {
+        switch (resp.getReturnCode()) {
+                 case ScriptRunResponse.RC_OK:
+                     // Note that the returned values from a script are very unlikely to be the same object we sent
+                     // even if the contents are the same, since scripts may have to change these in to other data structures
+                     // to make them accessible to their machinery, then convert them back.
+                     claims = (JSONObject) resp.getReturnedValues().get(SRE_REQ_CLAIMS);
+                     //sources = (List<ClaimSource>) resp.getReturnedValues().get(SRE_REQ_CLAIM_SOURCES);
+                     extendedAttributes = (JSONObject) resp.getReturnedValues().get(SRE_REQ_EXTENDED_ATTRIBUTES);
+                     atData = (JSONObject) resp.getReturnedValues().get(SRE_REQ_ACCESS_TOKEN);
+                 case ScriptRunResponse.RC_NOT_RUN:
+                     return;
 
+             }
     }
 
     @Override
     public void checkClaims() throws Throwable {
 
     }
+
 
     @Override
     public List<ClaimSource> getSources() throws Throwable {
@@ -77,6 +95,14 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
 
     @Override
     public void finish() throws Throwable {
+        /*
+          Make SURE the JTI gets set or token exchange, user info etc. will never work.
+         */
+        JSONObject atData = getAtData();
+        if (transaction.getAccessToken() != null) {
+            atData.put(JWT_ID, transaction.getAccessToken().getToken());
+        }
+        setAtData(atData);
     }
 
     /**
@@ -109,6 +135,8 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
     @Override
     public void saveState() throws Throwable {
         if (transaction != null && oa2se != null) {
+            transaction.setATData(getAtData());
+
             oa2se.getTransactionStore().save(transaction);
         } else {
             trace(this, "In saveState: either env or transaction null. Nothing saved.");
@@ -123,9 +151,9 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
         atData.put(ISSUER, oa2se.getIssuer());
         atData.put(EXPIRATION, System.currentTimeMillis() / 1000L + 900L);
         atData.put(ISSUED_AT, System.currentTimeMillis() / 1000L);
-        if (transaction.getAccessToken() != null) {
+/*        if (transaction.getAccessToken() != null) {
             atData.put(JWT_ID, transaction.getAccessToken().getToken());
-        }
+        }*/
         setAtData(atData);
 
     }

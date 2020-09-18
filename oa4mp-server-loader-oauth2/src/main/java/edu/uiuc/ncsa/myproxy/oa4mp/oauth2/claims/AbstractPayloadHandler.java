@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTUtil2;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.PayloadHandler;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.PayloadHandlerConfig;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
+import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import net.sf.json.JSONObject;
 
@@ -42,7 +43,10 @@ public abstract class AbstractPayloadHandler implements PayloadHandler {
         oa2se = phCfg.getOa2se();
         transaction = phCfg.getTransaction();
         request = phCfg.getRequest();
-     //   claims = new JSONObject();
+        ServletDebugUtil.trace(this, "payload handler cfg=" + phCfg);
+        ServletDebugUtil.trace(this, "transaction =" + transaction);
+        ServletDebugUtil.trace(this, "has OA2SE? " + (oa2se != null));
+        //   claims = new JSONObject();
         claims = null; // use lazy initialization
     }
 

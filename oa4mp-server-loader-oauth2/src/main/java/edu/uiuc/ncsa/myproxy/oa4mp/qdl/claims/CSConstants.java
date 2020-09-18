@@ -57,5 +57,6 @@ public interface CSConstants {
     String CS_LDAP_RENAME = "rename."; // new names of returned attributes, stem.old_name := new_name
     String CS_LDAP_LISTS = "lists."; // attributes that should be returned as lists, i.e. multi-valued rather than first one found
     String CS_LDAP_CONTEXT_NAME = "context"; // the name of the LDAP context or object to search. Very necessary when you need it. Defaults to "".
+    String CS_LDAP_ADDITIONAL_FILTER = "filter"; // the name of the LDAP context or object to search. Very necessary when you need it. Defaults to "".
 
 }

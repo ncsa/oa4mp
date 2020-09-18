@@ -26,7 +26,7 @@ public class OA2Asset extends Asset {
         this.issuedAt = issuedAt;
     }
 
-    Date issuedAt;
+    Date issuedAt = new Date();
 
     public String getState() {
         return state;

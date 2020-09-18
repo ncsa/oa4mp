@@ -6,7 +6,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ExtendedParameters;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ScriptRuntimeEngineFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.UsernameFindable;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.SciTokenConfig;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.AccessTokenConfig;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.IssuerTransactionState;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
@@ -460,13 +460,13 @@ public class OA2AuthorizedServletUtil {
         if (audience.size() == 0) {
             // try to special case it
             OA2Client client = (OA2Client) t.getClient();
-            SciTokenConfig stCfg = client.getSciTokensConfig();
+            AccessTokenConfig atCfg = client.getAccessTokensConfig();
 
-            if (stCfg.getPaths().size() == 1) {
+            if (atCfg.getPaths().size() == 1) {
                 // Special case. They have configured exactly one audience claim, so they may omit it and we
                 // will pull it out of their configuration and supply it. They do not need to
                 // send it along in the request. This fails if they ever configure a second template though (as it should).
-                audience.add(stCfg.getAudience().iterator().next());
+                audience.add(atCfg.getAudience().iterator().next());
             } else {
                 throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, "missing audience request", HttpStatus.SC_BAD_REQUEST);
             }

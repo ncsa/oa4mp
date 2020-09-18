@@ -188,7 +188,6 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         Collection<String> audience = convertToList(request, AUDIENCE);
         Collection<String> scopes = convertToList(request, OA2Constants.SCOPE);
         Collection<String> resources = convertToList(request, RESOURCE);
-        boolean isSciToken = false;
         if (subjectTokenType.equals(ACCESS_TOKEN_TYPE)) {
             // So we have an access token. Try to interpret it first as a SciToken then if that fails as a
             // standard OA4MP access token:

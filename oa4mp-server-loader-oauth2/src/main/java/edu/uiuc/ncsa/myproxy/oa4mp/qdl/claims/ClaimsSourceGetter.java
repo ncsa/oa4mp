@@ -134,7 +134,9 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
                             sl.append(array.get(i));
                         }
                     }
-                    out.put(key + STEM_INDEX_MARKER, sl);
+                    StemVariable st1 = new StemVariable();
+                    st1.setStemList(sl);
+                    out.put(key + STEM_INDEX_MARKER, st1);
                 } else {
                     out.put(key, obj.toString());
                 }

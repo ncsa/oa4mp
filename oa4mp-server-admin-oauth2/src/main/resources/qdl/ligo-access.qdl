@@ -1,0 +1,20 @@
+/*
+   This is for the access token in LIGO. See the ligo.qdl file comments for more.
+   Jeff Gaynor
+   2020-09-15T16:00:55Z
+*/
+s := '';
+if[
+   in_group(claims.isMemberOf., 'Communities:LSCVirgoLIGOGroupMembers')
+  ]then[
+   s := 'read:/DQSegDB';
+];
+if[
+   in_group(claims.isMemberOf., 'Communities:LVC:SegDB:SegDBWriter')
+  ]then[
+    s := s + ' ' + 'write:/DQSegDB';
+];
+
+access_token.scope := s;
+access_token.sub := claims.sub;
+access_token.test := 'this is a test claims';

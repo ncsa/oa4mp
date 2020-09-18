@@ -308,6 +308,9 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         respMap.put(SRE_REQ_CLAIM_SOURCES, toSources((StemVariable) state.getValue(CLAIM_SOURCES_VAR)));
         respMap.put(SRE_REQ_SCOPES, toScopes((StemVariable) state.getValue(SCOPES_VAR)));
         respMap.put(SRE_REQ_EXTENDED_ATTRIBUTES, ((StemVariable) state.getValue(EXTENDED_ATTRIBUTES_VAR)).toJSON());
+        if(state.getValue(ACCESS_TOKEN_VAR) != null) {
+            respMap.put(SRE_REQ_ACCESS_TOKEN, ((StemVariable) state.getValue(ACCESS_TOKEN_VAR)).toJSON());
+        }
         respMap.put(SRE_REQ_AUDIENCE, toScopes((StemVariable) state.getValue(AUDIENCE_VAR)));
         StemVariable stemClaims = (StemVariable) state.getValue(CLAIMS_VAR);
         JSON j = stemClaims.toJSON();

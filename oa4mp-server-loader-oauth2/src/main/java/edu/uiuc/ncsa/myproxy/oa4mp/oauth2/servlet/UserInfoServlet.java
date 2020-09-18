@@ -2,8 +2,8 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.PayloadHandlerConfigImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.IDTokenHandler;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.PayloadHandlerConfigImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.security.core.exceptions.InvalidTimestampException;
@@ -11,12 +11,15 @@ import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.server.request.IssuerResponse;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
+import edu.uiuc.ncsa.security.oauth_2_0.JWTUtil;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2GeneralError;
+import edu.uiuc.ncsa.security.oauth_2_0.OA2TokenForge;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTUtil2;
 import edu.uiuc.ncsa.security.oauth_2_0.server.UII2;
 import edu.uiuc.ncsa.security.oauth_2_0.server.UIIRequest2;
 import edu.uiuc.ncsa.security.oauth_2_0.server.UIIResponse2;
+import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import net.sf.json.JSONObject;
 import org.apache.http.HttpStatus;
 
@@ -40,18 +43,29 @@ public class UserInfoServlet extends MyProxyDelegationServlet {
         // Bearer oa4mp:...
 
         AccessToken at = getAT(request);
+        try {
+            JSONWebKeys keys = ((OA2SE) getServiceEnvironment()).getJsonWebKeys();
+            OA2TokenForge tokenForge = ((OA2TokenForge) getServiceEnvironment().getTokenForge());
+
+            JSONObject sciTokens = JWTUtil.verifyAndReadJWT(at.getToken(), keys);
+            at = tokenForge.getAccessToken(sciTokens.getString(JWT_ID));
+        } catch (Throwable tt) {
+            // didn't work, so its just a regular access token.
+        }
+        
         // Need to look this up by its jti if its not a basic access token.
         OA2ServiceTransaction transaction = (OA2ServiceTransaction) getTransactionStore().get(at);
         // check that
+        if (transaction == null) {
+            throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, "no transaction for the access token was found.", HttpStatus.SC_BAD_REQUEST);
+        }
         if (!transaction.getFlowStates().userInfo) {
             throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "user info access denied", HttpStatus.SC_UNAUTHORIZED);
         }
       /*  if (transaction.getOA2Client().isPublicClient()) {
             throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, "public client not authorized to access user information", HttpStatus.SC_UNAUTHORIZED);
         }*/
-        if (transaction == null) {
-            throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, "no transaction for the access token was found.", HttpStatus.SC_BAD_REQUEST);
-        }
+
         if (!transaction.isAccessTokenValid()) {
             throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, "invalid access token.", HttpStatus.SC_BAD_REQUEST);
         }

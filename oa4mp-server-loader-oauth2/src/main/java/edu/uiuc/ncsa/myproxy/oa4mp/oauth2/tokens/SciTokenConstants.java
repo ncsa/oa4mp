@@ -9,4 +9,5 @@ public interface SciTokenConstants {
     String OPERATION_READ = "read";
     String OPERATION_QUEUE = "queue";
     String OPERATION_EXECUTE = "execute";
+    String SCI_TOKEN_TAG = "sci_token";
 }

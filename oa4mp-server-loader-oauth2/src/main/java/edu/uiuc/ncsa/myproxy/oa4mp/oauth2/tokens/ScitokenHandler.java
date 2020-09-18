@@ -2,9 +2,6 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.AbstractAccessTokenHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.PayloadHandlerConfigImpl;
-import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
-import edu.uiuc.ncsa.security.util.scripting.ScriptRunRequest;
-import edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse;
 import net.sf.json.JSONObject;
 
 import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.SUBJECT;
@@ -56,44 +53,6 @@ public class ScitokenHandler extends AbstractAccessTokenHandler {
      * </pre>
      */
     protected void resolveTemplates() {
-
-    }
-
-    @Override
-    public void addRequestState(ScriptRunRequest req) throws Throwable {
-
-    }
-
-    @Override
-    public void handleResponse(ScriptRunResponse resp) throws Throwable {
-
-    }
-
-    @Override
-    public void checkClaims() throws Throwable {
-
-    }
-
-
-
-    @Override
-    public JSONObject execute(ClaimSource source, JSONObject claims) throws Throwable {
-        return null;
-    }
-
-    @Override
-    public void finish() throws Throwable {
-
-    }
-
-    @Override
-    public void saveState() throws Throwable {
-
-    }
-
-    @Override
-    public JSONObject getClaims() {
-        return null;
     }
 
     @Override
@@ -101,13 +60,4 @@ public class ScitokenHandler extends AbstractAccessTokenHandler {
         return transaction.getExtendedAttributes();
     }
 
-    @Override
-    public void setAccountingInformation() {
-
-    }
-
-    @Override
-    public void refreshAccountingInformation() {
-
-    }
 }

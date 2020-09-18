@@ -67,7 +67,7 @@ public class IDTokenHandler extends AbstractPayloadHandler {
 
     }
 
-    boolean IDP_DEBUG_ON = true;
+    boolean IDP_DEBUG_ON = false;
 
     /**
      * *****************
