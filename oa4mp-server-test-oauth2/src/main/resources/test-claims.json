@@ -35,5 +35,32 @@
       "acr": "https://refeds.org/profile/mfa",
       "uid": "jgaynor",
       "uidNumber": "25939"
-     }
+     },
+    "jgaynor@fnal.gov": {
+      "comment": [
+        "This is for testing the capabilities mechanism. The access token handler gets this",
+        "and then peels off the eduPersonEntitlement, each entry is a and may be returned in the scopes",
+        "claim of the access token."
+      ],
+      "dn": "voPersonID=MESS100005,ou=people,o=MESS,o=CO,dc=cilogon,dc=org",
+      "sn": "Gaynor",
+      "cn": "Jeff Gaynor",
+      "givenName": "Jeff",
+      "displayName": "Jeff Gaynor",
+      "mail": "jgaynor@fnal.gov",
+      "uid": "jgaynor@fnal.gov",
+      "isMemberOf": [
+        {"name":"CO:members:all"},
+        {"name":"CO:members:active"},
+        {"name":"CO:COU:MESS Employee:members:active"},
+        {"name":"CO:COU:MESS Employee:members:all"}
+      ],
+      "voPersonExternalID": "jgaynor@fnal.gov",
+      "voPersonID": "MESS12345",
+      "eduPersonEntitlement": [
+        "storage.read:/store/vo3",
+        "storage.write:/store/vo3/data",
+        "compute.create:/vo3-production-queue"
+      ]
+    }
 }

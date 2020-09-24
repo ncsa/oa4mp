@@ -316,7 +316,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             return;
         }
         warn("Error: grant type +\"" + grantType + "\" was not recognized. Request rejected.");
-        throw new OA2GeneralError(OA2Errors.REQUEST_NOT_SUPPORTED, "unsupported grant type.", HttpStatus.SC_BAD_REQUEST);
+        throw new OA2GeneralError(OA2Errors.REQUEST_NOT_SUPPORTED, "unsupported grant type \"" + grantType + "\"", HttpStatus.SC_BAD_REQUEST);
     }
 
     protected IssuerTransactionState doAT(HttpServletRequest request, HttpServletResponse response, OA2Client client) throws Throwable {

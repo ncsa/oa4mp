@@ -768,7 +768,7 @@ public class OIDCCMServlet extends EnvServlet {
                     OA2Constants.GRANT_TYPE_REFRESH_TOKEN, GRANT_TYPE_TOKEN_EXCHANGE};
             if (!areAllGrantsSupported(grantTypes, supportedGrants)) {
                 throw new OA2GeneralError(OA2Errors.REGISTRATION_NOT_SUPPORTED,
-                        "unsupported grant type",
+                        "unsupported grant type "  ,
                         HttpStatus.SC_BAD_REQUEST);
             }
             boolean requestedRT = false;

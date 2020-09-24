@@ -138,7 +138,7 @@ public class HeaderUtils {
         String rawSecret = URLDecoder.decode(header.substring(lastColonIndex + 1), "UTF-8");
 
         out[SECRET_INDEX] = rawSecret;
-        ServletDebugUtil.trace(HeaderUtils.class, "getCredentialsFromHeaders: returning  " + out);
+        ServletDebugUtil.trace(HeaderUtils.class, "getCredentialsFromHeaders: returning  " + id + ", " + rawSecret);
 
         return out;
 

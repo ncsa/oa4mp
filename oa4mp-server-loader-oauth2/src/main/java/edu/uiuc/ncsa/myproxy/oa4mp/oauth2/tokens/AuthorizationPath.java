@@ -1,7 +1,11 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens;
 
 import edu.uiuc.ncsa.security.core.util.BeanUtils;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import net.sf.json.JSONObject;
+
+import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.AuthorizationTemplates.OPERATION_KEY;
+import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.AuthorizationTemplates.PATH_KEY;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -11,6 +15,17 @@ public class AuthorizationPath {
     String operation;
     String path;
 
+    public String getOperation() {
+        return operation;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public boolean hasPath(){
+        return !StringUtils.isTrivial(path);
+    }
     public AuthorizationPath(JSONObject json) {
         fromJSON(json);
     }
@@ -27,14 +42,14 @@ public class AuthorizationPath {
 
     public JSONObject toJSON() {
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("operation", operation);
-        jsonObject.put("path", path);
+        jsonObject.put(OPERATION_KEY, operation);
+        jsonObject.put(PATH_KEY, path);
         return jsonObject;
     }
 
     public void fromJSON(JSONObject j) {
-        operation = j.getString("operation");
-        path = j.getString("path");
+        operation = j.getString(OPERATION_KEY);
+        path = j.getString(PATH_KEY);
     }
 
     /**

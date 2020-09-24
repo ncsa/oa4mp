@@ -25,7 +25,13 @@ public class OA2ClientKeys extends ClientKeys {
     String extended_attributes = "extended_attributes";
     String signTokens="sign_tokens";
     String publicClient="public_client";
+    String strictScopes="strict_scopes";
 
+     public String strictScopes(String... x) {
+         if (0 < x.length) strictScopes= x[0];
+         return strictScopes;
+
+     }
      public String issuer(String... x) {
          if (0 < x.length) issuer= x[0];
          return issuer;
@@ -89,6 +95,7 @@ public class OA2ClientKeys extends ClientKeys {
         allKeys.add(scopes());
         allKeys.add(signTokens());
         allKeys.add(ea());
+        allKeys.add(strictScopes());
         return allKeys;
     }
 }

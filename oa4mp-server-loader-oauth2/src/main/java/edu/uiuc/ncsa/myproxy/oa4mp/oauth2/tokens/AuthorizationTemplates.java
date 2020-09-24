@@ -5,7 +5,9 @@ import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 
 /**
@@ -15,6 +17,9 @@ import java.util.HashMap;
  * on 8/2/18 at  2:42 PM
  */
 public class AuthorizationTemplates extends HashMap<String, AuthorizationTemplate> {
+    public static final String OPERATION_KEY = "op";
+    public static final String PATH_KEY = "path";
+
     public AuthorizationTemplate put(AuthorizationTemplate value) {
         return super.put(value.getAudience(), value);
     }
@@ -22,6 +27,7 @@ public class AuthorizationTemplates extends HashMap<String, AuthorizationTemplat
     /**
      * the actual argument is assumed to be a JSON array of templates. If there si a single template,
      * it is wrapped in a JSONArray and passed to {@link #fromJSON(JSONArray)}.
+     *
      * @param json
      */
     public void fromJSON(JSON json) {
@@ -94,15 +100,15 @@ public class AuthorizationTemplates extends HashMap<String, AuthorizationTemplat
 
     @Override
     public boolean equals(Object obj) {
-        if(!(obj instanceof AuthorizationTemplates)){
-                                                    return false;
+        if (!(obj instanceof AuthorizationTemplates)) {
+            return false;
         }
-        AuthorizationTemplates ats = (AuthorizationTemplates)obj;
-        if(ats.size() != size()) return false;
-        for(String key: keySet()){
+        AuthorizationTemplates ats = (AuthorizationTemplates) obj;
+        if (ats.size() != size()) return false;
+        for (String key : keySet()) {
             AuthorizationTemplate thatAT = ats.get(key);
             AuthorizationTemplate thisAT = get(key);
-            if(!thisAT.equals(thatAT)){
+            if (!thisAT.equals(thatAT)) {
                 return false;
             }
 
@@ -110,4 +116,22 @@ public class AuthorizationTemplates extends HashMap<String, AuthorizationTemplat
         return true;
     }
 
+    public static void main(String[] args) {
+        List<AuthorizationPath> paths = new ArrayList<>();
+        paths.add(new AuthorizationPath(SciTokenConstants.OPERATION_READ, "/home/${sub}"));
+        paths.add(new AuthorizationPath(SciTokenConstants.OPERATION_WRITE, "/home/${sub}"));
+        paths.add(new AuthorizationPath(SciTokenConstants.OPERATION_QUEUE, "/home/${memberOf}/serialize.sh"));
+        AuthorizationTemplate template = new AuthorizationTemplate("https://foo.bigstate.edu", paths);
+        AuthorizationTemplates authorizationTemplates = new AuthorizationTemplates();
+        authorizationTemplates.put(template);
+        // And another one
+        paths = new ArrayList<>();
+        paths.add(new AuthorizationPath(SciTokenConstants.OPERATION_READ, "/home/${eppn}/${sub}"));
+        paths.add(new AuthorizationPath(SciTokenConstants.OPERATION_EXECUTE, "/home/${memberOf}/ingest.sh"));
+        template = new AuthorizationTemplate("https://bar.bigstate.edu", paths);
+        authorizationTemplates.put(template);
+
+        System.out.println(authorizationTemplates.toJSON().toString(1));
+
+    }
 }

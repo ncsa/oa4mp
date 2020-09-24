@@ -7,7 +7,8 @@ import java.util.HashMap;
 
 /**
  * A model for groups that are returned by various scope handlers. This is modelled
- * by a JSON array of {@link GroupElement} objects.
+ * by a JSON array of {@link GroupElement} objects. Each entry is keyed by the name of the group,
+ * so iterating over the keys effectively is a list of groups.
  * <p>Created by Jeff Gaynor<br>
  * on 3/1/18 at  4:11 PM
  */

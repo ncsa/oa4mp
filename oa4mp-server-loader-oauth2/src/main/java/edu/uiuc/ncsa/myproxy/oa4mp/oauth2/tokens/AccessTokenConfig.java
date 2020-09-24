@@ -1,7 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.AbstractPayloadConfig;
-import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import java.util.ArrayList;
@@ -21,11 +20,11 @@ public class AccessTokenConfig extends AbstractPayloadConfig {
     public static String TEMPLATES_KEY = "templates";
 
 
-    Long lifetime;
+    Long lifetime = -1L;
     String issuer;
     String subject;
-    List<String> audience;
-    List<AuthorizationPath> paths;
+    List<String> audience = new ArrayList<>();
+    AuthorizationTemplates templates = new AuthorizationTemplates();
 
 
     @Override
@@ -45,13 +44,8 @@ public class AccessTokenConfig extends AbstractPayloadConfig {
             audience = jsonObject.getJSONArray(AUDIENCE_KEY);
         }
         if (jsonObject.containsKey(TEMPLATES_KEY)) {
-            JSONArray array = jsonObject.getJSONArray(TEMPLATES_KEY);
-            paths = new ArrayList<>();
-            for(int i =0; i < array.size(); i++){
-                AuthorizationPath ap = new AuthorizationPath(array.getJSONObject(i));
-                paths.add(ap);
-            }
-            
+            templates = new AuthorizationTemplates();
+            templates.fromJSON(jsonObject.getJSONArray(TEMPLATES_KEY));
         }
     }
 
@@ -65,12 +59,14 @@ public class AccessTokenConfig extends AbstractPayloadConfig {
             json.put(SUBJECT_KEY, subject);
         }
 
-        if (paths != null) {
+        if (templates != null) {
+/*
             JSONArray array = new JSONArray();
-            for(AuthorizationPath ap: paths){
+            for(AuthorizationPath ap: templates){
                 array.add(ap.toJSON());
             }
-            json.put(TEMPLATES_KEY,  array);
+*/
+            json.put(TEMPLATES_KEY,  templates.toJSON());
         }
         if (issuer != null) {
             json.put(ISSUER_KEY, issuer);
@@ -115,12 +111,12 @@ public class AccessTokenConfig extends AbstractPayloadConfig {
         this.audience = audience;
     }
 
-    public List<AuthorizationPath> getPaths() {
-        return paths;
+    public AuthorizationTemplates getTemplates() {
+        return templates;
     }
 
-    public void setPaths(List<AuthorizationPath> paths) {
-        this.paths = paths;
+    public void setTemplates(AuthorizationTemplates templates) {
+        this.templates = templates;
     }
 
     public static void main(String[] args) {
@@ -145,7 +141,11 @@ public class AccessTokenConfig extends AbstractPayloadConfig {
         paths.add(new AuthorizationPath(SciTokenConstants.OPERATION_WRITE, "/home/${sub}"));
         paths.add(new AuthorizationPath(SciTokenConstants.OPERATION_EXECUTE, "/home/${memberOf}/ingest.sh"));
         paths.add(new AuthorizationPath(SciTokenConstants.OPERATION_QUEUE, "/home/${memberOf}/serialize.sh"));
-        acc.setPaths(paths);
+        AuthorizationTemplate template = new AuthorizationTemplate("https://fnal.gov/serverA", paths);
+        AuthorizationTemplates authorizationTemplates = new AuthorizationTemplates();
+        authorizationTemplates.put(template);
+        acc.setTemplates(authorizationTemplates);
+
         //  at.put(new AuthorizationTemplate("compute.create", ""));
         System.out.println(acc.toJSON().toString(1));
 

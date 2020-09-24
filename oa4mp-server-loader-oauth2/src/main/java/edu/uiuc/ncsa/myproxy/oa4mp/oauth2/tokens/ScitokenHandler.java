@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.AbstractAccessTokenHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.PayloadHandlerConfigImpl;
+import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
 import net.sf.json.JSONObject;
 
 import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.SUBJECT;
@@ -15,9 +16,8 @@ public class ScitokenHandler extends AbstractAccessTokenHandler {
         super(payloadHandlerConfig);
     }
 
-    String ST_SCOPE = "scope";
+//    String ST_SCOPE = "scope";
     String ST_CLIENT_IDENTIFIER = "cid";
-
     String VERSION_2_0 = "2.0";
 
 
@@ -46,18 +46,10 @@ public class ScitokenHandler extends AbstractAccessTokenHandler {
 
     }
 
-    /**
-     * Templates are of the format
-     * <pre>
-     *     {resource:{"action":[path0,path1,...]}}
-     * </pre>
-     */
-    protected void resolveTemplates() {
-    }
 
-    @Override
+ /*   @Override
     public JSONObject getExtendedAttributes() {
         return transaction.getExtendedAttributes();
-    }
+    }*/
 
 }

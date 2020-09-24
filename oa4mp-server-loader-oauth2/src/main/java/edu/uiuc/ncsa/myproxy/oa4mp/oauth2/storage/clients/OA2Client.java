@@ -158,9 +158,10 @@ public class OA2Client extends Client implements OA2ClientScopes {
         return pc;
     }
 
-    protected void setPayloadConfig(AbstractPayloadConfig apc, String root, String path){
+    protected void setPayloadConfig(AbstractPayloadConfig apc, String root, String path) {
         set(apc.toJSON(), root, path);
     }
+
     public boolean hasAccessTokenConfig() {
         return hasPayloadConfig(TOKENS_KEY, ACCESS_TOKENS_KEY);
     }
@@ -268,6 +269,22 @@ public class OA2Client extends Client implements OA2ClientScopes {
 
     public void setExtendedAttributeSupport(boolean b) {
         setNamedProperty(oa4mp_attributes, extendedAttributesEnabledKey, b);
+    }
+
+    boolean strictScopes = true;
+
+    /**
+     * Strict scopes means that the list of scopes must match exactly for the given client.
+     * Typically this is <code>false</code> for WLCG and other clients that can pass in arbitrary
+     * scopes.
+     * @return
+     */
+    public boolean useStrictScopes() {
+        return strictScopes;
+    }
+
+    public void setStrictscopes(boolean newValue) {
+        strictScopes = newValue;
     }
 
     protected Object getNamedProperty(String component, String key) {

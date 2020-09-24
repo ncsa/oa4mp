@@ -35,6 +35,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.*;
 
+import static edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet.getServiceEnvironment;
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.*;
 
 /**
@@ -152,7 +153,7 @@ public class OA2AuthorizedServletUtil {
         }
         ServletDebugUtil.trace(this, "Starting doDelegation");
         t = doDelegation(httpServletRequest, httpServletResponse);
-        OA2SE oa2SE = (OA2SE) MyProxyDelegationServlet.getServiceEnvironment();
+        OA2SE oa2SE = (OA2SE) getServiceEnvironment();
         ServletDebugUtil.trace(this, "Starting done with doDelegation, creating claim util");
         JWTRunner jwtRunner = new JWTRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2SE, t.getOA2Client().getConfig()));
         OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, t, httpServletRequest);
@@ -182,7 +183,7 @@ public class OA2AuthorizedServletUtil {
         String rawIDToken = String.valueOf(httpServletRequest.getParameterMap().get(ID_TOKEN_HINT));
         JSONObject idToken = null;
         try {
-            idToken = JWTUtil.verifyAndReadJWT(rawIDToken, ((OA2SE) servlet.getServiceEnvironment()).getJsonWebKeys());
+            idToken = JWTUtil.verifyAndReadJWT(rawIDToken, ((OA2SE) getServiceEnvironment()).getJsonWebKeys());
         } catch (Throwable e) {
             throw new GeneralException("Error: Cannot read ID token hint", e);
         }
@@ -328,7 +329,7 @@ public class OA2AuthorizedServletUtil {
         DebugUtil.trace(this, ".resolveScopes: stored client scopes =" + ((OA2Client) st.getClient()).getScopes());
         DebugUtil.trace(this, ".resolveScopes: passed in scopes =" + rawScopes);
         DebugUtil.trace(this, ".resolveScopes: Scope util =" + OA2Scopes.ScopeUtil.getScopes());
-        DebugUtil.trace(this, ".resolveScopes: server scopes=" + ((OA2SE) MyProxyDelegationServlet.getServiceEnvironment()).getScopes());
+        DebugUtil.trace(this, ".resolveScopes: server scopes=" + ((OA2SE) getServiceEnvironment()).getScopes());
         if (rawScopes == null || rawScopes.length() == 0) {
             throw new OA2RedirectableError(OA2Errors.INVALID_SCOPE, "Missing scopes parameter.", state, givenRedirect);
         }
@@ -351,20 +352,26 @@ public class OA2AuthorizedServletUtil {
         boolean hasOpenIDScope = false;
         while (stringTokenizer.hasMoreTokens()) {
             String x = stringTokenizer.nextToken();
-            if (!OA2Scopes.ScopeUtil.hasScope(x)) {
+            if (oa2Client.useStrictScopes() && !OA2Scopes.ScopeUtil.hasScope(x)) {
                 throw new OA2RedirectableError(OA2Errors.INVALID_SCOPE, "Unrecognized scope \"" + x + "\"", state, givenRedirect);
             }
             if (x.equals(OA2Scopes.SCOPE_OPENID)) hasOpenIDScope = true;
             scopes.add(x);
         }
-        Collection<String> storedClientScopes = oa2Client.getScopes();
-        scopes = intersection(OA2Scopes.ScopeUtil.getScopes(), intersection(scopes, storedClientScopes));
+        if (oa2Client.useStrictScopes()) {
+            Collection<String> storedClientScopes = oa2Client.getScopes();
+            scopes = intersection(OA2Scopes.ScopeUtil.getScopes(), intersection(scopes, storedClientScopes));
 
-        DebugUtil.trace(this, ".resolveScopes: after resolution=" + scopes);
 
+            DebugUtil.trace(this, ".resolveScopes: strict scopes after resolution=" + scopes);
+        } else {
+            DebugUtil.trace(this, ".resolveScopes: non-strict scopes =" + scopes);
 
-        if (!hasOpenIDScope)
-            throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST, "Scopes must contain " + OA2Scopes.SCOPE_OPENID, state, givenRedirect);
+        }
+        if (((OA2SE) getServiceEnvironment()).isOIDCEnabled()) {
+            if (!hasOpenIDScope)
+                throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST, "Scopes must contain " + OA2Scopes.SCOPE_OPENID, state, givenRedirect);
+        }
         return scopes;
     }
 
@@ -462,7 +469,7 @@ public class OA2AuthorizedServletUtil {
             OA2Client client = (OA2Client) t.getClient();
             AccessTokenConfig atCfg = client.getAccessTokensConfig();
 
-            if (atCfg.getPaths().size() == 1) {
+            if (atCfg.getTemplates().size() == 1) {
                 // Special case. They have configured exactly one audience claim, so they may omit it and we
                 // will pull it out of their configuration and supply it. They do not need to
                 // send it along in the request. This fails if they ever configure a second template though (as it should).
