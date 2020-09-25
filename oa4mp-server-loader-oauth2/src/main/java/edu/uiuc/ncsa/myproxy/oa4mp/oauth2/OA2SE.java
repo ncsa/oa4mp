@@ -71,9 +71,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
                  Provider<JSONStore> jsonStoreProvider,
                  CMConfigs cmConfigs,
                  QDLEnvironment qdlEnvironment,
-                 boolean isScitokenEnabled,
-                 boolean rfc8693Enabled,
-                 boolean wlcgEnabled) {
+                 boolean rfc8693Enabled) {
         super(logger,
                 mfp,
                 tsp,
@@ -125,9 +123,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.jsonStoreProvider = jsonStoreProvider;
         this.cmConfigs = cmConfigs;
         this.qdlEnvironment = qdlEnvironment;
-        this.scitokensEnabled = isScitokenEnabled;
         this.rfc8693Enabled = rfc8693Enabled;
-        this.wlcgEnabled = wlcgEnabled;
     }
 
     public QDLEnvironment getQDLEnvironment() {
@@ -165,21 +161,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
 
     boolean rfc8693Enabled = false;
 
-    boolean scitokensEnabled = false;
 
-    public boolean isScitokensEnabled() {
-        return scitokensEnabled;
-    }
-
-    public void setScitokensEnabled(boolean scitokensEnabled) {
-        this.scitokensEnabled = scitokensEnabled;
-    }
-
-    boolean wlcgEnabled = false;
-
-    public boolean isWlcgEnabled() {
-        return wlcgEnabled;
-    }
 
     protected Provider<AdminClientStore> acs;
 

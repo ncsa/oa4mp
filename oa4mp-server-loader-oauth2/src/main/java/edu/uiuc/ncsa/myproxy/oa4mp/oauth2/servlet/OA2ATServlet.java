@@ -115,14 +115,25 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
     protected boolean executeByGrant(String grantType,
                                      HttpServletRequest request,
                                      HttpServletResponse response) throws Throwable {
-
+        DebugUtil.trace(this, "starting execute by grant, grant = \"" + grantType + "\"");
+        DebugUtil.trace(this, "stored grant type is \"" + GRANT_TYPE_TOKEN_EXCHANGE + "\"");
         OA2Client client = (OA2Client) getClient(request);
-        OA2SE oa2SE = (OA2SE) getServiceEnvironment();
-        if (oa2SE.isRfc8693Enabled() && grantType.equals(GRANT_TYPE_TOKEN_EXCHANGE)) {
-            // Grants are checked in the doIt method
+        if (client == null) {
+            warn("executeByGrant encountered a null client");
+            throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, "no such client ", HttpStatus.SC_BAD_REQUEST);
 
-            // RFC8693 support - token exchange
+        }
+        OA2SE oa2SE = (OA2SE) getServiceEnvironment();
+        DebugUtil.trace(this, "8693 support enabled? " + oa2SE.isRfc8693Enabled());
+        DebugUtil.trace(this, "grants equal? " + grantType.equals(GRANT_TYPE_TOKEN_EXCHANGE));
+        if (grantType.equals(GRANT_TYPE_TOKEN_EXCHANGE)) {
+            if (!oa2SE.isRfc8693Enabled()) {
+                warn("Client " + client.getIdentifierString() + " requested a token exchange but token exchange is not enabled onthis server.");
+                throw new OA2GeneralError(OA2Errors.REQUEST_NOT_SUPPORTED, "token exchange not supported on this server ", HttpStatus.SC_BAD_REQUEST);
+            }
             doRFC8693(client, request, response);
+            DebugUtil.trace(this, "rfc8693 completed, returning... ");
+
             return true;
         }
 
@@ -308,6 +319,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
     protected void doIt(HttpServletRequest request, HttpServletResponse response) throws Throwable {
         printAllParameters(request);
         String grantType = getFirstParameterValue(request, OA2Constants.GRANT_TYPE);
+
         if (isEmpty(grantType)) {
             warn("Error servicing request. No grant type was given. Rejecting request.");
             throw new GeneralException("Error: Could not service request");
@@ -345,7 +357,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
     private void setupTokens(OA2Client client, IDTokenResponse atResponse, OA2SE oa2SE, OA2ServiceTransaction st2, JWTRunner jwtRunner) {
         if (jwtRunner.hasATHandler()) {
             AccessToken newAT = jwtRunner.getAccessTokenHandler().getSignedAT(oa2SE.getJsonWebKeys().getDefault());
-            atResponse.setAccessToken(newAT );
+            atResponse.setAccessToken(newAT);
             DebugUtil.trace(this, "Returned AT from handler:" + newAT + ", for claims " + st2.getATData().toString(2));
         }
         atResponse.setClaims(st2.getUserMetaData());
@@ -364,7 +376,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             st2.setRefreshTokenLifetime(oa2SE.getRefreshTokenLifetime());
             rt.setExpiresIn(computeRefreshLifetime(st2));
             st2.setRefreshTokenValid(true);
-            if(jwtRunner.hasRTHandler()){
+            if (jwtRunner.hasRTHandler()) {
                 RefreshToken newRT = jwtRunner.getRefreshTokenHandler().getSignedRT(null); // unsigned, for now
                 atResponse.setRefreshToken(newRT);
                 DebugUtil.trace(this, "Returned RT from handler:" + newRT + ", for claims " + st2.getRTData().toString(2));
@@ -456,7 +468,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT, "Missing secret");
         }
         // TODO -- replace next call with sha1Hex(rawSecret)? Need to know side effects first!
-        if(StringUtils.isTrivial(client.getSecret())){
+        if (StringUtils.isTrivial(client.getSecret())) {
             // Since clients can be administered by others now, we are finding that they sometimes
             // may change their scopes. If a client is public, there is no secret, but if
             // a client later is updated to have different scopes, then trying to use it for other
@@ -476,14 +488,14 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             throw new GeneralException("Error: null refresh token encountered.");
         }
         RefreshTokenStore rts = (RefreshTokenStore) getTransactionStore();
-        try{
-            JSONObject jsonObject = JWTUtil2.verifyAndReadJWT(refreshToken.getToken(), ((OA2SE)getServiceEnvironment()).getJsonWebKeys());
-             if(jsonObject.containsKey(JWT_ID)) {
-                 refreshToken = new OA2RefreshTokenImpl(URI.create(jsonObject.getString(JWT_ID)));
-             }else{
-                 throw new IllegalStateException("Error: Refresh token is a JWT, but has no " + JWT_ID + " claim.");
-             }
-        }catch(Throwable t){
+        try {
+            JSONObject jsonObject = JWTUtil2.verifyAndReadJWT(refreshToken.getToken(), ((OA2SE) getServiceEnvironment()).getJsonWebKeys());
+            if (jsonObject.containsKey(JWT_ID)) {
+                refreshToken = new OA2RefreshTokenImpl(URI.create(jsonObject.getString(JWT_ID)));
+            } else {
+                throw new IllegalStateException("Error: Refresh token is a JWT, but has no " + JWT_ID + " claim.");
+            }
+        } catch (Throwable t) {
 
         }
         return rts.get(refreshToken);
@@ -500,16 +512,16 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         if (c == null) {
             throw new InvalidTokenException("Could not find the client associated with refresh token \"" + oldRT + "\"");
         }
-         // Check if its a token or JWT
+        // Check if its a token or JWT
         OA2SE oa2SE = (OA2SE) getServiceEnvironment();
 
         try {
             JSONObject json = JWTUtil2.verifyAndReadJWT(oldRT.getToken(), oa2SE.getJsonWebKeys());
-            oldRT = ((OA2TokenForge)oa2SE.getTokenForge()).getRefreshToken(json.getString(JWT_ID));
-        }catch(Throwable t){
-             // do nothing, this means that the token is not a JWT which is fine too
+            oldRT = ((OA2TokenForge) oa2SE.getTokenForge()).getRefreshToken(json.getString(JWT_ID));
+        } catch (Throwable t) {
+            // do nothing, this means that the token is not a JWT which is fine too
         }
-        
+
         OA2ServiceTransaction t = getByRT(oldRT);
         if (!t.getFlowStates().acceptRequests || !t.getFlowStates().refreshToken) {
             throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "refresh token access denied", HttpStatus.SC_UNAUTHORIZED);

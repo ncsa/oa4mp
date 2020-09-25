@@ -126,11 +126,15 @@ public class JWTCommands implements Serializable {
                     break;
                 case 2:
                     doc.add(getName() + "(file_name) - create a set of JSON WebKeys, sets this to the current set and writes them to the given file.");
+                    break;
                 case 3:
                     doc.add(getName() + "(file_name, true|false) - create a set of JSON WebKeys, writes them to the given file.");
                     doc.add("If the second argument is true, the current active set of keys is replaced.");
-
+                    break;
+                default:
+                    return doc;
             }
+
             doc.add("If setting the current set of keys,  the default key will use RS256.");
             doc.add("See also: default_key");
             return doc;

@@ -1,0 +1,46 @@
+/*
+   This script will pull information from a claim source and compute the resulting
+   capabilities for the acccess token from that.
+
+   Script for the client
+
+      tokens{
+          access{
+             type=wlcg
+             issuer="https:cilogon.org"
+             aud= "https://wlcg.cern.ch/jwt/v1/any"
+             lifetime=3600000
+             qdl{
+                load="vfs#/scripts/fnal-at2.qdl"
+                xmd={exec_phase=post_token}
+             } //end QDL
+          } // end access token
+        } //end tokens
+
+*/
+
+// Set up debug source from file for testing.
+f. := new_template('file');
+f.file_path := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/test-claims.json';
+claims.eppn := 'jgaynor@fnal.gov';
+// In the LDAP store, use eppn to search for voPersonExternalID
+// End debug setup.
+
+// Get the claims. The capabilities are stored as a stem in  
+at_claims. := get_claims(f. , claims.eppn);
+
+access_token.sub := claims.eppn;
+
+if[
+   !is_defined(at_claims.eduPersonEntitlement.)
+]then[
+   access_token.scope := ''; // return empty scopes.
+   return(); // nothing to do. No capabilities, so no scopes.
+]; //end if
+
+caps. := at_claims.eduPersonEntitlement.; // capabilities in claim source
+temp_scopes. := mask(scopes., has_value(scopes., caps.)); // take the ones that match
+access_token.scope := detokenize(temp_scopes., ' ', 2); // turn in to string, omit trailing space
+
+
+

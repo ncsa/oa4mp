@@ -138,9 +138,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     getMultiJSONStoreProvider(),
                     getCmConfigs(),
                     getQDLEnvironment(),
-                    isScitokenEnabled(),
-                    isRFC8693Enabled(),
-                    isWLCGEnabled());
+                    isRFC8693Enabled());
 
             if (getClaimSource() instanceof BasicClaimsSourceImpl) {
                 ((BasicClaimsSourceImpl) getClaimSource()).setOa2SE((OA2SE) se);
@@ -203,38 +201,12 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                    // the configuration
                    rfc8693Enabled = Boolean.TRUE;
                }
+               DebugUtil.trace(this, "RFC 8693 support enabled? " + rfc8693Enabled);
            }
            return rfc8693Enabled;
        }
 
-    Boolean scitokenEnabled = null;
 
-    protected Boolean isScitokenEnabled() {
-        if (scitokenEnabled == null) {
-            try {
-                scitokenEnabled = Boolean.parseBoolean(getFirstAttribute(cn, OA4MPConfigTags.ENABLE_SCITOKEN_SUPPORT));
-            } catch (Throwable t) {
-                // use default which is to disabled. We let this be null to trigger pulling the value, if any, out of the
-                // the configuration
-                scitokenEnabled = Boolean.FALSE;
-            }
-        }
-        return scitokenEnabled;
-    }
-    Boolean wlcgEnabled = null;
-
-    protected Boolean isWLCGEnabled() {
-        if (wlcgEnabled == null) {
-            try {
-                wlcgEnabled = Boolean.parseBoolean(getFirstAttribute(cn, OA4MPConfigTags.ENABLE_WLCG_SUPPORT));
-            } catch (Throwable t) {
-                // use default which is to disabled. We let this be null to trigger pulling the value, if any, out of the
-                // the configuration
-                wlcgEnabled = Boolean.FALSE;
-            }
-        }
-        return wlcgEnabled;
-    }
     protected CMConfigs createDefaultCMConfig() {
         CMConfigs cmConfigs = new CMConfigs();
         String serverAddress = getServiceAddress().toString();

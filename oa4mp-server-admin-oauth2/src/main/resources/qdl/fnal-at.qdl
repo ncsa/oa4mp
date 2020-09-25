@@ -11,6 +11,8 @@
    tokens{
        access{
           type=wlcg
+          aud= "https://wlcg.cern.ch/jwt/v1/any"
+          lifetime=
           qdl{
              load="vfs#/scripts/fnal.qdl"
              xmd={exec_phase=post_token}
@@ -30,7 +32,7 @@ jeff_test := claims.sub ==  'http://cilogon.org/serverD/users/55' // me via NCSA
 if[
     !is_defined(claims.eppn)
  ]then[
-     claims.eppn := 'warning -- no EPPN detected; // just in case.
+     claims.eppn := 'warning -- no EPPN detected'; // just in case.
 ];
 if[
     // Even though this client is managed by FNAL, it is possible they use a different IDP.
