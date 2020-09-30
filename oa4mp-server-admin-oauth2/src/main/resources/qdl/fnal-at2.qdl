@@ -1,6 +1,7 @@
 /*
    This script will pull information from a claim source and compute the resulting
-   capabilities for the acccess token from that.
+   capabilities for the access token from that. Strategy is simple: The exact tokens
+   allowed are in the source, so pass back those that match from teh request.
 
    Script for the client
 
@@ -8,7 +9,7 @@
           access{
              type=wlcg
              issuer="https:cilogon.org"
-             aud= "https://wlcg.cern.ch/jwt/v1/any"
+             aud="https://wlcg.cern.ch/jwt/v1/any"
              lifetime=3600000
              qdl{
                 load="vfs#/scripts/fnal-at2.qdl"

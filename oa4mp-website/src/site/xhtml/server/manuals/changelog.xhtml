@@ -11,16 +11,24 @@
 <!--#include virtual="../../header.html" -->
 <p>Changes to the OA4MP server by version.</p>
 <h2>5.0</h2>
+<p>Release date 2020-09-30</p>
 <ul>
-    <li>CIL-708, CIL-689: Verify RFC 8693 (token exchange endpoint) compliance.</li>
-    <li>CIL-720: Update dynamic client registration webpage to list required parameters.</li>
-    <li>CIL-725: (RFC 7592) Allow admin clients to set the scopes of clients they administer.</li>
-    <li>CIL-729: Limited support for ISO 6429. This affects command line clients and utilities only.</li>
-    <li>CIL-737: Allow for prompt = select_login. Henceforth we accept all standard prompts except "none" and
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-675">CIL-675</a>,
+        <a href="https://jira.ncsa.illinois.edu/browse/CIL-631">CIL-631:</a>:SciTokens/WLCG support.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-696">CIL-696</a>: Code management. Bottom line is that the wars and jars are huge because we have dependencies that use IBM's international character support.
+        Actual OA4MP code runs at about 7% or less of what is in a given war or jar.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-708">CIL-708</a>,
+        <a href="https://jira.ncsa.illinois.edu/browse/CIL-689">CIL-689</a>: Verify RFC 8693 (token exchange endpoint) compliance.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-720">CIL-720</a>: Update dynamic client registration webpage to list required parameters.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-725">CIL-725</a>: (RFC 7592) Allow admin clients to set the scopes of clients they administer.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-729">CIL-729</a>: Limited support for ISO 6429. This affects command line clients and utilities only.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-737">CIL-737</a>: Allow for prompt = select_login. Henceforth we accept all standard prompts except "none" and
         "consent".
     </li>
-    <li>CIL-739: Restrict to absolute URIs callbacks only.</li>
-
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-738">CIL-738</a>: Implement subset of
+        <a href="https://tools.ietf.org/html/rfc7662">RFC 7662</a>, the token introspection endpoint.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-739">CIL-739</a>: Restrict to absolute URIs callbacks only.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-836">CIL-836</a>: Make <a href="https://cilogon.github.io/qdl/index.html">QDL</a> support official.</li>
 </ul>
 
 <h2>4.4.4</h2>

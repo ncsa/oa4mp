@@ -50,12 +50,12 @@ public class NCSALDAPClaimSource extends LDAPClaimsSource {
     public NCSALDAPClaimSource(OA2SE oa2SE) {
         super(oa2SE);
     }
-
+    // This is to test that this works.
     String rawConfig = " {\n" +
             "        \"ldap\": {\n" +
             "          \"id\": \"ncsa-default\",\n" +
             "          \"name\": \"ncsa-default\",\n" +
-            "          \"address\": \"ldap1.ncsa.illinois.edu,ldap2.ncsa.illinois.edu\",\n" +
+            "          \"address\": \"ldap4.ncsa.illinois.edu, ldap2.ncsa.illinois.edu,ldap1.ncsa.illinois.edu\",\n" +
             "          \"port\": 636,\n" +
             "          \"enabled\": true,\n" +
             "          \"authorizationType\": \"none\",\n" +

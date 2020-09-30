@@ -8,6 +8,7 @@ import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.oauth_2_0.server.UnsupportedScopeException;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
@@ -315,7 +316,11 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
             String[] searchAttributes = attributes.keySet().toArray(new String[]{});
             searchControls.setReturningAttributes(searchAttributes);
         }
-        String filter = "(&(" + getSearchFilterAttribute() + "=" + userID + ")" + getLDAPCfg().getAdditionalFilter() + ")";
+        String addFilter = "";
+        if(!StringUtils.isTrivial(getLDAPCfg().getAdditionalFilter())){
+            addFilter = "(" + getLDAPCfg().getAdditionalFilter() + ")";
+        }
+        String filter = "(&(" + getSearchFilterAttribute() + "=" + userID + ")" + addFilter + ")";
         String contextName = getLDAPCfg().getContextName();
         if(contextName == null){
             // You could use this with the search base but that gets complicated. We lookup the context
@@ -325,6 +330,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
 
             contextName = ""; // MUST be set or the query will fail. This is the default
         }
+        DebugUtil.trace(this, "filter = " + filter);
         NamingEnumeration e = ctx.search(contextName, filter, searchControls);
         return toJSON(attributes, e, userID);
     }

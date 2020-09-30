@@ -9,6 +9,8 @@ import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2TokenForge;
 import edu.uiuc.ncsa.security.util.TestBase;
 
+import java.util.Date;
+
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 3/25/14 at  11:29 AM
@@ -50,6 +52,7 @@ public class RefreshTokenStoreTest extends TestBase {
 
         st2.setAuthorizationGrant(ag);
         st2.setRefreshTokenLifetime(EXPIRES_IN);
+        st2.setAuthTime(new Date());
         tStore.save(st2);
         OA2ServiceTransaction testST = rts.get(rt);
         assert testST.equals(st2) : "Error: created transaction is not fetched faithfully from the store";

@@ -10,6 +10,7 @@ import edu.uiuc.ncsa.qdl.variables.StemEntry;
 import edu.uiuc.ncsa.qdl.variables.StemList;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -68,6 +69,8 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
     }
 
     protected StemVariable doNCSA(StemVariable arg, String username) {
+        DebugUtil.setIsEnabled(true);
+        DebugUtil.setDebugLevel(DebugUtil.DEBUG_LEVEL_TRACE);
         NCSALDAPClaimSource ncsaldapClaimSource = (NCSALDAPClaimSource) ConfigtoCS.convert(arg);
         OA2ServiceTransaction t = new OA2ServiceTransaction((Identifier) null);
         t.setUsername(username);
@@ -157,7 +160,6 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
     }
 
 
-
     protected static void testFS() {
         StemVariable mystem = new StemVariable();
         mystem.put(CS_DEFAULT_TYPE, CS_TYPE_FILE);
@@ -191,10 +193,22 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
 
     }
 
+    protected static void testNCSA() {
+        CreateSourceConfig csc = new CreateSourceConfig();
+        StemVariable cfg = new StemVariable();
+
+        csc.doNCSA(new StemVariable(), cfg); // populates the cfg
+        System.out.println("NCSA default config:" + cfg.toString(1));
+        ClaimsSourceGetter cst = new ClaimsSourceGetter();
+        StemVariable claims = (StemVariable) cst.evaluate(new Object[]{cfg, "jgaynor"});
+        System.out.println(claims.toString(2));
+
+    }
+
     protected static void testLDAP() {
         StemVariable mystem = new StemVariable();
         mystem.put(CS_DEFAULT_TYPE, CS_TYPE_LDAP);
-        mystem.put(CS_LDAP_SERVER_ADDRESS, "ldap1.ncsa.illinois.edu,ldap2.ncsa.illinois.edu");
+        mystem.put(CS_LDAP_SERVER_ADDRESS, "ldap4.ncsa.illinois.edu,ldap2.ncsa.illinois.edu,ldap1.ncsa.illinois.edu");
         mystem.put(CS_LDAP_AUTHZ_TYPE, "none");
         mystem.put(CS_LDAP_SEARCH_NAME, "uid");
         mystem.put(CS_DEFAULT_IS_ENABLED, Boolean.TRUE);
@@ -214,7 +228,7 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
         groupNames.put("0", "memberOf");
         mystem.put(CS_LDAP_SEARCH_ATTRIBUTES, sa);
         mystem.put(CS_LDAP_GROUP_NAMES, groupNames);
-
+        System.out.println("\n-----\nldap cfg:\n-----\n" + mystem.toString(1));
         ClaimsSourceGetter cst = new ClaimsSourceGetter();
         StemVariable claims = (StemVariable) cst.evaluate(new Object[]{mystem, "jgaynor"});
         System.out.println(claims.toString(2));
@@ -226,6 +240,9 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
         testFS();
         System.out.println("Testing LDAP claims");
         testLDAP();
+        System.out.println("Testing NCSA claims");
+        testNCSA();
+
     }
 
     @Override

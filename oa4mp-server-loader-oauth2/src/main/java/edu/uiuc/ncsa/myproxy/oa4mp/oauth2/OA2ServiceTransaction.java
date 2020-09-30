@@ -262,7 +262,7 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         this.authTime = authTime;
     }
 
-    Date authTime = null;
+    Date authTime = new Date(); 
 
     /**
      * The <b><i>resolved</i></b> scopes for this transaction. This means that the intersection of the client's allowed

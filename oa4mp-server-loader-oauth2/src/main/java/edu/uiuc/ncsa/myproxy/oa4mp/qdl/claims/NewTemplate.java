@@ -66,6 +66,11 @@ public class NewTemplate implements QDLFunction, CSConstants {
         doc.add(getName() + "(type) creates a template with the minimum required arguments for a source of this type.");
         doc.add("Generally you use this, then call create_source to add all the other required values before either");
         doc.add("testing it or adding it as a claim source.");
+        doc.add("Supported types are:");
+        doc.add(CS_TYPE_FILE + " - for file-based claims");
+        doc.add(CS_TYPE_HEADERS + " - for claims that are delivered in the HTTP headers");
+        doc.add(CS_TYPE_LDAP + " - to get claims from a generic LDAP");
+        doc.add(CS_TYPE_NCSA + " - to get claims from the NCSA LDAP (NOTE requires you be on the NCSA internal network!)");
         return doc;
     }
 }

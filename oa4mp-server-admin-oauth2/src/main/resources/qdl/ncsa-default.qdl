@@ -1,0 +1,13 @@
+/*
+   Default NCSA LDAP claim source. This will retrieve all group membership information.
+   This will do nothing unless the IDP is correct.
+*/
+
+if[
+    claims.idp == ''
+]then[
+   cfg. := new_template('ncsa');
+   claims.uid := claims.eppn - '@illinois.edu';
+   cfg. := create_source(cfg.); // let it fill in all the defaults.
+   list_append(claim_sources., create_source(cfg.));
+]; //end if

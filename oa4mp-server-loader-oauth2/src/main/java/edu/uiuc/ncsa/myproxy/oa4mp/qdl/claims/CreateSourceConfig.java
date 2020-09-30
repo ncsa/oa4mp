@@ -57,9 +57,50 @@ public class CreateSourceConfig implements QDLFunction, CSConstants {
         }
         return output;
     }
+        /*
+        {
+         auth_type=none,
+         address=ldap4.ncsa.illinois.edu,ldap2.ncsa.illinois.edu,ldap1.ncsa.illinois.edu,
+         groups.= {
+          0=memberOf
+         },
+         claim_name=uid,
+         search_base=ou=People,dc=ncsa,dc=illinois,dc=edu,
+         search_attributes.= {
+          0=mail,
+          1=uid,
+          2=uidNumber,
+          3=cn,
+          4=memberOf
+         },
+         type=ldap,
+         enabled=true,
+         ldap_name=uid
+        }
 
-    private void doNCSA(StemVariable arg, StemVariable output) {
+         */
+    protected void doNCSA(StemVariable arg, StemVariable output) {
+        output.put(CS_LDAP_SERVER_ADDRESS, "ldap4.ncsa.illinois.edu,ldap2.ncsa.illinois.edu,ldap1.ncsa.illinois.edu");
+        output.put(CS_LDAP_PORT, 636L);
+        output.put(CS_DEFAULT_TYPE, "ldap");
+        output.put(CS_LDAP_SEARCH_NAME, "uid"); //
+        output.put(CS_LDAP_SEARCH_FILTER_ATTRIBUTE, "uid");
+        output.put(CS_DEFAULT_IS_ENABLED, Boolean.TRUE);
+        output.put(CS_DEFAULT_FAIL_ON_ERROR, Boolean.FALSE); // failures are not show stoppers
+        output.put(CS_DEFAULT_NOTIFY_ON_FAIL, Boolean.TRUE); // tell us all about it though.
+        output.put(CS_LDAP_SEARCH_BASE, "ou=People,dc=ncsa,dc=illinois,dc=edu");
+        StemVariable searchAtt = new StemVariable();
+        searchAtt.put(0L, "mail");
+        searchAtt.put(1L, "uid");
+        searchAtt.put(2L, "uidNumber");
+        searchAtt.put(3L, "cn");
+        searchAtt.put(4L, "memberOf");
+        output.put("search_attributes.", searchAtt);
+        StemVariable groups = new StemVariable();
+        groups.put(0L, "memberOf");
+        output.put("groups.", groups);
         output.union(arg);
+
     }
 
     private void doHeaders(StemVariable arg, StemVariable output) {
