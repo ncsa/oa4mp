@@ -79,9 +79,6 @@ public class OA2TConverter<V extends OA2ServiceTransaction> extends TransactionC
         if (t.getNonce() != null && 0 < t.getNonce().length()) {
             map.put(getTCK().nonce(), t.getNonce());
         }
-/*        if (t.getScopes().isEmpty()) {
-            return;
-        }*/
         JSONArray jsonArray = new JSONArray();
         // OK, so in some weird cases the content of the scopes can be a thing called a MorphDynaBean in the JSON
         // library. This is a known issue that sometimes it returns these, so we have to do a test and convert
@@ -101,7 +98,6 @@ public class OA2TConverter<V extends OA2ServiceTransaction> extends TransactionC
         if (t.hasAuthTime()) {
             map.put(getTCK().authTime(), t.getAuthTime());
         }
-   //     map.put(getTCK().flowStates(), t.getFlowStates().toJSON().toString());
         map.put(getTCK().states(), t.getState().toString());
     }
 
