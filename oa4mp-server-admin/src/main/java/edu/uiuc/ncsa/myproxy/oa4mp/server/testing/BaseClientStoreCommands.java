@@ -9,6 +9,7 @@ import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApprovalStore;
 import edu.uiuc.ncsa.security.delegation.storage.BaseClient;
@@ -220,6 +221,20 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
     }
 
     @Override
+    protected String archiveFormat(Identifiable identifiable) {
+        int fieldWidth = 5; // width of field for version number
+        Long version = getVersionFromID(identifiable.getIdentifier());
+        BaseClient client = (BaseClient) identifiable;
+        String caput = "";
+        if(-1 < version){
+            caput = StringUtils.RJustify(version.toString(), fieldWidth);
+        }else{
+            caput = StringUtils.RJustify(" -- ", fieldWidth);
+        }
+        return "|" + caput + "| " + " archived on " + client.getLastModifiedTS();
+    }
+
+    @Override
     protected String format(Identifiable identifiable) {
         BaseClient client = (BaseClient) identifiable;
         ClientApproval ca = (ClientApproval) getClientApprovalStore().get(client.getIdentifier());
@@ -273,16 +288,7 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
     }
 
 
-/*    @Override
-    protected void longFormat(Identifiable identifiable) {
-        BaseClient client = (BaseClient) identifiable;
-        ClientApproval clientApproval = null;
-        if (getClientApprovalStore() != null) {
-            clientApproval = (ClientApproval) getClientApprovalStore().get(client.getIdentifier());
-        }
-        longFormat(client, clientApproval);
 
-    }*/
 
 
     protected void showApproveHelp() {

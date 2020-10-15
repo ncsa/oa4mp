@@ -47,7 +47,7 @@ if[
   ]else[
      // If this is not the NCSA IDP, do a search on their voPersonExternalID
      // to set their uid, then feed their uid to LDAP.
-     // Note that in this project, the only allowed IDPs are NCSA and these!
+     // Note that in this project, the ligo-accessonly allowed IDPs are NCSA and these!
      v := null;
      switch[
         if[claims.idp == idp.github]then[v:=claims.oidc+'@github.com';];
@@ -58,7 +58,8 @@ if[
      f. := new_template('ncsa');
      f.search_filter_attribute := 'voPersonExternalID';
      f.search_attributes.0 := 'uid'; // return the uid from the search as a claim
-     list_append(claim_sources., create_source(f.));
+     c. := get_claims(create_source(f.), v);
+
   ]; // end if
 f. := new_template('ncsa');
 f.search_filter_attribute := 'uid';

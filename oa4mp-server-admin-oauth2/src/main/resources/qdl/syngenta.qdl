@@ -1,0 +1,150 @@
+/*
+    Script for Syngenta client. This is for a client whose attributes are sent over out of band as SAML attributes.
+    They will be available at some point after authorization, but before claim processing, so this has to be run in the
+    pre_auth phase only.
+
+    Jeff Gaynor
+    2020-10-05T19:54:44.283Z
+
+*/
+
+/*
+    The configuration for this client:
+
+        tokens{
+          identity{
+          type=identity
+          qdl{
+              load="vfs#/scripts/syngenta/syngenta.qdl"
+              xmd={exec_phase=pre_auth}
+            }// end qdl
+          } //end identity token
+        } //end tokens
+*/
+if[
+    claims.idp ==  'https://sts.windows.net/06219a4a-a835-44d5-afaf-3926343bfb89/'
+][
+    cfg. := new_template('code');
+    cfg.java_class := 'org.cilogon.oauth2.servlet.claims.SAMLAttributeClaimSource';
+    list_append(claim_sources., to_list(create_source(cfg.)));
+    return(); // naught else to do
+]; //end if
+
+// other option is if it is the NCSA IDP, just process using NCSA LDAP
+
+idp.syngenta := 'https://sts.windows.net/06219a4a-a835-44d5-afaf-3926343bfb89/';
+idp.ncsa := 'https://idp.ncsa.illinois.edu/idp/shibboleth';
+
+if
+   claims.idp == idp.ncsa
+ ]then[
+   load_script('vfs#/scripts/ncsa/ncsa-default.qdl');
+];
+
+
+/*
+  ============= rest of this file is just reference for the old way.
+
+Old script
+
+{
+                      "claims":  {
+                       "preProcessing":   [
+                           {
+                         "$if": [{"$equals":     [
+                          {"$get": ["idp"]},
+                          "https://sts.windows.net/06219a4a-a835-44d5-afaf-3926343bfb89/"
+                         ]}],
+                         "$then": [{"$set_claim_source":     [
+                          "syngenta",
+                          "42"
+                         ]}]
+                        },
+                           {
+                         "$if": [{"$equals":     [
+                          {"$get": ["idp"]},
+                          "https://idp.ncsa.illinois.edu/idp/shibboleth"
+                         ]}],
+                         "$then": [{"$set_claim_source":     [
+                          "LDAP",
+                          "58a170bfe4a59c05"
+                         ]}]
+                        }
+                       ],
+                       "sourceConfig":   [
+                        {"default":    {
+                         "enabled": true,
+                         "failOnError": false,
+                         "id": "42",
+                         "name": "Syngenta SAML attribute source",
+                         "notifyOnFail": false
+                        }},
+                        {"ldap":    {
+                         "address": "ldap.ncsa.illinois.edu",
+                         "authorizationType": "none",
+                         "contextName": "",
+                         "enabled": true,
+                         "failOnError": false,
+                         "id": "58a170bfe4a59c05",
+                         "name": "58a170bfe4a59c05",
+                         "notifyOnFail": false,
+                         "port": 636,
+                         "postProcessing":     [
+                               {
+                           "$if": ["$true"],
+                           "$then": [{"$exclude": ["foo"]}]
+                          },
+                               {
+                           "$if": [{"$not": [{"$isMemberOf": ["prj_sprout"]}]}],
+                           "$then": [{"$accept_requests": ["$false"]}]
+                          }
+                         ],
+                         "preProcessing": [    {
+                          "$if": ["$true"],
+                          "$then": [{"$set":      [
+                           "foo",
+                           {"$drop":       [
+                            "@ncsa.illinois.edu",
+                            "${eppn}"
+                           ]}
+                          ]}]
+                         }],
+                         "searchAttributes":     [
+                               {
+                           "name": "mail",
+                           "returnAsList": false,
+                           "returnName": "email"
+                          },
+                               {
+                           "name": "cn",
+                           "returnAsList": false,
+                           "returnName": "name"
+                          },
+                               {
+                           "isGroup": true,
+                           "name": "memberOf",
+                           "returnAsList": false,
+                           "returnName": "isMemberOf"
+                          }
+                         ],
+                         "searchBase": "ou=People,dc=ncsa,dc=illinois,dc=edu",
+                         "searchName": "foo",
+                         "ssl":     {
+                          "keystore": {},
+                          "password": "changeit",
+                          "tlsVersion": "TLS",
+                          "type": "jks",
+                          "useJavaTrustStore": true
+                         }
+                        }}
+                       ],
+                       "sources": [  {
+                        "alias": "syngenta",
+                        "className": "org.cilogon.oauth2.servlet.claims.SAMLAttrbuteClaimSource"
+                       }]
+                      },
+                      "config": "Syngenta (sprout) client configuration 7/23/2018 ",
+                      "isSaved": true
+                     }
+
+*/

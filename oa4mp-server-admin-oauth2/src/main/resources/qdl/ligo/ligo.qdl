@@ -43,7 +43,7 @@ cfg.groups.0 := 'isMemberOf';
 cfg.ldap_name := 'uid';
 
 
-list_append(sa., 'email');
+list_append(sa., 'email');                                           no
 list_append(sa., 'uin');
 list_append(sa., 'uid');
 list_append(sa., 'isMemberOf');

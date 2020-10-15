@@ -1,0 +1,96 @@
+/*
+   The basic script for all COManage calls to ldap-test.cilogon.org
+
+   syntax:
+      co_manage(principal, password[, search_base]);
+
+   Note that this executes for every user, no matter what IDP they use for the client.
+   That should probably be fixed at some point.
+
+   Jeff Gaynor
+   2020-10-05T21:39:03.764Z
+
+*/
+
+/*
+  Here is the configuration for the client
+  NOTE: You *must* set the principal, password and search_base to whatever makes sense
+        for your client.
+
+    tokens{
+      identity{
+      type=identity
+      qdl{
+          load="vfs#/scripts/co_manage/co-manage.qdl"
+          xmd={exec_phase=pre_auth}
+          args=["principal", "password", "search_base"]
+        }// end qdl
+      } //end identity token
+    } //end tokens
+    
+*/
+
+if[
+  script_args() < 2
+]then[
+  claims.error := 'internal error. Please contact the system administrator.';
+  return();
+];
+
+cfg. := new_template('ldap');
+
+if[
+  2 < script_args()
+]then[
+   cfg.search_base := script_args(2);
+]else[
+   cfg.search_base := 'ou=people,o=OSG,o=CO,dc=cilogon,dc=org'; // default
+]; //end if
+
+cfg.auth_type := 'simple';
+cfg.username := script_args(0);
+cfg.password := script_args(1);
+cfg.address := 'ldap-test.cilogon.org';
+
+list_append(sa., 'givenName');
+cfg.search_attributes. := sa.;
+cfg.rename.givenName := 'given_name';
+
+// Just add it to any existing claim sources.
+i := size(claim_sources.);
+claim_sources.i. :=  create_source(cfg.);
+
+/*
+  Old Code
+  {
+                        "claims":  {
+                         "preProcessing": [  {
+                          "$if": ["$true"],
+                          "$then": [{"$set_claim_source":    [
+                           "LDAP",
+                           "cf6278064953a8fe7a66627fe5d0a15f8840ff26"
+                          ]}]
+                         }],
+                         "sourceConfig": [{"ldap":   {
+                          "address": "ldap-test.cilogon.org",
+                          "authorizationType": "simple",
+                          "enabled": "true",
+                          "id": "cf6278064953a8fe7a66627fe5d0a15f8840ff26",
+                          "password": "XXXXXXX",
+                          "port": 636,
+                          "principal": "YYYYYYY",
+                          "searchAttributes": [   {
+                           "name": "givenName",
+                           "returnAsList": "false",
+                           "returnName": "given_name"
+                          }],
+                          "searchBase": "ou=people,o=OSG,o=CO,dc=cilogon,dc=org",
+                          "searchName": "username"
+                         }}]
+                        },
+                        "config": "Created by COmanage Oa4mpClient Plugin",
+                        "isSaved": true
+                       }
+
+
+*/

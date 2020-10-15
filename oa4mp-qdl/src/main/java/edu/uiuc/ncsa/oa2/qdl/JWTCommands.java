@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.qdl.evaluate.IOEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
 import edu.uiuc.ncsa.qdl.extensions.QDLVariable;
+import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.oauth_2_0.JWTUtil;
@@ -79,7 +80,7 @@ public class JWTCommands implements Serializable {
         }
 
         @Override
-        public Object evaluate(Object[] objects) {
+        public Object evaluate(Object[] objects, State state) {
             File target = null;
             Boolean useNewkeys = true;
             if (0 < objects.length) {
@@ -161,7 +162,7 @@ public class JWTCommands implements Serializable {
         }
 
         @Override
-        public Object evaluate(Object[] objects) {
+        public Object evaluate(Object[] objects, State state) {
             if (objects.length != 1) {
                 throw new IllegalArgumentException("Error:" + getName() + " requires a file name");
             }
@@ -207,7 +208,7 @@ public class JWTCommands implements Serializable {
         }
 
         @Override
-        public Object evaluate(Object[] objects) {
+        public Object evaluate(Object[] objects, State state) {
             if (objects.length != 1) {
                 throw new IllegalArgumentException("Error: " + getName() + " requires a file name.");
             }
@@ -250,7 +251,7 @@ public class JWTCommands implements Serializable {
         int defaultLength = 32;
 
         @Override
-        public Object evaluate(Object[] objects) {
+        public Object evaluate(Object[] objects, State state) {
             List<String> sKeys = null;
             int count = 1;
             int length = defaultLength;
@@ -338,7 +339,7 @@ public class JWTCommands implements Serializable {
         }
 
         @Override
-        public Object evaluate(Object[] objects) {
+        public Object evaluate(Object[] objects, State state) {
             if (jwks == null || jwks.isEmpty()) {
                 return "";
             }
@@ -383,7 +384,7 @@ public class JWTCommands implements Serializable {
         }
 
         @Override
-        public Object evaluate(Object[] objects) {
+        public Object evaluate(Object[] objects, State state) {
             if (jwks == null || jwks.isEmpty()) {
                 throw new IllegalStateException("Error: no keys loaded.");
             }
@@ -443,7 +444,7 @@ public class JWTCommands implements Serializable {
         }
 
         @Override
-        public Object evaluate(Object[] objects) {
+        public Object evaluate(Object[] objects, State state) {
             if (jwks == null || jwks.isEmpty()) {
                 throw new IllegalStateException("Error: No keys have been set.");
             }
@@ -485,7 +486,7 @@ public class JWTCommands implements Serializable {
         }
 
         @Override
-        public Object evaluate(Object[] objects) {
+        public Object evaluate(Object[] objects, State state) {
             if (jwks == null || jwks.isEmpty()) {
                 throw new IllegalStateException("Error: No keys have been set.");
             }
@@ -542,7 +543,7 @@ public class JWTCommands implements Serializable {
         }
 
         @Override
-        public Object evaluate(Object[] objects) {
+        public Object evaluate(Object[] objects, State state) {
             String token = objects[0].toString();
 
             JSONObject[] array = JWTUtil.readJWT(token);
@@ -575,7 +576,7 @@ public class JWTCommands implements Serializable {
         }
 
         @Override
-        public Object evaluate(Object[] objects) {
+        public Object evaluate(Object[] objects, State state) {
             String token = objects[0].toString();
 
             JSONObject[] array = JWTUtil.readJWT(token);

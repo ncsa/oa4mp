@@ -19,6 +19,7 @@ import static edu.uiuc.ncsa.qdl.scripting.Scripts.*;
 
 /**
  * This set of commands lets you put in qdl script and manage them in the command line client.
+ * @deprecated -- format of scripts changed and this was not updated.
  * <p>Created by Jeff Gaynor<br>
  * on 2/24/20 at  12:38 PM
  */

@@ -159,6 +159,7 @@ public class OA2MPService extends OA4MPService {
         parameters.put(STATE, a.getState()); // random state is ok.
         parameters.put(NONCE, a.getNonce());
         parameters.put(PROMPT, PROMPT_LOGIN);
+        parameters.putAll(((OA2ClientEnvironment)getEnvironment()).getAdditionalParameters());
     }
 
 /*

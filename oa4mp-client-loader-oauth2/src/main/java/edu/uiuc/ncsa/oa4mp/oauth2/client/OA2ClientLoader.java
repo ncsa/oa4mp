@@ -25,6 +25,8 @@ import javax.inject.Provider;
 import java.net.URI;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.client.ClientEnvironment.CALLBACK_URI_KEY;
 
@@ -49,11 +51,20 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
 
     protected Collection<String> scopes = null;
 
-    public Collection<String> getScopes() throws IllegalAccessException, InstantiationException, ClassNotFoundException {
+    public Collection<String> getScopes() {
         if (scopes == null) {
             scopes = OA2ConfigurationLoaderUtils.getScopes(cn);
         }
         return scopes;
+    }
+
+    Map<String, List<String>> additionalParameters = null;
+
+    public Map<String, List<String>> getAdditionalParameters() {
+        if (additionalParameters == null) {
+            additionalParameters = OA2ConfigurationLoaderUtils.getAdditionalParameters(cn);
+        }
+        return additionalParameters;
     }
 
     /**
@@ -95,7 +106,8 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
                     getWellKnownURI(),
                     isOIDCEnabled(),
                     isShowIDToken(),
-                    isUseBasicAuth()
+                    isUseBasicAuth(),
+                    getAdditionalParameters()
             );
         } catch (Throwable e) {
             throw new GeneralException("Unable to create client environment", e);
@@ -127,6 +139,7 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
     /**
      * An option for the (demo) client that specifies that the user should be shown the ID token at some point.
      * Default is <code>false</code>
+     *
      * @return
      */
     public boolean isShowIDToken() {
@@ -147,9 +160,9 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
         if (oidcEnabled == null) {
             oidcEnabled = Boolean.TRUE; // default
             String content = getCfgValue(ClientXMLTags.OIDC_ENABLED);
-            if(content == null || content.isEmpty()){
+            if (content == null || content.isEmpty()) {
                 // use default
-               return oidcEnabled;
+                return oidcEnabled;
             }
             try {
                 oidcEnabled = Boolean.parseBoolean(content);

@@ -112,7 +112,6 @@ public class OA2ClientCommands extends ClientStoreCommands {
         }
     }
 
-
     protected void removeCB(OA2Client client, Collection<String> cbs) throws IOException {
         if (cbs.isEmpty()) {
             //    say("Enter callbacks to remove. A blank line ends input");

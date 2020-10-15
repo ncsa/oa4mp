@@ -1,0 +1,7 @@
+
+say('phase = ' + exec_phase);
+// This needs to be run later
+at. := at_init('wlcg', null);
+say(at.);
+at. := at_finish('wlcg',  at., false);
+say(at.);

@@ -12,7 +12,7 @@
        access{
           type=wlcg
           aud= "https://wlcg.cern.ch/jwt/v1/any"
-          lifetime=
+          lifetime=43200000 // 12 hours in milliseconds.
           qdl{
              load="vfs#/scripts/fnal.qdl"
              xmd={exec_phase=post_token}

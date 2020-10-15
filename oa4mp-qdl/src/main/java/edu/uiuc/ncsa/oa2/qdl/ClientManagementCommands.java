@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientConverter;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
+import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
@@ -27,7 +28,7 @@ import java.util.List;
  * <p>Created by Jeff Gaynor<br>
  * on 3/31/20 at  11:07 AM
  */
-public class ClientCommands implements Serializable {
+public class ClientManagementCommands implements Serializable {
     public MyLoggingFacade getLogger() {
         return logger;
     }
@@ -101,7 +102,7 @@ public class ClientCommands implements Serializable {
         }
 
         @Override
-        public Object evaluate(Object[] objects) {
+        public Object evaluate(Object[] objects, State state) {
             init(objects[0].toString(), objects[1].toString());
             return true;
         }
@@ -111,6 +112,7 @@ public class ClientCommands implements Serializable {
         public List<String> getDocumentation(int argCount) {
             List<String> doxx = new ArrayList<>();
             doxx.add(getName() + "(file, name) - reads the configuration file and then loads the configuration with the given name. ");
+            doxx.add("This sets the configuration and name. " + READ_NAME + " is used to read a specific client by id and returns a client.");
             doxx.add("This must be called before any other function.");
             return doxx;
         }
@@ -130,7 +132,7 @@ public class ClientCommands implements Serializable {
         }
 
         @Override
-        public Object evaluate(Object[] objects) {
+        public Object evaluate(Object[] objects, State state) {
             checkInit();
             try {
                 OA2Client client = (OA2Client) getEnvironment().getClientStore().get(BasicIdentifier.newID(objects[0].toString()));
@@ -145,6 +147,7 @@ public class ClientCommands implements Serializable {
         public List<String> getDocumentation(int argCount) {
             List<String> doxx = new ArrayList<>();
             doxx.add(getName() + "(id) - read the client with the given identifier. This will return a stem representation of the client. ");
+            doxx.add("You may have several active clients at once.");
             doxx.add(checkInitMessage);
             return doxx;
         }
@@ -186,7 +189,7 @@ public class ClientCommands implements Serializable {
         //  client. := cm#read('${id}')
         // cm#save(client.)
         @Override
-        public Object evaluate(Object[] objects) {
+        public Object evaluate(Object[] objects, State state) {
             checkInit();
             if (!(objects[0] instanceof StemVariable)) {
                 throw new IllegalArgumentException("Error: The argument must be a stem variable");
@@ -240,7 +243,7 @@ public class ClientCommands implements Serializable {
         }
 
         @Override
-        public Object evaluate(Object[] objects) {
+        public Object evaluate(Object[] objects, State state) {
             checkInit();
             String key = objects[0].toString();
             String regex = objects[1].toString();
@@ -264,6 +267,7 @@ public class ClientCommands implements Serializable {
         public List<String> getDocumentation(int argCount) {
             List<String> doxx = new ArrayList<>();
             doxx.add(getName() + "(key, regex) -  search for all clients with the given key whose values satisfy the regex.");
+            doxx.add("Note especially this returns a bunch of stems, one for each client that is found, so it is equivalent to a multi-read");
             doxx.add(checkInitMessage);
             return doxx;
         }
@@ -283,7 +287,7 @@ public class ClientCommands implements Serializable {
         }
 
         @Override
-        public Object evaluate(Object[] objects) {
+        public Object evaluate(Object[] objects, State state) {
             checkInit();
             try {
                 return new Long(getEnvironment().getClientStore().size());
@@ -316,7 +320,7 @@ public class ClientCommands implements Serializable {
         }
 
         @Override
-        public Object evaluate(Object[] objects) {
+        public Object evaluate(Object[] objects, State state) {
             checkInit();
             try {
                 Identifier id = BasicIdentifier.newID(objects[0].toString());
@@ -351,7 +355,7 @@ public class ClientCommands implements Serializable {
         }
 
         @Override
-        public Object evaluate(Object[] objects) {
+        public Object evaluate(Object[] objects, State state) {
             checkInit();
             OA2ClientConverter cc = null;
             try {
@@ -393,7 +397,7 @@ public class ClientCommands implements Serializable {
         //  q. := cm#search('client_id', '.*23.*')
         //   cm#approve(q.0.client_id)
         @Override
-        public Object evaluate(Object[] objects) {
+        public Object evaluate(Object[] objects, State state) {
             checkInit();
 
             Identifier id = BasicIdentifier.newID(objects[0].toString());

@@ -13,6 +13,7 @@ import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import javax.inject.Provider;
 import java.net.URI;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -81,7 +82,8 @@ public class OA2ClientEnvironment extends ClientEnvironment {
                                 String wellKnownURI,
                                 boolean oidcEnabled,
                                 boolean showIDToken,
-                                boolean useBasicAuth) {
+                                boolean useBasicAuth,
+                                Map<String,List<String>> additionalParameters) {
         super(logger,
                 constants,
                 accessTokenUri,
@@ -113,7 +115,18 @@ public class OA2ClientEnvironment extends ClientEnvironment {
         this.oidcEnabled = oidcEnabled;
         this.showIDToken = showIDToken;
         this.useBasicAuth = useBasicAuth;
+        this.additionalParameters = additionalParameters;
     }
+
+    public Map<String, List<String>> getAdditionalParameters() {
+        return additionalParameters;
+    }
+
+    public void setAdditionalParameters(Map<String, List<String>> additionalParameters) {
+        this.additionalParameters = additionalParameters;
+    }
+
+    Map<String,List<String>> additionalParameters;
 
     public boolean isUseBasicAuth() {
         return useBasicAuth;

@@ -5,8 +5,11 @@ import com.typesafe.config.ConfigFactory;
 import com.typesafe.config.ConfigRenderOptions;
 import edu.uiuc.ncsa.qdl.util.FileUtil;
 import edu.uiuc.ncsa.security.core.Identifiable;
+import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.XMLConverter;
+import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
+import edu.uiuc.ncsa.security.core.util.DoubleHashMap;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.XMLMap;
@@ -19,6 +22,7 @@ import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
 
 import java.io.*;
+import java.net.URI;
 import java.util.*;
 
 import static edu.uiuc.ncsa.security.core.util.StringUtils.*;
@@ -44,6 +48,7 @@ public abstract class StoreCommands2 extends StoreCommands {
     public StoreCommands2(MyLoggingFacade logger, Store store) {
         super(logger, store);
     }
+
     protected void showSerializeHelp() {
         say("serializes an object and either shows it on the command line or put it in a file. Cf. deserialize.");
         say("serialize  [-file path] index");
@@ -244,13 +249,13 @@ public abstract class StoreCommands2 extends StoreCommands {
             // put in the identifier
             MapConverter mc = (MapConverter) getStore().getXMLConverter();
 
-           subset.put(mc.getKeys().identifier(), x.getIdentifierString());
-           for(String key : keys){
-               if(c.containsKey(key)){
-                   subset.put(key, c.get(key));
-               }
-           }
-           c = subset; // set it to the right variable to get serialized.
+            subset.put(mc.getKeys().identifier(), x.getIdentifierString());
+            for (String key : keys) {
+                if (c.containsKey(key)) {
+                    subset.put(key, c.get(key));
+                }
+            }
+            c = subset; // set it to the right variable to get serialized.
         }
 
         try {
@@ -1046,5 +1051,269 @@ public abstract class StoreCommands2 extends StoreCommands {
         InputLine inputLine = new InputLine(v);
     }
 
+    MapConverter mapConverter = null;
 
+    protected MapConverter getMapConverter() {
+        if (mapConverter == null) {
+            XMLConverter xmlConverter = getStore().getXMLConverter();
+            if (!(xmlConverter instanceof MapConverter)) {
+                warn("internal error: The XML converter for the store is not a MapConverter.");
+                say("internal error: check logs");
+                return null;
+            }
+            mapConverter = (MapConverter) xmlConverter;
+        }
+        return mapConverter;
+    }
+
+    protected long getVersionFromID(Identifier id) {
+        URI uri = id.getUri();
+        String fragment = uri.getFragment();
+        if (StringUtils.isTrivial(fragment)) {
+            return -1L;
+        }
+        try {
+            return Long.parseLong(fragment.substring(fragment.indexOf(ARCHIVE_VERSION_SEPARATOR_TAG) + 1));
+        } catch (NumberFormatException nfx) {
+            return -1L;
+        }
+
+
+    }
+
+    /**
+     * @param inputLine
+     * @throws Exception
+     * @experimental
+     */
+    public void archive(InputLine inputLine) throws Exception {
+        if (showHelp(inputLine)) {
+            showArchiveHelp();
+            return;
+        }
+        // special case -- show accepts the version number. If we aren't careful, the version number
+        // will get fed to the findItem call and give very bad results.
+        // Intercept it here for later if needed.
+        boolean isShow = inputLine.hasArg(ARCHIVE_SHOW_FLAG);
+        String showArg = null;
+        if (isShow) {
+             showArg = inputLine.getNextArgFor(ARCHIVE_SHOW_FLAG);
+            inputLine.removeSwitchAndValue(ARCHIVE_SHOW_FLAG);
+        }
+        Identifiable identifiable = findItem(inputLine);
+        if (identifiable == null) {
+            say("sorry, I could not find that object. Check your id.");
+            return;
+        }
+        MapConverter mc = getMapConverter();
+
+          /*
+          Contract is that identifiers never have fragments -- these are used by the system for information.
+          In this case, a fragment of the form version_x where x is a non-negative integer is added.
+           */
+        if (inputLine.hasArg(ARCHIVE_VERSIONS_FLAG)) {
+            // Grab each client and run through information about them
+            List<Identifiable> values = getStore().search
+                    (mc.getKeys().identifier(),
+                            identifiable.getIdentifierString() + ".*",
+                            true);
+
+
+            TreeMap<Long, Identifiable> sortedMap = new TreeMap<>();
+            // There is every reason to assume that there will be gaps ion the number sequences over time.
+            // create a new set of these and manage the order manually.
+
+            for (Identifiable x : values) {
+                long version = getVersionFromID(x.getIdentifier());
+                if (-1 < version) {
+                    sortedMap.put(version, x);
+                }
+            }
+            if (sortedMap.isEmpty()) {
+                sayi("(no archived versions)");
+                return;
+            }
+            say("archived versions of " + identifiable.getIdentifierString() + ":");
+            // Now we run through them all in order
+            for (Long index : sortedMap.keySet()) {
+                say(archiveFormat(sortedMap.get(index)));
+            }
+            return;
+        }
+        if (inputLine.hasArg(ARCHIVE_RESTORE_FLAG)) {
+            String rawTargetVersion = inputLine.getNextArgFor(ARCHIVE_RESTORE_FLAG);
+            boolean doLatest = rawTargetVersion.equals(ARCHIVE_LATEST_VERSION_ARG);
+            DoubleHashMap<URI, Long> versionNumbers = getVersions(identifiable);
+            if (versionNumbers.isEmpty()) {
+                say("no versions found for \"" + identifiable.getIdentifierString() + "\"");
+                return;
+            }
+            long targetVersion = 0L;
+            if (doLatest) {
+                targetVersion = getLatestVersionNumber(versionNumbers);
+            } else {
+                try {
+                    targetVersion = Long.parseLong(rawTargetVersion);
+                } catch (NumberFormatException nfx) {
+                    say("sorry, but \"" + rawTargetVersion + "\" could not be parsed as a version number");
+                    return;
+                }
+            }
+            URI id = versionNumbers.getByValue(targetVersion);
+            if (id == null) {
+                say("sorry, but the version you requested \"" + rawTargetVersion + "\" does not exist.");
+                return;
+            }
+            Identifiable storedVersion = (Identifiable) getStore().get(BasicIdentifier.newID(id));
+            if (getInput("Are you sure that you want to replace the current version with version \"" + targetVersion + "\"?(y/n)", "n").equals("y")) {
+                // TODO Maybe put some version information inside the object?????
+                // Practical problem is that there is no place to necessarily put it in the general case.
+                // So version number, timestamp for version?
+                // What to do with these if the version is restored?
+                storedVersion.setIdentifier(identifiable.getIdentifier());
+                getStore().save(storedVersion);
+            } else {
+                say("aborted.");
+                return;
+            }
+
+        }
+        if (isShow) {
+            long targetVersion = -1L;
+
+            DoubleHashMap<URI, Long> versionNumbers = getVersions(identifiable);
+            if (showArg.equalsIgnoreCase(ARCHIVE_LATEST_VERSION_ARG)) {
+                targetVersion = getLatestVersionNumber(versionNumbers);
+            } else {
+                try {
+                    targetVersion = Long.parseLong(showArg);
+                } catch (NumberFormatException nfx) {
+                    say("sorry but the version number you supplied \"" + targetVersion + "\" is not a number.");
+                    return;
+                }
+            }
+            if (versionNumbers.getByValue(targetVersion) == null) {
+                say("sorry, but " + targetVersion + " is not the number of a version for \"" + identifiable.getIdentifierString() + "\".");
+                return;
+            }
+            Identifiable target = (Identifiable) getStore().get(BasicIdentifier.newID(versionNumbers.getByValue(targetVersion)));
+            longFormat(target, true); // show everything!
+            return;
+        }
+        // If we are at this point, then the user wants to version the object
+        DoubleHashMap<URI, Long> versionNumbers = getVersions(identifiable);
+        long newIndex = getLatestVersionNumber(versionNumbers) + 1;
+        if (!getInput("Archive object \"" + identifiable.getIdentifierString() + "\"?(y/n)", "n").equals("y")) {
+            say("aborted.");
+            return;
+        }
+        // last check
+        if (newIndex < 0) {
+            say("internal error: check logs");
+            warn("error: in creating a version, a negative version number was encountered. This implies something is off with auto-numbering.");
+            return;
+        }
+        // to and from map are charged with being faithful at all times, so we use these to clone the
+        Identifiable newVersion = getStore().create();
+        XMLMap map = new XMLMap();
+        mc.toMap(identifiable, map);
+
+        mc.fromMap(map, newVersion);
+
+        Identifier newID = createdVersionedID(identifiable.getIdentifier(), newIndex);
+        newVersion.setIdentifier(newID);
+        getStore().save(newVersion);
+
+
+    }
+
+    String ARCHIVE_VERSION_TAG = "version";
+    String ARCHIVE_VERSION_SEPARATOR_TAG = "=";
+    String ARCHIVE_VERSIONS_FLAG = "-versions";
+    String ARCHIVE_RESTORE_FLAG = "-restore";
+    String ARCHIVE_SHOW_FLAG = "-show";
+    String ARCHIVE_LATEST_VERSION_ARG = "latest";
+
+    protected Identifier createdVersionedID(Identifier id, long version) {
+        URI uri = id.getUri();
+        String rawURI = uri.toString();
+        rawURI = rawURI.substring(rawURI.indexOf("#") + 1);
+        rawURI = rawURI + "#" + ARCHIVE_VERSION_TAG + ARCHIVE_VERSION_SEPARATOR_TAG + Long.toString(version);
+        uri = URI.create(rawURI);
+        return BasicIdentifier.newID(uri);
+
+    }
+
+    /**
+     * Get the latest version number or return a -1 if no versions present.
+     *
+     * @param versionNumbers
+     * @return
+     */
+    protected Long getLatestVersionNumber(DoubleHashMap<URI, Long> versionNumbers) {
+        if (versionNumbers.isEmpty()) {
+            return -1L;
+        }
+        long maxValue = 0L;
+        for (URI key : versionNumbers.keySet()) {
+            maxValue = Math.max(maxValue, versionNumbers.get(key));
+        }
+        return maxValue;
+    }
+
+    /**
+     * For a given object in the store, return all the versions associated with it in a
+     * {@link DoubleHashMap}.
+     *
+     * @param identifiable
+     * @return
+     */
+    protected DoubleHashMap<URI, Long> getVersions(Identifiable identifiable) {
+        MapConverter mc = getMapConverter();
+        List<Identifiable> values = getStore().search
+                (mc.getKeys().identifier(),
+                        identifiable.getIdentifierString() + ".*",
+                        true);
+
+        // now we have to look through the list of clients and determine which is the one we want
+        DoubleHashMap<URI, Long> versionNumbers = new DoubleHashMap<>();
+        for (Identifiable value : values) {
+            URI uri = value.getIdentifier().getUri();
+            String fragment = uri.getFragment();
+            if (!StringUtils.isTrivial(fragment)) {
+                // This does two things. First, it will no show the base version as archived
+                // and secondly, will only add those with a valid versioning fragment
+                String rawIndex = fragment.substring(1 + fragment.indexOf(ARCHIVE_VERSION_SEPARATOR_TAG));
+
+                try {
+                    if (!StringUtils.isTrivial(rawIndex)) {
+                        versionNumbers.put(uri, Long.parseLong(rawIndex));
+                    }
+                } catch (Throwable t) {
+
+                }
+            }
+
+        }
+        return versionNumbers;
+    }
+
+    protected void showArchiveHelp() {
+        say("archive [-versions] | [-restore version] [id] - archive an object");
+        say("This will either create a copy of the current version or restore a versioned object.");
+        say("archive [id]");
+        sayi(" version the object, assigning it the last version.");
+        say("archive -versions [id]  ");
+        sayi("list the versions of an object");
+        say("archive -latest");
+        sayi("Show the number of the latest version (-1 if no versions exist)");
+
+        say("archive -restore (number | latest) [id]");
+        sayi("Restore the given version of this. If a number is given, use that. If the word \"latest\" (no quotes");
+        sayi("is used, give back the latest version.");
+    }
+
+    protected String archiveFormat(Identifiable id) {
+        return format(id);
+    }
 }

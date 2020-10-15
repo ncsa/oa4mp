@@ -23,7 +23,7 @@ public class ClientManagementModule extends JavaModule {
     @Override
     public Module newInstance(State state) {
         ClientManagementModule cmm = new ClientManagementModule(URI.create("oa2:/qdl/oidc/client/manage"), "cm");
-        ClientCommands cc = new ClientCommands();
+        ClientManagementCommands cc = new ClientManagementCommands();
         if(state != null){
             cc.setLogger(state.getLogger());
         }
