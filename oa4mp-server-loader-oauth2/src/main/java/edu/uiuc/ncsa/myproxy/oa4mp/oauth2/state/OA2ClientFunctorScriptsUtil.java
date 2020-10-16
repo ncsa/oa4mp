@@ -44,7 +44,7 @@ import static edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfigurationUt
  * <pre>
  *     runtime = directives to run before any processing. E.g. A condition to determine if claims are to be gotten.
  * </pre>
- * The sourcesConfig-urations are a list of configurations for the claim sources. This allows for multiple configurations
+ * The sourcesConfigurations are a list of configurations for the claim sources. This allows for multiple configurations
  * to be used (e,g. depending on the IDP,  specific LDAP claim sources will be invoked.)
  * <p>Created by Jeff Gaynor<br>
  * on 4/12/18 at  8:16 AM

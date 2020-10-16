@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims;
 
 import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
+import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.exceptions.IllegalAccessException;
 
@@ -27,7 +28,7 @@ public class CreateSourceConfig implements QDLFunction, CSConstants {
     }
 
     @Override
-    public Object evaluate(Object[] objects) {
+    public Object evaluate(Object[] objects, State state) {
         if (objects == null || objects.length == 0) {
             throw new IllegalArgumentException("Error:" + getName() + " requires one argument");
         }
@@ -54,31 +55,43 @@ public class CreateSourceConfig implements QDLFunction, CSConstants {
             case CS_TYPE_HEADERS:
                 doHeaders(arg,output);
                 break;
+            case CS_TYPE_CODE:
+                doCode(arg, output);
+                break;
         }
         return output;
     }
-        /*
-        {
-         auth_type=none,
-         address=ldap4.ncsa.illinois.edu,ldap2.ncsa.illinois.edu,ldap1.ncsa.illinois.edu,
-         groups.= {
-          0=memberOf
-         },
-         claim_name=uid,
-         search_base=ou=People,dc=ncsa,dc=illinois,dc=edu,
-         search_attributes.= {
-          0=mail,
-          1=uid,
-          2=uidNumber,
-          3=cn,
-          4=memberOf
-         },
-         type=ldap,
-         enabled=true,
-         ldap_name=uid
-        }
 
-         */
+    private void doCode(StemVariable arg, StemVariable output) {
+        if(! arg.containsKey(CS_CODE_JAVA_CLASS)){
+            throw new IllegalArgumentException("Error:" + CS_CODE_JAVA_CLASS + " is required for a custom code configuration.");
+        }
+        setBasicValues(arg, output);
+        output.union(arg);
+    }
+
+    /*
+    {
+     auth_type=none,
+     address=ldap4.ncsa.illinois.edu,ldap2.ncsa.illinois.edu,ldap1.ncsa.illinois.edu,
+     groups.= {
+      0=memberOf
+     },
+     claim_name=uid,
+     search_base=ou=People,dc=ncsa,dc=illinois,dc=edu,
+     search_attributes.= {
+      0=mail,
+      1=uid,
+      2=uidNumber,
+      3=cn,
+      4=memberOf
+     },
+     type=ldap,
+     enabled=true,
+     ldap_name=uid
+    }
+
+     */
     protected void doNCSA(StemVariable arg, StemVariable output) {
         output.put(CS_LDAP_SERVER_ADDRESS, "ldap4.ncsa.illinois.edu,ldap2.ncsa.illinois.edu,ldap1.ncsa.illinois.edu");
         output.put(CS_LDAP_PORT, 636L);
@@ -189,8 +202,8 @@ public class CreateSourceConfig implements QDLFunction, CSConstants {
         mystem.put(CS_LDAP_SEARCH_BASE, "ou=People,dc=ncsa,dc=illinois,dc=edu");
 
         CreateSourceConfig csc = new CreateSourceConfig();
-        System.out.println(((StemVariable) csc.evaluate(new Object[]{"ldap"})).toJSON().toString(1));
-        StemVariable out = (StemVariable) csc.evaluate(new Object[]{mystem});
+        System.out.println(((StemVariable) csc.evaluate(new Object[]{"ldap"}, null)).toJSON().toString(1));
+        StemVariable out = (StemVariable) csc.evaluate(new Object[]{mystem}, null);
         System.out.println(out.toJSON().toString(2));
 
     }

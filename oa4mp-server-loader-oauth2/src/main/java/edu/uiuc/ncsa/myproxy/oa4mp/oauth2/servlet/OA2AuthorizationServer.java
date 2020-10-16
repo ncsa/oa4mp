@@ -196,7 +196,7 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
         super.createRedirect(request, response, trans);
         // At this point, all authentication has been done, everything is set up and the next stop in the flow is the
         // redirect back to the client.
-        JWTRunner jwtRunner = new JWTRunner(st2, ScriptRuntimeEngineFactory.createRTE(oa2SE, st2.getOA2Client().getConfig()));
+        JWTRunner jwtRunner = new JWTRunner(st2, ScriptRuntimeEngineFactory.createRTE(oa2SE, st2, st2.getOA2Client().getConfig()));
         OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, st2, request);
 
 /*

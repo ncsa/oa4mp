@@ -1,7 +1,8 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims;
 
 /**
- * The constants for creating claim sources so that they are centralized.
+ * The constants for creating claim sources so that they are centralized.  These are the property names that
+ * appear in QDL configuration objects.
  * <p>Created by Jeff Gaynor<br>
  * on 2/10/20 at  6:31 AM
  */
@@ -24,9 +25,15 @@ public interface CSConstants {
     public String CS_TYPE_LDAP = "ldap";
     public String CS_TYPE_NCSA = "ncsa";
     public String CS_TYPE_HEADERS = "http";
+    public String CS_TYPE_CODE = "code";
     /*
     Specific values for specific configurations
      */
+
+    /*
+       Code-base claim source
+     */
+    public String CS_CODE_JAVA_CLASS = "java_class";
 
     /*
     File based claim sources

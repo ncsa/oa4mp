@@ -33,6 +33,15 @@ if[
    ]else[
       claims.uid := claims.sub;
  ];
+ idp.ncsa :='https://idp.ncsa.illinois.edu/idp/shibboleth';
+ idp.google := 'http://google.com/accounts/o8/id';
+ idp.orcid := 'http://orcid.org/oauth/authorize';
+ id.github := 'http://github.com/login/oauth/authorize';
+ switch[
+    // These should be mutually exclusive.
+    if[is_defined(claims.eppn)][voPersonExternalID := claims.eppn;];
+    if[is_defined(claims.eptid)][voPersonExternalID := claims.eptid];
+ ];
 cfg.auth_type :='none';
 cfg.address := 'ldap.ligo.org';
 cfg.port := 636;
@@ -48,8 +57,7 @@ list_append(sa., 'uin');
 list_append(sa., 'uid');
 list_append(sa., 'isMemberOf');
 cfg.search_attributes. := sa.;
-
-claim_sources.0. := create_source(cfg.);
+claim_sources. := union(claim_sources., [cfg.]);
 
 /* Old functor script on dev
 

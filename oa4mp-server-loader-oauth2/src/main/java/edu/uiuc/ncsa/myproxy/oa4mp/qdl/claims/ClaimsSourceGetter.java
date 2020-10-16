@@ -1,11 +1,9 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.FSClaimSource;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.HTTPHeaderClaimsSource;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.LDAPClaimsSource;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.NCSALDAPClaimSource;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.*;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
+import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.StemEntry;
 import edu.uiuc.ncsa.qdl.variables.StemList;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
@@ -35,7 +33,7 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
     }
 
     @Override
-    public Object evaluate(Object[] objects) {
+    public Object evaluate(Object[] objects, State state) {
         if (objects.length < 2) {
             throw new IllegalArgumentException("Error: " + getName() + " requires at least two arguments");
         }
@@ -56,6 +54,8 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
             headers = (StemVariable) arg.get("headers.");
         }
         switch (arg.getString(CS_DEFAULT_TYPE)) {
+            case CS_TYPE_CODE:
+                return doCode(arg, username, headers);
             case CS_TYPE_FILE:
                 return doFS(arg, username);
             case CS_TYPE_LDAP:
@@ -66,6 +66,19 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
                 return doNCSA(arg, username);
         }
         return null;
+    }
+
+    protected StemVariable doCode(StemVariable arg, String username, StemVariable headers) {
+        BasicClaimsSourceImpl basicClaimsSource = (BasicClaimsSourceImpl) ConfigtoCS.convert(arg);
+        OA2ServiceTransaction t = new OA2ServiceTransaction((Identifier) null);
+        t.setUsername(username);
+        JSONObject claims = new JSONObject();
+        TestHTTPRequest req = new TestHTTPRequest(headers);
+        claims = basicClaimsSource.process(claims, req, t);
+        StemVariable output = new StemVariable();
+        output.fromJSON(claims);
+        return output;
+
     }
 
     protected StemVariable doNCSA(StemVariable arg, String username) {
@@ -165,12 +178,12 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
         mystem.put(CS_DEFAULT_TYPE, CS_TYPE_FILE);
         mystem.put(CS_FILE_FILE_PATH, "/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/test-claims.json");
         CreateSourceConfig csc = new CreateSourceConfig();
-        StemVariable out = (StemVariable) csc.evaluate(new Object[]{mystem});
+        StemVariable out = (StemVariable) csc.evaluate(new Object[]{mystem}, null);
         System.out.println(out.toJSON().toString(2));
 
 
         ClaimsSourceGetter cst = new ClaimsSourceGetter();
-        StemVariable claims = (StemVariable) cst.evaluate(new Object[]{mystem, "jeff"});
+        StemVariable claims = (StemVariable) cst.evaluate(new Object[]{mystem, "jeff"}, null);
         System.out.println("File claim source configuration:");
         System.out.println(claims.toJSON().toString(2));
     }
@@ -185,10 +198,10 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
         mystem.put(CS_LDAP_SEARCH_NAME, "uid");
         mystem.put(CS_LDAP_AUTHZ_TYPE, "none");
         CreateSourceConfig createSourceConfig = new CreateSourceConfig();
-        StemVariable cfg = (StemVariable) createSourceConfig.evaluate(new Object[]{mystem});
+        StemVariable cfg = (StemVariable) createSourceConfig.evaluate(new Object[]{mystem}, null);
 
         ClaimsSourceGetter cst = new ClaimsSourceGetter();
-        StemVariable claims = (StemVariable) cst.evaluate(new Object[]{cfg, "jgaynor"});
+        StemVariable claims = (StemVariable) cst.evaluate(new Object[]{cfg, "jgaynor"}, null);
         System.out.println(claims.toJSON().toString(2));
 
     }
@@ -200,7 +213,7 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
         csc.doNCSA(new StemVariable(), cfg); // populates the cfg
         System.out.println("NCSA default config:" + cfg.toString(1));
         ClaimsSourceGetter cst = new ClaimsSourceGetter();
-        StemVariable claims = (StemVariable) cst.evaluate(new Object[]{cfg, "jgaynor"});
+        StemVariable claims = (StemVariable) cst.evaluate(new Object[]{cfg, "jgaynor"}, null);
         System.out.println(claims.toString(2));
 
     }
@@ -230,7 +243,7 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
         mystem.put(CS_LDAP_GROUP_NAMES, groupNames);
         System.out.println("\n-----\nldap cfg:\n-----\n" + mystem.toString(1));
         ClaimsSourceGetter cst = new ClaimsSourceGetter();
-        StemVariable claims = (StemVariable) cst.evaluate(new Object[]{mystem, "jgaynor"});
+        StemVariable claims = (StemVariable) cst.evaluate(new Object[]{mystem, "jgaynor"}, null);
         System.out.println(claims.toString(2));
 
     }

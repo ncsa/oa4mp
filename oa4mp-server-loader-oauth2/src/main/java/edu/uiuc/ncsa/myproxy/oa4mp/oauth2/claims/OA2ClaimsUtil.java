@@ -37,7 +37,9 @@ import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.*;
 /**
  * This used to be the main claims processing engine until scripting was improved
  * in version 4.4.
- * If you are using it, there is probably something wrong.
+ * If you are using it, there is probably something wrong. It is kept since there is some
+ * good code in it, mostly for reference if something ever breaks, I can refer to this
+ * to see if it had something better.
  * @deprecated 
  * <p>Created by Jeff Gaynor<br>
  * on 4/24/18 at  11:13 AM
@@ -58,7 +60,7 @@ public class OA2ClaimsUtil implements ScriptingConstants {
 
     public ScriptRuntimeEngine getScriptRuntimeEngine() {
         if (scriptRuntimeEngine == null) {
-            scriptRuntimeEngine = ScriptRuntimeEngineFactory.createRTE(oa2se, getOA2Client().getConfig());
+            scriptRuntimeEngine = ScriptRuntimeEngineFactory.createRTE(oa2se, transaction, getOA2Client().getConfig());
         }
         return scriptRuntimeEngine;
     }

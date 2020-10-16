@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.BasicClaimsSourceImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.FSClaimSource;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.HTTPHeaderClaimsSource;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
@@ -7,6 +8,7 @@ import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSourceConfiguration;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfigurationUtil;
+import net.sf.json.JSONObject;
 
 import java.util.*;
 
@@ -23,7 +25,8 @@ import java.util.*;
 public class ClaimSourceConfigConverter implements CSConstants {
     /**
      * Takes a {@link ClaimSource}, grabs it configuration and turns it in to a stem
-     * varaible. This is used to pass back configurations to scripts.
+     * variable. This is used to pass back configurations to scripts.
+     *
      * @param claimsSource
      * @param type
      * @return
@@ -36,6 +39,20 @@ public class ClaimSourceConfigConverter implements CSConstants {
         LDAPConfiguration cfg2 = null;
 
         switch (type) {
+            case CS_TYPE_CODE:
+                if (!(claimsSource instanceof BasicClaimsSourceImpl)) {
+                    throw new IllegalArgumentException("Error: Custom code must extend BasicClaimSourceImpl. The class \"" +
+                            claimsSource.getClass().getCanonicalName() + "\" does not.");
+                }
+                BasicClaimsSourceImpl basicClaimsSource = (BasicClaimsSourceImpl) claimsSource;
+                if (cfg.getProperty(CS_CODE_JAVA_CLASS) == null) {
+                    throw new IllegalStateException("Error: No java class has been set for a custom claim source.");
+                }
+                for(String key: cfg.getProperties().keySet()){
+                    stem.put(key, cfg.getProperty(key)); // First cut is just use strings
+                }
+                
+                break;
             case CS_TYPE_FILE:
                 FSClaimSource fsClaimSource = (FSClaimSource) claimsSource;
                 stem.put(CS_FILE_FILE_PATH, cfg.getProperty(FSClaimSource.FILE_PATH_KEY));
@@ -43,7 +60,7 @@ public class ClaimSourceConfigConverter implements CSConstants {
                     stem.put(CS_FILE_CLAIM_KEY, cfg.getProperty(FSClaimSource.FILE_CLAIM_KEY));
                 }
                 stem.put(CS_USE_DEFAULT_KEY, fsClaimSource.isUseDefaultClaims());
-                if(fsClaimSource.getDefaultClaimName() != null){
+                if (fsClaimSource.getDefaultClaimName() != null) {
                     stem.put(CS_DEFAULT_CLAIM_NAME_KEY, fsClaimSource.getDefaultClaimName());
                 }
                 break;
@@ -66,6 +83,8 @@ public class ClaimSourceConfigConverter implements CSConstants {
                 stem.put(CS_LDAP_ADDITIONAL_FILTER, cfg2.getAdditionalFilter());
                 stem.put(CS_LDAP_PORT, new Long(cfg2.getPort()));
                 stem.put(CS_LDAP_AUTHZ_TYPE, cUtil.getAuthName(cfg2.getAuthType()));
+                stem.put(CS_LDAP_SEARCH_FILTER_ATTRIBUTE, cfg2.getSearchFilterAttribute());
+
                 if (cfg2.getAuthType() == LDAPConfigurationUtil.LDAP_AUTH_SIMPLE_KEY) {
                     stem.put(CS_LDAP_PASSWORD, cfg2.getPassword());
                     stem.put(CS_LDAP_SECURITY_PRINCIPAL, cfg2.getSecurityPrincipal());
@@ -102,8 +121,8 @@ public class ClaimSourceConfigConverter implements CSConstants {
                             listStem.addList(isList);
                             stem.put(CS_LDAP_LISTS, listStem);
                         }
-                        if(renames.size() != 0){
-                             stem.put(CS_LDAP_RENAME, renames);
+                        if (renames.size() != 0) {
+                            stem.put(CS_LDAP_RENAME, renames);
                         }
                     }
 
@@ -118,6 +137,7 @@ public class ClaimSourceConfigConverter implements CSConstants {
     /**
      * Takes a stem variable of the configuration and returns a {@link ClaimSourceConfiguration}
      * object.
+     *
      * @param arg
      * @return
      */
@@ -125,6 +145,10 @@ public class ClaimSourceConfigConverter implements CSConstants {
         ClaimSourceConfiguration cfg = null;
         HashMap<String, Object> xp = new HashMap<>();
         switch (arg.getString(CS_DEFAULT_TYPE)) {
+            case CS_TYPE_CODE:
+                cfg = new ClaimSourceConfiguration();
+                cfg.setProperties((JSONObject)arg.toJSON());
+                return cfg;
             case CS_TYPE_FILE:
                 cfg = new ClaimSourceConfiguration();
                 setDefaultsinCfg(arg, cfg);
@@ -133,28 +157,31 @@ public class ClaimSourceConfigConverter implements CSConstants {
                 if (arg.containsKey(CS_FILE_CLAIM_KEY)) {
                     xp.put(FSClaimSource.FILE_CLAIM_KEY, arg.getString(CS_FILE_CLAIM_KEY));
                 }
-                if(arg.containsKey(CS_USE_DEFAULT_KEY)){
+                if (arg.containsKey(CS_USE_DEFAULT_KEY)) {
                     xp.put(FSClaimSource.USE_DEFAULT_KEY, arg.getBoolean(CS_USE_DEFAULT_KEY));
                 }
-                if(arg.containsKey(CS_DEFAULT_CLAIM_NAME_KEY)){
+                if (arg.containsKey(CS_DEFAULT_CLAIM_NAME_KEY)) {
                     xp.put(FSClaimSource.DEFAULT_CLAIM_KEY, arg.getString(CS_DEFAULT_CLAIM_NAME_KEY));
                 }
                 cfg.setProperties(xp);
                 return cfg;
-            case CS_TYPE_LDAP:                                            
+            case CS_TYPE_LDAP:
 
                 LDAPConfiguration ldapCfg = new LDAPConfiguration();
                 LDAPConfigurationUtil cUtil = new LDAPConfigurationUtil();
                 ldapCfg.setSearchNameKey(arg.getString(CS_LDAP_SEARCH_NAME));
                 ldapCfg.setServer(arg.getString(CS_LDAP_SERVER_ADDRESS));
-                if(arg.containsKey(CS_DEFAULT_IS_ENABLED)) {
+                if(arg.containsKey(CS_LDAP_SEARCH_FILTER_ATTRIBUTE)) {
+                    ldapCfg.setSearchFilterAttribute(arg.getString(CS_LDAP_SEARCH_FILTER_ATTRIBUTE));
+                }
+                if (arg.containsKey(CS_DEFAULT_IS_ENABLED)) {
                     ldapCfg.setEnabled(arg.getBoolean(CS_DEFAULT_IS_ENABLED));
-                }else{
+                } else {
                     ldapCfg.setEnabled(true);
                 }
-                if(arg.containsKey(CS_LDAP_ADDITIONAL_FILTER)){
+                if (arg.containsKey(CS_LDAP_ADDITIONAL_FILTER)) {
                     ldapCfg.setAdditionalFilter(arg.getString(CS_LDAP_ADDITIONAL_FILTER));
-                }else{
+                } else {
                     ldapCfg.setAdditionalFilter("");
                 }
                 if (arg.containsKey(CS_LDAP_CONTEXT_NAME)) {
@@ -192,7 +219,7 @@ public class ClaimSourceConfigConverter implements CSConstants {
                         groups = new ArrayList();
                     }
                     StemVariable renames = null;
-                    if(arg.containsKey(CS_LDAP_RENAME)){
+                    if (arg.containsKey(CS_LDAP_RENAME)) {
                         renames = (StemVariable) arg.get(CS_LDAP_RENAME);
                     }
                     if (arg.containsKey(CS_LDAP_LISTS)) {
@@ -209,8 +236,8 @@ public class ClaimSourceConfigConverter implements CSConstants {
                             throw new IllegalArgumentException("You cannot have a \"" + attrName + "\" be both a group and a list. ");
                         }
                         String rename = attrName;
-                        if(renames != null){
-                            if(renames.containsKey(attrName)){
+                        if (renames != null) {
+                            if (renames.containsKey(attrName)) {
                                 rename = renames.getString(attrName);
                             }
                         }

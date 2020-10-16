@@ -52,6 +52,16 @@ public class BasicRefreshTokenHandler extends AbstractPayloadHandler implements 
     @Override
     public RefreshToken getSignedRT(JSONWebKey key) {
         if (getRTData().isEmpty()) return null;
+        /*
+         Special case: If the claim has a single entry then that is the raw token. Return that. This allows
+         handlers in QDL to decide not to return a JWT and just return a standard identifier.
+          */
+         if(getRTData().size() == 1){
+             String k = String.valueOf(getRTData().keySet().iterator().next());
+             String v = String.valueOf(getRTData().get(k));
+             oa2se.info("Single value in refresh token for \"" + transaction.getOA2Client().getIdentifierString() + "\" found. Setting token value to " + v);
+             return new OA2RefreshTokenImpl(URI.create(v));
+         }
         try {
             if (key == null) {
                 key = new JSONWebKey();

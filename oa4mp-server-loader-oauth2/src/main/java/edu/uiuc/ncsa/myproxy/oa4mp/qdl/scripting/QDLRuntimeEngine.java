@@ -12,12 +12,14 @@ import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.module.ModuleMap;
 import edu.uiuc.ncsa.qdl.scripting.Scripts;
 import edu.uiuc.ncsa.qdl.state.ImportManager;
-import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.StateUtils;
 import edu.uiuc.ncsa.qdl.state.SymbolStack;
 import edu.uiuc.ncsa.qdl.statements.FunctionTable;
+import edu.uiuc.ncsa.qdl.variables.QDLNull;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
+import edu.uiuc.ncsa.security.oauth_2_0.jwt.ScriptRuntimeException;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.ScriptingConstants;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.util.scripting.ScriptInterface;
@@ -48,6 +50,11 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         init();
         setInitialized(false);
 
+    }
+
+    @Override
+    public OA2State getState() {
+        return (OA2State)state; // only thing it can create
     }
 
     public QDLRuntimeEngine(QDLEnvironment qe, JSONObject config) {
@@ -83,15 +90,16 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
 //        setScriptSet(QDLJSONConfigUtil.readScriptSet(config));  // <- old way
         //setScriptSet(AnotherJSONUtil.createScripts(config)); // <- new way
         SymbolStack stack = new SymbolStack();
-        state = new State(ImportManager.getResolver(),
+        state = new OA2State(ImportManager.getResolver(),
                 stack,
                 new OpEvaluator(),
                 MetaEvaluator.getInstance(),
                 new FunctionTable(),
                 new ModuleMap(),
                 null, // no logging at least for now
-                true);// enable server mode.
+                qe.isServerModeOn());// enable/disable server mode. Generally enable it in production.
         state.getOpEvaluator().setNumericDigits(qe.getNumericDigits());
+        state.setScriptPaths(qe.getScriptPath());  // Be sure script paths are read.
         if (qe != null && qe.isEnabled()) {
             try {
                 QDLConfigurationLoaderUtils.setupVFS(qe, state);
@@ -113,13 +121,13 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         }
     }
 
-    State state;
+    OA2State state;
 
     @Override
     public void deserializeState(String state) {
         if (state == null || state.isEmpty()) return;
         try {
-            this.state = StateUtils.loadb64(state);
+            this.state = (OA2State) StateUtils.loadb64(state);
         } catch (Throwable e) {
             if (e instanceof RuntimeException) {
                 throw (RuntimeException) e;
@@ -171,6 +179,9 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         return createSRR();
     }
 
+    protected String SYS_ERR_VAR = "sys_err.";
+    protected String SYS_ERR_OK = "ok";
+    protected String SYS_ERR_MESSAGE = "message";
     protected String FLOW_STATE_VAR = "flow_states.";
     protected String CLAIMS_VAR = "claims.";
     protected String ACCESS_TOKEN_VAR = "access_token.";
@@ -178,6 +189,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
     protected String EXTENDED_ATTRIBUTES_VAR = "xas.";
     protected String AUDIENCE_VAR = "audience.";
     protected String CLAIM_SOURCES_VAR = "claim_sources.";
+    protected String ACCESS_CONTROL = "access_control.";
 
 
     /**
@@ -186,6 +198,9 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
      * @param req
      */
     protected void setupState(ScriptRunRequest req) {
+        state.getSymbolStack().setValue(Scripts.EXEC_PHASE, req.getAction()); // set what is being executed
+
+        state.getSymbolStack().setValue(SYS_ERR_VAR, new StemVariable()); // just an empty one.
         FlowStates2 flowStates = (FlowStates2) req.getArgs().get(SRE_REQ_FLOW_STATES);
         state.getSymbolStack().setValue(FLOW_STATE_VAR, toStem(flowStates));
 
@@ -202,18 +217,18 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
 
         }
         List<String> scopes = (List<String>) req.getArgs().get(SRE_REQ_SCOPES);
-        if(scopes != null && !scopes.isEmpty()) {
+        if (scopes != null && !scopes.isEmpty()) {
             // It is possible for a minimal OAuth 2 client to have no scopes.
             state.getSymbolStack().setValue(SCOPES_VAR, toStem(scopes));
-        }else{
+        } else {
             state.getSymbolStack().setValue(SCOPES_VAR, new StemVariable());
 
         }
 
         List<String> audience = (List<String>) req.getArgs().get(SRE_REQ_AUDIENCE);
-        if(audience != null && !audience.isEmpty()) {
+        if (audience != null && !audience.isEmpty()) {
             state.getSymbolStack().setValue(AUDIENCE_VAR, toStem(audience));
-        }else{
+        } else {
             state.getSymbolStack().setValue(AUDIENCE_VAR, new StemVariable());
         }
 
@@ -222,7 +237,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
             StemVariable eaStem = new StemVariable();
             eaStem.fromJSON((JSONObject) eas);
             state.getSymbolStack().setValue(EXTENDED_ATTRIBUTES_VAR, eaStem);
-        }else{
+        } else {
             state.getSymbolStack().setValue(EXTENDED_ATTRIBUTES_VAR, new StemVariable());
         }
 
@@ -233,6 +248,25 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
             i++;
         }
         state.getSymbolStack().setValue(CLAIM_SOURCES_VAR, sources);
+        // Now do access control
+        // gives variable
+        // access_control.
+        // access_control.client_id == id of calling client
+        // access_control.admins. == list of administrators for this client.
+        StemVariable acl = new StemVariable();
+        acl.put("client_id",  state.getClientID().toString());
+        // Convert to a list of string.
+        ArrayList<Object> adminIDs = new ArrayList<>();
+        for(Identifier id : state.getAdminIDs()){
+            adminIDs.add(id.toString());
+        }
+        StemVariable adminStem = new StemVariable();
+        adminStem.addList(adminIDs);
+        acl.put("admins.", adminStem);
+        state.getSymbolStack().setValue(ACCESS_CONTROL, acl);
+
+
+
     }
 
     public StemVariable toStem(List<String> scopes) {
@@ -256,10 +290,10 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         ArrayList<ClaimSource> claimSources = new ArrayList<>();
 
         for (int i = 0; i < stemVariable.size(); i++) {
-            String index = Integer.toString(i) + "."; // make sure its a stem
+           // String index = Integer.toString(i) + "."; // make sure its a stem
             // if they added extra stuff, skip it. 
-            if (stemVariable.containsKey(index)) {
-                StemVariable cfg = (StemVariable) stemVariable.get(index);
+            if (stemVariable.containsKey((long)i)) {
+                StemVariable cfg = (StemVariable) stemVariable.get((long)i);
                 claimSources.add(ConfigtoCS.convert(cfg));
             }
         }
@@ -275,6 +309,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         stemVariable.put(getGTName(ID_TOKEN), flowStates.idToken);
         stemVariable.put(getGTName(REFRESH_TOKEN), flowStates.refreshToken);
         stemVariable.put(getGTName(USER_INFO), flowStates.userInfo);
+        stemVariable.put(getGTName(AT_DO_TEMPLATES), flowStates.at_do_templates);
 
         return stemVariable;
     }
@@ -292,6 +327,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         f.idToken = stem.getBoolean(getGTName(ID_TOKEN));
         f.refreshToken = stem.getBoolean(getGTName(REFRESH_TOKEN));
         f.userInfo = stem.getBoolean(getGTName(USER_INFO));
+        f.at_do_templates = stem.getBoolean(getGTName(AT_DO_TEMPLATES));
         return f;
     }
 
@@ -301,6 +337,14 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
     }
 
     protected ScriptRunResponse createSRR() {
+        Object x = state.getValue(SYS_ERR_VAR);
+        if (x != null && x instanceof StemVariable) {
+            StemVariable sysErr = (StemVariable) x;
+            if (sysErr.containsKey(SYS_ERR_OK) && !sysErr.getBoolean(SYS_ERR_OK)) {
+                String message = sysErr.getString(SYS_ERR_MESSAGE);
+                throw new ScriptRuntimeException(message == null ? "(no message)" : message);
+            }
+        }
         Map respMap = new HashMap();
         StemVariable flowStem = (StemVariable) state.getValue(FLOW_STATE_VAR);
 
@@ -308,11 +352,18 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         respMap.put(SRE_REQ_CLAIM_SOURCES, toSources((StemVariable) state.getValue(CLAIM_SOURCES_VAR)));
         respMap.put(SRE_REQ_SCOPES, toScopes((StemVariable) state.getValue(SCOPES_VAR)));
         respMap.put(SRE_REQ_EXTENDED_ATTRIBUTES, ((StemVariable) state.getValue(EXTENDED_ATTRIBUTES_VAR)).toJSON());
-        if(state.getValue(ACCESS_TOKEN_VAR) != null) {
+        if (state.getValue(ACCESS_TOKEN_VAR) != null) {
             respMap.put(SRE_REQ_ACCESS_TOKEN, ((StemVariable) state.getValue(ACCESS_TOKEN_VAR)).toJSON());
         }
         respMap.put(SRE_REQ_AUDIENCE, toScopes((StemVariable) state.getValue(AUDIENCE_VAR)));
-        StemVariable stemClaims = (StemVariable) state.getValue(CLAIMS_VAR);
+        Object z = state.getValue(CLAIMS_VAR);
+        StemVariable stemClaims;
+        if(z instanceof QDLNull){
+            stemClaims = new StemVariable();
+        }else{
+            stemClaims = (StemVariable) state.getValue(CLAIMS_VAR);
+        }
+
         JSON j = stemClaims.toJSON();
         if (j.isArray()) {
             throw new NFWException("Internal error: The returned claims object was not a JSON Object.");

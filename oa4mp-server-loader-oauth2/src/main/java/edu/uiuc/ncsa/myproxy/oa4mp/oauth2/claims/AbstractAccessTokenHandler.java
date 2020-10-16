@@ -32,6 +32,7 @@ import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.*;
  * on 7/21/20 at  2:50 PM
  */
 public class AbstractAccessTokenHandler extends AbstractPayloadHandler implements AccessTokenHandlerInterface {
+    public static final String AT_DEFAULT_HANDLER_TYPE = "default";
 
     public AbstractAccessTokenHandler(PayloadHandlerConfigImpl payloadHandlerConfig) {
         super(payloadHandlerConfig);
@@ -47,7 +48,6 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
      */
     public JSONObject getAtData() {
         if (atData == null) {
-
             atData = transaction.getATData();
         }
         return atData;
@@ -103,7 +103,7 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
      *     ]
      * </pre>
      */
-    protected String resolveTemplates() {
+    public String resolveTemplates() {
         // Returning a null means that this was skipped or did not execute.
         if (!transaction.getFlowStates().at_do_templates) {
             // This implies that, e.g. in a script, template processing was explicitly
@@ -229,8 +229,7 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
         return new ArrayList<>();
     }
 
-    @Override
-    public void finish() throws Throwable {
+    public void finish(boolean doTemplates) throws Throwable {
         /*
           Make SURE the JTI gets set or token exchange, user info etc. will never work.
          */
@@ -238,11 +237,18 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
         if (transaction.getAccessToken() != null) {
             atData.put(JWT_ID, transaction.getAccessToken().getToken());
         }
-        String scopes = resolveTemplates();
-        if (scopes != null) {
-            atData.put(OA2Constants.SCOPE, scopes);
+        if(doTemplates) {
+            String scopes = resolveTemplates();
+            if (scopes != null) {
+                atData.put(OA2Constants.SCOPE, scopes);
+            }
         }
         setAtData(atData);
+
+    }
+    @Override
+    public void finish() throws Throwable {
+        finish(true);
     }
 
     /**
@@ -255,9 +261,21 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
     @Override
     public AccessToken getSignedAT(JSONWebKey key) {
         if (key == null) {
+            oa2se.warn("Error: Null or missing key for signing encountered processing client \"" + transaction.getOA2Client().getIdentifierString() + "\"");
             throw new IllegalArgumentException("Error: A null JSON web key was encountered");
         }
         if (getAtData().isEmpty()) return null;
+        /*
+         Special case: If the claim has a single entry then that is the raw token. Return that. This allows
+         handlers in QDL to decide not to return a JWT and just return a standard identifier.
+          */
+         if(getAtData().size() == 1){
+             String k = String.valueOf(getAtData().keySet().iterator().next());
+             String v = String.valueOf(getAtData().get(k));
+             oa2se.info("Single value access token for client \"" + transaction.getOA2Client().getIdentifierString() + "\" found. Setting token value to " + v);
+             AccessTokenImpl accessToken = new AccessTokenImpl(URI.create(v));
+             return accessToken;
+         }
         try {
             String at = JWTUtil2.createJWT(getAtData(), key);
             URI x = URI.create(at);

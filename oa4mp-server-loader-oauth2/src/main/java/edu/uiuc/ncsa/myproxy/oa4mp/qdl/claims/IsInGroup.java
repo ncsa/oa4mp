@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims;
 
 import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
+import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ public class IsInGroup implements QDLFunction {
     }
 
     @Override
-    public Object evaluate(Object[] objects) {
+    public Object evaluate(Object[] objects, State state) {
         // First argument is a stem of groups. This is a list that has
         // stem elements of the form stem.name and stem.id. The name is the
         // name of the group.

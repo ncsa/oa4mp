@@ -26,12 +26,17 @@ public class WLCGTokenHandler extends AbstractAccessTokenHandler implements WLCG
         if (transaction.getUserMetaData() != null && transaction.getUserMetaData().containsKey("eppn")) {
             atData.put(SUBJECT, transaction.getUserMetaData().getString("eppn"));
         }
-        atData.put(AUDIENCE, DEFAULT_AUDIENCE);
-        // Specific request for expiration is 12 hours
-        atData.put(EXPIRATION, System.currentTimeMillis() / 1000L + 12L * 60L * 60L); // 12*60*60 = 43200 seconds is 12 hours.
 
-        // canned scopes for the moment because this is the only use case.
-       // atData.put(OA2Constants.SCOPE, "storage.read:/store storage.write:/store/data compute.create:/");
+        if (getATConfig().getAudience().isEmpty()) {
+            atData.put(AUDIENCE, DEFAULT_AUDIENCE);
+        } else {
+            String a = "";
+            for (String x : getATConfig().getAudience()) {
+                a = a + " " + x;
+            }
+            a = a.trim();
+            atData.put(AUDIENCE, a);
+        }
         transaction.setATData(atData);
     }
 

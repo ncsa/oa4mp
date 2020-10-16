@@ -1,6 +1,8 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.AbstractPayloadConfig;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import java.util.ArrayList;
@@ -41,7 +43,17 @@ public class AccessTokenConfig extends AbstractPayloadConfig {
         }
 
         if (jsonObject.containsKey(AUDIENCE_KEY)) {
-            audience = jsonObject.getJSONArray(AUDIENCE_KEY);
+            Object obj = jsonObject.get(AUDIENCE_KEY);
+            DebugUtil.trace(this, "Got audience=" + obj);
+            if (obj instanceof JSONArray) {
+                audience = (List<String>) obj;
+
+            } else {
+                ArrayList x = new ArrayList();
+                x.add(obj.toString());
+                audience = x;
+
+            }
         }
         if (jsonObject.containsKey(TEMPLATES_KEY)) {
             templates = new AuthorizationTemplates();
@@ -60,13 +72,8 @@ public class AccessTokenConfig extends AbstractPayloadConfig {
         }
 
         if (templates != null) {
-/*
-            JSONArray array = new JSONArray();
-            for(AuthorizationPath ap: templates){
-                array.add(ap.toJSON());
-            }
-*/
-            json.put(TEMPLATES_KEY,  templates.toJSON());
+
+            json.put(TEMPLATES_KEY, templates.toJSON());
         }
         if (issuer != null) {
             json.put(ISSUER_KEY, issuer);
@@ -100,7 +107,6 @@ public class AccessTokenConfig extends AbstractPayloadConfig {
     public void setSubject(String subject) {
         this.subject = subject;
     }
-
 
 
     public List<String> getAudience() {

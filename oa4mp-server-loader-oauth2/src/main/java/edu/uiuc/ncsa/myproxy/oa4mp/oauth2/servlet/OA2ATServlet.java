@@ -199,6 +199,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         Collection<String> audience = convertToList(request, AUDIENCE);
         Collection<String> scopes = convertToList(request, OA2Constants.SCOPE);
         Collection<String> resources = convertToList(request, RESOURCE);
+
         if (subjectTokenType.equals(ACCESS_TOKEN_TYPE)) {
             // So we have an access token. Try to interpret it first as a SciToken then if that fails as a
             // standard OA4MP access token:
@@ -226,13 +227,25 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             throw new GeneralException("Error: no pending transaction found.");
         }
 
+        Collection<String> originalScopes = t.getScopes();
+        if(!scopes.isEmpty()) {
+            // Missing scopes means use whatever is there.
+            t.setScopes(scopes);
+        }
+
         HashMap<String, String> parameters = new HashMap<>();
         parameters.put(OA2Claims.SUBJECT, t.getUsername());
         parameters.put(JWTUtil.KEY_ID, keys.getDefaultKeyID());
-        accessToken = tokenForge.getAccessToken();
-        t.setAccessToken(accessToken);
+        //  accessToken = tokenForge.getAccessToken();
+        RTIRequest rtiRequest = new RTIRequest(request, t, t.getAccessToken(), oa2se.isOIDCEnabled());
+        RTI2 rtIssuer = new RTI2(getTF2(), getServiceEnvironment().getServiceAddress());
+        RTIResponse rtiResponse = (RTIResponse) rtIssuer.process(rtiRequest);
+        rtiResponse.setSignToken(client.isSignTokens());
+        // set to new one.
+        t.setAccessToken(rtiResponse.getAccessToken());
+        t.setRefreshToken(rtiResponse.getRefreshToken());
+
         JSONObject claims = new JSONObject();
-        claims.put(OA2Constants.ACCESS_TOKEN, accessToken.getToken()); // Required.
         OA2Client oa2Client = (OA2Client) t.getClient();
         // only return a refresh token if the server is configured to do so and the client is too.
         if (oa2Client.isRTLifetimeEnabled() && oa2se.isRefreshTokenEnabled()) {
@@ -240,16 +253,18 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             t.setRefreshToken(refreshToken);
             claims.put(OA2Constants.REFRESH_TOKEN, refreshToken.getToken()); // Optional
         }
-        /*
-        About the token type. We return access_token. It is also possible to return a type of
-        jwt. We do not do that because that also implies we are supporting
-
-        https://tools.ietf.org/html/rfc7523
-
-        which we do not. SciTokens are a type of access token and that is where we leave it for now.
-        We may also issue a refresh token, but since the issued token type is single-valued,
-        we don't return a token type of refresh_token.
-         */
+        JWTRunner jwtRunner = new JWTRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2se, t, t.getOA2Client().getConfig()));
+        try {
+            OA2ClientUtils.setupHandlers(jwtRunner, oa2se, t, request);
+            jwtRunner.doRefreshClaims();
+        } catch (Throwable throwable) {
+            ServletDebugUtil.warn(this, "Unable to update claims on token exchange: \"" + throwable.getMessage() + "\"");
+        }
+        setupTokens(client, rtiResponse, oa2se, t, jwtRunner);
+        claims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getAccessToken().getToken()); // Required.
+        if (oa2Client.isRTLifetimeEnabled() && oa2se.isRefreshTokenEnabled()) {
+            claims.put(OA2Constants.REFRESH_TOKEN, rtiResponse.getRefreshToken().getToken()); // Optional
+        }
         claims.put(ISSUED_TOKEN_TYPE, ACCESS_TOKEN_TYPE); // Required. This is the type of token issued (mostly access tokens). Must be as per TX spec.
         claims.put(OA2Constants.TOKEN_TYPE, TOKEN_TYPE_BEARER); // Required. This is how the issued token can be used, mostly. BY RFC 6750 spec.
         claims.put(OA2Constants.EXPIRES_IN, Long.toString(Long.valueOf(System.currentTimeMillis() / 1000L + 900L))); // Optional
@@ -264,22 +279,23 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
                 if (!newScopes.contains(OA2Scopes.SCOPE_OPENID)) {
                     newScopes.add(OA2Scopes.SCOPE_OPENID);
                 }
-                String outscopes = "";
+                String requestedScopes = "";
                 boolean firstPass = true;
                 for (String x : newScopes) {
-                    outscopes = outscopes + x;
+                    requestedScopes = requestedScopes + x;
                     if (firstPass) {
                         firstPass = false;
-                        outscopes = x;
+                        requestedScopes = x;
                     } else {
-                        outscopes = outscopes + " " + x;
+                        requestedScopes = requestedScopes + " " + x;
                     }
                 }
                 // Set it to the restricted set of scopes???
                 //  client.setScopes(newScopes);
-                claims.put(OA2Constants.SCOPE, outscopes);
+                claims.put(OA2Constants.SCOPE, requestedScopes);
             }
         }
+        t.setScopes(originalScopes); // Set them back for the next round in case they request a different set of scopes.
         t.setUserMetaData(claims); // now stash it for future use.
         getTransactionStore().save(t);
         PrintWriter osw = response.getWriter();
@@ -345,7 +361,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         }
         st2.setAccessToken(atResponse.getAccessToken()); // needed if there are handlers later.
         st2.setRefreshToken(atResponse.getRefreshToken()); // ditto. Might be null.
-        JWTRunner jwtRunner = new JWTRunner(st2, ScriptRuntimeEngineFactory.createRTE(oa2SE, st2.getOA2Client().getConfig()));
+        JWTRunner jwtRunner = new JWTRunner(st2, ScriptRuntimeEngineFactory.createRTE(oa2SE, st2, st2.getOA2Client().getConfig()));
         OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, st2, request);
         jwtRunner.doTokenClaims();
         setupTokens(client, atResponse, oa2SE, st2, jwtRunner);
@@ -552,7 +568,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
 
         t.setAccessToken(rtiResponse.getAccessToken());
         t.setRefreshToken(rtiResponse.getRefreshToken());
-        JWTRunner jwtRunner = new JWTRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2SE, t.getOA2Client().getConfig()));
+        JWTRunner jwtRunner = new JWTRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2SE, t, t.getOA2Client().getConfig()));
         OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, t, request);
         try {
             jwtRunner.doRefreshClaims();

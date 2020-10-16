@@ -1,10 +1,8 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.FSClaimSource;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.HTTPHeaderClaimsSource;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.LDAPClaimsSource;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.NCSALDAPClaimSource;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.*;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSourceConfiguration;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
@@ -15,24 +13,30 @@ import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
  */
 public class ConfigtoCS implements CSConstants {
     public static StemVariable convert(ClaimSource source) {
-        if(source instanceof FSClaimSource){
+        if (source instanceof FSClaimSource) {
             return ClaimSourceConfigConverter.convert(source, CSConstants.CS_TYPE_FILE);
         }
-        if(source instanceof HTTPHeaderClaimsSource){
+        if (source instanceof HTTPHeaderClaimsSource) {
             return ClaimSourceConfigConverter.convert(source, CSConstants.CS_TYPE_HEADERS);
         }
-        if(source instanceof NCSALDAPClaimSource){
+        if (source instanceof NCSALDAPClaimSource) {
             return ClaimSourceConfigConverter.convert(source, CSConstants.CS_TYPE_NCSA);
         }
 
-        if(source instanceof LDAPClaimsSource){
+        if (source instanceof LDAPClaimsSource) {
             return ClaimSourceConfigConverter.convert(source, CSConstants.CS_TYPE_LDAP);
+        }
+        if(source instanceof BasicClaimsSourceImpl){
+            throw new GeneralException("Error: This probably means you instantiated a class using the code type, but handling it has not been implement yet.");
         }
 
         throw new IllegalArgumentException("Error: Unknown claims source type");
     }
+
     public static ClaimSource convert(StemVariable arg) {
         switch (arg.getString(CS_DEFAULT_TYPE)) {
+            case CS_TYPE_CODE:
+                return doCode(arg);
             case CS_TYPE_FILE:
                 ClaimSourceConfiguration cfg = ClaimSourceConfigConverter.convert(arg);
                 return new FSClaimSource(cfg);
@@ -54,9 +58,31 @@ public class ConfigtoCS implements CSConstants {
                 } else {
                     searchName = NCSALDAPClaimSource.DEFAULT_SEACH_NAME;
                 }
-                return new NCSALDAPClaimSource(NCSALDAPClaimSource.DEFAULT_SEACH_NAME);
+                return new NCSALDAPClaimSource(searchName);
 
         }
         throw new IllegalArgumentException("Error: Unrecognized claim source type \"" + arg.getString(CS_DEFAULT_TYPE) + "\"");
+    }
+
+    private static ClaimSource doCode(StemVariable arg) {
+        BasicClaimsSourceImpl claimsSource = null;
+        ClaimSourceConfiguration cfg = ClaimSourceConfigConverter.convert(arg);
+
+        try {
+            Class<?> c = Class.forName(arg.getString(CS_CODE_JAVA_CLASS));
+            Object object = c.newInstance();
+            if (!(object instanceof BasicClaimsSourceImpl)) {
+                throw new IllegalArgumentException("Error: Object must extend BasicClaimSourceImpl");
+            }
+            claimsSource = (BasicClaimsSourceImpl) object;
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        }
+        claimsSource.setConfiguration(cfg);
+        return claimsSource;
     }
 }

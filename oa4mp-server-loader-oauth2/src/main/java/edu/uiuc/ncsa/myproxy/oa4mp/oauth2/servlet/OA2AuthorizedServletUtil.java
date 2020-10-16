@@ -155,7 +155,7 @@ public class OA2AuthorizedServletUtil {
         t = doDelegation(httpServletRequest, httpServletResponse);
         OA2SE oa2SE = (OA2SE) getServiceEnvironment();
         ServletDebugUtil.trace(this, "Starting done with doDelegation, creating claim util");
-        JWTRunner jwtRunner = new JWTRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2SE, t.getOA2Client().getConfig()));
+        JWTRunner jwtRunner = new JWTRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2SE, t, t.getOA2Client().getConfig()));
         OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, t, httpServletRequest);
 
         DebugUtil.trace(this, "starting to process claims, creating basic claims:");

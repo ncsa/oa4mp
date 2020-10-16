@@ -25,18 +25,20 @@
   } //end tokens
 
 */
+DEBUG := false;
+if[DEBUG][
 // Debug stuff --  uncomment if running on my dev box. Should not be in store.
  claims.idp := 'https://idp.ncsa.illinois.edu/idp/shibboleth';
  claims.eppn := 'jgaynor@illinois.edu';
+]; //end debugging hack
 
 if[
-    exec_phase == 'pre_auth' &&
+     exec_phase == 'pre_auth' &&
      claims.idp == 'https://idp.ncsa.illinois.edu/idp/shibboleth'
 ]then[
-   cfg. := new_template('ncsa');
-   claims.uid := claims.eppn - '@illinois.edu'; // Set search key.
-   sz := size(claims_sources.);
-   claim_sources.sz. := create_source(cfg.);
+     cfg. := new_template('ncsa');
+     claims.uid := claims.eppn - '@illinois.edu'; // Set search key.
+     claim_sources. := union(claim_sources., [cfg.]);
 ]; //end if
 
 say('***script_args=' + to_string(script_args()));
@@ -47,12 +49,12 @@ if[
     s. := null; // initialize it
     n := size(claims.isMemberOf.);
     say('**n = ' + to_string(n));
+    say('**claims=' + to_json(claims.));
     while[
        for_next(j,n)
     ][
        s.j := claims.isMemberOf.j.name;
     ]; // end while
     claims.isMemberOf. := s.;
-    
 ];
 

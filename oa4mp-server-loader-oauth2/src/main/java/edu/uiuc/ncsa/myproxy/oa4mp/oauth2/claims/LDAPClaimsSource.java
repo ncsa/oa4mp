@@ -222,7 +222,10 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
     public Hashtable<String, String> createEnv(String host, LDAPConfiguration cfg) {
         Hashtable<String, String> env = new Hashtable<String, String>();
         env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-        String providerUrl = "ldaps://" + host.trim();
+        String providerUrl = host.trim();
+        if(!host.startsWith("ldaps://")){
+             providerUrl = "ldaps://" + providerUrl;
+        }
         if (0 <= cfg.getPort()) {
             providerUrl = providerUrl + ":" + cfg.getPort();
         }
@@ -317,6 +320,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
             searchControls.setReturningAttributes(searchAttributes);
         }
         String addFilter = "";
+        // For all questions about the filter, refer to https://tools.ietf.org/search/rfc4515
         if(!StringUtils.isTrivial(getLDAPCfg().getAdditionalFilter())){
             addFilter = "(" + getLDAPCfg().getAdditionalFilter() + ")";
         }

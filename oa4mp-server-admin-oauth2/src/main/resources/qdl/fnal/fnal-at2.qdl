@@ -1,7 +1,8 @@
 /*
    This script will pull information from a claim source and compute the resulting
-   capabilities for the access token from that. Strategy is simple: The exact tokens
-   allowed are in the source, so pass back those that match from the request.
+   capabilities for the access token from that. Strategy is simple: Use the requested scopes
+   as patterns. According to the WLCG and SciToken specs, an queried scope (e.g. write:/a/b/c/d)
+   for which the requested scope is a head (e.g. write:/a/b) should be returned.
 
    Script for the client
 

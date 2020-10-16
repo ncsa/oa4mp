@@ -90,6 +90,10 @@ public class OA2FunctorFactory extends JFunctorFactory {
             return new jAccessToken();
         }
 
+        if (name.equals(FlowType.AT_DO_TEMPLATES.getValue())) {
+            return new jATDoTemplates();
+        }
+
         if (name.equals(GET_CERT.getValue())) {
             return new jGetCert();
         }

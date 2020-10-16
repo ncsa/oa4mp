@@ -24,6 +24,15 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
+ * The most basic implementation of a {@link ClaimSource}.
+ * <h3>Extending this class</h3>
+ * <p>
+ *    If you want to write your own custom Java claim source and invoke it, you must extend this class
+ *    and over-right the {@link #realProcessing(JSONObject, HttpServletRequest, ServiceTransaction)}
+ *    method. Generally when claims are being gotten, the configuration that is created is passed
+ *    along faithfully and you may access your custom parameters by invoking {@link ClaimSourceConfiguration#getProperty(String)}.
+ *    An example is in {@link TestClaimSource}.
+ * </p>
  * <p>Created by Jeff Gaynor<br>
  * on 8/17/15 at  4:10 PM
  */
@@ -130,7 +139,9 @@ public class BasicClaimsSourceImpl implements ClaimSource {
     }
 
     /**
-     * This also just returns the {@link UserInfo} object passed in.
+     * This also just returns the {@link UserInfo} object passed in. This has some legacy code. If you are writing
+     * a custom claim source, you really only need to invoke {@link #realProcessing(JSONObject, HttpServletRequest, ServiceTransaction)}
+     * at the right time.
      *
      * @param claims
      * @param request

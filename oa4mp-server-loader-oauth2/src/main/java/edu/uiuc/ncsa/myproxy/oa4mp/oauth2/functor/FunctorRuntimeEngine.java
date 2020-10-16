@@ -213,6 +213,7 @@ public class FunctorRuntimeEngine extends ScriptRuntimeEngine implements Scripti
         f.idToken = findFSValue(functorMap, ID_TOKEN, f.idToken);
         f.refreshToken = findFSValue(functorMap, REFRESH_TOKEN, f.refreshToken);
         f.userInfo = findFSValue(functorMap, USER_INFO, f.userInfo);
+        f.at_do_templates = findFSValue(functorMap, AT_DO_TEMPLATES, f.at_do_templates);
     }
 
     protected static boolean findFSValue(FunctorMap functorMap, FlowType type, boolean previousValue) {

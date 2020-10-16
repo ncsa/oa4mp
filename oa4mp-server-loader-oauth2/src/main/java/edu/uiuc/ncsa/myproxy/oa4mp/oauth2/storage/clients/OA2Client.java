@@ -273,6 +273,7 @@ public class OA2Client extends Client implements OA2ClientScopes {
 
     boolean strictScopes = true;
 
+
     /**
      * Strict scopes means that the list of scopes must match exactly for the given client.
      * Typically this is <code>false</code> for WLCG and other clients that can pass in arbitrary

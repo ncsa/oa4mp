@@ -328,12 +328,16 @@ public class OA2ClientUtils {
             switch (client.getAccessTokensConfig().getType()) {
                 case WLCGTokenHandler.WLCG_TAG:
                     sth = new WLCGTokenHandler(st);
+                    ServletDebugUtil.trace(OA2ClientUtils.class, "WLCG access token handler created");
                     break;
                 case SciTokenConstants.SCI_TOKEN_TAG:
                     sth = new ScitokenHandler(st);
+                    ServletDebugUtil.trace(OA2ClientUtils.class, "SciTokens access token handler created");
                     break;
+                case AbstractAccessTokenHandler.AT_DEFAULT_HANDLER_TYPE:
                 default:
                     sth = new AbstractAccessTokenHandler(st);
+                    ServletDebugUtil.trace(OA2ClientUtils.class, "generic access token handler created");
             }
             jwtRunner.setAccessTokenHandler(sth);
         }

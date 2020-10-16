@@ -110,6 +110,7 @@ commit;
 
 /*
   A few very useful commands to issue in the psql client are
+  \c database - connect to this database
   \l - lists all databases
   \dn - lists all schemas in the current database
   \z tablename - lists permissions for the given table

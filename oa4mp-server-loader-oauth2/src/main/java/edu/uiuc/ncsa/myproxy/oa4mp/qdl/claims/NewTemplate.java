@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims;
 
 import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
+import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 
 import java.util.ArrayList;
@@ -27,7 +28,7 @@ public class NewTemplate implements QDLFunction, CSConstants {
 
 
     @Override
-    public Object evaluate(Object[] objects) {
+    public Object evaluate(Object[] objects, State state) {
         if (objects.length != 1) {
             throw new IllegalArgumentException("Error:" + getName() + " requires the type of the claim source");
         }
@@ -55,6 +56,10 @@ public class NewTemplate implements QDLFunction, CSConstants {
                 output.put(CS_DEFAULT_TYPE, CS_TYPE_HEADERS);
                 output.put(CS_HEADERS_PREFIX, REQUIRED_TEMPLATE);
                 return output;
+            case CS_TYPE_CODE:
+                output.put(CS_DEFAULT_TYPE, CS_TYPE_CODE);
+                output.put(CS_CODE_JAVA_CLASS, REQUIRED_TEMPLATE);
+                return output;
         }
         throw new IllegalArgumentException("Error: unknown configuration type \"" + type + "\".");
     }
@@ -71,6 +76,7 @@ public class NewTemplate implements QDLFunction, CSConstants {
         doc.add(CS_TYPE_HEADERS + " - for claims that are delivered in the HTTP headers");
         doc.add(CS_TYPE_LDAP + " - to get claims from a generic LDAP");
         doc.add(CS_TYPE_NCSA + " - to get claims from the NCSA LDAP (NOTE requires you be on the NCSA internal network!)");
+        doc.add(CS_TYPE_CODE + " - for custom written claim sources. (Note: The class must be available in the JVM.)");
         return doc;
     }
 }

@@ -1,0 +1,16 @@
+/*
+
+  For the demo client on test.cilogon.org. This will load various access token configs based on IDP.
+  Jeff Gaynor
+  created: 2020-10-16T21:05:25.213Z
+*/
+
+ idps.ncsa := 'https://idp.ncsa.illinois.edu/idp/shibboleth';
+ idps.fnal := 'https://idp.fnal.gov/idp/shibboleth';
+ idps.ligo := 'https://login.ligo.org/idp/shibboleth';
+
+ switch[
+   if[claims.idp == idps.ncsa][script_load('ncsa/ncsa-default.qdl');];
+   if[claims.idp == idps.fnal][script_load('fnal/fnal-at2.qdl');];
+   if[claims.idp == idps.ligo][script_load('ligo/ligo.qdl');];
+ ]; //end switch

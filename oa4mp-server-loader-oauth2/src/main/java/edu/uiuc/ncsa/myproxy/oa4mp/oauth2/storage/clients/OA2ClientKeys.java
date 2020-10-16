@@ -27,6 +27,7 @@ public class OA2ClientKeys extends ClientKeys {
     String publicClient="public_client";
     String strictScopes="strict_scopes";
 
+
      public String strictScopes(String... x) {
          if (0 < x.length) strictScopes= x[0];
          return strictScopes;

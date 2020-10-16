@@ -28,7 +28,8 @@ public enum FlowType implements FunctorType {
      * system generates an exception. It effectively is the same as setting all other state
      * variables to false.
      */
-    ACCEPT_REQUESTS("$accept_requests");
+    ACCEPT_REQUESTS("$accept_requests"),
+    AT_DO_TEMPLATES("$at_do_templates");
 
     FlowType(String value) {
         this.value = value;
