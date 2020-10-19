@@ -1,20 +1,37 @@
 /*
    This is for the access token in LIGO. See the ligo.qdl file comments for more.
    Jeff Gaynor
-   2020-09-15T16:00:55Z
+   created: 2020-09-15T16:00:55Z
+   updated: 2020-10-19T20:09:03.181Z
+
 */
 s := '';
+
 if[
-   in_group(claims.isMemberOf., 'Communities:LSCVirgoLIGOGroupMembers')
-  ]then[
-   s := 'read:/DQSegDB';
+     claims.idp != 'https://login.ligo.org/idp/shibboleth'
+][
+     return();
 ];
+
+if[
+      !is_defined(claims.isMemberOf.)
+  ]then[
+     sys_err.ok := false;
+     sys_err.message := 'Missing group information. Cannot determine scopes.';
+     return();
+];
+
+if[
+    in_group(claims.isMemberOf., 'Communities:LSCVirgoLIGOGroupMembers')
+  ]then[
+    s := s + 'read:/DQSegDB';
+ ];
+
 if[
    in_group(claims.isMemberOf., 'Communities:LVC:SegDB:SegDBWriter')
   ]then[
-    s := s + ' ' + 'write:/DQSegDB';
-];
+   s := s + ' ' + 'write:/DQSegDB';
+ ];
 
-access_token.scope := s;
-access_token.sub := claims.sub;
-access_token.test := 'this is a test claims';
+ access_token.scope := s;
+ access_token.aud := 'segments.ligo.org';

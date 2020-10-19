@@ -1,55 +1,44 @@
 /*
    Default NCSA LDAP claim source. This will retrieve all group membership information.
    This will do nothing unless the IDP is correct.
+   updated: 2020-10-19T20:09:03.181Z
+
 
   tokens{
     identity{
     type=identity
     qdl{
-        load="vfs#/scripts/ncsa/ncsa-default.qdl"
+        load="ncsa/ncsa-default.qdl"
         xmd={exec_phase=["pre_auth","post_token"]}
         args=["true"] // true if the member of claim is just a list. Default is false.
       }// end qdl
     } //end identity token
-    access{
-        type=wlcg
-        issuer="https:cilogon.org"
-        audience=["https://wlcg.cern.ch/jwt/v1/any", "https://wlcg2.cern.ch/jwt/v1/any"]
-        lifetime=3600000
-        qdl{
-           load="vfs#/scripts/ncsa/at-test.qdl"
-           xmd={exec_phase=post_token}
-           args=["uid=oa4mp_user,ou=system,o=Fermilab,o=CO,dc=cilogon,dc=org", "NandTzbY20wG03u3lMHk"]
-        } //end QDL
-    } // end access token
   } //end tokens
 
 */
-DEBUG := false;
+DEBUG := true;
 if[DEBUG][
 // Debug stuff --  uncomment if running on my dev box. Should not be in store.
- claims.idp := 'https://idp.ncsa.illinois.edu/idp/shibboleth';
+  claims.idp := 'https://idp.ncsa.illinois.edu/idp/shibboleth';
  claims.eppn := 'jgaynor@illinois.edu';
+claims.debug := 'debugging mode on.';
 ]; //end debugging hack
 
 if[
      exec_phase == 'pre_auth' &&
      claims.idp == 'https://idp.ncsa.illinois.edu/idp/shibboleth'
 ]then[
-     cfg. := new_template('ncsa');
-     claims.uid := claims.eppn - '@illinois.edu'; // Set search key.
-     claim_sources. := union(claim_sources., [cfg.]);
+               cfg. := new_template('ncsa');
+         claims.uid := claims.eppn - '@illinois.edu'; // Set search key.
+     claim_sources. := claim_sources. ~ [cfg.]; // add it to any claims
 ]; //end if
 
-say('***script_args=' + to_string(script_args()));
 if[
    exec_phase == 'post_token' &&  0 < script_args() && script_args(0)=='true'
 ]then[
    // then take the isMemberOf claims and return them as a flat list, not as a JSON structure.
     s. := null; // initialize it
-    n := size(claims.isMemberOf.);
-    say('**n = ' + to_string(n));
-    say('**claims=' + to_json(claims.));
+     n := size(claims.isMemberOf.);
     while[
        for_next(j,n)
     ][

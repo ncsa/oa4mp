@@ -1,4 +1,6 @@
-
+/*
+   Experimental. Nothing of use here...
+*/
 say('phase = ' + exec_phase);
 // This needs to be run later
 at. := at_init('wlcg', null);

@@ -32,19 +32,19 @@ Original script for functors -- here for reference while I debug, should be dele
 
 */
 // Some constants for later.
-vo:='voPersonExternalID';
-idp.ncsa := 'https://idp.ncsa.illinois.edu/idp/shibboleth';
+        vo := 'voPersonExternalID';
+  idp.ncsa := 'https://idp.ncsa.illinois.edu/idp/shibboleth';
 idp.google := 'http://google.com/accounts/o8/id';
-idp.orcid := 'http://orcid.org/oauth/authorize';
+ idp.orcid := 'http://orcid.org/oauth/authorize';
 idp.github := 'http://github.com/login/oauth/authorize';
 
 // in pre_auth
 if[
     claims.idp == idp.ncsa
-  ]then[
+ ]then[
     claims.uid := claims.eppn - '@ncsa.illinois.edu';
     claims.voPersonExternalID := claims.eppn;
-  ]else[
+ ]else[
      // If this is not the NCSA IDP, do a search on their voPersonExternalID
      // to set their uid, then feed their uid to LDAP.
      // Note that in this project, the ligo-accessonly allowed IDPs are NCSA and these!
@@ -60,7 +60,7 @@ if[
      f.search_attributes.0 := 'uid'; // return the uid from the search as a claim
      c. := get_claims(create_source(f.), v);
 
-  ]; // end if
+ ]; // end if
 f. := new_template('ncsa');
 f.search_filter_attribute := 'uid';
-list_append(claim_sources., create_source(f.));
+claim_sources. := claim_sources. ~ [create_source(f.)];

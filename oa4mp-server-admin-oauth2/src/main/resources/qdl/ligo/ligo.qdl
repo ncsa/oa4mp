@@ -2,7 +2,8 @@
    A configuration that sets up the LIGO claims source
    In this case, the groups are returned in the claims, along with the uin
    Jeff Gaynor
-   2020-09-15T16:00:55Z
+   created: 2020-09-15T16:00:55Z
+   updated: 2020-10-19T20:09:03.181Z
  */
 /*
   The configuration for this that should be in the client:
@@ -11,198 +12,47 @@
     identity{
     type=identity
     qdl{
-        load="vfs#/scripts/ligo.qdl"
+        load="ligo/ligo.qdl"
         xmd={exec_phase=pre_auth}
       }// end qdl
     } //end identity token
     access{
        type=sci_token
        qdl{
-          load="vfs#/scripts/ligo-access.qdl"
+          load="ligo/ligo-access.qdl"
           xmd={exec_phase=post_token}
        } //end QDL
-     } // end access token
+    } // end access token
   } //end tokens
 */
+
 /* **** Actual script **** */
 if[
-     // Properly this for debugging and should only get tripped in testing.
-     is_defined(claims.eppn)
-   ]then[
-     claims.uid := substring(claims.eppn, 0, index_of(claims.eppn, '@'));
-   ]else[
-      claims.uid := claims.sub;
- ];
- idp.ncsa :='https://idp.ncsa.illinois.edu/idp/shibboleth';
- idp.google := 'http://google.com/accounts/o8/id';
- idp.orcid := 'http://orcid.org/oauth/authorize';
- id.github := 'http://github.com/login/oauth/authorize';
- switch[
-    // These should be mutually exclusive.
-    if[is_defined(claims.eppn)][voPersonExternalID := claims.eppn;];
-    if[is_defined(claims.eptid)][voPersonExternalID := claims.eptid];
- ];
-cfg.auth_type :='none';
-cfg.address := 'ldap.ligo.org';
-cfg.port := 636;
-cfg.claim_name := 'uid';
-cfg.type := 'ldap';
-cfg.search_base := 'ou=people,dc=ligo,dc=org';
+     claims.idp != 'https://login.ligo.org/idp/shibboleth'
+][
+     return();
+];
+            claims.uid := substring(claims.eppn, 0, index_of(claims.eppn, '@'));
+
+         cfg.auth_type := 'none';
+           cfg.address := 'ldap.ligo.org';
+              cfg.port := 636;
+        cfg.claim_name := 'uid';
+              cfg.type := 'ldap';
+       cfg.search_base := 'ou=people,dc=ligo,dc=org';
+         cfg.ldap_name := 'uid';
+           cfg.groups. := ['isMemberOf'];
+cfg.search_attributes. := ['email', 'uin', 'uid', 'isMemberOf'];
+
+        claim_sources. := claim_sources. ~ [cfg.];
+
+
+
+/*  older way of doing it
 cfg.groups.0 := 'isMemberOf';
-cfg.ldap_name := 'uid';
-
-
 list_append(sa., 'email');                                           no
 list_append(sa., 'uin');
 list_append(sa., 'uid');
 list_append(sa., 'isMemberOf');
 cfg.search_attributes. := sa.;
-claim_sources. := union(claim_sources., [cfg.]);
-
-/* Old functor script on dev
-
- {
- "claims":  {
-  "postProcessing": {"$xor":   [
-      {
-    "$if": [{"$hasClaim": ["eppn"]}],
-    "$then": [{"$set":     [
-     "voPersonExternalID",
-     {"$get": ["eppn"]}
-    ]}]
-   },
-      {
-    "$if": [{"$hasClaim": ["eptid"]}],
-    "$then": [{"$set":     [
-     "voPersonExternalID",
-     {"$get": ["eptid"]}
-    ]}]
-   },
-      {
-    "$if": [{"$equals":     [
-     {"$get": ["idp"]},
-     "http://github.com/login/oauth/authorize"
-    ]}],
-    "$then": [{"$set":     [
-     "voPersonExternalID",
-     {"$concat":      [
-      {"$get": ["oidc"]},
-      "@github.com"
-     ]}
-    ]}]
-   },
-      {
-    "$if": [{"$equals":     [
-     {"$get": ["idp"]},
-     "http://google.com/accounts/o8/id"
-    ]}],
-    "$then": [{"$set":     [
-     "voPersonExternalID",
-     {"$concat":      [
-      {"$get": ["oidc"]},
-      "@accounts.google.com"
-     ]}
-    ]}]
-   },
-      {
-    "$if": [{"$equals":     [
-     {"$get": ["idp"]},
-     "http://orcid.org/oauth/authorize"
-    ]}],
-    "$then": [{"$set":     [
-     "voPersonExternalID",
-     {"$replace":      [
-      {"$get": ["oidc"]},
-      "http://",
-      "https://"
-     ]}
-    ]}]
-   }
-  ]},
-  "preProcessing": [  {
-   "$if": ["$true"],
-   "$then": [{"$set_claim_source":    [
-    "LDAP",
-    "3258ed63b62d1a78"
-   ]}]
-  }],
-  "sourceConfig": [{"ldap":   {
-   "address": "ldap1.ncsa.illinois.edu, ldap2.ncsa.illinois.edu",
-   "authorizationType": "none",
-   "contextName": "",
-   "enabled": "true",
-   "failOnError": "false",
-   "name": "3258ed63b62d1a78",
-   "port": 636,
-   "postProcessing": [   {
-    "$if": [{"$match":     [
-     "${idp}",
-     "https://idp.ncsa.illinois.edu/idp/shibboleth"
-    ]}],
-    "$then":     [
-     {"$set":      [
-      "sub",
-      {"$get": ["eppn"]}
-     ]},
-     {"$exclude": ["foo"]}
-    ]
-   }],
-   "preProcessing": [   {
-    "$else": [{"$get_claims": ["$false"]}],
-    "$if": [{"$match":     [
-     "${idp}",
-     "https://idp.ncsa.illinois.edu/idp/shibboleth"
-    ]}],
-    "$then": [{"$set":     [
-     "foo",
-     {"$drop":      [
-      "@ncsa.illinois.edu",
-      "${eppn}"
-     ]}
-    ]}]
-   }],
-   "searchAttributes":    [
-        {
-     "name": "mail",
-     "returnAsList": false,
-     "returnName": "email"
-    },
-        {
-     "name": "uid",
-     "returnAsList": false,
-     "returnName": "uid"
-    },
-        {
-     "name": "uid",
-     "returnAsList": false,
-     "returnName": "uid"
-    },
-        {
-     "name": "uidNumber",
-     "returnAsList": false,
-     "returnName": "uidNumber"
-    },
-        {
-     "name": "cn",
-     "returnAsList": false,
-     "returnName": "name"
-    },
-        {
-     "isGroup": true,
-     "name": "memberOf",
-     "returnAsList": false,
-     "returnName": "isMemberOf"
-    }
-   ],
-   "searchBase": "ou=People,dc=ncsa,dc=illinois,dc=edu",
-   "searchName": "foo",
-   "ssl":    {
-    "tlsVersion": "TLS",
-    "useJavaTrustStore": true
-   }
-  }}]
- },
- "config": "LSST client configuration, created by Jeff Gaynor 6/19/2018",
- "isSaved": true
-}
 */

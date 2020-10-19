@@ -38,7 +38,7 @@ if[
      return();
 ];
 
-cfg. := new_template('ldap');
+        cfg. := new_template('ldap');
 
 if[
   2 < script_args()
@@ -49,16 +49,15 @@ if[
 ]; //end if
 
 cfg.auth_type := 'simple';
-cfg.username := script_args(0);
-cfg.password := script_args(1);
-cfg.address := 'ldap-test.cilogon.org';
+ cfg.username := script_args(0);
+ cfg.password := script_args(1);
+  cfg.address := 'ldap-test.cilogon.org';
 
-list_append(sa., 'givenName');
-cfg.search_attributes. := sa.;
-cfg.rename.givenName := 'given_name';
+cfg.search_attributes. := ['givenName'];
+  cfg.rename.givenName := 'given_name';
 
 // Just add it to any existing claim sources.
-claim_sources. := union(claims_sources., [cfg.]);
+claim_sources. := claims_sources.~ [cfg.];
 
 
 /*

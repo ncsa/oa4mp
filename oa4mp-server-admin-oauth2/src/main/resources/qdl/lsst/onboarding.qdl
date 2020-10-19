@@ -7,10 +7,10 @@
    (and use the lsst-linking.qdl scripting).
 */
 // General constants
-vo:='voPersonExternalID';
-idp.ncsa := 'https://idp.ncsa.illinois.edu/idp/shibboleth';
+        vo := 'voPersonExternalID';
+  idp.ncsa := 'https://idp.ncsa.illinois.edu/idp/shibboleth';
 idp.google := 'http://google.com/accounts/o8/id';
-idp.orcid := 'http://orcid.org/oauth/authorize';
+ idp.orcid := 'http://orcid.org/oauth/authorize';
 idp.github := 'http://github.com/login/oauth/authorize';
 
 // run in pre_token

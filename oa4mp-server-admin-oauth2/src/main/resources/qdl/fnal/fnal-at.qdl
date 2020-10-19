@@ -1,46 +1,83 @@
 /*
-   Script to manage WLCG tokens for FNAL clients.
-   This will also allow for two clients for Jeff and Jim to test. Logging in with
-   Jeff Gaynor
-   2020-09-15T16:00:55Z
+   This script will pull information from a claim source and compute the resulting
+   capabilities for the access token from that. Strategy is simple: Use the requested scopes
+   as patterns. According to the WLCG and SciToken specs, an queried scope (e.g. write:/a/b/c/d)
+   for which the requested scope is a head (e.g. write:/a/b) should be returned.
+   updated: 2020-10-19T20:09:03.181Z
+
+
+   Script for the client
+
+ tokens{
+     access{
+        type=wlcg
+        issuer="https:cilogon.org"
+        audience="https://wlcg.cern.ch/jwt/v1/any"
+        lifetime=3600000
+        qdl{
+           load="fnal/fnal-at2.qdl"
+           xmd={exec_phase=["post_token","post_refresh"]}
+           args=["USER_ID", "PASSWORD"]
+        } //end QDL
+     } // end access token
+   } //end tokens
 
 */
 
-/*
-   The configuration in the client
-   tokens{
-       access{
-          type=wlcg
-          aud= "https://wlcg.cern.ch/jwt/v1/any"
-          lifetime=43200000 // 12 hours in milliseconds.
-          qdl{
-             load="vfs#/scripts/fnal.qdl"
-             xmd={exec_phase=post_token}
-          } //end QDL
-       } // end access token
-     } //end tokens
+DEBUG := false; // always false on production.
+if[DEBUG][
+//
+/* Set up debug source from file for testing. */
+//  f. := new_template('file');
+//  f.file_path := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/test-claims.json';
+//  claims.eppn := 'jgaynor@fnal.gov';
+//  at_claims. := get_claims(f. , claims.eppn);
 
-*/
-fnal_idp := 'https://idp.fnal.gov/idp/shibboleth';
-jeff_test := claims.sub ==  'http://cilogon.org/serverD/users/55' // me via NCSA IDP on polod
-             ||
-             claims.sub =='http://cilogon.org/serverA/users/16316'; // me via Google IDP, cilogon.org email on poloc
+/* ********** These fake getting the claims and scopes from the user. ********** */
+    claims.eppn := 'swhite@fnal.gov';
+    claims.uid := 'swhite@fnal.gov';
+    scopes.0 := 'storage.create:/dune';
+    //scopes.0 := 'storage.write:/dune/scratch/users/swhite';
+    scopes.1 :=  'storage.create:/dune/';
+]; // end debug block
 
- jim_test := claims.sub =='http://cilogon.org/serverD/users/65' // jim Basney NCSA IDP on polod
-             ||
-             claims.sub =='http://cilogon.org/serverT/users/37233';
 if[
-    !is_defined(claims.eppn)
- ]then[
-     claims.eppn := 'warning -- no EPPN detected'; // just in case.
-];
-if[
-    // Even though this client is managed by FNAL, it is possible they use a different IDP.
-    // Restrict tokens to the FNAL IDP only.
-    (claims.idp == fnal_idp) || jeff_test || jim_test
+     script_args() != 2
   ]then[
-    access_token.sub := claims.eppn;
-    access_token.aud := 'https://wlcg.cern.ch/jwt/v1/any';
-    access_token.scope := 'storage.read:/store storage.write:/store/data compute.create:/';
-    access_token.iss := 'https://cilogon.org/';
- ]; //end if
+     sys_err.ok := false;
+     sys_err.message := 'Sorry, but you must supply both a username (principal) and password.';
+     return();
+  ];
+
+           fnal. := new_template('ldap');
+   fnal.username := script_args(0);
+   fnal.password := script_args(1);
+  fnal.auth_type := 'simple';
+    fnal.address := 'ldap-test.cilogon.org';
+       fnal.port := 636;
+ fnal.claim_name := 'uid';
+fnal.search_base := 'ou=people,o=Fermilab,o=CO,dc=cilogon,dc=org';
+       fnal.type := 'ldap';
+  fnal.ldap_name := 'voPersonExternalID';
+
+fnal.search_attributes.
+                 :=  ['eduPersonEntitlement'];
+                 
+at_claims. := get_claims(fnal., claims.eppn); // test user
+// Get the claims. The capabilities are stored as a stem in
+
+access_token.sub := claims.eppn;
+
+if[
+   !is_defined(at_claims.eduPersonEntitlement.)
+]then[
+   access_token.scope := ''; // return empty scopes.
+   return(); // nothing to do. No capabilities, so no scopes.
+]; //end if
+
+             caps. := at_claims.eduPersonEntitlement.; // capabilities in claim source
+      temp_scopes. := mask(caps., -1 < list_starts_with(caps., scopes.)); // take the ones that match the start
+access_token.scope := detokenize(temp_scopes., ' ', 2); // turn in to string, omit trailing space
+
+say(access_token.);
+
