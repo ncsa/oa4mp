@@ -2,13 +2,11 @@ package edu.uiuc.ncsa.myproxy.oauth2.tools;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.client.AssetResponse;
 import edu.uiuc.ncsa.myproxy.oa4mp.client.ClientEnvironment;
-import edu.uiuc.ncsa.myproxy.oa4mp.client.ClientXMLTags;
 import edu.uiuc.ncsa.myproxy.oa4mp.client.OA4MPResponse;
 import edu.uiuc.ncsa.myproxy.oa4mp.client.storage.AssetStoreUtil;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.testing.CLCCommands;
 import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2Asset;
 import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2ClientEnvironment;
-import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2ClientLoader;
 import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2MPService;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.DateUtils;
@@ -26,11 +24,9 @@ import edu.uiuc.ncsa.security.oauth_2_0.client.ATResponse2;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTUtil2;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
-import edu.uiuc.ncsa.security.util.configuration.ConfigUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import edu.uiuc.ncsa.security.util.pkcs.CertUtil;
 import net.sf.json.JSONObject;
-import org.apache.commons.configuration.tree.ConfigurationNode;
 
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
@@ -61,9 +57,12 @@ import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.RAW_ID_TOKEN;
  * on 5/11/16 at  2:57 PM
  */
 public class OA2CLCCommands extends CLCCommands {
-    public OA2CLCCommands(MyLoggingFacade logger, ClientEnvironment ce) {
-        super(logger, ce);
+    public OA2CLCCommands(MyLoggingFacade logger,
+                          OA2CommandLineClient oa2CommandLineClient) throws Exception {
+        super(logger, (ClientEnvironment) oa2CommandLineClient.getEnvironment());
+        this.oa2CommandLineClient = oa2CommandLineClient;
     }
+
 
     public String getConfigFile() {
         return configFile;
@@ -89,11 +88,12 @@ public class OA2CLCCommands extends CLCCommands {
     }
 
     public void getURIHelp() {
-        say("seturi | geturi [" + CLIENT_CFG_NAME_KEY + " config_name]");
+        say("seturi | geturi");
+        //say("seturi | geturi [" + CLIENT_CFG_NAME_KEY + " config_name]");
         say("Usage: This will create the correct URL. If possible, it will put it in the clipboard.");
-        sayi("if no argument is given, then the default name for the client's configuration is used");
-        sayi("If the name is given, the configuration is re-read and the named configuration is set to the current one.");
-        sayi("This lets you test several clients in quick succession if needed.");
+        sayi("Create the uri using the  client's configuration");
+//        sayi("If the name is given, the configuration is re-read and the named configuration is set to the current one.");
+//        sayi("This lets you test several clients in quick succession if needed.");
         sayi("This will put this in to the clipboard if possible.");
         sayi("This URL should be pasted exactly into the location bar.");
         sayi("You must then authenticate. After you authenticate, the");
@@ -115,7 +115,21 @@ public class OA2CLCCommands extends CLCCommands {
     public void seturi(InputLine inputLine) throws Exception {
         geturi(inputLine);
     }
-
+        OA2CommandLineClient oa2CommandLineClient;
+    public void load(InputLine inputLine) throws Exception{
+        if(!inputLine.hasArgs()){
+            say("config file = " + oa2CommandLineClient.getConfigFile() + ", config name=" + oa2CommandLineClient.getConfigName());
+            return;
+        }
+        oa2CommandLineClient.load(inputLine);
+        if(showHelp(inputLine)){
+            return;
+        }
+        clear(inputLine); // only thing used in clear is --help. If that is present won't get here.
+        setCe((ClientEnvironment) oa2CommandLineClient.getEnvironment());
+        service = null;
+        say("Remember that loading a configuration clears all current state.");
+    }
     /**
      * Constructs the URI
      *
@@ -127,7 +141,10 @@ public class OA2CLCCommands extends CLCCommands {
             getURIHelp();
             return;
         }
-        if (inputLine.hasArg(CLIENT_CFG_NAME_KEY)) {
+        // Maybe one of these days allow for it all in one swoop. Lots of state to change though...
+        // And in particular, if there are issues (wrong config name) then hard to handle errors here.
+
+/*        if (inputLine.hasArg(CLIENT_CFG_NAME_KEY)) {
             String name = inputLine.getNextArgFor(CLIENT_CFG_NAME_KEY);
             say("...loading configuration named \"" + name + "\"");
             try {
@@ -139,7 +156,7 @@ public class OA2CLCCommands extends CLCCommands {
             } catch (Throwable t) {
                 say("Sorry, I could not find the configuration with id =\"" + name + "\":" + t.getMessage());
             }
-        }
+        }*/
         Identifier id = AssetStoreUtil.createID();
         OA4MPResponse resp = getService().requestCert(id);
         DebugUtil.trace(this, "client id = " + getCe().getClientId());

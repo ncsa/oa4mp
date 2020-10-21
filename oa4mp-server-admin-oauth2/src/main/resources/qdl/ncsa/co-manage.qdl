@@ -48,16 +48,15 @@ if[
    cfg.search_base := 'ou=people,o=OSG,o=CO,dc=cilogon,dc=org'; // default
 ]; //end if
 
-cfg.auth_type := 'simple';
- cfg.username := script_args(0);
- cfg.password := script_args(1);
-  cfg.address := 'ldap-test.cilogon.org';
-
+         cfg.auth_type := 'simple';
+          cfg.username := script_args(0);
+          cfg.password := script_args(1);
+           cfg.address := 'ldap-test.cilogon.org';
 cfg.search_attributes. := ['givenName'];
   cfg.rename.givenName := 'given_name';
 
 // Just add it to any existing claim sources.
-claim_sources. := claims_sources.~ [cfg.];
+claim_sources. := claims_sources.~ [create_surce(cfg.)];
 
 
 /*

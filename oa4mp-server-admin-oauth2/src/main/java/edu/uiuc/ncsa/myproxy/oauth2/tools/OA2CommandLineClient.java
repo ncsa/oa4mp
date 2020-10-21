@@ -1,6 +1,5 @@
 package edu.uiuc.ncsa.myproxy.oauth2.tools;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.client.ClientEnvironment;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.testing.CommandLineClient;
 import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2ClientLoader;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
@@ -29,7 +28,7 @@ public class OA2CommandLineClient extends CommandLineClient {
         try {
             OA2CommandLineClient testCommands = new OA2CommandLineClient(null);
             testCommands.start(args);
-            OA2CLCCommands usc = new OA2CLCCommands(testCommands.getMyLogger(), (ClientEnvironment) testCommands.getEnvironment());
+            OA2CLCCommands usc = new OA2CLCCommands(testCommands.getMyLogger(), testCommands);
             usc.setConfigFile(testCommands.getConfigFile());
             CLIDriver cli = new CLIDriver(usc);
             cli.start();
@@ -68,13 +67,14 @@ public class OA2CommandLineClient extends CommandLineClient {
 
     @Override
     public boolean use(InputLine inputLine) throws Exception {
-        String indent = "  ";
+        // No components so this is a stub.
+/*        String indent = "  ";
         if (inputLine.hasArg("test")) {
             OA2CLCCommands usc = new OA2CLCCommands(getMyLogger(), (ClientEnvironment) getEnvironment());
             CLIDriver cli = new CLIDriver(usc);
             cli.start();
             return true;
-        }
+        }*/
         return false;
     }
 }

@@ -295,6 +295,11 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
                 claims.put(OA2Constants.SCOPE, requestedScopes);
             }
         }
+
+        // The other components (access, refresh token) have responses that handle setting the encoding and
+        // char type. We have to set it manually here.
+        response.setContentType("application/json;charset=UTF-8");
+        response.setCharacterEncoding("UTF-8");
         t.setScopes(originalScopes); // Set them back for the next round in case they request a different set of scopes.
         t.setUserMetaData(claims); // now stash it for future use.
         getTransactionStore().save(t);

@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowType.*;
+import static edu.uiuc.ncsa.qdl.variables.StemVariable.STEM_INDEX_MARKER;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -178,18 +179,21 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         s.execute(state);
         return createSRR();
     }
-
-    protected String SYS_ERR_VAR = "sys_err.";
+    /*
+    Note that these are the names of the variable in the QDL symbol table and since they are stems
+    they must end with periods.
+     */
+    protected String SYS_ERR_VAR = "sys_err" + STEM_INDEX_MARKER;
     protected String SYS_ERR_OK = "ok";
     protected String SYS_ERR_MESSAGE = "message";
-    protected String FLOW_STATE_VAR = "flow_states.";
-    protected String CLAIMS_VAR = "claims.";
-    protected String ACCESS_TOKEN_VAR = "access_token.";
-    protected String SCOPES_VAR = "scopes.";
-    protected String EXTENDED_ATTRIBUTES_VAR = "xas.";
-    protected String AUDIENCE_VAR = "audience.";
-    protected String CLAIM_SOURCES_VAR = "claim_sources.";
-    protected String ACCESS_CONTROL = "access_control.";
+    protected String FLOW_STATE_VAR = "flow_states"+ STEM_INDEX_MARKER;
+    protected String CLAIMS_VAR = "claims"+ STEM_INDEX_MARKER;
+    protected String ACCESS_TOKEN_VAR = "access_token"+ STEM_INDEX_MARKER;
+    protected String SCOPES_VAR = "scopes"+ STEM_INDEX_MARKER;
+    protected String EXTENDED_ATTRIBUTES_VAR = "xas"+ STEM_INDEX_MARKER;
+    protected String AUDIENCE_VAR = "audience"+ STEM_INDEX_MARKER;
+    protected String CLAIM_SOURCES_VAR = "claim_sources"+ STEM_INDEX_MARKER;
+    protected String ACCESS_CONTROL = "access_control"+ STEM_INDEX_MARKER;
 
 
     /**

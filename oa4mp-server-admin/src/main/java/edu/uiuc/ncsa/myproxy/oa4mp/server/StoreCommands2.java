@@ -36,7 +36,13 @@ import static edu.uiuc.ncsa.security.util.cli.CLIDriver.EXIT_COMMAND;
  * on 7/2/18 at  10:06 AM
  */
 public abstract class StoreCommands2 extends StoreCommands {
+    /*
+     SQL Command to get non-version:
+     SELECT client_id FROM clients WHERE client_id  NOT LIKE '%#version%';
 
+     Counting non-versions:
+     SELECT count(*)  FROM clients WHERE client_id  NOT LIKE '%#version%';
+     */
     public static final String FILE_FLAG = "-file";
     public static final String UPDATE_FLAG = "-update";
     public static final String SHORT_UPDATE_FLAG = "-u";
@@ -146,7 +152,6 @@ public abstract class StoreCommands2 extends StoreCommands {
     @Override
     protected int longFormat(Identifiable identifiable) {
         return longFormat(identifiable, false);
-
     }
 
     protected int longFormat(Identifiable identifiable, boolean isVerbose) {
@@ -296,6 +301,7 @@ public abstract class StoreCommands2 extends StoreCommands {
         String KEY_FLAG = "-key";
         String LIST_KEYS_FLAG = "-listKeys";
         String REGEX_FLAG = "-regex";
+        String SHORT_REGEX_FLAG = "-r";
         String LONG_LIST_FLAG = "-la";
         String SIZE_FLAG = "-size";
         if (showHelp(inputLine)) {
@@ -323,7 +329,11 @@ public abstract class StoreCommands2 extends StoreCommands {
             }
             List<Identifiable> values = null;
             try {
-                values = getStore().search(key, inputLine.getLastArg(), inputLine.hasArg(REGEX_FLAG));
+                values = getStore().search(
+                        key,
+                        inputLine.getLastArg(),
+                        inputLine.hasArg(REGEX_FLAG)||inputLine.hasArg(SHORT_REGEX_FLAG))
+                ;
             } catch (Throwable t) {
                 if (showStackTraces) {
                     t.printStackTrace();
@@ -1315,5 +1325,54 @@ public abstract class StoreCommands2 extends StoreCommands {
 
     protected String archiveFormat(Identifiable id) {
         return format(id);
+    }
+
+    public void copy(InputLine inputLine) throws Exception{
+        if(showHelp(inputLine)){
+            showCopyHelp();
+            return;
+        }
+        boolean forceIt = inputLine.hasArg("-f");
+        String sourceString = inputLine.getArg(1); // zero-th arg is name of command.
+        String targetString = inputLine.getArg(2);
+        Identifier sourceId = null;
+        Identifier targetId = null;
+        try{
+            sourceId = BasicIdentifier.newID(sourceString);
+        }catch(Throwable t){
+            say("sorry, but the first argument \"" + sourceString + "\" is not a valid identifier");
+            return;
+        }
+        try{
+            targetId = BasicIdentifier.newID(targetString);
+        }catch(Throwable t){
+            say("sorry, but the second argument \"" + targetString + "\" is not a valid identifier");
+            return;
+        }
+
+        Identifiable source = (Identifiable) getStore().get(sourceId);
+        if(!forceIt && getStore().containsKey(targetId)){
+                say("sorry, but \"" + targetId + "\" already exists. Consider using the -f flag if you need to overwrite it.");
+                return;
+        }
+
+        MapConverter mc = getMapConverter();
+        Identifiable newVersion = getStore().create();
+        XMLMap map = new XMLMap();
+        mc.toMap(source, map);
+
+        mc.fromMap(map, newVersion);
+        newVersion.setIdentifier(targetId);
+        getStore().save(newVersion);
+
+    }
+
+    private void showCopyHelp() {
+        say("copy source target [-f] - copy source to target, possibly forcing the issue");
+        say("This will create a complete copy of source and store it with the id of target.");
+        say("Default is to refuse to do this if target exists. If you supply the -f flag, then");
+        say("target will be overwritten if it exists.");
+        say("This only makes a simple copy. If this is, e.g., a client, you will need to approve it, change secret etc.");
+        say("Note: source and target are identifiers (no lead /).");
     }
 }

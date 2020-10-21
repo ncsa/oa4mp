@@ -36,24 +36,29 @@
 <ul>
     <li><b>clear</b> -- clear the current state and start over</li>
     <li><b>exit</b> -- end the session and shut down the client.</li>
-    <li><b>geturi</b> -- this creates the URI (not trivial as it requires a lot of parameters) that you copy and paste
-        in to your browser.
+    <li><b>seturi</b> -- this creates the URI (not trivial as it requires a lot of parameters) that you copy and paste
+        in to your browser. It is automatically put into the clipbaord if your system has one.
     </li>
-    <li><b>setgrant</b>-- This is invoked on the callback uri from the server. It will grab the state information and
-        manage it.
+    <li><b>setgrant</b>-- This is invoked on the callback uri from the server. No argument means it will
+        pull it from the system clipboard. Otherwise it will read the argument.
     </li>
+    <li><b>load</b> -- load a configuration (by name) or even switch configuration files. This lets you run
+    multiple clients in a single session.</li>
     <li><b>getat</b> -- Get an access token. You may also get a refresh token at this time if the server supports this.
     </li>
     <li><b>getuserinfo</b> -- use the current access token to get the user's information</li>
     <li><b>getcert</b> -- get a certificate</li>
     <li><b>savecert</b> -- save the certificate to a file in PEM format</li>
     <li><b>getrt</b> -- get the next refresh token</li>
+    <li><b>showclaims</b> -- After you get the access token, you can print the claims that were returned.</li>
+    <li><b>exchange</b> -- If token exchange is supported on your server, exchange the current access or refresh
+    tokens for a new one.</li>
 </ul>
 <p>And here is the executive summary of the steps</p>
 <ol>
-    <li><b>geturi</b> -- cut the result, paste it in your brower, authenticate</li>
+    <li><b>seturi</b> -- cut the result, paste it in your brower, authenticate</li>
     <li>Get an error -- your redirect won't work. Great, but the url from the address box in your browser</li>
-    <li>issue <b>setgrant</b> using the callback you jus copied</li>
+    <li>issue <b>getgrant</b> using the callback you just copied to the clipbord</li>
     <li>issue <b>getat</b> This gets a access token, prints out stuff and lets you look at the id token, refresh token etc.</li>
 </ol>
 <h3>Setup</h3>
@@ -87,7 +92,7 @@
     the call). As with all calls, you can get a description of what it is and does by supplying
     the argument --help:</p>
 <pre>
-    client&gt;geturi --help
+    client&gt&gt;seturi --help
     Usage: This will create the correct URL to pass to your browser.
            This URL should be pasted exactly into the location bar.
            You must then authenticate. After you authenticate, the
@@ -95,16 +100,19 @@
            fail (this is the hook that lets us do this manually).
            Next Step: You should invoke setgrant with the callback uri from the server
 </pre>
-<p>You <b>must</b> cut and paste this into your browser. You will then complete the authorization there and
+<p>You <b>must</b> paste this into your browser. It should be in the clipboard at the end of the call.
+    You will then complete the authorization there and
     then next step will fail. What has happened is that the server tries to do the callback to the supplied (bogus) URI
-    and, of course, there is nothing at the endpoint. You take this callback from the browser's location bar and invoke
+    and, of course, there is nothing at the endpoint. You take this callback from the browser's location bar,
+    paste it into the clipboard and invoke
     the
-    <b>setgrant</b> call</p>
+    <b>getgrant</b> call</p>
 <pre>
-    client&gt;setgrant https://ashigaru.ncsa.uiuc.edu:9443/client/ready?code=https%3A%2F%2Fsurge.ncsa.illinois.edu%2Foauth2%2FauthzGrant%2F69423b7a0ff66ba67b6beb777baa4fce%2F1473714031677&amp;state=MUB0Y2wme8FvxTbtwjp6y4xLfR3SbxS4NY6_FqDlM-Q
+    client&gt;getgrant
         grant=https://surge.ncsa.illinois.edu/oauth2/authzGrant/69423b7a0ff66ba67b6beb777baa4fce/1473714031677
 </pre>
-<p>This call will update the internal state of the program. (This is managing a full client instance behind the
+<p>This call will read from the clipboard and update the internal state of the program.
+    (This is managing a full client instance behind the
     scenes which takes quite some little work, but fortunately, you don't have to do any of that.) It prints out the
     grant
     that the server issued, mostly so you can see it. Now you are in a position to get an access token. You should issue
@@ -181,6 +189,8 @@
 <p>It is useful to state that you may keep renewing the refresh token and getting certs. As long
     as you renew the refresh token before it expires, this may be done indefinitely. As long as you have
     a valid access token (such as right after getting a new refresh token) you may get a cert.</p>
+<p>In a similar way, you may use the <b>exchange</b> command, which exercises RFC 8693 so if you need
+to test this support on the server, it is very easy to do so.</p>
 <!--#include virtual="../../footer.html" -->
 </body>
 </html>

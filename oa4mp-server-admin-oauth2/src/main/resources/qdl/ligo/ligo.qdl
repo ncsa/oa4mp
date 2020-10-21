@@ -46,13 +46,3 @@ cfg.search_attributes. := ['email', 'uin', 'uid', 'isMemberOf'];
 
         claim_sources. := claim_sources. ~ [cfg.];
 
-
-
-/*  older way of doing it
-cfg.groups.0 := 'isMemberOf';
-list_append(sa., 'email');                                           no
-list_append(sa., 'uin');
-list_append(sa., 'uid');
-list_append(sa., 'isMemberOf');
-cfg.search_attributes. := sa.;
-*/

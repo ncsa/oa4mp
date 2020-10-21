@@ -24,7 +24,7 @@
 
 */
 
-DEBUG := false; // always false on production.
+DEBUG := true; // always false on production.
 if[DEBUG][
 //
 /* Set up debug source from file for testing. */
@@ -36,9 +36,11 @@ if[DEBUG][
 /* ********** These fake getting the claims and scopes from the user. ********** */
     claims.eppn := 'swhite@fnal.gov';
     claims.uid := 'swhite@fnal.gov';
-    scopes.0 := 'storage.create:/dune';
+    scopes.0 := 'storage.create:/dune/';
     //scopes.0 := 'storage.write:/dune/scratch/users/swhite';
-    scopes.1 :=  'storage.create:/dune/';
+    scopes.1 :=  'storage.write:/dune/';
+    // Give an extra long scope so it has to resolve it.
+    scopes.2 := 'storage.create:/dune/scratch/users/swhite/temp';
 ]; // end debug block
 
 if[
@@ -60,8 +62,7 @@ fnal.search_base := 'ou=people,o=Fermilab,o=CO,dc=cilogon,dc=org';
        fnal.type := 'ldap';
   fnal.ldap_name := 'voPersonExternalID';
 
-fnal.search_attributes.
-                 :=  ['eduPersonEntitlement'];
+fnal.search_attributes. :=  ['eduPersonEntitlement'];
                  
 at_claims. := get_claims(fnal., claims.eppn); // test user
 // Get the claims. The capabilities are stored as a stem in
@@ -76,7 +77,7 @@ if[
 ]; //end if
 
              caps. := at_claims.eduPersonEntitlement.; // capabilities in claim source
-      temp_scopes. := mask(caps., -1 < list_starts_with(caps., scopes.)); // take the ones that match the start
+      temp_scopes. := mask(scopes., -1 < list_starts_with(scopes., caps.)); // take the ones that match the start
 access_token.scope := detokenize(temp_scopes., ' ', 2); // turn in to string, omit trailing space
 
 say(access_token.);

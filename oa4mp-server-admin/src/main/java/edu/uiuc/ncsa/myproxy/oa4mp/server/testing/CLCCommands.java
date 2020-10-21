@@ -20,7 +20,11 @@ public abstract class CLCCommands extends CommonCommands {
         return ce;
     }
 
-    ClientEnvironment ce;
+    public void setCe(ClientEnvironment ce) {
+        this.ce = ce;
+    }
+
+    protected ClientEnvironment ce;
     OA4MPService service;
 
     public abstract OA4MPService getService();

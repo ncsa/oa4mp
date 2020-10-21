@@ -18,24 +18,33 @@
 */
 DEBUG := true;
 if[DEBUG][
+say('In debug = ON');
 // Debug stuff --  uncomment if running on my dev box. Should not be in store.
   claims.idp := 'https://idp.ncsa.illinois.edu/idp/shibboleth';
  claims.eppn := 'jgaynor@illinois.edu';
 claims.debug := 'debugging mode on.';
 ]; //end debugging hack
-
+say('at top');
+say('script arg count =' + script_args());
 if[
      exec_phase == 'pre_auth' &&
      claims.idp == 'https://idp.ncsa.illinois.edu/idp/shibboleth'
 ]then[
-               cfg. := new_template('ncsa');
-         claims.uid := claims.eppn - '@illinois.edu'; // Set search key.
-     claim_sources. := claim_sources. ~ [cfg.]; // add it to any claims
+     cfg. := new_template('ncsa');
+     claims.uid := claims.eppn - '@illinois.edu'; // Set search key.
+     claim_sources. := claim_sources. ~ [create_source(cfg.)]; // add it to any claims
 ]; //end if
 
 if[
-   exec_phase == 'post_token' &&  0 < script_args() && script_args(0)=='true'
+   exec_phase == 'post_token'
 ]then[
+   convert := false;
+   if[
+     0 < script_args()
+    ][
+      convert := script_args(0)=='true';
+    ];
+    if[!convert][return();];
    // then take the isMemberOf claims and return them as a flat list, not as a JSON structure.
     s. := null; // initialize it
      n := size(claims.isMemberOf.);
