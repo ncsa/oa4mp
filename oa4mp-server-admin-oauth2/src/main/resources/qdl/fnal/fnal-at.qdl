@@ -63,22 +63,32 @@ fnal.search_base := 'ou=people,o=Fermilab,o=CO,dc=cilogon,dc=org';
   fnal.ldap_name := 'voPersonExternalID';
 
 fnal.search_attributes. :=  ['eduPersonEntitlement'];
-                 
-at_claims. := get_claims(fnal., claims.eppn); // test user
-// Get the claims. The capabilities are stored as a stem in
 
-access_token.sub := claims.eppn;
+       at_claims. := get_claims(fnal., claims.eppn); // test user
+ access_token.sub := claims.eppn;
 
+// A 'starts with' function that returns the elements of x. that start with something in y.
+// read 'x starts with y'
+
+define[sw(x., y.)][return(mask(x., -1< list_starts_with(x., y.)));];
+
+// Hop out if for some reason there were no scopes in LDAP.
 if[
    !is_defined(at_claims.eduPersonEntitlement.)
 ]then[
    access_token.scope := ''; // return empty scopes.
-   return(); // nothing to do. No capabilities, so no scopes.
+   return(); // nothing to do. No capabilities ==>  no scopes.
 ]; //end if
 
-             caps. := at_claims.eduPersonEntitlement.; // capabilities in claim source
-      temp_scopes. := mask(scopes., -1 < list_starts_with(scopes., caps.)); // take the ones that match the start
-access_token.scope := detokenize(temp_scopes., ' ', 2); // turn in to string, omit trailing space
+temp_scopes. := {};
+       caps. := at_claims.eduPersonEntitlement.; // capabilities in claim source
+// case 1: The handed in scopes are superstring of the capabilities. Return the capability
+if[exec_phase == 'post_token'][temp_scopes. := sw(caps., scopes.);];
+
+// case 2: The capabilities are superstring of the scopes. Return the scope.
+if[exec_phase == 'post_refresh'][temp_scopes. := sw(scopes., caps.);];
+
+access_token.scope := detokenize(unique(temp_scopes.), ' ', 2); // turn in to string, omit duplications, trailing space
 
 say(access_token.);
 

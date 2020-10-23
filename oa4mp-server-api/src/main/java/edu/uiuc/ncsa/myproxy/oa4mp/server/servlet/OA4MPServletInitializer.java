@@ -131,7 +131,7 @@ public class OA4MPServletInitializer implements Initialization {
         // determining if log4j is in use and configuring that.
         URI serviceAddress = mps.getServiceEnvironment().getServiceAddress();
         if (serviceAddress != null) {
-            DebugUtil.host = serviceAddress.getHost();
+            DebugUtil.setHost(serviceAddress.getHost());
         }
         try {
             //mps.storeUpdates();

@@ -15,6 +15,7 @@ When a new version is deployed, here is the testing order
         a bogus WLCG access token.
 
 * Put on dev.
+  Note: Don't have local OA2 server running, since callbacks can get intercepted.
   -- Use command line client #1 from ashigaru (dev:command.line)
   -- Use command line client #2 from ashigaru (dev:command.line2)
   -- Do demo on dev: https://demo-dev.cilogon.org/cilogon2/ (cilogon:dev.cilogon.org/demo)

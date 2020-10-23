@@ -44,5 +44,5 @@ if[
            cfg.groups. := ['isMemberOf'];
 cfg.search_attributes. := ['email', 'uin', 'uid', 'isMemberOf'];
 
-        claim_sources. := claim_sources. ~ [cfg.];
+        claim_sources. := claim_sources. ~ [create_source(cfg.)];
 

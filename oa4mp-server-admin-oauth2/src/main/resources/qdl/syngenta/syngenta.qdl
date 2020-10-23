@@ -5,7 +5,7 @@
 
     Jeff Gaynor
     created: 2020-10-05T19:54:44.283Z
-    updated: 2020-10-20T11:41:45.145Z
+    updated: 2020-10-22T11:58:09.078Z
 */
 
 /*
@@ -26,27 +26,33 @@ idp.syngenta := 'https://sts.windows.net/06219a4a-a835-44d5-afaf-3926343bfb89/';
     idp.ncsa := 'https://idp.ncsa.illinois.edu/idp/shibboleth';
 
 if[
-    exec_phase == 'pre_auth' && claims.idp ==  idp.syngenta
+    exec_phase == 'pre_auth'
 ][
-    cfg. := new_template('code');
-    cfg.java_class := 'org.cilogon.oauth2.servlet.claims.SAMLAttributeClaimSource';
-    claim_sources. := claim_sources. ~ [create_source(cfg.)];
-    return(); // naught else to do
+  if[
+       claims.idp == idp.syngenta
+   ][
+       cfg. := new_template('code');
+       cfg.java_class := 'org.cilogon.oauth2.servlet.claims.SAMLAttributeClaimSource';
+       claim_sources. := claim_sources. ~ [create_source(cfg.)];
+       return(); // naught else to do
+   ];
+
+  // other option is if it is the NCSA IDP, just process using NCSA LDAP
+   if[
+       claims.idp == idp.ncsa
+    ][
+       script_load('ncsa/ncsa-default.qdl', [true]);
+    ];
 ]; //end if
 
-// other option is if it is the NCSA IDP, just process using NCSA LDAP
 
 if[
-   claims.idp == idp.ncsa
- ]then[
-   if[exec_phase == 'pre_auth'][script_load('ncsa/ncsa-default.qdl', [true]);];
-   if[
-       exec_phase == 'post_token'
-     ][
-       script_load('ncsa/ncsa-default.qdl', [true]); // This will process the is Member claims
-       flow_states.accept_requests := has_value('prj_sprout', claims.isMemberOf.);
-     ];
+    exec_phase == 'post_token' && claims.idp == idp.ncsa
+][
+    script_load('ncsa/ncsa-default.qdl', [true]); // This will process the is Member claims
+    flow_states.accept_requests := has_value('prj_sprout', claims.isMemberOf.);
 ];
+
 
 /*
   ============= rest of this file just references the old way.

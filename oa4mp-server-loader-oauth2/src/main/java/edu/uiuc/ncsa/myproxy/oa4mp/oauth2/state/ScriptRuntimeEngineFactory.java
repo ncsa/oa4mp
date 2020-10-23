@@ -32,7 +32,7 @@ public class ScriptRuntimeEngineFactory {
                 OA2State state = qrt.getState();
                 state.setOa2se(oa2SE);
                 state.setTransaction(transaction);
-
+                 state.setLogger(oa2SE.getMyLogger()); // This lets scripts write to the log.
                 return qrt;
             }
         return null;
