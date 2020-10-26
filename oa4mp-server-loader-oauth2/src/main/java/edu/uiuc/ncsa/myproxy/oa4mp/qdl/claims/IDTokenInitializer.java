@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import net.sf.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,7 +14,7 @@ import java.util.List;
  * <p>Created by Jeff Gaynor<br>
  * on 10/12/20 at  6:12 AM
  */
-public class IDTokenInitializer {
+public class IDTokenInitializer implements Serializable {
     public static String ID_TOKEN_INIT_METHOD = "id_init";
     public static String ID_TOKEN_FINISH_METHOD = "id_finish";
     public static String ID_TOKEN_REFRESH_METHOD = "id_refresh";
