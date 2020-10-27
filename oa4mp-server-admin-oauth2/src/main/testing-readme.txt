@@ -18,6 +18,7 @@ When a new version is deployed, here is the testing order
   Note: Don't have local OA2 server running, since callbacks can get intercepted.
   -- Use command line client #1 from ashigaru (dev:command.line)
   -- Use command line client #2 from ashigaru (dev:command.line2)
+  -- see file ~/dev/csd/config/dev-testing.txt for several configurations to test.
   -- Do demo on dev: https://demo-dev.cilogon.org/cilogon2/ (cilogon:dev.cilogon.org/demo)
        No additional configuration, just basic user claims and a cert.
   -- Do surge plain client: https://surge.ncsa.illinois.edu/cilogon-oa2-dev/
@@ -29,7 +30,9 @@ When a new version is deployed, here is the testing order
        ** NOTE: This is NOT QDL but functor scripting and is a critical regression test.
 
 * Put on test.
-  -- Command line client from ashigaru (test:command.line, id ends with 70530)
+  -- Command line client from ashigaru (test:command.line0, id ends with 70530)
+  -- Command line client from ashigaru (test:command.line)
+  -- Command line client from ashigaru (test:command.line2)
   -- Do surge test client: https://surge.ncsa.illinois.edu/cilogon-oa2-test/
         Plain vanilla, no extra configuration.
   -- Do demo0 client: https://demo0.cilogon.org/cilogon2/ (id ends with demo0)

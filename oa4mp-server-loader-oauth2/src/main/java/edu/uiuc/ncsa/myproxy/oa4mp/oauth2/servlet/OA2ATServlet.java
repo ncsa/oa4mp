@@ -226,7 +226,10 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         if (t == null) {
             throw new GeneralException("Error: no pending transaction found.");
         }
-
+        // Finally can check access here. Access for exchange is same as for refresh token.
+        if (!t.getFlowStates().acceptRequests || !t.getFlowStates().refreshToken) {
+             throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "token exchange access denied", HttpStatus.SC_UNAUTHORIZED);
+         }
         Collection<String> originalScopes = t.getScopes();
         if(!scopes.isEmpty()) {
             // Missing scopes means use whatever is there.
@@ -546,7 +549,6 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         OA2ServiceTransaction t = getByRT(oldRT);
         if (!t.getFlowStates().acceptRequests || !t.getFlowStates().refreshToken) {
             throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "refresh token access denied", HttpStatus.SC_UNAUTHORIZED);
-
         }
         if ((!(oa2SE).isRefreshTokenEnabled()) || (!c.isRTLifetimeEnabled())) {
             throw new OA2ATException(OA2Errors.REQUEST_NOT_SUPPORTED, "Refresh tokens are not supported on this server");
