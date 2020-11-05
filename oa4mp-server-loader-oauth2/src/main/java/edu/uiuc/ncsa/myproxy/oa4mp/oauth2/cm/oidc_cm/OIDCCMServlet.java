@@ -38,8 +38,9 @@ import java.sql.SQLException;
 import java.util.*;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.oidc_cm.OIDCCMConstants.*;
-import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.REFRESH_LIFETIME;
-import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.TOKEN_ENDPOINT_AUTH_NONE;
+import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.oidc_cm.OIDCCMConstants.CLIENT_ID;
+import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.oidc_cm.OIDCCMConstants.CLIENT_SECRET;
+import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.*;
 import static edu.uiuc.ncsa.security.oauth_2_0.server.RFC8693Constants.GRANT_TYPE_TOKEN_EXCHANGE;
 
 /**
@@ -685,6 +686,10 @@ public class OIDCCMServlet extends EnvServlet {
             // NOTE this is sent in seconds but is recorded as ms., so convert to milliseconds here.
             client.setRtLifetime(jsonRequest.getLong(REFRESH_LIFETIME) * 1000);
             jsonRequest.remove(REFRESH_LIFETIME);
+        }
+        if(jsonRequest.containsKey(STRICT_SCOPES)){
+            client.setStrictscopes(jsonRequest.getBoolean(STRICT_SCOPES));
+            jsonRequest.remove(STRICT_SCOPES);
         }
         // Fix for CIL-734: now handle everything else left over
         client.removeOIDC_CM_Attributes();
