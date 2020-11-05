@@ -3,7 +3,7 @@
    In this case, the groups are returned in the claims, along with the uin
    Jeff Gaynor
    created: 2020-09-15T16:00:55Z
-   updated: 2020-10-19T20:09:03.181Z
+   updated: 2020-10-31T11:57:45.909Z
  */
 /*
   The configuration for this that should be in the client:
@@ -19,7 +19,7 @@
     access{
        type=sci_token
        qdl{
-          load="ligo/ligo-access.qdl"
+          load="ligo/access.qdl"
           xmd={exec_phase=post_token}
        } //end QDL
     } // end access token
@@ -27,12 +27,14 @@
 */
 
 /* **** Actual script **** */
+script_load('utils/init.qdl');
 if[
-     claims.idp != 'https://login.ligo.org/idp/shibboleth'
+     claims.idp != idp.ligo
 ][
      return();
 ];
-            claims.uid := substring(claims.eppn, 0, index_of(claims.eppn, '@'));
+
+            claims.uid := caput(claims.eppn, '@');
 
          cfg.auth_type := 'none';
            cfg.address := 'ldap.ligo.org';

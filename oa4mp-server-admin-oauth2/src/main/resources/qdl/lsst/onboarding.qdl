@@ -1,60 +1,39 @@
 /*
    This  IS NOT DONE! DO NOT USE. Needs debugged.
-   This pair of scripts is for LSST's onboarding. It returns the user's claims
-   if their IDP is NCSA but in any case, sets voPersonExternalID and asserts it
-   as a claim. Once on-boarded (there are specific clients for this the user has
-   to visit first) then the user si directed to clients that link the identity
-   (and use the lsst-linking.qdl scripting).
+   There is a pair of scripts is for LSST. These do
+    * onboarding = if a person comes in through any of several IDPs create a voPersonExternalID
+                   and return that as a claim.
+    * linking = Once a user has been onboarded, possibly do a two-step look up. If their IDP is NCSA,
+                then just get them. If not, create the voPersonExternalID, query NCSA LDAP on that, then
+                look them up based on their associated EPPN.
+   Author: Jeff Gaynor
+   Created: 2020-10-31T12:58:43.944Z
+   
+
+   {"tokens": {"identity": {
+    "qdl":  {
+     "load": "lsst/onboarding.qdl",
+     "xmd": {"exec_phase":   [
+      "pre_auth",
+      "post_token"
+     ]}
+    },
+    "type": "identity"
+   }}}
 */
-// General constants
-        vo := 'voPersonExternalID';
-  idp.ncsa := 'https://idp.ncsa.illinois.edu/idp/shibboleth';
-idp.google := 'http://google.com/accounts/o8/id';
- idp.orcid := 'http://orcid.org/oauth/authorize';
-idp.github := 'http://github.com/login/oauth/authorize';
 
-// run in pre_token
-if[
-    claims.idp == idp.ncsa
-  ]then[
-    f. := new_template('ncsa');
-    claims.foo := claims.eppn - '@illinois.edu;
-    f.search_filter_attribute := 'foo';
-    f.search_attributes.0 := 'uid'; // return the uid from the search as a claim
-    list_append(claim_sources., create_source(f.));
-];
+script_load('ncsa/ncsa-default.qdl'); // also runs init. If NCSA, sets eppn/eptid, if not, no effect
 
-// run in post_token
+if[exec_phase=='pre_auth'][return();];
+
+// run in post_token -- if the IDP was NCSA then this has been run and we have an eppn or eptid.
 v := null;
-if[is_defined(claims.foo)]then[remove(claims.foo);];
-if[
-    is_defined(claims.eppn)
-]then[
-     v:=claims.eppn
-]else[
-    if[
-      is_defined(claims.eptid)
-    ]then[
-       v:=claims.eptid;
+if[is_defined(claims.eppn)][v:=claims.eppn;]else[
+    if[is_defined(claims.eptid)][v:=claims.eptid;];
     ];
-];
 
-if[
-   claims.idp == idp.github
- ]then[
-    v:=claims.oidc+'@github.com';
- ];
+if[claims.idp == idp.github][v:=claims.oidc+'@github.com';];
+if[claims.idp == idp.google][v:=claims.oidc+'@accounts.google.com';];
+if[claims.idp == idp.orcid][v:=replace(claims.oidc,'http://', 'https://');];
 
-if[
-  claims.idp == idp.google
-  ]then[
-    v:=claims.oidc+'@accounts.google.com';
-  ];
-
-if[
-   claims.idp == idp.orcid
-  ]then[
-    v:=replace(claims.oidc,'http://', 'https://');
-  ];
-
-if[ v!= null]then[claims.vo := v;];
+if[ v!= null]then[claims.VOP := v;];

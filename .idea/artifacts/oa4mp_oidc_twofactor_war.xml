@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="oa4mp-oidc-twofactor:war">
+    <output-path>$PROJECT_DIR$/oa4mp-oidc-twofactor/target</output-path>
+    <properties id="maven-jee-properties">
+      <options>
+        <module>oa4mp-oidc-twofactor</module>
+        <packaging>war</packaging>
+      </options>
+    </properties>
+    <root id="archive" name="oidc2fca.war">
+      <element id="artifact" artifact-name="oa4mp-oidc-twofactor:war exploded" />
+    </root>
+  </artifact>
+</component>

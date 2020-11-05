@@ -1,7 +1,7 @@
 /*
    Default NCSA LDAP claim source. This will retrieve all group membership information.
    This will do nothing unless the IDP is correct.
-   updated: 2020-10-22T12:08:12.620Z
+   updated: 2020-11-04T15:41:05.645Z
 
 
   tokens{
@@ -17,6 +17,8 @@
 
 */
 DEBUG := true;
+debug(0, 'first debug message');
+log('log message');
 if[DEBUG][
 say('In debug = ON');
 // Debug stuff --  uncomment if running on my dev box. Should not be in store.
@@ -27,13 +29,15 @@ claims.debug := 'debugging mode on.';
 say('at top');
 say('script arg count =' + script_args());
 
-if[ claims.idp != 'https://idp.ncsa.illinois.edu/idp/shibboleth'][return();];
+script_load('utils/init.qdl');
+
+if[claims.idp != idp.ncsa][return();]; // never process anything unless IDP is right.
 
 if[
      exec_phase == 'pre_auth'
 ]then[
      cfg. := new_template('ncsa');
-     claims.uid := substring(claims.eppn, 0, index_of(claims.eppn, '@')); // set search key
+     claims.uid := caput(claims.eppn, '@'); // set search key
      claim_sources. := claim_sources. ~ [create_source(cfg.)]; // add it to any claims
 ]; //end if
 
@@ -42,9 +46,18 @@ if[
 ]then[
    convert := false;
    if[
-     0 < script_args() // QDL does not do short-circuit 
+      0 < script_args() // QDL does not do short-circuit
     ][
-      convert := script_args(0)=='true'; // comes in a string, just check that.
+      // later (after 1.2.1) use this:
+      // convert := to_boolean(script_args(0));
+      if[
+         var_type(script_args(0)) == 1
+      ][
+         convert := script_args(0);
+       ]else[
+         convert := script_args(0) == 'true'; // comes in as a string, just check that.
+      ];
+
     ];
     if[!convert][return();];
    // then take the isMemberOf claims and return them as a flat list, not as a JSON structure.

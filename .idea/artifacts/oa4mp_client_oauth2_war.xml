@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="oa4mp-client-oauth2:war">
+    <output-path>$PROJECT_DIR$/oa4mp-client-oauth2/target</output-path>
+    <properties id="maven-jee-properties">
+      <options>
+        <module>oa4mp-client-oauth2</module>
+        <packaging>war</packaging>
+      </options>
+    </properties>
+    <root id="archive" name="client2.war">
+      <element id="artifact" artifact-name="oa4mp-client-oauth2:war exploded" />
+    </root>
+  </artifact>
+</component>

@@ -115,14 +115,16 @@ public class OA2CLCCommands extends CLCCommands {
     public void seturi(InputLine inputLine) throws Exception {
         geturi(inputLine);
     }
-        OA2CommandLineClient oa2CommandLineClient;
-    public void load(InputLine inputLine) throws Exception{
-        if(!inputLine.hasArgs()){
+
+    OA2CommandLineClient oa2CommandLineClient;
+
+    public void load(InputLine inputLine) throws Exception {
+        if (!inputLine.hasArgs()) {
             say("config file = " + oa2CommandLineClient.getConfigFile() + ", config name=" + oa2CommandLineClient.getConfigName());
             return;
         }
         oa2CommandLineClient.load(inputLine);
-        if(showHelp(inputLine)){
+        if (showHelp(inputLine)) {
             return;
         }
         clear(inputLine); // only thing used in clear is --help. If that is present won't get here.
@@ -130,6 +132,7 @@ public class OA2CLCCommands extends CLCCommands {
         service = null;
         say("Remember that loading a configuration clears all current state.");
     }
+
     /**
      * Constructs the URI
      *
@@ -157,6 +160,7 @@ public class OA2CLCCommands extends CLCCommands {
                 say("Sorry, I could not find the configuration with id =\"" + name + "\":" + t.getMessage());
             }
         }*/
+        clear(inputLine);
         Identifier id = AssetStoreUtil.createID();
         OA4MPResponse resp = getService().requestCert(id);
         DebugUtil.trace(this, "client id = " + getCe().getClientId());
@@ -460,9 +464,9 @@ public class OA2CLCCommands extends CLCCommands {
         if (dummyAsset.getAccessToken() != null) {
             // If the access token is a jwt
             JSONObject token = resolveFromToken(getDummyAsset().getAccessToken());
-            if(token == null){
-                say( "default access token = " + dummyAsset.getAccessToken().getToken());
-            }else{
+            if (token == null) {
+                say("default access token = " + dummyAsset.getAccessToken().getToken());
+            } else {
                 sayi("JWT access token:" + token.toString(1));
 
             }
@@ -471,18 +475,18 @@ public class OA2CLCCommands extends CLCCommands {
         if (dummyAsset.getRefreshToken() != null) {
 
             JSONObject token = resolveFromToken(getDummyAsset().getRefreshToken());
-            if(token == null){
+            if (token == null) {
                 say("default refresh token = " + dummyAsset.getRefreshToken().getToken());
                 say("RT expires in = " + dummyAsset.getRefreshToken().getExpiresIn() + " ms.");
                 Date startDate = DateUtils.getDate(dummyAsset.getRefreshToken().getToken());
                 startDate.setTime(startDate.getTime() + dummyAsset.getRefreshToken().getExpiresIn());
                 say("   expires at " + startDate);
 
-            }else{
+            } else {
                 say("JWT refresh token = " + token.toString(1));
-                if(token.containsKey(OA2Claims.EXPIRATION)){
+                if (token.containsKey(OA2Claims.EXPIRATION)) {
                     Date d = new Date();
-                    d.setTime(token.getLong(OA2Claims.EXPIRATION)*1000L);
+                    d.setTime(token.getLong(OA2Claims.EXPIRATION) * 1000L);
                     getDummyAsset().getRefreshToken().setExpiresIn(d.getTime() - System.currentTimeMillis());
                     say("RT expires in = " + getDummyAsset().getRefreshToken().getExpiresIn() + " ms.");
                 }

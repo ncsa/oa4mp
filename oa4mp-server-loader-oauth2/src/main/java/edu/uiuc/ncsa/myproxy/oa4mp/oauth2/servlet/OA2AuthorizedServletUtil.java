@@ -160,7 +160,11 @@ public class OA2AuthorizedServletUtil {
 
         DebugUtil.trace(this, "starting to process claims, creating basic claims:");
         jwtRunner.doAuthClaims();
-
+        if (!t.getFlowStates().acceptRequests  || t.getFlowStates().getClaims) {
+            // if they are not allowed to get claims, they get booted out here
+            oa2SE.getTransactionStore().save(t); // save it so we have this in the future, then bail
+            throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "access denied", HttpStatus.SC_UNAUTHORIZED);
+        }
         DebugUtil.trace(this, "done with claims, transaction saved, claims = " + t.getUserMetaData());
         return t;
     }

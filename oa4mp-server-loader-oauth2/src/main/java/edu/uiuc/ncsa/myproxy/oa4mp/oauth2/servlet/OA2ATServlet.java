@@ -364,7 +364,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         OA2SE oa2SE = (OA2SE) getServiceEnvironment();
 
         OA2ServiceTransaction st2 = (OA2ServiceTransaction) state.getTransaction();
-        if (!st2.getFlowStates().acceptRequests || !st2.getFlowStates().accessToken) {
+        if (!st2.getFlowStates().acceptRequests || !st2.getFlowStates().accessToken || !st2.getFlowStates().idToken) {
             throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "access denied", HttpStatus.SC_UNAUTHORIZED);
         }
         st2.setAccessToken(atResponse.getAccessToken()); // needed if there are handlers later.
@@ -375,6 +375,10 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         setupTokens(client, atResponse, oa2SE, st2, jwtRunner);
 
         getTransactionStore().save(st2);
+        // Check again after doing token claims in case a script changed it.
+        if (!st2.getFlowStates().acceptRequests || !st2.getFlowStates().accessToken || !st2.getFlowStates().idToken) {
+            throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "access denied", HttpStatus.SC_UNAUTHORIZED);
+        }
         return state;
     }
 

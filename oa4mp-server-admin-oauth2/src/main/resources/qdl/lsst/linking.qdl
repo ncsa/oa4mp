@@ -1,8 +1,47 @@
 /*
-This is for linking identities. It assumes that the voPersonExternalID is already in
-LDAP and will do a search there for it. If found, then it will do a second LDAP query
-for the user's NCSA-specific information.
-------
+   This is for linking identities. It assumes that the voPersonExternalID is already in
+   LDAP and will do a search there for it. If found, then it will do a second LDAP query
+   for the user's NCSA-specific information.
+   Author: Jeff Gaynor
+   Created: 2020-10-31T12:39:30.422Z
+
+   The client configuration:
+
+   {"tokens": {"identity": {
+    "qdl":  {
+     "load": "lsst/linking.qdl",
+     "xmd": {"exec_phase":   [
+      "pre_auth",
+      "post_token"
+     ]}
+    },
+    "type": "identity"
+   }}}
+
+*/
+
+
+// Some constants for later.
+script_load('utils/init.qdl');
+if[
+    exec_phase == 'pre_auth' && claims.idp != idp.ncsa
+  ][
+     v := null;
+     switch[
+        if[claims.idp == idp.github]then[v:=claims.oidc+'@github.com';];
+        if[claims.idp == idp.google]then[v:=claims.oidc+'@accounts.google.com';];
+        if[claims.idp == idp.orcid ]then[v:=replace(claims.oidc,'http://', 'https://');];
+     ]; //end switch
+     claims.VOP := v;
+     f. := new_template('ncsa');
+     f.search_filter_attribute := VOP;
+     f.search_attributes. := ['uid']; // return the uid from the search as a claim
+     c. := get_claims(create_source(f.), v);
+     claims.uid := c.uid;
+]; // end if
+script_load('ncsa/ncsa-default.qdl');
+
+/*
 Original script for functors -- here for reference while I debug, should be deleted at some point.
 "setEnv('vo','voPersonExternalID');",
   "setEnv('ncsa','https://idp.ncsa.illinois.edu/idp/shibboleth');",
@@ -28,39 +67,4 @@ Original script for functors -- here for reference while I debug, should be dele
       "    if[equals(get('idp'),'${google}')]then[set('${vo}',concat(get('oidc'),'@accounts.google.com'))],",
       "   if[equals(get('idp'),'${orcid}')]then[set('${vo}',replace(get('oidc'),'http://','https://'))]",
       "};"
-------
-
 */
-// Some constants for later.
-        vo := 'voPersonExternalID';
-  idp.ncsa := 'https://idp.ncsa.illinois.edu/idp/shibboleth';
-idp.google := 'http://google.com/accounts/o8/id';
- idp.orcid := 'http://orcid.org/oauth/authorize';
-idp.github := 'http://github.com/login/oauth/authorize';
-
-// in pre_auth
-if[
-    claims.idp == idp.ncsa
- ]then[
-    claims.uid := claims.eppn - '@ncsa.illinois.edu';
-    claims.voPersonExternalID := claims.eppn;
- ]else[
-     // If this is not the NCSA IDP, do a search on their voPersonExternalID
-     // to set their uid, then feed their uid to LDAP.
-     // Note that in this project, the ligo-accessonly allowed IDPs are NCSA and these!
-     v := null;
-     switch[
-        if[claims.idp == idp.github]then[v:=claims.oidc+'@github.com';];
-        if[claims.idp == idp.google]then[v:=claims.oidc+'@accounts.google.com';];
-        if[claims.idp == idp.orcid ]then[v:=replace(claims.oidc,'http://', 'https://');];
-     ]; //end switch
-     claims.voPersonExternalID := v;
-     f. := new_template('ncsa');
-     f.search_filter_attribute := 'voPersonExternalID';
-     f.search_attributes.0 := 'uid'; // return the uid from the search as a claim
-     c. := get_claims(create_source(f.), v);
-
- ]; // end if
-f. := new_template('ncsa');
-f.search_filter_attribute := 'uid';
-claim_sources. := claim_sources. ~ [create_source(f.)];

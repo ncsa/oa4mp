@@ -1,0 +1,134 @@
+{
+  "config": "Syngenta (sprout) client configuration 7/23/2018 ",
+  "isSaved": false,
+  "claims": {
+    "sourceConfig": [
+      {
+        "default": {
+          "name": "Syngenta SAML attribute source",
+          "id": "42",
+          "enabled": true,
+          "failOnError": false,
+          "notifyOnFail": false
+        }
+      },
+      {
+        "ldap": {
+          "preProcessing": [
+            {
+              "$if": ["$true"],
+              "$then": [
+                {
+                  "$set": [
+                    "foo",
+                    {
+                      "$drop": [
+                        "@ncsa.illinois.edu",
+                        "${eppn}"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "postProcessing": [
+            {
+              "$if": ["$true"],
+              "$then": [
+                {"$exclude": ["foo"]},
+                {"$set": ["sub",{"$get": ["eppn"]}]}
+              ]
+            },
+            {
+              "$if": [
+                {"$not": [{"$isMemberOf": ["prj_sprout"]}]}
+              ],
+              "$then": [{"$accept_requests": ["$false"]}]
+            }
+          ],
+          "id": "58a170bfe4a59c05",
+          "name": "58a170bfe4a59c05",
+          "address": "ldap.ncsa.illinois.edu",
+          "port": 636,
+          "enabled": true,
+          "authorizationType": "none",
+          "failOnError": false,
+          "notifyOnFail": false,
+          "searchAttributes": [
+            {
+              "name": "mail",
+              "returnAsList": false,
+              "returnName": "email"
+            },
+            {
+              "name": "cn",
+              "returnAsList": false,
+              "returnName": "name"
+            },
+            {
+              "name": "memberOf",
+              "isGroup": true,
+              "returnAsList": false,
+              "returnName": "isMemberOf"
+            }
+          ],
+          "searchBase": "ou=People,dc=ncsa,dc=illinois,dc=edu",
+          "searchName": "foo",
+          "contextName": "",
+          "ssl": {
+            "keystore": {},
+            "tlsVersion": "TLS",
+            "useJavaTrustStore": true,
+            "password": "changeit",
+            "type": "jks"
+          }
+        }
+      }
+    ],
+    "sources": [
+      {
+        "alias": "syngenta",
+        "className": "org.cilogon.oauth2.servlet.claims.SAMLAttrbuteClaimSource"
+      }
+    ],
+    "preProcessing": [
+      {
+        "$if": [
+          {
+            "$equals": [
+              {"$get": ["idp"]},
+              "https://sts.windows.net/06219a4a-a835-44d5-afaf-3926343bfb89/"
+            ]
+          }
+        ],
+        "$then": [
+          {
+            "$set_claim_source": [
+              "syngenta",
+              "42"
+            ]
+          }
+        ]
+      },
+      {
+        "$if": [
+          {
+            "$equals": [
+              {"$get": ["idp"]},
+              "https://idp.ncsa.illinois.edu/idp/shibboleth"
+            ]
+          }
+        ],
+        "$then": [
+          {
+            "$set_claim_source": [
+              "LDAP",
+              "58a170bfe4a59c05"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

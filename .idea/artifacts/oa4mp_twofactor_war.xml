@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="oa4mp-twofactor:war">
+    <output-path>$PROJECT_DIR$/oa4mp-twofactor/target</output-path>
+    <properties id="maven-jee-properties">
+      <options>
+        <module>oa4mp-twofactor</module>
+        <packaging>war</packaging>
+      </options>
+    </properties>
+    <root id="archive" name="twofactor.war">
+      <element id="artifact" artifact-name="oa4mp-twofactor:war exploded" />
+    </root>
+  </artifact>
+</component>

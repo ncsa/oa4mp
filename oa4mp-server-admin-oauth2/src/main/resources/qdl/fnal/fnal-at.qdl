@@ -15,7 +15,7 @@
         audience="https://wlcg.cern.ch/jwt/v1/any"
         lifetime=3600000
         qdl{
-           load="fnal/fnal-at2.qdl"
+           load="fnal/fnal-at.qdl"
            xmd={exec_phase=["post_token","post_refresh"]}
            args=["USER_ID", "PASSWORD"]
         } //end QDL

@@ -18,6 +18,12 @@ When a new version is deployed, here is the testing order
   Note: Don't have local OA2 server running, since callbacks can get intercepted.
   -- Use command line client #1 from ashigaru (dev:command.line)
   -- Use command line client #2 from ashigaru (dev:command.line2)
+  -- Do test using Syngenta old configuration  (dev:syngenta)
+     NOTE this is a specific version of this for dev! When logging in with GitHub, dummy SAML
+     assertions are sent that can get parsed. This triggers the introspection machinery for
+     claim sources, so this is a must run test.
+     -- Logging in with NCSA should fail since I am not in the prj_sprout group. Test
+        that getcert, exchange, user info and refresh all fail at that point too.
   -- see file ~/dev/csd/config/dev-testing.txt for several configurations to test.
   -- Do demo on dev: https://demo-dev.cilogon.org/cilogon2/ (cilogon:dev.cilogon.org/demo)
        No additional configuration, just basic user claims and a cert.

@@ -1,0 +1,50 @@
+/*
+   Standard initialization for most scripts.
+
+   Jeff Gaynor
+   created: 2020-10-31T11:57:45.909Z
+*/
+
+/*
+   A function to return the if elements of x. that start with some element in y.
+   E.g.
+   x. := ['foo','bar','baz'];
+   y. := ['qqq','ba'];
+   sw(x., y.);
+{
+ 1:bar,
+ 2:baz
+}
+
+*/
+
+/*
+    Note that this works generally on stems (a useful case is determining if scopes are returned).
+*/
+define[sw(x., y.)][return(mask(x., -1< list_starts_with(x., y.)));];
+
+// Version above 1.2.1 of QDL should pass this off to the head function.
+define[
+   caput(x, stopChar)
+  ][
+>> caput(string, stopChar) Returns everything up to the stopChar
+>> E.g.
+>> caput('bob@bsu.edu', '@') return 'bob'
+   ndx := index_of(x,stopChar);
+   if[ndx < 0][return('');];
+   return(substring(x, 0, ndx));
+ ]; // end caput
+/*
+   Bunch of standard IDPs and constants so we don' have to boilerplate these everywhere.
+
+*/
+    idp.fnal := 'https://idp.fnal.gov/idp/shibboleth';
+  idp.github := 'http://github.com/login/oauth/authorize';
+  idp.google := 'http://google.com/accounts/o8/id';
+    idp.ligo := 'https://login.ligo.org/idp/shibboleth';
+    idp.ncsa := 'https://idp.ncsa.illinois.edu/idp/shibboleth';
+   idp.orcid := 'http://orcid.org/oauth/authorize';
+idp.syngenta := 'https://sts.windows.net/06219a4a-a835-44d5-afaf-3926343bfb89/';
+
+         VOP := 'voPersonExternalID';
+         EPE := 'eduPersonEntitlement';
