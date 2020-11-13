@@ -3,9 +3,8 @@ package edu.uiuc.ncsa.oa4mp.oauth2.client;
 import edu.uiuc.ncsa.myproxy.oa4mp.client.Asset;
 import edu.uiuc.ncsa.myproxy.oa4mp.client.storage.AssetConverter;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
-import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
 import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2RefreshTokenImpl;
+import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
 import edu.uiuc.ncsa.security.storage.data.ConversionMap;
 import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
 import edu.uiuc.ncsa.security.util.pkcs.CertUtil;
@@ -39,8 +38,8 @@ public class OA2AssetConverter extends AssetConverter {
         if (at != null) a.setAccessToken(new AccessTokenImpl(URI.create(at)));
         String rt = map.getString(getASK().refreshToken());
         if (rt != null) {
-            RefreshToken refreshToken = new OA2RefreshTokenImpl(URI.create(rt));
-            refreshToken.setExpiresIn(map.getLong(getASK().refreshLifetime()));
+            RefreshTokenImpl refreshToken = new RefreshTokenImpl(URI.create(rt));
+            refreshToken.setExpiresAt(map.getLong(getASK().refreshLifetime()));
             a.setRefreshToken(refreshToken);
         }
         String state = map.getString(getASK().state());
@@ -70,7 +69,7 @@ public class OA2AssetConverter extends AssetConverter {
         if (a.getAccessToken() != null) map.put(getASK().accessToken(), a.getAccessToken().getToken());
         if (a.getRefreshToken() != null) {
             map.put(getASK().refreshToken(), a.getRefreshToken().getToken());
-            map.put(getASK().refreshLifetime(), a.getRefreshToken().getExpiresIn());
+            map.put(getASK().refreshLifetime(), a.getRefreshToken().getExpiresAt());
         }
         if (a.getState() != null) {
             map.put(getASK().state(), a.getState());

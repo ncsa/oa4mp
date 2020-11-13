@@ -7,7 +7,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.client.storage.AssetStore;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
 import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2RefreshTokenImpl;
+import edu.uiuc.ncsa.security.oauth_2_0.RefreshTokenImpl;
 
 import java.net.URI;
 
@@ -22,7 +22,7 @@ public class Client2AssetStoreTest extends AssetStoreTest {
     public Asset storeTest(AssetStore store) throws Exception {
         OA2Asset asset = (OA2Asset) super.storeTest(store);
         AccessToken at = new AccessTokenImpl(URI.create("oa4mp:accessToken:/" + ClientTestStoreUtil.getRandomString()));
-        RefreshToken rt = new OA2RefreshTokenImpl(URI.create("oa4mp:refreshToken:/" + ClientTestStoreUtil.getRandomString()));
+        RefreshToken rt = new RefreshTokenImpl(URI.create("oa4mp:refreshToken:/" + ClientTestStoreUtil.getRandomString()));
 
         rt.setExpiresIn(1000000L);
         asset.setAccessToken(at);

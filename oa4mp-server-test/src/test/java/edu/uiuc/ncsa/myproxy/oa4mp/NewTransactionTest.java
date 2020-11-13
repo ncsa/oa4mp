@@ -48,7 +48,7 @@ public class NewTransactionTest extends TestBase {
         AuthorizationGrant ag = tokenForge.getAuthorizationGrant(x);
         // The forge may return a shared secret. Since we never use this in OA4MP, make sure it is null
         // or you will get false test results since the secret won't be stored.
-        ag.setSharedSecret(null);
+    //    ag.setSharedSecret(null);
         return ag;
     }
 
@@ -58,7 +58,7 @@ public class NewTransactionTest extends TestBase {
 
     protected AccessToken newAT(TokenForge tokenForge, String... x) {
         AccessToken at = tokenForge.getAccessToken(x);
-        at.setSharedSecret(null);
+   //     at.setSharedSecret(null);
         return at;
     }
 

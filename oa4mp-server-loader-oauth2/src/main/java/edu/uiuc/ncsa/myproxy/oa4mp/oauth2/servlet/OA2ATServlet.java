@@ -20,6 +20,7 @@ import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.delegation.storage.TransactionStore;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
+import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
 import edu.uiuc.ncsa.security.oauth_2_0.*;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTRunner;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTUtil2;
@@ -171,6 +172,11 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         if (subjectToken == null) {
             throw new GeneralException("Error: missing subject token");
         }
+
+        String requestedTokenType = getFirstParameterValue(request, REQUESTED_TOKEN_TYPE);
+        if (StringUtils.isTrivial(requestedTokenType)) {
+            requestedTokenType = ACCESS_TOKEN_TYPE;
+        }
         // And now do the spec stuff for the actor token
         String actorToken = getFirstParameterValue(request, ACTOR_TOKEN);
         String actorTokenType = getFirstParameterValue(request, ACTOR_TOKEN_TYPE);
@@ -228,10 +234,10 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         }
         // Finally can check access here. Access for exchange is same as for refresh token.
         if (!t.getFlowStates().acceptRequests || !t.getFlowStates().refreshToken) {
-             throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "token exchange access denied", HttpStatus.SC_UNAUTHORIZED);
-         }
+            throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "token exchange access denied", HttpStatus.SC_UNAUTHORIZED);
+        }
         Collection<String> originalScopes = t.getScopes();
-        if(!scopes.isEmpty()) {
+        if (!scopes.isEmpty()) {
             // Missing scopes means use whatever is there.
             t.setScopes(scopes);
         }
@@ -246,7 +252,15 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         rtiResponse.setSignToken(client.isSignTokens());
         // set to new one.
         t.setAccessToken(rtiResponse.getAccessToken());
-        t.setRefreshToken(rtiResponse.getRefreshToken());
+        switch (requestedTokenType) {
+            default:
+            case ACCESS_TOKEN_TYPE:
+                break; // do NOT reset the refresh token
+            case REFRESH_TOKEN_TYPE:
+                t.setRefreshToken(rtiResponse.getRefreshToken());
+                break;
+        }
+        //t.setRefreshToken(rtiResponse.getRefreshToken());
 
         JSONObject claims = new JSONObject();
         OA2Client oa2Client = (OA2Client) t.getClient();
@@ -398,14 +412,14 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         }
         if (client.isRTLifetimeEnabled() && oa2SE.isRefreshTokenEnabled()) {
 
-            RefreshToken rt = atResponse.getRefreshToken();
+            RefreshTokenImpl rt = atResponse.getRefreshToken();
             st2.setRefreshToken(rt);
             // First pass through the system should have the system default as the refresh token lifetime.
             st2.setRefreshTokenLifetime(oa2SE.getRefreshTokenLifetime());
-            rt.setExpiresIn(computeRefreshLifetime(st2));
+            rt.setExpiresAt(computeRefreshLifetime(st2));
             st2.setRefreshTokenValid(true);
             if (jwtRunner.hasRTHandler()) {
-                RefreshToken newRT = jwtRunner.getRefreshTokenHandler().getSignedRT(null); // unsigned, for now
+                RefreshTokenImpl newRT = (RefreshTokenImpl) jwtRunner.getRefreshTokenHandler().getSignedRT(null); // unsigned, for now
                 atResponse.setRefreshToken(newRT);
                 DebugUtil.trace(this, "Returned RT from handler:" + newRT + ", for claims " + st2.getRTData().toString(2));
             }
@@ -519,7 +533,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         try {
             JSONObject jsonObject = JWTUtil2.verifyAndReadJWT(refreshToken.getToken(), ((OA2SE) getServiceEnvironment()).getJsonWebKeys());
             if (jsonObject.containsKey(JWT_ID)) {
-                refreshToken = new OA2RefreshTokenImpl(URI.create(jsonObject.getString(JWT_ID)));
+                refreshToken = new RefreshTokenImpl(URI.create(jsonObject.getString(JWT_ID)));
             } else {
                 throw new IllegalStateException("Error: Refresh token is a JWT, but has no " + JWT_ID + " claim.");
             }

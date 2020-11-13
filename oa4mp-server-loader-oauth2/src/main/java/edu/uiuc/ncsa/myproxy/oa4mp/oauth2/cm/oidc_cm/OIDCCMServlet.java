@@ -686,6 +686,10 @@ public class OIDCCMServlet extends EnvServlet {
             client.setRtLifetime(jsonRequest.getLong(REFRESH_LIFETIME) * 1000);
             jsonRequest.remove(REFRESH_LIFETIME);
         }
+        if(jsonRequest.containsKey(CLIENT_STRICT_SCOPES)){
+            client.setStrictscopes(jsonRequest.getBoolean(CLIENT_STRICT_SCOPES));
+            jsonRequest.remove(CLIENT_STRICT_SCOPES);
+        }
         // Fix for CIL-734: now handle everything else left over
         client.removeOIDC_CM_Attributes();
         if (!jsonRequest.isEmpty()) {

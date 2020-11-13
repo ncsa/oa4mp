@@ -13,9 +13,9 @@ import edu.uiuc.ncsa.security.delegation.storage.TransactionStore;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
 import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
+import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2GeneralError;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2RefreshTokenImpl;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.http.HttpStatus;
@@ -107,7 +107,7 @@ public class RevocationServlet extends MyProxyDelegationServlet {
         AccessToken at = new AccessTokenImpl(URI.create(token));
         transaction = (OA2ServiceTransaction) tStore.get(at);
         if (transaction == null) {
-            RefreshToken refreshToken = new OA2RefreshTokenImpl(URI.create(token));
+            RefreshToken refreshToken = new RefreshTokenImpl(URI.create(token));
             RefreshTokenStore rts = (RefreshTokenStore) tStore;
 
             transaction = rts.get(refreshToken);

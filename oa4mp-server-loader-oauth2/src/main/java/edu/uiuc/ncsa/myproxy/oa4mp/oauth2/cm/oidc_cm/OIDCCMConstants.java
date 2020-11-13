@@ -392,4 +392,6 @@ public interface OIDCCMConstants {
      * in UTC until the date/time.
      */
     public static final String CLIENT_SECRET_EXPIRES_AT = "client_secret_expires_at";
+
+    String CLIENT_STRICT_SCOPES = "strict_scopes";
 }

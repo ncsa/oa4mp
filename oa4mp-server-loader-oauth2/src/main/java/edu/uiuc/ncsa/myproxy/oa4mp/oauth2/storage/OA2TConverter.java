@@ -42,7 +42,9 @@ public class OA2TConverter<V extends OA2ServiceTransaction> extends TransactionC
             if (refreshToken instanceof RefreshToken) {
                 st.setRefreshToken((RefreshToken) refreshToken);
             } else {
-                st.setRefreshToken(getTF2().getRefreshToken(refreshToken.toString()));
+                RefreshToken rt = getTF2().getRefreshToken();
+                rt.fromString(refreshToken.toString());
+                st.setRefreshToken(rt);
             }
         }
         st.setRefreshTokenValid(map.getBoolean(getTCK().refreshTokenValid()));

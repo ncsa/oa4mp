@@ -32,7 +32,7 @@ public abstract class TransactionStoreTest extends StoreTest{
         AuthorizationGrant ag = getTSProvider().getTokenForge().getAuthorizationGrant(x);
         // The forge may return a shared secret. Since we never use this in OA4MP, make sure it is null
         // or you will get false test results since the secret won't be stored.
-        ag.setSharedSecret(null);
+        //ag.setSharedSecret(null);
         return ag;
     }
 
@@ -42,7 +42,7 @@ public abstract class TransactionStoreTest extends StoreTest{
 
     protected AccessToken newAT(String... x) {
         AccessToken  at = getTSProvider().getTokenForge().getAccessToken(x);
-        at.setSharedSecret(null);
+       // at.setSharedSecret(null);
         return at;
     }
 

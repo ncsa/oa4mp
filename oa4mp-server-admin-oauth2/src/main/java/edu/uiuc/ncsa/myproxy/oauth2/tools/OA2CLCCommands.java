@@ -477,9 +477,9 @@ public class OA2CLCCommands extends CLCCommands {
             JSONObject token = resolveFromToken(getDummyAsset().getRefreshToken());
             if (token == null) {
                 say("default refresh token = " + dummyAsset.getRefreshToken().getToken());
-                say("RT expires in = " + dummyAsset.getRefreshToken().getExpiresIn() + " ms.");
+                say("RT expires in = " + dummyAsset.getRefreshToken().getExpiresAt() + " ms.");
                 Date startDate = DateUtils.getDate(dummyAsset.getRefreshToken().getToken());
-                startDate.setTime(startDate.getTime() + dummyAsset.getRefreshToken().getExpiresIn());
+                startDate.setTime(startDate.getTime() + dummyAsset.getRefreshToken().getExpiresAt());
                 say("   expires at " + startDate);
 
             } else {
@@ -487,8 +487,8 @@ public class OA2CLCCommands extends CLCCommands {
                 if (token.containsKey(OA2Claims.EXPIRATION)) {
                     Date d = new Date();
                     d.setTime(token.getLong(OA2Claims.EXPIRATION) * 1000L);
-                    getDummyAsset().getRefreshToken().setExpiresIn(d.getTime() - System.currentTimeMillis());
-                    say("RT expires in = " + getDummyAsset().getRefreshToken().getExpiresIn() + " ms.");
+                    getDummyAsset().getRefreshToken().setExpiresAt(d.getTime() - System.currentTimeMillis());
+                    say("RT expires in = " + getDummyAsset().getRefreshToken().getExpiresAt() + " ms.");
                 }
             }
 

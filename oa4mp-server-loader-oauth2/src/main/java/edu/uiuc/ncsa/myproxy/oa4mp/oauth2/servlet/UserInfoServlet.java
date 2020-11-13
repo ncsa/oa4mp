@@ -161,6 +161,6 @@ public class UserInfoServlet extends MyProxyDelegationServlet {
     }
 
     protected AccessToken getAT(HttpServletRequest request) {
-        return new AccessTokenImpl(URI.create(getRawAT(request)), null);
+        return new AccessTokenImpl(URI.create(getRawAT(request)));
     }
 }

@@ -41,7 +41,7 @@ public class AssetRetentionPolicy implements RetentionPolicy {
           // Now we have to check against the timestamp on the original and the expires in flag.
            Date creationTS = DateUtils.getDate(oa2Asset.getRefreshToken().getToken());
 
-          if(creationTS.getTime() + oa2Asset.getRefreshToken().getExpiresIn() <= System.currentTimeMillis()){
+          if(creationTS.getTime() + oa2Asset.getRefreshToken().getExpiresAt() <= System.currentTimeMillis()){
               return true;
           }
           return false;

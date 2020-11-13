@@ -10,9 +10,9 @@ import edu.uiuc.ncsa.security.delegation.client.request.*;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.delegation.token.*;
 import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
+import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
 import edu.uiuc.ncsa.security.oauth_2_0.NonceHerder;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2RefreshTokenImpl;
 import edu.uiuc.ncsa.security.oauth_2_0.UserInfo;
 import edu.uiuc.ncsa.security.oauth_2_0.client.ATResponse2;
 import edu.uiuc.ncsa.security.oauth_2_0.client.ATServer2;
@@ -190,7 +190,7 @@ public class OA2MPService extends OA4MPService {
         }
         NonceHerder.removeNonce((String) atResponse2.getParameters().get(NONCE)); // prevent replay attacks.
 
-        asset.setAccessToken(atResponse2.getAccessToken());
+        asset.setAccessToken((AccessTokenImpl) atResponse2.getAccessToken());
         asset.setRefreshToken(atResponse2.getRefreshToken());
 
         getAssetStore().save(asset);
@@ -273,7 +273,7 @@ public class OA2MPService extends OA4MPService {
         rtRequest.setAccessToken(asset.getAccessToken());
         rtRequest.setRefreshToken(asset.getRefreshToken());
         RTResponse rtResponse = ds2.refresh(rtRequest);
-        asset.setAccessToken(rtResponse.getAccessToken());
+        asset.setAccessToken((AccessTokenImpl) rtResponse.getAccessToken());
         asset.setRefreshToken(rtResponse.getRefreshToken());
         getAssetStore().remove(asset.getIdentifier()); // clear out
         getAssetStore().save(asset);
@@ -369,7 +369,7 @@ public class OA2MPService extends OA4MPService {
     protected void updateAsset(OA2Asset asset, JSONObject claims) {
         String rt = claims.getString(OA2Constants.REFRESH_TOKEN);
         if (rt != null && !rt.isEmpty()) {
-            RefreshToken refreshToken = new OA2RefreshTokenImpl(URI.create(rt));
+            RefreshTokenImpl refreshToken = new RefreshTokenImpl(URI.create(rt));
             asset.setRefreshToken(refreshToken);
         }
         // reset access token to returned value and stash it

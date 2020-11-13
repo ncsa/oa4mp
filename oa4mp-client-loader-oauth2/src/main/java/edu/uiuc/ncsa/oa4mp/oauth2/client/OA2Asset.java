@@ -2,8 +2,8 @@ package edu.uiuc.ncsa.oa4mp.oauth2.client;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.client.Asset;
 import edu.uiuc.ncsa.security.core.Identifier;
-import edu.uiuc.ncsa.security.delegation.token.AccessToken;
-import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
+import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
+import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
 
 import java.util.Date;
 
@@ -15,8 +15,8 @@ public class OA2Asset extends Asset {
     public OA2Asset(Identifier identifier) {
         super(identifier);
     }
-    AccessToken accessToken;
-    RefreshToken refreshToken;
+    AccessTokenImpl accessToken;
+    RefreshTokenImpl refreshToken;
 
     public Date getIssuedAt() {
         return issuedAt;
@@ -48,20 +48,20 @@ public class OA2Asset extends Asset {
 
     String nonce;
 
-    public AccessToken getAccessToken() {
+    public AccessTokenImpl getAccessToken() {
         return accessToken;
     }
 
-    public void setAccessToken(AccessToken accessToken) {
+    public void setAccessToken(AccessTokenImpl accessToken) {
         this.accessToken = accessToken;
     }
 
 
-    public RefreshToken getRefreshToken() {
+    public RefreshTokenImpl getRefreshToken() {
         return refreshToken;
     }
 
-    public void setRefreshToken(RefreshToken refreshToken) {
+    public void setRefreshToken(RefreshTokenImpl refreshToken) {
         this.refreshToken = refreshToken;
     }
 

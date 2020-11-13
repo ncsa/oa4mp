@@ -5,7 +5,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.PayloadHandlerConfigImpl;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2RefreshTokenImpl;
+import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTUtil2;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.RefreshTokenHandlerInterface;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
@@ -60,7 +60,7 @@ public class BasicRefreshTokenHandler extends AbstractPayloadHandler implements 
              String k = String.valueOf(getRTData().keySet().iterator().next());
              String v = String.valueOf(getRTData().get(k));
              oa2se.info("Single value in refresh token for \"" + transaction.getOA2Client().getIdentifierString() + "\" found. Setting token value to " + v);
-             return new OA2RefreshTokenImpl(URI.create(v));
+             return new RefreshTokenImpl(URI.create(v));
          }
         try {
             if (key == null) {
@@ -69,7 +69,7 @@ public class BasicRefreshTokenHandler extends AbstractPayloadHandler implements 
             }
             String at = JWTUtil2.createJWT(getRTData(), key);
             URI x = URI.create(at);
-            return new OA2RefreshTokenImpl(x);
+            return new RefreshTokenImpl(x);
         } catch (Throwable e) {
             if (e instanceof RuntimeException) {
                 throw (RuntimeException) e;
