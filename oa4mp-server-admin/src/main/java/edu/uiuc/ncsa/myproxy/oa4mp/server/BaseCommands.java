@@ -13,6 +13,7 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl {
     public static final String CLIENT_APPROVALS = "approvals";
     public static final String COPY = "copy";
     public String PARSER_COMMAND = "parser";
+    public String TRANSACTION_COMMAND = "transactions";
 
 
     public abstract void about();
@@ -20,6 +21,9 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl {
     public abstract ClientStoreCommands getNewClientStoreCommands() throws Exception;
 
     public abstract CopyCommands getNewCopyCommands() throws Exception;
+
+    protected abstract CommonCommands getTransactionCommands() throws Exception;
+
 
     protected BaseCommands(MyLoggingFacade logger) {
         super(logger);
@@ -65,6 +69,9 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl {
         if (inputLine.hasArg(PARSER_COMMAND)) {
             commands = getNewParserCommands();
         }
+        if(inputLine.hasArg(TRANSACTION_COMMAND)){
+            commands = getTransactionCommands();
+        }
         if (commands != null) {
             CLIDriver cli = new CLIDriver(commands);
             cli.setEnv(getGlobalEnv());
@@ -78,6 +85,7 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl {
 
         return false;
     }
+
 
 
     protected boolean hasComponent(String componentName) {

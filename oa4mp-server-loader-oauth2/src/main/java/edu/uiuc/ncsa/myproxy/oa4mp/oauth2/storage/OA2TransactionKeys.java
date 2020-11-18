@@ -16,11 +16,17 @@ public class OA2TransactionKeys extends DSTransactionKeys {
     }
 
     protected String refreshToken = "refresh_token";
+    protected String refreshTokenLifetime = "refresh_token_lifetime";
     protected String refreshTokenValid = "refresh_token_valid";
     protected String expiresIn = "expires_in";
     protected String scopes = "scopes";
     protected String authTime = "auth_time";
     protected String states = "states";
+
+    public String refreshTokenLifetime(String... x) {
+        if (0 < x.length) refreshTokenLifetime = x[0];
+        return refreshTokenLifetime;
+    }
 
     public String refreshToken(String... x) {
         if (0 < x.length) refreshToken = x[0];
@@ -56,9 +62,11 @@ public class OA2TransactionKeys extends DSTransactionKeys {
     public List<String> allKeys() {
         List<String> allKeys =  super.allKeys();
         allKeys.add(refreshToken());
+        allKeys.add(refreshTokenLifetime());
         allKeys.add(refreshTokenValid());
         allKeys.add(expiresIn());
         allKeys.add(scopes());
+        allKeys.add(nonce());
         allKeys.add(authTime());
         allKeys.add(states());
         return allKeys;

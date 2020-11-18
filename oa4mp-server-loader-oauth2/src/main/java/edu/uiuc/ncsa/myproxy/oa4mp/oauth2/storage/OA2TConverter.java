@@ -46,7 +46,8 @@ public class OA2TConverter<V extends OA2ServiceTransaction> extends TransactionC
             }
         }
         st.setRefreshTokenValid(map.getBoolean(getTCK().refreshTokenValid()));
-        st.setRefreshTokenLifetime(map.getLong(getTCK().expiresIn()));
+        st.setRefreshTokenLifetime(map.getLong(getTCK().refreshTokenLifetime()));
+        st.setAccessTokenLifetime(map.getLong(getTCK().expiresIn()));
         st.setCallback(map.getURI(getTCK().callbackUri()));
         st.setNonce(map.getString(getTCK().nonce()));
         if (map.get(getTCK().scopes()) != null) {
@@ -75,7 +76,9 @@ public class OA2TConverter<V extends OA2ServiceTransaction> extends TransactionC
         if (t.getCallback() != null) {
             map.put(getTCK().callbackUri(), t.getCallback().toString());
         }
-        map.put(getTCK().expiresIn(), t.getRefreshTokenLifetime());
+
+        map.put(getTCK().expiresIn(), t.getAccessTokenLifetime());
+        map.put(getTCK().refreshTokenLifetime(), t.getRefreshTokenLifetime());
         if (t.getNonce() != null && 0 < t.getNonce().length()) {
             map.put(getTCK().nonce(), t.getNonce());
         }

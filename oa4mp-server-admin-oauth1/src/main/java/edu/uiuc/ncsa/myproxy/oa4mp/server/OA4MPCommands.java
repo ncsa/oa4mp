@@ -1,11 +1,13 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.server;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.loader.OA4MPConfigurationLoader;
+import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
 import edu.uiuc.ncsa.security.core.util.LoggingConfigLoader;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.util.cli.CLIDriver;
+import edu.uiuc.ncsa.security.util.cli.CommonCommands;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import edu.uiuc.ncsa.security.util.cli.ParserCommands;
 import edu.uiuc.ncsa.security.util.functor.JFunctorFactory;
@@ -16,6 +18,11 @@ import org.apache.commons.lang.StringUtils;
  * on 5/22/13 at  4:49 PM
  */
 public class OA4MPCommands extends BaseCommands {
+    @Override
+    protected CommonCommands getTransactionCommands() throws Exception {
+        throw new NotImplementedException("Error: No such component for OAuth 1.");
+    }
+
     public OA4MPCommands(MyLoggingFacade logger) {
         super(logger);
     }

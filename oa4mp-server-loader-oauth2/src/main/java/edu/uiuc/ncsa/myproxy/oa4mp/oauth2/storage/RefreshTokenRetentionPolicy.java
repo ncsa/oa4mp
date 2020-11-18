@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.security.core.cache.RetentionPolicy;
 import edu.uiuc.ncsa.security.core.exceptions.InvalidTimestampException;
 import edu.uiuc.ncsa.security.core.util.DateUtils;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
 
 import java.util.Map;
@@ -31,9 +32,12 @@ public class RefreshTokenRetentionPolicy implements RetentionPolicy {
 
     @Override
     public boolean retain(Object key, Object value) {
+        DebugUtil.trace(this, "retain start");
         OA2ServiceTransaction st2 = (OA2ServiceTransaction) value;
         RefreshToken rt = st2.getRefreshToken();
         long timeout = st2.getRefreshTokenLifetime();
+        DebugUtil.trace(this, "timeout=" + timeout);
+
         if (rt == null || rt.getToken() == null) {
             // fall back to looking at the access token timestamp. Failing that, fall back to the creation time from
             // the identifier.
@@ -42,6 +46,8 @@ public class RefreshTokenRetentionPolicy implements RetentionPolicy {
             try {
                 DateUtils.checkTimestamp(token);
             } catch (InvalidTimestampException its) {
+                DebugUtil.trace(this, "Caught invalid timestamp for access token = " + st2.getAccessToken() + "msg = " + its.getMessage() );
+
                 return false;
             }
             return true;
@@ -56,6 +62,7 @@ public class RefreshTokenRetentionPolicy implements RetentionPolicy {
             return true;
 
         } catch (InvalidTimestampException its) {
+            DebugUtil.trace(this, "Caught invalid timestamp for refresh token, lifetime = " + st2.getRefreshTokenLifetime() + ", actual timeout = " + timeout + ", msg=" + its.getMessage());
             return false;
         }
     }

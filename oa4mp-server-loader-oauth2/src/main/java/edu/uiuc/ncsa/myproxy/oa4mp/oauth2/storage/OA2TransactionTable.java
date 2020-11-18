@@ -25,6 +25,7 @@ public class OA2TransactionTable extends DSTransactionTable {
         getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().refreshToken(), java.sql.Types.LONGVARCHAR));
         getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().refreshTokenValid(), Types.BOOLEAN));
         getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().expiresIn(), Types.BIGINT));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().refreshTokenLifetime(), Types.BIGINT));
         getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().nonce(), Types.LONGVARCHAR));
         getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().states(), Types.LONGVARCHAR));
         getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().authTime(), Types.TIMESTAMP));
