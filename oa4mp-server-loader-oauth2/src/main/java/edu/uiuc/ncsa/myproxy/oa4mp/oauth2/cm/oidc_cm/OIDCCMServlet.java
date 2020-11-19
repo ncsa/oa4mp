@@ -38,8 +38,9 @@ import java.sql.SQLException;
 import java.util.*;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.oidc_cm.OIDCCMConstants.*;
-import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.REFRESH_LIFETIME;
-import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.TOKEN_ENDPOINT_AUTH_NONE;
+import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.oidc_cm.OIDCCMConstants.CLIENT_ID;
+import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.oidc_cm.OIDCCMConstants.CLIENT_SECRET;
+import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.*;
 import static edu.uiuc.ncsa.security.oauth_2_0.server.RFC8693Constants.GRANT_TYPE_TOKEN_EXCHANGE;
 
 /**

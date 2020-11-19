@@ -67,6 +67,16 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         return flowStates;
     }
 
+    public long getAccessTokenLifetime() {
+        return access_token_lifetime;
+    }
+
+    public void setAccessTokenLifetime(long access_token_lifetime) {
+        this.access_token_lifetime = access_token_lifetime;
+    }
+
+    long access_token_lifetime = 0L;
+
     /**
      * Clients may send an audience which is used by some components (notable SciTokens) but
      * is generally optional.

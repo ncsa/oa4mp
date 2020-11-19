@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: edu.uiuc.ncsa.security:ncsa-security-util:test-jar:tests:5.0.3">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/ncsa-security-util/5.0.3/ncsa-security-util-5.0.3-tests.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/ncsa-security-util/5.0.3/ncsa-security-util-5.0.3-test-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/ncsa-security-util/5.0.3/ncsa-security-util-5.0.3-test-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

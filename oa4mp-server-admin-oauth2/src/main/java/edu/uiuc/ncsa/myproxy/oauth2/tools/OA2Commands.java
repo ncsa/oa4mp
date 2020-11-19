@@ -121,6 +121,16 @@ public class OA2Commands extends BaseCommands {
         return new CopyCommands(getMyLogger(), new OA2CopyTool(), new OA2CopyToolVerifier(), getConfigFile());
     }
 
+    TransactionStoreCommands transactionStoreCommands = null;
+    @Override
+    protected CommonCommands getTransactionCommands() throws Exception{
+        if(transactionStoreCommands == null){
+            transactionStoreCommands = new TransactionStoreCommands(getMyLogger(), "  ", getOA2SE().getTransactionStore());
+        }
+
+        return transactionStoreCommands;
+    }
+
     OA2AdminClientCommands oa2AdminClientCommands = null;
     public OA2AdminClientCommands getAdminClientCommands() throws Exception {
         if(oa2AdminClientCommands == null) {

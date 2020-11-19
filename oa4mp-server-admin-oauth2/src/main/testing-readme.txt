@@ -24,6 +24,9 @@ When a new version is deployed, here is the testing order
      claim sources, so this is a must run test.
      -- Logging in with NCSA should fail since I am not in the prj_sprout group. Test
         that getcert, exchange, user info and refresh all fail at that point too.
+     -- to test that permissions are granted, use NCSA IDP and change the group name
+        in the configuration from prj_sprout to cilogon_help. everything should work.
+        Then set it back so you don't forget.
   -- see file ~/dev/csd/config/dev-testing.txt for several configurations to test.
   -- Do demo on dev: https://demo-dev.cilogon.org/cilogon2/ (cilogon:dev.cilogon.org/demo)
        No additional configuration, just basic user claims and a cert.

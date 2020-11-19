@@ -418,6 +418,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             st2.setRefreshTokenLifetime(oa2SE.getRefreshTokenLifetime());
             rt.setExpiresAt(computeRefreshLifetime(st2));
             st2.setRefreshTokenValid(true);
+            st2.setAccessTokenLifetime(15*60*1000L); // FIX ME!!! This needs to come from OA2SE and be set in the config
             if (jwtRunner.hasRTHandler()) {
                 RefreshTokenImpl newRT = (RefreshTokenImpl) jwtRunner.getRefreshTokenHandler().getSignedRT(null); // unsigned, for now
                 atResponse.setRefreshToken(newRT);
@@ -565,15 +566,18 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         }
 
         OA2ServiceTransaction t = getByRT(oldRT);
+
+
+        if (t == null || !t.isRefreshTokenValid()) {
+            DebugUtil.trace(this, "Missing refresh token.");
+            throw new OA2ATException(OA2Errors.INVALID_REQUEST, "Error: The refresh token is no longer valid.");
+        }
+        DebugUtil.trace(this, "flow states = " + t.getFlowStates());
         if (!t.getFlowStates().acceptRequests || !t.getFlowStates().refreshToken) {
             throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "refresh token access denied", HttpStatus.SC_UNAUTHORIZED);
         }
         if ((!(oa2SE).isRefreshTokenEnabled()) || (!c.isRTLifetimeEnabled())) {
             throw new OA2ATException(OA2Errors.REQUEST_NOT_SUPPORTED, "Refresh tokens are not supported on this server");
-        }
-
-        if (t == null || !t.isRefreshTokenValid()) {
-            throw new OA2ATException(OA2Errors.INVALID_REQUEST, "Error: The refresh token is no longer valid.");
         }
         t.setRefreshTokenValid(false); // this way if it fails at some point we know it is invalid.
         AccessToken at = t.getAccessToken();

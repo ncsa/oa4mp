@@ -119,7 +119,9 @@ public class OA4MPServletInitializer implements Initialization {
         MyProxyDelegationServlet.addNotificationListener(exceptionNotifier);
         notifiersSet = true;
     }
+   protected void realInit() throws ServletException{
 
+   }
     @Override
     public void init() throws ServletException {
         if (isInitRun) return;
@@ -149,7 +151,9 @@ public class OA4MPServletInitializer implements Initialization {
         MyLoggingFacade logger = env.getMyLogger();
         logger.info("Cleaning up incomplete client registrations");
 
+
         if (transactionCleanup == null) {
+
             transactionCleanup = new Cleanup<>(logger);
             MyProxyDelegationServlet.transactionCleanup = transactionCleanup; // set it in the servlet
             transactionCleanup.setStopThread(false);
@@ -159,6 +163,8 @@ public class OA4MPServletInitializer implements Initialization {
             logger.info("Starting transaction store cleanup thread");
         }
         Cleanup<Identifier, CachedObject> myproxyConnectionCleanup = MyProxyDelegationServlet.myproxyConnectionCleanup;
+        int i = 0;
+
         if (myproxyConnectionCleanup == null) {
             myproxyConnectionCleanup = new Cleanup<Identifier, CachedObject>(logger) {
                 @Override
@@ -183,30 +189,42 @@ public class OA4MPServletInitializer implements Initialization {
             MyProxyDelegationServlet.myproxyConnectionCleanup = myproxyConnectionCleanup; // set it in the servlet
             myproxyConnectionCleanup.setStopThread(false);
             Cache myproxyConnectionCache = MyProxyDelegationServlet.myproxyConnectionCache;
+
             if (myproxyConnectionCache == null) {
                 myproxyConnectionCache = new Cache();
                 MyProxyDelegationServlet.myproxyConnectionCache = myproxyConnectionCache; // set it in the servlet
             }
+
             myproxyConnectionCleanup.setMap(myproxyConnectionCache);
             myproxyConnectionCleanup.addRetentionPolicy(new ConnectionCacheRetentionPolicy(myproxyConnectionCache, env.getTransactionStore()));
             myproxyConnectionCleanup.start();
+
             logger.info("Starting myproxy connection cache cleanup thread");
         }
+
         AbstractCLIApprover.ClientApprovalThread caThread = MyProxyDelegationServlet.caThread;
         if (caThread != null && !caThread.isAlive()) {
             caThread.setStopThread(false);
             caThread.start();
         }
+
         KeyPairPopulationThread kpt = MyProxyDelegationServlet.kpt;
         if (kpt != null && !kpt.isAlive()) {
             kpt.setStopThread(false);
             kpt.start();
         }
+
         try {
             setupNotifiers();
-        } catch (IOException e) {
+        } catch (Throwable e) {
+            e.printStackTrace(); // uuuugly but if init did not complete, there may be no logging
+            // AND Tomcat seems to eat certain exceptions and squirrels them away so at least a few
+            // times (due to missing java mail jar) we had a silent error here and the servlet
+            // was not initialized and behaved very strangely (since it did not finish OA2 load).
+
             throw new GeneralException("Error: could not set up notifiers ", e);
         }
+
     }
 
     @Override
