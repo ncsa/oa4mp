@@ -35,23 +35,20 @@
         <module name="oa4mp-client-webapp" />
         <module name="oa4mp-client-loader-oauth2" />
         <module name="oa4mp-client-loader-oauth1" />
+        <module name="oa4mp-client-test" />
         <module name="oa4mp-server-admin" />
         <module name="oa4mp-server-oauth2" />
         <module name="oa4mp-server-oauth1" />
         <module name="oa4mp-oidc-twofactor" />
-        <module name="oa4mp-twofactor" />
         <module name="oa4mp-website" />
-        <module name="myproxy-logon" />
         <module name="oa4mp-xsede-oauth2" />
-        <module name="oa4mp-xsede" />
         <module name="oa4mp-server-admin-oauth1" />
-        <module name="oa4mp-client-test" />
+        <module name="myproxy-logon" />
         <module name="oa4mp-server-test-oauth2" />
         <module name="oa4mp-server-test-auth2" />
         <module name="oa4mp-server-api" />
         <module name="scitokens-server" />
         <module name="oa4mp-server-admin-oauth2" />
-        <module name="oa4mp-co-oidc" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>

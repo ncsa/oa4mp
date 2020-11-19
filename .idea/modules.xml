@@ -12,7 +12,6 @@
       <module fileurl="file://$PROJECT_DIR$/oa4mp-client-oauth2/oa4mp-client-oauth2.iml" filepath="$PROJECT_DIR$/oa4mp-client-oauth2/oa4mp-client-oauth2.iml" />
       <module fileurl="file://$PROJECT_DIR$/oa4mp-client-test/oa4mp-client-test.iml" filepath="$PROJECT_DIR$/oa4mp-client-test/oa4mp-client-test.iml" />
       <module fileurl="file://$PROJECT_DIR$/oa4mp-client-webapp/oa4mp-client-webapp.iml" filepath="$PROJECT_DIR$/oa4mp-client-webapp/oa4mp-client-webapp.iml" />
-      <module fileurl="file://$PROJECT_DIR$/oa4mp-co-oidc/oa4mp-co-oidc.iml" filepath="$PROJECT_DIR$/oa4mp-co-oidc/oa4mp-co-oidc.iml" />
       <module fileurl="file://$PROJECT_DIR$/oa4mp-gui/oa4mp-gui.iml" filepath="$PROJECT_DIR$/oa4mp-gui/oa4mp-gui.iml" />
       <module fileurl="file://$PROJECT_DIR$/oa4mp-oidc-twofactor/oa4mp-oidc-twofactor.iml" filepath="$PROJECT_DIR$/oa4mp-oidc-twofactor/oa4mp-oidc-twofactor.iml" />
       <module fileurl="file://$PROJECT_DIR$/oa4mp-qdl/oa4mp-qdl.iml" filepath="$PROJECT_DIR$/oa4mp-qdl/oa4mp-qdl.iml" />
@@ -27,10 +26,8 @@
       <module fileurl="file://$PROJECT_DIR$/oa4mp-server-test/oa4mp-server-test.iml" filepath="$PROJECT_DIR$/oa4mp-server-test/oa4mp-server-test.iml" />
       <module fileurl="file://$PROJECT_DIR$/oa4mp-server-test-oauth2/oa4mp-server-test-oauth2.iml" filepath="$PROJECT_DIR$/oa4mp-server-test-oauth2/oa4mp-server-test-oauth2.iml" />
       <module fileurl="file://$PROJECT_DIR$/oa4mp-skin/oa4mp-skin.iml" filepath="$PROJECT_DIR$/oa4mp-skin/oa4mp-skin.iml" />
-      <module fileurl="file://$PROJECT_DIR$/oa4mp-twofactor/oa4mp-twofactor.iml" filepath="$PROJECT_DIR$/oa4mp-twofactor/oa4mp-twofactor.iml" />
       <module fileurl="file://$PROJECT_DIR$/oa4mp-webapp/oa4mp-webapp.iml" filepath="$PROJECT_DIR$/oa4mp-webapp/oa4mp-webapp.iml" />
       <module fileurl="file://$PROJECT_DIR$/oa4mp-website/oa4mp-website.iml" filepath="$PROJECT_DIR$/oa4mp-website/oa4mp-website.iml" />
-      <module fileurl="file://$PROJECT_DIR$/oa4mp-xsede/oa4mp-xsede.iml" filepath="$PROJECT_DIR$/oa4mp-xsede/oa4mp-xsede.iml" />
       <module fileurl="file://$PROJECT_DIR$/oa4mp-xsede-oauth2/oa4mp-xsede-oauth2.iml" filepath="$PROJECT_DIR$/oa4mp-xsede-oauth2/oa4mp-xsede-oauth2.iml" />
       <module fileurl="file://$PROJECT_DIR$/scitokens/scitokens.iml" filepath="$PROJECT_DIR$/scitokens/scitokens.iml" />
       <module fileurl="file://$PROJECT_DIR$/scitokens-client/scitokens-client.iml" filepath="$PROJECT_DIR$/scitokens-client/scitokens-client.iml" />
