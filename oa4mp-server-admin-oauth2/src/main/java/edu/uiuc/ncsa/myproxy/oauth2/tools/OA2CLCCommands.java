@@ -12,9 +12,9 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.DateUtils;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.delegation.client.request.RTResponse;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
-import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
 import edu.uiuc.ncsa.security.delegation.token.Token;
 import edu.uiuc.ncsa.security.delegation.token.impl.AuthorizationGrantImpl;
@@ -33,15 +33,18 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.SecureRandom;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.StringTokenizer;
+import java.util.List;
+import java.util.*;
 
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.ID_TOKEN;
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.RAW_ID_TOKEN;
@@ -198,7 +201,7 @@ public class OA2CLCCommands extends CLCCommands {
         return URLDecoder.decode(x, encoding);
     }
 
-    AuthorizationGrant grant;
+    AuthorizationGrantImpl grant;
 
     public void getgrant(InputLine inputLine) throws Exception {
         setgrant(inputLine);
@@ -334,7 +337,7 @@ public class OA2CLCCommands extends CLCCommands {
 
     JSONObject claims = null;
 
-    public void showclaims(InputLine inputLine) throws Exception {
+    public void claims(InputLine inputLine) throws Exception {
         if (grant == null || showHelp(inputLine)) {
             showClaimsHelp();
             return;
@@ -460,6 +463,18 @@ public class OA2CLCCommands extends CLCCommands {
 
     }
 
+    public void tokens(InputLine inputLine) throws Exception {
+        if (showHelp(inputLine)) {
+            showTokensHelp();
+            return;
+        }
+        printTokens();
+    }
+
+    private void showTokensHelp() {
+        say("tokens - print the current list of tokens");
+    }
+
     protected void printTokens() {
         if (dummyAsset.getAccessToken() != null) {
             // If the access token is a jwt
@@ -480,7 +495,7 @@ public class OA2CLCCommands extends CLCCommands {
                 say("RT expires in = " + dummyAsset.getRefreshToken().getExpiresAt() + " ms.");
                 Date startDate = DateUtils.getDate(dummyAsset.getRefreshToken().getToken());
                 startDate.setTime(startDate.getTime() + dummyAsset.getRefreshToken().getExpiresAt());
-                say("   expires at " + startDate);
+                say("   valid until " + startDate);
 
             } else {
                 say("JWT refresh token = " + token.toString(1));
@@ -579,5 +594,167 @@ public class OA2CLCCommands extends CLCCommands {
         }
 
 
+    }
+
+    protected String CONFIG_NAME_KEY = "config_name";
+    protected String CONFIG_FILE_KEY = "config_file";
+    protected String SYSTEM_MESSAGE_KEY = "system_message";
+    protected String USER_MESSAGE_KEY = "user_message";
+    protected String ASSET_KEY = "asset";
+    protected String CLAIMS_KEY = "claims";
+    protected String AUTHZ_GRANT_KEY = "authz_grant";
+
+    public void read(InputLine inputLine) throws Exception {
+        if (showHelp(inputLine)) {
+            showReadHelp();
+            return;
+        }
+        if (0 == inputLine.getArgCount()) {
+            if (saveFile == null) {
+                say("sorry, but you must specify a file");
+                return;
+            }
+        } else {
+            saveFile = new File(inputLine.getLastArg());
+        }
+
+        if (!saveFile.exists()) {
+            say("sorry, but \"" + saveFile.getAbsolutePath() + "\" does not exist");
+            return;
+        }
+        if (saveFile.isDirectory()) {
+            say("sorry, but \"" + saveFile.getAbsolutePath() + "\" is a directory");
+            return;
+        }
+
+        StringBuffer stringBuffer = new StringBuffer();
+        Path path = Paths.get(saveFile.getAbsolutePath());
+        say("reading file \"" + saveFile.getAbsolutePath() + "\"");
+        List<String> contents = Files.readAllLines(path);
+        int i = 0;
+        //Read from the stream
+        for (String content : contents) {
+            stringBuffer.append(content + "\n");
+        }
+
+        JSONObject json = JSONObject.fromObject(stringBuffer.toString());
+        if (json.containsKey(SYSTEM_MESSAGE_KEY)) {
+            say(json.getString(SYSTEM_MESSAGE_KEY));
+        }
+
+        if (json.containsKey(USER_MESSAGE_KEY)) {
+            lastUserMessage =json.getString(USER_MESSAGE_KEY);
+            say(lastUserMessage);
+        }
+        if (json.containsKey(CLAIMS_KEY)) {
+            claims = json.getJSONObject(CLAIMS_KEY);
+        }
+        if(json.containsKey(AUTHZ_GRANT_KEY)){
+            grant = new AuthorizationGrantImpl("");
+            grant.fromJSON(json.getJSONObject(AUTHZ_GRANT_KEY));
+        }
+
+        if (json.containsKey(CONFIG_FILE_KEY)) {
+            // make a fake input line for loading the last configuration and run it.
+            Vector v = new Vector();
+            v.add("load");
+            v.add(json.getString(CONFIG_NAME_KEY));
+            v.add(json.getString(CONFIG_FILE_KEY));
+            InputLine loadLine = new InputLine(v);
+            load(loadLine);
+        }
+
+
+        dummyAsset = new OA2Asset(null);
+        if (json.containsKey(ASSET_KEY)) {
+            dummyAsset.fromJSON(json.getJSONObject(ASSET_KEY));
+        } else {
+            say("warning -- no stored asset found, so no state was saved.");
+        }
+        say("done!");
+    }
+
+    private void showReadHelp() {
+        say("read  path - reads a saved session from a given file.");
+        say("See also: write");
+    }
+
+    String MESSAGE_SWITCH = "-m";
+    String lastUserMessage = null;
+    File saveFile = null;
+
+    public void write(InputLine inputLine) throws Exception {
+        if (showHelp(inputLine)) {
+            showWriteHelp();
+            return;
+        }
+        JSONObject jsonObject = new JSONObject();
+
+        if (inputLine.hasArg(MESSAGE_SWITCH)) {
+            lastUserMessage = inputLine.getNextArgFor(MESSAGE_SWITCH);
+            inputLine.removeSwitchAndValue(MESSAGE_SWITCH);
+        }
+        if (!StringUtils.isTrivial(lastUserMessage)) {
+            jsonObject.put(USER_MESSAGE_KEY, lastUserMessage);
+        }
+
+        if (inputLine.getArgCount() == 0) {
+            if (saveFile == null) {
+                say("sorry, no file specified.");
+                return;
+            }
+        } else {
+            saveFile = new File(inputLine.getLastArg());
+        }
+        jsonObject.put(SYSTEM_MESSAGE_KEY, "OA4MP command line client state stored on " + (new Date()));
+        if(grant != null){
+            jsonObject.put(AUTHZ_GRANT_KEY, grant.toJSON());
+        }
+        if (dummyAsset != null) {
+            jsonObject.put(ASSET_KEY, dummyAsset.toJSON());
+        }
+        if (saveFile.isDirectory()) {
+            say("sorry, but \"" + saveFile.getAbsolutePath() + "\" is a directory");
+            return;
+        }
+        if (saveFile.exists()) {
+            String r = readline("\"" + saveFile.getAbsolutePath() + "\" exists. Overwrite?[y/n]");
+            if (!r.equals("y")) {
+                say("aborted. Returning...");
+                return;
+            }
+        }
+        jsonObject.put(CONFIG_NAME_KEY, oa2CommandLineClient.getConfigName());
+        jsonObject.put(CONFIG_FILE_KEY, oa2CommandLineClient.getConfigFile());
+
+        if (claims != null && !claims.isEmpty()) {
+            jsonObject.put(CLAIMS_KEY, claims);
+        }
+        FileWriter fileWriter = new FileWriter(saveFile);
+        fileWriter.write(jsonObject.toString(1));
+        fileWriter.flush();
+        fileWriter.close();
+        say("done! Saved to \"" + saveFile.getAbsolutePath() + "\".");
+    }
+
+
+    private void showWriteHelp() {
+        say("write [" + MESSAGE_SWITCH + " message] path - write the current session state to a file. You may read it and resume your session");
+        say("-m - (optional) a message to include about this session. Make sure it is double quote delimited");
+        say("Note that these are serialized to JSON.");
+        say("E.g.");
+        sayi("write -m \"testing refresh on poloc\" /opt/cilogon-oa2/var/temp/poloc-test.json");
+        say("See also: read");
+    }
+
+    public void grant(InputLine inputLine) throws Exception{
+          if(showHelp(inputLine)){
+              say("grant - show the current authorization grant if any");
+              return;
+          }
+          if(grant == null){
+              say("(no grant)");
+          }
+          say(grant.toJSON().toString(1));
     }
 }

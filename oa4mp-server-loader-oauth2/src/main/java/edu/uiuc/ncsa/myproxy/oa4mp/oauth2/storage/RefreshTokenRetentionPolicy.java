@@ -32,12 +32,9 @@ public class RefreshTokenRetentionPolicy implements RetentionPolicy {
 
     @Override
     public boolean retain(Object key, Object value) {
-        DebugUtil.trace(this, "retain start");
         OA2ServiceTransaction st2 = (OA2ServiceTransaction) value;
         RefreshToken rt = st2.getRefreshToken();
         long timeout = st2.getRefreshTokenLifetime();
-        DebugUtil.trace(this, "timeout=" + timeout);
-
         if (rt == null || rt.getToken() == null) {
             // fall back to looking at the access token timestamp. Failing that, fall back to the creation time from
             // the identifier.

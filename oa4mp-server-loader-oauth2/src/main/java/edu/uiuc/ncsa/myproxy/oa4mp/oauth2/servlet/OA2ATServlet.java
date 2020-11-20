@@ -20,6 +20,7 @@ import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.delegation.storage.TransactionStore;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
+import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
 import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
 import edu.uiuc.ncsa.security.oauth_2_0.*;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTRunner;
@@ -413,12 +414,14 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         if (client.isRTLifetimeEnabled() && oa2SE.isRefreshTokenEnabled()) {
 
             RefreshTokenImpl rt = atResponse.getRefreshToken();
+            AccessTokenImpl at = (AccessTokenImpl) atResponse.getAccessToken();
             st2.setRefreshToken(rt);
             // First pass through the system should have the system default as the refresh token lifetime.
             st2.setRefreshTokenLifetime(oa2SE.getRefreshTokenLifetime());
             rt.setExpiresAt(computeRefreshLifetime(st2));
             st2.setRefreshTokenValid(true);
             st2.setAccessTokenLifetime(15*60*1000L); // FIX ME!!! This needs to come from OA2SE and be set in the config
+            at.setExpiresAt(st2.getAccessTokenLifetime());
             if (jwtRunner.hasRTHandler()) {
                 RefreshTokenImpl newRT = (RefreshTokenImpl) jwtRunner.getRefreshTokenHandler().getSignedRT(null); // unsigned, for now
                 atResponse.setRefreshToken(newRT);
@@ -602,6 +605,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         try {
             jwtRunner.doRefreshClaims();
         } catch (Throwable throwable) {
+            ServletDebugUtil.trace(this, "Unable to update claims on token refresh", throwable);
             ServletDebugUtil.warn(this, "Unable to update claims on token refresh: \"" + throwable.getMessage() + "\"");
         }
         setupTokens(c, rtiResponse, oa2SE, t, jwtRunner);
