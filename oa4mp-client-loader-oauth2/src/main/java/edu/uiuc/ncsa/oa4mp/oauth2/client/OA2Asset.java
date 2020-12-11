@@ -8,6 +8,7 @@ import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
 import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
 import net.sf.json.JSONObject;
 
+import java.net.URI;
 import java.text.ParseException;
 import java.util.Date;
 
@@ -107,13 +108,26 @@ public class OA2Asset extends Asset {
             setState(jsonObject.getString(STATE_KEY));
         }
         if (jsonObject.containsKey(ACCESS_TOKEN_KEY)) {
-            AccessTokenImpl at = new AccessTokenImpl("");
-            at.fromJSON(jsonObject.getJSONObject(ACCESS_TOKEN_KEY));
+            AccessTokenImpl at = null;
+            try {
+                // Old token format
+                 at = new AccessTokenImpl(URI.create(jsonObject.getString(ACCESS_TOKEN_KEY)));
+            }catch(Throwable t){
+                at = new AccessTokenImpl(URI.create("a"));// dummy
+                 at.fromJSON(jsonObject.getJSONObject(ACCESS_TOKEN_KEY));
+            }
+            //at.fromJSON(jsonObject.getJSONObject(ACCESS_TOKEN_KEY));
             setAccessToken(at);
         }
         if (jsonObject.containsKey(REFRESH_TOKEN_KEY)) {
-            RefreshTokenImpl rt = new RefreshTokenImpl("");
-            rt.fromJSON(jsonObject.getJSONObject(REFRESH_TOKEN_KEY));
+            RefreshTokenImpl rt = null;
+            try {
+                rt = new RefreshTokenImpl(URI.create(jsonObject.getString(REFRESH_TOKEN_KEY)));
+            }catch(Throwable t){
+                rt = new RefreshTokenImpl(URI.create("a")); // dummy
+                rt.fromJSON(jsonObject.getJSONObject(REFRESH_TOKEN_KEY));
+            }
+           // rt.fromJSON(jsonObject.getJSONObject(REFRESH_TOKEN_KEY));
             setRefreshToken(rt);
         }
         if (jsonObject.containsKey(ISSUED_AT_KEY)) {

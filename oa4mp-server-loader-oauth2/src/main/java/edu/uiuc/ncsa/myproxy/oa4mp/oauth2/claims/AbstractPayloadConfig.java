@@ -28,6 +28,7 @@ public abstract class AbstractPayloadConfig implements Serializable {
     public static String ID_KEY = "id";
     public static String VERSIONS_KEY = "versions";
     public static String CREATE_TS_KEY = "creation_ts";
+    public static String LIFETIME_KEY = "lifetime";
 
     String type;
     List<String> versions;
@@ -56,6 +57,9 @@ public abstract class AbstractPayloadConfig implements Serializable {
     JSONObject rawScripts;
 
     public void fromJSON(JSONObject jsonObject) {
+        if (jsonObject.containsKey(LIFETIME_KEY)) {
+            lifetime = jsonObject.getLong(LIFETIME_KEY);
+        }
         if(jsonObject.containsKey(QDLRuntimeEngine.CONFIG_TAG)) {
             rawScripts = jsonObject.getJSONObject(QDLRuntimeEngine.CONFIG_TAG);
             setScriptSet(AnotherJSONUtil.createScripts(rawScripts));
@@ -86,6 +90,9 @@ public abstract class AbstractPayloadConfig implements Serializable {
             json.put(TYPE_KEY, type);
 
         }
+        if (lifetime != null) {
+             json.put(LIFETIME_KEY, lifetime);
+         }
         if (versions != null) {
             json.put(VERSIONS_KEY, versions);
         }
@@ -122,6 +129,14 @@ public abstract class AbstractPayloadConfig implements Serializable {
     public void setVersions(List<String> versions) {
         this.versions = versions;
     }
+        Long lifetime = -1L;
 
+    public Long getLifetime() {
+        return lifetime;
+    }
+
+    public void setLifetime(Long lifetime) {
+        this.lifetime = lifetime;
+    }
 
 }

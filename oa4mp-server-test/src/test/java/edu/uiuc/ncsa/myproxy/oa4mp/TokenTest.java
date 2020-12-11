@@ -23,15 +23,15 @@ public class TokenTest extends TestBase {
         // check later if they have been set right.
         TokenForge tf = getTSProvider().getTokenForge();
         AuthorizationGrant ag = tf.getAuthorizationGrant();
-        assert 0 > ag.getExpiresAt();
+        assert 0 > ag.getLifetime();
         assert 0 > ag.getIssuedAt();
 
         AccessToken at = tf.getAccessToken();
-        assert 0 > at.getExpiresAt();
+        assert 0 > at.getLifetime();
         assert 0 > at.getIssuedAt();
         
         Verifier v = tf.getVerifier();
-        assert 0 > v.getExpiresAt();
+        assert 0 > v.getLifetime();
         assert 0 > v.getIssuedAt();
 
     }

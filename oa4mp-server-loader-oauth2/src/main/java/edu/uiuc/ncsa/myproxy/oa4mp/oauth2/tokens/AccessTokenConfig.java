@@ -15,14 +15,11 @@ import java.util.List;
  * on 7/28/20 at  7:51 AM
  */
 public class AccessTokenConfig extends AbstractPayloadConfig {
-    public static String LIFETIME_KEY = "lifetime";
     public static String SUBJECT_KEY = "subject";
     public static String ISSUER_KEY = "issuer";
     public static String AUDIENCE_KEY = "audience";
     public static String TEMPLATES_KEY = "templates";
 
-
-    Long lifetime = -1L;
     String issuer;
     String subject;
     List<String> audience = new ArrayList<>();
@@ -32,9 +29,7 @@ public class AccessTokenConfig extends AbstractPayloadConfig {
     @Override
     public void fromJSON(JSONObject jsonObject) {
         super.fromJSON(jsonObject);
-        if (jsonObject.containsKey(LIFETIME_KEY)) {
-            lifetime = jsonObject.getLong(LIFETIME_KEY);
-        }
+
         if (jsonObject.containsKey(ISSUER_KEY)) {
             issuer = jsonObject.getString(ISSUER_KEY);
         }
@@ -64,9 +59,7 @@ public class AccessTokenConfig extends AbstractPayloadConfig {
     @Override
     public JSONObject toJSON() {
         JSONObject json = super.toJSON();
-        if (lifetime != null) {
-            json.put(LIFETIME_KEY, lifetime);
-        }
+
         if (subject != null) {
             json.put(SUBJECT_KEY, subject);
         }
@@ -84,13 +77,7 @@ public class AccessTokenConfig extends AbstractPayloadConfig {
         return json;
     }
 
-    public Long getLifetime() {
-        return lifetime;
-    }
 
-    public void setLifetime(Long lifetime) {
-        this.lifetime = lifetime;
-    }
 
     public String getIssuer() {
         return issuer;

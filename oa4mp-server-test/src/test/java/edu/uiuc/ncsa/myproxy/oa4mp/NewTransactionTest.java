@@ -43,12 +43,11 @@ public class NewTransactionTest extends TestBase {
     }
 
 
-
     protected AuthorizationGrant newAG(TokenForge tokenForge, String... x) {
         AuthorizationGrant ag = tokenForge.getAuthorizationGrant(x);
         // The forge may return a shared secret. Since we never use this in OA4MP, make sure it is null
         // or you will get false test results since the secret won't be stored.
-    //    ag.setSharedSecret(null);
+        //    ag.setSharedSecret(null);
         return ag;
     }
 
@@ -58,47 +57,49 @@ public class NewTransactionTest extends TestBase {
 
     protected AccessToken newAT(TokenForge tokenForge, String... x) {
         AccessToken at = tokenForge.getAccessToken(x);
-   //     at.setSharedSecret(null);
+        //     at.setSharedSecret(null);
         return at;
     }
 
     public void testServiceTransaction(TransactionStore transactionStore, TokenForge tokenForge, ClientStore clientStore) throws Exception {
-        OA4MPServiceTransaction OA4MPServiceTransaction = (OA4MPServiceTransaction) transactionStore.create();
-        OA4MPServiceTransaction.setCallback(URI.create("http://callback"));
-
-        OA4MPServiceTransaction.setLifetime(10 * 60 * 60 * 1000); // set lifetime to 10 hours (stored in ms!)
-        OA4MPServiceTransaction.setUsername("FakeUserName");
+        OA4MPServiceTransaction serviceTransaction = (OA4MPServiceTransaction) transactionStore.create();
+        serviceTransaction.setCallback(URI.create("http://callback"));
+        AuthorizationGrant ag = tokenForge.getAuthorizationGrant(serviceTransaction.getIdentifierString());
+        serviceTransaction.setAuthorizationGrant(ag);
+        serviceTransaction.setLifetime(10 * 60 * 60 * 1000); // set lifetime to 10 hours (stored in ms!)
+        serviceTransaction.setUsername("FakeUserName");
         String mpUN = "myproxy username /with weird $$#@ in=it/#" + System.nanoTime();
-        OA4MPServiceTransaction.setMyproxyUsername(mpUN);
+        serviceTransaction.setMyproxyUsername(mpUN);
         Client client = (Client) clientStore.create();
         client.setIdentifier(new BasicIdentifier(URI.create("test:client:1d/" + System.currentTimeMillis())));
-        OA4MPServiceTransaction.setAuthorizationGrant(newAG(tokenForge));
-        OA4MPServiceTransaction.setAuthGrantValid(false);
+        //serviceTransaction.setAuthorizationGrant(newAG(tokenForge));
+        serviceTransaction.setAuthGrantValid(false);
         client.setName("service test name #" + System.nanoTime());
-        transactionStore.save(OA4MPServiceTransaction);
-        assert transactionStore.containsKey(OA4MPServiceTransaction.getIdentifier());
-        assert OA4MPServiceTransaction.equals(transactionStore.get(OA4MPServiceTransaction.getIdentifier()));
-        assert OA4MPServiceTransaction.equals(transactionStore.get(OA4MPServiceTransaction.getAuthorizationGrant()));
+        transactionStore.save(serviceTransaction);
+        assert transactionStore.containsKey(serviceTransaction.getIdentifier());
+        assert serviceTransaction.equals(transactionStore.get(serviceTransaction.getIdentifier()));
+        // Contract has changed in version 5.0+, so auth grant is now
+        assert serviceTransaction.equals(transactionStore.get(serviceTransaction.getAuthorizationGrant()));
         // now emulate doing oauth type transactions with it.
         // First leg sets the verifier and user
 
         String r = getRandomString(12);
-        OA4MPServiceTransaction.setVerifier(newVerifier(tokenForge));
-        transactionStore.save(OA4MPServiceTransaction);
+        serviceTransaction.setVerifier(newVerifier(tokenForge));
+        transactionStore.save(serviceTransaction);
 
-        assert OA4MPServiceTransaction.equals(transactionStore.get(OA4MPServiceTransaction.getVerifier()));
+        assert serviceTransaction.equals(transactionStore.get(serviceTransaction.getVerifier()));
         // next leg creates the access tokens and invalidates the temp credentials
-        OA4MPServiceTransaction.setAccessToken(newAT(tokenForge));
-        OA4MPServiceTransaction.setAuthGrantValid(false);
-        OA4MPServiceTransaction.setAccessTokenValid(true);
-        transactionStore.save(OA4MPServiceTransaction);
-        assert OA4MPServiceTransaction.equals(transactionStore.get(OA4MPServiceTransaction.getIdentifier()));
-        assert OA4MPServiceTransaction.equals(transactionStore.get(OA4MPServiceTransaction.getAccessToken()));
-        OA4MPServiceTransaction.setAccessTokenValid(false);
-        transactionStore.save(OA4MPServiceTransaction);
-        assert OA4MPServiceTransaction.equals(transactionStore.get(OA4MPServiceTransaction.getIdentifier()));
+        serviceTransaction.setAccessToken(newAT(tokenForge));
+        serviceTransaction.setAuthGrantValid(false);
+        serviceTransaction.setAccessTokenValid(true);
+        transactionStore.save(serviceTransaction);
+        assert serviceTransaction.equals(transactionStore.get(serviceTransaction.getIdentifier()));
+        assert serviceTransaction.equals(transactionStore.get(serviceTransaction.getAccessToken()));
+        serviceTransaction.setAccessTokenValid(false);
+        transactionStore.save(serviceTransaction);
+        assert serviceTransaction.equals(transactionStore.get(serviceTransaction.getIdentifier()));
         //and we're done
-        transactionStore.remove(OA4MPServiceTransaction.getIdentifier());
-        assert !transactionStore.containsKey(OA4MPServiceTransaction.getIdentifier());
+        transactionStore.remove(serviceTransaction.getIdentifier());
+        assert !transactionStore.containsKey(serviceTransaction.getIdentifier());
     }
 }

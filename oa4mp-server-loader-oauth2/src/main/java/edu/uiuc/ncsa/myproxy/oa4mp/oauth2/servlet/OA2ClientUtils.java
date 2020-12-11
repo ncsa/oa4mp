@@ -126,6 +126,11 @@ public class OA2ClientUtils {
             // How it works: Either the protocol is not http/https in which case it is allowed
             // but if it is http, only localhost is permitted. Any https works.
             try {
+                // CIL-871 fix -- no wildcards allowed.
+                if(x.contains("*")){
+                    throw new IllegalArgumentException("Error: wildcard in \"" + x + "\" is not allowed.");
+                }
+
                 URI temp = URI.create(x);
                 // Fix for CIL-739, accept only absolute URIs
                 if (!temp.isAbsolute()) {

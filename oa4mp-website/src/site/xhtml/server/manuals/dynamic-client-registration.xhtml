@@ -141,6 +141,9 @@
             Note that
             the getcert scope requires you be able to get X509 certs via a MyProxy server, so only specify that if
             you really need it.
+            <br/><b>Public clients:</b> Only openid scope is allowed and attempts to change the scopes will result in
+            an error. It is not possible to change a public client to a confidential client. You must
+            register a new client instead (This is due to our policies regarding creation of client secrets.).
         </td>
     </tr>
     <tr align="left" valign="top">
@@ -154,6 +157,15 @@
         </td>
     </tr>
     <tr align="left" valign="top">
+        <td>at_lifetime</td>
+        <td>N</td>
+        <td>A integer (in seconds)</td>
+        <td><b>(OA4MP specific!!)</b>This sets the access token lifetime for all subsequent access tokens. Note
+            that is <i>must be less than or equal to the server's default</i>. You should only set this if
+            you have a specific need for it an knowledge of what values will work.
+        </td>
+    </tr>
+    <tr align="left" valign="top">
         <td>cfg</td>
         <td>N</td>
         <td>A JSON object</td>
@@ -161,7 +173,8 @@
             additional claims.
             Generally you do not need one of these unless you have a very, very specific requirement. If you
             send attributes that do not fall within the spec., they will be put in this object for you.
-            Generally if you do not know you need it and know what it does, you can safely ignore it.
+            Generally if you do not know you need it and know what it does, you can safely ignore it.<br/>
+            <b>Public clients:</b>This parameter is not supported and will result in the rejection of any request.
         </td>
     </tr>
 </table>

@@ -1,7 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.server.servlet;
 
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
-import edu.uiuc.ncsa.security.core.util.DateUtils;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.server.request.ATRequest;
 import edu.uiuc.ncsa.security.delegation.server.request.ATResponse;
@@ -24,7 +23,7 @@ public abstract class AbstractAccessTokenServlet extends MyProxyDelegationServle
     protected void doIt(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Throwable {
         doDelegation(httpServletRequest, httpServletResponse);
     }
-
+    protected abstract ATRequest getATRequest(HttpServletRequest request, ServiceTransaction transaction);
     protected IssuerTransactionState doDelegation(Client client, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Throwable, ServletException {
         printAllParameters(httpServletRequest);
         info("5.a. Starting access token exchange");
@@ -36,11 +35,11 @@ public abstract class AbstractAccessTokenServlet extends MyProxyDelegationServle
             ServletDebugUtil.trace(this,message);
             throw new ServletException("No transaction found for grant \"" + ag  +"\"");
         }
-        ATRequest atRequest = new ATRequest(httpServletRequest, transaction);
+        ATRequest atRequest = getATRequest(httpServletRequest, transaction);
 
         atRequest.setVerifier(v);
         atRequest.setAuthorizationGrant(ag);
-        atRequest.setExpiresIn(DateUtils.MAX_TIMEOUT); // FIXME!! make this configurable??
+     //   atRequest.setExpiresIn(DateUtils.MAX_TIMEOUT); // FIXME!! make this configurable??
         ATResponse atResp = (ATResponse) getATI().process(atRequest);
 
         transaction = verifyAndGet(atResp);

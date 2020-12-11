@@ -111,6 +111,7 @@ create table :oa4mpSchema.:oa4mpTransactionTable  (
    refresh_token_valid  boolean,
    expires_in           bigint,
    myproxyusername      text,
+   at_lifetime          bigint,
    username             text,
    auth_time            TIMESTAMP DEFAULT now(),
    nonce                text,

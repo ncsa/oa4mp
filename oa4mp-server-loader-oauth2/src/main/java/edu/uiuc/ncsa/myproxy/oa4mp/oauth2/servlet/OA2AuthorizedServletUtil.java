@@ -15,13 +15,13 @@ import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.server.UnapprovedClientException;
-import edu.uiuc.ncsa.security.delegation.server.request.AGRequest;
 import edu.uiuc.ncsa.security.delegation.server.request.AGResponse;
 import edu.uiuc.ncsa.security.delegation.server.request.IssuerResponse;
 import edu.uiuc.ncsa.security.delegation.servlet.TransactionState;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.oauth_2_0.*;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTRunner;
+import edu.uiuc.ncsa.security.oauth_2_0.server.AGRequest2;
 import edu.uiuc.ncsa.security.oauth_2_0.server.RFC8693Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
@@ -63,13 +63,16 @@ public class OA2AuthorizedServletUtil {
      */
     public OA2ServiceTransaction doDelegation(HttpServletRequest req, HttpServletResponse resp) throws Throwable {
         OA2Client client = (OA2Client) servlet.getClient(req);
+        OA2SE oa2se = (OA2SE) getServiceEnvironment();
 
         try {
             String cid = "client=" + client.getIdentifier();
             DebugUtil.info(this, "2.a. Starting a new cert request: " + cid);
             servlet.checkClientApproval(client);
-            AGResponse agResponse = (AGResponse) servlet.getAGI().process(new AGRequest(req, null));
+            // Generally the lifetime of an authorization grant is a matter of server policy, not a client request.
+            AGResponse agResponse = (AGResponse) servlet.getAGI().process(new AGRequest2(req, oa2se.getAuthorizationGrantLifetime()));
             OA2ServiceTransaction transaction = createNewTransaction(agResponse.getGrant());
+            transaction.setAuthGrantLifetime(oa2se.getAuthorizationGrantLifetime()); // make sure these match.
             /*
             Fixes CIL-644
             Extended attribute support means that a client may send fully qualifies (FQ) request parameters

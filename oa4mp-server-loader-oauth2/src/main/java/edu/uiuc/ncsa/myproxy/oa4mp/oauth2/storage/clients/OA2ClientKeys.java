@@ -18,6 +18,7 @@ public class OA2ClientKeys extends ClientKeys {
     String issuer = "issuer";
     String callback_uri = "callback_uri";
     String rtLifetime = "rt_lifetime";
+    String atLifetime = "at_lifetime";
     String scopes = "scopes";
     String ldap = "ldap";
 
@@ -31,8 +32,13 @@ public class OA2ClientKeys extends ClientKeys {
      public String strictScopes(String... x) {
          if (0 < x.length) strictScopes= x[0];
          return strictScopes;
-
      }
+
+    public String atLifetime(String... x) {
+        if (0 < x.length) atLifetime= x[0];
+        return atLifetime;
+    }
+
      public String issuer(String... x) {
          if (0 < x.length) issuer= x[0];
          return issuer;
@@ -93,6 +99,7 @@ public class OA2ClientKeys extends ClientKeys {
         allKeys.add(ldap());
         allKeys.add(publicClient());
         allKeys.add(rtLifetime());
+        allKeys.add(atLifetime());
         allKeys.add(scopes());
         allKeys.add(signTokens());
         allKeys.add(ea());

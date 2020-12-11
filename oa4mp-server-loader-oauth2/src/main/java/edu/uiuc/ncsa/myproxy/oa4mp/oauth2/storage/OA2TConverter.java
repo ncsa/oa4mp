@@ -6,14 +6,18 @@ import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
+import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
 import edu.uiuc.ncsa.security.delegation.token.TokenForge;
+import edu.uiuc.ncsa.security.delegation.token.impl.AuthorizationGrantImpl;
+import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2TokenForge;
 import edu.uiuc.ncsa.security.storage.data.ConversionMap;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
 
+import java.net.URI;
 import java.util.Collection;
 
 /**
@@ -42,11 +46,25 @@ public class OA2TConverter<V extends OA2ServiceTransaction> extends TransactionC
             if (refreshToken instanceof RefreshToken) {
                 st.setRefreshToken((RefreshToken) refreshToken);
             } else {
-                RefreshToken rt = getTF2().getRefreshToken();
-                rt.fromString(refreshToken.toString());
+                RefreshTokenImpl rt = new RefreshTokenImpl(URI.create(refreshToken.toString()));
                 st.setRefreshToken(rt);
             }
         }
+        Object rawAG = map.get(getTCK().authGrant());
+        if(rawAG == null){
+            if(st.getIdentifier() != null){
+                 AuthorizationGrantImpl ag = new AuthorizationGrantImpl(st.getIdentifier().getUri());
+                 st.setAuthorizationGrant(ag);
+            }
+        }else{
+           if(rawAG instanceof AuthorizationGrant){
+               st.setAuthorizationGrant((AuthorizationGrant)rawAG);
+           }else{
+               AuthorizationGrantImpl ag = new AuthorizationGrantImpl(URI.create(rawAG.toString()));
+               st.setAuthorizationGrant(ag);
+           }
+        }
+        st.setAuthGrantLifetime(map.getLong(getTCK().authzGrantLifetime()));
         st.setRefreshTokenValid(map.getBoolean(getTCK().refreshTokenValid()));
         st.setRefreshTokenLifetime(map.getLong(getTCK().refreshTokenLifetime()));
         st.setAccessTokenLifetime(map.getLong(getTCK().expiresIn()));
@@ -74,11 +92,20 @@ public class OA2TConverter<V extends OA2ServiceTransaction> extends TransactionC
         if (t.getRefreshToken() != null) {
             map.put(getTCK().refreshToken(), t.getRefreshToken().getToken());
         }
+        if(t.getAuthorizationGrant()==null){
+          // If the transaction is old, this will be missing. Create it from the
+          // identifier
+            AuthorizationGrantImpl ag = new AuthorizationGrantImpl(t.getIdentifier().getUri());
+            map.put(getTCK().authGrant(), ag);
+        }else{
+            map.put(getTCK().authGrant(), t.getAuthorizationGrant().getToken());
+        }
         map.put(getTCK().refreshTokenValid(), t.isRefreshTokenValid());
         if (t.getCallback() != null) {
             map.put(getTCK().callbackUri(), t.getCallback().toString());
         }
 
+        map.put(getTCK().authzGrantLifetime(), t.getAuthzGrantLifetime());
         map.put(getTCK().expiresIn(), t.getAccessTokenLifetime());
         map.put(getTCK().refreshTokenLifetime(), t.getRefreshTokenLifetime());
         if (t.getNonce() != null && 0 < t.getNonce().length()) {

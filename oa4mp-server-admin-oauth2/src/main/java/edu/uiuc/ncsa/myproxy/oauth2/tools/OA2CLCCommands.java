@@ -394,7 +394,7 @@ public class OA2CLCCommands extends CLCCommands {
                 say(claims.toString(2));
             }
         }
-        printTokens();
+        printTokens(inputLine.hasArg(NO_VERIFY_JWT));
 
     }
 
@@ -442,15 +442,25 @@ public class OA2CLCCommands extends CLCCommands {
         say(CertUtil.toPEM(assetResponse.getX509Certificates()));
 
     }
-
+    public static final String NO_VERIFY_JWT = "-no_verify";
     protected void getRTHelp() {
-        say("getrt [-claims]:");
+        say("getrt ["+ CLAIMS_FLAG  + " | " + NO_VERIFY_JWT + "]:");
         say("   Get a new refresh token. You must have already called getat to have gotten an access token");
         say("   first. This will print out a summary of the expiration time.");
-        say("   If the " + CLAIMS_FLAG + " flag is supplied, the id token will be printed");
+        say("   "+ CLAIMS_FLAG + " = the id token will be printed");
+        say("   " + NO_VERIFY_JWT + " = do not verify JWTs against server. Default is to verify.");
+
     }
 
-    protected JSONObject resolveFromToken(Token token) {
+    protected JSONObject resolveFromToken(Token token, boolean noVerify) {
+        if (noVerify) {
+            try {
+                String[] components = JWTUtil.decat(token.getToken());
+                return JSONObject.fromObject(components[JWTUtil.PAYLOAD_INDEX]);
+            } catch (Throwable t) {
+                return null;
+            }
+        }
         JSONWebKeys keys = JWTUtil2.getJsonWebKeys(getService().getServiceClient(), ((OA2ClientEnvironment) getService().getEnvironment()).getWellKnownURI());
         try {
             JSONObject json = JWTUtil.verifyAndReadJWT(token.getToken(), keys);
@@ -468,17 +478,25 @@ public class OA2CLCCommands extends CLCCommands {
             showTokensHelp();
             return;
         }
-        printTokens();
+        printTokens(inputLine.hasArg(NO_VERIFY_JWT));
     }
 
     private void showTokensHelp() {
-        say("tokens - print the current list of tokens");
+        say("tokens [" + NO_VERIFY_JWT + "] - print the current list of tokens");
+        say("   " + NO_VERIFY_JWT + " = do not verify JWTs against server. Default is to verify.");
     }
 
-    protected void printTokens() {
+    protected void printTokens(boolean noVerify) {
+        // It is possible that the service is down in which case the tokens can't be verified.
         if (dummyAsset.getAccessToken() != null) {
+            JSONObject token = null;
             // If the access token is a jwt
-            JSONObject token = resolveFromToken(getDummyAsset().getAccessToken());
+            try {
+                token = resolveFromToken(getDummyAsset().getAccessToken(), noVerify);
+            } catch (Throwable t) {
+                say("service is unreachable -- cannot verify token.");
+                return;
+            }
             if (token == null) {
                 say("default access token = " + dummyAsset.getAccessToken().getToken());
             } else {
@@ -488,13 +506,18 @@ public class OA2CLCCommands extends CLCCommands {
         }
 
         if (dummyAsset.getRefreshToken() != null) {
-
-            JSONObject token = resolveFromToken(getDummyAsset().getRefreshToken());
+            JSONObject token = null;
+            try {
+                token = resolveFromToken(getDummyAsset().getRefreshToken(), noVerify);
+            } catch (Throwable t) {
+                say("service is unreachable -- cannot verify token.");
+                return;
+            }
             if (token == null) {
                 say("default refresh token = " + dummyAsset.getRefreshToken().getToken());
-                say("RT expires in = " + dummyAsset.getRefreshToken().getExpiresAt() + " ms.");
+                say("RT expires in = " + dummyAsset.getRefreshToken().getLifetime() + " ms.");
                 Date startDate = DateUtils.getDate(dummyAsset.getRefreshToken().getToken());
-                startDate.setTime(startDate.getTime() + dummyAsset.getRefreshToken().getExpiresAt());
+                startDate.setTime(startDate.getTime() + dummyAsset.getRefreshToken().getLifetime());
                 say("   valid until " + startDate);
 
             } else {
@@ -502,8 +525,8 @@ public class OA2CLCCommands extends CLCCommands {
                 if (token.containsKey(OA2Claims.EXPIRATION)) {
                     Date d = new Date();
                     d.setTime(token.getLong(OA2Claims.EXPIRATION) * 1000L);
-                    getDummyAsset().getRefreshToken().setExpiresAt(d.getTime() - System.currentTimeMillis());
-                    say("RT expires in = " + getDummyAsset().getRefreshToken().getExpiresAt() + " ms.");
+                    //  getDummyAsset().getRefreshToken().setLifetime(d.getTime() - System.currentTimeMillis());
+                    say("RT expires in = " + getDummyAsset().getRefreshToken().getLifetime() + " ms.");
                 }
             }
 
@@ -533,16 +556,17 @@ public class OA2CLCCommands extends CLCCommands {
                 say(json.toString(2));
             }
         }
-        printTokens();
+        printTokens(inputLine.hasArg(NO_VERIFY_JWT));
     }
 
 
     protected void getATHelp() {
-        say("getat [-claims]:");
+        say("getat [" + CLAIMS_FLAG + " | " + NO_VERIFY_JWT + "]:");
         say("   Gets the access token and refresh token (if supported on the server) for a given grant. ");
         say("   Your must have already set the grant with the setgrant call.");
         say("   A summary of the refresh token and its expiration is printed, if applicable.");
-        say("   If the -" + CLAIMS_FLAG + " flag is supplied, the id token will be printed");
+        say("   "+ CLAIMS_FLAG + " =  he id token will be printed");
+        say("   " + NO_VERIFY_JWT + " = do not verify JWTs against server. Default is to verify.");
 
     }
 
@@ -643,15 +667,18 @@ public class OA2CLCCommands extends CLCCommands {
         }
 
         if (json.containsKey(USER_MESSAGE_KEY)) {
-            lastUserMessage =json.getString(USER_MESSAGE_KEY);
+            lastUserMessage = json.getString(USER_MESSAGE_KEY);
             say(lastUserMessage);
         }
         if (json.containsKey(CLAIMS_KEY)) {
             claims = json.getJSONObject(CLAIMS_KEY);
         }
-        if(json.containsKey(AUTHZ_GRANT_KEY)){
-            grant = new AuthorizationGrantImpl("");
+        if (json.containsKey(AUTHZ_GRANT_KEY)) {
+
+            grant = new AuthorizationGrantImpl(URI.create("a"));
             grant.fromJSON(json.getJSONObject(AUTHZ_GRANT_KEY));
+            //grant = new AuthorizationGrantImpl(URI.create(json.getString(AUTHZ_GRANT_KEY)));
+            //grant.fromJSON(json.getJSONObject(AUTHZ_GRANT_KEY));
         }
 
         if (json.containsKey(CONFIG_FILE_KEY)) {
@@ -707,7 +734,7 @@ public class OA2CLCCommands extends CLCCommands {
             saveFile = new File(inputLine.getLastArg());
         }
         jsonObject.put(SYSTEM_MESSAGE_KEY, "OA4MP command line client state stored on " + (new Date()));
-        if(grant != null){
+        if (grant != null) {
             jsonObject.put(AUTHZ_GRANT_KEY, grant.toJSON());
         }
         if (dummyAsset != null) {
@@ -747,14 +774,14 @@ public class OA2CLCCommands extends CLCCommands {
         say("See also: read");
     }
 
-    public void grant(InputLine inputLine) throws Exception{
-          if(showHelp(inputLine)){
-              say("grant - show the current authorization grant if any");
-              return;
-          }
-          if(grant == null){
-              say("(no grant)");
-          }
-          say(grant.toJSON().toString(1));
+    public void grant(InputLine inputLine) throws Exception {
+        if (showHelp(inputLine)) {
+            say("grant - show the current authorization grant if any");
+            return;
+        }
+        if (grant == null) {
+            say("(no grant)");
+        }
+        say(grant.toJSON().toString(1));
     }
 }

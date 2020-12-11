@@ -42,6 +42,8 @@ public class OA2SE extends ServiceEnvironmentImpl {
                  Provider<TransactionStore> tsp,
                  Provider<ClientStore> csp,
                  int maxAllowedNewClientRequests,
+                 long agLifetime,
+                 long atLifetime,
                  long rtLifetime,
                  Provider<ClientApprovalStore> casp,
                  List<MyProxyFacadeProvider> mfp,
@@ -89,9 +91,16 @@ public class OA2SE extends ServiceEnvironmentImpl {
                 usernameTransformer,
                 isPingable,
                 psp);
+        if(0 < agLifetime){
+            this.authorizationGrantLifetime = agLifetime;
+        }
+        if(0 < atLifetime){
+            this.accessTokenLifetime = atLifetime;
+        }
         if (0 < rtLifetime) {
             this.rtLifetime = rtLifetime;
         }
+
         if (clientSecretLength < 0) {
             throw new MyConfigurationException("Error: The client secret length (=" + clientSecretLength + ") is invalid. It must be a positive integer.");
         }
@@ -289,4 +298,24 @@ public class OA2SE extends ServiceEnvironmentImpl {
     }
 
     boolean oidcEnabled = true;
+
+    //FIXME Default.
+    long accessTokenLifetime = 15*60*1000L;
+
+    public long getAccessTokenLifetime() {
+        return accessTokenLifetime;
+    }
+    public void setAccessTokenLifetime(long accessTokenLifetime){
+        this.accessTokenLifetime = accessTokenLifetime;
+    }
+
+    public long getAuthorizationGrantLifetime() {
+        return authorizationGrantLifetime;
+    }
+
+    public void setAuthorizationGrantLifetime(long authorizationGrantLifetime) {
+        this.authorizationGrantLifetime = authorizationGrantLifetime;
+    }
+
+    long authorizationGrantLifetime = 15*60*1000L;
 }

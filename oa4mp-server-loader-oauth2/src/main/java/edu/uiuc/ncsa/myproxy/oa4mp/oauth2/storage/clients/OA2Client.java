@@ -109,6 +109,16 @@ public class OA2Client extends Client implements OA2ClientScopes {
         this.rtLifetime = rtLifetime;
     }
 
+    public long getAtLifetime() {
+        return atLifetime;
+    }
+
+    public void setAtLifetime(long atLifetime) {
+        this.atLifetime = atLifetime;
+    }
+
+    long atLifetime = -1L;
+
     /**
      * This returns whether or not this client is configured to return refresh tokens.
      *

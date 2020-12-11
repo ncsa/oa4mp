@@ -78,6 +78,7 @@ import java.util.List;
 import static edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.OA4MPIdentifierProvider.TRANSACTION_ID;
 import static edu.uiuc.ncsa.security.core.configuration.Configurations.*;
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2ConfigTags.*;
+import static edu.uiuc.ncsa.security.oauth_2_0.OA2ConfigTags.ACCESS_TOKEN_LIFETIME;
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.*;
 
 /**
@@ -89,7 +90,9 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
      * Default is 15 days. Internally the refresh lifetime (as all date-ish things) are in milliseconds
      * though the configuration file is assumed to be in seconds.
      */
-    public long REFRESH_TOKEN_LIFETIME_DEFAULT = 15 * 24 * 3600 * 1000L;
+    public long REFRESH_TOKEN_LIFETIME_DEFAULT = 15 * 24 * 3600 * 1000L; // 15 days
+    public long ACCESS_TOKEN_LIFETIME_DEFAULT = 15*60*1000L; // 15 minutes
+    public long AUTHORIZATION_GRANT_LIFETIME_DEFAULT = 15*60*1000L; // 15 minutes
     public int CLIENT_SECRET_LENGTH_DEFAULT = 258; //This is divisible by 3 and greater than 256, so when it is base64 encoded there will be no extra characters.
 
     public OA2ConfigurationLoader(ConfigurationNode node) {
@@ -108,6 +111,8 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     getTransactionStoreProvider(),
                     getClientStoreProvider(),
                     getMaxAllowedNewClientRequests(),
+                    getAGLifetime(),
+                    getATLifetime(),
                     getRTLifetime(),
                     getClientApprovalStoreProvider(),
                     getMyProxyFacadeProvider(),
@@ -442,6 +447,44 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         }
         return rtLifetime;
 
+    }
+
+    // Authorization grants lifetime
+    long agLifetime = -1L;
+
+    protected long getAGLifetime() {
+        if (agLifetime < 0) {
+            String x = getFirstAttribute(cn, AUTH_GRANT_LIFETIME);
+            if (x == null || x.length() == 0) {
+                agLifetime = AUTHORIZATION_GRANT_LIFETIME_DEFAULT;
+            } else {
+                try {
+                    agLifetime = Long.parseLong(x) * 1000; // The configuration file has this in seconds. Internally this is ms.
+                } catch (Throwable t) {
+                    agLifetime = AUTHORIZATION_GRANT_LIFETIME_DEFAULT;
+                }
+            }
+        }
+        return agLifetime;
+    }
+   // access token lifetime
+
+    long atLifetime = -1L;
+
+    protected long getATLifetime() {
+        if (atLifetime < 0) {
+            String x = getFirstAttribute(cn, ACCESS_TOKEN_LIFETIME);
+            if (x == null || x.length() == 0) {
+                atLifetime = ACCESS_TOKEN_LIFETIME_DEFAULT;
+            } else {
+                try {
+                    atLifetime = Long.parseLong(x) * 1000; // The configuration file has this in seconds. Internally this is ms.
+                } catch (Throwable t) {
+                    atLifetime = ACCESS_TOKEN_LIFETIME_DEFAULT;
+                }
+            }
+        }
+        return agLifetime;
     }
 
     String issuer = null;

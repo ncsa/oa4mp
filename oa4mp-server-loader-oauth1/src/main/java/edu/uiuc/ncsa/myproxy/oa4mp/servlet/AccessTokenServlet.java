@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.IssuerTransactionState;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.TransactionNotFoundException;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
+import edu.uiuc.ncsa.security.delegation.server.request.ATRequest;
 import edu.uiuc.ncsa.security.delegation.server.request.ATResponse;
 import edu.uiuc.ncsa.security.delegation.server.request.IssuerResponse;
 import edu.uiuc.ncsa.security.delegation.token.Verifier;
@@ -21,6 +22,11 @@ import static edu.uiuc.ncsa.security.core.util.DateUtils.checkTimestamp;
  * on May 18, 2011 at  11:20:06 AM
  */
 public class AccessTokenServlet extends AbstractAccessTokenServlet {
+    @Override
+    protected ATRequest getATRequest(HttpServletRequest request, ServiceTransaction transaction) {
+        return new ATRequest(request, transaction); // nothing to do for OAuth 1.0a
+    }
+
     @Override
     public ServiceTransaction verifyAndGet(IssuerResponse iResponse) throws IOException {
         ATResponse atResponse = (ATResponse)  iResponse;

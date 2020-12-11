@@ -14,13 +14,13 @@ import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
+import edu.uiuc.ncsa.security.delegation.server.request.ATRequest;
 import edu.uiuc.ncsa.security.delegation.server.request.IssuerResponse;
 import edu.uiuc.ncsa.security.delegation.servlet.TransactionState;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.delegation.storage.TransactionStore;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
-import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
 import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
 import edu.uiuc.ncsa.security.oauth_2_0.*;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTRunner;
@@ -30,6 +30,7 @@ import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSourceFactory;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
+import edu.uiuc.ncsa.security.storage.XMLMap;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import net.sf.json.JSONObject;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -100,8 +101,68 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             // and whatever they client is allowed.
             lifetime = Math.min(st2.getRefreshTokenLifetime(), lifetime);
         }
+        if (client.hasRefreshTokenConfig()) {
+            if (0 < client.getRefreshTokensConfig().getLifetime()) {
+                lifetime = Math.min(client.getRefreshTokensConfig().getLifetime(), lifetime);
+
+            }
+        }
         // Now take the minimum of what the server allows.
         return Math.min(lifetime, oa2SE.getRefreshTokenLifetime());
+    }
+
+    protected long computeATLifetime(OA2ServiceTransaction st2) {
+        OA2SE oa2SE = (OA2SE) getServiceEnvironment();
+        if (oa2SE.getAccessTokenLifetime() <= 0) {
+            throw new NFWException("Internal error: the server-wide default for the access token lifetime has not been set.");
+        }
+        long lifetime = oa2SE.getAccessTokenLifetime();
+
+        OA2Client client = (OA2Client) st2.getClient();
+        if (0 < client.getAtLifetime()) {
+            lifetime = Math.min(client.getAtLifetime(), lifetime);
+        }
+        if (client.hasAccessTokenConfig()) {
+            if (0 < client.getAccessTokensConfig().getLifetime()) {
+                lifetime = Math.min(client.getAccessTokensConfig().getLifetime(), lifetime);
+            }
+        }
+
+        // If the server default is <= 0 that implies there is some misconfiguration. Better to find that out here than
+        // get squirrelly results later.
+        // If the transaction has a specific request, take it in to account.
+        if (0 < st2.getAccessTokenLifetime()) {
+            // IF they specified a refresh token lifetime in the request, take the minimum of that
+            // and whatever they client is allowed.
+            lifetime = Math.min(st2.getAccessTokenLifetime(), lifetime);
+        }
+        return lifetime;
+
+    }
+
+    /**
+     * If a value is negative, that means to not check it, e.g., no specific value requested in transaction,
+     * so ignore it.
+     *
+     * @param serverValue
+     * @param clientValue
+     * @param transactionValue
+     * @return
+     */
+    protected long computeTokenLifetime(long serverValue, long clientValue, long transactionValue) {
+        if (serverValue <= 0) {
+            throw new NFWException("Internal error: the server-wide default for access token lifetimes has not been set.");
+        }
+        long lifetime = serverValue;
+        if (0 < clientValue) {
+            lifetime = Math.min(serverValue, clientValue);
+        }
+        // Now take the minimum of what the server allows.
+        if (0 < transactionValue) {
+            lifetime = Math.min(lifetime, transactionValue);
+        }
+
+        return lifetime;
     }
 
     /**
@@ -214,7 +275,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
                 sciTokens = JWTUtil.verifyAndReadJWT(subjectToken, keys);
                 accessToken = tokenForge.getAccessToken(sciTokens.getString(JWT_ID));
             } catch (Throwable tt) {
-                // didn't work, so now we assume it is a SciToken and verify then parse it
+                // didn't work, so now we assume it is regular token
                 accessToken = oa2se.getTokenForge().getAccessToken(subjectToken);
             }
             t = (OA2ServiceTransaction) getTransactionStore().get(accessToken);
@@ -237,11 +298,20 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         if (!t.getFlowStates().acceptRequests || !t.getFlowStates().refreshToken) {
             throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "token exchange access denied", HttpStatus.SC_UNAUTHORIZED);
         }
+        /*
+           Earth shaking change is that we need to create a new transaction for each exchange since the tokens
+           have a lifetime and lifecycle of their own. Once in the wild, people may come back to this
+           service and swap them willy nilly.
+         */
+
+        t = cloneTransaction(t);
+
         Collection<String> originalScopes = t.getScopes();
         if (!scopes.isEmpty()) {
             // Missing scopes means use whatever is there.
             t.setScopes(scopes);
         }
+
 
         HashMap<String, String> parameters = new HashMap<>();
         parameters.put(OA2Claims.SUBJECT, t.getUsername());
@@ -252,25 +322,27 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         RTIResponse rtiResponse = (RTIResponse) rtIssuer.process(rtiRequest);
         rtiResponse.setSignToken(client.isSignTokens());
         // set to new one.
-        t.setAccessToken(rtiResponse.getAccessToken());
+        JSONObject claims = new JSONObject();
+
         switch (requestedTokenType) {
             default:
             case ACCESS_TOKEN_TYPE:
-                break; // do NOT reset the refresh token
+                // do NOT reset the refresh token
+                // All the machinery from here out gets the RT from the rtiResponse.
+                claims.put(ISSUED_TOKEN_TYPE, ACCESS_TOKEN_TYPE); // Required. This is the type of token issued (mostly access tokens). Must be as per TX spec.
+                claims.put(OA2Constants.TOKEN_TYPE, TOKEN_TYPE_BEARER); // Required. This is how the issued token can be used, mostly. BY RFC 6750 spec.
+                claims.put(OA2Constants.EXPIRES_IN, t.getAccessTokenLifetime() / 1000); // internal in ms., external in sec.
+                rtiResponse.setRefreshToken(null); // no refresh token should get processed
+                t.setAccessToken(rtiResponse.getAccessToken()); // update to new AT
+                break;
             case REFRESH_TOKEN_TYPE:
-                t.setRefreshToken(rtiResponse.getRefreshToken());
+                claims.put(ISSUED_TOKEN_TYPE, REFRESH_TOKEN_TYPE); // Required. This is the type of token issued (mostly access tokens). Must be as per TX spec.
+                claims.put(OA2Constants.TOKEN_TYPE, TOKEN_TYPE_N_A); // Required. This is how the issued token can be used, mostly. BY RFC 6750 spec.
+                claims.put(OA2Constants.EXPIRES_IN, t.getRefreshTokenLifetime() / 1000); // internal in ms., external in sec.
+                t.setRefreshToken(rtiResponse.getRefreshToken()); // Update to new RT
                 break;
         }
-        //t.setRefreshToken(rtiResponse.getRefreshToken());
 
-        JSONObject claims = new JSONObject();
-        OA2Client oa2Client = (OA2Client) t.getClient();
-        // only return a refresh token if the server is configured to do so and the client is too.
-        if (oa2Client.isRTLifetimeEnabled() && oa2se.isRefreshTokenEnabled()) {
-            refreshToken = tokenForge.getRefreshToken();
-            t.setRefreshToken(refreshToken);
-            claims.put(OA2Constants.REFRESH_TOKEN, refreshToken.getToken()); // Optional
-        }
         JWTRunner jwtRunner = new JWTRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2se, t, t.getOA2Client().getConfig()));
         try {
             OA2ClientUtils.setupHandlers(jwtRunner, oa2se, t, request);
@@ -279,13 +351,28 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             ServletDebugUtil.warn(this, "Unable to update claims on token exchange: \"" + throwable.getMessage() + "\"");
         }
         setupTokens(client, rtiResponse, oa2se, t, jwtRunner);
-        claims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getAccessToken().getToken()); // Required.
-        if (oa2Client.isRTLifetimeEnabled() && oa2se.isRefreshTokenEnabled()) {
+        if (rtiResponse.hasRefreshToken()) {
+            // Maddening part of the spec is that the access_oadtoken claim can be a refresh token.
+            // User has to look at the returned token type.
+            claims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getRefreshToken().getToken()); // Required
             claims.put(OA2Constants.REFRESH_TOKEN, rtiResponse.getRefreshToken().getToken()); // Optional
+        } else {
+            claims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getAccessToken().getToken()); // Required.
         }
+        /*
+         Important note: In the RFC 8693 spec., access_token MUST be returned, however, it explains that this
+         is so named merely for compatibility with OAuth 2.0 request/response constructs. The actual
+         content of this is undefined.
+
+         Our policy: access_token contains whatever the requested token is. Look at the returned_token_type
+         to see what they got. As a convenience, if there is a refresh token, that will be returned as the
+         refresh_token claim.
+         */
+/*
         claims.put(ISSUED_TOKEN_TYPE, ACCESS_TOKEN_TYPE); // Required. This is the type of token issued (mostly access tokens). Must be as per TX spec.
         claims.put(OA2Constants.TOKEN_TYPE, TOKEN_TYPE_BEARER); // Required. This is how the issued token can be used, mostly. BY RFC 6750 spec.
-        claims.put(OA2Constants.EXPIRES_IN, Long.toString(Long.valueOf(System.currentTimeMillis() / 1000L + 900L))); // Optional
+        claims.put(OA2Constants.EXPIRES_IN, t.getAccessTokenLifetime());
+*/
         // TODO -- figure out scopes for SciTokens. These are optional if they are the same as the scope parameter (or parameter omitted).
         // Issue is that OIDC client scopes do not alter the access token. SciToken scopes, however, do.
         // handle OIDC clients:
@@ -329,6 +416,20 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
 
     }
 
+    protected OA2ServiceTransaction cloneTransaction(OA2ServiceTransaction t) throws IOException {
+        if (t == null) {
+            return t;
+        }
+        XMLMap xmlMap = new XMLMap();
+        getTransactionStore().getXMLConverter().toMap(t, xmlMap);
+        OA2ServiceTransaction t2 = (OA2ServiceTransaction) getTransactionStore().create();
+        Identifier identifier = t2.getIdentifier(); // new and unique
+        getTransactionStore().getXMLConverter().fromMap(xmlMap, t2);
+        t2.setIdentifier(identifier); // or we overwrite the original.
+        t2.setVerifier(getTF2().getVerifier()); // Have to have a unique verifier for DB key.
+          return t2;
+    }
+
     /**
      * Convert a string or list of strings to a list of them. This is for lists of space delimited values
      * The spec allows for multiple value which in practice can also mean that a client makes the request with
@@ -370,6 +471,17 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         throw new OA2GeneralError(OA2Errors.REQUEST_NOT_SUPPORTED, "unsupported grant type \"" + grantType + "\"", HttpStatus.SC_BAD_REQUEST);
     }
 
+    @Override
+    protected ATRequest getATRequest(HttpServletRequest request, ServiceTransaction transaction) {
+        OA2ServiceTransaction oa2T = (OA2ServiceTransaction) transaction;
+        long rtLifetime = computeRefreshLifetime(oa2T);
+        long atLifetime = computeATLifetime(oa2T);
+        // Set these in the transaction then send it along.
+        oa2T.setAccessTokenLifetime(atLifetime);
+        oa2T.setRefreshTokenLifetime(rtLifetime);
+        return new ATRequest(request, transaction);
+    }
+
     protected IssuerTransactionState doAT(HttpServletRequest request, HttpServletResponse response, OA2Client client) throws Throwable {
         // Grants are checked in the doIt method
         verifyClientSecret(client, getClientSecret(request));
@@ -387,6 +499,9 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         JWTRunner jwtRunner = new JWTRunner(st2, ScriptRuntimeEngineFactory.createRTE(oa2SE, st2, st2.getOA2Client().getConfig()));
         OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, st2, request);
         jwtRunner.doTokenClaims();
+        if (!client.isRTLifetimeEnabled()) {
+            atResponse.setRefreshToken(null);
+        }
         setupTokens(client, atResponse, oa2SE, st2, jwtRunner);
 
         getTransactionStore().save(st2);
@@ -397,39 +512,56 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         return state;
     }
 
-    private void setupTokens(OA2Client client, IDTokenResponse atResponse, OA2SE oa2SE, OA2ServiceTransaction st2, JWTRunner jwtRunner) {
+    /**
+     * This will take the {@link IDTokenResponse} and if necessary create a signed JWT, setting the jti to the
+     * returned token. It will then set the new JWT in the tokenResponse to be returned to the user.
+     * <br/>
+     * <b>Contract:</b> the idTokenResponse must have an access token and should only have a refresh token if
+     * that is allowed. If the refresh token is null, nothing will be done with the refresh token.
+     *
+     * @param client
+     * @param idTokenResponse
+     * @param oa2SE
+     * @param st2
+     * @param jwtRunner
+     */
+    private void setupTokens(OA2Client client,
+                             IDTokenResponse idTokenResponse,
+                             OA2SE oa2SE,
+                             OA2ServiceTransaction st2,
+                             JWTRunner jwtRunner) {
         if (jwtRunner.hasATHandler()) {
             AccessToken newAT = jwtRunner.getAccessTokenHandler().getSignedAT(oa2SE.getJsonWebKeys().getDefault());
-            atResponse.setAccessToken(newAT);
+            idTokenResponse.setAccessToken(newAT);
             DebugUtil.trace(this, "Returned AT from handler:" + newAT + ", for claims " + st2.getATData().toString(2));
         }
-        atResponse.setClaims(st2.getUserMetaData());
-        DebugUtil.trace(this, "set token signing flag =" + atResponse.isSignToken());
+        idTokenResponse.setClaims(st2.getUserMetaData());
+        DebugUtil.trace(this, "set token signing flag =" + idTokenResponse.isSignToken());
+        // no processing of the refresh token is needed if there is none.
+        if (!idTokenResponse.hasRefreshToken()) {
+            return;
+        }
         if (!client.isRTLifetimeEnabled() && oa2SE.isRefreshTokenEnabled()) {
             // Since this bit of information could be extremely useful if a service decides
-            // eto start issuing refresh tokens after
+            // to start issuing refresh tokens after
             // clients have been registered, it should be logged.
             info("Refresh tokens are disabled for client " + client.getIdentifierString() + ", but enabled on the server. No refresh token will be made.");
         }
         if (client.isRTLifetimeEnabled() && oa2SE.isRefreshTokenEnabled()) {
-
-            RefreshTokenImpl rt = atResponse.getRefreshToken();
-            AccessTokenImpl at = (AccessTokenImpl) atResponse.getAccessToken();
+            RefreshTokenImpl rt = idTokenResponse.getRefreshToken();
+            // rt is used as a key in the database. If the refresh token is  JWT, it will be used as the jti.
             st2.setRefreshToken(rt);
-            // First pass through the system should have the system default as the refresh token lifetime.
-            st2.setRefreshTokenLifetime(oa2SE.getRefreshTokenLifetime());
-            rt.setExpiresAt(computeRefreshLifetime(st2));
             st2.setRefreshTokenValid(true);
-            st2.setAccessTokenLifetime(15*60*1000L); // FIX ME!!! This needs to come from OA2SE and be set in the config
-            at.setExpiresAt(st2.getAccessTokenLifetime());
             if (jwtRunner.hasRTHandler()) {
                 RefreshTokenImpl newRT = (RefreshTokenImpl) jwtRunner.getRefreshTokenHandler().getSignedRT(null); // unsigned, for now
-                atResponse.setRefreshToken(newRT);
+                idTokenResponse.setRefreshToken(newRT);
                 DebugUtil.trace(this, "Returned RT from handler:" + newRT + ", for claims " + st2.getRTData().toString(2));
             }
         } else {
-            // Do not return a refresh token.
-            atResponse.setRefreshToken(null);
+            // Even if a token is sent, do not return a refresh token.
+            // This might be in a legacy case where a server changes it policy to prohibit  issuing refresh tokens but
+            // an outstanding transaction has one.   
+            idTokenResponse.setRefreshToken(null);
         }
     }
 
@@ -586,9 +718,19 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         AccessToken at = t.getAccessToken();
         RTIRequest rtiRequest = new RTIRequest(request, t, at, oa2SE.isOIDCEnabled());
         RTI2 rtIssuer = new RTI2(getTF2(), getServiceEnvironment().getServiceAddress());
+        if (t.getRefreshTokenLifetime() == 0 && 0 < c.getRtLifetime()) {
+            // This is in case we have a really old token that is getting refreshed.
+            // Have to set the rt lifetime in the transaction so the new token is
+            // created correctly.
+            t.setRefreshTokenLifetime(Math.min(oa2SE.getRefreshTokenLifetime(), c.getRtLifetime()));
+        }
         RTIResponse rtiResponse = (RTIResponse) rtIssuer.process(rtiRequest);
         rtiResponse.setSignToken(c.isSignTokens());
-
+        if (c.isRTLifetimeEnabled() && oa2SE.isRefreshTokenEnabled()) {
+            t.setRefreshToken(rtiResponse.getRefreshToken());
+        } else {
+            rtiResponse.setRefreshToken(null);
+        }
         // Note for CIL-525: Here is where we need to recompute the claims. If a request comes in for a new
         // refresh token, it has to be checked against the recomputed claims. Use case is that a very long-lived
         // refresh token is issued, a user is no longer associated with a group and her access is revoked, then
@@ -599,7 +741,6 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         // is that they exist only for the initialization.
 
         t.setAccessToken(rtiResponse.getAccessToken());
-        t.setRefreshToken(rtiResponse.getRefreshToken());
         JWTRunner jwtRunner = new JWTRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2SE, t, t.getOA2Client().getConfig()));
         OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, t, request);
         try {
@@ -609,12 +750,6 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             ServletDebugUtil.warn(this, "Unable to update claims on token refresh: \"" + throwable.getMessage() + "\"");
         }
         setupTokens(c, rtiResponse, oa2SE, t, jwtRunner);
-      /*  rtiResponse.setClaims(t.getUserMetaData());
-        RefreshToken rt = rtiResponse.getRefreshToken();
-        rt.setExpiresIn(computeRefreshLifetime(t));
-        t.setRefreshToken(rtiResponse.getRefreshToken());
-        t.setRefreshTokenValid(true);
-        t.setAccessToken(rtiResponse.getAccessToken());*/
         // At this point, key in the transaction store is the grant, so changing the access token
         // over-writes the current value. This practically invalidates the previous access token.
         getTransactionStore().remove(t.getIdentifier()); // this is necessary to clear any caches.
@@ -654,7 +789,13 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         TransactionStore transactionStore = getTransactionStore();
         BasicIdentifier basicIdentifier = new BasicIdentifier(atResponse.getParameters().get(OA2Constants.AUTHORIZATION_CODE));
         DebugUtil.trace(this, "getting transaction for identifier=" + basicIdentifier);
-        OA2ServiceTransaction transaction = (OA2ServiceTransaction) transactionStore.get(basicIdentifier);
+        OA2ServiceTransaction transaction = null;
+        // Transaction may have unsaved state in it. Don't just get rid of it if it is passed in.
+        if (((ATIResponse2) iResponse).getServiceTransaction() == null) {
+            transaction = (OA2ServiceTransaction) transactionStore.get(basicIdentifier);
+        } else {
+            transaction = (OA2ServiceTransaction) ((ATIResponse2) iResponse).getServiceTransaction();
+        }
         if (transaction == null) {
             // Then this request does not correspond to an previous one and must be rejected asap.
             throw new OA2ATException(OA2Errors.INVALID_REQUEST, "No pending transaction found for id=" + basicIdentifier);

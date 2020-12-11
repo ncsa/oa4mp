@@ -102,13 +102,13 @@ public class IDTokenHandler extends AbstractPayloadHandler {
          *********************/
         boolean jeffTest =
                 transaction.getUsername().equals("http://cilogon.org/serverD/users/55") // me via NCSA IDP on polod
-                ||
-                transaction.getUsername().equals("http://cilogon.org/serverA/users/16316"); // me via Google IDP, cilogon.org email on poloc
+                        ||
+                        transaction.getUsername().equals("http://cilogon.org/serverA/users/16316"); // me via Google IDP, cilogon.org email on poloc
 
         boolean jimTest =
                 transaction.getUsername().equals("http://cilogon.org/serverD/users/65") // jim Basney NCSA IDP on polod
-                ||
-                transaction.getUsername().equals("http://cilogon.org/serverT/users/37233"); // jim Basney NCSA IDP on poloc
+                        ||
+                        transaction.getUsername().equals("http://cilogon.org/serverT/users/37233"); // jim Basney NCSA IDP on poloc
 
 
         DebugUtil.trace(this, "In add debug claims. Username = " + transaction.getUsername() +
@@ -170,7 +170,11 @@ public class IDTokenHandler extends AbstractPayloadHandler {
     @Override
     public void refreshAccountingInformation() {
         trace(this, "Refreshing the accounting information for the claims");
-        getClaims().put(EXPIRATION, System.currentTimeMillis() / 1000 + 15 * 60); // expiration is in SECONDS from the epoch.
+        if (0 < getPhCfg().getPayloadConfig().getLifetime()) {
+            getClaims().put(EXPIRATION, (getPhCfg().getPayloadConfig().getLifetime() + System.currentTimeMillis()) / 1000); // expiration is in SECONDS from the epoch.
+        } else {
+            getClaims().put(EXPIRATION, System.currentTimeMillis() / 1000 + 15 * 60); // expiration is in SECONDS from the epoch.
+        }
         getClaims().put(ISSUED_AT, System.currentTimeMillis() / 1000); // issued at = current time in seconds.
     }
 

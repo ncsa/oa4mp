@@ -19,7 +19,6 @@ import edu.uiuc.ncsa.security.oauth_2_0.client.ATServer2;
 import edu.uiuc.ncsa.security.oauth_2_0.client.DS2;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTUtil2;
 import edu.uiuc.ncsa.security.oauth_2_0.server.InvalidNonceException;
-import edu.uiuc.ncsa.security.oauth_2_0.server.RFC8693Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
 import edu.uiuc.ncsa.security.servlet.ServiceClient;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
@@ -37,6 +36,7 @@ import java.util.*;
 import static edu.uiuc.ncsa.myproxy.oa4mp.client.ClientEnvironment.CALLBACK_URI_KEY;
 import static edu.uiuc.ncsa.security.delegation.client.AbstractClientEnvironment.CERT_REQUEST_KEY;
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.*;
+import static edu.uiuc.ncsa.security.oauth_2_0.server.RFC8693Constants.*;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -159,7 +159,7 @@ public class OA2MPService extends OA4MPService {
         parameters.put(STATE, a.getState()); // random state is ok.
         parameters.put(NONCE, a.getNonce());
         parameters.put(PROMPT, PROMPT_LOGIN);
-        parameters.putAll(((OA2ClientEnvironment)getEnvironment()).getAdditionalParameters());
+        parameters.putAll(((OA2ClientEnvironment) getEnvironment()).getAdditionalParameters());
     }
 
 /*
@@ -320,63 +320,86 @@ public class OA2MPService extends OA4MPService {
      */
     public JSONObject exchangeRefreshToken(OA2Asset asset, RefreshToken refreshToken) {
         HashMap<String, String> parameterMap = new HashMap<>();
-        parameterMap.put("subject_token_type", RFC8693Constants.REFRESH_TOKEN_TYPE);
-        parameterMap.put("subject_token", refreshToken.getToken());
+        parameterMap.put(SUBJECT_TOKEN, refreshToken.getToken());
+        parameterMap.put(SUBJECT_TOKEN_TYPE, REFRESH_TOKEN_TYPE);
+        parameterMap.put(REQUESTED_TOKEN_TYPE, REFRESH_TOKEN_TYPE);
         return exchangeIt(asset, parameterMap);
     }
-    
+
     public JSONObject exchangeAccessToken(OA2Asset asset, AccessToken accessToken) {
         HashMap<String, String> parameterMap = new HashMap<>();
-        parameterMap.put("subject_token", accessToken.getToken());
-        parameterMap.put("subject_token_type", RFC8693Constants.ACCESS_TOKEN_TYPE);
+        parameterMap.put(SUBJECT_TOKEN, accessToken.getToken());
+        parameterMap.put(SUBJECT_TOKEN_TYPE, ACCESS_TOKEN_TYPE);
+        parameterMap.put(REQUESTED_TOKEN_TYPE, ACCESS_TOKEN_TYPE);
         return exchangeIt(asset, parameterMap);
     }
 
     /**
      * Actual workhorse. Takes the token and the type then does the exchange.
+     *
      * @param asset
      * @param parameterMap
      * @return
      */
-     protected JSONObject exchangeIt(OA2Asset asset, HashMap<String, String> parameterMap){
-         ServiceClient serviceClient = getServiceClient();
-         parameterMap.put(OA2Constants.GRANT_TYPE, RFC8693Constants.GRANT_TYPE_TOKEN_EXCHANGE);
-         Client client = getEnvironment().getClient();
-         String rawResponse = serviceClient.getRawResponse(parameterMap, client.getIdentifierString(), client.getSecret());
+    protected JSONObject exchangeIt(OA2Asset asset, HashMap<String, String> parameterMap) {
+        ServiceClient serviceClient = getServiceClient();
+        parameterMap.put(OA2Constants.GRANT_TYPE, GRANT_TYPE_TOKEN_EXCHANGE);
+        Client client = getEnvironment().getClient();
+        String rawResponse = serviceClient.getRawResponse(parameterMap, client.getIdentifierString(), client.getSecret());
 
-         System.out.println("raw response = " + rawResponse);
-         JSONObject json = JSONObject.fromObject(rawResponse);
-         updateAsset(asset, json);
-         String rawToken = json.getString(OA2Constants.ACCESS_TOKEN);
-         JSONWebKeys keys = JWTUtil2.getJsonWebKeys(serviceClient, ((OA2ClientEnvironment) getEnvironment()).getWellKnownURI());
-         JSONObject j = null;
-         try {
-             // See if its a SciToken
-             j= JWTUtil2.verifyAndReadJWT(rawToken, keys);
-         }catch(Throwable t){
-             j = new JSONObject();
-             j.put(OA2Constants.ACCESS_TOKEN, rawToken);
-         }
-         return j;
+        System.out.println("raw response = " + rawResponse);
+        JSONObject json = JSONObject.fromObject(rawResponse);
+        updateExchangedAsset(asset, json);
+        String rawToken = json.getString(OA2Constants.ACCESS_TOKEN);
+        JSONWebKeys keys = JWTUtil2.getJsonWebKeys(serviceClient, ((OA2ClientEnvironment) getEnvironment()).getWellKnownURI());
+        JSONObject j = null;
+        try {
+            // See if its a SciToken
+            j = JWTUtil2.verifyAndReadJWT(rawToken, keys);
+        } catch (Throwable t) {
+            j = new JSONObject();
+            if (json.getString(ISSUED_TOKEN_TYPE).equals(REFRESH_TOKEN_TYPE)) {
+                j.put(REFRESH_TOKEN, rawToken);
+            } else {
+                j.put(OA2Constants.ACCESS_TOKEN, rawToken);
+            }
+        }
+        return j;
 
-     }
+    }
 
 
     public ServiceClient getServiceClient() {
         ATServer2 atServer2 = (ATServer2) getEnvironment().getDelegationService().getAtServer();
         return atServer2.getServiceClient();
     }
-    protected void updateAsset(OA2Asset asset, JSONObject claims) {
-        String rt = claims.getString(OA2Constants.REFRESH_TOKEN);
-        if (rt != null && !rt.isEmpty()) {
-            RefreshTokenImpl refreshToken = new RefreshTokenImpl(URI.create(rt));
-            asset.setRefreshToken(refreshToken);
+
+    protected void updateExchangedAsset(OA2Asset asset, JSONObject claims) {
+        boolean saveAsset = false;
+        if (claims.containsKey(ISSUED_TOKEN_TYPE)) {
+            String token = claims.getString(ACCESS_TOKEN);
+
+            if (claims.getString(ISSUED_TOKEN_TYPE).equals(ACCESS_TOKEN_TYPE)) {
+                if (token != null && !token.isEmpty()) {
+                    AccessTokenImpl at = new AccessTokenImpl(URI.create(token));
+                    asset.setAccessToken(at);
+                    saveAsset = true;
+                }
+
+            }
+            if (claims.getString(ISSUED_TOKEN_TYPE).equals(REFRESH_TOKEN_TYPE)) {
+                // Then the returned token is a refresh token, as per spec.
+                if (token != null && !token.isEmpty()) {
+                    RefreshTokenImpl refreshToken = new RefreshTokenImpl(URI.create(token));
+                    asset.setRefreshToken(refreshToken);
+                    saveAsset = true;
+                }
+
+            }
         }
-        // reset access token to returned value and stash it
-        String at = claims.getString(OA2Constants.ACCESS_TOKEN);
-        AccessTokenImpl accessToken = new AccessTokenImpl(URI.create(at));
-        asset.setAccessToken(accessToken);
-        getEnvironment().getAssetStore().save(asset);
+        if (saveAsset) {
+            getEnvironment().getAssetStore().save(asset);
+        }
     }
 
 }

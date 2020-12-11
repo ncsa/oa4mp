@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.OA4MPServiceTransaction;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
+import edu.uiuc.ncsa.security.delegation.token.impl.AuthorizationGrantImpl;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.FlowStates;
 import edu.uiuc.ncsa.security.oauth_2_0.server.OA2TransactionScopes;
@@ -42,6 +43,13 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
 
     public OA2ServiceTransaction(Identifier identifier) {
         super(identifier);
+        AuthorizationGrantImpl ag = null;
+        if (identifier == null) {
+            ag = new AuthorizationGrantImpl(null);
+        } else {
+            ag = new AuthorizationGrantImpl(identifier.getUri());
+        }
+        this.authorizationGrant = ag;
     }
 
     /**
@@ -80,15 +88,17 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
     /**
      * Clients may send an audience which is used by some components (notable SciTokens) but
      * is generally optional.
+     *
      * @return
      */
-    public List<String> getAudience(){
-        if(getState().containsKey(AUDIENCE_KEY)){
+    public List<String> getAudience() {
+        if (getState().containsKey(AUDIENCE_KEY)) {
             return getState().getJSONArray(AUDIENCE_KEY);
         }
         return null;
     }
-    public void setAudience(List<String> audience){
+
+    public void setAudience(List<String> audience) {
         getState().put(AUDIENCE_KEY, audience);
     }
 
@@ -107,6 +117,7 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
 
     /**
      * Extended attributes are sent over the wire as specific requests.
+     *
      * @return
      */
     public JSONObject getExtendedAttributes() {
@@ -115,6 +126,17 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         }
 
         return getState().getJSONObject(EXTENDED_ATTRIBUTES_KEY);
+    }
+
+    long grantLifetime = 15 * 60 * 1000L;
+
+    @Override
+    public long getAuthzGrantLifetime() {
+        return grantLifetime;
+    }
+
+    public void setAuthGrantLifetime(long lifetime) {
+        grantLifetime = lifetime;
     }
 
     public void setExtendedAttributes(JSONObject jsonObject) {
@@ -219,23 +241,24 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
 
     String AT_DATA_KEY = "at_data"; // access token contents
 
-    public JSONObject getATData(){
+    public JSONObject getATData() {
         if (!getState().containsKey(AT_DATA_KEY)) {
             return new JSONObject();
         }
         return getState().getJSONObject(AT_DATA_KEY);
     }
-    public void setATData(JSONObject atData){
+
+    public void setATData(JSONObject atData) {
         getState().put(AT_DATA_KEY, atData);
     }
 
     String RT_DATA_KEY = "rt_data"; // refresh token contents
 
-    public void setRTData(JSONObject rtData){
+    public void setRTData(JSONObject rtData) {
         getState().put(RT_DATA_KEY, rtData);
     }
 
-    public JSONObject getRTData(){
+    public JSONObject getRTData() {
         if (!getState().containsKey(RT_DATA_KEY)) {
             return new JSONObject();
         }
@@ -272,7 +295,7 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         this.authTime = authTime;
     }
 
-    Date authTime = new Date(); 
+    Date authTime = new Date();
 
     /**
      * The <b><i>resolved</i></b> scopes for this transaction. This means that the intersection of the client's allowed

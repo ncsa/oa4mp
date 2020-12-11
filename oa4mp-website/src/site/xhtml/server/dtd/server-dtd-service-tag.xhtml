@@ -100,6 +100,31 @@
         </td>
     </tr>
     <tr>
+        <td style="vertical-align: top;">authorizationGrantLifetime</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">900</td>
+        <td style="vertical-align: top;">"<span style="background-color: #ff6600;">OAuth 2</span>
+            specific. This will set the lifetime of authorization grants, in seconds, issued by
+            the server. The default is 900 seconds = 15 minutes. As long as the grant has not expired,
+            the second leg of the exchange (getting an access token) can be done. If there is too
+            long a gap between authentication and getting an access token, it will fail. Generally
+            the default is quite reasonable. 
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">accessTokenLifetime</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">900</td>
+        <td style="vertical-align: top;">"<span style="background-color: #ff6600;">OAuth 2</span>
+            specific. This will set the lifetime of access tokens, in seconds, issued by
+            the server. The default is 900 seconds = 15 minutes. Note that generally access tokens should have
+            much shorter lifetime than refresh tokens. The reason is that access tokens allow access to a resource
+            and refresh tokens let a client get access tokens. Best practices is that an access token is gotten
+            for a specific task and should be therefore short lived. Clients may request different lifetimes, but
+            are limited to this value as a maximum.
+        </td>
+    </tr>
+    <tr>
         <td style="vertical-align: top;">refreshTokenLifetime</td>
         <td style="vertical-align: top;">N</td>
         <td style="vertical-align: top;">1296000</td>
@@ -152,11 +177,13 @@
     <tr>
         <td style="vertical-align: top;">disableDefaultStores</td>
         <td style="vertical-align: top;">N</td>
-        <td style="vertical-align: top;">false</td>
-        <td style="vertical-align: top;">The default server behavior is to default
-            to using a memory store if no other store is explicitly set. If set to true, this will make the server throw
+        <td style="vertical-align: top;">true</td>
+        <td style="vertical-align: top;">Allow the server
+            to use  memory stores if no other store is explicitly set. If set to true, this will make the server throw
             an
-            exception if there is no store configured.
+            exception if there is no store configured.   The default is true precisely to force you to explicitly enable this,
+            since otherwise a store misconfiguration might be a silent error and everything (such as client
+            registrations, approvals, etc.) might end up in memory where they would vanish at service restart.
         </td>
     </tr>
     <tr>

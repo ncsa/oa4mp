@@ -15,6 +15,7 @@ public class OA2TransactionKeys extends DSTransactionKeys {
         clientKey("client_id");
     }
 
+    protected String authzGrantLifetime = "authz_grant_lifetime";
     protected String refreshToken = "refresh_token";
     protected String refreshTokenLifetime = "refresh_token_lifetime";
     protected String refreshTokenValid = "refresh_token_valid";
@@ -22,6 +23,11 @@ public class OA2TransactionKeys extends DSTransactionKeys {
     protected String scopes = "scopes";
     protected String authTime = "auth_time";
     protected String states = "states";
+
+    public String authzGrantLifetime(String... x) {
+        if (0 < x.length) authzGrantLifetime = x[0];
+        return authzGrantLifetime;
+    }
 
     public String refreshTokenLifetime(String... x) {
         if (0 < x.length) refreshTokenLifetime = x[0];

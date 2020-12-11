@@ -39,7 +39,7 @@ public class OA2AssetConverter extends AssetConverter {
         String rt = map.getString(getASK().refreshToken());
         if (rt != null) {
             RefreshTokenImpl refreshToken = new RefreshTokenImpl(URI.create(rt));
-            refreshToken.setExpiresAt(map.getLong(getASK().refreshLifetime()));
+            //refreshToken.setLifetime(map.getLong(getASK().refreshLifetime()));
             a.setRefreshToken(refreshToken);
         }
         String state = map.getString(getASK().state());
@@ -69,7 +69,7 @@ public class OA2AssetConverter extends AssetConverter {
         if (a.getAccessToken() != null) map.put(getASK().accessToken(), a.getAccessToken().getToken());
         if (a.getRefreshToken() != null) {
             map.put(getASK().refreshToken(), a.getRefreshToken().getToken());
-            map.put(getASK().refreshLifetime(), a.getRefreshToken().getExpiresAt());
+            map.put(getASK().refreshLifetime(), a.getRefreshToken().getLifetime());
         }
         if (a.getState() != null) {
             map.put(getASK().state(), a.getState());
