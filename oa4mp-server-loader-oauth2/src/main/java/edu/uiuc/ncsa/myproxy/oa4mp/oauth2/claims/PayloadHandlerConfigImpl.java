@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.PayloadHandlerConfig;
 import edu.uiuc.ncsa.security.util.scripting.ScriptSet;
 
@@ -29,14 +30,26 @@ public  class PayloadHandlerConfigImpl implements PayloadHandlerConfig {
 
     AbstractPayloadConfig clientConfig;
 
+    public TXRecord getTxRecord() {
+        return txRecord;
+    }
+
+    public void setTxRecord(TXRecord txRecord) {
+        this.txRecord = txRecord;
+    }
+
+    TXRecord txRecord;
+
     public PayloadHandlerConfigImpl(AbstractPayloadConfig abstractClientConfig,
                                     OA2SE oa2se,
                                     OA2ServiceTransaction transaction,
+                                    TXRecord txRecord,
                                     HttpServletRequest request) {
         clientConfig = abstractClientConfig;
         this.oa2se = oa2se;
         this.transaction = transaction;
         this.request = request;
+        this.txRecord = txRecord;
     }
 
 

@@ -6,9 +6,12 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.ClaimSourceFactoryImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ScriptRuntimeEngineFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RefreshTokenStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractAccessTokenServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.IssuerTransactionState;
 import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.cache.Cleanup;
+import edu.uiuc.ncsa.security.core.cache.RetentionPolicy;
 import edu.uiuc.ncsa.security.core.exceptions.*;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
@@ -28,9 +31,7 @@ import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTUtil2;
 import edu.uiuc.ncsa.security.oauth_2_0.server.*;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSourceFactory;
-import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
-import edu.uiuc.ncsa.security.storage.XMLMap;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import net.sf.json.JSONObject;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -53,6 +54,40 @@ import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.JWT_ID;
  * on 10/3/13 at  2:03 PM
  */
 public class OA2ATServlet extends AbstractAccessTokenServlet {
+    // Don't really have a better place to put this.  TXRecord is not visible except in this module.
+    public static Cleanup<Identifier, TXRecord> txRecordCleanup = null;
+
+    @Override
+    public void destroy() {
+        super.destroy();
+        shutdownCleanup(txRecordCleanup); // try to shutdown cleanly
+    }
+
+    public static class TokenExchangeRecordRetentionPolicy implements RetentionPolicy{
+        public TokenExchangeRecordRetentionPolicy() {
+        }
+
+        @Override
+        public boolean retain(Object key, Object value) {
+            // key is the identifier, values is the TXRecord
+            TXRecord txr = (TXRecord)value;
+            if( System.currentTimeMillis() <= txr.getExpiresAt()){
+                return true; // so keep it.
+            }
+            return false;
+        }
+
+        @Override
+        public Map getMap() {
+            // Don't need the map for the policy, so don't set it.
+            return null;
+        }
+
+        @Override
+        public boolean applies() {
+            return true;
+        }
+    }
     @Override
     public void preprocess(TransactionState state) throws Throwable {
         super.preprocess(state);
@@ -229,6 +264,9 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
                            HttpServletResponse response) throws IOException {
         printAllParameters(request);
         // https://tools.ietf.org/html/rfc8693
+        String rawSecret = getClientSecret(request);
+
+        verifyClientSecret(client, rawSecret);
 
         String subjectToken = getFirstParameterValue(request, SUBJECT_TOKEN);
         if (subjectToken == null) {
@@ -258,16 +296,18 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         if (subjectTokenType == null) {
             throw new GeneralException("Error: missing subject token type");
         }
+
         /*
         These can come as multiple space delimited string and as multiple parameters, so it is possible to get
         arrays of arrays of these and they have to be regularized to a single list for processing.
         NOTE: These are ignored for regular access tokens. For SciTokens we *should* allow exchanging
         a token for a weaker one. Need to figure out what weaker means though.
          */
-        Collection<String> audience = convertToList(request, AUDIENCE);
-        Collection<String> scopes = convertToList(request, OA2Constants.SCOPE);
-        Collection<String> resources = convertToList(request, RESOURCE);
+        List<String> audience = convertToList(request, AUDIENCE);
+        List<String> scopes = convertToList(request, OA2Constants.SCOPE);
+        List<String> resources = convertToList(request, RESOURCE);
 
+        TXRecord oldTXR = null;
         if (subjectTokenType.equals(ACCESS_TOKEN_TYPE)) {
             // So we have an access token. Try to interpret it first as a SciToken then if that fails as a
             // standard OA4MP access token:
@@ -280,6 +320,16 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             }
             t = (OA2ServiceTransaction) getTransactionStore().get(accessToken);
 
+            if (t != null) {
+                // Must present a valid token to get one.
+                if (!t.isAccessTokenValid()) {
+                    throw new OA2GeneralError(OA2Errors.INVALID_TOKEN, "The token is not valid", HttpStatus.SC_UNAUTHORIZED);
+                }
+                if (accessToken.isExpired()) {
+                    throw new OA2GeneralError(OA2Errors.INVALID_TOKEN, "The token has expired", HttpStatus.SC_UNAUTHORIZED);
+                }
+            }
+
         }
         if (subjectTokenType.equals(REFRESH_TOKEN_TYPE)) {
             // Handle the refresh token case.
@@ -290,10 +340,34 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             } catch (Throwable tt) {
                 throw new GeneralException("Error: Could not get a refresh token:" + tt.getMessage());
             }
+            if (t != null) {
+                // Must present a valid token to get one.
+                if (!t.isRefreshTokenValid()) {
+                    throw new OA2GeneralError(OA2Errors.INVALID_TOKEN, "The token is not valid", HttpStatus.SC_UNAUTHORIZED);
+                }
+                if (refreshToken.isExpired()) {
+                    throw new OA2GeneralError(OA2Errors.INVALID_TOKEN, "The token has expired", HttpStatus.SC_UNAUTHORIZED);
+                }
+            }
         }
         if (t == null) {
+            // if there is no such transaction found, then this is probably from a previous exchange. Go find it
+            oldTXR = (TXRecord) oa2se.getTxStore().get(BasicIdentifier.newID(accessToken.getToken()));
+            if (!oldTXR.isValid()) {
+                throw new OA2GeneralError(OA2Errors.INVALID_TOKEN, "The token is not valid", HttpStatus.SC_UNAUTHORIZED);
+            }
+            if (oldTXR.getExpiresAt() < System.currentTimeMillis()) {
+                throw new OA2GeneralError(OA2Errors.INVALID_TOKEN, "The token has expired", HttpStatus.SC_UNAUTHORIZED);
+            }
+            if (oldTXR != null) {
+                t = (OA2ServiceTransaction) getTransactionStore().get(oldTXR.getParentID());
+            }
+        }
+        if (t == null) {
+            // Ain't one no place. Bail.
             throw new GeneralException("Error: no pending transaction found.");
         }
+
         // Finally can check access here. Access for exchange is same as for refresh token.
         if (!t.getFlowStates().acceptRequests || !t.getFlowStates().refreshToken) {
             throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "token exchange access denied", HttpStatus.SC_UNAUTHORIZED);
@@ -304,60 +378,82 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
            service and swap them willy nilly.
          */
 
-        t = cloneTransaction(t);
-
-        Collection<String> originalScopes = t.getScopes();
-        if (!scopes.isEmpty()) {
-            // Missing scopes means use whatever is there.
-            t.setScopes(scopes);
+        TXRecord newTXR = (TXRecord) oa2se.getTxStore().create();
+        newTXR.setTokenType(requestedTokenType);
+        newTXR.setParentID(t.getIdentifier());
+        if (!audience.isEmpty()) {
+            newTXR.setAudience(audience);
+        }
+        if (!resources.isEmpty()) {
+            // convert to URIs
+            ArrayList<URI> r = new ArrayList<>();
+            for (String x : resources) {
+                try {
+                    r.add(URI.create(x));
+                } catch (Throwable throwable) {
+                    info("rejected resource request \"" + x + "\"");
+                }
+            }
+            newTXR.setResource(r);
         }
 
-
-        HashMap<String, String> parameters = new HashMap<>();
-        parameters.put(OA2Claims.SUBJECT, t.getUsername());
-        parameters.put(JWTUtil.KEY_ID, keys.getDefaultKeyID());
+        //HashMap<String, String> parameters = new HashMap<>();
+        //   parameters.put(OA2Claims.SUBJECT, t.getUsername());
+        //    parameters.put(JWTUtil.KEY_ID, keys.getDefaultKeyID());
         //  accessToken = tokenForge.getAccessToken();
         RTIRequest rtiRequest = new RTIRequest(request, t, t.getAccessToken(), oa2se.isOIDCEnabled());
         RTI2 rtIssuer = new RTI2(getTF2(), getServiceEnvironment().getServiceAddress());
         RTIResponse rtiResponse = (RTIResponse) rtIssuer.process(rtiRequest);
         rtiResponse.setSignToken(client.isSignTokens());
-        // set to new one.
-        JSONObject claims = new JSONObject();
+        // These are the claims that are returned in the RFC's required response. They have nothing to do
+        // with id token claims, fyi.
+        JSONObject rfcClaims = new JSONObject();
+        newTXR.setIssuedAt(System.currentTimeMillis());
 
         switch (requestedTokenType) {
             default:
             case ACCESS_TOKEN_TYPE:
                 // do NOT reset the refresh token
                 // All the machinery from here out gets the RT from the rtiResponse.
-                claims.put(ISSUED_TOKEN_TYPE, ACCESS_TOKEN_TYPE); // Required. This is the type of token issued (mostly access tokens). Must be as per TX spec.
-                claims.put(OA2Constants.TOKEN_TYPE, TOKEN_TYPE_BEARER); // Required. This is how the issued token can be used, mostly. BY RFC 6750 spec.
-                claims.put(OA2Constants.EXPIRES_IN, t.getAccessTokenLifetime() / 1000); // internal in ms., external in sec.
+                rfcClaims.put(ISSUED_TOKEN_TYPE, ACCESS_TOKEN_TYPE); // Required. This is the type of token issued (mostly access tokens). Must be as per TX spec.
+                rfcClaims.put(OA2Constants.TOKEN_TYPE, TOKEN_TYPE_BEARER); // Required. This is how the issued token can be used, mostly. BY RFC 6750 spec.
+                rfcClaims.put(OA2Constants.EXPIRES_IN, t.getAccessTokenLifetime() / 1000); // internal in ms., external in sec.
+                newTXR.setLifetime(t.getAccessTokenLifetime());
+
                 rtiResponse.setRefreshToken(null); // no refresh token should get processed
-                t.setAccessToken(rtiResponse.getAccessToken()); // update to new AT
+                newTXR.setIdentifier(BasicIdentifier.newID(rtiResponse.getAccessToken().getToken()));
+                //t.setAccessToken(rtiResponse.getAccessToken()); // update to new AT
                 break;
             case REFRESH_TOKEN_TYPE:
-                claims.put(ISSUED_TOKEN_TYPE, REFRESH_TOKEN_TYPE); // Required. This is the type of token issued (mostly access tokens). Must be as per TX spec.
-                claims.put(OA2Constants.TOKEN_TYPE, TOKEN_TYPE_N_A); // Required. This is how the issued token can be used, mostly. BY RFC 6750 spec.
-                claims.put(OA2Constants.EXPIRES_IN, t.getRefreshTokenLifetime() / 1000); // internal in ms., external in sec.
-                t.setRefreshToken(rtiResponse.getRefreshToken()); // Update to new RT
+                rfcClaims.put(ISSUED_TOKEN_TYPE, REFRESH_TOKEN_TYPE); // Required. This is the type of token issued (mostly access tokens). Must be as per TX spec.
+                rfcClaims.put(OA2Constants.TOKEN_TYPE, TOKEN_TYPE_N_A); // Required. This is how the issued token can be used, mostly. BY RFC 6750 spec.
+                rfcClaims.put(OA2Constants.EXPIRES_IN, t.getRefreshTokenLifetime() / 1000); // internal in ms., external in sec.
+                newTXR.setLifetime(t.getRefreshTokenLifetime());
+                newTXR.setIdentifier(BasicIdentifier.newID(rtiResponse.getRefreshToken().getToken()));
+                //t.setRefreshToken(rtiResponse.getRefreshToken()); // Update to new RT
                 break;
         }
-
-        JWTRunner jwtRunner = new JWTRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2se, t, t.getOA2Client().getConfig()));
+        newTXR.setExpiresAt(newTXR.getIssuedAt() + newTXR.getLifetime());
+        JWTRunner jwtRunner = new JWTRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2se, t, newTXR, t.getOA2Client().getConfig()));
         try {
-            OA2ClientUtils.setupHandlers(jwtRunner, oa2se, t, request);
-            jwtRunner.doRefreshClaims();
+            OA2ClientUtils.setupHandlers(jwtRunner, oa2se, t, newTXR, request);
+            // NOTE WELL that the next two lines are where our identifiers are used to create JWTs (like SciTokens)
+            // so if this is not done, the wrong token type will be returned.
+            //jwtRunner.doRefreshClaims();
+            jwtRunner.doTokenExchange();
+
         } catch (Throwable throwable) {
             ServletDebugUtil.warn(this, "Unable to update claims on token exchange: \"" + throwable.getMessage() + "\"");
         }
         setupTokens(client, rtiResponse, oa2se, t, jwtRunner);
+
         if (rtiResponse.hasRefreshToken()) {
             // Maddening part of the spec is that the access_oadtoken claim can be a refresh token.
             // User has to look at the returned token type.
-            claims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getRefreshToken().getToken()); // Required
-            claims.put(OA2Constants.REFRESH_TOKEN, rtiResponse.getRefreshToken().getToken()); // Optional
+            rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getRefreshToken().getToken()); // Required
+            rfcClaims.put(OA2Constants.REFRESH_TOKEN, rtiResponse.getRefreshToken().getToken()); // Optional
         } else {
-            claims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getAccessToken().getToken()); // Required.
+            rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getAccessToken().getToken()); // Required.
         }
         /*
          Important note: In the RFC 8693 spec., access_token MUST be returned, however, it explains that this
@@ -397,38 +493,28 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
                 }
                 // Set it to the restricted set of scopes???
                 //  client.setScopes(newScopes);
-                claims.put(OA2Constants.SCOPE, requestedScopes);
+                rfcClaims.put(OA2Constants.SCOPE, requestedScopes);
+                newTXR.setScopes(newScopes); // Store even if empty to show that.
+
             }
         }
-
         // The other components (access, refresh token) have responses that handle setting the encoding and
         // char type. We have to set it manually here.
         response.setContentType("application/json;charset=UTF-8");
         response.setCharacterEncoding("UTF-8");
-        t.setScopes(originalScopes); // Set them back for the next round in case they request a different set of scopes.
-        t.setUserMetaData(claims); // now stash it for future use.
+        // t.setScopes(originalScopes); // Set them back for the next round in case they request a different set of scopes.
+        // t.setUserMetaData(claims); // now stash it for future use.
+        newTXR.setValid(true); // automatically.
+        oa2se.getTxStore().save(newTXR);
         getTransactionStore().save(t);
         PrintWriter osw = response.getWriter();
-        claims.write(osw);
+        rfcClaims.write(osw);
         osw.flush();
         osw.close();
 
 
     }
 
-    protected OA2ServiceTransaction cloneTransaction(OA2ServiceTransaction t) throws IOException {
-        if (t == null) {
-            return t;
-        }
-        XMLMap xmlMap = new XMLMap();
-        getTransactionStore().getXMLConverter().toMap(t, xmlMap);
-        OA2ServiceTransaction t2 = (OA2ServiceTransaction) getTransactionStore().create();
-        Identifier identifier = t2.getIdentifier(); // new and unique
-        getTransactionStore().getXMLConverter().fromMap(xmlMap, t2);
-        t2.setIdentifier(identifier); // or we overwrite the original.
-        t2.setVerifier(getTF2().getVerifier()); // Have to have a unique verifier for DB key.
-          return t2;
-    }
 
     /**
      * Convert a string or list of strings to a list of them. This is for lists of space delimited values

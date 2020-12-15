@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.AbstractPayloadConfig;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.PayloadHandlerConfigImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
 import edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.OA2State;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
@@ -48,6 +49,7 @@ public abstract class TokenHandlerMethod implements QDLFunction {
                     getPayloadConfig(),
                     getSE(),
                     getTransaction(),
+                    getTXRecord(),
                     getServletRequest());
         }
         return payloadHandlerConfig;
@@ -84,6 +86,10 @@ public abstract class TokenHandlerMethod implements QDLFunction {
 
     protected OA2ServiceTransaction getTransaction() {
         return oa2State.getTransaction();
+    }
+
+    protected TXRecord getTXRecord(){
+        return oa2State.getTxRecord();
     }
 
     protected OA2Client getClient() {

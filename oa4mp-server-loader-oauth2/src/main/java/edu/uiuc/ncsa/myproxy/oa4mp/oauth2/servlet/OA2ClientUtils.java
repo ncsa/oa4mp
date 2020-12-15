@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.IDTokenClientConfig;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.IDTokenHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.PayloadHandlerConfigImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.BasicRefreshTokenHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.SciTokenConstants;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.ScitokenHandler;
@@ -127,7 +128,7 @@ public class OA2ClientUtils {
             // but if it is http, only localhost is permitted. Any https works.
             try {
                 // CIL-871 fix -- no wildcards allowed.
-                if(x.contains("*")){
+                if (x.contains("*")) {
                     throw new IllegalArgumentException("Error: wildcard in \"" + x + "\" is not allowed.");
                 }
 
@@ -298,6 +299,10 @@ public class OA2ClientUtils {
     }
 
     public static void setupHandlers(JWTRunner jwtRunner, OA2SE oa2SE, OA2ServiceTransaction transaction, HttpServletRequest req) throws Throwable {
+        setupHandlers(jwtRunner, oa2SE, transaction, null, req);
+    }
+
+    public static void setupHandlers(JWTRunner jwtRunner, OA2SE oa2SE, OA2ServiceTransaction transaction, TXRecord txRecord, HttpServletRequest req) throws Throwable {
         DebugUtil.trace(OA2ClientUtils.class, "Setting up handlers");
         OA2Client client = (OA2Client) transaction.getClient();
         PayloadHandlerConfigImpl idthCfg = null;
@@ -307,6 +312,7 @@ public class OA2ClientUtils {
                     client.getIDTokenConfig(),
                     oa2SE,
                     transaction,
+                    txRecord,
                     req);
         } else {
             // Legacy case. Functors have no config, but need a handler to get the init and accounting information.
@@ -316,6 +322,7 @@ public class OA2ClientUtils {
                     new IDTokenClientConfig(),  // here is the trick: An empty object triggers a hunt for functors.
                     oa2SE,
                     transaction,
+                    txRecord,
                     req);
         }
         IDTokenHandler idTokenHandler = new IDTokenHandler(idthCfg);
@@ -328,6 +335,7 @@ public class OA2ClientUtils {
                     client.getAccessTokensConfig(),
                     oa2SE,
                     transaction,
+                    txRecord,
                     req);
             AbstractAccessTokenHandler sth = null;
             switch (client.getAccessTokensConfig().getType()) {
@@ -353,6 +361,7 @@ public class OA2ClientUtils {
                     client.getRefreshTokensConfig(),
                     oa2SE,
                     transaction,
+                    txRecord,
                     req);
             BasicRefreshTokenHandler rth = new BasicRefreshTokenHandler(st);
             jwtRunner.setRefreshTokenHandler(rth);

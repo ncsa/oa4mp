@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.BasicClaimsSourceImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.CMConfigs;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.MyProxyFacadeProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironmentImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
@@ -40,6 +41,7 @@ import java.util.List;
 public class OA2SE extends ServiceEnvironmentImpl {
     public OA2SE(MyLoggingFacade logger,
                  Provider<TransactionStore> tsp,
+                 Provider<TXStore> txStoreProvider,
                  Provider<ClientStore> csp,
                  int maxAllowedNewClientRequests,
                  long agLifetime,
@@ -133,8 +135,18 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.cmConfigs = cmConfigs;
         this.qdlEnvironment = qdlEnvironment;
         this.rfc8693Enabled = rfc8693Enabled;
+        this.txStore = txStoreProvider.get();
     }
 
+    public TXStore getTxStore() {
+        return txStore;
+    }
+
+    public void setTxStore(TXStore txStore) {
+        this.txStore = txStore;
+    }
+
+    TXStore txStore;
     public QDLEnvironment getQDLEnvironment() {
         return qdlEnvironment;
     }

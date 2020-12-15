@@ -12,6 +12,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.json.MultiJSONStoreProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.*;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientConverter;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientProvider;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.*;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.ClientApprovalProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.OA4MPConfigTags;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceConstantKeys;
@@ -77,8 +78,8 @@ import java.util.List;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.OA4MPIdentifierProvider.TRANSACTION_ID;
 import static edu.uiuc.ncsa.security.core.configuration.Configurations.*;
-import static edu.uiuc.ncsa.security.oauth_2_0.OA2ConfigTags.*;
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2ConfigTags.ACCESS_TOKEN_LIFETIME;
+import static edu.uiuc.ncsa.security.oauth_2_0.OA2ConfigTags.*;
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.*;
 
 /**
@@ -91,8 +92,8 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
      * though the configuration file is assumed to be in seconds.
      */
     public long REFRESH_TOKEN_LIFETIME_DEFAULT = 15 * 24 * 3600 * 1000L; // 15 days
-    public long ACCESS_TOKEN_LIFETIME_DEFAULT = 15*60*1000L; // 15 minutes
-    public long AUTHORIZATION_GRANT_LIFETIME_DEFAULT = 15*60*1000L; // 15 minutes
+    public long ACCESS_TOKEN_LIFETIME_DEFAULT = 15 * 60 * 1000L; // 15 minutes
+    public long AUTHORIZATION_GRANT_LIFETIME_DEFAULT = 15 * 60 * 1000L; // 15 minutes
     public int CLIENT_SECRET_LENGTH_DEFAULT = 258; //This is divisible by 3 and greater than 256, so when it is base64 encoded there will be no extra characters.
 
     public OA2ConfigurationLoader(ConfigurationNode node) {
@@ -109,6 +110,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
             initialize();
             T se = (T) new OA2SE(loggerProvider.get(),
                     getTransactionStoreProvider(),
+                    getTXStoreProvider(),
                     getClientStoreProvider(),
                     getMaxAllowedNewClientRequests(),
                     getAGLifetime(),
@@ -161,7 +163,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         }
         // Note that the first argument is the name fo the file. In server mode this won't be available anyway
         // and is optional.
-        QDLConfigurationLoader loader = new QDLConfigurationLoader("(none)", node,loggerProvider.get());
+        QDLConfigurationLoader loader = new QDLConfigurationLoader("(none)", node, loggerProvider.get());
         return loader.load();
     }
 
@@ -196,20 +198,22 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         }
         return utilServerEnabled;
     }
+
     Boolean rfc8693Enabled = null;
+
     protected Boolean isRFC8693Enabled() {
-           if (rfc8693Enabled == null) {
-               try {
-                   rfc8693Enabled = Boolean.parseBoolean(getFirstAttribute(cn, OA4MPConfigTags.ENABLE_RFC8693_SUPPORT));
-               } catch (Throwable t) {
-                   // use default which is to disabled. We let this be null to trigger pulling the value, if any, out of the
-                   // the configuration
-                   rfc8693Enabled = Boolean.TRUE;
-               }
-               DebugUtil.trace(this, "RFC 8693 support enabled? " + rfc8693Enabled);
-           }
-           return rfc8693Enabled;
-       }
+        if (rfc8693Enabled == null) {
+            try {
+                rfc8693Enabled = Boolean.parseBoolean(getFirstAttribute(cn, OA4MPConfigTags.ENABLE_RFC8693_SUPPORT));
+            } catch (Throwable t) {
+                // use default which is to disabled. We let this be null to trigger pulling the value, if any, out of the
+                // the configuration
+                rfc8693Enabled = Boolean.TRUE;
+            }
+            DebugUtil.trace(this, "RFC 8693 support enabled? " + rfc8693Enabled);
+        }
+        return rfc8693Enabled;
+    }
 
 
     protected CMConfigs createDefaultCMConfig() {
@@ -467,7 +471,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         }
         return agLifetime;
     }
-   // access token lifetime
+    // access token lifetime
 
     long atLifetime = -1L;
 
@@ -738,6 +742,69 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                                                           MapConverter converter) {
         return new OA2SQLTransactionStoreProvider(config, cpp, type, clientStoreProvider, tp, tfp, converter);
     }
+
+    protected SQLTXRStoreProvider createSQLTXRecordP(ConfigurationNode config,
+                                                     ConnectionPoolProvider<? extends ConnectionPool> cpp,
+                                                     String type,
+                                                     TXRecordProvider<? extends TXRecord> tp,
+                                                     Provider<TokenForge> tfp,
+                                                     TXRecordConverter converter) {
+        return new SQLTXRStoreProvider(config, cpp, type, converter, tp);
+    }
+
+    Provider<TXStore> txStoreProvider;
+
+    protected Provider<TXStore> getTXStoreProvider() {
+        TXRecordProvider txRecordProvider = new TXRecordProvider(null, (OA2TokenForge) getTokenForgeProvider().get());
+        TXRecordConverter txRecordConverter = new TXRecordConverter(new TXRecordSerializationKeys(), txRecordProvider);
+        return getTXStoreProvider(txRecordProvider, txRecordConverter);
+    }
+
+    protected Provider<TXStore> getTXStoreProvider(TXRecordProvider txRecordProvider,
+                                                   TXRecordConverter<? extends TXRecord> txRecordConverter) {
+        if (txStoreProvider == null) {
+            OA2MultiTypeProvider storeProvider = new OA2MultiTypeProvider(cn, isDefaultStoreDisabled(), loggerProvider.get(), txRecordProvider);
+
+            storeProvider.addListener(createSQLTXRecordP(cn,
+                    getMySQLConnectionPoolProvider(),
+                    OA4MPConfigTags.MYSQL_STORE,
+                    txRecordProvider,
+                    getTokenForgeProvider(),
+                    txRecordConverter));
+            storeProvider.addListener(createSQLTXRecordP(cn,
+                    getMariaDBConnectionPoolProvider(),
+                    OA4MPConfigTags.MARIADB_STORE,
+                    txRecordProvider,
+                    getTokenForgeProvider(),
+                    txRecordConverter));
+            storeProvider.addListener(createSQLTXRecordP(cn,
+                    getPgConnectionPoolProvider(),
+                    OA4MPConfigTags.POSTGRESQL_STORE,
+                    txRecordProvider,
+                    getTokenForgeProvider(),
+                    txRecordConverter));
+
+            storeProvider.addListener(new TXFSProvider(cn, txRecordProvider, txRecordConverter));
+            storeProvider.addListener(new TypedProvider<TXStore>(cn, OA4MPConfigTags.MEMORY_STORE, OA4MPConfigTags.TOKEN_EXCHANGE_RECORD_STORE) {
+                @Override
+                public Object componentFound(CfgEvent configurationEvent) {
+                    if (checkEvent(configurationEvent)) {
+                        return get();
+                    }
+                    return null;
+                }
+
+                @Override
+                public TXStore get() {
+                    return new TXMemoryStore(txRecordProvider, txRecordConverter);
+                }
+
+            });
+            txStoreProvider = storeProvider;
+        }
+        return txStoreProvider;
+    }
+
 
     protected Provider<TransactionStore> getTSP(IdentifiableProvider tp,
                                                 OA2TConverter<? extends OA2ServiceTransaction> tc) {

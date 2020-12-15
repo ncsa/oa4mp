@@ -88,6 +88,7 @@ public abstract class MyProxyDelegationServlet extends EnvServlet implements Tra
 
     public static Cleanup<Identifier, CachedObject> myproxyConnectionCleanup = null;
 
+
     public static Cache getMyproxyConnectionCache() {
         if (myproxyConnectionCache == null) {
             myproxyConnectionCache = new Cache();

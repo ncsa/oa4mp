@@ -14,6 +14,7 @@ public interface OA4MPConfigTags extends StorageConfigurationTags, MailConfigura
     public static final String ADMIN_CLIENT_STORE = "adminClients";
     public static final String TRANSACTIONS_STORE = "transactions";
     public static final String PERMISSION_STORE = "permissions";
+    public static final String TOKEN_EXCHANGE_RECORD_STORE = "txStore";
     public static final String JSON_STORE = "jsonStore";  // not in base OA4MP, but otherwise no reasonable place for this tag.
 
     public static final String MYPROXY = "myproxy";

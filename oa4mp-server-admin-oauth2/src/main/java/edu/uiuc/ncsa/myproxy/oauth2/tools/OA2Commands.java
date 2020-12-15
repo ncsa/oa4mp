@@ -26,6 +26,7 @@ import java.util.LinkedList;
 public class OA2Commands extends BaseCommands {
     public static final String PERMISSIONS = "permissions";
     public static final String ADMINS = "admins";
+    public static final String TOKENS = "tokens";
     public static final String KEYS = "keys";
   //  public static final String JSON = "json";
 
@@ -81,6 +82,7 @@ public class OA2Commands extends BaseCommands {
         say(PERMISSIONS + " - basic permission management.\n");
         say(ADMINS + " - create or manage administrative clients.\n");
         say(PARSER_COMMAND + " - write/debug scripts from the command line.\n");
+        say(TOKENS + " - manage tokens created in the token exchange endpoint\n");
 //        say(JSON + " - enter JSON snippets to be used by the system in client configurations.\n");
         say("e.g.\n\nuse " + CLIENTS + "\n\nwill call up the client management component.");
         say("Type 'exit' when you wish to exit the component and return to the main menu");
@@ -120,6 +122,16 @@ public class OA2Commands extends BaseCommands {
     public CopyCommands getNewCopyCommands() throws Exception {
         return new CopyCommands(getMyLogger(), new OA2CopyTool(), new OA2CopyToolVerifier(), getConfigFile());
     }
+    TokenStoreCommands tokenStoreCommands = null;
+    protected CommonCommands getTokenCommands() throws Exception{
+        if(tokenStoreCommands == null){
+            tokenStoreCommands = new TokenStoreCommands(getMyLogger(), "  ", getOA2SE().getTxStore());
+        }
+
+        return tokenStoreCommands;
+    }
+
+
 
     TransactionStoreCommands transactionStoreCommands = null;
     @Override
@@ -162,6 +174,9 @@ public class OA2Commands extends BaseCommands {
         }
         if (inputLine.hasArg(PERMISSIONS)) {
             commands = getPermissionCommands();
+        }
+        if(inputLine.hasArg(TOKENS)){
+            commands = getTokenCommands();
         }
         if (commands != null) {
             CLIDriver cli = new CLIDriver(commands);

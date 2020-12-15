@@ -84,6 +84,7 @@ public class UserInfoServlet extends MyProxyDelegationServlet {
                 ((OA2Client) transaction.getClient()).getIDTokenConfig(),
                 oa2SE,
                 transaction,
+                null, // no token exchange record outside of token exchanges.
                 null));
         idTokenHandler.refreshAccountingInformation();
         getTransactionStore().save(transaction);

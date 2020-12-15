@@ -10,6 +10,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.SATFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.OA4MPServletInitializer;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.NewClientNotifier;
+import edu.uiuc.ncsa.security.core.cache.Cleanup;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
@@ -20,6 +21,9 @@ import edu.uiuc.ncsa.security.util.mail.MailUtil;
 
 import javax.servlet.ServletException;
 import java.sql.SQLException;
+
+import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2ATServlet.TokenExchangeRecordRetentionPolicy;
+import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2ATServlet.txRecordCleanup;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -50,7 +54,7 @@ public class OA2ServletInitializer extends OA4MPServletInitializer {
             //mps.storeUpdates();
             mps.processStoreCheck(oa2SE.getPermissionStore());
             mps.processStoreCheck(oa2SE.getAdminClientStore());
-
+            mps.processStoreCheck(oa2SE.getTxStore());
         } catch (SQLException e) {
             if (DebugUtil.isEnabled()) {
                 e.printStackTrace();
@@ -65,6 +69,16 @@ public class OA2ServletInitializer extends OA4MPServletInitializer {
         if (!ClaimSourceFactory.isFactorySet()) {
             ClaimSourceFactory.setFactory(new ClaimSourceFactoryImpl());
         }
+        if (txRecordCleanup == null) {
+
+            txRecordCleanup = new Cleanup<>(getEnvironment().getMyLogger());
+            txRecordCleanup.setStopThread(false);
+            txRecordCleanup.setMap(oa2SE.getTxStore());
+            txRecordCleanup.addRetentionPolicy(new TokenExchangeRecordRetentionPolicy());
+            txRecordCleanup.start();
+            oa2SE.getMyLogger().info("Starting token exchange record store cleanup thread");
+              }
+
         try {
             SATFactory.setAdminClientConverter(AdminClientStoreProviders.getAdminClientConverter());
             SATFactory.setClientConverter((ClientConverter<? extends Client>) oa2SE.getClientStore().getMapConverter());

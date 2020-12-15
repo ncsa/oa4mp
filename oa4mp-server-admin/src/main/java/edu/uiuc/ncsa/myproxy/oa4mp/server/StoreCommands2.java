@@ -154,22 +154,41 @@ public abstract class StoreCommands2 extends StoreCommands {
         return longFormat(identifiable, false);
     }
 
-    protected int longFormat(Identifiable identifiable, boolean isVerbose) {
+    /**
+     * Prints a restricted set of keys from the fiorst argument. Note that a missing
+     * or empty subset means print everything. Also note that this ignores unknown keys
+     * so it will print out only keys it has and are in the subset.
+     *
+     * @param identifiable
+     * @param keySubset
+     * @param isVerbose
+     * @return
+     */
+    protected int longFormat(Identifiable identifiable, List<String> keySubset, boolean isVerbose) {
         XMLMap map = new XMLMap();
         getStore().getXMLConverter().toMap(identifiable, map);
 
         TreeMap<String, Object> tMap = new TreeMap<>();
-        tMap.putAll(map);
+        if(keySubset == null || keySubset.isEmpty()){
+            tMap.putAll(map);
+        }else{
+            // do a subset
+            for(String k : keySubset){
+                if(map.containsKey(k)){
+                    tMap.put(k, map.get(k));
+                }
+            }
+        }
         int width = 0;
         for (String key : tMap.keySet()) {
             width = Math.max(width, key.length());
         }
-
         // Use the order of the tmap (so its sorted) but the XMLMap has information we need to get these.
         for (String key : tMap.keySet()) {
             String v = map.getString(key);
             if (!StringUtils.isTrivial(v)) {
                 try {
+                    // Check if its JSON.
                     JSON json = JSONSerializer.toJSON(v);
                     v = json.toString(1);
                 } catch (Throwable t) {
@@ -180,6 +199,10 @@ public abstract class StoreCommands2 extends StoreCommands {
 
         }
         return width;
+    }
+
+    protected int longFormat(Identifiable identifiable, boolean isVerbose) {
+       return longFormat(identifiable, null, isVerbose);
     }
 
     int display_width = 120;
@@ -247,7 +270,7 @@ public abstract class StoreCommands2 extends StoreCommands {
         getStore().getXMLConverter().toMap(x, c);
 
         if (inputLine.hasArg(KEYS_FLAG)) {
-            List<String> keys = getKeysList(inputLine);
+            List<String> keys = getArgList(inputLine);
             inputLine.removeSwitchAndValue(KEYS_FLAG);
             // c now contains all the fields. We remove anything
             XMLMap subset = new XMLMap();
@@ -276,41 +299,60 @@ public abstract class StoreCommands2 extends StoreCommands {
     }
 
     protected void showSearchHelp() {
-        say("search -key key [-regex|-la -size] [-listKeys] [-v] condition");
+        say("search " +
+                SEARCH_KEY_FLAG + " key [ " +
+                SEARCH_REGEX_FLAG + "|" + SEARCH_SHORT_REGEX_FLAG +
+                SEARCH_SIZE_FLAG + "] [" +
+                SEARCH_LIST_KEYS_FLAG + "] [" +
+                SEARCH_DEBUG_FLAG + "] [" +
+                LINE_LIST_COMMAND + " | " + VERBOSE_COMMAND + " ] [" +
+                SEARCH_RETURNED_ATTRIBUTES_FLAG + " list] condition");
         sayi("Searches the current component for all entries satisfying the condition. You may also specify that the ");
         sayi("condition is a regular expression rather than using simple equality");
         sayi("Invoking this with the -listkeys flag prints out all the keys for this store. Omit that for searches.");
-        sayi("-key = the name of the key to be searched for");
-        sayi("-regex (optional) attempt to interpret the conditional as a regular expression");
-        sayi("-la (optional) print the result in long format.");
-        sayi("-size (optional) print *only* the number of results.");
-        sayi("-v (optional) show stack traces. Only use this if you really need it.");
+        sayi(SEARCH_KEY_FLAG + " = the name of the key to be searched for");
+        sayi(SEARCH_REGEX_FLAG + "|" + SEARCH_SHORT_REGEX_FLAG + " (optional) attempt to interpret the conditional as a regular expression");
+        sayi(LINE_LIST_COMMAND + " (optional) print the result in long format.");
+        sayi(VERBOSE_COMMAND + " (optional) print the result in verbose format.");
+        sayi(SEARCH_SIZE_FLAG + " (optional) print *only* the number of results.");
+        sayi(SEARCH_DEBUG_FLAG + " (optional) show stack traces. Only use this if you really need it.");
+        sayi(SEARCH_RETURNED_ATTRIBUTES_FLAG + " [attr0,attr1,...] = return only those attributes. " +
+                "Note this overrides the " + LINE_LIST_COMMAND + " switch if there.");
         sayi("\nE.g.\n");
-        sayi("search -key client_id -regex \".*07028.*\"");
+        sayi("search " + SEARCH_KEY_FLAG + " client_id " + SEARCH_REGEX_FLAG + " \".*07028.*\"");
         sayi("\n(In the clients components) This would find the clients whose identifiers contain the string 07028");
         sayi("\nE.g.\n");
-        sayi("search -key email -regex \".*bigstate\\.edu.*\"");
+        sayi("search " + SEARCH_KEY_FLAG + " email " + SEARCH_SHORT_REGEX_FLAG + " \".*bigstate\\.edu.*\"");
         sayi("\n(in the clients or user component) This would match all email addresses from that institution bigstate.edu. \n");
         sayi("Note that the period must be escaped for a regex.");
+        sayi("\nE.g.\n");
+        sayi("search " + KEYS_FLAG + " client_id " +
+                SEARCH_SHORT_REGEX_FLAG + " " +
+                SEARCH_RETURNED_ATTRIBUTES_FLAG + "[name, email] " +
+                ".*237.*"
+        );
+        sayi("\nThis would search for all client id's that contain the string 237 and only print out the name and email from those.");
 
     }
+
+    static String SEARCH_KEY_FLAG = "-key";
+    static String SEARCH_LIST_KEYS_FLAG = "-listKeys";
+    static String SEARCH_REGEX_FLAG = "-regex";
+    static String SEARCH_SHORT_REGEX_FLAG = "-r";
+    static String SEARCH_SIZE_FLAG = "-size";
+    static String SEARCH_DEBUG_FLAG = "-debug";
+    static String SEARCH_RETURNED_ATTRIBUTES_FLAG = "-out";
 
 
     @Override
     public void search(InputLine inputLine) {
-        String KEY_FLAG = "-key";
-        String LIST_KEYS_FLAG = "-listKeys";
-        String REGEX_FLAG = "-regex";
-        String SHORT_REGEX_FLAG = "-r";
-        String LONG_LIST_FLAG = "-la";
-        String SIZE_FLAG = "-size";
         if (showHelp(inputLine)) {
             showSearchHelp();
             return;
         }
         SerializationKeys keys = ((MapConverter) getStore().getXMLConverter()).getKeys();
-        boolean showStackTraces = inputLine.hasArg("-v");
-        if (inputLine.hasArg(LIST_KEYS_FLAG)) {
+        boolean showStackTraces = inputLine.hasArg(SEARCH_DEBUG_FLAG);
+        if (inputLine.hasArg(SEARCH_LIST_KEYS_FLAG)) {
             if (getStore().getXMLConverter() instanceof MapConverter) {
                 say("keys");
                 say("-------");
@@ -320,7 +362,10 @@ public abstract class StoreCommands2 extends StoreCommands {
             }
             return;
         }
-
+        List<String> returnedAttributes = null;
+        if (inputLine.hasArg(SEARCH_RETURNED_ATTRIBUTES_FLAG)) {
+            returnedAttributes = getArgList(inputLine);
+        }
         if (inputLine.hasArg(KEY_FLAG)) {
             String key = inputLine.getNextArgFor(KEY_FLAG);
             if (!keys.allKeys().contains(key)) {
@@ -332,8 +377,7 @@ public abstract class StoreCommands2 extends StoreCommands {
                 values = getStore().search(
                         key,
                         inputLine.getLastArg(),
-                        inputLine.hasArg(REGEX_FLAG)||inputLine.hasArg(SHORT_REGEX_FLAG))
-                ;
+                        inputLine.hasArg(SEARCH_REGEX_FLAG) || inputLine.hasArg(SEARCH_SHORT_REGEX_FLAG));
             } catch (Throwable t) {
                 if (showStackTraces) {
                     t.printStackTrace();
@@ -344,20 +388,21 @@ public abstract class StoreCommands2 extends StoreCommands {
             if (values.isEmpty()) {
                 say("no matches");
             }
-            if (inputLine.hasArg(SIZE_FLAG)) {
+            if (inputLine.hasArg(SEARCH_SIZE_FLAG)) {
                 say("Got " + values.size() + " results");
                 return;
             }
             for (Identifiable identifiable : values) {
-                if (inputLine.hasArg(LONG_LIST_FLAG)) {
-                    longFormat(identifiable);
+                if (returnedAttributes != null) {
+                    longFormat(identifiable, returnedAttributes, inputLine.hasArg(VERBOSE_COMMAND));
+                    say("-----"); // or the output runs together
                 } else {
                     say(format(identifiable));
-                }
+                }     // search -key token_id -r -out [parent_id, valid] .*oauth2.*
             }
             say("\ngot " + values.size() + " match" + (values.size() == 1 ? "." : "es."));
         } else {
-            say("Sorry, you must specify a key for the search. Try typing \nsearch " + LIST_KEYS_FLAG + "\n for all available keys");
+            say("Sorry, you must specify a key for the search. Try typing \nsearch " + SEARCH_LIST_KEYS_FLAG + "\n for all available keys");
         }
 
     }
@@ -441,7 +486,7 @@ public abstract class StoreCommands2 extends StoreCommands {
             return;
         }
         if (inputLine.hasArg(KEYS_FLAG)) {
-            List<String> array = getKeysList(inputLine);
+            List<String> array = getArgList(inputLine);
 
             if (array == null) {
                 say("sorry, but this requires a list for this option.");
@@ -476,7 +521,7 @@ public abstract class StoreCommands2 extends StoreCommands {
             return;
         }
         if (inputLine.hasArg(KEYS_FLAG)) {
-            List<String> array = getKeysList(inputLine);
+            List<String> array = getArgList(inputLine);
 
             if (array == null) {
                 say("sorry, but this requires a list for this option.");
@@ -604,7 +649,7 @@ public abstract class StoreCommands2 extends StoreCommands {
 
 
         if (inputLine.hasArg(KEYS_FLAG)) {
-            List<String> keys = getKeysList(inputLine);
+            List<String> keys = getArgList(inputLine);
             inputLine.removeSwitchAndValue(KEYS_FLAG);
             identifiable = findItem(inputLine);
             if (identifiable == null) {
@@ -1030,7 +1075,20 @@ public abstract class StoreCommands2 extends StoreCommands {
     String LIST_END_DELIMITER = "]";
     String LIST_SEPARATOR = ",";
 
-    protected List<String> getKeysList(InputLine inputLine) {
+    /**
+     * Slightly special case. This will look on the input line and extract a list of the form
+     * <pre>
+     *     [a,b,c,...]
+     * </pre>
+     * So to avoid having a lot of parsing (and the fact that there is pretty much at most one
+     * array per line) this will take everything between [ ] and try to turn it in to a list.
+     * The alternative would be make the list syntax have to conform to
+     * {@link InputLine}'s fairly primitive system of checking for flags.
+     *
+     * @param inputLine
+     * @return
+     */
+    protected List<String> getArgList(InputLine inputLine) {
         List<String> list = new ArrayList<>();
         String rawLine = inputLine.getOriginalLine();
         if (rawLine == null || rawLine.isEmpty()) {
@@ -1107,7 +1165,7 @@ public abstract class StoreCommands2 extends StoreCommands {
         boolean isShow = inputLine.hasArg(ARCHIVE_SHOW_FLAG);
         String showArg = null;
         if (isShow) {
-             showArg = inputLine.getNextArgFor(ARCHIVE_SHOW_FLAG);
+            showArg = inputLine.getNextArgFor(ARCHIVE_SHOW_FLAG);
             inputLine.removeSwitchAndValue(ARCHIVE_SHOW_FLAG);
         }
         Identifiable identifiable = findItem(inputLine);
@@ -1327,8 +1385,8 @@ public abstract class StoreCommands2 extends StoreCommands {
         return format(id);
     }
 
-    public void copy(InputLine inputLine) throws Exception{
-        if(showHelp(inputLine)){
+    public void copy(InputLine inputLine) throws Exception {
+        if (showHelp(inputLine)) {
             showCopyHelp();
             return;
         }
@@ -1337,23 +1395,23 @@ public abstract class StoreCommands2 extends StoreCommands {
         String targetString = inputLine.getArg(2);
         Identifier sourceId = null;
         Identifier targetId = null;
-        try{
+        try {
             sourceId = BasicIdentifier.newID(sourceString);
-        }catch(Throwable t){
+        } catch (Throwable t) {
             say("sorry, but the first argument \"" + sourceString + "\" is not a valid identifier");
             return;
         }
-        try{
+        try {
             targetId = BasicIdentifier.newID(targetString);
-        }catch(Throwable t){
+        } catch (Throwable t) {
             say("sorry, but the second argument \"" + targetString + "\" is not a valid identifier");
             return;
         }
 
         Identifiable source = (Identifiable) getStore().get(sourceId);
-        if(!forceIt && getStore().containsKey(targetId)){
-                say("sorry, but \"" + targetId + "\" already exists. Consider using the -f flag if you need to overwrite it.");
-                return;
+        if (!forceIt && getStore().containsKey(targetId)) {
+            say("sorry, but \"" + targetId + "\" already exists. Consider using the -f flag if you need to overwrite it.");
+            return;
         }
 
         MapConverter mc = getMapConverter();
