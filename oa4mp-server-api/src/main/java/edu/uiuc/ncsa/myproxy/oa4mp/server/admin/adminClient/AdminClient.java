@@ -141,6 +141,16 @@ public class AdminClient extends BaseClient {
         c.setMaxClients(getMaxClients());
     }
 
+    public boolean isAllowQDL() {
+        return allowQDL;
+    }
+
+    public void setAllowQDL(boolean allowQDL) {
+        this.allowQDL = allowQDL;
+    }
+
+    boolean allowQDL = false;
+
     @Override
     public String toString() {
         return "AdminClient{" +

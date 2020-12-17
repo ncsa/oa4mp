@@ -60,6 +60,7 @@ public abstract class AbstractPayloadHandler implements PayloadHandler {
 
     public void setClaims(JSONObject claims){
         transaction.setUserMetaData(claims);
+        this.claims = claims;
     }
     JSONObject extendedAttributes = null;
 

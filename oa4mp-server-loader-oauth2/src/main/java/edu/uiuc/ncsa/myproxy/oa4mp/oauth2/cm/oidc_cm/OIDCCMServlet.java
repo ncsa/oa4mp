@@ -167,6 +167,7 @@ public class OIDCCMServlet extends EnvServlet {
         // This is in seconds since the epoch
         json.put(OIDCCMConstants.CLIENT_ID_ISSUED_AT, client.getCreationTS().getTime() / 1000);
         if (client.getConfig() != null && !client.getConfig().isEmpty()) {
+
             json.put("cfg", client.getConfig());
         }
         OA2ClientKeys clientKeys = (OA2ClientKeys) getOA2SE().getClientStore().getMapConverter().getKeys();
@@ -369,7 +370,7 @@ public class OIDCCMServlet extends EnvServlet {
             newClient.setIdentifier(client.getIdentifier());
             newClient.setConfig(client.getConfig());
             try {
-                newClient = updateClient(newClient, jsonRequest, false, resp);
+                newClient = updateClient(newClient, adminClient, jsonRequest, false, resp);
 
                 getOA2SE().getClientStore().save(newClient);
                 writeOK(resp, toJSONObject(newClient));
@@ -472,7 +473,7 @@ public class OIDCCMServlet extends EnvServlet {
             getMyLogger().info("Error: Got a JSON array rather than a request:" + rawJSON);
             throw new IllegalArgumentException("Error: incorrect argument. Not a valid JSON request");
         }
-        OA2Client client = processRegistrationRequest((JSONObject) rawJSON, httpServletResponse);
+        OA2Client client = processRegistrationRequest((JSONObject) rawJSON, adminClient, httpServletResponse);
         JSONObject jsonResp = new JSONObject(); // The response object.
         jsonResp.put(CLIENT_ID, client.getIdentifierString());
         if (!StringUtils.isTrivial(client.getSecret())) {
@@ -549,6 +550,7 @@ public class OIDCCMServlet extends EnvServlet {
     }
 
     protected OA2Client updateClient(OA2Client client,
+                                     AdminClient adminClient,
                                      JSONObject jsonRequest,
                                      boolean newClient,
                                      HttpServletResponse httpResponse) {
@@ -731,6 +733,13 @@ public class OIDCCMServlet extends EnvServlet {
 
             }
             JSONObject jsonObject = jsonRequest.getJSONObject("cfg");
+            // CIL-889 fix
+            if (!adminClient.isAllowQDL() && jsonRequest.getString("cfg").contains("qdl")) {
+                // Pretty draconian test -- any tag for QDL gets booted.
+                throw new OA2GeneralError(OA2Errors.INVALID_REQUEST_OBJECT,
+                        "QDL scripting is not allowed for this client.",
+                        HttpStatus.SC_BAD_REQUEST);
+            }
             jsonRequest.remove("cfg");
             client.setConfig(jsonObject);
         } else {
@@ -889,9 +898,10 @@ public class OIDCCMServlet extends EnvServlet {
         }
     }
 
-    protected OA2Client processRegistrationRequest(JSONObject jsonRequest, HttpServletResponse httpResponse) {
+    protected OA2Client processRegistrationRequest(JSONObject jsonRequest, AdminClient adminClient, HttpServletResponse httpResponse) {
+
         OA2Client client = (OA2Client) getOA2SE().getClientStore().create();
-        return updateClient(client, jsonRequest, true, httpResponse);
+        return updateClient(client, adminClient, jsonRequest, true, httpResponse);
     }
 
     SecureRandom random = new SecureRandom();

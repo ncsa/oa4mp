@@ -23,7 +23,9 @@ import edu.uiuc.ncsa.security.delegation.servlet.TransactionState;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.delegation.storage.TransactionStore;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
+import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
+import edu.uiuc.ncsa.security.delegation.token.impl.AuthorizationGrantImpl;
 import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
 import edu.uiuc.ncsa.security.oauth_2_0.*;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTRunner;
@@ -37,6 +39,7 @@ import net.sf.json.JSONObject;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.http.HttpStatus;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -63,15 +66,15 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         shutdownCleanup(txRecordCleanup); // try to shutdown cleanly
     }
 
-    public static class TokenExchangeRecordRetentionPolicy implements RetentionPolicy{
+    public static class TokenExchangeRecordRetentionPolicy implements RetentionPolicy {
         public TokenExchangeRecordRetentionPolicy() {
         }
 
         @Override
         public boolean retain(Object key, Object value) {
             // key is the identifier, values is the TXRecord
-            TXRecord txr = (TXRecord)value;
-            if( System.currentTimeMillis() <= txr.getExpiresAt()){
+            TXRecord txr = (TXRecord) value;
+            if (System.currentTimeMillis() <= txr.getExpiresAt()) {
                 return true; // so keep it.
             }
             return false;
@@ -88,6 +91,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             return true;
         }
     }
+
     @Override
     public void preprocess(TransactionState state) throws Throwable {
         super.preprocess(state);
@@ -606,25 +610,25 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
      * that is allowed. If the refresh token is null, nothing will be done with the refresh token.
      *
      * @param client
-     * @param idTokenResponse
+     * @param tokenResponse
      * @param oa2SE
      * @param st2
      * @param jwtRunner
      */
     private void setupTokens(OA2Client client,
-                             IDTokenResponse idTokenResponse,
+                             IDTokenResponse tokenResponse,
                              OA2SE oa2SE,
                              OA2ServiceTransaction st2,
                              JWTRunner jwtRunner) {
         if (jwtRunner.hasATHandler()) {
             AccessToken newAT = jwtRunner.getAccessTokenHandler().getSignedAT(oa2SE.getJsonWebKeys().getDefault());
-            idTokenResponse.setAccessToken(newAT);
+            tokenResponse.setAccessToken(newAT);
             DebugUtil.trace(this, "Returned AT from handler:" + newAT + ", for claims " + st2.getATData().toString(2));
         }
-        idTokenResponse.setClaims(st2.getUserMetaData());
-        DebugUtil.trace(this, "set token signing flag =" + idTokenResponse.isSignToken());
+        tokenResponse.setClaims(st2.getUserMetaData());
+        DebugUtil.trace(this, "set token signing flag =" + tokenResponse.isSignToken());
         // no processing of the refresh token is needed if there is none.
-        if (!idTokenResponse.hasRefreshToken()) {
+        if (!tokenResponse.hasRefreshToken()) {
             return;
         }
         if (!client.isRTLifetimeEnabled() && oa2SE.isRefreshTokenEnabled()) {
@@ -634,20 +638,20 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             info("Refresh tokens are disabled for client " + client.getIdentifierString() + ", but enabled on the server. No refresh token will be made.");
         }
         if (client.isRTLifetimeEnabled() && oa2SE.isRefreshTokenEnabled()) {
-            RefreshTokenImpl rt = idTokenResponse.getRefreshToken();
+            RefreshTokenImpl rt = tokenResponse.getRefreshToken();
             // rt is used as a key in the database. If the refresh token is  JWT, it will be used as the jti.
             st2.setRefreshToken(rt);
             st2.setRefreshTokenValid(true);
             if (jwtRunner.hasRTHandler()) {
                 RefreshTokenImpl newRT = (RefreshTokenImpl) jwtRunner.getRefreshTokenHandler().getSignedRT(null); // unsigned, for now
-                idTokenResponse.setRefreshToken(newRT);
+                tokenResponse.setRefreshToken(newRT);
                 DebugUtil.trace(this, "Returned RT from handler:" + newRT + ", for claims " + st2.getRTData().toString(2));
             }
         } else {
             // Even if a token is sent, do not return a refresh token.
             // This might be in a legacy case where a server changes it policy to prohibit  issuing refresh tokens but
             // an outstanding transaction has one.   
-            idTokenResponse.setRefreshToken(null);
+            tokenResponse.setRefreshToken(null);
         }
     }
 
@@ -962,5 +966,26 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
 
         ClaimSourceFactoryImpl.setFactory(oldSHF);
         return scopeHandlers;
+    }
+
+    @Override
+    protected ServiceTransaction getTransaction(AuthorizationGrant ag, HttpServletRequest req) throws ServletException {
+
+        ServiceTransaction transaction = getServiceEnvironment().getTransactionStore().get(ag);
+        if (transaction == null) {
+            if (ag instanceof AuthorizationGrantImpl) {
+                AuthorizationGrantImpl agi = (AuthorizationGrantImpl) ag;
+                if (agi.isExpired()) {
+                    ServletDebugUtil.trace(this, "Token \"" + ag.getToken() + "\" has expired");
+                    throw new OA2GeneralError(OA2Errors.INVALID_GRANT, "The token has expired.", HttpStatus.SC_BAD_REQUEST);
+                }
+
+            }
+        }
+        if (!transaction.isAuthGrantValid()) {
+            ServletDebugUtil.trace(this, "Token \"" + ag.getToken() + "\" is invalid");
+            throw new OA2GeneralError(OA2Errors.INVALID_GRANT, "The token is invalid.", HttpStatus.SC_BAD_REQUEST);
+        }
+        return transaction;
     }
 }

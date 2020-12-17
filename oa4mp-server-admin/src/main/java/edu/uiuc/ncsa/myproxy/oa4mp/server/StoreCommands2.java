@@ -169,12 +169,12 @@ public abstract class StoreCommands2 extends StoreCommands {
         getStore().getXMLConverter().toMap(identifiable, map);
 
         TreeMap<String, Object> tMap = new TreeMap<>();
-        if(keySubset == null || keySubset.isEmpty()){
+        if (keySubset == null || keySubset.isEmpty()) {
             tMap.putAll(map);
-        }else{
+        } else {
             // do a subset
-            for(String k : keySubset){
-                if(map.containsKey(k)){
+            for (String k : keySubset) {
+                if (map.containsKey(k)) {
                     tMap.put(k, map.get(k));
                 }
             }
@@ -202,7 +202,7 @@ public abstract class StoreCommands2 extends StoreCommands {
     }
 
     protected int longFormat(Identifiable identifiable, boolean isVerbose) {
-       return longFormat(identifiable, null, isVerbose);
+        return longFormat(identifiable, null, isVerbose);
     }
 
     int display_width = 120;
@@ -300,7 +300,7 @@ public abstract class StoreCommands2 extends StoreCommands {
 
     protected void showSearchHelp() {
         say("search " +
-                SEARCH_KEY_FLAG + " key [ " +
+                KEY_FLAG + " key [ " +
                 SEARCH_REGEX_FLAG + "|" + SEARCH_SHORT_REGEX_FLAG +
                 SEARCH_SIZE_FLAG + "] [" +
                 SEARCH_LIST_KEYS_FLAG + "] [" +
@@ -310,19 +310,20 @@ public abstract class StoreCommands2 extends StoreCommands {
         sayi("Searches the current component for all entries satisfying the condition. You may also specify that the ");
         sayi("condition is a regular expression rather than using simple equality");
         sayi("Invoking this with the -listkeys flag prints out all the keys for this store. Omit that for searches.");
-        sayi(SEARCH_KEY_FLAG + " = the name of the key to be searched for");
+        sayi(KEY_FLAG + " = the name of the key to be searched for");
         sayi(SEARCH_REGEX_FLAG + "|" + SEARCH_SHORT_REGEX_FLAG + " (optional) attempt to interpret the conditional as a regular expression");
         sayi(LINE_LIST_COMMAND + " (optional) print the result in long format.");
         sayi(VERBOSE_COMMAND + " (optional) print the result in verbose format.");
         sayi(SEARCH_SIZE_FLAG + " (optional) print *only* the number of results.");
         sayi(SEARCH_DEBUG_FLAG + " (optional) show stack traces. Only use this if you really need it.");
         sayi(SEARCH_RETURNED_ATTRIBUTES_FLAG + " [attr0,attr1,...] = return only those attributes. " +
-                "Note this overrides the " + LINE_LIST_COMMAND + " switch if there.");
+                "Note you may specify long or verbose format too.");
+        showKeyShorthandHelp();
         sayi("\nE.g.\n");
-        sayi("search " + SEARCH_KEY_FLAG + " client_id " + SEARCH_REGEX_FLAG + " \".*07028.*\"");
+        sayi("search " + KEY_SHORTHAND_PREFIX + "client_id " + SEARCH_REGEX_FLAG + " \".*07028.*\"");
         sayi("\n(In the clients components) This would find the clients whose identifiers contain the string 07028");
         sayi("\nE.g.\n");
-        sayi("search " + SEARCH_KEY_FLAG + " email " + SEARCH_SHORT_REGEX_FLAG + " \".*bigstate\\.edu.*\"");
+        sayi("search " + KEY_FLAG + " email " + SEARCH_SHORT_REGEX_FLAG + " \".*bigstate\\.edu.*\"");
         sayi("\n(in the clients or user component) This would match all email addresses from that institution bigstate.edu. \n");
         sayi("Note that the period must be escaped for a regex.");
         sayi("\nE.g.\n");
@@ -332,10 +333,8 @@ public abstract class StoreCommands2 extends StoreCommands {
                 ".*237.*"
         );
         sayi("\nThis would search for all client id's that contain the string 237 and only print out the name and email from those.");
-
     }
 
-    static String SEARCH_KEY_FLAG = "-key";
     static String SEARCH_LIST_KEYS_FLAG = "-listKeys";
     static String SEARCH_REGEX_FLAG = "-regex";
     static String SEARCH_SHORT_REGEX_FLAG = "-r";
@@ -366,12 +365,8 @@ public abstract class StoreCommands2 extends StoreCommands {
         if (inputLine.hasArg(SEARCH_RETURNED_ATTRIBUTES_FLAG)) {
             returnedAttributes = getArgList(inputLine);
         }
-        if (inputLine.hasArg(KEY_FLAG)) {
-            String key = inputLine.getNextArgFor(KEY_FLAG);
-            if (!keys.allKeys().contains(key)) {
-                say("Sorry, but the key \"" + key + "\" is not a known key for this component.");
-                return;
-            }
+        String key = getKeyArg(inputLine);
+        if (key != null) {
             List<Identifiable> values = null;
             try {
                 values = getStore().search(
@@ -382,7 +377,11 @@ public abstract class StoreCommands2 extends StoreCommands {
                 if (showStackTraces) {
                     t.printStackTrace();
                 }
-                say("Sorry, that didn't work:" + t.getMessage());
+                if (t.getCause() == null) {
+                    say("Sorry, that didn't work:" + t.getMessage());
+                } else {
+                    say("Sorry, that didn't work:" + t.getCause().getMessage());
+                }
                 return;
             }
             if (values.isEmpty()) {
@@ -395,7 +394,9 @@ public abstract class StoreCommands2 extends StoreCommands {
             for (Identifiable identifiable : values) {
                 if (returnedAttributes != null) {
                     longFormat(identifiable, returnedAttributes, inputLine.hasArg(VERBOSE_COMMAND));
-                    say("-----"); // or the output runs together
+                    if (1 < values.size()) {
+                        say("-----"); // or the output runs together
+                    }
                 } else {
                     say(format(identifiable));
                 }     // search -key token_id -r -out [parent_id, valid] .*oauth2.*
@@ -414,6 +415,7 @@ public abstract class StoreCommands2 extends StoreCommands {
         sayi("When listing multiple entries, tools will use the most numbers from the most recent call to this.");
         sayi("A line listing is tabular and will shorten entries that are too long, ending them with " + ELLIPSIS);
         sayi("A verbose command will format every bit of every entry within the margins.");
+        showKeyShorthandHelp();
         say("E.g.");
         sayi("ls " + LINE_LIST_COMMAND + "  " + ALL_LIST_COMMAND);
         sayi("Prints out the line form of *every* object in this store. This may be simply huge");
@@ -446,8 +448,9 @@ public abstract class StoreCommands2 extends StoreCommands {
         sayi("Remove a property from this the object with the given value.");
         sayi("If you supply a list, all of the properties in the list will be removed");
         sayi("No list of keys means to remove the entire object from the store (!)");
+        showKeyShorthandHelp();
         say("E.g.");
-        sayi("rm " + KEY_FLAG + " error_uri /foo:bar");
+        sayi("rm " + KEY_SHORTHAND_PREFIX + "error_uri /foo:bar");
         sayi("Removes the value of the property 'error_uri' from the object with id foo:bar");
         say("E.g.");
         sayi("rm /foo:bar");
@@ -456,7 +459,6 @@ public abstract class StoreCommands2 extends StoreCommands {
         sayi("rm " + KEYS_FLAG + " [error_uri,home_uri] /foo:bar");
         sayi("removes the values of the properties error_uri and home_uri from the object with id");
         sayi("equal to foo:bar");
-
     }
 
     /**
@@ -479,8 +481,9 @@ public abstract class StoreCommands2 extends StoreCommands {
             say("Object not found");
             return;
         }
+        String key = getKeyArg(inputLine);
         // if the request does not have new stuff, do old stuff.
-        if (!inputLine.hasArg(KEY_FLAG) && !inputLine.hasArg(KEYS_FLAG)) {
+        if (key == null && !inputLine.hasArg(KEYS_FLAG)) {
             super.rm(inputLine);
             rmCleanup(identifiable);
             return;
@@ -498,13 +501,13 @@ public abstract class StoreCommands2 extends StoreCommands {
             }
             removeEntries(identifiable, array);
         }
-        if (inputLine.hasArg(KEY_FLAG)) {
+        if (key != null) {
             if (identifiable == null) {
                 say("sorry, I could not find that object. Check your id.");
                 return;
             }
 
-            removeEntry(identifiable, inputLine.getNextArgFor(KEY_FLAG));
+            removeEntry(identifiable, key);
         }
         //    rmCleanup(identifiable);
     }
@@ -515,8 +518,8 @@ public abstract class StoreCommands2 extends StoreCommands {
             showLSHelp();
             return;
         }
-
-        if (!inputLine.hasArg(KEY_FLAG) && !inputLine.hasArg(KEYS_FLAG)) {
+        String key = getKeyArg(inputLine);
+        if (key == null && !inputLine.hasArg(KEYS_FLAG)) {
             super.ls(inputLine);
             return;
         }
@@ -536,13 +539,13 @@ public abstract class StoreCommands2 extends StoreCommands {
             showEntries(identifiable, array, inputLine.hasArg(VERBOSE_COMMAND));
             return;
         }
-        if (inputLine.hasArg(KEY_FLAG)) {
+        if (key != null) {
             Identifiable identifiable = findItem(inputLine);
             if (identifiable == null) {
                 say("sorry, I could not find that object. Check your id.");
                 return;
             }
-            showEntry(identifiable, inputLine.getNextArgFor(KEY_FLAG), inputLine.hasArg(VERBOSE_COMMAND));
+            showEntry(identifiable, key, inputLine.hasArg(VERBOSE_COMMAND));
         }
 
     }
@@ -556,6 +559,7 @@ public abstract class StoreCommands2 extends StoreCommands {
         say("Alternately, you may either specify a single key + value OR you may specify an array of keys");
         sayi("of the form [key0,key1,...]. (The list_keys command will tell what the keys are.)");
         sayi("The " + KEYS_FLAG + " will act on all the keys supplied.");
+        showKeyShorthandHelp();
         say("E.g.");
         sayi("update /foo:bar");
         sayi("no arguments means to interactively ask for every attribute. /foo:bar is the identifier for this object.");
@@ -563,7 +567,7 @@ public abstract class StoreCommands2 extends StoreCommands {
         sayi("update -key cfg -file /path/to/file /foo:bar");
         sayi("read the contents of the file (as a string) into the attribute");
         say("E.g.");
-        sayi("update " + KEY_FLAG + " name " + VALUE_FLAG + " \"My client\" /foo:bar");
+        sayi("update " + KEY_SHORTHAND_PREFIX + "name " + VALUE_FLAG + " \"My client\" /foo:bar");
         sayi("This changes the value of the 'name' attribute to 'My client' for the object with id 'foo:bar'");
         sayi("Note that no prompting is done! The value will be updated.");
         say("E.g.");
@@ -593,28 +597,25 @@ public abstract class StoreCommands2 extends StoreCommands {
             say("Sorry, you have specified both a value and a file for the value.");
             return;
         }
-        if (!inputLine.hasArg(KEY_FLAG) && !inputLine.hasArg(KEYS_FLAG)) {
+        String key = getKeyArg(inputLine);
+        if (key == null && !inputLine.hasArg(KEYS_FLAG)) {
             super.update(inputLine);
             return;
         }
 
         boolean hasFileFlag = inputLine.hasArg(FILE_FLAG);
-        boolean hasJSONFalg = inputLine.hasArg(JSON_FLAG);
         Identifiable identifiable = null;
         XMLMap map = null;
         // Since the value can be anything --like a path to a file. e.g. /tmp/foo or
         // an integer, we *have* to remove arguments until we can see what the
         // actual id is.
         boolean gotOne = false;
-        String key = null;
         String value = null;
-        if (inputLine.hasArg(KEY_FLAG)) {
-            key = inputLine.getNextArgFor(KEY_FLAG);
-            if (!hasKey(key)) {
-                say("sorry, but \"" + key + "\" is not a recognized attribute.");
-                return;
-            }
-            inputLine.removeSwitchAndValue(KEY_FLAG);
+        if (key == null) {
+            say("sorry, but \"" + key + "\" is not a recognized attribute.");
+            return;
+        } else {
+            // inputLine.removeSwitchAndValue(KEY_FLAG);
             if (inputLine.hasArg(VALUE_FLAG)) {
                 value = inputLine.getNextArgFor(VALUE_FLAG);
                 inputLine.removeSwitchAndValue(VALUE_FLAG);
@@ -1432,5 +1433,41 @@ public abstract class StoreCommands2 extends StoreCommands {
         say("target will be overwritten if it exists.");
         say("This only makes a simple copy. If this is, e.g., a client, you will need to approve it, change secret etc.");
         say("Note: source and target are identifiers (no lead /).");
+    }
+
+    public static String KEY_SHORTHAND_PREFIX = ">";
+
+    /**
+     * resolves key shorthand of >key_name or -key key_name
+     *
+     * @param inputLine
+     * @return
+     */
+    protected String getKeyArg(InputLine inputLine) {
+        if (inputLine.hasArg(KEY_FLAG)) {
+            return inputLine.getNextArgFor(KEY_FLAG);
+        }
+        if(inputLine.size() <=1){
+            // so no actual arguments supplied.
+            return null;
+        }
+
+        // have to search
+        for (int i = 1; i < inputLine.size(); i++) {
+            String arg = inputLine.getArg(i);
+            if (arg.startsWith(KEY_SHORTHAND_PREFIX)) {
+                String out = arg.substring(1);
+                // check that it is a key. If not, ignore it.
+                if (getMapConverter().getKeys().allKeys().contains(out)) {
+                    inputLine.removeSwitch(arg); // or it can screw up other things.
+                    return out;
+                }
+            }
+        }
+        return null;
+    }
+
+    protected void showKeyShorthandHelp() {
+        sayi("Note: The argument idiom '-key key_name' may be replaced with '" + KEY_SHORTHAND_PREFIX + "key_name' as a shorthand");
     }
 }

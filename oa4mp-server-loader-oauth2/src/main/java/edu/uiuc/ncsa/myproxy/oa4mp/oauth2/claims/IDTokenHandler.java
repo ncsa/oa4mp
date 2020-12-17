@@ -151,6 +151,7 @@ public class IDTokenHandler extends AbstractPayloadHandler {
         checkRequiredScopes(transaction);
         if (transaction.getOA2Client().isPublicClient()) {
             // Public clients do not get more than basic claims.
+            transaction.setUserMetaData(claims); // make sure this is available to the next handler
             return;
         }
 
@@ -165,12 +166,14 @@ public class IDTokenHandler extends AbstractPayloadHandler {
         } else {
             trace(this, "Service environment has a claims no source enabled during authorization");
         }
+        transaction.setUserMetaData(claims); // make sure this is available to the next handler
     }
 
     @Override
     public void refreshAccountingInformation() {
         trace(this, "Refreshing the accounting information for the claims");
         if (0 < getPhCfg().getPayloadConfig().getLifetime()) {
+            // CIL-708 fix: Make sure the refresh endpoint hands back the right expiration.
             getClaims().put(EXPIRATION, (getPhCfg().getPayloadConfig().getLifetime() + System.currentTimeMillis()) / 1000); // expiration is in SECONDS from the epoch.
         } else {
             getClaims().put(EXPIRATION, System.currentTimeMillis() / 1000 + 15 * 60); // expiration is in SECONDS from the epoch.
@@ -207,9 +210,14 @@ public class IDTokenHandler extends AbstractPayloadHandler {
                 // Note that the returned values from a script are very unlikely to be the same object we sent
                 // even if the contents are the same, since scripts may have to change these in to other data structures
                 // to make them accessible to their machinery, then convert them back.
-                claims = (JSONObject) resp.getReturnedValues().get(SRE_REQ_CLAIMS);
+                // Update the transaction here because if you do not, then values don't chain between
+                // handlers. The transaction is the medium of communication.
+                setClaims((JSONObject) resp.getReturnedValues().get(SRE_REQ_CLAIMS));
                 sources = (List<ClaimSource>) resp.getReturnedValues().get(SRE_REQ_CLAIM_SOURCES);
+                transaction.setClaimsSources(sources);
                 extendedAttributes = (JSONObject) resp.getReturnedValues().get(SRE_REQ_EXTENDED_ATTRIBUTES);
+                // Note that as per our contract, extended attributes are not updateable.
+                return;
             case ScriptRunResponse.RC_NOT_RUN:
                 return;
 
@@ -271,10 +279,13 @@ public class IDTokenHandler extends AbstractPayloadHandler {
 
     @Override
     public void saveState() throws Throwable {
+        DebugUtil.trace(this, ".saveState: claims = " + getClaims().toString(2));
         if (transaction != null && oa2se != null) {
             transaction.setUserMetaData(getClaims());
             transaction.setClaimsSources(getSources());
             oa2se.getTransactionStore().save(transaction);
+            DebugUtil.trace(this, ".saveState: done saving transaction.");
+
         } else {
             trace(this, "In saveState: either env or transaction null. Nothing saved.");
         }

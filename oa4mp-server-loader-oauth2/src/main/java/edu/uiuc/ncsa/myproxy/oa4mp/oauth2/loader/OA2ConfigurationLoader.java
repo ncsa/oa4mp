@@ -763,7 +763,11 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
     protected Provider<TXStore> getTXStoreProvider(TXRecordProvider txRecordProvider,
                                                    TXRecordConverter<? extends TXRecord> txRecordConverter) {
         if (txStoreProvider == null) {
-            OA2MultiTypeProvider storeProvider = new OA2MultiTypeProvider(cn, isDefaultStoreDisabled(), loggerProvider.get(), txRecordProvider);
+            TXMultiStoreProvider storeProvider = new TXMultiStoreProvider(cn,
+                    isDefaultStoreDisabled(),
+                    loggerProvider.get(),
+                    null,null,
+                    txRecordProvider, txRecordConverter);
 
             storeProvider.addListener(createSQLTXRecordP(cn,
                     getMySQLConnectionPoolProvider(),
@@ -810,7 +814,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                                                 OA2TConverter<? extends OA2ServiceTransaction> tc) {
         if (tsp == null) {
             final IdentifiableProvider tp1 = tp; // since this is referenced in an inner class below.
-            OA2MultiTypeProvider storeProvider = new OA2MultiTypeProvider(cn, isDefaultStoreDisabled(), loggerProvider.get(), tp);
+            OA2MultiTypeTransactionProvider storeProvider = new OA2MultiTypeTransactionProvider(cn, isDefaultStoreDisabled(), loggerProvider.get(), tp);
             storeProvider.addListener(createSQLTSP(cn,
                     getMySQLConnectionPoolProvider(),
                     OA4MPConfigTags.MYSQL_STORE,

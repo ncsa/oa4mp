@@ -11,12 +11,12 @@ import org.apache.commons.configuration.tree.ConfigurationNode;
  * <p>Created by Jeff Gaynor<br>
  * on 3/25/14 at  1:32 PM
  */
-public class OA2MultiTypeProvider extends MultiDSTransactionStoreProvider {
-    public OA2MultiTypeProvider(ConfigurationNode config, boolean disableDefaultStore, MyLoggingFacade logger, IdentifiableProvider tp) {
+public class OA2MultiTypeTransactionProvider extends MultiDSTransactionStoreProvider {
+    public OA2MultiTypeTransactionProvider(ConfigurationNode config, boolean disableDefaultStore, MyLoggingFacade logger, IdentifiableProvider tp) {
         super(config, disableDefaultStore, logger, tp);
     }
 
-    public OA2MultiTypeProvider(ConfigurationNode config, boolean disableDefaultStore, MyLoggingFacade logger, String type, String target, IdentifiableProvider tp) {
+    public OA2MultiTypeTransactionProvider(ConfigurationNode config, boolean disableDefaultStore, MyLoggingFacade logger, String type, String target, IdentifiableProvider tp) {
         super(config, disableDefaultStore, logger, type, target, tp);
     }
 

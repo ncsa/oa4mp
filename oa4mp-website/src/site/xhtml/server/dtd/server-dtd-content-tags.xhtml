@@ -37,12 +37,47 @@
         <td style="vertical-align: top;">Approvals for clients. These should be persisted.</td>
         <td style="vertical-align: top;">&lt;clientApprovals/&gt;</td>
     </tr>
+    <tr>
+        <td style="vertical-align: top;">adminClients</td>
+        <td style="vertical-align: top;">Administrative client store. If the client management endpoint is active, you must have one of these.</td>
+        <td style="vertical-align: top;">&lt;adminClients/&gt;</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">permissions</td>
+        <td style="vertical-align: top;">Various permissions, such as  admin clients have granted to clients they have created or
+            are granted to admin clients by the system.</td>
+        <td style="vertical-align: top;">&lt;permissions/&gt;</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">txStore</td>
+        <td style="vertical-align: top;">Token eXchange token store. Every token that is exchanged is stored here.
+        If you have enabled the token exchange endpoint, you must specify a txStore.</td>
+        <td style="vertical-align: top;">&lt;txStore/&gt;</td>
+    </tr>
     </tbody>
 </table>
 <p>There is one optional attribute associated with any content tag and this is "tablename". In cases where the
     underlying store is an SQL store, you may use this to specify the table name, overriding the default. This attribute
     is ignored by other stores.</p>
 
+<h2>Database scripts</h2>
+<p>These are stored in github on the release page. If you are going to set up database support, then you need to set
+up your database(s) accordingly. OA4MP is happy having several store sources, but only one store is active (so you can have
+a few file stores, mysql and postgres instances but only a single client store, single transactions store, etc. </p>
+<ul>
+    <li><a href="https://github.com/ncsa/OA4MP/releases/download/5.1-SNAPSHOT/oauth2-mariadb.sql">maria DB</a></li>
+    <li><a href="https://github.com/ncsa/OA4MP/releases/download/5.1-SNAPSHOT/oauth2-mysql.sql">mysql</a></li>
+    <li><a href="https://github.com/ncsa/OA4MP/releases/download/5.1-SNAPSHOT/oauth2-pg.sql">postges</a></li>
+</ul>
+<p>If you are using CILogon (which is an extension of OA4MP that has user support, among other things) then
+the corresponding scripts are at</p>
+<ul>
+    <li><a href="https://github.com/cilogon/cilogon-java/releases/download/5.1-SNAPSHOT/cilogon-oa2-mariadb.sql">maria DB</a></li>
+    <li><a href="https://github.com/cilogon/cilogon-java/releases/download/5.1-SNAPSHOT/cilogon-oa2-mysql.sql">mysql</a></li>
+    <li><a href="https://github.com/cilogon/cilogon-java/releases/download/5.1-SNAPSHOT/cilogon-oa2-postgres.sql">postgres</a></li>
+</ul>
+<p>It is highly advisable that you carefully read what is there. These scripts are mostly ready to install but do
+need some configuration and set up (such as installation of the database(s), creating users that will access the databases, etc.)</p>
 <h3>Example 1.</h3>
 
 <p>This puts the client approvals in a <a href="../../configuration/file-store.html">file store</a></p>

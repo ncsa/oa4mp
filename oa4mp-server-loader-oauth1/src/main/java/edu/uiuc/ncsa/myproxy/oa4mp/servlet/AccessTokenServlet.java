@@ -8,7 +8,9 @@ import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.server.request.ATRequest;
 import edu.uiuc.ncsa.security.delegation.server.request.ATResponse;
 import edu.uiuc.ncsa.security.delegation.server.request.IssuerResponse;
+import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.delegation.token.Verifier;
+import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -25,6 +27,17 @@ public class AccessTokenServlet extends AbstractAccessTokenServlet {
     @Override
     protected ATRequest getATRequest(HttpServletRequest request, ServiceTransaction transaction) {
         return new ATRequest(request, transaction); // nothing to do for OAuth 1.0a
+    }
+
+    @Override
+    protected ServiceTransaction getTransaction(AuthorizationGrant ag, HttpServletRequest req) throws ServletException {
+        ServiceTransaction transaction = getServiceEnvironment().getTransactionStore().get(ag);
+        if(transaction == null){
+            String message = "No transaction found for grant \"" + ag  +"\"";
+            ServletDebugUtil.trace(this,message);
+            throw new ServletException("No transaction found for grant \"" + ag  +"\"");
+        }
+        return transaction;
     }
 
     @Override

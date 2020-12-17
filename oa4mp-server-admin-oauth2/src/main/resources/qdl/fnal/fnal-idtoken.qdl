@@ -1,0 +1,41 @@
+/*
+   QDL script for getting the id token claims set up.
+   NOTE: setting ID token claims in another handler won't get them picked up.
+   updated: 2020-12-16T21:40:05.453Z
+*/
+if[
+     exec_phase == 'post_token'
+ ][
+    // Special claim for vault
+   if[
+      is_defined(claims.eppn)
+   ][
+           vault_uid := 'vault.uid';
+    claims.vault_uid := head(claims.eppn,'@');
+  ]; // end if
+
+  claims.err := 'hi Dave!';
+];
+
+  /*
+ tokens{
+  identity{
+     type=identity
+     qdl{
+         load="fnal/fnal-idtoken.qdl"
+         xmd={exec_phase="post_token"}
+       }// end qdl
+     } //end identity token
+     access{
+        type=wlcg
+        issuer="https:cilogon.org"
+        audience="https://wlcg.cern.ch/jwt/v1/any"
+        lifetime=3600000
+        qdl{
+           load="fnal/fnal-at.qdl"
+           xmd={exec_phase=["post_token","post_refresh"]}
+           args=["USER_ID", "PASSWORD"]
+        } //end QDL
+     } // end access token
+   } //end tokens
+    */

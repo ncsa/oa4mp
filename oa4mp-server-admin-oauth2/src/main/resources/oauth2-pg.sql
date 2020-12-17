@@ -95,6 +95,21 @@ create table :oa4mpSchema.:oa4mpApproverTable(
     approved    boolean,
     approval_ts TIMESTAMP);
 
+CREATE TABLE :oa4mpSchema.tx_records
+(
+    token_id   VARCHAR(255) PRIMARY KEY,
+    lifetime   bigint,
+    issued_at  bigint,
+    expires_at bigint,
+    parent_id  text,
+    token_type text,
+    valid      boolean,
+    scopes     text,
+    audience   text,
+    issuer     text,
+    resource   text
+);
+
 create table :oa4mpSchema.:oa4mpTransactionTable  (
    temp_token           text primary key,
    temp_token_valid     boolean,

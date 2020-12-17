@@ -8,7 +8,6 @@ import edu.uiuc.ncsa.security.delegation.servlet.TransactionState;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.delegation.token.Verifier;
-import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -24,17 +23,16 @@ public abstract class AbstractAccessTokenServlet extends MyProxyDelegationServle
         doDelegation(httpServletRequest, httpServletResponse);
     }
     protected abstract ATRequest getATRequest(HttpServletRequest request, ServiceTransaction transaction);
+
+    protected abstract ServiceTransaction getTransaction(AuthorizationGrant ag, HttpServletRequest req) throws ServletException;
+
     protected IssuerTransactionState doDelegation(Client client, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Throwable, ServletException {
         printAllParameters(httpServletRequest);
         info("5.a. Starting access token exchange");
         Verifier v = getServiceEnvironment().getTokenForge().getVerifier(httpServletRequest);
         AuthorizationGrant ag = getServiceEnvironment().getTokenForge().getAuthorizationGrant(httpServletRequest);
-        ServiceTransaction transaction = getServiceEnvironment().getTransactionStore().get(ag);
-        if(transaction == null){
-            String message = "No transaction found for grant \"" + ag  +"\"";
-            ServletDebugUtil.trace(this,message);
-            throw new ServletException("No transaction found for grant \"" + ag  +"\"");
-        }
+        ServiceTransaction transaction = getTransaction(ag, httpServletRequest);
+
         ATRequest atRequest = getATRequest(httpServletRequest, transaction);
 
         atRequest.setVerifier(v);

@@ -62,23 +62,32 @@
     type CDATA #REQUIRED
     factory CDATA #REQUIRED
     useJavaKeystore CDATA #IMPLIED&gt;
-&lt;!ELEMENT <a href="server/dtd/server-dtd-content-tags.html">clients</a>&gt;
-&lt;!ELEMENT <a href="server/dtd/server-dtd-content-tags.html">clientApprovals</a>&gt;
-&lt;!ELEMENT <a href="server/dtd/server-dtd-content-tags.html">transactions</a>&gt;
+&lt;!ELEMENT <a href="server-dtd-content-tags.html">clients</a>&gt;
+&lt;!ELEMENT <a href="server-dtd-content-tags.html">clientApprovals</a>&gt;
+&lt;!ELEMENT <a href="server-dtd-content-tags.html">transactions</a>&gt;
+&lt;!ELEMENT <a href="server-dtd-content-tags.html">permissions</a>&gt;
+&lt;!ELEMENT <a href="server-dtd-content-tags.html">adminClients</a>&gt;
+&lt;!ELEMENT <a href="server-dtd-content-tags.html">txStore</a>&gt;
 &lt;!ATTLIST clients
     tablename CDATA #IMPLED&gt;
 &lt;!ATTLIST clientApprovals
     tablename CDATA #IMPLIED&gt;
 &lt;!ATTLIST transactions
     tablename CDATA #IMPLIED&gt;
-&lt;!ELEMENT memoryStore (clients|clientApprovals|transactions)*&gt;
-&lt;!ELEMENT fileStore (clients|clientApprovals|transactions)*&gt;
-&lt;!ATTLIST fileStore
+  &lt;!ATTLIST permissions
+      tablename CDATA #IMPLED&gt;
+  &lt;!ATTLIST clients
+      tablename admiClients #IMPLED&gt;
+    &lt;!ATTLIST clients
+        txStore CDATA #IMPLED&gt;
+&lt;!ELEMENT memoryStore (clients|clientApprovals|transactions|permissions|adminClients|txStore)*&gt;
+    &lt;!ELEMENT <a href="../../common/configuration/file-store.html">fileStore</a> (clients|clientApprovals|transactions|permissions|adminClients|txStore)*&gt;
+&lt;!ATTLIST <a href="../../common/configuration/file-store.html">fileStore</a>
     dataPath CDATA #IMPLIED
     indexPath CDATA #IMPLIED
     path CDATA #IMPLIED&gt;
-&lt;!ELEMENT mysql (clients|clientApprovals|transactions)*&gt;
-&lt;!ATTLIST mysql
+&lt;!ELEMENT <a href="../../common/configuration/mysql-store.html">mysql</a> (clients|clientApprovals|transactions|permissions|adminClients|txStore)*&gt;
+&lt;!ATTLIST <a href="../../common/configuration/mysql-store.html">mysql</a>
     password CDATA #REQUIRED
     port CDATA #IMPLIED
     host CDATA #IMPLIED
@@ -88,8 +97,8 @@
     tablename CDATA #IMPLIED
     tablePrefix CDATA #IMPLIED
     driver CDATA #IMPLIED&gt;
-&lt;!ELEMENT mariadb (clients|clientApprovals|transactions)*&gt;
-&lt;!ATTLIST mariadb
+&lt;!ELEMENT <a href="../../common/configuration/mariadb-store.html">mariadb</a> (clients|clientApprovals|transactions|permissions|adminClients|txStore)*&gt;
+&lt;!ATTLIST <a href="../../common/configuration/mariadb-store.html">mariadb</a>
     password CDATA #REQUIRED
     port CDATA #IMPLIED
     host CDATA #IMPLIED
@@ -99,8 +108,8 @@
     tablename CDATA #IMPLIED
     tablePrefix CDATA #IMPLIED
     driver CDATA #IMPLIED&gt;
-&lt;!ELEMENT postgresql (clients|clientApprovals|transactions)*&gt;
-&lt;!ATTLIST postgresql
+&lt;!ELEMENT <a href="../../common/configuration/postgres-store.html">postgresql</a> (clients|clientApprovals|transactions|permissions|adminClients|txStore)*&gt;
+&lt;!ATTLIST <a href="../../common/configuration/postgres-store.html">postgresql</a>
     username CDATA #REQUIRED
     password CDATA #REQUIRED
     port CDATA #IMPLIED

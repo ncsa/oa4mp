@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.AuthorizationPath;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.AuthorizationTemplate;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.AuthorizationTemplates;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
@@ -57,6 +58,7 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
 
     public void setAtData(JSONObject atData) {
         transaction.setATData(atData);
+        this.atData = atData;
     }
 
     @Override
@@ -79,10 +81,13 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
                 // Note that the returned values from a script are very unlikely to be the same object we sent
                 // even if the contents are the same, since scripts may have to change these in to other data structures
                 // to make them accessible to their machinery, then convert them back.
-                claims = (JSONObject) resp.getReturnedValues().get(SRE_REQ_CLAIMS);
+                setClaims((JSONObject) resp.getReturnedValues().get(SRE_REQ_CLAIMS));
+                DebugUtil.trace(this, "Setting claims to " + claims.toString(2));
                 //sources = (List<ClaimSource>) resp.getReturnedValues().get(SRE_REQ_CLAIM_SOURCES);
                 extendedAttributes = (JSONObject) resp.getReturnedValues().get(SRE_REQ_EXTENDED_ATTRIBUTES);
-                atData = (JSONObject) resp.getReturnedValues().get(SRE_REQ_ACCESS_TOKEN);
+
+                setAtData((JSONObject) resp.getReturnedValues().get(SRE_REQ_ACCESS_TOKEN));
+                return;
             case ScriptRunResponse.RC_NOT_RUN:
                 return;
 
@@ -292,10 +297,13 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
 
     @Override
     public void saveState() throws Throwable {
+        DebugUtil.trace(this, ".saveState: claims = " + getClaims().toString(2));
         if (transaction != null && oa2se != null) {
+            transaction.setUserMetaData(getClaims());  // It is possible that the claims were updated. Save them.
             transaction.setATData(getAtData());
 
             oa2se.getTransactionStore().save(transaction);
+            DebugUtil.trace(this, ".saveState: done saving transaction.");
         } else {
             trace(this, "In saveState: either env or transaction null. Nothing saved.");
         }

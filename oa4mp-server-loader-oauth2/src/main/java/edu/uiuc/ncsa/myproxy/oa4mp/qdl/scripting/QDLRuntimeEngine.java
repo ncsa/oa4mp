@@ -20,6 +20,7 @@ import edu.uiuc.ncsa.qdl.variables.QDLNull;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.ScriptRuntimeException;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.ScriptingConstants;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
@@ -259,9 +260,13 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
 
         StemVariable sources = new StemVariable();
         int i = 0;
-        for (ClaimSource source : (List<ClaimSource>) req.getArgs().get(SRE_REQ_CLAIM_SOURCES)) {
-            sources.put(i + ".", ConfigtoCS.convert(source));
-            i++;
+        // not every handler or request has claim sources.
+        // Some handlers inject them later because they need more state than is available.
+        if(req.getArgs().containsKey(SRE_REQ_CLAIM_SOURCES)) {
+            for (ClaimSource source : (List<ClaimSource>) req.getArgs().get(SRE_REQ_CLAIM_SOURCES)) {
+                sources.put(i + ".", ConfigtoCS.convert(source));
+                i++;
+            }
         }
         state.getSymbolStack().setValue(CLAIM_SOURCES_VAR, sources);
         // Now do access control
@@ -281,26 +286,28 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         acl.put("admins.", adminStem);
         state.getSymbolStack().setValue(ACCESS_CONTROL, acl);
         if (state.getTxRecord() != null) {
+            // following block always sets these variables even if there is nothing sent.
+            // In this way, it is easier to use them in scripting rather than having to check
+            // if they exist.
             TXRecord txr = state.getTxRecord();
+            StemVariable txScopes = new StemVariable();
             if (txr.hasScopes()) {
-                StemVariable txScopes = new StemVariable();
                 txScopes.addList(txr.getScopes());
-                state.getSymbolStack().setValue(TX_SCOPES_VAR, txScopes);
-
             }
+            state.getSymbolStack().setValue(TX_SCOPES_VAR, txScopes);
+            StemVariable txAud = new StemVariable();
             if (txr.hasAudience()) {
-                StemVariable txAud = new StemVariable();
                 txAud.addList(txr.getAudience());
-                state.getSymbolStack().setValue(TX_AUDIENCE_VAR, txAud);
             }
+            state.getSymbolStack().setValue(TX_AUDIENCE_VAR, txAud);
+            StemVariable txRes = new StemVariable();
             if (txr.hasResources()) {
-                StemVariable txRes = new StemVariable();
                 for (URI uri : txr.getResource()) {
 
                     txRes.listAppend(uri.toString());
                 }
-                state.getSymbolStack().setValue(TX_RESOURCE_VAR, txRes);
             }
+            state.getSymbolStack().setValue(TX_RESOURCE_VAR, txRes);
         }
 
 
@@ -394,6 +401,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         }
         respMap.put(SRE_REQ_AUDIENCE, stemToList((StemVariable) state.getValue(AUDIENCE_VAR)));
         Object z = state.getValue(CLAIMS_VAR);
+        DebugUtil.trace(this, "QDL returned claims from state:" + z);
         StemVariable stemClaims;
         if (z instanceof QDLNull) {
             stemClaims = new StemVariable();
@@ -406,24 +414,25 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
             throw new NFWException("Internal error: The returned claims object was not a JSON Object.");
         }
         respMap.put(SRE_REQ_CLAIMS, j);
+        DebugUtil.trace(this, "QDL updates response map:" + j.toString(1));
 
         /*
         Now for token exchange stuff
          */
-        if(state.isDefined(TX_SCOPES_VAR)) {
+        if (state.isDefined(TX_SCOPES_VAR)) {
             respMap.put(SRE_TX_REQ_SCOPES, stemToList((StemVariable) state.getValue(TX_SCOPES_VAR)));
         }
-        if(state.isDefined(TX_AUDIENCE_VAR)){
-                respMap.put(SRE_TX_REQ_AUDIENCE, stemToList((StemVariable) state.getValue(TX_AUDIENCE_VAR)));
+        if (state.isDefined(TX_AUDIENCE_VAR)) {
+            respMap.put(SRE_TX_REQ_AUDIENCE, stemToList((StemVariable) state.getValue(TX_AUDIENCE_VAR)));
         }
-        if(state.isDefined(TX_RESOURCE_VAR)){
+        if (state.isDefined(TX_RESOURCE_VAR)) {
             List<String> res = stemToList((StemVariable) state.getValue(TX_RESOURCE_VAR));
 
             ArrayList<URI> zz = new ArrayList<>();
-            for(String r : res){
-                try{
+            for (String r : res) {
+                try {
                     zz.add(URI.create(r));
-                }catch(Throwable t){
+                } catch (Throwable t) {
                     getState().getLogger().warn("Illegal uri in stem conversion for token exchange resources: \"" + r + "\". Skipping");
                 }
 

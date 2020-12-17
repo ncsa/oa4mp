@@ -4,7 +4,6 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.security.core.cache.RetentionPolicy;
 import edu.uiuc.ncsa.security.core.exceptions.InvalidTimestampException;
 import edu.uiuc.ncsa.security.core.util.DateUtils;
-import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
 
 import java.util.Map;
@@ -68,7 +67,6 @@ public class RefreshTokenRetentionPolicy implements RetentionPolicy {
                 timeout = st2.getAuthzGrantLifetime();
             }
         }
-        DebugUtil.trace(this, "token = " + token + " lifetime = " + timeout);
 
         try {
             if (timeout <= 0) {
@@ -79,45 +77,10 @@ public class RefreshTokenRetentionPolicy implements RetentionPolicy {
             return true;
 
         } catch (InvalidTimestampException its) {
-            DebugUtil.trace(this, "Caught invalid timestamp for refresh token, lifetime = " + st2.getRefreshTokenLifetime() + ", actual timeout = " + timeout + ", msg=" + its.getMessage());
             return false;
         }
 
 
-        // ***************
-
-/*
-        if (rt == null || rt.getToken() == null) {
-            // fall back to looking at the access token timestamp. Failing that, fall back to the creation time from
-            // the identifier.
-            String token;
-            token = (st2.getAccessToken() == null ? st2.getIdentifierString() : st2.getAccessToken().getToken());
-            timeout = st2.getAccessTokenLifetime();
-            try {
-                DateUtils.checkTimestamp(token, timeout);
-            } catch (InvalidTimestampException its) {
-                DebugUtil.trace(this, "Caught invalid timestamp for access token = " + st2.getAccessToken() + "msg = " + its.getMessage());
-
-                return false;
-            }
-            return true;
-        }
-*/
-
-/*
-        try {
-            if (timeout <= 0) {
-                DateUtils.checkTimestamp(rt.getToken()); // use default????
-            } else {
-                DateUtils.checkTimestamp(rt.getToken(), timeout);
-            }
-            return true;
-
-        } catch (InvalidTimestampException its) {
-            DebugUtil.trace(this, "Caught invalid timestamp for refresh token, lifetime = " + st2.getRefreshTokenLifetime() + ", actual timeout = " + timeout + ", msg=" + its.getMessage());
-            return false;
-        }
-*/
     }
 
     @Override

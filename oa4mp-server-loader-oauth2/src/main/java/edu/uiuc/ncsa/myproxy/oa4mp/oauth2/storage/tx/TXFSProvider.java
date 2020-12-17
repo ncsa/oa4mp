@@ -1,7 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.server.OA4MPConfigTags;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2TokenForge;
 import edu.uiuc.ncsa.security.storage.FSProvider;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
@@ -20,7 +19,6 @@ public class TXFSProvider<T extends TXFileStore> extends FSProvider<T> implement
     }
 
     TXRecordProvider provider = null;
-    OA2TokenForge tokenForge = null;
 
 
     @Override

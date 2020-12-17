@@ -17,6 +17,12 @@ public class AdminClientKeys extends BaseClientKeys {
     String maxClients = "max_clients";
     String issuer = "issuer";
     String config = "config";
+    String allowQDL = "allow_qdl";
+
+    public String allowQDL(String... x) {
+           if (0 < x.length) allowQDL= x[0];
+           return allowQDL;
+       }
 
     public String config(String... x) {
            if (0 < x.length) config= x[0];
