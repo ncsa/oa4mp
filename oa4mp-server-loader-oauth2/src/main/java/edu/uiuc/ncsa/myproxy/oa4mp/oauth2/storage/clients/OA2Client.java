@@ -433,7 +433,7 @@ public class OA2Client extends Client implements OA2ClientScopes {
      *
      * @return
      */
-    protected JSONObject getExtendedAttributes() {
+    public JSONObject getExtendedAttributes() {
         if (extended_attributes == null) {
             extended_attributes = new JSONObject();
         }

@@ -18,6 +18,8 @@ public class AdminClientKeys extends BaseClientKeys {
     String issuer = "issuer";
     String config = "config";
     String allowQDL = "allow_qdl";
+    String vo="vo";
+
 
     public String allowQDL(String... x) {
            if (0 < x.length) allowQDL= x[0];
@@ -39,7 +41,6 @@ public class AdminClientKeys extends BaseClientKeys {
            return issuer;
        }
 
-    String vo="vo";
 
     public String vo(String... x) {
            if (0 < x.length) vo = x[0];

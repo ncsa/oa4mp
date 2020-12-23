@@ -56,4 +56,9 @@ public class ClientApprovalMemoryStore<V extends ClientApproval> extends MemoryS
     public XMLConverter<V> getXMLConverter() {
         return converter;
     }
+
+    @Override
+    public MapConverter getMapConverter() {
+        return converter;
+    }
 }

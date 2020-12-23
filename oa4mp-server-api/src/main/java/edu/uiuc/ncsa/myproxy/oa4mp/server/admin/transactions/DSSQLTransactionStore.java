@@ -22,4 +22,6 @@ public class DSSQLTransactionStore<V extends OA4MPServiceTransaction> extends SQ
                                  MapConverter converter) {
         super(tokenForge, connectionPool, table, idp, converter);
     }
+
+   
 }

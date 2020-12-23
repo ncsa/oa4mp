@@ -877,7 +877,6 @@ public abstract class StoreCommands2 extends StoreCommands {
      * @param map
      */
     protected Identifiable fromXMLMap(XMLMap map) {
-
         Identifiable identifiable = getStore().create();
         MapConverter mapConverter = (MapConverter) getStore().getXMLConverter();
         mapConverter.fromMap(map, identifiable);

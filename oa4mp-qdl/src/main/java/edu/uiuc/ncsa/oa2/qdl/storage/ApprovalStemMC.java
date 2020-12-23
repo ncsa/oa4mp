@@ -1,0 +1,59 @@
+package edu.uiuc.ncsa.oa2.qdl.storage;
+
+import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
+import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
+import edu.uiuc.ncsa.security.delegation.storage.ClientApprovalKeys;
+import edu.uiuc.ncsa.security.storage.data.MapConverter;
+
+/**
+ * <p>Created by Jeff Gaynor<br>
+ * on 12/21/20 at  6:11 AM
+ */
+public class ApprovalStemMC<V extends ClientApproval> extends StemConverter<V> {
+    public ApprovalStemMC(MapConverter<V> mapConverter) {
+        super(mapConverter);
+    }
+
+    ClientApprovalKeys kk() {
+        return (ClientApprovalKeys) keys;
+    }
+
+    @Override
+    public V fromMap(StemVariable stem, V v) {
+        v = super.fromMap(stem, v);
+        if (stem.containsKey(kk().approved())) {
+            v.setApproved(stem.getBoolean(kk().approved()));
+        }
+        if (isTimeOk(stem, kk().approvalTS())) {
+            v.setApprovalTimestamp(toDate(stem, kk().approvalTS()));
+        }
+        if (isStringKeyOK(stem, kk().status())) {
+            ClientApproval.Status status1 = ClientApproval.Status.resolveByStatusValue(stem.getString(kk().status()));
+            v.setStatus(status1);
+        } else {
+            v.setStatus(ClientApproval.Status.NONE);
+        }
+        if (isStringKeyOK(stem, kk().approver())) {
+            v.setApprover(stem.getString(kk().approver()));
+        }
+        return v;
+    }
+
+    @Override
+    public StemVariable toMap(V v, StemVariable stem) {
+       stem =  super.toMap(v, stem);
+
+        if (v.getStatus() == null) {
+            stem.put(kk().status(), ClientApproval.Status.NONE.getStatus());
+        } else {
+            stem.put(kk().status(), v.getStatus().getStatus());
+        }
+        stem.put(kk().approvalTS(), v.getApprovalTimestamp().getTime());
+        if (!StringUtils.isTrivial(v.getApprover())) {
+            stem.put(kk().approver(), v.getApprover());
+        }
+        stem.put(kk().approved(), v.isApproved());
+        return stem;
+    }
+}

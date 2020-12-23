@@ -58,7 +58,11 @@
         </dependency>
 
     </dependencies>
-
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <additionalparam>-Xdoclint:none</additionalparam>
+        <maven.javadoc.skip>true</maven.javadoc.skip>
+    </properties>
     <profiles>
         <profile>
             <id>qdl</id>
