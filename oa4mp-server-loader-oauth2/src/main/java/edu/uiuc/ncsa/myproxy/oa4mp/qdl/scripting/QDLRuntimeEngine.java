@@ -7,17 +7,12 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
 import edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims.ConfigtoCS;
 import edu.uiuc.ncsa.qdl.config.QDLConfigurationLoaderUtils;
 import edu.uiuc.ncsa.qdl.config.QDLEnvironment;
-import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
-import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
-import edu.uiuc.ncsa.qdl.module.ModuleMap;
 import edu.uiuc.ncsa.qdl.scripting.Scripts;
-import edu.uiuc.ncsa.qdl.state.ImportManager;
 import edu.uiuc.ncsa.qdl.state.StateUtils;
-import edu.uiuc.ncsa.qdl.state.SymbolStack;
-import edu.uiuc.ncsa.qdl.statements.FunctionTable;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.xml.XMLUtils;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
@@ -31,7 +26,12 @@ import edu.uiuc.ncsa.security.util.scripting.ScriptRuntimeEngine;
 import net.sf.json.JSON;
 import net.sf.json.JSONObject;
 
-import java.io.IOException;
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamWriter;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -93,6 +93,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
     protected void init() {
 //        setScriptSet(QDLJSONConfigUtil.readScriptSet(config));  // <- old way
         //setScriptSet(AnotherJSONUtil.createScripts(config)); // <- new way
+/*
         SymbolStack stack = new SymbolStack();
         state = new OA2State(ImportManager.getResolver(),
                 stack,
@@ -102,6 +103,9 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
                 new ModuleMap(),
                 null, // no logging at least for now
                 qe.isServerModeOn());// enable/disable server mode. Generally enable it in production.
+*/
+        state = (OA2State) StateUtils.newInstance();
+        state.setServerMode(qe.isServerModeOn());
         state.getOpEvaluator().setNumericDigits(qe.getNumericDigits());
         state.setScriptPaths(qe.getScriptPath());  // Be sure script paths are read.
         if (qe != null && qe.isEnabled()) {
@@ -118,8 +122,15 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
     @Override
     public String serializeState() {
         try {
-            return StateUtils.saveb64(state);
-        } catch (IOException e) {
+            StringWriter w = new StringWriter();
+            XMLOutputFactory xof = XMLOutputFactory.newInstance();
+            XMLStreamWriter xsw = xof.createXMLStreamWriter(w);
+
+            state.toXML(xsw);
+            return XMLUtils.prettyPrint(w.toString());
+            // Old way:
+            //   return StateUtils.saveb64(state);
+        } catch (Throwable e) {
             e.printStackTrace();
             throw new QDLException("Error: could not serialize the state:" + e.getMessage(), e);
         }
@@ -128,10 +139,16 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
     OA2State state;
 
     @Override
-    public void deserializeState(String state) {
-        if (state == null || state.isEmpty()) return;
+    public void deserializeState(String rawState) {
+        if (rawState == null || rawState.isEmpty()) return;
         try {
-            this.state = (OA2State) StateUtils.loadb64(state);
+            StringReader reader = new StringReader(rawState);
+            XMLInputFactory xmlif = XMLInputFactory.newInstance();
+            XMLEventReader xer = xmlif.createXMLEventReader(reader);
+            state = (OA2State) StateUtils.newInstance();
+            state.fromXML(xer,null); // No XProperties in serialization.
+            // Old way
+            // this.state = (OA2State) StateUtils.loadb64(state);
         } catch (Throwable e) {
             if (e instanceof RuntimeException) {
                 throw (RuntimeException) e;
@@ -262,7 +279,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         int i = 0;
         // not every handler or request has claim sources.
         // Some handlers inject them later because they need more state than is available.
-        if(req.getArgs().containsKey(SRE_REQ_CLAIM_SOURCES)) {
+        if (req.getArgs().containsKey(SRE_REQ_CLAIM_SOURCES)) {
             for (ClaimSource source : (List<ClaimSource>) req.getArgs().get(SRE_REQ_CLAIM_SOURCES)) {
                 sources.put(i + ".", ConfigtoCS.convert(source));
                 i++;

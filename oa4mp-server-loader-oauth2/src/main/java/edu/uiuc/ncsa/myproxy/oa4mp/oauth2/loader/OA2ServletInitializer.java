@@ -5,11 +5,20 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.ClaimSourceFactoryImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2ExceptionHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RefreshTokenRetentionPolicy;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RefreshTokenStore;
+import edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.OA2State;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientStoreProviders;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.SATFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.OA4MPServletInitializer;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.NewClientNotifier;
+import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
+import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
+import edu.uiuc.ncsa.qdl.module.ModuleMap;
+import edu.uiuc.ncsa.qdl.state.ImportManager;
+import edu.uiuc.ncsa.qdl.state.State;
+import edu.uiuc.ncsa.qdl.state.StateUtils;
+import edu.uiuc.ncsa.qdl.state.SymbolStack;
+import edu.uiuc.ncsa.qdl.statements.FunctionTable;
 import edu.uiuc.ncsa.security.core.cache.Cleanup;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
@@ -77,7 +86,7 @@ public class OA2ServletInitializer extends OA4MPServletInitializer {
             txRecordCleanup.addRetentionPolicy(new TokenExchangeRecordRetentionPolicy());
             txRecordCleanup.start();
             oa2SE.getMyLogger().info("Starting token exchange record store cleanup thread");
-              }
+        }
 
         try {
             SATFactory.setAdminClientConverter(AdminClientStoreProviders.getAdminClientConverter());
@@ -85,6 +94,20 @@ public class OA2ServletInitializer extends OA4MPServletInitializer {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        // QDL stuff. Make sure the factory returns the right state object
+        StateUtils.setFactory(new StateUtils() {
+            @Override
+            public State create() {
+                return new OA2State(ImportManager.getResolver(),
+                        new SymbolStack(),
+                        new OpEvaluator(),
+                        MetaEvaluator.getInstance(),
+                        new FunctionTable(),
+                        new ModuleMap(),
+                        null, // no logging at least for now
+                        true); // default in server mode, but can be overridden later
+            }
+        });
     }
 
 }
