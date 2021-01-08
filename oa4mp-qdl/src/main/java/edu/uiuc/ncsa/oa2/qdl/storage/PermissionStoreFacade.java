@@ -15,6 +15,10 @@ import java.util.List;
  * on 12/23/20 at  8:31 AM
  */
 public class PermissionStoreFacade extends StoreFacade {
+    public PermissionStoreFacade() {
+        System.out.println("in constructor");
+    }
+
     protected QDLPermissionStoreAccessor getPS() {
         return (QDLPermissionStoreAccessor) getStoreAccessor();
     }
@@ -136,7 +140,7 @@ public class PermissionStoreFacade extends StoreFacade {
         }
         switch (storeType) {
             case STORE_TYPE_PERMISSION_STORE:
-                a = new QDLPermissionStoreAccessor(storeType, getEnvironment().getPermissionStore());
+                a = new QDLPermissionStoreAccessor(storeType, getEnvironment().getPermissionStore(), getEnvironment().getMyLogger());
                 a.setMapConverter(new PermissionStemMC(getEnvironment().getPermissionStore().getMapConverter()));
                 break;
         }

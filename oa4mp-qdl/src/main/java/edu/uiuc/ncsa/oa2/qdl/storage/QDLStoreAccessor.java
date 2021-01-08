@@ -8,6 +8,7 @@ import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.XMLConverter;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
+import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.delegation.token.impl.AuthorizationGrantImpl;
 import edu.uiuc.ncsa.security.storage.XMLMap;
@@ -32,10 +33,12 @@ import java.util.List;
  * on 12/17/20 at  4:28 PM
  */
 public class QDLStoreAccessor {
-    public QDLStoreAccessor(String accessorType, Store store) {
+    public QDLStoreAccessor(String accessorType, Store store, MyLoggingFacade myLogger) {
         this.accessorType = accessorType;
         this.store = store;
+        this.logger = myLogger;
     }
+     MyLoggingFacade logger;
 
     public String getAccessorType() {
         return accessorType;
@@ -61,30 +64,49 @@ public class QDLStoreAccessor {
         return toStem((Identifiable) getStore().get(id));
     }
 
+
     /**
-     * Save a stem OR list of them.
-     *
+     * Save OR update the store from a stem or list of them.
      * @param stemVariable
+     * @param doSave
+     * @return
      */
-    public void save(StemVariable stemVariable) {
+    public List<Boolean> saveOrUpdate(StemVariable stemVariable, boolean doSave) {
+        List<Boolean> out = new ArrayList<>();
         if (stemVariable.isList()) {
             for (int i = 0; i < stemVariable.size(); i++) {
                 Object obj = stemVariable.get(i);
                 if (obj instanceof StemVariable) {
                     StemVariable stemVariable1 = (StemVariable) obj;
                     if (!stemVariable1.isList()) {
-                        getStore().save(fromStem(stemVariable1));
+                        try {
+                            if(doSave) {
+                                getStore().save(fromStem(stemVariable1));
+                            }else{
+                                getStore().update(fromStem(stemVariable1));
+                            }
+                            out.add(Boolean.TRUE);
+                        }catch(Throwable t){
+                            String msg = t.getMessage();
+                            if(t.getCause() != null){
+                                msg = t.getCause().getMessage();
+                            }
+                            warn("Could not "+ (doSave?"save":"update") + " object:" + msg);
+                            out.add(Boolean.FALSE);
+                        }
+                    }else{
+                        out.add(Boolean.FALSE);
                     }
                 }
             }
         } else {
             getStore().save(fromStem(stemVariable));
+            out.add(Boolean.TRUE);
+
         }
+        return out;
     }
 
-    public void update(StemVariable stemVariable) {
-        getStore().update(fromStem(stemVariable));
-    }
 
     /**
      * Does the same as the {@link edu.uiuc.ncsa.myproxy.oa4mp.server.StoreCommands2#serialize(InputLine)}
@@ -234,5 +256,20 @@ public class QDLStoreAccessor {
         Identifiable identifiable = getStore().create();
         getConverter().fromMap(map, identifiable);
         return identifiable;
+    }
+    public void warn(String x){
+       if(logger == null){
+           System.err.println(x);
+       }else{
+           logger.warn(x);
+       }
+    }
+    public void info(String x){
+        if(logger == null){
+            System.err.println(x);
+        }else{
+            logger.info(x);
+        }
+
     }
 }

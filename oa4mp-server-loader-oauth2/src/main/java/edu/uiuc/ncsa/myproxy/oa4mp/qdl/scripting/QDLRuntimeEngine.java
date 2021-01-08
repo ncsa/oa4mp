@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowStates2;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowType;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ScriptRuntimeEngineFactory;
@@ -25,18 +26,20 @@ import edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRuntimeEngine;
 import net.sf.json.JSON;
 import net.sf.json.JSONObject;
+import org.apache.commons.codec.binary.Base64;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;
-import java.io.StringReader;
-import java.io.StringWriter;
+import java.io.*;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowType.*;
 import static edu.uiuc.ncsa.qdl.variables.StemVariable.STEM_INDEX_MARKER;
@@ -49,11 +52,10 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
     public static String CONFIG_TAG = "qdl";
     public static String SCRIPTS_TAG = "scripts";
 
-    public QDLRuntimeEngine(QDLEnvironment qe) {
+    public QDLRuntimeEngine(QDLEnvironment qe, OA2ServiceTransaction transaction) {
         this.qe = qe;
-        init();
+        init(transaction);
         setInitialized(false);
-
     }
 
     @Override
@@ -61,11 +63,13 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         return (OA2State) state; // only thing it can create
     }
 
+/*
     public QDLRuntimeEngine(QDLEnvironment qe, JSONObject config) {
         this.qe = qe;
         init();
         setInitialized(true);
     }
+*/
 
     public QDLEnvironment getQE() {
         return qe;
@@ -90,21 +94,18 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
      * The assumption is that this is handed the qdl config object and can start pulling it apart at
      * that level.
      */
-    protected void init() {
-//        setScriptSet(QDLJSONConfigUtil.readScriptSet(config));  // <- old way
-        //setScriptSet(AnotherJSONUtil.createScripts(config)); // <- new way
-/*
-        SymbolStack stack = new SymbolStack();
-        state = new OA2State(ImportManager.getResolver(),
-                stack,
-                new OpEvaluator(),
-                MetaEvaluator.getInstance(),
-                new FunctionTable(),
-                new ModuleMap(),
-                null, // no logging at least for now
-                qe.isServerModeOn());// enable/disable server mode. Generally enable it in production.
-*/
+    protected void init(OA2ServiceTransaction transaction) {
         state = (OA2State) StateUtils.newInstance();
+        if (transaction.hasScriptState()) {
+            try {
+                deserializeState(transaction.getScriptState());
+            }catch(Throwable t){
+                DebugUtil.trace(this, "Could not deserialize stored transaction state:" + t.getMessage());
+                if(getState().getOa2se() != null){
+                    getState().getOa2se().getMyLogger().warn("Could not deserialize stored transaction state:" + t.getMessage());
+                }
+            }
+        }
         state.setServerMode(qe.isServerModeOn());
         state.getOpEvaluator().setNumericDigits(qe.getNumericDigits());
         state.setScriptPaths(qe.getScriptPath());  // Be sure script paths are read.
@@ -127,7 +128,17 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
             XMLStreamWriter xsw = xof.createXMLStreamWriter(w);
 
             state.toXML(xsw);
-            return XMLUtils.prettyPrint(w.toString());
+            String xml2 = XMLUtils.prettyPrint(w.toString()); // We do this because whitespace matters. This controls it.
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            GZIPOutputStream gzipOutputStream = new GZIPOutputStream(baos);
+            gzipOutputStream.write(xml2.getBytes("UTF-8"));
+            gzipOutputStream.flush();
+            gzipOutputStream.close();
+            xsw.close();
+            return Base64.encodeBase64String(baos.toByteArray());
+
+
+//            return XMLUtils.prettyPrint(w.toString());
             // Old way:
             //   return StateUtils.saveb64(state);
         } catch (Throwable e) {
@@ -142,11 +153,34 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
     public void deserializeState(String rawState) {
         if (rawState == null || rawState.isEmpty()) return;
         try {
-            StringReader reader = new StringReader(rawState);
+            byte[] xx = Base64.decodeBase64(rawState);
+            ByteArrayInputStream bais = new ByteArrayInputStream(xx);
+            // Reconstruct the XML as a string, preserving whitespace.
+            GZIPInputStream gzipInputStream = new GZIPInputStream(bais, 65536);
+            Reader r = new InputStreamReader(gzipInputStream);
+/*
+            Debug stuff to recreate the XML exactly and print it out. Otherwise it is
+            squirreled away inside a zgip stream someplace.
+*/
+/*
+            BufferedReader br = new BufferedReader(r);
+            StringBuffer stringBuffer = new StringBuffer();
+            String lineIn = br.readLine();
+            while(lineIn != null){
+                stringBuffer.append(lineIn + "\n");
+                System.out.println(lineIn);
+                lineIn = br.readLine();
+            }
+            DebugUtil.trace(this, "De-zipped XML:\n" + stringBuffer.toString());
+            StringReader reader = new StringReader(stringBuffer.toString());
+*/
             XMLInputFactory xmlif = XMLInputFactory.newInstance();
-            XMLEventReader xer = xmlif.createXMLEventReader(reader);
-            state = (OA2State) StateUtils.newInstance();
-            state.fromXML(xer,null); // No XProperties in serialization.
+            XMLEventReader xer = xmlif.createXMLEventReader(r);
+            // Moar debug, if using the string, replace preceeding line with this.
+            // XMLEventReader xer = xmlif.createXMLEventReader(reader);
+            // state = (OA2State) StateUtils.newInstance();
+            state.fromXML(xer, null); // No XProperties in serialization.
+            xer.close();
             // Old way
             // this.state = (OA2State) StateUtils.loadb64(state);
         } catch (Throwable e) {
@@ -232,6 +266,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
      * @param req
      */
     protected void setupState(ScriptRunRequest req) {
+
         state.getSymbolStack().setValue(Scripts.EXEC_PHASE, req.getAction()); // set what is being executed
 
         state.getSymbolStack().setValue(SYS_ERR_VAR, new StemVariable()); // just an empty one.
@@ -456,7 +491,14 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
             }
             respMap.put(SRE_TX_REQ_RESOURCES, zz);
         }
-
+        try {
+            state.getTransaction().setScriptState(serializeState());
+        }catch(Throwable t){
+            DebugUtil.trace(this, "Could not serialize stored transaction state:" + t.getMessage());
+            if(getState().getOa2se() != null){
+                getState().getOa2se().getMyLogger().warn("Could not serialize stored transaction state:" + t.getMessage());
+            }
+        }
         //runResponse.
         return new ScriptRunResponse("ok", respMap, ScriptRunResponse.RC_OK);
     }

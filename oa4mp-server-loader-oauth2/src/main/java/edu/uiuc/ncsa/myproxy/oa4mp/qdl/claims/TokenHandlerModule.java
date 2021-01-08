@@ -1,6 +1,5 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.OA2State;
 import edu.uiuc.ncsa.qdl.extensions.JavaModule;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
 import edu.uiuc.ncsa.qdl.module.Module;
@@ -25,8 +24,6 @@ public class TokenHandlerModule extends JavaModule {
     public Module newInstance(State state) {
         TokenHandlerModule thm = new TokenHandlerModule(URI.create("oa2:/qdl/oidc/token"), "tokens");
         ArrayList<QDLFunction> funcs = new ArrayList<>();
-        OA2State oa2State = (OA2State) state;
-
         IDTokenInitializer ida = new IDTokenInitializer();
         funcs.add(ida.new idInit());
         funcs.add(ida.new idFinish());

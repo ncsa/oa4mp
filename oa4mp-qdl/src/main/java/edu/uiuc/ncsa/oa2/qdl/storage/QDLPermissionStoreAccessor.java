@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.oa2.qdl.storage;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionsStore;
 import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 
 import java.util.List;
 
@@ -10,8 +11,8 @@ import java.util.List;
  * on 12/23/20 at  7:57 AM
  */
 public class QDLPermissionStoreAccessor extends QDLStoreAccessor {
-    public QDLPermissionStoreAccessor(String accessorType, PermissionsStore store) {
-        super(accessorType, store);
+    public QDLPermissionStoreAccessor(String accessorType, PermissionsStore store, MyLoggingFacade facade) {
+        super(accessorType, store, facade);
     }
     protected PermissionsStore getPStore(){return ((PermissionsStore)store);}
     public List<Identifier> getClients(Identifier adminID){

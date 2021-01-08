@@ -219,6 +219,10 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         }
     }
 
+    public boolean hasScriptState(){
+        return getState().containsKey(SCRIPT_STATE_KEY);
+
+    }
     public String getScriptState() {
         if (getState().containsKey(SCRIPT_STATE_KEY)) {
             return getState().getString(SCRIPT_STATE_KEY);

@@ -8,7 +8,6 @@ import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
 import edu.uiuc.ncsa.qdl.extensions.QDLVariable;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
-import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
@@ -23,7 +22,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
+
 /**
+ * The class with the inner classes that do all the work here.
  * <p>Created by Jeff Gaynor<br>
  * on 12/18/20 at  7:05 AM
  */
@@ -70,7 +72,6 @@ public class StoreFacade implements Serializable {
     }
 
     protected void init(String configFile, String cfgName) {
-
         try {
             setConfigurationNode(ConfigUtil.findConfiguration(configFile, cfgName, "service"));
         } catch (Exception x) {
@@ -97,6 +98,9 @@ public class StoreFacade implements Serializable {
     String file = null;
     String cfgName = null;
     String storeType = null;
+    String FILE_ARG = "file";
+    String NAME_ARG = "name";
+    String TYPE_ARG = "type";
 
     public class InitMethod implements QDLFunction {
         @Override
@@ -117,30 +121,27 @@ public class StoreFacade implements Serializable {
                     throw new IllegalArgumentException("Error: A single argument must be a stem.");
                 }
                 StemVariable stem = (StemVariable) objects[0];
-                file = stem.getString("file");
-                cfgName = stem.getString("name");
+                file = stem.getString(FILE_ARG);
+                cfgName = stem.getString(NAME_ARG);
+                storeType = stem.getString(TYPE_ARG);
             }
+
             if (objects.length == 3) {
+                for (int j = 0; j < objects.length; j++) {
+                    if (!(objects[j] instanceof String)) {
+                        throw new IllegalArgumentException("Error: argument " + j + " must be a string.");
+                    }
+                }
                 file = (String) objects[0];
                 cfgName = (String) objects[1];
                 storeType = (String) objects[2];
             }
-
-            if (file == null || cfgName == null || storeType == null) {
+            // Implicit case of zero args is here too.
+            if (isTrivial(file) || isTrivial(cfgName) || isTrivial(storeType)) {
                 throw new IllegalArgumentException("Error: Missing argument");
             }
 
-            init(file, cfgName);
-            try {
-                storeAccessor = createAccessor(storeType);
-            } catch (Exception x) {
-                // If loading the store blows up,
-                throw new QDLException("Error loading store: for file " + file + ", config " + cfgName + ", type " + storeType);
-            }
-            if (storeAccessor == null) {
-                // If there is no such store.
-                throw new QDLException("Error loading store: for file " + file + ", config " + cfgName + ", type " + storeType);
-            }
+            doSetup();
             return true;
         }
 
@@ -186,6 +187,24 @@ public class StoreFacade implements Serializable {
         }
     }
 
+    protected void doSetup() {
+        if(isTrivial(file) || isTrivial(cfgName) || isTrivial(storeType)){
+            // case is that init is not called. This should be benign at this point.
+            return;
+        }
+        init(file, cfgName);
+        try {
+            setStoreAccessor(createAccessor(storeType));
+        } catch (Exception x) {
+            // If loading the store blows up,
+            throw new QDLException("Error loading store: for file " + file + ", config " + cfgName + ", type " + storeType);
+        }
+        if (storeAccessor == null) {
+            // If there is no such store.
+            throw new QDLException("Error loading store: for file " + file + ", config " + cfgName + ", type " + storeType);
+        }
+    }
+
     /**
      * Thanks to the vagaraies of Java non-static inner class inheritence, it is just best if this
      * livesin the encloising class and is called. That means it can be easily (and predictably) overridden.
@@ -199,25 +218,25 @@ public class StoreFacade implements Serializable {
         switch (storeType) {
 
             case STORE_TYPE_ADMIN_CLIENT_STORE:
-                storeAccessor = new QDLStoreAccessor(storeType, getEnvironment().getAdminClientStore());
+                storeAccessor = new QDLStoreAccessor(storeType, getEnvironment().getAdminClientStore(), getEnvironment().getMyLogger());
                 storeAccessor.setMapConverter(new AdminClientStemMC(getEnvironment().getAdminClientStore().getMapConverter()));
                 break;
             case STORE_TYPE_CLIENT:
-                storeAccessor = new QDLStoreAccessor(storeType, getEnvironment().getClientStore());
+                storeAccessor = new QDLStoreAccessor(storeType, getEnvironment().getClientStore(), getEnvironment().getMyLogger());
                 storeAccessor.setMapConverter(new ClientStemMC(getEnvironment().getClientStore().getMapConverter()));
                 break;
             case STORE_TYPE_APPROVALS:
-                storeAccessor = new QDLStoreAccessor(storeType, getEnvironment().getClientApprovalStore());
+                storeAccessor = new QDLStoreAccessor(storeType, getEnvironment().getClientApprovalStore(), getEnvironment().getMyLogger());
                 MapConverter mc = getEnvironment().getClientApprovalStore().getMapConverter();
 
                 storeAccessor.setMapConverter(new ApprovalStemMC(mc));
                 break;
             case STORE_TYPE_TRANSACTION:
-                storeAccessor = new QDLStoreAccessor(storeType, (Store) getEnvironment().getTransactionStore());
+                storeAccessor = new QDLStoreAccessor(storeType, (Store) getEnvironment().getTransactionStore(), getEnvironment().getMyLogger());
                 storeAccessor.setMapConverter(new TransactionStemMC((getEnvironment().getTransactionStore()).getMapConverter(), getEnvironment().getClientStore()));
                 break;
             case STORE_TYPE_TX_STORE:
-                storeAccessor = new QDLStoreAccessor(storeType, getEnvironment().getTxStore());
+                storeAccessor = new QDLStoreAccessor(storeType, getEnvironment().getTxStore(), getEnvironment().getMyLogger());
                 storeAccessor.setMapConverter(new TXRStemMC(getEnvironment().getTxStore().getMapConverter()));
                 break;
 
@@ -303,7 +322,11 @@ public class StoreFacade implements Serializable {
         return storeAccessor;
     }
 
-    transient QDLStoreAccessor storeAccessor;
+    public void setStoreAccessor(QDLStoreAccessor storeAccessor) {
+        this.storeAccessor = storeAccessor;
+    }
+
+    protected transient QDLStoreAccessor storeAccessor;
     protected String CREATE_NAME = "create";
 
     public class Create implements QDLFunction {
@@ -395,8 +418,16 @@ public class StoreFacade implements Serializable {
                 throw new IllegalArgumentException("Error: The argument must be a stem variable");
             }
             StemVariable stemVariable = (StemVariable) objects[0];
-            getStoreAccessor().update(stemVariable);
-            return Boolean.TRUE;
+            List<Boolean> out = getStoreAccessor().saveOrUpdate(stemVariable, false);
+            if (out.size() == 0) {
+                return Boolean.FALSE;
+            }
+            if (out.size() == 1) {
+                return out.get(0);
+            }
+            StemVariable stemVariable1 = new StemVariable();
+            stemVariable1.addList(out);
+            return stemVariable1;
         }
 
         @Override
@@ -431,9 +462,16 @@ public class StoreFacade implements Serializable {
                 throw new IllegalArgumentException("Error: The argument must be a stem variable");
             }
             StemVariable stemVariable = (StemVariable) objects[0];
-            getStoreAccessor().save(stemVariable);
-
-            return Boolean.TRUE;
+            List<Boolean> out = getStoreAccessor().saveOrUpdate(stemVariable, true);
+            if (out.size() == 0) {
+                return Boolean.FALSE;
+            }
+            if (out.size() == 1) {
+                return out.get(0);
+            }
+            StemVariable stemVariable1 = new StemVariable();
+            stemVariable1.addList(out);
+            return stemVariable1;
         }
 
 
@@ -531,12 +569,20 @@ public class StoreFacade implements Serializable {
 
         @Override
         public int[] getArgCount() {
-            return new int[]{0};
+            return new int[]{0, 1};
         }
 
         @Override
         public Object evaluate(Object[] objects, State state) {
-            checkInit();
+            //checkInit();
+
+            if(objects.length == 1){
+                if((objects[0] instanceof Boolean)){
+                    if((Boolean)objects[0]) {
+                        return getStoreAccessor().getStoreKeys().identifier();
+                    }
+                }
+            }
             return getStoreAccessor().listKeys();
         }
 
@@ -569,13 +615,24 @@ public class StoreFacade implements Serializable {
             if (objects.length != 1) {
                 throw new IllegalArgumentException("Error: You must specify an identifier for " + REMOVE_NAME);
             }
-            if (!(objects[0] instanceof String)) {
+            String id = null;
+            if (objects[0] instanceof String) {
+                id = (String) objects[0];
+            }
+            if (objects[0] instanceof StemVariable) {
+                StemVariable stemVariable = (StemVariable) objects[0];
+                if (stemVariable.containsKey(getStoreAccessor().getStoreKeys().identifier())) {
+                    id = (String) stemVariable.get(getStoreAccessor().getStoreKeys().identifier());
+                } else {
+                    throw new IllegalArgumentException("Error: The stem does not contain the key \"" + getStoreAccessor().getStoreKeys().identifier() + "\", hence there is no unique identifier given.");
+                }
+            }
+            if (isTrivial(id)) {
                 throw new IllegalArgumentException("Error: argument must be a string for " + REMOVE_NAME);
             }
 
             try {
-                Identifier id = BasicIdentifier.newID(objects[0].toString());
-                return getStoreAccessor().remove(id);
+                return getStoreAccessor().remove(BasicIdentifier.newID(id));
             } catch (Throwable e) {
                 throw new QDLException("Error: Could not remove object with id " + objects[0] + ":" + e.getMessage());
             }
@@ -640,7 +697,7 @@ public class StoreFacade implements Serializable {
                 s.append(STORE_TYPE_TX_STORE + " for tokens created by the exchange endpoint (RFC 8693)\n");
                 s.append(STORE_TYPE_TRANSACTION + " for pending transactions.\n");
                 s.append("There is a list of these in the variable " + STORE_TYPES_STEM_NAME + " \n");
-                s.append("\n" + "Every store allows for the following commands (online help is available for these in teh workspace\n");
+                s.append("\n" + "Every store allows for the following commands (online help is available for these in the workspace\n");
                 s.append("using e.g.\n");
                 s.append("\n)help p_store#init\n");
                 s.append("\n" + FROM_XML_NAME + " Take and object's XML serialization (as a string, e.g. in a file) and convert to a stem.\n");

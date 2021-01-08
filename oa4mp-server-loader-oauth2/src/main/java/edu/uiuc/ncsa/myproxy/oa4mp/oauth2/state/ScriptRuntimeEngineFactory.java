@@ -29,7 +29,7 @@ public class ScriptRuntimeEngineFactory {
             oa2SE.getMyLogger().warn("No QDL scripts will be run.");
             oa2SE.getMyLogger().warn("**********************************");
         } else {
-            QDLRuntimeEngine qrt = new QDLRuntimeEngine(oa2SE.getQDLEnvironment());
+            QDLRuntimeEngine qrt = new QDLRuntimeEngine(oa2SE.getQDLEnvironment(), transaction);
             OA2State state = qrt.getState();
             state.setOa2se(oa2SE);
             state.setTransaction(transaction);

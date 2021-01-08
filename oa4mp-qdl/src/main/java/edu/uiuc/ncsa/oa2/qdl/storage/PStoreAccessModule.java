@@ -13,6 +13,7 @@ import java.util.List;
  */
 public class PStoreAccessModule extends StoreAccessModule {
     public PStoreAccessModule() {
+        System.out.println("in pstore SAM constructor");
     }
 
     public PStoreAccessModule(URI namespace, String alias) {
@@ -22,16 +23,20 @@ public class PStoreAccessModule extends StoreAccessModule {
     @Override
     public Module newInstance(State state) {
         PStoreAccessModule storeAccessModule = new PStoreAccessModule(URI.create("oa2:/qdl/p_store"), "p_store");
-        PermissionStoreFacade permissionStoreFacade = new PermissionStoreFacade();
-        doIt(storeAccessModule, permissionStoreFacade, state);
+        storeAccessModule.storeFacade = newStoreFacade();
+        doIt(storeAccessModule, state);
         return storeAccessModule;
     }
 
     @Override
-    protected List<QDLFunction> createFList(StoreFacade configuredStoreFacade) {
-        List<QDLFunction> functions =
-                super.createFList(configuredStoreFacade);
-        PermissionStoreFacade permissionStoreFacade = (PermissionStoreFacade) configuredStoreFacade;
+    public StoreFacade newStoreFacade() {
+        return new PermissionStoreFacade();
+    }
+
+    @Override
+    protected List<QDLFunction> createFList(StoreFacade sf) {
+        List<QDLFunction> functions = super.createFList(sf);
+        PermissionStoreFacade permissionStoreFacade = (PermissionStoreFacade) sf;
         functions.add(permissionStoreFacade.new ClientCount());
         functions.add(permissionStoreFacade.new GetAdmins());
         functions.add(permissionStoreFacade.new GetClients());
