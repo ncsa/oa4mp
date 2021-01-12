@@ -155,9 +155,8 @@ public abstract class StoreCommands2 extends StoreCommands {
     }
 
     /**
-     * Prints a restricted set of keys from the fiorst argument. Note that a missing
-     * or empty subset means print everything. Also note that this ignores unknown keys
-     * so it will print out only keys it has and are in the subset.
+     * Prints a restricted set of keys from the first argument. Note that a missing
+     * or empty subset means print everything.
      *
      * @param identifiable
      * @param keySubset
@@ -167,38 +166,16 @@ public abstract class StoreCommands2 extends StoreCommands {
     protected int longFormat(Identifiable identifiable, List<String> keySubset, boolean isVerbose) {
         XMLMap map = new XMLMap();
         getStore().getXMLConverter().toMap(identifiable, map);
-
-        TreeMap<String, Object> tMap = new TreeMap<>();
-        if (keySubset == null || keySubset.isEmpty()) {
-            tMap.putAll(map);
-        } else {
-            // do a subset
-            for (String k : keySubset) {
-                if (map.containsKey(k)) {
-                    tMap.put(k, map.get(k));
-                }
-            }
+        List<String> outputList = StringUtils.formatMap(map,
+                keySubset,
+                true,
+                isVerbose,
+                indentWidth(),
+                display_width);
+        for(String x : outputList){
+            say(x);
         }
-        int width = 0;
-        for (String key : tMap.keySet()) {
-            width = Math.max(width, key.length());
-        }
-        // Use the order of the tmap (so its sorted) but the XMLMap has information we need to get these.
-        for (String key : tMap.keySet()) {
-            String v = map.getString(key);
-            if (!StringUtils.isTrivial(v)) {
-                try {
-                    // Check if its JSON.
-                    JSON json = JSONSerializer.toJSON(v);
-                    v = json.toString(1);
-                } catch (Throwable t) {
-
-                }
-                say(formatLongLine(key, v, width, isVerbose));
-            }
-
-        }
-        return width;
+        return 0;
     }
 
     protected int longFormat(Identifiable identifiable, boolean isVerbose) {

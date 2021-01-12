@@ -84,8 +84,8 @@ public class OA2State extends State {
     }
 
     @Override
-    public void additionalFromXML(XMLEvent xe, XMLEventReader xer) throws XMLStreamException {
-        super.additionalFromXML(xe, xer);
+    public void readExtraXMLElements(XMLEvent xe, XMLEventReader xer) throws XMLStreamException {
+        super.readExtraXMLElements(xe, xer);
         switch (xe.asStartElement().getName().getLocalPart()) {
             case QDLXMLConstants.TX_RECORD:
                 txRecord = new TXRecord(null);
@@ -96,8 +96,8 @@ public class OA2State extends State {
     }
 
     @Override
-    public void additionalToXML(XMLStreamWriter xsw) throws XMLStreamException {
-        super.additionalToXML(xsw);
+    public void writeExtraXMLElements(XMLStreamWriter xsw) throws XMLStreamException {
+        super.writeExtraXMLElements(xsw);
         if(txRecord != null){
             txRecord.toXML(xsw);
         }

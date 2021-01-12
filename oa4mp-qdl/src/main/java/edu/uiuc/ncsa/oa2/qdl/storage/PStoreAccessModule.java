@@ -13,7 +13,6 @@ import java.util.List;
  */
 public class PStoreAccessModule extends StoreAccessModule {
     public PStoreAccessModule() {
-        System.out.println("in pstore SAM constructor");
     }
 
     public PStoreAccessModule(URI namespace, String alias) {

@@ -15,9 +15,7 @@ import java.util.List;
  * on 12/23/20 at  8:31 AM
  */
 public class PermissionStoreFacade extends StoreFacade {
-    public PermissionStoreFacade() {
-        System.out.println("in constructor");
-    }
+
 
     protected QDLPermissionStoreAccessor getPS() {
         return (QDLPermissionStoreAccessor) getStoreAccessor();

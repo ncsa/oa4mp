@@ -384,7 +384,7 @@ public class StoreFacade implements Serializable {
             try {
                 return getStoreAccessor().get(BasicIdentifier.newID(objects[0].toString()));
             } catch (Throwable t) {
-                throw new QDLException("Error: Could not find the client with id \"" + objects[0].toString() + "\"");
+                throw new QDLException("Error: Could not find the object with id \"" + objects[0].toString() + "\"");
             }
         }
 

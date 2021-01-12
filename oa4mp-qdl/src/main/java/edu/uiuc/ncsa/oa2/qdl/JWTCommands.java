@@ -122,13 +122,13 @@ public class JWTCommands implements Serializable {
         public List<String> getDocumentation(int argCount) {
             List<String> doc = new ArrayList<>();
             switch (argCount) {
-                case 1:
+                case 0:
                     doc.add(getName() + "() - create a set of JSON WebKeys and sets the current set of web keys.");
                     break;
-                case 2:
+                case 1:
                     doc.add(getName() + "(file_name) - create a set of JSON WebKeys, sets this to the current set and writes them to the given file.");
                     break;
-                case 3:
+                case 2:
                     doc.add(getName() + "(file_name, true|false) - create a set of JSON WebKeys, writes them to the given file.");
                     doc.add("If the second argument is true, the current active set of keys is replaced.");
                     break;
