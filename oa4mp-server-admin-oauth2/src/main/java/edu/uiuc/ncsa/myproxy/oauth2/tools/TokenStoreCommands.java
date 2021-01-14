@@ -24,7 +24,7 @@ public class TokenStoreCommands extends StoreCommands2 {
 
     @Override
     public String getName() {
-        return "tokens";
+        return "  tokens";
     }
 
     @Override

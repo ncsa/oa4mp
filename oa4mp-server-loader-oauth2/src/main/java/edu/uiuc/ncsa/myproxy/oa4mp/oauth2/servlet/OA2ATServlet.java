@@ -377,7 +377,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "token exchange access denied", HttpStatus.SC_UNAUTHORIZED);
         }
         /*
-           Earth shaking change is that we need to create a new transaction for each exchange since the tokens
+           Earth shaking change is that we need to create a new token exchange record for each exchange since the tokens
            have a lifetime and lifecycle of their own. Once in the wild, people may come back to this
            service and swap them willy nilly.
          */
@@ -388,6 +388,10 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         if (!audience.isEmpty()) {
             newTXR.setAudience(audience);
         }
+        if (!scopes.isEmpty()) {
+            newTXR.setScopes(scopes);
+        }
+
         if (!resources.isEmpty()) {
             // convert to URIs
             ArrayList<URI> r = new ArrayList<>();
@@ -458,6 +462,10 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             rfcClaims.put(OA2Constants.REFRESH_TOKEN, rtiResponse.getRefreshToken().getToken()); // Optional
         } else {
             rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getAccessToken().getToken()); // Required.
+            // create scope string  Remember that these may have been changed by a script,
+            // so here is the right place to set it.
+            rfcClaims.put(OA2Constants.SCOPE, scopesToString(newTXR.getScopes()));
+
         }
         /*
          Important note: In the RFC 8693 spec., access_token MUST be returned, however, it explains that this
@@ -476,6 +484,10 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         // TODO -- figure out scopes for SciTokens. These are optional if they are the same as the scope parameter (or parameter omitted).
         // Issue is that OIDC client scopes do not alter the access token. SciToken scopes, however, do.
         // handle OIDC clients:
+  /*    // The aim of the next block was to massage the scopes stored in  the client and update them
+        // as requests come in. This changed so that all requests are evaluated against the stored scopes
+        // and resolved against them (since they are apt to be gotten live from, e.g., LDAP so we do
+        // not actually control them, we just read what's there.
         if (client.isOIDCClient() && 0 < scopes.size()) {
             // OIDC client
             Collection<String> newScopes = OA2AuthorizedServletUtil.intersection(scopes, client.getScopes());
@@ -499,9 +511,10 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
                 //  client.setScopes(newScopes);
                 rfcClaims.put(OA2Constants.SCOPE, requestedScopes);
                 newTXR.setScopes(newScopes); // Store even if empty to show that.
-
             }
         }
+
+   */
         // The other components (access, refresh token) have responses that handle setting the encoding and
         // char type. We have to set it manually here.
         response.setContentType("application/json;charset=UTF-8");
@@ -987,5 +1000,22 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             throw new OA2GeneralError(OA2Errors.INVALID_GRANT, "The token is invalid.", HttpStatus.SC_BAD_REQUEST);
         }
         return transaction;
+    }
+
+    protected String scopesToString(List<String> scopes) {
+        String requestedScopes = "";
+        if(scopes == null | scopes.isEmpty()){
+            return requestedScopes;
+        }
+        boolean firstPass = true;
+        for (String x : scopes) {
+            if (firstPass) {
+                firstPass = false;
+                requestedScopes = x;
+            } else {
+                requestedScopes = requestedScopes + " " + x;
+            }
+        }
+        return requestedScopes;
     }
 }

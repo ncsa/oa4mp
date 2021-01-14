@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.client.ClientEnvironment;
 import edu.uiuc.ncsa.myproxy.oa4mp.client.OA4MPService;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.delegation.client.request.*;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.delegation.token.*;
@@ -326,11 +327,14 @@ public class OA2MPService extends OA4MPService {
         return exchangeIt(asset, parameterMap);
     }
 
-    public JSONObject exchangeAccessToken(OA2Asset asset, AccessToken accessToken) {
+    public JSONObject exchangeAccessToken(OA2Asset asset, String scopes, AccessToken accessToken) {
         HashMap<String, String> parameterMap = new HashMap<>();
         parameterMap.put(SUBJECT_TOKEN, accessToken.getToken());
         parameterMap.put(SUBJECT_TOKEN_TYPE, ACCESS_TOKEN_TYPE);
         parameterMap.put(REQUESTED_TOKEN_TYPE, ACCESS_TOKEN_TYPE);
+        if(!StringUtils.isTrivial(scopes)){
+            parameterMap.put(SCOPE, scopes);
+        }
         return exchangeIt(asset, parameterMap);
     }
 

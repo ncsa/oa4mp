@@ -23,6 +23,7 @@ import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.AUTHORIZATION_TIME;
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.NONCE;
 import static edu.uiuc.ncsa.security.oauth_2_0.jwt.ScriptingConstants.*;
 import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.*;
+import static edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse.*;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -190,7 +191,8 @@ public class IDTokenHandler extends AbstractPayloadHandler {
         }
         if (transaction.hasAuthTime()) {
             // convert the date to a time if needed.
-            getClaims().put(AUTHORIZATION_TIME, Long.toString(transaction.getAuthTime().getTime() / 1000));
+            // Fix CIL-906
+            getClaims().put(AUTHORIZATION_TIME, transaction.getAuthTime().getTime() / 1000); // spec says this is an integer
         }
         refreshAccountingInformation();
     }
@@ -202,11 +204,11 @@ public class IDTokenHandler extends AbstractPayloadHandler {
         req.getArgs().put(SRE_REQ_CLAIM_SOURCES, getSources()); // so its a map
         req.getArgs().put(SRE_REQ_EXTENDED_ATTRIBUTES, getExtendedAttributes()); // so its a map
     }
-
+   int responseCode = RC_NOT_RUN;
     @Override
     public void handleResponse(ScriptRunResponse resp) throws Throwable {
         switch (resp.getReturnCode()) {
-            case ScriptRunResponse.RC_OK:
+            case RC_OK:
                 // Note that the returned values from a script are very unlikely to be the same object we sent
                 // even if the contents are the same, since scripts may have to change these in to other data structures
                 // to make them accessible to their machinery, then convert them back.
@@ -217,8 +219,9 @@ public class IDTokenHandler extends AbstractPayloadHandler {
                 transaction.setClaimsSources(sources);
                 extendedAttributes = (JSONObject) resp.getReturnedValues().get(SRE_REQ_EXTENDED_ATTRIBUTES);
                 // Note that as per our contract, extended attributes are not updateable.
+                responseCode = RC_OK;
                 return;
-            case ScriptRunResponse.RC_NOT_RUN:
+            case RC_NOT_RUN:
                 return;
 
         }
@@ -280,7 +283,7 @@ public class IDTokenHandler extends AbstractPayloadHandler {
     @Override
     public void saveState() throws Throwable {
         DebugUtil.trace(this, ".saveState: claims = " + getClaims().toString(2));
-        if (transaction != null && oa2se != null) {
+        if (transaction != null && oa2se != null && responseCode==RC_OK) {
             transaction.setUserMetaData(getClaims());
             transaction.setClaimsSources(getSources());
             oa2se.getTransactionStore().save(transaction);

@@ -28,6 +28,9 @@
 
 /* **** Actual script **** */
 script_load('utils/init.qdl');
+            claims.eppn := 'jim.basney@ligo.org';
+            claims.idp := idp.ligo;
+            
 if[
      claims.idp != idp.ligo
 ][

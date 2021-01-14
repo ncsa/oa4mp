@@ -25,6 +25,8 @@ import java.util.*;
 import static edu.uiuc.ncsa.security.core.util.DebugUtil.trace;
 import static edu.uiuc.ncsa.security.oauth_2_0.jwt.ScriptingConstants.*;
 import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.*;
+import static edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse.RC_NOT_RUN;
+import static edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse.RC_OK;
 
 /**
  * Only create an access token handler if you need some special handling, otherwise the
@@ -74,10 +76,12 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
         req.getArgs().put(SRE_REQ_ACCESS_TOKEN, getAtData());
     }
 
+    int responseCode = RC_NOT_RUN;
+
     @Override
     public void handleResponse(ScriptRunResponse resp) throws Throwable {
         switch (resp.getReturnCode()) {
-            case ScriptRunResponse.RC_OK:
+            case RC_OK:
                 // Note that the returned values from a script are very unlikely to be the same object we sent
                 // even if the contents are the same, since scripts may have to change these in to other data structures
                 // to make them accessible to their machinery, then convert them back.
@@ -87,8 +91,9 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
                 extendedAttributes = (JSONObject) resp.getReturnedValues().get(SRE_REQ_EXTENDED_ATTRIBUTES);
 
                 setAtData((JSONObject) resp.getReturnedValues().get(SRE_REQ_ACCESS_TOKEN));
+                responseCode = RC_OK;
                 return;
-            case ScriptRunResponse.RC_NOT_RUN:
+            case RC_NOT_RUN:
                 return;
 
         }
@@ -132,7 +137,7 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
                     throw new IllegalStateException("Error: The client has no configured audiences and none were requested. Cannot resolve scopes.");
                 case 1:
                     // no audience requested and a single one is configured. Use that.
-                    if(requestedAudience == null){
+                    if (requestedAudience == null) {
                         requestedAudience = new ArrayList<>();
                     }
                     requestedAudience.add(getATConfig().getAudience().get(0));
@@ -177,7 +182,7 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
                 s = s + " " + x;
             }
         }
-        if(StringUtils.isTrivial(s)){
+        if (StringUtils.isTrivial(s)) {
             return null;
         }
         return s;
@@ -242,7 +247,7 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
         if (transaction.getAccessToken() != null) {
             atData.put(JWT_ID, transaction.getAccessToken().getToken());
         }
-        if(doTemplates) {
+        if (doTemplates) {
             String scopes = resolveTemplates();
             if (scopes != null) {
                 atData.put(OA2Constants.SCOPE, scopes);
@@ -251,6 +256,7 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
         setAtData(atData);
 
     }
+
     @Override
     public void finish() throws Throwable {
         finish(true);
@@ -274,17 +280,23 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
          Special case: If the claim has a single entry then that is the raw token. Return that. This allows
          handlers in QDL to decide not to return a JWT and just return a standard identifier.
           */
-         if(getAtData().size() == 1){
-             String k = String.valueOf(getAtData().keySet().iterator().next());
-             String v = String.valueOf(getAtData().get(k));
-             oa2se.info("Single value access token for client \"" + transaction.getOA2Client().getIdentifierString() + "\" found. Setting token value to " + v);
-             AccessTokenImpl accessToken = new AccessTokenImpl(URI.create(v));
-             return accessToken;
-         }
+        if (getAtData().size() == 1) {
+            String k = String.valueOf(getAtData().keySet().iterator().next());
+            String v = String.valueOf(getAtData().get(k));
+            oa2se.info("Single value access token for client \"" + transaction.getOA2Client().getIdentifierString() + "\" found. Setting token value to " + v);
+            AccessTokenImpl accessToken = new AccessTokenImpl(URI.create(v));
+            return accessToken;
+        }
+        if (!getAtData().containsKey(JWT_ID)) {
+            // There is something wrong. This is required.
+            throw new IllegalStateException("Error: no JTI. Cannot create access token");
+        }
         try {
             String at = JWTUtil2.createJWT(getAtData(), key);
-            URI x = URI.create(at);
-            return new AccessTokenImpl(x);
+            URI jti = URI.create(getAtData().getString(JWT_ID));
+            AccessTokenImpl at0 = new AccessTokenImpl(at, jti);
+            at0.setLifetime(getAtData().getLong(EXPIRATION) - getAtData().getLong(ISSUED_AT));
+            return at0;
         } catch (Throwable e) {
             if (e instanceof RuntimeException) {
                 throw (RuntimeException) e;
@@ -298,7 +310,7 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
     @Override
     public void saveState() throws Throwable {
         DebugUtil.trace(this, ".saveState: claims = " + getClaims().toString(2));
-        if (transaction != null && oa2se != null) {
+        if (transaction != null && oa2se != null && responseCode == RC_OK) {
             transaction.setUserMetaData(getClaims());  // It is possible that the claims were updated. Save them.
             transaction.setATData(getAtData());
 

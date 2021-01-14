@@ -33,5 +33,5 @@ if[
    s := s + ' ' + 'write:/DQSegDB';
  ];
 
- access_token.scope := s;
+ access_token.scope := s + ' jeff:debug';
  access_token.aud := 'segments.ligo.org';

@@ -56,20 +56,25 @@ public class BasicRefreshTokenHandler extends AbstractPayloadHandler implements 
          Special case: If the claim has a single entry then that is the raw token. Return that. This allows
          handlers in QDL to decide not to return a JWT and just return a standard identifier.
           */
-         if(getRTData().size() == 1){
-             String k = String.valueOf(getRTData().keySet().iterator().next());
-             String v = String.valueOf(getRTData().get(k));
-             oa2se.info("Single value in refresh token for \"" + transaction.getOA2Client().getIdentifierString() + "\" found. Setting token value to " + v);
-             return new RefreshTokenImpl(URI.create(v));
-         }
+        if (getRTData().size() == 1) {
+            String k = String.valueOf(getRTData().keySet().iterator().next());
+            String v = String.valueOf(getRTData().get(k));
+            oa2se.info("Single value in refresh token for \"" + transaction.getOA2Client().getIdentifierString() + "\" found. Setting token value to " + v);
+            return new RefreshTokenImpl(URI.create(v));
+        }
+        if (!getRTData().containsKey(JWT_ID)) {
+            throw new IllegalStateException("Error: no " + JWT_ID + ". Cannot create refresh token");
+        }
         try {
             if (key == null) {
                 key = new JSONWebKey();
                 key.algorithm = JWTUtil2.NONE_JWT;
             }
             String at = JWTUtil2.createJWT(getRTData(), key);
-            URI x = URI.create(at);
-            return new RefreshTokenImpl(x);
+            URI jti = URI.create(getRTData().getString(JWT_ID));
+            RefreshTokenImpl rt0 = new RefreshTokenImpl(at, jti);
+            rt0.setLifetime(getRTData().getLong(EXPIRATION) - getRTData().getLong(ISSUED_AT));
+            return rt0;
         } catch (Throwable e) {
             if (e instanceof RuntimeException) {
                 throw (RuntimeException) e;
@@ -136,6 +141,6 @@ public class BasicRefreshTokenHandler extends AbstractPayloadHandler implements 
 
     @Override
     public void refreshAccountingInformation() {
-     setAccountingInformation();
+        setAccountingInformation();
     }
 }

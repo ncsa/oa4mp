@@ -184,10 +184,10 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
             // Old way
             // this.state = (OA2State) StateUtils.loadb64(state);
         } catch (Throwable e) {
+            DebugUtil.trace(this, "error deserializing state", e);
             if (e instanceof RuntimeException) {
                 throw (RuntimeException) e;
             }
-            e.printStackTrace();
             throw new QDLException("Error deserializing state", e);
         }
     }
@@ -251,14 +251,13 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
     protected String CLAIMS_VAR = "claims" + STEM_INDEX_MARKER;
     protected String ACCESS_TOKEN_VAR = "access_token" + STEM_INDEX_MARKER;
     protected String SCOPES_VAR = "scopes" + STEM_INDEX_MARKER;
-    protected String TX_SCOPES_VAR = "tx_scopes" + STEM_INDEX_MARKER;
     protected String EXTENDED_ATTRIBUTES_VAR = "xas" + STEM_INDEX_MARKER;
     protected String AUDIENCE_VAR = "audience" + STEM_INDEX_MARKER;
+    protected String TX_SCOPES_VAR = "tx_scopes" + STEM_INDEX_MARKER;
     protected String TX_AUDIENCE_VAR = "tx_audience" + STEM_INDEX_MARKER;
     protected String TX_RESOURCE_VAR = "tx_resource" + STEM_INDEX_MARKER;
     protected String CLAIM_SOURCES_VAR = "claim_sources" + STEM_INDEX_MARKER;
     protected String ACCESS_CONTROL = "access_control" + STEM_INDEX_MARKER;
-
 
     /**
      * This injects the values in the request in to the current state so they are available.
@@ -492,6 +491,23 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
             respMap.put(SRE_TX_REQ_RESOURCES, zz);
         }
         try {
+            // Don't serialize anything the system manages since that may cause confusion later.
+            cleanUpState(new String[]{
+                    SYS_ERR_VAR,
+                    TX_SCOPES_VAR,
+                    TX_AUDIENCE_VAR,
+                    TX_RESOURCE_VAR,
+                    CLAIMS_VAR,
+                    CLAIM_SOURCES_VAR,
+                    FLOW_STATE_VAR,
+                    SCOPES_VAR,
+                    EXTENDED_ATTRIBUTES_VAR,
+                    ACCESS_TOKEN_VAR,
+                    AUDIENCE_VAR,
+                    Scripts.EXEC_PHASE
+
+            });
+
             state.getTransaction().setScriptState(serializeState());
         }catch(Throwable t){
             DebugUtil.trace(this, "Could not serialize stored transaction state:" + t.getMessage());
@@ -501,5 +517,12 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         }
         //runResponse.
         return new ScriptRunResponse("ok", respMap, ScriptRunResponse.RC_OK);
+    }
+    protected void cleanUpState(String[] varNames){
+        for(String varName:varNames) {
+            if (state.isDefined(varName)) {
+                state.remove(varName);
+            }
+        }
     }
 }

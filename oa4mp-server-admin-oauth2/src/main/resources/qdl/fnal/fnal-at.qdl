@@ -33,21 +33,21 @@
 
 DEBUG := true; // always false on production.
 if[DEBUG][
-//
-/* Set up debug source from file for testing. */
-//  f. := new_template('file');
-//  f.file_path := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/test-claims.json';
-//  claims.eppn := 'jgaynor@fnal.gov';
-//  at_claims. := get_claims(f. , claims.eppn);
+   //
+   /* Set up debug source from file for testing. */
+   //  f. := new_template('file');
+   //  f.file_path := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/test-claims.json';
+   //  claims.eppn := 'jgaynor@fnal.gov';
+   //  at_claims. := get_claims(f. , claims.eppn);
 
-/* ********** These fake getting the claims and scopes from the user. ********** */
-    claims.eppn := 'swhite@fnal.gov';
-    claims.uid := 'swhite@fnal.gov';
-    scopes.0 := 'storage.create:/dune/';
-    //scopes.0 := 'storage.write:/dune/scratch/users/swhite';
-    scopes.1 :=  'storage.write:/dune/';
-    // Give an extra long scope so it has to resolve it.
-    scopes.2 := 'storage.create:/dune/scratch/users/swhite/temp';
+   /* ********** These fake getting the claims and scopes from the user. ********** */
+       claims.eppn := 'swhite@fnal.gov';
+       claims.uid := 'swhite@fnal.gov';
+       scopes.0 := 'storage.create:/dune/';
+       //scopes.0 := 'storage.write:/dune/scratch/users/swhite';
+       scopes.1 :=  'storage.write:/dune/';
+       // Give an extra long scope so it has to resolve it.
+       scopes.2 := 'storage.create:/dune/scratch/users/swhite/temp';
 ]; // end debug block
 
 if[

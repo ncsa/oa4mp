@@ -372,6 +372,20 @@ public class OA2CLCCommands extends CLCCommands {
 
     }
 
+    public void asset(InputLine inputLine) throws Exception {
+        if (showHelp(inputLine)) {
+            say("Show the current asset");
+
+            return;
+        }
+        if (getDummyAsset() == null) {
+            say("no asset");
+            return;
+        }
+        say(getDummyAsset().toJSON().toString(1));
+
+    }
+
     public void getat(InputLine inputLine) throws Exception {
         if (grant == null || showHelp(inputLine)) {
             getATHelp();
@@ -442,12 +456,14 @@ public class OA2CLCCommands extends CLCCommands {
         say(CertUtil.toPEM(assetResponse.getX509Certificates()));
 
     }
+
     public static final String NO_VERIFY_JWT = "-no_verify";
+
     protected void getRTHelp() {
-        say("getrt ["+ CLAIMS_FLAG  + " | " + NO_VERIFY_JWT + "]:");
+        say("getrt [" + CLAIMS_FLAG + " | " + NO_VERIFY_JWT + "]:");
         say("   Get a new refresh token. You must have already called getat to have gotten an access token");
         say("   first. This will print out a summary of the expiration time.");
-        say("   "+ CLAIMS_FLAG + " = the id token will be printed");
+        say("   " + CLAIMS_FLAG + " = the id token will be printed");
         say("   " + NO_VERIFY_JWT + " = do not verify JWTs against server. Default is to verify.");
 
     }
@@ -565,7 +581,7 @@ public class OA2CLCCommands extends CLCCommands {
         say("   Gets the access token and refresh token (if supported on the server) for a given grant. ");
         say("   Your must have already set the grant with the setgrant call.");
         say("   A summary of the refresh token and its expiration is printed, if applicable.");
-        say("   "+ CLAIMS_FLAG + " =  he id token will be printed");
+        say("   " + CLAIMS_FLAG + " =  he id token will be printed");
         say("   " + NO_VERIFY_JWT + " = do not verify JWTs against server. Default is to verify.");
 
     }
@@ -580,12 +596,18 @@ public class OA2CLCCommands extends CLCCommands {
         say("   that to get an access token.");
     }
 
+    public static String TX_SCOPES_FLAG = "-scope";
+
     protected void exchangeHelp() {
-        sayi("exchange [-at|-rt]");
+        sayi("exchange [-at|-rt] [" + TX_SCOPES_FLAG + " \"scope1 scope2 \"...]");
         sayi("   This will exchange the current access token (so you need to have gotten that far first)");
         sayi("   for a secure token. The response will contain other information that will be displayed.");
         sayi("   If there is no parameter, the current access token is used for the exchange");
         sayi("   Otherwise you may specify -at to exchange the access token or -rt to exchange using the refresh token.");
+        sayi(TX_SCOPES_FLAG + " = send these scopes along with the request. This is a blank delimited list");
+        say("E.g.");
+        sayi("exchange -at " + TX_SCOPES_FLAG + " \"read:/ligoDB\"");
+        say("Note: you can only specify scopes for the access token. They are ignored for refresh tokens");
     }
 
     JSONObject sciToken = null;
@@ -596,10 +618,15 @@ public class OA2CLCCommands extends CLCCommands {
             return;
         }
         boolean didIt = false;
+        String scopes = null;
+        if (inputLine.hasArg(TX_SCOPES_FLAG)) {
+            inputLine.removeSwitchAndValue(TX_SCOPES_FLAG);
+            scopes = inputLine.getNextArgFor(TX_SCOPES_FLAG);
+        }
         if (1 == inputLine.size() || inputLine.hasArg("-at")) {
             didIt = true;
             AccessToken at = getDummyAsset().getAccessToken();
-            JSONObject response = getService().exchangeAccessToken(getDummyAsset(), at);
+            JSONObject response = getService().exchangeAccessToken(getDummyAsset(), scopes, at);
             sciToken = response;
 
             sayi(response.toString(2));

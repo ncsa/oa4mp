@@ -21,11 +21,9 @@
         <td style="vertical-align: top;">Tag</td>
     </tr>
     <tr>
-        <td style="vertical-align: top;">transactions</td>
-        <td style="vertical-align: top;">Transactions that are pending. These are generally short-lived and should not
-            be persisted for extended periods.
-        </td>
-        <td style="vertical-align: top;">&lt;transactions/&gt;</td>
+        <td style="vertical-align: top;">adminClients</td>
+        <td style="vertical-align: top;">Administrative client store. If the client management endpoint is active, you must have one of these.</td>
+        <td style="vertical-align: top;">&lt;adminClients/&gt;</td>
     </tr>
     <tr>
         <td style="vertical-align: top;">client</td>
@@ -37,11 +35,7 @@
         <td style="vertical-align: top;">Approvals for clients. These should be persisted.</td>
         <td style="vertical-align: top;">&lt;clientApprovals/&gt;</td>
     </tr>
-    <tr>
-        <td style="vertical-align: top;">adminClients</td>
-        <td style="vertical-align: top;">Administrative client store. If the client management endpoint is active, you must have one of these.</td>
-        <td style="vertical-align: top;">&lt;adminClients/&gt;</td>
-    </tr>
+
     <tr>
         <td style="vertical-align: top;">permissions</td>
         <td style="vertical-align: top;">Various permissions, such as  admin clients have granted to clients they have created or
@@ -49,8 +43,15 @@
         <td style="vertical-align: top;">&lt;permissions/&gt;</td>
     </tr>
     <tr>
+        <td style="vertical-align: top;">transactions</td>
+        <td style="vertical-align: top;">Transactions that are pending. These are generally short-lived and should not
+            be persisted for extended periods.
+        </td>
+        <td style="vertical-align: top;">&lt;transactions/&gt;</td>
+    </tr>
+    <tr>
         <td style="vertical-align: top;">txStore</td>
-        <td style="vertical-align: top;">Token eXchange token store. Every token that is exchanged is stored here.
+        <td style="vertical-align: top;"><b>T</b>oken e<b>X</b>change token store. Every token that is exchanged is stored here.
         If you have enabled the token exchange endpoint, you must specify a txStore.</td>
         <td style="vertical-align: top;">&lt;txStore/&gt;</td>
     </tr>
