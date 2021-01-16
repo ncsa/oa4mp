@@ -12,7 +12,6 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
-import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.server.UnapprovedClientException;
 import edu.uiuc.ncsa.security.delegation.server.request.AGResponse;
@@ -36,6 +35,7 @@ import java.net.URI;
 import java.util.*;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet.getServiceEnvironment;
+import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.*;
 
 /**
@@ -163,7 +163,7 @@ public class OA2AuthorizedServletUtil {
 
         DebugUtil.trace(this, "starting to process claims, creating basic claims:");
         jwtRunner.doAuthClaims();
-        if (!t.getFlowStates().acceptRequests  || t.getFlowStates().getClaims) {
+        if (!t.getFlowStates().acceptRequests || t.getFlowStates().getClaims) {
             // if they are not allowed to get claims, they get booted out here
             oa2SE.getTransactionStore().save(t); // save it so we have this in the future, then bail
             throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "access denied", HttpStatus.SC_UNAUTHORIZED);
@@ -258,11 +258,21 @@ public class OA2AuthorizedServletUtil {
                 DebugUtil.info(this, "And for what it is worth, the client sent along an incorrect secret too...");
             }
         }
+        String rawATLifetime = params.get(ACCESS_TOKEN_LIFETIME);
+        if (!isTrivial(rawATLifetime)) {
+
+            try {
+                long rt = Long.parseLong(rawATLifetime);
+                st.setRequestedATLifetime(rt);
+            } catch (Throwable t) {
+                // do nothing.
+            }
+        }
         String rawRefreshLifetime = params.get(REFRESH_LIFETIME);
-        if (rawRefreshLifetime != null && !rawRefreshLifetime.isEmpty()) {
+        if (!isTrivial(rawRefreshLifetime)) {
             try {
                 long rt = Long.parseLong(rawRefreshLifetime);
-                st.setRefreshTokenLifetime(rt);
+                st.setRequestedRTLifetime(rt);
             } catch (Throwable t) {
                 // do nothing.
             }
@@ -455,9 +465,9 @@ public class OA2AuthorizedServletUtil {
         // a list of logical names or URIs. Generally we encourage people to just use
         // the audience parameter.
         String rawAudience = state.getRequest().getParameter(RFC8693Constants.RESOURCE);
-        if (StringUtils.isTrivial(rawAudience)) {
+        if (isTrivial(rawAudience)) {
             rawAudience = state.getRequest().getParameter(RFC8693Constants.AUDIENCE);
-            if (StringUtils.isTrivial(rawAudience)) {
+            if (isTrivial(rawAudience)) {
                 return; // nothing to do.
             }
         }

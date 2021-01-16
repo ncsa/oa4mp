@@ -45,8 +45,9 @@ public class OA2SE extends ServiceEnvironmentImpl {
                  Provider<ClientStore> csp,
                  int maxAllowedNewClientRequests,
                  long agLifetime,
+                 long maxATLifetime,
                  long atLifetime,
-                 long rtLifetime,
+                 long maxRTLifetime,
                  Provider<ClientApprovalStore> casp,
                  List<MyProxyFacadeProvider> mfp,
                  MailUtilProvider mup,
@@ -99,9 +100,9 @@ public class OA2SE extends ServiceEnvironmentImpl {
         if(0 < atLifetime){
             this.accessTokenLifetime = atLifetime;
         }
-        if (0 < rtLifetime) {
+/*        if (0 < rtLifetime) {
             this.rtLifetime = rtLifetime;
-        }
+        }*/
 
         if (clientSecretLength < 0) {
             throw new MyConfigurationException("Error: The client secret length (=" + clientSecretLength + ") is invalid. It must be a positive integer.");
@@ -136,7 +137,20 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.qdlEnvironment = qdlEnvironment;
         this.rfc8693Enabled = rfc8693Enabled;
         this.txStore = txStoreProvider.get();
+        this.maxATLifetime = maxATLifetime;
+        this.maxRTLifetime = maxRTLifetime;
     }
+    long maxATLifetime = -1L;
+
+    public long getMaxATLifetime() {
+        return maxATLifetime;
+    }
+
+    public long getMaxRTLifetime() {
+        return maxRTLifetime;
+    }
+
+    long maxRTLifetime = -1L;
 
     public TXStore getTxStore() {
         return txStore;
@@ -243,15 +257,15 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.refreshTokenEnabled = refreshTokenEnabled;
     }
 
-    long rtLifetime = 15 * 24 * 3600 * 1000L; // default is 15 days.
 
     /**
      * The default if nothing is specified is 15 days.
      *
      * @return
+     * @deprecated This was badly named. Use {@link #getMaxRTLifetime()}
      */
     public long getRefreshTokenLifetime() {
-        return rtLifetime;
+        return getMaxRTLifetime();
     }
 
     int clientSecretLength = 64; // default in spec. see OAUTH-215

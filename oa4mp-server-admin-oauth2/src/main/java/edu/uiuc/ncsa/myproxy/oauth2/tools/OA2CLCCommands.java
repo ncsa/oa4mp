@@ -22,6 +22,7 @@ import edu.uiuc.ncsa.security.oauth_2_0.JWTUtil;
 import edu.uiuc.ncsa.security.oauth_2_0.UserInfo;
 import edu.uiuc.ncsa.security.oauth_2_0.client.ATResponse2;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTUtil2;
+import edu.uiuc.ncsa.security.oauth_2_0.server.RFC8693Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
@@ -214,6 +215,17 @@ public class OA2CLCCommands extends CLCCommands {
         }
         String x = null;
         if (inputLine.size() == 1) {
+            if (grant != null) {
+                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                if (clipboard != null) {
+                    StringSelection data = new StringSelection(grant.getToken());
+                    clipboard.setContents(data, data);
+                    say("grant copied to clipboard.");
+                }
+                // already have a grant. Show it and copy it to the clipboard
+                say("grant=" + grant.getToken());
+                return;
+            }
             // no arg. get it from the clipboard
             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
             x = (String) clipboard.getData(DataFlavor.stringFlavor);
@@ -234,6 +246,12 @@ public class OA2CLCCommands extends CLCCommands {
                 URI uri = URI.create(decode(current.substring(5)));
                 say("grant=" + uri.toString()); // length of string "code="
                 grant = new AuthorizationGrantImpl(uri);
+                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                if (clipboard != null) {
+                    StringSelection data = new StringSelection(uri.toString());
+                    clipboard.setContents(data, data);
+                    say("grant copied to clipboard.");
+                }
             }
         }
     }
@@ -588,18 +606,26 @@ public class OA2CLCCommands extends CLCCommands {
 
     protected void setGrantHelp() {
         say("[g|s]etgrant [callback]:");
-        say("   The assumption is that you use geturi to get the correct authorization uri and have ");
-        say("   logged in. Your browser *should* have a call back to your client.");
-        say("   Copy that to the clipboard. If you call this with no argument, then the clipboard is read.");
-        say("   Otherwise paste the callback ");
-        say("   as the argument to this call. This will return a string with the grant in it. You can use");
-        say("   that to get an access token.");
+        sayi("callback = the entire callback returned from the service");
+        sayi("no arg -- either ");
+        sayi("case A: you already have done this and a grant is set. Show it, paste it in the clipboard.");
+        sayi("case B: No grant is set. Read the clipboard and set it from that.");
+        sayi("The assumption is that you use seturi to get the correct authorization uri and have ");
+        sayi("logged in. Your browser *should* have a callback to your client.");
+        sayi("Copy that to the clipboard. If you call this with no argument, then the clipboard is read.");
+        sayi("Otherwise paste the callback directly");
     }
 
-    public static String TX_SCOPES_FLAG = "-scope";
+    public static String TX_SCOPES_FLAG = "-" + RFC8693Constants.SCOPE;
+    public static String TX_AUDIENCE_FLAG = "-" + RFC8693Constants.AUDIENCE;
+    public static String TX_RESOURCE_FLAG = "-" + RFC8693Constants.RESOURCE;
 
     protected void exchangeHelp() {
-        sayi("exchange [-at|-rt] [" + TX_SCOPES_FLAG + " \"scope1 scope2 \"...]");
+        sayi("exchange [-at|-rt] [" +
+                TX_SCOPES_FLAG + " \"scope1 scope2 \"...] ["
+                + TX_AUDIENCE_FLAG + " audience] [" +
+                TX_RESOURCE_FLAG + "resource]"
+        );
         sayi("   This will exchange the current access token (so you need to have gotten that far first)");
         sayi("   for a secure token. The response will contain other information that will be displayed.");
         sayi("   If there is no parameter, the current access token is used for the exchange");
@@ -620,13 +646,16 @@ public class OA2CLCCommands extends CLCCommands {
         boolean didIt = false;
         String scopes = null;
         if (inputLine.hasArg(TX_SCOPES_FLAG)) {
-            inputLine.removeSwitchAndValue(TX_SCOPES_FLAG);
             scopes = inputLine.getNextArgFor(TX_SCOPES_FLAG);
+            inputLine.removeSwitchAndValue(TX_SCOPES_FLAG);
         }
         if (1 == inputLine.size() || inputLine.hasArg("-at")) {
             didIt = true;
             AccessToken at = getDummyAsset().getAccessToken();
-            JSONObject response = getService().exchangeAccessToken(getDummyAsset(), scopes, at);
+            JSONObject response = getService().exchangeAccessToken(getDummyAsset(),
+                    scopes, null,
+                    null,
+                    at);
             sciToken = response;
 
             sayi(response.toString(2));

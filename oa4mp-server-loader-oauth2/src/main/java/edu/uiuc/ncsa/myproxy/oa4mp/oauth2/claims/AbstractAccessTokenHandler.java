@@ -253,7 +253,16 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
                 atData.put(OA2Constants.SCOPE, scopes);
             }
         }
+        // AT Data is in seconds, as per spec!
+        long proposedLifetime = (atData.getLong(EXPIRATION) - atData.getLong(ISSUED_AT))*1000;
+        if(proposedLifetime <= 0){
+            proposedLifetime = transaction.getMaxAtLifetime();
+        }else{
+            proposedLifetime = Math.min(proposedLifetime, transaction.getMaxAtLifetime());
+        }
+        atData.put(EXPIRATION, (atData.getLong(ISSUED_AT)*1000 + proposedLifetime)/1000);
         setAtData(atData);
+        transaction.setAccessTokenLifetime(proposedLifetime);
 
     }
 
@@ -295,7 +304,7 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
             String at = JWTUtil2.createJWT(getAtData(), key);
             URI jti = URI.create(getAtData().getString(JWT_ID));
             AccessTokenImpl at0 = new AccessTokenImpl(at, jti);
-            at0.setLifetime(getAtData().getLong(EXPIRATION) - getAtData().getLong(ISSUED_AT));
+            at0.setLifetime(1000*(getAtData().getLong(EXPIRATION) - getAtData().getLong(ISSUED_AT)));
             return at0;
         } catch (Throwable e) {
             if (e instanceof RuntimeException) {

@@ -73,7 +73,7 @@ public class BasicRefreshTokenHandler extends AbstractPayloadHandler implements 
             String at = JWTUtil2.createJWT(getRTData(), key);
             URI jti = URI.create(getRTData().getString(JWT_ID));
             RefreshTokenImpl rt0 = new RefreshTokenImpl(at, jti);
-            rt0.setLifetime(getRTData().getLong(EXPIRATION) - getRTData().getLong(ISSUED_AT));
+            rt0.setLifetime(1000*(getRTData().getLong(EXPIRATION) - getRTData().getLong(ISSUED_AT)));
             return rt0;
         } catch (Throwable e) {
             if (e instanceof RuntimeException) {
@@ -115,7 +115,16 @@ public class BasicRefreshTokenHandler extends AbstractPayloadHandler implements 
 
     @Override
     public void finish() throws Throwable {
+        JSONObject rtData = transaction.getRTData();
+        long proposedLifetime = rtData.getLong(EXPIRATION) - rtData.getLong(ISSUED_AT);
+          if(proposedLifetime <= 0){
+              proposedLifetime = transaction.getMaxRtLifetime();
+          }else{
+              proposedLifetime = Math.min(proposedLifetime, transaction.getMaxRtLifetime());
+          }
+          rtData.put(EXPIRATION, rtData.getLong(ISSUED_AT) + proposedLifetime);
 
+          transaction.setRTData(rtData);
     }
 
     @Override

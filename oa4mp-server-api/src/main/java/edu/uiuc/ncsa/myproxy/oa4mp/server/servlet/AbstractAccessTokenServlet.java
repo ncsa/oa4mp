@@ -20,14 +20,15 @@ import javax.servlet.http.HttpServletResponse;
 public abstract class AbstractAccessTokenServlet extends MyProxyDelegationServlet {
     @Override
     protected void doIt(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Throwable {
+        printAllParameters(httpServletRequest);
         doDelegation(httpServletRequest, httpServletResponse);
     }
+
     protected abstract ATRequest getATRequest(HttpServletRequest request, ServiceTransaction transaction);
 
     protected abstract ServiceTransaction getTransaction(AuthorizationGrant ag, HttpServletRequest req) throws ServletException;
 
     protected IssuerTransactionState doDelegation(Client client, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Throwable, ServletException {
-        printAllParameters(httpServletRequest);
         info("5.a. Starting access token exchange");
         Verifier v = getServiceEnvironment().getTokenForge().getVerifier(httpServletRequest);
         AuthorizationGrant ag = getServiceEnvironment().getTokenForge().getAuthorizationGrant(httpServletRequest);

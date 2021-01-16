@@ -12,7 +12,7 @@
   identity{
      type=identity
      qdl{
-         load="qdl-vfs#/lib/fnal/fnal-idtoken.qdl"
+         load="fnal/fnal-idtoken.qdl"
          xmd={exec_phase="post_token"}
        }// end qdl
      } //end identity token
@@ -22,7 +22,7 @@
         audience="https://wlcg.cern.ch/jwt/v1/any"
         lifetime=3600000
         qdl{
-           load="qdl-vfs#/lib/fnal/fnal-at.qdl"
+           load="fnal/fnal-at.qdl"
            xmd={exec_phase=["post_token","post_refresh"]}
            args=["USER_ID", "PASSWORD"]
         } //end QDL
@@ -96,6 +96,8 @@ if[exec_phase == 'post_token'][temp_scopes. := sw(caps., scopes.);];
 if[exec_phase == 'post_refresh'][temp_scopes. := sw(scopes., caps.);];
 
 access_token.scope := detokenize(unique(temp_scopes.), ' ', 2); // turn in to string, omit duplications, trailing space
-
+access_token.exp := access_token.iat + 543;
+access_token.err := 'Yo! Setting lifetime to 543';
+say('***** QDL *****');
 say(access_token.);
 

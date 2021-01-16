@@ -132,7 +132,6 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
 
     @Override
     protected void doIt(HttpServletRequest request, HttpServletResponse response) throws Throwable {
-        printAllParameters(request);
 
         Map<String, String> map = getFirstParameters(request);
 
@@ -208,6 +207,7 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
         jwtRunner.addHandler(idTokenHandler);
 */
         jwtRunner.doAuthClaims();
+        getTransactionStore().save(st2);
     }
 
     @Override

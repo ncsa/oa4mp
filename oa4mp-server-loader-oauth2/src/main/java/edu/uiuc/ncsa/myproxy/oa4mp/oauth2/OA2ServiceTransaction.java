@@ -283,6 +283,64 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         return getState().containsKey(RESPONSE_MODE_KEY);
     }
 
+    String MAX_AT_LIFETIME_KEY = "maxATLifetime";
+    String REQUESTED_AT_LIFETIME_KEY = "requestedATLifetime";
+    String MAX_RT_LIFETIME_KEY = "maxRTLifetime";
+    String REQUESTED_RT_LIFETIME_KEY = "requestedRTLifetime";
+
+    public long getRequestedATLifetime(){
+        if(hasRequestedATLifetime()){
+            return getState().getLong(REQUESTED_AT_LIFETIME_KEY);
+        }
+        return -1L;
+    }
+    public boolean hasRequestedATLifetime(){
+        return getState().containsKey(REQUESTED_AT_LIFETIME_KEY);
+    }
+    public void setRequestedATLifetime(long atLifetime){
+        getState().put(REQUESTED_AT_LIFETIME_KEY, atLifetime);
+    }
+    public long getRequestedRTLifetime(){
+        if(hasRequestedRTLifetime()){
+            return getState().getLong(REQUESTED_RT_LIFETIME_KEY);
+        }
+        return -1L;
+    }
+    public void setRequestedRTLifetime(long rtLifetime){
+        getState().put(REQUESTED_RT_LIFETIME_KEY, rtLifetime);
+    }
+    public boolean hasRequestedRTLifetime(){
+        return getState().containsKey(REQUESTED_RT_LIFETIME_KEY);
+    }
+    public long getMaxAtLifetime(){
+        if(hasMaxATLifetime()){
+             return getState().getLong(MAX_AT_LIFETIME_KEY);
+        }
+        return -1L;
+    }
+    public void setMaxATLifetime(long max){
+        getState().put(MAX_AT_LIFETIME_KEY, max);
+    }
+
+    public boolean hasMaxATLifetime(){
+        return getState().containsKey(MAX_AT_LIFETIME_KEY);
+    }
+
+    public long getMaxRtLifetime(){
+        if(hasMaxATLifetime()){
+             return getState().getLong(MAX_RT_LIFETIME_KEY);
+        }
+        return -1L;
+    }
+    public void setMaxRTLifetime(long max){
+        getState().put(MAX_RT_LIFETIME_KEY, max);
+    }
+
+    public boolean hasMaxRTLifetime(){
+        return getState().containsKey(MAX_RT_LIFETIME_KEY);
+    }
+
+
     RefreshToken refreshToken;
     long refreshTokenLifetime = 0L;
     String nonce;

@@ -65,6 +65,7 @@ import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPoolProvider;
+import edu.uiuc.ncsa.security.util.configuration.ConfigUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import org.apache.commons.configuration.tree.ConfigurationNode;
@@ -78,6 +79,7 @@ import java.util.List;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.OA4MPIdentifierProvider.TRANSACTION_ID;
 import static edu.uiuc.ncsa.security.core.configuration.Configurations.*;
+import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2ConfigTags.ACCESS_TOKEN_LIFETIME;
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2ConfigTags.*;
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.*;
@@ -91,8 +93,12 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
      * Default is 15 days. Internally the refresh lifetime (as all date-ish things) are in milliseconds
      * though the configuration file is assumed to be in seconds.
      */
+
     public long REFRESH_TOKEN_LIFETIME_DEFAULT = 15 * 24 * 3600 * 1000L; // 15 days
+    public long MAX_REFRESH_TOKEN_LIFETIME_DEFAULT = 2 * REFRESH_TOKEN_LIFETIME_DEFAULT; // 30 days
+
     public long ACCESS_TOKEN_LIFETIME_DEFAULT = 15 * 60 * 1000L; // 15 minutes
+    public long MAX_ACCESS_TOKEN_LIFETIME_DEFAULT = 2 * ACCESS_TOKEN_LIFETIME_DEFAULT; // 30 minutes
     public long AUTHORIZATION_GRANT_LIFETIME_DEFAULT = 15 * 60 * 1000L; // 15 minutes
     public int CLIENT_SECRET_LENGTH_DEFAULT = 258; //This is divisible by 3 and greater than 256, so when it is base64 encoded there will be no extra characters.
 
@@ -114,8 +120,9 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     getClientStoreProvider(),
                     getMaxAllowedNewClientRequests(),
                     getAGLifetime(),
+                    getMaxATLifetime(),
                     getATLifetime(),
-                    getRTLifetime(),
+                    getMaxRTLifetime(),
                     getClientApprovalStoreProvider(),
                     getMyProxyFacadeProvider(),
                     getMailUtilProvider(),
@@ -433,13 +440,16 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         }
     }
 
-    long rtLifetime = -1L;
+/*    long rtLifetime = -1L;
 
     protected long getRTLifetime() {
         if (rtLifetime < 0) {
-            String x = getFirstAttribute(cn, REFRESH_TOKEN_LIFETIME);
+            String x = getFirstAttribute(cn, DEFAULT_REFRESH_TOKEN_LIFETIME);
+            if (isTrivial(x)) {
+                x = getFirstAttribute(cn, REFRESH_TOKEN_LIFETIME);
+            }
             // Fixes OAUTH-214
-            if (x == null || x.length() == 0) {
+            if (isTrivial(x)) {
                 rtLifetime = REFRESH_TOKEN_LIFETIME_DEFAULT;
             } else {
                 try {
@@ -450,20 +460,21 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
             }
         }
         return rtLifetime;
-
-    }
+    }*/
 
     // Authorization grants lifetime
     long agLifetime = -1L;
 
+
     protected long getAGLifetime() {
         if (agLifetime < 0) {
             String x = getFirstAttribute(cn, AUTH_GRANT_LIFETIME);
-            if (x == null || x.length() == 0) {
+            if (isTrivial(x)) {
                 agLifetime = AUTHORIZATION_GRANT_LIFETIME_DEFAULT;
             } else {
                 try {
-                    agLifetime = Long.parseLong(x) * 1000; // The configuration file has this in seconds. Internally this is ms.
+                    agLifetime = ConfigUtil.getValueSecsOrMillis(x, true);
+                    //agLifetime = Long.parseLong(x) * 1000; // The configuration file has this in seconds. Internally this is ms.
                 } catch (Throwable t) {
                     agLifetime = AUTHORIZATION_GRANT_LIFETIME_DEFAULT;
                 }
@@ -477,18 +488,65 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
 
     protected long getATLifetime() {
         if (atLifetime < 0) {
-            String x = getFirstAttribute(cn, ACCESS_TOKEN_LIFETIME);
-            if (x == null || x.length() == 0) {
+            String x = getFirstAttribute(cn, DEFAULT_ACCESS_TOKEN_LIFETIME);
+            if (isTrivial(x)) {
+                // Old way
+                x = getFirstAttribute(cn, ACCESS_TOKEN_LIFETIME);
+            }
+            if (isTrivial(x)) {
                 atLifetime = ACCESS_TOKEN_LIFETIME_DEFAULT;
             } else {
                 try {
-                    atLifetime = Long.parseLong(x) * 1000; // The configuration file has this in seconds. Internally this is ms.
+                    atLifetime = ConfigUtil.getValueSecsOrMillis(x, true);
+                    //atLifetime = Long.parseLong(x) * 1000; // The configuration file has this in seconds. Internally this is ms.
                 } catch (Throwable t) {
                     atLifetime = ACCESS_TOKEN_LIFETIME_DEFAULT;
                 }
             }
         }
-        return agLifetime;
+        return atLifetime;
+    }
+
+    public long getMaxATLifetime() {
+        if (maxATLifetime < 0) {
+            String x = getFirstAttribute(cn, MAX_ACCESS_TOKEN_LIFETIME);
+            if (isTrivial(x)) {
+                maxATLifetime = MAX_ACCESS_TOKEN_LIFETIME_DEFAULT;
+            } else {
+                try {
+                    maxATLifetime =ConfigUtil.getValueSecsOrMillis(x, true);
+                //    maxATLifetime = Long.parseLong(x) * 1000; // The configuration file has this in seconds. Internally this is ms.
+                } catch (Throwable t) {
+                    maxATLifetime = MAX_ACCESS_TOKEN_LIFETIME_DEFAULT;
+                }
+            }
+        }
+        return maxATLifetime;
+    }
+
+    public void setMaxATLifetime(long maxATLifetime) {
+        this.maxATLifetime = maxATLifetime;
+    }
+
+    long maxATLifetime = -1L;
+
+    long maxRTLifetime = -1L;
+
+    public long getMaxRTLifetime() {
+        if (maxRTLifetime < 0) {
+            String x = getFirstAttribute(cn, MAX_REFRESH_TOKEN_LIFETIME);
+            if (isTrivial(x)) {
+                maxRTLifetime = MAX_REFRESH_TOKEN_LIFETIME_DEFAULT;
+            } else {
+                try {
+                    maxRTLifetime = ConfigUtil.getValueSecsOrMillis(x, true);
+                    //maxRTLifetime = Long.parseLong(x) * 1000; // The configuration file has this in seconds. Internally this is ms.
+                } catch (Throwable t) {
+                    maxRTLifetime = MAX_REFRESH_TOKEN_LIFETIME_DEFAULT;
+                }
+            }
+        }
+        return maxRTLifetime;
     }
 
     String issuer = null;
@@ -517,7 +575,8 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                 maxClientRefreshTokenLifetime = 13 * 30 * 24 * 3600 * 1000L; // default of 13 months.
             } else {
                 try {
-                    maxClientRefreshTokenLifetime = Long.parseLong(x) * 1000; // The configuration file has this in seconds. Internally this is ms.
+                    maxClientRefreshTokenLifetime = ConfigUtil.getValueSecsOrMillis(x, true); // The configuration file has this in seconds. Internally this is ms.
+                    //maxClientRefreshTokenLifetime = Long.parseLong(x) * 1000; // The configuration file has this in seconds. Internally this is ms.
                 } catch (Throwable t) {
                     maxClientRefreshTokenLifetime = 13 * 30 * 24 * 3600 * 1000L; // default of 13 months.
                 }
@@ -537,7 +596,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                 try {
                     oidcEnabled = Boolean.valueOf(x);
                 } catch (Throwable t) {
-                    info("COuld not parse OIDC enabled flag, setting default to true");
+                    info("Could not parse OIDC enabled flag, setting default to true");
                     oidcEnabled = Boolean.TRUE;
                 }
             }
@@ -766,7 +825,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
             TXMultiStoreProvider storeProvider = new TXMultiStoreProvider(cn,
                     isDefaultStoreDisabled(),
                     loggerProvider.get(),
-                    null,null,
+                    null, null,
                     txRecordProvider, txRecordConverter);
 
             storeProvider.addListener(createSQLTXRecordP(cn,

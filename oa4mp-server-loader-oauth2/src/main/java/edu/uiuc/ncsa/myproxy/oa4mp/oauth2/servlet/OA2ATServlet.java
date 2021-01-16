@@ -25,6 +25,7 @@ import edu.uiuc.ncsa.security.delegation.storage.TransactionStore;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
+import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
 import edu.uiuc.ncsa.security.delegation.token.impl.AuthorizationGrantImpl;
 import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
 import edu.uiuc.ncsa.security.oauth_2_0.*;
@@ -50,7 +51,8 @@ import java.util.*;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8693Constants2.*;
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.CLIENT_SECRET;
-import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.JWT_ID;
+import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.AUDIENCE;
+import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.*;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -130,50 +132,85 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
      */
     protected long computeRefreshLifetime(OA2ServiceTransaction st2) {
         OA2SE oa2SE = (OA2SE) getServiceEnvironment();
-        if (oa2SE.getRefreshTokenLifetime() <= 0) {
+        if (oa2SE.getMaxRTLifetime() <= 0) {
             throw new NFWException("Internal error: the server-wide default for the refresh token lifetime has not been set.");
         }
+        long lifetime = oa2SE.getMaxRTLifetime();
+
         OA2Client client = (OA2Client) st2.getClient();
-        long lifetime = client.getRtLifetime();
-        if (0 < st2.getRefreshTokenLifetime()) {
-            // IF they specified a refresh token lifetime in the request, take the minimum of that
-            // and whatever they client is allowed.
-            lifetime = Math.min(st2.getRefreshTokenLifetime(), lifetime);
+        if(0 < client.getRtLifetime()){
+             lifetime = Math.min(lifetime, client.getRtLifetime());
         }
+        st2.setMaxRTLifetime(lifetime);// absolute max allowed on this server for this request
+
+
         if (client.hasRefreshTokenConfig()) {
             if (0 < client.getRefreshTokensConfig().getLifetime()) {
                 lifetime = Math.min(client.getRefreshTokensConfig().getLifetime(), lifetime);
-
             }
         }
-        // Now take the minimum of what the server allows.
-        return Math.min(lifetime, oa2SE.getRefreshTokenLifetime());
+        if (0 < st2.getRequestedRTLifetime()) {
+            // IF they specified a refresh token lifetime in the request, take the minimum of that
+            // and whatever they client is allowed.
+            lifetime = Math.min(st2.getRequestedRTLifetime(), lifetime);
+        }
+
+        return lifetime;
     }
 
+    /**
+     *      Scorecard:
+     *                  server default     | oa2SE.getAccessTokenLifetime()
+     *                  server default max | oa2SE.getMaxATLifetime();
+     *                  client default max | client.getAtLifetime()
+     *         value in cfg access element | client.getAccessTokensConfig().getLifetime()
+     *                value in the request | st2.getRequestedATLifetime()
+     *    result = actual definitive value | st2.getAccessTokenLifetime()
+     *
+     *         Policies: no lifetime can exceed the non-zero max of the server and client defaults. These are hard
+     *         limits placed there by administrators.
+     *
+     *         Note that inside of scripts, these can be reset to anything, so
+     *
+     *         st2.getAtData()
+     *
+     *         has the final, definitive values. Once this has been set in the first pass, it
+     *         **must** be authoritative.
+     * @param st2
+     * @return
+     */
+    /*
+    List of useful numbers for testing. These are all prime and are either in seconds or milliseconds as
+    needed. Setting these in the configurations will let you track exactly what values are used.
+    server default 97
+     */
     protected long computeATLifetime(OA2ServiceTransaction st2) {
         OA2SE oa2SE = (OA2SE) getServiceEnvironment();
-        if (oa2SE.getAccessTokenLifetime() <= 0) {
+        // If the server default is <= 0 that implies there is some misconfiguration. Better to find that out here than
+        // get squirrelly results later.
+        if (oa2SE.getMaxATLifetime() <= 0) {
             throw new NFWException("Internal error: the server-wide default for the access token lifetime has not been set.");
         }
-        long lifetime = oa2SE.getAccessTokenLifetime();
+        long lifetime = oa2SE.getMaxATLifetime();
 
         OA2Client client = (OA2Client) st2.getClient();
         if (0 < client.getAtLifetime()) {
             lifetime = Math.min(client.getAtLifetime(), lifetime);
         }
+        // This is the max for any token.
+        st2.setMaxATLifetime(lifetime); // absolute max allowed on this server for this request
+
         if (client.hasAccessTokenConfig()) {
             if (0 < client.getAccessTokensConfig().getLifetime()) {
                 lifetime = Math.min(client.getAccessTokensConfig().getLifetime(), lifetime);
             }
         }
 
-        // If the server default is <= 0 that implies there is some misconfiguration. Better to find that out here than
-        // get squirrelly results later.
         // If the transaction has a specific request, take it in to account.
-        if (0 < st2.getAccessTokenLifetime()) {
+        if (0 < st2.getRequestedATLifetime()) {
             // IF they specified a refresh token lifetime in the request, take the minimum of that
             // and whatever they client is allowed.
-            lifetime = Math.min(st2.getAccessTokenLifetime(), lifetime);
+            lifetime = Math.min(st2.getRequestedATLifetime(), lifetime);
         }
         return lifetime;
 
@@ -266,7 +303,6 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
     private void doRFC8693(OA2Client client,
                            HttpServletRequest request,
                            HttpServletResponse response) throws IOException {
-        printAllParameters(request);
         // https://tools.ietf.org/html/rfc8693
         String rawSecret = getClientSecret(request);
 
@@ -560,7 +596,6 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
 
     @Override
     protected void doIt(HttpServletRequest request, HttpServletResponse response) throws Throwable {
-        printAllParameters(request);
         String grantType = getFirstParameterValue(request, OA2Constants.GRANT_TYPE);
 
         if (isEmpty(grantType)) {
@@ -804,7 +839,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         }
 
         OA2ServiceTransaction t = getByRT(oldRT);
-
+        AccessTokenImpl at = (AccessTokenImpl) t.getAccessToken();
 
         if (t == null || !t.isRefreshTokenValid()) {
             DebugUtil.trace(this, "Missing refresh token.");
@@ -818,14 +853,13 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             throw new OA2ATException(OA2Errors.REQUEST_NOT_SUPPORTED, "Refresh tokens are not supported on this server");
         }
         t.setRefreshTokenValid(false); // this way if it fails at some point we know it is invalid.
-        AccessToken at = t.getAccessToken();
         RTIRequest rtiRequest = new RTIRequest(request, t, at, oa2SE.isOIDCEnabled());
         RTI2 rtIssuer = new RTI2(getTF2(), getServiceEnvironment().getServiceAddress());
         if (t.getRefreshTokenLifetime() == 0 && 0 < c.getRtLifetime()) {
             // This is in case we have a really old token that is getting refreshed.
             // Have to set the rt lifetime in the transaction so the new token is
             // created correctly.
-            t.setRefreshTokenLifetime(Math.min(oa2SE.getRefreshTokenLifetime(), c.getRtLifetime()));
+            t.setRefreshTokenLifetime(Math.min(oa2SE.getMaxRTLifetime(), c.getRtLifetime()));
         }
         RTIResponse rtiResponse = (RTIResponse) rtIssuer.process(rtiRequest);
         rtiResponse.setSignToken(c.isSignTokens());

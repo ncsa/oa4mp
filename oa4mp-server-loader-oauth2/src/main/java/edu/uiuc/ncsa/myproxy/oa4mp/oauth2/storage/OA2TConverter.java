@@ -9,9 +9,11 @@ import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
 import edu.uiuc.ncsa.security.delegation.token.TokenForge;
+import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
 import edu.uiuc.ncsa.security.delegation.token.impl.AuthorizationGrantImpl;
 import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2TokenForge;
+import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
 import edu.uiuc.ncsa.security.storage.data.ConversionMap;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -51,18 +53,18 @@ public class OA2TConverter<V extends OA2ServiceTransaction> extends TransactionC
             }
         }
         Object rawAG = map.get(getTCK().authGrant());
-        if(rawAG == null){
-            if(st.getIdentifier() != null){
-                 AuthorizationGrantImpl ag = new AuthorizationGrantImpl(st.getIdentifier().getUri());
-                 st.setAuthorizationGrant(ag);
+        if (rawAG == null) {
+            if (st.getIdentifier() != null) {
+                AuthorizationGrantImpl ag = new AuthorizationGrantImpl(st.getIdentifier().getUri());
+                st.setAuthorizationGrant(ag);
             }
-        }else{
-           if(rawAG instanceof AuthorizationGrant){
-               st.setAuthorizationGrant((AuthorizationGrant)rawAG);
-           }else{
-               AuthorizationGrantImpl ag = new AuthorizationGrantImpl(URI.create(rawAG.toString()));
-               st.setAuthorizationGrant(ag);
-           }
+        } else {
+            if (rawAG instanceof AuthorizationGrant) {
+                st.setAuthorizationGrant((AuthorizationGrant) rawAG);
+            } else {
+                AuthorizationGrantImpl ag = new AuthorizationGrantImpl(URI.create(rawAG.toString()));
+                st.setAuthorizationGrant(ag);
+            }
         }
         st.setAuthGrantLifetime(map.getLong(getTCK().authzGrantLifetime()));
         st.setRefreshTokenValid(map.getBoolean(getTCK().refreshTokenValid()));
@@ -83,6 +85,34 @@ public class OA2TConverter<V extends OA2ServiceTransaction> extends TransactionC
         } else {
             st.setState(new JSONObject());
         }
+        /*
+        Must recover any state from user-created/modified access or refresh tokens.
+         */
+        if (st.hasAccessToken()) {
+            AccessTokenImpl accessToken = (AccessTokenImpl) st.getAccessToken();
+            JSONObject atData = st.getATData();
+            if (atData != null && !atData.isEmpty()) {
+                if (atData.containsKey(OA2Claims.ISSUED_AT)) {
+                    accessToken.setIssuedAt(1000 * atData.getLong(OA2Claims.ISSUED_AT));
+                    if (atData.containsKey(OA2Claims.EXPIRATION)) {
+                        accessToken.setLifetime(1000 * (atData.getLong(OA2Claims.EXPIRATION) - atData.getLong(OA2Claims.ISSUED_AT)));
+                    }
+                }
+            }
+        }
+        if (st.hasRefreshToken()) {
+            RefreshTokenImpl rt = (RefreshTokenImpl) st.getRefreshToken();
+            JSONObject rtData = st.getRTData();
+            if (rtData != null && !rtData.isEmpty()) {
+                if (rtData.containsKey(OA2Claims.ISSUED_AT)) {
+                    rt.setIssuedAt(1000 * rtData.getLong(OA2Claims.ISSUED_AT));
+                    if (rtData.containsKey(OA2Claims.EXPIRATION)) {
+                        rt.setLifetime(1000 * (rtData.getLong(OA2Claims.EXPIRATION) - rtData.getLong(OA2Claims.ISSUED_AT)));
+                    }
+                }
+
+            }
+        }
         return st;
     }
 
@@ -92,12 +122,12 @@ public class OA2TConverter<V extends OA2ServiceTransaction> extends TransactionC
         if (t.getRefreshToken() != null) {
             map.put(getTCK().refreshToken(), t.getRefreshToken().getToken());
         }
-        if(t.getAuthorizationGrant()==null){
-          // If the transaction is old, this will be missing. Create it from the
-          // identifier
+        if (t.getAuthorizationGrant() == null) {
+            // If the transaction is old, this will be missing. Create it from the
+            // identifier
             AuthorizationGrantImpl ag = new AuthorizationGrantImpl(t.getIdentifier().getUri());
             map.put(getTCK().authGrant(), ag);
-        }else{
+        } else {
             map.put(getTCK().authGrant(), t.getAuthorizationGrant().getToken());
         }
         map.put(getTCK().refreshTokenValid(), t.isRefreshTokenValid());
@@ -118,13 +148,13 @@ public class OA2TConverter<V extends OA2ServiceTransaction> extends TransactionC
         // the scopes is a Collection<String>, so the fact that it can contain DynaBeans at all is become of some
         /// weirdness with erasure in the JSON library that they should not be doing.
         for (Object s : t.getScopes()) {
-            if(DebugUtil.isEnabled()){
-                if(!(s instanceof String)){
-                    DebugUtil.trace(this,"Erasure error. A String was expected, but an object of class " + s.getClass().getCanonicalName() + " was found instead.");
+            if (DebugUtil.isEnabled()) {
+                if (!(s instanceof String)) {
+                    DebugUtil.trace(this, "Erasure error. A String was expected, but an object of class " + s.getClass().getCanonicalName() + " was found instead.");
                     DebugUtil.trace(this, "Value of the class=\"" + s + "\"");
                 }
             }
-                jsonArray.add(s.toString());
+            jsonArray.add(s.toString());
         }
         map.put(getTCK().scopes(), jsonArray.toString());
         if (t.hasAuthTime()) {

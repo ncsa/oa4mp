@@ -6,7 +6,6 @@ import edu.uiuc.ncsa.myproxy.oa4mp.client.ClientEnvironment;
 import edu.uiuc.ncsa.myproxy.oa4mp.client.OA4MPService;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
-import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.delegation.client.request.*;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.delegation.token.*;
@@ -35,6 +34,7 @@ import java.security.KeyPair;
 import java.util.*;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.client.ClientEnvironment.CALLBACK_URI_KEY;
+import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 import static edu.uiuc.ncsa.security.delegation.client.AbstractClientEnvironment.CERT_REQUEST_KEY;
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.*;
 import static edu.uiuc.ncsa.security.oauth_2_0.server.RFC8693Constants.*;
@@ -327,13 +327,23 @@ public class OA2MPService extends OA4MPService {
         return exchangeIt(asset, parameterMap);
     }
 
-    public JSONObject exchangeAccessToken(OA2Asset asset, String scopes, AccessToken accessToken) {
+    public JSONObject exchangeAccessToken(OA2Asset asset,
+                                          String scopes,
+                                          String resource,
+                                          String audience,
+                                          AccessToken accessToken) {
         HashMap<String, String> parameterMap = new HashMap<>();
         parameterMap.put(SUBJECT_TOKEN, accessToken.getToken());
         parameterMap.put(SUBJECT_TOKEN_TYPE, ACCESS_TOKEN_TYPE);
         parameterMap.put(REQUESTED_TOKEN_TYPE, ACCESS_TOKEN_TYPE);
-        if(!StringUtils.isTrivial(scopes)){
+        if(!isTrivial(scopes)){
             parameterMap.put(SCOPE, scopes);
+        }
+        if(!isTrivial(resource)){
+            parameterMap.put(RESOURCE, resource);
+        }
+        if(!isTrivial(audience)){
+            parameterMap.put(AUDIENCE, audience);
         }
         return exchangeIt(asset, parameterMap);
     }
