@@ -30,6 +30,11 @@ public class AccessTokenServlet extends AbstractAccessTokenServlet {
     }
 
     @Override
+    protected void checkAGExpiration(AuthorizationGrant ag) {
+          // do nothing in Oauth 1
+    }
+
+    @Override
     protected ServiceTransaction getTransaction(AuthorizationGrant ag, HttpServletRequest req) throws ServletException {
         ServiceTransaction transaction = getServiceEnvironment().getTransactionStore().get(ag);
         if(transaction == null){

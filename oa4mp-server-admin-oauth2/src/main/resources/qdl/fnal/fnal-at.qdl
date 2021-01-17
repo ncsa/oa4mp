@@ -97,7 +97,7 @@ if[exec_phase == 'post_refresh'][temp_scopes. := sw(scopes., caps.);];
 
 access_token.scope := detokenize(unique(temp_scopes.), ' ', 2); // turn in to string, omit duplications, trailing space
 access_token.exp := access_token.iat + 543;
-access_token.err := 'Yo! Setting lifetime to 543';
+access_token.err := 'Yo! Setting lifetime to 678';
 say('***** QDL *****');
 say(access_token.);
 

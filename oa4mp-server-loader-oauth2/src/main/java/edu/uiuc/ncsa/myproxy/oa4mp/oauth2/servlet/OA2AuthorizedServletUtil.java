@@ -24,6 +24,7 @@ import edu.uiuc.ncsa.security.oauth_2_0.server.AGRequest2;
 import edu.uiuc.ncsa.security.oauth_2_0.server.RFC8693Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
+import edu.uiuc.ncsa.security.util.configuration.ConfigUtil;
 import net.sf.json.JSONObject;
 import org.apache.http.HttpStatus;
 
@@ -262,18 +263,24 @@ public class OA2AuthorizedServletUtil {
         if (!isTrivial(rawATLifetime)) {
 
             try {
-                long rt = Long.parseLong(rawATLifetime);
-                st.setRequestedATLifetime(rt);
+                long at = ConfigUtil.getValueSecsOrMillis(rawATLifetime);
+                //               long at = Long.parseLong(rawATLifetime);
+                st.setRequestedATLifetime(at);
             } catch (Throwable t) {
+                getServiceEnvironment().info("Could not set request access token lifetime to \"" + rawATLifetime
+                        + "\" for client " + client.getIdentifierString());
                 // do nothing.
             }
         }
         String rawRefreshLifetime = params.get(REFRESH_LIFETIME);
         if (!isTrivial(rawRefreshLifetime)) {
             try {
-                long rt = Long.parseLong(rawRefreshLifetime);
+                long rt = ConfigUtil.getValueSecsOrMillis(rawRefreshLifetime);
+                //long rt = Long.parseLong(rawRefreshLifetime);
                 st.setRequestedRTLifetime(rt);
             } catch (Throwable t) {
+                getServiceEnvironment().info("Could not set request refresh token lifetime to \"" + rawRefreshLifetime
+                        + "\" for client " + client.getIdentifierString());
                 // do nothing.
             }
 

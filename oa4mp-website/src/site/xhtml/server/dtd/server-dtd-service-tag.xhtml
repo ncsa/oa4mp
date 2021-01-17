@@ -271,21 +271,24 @@
 specified. So this is a perfectly acceptable snipped from a configuration file:</p>
 <pre>
     &lt;service name="localhost:oa4mp.oa2.mariadb"
-             version="1.0"
              disableDefaultStores="true"
-             enableTwoFactorSupport="true"
-             maxAccessTokenLifetime="1800 sec"
-             defaultAccessTokenLifetime="1009000 ms"
+             enableTwoFactorSupport="false"
              authorizationGrantLifetime="12345"
-             maxRefreshTokenLifetime="1000000sec"
-             refreshTokenEnabled="true"
+             defaultAccessTokenLifetime="1009000 ms"
+             maxAccessTokenLifetime="1800 sec"
              maxClientRefreshTokenLifetime="2592000 sec"
+             maxRefreshTokenLifetime="1000000s."
+             refreshTokenEnabled="true"
              enableTokenExchange="true"
              serverDN="CN=localhost2"
     &lt;!-- lots of stuff --&gt;
 </pre>
 <p>Note that, in order to maintain backwards compatibility, the assumption is that all of these <i>without</i>
-units are in <b>seconds</b>.</p>
+units are in <b>seconds</b>. Blanks before and after units are allowed. Acceptable units are</p>
+<ul>
+    <li>"sec.", "sec", "s." or "s" for seconds</li>
+    <li>"ms.", "ms" or no units for milliseconds</li>
+</ul>
 
 <h2>Notes</h2>
 <p>The <span style="font-weight: bold;">name</span> can be anything. The name of the configuration to use may be

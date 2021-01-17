@@ -620,6 +620,14 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         return new ATRequest(request, transaction);
     }
 
+    @Override
+    protected void checkAGExpiration(AuthorizationGrant ag) {
+           if(ag.isExpired()){
+               throw new OA2GeneralError(OA2Errors.INVALID_GRANT, "grant expired", HttpStatus.SC_FORBIDDEN);
+           }
+
+    }
+
     protected IssuerTransactionState doAT(HttpServletRequest request, HttpServletResponse response, OA2Client client) throws Throwable {
         // Grants are checked in the doIt method
         verifyClientSecret(client, getClientSecret(request));
@@ -631,6 +639,9 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         OA2ServiceTransaction st2 = (OA2ServiceTransaction) state.getTransaction();
         if (!st2.getFlowStates().acceptRequests || !st2.getFlowStates().accessToken || !st2.getFlowStates().idToken) {
             throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "access denied", HttpStatus.SC_UNAUTHORIZED);
+        }
+        if(!st2.isAuthGrantValid()){
+            throw new OA2GeneralError(OA2Errors.INVALID_GRANT, "invalid grant", HttpStatus.SC_FORBIDDEN);
         }
         st2.setAccessToken(atResponse.getAccessToken()); // needed if there are handlers later.
         st2.setRefreshToken(atResponse.getRefreshToken()); // ditto. Might be null.
@@ -814,6 +825,9 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         } catch (Throwable t) {
 
         }
+        if(refreshToken.isExpired()){
+            throw new OA2GeneralError(OA2Errors.INVALID_GRANT, "token expired", HttpStatus.SC_FORBIDDEN);
+        }
         return rts.get(refreshToken);
     }
 
@@ -843,7 +857,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
 
         if (t == null || !t.isRefreshTokenValid()) {
             DebugUtil.trace(this, "Missing refresh token.");
-            throw new OA2ATException(OA2Errors.INVALID_REQUEST, "Error: The refresh token is no longer valid.");
+            throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, "Error: The refresh token is no longer valid.", HttpStatus.SC_UNAUTHORIZED);
         }
         DebugUtil.trace(this, "flow states = " + t.getFlowStates());
         if (!t.getFlowStates().acceptRequests || !t.getFlowStates().refreshToken) {
