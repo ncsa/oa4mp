@@ -29,18 +29,19 @@ public abstract class AbstractAccessTokenServlet extends MyProxyDelegationServle
     protected abstract ServiceTransaction getTransaction(AuthorizationGrant ag, HttpServletRequest req) throws ServletException;
 
     protected abstract void checkAGExpiration(AuthorizationGrant ag);
+
     protected IssuerTransactionState doDelegation(Client client, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Throwable, ServletException {
         info("5.a. Starting access token exchange");
         Verifier v = getServiceEnvironment().getTokenForge().getVerifier(httpServletRequest);
         AuthorizationGrant ag = getServiceEnvironment().getTokenForge().getAuthorizationGrant(httpServletRequest);
-       checkAGExpiration(ag);
+        checkAGExpiration(ag);
         ServiceTransaction transaction = getTransaction(ag, httpServletRequest);
 
         ATRequest atRequest = getATRequest(httpServletRequest, transaction);
 
         atRequest.setVerifier(v);
         atRequest.setAuthorizationGrant(ag);
-     //   atRequest.setExpiresIn(DateUtils.MAX_TIMEOUT); // FIXME!! make this configurable??
+        //   atRequest.setExpiresIn(DateUtils.MAX_TIMEOUT); // FIXME!! make this configurable??
         ATResponse atResp = (ATResponse) getATI().process(atRequest);
 
         transaction = verifyAndGet(atResp);

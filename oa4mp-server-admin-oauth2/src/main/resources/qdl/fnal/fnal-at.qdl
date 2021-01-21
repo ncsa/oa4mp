@@ -100,4 +100,7 @@ access_token.exp := access_token.iat + 543;
 access_token.err := 'Yo! Setting lifetime to 678';
 say('***** QDL *****');
 say(access_token.);
+say('tx_scope ' + to_string(tx_scopes.));
+say('tx_resource ' + to_string(tx_resource.));
+say('tx_audience ' + to_string(tx_audience.));
 

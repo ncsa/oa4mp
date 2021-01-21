@@ -34,7 +34,6 @@ import java.security.KeyPair;
 import java.util.*;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.client.ClientEnvironment.CALLBACK_URI_KEY;
-import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 import static edu.uiuc.ncsa.security.delegation.client.AbstractClientEnvironment.CERT_REQUEST_KEY;
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.*;
 import static edu.uiuc.ncsa.security.oauth_2_0.server.RFC8693Constants.*;
@@ -154,8 +153,13 @@ public class OA2MPService extends OA4MPService {
         //parameters.put(OA2Constants.REQUEST, "My_request");
 
         parameters.put(RESPONSE_TYPE, AUTHORIZATION_CODE);
-        //parameters.put(OA2Constants.CLIENT_ID, delegationRequest.getClient().getIdentifierString());
-        parameters.put(SCOPE, getRequestedScopes());
+        // Add in extra scopes if any.
+        String s = getRequestedScopes(); // reads them from the client
+        if (parameters.containsKey(SCOPE)) {
+            s = s + " " + parameters.get(SCOPE);
+        }
+        parameters.put(SCOPE, s);
+
         //parameters.put(OA2Constants.REDIRECT_URI, delegationRequest.getParameters().get(OA2Constants.REDIRECT_URI));
         parameters.put(STATE, a.getState()); // random state is ok.
         parameters.put(NONCE, a.getNonce());
@@ -175,11 +179,14 @@ public class OA2MPService extends OA4MPService {
         super(environment);
     }
 
-    public ATResponse2 getAccessToken(OA2Asset asset, AuthorizationGrant ag) {
+    public ATResponse2 getAccessToken(OA2Asset asset, AuthorizationGrant ag, Map<String, String> additionalParameters) {
         DelegatedAssetRequest dar = new DelegatedAssetRequest();
         dar.setAuthorizationGrant(ag);
         dar.setClient(getEnvironment().getClient());
         Map<String, String> m1 = getATParameters(asset, ag, null);
+        if (additionalParameters != null) {
+            m1.putAll(additionalParameters);
+        }
         dar.setParameters(m1);
 
 
@@ -196,6 +203,10 @@ public class OA2MPService extends OA4MPService {
 
         getAssetStore().save(asset);
         return atResponse2;
+    }
+
+    public ATResponse2 getAccessToken(OA2Asset asset, AuthorizationGrant ag) {
+        return getAccessToken(asset, ag, null);
     }
 
     /**
@@ -319,32 +330,51 @@ public class OA2MPService extends OA4MPService {
     /*
     Starting here is support for RFC 8693, token exchange
      */
-    public JSONObject exchangeRefreshToken(OA2Asset asset, RefreshToken refreshToken) {
+
+    /**
+     * Use this to either just get a new refresh token (getAT = false) or to use the refresh token
+     * to get a new access token (most usual case).
+     *
+     * @param asset
+     * @param refreshToken
+     * @param additionalParameters
+     * @param getAT
+     * @return
+     */
+    public JSONObject exchangeRefreshToken(OA2Asset asset, RefreshToken refreshToken,
+                                           Map additionalParameters,
+                                           boolean getAT) {
         HashMap<String, String> parameterMap = new HashMap<>();
+
         parameterMap.put(SUBJECT_TOKEN, refreshToken.getToken());
         parameterMap.put(SUBJECT_TOKEN_TYPE, REFRESH_TOKEN_TYPE);
-        parameterMap.put(REQUESTED_TOKEN_TYPE, REFRESH_TOKEN_TYPE);
+        if (getAT) {
+            parameterMap.put(REQUESTED_TOKEN_TYPE, ACCESS_TOKEN_TYPE);
+        } else {
+            parameterMap.put(REQUESTED_TOKEN_TYPE, REFRESH_TOKEN_TYPE);
+        }
+        if (additionalParameters != null) {
+            parameterMap.putAll(additionalParameters);
+        }
         return exchangeIt(asset, parameterMap);
     }
 
-    public JSONObject exchangeAccessToken(OA2Asset asset,
-                                          String scopes,
-                                          String resource,
-                                          String audience,
-                                          AccessToken accessToken) {
-        HashMap<String, String> parameterMap = new HashMap<>();
+    /**
+     * Use the access token to get another access token. This is certainly a supported case, but
+     * not a usual one. Mostly you use a refresh token to get another access token.
+     *
+     * @param asset
+     * @param accessToken
+     * @param additionalParams
+     * @return
+     */
+    public JSONObject exchangeAccessToken(OA2Asset asset, AccessToken accessToken, Map<String, String> additionalParams) {
+        Map parameterMap = new HashMap();
         parameterMap.put(SUBJECT_TOKEN, accessToken.getToken());
         parameterMap.put(SUBJECT_TOKEN_TYPE, ACCESS_TOKEN_TYPE);
         parameterMap.put(REQUESTED_TOKEN_TYPE, ACCESS_TOKEN_TYPE);
-        if(!isTrivial(scopes)){
-            parameterMap.put(SCOPE, scopes);
-        }
-        if(!isTrivial(resource)){
-            parameterMap.put(RESOURCE, resource);
-        }
-        if(!isTrivial(audience)){
-            parameterMap.put(AUDIENCE, audience);
-        }
+        parameterMap.putAll(additionalParams);
+
         return exchangeIt(asset, parameterMap);
     }
 
@@ -352,11 +382,15 @@ public class OA2MPService extends OA4MPService {
      * Actual workhorse. Takes the token and the type then does the exchange.
      *
      * @param asset
-     * @param parameterMap
+     * @param additionalParameters
      * @return
      */
-    protected JSONObject exchangeIt(OA2Asset asset, HashMap<String, String> parameterMap) {
+    protected JSONObject exchangeIt(OA2Asset asset, Map<String, String> additionalParameters) {
         ServiceClient serviceClient = getServiceClient();
+        Map parameterMap = new HashMap<>();
+        if (additionalParameters != null) {
+            parameterMap.putAll(additionalParameters);
+        }
         parameterMap.put(OA2Constants.GRANT_TYPE, GRANT_TYPE_TOKEN_EXCHANGE);
         Client client = getEnvironment().getClient();
         String rawResponse = serviceClient.getRawResponse(parameterMap, client.getIdentifierString(), client.getSecret());

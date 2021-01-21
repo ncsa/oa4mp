@@ -36,6 +36,7 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
     public String CLAIMS_KEY = "claims";
     public String SCRIPT_STATE_KEY = "script_state";
     public String AUDIENCE_KEY = "audience";
+    public String RESOURCE_KEY = "resource";
 
     public OA2ServiceTransaction(AuthorizationGrant ag) {
         super(ag);
@@ -87,7 +88,13 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
 
     /**
      * Clients may send an audience which is used by some components (notable SciTokens) but
-     * is generally optional.
+     * is generally optional. This is a list of them. This is returned as the
+     * {@link edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims#AUDIENCE } claim
+     * in JWT access tokens.
+     * <br/><br/>
+     * <b>Note:</b> These are simply logical names that describe the audience, such as "ALL"
+     * or "ligo_cluster." Compare with {@link #getResource()} which has a list of URIs for the
+     * same purpose.
      *
      * @return
      */
@@ -102,6 +109,29 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         getState().put(AUDIENCE_KEY, audience);
     }
 
+    /**
+     * Resources are URIs that are used as part of the {@link edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims#AUDIENCE}
+     * claim in a (compound) access token.
+     * @return
+     */
+    public List<String> getResource(){
+        // This is a list of string and not URIs because it is in the state object which gets serialized
+        // JSON which does very odd things to URIs. Best we can do is check that the elements are URIs
+        // when setting it rather than writing some handler if it gets changed.
+        if (getState().containsKey(RESOURCE_KEY)) {
+            return getState().getJSONArray(RESOURCE_KEY);
+        }
+        return null;
+    }
+
+    public void setResource(List<String> r){
+        getState().put(RESOURCE_KEY, r);
+    }
+
+    /**
+     * Generally you should never set the state directly unless you know exactly how it is constructed.
+     * @param state
+     */
     public void setState(JSONObject state) {
         this.state = state;
     }
@@ -374,6 +404,11 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         return scopes;
     }
 
+    /**
+     * The scopes <b><i>requested</i></b> by the client. This does not mean they are all
+     * allowed, just so we have a list of them
+     * @param scopes
+     */
     @Override
     public void setScopes(Collection<String> scopes) {
         this.scopes = scopes;

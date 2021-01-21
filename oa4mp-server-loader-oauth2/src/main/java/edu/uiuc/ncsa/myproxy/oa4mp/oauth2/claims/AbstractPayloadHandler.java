@@ -9,9 +9,13 @@ import edu.uiuc.ncsa.security.oauth_2_0.jwt.PayloadHandlerConfig;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
+import edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse;
 import net.sf.json.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+
+import static edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse.RC_NOT_RUN;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -26,7 +30,6 @@ public abstract class AbstractPayloadHandler implements PayloadHandler {
     public PayloadHandlerConfigImpl getPhCfg() {
         return phCfg;
     }
-
 
 
     PayloadHandlerConfigImpl phCfg;
@@ -58,10 +61,15 @@ public abstract class AbstractPayloadHandler implements PayloadHandler {
         return claims;
     }
 
-    public void setClaims(JSONObject claims){
+    public void setClaims(JSONObject claims) {
         transaction.setUserMetaData(claims);
         this.claims = claims;
     }
+
+    public void setExtendedAttributes(JSONObject extendedAttributes) {
+        this.extendedAttributes = extendedAttributes;
+    }
+
     JSONObject extendedAttributes = null;
 
     /**
@@ -84,10 +92,10 @@ public abstract class AbstractPayloadHandler implements PayloadHandler {
     @Override
     public JSONObject execute(ClaimSource source, JSONObject claims) throws Throwable {
         // If this is disabled, return the claims unaltered -- do not execute.
-        if(!source.isEnabled()){
+        if (!source.isEnabled()) {
             return claims;
         }
-        if(!source.isEnabled()){
+        if (!source.isEnabled()) {
             return claims; // do nothing if the source is enabled.
         }
         // Fix for CIL-693:
@@ -96,11 +104,11 @@ public abstract class AbstractPayloadHandler implements PayloadHandler {
             ((BasicClaimsSourceImpl) source).setOa2SE(oa2se);
         }
         // For those handlers that may require the http servlet request, pass it along.
-        if(request == null){
-              return source.process(claims, transaction);
-          }else{
-              return source.process(claims, request, transaction);
-          }
+        if (request == null) {
+            return source.process(claims, transaction);
+        } else {
+            return source.process(claims, request, transaction);
+        }
     }
 
     @Override
@@ -115,17 +123,68 @@ public abstract class AbstractPayloadHandler implements PayloadHandler {
 
     @Override
     public String getToken(JSONWebKey key) {
-        if(getClaims() == null || getClaims().isEmpty()){
+        if (getClaims() == null || getClaims().isEmpty()) {
             return "";
         }
 
         try {
             return JWTUtil2.createJWT(getClaims(), key);
         } catch (Throwable e) {
-            if(e instanceof RuntimeException){
-                throw (RuntimeException)e;
+            if (e instanceof RuntimeException) {
+                throw (RuntimeException) e;
             }
             throw new GeneralException("Could not create signed token", e);
         }
+    }
+
+    public void setResponseCode(int responseCode) {
+        this.responseCode = responseCode;
+    }
+
+    public int getResponseCode() {
+        return responseCode;
+    }
+
+    int responseCode = RC_NOT_RUN;
+
+    @Override
+    public void handleResponse(ScriptRunResponse resp) throws Throwable {
+        responseCode = resp.getReturnCode();
+    }
+
+    /**
+     * A utility to take a list and convert it to a blank delimited string.
+     * This is returned by any number of handlers. Note that objects
+     *
+     * @param list
+     * @return
+     */
+    protected String listToString(List list) {
+        String requestedScopes = "";
+        if (list == null | list.isEmpty()) {
+            return requestedScopes;
+        }
+        boolean firstPass = true;
+        for (Object x : list) {
+            if (x == null) {
+                continue;
+            }
+            if (firstPass) {
+                firstPass = false;
+                requestedScopes = x.toString();
+            } else {
+                requestedScopes = requestedScopes + " " + x.toString();
+            }
+        }
+        return requestedScopes;
+    }
+
+
+    @Override
+    public boolean hasScript() {
+        if (getPhCfg() == null) {
+            return false;
+        }
+        return getPhCfg().getScriptSet() != null && !getPhCfg().getScriptSet().isEmpty();
     }
 }

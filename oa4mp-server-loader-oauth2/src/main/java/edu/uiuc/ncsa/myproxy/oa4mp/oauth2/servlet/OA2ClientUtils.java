@@ -27,6 +27,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -326,7 +327,7 @@ public class OA2ClientUtils {
                     req);
         }
         IDTokenHandler idTokenHandler = new IDTokenHandler(idthCfg);
-        jwtRunner.addHandler(idTokenHandler);
+        jwtRunner.setIdTokenHandlerInterface(idTokenHandler);
 
         if (client.hasAccessTokenConfig()) {
             ServletDebugUtil.trace(OA2ClientUtils.class, "has access token config, creating handler, type="
@@ -366,5 +367,10 @@ public class OA2ClientUtils {
             BasicRefreshTokenHandler rth = new BasicRefreshTokenHandler(st);
             jwtRunner.setRefreshTokenHandler(rth);
         }
+    }
+    public static List<String> scopesFromTemplates(List<String> scopes, OA2ServiceTransaction t){
+        List<String> computedScopes = new ArrayList<>();
+        return computedScopes;
+
     }
 }

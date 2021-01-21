@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.functor.FunctorRuntimeEngine;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
 import edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.OA2State;
 import edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.QDLRuntimeEngine;
@@ -21,6 +22,11 @@ public class ScriptRuntimeEngineFactory {
         // This is because there is nothing to execute so no reason to incur the overhead of creating it.
         if (config.containsKey(OA2ClientFunctorScriptsUtil.CLAIMS_KEY)) {
             return new FunctorRuntimeEngine(config);
+        }
+
+        OA2Client oa2Client = (OA2Client) transaction.getClient();
+        if(!oa2Client.hasScript()){
+            return null; // Only create QDL runtime environment if there is a reason to do so.
         }
 
         if (oa2SE.getQDLEnvironment() == null || !oa2SE.getQDLEnvironment().isEnabled()) {

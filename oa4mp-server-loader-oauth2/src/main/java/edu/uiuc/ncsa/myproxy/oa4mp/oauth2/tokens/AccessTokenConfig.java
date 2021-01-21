@@ -1,12 +1,8 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.AbstractPayloadConfig;
-import edu.uiuc.ncsa.security.core.util.DebugUtil;
-import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Common configuration for all access tokens. This includes things like the lifetime,
@@ -14,42 +10,15 @@ import java.util.List;
  * <p>Created by Jeff Gaynor<br>
  * on 7/28/20 at  7:51 AM
  */
-public class AccessTokenConfig extends AbstractPayloadConfig {
-    public static String SUBJECT_KEY = "subject";
-    public static String ISSUER_KEY = "issuer";
-    public static String AUDIENCE_KEY = "audience";
+public class AccessTokenConfig extends AbstractCommonATandRTConfig {
     public static String TEMPLATES_KEY = "templates";
 
-    String issuer;
-    String subject;
-    List<String> audience = new ArrayList<>();
     AuthorizationTemplates templates = new AuthorizationTemplates();
 
 
     @Override
     public void fromJSON(JSONObject jsonObject) {
         super.fromJSON(jsonObject);
-
-        if (jsonObject.containsKey(ISSUER_KEY)) {
-            issuer = jsonObject.getString(ISSUER_KEY);
-        }
-        if (jsonObject.containsKey(SUBJECT_KEY)) {
-            subject = jsonObject.getString(SUBJECT_KEY);
-        }
-
-        if (jsonObject.containsKey(AUDIENCE_KEY)) {
-            Object obj = jsonObject.get(AUDIENCE_KEY);
-            DebugUtil.trace(this, "Got audience=" + obj);
-            if (obj instanceof JSONArray) {
-                audience = (List<String>) obj;
-
-            } else {
-                ArrayList x = new ArrayList();
-                x.add(obj.toString());
-                audience = x;
-
-            }
-        }
         if (jsonObject.containsKey(TEMPLATES_KEY)) {
             templates = new AuthorizationTemplates();
             templates.fromJSON(jsonObject.getJSONArray(TEMPLATES_KEY));
@@ -59,50 +28,13 @@ public class AccessTokenConfig extends AbstractPayloadConfig {
     @Override
     public JSONObject toJSON() {
         JSONObject json = super.toJSON();
-
-        if (subject != null) {
-            json.put(SUBJECT_KEY, subject);
-        }
-
         if (templates != null) {
-
             json.put(TEMPLATES_KEY, templates.toJSON());
-        }
-        if (issuer != null) {
-            json.put(ISSUER_KEY, issuer);
-        }
-        if (audience != null) {
-            json.put(AUDIENCE_KEY, audience);
         }
         return json;
     }
 
 
-
-    public String getIssuer() {
-        return issuer;
-    }
-
-    public void setIssuer(String issuer) {
-        this.issuer = issuer;
-    }
-
-    public String getSubject() {
-        return subject;
-    }
-
-    public void setSubject(String subject) {
-        this.subject = subject;
-    }
-
-
-    public List<String> getAudience() {
-        return audience;
-    }
-
-    public void setAudience(List<String> audience) {
-        this.audience = audience;
-    }
 
     public AuthorizationTemplates getTemplates() {
         return templates;
@@ -113,6 +45,9 @@ public class AccessTokenConfig extends AbstractPayloadConfig {
     }
 
     public static void main(String[] args) {
+        /*
+        This will create an example access token config entry with templates.
+         */
         AccessTokenConfig acc = new AccessTokenConfig();
         acc.setId(Long.toString(System.currentTimeMillis(), 16));
         acc.setType("scitoken");

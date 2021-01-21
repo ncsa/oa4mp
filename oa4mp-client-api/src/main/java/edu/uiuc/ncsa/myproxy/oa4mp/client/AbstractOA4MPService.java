@@ -102,9 +102,9 @@ public abstract class AbstractOA4MPService {
      * @return
      */
     public OA4MPResponse requestCert(Identifier identifier, Map additionalParameters) {
-        if (additionalParameters == null) {
-            additionalParameters = new HashMap();
-        }
+        // DOn't just add stuff to the argument since the caller might not want it changed.
+        Map newAP = new HashMap();
+        newAP.putAll(additionalParameters);
         AssetProvider assetProvider = getEnvironment().getAssetProvider();
         Asset asset = null;
         if (identifier == null) {
@@ -113,7 +113,7 @@ public abstract class AbstractOA4MPService {
             asset = assetProvider.get(identifier);
         }
 
-        OA4MPResponse response = requestCert(asset, additionalParameters);
+        OA4MPResponse response = requestCert(asset, newAP);
         asset.setPrivateKey(response.getPrivateKey());
         asset.setRedirect(response.getRedirect());
         getAssetStore().save(asset);
@@ -164,17 +164,16 @@ public abstract class AbstractOA4MPService {
 
 
     protected OA4MPResponse requestCert(Asset asset, Map additionalParameters) {
-        if (additionalParameters == null) {
-            additionalParameters = new HashMap();
-        }
+        Map requestParameters = new HashMap();
+        requestParameters.putAll(additionalParameters);
         try {
 
-            preRequestCert(asset, additionalParameters);
+            preRequestCert(asset, requestParameters);
 
             OA4MPResponse mpdsResponse = new OA4MPResponse();
             mpdsResponse.setPrivateKey(asset.getPrivateKey());
             DelegationRequest daReq = new DelegationRequest();
-            daReq.setParameters(additionalParameters);
+            daReq.setParameters(requestParameters);
             daReq.setClient(getEnvironment().getClient());
             daReq.setBaseUri(getEnvironment().getAuthorizationUri());
             DelegationResponse daResp = (DelegationResponse) getEnvironment().getDelegationService().process(daReq);

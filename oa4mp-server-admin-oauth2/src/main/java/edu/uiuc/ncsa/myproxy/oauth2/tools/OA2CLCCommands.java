@@ -14,20 +14,20 @@ import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.delegation.client.request.RTResponse;
-import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
 import edu.uiuc.ncsa.security.delegation.token.Token;
 import edu.uiuc.ncsa.security.delegation.token.impl.AuthorizationGrantImpl;
+import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
 import edu.uiuc.ncsa.security.oauth_2_0.JWTUtil;
 import edu.uiuc.ncsa.security.oauth_2_0.UserInfo;
 import edu.uiuc.ncsa.security.oauth_2_0.client.ATResponse2;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTUtil2;
-import edu.uiuc.ncsa.security.oauth_2_0.server.RFC8693Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import edu.uiuc.ncsa.security.util.pkcs.CertUtil;
 import net.sf.json.JSONObject;
+import org.apache.commons.codec.binary.Base64;
 
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
@@ -49,12 +49,13 @@ import java.util.*;
 
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.ID_TOKEN;
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.RAW_ID_TOKEN;
+import static edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTUtil2.PAYLOAD_INDEX;
 
 /**
  * A command line client. Invoke help as needed, but the basic operation is to create the initial
- * request url using the {@link #geturi(InputLine)} call, paste it in your browser, authenticate
+ * request url using the {@link #set_uri(InputLine)} call, paste it in your browser, authenticate
  * (since this is an OIDC client, you must pass through a browser at some point). The call back should
- * fail, so you copy the attempted callback from the service using the {@link #setgrant(InputLine)}
+ * fail, so you copy the attempted callback from the service using the {@link #get_grant(InputLine)}
  * call. You can then do whatever you needed (get an access token, get refresh tokens if the server supports it)
  * inspect id tokens and such.
  * <p>Created by Jeff Gaynor<br>
@@ -92,19 +93,16 @@ public class OA2CLCCommands extends CLCCommands {
     }
 
     public void getURIHelp() {
-        say("seturi | geturi");
-        //say("seturi | geturi [" + CLIENT_CFG_NAME_KEY + " config_name]");
+        say("set_uri");
         say("Usage: This will create the correct URL. If possible, it will put it in the clipboard.");
         sayi("Create the uri using the  client's configuration");
-//        sayi("If the name is given, the configuration is re-read and the named configuration is set to the current one.");
-//        sayi("This lets you test several clients in quick succession if needed.");
         sayi("This will put this in to the clipboard if possible.");
         sayi("This URL should be pasted exactly into the location bar.");
         sayi("You must then authenticate. After you authenticate, the");
         sayi("service will attempt a call back to a client endpoint which will");
         sayi("fail (this is the hook that lets us do this manually).");
         sayi("Next Step: You should invoke setgrant with the callback uri from the server.");
-
+        say("See also: set_param");
     }
 
     SecureRandom secureRandom = new SecureRandom();
@@ -116,9 +114,6 @@ public class OA2CLCCommands extends CLCCommands {
 
     String CLIENT_CFG_NAME_KEY = "-name";
 
-    public void seturi(InputLine inputLine) throws Exception {
-        geturi(inputLine);
-    }
 
     OA2CommandLineClient oa2CommandLineClient;
 
@@ -143,7 +138,7 @@ public class OA2CLCCommands extends CLCCommands {
      * @param inputLine
      * @throws Exception
      */
-    public void geturi(InputLine inputLine) throws Exception {
+    public void set_uri(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
             getURIHelp();
             return;
@@ -164,16 +159,20 @@ public class OA2CLCCommands extends CLCCommands {
                 say("Sorry, I could not find the configuration with id =\"" + name + "\":" + t.getMessage());
             }
         }*/
-        clear(inputLine);
+        clear(inputLine, true); //clear out everything except any set parameters
         Identifier id = AssetStoreUtil.createID();
-        OA4MPResponse resp = getService().requestCert(id);
+        OA4MPResponse resp = getService().requestCert(id, requestParameters);
         DebugUtil.trace(this, "client id = " + getCe().getClientId());
         dummyAsset = (OA2Asset) getCe().getAssetStore().get(id.toString());
-        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-        if (clipboard != null) {
-            StringSelection data = new StringSelection(resp.getRedirect().toString());
-            clipboard.setContents(data, data);
-            say("URL copied to clipboard:");
+        try {
+            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+            if (clipboard != null) {
+                StringSelection data = new StringSelection(resp.getRedirect().toString());
+                clipboard.setContents(data, data);
+                say("URL copied to clipboard:");
+            }
+        } catch (Throwable t) {
+            // there was a problem with the clipboard. Skip it.
         }
         say(resp.getRedirect().toString());
     }
@@ -204,11 +203,8 @@ public class OA2CLCCommands extends CLCCommands {
 
     AuthorizationGrantImpl grant;
 
-    public void getgrant(InputLine inputLine) throws Exception {
-        setgrant(inputLine);
-    }
 
-    public void setgrant(InputLine inputLine) throws Exception {
+    public void get_grant(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
             setGrantHelp();
             return;
@@ -216,19 +212,32 @@ public class OA2CLCCommands extends CLCCommands {
         String x = null;
         if (inputLine.size() == 1) {
             if (grant != null) {
-                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                if (clipboard != null) {
-                    StringSelection data = new StringSelection(grant.getToken());
-                    clipboard.setContents(data, data);
-                    say("grant copied to clipboard.");
-                }
                 // already have a grant. Show it and copy it to the clipboard
                 say("grant=" + grant.getToken());
+                try {
+                    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                    if (clipboard != null) {
+                        StringSelection data = new StringSelection(grant.getToken());
+                        clipboard.setContents(data, data);
+                        say("grant copied to clipboard.");
+                    }
+                } catch (Throwable t) {
+                    // there was a problem with the clipboard.
+                }
                 return;
             }
             // no arg. get it from the clipboard
-            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-            x = (String) clipboard.getData(DataFlavor.stringFlavor);
+            try {
+                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                x = (String) clipboard.getData(DataFlavor.stringFlavor);
+            } catch (Throwable t) {
+                say("No clipboard.");
+                x = getInput("Enter the callback", "");
+                if (StringUtils.isTrivial(x)) {
+                    say("aborted");
+                    return;
+                }
+            }
         } else {
 
             x = inputLine.getArg(1); // zero-th element is the name of this function. 1st is the actual argument.
@@ -246,11 +255,15 @@ public class OA2CLCCommands extends CLCCommands {
                 URI uri = URI.create(decode(current.substring(5)));
                 say("grant=" + uri.toString()); // length of string "code="
                 grant = new AuthorizationGrantImpl(uri);
-                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                if (clipboard != null) {
-                    StringSelection data = new StringSelection(uri.toString());
-                    clipboard.setContents(data, data);
-                    say("grant copied to clipboard.");
+                try {
+                    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                    if (clipboard != null) {
+                        StringSelection data = new StringSelection(uri.toString());
+                        clipboard.setContents(data, data);
+                        say("grant copied to clipboard.");
+                    }
+                } catch (Throwable t) {
+                    // no clipboard
                 }
             }
         }
@@ -260,7 +273,7 @@ public class OA2CLCCommands extends CLCCommands {
         return dummyAsset;
     }
 
-    public void clear(InputLine inputLine) throws Exception {
+    public void clear(InputLine inputLine, boolean keepParams) throws Exception {
         if (showHelp(inputLine)) {
             getClearHelp();
             return;
@@ -276,6 +289,16 @@ public class OA2CLCCommands extends CLCCommands {
         canGetGrant = false;
         canGetRT = false;
         canGetAT = false;
+        if (!keepParams) {
+            requestParameters = new HashMap<>();
+            tokenParameters = new HashMap<>();
+            exchangeParameters = new HashMap<>();
+        }
+
+    }
+
+    public void clear(InputLine inputLine) throws Exception {
+        clear(inputLine, false);
     }
 
     boolean canGetGrant = false;
@@ -291,10 +314,10 @@ public class OA2CLCCommands extends CLCCommands {
     OA2Asset dummyAsset;
 
     protected void saveCertHelp() {
-        say("savecert filename:");
-        say("   This will save the cert (be sure to do a getcert call first so you have one) to the");
-        say("   fully qualified filename");
-        say("   If there is no cert available, no file will be written, but a message will be printed.");
+        say("save_cert filename:");
+        sayi("This will save the cert (be sure to do a getcert call first so you have one) to the");
+        sayi("fully qualified filename");
+        sayi("If there is no cert available, no file will be written, but a message will be printed.");
     }
 
     /**
@@ -304,7 +327,7 @@ public class OA2CLCCommands extends CLCCommands {
      * @param inputLine
      * @throws Exception
      */
-    public void savecert(InputLine inputLine) throws Exception {
+    public void save_cert(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
             saveCertHelp();
             return;
@@ -330,13 +353,13 @@ public class OA2CLCCommands extends CLCCommands {
     String rawIdToken = null;
 
     protected void showRawTokenHelp() {
-        sayi("showRawToken:");
-        say("    This will show the raw id token, i.e., the JWT. ");
-        sayi("   If you wish to see the contents of this JWT");
-        sayi("   you should probably invoke showClaims instead.");
+        sayi("show_rawtoken:");
+        sayi("This will show the raw id token, i.e., the JWT. ");
+        sayi("If you wish to see the contents of this JWT");
+        sayi("you should probably invoke showClaims instead.");
     }
 
-    public void showrawtoken(InputLine inputLine) throws Exception {
+    public void show_rawtoken(InputLine inputLine) throws Exception {
         if (grant == null || showHelp(inputLine)) {
             getATHelp();
             return;
@@ -404,13 +427,13 @@ public class OA2CLCCommands extends CLCCommands {
 
     }
 
-    public void getat(InputLine inputLine) throws Exception {
+    public void get_at(InputLine inputLine) throws Exception {
         if (grant == null || showHelp(inputLine)) {
             getATHelp();
             return;
         }
         DebugUtil.trace(this, "Getting AT, grant=" + grant);
-        currentATResponse = getOA2S().getAccessToken(getDummyAsset(), grant);
+        currentATResponse = getOA2S().getAccessToken(getDummyAsset(), grant, tokenParameters);
         Object x = currentATResponse.getParameters().get(RAW_ID_TOKEN);
         if (x == null) {
             x = "";
@@ -433,19 +456,19 @@ public class OA2CLCCommands extends CLCCommands {
     ATResponse2 currentATResponse;
 
     protected void getCertHelp() {
-        say("getcert");
-        say("   This will get the requested cert chain from the server.");
+        say("get_cert");
+        sayi("This will get the requested cert chain from the server.");
     }
 
     protected void getUIHelp() {
-        say("getuserinfo");
-        say("   This will get the user info from the server. You must have already authenticated");
-        say("   *and* gotten a valid access token by this point. Just a list of these it printed.");
-        say("   What is returned is dependant upon what the server supports.");
-        say("   If possible this will be put in to the clipboard for easy access.");
+        say("get_userinfo");
+        sayi("This will get the user info from the server. You must have already authenticated");
+        sayi("*and* gotten a valid access token by this point. Just a list of these it printed.");
+        sayi("What is returned is dependant upon what the server supports.");
+        sayi("If possible this will be put in to the clipboard for easy access.");
     }
 
-    public void getuserinfo(InputLine inputLine) throws Exception {
+    public void get_userinfo(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
             getUIHelp();
             return;
@@ -461,7 +484,7 @@ public class OA2CLCCommands extends CLCCommands {
 
     AssetResponse assetResponse = null;
 
-    public void getcert(InputLine inputLine) throws Exception {
+    public void get_cert(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
             getCertHelp();
             return;
@@ -478,11 +501,11 @@ public class OA2CLCCommands extends CLCCommands {
     public static final String NO_VERIFY_JWT = "-no_verify";
 
     protected void getRTHelp() {
-        say("getrt [" + CLAIMS_FLAG + " | " + NO_VERIFY_JWT + "]:");
-        say("   Get a new refresh token. You must have already called getat to have gotten an access token");
-        say("   first. This will print out a summary of the expiration time.");
-        say("   " + CLAIMS_FLAG + " = the id token will be printed");
-        say("   " + NO_VERIFY_JWT + " = do not verify JWTs against server. Default is to verify.");
+        say("get_rt [" + CLAIMS_FLAG + " | " + NO_VERIFY_JWT + "]:");
+        sayi("Get a new refresh token. You must have already called getat to have gotten an access token");
+        sayi("first. This will print out a summary of the expiration time.");
+        sayi(CLAIMS_FLAG + " = the id token will be printed");
+        sayi(NO_VERIFY_JWT + " = do not verify JWTs against server. Default is to verify.");
 
     }
 
@@ -490,7 +513,7 @@ public class OA2CLCCommands extends CLCCommands {
         if (noVerify) {
             try {
                 String[] components = JWTUtil.decat(token.getToken());
-                return JSONObject.fromObject(components[JWTUtil.PAYLOAD_INDEX]);
+                return JSONObject.fromObject(new String(Base64.decodeBase64(components[PAYLOAD_INDEX])));
             } catch (Throwable t) {
                 return null;
             }
@@ -533,9 +556,19 @@ public class OA2CLCCommands extends CLCCommands {
             }
             if (token == null) {
                 say("default access token = " + dummyAsset.getAccessToken().getToken());
+                say("AT expires in = " + dummyAsset.getAccessToken().getLifetime() + " ms.");
+                Date startDate = DateUtils.getDate(dummyAsset.getAccessToken().getToken());
+                startDate.setTime(startDate.getTime() + dummyAsset.getAccessToken().getLifetime());
+                say("   valid until " + startDate + "\n");
             } else {
                 sayi("JWT access token:" + token.toString(1));
+                if (token.containsKey(OA2Claims.EXPIRATION)) {
+                    Date d = new Date();
+                    d.setTime(token.getLong(OA2Claims.EXPIRATION) * 1000L);
 
+                    getDummyAsset().getAccessToken().setLifetime(d.getTime() - System.currentTimeMillis());
+                    say("AT expires in = " + getDummyAsset().getAccessToken().getLifetime() + " ms.\n");
+                }
             }
         }
 
@@ -552,14 +585,15 @@ public class OA2CLCCommands extends CLCCommands {
                 say("RT expires in = " + dummyAsset.getRefreshToken().getLifetime() + " ms.");
                 Date startDate = DateUtils.getDate(dummyAsset.getRefreshToken().getToken());
                 startDate.setTime(startDate.getTime() + dummyAsset.getRefreshToken().getLifetime());
-                say("   valid until " + startDate);
+                say("   valid until " + startDate + "\n");
 
             } else {
                 say("JWT refresh token = " + token.toString(1));
                 if (token.containsKey(OA2Claims.EXPIRATION)) {
                     Date d = new Date();
                     d.setTime(token.getLong(OA2Claims.EXPIRATION) * 1000L);
-                    //  getDummyAsset().getRefreshToken().setLifetime(d.getTime() - System.currentTimeMillis());
+
+                    getDummyAsset().getRefreshToken().setLifetime(d.getTime() - System.currentTimeMillis());
                     say("RT expires in = " + getDummyAsset().getRefreshToken().getLifetime() + " ms.");
                 }
             }
@@ -570,7 +604,7 @@ public class OA2CLCCommands extends CLCCommands {
 
     public static final String CLAIMS_FLAG = "-claims";
 
-    public void getrt(InputLine inputLine) throws Exception {
+    public void get_rt(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
             getRTHelp();
             return;
@@ -595,7 +629,7 @@ public class OA2CLCCommands extends CLCCommands {
 
 
     protected void getATHelp() {
-        say("getat [" + CLAIMS_FLAG + " | " + NO_VERIFY_JWT + "]:");
+        say("get_at [" + CLAIMS_FLAG + " | " + NO_VERIFY_JWT + "]:");
         say("   Gets the access token and refresh token (if supported on the server) for a given grant. ");
         say("   Your must have already set the grant with the setgrant call.");
         say("   A summary of the refresh token and its expiration is printed, if applicable.");
@@ -605,7 +639,7 @@ public class OA2CLCCommands extends CLCCommands {
     }
 
     protected void setGrantHelp() {
-        say("[g|s]etgrant [callback]:");
+        say("get_grant [callback]:");
         sayi("callback = the entire callback returned from the service");
         sayi("no arg -- either ");
         sayi("case A: you already have done this and a grant is set. Show it, paste it in the clipboard.");
@@ -616,24 +650,17 @@ public class OA2CLCCommands extends CLCCommands {
         sayi("Otherwise paste the callback directly");
     }
 
-    public static String TX_SCOPES_FLAG = "-" + RFC8693Constants.SCOPE;
-    public static String TX_AUDIENCE_FLAG = "-" + RFC8693Constants.AUDIENCE;
-    public static String TX_RESOURCE_FLAG = "-" + RFC8693Constants.RESOURCE;
 
     protected void exchangeHelp() {
-        sayi("exchange [-at|-rt] [" +
-                TX_SCOPES_FLAG + " \"scope1 scope2 \"...] ["
-                + TX_AUDIENCE_FLAG + " audience] [" +
-                TX_RESOURCE_FLAG + "resource]"
-        );
-        sayi("   This will exchange the current access token (so you need to have gotten that far first)");
-        sayi("   for a secure token. The response will contain other information that will be displayed.");
-        sayi("   If there is no parameter, the current access token is used for the exchange");
-        sayi("   Otherwise you may specify -at to exchange the access token or -rt to exchange using the refresh token.");
-        sayi(TX_SCOPES_FLAG + " = send these scopes along with the request. This is a blank delimited list");
+        sayi("exchange [-at|-rt]");
+        sayi(" This will exchange the current access token (so you need to have gotten that far first)");
+        sayi(" for a secure token. The response will contain other information that will be displayed.");
+        sayi(" If there is no parameter, the current access token is used for the exchange");
+        sayi(" Otherwise you may specify -at to exchange the access token or -rt to exchange using the refresh token.");
         say("E.g.");
-        sayi("exchange -at " + TX_SCOPES_FLAG + " \"read:/ligoDB\"");
-        say("Note: you can only specify scopes for the access token. They are ignored for refresh tokens");
+        sayi("exchange -at ");
+        sayi("Note: you can only specify scopes for the access token. They are ignored for refresh tokens");
+        say("See also: set_param to set additional parameters (like specific scopes or the audience");
     }
 
     JSONObject sciToken = null;
@@ -644,26 +671,37 @@ public class OA2CLCCommands extends CLCCommands {
             return;
         }
         boolean didIt = false;
-        String scopes = null;
-        if (inputLine.hasArg(TX_SCOPES_FLAG)) {
-            scopes = inputLine.getNextArgFor(TX_SCOPES_FLAG);
-            inputLine.removeSwitchAndValue(TX_SCOPES_FLAG);
-        }
+
         if (1 == inputLine.size() || inputLine.hasArg("-at")) {
             didIt = true;
-            AccessToken at = getDummyAsset().getAccessToken();
-            JSONObject response = getService().exchangeAccessToken(getDummyAsset(),
-                    scopes, null,
-                    null,
-                    at);
+            RefreshToken at = null;
+            JSONObject token = resolveFromToken(getDummyAsset().getRefreshToken(), true);
+            if (token == null) {
+                at = getDummyAsset().getRefreshToken();
+            } else {
+                at = new RefreshTokenImpl(getDummyAsset().getRefreshToken().getToken(),
+                        URI.create(token.getString(OA2Claims.JWT_ID)));
+            }
+            JSONObject response = getService().exchangeRefreshToken(getDummyAsset(),
+                    at,
+                    exchangeParameters,
+                    true);
             sciToken = response;
 
             sayi(response.toString(2));
         }
         if (inputLine.hasArg("-rt")) {
             didIt = true;
-            RefreshToken rt = getDummyAsset().getRefreshToken();
-            JSONObject response = getService().exchangeRefreshToken(getDummyAsset(), rt);
+            RefreshToken rt = null;
+            JSONObject token = resolveFromToken(getDummyAsset().getRefreshToken(), true);
+            if (token == null) {
+                rt = getDummyAsset().getRefreshToken();
+            } else {
+                rt = new RefreshTokenImpl(getDummyAsset().getRefreshToken().getToken(),
+                        URI.create(token.getString(OA2Claims.JWT_ID)));
+            }
+            //RefreshToken rt = getDummyAsset().getRefreshToken();
+            JSONObject response = getService().exchangeRefreshToken(getDummyAsset(), rt, null, false);
             sciToken = response;
 
             sayi(response.toString(2));
@@ -683,6 +721,10 @@ public class OA2CLCCommands extends CLCCommands {
     protected String ASSET_KEY = "asset";
     protected String CLAIMS_KEY = "claims";
     protected String AUTHZ_GRANT_KEY = "authz_grant";
+    protected String TOKEN_PARAMETERS_KEY = "token_parameters";
+    protected String AUTHZ_PARAMETERS_KEY = "authz_parameters";
+    protected String EXCHANGE_PARAMETERS_KEY = "exchange_parameters";
+
 
     public void read(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
@@ -733,8 +775,6 @@ public class OA2CLCCommands extends CLCCommands {
 
             grant = new AuthorizationGrantImpl(URI.create("a"));
             grant.fromJSON(json.getJSONObject(AUTHZ_GRANT_KEY));
-            //grant = new AuthorizationGrantImpl(URI.create(json.getString(AUTHZ_GRANT_KEY)));
-            //grant.fromJSON(json.getJSONObject(AUTHZ_GRANT_KEY));
         }
 
         if (json.containsKey(CONFIG_FILE_KEY)) {
@@ -746,7 +786,19 @@ public class OA2CLCCommands extends CLCCommands {
             InputLine loadLine = new InputLine(v);
             load(loadLine);
         }
+        if (json.containsKey(TOKEN_PARAMETERS_KEY)) {
+            tokenParameters = new HashMap<>();
+            tokenParameters.putAll(json.getJSONObject(TOKEN_PARAMETERS_KEY));
+        }
+        if (json.containsKey(AUTHZ_PARAMETERS_KEY)) {
+            requestParameters = new HashMap<>();
+            requestParameters.putAll(json.getJSONObject(AUTHZ_PARAMETERS_KEY));
+        }
 
+        if (json.containsKey(EXCHANGE_PARAMETERS_KEY)) {
+            exchangeParameters = new HashMap<>();
+            exchangeParameters.putAll(json.getJSONObject(EXCHANGE_PARAMETERS_KEY));
+        }
 
         dummyAsset = new OA2Asset(null);
         if (json.containsKey(ASSET_KEY)) {
@@ -810,6 +862,24 @@ public class OA2CLCCommands extends CLCCommands {
         jsonObject.put(CONFIG_NAME_KEY, oa2CommandLineClient.getConfigName());
         jsonObject.put(CONFIG_FILE_KEY, oa2CommandLineClient.getConfigFile());
 
+        if (!requestParameters.isEmpty()) {
+            JSONObject jj = new JSONObject();
+            jj.putAll(requestParameters);
+            jsonObject.put(AUTHZ_PARAMETERS_KEY, jj);
+        }
+
+        if (!tokenParameters.isEmpty()) {
+            JSONObject jj = new JSONObject();
+            jj.putAll(tokenParameters);
+            jsonObject.put(AUTHZ_PARAMETERS_KEY, jj);
+        }
+
+        if (!exchangeParameters.isEmpty()) {
+            JSONObject jj = new JSONObject();
+            jj.putAll(exchangeParameters);
+            jsonObject.put(EXCHANGE_PARAMETERS_KEY, jj);
+        }
+
         if (claims != null && !claims.isEmpty()) {
             jsonObject.put(CLAIMS_KEY, claims);
         }
@@ -839,5 +909,183 @@ public class OA2CLCCommands extends CLCCommands {
             say("(no grant)");
         }
         say(grant.toJSON().toString(1));
+    }
+
+    HashMap<String, String> requestParameters = new HashMap<>();
+    HashMap<String, String> tokenParameters = new HashMap<>();
+    HashMap<String, String> exchangeParameters = new HashMap<>();
+
+    public static final String REQ_PARAM_SWITCH = "-authz";
+    public static final String SHORT_REQ_PARAM_SWITCH = "-a";
+    public static final String TOKEN_PARAM_SWITCH = "-token";
+    public static final String SHORT_TOKEN_PARAM_SWITCH = "-t";
+    public static final String EXCHANGE_PARAM_SWITCH = "-exchange";
+    public static final String SHORT_EXCHANGE_PARAM_SWITCH = "-x";
+
+    public void set_param(InputLine inputLine) throws Exception {
+        if (showHelp(inputLine)) {
+            say("set_param " + REQ_PARAM_SWITCH + " | " + TOKEN_PARAM_SWITCH + " | " + EXCHANGE_PARAM_SWITCH + " key value");
+            sayi("sets an additional request parameter to be send along with the request.");
+            sayi(REQ_PARAM_SWITCH + " = parameters for the initial request to the authorization endpoint.");
+            sayi(TOKEN_PARAM_SWITCH + " = parameters to send in the token request");
+            sayi(EXCHANGE_PARAM_SWITCH + " = parameters for the token exchange request.");
+            sayi(shortSwitchBlurb);
+            say("See also: get_param, clear_param");
+            return;
+        }
+        boolean setRP = inputLine.hasArg(REQ_PARAM_SWITCH, SHORT_REQ_PARAM_SWITCH);
+        boolean setTP = inputLine.hasArg(TOKEN_PARAM_SWITCH, SHORT_TOKEN_PARAM_SWITCH);
+        boolean setXP = inputLine.hasArg(EXCHANGE_PARAM_SWITCH, SHORT_EXCHANGE_PARAM_SWITCH);
+        inputLine.removeSwitch(REQ_PARAM_SWITCH, SHORT_REQ_PARAM_SWITCH);
+        inputLine.removeSwitch(TOKEN_PARAM_SWITCH, SHORT_TOKEN_PARAM_SWITCH);
+        inputLine.removeSwitch(EXCHANGE_PARAM_SWITCH, SHORT_EXCHANGE_PARAM_SWITCH);
+        if (!(setRP || setTP || setXP)) {
+            say("sorry, you must specify the switch for which additional parameters to set");
+            return;
+        }
+        if (inputLine.getArgCount() < 2) {
+            say("Sorry, missing argument");
+            return;
+        }
+        if (2 < inputLine.getArgCount()) {
+            say("sorry, too many args -- can't determine which is they key and value. Perhaps use double quotes around arguments?");
+            return;
+        }
+        if (setRP) {
+            requestParameters.put(inputLine.getArg(1), inputLine.getArg(2));
+        }
+        if (setTP) {
+            tokenParameters.put(inputLine.getArg(1), inputLine.getArg(2));
+        }
+        if (setXP) {
+            exchangeParameters.put(inputLine.getArg(1), inputLine.getArg(2));
+        }
+    }
+
+    public void get_param(InputLine inputLine) throws Exception {
+        if (showHelp(inputLine)) {
+            say("get_param [" + REQ_PARAM_SWITCH + " | " + TOKEN_PARAM_SWITCH + " | " + EXCHANGE_PARAM_SWITCH + "] key0 key1 key2 ...");
+            sayi("show what additional parameters have been set.");
+            sayi("If no switches are given then both token and authorization additional parameters are shown ");
+            sayi("If keys are specified, only those are shown. If no keys are specified, all the given parameters are shown");
+            sayi(shortSwitchBlurb);
+            say("See also: set_param, clear_param, rm_param");
+            return;
+        }
+        boolean getRP = inputLine.hasArg(REQ_PARAM_SWITCH, SHORT_REQ_PARAM_SWITCH);
+        boolean getTP = inputLine.hasArg(TOKEN_PARAM_SWITCH, SHORT_TOKEN_PARAM_SWITCH);
+        boolean getXP = inputLine.hasArg(EXCHANGE_PARAM_SWITCH, SHORT_EXCHANGE_PARAM_SWITCH);
+        inputLine.removeSwitch(REQ_PARAM_SWITCH, SHORT_REQ_PARAM_SWITCH);
+        inputLine.removeSwitch(TOKEN_PARAM_SWITCH, SHORT_TOKEN_PARAM_SWITCH);
+        inputLine.removeSwitch(EXCHANGE_PARAM_SWITCH, SHORT_EXCHANGE_PARAM_SWITCH);
+
+        // If nothing is specified, do both
+        if (!getRP && !getRP && !getXP) {
+            getTP = true;
+            getRP = true;
+            getXP = true;
+        }
+        if (getTP) {
+            listParams(tokenParameters, inputLine, "tokens");
+        }
+
+        if (getRP) {
+            listParams(requestParameters, inputLine, "authz");
+        }
+        if (getXP) {
+            listParams(exchangeParameters, inputLine, "exchange");
+        }
+    }
+
+    private void listParams(Map<String, String> params, InputLine inputLine, String component) {
+        if (inputLine.getArgCount() == 0) {
+            // show them all
+            for (String k : params.keySet()) {
+                say(component + ": " + k + "=" + params.get(k));
+            }
+        } else {
+            for (String k : inputLine.getArgs()) {
+                if (params.containsKey(k)) {
+                    say(component + ": " + k + "=" + params.get(k));
+                }
+            }
+        }
+    }
+
+    public void clear_all_params(InputLine inputLine) throws Exception {
+        if (showHelp(inputLine)) {
+            say("clear_all_params " + REQ_PARAM_SWITCH + " | " + TOKEN_PARAM_SWITCH + " | " + EXCHANGE_PARAM_SWITCH);
+            say("Clear all of the additional parameters for the switch.");
+            sayi("There is no default to clear all. You must invoke this with both switches or nothing will be done.");
+            sayi(shortSwitchBlurb);
+            say("See also: set_param, get_param, rm_param");
+            return;
+        }
+        boolean getRP = inputLine.hasArg(REQ_PARAM_SWITCH, SHORT_REQ_PARAM_SWITCH);
+        boolean getTP = inputLine.hasArg(TOKEN_PARAM_SWITCH, SHORT_TOKEN_PARAM_SWITCH);
+        boolean getXP = inputLine.hasArg(EXCHANGE_PARAM_SWITCH, SHORT_EXCHANGE_PARAM_SWITCH);
+        inputLine.removeSwitch(REQ_PARAM_SWITCH, SHORT_REQ_PARAM_SWITCH);
+        inputLine.removeSwitch(TOKEN_PARAM_SWITCH, SHORT_TOKEN_PARAM_SWITCH);
+        inputLine.removeSwitch(EXCHANGE_PARAM_SWITCH, SHORT_EXCHANGE_PARAM_SWITCH);
+
+        if (!(getTP || getRP || getXP)) {
+            say("Sorry, you must specify which set of additional parameters to clear.");
+            return;
+        }
+        if (getTP) {
+            tokenParameters = new HashMap<>();
+            say("additional token parameters cleared.");
+        }
+        if (getRP) {
+            requestParameters = new HashMap<>();
+            say("additional authorization parameters cleared.");
+        }
+        if (getXP) {
+            exchangeParameters = new HashMap<>();
+            say("additional exchange parameters cleared.");
+        }
+    }
+
+    String shortSwitchBlurb = "Short values of switches are allowed: " + SHORT_REQ_PARAM_SWITCH + " | " + SHORT_TOKEN_PARAM_SWITCH + " | " + SHORT_EXCHANGE_PARAM_SWITCH;
+
+    public void rm_param(InputLine inputLine) throws Exception {
+        if (showHelp(inputLine)) {
+            say("rm_param " + REQ_PARAM_SWITCH + " | " + TOKEN_PARAM_SWITCH + " | " + EXCHANGE_PARAM_SWITCH + " key0 key1 ...");
+            sayi("Remove the given key(s) from the set of additional parameters");
+            sayi("If none are given, then nothing is done.");
+            sayi(shortSwitchBlurb);
+            return;
+        }
+        boolean getRP = inputLine.hasArg(REQ_PARAM_SWITCH, SHORT_REQ_PARAM_SWITCH);
+        boolean getTP = inputLine.hasArg(TOKEN_PARAM_SWITCH, SHORT_TOKEN_PARAM_SWITCH);
+        boolean getXP = inputLine.hasArg(EXCHANGE_PARAM_SWITCH, SHORT_EXCHANGE_PARAM_SWITCH);
+        inputLine.removeSwitch(REQ_PARAM_SWITCH, SHORT_REQ_PARAM_SWITCH);
+        inputLine.removeSwitch(TOKEN_PARAM_SWITCH, SHORT_TOKEN_PARAM_SWITCH);
+        inputLine.removeSwitch(EXCHANGE_PARAM_SWITCH, SHORT_EXCHANGE_PARAM_SWITCH);
+
+        if (inputLine.getArgCount() == 0) {
+            say("No keys found.");
+            return;
+        }
+        int tRemoved = 0;
+        int rRemoved = 0;
+        int xRemoved = 0;
+        for (String k : inputLine.getArgs()) {
+            if (getTP) {
+                tokenParameters.remove(k);
+                tRemoved++;
+            }
+            if (getRP) {
+                requestParameters.remove(k);
+                rRemoved++;
+            }
+            if (getXP) {
+                exchangeParameters.remove(k);
+                xRemoved++;
+            }
+
+        }
+        say("removed: " + tRemoved + " token parameters, " + rRemoved + " authz parameters, " + xRemoved + " exchange parameters");
+        ;
     }
 }

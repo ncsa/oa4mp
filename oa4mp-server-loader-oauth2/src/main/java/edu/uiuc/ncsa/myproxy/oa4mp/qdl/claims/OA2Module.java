@@ -29,9 +29,10 @@ public class OA2Module extends JavaModule {
         funcs.add(new CreateSourceConfig());
         funcs.add(new NewTemplate());
         funcs.add(new IsInGroup());
-
+        funcs.add(new ScopeTemplateQDLUtil());
+        
         oa2Module.addFunctions(funcs);
-        if(state != null){
+        if (state != null) {
             oa2Module.init(state);
         }
         return oa2Module;

@@ -12,6 +12,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.server.UnapprovedClientException;
 import edu.uiuc.ncsa.security.delegation.server.request.AGResponse;
@@ -93,7 +94,6 @@ public class OA2AuthorizedServletUtil {
             transaction.setClient(client);
             transaction = (OA2ServiceTransaction) verifyAndGet(agResponse);
             transaction.setAuthTime(new Date()); // have to set the time to now.
-            servlet.getTransactionStore().save(transaction);
             DebugUtil.info(this, "Saved new transaction with id=" + transaction.getIdentifierString());
 
             Map<String, String> params = agResponse.getParameters();
@@ -105,6 +105,7 @@ public class OA2AuthorizedServletUtil {
             DebugUtil.info(this, "2.b finished initial request for token =\"" + transaction.getIdentifierString() + "\".");
 
             postprocess(new IssuerTransactionState(req, resp, params, transaction, agResponse));
+            servlet.getTransactionStore().save(transaction);
             return transaction;
         } catch (Throwable t) {
             if (t instanceof UnapprovedClientException) {
@@ -238,14 +239,13 @@ public class OA2AuthorizedServletUtil {
         AGResponse agResponse = (AGResponse) iResponse;
         Map<String, String> params = agResponse.getParameters();
         // Since the state (if present) has to be returned with any error message, we have to see if there is one
-        // there first.
+        // there first. We do not store the state.
         String state = null;
 
         if (params.containsKey(STATE)) {
             state = params.get(STATE);
         }
         OA2ServiceTransaction st = (OA2ServiceTransaction) agResponse.getServiceTransaction();
-
         //Spec says that the redirect must match one of the ones stored and if not, the request is rejected.
         String givenRedirect = params.get(REDIRECT_URI);
         OA2Client client = st.getOA2Client();
@@ -302,8 +302,7 @@ public class OA2AuthorizedServletUtil {
         //OA2ServiceTransaction st = createNewTransaction(agResponse.getGrant());
         //st.setClient(agResponse.getClient());
         DebugUtil.info(this, "Created new unsaved transaction with id=" + st.getIdentifierString());
-        Collection<String> scopes = resolveScopes(st, params, state, givenRedirect);
-        st.setScopes(scopes);
+
         st.setAuthGrantValid(false);
         st.setAccessTokenValid(false);
         st.setCallback(URI.create(params.get(REDIRECT_URI)));
@@ -341,14 +340,17 @@ public class OA2AuthorizedServletUtil {
      * to request. The result will be a list of permitted scopes. This is also where omitting the openid scope
      * causes the request to be rejected.
      *
-     * @param st
-     * @param params
-     * @param state
-     * @param givenRedirect
+     * @param transactionState
      * @return
      */
-    protected Collection<String> resolveScopes(OA2ServiceTransaction st, Map<String, String> params, String state, String givenRedirect) {
-        String rawScopes = params.get(SCOPE);
+    protected Collection<String> resolveScopes(TransactionState transactionState) {
+        // Next 2 parameters are so error messages can be reasonably constructed, naught else
+        String state = transactionState.getRequest().getParameter(STATE);
+        String givenRedirect = transactionState.getRequest().getParameter(REDIRECT_URI);
+
+        String rawScopes = transactionState.getRequest().getParameter(SCOPE);
+
+        OA2ServiceTransaction st = (OA2ServiceTransaction) transactionState.getTransaction();
 
         DebugUtil.trace(this, ".resolveScopes: stored client scopes =" + ((OA2Client) st.getClient()).getScopes());
         DebugUtil.trace(this, ".resolveScopes: passed in scopes =" + rawScopes);
@@ -357,9 +359,10 @@ public class OA2AuthorizedServletUtil {
         if (rawScopes == null || rawScopes.length() == 0) {
             throw new OA2RedirectableError(OA2Errors.INVALID_SCOPE, "Missing scopes parameter.", state, givenRedirect);
         }
-        Collection<String> scopes = new ArrayList<>();
-
+        // The scopes the client wants:
         OA2Client oa2Client = (OA2Client) st.getClient();
+        Collection<String> requestedScopes = new ArrayList<>();
+
         // Fixes github issue 8, support for public clients: https://github.com/ncsa/OA4MP/issues/8
         if (oa2Client.isPublicClient()) {
             if (!oa2Client.getScopes().contains(OA2Scopes.SCOPE_OPENID)) {
@@ -368,10 +371,12 @@ public class OA2AuthorizedServletUtil {
             // only allowed scope, regardless of what is requested.
             // This also covers the case of a client made with a full set of scopes, then
             // converted to a public client but the stored scopes are not updated.
-            scopes.add(OA2Scopes.SCOPE_OPENID);
-            DebugUtil.trace(this, ".resolveScopes: after resolution=" + scopes);
-            return scopes;
+            requestedScopes.add(OA2Scopes.SCOPE_OPENID);
+            DebugUtil.trace(this, ".resolveScopes: after resolution=" + requestedScopes);
+            return requestedScopes;
         }
+        // The scopes that minimally are allowed. Permissions scopes are never in this list.
+
         StringTokenizer stringTokenizer = new StringTokenizer(rawScopes);
         boolean hasOpenIDScope = false;
         while (stringTokenizer.hasMoreTokens()) {
@@ -380,25 +385,38 @@ public class OA2AuthorizedServletUtil {
                 throw new OA2RedirectableError(OA2Errors.INVALID_SCOPE, "Unrecognized scope \"" + x + "\"", state, givenRedirect);
             }
             if (x.equals(OA2Scopes.SCOPE_OPENID)) hasOpenIDScope = true;
-            scopes.add(x);
-        }
-        if (oa2Client.useStrictScopes()) {
-            Collection<String> storedClientScopes = oa2Client.getScopes();
-            scopes = intersection(OA2Scopes.ScopeUtil.getScopes(), intersection(scopes, storedClientScopes));
-
-
-            DebugUtil.trace(this, ".resolveScopes: strict scopes after resolution=" + scopes);
-        } else {
-            DebugUtil.trace(this, ".resolveScopes: non-strict scopes =" + scopes);
-
+            requestedScopes.add(x);
         }
         if (((OA2SE) getServiceEnvironment()).isOIDCEnabled()) {
             if (!hasOpenIDScope)
                 throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST, "Scopes must contain " + OA2Scopes.SCOPE_OPENID, state, givenRedirect);
         }
-        return scopes;
-    }
+        st.setScopes(requestedScopes);
+        if (oa2Client.useStrictScopes()) {
+            Collection<String> storedClientScopes = oa2Client.getScopes();
+            requestedScopes = intersection(OA2Scopes.ScopeUtil.getScopes(), intersection(requestedScopes, storedClientScopes));
+            DebugUtil.trace(this, ".resolveScopes: strict scopes after resolution=" + requestedScopes);
+        } else {
+            DebugUtil.trace(this, ".resolveScopes: non-strict scopes =" + requestedScopes);
+/*   This computes the minimal set of scopes and tries to see which should be returned.
 
+            Collection<String> minimalScopes = intersection(requestedScopes, oa2Client.getScopes());
+
+            AuthorizationTemplates templates = oa2Client.getAccessTokensConfig().getTemplates();
+            if (!templates.isEmpty()) {
+                List<String> scopeCandidates = new ArrayList<>();
+                for (String key : templates.keySet()) {
+                    extractTemplatePath(st.getAudience(), st.getUsername(), requestedScopes, templates, scopeCandidates, key);
+                    extractTemplatePath(st.getResource(), st.getUsername(), requestedScopes, templates, scopeCandidates, key);
+                }
+                minimalScopes.addAll(scopeCandidates);
+            }
+            return minimalScopes;
+*/
+        }
+
+        return requestedScopes;
+    }
 
     /**
      * Utility call to return the intersection of two lists of strings.
@@ -460,35 +478,61 @@ public class OA2AuthorizedServletUtil {
     public void preprocess(TransactionState state) throws Throwable {
         state.getResponse().setHeader("X-Frame-Options", "DENY");
     }
+
     /* *******
     End boiler-plate
      */
-
-    public void postprocess(TransactionState state) throws Throwable {
+    public void figureOutAudienceAndResource(TransactionState state) {
         OA2ServiceTransaction t = (OA2ServiceTransaction) state.getTransaction();
-        // For sciTokens. Note that WLCG might use these too at some point.
+        // RFC 8707 support.
         // Internally we call it audience (since the aud claim is returned),
         // but the difference is that a resource is a list of URIs and the audience is
-        // a list of logical names or URIs. Generally we encourage people to just use
-        // the audience parameter.
-        String rawAudience = state.getRequest().getParameter(RFC8693Constants.RESOURCE);
-        if (isTrivial(rawAudience)) {
-            rawAudience = state.getRequest().getParameter(RFC8693Constants.AUDIENCE);
-            if (isTrivial(rawAudience)) {
-                return; // nothing to do.
+        // a list of logical names or URIs.
+        // Generally we  encourage people to just use
+        // the resource parameter.
+        String[] rawResource = state.getRequest().getParameterValues(RFC8693Constants.RESOURCE);
+        String[] rawAudience = state.getRequest().getParameterValues(RFC8693Constants.AUDIENCE);
+
+        if (rawResource == null && rawAudience == null) {
+            // implies there is no such parameters.
+            return; // nothing to do.
+        }
+
+        ServletDebugUtil.trace(this, "raw audience = " + rawAudience);
+        ServletDebugUtil.trace(this, "raw resource = " + rawResource);
+
+        LinkedList<String> resource = new LinkedList<>();
+        LinkedList<String> audience = new LinkedList<>();
+        
+        if (rawResource != null) {
+            for (String r : rawResource) {
+                try {
+                    URI uri = URI.create(r);
+                    resource.add(r);
+                    if (!uri.isAbsolute()) {
+                        throw new OA2GeneralError(OA2Errors.INVALID_TARGET, "Only absolute uris are allowed", HttpStatus.SC_BAD_REQUEST);
+                    }
+                    if (!StringUtils.isTrivial(uri.getFragment())) {
+                        throw new OA2GeneralError(OA2Errors.INVALID_TARGET, "Fragments are not allowed", HttpStatus.SC_BAD_REQUEST);
+                    }
+                } catch (Throwable throwable) {
+                    // skip it
+                }
             }
         }
-        ServletDebugUtil.trace(this, "raw audience = " + rawAudience);
-        if (rawAudience == null || rawAudience.isEmpty()) {
-            rawAudience = ""; // this throws it in to the case of no requested audience. If this is missing and there is
-            // a single registered template, just implicitly accept they are the same and continue.
+
+        if (rawAudience != null) {
+            for (String a : rawAudience) {
+                audience.add(a);
+            }
         }
-        StringTokenizer stringTokenizer = new StringTokenizer(rawAudience, " ");
-        LinkedList<String> audience = new LinkedList<>();
-        while (stringTokenizer.hasMoreElements()) {
-            audience.add(stringTokenizer.nextToken().trim());
-        }
-        if (audience.size() == 0) {
+
+             /*
+             Scorecard: the client can request either resources (URIs for the audience claim) or audiences (which
+             are logical names for the audience claim). This is truly annoying since both end up in the same
+             claim, but do very different things. Templates are stored by either.
+              */
+        if (resource.size() == 0 && audience.size() == 0) {
             // try to special case it
             OA2Client client = (OA2Client) t.getClient();
             AccessTokenConfig atCfg = client.getAccessTokensConfig();
@@ -497,13 +541,29 @@ public class OA2AuthorizedServletUtil {
                 // Special case. They have configured exactly one audience claim, so they may omit it and we
                 // will pull it out of their configuration and supply it. They do not need to
                 // send it along in the request. This fails if they ever configure a second template though (as it should).
-                audience.add(atCfg.getAudience().iterator().next());
+                String x = atCfg.getAudience().iterator().next();
+                try {
+                    URI.create(x);
+                    resource.add(x);
+                } catch (Throwable throwable) {
+                    audience.add(x);
+                }
             } else {
                 throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, "missing audience request", HttpStatus.SC_BAD_REQUEST);
             }
         }
+        // One of these may be empty.
+        t.setResource(resource);
         t.setAudience(audience);
-        servlet.getTransactionStore().save(t);
 
+    }
+
+    public void postprocess(TransactionState transactionState) {
+        // Order of operations: The audience and resources must be determined before the scopes can
+        // be resolved since they are required for that and this bit must be done as the absolutely last thing.
+        figureOutAudienceAndResource(transactionState);
+        OA2ServiceTransaction t = (OA2ServiceTransaction) transactionState.getTransaction();
+        Collection<String> scopes = resolveScopes(transactionState);
+        //t.setScopes(scopes);
     }
 }

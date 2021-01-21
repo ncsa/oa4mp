@@ -94,13 +94,13 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
      * though the configuration file is assumed to be in seconds.
      */
 
-    public long REFRESH_TOKEN_LIFETIME_DEFAULT = 15 * 24 * 3600 * 1000L; // 15 days
-    public long MAX_REFRESH_TOKEN_LIFETIME_DEFAULT = 2 * REFRESH_TOKEN_LIFETIME_DEFAULT; // 30 days
+    public static long REFRESH_TOKEN_LIFETIME_DEFAULT = 15 * 24 * 3600 * 1000L; // 15 days
+    public static long MAX_REFRESH_TOKEN_LIFETIME_DEFAULT = 2 * REFRESH_TOKEN_LIFETIME_DEFAULT; // 30 days
 
-    public long ACCESS_TOKEN_LIFETIME_DEFAULT = 15 * 60 * 1000L; // 15 minutes
-    public long MAX_ACCESS_TOKEN_LIFETIME_DEFAULT = 2 * ACCESS_TOKEN_LIFETIME_DEFAULT; // 30 minutes
-    public long AUTHORIZATION_GRANT_LIFETIME_DEFAULT = 15 * 60 * 1000L; // 15 minutes
-    public int CLIENT_SECRET_LENGTH_DEFAULT = 258; //This is divisible by 3 and greater than 256, so when it is base64 encoded there will be no extra characters.
+    public static long ACCESS_TOKEN_LIFETIME_DEFAULT = 15 * 60 * 1000L; // 15 minutes
+    public static long MAX_ACCESS_TOKEN_LIFETIME_DEFAULT = 2 * ACCESS_TOKEN_LIFETIME_DEFAULT; // 30 minutes
+    public static long AUTHORIZATION_GRANT_LIFETIME_DEFAULT = 15 * 60 * 1000L; // 15 minutes
+    public static int CLIENT_SECRET_LENGTH_DEFAULT = 258; //This is divisible by 3 and greater than 256, so when it is base64 encoded there will be no extra characters.
 
     public OA2ConfigurationLoader(ConfigurationNode node) {
         super(node);

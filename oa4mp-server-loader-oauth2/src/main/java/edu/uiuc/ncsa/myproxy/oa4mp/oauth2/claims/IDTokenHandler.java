@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.oauth_2_0.*;
+import edu.uiuc.ncsa.security.oauth_2_0.jwt.IDTokenHandlerInterface;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRunRequest;
@@ -29,7 +30,7 @@ import static edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse.*;
  * <p>Created by Jeff Gaynor<br>
  * on 2/16/20 at  6:51 AM
  */
-public class IDTokenHandler extends AbstractPayloadHandler {
+public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHandlerInterface {
     protected String issuer;
 
     public IDTokenHandler(PayloadHandlerConfigImpl payloadHandlerConfig) {
@@ -204,9 +205,10 @@ public class IDTokenHandler extends AbstractPayloadHandler {
         req.getArgs().put(SRE_REQ_CLAIM_SOURCES, getSources()); // so its a map
         req.getArgs().put(SRE_REQ_EXTENDED_ATTRIBUTES, getExtendedAttributes()); // so its a map
     }
-   int responseCode = RC_NOT_RUN;
+
     @Override
     public void handleResponse(ScriptRunResponse resp) throws Throwable {
+        super.handleResponse(resp);
         switch (resp.getReturnCode()) {
             case RC_OK:
                 // Note that the returned values from a script are very unlikely to be the same object we sent
@@ -219,7 +221,6 @@ public class IDTokenHandler extends AbstractPayloadHandler {
                 transaction.setClaimsSources(sources);
                 extendedAttributes = (JSONObject) resp.getReturnedValues().get(SRE_REQ_EXTENDED_ATTRIBUTES);
                 // Note that as per our contract, extended attributes are not updateable.
-                responseCode = RC_OK;
                 return;
             case RC_NOT_RUN:
                 return;
@@ -283,7 +284,21 @@ public class IDTokenHandler extends AbstractPayloadHandler {
     @Override
     public void saveState() throws Throwable {
         DebugUtil.trace(this, ".saveState: claims = " + getClaims().toString(2));
-        if (transaction != null && oa2se != null && responseCode==RC_OK) {
+        switch (getResponseCode()) {
+            case RC_NOT_RUN:
+                break;
+            case RC_OK:
+                if (transaction != null && oa2se != null) {
+                    transaction.setUserMetaData(getClaims());
+                    transaction.setClaimsSources(getSources());
+                    DebugUtil.trace(this, ".saveState: done updating transaction.");
+                }
+            case RC_OK_NO_SCRIPTS:
+                oa2se.getTransactionStore().save(transaction);
+                break;
+
+        }
+/*        if (transaction != null && oa2se != null) {
             transaction.setUserMetaData(getClaims());
             transaction.setClaimsSources(getSources());
             oa2se.getTransactionStore().save(transaction);
@@ -291,7 +306,7 @@ public class IDTokenHandler extends AbstractPayloadHandler {
 
         } else {
             trace(this, "In saveState: either env or transaction null. Nothing saved.");
-        }
+        }*/
     }
 
 

@@ -502,6 +502,13 @@ public class OA2Client extends Client implements OA2ClientScopes {
         client.setResponseTypes(rst);
         System.out.println(client.getExtendedAttributes().toString(2));
     }
-
+    public boolean hasScript(){
+        boolean rc = false;
+        rc = rc || hasIDTokenConfig() && !getIDTokenConfig().getScriptSet().isEmpty();
+        rc = rc || hasAccessTokenConfig() && !getAccessTokensConfig().getScriptSet().isEmpty();
+        rc = rc || hasRefreshTokenConfig() && !getRefreshTokensConfig().getScriptSet().isEmpty();
+        
+        return rc;
+    }
 }
 

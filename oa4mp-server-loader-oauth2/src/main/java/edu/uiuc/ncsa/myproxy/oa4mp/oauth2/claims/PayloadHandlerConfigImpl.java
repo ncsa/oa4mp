@@ -28,6 +28,10 @@ public  class PayloadHandlerConfigImpl implements PayloadHandlerConfig {
         this.clientConfig = clientConfig;
     }
 
+    public AbstractPayloadConfig getClientConfig() {
+        return clientConfig;
+    }
+
     AbstractPayloadConfig clientConfig;
 
     public TXRecord getTxRecord() {

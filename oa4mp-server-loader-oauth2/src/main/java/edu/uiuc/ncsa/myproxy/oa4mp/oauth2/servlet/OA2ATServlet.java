@@ -51,8 +51,7 @@ import java.util.*;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8693Constants2.*;
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.CLIENT_SECRET;
-import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.AUDIENCE;
-import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.*;
+import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.JWT_ID;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -132,14 +131,17 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
      */
     protected long computeRefreshLifetime(OA2ServiceTransaction st2) {
         OA2SE oa2SE = (OA2SE) getServiceEnvironment();
+        if (!oa2SE.isRefreshTokenEnabled()) {
+            throw new NFWException("Internal error: Refresh tokens are disabled for this server.");
+        }
         if (oa2SE.getMaxRTLifetime() <= 0) {
-            throw new NFWException("Internal error: the server-wide default for the refresh token lifetime has not been set.");
+            throw new NFWException("Internal error: Either refresh tokens are disabled for this server, or the server-wide default for the refresh token lifetime has not been set.");
         }
         long lifetime = oa2SE.getMaxRTLifetime();
 
         OA2Client client = (OA2Client) st2.getClient();
-        if(0 < client.getRtLifetime()){
-             lifetime = Math.min(lifetime, client.getRtLifetime());
+        if (0 < client.getRtLifetime()) {
+            lifetime = Math.min(lifetime, client.getRtLifetime());
         }
         st2.setMaxRTLifetime(lifetime);// absolute max allowed on this server for this request
 
@@ -159,23 +161,24 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
     }
 
     /**
-     *      Scorecard:
-     *                  server default     | oa2SE.getAccessTokenLifetime()
-     *                  server default max | oa2SE.getMaxATLifetime();
-     *                  client default max | client.getAtLifetime()
-     *         value in cfg access element | client.getAccessTokensConfig().getLifetime()
-     *                value in the request | st2.getRequestedATLifetime()
-     *    result = actual definitive value | st2.getAccessTokenLifetime()
+     * Scorecard:
+     * server default     | oa2SE.getAccessTokenLifetime()
+     * server default max | oa2SE.getMaxATLifetime();
+     * client default max | client.getAtLifetime()
+     * value in cfg access element | client.getAccessTokensConfig().getLifetime()
+     * value in the request | st2.getRequestedATLifetime()
+     * result = actual definitive value | st2.getAccessTokenLifetime()
+     * <p>
+     * Policies: no lifetime can exceed the non-zero max of the server and client defaults. These are hard
+     * limits placed there by administrators.
+     * <p>
+     * Note that inside of scripts, these can be reset to anything, so
+     * <p>
+     * st2.getAtData()
+     * <p>
+     * has the final, definitive values. Once this has been set in the first pass, it
+     * **must** be authoritative.
      *
-     *         Policies: no lifetime can exceed the non-zero max of the server and client defaults. These are hard
-     *         limits placed there by administrators.
-     *
-     *         Note that inside of scripts, these can be reset to anything, so
-     *
-     *         st2.getAtData()
-     *
-     *         has the final, definitive values. Once this has been set in the first pass, it
-     *         **must** be authoritative.
      * @param st2
      * @return
      */
@@ -343,9 +346,16 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         NOTE: These are ignored for regular access tokens. For SciTokens we *should* allow exchanging
         a token for a weaker one. Need to figure out what weaker means though.
          */
-        List<String> audience = convertToList(request, AUDIENCE);
         List<String> scopes = convertToList(request, OA2Constants.SCOPE);
-        List<String> resources = convertToList(request, RESOURCE);
+        /*
+          There is an entire RFC now associated with the resource parameter:
+
+          https://tools.ietf.org/html/rfc8707
+
+          Argh!
+         */
+        List<String> audience = convertToList(request, RFC8693Constants.AUDIENCE);
+        List<String> resources = convertToList(request, RFC8693Constants.RESOURCE);
 
         TXRecord oldTXR = null;
         if (subjectTokenType.equals(ACCESS_TOKEN_TYPE)) {
@@ -374,7 +384,12 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         if (subjectTokenType.equals(REFRESH_TOKEN_TYPE)) {
             // Handle the refresh token case.
             try {
-                refreshToken = tokenForge.getRefreshToken(subjectToken);
+                JSONObject tt = JWTUtil.verifyAndReadJWT(subjectToken, oa2se.getJsonWebKeys());
+                if(tt == null){
+                    refreshToken = tokenForge.getRefreshToken(subjectToken);
+                }else{
+                    refreshToken = new RefreshTokenImpl(URI.create(tt.getString(JWT_ID)));
+                }
                 RefreshTokenStore zzz = (RefreshTokenStore) getTransactionStore();
                 t = zzz.get(refreshToken);
             } catch (Throwable tt) {
@@ -500,7 +515,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getAccessToken().getToken()); // Required.
             // create scope string  Remember that these may have been changed by a script,
             // so here is the right place to set it.
-            rfcClaims.put(OA2Constants.SCOPE, scopesToString(newTXR.getScopes()));
+            rfcClaims.put(OA2Constants.SCOPE, listToString(newTXR.getScopes()));
 
         }
         /*
@@ -512,45 +527,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
          to see what they got. As a convenience, if there is a refresh token, that will be returned as the
          refresh_token claim.
          */
-/*
-        claims.put(ISSUED_TOKEN_TYPE, ACCESS_TOKEN_TYPE); // Required. This is the type of token issued (mostly access tokens). Must be as per TX spec.
-        claims.put(OA2Constants.TOKEN_TYPE, TOKEN_TYPE_BEARER); // Required. This is how the issued token can be used, mostly. BY RFC 6750 spec.
-        claims.put(OA2Constants.EXPIRES_IN, t.getAccessTokenLifetime());
-*/
-        // TODO -- figure out scopes for SciTokens. These are optional if they are the same as the scope parameter (or parameter omitted).
-        // Issue is that OIDC client scopes do not alter the access token. SciToken scopes, however, do.
-        // handle OIDC clients:
-  /*    // The aim of the next block was to massage the scopes stored in  the client and update them
-        // as requests come in. This changed so that all requests are evaluated against the stored scopes
-        // and resolved against them (since they are apt to be gotten live from, e.g., LDAP so we do
-        // not actually control them, we just read what's there.
-        if (client.isOIDCClient() && 0 < scopes.size()) {
-            // OIDC client
-            Collection<String> newScopes = OA2AuthorizedServletUtil.intersection(scopes, client.getScopes());
-            if (newScopes.size() != client.getScopes().size()) {
-                // Have to return the scopes
-                if (!newScopes.contains(OA2Scopes.SCOPE_OPENID)) {
-                    newScopes.add(OA2Scopes.SCOPE_OPENID);
-                }
-                String requestedScopes = "";
-                boolean firstPass = true;
-                for (String x : newScopes) {
-                    requestedScopes = requestedScopes + x;
-                    if (firstPass) {
-                        firstPass = false;
-                        requestedScopes = x;
-                    } else {
-                        requestedScopes = requestedScopes + " " + x;
-                    }
-                }
-                // Set it to the restricted set of scopes???
-                //  client.setScopes(newScopes);
-                rfcClaims.put(OA2Constants.SCOPE, requestedScopes);
-                newTXR.setScopes(newScopes); // Store even if empty to show that.
-            }
-        }
 
-   */
         // The other components (access, refresh token) have responses that handle setting the encoding and
         // char type. We have to set it manually here.
         response.setContentType("application/json;charset=UTF-8");
@@ -572,8 +549,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
     /**
      * Convert a string or list of strings to a list of them. This is for lists of space delimited values
      * The spec allows for multiple value which in practice can also mean that a client makes the request with
-     * multiple parameters, so we have to snoop for those and for space delimited string inside of those.
-     * This is used by RFC 8693.
+     * multiple parameters, so we have to snoop for those and for space delimited strings inside of those.
+     * This is used by RFC 8693 and specific to it.
      *
      * @param req
      * @param parameterName
@@ -612,20 +589,22 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
     @Override
     protected ATRequest getATRequest(HttpServletRequest request, ServiceTransaction transaction) {
         OA2ServiceTransaction oa2T = (OA2ServiceTransaction) transaction;
-        long rtLifetime = computeRefreshLifetime(oa2T);
         long atLifetime = computeATLifetime(oa2T);
         // Set these in the transaction then send it along.
         oa2T.setAccessTokenLifetime(atLifetime);
-        oa2T.setRefreshTokenLifetime(rtLifetime);
+        if (((OA2SE) getServiceEnvironment()).isRefreshTokenEnabled()) {
+            long rtLifetime = computeRefreshLifetime(oa2T);
+            oa2T.setRefreshTokenLifetime(rtLifetime);
+        }
+
         return new ATRequest(request, transaction);
     }
 
     @Override
     protected void checkAGExpiration(AuthorizationGrant ag) {
-           if(ag.isExpired()){
-               throw new OA2GeneralError(OA2Errors.INVALID_GRANT, "grant expired", HttpStatus.SC_FORBIDDEN);
-           }
-
+        if (ag.isExpired()) {
+            throw new OA2GeneralError(OA2Errors.INVALID_GRANT, "grant expired", HttpStatus.SC_FORBIDDEN);
+        }
     }
 
     protected IssuerTransactionState doAT(HttpServletRequest request, HttpServletResponse response, OA2Client client) throws Throwable {
@@ -640,9 +619,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         if (!st2.getFlowStates().acceptRequests || !st2.getFlowStates().accessToken || !st2.getFlowStates().idToken) {
             throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "access denied", HttpStatus.SC_UNAUTHORIZED);
         }
-        if(!st2.isAuthGrantValid()){
-            throw new OA2GeneralError(OA2Errors.INVALID_GRANT, "invalid grant", HttpStatus.SC_FORBIDDEN);
-        }
+
+
         st2.setAccessToken(atResponse.getAccessToken()); // needed if there are handlers later.
         st2.setRefreshToken(atResponse.getRefreshToken()); // ditto. Might be null.
         JWTRunner jwtRunner = new JWTRunner(st2, ScriptRuntimeEngineFactory.createRTE(oa2SE, st2, st2.getOA2Client().getConfig()));
@@ -825,7 +803,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         } catch (Throwable t) {
 
         }
-        if(refreshToken.isExpired()){
+        if (refreshToken.isExpired()) {
             throw new OA2GeneralError(OA2Errors.INVALID_GRANT, "token expired", HttpStatus.SC_FORBIDDEN);
         }
         return rts.get(refreshToken);
@@ -871,7 +849,10 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         RTI2 rtIssuer = new RTI2(getTF2(), getServiceEnvironment().getServiceAddress());
         if (t.getRefreshTokenLifetime() == 0 && 0 < c.getRtLifetime()) {
             // This is in case we have a really old token that is getting refreshed.
-            // Have to set the rt lifetime in the transaction so the new token is
+            // The rt lifetime in the transaction was not set (it's new) so we
+            // just look in the client config for the value rather than refuse to
+            // create aa refresh token. Mostly this relates to converting 4.4 servers to 5.x servers.
+            // Now, set the rt lifetime in the transaction so the new token is
             // created correctly.
             t.setRefreshTokenLifetime(Math.min(oa2SE.getMaxRTLifetime(), c.getRtLifetime()));
         }
@@ -1050,20 +1031,25 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         return transaction;
     }
 
-    protected String scopesToString(List<String> scopes) {
+    protected String listToString(List scopes) {
         String requestedScopes = "";
-        if(scopes == null | scopes.isEmpty()){
+        if (scopes == null || scopes.isEmpty()) {
             return requestedScopes;
         }
         boolean firstPass = true;
-        for (String x : scopes) {
+        for (Object x : scopes) {
+            if (x == null) {
+                continue;
+            }
             if (firstPass) {
                 firstPass = false;
-                requestedScopes = x;
+                requestedScopes = x.toString();
             } else {
-                requestedScopes = requestedScopes + " " + x;
+                requestedScopes = requestedScopes + " " + x.toString();
             }
         }
         return requestedScopes;
     }
+
+
 }

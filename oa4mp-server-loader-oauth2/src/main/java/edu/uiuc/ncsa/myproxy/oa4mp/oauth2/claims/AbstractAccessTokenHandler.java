@@ -1,5 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2ConfigurationLoader;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.AccessTokenConfig;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.AuthorizationPath;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.AuthorizationTemplate;
@@ -13,20 +15,20 @@ import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.AccessTokenHandlerInterface;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTUtil2;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
-import edu.uiuc.ncsa.security.util.configuration.TemplateUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRunRequest;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import java.net.URI;
 import java.util.*;
 
-import static edu.uiuc.ncsa.security.core.util.DebugUtil.trace;
+import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.ScopeTemplateUtil.doCompareTemplates;
+import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.ScopeTemplateUtil.replaceTemplate;
 import static edu.uiuc.ncsa.security.oauth_2_0.jwt.ScriptingConstants.*;
 import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.*;
-import static edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse.RC_NOT_RUN;
-import static edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse.RC_OK;
+import static edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse.*;
 
 /**
  * Only create an access token handler if you need some special handling, otherwise the
@@ -76,10 +78,10 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
         req.getArgs().put(SRE_REQ_ACCESS_TOKEN, getAtData());
     }
 
-    int responseCode = RC_NOT_RUN;
 
     @Override
     public void handleResponse(ScriptRunResponse resp) throws Throwable {
+        super.handleResponse(resp);
         switch (resp.getReturnCode()) {
             case RC_OK:
                 // Note that the returned values from a script are very unlikely to be the same object we sent
@@ -88,14 +90,11 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
                 setClaims((JSONObject) resp.getReturnedValues().get(SRE_REQ_CLAIMS));
                 DebugUtil.trace(this, "Setting claims to " + claims.toString(2));
                 //sources = (List<ClaimSource>) resp.getReturnedValues().get(SRE_REQ_CLAIM_SOURCES);
-                extendedAttributes = (JSONObject) resp.getReturnedValues().get(SRE_REQ_EXTENDED_ATTRIBUTES);
-
+                setExtendedAttributes((JSONObject) resp.getReturnedValues().get(SRE_REQ_EXTENDED_ATTRIBUTES));
                 setAtData((JSONObject) resp.getReturnedValues().get(SRE_REQ_ACCESS_TOKEN));
-                responseCode = RC_OK;
                 return;
             case RC_NOT_RUN:
                 return;
-
         }
     }
 
@@ -127,7 +126,6 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
         }
         Collection<String> requestedScopes = transaction.getScopes();
         Collection<String> requestedAudience = transaction.getAudience();
-
         // check for audiences.
         if (requestedAudience == null || requestedAudience.isEmpty()) {
 
@@ -147,34 +145,77 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
                     throw new IllegalStateException("Error: The client is configured with multiple audiences, but none were requested. Cannot resolve scopes.");
             }
         }
-        Set<String> computedScopes = new HashSet<>(); // makes sure there are unique scopes.
-        List<String> groupKeys = new ArrayList<>();
-        for (Object claim : getClaims().keySet()) {
-            Object x = getClaims().get(claim);
-            if (x instanceof Groups) {
-                groupKeys.add(claim.toString());
+        Map<String, List<String>> groupMap = new HashMap<>();
+        Groups gg = new Groups();
+        GroupElement groupElement = new GroupElement("all-access", 42);
+        gg.put(groupElement);
+        getClaims().put("memberOf", gg.toJSON());
+
+        gg = new Groups();
+        groupElement = new GroupElement("other-access", 43);
+        gg.put(groupElement);
+        getClaims().put("otherMemberOf", gg.toJSON());
+        Map claimsNoGroups = new HashMap();
+        for (Object claimKey : getClaims().keySet()) {
+            Object claim = getClaims().get(claimKey);
+            // Only groups are allowed to be embedded arrays in claims.
+            if (claim instanceof JSONArray) {
+                List<String> groupKeys = new ArrayList<>();  // list of groups in the current claims for this user
+
+                JSONArray array = (JSONArray) claim;
+                for (int i = 0; i < array.size(); i++) {
+                    JSONObject jo = array.getJSONObject(i);
+                    if (jo.containsKey(Groups.GROUP_ENTRY_NAME)) {
+                        groupKeys.add(jo.getString(Groups.GROUP_ENTRY_NAME));
+                    }
+                }
+                if (!groupKeys.isEmpty()) {
+                    groupMap.put(claimKey.toString(), groupKeys);
+                }
+            }else{
+                claimsNoGroups.put(claimKey, claim);
             }
         }
         // So we have groups (if any) and we have target audiences (at least one, perhaps a default).
         // Next up is we have to look at all templates stored by audience and do the appropriate replacement
         // If the replaced version is one of the requested scopes, add it to the computedScopes to get returned.
         // If not, ignore it.
+        Set<String> computedScopes = new HashSet<>(); // makes sure there are unique scopes.
+
         for (String aud : requestedAudience) {
             if (!templates.containsKey(aud)) {
                 throw new IllegalStateException("Error: The requested audience \"" + aud + "\" is not valid for this client. Cannot resolve scopes.");
             }
             AuthorizationTemplate template = templates.get(aud);
             for (AuthorizationPath authorizationPath : template.getPaths()) {
-                String z = replaceTemplate(authorizationPath.toString(), groupKeys);
-                if (z != null) {
-                    computedScopes.add(z);
-                }
+                List<String> z = replaceTemplate(authorizationPath.toString(), groupMap, claimsNoGroups);
+                computedScopes.addAll(z);
             }
         }
+        // Scorecard: we have all of the templates resolved for this resource/audience.
+        // The question is what do we return?
+        // This has the most recent exchange requests in it any of which may be empty.
+        Collection<String> actualScopes;
+        TXRecord txRecord = getPhCfg().getTxRecord();
+        /*
+            If there is a token exchange record, then this is being invoked as part of a token
+            exchange. In that case, any supplied scopes are used and the templates are used as
+            super-paths.
+        */
+        if (txRecord == null) {
+            actualScopes = doCompareTemplates(computedScopes,
+                    transaction.getScopes(),
+                    false);
+        } else {
+            actualScopes = doCompareTemplates(computedScopes,
+                    txRecord.hasScopes() ? txRecord.getScopes() : transaction.getScopes(),
+                    true);
+        }
+
         // now we convert to a scope string.
         String s = "";
         boolean firstPass = true;
-        for (String x : computedScopes) {
+        for (String x : actualScopes) {
             if (firstPass) {
                 firstPass = false;
                 s = x;
@@ -189,41 +230,6 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
 
     }
 
-    /**
-     * resolve a single template for groups (if any) and other claims.  Returns the scope if this checks out
-     * or null if there is no such match.
-     *
-     * @param currentTemplate
-     * @param groups
-     */
-    protected String replaceTemplate(String currentTemplate, List<String> groups) {
-        if (groups.isEmpty()) {
-            return simpleReplacement(currentTemplate);
-        }
-        for (String g : groups) {
-            String claimKey = TemplateUtil.REGEX_LEFT_DELIMITER + g + TemplateUtil.REGEX_RIGHT_DELIMITER;
-            if (currentTemplate.contains(claimKey)) {
-
-                Groups groups1 = (Groups) getClaims().get(g);
-                for (String p : groups1.keySet()) {
-                    String newPath = currentTemplate.replace(claimKey, p); // replace the ${group_claim} with its value
-                    String replacedTemplate = simpleReplacement(newPath);
-                    if (replacedTemplate != null) {
-                        return replacedTemplate;
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
-    protected String simpleReplacement(String currentTemplate) {
-        String newPath = TemplateUtil.replaceAll(currentTemplate, getClaims());
-        if (transaction.getScopes().contains(newPath)) {
-            return newPath;
-        }
-        return null;
-    }
 
     /**
      * Convenience to peel off the {@link AccessTokenConfig} from the handler config and return it.
@@ -231,7 +237,7 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
      * @return
      */
     protected AccessTokenConfig getATConfig() {
-        return (AccessTokenConfig) getPhCfg().clientConfig;
+        return (AccessTokenConfig) getPhCfg().getClientConfig();
     }
 
     @Override
@@ -254,16 +260,15 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
             }
         }
         // AT Data is in seconds, as per spec!
-        long proposedLifetime = (atData.getLong(EXPIRATION) - atData.getLong(ISSUED_AT))*1000;
-        if(proposedLifetime <= 0){
+        long proposedLifetime = (atData.getLong(EXPIRATION) - atData.getLong(ISSUED_AT)) * 1000;
+        if (proposedLifetime <= 0) {
             proposedLifetime = transaction.getMaxAtLifetime();
-        }else{
+        } else {
             proposedLifetime = Math.min(proposedLifetime, transaction.getMaxAtLifetime());
         }
-        atData.put(EXPIRATION, (atData.getLong(ISSUED_AT)*1000 + proposedLifetime)/1000);
+        atData.put(EXPIRATION, (atData.getLong(ISSUED_AT) * 1000 + proposedLifetime) / 1000);
         setAtData(atData);
         transaction.setAccessTokenLifetime(proposedLifetime);
-
     }
 
     @Override
@@ -282,7 +287,7 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
     public AccessToken getSignedAT(JSONWebKey key) {
         if (key == null) {
             oa2se.warn("Error: Null or missing key for signing encountered processing client \"" + transaction.getOA2Client().getIdentifierString() + "\"");
-            throw new IllegalArgumentException("Error: A null JSON web key was encountered");
+            throw new IllegalArgumentException("Error: Missing JSON web key. Cannto sign access token.");
         }
         if (getAtData().isEmpty()) return null;
         /*
@@ -304,7 +309,7 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
             String at = JWTUtil2.createJWT(getAtData(), key);
             URI jti = URI.create(getAtData().getString(JWT_ID));
             AccessTokenImpl at0 = new AccessTokenImpl(at, jti);
-            at0.setLifetime(1000*(getAtData().getLong(EXPIRATION) - getAtData().getLong(ISSUED_AT)));
+            at0.setLifetime(1000 * (getAtData().getLong(EXPIRATION) - getAtData().getLong(ISSUED_AT)));
             return at0;
         } catch (Throwable e) {
             if (e instanceof RuntimeException) {
@@ -319,7 +324,23 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
     @Override
     public void saveState() throws Throwable {
         DebugUtil.trace(this, ".saveState: claims = " + getClaims().toString(2));
-        if (transaction != null && oa2se != null && responseCode == RC_OK) {
+        switch (getResponseCode()) {
+            case RC_NOT_RUN:
+                break;
+            case RC_OK:
+                if (transaction != null && oa2se != null) {
+                    transaction.setUserMetaData(getClaims());  // It is possible that the claims were updated. Save them.
+                    transaction.setATData(getAtData());
+                    DebugUtil.trace(this, ".saveState: done updating transaction.");
+                }
+            case RC_OK_NO_SCRIPTS:
+                oa2se.getTransactionStore().save(transaction);
+                break;
+
+        }
+
+
+/*        if (transaction != null && oa2se != null && getResponseCode() == RC_OK) {
             transaction.setUserMetaData(getClaims());  // It is possible that the claims were updated. Save them.
             transaction.setATData(getAtData());
 
@@ -327,27 +348,28 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
             DebugUtil.trace(this, ".saveState: done saving transaction.");
         } else {
             trace(this, "In saveState: either env or transaction null. Nothing saved.");
-        }
+        }*/
     }
 
     @Override
     public void setAccountingInformation() {
         JSONObject atData = getAtData();
-        atData.put(ISSUER, getATConfig().getIssuer());
+
+        if (!StringUtils.isTrivial(getATConfig().getIssuer())) {
+            atData.put(ISSUER, getATConfig().getIssuer());
+        }
+        if (getATConfig().getAudience() != null && !getATConfig().getAudience().isEmpty()) {
+            atData.put(AUDIENCE, getATConfig().getAudience());
+        }
         if (0 < getATConfig().getLifetime()) {
             atData.put(EXPIRATION, (System.currentTimeMillis() + getATConfig().getLifetime()) / 1000L);
         } else {
-            atData.put(EXPIRATION, (System.currentTimeMillis() / 1000L) + 900L); // 15 minutes.
+            atData.put(EXPIRATION, (System.currentTimeMillis() / 1000L) + OA2ConfigurationLoader.ACCESS_TOKEN_LIFETIME_DEFAULT); // 15 minutes.
         }
         atData.put(NOT_VALID_BEFORE, (System.currentTimeMillis() - 5000L) / 1000L); // not before is 5 minutes before current
-        //atData.put(ISSUER, oa2se.getIssuer());
-        //atData.put(EXPIRATION, System.currentTimeMillis() / 1000L + 900L);
         atData.put(ISSUED_AT, System.currentTimeMillis() / 1000L);
-/*        if (transaction.getAccessToken() != null) {
-            atData.put(JWT_ID, transaction.getAccessToken().getToken());
-        }*/
-        setAtData(atData);
 
+        setAtData(atData);
     }
 
     @Override
