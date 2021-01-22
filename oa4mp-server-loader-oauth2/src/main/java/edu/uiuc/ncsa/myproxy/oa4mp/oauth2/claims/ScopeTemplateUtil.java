@@ -189,23 +189,6 @@ public class ScopeTemplateUtil {
         }
         return result;
 
-/*
-        for (String g : groups) {
-            String claimKey = TemplateUtil.REGEX_LEFT_DELIMITER + g + TemplateUtil.REGEX_RIGHT_DELIMITER;
-            if (currentTemplate.contains(claimKey)) {
-
-                Groups groups1 = (Groups) claims.get(g);
-                for (String p : groups1.keySet()) {
-                    String newPath = currentTemplate.replace(claimKey, p); // replace the ${group_claim} with its value
-                    String replacedTemplate = simpleReplacement(newPath, claims);
-                    if (replacedTemplate != null) {
-                        return replacedTemplate;
-                    }
-                }
-            }
-        }
-        return null;
-*/
     }
 
     protected static String simpleReplacement(String currentTemplate, Map claims) {

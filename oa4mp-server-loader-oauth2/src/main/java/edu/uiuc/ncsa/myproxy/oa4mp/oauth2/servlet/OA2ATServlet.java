@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.ClaimSourceFactoryImpl;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2ConfigurationLoader;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ScriptRuntimeEngineFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RefreshTokenStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
@@ -14,6 +15,7 @@ import edu.uiuc.ncsa.security.core.cache.Cleanup;
 import edu.uiuc.ncsa.security.core.cache.RetentionPolicy;
 import edu.uiuc.ncsa.security.core.exceptions.*;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
+import edu.uiuc.ncsa.security.core.util.DateUtils;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
@@ -50,6 +52,8 @@ import java.net.URI;
 import java.util.*;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8693Constants2.*;
+import static edu.uiuc.ncsa.security.core.util.Identifiers.VERSION_1_0_TAG;
+import static edu.uiuc.ncsa.security.core.util.Identifiers.VERSION_TAG;
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.CLIENT_SECRET;
 import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.JWT_ID;
 
@@ -385,13 +389,14 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             // Handle the refresh token case.
             try {
                 JSONObject tt = JWTUtil.verifyAndReadJWT(subjectToken, oa2se.getJsonWebKeys());
-                if(tt == null){
-                    refreshToken = tokenForge.getRefreshToken(subjectToken);
-                }else{
-                    refreshToken = new RefreshTokenImpl(URI.create(tt.getString(JWT_ID)));
-                }
+                refreshToken = new RefreshTokenImpl(URI.create(tt.getString(JWT_ID)));
+            } catch (Throwable tt) {
+                refreshToken = tokenForge.getRefreshToken(subjectToken);
+            }
+            try {
                 RefreshTokenStore zzz = (RefreshTokenStore) getTransactionStore();
                 t = zzz.get(refreshToken);
+
             } catch (Throwable tt) {
                 throw new GeneralException("Error: Could not get a refresh token:" + tt.getMessage());
             }
@@ -571,6 +576,25 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         return out;
     }
 
+    protected List<URI> convertToURIList(HttpServletRequest req, String parameterName) {
+        ArrayList<URI> out = new ArrayList<>();
+        String[] rawValues = req.getParameterValues(parameterName);
+        if (rawValues == null) {
+            return null;
+        }
+        for (String v : rawValues) {
+            StringTokenizer st = new StringTokenizer(v);
+            while (st.hasMoreTokens()) {
+                try {
+                    out.add(URI.create(st.nextToken()));
+                }catch(Throwable t){
+                    // just skip it
+                }
+            }
+        }
+        return out;
+    }
+
     @Override
     protected void doIt(HttpServletRequest request, HttpServletResponse response) throws Throwable {
         String grantType = getFirstParameterValue(request, OA2Constants.GRANT_TYPE);
@@ -588,23 +612,30 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
 
     @Override
     protected ATRequest getATRequest(HttpServletRequest request, ServiceTransaction transaction) {
-        OA2ServiceTransaction oa2T = (OA2ServiceTransaction) transaction;
-        long atLifetime = computeATLifetime(oa2T);
+        OA2ServiceTransaction t = (OA2ServiceTransaction) transaction;
         // Set these in the transaction then send it along.
-        oa2T.setAccessTokenLifetime(atLifetime);
+        t.setAccessTokenLifetime(computeATLifetime(t));
         if (((OA2SE) getServiceEnvironment()).isRefreshTokenEnabled()) {
-            long rtLifetime = computeRefreshLifetime(oa2T);
-            oa2T.setRefreshTokenLifetime(rtLifetime);
+            t.setRefreshTokenLifetime(computeRefreshLifetime(t));
         }
 
         return new ATRequest(request, transaction);
     }
 
     @Override
-    protected void checkAGExpiration(AuthorizationGrant ag) {
+    protected AuthorizationGrantImpl checkAGExpiration(AuthorizationGrant ag) {
+        if (!ag.getToken().contains(VERSION_TAG)) {
+            // update old version 1 token.
+            AuthorizationGrantImpl ag0 = (AuthorizationGrantImpl) ag;
+            ag0.setIssuedAt(DateUtils.getDate(ag0.getToken()).getTime());
+            ag0.setLifetime(OA2ConfigurationLoader.AUTHORIZATION_GRANT_LIFETIME_DEFAULT);
+            ag0.setVersion(VERSION_1_0_TAG);  // just in case.
+            return ag0;
+        }
         if (ag.isExpired()) {
             throw new OA2GeneralError(OA2Errors.INVALID_GRANT, "grant expired", HttpStatus.SC_FORBIDDEN);
         }
+        return null;
     }
 
     protected IssuerTransactionState doAT(HttpServletRequest request, HttpServletResponse response, OA2Client client) throws Throwable {
@@ -625,6 +656,10 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         st2.setRefreshToken(atResponse.getRefreshToken()); // ditto. Might be null.
         JWTRunner jwtRunner = new JWTRunner(st2, ScriptRuntimeEngineFactory.createRTE(oa2SE, st2, st2.getOA2Client().getConfig()));
         OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, st2, request);
+        if (st2.getAuthorizationGrant().getVersion() == null || st2.getAuthorizationGrant().getVersion().equals(VERSION_1_0_TAG)) {
+            // Old version. Handlers have not been initialized yet.
+            jwtRunner.initializeHandlers();
+        }
         jwtRunner.doTokenClaims();
         if (!client.isRTLifetimeEnabled()) {
             atResponse.setRefreshToken(null);
@@ -816,22 +851,51 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
     protected TransactionState doRefresh(OA2Client c, HttpServletRequest request, HttpServletResponse response) throws Throwable {
         // Grants are checked in the doIt method
 
-        RefreshToken oldRT = getTF2().getRefreshToken(request.getParameter(OA2Constants.REFRESH_TOKEN));
+        String rawRefreshToken = request.getParameter(OA2Constants.REFRESH_TOKEN);
+        RefreshTokenImpl oldRT = getTF2().getRefreshToken(request.getParameter(OA2Constants.REFRESH_TOKEN));
         if (c == null) {
             throw new InvalidTokenException("Could not find the client associated with refresh token \"" + oldRT + "\"");
         }
         // Check if its a token or JWT
         OA2SE oa2SE = (OA2SE) getServiceEnvironment();
-
+        boolean tokenVersion1 = false;
         try {
             JSONObject json = JWTUtil2.verifyAndReadJWT(oldRT.getToken(), oa2SE.getJsonWebKeys());
             oldRT = ((OA2TokenForge) oa2SE.getTokenForge()).getRefreshToken(json.getString(JWT_ID));
         } catch (Throwable t) {
+            if (!rawRefreshToken.contains(VERSION_TAG)) {
+                tokenVersion1 = true;
+                // then this is an old format token.
+                if (0 < DateUtils.getDate(rawRefreshToken).getTime() + c.getRtLifetime() - System.currentTimeMillis()) {
+                    oldRT.setLifetime(c.getRtLifetime());
+                    oldRT.setIssuedAt(DateUtils.getDate(rawRefreshToken).getTime());
+                    oldRT.setVersion(VERSION_1_0_TAG);
+                } else {
+                    oldRT.setLifetime(-1L); // expire it if too old
+                }
+            }
             // do nothing, this means that the token is not a JWT which is fine too
         }
 
         OA2ServiceTransaction t = getByRT(oldRT);
+        if (tokenVersion1) {
+            // Can't fix it until we have the right transaction.
+            t.setRefreshTokenLifetime(computeRefreshLifetime(t));
+            t.setAccessTokenLifetime(computeATLifetime(t));
+        }
+
         AccessTokenImpl at = (AccessTokenImpl) t.getAccessToken();
+
+        List<String> scopes = convertToList(request, OA2Constants.SCOPE);
+        List<String> audience = convertToList(request, RFC8693Constants.AUDIENCE);
+        List<URI> resources = convertToURIList(request, RFC8693Constants.RESOURCE);
+        TXRecord txRecord= null;
+        if(!scopes.isEmpty() || !audience.isEmpty() || !resources.isEmpty()){
+                    txRecord = new TXRecord(t.getIdentifier());
+                    txRecord.setScopes(scopes);
+                    txRecord.setAudience(audience);
+                    txRecord.setResource(resources);
+        }
 
         if (t == null || !t.isRefreshTokenValid()) {
             DebugUtil.trace(this, "Missing refresh token.");
@@ -847,15 +911,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         t.setRefreshTokenValid(false); // this way if it fails at some point we know it is invalid.
         RTIRequest rtiRequest = new RTIRequest(request, t, at, oa2SE.isOIDCEnabled());
         RTI2 rtIssuer = new RTI2(getTF2(), getServiceEnvironment().getServiceAddress());
-        if (t.getRefreshTokenLifetime() == 0 && 0 < c.getRtLifetime()) {
-            // This is in case we have a really old token that is getting refreshed.
-            // The rt lifetime in the transaction was not set (it's new) so we
-            // just look in the client config for the value rather than refuse to
-            // create aa refresh token. Mostly this relates to converting 4.4 servers to 5.x servers.
-            // Now, set the rt lifetime in the transaction so the new token is
-            // created correctly.
-            t.setRefreshTokenLifetime(Math.min(oa2SE.getMaxRTLifetime(), c.getRtLifetime()));
-        }
+
         RTIResponse rtiResponse = (RTIResponse) rtIssuer.process(rtiRequest);
         rtiResponse.setSignToken(c.isSignTokens());
         if (c.isRTLifetimeEnabled() && oa2SE.isRefreshTokenEnabled()) {
@@ -873,7 +929,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         // is that they exist only for the initialization.
 
         t.setAccessToken(rtiResponse.getAccessToken());
-        JWTRunner jwtRunner = new JWTRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2SE, t, t.getOA2Client().getConfig()));
+        JWTRunner jwtRunner = new JWTRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2SE, t, txRecord, t.getOA2Client().getConfig()));
         OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, t, request);
         try {
             jwtRunner.doRefreshClaims();

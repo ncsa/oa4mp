@@ -30,8 +30,9 @@ public class AccessTokenServlet extends AbstractAccessTokenServlet {
     }
 
     @Override
-    protected void checkAGExpiration(AuthorizationGrant ag) {
+    protected AuthorizationGrant checkAGExpiration(AuthorizationGrant ag) {
           // do nothing in Oauth 1
+        return ag;
     }
 
     @Override

@@ -1,0 +1,77 @@
+This document is about testing the funtionality of the claims handlers. There are a few cases to plow through.
+First is if there are no scripts and simple configuration.
+Server configuration has
+<server authorizationGrantLifetime="12345 sec"
+        defaultAccessTokenLifetime="1009000 ms"
+        maxAccessTokenLifetime="1800 sec."
+        maxRefreshTokenLifetime="2592000 s"
+        maxClientRefreshTokenLifetime="1296000s."
+        refreshTokenEnabled="true"
+        enableTokenExchange="true"
+        ... etc...
+
+The test cfg claim for the client is
+
+{"tokens": {
+   "access":  {
+    "audience": "https://wlcg.cern.ch/jwt/v1/access",
+    "issuer": "https://access.cilogon.org",
+    "lifetime" : 750019
+    "type": "wlcg",
+    "templates": [ {
+       "aud": "https://wlcg.cern.ch/jwt/v1/access",
+       "paths":   [
+          {"op": "read","path": "/home/${sub}"},
+          {"op": "x.y","path": "/abc/def"},
+          {"op": "x.z","path": ""},
+          {"op": "write","path": "/data/cluster"},
+          {"op": "execute","path": "/home/${memberOf}/setup.sh"}
+          ]}]
+          }
+   "refresh":  {
+    "audience": "https://wlcg.cern.ch/jwt/refresh",
+    "issuer": "https://refresh.cilogon.org",
+    "lifetime": 3600000,
+    "type": "refresh"
+    }
+   "identity":  {
+    "type": "identity"
+   }
+ }}
+
+(also in claims-test-client-cfg-1.json)
+
+In the command line client, set the following parameters
+
+set_param -a scope "read:/home/jeffy x.y: write: x.z:/any"
+set_param -x scope "read:/home/jeff execute:/home/all-access/setup.sh x.y:/abc/def/ghi write:/data/cluster1 x.z:/any"
+
+Expected output
+
+after token call
+Access token
+-------------
+lifetime of around 750000 ms
+scopes = "x.z:/any write:/data/cluster x.y:/abc/def"
+
+refresh token
+--------------
+lifetime of around 3600 sec.
+
+After TX (Token exchange)
+Access Token
+-------------
+same lifetime
+scopes = "read:/home/jeff x.y:/abc/def/ghi x.z:/any"
+
+Aim of this test. The templating mechanism should allow for super-scopes as queries. In this case a scope of "write:"
+is passed in and the access token responds with "write:/data/cluster". A few duds are included too as well as
+straight up scopes, so "x.z:/any" is sent in the token request and is returned since the template has "x.z:"
+Note that there is a bad scopes for "read:/home/jeffy" which is not a template. This tests if the URIs are tested
+component-wise so they match. We would not want to have a template like "write:/b/cluster1" and have someone get a scope
+of "write:/b/cluster11".
+
+In the token exchange, reduced scopes (meaning they are longer, a scope of a:/b/c/d has reduced access from a:/b/c)
+are sent and a group is tested. Note that this is manually enabled ca. line 150 in the AbstractAccessTokenHandler.
+There are multiple groups and a group reference in the template like ${memberOf} will have it's value replaced with
+the value of each group name in turn and tested against the scopes.

@@ -36,30 +36,64 @@
 <ul>
     <li><b>clear</b> -- clear the current state and start over</li>
     <li><b>exit</b> -- end the session and shut down the client.</li>
-    <li><b>seturi</b> -- this creates the URI (not trivial as it requires a lot of parameters) that you copy and paste
+    <li><b>set_uri</b> -- this creates the URI (not trivial as it requires a lot of parameters) that you copy and paste
         in to your browser. It is automatically put into the clipbaord if your system has one.
     </li>
-    <li><b>setgrant</b>-- This is invoked on the callback uri from the server. No argument means it will
+    <li><b>set_grant</b>-- This is invoked on the callback uri from the server. No argument means it will
         pull it from the system clipboard. Otherwise it will read the argument.
     </li>
     <li><b>load</b> -- load a configuration (by name) or even switch configuration files. This lets you run
     multiple clients in a single session.</li>
-    <li><b>getat</b> -- Get an access token. You may also get a refresh token at this time if the server supports this.
+    <li><b>get_at</b> -- Get an access token. You may also get a refresh token at this time if the server supports this.
     </li>
-    <li><b>getuserinfo</b> -- use the current access token to get the user's information</li>
-    <li><b>getcert</b> -- get a certificate</li>
-    <li><b>savecert</b> -- save the certificate to a file in PEM format</li>
-    <li><b>getrt</b> -- get the next refresh token</li>
+    <li><b>get_userinfo</b> -- use the current access token to get the user's information</li>
+    <li><b>get_cert</b> -- get a certificate</li>
+    <li><b>save_cert</b> -- save the certificate to a file in PEM format</li>
+    <li><b>get_rt</b> -- get the next refresh token</li>
     <li><b>showclaims</b> -- After you get the access token, you can print the claims that were returned.</li>
-    <li><b>exchange</b> -- If token exchange is supported on your server, exchange the current access or refresh
+    <li><b>exchange</b> -- If token exchange (RFC 8693) is supported on your server, exchange the current access or refresh
     tokens for a new one.</li>
+</ul>
+
+<ul>
+    <li><b>asset:</b></li>
+    <li><b>claims:</b>  </li>
+    <li><b>clear:</b>  </li>
+    <li><b>clear_all_params:</b>  </li>
+    <li><b>clear_env:</b>  </li>
+    <li><b>echo:</b>  </li>
+    <li><b>exchange:</b>  </li>
+    <li><b>get_at:</b>  </li>
+    <li><b>get_cert:</b>  </li>
+    <li><b>get_grant:</b>  </li>
+    <li><b>get_param:</b>  </li>
+    <li><b>get_rt:</b>  </li>
+    <li><b>get_userinfo:</b>  </li>
+    <li><b>load:</b>  </li>
+    <li><b>print_env:</b>  </li>
+    <li><b>print_help:</b>  </li>
+    <li><b>read:</b>  </li>
+    <li><b>read_env:</b>  </li>
+    <li><b>revoke:</b>  </li>
+    <li><b>rm_param:</b>  </li>
+    <li><b>save_cert:</b>  </li>
+    <li><b>save_env:</b>  </li>
+    <li><b>set_env:</b>  </li>
+    <li><b>set_output_on:</b>  </li>
+    <li><b>set_param:</b>  </li>
+    <li><b>set_uri:</b>  </li>
+    <li><b>set_verbose_on:</b>  </li>
+    <li><b>show_raw_token:</b>  </li>
+    <li><b>tokens:</b>  </li>
+    <li><b>version:</b>  </li>
+    <li><b>write:</b>  </li>
 </ul>
 <p>And here is the executive summary of the steps</p>
 <ol>
-    <li><b>seturi</b> -- cut the result, paste it in your brower, authenticate</li>
+    <li><b>set_uri</b> -- cut the result, paste it in your brower, authenticate</li>
     <li>Get an error -- your redirect won't work. Great, but the url from the address box in your browser</li>
-    <li>issue <b>getgrant</b> using the callback you just copied to the clipbord</li>
-    <li>issue <b>getat</b> This gets a access token, prints out stuff and lets you look at the id token, refresh token etc.</li>
+    <li>issue <b>get_grant</b> using the callback you just copied to the clipbord</li>
+    <li>issue <b>get_at</b> This gets a access token, prints out stuff and lets you look at the id token, refresh token etc.</li>
 </ol>
 <h3>Setup</h3>
 <p>You must register the a client with the server as per <a
@@ -84,7 +118,7 @@
 <h3>Getting the correct URI</h3>
 <p>Issue the following <b>geturi</b> call:</p>
 <pre>
-    client&gt;geturi
+    client&gt;set_uri
     https://surge.ncsa.illinois.edu/oauth2/authorize?scope=edu.uiuc.ncsa.myproxy.getcert+openid+profile+email&amp;response_type=code&amp;redirect_uri=https%3A%2F%2Fashigaru.ncsa.uiuc.edu%3A9443%2Fclient%2Fready&amp;state=MUB0Y2wme8FvxTbtwjp6y4xLfR3SbxS4NY6_FqDlM-Q&amp;nonce=udBh62PGMyZaYNa4-vlmfYbNl8MSgb7IO9rBIOkPWcM&amp;prompt=login&amp;client_id=myproxy%3Aoa4mp%2C2012%3A%2Fclient_id%2F2a3aab4b67f3c8d9f3bff4aafb6e236c&amp;skin=dataOne
     </pre>
 <p>The command causes a uri to be generated with the full state for the OIDC request (which is actually hard to make,
@@ -92,7 +126,7 @@
     the call). As with all calls, you can get a description of what it is and does by supplying
     the argument --help:</p>
 <pre>
-    client&gt;seturi --help
+    client&gt;set_uri --help
     Usage: This will create the correct URL to pass to your browser.
            This URL should be pasted exactly into the location bar.
            You must then authenticate. After you authenticate, the

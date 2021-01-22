@@ -129,7 +129,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
 
             state.toXML(xsw);
             String xml2 = XMLUtils.prettyPrint(w.toString()); // We do this because whitespace matters. This controls it.
-            DebugUtil.trace(this, "\nSerialized state\n:" + xml2);
+        //    DebugUtil.trace(this, "\nSerialized state\n:" + xml2);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             GZIPOutputStream gzipOutputStream = new GZIPOutputStream(baos);
             gzipOutputStream.write(xml2.getBytes("UTF-8"));

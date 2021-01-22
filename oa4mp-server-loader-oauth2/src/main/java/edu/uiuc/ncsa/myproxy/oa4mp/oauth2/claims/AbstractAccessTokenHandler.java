@@ -146,6 +146,11 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
             }
         }
         Map<String, List<String>> groupMap = new HashMap<>();
+
+        /*
+          Manual testing of groups. This lets me turn on groups to emulate a more complex
+          testing environment. See the note in claims-handler-testing.txt
+
         Groups gg = new Groups();
         GroupElement groupElement = new GroupElement("all-access", 42);
         gg.put(groupElement);
@@ -155,6 +160,7 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
         groupElement = new GroupElement("other-access", 43);
         gg.put(groupElement);
         getClaims().put("otherMemberOf", gg.toJSON());
+        */
         Map claimsNoGroups = new HashMap();
         for (Object claimKey : getClaims().keySet()) {
             Object claim = getClaims().get(claimKey);

@@ -1,0 +1,49 @@
+{
+  "tokens": {
+    "access": {
+      "audience": "https://wlcg.cern.ch/jwt/v1/access",
+      "issuer": "https://access.cilogon.org",
+      "lifetime": 750019,
+      "type": "wlcg",
+      "templates": [
+        {
+          "aud": "https://wlcg.cern.ch/jwt/v1/access",
+          "paths": [
+            {
+              "op": "read",
+              "path": "/home/${sub}"
+            },
+            {
+              "op": "x.y",
+              "path": "/abc/def"
+            },
+            {
+              "op": "x.z",
+              "path": ""
+            },
+            {
+              "op": "write",
+              "path": "/data/cluster"
+            },
+            {
+              "op": "execute",
+              "path": "/home/${memberOf}/setup.sh"
+            }
+          ]
+        }
+      ]
+    },
+    "refresh": {
+      "audience": "https://wlcg.cern.ch/jwt/refresh",
+      "issuer": "https://refresh.cilogon.org",
+      "lifetime": 3600000,
+      "type": "refresh"
+    },
+    "identity": {
+      "type": "identity"
+    }
+  }
+}
+
+
+

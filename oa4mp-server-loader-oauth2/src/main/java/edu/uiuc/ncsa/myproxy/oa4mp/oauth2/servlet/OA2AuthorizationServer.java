@@ -198,14 +198,7 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
         JWTRunner jwtRunner = new JWTRunner(st2, ScriptRuntimeEngineFactory.createRTE(oa2SE, st2, st2.getOA2Client().getConfig()));
         OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, st2, request);
 
-/*
-        IDTokenHandler idTokenHandler = new IDTokenHandler(new IDTokenHandlerConfig(
-                ((OA2Client) st2.getClient()).getIDTokenConfig(),
-                oa2SE,
-                st2,
-                request));
-        jwtRunner.addHandler(idTokenHandler);
-*/
+
         jwtRunner.doAuthClaims();
         getTransactionStore().save(st2);
     }

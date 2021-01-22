@@ -28,15 +28,24 @@ public abstract class AbstractAccessTokenServlet extends MyProxyDelegationServle
 
     protected abstract ServiceTransaction getTransaction(AuthorizationGrant ag, HttpServletRequest req) throws ServletException;
 
-    protected abstract void checkAGExpiration(AuthorizationGrant ag);
+    /**
+     * Contract: if the token gets updated (might have to because of changes to token versions), return it.
+     * If no changes, return null.
+     * @param ag
+     * @return
+     */
+    protected abstract AuthorizationGrant checkAGExpiration(AuthorizationGrant ag);
 
     protected IssuerTransactionState doDelegation(Client client, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Throwable, ServletException {
         info("5.a. Starting access token exchange");
         Verifier v = getServiceEnvironment().getTokenForge().getVerifier(httpServletRequest);
         AuthorizationGrant ag = getServiceEnvironment().getTokenForge().getAuthorizationGrant(httpServletRequest);
-        checkAGExpiration(ag);
+        AuthorizationGrant updatedAG  = checkAGExpiration(ag);
         ServiceTransaction transaction = getTransaction(ag, httpServletRequest);
-
+        if(updatedAG != null){
+            // This allows for maintaining version 4.x to 5.x token compatibility
+            transaction.setAuthorizationGrant(updatedAG);
+        }
         ATRequest atRequest = getATRequest(httpServletRequest, transaction);
 
         atRequest.setVerifier(v);

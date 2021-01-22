@@ -16,7 +16,7 @@ import java.util.List;
 public class ScopeTemplateQDLUtil implements QDLFunction {
     @Override
     public String getName() {
-        return "resolve_template";
+        return "resolve_templates";
     }
 
     @Override
@@ -47,7 +47,7 @@ public class ScopeTemplateQDLUtil implements QDLFunction {
     public List<String> getDocumentation(int argCount) {
         List<String> doxx = new ArrayList<>();
         doxx.add(getName() +"(computed_scopes, requested_scopes, is_token_exchange)");
-        doxx.add("compute_scopes = scopes from templates that have been resolved.");
+        doxx.add("computed_scopes = scopes from templates that have been resolved.");
         doxx.add("requested_scopes = the scopes the client has requested.");
         doxx.add("is_token_exchange = true if this is part of a token exchange");
         return doxx;

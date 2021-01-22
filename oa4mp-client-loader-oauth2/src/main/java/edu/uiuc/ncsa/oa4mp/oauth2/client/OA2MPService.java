@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.client.ClientEnvironment;
 import edu.uiuc.ncsa.myproxy.oa4mp.client.OA4MPService;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.delegation.client.request.*;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.delegation.token.*;
@@ -278,10 +279,14 @@ public class OA2MPService extends OA4MPService {
      * @param identifier
      */
     public RTResponse refresh(String identifier) {
+        return refresh(identifier, null);
+    }
+
+    public RTResponse refresh(String identifier, Map additionalParameters) {
         OA2Asset asset = (OA2Asset) getAssetStore().get(identifier);
         if (asset == null) return null;
         DS2 ds2 = (DS2) getEnvironment().getDelegationService();
-        RTRequest rtRequest = new RTRequest(getEnvironment().getClient(), null);
+        RTRequest rtRequest = new RTRequest(getEnvironment().getClient(), additionalParameters);
         rtRequest.setAccessToken(asset.getAccessToken());
         rtRequest.setRefreshToken(asset.getRefreshToken());
         RTResponse rtResponse = ds2.refresh(rtRequest);
@@ -290,8 +295,8 @@ public class OA2MPService extends OA4MPService {
         getAssetStore().remove(asset.getIdentifier()); // clear out
         getAssetStore().save(asset);
         return rtResponse;
-    }
 
+    }
 
     public UserInfo getUserInfo(String identifier) {
         OA2Asset asset = getAsset2(identifier);
@@ -395,7 +400,7 @@ public class OA2MPService extends OA4MPService {
         Client client = getEnvironment().getClient();
         String rawResponse = serviceClient.getRawResponse(parameterMap, client.getIdentifierString(), client.getSecret());
 
-        System.out.println("raw response = " + rawResponse);
+        DebugUtil.trace(this, "raw response = " + rawResponse);
         JSONObject json = JSONObject.fromObject(rawResponse);
         updateExchangedAsset(asset, json);
         String rawToken = json.getString(OA2Constants.ACCESS_TOKEN);

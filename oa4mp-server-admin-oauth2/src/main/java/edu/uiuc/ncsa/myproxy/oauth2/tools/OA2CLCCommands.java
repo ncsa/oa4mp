@@ -14,8 +14,10 @@ import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.delegation.client.request.RTResponse;
+import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
 import edu.uiuc.ncsa.security.delegation.token.Token;
+import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
 import edu.uiuc.ncsa.security.delegation.token.impl.AuthorizationGrantImpl;
 import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
 import edu.uiuc.ncsa.security.oauth_2_0.JWTUtil;
@@ -353,15 +355,15 @@ public class OA2CLCCommands extends CLCCommands {
     String rawIdToken = null;
 
     protected void showRawTokenHelp() {
-        sayi("show_rawtoken:");
+        sayi("show_raw_id_token:");
         sayi("This will show the raw id token, i.e., the JWT. ");
         sayi("If you wish to see the contents of this JWT");
         sayi("you should probably invoke showClaims instead.");
     }
 
-    public void show_rawtoken(InputLine inputLine) throws Exception {
+    public void show_raw_id_token(InputLine inputLine) throws Exception {
         if (grant == null || showHelp(inputLine)) {
-            getATHelp();
+            showRawTokenHelp();
             return;
         }
 
@@ -395,7 +397,7 @@ public class OA2CLCCommands extends CLCCommands {
         sayi("showClaims");
         say("    This will show the most recent set of claims. You must get an access token");
         sayi("   before this is set.");
-        sayi("   You may also see the raw version of this (simply the JWT) by calling showRawToken.");
+        sayi("   You may also see the raw version of this (simply the JWT) by calling show_raw_token.");
     }
 
     protected void showRevokeHelp() {
@@ -461,14 +463,13 @@ public class OA2CLCCommands extends CLCCommands {
     }
 
     protected void getUIHelp() {
-        say("get_userinfo");
+        say("get_user_info");
         sayi("This will get the user info from the server. You must have already authenticated");
         sayi("*and* gotten a valid access token by this point. Just a list of these it printed.");
         sayi("What is returned is dependant upon what the server supports.");
-        sayi("If possible this will be put in to the clipboard for easy access.");
     }
 
-    public void get_userinfo(InputLine inputLine) throws Exception {
+    public void get_user_info(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
             getUIHelp();
             return;
@@ -543,49 +544,65 @@ public class OA2CLCCommands extends CLCCommands {
         say("   " + NO_VERIFY_JWT + " = do not verify JWTs against server. Default is to verify.");
     }
 
-    protected void printTokens(boolean noVerify) {
-        // It is possible that the service is down in which case the tokens can't be verified.
-        if (dummyAsset.getAccessToken() != null) {
+    protected void printToken(AccessToken accessToken, boolean noVerify) {
+
+        if (accessToken != null) {
             JSONObject token = null;
             // If the access token is a jwt
             try {
-                token = resolveFromToken(getDummyAsset().getAccessToken(), noVerify);
+                token = resolveFromToken(accessToken, noVerify);
             } catch (Throwable t) {
                 say("service is unreachable -- cannot verify token.");
                 return;
             }
             if (token == null) {
-                say("default access token = " + dummyAsset.getAccessToken().getToken());
-                say("AT expires in = " + dummyAsset.getAccessToken().getLifetime() + " ms.");
-                Date startDate = DateUtils.getDate(dummyAsset.getAccessToken().getToken());
-                startDate.setTime(startDate.getTime() + dummyAsset.getAccessToken().getLifetime());
-                say("   valid until " + startDate + "\n");
+                say("default access token = " + accessToken.getToken());
+                Date startDate = DateUtils.getDate(accessToken.getToken());
+                startDate.setTime(startDate.getTime() + accessToken.getLifetime());
+                if (startDate.getTime() < System.currentTimeMillis()) {
+                    say("token expired \n");
+                } else {
+                    say("AT expires in = " + accessToken.getLifetime() + " ms.");
+                    say("   valid until " + startDate + "\n");
+                }
             } else {
                 sayi("JWT access token:" + token.toString(1));
+                AccessTokenImpl at = (AccessTokenImpl) accessToken;
                 if (token.containsKey(OA2Claims.EXPIRATION)) {
                     Date d = new Date();
                     d.setTime(token.getLong(OA2Claims.EXPIRATION) * 1000L);
 
-                    getDummyAsset().getAccessToken().setLifetime(d.getTime() - System.currentTimeMillis());
-                    say("AT expires in = " + getDummyAsset().getAccessToken().getLifetime() + " ms.\n");
+                    at.setLifetime(d.getTime() - System.currentTimeMillis());
+                    if (at.getLifetime() <= 0) {
+                        say("token expired \n");
+                    } else {
+                        say("AT expires in = " + at.getLifetime() + " ms.\n");
+                    }
                 }
             }
         }
 
-        if (dummyAsset.getRefreshToken() != null) {
+    }
+
+    protected void printToken(RefreshTokenImpl refreshToken, boolean noVerify) {
+        if (refreshToken != null) {
             JSONObject token = null;
             try {
-                token = resolveFromToken(getDummyAsset().getRefreshToken(), noVerify);
+                token = resolveFromToken(refreshToken, noVerify);
             } catch (Throwable t) {
                 say("service is unreachable -- cannot verify token.");
                 return;
             }
             if (token == null) {
-                say("default refresh token = " + dummyAsset.getRefreshToken().getToken());
-                say("RT expires in = " + dummyAsset.getRefreshToken().getLifetime() + " ms.");
-                Date startDate = DateUtils.getDate(dummyAsset.getRefreshToken().getToken());
-                startDate.setTime(startDate.getTime() + dummyAsset.getRefreshToken().getLifetime());
-                say("   valid until " + startDate + "\n");
+                say("default refresh token = " + refreshToken.getToken());
+                Date startDate = DateUtils.getDate(refreshToken.getToken());
+                startDate.setTime(startDate.getTime() + refreshToken.getLifetime());
+                if (startDate.getTime() <= System.currentTimeMillis()) {
+                    say("token expired" + startDate + "\n");
+                } else {
+                    say("RT expires in = " + refreshToken.getLifetime() + " ms.");
+                    say("   valid until " + startDate + "\n");
+                }
 
             } else {
                 say("JWT refresh token = " + token.toString(1));
@@ -593,12 +610,22 @@ public class OA2CLCCommands extends CLCCommands {
                     Date d = new Date();
                     d.setTime(token.getLong(OA2Claims.EXPIRATION) * 1000L);
 
-                    getDummyAsset().getRefreshToken().setLifetime(d.getTime() - System.currentTimeMillis());
-                    say("RT expires in = " + getDummyAsset().getRefreshToken().getLifetime() + " ms.");
+                    refreshToken.setLifetime(d.getTime() - System.currentTimeMillis());
+                    if (refreshToken.getLifetime() <= 0) {
+                        say("token expired\n");
+                    } else {
+                        say("RT expires in = " + refreshToken.getLifetime() + " ms.");
+                    }
                 }
             }
-
         }
+    }
+
+    protected void printTokens(boolean noVerify) {
+        // It is possible that the service is down in which case the tokens can't be verified.
+        printToken(getDummyAsset().getAccessToken(), noVerify);
+        printToken(getDummyAsset().getRefreshToken(), noVerify);
+
 
     }
 
@@ -610,7 +637,7 @@ public class OA2CLCCommands extends CLCCommands {
             return;
         }
 
-        RTResponse rtResponse = getOA2S().refresh(dummyAsset.getIdentifier().toString());
+        RTResponse rtResponse = getOA2S().refresh(dummyAsset.getIdentifier().toString(), exchangeParameters);
         dummyAsset = (OA2Asset) getCe().getAssetStore().get(dummyAsset.getIdentifier().toString());
         // Have to update the AT reponse here every time or no token state is preserved.
         currentATResponse = new ATResponse2(dummyAsset.getAccessToken(), dummyAsset.getRefreshToken());
@@ -682,13 +709,17 @@ public class OA2CLCCommands extends CLCCommands {
                 at = new RefreshTokenImpl(getDummyAsset().getRefreshToken().getToken(),
                         URI.create(token.getString(OA2Claims.JWT_ID)));
             }
+            // Note in the next call, the asset is updated by the call since it has all of the information
+            // for the token types. We just need to grab the raw token since we also stash it.
             JSONObject response = getService().exchangeRefreshToken(getDummyAsset(),
                     at,
                     exchangeParameters,
                     true);
             sciToken = response;
+            //    AccessTokenImpl newAt = new AccessTokenImpl(sciToken.getString(RFC8693Constants.ACCESS_TOKEN));
+            //  newAt.isExpired()
 
-            sayi(response.toString(2));
+            printToken(getDummyAsset().getAccessToken(), false);
         }
         if (inputLine.hasArg("-rt")) {
             didIt = true;
@@ -704,7 +735,7 @@ public class OA2CLCCommands extends CLCCommands {
             JSONObject response = getService().exchangeRefreshToken(getDummyAsset(), rt, null, false);
             sciToken = response;
 
-            sayi(response.toString(2));
+            printToken(getDummyAsset().getRefreshToken(), false);
         }
         if (!didIt) {
             sayi("Sorry, argument not understood");
@@ -760,6 +791,18 @@ public class OA2CLCCommands extends CLCCommands {
         }
 
         JSONObject json = JSONObject.fromObject(stringBuffer.toString());
+        if (json.containsKey(CONFIG_FILE_KEY)) {
+            // make a fake input line for loading the last configuration and run it.
+            // Do this first since it clears the current state and anything loaded before it is lost.
+
+            Vector v = new Vector();
+            v.add("load");
+            v.add(json.getString(CONFIG_NAME_KEY));
+            v.add(json.getString(CONFIG_FILE_KEY));
+            InputLine loadLine = new InputLine(v);
+            load(loadLine);
+        }
+
         if (json.containsKey(SYSTEM_MESSAGE_KEY)) {
             say(json.getString(SYSTEM_MESSAGE_KEY));
         }
@@ -777,15 +820,7 @@ public class OA2CLCCommands extends CLCCommands {
             grant.fromJSON(json.getJSONObject(AUTHZ_GRANT_KEY));
         }
 
-        if (json.containsKey(CONFIG_FILE_KEY)) {
-            // make a fake input line for loading the last configuration and run it.
-            Vector v = new Vector();
-            v.add("load");
-            v.add(json.getString(CONFIG_NAME_KEY));
-            v.add(json.getString(CONFIG_FILE_KEY));
-            InputLine loadLine = new InputLine(v);
-            load(loadLine);
-        }
+
         if (json.containsKey(TOKEN_PARAMETERS_KEY)) {
             tokenParameters = new HashMap<>();
             tokenParameters.putAll(json.getJSONObject(TOKEN_PARAMETERS_KEY));
@@ -900,7 +935,8 @@ public class OA2CLCCommands extends CLCCommands {
         say("See also: read");
     }
 
-    public void grant(InputLine inputLine) throws Exception {
+    // get_grant replaces this.
+  /*  public void grant(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
             say("grant - show the current authorization grant if any");
             return;
@@ -909,7 +945,7 @@ public class OA2CLCCommands extends CLCCommands {
             say("(no grant)");
         }
         say(grant.toJSON().toString(1));
-    }
+    }*/
 
     HashMap<String, String> requestParameters = new HashMap<>();
     HashMap<String, String> tokenParameters = new HashMap<>();
