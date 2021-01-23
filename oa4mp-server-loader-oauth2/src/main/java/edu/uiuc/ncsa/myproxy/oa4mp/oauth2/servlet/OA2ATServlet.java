@@ -199,13 +199,14 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             throw new NFWException("Internal error: the server-wide default for the access token lifetime has not been set.");
         }
         long lifetime = oa2SE.getMaxATLifetime();
+        st2.setMaxATLifetime(lifetime); // absolute max allowed on this server for this request
 
         OA2Client client = (OA2Client) st2.getClient();
         if (0 < client.getAtLifetime()) {
             lifetime = Math.min(client.getAtLifetime(), lifetime);
+        }else{
+               lifetime = Math.min(lifetime, OA2ConfigurationLoader.ACCESS_TOKEN_LIFETIME_DEFAULT);
         }
-        // This is the max for any token.
-        st2.setMaxATLifetime(lifetime); // absolute max allowed on this server for this request
 
         if (client.hasAccessTokenConfig()) {
             if (0 < client.getAccessTokensConfig().getLifetime()) {
@@ -223,34 +224,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
 
     }
 
-    /**
-     * If a value is negative, that means to not check it, e.g., no specific value requested in transaction,
-     * so ignore it.
-     *
-     * @param serverValue
-     * @param clientValue
-     * @param transactionValue
-     * @return
-     */
-    protected long computeTokenLifetime(long serverValue, long clientValue, long transactionValue) {
-        if (serverValue <= 0) {
-            throw new NFWException("Internal error: the server-wide default for access token lifetimes has not been set.");
-        }
-        long lifetime = serverValue;
-        if (0 < clientValue) {
-            lifetime = Math.min(serverValue, clientValue);
-        }else{
-            // Some clients don't set this. Use the default or you always get the server max.
-            lifetime = Math.min(serverValue, OA2ConfigurationLoader.ACCESS_TOKEN_LIFETIME_DEFAULT);
 
-        }
-        // Now take the minimum of what the server allows.
-        if (0 < transactionValue) {
-            lifetime = Math.min(lifetime, transactionValue);
-        }
-
-        return lifetime;
-    }
 
     /**
      * Contains the tests for executing a request based on its grant type. over-ride this as needed by writing your

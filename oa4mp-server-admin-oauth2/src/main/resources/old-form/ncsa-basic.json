@@ -1,0 +1,115 @@
+{
+  "claims": {
+    "preProcessing": [
+      {
+        "$if": [
+          "$true"
+        ],
+        "$then": [
+          {
+            "$set_claim_source": [
+              "LDAP",
+              "2f98a0298b27c2d8"
+            ]
+          }
+        ]
+      }
+    ],
+    "sourceConfig": [
+      {
+        "ldap": {
+          "address": "ldap4.ncsa.illinois.edu",
+          "authorizationType": "none",
+          "contextName": "",
+          "enabled": true,
+          "failOnError": false,
+          "name": "2f98a0298b27c2d8",
+          "notifyOnFail": false,
+          "port": 636,
+          "postProcessing": [
+            {
+              "$if": [
+                {
+                  "$match": [
+                    "${idp}",
+                    "https://idp.ncsa.illinois.edu/idp/shibboleth"
+                  ]
+                }
+              ],
+              "$then": [
+                {
+                  "$exclude": [
+                    "foo"
+                  ]
+                }
+              ]
+            }
+          ],
+          "preProcessing": [
+            {
+              "$else": [
+                {
+                  "$get_claims": [
+                    "$false"
+                  ]
+                }
+              ],
+              "$if": [
+                {
+                  "$match": [
+                    "${idp}",
+                    "https://idp.ncsa.illinois.edu/idp/shibboleth"
+                  ]
+                }
+              ],
+              "$then": [
+                {
+                  "$set": [
+                    "foo",
+                    {
+                      "$drop": [
+                        "@ncsa.illinois.edu",
+                        "${eppn}"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "searchAttributes": [
+            {
+              "name": "cn",
+              "returnAsList": false,
+              "returnName": "name"
+            },
+            {
+              "isGroup": true,
+              "name": "memberOf",
+              "returnAsList": false,
+              "returnName": "isMemberOf"
+            },
+            {
+              "name": "uid",
+              "returnAsList": false,
+              "returnName": "uid"
+            },
+            {
+              "name": "uidNumber",
+              "returnAsList": false,
+              "returnName": "uidNumber"
+            }
+          ],
+          "searchBase": "ou=People,dc=ncsa,dc=illinois,dc=edu",
+          "searchName": "foo",
+          "ssl": {
+            "tlsVersion": "TLS",
+            "useJavaTrustStore": true
+          }
+        }
+      }
+    ]
+  },
+  "config": "created_by_Terry_Fleury_2020-10-05",
+  "isSaved": true
+}

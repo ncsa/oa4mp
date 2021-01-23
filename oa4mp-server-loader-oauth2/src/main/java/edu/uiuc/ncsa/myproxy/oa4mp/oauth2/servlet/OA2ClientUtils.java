@@ -325,6 +325,7 @@ public class OA2ClientUtils {
                     transaction,
                     txRecord,
                     req);
+            idthCfg.setLegacyHandler(true);
         }
         IDTokenHandler idTokenHandler = new IDTokenHandler(idthCfg);
         jwtRunner.setIdTokenHandlerInterface(idTokenHandler);

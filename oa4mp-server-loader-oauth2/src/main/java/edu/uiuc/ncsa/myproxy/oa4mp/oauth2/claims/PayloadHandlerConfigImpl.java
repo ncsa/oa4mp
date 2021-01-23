@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletRequest;
  * <p>Created by Jeff Gaynor<br>
  * on 6/30/20 at  10:53 AM
  */
-public  class PayloadHandlerConfigImpl implements PayloadHandlerConfig {
+public class PayloadHandlerConfigImpl implements PayloadHandlerConfig {
     OA2SE oa2se;
     OA2ServiceTransaction transaction;
     HttpServletRequest request;
@@ -87,4 +87,24 @@ public  class PayloadHandlerConfigImpl implements PayloadHandlerConfig {
         return clientConfig.getScriptSet();
     }
 
+    @Override
+    public String toString() {
+        return "PayloadHandlerConfigImpl{" +
+                "oa2se=" + oa2se +
+                ", transaction=" + transaction +
+                ", request=" + request +
+                ", clientConfig=" + clientConfig +
+                ", txRecord=" + txRecord +
+                '}';
+    }
+
+    boolean legacyHandler = false;
+
+    public boolean isLegacyHandler() {
+        return legacyHandler;
+    }
+
+    public void setLegacyHandler(boolean b) {
+        legacyHandler = b;
+    }
 }

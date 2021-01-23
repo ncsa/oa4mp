@@ -163,8 +163,10 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
     protected JSONObject realProcessing(JSONObject claims, HttpServletRequest request, ServiceTransaction transaction) throws UnsupportedScopeException {
         String name="realProcessing(id=" + getLDAPCfg().getId() + "):" ;
 
+
         DebugUtil.trace(this,name + " preparing to do processing.");
         DebugUtil.trace(this,name + " initial claims = " + claims);
+
         if (!isEnabled()) {
             DebugUtil.trace(this,name + " Claims source not enabled." );
             return claims;
@@ -175,6 +177,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
         }
         try {
             String searchName = getSearchName(claims, request, transaction);
+     //       String searchName = "jgaynor";
             DebugUtil.trace(this,name + " search name=" + searchName);
 
             if (searchName != null) {

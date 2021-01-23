@@ -189,6 +189,7 @@ public class BasicClaimsSourceImpl implements ClaimSource {
             FlowStates2 f = t.getFlowStates();
             FunctorRuntimeEngine.updateFSValues(f, postProcessor.getFunctorMap());
             t.setFlowStates(f);
+            t.setUserMetaData(claims);
         }
         DebugUtil.trace(this,"returned claims=:" + claims );
 

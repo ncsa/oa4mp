@@ -485,6 +485,7 @@ public abstract class StoreCommands2 extends StoreCommands {
             }
 
             removeEntry(identifiable, key);
+            say("removed attribute \"" + key + "\"");
         }
         //    rmCleanup(identifiable);
     }
@@ -1409,6 +1410,10 @@ public abstract class StoreCommands2 extends StoreCommands {
         say("target will be overwritten if it exists.");
         say("This only makes a simple copy. If this is, e.g., a client, you will need to approve it, change secret etc.");
         say("Note: source and target are identifiers (no lead /).");
+        say("E.g. In the client store:\n");
+        say("  client>copy dev:command.line dev:no_cfg\n");
+        say("would take the client configuration with id dev:command.line and create a new client config. that is");
+        say("identical except with id dev:no_cfg. In this case, as a new client, it needs to be approved.");
     }
 
     public static String KEY_SHORTHAND_PREFIX = ">";
