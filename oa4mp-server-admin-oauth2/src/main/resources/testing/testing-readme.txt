@@ -5,6 +5,7 @@ When a new version is deployed, here is the testing order
   -- Run command line client #0 (ashigaru:command.line2)
         currently gets basic NCSA claims
   -- Run command line client #1 (localhost:command.line)
+        currently has no configuration. This is the most common case in production.
   -- Run command line client #2 (localhost:command.line2)
          Plain vanilla, no extra claims.
   -- Start local QDL-aware client on ashigaru (qdl:test0)
@@ -28,6 +29,7 @@ When a new version is deployed, here is the testing order
         in the configuration from prj_sprout to cilogon_help. everything should work.
         Then set it back so you don't forget.
   -- see file ~/dev/csd/config/dev-testing.txt for several configurations to test.
+         These can't be in this directory since some of the configurations contain passwords.
   -- Do demo on dev: https://demo-dev.cilogon.org/cilogon2/ (cilogon:dev.cilogon.org/demo)
        No additional configuration, just basic user claims and a cert.
   -- Do surge plain client: https://surge.ncsa.illinois.edu/cilogon-oa2-dev/

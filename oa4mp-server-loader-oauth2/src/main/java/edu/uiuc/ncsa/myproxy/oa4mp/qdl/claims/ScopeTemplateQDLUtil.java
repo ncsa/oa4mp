@@ -30,8 +30,19 @@ public class ScopeTemplateQDLUtil implements QDLFunction {
         if(objects.length != 3){
             throw new IllegalArgumentException(getName() + " requires 3 arguments");
         }
+        if(!(objects[0] instanceof StemVariable)){
+            throw new IllegalArgumentException("Error: The first argument (for the computed scopes) must be a stem.");
+        }
         StemVariable computedStem =   (StemVariable )objects[0];
+        if(!(objects[1] instanceof StemVariable)){
+            throw new IllegalArgumentException("Error: The second argument (for the requested scopes) must be a stem.");
+        }
+
         StemVariable requestedStem =   (StemVariable )objects[1];
+        if(!(objects[2] instanceof Boolean)){
+            throw new IllegalArgumentException("Error: The third argument (if the operation is part of a token exchange) must be a stem.");
+        }
+
         Boolean isTX = (Boolean)objects[2];
         List<String> computedScopes = computedStem.getStemList().toJSON();
         List<String> requestedScopes = requestedStem.getStemList().toJSON();

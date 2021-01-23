@@ -239,6 +239,10 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         long lifetime = serverValue;
         if (0 < clientValue) {
             lifetime = Math.min(serverValue, clientValue);
+        }else{
+            // Some clients don't set this. Use the default or you always get the server max.
+            lifetime = Math.min(serverValue, OA2ConfigurationLoader.ACCESS_TOKEN_LIFETIME_DEFAULT);
+
         }
         // Now take the minimum of what the server allows.
         if (0 < transactionValue) {
@@ -580,7 +584,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         ArrayList<URI> out = new ArrayList<>();
         String[] rawValues = req.getParameterValues(parameterName);
         if (rawValues == null) {
-            return null;
+            return out;
         }
         for (String v : rawValues) {
             StringTokenizer st = new StringTokenizer(v);
