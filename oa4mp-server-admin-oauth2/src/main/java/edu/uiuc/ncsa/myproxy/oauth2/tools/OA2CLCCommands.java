@@ -560,9 +560,9 @@ public class OA2CLCCommands extends CLCCommands {
                 Date startDate = DateUtils.getDate(accessToken.getToken());
                 startDate.setTime(startDate.getTime() + accessToken.getLifetime());
                 if (startDate.getTime() < System.currentTimeMillis()) {
-                    say("token expired \n");
+                    say("   token expired \n");
                 } else {
-                    say("AT expires in = " + accessToken.getLifetime() + " ms.");
+                    say("   expires in = " + accessToken.getLifetime() + " ms.");
                     say("   valid until " + startDate + "\n");
                 }
             } else {
@@ -574,9 +574,9 @@ public class OA2CLCCommands extends CLCCommands {
 
                     at.setLifetime(d.getTime() - System.currentTimeMillis());
                     if (at.getLifetime() <= 0) {
-                        say("token expired \n");
+                        say("   token expired \n");
                     } else {
-                        say("AT expires in = " + at.getLifetime() + " ms.\n");
+                        say("   expires in = " + at.getLifetime() + " ms.\n");
                     }
                 }
             }
@@ -598,9 +598,9 @@ public class OA2CLCCommands extends CLCCommands {
                 Date startDate = DateUtils.getDate(refreshToken.getToken());
                 startDate.setTime(startDate.getTime() + refreshToken.getLifetime());
                 if (startDate.getTime() <= System.currentTimeMillis()) {
-                    say("token expired" + startDate + "\n");
+                    say("   token expired" + startDate + "\n");
                 } else {
-                    say("RT expires in = " + refreshToken.getLifetime() + " ms.");
+                    say("   expires in = " + refreshToken.getLifetime() + " ms.");
                     say("   valid until " + startDate + "\n");
                 }
 
@@ -612,9 +612,9 @@ public class OA2CLCCommands extends CLCCommands {
 
                     refreshToken.setLifetime(d.getTime() - System.currentTimeMillis());
                     if (refreshToken.getLifetime() <= 0) {
-                        say("token expired\n");
+                        say("   token expired\n");
                     } else {
-                        say("RT expires in = " + refreshToken.getLifetime() + " ms.");
+                        say("   expires in = " + refreshToken.getLifetime() + " ms.");
                     }
                 }
             }
@@ -637,7 +637,7 @@ public class OA2CLCCommands extends CLCCommands {
             return;
         }
 
-        RTResponse rtResponse = getOA2S().refresh(dummyAsset.getIdentifier().toString(), exchangeParameters);
+        RTResponse rtResponse = getOA2S().refresh(dummyAsset.getIdentifier().toString(), tokenParameters);
         dummyAsset = (OA2Asset) getCe().getAssetStore().get(dummyAsset.getIdentifier().toString());
         // Have to update the AT reponse here every time or no token state is preserved.
         currentATResponse = new ATResponse2(dummyAsset.getAccessToken(), dummyAsset.getRefreshToken());

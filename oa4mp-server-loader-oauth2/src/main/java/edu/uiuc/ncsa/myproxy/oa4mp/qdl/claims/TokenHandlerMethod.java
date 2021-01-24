@@ -74,11 +74,11 @@ public abstract class TokenHandlerMethod implements QDLFunction {
      */
     protected StemVariable checkArg(Object[] objects, String name, int argIndex) {
 
-        if(objects[1] == null || (objects[1] instanceof QDLNull)){
+        if(objects[argIndex] == null || (objects[argIndex] instanceof QDLNull)){
             // just make one
             return new StemVariable();
         }
-        if (objects[1] instanceof StemVariable) {
+        if (objects[argIndex] instanceof StemVariable) {
             return (StemVariable) objects[argIndex];
         }
         throw new IllegalArgumentException("Error: " + name + " requires a stem argument #" + argIndex);

@@ -274,7 +274,7 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
      * will check that claims that <b>must</b> be present are there or will raise a server-side exception.
      */
     @Override
-    public void finish() throws Throwable {
+    public void finish(String execPhase) throws Throwable {
         // only required one by the spec. and only if the server is OIDC.
         if (oa2se.isOIDCEnabled()) {
             checkClaim(getClaims(), SUBJECT);

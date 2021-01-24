@@ -5,8 +5,10 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.IDTokenHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.PayloadHandlerConfigImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.security.core.exceptions.InvalidTimestampException;
+import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.server.request.IssuerResponse;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
@@ -52,9 +54,24 @@ public class UserInfoServlet extends MyProxyDelegationServlet {
         } catch (Throwable tt) {
             // didn't work, so its just a regular access token.
         }
-        
+
         // Need to look this up by its jti if its not a basic access token.
         OA2ServiceTransaction transaction = (OA2ServiceTransaction) getTransactionStore().get(at);
+        OA2SE oa2SE = (OA2SE) getServiceEnvironment();
+        // See if this is an exchanged token
+        if (transaction == null) {
+            // if there is no such transaction found, then this is probably from a previous exchange. Go find it
+            TXRecord oldTXR = (TXRecord) oa2SE.getTxStore().get(BasicIdentifier.newID(at.getToken()));
+            if (!oldTXR.isValid()) {
+                throw new OA2GeneralError(OA2Errors.INVALID_TOKEN, "The token is not valid", HttpStatus.SC_UNAUTHORIZED);
+            }
+            if (oldTXR.getExpiresAt() < System.currentTimeMillis()) {
+                throw new OA2GeneralError(OA2Errors.INVALID_TOKEN, "The token has expired", HttpStatus.SC_UNAUTHORIZED);
+            }
+            if (oldTXR != null) {
+                transaction = (OA2ServiceTransaction) getTransactionStore().get(oldTXR.getParentID());
+            }
+        }
         // check that
         if (transaction == null) {
             throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, "no transaction for the access token was found.", HttpStatus.SC_BAD_REQUEST);
@@ -74,7 +91,6 @@ public class UserInfoServlet extends MyProxyDelegationServlet {
         } catch (InvalidTimestampException itx) {
             throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, "token expired.", HttpStatus.SC_BAD_REQUEST);
         }
-        OA2SE oa2SE = (OA2SE) getServiceEnvironment();
         UII2 uis = new UII2(oa2SE.getTokenForge(), getServiceEnvironment().getServiceAddress());
         UIIRequest2 uireq = new UIIRequest2(request, at);
         uireq.setUsername(getUsername(transaction));

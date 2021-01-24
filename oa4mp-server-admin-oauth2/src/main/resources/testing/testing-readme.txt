@@ -6,7 +6,36 @@ When a new version is deployed, here is the testing order
   ** Note all of these authenticate  to the local tomcat instance.
 
   -- ashigaru:command.line2
-        currently gets basic NCSA claims
+        currently gets basic NCSA claims using the default QDL script
+  -- localhost:test/no_cfg
+        Has no cfg attribute -- most common case on production
+          get_rt, exchange, get_user_info, no cert possible
+          at lifetime = 1009 sec.
+          rt lifetime = 950400 sec. (11 days)
+  -- localhost:test/no_qdl
+        Has basic configuration for tokens, but no scripting
+        In CLC you need to set the following parameters *before* starting exchange:
+
+        set_param -a scope "read:/home/jeff x.y: write:"
+        set_param -t scope "read:/home/jeff x.y: write:/data/cluster"
+        set_param -x scope "read:/home/jeffy x.y:/abc/def/ghi write:/data/cluster1 x.z:/any"
+
+        get_at
+          at lifetime 750 sec
+          rt lifetime  3600 sec
+          at scopes: "read:/home/jeff write:/data/cluster x.y:/abc/def"
+
+        get_rt
+          same lifetimes
+          scopes: "read:/home/jeff write:/data/cluster"
+
+        exchange
+          same at lifetime
+          scopes: "x.z:/any x.y:/abc/def/ghi"
+
+        get_user_info
+        get_cert "Error: No usable MyProxy service found."
+
   -- localhost:command.line
         Configured with basic NCSA functor.
   -- localhost:command.line2
@@ -77,3 +106,26 @@ When a new version is deployed, here is the testing order
       * Dave at FNAL needs to test with his FNAL credentials
    -- Farm out testing to others: LSST, LIGO, FNAL
 
+{"tokens": {
+    "access":  {
+       "audience": "https://wlcg.cern.ch/jwt/v1/access",
+         "issuer": "https://access.cilogon.org",
+      "lifetime" : 750019
+           "type": "wlcg",
+      "templates": [ {
+           "aud": "https://wlcg.cern.ch/jwt/v1/access",
+         "paths":   [
+             {"op": "read","path": "/home/${sub}"},
+             {"op": "x.y","path": "/abc/def"},
+             {"op": "x.z","path": ""},
+             {"op": "write","path": "/data/cluster"}
+           ]}]
+           }
+    "refresh":  {
+      "audience": "https://wlcg.cern.ch/jwt/refresh",
+        "issuer": "https://refresh.cilogon.org",
+      "lifetime": 3600000,
+          "type": "refresh"
+     }
+    "identity":  {"type": "identity"}
+  }}

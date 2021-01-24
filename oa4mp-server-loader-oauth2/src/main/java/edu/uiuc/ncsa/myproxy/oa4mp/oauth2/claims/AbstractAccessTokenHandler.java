@@ -112,7 +112,7 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
      *     ]
      * </pre>
      */
-    public String resolveTemplates() {
+    public String resolveTemplates(boolean isQuery) {
         // Returning a null means that this was skipped or did not execute.
         if (!transaction.getFlowStates().at_do_templates) {
             // This implies that, e.g. in a script, template processing was explicitly
@@ -178,7 +178,7 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
                 if (!groupKeys.isEmpty()) {
                     groupMap.put(claimKey.toString(), groupKeys);
                 }
-            }else{
+            } else {
                 claimsNoGroups.put(claimKey, claim);
             }
         }
@@ -211,11 +211,11 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
         if (txRecord == null) {
             actualScopes = doCompareTemplates(computedScopes,
                     transaction.getScopes(),
-                    false);
+                    isQuery);
         } else {
             actualScopes = doCompareTemplates(computedScopes,
                     txRecord.hasScopes() ? txRecord.getScopes() : transaction.getScopes(),
-                    true);
+                    isQuery);
         }
 
         // now we convert to a scope string.
@@ -251,7 +251,7 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
         return new ArrayList<>();
     }
 
-    public void finish(boolean doTemplates) throws Throwable {
+    public void finish(boolean doTemplates, boolean isQuery) throws Throwable {
         /*
           Make SURE the JTI gets set or token exchange, user info etc. will never work.
          */
@@ -260,7 +260,7 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
             atData.put(JWT_ID, transaction.getAccessToken().getToken());
         }
         if (doTemplates) {
-            String scopes = resolveTemplates();
+            String scopes = resolveTemplates(isQuery);
             if (scopes != null) {
                 atData.put(OA2Constants.SCOPE, scopes);
             }
@@ -278,8 +278,21 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
     }
 
     @Override
-    public void finish() throws Throwable {
-        finish(true);
+    public void finish(String execPhase) throws Throwable {
+        boolean isQuery = false;
+        switch (execPhase) {
+            case SRE_PRE_AUTH:
+            case SRE_POST_AUTH:
+            case SRE_EXEC_INIT:
+            case SRE_PRE_AT:
+            case SRE_POST_AT:
+                isQuery = true;
+                break;
+            default:
+                // This covers refreshes and exchanges.
+                isQuery = false;
+        }
+        finish(true, isQuery);
     }
 
     /**

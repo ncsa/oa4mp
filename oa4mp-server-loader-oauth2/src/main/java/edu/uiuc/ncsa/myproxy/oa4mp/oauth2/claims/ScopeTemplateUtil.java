@@ -15,7 +15,8 @@ import static edu.uiuc.ncsa.security.util.configuration.TemplateUtil.*;
 public class ScopeTemplateUtil {
     public static Collection<String> doCompareTemplates(Collection<String> computedScopes,
                                                         Collection<String> requestedScopes,
-                                                        boolean isTX) {
+                                                        boolean isQuery) {
+        boolean isTX = ! isQuery;
         Collection<String> returnedScopes = new HashSet<>();
         for (String r : requestedScopes) {
             if (!r.contains(":")) {

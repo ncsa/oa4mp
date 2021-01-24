@@ -132,7 +132,7 @@ public class BasicRefreshTokenHandler extends AbstractPayloadHandler implements 
     }
 
     @Override
-    public void finish() throws Throwable {
+    public void finish(String execPhase) throws Throwable {
         JSONObject rtData = transaction.getRTData();
         if (transaction.getRefreshToken() != null) {
             rtData.put(JWT_ID, transaction.getRefreshToken().getToken());

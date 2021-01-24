@@ -74,6 +74,7 @@ public class AccessTokenInitializer implements Serializable {
 
         /**
          * The method this class wraps.
+         *
          * @throws Throwable
          */
         protected abstract void doMethod() throws Throwable;
@@ -182,6 +183,7 @@ public class AccessTokenInitializer implements Serializable {
             StemVariable at = checkArg(objects, getName(), 1);
             StemVariable output = new StemVariable();
             Boolean doTemplates = Boolean.TRUE;
+            Boolean isQuery = Boolean.FALSE;
             if (objects.length == 3) {
                 if ((objects[2] instanceof Boolean)) {
                     doTemplates = (Boolean) objects[2];
@@ -189,9 +191,17 @@ public class AccessTokenInitializer implements Serializable {
                     throw new IllegalArgumentException("Error: the third argument must be a boolean");
                 }
             }
+            if (objects.length == 4) {
+                if ((objects[3] instanceof Boolean)) {
+                    isQuery = (Boolean) objects[3];
+                } else {
+                    throw new IllegalArgumentException("Error: the fourth argument must be a boolean");
+                }
+            }
+
             getAtHandler().setAtData((JSONObject) at.toJSON());
             try {
-                getAtHandler().finish(doTemplates);
+                getAtHandler().finish(doTemplates, isQuery);
             } catch (Throwable throwable) {
                 handleException(throwable);
             }
@@ -209,7 +219,11 @@ public class AccessTokenInitializer implements Serializable {
                     doxx.add(getName() + "(type,  access_token.) - finish the creation of the token. ");
                     break;
                 case 3:
-                    doxx.add(getName() + "(type,  access_token., doTemplates) - finish the creation of the token. ");
+                    doxx.add(getName() + "(type,  access_token., do_templates) - finish the creation of the token. ");
+                    break;
+                case 4:
+                    doxx.add(getName() + "(type,  access_token., do_templates, is_query) - finish the creation of the token.");
+                    doxx.add("is_query - treat the request as a query for available scopes. Default is false.");
                     break;
                 default:
                     return doxx;

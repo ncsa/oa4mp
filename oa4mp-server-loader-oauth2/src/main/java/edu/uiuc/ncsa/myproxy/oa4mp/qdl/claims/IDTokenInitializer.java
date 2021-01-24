@@ -10,6 +10,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import static edu.uiuc.ncsa.security.oauth_2_0.jwt.ScriptingConstants.*;
+
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 10/12/20 at  6:12 AM
@@ -29,13 +31,26 @@ public class IDTokenInitializer implements Serializable {
     boolean isInit = false;
 
     public abstract class IDMethods extends TokenHandlerMethod {
+        protected Boolean isQuery(String execPhase) {
+            boolean isQuery = false;
+            switch (execPhase) {
+                case SRE_PRE_AUTH:
+                case SRE_POST_AUTH:
+                case SRE_EXEC_INIT:
+                    isQuery = true;
+                    break;
+                default:
+                    isQuery = false;
+            }
+            return isQuery;
+        }
 
         @Override
         protected AbstractPayloadConfig getPayloadConfig() {
             return getClient().getIDTokenConfig();
         }
 
-        public abstract void doMethod() throws Throwable;
+        public abstract void doMethod(String execPhase) throws Throwable;
 
         @Override
         public Object evaluate(Object[] objects, State state) {
@@ -45,9 +60,17 @@ public class IDTokenInitializer implements Serializable {
             if (idTokenHandler == null) {
                 idTokenHandler = new IDTokenHandler(getPayloadHandlerConfig());
             }
+            if(1 < objects.length ){
+                throw new IllegalArgumentException("Error: Missing second argument must be the execution phase.");
+            }
+            if(!(objects[1] instanceof String)){
+                throw new IllegalArgumentException("Error: The second argument must be a string.");
+
+            }
+            String execPhase = (String)objects[1];
             getidTokenHandler().setClaims((JSONObject) idtoken.toJSON());
             try {
-                doMethod();
+                doMethod(execPhase);
             } catch (Throwable throwable) {
                 handleException(throwable);
             }
@@ -71,7 +94,7 @@ public class IDTokenInitializer implements Serializable {
         }
 
         @Override
-        public void doMethod() throws Throwable {
+        public void doMethod(String execPhase) throws Throwable {
             getidTokenHandler().init();
             isInit = true;
         }
@@ -103,11 +126,11 @@ public class IDTokenInitializer implements Serializable {
         }
 
         @Override
-        public void doMethod() throws Throwable {
+        public void doMethod(String execPhase) throws Throwable {
             if (!isInit) {
                 throw new IllegalStateException("Error: You must run init first.");
             }
-            getidTokenHandler().finish();
+            getidTokenHandler().finish(execPhase);
         }
 
 
@@ -116,7 +139,7 @@ public class IDTokenInitializer implements Serializable {
             List<String> doxx = new ArrayList<>();
             if (argCount == 1) {
                 doxx.add(getName() + "(id_token.) - finish any setup that is required for this token, e.g., the expiration time.");
-                doxx.add("This is the last thing that you should invokde before returning the id token.");
+                doxx.add("This is the last thing that you should invoke before returning the id token.");
                 doxx.add("See also: " + ID_TOKEN_INIT_METHOD);
             }
             return doxx;
@@ -135,7 +158,7 @@ public class IDTokenInitializer implements Serializable {
         }
 
         @Override
-        public void doMethod() throws Throwable {
+        public void doMethod(String execPhase) throws Throwable {
             if (!isInit) {
                 throw new IllegalStateException("Error: You must run init first.");
             }
@@ -166,7 +189,7 @@ public class IDTokenInitializer implements Serializable {
         }
 
         @Override
-        public void doMethod() throws Throwable {
+        public void doMethod(String execPhase) throws Throwable {
 
         }
 

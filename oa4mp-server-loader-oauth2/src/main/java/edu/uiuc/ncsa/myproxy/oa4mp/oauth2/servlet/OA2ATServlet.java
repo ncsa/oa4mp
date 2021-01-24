@@ -908,7 +908,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
 
         t.setAccessToken(rtiResponse.getAccessToken());
         JWTRunner jwtRunner = new JWTRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2SE, t, txRecord, t.getOA2Client().getConfig()));
-        OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, t, request);
+        OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, t, txRecord, request);
         try {
             jwtRunner.doRefreshClaims();
         } catch (Throwable throwable) {
