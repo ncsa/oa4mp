@@ -41,6 +41,7 @@ public class ScriptRuntimeEngineFactory {
             state.setTransaction(transaction);
             state.setTxRecord(txRecord);
             state.setLogger(oa2SE.getMyLogger()); // This lets scripts write to the log.
+            state.setStrictACLs(oa2SE.isQdlStrictACLs());
             return qrt;
         }
         return null;

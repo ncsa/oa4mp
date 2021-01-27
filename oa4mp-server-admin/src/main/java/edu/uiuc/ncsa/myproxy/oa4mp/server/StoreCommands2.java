@@ -3,15 +3,11 @@ package edu.uiuc.ncsa.myproxy.oa4mp.server;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import com.typesafe.config.ConfigRenderOptions;
-import edu.uiuc.ncsa.qdl.util.FileUtil;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.XMLConverter;
-import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
-import edu.uiuc.ncsa.security.core.util.DoubleHashMap;
-import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.core.util.StringUtils;
+import edu.uiuc.ncsa.security.core.util.*;
 import edu.uiuc.ncsa.security.storage.XMLMap;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
@@ -64,15 +60,15 @@ public abstract class StoreCommands2 extends StoreCommands {
     }
 
     protected void showDeserializeHelp() {
-        say("Deserializes an object into the currnet store overwriting the contents. Cf. serialize.");
         say("deserialize  [-new] -file path [" + SHORT_UPDATE_FLAG + "|" + UPDATE_FLAG + "]");
-        say("Deserializes the object in the given file. This replaces the object with the given index in the store.");
-        say("The response will give the identifier of the object created.");
-        say("If the -new flag is used, it is assumed that the object should be new. This means that if there is an existing object");
-        say("with that identifier the operation will fail. If there is no identifier, one will be created.");
-        say("Omitting the -new flag means that any object will be overwritten and if needed, a new identifier will be created");
-        say("If the  " + UPDATE_FLAG + " or " + SHORT_UPDATE_FLAG + " is used, the existing object is simply updated");
-        say("Note that an object cannot be new and updated at the same time.");
+        sayi("Deserializes an object into the current store overwriting the contents. Cf. serialize.");
+        sayi("This replaces the object with the given index in the store.\n");
+        sayi("If the -new flag is used, it is assumed that the object should be new. This means that if there is an existing object");
+        sayi("with that identifier the operation will fail. If there is no identifier, one will be created.");
+        sayi("Omitting the -new flag means that any object will be overwritten and if needed, a new identifier will be created");
+        sayi("If the  " + UPDATE_FLAG + " or " + SHORT_UPDATE_FLAG + " is used, the existing object is simply updated");
+        sayi("Note that an object cannot be new and updated at the same time.");
+        say("See also: serialize, create_hash");
     }
 
 
@@ -172,7 +168,7 @@ public abstract class StoreCommands2 extends StoreCommands {
                 isVerbose,
                 indentWidth(),
                 display_width);
-        for(String x : outputList){
+        for (String x : outputList) {
             say(x);
         }
         return 0;
@@ -552,11 +548,14 @@ public abstract class StoreCommands2 extends StoreCommands {
         sayi("update " + KEYS_FLAG + " [name,callback_uri] /foo:bar");
         sayi("This would prompt to update the values for the 'name' and 'callback_uri' properties");
         sayi("of the object with id 'foo:bar'");
-        sayi("A few notes. If the value of the property is a JSON object, you can edit it.");
-        sayi("If the value of the property is an array, then you may add a value, delete a value,");
-        sayi("replace the entire contents (new entries are comma separated) or simply clear the .");
-        sayi("entire list of entries. You may also back out of the update request.");
-        say("See also list_keys");
+        sayi("A few notes.");
+        say(" 1. If the value of the property is a JSON object, you can edit it.");
+        sayi("2. If the value of the property is an array, then you may add a value, delete a value,");
+        sayi("   replace the entire contents (new entries are comma separated) or simply clear the .");
+        sayi("   entire list of entries. You may also back out of the update request.");
+        say("3. What you type in is stored without change, so if you need to save the hash of something,");
+        say("   e.g. a password, use create_hash to make the hash first and save that.");
+        say("See also: list_keys, create_hash");
     }
 
 
@@ -997,24 +996,23 @@ public abstract class StoreCommands2 extends StoreCommands {
 
     public void list_keys(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
-            showListKeysHelp();
+            showListKeysHelp(inputLine);
             return;
         }
         XMLConverter xmlConverter = getStore().getXMLConverter();
         if (xmlConverter instanceof MapConverter) {
             MapConverter mc = (MapConverter) xmlConverter;
-            TreeSet<String> kk = new TreeSet<>();
+            List<String> kk = new ArrayList<>();
             kk.addAll(mc.getKeys().allKeys());
             // print them in order.
-            for (String key : kk) {
-                say(key);
-            }
+            FormatUtil.formatList(inputLine, kk);
         }
     }
 
-    protected void showListKeysHelp() {
+    protected void showListKeysHelp(InputLine inputLine) {
         say("list_keys");
         sayi("This lists the keys of the current store.");
+        FormatUtil.printFormatListHelp(getIoInterface(), INDENT, inputLine);
     }
 
     @Override
@@ -1355,7 +1353,7 @@ public abstract class StoreCommands2 extends StoreCommands {
         sayi("Show the number of the latest version (-1 if no versions exist)");
 
         say("archive -restore (number | latest) [id]");
-        sayi("Restore the given version of this. If a number is given, use that. If the word \"latest\" (no quotes");
+        sayi("Restore the given version of this. If a number is given, use that. If the word \"latest\" (no quotes)");
         sayi("is used, give back the latest version.");
     }
 
@@ -1392,6 +1390,11 @@ public abstract class StoreCommands2 extends StoreCommands {
             return;
         }
 
+        doCopy(source, targetId);
+
+    }
+
+    protected void doCopy(Identifiable source, Identifier targetId) {
         MapConverter mc = getMapConverter();
         Identifiable newVersion = getStore().create();
         XMLMap map = new XMLMap();
@@ -1400,7 +1403,6 @@ public abstract class StoreCommands2 extends StoreCommands {
         mc.fromMap(map, newVersion);
         newVersion.setIdentifier(targetId);
         getStore().save(newVersion);
-
     }
 
     private void showCopyHelp() {
@@ -1428,7 +1430,7 @@ public abstract class StoreCommands2 extends StoreCommands {
         if (inputLine.hasArg(KEY_FLAG)) {
             return inputLine.getNextArgFor(KEY_FLAG);
         }
-        if(inputLine.size() <=1){
+        if (inputLine.size() <= 1) {
             // so no actual arguments supplied.
             return null;
         }
@@ -1450,5 +1452,68 @@ public abstract class StoreCommands2 extends StoreCommands {
 
     protected void showKeyShorthandHelp() {
         sayi("Note: The argument idiom '-key key_name' may be replaced with '" + KEY_SHORTHAND_PREFIX + "key_name' as a shorthand");
+    }
+
+    public void rename(InputLine inputLine) throws Exception {
+        if (showHelp(inputLine)) {
+            say("rename source_id target_id");
+            say("Rename source_id to target_id, replacing it.");
+            say("E.g.\n");
+            say("rename dev:test dev:test/no_cfg\n");
+            say("(Note lead slashes on ids are optional) would rename dev:test to dev:test/no_cfg");
+            say("At the end of this operation, dev:test would not exist. ");
+            say("See also: copy, rm");
+            return;
+        }
+        if (inputLine.getArgCount() != 2) {
+            say("Sorry, you must supply both a source id and a target id");
+            return;
+        }
+        String src = inputLine.getArg(1);
+        if (src.startsWith("/")) {
+            src = src.substring(1);
+        }
+        if (isTrivial(src)) {
+            say("Sorry, but you must supply a valid source id");
+            return;
+        }
+        Identifier srcID;
+        try {
+            srcID = BasicIdentifier.newID(src);
+        } catch (Throwable t) {
+            say("Sorry, but the source id \"" + src + "\" you supplied is not a valid id");
+            return;
+        }
+        if (!getStore().containsKey(srcID)) {
+            say("Sorry, but the source is not in this store.");
+            return;
+        }
+
+        String target = inputLine.getArg(2);
+        if (target.startsWith("/")) {
+            target = target.substring(1);
+        }
+        if (isTrivial(target)) {
+            say("Sorry, but you must supply a valid target id");
+            return;
+        }
+        Identifier targetID;
+        try {
+            targetID = BasicIdentifier.newID(target);
+        } catch (Throwable t) {
+            say("Sorry, but the target id \"" + target + "\" you supplied is not a valid id");
+            return;
+        }
+        if (getStore().containsKey(targetID)) {
+            say("Sorry, but " + targetID.toString() + " already exists on this system.");
+            return;
+        }
+        doRename(srcID, targetID);
+    }
+
+    protected void doRename(Identifier srcID, Identifier targetID) {
+        Identifiable source = (Identifiable) getStore().get(srcID);
+        doCopy(source, targetID);
+        getStore().remove(srcID);
     }
 }

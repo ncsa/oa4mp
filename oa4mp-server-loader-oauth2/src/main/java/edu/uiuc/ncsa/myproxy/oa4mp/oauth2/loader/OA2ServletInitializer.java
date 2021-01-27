@@ -105,7 +105,8 @@ public class OA2ServletInitializer extends OA4MPServletInitializer {
                         new FunctionTable(),
                         new ModuleMap(),
                         null, // no logging at least for now
-                        true); // default in server mode, but can be overridden later
+                        true,
+                        false); // default in server mode, but can be overridden later
             }
         });
     }

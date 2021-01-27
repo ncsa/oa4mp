@@ -37,7 +37,7 @@ if[
      exec_phase == 'pre_auth'
 ]then[
      cfg. := new_template('ncsa');
-     claims.uid := caput(claims.eppn, '@'); // set search key
+     claims.uid := head(claims.eppn, '@'); // set search key
      claim_sources. := claim_sources. ~ [create_source(cfg.)]; // add it to any claims
 ]; //end if
 

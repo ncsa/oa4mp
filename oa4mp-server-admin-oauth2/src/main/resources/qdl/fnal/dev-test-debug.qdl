@@ -1,0 +1,21 @@
+/*
+   Debug stuff  for dev/test with identites for me and Jim Basney there -- this has bunch of stuff
+   hard-coded for only for testing. import this to
+   fnal-at.qdl.
+   Jeff Gaynor
+   2020-09-15T16:00:55Z
+
+*/
+
+jeff_test := claims.sub ==  'http://cilogon.org/serverD/users/55' // me via NCSA IDP on polod
+             ||
+             claims.sub =='http://cilogon.org/serverA/users/16316'; // me via Google IDP, cilogon.org email on poloc
+
+ jim_test := claims.sub =='http://cilogon.org/serverD/users/65' // jim Basney NCSA IDP on polod
+             ||
+             claims.sub =='http://cilogon.org/serverT/users/37233';
+if[
+    !is_defined(claims.eppn)
+ ]then[
+     claims.eppn := 'warning -- no EPPN detected'; // just in case use wrong idp.
+];

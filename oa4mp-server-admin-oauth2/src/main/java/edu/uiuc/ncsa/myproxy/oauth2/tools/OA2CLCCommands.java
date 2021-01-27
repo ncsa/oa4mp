@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.client.AssetResponse;
 import edu.uiuc.ncsa.myproxy.oa4mp.client.ClientEnvironment;
 import edu.uiuc.ncsa.myproxy.oa4mp.client.OA4MPResponse;
 import edu.uiuc.ncsa.myproxy.oa4mp.client.storage.AssetStoreUtil;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2ConfigurationLoader;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.testing.CLCCommands;
 import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2Asset;
 import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2ClientEnvironment;
@@ -12,7 +13,6 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.DateUtils;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.delegation.client.request.RTResponse;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
@@ -21,10 +21,12 @@ import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
 import edu.uiuc.ncsa.security.delegation.token.impl.AuthorizationGrantImpl;
 import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
 import edu.uiuc.ncsa.security.oauth_2_0.JWTUtil;
+import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.UserInfo;
 import edu.uiuc.ncsa.security.oauth_2_0.client.ATResponse2;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTUtil2;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
+import edu.uiuc.ncsa.security.util.cli.ConfigurableCommandsImpl;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import edu.uiuc.ncsa.security.util.pkcs.CertUtil;
@@ -49,6 +51,7 @@ import java.security.SecureRandom;
 import java.util.List;
 import java.util.*;
 
+import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.ID_TOKEN;
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.RAW_ID_TOKEN;
 import static edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTUtil2.PAYLOAD_INDEX;
@@ -66,7 +69,12 @@ import static edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTUtil2.PAYLOAD_INDEX;
 public class OA2CLCCommands extends CLCCommands {
     public OA2CLCCommands(MyLoggingFacade logger,
                           OA2CommandLineClient oa2CommandLineClient) throws Exception {
-        super(logger, (ClientEnvironment) oa2CommandLineClient.getEnvironment());
+        super(logger, null);
+        try {
+            setCe((ClientEnvironment) oa2CommandLineClient.getEnvironment());
+        } catch (Throwable t) {
+            say("No configuration loaded.");
+        }
         this.oa2CommandLineClient = oa2CommandLineClient;
     }
 
@@ -122,16 +130,22 @@ public class OA2CLCCommands extends CLCCommands {
     public void load(InputLine inputLine) throws Exception {
         if (!inputLine.hasArgs()) {
             say("config file = " + oa2CommandLineClient.getConfigFile() + ", config name=" + oa2CommandLineClient.getConfigName());
+            say("Remember that loading a configuration clears all current state, except parameters.");
             return;
         }
-        oa2CommandLineClient.load(inputLine);
+        try {
+            oa2CommandLineClient.load(inputLine);
+        } catch (ConfigurableCommandsImpl.ListOnlyNotification listOnlyNotification) {
+            // This just means we added an out of band way to list. If we don't exit here
+            // we will clear the state no matter what the user requested.
+            return;
+        }
         if (showHelp(inputLine)) {
             return;
         }
         clear(inputLine); // only thing used in clear is --help. If that is present won't get here.
         setCe((ClientEnvironment) oa2CommandLineClient.getEnvironment());
         service = null;
-        say("Remember that loading a configuration clears all current state.");
     }
 
     /**
@@ -143,6 +157,10 @@ public class OA2CLCCommands extends CLCCommands {
     public void set_uri(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
             getURIHelp();
+            return;
+        }
+        if (getCe() == null) {
+            say("Oops! No configuration has been loaded.");
             return;
         }
         // Maybe one of these days allow for it all in one swoop. Lots of state to change though...
@@ -161,7 +179,7 @@ public class OA2CLCCommands extends CLCCommands {
                 say("Sorry, I could not find the configuration with id =\"" + name + "\":" + t.getMessage());
             }
         }*/
-        clear(inputLine, true); //clear out everything except any set parameters
+        clear(inputLine, false); //clear out everything except any set parameters
         Identifier id = AssetStoreUtil.createID();
         OA4MPResponse resp = getService().requestCert(id, requestParameters);
         DebugUtil.trace(this, "client id = " + getCe().getClientId());
@@ -211,6 +229,10 @@ public class OA2CLCCommands extends CLCCommands {
             setGrantHelp();
             return;
         }
+        if (getCe() == null) {
+            say("Oops! No configuration has been loaded.");
+            return;
+        }
         String x = null;
         if (inputLine.size() == 1) {
             if (grant != null) {
@@ -235,7 +257,7 @@ public class OA2CLCCommands extends CLCCommands {
             } catch (Throwable t) {
                 say("No clipboard.");
                 x = getInput("Enter the callback", "");
-                if (StringUtils.isTrivial(x)) {
+                if (isTrivial(x)) {
                     say("aborted");
                     return;
                 }
@@ -244,6 +266,10 @@ public class OA2CLCCommands extends CLCCommands {
 
             x = inputLine.getArg(1); // zero-th element is the name of this function. 1st is the actual argument.
         }
+        if (isTrivial(x)) {
+            say("(no grant)");
+            return;
+        }
         // now we parse this.
         if (!x.startsWith(getCe().getCallback().toString())) {
             say("The callback in the configuration does not match that in the argument you gave");
@@ -251,11 +277,25 @@ public class OA2CLCCommands extends CLCCommands {
         }
         String args = x.substring(x.indexOf("?") + 1); // skip the ? in the substring.
         StringTokenizer st = new StringTokenizer(args, "&");
+        boolean gotGrant = false;
+        boolean gotError = false;
+        String errorCode = "";
+        String errorDescription = "";
         while (st.hasMoreTokens()) {
             String current = st.nextToken();
-            if (current.startsWith("code=")) {
+            if (current.startsWith(OA2Constants.ERROR + "=")) {
+                gotError = true;
+                errorCode = current.substring(OA2Constants.ERROR.length() + 1);
+            }
+
+            if (current.startsWith(OA2Constants.ERROR_DESCRIPTION + "=")) {
+                gotError = true;
+                errorDescription = current.substring(OA2Constants.ERROR_DESCRIPTION.length() + 1);
+            }
+
+            if (current.startsWith(OA2Constants.AUTHORIZATION_CODE + "=")) {
                 URI uri = URI.create(decode(current.substring(5)));
-                say("grant=" + uri.toString()); // length of string "code="
+                gotGrant = true;
                 grant = new AuthorizationGrantImpl(uri);
                 try {
                     Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -269,13 +309,29 @@ public class OA2CLCCommands extends CLCCommands {
                 }
             }
         }
+        if (gotError) {
+            if (isTrivial(errorCode)) {
+                say("Error! (no code)");
+            } else {
+                say("Error! The code is:" + errorCode);
+            }
+            if (!isTrivial(errorDescription)) {
+                say("       description: " + URLDecoder.decode(errorDescription, "UTF-8"));
+            }
+            return;
+        }
+        if (gotGrant) {
+            say("grant=" + grant.getToken());
+        } else {
+            say("No grant found. Check the URL?");
+        }
     }
 
     public OA2Asset getDummyAsset() {
         return dummyAsset;
     }
 
-    public void clear(InputLine inputLine, boolean keepParams) throws Exception {
+    public void clear(InputLine inputLine, boolean clearParams) throws Exception {
         if (showHelp(inputLine)) {
             getClearHelp();
             return;
@@ -291,7 +347,7 @@ public class OA2CLCCommands extends CLCCommands {
         canGetGrant = false;
         canGetRT = false;
         canGetAT = false;
-        if (!keepParams) {
+        if (clearParams) {
             requestParameters = new HashMap<>();
             tokenParameters = new HashMap<>();
             exchangeParameters = new HashMap<>();
@@ -299,8 +355,10 @@ public class OA2CLCCommands extends CLCCommands {
 
     }
 
+    public static String CLEAR_PARAMETERS_FLAG = "-clear_params";
+
     public void clear(InputLine inputLine) throws Exception {
-        clear(inputLine, false);
+        clear(inputLine, inputLine.hasArg(CLEAR_PARAMETERS_FLAG));
     }
 
     boolean canGetGrant = false;
@@ -309,8 +367,10 @@ public class OA2CLCCommands extends CLCCommands {
     boolean canGetRT = false;
 
     protected void getClearHelp() {
-        say("clear: reset all internal state and restart. You should do this rather than just starting over");
-        say("       as you may run into old state.");
+        say("clear [" + CLEAR_PARAMETERS_FLAG + "]");
+        sayi("Reset all internal state and restart. You should do this rather than just starting over");
+        sayi("as you may run into old state.");
+        sayi(CLEAR_PARAMETERS_FLAG + " (optional) if true, will also clear all stored parameters.");
     }
 
     OA2Asset dummyAsset;
@@ -434,8 +494,18 @@ public class OA2CLCCommands extends CLCCommands {
             getATHelp();
             return;
         }
+        if (getCe() == null) {
+            say("Oops! No configuration has been loaded.");
+            return;
+        }
         DebugUtil.trace(this, "Getting AT, grant=" + grant);
         currentATResponse = getOA2S().getAccessToken(getDummyAsset(), grant, tokenParameters);
+        if (getDummyAsset().getAccessToken().isOldVersion() && getDummyAsset().getAccessToken().getLifetime() < 0) {
+            getDummyAsset().getAccessToken().setLifetime(OA2ConfigurationLoader.ACCESS_TOKEN_LIFETIME_DEFAULT);
+        }
+        if (getDummyAsset().getRefreshToken().isOldVersion() && getDummyAsset().getRefreshToken().getLifetime() < 0) {
+            getDummyAsset().getRefreshToken().setLifetime(OA2ConfigurationLoader.MAX_REFRESH_TOKEN_LIFETIME_DEFAULT);
+        }
         Object x = currentATResponse.getParameters().get(RAW_ID_TOKEN);
         if (x == null) {
             x = "";
@@ -488,6 +558,10 @@ public class OA2CLCCommands extends CLCCommands {
     public void get_cert(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
             getCertHelp();
+            return;
+        }
+        if (getCe() == null) {
+            say("Oops! No configuration has been loaded.");
             return;
         }
         assetResponse = getOA2S().getCert(dummyAsset, currentATResponse);
@@ -598,7 +672,7 @@ public class OA2CLCCommands extends CLCCommands {
                 Date startDate = DateUtils.getDate(refreshToken.getToken());
                 startDate.setTime(startDate.getTime() + refreshToken.getLifetime());
                 if (startDate.getTime() <= System.currentTimeMillis()) {
-                    say("   token expired" + startDate + "\n");
+                    say("   token expired " + startDate + "\n");
                 } else {
                     say("   expires in = " + refreshToken.getLifetime() + " ms.");
                     say("   valid until " + startDate + "\n");
@@ -636,7 +710,10 @@ public class OA2CLCCommands extends CLCCommands {
             getRTHelp();
             return;
         }
-
+        if (getCe() == null) {
+            say("Oops! No configuration has been loaded.");
+            return;
+        }
         RTResponse rtResponse = getOA2S().refresh(dummyAsset.getIdentifier().toString(), tokenParameters);
         dummyAsset = (OA2Asset) getCe().getAssetStore().get(dummyAsset.getIdentifier().toString());
         // Have to update the AT reponse here every time or no token state is preserved.
@@ -697,6 +774,10 @@ public class OA2CLCCommands extends CLCCommands {
             exchangeHelp();
             return;
         }
+        if (getCe() == null) {
+            say("Oops! No configuration has been loaded.");
+            return;
+        }
         boolean didIt = false;
 
         if (1 == inputLine.size() || inputLine.hasArg("-at")) {
@@ -755,6 +836,7 @@ public class OA2CLCCommands extends CLCCommands {
     protected String TOKEN_PARAMETERS_KEY = "token_parameters";
     protected String AUTHZ_PARAMETERS_KEY = "authz_parameters";
     protected String EXCHANGE_PARAMETERS_KEY = "exchange_parameters";
+    protected String AT_RESPONSE_KEY = "at_response";
 
 
     public void read(InputLine inputLine) throws Exception {
@@ -834,6 +916,17 @@ public class OA2CLCCommands extends CLCCommands {
             exchangeParameters = new HashMap<>();
             exchangeParameters.putAll(json.getJSONObject(EXCHANGE_PARAMETERS_KEY));
         }
+        if (json.containsKey(AT_RESPONSE_KEY)) {
+            JSONObject atr = json.getJSONObject(AT_RESPONSE_KEY);
+            AccessTokenImpl ati = new AccessTokenImpl(null);
+            ati.fromJSON(atr.getJSONObject("access_token"));
+            RefreshTokenImpl rti = new RefreshTokenImpl(null);
+            rti.fromJSON(atr.getJSONObject("refresh_token"));
+            currentATResponse = new ATResponse2(ati, rti);
+            if (atr.containsKey("parameters")) {
+                currentATResponse.setParameters(atr.getJSONObject("parameters"));
+            }
+        }
 
         dummyAsset = new OA2Asset(null);
         if (json.containsKey(ASSET_KEY)) {
@@ -864,7 +957,7 @@ public class OA2CLCCommands extends CLCCommands {
             lastUserMessage = inputLine.getNextArgFor(MESSAGE_SWITCH);
             inputLine.removeSwitchAndValue(MESSAGE_SWITCH);
         }
-        if (!StringUtils.isTrivial(lastUserMessage)) {
+        if (!isTrivial(lastUserMessage)) {
             jsonObject.put(USER_MESSAGE_KEY, lastUserMessage);
         }
 
@@ -917,6 +1010,17 @@ public class OA2CLCCommands extends CLCCommands {
 
         if (claims != null && !claims.isEmpty()) {
             jsonObject.put(CLAIMS_KEY, claims);
+        }
+        if (currentATResponse != null) {
+            JSONObject atr = new JSONObject();
+            atr.put("access_token", currentATResponse.getAccessToken().toJSON());
+            atr.put("refresh_token", currentATResponse.getRefreshToken().toJSON());
+            if (currentATResponse.getParameters() != null && !currentATResponse.getParameters().isEmpty()) {
+                JSONObject atState = new JSONObject();
+                atState.putAll(currentATResponse.getParameters());
+                atr.put("parameters", atState);
+            }
+            jsonObject.put(AT_RESPONSE_KEY, atr);
         }
         FileWriter fileWriter = new FileWriter(saveFile);
         fileWriter.write(jsonObject.toString(1));

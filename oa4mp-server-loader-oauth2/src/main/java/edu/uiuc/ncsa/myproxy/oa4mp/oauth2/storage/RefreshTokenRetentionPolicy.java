@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.security.core.cache.RetentionPolicy;
 import edu.uiuc.ncsa.security.core.exceptions.InvalidTimestampException;
 import edu.uiuc.ncsa.security.core.util.DateUtils;
@@ -49,11 +50,14 @@ public class RefreshTokenRetentionPolicy implements RetentionPolicy {
                 // Now, the RT lifetime cannot be zero (since that means no refresh token would have been made)
                 // Therefore, set it correctly.
                 if (st2.getRefreshTokenLifetime() <= 0) {
-                    timeout = st2.getAccessTokenLifetime();
+                    OA2Client oa2Client = (OA2Client) st2.getClient();
+                    if (0 < oa2Client.getRtLifetime()) {
+                        timeout = oa2Client.getRtLifetime(); // used to be authoritative in version < 5.0
+                    }
                 } else {
-                    timeout = st2.getRefreshTokenLifetime();
+                    timeout = st2.getRefreshTokenLifetime(); // it was set at some point
                 }
-            }else{
+            } else {
                 timeout = st2.getRefreshTokenLifetime();
             }
             token = rt.getToken();

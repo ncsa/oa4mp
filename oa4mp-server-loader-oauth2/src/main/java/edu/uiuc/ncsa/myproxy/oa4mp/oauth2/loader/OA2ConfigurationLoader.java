@@ -89,6 +89,7 @@ import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.*;
  * on 9/23/13 at  1:50 PM
  */
 public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends AbstractConfigurationLoader<T> {
+    public static final String STRICT_ACLS = "strict_acls";
     /**
      * Default is 15 days. Internally the refresh lifetime (as all date-ish things) are in milliseconds
      * though the configuration file is assumed to be in seconds.
@@ -152,7 +153,8 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     getMultiJSONStoreProvider(),
                     getCmConfigs(),
                     getQDLEnvironment(),
-                    isRFC8693Enabled());
+                    isRFC8693Enabled(),
+                    isQdlStrictACLS());
 
             if (getClaimSource() instanceof BasicClaimsSourceImpl) {
                 ((BasicClaimsSourceImpl) getClaimSource()).setOa2SE((OA2SE) se);
@@ -170,9 +172,23 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         }
         // Note that the first argument is the name fo the file. In server mode this won't be available anyway
         // and is optional.
+        String x = getFirstAttribute(node, STRICT_ACLS);
+        if(!isTrivial(x)){
+            try{
+                qdlStrictACLS = Boolean.parseBoolean(x);
+            }catch(Throwable t){
+                // nothing to do.
+            }
+        }
         QDLConfigurationLoader loader = new QDLConfigurationLoader("(none)", node, loggerProvider.get());
         return loader.load();
     }
+
+    public boolean isQdlStrictACLS() {
+        return qdlStrictACLS;
+    }
+
+    boolean qdlStrictACLS = false;
 
     HashMap<String, String> constants;
 

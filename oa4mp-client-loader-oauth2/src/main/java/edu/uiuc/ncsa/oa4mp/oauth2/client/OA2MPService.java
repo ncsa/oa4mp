@@ -243,7 +243,7 @@ public class OA2MPService extends OA4MPService {
             if (e instanceof RuntimeException) {
                 throw (RuntimeException) e;
             }
-            throw new GeneralException("Could no create cert request", e);
+            throw new GeneralException("Could not create cert request", e);
         }
         a.setPrivateKey(keyPair.getPrivate());
         a.setCertReq(certReq);

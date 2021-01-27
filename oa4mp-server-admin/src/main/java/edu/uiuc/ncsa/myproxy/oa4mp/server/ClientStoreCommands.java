@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApprovalStore;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.util.pkcs.KeyUtil;
@@ -42,7 +43,7 @@ public class ClientStoreCommands extends BaseClientStoreCommands {
     }
 
     @Override
-    public void extraUpdates(Identifiable identifiable) throws IOException{
+    public void extraUpdates(Identifiable identifiable) throws IOException {
         Client client = (Client) identifiable;
         client.setErrorUri(getInput("enter error uri", client.getErrorUri()));
         client.setHomeUri(getInput("enter home uri", client.getHomeUri()));
@@ -151,5 +152,25 @@ public class ClientStoreCommands extends BaseClientStoreCommands {
         }
     }
 
+    @Override
+    protected void doRename(Identifier srcID, Identifier targetID) {
+        super.doRename(srcID, targetID);
+        // Now fix approval
+        cloneApproval(srcID, targetID);
+        getClientApprovalStore().remove(srcID);
 
+    }
+
+    private void cloneApproval(Identifier srcID, Identifier targetID) {
+        ClientApproval oldCA = (ClientApproval) getClientApprovalStore().get(srcID);
+        ClientApproval newCA = (ClientApproval) oldCA.clone();
+        newCA.setIdentifier(targetID);
+        getClientApprovalStore().save(newCA);
+    }
+
+    @Override
+    protected void doCopy(Identifiable source, Identifier targetId) {
+        super.doCopy(source, targetId);
+        cloneApproval(source.getIdentifier(), targetId);
+    }
 }

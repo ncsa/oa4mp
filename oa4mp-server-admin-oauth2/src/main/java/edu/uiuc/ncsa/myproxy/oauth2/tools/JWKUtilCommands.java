@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oauth2.tools;
 
-import edu.uiuc.ncsa.qdl.util.FileUtil;
+import edu.uiuc.ncsa.security.core.util.FileUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.oauth_2_0.JWTUtil;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;

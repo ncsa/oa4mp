@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.qdl;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.qdl.acl.AccessControlModule;
 import edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims.OA2Module;
 import edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims.TokenHandlerModule;
 import edu.uiuc.ncsa.qdl.extensions.QDLLoader;
@@ -20,6 +21,7 @@ public class OA2QDLLoader implements QDLLoader {
         ArrayList<Module> modules = new ArrayList<>();
         modules.add(new OA2Module().newInstance(null));
         modules.add(new TokenHandlerModule().newInstance(null));
+        modules.add(new AccessControlModule().newInstance(null));
         return modules;
     }
 }

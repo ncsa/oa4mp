@@ -327,8 +327,9 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         // access_control.client_id == id of calling client
         // access_control.admins. == list of administrators for this client.
         StemVariable acl = new StemVariable();
+        // There is always a client id.
         acl.put("client_id", state.getClientID().toString());
-        // Convert to a list of string.
+        // Convert to a list of strings. List of admins may be empty.
         ArrayList<Object> adminIDs = new ArrayList<>();
         for (Identifier id : state.getAdminIDs()) {
             adminIDs.add(id.toString());

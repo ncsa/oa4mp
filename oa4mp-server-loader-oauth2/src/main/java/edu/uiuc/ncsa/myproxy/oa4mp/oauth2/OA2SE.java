@@ -76,7 +76,8 @@ public class OA2SE extends ServiceEnvironmentImpl {
                  Provider<JSONStore> jsonStoreProvider,
                  CMConfigs cmConfigs,
                  QDLEnvironment qdlEnvironment,
-                 boolean rfc8693Enabled) {
+                 boolean rfc8693Enabled,
+                 boolean qdlStrictACLs) {
         super(logger,
                 mfp,
                 tsp,
@@ -139,7 +140,14 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.txStore = txStoreProvider.get();
         this.maxATLifetime = maxATLifetime;
         this.maxRTLifetime = maxRTLifetime;
+        this.qdlStrictACLs = qdlStrictACLs;
     }
+
+    public boolean isQdlStrictACLs() {
+        return qdlStrictACLs;
+    }
+
+    boolean qdlStrictACLs = false;
     long maxATLifetime = -1L;
 
     public long getMaxATLifetime() {

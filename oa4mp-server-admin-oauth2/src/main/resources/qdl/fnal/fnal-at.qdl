@@ -23,32 +23,16 @@
         lifetime=3600000
         qdl{
            load="fnal/fnal-at.qdl"
-           xmd={exec_phase=["post_token","post_refresh"]}
+           xmd={exec_phase=["post_token","post_refresh","post_exchange"]}
            args=["USER_ID", "PASSWORD"]
         } //end QDL
      } // end access token
    } //end tokens
 
 */
+ acl_add('localhost:test/fnal');
+ acl_check();
 
-DEBUG := true; // always false on production.
-if[DEBUG][
-   //
-   /* Set up debug source from file for testing. */
-   //  f. := new_template('file');
-   //  f.file_path := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/test-claims.json';
-   //  claims.eppn := 'jgaynor@fnal.gov';
-   //  at_claims. := get_claims(f. , claims.eppn);
-
-   /* ********** These fake getting the claims and scopes from the user. ********** */
-       claims.eppn := 'swhite@fnal.gov';
-       claims.uid := 'swhite@fnal.gov';
-       scopes.0 := 'storage.create:/dune/';
-       //scopes.0 := 'storage.write:/dune/scratch/users/swhite';
-       scopes.1 :=  'storage.write:/dune/';
-       // Give an extra long scope so it has to resolve it.
-       scopes.2 := 'storage.create:/dune/scratch/users/swhite/temp';
-]; // end debug block
 
 if[
      script_args() != 2
@@ -77,7 +61,6 @@ fnal.search_attributes. :=  ['eduPersonEntitlement'];
 // A 'starts with' function that returns the elements of x. that start with something in y.
 // read 'x starts with y'
 
-define[sw(x., y.)][return(mask(x., -1< list_starts_with(x., y.)));];
 
 // Hop out if for some reason there were no scopes in LDAP.
 if[
@@ -87,20 +70,44 @@ if[
    return(); // nothing to do. No capabilities ==>  no scopes.
 ]; //end if
 
-temp_scopes. := {};
-       caps. := at_claims.eduPersonEntitlement.; // capabilities in claim source
-// case 1: The handed in scopes are superstring of the capabilities. Return the capability
-if[exec_phase == 'post_token'][temp_scopes. := sw(caps., scopes.);];
 
-// case 2: The capabilities are superstring of the scopes. Return the scope.
-if[exec_phase == 'post_refresh'][temp_scopes. := sw(scopes., caps.);];
+     temp_scopes. := {}; // result
+requested_scopes. := {}; // which scope request to check
+            caps. := at_claims.eduPersonEntitlement.; // capabilities in claim source
+
+   if[
+        0 < size(tx_scopes.)
+   ][
+       requested_scopes. := tx_scopes.;
+   ]else[
+      requested_scopes. := scopes.;
+   ];
+
+// case 1: Query for available scopes. Return the capabilities requested.
+if[
+    exec_phase == 'post_token'
+  ][
+    temp_scopes. := resolve_templates(caps., requested_scopes., true);
+  ];
+
+// case 2: Actual scope request. Return the scope.
+
+if[
+    exec_phase == 'post_exchange' || exec_phase == 'post_refresh'
+  ][
+        temp_scopes. := resolve_templates(caps., requested_scopes., false);
+  ];
 
 access_token.scope := detokenize(unique(temp_scopes.), ' ', 2); // turn in to string, omit duplications, trailing space
-access_token.exp := access_token.iat + 543;
-access_token.err := 'Yo! Setting lifetime to 678';
+
+// Debugging stuff
+access_token.exp := access_token.iat + 543; // This is in seconds!!!
+access_token.message := 'Testing new resolve template command. Setting AT lifetime to 543 sec.';
+
 say('***** QDL *****');
 say(access_token.);
-say('tx_scope ' + to_string(tx_scopes.));
-say('tx_resource ' + to_string(tx_resource.));
-say('tx_audience ' + to_string(tx_audience.));
+say('       caps = ' + to_string(caps.));
+say('   tx_scope = ' + to_string(tx_scopes.));
+say('tx_resource = ' + to_string(tx_resource.));
+say('tx_audience = ' + to_string(tx_audience.));
 

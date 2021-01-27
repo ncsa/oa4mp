@@ -16,7 +16,7 @@ public class ScopeTemplateUtil {
     public static Collection<String> doCompareTemplates(Collection<String> computedScopes,
                                                         Collection<String> requestedScopes,
                                                         boolean isQuery) {
-        boolean isTX = ! isQuery;
+        //boolean isTX = ! isQuery;
         Collection<String> returnedScopes = new HashSet<>();
         for (String r : requestedScopes) {
             if (!r.contains(":")) {
@@ -36,7 +36,7 @@ public class ScopeTemplateUtil {
                       r = x.y:/abc/defg     fail -- would grant access to different resource
                       So simple sub/super string comparisons fail here.
                    */
-                    String x = compareAsURI(r, c, isTX);
+                    String x = compareAsURI(r, c, isQuery);
                     if (x != null) {
                         returnedScopes.add(x);
                     }
@@ -51,15 +51,15 @@ public class ScopeTemplateUtil {
      *
      * @param requestedScope
      * @param computedScope
-     * @param isTX
+     * @param isQuery
      * @return
      */
-    public static String compareAsURI(String requestedScope, String computedScope, boolean isTX) {
+    public static String compareAsURI(String requestedScope, String computedScope, boolean isQuery) {
         try {
             //heads and tails must match. No fragments allowed
             // First special case, one of them is just a head, e.g. read: (asking for read scopes)
             // Can't make a URI out of that since there is no scheme specific part.
-            if (isTX) {
+            if (!isQuery) {
                 if (requestedScope.endsWith(":")) {
                     return null;
                 }
@@ -83,7 +83,7 @@ public class ScopeTemplateUtil {
                     // if the computed scope ends with : and the request scope does too or not
                     // This is to prevent running through all the code below and failing at the
                     // last instant.
-                    if (!isTX) {
+                    if (isQuery) {
                         // Case where initial token exchange is just asking for the scope it wants:
                         // E.g. requested = x.z:/any computed = x.z:
                         if (requestedScope.startsWith(computedScope)) {
@@ -116,7 +116,7 @@ public class ScopeTemplateUtil {
 
             StringTokenizer base;
             StringTokenizer proposed;
-            if (isTX) {
+            if (!isQuery) {
                 base = new StringTokenizer(c.getPath(), "/");
                 proposed = new StringTokenizer(r.getPath(), "/");
             } else {
@@ -124,7 +124,7 @@ public class ScopeTemplateUtil {
                 proposed = new StringTokenizer(c.getPath(), "/");
             }
             // proposed is always a super URI of base. It cannot match if it has fewer components
-            if (isTX && proposed.countTokens() < base.countTokens()) {
+            if (!isQuery && proposed.countTokens() < base.countTokens()) {
                 return null;
             }
             // compare base has fewer tokens, so this loop should always work
@@ -136,7 +136,7 @@ public class ScopeTemplateUtil {
                         return null;
                     }
                 } else {
-                    if (!isTX) {
+                    if (isQuery) {
                         // E.g. computed = x.y:/abc/def requested = x.y:/abc/def/ghi
                         // Case where in token call they actually request the scopes they want
                         // not a super set for querying what is there.
@@ -149,7 +149,7 @@ public class ScopeTemplateUtil {
         } catch (Throwable t) {
             return null;
         }
-        if (isTX) {
+        if (!isQuery) {
             return requestedScope;
         }
         return computedScope;

@@ -40,7 +40,7 @@ public class ScopeTemplateQDLUtil implements QDLFunction {
 
         StemVariable requestedStem =   (StemVariable )objects[1];
         if(!(objects[2] instanceof Boolean)){
-            throw new IllegalArgumentException("Error: The third argument (if the operation is part of a token exchange) must be a stem.");
+            throw new IllegalArgumentException("Error: The third argument (if the operation queries available scopes) must be a boolean.");
         }
 
         Boolean isTX = (Boolean)objects[2];
@@ -60,7 +60,7 @@ public class ScopeTemplateQDLUtil implements QDLFunction {
         doxx.add(getName() +"(computed_scopes, requested_scopes, is_token_exchange)");
         doxx.add("computed_scopes = scopes from templates that have been resolved.");
         doxx.add("requested_scopes = the scopes the client has requested.");
-        doxx.add("is_token_exchange = true if this is part of a token exchange");
+        doxx.add("is_query = true if this call is to query available scopes. ");
         return doxx;
     }
 }

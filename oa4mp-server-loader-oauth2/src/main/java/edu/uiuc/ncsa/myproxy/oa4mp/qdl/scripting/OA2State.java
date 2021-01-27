@@ -19,6 +19,7 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.stream.events.XMLEvent;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -33,13 +34,45 @@ public class OA2State extends State {
                     FunctionTable functionTable,
                     ModuleMap moduleMap,
                     MyLoggingFacade myLoggingFacade,
-                    boolean isServerMode) {
+                    boolean isServerMode,
+                    boolean strictACLs) {
         super(resolver, symbolStack, opEvaluator, metaEvaluator, functionTable, moduleMap, myLoggingFacade, isServerMode);
+        this.strictACLs = strictACLs;
     }
 
     transient OA2ServiceTransaction transaction;
     transient OA2SE oa2se;
     transient HttpServletRequest request;
+
+    public void setStrictACLs(boolean strictACLs) {
+        this.strictACLs = strictACLs;
+    }
+
+    /**
+     * If ACLs are enforced strictly. Strictly means that no access control list is ok, connoting general access.
+     * Strict ACLs means there must be an exact match of one of the identifiers.
+     * <br/><br/>
+     * Setting this true in the configuration (with the
+     * {@link edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2ConfigurationLoader#STRICT_ACLS} attribute of the qdl tag) will
+     * lock down the server so that nothing can execute unless everything is granted explicit permission. Use this wisely.
+     *
+     * @return
+     */
+    public boolean isStrictACLs() {
+        return strictACLs;
+    }
+
+    boolean strictACLs = false;
+
+    public List<Identifier> getAclList() {
+        return aclList;
+    }
+
+    public void setAclList(List<Identifier> aclList) {
+        this.aclList = aclList;
+    }
+
+    transient List<Identifier> aclList =new ArrayList<>();
 
     public TXRecord getTxRecord() {
         return txRecord;
