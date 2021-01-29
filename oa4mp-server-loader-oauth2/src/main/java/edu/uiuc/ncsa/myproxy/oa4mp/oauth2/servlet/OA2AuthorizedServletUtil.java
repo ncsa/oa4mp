@@ -9,8 +9,9 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.AccessTokenConfig;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.IssuerTransactionState;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
-import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.core.exceptions.IllegalAccessException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
+import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
@@ -22,6 +23,7 @@ import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.oauth_2_0.*;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTRunner;
 import edu.uiuc.ncsa.security.oauth_2_0.server.AGRequest2;
+import edu.uiuc.ncsa.security.oauth_2_0.server.InvalidNonceException;
 import edu.uiuc.ncsa.security.oauth_2_0.server.RFC8693Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
@@ -64,8 +66,16 @@ public class OA2AuthorizedServletUtil {
      * @throws Throwable
      */
     public OA2ServiceTransaction doDelegation(HttpServletRequest req, HttpServletResponse resp) throws Throwable {
-        OA2Client client = (OA2Client) servlet.getClient(req);
+        OA2Client client;
+        try {
+            client = (OA2Client) servlet.getClient(req);
+        }catch (UnknownClientException ukc){
+            throw new OA2GeneralError(OA2Errors.UNAUTHORIZED_CLIENT
+                    ,"unknown client",
+                    HttpStatus.SC_BAD_REQUEST, null);
+        }
         OA2SE oa2se = (OA2SE) getServiceEnvironment();
+        basicChecks(req); // Checks response type, code and such
 
         try {
             String cid = "client=" + client.getIdentifier();
@@ -75,6 +85,8 @@ public class OA2AuthorizedServletUtil {
             AGResponse agResponse = (AGResponse) servlet.getAGI().process(new AGRequest2(req, oa2se.getAuthorizationGrantLifetime()));
             OA2ServiceTransaction transaction = createNewTransaction(agResponse.getGrant());
             transaction.setAuthGrantLifetime(oa2se.getAuthorizationGrantLifetime()); // make sure these match.
+            String requestState = req.getParameter(OA2Constants.STATE);
+            transaction.setRequestState(requestState);
             /*
             Fixes CIL-644
             Extended attribute support means that a client may send fully qualifies (FQ) request parameters
@@ -127,33 +139,10 @@ public class OA2AuthorizedServletUtil {
      * @throws Throwable
      */
     protected OA2ServiceTransaction doIt(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Throwable {
-        ServletDebugUtil.printAllParameters(this.getClass(), httpServletRequest);
-        String callback = httpServletRequest.getParameter(OA2Constants.REDIRECT_URI);
-        if (httpServletRequest.getParameterMap().containsKey(OA2Constants.REQUEST_URI)) {
-            throw new OA2RedirectableError(OA2Errors.REQUEST_URI_NOT_SUPPORTED,
-                    "Request uri not supported by this server",
-                    httpServletRequest.getParameter(OA2Constants.STATE),
-                    callback);
-        }
-        if (httpServletRequest.getParameterMap().containsKey(OA2Constants.REQUEST)) {
-            throw new OA2RedirectableError(OA2Errors.REQUEST_NOT_SUPPORTED,
-                    "Request not supported by this server",
-                    httpServletRequest.getParameter(OA2Constants.STATE),
-                    callback);
-        }
-
-        if (!httpServletRequest.getParameterMap().containsKey(OA2Constants.RESPONSE_TYPE)) {
-            throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST,
-                    "no response type",
-                    httpServletRequest.getParameter(OA2Constants.STATE),
-                    callback);
-        }
-
-        if (!httpServletRequest.getParameter(RESPONSE_TYPE).equals(RESPONSE_TYPE_CODE)) {
-            throw new OA2GeneralError(OA2Errors.UNSUPPORTED_RESPONSE_TYPE, "unsupported reponse type", HttpStatus.SC_BAD_REQUEST);
-        }
-        OA2ServiceTransaction t = CheckIdTokenHint(httpServletRequest, httpServletResponse, callback);
+        String rawcb = basicChecks(httpServletRequest);
+        OA2ServiceTransaction t = CheckIdTokenHint(httpServletRequest, httpServletResponse, rawcb);
         if (t != null) {
+            // In this case, there is an id token hint, so processing changes.
             return t;
         }
         ServletDebugUtil.trace(this, "Starting doDelegation");
@@ -164,14 +153,77 @@ public class OA2AuthorizedServletUtil {
         OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, t, httpServletRequest);
 
         DebugUtil.trace(this, "starting to process claims, creating basic claims:");
-        jwtRunner.doAuthClaims();
+        try {
+            jwtRunner.doAuthClaims();
+        } catch (IllegalAccessException iax) {
+            oa2SE.getTransactionStore().save(t); // save it so we have this in the future, then bail
+            throw new OA2RedirectableError(OA2Errors.ACCESS_DENIED,
+                    "access denied",
+                    HttpStatus.SC_UNAUTHORIZED,
+                    t.getRequestState(),
+                    t.getCallback());
+
+        }
         if (!t.getFlowStates().acceptRequests || t.getFlowStates().getClaims) {
             // if they are not allowed to get claims, they get booted out here
             oa2SE.getTransactionStore().save(t); // save it so we have this in the future, then bail
-            throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "access denied", HttpStatus.SC_UNAUTHORIZED);
+            throw new OA2RedirectableError(OA2Errors.ACCESS_DENIED,
+                    "access denied",
+                    HttpStatus.SC_UNAUTHORIZED,
+                    t.getRequestState(),
+                    t.getCallback());
         }
         DebugUtil.trace(this, "done with claims, transaction saved, claims = " + t.getUserMetaData());
         return t;
+    }
+
+    private String basicChecks(HttpServletRequest httpServletRequest) {
+        ServletDebugUtil.printAllParameters(this.getClass(), httpServletRequest);
+        String requestState = httpServletRequest.getParameter(OA2Constants.STATE);
+        String rawcb = httpServletRequest.getParameter(OA2Constants.REDIRECT_URI);
+        try {
+            URI.create(rawcb); // check they didn't send us garbage
+        } catch (Throwable t) {
+            throw new OA2GeneralError(
+                    OA2Errors.REQUEST_URI_NOT_SUPPORTED,
+                    "redirect is not a valid uri",
+                    HttpStatus.SC_BAD_REQUEST,
+                    requestState
+            );
+
+        }
+        // The request state needs to be set as early as possible since it is used to construct
+        // any error messages.
+        // Note that even though we have a callback, we are not far enough along yet to look in
+        // the client configuration and see if it is valid, so we cannot use it.
+        if (httpServletRequest.getParameterMap().containsKey(OA2Constants.REQUEST_URI)) {
+            throw new OA2GeneralError(
+                    OA2Errors.REQUEST_URI_NOT_SUPPORTED,
+                    "Request uri not supported by this server",
+                    HttpStatus.SC_BAD_REQUEST,
+                    requestState);
+        }
+        if (httpServletRequest.getParameterMap().containsKey(OA2Constants.REQUEST)) {
+            throw new OA2GeneralError(OA2Errors.REQUEST_NOT_SUPPORTED,
+                    "Request not supported by this server",
+                    HttpStatus.SC_BAD_REQUEST,
+                    requestState);
+        }
+
+        if (!httpServletRequest.getParameterMap().containsKey(OA2Constants.RESPONSE_TYPE)) {
+            throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
+                    "no response type",
+                    HttpStatus.SC_BAD_REQUEST,
+                    requestState);
+        }
+
+        if (!httpServletRequest.getParameter(RESPONSE_TYPE).equals(RESPONSE_TYPE_CODE)) {
+            throw new OA2GeneralError(OA2Errors.UNSUPPORTED_RESPONSE_TYPE,
+                    "unsupported reponse type",
+                    HttpStatus.SC_BAD_REQUEST,
+                    requestState);
+        }
+        return rawcb;
     }
 
     /**
@@ -194,9 +246,12 @@ public class OA2AuthorizedServletUtil {
         try {
             idToken = JWTUtil.verifyAndReadJWT(rawIDToken, ((OA2SE) getServiceEnvironment()).getJsonWebKeys());
         } catch (Throwable e) {
-            throw new GeneralException("Error: Cannot read ID token hint", e);
+            throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
+                    "cannot read ID token hint",
+                    HttpStatus.SC_BAD_REQUEST,
+                    null);
         }
-        String state = httpServletRequest.getParameter(STATE);
+
         String username = null;
         if (idToken.containsKey(OA2Claims.SUBJECT)) {
             username = idToken.getString(OA2Claims.SUBJECT);
@@ -209,16 +264,23 @@ public class OA2AuthorizedServletUtil {
             OA2ServiceTransaction t = ufStore.getByUsername(username);
 
             if (t != null) {
-
                 // Then there is a transaction, so the user authenticated successfully.
                 if (idToken.containsKey(OA2Claims.AUDIENCE)) {
                     if (!t.getClient().getIdentifierString().equals(idToken.getString(OA2Claims.AUDIENCE))) {
                         // The wrong client for this user is attempting the request. That is not allowed.
-                        throw new OA2RedirectableError(OA2Errors.REQUEST_NOT_SUPPORTED, "Incorrect aud parameter in the ID token. This request is not supported on this server", state, callback);
+                        throw new OA2RedirectableError(OA2Errors.REQUEST_NOT_SUPPORTED,
+                                "Incorrect aud parameter in the ID token. This request is not supported on this server",
+                                HttpStatus.SC_BAD_REQUEST,
+                                t.getRequestState(),
+                                t.getCallback());
                     }
                 } else {
                     // The client that is associated with this user must be supplied.
-                    throw new OA2RedirectableError(OA2Errors.REQUEST_NOT_SUPPORTED, "No aud parameter in the ID token. This request is not supported on this server", state, callback);
+                    throw new OA2RedirectableError(OA2Errors.REQUEST_NOT_SUPPORTED,
+                            "No aud parameter in the ID token. This request is not supported on this server",
+                            HttpStatus.SC_BAD_REQUEST,
+                            t.getRequestState(),
+                            t.getCallback());
                 }
                 httpServletResponse.setStatus(HttpStatus.SC_OK);
                 // The spec does not state that anything is returned, just a positive response.
@@ -231,8 +293,11 @@ public class OA2AuthorizedServletUtil {
             throw new NFWException("Internal error: Could not cast the store to a username findable store.");
         }
 
-
-        throw new OA2RedirectableError(OA2Errors.LOGIN_REQUIRED, "Login required.", state, callback);
+        // Something is wrong with the request, so just bomb.
+        throw new OA2GeneralError(OA2Errors.LOGIN_REQUIRED,
+                "Login required.",
+                HttpStatus.SC_UNAUTHORIZED,
+                null);
     }
 
     protected ServiceTransaction verifyAndGet(IssuerResponse iResponse) throws UnsupportedEncodingException {
@@ -240,11 +305,6 @@ public class OA2AuthorizedServletUtil {
         Map<String, String> params = agResponse.getParameters();
         // Since the state (if present) has to be returned with any error message, we have to see if there is one
         // there first. We do not store the state.
-        String state = null;
-
-        if (params.containsKey(STATE)) {
-            state = params.get(STATE);
-        }
         OA2ServiceTransaction st = (OA2ServiceTransaction) agResponse.getServiceTransaction();
         //Spec says that the redirect must match one of the ones stored and if not, the request is rejected.
         String givenRedirect = params.get(REDIRECT_URI);
@@ -289,12 +349,24 @@ public class OA2AuthorizedServletUtil {
         // FIX for OAUTH-180. Server must support clients that do not use a nonce. Just log it and rock on.
         if (nonce == null || nonce.length() == 0) {
             DebugUtil.info(this, "No nonce in initial request for " + client.getIdentifierString());
-        } else {
-            NonceHerder.putNonce(nonce); // Don't check it, just store it and return it later.
+        }        
+        try {
+            NonceHerder.checkNonce(nonce);
+        }catch(InvalidNonceException ine){
+            throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
+                    "invalid nonce",
+                    HttpStatus.SC_BAD_REQUEST,
+                    st.getRequestState());
         }
+
+
         if (params.containsKey(DISPLAY)) {
             if (!params.get(DISPLAY).equals(DISPLAY_PAGE)) {
-                throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST, "Only " + DISPLAY + "=" + DISPLAY_PAGE + " is supported", state, givenRedirect);
+                throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST,
+                        "Only " + DISPLAY + "=" + DISPLAY_PAGE + " is supported",
+                        HttpStatus.SC_BAD_REQUEST,
+                        st.getRequestState(),
+                        st.getCallback());
             }
         }
 
@@ -311,18 +383,30 @@ public class OA2AuthorizedServletUtil {
         // We can't support this because the spec says we must re-authenticate the user. We should have to track this
         // in all subsequent attempts. Since all requests have an expiration date, this parameter is redundant in any case.
         if (agResponse.getParameters().containsKey(OA2Constants.MAX_AGE)) {
-            throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST, "The " + OA2Constants.MAX_AGE + " parameter is not supported at this time.", state, givenRedirect);
+            throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST,
+                    "The " + OA2Constants.MAX_AGE + " parameter is not supported at this time.",
+                    HttpStatus.SC_BAD_REQUEST,
+                    st.getRequestState(),
+                    st.getCallback());
         }
 
         // Store the callback the user needs to use for this request, since the spec allows for many.
         // and now check for a bunch of stuff that might fail.
 
-        checkPrompts(params);
+        checkPrompts(st, params);
         if (params.containsKey(REQUEST)) {
-            throw new OA2RedirectableError(OA2Errors.REQUEST_NOT_SUPPORTED, "The \"request\" parameter is not supported on this server", state, givenRedirect);
+            throw new OA2RedirectableError(OA2Errors.REQUEST_NOT_SUPPORTED,
+                    REQUEST + " not supported on this server",
+                    HttpStatus.SC_BAD_REQUEST,
+                    st.getRequestState(),
+                    st.getCallback());
         }
         if (params.containsKey(REQUEST_URI)) {
-            throw new OA2RedirectableError(OA2Errors.REQUEST_URI_NOT_SUPPORTED, "The \"request_uri\" parameter is not supported on this server", state, givenRedirect);
+            throw new OA2RedirectableError(OA2Errors.REQUEST_URI_NOT_SUPPORTED,
+                    REQUEST_URI + " not supported on this server",
+                    HttpStatus.SC_BAD_REQUEST,
+                    st.getRequestState(),
+                    st.getCallback());
         }
         if (params.containsKey(RESPONSE_MODE)) {
             st.setResponseMode(params.get(RESPONSE_MODE));
@@ -357,7 +441,11 @@ public class OA2AuthorizedServletUtil {
         DebugUtil.trace(this, ".resolveScopes: Scope util =" + OA2Scopes.ScopeUtil.getScopes());
         DebugUtil.trace(this, ".resolveScopes: server scopes=" + ((OA2SE) getServiceEnvironment()).getScopes());
         if (rawScopes == null || rawScopes.length() == 0) {
-            throw new OA2RedirectableError(OA2Errors.INVALID_SCOPE, "Missing scopes parameter.", state, givenRedirect);
+            throw new OA2RedirectableError(OA2Errors.INVALID_SCOPE,
+                    "Missing scopes parameter.",
+                    HttpStatus.SC_BAD_REQUEST,
+                    st.getRequestState(),
+                    st.getCallback());
         }
         // The scopes the client wants:
         OA2Client oa2Client = (OA2Client) st.getClient();
@@ -366,7 +454,11 @@ public class OA2AuthorizedServletUtil {
         // Fixes github issue 8, support for public clients: https://github.com/ncsa/OA4MP/issues/8
         if (oa2Client.isPublicClient()) {
             if (!oa2Client.getScopes().contains(OA2Scopes.SCOPE_OPENID)) {
-                throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST, "Scopes must contain " + OA2Scopes.SCOPE_OPENID, state, givenRedirect);
+                throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST,
+                        "Scopes must contain " + OA2Scopes.SCOPE_OPENID,
+                        HttpStatus.SC_BAD_REQUEST,
+                        st.getRequestState(),
+                        st.getCallback());
             }
             // only allowed scope, regardless of what is requested.
             // This also covers the case of a client made with a full set of scopes, then
@@ -382,14 +474,22 @@ public class OA2AuthorizedServletUtil {
         while (stringTokenizer.hasMoreTokens()) {
             String x = stringTokenizer.nextToken();
             if (oa2Client.useStrictScopes() && !OA2Scopes.ScopeUtil.hasScope(x)) {
-                throw new OA2RedirectableError(OA2Errors.INVALID_SCOPE, "Unrecognized scope \"" + x + "\"", state, givenRedirect);
+                throw new OA2RedirectableError(OA2Errors.INVALID_SCOPE,
+                        "Unrecognized scope \"" + x + "\"",
+                        HttpStatus.SC_BAD_REQUEST,
+                        st.getRequestState(),
+                        st.getCallback());
             }
             if (x.equals(OA2Scopes.SCOPE_OPENID)) hasOpenIDScope = true;
             requestedScopes.add(x);
         }
         if (((OA2SE) getServiceEnvironment()).isOIDCEnabled()) {
             if (!hasOpenIDScope)
-                throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST, "Scopes must contain " + OA2Scopes.SCOPE_OPENID, state, givenRedirect);
+                throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST,
+                        "Scopes must contain " + OA2Scopes.SCOPE_OPENID,
+                        HttpStatus.SC_BAD_REQUEST,
+                        st.getRequestState(),
+                        st.getCallback());
         }
         st.setScopes(requestedScopes);
         if (oa2Client.useStrictScopes()) {
@@ -398,21 +498,6 @@ public class OA2AuthorizedServletUtil {
             DebugUtil.trace(this, ".resolveScopes: strict scopes after resolution=" + requestedScopes);
         } else {
             DebugUtil.trace(this, ".resolveScopes: non-strict scopes =" + requestedScopes);
-/*   This computes the minimal set of scopes and tries to see which should be returned.
-
-            Collection<String> minimalScopes = intersection(requestedScopes, oa2Client.getScopes());
-
-            AuthorizationTemplates templates = oa2Client.getAccessTokensConfig().getTemplates();
-            if (!templates.isEmpty()) {
-                List<String> scopeCandidates = new ArrayList<>();
-                for (String key : templates.keySet()) {
-                    extractTemplatePath(st.getAudience(), st.getUsername(), requestedScopes, templates, scopeCandidates, key);
-                    extractTemplatePath(st.getResource(), st.getUsername(), requestedScopes, templates, scopeCandidates, key);
-                }
-                minimalScopes.addAll(scopeCandidates);
-            }
-            return minimalScopes;
-*/
         }
 
         return requestedScopes;
@@ -440,7 +525,7 @@ public class OA2AuthorizedServletUtil {
      *
      * @param map
      */
-    protected void checkPrompts(Map<String, String> map) {
+    protected void checkPrompts(OA2ServiceTransaction transaction, Map<String, String> map) {
         if (!map.containsKey(PROMPT)) return;  //nix to do
         String prompts = map.get(PROMPT);
         // now we have to see what is in it.
@@ -452,10 +537,17 @@ public class OA2AuthorizedServletUtil {
         }
         // CIL-91 if prompt = none is passed in, return an error with login_required as the message.
         if (!prompt.contains(PROMPT_NONE) && prompt.size() == 0) {
-            throw new OA2RedirectableError(OA2Errors.LOGIN_REQUIRED, "A login is required on this server", map.get(OA2Constants.STATE));
+            throw new OA2RedirectableError(OA2Errors.LOGIN_REQUIRED,
+                    "A login is required on this server",
+                    HttpStatus.SC_BAD_REQUEST,
+                    map.get(OA2Constants.STATE));
         }
         if (prompt.contains(PROMPT_NONE) && 1 < prompt.size()) {
-            throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST, "You cannot specify \"none\" for the prompt and any other option", map.get(OA2Constants.STATE));
+            throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST,
+                    "You cannot specify \"none\" for the prompt and any other option",
+                    HttpStatus.SC_BAD_REQUEST,
+                    transaction.getRequestState(),
+                    transaction.getCallback());
         }
 
         if (prompt.contains(PROMPT_LOGIN)) return;
@@ -466,7 +558,11 @@ public class OA2AuthorizedServletUtil {
 
         throw new OA2RedirectableError(OA2Errors.LOGIN_REQUIRED,
                 "Only " + PROMPT + "=" + PROMPT_LOGIN + " or " + PROMPT_SELECT_ACCOUNT +
-                        " are supported on this server.", map.get(OA2Constants.STATE));
+                        " are supported on this server.",
+                HttpStatus.SC_BAD_REQUEST,
+                transaction.getRequestState(),
+                transaction.getCallback()
+        );
 
 
     }
@@ -503,17 +599,23 @@ public class OA2AuthorizedServletUtil {
 
         LinkedList<String> resource = new LinkedList<>();
         LinkedList<String> audience = new LinkedList<>();
-        
+
         if (rawResource != null) {
             for (String r : rawResource) {
                 try {
                     URI uri = URI.create(r);
                     resource.add(r);
                     if (!uri.isAbsolute()) {
-                        throw new OA2GeneralError(OA2Errors.INVALID_TARGET, "Only absolute uris are allowed", HttpStatus.SC_BAD_REQUEST);
+                        throw new OA2GeneralError(OA2Errors.INVALID_TARGET,
+                                "Only absolute uris are allowed",
+                                HttpStatus.SC_BAD_REQUEST,
+                                t.getRequestState());
                     }
                     if (!StringUtils.isTrivial(uri.getFragment())) {
-                        throw new OA2GeneralError(OA2Errors.INVALID_TARGET, "Fragments are not allowed", HttpStatus.SC_BAD_REQUEST);
+                        throw new OA2GeneralError(OA2Errors.INVALID_TARGET,
+                                "Fragments are not allowed",
+                                HttpStatus.SC_BAD_REQUEST,
+                                t.getRequestState());
                     }
                 } catch (Throwable throwable) {
                     // skip it
@@ -549,7 +651,10 @@ public class OA2AuthorizedServletUtil {
                     audience.add(x);
                 }
             } else {
-                throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, "missing audience request", HttpStatus.SC_BAD_REQUEST);
+                throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
+                        "missing audience request",
+                        HttpStatus.SC_BAD_REQUEST,
+                        t.getRequestState());
             }
         }
         // One of these may be empty.

@@ -13,10 +13,7 @@ import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.server.request.IssuerResponse;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
-import edu.uiuc.ncsa.security.oauth_2_0.JWTUtil;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2GeneralError;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2TokenForge;
+import edu.uiuc.ncsa.security.oauth_2_0.*;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTUtil2;
 import edu.uiuc.ncsa.security.oauth_2_0.server.UII2;
 import edu.uiuc.ncsa.security.oauth_2_0.server.UIIRequest2;
@@ -63,10 +60,16 @@ public class UserInfoServlet extends MyProxyDelegationServlet {
             // if there is no such transaction found, then this is probably from a previous exchange. Go find it
             TXRecord oldTXR = (TXRecord) oa2SE.getTxStore().get(BasicIdentifier.newID(at.getToken()));
             if (!oldTXR.isValid()) {
-                throw new OA2GeneralError(OA2Errors.INVALID_TOKEN, "The token is not valid", HttpStatus.SC_UNAUTHORIZED);
+                throw new OA2GeneralError(OA2Errors.INVALID_TOKEN,
+                        "The token is not valid",
+                        HttpStatus.SC_UNAUTHORIZED,
+                        null);
             }
             if (oldTXR.getExpiresAt() < System.currentTimeMillis()) {
-                throw new OA2GeneralError(OA2Errors.INVALID_TOKEN, "The token has expired", HttpStatus.SC_UNAUTHORIZED);
+                throw new OA2GeneralError(OA2Errors.INVALID_TOKEN,
+                        "The token has expired",
+                        HttpStatus.SC_UNAUTHORIZED,
+                        null);
             }
             if (oldTXR != null) {
                 transaction = (OA2ServiceTransaction) getTransactionStore().get(oldTXR.getParentID());
@@ -74,22 +77,36 @@ public class UserInfoServlet extends MyProxyDelegationServlet {
         }
         // check that
         if (transaction == null) {
-            throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, "no transaction for the access token was found.", HttpStatus.SC_BAD_REQUEST);
+            throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
+                    "no transaction found.",
+                    HttpStatus.SC_BAD_REQUEST,
+                    null);
         }
         if (!transaction.getFlowStates().userInfo) {
-            throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "user info access denied", HttpStatus.SC_UNAUTHORIZED);
+            throw new OA2RedirectableError(OA2Errors.ACCESS_DENIED,
+                    "access denied", HttpStatus.SC_UNAUTHORIZED,
+                    transaction.getRequestState(),
+                    transaction.getCallback());
         }
       /*  if (transaction.getOA2Client().isPublicClient()) {
             throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, "public client not authorized to access user information", HttpStatus.SC_UNAUTHORIZED);
         }*/
 
         if (!transaction.isAccessTokenValid()) {
-            throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, "invalid access token.", HttpStatus.SC_BAD_REQUEST);
+            throw new OA2RedirectableError(OA2Errors.INVALID_TOKEN,
+                    "invalid access token.",
+                    HttpStatus.SC_BAD_REQUEST,
+                    transaction.getRequestState(),
+                    transaction.getCallback());
         }
         try {
             checkTimestamp(at.getToken());
         } catch (InvalidTimestampException itx) {
-            throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, "token expired.", HttpStatus.SC_BAD_REQUEST);
+            throw new OA2RedirectableError(OA2Errors.INVALID_TOKEN,
+                    "expired token.",
+                    HttpStatus.SC_BAD_REQUEST,
+                    transaction.getRequestState(),
+                    transaction.getCallback());
         }
         UII2 uis = new UII2(oa2SE.getTokenForge(), getServiceEnvironment().getServiceAddress());
         UIIRequest2 uireq = new UIIRequest2(request, at);
@@ -148,7 +165,10 @@ public class UserInfoServlet extends MyProxyDelegationServlet {
 
         if (paramAT == null) {
             if (headerAT == null) {
-                throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, "no access token was sent.", HttpStatus.SC_BAD_REQUEST);
+                throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
+                        "missing access token",
+                        HttpStatus.SC_BAD_REQUEST,
+                        null);
             }
             rawAT = headerAT;
         } else {
@@ -156,7 +176,10 @@ public class UserInfoServlet extends MyProxyDelegationServlet {
                 rawAT = paramAT;
             } else {
                 if (!paramAT.equals(headerAT)) {
-                    throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, "too many access tokens.", HttpStatus.SC_BAD_REQUEST);
+                    throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
+                            "multiple access tokens",
+                            HttpStatus.SC_BAD_REQUEST,
+                            null);
                 }
                 rawAT = paramAT;
             }

@@ -7,8 +7,6 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.ACS2;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractAuthorizationServlet.MyMyProxyLogon;
 import edu.uiuc.ncsa.security.core.Identifier;
-import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
-import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
@@ -51,17 +49,26 @@ public class OA2CertServlet extends ACS2 {
             // might have been sent as a bearer token.
             List<String> bearerTokens = HeaderUtils.getAuthHeader(request, "Bearer");
             if (bearerTokens.isEmpty()) {
-                throw new GeneralException("Error: no access token");
+                throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
+                        "missing access token",
+                        HttpStatus.SC_BAD_REQUEST,
+                        null);
             }
             if (1 < bearerTokens.size()) {
-                throw new GeneralException("Error: too many access tokens");
+                throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
+                        "too many access tokens",
+                        HttpStatus.SC_BAD_REQUEST,
+                        null);
             }
             rawAT = bearerTokens.get(0);
         }
         // If there is nothing in the raw access token at this point, then nothing was sent.
 
         if (StringUtils.isTrivial(rawAT)) {
-            throw new GeneralException("Error: No access token found.");
+            throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
+                    "missing access token",
+                    HttpStatus.SC_BAD_REQUEST,
+                    null);
         }
         // Now decide if it's a JWT
 
@@ -72,47 +79,17 @@ public class OA2CertServlet extends ACS2 {
             if (jwt.containsKey(JWT_ID)) {
                 rawAT = jwt.getString(JWT_ID);
             } else {
-                throw new GeneralException("Error: The access token is a JWT, but does not have a " + JWT_ID + " claim and cannot be processed.");
+                throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
+                        "The access token is a JWT, but does not have a \" + JWT_ID + \" claim and cannot be processed.",
+                        HttpStatus.SC_BAD_REQUEST,
+                        null);
+
             }
         } catch (Throwable t) {
             // do nothing. It is a standard access token, not a jwt.
         }
 
         return new AccessTokenImpl(URI.create(rawAT));
-/*
-
-        AccessToken accessToken = null;
-        try {
-            accessToken = getServiceEnvironment().getTokenForge().getAccessToken(request);
-        } catch (Throwable t) {
-            // this just means that the access token was not sent as a parameter. It
-            // might have been sent as a bearer token.
-        }
-        List<String> bearerTokens = HeaderUtils.getAuthHeader(request, "Bearer");
-        if (bearerTokens.isEmpty()) {
-            throw new GeneralException("Error: no access token");
-        }
-        if (1 < bearerTokens.size()) {
-            throw new GeneralException("Error: too many access tokens");
-        }
-        accessToken = getServiceEnvironment().getTokenForge().getAccessToken(bearerTokens.get(0));
-
-        // Now we have to check if the access token is simple or if it is in fact a JWT of some sort.
-
-        try {
-            OA2SE oa2se = (OA2SE) getServiceEnvironment();
-
-            JSONObject jwt = JWTUtil2.verifyAndReadJWT(accessToken.getToken(), oa2se.getJsonWebKeys());
-            if (jwt.containsKey(JWT_ID)) {
-                accessToken = new AccessTokenImpl(URI.create(jwt.get(JWT_ID).toString()));
-            }else{
-                throw new GeneralException("Error: The access token is a JWT, but does not have a " + JWT_ID + " claim and cannot be processed.");
-            }
-        } catch (Throwable t) {
-            // do nothing. Assume it is a standard access token, not a sci token.
-        }
-        return accessToken;
-*/
     }
 
     /**
@@ -129,7 +106,10 @@ public class OA2CertServlet extends ACS2 {
         List<String> basicTokens = HeaderUtils.getAuthHeader(req, "Basic");
         if (2 < basicTokens.size()) {
             // too many tokens to unscramble
-            throw new OA2GeneralError(OA2Errors.INVALID_TOKEN, "Error: Too many authorization tokens.", HttpStatus.SC_UNAUTHORIZED);
+            throw new OA2GeneralError(OA2Errors.INVALID_TOKEN,
+                    "Error: Too many authorization tokens.",
+                    HttpStatus.SC_UNAUTHORIZED,
+                    null);
             //throw new GeneralException("Too many authorization tokens");
         }
         if (rawID == null) {
@@ -160,19 +140,34 @@ public class OA2CertServlet extends ACS2 {
             }
         }
         if (rawID == null) {
-            throw new UnknownClientException("No client id");
+            throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
+                    "No client id",
+                    HttpStatus.SC_BAD_REQUEST,
+                    null
+            );
         }
         Identifier id = BasicIdentifier.newID(rawID);
         OA2Client client = (OA2Client) getClient(id);
         if (client.isPublicClient()) {
-            throw new GeneralException("Error: public clients not supported for this operation.");
+            throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
+                    "public clients not supported for this operation",
+                    HttpStatus.SC_BAD_REQUEST,
+                    null
+            );
         }
         if (rawSecret == null) {
-            throw new GeneralException("Error: No secret. request refused.");
+            throw new OA2GeneralError(OA2Errors.UNAUTHORIZED_CLIENT,
+                    "no secret, request refused.",
+                    HttpStatus.SC_UNAUTHORIZED,
+                    null
+            );
         }
         if (!client.getSecret().equals(DigestUtils.shaHex(rawSecret))) {
-            throw new GeneralException("Error: Secret is incorrect. request refused.");
-
+            throw new OA2GeneralError(OA2Errors.UNAUTHORIZED_CLIENT,
+                    "incorrect secret, request refused.",
+                    HttpStatus.SC_UNAUTHORIZED,
+                    null
+            );
         }
         return client;
     }
@@ -184,18 +179,27 @@ public class OA2CertServlet extends ACS2 {
         // CIL-404 fix. Throw appropriate exceptions. Do not use the callback mechanism from OAuth for errors since that returns
         // an HTTP status code of 200 with no other information.
         if (t == null) {
-            throw new GeneralException("Invalid access token. Request refused");
+            throw new OA2GeneralError(OA2Errors.INVALID_TOKEN,
+                    "Invalid access token",
+                    HttpStatus.SC_BAD_REQUEST,
+                    null);
         }
         if (!t.getScopes().contains(OA2Scopes.SCOPE_MYPROXY)) {
             // Note that this requires a state, but none is sent in the OA4MP cert request.
-            throw new GeneralException("Certificate request is not in scope.");
-        }
-        if (t == null) {
-            throw new GeneralException("No transaction found for access token \"" + accessToken + "\"");
+            throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
+                    "Certificate request is not in scope.",
+                    HttpStatus.SC_BAD_REQUEST,
+                    t.getRequestState());
         }
 
+
         if (!t.isAccessTokenValid()) {
-            throw new GeneralException("Invalid access token. Request refused");
+            throw new OA2GeneralError(OA2Errors.INVALID_TOKEN,
+                    "invalid token",
+                    HttpStatus.SC_BAD_REQUEST,
+                    t.getRequestState()
+            );
+
         }
         checkClientApproval(t.getClient());
         // Access tokens must be valid in order to get a cert. If the token is invalid, the user must
@@ -222,7 +226,10 @@ public class OA2CertServlet extends ACS2 {
 */
         OA2ServiceTransaction st = (OA2ServiceTransaction) trans;
         if (!st.getFlowStates().acceptRequests || !st.getFlowStates().getCert) {
-            throw new GeneralException("getCert access denied");
+            throw new OA2GeneralError(OA2Errors.ACCESS_DENIED,
+                     "access denied",
+                     HttpStatus.SC_UNAUTHORIZED,
+                     st.getRequestState());
         }
         OA2SE oa2SE = (OA2SE) getServiceEnvironment();
         if (!oa2SE.isTwoFactorSupportEnabled()) {
@@ -232,7 +239,10 @@ public class OA2CertServlet extends ACS2 {
             // used since the password is valid exactly once. Here is where we set up the connection once
             // and for all.
             if (!getMyproxyConnectionCache().containsKey(st.getIdentifier())) {
-                throw new GeneralException("No cached my proxy object with identifier " + st.getIdentifierString());
+                throw new OA2GeneralError(OA2Errors.SERVER_ERROR,
+                        "No cached my proxy object with identifier " + st.getIdentifierString(),
+                        HttpStatus.SC_SERVICE_UNAVAILABLE,
+                        st.getRequestState());
             }
             MPSingleConnectionProvider.MyProxyLogonConnection mpc = (MPSingleConnectionProvider.MyProxyLogonConnection) getMyproxyConnectionCache().get(st.getIdentifier()).getValue();
             // First pass will be a MyMyProxyLogon object that allows completing the logon.

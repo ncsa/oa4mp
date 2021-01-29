@@ -39,7 +39,7 @@ public class OA2ExceptionHandler implements ExceptionHandler {
         ServletDebugUtil.trace(this, "Error", t);
         if ((t instanceof NullPointerException)) {
             getLogger().error("Null pointer", t);
-            t = new OA2GeneralError(OA2Errors.SERVER_ERROR, "Null pointer", HttpStatus.SC_INTERNAL_SERVER_ERROR);
+            t = new OA2GeneralError(OA2Errors.SERVER_ERROR, "Null pointer", HttpStatus.SC_INTERNAL_SERVER_ERROR, null);
         }
 
         if (t instanceof ExceptionWrapper) {
@@ -49,7 +49,7 @@ public class OA2ExceptionHandler implements ExceptionHandler {
 
         if (t == null) {
             // really messed up, should never ever happen
-            t = new OA2GeneralError(OA2Errors.SERVER_ERROR, "Internal error", HttpStatus.SC_INTERNAL_SERVER_ERROR);
+            t = new OA2GeneralError(OA2Errors.SERVER_ERROR, "Internal error", HttpStatus.SC_INTERNAL_SERVER_ERROR, null);
         }
         // If there is really a servlet exception (defined as a bonafide unrecoverable state, like storage is down or
         // no client_id, e.g.) then pass back the servlet exception and let the container handle it. At some point we might just
@@ -79,7 +79,7 @@ public class OA2ExceptionHandler implements ExceptionHandler {
         }
         // This handles every other type of exception.
 //        if (t instanceof GeneralException) {
-            handleOA2Error(new OA2GeneralError(OA2Errors.SERVER_ERROR, t.getMessage(), HttpStatus.SC_INTERNAL_SERVER_ERROR), response);
+            handleOA2Error(new OA2GeneralError(OA2Errors.SERVER_ERROR, t.getMessage(), HttpStatus.SC_INTERNAL_SERVER_ERROR, null), response);
     //        return;
   //      }
 
@@ -95,17 +95,27 @@ public class OA2ExceptionHandler implements ExceptionHandler {
         response.setStatus(oa2GeneralError.getHttpStatus());
         writer.println(OA2Constants.ERROR + "=\"" + encode(oa2GeneralError.getError()) + "\"");
         writer.println(OA2Constants.ERROR_DESCRIPTION + "=\"" + encode(oa2GeneralError.getDescription()) + "\"");
+        if(oa2GeneralError.getState() != null){
+            writer.println(OA2Constants.STATE + "=\"" + encode(oa2GeneralError.getState()) + "\"");
+        }
         writer.flush();
         writer.close();
     }
 
     // Fix for CIL-332: This should now send JSON with the correct http status.
+    // Also note, that according to the spec (section 5.2) there is never a redirect to
+    // the error endpoint. The body of the response is JSON.
     protected void handleOA2Error(OA2ATException oa2ATException, HttpServletResponse response) throws IOException {
-        response.setStatus(oa2ATException.getStatusCode());
+        response.setStatus(oa2ATException.getHttpStatus());
         response.setHeader("Content-Type", "application/json;charset=UTF-8");
         JSONObject jsonObject = new JSONObject();
         jsonObject.put(OA2Constants.ERROR, oa2ATException.getError());
         jsonObject.put(OA2Constants.ERROR_DESCRIPTION, oa2ATException.getDescription());
+        if(oa2ATException.getState() != null){
+            // not quite the spec., but clients may need this.
+            jsonObject.put(OA2Constants.STATE, oa2ATException.getState());
+        }
+
         PrintWriter writer = response.getWriter();
 
         writer.write(jsonObject.toString());

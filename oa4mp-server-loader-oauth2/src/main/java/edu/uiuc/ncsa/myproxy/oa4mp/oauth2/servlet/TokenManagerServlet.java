@@ -87,7 +87,10 @@ public abstract class TokenManagerServlet extends MyProxyDelegationServlet {
         OA2TokenForge tf = (OA2TokenForge) oa2SE.getTokenForge();
         switch (tf.getType(token)) {
             case OA2TokenForge.TYPE_AUTH_GRANT:
-                throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, "invalid request", HttpStatus.SC_BAD_REQUEST);
+                throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
+                        "invalid request",
+                        HttpStatus.SC_BAD_REQUEST,
+                        null);
     /*      This is the code to handle Authorization grant revocations if we ever want to do that too...
                 case OA2TokenForge.TYPE_AUTH_GRANT:
                     t = oa2SE.getTransactionStore().get(tf.getAuthorizationGrant(token));

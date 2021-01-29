@@ -2,7 +2,6 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
-import edu.uiuc.ncsa.security.core.cache.RetentionPolicy;
 import edu.uiuc.ncsa.security.core.exceptions.InvalidTimestampException;
 import edu.uiuc.ncsa.security.core.util.DateUtils;
 import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
@@ -13,11 +12,11 @@ import java.util.Map;
  * <p>Created by Jeff Gaynor<br>
  * on 3/26/14 at  3:39 PM
  */
-public class RefreshTokenRetentionPolicy implements RetentionPolicy {
-    public RefreshTokenRetentionPolicy(RefreshTokenStore rts) {
+public class RefreshTokenRetentionPolicy extends SafeGCRetentionPolicy {
+    public RefreshTokenRetentionPolicy(RefreshTokenStore rts, String serviceAddress, boolean safeGC) {
+        super(serviceAddress,safeGC);
         this.rts = rts;
     }
-
     RefreshTokenStore rts;
 
     /**
@@ -37,6 +36,9 @@ public class RefreshTokenRetentionPolicy implements RetentionPolicy {
      */
     @Override
     public boolean retain(Object key, Object value) {
+        if(safeGCSkipIt(key.toString())){
+            return true;
+        }
         OA2ServiceTransaction st2 = (OA2ServiceTransaction) value;
         String token = null;
 
@@ -71,7 +73,6 @@ public class RefreshTokenRetentionPolicy implements RetentionPolicy {
                 timeout = st2.getAuthzGrantLifetime();
             }
         }
-
         try {
             if (timeout <= 0) {
                 DateUtils.checkTimestamp(token); // use default????

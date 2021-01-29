@@ -143,7 +143,8 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
 //              JSPUtil.fwd(request, wrapper, AUTHORIZED_ENDPOINT);
             init.doDelegation(request, wrapper);
             if (wrapper.isExceptionEncountered()) {
-                throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, wrapper.toString(), wrapper.getStatus());
+                throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, wrapper.toString(), wrapper.getStatus(),
+                        getFirstParameterValue(request, OA2Constants.STATE));
             } // something happened someplace else and the exception was handled.
             String content = wrapper.toString();
             // issue now is that the nonce was registered in the init servlet (as it should be for OA1)

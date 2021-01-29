@@ -95,7 +95,7 @@ public class OIDCCMServlet extends EnvServlet {
             if (client == null) {
                 throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
                         "no such client",
-                        HttpStatus.SC_BAD_REQUEST);
+                        HttpStatus.SC_BAD_REQUEST,null);
             }
             // One major different is that we have an email that we store and this has to be
             // converted to a contacts array or we run the risk of inadvertantly losing this.
@@ -206,7 +206,7 @@ public class OIDCCMServlet extends EnvServlet {
             AdminClient adminClient = getAndCheckAdminClient(req);
             String rawID = req.getParameter(OA2Constants.CLIENT_ID);
             if (rawID == null || rawID.isEmpty()) {
-                throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, "Missing client id", HttpStatus.SC_BAD_REQUEST);
+                throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, "Missing client id", HttpStatus.SC_BAD_REQUEST,null);
             }
             OA2Client client = (OA2Client) getOA2SE().getClientStore().get(BasicIdentifier.newID(rawID));
             if (client == null) {
@@ -241,7 +241,8 @@ public class OIDCCMServlet extends EnvServlet {
         if (client == null) {
             throw new OA2GeneralError(OA2Errors.UNAUTHORIZED_CLIENT,
                     "unknown client",
-                    HttpStatus.SC_UNAUTHORIZED // as per spec
+                    HttpStatus.SC_UNAUTHORIZED, // as per spec
+                    null
             );
         }
         // now we check that this admin owns this client
@@ -249,7 +250,8 @@ public class OIDCCMServlet extends EnvServlet {
         if (!clientList.contains(client.getIdentifier())) {
             throw new OA2GeneralError(OA2Errors.ACCESS_DENIED,
                     "access denied",
-                    HttpStatus.SC_FORBIDDEN // as per spec.
+                    HttpStatus.SC_FORBIDDEN, // as per spec.
+                    null
             );
         }
 
@@ -290,7 +292,9 @@ public class OIDCCMServlet extends EnvServlet {
                 // everything for this client except the id. The assumption is they don't want to do that.
                 getMyLogger().info("Error: Got an empty JSON object. Request rejected.");
                 throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
-                        "invalid request", HttpStatus.SC_BAD_REQUEST);
+                        "invalid request",
+                        HttpStatus.SC_BAD_REQUEST,
+                        null);
             }
             //have to check that certain key/values are excluded from the update.
             if (jsonRequest.containsKey(OIDCCMConstants.REGISTRATION_ACCESS_TOKEN) ||
@@ -299,7 +303,8 @@ public class OIDCCMServlet extends EnvServlet {
                     jsonRequest.containsKey(OIDCCMConstants.CLIENT_ID_ISSUED_AT)) {
                 throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
                         "invalid parameter",
-                        HttpStatus.SC_BAD_REQUEST);
+                        HttpStatus.SC_BAD_REQUEST,
+                        null);
             }
             if (jsonRequest.containsKey(OA2Constants.SCOPE)) {
                 // the only thing that we are concerned with is is client is attempting to increase their
@@ -314,7 +319,8 @@ public class OIDCCMServlet extends EnvServlet {
                         if (!(newScopes.size() == 1 && newScopes.contains(OA2Scopes.SCOPE_OPENID))) {
                             throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
                                     "Cannot increase scope of public client.",
-                                    HttpStatus.SC_BAD_REQUEST);
+                                    HttpStatus.SC_BAD_REQUEST,
+                                    null);
                         }
                     }
 
@@ -338,7 +344,8 @@ public class OIDCCMServlet extends EnvServlet {
                 if (rejectRequest) {
                     throw new OA2GeneralError(OA2Errors.INVALID_SCOPE,
                             "invalid scope",
-                            HttpStatus.SC_FORBIDDEN // as per spec, section RFC 7592 section 2.2
+                            HttpStatus.SC_FORBIDDEN, // as per spec, section RFC 7592 section 2.2
+                            null
                     );
                 }
                 client.setScopes(newScopeList);
@@ -352,7 +359,10 @@ public class OIDCCMServlet extends EnvServlet {
                 // we are being requested to generate a new secret.
                 String hashedSecret = DigestUtils.sha1Hex(jsonRequest.getString(CLIENT_SECRET));
                 if (!hashedSecret.equals(client.getSecret())) {
-                    throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, "client id does not match", HttpStatus.SC_FORBIDDEN);
+                    throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
+                            "client id does not match",
+                            HttpStatus.SC_FORBIDDEN,
+                            null);
                 }
                 newClient.setSecret(client.getSecret());  // it matches, send it along.
             }
@@ -401,7 +411,7 @@ public class OIDCCMServlet extends EnvServlet {
 
             //   printAllParameters(httpServletRequest);
             if (doPing(httpServletRequest, httpServletResponse)) return;
-            System.err.println("ENCODING is of type " + httpServletRequest.getContentType());
+            DebugUtil.trace(this, "ENCODING is of type " + httpServletRequest.getContentType());
             // TODO Probably should parse the encoding type. 'application/json; charset=UTF-8' would be standard.
             if (!httpServletRequest.getContentType().contains("application/json")) {
                 httpServletResponse.setStatus(HttpStatus.SC_UNSUPPORTED_MEDIA_TYPE);
@@ -566,8 +576,10 @@ public class OIDCCMServlet extends EnvServlet {
         if (jsonRequest.containsKey(OIDCCMConstants.APPLICATION_TYPE)) {
             // optional but must be "web" if present
             if (!jsonRequest.getString(OIDCCMConstants.APPLICATION_TYPE).equals("web")) {
-                throw new OA2GeneralError("Unsupported application type", OA2Errors.INVALID_REQUEST, "Unsupported application type",
-                        HttpStatus.SC_BAD_REQUEST);
+                throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
+                        "Unsupported application type",
+                        HttpStatus.SC_BAD_REQUEST,
+                        null);
             }
         }
 
@@ -575,35 +587,40 @@ public class OIDCCMServlet extends EnvServlet {
         handleGrants(client, jsonRequest, keys);
         handleResponseTypes(client, jsonRequest, keys);
 
-
         if (!jsonRequest.containsKey(OIDCCMConstants.REDIRECT_URIS)) {
-            throw new OA2GeneralError("Error: Required parameter \"" + OIDCCMConstants.REDIRECT_URIS + "\" missing.",
+            throw new OA2GeneralError(
                     OA2Errors.INVALID_REQUEST,
                     "Error: Required parameter \"" + OIDCCMConstants.REDIRECT_URIS + "\" missing.",
-                    HttpStatus.SC_BAD_REQUEST);
+                    HttpStatus.SC_BAD_REQUEST,
+                    null);
         }
         JSONArray redirectURIs = jsonRequest.getJSONArray(OIDCCMConstants.REDIRECT_URIS);
         // URI sanity check. Since it's JSON they could send garbage.
         // Wildcard check for CIL-871
         for (Object z : redirectURIs) {
             if (!(z instanceof String)) {
-                throw new OA2GeneralError("Error: illegal redirect uri \"" + z + "\" ",
+                throw new OA2GeneralError(
                         OA2Errors.INVALID_REQUEST,
                         "Error: illegal redirect uri \"" + z + "\" ",
-                        HttpStatus.SC_BAD_REQUEST);
+                        HttpStatus.SC_BAD_REQUEST,
+                        null);
             }
             if (z.toString().contains("*")) {
-                throw new OA2GeneralError("Error: wildcards not allows in redirect uri \"" + z + "\" ",
+                throw new OA2GeneralError(
                         OA2Errors.INVALID_REQUEST,
                         "Error: wildcards not allows in redirect uri \"" + z + "\" ",
-                        HttpStatus.SC_BAD_REQUEST);
+                        HttpStatus.SC_BAD_REQUEST, null);
             }
         }
         client.setCallbackURIs(redirectURIs);
         jsonRequest.remove(OIDCCMConstants.REDIRECT_URIS);
         // Now we do the stuff we think we need.
         if (!jsonRequest.containsKey(OIDCCMConstants.CLIENT_NAME)) {
-            throw new OA2GeneralError("Error: no client name", OA2Errors.INVALID_REQUEST, HttpStatus.SC_BAD_REQUEST);
+            throw new OA2GeneralError(
+                    OA2Errors.INVALID_REQUEST,
+                    "Error: no client name",
+                    HttpStatus.SC_BAD_REQUEST,
+                    null);
         }
         client.setName(jsonRequest.getString(OIDCCMConstants.CLIENT_NAME));
         jsonRequest.remove(OIDCCMConstants.CLIENT_NAME);
@@ -634,7 +651,7 @@ public class OIDCCMServlet extends EnvServlet {
                         // Don't let admins change client confidential --> public
                         throw new OA2GeneralError(OA2Errors.INVALID_REQUEST_OBJECT,
                                 "cannot change from a confidential to a public client",
-                                HttpStatus.SC_BAD_REQUEST);
+                                HttpStatus.SC_BAD_REQUEST, null);
 
                     }
                 }
@@ -649,7 +666,7 @@ public class OIDCCMServlet extends EnvServlet {
                         // to get a secret.
                         throw new OA2GeneralError(OA2Errors.INVALID_REQUEST_OBJECT,
                                 "cannot change from a public to a confidential client",
-                                HttpStatus.SC_BAD_REQUEST);
+                                HttpStatus.SC_BAD_REQUEST,null);
 
                     }
                     gotSupportedAuthMethod = true;
@@ -661,7 +678,7 @@ public class OIDCCMServlet extends EnvServlet {
             if (!gotSupportedAuthMethod) {
                 throw new OA2GeneralError(OA2Errors.INVALID_REQUEST_OBJECT,
                         "unsupported token endpoint authorization method",
-                        HttpStatus.SC_BAD_REQUEST);
+                        HttpStatus.SC_BAD_REQUEST,null);
             }
             jsonRequest.remove(TOKEN_ENDPOINT_AUTH_METHOD);
         }
@@ -688,12 +705,12 @@ public class OIDCCMServlet extends EnvServlet {
                 if (!newScopes.contains(OA2Scopes.SCOPE_OPENID)) {
                     throw new OA2GeneralError(OA2Errors.INVALID_REQUEST_OBJECT,
                             "cannot decrease scope on a public client.",
-                            HttpStatus.SC_BAD_REQUEST);
+                            HttpStatus.SC_BAD_REQUEST,null);
                 }
                 if (1 < newScopes.size()) {
                     throw new OA2GeneralError(OA2Errors.INVALID_REQUEST_OBJECT,
                             "cannot increase scopes on a public client.",
-                            HttpStatus.SC_BAD_REQUEST);
+                            HttpStatus.SC_BAD_REQUEST,null);
                 }
             }
             client.setScopes(newScopes);
@@ -729,7 +746,7 @@ public class OIDCCMServlet extends EnvServlet {
             if (client.isPublicClient()) {
                 throw new OA2GeneralError(OA2Errors.INVALID_REQUEST_OBJECT,
                         "custom configurations not permitted in public clients.",
-                        HttpStatus.SC_BAD_REQUEST);
+                        HttpStatus.SC_BAD_REQUEST,null);
 
             }
             JSONObject jsonObject = jsonRequest.getJSONObject("cfg");
@@ -738,7 +755,7 @@ public class OIDCCMServlet extends EnvServlet {
                 // Pretty draconian test -- any tag for QDL gets booted.
                 throw new OA2GeneralError(OA2Errors.INVALID_REQUEST_OBJECT,
                         "QDL scripting is not allowed for this client.",
-                        HttpStatus.SC_BAD_REQUEST);
+                        HttpStatus.SC_BAD_REQUEST,null);
             }
             jsonRequest.remove("cfg");
             client.setConfig(jsonObject);
@@ -746,6 +763,7 @@ public class OIDCCMServlet extends EnvServlet {
             // CIL-735 if not config object, remove it. 
             client.setConfig(null);
         }
+
         if (jsonRequest.containsKey(REFRESH_LIFETIME)) {
             // NOTE this is sent in seconds but is recorded as ms., so convert to milliseconds here.
             client.setRtLifetime(jsonRequest.getLong(REFRESH_LIFETIME) * 1000);
@@ -784,19 +802,19 @@ public class OIDCCMServlet extends EnvServlet {
             if (!responseTypes.contains(OA2Constants.RESPONSE_TYPE_CODE)) {
                 throw new OA2GeneralError(OA2Errors.UNSUPPORTED_RESPONSE_TYPE,
                         "unsupported response type",
-                        HttpStatus.SC_BAD_REQUEST);
+                        HttpStatus.SC_BAD_REQUEST,null);
             }
             if (responseTypes.contains(OA2Constants.RESPONSE_TYPE_TOKEN)) {
                 // This is required for implicit flow, which we do not support.
                 throw new OA2GeneralError(OA2Errors.UNSUPPORTED_RESPONSE_TYPE,
                         "unsupported response type",
-                        HttpStatus.SC_BAD_REQUEST);
+                        HttpStatus.SC_BAD_REQUEST,null);
 
             }
             if (1 < responseTypes.size() && !checkJAEntry(responseTypes, OA2Constants.RESPONSE_TYPE_ID_TOKEN)) {
                 throw new OA2GeneralError(OA2Errors.UNSUPPORTED_RESPONSE_TYPE,
                         "unsupported response type",
-                        HttpStatus.SC_BAD_REQUEST);
+                        HttpStatus.SC_BAD_REQUEST,null);
 
             }
             client.setResponseTypes(responseTypes);
@@ -843,7 +861,8 @@ public class OIDCCMServlet extends EnvServlet {
             if (!areAllGrantsSupported(grantTypes, supportedGrants)) {
                 throw new OA2GeneralError(OA2Errors.REGISTRATION_NOT_SUPPORTED,
                         "unsupported grant type ",
-                        HttpStatus.SC_BAD_REQUEST);
+                        HttpStatus.SC_BAD_REQUEST,
+                        null);
             }
             boolean requestedRT = false;
 

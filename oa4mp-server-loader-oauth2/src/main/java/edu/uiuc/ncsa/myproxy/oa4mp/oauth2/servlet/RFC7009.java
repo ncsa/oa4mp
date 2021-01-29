@@ -34,8 +34,11 @@ public class RFC7009 extends TokenManagerServlet {
         String tokenTypeHint = req.getParameter(TOKEN_TYPE_HINT);
         if (!tokenTypeHint.equals(TYPE_ACCESS_TOKEN) || !tokenTypeHint.equals(TYPE_REFRESH_TOKEN)) {
             // as per spec, throw the only exception this servlet is allowed
-            new OA2GeneralError("unsupported_token_type", "The token type of \"" + tokenTypeHint + "\" is not supported on this server.",
-                    HttpStatus.SC_FORBIDDEN);
+            new OA2GeneralError(
+                    "unsupported_token_type", // special value in spec.
+                    "The token type of \"" + tokenTypeHint + "\" is not supported on this server.",
+                    HttpStatus.SC_FORBIDDEN,
+                    null);
             // if we throw a status of 503, this means that while the token type was wrong, the
             // token still exists on the server.
         }
@@ -73,7 +76,10 @@ public class RFC7009 extends TokenManagerServlet {
         if (t != null) {
             // Finally, don't let some other client try to revoke other people's tokens.
             if (!t.getClient().getIdentifier().equals(requestingClient.getIdentifier())) {
-                throw new OA2GeneralError(OA2Errors.UNAUTHORIZED_CLIENT, "Unauthorized client", HttpStatus.SC_UNAUTHORIZED);
+                throw new OA2GeneralError(OA2Errors.UNAUTHORIZED_CLIENT,
+                        "Unauthorized client",
+                        HttpStatus.SC_UNAUTHORIZED,
+                        null);
             }
             oa2SE.getTransactionStore().remove(t.getIdentifier());
             return true;

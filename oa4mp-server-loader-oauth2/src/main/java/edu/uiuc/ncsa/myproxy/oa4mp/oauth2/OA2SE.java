@@ -77,7 +77,8 @@ public class OA2SE extends ServiceEnvironmentImpl {
                  CMConfigs cmConfigs,
                  QDLEnvironment qdlEnvironment,
                  boolean rfc8693Enabled,
-                 boolean qdlStrictACLs) {
+                 boolean qdlStrictACLs,
+                 boolean safeGC) {
         super(logger,
                 mfp,
                 tsp,
@@ -141,7 +142,18 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.maxATLifetime = maxATLifetime;
         this.maxRTLifetime = maxRTLifetime;
         this.qdlStrictACLs = qdlStrictACLs;
+        this.safeGC = safeGC;
     }
+
+    public boolean isSafeGC() {
+        return safeGC;
+    }
+
+    public void setSafeGC(boolean safeGC) {
+        this.safeGC = safeGC;
+    }
+
+    boolean safeGC = true;
 
     public boolean isQdlStrictACLs() {
         return qdlStrictACLs;

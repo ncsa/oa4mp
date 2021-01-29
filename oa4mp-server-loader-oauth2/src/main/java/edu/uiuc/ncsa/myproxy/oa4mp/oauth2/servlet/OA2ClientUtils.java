@@ -48,7 +48,9 @@ public class OA2ClientUtils {
     public static void check(Client client, String redirect) {
 
         if (client == null) {
-            throw new NoClientIDException(OA2Errors.INVALID_REQUEST, "no client id", HttpStatus.SC_BAD_REQUEST);
+            throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
+                    "no client id",
+                    HttpStatus.SC_BAD_REQUEST, null);
         }
         if (!(client instanceof OA2Client)) {
             throw new NFWException("Internal error: Client is not an OA2Client");
@@ -59,7 +61,10 @@ public class OA2ClientUtils {
 
         boolean foundCB = false;
         if (oa2Client.getCallbackURIs() == null) {
-            throw new NoRegisteredRedirectError(OA2Errors.INVALID_REQUEST, "client has not registered any callback URIs", HttpStatus.SC_BAD_REQUEST);
+            throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
+                    "client has not registered any callback URIs",
+                    HttpStatus.SC_BAD_REQUEST,
+                    null);
         }
         for (String uri : oa2Client.getCallbackURIs()) {
             if (uri.equals(redirect)) {
@@ -72,37 +77,10 @@ public class OA2ClientUtils {
             ServletDebugUtil.trace(OA2ClientUtils.class,
                     "invalid redirect uri for client \"" +
                             oa2Client.getIdentifierString() + "\": \"" + redirect + "\"");
-            throw new InvalidRedirectError(OA2Errors.INVALID_REQUEST, "The given redirect \"" + redirect + "\" is not valid for this client", HttpStatus.SC_BAD_REQUEST);
-        }
-    }
-
-    public static class InvalidRedirectError extends OA2GeneralError {
-
-        public InvalidRedirectError(String error, String description, int httpStatus) {
-            super(error, description, httpStatus);
-        }
-
-    }
-
-    public static class NoScopesError extends OA2GeneralError {
-
-        public NoScopesError(String error, String description, int httpStatus) {
-            super(error, description, httpStatus);
-        }
-
-    }
-
-    public static class NoRegisteredRedirectError extends OA2GeneralError {
-
-        public NoRegisteredRedirectError(String error, String description, int httpStatus) {
-            super(error, description, httpStatus);
-        }
-
-    }
-
-    public static class NoClientIDException extends OA2GeneralError {
-        public NoClientIDException(String error, String description, int httpStatus) {
-            super(error, description, httpStatus);
+            throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
+                    "The given redirect \"" + redirect + "\" is not valid for this client",
+                    HttpStatus.SC_BAD_REQUEST,
+                    null);
         }
     }
 

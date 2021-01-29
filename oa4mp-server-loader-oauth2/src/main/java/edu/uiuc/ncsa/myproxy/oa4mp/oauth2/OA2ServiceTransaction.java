@@ -442,6 +442,20 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         this.refreshTokenLifetime = refreshTokenLifetime;
     }
 
+    /**
+     * This is the state parameter in the initial request, if present
+     * @return
+     */
+    public String getRequestState() {
+        return requestState;
+    }
+
+    public void setRequestState(String requestState) {
+        this.requestState = requestState;
+    }
+
+    String requestState = null;
+
     public boolean hasRefreshToken() {
         return refreshToken != null;
     }

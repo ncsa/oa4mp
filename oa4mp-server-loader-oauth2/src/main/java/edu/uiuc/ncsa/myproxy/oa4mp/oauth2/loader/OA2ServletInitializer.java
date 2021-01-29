@@ -72,7 +72,11 @@ public class OA2ServletInitializer extends OA4MPServletInitializer {
         }
         if (oa2SE.isRefreshTokenEnabled()) {
             MyProxyDelegationServlet.transactionCleanup.getRetentionPolicies().clear(); // We need a different set of policies than the original one.
-            MyProxyDelegationServlet.transactionCleanup.addRetentionPolicy(new RefreshTokenRetentionPolicy((RefreshTokenStore) oa2SE.getTransactionStore()));
+            MyProxyDelegationServlet.transactionCleanup.addRetentionPolicy(
+                    new RefreshTokenRetentionPolicy(
+                            (RefreshTokenStore) oa2SE.getTransactionStore(),
+                            oa2SE.getServiceAddress().toString(),
+                            oa2SE.isSafeGC()));
             oa2SE.getMyLogger().info("Initialized refresh token cleanup thread");
         }
         if (!ClaimSourceFactory.isFactorySet()) {
@@ -83,7 +87,7 @@ public class OA2ServletInitializer extends OA4MPServletInitializer {
             txRecordCleanup = new Cleanup<>(getEnvironment().getMyLogger());
             txRecordCleanup.setStopThread(false);
             txRecordCleanup.setMap(oa2SE.getTxStore());
-            txRecordCleanup.addRetentionPolicy(new TokenExchangeRecordRetentionPolicy());
+            txRecordCleanup.addRetentionPolicy(new TokenExchangeRecordRetentionPolicy(oa2SE.getServiceAddress().toString(), oa2SE.isSafeGC()));
             txRecordCleanup.start();
             oa2SE.getMyLogger().info("Starting token exchange record store cleanup thread");
         }

@@ -22,6 +22,8 @@ import net.sf.json.JSONSerializer;
 import java.net.URI;
 import java.util.Collection;
 
+import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
+
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 3/12/14 at  1:35 PM
@@ -72,6 +74,7 @@ public class OA2TConverter<V extends OA2ServiceTransaction> extends TransactionC
         st.setAccessTokenLifetime(map.getLong(getTCK().expiresIn()));
         st.setCallback(map.getURI(getTCK().callbackUri()));
         st.setNonce(map.getString(getTCK().nonce()));
+        st.setRequestState(map.getString(getTCK().reqState()));
         if (map.get(getTCK().scopes()) != null) {
             net.sf.json.JSONArray json = (JSONArray) JSONSerializer.toJSON(map.get(getTCK().scopes()));
             Collection<String> zzz = (Collection<String>) JSONSerializer.toJava(json);
@@ -138,8 +141,11 @@ public class OA2TConverter<V extends OA2ServiceTransaction> extends TransactionC
         map.put(getTCK().authzGrantLifetime(), t.getAuthzGrantLifetime());
         map.put(getTCK().expiresIn(), t.getAccessTokenLifetime());
         map.put(getTCK().refreshTokenLifetime(), t.getRefreshTokenLifetime());
-        if (t.getNonce() != null && 0 < t.getNonce().length()) {
+        if (!isTrivial(t.getNonce())) {
             map.put(getTCK().nonce(), t.getNonce());
+        }
+        if(!isTrivial(t.getRequestState())){
+            map.put(getTCK().reqState(), t.getRequestState());
         }
         JSONArray jsonArray = new JSONArray();
         // OK, so in some weird cases the content of the scopes can be a thing called a MorphDynaBean in the JSON

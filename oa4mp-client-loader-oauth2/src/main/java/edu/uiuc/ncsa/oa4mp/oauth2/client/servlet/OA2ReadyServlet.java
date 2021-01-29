@@ -26,6 +26,7 @@ import edu.uiuc.ncsa.security.util.pkcs.KeyUtil;
 import net.sf.json.JSONObject;
 import net.sf.json.util.JSONUtils;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -45,8 +46,9 @@ public class OA2ReadyServlet extends ClientServlet {
     @Override
     protected void doIt(HttpServletRequest request, HttpServletResponse response) throws Throwable {
         if (request.getParameterMap().containsKey(OA2Constants.ERROR)) {
-            throw new OA2RedirectableError(request.getParameter(OA2Constants.ERROR),
+            throw new OA2GeneralError(request.getParameter(OA2Constants.ERROR),
                     request.getParameter(OA2Constants.ERROR_DESCRIPTION),
+                    HttpStatus.SC_BAD_REQUEST,
                     request.getParameter(OA2Constants.STATE));
         }
         // Get the cert itself. The server itself does a redirect using the callback to this servlet

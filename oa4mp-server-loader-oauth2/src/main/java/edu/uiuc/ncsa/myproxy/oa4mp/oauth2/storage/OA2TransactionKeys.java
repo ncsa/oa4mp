@@ -23,10 +23,16 @@ public class OA2TransactionKeys extends DSTransactionKeys {
     protected String scopes = "scopes";
     protected String authTime = "auth_time";
     protected String states = "states";
+    protected String reqState = "req_state";
 
     public String authzGrantLifetime(String... x) {
         if (0 < x.length) authzGrantLifetime = x[0];
         return authzGrantLifetime;
+    }
+
+    public String reqState(String... x) {
+        if (0 < x.length) reqState = x[0];
+        return reqState;
     }
 
     public String refreshTokenLifetime(String... x) {
@@ -75,6 +81,7 @@ public class OA2TransactionKeys extends DSTransactionKeys {
         allKeys.add(nonce());
         allKeys.add(authTime());
         allKeys.add(states());
+        allKeys.add(reqState());
         return allKeys;
 
     }

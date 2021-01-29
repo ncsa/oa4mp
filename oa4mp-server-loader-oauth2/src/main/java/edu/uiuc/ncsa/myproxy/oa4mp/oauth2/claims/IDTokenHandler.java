@@ -319,7 +319,11 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
      */
     protected void checkRequiredScopes(OA2ServiceTransaction t) throws Throwable {
         if (oa2se.isOIDCEnabled() && !t.getScopes().contains(OA2Scopes.SCOPE_OPENID)) {
-            throw new OA2GeneralError(OA2Errors.INVALID_SCOPE, "invalid scope: no open id scope", HttpStatus.SC_UNAUTHORIZED);
+            throw new OA2RedirectableError(OA2Errors.INVALID_SCOPE,
+                    "invalid scope: no open id scope",
+                    HttpStatus.SC_UNAUTHORIZED,
+                    t.getRequestState(),
+                    t.getCallback());
         }
     }
 
@@ -327,10 +331,16 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
         if (claims.containsKey(claimKey)) {
             if (isEmpty(claims.getString(claimKey))) {
                 //           DebugUtil.trace(this, "Missing \"" + claimKey+ "\" claim= " );
-                throw new OA2GeneralError(OA2Errors.SERVER_ERROR, "Missing " + claimKey + " claim", HttpStatus.SC_INTERNAL_SERVER_ERROR);
+                throw new OA2GeneralError(OA2Errors.SERVER_ERROR,
+                        "Missing " + claimKey + " claim",
+                        HttpStatus.SC_INTERNAL_SERVER_ERROR,
+                        null);
             }
         } else {
-            throw new OA2GeneralError(OA2Errors.SERVER_ERROR, "Missing " + claimKey + " claim", HttpStatus.SC_INTERNAL_SERVER_ERROR);
+            throw new OA2GeneralError(OA2Errors.SERVER_ERROR,
+                    "Missing " + claimKey + " claim",
+                    HttpStatus.SC_INTERNAL_SERVER_ERROR,
+                    null);
         }
     }
 

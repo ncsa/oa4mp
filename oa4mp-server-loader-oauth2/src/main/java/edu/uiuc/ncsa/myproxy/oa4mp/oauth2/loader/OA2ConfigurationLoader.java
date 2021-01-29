@@ -90,6 +90,7 @@ import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.*;
  */
 public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends AbstractConfigurationLoader<T> {
     public static final String STRICT_ACLS = "strict_acls";
+    public static final String SAFE_GARBAGE_COLLECTION = "safe_gc";
     /**
      * Default is 15 days. Internally the refresh lifetime (as all date-ish things) are in milliseconds
      * though the configuration file is assumed to be in seconds.
@@ -154,7 +155,8 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     getCmConfigs(),
                     getQDLEnvironment(),
                     isRFC8693Enabled(),
-                    isQdlStrictACLS());
+                    isQdlStrictACLS(),
+                    isSafeGC());
 
             if (getClaimSource() instanceof BasicClaimsSourceImpl) {
                 ((BasicClaimsSourceImpl) getClaimSource()).setOa2SE((OA2SE) se);
@@ -183,6 +185,23 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         QDLConfigurationLoader loader = new QDLConfigurationLoader("(none)", node, loggerProvider.get());
         return loader.load();
     }
+
+    public boolean isSafeGC() {
+        if(safeGC == null){
+            try {
+                safeGC = Boolean.parseBoolean(getFirstAttribute(cn, SAFE_GARBAGE_COLLECTION));
+            } catch (Throwable t) {
+                // use default which is to doo safe garbage collection.
+                // We let this be null to trigger pulling the value, if any, out of the
+                // the configuration
+                safeGC = Boolean.TRUE;
+            }
+            DebugUtil.trace(this, "safe garbage collection enabled? " + safeGC);
+        }
+        return safeGC;
+    }
+
+    Boolean safeGC = true;
 
     public boolean isQdlStrictACLS() {
         return qdlStrictACLS;

@@ -27,7 +27,8 @@
         <td style="vertical-align: top;">N</td>
         <td style="vertical-align: top;">N/A</td>
         <td style="vertical-align: top;">The address associated with this service. Normally this is not needed unless
-            there is some aliasing used by the host.The host name is taken from the servlet itself and used in
+            either there is some aliasing used by the host or safe garbage collection
+            is needed. Otherwise the host name is taken from the servlet itself and used in
             constructing urls that point to this server. For instance, if there is a server farm with a given
             external-facing address which will be resolved to one of the members based on load-balancing, this
             would be the external-facing address.
@@ -223,6 +224,17 @@
         <td style="vertical-align: top;">N</td>
         <td style="vertical-align: top;">1296000</td>
         <td style="vertical-align: top;">deprecated. Use maxRefreshTokenLifetime instead.
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">safe_gc</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">true</td>
+        <td style="vertical-align: top;">Enable safe garbage collection in the various clean up threads. This means that
+            the server will not remove any token unless it is from the current service address.
+            This allows deploying OA4MP to environments with a shared database and possibly many
+            other OA4MP services. <i>Be sure to set the service address</i> (the <b>address</b> attribute described
+            in this table.
         </td>
     </tr>
     <tr>
