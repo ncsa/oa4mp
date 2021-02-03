@@ -1,6 +1,6 @@
 <component name="ArtifactManager">
   <artifact type="exploded-war" name="oa4mp-client-webapp:war exploded">
-    <output-path>$PROJECT_DIR$/oa4mp-client-webapp/target/oa4mp-client-webapp-5.1-SNAPSHOT</output-path>
+    <output-path>$PROJECT_DIR$/oa4mp-client-webapp/target/oa4mp-client-webapp-5.1.0</output-path>
     <properties id="maven-jee-properties">
       <options>
         <exploded>true</exploded>
@@ -14,8 +14,8 @@
           <element id="module-output" name="oa4mp-client-webapp" />
         </element>
         <element id="directory" name="lib">
-          <element id="library" level="project" name="Maven: edu.uiuc.ncsa.security:ncsa-security-servlet:5.1-SNAPSHOT" />
-          <element id="library" level="project" name="Maven: edu.uiuc.ncsa.security:ncsa-security-core:5.1-SNAPSHOT" />
+          <element id="library" level="project" name="Maven: edu.uiuc.ncsa.security:ncsa-security-servlet:5.1.0" />
+          <element id="library" level="project" name="Maven: edu.uiuc.ncsa.security:ncsa-security-core:5.1.0" />
           <element id="library" level="project" name="Maven: commons-configuration:commons-configuration:1.10" />
           <element id="library" level="project" name="Maven: commons-lang:commons-lang:2.6" />
           <element id="library" level="project" name="Maven: commons-collections:commons-collections:3.2.2" />
@@ -25,7 +25,7 @@
           <element id="library" level="project" name="Maven: net.sf.json-lib:json-lib:jdk15:2.4" />
           <element id="library" level="project" name="Maven: net.sf.ezmorph:ezmorph:1.0.6" />
           <element id="library" level="project" name="Maven: log4j:log4j:1.2.17" />
-          <element id="library" level="project" name="Maven: edu.uiuc.ncsa.security:ncsa-security-util:5.1-SNAPSHOT" />
+          <element id="library" level="project" name="Maven: edu.uiuc.ncsa.security:ncsa-security-util:5.1.0" />
           <element id="library" level="project" name="Maven: org.jline:jline:3.14.1" />
           <element id="library" level="project" name="Maven: commons-cli:commons-cli:1.3.1" />
           <element id="library" level="project" name="Maven: org.antlr:antlr4:4.7.2" />
@@ -41,7 +41,7 @@
         </element>
       </element>
       <element id="directory" name="META-INF">
-        <element id="file-copy" path="$PROJECT_DIR$/oa4mp-client-webapp/target/oa4mp-client-webapp-5.1-SNAPSHOT/META-INF/MANIFEST.MF" />
+        <element id="file-copy" path="$PROJECT_DIR$/oa4mp-client-webapp/target/oa4mp-client-webapp-5.1.0/META-INF/MANIFEST.MF" />
       </element>
       <element id="javaee-facet-resources" facet="oa4mp-client-webapp/web/Web" />
     </root>

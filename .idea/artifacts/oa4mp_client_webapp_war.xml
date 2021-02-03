@@ -7,7 +7,7 @@
         <packaging>war</packaging>
       </options>
     </properties>
-    <root id="archive" name="oa4mp-client-webapp-5.1-SNAPSHOT.war">
+    <root id="archive" name="oa4mp-client-webapp-5.1.0.war">
       <element id="artifact" artifact-name="oa4mp-client-webapp:war exploded" />
     </root>
   </artifact>
