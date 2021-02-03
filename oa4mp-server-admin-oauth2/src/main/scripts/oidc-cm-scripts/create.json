@@ -21,5 +21,8 @@
   ],
   "request_uris": [
     "https://client.example.org/rf.txt#qpXaRLh_n93TTR9F252ValdatUQvQiJi5BDub2BeznA"
-  ]
+  ],
+  "at_lifetime":1009,
+  "rt_lifetime":1000000,
+  "strict_scopes":false
 }
