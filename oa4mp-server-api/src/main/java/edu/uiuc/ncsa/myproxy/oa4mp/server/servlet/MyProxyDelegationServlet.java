@@ -257,11 +257,12 @@ public abstract class MyProxyDelegationServlet extends EnvServlet implements Tra
      */
     @Override
     public void preprocess(TransactionState state) throws Throwable {
-        state.getResponse().setHeader("X-Frame-Options", "DENY");
+        //state.getResponse().setHeader("X-Frame-Options", "DENY");
     }
 
     @Override
     public void postprocess(TransactionState state) throws Throwable {
+        state.getResponse().setHeader("X-Frame-Options", "DENY");
     }
 
 

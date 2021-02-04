@@ -1,18 +1,18 @@
 /*
  Creates everything for the OA4MP = OAuth for MyProxy PostgreSQL server database.
- pipe it into postgres by issuing
+ AFTER YOU HAVE (at the least) EDITED THE PASSWORD BELOW, pipe it into postgres by issuing
 
  \i /path/to/oauth2-pg.sql
 
  in the psql client or just cut and paste it into the client directly.
 
- Edit the following values to be what you want. Be sure to update your configuration file.
+ Be sure to update your configuration file.
  Note that passwords must have included escaped quotes, so place your password between the
  \' delimeters.
 
  */
 \set oa4mpServerUser oa4mp
-\set oa4mpServerUserPassword '\'setpassword\''
+\set oa4mpServerUserPassword '\'vnlH814i\''
 
 /* Probably don't have to change anything from here on down... */
 \set oa4mpDatabase oauth2
@@ -23,7 +23,6 @@
 \set oa4mpApproverTable client_approvals
 \set oa4mpAdminClientTable adminClients
 \set oa4mpPermissionsTable permissions
-\set oa4mpLDAPTable ldaps
 
 
 /*
@@ -47,16 +46,24 @@ set search_path to :oa4mpSchema;
 CREATE USER :oa4mpServerUser with PASSWORD :oa4mpServerUserPassword;
 
 create table :oa4mpSchema.:oa4mpClientTable  (
-    client_id  text PRIMARY KEY,
-    public_key text,
-    name text,
-    home_url text,
-    error_url text,
-    email text,
-    callback_uri text,
-    proxy_limited boolean,
-    rt_lifetime bigint,
-    creation_ts TIMESTAMP);
+    client_id           text PRIMARY KEY,
+    public_key          text,
+    name                text,
+    home_url            text,
+    error_url           text,
+    email               text,
+    callback_uri        text,
+    proxy_limited       boolean,
+    rt_lifetime         bigint,
+    last_modified_ts    TIMESTAMP,
+    creation_ts         TIMESTAMP,
+    issuer              text,
+    ldap                text,
+    scopes              text,
+    public_client       boolean,
+    sign_tokens         boolean,
+    cfg                 text,
+    extended_attributes text);
 
 create table :oa4mpSchema.:oa4mpPermissionsTable  (
  permission_id text PRIMARY KEY,
@@ -70,48 +77,60 @@ create table :oa4mpSchema.:oa4mpPermissionsTable  (
   creation_ts   TIMESTAMP
   );
 create table :oa4mpSchema.:oa4mpAdminClientTable  (
-    admin_id  text PRIMARY KEY,
-    name text,
-    email text,
-    secret text,
-    vo text,
-    issuer text,
+    admin_id    text PRIMARY KEY,
+    name        text,
+    email       text,
+    secret      text,
+    vo          text,
+    issuer      text,
+    max_clients integer,
     creation_ts TIMESTAMP);
-
-
-create table :oa4mpSchema.:oa4mpLDAPTable (
-    id         text PRIMARY KEY,
-    client_id  text,
-    ldap       text);
 
 
 
 create table :oa4mpSchema.:oa4mpApproverTable(
-    client_id text primary key,
-    approver text,
-    approved boolean,
+    client_id   text primary key,
+    approver    text,
+    status      text,
+    approved    boolean,
     approval_ts TIMESTAMP);
 
+CREATE TABLE :oa4mpSchema.tx_records
+(
+    token_id   VARCHAR(255) PRIMARY KEY,
+    lifetime   bigint,
+    issued_at  bigint,
+    expires_at bigint,
+    parent_id  text,
+    token_type text,
+    valid      boolean,
+    scopes     text,
+    audience   text,
+    issuer     text,
+    resource   text
+);
+
 create table :oa4mpSchema.:oa4mpTransactionTable  (
-create table cilogon2.transactions  (
-   temp_token text primary key,
-   temp_token_valid boolean,
-   callback_uri text,
-   certreq text,
-   certlifetime bigint,
-   client_id text,
-   verifier_token text,
-   access_token text,
-   access_token_valid boolean,
-   certificate text,
-   refresh_token text,
-   refresh_token_valid boolean,
-   expires_in bigint,
-   myproxyusername text,
-   username text,
-   auth_time TIMESTAMP DEFAULT now(),
-   nonce text,
-   scopes text);
+   temp_token           text primary key,
+   temp_token_valid     boolean,
+   callback_uri         text,
+   certreq              text,
+   certlifetime         bigint,
+   client_id            text,
+   verifier_token       text,
+   access_token         text,
+   access_token_valid   boolean,
+   states               text,
+   certificate          text,
+   refresh_token        text,
+   refresh_token_valid  boolean,
+   expires_in           bigint,
+   myproxyusername      text,
+   at_lifetime          bigint,
+   username             text,
+   auth_time            TIMESTAMP DEFAULT now(),
+   nonce                text,
+   scopes               text);
 
 CREATE UNIQUE INDEX trans_ndx ON :oa4mpSchema.:oa4mpTransactionTable (temp_token, refresh_token, access_token, username);
 
@@ -141,4 +160,11 @@ commit;
   \d  - lists all tables in a database
   \d tablename - lists all columns in the given table
   \d+ tablename - lists a description of the table.
+
+  E.g.
+  \c cilgon2;
+  \dn <-- lists all schemas
+  set search_path to oauth2; <-- or no meta commands work right
+  \d <-- lists the tables
+  
 */

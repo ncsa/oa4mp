@@ -23,7 +23,6 @@ import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.oauth_2_0.*;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTRunner;
 import edu.uiuc.ncsa.security.oauth_2_0.server.AGRequest2;
-import edu.uiuc.ncsa.security.oauth_2_0.server.InvalidNonceException;
 import edu.uiuc.ncsa.security.oauth_2_0.server.RFC8693Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
@@ -113,11 +112,11 @@ public class OA2AuthorizedServletUtil {
             preprocess(new TransactionState(req, resp, params, transaction));
             DebugUtil.trace(this, "saved transaction for " + cid + ", trans id=" + transaction.getIdentifierString());
 
-            agResponse.write(resp);
             DebugUtil.info(this, "2.b finished initial request for token =\"" + transaction.getIdentifierString() + "\".");
 
             postprocess(new IssuerTransactionState(req, resp, params, transaction, agResponse));
             servlet.getTransactionStore().save(transaction);
+            agResponse.write(resp);
             return transaction;
         } catch (Throwable t) {
             if (t instanceof UnapprovedClientException) {
@@ -349,15 +348,18 @@ public class OA2AuthorizedServletUtil {
         // FIX for OAUTH-180. Server must support clients that do not use a nonce. Just log it and rock on.
         if (nonce == null || nonce.length() == 0) {
             DebugUtil.info(this, "No nonce in initial request for " + client.getIdentifierString());
-        }        
-        try {
+        }
+        NonceHerder.putNonce(nonce);
+      /*  This checks that nonces are not re-used. Used to check for them,
+          but not now. Just store it for returning later in the ID token.
+      try {
             NonceHerder.checkNonce(nonce);
         }catch(InvalidNonceException ine){
             throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
                     "invalid nonce",
                     HttpStatus.SC_BAD_REQUEST,
                     st.getRequestState());
-        }
+        }*/
 
 
         if (params.containsKey(DISPLAY)) {
@@ -572,7 +574,7 @@ public class OA2AuthorizedServletUtil {
   */
 
     public void preprocess(TransactionState state) throws Throwable {
-        state.getResponse().setHeader("X-Frame-Options", "DENY");
+      //  state.getResponse().setHeader("X-Frame-Options", "DENY");
     }
 
     /* *******
@@ -669,6 +671,8 @@ public class OA2AuthorizedServletUtil {
         figureOutAudienceAndResource(transactionState);
         OA2ServiceTransaction t = (OA2ServiceTransaction) transactionState.getTransaction();
         Collection<String> scopes = resolveScopes(transactionState);
+        transactionState.getResponse().setHeader("X-Frame-Options", "DENY");
+
         //t.setScopes(scopes);
     }
 }
