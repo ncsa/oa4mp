@@ -412,7 +412,7 @@ public abstract class StoreCommands2 extends StoreCommands {
         sayi("ls " + KEYS_FLAG + " [id,callback_uris,create_ts] /foo:bar");
         sayi("would print the id, callback_uri and create_ts properties for the object with id");
         sayi("foo:bar. ");
-        sayi("\nSee also list_keys, search");
+        sayi("\nSee also list_keys, search, archive");
     }
 
     @Override

@@ -211,14 +211,14 @@ public class OA2AuthorizedServletUtil {
 
         if (!httpServletRequest.getParameterMap().containsKey(OA2Constants.RESPONSE_TYPE)) {
             throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
-                    "no response type",
+                    " The " + RESPONSE_TYPE + " is missing from the request.",
                     HttpStatus.SC_BAD_REQUEST,
                     requestState);
         }
 
         if (!httpServletRequest.getParameter(RESPONSE_TYPE).equals(RESPONSE_TYPE_CODE)) {
             throw new OA2GeneralError(OA2Errors.UNSUPPORTED_RESPONSE_TYPE,
-                    "unsupported reponse type",
+                    "The given "+ RESPONSE_TYPE + " is not supported.",
                     HttpStatus.SC_BAD_REQUEST,
                     requestState);
         }
@@ -457,7 +457,7 @@ public class OA2AuthorizedServletUtil {
         if (oa2Client.isPublicClient()) {
             if (!oa2Client.getScopes().contains(OA2Scopes.SCOPE_OPENID)) {
                 throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST,
-                        "Scopes must contain " + OA2Scopes.SCOPE_OPENID,
+                        "The " + OA2Scopes.SCOPE_OPENID +" scope is missing from the request.",
                         HttpStatus.SC_BAD_REQUEST,
                         st.getRequestState(),
                         st.getCallback());
@@ -488,7 +488,7 @@ public class OA2AuthorizedServletUtil {
         if (((OA2SE) getServiceEnvironment()).isOIDCEnabled()) {
             if (!hasOpenIDScope)
                 throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST,
-                        "Scopes must contain " + OA2Scopes.SCOPE_OPENID,
+                        "The " + OA2Scopes.SCOPE_OPENID +" scope is missing from the request.",
                         HttpStatus.SC_BAD_REQUEST,
                         st.getRequestState(),
                         st.getCallback());

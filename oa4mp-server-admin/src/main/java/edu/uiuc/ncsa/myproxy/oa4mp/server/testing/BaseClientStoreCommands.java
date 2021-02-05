@@ -222,8 +222,8 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
 
     @Override
     protected String archiveFormat(Identifiable identifiable) {
-        int fieldWidth = 5; // width of field for version number
         Long version = getVersionFromID(identifiable.getIdentifier());
+        int fieldWidth = Math.max(5, version.toString().length());
         BaseClient client = (BaseClient) identifiable;
         String caput = "";
         if(-1 < version){

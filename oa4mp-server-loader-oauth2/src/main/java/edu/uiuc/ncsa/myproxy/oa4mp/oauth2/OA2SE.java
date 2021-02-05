@@ -102,9 +102,6 @@ public class OA2SE extends ServiceEnvironmentImpl {
         if(0 < atLifetime){
             this.accessTokenLifetime = atLifetime;
         }
-/*        if (0 < rtLifetime) {
-            this.rtLifetime = rtLifetime;
-        }*/
 
         if (clientSecretLength < 0) {
             throw new MyConfigurationException("Error: The client secret length (=" + clientSecretLength + ") is invalid. It must be a positive integer.");

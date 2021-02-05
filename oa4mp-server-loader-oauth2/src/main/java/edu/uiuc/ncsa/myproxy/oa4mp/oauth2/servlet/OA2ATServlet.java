@@ -392,12 +392,12 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             if (t != null) {
                 // Must present a valid token to get one.
                 if (!t.isRefreshTokenValid()) {
-                    throw new OA2ATException(OA2Errors.INVALID_TOKEN,
+                    throw new OA2ATException(OA2Errors.INVALID_GRANT,
                             "invalid refresh token",
                             t.getRequestState());
                 }
                 if (refreshToken.isExpired()) {
-                    throw new OA2ATException(OA2Errors.INVALID_TOKEN,
+                    throw new OA2ATException(OA2Errors.INVALID_GRANT,
                             "expired refresh token",
                             t.getRequestState());
                 }

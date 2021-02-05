@@ -16,6 +16,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractRegistrationServlet;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
+import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2GeneralError;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTRunner;
@@ -78,7 +79,7 @@ public class OA2ClientUtils {
                     "invalid redirect uri for client \"" +
                             oa2Client.getIdentifierString() + "\": \"" + redirect + "\"");
             throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
-                    "The given redirect \"" + redirect + "\" is not valid for this client",
+                    "The given " + OA2Constants.REDIRECT_URI +" is not valid for this client.",
                     HttpStatus.SC_BAD_REQUEST,
                     null);
         }

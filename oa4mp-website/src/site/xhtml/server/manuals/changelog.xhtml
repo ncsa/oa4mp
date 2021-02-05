@@ -20,9 +20,28 @@
 <p>Release date</p>
 <ul>
     <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-697">CIL-697</a>Improve error messages to include a description.</li>
-    <li>CIL-708: review of token exchange endpoint.</li>
-    <li>CIL-824: Making all demo clients at CILogon distinct.</li>
-    <li>CIL-848: Add access control to QDL scripts on server based on client/admin id.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-708">CIL-708</a>: review of token exchange endpoint.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-824">CIL-824</a>: Making all demo clients at CILogon distinct.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-833">CIL-833</a>: Better enforcement of response_type.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-841">CIL-841</a>: Fix returned claims for NCSA client.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-843">CIL-843</a>: Some NCSA clients require a flat list for the isMemberOf claim, some require a JSON object
+        that has group ids. Amend QDL script to accept a parameter to set this.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-845">CIL-845</a>: Allow basic versioning of objects in stores (clients, users, admin clients) with the CLI.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-848">CIL-848</a>: Add access control to QDL scripts on server based on client/admin id.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-855">CIL-855</a>: Review and set policy for unrecognized scopes.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-871">CIL-871</a>: OA4MP rejects wildcards in callbacks everywhere, both at registration
+        and using the client management API.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-872">CIL-872</a>: OA4MP servers will now, by default, only garbage collect tokens that they have created.
+    There is a new server configuration flag to have all expired tokens removed too.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-882">CIL-882</a>: Expired or invalid refresh tokens return an error of invalid_grant, not invalid_token.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-884">CIL-884</a>: Client Management API allows updating public clients <i>except</i> for changing a public
+    client to a confidential one -- that would require a new secret and secrets are only created at registration.
+    Therefore, you must register a new client if you need a confidential one.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-889">CIL-889</a>: Admin clients may now have a flag set that will allow them to reference QDL scripts. If this
+    is disabled (default) any configuration with a QDL block will be rejected.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-892">CIL-892</a>: Missing documentation for the client well known URI tag. This can be found
+    <a href="https://cilogon.github.io/oa4mp/client/dtd/dtd-file.html">here</a>. </li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-906">CIL-906</a>: in id tokens, the auth_time claim must be a number. It was being returned as a string.</li>
 </ul>
 
 <h2>5.0</h2>
