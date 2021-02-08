@@ -26,6 +26,7 @@ import edu.uiuc.ncsa.security.oauth_2_0.UserInfo;
 import edu.uiuc.ncsa.security.oauth_2_0.client.ATResponse2;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTUtil2;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
+import edu.uiuc.ncsa.security.servlet.ServiceClientHTTPException;
 import edu.uiuc.ncsa.security.util.cli.ConfigurableCommandsImpl;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
@@ -149,6 +150,10 @@ public class OA2CLCCommands extends CLCCommands {
     }
 
     /**
+     * What is currently from the {@link #set_uri(InputLine)}.
+     */
+     URI currentURI;
+    /**
      * Constructs the URI
      *
      * @param inputLine
@@ -183,18 +188,20 @@ public class OA2CLCCommands extends CLCCommands {
         Identifier id = AssetStoreUtil.createID();
         OA4MPResponse resp = getService().requestCert(id, requestParameters);
         DebugUtil.trace(this, "client id = " + getCe().getClientId());
+        currentURI= resp.getRedirect();
+
         dummyAsset = (OA2Asset) getCe().getAssetStore().get(id.toString());
         try {
             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
             if (clipboard != null) {
-                StringSelection data = new StringSelection(resp.getRedirect().toString());
+                StringSelection data = new StringSelection(currentURI.toString());
                 clipboard.setContents(data, data);
                 say("URL copied to clipboard:");
             }
         } catch (Throwable t) {
             // there was a problem with the clipboard. Skip it.
         }
-        say(resp.getRedirect().toString());
+        say(currentURI.toString());
     }
 
     protected String createURI(String base, HashMap<String, String> args) throws UnsupportedEncodingException {
@@ -339,6 +346,7 @@ public class OA2CLCCommands extends CLCCommands {
         dummyAsset = null;
         assetResponse = null;
         currentATResponse = null;
+        currentURI = null;
         grant = null;
         rawIdToken = null;
         claims = null;
@@ -604,6 +612,33 @@ public class OA2CLCCommands extends CLCCommands {
         return null;
 
     }
+    public void authz(InputLine inputLine) throws Exception{
+        String rawResponse = null;
+        try {
+            if (inputLine.hasArgs()) {
+                rawResponse = getService().getServiceClient().getRawResponse(inputLine.getLastArg());
+            } else {
+                if (currentURI == null) {
+                    say("sorry, you did not specify a URL and no default was found.");
+                    return;
+                } else {
+                    rawResponse = getService().getServiceClient().getRawResponse(currentURI.toString());
+                }
+
+            }
+
+        }catch(ServiceClientHTTPException t){
+            if(t.getMessage().contains("requires HTTP authentication")){
+                say("Request ok, but this requires authentication to continue");
+                return;
+            }
+        }
+        if(rawResponse == null){
+            say("(no response)");
+        }else{
+            say(rawResponse);
+        }
+    }
 
     public void tokens(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
@@ -697,6 +732,10 @@ public class OA2CLCCommands extends CLCCommands {
 
     protected void printTokens(boolean noVerify) {
         // It is possible that the service is down in which case the tokens can't be verified.
+        if(currentURI != null){
+            say("Current request URI:");
+            say(currentURI.toString());
+        }
         printToken(getDummyAsset().getAccessToken(), noVerify);
         printToken(getDummyAsset().getRefreshToken(), noVerify);
 
@@ -832,6 +871,7 @@ public class OA2CLCCommands extends CLCCommands {
     protected String USER_MESSAGE_KEY = "user_message";
     protected String ASSET_KEY = "asset";
     protected String CLAIMS_KEY = "claims";
+    protected String CURRENT_URI_KEY = "current_uri";
     protected String AUTHZ_GRANT_KEY = "authz_grant";
     protected String TOKEN_PARAMETERS_KEY = "token_parameters";
     protected String AUTHZ_PARAMETERS_KEY = "authz_parameters";
@@ -896,8 +936,10 @@ public class OA2CLCCommands extends CLCCommands {
         if (json.containsKey(CLAIMS_KEY)) {
             claims = json.getJSONObject(CLAIMS_KEY);
         }
+        if (json.containsKey(CURRENT_URI_KEY)) {
+            currentURI = URI.create(json.getString(CURRENT_URI_KEY));
+        }
         if (json.containsKey(AUTHZ_GRANT_KEY)) {
-
             grant = new AuthorizationGrantImpl(URI.create("a"));
             grant.fromJSON(json.getJSONObject(AUTHZ_GRANT_KEY));
         }
@@ -973,6 +1015,10 @@ public class OA2CLCCommands extends CLCCommands {
         if (grant != null) {
             jsonObject.put(AUTHZ_GRANT_KEY, grant.toJSON());
         }
+        if(currentURI != null){
+            jsonObject.put(CURRENT_URI_KEY, currentURI.toString());
+        }
+
         if (dummyAsset != null) {
             jsonObject.put(ASSET_KEY, dummyAsset.toJSON());
         }

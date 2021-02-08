@@ -33,12 +33,7 @@
         <td style="vertical-align: top;">7512</td>
         <td style="vertical-align: top;">The port of the service</td>
     </tr>
-    <tr>
-          <td style="vertical-align: top;">socketTimeout</td>
-          <td style="vertical-align: top;">N</td>
-          <td style="vertical-align: top;">0</td>
-          <td style="vertical-align: top;">The timeout for the connection, in ms.</td>
-      </tr>
+
     <tr>
           <td style="vertical-align: top;">serverDN</td>
           <td style="vertical-align: top;">N</td>
@@ -47,6 +42,12 @@
           <b>Note:</b> this may also be set globally for all MyProxy instances in the service tag. Note that setting this in a
           MyProxy element will over-ride the global setting. If you are looking to set the DN of the certificate for
           the client, look at the entry for the <a href="../../common/configuration/ssl.html">trust store.</a> </td>
+      </tr>
+    <tr>
+          <td style="vertical-align: top;">socketTimeout</td>
+          <td style="vertical-align: top;">N</td>
+          <td style="vertical-align: top;">0</td>
+          <td style="vertical-align: top;">The timeout for the connection, in ms.</td>
       </tr>
     </tbody>
 </table>

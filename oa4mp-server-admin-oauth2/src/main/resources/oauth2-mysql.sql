@@ -113,7 +113,7 @@ CREATE TABLE oauth2.transactions
     UNIQUE INDEX refreshToken (refresh_token(255))
 );
 
-CREATE TABLE ciloa2.tx_records
+CREATE TABLE oauth2.tx_records
 (
     token_id   VARCHAR(255) PRIMARY KEY,
     lifetime   bigint,

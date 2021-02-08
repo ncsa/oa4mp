@@ -22,7 +22,7 @@
         <td style="vertical-align: top;">Default</td>
         <td style="vertical-align: top;">Description</td>
     </tr>
-    <tr>
+    <tr id="address">
         <td style="vertical-align: top;">address</td>
         <td style="vertical-align: top;">N</td>
         <td style="vertical-align: top;">N/A</td>
@@ -34,14 +34,14 @@
             would be the external-facing address.
         </td>
     </tr>
-    <tr>
+    <tr id="accessTokenLifetime">
         <td style="vertical-align: top;">accessTokenLifetime</td>
         <td style="vertical-align: top;">N</td>
         <td style="vertical-align: top;">900</td>
         <td style="vertical-align: top;">Deprecated. Use defaultAccessTokenLifetime instead.
         </td>
     </tr>
-    <tr>
+    <tr id="authorizationGrantLifetime">
         <td style="vertical-align: top;">authorizationGrantLifetime</td>
         <td style="vertical-align: top;">N</td>
         <td style="vertical-align: top;">900</td>
@@ -53,7 +53,7 @@
             the default is quite reasonable. See note below on units.
         </td>
     </tr>
-    <tr>
+    <tr id="clientSecretLength">
         <td style="vertical-align: top;">clientSecretLength</td>
         <td style="vertical-align: top;">N</td>
         <td style="vertical-align: top;">64</td>
@@ -63,7 +63,7 @@
             the returned secret is URL safe encoded as well. The default is 64 bytes = 512 bits.
         </td>
     </tr>
-    <tr>
+    <tr id = "debug">
         <td style="vertical-align: top;">debug</td>
         <td style="vertical-align: top;">N</td>
         <td style="vertical-align: top;">"warn"</td>
@@ -74,7 +74,7 @@
             service. This may be very, very large.
         </td>
     </tr>
-    <tr>
+    <tr id="defaultAccessTokenLifetime">
         <td style="vertical-align: top;">defaultAccessTokenLifetime</td>
         <td style="vertical-align: top;">N</td>
         <td style="vertical-align: top;">900</td>
@@ -88,7 +88,7 @@
         </td>
     </tr>
 
-    <tr>
+    <tr id="disableDefaultStores">
         <td style="vertical-align: top;">disableDefaultStores</td>
         <td style="vertical-align: top;">N</td>
         <td style="vertical-align: top;">true</td>
@@ -101,14 +101,14 @@
             registrations, approvals, etc.) might end up in memory where they would vanish at service restart.
         </td>
     </tr>
-    <tr>
+    <tr id="enableTwoFactorSupport">
         <td style="vertical-align: top;">enableTwoFactorSupport</td>
         <td style="vertical-align: top;">N</td>
         <td style="vertical-align: top;">false</td>
         <td style="vertical-align: top;">Boolean value. If true, the support for two factor authentication is enabled.
         </td>
     </tr>
-    <tr>
+    <tr id="issuer">
         <td style="vertical-align: top;">issuer</td>
         <td style="vertical-align: top;">N</td>
         <td style="vertical-align: top;">(none)</td>
@@ -117,7 +117,7 @@
             client. Note that this may be overridden by an administrative client or the client itself.
         </td>
     </tr>
-    <tr>
+    <tr id="maxAccessTokenLifetime">
         <td style="vertical-align: top;">maxAccessTokenLifetime</td>
         <td style="vertical-align: top;">N</td>
         <td style="vertical-align: top;">1800</td>
@@ -128,7 +128,7 @@
             See note below on units.
         </td>
     </tr>
-    <tr>
+    <tr id="maxAllowedNewClientRequests">
         <td style="vertical-align: top;">maxAllowedNewClientRequests</td>
         <td style="vertical-align: top;">N</td>
         <td style="vertical-align: top;">unlimited</td>
@@ -139,7 +139,7 @@
             to 10 or 20 with no issue on a production system.
         </td>
     </tr>
-    <tr>
+    <tr id="maxClientRefreshTokenLifetime">
          <td style="vertical-align: top;">maxClientRefreshTokenLifetime</td>
          <td style="vertical-align: top;">N</td>
          <td style="vertical-align: top;">2592000</td>
@@ -150,7 +150,7 @@
              See note below on units.
          </td>
      </tr>
-    <tr>
+    <tr id="maxRefreshTokenLifetime">
         <td style="vertical-align: top;">maxRefreshTokenLifetime</td>
         <td style="vertical-align: top;">N</td>
         <td style="vertical-align: top;">2592000</td>
@@ -159,7 +159,7 @@
             See note below on units.
         </td>
     </tr>
-    <tr>
+    <tr id="name">
         <td style="vertical-align: top;">name</td>
         <td style="vertical-align: top;">N</td>
         <td style="vertical-align: top;">(none)</td>
@@ -167,7 +167,7 @@
             supported.
         </td>
     </tr>
-    <tr>
+    <tr id="OIDCEnabled">
         <td style="vertical-align: top;">OIDCEnabled</td>
         <td style="vertical-align: top;">N</td>
         <td style="vertical-align: top;">true</td>
@@ -178,7 +178,7 @@
             will be rejected. Note that if false, the service is OAuth 2.0 compliant, but not OIDC compliant.
         </td>
     </tr>
-    <tr>
+    <tr id="pingable">
         <td style="vertical-align: top;">pingable</td>
         <td style="vertical-align: top;">N</td>
         <td style="vertical-align: top;">true</td>
@@ -189,7 +189,7 @@
         </td>
     </tr>
 
-    <tr>
+    <tr id="pollingDirectory">
         <td style="vertical-align: top;">pollingDirectory</td>
         <td style="vertical-align: top;">N</td>
         <td style="vertical-align: top;">N/A</td>
@@ -200,7 +200,7 @@
             do not set this. Note that the CLI should use the same configuration as the server.
         </td>
     </tr>
-    <tr>
+    <tr id="pollingInterval">
         <td style="vertical-align: top;">pollingInterval</td>
         <td style="vertical-align: top;">N</td>
         <td style="vertical-align: top;">N/A</td>
@@ -208,7 +208,7 @@
             Note that this is ignored if polling is not enabled.
         </td>
     </tr>
-    <tr>
+    <tr id="refreshTokenEnabled">
         <td style="vertical-align: top;">refreshTokenEnabled</td>
         <td style="vertical-align: top;">N</td>
         <td style="vertical-align: top;">false</td>
@@ -219,14 +219,14 @@
             does not issue refresh tokens.
         </td>
     </tr>
-    <tr>
+    <tr id="refreshTokenLifetime">
         <td style="vertical-align: top;">refreshTokenLifetime</td>
         <td style="vertical-align: top;">N</td>
         <td style="vertical-align: top;">1296000</td>
         <td style="vertical-align: top;">deprecated. Use maxRefreshTokenLifetime instead.
         </td>
     </tr>
-    <tr>
+    <tr id="safe_gc">
         <td style="vertical-align: top;">safe_gc</td>
         <td style="vertical-align: top;">N</td>
         <td style="vertical-align: top;">true</td>
@@ -237,7 +237,7 @@
             in this table.
         </td>
     </tr>
-    <tr>
+    <tr id="scheme">
         <td style="vertical-align: top;">scheme</td>
         <td style="vertical-align: top;">N</td>
         <td style="vertical-align: top;">myproxy</td>
@@ -248,7 +248,7 @@
             name for the component.
         </td>
     </tr>
-    <tr>
+    <tr id="schemeSpecificPart">
         <td style="vertical-align: top;">schemeSpecificPart</td>
         <td style="vertical-align: top;">N</td>
         <td style="vertical-align: top;">oa4mp,2012</td>
@@ -256,7 +256,7 @@
             omitted then the default is used. If you wish to suppress this, set it equal to "".
         </td>
     </tr>
-    <tr>
+    <tr id="serverDN">
         <td style="vertical-align: top;">serverDN</td>
         <td style="vertical-align: top;">N</td>
         <td style="vertical-align: top;">(none)</td>
@@ -267,7 +267,7 @@
         </td>
     </tr>
 
-    <tr>
+    <tr id="version">
         <td style="vertical-align: top;">version</td>
         <td style="vertical-align: top;">N</td>
         <td style="vertical-align: top;">latest</td>
@@ -298,8 +298,8 @@ specified. So this is a perfectly acceptable snipped from a configuration file:<
 <p>Note that, in order to maintain backwards compatibility, the assumption is that all of these <i>without</i>
 units are in <b>seconds</b>. Blanks before and after units are allowed. Acceptable units are</p>
 <ul>
-    <li>"sec.", "sec", "s." or "s" for seconds</li>
-    <li>"ms.", "ms" or no units for milliseconds</li>
+    <li>"sec.", "sec", "s.", "s" or no units for seconds</li>
+    <li>"ms.", "ms" for milliseconds</li>
 </ul>
 
 <h2>Notes</h2>

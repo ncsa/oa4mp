@@ -36,17 +36,31 @@
       <span style="background-color: #ff6600;"><a href="server/configuration/signing.html">JSONWebKey</a></span>
     )*>
 &lt;!ATTLIST <a href="server-dtd-service-tag.html">service</a>
-    address CDATA #IMPLIED
-    name CDATA #IMPLIED
-    version CDATA #IMPLIED
-    maxAllowedNewClientRequests CDATA #IMPLIED
-    disableDefaultStores CDATA #IMPLIED
-    serverDN CDATA #IMPLIED
-    pingable CDATA #IMPLIED
-    <span style="background-color: #ff6600;">refreshTokenEnabled</span> CDATA #IMPLIED
-    <span style="background-color: #ff6600;">refreshTokenLifetime</span> CDATA #IMPLIED
-    <span style="background-color: #ff6600;">clientSecretLength</span> CDATA #IMPLIED
-    debug CDATA #IMPLIED&gt;
+    <a href="server-dtd-service-tag.html#address">address</a> CDATA #IMPLIED
+    <a href="server-dtd-service-tag.html#accessTokenLifetime">accessTokenLifetime</a>
+    <a href="server-dtd-service-tag.html#authorizationGrantLifetime">authorizationGrantLifetime</a>
+    <span style="background-color: #ff6600;"><a href="server-dtd-service-tag.html#clientSecretLength">clientSecretLength</a></span> CDATA #IMPLIED
+    <a href="server-dtd-service-tag.html#debug">debug</a> CDATA #IMPLIED
+    <a href="server-dtd-service-tag.html#defaultAccessTokenLifetime">defaultAccessTokenLifetime</a> CDATA #IMPLIED
+    <a href="server-dtd-service-tag.html#disableDefaultStores">disableDefaultStores</a> CDATA #IMPLIED
+    <a href="server-dtd-service-tag.html#enableTwoFactorSupport">enableTwoFactorSupport</a> CDATA #IMPLIED
+    <a href="server-dtd-service-tag.html#issuer">issuer</a> CDATA #IMPLIED
+    <a href="server-dtd-service-tag.html#maxAccessTokenLifetime">maxAccessTokenLifetime</a> CDATA #IMPLIED
+    <a href="server-dtd-service-tag.html#maxAllowedNewClientRequests">maxAllowedNewClientRequests</a> CDATA #IMPLIED
+    <a href="server-dtd-service-tag.html#maxClientRefreshTokenLifetime">maxClientRefreshTokenLifetime</a> CDATA #IMPLIED
+    <a href="server-dtd-service-tag.html#maxRefreshTokenLifetime">maxRefreshTokenLifetime</a> CDATA #IMPLIED
+    <a href="server-dtd-service-tag.html#name">name</a> CDATA #IMPLIED
+    <a href="server-dtd-service-tag.html#OIDCEnabled">OIDCEnabled</a> CDATA #IMPLIED
+    <a href="server-dtd-service-tag.html#pingable">pingable</a> CDATA #IMPLIED
+    <a href="server-dtd-service-tag.html#pollingDirectory">pollingDirectory</a> CDATA #IMPLIED
+    <a href="server-dtd-service-tag.html#pollingInterval">pollingInterval</a> CDATA #IMPLIED
+    <span style="background-color: #ff6600;"><a href="server-dtd-service-tag.html#refreshTokenEnabled">refreshTokenEnabled</a></span> CDATA #IMPLIED
+    <span style="background-color: #ff6600;"><a href="server-dtd-service-tag.html#refreshTokenLifetime">refreshTokenLifetime</a></span> CDATA #IMPLIED
+    <a href="server-dtd-service-tag.html#safe_gc">safe_gc</a> CDATA #IMPLIED
+    <a href="server-dtd-service-tag.html#scheme">scheme</a> CDATA #IMPLIED
+    <a href="server-dtd-service-tag.html#schemeSpecificPart">schemeSpecificPart</a> CDATA #IMPLIED
+    <a href="server-dtd-service-tag.html#serverDN">serverDN</a> CDATA #IMPLIED
+    <a href="server-dtd-service-tag.html#version">version</a> CDATA #IMPLIED&gt;
 &lt;!ELEMENT <a href="../configuration/server-messages.html">messages (retryMessage)</a>*&gt;
 &lt;!ELEMENT <a href="../configuration/server-messages.html">retryMessage (#PCDATA)</a>&gt;
 &lt;!ELEMENT <a href="../configuration/server-myproxy.html">myproxy</a> (<a href="../../common/configuration/keystore.html">keystore</a>|
