@@ -38,28 +38,58 @@ public abstract class AbstractAccessTokenServlet extends MyProxyDelegationServle
 
     protected IssuerTransactionState doDelegation(Client client, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Throwable, ServletException {
         info("5.a. Starting access token exchange");
-        Verifier v = getServiceEnvironment().getTokenForge().getVerifier(httpServletRequest);
         AuthorizationGrant ag = getServiceEnvironment().getTokenForge().getAuthorizationGrant(httpServletRequest);
         AuthorizationGrant updatedAG  = checkAGExpiration(ag);
         ServiceTransaction transaction = getTransaction(ag, httpServletRequest);
+        return getIssuerTransactionState(httpServletRequest, httpServletResponse,  updatedAG, transaction);
+    }
+
+    /**
+     * Default for standard token endpoint call.
+     * @param httpServletRequest
+     * @param httpServletResponse
+     * @param updatedAG
+     * @param transaction
+     * @return
+     * @throws Throwable
+     */
+    protected IssuerTransactionState getIssuerTransactionState(HttpServletRequest httpServletRequest,
+                                                             HttpServletResponse httpServletResponse,
+                                                             AuthorizationGrant updatedAG,
+                                                             ServiceTransaction transaction) throws Throwable {
+         return getIssuerTransactionState(
+                 httpServletRequest,
+                 httpServletResponse,
+                 updatedAG,
+                 transaction,
+                 false);
+    }
+    protected IssuerTransactionState getIssuerTransactionState(HttpServletRequest httpServletRequest,
+                                                             HttpServletResponse httpServletResponse,
+                                                             AuthorizationGrant updatedAG,
+                                                             ServiceTransaction transaction,
+                                                               boolean isRFC8628) throws Throwable {
+
+
         if(updatedAG != null){
             // This allows for maintaining version 4.x to 5.x token compatibility
             transaction.setAuthorizationGrant(updatedAG);
         }
         ATRequest atRequest = getATRequest(httpServletRequest, transaction);
 
-        atRequest.setVerifier(v);
-        atRequest.setAuthorizationGrant(ag);
-        //   atRequest.setExpiresIn(DateUtils.MAX_TIMEOUT); // FIXME!! make this configurable??
+        Verifier v = getServiceEnvironment().getTokenForge().getVerifier(httpServletRequest);
+        atRequest.setVerifier(v); // can be null
+        atRequest.setAuthorizationGrant(updatedAG);
         ATResponse atResp = (ATResponse) getATI().process(atRequest);
-
-        transaction = verifyAndGet(atResp);
+        if(!isRFC8628) {
+            transaction = verifyAndGet(atResp);
+        }
         String cc = "client=" + transaction.getClient();
         info("5.a. got access token " + cc);
 
         preprocess(new TransactionState(httpServletRequest, httpServletResponse, atResp.getParameters(), transaction));
 
-        debug("5.a. access token = " + atResp.getAccessToken() + " for verifier = " + v);
+        debug("5.a. access token = " + atResp.getAccessToken() + (v!=null?(" for verifier = " + v):""));
         transaction.setAuthGrantValid(false);
         transaction.setAccessToken(atResp.getAccessToken());
         transaction.setAccessTokenValid(true);
@@ -78,6 +108,7 @@ public abstract class AbstractAccessTokenServlet extends MyProxyDelegationServle
                 atResp.getParameters(),
                 transaction,
                 atResp);
+        transactionState.setRfc8628(isRFC8628);
         postprocess(transactionState);
         return transactionState;
     }

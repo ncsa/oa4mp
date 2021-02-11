@@ -22,6 +22,7 @@ public class OA2DiscoveryServlet extends DiscoveryServlet {
     public static final String TOKEN_ENDPOINT = "token_endpoint";
     public static final String USERINFO_ENDPOINT = "userinfo_endpoint";
     public static final String ISSUER = "issuer";
+    public static final String DEVICE_AUTHORIZATION_ENDPOINT = "device_authorization";
 
     @Override
     protected void doIt(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Throwable {
@@ -69,6 +70,10 @@ public class OA2DiscoveryServlet extends DiscoveryServlet {
         json.put(ISSUER, getIssuer(request));
         json.put(TOKEN_ENDPOINT, requestURI + "/token");
         json.put(USERINFO_ENDPOINT, requestURI + "/userinfo");
+        if(oa2SE.isRfc8628Enabled()){
+            json.put(DEVICE_AUTHORIZATION_ENDPOINT, requestURI + "/device_authorization");
+        }
+
         json.put("token_endpoint_auth_methods_supported", null);
 
         JSONArray tokenEndpointAuthSupported = new JSONArray();
@@ -90,6 +95,14 @@ public class OA2DiscoveryServlet extends DiscoveryServlet {
         responseTypes.add("token");
         responseTypes.add("id_token");
         json.put("response_types_supported", responseTypes);
+
+        JSONArray grantTypes = new JSONArray();
+        grantTypes.add("web");
+        if(oa2SE.isRfc8628Enabled()){
+            grantTypes.add(RFC8628Constants2.GRANT_TYPE_DEVICE_CODE);
+        }
+        json.put("grant_types_supported", grantTypes);
+
         JSONArray claimsSupported = new JSONArray();
         if (oa2SE.getClaimSource() != null) {
             claimsSupported.addAll(oa2SE.getClaimSource().getClaims());

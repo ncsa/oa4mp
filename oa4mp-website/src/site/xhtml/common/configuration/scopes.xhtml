@@ -12,9 +12,10 @@
 <!--#include virtual="../../header.html" -->
 <h2>Scopes</h2>
 
-<p>Scope of this document: for client and server, <span style="background-color: #ff6600;">OAuth 2/OIDC</span> only.</p>
+<p>Scope of this document: for clients <span style="background-color: #ff6600;">OAuth 2/OIDC</span> only.</p>
 
-<p>OAuth 2 supports custom scopes for servers. The top-level tag is the <code>scopes</code>
+<p>As of OAuth 2 , OA4MP supports the scope parameter for servers. In the client configuration, you may set
+    which scopes are requested as follows. The top-level tag is the <code>scopes</code>
 tag and that in turn contains <code>scope</code> tags. These scope tags contain a single scope and
     support a single attribute:
 </p>
@@ -49,43 +50,21 @@ tag and that in turn contains <code>scope</code> tags. These scope tags contain 
     </li>
 </ul>
 <p>
-    The default behavior is that all basic scopes are used. Any other scopes that are specified are added to the
-    list. On the client, this means that these will be requested. On the server, this means that if requested,
-    they will be processed. Specifying a scope on the client that is unknown to a server will make the request
-    fail.
+    The default behavior is that no scopes are requested unless explicitly in the list.
+    Any other scopes that are specified are added to the
+    list.  Specifying a scope on the client that is unknown to a server will make the request
+    fail, unless the client has special permission (e.g. it supports sciTokens or WLCG access tokens
+    and needs to pass in scopes for those too).
 </p>
 <p>
     Sometimes, it is necessary to disable a scope. For instance, a specialized instance that only issues certificates
     against a refresh token should never return any user information. This is the purpose of the enabled flag. Here
     would be how to effect that.
 </p>
+<h3>Final caveat</h3>
 
-<pre>
-&lt;service name="default" address="https://myservice.org:8443/oauth"&gt;
-   &lt;scopes&gt;
-       &lt;scope enabled="false"&gt;profile&lt;/scope&gt;
-       &lt;scope enabled="false"&gt;email&lt;/scope&gt;
-   &lt;/scopes&gt;
-    &lt;!-- other stuff.. --&gt;
-&lt;/service&gt;
-</pre>
-
-Attempts by a client to request the profile scope would be rejected. Since the getcert scope is not specified, it is
-enabled (you could also simply specify explicitly) so this server will return certificates but only the sub claim (since
-that is required by the openid scope, which is manadatory for OA4MP since it is OIDC compliant.)
-
-<h2>A Server Example</h2>
-
-<pre>
-&lt;service name="default" address="https://myservice.org:8443/oauth"&gt;
-   &lt;scopes&gt;
-       &lt;scope&gt;custom.scope&lt;/scope&gt;
-   &lt;/scopes&gt;
-    &lt;!-- other stuff.. --&gt;
-&lt;/service&gt;
-</pre>
-<p>This informs the server that the scope with tag "custom.scope" should be passed through to whatever custom handler
-has been specified. If this were not configured, the server would reject any request with this scope.</p>
+<p>The standard OA4MP client sends along only the scope parameter in the initial request. The token and token exchange
+endpoints do allows for other scope parameters to be sent, but that is not supported in the most basic client.</p>
 
 <h2>A Client Example</h2>
 <pre>

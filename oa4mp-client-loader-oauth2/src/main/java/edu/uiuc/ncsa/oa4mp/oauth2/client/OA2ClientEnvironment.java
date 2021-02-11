@@ -38,7 +38,8 @@ public class OA2ClientEnvironment extends ClientEnvironment {
                                 String successPagePath,
                                 boolean oidcEnabled,
                                 boolean showIDToken,
-                                boolean useBasicAuth) {
+                                boolean useBasicAuth,
+                                URI deviceAuthorizationUri ) {
         super(accessTokenUri,
                 authorizationUri,
                 callback,
@@ -54,6 +55,7 @@ public class OA2ClientEnvironment extends ClientEnvironment {
         this.oidcEnabled = oidcEnabled;
         this.showIDToken = showIDToken;
         this.useBasicAuth = useBasicAuth;
+        this.deviceAuthorizationUri =  deviceAuthorizationUri;
     }
 
     public OA2ClientEnvironment(MyLoggingFacade logger, Map<String, String> constants,
@@ -83,7 +85,8 @@ public class OA2ClientEnvironment extends ClientEnvironment {
                                 boolean oidcEnabled,
                                 boolean showIDToken,
                                 boolean useBasicAuth,
-                                Map<String,List<String>> additionalParameters) {
+                                Map<String,List<String>> additionalParameters,
+                                URI deviceAuthorizationUri) {
         super(logger,
                 constants,
                 accessTokenUri,
@@ -116,7 +119,18 @@ public class OA2ClientEnvironment extends ClientEnvironment {
         this.showIDToken = showIDToken;
         this.useBasicAuth = useBasicAuth;
         this.additionalParameters = additionalParameters;
+        this.deviceAuthorizationUri = deviceAuthorizationUri;
     }
+
+    public URI getDeviceAuthorizationUri() {
+        return deviceAuthorizationUri;
+    }
+
+    public void setDeviceAuthorizationUri(URI deviceAuthorizationUri) {
+        this.deviceAuthorizationUri = deviceAuthorizationUri;
+    }
+
+    URI deviceAuthorizationUri;
 
     public Map<String, List<String>> getAdditionalParameters() {
         return additionalParameters;

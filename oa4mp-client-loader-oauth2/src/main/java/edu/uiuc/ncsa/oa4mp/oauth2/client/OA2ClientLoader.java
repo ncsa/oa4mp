@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.client.ClientEnvironment.CALLBACK_URI_KEY;
+import static edu.uiuc.ncsa.myproxy.oa4mp.client.ClientXMLTags.DEVICE_AUTHORIZATION_URI;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -107,7 +108,8 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
                     isOIDCEnabled(),
                     isShowIDToken(),
                     isUseBasicAuth(),
-                    getAdditionalParameters()
+                    getAdditionalParameters(),
+                    getDeviceAuthorizationURI()
             );
         } catch (Throwable e) {
             throw new GeneralException("Unable to create client environment", e);
@@ -309,6 +311,9 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
 
     protected URI getUIURI() {
         return createServiceURI(getCfgValue(ClientXMLTags.USER_INFO_URI), getCfgValue(ClientXMLTags.BASE_URI), USER_INFO_ENDPOINT);
+    }
+    protected URI getDeviceAuthorizationURI() {
+        return createServiceURI(getCfgValue(DEVICE_AUTHORIZATION_URI), getCfgValue(ClientXMLTags.BASE_URI), DEVICE_AUTHORIZATION_URI);
     }
 
     protected URI getAuthzURI() {

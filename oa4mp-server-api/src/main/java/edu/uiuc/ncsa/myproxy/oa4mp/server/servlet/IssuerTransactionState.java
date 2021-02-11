@@ -31,4 +31,5 @@ public class IssuerTransactionState extends TransactionState {
     public void setIssuerResponse(IssuerResponse issuerResponse) {
         this.issuerResponse = issuerResponse;
     }
+
 }

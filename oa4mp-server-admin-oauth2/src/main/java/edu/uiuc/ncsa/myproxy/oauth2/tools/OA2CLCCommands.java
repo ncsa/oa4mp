@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.client.ClientEnvironment;
 import edu.uiuc.ncsa.myproxy.oa4mp.client.OA4MPResponse;
 import edu.uiuc.ncsa.myproxy.oa4mp.client.storage.AssetStoreUtil;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2ConfigurationLoader;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8628Constants2;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.testing.CLCCommands;
 import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2Asset;
 import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2ClientEnvironment;
@@ -56,6 +57,7 @@ import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.ID_TOKEN;
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.RAW_ID_TOKEN;
 import static edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTUtil2.PAYLOAD_INDEX;
+import static edu.uiuc.ncsa.security.oauth_2_0.server.RFC8628Constants.*;
 
 /**
  * A command line client. Invoke help as needed, but the basic operation is to create the initial
@@ -68,6 +70,9 @@ import static edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTUtil2.PAYLOAD_INDEX;
  * on 5/11/16 at  2:57 PM
  */
 public class OA2CLCCommands extends CLCCommands {
+
+    public static final String IS_RFC_8628_KEY = "is_rfc8628";
+
     public OA2CLCCommands(MyLoggingFacade logger,
                           OA2CommandLineClient oa2CommandLineClient) throws Exception {
         super(logger, null);
@@ -149,10 +154,58 @@ public class OA2CLCCommands extends CLCCommands {
         service = null;
     }
 
+    boolean isDeviceFlow = false;
+    String deviceFlowCallback;
+
+    public void df(InputLine inputLine) throws Exception {
+        if (showHelp(inputLine)) {
+            say("df - initiate the device flow for this client");
+            say("You will need to use a borser and the returned user code to authenticate. Then");
+            say("you can get that access token with the get_at command. This client does not" );
+            say("do polling");
+            say("See also: get_at");
+            return;
+        }
+        // set up for the next round
+        clear(inputLine, false);
+        if (getCe() == null) {
+            say("sorry, but you have no loaded a configuration yet.");
+            return;
+        }
+        dummyAsset = (OA2Asset) getCe().getAssetStore().create();
+        
+        OA2ClientEnvironment oa2ce = (OA2ClientEnvironment) getCe();
+        String requestString = oa2ce.getDeviceAuthorizationUri().toString();
+        requestString = requestString + "?" + OA2Constants.CLIENT_ID + "=" + oa2ce.getClientId();
+        String rawResponse = getService().getServiceClient().getRawResponse(requestString,
+                oa2ce.getClient().getIdentifierString(),
+                oa2ce.getClient().getSecret());
+        try {
+            JSONObject resp = JSONObject.fromObject(rawResponse);
+            deviceFlowCallback = resp.getString(RFC8628Constants2.VERIFICATION_URI);
+            say("please go to :" + deviceFlowCallback);
+            userCode = resp.getString(RFC8628Constants2.USER_CODE);
+            deviceCode = resp.getString(DEVICE_CODE);
+            say("user code: " + userCode);
+            say("code valid for " + resp.getLong(RFC8628Constants2.EXPIRES_IN) + " sec.");
+            copyToClipboard(userCode, "user code copied to clipboard");
+            isDeviceFlow = true;
+            grant = new AuthorizationGrantImpl(URI.create(resp.getString(RFC8628Constants2.DEVICE_CODE)));
+        } catch (Throwable t) {
+            say("sorry but the response from the service was not understood:" + rawResponse);
+            if (DebugUtil.isEnabled()) {
+                t.printStackTrace(); // in case /trace on
+            }
+        }
+    }
+
+    String userCode;
+    String deviceCode;
     /**
      * What is currently from the {@link #set_uri(InputLine)}.
      */
-     URI currentURI;
+    URI currentURI;
+
     /**
      * Constructs the URI
      *
@@ -188,20 +241,24 @@ public class OA2CLCCommands extends CLCCommands {
         Identifier id = AssetStoreUtil.createID();
         OA4MPResponse resp = getService().requestCert(id, requestParameters);
         DebugUtil.trace(this, "client id = " + getCe().getClientId());
-        currentURI= resp.getRedirect();
+        currentURI = resp.getRedirect();
 
         dummyAsset = (OA2Asset) getCe().getAssetStore().get(id.toString());
+        copyToClipboard(currentURI.toString(), "URL copied to clipboard:");
+        say(currentURI.toString());
+    }
+
+    protected void copyToClipboard(String target, String s) {
         try {
             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
             if (clipboard != null) {
-                StringSelection data = new StringSelection(currentURI.toString());
+                StringSelection data = new StringSelection(target);
                 clipboard.setContents(data, data);
-                say("URL copied to clipboard:");
+                say(s);
             }
         } catch (Throwable t) {
             // there was a problem with the clipboard. Skip it.
         }
-        say(currentURI.toString());
     }
 
     protected String createURI(String base, HashMap<String, String> args) throws UnsupportedEncodingException {
@@ -245,16 +302,7 @@ public class OA2CLCCommands extends CLCCommands {
             if (grant != null) {
                 // already have a grant. Show it and copy it to the clipboard
                 say("grant=" + grant.getToken());
-                try {
-                    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                    if (clipboard != null) {
-                        StringSelection data = new StringSelection(grant.getToken());
-                        clipboard.setContents(data, data);
-                        say("grant copied to clipboard.");
-                    }
-                } catch (Throwable t) {
-                    // there was a problem with the clipboard.
-                }
+                copyToClipboard(grant.getToken(), "grant copied to clipboard");
                 return;
             }
             // no arg. get it from the clipboard
@@ -304,16 +352,7 @@ public class OA2CLCCommands extends CLCCommands {
                 URI uri = URI.create(decode(current.substring(5)));
                 gotGrant = true;
                 grant = new AuthorizationGrantImpl(uri);
-                try {
-                    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                    if (clipboard != null) {
-                        StringSelection data = new StringSelection(uri.toString());
-                        clipboard.setContents(data, data);
-                        say("grant copied to clipboard.");
-                    }
-                } catch (Throwable t) {
-                    // no clipboard
-                }
+                copyToClipboard(uri.toString(), "grant copied to clipboard.");
             }
         }
         if (gotError) {
@@ -360,7 +399,10 @@ public class OA2CLCCommands extends CLCCommands {
             tokenParameters = new HashMap<>();
             exchangeParameters = new HashMap<>();
         }
-
+        isDeviceFlow = false;
+        userCode = null;
+        deviceFlowCallback = null;
+        deviceCode = null;
     }
 
     public static String CLEAR_PARAMETERS_FLAG = "-clear_params";
@@ -507,7 +549,29 @@ public class OA2CLCCommands extends CLCCommands {
             return;
         }
         DebugUtil.trace(this, "Getting AT, grant=" + grant);
+        if (!isDeviceFlow) {
+            standard_get_at(inputLine);
+        } else {
+            df_get_at(inputLine);
+        }
+
+    }
+
+    private void df_get_at(InputLine inputLine) {
+        if (isDeviceFlow) {
+            currentATResponse = getService().rfc8628Request(dummyAsset, deviceCode, tokenParameters);
+            processATResponse(inputLine);
+        } else {
+            say("sorry, but there is no device flow active");
+        }
+    }
+
+    private void standard_get_at(InputLine inputLine) {
         currentATResponse = getOA2S().getAccessToken(getDummyAsset(), grant, tokenParameters);
+        processATResponse(inputLine);
+    }
+
+    private void processATResponse(InputLine inputLine) {
         if (getDummyAsset().getAccessToken().isOldVersion() && getDummyAsset().getAccessToken().getLifetime() < 0) {
             getDummyAsset().getAccessToken().setLifetime(OA2ConfigurationLoader.ACCESS_TOKEN_LIFETIME_DEFAULT);
         }
@@ -530,7 +594,6 @@ public class OA2CLCCommands extends CLCCommands {
             }
         }
         printTokens(inputLine.hasArg(NO_VERIFY_JWT));
-
     }
 
     ATResponse2 currentATResponse;
@@ -612,7 +675,8 @@ public class OA2CLCCommands extends CLCCommands {
         return null;
 
     }
-    public void authz(InputLine inputLine) throws Exception{
+
+    public void authz(InputLine inputLine) throws Exception {
         String rawResponse = null;
         try {
             if (inputLine.hasArgs()) {
@@ -627,15 +691,15 @@ public class OA2CLCCommands extends CLCCommands {
 
             }
 
-        }catch(ServiceClientHTTPException t){
-            if(t.getMessage().contains("requires HTTP authentication")){
+        } catch (ServiceClientHTTPException t) {
+            if (t.getMessage().contains("requires HTTP authentication")) {
                 say("Request ok, but this requires authentication to continue");
                 return;
             }
         }
-        if(rawResponse == null){
+        if (rawResponse == null) {
             say("(no response)");
-        }else{
+        } else {
             say(rawResponse);
         }
     }
@@ -732,7 +796,7 @@ public class OA2CLCCommands extends CLCCommands {
 
     protected void printTokens(boolean noVerify) {
         // It is possible that the service is down in which case the tokens can't be verified.
-        if(currentURI != null){
+        if (currentURI != null) {
             say("Current request URI:");
             say(currentURI.toString());
         }
@@ -970,11 +1034,24 @@ public class OA2CLCCommands extends CLCCommands {
             }
         }
 
+        // RFC 8628 attributes
+        isDeviceFlow = json.getBoolean(IS_RFC_8628_KEY);
+        if(json.containsKey(USER_CODE)){
+            userCode = json.getString(USER_CODE);
+        }
+        if(json.containsKey(DEVICE_CODE)){
+            deviceCode = json.getString(DEVICE_CODE);
+        }
+        if(json.containsKey(VERIFICATION_URI)){
+            deviceFlowCallback = json.getString(VERIFICATION_URI);
+        }
+        // End RFC 8628 attributes
+
         dummyAsset = new OA2Asset(null);
         if (json.containsKey(ASSET_KEY)) {
             dummyAsset.fromJSON(json.getJSONObject(ASSET_KEY));
         } else {
-            say("warning -- no stored asset found, so no state was saved.");
+            //say("warning -- no stored asset found.");
         }
         say("done!");
     }
@@ -1015,7 +1092,7 @@ public class OA2CLCCommands extends CLCCommands {
         if (grant != null) {
             jsonObject.put(AUTHZ_GRANT_KEY, grant.toJSON());
         }
-        if(currentURI != null){
+        if (currentURI != null) {
             jsonObject.put(CURRENT_URI_KEY, currentURI.toString());
         }
 
@@ -1068,6 +1145,19 @@ public class OA2CLCCommands extends CLCCommands {
             }
             jsonObject.put(AT_RESPONSE_KEY, atr);
         }
+        // RFC8628 attributes
+        jsonObject.put(IS_RFC_8628_KEY, isDeviceFlow);
+        if(!isTrivial(deviceCode)) {
+            jsonObject.put(DEVICE_CODE, deviceCode);
+        }
+        if(!isTrivial(userCode)){
+            jsonObject.put(USER_CODE, userCode);
+        }
+        if(!isTrivial(deviceFlowCallback)){
+            jsonObject.put(VERIFICATION_URI, deviceFlowCallback);
+        }
+        // End RFC8628 attributes
+
         FileWriter fileWriter = new FileWriter(saveFile);
         fileWriter.write(jsonObject.toString(1));
         fileWriter.flush();

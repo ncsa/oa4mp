@@ -57,11 +57,12 @@ be limited in their lifetime -- you very probably do not want an access token wi
 (the server default is 900 sec or 15 minutes). Refresh tokens are used to get access tokens and can
 have a much longer lifetime, in the order of weeks or months. Typically you stash the refresh token
 until you need an access token, then get an access token.</p>
-<p>OIDC server allow for an id token with various bits of user information in it. These are signed JWTs
+<p>OIDC servers allow for an id token with various bits of user information in it. These are signed JWTs
    (JSON Web Token) and include both the access token and refresh token.
    The actual use of one is showing that the user successfully authenticated to the
    service. A common (and poor use) of them though is as a "poor man's" access token, because, as per the spec.,
-   the lifetime of the id token is the same as the lifetime of the access token. This cannot be condemned
+   the lifetime of the id token is the same as the lifetime of the access token, and the id token can be verified
+    against the issuing server, so its contents can be trusted. This cannot be condemned
    enough and you should not do it. There are formats of access tokens that are designed to be
    self-describing, such as SciTokens or WLCG tokens (both supported in OA4MP) so please use one of these
    instead.</p>
@@ -107,10 +108,10 @@ and how to do it. Again, server maxima are always enforced no matter what the va
 <h1>How do these all relate?</h1>
 <p>The steps are</p>
 <ol>
-    <li>The maximum allowed lifetime is computed. This is the minumum of the server maximum and
-    the lifetime in the client configuration.</li>
-    <li>Token configurations are checked for lifetimes. If present, the minumum of this and the
-    computed maximum is taken. This is referred to as the <i>computed lifetime</i></li>
+    <li>The maximum allowed lifetime is taken from the server configuration. </li>
+    <li>The  lifetime is taken from the client configuration. This is the initial value of the <i>computed lifetime</i>.</li>
+    <li>Token configurations are checked for lifetimes. If present, the minimum of this
+        and computed lifetime is taken.</li>
     <li>Requested values are checked. If there was an explicit request for a lifetime, the
     minimum of that and the computed lifetime is taken.</li>
     <li>Scripts <i>may</i> determine lifetimes independent of the computed lifetime and set this. We stress

@@ -102,7 +102,9 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
     public static long ACCESS_TOKEN_LIFETIME_DEFAULT = 15 * 60 * 1000L; // 15 minutes
     public static long MAX_ACCESS_TOKEN_LIFETIME_DEFAULT = 2 * ACCESS_TOKEN_LIFETIME_DEFAULT; // 30 minutes
     public static long AUTHORIZATION_GRANT_LIFETIME_DEFAULT = 15 * 60 * 1000L; // 15 minutes
-    public static int CLIENT_SECRET_LENGTH_DEFAULT = 258; //This is divisible by 3 and greater than 256, so when it is base64 encoded there will be no extra characters.
+    //This is divisible by 3 and greater than 256,
+    // so when it is base64 encoded there will be no extra characters:
+    public static int CLIENT_SECRET_LENGTH_DEFAULT = 258;
 
     public OA2ConfigurationLoader(ConfigurationNode node) {
         super(node);
@@ -148,7 +150,6 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     getMaxClientRefreshTokenLifetime(),
                     getJSONWebKeys(),
                     getIssuer(),
-                    // getMLDAP(),
                     isUtilServerEnabled(),
                     isOIDCEnabled(),
                     getMultiJSONStoreProvider(),
@@ -156,7 +157,8 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     getQDLEnvironment(),
                     isRFC8693Enabled(),
                     isQdlStrictACLS(),
-                    isSafeGC());
+                    isSafeGC(),
+                    isRFC8628Enabled());
 
             if (getClaimSource() instanceof BasicClaimsSourceImpl) {
                 ((BasicClaimsSourceImpl) getClaimSource()).setOa2SE((OA2SE) se);
@@ -248,7 +250,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
             try {
                 rfc8693Enabled = Boolean.parseBoolean(getFirstAttribute(cn, OA4MPConfigTags.ENABLE_RFC8693_SUPPORT));
             } catch (Throwable t) {
-                // use default which is to disabled. We let this be null to trigger pulling the value, if any, out of the
+                // use default which is to enable. We let this be null to trigger pulling the value, if any, out of the
                 // the configuration
                 rfc8693Enabled = Boolean.TRUE;
             }
@@ -257,6 +259,21 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         return rfc8693Enabled;
     }
 
+    Boolean rfc8628Enabled = null;
+
+    protected Boolean isRFC8628Enabled() {
+        if (rfc8628Enabled == null) {
+            try {
+                rfc8628Enabled = Boolean.parseBoolean(getFirstAttribute(cn, OA4MPConfigTags.ENABLE_RFC8693_SUPPORT));
+            } catch (Throwable t) {
+                // use default which is to disabled. We let this be null to trigger pulling the value, if any, out of the
+                // the configuration
+                rfc8628Enabled = Boolean.FALSE;
+            }
+            DebugUtil.trace(this, "RFC 8628 support enabled? " + rfc8693Enabled);
+        }
+        return rfc8628Enabled;
+    }
 
     protected CMConfigs createDefaultCMConfig() {
         CMConfigs cmConfigs = new CMConfigs();

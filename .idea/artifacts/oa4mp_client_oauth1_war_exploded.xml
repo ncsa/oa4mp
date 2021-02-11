@@ -14,18 +14,18 @@
           <element id="module-output" name="oa4mp-client-oauth1" />
         </element>
         <element id="directory" name="lib">
-          <element id="library" level="project" name="Maven: edu.uiuc.ncsa.security.delegation:ncsa-security-delegation-server:5.1.0" />
-          <element id="library" level="project" name="Maven: edu.uiuc.ncsa.security.delegation:ncsa-security-delegation-common:5.1.0" />
-          <element id="library" level="project" name="Maven: edu.uiuc.ncsa.security:ncsa-security-core:5.1.0" />
-          <element id="archive" name="oa4mp-client-api-5.1.0.jar">
+          <element id="library" level="project" name="Maven: edu.uiuc.ncsa.security.delegation:ncsa-security-delegation-server:5.1-SNAPSHOT" />
+          <element id="library" level="project" name="Maven: edu.uiuc.ncsa.security.delegation:ncsa-security-delegation-common:5.1-SNAPSHOT" />
+          <element id="library" level="project" name="Maven: edu.uiuc.ncsa.security:ncsa-security-core:5.1-SNAPSHOT" />
+          <element id="archive" name="oa4mp-client-api-5.1-SNAPSHOT.jar">
             <element id="module-output" name="oa4mp-client-api" />
           </element>
-          <element id="library" level="project" name="Maven: edu.uiuc.ncsa.security.delegation:ncsa-security-delegation-client:5.1.0" />
-          <element id="archive" name="oa4mp-client-loader-oauth1-5.1.0.jar">
+          <element id="library" level="project" name="Maven: edu.uiuc.ncsa.security.delegation:ncsa-security-delegation-client:5.1-SNAPSHOT" />
+          <element id="archive" name="oa4mp-client-loader-oauth1-5.1-SNAPSHOT.jar">
             <element id="module-output" name="oa4mp-client-loader-oauth1" />
           </element>
-          <element id="library" level="project" name="Maven: edu.uiuc.ncsa.security:ncsa-security-util:5.1.0" />
-          <element id="library" level="project" name="Maven: edu.uiuc.ncsa.security:ncsa-security-storage:5.1.0" />
+          <element id="library" level="project" name="Maven: edu.uiuc.ncsa.security:ncsa-security-util:5.1-SNAPSHOT" />
+          <element id="library" level="project" name="Maven: edu.uiuc.ncsa.security:ncsa-security-storage:5.1-SNAPSHOT" />
           <element id="library" level="project" name="Maven: net.sf.json-lib:json-lib:jdk15:2.4" />
           <element id="library" level="project" name="Maven: commons-lang:commons-lang:2.5" />
           <element id="library" level="project" name="Maven: commons-logging:commons-logging:1.1.1" />
@@ -47,11 +47,11 @@
           <element id="library" level="project" name="Maven: org.abego.treelayout:org.abego.treelayout.core:1.0.3" />
           <element id="library" level="project" name="Maven: org.glassfish:javax.json:1.0.4" />
           <element id="library" level="project" name="Maven: com.ibm.icu:icu4j:61.1" />
-          <element id="library" level="project" name="Maven: edu.uiuc.ncsa.security:ncsa-security-servlet:5.1.0" />
-          <element id="archive" name="myproxy-logon-5.1.0.jar">
+          <element id="library" level="project" name="Maven: edu.uiuc.ncsa.security:ncsa-security-servlet:5.1-SNAPSHOT" />
+          <element id="archive" name="myproxy-logon-5.1-SNAPSHOT.jar">
             <element id="module-output" name="myproxy-logon" />
           </element>
-          <element id="library" level="project" name="Maven: edu.uiuc.ncsa.security.delegation:ncsa-security-oauth-1.0a:5.1.0" />
+          <element id="library" level="project" name="Maven: edu.uiuc.ncsa.security.delegation:ncsa-security-oauth-1.0a:5.1-SNAPSHOT" />
           <element id="library" level="project" name="Maven: net.oauth.core:oauth-httpclient4:20090617" />
           <element id="library" level="project" name="Maven: net.oauth.core:oauth:20100527" />
           <element id="library" level="project" name="Maven: net.oauth.core:oauth-consumer:20100527" />

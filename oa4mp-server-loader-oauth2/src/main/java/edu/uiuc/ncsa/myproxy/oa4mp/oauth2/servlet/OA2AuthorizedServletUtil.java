@@ -68,9 +68,9 @@ public class OA2AuthorizedServletUtil {
         OA2Client client;
         try {
             client = (OA2Client) servlet.getClient(req);
-        }catch (UnknownClientException ukc){
+        } catch (UnknownClientException ukc) {
             throw new OA2GeneralError(OA2Errors.UNAUTHORIZED_CLIENT
-                    ,"unknown client",
+                    , "unknown client",
                     HttpStatus.SC_BAD_REQUEST, null);
         }
         OA2SE oa2se = (OA2SE) getServiceEnvironment();
@@ -218,7 +218,7 @@ public class OA2AuthorizedServletUtil {
 
         if (!httpServletRequest.getParameter(RESPONSE_TYPE).equals(RESPONSE_TYPE_CODE)) {
             throw new OA2GeneralError(OA2Errors.UNSUPPORTED_RESPONSE_TYPE,
-                    "The given "+ RESPONSE_TYPE + " is not supported.",
+                    "The given " + RESPONSE_TYPE + " is not supported.",
                     HttpStatus.SC_BAD_REQUEST,
                     requestState);
         }
@@ -421,89 +421,6 @@ public class OA2AuthorizedServletUtil {
         return new OA2ServiceTransaction(grant);
     }
 
-    /**
-     * This method will take the scopes that the client sends in its request and inspect the scopes that it is allowed
-     * to request. The result will be a list of permitted scopes. This is also where omitting the openid scope
-     * causes the request to be rejected.
-     *
-     * @param transactionState
-     * @return
-     */
-    protected Collection<String> resolveScopes(TransactionState transactionState) {
-        // Next 2 parameters are so error messages can be reasonably constructed, naught else
-        String state = transactionState.getRequest().getParameter(STATE);
-        String givenRedirect = transactionState.getRequest().getParameter(REDIRECT_URI);
-
-        String rawScopes = transactionState.getRequest().getParameter(SCOPE);
-
-        OA2ServiceTransaction st = (OA2ServiceTransaction) transactionState.getTransaction();
-
-        DebugUtil.trace(this, ".resolveScopes: stored client scopes =" + ((OA2Client) st.getClient()).getScopes());
-        DebugUtil.trace(this, ".resolveScopes: passed in scopes =" + rawScopes);
-        DebugUtil.trace(this, ".resolveScopes: Scope util =" + OA2Scopes.ScopeUtil.getScopes());
-        DebugUtil.trace(this, ".resolveScopes: server scopes=" + ((OA2SE) getServiceEnvironment()).getScopes());
-        if (rawScopes == null || rawScopes.length() == 0) {
-            throw new OA2RedirectableError(OA2Errors.INVALID_SCOPE,
-                    "Missing scopes parameter.",
-                    HttpStatus.SC_BAD_REQUEST,
-                    st.getRequestState(),
-                    st.getCallback());
-        }
-        // The scopes the client wants:
-        OA2Client oa2Client = (OA2Client) st.getClient();
-        Collection<String> requestedScopes = new ArrayList<>();
-
-        // Fixes github issue 8, support for public clients: https://github.com/ncsa/OA4MP/issues/8
-        if (oa2Client.isPublicClient()) {
-            if (!oa2Client.getScopes().contains(OA2Scopes.SCOPE_OPENID)) {
-                throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST,
-                        "The " + OA2Scopes.SCOPE_OPENID +" scope is missing from the request.",
-                        HttpStatus.SC_BAD_REQUEST,
-                        st.getRequestState(),
-                        st.getCallback());
-            }
-            // only allowed scope, regardless of what is requested.
-            // This also covers the case of a client made with a full set of scopes, then
-            // converted to a public client but the stored scopes are not updated.
-            requestedScopes.add(OA2Scopes.SCOPE_OPENID);
-            DebugUtil.trace(this, ".resolveScopes: after resolution=" + requestedScopes);
-            return requestedScopes;
-        }
-        // The scopes that minimally are allowed. Permissions scopes are never in this list.
-
-        StringTokenizer stringTokenizer = new StringTokenizer(rawScopes);
-        boolean hasOpenIDScope = false;
-        while (stringTokenizer.hasMoreTokens()) {
-            String x = stringTokenizer.nextToken();
-            if (oa2Client.useStrictScopes() && !OA2Scopes.ScopeUtil.hasScope(x)) {
-                throw new OA2RedirectableError(OA2Errors.INVALID_SCOPE,
-                        "Unrecognized scope \"" + x + "\"",
-                        HttpStatus.SC_BAD_REQUEST,
-                        st.getRequestState(),
-                        st.getCallback());
-            }
-            if (x.equals(OA2Scopes.SCOPE_OPENID)) hasOpenIDScope = true;
-            requestedScopes.add(x);
-        }
-        if (((OA2SE) getServiceEnvironment()).isOIDCEnabled()) {
-            if (!hasOpenIDScope)
-                throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST,
-                        "The " + OA2Scopes.SCOPE_OPENID +" scope is missing from the request.",
-                        HttpStatus.SC_BAD_REQUEST,
-                        st.getRequestState(),
-                        st.getCallback());
-        }
-        st.setScopes(requestedScopes);
-        if (oa2Client.useStrictScopes()) {
-            Collection<String> storedClientScopes = oa2Client.getScopes();
-            requestedScopes = intersection(OA2Scopes.ScopeUtil.getScopes(), intersection(requestedScopes, storedClientScopes));
-            DebugUtil.trace(this, ".resolveScopes: strict scopes after resolution=" + requestedScopes);
-        } else {
-            DebugUtil.trace(this, ".resolveScopes: non-strict scopes =" + requestedScopes);
-        }
-
-        return requestedScopes;
-    }
 
     /**
      * Utility call to return the intersection of two lists of strings.
@@ -574,7 +491,7 @@ public class OA2AuthorizedServletUtil {
   */
 
     public void preprocess(TransactionState state) throws Throwable {
-      //  state.getResponse().setHeader("X-Frame-Options", "DENY");
+        //  state.getResponse().setHeader("X-Frame-Options", "DENY");
     }
 
     /* *******
@@ -663,6 +580,10 @@ public class OA2AuthorizedServletUtil {
         t.setResource(resource);
         t.setAudience(audience);
 
+    }
+
+    protected Collection<String> resolveScopes(TransactionState transactionState) {
+        return ClientUtils.resolveScopes(transactionState, false);
     }
 
     public void postprocess(TransactionState transactionState) {

@@ -78,7 +78,8 @@ public class OA2SE extends ServiceEnvironmentImpl {
                  QDLEnvironment qdlEnvironment,
                  boolean rfc8693Enabled,
                  boolean qdlStrictACLs,
-                 boolean safeGC) {
+                 boolean safeGC,
+                 boolean rfc8628Enabled) {
         super(logger,
                 mfp,
                 tsp,
@@ -140,6 +141,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.maxRTLifetime = maxRTLifetime;
         this.qdlStrictACLs = qdlStrictACLs;
         this.safeGC = safeGC;
+        this.rfc8628Enabled = rfc8628Enabled;
     }
 
     public boolean isSafeGC() {
@@ -203,6 +205,10 @@ public class OA2SE extends ServiceEnvironmentImpl {
         return jsonStore;
     }
 
+    /**
+     * Token exchange endpoint
+     * @return
+     */
     public boolean isRfc8693Enabled() {
         return rfc8693Enabled;
     }
@@ -213,7 +219,19 @@ public class OA2SE extends ServiceEnvironmentImpl {
 
     boolean rfc8693Enabled = false;
 
+    /**
+     * Device authorization flow endpoints.
+     * @return
+     */
+    public boolean isRfc8628Enabled() {
+        return rfc8628Enabled;
+    }
 
+    public void setRfc8628Enabled(boolean rfc8628Enabled) {
+        this.rfc8628Enabled = rfc8628Enabled;
+    }
+
+    boolean rfc8628Enabled = false;
 
     protected Provider<AdminClientStore> acs;
 

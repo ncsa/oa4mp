@@ -11,6 +11,7 @@ import edu.uiuc.ncsa.security.delegation.client.request.*;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.delegation.token.*;
 import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
+import edu.uiuc.ncsa.security.delegation.token.impl.AuthorizationGrantImpl;
 import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
 import edu.uiuc.ncsa.security.oauth_2_0.NonceHerder;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
@@ -30,12 +31,10 @@ import edu.uiuc.ncsa.security.util.pkcs.PEMFormatUtil;
 import net.sf.json.JSONObject;
 
 import java.net.URI;
-import java.net.URLEncoder;
 import java.security.KeyPair;
 import java.util.*;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.client.ClientEnvironment.CALLBACK_URI_KEY;
-import static edu.uiuc.ncsa.security.delegation.client.AbstractClientEnvironment.CERT_REQUEST_KEY;
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.*;
 import static edu.uiuc.ncsa.security.oauth_2_0.server.RFC8693Constants.*;
 
@@ -44,7 +43,6 @@ import static edu.uiuc.ncsa.security.oauth_2_0.server.RFC8693Constants.*;
  * on 2/21/14 at  2:50 PM
  */
 public class OA2MPService extends OA4MPService {
-    private static final boolean MANUAL_TEST = false;
 
     @Override
     public void preGetCert(Asset asset, Map parameters) {
@@ -140,6 +138,16 @@ public class OA2MPService extends OA4MPService {
         return requestedScopes;
     }
 
+    public ATResponse2 rfc8628Request(OA2Asset asset, String deviceCode, Map<String, String> additionalParameters) {
+        DelegatedAssetRequest dar = new DelegatedAssetRequest();
+        dar.setRfc8628(true);
+        dar.setAuthorizationGrant(new AuthorizationGrantImpl(URI.create(deviceCode)));
+        dar.setClient(getEnvironment().getClient());
+        Map<String, String> map = new HashMap<>();
+        map.putAll(additionalParameters);
+        dar.setParameters(map);
+        return processAtRequest(asset, dar);
+    }
 
     @Override
     public void preRequestCert(Asset asset, Map parameters) {
@@ -168,13 +176,6 @@ public class OA2MPService extends OA4MPService {
         parameters.putAll(((OA2ClientEnvironment) getEnvironment()).getAdditionalParameters());
     }
 
-/*
-    @Override
-    public void postRequestCert(Asset asset, OA4MPResponse oa4MPResponse) {
-        super.postRequestCert(asset, oa4MPResponse);
-        OA2Asset a = (OA2Asset) asset;
-    }
-*/
 
     public OA2MPService(ClientEnvironment environment) {
         super(environment);
@@ -189,12 +190,14 @@ public class OA2MPService extends OA4MPService {
             m1.putAll(additionalParameters);
         }
         dar.setParameters(m1);
+        return processAtRequest(asset, dar);
+    }
 
-
+    private ATResponse2 processAtRequest(OA2Asset asset, DelegatedAssetRequest dar) {
         ATResponse2 atResponse2 = (ATResponse2) getEnvironment().getDelegationService().getAT(dar);
         asset.setIssuedAt((Date) atResponse2.getParameters().get(OA2Claims.ISSUED_AT));
         asset.setUsername((String) atResponse2.getParameters().get(OA2Claims.SUBJECT));
-        if (!NonceHerder.hasNonce((String) atResponse2.getParameters().get(NONCE))) {
+        if (atResponse2.getParameters().containsKey(NONCE) && !NonceHerder.hasNonce((String) atResponse2.getParameters().get(NONCE))) {
             throw new InvalidNonceException("Unknown nonce.");
         }
         NonceHerder.removeNonce((String) atResponse2.getParameters().get(NONCE)); // prevent replay attacks.
@@ -210,28 +213,6 @@ public class OA2MPService extends OA4MPService {
         return getAccessToken(asset, ag, null);
     }
 
-    /**
-     * This should only be invoked during a manual test by setting the MANUAL_TEST flag to true. it will print out
-     * interim results from the getCert call which can then be cut and pasted into a curl call. This is intended to be
-     * a low-level debugging aid and if this test flag is enabled, then the client will be unable to actually get a cert.
-     *
-     * @param a
-     * @param m1
-     * @return
-     */
-    protected AssetResponse manualTest(OA2Asset a, Map<String, String> m1) {
-        try {
-            System.err.println(getClass().getSimpleName() + ".getAccessToken: Returned parameters");
-            System.err.println("access token=" + URLEncoder.encode(a.getAccessToken().getToken(), "UTF-8") + "");
-            System.err.println("&client_id=" + URLEncoder.encode(getEnvironment().getClient().getIdentifierString(), "UTF-8") + "");
-            System.err.println("&client_secret=" + URLEncoder.encode(getEnvironment().getClient().getSecret(), "UTF-8") + "");
-            System.err.println("&" + CERT_REQUEST_KEY + "=" + URLEncoder.encode(m1.get(CERT_REQUEST_KEY), "UTF-8") + "");
-        } catch (Throwable t) {
-            System.err.println(getClass().getSimpleName() + ".getCert: attempt to get response parameters failed.");
-            t.printStackTrace();
-        }
-        return null; // This will cause all sorts of stuff to fail later, which we want,
-    }
 
     public AssetResponse getCert(OA2Asset a,
                                  ATResponse2 atResponse2) {
@@ -250,9 +231,7 @@ public class OA2MPService extends OA4MPService {
         Map<String, String> m1 = getAssetParameters(a);
 
         preGetCert(a, m1);
-        if (MANUAL_TEST) {
-            return manualTest(a, m1);
-        }
+
         DelegatedAssetResponse daResp = getEnvironment().getDelegationService().getCert(atResponse2, getEnvironment().getClient(), m1);
 
         AssetResponse par = new AssetResponse();

@@ -40,6 +40,7 @@ public interface OA4MPConfigTags extends StorageConfigurationTags, MailConfigura
     public static final String MAX_ALLOWED_NEW_CLIENT_REQUESTS = "maxAllowedNewClientRequests"; // The name of the header field to be used for the username, e.g. REMOTE_USER
     public static final String ENABLE_UTIL_SERVLET = "enableUtilServlet"; // attribute tag for enabling the util servlet
     public static final String ENABLE_RFC8693_SUPPORT = "enableTokenExchange"; //
+    public static final String ENABLE_RFC8628_SUPPORT = "enableDeviceFlow"; //
 
 
     public static final String MESSAGES = "messages";

@@ -100,6 +100,9 @@ public class BasicClaimsSourceImpl implements ClaimSource {
 
 
     public boolean isEnabled() {
+        if(getConfiguration() == null){
+            return false;
+        }
         return getConfiguration().isEnabled();
     }
 

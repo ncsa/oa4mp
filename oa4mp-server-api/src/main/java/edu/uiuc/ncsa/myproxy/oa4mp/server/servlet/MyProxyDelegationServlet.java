@@ -192,6 +192,7 @@ public abstract class MyProxyDelegationServlet extends EnvServlet implements Tra
        return BasicIdentifier.newID(req.getParameter(CONST(CONSUMER_KEY)));
 
    }
+
     public Client getClient(Identifier identifier) {
         if (identifier == null) {
             throw new UnknownClientException("no client id");

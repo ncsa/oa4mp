@@ -24,7 +24,7 @@ public interface ClientXMLTags extends StorageConfigurationTags{
     public static final String INITIATE_URI = "initiateUri";
     public static final String USER_INFO_URI = "userInfoUri";
     public static final String REVOCATION_URI = "revocationUri";
-    //public static final String AUTHORIZATION_URI = "authorizationUri";
+    public static final String DEVICE_AUTHORIZATION_URI = "deviceAuthorizationUri";
     public static final String ACCESS_TOKEN_URI = "accessTokenUri";
     public static final String AUTHORIZE_TOKEN_URI = "authorizeUri";
     public static final String ASSET_URI = "assetUri";

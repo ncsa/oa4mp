@@ -40,7 +40,7 @@ import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSourceFactory;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import net.sf.json.JSONObject;
-import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.http.HttpStatus;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -51,10 +51,16 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.*;
 
+import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.ClientUtils.computeATLifetime;
+import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.ClientUtils.computeRefreshLifetime;
+import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8628Constants2.DEVICE_CODE;
+import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8628Constants2.GRANT_TYPE_DEVICE_CODE;
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8693Constants2.*;
 import static edu.uiuc.ncsa.security.core.util.Identifiers.VERSION_1_0_TAG;
 import static edu.uiuc.ncsa.security.core.util.Identifiers.VERSION_TAG;
+import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.CLIENT_SECRET;
+import static edu.uiuc.ncsa.security.oauth_2_0.server.RFC8628Constants.DEFAULT_WAIT;
 import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.JWT_ID;
 
 /**
@@ -65,40 +71,32 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
     // Don't really have a better place to put this.  TXRecord is not visible except in this module.
     public static Cleanup<Identifier, TXRecord> txRecordCleanup = null;
 
+    public static LinkedList<ClaimSource> setupClaimSources(OA2ServiceTransaction transaction, OA2SE oa2SE) {
+        LinkedList<ClaimSource> scopeHandlers = new LinkedList<>();
+        DebugUtil.trace(OA2ATServlet.class, "setting up claim sources");
+        if (oa2SE.getClaimSource() != null && oa2SE.getClaimSource().isEnabled()) {
+            DebugUtil.trace(OA2ATServlet.class, "Adding default claim source.");
+
+            scopeHandlers.add(oa2SE.getClaimSource());
+        }
+        ClaimSourceFactory oldSHF = ClaimSourceFactoryImpl.getFactory();
+        ClaimSourceFactoryImpl.setFactory(new ClaimSourceFactoryImpl());
+
+        OA2Client client = (OA2Client) transaction.getClient();
+        DebugUtil.trace(OA2ATServlet.class, "Getting configured claim source factory " + ClaimSourceFactoryImpl.getFactory().getClass().getSimpleName());
+        DebugUtil.trace(OA2ATServlet.class, "Adding other claim sources");
+
+        scopeHandlers.addAll(ClaimSourceFactoryImpl.createClaimSources(oa2SE, transaction));
+        DebugUtil.trace(OA2ATServlet.class, "Total claim source count = " + scopeHandlers.size());
+
+        ClaimSourceFactoryImpl.setFactory(oldSHF);
+        return scopeHandlers;
+    }
+
     @Override
     public void destroy() {
         super.destroy();
         shutdownCleanup(txRecordCleanup); // try to shutdown cleanly
-    }
-
-    public static class TokenExchangeRecordRetentionPolicy extends SafeGCRetentionPolicy {
-        public TokenExchangeRecordRetentionPolicy(String serviceAddress, boolean safeGC) {
-            super(serviceAddress, safeGC);
-        }
-
-        @Override
-        public boolean retain(Object key, Object value) {
-            if (safeGCSkipIt(key.toString())) {
-                return true;
-            }
-            // key is the identifier, values is the TXRecord
-            TXRecord txr = (TXRecord) value;
-            if (System.currentTimeMillis() <= txr.getExpiresAt()) {
-                return true; // so keep it.
-            }
-            return false;
-        }
-
-        @Override
-        public Map getMap() {
-            // Don't need the map for the policy, so don't set it.
-            return null;
-        }
-
-        @Override
-        public boolean applies() {
-            return true;
-        }
     }
 
     @Override
@@ -109,125 +107,33 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
 
         OA2ServiceTransaction st = (OA2ServiceTransaction) state.getTransaction();
         Map<String, String> p = state.getParameters();
-        String givenRedirect = p.get(OA2Constants.REDIRECT_URI);
-        try {
-            st.setCallback(URI.create(givenRedirect));
-        } catch (Throwable t) {
-            throw new OA2ATException(OA2Errors.INVALID_REQUEST_URI,
-                    "invalid redirect URI \"" + givenRedirect + "\"",
-                    st.getRequestState());
-        }
-        //Spec says that the redirect must match one of the ones stored and if not, the request is rejected.
-        OA2ClientUtils.check(st.getClient(), givenRedirect);
-        // Store the callback the user needs to use for this request, since the spec allows for many.
+        if(state.isRfc8628()){
+            String givenRedirect = p.get(OA2Constants.REDIRECT_URI);
+            try {
+                st.setCallback(URI.create(givenRedirect));
+            } catch (Throwable t) {
+                throw new OA2ATException(OA2Errors.INVALID_REQUEST_URI,
+                        "invalid redirect URI \"" + givenRedirect + "\"",
+                        st.getRequestState());
+            }
+            //Spec says that the redirect must match one of the ones stored and if not, the request is rejected.
+            OA2ClientUtils.check(st.getClient(), givenRedirect);
+            // Store the callback the user needs to use for this request, since the spec allows for many.
 
-        // If there is a nonce in the initial request, it must be returned as part of the access token
-        // response to prevent replay attacks.
-        // Here is where we put the information from the session for generating claims in the id_token
-        if (st.getNonce() != null && 0 < st.getNonce().length()) {
-            p.put(OA2Constants.NONCE, st.getNonce());
+            // If there is a nonce in the initial request, it must be returned as part of the access token
+            // response to prevent replay attacks.
+            // Here is where we put the information from the session for generating claims in the id_token
+            if (st.getNonce() != null && 0 < st.getNonce().length()) {
+                p.put(OA2Constants.NONCE, st.getNonce());
+            }
         }
 
         p.put(OA2Constants.CLIENT_ID, st.getClient().getIdentifierString());
     }
 
 
-    /**
-     * The lifetime of the refresh token. This is the non-zero minimum of the client's requested
-     * lifetime, the user's request at authorization time and the server global limit.
-     *
-     * @param st2
-     * @return
-     */
-    protected long computeRefreshLifetime(OA2ServiceTransaction st2) {
-        OA2SE oa2SE = (OA2SE) getServiceEnvironment();
-        if (!oa2SE.isRefreshTokenEnabled()) {
-            throw new NFWException("Internal error: Refresh tokens are disabled for this server.");
-        }
-        if (oa2SE.getMaxRTLifetime() <= 0) {
-            throw new NFWException("Internal error: Either refresh tokens are disabled for this server, or the server-wide default for the refresh token lifetime has not been set.");
-        }
-        long lifetime = oa2SE.getMaxRTLifetime();
-
-        OA2Client client = (OA2Client) st2.getClient();
-        if (0 < client.getRtLifetime()) {
-            lifetime = Math.min(lifetime, client.getRtLifetime());
-        }
-        st2.setMaxRTLifetime(lifetime);// absolute max allowed on this server for this request
-
-
-        if (client.hasRefreshTokenConfig()) {
-            if (0 < client.getRefreshTokensConfig().getLifetime()) {
-                lifetime = Math.min(client.getRefreshTokensConfig().getLifetime(), lifetime);
-            }
-        }
-        if (0 < st2.getRequestedRTLifetime()) {
-            // IF they specified a refresh token lifetime in the request, take the minimum of that
-            // and whatever they client is allowed.
-            lifetime = Math.min(st2.getRequestedRTLifetime(), lifetime);
-        }
-
-        return lifetime;
-    }
-
-    /**
-     * Scorecard:
-     * server default     | oa2SE.getAccessTokenLifetime()
-     * server default max | oa2SE.getMaxATLifetime();
-     * client default max | client.getAtLifetime()
-     * value in cfg access element | client.getAccessTokensConfig().getLifetime()
-     * value in the request | st2.getRequestedATLifetime()
-     * result = actual definitive value | st2.getAccessTokenLifetime()
-     * <p>
-     * Policies: no lifetime can exceed the non-zero max of the server and client defaults. These are hard
-     * limits placed there by administrators.
-     * <p>
-     * Note that inside of scripts, these can be reset to anything, so
-     * <p>
-     * st2.getAtData()
-     * <p>
-     * has the final, definitive values. Once this has been set in the first pass, it
-     * **must** be authoritative.
-     *
-     * @param st2
-     * @return
-     */
-    /*
-    List of useful numbers for testing. These are all prime and are either in seconds or milliseconds as
-    needed. Setting these in the configurations will let you track exactly what values are used.
-    server default 97
-     */
-    protected long computeATLifetime(OA2ServiceTransaction st2) {
-        OA2SE oa2SE = (OA2SE) getServiceEnvironment();
-        // If the server default is <= 0 that implies there is some misconfiguration. Better to find that out here than
-        // get squirrelly results later.
-        if (oa2SE.getMaxATLifetime() <= 0) {
-            throw new NFWException("Internal error: the server-wide default for the access token lifetime has not been set.");
-        }
-        long lifetime = oa2SE.getMaxATLifetime();
-        st2.setMaxATLifetime(lifetime); // absolute max allowed on this server for this request
-
-        OA2Client client = (OA2Client) st2.getClient();
-        if (0 < client.getAtLifetime()) {
-            lifetime = Math.min(client.getAtLifetime(), lifetime);
-        } else {
-            lifetime = Math.min(lifetime, OA2ConfigurationLoader.ACCESS_TOKEN_LIFETIME_DEFAULT);
-        }
-
-        if (client.hasAccessTokenConfig()) {
-            if (0 < client.getAccessTokensConfig().getLifetime()) {
-                lifetime = Math.min(client.getAccessTokensConfig().getLifetime(), lifetime);
-            }
-        }
-
-        // If the transaction has a specific request, take it in to account.
-        if (0 < st2.getRequestedATLifetime()) {
-            // IF they specified a refresh token lifetime in the request, take the minimum of that
-            // and whatever they client is allowed.
-            lifetime = Math.min(st2.getRequestedATLifetime(), lifetime);
-        }
-        return lifetime;
-
+    protected String getClientSecret(HttpServletRequest request) {
+        return ClientUtils.getClientSecret(request, getFirstParameterValue(request, CLIENT_SECRET));
     }
 
 
@@ -267,7 +173,17 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             return true;
         }
 
+        if (grantType.equals(GRANT_TYPE_DEVICE_CODE)) {
+            if (!oa2SE.isRfc8628Enabled()) {
+                warn("Client " + client.getIdentifierString() + " requested a token exchange but token exchange is not enabled onthis server.");
+                throw new OA2ATException(OA2Errors.REQUEST_NOT_SUPPORTED,
+                        "device code flow not supported on this server ");
+            }
+            doRFC8628(client, request, response);
+            DebugUtil.trace(this, "rfc8628 completed, returning... ");
 
+            return true;
+        }
         if (grantType.equals(OA2Constants.GRANT_TYPE_REFRESH_TOKEN)) {
             String rawSecret = getClientSecret(request);
             if (!client.isPublicClient()) {
@@ -281,14 +197,18 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             // OAuth 2. spec., section 4.1.3 states that the grant type must be included and it must be code.
             // public clients cannot get an access token
             IssuerTransactionState state = doAT(request, response, client);
-            ATIResponse2 atResponse = (ATIResponse2) state.getIssuerResponse();
-            OA2ServiceTransaction t = (OA2ServiceTransaction) state.getTransaction();
-            atResponse.setClaims(t.getUserMetaData());
-            atResponse.write(response);
+            writeATResponse(response, state);
             return true;
         }
 
         return false;
+    }
+
+    private void writeATResponse(HttpServletResponse response, IssuerTransactionState state) throws IOException {
+        ATIResponse2 atResponse = (ATIResponse2) state.getIssuerResponse();
+        OA2ServiceTransaction t = (OA2ServiceTransaction) state.getTransaction();
+        atResponse.setClaims(t.getUserMetaData());
+        atResponse.write(response);
     }
 
     private void doRFC8693(OA2Client client,
@@ -607,7 +527,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
 
         if (isEmpty(grantType)) {
             warn("Error servicing request. No grant type was given. Rejecting request.");
-            throw new OA2ATException(OA2Errors.INVALID_REQUEST,"missing grant type");
+            throw new OA2ATException(OA2Errors.INVALID_REQUEST, "missing grant type");
         }
         if (executeByGrant(grantType, request, response)) {
             return;
@@ -621,9 +541,9 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
     protected ATRequest getATRequest(HttpServletRequest request, ServiceTransaction transaction) {
         OA2ServiceTransaction t = (OA2ServiceTransaction) transaction;
         // Set these in the transaction then send it along.
-        t.setAccessTokenLifetime(computeATLifetime(t));
+        t.setAccessTokenLifetime(computeATLifetime(t, (OA2SE) getServiceEnvironment()));
         if (((OA2SE) getServiceEnvironment()).isRefreshTokenEnabled()) {
-            t.setRefreshTokenLifetime(computeRefreshLifetime(t));
+            t.setRefreshTokenLifetime(computeRefreshLifetime(t, (OA2SE) getServiceEnvironment()));
         }
 
         return new ATRequest(request, transaction);
@@ -647,10 +567,15 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
     }
 
     protected IssuerTransactionState doAT(HttpServletRequest request, HttpServletResponse response, OA2Client client) throws Throwable {
-        // Grants are checked in the doIt method
         verifyClientSecret(client, getClientSecret(request));
         IssuerTransactionState state = doDelegation(client, request, response);
+        return doAT(state, client);
+    }
+
+    protected IssuerTransactionState doAT(IssuerTransactionState state, OA2Client client) throws Throwable {
+        // Grants are checked in the doIt method
         ATIResponse2 atResponse = (ATIResponse2) state.getIssuerResponse();
+
         atResponse.setSignToken(client.isSignTokens());
         OA2SE oa2SE = (OA2SE) getServiceEnvironment();
 
@@ -665,17 +590,17 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         st2.setAccessToken(atResponse.getAccessToken()); // needed if there are handlers later.
         st2.setRefreshToken(atResponse.getRefreshToken()); // ditto. Might be null.
         JWTRunner jwtRunner = new JWTRunner(st2, ScriptRuntimeEngineFactory.createRTE(oa2SE, st2, st2.getOA2Client().getConfig()));
-        OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, st2, request);
-        if (st2.getAuthorizationGrant().getVersion() == null || st2.getAuthorizationGrant().getVersion().equals(VERSION_1_0_TAG)) {
-            // Old version. Handlers have not been initialized yet.
+        OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, st2, state.getRequest());
+        if (state.isRfc8628() || st2.getAuthorizationGrant().getVersion() == null || st2.getAuthorizationGrant().getVersion().equals(VERSION_1_0_TAG)) {
+            // Handlers have not been initialized yet. Either because of old tokens or rfc 8628 (so no tokens).
             jwtRunner.initializeHandlers();
         }
         try {
             jwtRunner.doTokenClaims();
         } catch (IllegalAccessException iax) {
             throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
-                  "access denied",
-                  st2.getRequestState());
+                    "access denied",
+                    st2.getRequestState());
         }
 
         if (!client.isRTLifetimeEnabled()) {
@@ -747,33 +672,6 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         }
     }
 
-    /**
-     * This either peels the secret off the parameter list if it is there or from the headers. It
-     * merely returns the raw string that is the secret. No checking against a client is done.
-     * Also, a null is a perfectly acceptable return value if there is no secret, e.g. the client is public.
-     *
-     * @param request
-     * @return
-     */
-    protected String getClientSecret(HttpServletRequest request) {
-        String rawSecret = null;
-        // Fix for CIL-430. Check the header and decode as needed.
-        if (HeaderUtils.hasBasicHeader(request)) {
-            DebugUtil.trace(this, "doIt: Got the header.");
-            try {
-                rawSecret = HeaderUtils.getSecretFromHeaders(request);
-            } catch (UnsupportedEncodingException e) {
-                throw new NFWException("Error: internal use of UTF-8 encoding failed");
-            }
-
-        } else {
-            DebugUtil.trace(this, "doIt: no header for authentication, looking at parameters.");
-            rawSecret = getFirstParameterValue(request, CLIENT_SECRET);
-
-        }
-
-        return rawSecret;
-    }
 
     /**
      * This finds the client identifier either as a parameter or in the authorization header and uses
@@ -821,13 +719,14 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         return client;
     }
 
-    protected void verifyClientSecret(OA2Client client, String rawSecret) {
+    public void verifyClientSecret(OA2Client client, String rawSecret) {
+        ClientUtils.verifyClientSecret(client, rawSecret, true);
         // Fix for CIL-332
+/*
         if (rawSecret == null) {
             DebugUtil.trace(this, "doIt: no secret, throwing exception.");
             throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT, "missing secret");
         }
-        // TODO -- replace next call with sha1Hex(rawSecret)? Need to know side effects first!
         if (StringUtils.isTrivial(client.getSecret())) {
             // Since clients can be administered by others now, we are finding that they sometimes
             // may change their scopes. If a client is public, there is no secret, but if
@@ -836,11 +735,15 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             // than blowing up with an NPE.
             throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT, "client has no configured secret",null);
         }
+
+        // TODO -- replace next call with sha1Hex(rawSecret)? Need to know side effects first!
+
         if (!client.getSecret().equals(DigestUtils.shaHex(rawSecret))) {
             DebugUtil.trace(this, "doIt: bad secret, throwing exception.");
             throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
                     "incorrect secret");
         }
+*/
 
     }
 
@@ -903,8 +806,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         OA2ServiceTransaction t = getByRT(oldRT);
         if (tokenVersion1) {
             // Can't fix it until we have the right transaction.
-            t.setRefreshTokenLifetime(computeRefreshLifetime(t));
-            t.setAccessTokenLifetime(computeATLifetime(t));
+            t.setRefreshTokenLifetime(computeRefreshLifetime(t, oa2SE));
+            t.setAccessTokenLifetime(computeATLifetime(t, oa2SE));
         }
 
         AccessTokenImpl at = (AccessTokenImpl) t.getAccessToken();
@@ -1081,28 +984,6 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         return transaction;
     }
 
-    public static LinkedList<ClaimSource> setupClaimSources(OA2ServiceTransaction transaction, OA2SE oa2SE) {
-        LinkedList<ClaimSource> scopeHandlers = new LinkedList<>();
-        DebugUtil.trace(OA2ATServlet.class, "setting up claim sources");
-        if (oa2SE.getClaimSource() != null && oa2SE.getClaimSource().isEnabled()) {
-            DebugUtil.trace(OA2ATServlet.class, "Adding default claim source.");
-
-            scopeHandlers.add(oa2SE.getClaimSource());
-        }
-        ClaimSourceFactory oldSHF = ClaimSourceFactoryImpl.getFactory();
-        ClaimSourceFactoryImpl.setFactory(new ClaimSourceFactoryImpl());
-
-        OA2Client client = (OA2Client) transaction.getClient();
-        DebugUtil.trace(OA2ATServlet.class, "Getting configured claim source factory " + ClaimSourceFactoryImpl.getFactory().getClass().getSimpleName());
-        DebugUtil.trace(OA2ATServlet.class, "Adding other claim sources");
-
-        scopeHandlers.addAll(ClaimSourceFactoryImpl.createClaimSources(oa2SE, transaction));
-        DebugUtil.trace(OA2ATServlet.class, "Total claim source count = " + scopeHandlers.size());
-
-        ClaimSourceFactoryImpl.setFactory(oldSHF);
-        return scopeHandlers;
-    }
-
     @Override
     protected ServiceTransaction getTransaction(AuthorizationGrant ag, HttpServletRequest req) throws ServletException {
 
@@ -1149,5 +1030,117 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         return requestedScopes;
     }
 
+    protected void doRFC8628(OA2Client client, HttpServletRequest request, HttpServletResponse response) throws Throwable {
+        printAllParameters(request);
+        long now = System.currentTimeMillis();
+        String rawSecret = getClientSecret(request);
+
+        verifyClientSecret(client, rawSecret);
+        String deviceCode = request.getParameter(DEVICE_CODE);
+        if (StringUtils.isTrivial(deviceCode)) {
+            throw new OA2GeneralError(OA2Errors.ACCESS_DENIED,
+                    "Missing " + DEVICE_CODE + " parameter",
+                    HttpStatus.SC_UNAUTHORIZED,
+                    null);
+        }
+        URI ag;
+        try {
+            ag = URI.create(deviceCode);
+        } catch (Throwable t) {
+            info("Failed to create " + DEVICE_CODE + " from input \"" + deviceCode + "\"");
+            throw new OA2GeneralError(OA2Errors.ACCESS_DENIED,
+                    DEVICE_CODE + " is not a uri", HttpStatus.SC_UNAUTHORIZED, null);
+        }
+        AuthorizationGrantImpl authorizationGrant = new AuthorizationGrantImpl(ag);
+        try {
+            checkAGExpiration(authorizationGrant);
+        } catch (OA2ATException atException) {
+            // even though the token endpoint has a perfectly good way of communicating
+            // that the token is expired, the RFC requires this instead
+            throw new OA2ATException("expired_token", DEVICE_CODE + " expired");
+        }
+        OA2ServiceTransaction transaction = (OA2ServiceTransaction) getTransaction(authorizationGrant);
+        if(!transaction.isAuthGrantValid()){
+            throw new OA2GeneralError(OA2Errors.INVALID_GRANT, "invalid device code", HttpStatus.SC_BAD_REQUEST, null);
+        }
+
+        if (transaction == null || !transaction.isRFC8628Request()) {
+            info("Attempt to access RFC8628 end point by client, but no pending devide flow found.");
+            throw new OA2GeneralError(OA2Errors.ACCESS_DENIED,
+                    "no pending request", HttpStatus.SC_UNAUTHORIZED, null);
+        }
+
+        RFC8628State rfc8628State = transaction.getRFC8628State();
+        if (rfc8628State.isExpired()) {
+            // Odd case that it has expired, but the garbage collector has not disposed of it yet, for whatever reason.
+            throw new OA2ATException(OA2Errors.ACCESS_DENIED, DEVICE_CODE + " expired", HttpStatus.SC_UNAUTHORIZED, null);
+        }
+
+        if ( rfc8628State.lastTry + rfc8628State.interval > now) {
+            rfc8628State.lastTry= now;
+            rfc8628State.interval = rfc8628State.interval + DEFAULT_WAIT;
+            transaction.setRFC8628State(rfc8628State);
+            getTransactionStore().save(transaction);
+            throw new OA2ATException("slow_down", "slow down");
+        }
+        rfc8628State.lastTry= now;
+        transaction.setRFC8628State(rfc8628State);
+        String scope = getFirstParameterValue(request, SCOPE);
+        if (!isTrivial(scope)) {
+            // scope is optional, so only take notice if they send something
+            TransactionState transactionState = new TransactionState(request, response, null, transaction);
+            transaction.setScopes(ClientUtils.resolveScopes(transactionState, true));
+        }
+
+        getTransactionStore().save(transaction);
+
+        if (!rfc8628State.valid) {
+            throw new OA2ATException("authorization_pending", "authorization pending");
+        }
+        // If we make it this far, we just turn the entire thing over to the standard access token flow
+        transaction.setAuthGrantValid(false);
+        getTransactionStore().save(transaction);
+
+        IssuerTransactionState issuerTransactionState = getIssuerTransactionState(
+                request,
+                response,
+                authorizationGrant,
+                transaction,
+                true);
+        doAT(issuerTransactionState, client);
+        ((ATIResponse2)issuerTransactionState.getIssuerResponse()).setJsonWebKey(((OA2SE)getServiceEnvironment()).getJsonWebKeys().getDefault());
+        writeATResponse(response, issuerTransactionState);
+
+    }
+
+    public static class TokenExchangeRecordRetentionPolicy extends SafeGCRetentionPolicy {
+        public TokenExchangeRecordRetentionPolicy(String serviceAddress, boolean safeGC) {
+            super(serviceAddress, safeGC);
+        }
+
+        @Override
+        public boolean retain(Object key, Object value) {
+            if (safeGCSkipIt(key.toString())) {
+                return true;
+            }
+            // key is the identifier, values is the TXRecord
+            TXRecord txr = (TXRecord) value;
+            if (System.currentTimeMillis() <= txr.getExpiresAt()) {
+                return true; // so keep it.
+            }
+            return false;
+        }
+
+        @Override
+        public Map getMap() {
+            // Don't need the map for the policy, so don't set it.
+            return null;
+        }
+
+        @Override
+        public boolean applies() {
+            return true;
+        }
+    }
 
 }

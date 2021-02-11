@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.BasicClaimsSourceImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowStates2;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8628State;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.OA4MPServiceTransaction;
 import edu.uiuc.ncsa.security.core.Identifier;
@@ -37,6 +38,7 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
     public String SCRIPT_STATE_KEY = "script_state";
     public String AUDIENCE_KEY = "audience";
     public String RESOURCE_KEY = "resource";
+    public String IS_RFC8628_KEY = "is_rfc8628";
 
     public OA2ServiceTransaction(AuthorizationGrant ag) {
         super(ag);
@@ -76,6 +78,20 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         return flowStates;
     }
 
+    String RFC862_STATE_KEY = "rfc8628_state";
+
+    public RFC8628State getRFC8628State() {
+        JSONObject j = getState().getJSONObject(RFC862_STATE_KEY);
+        RFC8628State state = new RFC8628State();
+        if (j != null) {
+            state.fromJSON(j);
+        }
+        return state;
+    }
+    public void setRFC8628State(RFC8628State rfc8628State){
+        getState().put(RFC862_STATE_KEY, rfc8628State.toJSON());
+    }
+
     public long getAccessTokenLifetime() {
         return access_token_lifetime;
     }
@@ -109,12 +125,25 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         getState().put(AUDIENCE_KEY, audience);
     }
 
+
+    public boolean isRFC8628Request() {
+        if (getState().containsKey(IS_RFC8628_KEY)) {
+            return getState().getBoolean(IS_RFC8628_KEY);
+        }
+        return false;
+    }
+
+    public void setRFC8628Request(boolean b) {
+        getState().put(IS_RFC8628_KEY, b);
+    }
+
     /**
      * Resources are URIs that are used as part of the {@link edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims#AUDIENCE}
      * claim in a (compound) access token.
+     *
      * @return
      */
-    public List<String> getResource(){
+    public List<String> getResource() {
         // This is a list of string and not URIs because it is in the state object which gets serialized
         // JSON which does very odd things to URIs. Best we can do is check that the elements are URIs
         // when setting it rather than writing some handler if it gets changed.
@@ -124,12 +153,13 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         return null;
     }
 
-    public void setResource(List<String> r){
+    public void setResource(List<String> r) {
         getState().put(RESOURCE_KEY, r);
     }
 
     /**
      * Generally you should never set the state directly unless you know exactly how it is constructed.
+     *
      * @param state
      */
     public void setState(JSONObject state) {
@@ -249,10 +279,11 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         }
     }
 
-    public boolean hasScriptState(){
+    public boolean hasScriptState() {
         return getState().containsKey(SCRIPT_STATE_KEY);
 
     }
+
     public String getScriptState() {
         if (getState().containsKey(SCRIPT_STATE_KEY)) {
             return getState().getString(SCRIPT_STATE_KEY);
@@ -318,55 +349,63 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
     String MAX_RT_LIFETIME_KEY = "maxRTLifetime";
     String REQUESTED_RT_LIFETIME_KEY = "requestedRTLifetime";
 
-    public long getRequestedATLifetime(){
-        if(hasRequestedATLifetime()){
+    public long getRequestedATLifetime() {
+        if (hasRequestedATLifetime()) {
             return getState().getLong(REQUESTED_AT_LIFETIME_KEY);
         }
         return -1L;
     }
-    public boolean hasRequestedATLifetime(){
+
+    public boolean hasRequestedATLifetime() {
         return getState().containsKey(REQUESTED_AT_LIFETIME_KEY);
     }
-    public void setRequestedATLifetime(long atLifetime){
+
+    public void setRequestedATLifetime(long atLifetime) {
         getState().put(REQUESTED_AT_LIFETIME_KEY, atLifetime);
     }
-    public long getRequestedRTLifetime(){
-        if(hasRequestedRTLifetime()){
+
+    public long getRequestedRTLifetime() {
+        if (hasRequestedRTLifetime()) {
             return getState().getLong(REQUESTED_RT_LIFETIME_KEY);
         }
         return -1L;
     }
-    public void setRequestedRTLifetime(long rtLifetime){
+
+    public void setRequestedRTLifetime(long rtLifetime) {
         getState().put(REQUESTED_RT_LIFETIME_KEY, rtLifetime);
     }
-    public boolean hasRequestedRTLifetime(){
+
+    public boolean hasRequestedRTLifetime() {
         return getState().containsKey(REQUESTED_RT_LIFETIME_KEY);
     }
-    public long getMaxAtLifetime(){
-        if(hasMaxATLifetime()){
-             return getState().getLong(MAX_AT_LIFETIME_KEY);
+
+    public long getMaxAtLifetime() {
+        if (hasMaxATLifetime()) {
+            return getState().getLong(MAX_AT_LIFETIME_KEY);
         }
         return -1L;
     }
-    public void setMaxATLifetime(long max){
+
+    public void setMaxATLifetime(long max) {
         getState().put(MAX_AT_LIFETIME_KEY, max);
     }
 
-    public boolean hasMaxATLifetime(){
+    public boolean hasMaxATLifetime() {
         return getState().containsKey(MAX_AT_LIFETIME_KEY);
     }
 
-    public long getMaxRtLifetime(){
-        if(hasMaxATLifetime()){
-             return getState().getLong(MAX_RT_LIFETIME_KEY);
+    public long getMaxRtLifetime() {
+        if (hasMaxATLifetime()) {
+            return getState().getLong(MAX_RT_LIFETIME_KEY);
         }
         return -1L;
     }
-    public void setMaxRTLifetime(long max){
+
+    public void setMaxRTLifetime(long max) {
         getState().put(MAX_RT_LIFETIME_KEY, max);
     }
 
-    public boolean hasMaxRTLifetime(){
+    public boolean hasMaxRTLifetime() {
         return getState().containsKey(MAX_RT_LIFETIME_KEY);
     }
 
@@ -407,6 +446,7 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
     /**
      * The scopes <b><i>requested</i></b> by the client. This does not mean they are all
      * allowed, just so we have a list of them
+     *
      * @param scopes
      */
     @Override
@@ -444,6 +484,7 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
 
     /**
      * This is the state parameter in the initial request, if present
+     *
      * @return
      */
     public String getRequestState() {

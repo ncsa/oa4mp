@@ -82,6 +82,14 @@
         <url-pattern>/authorize</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>device_authorization</servlet-name>
+        <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8628Servlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>device_authorization</servlet-name>
+        <url-pattern>/device_authorization</url-pattern>
+    </servlet-mapping>
 
     <servlet>
         <servlet-name>admin-register</servlet-name>
