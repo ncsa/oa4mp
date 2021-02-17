@@ -1,6 +1,5 @@
 /*
-   This  IS NOT DONE! DO NOT USE. Needs debugged.
-   There is a pair of scripts is for LSST. These do
+)help    There is a pair of scripts is for LSST. These do
     * onboarding = if a person comes in through any of several IDPs create a voPersonExternalID
                    and return that as a claim.
     * linking = Once a user has been onboarded, possibly do a two-step look up. If their IDP is NCSA,
@@ -13,27 +12,47 @@
    {"tokens": {"identity": {
     "qdl":  {
      "load": "lsst/onboarding.qdl",
-     "xmd": {"exec_phase":   [
-      "pre_auth",
-      "post_token"
-     ]}
+     "xmd": {"exec_phase":   ["post_token"]}
     },
     "type": "identity"
    }}}
 */
+script_load('utils/init.qdl');
 
-script_load('ncsa/ncsa-default.qdl'); // also runs init. If NCSA, sets eppn/eptid, if not, no effect
 
-if[exec_phase=='pre_auth'][return();];
-
-// run in post_token -- if the IDP was NCSA then this has been run and we have an eppn or eptid.
 v := null;
-if[is_defined(claims.eppn)][v:=claims.eppn;]else[
-    if[is_defined(claims.eptid)][v:=claims.eptid;];
-    ];
-
 if[claims.idp == idp.github][v:=claims.oidc+'@github.com';];
 if[claims.idp == idp.google][v:=claims.oidc+'@accounts.google.com';];
 if[claims.idp == idp.orcid][v:=replace(claims.oidc,'http://', 'https://');];
+if[
+     v != null
+   ][
+// go look up voPersonExternalID  first in LDAP
+                    cfg. := new_template('ncsa');
+                    cfg. := create_source(cfg.);
+          cfg.claim_name := 'uid';
+           cfg.ldap_name := 'voPersonExternalID';
+         cfg.search_base := 'ou=People,dc=ncsa,dc=illinois,dc=edu';
+  cfg.search_attributes. := ['uid'];
+    cfg.type := 'ldap';
+say('***QDL: cfg. ==' + to_string(cfg.));
+                      c. := get_claims(cfg., v);
+say('***QDL: got VOP claims:' + to_string(c.));
+   if[is_defined(c.uid)][claims.uid := c.uid;];
+]else[
+   // no recognized IDP at this point -- they used somethine we don't honor.
+   if[
+       claims.idp != idp.ncsa
+     ][
+        return();
+     ]else[
+        claims.uid := head(claims.eppn, '@');
+     ];
+];
 
-if[ v!= null]then[claims.VOP := v;];
+
+say('***QDL: getting claims');
+             cfg. := new_template('ncsa');
+             cfg. := create_source(cfg.);
+          claims. := claims. ~ get_claims(cfg., claims.uid);
+say('***QDL: Returning claims:' + to_string(claims.));

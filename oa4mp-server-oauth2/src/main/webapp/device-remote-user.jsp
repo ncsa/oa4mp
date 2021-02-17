@@ -18,7 +18,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-    <title>MyProxy Delegation Portal Authorization Page</title>
+    <title>OA4MP Device Authorization Page.</title>
 
 </head>
 <style type="text/css">
@@ -31,28 +31,23 @@
     }
 </style>
 <body>
-<h2>Welcome to the OAuth 2.0 for MyProxy Client Authorization Page</h2>
-The Client below is requesting access to your account. If you approve,
-please accept, otherwise, cancel.
+<h2>Welcome to the OAuth 2.0 for MyProxy (OA4MP) device Authorization Page.</h2>
+please enter the user code your received.
 <p>
 
 <form action="${actionToTake}" method="POST">
 
     <table border=1>
         <tr valign="top">
-            <th>Client Information</th>
+            <th>Device flow</th>
         </tr>
         <tr>
-            <td> The client listed below is requesting access to your
-                account. If you approve, please accept.
-                <br/><br/>
-                <i>Name:</i> ${clientName}
-                <br/>
-                <i>URL:</i> ${clientHome}
-                <br/>
-                <i>Requested Scopes:</i> ${clientScopes}
-
-            </td>
+            <td>User code:</td>
+            <td><input type="text" size="25" name="${AuthUserCode}"
+                       value="${userCode}"/></td>
+        </tr>
+        <tr>
+            <td colspan="2">&nbsp;</td>
         </tr>
         <tr>
             <td>
@@ -65,18 +60,11 @@ please accept, otherwise, cancel.
         </tr>
     </table>
 
-    <!-- Unhide this when you want to support it. All the machinery is in place.
-                     <tr>
-                        <td>Refresh token lifetime</td>
-                        <td><input type="text" size="25" name="${AuthRTL}"
-                                   value="${rtLifetime}"/></td>
-                    </tr>
-                    -->
     <!-- Close sign in table -->
     <input type="hidden" id="status" name="${action}"
            value="${actionOk}"/>
-    <input type="hidden" id="token" name="${tokenKey}" value="${authorizationGrant}"/>
-    <input type="hidden" id="state" name="${stateKey}" value="${authorizationState}"/>
+    <input type="hidden" id="token" name="identifier" value="${identifier}"/>
+    <input type="hidden" id="counter" name="counter" value="${count}"/>
 
 </form>
 

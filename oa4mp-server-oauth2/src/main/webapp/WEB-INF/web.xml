@@ -92,6 +92,15 @@
     </servlet-mapping>
 
     <servlet>
+        <servlet-name>device</servlet-name>
+        <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8628AuthorizationServer</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>device</servlet-name>
+        <url-pattern>/device</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
         <servlet-name>admin-register</servlet-name>
         <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2AdminRegistrationServlet</servlet-class>
     </servlet>
@@ -187,6 +196,22 @@
            <transport-guarantee>NONE</transport-guarantee>
          </user-data-constraint>
        </security-constraint>
+
+    <security-constraint>
+        <web-resource-collection>
+          <web-resource-name>OAuth Security</web-resource-name>
+          <url-pattern>/device</url-pattern>
+          <http-method>POST</http-method>
+          <http-method>GET</http-method>
+        </web-resource-collection>
+        <auth-constraint>
+          <role-name>oa4mp</role-name>
+        </auth-constraint>
+        <user-data-constraint>
+        <!-- transport-guarantee can be CONFIDENTIAL, INTEGRAL, or NONE -->
+          <transport-guarantee>NONE</transport-guarantee>
+        </user-data-constraint>
+      </security-constraint>
 
        <login-config>
           <auth-method>BASIC</auth-method>

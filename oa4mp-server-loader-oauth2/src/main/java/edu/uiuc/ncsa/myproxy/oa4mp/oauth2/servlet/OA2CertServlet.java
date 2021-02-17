@@ -15,6 +15,7 @@ import edu.uiuc.ncsa.security.delegation.servlet.TransactionState;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
+import edu.uiuc.ncsa.security.delegation.token.impl.TokenUtils;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2GeneralError;
@@ -86,7 +87,10 @@ public class OA2CertServlet extends ACS2 {
 
             }
         } catch (Throwable t) {
-            // do nothing. It is a standard access token, not a jwt.
+            if(TokenUtils.isBase64(rawAT)){
+                rawAT = TokenUtils.decodeToken(rawAT);
+            }
+            // It is a standard access token, not a jwt.
         }
 
         return new AccessTokenImpl(URI.create(rawAT));

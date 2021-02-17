@@ -29,7 +29,6 @@
             "version": "1.0"
           },
           "failOnError": "true",
-        
           "enabled": "true",
           "authorizationType": "none",
           "searchName": "voPersonExternalID",

@@ -10,6 +10,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractAuthorizationServlet;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
+import edu.uiuc.ncsa.security.delegation.token.impl.TokenUtils;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2GeneralError;
@@ -68,9 +69,11 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
 
     /**
      * This class is needed to pass information between servlets, where one servlet
-     * calls another.
+     * calls another. It intercepts the calls from the target servlet and passes
+     * it back to the calling servlet for processing. This way we can keep straight who
+     * did what.
      */
-    static class MyHttpServletResponseWrapper
+    public static class MyHttpServletResponseWrapper
             extends HttpServletResponseWrapper {
 
         private StringWriter sw = new StringWriter();
@@ -169,7 +172,6 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
         if (state.getState() == AUTHORIZATION_ACTION_OK) {
             AuthorizedState authorizedState = (AuthorizedState) state;
             ((OA2ServiceTransaction) authorizedState.getTransaction()).setAuthTime(new Date());
-
         }
     }
 
@@ -226,7 +228,7 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
             }
         }
         try {
-            cb = cb + (cb.indexOf(responseDelimiter) == -1 ? responseDelimiter : "&") + OA2Constants.AUTHORIZATION_CODE + "=" + URLEncoder.encode(idStr, "UTF-8");
+            cb = cb + (cb.indexOf(responseDelimiter) == -1 ? responseDelimiter : "&") + OA2Constants.AUTHORIZATION_CODE + "=" + TokenUtils.encodeToken(idStr);
             if (params.containsKey(OA2Constants.STATE)) {
                 cb = cb + "&" + OA2Constants.STATE + "=" + URLEncoder.encode(params.get(OA2Constants.STATE), "UTF-8");
             }

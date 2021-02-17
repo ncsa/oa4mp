@@ -13,6 +13,7 @@ import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.server.request.IssuerResponse;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
+import edu.uiuc.ncsa.security.delegation.token.impl.TokenUtils;
 import edu.uiuc.ncsa.security.oauth_2_0.*;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTUtil2;
 import edu.uiuc.ncsa.security.oauth_2_0.server.UII2;
@@ -201,6 +202,10 @@ public class UserInfoServlet extends MyProxyDelegationServlet {
     }
 
     protected AccessToken getAT(HttpServletRequest request) {
-        return new AccessTokenImpl(URI.create(getRawAT(request)));
+        String rawAt = getRawAT(request);
+        if(TokenUtils.isBase64(rawAt)){
+            rawAt = TokenUtils.decodeToken(rawAt);
+        }
+        return new AccessTokenImpl(URI.create(rawAt));
     }
 }

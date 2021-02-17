@@ -10,6 +10,7 @@ import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.server.request.IssuerResponse;
+import edu.uiuc.ncsa.security.delegation.token.impl.TokenUtils;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2GeneralError;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2TokenForge;
@@ -83,6 +84,9 @@ public abstract class TokenManagerServlet extends MyProxyDelegationServlet {
     }
 
     protected OA2ServiceTransaction getTransFromToken(String token) {
+        if(TokenUtils.isBase64(token)){
+            token = TokenUtils.decodeToken(token);
+        }
         OA2SE oa2SE = (OA2SE) getServiceEnvironment().getTransactionStore();
         OA2TokenForge tf = (OA2TokenForge) oa2SE.getTokenForge();
         switch (tf.getType(token)) {

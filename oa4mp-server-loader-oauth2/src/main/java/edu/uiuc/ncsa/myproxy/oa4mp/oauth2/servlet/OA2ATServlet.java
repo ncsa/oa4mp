@@ -31,6 +31,7 @@ import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
 import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
 import edu.uiuc.ncsa.security.delegation.token.impl.AuthorizationGrantImpl;
 import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
+import edu.uiuc.ncsa.security.delegation.token.impl.TokenUtils;
 import edu.uiuc.ncsa.security.oauth_2_0.*;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTRunner;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTUtil2;
@@ -220,10 +221,13 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         verifyClientSecret(client, rawSecret);
 
         String subjectToken = getFirstParameterValue(request, SUBJECT_TOKEN);
+
         if (subjectToken == null) {
             throw new OA2ATException(OA2Errors.INVALID_REQUEST, "missing subject token");
         }
-
+        if(TokenUtils.isBase64(subjectToken)){
+            subjectToken = TokenUtils.decodeToken(subjectToken);
+        }
         String requestedTokenType = getFirstParameterValue(request, REQUESTED_TOKEN_TYPE);
         if (StringUtils.isTrivial(requestedTokenType)) {
             requestedTokenType = ACCESS_TOKEN_TYPE;
@@ -365,6 +369,9 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         }
         if (!scopes.isEmpty()) {
             newTXR.setScopes(scopes);
+        } else{
+            // If no scopes sent with request, revert to scopes in original request.
+            newTXR.setScopes(t.getScopes());
         }
 
         if (!resources.isEmpty()) {
@@ -440,10 +447,10 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         if (rtiResponse.hasRefreshToken()) {
             // Maddening part of the spec is that the access_oadtoken claim can be a refresh token.
             // User has to look at the returned token type.
-            rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getRefreshToken().getToken()); // Required
-            rfcClaims.put(OA2Constants.REFRESH_TOKEN, rtiResponse.getRefreshToken().getToken()); // Optional
+            rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getRefreshToken().toB64()); // Required
+            rfcClaims.put(OA2Constants.REFRESH_TOKEN, rtiResponse.getRefreshToken().toB64()); // Optional
         } else {
-            rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getAccessToken().getToken()); // Required.
+            rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getAccessToken().toB64()); // Required.
             // create scope string  Remember that these may have been changed by a script,
             // so here is the right place to set it.
             rfcClaims.put(OA2Constants.SCOPE, listToString(newTXR.getScopes()));
@@ -778,7 +785,10 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         // Grants are checked in the doIt method
 
         String rawRefreshToken = request.getParameter(OA2Constants.REFRESH_TOKEN);
-        RefreshTokenImpl oldRT = getTF2().getRefreshToken(request.getParameter(OA2Constants.REFRESH_TOKEN));
+        if(TokenUtils.isBase64(rawRefreshToken)){
+            rawRefreshToken = TokenUtils.decodeToken(rawRefreshToken);
+        }
+        RefreshTokenImpl oldRT = getTF2().getRefreshToken(rawRefreshToken);
         if (c == null) {
             throw new OA2ATException(OA2Errors.INVALID_REQUEST, "Could not find the client associated with refresh token \"" + oldRT + "\"");
         }

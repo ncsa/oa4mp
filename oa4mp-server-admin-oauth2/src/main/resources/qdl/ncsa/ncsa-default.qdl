@@ -19,12 +19,12 @@
 DEBUG := true;
 debug(0, 'first debug message');
 log('log message');
-if[DEBUG][
-say('In debug = ON');
 // Debug stuff --  uncomment if running on my dev box. Should not be in store.
+if[DEBUG][
+  say('In debug = ON');
   claims.idp := 'https://idp.ncsa.illinois.edu/idp/shibboleth';
- claims.eppn := 'jgaynor@illinois.edu';
-claims.debug := 'debugging mode on.';
+  claims.eppn := 'jgaynor@illinois.edu';
+  claims.debug := 'debugging mode on.';
 ]; //end debugging hack
 say('at top');
 say('script arg count =' + script_args());

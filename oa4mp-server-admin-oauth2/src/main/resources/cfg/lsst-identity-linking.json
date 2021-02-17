@@ -27,7 +27,7 @@
     "version": "1.0"
    },
       "failOnError": "true",
-      "address": "ldap.ncsa.illinois.edu",
+      "address": "ldap4.ncsa.illinois.edu",
       "port": 636,
       "enabled": "true",
       "authorizationType": "none",

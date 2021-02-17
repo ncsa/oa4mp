@@ -1,8 +1,5 @@
 {
-  "config": [
-    "LSST client configuration, created by Jeff Gaynor 6/19/2018",
-    "This does the on-boarding of users. Note that it accesses ldap-test2 for this."
-  ],
+  "config": "LSST client configuration, created by Jeff Gaynor 6/19/2018",
   "claims": {
     "sourceConfig": [
       {
@@ -79,11 +76,6 @@
               "name": "mail",
               "returnAsList": false,
               "returnName": "email"
-            },
-            {
-              "name": "uid",
-              "returnAsList": false,
-              "returnName": "uid"
             },
             {
               "name": "uid",

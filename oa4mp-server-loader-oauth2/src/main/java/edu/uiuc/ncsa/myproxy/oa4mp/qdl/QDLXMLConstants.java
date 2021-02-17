@@ -20,6 +20,15 @@ public interface QDLXMLConstants extends XMLConstants {
     String RESOURCES = "resources;";
     String ID_ATTR = "id";
 
+    String VO_ENTRY = "virtual_organization";
+    String VO_JSON_WEB_KEYS = "json_web_keys";
+    String VO_DEFAULT_KEY = "default_key";
+    String VO_TITLE = "title";
+    String VO_LAST_MODIFIED = "last_modified_at";
+    String VO_CREATED = "created_at";
+    String VO_DISCOVERY_PATH = "discovery_path";
+    // use issuer and id_attr from above
+
     /*
         String tokenType;
     List<String> audience;

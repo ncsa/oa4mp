@@ -21,6 +21,7 @@ import edu.uiuc.ncsa.security.delegation.token.Token;
 import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
 import edu.uiuc.ncsa.security.delegation.token.impl.AuthorizationGrantImpl;
 import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
+import edu.uiuc.ncsa.security.delegation.token.impl.TokenUtils;
 import edu.uiuc.ncsa.security.oauth_2_0.JWTUtil;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.UserInfo;
@@ -729,7 +730,15 @@ public class OA2CLCCommands extends CLCCommands {
                 return;
             }
             if (token == null) {
-                say("default access token = " + accessToken.getToken());
+                say("access token = " + accessToken.getToken());
+                if(TokenUtils.isBase64(accessToken.getToken())){
+                    // Or we over-write the access token and lose base 64 encoding.
+                  AccessTokenImpl  accessToken2  = new AccessTokenImpl(null);
+
+                    accessToken2.fromB64(accessToken.getToken());
+                    accessToken = accessToken2;
+                    say("   decoded token:" + accessToken.getToken());
+                }
                 Date startDate = DateUtils.getDate(accessToken.getToken());
                 startDate.setTime(startDate.getTime() + accessToken.getLifetime());
                 if (startDate.getTime() < System.currentTimeMillis()) {
@@ -767,7 +776,14 @@ public class OA2CLCCommands extends CLCCommands {
                 return;
             }
             if (token == null) {
-                say("default refresh token = " + refreshToken.getToken());
+                say("refresh token = " + refreshToken.getToken());
+                if(TokenUtils.isBase64(refreshToken.getToken())){
+                    RefreshTokenImpl refreshToken2 = new RefreshTokenImpl(null);
+
+                    refreshToken2.fromB64(refreshToken.getToken());
+                    refreshToken = refreshToken2;
+                    say("   decoded token:" + refreshToken.getToken());
+                }
                 Date startDate = DateUtils.getDate(refreshToken.getToken());
                 startDate.setTime(startDate.getTime() + refreshToken.getLifetime());
                 if (startDate.getTime() <= System.currentTimeMillis()) {

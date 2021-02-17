@@ -13,6 +13,7 @@ import edu.uiuc.ncsa.security.delegation.servlet.TransactionState;
 import edu.uiuc.ncsa.security.delegation.token.impl.AuthorizationGrantImpl;
 import edu.uiuc.ncsa.security.oauth_2_0.*;
 import edu.uiuc.ncsa.security.oauth_2_0.server.AGRequest2;
+import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.util.configuration.ConfigUtil;
 import net.sf.json.JSONObject;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -94,16 +95,33 @@ public class RFC8628Servlet extends MyProxyDelegationServlet implements RFC8628C
         t.setClient(client);
         t.setIdentifier(BasicIdentifier.newID(ag.getURIToken()));
         t.setAuthGrantLifetime(lifetime);
+        t.setAuthGrantValid(true);
         t.setRFC8628Request(true);
         RFC8628State rfc8628State = new RFC8628State();
         String userCode = getUserCode();
+        boolean gotUserCode = false;
+        for(int i = 0; i < 5 ; i++){
+            // 5 tries to come up with an unused user code.
+            if(cache.containsKey(userCode)){
+                ServletDebugUtil.trace(this, "Attempt to get user code # " + i + "failed for \"" + userCode + "\".");
+                userCode = getUserCode();
+            }else {
+                cache.put(userCode, ag.getToken());
+                gotUserCode = true;
+                break;
+            }
+        }
+        if(!gotUserCode){
+            ServletDebugUtil.error(this, "Could not get an unused user code. Cache contains " + cache.size() + " entries.");
+            throw new OA2GeneralError(OA2Errors.SERVER_ERROR, "could not create new user code", HttpStatus.SC_INTERNAL_SERVER_ERROR, null);
+        }
+
         rfc8628State.userCode = userCode;
         rfc8628State.deviceCode = ag.getURIToken();
         rfc8628State.issuedAt = System.currentTimeMillis();
         rfc8628State.lastTry = System.currentTimeMillis(); // so it has a reasonable value
         rfc8628State.lifetime = lifetime;
         rfc8628State.interval = DEFAULT_WAIT; // *may* make this configurable
-        cache.put(userCode, ag.getToken());
         String scope = req.getParameter(OA2Constants.SCOPE);
         if (!isTrivial(scope)) {
             // scope is optional, so only take notice if they send something

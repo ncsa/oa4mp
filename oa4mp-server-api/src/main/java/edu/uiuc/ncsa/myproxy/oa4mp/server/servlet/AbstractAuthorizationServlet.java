@@ -12,6 +12,7 @@ import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.servlet.JSPUtil;
 import edu.uiuc.ncsa.security.servlet.Presentable;
 import edu.uiuc.ncsa.security.servlet.PresentableState;
+import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -55,7 +56,7 @@ public abstract class AbstractAuthorizationServlet extends CRServlet implements 
     /**
      * State object after authorization has worked.
      */
-    protected class AuthorizedState extends PresentationState {
+    public static class AuthorizedState extends PresentationState {
         public AuthorizedState(int state, HttpServletRequest request, HttpServletResponse response, ServiceTransaction transaction) {
             super(state, request, response);
             this.transaction = transaction;
@@ -113,16 +114,27 @@ public abstract class AbstractAuthorizationServlet extends CRServlet implements 
     public static String OK_PAGE = "/authorize-ok.jsp";
     public static String ERROR_PAGE = "/authorize-error.jsp";
 
+   protected String getInitialPage(){
+       return INITIAL_PAGE;
+   }
+
+   protected String getRemoteUserInitialPage(){
+       return REMOTE_USER_INITIAL_PAGE;
+   }
+
+   protected String getOkPage(){
+       return OK_PAGE;
+   }
     public void present(PresentableState state) throws Throwable {
         AuthorizedState aState = (AuthorizedState) state;
         postprocess(new TransactionState(state.getRequest(), aState.getResponse(), null, aState.getTransaction()));
 
         switch (aState.getState()) {
             case AUTHORIZATION_ACTION_START:
-                String initPage = INITIAL_PAGE;
+                String initPage = getInitialPage();
                 info("*** STARTING present");
                 if (getServiceEnvironment().getAuthorizationServletConfig().isUseHeader()) {
-                    initPage = REMOTE_USER_INITIAL_PAGE;
+                    initPage = getRemoteUserInitialPage();
 
                     info("*** PRESENT: Use headers enabled.");
                     String x = null;
@@ -161,7 +173,7 @@ public abstract class AbstractAuthorizationServlet extends CRServlet implements 
                 info("3.a. User information obtained for grant = " + aState.getTransaction().getAuthorizationGrant());
                 break;
             case AUTHORIZATION_ACTION_OK:
-                JSPUtil.fwd(state.getRequest(), state.getResponse(), OK_PAGE);
+                JSPUtil.fwd(state.getRequest(), state.getResponse(), getOkPage());
                 break;
             default:
                 // fall through and do nothing
@@ -190,7 +202,7 @@ public abstract class AbstractAuthorizationServlet extends CRServlet implements 
 
     @Override
     protected void doIt(HttpServletRequest request, HttpServletResponse response) throws Throwable {
-        info("*** STARTING request");
+        info( "starting request");
         //String ag = request.getParameter(CONST(TOKEN_KEY));
         String ag = getParam(request, CONST(TOKEN_KEY));
         ServiceTransaction trans = null;
@@ -236,9 +248,9 @@ public abstract class AbstractAuthorizationServlet extends CRServlet implements 
         present(pState);
     }
 
-    public int getState(HttpServletRequest request) {
+    public static int getState(HttpServletRequest request) {
         String action = request.getParameter(AUTHORIZATION_ACTION_KEY);
-        log("action = " + action);
+        ServletDebugUtil.trace(AbstractAuthorizationServlet.class, "action = " + action);
         if (action == null || action.length() == 0) return AUTHORIZATION_ACTION_START;
         if (action.equals(AUTHORIZATION_ACTION_OK_VALUE)) return AUTHORIZATION_ACTION_OK;
         throw new GeneralException("Error: unknown authorization request action = \"" + action + "\"");
@@ -265,6 +277,7 @@ public abstract class AbstractAuthorizationServlet extends CRServlet implements 
         String userName = null;
         String password = null;
         // Fixes OAUTH-192.
+        // Note this regets it from the heade rif present to check that the user got here legitimately
         if (getServiceEnvironment().getAuthorizationServletConfig().isUseHeader()) {
             String headerName = getServiceEnvironment().getAuthorizationServletConfig().getHeaderFieldName();
             if (isEmpty(headerName) || headerName.toLowerCase().equals("remote_user")) {
@@ -295,6 +308,7 @@ public abstract class AbstractAuthorizationServlet extends CRServlet implements 
             // Headers not used, just pull it off the form the user POSTs.
             userName = request.getParameter(AUTHORIZATION_USER_NAME_KEY);
             password = request.getParameter(AUTHORIZATION_PASSWORD_KEY);
+            checkUser(userName, password);
             trans.setUsername(userName);
         }
 
@@ -314,6 +328,28 @@ public abstract class AbstractAuthorizationServlet extends CRServlet implements 
         info("4.a. starting redirect to " + cb + ", " + statusString);
         response.sendRedirect(cb);
         info("4.b. Redirect to callback " + cb + " ok, " + statusString);
+    }
+    public void checkUser(String username, String password) throws GeneralSecurityException {
+        // At this point in the basic servlet, there is no system for passwords.
+        // This is because OA4MP has no native concept of managing users, it being
+        // far outside of the OAuth spec.
+        // If you were checking users and there  were a problem, you would do this:
+        /*
+        String message = "invalid login";
+        throw new UserLoginException(message, username, password);
+        */
+        // which would display the message as the retry message.
+
+    }
+    public static class UserLoginException extends GeneralException{
+        String username;
+        String password;
+
+        public UserLoginException(String message, String username, String password) {
+            super(message);
+            this.username = username;
+            this.password = password;
+        }
     }
 
     public static class MyMyProxyLogon extends MyProxyLogon {

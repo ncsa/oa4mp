@@ -155,6 +155,7 @@ When a new version is deployed, here is the testing order
   -- Do serge LSST client: https://serge.ncsa.illinois.edu/lsst-client/ (id ends with 74741)
        ** NOTE: This should return standard NCSA claims and voPersonExternalID must
           be set in the claims or this fails.
+       ** NOTE: uidNumber must be asserted or this fails.
        ** NOTE: This is NOT QDL but functor scripting and is a critical regression test.
 
    -- Farm out testing to others: LSST, LIGO, FNAL
