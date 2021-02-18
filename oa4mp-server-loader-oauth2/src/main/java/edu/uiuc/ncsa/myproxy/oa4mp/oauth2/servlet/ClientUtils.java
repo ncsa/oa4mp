@@ -150,9 +150,7 @@ public class ClientUtils {
 
         }
 
-        // TODO -- replace next call with sha1Hex(rawSecret)? Need to know side effects first!
-
-        if (!client.getSecret().equals(DigestUtils.shaHex(rawSecret))) {
+        if (!client.getSecret().equals(DigestUtils.sha1Hex(rawSecret))) {
             DebugUtil.trace(ClientUtils.class, "doIt: bad secret, throwing exception.");
             if (isAT) {
 

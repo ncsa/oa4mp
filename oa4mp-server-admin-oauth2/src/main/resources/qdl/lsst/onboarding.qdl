@@ -1,5 +1,5 @@
 /*
-)help    There is a pair of scripts is for LSST. These do
+    There is a pair of scripts is for LSST. These do
     * onboarding = if a person comes in through any of several IDPs create a voPersonExternalID
                    and return that as a claim.
     * linking = Once a user has been onboarded, possibly do a two-step look up. If their IDP is NCSA,
@@ -12,47 +12,37 @@
    {"tokens": {"identity": {
     "qdl":  {
      "load": "lsst/onboarding.qdl",
-     "xmd": {"exec_phase":   ["post_token"]}
+     "xmd": {"exec_phase":   ["pre_auth","post_token"]}
     },
     "type": "identity"
    }}}
 */
+// Onboarding for LSST (CIL-523): Create a voPersonExternalID (VOP) for them. This is run in a special
+  client by LSST just when a person needs to create it. Effectively this just assert VOP as a  claim,
+  so the only difference between this and their regular logon is a single VOP claim.
+  This will trivially create a VOP if the IDP is from the NCSA which si just the eppn.
+  Also note that the eppn or eptid may be set for various other IDP (e.g. XSEDE) and VOP is
+  created for those too.
+
+// Some constants for later.
 script_load('utils/init.qdl');
+script_load('ncsa/ncsa-default');
 
+if[exec_phase == 'pre_auth'][return();]; // do nothing else in the first pass
 
-v := null;
-if[claims.idp == idp.github][v:=claims.oidc+'@github.com';];
-if[claims.idp == idp.google][v:=claims.oidc+'@accounts.google.com';];
-if[claims.idp == idp.orcid][v:=replace(claims.oidc,'http://', 'https://');];
-if[
-     v != null
-   ][
-// go look up voPersonExternalID  first in LDAP
-                    cfg. := new_template('ncsa');
-                    cfg. := create_source(cfg.);
-          cfg.claim_name := 'uid';
-           cfg.ldap_name := 'voPersonExternalID';
-         cfg.search_base := 'ou=People,dc=ncsa,dc=illinois,dc=edu';
-  cfg.search_attributes. := ['uid'];
-    cfg.type := 'ldap';
-say('***QDL: cfg. ==' + to_string(cfg.));
-                      c. := get_claims(cfg., v);
-say('***QDL: got VOP claims:' + to_string(c.));
-   if[is_defined(c.uid)][claims.uid := c.uid;];
-]else[
-   // no recognized IDP at this point -- they used somethine we don't honor.
-   if[
-       claims.idp != idp.ncsa
-     ][
-        return();
-     ]else[
-        claims.uid := head(claims.eppn, '@');
-     ];
-];
+// LSST wants the subject customized in this case:
+if[claims.idp == idp.ncsa][ claims.sub := claims.eppn; ];
 
+// now we can figure out the VOP claim. Usually one of these should work, eppn has the
+// right of way followed by eptid. The other IDPs tested have VOP constructed.
 
-say('***QDL: getting claims');
-             cfg. := new_template('ncsa');
-             cfg. := create_source(cfg.);
-          claims. := claims. ~ get_claims(cfg., claims.uid);
-say('***QDL: Returning claims:' + to_string(claims.));
+     v := null;
+switch[
+    if[ is_defined(claims.eppn) ][ v := claims.eppn;];
+    if[is_defined(claims.eptid) ][ v := claims.eptid;];
+    if[claims.idp == idp.github ][ v := claims.oidc+'@github.com';];
+    if[claims.idp == idp.google ][ v := claims.oidc+'@accounts.google.com';];
+    if[claims.idp == idp.orcid  ][ v := replace(claims.oidc,'http://', 'https://');];
+]; // end switch
+
+if[v != null][claims.VOP := v;];

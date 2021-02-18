@@ -23,6 +23,8 @@ public class OA2NewClientNotifier extends NewClientNotifier {
     public static final String SIGN_TOKEN_OK = "signTokens";
     public static final String LDAP_CONFIGURATION = "ldapConfiguration";
     public static final String CALLBACK = "callback";
+    public static final String IS_PUBLIC = "isPublic";
+    public static final String STRICT_SCOPES = "strictScopes";
 
 
     public OA2NewClientNotifier(MailUtil mailUtil, MyLoggingFacade loggingFacade) {
@@ -42,6 +44,8 @@ public class OA2NewClientNotifier extends NewClientNotifier {
         replacements.put(SCOPES, String.valueOf(oa2Client.getScopes()));
         replacements.put(CALLBACK, String.valueOf(oa2Client.getCallbackURIs()));
         replacements.put(REFRESH_ENABLED, Boolean.toString(oa2Client.isRTLifetimeEnabled()));
+        replacements.put(IS_PUBLIC, Boolean.toString(oa2Client.isPublicClient()));
+        replacements.put(STRICT_SCOPES, Boolean.toString(oa2Client.useStrictScopes()));
         if (oa2Client.isRTLifetimeEnabled()) {
             replacements.put(REFRESH_LIFETIME, Long.toString(oa2Client.getRtLifetime()));
         } else {

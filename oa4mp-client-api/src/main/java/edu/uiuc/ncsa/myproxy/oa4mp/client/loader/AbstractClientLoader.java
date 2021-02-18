@@ -33,6 +33,7 @@ public abstract class AbstractClientLoader<T extends ClientEnvironment> extends 
     public static final String ASSET_ENDPOINT = "getcert";
     public static final String INITIATE_ENDPOINT = "initiate";
     public static final String USER_INFO_ENDPOINT = "userinfo";
+    public static final String DEVICE_AUTHORIZATION_ENDPOINT = "device_authorization"; // suggested in the spec, best guess for default.
 
 
     // FIX for OAUTH-137. Set default cert lifetime to be 12 hours, not 10 days.

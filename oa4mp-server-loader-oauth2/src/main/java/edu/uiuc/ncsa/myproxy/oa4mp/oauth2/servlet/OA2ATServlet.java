@@ -15,6 +15,7 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.cache.Cleanup;
 import edu.uiuc.ncsa.security.core.exceptions.IllegalAccessException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
+import edu.uiuc.ncsa.security.core.exceptions.TransactionNotFoundException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DateUtils;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
@@ -225,8 +226,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         if (subjectToken == null) {
             throw new OA2ATException(OA2Errors.INVALID_REQUEST, "missing subject token");
         }
-        if(TokenUtils.isBase64(subjectToken)){
-            subjectToken = TokenUtils.decodeToken(subjectToken);
+        if(TokenUtils.isBase32(subjectToken)){
+            subjectToken = TokenUtils.b32DecodeToken(subjectToken);
         }
         String requestedTokenType = getFirstParameterValue(request, REQUESTED_TOKEN_TYPE);
         if (StringUtils.isTrivial(requestedTokenType)) {
@@ -447,10 +448,10 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         if (rtiResponse.hasRefreshToken()) {
             // Maddening part of the spec is that the access_oadtoken claim can be a refresh token.
             // User has to look at the returned token type.
-            rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getRefreshToken().toB64()); // Required
-            rfcClaims.put(OA2Constants.REFRESH_TOKEN, rtiResponse.getRefreshToken().toB64()); // Optional
+            rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getRefreshToken().encodeToken()); // Required
+            rfcClaims.put(OA2Constants.REFRESH_TOKEN, rtiResponse.getRefreshToken().encodeToken()); // Optional
         } else {
-            rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getAccessToken().toB64()); // Required.
+            rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getAccessToken().encodeToken()); // Required.
             // create scope string  Remember that these may have been changed by a script,
             // so here is the right place to set it.
             rfcClaims.put(OA2Constants.SCOPE, listToString(newTXR.getScopes()));
@@ -774,7 +775,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
                     "token expired");
         }
         // Can only determine if token is valid after we get the transaction and examine it.
-        return rts.get(refreshToken);
+            return rts.get(refreshToken);
     }
 
     protected OA2TokenForge getTF2() {
@@ -785,8 +786,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         // Grants are checked in the doIt method
 
         String rawRefreshToken = request.getParameter(OA2Constants.REFRESH_TOKEN);
-        if(TokenUtils.isBase64(rawRefreshToken)){
-            rawRefreshToken = TokenUtils.decodeToken(rawRefreshToken);
+        if(TokenUtils.isBase32(rawRefreshToken)){
+            rawRefreshToken = TokenUtils.b32DecodeToken(rawRefreshToken);
         }
         RefreshTokenImpl oldRT = getTF2().getRefreshToken(rawRefreshToken);
         if (c == null) {
@@ -812,8 +813,20 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             }
             // do nothing, this means that the token is not a JWT which is fine too
         }
-
-        OA2ServiceTransaction t = getByRT(oldRT);
+        OA2ServiceTransaction t = null;
+        if(oldRT.isExpired()){
+            throw new OA2ATException(OA2Errors.INVALID_GRANT, "expired refresh token", HttpStatus.SC_BAD_REQUEST, null);
+        }
+        try {
+            // Fix for CIL-882
+             t = getByRT(oldRT);
+        }catch(TransactionNotFoundException e){
+            String message =  "The refresh token \"" + oldRT.getToken() + "\" for client " + c.getIdentifierString() + " is not expired, but also was not found.";
+            ServletDebugUtil.trace(this, message);
+            info(message);
+            throw new OA2ATException(OA2Errors.INVALID_TOKEN, "The token \"" + oldRT.getToken() + "\" could not be associated with a pending flow",
+                    HttpStatus.SC_BAD_REQUEST, null);
+        }
         if (tokenVersion1) {
             // Can't fix it until we have the right transaction.
             t.setRefreshTokenLifetime(computeRefreshLifetime(t, oa2SE));

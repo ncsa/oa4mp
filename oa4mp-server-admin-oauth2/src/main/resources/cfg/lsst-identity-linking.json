@@ -1,11 +1,27 @@
 {
- "config":  [
-  "Configuration that contains new scripting notation 2/25/2019",
-  "This is currently deployed on production for LSST clients to link users, setting voPersonExternalID",
-  "then searching ldap-test for this value."
- ],
  "claims":  {
+  "preProcessing": {"script":   [
+   "setEnv('vo','voPersonExternalID');",
+   "setEnv('ncsa','https://idp.ncsa.illinois.edu/idp/shibboleth');",
+   "# if the IDP is NCSA, just set the uid and do the second LDAP search, otherwise, search first on voPersonExternalID to set it.",
+   "if[",
+   "equals(get('idp'),'${ncsa}')",
+   "]then[",
+   "set('uid',drop('@ncsa.illinois.edu',get('eppn'))),",
+   "set('${vo}',get('eppn'))",
+   "]else[",
+   "set_claim_source('LDAP','3258ed63b62d1a78')",
+   "];",
+   "set_claim_source('ncsa-default','uid');"
+  ]},
   "sourceConfig": [{"ldap":   {
+   "address": "ldap4.ncsa.illinois.edu",
+   "authorizationType": "none",
+   "contextName": "",
+   "enabled": "true",
+   "failOnError": "true",
+   "id": "3258ed63b62d1a78",
+   "port": 636,
    "preProcessing":    {
     "script":     [
      "# Set some variables to keep the verbosity down. These are mostly the IDPs.",
@@ -26,40 +42,24 @@
     ],
     "version": "1.0"
    },
-      "failOnError": "true",
-      "address": "ldap4.ncsa.illinois.edu",
-      "port": 636,
-      "enabled": "true",
-      "authorizationType": "none",
-      "searchName": "voPersonExternalID",
-      "searchFilterAttribute": "voPersonExternalID",
-      "searchAttributes": [      {
-        "name": "uid",
-        "returnAsList": false,
-        "returnName": "uid"
-      }],
-      "searchBase": "ou=People,dc=ncsa,dc=illinois,dc=edu",
-      "contextName": "",
-      "ssl":       {
-        "tlsVersion": "TLS",
-        "useJavaTrustStore": true
-      },
-      "id": "3258ed63b62d1a78"
-    }}],
-   "preProcessing": {"script":     [
-      "setEnv('vo','voPersonExternalID');",
-      "setEnv('ncsa','https://idp.ncsa.illinois.edu/idp/shibboleth');",
-      "# if the IDP is NCSA, just set the uid and do the second LDAP search, otherwise, search first on voPersonExternalID to set it.",
-      "if[",
-      "equals(get('idp'),'${ncsa}')",
-      "]then[",
-      "set('uid',drop('@ncsa.illinois.edu',get('eppn'))),",
-      "set('${vo}',get('eppn'))",
-      "]else[",
-      "set_claim_source('LDAP','3258ed63b62d1a78')",
-      "];",
-      "set_claim_source('ncsa-default','uid');"
-    ]}
-  },
-  "isSaved": true
+   "searchAttributes": [   {
+    "name": "uid",
+    "returnAsList": false,
+    "returnName": "uid"
+   }],
+   "searchBase": "ou=People,dc=ncsa,dc=illinois,dc=edu",
+   "searchFilterAttribute": "voPersonExternalID",
+   "searchName": "voPersonExternalID",
+   "ssl":    {
+    "tlsVersion": "TLS",
+    "useJavaTrustStore": true
+   }
+  }}]
+ },
+ "config":  [
+  "Configuration that contains new scripting notation 2/25/2019",
+  "This is currently deployed on production for LSST clients to link users, setting voPersonExternalID",
+  "then searching ldap-test for this value."
+ ],
+ "isSaved": true
 }

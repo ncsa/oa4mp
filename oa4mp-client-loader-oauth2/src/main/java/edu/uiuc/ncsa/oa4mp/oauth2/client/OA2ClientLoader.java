@@ -313,7 +313,7 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
         return createServiceURI(getCfgValue(ClientXMLTags.USER_INFO_URI), getCfgValue(ClientXMLTags.BASE_URI), USER_INFO_ENDPOINT);
     }
     protected URI getDeviceAuthorizationURI() {
-        return createServiceURI(getCfgValue(DEVICE_AUTHORIZATION_URI), getCfgValue(ClientXMLTags.BASE_URI), DEVICE_AUTHORIZATION_URI);
+        return createServiceURI(getCfgValue(DEVICE_AUTHORIZATION_URI), getCfgValue(ClientXMLTags.BASE_URI), DEVICE_AUTHORIZATION_ENDPOINT);
     }
 
     protected URI getAuthzURI() {

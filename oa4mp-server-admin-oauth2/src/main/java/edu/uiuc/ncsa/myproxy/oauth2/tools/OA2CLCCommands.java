@@ -731,11 +731,11 @@ public class OA2CLCCommands extends CLCCommands {
             }
             if (token == null) {
                 say("access token = " + accessToken.getToken());
-                if(TokenUtils.isBase64(accessToken.getToken())){
+                if(TokenUtils.isBase32(accessToken.getToken())){
                     // Or we over-write the access token and lose base 64 encoding.
                   AccessTokenImpl  accessToken2  = new AccessTokenImpl(null);
 
-                    accessToken2.fromB64(accessToken.getToken());
+                    accessToken2.decodeToken(accessToken.getToken());
                     accessToken = accessToken2;
                     say("   decoded token:" + accessToken.getToken());
                 }
@@ -777,10 +777,10 @@ public class OA2CLCCommands extends CLCCommands {
             }
             if (token == null) {
                 say("refresh token = " + refreshToken.getToken());
-                if(TokenUtils.isBase64(refreshToken.getToken())){
+                if(TokenUtils.isBase32(refreshToken.getToken())){
                     RefreshTokenImpl refreshToken2 = new RefreshTokenImpl(null);
 
-                    refreshToken2.fromB64(refreshToken.getToken());
+                    refreshToken2.decodeToken(refreshToken.getToken());
                     refreshToken = refreshToken2;
                     say("   decoded token:" + refreshToken.getToken());
                 }

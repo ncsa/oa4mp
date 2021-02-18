@@ -87,8 +87,8 @@ public class OA2CertServlet extends ACS2 {
 
             }
         } catch (Throwable t) {
-            if(TokenUtils.isBase64(rawAT)){
-                rawAT = TokenUtils.decodeToken(rawAT);
+            if(TokenUtils.isBase32(rawAT)){
+                rawAT = TokenUtils.b32DecodeToken(rawAT);
             }
             // It is a standard access token, not a jwt.
         }
@@ -166,7 +166,7 @@ public class OA2CertServlet extends ACS2 {
                     null
             );
         }
-        if (!client.getSecret().equals(DigestUtils.shaHex(rawSecret))) {
+        if (!client.getSecret().equals(DigestUtils.sha1Hex(rawSecret))) {
             throw new OA2GeneralError(OA2Errors.UNAUTHORIZED_CLIENT,
                     "incorrect secret, request refused.",
                     HttpStatus.SC_UNAUTHORIZED,

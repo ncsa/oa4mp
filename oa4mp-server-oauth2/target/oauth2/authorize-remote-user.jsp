@@ -45,10 +45,13 @@ please accept, otherwise, cancel.
         <tr>
             <td> The client listed below is requesting access to your
                 account. If you approve, please accept.
-                <br><br>
+                <br/><br/>
                 <i>Name:</i> ${clientName}
-                <br>
+                <br/>
                 <i>URL:</i> ${clientHome}
+                <br/>
+                <i>Requested Scopes:</i> ${clientScopes}
+
             </td>
         </tr>
         <tr>

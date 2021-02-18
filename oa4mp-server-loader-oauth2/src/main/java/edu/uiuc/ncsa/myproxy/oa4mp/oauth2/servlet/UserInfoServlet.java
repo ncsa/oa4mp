@@ -203,8 +203,8 @@ public class UserInfoServlet extends MyProxyDelegationServlet {
 
     protected AccessToken getAT(HttpServletRequest request) {
         String rawAt = getRawAT(request);
-        if(TokenUtils.isBase64(rawAt)){
-            rawAt = TokenUtils.decodeToken(rawAt);
+        if(TokenUtils.isBase32(rawAt)){
+            rawAt = TokenUtils.b32DecodeToken(rawAt);
         }
         return new AccessTokenImpl(URI.create(rawAt));
     }

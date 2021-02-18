@@ -4,6 +4,7 @@
    for the user's NCSA-specific information.
    Author: Jeff Gaynor
    Created: 2020-10-31T12:39:30.422Z
+   Last modified: 2021-02-17T12:30:30.540Z
 
    The client configuration:
 
@@ -20,51 +21,45 @@
 
 */
 
+// Linking for LSST (CIL-523): Do two stage lookup if the user did not use the NCSA LDAP
+// to link their external account.
 
-// Some constants for later.
 script_load('utils/init.qdl');
+
+v := null;
+if[claims.idp == idp.github][v:=claims.oidc+'@github.com';];
+if[claims.idp == idp.google][v:=claims.oidc+'@accounts.google.com';];
+if[claims.idp == idp.orcid][v:=replace(claims.oidc,'http://', 'https://');];
 if[
-    exec_phase == 'pre_auth' && claims.idp != idp.ncsa
-  ][
-     v := null;
-     switch[
-        if[claims.idp == idp.github]then[v:=claims.oidc+'@github.com';];
-        if[claims.idp == idp.google]then[v:=claims.oidc+'@accounts.google.com';];
-        if[claims.idp == idp.orcid ]then[v:=replace(claims.oidc,'http://', 'https://');];
-     ]; //end switch
-     claims.VOP := v;
-     f. := new_template('ncsa');
-     f.search_filter_attribute := VOP;
-     f.search_attributes. := ['uid']; // return the uid from the search as a claim
-     c. := get_claims(create_source(f.), v);
-     claims.uid := c.uid;
-]; // end if
-script_load('ncsa/ncsa-default.qdl');
-
-/*
-Original script for functors -- here for reference while I debug, should be deleted at some point.
-"setEnv('vo','voPersonExternalID');",
-  "setEnv('ncsa','https://idp.ncsa.illinois.edu/idp/shibboleth');",
-  "# if the IDP is NCSA, just set the uid and do the second LDAP search, otherwise, search first on voPersonExternalID to set it.",
-  "if[",
-  "equals(get('idp'),'${ncsa}')",
-  "]then[",
-  "set('uid',drop('@ncsa.illinois.edu',get('eppn'))),",
-  "set('${vo}',get('eppn'))",
-  "]else[",
-  "set_claim_source('LDAP','3258ed63b62d1a78')",
-  "];",
-  "set_claim_source('ncsa-default','uid');"
+     v != null
+   ][
+// go look up voPersonExternalID  first in LDAP
+                    cfg. := new_template('ncsa');
+                    cfg. := create_source(cfg.);
+          cfg.claim_name := 'uid';
+           cfg.ldap_name := 'voPersonExternalID';
+         cfg.search_base := 'ou=People,dc=ncsa,dc=illinois,dc=edu';
+  cfg.search_attributes. := ['uid'];
+                cfg.type := 'ldap'; // Set the type to LDAP or the handler will on search by uid
+say('***QDL: cfg. ==' + to_string(cfg.));
+                      c. := get_claims(cfg., v);
+say('***QDL: got VOP claims:' + to_string(c.));
+   if[is_defined(c.uid)][claims.uid := c.uid;];
+]else[
+   // no recognized IDP at this point -- they used something we don't honor.
+   if[
+       claims.idp != idp.ncsa
+     ][
+        return();
+     ]else[
+        claims.uid := head(claims.eppn, '@');
+     ];
+];
 
 
-   "setEnv('github','http://github.com/login/oauth/authorize');",
-      "setEnv('google','http://google.com/accounts/o8/id');",
-      "setEnv('orcid','http://orcid.org/oauth/authorize');",
-      "setEnv('ncsa','https://idp.ncsa.illinois.edu/idp/shibboleth');",
-      "#  Now figure out which IDP was used and set voPersonExternalID so it may be searched for.",
-      "xor{",
-      "    if[equals(get('idp'),'${github}')]then[set('${vo}',concat(get('oidc'),'@github.com'))],",
-      "    if[equals(get('idp'),'${google}')]then[set('${vo}',concat(get('oidc'),'@accounts.google.com'))],",
-      "   if[equals(get('idp'),'${orcid}')]then[set('${vo}',replace(get('oidc'),'http://','https://'))]",
-      "};"
-*/
+say('***QDL: getting claims');
+             cfg. := new_template('ncsa');
+             cfg. := create_source(cfg.);
+          claims. := claims. ~ get_claims(cfg., claims.uid);
+say('***QDL: Returning claims:' + to_string(claims.));
+

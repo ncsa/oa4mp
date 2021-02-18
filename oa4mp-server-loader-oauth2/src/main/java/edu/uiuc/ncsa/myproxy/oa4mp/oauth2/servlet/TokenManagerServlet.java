@@ -84,8 +84,8 @@ public abstract class TokenManagerServlet extends MyProxyDelegationServlet {
     }
 
     protected OA2ServiceTransaction getTransFromToken(String token) {
-        if(TokenUtils.isBase64(token)){
-            token = TokenUtils.decodeToken(token);
+        if(TokenUtils.isBase32(token)){
+            token = TokenUtils.b32DecodeToken(token);
         }
         OA2SE oa2SE = (OA2SE) getServiceEnvironment().getTransactionStore();
         OA2TokenForge tf = (OA2TokenForge) oa2SE.getTokenForge();

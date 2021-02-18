@@ -228,7 +228,7 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
             }
         }
         try {
-            cb = cb + (cb.indexOf(responseDelimiter) == -1 ? responseDelimiter : "&") + OA2Constants.AUTHORIZATION_CODE + "=" + TokenUtils.encodeToken(idStr);
+            cb = cb + (cb.indexOf(responseDelimiter) == -1 ? responseDelimiter : "&") + OA2Constants.AUTHORIZATION_CODE + "=" + TokenUtils.b32EncodeToken(idStr);
             if (params.containsKey(OA2Constants.STATE)) {
                 cb = cb + "&" + OA2Constants.STATE + "=" + URLEncoder.encode(params.get(OA2Constants.STATE), "UTF-8");
             }
