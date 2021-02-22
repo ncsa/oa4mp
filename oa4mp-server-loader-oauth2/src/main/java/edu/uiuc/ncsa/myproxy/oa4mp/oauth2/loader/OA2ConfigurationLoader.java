@@ -13,6 +13,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.*;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientConverter;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.*;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo.*;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.ClientApprovalProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.OA4MPConfigTags;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceConstantKeys;
@@ -121,6 +122,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
             T se = (T) new OA2SE(loggerProvider.get(),
                     getTransactionStoreProvider(),
                     getTXStoreProvider(),
+                    getVOStoreProvider(),
                     getClientStoreProvider(),
                     getMaxAllowedNewClientRequests(),
                     getAGLifetime(),
@@ -862,6 +864,72 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                                                      TXRecordConverter converter) {
         return new SQLTXRStoreProvider(config, cpp, type, converter, tp);
     }
+
+
+    protected SQLVOStoreProvider createSQLVOP(ConfigurationNode config,
+                                                     ConnectionPoolProvider<? extends ConnectionPool> cpp,
+                                                     String type,
+                                                     VOProvider<? extends VirtualOrganization> tp,
+                                                     Provider<TokenForge> tfp,
+                                                     VOConverter converter) {
+        return new SQLVOStoreProvider(config, cpp, type, converter, tp);
+    }
+
+    Provider<VOStore> voStoreProvider;
+    protected Provider<VOStore> getVOStoreProvider() {
+        VOProvider voProvider = new VOProvider(null, (OA2TokenForge) getTokenForgeProvider().get());
+        VOConverter voConverter = new VOConverter(new VOSerializationKeys(), voProvider);
+        return getVOStoreProvider(voProvider, voConverter);
+    }
+    protected Provider<VOStore> getVOStoreProvider(VOProvider voProvider,
+                                                   VOConverter<? extends VirtualOrganization> voConverter) {
+        if (voStoreProvider == null) {
+            VOMultiStoreProvider storeProvider = new VOMultiStoreProvider(cn,
+                    isDefaultStoreDisabled(),
+                    loggerProvider.get(),
+                    null, null,
+                    voProvider, voConverter);
+
+            storeProvider.addListener(createSQLVOP(cn,
+                    getMySQLConnectionPoolProvider(),
+                    OA4MPConfigTags.MYSQL_STORE,
+                    voProvider,
+                    getTokenForgeProvider(),
+                    voConverter));
+            storeProvider.addListener(createSQLVOP(cn,
+                    getMariaDBConnectionPoolProvider(),
+                    OA4MPConfigTags.MARIADB_STORE,
+                    voProvider,
+                    getTokenForgeProvider(),
+                    voConverter));
+            storeProvider.addListener(createSQLVOP(cn,
+                    getPgConnectionPoolProvider(),
+                    OA4MPConfigTags.POSTGRESQL_STORE,
+                    voProvider,
+                    getTokenForgeProvider(),
+                    voConverter));
+
+            storeProvider.addListener(new VOFSProvider(cn, voProvider, voConverter));
+            storeProvider.addListener(new TypedProvider<VOStore>(cn, OA4MPConfigTags.MEMORY_STORE, OA4MPConfigTags.VIRTUAL_ORGANIZATION_STORE) {
+                @Override
+                public Object componentFound(CfgEvent configurationEvent) {
+                    if (checkEvent(configurationEvent)) {
+                        return get();
+                    }
+                    return null;
+                }
+
+                @Override
+                public VOStore get() {
+                    return new VOMemoryStore(voProvider, voConverter);
+                }
+
+            });
+            voStoreProvider = storeProvider;
+        }
+        return voStoreProvider;
+    }
+
 
     Provider<TXStore> txStoreProvider;
 

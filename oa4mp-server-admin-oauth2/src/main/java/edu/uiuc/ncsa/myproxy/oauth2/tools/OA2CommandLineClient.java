@@ -11,6 +11,8 @@ import edu.uiuc.ncsa.security.util.cli.CLIDriver;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import org.apache.commons.lang.StringUtils;
 
+import java.util.List;
+
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 5/11/16 at  2:51 PM
@@ -18,6 +20,11 @@ import org.apache.commons.lang.StringUtils;
 public class OA2CommandLineClient extends CommandLineClient {
     public OA2CommandLineClient(MyLoggingFacade logger) {
         super(logger);
+    }
+
+    @Override
+    public List<String> listComponents() {
+        return null;
     }
 
     @Override

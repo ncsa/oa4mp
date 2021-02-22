@@ -129,6 +129,22 @@ CREATE TABLE oauth2.tx_records
     INDEX parents (parent_id(255))
 );
 
+
+CREATE TABLE oauth2.virtual_organisations
+(
+    vo_id          VARCHAR(255) PRIMARY KEY,
+    created        bigint,
+    default_key_id text,
+    discovery_path text,
+    issuer         text,
+    json_web_keys  text,
+    last_modified  bigint,
+    tite           text,
+    resource       text,
+    valid          boolean,
+    UNIQUE INDEX parents (vo_id(255)),
+    INDEX discovery_path (discovery_path(255))
+);
 COMMIT;
 # Now to grant restricted access. The  tables have to exist before this step
 
@@ -138,5 +154,6 @@ GRANT ALL ON oauth2.adminClients TO 'oa4mp-server'@'localhost';
 GRANT ALL ON oauth2.transactions TO 'oa4mp-server'@'localhost';
 GRANT ALL ON oauth2.permissions TO 'oa4mp-server'@'localhost';
 GRANT ALL ON oauth2.tx_records TO 'oa4mp-server'@'localhost';
+GRANT ALL ON oauth2.virtual_organisations TO 'oa4mp-server'@'localhost';
 
 commit;

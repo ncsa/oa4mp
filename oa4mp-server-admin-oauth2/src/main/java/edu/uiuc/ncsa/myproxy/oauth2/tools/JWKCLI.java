@@ -30,6 +30,10 @@ public class JWKCLI extends ConfigurableCommandsImpl {
         super(logger);
     }
 
+    @Override
+    public List<String> listComponents() {
+        return null;
+    }
 
     public void about() {
         int width = 60;

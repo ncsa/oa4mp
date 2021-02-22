@@ -9,12 +9,14 @@ import edu.uiuc.ncsa.security.util.mail.MailConfigurationTags;
  * on 1/19/12 at  8:42 AM
  */
 public interface OA4MPConfigTags extends StorageConfigurationTags, MailConfigurationTags {
+    // The next of these are the names of the stores used in configuration files.
     public static final String CLIENTS_STORE = "clients";
     public static final String CLIENT_APPROVAL_STORE = "clientApprovals";
     public static final String ADMIN_CLIENT_STORE = "adminClients";
     public static final String TRANSACTIONS_STORE = "transactions";
     public static final String PERMISSION_STORE = "permissions";
     public static final String TOKEN_EXCHANGE_RECORD_STORE = "txStore";
+    public static final String VIRTUAL_ORGANIZATION_STORE = "voStore";
     public static final String JSON_STORE = "jsonStore";  // not in base OA4MP, but otherwise no reasonable place for this tag.
 
     public static final String MYPROXY = "myproxy";

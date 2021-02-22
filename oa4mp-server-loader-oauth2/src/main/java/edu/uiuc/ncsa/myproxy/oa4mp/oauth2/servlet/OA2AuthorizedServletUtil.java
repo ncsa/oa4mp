@@ -22,6 +22,7 @@ import edu.uiuc.ncsa.security.delegation.servlet.TransactionState;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.oauth_2_0.*;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTRunner;
+import edu.uiuc.ncsa.security.oauth_2_0.server.AGIResponse2;
 import edu.uiuc.ncsa.security.oauth_2_0.server.AGRequest2;
 import edu.uiuc.ncsa.security.oauth_2_0.server.RFC8693Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
@@ -53,6 +54,9 @@ public class OA2AuthorizedServletUtil {
         this.servlet = servlet;
     }
 
+    public OA2ServiceTransaction doDelegation(HttpServletRequest req, HttpServletResponse resp) throws Throwable {
+    return doDelegation(req,resp, false); // Default operation for all of OA4MP.
+    }
 
     /**
      * Main entry point for this class. Call this. It does <b>not</b> do claims processing. That is done in the
@@ -64,7 +68,7 @@ public class OA2AuthorizedServletUtil {
      * @return
      * @throws Throwable
      */
-    public OA2ServiceTransaction doDelegation(HttpServletRequest req, HttpServletResponse resp) throws Throwable {
+    public OA2ServiceTransaction doDelegation(HttpServletRequest req, HttpServletResponse resp, boolean encodeTokenInResponse) throws Throwable {
         OA2Client client;
         try {
             client = (OA2Client) servlet.getClient(req);
@@ -81,7 +85,10 @@ public class OA2AuthorizedServletUtil {
             DebugUtil.info(this, "2.a. Starting a new cert request: " + cid);
             servlet.checkClientApproval(client);
             // Generally the lifetime of an authorization grant is a matter of server policy, not a client request.
-            AGResponse agResponse = (AGResponse) servlet.getAGI().process(new AGRequest2(req, oa2se.getAuthorizationGrantLifetime()));
+            AGRequest2 agRequest2 = new AGRequest2(req, oa2se.getAuthorizationGrantLifetime());
+            //agRequest2.setEncodeToken(encodeTokenInResponse);
+            AGIResponse2 agResponse = (AGIResponse2) servlet.getAGI().process(agRequest2);
+            agResponse.setEncodeToken(encodeTokenInResponse);
             OA2ServiceTransaction transaction = createNewTransaction(agResponse.getGrant());
             transaction.setAuthGrantLifetime(oa2se.getAuthorizationGrantLifetime()); // make sure these match.
             String requestState = req.getParameter(OA2Constants.STATE);

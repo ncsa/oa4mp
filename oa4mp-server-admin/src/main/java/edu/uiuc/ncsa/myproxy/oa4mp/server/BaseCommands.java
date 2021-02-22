@@ -3,11 +3,14 @@ package edu.uiuc.ncsa.myproxy.oa4mp.server;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.util.cli.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 3/27/15 at  1:49 PM
  */
-public abstract class BaseCommands extends ConfigurableCommandsImpl {
+public abstract class BaseCommands extends ConfigurableCommandsImpl implements ComponentManager {
 
     public static final String CLIENTS = "clients";
     public static final String CLIENT_APPROVALS = "approvals";
@@ -15,6 +18,20 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl {
     public String PARSER_COMMAND = "parser";
     public String TRANSACTION_COMMAND = "transactions";
 
+ protected   List<String> components = new ArrayList<>();
+    protected void init(){
+        if(components.isEmpty()){
+             components.add(CLIENTS);
+             components.add(CLIENT_APPROVALS);
+             components.add(COPY);
+             components.add(PARSER_COMMAND);
+             components.add(TRANSACTION_COMMAND);
+        }
+    }
+    @Override
+    public List<String> listComponents() {
+        return components;
+    }
 
     public abstract void about();
 
@@ -27,6 +44,7 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl {
 
     protected BaseCommands(MyLoggingFacade logger) {
         super(logger);
+        init();
     }
 
     @Override
@@ -57,6 +75,8 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl {
     @Override
     public boolean use(InputLine inputLine) throws Exception {
         CommonCommands commands = null;
+        boolean switchComponent = 1 < inputLine.getArgCount();
+
         if (inputLine.hasArg(CLIENTS)) {
             commands = getNewClientStoreCommands();
         }
@@ -75,8 +95,13 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl {
         if (commands != null) {
             CLIDriver cli = new CLIDriver(commands);
             cli.setEnv(getGlobalEnv());
-
-            cli.start();
+            cli.setComponentManager(this);
+            if(switchComponent){
+                inputLine.removeArgAt(0); // removes original arg ("use")
+                cli.execute(inputLine.removeArgAt(0)); // removes components before executing
+            }else {
+                cli.start();
+            }
             return true;
         }
 

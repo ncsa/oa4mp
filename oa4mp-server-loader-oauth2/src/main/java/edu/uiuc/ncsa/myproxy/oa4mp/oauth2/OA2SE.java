@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.BasicClaimsSourceImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.CMConfigs;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXStore;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo.VOStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.MyProxyFacadeProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironmentImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
@@ -42,6 +43,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
     public OA2SE(MyLoggingFacade logger,
                  Provider<TransactionStore> tsp,
                  Provider<TXStore> txStoreProvider,
+                 Provider<VOStore> voStoreProvider,
                  Provider<ClientStore> csp,
                  int maxAllowedNewClientRequests,
                  long agLifetime,
@@ -124,7 +126,6 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.maxClientRefreshTokenLifetime = maxClientRefreshTokenLifetime;
         this.jsonWebKeys = jsonWebKeys;
         this.issuer = issuer;
-        //   this.mldap = mldap;
         if (claimSource instanceof BasicClaimsSourceImpl) {
             DebugUtil.trace(this, "***Setting runtime environment in the scope handler:" + claimSource.getClass().getSimpleName());
             ((BasicClaimsSourceImpl) claimSource).setOa2SE(this);
@@ -137,6 +138,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.qdlEnvironment = qdlEnvironment;
         this.rfc8693Enabled = rfc8693Enabled;
         this.txStore = txStoreProvider.get();
+        this.voStore = voStoreProvider.get();
         this.maxATLifetime = maxATLifetime;
         this.maxRTLifetime = maxRTLifetime;
         this.qdlStrictACLs = qdlStrictACLs;
@@ -170,6 +172,10 @@ public class OA2SE extends ServiceEnvironmentImpl {
     }
 
     long maxRTLifetime = -1L;
+
+    VOStore voStore;
+    
+   public VOStore getVOStore(){return voStore;}
 
     public TXStore getTxStore() {
         return txStore;

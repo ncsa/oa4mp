@@ -28,7 +28,19 @@ public class OA2Commands extends BaseCommands {
     public static final String ADMINS = "admins";
     public static final String TOKENS = "tokens";
     public static final String KEYS = "keys";
-  //  public static final String JSON = "json";
+    public static final String VIRTUAL_ORGANIZATION = "vo";
+    //  public static final String JSON = "json";
+
+
+    @Override
+    protected void init() {
+        super.init();
+        components.add(PERMISSIONS);
+        components.add(ADMINS);
+        components.add(TOKENS);
+        components.add(KEYS);
+        components.add(VIRTUAL_ORGANIZATION);
+    }
 
     public OA2Commands(MyLoggingFacade logger) {
         super(logger);
@@ -45,8 +57,8 @@ public class OA2Commands extends BaseCommands {
     }
 
     @Override
-    public void print_help(InputLine inputLine) throws Exception{
-           say("Need to write help");
+    public void print_help(InputLine inputLine) throws Exception {
+        say("Need to write help");
     }
 
     @Override
@@ -83,6 +95,7 @@ public class OA2Commands extends BaseCommands {
         say(ADMINS + " - create or manage administrative clients.");
         say(PARSER_COMMAND + " - write/debug scripts from the command line.");
         say(TOKENS + " - manage tokens created in the token exchange endpoint");
+        say(VIRTUAL_ORGANIZATION + " - manage virtual organizations");
 //        say(JSON + " - enter JSON snippets to be used by the system in client configurations.\n");
         say("e.g.\n\nuse " + CLIENTS + "\n\nwill call up the client management component.");
         say("Type 'exit' when you wish to exit the component and return to the main menu");
@@ -104,10 +117,12 @@ public class OA2Commands extends BaseCommands {
         say(padLineWithBlanks("*      'exit' or 'quit' to end this session.", width) + "*");
         say(stars);
     }
+
     OA2ClientCommands oa2ClientCommands = null;
+
     @Override
     public ClientStoreCommands getNewClientStoreCommands() throws Exception {
-        if(oa2ClientCommands == null) {
+        if (oa2ClientCommands == null) {
             oa2ClientCommands = new OA2ClientCommands(getMyLogger(),
                     "  ",
                     getServiceEnvironment().getClientStore(),
@@ -122,43 +137,56 @@ public class OA2Commands extends BaseCommands {
     public CopyCommands getNewCopyCommands() throws Exception {
         return new CopyCommands(getMyLogger(), new OA2CopyTool(), new OA2CopyToolVerifier(), getConfigFile());
     }
+
     TokenStoreCommands tokenStoreCommands = null;
-    protected CommonCommands getTokenCommands() throws Exception{
-        if(tokenStoreCommands == null){
+
+    protected CommonCommands getTokenCommands() throws Exception {
+        if (tokenStoreCommands == null) {
             tokenStoreCommands = new TokenStoreCommands(getMyLogger(), "  ", getOA2SE().getTxStore());
         }
 
         return tokenStoreCommands;
     }
 
+    VOCommands voCommands;
 
+    protected VOCommands getVOCommands() throws Exception {
+        if (voCommands == null) {
+            voCommands = new VOCommands(getMyLogger(), "  ", getOA2SE().getVOStore());
+        }
+        return voCommands;
+    }
 
     TransactionStoreCommands transactionStoreCommands = null;
+
     @Override
-    protected CommonCommands getTransactionCommands() throws Exception{
-        if(transactionStoreCommands == null){
+    protected CommonCommands getTransactionCommands() throws Exception {
+        if (transactionStoreCommands == null) {
             transactionStoreCommands = new TransactionStoreCommands(getMyLogger(), "  ", getOA2SE().getTransactionStore());
         }
 
         return transactionStoreCommands;
     }
 
+
     OA2AdminClientCommands oa2AdminClientCommands = null;
+
     public OA2AdminClientCommands getAdminClientCommands() throws Exception {
-        if(oa2AdminClientCommands == null) {
-            oa2AdminClientCommands =  new OA2AdminClientCommands(getMyLogger(),
+        if (oa2AdminClientCommands == null) {
+            oa2AdminClientCommands = new OA2AdminClientCommands(getMyLogger(),
                     "  ",
                     getOA2SE().getAdminClientStore(),
                     getOA2SE().getClientApprovalStore(),
                     getOA2SE().getPermissionStore());
         }
-        return  oa2AdminClientCommands;
+        return oa2AdminClientCommands;
     }
 
     OA2PermissionCommands oa2PermissionCommands = null;
+
     public OA2PermissionCommands getPermissionCommands() throws Exception {
-        if(oa2PermissionCommands == null) {
-            oa2PermissionCommands =  new OA2PermissionCommands(getMyLogger(), "  ", getOA2SE().getPermissionStore());
+        if (oa2PermissionCommands == null) {
+            oa2PermissionCommands = new OA2PermissionCommands(getMyLogger(), "  ", getOA2SE().getPermissionStore());
         }
         return oa2PermissionCommands;
     }
@@ -175,11 +203,15 @@ public class OA2Commands extends BaseCommands {
         if (inputLine.hasArg(PERMISSIONS)) {
             commands = getPermissionCommands();
         }
-        if(inputLine.hasArg(TOKENS)){
+        if (inputLine.hasArg(TOKENS)) {
             commands = getTokenCommands();
+        }
+        if (inputLine.hasArg(VIRTUAL_ORGANIZATION)) {
+            commands = getVOCommands();
         }
         if (commands != null) {
             CLIDriver cli = new CLIDriver(commands);
+            cli.setComponentManager(this);
             cli.setEnv(getGlobalEnv());
             cli.start();
             return true;
@@ -188,7 +220,7 @@ public class OA2Commands extends BaseCommands {
         if (super.use(inputLine)) {
             return true;
         }
-
+        say("(no such component)");
         return false;
     }
 }

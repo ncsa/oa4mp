@@ -158,12 +158,13 @@ public class ScopeTemplateUtil {
     /**
      * resolve a single template for groups (if any) and other claims.
      * Such a template would look like head:/path/${groupName} where the name of the
-     * group is there. Any
+     * group is there. This returns a list of templates that have been resolved, one
+     * per group.
      *
      * @param currentTemplate
      * @param groups
      */
-    protected static List<String> replaceTemplate(String currentTemplate,
+    public static List<String> replaceTemplate(String currentTemplate,
                                             Map<String, List<String>> groups,
                                             Map claimsNoGroups) {
         List<String> result = new ArrayList<>();

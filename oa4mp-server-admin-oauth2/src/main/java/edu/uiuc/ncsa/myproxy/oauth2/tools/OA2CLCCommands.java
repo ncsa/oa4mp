@@ -83,6 +83,7 @@ public class OA2CLCCommands extends CLCCommands {
             say("No configuration loaded.");
         }
         this.oa2CommandLineClient = oa2CommandLineClient;
+        say(hasClipboard()?"clipboard is supported.":"no clipboard support available.");
     }
 
 
@@ -262,6 +263,32 @@ public class OA2CLCCommands extends CLCCommands {
         }
     }
 
+    protected String getFromClipboard(boolean silentMode){
+        // TODO Places where the clipboard is read have a lot of cases of prompting the user for the information. Refactor that to use this method?
+        try {
+            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+            return (String) clipboard.getData(DataFlavor.stringFlavor);
+        } catch (Throwable t) {
+
+        }
+        return null;
+    }
+
+    /**
+     * Peeks into clipboard to see if it is there and actually works. This is far from a perfect test
+     * since it only looks for a string in the clipboard, but actually testing every case for a supported
+     * flavor would be much more of a task.
+     * @return
+     */
+    protected boolean hasClipboard(){
+        try{
+            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+            Object obj = clipboard.getData(DataFlavor.stringFlavor);
+            return true;
+        }catch(Throwable t){
+            return false;
+        }
+    }
     protected String createURI(String base, HashMap<String, String> args) throws UnsupportedEncodingException {
         String uri = base;
         boolean firstPass = true;

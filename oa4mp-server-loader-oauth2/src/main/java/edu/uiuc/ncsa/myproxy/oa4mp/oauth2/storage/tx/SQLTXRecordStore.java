@@ -1,6 +1,5 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx;
 
-import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
 import edu.uiuc.ncsa.security.storage.sql.SQLStore;
 
@@ -18,8 +17,8 @@ public class SQLTXRecordStore<V extends TXRecord> extends SQLStore<V>  implement
         super(connectionPool, table, identifiableProvider, converter);
     }
 
-    @Override
+/*    @Override
     public MapConverter<V> getMapConverter() {
         return converter;
-    }
+    }*/
 }
