@@ -13,6 +13,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientStoreProv
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.Permission;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionList;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.OA4MPIdentifierProvider;
+import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
@@ -207,7 +208,7 @@ public abstract class DDServerTests extends TestCase {
         adminClient.setSecret(getRandom(64));
         adminClient.setName("Test admin client " + random);
         adminClient.setEmail("bob@" + random + ".foo.bar");
-        adminClient.setVirtualOrganization("VO=" + getRandom(64));
+        adminClient.setVirtualOrganization(BasicIdentifier.randomID());
         adminClient.setIssuer("Issuer=" + random);
         store.save(adminClient);
         return adminClient;

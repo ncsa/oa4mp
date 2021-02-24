@@ -31,7 +31,9 @@
 
 */
  acl_add('localhost:test/fnal');
+ acl_add('fnal:dwd-7');
  acl_check();
+ EPE := 'eduPersonEntitlement';
 
 
 if[
@@ -53,7 +55,7 @@ fnal.search_base := 'ou=people,o=Fermilab,o=CO,dc=cilogon,dc=org';
        fnal.type := 'ldap';
   fnal.ldap_name := 'voPersonExternalID';
 
-fnal.search_attributes. :=  ['eduPersonEntitlement'];
+fnal.search_attributes. :=  [EPE];
 
        at_claims. := get_claims(fnal., claims.eppn); // test user
  access_token.sub := claims.eppn;
@@ -64,7 +66,7 @@ fnal.search_attributes. :=  ['eduPersonEntitlement'];
 
 // Hop out if for some reason there were no scopes in LDAP.
 if[
-   !is_defined(at_claims.eduPersonEntitlement.)
+   !is_defined(at_claims.EPE.)
 ]then[
    access_token.scope := ''; // return empty scopes.
    return(); // nothing to do. No capabilities ==>  no scopes.
@@ -73,7 +75,7 @@ if[
 
      temp_scopes. := {}; // result
 requested_scopes. := {}; // which scope request to check
-            caps. := at_claims.eduPersonEntitlement.; // capabilities in claim source
+            caps. := at_claims.EPE.; // capabilities in claim source
 
    if[
         0 < size(tx_scopes.)
@@ -98,11 +100,19 @@ if[
         temp_scopes. := resolve_templates(caps., requested_scopes., false);
   ];
 
-access_token.scope := detokenize(unique(temp_scopes.), ' ', 2); // turn in to string, omit duplications, trailing space
+ say('new scopes = ' + to_string(temp_scopes.));
 
 // Debugging stuff
 access_token.exp := access_token.iat + 543; // This is in seconds!!!
 access_token.message := 'Testing new resolve template command. Setting AT lifetime to 543 sec.';
+
+temp_scopes. := temp_scopes.~script_load('fnal/wlcg_cs.qdl', [script_args(0), script_args(1)]);
+// Uncomment next line for wlcg.groups support (which needs work, since the spec wasn't done yet.)
+// temp_scopes. := temp_scopes.~script_load('fnal/wlcg_groups.qdl', [script_args(0), script_args(1)]);
+
+if[!sys_err.ok][return();]; // If there was an error, bail.
+
+access_token.scope := detokenize(unique(temp_scopes.), ' ', 2); // turn in to string, omit duplications, trailing space
 
 say('***** QDL *****');
 say(access_token.);

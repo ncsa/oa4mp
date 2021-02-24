@@ -1,10 +1,13 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo;
 
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
+import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.FileStore;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -29,5 +32,32 @@ public class VOFileStore<V extends VirtualOrganization> extends FileStore<V> imp
     @Override
     public MapConverter<V> getMapConverter() {
         return converter;
+    }
+
+    @Override
+    public V findByPath(String component) {
+        return getIndexEntry(component);
+    }
+
+    @Override
+    protected V realRemove(V oldItem) {
+        super.realRemove(oldItem);
+        if (!StringUtils.isTrivial(oldItem.getDiscoveryPath())) {
+            removeIndexEntry(oldItem.getDiscoveryPath());
+        }
+        return oldItem;
+    }
+
+    @Override
+    public void realSave(boolean checkExists, V t) {
+        t.setLastModified(System.currentTimeMillis());
+        super.realSave(checkExists, t);
+        try {
+            if (!StringUtils.isTrivial(t.getDiscoveryPath())) {
+                createIndexEntry(t.getDiscoveryPath(), t.getIdentifierString());
+            }
+        } catch (IOException e) {
+            throw new GeneralException("Error serializing item " + t + "to file ");
+        }
     }
 }

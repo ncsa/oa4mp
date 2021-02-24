@@ -12,7 +12,7 @@ import org.apache.commons.configuration.tree.ConfigurationNode;
  * on 12/14/20 at  11:27 AM
  */
 public class SQLVOStoreProvider<T extends SQLVOStore> extends SQLStoreProvider<T> implements OA4MPConfigTags {
-    public static final String DEFAULT_TABLENAME = "virtual_organisations";
+    public static final String DEFAULT_TABLENAME = "virtual_organizations";
 
     public SQLVOStoreProvider(ConfigurationNode config,
                               ConnectionPoolProvider<? extends ConnectionPool> cpp,

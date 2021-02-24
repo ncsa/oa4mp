@@ -25,7 +25,7 @@ public class VOCommands extends StoreCommands2 {
 
     @Override
     public String getName() {
-        return "vo";
+        return "  vo";
     }
 
     @Override

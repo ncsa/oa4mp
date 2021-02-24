@@ -10,4 +10,5 @@ import edu.uiuc.ncsa.security.storage.data.MapConverter;
 public interface VOStore<V extends VirtualOrganization> extends Store<V> {
      MapConverter<V> getMapConverter();
 
+    V findByPath(String component);
 }

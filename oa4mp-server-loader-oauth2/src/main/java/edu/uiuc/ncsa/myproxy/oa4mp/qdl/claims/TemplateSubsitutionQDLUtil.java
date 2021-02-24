@@ -27,7 +27,16 @@ public class TemplateSubsitutionQDLUtil implements QDLFunction {
 
     @Override
     public Object evaluate(Object[] objects, State state) {
-        String rawString = (String) (objects[0]);
+        StemVariable arg = null;
+        if(objects[0] instanceof String){
+            arg = new StemVariable();
+            arg.listAppend(objects[0]);
+        }else if(objects[0] instanceof StemVariable){
+            arg = (StemVariable) objects[0];
+        }
+        if(arg == null){
+            throw new IllegalArgumentException("error: The first argument must be a string or list of strings");
+        }
         StemVariable otherClaimStem = (StemVariable) objects[1];
         Map<String, List<String>> groups = new HashMap<>();
 
@@ -38,8 +47,11 @@ public class TemplateSubsitutionQDLUtil implements QDLFunction {
                 groups.put(key, ss.getStemList().toJSON());
             }
         }
-
-        List<String> out = ScopeTemplateUtil.replaceTemplate(rawString, groups, otherClaimStem);
+        List<String> out = new ArrayList<>();
+        for(String key: arg.keySet()){
+            String rawString = arg.getString(key);
+            out.addAll( ScopeTemplateUtil.replaceTemplate(rawString, groups, otherClaimStem));
+        }
         StemVariable outStem = new StemVariable();
         outStem.addList(out);
 
@@ -51,17 +63,20 @@ public class TemplateSubsitutionQDLUtil implements QDLFunction {
         List<String> doxx = new ArrayList<>();
         switch (argCount) {
             case 2:
-                doxx.add(getName() + "(raw_string, simple_claims.");
-
+                doxx.add(getName() + "(raw_string | stem., simple_claims.");
                 break;
             case 3:
-                doxx.add(getName() + "(raw_string, simple_claims.[,  group_claims.]");
+                doxx.add(getName() + "(raw_string | stem., simple_claims.[,  group_claims.]");
                 break;
         }
+        doxx.add("raw_string = string to be acted upon");
+        doxx.add("stem.  = a list of strings to be acted upon");
+
 
         switch (argCount) {
             case 2:
-                doxx.add("Note, you will get back a single string with all possible substitutions done.");
+                doxx.add("Note, you will get back a single string with all possible substitutions done for each argument.");
+                doxx.add("E.g. #1");
                 doxx.add("Take the raw_string and apply templates to it. So if the string were");
                 doxx.add("'storage.read:/home/${uid} and simple_claims.uid := 'bob', the result would be");
                 doxx.add("'storage.read:/home/bob");
@@ -71,6 +86,7 @@ public class TemplateSubsitutionQDLUtil implements QDLFunction {
                 doxx.add("Caveat: Be sure that the group_claims. have values simple flat lists of strings,");
                 doxx.add("        since this get handed off");
                 doxx.add("        to Java, which cannot understand complex stems.");
+                doxx.add("You will get back a list of strings for each argument, one for each group found.");
                 doxx.add("E.g. #1");
                 doxx.add("If you have claims in an stem called claims. ");
                 doxx.add("grps. := include_keys(claims., list_keys(claims., false));");
@@ -84,10 +100,8 @@ public class TemplateSubsitutionQDLUtil implements QDLFunction {
                 doxx.add("  claims.uid := 'bob';");
                 doxx.add("  grps.isMemberOf. := ['all','dune'];");
                 doxx.add("  template_substitution(raw,claims., grps.);");
-                doxx.add("[storage.read:/bsu/all/bob,storage.read:/bsu/dune/bo]");
+                doxx.add("[storage.read:/bsu/all/bob,storage.read:/bsu/dune/bob]");
                 doxx.add("");
-                doxx.add("Note you will get back a list of strings, one per found group entry with all other");
-                doxx.add("substitutions done as well.");
                 break;
         }
 

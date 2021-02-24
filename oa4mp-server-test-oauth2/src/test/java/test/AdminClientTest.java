@@ -2,6 +2,7 @@ package test;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.TestUtils;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.*;
+import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.util.TestBase;
 import net.sf.json.JSONObject;
 
@@ -50,7 +51,7 @@ public class AdminClientTest extends TestBase {
         c.setEmail("bob@foo.bar");
         c.setName("Test client 42");
         c.setIssuer("https://www.bigscience.org/claims");
-        c.setVirtualOrganization("dfkjg9egh39yudfnwj9engidugnHIRH9wht9f");
+        c.setVirtualOrganization(BasicIdentifier.randomID());
         c.setMaxClients(AdminClient.DEFAULT_MAX_NUMBER_OF_OIDC_CLIENTS + 100);
         JSONObject j = new JSONObject();
         converter.toJSON(c, j);
@@ -80,7 +81,7 @@ public class AdminClientTest extends TestBase {
         c.setEmail("bob@foo.bar");
         c.setName("Test client 42");
         c.setIssuer("https://www.bigscience.org/claims");
-        c.setVirtualOrganization("dfkjg9egh39yudfnwj9engidugnHIRH9wht9f");
+        c.setVirtualOrganization(BasicIdentifier.randomID());
         c.setMaxClients(AdminClient.DEFAULT_MAX_NUMBER_OF_OIDC_CLIENTS + 100);
         Date nowDate = new Date();
         long now = nowDate.getTime();

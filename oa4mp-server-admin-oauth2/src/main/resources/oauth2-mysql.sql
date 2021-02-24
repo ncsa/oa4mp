@@ -130,7 +130,7 @@ CREATE TABLE oauth2.tx_records
 );
 
 
-CREATE TABLE oauth2.virtual_organisations
+CREATE TABLE oauth2.virtual_organizations
 (
     vo_id          VARCHAR(255) PRIMARY KEY,
     created        bigint,
@@ -139,7 +139,7 @@ CREATE TABLE oauth2.virtual_organisations
     issuer         text,
     json_web_keys  text,
     last_modified  bigint,
-    tite           text,
+    title           text,
     resource       text,
     valid          boolean,
     UNIQUE INDEX parents (vo_id(255)),
@@ -154,6 +154,6 @@ GRANT ALL ON oauth2.adminClients TO 'oa4mp-server'@'localhost';
 GRANT ALL ON oauth2.transactions TO 'oa4mp-server'@'localhost';
 GRANT ALL ON oauth2.permissions TO 'oa4mp-server'@'localhost';
 GRANT ALL ON oauth2.tx_records TO 'oa4mp-server'@'localhost';
-GRANT ALL ON oauth2.virtual_organisations TO 'oa4mp-server'@'localhost';
+GRANT ALL ON oauth2.virtual_organizations TO 'oa4mp-server'@'localhost';
 
 commit;

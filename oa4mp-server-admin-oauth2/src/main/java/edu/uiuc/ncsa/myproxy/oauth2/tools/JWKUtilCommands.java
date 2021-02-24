@@ -39,7 +39,7 @@ public class JWKUtilCommands extends CommonCommands {
 
     @Override
     public String getPrompt() {
-        return "jwt>";
+        return "jwk>";
     }
 
     public static String JWK_EXTENSION = "jwk";

@@ -64,6 +64,9 @@ public class VirtualOrganization extends IdentifiableImpl {
 
     public void setDefaultKeyID(String defaultKeyID) {
         this.defaultKeyID = defaultKeyID;
+        if(getJsonWebKeys() != null){
+            getJsonWebKeys().setDefaultKeyID(defaultKeyID);
+        }
     }
 
     public String getDiscoveryPath() {

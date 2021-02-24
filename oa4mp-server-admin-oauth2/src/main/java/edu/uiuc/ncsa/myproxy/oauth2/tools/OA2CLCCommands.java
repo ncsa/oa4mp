@@ -40,10 +40,7 @@ import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.URI;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -281,13 +278,28 @@ public class OA2CLCCommands extends CLCCommands {
      * @return
      */
     protected boolean hasClipboard(){
+        // Annoying thing #42. we check if the clipboard exists by trying to read from it
+        // this is the most reliable cross platform way to do it. The problem is that
+        // error messages can be generated very deep in the stack that cannot be intercepted
+        // with a try...catch block and sent to std err. So we have to turn redirect the error
+        // then reset the std err. Pain in the neck, but users should not see large random
+        // stack traces that the last thing someone left on their clipboard can't be
+        // easily converted to a string.
+        PrintStream errStream = System.err;
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        System.setErr(new PrintStream(byteArrayOutputStream));
+
         try{
             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-            Object obj = clipboard.getData(DataFlavor.stringFlavor);
+            clipboard.getData(DataFlavor.stringFlavor);
+            System.setErr(errStream);
             return true;
         }catch(Throwable t){
-            return false;
+            info("Probably benign message from checking clipboard:" + new String(byteArrayOutputStream.toByteArray()));
         }
+        System.setErr(errStream);
+        return false;
+
     }
     protected String createURI(String base, HashMap<String, String> args) throws UnsupportedEncodingException {
         String uri = base;
@@ -839,7 +851,7 @@ public class OA2CLCCommands extends CLCCommands {
 
     protected void printTokens(boolean noVerify) {
         // It is possible that the service is down in which case the tokens can't be verified.
-        if (currentURI != null) {
+        if (isVerbose() && currentURI != null) {
             say("Current request URI:");
             say(currentURI.toString());
         }

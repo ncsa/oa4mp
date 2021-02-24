@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient;
 
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
+import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.delegation.storage.impl.BaseClientConverter;
 import edu.uiuc.ncsa.security.storage.data.ConversionMap;
 import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
@@ -29,7 +30,7 @@ public class AdminClientConverter<V extends AdminClient> extends BaseClientConve
     public V fromJSON(JSONObject json) {
         V v = super.fromJSON(json);
         v.setIssuer(getJsonUtil().getJSONValueString(json, getACK().issuer()));
-        v.setVirtualOrganization(getJsonUtil().getJSONValueString(json, getACK().vo()));
+        v.setVirtualOrganization(BasicIdentifier.newID(getJsonUtil().getJSONValueString(json, getACK().vo())));
         v.setMaxClients(getJsonUtil().getJSONValueInt(json, getACK().maxClients()));
         v.setAllowQDL(getJsonUtil().getJSONValueBoolean(json, getACK().allowQDL()));
         JSONObject config = (JSONObject) getJsonUtil().getJSONValue(json, getACK().config());
@@ -42,7 +43,7 @@ public class AdminClientConverter<V extends AdminClient> extends BaseClientConve
     @Override
     public V fromMap(ConversionMap<String, Object> map, V v) {
         V value = super.fromMap(map, v);
-        value.setVirtualOrganization(map.getString(getACK().vo()));
+        value.setVirtualOrganization(BasicIdentifier.newID(map.getString(getACK().vo())));
         value.setIssuer(map.getString(getACK().issuer()));
         if(map.containsKey(getACK().allowQDL())) {
             // older clients won't have this, so don't force the issue.
@@ -69,7 +70,7 @@ public class AdminClientConverter<V extends AdminClient> extends BaseClientConve
     @Override
     public void toJSON(V client, JSONObject json) {
         super.toJSON(client, json);
-        getJsonUtil().setJSONValue(json, getACK().vo(), client.getVirtualOrganization());
+        getJsonUtil().setJSONValue(json, getACK().vo(), client.getVirtualOrganization().toString());
         getJsonUtil().setJSONValue(json, getACK().issuer(), client.getIssuer());
         getJsonUtil().setJSONValue(json, getACK().maxClients(), client.getMaxClients());
         getJsonUtil().setJSONValue(json, getACK().allowQDL(), client.isAllowQDL());

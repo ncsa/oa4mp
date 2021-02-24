@@ -9,6 +9,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RefreshTokenStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.SafeGCRetentionPolicy;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo.VirtualOrganization;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractAccessTokenServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.IssuerTransactionState;
 import edu.uiuc.ncsa.security.core.Identifier;
@@ -109,7 +110,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
 
         OA2ServiceTransaction st = (OA2ServiceTransaction) state.getTransaction();
         Map<String, String> p = state.getParameters();
-        if(state.isRfc8628()){
+        if (state.isRfc8628()) {
             String givenRedirect = p.get(OA2Constants.REDIRECT_URI);
             try {
                 st.setCallback(URI.create(givenRedirect));
@@ -226,7 +227,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         if (subjectToken == null) {
             throw new OA2ATException(OA2Errors.INVALID_REQUEST, "missing subject token");
         }
-        if(TokenUtils.isBase32(subjectToken)){
+        if (TokenUtils.isBase32(subjectToken)) {
             subjectToken = TokenUtils.b32DecodeToken(subjectToken);
         }
         String requestedTokenType = getFirstParameterValue(request, REQUESTED_TOKEN_TYPE);
@@ -370,7 +371,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         }
         if (!scopes.isEmpty()) {
             newTXR.setScopes(scopes);
-        } else{
+        } else {
             // If no scopes sent with request, revert to scopes in original request.
             newTXR.setScopes(t.getScopes());
         }
@@ -775,7 +776,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
                     "token expired");
         }
         // Can only determine if token is valid after we get the transaction and examine it.
-            return rts.get(refreshToken);
+        return rts.get(refreshToken);
     }
 
     protected OA2TokenForge getTF2() {
@@ -786,7 +787,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         // Grants are checked in the doIt method
 
         String rawRefreshToken = request.getParameter(OA2Constants.REFRESH_TOKEN);
-        if(TokenUtils.isBase32(rawRefreshToken)){
+        if (TokenUtils.isBase32(rawRefreshToken)) {
             rawRefreshToken = TokenUtils.b32DecodeToken(rawRefreshToken);
         }
         RefreshTokenImpl oldRT = getTF2().getRefreshToken(rawRefreshToken);
@@ -814,14 +815,14 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             // do nothing, this means that the token is not a JWT which is fine too
         }
         OA2ServiceTransaction t = null;
-        if(oldRT.isExpired()){
+        if (oldRT.isExpired()) {
             throw new OA2ATException(OA2Errors.INVALID_GRANT, "expired refresh token", HttpStatus.SC_BAD_REQUEST, null);
         }
         try {
             // Fix for CIL-882
-             t = getByRT(oldRT);
-        }catch(TransactionNotFoundException e){
-            String message =  "The refresh token \"" + oldRT.getToken() + "\" for client " + c.getIdentifierString() + " is not expired, but also was not found.";
+            t = getByRT(oldRT);
+        } catch (TransactionNotFoundException e) {
+            String message = "The refresh token \"" + oldRT.getToken() + "\" for client " + c.getIdentifierString() + " is not expired, but also was not found.";
             ServletDebugUtil.trace(this, message);
             info(message);
             throw new OA2ATException(OA2Errors.INVALID_TOKEN, "The token \"" + oldRT.getToken() + "\" could not be associated with a pending flow",
@@ -915,7 +916,12 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         }
 
         rtiResponse.setServiceTransaction(t);
-        rtiResponse.setJsonWebKey(oa2SE.getJsonWebKeys().getDefault());
+        VirtualOrganization vo = oa2SE.getVO(t.getClient().getIdentifier());
+        if(vo == null) {
+            rtiResponse.setJsonWebKey(oa2SE.getJsonWebKeys().getDefault());
+        }else{
+            rtiResponse.setJsonWebKey(vo.getJsonWebKeys().get(vo.getDefaultKeyID()));
+        }
         rtiResponse.setClaims(t.getUserMetaData());
         getTransactionStore().save(t);
         rtiResponse.write(response);
@@ -1000,7 +1006,12 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         //      atResponse.setClaimSources(setupClaimSources(transaction, oa2SE));
 
         atResponse.setServiceTransaction(transaction);
-        atResponse.setJsonWebKey(oa2SE.getJsonWebKeys().getDefault());
+        VirtualOrganization vo = oa2SE.getVO(transaction.getClient().getIdentifier());
+        if(vo == null) {
+            atResponse.setJsonWebKey(oa2SE.getJsonWebKeys().getDefault());
+        }else{
+            atResponse.setJsonWebKey(vo.getJsonWebKeys().get(vo.getDefaultKeyID()));
+        }
         atResponse.setClaims(transaction.getUserMetaData());
         // Need to do some checking but for now, just return transaction
         //return null;
@@ -1083,7 +1094,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             throw new OA2ATException("expired_token", DEVICE_CODE + " expired");
         }
         OA2ServiceTransaction transaction = (OA2ServiceTransaction) getTransaction(authorizationGrant);
-        if(!transaction.isAuthGrantValid()){
+        if (!transaction.isAuthGrantValid()) {
             throw new OA2GeneralError(OA2Errors.INVALID_GRANT, "invalid device code", HttpStatus.SC_BAD_REQUEST, null);
         }
 
@@ -1099,14 +1110,14 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             throw new OA2ATException(OA2Errors.ACCESS_DENIED, DEVICE_CODE + " expired", HttpStatus.SC_UNAUTHORIZED, null);
         }
 
-        if ( rfc8628State.lastTry + rfc8628State.interval > now) {
-            rfc8628State.lastTry= now;
+        if (rfc8628State.lastTry + rfc8628State.interval > now) {
+            rfc8628State.lastTry = now;
             rfc8628State.interval = rfc8628State.interval + DEFAULT_WAIT;
             transaction.setRFC8628State(rfc8628State);
             getTransactionStore().save(transaction);
             throw new OA2ATException("slow_down", "slow down");
         }
-        rfc8628State.lastTry= now;
+        rfc8628State.lastTry = now;
         transaction.setRFC8628State(rfc8628State);
         String scope = getFirstParameterValue(request, SCOPE);
         if (!isTrivial(scope)) {
@@ -1131,7 +1142,13 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
                 transaction,
                 true);
         doAT(issuerTransactionState, client);
-        ((ATIResponse2)issuerTransactionState.getIssuerResponse()).setJsonWebKey(((OA2SE)getServiceEnvironment()).getJsonWebKeys().getDefault());
+        OA2SE oa2se = (OA2SE) getServiceEnvironment();
+        VirtualOrganization vo = oa2se.getVO(transaction.getIdentifier());
+        if (vo == null) {
+            ((ATIResponse2) issuerTransactionState.getIssuerResponse()).setJsonWebKey((oa2se).getJsonWebKeys().getDefault());
+        } else {
+            ((ATIResponse2) issuerTransactionState.getIssuerResponse()).setJsonWebKey(vo.getJsonWebKeys().get(vo.getDefaultKeyID()));
+        }
         writeATResponse(response, issuerTransactionState);
 
     }

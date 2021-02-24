@@ -18,13 +18,9 @@
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>discovery</servlet-name>
-        <url-pattern>/certs</url-pattern>
+        <url-pattern>/certs/*</url-pattern>
     </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>discovery</servlet-name>
-        <url-pattern>/client0</url-pattern>
-    </servlet-mapping>
-
+  
     <servlet>
         <servlet-name>accessToken</servlet-name>
         <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2ATServlet</servlet-class>

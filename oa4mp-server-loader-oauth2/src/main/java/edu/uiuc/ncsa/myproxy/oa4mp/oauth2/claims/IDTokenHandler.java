@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2DiscoveryServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo.VirtualOrganization;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
@@ -44,6 +45,11 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
     protected void setIssuer(HttpServletRequest request) {
         issuer = null;
         // So in order
+        VirtualOrganization vo = oa2se.getVO(transaction.getClient().getIdentifier());
+        if(vo != null){
+            issuer = vo.getIssuer();
+            return;
+        }
         // 1. get the issuer from the admin client
         List<Identifier> admins = oa2se.getPermissionStore().getAdmins(transaction.getClient().getIdentifier());
 

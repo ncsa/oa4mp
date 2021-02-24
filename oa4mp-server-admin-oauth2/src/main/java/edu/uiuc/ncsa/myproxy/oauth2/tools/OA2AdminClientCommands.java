@@ -74,9 +74,9 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
         if (!isEmpty(issuer)) {
             client.setIssuer(issuer);
         }
-        String vo = getInput("Give the VO", client.getVirtualOrganization());
+        String vo = getInput("Give the VO", client.getVirtualOrganization().toString());
         if (!isEmpty(vo)) {
-            client.setVirtualOrganization(vo);
+            client.setVirtualOrganization(BasicIdentifier.newID(vo));
         }
         String max = getInput("Enter new maximum number of clients allowed", Integer.toString(client.getMaxClients()));
         if(!isEmpty(max)){

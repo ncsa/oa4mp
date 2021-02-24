@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.oa2.qdl.storage;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientKeys;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import net.sf.json.JSONObject;
 
@@ -52,7 +53,7 @@ public class AdminClientStemMC<V extends AdminClient> extends StemConverter<V> {
            v.setEmail(stem.getString(kk().email()));
        }
        if(isStringKeyOK(stem, kk().vo())){
-           v.setVirtualOrganization(stem.getString(kk().vo()));
+           v.setVirtualOrganization(BasicIdentifier.newID(stem.getString(kk().vo())));
        }
         return v;
     }
@@ -94,8 +95,8 @@ public class AdminClientStemMC<V extends AdminClient> extends StemConverter<V> {
         if (v.getLastModifiedTS() != null) {
             stem.put(kk().lastModifiedTS(), v.getLastModifiedTS().getTime());
         }
-        if (!isTrivial(v.getVirtualOrganization())) {
-            stem.put(kk().vo(), v.getVirtualOrganization());
+        if (v.getVirtualOrganization()!= null) {
+            stem.put(kk().vo(), v.getVirtualOrganization().toString());
         }
         return stem;
     }

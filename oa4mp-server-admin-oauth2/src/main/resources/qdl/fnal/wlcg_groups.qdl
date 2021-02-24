@@ -1,0 +1,73 @@
+/*
+   Experimental script for WLCG capability set support using wlcg.groups. This takes up the value in the person's
+   eduPersonEntitlement entry in LDAP and does an additional look up to get the capabilities
+   for that.
+   Based on
+
+   https://github.com/WLCG-AuthZ-WG/common-jwt-profile/blob/2d9aa500c70453d54bbf2b6c389cfc148c995e1e/profile.md#group-or-role-based-capability-selection
+
+   in the WLCG specification.   This returns a list of the capabilites. The spec says that if they request other capabilites
+   then just add these.
+*/
+
+say('*** WLCG_G debug script arg count = ' + to_string(script_args()));
+say('*** WLCG_G at_claims. = ' + to_string(at_claims.));
+say('*** WLCG_G at_claims.EPE. = ' + to_string(at_claims.EPE.));
+
+// Constants
+WG := 'wlcg.groups';
+WG_HEAD := WG + ':/';
+
+
+wlcg_cs. := []; // the WLCG capabilites set we are going to return
+
+x. :=   mask(at_claims.EPE.,has_value(index_of(at_claims.EPE., WG_HEAD), 0));
+
+
+if[size(x.) == 0][return([]);]; // nothing to do.
+
+if[
+   1<size(x.)
+   ][
+        sys_err.ok := false;
+        sys_err.message := 'Multiple ' + CS + ' scopes unsupported.';
+        return(wlcg_cs.);
+   ];
+
+// So we have exactly one.
+k. := list_keys(x.);
+c := x.k.0;
+u. := to_uri(c);
+parsedPath. := tokenize(u.path, '/');
+lastIndex := size(parsedPath.) - 1;
+lookupName := parsedPath.lastIndex + '@fnal.gov'; // required to construct the vop id
+
+say('*** WLCG_G debug: capabilities are ' + c);
+say('*** WLCG_G debug: lookup name is ' + lookupName);
+
+
+           cs. := new_template('ldap');
+   cs.username := script_args(0);
+   cs.password := script_args(1);
+  cs.auth_type := 'simple';
+    cs.address := 'ldap-test.cilogon.org';
+       cs.port := 636;
+ cs.claim_name := 'uid';
+cs.search_base := 'ou=services,o=Fermilab,o=CO,dc=cilogon,dc=org';
+       cs.type := 'ldap';
+  cs.ldap_name := 'voPersonExternalID';
+
+cs.search_attributes. :=  [EPE];
+
+record. := get_claims(create_source(cs.), lookupName);
+if[!is_defined(record.EPE.)][return(wlcg_cs.);]; // no capabilites means do nothing.
+
+// return the EPE after resolving any templates
+
+    wlcg_cs. := record.EPE.;
+    wlcg_cs. := template_substitution(wlcg_cs., claims.);
+say('*** WLCG_G debug, retrunung: ' + to_string(wlcg_cs.));
+return(wlcg_cs.);
+
+
+

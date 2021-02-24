@@ -59,6 +59,7 @@ public class ServiceTestSuite2 extends TestSuite {
 
     @BeforeClass
     public static void initialize() {
+        System.setProperty(OA2Bootstrapper.OA2_CONFIG_FILE_KEY, "/home/ncsa/dev/csd/config/servers.xml");
         TestSuiteInitializer testSuiteInitializer = new TestSuiteInitializer(new OA2Bootstrapper());
         testSuiteInitializer.init();
     }

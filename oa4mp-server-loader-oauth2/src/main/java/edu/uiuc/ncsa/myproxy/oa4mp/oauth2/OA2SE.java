@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.BasicClaimsSourceImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.CMConfigs;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo.VOStore;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo.VirtualOrganization;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.MyProxyFacadeProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironmentImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
@@ -11,7 +12,9 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionsStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AuthorizationServletConfig;
 import edu.uiuc.ncsa.qdl.config.QDLEnvironment;
+import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
+import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.delegation.server.issuers.AGIssuer;
@@ -385,4 +388,24 @@ public class OA2SE extends ServiceEnvironmentImpl {
     }
 
     long authorizationGrantLifetime = 15*60*1000L;
+
+    /**
+     * Given the client id, look up the admin and determine what (if any) the VO is.
+     * The returned value may be null,, meaning there is no VO.
+     * @param clientID
+     * @return
+     */
+    public VirtualOrganization getVO(Identifier clientID){
+            List<Identifier> adminIDs = getPermissionStore().getAdmins(clientID);
+            switch (adminIDs.size()){
+                case 0:
+                    return null;
+                case 1:
+                    AdminClient ac = getAdminClientStore().get(adminIDs.get(0));
+                    return (VirtualOrganization) getVOStore().get(ac.getVirtualOrganization());
+                case 2:
+                    throw new NFWException("Error: too many admins for this client.");
+            }
+            return null;
+    }
 }

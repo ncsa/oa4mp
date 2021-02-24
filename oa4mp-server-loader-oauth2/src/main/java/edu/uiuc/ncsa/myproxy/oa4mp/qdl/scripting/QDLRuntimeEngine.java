@@ -268,8 +268,11 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
     protected void setupState(ScriptRunRequest req) {
 
         state.getSymbolStack().setValue(Scripts.EXEC_PHASE, req.getAction()); // set what is being executed
+        StemVariable sysErr = new StemVariable();
+        // Set sys_err.ok  here so scripts don't have to keep checking if it is defined.
+        sysErr.put(SYS_ERR_OK, Boolean.TRUE);
+        state.getSymbolStack().setValue(SYS_ERR_VAR, sysErr);
 
-        state.getSymbolStack().setValue(SYS_ERR_VAR, new StemVariable()); // just an empty one.
         FlowStates2 flowStates = (FlowStates2) req.getArgs().get(SRE_REQ_FLOW_STATES);
         state.getSymbolStack().setValue(FLOW_STATE_VAR, toStem(flowStates));
 

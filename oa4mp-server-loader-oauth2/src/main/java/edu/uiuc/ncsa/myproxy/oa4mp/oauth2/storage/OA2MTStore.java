@@ -9,13 +9,13 @@ import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
  * <p>Created by Jeff Gaynor<br>
  * on 3/25/14 at  12:51 PM
  */
-public class OA2MTStore<V extends OA2ServiceTransaction> extends TransactionMemoryStore<V> implements RefreshTokenStore<V>, UsernameFindable<V>{
+public class OA2MTStore<V extends OA2ServiceTransaction> extends TransactionMemoryStore<V> implements RefreshTokenStore<V>, UsernameFindable<V> {
     public OA2MTStore(IdentifiableProvider identifiableProvider) {
         super(identifiableProvider);
     }
 
     TokenIndex rtIndex;
-     TokenIndex userIndex;
+    TokenIndex userIndex;
 
     public TokenIndex getRTIndex() {
         if (rtIndex == null) {
@@ -24,19 +24,20 @@ public class OA2MTStore<V extends OA2ServiceTransaction> extends TransactionMemo
         return rtIndex;
     }
 
-    public TokenIndex getUserIndex(){
-        if(userIndex == null){
+    public TokenIndex getUserIndex() {
+        if (userIndex == null) {
             userIndex = new TokenIndex();
         }
         return userIndex;
     }
+
     @Override
     protected void updateIndices(V v) {
         super.updateIndices(v);
         if (v.getRefreshToken() != null) {
-                   getRTIndex().put(v.getRefreshToken().getToken(), v);
-               }
-        if(v.getUsername()!= null){
+            getRTIndex().put(v.getRefreshToken().getToken(), v);
+        }
+        if (v.getUsername() != null) {
             getUserIndex().put(v.getUsername(), v);
         }
     }

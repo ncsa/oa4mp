@@ -210,11 +210,7 @@ public class OA2Commands extends BaseCommands {
             commands = getVOCommands();
         }
         if (commands != null) {
-            CLIDriver cli = new CLIDriver(commands);
-            cli.setComponentManager(this);
-            cli.setEnv(getGlobalEnv());
-            cli.start();
-            return true;
+            return switchOrRun(inputLine, commands);
         }
 
         if (super.use(inputLine)) {

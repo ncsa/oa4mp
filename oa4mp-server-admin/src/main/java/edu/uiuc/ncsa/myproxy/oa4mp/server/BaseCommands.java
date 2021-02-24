@@ -75,7 +75,6 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl implements C
     @Override
     public boolean use(InputLine inputLine) throws Exception {
         CommonCommands commands = null;
-        boolean switchComponent = 1 < inputLine.getArgCount();
 
         if (inputLine.hasArg(CLIENTS)) {
             commands = getNewClientStoreCommands();
@@ -93,16 +92,7 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl implements C
             commands = getTransactionCommands();
         }
         if (commands != null) {
-            CLIDriver cli = new CLIDriver(commands);
-            cli.setEnv(getGlobalEnv());
-            cli.setComponentManager(this);
-            if(switchComponent){
-                inputLine.removeArgAt(0); // removes original arg ("use")
-                cli.execute(inputLine.removeArgAt(0)); // removes components before executing
-            }else {
-                cli.start();
-            }
-            return true;
+            return switchOrRun(inputLine, commands);
         }
 
         if (super.use(inputLine)) {
@@ -112,6 +102,28 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl implements C
         return false;
     }
 
+    /**
+     * Either switch to another component or (if there are arguments) simply run the
+     * single command and return. Note that each component has stored state, so
+     * these will be run with whatever is in that state.
+     * @param inputLine
+     * @param commands
+     * @return
+     */
+    protected boolean switchOrRun(InputLine inputLine, CommonCommands commands) {
+        boolean switchComponent = 1 < inputLine.getArgCount();
+
+        CLIDriver cli = new CLIDriver(commands);
+        cli.setEnv(getGlobalEnv());
+        cli.setComponentManager(this);
+        if(switchComponent){
+            inputLine.removeArgAt(0); // removes original arg ("use")
+            cli.execute(inputLine.removeArgAt(0)); // removes components before executing
+        }else {
+            cli.start();
+        }
+        return true;
+    }
 
 
     protected boolean hasComponent(String componentName) {
