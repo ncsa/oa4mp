@@ -31,12 +31,20 @@ if[
         return(wlcg_cs.);
    ];
 
+
 // So we have exactly one. Don't know which element of x it is,
 // so list the keys and get the only one
+
 k. := list_keys(x.);
 c := x.k.0;
 
+say('*** WLCG_CS k=  ' + to_string(k.));
+
 // c looks like e.g., wlcg.capabilityset:/dunepro
+//remove c from the scopes
+say('*** WLCG_CS scopes before remove  ' + to_string(temp_scopes.));
+temp_scopes. := mask(temp_scopes., temp_scopes. != c);
+say('*** WLCG_CS scopes after remove  ' + to_string(temp_scopes.));
 
 /*
    From the spec:

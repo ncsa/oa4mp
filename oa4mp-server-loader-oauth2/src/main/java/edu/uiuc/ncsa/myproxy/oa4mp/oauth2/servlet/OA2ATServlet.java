@@ -449,10 +449,19 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         if (rtiResponse.hasRefreshToken()) {
             // Maddening part of the spec is that the access_oadtoken claim can be a refresh token.
             // User has to look at the returned token type.
-            rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getRefreshToken().encodeToken()); // Required
-            rfcClaims.put(OA2Constants.REFRESH_TOKEN, rtiResponse.getRefreshToken().encodeToken()); // Optional
+            if(rtiResponse.getRefreshToken().isJWT()){
+                rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getRefreshToken().getToken()); // Required
+                rfcClaims.put(OA2Constants.REFRESH_TOKEN, rtiResponse.getRefreshToken().getToken()); // Optional
+            }else{
+                rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getRefreshToken().encodeToken()); // Required
+                rfcClaims.put(OA2Constants.REFRESH_TOKEN, rtiResponse.getRefreshToken().encodeToken()); // Optional
+            }
         } else {
-            rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getAccessToken().encodeToken()); // Required.
+            if(((AccessTokenImpl)rtiResponse.getAccessToken()).isJWT()){
+                rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getAccessToken().getToken()); // Required.
+            } else {
+                rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getAccessToken().encodeToken()); // Required.
+            }
             // create scope string  Remember that these may have been changed by a script,
             // so here is the right place to set it.
             rfcClaims.put(OA2Constants.SCOPE, listToString(newTXR.getScopes()));

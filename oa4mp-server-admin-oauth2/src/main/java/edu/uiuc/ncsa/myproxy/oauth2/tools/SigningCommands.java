@@ -28,6 +28,11 @@ import java.util.List;
  * on 1/6/17 at  9:27 AM
  */
 public class SigningCommands extends CommonCommands {
+
+    public static final String RS_256 = "RS256";
+    public static final String RS_384 = "RS384";
+    public static final String RS_512 = "RS512";
+
     public SigningCommands(OA2SE oa2se) {
         super(oa2se == null ? null : oa2se.getMyLogger());
         this.oa2SE = oa2se;
@@ -61,7 +66,14 @@ public class SigningCommands extends CommonCommands {
         boolean isInteractive = true;
 
         if (1 < inputLine.size()) {
-            publicKeyFile = new File(inputLine.getArg(1));
+            // a lot of command utils specify the fiule with this flag. Since everyone keeps
+            // sending this, allow for it (otherwise people create a key file called -file in the
+            // invocation directory, which is not intuitive and therefore not findable afterwards).
+            if(inputLine.hasArg("-file")){
+                publicKeyFile = new File(inputLine.getNextArgFor("-file"));
+            }else {
+                publicKeyFile = new File(inputLine.getArg(1));
+            }
         }
         if (publicKeyFile == null && isBatchMode()) {
             throw new GeneralException("No full path to the file given.");
@@ -90,7 +102,7 @@ public class SigningCommands extends CommonCommands {
             }
         }
         if (!isBatchMode()) {
-            if (!isOk(readline("create a new set of JSON web keys?[y/n]"))) {
+            if (!isOk(readline("create a new set of JSON web keys to \"" + publicKeyFile.getAbsolutePath() + "\"?[y/n]"))) {
                 say("create cancelled.");
                 return;
             }
@@ -111,14 +123,19 @@ public class SigningCommands extends CommonCommands {
 
     }
 
-    public JSONWebKeys createJsonWebKeys() throws NoSuchProviderException, NoSuchAlgorithmException {
+    /**
+     * This should probably move to {@link JSONWebKeyUtil}.
+     * @return
+     * @throws NoSuchProviderException
+     * @throws NoSuchAlgorithmException
+     */
+    public static JSONWebKeys createJsonWebKeys() throws NoSuchProviderException, NoSuchAlgorithmException {
         JSONWebKeys keys = new JSONWebKeys(null);
-        keys.put(createJWK("RS256"));
-        keys.put(createJWK("RS384"));
-        keys.put(createJWK("RS512"));
+        keys.put(createJWK(RS_256));
+        keys.put(createJWK(RS_384));
+        keys.put(createJWK(RS_512));
         return keys;
     }
-
     public int defaultSymmetricKeyLength = 256;
     public String SYMMETRIC_KEY_ARG = "-length";
     public String SYMMETRIC_KEY_COUNT_ARG = "-count";
@@ -201,9 +218,9 @@ public class SigningCommands extends CommonCommands {
      * by setting the  java.security.egd property for the JVM. On unix systems this would look like
      * <code>java -Djava.security.egd=file:/dev/urandom</code>
      */
-    SecureRandom random = new SecureRandom();
+    static SecureRandom random = new SecureRandom();
 
-    protected JSONWebKey createJWK(String algorithm) throws NoSuchProviderException, NoSuchAlgorithmException {
+    protected static JSONWebKey createJWK(String algorithm) throws NoSuchProviderException, NoSuchAlgorithmException {
         byte[] byteArray = new byte[16];
         random.nextBytes(byteArray);
         String id = DatatypeConverter.printHexBinary(byteArray);

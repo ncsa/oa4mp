@@ -266,13 +266,13 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
     protected Boolean isRFC8628Enabled() {
         if (rfc8628Enabled == null) {
             try {
-                rfc8628Enabled = Boolean.parseBoolean(getFirstAttribute(cn, OA4MPConfigTags.ENABLE_RFC8693_SUPPORT));
+                rfc8628Enabled = Boolean.parseBoolean(getFirstAttribute(cn, OA4MPConfigTags.ENABLE_RFC8628_SUPPORT));
             } catch (Throwable t) {
                 // use default which is to disabled. We let this be null to trigger pulling the value, if any, out of the
                 // the configuration
                 rfc8628Enabled = Boolean.FALSE;
             }
-            DebugUtil.trace(this, "RFC 8628 support enabled? " + rfc8693Enabled);
+            DebugUtil.trace(this, "RFC 8628 support enabled? " + rfc8628Enabled);
         }
         return rfc8628Enabled;
     }

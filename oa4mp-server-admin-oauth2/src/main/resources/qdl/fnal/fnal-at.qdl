@@ -106,11 +106,11 @@ if[
 access_token.exp := access_token.iat + 543; // This is in seconds!!!
 access_token.message := 'Testing new resolve template command. Setting AT lifetime to 543 sec.';
 
-temp_scopes. := temp_scopes.~script_load('fnal/wlcg_cs.qdl', [script_args(0), script_args(1)]);
-// Uncomment next line for wlcg.groups support (which needs work, since the spec wasn't done yet.)
-// temp_scopes. := temp_scopes.~script_load('fnal/wlcg_groups.qdl', [script_args(0), script_args(1)]);
+wlcg_scopes. := script_load('fnal/wlcg_cs.qdl', [script_args(0), script_args(1)]);
 
 if[!sys_err.ok][return();]; // If there was an error, bail.
+
+temp_scopes. := temp_scopes. ~ wlcg_scopes.;
 
 access_token.scope := detokenize(unique(temp_scopes.), ' ', 2); // turn in to string, omit duplications, trailing space
 

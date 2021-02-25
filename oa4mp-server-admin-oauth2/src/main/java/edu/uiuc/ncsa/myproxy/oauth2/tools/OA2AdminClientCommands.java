@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApprovalStore;
@@ -15,6 +16,7 @@ import net.sf.json.JSONObject;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.List;
 
 /**
@@ -74,19 +76,33 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
         if (!isEmpty(issuer)) {
             client.setIssuer(issuer);
         }
-        String vo = getInput("Give the VO", client.getVirtualOrganization().toString());
+        String vo;
+        if (client.getVirtualOrganization() == null) {
+            vo = getInput("Give the VO", null);
+        } else {
+            vo = getInput("Give the VO", client.getVirtualOrganization().toString());
+        }
+
         if (!isEmpty(vo)) {
-            client.setVirtualOrganization(BasicIdentifier.newID(vo));
+            try {
+                URI z = URI.create(vo);
+                client.setVirtualOrganization(BasicIdentifier.newID(z));
+            } catch (Throwable t) {
+                if (DebugUtil.isEnabled()) {
+                    t.printStackTrace();
+                }
+                say("sorry, but that was not a valid identifier");
+            }
         }
         String max = getInput("Enter new maximum number of clients allowed", Integer.toString(client.getMaxClients()));
-        if(!isEmpty(max)){
+        if (!isEmpty(max)) {
             client.setMaxClients(Integer.parseInt(max));
         }
 
         JSONObject newConfig = (JSONObject) inputJSON(client.getConfig(), "client configuration");
-           if (newConfig != null) {
-               client.setConfig(newConfig);
-           }
+        if (newConfig != null) {
+            client.setConfig(newConfig);
+        }
 
     }
 
@@ -96,7 +112,7 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
     }
 
     // For CIL-508
-    public void list_clients(InputLine inputLine) throws Exception{
+    public void list_clients(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
             showListClientsHelp();
             return;
@@ -107,13 +123,13 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
             return;
         }
         List<Identifier> clients = permissionsStore.getClients(adminClient.getIdentifier());
-        if(clients == null || clients.isEmpty()){
+        if (clients == null || clients.isEmpty()) {
             say("(none)");
         }
         for (Identifier identifier : clients) {
-            say("(" + (getClientApprovalStore().isApproved(identifier)?"Y":"N") + ") " + identifier);
+            say("(" + (getClientApprovalStore().isApproved(identifier) ? "Y" : "N") + ") " + identifier);
         }
-       say(clients.size() + " total clients");
+        say(clients.size() + " total clients");
     }
 
     protected void showCountClientsHelp() {
@@ -122,61 +138,61 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
     }
 
 
-    public void count_clients(InputLine inputLine) throws Exception{
-           if (showHelp(inputLine)) {
-               showCountClientsHelp();
-               return;
-           }
-           AdminClient adminClient = (AdminClient) findItem(inputLine);
-           if (adminClient == null) {
-               say("Sorry, there is no admin client for this identifier.");
-               return;
-           }
-           say("This admin client manages " + permissionsStore.getClientCount(adminClient.getIdentifier()) + " out of " + adminClient.getMaxClients() + ".");
-       }
+    public void count_clients(InputLine inputLine) throws Exception {
+        if (showHelp(inputLine)) {
+            showCountClientsHelp();
+            return;
+        }
+        AdminClient adminClient = (AdminClient) findItem(inputLine);
+        if (adminClient == null) {
+            say("Sorry, there is no admin client for this identifier.");
+            return;
+        }
+        say("This admin client manages " + permissionsStore.getClientCount(adminClient.getIdentifier()) + " out of " + adminClient.getMaxClients() + ".");
+    }
 
 
-
-    protected void showListAdminsHelp(){
+    protected void showListAdminsHelp() {
         say("list_admins id - list the administrators associated with the given client id");
         say("                 Note that you need the actual identifier for the client, not an index.");
     }
-    public void list_admins(InputLine inputLine) throws Exception{
-        if(showHelp(inputLine)){
+
+    public void list_admins(InputLine inputLine) throws Exception {
+        if (showHelp(inputLine)) {
             showListAdminsHelp();
             return;
         }
-        Identifier clientID  = null;
+        Identifier clientID = null;
         try {
             String rawID = inputLine.getLastArg();
-            if(rawID.startsWith("/")){
+            if (rawID.startsWith("/")) {
                 // if they supply a leading / just drop it, since the user is being consistent with other cases.
                 rawID = rawID.substring(1);
             }
             clientID = BasicIdentifier.newID(rawID);
-        }catch(Throwable t){
+        } catch (Throwable t) {
             say("Sorry, \"" + inputLine.getLastArg() + "\" is not a valid identifier. " + t.getMessage());
             return;
         }
         List<Identifier> admins = permissionsStore.getAdmins(clientID);
-        if(admins == null || admins.isEmpty()){
+        if (admins == null || admins.isEmpty()) {
             say("(none)");
             return;
         }
-        for(Identifier id : admins){
-            AdminClient adminClient = (AdminClient)getStore().get(id);
+        for (Identifier id : admins) {
+            AdminClient adminClient = (AdminClient) getStore().get(id);
             say(format(adminClient, (ClientApproval) getClientApprovalStore().get(adminClient.getIdentifier())));
         }
         say(admins.size() + " admin clients");
 
     }
+
     @Override
     protected void showDeserializeHelp() {
         super.showDeserializeHelp();
         say("NOTE that for clients, the assumption is that you are supplying the hashed secret, not the actual secret.");
         say("If you need to create a hash of a secret, invoke the create_hash method on the secret");
     }
-
 
 
 }

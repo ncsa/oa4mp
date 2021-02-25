@@ -102,10 +102,10 @@ public class OA2SE extends ServiceEnvironmentImpl {
                 usernameTransformer,
                 isPingable,
                 psp);
-        if(0 < agLifetime){
+        if (0 < agLifetime) {
             this.authorizationGrantLifetime = agLifetime;
         }
-        if(0 < atLifetime){
+        if (0 < atLifetime) {
             this.accessTokenLifetime = atLifetime;
         }
 
@@ -177,8 +177,10 @@ public class OA2SE extends ServiceEnvironmentImpl {
     long maxRTLifetime = -1L;
 
     VOStore voStore;
-    
-   public VOStore getVOStore(){return voStore;}
+
+    public VOStore getVOStore() {
+        return voStore;
+    }
 
     public TXStore getTxStore() {
         return txStore;
@@ -189,6 +191,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
     }
 
     TXStore txStore;
+
     public QDLEnvironment getQDLEnvironment() {
         return qdlEnvironment;
     }
@@ -216,6 +219,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
 
     /**
      * Token exchange endpoint
+     *
      * @return
      */
     public boolean isRfc8693Enabled() {
@@ -230,6 +234,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
 
     /**
      * Device authorization flow endpoints.
+     *
      * @return
      */
     public boolean isRfc8628Enabled() {
@@ -323,6 +328,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
 
     /**
      * The scopes this server currently supports.
+     *
      * @return
      */
     public Collection<String> getScopes() {
@@ -370,12 +376,13 @@ public class OA2SE extends ServiceEnvironmentImpl {
     boolean oidcEnabled = true;
 
     //FIXME Default.
-    long accessTokenLifetime = 15*60*1000L;
+    long accessTokenLifetime = 15 * 60 * 1000L;
 
     public long getAccessTokenLifetime() {
         return accessTokenLifetime;
     }
-    public void setAccessTokenLifetime(long accessTokenLifetime){
+
+    public void setAccessTokenLifetime(long accessTokenLifetime) {
         this.accessTokenLifetime = accessTokenLifetime;
     }
 
@@ -387,25 +394,44 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.authorizationGrantLifetime = authorizationGrantLifetime;
     }
 
-    long authorizationGrantLifetime = 15*60*1000L;
+    long authorizationGrantLifetime = 15 * 60 * 1000L;
 
     /**
      * Given the client id, look up the admin and determine what (if any) the VO is.
      * The returned value may be null,, meaning there is no VO.
+     * If the VO is disabled, it will not be returned either.<br/><br/>
+     * This has its own call here because it involves multiple store lookups. It cannot
+     * be done as a join in SQL or some such because there are no guarantees the stores
+     * are all SQL -- some may be file stores or even in another unrelated database.
+     *
      * @param clientID
      * @return
      */
-    public VirtualOrganization getVO(Identifier clientID){
-            List<Identifier> adminIDs = getPermissionStore().getAdmins(clientID);
-            switch (adminIDs.size()){
-                case 0:
+    public VirtualOrganization getVO(Identifier clientID) {
+        if (clientID == null) {
+            return null; // should not happen.
+        }
+        List<Identifier> adminIDs = getPermissionStore().getAdmins(clientID);
+        if (adminIDs == null || adminIDs.isEmpty()) {
+            return null; // happens for every unmanaged client.
+        }
+        switch (adminIDs.size()) {
+            case 0:
+                return null;
+            case 1:
+                AdminClient ac = getAdminClientStore().get(adminIDs.get(0));
+                if (ac == null || ac.getVirtualOrganization() == null) {
+                    return null; // no VO set. Most common case.
+                }
+                VirtualOrganization vo = (VirtualOrganization) getVOStore().get(ac.getVirtualOrganization());
+                if (vo.isValid()) {
+                    return vo;
+                } else {
                     return null;
-                case 1:
-                    AdminClient ac = getAdminClientStore().get(adminIDs.get(0));
-                    return (VirtualOrganization) getVOStore().get(ac.getVirtualOrganization());
-                case 2:
-                    throw new NFWException("Error: too many admins for this client.");
-            }
-            return null;
+                }
+            case 2:
+                throw new NFWException("Error: too many admins for this client.");
+        }
+        return null;
     }
 }
