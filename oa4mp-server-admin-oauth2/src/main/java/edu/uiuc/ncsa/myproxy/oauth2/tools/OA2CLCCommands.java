@@ -327,7 +327,18 @@ public class OA2CLCCommands extends CLCCommands {
 
     AuthorizationGrantImpl grant;
 
-
+     protected void printGrant(){
+              if(grant == null){
+                  say("no grant");
+                  return;
+              }
+              if(TokenUtils.isBase32(grant.getToken())){
+           say("raw grant = " + grant.getToken());
+           say("    grant = " + TokenUtils.b32DecodeToken(grant.getToken()));
+         }else{
+                  say("grant = " + grant.getToken());
+              }
+     }
     public void get_grant(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
             setGrantHelp();
@@ -341,7 +352,7 @@ public class OA2CLCCommands extends CLCCommands {
         if (inputLine.size() == 1) {
             if (grant != null) {
                 // already have a grant. Show it and copy it to the clipboard
-                say("grant=" + grant.getToken());
+                printGrant();
                 copyToClipboard(grant.getToken(), "grant copied to clipboard");
                 return;
             }
@@ -407,7 +418,7 @@ public class OA2CLCCommands extends CLCCommands {
             return;
         }
         if (gotGrant) {
-            say("grant=" + grant.getToken());
+            printGrant();
         } else {
             say("No grant found. Check the URL?");
         }
