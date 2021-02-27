@@ -91,4 +91,5 @@ if[!is_defined(record.EPE.)][return(wlcg_cs.);]; // no capabilites means do noth
 
 wlcg_cs. := record.EPE.;
 wlcg_cs. := template_substitution(wlcg_cs., claims.);
+say('*** WLCG_CS debug, returning: ' + to_string(wlcg_cs., true));
 return(wlcg_cs.);

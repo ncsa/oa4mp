@@ -97,7 +97,7 @@ if[
 if[
     exec_phase == 'post_exchange' || exec_phase == 'post_refresh'
   ][
-        temp_scopes. := resolve_templates(caps., requested_scopes., false);
+        temp_scopes. := resolve_templates(caps., requested_scopes., true);
   ];
 
  say('new scopes = ' + to_string(temp_scopes.));
@@ -114,10 +114,13 @@ temp_scopes. := temp_scopes. ~ wlcg_scopes.;
 
 access_token.scope := detokenize(unique(temp_scopes.), ' ', 2); // turn in to string, omit duplications, trailing space
 
-say('***** QDL *****');
-say(access_token.);
-say('       caps = ' + to_string(caps.));
-say('   tx_scope = ' + to_string(tx_scopes.));
-say('tx_resource = ' + to_string(tx_resource.));
-say('tx_audience = ' + to_string(tx_audience.));
+if[0<size(tx_audience.) || 0 < size(tx_resource.)][access_token.aud. := tx_audience.~tx_resource.;];
 
+say('***** QDL *****');
+say(' wlcg_scopes. =' + to_string(wlcg_scopes., true));
+say(' temp_scopes. =' + to_string(temp_scopes., true));
+say('access_token. = ' + to_string(access_token., true));
+say('         caps = ' + to_string(caps.));
+say('     tx_scope = ' + to_string(tx_scopes.));
+say('  tx_resource = ' + to_string(tx_resource.));
+say('  tx_audience = ' + to_string(tx_audience.));
