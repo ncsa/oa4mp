@@ -8,6 +8,7 @@ import edu.uiuc.ncsa.qdl.state.State;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -31,11 +32,21 @@ public class OA2Module extends JavaModule {
         funcs.add(new IsInGroup());
         funcs.add(new ScopeTemplateQDLUtil());
         funcs.add(new TemplateSubsitutionQDLUtil());
-
         oa2Module.addFunctions(funcs);
         if (state != null) {
             oa2Module.init(state);
         }
         return oa2Module;
     }
+        List<String> descr = new ArrayList<>();
+    @Override
+    public List<String> getDescription() {
+        if(descr.isEmpty()){
+            descr.add("This modules contains several utilities written specifically for OA4MP for processing claims");
+            descr.add("It allows for creating claims sources using templates, checking group memberships");
+            descr.add("and computing scopes");
+        }
+        return descr;
+    }
+
 }

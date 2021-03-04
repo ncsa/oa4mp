@@ -14,9 +14,12 @@ import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.Groups.GROUP_ENTRY_NAME;
  * on 2/24/20 at  7:52 AM
  */
 public class IsInGroup implements QDLFunction {
+
+    public static final String IN_GROUP_NAME = "in_group";
+
     @Override
     public String getName() {
-        return "in_group";
+        return IN_GROUP_NAME;
     }
 
     @Override

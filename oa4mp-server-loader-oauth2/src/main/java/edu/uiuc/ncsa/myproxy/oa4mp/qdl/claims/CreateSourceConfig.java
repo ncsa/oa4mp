@@ -17,9 +17,11 @@ import java.util.List;
  */
 public class CreateSourceConfig implements QDLFunction, CSConstants {
 
+    public static final String CREATE_SOURCE_NAME = "create_source";
+
     @Override
     public String getName() {
-        return "create_source";
+        return CREATE_SOURCE_NAME;
     }
 
     @Override

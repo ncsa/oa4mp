@@ -26,7 +26,6 @@ public class VOConverter<V extends VirtualOrganization> extends MapConverter<V> 
     @Override
     public V fromMap(ConversionMap<String, Object> map, V v) {
         V vo = super.fromMap(map, v);
-        //        txr.setExpiresAt(map.getLong(tkeys().expiresAt()));
         vo.setCreated(map.getLong(vok().created()));
         vo.setLastModified(map.getLong(vok().lastModified()));
         vo.setValid(map.getBoolean(vok().valid()));
@@ -34,6 +33,9 @@ public class VOConverter<V extends VirtualOrganization> extends MapConverter<V> 
         if (map.containsKey(vok().issuer()) && !isTrivial(map.getString(vok().issuer()))) {
             vo.setIssuer(map.getString(vok().issuer()));
         }
+        if (map.containsKey(vok().atIssuer()) && !isTrivial(map.getString(vok().atIssuer()))) {
+              vo.setAtIssuer(map.getString(vok().atIssuer()));
+          }
         if (map.containsKey(vok().defaultKeyID()) && !isTrivial(map.getString(vok().defaultKeyID()))) {
             vo.setDefaultKeyID(map.getString(vok().defaultKeyID()));
         }
@@ -65,6 +67,9 @@ public class VOConverter<V extends VirtualOrganization> extends MapConverter<V> 
         if(!isTrivial(value.getIssuer())){
             data.put(vok().issuer(), value.getIssuer());
         }
+        if(!isTrivial(value.getAtIssuer())){
+              data.put(vok().atIssuer(), value.getAtIssuer());
+          }
         if(!isTrivial(value.getTitle())){
             data.put(vok().title(), value.getTitle());
         }

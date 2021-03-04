@@ -74,6 +74,16 @@ public class OA2State extends State {
 
     transient List<Identifier> aclList =new ArrayList<>();
 
+    public List<Identifier> getAclBlackList() {
+        return aclBlackList;
+    }
+
+    public void setAclBlackList(List<Identifier> aclBlackList) {
+        this.aclBlackList = aclBlackList;
+    }
+
+    transient List<Identifier> aclBlackList =new ArrayList<>();
+
     public TXRecord getTxRecord() {
         return txRecord;
     }

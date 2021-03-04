@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.security.core.exceptions.InvalidTimestampException;
 import edu.uiuc.ncsa.security.core.util.DateUtils;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
 
 import java.util.Map;
@@ -14,9 +15,10 @@ import java.util.Map;
  */
 public class RefreshTokenRetentionPolicy extends SafeGCRetentionPolicy {
     public RefreshTokenRetentionPolicy(RefreshTokenStore rts, String serviceAddress, boolean safeGC) {
-        super(serviceAddress,safeGC);
+        super(serviceAddress, safeGC);
         this.rts = rts;
     }
+
     RefreshTokenStore rts;
 
     /**
@@ -29,6 +31,14 @@ public class RefreshTokenRetentionPolicy extends SafeGCRetentionPolicy {
         return true;
     }
 
+    boolean rttracing = false; // This turns on tracing of cleanup independent of the debug state or the log fills.
+
+    protected void trace(String x) {
+        if (rttracing) {
+            DebugUtil.trace(this, x);
+        }
+    }
+
     /*
     This has to manage three types of token: Authz grants, access tokens and refresh tokens.
     It must check each in turn if one is missing. Final case if authz grants so that if a user
@@ -36,7 +46,7 @@ public class RefreshTokenRetentionPolicy extends SafeGCRetentionPolicy {
      */
     @Override
     public boolean retain(Object key, Object value) {
-        if(safeGCSkipIt(key.toString())){
+        if (safeGCSkipIt(key.toString())) {
             return true;
         }
         OA2ServiceTransaction st2 = (OA2ServiceTransaction) value;
@@ -47,6 +57,8 @@ public class RefreshTokenRetentionPolicy extends SafeGCRetentionPolicy {
         long timeout = -1L;
         if (st2.hasRefreshToken()) {
             RefreshTokenImpl rt = (RefreshTokenImpl) st2.getRefreshToken();
+            trace("Checking refresh token");
+
             if (rt.isOldVersion()) {
                 // then the expires_in attribute is the same as the refresh token lifetime
                 // Now, the RT lifetime cannot be zero (since that means no refresh token would have been made)
@@ -64,10 +76,13 @@ public class RefreshTokenRetentionPolicy extends SafeGCRetentionPolicy {
             }
             token = rt.getToken();
         } else {
+
             if (st2.hasAccessToken()) {
+                trace("Checking access token");
                 token = st2.getAccessToken().getToken();
                 timeout = st2.getAccessTokenLifetime();
             } else {
+                trace("Checking authz grant");
                 // Can't be here without an authz grant.
                 token = st2.getIdentifierString();
                 timeout = st2.getAuthzGrantLifetime();
@@ -82,6 +97,9 @@ public class RefreshTokenRetentionPolicy extends SafeGCRetentionPolicy {
             return true;
 
         } catch (InvalidTimestampException its) {
+
+            trace("***Removing token " + token + " with time out " + timeout + " at " + System.currentTimeMillis());
+
             return false;
         }
 

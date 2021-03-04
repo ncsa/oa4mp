@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.qdl.state.State;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -42,4 +43,16 @@ public class ClientManagementModule extends JavaModule {
         }
         return cmm;
     }
+    List<String> descr = new ArrayList<>();
+
+    @Override
+    public List<String> getDescription() {
+        if(descr.isEmpty()){
+            descr.add("Module for managing clients. This allows you to create, approve, edit etc. ");
+            descr.add("Note that this is older, and you should use the newer store access modules, which ");
+            descr.add("have much more complete support.");
+        }
+        return descr;
+    }
+
 }

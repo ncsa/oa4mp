@@ -1,14 +1,15 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2ConfigurationLoader;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2DiscoveryServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo.VirtualOrganization;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.AccessTokenConfig;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.AuthorizationPath;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.AuthorizationTemplate;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.AuthorizationTemplates;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
-import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
@@ -26,6 +27,7 @@ import java.util.*;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.ScopeTemplateUtil.doCompareTemplates;
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.ScopeTemplateUtil.replaceTemplate;
+import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 import static edu.uiuc.ncsa.security.oauth_2_0.jwt.ScriptingConstants.*;
 import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.*;
 import static edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse.*;
@@ -229,7 +231,7 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
                 s = s + " " + x;
             }
         }
-        if (StringUtils.isTrivial(s)) {
+        if (isTrivial(s)) {
             return null;
         }
         return s;
@@ -373,10 +375,33 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
     @Override
     public void setAccountingInformation() {
         JSONObject atData = getAtData();
+        // Figure out issuer. If in config, that wins. If not, if the client is
+        // in a vo, use the designated at issuer. If that is not set, use the
+        // VO issuer. If that fails, get the server issuer from the discovery servlet.
+        //
+        String issuer = "";
 
-        if (!StringUtils.isTrivial(getATConfig().getIssuer())) {
-            atData.put(ISSUER, getATConfig().getIssuer());
+        if (isTrivial(getATConfig().getIssuer())) {
+            VirtualOrganization vo = oa2se.getVO(transaction.getClient().getIdentifier());
+            if (vo == null) {
+                // fail safe. No VO, no configuration, return this service as issuer.
+                issuer = OA2DiscoveryServlet.getIssuer(request);
+            } else {
+                if (!isTrivial(vo.getAtIssuer())) {
+                    issuer = vo.getAtIssuer();
+                } else {
+                    if (isTrivial(vo.getIssuer())) {
+                        issuer = vo.getIssuer();
+                    } else {
+                        issuer = OA2DiscoveryServlet.getIssuer(request);
+                    }
+                }
+            }
+        } else {
+            // This lets the configuration override the VO.
+            issuer = getATConfig().getIssuer();
         }
+        atData.put(ISSUER, issuer);
         if (getATConfig().getAudience() != null && !getATConfig().getAudience().isEmpty()) {
             atData.put(AUDIENCE, getATConfig().getAudience());
         }

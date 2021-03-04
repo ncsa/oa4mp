@@ -14,6 +14,7 @@ public class VOSerializationKeys extends SerializationKeys {
     }
 
 
+    String atIssuer = "at_issuer";
     String created = "created";
     String defaultKeyID = "default_key_id";
     String discoveryPath = "discovery_path";
@@ -30,11 +31,17 @@ public class VOSerializationKeys extends SerializationKeys {
         all.add(defaultKeyID());
         all.add(discoveryPath());
         all.add(issuer());
+        all.add(atIssuer());
         all.add(jsonWebKeys());
         all.add(lastModified());
         all.add(title());
         all.add(valid());
         return all;
+    }
+
+    public String atIssuer(String... x) {
+        if (0 < x.length) atIssuer = x[0];
+        return atIssuer;
     }
 
     public String created(String... x) {

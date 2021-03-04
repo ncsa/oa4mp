@@ -169,8 +169,9 @@ public class ClientStoreCommands extends BaseClientStoreCommands {
     }
 
     @Override
-    protected void doCopy(Identifiable source, Identifier targetId) {
-        super.doCopy(source, targetId);
-        cloneApproval(source.getIdentifier(), targetId);
+    protected Identifier doCopy(Identifiable source, Identifier targetId, boolean useRandomID) {
+       Identifier id = super.doCopy(source, targetId, useRandomID);
+        cloneApproval(source.getIdentifier(), id);
+        return id;
     }
 }

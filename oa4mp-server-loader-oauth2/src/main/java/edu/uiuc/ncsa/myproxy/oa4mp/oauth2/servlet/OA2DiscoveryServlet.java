@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo.VirtualOrganization;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.DiscoveryServlet;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2GeneralError;
+import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import net.sf.json.JSONArray;
@@ -110,6 +111,7 @@ public class OA2DiscoveryServlet extends DiscoveryServlet {
      */
     @Override
     protected void doIt(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Throwable {
+        ServletDebugUtil.printAllParameters(this.getClass(), httpServletRequest);
         String requestUri = httpServletRequest.getRequestURI();
         boolean isCerts = false;
         if (requestUri.contains(CERTS)) {

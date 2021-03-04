@@ -28,9 +28,25 @@ public class AccessControlModule extends JavaModule {
         QDLACL qdlacl = new QDLACL();
         List<QDLFunction> funcs = new ArrayList<>();
         funcs.add(qdlacl.new AddToACL());
+        funcs.add(qdlacl.new ACLReject());
         funcs.add(qdlacl.new CheckACL());
         accessControlModule.addFunctions(funcs);
 
         return accessControlModule;
+    }
+    List<String> descr = new ArrayList<>();
+
+    @Override
+    public List<String> getDescription() {
+        if(descr.isEmpty()){
+            descr.add("ACL (Access Control List) management for QDL scripts running under OA4MP.");
+            descr.add("If you need access control, this module is required and should be loaded automatically.");
+        }
+        return descr;
+    }
+
+    @Override
+    public void setDocumentation(List<String> documentation) {
+
     }
 }

@@ -4,7 +4,6 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import com.typesafe.config.ConfigRenderOptions;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
-import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.delegation.storage.impl.ClientConverter;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfigurationUtil;
@@ -18,6 +17,8 @@ import net.sf.json.JSONSerializer;
 
 import java.io.StringReader;
 import java.util.Collection;
+
+import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -43,7 +44,7 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         if (map.get(getCK2().callbackUri()) != null) {
             otherV.setCallbackURIs(jsonArrayToCollection(map, getCK2().callbackUri()));
         }
-        if(map.get(getCK2().strictScopes()) != null){
+        if (map.get(getCK2().strictScopes()) != null) {
             otherV.setStrictscopes(map.getBoolean(getCK2().strictScopes()));
 
         }
@@ -56,7 +57,7 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         otherV.setRtLifetime(map.getLong(getCK2().rtLifetime()));
         // In certain legacy cases, this may end up being populated with a null. Treat it like
         // a -1 (which means it isn't set, so don't use this in calculations)
-        if(map.containsKey(getCK2().atLifetime()) && map.get(getCK2().atLifetime())!=null){
+        if (map.containsKey(getCK2().atLifetime()) && map.get(getCK2().atLifetime()) != null) {
             otherV.setAtLifetime(map.getLong(getCK2().atLifetime()));
 
         }
@@ -91,7 +92,7 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         }
         if (map.containsKey(getCK2().ea())) {
             String rawCfg = map.getString(getCK2().ea());
-            if (!StringUtils.isTrivial(rawCfg)) {
+            if (!isTrivial(rawCfg)) {
                 otherV.setExtendedAttributes(JSONObject.fromObject(rawCfg));
             }
         }
@@ -99,13 +100,18 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         if (map.containsKey(getCK2().cfg())) {
             String rawCfg = map.getString(getCK2().cfg());
             if (rawCfg != null && !rawCfg.isEmpty()) {
-            //    cfg = JSONObject.fromObject(map.getString(getCK2().cfg()));
+                //    cfg = JSONObject.fromObject(map.getString(getCK2().cfg()));
                 // Extra hoop allows us to process HOCON format in addition to JSON.
-                StringReader stringReader = new StringReader(map.getString(getCK2().cfg()));
-                Config conf = ConfigFactory.parseReader(stringReader);
-                String rawJSON = conf.root().render(ConfigRenderOptions.concise());
-                cfg = JSONObject.fromObject(rawJSON);
-               otherV.setRawConfig(map.getString(getCK2().cfg()));
+                String tempcfg = map.getString(getCK2().cfg());
+                if (!isTrivial(tempcfg)) {
+               //     System.out.println(map.getString(getCK2().identifier()));
+               //     System.out.println("\"" + tempcfg + "\"");
+                    StringReader stringReader = new StringReader(tempcfg);
+                    Config conf = ConfigFactory.parseReader(stringReader);
+                    String rawJSON = conf.root().render(ConfigRenderOptions.concise());
+                    cfg = JSONObject.fromObject(rawJSON);
+                    otherV.setRawConfig(map.getString(getCK2().cfg()));
+                }
             }
             //otherV.setConfig(JSONObject.fromObject(map.getString(getCK2().cfg())));
         }
@@ -214,13 +220,13 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
     public V fromJSON(JSONObject json) {
         V v = super.fromJSON(json);
         v.setRtLifetime(getJsonUtil().getJSONValueLong(json, getCK2().rtLifetime()));
-        if(json.containsKey(getCK2().atLifetime)){
+        if (json.containsKey(getCK2().atLifetime)) {
             v.setAtLifetime(getJsonUtil().getJSONValueLong(json, getCK2().atLifetime()));
         }
         v.setIssuer(getJsonUtil().getJSONValueString(json, getCK2().issuer()));
         v.setSignTokens(getJsonUtil().getJSONValueBoolean(json, getCK2().signTokens()));
         v.setPublicClient(getJsonUtil().getJSONValueBoolean(json, getCK2().publicClient())); // JSON util returns false if missing key
-        if(json.containsKey(getCK2().strictScopes)) {
+        if (json.containsKey(getCK2().strictScopes)) {
             v.setStrictscopes(getJsonUtil().getJSONValueBoolean(json, getCK2().strictScopes())); // JSON util returns false if missing key
         }
         JSON cbs = (JSON) getJsonUtil().getJSONValue(json, getCK2().callbackUri());
@@ -246,7 +252,7 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
 
             v.setRawConfig(config.toString());
         }
-         v.setExtendedAttributes(json.getJSONObject(getCK2().ea()));
+        v.setExtendedAttributes(json.getJSONObject(getCK2().ea()));
 
         return v;
     }
@@ -288,8 +294,8 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         if (client.getLdaps() != null && !client.getLdaps().isEmpty()) {
             getJsonUtil().setJSONValue(json, getCK2().ldap(), getLdapConfigurationUtil().toJSON(client.getLdaps()));
         }
-        
-        if(client.getExtendedAttributes() != null && !client.getExtendedAttributes().isEmpty()){
+
+        if (client.getExtendedAttributes() != null && !client.getExtendedAttributes().isEmpty()) {
             getJsonUtil().setJSONValue(json, getCK2().ea(), client.getExtendedAttributes());
         }
 

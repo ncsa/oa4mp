@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.state.State;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -40,5 +41,17 @@ public class PStoreAccessModule extends StoreAccessModule {
         functions.add(permissionStoreFacade.new GetAdmins());
         functions.add(permissionStoreFacade.new GetClients());
         return functions;
+    }
+    List<String> descr = new ArrayList<>();
+
+    @Override
+    public List<String> getDescription() {
+        if(descr.isEmpty()){
+            descr.add("Module to access admin to its managed client permissions for OA4MP.");
+            descr.add("This has the same access patterns as per the standard store module, plus");
+            descr.add("calls to get all the clients administered by an admin, or what admins");
+            descr.add("apply to a client.");
+        }
+        return descr;
     }
 }

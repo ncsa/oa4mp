@@ -15,9 +15,12 @@ import java.util.Map;
  * on 2/22/21 at  2:30 PM
  */
 public class TemplateSubsitutionQDLUtil implements QDLFunction {
+
+    public static final String TEMPLATE_SUBSTITUTION_NAME = "template_substitution";
+
     @Override
     public String getName() {
-        return "template_substitution";
+        return TEMPLATE_SUBSTITUTION_NAME;
     }
 
     @Override

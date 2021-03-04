@@ -55,6 +55,7 @@ public class VOCommands extends StoreCommands2 {
 
         vo.setTitle(getInput("enter the title", vo.getTitle()));
         vo.setIssuer(getInput("enter the issuer", vo.getIssuer()));
+        vo.setAtIssuer(getInput("enter the access token issuer (if different)", vo.getAtIssuer()));
         vo.setDiscoveryPath(getInput("enter the discovery path", vo.getDiscoveryPath()));
         String ok = getInput("Did you want to specify a file with the JSON web keys(y/n)", "n");
         if (!isTrivial(ok)) {
@@ -151,6 +152,8 @@ public class VOCommands extends StoreCommands2 {
             String ok = getInput("Did you want to overwrite the current set of keys?(y/n)", "n");
             if (ok.trim().toLowerCase().equals("y")) {
                 newKeys(vo);
+                getStore().save(vo);
+                say("new keys saved");
             } else {
                 say("aborted...");
                 info("new keys aborted by user.");

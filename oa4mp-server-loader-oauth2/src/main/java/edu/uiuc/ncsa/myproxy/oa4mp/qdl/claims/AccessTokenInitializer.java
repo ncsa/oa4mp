@@ -19,7 +19,7 @@ import java.util.List;
  * on 10/9/20 at  9:40 AM
  */
 public class AccessTokenInitializer implements Serializable {
-    public static String AT_INIT_METHOD = "at_init";
+    public static String AT_INIT_METHOD     = "at_init";
     public static String AT_FINISH_METHOD = "at_finish";
     public static String AT_REFRESH_METHOD = "at_refresh";
 

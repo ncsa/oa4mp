@@ -22,9 +22,11 @@ import static edu.uiuc.ncsa.qdl.variables.StemVariable.STEM_INDEX_MARKER;
  * on 2/10/20 at  10:18 AM
  */
 public class ClaimsSourceGetter implements QDLFunction, CSConstants {
+    public static final String GET_CLAIMS_NAME = "get_claims";
+
     @Override
     public String getName() {
-        return "get_claims";
+        return GET_CLAIMS_NAME;
     }
 
     @Override

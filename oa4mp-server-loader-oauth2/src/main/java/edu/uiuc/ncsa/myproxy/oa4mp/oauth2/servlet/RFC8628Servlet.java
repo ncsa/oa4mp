@@ -45,6 +45,10 @@ public class RFC8628Servlet extends MyProxyDelegationServlet implements RFC8628C
 
     long lastAttemptTS = -1L; // so the first call to the servlet works, otherwise the check
 
+    public static Map<String, String> getCache() {
+        return cache;
+    }
+
     static Map<String, String> cache = new HashMap<>();
 
     /**
@@ -84,7 +88,6 @@ public class RFC8628Servlet extends MyProxyDelegationServlet implements RFC8628C
         lastAttemptTS = System.currentTimeMillis();
         // Next two lines also verify that it is a client, has been approved and has the right secret.
         OA2Client client = (OA2Client) getClient(req);
-        // Boot out public clients at this point???
         ClientUtils.verifyClientSecret(client, getClientSecret(req), false);
 
         long lifetime = oa2SE.getAuthorizationGrantLifetime();
@@ -144,6 +147,7 @@ public class RFC8628Servlet extends MyProxyDelegationServlet implements RFC8628C
         }
         String x = serviceAddress + VERIFICATION_URI_ENDPOINT;
         jsonObject.put(VERIFICATION_URI, x);
+        jsonObject.put(VERIFICATION_URI_COMPLETE, x + "?" + USER_CODE+"="+userCode);
         resp.getWriter().println(jsonObject.toString(1));
         resp.getWriter().flush();
         resp.getWriter().close();

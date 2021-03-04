@@ -39,6 +39,10 @@
     <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-906">CIL-906</a>: In id tokens, the auth_time claim must be a number. It was being returned as a string.</li>
     <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-911">CIL-911</a>: Return the state parameter with errors consistently.</li>
     <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-915">CIL-915</a>: Review and update the scopes documentation for clients.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-917">CIL-917</a>: Improved client registration templates to include more information.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-922">CIL-922</a>: Base 32 encode all non-JWT tokens. This is because some libraries (in PHP)
+    were unable to reliably url encode the new tokens. Base 32 tokens are case insensitive to boot.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-931">CIL-931</a>: The client management API needs to return strict_scopes when GETting a client.</li>
 </ul>
 
 <h2>5.0</h2>

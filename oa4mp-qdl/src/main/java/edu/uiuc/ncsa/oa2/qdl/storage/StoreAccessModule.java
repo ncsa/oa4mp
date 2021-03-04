@@ -32,7 +32,7 @@ public class StoreAccessModule extends JavaModule {
     }
 
     /**
-     * This will create the module and store. Then call {@link #doIt(StoreAccessModule,  State)}
+     * This will create the module and store. Then call {@link #doIt(StoreAccessModule, State)}
      * to finish off the setup.
      *
      * @param state
@@ -52,7 +52,7 @@ public class StoreAccessModule extends JavaModule {
      * @param sam
      * @param state
      */
-    protected void doIt(StoreAccessModule sam,  State state) {
+    protected void doIt(StoreAccessModule sam, State state) {
         if (state != null) {
             sam.storeFacade.setLogger(state.getLogger());
         }
@@ -85,7 +85,7 @@ public class StoreAccessModule extends JavaModule {
         return functions;
     }
 
-    public StoreFacade newStoreFacade(){
+    public StoreFacade newStoreFacade() {
         return new StoreFacade();
     }
 
@@ -175,7 +175,7 @@ public class StoreAccessModule extends JavaModule {
                             if (storeFacade == null) {
                                 storeFacade = newStoreFacade(); // get the right type of store facade
                             }
-                                storeFacade.doSetup();
+                            storeFacade.doSetup();
                         } catch (Throwable t) {
                             System.out.println("Could not re-initialize store facade for alias " + getAlias());
                         }
@@ -186,7 +186,28 @@ public class StoreAccessModule extends JavaModule {
         }
         throw new XMLMissingCloseTagException(STORE_FACADE_TAG);
     }
-    /*
+
+    List<String> descr = new ArrayList<>();
+
+    @Override
+    public List<String> getDescription() {
+        if (descr.isEmpty()) {
+            descr.add("Module for accessing OA4MP stores (except permissions, which require their");
+            descr.add("own machinery and hence they have their own module.");
+            descr.add("All operations are available, such as creating objects and getting");
+            descr.add("objects or searches. Note that you will get a stem of the properties ");
+            descr.add("for the object. This determines the object. Note that saving the object");
+            descr.add("is not an update, i.e., if you remove properties, they will be deleted");
+            descr.add("in the store.");
+            if (storeFacade != null) {
+                descr.add("Supported store types are ");
+                descr.add(storeFacade.getStoreTypes().toString());
+
+            }
+        }
+        return descr;
+    }
+/*
        // Sets up a couple of stores for testing serialization
 
        module_import('oa2:/qdl/p_store', 'p');

@@ -161,6 +161,8 @@ public class OIDCCMServlet extends EnvServlet {
         json.put(OA2Constants.SCOPE, scopes);
         json.put(OIDCCMConstants.CLIENT_URI, client.getHomeUri());
         json.put(OA2Constants.ERROR_URI, client.getErrorUri());
+        // CIL-931 fix.
+        json.put(STRICT_SCOPES, client.useStrictScopes());
         // Note that a contact email is something specific to OA4MP and does not occur in
         // either RFC 7591 or 7592.
         json.put("email", client.getEmail());
@@ -774,9 +776,9 @@ public class OIDCCMServlet extends EnvServlet {
             client.setAtLifetime(jsonRequest.getLong(ACCESS_TOKEN_LIFETIME) * 1000);
             jsonRequest.remove(ACCESS_TOKEN_LIFETIME);
         }
-        if (jsonRequest.containsKey(CLIENT_STRICT_SCOPES)) {
-            client.setStrictscopes(jsonRequest.getBoolean(CLIENT_STRICT_SCOPES));
-            jsonRequest.remove(CLIENT_STRICT_SCOPES);
+        if (jsonRequest.containsKey(STRICT_SCOPES)) {
+            client.setStrictscopes(jsonRequest.getBoolean(STRICT_SCOPES));
+            jsonRequest.remove(STRICT_SCOPES);
         }
         // Fix for CIL-734: now handle everything else left over
         client.removeOIDC_CM_Attributes();

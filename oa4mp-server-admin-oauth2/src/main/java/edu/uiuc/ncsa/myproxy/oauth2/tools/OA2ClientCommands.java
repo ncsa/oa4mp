@@ -431,7 +431,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
             This is called in StoreCommands2 and all it will do is replace the entry in toto.
             All decisions about what goes where are done here.
             And don't forget that the JSON library we use tends to makes tons of copies of things,
-            so updating requires we reset the values. You canot just get a JSON component and alter it.
+            so updating requires we reset the values. You cannot just get a JSON component and alter it.
              */
         if (result.containsKey(Scripts.SCRIPT)) {
             // They entered a single script. Add it

@@ -14,9 +14,12 @@ import java.util.List;
  * on 2/11/20 at  12:29 PM
  */
 public class NewTemplate implements QDLFunction, CSConstants {
+
+    public static final String NEW_TEMPLATE_NAME = "new_template";
+
     @Override
     public String getName() {
-        return "new_template";
+        return NEW_TEMPLATE_NAME;
     }
 
     @Override

@@ -12,6 +12,7 @@ import javax.xml.stream.XMLStreamWriter;
 import javax.xml.stream.events.XMLEvent;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -99,5 +100,15 @@ public class JWTModule extends JavaModule {
             xe = xer.nextEvent();
         }
         throw new XMLMissingCloseTagException(JWT_COMMANDS_TAG);
+    }
+    List<String> descr = new ArrayList<>();
+
+    @Override
+    public List<String> getDescription() {
+        if(descr.isEmpty()){
+            descr.add("The module for JWT (JSON Web Token) support. This will allow you to create them,");
+            descr.add("validate them, create and save keys, etc.");
+        }
+        return descr;
     }
 }

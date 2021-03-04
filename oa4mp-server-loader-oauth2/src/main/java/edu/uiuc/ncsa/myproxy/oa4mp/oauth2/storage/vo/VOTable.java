@@ -22,6 +22,7 @@ public class VOTable extends Table {
         getColumnDescriptor().add(new ColumnDescriptorEntry(vok().created(), Types.BIGINT));
         getColumnDescriptor().add(new ColumnDescriptorEntry(vok().defaultKeyID(), java.sql.Types.LONGVARCHAR));
         getColumnDescriptor().add(new ColumnDescriptorEntry(vok().issuer(), java.sql.Types.LONGVARCHAR));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(vok().atIssuer(), java.sql.Types.LONGVARCHAR));
         getColumnDescriptor().add(new ColumnDescriptorEntry(vok().discoveryPath(), java.sql.Types.LONGVARCHAR));
         getColumnDescriptor().add(new ColumnDescriptorEntry(vok().lastModified(), Types.BIGINT));
         getColumnDescriptor().add(new ColumnDescriptorEntry(vok().valid(), Types.BOOLEAN));

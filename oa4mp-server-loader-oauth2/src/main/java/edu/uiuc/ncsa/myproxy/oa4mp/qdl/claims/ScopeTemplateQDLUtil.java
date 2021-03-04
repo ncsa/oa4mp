@@ -14,9 +14,11 @@ import java.util.List;
  * on 1/21/21 at  11:11 AM
  */
 public class ScopeTemplateQDLUtil implements QDLFunction {
+    public static final String RESOLVE_TEMPLATES_NAME = "resolve_templates";
+
     @Override
     public String getName() {
-        return "resolve_templates";
+        return RESOLVE_TEMPLATES_NAME;
     }
 
     @Override

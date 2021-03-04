@@ -1366,9 +1366,16 @@ public abstract class StoreCommands2 extends StoreCommands {
             showCopyHelp();
             return;
         }
-        boolean forceIt = inputLine.hasArg("-f");
+        boolean forceIt = inputLine.hasArg(FORCE_COPY_FLAG);
+        boolean randomID = inputLine.hasArg(RANDOM_ID_FLAG);
+        inputLine.removeSwitch(FORCE_COPY_FLAG);
+        inputLine.removeSwitch(RANDOM_ID_FLAG);
+
         String sourceString = inputLine.getArg(1); // zero-th arg is name of command.
-        String targetString = inputLine.getArg(2);
+        String targetString = null;
+        if(inputLine.getArgCount() == 2) {
+            targetString = inputLine.getArg(2);
+        }
         Identifier sourceId = null;
         Identifier targetId = null;
         try {
@@ -1377,48 +1384,85 @@ public abstract class StoreCommands2 extends StoreCommands {
             say("sorry, but the first argument \"" + sourceString + "\" is not a valid identifier");
             return;
         }
-        try {
-            targetId = BasicIdentifier.newID(targetString);
-        } catch (Throwable t) {
-            say("sorry, but the second argument \"" + targetString + "\" is not a valid identifier");
-            return;
+        if(isTrivial(targetString)) {
+            if(!randomID){
+                say("No id specified and you did not supply the " + RANDOM_ID_FLAG + " flag. Cannot process.");
+                return;
+            }
+        }else{
+            try {
+                targetId = BasicIdentifier.newID(targetString);
+            } catch (Throwable t) {
+                say("sorry, but the second argument \"" + targetString + "\" is not a valid identifier");
+                return;
+            }
         }
 
         Identifiable source = (Identifiable) getStore().get(sourceId);
-        if (!forceIt && getStore().containsKey(targetId)) {
-            say("sorry, but \"" + targetId + "\" already exists. Consider using the -f flag if you need to overwrite it.");
+        // store is charged with making a valid, unused random id, so no need to check if that is requested.
+        if (!forceIt && !randomID && getStore().containsKey(targetId)) {
+            say("sorry, but \"" + targetId + "\" already exists. Consider using the " +FORCE_COPY_FLAG + " flag if you need to overwrite it.");
             return;
         }
 
-        doCopy(source, targetId);
-
+        Identifier newID = doCopy(source, targetId, randomID);
+        if(randomID){
+            say("new copy with id \"" + newID.toString() + "\" created.");
+        }
     }
 
-    protected void doCopy(Identifiable source, Identifier targetId) {
+    /**
+     * Do the copy. Note that if useRandomID is true, targetID is ignored,
+     * @param source
+     * @param targetId
+     * @param useRandomID
+     */
+    protected Identifier doCopy(Identifiable source, Identifier targetId, boolean useRandomID) {
         MapConverter mc = getMapConverter();
         Identifiable newVersion = getStore().create();
+        Identifier newVersionIdentifier = newVersion.getIdentifier();
         XMLMap map = new XMLMap();
         mc.toMap(source, map);
 
         mc.fromMap(map, newVersion);
-        newVersion.setIdentifier(targetId);
+        // Caveat: this copy will set the target id equal to the source if
+        if(useRandomID) {
+            newVersion.setIdentifier(newVersionIdentifier);
+        }else{
+            newVersion.setIdentifier(targetId);
+        }
         getStore().save(newVersion);
+        if(useRandomID){
+            return newVersionIdentifier; 
+        }else{
+            return targetId;
+        }
     }
 
     private void showCopyHelp() {
-        say("copy source target [-f] - copy source to target, possibly forcing the issue");
+        say("copy source target [" + FORCE_COPY_FLAG +"] [" + RANDOM_ID_FLAG + "] [new_id]- copy source to target");
+        say(FORCE_COPY_FLAG + " = force it, so overwrite if the target exists.");
+        say(RANDOM_ID_FLAG + " = create a random id for the target.");
+        say("new_id = specify the new id. Note if this is present, " + RANDOM_ID_FLAG + " is ignored.");
         say("This will create a complete copy of source and store it with the id of target.");
-        say("Default is to refuse to do this if target exists. If you supply the -f flag, then");
-        say("target will be overwritten if it exists.");
-        say("This only makes a simple copy. If this is, e.g., a client, you will need to approve it, change secret etc.");
+        say("Note: This will refuse to do this if target exists.");
+        say("Note: If you do not specify to use a random id and do not supply one, this will abort.");
+        say("This only makes a simple copy. Except if this is a client, and the approval will be cloned too, though not permissions etc.");
+        say("Other objects may need to be updated (such as permissions).");
         say("Note: source and target are identifiers (no lead /).");
         say("E.g. In the client store:\n");
         say("  client>copy dev:command.line dev:no_cfg\n");
         say("would take the client configuration with id dev:command.line and create a new client config. that is");
         say("identical except with id dev:no_cfg. In this case, as a new client, it needs to be approved.");
+        say("E.g.");
+        say("  client>copy dev:command.line " + RANDOM_ID_FLAG + "\n");
+        say("Creates a copy of dev:command.line with a random id, which is printed");
+
     }
 
     public static String KEY_SHORTHAND_PREFIX = ">";
+    public static String RANDOM_ID_FLAG = "-random_id";
+    public static String FORCE_COPY_FLAG = "-f";
 
     /**
      * resolves key shorthand of >key_name or -key key_name
@@ -1513,7 +1557,7 @@ public abstract class StoreCommands2 extends StoreCommands {
 
     protected void doRename(Identifier srcID, Identifier targetID) {
         Identifiable source = (Identifiable) getStore().get(srcID);
-        doCopy(source, targetID);
+        doCopy(source, targetID, false);  // always require an explicit id for the rename.
         getStore().remove(srcID);
     }
 }

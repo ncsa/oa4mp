@@ -35,6 +35,16 @@ public class VirtualOrganization extends IdentifiableImpl {
     String defaultKeyID;
     String discoveryPath;
     String issuer;
+
+    public String getAtIssuer() {
+        return atIssuer;
+    }
+
+    public void setAtIssuer(String atIssuer) {
+        this.atIssuer = atIssuer;
+    }
+
+    String atIssuer;
     JSONWebKeys jsonWebKeys;
     long lastModified = System.currentTimeMillis();
     String title;

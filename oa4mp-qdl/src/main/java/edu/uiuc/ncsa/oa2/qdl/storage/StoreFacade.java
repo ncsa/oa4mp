@@ -30,6 +30,21 @@ import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
  * on 12/18/20 at  7:05 AM
  */
 public class StoreFacade implements Serializable {
+    List<String> types;
+
+    public List<String> getStoreTypes() {
+        if (types == null) {
+            List<String> types = new ArrayList<>();
+            types.add(STORE_TYPE_CLIENT);
+            types.add(STORE_TYPE_APPROVALS);
+            types.add(STORE_TYPE_ADMIN_CLIENT_STORE);
+            types.add(STORE_TYPE_PERMISSION_STORE);
+            types.add(STORE_TYPE_TRANSACTION);
+            types.add(STORE_TYPE_TX_STORE);
+        }
+        return types;
+    }
+
     public MyLoggingFacade getLogger() {
         return logger;
     }
@@ -188,7 +203,7 @@ public class StoreFacade implements Serializable {
     }
 
     protected void doSetup() {
-        if(isTrivial(file) || isTrivial(cfgName) || isTrivial(storeType)){
+        if (isTrivial(file) || isTrivial(cfgName) || isTrivial(storeType)) {
             // case is that init is not called. This should be benign at this point.
             return;
         }
@@ -576,9 +591,9 @@ public class StoreFacade implements Serializable {
         public Object evaluate(Object[] objects, State state) {
             //checkInit();
 
-            if(objects.length == 1){
-                if((objects[0] instanceof Boolean)){
-                    if((Boolean)objects[0]) {
+            if (objects.length == 1) {
+                if ((objects[0] instanceof Boolean)) {
+                    if ((Boolean) objects[0]) {
                         return getStoreAccessor().getStoreKeys().identifier();
                     }
                 }
@@ -662,12 +677,15 @@ public class StoreFacade implements Serializable {
         public Object getValue() {
             if (storeTypes == null) {
                 storeTypes = new StemVariable();
+                storeTypes.addList(getStoreTypes());
+/*
                 storeTypes.listAppend(STORE_TYPE_CLIENT);
                 storeTypes.listAppend(STORE_TYPE_APPROVALS);
                 storeTypes.listAppend(STORE_TYPE_ADMIN_CLIENT_STORE);
                 storeTypes.listAppend(STORE_TYPE_PERMISSION_STORE);
                 storeTypes.listAppend(STORE_TYPE_TRANSACTION);
                 storeTypes.listAppend(STORE_TYPE_TX_STORE);
+*/
             }
             return storeTypes;
         }

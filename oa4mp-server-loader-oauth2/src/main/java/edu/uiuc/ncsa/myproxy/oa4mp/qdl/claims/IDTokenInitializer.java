@@ -20,7 +20,7 @@ public class IDTokenInitializer implements Serializable {
     public static String ID_TOKEN_INIT_METHOD = "id_init";
     public static String ID_TOKEN_FINISH_METHOD = "id_finish";
     public static String ID_TOKEN_REFRESH_METHOD = "id_refresh";
-    public static String ID_TOKEN_CHECK_CALIM_METHOD = "id_check_claim";
+    public static String ID_TOKEN_CHECK_CLAIM_METHOD = "id_check_claim";
 
     IDTokenHandler idTokenHandler;
 
@@ -60,14 +60,14 @@ public class IDTokenInitializer implements Serializable {
             if (idTokenHandler == null) {
                 idTokenHandler = new IDTokenHandler(getPayloadHandlerConfig());
             }
-            if(1 < objects.length ){
+            if (1 < objects.length) {
                 throw new IllegalArgumentException("Error: Missing second argument must be the execution phase.");
             }
-            if(!(objects[1] instanceof String)){
+            if (!(objects[1] instanceof String)) {
                 throw new IllegalArgumentException("Error: The second argument must be a string.");
 
             }
-            String execPhase = (String)objects[1];
+            String execPhase = (String) objects[1];
             getidTokenHandler().setClaims((JSONObject) idtoken.toJSON());
             try {
                 doMethod(execPhase);
@@ -180,7 +180,7 @@ public class IDTokenInitializer implements Serializable {
     public class idCheckClaims extends IDMethods {
         @Override
         public String getName() {
-            return ID_TOKEN_CHECK_CALIM_METHOD;
+            return ID_TOKEN_CHECK_CLAIM_METHOD;
         }
 
         @Override
