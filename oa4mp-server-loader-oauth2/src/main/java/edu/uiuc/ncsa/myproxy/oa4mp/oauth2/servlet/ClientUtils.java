@@ -125,6 +125,14 @@ public class ClientUtils {
         return lifetime;
     }
 
+    /**
+     * This verifies secrets only call if the client has a secret (e.g. do not call this
+     * if the client is public). This is because it will do various checks in the assumption
+     * that the client <b>must</b> have a secret and raise errors if it is missing, etc.
+     * @param client
+     * @param rawSecret
+     * @param isAT
+     */
     public static void verifyClientSecret(OA2Client client, String rawSecret, boolean isAT) {
         // Fix for CIL-332
         if (rawSecret == null) {
@@ -243,6 +251,7 @@ public class ClientUtils {
             // converted to a public client but the stored scopes are not updated.
             requestedScopes.add(OA2Scopes.SCOPE_OPENID);
             DebugUtil.trace(ClientUtils.class, ".resolveScopes: after resolution=" + requestedScopes);
+            st.setScopes(requestedScopes); //Fix for CIL-936
             return requestedScopes;
         }
         // The scopes that minimally are allowed. Permissions scopes are never in this list.

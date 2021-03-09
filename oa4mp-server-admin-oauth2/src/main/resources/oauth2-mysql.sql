@@ -155,6 +155,5 @@ GRANT ALL ON oauth2.transactions TO 'oa4mp-server'@'localhost';
 GRANT ALL ON oauth2.permissions TO 'oa4mp-server'@'localhost';
 GRANT ALL ON oauth2.tx_records TO 'oa4mp-server'@'localhost';
 GRANT ALL ON oauth2.virtual_organizations TO 'oa4mp-server'@'localhost';
-GRANT ALL ON ciloa2.virtual_organizations TO 'cilogon'@'localhost';
 
 commit;

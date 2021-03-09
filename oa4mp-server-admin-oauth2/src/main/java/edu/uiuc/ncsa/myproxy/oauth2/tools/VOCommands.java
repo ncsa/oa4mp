@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.util.Date;
 
 import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 
@@ -206,6 +207,6 @@ public class VOCommands extends StoreCommands2 {
     @Override
     protected String format(Identifiable identifiable) {
         VirtualOrganization vo = (VirtualOrganization) identifiable;
-        return vo.getIdentifierString() + " title:" + vo.getTitle() + " create time: " + vo.getCreated();
+        return vo.getIdentifierString() + " title:" + vo.getTitle() + " create time: " + (new Date(vo.getCreated()));
     }
 }

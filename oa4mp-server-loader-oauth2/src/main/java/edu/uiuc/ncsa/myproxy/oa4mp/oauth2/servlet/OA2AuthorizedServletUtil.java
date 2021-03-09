@@ -599,6 +599,7 @@ public class OA2AuthorizedServletUtil {
         figureOutAudienceAndResource(transactionState);
         OA2ServiceTransaction t = (OA2ServiceTransaction) transactionState.getTransaction();
         Collection<String> scopes = resolveScopes(transactionState);
+        t.setScopes(scopes);
         transactionState.getResponse().setHeader("X-Frame-Options", "DENY");
 
         //t.setScopes(scopes);

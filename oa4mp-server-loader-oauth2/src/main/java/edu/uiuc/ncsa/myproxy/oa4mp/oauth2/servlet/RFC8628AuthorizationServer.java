@@ -287,7 +287,7 @@ public class RFC8628AuthorizationServer extends EnvServlet {
         trans.setUsername(userName);
         RFC8628State rfc8628State = trans.getRFC8628State();
         rfc8628State.valid = true; // means they actually logged in
-        // The JSON library copies everything matter what, so no guarantee what's in the transaction is the same object.
+        // The JSON library copies everything no matter what, so no guarantee what's in the transaction is the same object.
         // Just replace it with the good copy.
         trans.setRFC8628State(rfc8628State);
         pending.remove(pendingState.id); // clean that out

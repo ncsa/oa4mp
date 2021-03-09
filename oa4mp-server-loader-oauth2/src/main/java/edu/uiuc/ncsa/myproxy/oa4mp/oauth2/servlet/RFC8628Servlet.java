@@ -251,7 +251,9 @@ public class RFC8628Servlet extends MyProxyDelegationServlet implements RFC8628C
     public static void main(String[] args) {
         long ts = System.currentTimeMillis();
         System.out.println("code =" + getUserCode(BigInteger.valueOf(ts)));
-        System.out.println("code 2 =" + getUserCode());
+        System.out.println("current default user code impl:" + getUserCode());
+
+
         for (int i = 1; i <= 10; i++) {
             byte[] b = new byte[i];
             secureRandom.nextBytes(b);

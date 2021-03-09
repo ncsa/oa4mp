@@ -164,6 +164,9 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         OA2SE oa2SE = (OA2SE) getServiceEnvironment();
         DebugUtil.trace(this, "8693 support enabled? " + oa2SE.isRfc8693Enabled());
         DebugUtil.trace(this, "grants equal? " + grantType.equals(GRANT_TYPE_TOKEN_EXCHANGE));
+         if(!client.isPublicClient()) {
+             verifyClientSecret(client, getClientSecret(request));
+         }
         if (grantType.equals(GRANT_TYPE_TOKEN_EXCHANGE)) {
             if (!oa2SE.isRfc8693Enabled()) {
                 warn("Client " + client.getIdentifierString() + " requested a token exchange but token exchange is not enabled onthis server.");
@@ -188,17 +191,11 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             return true;
         }
         if (grantType.equals(OA2Constants.GRANT_TYPE_REFRESH_TOKEN)) {
-            String rawSecret = getClientSecret(request);
-            if (!client.isPublicClient()) {
-                // if there is a secret, verify it.
-                verifyClientSecret(client, rawSecret);
-            }
             doRefresh(client, request, response);
             return true;
         }
         if (grantType.equals(OA2Constants.GRANT_TYPE_AUTHORIZATION_CODE)) {
             // OAuth 2. spec., section 4.1.3 states that the grant type must be included and it must be code.
-            // public clients cannot get an access token
             IssuerTransactionState state = doAT(request, response, client);
             writeATResponse(response, state);
             return true;
@@ -218,9 +215,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
                            HttpServletRequest request,
                            HttpServletResponse response) throws IOException {
         // https://tools.ietf.org/html/rfc8693
-        String rawSecret = getClientSecret(request);
 
-        verifyClientSecret(client, rawSecret);
 
         String subjectToken = getFirstParameterValue(request, SUBJECT_TOKEN);
 
@@ -585,7 +580,6 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
     }
 
     protected IssuerTransactionState doAT(HttpServletRequest request, HttpServletResponse response, OA2Client client) throws Throwable {
-        verifyClientSecret(client, getClientSecret(request));
         IssuerTransactionState state = doDelegation(client, request, response);
         return doAT(state, client);
     }
