@@ -46,30 +46,25 @@ public class CreateSourceConfig implements QDLFunction, CSConstants {
         setBasicValues(arg, output);
         switch (arg.getString(CS_DEFAULT_TYPE)) {
             case CS_TYPE_FILE:
-                doFS(arg, output);
-                break;
+               return doFS(arg, output);
             case CS_TYPE_NCSA:
-                doNCSA(arg, output);
-                break;
+return                doNCSA(arg, output);
             case CS_TYPE_LDAP:
-                doLDAP(arg, output);
-                break;
+return                doLDAP(arg, output);
             case CS_TYPE_HEADERS:
-                doHeaders(arg,output);
-                break;
+return                 doHeaders(arg,output);
             case CS_TYPE_CODE:
-                doCode(arg, output);
-                break;
+return                doCode(arg, output);
         }
         return output;
     }
 
-    private void doCode(StemVariable arg, StemVariable output) {
+    private StemVariable doCode(StemVariable arg, StemVariable output) {
         if(! arg.containsKey(CS_CODE_JAVA_CLASS)){
             throw new IllegalArgumentException("Error:" + CS_CODE_JAVA_CLASS + " is required for a custom code configuration.");
         }
         setBasicValues(arg, output);
-        output.union(arg);
+        return output.union(arg);
     }
 
     /*
@@ -94,7 +89,7 @@ public class CreateSourceConfig implements QDLFunction, CSConstants {
     }
 
      */
-    protected void doNCSA(StemVariable arg, StemVariable output) {
+    protected StemVariable doNCSA(StemVariable arg, StemVariable output) {
         output.put(CS_LDAP_SERVER_ADDRESS, "ldap4.ncsa.illinois.edu,ldap2.ncsa.illinois.edu,ldap1.ncsa.illinois.edu");
         output.put(CS_LDAP_PORT, 636L);
         output.put(CS_DEFAULT_TYPE, "ldap");
@@ -114,21 +109,20 @@ public class CreateSourceConfig implements QDLFunction, CSConstants {
         StemVariable groups = new StemVariable();
         groups.put(0L, "memberOf");
         output.put("groups.", groups);
-        output.union(arg);
-
+        return output.union(arg);
     }
 
-    private void doHeaders(StemVariable arg, StemVariable output) {
-        output.union(arg);
+    private StemVariable doHeaders(StemVariable arg, StemVariable output) {
+        return output.union(arg);
     }
 
 
-    protected void doLDAP(StemVariable arg, StemVariable output) {
+    protected StemVariable doLDAP(StemVariable arg, StemVariable output) {
         if (!arg.containsKey(CS_LDAP_SERVER_ADDRESS)) {
             throw new IllegalArgumentException("Error:" + CS_LDAP_SERVER_ADDRESS + " is required for ldap configurations");
         }
         setValue(arg,output, CS_LDAP_CONTEXT_NAME,"");
-        output.union(arg);
+       return output.union(arg);
     }
 
     /**
@@ -144,12 +138,12 @@ public class CreateSourceConfig implements QDLFunction, CSConstants {
 
 
 
-    protected void doFS(StemVariable arg, StemVariable output) {
+    protected StemVariable doFS(StemVariable arg, StemVariable output) {
         if (!arg.containsKey(CS_FILE_FILE_PATH)) {
             throw new IllegalArgumentException("Error: No " + CS_FILE_FILE_PATH + " specified. You must specify this.");
         }
         setValue(arg, output, CS_FILE_FILE_PATH, null);
-        output.union(arg);
+        return output.union(arg);
     }
 
    protected void setValue(StemVariable arg, StemVariable output, String key, Object defaultValue) {

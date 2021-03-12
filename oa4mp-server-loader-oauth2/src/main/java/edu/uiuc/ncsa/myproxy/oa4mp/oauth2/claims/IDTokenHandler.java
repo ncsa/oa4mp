@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static edu.uiuc.ncsa.security.core.util.DebugUtil.trace;
+import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.AUTHORIZATION_TIME;
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.NONCE;
 import static edu.uiuc.ncsa.security.oauth_2_0.jwt.ScriptingConstants.*;
@@ -48,7 +49,10 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
         VirtualOrganization vo = oa2se.getVO(transaction.getClient().getIdentifier());
         if(vo != null){
             issuer = vo.getIssuer();
-            return;
+            // if issuer set, return it.
+            if(!isTrivial(issuer)) {
+                return;
+            }
         }
         // 1. get the issuer from the admin client
         List<Identifier> admins = oa2se.getPermissionStore().getAdmins(transaction.getClient().getIdentifier());
@@ -56,20 +60,20 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
         for (Identifier adminID : admins) {
             AdminClient ac = oa2se.getAdminClientStore().get(adminID);
             if (ac != null) {
-                if (ac.getIssuer() != null) {
+                if (!isTrivial(ac.getIssuer())) {
                     issuer = ac.getIssuer();
                     break;
                 }
             }
         }
         // 2. If the admin client does not have an issuer set, see if the client has one
-        if (issuer == null) {
+        if (isTrivial(issuer)) {
             issuer = ((OA2Client) transaction.getClient()).getIssuer();
         }
 
         // 3. If the client does not have one, see if there is a server default to use
         // The discovery servlet will try to use the server default or construct the issuer
-        if (issuer == null) {
+        if (isTrivial(issuer)) {
             issuer = OA2DiscoveryServlet.getIssuer(request);
         }
 

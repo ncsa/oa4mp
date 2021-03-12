@@ -423,8 +423,10 @@ public class OA2SE extends ServiceEnvironmentImpl {
                 if (ac == null || ac.getVirtualOrganization() == null) {
                     return null; // no VO set. Most common case.
                 }
+                DebugUtil.trace(this, "got admin client " + ac.getIdentifierString());
                 VirtualOrganization vo = (VirtualOrganization) getVOStore().get(ac.getVirtualOrganization());
-                if (vo.isValid()) {
+                DebugUtil.trace(this, "got vo  " + (vo==null?"(none)":vo.getIdentifierString()));
+                if (vo != null && vo.isValid()) {
                     return vo;
                 } else {
                     return null;
