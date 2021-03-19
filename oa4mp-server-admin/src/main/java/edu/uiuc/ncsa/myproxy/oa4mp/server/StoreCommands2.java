@@ -12,6 +12,9 @@ import edu.uiuc.ncsa.security.storage.XMLMap;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
 import edu.uiuc.ncsa.security.util.cli.*;
+import edu.uiuc.ncsa.security.util.cli.editing.EditorEntry;
+import edu.uiuc.ncsa.security.util.cli.editing.EditorUtils;
+import edu.uiuc.ncsa.security.util.cli.editing.LineEditor;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -1015,8 +1018,95 @@ public abstract class StoreCommands2 extends StoreCommands {
         FormatUtil.printFormatListHelp(getIoInterface(), INDENT, inputLine);
     }
 
+    EditorEntry editorEntry = null;
+
+    public EditorEntry getEditorEntry() {
+        if (editorEntry == null) {
+            editorEntry = new EditorEntry();
+            editorEntry.exec = "vim";
+            editorEntry.name = "vim";
+        }
+        return editorEntry;
+    }
+
+    String TEMP_FILE = "/opt/cilogon-oa2/var/temp";
+    File tempDir = null;
+
+    protected File getTempDir() {
+        if (tempDir == null) {
+            tempDir = new File(TEMP_FILE);
+            if (tempDir.exists()) {
+                if (!tempDir.isDirectory()) {
+                    say("sorry, but could not find the temp directory");
+                }
+            } else {
+                tempDir.mkdirs();
+            }
+        }
+        return tempDir;
+    }
+
     @Override
     public void edit(InputLine inputLine) {
+        File tempFile;
+        try {
+            tempFile = File.createTempFile("edit", ".oa2", getTempDir());
+        } catch (IOException iox) {
+            if(DebugUtil.isEnabled()){
+                iox.printStackTrace();
+            }
+            say("could not open file:" + iox.getMessage());
+            return;
+        }
+        Identifiable x = findItem(inputLine);
+        XMLMap c = new XMLMap();
+        getStore().getXMLConverter().toMap(x, c);
+        try {
+            FileOutputStream fos = new FileOutputStream(tempFile);
+            c.toXML(fos);
+            fos.flush();
+            fos.close();
+        } catch (IOException iox) {
+            if(DebugUtil.isEnabled()){
+                iox.printStackTrace();
+            }
+
+            say("could not write temp file:" + iox.getMessage());
+            return;
+        }
+        if (EditorUtils.EDITOR_RC_OK == EditorUtils.editFile(getEditorEntry(), tempFile)) {
+            try {
+                FileInputStream fis = new FileInputStream(tempFile);
+                c = new XMLMap();
+
+                c.fromXML(fis);
+                fis.close();
+                Identifiable identifiable = getStore().getXMLConverter().fromMap(c, null);
+                if (!identifiable.getIdentifier().equals(x.getIdentifier())
+                ) {
+                     boolean ok = readline("You realize that the identifier for the original and edited objects are not the same, right? Save anyway(y/n)?").equals("y");
+                     if(ok){
+                         getStore().save(identifiable);
+
+                     }else{
+                         say("save aborted");
+                         return;
+                     }
+
+                }
+                getStore().save(identifiable);
+
+            } catch (IOException iox) {
+                if(DebugUtil.isEnabled()){
+                    iox.printStackTrace();
+                }
+                say("there was a problem reading the edited file:" + iox.getMessage());
+            }
+        }
+        say("update ok.");
+    }
+
+    protected void oldEdit(InputLine inputLine) {
         Identifiable x = findItem(inputLine);
         XMLMap c = new XMLMap();
         getStore().getXMLConverter().toMap(x, c);
@@ -1373,7 +1463,7 @@ public abstract class StoreCommands2 extends StoreCommands {
 
         String sourceString = inputLine.getArg(1); // zero-th arg is name of command.
         String targetString = null;
-        if(inputLine.getArgCount() == 2) {
+        if (inputLine.getArgCount() == 2) {
             targetString = inputLine.getArg(2);
         }
         Identifier sourceId = null;
@@ -1384,12 +1474,12 @@ public abstract class StoreCommands2 extends StoreCommands {
             say("sorry, but the first argument \"" + sourceString + "\" is not a valid identifier");
             return;
         }
-        if(isTrivial(targetString)) {
-            if(!randomID){
+        if (isTrivial(targetString)) {
+            if (!randomID) {
                 say("No id specified and you did not supply the " + RANDOM_ID_FLAG + " flag. Cannot process.");
                 return;
             }
-        }else{
+        } else {
             try {
                 targetId = BasicIdentifier.newID(targetString);
             } catch (Throwable t) {
@@ -1401,18 +1491,19 @@ public abstract class StoreCommands2 extends StoreCommands {
         Identifiable source = (Identifiable) getStore().get(sourceId);
         // store is charged with making a valid, unused random id, so no need to check if that is requested.
         if (!forceIt && !randomID && getStore().containsKey(targetId)) {
-            say("sorry, but \"" + targetId + "\" already exists. Consider using the " +FORCE_COPY_FLAG + " flag if you need to overwrite it.");
+            say("sorry, but \"" + targetId + "\" already exists. Consider using the " + FORCE_COPY_FLAG + " flag if you need to overwrite it.");
             return;
         }
 
         Identifier newID = doCopy(source, targetId, randomID);
-        if(randomID){
+        if (randomID) {
             say("new copy with id \"" + newID.toString() + "\" created.");
         }
     }
 
     /**
      * Do the copy. Note that if useRandomID is true, targetID is ignored,
+     *
      * @param source
      * @param targetId
      * @param useRandomID
@@ -1426,21 +1517,21 @@ public abstract class StoreCommands2 extends StoreCommands {
 
         mc.fromMap(map, newVersion);
         // Caveat: this copy will set the target id equal to the source if
-        if(useRandomID) {
+        if (useRandomID) {
             newVersion.setIdentifier(newVersionIdentifier);
-        }else{
+        } else {
             newVersion.setIdentifier(targetId);
         }
         getStore().save(newVersion);
-        if(useRandomID){
-            return newVersionIdentifier; 
-        }else{
+        if (useRandomID) {
+            return newVersionIdentifier;
+        } else {
             return targetId;
         }
     }
 
     private void showCopyHelp() {
-        say("copy source target [" + FORCE_COPY_FLAG +"] [" + RANDOM_ID_FLAG + "] [new_id]- copy source to target");
+        say("copy source target [" + FORCE_COPY_FLAG + "] [" + RANDOM_ID_FLAG + "] [new_id]- copy source to target");
         say(FORCE_COPY_FLAG + " = force it, so overwrite if the target exists.");
         say(RANDOM_ID_FLAG + " = create a random id for the target.");
         say("new_id = specify the new id. Note if this is present, " + RANDOM_ID_FLAG + " is ignored.");

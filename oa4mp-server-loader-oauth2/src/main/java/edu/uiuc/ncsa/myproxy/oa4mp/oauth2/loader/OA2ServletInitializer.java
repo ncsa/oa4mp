@@ -14,12 +14,12 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.OA4MPServletInitializer;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.NewClientNotifier;
 import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
+import edu.uiuc.ncsa.qdl.functions.FTStack;
 import edu.uiuc.ncsa.qdl.module.ModuleMap;
 import edu.uiuc.ncsa.qdl.state.ImportManager;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.StateUtils;
 import edu.uiuc.ncsa.qdl.state.SymbolStack;
-import edu.uiuc.ncsa.qdl.statements.FunctionTable;
 import edu.uiuc.ncsa.security.core.cache.Cleanup;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
@@ -108,7 +108,7 @@ public class OA2ServletInitializer extends OA4MPServletInitializer {
                         new SymbolStack(),
                         new OpEvaluator(),
                         MetaEvaluator.getInstance(),
-                        new FunctionTable(),
+                        new FTStack(),
                         new ModuleMap(),
                         null, // no logging at least for now
                         true,

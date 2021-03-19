@@ -6,11 +6,11 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
 import edu.uiuc.ncsa.myproxy.oa4mp.qdl.QDLXMLConstants;
 import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
+import edu.uiuc.ncsa.qdl.functions.FTStack;
 import edu.uiuc.ncsa.qdl.module.ModuleMap;
 import edu.uiuc.ncsa.qdl.state.ImportManager;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.SymbolStack;
-import edu.uiuc.ncsa.qdl.statements.FunctionTable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 
@@ -31,12 +31,13 @@ public class OA2State extends State {
                     SymbolStack symbolStack,
                     OpEvaluator opEvaluator,
                     MetaEvaluator metaEvaluator,
-                    FunctionTable functionTable,
+                    FTStack ft,
                     ModuleMap moduleMap,
                     MyLoggingFacade myLoggingFacade,
                     boolean isServerMode,
                     boolean strictACLs) {
-        super(resolver, symbolStack, opEvaluator, metaEvaluator, functionTable, moduleMap, myLoggingFacade, isServerMode);
+        super(resolver, symbolStack, opEvaluator, metaEvaluator,
+                ft, moduleMap, myLoggingFacade, isServerMode);
         this.strictACLs = strictACLs;
     }
 

@@ -7,7 +7,7 @@ import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
-import edu.uiuc.ncsa.security.util.cli.LineEditor;
+import edu.uiuc.ncsa.security.util.cli.editing.LineEditor;
 import edu.uiuc.ncsa.security.util.json.Ingester;
 import edu.uiuc.ncsa.security.util.json.JSONEntry;
 import edu.uiuc.ncsa.security.util.json.JSONStore;

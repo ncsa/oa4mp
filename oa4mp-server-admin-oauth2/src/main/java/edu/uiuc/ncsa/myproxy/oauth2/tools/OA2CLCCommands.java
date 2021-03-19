@@ -456,7 +456,7 @@ public class OA2CLCCommands extends CLCCommands {
         deviceCode = null;
     }
 
-    public static String CLEAR_PARAMETERS_FLAG = "-clear_params";
+    public static String CLEAR_PARAMETERS_FLAG = "-all";
 
     public void clear(InputLine inputLine) throws Exception {
         clear(inputLine, inputLine.hasArg(CLEAR_PARAMETERS_FLAG));
