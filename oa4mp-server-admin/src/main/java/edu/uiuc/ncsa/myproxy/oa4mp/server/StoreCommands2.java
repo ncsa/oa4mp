@@ -304,10 +304,8 @@ public abstract class StoreCommands2 extends StoreCommands {
         sayi("Note that the period must be escaped for a regex.");
         sayi("\nE.g.\n");
         sayi("search " + KEYS_FLAG + " client_id " +
-                SEARCH_SHORT_REGEX_FLAG + " " +
-                SEARCH_RETURNED_ATTRIBUTES_FLAG + "[name, email] " +
-                ".*237.*"
-        );
+                SEARCH_RETURNED_ATTRIBUTES_FLAG + " [name, email] " +
+                SEARCH_SHORT_REGEX_FLAG + " " + ".*237.*");
         sayi("\nThis would search for all client id's that contain the string 237 and only print out the name and email from those.");
     }
 
@@ -552,13 +550,13 @@ public abstract class StoreCommands2 extends StoreCommands {
         sayi("This would prompt to update the values for the 'name' and 'callback_uri' properties");
         sayi("of the object with id 'foo:bar'");
         sayi("A few notes.");
-        say(" 1. If the value of the property is a JSON object, you can edit it.");
+        say( "1. If the value of the property is a JSON object, you can edit it.");
         sayi("2. If the value of the property is an array, then you may add a value, delete a value,");
         sayi("   replace the entire contents (new entries are comma separated) or simply clear the .");
         sayi("   entire list of entries. You may also back out of the update request.");
-        say("3. What you type in is stored without change, so if you need to save the hash of something,");
-        say("   e.g. a password, use create_hash to make the hash first and save that.");
-        say("See also: list_keys, create_hash");
+        sayi( "3. What you type in is stored without change, so if you need to save the hash of something,");
+        sayi("    e.g. a password, use create_hash to make the hash first and save that.");
+        sayi("See also: list_keys, create_hash");
     }
 
 
@@ -737,7 +735,8 @@ public abstract class StoreCommands2 extends StoreCommands {
         }
         if (json != null && (json instanceof JSONObject)) {
             if (supportsQDL()) {
-                boolean loadQDL = getInput("Load only a QDL script or edit the full config? (q/f)", "f").equalsIgnoreCase("q");
+        /* Editing QDL scripts this way is a PITA. Just skip it. Needs refactored
+        boolean loadQDL = getInput("Load only a QDL script or edit the full config? (q/f)", "f").equalsIgnoreCase("q");
                 if (loadQDL) {
                     JSONObject oldCfg = (JSONObject) json;
                     JSONObject qdlcfg = loadQDLScript(oldCfg);
@@ -748,14 +747,14 @@ public abstract class StoreCommands2 extends StoreCommands {
 
                     map.put(key, oldCfg.toString());
                     return true;
-                } else {
+                } else {*/
                     JSONObject newConfig = (JSONObject) inputJSON((JSONObject) json, "client configuration");
                     if (newConfig == null) {
                         return false;
                     } // user cancelled
                     map.put(key, newConfig);
                     return true;
-                }
+                //}
             } else {
                 JSONObject newJSON = inputJSON((JSONObject) json, key);
                 if (newJSON == null) {
