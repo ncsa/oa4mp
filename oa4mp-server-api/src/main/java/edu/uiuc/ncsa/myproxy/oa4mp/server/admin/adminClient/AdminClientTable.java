@@ -23,6 +23,7 @@ public class AdminClientTable extends BaseClientTable {
         getColumnDescriptor().add(new ColumnDescriptorEntry(ak().name(), Types.LONGVARCHAR));
         getColumnDescriptor().add(new ColumnDescriptorEntry(ak().issuer(), Types.LONGVARCHAR));
         getColumnDescriptor().add(new ColumnDescriptorEntry(ak().vo(), Types.LONGVARCHAR));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(ak().voURI(), Types.LONGVARCHAR));
         getColumnDescriptor().add(new ColumnDescriptorEntry(ak().email(), Types.LONGVARCHAR));
         getColumnDescriptor().add(new ColumnDescriptorEntry(ak().config(), Types.LONGVARCHAR));
         getColumnDescriptor().add(new ColumnDescriptorEntry(ak().maxClients(), Types.BIGINT));

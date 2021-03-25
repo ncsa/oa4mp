@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient;
 
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
+import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.delegation.storage.impl.BaseClientConverter;
 import edu.uiuc.ncsa.security.storage.data.ConversionMap;
@@ -30,7 +31,8 @@ public class AdminClientConverter<V extends AdminClient> extends BaseClientConve
     public V fromJSON(JSONObject json) {
         V v = super.fromJSON(json);
         v.setIssuer(getJsonUtil().getJSONValueString(json, getACK().issuer()));
-        v.setVirtualOrganization(BasicIdentifier.newID(getJsonUtil().getJSONValueString(json, getACK().vo())));
+        v.setExternalVOName(getJsonUtil().getJSONValueString(json, getACK().vo()));
+        v.setVirtualOrganization(BasicIdentifier.newID(getJsonUtil().getJSONValueString(json, getACK().voURI())));
         v.setMaxClients(getJsonUtil().getJSONValueInt(json, getACK().maxClients()));
         v.setAllowQDL(getJsonUtil().getJSONValueBoolean(json, getACK().allowQDL()));
         JSONObject config = (JSONObject) getJsonUtil().getJSONValue(json, getACK().config());
@@ -43,7 +45,13 @@ public class AdminClientConverter<V extends AdminClient> extends BaseClientConve
     @Override
     public V fromMap(ConversionMap<String, Object> map, V v) {
         V value = super.fromMap(map, v);
-        value.setVirtualOrganization(BasicIdentifier.newID(map.getString(getACK().vo())));
+        value.setExternalVOName(map.getString(getACK().vo()));
+        try {
+            value.setVirtualOrganization(BasicIdentifier.newID(map.getString(getACK().voURI())));
+        }catch(Throwable t){
+            throw new GeneralException("Error reading " + getACK().voURI() + " field in database: \"" + t.getMessage() + "\"");
+        }
+
         value.setIssuer(map.getString(getACK().issuer()));
         if(map.containsKey(getACK().allowQDL())) {
             // older clients won't have this, so don't force the issue.
@@ -70,7 +78,8 @@ public class AdminClientConverter<V extends AdminClient> extends BaseClientConve
     @Override
     public void toJSON(V client, JSONObject json) {
         super.toJSON(client, json);
-        getJsonUtil().setJSONValue(json, getACK().vo(), client.getVirtualOrganization().toString());
+        getJsonUtil().setJSONValue(json, getACK().vo(), client.getExternalVOName().toString());
+        getJsonUtil().setJSONValue(json, getACK().voURI(), client.getVirtualOrganization().toString());
         getJsonUtil().setJSONValue(json, getACK().issuer(), client.getIssuer());
         getJsonUtil().setJSONValue(json, getACK().maxClients(), client.getMaxClients());
         getJsonUtil().setJSONValue(json, getACK().allowQDL(), client.isAllowQDL());
@@ -82,7 +91,8 @@ public class AdminClientConverter<V extends AdminClient> extends BaseClientConve
     @Override
     public void toMap(V client, ConversionMap<String, Object> map) {
         map.put(getACK().issuer(), client.getIssuer());
-        map.put(getACK().vo(), client.getVirtualOrganization());
+        map.put(getACK().vo(), client.getExternalVOName());
+        map.put(getACK().voURI(), client.getVirtualOrganization());
         map.put(getACK().maxClients(), client.getMaxClients());
         map.put(getACK().allowQDL(), client.isAllowQDL());
         if (client.getConfig() != null && !client.getConfig().isEmpty()) {

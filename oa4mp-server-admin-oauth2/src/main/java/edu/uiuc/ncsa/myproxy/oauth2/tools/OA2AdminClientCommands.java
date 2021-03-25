@@ -76,16 +76,16 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
         if (!isEmpty(issuer)) {
             client.setIssuer(issuer);
         }
-        String vo;
+        String voURI;
         if (client.getVirtualOrganization() == null) {
-            vo = getInput("Give the VO", null);
+            voURI = getInput("Give the VO", null);
         } else {
-            vo = getInput("Give the VO", client.getVirtualOrganization().toString());
+            voURI = getInput("Give the VO", client.getVirtualOrganization().toString());
         }
 
-        if (!isEmpty(vo)) {
+        if (!isEmpty(voURI)) {
             try {
-                URI z = URI.create(vo);
+                URI z = URI.create(voURI);
                 client.setVirtualOrganization(BasicIdentifier.newID(z));
             } catch (Throwable t) {
                 if (DebugUtil.isEnabled()) {
@@ -94,6 +94,20 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
                 say("sorry, but that was not a valid identifier");
             }
         }
+
+
+        String vo;
+        if (client.getExternalVOName() == null) {
+            vo = getInput("Give the VO", null);
+        } else {
+            vo = getInput("Give the VO", client.getExternalVOName().toString());
+        }
+
+        if (!isEmpty(vo)) {
+                client.setExternalVOName(vo);
+        }
+
+
         String max = getInput("Enter new maximum number of clients allowed", Integer.toString(client.getMaxClients()));
         if (!isEmpty(max)) {
             client.setMaxClients(Integer.parseInt(max));

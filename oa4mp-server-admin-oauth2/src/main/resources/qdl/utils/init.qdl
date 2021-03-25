@@ -6,7 +6,7 @@
 */
 
 /*
-   Bunch of standard IDPs and constants so we don' have to boilerplate these everywhere.
+   Bunch of standard IDPs and constants so we don't have to boilerplate these everywhere.
 
 */
     idp.fnal := 'https://idp.fnal.gov/idp/shibboleth';

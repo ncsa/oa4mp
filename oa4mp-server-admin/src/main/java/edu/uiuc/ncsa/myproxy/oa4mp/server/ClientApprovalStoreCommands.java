@@ -3,16 +3,21 @@ package edu.uiuc.ncsa.myproxy.oa4mp.server;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 5/22/13 at  1:51 PM
  */
 public class ClientApprovalStoreCommands extends StoreCommands2 {
+
+    public static final String SHOW_UNAPPROVED_FLAG = "-n";
+
     @Override
     public void extraUpdates(Identifiable identifiable) {
     }
@@ -25,18 +30,6 @@ public class ClientApprovalStoreCommands extends StoreCommands2 {
         super(logger, store);
     }
 
-/*    @Override
-    protected void longFormat(Identifiable identifiable) {
-        ClientApproval clientApproval = (ClientApproval) identifiable;
-        say("\nApprover:" + clientApproval.getApprover());
-        say("Identifier:" + clientApproval.getIdentifierString());
-        say("Approved at:" + clientApproval.getApprovalTimestamp());
-        say("Is approved? " + clientApproval.isApproved());
-        say("Status:" + clientApproval.getStatus());
-
-    }*/
-
-  
 
     @Override
     protected String format(Identifiable identifiable) {
@@ -155,5 +148,58 @@ public class ClientApprovalStoreCommands extends StoreCommands2 {
         info("Approval cancelled for id=" + ca.getIdentifierString());
     }
 
+    protected void show(boolean showApproved, String regex) throws Exception {
+        say("showing " + (showApproved ? "" : "un") + "approved entries");
+        List<ClientApproval> approvals = getStore().getAll();
+        java.util.regex.Pattern p = null;
+        java.util.regex.Matcher m;
+        if (!StringUtils.isTrivial(regex)) {
+            p = java.util.regex.Pattern.compile(regex);
+        }
 
+        int i = 0;
+        for (ClientApproval ca : approvals) {
+            if (p != null) {
+                m = p.matcher(ca.getIdentifierString());
+                if (!m.matches()) {
+                    continue;
+                }
+            }
+            if (showApproved) {
+                if (ca.isApproved()) {
+                    say(format(ca));
+                    i++;
+                }
+            } else {
+                if (!ca.isApproved()) {
+                    say(format(ca));
+                    i++;
+                }
+            }
+        }
+        say(i + (showApproved ? " " : " un") + "approved entries found");
+    }
+
+
+    public void show(InputLine inputLine) throws Exception {
+        if (showHelp(inputLine)) {
+            say("show [" + SHOW_UNAPPROVED_FLAG + "] [" + SEARCH_SHORT_REGEX_FLAG + " regex]");
+            sayi("Show either all the approved or unapproved records");
+            sayi(SHOW_UNAPPROVED_FLAG + " - show only unapproved records");
+            sayi(SEARCH_SHORT_REGEX_FLAG + " - apply the regular expression to the identifier");
+            say("E.g.");
+            sayi("show " + SEARCH_SHORT_REGEX_FLAG +  " qdl.*");
+            sayi("shows all approved clients whose identifier starts with qdl");
+            sayi("show " + SHOW_UNAPPROVED_FLAG + " "  + SEARCH_SHORT_REGEX_FLAG +" qdl.*");
+            sayi("shows all UNapproved clients whose identifier starts with qdl");
+        }
+        boolean showApproved = !inputLine.hasArg(SHOW_UNAPPROVED_FLAG);
+        inputLine.removeSwitch(SHOW_UNAPPROVED_FLAG);
+        String regex = null;
+        if(inputLine.hasArg(SEARCH_SHORT_REGEX_FLAG)){
+            regex = inputLine.getNextArgFor(SEARCH_SHORT_REGEX_FLAG);
+            inputLine.removeSwitchAndValue(SEARCH_SHORT_REGEX_FLAG);
+        }
+        show(showApproved, regex);
+    }
 }

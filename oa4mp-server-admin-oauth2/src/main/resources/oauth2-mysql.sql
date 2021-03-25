@@ -133,15 +133,16 @@ CREATE TABLE oauth2.tx_records
 CREATE TABLE oauth2.virtual_organizations
 (
     vo_id          VARCHAR(255) PRIMARY KEY,
-    created        bigint,
+           created bigint,
     default_key_id text,
     discovery_path text,
-    issuer         text,
-    json_web_keys  text,
-    last_modified  bigint,
-    title           text,
-    resource       text,
-    valid          boolean,
+            issuer text,
+         at_issuer text,
+     json_web_keys text,
+     last_modified bigint,
+             title text,
+          resource text,
+             valid boolean,
     UNIQUE INDEX parents (vo_id(255)),
     INDEX discovery_path (discovery_path(255))
 );

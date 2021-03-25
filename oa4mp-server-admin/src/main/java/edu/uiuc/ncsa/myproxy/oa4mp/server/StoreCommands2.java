@@ -55,16 +55,15 @@ public abstract class StoreCommands2 extends StoreCommands {
     }
 
     protected void showSerializeHelp() {
-        say("serializes an object and either shows it on the command line or put it in a file. Cf. deserialize.");
         say("serialize  [-file path] index");
-        say("Serializes the object with the given index. (Note that the index must be the last argument!) " +
-                "It will print it to the command line or save it to the given file,");
-        say("overwriting the contents of the file.");
+        sayi("Usage: XML serializes an object and either shows it on the ");
+        sayi("   command line or put it in a file. Cf. deserialize.");
+        sayi("See also: deserialize.");
     }
 
     protected void showDeserializeHelp() {
         say("deserialize  [-new] -file path [" + SHORT_UPDATE_FLAG + "|" + UPDATE_FLAG + "]");
-        sayi("Deserializes an object into the current store overwriting the contents. Cf. serialize.");
+        sayi("Usage: Deserializes an object into the current store overwriting the contents. Cf. serialize.");
         sayi("This replaces the object with the given index in the store.\n");
         sayi("If the -new flag is used, it is assumed that the object should be new. This means that if there is an existing object");
         sayi("with that identifier the operation will fail. If there is no identifier, one will be created.");
@@ -283,7 +282,8 @@ public abstract class StoreCommands2 extends StoreCommands {
                 SEARCH_DEBUG_FLAG + "] [" +
                 LINE_LIST_COMMAND + " | " + VERBOSE_COMMAND + " ] [" +
                 SEARCH_RETURNED_ATTRIBUTES_FLAG + " list] condition");
-        sayi("Searches the current component for all entries satisfying the condition. You may also specify that the ");
+        sayi("Usage: Searches the current component for all entries satisfying the condition.");
+        sayi("You may also specify that the ");
         sayi("condition is a regular expression rather than using simple equality");
         sayi("Invoking this with the -listkeys flag prints out all the keys for this store. Omit that for searches.");
         sayi(KEY_FLAG + " = the name of the key to be searched for");
@@ -303,7 +303,7 @@ public abstract class StoreCommands2 extends StoreCommands {
         sayi("\n(in the clients or user component) This would match all email addresses from that institution bigstate.edu. \n");
         sayi("Note that the period must be escaped for a regex.");
         sayi("\nE.g.\n");
-        sayi("search " + KEYS_FLAG + " client_id " +
+        sayi("search " + KEY_SHORTHAND_PREFIX + "client_id " +
                 SEARCH_RETURNED_ATTRIBUTES_FLAG + " [name, email] " +
                 SEARCH_SHORT_REGEX_FLAG + " " + ".*237.*");
         sayi("\nThis would search for all client id's that contain the string 237 and only print out the name and email from those.");
@@ -385,7 +385,8 @@ public abstract class StoreCommands2 extends StoreCommands {
     @Override
     protected void showLSHelp() {
         say("ls [" + LINE_LIST_COMMAND + "  | " + VERBOSE_COMMAND + " | " + ALL_LIST_COMMAND + "] | [" + KEY_FLAG + " key | " + KEYS_FLAG + " array] id");
-        sayi("Lists information about the contents of the store, an entry and individual values of the entry.");
+        sayi("Usage: Lists information about the contents of the store, an entry and");
+        sayi("   individual values of the entry.");
         sayi("When listing multiple entries, tools will use the most numbers from the most recent call to this.");
         sayi("A line listing is tabular and will shorten entries that are too long, ending them with " + ELLIPSIS);
         sayi("A verbose command will format every bit of every entry within the margins.");
@@ -419,7 +420,7 @@ public abstract class StoreCommands2 extends StoreCommands {
     @Override
     protected void showRMHelp() {
         say("rm [" + KEY_FLAG + " | " + KEYS_FLAG + " list] id");
-        sayi("Remove a property from this the object with the given value.");
+        sayi("Usage: Remove a property from this the object with the given value.");
         sayi("If you supply a list, all of the properties in the list will be removed");
         sayi("No list of keys means to remove the entire object from the store (!)");
         showKeyShorthandHelp();
@@ -528,10 +529,10 @@ public abstract class StoreCommands2 extends StoreCommands {
     @Override
     protected void showUpdateHelp() {
         say("update [" + KEY_FLAG + " key [" + VALUE_FLAG + " value | " + FILE_FLAG + " file_path " + JSON_FLAG + "]]" +
-                "[" + KEYS_FLAG + " array] index\n");
-        sayi("where the index is the index in the list command.");
+                "[" + KEYS_FLAG + " array] [id | index]");
+        sayi("Usage: Update the properties of the object.");
         sayi("This has three modes. Just an id will prompt you for every value to update.");
-        say("Alternately, you may either specify a single key + value OR you may specify an array of keys");
+        sayi("Alternately, you may either specify a single key + value OR you may specify an array of keys");
         sayi("of the form [key0,key1,...]. (The list_keys command will tell what the keys are.)");
         sayi("The " + KEYS_FLAG + " will act on all the keys supplied.");
         showKeyShorthandHelp();
@@ -550,12 +551,12 @@ public abstract class StoreCommands2 extends StoreCommands {
         sayi("This would prompt to update the values for the 'name' and 'callback_uri' properties");
         sayi("of the object with id 'foo:bar'");
         sayi("A few notes.");
-        say( "1. If the value of the property is a JSON object, you can edit it.");
-        sayi("2. If the value of the property is an array, then you may add a value, delete a value,");
-        sayi("   replace the entire contents (new entries are comma separated) or simply clear the .");
-        sayi("   entire list of entries. You may also back out of the update request.");
+        sayi( "1. If the value of the property is a JSON object, you can edit it.");
+        sayi( "2. If the value of the property is an array, then you may add a value, delete a value,");
+        sayi( "   replace the entire contents (new entries are comma separated) or simply clear the .");
+        sayi( "   entire list of entries. You may also back out of the update request.");
         sayi( "3. What you type in is stored without change, so if you need to save the hash of something,");
-        sayi("    e.g. a password, use create_hash to make the hash first and save that.");
+        sayi( "    e.g. a password, use create_hash to make the hash first and save that.");
         sayi("See also: list_keys, create_hash");
     }
 
@@ -1013,7 +1014,7 @@ public abstract class StoreCommands2 extends StoreCommands {
 
     protected void showListKeysHelp(InputLine inputLine) {
         say("list_keys");
-        sayi("This lists the keys of the current store.");
+        sayi("Usage: This lists the keys of the current store.");
         FormatUtil.printFormatListHelp(getIoInterface(), INDENT, inputLine);
     }
 
@@ -1047,6 +1048,11 @@ public abstract class StoreCommands2 extends StoreCommands {
 
     @Override
     public void edit(InputLine inputLine) {
+        if(showHelp(inputLine)){
+            say("edit [id | index]");
+            sayi("Usage: Edit an object in an external editor.");
+            sayi("Note that this will update the object on exiting the editor");
+        }
         File tempFile;
         try {
             tempFile = File.createTempFile("edit", ".oa2", getTempDir());
@@ -1433,16 +1439,14 @@ public abstract class StoreCommands2 extends StoreCommands {
 
     protected void showArchiveHelp() {
         say("archive [-versions] | [-restore version] [id] - archive an object");
-        say("This will either create a copy of the current version or restore a versioned object.");
-        say("archive [id]");
-        sayi(" version the object, assigning it the last version.");
-        say("archive -versions [id]  ");
-        sayi("list the versions of an object");
-        say("archive -latest");
-        sayi("Show the number of the latest version (-1 if no versions exist)");
+        say("Usage: This will either create a copy of the current version");
+        sayi("   or restore a versioned object.");
+        sayi("archive [id] - version the object, assigning it the last version.");
+        sayi("archive -versions [id]  - list the versions of an object");
+        sayi("archive -latest - show the number of the latest version (-1 if no versions exist)");
 
-        say("archive -restore (number | latest) [id]");
-        sayi("Restore the given version of this. If a number is given, use that. If the word \"latest\" (no quotes)");
+        sayi("archive -restore (number | latest) [id] - restore the given version");
+        sayi("of this. If a number is given, use that. If the word \"latest\" (no quotes)");
         sayi("is used, give back the latest version.");
     }
 
@@ -1530,23 +1534,24 @@ public abstract class StoreCommands2 extends StoreCommands {
     }
 
     private void showCopyHelp() {
-        say("copy source target [" + FORCE_COPY_FLAG + "] [" + RANDOM_ID_FLAG + "] [new_id]- copy source to target");
-        say(FORCE_COPY_FLAG + " = force it, so overwrite if the target exists.");
-        say(RANDOM_ID_FLAG + " = create a random id for the target.");
-        say("new_id = specify the new id. Note if this is present, " + RANDOM_ID_FLAG + " is ignored.");
-        say("This will create a complete copy of source and store it with the id of target.");
-        say("Note: This will refuse to do this if target exists.");
-        say("Note: If you do not specify to use a random id and do not supply one, this will abort.");
-        say("This only makes a simple copy. Except if this is a client, and the approval will be cloned too, though not permissions etc.");
-        say("Other objects may need to be updated (such as permissions).");
-        say("Note: source and target are identifiers (no lead /).");
-        say("E.g. In the client store:\n");
-        say("  client>copy dev:command.line dev:no_cfg\n");
-        say("would take the client configuration with id dev:command.line and create a new client config. that is");
-        say("identical except with id dev:no_cfg. In this case, as a new client, it needs to be approved.");
+        say("copy source target [" + FORCE_COPY_FLAG + "] [" + RANDOM_ID_FLAG + "] [new_id]");
+        sayi("Usage: Copy source to target");
+        sayi(FORCE_COPY_FLAG + " - force it, so overwrite if the target exists.");
+        sayi(RANDOM_ID_FLAG + " - create a random id for the target.");
+        sayi("new_id - specify the new id. Note if this is present, " + RANDOM_ID_FLAG + " is ignored.");
+        sayi("This will create a complete copy of source and store it with the id of target.");
+        sayi("Note: This will refuse to do this if target exists.");
+        sayi("Note: If you do not specify to use a random id and do not supply one, this will abort.");
+        sayi("This only makes a simple copy. Except if this is a client, and the approval will be cloned too, though not permissions etc.");
+        sayi("Other objects may need to be updated (such as permissions).");
+        sayi("Note: source and target are identifiers (no lead /).");
+        sayi("E.g. In the client store:\n");
+        sayi("  client>copy dev:command.line dev:no_cfg\n");
+        sayi("would take the client configuration with id dev:command.line and create a new client config. that is");
+        sayi("identical except with id dev:no_cfg. In this case, as a new client, it needs to be approved.");
         say("E.g.");
-        say("  client>copy dev:command.line " + RANDOM_ID_FLAG + "\n");
-        say("Creates a copy of dev:command.line with a random id, which is printed");
+        sayi("  client>copy dev:command.line " + RANDOM_ID_FLAG + "\n");
+        sayi("Creates a copy of dev:command.line with a random id, which is printed");
 
     }
 
@@ -1591,12 +1596,12 @@ public abstract class StoreCommands2 extends StoreCommands {
     public void rename(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
             say("rename source_id target_id");
-            say("Rename source_id to target_id, replacing it.");
+            sayi("Usage: Rename source_id to target_id, replacing it.");
             say("E.g.\n");
-            say("rename dev:test dev:test/no_cfg\n");
-            say("(Note lead slashes on ids are optional) would rename dev:test to dev:test/no_cfg");
-            say("At the end of this operation, dev:test would not exist. ");
-            say("See also: copy, rm");
+            sayi("rename dev:test dev:test/no_cfg\n");
+            sayi("(Note lead slashes on ids are optional) would rename dev:test to dev:test/no_cfg");
+            sayi("At the end of this operation, dev:test would not exist. ");
+            sayi("See also: copy, rm");
             return;
         }
         if (inputLine.getArgCount() != 2) {

@@ -80,6 +80,22 @@ public class AdminClient extends BaseClient {
         this.issuer = issuer;
     }
 
+    /**
+     * The  name, used by external applications for their VO. These names have nothing to do
+     * with OA4MP's virtual organization mechanisms and are typically just displayed to the
+     * user at some point.
+     * @return
+     */
+    public String getExternalVOName() {
+        return externalVOName;
+    }
+
+    public void setExternalVOName(String externalVOName) {
+        this.externalVOName = externalVOName;
+    }
+
+    String externalVOName;
+
     public Identifier getVirtualOrganization() {
         return virtualOrganization;
     }

@@ -80,7 +80,7 @@ public class OA2CLCCommands extends CLCCommands {
             say("No configuration loaded.");
         }
         this.oa2CommandLineClient = oa2CommandLineClient;
-        say(hasClipboard()?"clipboard is supported.":"no clipboard support available.");
+        say(hasClipboard() ? "clipboard is supported." : "no clipboard support available.");
     }
 
 
@@ -135,7 +135,8 @@ public class OA2CLCCommands extends CLCCommands {
     public void load(InputLine inputLine) throws Exception {
         if (!inputLine.hasArgs()) {
             say("config file = " + oa2CommandLineClient.getConfigFile() + ", config name=" + oa2CommandLineClient.getConfigName());
-            say("Remember that loading a configuration clears all current state, except parameters.");
+            sayi("Usage: load a configuration from a file and make it active.");
+            sayi("Remember that loading a configuration clears all current state, except parameters.");
             return;
         }
         try {
@@ -158,11 +159,12 @@ public class OA2CLCCommands extends CLCCommands {
 
     public void df(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
-            say("df - initiate the device flow for this client");
-            say("You will need to use a borser and the returned user code to authenticate. Then");
-            say("you can get that access token with the get_at command. This client does not" );
-            say("do polling");
-            say("See also: get_at");
+            say("df");
+            sayi("Usage: Initiate the device flow for this client");
+            sayi("You will need to use a browser and the returned user code to authenticate. Then");
+            sayi("you can get that access token with the get_at command. This client does not");
+            sayi("do polling.");
+            sayi("See also: get_at");
             return;
         }
         // set up for the next round
@@ -172,7 +174,7 @@ public class OA2CLCCommands extends CLCCommands {
             return;
         }
         dummyAsset = (OA2Asset) getCe().getAssetStore().create();
-        
+
         OA2ClientEnvironment oa2ce = (OA2ClientEnvironment) getCe();
         String requestString = oa2ce.getDeviceAuthorizationUri().toString();
         requestString = requestString + "?" + OA2Constants.CLIENT_ID + "=" + oa2ce.getClientId();
@@ -260,7 +262,7 @@ public class OA2CLCCommands extends CLCCommands {
         }
     }
 
-    protected String getFromClipboard(boolean silentMode){
+    protected String getFromClipboard(boolean silentMode) {
         // TODO Places where the clipboard is read have a lot of cases of prompting the user for the information. Refactor that to use this method?
         try {
             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -275,9 +277,10 @@ public class OA2CLCCommands extends CLCCommands {
      * Peeks into clipboard to see if it is there and actually works. This is far from a perfect test
      * since it only looks for a string in the clipboard, but actually testing every case for a supported
      * flavor would be much more of a task.
+     *
      * @return
      */
-    protected boolean hasClipboard(){
+    protected boolean hasClipboard() {
         // Annoying thing #42. we check if the clipboard exists by trying to read from it
         // this is the most reliable cross platform way to do it. The problem is that
         // error messages can be generated very deep in the stack that cannot be intercepted
@@ -289,18 +292,19 @@ public class OA2CLCCommands extends CLCCommands {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         System.setErr(new PrintStream(byteArrayOutputStream));
 
-        try{
+        try {
             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
             clipboard.getData(DataFlavor.stringFlavor);
             System.setErr(errStream);
             return true;
-        }catch(Throwable t){
+        } catch (Throwable t) {
             info("Probably benign message from checking clipboard:" + new String(byteArrayOutputStream.toByteArray()));
         }
         System.setErr(errStream);
         return false;
 
     }
+
     protected String createURI(String base, HashMap<String, String> args) throws UnsupportedEncodingException {
         String uri = base;
         boolean firstPass = true;
@@ -327,18 +331,19 @@ public class OA2CLCCommands extends CLCCommands {
 
     AuthorizationGrantImpl grant;
 
-     protected void printGrant(){
-              if(grant == null){
-                  say("no grant");
-                  return;
-              }
-              if(TokenUtils.isBase32(grant.getToken())){
-           say("raw grant = " + grant.getToken());
-           say("    grant = " + TokenUtils.b32DecodeToken(grant.getToken()));
-         }else{
-                  say("grant = " + grant.getToken());
-              }
-     }
+    protected void printGrant() {
+        if (grant == null) {
+            say("no grant");
+            return;
+        }
+        if (TokenUtils.isBase32(grant.getToken())) {
+            say("raw grant = " + grant.getToken());
+            say("    grant = " + TokenUtils.b32DecodeToken(grant.getToken()));
+        } else {
+            say("grant = " + grant.getToken());
+        }
+    }
+
     public void get_grant(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
             setGrantHelp();
@@ -469,7 +474,8 @@ public class OA2CLCCommands extends CLCCommands {
 
     protected void getClearHelp() {
         say("clear [" + CLEAR_PARAMETERS_FLAG + "]");
-        sayi("Reset all internal state and restart. You should do this rather than just starting over");
+        sayi("Usage: Reset all internal state and restart.");
+        sayi("You should do this rather than just starting over");
         sayi("as you may run into old state.");
         sayi(CLEAR_PARAMETERS_FLAG + " (optional) if true, will also clear all stored parameters.");
     }
@@ -478,8 +484,9 @@ public class OA2CLCCommands extends CLCCommands {
 
     protected void saveCertHelp() {
         say("save_cert filename:");
-        sayi("This will save the cert (be sure to do a getcert call first so you have one) to the");
-        sayi("fully qualified filename");
+        sayi("Usage: This will save the cert to the filename.");
+        sayi("Be sure to do a getcert call first so you have one.");
+        sayi("Note that the filename must be fully qualified.");
         sayi("If there is no cert available, no file will be written, but a message will be printed.");
     }
 
@@ -505,21 +512,27 @@ public class OA2CLCCommands extends CLCCommands {
             return;
         }
         String fileName = inputLine.getArg(1);
+        File file = new File(fileName);
+        if (!file.isAbsolute()) {
+            say("Sorry, you must supply a path.");
+            return;
+        }
         FileWriter fileWriter = new FileWriter(fileName);
         BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
         bufferedWriter.write(cert + "\n");
         bufferedWriter.flush();
         bufferedWriter.close();
-        say("File \"" + fileName + "\" saved successfully.");
+        say("File \"" + file.getAbsolutePath() + "\" saved successfully.");
     }
 
     String rawIdToken = null;
 
     protected void showRawTokenHelp() {
         sayi("show_raw_id_token:");
-        sayi("This will show the raw id token, i.e., the JWT. ");
+        sayi("Usage: This will show the raw id token, i.e., the JWT. ");
         sayi("If you wish to see the contents of this JWT");
-        sayi("you should probably invoke showClaims instead.");
+        sayi("you should probably invoke show_claims instead.");
+        sayi("See also: show_claims");
     }
 
     public void show_raw_id_token(InputLine inputLine) throws Exception {
@@ -556,13 +569,15 @@ public class OA2CLCCommands extends CLCCommands {
 
     protected void showClaimsHelp() {
         sayi("showClaims");
-        say("    This will show the most recent set of claims. You must get an access token");
-        sayi("   before this is set.");
-        sayi("   You may also see the raw version of this (simply the JWT) by calling show_raw_token.");
+        sayi("Usage: This will show the most recent set of claims.");
+        sayi(" You must get an access token before this is set.");
+        sayi("You may also see the raw version of this (simply the JWT) by calling show_raw_token.");
+        sayi("See also: get_at, get_rt, exchange");
     }
 
     protected void showRevokeHelp() {
-        say("revoke -at | -rt = revoke either the access token of the refresh token");
+        say("revoke -at | -rt");
+        sayi("Usage: Revoke either the access token or the refresh token");
     }
 
     public void revoke(InputLine inputLine) throws Exception {
@@ -572,14 +587,18 @@ public class OA2CLCCommands extends CLCCommands {
         }
         boolean revokeAT = inputLine.hasArg("-at");
         boolean revokeRT = inputLine.hasArg("-rt");
-
+        say("under construction");
 
     }
 
     public void asset(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
-            say("Show the current asset");
-
+            say("asset");
+            sayi("Usage: Show the current asset.");
+            sayi("Asset refers to the internal state of this exchange.");
+            sayi("Mostly this is used if you are trying to debug exactly what");
+            sayi("the state of the exchange is. Other calls display parts of the asset.");
+            sayi("See also: tokens, get_grant, claims");
             return;
         }
         if (getDummyAsset() == null) {
@@ -651,12 +670,13 @@ public class OA2CLCCommands extends CLCCommands {
 
     protected void getCertHelp() {
         say("get_cert");
-        sayi("This will get the requested cert chain from the server.");
+        sayi("Usage: This will get the requested cert chain from the server.");
     }
 
     protected void getUIHelp() {
         say("get_user_info");
-        sayi("This will get the user info from the server. You must have already authenticated");
+        sayi("Usage: This will get the user info from the server.");
+        sayi("You must have already authenticated");
         sayi("*and* gotten a valid access token by this point. Just a list of these it printed.");
         sayi("What is returned is dependant upon what the server supports.");
     }
@@ -699,11 +719,12 @@ public class OA2CLCCommands extends CLCCommands {
 
     protected void getRTHelp() {
         say("get_rt [" + CLAIMS_FLAG + " | " + NO_VERIFY_JWT + "]:");
-        sayi("Get a new refresh token. You must have already called getat to have gotten an access token");
-        sayi("first. This will print out a summary of the expiration time.");
+        sayi("Usage: Get new refresh and access tokens.");
+        sayi("You must have already called get_at first *and* the server must issue refresh");
+        sayi("tokens. This will print out a summary of the expiration time.");
         sayi(CLAIMS_FLAG + " = the id token will be printed");
         sayi(NO_VERIFY_JWT + " = do not verify JWTs against server. Default is to verify.");
-
+        sayi("See also: get_at");
     }
 
     protected JSONObject resolveFromToken(Token token, boolean noVerify) {
@@ -764,8 +785,11 @@ public class OA2CLCCommands extends CLCCommands {
     }
 
     private void showTokensHelp() {
-        say("tokens [" + NO_VERIFY_JWT + "] - print the current list of tokens");
-        say("   " + NO_VERIFY_JWT + " = do not verify JWTs against server. Default is to verify.");
+        say("tokens [" + NO_VERIFY_JWT + "]");
+        sayi("Usage: Print the current list of tokens");
+        sayi(NO_VERIFY_JWT + " = do not verify JWTs against server. Default is to verify.");
+        sayi("Note: If the token has expired, then verification will fail and nothing will be");
+        sayi("displayed.");
     }
 
     protected void printToken(AccessToken accessToken, boolean noVerify) {
@@ -781,9 +805,9 @@ public class OA2CLCCommands extends CLCCommands {
             }
             if (token == null) {
                 say("access token = " + accessToken.getToken());
-                if(TokenUtils.isBase32(accessToken.getToken())){
+                if (TokenUtils.isBase32(accessToken.getToken())) {
                     // Or we over-write the access token and lose base 64 encoding.
-                  AccessTokenImpl  accessToken2  = new AccessTokenImpl(null);
+                    AccessTokenImpl accessToken2 = new AccessTokenImpl(null);
 
                     accessToken2.decodeToken(accessToken.getToken());
                     accessToken = accessToken2;
@@ -827,7 +851,7 @@ public class OA2CLCCommands extends CLCCommands {
             }
             if (token == null) {
                 say("refresh token = " + refreshToken.getToken());
-                if(TokenUtils.isBase32(refreshToken.getToken())){
+                if (TokenUtils.isBase32(refreshToken.getToken())) {
                     RefreshTokenImpl refreshToken2 = new RefreshTokenImpl(null);
 
                     refreshToken2.decodeToken(refreshToken.getToken());
@@ -903,16 +927,18 @@ public class OA2CLCCommands extends CLCCommands {
 
     protected void getATHelp() {
         say("get_at [" + CLAIMS_FLAG + " | " + NO_VERIFY_JWT + "]:");
-        say("   Gets the access token and refresh token (if supported on the server) for a given grant. ");
-        say("   Your must have already set the grant with the setgrant call.");
-        say("   A summary of the refresh token and its expiration is printed, if applicable.");
-        say("   " + CLAIMS_FLAG + " =  he id token will be printed");
-        say("   " + NO_VERIFY_JWT + " = do not verify JWTs against server. Default is to verify.");
+        sayi("Usage: Gets the access token and refresh token (if supported on");
+        sayi("   the server) for a given grant. ");
+        sayi("You must have already set the grant with the get_grant call.");
+        sayi("A summary of the refresh token and its expiration is printed, if applicable.");
+        sayi("" + CLAIMS_FLAG + " =  he id token will be printed");
+        sayi("" + NO_VERIFY_JWT + " = do not verify JWTs against server. Default is to verify.");
 
     }
 
     protected void setGrantHelp() {
         say("get_grant [callback]:");
+        sayi("Usage: Read the callback URL and process it into a grant, etc.");
         sayi("callback = the entire callback returned from the service");
         sayi("no arg -- either ");
         sayi("case A: you already have done this and a grant is set. Show it, paste it in the clipboard.");
@@ -921,19 +947,21 @@ public class OA2CLCCommands extends CLCCommands {
         sayi("logged in. Your browser *should* have a callback to your client.");
         sayi("Copy that to the clipboard. If you call this with no argument, then the clipboard is read.");
         sayi("Otherwise paste the callback directly");
+        sayi("See also: set_uri");
     }
 
 
     protected void exchangeHelp() {
         sayi("exchange [-at|-rt]");
-        sayi(" This will exchange the current access token (so you need to have gotten that far first)");
-        sayi(" for a secure token. The response will contain other information that will be displayed.");
-        sayi(" If there is no parameter, the current access token is used for the exchange");
-        sayi(" Otherwise you may specify -at to exchange the access token or -rt to exchange using the refresh token.");
+        sayi("Usage: This will exchange the current access token (so you need to");
+        sayi("   have gotten that far first) for a secure token.");
+        sayi("The response will contain other information that will be displayed.");
+        sayi("If there is no parameter, the current access token is used for the exchange");
+        sayi("Otherwise you may specify -at to exchange the access token or -rt to exchange using the refresh token.");
         say("E.g.");
         sayi("exchange -at ");
         sayi("Note: you can only specify scopes for the access token. They are ignored for refresh tokens");
-        say("See also: set_param to set additional parameters (like specific scopes or the audience");
+        say("See also: get_at, set_param to set additional parameters (like specific scopes or the audience");
     }
 
     JSONObject sciToken = null;
@@ -1102,13 +1130,13 @@ public class OA2CLCCommands extends CLCCommands {
 
         // RFC 8628 attributes
         isDeviceFlow = json.getBoolean(IS_RFC_8628_KEY);
-        if(json.containsKey(USER_CODE)){
+        if (json.containsKey(USER_CODE)) {
             userCode = json.getString(USER_CODE);
         }
-        if(json.containsKey(DEVICE_CODE)){
+        if (json.containsKey(DEVICE_CODE)) {
             deviceCode = json.getString(DEVICE_CODE);
         }
-        if(json.containsKey(VERIFICATION_URI)){
+        if (json.containsKey(VERIFICATION_URI)) {
             deviceFlowCallback = json.getString(VERIFICATION_URI);
         }
         // End RFC 8628 attributes
@@ -1123,8 +1151,9 @@ public class OA2CLCCommands extends CLCCommands {
     }
 
     private void showReadHelp() {
-        say("read  path - reads a saved session from a given file.");
-        say("See also: write");
+        say("read  path");
+        sayi("Usage: Reads a saved session from a given file.");
+        sayi("See also: write");
     }
 
     String MESSAGE_SWITCH = "-m";
@@ -1167,6 +1196,10 @@ public class OA2CLCCommands extends CLCCommands {
         }
         if (saveFile.isDirectory()) {
             say("sorry, but \"" + saveFile.getAbsolutePath() + "\" is a directory");
+            return;
+        }
+        if(!saveFile.isAbsolute()){
+            say("Sorry, but " + saveFile.getName() + " needs the path.");
             return;
         }
         if (saveFile.exists()) {
@@ -1213,13 +1246,13 @@ public class OA2CLCCommands extends CLCCommands {
         }
         // RFC8628 attributes
         jsonObject.put(IS_RFC_8628_KEY, isDeviceFlow);
-        if(!isTrivial(deviceCode)) {
+        if (!isTrivial(deviceCode)) {
             jsonObject.put(DEVICE_CODE, deviceCode);
         }
-        if(!isTrivial(userCode)){
+        if (!isTrivial(userCode)) {
             jsonObject.put(USER_CODE, userCode);
         }
-        if(!isTrivial(deviceFlowCallback)){
+        if (!isTrivial(deviceFlowCallback)) {
             jsonObject.put(VERIFICATION_URI, deviceFlowCallback);
         }
         // End RFC8628 attributes
@@ -1233,25 +1266,17 @@ public class OA2CLCCommands extends CLCCommands {
 
 
     private void showWriteHelp() {
-        say("write [" + MESSAGE_SWITCH + " message] path - write the current session state to a file. You may read it and resume your session");
-        say("-m - (optional) a message to include about this session. Make sure it is double quote delimited");
-        say("Note that these are serialized to JSON.");
+        say("write [" + MESSAGE_SWITCH + " message] path");
+        sayi("Usage: Write the current session to a file.");
+        sayi("You may read it and resume your session");
+        sayi(MESSAGE_SWITCH + " - (optional) a message to include about this session.");
+        sayi("Make sure it is double quote delimited");
+        sayi("Note that these are serialized to JSON, so you can just go look at one if you like.");
         say("E.g.");
         sayi("write -m \"testing refresh on poloc\" /opt/cilogon-oa2/var/temp/poloc-test.json");
         say("See also: read");
     }
 
-    // get_grant replaces this.
-  /*  public void grant(InputLine inputLine) throws Exception {
-        if (showHelp(inputLine)) {
-            say("grant - show the current authorization grant if any");
-            return;
-        }
-        if (grant == null) {
-            say("(no grant)");
-        }
-        say(grant.toJSON().toString(1));
-    }*/
 
     HashMap<String, String> requestParameters = new HashMap<>();
     HashMap<String, String> tokenParameters = new HashMap<>();
@@ -1267,7 +1292,7 @@ public class OA2CLCCommands extends CLCCommands {
     public void set_param(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
             say("set_param " + REQ_PARAM_SWITCH + " | " + TOKEN_PARAM_SWITCH + " | " + EXCHANGE_PARAM_SWITCH + " key value");
-            sayi("sets an additional request parameter to be send along with the request.");
+            sayi("Usage: Sets an additional request parameter to be send along with the request.");
             sayi(REQ_PARAM_SWITCH + " = parameters for the initial request to the authorization endpoint.");
             sayi(TOKEN_PARAM_SWITCH + " = parameters to send in the token request");
             sayi(EXCHANGE_PARAM_SWITCH + " = parameters for the token exchange request.");
@@ -1307,7 +1332,7 @@ public class OA2CLCCommands extends CLCCommands {
     public void get_param(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
             say("get_param [" + REQ_PARAM_SWITCH + " | " + TOKEN_PARAM_SWITCH + " | " + EXCHANGE_PARAM_SWITCH + "] key0 key1 key2 ...");
-            sayi("show what additional parameters have been set.");
+            sayi("Usage: Show what additional parameters have been set.");
             sayi("If no switches are given then both token and authorization additional parameters are shown ");
             sayi("If keys are specified, only those are shown. If no keys are specified, all the given parameters are shown");
             sayi(shortSwitchBlurb);
@@ -1357,7 +1382,7 @@ public class OA2CLCCommands extends CLCCommands {
     public void clear_all_params(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
             say("clear_all_params " + REQ_PARAM_SWITCH + " | " + TOKEN_PARAM_SWITCH + " | " + EXCHANGE_PARAM_SWITCH);
-            say("Clear all of the additional parameters for the switch.");
+            say("Usage: Clear all of the additional parameters for the switch.");
             sayi("There is no default to clear all. You must invoke this with both switches or nothing will be done.");
             sayi(shortSwitchBlurb);
             say("See also: set_param, get_param, rm_param");
@@ -1393,7 +1418,7 @@ public class OA2CLCCommands extends CLCCommands {
     public void rm_param(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
             say("rm_param " + REQ_PARAM_SWITCH + " | " + TOKEN_PARAM_SWITCH + " | " + EXCHANGE_PARAM_SWITCH + " key0 key1 ...");
-            sayi("Remove the given key(s) from the set of additional parameters");
+            sayi("Usage: Remove the given key(s) from the set of additional parameters");
             sayi("If none are given, then nothing is done.");
             sayi(shortSwitchBlurb);
             return;

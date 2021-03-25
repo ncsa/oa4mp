@@ -129,6 +129,7 @@ TO DO:
   -- Do demo on dev: https://demo-dev.cilogon.org/cilogon2/ (cilogon:dev.cilogon.org/demo)
        No additional configuration, just basic user claims and a cert.
        IDP: NCSA, UIUC, any
+       NOTE: NCSA IDP won't return groups!
 
  Additional CLCs for me on dev
    -- dev:command.line
@@ -157,7 +158,9 @@ TO DO:
           be set in the claims or this fails.
        ** NOTE: uidNumber must be asserted or this fails.
        ** NOTE: This is NOT QDL but functor scripting and is a critical regression test.
-
+  -- Do https://serge.ncsa.illinois.edu/cilogon-mod/
+       Nothing fancy, just a non OA4MP client that returns claims. It should be
+       NCSA IDP aware though. (interoperability test).
    -- Farm out testing to others: LSST, LIGO, FNAL
 
 {"tokens": {

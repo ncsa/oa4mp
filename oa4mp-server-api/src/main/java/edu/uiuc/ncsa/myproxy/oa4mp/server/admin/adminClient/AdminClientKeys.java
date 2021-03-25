@@ -19,7 +19,13 @@ public class AdminClientKeys extends BaseClientKeys {
     String config = "config";
     String allowQDL = "allow_qdl";
     String vo="vo";
+    String voURI="vo_uri";
 
+
+    public String voURI(String... x) {
+           if (0 < x.length) voURI= x[0];
+           return voURI;
+       }
 
     public String allowQDL(String... x) {
            if (0 < x.length) allowQDL= x[0];
@@ -54,6 +60,7 @@ public class AdminClientKeys extends BaseClientKeys {
         allKeys.add(issuer());
         allKeys.add(maxClients());
         allKeys.add(vo());
+        allKeys.add(voURI());
         return allKeys;
     }
 }
