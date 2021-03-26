@@ -47,6 +47,7 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
         issuer = null;
         // So in order
         VirtualOrganization vo = oa2se.getVO(transaction.getClient().getIdentifier());
+        DebugUtil.trace(this, "vo = " + vo);
         if(vo != null){
             issuer = vo.getIssuer();
             // if issuer set, return it.
@@ -62,6 +63,7 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
             if (ac != null) {
                 if (!isTrivial(ac.getIssuer())) {
                     issuer = ac.getIssuer();
+                    DebugUtil.trace(this, "got issuer from admin client \"" + ac.getIdentifierString() + "\" =" + issuer);
                     break;
                 }
             }
@@ -69,13 +71,17 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
         // 2. If the admin client does not have an issuer set, see if the client has one
         if (isTrivial(issuer)) {
             issuer = ((OA2Client) transaction.getClient()).getIssuer();
+            DebugUtil.trace(this, "got issuer from  client \"" + transaction.getClient().getIdentifierString() + "\" =" + issuer);
+
         }
 
         // 3. If the client does not have one, see if there is a server default to use
         // The discovery servlet will try to use the server default or construct the issuer
         if (isTrivial(issuer)) {
             issuer = OA2DiscoveryServlet.getIssuer(request);
+            DebugUtil.trace(this, "got issuer from  discovery servlet  =" + issuer);
         }
+        DebugUtil.trace(this, "RETURNED issuer  =" + issuer);
 
     }
 
