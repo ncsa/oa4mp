@@ -36,7 +36,6 @@
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin-javadoc.jar" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin-javadoc.jar" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin-sources.jar" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin-sources.jar" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin.jar" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/claims/IDTokenHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/claims/IDTokenHandler.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -425,7 +424,7 @@
       <workItem from="1613950759784" duration="169488000" />
       <workItem from="1615230567097" duration="57343000" />
       <workItem from="1616004462456" duration="5602000" />
-      <workItem from="1616065789840" duration="56477000" />
+      <workItem from="1616065789840" duration="57803000" />
     </task>
     <task id="LOCAL-00001" summary="IDE caused some version issues, lots of documentation updates. First cut of RFC8628 impl">
       <created>1613086394676</created>
@@ -525,7 +524,14 @@
       <option name="project" value="LOCAL" />
       <updated>1616708318578</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="Added some more telemetry to track down how issuer was set.">
+      <created>1616796218389</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1616796218389</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -546,7 +552,8 @@
     <MESSAGE value="Tweak some command line utilities. Changed a constructor." />
     <MESSAGE value="Fixed bad help entry." />
     <MESSAGE value="reworked all of the online help in the CLI. Changed which database field is used for VOs rather than deal with possible collisions. Added command to the approval component of the CLI to list approved or unapproved clients." />
-    <option name="LAST_COMMIT_MESSAGE" value="reworked all of the online help in the CLI. Changed which database field is used for VOs rather than deal with possible collisions. Added command to the approval component of the CLI to list approved or unapproved clients." />
+    <MESSAGE value="Added some more telemetry to track down how issuer was set." />
+    <option name="LAST_COMMIT_MESSAGE" value="Added some more telemetry to track down how issuer was set." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
