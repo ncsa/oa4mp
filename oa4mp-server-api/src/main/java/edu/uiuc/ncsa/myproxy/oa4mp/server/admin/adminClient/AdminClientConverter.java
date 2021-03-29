@@ -78,8 +78,10 @@ public class AdminClientConverter<V extends AdminClient> extends BaseClientConve
     @Override
     public void toJSON(V client, JSONObject json) {
         super.toJSON(client, json);
-        getJsonUtil().setJSONValue(json, getACK().vo(), client.getExternalVOName().toString());
-        getJsonUtil().setJSONValue(json, getACK().voURI(), client.getVirtualOrganization().toString());
+        getJsonUtil().setJSONValue(json, getACK().vo(), client.getExternalVOName());
+        if(client.getVirtualOrganization() != null) {
+            getJsonUtil().setJSONValue(json, getACK().voURI(), client.getVirtualOrganization().toString());
+        }
         getJsonUtil().setJSONValue(json, getACK().issuer(), client.getIssuer());
         getJsonUtil().setJSONValue(json, getACK().maxClients(), client.getMaxClients());
         getJsonUtil().setJSONValue(json, getACK().allowQDL(), client.isAllowQDL());

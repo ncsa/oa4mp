@@ -12,7 +12,7 @@
 
  */
 \set oa4mpServerUser oa4mp
-\set oa4mpServerUserPassword '\'vnlH814i\''
+\set oa4mpServerUserPassword '\'Password\''
 
 /* Probably don't have to change anything from here on down... */
 \set oa4mpDatabase oauth2
@@ -82,6 +82,7 @@ create table :oa4mpSchema.:oa4mpAdminClientTable  (
     email       text,
     secret      text,
     vo          text,
+    vo_uri      text,
     issuer      text,
     max_clients integer,
     creation_ts TIMESTAMP);
