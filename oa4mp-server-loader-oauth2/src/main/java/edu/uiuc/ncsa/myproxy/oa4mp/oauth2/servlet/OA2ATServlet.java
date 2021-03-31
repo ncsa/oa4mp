@@ -819,6 +819,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         }
         OA2ServiceTransaction t = null;
         if (oldRT.isExpired()) {
+            DebugUtil.error(this, "Expired refresh token:\"" + oldRT.getToken()+"\"");
             throw new OA2ATException(OA2Errors.INVALID_GRANT, "expired refresh token", HttpStatus.SC_BAD_REQUEST, null);
         }
         try {
@@ -934,6 +935,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
                 rtiResponse.getParameters(),
                 t,
                 rtiResponse);
+        DebugUtil.trace(this, "done with token refresh, returning.");
         return state;
     }
 

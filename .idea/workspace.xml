@@ -13,7 +13,6 @@
     <list default="true" id="e978b12f-4441-4d62-90dd-04c86c0aa044" name="Default Changelist" comment="CIL-936, CIL-922. Fixed verification of public clients, changed base 32 encoding so padding not needed. Documentation, as always.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-qdl/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-qdl/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/oauth2-pg.sql" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/oauth2-pg.sql" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/allclasses-frame.html" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/allclasses-frame.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/allclasses-noframe.html" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/allclasses-noframe.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/constant-values.html" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/constant-values.html" afterDir="false" />
@@ -33,12 +32,14 @@
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/overview-tree.html" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/overview-tree.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/classes/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2Commands.class" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/classes/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2Commands.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/classes/oauth2-mysql.sql" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/classes/oauth2-mysql.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/classes/oauth2-pg.sql" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/classes/oauth2-pg.sql" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/javadoc-bundle-options/package-list" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/javadoc-bundle-options/package-list" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/maven-archiver/pom.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin-javadoc.jar" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin-javadoc.jar" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin-sources.jar" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin-sources.jar" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin.jar" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/admin/adminClient/AdminClientConverter.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/admin/adminClient/AdminClientConverter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/servlet/OA2ATServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/servlet/OA2ATServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/servlet/OA2ExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/servlet/OA2ExceptionHandler.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth1/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth1/buildNumber.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-test-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-test-oauth2/buildNumber.properties" afterDir="false" />
@@ -118,7 +119,7 @@
       <recent name="edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.OA2 test suite">
+  <component name="RunManager" selected="Tomcat Server.OA2 Server">
     <configuration name="OA2 CLC" type="Application" factoryName="Application">
       <option name="ALTERNATIVE_JRE_PATH" value="1.8_261" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
@@ -174,13 +175,15 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration default="true" type="ArquillianJUnit" factoryName="" nameIsGenerated="true">
+    <configuration default="true" type="ArquillianTestNG" factoryName="" nameIsGenerated="true">
       <option name="arquillianRunConfiguration">
         <value>
           <option name="containerStateName" value="" />
         </value>
       </option>
-      <option name="TEST_OBJECT" value="class" />
+      <option name="TEST_OBJECT" value="CLASS" />
+      <properties />
+      <listeners />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>

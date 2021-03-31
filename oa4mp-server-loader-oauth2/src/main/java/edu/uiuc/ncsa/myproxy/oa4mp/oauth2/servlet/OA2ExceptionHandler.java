@@ -74,16 +74,14 @@ public class OA2ExceptionHandler implements ExceptionHandler {
         }
         // The next couple of exceptions can be thrown when there is no client (so the callback uri cannot be verified)
         if ((t instanceof UnknownClientException) || (t instanceof UnapprovedClientException)) {
-            t.printStackTrace();
-            throw new ServletException(t.getMessage());
+            handleOA2Error(
+                    new OA2GeneralError(OA2Errors.UNAUTHORIZED_CLIENT
+                            , "unknown client",
+                            HttpStatus.SC_BAD_REQUEST, null), response);
+            return;
         }
         // This handles every other type of exception.
-//        if (t instanceof GeneralException) {
-            handleOA2Error(new OA2GeneralError(OA2Errors.SERVER_ERROR, t.getMessage(), HttpStatus.SC_INTERNAL_SERVER_ERROR, null), response);
-    //        return;
-  //      }
-
-
+        handleOA2Error(new OA2GeneralError(OA2Errors.SERVER_ERROR, t.getMessage(), HttpStatus.SC_INTERNAL_SERVER_ERROR, null), response);
     }
 
     protected String encode(String x) throws UnsupportedEncodingException {
@@ -95,7 +93,7 @@ public class OA2ExceptionHandler implements ExceptionHandler {
         response.setStatus(oa2GeneralError.getHttpStatus());
         writer.println(OA2Constants.ERROR + "=\"" + encode(oa2GeneralError.getError()) + "\"");
         writer.println(OA2Constants.ERROR_DESCRIPTION + "=\"" + encode(oa2GeneralError.getDescription()) + "\"");
-        if(oa2GeneralError.getState() != null){
+        if (oa2GeneralError.getState() != null) {
             writer.println(OA2Constants.STATE + "=\"" + encode(oa2GeneralError.getState()) + "\"");
         }
         writer.flush();
@@ -111,7 +109,7 @@ public class OA2ExceptionHandler implements ExceptionHandler {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put(OA2Constants.ERROR, oa2ATException.getError());
         jsonObject.put(OA2Constants.ERROR_DESCRIPTION, oa2ATException.getDescription());
-        if(oa2ATException.getState() != null){
+        if (oa2ATException.getState() != null) {
             // not quite the spec., but clients may need this.
             jsonObject.put(OA2Constants.STATE, oa2ATException.getState());
         }
