@@ -29,6 +29,13 @@
      } // end access token
    } //end tokens
 
+ tokens{
+     access{
+        type=wlcg
+        audience="https://wlcg.cern.ch/jwt/v1/any"
+     } // end access token
+   } //end tokens
+
 */
  acl_add('localhost:test/fnal');
  acl_add('fnal:dwd-7');

@@ -41,6 +41,7 @@ import edu.uiuc.ncsa.security.oauth_2_0.server.*;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSourceFactory;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
+import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import net.sf.json.JSONObject;
 import org.apache.http.HttpStatus;
@@ -164,9 +165,9 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         OA2SE oa2SE = (OA2SE) getServiceEnvironment();
         DebugUtil.trace(this, "8693 support enabled? " + oa2SE.isRfc8693Enabled());
         DebugUtil.trace(this, "grants equal? " + grantType.equals(GRANT_TYPE_TOKEN_EXCHANGE));
-         if(!client.isPublicClient()) {
-             verifyClientSecret(client, getClientSecret(request));
-         }
+        if (!client.isPublicClient()) {
+            verifyClientSecret(client, getClientSecret(request));
+        }
         if (grantType.equals(GRANT_TYPE_TOKEN_EXCHANGE)) {
             if (!oa2SE.isRfc8693Enabled()) {
                 warn("Client " + client.getIdentifierString() + " requested a token exchange but token exchange is not enabled onthis server.");
@@ -444,15 +445,15 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         if (rtiResponse.hasRefreshToken()) {
             // Maddening part of the spec is that the access_oadtoken claim can be a refresh token.
             // User has to look at the returned token type.
-            if(rtiResponse.getRefreshToken().isJWT()){
+            if (rtiResponse.getRefreshToken().isJWT()) {
                 rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getRefreshToken().getToken()); // Required
                 rfcClaims.put(OA2Constants.REFRESH_TOKEN, rtiResponse.getRefreshToken().getToken()); // Optional
-            }else{
+            } else {
                 rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getRefreshToken().encodeToken()); // Required
                 rfcClaims.put(OA2Constants.REFRESH_TOKEN, rtiResponse.getRefreshToken().encodeToken()); // Optional
             }
         } else {
-            if(((AccessTokenImpl)rtiResponse.getAccessToken()).isJWT()){
+            if (((AccessTokenImpl) rtiResponse.getAccessToken()).isJWT()) {
                 rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getAccessToken().getToken()); // Required.
             } else {
                 rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getAccessToken().encodeToken()); // Required.
@@ -649,8 +650,17 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
                              OA2SE oa2SE,
                              OA2ServiceTransaction st2,
                              JWTRunner jwtRunner) {
+        VirtualOrganization vo = oa2SE.getVO(client.getIdentifier());
+        // get the right key for access tokens.
+        JSONWebKey key;
+        if (vo != null && vo.getJsonWebKeys() != null) {
+            key = vo.getJsonWebKeys().get(vo.getDefaultKeyID());
+        } else {
+            key = oa2SE.getJsonWebKeys().getDefault();
+        }
         if (jwtRunner.hasATHandler()) {
-            AccessToken newAT = jwtRunner.getAccessTokenHandler().getSignedAT(oa2SE.getJsonWebKeys().getDefault());
+
+            AccessToken newAT = jwtRunner.getAccessTokenHandler().getSignedAT(key);
             tokenResponse.setAccessToken(newAT);
             DebugUtil.trace(this, "Returned AT from handler:" + newAT + ", for claims " + st2.getATData().toString(2));
         }
@@ -921,9 +931,9 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
 
         rtiResponse.setServiceTransaction(t);
         VirtualOrganization vo = oa2SE.getVO(t.getClient().getIdentifier());
-        if(vo == null) {
+        if (vo == null) {
             rtiResponse.setJsonWebKey(oa2SE.getJsonWebKeys().getDefault());
-        }else{
+        } else {
             rtiResponse.setJsonWebKey(vo.getJsonWebKeys().get(vo.getDefaultKeyID()));
         }
         rtiResponse.setClaims(t.getUserMetaData());
@@ -1011,9 +1021,9 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
 
         atResponse.setServiceTransaction(transaction);
         VirtualOrganization vo = oa2SE.getVO(transaction.getClient().getIdentifier());
-        if(vo == null) {
+        if (vo == null) {
             atResponse.setJsonWebKey(oa2SE.getJsonWebKeys().getDefault());
-        }else{
+        } else {
             atResponse.setJsonWebKey(vo.getJsonWebKeys().get(vo.getDefaultKeyID()));
         }
         atResponse.setClaims(transaction.getUserMetaData());
