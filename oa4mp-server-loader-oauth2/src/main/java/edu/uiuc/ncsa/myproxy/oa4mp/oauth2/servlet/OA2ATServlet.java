@@ -41,6 +41,7 @@ import edu.uiuc.ncsa.security.oauth_2_0.server.*;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSourceFactory;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
+import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import net.sf.json.JSONObject;
 import org.apache.http.HttpStatus;
@@ -649,8 +650,15 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
                              OA2SE oa2SE,
                              OA2ServiceTransaction st2,
                              JWTRunner jwtRunner) {
+        VirtualOrganization vo = oa2SE.getVO(client.getIdentifier());
+        JSONWebKey key = null;
+        if(vo!=null && vo.getJsonWebKeys()!=null){
+            key = vo.getJsonWebKeys().getDefault();
+        }else{
+            key = oa2SE.getJsonWebKeys().getDefault();
+        }
         if (jwtRunner.hasATHandler()) {
-            AccessToken newAT = jwtRunner.getAccessTokenHandler().getSignedAT(oa2SE.getJsonWebKeys().getDefault());
+            AccessToken newAT = jwtRunner.getAccessTokenHandler().getSignedAT(key);
             tokenResponse.setAccessToken(newAT);
             DebugUtil.trace(this, "Returned AT from handler:" + newAT + ", for claims " + st2.getATData().toString(2));
         }
@@ -819,7 +827,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         }
         OA2ServiceTransaction t = null;
         if (oldRT.isExpired()) {
-            DebugUtil.error(this, "Expired refresh token:\"" + oldRT.getToken()+"\"");
+            DebugUtil.trace(this, "expired refresh token \"" + oldRT.getToken() + "\" for client " + c.getIdentifierString());
             throw new OA2ATException(OA2Errors.INVALID_GRANT, "expired refresh token", HttpStatus.SC_BAD_REQUEST, null);
         }
         try {

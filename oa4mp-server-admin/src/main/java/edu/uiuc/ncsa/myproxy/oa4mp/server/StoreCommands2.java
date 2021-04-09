@@ -8,6 +8,7 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.XMLConverter;
 import edu.uiuc.ncsa.security.core.util.*;
+import edu.uiuc.ncsa.security.delegation.token.impl.TokenUtils;
 import edu.uiuc.ncsa.security.storage.XMLMap;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
@@ -73,6 +74,70 @@ public abstract class StoreCommands2 extends StoreCommands {
         say("See also: serialize, create_hash");
     }
 
+    static final String BASE_32_FLAG = "-32";
+
+    public void encode(InputLine inputLine) throws Throwable {
+        if (showHelp(inputLine)) {
+            say("encode [" + BASE_32_FLAG + "] arg");
+            sayi("encode a string using base 64 or base 32. The default is base 64");
+            sayi("Note: Enclose your argument in double quotes. You must escape embedded");
+            sayi("      double quotes with \\\"");
+            say("E.g.");
+            sayi("clients>encode \"config \\\" foo \\\"\"\n" +
+                            "  Y29uZmlnICIgZm9vICI\n" +
+                            "  clients>decode Y29uZmlnICIgZm9vICI\n" +
+                            "  config \" foo \"");
+            say("note the embedded blanks and quotes are preserved.");
+            return;
+        }
+        boolean doBase32 = inputLine.hasArg(BASE_32_FLAG);
+        inputLine.removeSwitch(BASE_32_FLAG);
+       // Do surgery so the line acts like the user expects.
+        String originalLine = inputLine.getOriginalLine();
+        originalLine = originalLine.substring("encode".length()).trim();
+        if (doBase32) {
+            originalLine = originalLine.substring(BASE_32_FLAG.length()).trim();
+        }
+
+        if (originalLine.length() == 0) {
+            say("sorry, this needs a single argument.");
+            return;
+        }
+        if(originalLine.startsWith("\"")){
+            originalLine = originalLine.substring(1);
+        }
+        if(originalLine.endsWith("\"")){
+            originalLine = originalLine.substring(0, originalLine.length()-1);
+        }
+        String arg = originalLine.replace("\\\"", "\"");
+
+        if (doBase32) {
+            say(TokenUtils.b32EncodeToken(arg));
+        } else {
+            say(TokenUtils.b64EncodeToken(arg));
+        }
+    }
+
+    public void decode(InputLine inputLine) throws Throwable {
+        if (showHelp(inputLine)) {
+            say("decode [" + BASE_32_FLAG + "] arg");
+            sayi("decode a string using base 64 or base 32. The default is base 64");
+
+            return;
+        }
+        boolean doBase32 = inputLine.hasArg(BASE_32_FLAG);
+        inputLine.removeSwitch(BASE_32_FLAG);
+        if (inputLine.getArgCount() != 1) {
+            say("sorry, this needs a single argument.");
+            return;
+        }
+        String arg = inputLine.getLastArg();
+        if (doBase32) {
+            say(TokenUtils.b32DecodeToken(arg));
+        } else {
+            say(TokenUtils.b64DecodeToken(arg));
+        }
+    }
 
     /**
      * Get the {@link MapConverter} for the store.
@@ -551,12 +616,12 @@ public abstract class StoreCommands2 extends StoreCommands {
         sayi("This would prompt to update the values for the 'name' and 'callback_uri' properties");
         sayi("of the object with id 'foo:bar'");
         sayi("A few notes.");
-        sayi( "1. If the value of the property is a JSON object, you can edit it.");
-        sayi( "2. If the value of the property is an array, then you may add a value, delete a value,");
-        sayi( "   replace the entire contents (new entries are comma separated) or simply clear the .");
-        sayi( "   entire list of entries. You may also back out of the update request.");
-        sayi( "3. What you type in is stored without change, so if you need to save the hash of something,");
-        sayi( "    e.g. a password, use create_hash to make the hash first and save that.");
+        sayi("1. If the value of the property is a JSON object, you can edit it.");
+        sayi("2. If the value of the property is an array, then you may add a value, delete a value,");
+        sayi("   replace the entire contents (new entries are comma separated) or simply clear the .");
+        sayi("   entire list of entries. You may also back out of the update request.");
+        sayi("3. What you type in is stored without change, so if you need to save the hash of something,");
+        sayi("    e.g. a password, use create_hash to make the hash first and save that.");
         sayi("See also: list_keys, create_hash");
     }
 
@@ -749,12 +814,12 @@ public abstract class StoreCommands2 extends StoreCommands {
                     map.put(key, oldCfg.toString());
                     return true;
                 } else {*/
-                    JSONObject newConfig = (JSONObject) inputJSON((JSONObject) json, "client configuration");
-                    if (newConfig == null) {
-                        return false;
-                    } // user cancelled
-                    map.put(key, newConfig);
-                    return true;
+                JSONObject newConfig = (JSONObject) inputJSON((JSONObject) json, "client configuration");
+                if (newConfig == null) {
+                    return false;
+                } // user cancelled
+                map.put(key, newConfig);
+                return true;
                 //}
             } else {
                 JSONObject newJSON = inputJSON((JSONObject) json, key);
@@ -1048,7 +1113,7 @@ public abstract class StoreCommands2 extends StoreCommands {
 
     @Override
     public void edit(InputLine inputLine) {
-        if(showHelp(inputLine)){
+        if (showHelp(inputLine)) {
             say("edit [id | index]");
             sayi("Usage: Edit an object in an external editor.");
             sayi("Note that this will update the object on exiting the editor");
@@ -1057,7 +1122,7 @@ public abstract class StoreCommands2 extends StoreCommands {
         try {
             tempFile = File.createTempFile("edit", ".oa2", getTempDir());
         } catch (IOException iox) {
-            if(DebugUtil.isEnabled()){
+            if (DebugUtil.isEnabled()) {
                 iox.printStackTrace();
             }
             say("could not open file:" + iox.getMessage());
@@ -1072,7 +1137,7 @@ public abstract class StoreCommands2 extends StoreCommands {
             fos.flush();
             fos.close();
         } catch (IOException iox) {
-            if(DebugUtil.isEnabled()){
+            if (DebugUtil.isEnabled()) {
                 iox.printStackTrace();
             }
 
@@ -1089,20 +1154,20 @@ public abstract class StoreCommands2 extends StoreCommands {
                 Identifiable identifiable = getStore().getXMLConverter().fromMap(c, null);
                 if (!identifiable.getIdentifier().equals(x.getIdentifier())
                 ) {
-                     boolean ok = readline("You realize that the identifier for the original and edited objects are not the same, right? Save anyway(y/n)?").equals("y");
-                     if(ok){
-                         getStore().save(identifiable);
+                    boolean ok = readline("You realize that the identifier for the original and edited objects are not the same, right? Save anyway(y/n)?").equals("y");
+                    if (ok) {
+                        getStore().save(identifiable);
 
-                     }else{
-                         say("save aborted");
-                         return;
-                     }
+                    } else {
+                        say("save aborted");
+                        return;
+                    }
 
                 }
                 getStore().save(identifiable);
 
             } catch (IOException iox) {
-                if(DebugUtil.isEnabled()){
+                if (DebugUtil.isEnabled()) {
                     iox.printStackTrace();
                 }
                 say("there was a problem reading the edited file:" + iox.getMessage());

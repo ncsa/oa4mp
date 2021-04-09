@@ -6,6 +6,24 @@ When a new version is deployed, here is the testing order
   ** Note all of these authenticate  to the local tomcat instance.
 
   Main testing clients and tests
+  -- localhost kubernetes install. This is located in the ~/.kube directory.
+     1. Go to https://portal.nrp-nautilus.io
+     2. Select Login (upper right corner)
+     3. Log in with NCSA IDP
+     4. Now you should see a "Get config" button near the top right hand side. Press it.
+     5. Save the config file to the /.kube directory, overwriting the current config file.
+     6. At the command line, issue
+
+        ./kubectl get pods
+
+     If it worked, you will get the following error (since I am enrolled in no projects, I just have
+     a login):
+
+        Error from server (Forbidden): pods is forbidden: User "http://cilogon.org/serverT/users/173048"
+        cannot list resource "pods" in API group "" in the namespace "default"
+
+     Any other message, such as expired token is an error.
+
   -- localhost:test/no_cfg
      No configuration of any sort (i.e., cfg is unset, strict scopes etc)
      Most common configuration in production.
@@ -47,8 +65,8 @@ When a new version is deployed, here is the testing order
         Test client that point to main QDL scripts.
         NCSA VPN needs to be active
         Set following in CLC before starting
-        set_param -a scope "storage.create:/ storage.read:/"
-        set_param -x scope "storage.create:/dune/ storage.read:/dune/scratch/users/swhite storage.create:/dune/scratch/users/swhite/temp"
+        set_param -a scope "wlcg.capabilityset:/ storage.create:/ storage.read:/"
+        set_param -x scope "wlcg.capabilityset:/ storage.create:/dune/ storage.read:/dune/scratch/users/swhite storage.create:/dune/scratch/users/swhite/temp"
 
         get_at
            scopes:"storage.create:/dune/scratch/users/swhite storage.read:/dune/"
