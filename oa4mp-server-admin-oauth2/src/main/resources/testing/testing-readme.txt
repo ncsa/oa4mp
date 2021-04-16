@@ -123,6 +123,12 @@ When a new version is deployed, here is the testing order
   -- dev:/test/fnal
      IDP: Github
      See above for localhost.
+
+  -- dev:test/vo1
+     IDP: any
+     This will also create a WLCG token (barebones) to check if that is signed correctly.
+       If the CLC works, then it is ok.
+
 TO DO:
   -- dev:/test/ligo
   -- dev:/test/lsst/onboarding

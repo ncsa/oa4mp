@@ -653,7 +653,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         VirtualOrganization vo = oa2SE.getVO(client.getIdentifier());
         JSONWebKey key = null;
         if(vo!=null && vo.getJsonWebKeys()!=null){
-            key = vo.getJsonWebKeys().getDefault();
+            key = vo.getJsonWebKeys().get(vo.getDefaultKeyID());
         }else{
             key = oa2SE.getJsonWebKeys().getDefault();
         }
