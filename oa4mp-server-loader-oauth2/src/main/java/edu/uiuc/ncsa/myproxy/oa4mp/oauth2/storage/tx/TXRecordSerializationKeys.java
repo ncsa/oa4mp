@@ -64,6 +64,8 @@ public class TXRecordSerializationKeys extends SerializationKeys {
         return scopes;
     }
 
+
+
     public String tokenType(String... x) {
         if (0 < x.length) tokenType = x[0];
         return tokenType;

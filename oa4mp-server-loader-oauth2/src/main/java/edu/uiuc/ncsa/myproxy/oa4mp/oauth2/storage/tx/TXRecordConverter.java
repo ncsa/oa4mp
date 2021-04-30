@@ -50,6 +50,7 @@ public class TXRecordConverter<V extends TXRecord> extends MapConverter<V> {
             a1.addAll(a);
             txr.setResource(a1);
         }
+
         if (map.containsKey(tkeys().isValid())) {
             txr.setValid(map.getBoolean(tkeys().isValid()));
         }
@@ -71,6 +72,7 @@ public class TXRecordConverter<V extends TXRecord> extends MapConverter<V> {
         data.put(tkeys().expiresAt(), value.getExpiresAt());
         data.put(tkeys().isValid(), value.isValid());
         data.put(tkeys().tokenType(), value.getTokenType());
+
         if (value.hasScopes()) {
             JSONArray array;
             if (value.getScopes() instanceof JSONArray) {

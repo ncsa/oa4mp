@@ -40,7 +40,7 @@ public class HeaderUtils {
      */
     public static List<String> getAuthHeader(HttpServletRequest request, String type) {
 
-        ServletDebugUtil.printAllParameters(HeaderUtils.class, request);
+    //    ServletDebugUtil.printAllParameters(HeaderUtils.class, request);
         ServletDebugUtil.trace(HeaderUtils.class, "getAuthHeader: Getting type \"" + type + "\"");
         Enumeration enumeration = request.getHeaders("authorization");
         ServletDebugUtil.trace(HeaderUtils.class, "getAuthHeader: Header enumeration = \"" + enumeration + "\"");

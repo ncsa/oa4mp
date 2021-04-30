@@ -165,9 +165,9 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         OA2SE oa2SE = (OA2SE) getServiceEnvironment();
         DebugUtil.trace(this, "8693 support enabled? " + oa2SE.isRfc8693Enabled());
         DebugUtil.trace(this, "grants equal? " + grantType.equals(GRANT_TYPE_TOKEN_EXCHANGE));
-         if(!client.isPublicClient()) {
-             verifyClientSecret(client, getClientSecret(request));
-         }
+        if (!client.isPublicClient()) {
+            verifyClientSecret(client, getClientSecret(request));
+        }
         if (grantType.equals(GRANT_TYPE_TOKEN_EXCHANGE)) {
             if (!oa2SE.isRfc8693Enabled()) {
                 warn("Client " + client.getIdentifierString() + " requested a token exchange but token exchange is not enabled onthis server.");
@@ -239,7 +239,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             throw new OA2ATException(OA2Errors.INVALID_REQUEST,
                     "actor token type is not allowed");
         }
-        AccessToken accessToken = null;
+        AccessTokenImpl accessToken = null;
         RefreshToken refreshToken = null;
         JSONObject sciTokens = null;
         OA2ServiceTransaction t = null;
@@ -277,8 +277,10 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
                 accessToken = tokenForge.getAccessToken(sciTokens.getString(JWT_ID));
             } catch (Throwable tt) {
                 // didn't work, so now we assume it is regular token
-                accessToken = oa2se.getTokenForge().getAccessToken(subjectToken);
+                accessToken = (AccessTokenImpl) oa2se.getTokenForge().getAccessToken(subjectToken);
             }
+            ServletDebugUtil.trace(this, "access token from subject token = " + accessToken);
+
             t = (OA2ServiceTransaction) getTransactionStore().get(accessToken);
 
             if (t != null) {
@@ -304,6 +306,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             } catch (Throwable tt) {
                 refreshToken = tokenForge.getRefreshToken(subjectToken);
             }
+            ServletDebugUtil.trace(this, "refresh token from subject token = " + refreshToken);
             try {
                 RefreshTokenStore zzz = (RefreshTokenStore) getTransactionStore();
                 t = zzz.get(refreshToken);
@@ -327,7 +330,15 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         }
         if (t == null) {
             // if there is no such transaction found, then this is probably from a previous exchange. Go find it
-            oldTXR = (TXRecord) oa2se.getTxStore().get(BasicIdentifier.newID(accessToken.getToken()));
+            oldTXR = (TXRecord) oa2se.getTxStore().get(BasicIdentifier.newID(accessToken.getJti()));
+            if (oldTXR == null) {
+                ServletDebugUtil.trace(this, "No transaction found, no TXRecord found for access token = " + accessToken);
+
+                throw new OA2GeneralError(OA2Errors.INVALID_TOKEN,
+                        "token not found",
+                        HttpStatus.SC_UNAUTHORIZED,
+                        null);
+            }
             if (!oldTXR.isValid()) {
                 throw new OA2ATException(OA2Errors.INVALID_TOKEN,
                         "invalid token",
@@ -338,15 +349,22 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
                         "token expired",
                         t.getRequestState());
             }
-            if (oldTXR != null) {
-                t = (OA2ServiceTransaction) getTransactionStore().get(oldTXR.getParentID());
-            }
+            t = (OA2ServiceTransaction) getTransactionStore().get(oldTXR.getParentID());
         }
         if (t == null) {
-            // Ain't one no place. Bail.
+            // Still null. Ain't one no place. Bail.
             throw new OA2ATException(OA2Errors.INVALID_GRANT, "no pending transaction found.");
         }
-
+        // Don't let an authorized client access anything unless it is the client
+        // of record in the transaction -- that way a valid client can't send someone else's
+        // token and get information.
+        if (!t.getClient().getIdentifierString().equals(client.getIdentifierString())) {
+            // NOTE don't throw an OA2 AT Exception here since that returns some state about
+            // the original client. Wrong client means it bombs.
+            throw new OA2GeneralError(OA2Errors.UNAUTHORIZED_CLIENT,
+                    "wrong client, access denied",
+                    HttpStatus.SC_UNAUTHORIZED, null);
+        }
         // Finally can check access here. Access for exchange is same as for refresh token.
         if (!t.getFlowStates().acceptRequests || !t.getFlowStates().refreshToken) {
             throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
@@ -427,7 +445,6 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             OA2ClientUtils.setupHandlers(jwtRunner, oa2se, t, newTXR, request);
             // NOTE WELL that the next two lines are where our identifiers are used to create JWTs (like SciTokens)
             // so if this is not done, the wrong token type will be returned.
-            //jwtRunner.doRefreshClaims();
             jwtRunner.doTokenExchange();
 
         } catch (IllegalAccessException iax) {
@@ -443,17 +460,17 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         setupTokens(client, rtiResponse, oa2se, t, jwtRunner);
 
         if (rtiResponse.hasRefreshToken()) {
-            // Maddening part of the spec is that the access_oadtoken claim can be a refresh token.
+            // Maddening part of the spec is that the access token claim can be a refresh token.
             // User has to look at the returned token type.
-            if(rtiResponse.getRefreshToken().isJWT()){
+            if (rtiResponse.getRefreshToken().isJWT()) {
                 rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getRefreshToken().getToken()); // Required
                 rfcClaims.put(OA2Constants.REFRESH_TOKEN, rtiResponse.getRefreshToken().getToken()); // Optional
-            }else{
+            } else {
                 rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getRefreshToken().encodeToken()); // Required
                 rfcClaims.put(OA2Constants.REFRESH_TOKEN, rtiResponse.getRefreshToken().encodeToken()); // Optional
             }
         } else {
-            if(((AccessTokenImpl)rtiResponse.getAccessToken()).isJWT()){
+            if (((AccessTokenImpl) rtiResponse.getAccessToken()).isJWT()) {
                 rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getAccessToken().getToken()); // Required.
             } else {
                 rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getAccessToken().encodeToken()); // Required.
@@ -477,8 +494,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         // char type. We have to set it manually here.
         response.setContentType("application/json;charset=UTF-8");
         response.setCharacterEncoding("UTF-8");
-        // t.setScopes(originalScopes); // Set them back for the next round in case they request a different set of scopes.
-        // t.setUserMetaData(claims); // now stash it for future use.
+
         newTXR.setValid(true); // automatically.
         oa2se.getTxStore().save(newTXR);
         getTransactionStore().save(t);
@@ -599,7 +615,11 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
                     st2.getRequestState());
         }
 
-
+        if (!st2.getClient().getIdentifierString().equals(client.getIdentifierString())) {
+            throw new OA2GeneralError(OA2Errors.UNAUTHORIZED_CLIENT,
+                    "wrong client, access denied",
+                    HttpStatus.SC_UNAUTHORIZED, null);
+        }
         st2.setAccessToken(atResponse.getAccessToken()); // needed if there are handlers later.
         st2.setRefreshToken(atResponse.getRefreshToken()); // ditto. Might be null.
         JWTRunner jwtRunner = new JWTRunner(st2, ScriptRuntimeEngineFactory.createRTE(oa2SE, st2, st2.getOA2Client().getConfig()));
@@ -650,11 +670,19 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
                              OA2SE oa2SE,
                              OA2ServiceTransaction st2,
                              JWTRunner jwtRunner) {
+        setupTokens(client,tokenResponse,oa2SE,st2,jwtRunner,false);
+    }
+    private void setupTokens(OA2Client client,
+                             IDTokenResponse tokenResponse,
+                             OA2SE oa2SE,
+                             OA2ServiceTransaction st2,
+                             JWTRunner jwtRunner,
+                             boolean isTokenExchange) {
         VirtualOrganization vo = oa2SE.getVO(client.getIdentifier());
         JSONWebKey key = null;
-        if(vo!=null && vo.getJsonWebKeys()!=null){
+        if (vo != null && vo.getJsonWebKeys() != null) {
             key = vo.getJsonWebKeys().get(vo.getDefaultKeyID());
-        }else{
+        } else {
             key = oa2SE.getJsonWebKeys().getDefault();
         }
         if (jwtRunner.hasATHandler()) {
@@ -929,9 +957,9 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
 
         rtiResponse.setServiceTransaction(t);
         VirtualOrganization vo = oa2SE.getVO(t.getClient().getIdentifier());
-        if(vo == null) {
+        if (vo == null) {
             rtiResponse.setJsonWebKey(oa2SE.getJsonWebKeys().getDefault());
-        }else{
+        } else {
             rtiResponse.setJsonWebKey(vo.getJsonWebKeys().get(vo.getDefaultKeyID()));
         }
         rtiResponse.setClaims(t.getUserMetaData());
@@ -1020,9 +1048,9 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
 
         atResponse.setServiceTransaction(transaction);
         VirtualOrganization vo = oa2SE.getVO(transaction.getClient().getIdentifier());
-        if(vo == null) {
+        if (vo == null) {
             atResponse.setJsonWebKey(oa2SE.getJsonWebKeys().getDefault());
-        }else{
+        } else {
             atResponse.setJsonWebKey(vo.getJsonWebKeys().get(vo.getDefaultKeyID()));
         }
         atResponse.setClaims(transaction.getUserMetaData());
@@ -1077,6 +1105,14 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         return requestedScopes;
     }
 
+    /**
+     * device flow
+     *
+     * @param client
+     * @param request
+     * @param response
+     * @throws Throwable
+     */
     protected void doRFC8628(OA2Client client, HttpServletRequest request, HttpServletResponse response) throws Throwable {
         printAllParameters(request);
         long now = System.currentTimeMillis();
@@ -1116,7 +1152,11 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             throw new OA2GeneralError(OA2Errors.ACCESS_DENIED,
                     "no pending request", HttpStatus.SC_UNAUTHORIZED, null);
         }
-
+        if (!transaction.getClient().getIdentifierString().equals(client.getIdentifierString())) {
+            throw new OA2GeneralError(OA2Errors.UNAUTHORIZED_CLIENT,
+                    "wrong client, access denied",
+                    HttpStatus.SC_UNAUTHORIZED, null);
+        }
         RFC8628State rfc8628State = transaction.getRFC8628State();
         if (rfc8628State.isExpired()) {
             // Odd case that it has expired, but the garbage collector has not disposed of it yet, for whatever reason.

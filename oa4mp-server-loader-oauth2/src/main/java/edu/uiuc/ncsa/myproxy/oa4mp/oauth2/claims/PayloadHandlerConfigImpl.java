@@ -33,7 +33,9 @@ public class PayloadHandlerConfigImpl implements PayloadHandlerConfig {
     }
 
     AbstractPayloadConfig clientConfig;
-
+     public boolean hasTXRecord(){
+         return txRecord != null;
+     }
     public TXRecord getTxRecord() {
         return txRecord;
     }

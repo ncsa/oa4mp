@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.AbstractPayloadHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.PayloadHandlerConfigImpl;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
@@ -9,6 +10,7 @@ import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
 import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTUtil2;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.RefreshTokenHandlerInterface;
+import edu.uiuc.ncsa.security.oauth_2_0.server.RFC8693Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRunRequest;
@@ -131,12 +133,25 @@ public class BasicRefreshTokenHandler extends AbstractPayloadHandler implements 
         return new ArrayList<>();
     }
 
+
+
     @Override
     public void finish(String execPhase) throws Throwable {
         JSONObject rtData = transaction.getRTData();
-        if (transaction.getRefreshToken() != null) {
-            rtData.put(JWT_ID, transaction.getRefreshToken().getToken());
+        // if the token identifier has been updated, record this.
+        if(getPhCfg().hasTXRecord()){
+            // Fixes CIL-971
+            TXRecord txRecord = getPhCfg().getTxRecord();
+            if(RFC8693Constants.REFRESH_TOKEN_TYPE.equals(txRecord.getTokenType())){
+                rtData.put(JWT_ID, txRecord.getIdentifierString());
+            }
+        }else{
+            if (transaction.getRefreshToken() != null) {
+                rtData.put(JWT_ID, transaction.getRefreshToken().getToken());
+            }
+
         }
+
         long proposedLifetime = (rtData.getLong(EXPIRATION) - rtData.getLong(ISSUED_AT))*1000;
         if (proposedLifetime <= 0) {
             proposedLifetime = transaction.getMaxRtLifetime();
@@ -146,6 +161,7 @@ public class BasicRefreshTokenHandler extends AbstractPayloadHandler implements 
         rtData.put(EXPIRATION, (rtData.getLong(ISSUED_AT) * 1000 + proposedLifetime) / 1000);
         transaction.setRefreshTokenLifetime(proposedLifetime);
         setRTData(rtData);
+
     }
 
     @Override
@@ -164,19 +180,6 @@ public class BasicRefreshTokenHandler extends AbstractPayloadHandler implements 
                 break;
 
         }
-/*
-        if (transaction != null && oa2se != null && getResponseCode() == RC_OK) {
-            transaction.setUserMetaData(getClaims());  // It is possible that the claims were updated. Save them.
-            transaction.setRTData(getRTData());
-
-            oa2se.getTransactionStore().save(transaction);
-            DebugUtil.trace(this, ".saveState: done saving transaction.");
-        } else {
-            trace(this, "In saveState: either env or transaction null. Nothing saved.");
-        }
-*/
-
-
     }
 
     protected RefreshTokenConfig getRTConfig() {

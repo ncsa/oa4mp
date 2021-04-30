@@ -59,7 +59,7 @@ public class ScopeTemplateQDLUtil implements QDLFunction {
     @Override
     public List<String> getDocumentation(int argCount) {
         List<String> doxx = new ArrayList<>();
-        doxx.add(getName() +"(computed_scopes, requested_scopes, is_token_exchange)");
+        doxx.add(getName() +"(computed_scopes, requested_scopes, is_query)");
         doxx.add("computed_scopes = scopes from templates that have been resolved.");
         doxx.add("requested_scopes = the scopes the client has requested.");
         doxx.add("is_query = true if this call is to query available scopes. ");

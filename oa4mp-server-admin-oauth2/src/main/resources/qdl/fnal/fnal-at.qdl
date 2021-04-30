@@ -3,7 +3,7 @@
    capabilities for the access token from that. Strategy is simple: Use the requested scopes
    as patterns. According to the WLCG and SciToken specs, an queried scope (e.g. write:/a/b/c/d)
    for which the requested scope is a head (e.g. write:/a/b) should be returned.
-   updated: 2020-12-16T21:40:05.453Z
+   updated: 2021-04-27T15:11:46.565Z
 
 
    Script for the client
@@ -72,55 +72,81 @@ if[
    return(); // nothing to do. No capabilities ==>  no scopes.
 ]; //end if
 
+/*
+   Variable score card
+  ╔══════════════════╦════════════════════════════════════════════════════════════════════╗
+  ║   output_scopes. ║   The output from this script, returned as access_token.scopes     ║
+  ╠══════════════════╬════════════════════════════════════════════════════════════════════╣
+  ║ requested_scopes.║   The scopes in this request. Note that in token exchanges         ║
+  ║                  ║   there might be no such explicit requested tokens, so this will   ║
+  ║                  ║   use the scopes in the initial request, stored in  scopes.        ║
+  ╠══════════════════╬════════════════════════════════════════════════════════════════════╣
+  ║       caps.      ║  Capabilities for this user stored in LDAP                         ║
+  ╠══════════════════╬════════════════════════════════════════════════════════════════════╣
+  ║   wlcg_scopes.   ║   Scopes stored as a WLCG capability set (CS). This may be empty   ║
+  ║                  ║   and the requested CS must be in  caps. or an error is to be      ║
+  ║                  ║   raised. Returned from wlcg_cs.qdl script.                        ║
+  ║                  ║   N.B. These are added to the caps. variable as additional         ║
+  ║                  ║   capabilites before processing.                                   ║
+  ╠══════════════════╬════════════════════════════════════════════════════════════════════╣
+  ║   scopes.        ║   The scopes of the initial request.                               ║
+  ╚══════════════════╩════════════════════════════════════════════════════════════════════╝
 
-     temp_scopes. := {}; // result
+*/
+     output_scopes. := {}; // result
 requested_scopes. := {}; // which scope request to check
             caps. := at_claims.EPE.; // capabilities in claim source
 
-   if[
-        0 < size(tx_scopes.)
-   ][
-       requested_scopes. := tx_scopes.;
-   ]else[
-      requested_scopes. := scopes.;
-   ];
+say('         caps = ' + to_string(caps.));
+say('      scopes. ='  +  to_string(scopes., true));
+
+if[
+     0 < size(tx_scopes.)
+  ][
+    requested_scopes. := tx_scopes.;
+  ]else[
+   requested_scopes. := scopes.;
+];
+
+wlcg_scopes. := script_load('fnal/wlcg_cs.qdl', [script_args(0), script_args(1)]);
+
+if[!sys_err.ok][return();]; // If there was an error, bail.
+
+caps. := caps. ~ wlcg_scopes.;
+say(' caps. =' + to_string(caps., true));
+
 
 // case 1: Query for available scopes. Return the capabilities requested.
 if[
     exec_phase == 'post_token'
   ][
-    temp_scopes. := resolve_templates(caps., requested_scopes., true);
-  ];
+    output_scopes. := resolve_templates(caps., requested_scopes., true);
+];
 
 // case 2: Actual scope request. Return the scope.
 
 if[
     exec_phase == 'post_exchange' || exec_phase == 'post_refresh'
   ][
-        temp_scopes. := resolve_templates(caps., requested_scopes., true);
-  ];
+        output_scopes. := resolve_templates(caps., requested_scopes., true);
+];
 
- say('new scopes = ' + to_string(temp_scopes.));
+ say('new output_scopes = ' + to_string(output_scopes.));
 
-// Debugging stuff
-access_token.exp := access_token.iat + 543; // This is in seconds!!!
-access_token.message := 'Testing new resolve template command. Setting AT lifetime to 543 sec.';
+// Last thing: never return more than they initially asked for. So here this removes
+// any scopes that does not st least start with one of the original scopes.
 
-wlcg_scopes. := script_load('fnal/wlcg_cs.qdl', [script_args(0), script_args(1)]);
+output_scopes. :=  mask(output_scopes., -1 < list_starts_with(output_scopes., scopes.));
 
-if[!sys_err.ok][return();]; // If there was an error, bail.
-
-temp_scopes. := temp_scopes. ~ wlcg_scopes.;
-
-access_token.scope := detokenize(unique(temp_scopes.), ' ', 2); // turn in to string, omit duplications, trailing space
+access_token.scope := detokenize(unique(output_scopes.), ' ', 2); // turn in to string, omit duplications, trailing space
 
 if[0<size(tx_audience.) || 0 < size(tx_resource.)][access_token.aud. := tx_audience.~tx_resource.;];
 
 say('***** QDL *****');
-say(' wlcg_scopes. =' + to_string(wlcg_scopes., true));
-say(' temp_scopes. =' + to_string(temp_scopes., true));
-say('access_token. = ' + to_string(access_token., true));
-say('         caps = ' + to_string(caps.));
-say('     tx_scope = ' + to_string(tx_scopes.));
-say('  tx_resource = ' + to_string(tx_resource.));
-say('  tx_audience = ' + to_string(tx_audience.));
+say('        caps. ='  +  to_string(caps., true));
+say(' wlcg_scopes. ='  +  to_string(wlcg_scopes., true));
+say(' output_scopes. ='  +  to_string(output_scopes., true));
+say('access_token. = ' +  to_string(access_token., true));
+say('     tx_scope = ' +  to_string(tx_scopes.));
+say('  tx_resource = ' +  to_string(tx_resource.));
+say('  tx_audience = ' +  to_string(tx_audience.));

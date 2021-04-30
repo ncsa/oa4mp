@@ -1,11 +1,15 @@
 /*
    A script for WLCG capability set support.
-   Based on
+   Based on pull request
 
    https://github.com/WLCG-AuthZ-WG/common-jwt-profile/blob/2d9aa500c70453d54bbf2b6c389cfc148c995e1e/profile.md#group-or-role-based-capability-selection
 
+   Actual document: https://github.com/WLCG-AuthZ-WG/common-jwt-profile/blob/master/profile.md
+   
    in the WLCG specification.   This returns a list of the capabilites. The spec says that if they request other capabilites
    then just add these.
+
+   Updated: 2021-04-27T15:11:46.565Z
 */
 
 say('*** WLCG_CS debug script arg count = ' + to_string(script_args()));
@@ -18,6 +22,9 @@ CS_HEAD := CS + ':/';
 wlcg_cs. := []; // the WLCG capabilites set we are going to return
 
 // There should be a single one of these per set of scopes.
+// N.B. this is from the scopes of the initial request (!) so even if
+// the user tries to get another capability set on an exchange, they
+// are restricted to just the initial one.
   
 x. :=   mask(scopes.,has_value(index_of(scopes., CS_HEAD), 0));
 
@@ -38,14 +45,17 @@ if[
 k. := list_keys(x.);
 c := x.k.0;
 
-say('*** WLCG_CS k=  ' + to_string(k.));
+say('*** WLCG_CS x.=  ' + to_string(x.));
+say('*** WLCG_CS k =  ' + to_string(k.));
+say('*** WLCG_CS c =  ' + to_string(c));
 
 // c looks like e.g., wlcg.capabilityset:/dunepro
 //remove c from the scopes
-say('*** WLCG_CS scopes before remove  ' + to_string(temp_scopes.));
-temp_scopes. := mask(temp_scopes., temp_scopes. != c);
-say('*** WLCG_CS scopes after remove  ' + to_string(temp_scopes.));
 
+
+say('*** WLCG_CS requested_scopes before remove  ' + to_string(requested_scopes.));
+requested_scopes. := mask(requested_scopes., requested_scopes. != c);
+say('*** WLCG_CS requested_scopes after remove  ' + to_string(requested_scopes.));
 /*
    From the spec:
    If the requester is not authorized to use the wlcg.capabilityset,
@@ -67,7 +77,7 @@ u. := to_uri(c);
 parsedPath. := tokenize(u.path, '/');
 lastIndex := size(parsedPath.) - 1;
 lookupName := parsedPath.lastIndex + '@fnal.gov'; // required to construct the vop id
-VOPAUID = 'voPersonApplicationUID';
+VOPAUID := 'voPersonApplicationUID';
 
 say('*** WLCG_CS debug: requested capabilities: ' + c);
 say('*** WLCG_CS debug: claims count = ' + to_string(size(claims.)));
@@ -96,6 +106,7 @@ if[
 ];
 wlcg_cs. := record.EPE.;
 wlcg_cs. := template_substitution(wlcg_cs., claims.);
-wlcg_cs. := mask(wlcg_cs., has_value(wlcg_cs., requested_scopes.));
+// Only return the scopes they requested.
+//wlcg_cs. := mask(wlcg_cs., has_value(wlcg_cs., requested_scopes.));
 say('*** WLCG_CS debug, returning: ' + to_string(wlcg_cs., true));
 return(wlcg_cs.);

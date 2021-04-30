@@ -213,4 +213,18 @@ public class VirtualOrganization extends IdentifiableImpl {
             }
         }
     }
+
+    @Override
+    public String toString() {
+        return "VirtualOrganization{" +
+                "created=" + created +
+                ", defaultKeyID='" + defaultKeyID + '\'' +
+                ", discoveryPath='" + discoveryPath + '\'' +
+                ", issuer='" + issuer + '\'' +
+                ", atIssuer='" + atIssuer + '\'' +
+                ", lastModified=" + lastModified +
+                ", title='" + title + '\'' +
+                ", valid=" + valid +
+                '}';
+    }
 }

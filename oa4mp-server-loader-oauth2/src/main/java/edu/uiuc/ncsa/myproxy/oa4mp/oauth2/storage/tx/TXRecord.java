@@ -142,6 +142,9 @@ public class TXRecord extends IdentifiableImpl {
     List<URI> resource;
     boolean valid;
 
+
+
+
     /**
      * This and {@link #fromXML(XMLEventReader)} are needed for QDL state storage.
      *
@@ -186,8 +189,8 @@ public class TXRecord extends IdentifiableImpl {
 
     public void fromXML(XMLEventReader xer) throws XMLStreamException {
         XMLEvent xe = xer.nextEvent();
-        doXMLAttributes(xe);
         // process all the attributes
+        doXMLAttributes(xe);
         while (xer.hasNext()) {
             xe = xer.peek();
 
@@ -207,6 +210,7 @@ public class TXRecord extends IdentifiableImpl {
                                 resource.add(URI.create(s));
                             }
                             break;
+
                     }
                     break;
                 case XMLEvent.END_ELEMENT:

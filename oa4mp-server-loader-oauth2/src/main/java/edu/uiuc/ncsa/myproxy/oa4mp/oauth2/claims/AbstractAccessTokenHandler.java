@@ -15,6 +15,7 @@ import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.AccessTokenHandlerInterface;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTUtil2;
+import edu.uiuc.ncsa.security.oauth_2_0.server.RFC8693Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRunRequest;
@@ -258,8 +259,16 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
           Make SURE the JTI gets set or token exchange, user info etc. will never work.
          */
         JSONObject atData = getAtData();
-        if (transaction.getAccessToken() != null) {
-            atData.put(JWT_ID, transaction.getAccessToken().getToken());
+        if (getPhCfg().hasTXRecord()) {
+            // Fixes CIL-971b
+            TXRecord txRecord = getPhCfg().getTxRecord();
+            if (RFC8693Constants.ACCESS_TOKEN_TYPE.equals(txRecord.getTokenType())) {
+                atData.put(JWT_ID, txRecord.getIdentifierString());
+            }
+        } else {
+            if (transaction.getAccessToken() != null) {
+                atData.put(JWT_ID, transaction.getAccessToken().getToken());
+            }
         }
         if (doTemplates) {
             String scopes = resolveTemplates(isQuery);
