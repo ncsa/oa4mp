@@ -16,7 +16,6 @@ import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.delegation.client.request.RTResponse;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
-import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
 import edu.uiuc.ncsa.security.delegation.token.Token;
 import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
 import edu.uiuc.ncsa.security.delegation.token.impl.AuthorizationGrantImpl;
@@ -338,10 +337,8 @@ public class OA2CLCCommands extends CLCCommands {
         }
         if (TokenUtils.isBase32(grant.getToken())) {
             say("raw grant = " + grant.getToken());
-            say("    grant = " + TokenUtils.b32DecodeToken(grant.getToken()));
-        } else {
-            say("grant = " + grant.getToken());
         }
+        say("    grant = " + (grant.getJti()));
     }
 
     public void get_grant(InputLine inputLine) throws Exception {
@@ -358,7 +355,7 @@ public class OA2CLCCommands extends CLCCommands {
             if (grant != null) {
                 // already have a grant. Show it and copy it to the clipboard
                 printGrant();
-                copyToClipboard(grant.getToken(), "grant copied to clipboard");
+                copyToClipboard(grant.getJti().toString(), "grant copied to clipboard");
                 return;
             }
             // no arg. get it from the clipboard
@@ -405,10 +402,17 @@ public class OA2CLCCommands extends CLCCommands {
             }
 
             if (current.startsWith(OA2Constants.AUTHORIZATION_CODE + "=")) {
-                URI uri = URI.create(decode(current.substring(5)));
+                String raw = decode(current.substring(5));
+                URI jti;
+                if(TokenUtils.isBase32(raw)){
+                    jti = URI.create(TokenUtils.b32DecodeToken(raw));
+                }else{
+                     jti = URI.create(raw);
+                }
+                grant = new AuthorizationGrantImpl(raw,jti);
+
                 gotGrant = true;
-                grant = new AuthorizationGrantImpl(uri);
-                copyToClipboard(uri.toString(), "grant copied to clipboard.");
+                copyToClipboard(jti.toString(), "grant copied to clipboard.");
             }
         }
         if (gotError) {
@@ -976,21 +980,22 @@ public class OA2CLCCommands extends CLCCommands {
             return;
         }
         boolean didIt = false;
-
         if (1 == inputLine.size() || inputLine.hasArg("-at")) {
+            // use the access token to get access token. This is legal in the spec
+            // and this ensures it gets tested
             didIt = true;
-            RefreshToken at = null;
-            JSONObject token = resolveFromToken(getDummyAsset().getRefreshToken(), true);
+            AccessTokenImpl accessToken = null;
+            JSONObject token = resolveFromToken(getDummyAsset().getAccessToken(), true);
             if (token == null) {
-                at = getDummyAsset().getRefreshToken();
+                accessToken = getDummyAsset().getAccessToken();
             } else {
-                at = new RefreshTokenImpl(getDummyAsset().getRefreshToken().getToken(),
+                accessToken = new AccessTokenImpl(getDummyAsset().getAccessToken().getToken(),
                         URI.create(token.getString(OA2Claims.JWT_ID)));
             }
             // Note in the next call, the asset is updated by the call since it has all of the information
             // for the token types. We just need to grab the raw token since we also stash it.
             JSONObject response = getService().exchangeRefreshToken(getDummyAsset(),
-                    at,
+                    accessToken,
                     exchangeParameters,
                     true);
             sciToken = response;
@@ -999,9 +1004,10 @@ public class OA2CLCCommands extends CLCCommands {
 
             printToken(getDummyAsset().getAccessToken(), false);
         }
+        
         if (inputLine.hasArg("-rt")) {
             didIt = true;
-            RefreshToken rt = null;
+            RefreshTokenImpl rt = null;
             JSONObject token = resolveFromToken(getDummyAsset().getRefreshToken(), true);
             if (token == null) {
                 rt = getDummyAsset().getRefreshToken();

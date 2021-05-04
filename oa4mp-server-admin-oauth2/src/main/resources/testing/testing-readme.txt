@@ -23,6 +23,12 @@ When a new version is deployed, here is the testing order
         cannot list resource "pods" in API group "" in the namespace "default"
 
      Any other message, such as expired token is an error.
+  -- localhost:command.line2
+     Most basic virtual organization test. Configuration will return JWTs for both access and
+     refesh tokens, requiring signatures for generation and verification.
+     * be sure to check get_user_info after refresh token and after TX.
+     * Be sure to exchange both an access token and refresh token since these have somewhat difference
+       code paths.
 
   -- localhost:test/no_cfg
      No configuration of any sort (i.e., cfg is unset, strict scopes etc)

@@ -7,34 +7,31 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.PayloadHandlerConfigImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo.VirtualOrganization;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.OA2TokenUtils;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.server.request.IssuerResponse;
-import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
-import edu.uiuc.ncsa.security.delegation.token.impl.TokenUtils;
 import edu.uiuc.ncsa.security.oauth_2_0.JWTUtil;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2GeneralError;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2RedirectableError;
-import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTUtil2;
 import edu.uiuc.ncsa.security.oauth_2_0.server.UII2;
 import edu.uiuc.ncsa.security.oauth_2_0.server.UIIRequest2;
 import edu.uiuc.ncsa.security.oauth_2_0.server.UIIResponse2;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
-import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
 import org.apache.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.net.URI;
 
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.*;
-import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.*;
+import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.EXPIRATION;
+import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.ISSUED_AT;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -46,7 +43,7 @@ public class UserInfoServlet extends MyProxyDelegationServlet {
         // The access token is sent in the authorization header and should look like
         // Bearer oa4mp:...
 
-        AccessTokenImpl at = getAT2(request);
+        AccessTokenImpl at = OA2TokenUtils.getAT(getRawAT(request));
 
         // Need to look this up by its jti if its not a basic access token.
         OA2ServiceTransaction transaction = (OA2ServiceTransaction) getTransactionStore().get(new AccessTokenImpl(at.getJti()));
@@ -88,6 +85,8 @@ public class UserInfoServlet extends MyProxyDelegationServlet {
         // to find any VO. Since VOs manage their keys, and the call to this endpoint only requires
         // the access token (which typically does nto have any information in its header about OA4MP VO')
         // there is no good way to do this until now.
+
+        //CIL-974 fix:
 
         if(at.isJWT()){
             JSONWebKeys keys = ((OA2SE) getServiceEnvironment()).getJsonWebKeys();
@@ -177,95 +176,14 @@ public class UserInfoServlet extends MyProxyDelegationServlet {
         return null;
     }
 
-    /**
-     * This will return a standard token if found <b>or</b> try to interpret it
-     * as some form of JWT and return the JTI as the token. Therefore, no
-     * further processing of the access token should be needed.
-     * @param request
-     * @return
-     */
-    protected String getRawAT(HttpServletRequest request) {
-        String rawAT = null;
-        String headerAT = HeaderUtils.getBearerAuthHeader(request);
-        String paramAT = getFirstParameterValue(request, ACCESS_TOKEN);
 
-        if (paramAT == null) {
-            if (headerAT == null) {
-                throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
-                        "missing access token",
-                        HttpStatus.SC_BAD_REQUEST,
-                        null);
-            }
-            rawAT = headerAT;
-        } else {
-            if (headerAT == null) {
-                rawAT = paramAT;
-            } else {
-                if (!paramAT.equals(headerAT)) {
-                    throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
-                            "multiple access tokens",
-                            HttpStatus.SC_BAD_REQUEST,
-                            null);
-                }
-                rawAT = paramAT;
-            }
-        }
-        // now we have to take into account that this might not be a basic token.
-        // Note that we do not care at this point about anything in the token but
-        //  its signature (must be valid, so no tampering allowed) and JTI.
-        try {
-
-            JSONObject[] sciTokenJWT = JWTUtil2.readJWT(rawAT); // cannot verify now
-
-            JSONObject sciToken = sciTokenJWT[JWTUtil2.PAYLOAD_INDEX];
-            if (sciToken.containsKey(JWT_ID)) {
-                return sciToken.get(JWT_ID).toString();
-            }
-        } catch (JSONException t) {
-            // do nothing. Assume it is a standard access token, not a sci token.
-        }
-        return rawAT;
-    }
-
-    protected AccessToken getAT(HttpServletRequest request) {
-        String rawAt = getRawAT(request);
-        if (TokenUtils.isBase32(rawAt)) {
-            rawAt = TokenUtils.b32DecodeToken(rawAt);
-        }
-        return new AccessTokenImpl(URI.create(rawAt));
-    }
-
-    protected AccessTokenImpl getAT2(HttpServletRequest request) {
-        String rawAt = getRawAT2(request);
-        // Base 32 encoded, return that
-        if (TokenUtils.isBase32(rawAt)) {
-            return new AccessTokenImpl(URI.create( TokenUtils.b32DecodeToken(rawAt)));
-        }
-        try {
-            // see if its a JWT
-            JSONObject[] sciTokenJWT = JWTUtil2.readJWT(rawAt); // cannot verify now
-            JSONObject sciToken = sciTokenJWT[JWTUtil2.PAYLOAD_INDEX];
-            if (sciToken.containsKey(JWT_ID)) {
-                return new AccessTokenImpl(rawAt,URI.create(sciToken.get(JWT_ID).toString()));
-            }
-            throw  new OA2GeneralError(OA2Errors.INVALID_REQUEST,
-                                        "corrupt access token",
-                                        HttpStatus.SC_BAD_REQUEST,
-                                        null);
-        } catch (JSONException t) {
-            // do nothing. Assume it is a standard access token, not a sci token.
-        }
-        // Legacy case, 
-        return new AccessTokenImpl(URI.create(rawAt));
-
-    }
 
     /**
      * Gets the current raw access token from the header or throws an exception none is found.
      * @param request
      * @return
      */
-    protected String getRawAT2(HttpServletRequest request) {
+    protected String getRawAT(HttpServletRequest request) {
         String headerAT = HeaderUtils.getBearerAuthHeader(request);
         String paramAT = getFirstParameterValue(request, ACCESS_TOKEN);
         if(headerAT == null && paramAT == null){

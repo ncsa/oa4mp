@@ -13,6 +13,7 @@ import edu.uiuc.ncsa.security.delegation.token.*;
 import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
 import edu.uiuc.ncsa.security.delegation.token.impl.AuthorizationGrantImpl;
 import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
+import edu.uiuc.ncsa.security.delegation.token.impl.TokenImpl;
 import edu.uiuc.ncsa.security.oauth_2_0.NonceHerder;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.UserInfo;
@@ -320,23 +321,25 @@ public class OA2MPService extends OA4MPService {
      * to get a new access token (most usual case).
      *
      * @param asset
-     * @param refreshToken
+     * @param token
      * @param additionalParameters
      * @param getAT
      * @return
      */
-    public JSONObject exchangeRefreshToken(OA2Asset asset, RefreshToken refreshToken,
+    public JSONObject exchangeRefreshToken(OA2Asset asset, TokenImpl token,
                                            Map additionalParameters,
                                            boolean getAT) {
         HashMap<String, String> parameterMap = new HashMap<>();
+        parameterMap.put(SUBJECT_TOKEN, token.getToken());
 
-        parameterMap.put(SUBJECT_TOKEN, refreshToken.getToken());
-        parameterMap.put(SUBJECT_TOKEN_TYPE, REFRESH_TOKEN_TYPE);
         if (getAT) {
+            parameterMap.put(SUBJECT_TOKEN_TYPE, ACCESS_TOKEN_TYPE);
             parameterMap.put(REQUESTED_TOKEN_TYPE, ACCESS_TOKEN_TYPE);
         } else {
+            parameterMap.put(SUBJECT_TOKEN_TYPE, REFRESH_TOKEN_TYPE);
             parameterMap.put(REQUESTED_TOKEN_TYPE, REFRESH_TOKEN_TYPE);
         }
+        
         if (additionalParameters != null) {
             parameterMap.putAll(additionalParameters);
         }

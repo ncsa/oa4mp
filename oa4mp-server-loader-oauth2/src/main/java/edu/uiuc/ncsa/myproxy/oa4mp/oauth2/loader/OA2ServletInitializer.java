@@ -66,6 +66,7 @@ public class OA2ServletInitializer extends OA4MPServletInitializer {
             mps.processStoreCheck(oa2SE.getPermissionStore());
             mps.processStoreCheck(oa2SE.getAdminClientStore());
             mps.processStoreCheck(oa2SE.getTxStore());
+            mps.processStoreCheck(oa2SE.getVOStore());
         } catch (SQLException e) {
             if (DebugUtil.isEnabled()) {
                 e.printStackTrace();
