@@ -1,5 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
 
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
+
 import java.net.URI;
 import java.util.*;
 
@@ -19,6 +21,9 @@ public class ScopeTemplateUtil {
         //boolean isTX = ! isQuery;
         Collection<String> returnedScopes = new HashSet<>();
         for (String r : requestedScopes) {
+            if(r.contains(",")){
+                throw new IllegalArgumentException("error: got embedded comma in scope \"" + r +"\"");
+            }
             if (!r.contains(":")) {
                 // This is a quick and dirty check that the requested scope is a relative URI
                 // we don't want to check, e.g. "profile" against all the stored templates.
@@ -56,6 +61,7 @@ public class ScopeTemplateUtil {
      */
     public static String compareAsURI(String requestedScope, String computedScope, boolean isQuery) {
         try {
+
             //heads and tails must match. No fragments allowed
             // First special case, one of them is just a head, e.g. read: (asking for read scopes)
             // Can't make a URI out of that since there is no scheme specific part.
@@ -147,6 +153,7 @@ public class ScopeTemplateUtil {
             }
 
         } catch (Throwable t) {
+            t.printStackTrace();
             return null;
         }
         if (!isQuery) {

@@ -166,6 +166,8 @@ public class BasicRefreshTokenHandler extends AbstractPayloadHandler implements 
 
     @Override
     public void saveState() throws Throwable {
+        DebugUtil.trace(this, ".saveState: starting");
+
         switch (getResponseCode()) {
             case RC_NOT_RUN:
                 break;

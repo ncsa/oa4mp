@@ -6,7 +6,6 @@ import edu.uiuc.ncsa.security.oauth_2_0.OA2ATException;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
 import edu.uiuc.ncsa.security.servlet.AbstractServlet;
-import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import org.apache.commons.codec.binary.Base64;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,7 +16,6 @@ import java.util.Enumeration;
 import java.util.List;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceConstantKeys.CONSUMER_KEY;
-import static edu.uiuc.ncsa.security.core.util.DebugUtil.trace;
 
 /**
  * Utilities for dealing with getting tokens that may be either sent as parameters
@@ -41,14 +39,14 @@ public class HeaderUtils {
     public static List<String> getAuthHeader(HttpServletRequest request, String type) {
 
     //    ServletDebugUtil.printAllParameters(HeaderUtils.class, request);
-        ServletDebugUtil.trace(HeaderUtils.class, "getAuthHeader: Getting type \"" + type + "\"");
+   //     ServletDebugUtil.trace(HeaderUtils.class, "getAuthHeader: Getting type \"" + type + "\"");
         Enumeration enumeration = request.getHeaders("authorization");
-        ServletDebugUtil.trace(HeaderUtils.class, "getAuthHeader: Header enumeration = \"" + enumeration + "\"");
+//        ServletDebugUtil.trace(HeaderUtils.class, "getAuthHeader: Header enumeration = \"" + enumeration + "\"");
 
         ArrayList<String> out = new ArrayList<>();
         while (enumeration.hasMoreElements()) {
             Object obj = enumeration.nextElement();
-            ServletDebugUtil.trace(HeaderUtils.class, "getAuthHeader: Processing header = \"" + obj + "\"");
+        //    ServletDebugUtil.trace(HeaderUtils.class, "getAuthHeader: Processing header = \"" + obj + "\"");
 
             if (obj != null) {
                 String rawToken = obj.toString();
@@ -66,7 +64,7 @@ public class HeaderUtils {
 
             }
         }
-        ServletDebugUtil.trace(HeaderUtils.class, "getAuthHeader: Returning  = \"" + out + "\"");
+ //       ServletDebugUtil.trace(HeaderUtils.class, "getAuthHeader: Returning  = \"" + out + "\"");
 
         return out;
     }
@@ -77,7 +75,7 @@ public class HeaderUtils {
 
     public static String getBasicHeader(HttpServletRequest request) {
         List<String> authHeaders = getAuthHeader(request, "Basic");
-        ServletDebugUtil.trace(HeaderUtils.class, "getBasicHeader: returned auth headers = \"" + authHeaders + "\"");
+   //     ServletDebugUtil.trace(HeaderUtils.class, "getBasicHeader: returned auth headers = \"" + authHeaders + "\"");
         if (authHeaders.isEmpty()) {
             return null;
         }
@@ -98,7 +96,7 @@ public class HeaderUtils {
     public static int SECRET_INDEX = 1;
 
     public static String[] getCredentialsFromHeaders(HttpServletRequest request, String type) throws UnsupportedEncodingException {
-        ServletDebugUtil.trace(HeaderUtils.class, "getCredentialsFromHeaders: type = \"" + type + "\"");
+      //  ServletDebugUtil.trace(HeaderUtils.class, "getCredentialsFromHeaders: type = \"" + type + "\"");
         type = type.trim();
         // assume the client id and secret are in the headers.
         String header64 = null;
@@ -131,14 +129,14 @@ public class HeaderUtils {
 
         // semantics are that this is base64.encode(id:secret)
 
-        trace(HeaderUtils.class, " received authz header of " + header);
+        //trace(HeaderUtils.class, " received authz header of " + header);
         String id = URLDecoder.decode(header.substring(0, lastColonIndex), "UTF-8");
         out[ID_INDEX] = id;
 
         String rawSecret = URLDecoder.decode(header.substring(lastColonIndex + 1), "UTF-8");
 
         out[SECRET_INDEX] = rawSecret;
-        ServletDebugUtil.trace(HeaderUtils.class, "getCredentialsFromHeaders: returning  " + id + ", " + rawSecret);
+    //    ServletDebugUtil.trace(HeaderUtils.class, "getCredentialsFromHeaders: returning  " + id + ", " + rawSecret);
 
         return out;
 

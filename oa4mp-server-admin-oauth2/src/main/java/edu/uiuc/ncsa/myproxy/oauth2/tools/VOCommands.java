@@ -20,6 +20,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.util.Date;
 
+import static edu.uiuc.ncsa.myproxy.oauth2.tools.SigningCommands.RS_256;
 import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 
 /**
@@ -57,7 +58,7 @@ public class VOCommands extends StoreCommands2 {
         vo.setTitle(getInput("enter the title", vo.getTitle()));
         vo.setIssuer(getInput("enter the issuer", vo.getIssuer()));
         vo.setAtIssuer(getInput("enter the access token issuer (if different)", vo.getAtIssuer()));
-        vo.setDiscoveryPath(getInput("enter the discovery path", vo.getDiscoveryPath()));
+        vo.setDiscoveryPath(getInput("enter the discovery path. NOTE this should be of the form host/path e.g.cilogon.org/ligo:", vo.getDiscoveryPath()));
         String ok = getInput("Did you want to specify a file with the JSON web keys(y/n)", "n");
         if (!isTrivial(ok)) {
             if (ok.trim().toLowerCase().equals("y")) {
@@ -103,7 +104,7 @@ public class VOCommands extends StoreCommands2 {
         if (vo.getJsonWebKeys() != null) {
             for (String keyID : vo.getJsonWebKeys().keySet()) {
                 JSONWebKey jsonWebKey = vo.getJsonWebKeys().get(keyID);
-                if (jsonWebKey.algorithm.equals(SigningCommands.RS_256)) {
+                if (jsonWebKey.algorithm.equals(RS_256)) {
                     defaultKey = jsonWebKey.id;
                     break;
                 }
@@ -151,8 +152,16 @@ public class VOCommands extends StoreCommands2 {
         VirtualOrganization vo = (VirtualOrganization) id;
         if (vo.getJsonWebKeys() != null) {
             String ok = getInput("Did you want to overwrite the current set of keys?(y/n)", "n");
-            if (ok.trim().toLowerCase().equals("y")) {
+            if (ok.trim().equalsIgnoreCase("y")) {
                 newKeys(vo);
+                String defaultId = null;
+                for(JSONWebKey key :vo.getJsonWebKeys().values()){
+                    if(key.algorithm.equals(RS_256)){
+                        defaultId = key.id;
+                    }
+                }
+                String newID = getInput("Set the new default key", defaultId==null?"":defaultId);
+                vo.setDefaultKeyID(newID);
                 getStore().save(vo);
                 say("new keys saved");
             } else {

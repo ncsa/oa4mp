@@ -33,8 +33,10 @@ public class OA2DiscoveryServlet extends DiscoveryServlet {
     public static final String WELL_KNOWN_PATH = ".well-known";
     public static final String CERTS = "/certs";
 
+    public static String  DISCOVERY_PATH_SEPARATOR = "/";
     protected VirtualOrganization getVO(HttpServletRequest req, String requestUri) {
         VirtualOrganization vo = null;
+        String host = getOA2SE().getServiceAddress().getHost();
         String p = requestUri.substring(getOA2SE().getServiceAddress().getPath().length());
         StringTokenizer st = new StringTokenizer(p, "/");
         // Check the format
@@ -51,7 +53,8 @@ public class OA2DiscoveryServlet extends DiscoveryServlet {
             if (x1.equals(OPENID_CONFIG_PATH) || x1.equals(OAUTH_AUTHZ_SERVER_PATH)) {
                 if (st.hasMoreTokens()) {
                     String component = st.nextToken();
-                    vo = getOA2SE().getVOStore().findByPath(component);
+                    // Fix for CIL-976
+                    vo = getOA2SE().getVOStore().findByPath(host+DISCOVERY_PATH_SEPARATOR + component);
                     if (vo == null) {
                         // Then this is not recognized.
                         throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
@@ -80,7 +83,8 @@ public class OA2DiscoveryServlet extends DiscoveryServlet {
         }
         // case 3, vo component comes first
         if (nextToken.equals(WELL_KNOWN_PATH) && st.nextToken().equals(OPENID_CONFIG_PATH) && !st.hasMoreTokens()) {
-            vo = getOA2SE().getVOStore().findByPath(x);
+            // Fix for CIL-976
+            vo = getOA2SE().getVOStore().findByPath(host+DISCOVERY_PATH_SEPARATOR + x);
         } else {
             throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
                     "unsupported discovery url for \"" + x + "\"",
@@ -111,6 +115,7 @@ public class OA2DiscoveryServlet extends DiscoveryServlet {
     @Override
     protected void doIt(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Throwable {
    //     ServletDebugUtil.printAllParameters(this.getClass(), httpServletRequest);
+
         String requestUri = httpServletRequest.getRequestURI();
         boolean isCerts = false;
         if (requestUri.contains(CERTS)) {
@@ -124,7 +129,8 @@ public class OA2DiscoveryServlet extends DiscoveryServlet {
         // normalize the uri
         if (isCerts) {
             String discoveryPath = requestUri.substring(1+requestUri.lastIndexOf("/"));
-            VirtualOrganization vo = getOA2SE().getVOStore().findByPath(discoveryPath);
+            // Fix for CIL-976
+            VirtualOrganization vo = getOA2SE().getVOStore().findByPath(getOA2SE().getServiceAddress().getHost() + DISCOVERY_PATH_SEPARATOR + discoveryPath);
             JSONWebKeys publicKeys;
             if (vo == null) {
                 publicKeys = JSONWebKeyUtil.makePublic(((OA2SE) getServiceEnvironment()).getJsonWebKeys());
@@ -185,7 +191,8 @@ public class OA2DiscoveryServlet extends DiscoveryServlet {
         }else{
             // has to go at the end since there is no way Tomcat can have it specified otherwise
             // without a lot of gyrations in the web.xml file.
-            json.put("jwks_uri", requestURI  + "/certs" + "/" + vo.getDiscoveryPath());
+            String p = vo.getDiscoveryPath().substring(vo.getDiscoveryPath().lastIndexOf("/") + 1);
+            json.put("jwks_uri", requestURI  + "/certs" + "/" + p);
 
         }
         if (vo == null) {

@@ -353,7 +353,7 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
 
     @Override
     public void saveState() throws Throwable {
-        DebugUtil.trace(this, ".saveState: claims = " + getClaims().toString(2));
+  //      DebugUtil.trace(this, ".saveState: claims = " + getClaims().toString(2));
         switch (getResponseCode()) {
             case RC_NOT_RUN:
                 break;
@@ -361,24 +361,13 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
                 if (transaction != null && oa2se != null) {
                     transaction.setUserMetaData(getClaims());  // It is possible that the claims were updated. Save them.
                     transaction.setATData(getAtData());
-                    DebugUtil.trace(this, ".saveState: done updating transaction.");
+    //                DebugUtil.trace(this, ".saveState: done updating transaction.");
                 }
             case RC_OK_NO_SCRIPTS:
                 oa2se.getTransactionStore().save(transaction);
                 break;
 
         }
-
-
-/*        if (transaction != null && oa2se != null && getResponseCode() == RC_OK) {
-            transaction.setUserMetaData(getClaims());  // It is possible that the claims were updated. Save them.
-            transaction.setATData(getAtData());
-
-            oa2se.getTransactionStore().save(transaction);
-            DebugUtil.trace(this, ".saveState: done saving transaction.");
-        } else {
-            trace(this, "In saveState: either env or transaction null. Nothing saved.");
-        }*/
     }
 
     @Override

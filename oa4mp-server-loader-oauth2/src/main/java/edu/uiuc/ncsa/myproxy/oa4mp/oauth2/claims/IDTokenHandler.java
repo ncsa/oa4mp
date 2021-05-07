@@ -299,7 +299,7 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
 
     @Override
     public void saveState() throws Throwable {
-        DebugUtil.trace(this, ".saveState: claims = " + getClaims().toString(2));
+        DebugUtil.trace(this, ".saveState: starting save.");
         switch (getResponseCode()) {
             case RC_NOT_RUN:
                 break;
@@ -314,15 +314,7 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
                 break;
 
         }
-/*        if (transaction != null && oa2se != null) {
-            transaction.setUserMetaData(getClaims());
-            transaction.setClaimsSources(getSources());
-            oa2se.getTransactionStore().save(transaction);
-            DebugUtil.trace(this, ".saveState: done saving transaction.");
 
-        } else {
-            trace(this, "In saveState: either env or transaction null. Nothing saved.");
-        }*/
     }
 
 

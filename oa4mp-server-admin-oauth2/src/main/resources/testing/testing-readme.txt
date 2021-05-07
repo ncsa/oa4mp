@@ -86,7 +86,7 @@ When a new version is deployed, here is the testing order
          eduPersonEntitlement: wlcg.capabilityset:/dunepro
          eduPersonEntitlement: wlcg.capabilityset:/fermilab
 
-       QDL g -- gets the capabilities for the WLCG capabilities
+       QDL g -- gets the capabilities for the WLCG capabilities (in fnal workspace)
          g('duneana@fnal.gov')
        {
         eduPersonEntitlement: [storage.read:/dune,storage.write:/dune/scratch/users/${uid}],
@@ -130,15 +130,31 @@ When a new version is deployed, here is the testing order
            error="server_error"
            error_description="User does not have access to this capability set. Request denied."
 
-        Test #3 - with wlcg capabilities
+        Test #3 - with wlcg capabilities, none in TX
         Set following in CLC before starting
-        set_param -a scope "wlcg.capabilityset:/duneana  storage.read:/"
-        set_param -x scope "storage.create:/dune/public storage.write:/dune/scratch/users/cilogontest storage.read:/dune/scratch/users/cilogon storage.read:/dune/scratch/users/swhite/temp"
+        clear_params if needed.
+        set_param -a scope "storage.create:/ wlcg.capabilityset:/fermilab"
+        get_at:
+          scopes:compute.modify:/
+                 storage.write:/fermilab/users/cilogontest
+                 compute.cancel:/
+                 storage.read:/fermilab/users/cilogontest
+                 compute.create:/
+          lifetime:3600 sec.
+         exchange:
+           scopes: same (since no scopes in TX request.)
+         lifetime: 3600 sec.
+
+        Aim is that the initial set should be resolved to what was passed in.
+
+        Test #4 - with wlcg capabilities
+        Set following in CLC before starting. Some of the TX scopes are bogus on purpose.
+        set_param -a scope "storage.create:/ wlcg.capabilityset:/fermilab"
+        set_param -x scope "compute.modify:/foo storage.write:/fermilab/users/cilogontest/public storage.read:/dune/scratch/users/cilogon storage.read:/dune/scratch/users/swhite/temp"
 
         get_at
-           scopes: storage.read:/X
-                   storage.read:/Y/foo
-                   storage.read:/dune
+           scopes: compute.modify:/foo
+                   storage.write:/fermilab/users/cilogontest/public
            at lifetime 750 sec
            rt lifetime 750 sec
            which are set in the cfg configuration, overriding the values in the client config proper.

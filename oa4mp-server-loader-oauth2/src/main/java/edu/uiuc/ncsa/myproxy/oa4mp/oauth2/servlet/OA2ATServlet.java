@@ -210,13 +210,13 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         atResponse.setClaims(t.getUserMetaData());
         atResponse.write(response);
     }
-
+   // Token exchange
     private void doRFC8693(OA2Client client,
                            HttpServletRequest request,
                            HttpServletResponse response) throws IOException {
         // https://tools.ietf.org/html/rfc8693
 
-
+        printAllParameters(request);
         String subjectToken = getFirstParameterValue(request, SUBJECT_TOKEN);
 
         if (subjectToken == null) {
@@ -406,11 +406,13 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             newTXR.setAudience(audience);
         }
         if (!scopes.isEmpty()) {
+            ServletDebugUtil.trace(this, "user requested scopes:" + scopes);
             newTXR.setScopes(scopes);
-        }/* else {
+        } else {
             // If no scopes sent with request, revert to scopes in original request.
-            newTXR.setScopes(t.getScopes());
-        }*/
+            ServletDebugUtil.trace(this, "NO user requested scopes");
+         //   newTXR.setScopes(t.getScopes());
+        }
 
         if (!resources.isEmpty()) {
             // convert to URIs
@@ -425,13 +427,10 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             newTXR.setResource(r);
         }
 
-        //HashMap<String, String> parameters = new HashMap<>();
-        //   parameters.put(OA2Claims.SUBJECT, t.getUsername());
-        //    parameters.put(JWTUtil.KEY_ID, keys.getDefaultKeyID());
-        //  accessToken = tokenForge.getAccessToken();
         RTIRequest rtiRequest = new RTIRequest(request, t, t.getAccessToken(), oa2se.isOIDCEnabled());
         RTI2 rtIssuer = new RTI2(getTF2(), getServiceEnvironment().getServiceAddress());
         RTIResponse rtiResponse = (RTIResponse) rtIssuer.process(rtiRequest);
+        ServletDebugUtil.trace(this, "rti response=" + rtiResponse);
         rtiResponse.setSignToken(client.isSignTokens());
         // These are the claims that are returned in the RFC's required response. They have nothing to do
         // with id token claims, fyi.
@@ -477,7 +476,12 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
                     t.getRequestState());
 
         } catch (Throwable throwable) {
-            ServletDebugUtil.warn(this, "Unable to update claims on token exchange: \"" + throwable.getMessage() + "\"");
+            /*
+            NOTE: If there is some other error (such as a bad QDL script) and this fails, then as a fallback position
+            this will return the token with the same claims as are currently available in the handler.
+            There is no good way to communicate this to the user though.
+             */
+            ServletDebugUtil.warn(this, "*** Unable to update claims on token exchange: \"" + throwable.getMessage() + "\"");
         }
         setupTokens(client, rtiResponse, oa2se, t, jwtRunner);
 
@@ -502,7 +506,9 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             rfcClaims.put(OA2Constants.SCOPE, listToString(newTXR.getScopes()));
 
         }
+        ServletDebugUtil.trace(this,"rfc claims returned:" + rfcClaims.toString(1));
         /*
+
          Important note: In the RFC 8693 spec., access_token MUST be returned, however, it explains that this
          is so named merely for compatibility with OAuth 2.0 request/response constructs. The actual
          content of this is undefined.
