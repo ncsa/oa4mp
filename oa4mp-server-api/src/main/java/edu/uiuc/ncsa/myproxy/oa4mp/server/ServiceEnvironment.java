@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AuthorizationServletConfig;
 import edu.uiuc.ncsa.security.core.Logable;
+import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.server.issuers.AGIssuer;
 import edu.uiuc.ncsa.security.delegation.server.issuers.ATIssuer;
@@ -139,4 +140,10 @@ public interface ServiceEnvironment extends Logable {
     void setUsernameTransformer(UsernameTransformer usernameTransformer);
 
     boolean isPingable();
+
+    /**
+     * List the current stores in this environment. Used at bootstrapping for various types of introspection.
+     * @return
+     */
+    List<Store> listStores();
 }

@@ -42,6 +42,7 @@ import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSourceFactory;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
+import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
 import org.apache.http.HttpStatus;
 
@@ -283,7 +284,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             try {
                 sciTokens = JWTUtil.verifyAndReadJWT(subjectToken, keys);
                 accessToken = tokenForge.getAccessToken(sciTokens.getString(JWT_ID));
-            } catch (IllegalArgumentException tt) {
+            } catch (JSONException | IllegalArgumentException tt) {
                 // didn't work, so now we assume it is regular token
                 ServletDebugUtil.trace(this, "failed to parse access token as JWT:" + tt.getMessage());
                 accessToken = (AccessTokenImpl) oa2se.getTokenForge().getAccessToken(subjectToken);
@@ -876,7 +877,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         try {
             JSONObject json = JWTUtil2.verifyAndReadJWT(rawRefreshToken, keys);
             oldRT = ((OA2TokenForge) oa2SE.getTokenForge()).getRefreshToken(json.getString(JWT_ID));
-        } catch (IllegalArgumentException t) {
+        } catch (JSONException | IllegalArgumentException t) {
             // so it's not a JWT
             oldRT = new RefreshTokenImpl(URI.create(rawRefreshToken));
 

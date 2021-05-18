@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
+import edu.uiuc.ncsa.security.storage.sql.ConnectionRecord;
 import edu.uiuc.ncsa.security.storage.sql.SQLStore;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnMap;
 import edu.uiuc.ncsa.security.storage.sql.internals.Table;
@@ -49,7 +50,9 @@ public class SQLAssetStore extends SQLStore<Asset> implements AssetStore {
         if (token == null) {
             return null;
         }
-        Connection c = getConnection();
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
+
         Asset t = null;
         try {
             PreparedStatement stmt = c.prepareStatement(getAST().getByTokenStatement());
@@ -70,16 +73,16 @@ public class SQLAssetStore extends SQLStore<Asset> implements AssetStore {
             t = create();
             populate(map, t);
         } catch (SQLException e) {
-            destroyConnection(c);
+            destroyConnection(cr);
             throw new GeneralException("Error getting object with identifier \"" + token + "\"", e);
         } finally {
-            releaseConnection(c);
+            releaseConnection(cr);
         }
         return t;
     }
 
     @Override
     public void putByToken(Asset asset) {
-           save(asset);
+        save(asset);
     }
 }

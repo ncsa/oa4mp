@@ -8,6 +8,7 @@ import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApprovalStore;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
+import edu.uiuc.ncsa.security.storage.sql.ConnectionRecord;
 import edu.uiuc.ncsa.security.storage.sql.SQLStore;
 import edu.uiuc.ncsa.security.storage.sql.internals.Table;
 
@@ -47,7 +48,9 @@ public class SQLClientApprovalStore extends SQLStore<ClientApproval> implements 
 
         String query = "Select " + getTable().getPrimaryKeyColumnName() + " from " + getTable().getFQTablename()
                 + " where " + getCAT().ca().approved() + "=false ";
-        Connection c = getConnection();
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
+
         try {
             PreparedStatement stmt = c.prepareStatement(query);
             stmt.execute();
@@ -58,10 +61,10 @@ public class SQLClientApprovalStore extends SQLStore<ClientApproval> implements 
             rs.close();
             stmt.close();
         } catch (SQLException e) {
-            destroyConnection(c);
+            destroyConnection(cr);
             throw new GeneralException("Error getting the user ids", e);
         } finally {
-            releaseConnection(c);
+            releaseConnection(cr);
         }
         return count;
     }
@@ -72,7 +75,8 @@ public class SQLClientApprovalStore extends SQLStore<ClientApproval> implements 
 
         String query = "Select " + getTable().getPrimaryKeyColumnName() + " from " + getTable().getFQTablename()
                 + " where " + getCAT().ca().approved() + "=false ";
-        Connection c = getConnection();
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
         try {
             PreparedStatement stmt = c.prepareStatement(query);
             stmt.execute();
@@ -83,10 +87,10 @@ public class SQLClientApprovalStore extends SQLStore<ClientApproval> implements 
             rs.close();
             stmt.close();
         } catch (SQLException e) {
-            destroyConnection(c);
+            destroyConnection(cr);
             throw new GeneralException("Error getting the user ids", e);
         } finally {
-            releaseConnection(c);
+            releaseConnection(cr);
         }
         return count;
     }

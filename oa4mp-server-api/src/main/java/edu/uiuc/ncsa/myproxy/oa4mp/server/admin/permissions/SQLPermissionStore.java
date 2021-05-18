@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
+import edu.uiuc.ncsa.security.storage.sql.ConnectionRecord;
 import edu.uiuc.ncsa.security.storage.sql.SQLStore;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnMap;
 import edu.uiuc.ncsa.security.storage.sql.internals.Table;
@@ -34,7 +35,9 @@ public class SQLPermissionStore<V extends Permission> extends SQLStore<V> implem
     @Override
     public PermissionList get(Identifier adminID, Identifier clientID) {
         PermissionList allOfThem = new PermissionList();
-        Connection c = getConnection();
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
+
         PermissionKeys permissionKeys = new PermissionKeys();
         try {
             PreparedStatement stmt = c.prepareStatement("select * from " +
@@ -54,10 +57,10 @@ public class SQLPermissionStore<V extends Permission> extends SQLStore<V> implem
             rs.close();
             stmt.close();
         } catch (SQLException e) {
-            destroyConnection(c);
+            destroyConnection(cr);
             throw new GeneralException("Error: could not get database object", e);
         } finally {
-            releaseConnection(c);
+            releaseConnection(cr);
         }
         return allOfThem;
     }
@@ -67,7 +70,8 @@ public class SQLPermissionStore<V extends Permission> extends SQLStore<V> implem
         ArrayList<Identifier> clients = new ArrayList<>();
           if(adminID == null) return 0;
 
-            Connection c = getConnection();
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
             PermissionKeys permissionKeys = new PermissionKeys();
             try {
                 PreparedStatement stmt = c.prepareStatement("select COUNT(*)  from " +
@@ -82,10 +86,10 @@ public class SQLPermissionStore<V extends Permission> extends SQLStore<V> implem
                 stmt.close();
                 return totalClients;
             } catch (SQLException e) {
-                destroyConnection(c);
+                destroyConnection(cr);
                 throw new GeneralException("Error: could not get database object", e);
             } finally {
-                releaseConnection(c);
+                releaseConnection(cr);
             }
     }
 
@@ -94,7 +98,8 @@ public class SQLPermissionStore<V extends Permission> extends SQLStore<V> implem
         ArrayList<Identifier> clients = new ArrayList<>();
         if(adminID == null) return clients;
 
-          Connection c = getConnection();
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
           PermissionKeys permissionKeys = new PermissionKeys();
           try {
               PreparedStatement stmt = c.prepareStatement("select " + permissionKeys.clientID() + "  from " +
@@ -110,10 +115,10 @@ public class SQLPermissionStore<V extends Permission> extends SQLStore<V> implem
               rs.close();
               stmt.close();
           } catch (SQLException e) {
-              destroyConnection(c);
+              destroyConnection(cr);
               throw new GeneralException("Error: could not get database object", e);
           } finally {
-              releaseConnection(c);
+              releaseConnection(cr);
           }
           return clients;
     }
@@ -123,7 +128,9 @@ public class SQLPermissionStore<V extends Permission> extends SQLStore<V> implem
             ArrayList<Identifier> admins = new ArrayList<>();
         if(clientID == null) return admins;
 
-        Connection c = getConnection();
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
+
         PermissionKeys permissionKeys = new PermissionKeys();
                try {
                    PreparedStatement stmt = c.prepareStatement("select " + permissionKeys.adminID() + "  from " +
@@ -139,10 +146,10 @@ public class SQLPermissionStore<V extends Permission> extends SQLStore<V> implem
                    rs.close();
                    stmt.close();
                } catch (SQLException e) {
-                   destroyConnection(c);
+                   destroyConnection(cr);
                    throw new GeneralException("Error: could not get database object", e);
                } finally {
-                   releaseConnection(c);
+                   releaseConnection(cr);
                }
                return admins;
     }

@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.Permission;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionsStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AuthorizationServletConfig;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.AbstractCLIApprover;
+import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.configuration.Configurations;
 import edu.uiuc.ncsa.security.core.configuration.provider.CfgEvent;
 import edu.uiuc.ncsa.security.core.configuration.provider.HierarchicalConfigProvider;
@@ -31,6 +32,7 @@ import javax.inject.Provider;
 import java.net.URI;
 import java.security.KeyPair;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -44,7 +46,7 @@ import static edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractAuthorizationSe
  * <p>Created by Jeff Gaynor<br>
  * on 1/9/12 at  4:08 PM
  */
-public  class ServiceEnvironmentImpl extends MyProxyServiceEnvironment implements ServiceEnvironment {
+public class ServiceEnvironmentImpl extends MyProxyServiceEnvironment implements ServiceEnvironment {
 
     public KeyPairQueue getKeyPairQueue() {
         return kpq;
@@ -179,11 +181,11 @@ public  class ServiceEnvironmentImpl extends MyProxyServiceEnvironment implement
     protected Provider<TransactionStore> tsp;
     protected Provider<ClientStore> csp;
     protected Provider<ClientApprovalStore> casp;
+    protected Provider<PermissionsStore> psp;
     protected Provider<AGIssuer> agip;
     protected Provider<ATIssuer> atip;
     protected Provider<PAIssuer> paip;
     protected Provider<TokenForge> tfp;
-    protected Provider<PermissionsStore> psp;
 
 
     Map<String, String> messages;
@@ -200,7 +202,6 @@ public  class ServiceEnvironmentImpl extends MyProxyServiceEnvironment implement
         }
         return messages;
     }
-
 
 
     PermissionsStore permissionsStore = null;
@@ -290,5 +291,16 @@ public  class ServiceEnvironmentImpl extends MyProxyServiceEnvironment implement
     @Override
     public AdminClientStore<AdminClient> getAdminClientStore() {
         throw new NotImplementedException("No admin client store in legacy code");
+    }
+
+    @Override
+    public List<Store> listStores() {
+        List<Store> stores = new LinkedList<>();
+        stores.add(getClientStore());
+        stores.add(getPermissionStore());
+        stores.add(getTransactionStore());
+        stores.add(getAdminClientStore());
+        stores.add(getClientApprovalStore());
+        return stores;
     }
 }

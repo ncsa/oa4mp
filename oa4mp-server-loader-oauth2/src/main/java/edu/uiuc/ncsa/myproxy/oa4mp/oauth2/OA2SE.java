@@ -13,6 +13,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionsStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AuthorizationServletConfig;
 import edu.uiuc.ncsa.qdl.config.QDLEnvironment;
 import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
@@ -435,5 +436,13 @@ public class OA2SE extends ServiceEnvironmentImpl {
                 throw new NFWException("Error: too many admins for this client.");
         }
         return null;
+    }
+
+    @Override
+    public List<Store> listStores() {
+        List<Store> stores =  super.listStores();
+        stores.add(getTxStore());
+        stores.add(getVOStore());
+        return stores;
     }
 }

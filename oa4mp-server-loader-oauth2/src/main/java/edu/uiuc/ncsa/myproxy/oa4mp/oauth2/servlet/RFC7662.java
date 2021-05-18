@@ -26,7 +26,7 @@ public class RFC7662 extends TokenManagerServlet {
 
     @Override
     protected void doIt(HttpServletRequest req, HttpServletResponse resp) throws Throwable {
-        OA2SE oa2SE = (OA2SE) getServiceEnvironment().getTransactionStore();
+        OA2SE oa2SE = (OA2SE) getServiceEnvironment();
 
         OA2Client client = verifyClient(req, "Bearer");
 

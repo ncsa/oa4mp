@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.util.ConnectionCacheRetentionPolicy;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.ExceptionEventNotifier;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.NewClientNotifier;
 import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.cache.Cache;
 import edu.uiuc.ncsa.security.core.cache.CachedObject;
 import edu.uiuc.ncsa.security.core.cache.Cleanup;
@@ -137,11 +138,17 @@ public class OA4MPServletInitializer implements Initialization {
         }
         try {
             //mps.storeUpdates();
+            for(Store s : mps.getServiceEnvironment().listStores()){
+
+                mps.processStoreCheck(s);
+            }
+/*
             mps.processStoreCheck(mps.getTransactionStore());
             mps.processStoreCheck(mps.getServiceEnvironment().getClientStore());
             mps.processStoreCheck(mps.getServiceEnvironment().getClientApprovalStore());
+*/
 
-        } catch (IOException | SQLException e) {
+        } catch ( SQLException e) {
             e.printStackTrace();
             throw new ServletException("Could not update table", e);
         }
