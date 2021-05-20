@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.client.ClientEnvironment.CALLBACK_URI_KEY;
-import static edu.uiuc.ncsa.myproxy.oa4mp.client.ClientXMLTags.DEVICE_AUTHORIZATION_URI;
+import static edu.uiuc.ncsa.myproxy.oa4mp.client.ClientXMLTags.*;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -301,7 +301,9 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
                                     isUseBasicAuth()),
                             new PAServer2(createServiceClient(getAssetURI())),
                             new UIServer2(createServiceClient(getUIURI())),
-                            new RTServer2(createServiceClient(getAccessTokenURI()), getWellKnownURI(), isOIDCEnabled()) // as per spec, refresh token server is at same endpoint as access token server.
+                            new RTServer2(createServiceClient(getAccessTokenURI()), getWellKnownURI(), isOIDCEnabled()), // as per spec, refresh token server is at same endpoint as access token server.
+                            new RFC7009Server2(createServiceClient(getRFC7009Endpoint()), getWellKnownURI(), isOIDCEnabled()),
+                            new RFC7662Server2(createServiceClient(getRFC7662Endpoint()), getWellKnownURI(), isOIDCEnabled())
                     );
                 }
             };
@@ -315,14 +317,18 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
     protected URI getDeviceAuthorizationURI() {
         return createServiceURI(getCfgValue(DEVICE_AUTHORIZATION_URI), getCfgValue(ClientXMLTags.BASE_URI), DEVICE_AUTHORIZATION_ENDPOINT);
     }
+    protected URI getRFC7009Endpoint() {
+        return createServiceURI(getCfgValue(REVOCATION_URI), getBaseURI(), REVOCATION_ENDPOINT);
+    }
+
+    protected URI getRFC7662Endpoint() {
+        return createServiceURI(getCfgValue(INTROSPECTION_URI), getBaseURI(), INTROSPECTION_ENDPOINT);
+    }
 
     protected URI getAuthzURI() {
         return createServiceURI(getCfgValue(ClientXMLTags.AUTHORIZE_TOKEN_URI), getCfgValue(ClientXMLTags.BASE_URI), AUTHORIZE_ENDPOINT);
     }
 
-    protected URI getRevocationURI() {
-        return createServiceURI(getCfgValue(ClientXMLTags.REVOCATION_URI), getCfgValue(ClientXMLTags.BASE_URI), AUTHORIZE_ENDPOINT);
-    }
 
     @Override
     public HashMap<String, String> getConstants() {

@@ -18,16 +18,25 @@ public interface ClientXMLTags extends StorageConfigurationTags{
     public static final String ID = "id";
     /**
      * The callback uri to be used for every request. See also {@link ClientEnvironment#getCallback()}.
+     * The various other URIs may be used to override the values
+     * (e.g. the revocation uri) if  not the standard for the distro.
      */
+
     public static final String CALLBACK_URI = "callbackUri";
-    public static final String BASE_URI = "serviceUri";
-    public static final String INITIATE_URI = "initiateUri";
-    public static final String USER_INFO_URI = "userInfoUri";
-    public static final String REVOCATION_URI = "revocationUri";
-    public static final String DEVICE_AUTHORIZATION_URI = "deviceAuthorizationUri";
+
     public static final String ACCESS_TOKEN_URI = "accessTokenUri";
-    public static final String AUTHORIZE_TOKEN_URI = "authorizeUri";
     public static final String ASSET_URI = "assetUri";
+    public static final String AUTHORIZE_TOKEN_URI = "authorizeUri";
+    public static final String BASE_URI = "serviceUri";
+    public static final String DEVICE_AUTHORIZATION_URI = "deviceAuthorizationUri";
+    public static final String INITIATE_URI = "initiateUri";
+    public static final String INTROSPECTION_URI = "introspectionUri"; // RFC 7662
+    public static final String REVOCATION_URI = "revocationUri"; // RFC 7009
+    public static final String USER_INFO_URI = "userInfoUri";
+
+    /*
+    Other configuration parameters.
+     */
     public static final String SECRET_KEY = "secret";
     public static final String PUBLIC_KEY = "publicKeyFile";
     public static final String PRIVATE_KEY = "privateKeyFile";

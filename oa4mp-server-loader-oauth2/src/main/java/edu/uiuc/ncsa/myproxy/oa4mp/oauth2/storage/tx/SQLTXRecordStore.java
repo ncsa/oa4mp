@@ -6,6 +6,9 @@ import edu.uiuc.ncsa.security.storage.sql.SQLStore;
 import javax.inject.Provider;
 
 /**
+ * Note that the identifier is simple the JTI of the token and may be either an access or refresh
+ * token. The important bit is that there si also a pernt id which is the auth grant of the original
+ * service transaction. This is how they tie together.
  * <p>Created by Jeff Gaynor<br>
  * on 12/14/20 at  10:40 AM
  */
@@ -17,8 +20,5 @@ public class SQLTXRecordStore<V extends TXRecord> extends SQLStore<V>  implement
         super(connectionPool, table, identifiableProvider, converter);
     }
 
-/*    @Override
-    public MapConverter<V> getMapConverter() {
-        return converter;
-    }*/
+
 }

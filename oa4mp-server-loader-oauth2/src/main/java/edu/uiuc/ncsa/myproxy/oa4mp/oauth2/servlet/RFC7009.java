@@ -2,52 +2,70 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
+import edu.uiuc.ncsa.security.delegation.token.impl.TokenImpl;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2GeneralError;
-import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTUtil2;
-import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
-import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
-import net.sf.json.JSONObject;
 import org.apache.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * Token Revocation endpoint. Points of policy for us is that revoking either an access token or
- * a refresh token invalidates both. We may revisit this policy but at the time of writing this, it
- * seems to be the most reasonable. This implements <a href="https://tools.ietf.org/html/rfc7009">RFC7009</a>.
+ * Token Revocation endpoint.  This implements <a href="https://tools.ietf.org/html/rfc7009">RFC7009</a>.
  * <p>Created by Jeff Gaynor<br>
  * on 2/17/20 at  12:24 PM
  */
-// NOTE that there is a revocation servlet, but it does not handle JWts as access tokens and a few other
+// NOTE that there is an older revocation servlet, but it does not handle JWTs as access tokens and a few other
 // things. This is to replace that.
 public class RFC7009 extends TokenManagerServlet {
 
     @Override
     protected void doIt(HttpServletRequest req, HttpServletResponse resp) throws Throwable {
-        OA2SE oa2SE = (OA2SE) getServiceEnvironment().getTransactionStore();
-        OA2Client client = verifyClient(req, "Basic");
-
-        String token = req.getParameter(TOKEN);
-        String tokenTypeHint = req.getParameter(TOKEN_TYPE_HINT);
-        if (!tokenTypeHint.equals(TYPE_ACCESS_TOKEN) || !tokenTypeHint.equals(TYPE_REFRESH_TOKEN)) {
-            // as per spec, throw the only exception this servlet is allowed
-            new OA2GeneralError(
-                    "unsupported_token_type", // special value in spec.
-                    "The token type of \"" + tokenTypeHint + "\" is not supported on this server.",
-                    HttpStatus.SC_FORBIDDEN,
-                    null);
-            // if we throw a status of 503, this means that while the token type was wrong, the
-            // token still exists on the server.
-        }
-        if (checkToken(client, token)) {
+        OA2SE oa2SE = (OA2SE) getServiceEnvironment();
+        State state;
+        TokenImpl token;
+        try {
+            if (!HeaderUtils.getAuthHeader(req, HeaderUtils.BASIC_HEADER).isEmpty()) {
+                state = checkBasic(req);
+            } else {
+                state = checkBearer(req);
+            }
+        }catch(OA2GeneralError x){
+            DebugUtil.error(this, "Got exception checking bearer/basic header ",x);
+            // if the token does not exist, return an OK == whatever it was they sent is
+            // revoked.
             resp.setStatus(HttpStatus.SC_OK);
             return;
         }
 
+         // By this point the state object has the original transaction and request information in it,
+        // plus it has the TX record if there is one.
+        // Now we have enough to do what we need to.
+        if(state.txRecord != null){
+            state.txRecord.setValid(false);
+            oa2SE.getTxStore().save(state.txRecord);
+            resp.setStatus(HttpStatus.SC_OK);
+            return;
+        }
+        if(state.transaction == null){
+            // no such record
+            oa2SE.getTxStore().save(state.txRecord);
+            resp.setStatus(HttpStatus.SC_OK);
+            return;
+        }
+        if(state.isAT) {
+            state.transaction.setAccessTokenValid(false);
+        }else{
+            state.transaction.setRefreshTokenValid(false);
+        }
+        oa2SE.getTransactionStore().save(state.transaction);
+        resp.setStatus(HttpStatus.SC_OK);
+        return;
+
         // now we check that the token is a JWT.
+/*
         JSONObject jwt;
         try {
             jwt = JWTUtil2.verifyAndReadJWT(token, oa2SE.getJsonWebKeys());
@@ -66,11 +84,12 @@ public class RFC7009 extends TokenManagerServlet {
             resp.setStatus(HttpStatus.SC_OK);
             return;
         }
+*/
     }
 
 
     protected boolean checkToken(OA2Client requestingClient, String token) {
-        OA2SE oa2SE = (OA2SE) getServiceEnvironment().getTransactionStore();
+        OA2SE oa2SE = (OA2SE) getServiceEnvironment();
 
         ServiceTransaction t = getTransFromToken(token);
         if (t != null) {

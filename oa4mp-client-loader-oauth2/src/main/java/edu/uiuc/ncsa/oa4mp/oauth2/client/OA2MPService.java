@@ -9,7 +9,10 @@ import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.delegation.client.request.*;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
-import edu.uiuc.ncsa.security.delegation.token.*;
+import edu.uiuc.ncsa.security.delegation.token.AccessToken;
+import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
+import edu.uiuc.ncsa.security.delegation.token.MyX509Certificates;
+import edu.uiuc.ncsa.security.delegation.token.Verifier;
 import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
 import edu.uiuc.ncsa.security.delegation.token.impl.AuthorizationGrantImpl;
 import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
@@ -321,25 +324,28 @@ public class OA2MPService extends OA4MPService {
      * to get a new access token (most usual case).
      *
      * @param asset
-     * @param token
+     * @param subjectToken
      * @param additionalParameters
      * @param getAT
      * @return
      */
-    public JSONObject exchangeRefreshToken(OA2Asset asset, TokenImpl token,
+    public JSONObject exchangeRefreshToken(OA2Asset asset, TokenImpl subjectToken,
                                            Map additionalParameters,
-                                           boolean getAT) {
+                                           boolean getAT,
+                                           boolean subjectTokenIsAT) {
         HashMap<String, String> parameterMap = new HashMap<>();
-        parameterMap.put(SUBJECT_TOKEN, token.getToken());
-
-        if (getAT) {
+        parameterMap.put(SUBJECT_TOKEN, subjectToken.getToken());
+        if(subjectTokenIsAT){
             parameterMap.put(SUBJECT_TOKEN_TYPE, ACCESS_TOKEN_TYPE);
+        }else{
+            parameterMap.put(SUBJECT_TOKEN_TYPE, REFRESH_TOKEN_TYPE);
+        }
+        if (getAT) {
             parameterMap.put(REQUESTED_TOKEN_TYPE, ACCESS_TOKEN_TYPE);
         } else {
-            parameterMap.put(SUBJECT_TOKEN_TYPE, REFRESH_TOKEN_TYPE);
             parameterMap.put(REQUESTED_TOKEN_TYPE, REFRESH_TOKEN_TYPE);
         }
-        
+
         if (additionalParameters != null) {
             parameterMap.putAll(additionalParameters);
         }
@@ -437,4 +443,35 @@ public class OA2MPService extends OA4MPService {
         }
     }
 
+    public boolean revoke(OA2Asset dummyAsset, boolean revokeRT) {
+        RFC7009Request request = new RFC7009Request();
+        if (revokeRT) {
+            request.setRefreshToken(dummyAsset.getRefreshToken());
+        } else {
+            request.setAccessToken(dummyAsset.getAccessToken());
+        }
+        DS2 ds2 = (DS2) getEnvironment().getDelegationService();
+        try {
+            ds2.rfc7009(request);
+            return true;
+        } catch (Throwable t) {
+            DebugUtil.trace(this, "revoke encountered a "
+                    + t.getClass().getSimpleName()
+                    + ": \""
+                    + t.getMessage() + "\" ");
+        }
+        return false;
+    }
+
+    public JSONObject introspect(OA2Asset asset, boolean doRT) {
+        RFC7662Request request = new RFC7662Request();
+        if(doRT){
+            request.setRefreshToken(asset.getRefreshToken());
+        }else{
+            request.setAccessToken(asset.getAccessToken());
+        }
+        request.setClient(getEnvironment().getClient());
+        DS2 ds2 = (DS2) getEnvironment().getDelegationService();
+        return ds2.rfc7662(request).getResponse();
+    }
 }

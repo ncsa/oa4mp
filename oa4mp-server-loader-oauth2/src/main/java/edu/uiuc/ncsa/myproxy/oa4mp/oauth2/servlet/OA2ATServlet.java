@@ -15,7 +15,8 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.IssuerTransactionState;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.cache.Cleanup;
 import edu.uiuc.ncsa.security.core.exceptions.IllegalAccessException;
-import edu.uiuc.ncsa.security.core.exceptions.*;
+import edu.uiuc.ncsa.security.core.exceptions.NFWException;
+import edu.uiuc.ncsa.security.core.exceptions.TransactionNotFoundException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DateUtils;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
@@ -32,7 +33,6 @@ import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
 import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
 import edu.uiuc.ncsa.security.delegation.token.impl.AuthorizationGrantImpl;
 import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
-import edu.uiuc.ncsa.security.delegation.token.impl.TokenUtils;
 import edu.uiuc.ncsa.security.oauth_2_0.*;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTRunner;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTUtil2;
@@ -42,7 +42,6 @@ import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSourceFactory;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
-import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
 import org.apache.http.HttpStatus;
 
@@ -57,6 +56,7 @@ import java.util.*;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.ClientUtils.computeATLifetime;
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.ClientUtils.computeRefreshLifetime;
+import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2TokenUtils.getTransactionFromTX;
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8628Constants2.DEVICE_CODE;
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8628Constants2.GRANT_TYPE_DEVICE_CODE;
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8693Constants2.*;
@@ -211,20 +211,18 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         atResponse.setClaims(t.getUserMetaData());
         atResponse.write(response);
     }
-   // Token exchange
+
+    // Token exchange
     private void doRFC8693(OA2Client client,
                            HttpServletRequest request,
                            HttpServletResponse response) throws IOException {
         // https://tools.ietf.org/html/rfc8693
 
-        printAllParameters(request);
+        //   printAllParameters(request);
         String subjectToken = getFirstParameterValue(request, SUBJECT_TOKEN);
 
         if (subjectToken == null) {
             throw new OA2ATException(OA2Errors.INVALID_REQUEST, "missing subject token");
-        }
-        if (TokenUtils.isBase32(subjectToken)) {
-            subjectToken = TokenUtils.b32DecodeToken(subjectToken);
         }
         String requestedTokenType = getFirstParameterValue(request, REQUESTED_TOKEN_TYPE);
         if (StringUtils.isTrivial(requestedTokenType)) {
@@ -268,111 +266,24 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         List<String> resources = convertToList(request, RFC8693Constants.RESOURCE);
 
         TXRecord oldTXR = null;
-        VirtualOrganization vo = oa2se.getVO(client.getIdentifier());
+
         //CIL-974
-        JSONWebKeys keys = ((OA2SE) getServiceEnvironment()).getJsonWebKeys();
-
-        if (vo != null) {
-            keys = vo.getJsonWebKeys();
-            ServletDebugUtil.trace(this, "Got VO for client " + client.getIdentifierString());
+        JSONWebKeys keys = OA2TokenUtils.getKeys(oa2se, client);
+        switch (subjectTokenType) {
+            case ACCESS_TOKEN_TYPE:
+                accessToken = OA2TokenUtils.getAT(subjectToken, oa2se, keys);
+                t = (OA2ServiceTransaction) getTransactionStore().get(accessToken);
+                break;
+            case REFRESH_TOKEN_TYPE:
+                refreshToken = OA2TokenUtils.getRT(subjectToken, oa2se, keys);
+                RefreshTokenStore rts = (RefreshTokenStore) getTransactionStore();
+                t = rts.get(refreshToken);
+                break;
         }
 
-        if (subjectTokenType.equals(ACCESS_TOKEN_TYPE)) {
-
-            // So we have an access token. Try to interpret it first as a SciToken then if that fails as a
-            // standard OA4MP access token:
-            try {
-                sciTokens = JWTUtil.verifyAndReadJWT(subjectToken, keys);
-                accessToken = tokenForge.getAccessToken(sciTokens.getString(JWT_ID));
-            } catch (JSONException | IllegalArgumentException tt) {
-                // didn't work, so now we assume it is regular token
-                ServletDebugUtil.trace(this, "failed to parse access token as JWT:" + tt.getMessage());
-                accessToken = (AccessTokenImpl) oa2se.getTokenForge().getAccessToken(subjectToken);
-            } catch (InvalidSignatureException | InvalidAlgorithmException | UnsupportedJWTTypeException tt) {
-                ServletDebugUtil.trace(this, "Failed to verify access token JWT: \"" + tt.getMessage());
-                throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
-                        "invalid access token",
-                        HttpStatus.SC_BAD_REQUEST,
-                        null);
-            }
-            ServletDebugUtil.trace(this, "access token from subject token = " + accessToken);
-
-
-            t = (OA2ServiceTransaction) getTransactionStore().get(accessToken);
-
-            if (t != null) {
-                // Must present a valid token to get one.
-                if (!t.isAccessTokenValid()) {
-                    throw new OA2ATException(OA2Errors.INVALID_TOKEN,
-                            "token invalid",
-                            t.getRequestState());
-                }
-                if (accessToken.isExpired()) {
-                    throw new OA2ATException(OA2Errors.INVALID_TOKEN,
-                            "token expired",
-                            t.getRequestState());
-                }
-            }
-
-        }
-        if (subjectTokenType.equals(REFRESH_TOKEN_TYPE)) {
-            // Handle the refresh token case.
-            try {
-                JSONObject tt = JWTUtil.verifyAndReadJWT(subjectToken, keys);
-                refreshToken = new RefreshTokenImpl(URI.create(tt.getString(JWT_ID)));
-            } catch (IllegalArgumentException tt) {
-                ServletDebugUtil.trace(this, "Failed to parse refresh token as JWT:" + tt.getMessage());
-                refreshToken = tokenForge.getRefreshToken(subjectToken);
-            } catch (InvalidSignatureException | InvalidAlgorithmException | UnsupportedJWTTypeException tt) {
-                ServletDebugUtil.trace(this, "Failed to verify refresh token JWT: \"" + tt.getMessage());
-                throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
-                        "invalid refresh token",
-                        HttpStatus.SC_BAD_REQUEST,
-                        null);
-            }
-            ServletDebugUtil.trace(this, "refresh token from subject token = " + refreshToken);
-            try {
-                RefreshTokenStore zzz = (RefreshTokenStore) getTransactionStore(); // better to get a class cast exception here
-                t = zzz.get(refreshToken);
-            } catch (Throwable tt) {
-                throw new OA2ATException(OA2Errors.INVALID_GRANT, "invalid refresh token");
-            }
-            if (t != null) {
-                // Must present a valid token to get one.
-                if (!t.isRefreshTokenValid()) {
-                    throw new OA2ATException(OA2Errors.INVALID_GRANT,
-                            "invalid refresh token",
-                            t.getRequestState());
-                }
-                if (refreshToken.isExpired()) {
-                    throw new OA2ATException(OA2Errors.INVALID_GRANT,
-                            "expired refresh token",
-                            t.getRequestState());
-                }
-            }
-        }
         if (t == null) {
             // if there is no such transaction found, then this is probably from a previous exchange. Go find it
-            oldTXR = (TXRecord) oa2se.getTxStore().get(BasicIdentifier.newID(accessToken.getJti()));
-            if (oldTXR == null) {
-                ServletDebugUtil.trace(this, "No transaction found, no TXRecord found for access token = " + accessToken);
-
-                throw new OA2GeneralError(OA2Errors.INVALID_TOKEN,
-                        "token not found",
-                        HttpStatus.SC_UNAUTHORIZED,
-                        null);
-            }
-            if (!oldTXR.isValid()) {
-                throw new OA2ATException(OA2Errors.INVALID_TOKEN,
-                        "invalid token",
-                        t.getRequestState());
-            }
-            if (oldTXR.getExpiresAt() < System.currentTimeMillis()) {
-                throw new OA2ATException(OA2Errors.INVALID_TOKEN,
-                        "token expired",
-                        t.getRequestState());
-            }
-            t = (OA2ServiceTransaction) getTransactionStore().get(oldTXR.getParentID());
+            t = getTransactionFromTX(accessToken, t, oa2se);
         }
         if (t == null) {
             // Still null. Ain't one no place. Bail.
@@ -412,7 +323,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         } else {
             // If no scopes sent with request, revert to scopes in original request.
             ServletDebugUtil.trace(this, "NO user requested scopes");
-         //   newTXR.setScopes(t.getScopes());
+            //   newTXR.setScopes(t.getScopes());
         }
 
         if (!resources.isEmpty()) {
@@ -507,7 +418,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             rfcClaims.put(OA2Constants.SCOPE, listToString(newTXR.getScopes()));
 
         }
-        ServletDebugUtil.trace(this,"rfc claims returned:" + rfcClaims.toString(1));
+        ServletDebugUtil.trace(this, "rfc claims returned:" + rfcClaims.toString(1));
         /*
 
          Important note: In the RFC 8693 spec., access_token MUST be returned, however, it explains that this
@@ -534,6 +445,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
 
 
     }
+
+
 
 
     /**
@@ -856,50 +769,17 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         // Grants are checked in the doIt method
 
         String rawRefreshToken = request.getParameter(OA2Constants.REFRESH_TOKEN);
-        if (TokenUtils.isBase32(rawRefreshToken)) {
-            rawRefreshToken = TokenUtils.b32DecodeToken(rawRefreshToken);
-        }
-        //RefreshTokenImpl oldRT = getTF2().getRefreshToken(rawRefreshToken);
         if (c == null) {
             throw new OA2ATException(OA2Errors.INVALID_REQUEST, "Could not find the client associated with refresh token \"" + rawRefreshToken + "\"");
         }
         // Check if its a token or JWT
         OA2SE oa2SE = (OA2SE) getServiceEnvironment();
-        JSONWebKeys keys = oa2SE.getJsonWebKeys();
         //CIL-974:
-        VirtualOrganization vo = oa2SE.getVO(c.getIdentifier());
-        if (vo != null) {
-            keys = vo.getJsonWebKeys();
-        }
+        JSONWebKeys keys = OA2TokenUtils.getKeys(oa2SE, c);
 
         boolean tokenVersion1 = false;
-        RefreshTokenImpl oldRT = null;
-        try {
-            JSONObject json = JWTUtil2.verifyAndReadJWT(rawRefreshToken, keys);
-            oldRT = ((OA2TokenForge) oa2SE.getTokenForge()).getRefreshToken(json.getString(JWT_ID));
-        } catch (JSONException | IllegalArgumentException t) {
-            // so it's not a JWT
-            oldRT = new RefreshTokenImpl(URI.create(rawRefreshToken));
+        RefreshTokenImpl oldRT = OA2TokenUtils.getRT(rawRefreshToken, oa2SE, keys);
 
-            if (!rawRefreshToken.contains(VERSION_TAG)) {
-                tokenVersion1 = true;
-                // then this is an old format token.
-                if (0 < DateUtils.getDate(rawRefreshToken).getTime() + c.getRtLifetime() - System.currentTimeMillis()) {
-                    oldRT.setLifetime(c.getRtLifetime());
-                    oldRT.setIssuedAt(DateUtils.getDate(rawRefreshToken).getTime());
-                    oldRT.setVersion(VERSION_1_0_TAG);
-                } else {
-                    oldRT.setLifetime(-1L); // expire it if too old
-                }
-            }
-            // do nothing, this means that the token is not a JWT which is fine too
-        } catch (InvalidSignatureException | InvalidAlgorithmException | UnsupportedJWTTypeException tt) {
-            ServletDebugUtil.trace(this, "Failed to verify refresh token JWT: \"" + tt.getMessage());
-            throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
-                    "invalid refresh token",
-                    HttpStatus.SC_BAD_REQUEST,
-                    null);
-        }
         OA2ServiceTransaction t = null;
         if (oldRT.isExpired()) {
             DebugUtil.trace(this, "expired refresh token \"" + oldRT.getToken() + "\" for client " + c.getIdentifierString());
@@ -908,8 +788,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         try {
             // Fix for CIL-882
             t = getByRT(oldRT);
-            if(!t.getClient().getIdentifier().equals(c.getIdentifier())){
-                ServletDebugUtil.trace(this,"transaction lists client id \"" + t.getClient().getIdentifierString()
+            if (!t.getClient().getIdentifier().equals(c.getIdentifier())) {
+                ServletDebugUtil.trace(this, "transaction lists client id \"" + t.getClient().getIdentifierString()
                         + "\", but the client in the request is \"" + c.getIdentifierString() + "\". Request rejected.");
                 throw new OA2ATException(OA2Errors.INVALID_REQUEST,
                         "wrong client",
@@ -1011,6 +891,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         }
 
         rtiResponse.setServiceTransaction(t);
+        VirtualOrganization vo = oa2SE.getVO(c.getIdentifier());
+
         if (vo == null) {
             rtiResponse.setJsonWebKey(oa2SE.getJsonWebKeys().getDefault());
         } else {

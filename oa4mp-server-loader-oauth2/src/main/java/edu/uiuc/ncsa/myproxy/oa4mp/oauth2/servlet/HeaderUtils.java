@@ -25,6 +25,9 @@ import static edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceConstantKeys.CONSUMER_KE
  * on 9/25/17 at  5:33 PM
  */
 public class HeaderUtils {
+    public static final String BASIC_HEADER = "Basic";
+    public static final String BEARER_HEADER = "Bearer";
+
     /**
      * This gets the tokens from the authorization header. There are several types and it is possible to have several
      * values passed in, so this returns an array of string rather than a single value. A downside with passing
@@ -100,10 +103,10 @@ public class HeaderUtils {
         type = type.trim();
         // assume the client id and secret are in the headers.
         String header64 = null;
-        if (type.equals("Basic")) {
+        if (type.equals(BASIC_HEADER)) {
             header64 = getBasicHeader(request);
         }
-        if (type.equals("Bearer")) {
+        if (type.equals(BEARER_HEADER)) {
             header64 = getBearerAuthHeader(request);
         }
         if (header64 == null) {

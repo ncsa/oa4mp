@@ -17,10 +17,7 @@ import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.delegation.client.request.RTResponse;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.Token;
-import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
-import edu.uiuc.ncsa.security.delegation.token.impl.AuthorizationGrantImpl;
-import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
-import edu.uiuc.ncsa.security.delegation.token.impl.TokenUtils;
+import edu.uiuc.ncsa.security.delegation.token.impl.*;
 import edu.uiuc.ncsa.security.oauth_2_0.JWTUtil;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.UserInfo;
@@ -404,12 +401,12 @@ public class OA2CLCCommands extends CLCCommands {
             if (current.startsWith(OA2Constants.AUTHORIZATION_CODE + "=")) {
                 String raw = decode(current.substring(5));
                 URI jti;
-                if(TokenUtils.isBase32(raw)){
+                if (TokenUtils.isBase32(raw)) {
                     jti = URI.create(TokenUtils.b32DecodeToken(raw));
-                }else{
-                     jti = URI.create(raw);
+                } else {
+                    jti = URI.create(raw);
                 }
-                grant = new AuthorizationGrantImpl(raw,jti);
+                grant = new AuthorizationGrantImpl(raw, jti);
 
                 gotGrant = true;
                 copyToClipboard(jti.toString(), "grant copied to clipboard.");
@@ -589,9 +586,25 @@ public class OA2CLCCommands extends CLCCommands {
             showRevokeHelp();
             return;
         }
-        boolean revokeAT = inputLine.hasArg("-at");
         boolean revokeRT = inputLine.hasArg("-rt");
-        say("under construction");
+        getService().revoke(getDummyAsset(), revokeRT);
+        say("revocation on " + (revokeRT?"refresh":"access") + " token returned ok");
+    }
+
+    protected void showIntrospectHelp() {
+        say("introspect -at | -rt");
+        sayi("Usage: Call the introspection endpoint on the server with either the access token or the refresh token");
+    }
+
+    public void introspect(InputLine inputLine) throws Exception {
+        if (grant == null || showHelp(inputLine)) {
+            showIntrospectHelp();
+            return;
+        }
+        boolean checkRT = inputLine.hasArg("-rt");
+        JSONObject json = getService().introspect(getDummyAsset(), checkRT);
+        say("introspection endpoint on " + (checkRT?"refresh":"access") +" token returned:");
+        say(json.toString(2));
 
     }
 
@@ -956,14 +969,17 @@ public class OA2CLCCommands extends CLCCommands {
 
 
     protected void exchangeHelp() {
-        sayi("exchange [-at|-rt]");
+        sayi("exchange [-at|-rt] [-x]");
         sayi("Usage: This will exchange the current access token (so you need to");
         sayi("   have gotten that far first) for a secure token.");
+        sayi("-x = use the refresh token as the subject token in the exchange. Default is to use ");
+        sayi("     the same type as the requested token. This will fail if requesting an access token");
+        sayi("     with one that has expired.");
         sayi("The response will contain other information that will be displayed.");
         sayi("If there is no parameter, the current access token is used for the exchange");
         sayi("Otherwise you may specify -at to exchange the access token or -rt to exchange using the refresh token.");
         say("E.g.");
-        sayi("exchange -at ");
+        sayi("exchange -at -x");
         sayi("Note: you can only specify scopes for the access token. They are ignored for refresh tokens");
         say("See also: get_at, set_param to set additional parameters (like specific scopes or the audience");
     }
@@ -979,44 +995,83 @@ public class OA2CLCCommands extends CLCCommands {
             say("Oops! No configuration has been loaded.");
             return;
         }
-        boolean didIt = false;
+
+        boolean requestAT = 1 == inputLine.size() || inputLine.hasArg("-at"); // if default or no args
+
+        boolean subjectTokenIsAT = true;
+        if (inputLine.hasArg("-x")) {
+            subjectTokenIsAT = false;
+        } else {
+            subjectTokenIsAT = requestAT;
+        }
+        TokenImpl subjectToken = null;
+        // NOTE ATServer2 class is slightly broken in that it sets the JTI to be the token
+        // This fixes it, but this code should be moved there, along with the resolveFromToken method
+        // Since it only really affects the CLC, it has a low priority though.
+        if (subjectTokenIsAT) {
+  //          subjectToken = getDummyAsset().getAccessToken();
+
+
+            JSONObject token = resolveFromToken(getDummyAsset().getAccessToken(), true);
+            if (token == null) {
+                subjectToken = getDummyAsset().getAccessToken();
+            } else {
+                subjectToken = new AccessTokenImpl(getDummyAsset().getAccessToken().getToken(),
+                        URI.create(token.getString(OA2Claims.JWT_ID)));
+            }
+
+        } else {
+//            subjectToken = getDummyAsset().getRefreshToken();
+
+
+            JSONObject token = resolveFromToken(getDummyAsset().getRefreshToken(), true);
+            if (token == null) {
+                subjectToken = getDummyAsset().getRefreshToken();
+            } else {
+                subjectToken = new RefreshTokenImpl(getDummyAsset().getRefreshToken().getToken(),
+                        URI.create(token.getString(OA2Claims.JWT_ID)));
+            }
+
+
+        }
+
+        getService().exchangeRefreshToken(getDummyAsset(),
+                subjectToken,
+                exchangeParameters,
+                requestAT, subjectTokenIsAT);
+        // Note that the call updates the asset, so we don't need to look at the response,
+        // just print th right thing.
+        if (requestAT) {
+            printToken(getDummyAsset().getAccessToken(), false);
+        } else {
+            printToken(getDummyAsset().getRefreshToken(), false);
+        }
+/*
         if (1 == inputLine.size() || inputLine.hasArg("-at")) {
             // use the access token to get access token. This is legal in the spec
             // and this ensures it gets tested
             didIt = true;
-            AccessTokenImpl accessToken = null;
-            JSONObject token = resolveFromToken(getDummyAsset().getAccessToken(), true);
-            if (token == null) {
-                accessToken = getDummyAsset().getAccessToken();
-            } else {
-                accessToken = new AccessTokenImpl(getDummyAsset().getAccessToken().getToken(),
-                        URI.create(token.getString(OA2Claims.JWT_ID)));
-            }
             // Note in the next call, the asset is updated by the call since it has all of the information
             // for the token types. We just need to grab the raw token since we also stash it.
-            JSONObject response = getService().exchangeRefreshToken(getDummyAsset(),
-                    accessToken,
-                    exchangeParameters,
-                    true);
+            JSONObject response;
+                response = getService().exchangeRefreshToken(getDummyAsset(),
+                       accessToken,
+                       exchangeParameters,
+                       true,true);
             sciToken = response;
             //    AccessTokenImpl newAt = new AccessTokenImpl(sciToken.getString(RFC8693Constants.ACCESS_TOKEN));
             //  newAt.isExpired()
 
             printToken(getDummyAsset().getAccessToken(), false);
         }
-        
+*/
+
+/*
         if (inputLine.hasArg("-rt")) {
             didIt = true;
             RefreshTokenImpl rt = null;
-            JSONObject token = resolveFromToken(getDummyAsset().getRefreshToken(), true);
-            if (token == null) {
-                rt = getDummyAsset().getRefreshToken();
-            } else {
-                rt = new RefreshTokenImpl(getDummyAsset().getRefreshToken().getToken(),
-                        URI.create(token.getString(OA2Claims.JWT_ID)));
-            }
             //RefreshToken rt = getDummyAsset().getRefreshToken();
-            JSONObject response = getService().exchangeRefreshToken(getDummyAsset(), rt, null, false);
+            JSONObject response = getService().exchangeRefreshToken(getDummyAsset(), rt, null, false, false);
             sciToken = response;
 
             printToken(getDummyAsset().getRefreshToken(), false);
@@ -1025,6 +1080,7 @@ public class OA2CLCCommands extends CLCCommands {
             sayi("Sorry, argument not understood");
             exchangeHelp();
         }
+*/
 
 
     }
@@ -1204,7 +1260,7 @@ public class OA2CLCCommands extends CLCCommands {
             say("sorry, but \"" + saveFile.getAbsolutePath() + "\" is a directory");
             return;
         }
-        if(!saveFile.isAbsolute()){
+        if (!saveFile.isAbsolute()) {
             say("Sorry, but " + saveFile.getName() + " needs the path.");
             return;
         }

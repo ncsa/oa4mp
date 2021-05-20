@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.HeaderUtils;
 import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
 import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
 import edu.uiuc.ncsa.security.delegation.token.impl.TokenUtils;
@@ -10,15 +11,19 @@ import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
 import org.apache.http.HttpStatus;
 
+import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
 
+import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.ACCESS_TOKEN;
 import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.JWT_ID;
 
 /**
+ * Mostly this is used in the {@link edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.UserInfoServlet}
+ * where the handling has to be a bit different than in the token endpoint.
  * <p>Created by Jeff Gaynor<br>
  * on 5/3/21 at  4:02 PM
  */
-public class OA2TokenUtils {
+public class UITokenUtils {
     /**
      * Given the a string of some token (unknown format, e.g. from a header or
      * passed in as a a parameter) return an access token.<br/><br/>
@@ -76,5 +81,27 @@ public class OA2TokenUtils {
         // Legacy case,
         return new RefreshTokenImpl(URI.create(rawRT));
 
+    }
+
+
+    /**
+     * Gets the current raw access token from the header or throws an exception none is found.
+     * <h1>NOTE</h1>
+     * OA4MP uses either JWTs or base32 encoded access tokens, so no further encoding to base 64 is needed.
+     * @param request
+     * @return
+     */
+    public static String getRawAT(HttpServletRequest request) {
+        String headerAT = HeaderUtils.getBearerAuthHeader(request);
+        String paramAT = request.getParameter(ACCESS_TOKEN);
+        //String paramAT = getFirstParameterValue(request, ACCESS_TOKEN);
+        if(headerAT == null && paramAT == null){
+            throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
+                            "missing access token",
+                            HttpStatus.SC_BAD_REQUEST,
+                            null);
+        }
+
+        return headerAT == null?paramAT:headerAT;
     }
 }
