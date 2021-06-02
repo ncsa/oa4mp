@@ -77,7 +77,7 @@ if[
     say('*** WLCG_CS  inside conditional');
 
          sys_err.ok := false;
-    sys_err.message := 'User does not have access to this capability set. Request denied.';
+    sys_err.message := 'User does not have access to this capability set.';
   sys_err.error_type := 'access_denied';
     return(wlcg_cs.);
   ]else[

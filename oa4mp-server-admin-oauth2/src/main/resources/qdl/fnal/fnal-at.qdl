@@ -35,8 +35,6 @@
  acl_check();
  EPE := 'eduPersonEntitlement';
 
-assert[3<2]['fail!'];
-
 if[
      script_args() != 2
   ]then[
