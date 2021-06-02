@@ -11,6 +11,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e978b12f-4441-4d62-90dd-04c86c0aa044" name="Default Changelist" comment="CIL-936, CIL-922. Fixed verification of public clients, changed base 32 encoding so padding not needed. Documentation, as always.">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/myproxy-logon/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/myproxy-logon/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/myproxy-website/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/myproxy-website/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-client-api/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-client-api/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-client-loader-oauth1/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-client-loader-oauth1/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-client-loader-oauth2/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-client-loader-oauth2/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-client-oauth1/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-client-oauth1/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-client-oauth2/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-client-oauth2/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-client-test/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-client-test/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-client-webapp/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-client-webapp/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-co-oidc/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-co-oidc/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-gui/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-gui/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-oidc-twofactor/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-oidc-twofactor/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-qdl/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-qdl/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth1/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth1/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/allclasses-frame.html" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/allclasses-frame.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/allclasses-noframe.html" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/allclasses-noframe.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/constant-values.html" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/constant-values.html" afterDir="false" />
@@ -36,6 +52,25 @@
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin-javadoc.jar" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin-javadoc.jar" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin-sources.jar" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin-sources.jar" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin.jar" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-api/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-api/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-loader-oauth1/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-loader-oauth1/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/storage/clients/OA2ClientConverter.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/storage/clients/OA2ClientConverter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth1/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth1/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-test-oauth2/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-test-oauth2/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-test/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-test/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-skin/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-skin/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-twofactor/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-twofactor/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-webapp/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-webapp/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-website/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-website/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-website/src/site/apt/index.apt" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-website/src/site/apt/index.apt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-website/src/site/site.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-website/src/site/site.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-website/src/site/xhtml/server/dtd/server-dtd-content-tags.xhtml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-website/src/site/xhtml/server/dtd/server-dtd-content-tags.xhtml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-xsede-oauth2/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-xsede-oauth2/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-xsede/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-xsede/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -56,7 +91,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="5.1.1" />
+        <entry key="$PROJECT_DIR$" value="master" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -117,7 +152,7 @@
       <recent name="edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.OA2 CLC">
+  <component name="RunManager" selected="JUnit.OA2 test suite">
     <configuration name="OA2 CLC" type="Application" factoryName="Application">
       <option name="ALTERNATIVE_JRE_PATH" value="1.8_261" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
@@ -440,7 +475,7 @@
       <workItem from="1620040588342" duration="52070000" />
       <workItem from="1620659826120" duration="38283000" />
       <workItem from="1621262635525" duration="72988000" />
-      <workItem from="1621855845034" duration="101034000" />
+      <workItem from="1621855845034" duration="102787000" />
     </task>
     <task id="LOCAL-00001" summary="IDE caused some version issues, lots of documentation updates. First cut of RFC8628 impl">
       <created>1613086394676</created>
@@ -610,7 +645,14 @@
       <option name="project" value="LOCAL" />
       <updated>1622648635477</updated>
     </task>
-    <option name="localTasksCounter" value="25" />
+    <task id="LOCAL-00025" summary="Last checkin before release. CIL-607.">
+      <created>1622648933839</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1622648933839</updated>
+    </task>
+    <option name="localTasksCounter" value="26" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -641,7 +683,8 @@
     <MESSAGE value="CIL-985, CIL-947" />
     <MESSAGE value="CIL-986" />
     <MESSAGE value="Last minute commits before branching. CIL-607." />
-    <option name="LAST_COMMIT_MESSAGE" value="Last minute commits before branching. CIL-607." />
+    <MESSAGE value="Last checkin before release. CIL-607." />
+    <option name="LAST_COMMIT_MESSAGE" value="Last checkin before release. CIL-607." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
