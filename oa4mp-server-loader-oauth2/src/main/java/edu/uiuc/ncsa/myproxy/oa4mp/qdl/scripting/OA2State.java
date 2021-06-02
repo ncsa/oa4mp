@@ -35,9 +35,10 @@ public class OA2State extends State {
                     ModuleMap moduleMap,
                     MyLoggingFacade myLoggingFacade,
                     boolean isServerMode,
+                    boolean assertionsOn,
                     boolean strictACLs) {
         super(resolver, symbolStack, opEvaluator, metaEvaluator,
-                ft, moduleMap, myLoggingFacade, isServerMode);
+                ft, moduleMap, myLoggingFacade, isServerMode, assertionsOn);
         this.strictACLs = strictACLs;
     }
 

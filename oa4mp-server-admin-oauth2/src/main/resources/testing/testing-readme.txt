@@ -34,33 +34,33 @@ When a new version is deployed, here is the testing order
      No configuration of any sort (i.e., cfg is unset, strict scopes etc)
      Most common configuration in production.
      ** Must pass **
-     Test exchange and revocation.
-        This will exchange sets of tokens and introspect on them.
-        standard up through get_at. Then
-        introspect
-          > true
-        introspect -rt
-          > true
-        revoke // invalidates access token
-          > ok
-        introspect // invalidated access token should not be valid
-          > false
-        exchange
-          FAILS (because access token should be invalid and that is used as bearer token)
-        exchange -at -x // Have to use refresh token to get back new access token
-        introspect
-          > true
-        exchange -rt // get a new refresh token
-        introspect -rt
-          > true
-        revoke -rt
-          > ok
-        introspect -rt
-          > false
-        exchange -rt
-          FAILS
-        exchange -at
-          New access token (since swapping with valid one)
+  Test any client for exchange, introspection and revocation.
+     This will exchange sets of tokens and introspect on them.
+     standard up through get_at. Then
+     introspect
+       > true
+     introspect -rt
+       > true
+     revoke // invalidates access token
+       > ok
+     introspect // invalidated access token should not be valid
+       > false
+     exchange
+       FAILS (because access token should be invalid and that is used as bearer token)
+     exchange -at -x // Have to use refresh token to get back new access token
+     introspect
+       > true
+     exchange -rt // get a new refresh token
+     introspect -rt
+       > true
+     revoke -rt
+       > ok
+     introspect -rt
+       > false
+     exchange -rt
+       FAILS
+     exchange -at
+       New access token (since swapping with valid one)
      At this point, the refresh token is invalid and while you can exchange ATs, you cannot ever get another RT
      which is as it should be. If the access token expires, then any attempts to exchange or refresh fail.
   -- localhost:test/no_qdl
@@ -328,3 +328,14 @@ TO DO:
     "identity":  {"type": "identity"}
   }}
 
+
+{"tokens": {"identity": {
+                      "qdl":  {
+                       "load": "ncsa/glick-dda9f0.qdl",
+                       "xmd": {"exec_phase":   [
+                        "pre_auth",
+                        "post_token"
+                       ]}
+                      },
+                      "type": "identity"
+                     }}}

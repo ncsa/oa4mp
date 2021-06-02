@@ -62,7 +62,7 @@ public class RFC8628Servlet extends MyProxyDelegationServlet implements RFC8628C
         }
         for (Identifier id : getServiceEnvironment().getTransactionStore().keySet()) {
             OA2ServiceTransaction transaction = (OA2ServiceTransaction) getServiceEnvironment().getTransactionStore().get(id);
-            if (transaction.isRFC8628Request()) {
+            if (transaction != null && transaction.isRFC8628Request()) {
                 RFC8628State rfc8628State = transaction.getRFC8628State();
                 if (!isTrivial(rfc8628State.userCode) && rfc8628State.deviceCode != null) {
                     cache.put(rfc8628State.userCode, rfc8628State.deviceCode.toString());

@@ -27,7 +27,18 @@ public class OA2ClientKeys extends ClientKeys {
     String signTokens="sign_tokens";
     String publicClient="public_client";
     String strictScopes="strict_scopes";
+    String audience="audience";
+    String resource="resource";
 
+    public String audience(String... x) {
+           if (0 < x.length) audience= x[0];
+           return audience;
+       }
+
+    public String resource(String... x) {
+           if (0 < x.length) resource= x[0];
+           return resource;
+       }
 
      public String strictScopes(String... x) {
          if (0 < x.length) strictScopes= x[0];

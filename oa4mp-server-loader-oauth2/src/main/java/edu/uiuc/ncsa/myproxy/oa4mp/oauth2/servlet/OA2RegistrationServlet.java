@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractRegistrationServlet;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.util.NewClientEvent;
 import edu.uiuc.ncsa.security.core.exceptions.RetryException;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
@@ -188,7 +189,7 @@ public class OA2RegistrationServlet extends AbstractRegistrationServlet {
         OA2Client client = (OA2Client) setupNewClient(request, response);
 
         if (fireClientEvents) {
-            fireNewClientEvent(client);
+            fireNewClientEvent(new NewClientEvent(this,client));
         }
         return client;
     }

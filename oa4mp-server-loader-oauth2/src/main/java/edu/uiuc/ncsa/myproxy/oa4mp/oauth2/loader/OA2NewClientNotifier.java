@@ -2,6 +2,8 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.util.ACNewClientEvent;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.util.NewAdminClientEvent;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.NewClientEvent;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.NewClientNotifier;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
@@ -74,9 +76,9 @@ public class OA2NewClientNotifier extends NewClientNotifier {
         }
         BaseClient client = notificationEvent.getClient();
         Map<String, String> replacements = getReplacements(client);
-
+        boolean done = false;
         boolean rc = false;
-        if (client instanceof AdminClient) {
+        if (notificationEvent instanceof NewAdminClientEvent) {
             String subject = "New administrative client registration on ${host}";
             String body = "A new administrative client has requested approved on ${host}\n\n"
                     + "If you approve this request, you should send a notice\n" +
@@ -88,8 +90,40 @@ public class OA2NewClientNotifier extends NewClientNotifier {
                     "Name: ${name}\n" +
                     "Contact email: ${email}";
             rc = mailUtil.sendMessage(subject, body, replacements);
+            done = true;
+        }
+        //CIL-607 fix. May want to make templates customizable?
+        if (notificationEvent instanceof ACNewClientEvent) {
+            replacements.put("admin_id", ((ACNewClientEvent) notificationEvent).getAdminClient().getIdentifierString());
+            String subject = "New client created by admin ${admin_id}";
+            String body = "An OIDC client has been created on ${host}.\n" +
+                    "\n" +
+                    "\n" +
+                    " Admin identifier : ${admin_id}\n" +
+                    "Client identifier : ${identifier}\n" +
+                    "    Creation time : ${creationTime}\n" +
+                    "\n" +
+                    "\n" +
+                    "            Name  : ${name}\n" +
+                    "   Contact email  : ${email}\n" +
+                    "        Home uri  : ${homeUri}\n" +
+                    "          Scopes  : ${scopes}\n" +
+                    "       Callbacks  :\n" +
+                    "${callback}\n" +
+                    "\n" +
+                    "\n" +
+                    " Refresh enabled?  : ${refreshEnabled}\n" +
+                    "Refresh lifetime?  : ${refreshLifetime}\n" +
+                    "           Issuer  : ${issuer}\n" +
+                    "     Sign tokens?  : ${signTokens}\n" +
+                    "   Proxy Limited?  : ${limitedProxy}\n" +
+                    "   Public client?  : ${isPublic}\n" +
+                    "   Strict Scopes?  : ${strictScopes}\n";
 
-        } else {
+            rc = mailUtil.sendMessage(subject, body, replacements);
+            done = true;
+        }
+        if (!done) {
             rc = mailUtil.sendMessage(replacements);
 
         }

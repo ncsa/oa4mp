@@ -175,6 +175,17 @@ public class AdminClient extends BaseClient {
                 ", issuer='" + issuer + '\'' +
                 ", maxClients=" + maxClients +
                 ", config=" + config +
+                ", new client notity=" + notifyOnNewClientCreate +
                 '}';
     }
+
+    public boolean isNotifyOnNewClientCreate() {
+        return notifyOnNewClientCreate;
+    }
+
+    public void setNotifyOnNewClientCreate(boolean notifyOnNewClientCreate) {
+        this.notifyOnNewClientCreate = notifyOnNewClientCreate;
+    }
+
+    boolean notifyOnNewClientCreate = false;
 }

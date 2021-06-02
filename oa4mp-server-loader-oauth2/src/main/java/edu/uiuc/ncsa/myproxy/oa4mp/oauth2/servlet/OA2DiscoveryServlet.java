@@ -68,7 +68,7 @@ public class OA2DiscoveryServlet extends DiscoveryServlet {
                 }
             }
         }
-        getOA2SE().getAdminClientStore();
+       // getOA2SE().getAdminClientStore();
         if (!st.hasMoreTokens()) {
             throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
                     "unsupported discovery url",

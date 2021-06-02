@@ -85,7 +85,8 @@ public class OA2SE extends ServiceEnvironmentImpl {
                  boolean rfc8693Enabled,
                  boolean qdlStrictACLs,
                  boolean safeGC,
-                 boolean rfc8628Enabled) {
+                 boolean rfc8628Enabled,
+                 boolean notifyOnACNewClientCreate) {
         super(logger,
                 mfp,
                 tsp,
@@ -118,6 +119,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.claimSource = claimSource;
         OA2Scopes.ScopeUtil.setScopes(scopes); //Probably need a better place to do this at some point. Probably.
 
+        this.notifyOnACNewClientCreate = notifyOnACNewClientCreate;
         this.refreshTokenEnabled = isRefreshTokenEnabled;
         if (this.refreshTokenEnabled) {
             logger.info("Refresh token support enabled");
@@ -426,7 +428,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
                 }
                 DebugUtil.trace(this, "got admin client " + ac.getIdentifierString());
                 VirtualOrganization vo = (VirtualOrganization) getVOStore().get(ac.getVirtualOrganization());
-                DebugUtil.trace(this, "got vo  " + (vo==null?"(none)":vo.getIdentifierString()));
+                DebugUtil.trace(this, "got vo  " + (vo == null ? "(none)" : vo.getIdentifierString()));
                 if (vo != null && vo.isValid()) {
                     return vo;
                 } else {
@@ -440,9 +442,15 @@ public class OA2SE extends ServiceEnvironmentImpl {
 
     @Override
     public List<Store> listStores() {
-        List<Store> stores =  super.listStores();
+        List<Store> stores = super.listStores();
         stores.add(getTxStore());
         stores.add(getVOStore());
         return stores;
+    }
+
+    boolean notifyOnACNewClientCreate = false;
+
+    public boolean isNotifyOnACNewClientCreate() {
+        return notifyOnACNewClientCreate;
     }
 }

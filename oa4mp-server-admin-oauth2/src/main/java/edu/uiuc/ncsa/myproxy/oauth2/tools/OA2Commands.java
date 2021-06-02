@@ -177,7 +177,8 @@ public class OA2Commands extends BaseCommands {
                     "  ",
                     getOA2SE().getAdminClientStore(),
                     getOA2SE().getClientApprovalStore(),
-                    getOA2SE().getPermissionStore());
+                    getOA2SE().getPermissionStore(),
+                    getOA2SE().getClientStore());
         }
         return oa2AdminClientCommands;
     }

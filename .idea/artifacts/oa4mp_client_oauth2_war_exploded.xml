@@ -60,6 +60,7 @@
           <element id="library" level="project" name="Maven: net.minidev:accessors-smart:1.2" />
           <element id="library" level="project" name="Maven: org.ow2.asm:asm:5.0.4" />
           <element id="library" level="project" name="Maven: org.slf4j:slf4j-api:1.7.25" />
+          <element id="library" level="project" name="Maven: org.slf4j:slf4j-simple:1.7.21" />
           <element id="library" level="project" name="Maven: org.postgresql:postgresql:42.2.2.jre7" />
           <element id="library" level="project" name="Maven: ch.obermuhlner:big-math:2.3.0" />
         </element>

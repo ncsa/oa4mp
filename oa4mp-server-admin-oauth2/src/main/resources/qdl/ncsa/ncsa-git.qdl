@@ -20,3 +20,18 @@ if[
 ]then[
      claims.uid := head(claims.eppn, '@'); // set search key
 ]; //end if
+
+// Sample of groups
+/*
+x.:=['doorg_ici','all_ncsa_employe','lsst_int_ncsa_its','prj_bw_users','grp_bw_crs_admin','lsst_nebula','grp_asd_scm','grp_its_os_admin','org_asd','grp_asd_webapp','prj_des_newgroup','mayo_ncsa','ici_monitoring_admin','mg_ncsa_user','all_lsst','grp_bldg_both','ache_mforge_admins','grp_jira_users','all_users','grp_bw_supp_staf','hipaa_room_npcf','list_allncsa','ache_vcenter_admin','user_group_test','ache_entity','jira-users','grp_asd_vsi','grp_ncsa_prac','grp_sys_isl2','lsst_admin_ncsa','lsst_users','prj_nebula_admin','lsst_int_lspdev','mg_admin','org_core','ache_bastion','list_staff','grp_web_iccp','prj_its','org_all_groups','lsst_reporting','its_testing','list_apcs','list_staffsanscenaffl','grp_web_ncsa','grp_psi','grp_radiant','grp_bldg_ncsa','lsst_infrastruct','prj_cerb_users','all_asd','all_building','grp_it','mis_iam_test','grp_its_os_usersne'];
+g. := ['mg_ncsa_user','mg_admin','mg_abv_user'];
+flow_states.accept_requests := reduce(@∨,has_value(g., x.));
+if[!flow_states.accept_requests][return();];
+
+
+Later he said he *might* want something like a regex match:
+flow_states.accept_requests :=  reduce(@∨,'mg_.*' ≈ x.);
+
+mask(x., -1 < list_starts_with(x., ['mg_']));
+
+*/

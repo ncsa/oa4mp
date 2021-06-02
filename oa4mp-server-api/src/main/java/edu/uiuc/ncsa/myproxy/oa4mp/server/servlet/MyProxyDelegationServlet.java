@@ -50,29 +50,6 @@ public abstract class MyProxyDelegationServlet extends EnvServlet implements Tra
      */
     public abstract ServiceTransaction verifyAndGet(IssuerResponse iResponse) throws IOException;
 
-    // Same as in client.
-    /**
-     * Servlet context key that points to the fully qualified file which contains the message
-     * body to be used in cases of server-side exceptions.
-     */
-    public static final String ERROR_NOTIFICATION_BODY_KEY = "oa4mp:server.error.message";
-    /**
-     * Servlet context key that points to the fully qualified file which contains the message
-     * subject to be used in cases of server-side exceptions.
-     */
-    public static final String ERROR_NOTIFICATION_SUBJECT_KEY = "oa4mp:server.error.subject";
-
-    static List<NotificationListener> notificationListeners = new ArrayList<NotificationListener>();
-
-    public static void addNotificationListener(NotificationListener notificationListener) {
-        if (!notificationListeners.contains(notificationListener)) {
-            notificationListeners.add(notificationListener);
-        }
-    }
-
-    public static boolean removeNotificationListener(NotificationListener notificationListener) {
-        return notificationListeners.remove(notificationListener);
-    }
 
     @Override
     public ServiceEnvironmentImpl loadProperties2() throws IOException {

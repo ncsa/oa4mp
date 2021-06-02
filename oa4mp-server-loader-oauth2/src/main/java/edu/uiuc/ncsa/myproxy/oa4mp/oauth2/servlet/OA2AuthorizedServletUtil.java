@@ -504,14 +504,34 @@ public class OA2AuthorizedServletUtil {
     /* *******
     End boiler-plate
      */
+
+    /**
+     * <h3>RFC 8707 support.</h3>
+     * Internally we call it audience (since the aud claim is returned),
+     * but the difference is that a resource is a list of URIs and the audience is
+     * a list of logical names or URIs.
+     * Generally we  encourage people to just use
+     * the resource parameter. <br/><br/>
+     *
+     * <b>Especial note:</b> The resource and audience configuration lives in the access token
+     * configuration of the client.<br/><br/>
+     *
+     * According to 2.1 in RFC 8707: <br/>
+     * "In the code flow (Section 4.1 of OAuth 2.0 [RFC6749]) where an intermediate
+     *   representation of the authorization grant (the authorization code) is
+     *   returned from the authorization endpoint, the requested resource is
+     *   applicable to the full authorization grant."
+     *  <br/><br/>
+     * We return these in the access token. We do allow that the user can pass these in
+     * as part of the authorization request, but merely record the fact for the access
+     * token, since we do not have some use of resource/audience for authorization grants.
+     * The spec simply (seems) to state that if it is present in the auth request, it should
+     * apply to that too.
+     * @param state
+     */
     public void figureOutAudienceAndResource(TransactionState state) {
         OA2ServiceTransaction t = (OA2ServiceTransaction) state.getTransaction();
-        // RFC 8707 support.
-        // Internally we call it audience (since the aud claim is returned),
-        // but the difference is that a resource is a list of URIs and the audience is
-        // a list of logical names or URIs.
-        // Generally we  encourage people to just use
-        // the resource parameter.
+
         String[] rawResource = state.getRequest().getParameterValues(RFC8693Constants.RESOURCE);
         String[] rawAudience = state.getRequest().getParameterValues(RFC8693Constants.AUDIENCE);
 

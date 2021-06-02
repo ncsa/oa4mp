@@ -57,20 +57,7 @@ public class OA2ServletInitializer extends OA4MPServletInitializer {
         if (isInitRun) return;
         super.init();
         OA2SE oa2SE = (OA2SE) getEnvironment();
-            // Nest block is now handled better in super class.
-/*        try {
-                    MyProxyDelegationServlet mps = (MyProxyDelegationServlet) getServlet();
 
-          mps.processStoreCheck(oa2SE.getPermissionStore());
-            mps.processStoreCheck(oa2SE.getAdminClientStore());
-            mps.processStoreCheck(oa2SE.getTxStore());
-            mps.processStoreCheck(oa2SE.getVOStore());
-        } catch (SQLException e) {
-            if (DebugUtil.isEnabled()) {
-                e.printStackTrace();
-            }
-            throw new ServletException("Could not update table", e);
-        }*/
         if (oa2SE.isRefreshTokenEnabled()) {
             MyProxyDelegationServlet.transactionCleanup.getRetentionPolicies().clear(); // We need a different set of policies than the original one.
             MyProxyDelegationServlet.transactionCleanup.addRetentionPolicy(
@@ -111,7 +98,8 @@ public class OA2ServletInitializer extends OA4MPServletInitializer {
                         new ModuleMap(),
                         null, // no logging at least for now
                         true,
-                        false); // default in server mode, but can be overridden later
+                        false,
+                        true); // default in server mode, but can be overridden later
             }
         });
         if (oa2SE.isRfc8628Enabled()) {

@@ -1,0 +1,37 @@
+/*
+   Custom script for Bill Glick's client with id cilogon:/client_id/64d029bb7ea79ffcb29314be1edda9f0
+   This returns all isMemberOf claims that start with 'mg_'.
+
+
+  tokens{
+    identity{
+    type=identity
+    qdl{
+        load="ncsa/glick-dda9f0.qdl"
+        xmd={exec_phase=["pre_auth","post_token"]}
+      }// end qdl
+    } //end identity token
+  } //end tokens
+
+*/
+
+script_load('ncsa/ncsa-default.qdl',true);
+say('got past ncsa-default');
+
+if[claims.idp != idp.ncsa][return();]; // never process anything unless IDP is right.
+
+if[exec_phase == 'pre_auth']then[return();];
+
+s. := claims.isMemberOf.; // keep it less verbose below
+
+g. := ['mg_ncsa_user','mg_admin','mg_abv_user']; // restricted groups.
+
+flow_states.accept_requests := reduce(@||,has_value(g., s.));
+
+if[!flow_states.accept_requests][return();]; // hop out if not in group.
+
+claims.cilogon_uid := to_uri(claims.sub).path - '/server' - '/users/';
+
+s. :=  mask(s., -1 < list_starts_with(s., ['mg_']));
+
+claims.isMemberOf. := s.;

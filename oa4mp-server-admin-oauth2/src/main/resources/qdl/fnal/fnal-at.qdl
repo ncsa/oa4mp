@@ -35,6 +35,7 @@
  acl_check();
  EPE := 'eduPersonEntitlement';
 
+assert[3<2]['fail!'];
 
 if[
      script_args() != 2
@@ -99,7 +100,7 @@ requested_scopes. := {}; // which scope request to check
 
 say('         caps = ' + to_string(caps.));
 say('      scopes. ='  +  to_string(scopes., true));
-
+ // requested_scopes. := 0 < size(tx_scopes.) ? tx_scopes. : scopes.;
 if[
      0 < size(tx_scopes.)
   ][

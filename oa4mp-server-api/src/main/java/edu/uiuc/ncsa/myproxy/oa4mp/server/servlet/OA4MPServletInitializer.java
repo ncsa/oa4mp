@@ -92,6 +92,7 @@ public class OA4MPServletInitializer implements Initialization {
         MyLoggingFacade logger = env.getMyLogger();
         NewClientNotifier newClientNotifier = createNewClientNotifier(env.getMailUtil(), logger);
         MyProxyDelegationServlet.addNotificationListener(newClientNotifier);
+
         String fName = mps.getServletContext().getInitParameter(ERROR_NOTIFICATION_SUBJECT_KEY);
         if (fName == null) {
             logger.info("No error notification subject set. Skipping...");

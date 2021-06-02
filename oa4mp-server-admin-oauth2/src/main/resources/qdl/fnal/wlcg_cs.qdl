@@ -33,8 +33,9 @@ if[size(x.) == 0][return(wlcg_cs.);]; // no request cs, nothing to do.
 if[
    1<size(x.)
    ][
-        sys_err.ok := false;
+             sys_err.ok := false;
         sys_err.message := 'Multiple ' + CS + ' scopes are unsupported.';
+      sys_err.errorType := 'access_denied';
         return(wlcg_cs.);
    ];
 
@@ -64,13 +65,23 @@ say('*** WLCG_CS requested_scopes after remove  ' + to_string(requested_scopes.)
 
    Implementation: This must be in the user's LDAP record as an EPE.
 */
+say('*** WLCG_CS is_defined  ' + to_string(is_defined(at_claims.EPE.)));
+say('*** WLCG_CS  has_value  ' + to_string(has_value(c, at_claims.EPE.)));
+zzz := (!is_defined(at_claims.EPE.)) || (!has_value(c, at_claims.EPE.));
+say('*** WLCG_CS  zzz =   ' + to_string(zzz));
+
 if[
-   !is_defined(at_claims.EPE.) || !has_value(c, at_claims.EPE.)
+   (!is_defined(at_claims.EPE.)) || (!has_value(c, at_claims.EPE.))
   ][
     // blow up if the user is not allowed
-    sys_err.ok := false;
+    say('*** WLCG_CS  inside conditional');
+
+         sys_err.ok := false;
     sys_err.message := 'User does not have access to this capability set. Request denied.';
+  sys_err.error_type := 'access_denied';
     return(wlcg_cs.);
+  ]else[
+    say('*** WLCG_CS  FAILED conditional');
   ];
 
 u. := to_uri(c);

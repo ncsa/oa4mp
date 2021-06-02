@@ -30,6 +30,7 @@ public class AdminClientConverter<V extends AdminClient> extends BaseClientConve
     @Override
     public V fromJSON(JSONObject json) {
         V v = super.fromJSON(json);
+        v.setNotifyOnNewClientCreate(getJsonUtil().getJSONValueBoolean(json, getACK().notifyOnNewClientCreate()));
         v.setIssuer(getJsonUtil().getJSONValueString(json, getACK().issuer()));
         v.setExternalVOName(getJsonUtil().getJSONValueString(json, getACK().vo()));
         v.setVirtualOrganization(BasicIdentifier.newID(getJsonUtil().getJSONValueString(json, getACK().voURI())));
@@ -56,6 +57,9 @@ public class AdminClientConverter<V extends AdminClient> extends BaseClientConve
         if(map.containsKey(getACK().allowQDL())) {
             // older clients won't have this, so don't force the issue.
             value.setAllowQDL(map.getBoolean(getACK().allowQDL()));
+        }
+        if(map.containsKey(getACK().notifyOnNewClientCreate())){
+            value.setNotifyOnNewClientCreate(map.getBoolean(getACK().notifyOnNewClientCreate()));
         }
         // implies that this might be a legacy admin client and has a database entry that is null
         // rather than an integer. In that case, set it to the default.
@@ -85,6 +89,7 @@ public class AdminClientConverter<V extends AdminClient> extends BaseClientConve
         getJsonUtil().setJSONValue(json, getACK().issuer(), client.getIssuer());
         getJsonUtil().setJSONValue(json, getACK().maxClients(), client.getMaxClients());
         getJsonUtil().setJSONValue(json, getACK().allowQDL(), client.isAllowQDL());
+        getJsonUtil().setJSONValue(json, getACK().notifyOnNewClientCreate(), client.isNotifyOnNewClientCreate());
         if (client.getConfig() != null && !client.getConfig().isEmpty()) {
             json.put(getACK().config(), client.getConfig());
         }
@@ -97,6 +102,7 @@ public class AdminClientConverter<V extends AdminClient> extends BaseClientConve
         map.put(getACK().voURI(), client.getVirtualOrganization());
         map.put(getACK().maxClients(), client.getMaxClients());
         map.put(getACK().allowQDL(), client.isAllowQDL());
+        map.put(getACK().notifyOnNewClientCreate(), client.isNotifyOnNewClientCreate());
         if (client.getConfig() != null && !client.getConfig().isEmpty()) {
             map.put(getACK().config(), client.getConfig().toString(1)); // make it pretty at least...
         }

@@ -12,6 +12,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo.VirtualOrganization;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractAccessTokenServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.IssuerTransactionState;
+import edu.uiuc.ncsa.qdl.exceptions.AssertionException;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.cache.Cleanup;
 import edu.uiuc.ncsa.security.core.exceptions.IllegalAccessException;
@@ -36,6 +37,7 @@ import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
 import edu.uiuc.ncsa.security.oauth_2_0.*;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTRunner;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTUtil2;
+import edu.uiuc.ncsa.security.oauth_2_0.jwt.ScriptRuntimeException;
 import edu.uiuc.ncsa.security.oauth_2_0.server.*;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSourceFactory;
@@ -380,6 +382,11 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             // so if this is not done, the wrong token type will be returned.
             jwtRunner.doTokenExchange();
 
+        } catch (AssertionException assertionError) {
+            throw new OA2ATException(OA2Errors.INVALID_REQUEST, assertionError.getMessage(),HttpStatus.SC_BAD_REQUEST, t.getRequestState());
+        } catch (ScriptRuntimeException sre) {
+            // Client threw an exception.
+            throw new OA2ATException(sre.getRequestedType(), sre.getMessage(), t.getRequestState());
         } catch (IllegalAccessException iax) {
             // implies that the at some point there was a change in access allowed, e.g. a script
             // set a policy that denied it.
@@ -445,8 +452,6 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
 
 
     }
-
-
 
 
     /**
@@ -572,6 +577,11 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         }
         try {
             jwtRunner.doTokenClaims();
+        } catch (AssertionException assertionError) {
+            throw new OA2ATException(OA2Errors.INVALID_REQUEST, assertionError.getMessage(),HttpStatus.SC_BAD_REQUEST, st2.getRequestState());
+        } catch (ScriptRuntimeException sre) {
+            // Client threw an exception.
+            throw new OA2ATException(sre.getRequestedType(), sre.getMessage(), st2.getRequestState());
         } catch (IllegalAccessException iax) {
             throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
                     "access denied",
@@ -864,6 +874,11 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, t, txRecord, request);
         try {
             jwtRunner.doRefreshClaims();
+        } catch (AssertionException assertionError) {
+            throw new OA2ATException(OA2Errors.INVALID_REQUEST, assertionError.getMessage(),HttpStatus.SC_BAD_REQUEST, t.getRequestState());
+        } catch (ScriptRuntimeException sre) {
+            // Client threw an exception.
+            throw new OA2ATException(sre.getRequestedType(), sre.getMessage(), t.getRequestState());
         } catch (IllegalAccessException iax) {
             throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
                     "access denied",

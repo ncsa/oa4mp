@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.server.servlet;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.server.util.NewClientEvent;
 import edu.uiuc.ncsa.security.core.exceptions.RetryException;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.servlet.Presentable;
@@ -32,7 +33,7 @@ public class RegistrationServlet extends AbstractRegistrationServlet {
             request.setAttribute("client", client);
             throw new RetryException("public key could not be parsed. " + t.getMessage());
         }
-        fireNewClientEvent(client);
+        fireNewClientEvent(new NewClientEvent(this,client));
         return client;
     }
 }

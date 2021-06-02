@@ -16,7 +16,10 @@ import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
 
 import java.io.StringReader;
+import java.net.URI;
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 
@@ -46,10 +49,21 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         }
         if (map.get(getCK2().strictScopes()) != null) {
             otherV.setStrictscopes(map.getBoolean(getCK2().strictScopes()));
-
         }
         if (map.get(getCK2().scopes()) != null) {
             otherV.setScopes(jsonArrayToCollection(map, getCK2().scopes()));
+        }
+        if (map.get(getCK2().audience()) != null) {
+            otherV.setAudience(jsonArrayToCollection(map, getCK2().audience()));
+        }
+        if (map.get(getCK2().resource()) != null) {
+           Collection<String> collection= jsonArrayToCollection(map, getCK2().resource()); // This is now strings.
+
+            JSONArray jsonArray = new JSONArray();
+            for(String x: collection){
+                jsonArray.add(URI.create(x));
+            }
+            otherV.setAudience(jsonArray);
         }
         if (map.get(getCK2().publicClient()) != null) {
             otherV.setPublicClient(map.getBoolean(getCK2().publicClient()));
@@ -104,8 +118,8 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
                 // Extra hoop allows us to process HOCON format in addition to JSON.
                 String tempcfg = map.getString(getCK2().cfg());
                 if (!isTrivial(tempcfg)) {
-               //     System.out.println(map.getString(getCK2().identifier()));
-               //     System.out.println("\"" + tempcfg + "\"");
+                    //     System.out.println(map.getString(getCK2().identifier()));
+                    //     System.out.println("\"" + tempcfg + "\"");
                     StringReader stringReader = new StringReader(tempcfg);
                     Config conf = ConfigFactory.parseReader(stringReader);
                     String rawJSON = conf.root().render(ConfigRenderOptions.concise());
@@ -198,13 +212,26 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         map.put(getCK2().strictScopes(), client.useStrictScopes());
         if (client.getScopes() != null) {
             JSONArray scopes = new JSONArray();
-
             for (String s : client.getScopes()) {
                 scopes.add(s);
             }
-
             map.put(getCK2().scopes(), scopes.toString());
         }
+        if (client.getAudience() != null) {
+            JSONArray aud = new JSONArray();
+            for (String s : client.getAudience()) {
+                aud.add(s);
+            }
+            map.put(getCK2().audience(), aud.toString());
+        }
+        if (client.getResource() != null) {
+            JSONArray resources = new JSONArray();
+            for (URI s : client.getResource()) {
+                resources.add(s.toString());
+            }
+            map.put(getCK2().audience(), resources.toString());
+        }
+
         if (client.getLdaps() != null && !client.getLdaps().isEmpty()) {
             map.put(getCK2().ldap(), getLdapConfigurationUtil().toJSON(client.getLdaps()).toString());
         }
@@ -242,6 +269,24 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
             Collection<String> zzz = (Collection<String>) JSONSerializer.toJava(array);
             v.setScopes(zzz);
         }
+        JSON aud = (JSON) getJsonUtil().getJSONValue(json, getCK2().audience());
+        if (aud != null && aud instanceof JSONArray) {
+            JSONArray array = (JSONArray) json.getJSONObject(getJSONComponentName()).get(getCK2().audience());
+            Collection<String> zzz = (Collection<String>) JSONSerializer.toJava(array);
+            v.setAudience(zzz);
+        }
+        JSON resources = (JSON) getJsonUtil().getJSONValue(json, getCK2().resource());
+        if(resources != null && !resources.isEmpty()){
+            JSONArray array = (JSONArray) json.getJSONObject(getJSONComponentName()).get(getCK2().resource());
+            Collection<String> zzz = (Collection<String>) JSONSerializer.toJava(array);
+            List<URI> x = new LinkedList<>();
+            for(String s : zzz){
+                x.add(URI.create(s));
+            }
+            v.setResource(x);
+        }
+
+
         JSON ldaps = (JSON) getJsonUtil().getJSONValue(json, getCK2().ldap());
         if (ldaps != null) {
             v.setLdaps(getLdapConfigurationUtil().fromJSON(ldaps));
@@ -269,13 +314,30 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         if (callbacks.size() != 0) {
             getJsonUtil().setJSONValue(json, getCK2().callbackUri(), callbacks);
         }
-        JSONArray scopes = new JSONArray();
+        JSONArray aud = new JSONArray();
+        Collection<String> audience = client.getAudience();
+        for (String x : audience) {
+            aud.add(x);
+        }
+        if (aud.size() != 0) {
+            getJsonUtil().setJSONValue(json, getCK2().audience(), aud);
+        }
+
+        JSONArray res = new JSONArray();
+        List<URI> resources = client.getResource();
+        for(URI uri:resources){
+               res.add(uri.toString());
+
+        }
+        if(res.size() != 0){
+            getJsonUtil().setJSONValue(json, getCK2().resource(), res);
+        }
+
         // Fix CIL-519: converter must serialize configuration object in toJSON call
         if (client.getConfig() != null && !client.getConfig().isEmpty()) {
             //json.put(getCK2().cfg(), client.getConfig());
             getJsonUtil().setJSONValue(json, getCK2().cfg(), client.getConfig());
         }
-        Collection<String> scopeList = client.getScopes();
 
         if (client.getIssuer() != null) {
             getJsonUtil().setJSONValue(json, getCK2().issuer(), client.getIssuer());
@@ -284,6 +346,10 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         getJsonUtil().setJSONValue(json, getCK2().signTokens(), client.isSignTokens());
         getJsonUtil().setJSONValue(json, getCK2().publicClient(), client.isPublicClient());
         getJsonUtil().setJSONValue(json, getCK2().strictScopes(), client.useStrictScopes());
+
+        JSONArray scopes = new JSONArray();
+        Collection<String> scopeList = client.getScopes();
+
         for (String x : scopeList) {
             scopes.add(x);
         }

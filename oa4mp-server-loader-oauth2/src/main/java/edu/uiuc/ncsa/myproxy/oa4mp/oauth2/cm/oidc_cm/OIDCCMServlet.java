@@ -9,6 +9,9 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientKeys;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.EnvServlet;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.util.ACNewClientEvent;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.util.NewClientEvent;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.util.NewClientListener;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
@@ -19,6 +22,7 @@ import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2GeneralError;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Scopes;
+import edu.uiuc.ncsa.security.servlet.NotificationListener;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
@@ -256,9 +260,15 @@ public class OIDCCMServlet extends EnvServlet {
                     null
             );
         }
-
     }
 
+    protected void fireNewClientEvent(NewClientEvent newClientEvent) {
+        for (NotificationListener notificationListener : notificationListeners) {
+            if (notificationListener instanceof NewClientListener) {
+                ((NewClientListener) notificationListener).fireNewClientEvent(newClientEvent);
+            }
+        }
+    }
     /**
      * Update a client. Note that as per the specification, all values that are sent over-write existing
      * values and omitted values are taken to mean the stored value is unset.
@@ -486,6 +496,10 @@ public class OIDCCMServlet extends EnvServlet {
             throw new IllegalArgumentException("Error: incorrect argument. Not a valid JSON request");
         }
         OA2Client client = processRegistrationRequest((JSONObject) rawJSON, adminClient, httpServletResponse);
+        if(getOA2SE().isNotifyOnACNewClientCreate() || adminClient.isNotifyOnNewClientCreate()) {
+            // CIL-607
+            fireNewClientEvent(new ACNewClientEvent(this, adminClient, client));
+        }
         JSONObject jsonResp = new JSONObject(); // The response object.
         jsonResp.put(CLIENT_ID, client.getIdentifierString());
         if (!StringUtils.isTrivial(client.getSecret())) {

@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.server.servlet;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.server.util.NewClientEvent;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
@@ -25,7 +26,7 @@ public class AutoRegistrationServlet extends RegistrationServlet {
         if(client != null){
             approveClient(client.getIdentifier(), "auto-approver");
         }
-        fireNewClientEvent(client);
+        fireNewClientEvent(new NewClientEvent(this,client));
         return client;
     }
 

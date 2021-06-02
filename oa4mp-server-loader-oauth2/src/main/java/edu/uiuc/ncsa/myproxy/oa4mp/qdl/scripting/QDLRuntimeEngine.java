@@ -17,6 +17,7 @@ import edu.uiuc.ncsa.qdl.xml.XMLUtils;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
+import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.ScriptRuntimeException;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.ScriptingConstants;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
@@ -99,9 +100,9 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         if (transaction.hasScriptState()) {
             try {
                 deserializeState(transaction.getScriptState());
-            }catch(Throwable t){
+            } catch (Throwable t) {
                 DebugUtil.trace(this, "Could not deserialize stored transaction state:" + t.getMessage());
-                if(getState().getOa2se() != null){
+                if (getState().getOa2se() != null) {
                     getState().getOa2se().getMyLogger().warn("Could not deserialize stored transaction state:" + t.getMessage());
                 }
             }
@@ -109,6 +110,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         state.setServerMode(qe.isServerModeOn());
         state.getOpEvaluator().setNumericDigits(qe.getNumericDigits());
         state.setScriptPaths(qe.getScriptPath());  // Be sure script paths are read.
+        state.setAssertionsOn(qe.isAssertionsOn());
         if (qe != null && qe.isEnabled()) {
             try {
                 QDLConfigurationLoaderUtils.setupVFS(qe, state);
@@ -129,7 +131,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
 
             state.toXML(xsw);
             String xml2 = XMLUtils.prettyPrint(w.toString()); // We do this because whitespace matters. This controls it.
-        //    DebugUtil.trace(this, "\nSerialized state\n:" + xml2);
+            //    DebugUtil.trace(this, "\nSerialized state\n:" + xml2);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             GZIPOutputStream gzipOutputStream = new GZIPOutputStream(baos);
             gzipOutputStream.write(xml2.getBytes("UTF-8"));
@@ -248,6 +250,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
     protected String SYS_ERR_VAR = "sys_err" + STEM_INDEX_MARKER;
     protected String SYS_ERR_OK = "ok";
     protected String SYS_ERR_MESSAGE = "message";
+    protected String SYS_ERR_ERROR_TYPE = "error_type";
     protected String FLOW_STATE_VAR = "flow_states" + STEM_INDEX_MARKER;
     protected String CLAIMS_VAR = "claims" + STEM_INDEX_MARKER;
     protected String ACCESS_TOKEN_VAR = "access_token" + STEM_INDEX_MARKER;
@@ -442,7 +445,13 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
             StemVariable sysErr = (StemVariable) x;
             if (sysErr.containsKey(SYS_ERR_OK) && !sysErr.getBoolean(SYS_ERR_OK)) {
                 String message = sysErr.getString(SYS_ERR_MESSAGE);
-                throw new ScriptRuntimeException(message == null ? "(no message)" : message);
+                ScriptRuntimeException scriptRuntimeException = new ScriptRuntimeException(message == null ? "(no message)" : message);
+                if (sysErr.containsKey(SYS_ERR_ERROR_TYPE)) {
+                    scriptRuntimeException.setRequestedType(sysErr.getString(SYS_ERR_ERROR_TYPE));
+                } else{
+                    scriptRuntimeException.setRequestedType(sysErr.getString(OA2Errors.ACCESS_DENIED));
+                }
+                throw scriptRuntimeException;
             }
         }
         Map respMap = new HashMap();
@@ -514,17 +523,18 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
             });
 
             state.getTransaction().setScriptState(serializeState());
-        }catch(Throwable t){
+        } catch (Throwable t) {
             DebugUtil.trace(this, "Could not serialize stored transaction state:" + t.getMessage());
-            if(getState().getOa2se() != null){
+            if (getState().getOa2se() != null) {
                 getState().getOa2se().getMyLogger().warn("Could not serialize stored transaction state:" + t.getMessage());
             }
         }
         //runResponse.
         return new ScriptRunResponse("ok", respMap, ScriptRunResponse.RC_OK);
     }
-    protected void cleanUpState(String[] varNames){
-        for(String varName:varNames) {
+
+    protected void cleanUpState(String[] varNames) {
+        for (String varName : varNames) {
             if (state.isDefined(varName)) {
                 state.remove(varName);
             }

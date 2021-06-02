@@ -1,0 +1,58 @@
+/*
+   This is for the access token in LIGO. See the ligo.qdl file comments for more.
+   Jeff Gaynor
+   created: 2020-09-15T16:00:55Z
+   updated: 2020-10-19T20:09:03.181Z
+
+*/
+s := '';
+
+if[
+     claims.idp != 'https://login.ligo.org/idp/shibboleth'
+][
+     return();
+];
+/*
+Set "scope" to "read:/frames" if:
+ * user is in the "Communities:LSCVirgoLIGOGroupMembers" group in ldap.ligo.org
+ * user is in the "gw-astronomy:KAGRA-LIGO:members" group in ldap.gw-astronomy.cilogon.org
+
+This is in addition to the "read:/DQSegDB" and "write:/DQSegDB" values set according to the rules in CIL-796.
+*/
+
+if[
+      !is_defined(claims.isMemberOf.)
+  ]then[
+     sys_err.ok := false;
+     sys_err.message := 'Missing group information. Cannot determine scopes.';
+     return();
+];
+
+
+if[
+    in_group(claims.isMemberOf., 'Communities:LSCVirgoLIGOGroupMembers')
+  ]then[
+    s := s + ' read:/DQSegDB' + ' read:/frames';
+ ];
+
+if[
+   in_group(claims.isMemberOf., 'Communities:LVC:SegDB:SegDBWriter')
+  ]then[
+   s := s + ' ' + 'write:/DQSegDB';
+ ];
+
+if[
+   in_group(claims.isMemberOf., 'gw-astronomy:KAGRA-LIGO:members')
+  ]then[
+   s := s + ' ' + 'read:/frames';
+ ];
+
+ access_token.scope := s + ' jeff:debug';
+ if[
+      0 < size(tx_scopes.)
+   ][
+     requested_audience. := ['ANY', 'LIGO', 'segments.ligo.org']; // so its parts of a token exchange
+   ]else[
+    requested_scopes. := scopes.;
+ ];
+ access_token.aud := 'segments.ligo.org';

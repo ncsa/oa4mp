@@ -92,6 +92,7 @@ import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.*;
 public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends AbstractConfigurationLoader<T> {
     public static final String STRICT_ACLS = "strict_acls";
     public static final String SAFE_GARBAGE_COLLECTION = "safe_gc";
+    public static final String NOTIFY_ON_ADMIN_CLIENT_NEW_CLIENT = "acNewClientNotify";
     /**
      * Default is 15 days. Internally the refresh lifetime (as all date-ish things) are in milliseconds
      * though the configuration file is assumed to be in seconds.
@@ -160,7 +161,8 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     isRFC8693Enabled(),
                     isQdlStrictACLS(),
                     isSafeGC(),
-                    isRFC8628Enabled());
+                    isRFC8628Enabled(),
+                    isNotifyOnACNewClient());
 
             if (getClaimSource() instanceof BasicClaimsSourceImpl) {
                 ((BasicClaimsSourceImpl) getClaimSource()).setOa2SE((OA2SE) se);
@@ -190,6 +192,21 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         return loader.load();
     }
 
+    Boolean notifyOnACNewClient = null;
+    public boolean isNotifyOnACNewClient() {
+        if(notifyOnACNewClient == null){
+            try {
+                notifyOnACNewClient = Boolean.parseBoolean(getFirstAttribute(cn, NOTIFY_ON_ADMIN_CLIENT_NEW_CLIENT));
+            } catch (Throwable t) {
+                // use default which is to doo safe garbage collection.
+                // We let this be null to trigger pulling the value, if any, out of the
+                // the configuration
+                notifyOnACNewClient = Boolean.FALSE;
+            }
+            DebugUtil.trace(this, "notify when any admin client creates a new client? " + notifyOnACNewClient);
+        }
+        return notifyOnACNewClient;
+    }
     public boolean isSafeGC() {
         if(safeGC == null){
             try {

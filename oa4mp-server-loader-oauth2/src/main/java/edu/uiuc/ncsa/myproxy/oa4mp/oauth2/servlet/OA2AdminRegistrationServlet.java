@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractRegistrationServlet;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.util.NewAdminClientEvent;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.delegation.storage.BaseClient;
 import edu.uiuc.ncsa.security.servlet.PresentableState;
@@ -69,7 +70,7 @@ public class OA2AdminRegistrationServlet extends AbstractRegistrationServlet {
     @Override
     protected BaseClient addNewClient(HttpServletRequest request, HttpServletResponse response) throws Throwable {
         AdminClient client = (AdminClient) setupNewClient(request, response);
-        fireNewClientEvent(client);
+        fireNewClientEvent(new NewAdminClientEvent(this, client));
         return client;
     }
 

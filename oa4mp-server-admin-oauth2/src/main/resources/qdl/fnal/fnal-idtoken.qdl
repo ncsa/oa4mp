@@ -10,7 +10,6 @@ if[DEBUG][
        claims.uid := 'cilogontest';
 ]; // end debug block
 
-
 if[
      exec_phase == 'post_token'
  ][

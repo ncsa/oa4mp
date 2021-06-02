@@ -28,6 +28,7 @@ public class AdminClientTable extends BaseClientTable {
         getColumnDescriptor().add(new ColumnDescriptorEntry(ak().config(), Types.LONGVARCHAR));
         getColumnDescriptor().add(new ColumnDescriptorEntry(ak().maxClients(), Types.BIGINT));
         getColumnDescriptor().add(new ColumnDescriptorEntry(ak().allowQDL(), Types.BOOLEAN));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(ak().notifyOnNewClientCreate(), Types.BOOLEAN));
         getColumnDescriptor().add(new ColumnDescriptorEntry(ak().creationTS(), Types.TIMESTAMP));
     }
 }

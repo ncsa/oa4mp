@@ -49,10 +49,10 @@ public abstract class AbstractRegistrationServlet extends MyProxyDelegationServl
         return ERROR_STATE; // something is wrong with the request or state,
     }
 
-    protected void fireNewClientEvent(BaseClient client) {
+    protected void fireNewClientEvent(NewClientEvent newClientEvent) {
         for (NotificationListener notificationListener : notificationListeners) {
             if (notificationListener instanceof NewClientListener) {
-                ((NewClientListener) notificationListener).fireNewClientEvent(new NewClientEvent(this, client));
+                ((NewClientListener) notificationListener).fireNewClientEvent(newClientEvent);
             }
         }
     }

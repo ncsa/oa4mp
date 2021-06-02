@@ -16,6 +16,7 @@ import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -128,6 +129,26 @@ public class OA2Client extends Client implements OA2ClientScopes {
         return 0 < rtLifetime;
     }
 
+    public Collection<String> getAudience() {
+        return audience;
+    }
+
+    public void setAudience(Collection<String> audience) {
+        this.audience = audience;
+    }
+
+    Collection<String> audience;
+
+    public List<URI> getResource() {
+        return resource;
+    }
+
+    public void setResource(List<URI> resource) {
+        this.resource = resource;
+    }
+
+    List<URI> resource;
+
     public Collection<String> getScopes() {
         return scopes;
     }
@@ -181,7 +202,7 @@ public class OA2Client extends Client implements OA2ClientScopes {
         return (AccessTokenConfig) setupPayloadConfig(atConfig, TOKENS_KEY, ACCESS_TOKENS_KEY);
     }
 
-    public void setAccessToken(AccessTokenConfig cfg) {
+    public void setAccessTokenConfig(AccessTokenConfig cfg) {
         //set(getConfig(), TOKENS_KEY, ACCESS_TOKENS_KEY, cfg.toJSON());
         setPayloadConfig(cfg, TOKENS_KEY, ACCESS_TOKENS_KEY);
     }

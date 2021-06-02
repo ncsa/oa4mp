@@ -73,6 +73,10 @@ public class TXRecord extends IdentifiableImpl {
         return scopes;
     }
 
+    /**
+     * The requested token type from the TX request.
+     * @return
+     */
     public String getTokenType() {
         return tokenType;
     }
