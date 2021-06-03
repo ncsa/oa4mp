@@ -235,7 +235,11 @@ When a new version is deployed, here is the testing order
      Has the original NCSA functor configuration on it. Many installs use this.
      IDP: NCSA only
 
-  -- dev:/test/qdl_ncsa
+  -- dev:/test/ncsa_qdl
+     Has standard ncsa/ncsa-default.qdl script with plain vanilla configuration
+     Critical regression test.
+      -- Should get full claims as list
+      -- check that returned id token from refresh and exchange still have isMemberOf as flat list.
   
   -- dev:/test/fnal
      IDP: Github

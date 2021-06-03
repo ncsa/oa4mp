@@ -416,7 +416,7 @@ public class OA2CLCCommands extends CLCCommands {
             if (isTrivial(errorCode)) {
                 say("Error! (no code)");
             } else {
-                say("Error! The code is:" + errorCode);
+                say("Error! The code is: " + errorCode);
             }
             if (!isTrivial(errorDescription)) {
                 say("       description: " + URLDecoder.decode(errorDescription, "UTF-8"));
@@ -735,12 +735,13 @@ public class OA2CLCCommands extends CLCCommands {
     public static final String NO_VERIFY_JWT = "-no_verify";
 
     protected void getRTHelp() {
-        say("get_rt [" + CLAIMS_FLAG + " | " + NO_VERIFY_JWT + "]:");
+        say("refresh [" + CLAIMS_FLAG + " | " + NO_VERIFY_JWT + "]:");
         sayi("Usage: Get new refresh and access tokens.");
         sayi("You must have already called get_at first *and* the server must issue refresh");
         sayi("tokens. This will print out a summary of the expiration time.");
         sayi(CLAIMS_FLAG + " = the id token will be printed");
         sayi(NO_VERIFY_JWT + " = do not verify JWTs against server. Default is to verify.");
+        sayi("Alias: get_rt");
         sayi("See also: get_at");
     }
 
@@ -943,18 +944,19 @@ public class OA2CLCCommands extends CLCCommands {
 
 
     protected void getATHelp() {
-        say("get_at [" + CLAIMS_FLAG + " | " + NO_VERIFY_JWT + "]:");
+        say("access [" + CLAIMS_FLAG + " | " + NO_VERIFY_JWT + "]:");
         sayi("Usage: Gets the access token and refresh token (if supported on");
         sayi("   the server) for a given grant. ");
         sayi("You must have already set the grant with the get_grant call.");
         sayi("A summary of the refresh token and its expiration is printed, if applicable.");
         sayi("" + CLAIMS_FLAG + " =  he id token will be printed");
         sayi("" + NO_VERIFY_JWT + " = do not verify JWTs against server. Default is to verify.");
+        sayi("Alias: get_at");
 
     }
 
     protected void setGrantHelp() {
-        say("get_grant [callback]:");
+        say("grant [callback]:");
         sayi("Usage: Read the callback URL and process it into a grant, etc.");
         sayi("callback = the entire callback returned from the service");
         sayi("no arg -- either ");
@@ -964,6 +966,7 @@ public class OA2CLCCommands extends CLCCommands {
         sayi("logged in. Your browser *should* have a callback to your client.");
         sayi("Copy that to the clipboard. If you call this with no argument, then the clipboard is read.");
         sayi("Otherwise paste the callback directly");
+        sayi("Alias: get_grant");
         sayi("See also: set_uri");
     }
 
@@ -1516,5 +1519,14 @@ public class OA2CLCCommands extends CLCCommands {
         }
         say("removed: " + tRemoved + " token parameters, " + rRemoved + " authz parameters, " + xRemoved + " exchange parameters");
         ;
+    }
+    public void refresh(InputLine inputLine) throws Exception {
+        get_rt(inputLine);
+    }
+    public void access(InputLine inputLine) throws Exception{
+        get_at(inputLine);
+    }
+    public void grant(InputLine inputLine) throws Exception{
+        get_grant(inputLine);
     }
 }

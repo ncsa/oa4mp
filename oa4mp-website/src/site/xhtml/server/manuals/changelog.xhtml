@@ -10,9 +10,22 @@
 <body class="composite">
 <!--#include virtual="../../header.html" -->
 <p>Changes to the OA4MP server by version.</p>
-
+ <h2>5.1.3</h2>
+<p>Propsed release date 2021-06-10</p>
+<ul>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-958">CIL-958</a>: CIlogon now asserts the cilogon_uid claim, which is
+        a shortened version of the unique identifier.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-962">CIL-962</a>: Support for WLCG wlcg.credkey claim.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-971">CIL-971</a>: In certain cases, token exchange does not update the actual token.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-974">CIL-974</a>: User info endpoint needs to ensure correct signing keys are used for custom issuers.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-976">CIL-976</a>: Discovery paths for custom issuers need to be resolved better.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-980">CIL-980</a>: RFC 8707 is supported</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-985">CIL-985</a>: Errant cast in revocation servlet caused unrecoverable error.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-986">CIL-986</a>: Support for custom token issuers in
+    the introspection and revocation endpoints.</li>
+</ul>
 <h2>5.1</h2>
-<p>Release date</p>
+<p>Release date 2021-04-14</p>
 <ul>
     <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-697">CIL-697</a>: Improve error messages to include a description.</li>
     <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-708">CIL-708</a>: review of token exchange endpoint.</li>

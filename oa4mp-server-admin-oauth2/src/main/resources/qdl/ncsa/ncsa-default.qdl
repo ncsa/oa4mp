@@ -4,7 +4,7 @@
    have both a pre_auth and post_token phase: this adds itself as a claim source for
    the usual claims system.
 
-   updated: 2021-02-17T12:50:55.202Z
+   updated: 2021-06-03T14:58:43.439Z
 
 
   tokens{
@@ -12,7 +12,7 @@
     type=identity
     qdl{
         load="ncsa/ncsa-default.qdl"
-        xmd={exec_phase=["pre_auth","post_token"]}
+        xmd={exec_phase=["pre_auth","post_token", "post_exchange","post_refresh"]}
         args=["true"] // true if the member of claim is just a list. Default is false.
       }// end qdl
     } //end identity token
@@ -44,8 +44,16 @@ if[
      claim_sources. := claim_sources. ~ [create_source(cfg.)]; // add it to any claims
 ]; //end if
 
+/* This replaces the next block if QDL is at 1.3.2 or above.
 if[
-   exec_phase == 'post_token'
+     reduce(@∨,exec_phase ≡ ['post_token','post_refresh','post_exchange'])
+ ][
+     convert ≔ 0 < script_args() ? to_boolean(script_args(0)) : false;
+     if[convert][claims.isMemberOf. ≔ query(claims.isMemberOf., '$..name');];
+ ];
+ */
+if[
+   exec_phase == 'post_token' ||exec_phase == 'post_refresh' || exec_phase == 'post_exchange'
 ]then[
      // default is false -- return whole list
     convert := false;
@@ -67,4 +75,5 @@ if[
     ]; // end while
     claims.isMemberOf. := s.;
 ];
+
 

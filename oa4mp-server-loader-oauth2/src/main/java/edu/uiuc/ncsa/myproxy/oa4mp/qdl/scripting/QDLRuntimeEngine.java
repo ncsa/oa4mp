@@ -28,6 +28,7 @@ import edu.uiuc.ncsa.security.util.scripting.ScriptRuntimeEngine;
 import net.sf.json.JSON;
 import net.sf.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.http.HttpStatus;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
@@ -251,6 +252,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
     protected String SYS_ERR_OK = "ok";
     protected String SYS_ERR_MESSAGE = "message";
     protected String SYS_ERR_ERROR_TYPE = "error_type";
+    protected String SYS_ERR_STATUS_CODE = "status";
     protected String FLOW_STATE_VAR = "flow_states" + STEM_INDEX_MARKER;
     protected String CLAIMS_VAR = "claims" + STEM_INDEX_MARKER;
     protected String ACCESS_TOKEN_VAR = "access_token" + STEM_INDEX_MARKER;
@@ -450,6 +452,11 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
                     scriptRuntimeException.setRequestedType(sysErr.getString(SYS_ERR_ERROR_TYPE));
                 } else{
                     scriptRuntimeException.setRequestedType(sysErr.getString(OA2Errors.ACCESS_DENIED));
+                }
+                if(sysErr.containsKey(SYS_ERR_STATUS_CODE)){
+                    scriptRuntimeException.setStatus(sysErr.getLong(SYS_ERR_STATUS_CODE).intValue());
+                }else{
+                    scriptRuntimeException.setStatus(HttpStatus.SC_UNAUTHORIZED);
                 }
                 throw scriptRuntimeException;
             }

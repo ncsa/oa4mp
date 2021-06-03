@@ -383,10 +383,13 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             jwtRunner.doTokenExchange();
 
         } catch (AssertionException assertionError) {
-            throw new OA2ATException(OA2Errors.INVALID_REQUEST, assertionError.getMessage(),HttpStatus.SC_BAD_REQUEST, t.getRequestState());
+            throw new OA2ATException(OA2Errors.INVALID_REQUEST,
+                    assertionError.getMessage(),
+                    HttpStatus.SC_BAD_REQUEST, t.getRequestState());
         } catch (ScriptRuntimeException sre) {
             // Client threw an exception.
-            throw new OA2ATException(sre.getRequestedType(), sre.getMessage(), t.getRequestState());
+            throw new OA2ATException(sre.getRequestedType(), sre.getMessage(),
+                    sre.getStatus(), t.getRequestState());
         } catch (IllegalAccessException iax) {
             // implies that the at some point there was a change in access allowed, e.g. a script
             // set a policy that denied it.
@@ -581,7 +584,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             throw new OA2ATException(OA2Errors.INVALID_REQUEST, assertionError.getMessage(),HttpStatus.SC_BAD_REQUEST, st2.getRequestState());
         } catch (ScriptRuntimeException sre) {
             // Client threw an exception.
-            throw new OA2ATException(sre.getRequestedType(), sre.getMessage(), st2.getRequestState());
+            throw new OA2ATException(sre.getRequestedType(), sre.getMessage(), sre.getStatus(), st2.getRequestState());
         } catch (IllegalAccessException iax) {
             throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
                     "access denied",
@@ -878,7 +881,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             throw new OA2ATException(OA2Errors.INVALID_REQUEST, assertionError.getMessage(),HttpStatus.SC_BAD_REQUEST, t.getRequestState());
         } catch (ScriptRuntimeException sre) {
             // Client threw an exception.
-            throw new OA2ATException(sre.getRequestedType(), sre.getMessage(), t.getRequestState());
+            throw new OA2ATException(sre.getRequestedType(), sre.getMessage(), sre.getStatus(), t.getRequestState());
         } catch (IllegalAccessException iax) {
             throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
                     "access denied",
