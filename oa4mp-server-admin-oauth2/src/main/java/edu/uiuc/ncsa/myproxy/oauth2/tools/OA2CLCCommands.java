@@ -104,7 +104,7 @@ public class OA2CLCCommands extends CLCCommands {
     }
 
     public void getURIHelp() {
-        say("set_uri");
+        say("uri");
         say("Usage: This will create the correct URL. If possible, it will put it in the clipboard.");
         sayi("Create the uri using the  client's configuration");
         sayi("This will put this in to the clipboard if possible.");
@@ -114,6 +114,7 @@ public class OA2CLCCommands extends CLCCommands {
         sayi("fail (this is the hook that lets us do this manually).");
         sayi("Next Step: You should invoke setgrant with the callback uri from the server.");
         say("See also: set_param");
+        say("Alias: set_uri");
     }
 
     SecureRandom secureRandom = new SecureRandom();
@@ -1529,4 +1530,8 @@ public class OA2CLCCommands extends CLCCommands {
     public void grant(InputLine inputLine) throws Exception{
         get_grant(inputLine);
     }
+    public void uri(InputLine inputLine) throws Exception{
+        set_uri(inputLine);
+    }
+
 }

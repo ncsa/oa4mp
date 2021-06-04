@@ -161,8 +161,8 @@ When a new version is deployed, here is the testing order
 
         Test #3 - with wlcg capabilities, none in TX
         Set following in CLC before starting
-        clear_params if needed.
-        set_param -a scope "storage.create:/ wlcg.capabilityset:/fermilab"
+        clear_all_params if needed.
+        set_param -a scope "storage.create:/ wlcg.capabilityset:/cilogontest"
         get_at:
           scopes:compute.modify:/
                  storage.write:/fermilab/users/cilogontest

@@ -54,7 +54,7 @@ fnal.search_base := 'ou=people,o=Fermilab,o=CO,dc=cilogon,dc=org';
        fnal.type := 'ldap';
   fnal.ldap_name := 'voPersonExternalID';
 
-fnal.search_attributes. :=  [EPE];
+fnal.search_attributes. :=  [EPE,'isMemberOf'];
 
        at_claims. := get_claims(fnal., claims.eppn); // test user
  access_token.sub := claims.eppn;
@@ -107,14 +107,24 @@ if[
    requested_scopes. := scopes.;
 ];
 
+
 wlcg_scopes. := script_load('fnal/wlcg_cs.qdl', [script_args(0), script_args(1)]);
 
 if[!sys_err.ok][return();]; // If there was an error, bail.
 
 caps. := caps. ~ wlcg_scopes.;
 say(' caps. =' + to_string(caps., true));
-
-
+ wlcg_groups ='wlcg.groups';
+ if[
+    has_value(requested_scopes., wlcg_groups)
+ ][
+    if[
+      is_defined(claims.isMemberOf)
+      ][
+       claims.wlcg_groups := claim.isMemberOf.;
+       remove(claims.isMemberOf.);
+    ];
+ ];
 // case 1: Query for available scopes. Return the capabilities requested.
 if[
     exec_phase == 'post_token'
