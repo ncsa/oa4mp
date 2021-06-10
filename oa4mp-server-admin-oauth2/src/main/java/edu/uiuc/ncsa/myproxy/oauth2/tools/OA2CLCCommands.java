@@ -112,7 +112,7 @@ public class OA2CLCCommands extends CLCCommands {
         sayi("You must then authenticate. After you authenticate, the");
         sayi("service will attempt a call back to a client endpoint which will");
         sayi("fail (this is the hook that lets us do this manually).");
-        sayi("Next Step: You should invoke setgrant with the callback uri from the server.");
+        sayi("Next Step: You should invoke grant with the callback uri from the server.");
         say("See also: set_param");
         say("Alias: set_uri");
     }

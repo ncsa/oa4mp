@@ -62,6 +62,7 @@ fnal.search_attributes. :=  [EPE,'isMemberOf'];
 // A 'starts with' function that returns the elements of x. that start with something in y.
 // read 'x starts with y'
 
+ say('*** FNAL at claims = ' + to_string(at_claims.));
 
 // Hop out if for some reason there were no scopes in LDAP.
 if[
@@ -114,16 +115,16 @@ if[!sys_err.ok][return();]; // If there was an error, bail.
 
 caps. := caps. ~ wlcg_scopes.;
 say(' caps. =' + to_string(caps., true));
- wlcg_groups ='wlcg.groups';
- if[
-    has_value(requested_scopes., wlcg_groups)
- ][
-    if[
-      is_defined(claims.isMemberOf)
-      ][
-       claims.wlcg_groups := claim.isMemberOf.;
-       remove(claims.isMemberOf.);
-    ];
+// WLCG Groups support. These are found in the claims and if present
+// are asserted in the wlcg_groups claims
+ wlcg_groups :='wlcg.groups';
+if[
+    has_value( wlcg_groups, requested_scopes.) && is_defined(at_claims.isMemberOf.)
+   ][
+       claims.wlcg_groups. := at_claims.isMemberOf.;
+       remove(at_claims.isMemberOf.);
+       // remove the scope from the request, so it is not .
+       requested_scopes. := mask(requested_scopes.,requested_scopes. != wlcg_groups );
  ];
 // case 1: Query for available scopes. Return the capabilities requested.
 if[

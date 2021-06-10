@@ -67,15 +67,11 @@ say('*** WLCG_CS requested_scopes after remove  ' + to_string(requested_scopes.)
 */
 say('*** WLCG_CS is_defined  ' + to_string(is_defined(at_claims.EPE.)));
 say('*** WLCG_CS  has_value  ' + to_string(has_value(c, at_claims.EPE.)));
-zzz := (!is_defined(at_claims.EPE.)) || (!has_value(c, at_claims.EPE.));
-say('*** WLCG_CS  zzz =   ' + to_string(zzz));
 
 if[
    (!is_defined(at_claims.EPE.)) || (!has_value(c, at_claims.EPE.))
   ][
     // blow up if the user is not allowed
-    say('*** WLCG_CS  inside conditional');
-
          sys_err.ok := false;
     sys_err.message := 'User does not have access to this capability set.';
   sys_err.error_type := 'access_denied';
