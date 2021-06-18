@@ -72,6 +72,7 @@ if[
    return(); // nothing to do. No capabilities ==>  no scopes.
 ]; //end if
 
+
 /*
    Variable score card
   ╔══════════════════╦════════════════════════════════════════════════════════════════════╗
@@ -107,8 +108,30 @@ if[
   ]else[
    requested_scopes. := scopes.;
 ];
+if[
+    is_defined(at_claims.isMemberOf.)
+  ][
+    // Process any WLCG groups is there is member information
+    wlcg_groups :='wlcg.groups';// need this later to assign stem value.
 
-
+    wlcg_groups. := script_run('fnal/wlcg_groups.qdl', scopes., at_claims.isMemberOf.);
+    if[
+         size(wlcg_groups.) != 0
+       ][
+           claims.wlcg_groups. := wlcg_groups.;
+           remove(at_claims.isMemberOf.);
+    ];
+];
+/* Old stuff. Just returned all scopes at all times.
+if[
+    has_value( wlcg_groups, requested_scopes.) && is_defined(at_claims.isMemberOf.)
+   ][
+       claims.wlcg_groups. := at_claims.isMemberOf.;
+       remove(at_claims.isMemberOf.);
+       // remove the scope from the request, so it is not .
+       requested_scopes. := mask(requested_scopes.,requested_scopes. != wlcg_groups );
+ ];*/
+ 
 wlcg_scopes. := script_load('fnal/wlcg_cs.qdl', [script_args(0), script_args(1)]);
 
 if[!sys_err.ok][return();]; // If there was an error, bail.
@@ -117,15 +140,7 @@ caps. := caps. ~ wlcg_scopes.;
 say(' caps. =' + to_string(caps., true));
 // WLCG Groups support. These are found in the claims and if present
 // are asserted in the wlcg_groups claims
- wlcg_groups :='wlcg.groups';
-if[
-    has_value( wlcg_groups, requested_scopes.) && is_defined(at_claims.isMemberOf.)
-   ][
-       claims.wlcg_groups. := at_claims.isMemberOf.;
-       remove(at_claims.isMemberOf.);
-       // remove the scope from the request, so it is not .
-       requested_scopes. := mask(requested_scopes.,requested_scopes. != wlcg_groups );
- ];
+
 // case 1: Query for available scopes. Return the capabilities requested.
 if[
     exec_phase == 'post_token'

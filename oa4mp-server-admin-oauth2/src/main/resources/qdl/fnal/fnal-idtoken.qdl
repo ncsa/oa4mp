@@ -17,11 +17,9 @@ if[
    if[
       is_defined(claims.eppn)
    ][
-           //vault_uid := 'vault.uid';
            vault_uid := 'wlcg.credkey';
     claims.vault_uid := head(claims.eppn,'@');
   ]; // end if
 
 ];
-a := 5;
-if  [  a <= 17  ]  [  say('oi!');  ];
+

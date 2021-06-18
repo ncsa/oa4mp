@@ -139,7 +139,7 @@ When a new version is deployed, here is the testing order
         Test #0 -- request with no scopes.
         Claims should have
           "wlcg.credkey": "cilogontest",
-         no scopes in access token (since none requested)
+         no scopes in access token (since none requested) => access_denied exception
 
         Test #1 -- plain, no wlcg capability sets. Requests two storage capabilities, one good one not
         set_param -a scope "storage.create:/ storage.read:/"
@@ -164,21 +164,23 @@ When a new version is deployed, here is the testing order
         clear_all_params if needed.
         set_param -a scope "storage.read:/ wlcg.capabilityset:/duneana wlcg.groups"
         get_at:
-          scopes:compute.modify:/
-                 storage.write:/fermilab/users/cilogontest
-                 compute.cancel:/
-                 storage.read:/fermilab/users/cilogontest
-                 compute.create:/
+          scopes:
+             storage.create:/dune/scratch/users/cilogontest
+             storage.read:/dune
+          wlcg.groups:
+             /dune
+             /dune/production
+             /fermilab"
           lifetime:3600 sec.
-         exchange:
+         refresh, exchange:
            scopes: same (since no scopes in TX request.)
          lifetime: 3600 sec.
 
         Aim is that the initial set should be resolved to what was passed in.
 
-        Test #4 - with wlcg capabilities
+        Test #4 - with wlcg capabilities for fermilab
         Set following in CLC before starting. Some of the TX scopes are bogus on purpose.
-        set_param -a scope "storage.create:/ wlcg.capabilityset:/fermilab"
+        set_param -a scope "storage.create:/ wlcg.capabilityset:/fermilab wlcg.groups"
         set_param -x scope "compute.modify:/foo storage.write:/fermilab/users/cilogontest/public storage.read:/dune/scratch/users/cilogon storage.read:/dune/scratch/users/swhite/temp"
 
         get_at

@@ -21,7 +21,7 @@
        type=sci_token
        qdl{
           load="ligo/access2.qdl"
-          xmd={exec_phase=post_token}
+           xmd={exec_phase=["post_token","post_refresh","post_exchange"]}
        } //end QDL
     } // end access token
   } //end tokens
@@ -29,8 +29,8 @@
 
 /* **** Actual script **** */
 script_load('utils/init.qdl');
-            claims.eppn := 'jim.basney@ligo.org';
-            claims.idp := idp.ligo;
+        //    claims.eppn := 'jim.basney@ligo.org';
+       //     claims.idp := idp.ligo;
             
 if[
      claims.idp != idp.ligo
@@ -38,7 +38,7 @@ if[
      return();
 ];
 
-            claims.uid := caput(claims.eppn, '@');
+            claims.uid := head(claims.eppn, '@');
 
          cfg.auth_type := 'none';
            cfg.address := 'ldap.ligo.org';

@@ -1,16 +1,44 @@
 /*
-   This is for the access token in LIGO. See the ligo.qdl file comments for more.
-   Jeff Gaynor
-   created: 2020-09-15T16:00:55Z
-   updated: 2020-10-19T20:09:03.181Z
+   Addresses CIL-964. audience claims for access tokens.
+   
+   Please configure a test and prod client for Dave Dykstra and Derek Weitzel that issues LIGO SciTokens
+   for LIGO SegDB (CIL-796) and LIGO CVMFS (new).
+
+   Use "iss" values of "https://cilogon.org/ligo" (prod) & "https://test.cilogon.org/ligo" (test), with
+   unique signing keys.
+
+   Use an "aud" value of ["ANY", "LIGO", "segments.ligo.org"]. I think this is the first time we've tried a list
+   for the "aud" claim, so Dave and Derek will be testing if that works on their side.
+
+   Set "scope" to "read:/frames" if:
+
+       user is in the "Communities:LSCVirgoLIGOGroupMembers" group in ldap.ligo.org
+       user is in the "gw-astronomy:KAGRA-LIGO:members" group in ldap.gw-astronomy.cilogon.org
+
+   This is in addition to the "read:/DQSegDB" and "write:/DQSegDB" values set according to the rules in CIL-796.
+
+   Part of the functionality we want to test is reducing the scopes via token exchange, so after the
+   user gets a token with both SegDB and CVMFS scopes, they can exchange it for a token with a subset of those
+   scopes for different jobs/tasks. Likewise, we want to test reducing the list of values in the "aud"
+   claim using token exchange.
+
+
+    author: Jeff Gaynor
+   created: 2021-06-17T16:19:03.285Z
 
 */
-s := '';
+allowed_scopes. ≔ [];
+      jeff_test ≔ claims.sub ≡ 'http://cilogon.org/serverT/users/21340363'; // me via github
 
 if[
-     claims.idp != 'https://login.ligo.org/idp/shibboleth'
+    (¬jeff_test) && claims.idp ≠ 'https://login.ligo.org/idp/shibboleth'
 ][
      return();
+];
+if[jeff_test][
+ claims.isMemberOf. ≔ ['Communities:LSCVirgoLIGOGroupMembers',
+                       'Communities:LVC:SegDB:SegDBWriter',
+                       'gw-astronomy:KAGRA-LIGO:members'];
 ];
 /*
 Set "scope" to "read:/frames" if:
@@ -20,6 +48,8 @@ Set "scope" to "read:/frames" if:
 This is in addition to the "read:/DQSegDB" and "write:/DQSegDB" values set according to the rules in CIL-796.
 */
 
+all_audience. := ['ANY', 'LIGO', 'segments.ligo.org'];
+
 if[
       !is_defined(claims.isMemberOf.)
   ]then[
@@ -27,32 +57,61 @@ if[
      sys_err.message := 'Missing group information. Cannot determine scopes.';
      return();
 ];
-
+ /*
+   TO DO - Look at requested scopes in initial request and restrict to those
+           or give all scopes if none requested. This will require removing
+           all of the 'standard' scopes like email, profile, then masking.
+ */
 
 if[
     in_group(claims.isMemberOf., 'Communities:LSCVirgoLIGOGroupMembers')
   ]then[
-    s := s + ' read:/DQSegDB' + ' read:/frames';
+    allowed_scopes. := allowed_scopes. ~ 'read:/DQSegDB' ~ 'read:/frames';
  ];
 
 if[
    in_group(claims.isMemberOf., 'Communities:LVC:SegDB:SegDBWriter')
   ]then[
-   s := s + ' ' + 'write:/DQSegDB';
+   allowed_scopes. := allowed_scopes. ~ 'write:/DQSegDB';
  ];
 
 if[
    in_group(claims.isMemberOf., 'gw-astronomy:KAGRA-LIGO:members')
   ]then[
-   s := s + ' ' + 'read:/frames';
+   allowed_scopes. := allowed_scopes. ~ 'read:/frames';
  ];
 
- access_token.scope := s + ' jeff:debug';
+  requested_scopes. := scopes.;
+if[
+  exec_phase == 'post_exchange' || exec_phase == 'post_refresh'
+ ][
+            has_tx := 0 < size(tx_scopes.);
+ requested_scopes. := (has_tx)?scopes.:tx_scopes.;
+];
+
+
  if[
-      0 < size(tx_scopes.)
-   ][
-     requested_audience. := ['ANY', 'LIGO', 'segments.ligo.org']; // so its parts of a token exchange
-   ]else[
-    requested_scopes. := scopes.;
- ];
- access_token.aud := 'segments.ligo.org';
+    0 < size(requested_scopes.)
+  ][
+    // If they request different scopes, honor it. Otherwise don't.
+    allowed_scopes. := mask(allowed_scopes., has_value(allowed_scopes., requested_scopes.));
+  ];
+ access_token.scope := detokenize(unique(allowed_scopes.), ' ', 2); // turn in to string, omit duplications, trailing space
+
+
+ // Figure out if there are specific requests for the audience and if none, use
+ // the initial request.
+ requested_audience. := (size(tx_audience.) == 0)?audience.:tx_audience.;
+
+ // if the audience is still empty, they never requested anything any place, so
+ // set the aud claim
+
+
+ if[
+   size(requested_audience.) == 0
+  ][
+     access_token.aud. := all_audience.;
+  ]else[
+     // return only things we recognize.
+     access_token.aud. :=mask(all_audience.,  has_value(all_audience., requested_audience.));
+  ];

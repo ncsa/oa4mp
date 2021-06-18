@@ -643,6 +643,10 @@ public abstract class StoreCommands2 extends StoreCommands {
         }
         String key = getKeyArg(inputLine);
         if (key == null && !inputLine.hasArg(KEYS_FLAG)) {
+            say("sorry, but that is not a recognized key.");
+            return;
+        }
+        if (key == null && inputLine.hasArg(KEYS_FLAG)) {
             super.update(inputLine);
             return;
         }

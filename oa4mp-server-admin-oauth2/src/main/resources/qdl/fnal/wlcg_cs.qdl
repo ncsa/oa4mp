@@ -124,33 +124,3 @@ wlcg_cs. := template_substitution(wlcg_cs., claims.);
 //wlcg_cs. := mask(wlcg_cs., has_value(wlcg_cs., requested_scopes.));
 say('*** WLCG_CS debug, returning: ' + to_string(wlcg_cs., true));
 return(wlcg_cs.);
-
-/*
-  WLCG groups support. There will be a possible entry in the LDAP.
-  scope requested is wlcg.groups. Contents of LDAP is
-
-  dn: voPersonID=FNAL000001489,ou=people,o=Fermilab,o=CO,dc=cilogon,dc=org
-  objectClass: person
-  objectClass: organizationalPerson
-  objectClass: inetOrgPerson
-  objectClass: eduMember
-  objectClass: eduPerson
-  objectClass: voPerson
-  givenName: Dave Dykstra
-  sn: Dykstra
-  cn: Dave
-  mail: dwd@fnal.gov
-  eduPersonPrincipalName: dwd@fnal.gov
-  voPersonExternalID: dwd@fnal.gov
-  voPersonID: FNAL000001489
-  uid: dwd
-  eduPersonEntitlement: wlcg.capabilityset:/duneana
-  eduPersonEntitlement: wlcg.capabilityset:/fermilab
-  eduPersonEntitlement: wlcg.capabilityset:/novaana
-  eduPersonEntitlement: wlcg.capabilityset:/novapro
-  eduPersonEntitlement: wlcg.groups:/nova/production
-
-  If scope for wlcg.groups asserted, assert claim  as flat list
-  wlcg.groups: [“/nova/production”]
-
-*/

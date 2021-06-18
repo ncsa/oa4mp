@@ -346,30 +346,27 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         adminStem.addList(adminIDs);
         acl.put("admins.", adminStem);
         state.getSymbolStack().setValue(ACCESS_CONTROL, acl);
+        // these are always defined.
+        StemVariable txScopes = new StemVariable();
+        StemVariable txRes = new StemVariable();
+        StemVariable txAud = new StemVariable();
         if (state.getTxRecord() != null) {
-            // following block always sets these variables even if there is nothing sent.
-            // In this way, it is easier to use them in scripting rather than having to check
-            // if they exist.
             TXRecord txr = state.getTxRecord();
-            StemVariable txScopes = new StemVariable();
             if (txr.hasScopes()) {
                 txScopes.addList(txr.getScopes());
             }
-            state.getSymbolStack().setValue(TX_SCOPES_VAR, txScopes);
-            StemVariable txAud = new StemVariable();
             if (txr.hasAudience()) {
                 txAud.addList(txr.getAudience());
             }
-            state.getSymbolStack().setValue(TX_AUDIENCE_VAR, txAud);
-            StemVariable txRes = new StemVariable();
             if (txr.hasResources()) {
                 for (URI uri : txr.getResource()) {
-
                     txRes.listAppend(uri.toString());
                 }
             }
-            state.getSymbolStack().setValue(TX_RESOURCE_VAR, txRes);
         }
+        state.getSymbolStack().setValue(TX_SCOPES_VAR, txScopes);
+        state.getSymbolStack().setValue(TX_AUDIENCE_VAR, txAud);
+        state.getSymbolStack().setValue(TX_RESOURCE_VAR, txRes);
 
 
     }
