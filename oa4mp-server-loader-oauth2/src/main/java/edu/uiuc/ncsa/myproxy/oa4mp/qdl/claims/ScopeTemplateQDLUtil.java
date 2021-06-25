@@ -63,6 +63,16 @@ public class ScopeTemplateQDLUtil implements QDLFunction {
         doxx.add("computed_scopes = scopes from templates that have been resolved.");
         doxx.add("requested_scopes = the scopes the client has requested.");
         doxx.add("is_query = true if this call is to query available scopes. ");
+        doxx.add("E.g. There are two templates");
+        doxx.add("   x. :=['x.y:/abc/def','p.q:/rst']");
+        doxx.add("   // The requested scopes includes a super-scope of the p.q template");
+        doxx.add("   y. := ['x.y:/abc/def/ghi','x.y:/abc/defg', 'p.q:/']");
+        doxx.add("  resolve_templates(x., y., false)");
+        doxx.add("// The false flag means to resolve only sub-scopes");
+        doxx.add("[x.y:/abc/def/ghi]");
+        doxx.add("// A last argument fo true means to interpret super-scopes as requests for supported templates");
+        doxx.add("  resolve_templates(x., y., true)");
+        doxx.add("p.q:/rst,x.y:/abc/def/ghi]");
         return doxx;
     }
 }

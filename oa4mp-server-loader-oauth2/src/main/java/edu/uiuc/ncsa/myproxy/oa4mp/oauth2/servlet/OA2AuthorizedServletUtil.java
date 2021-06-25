@@ -13,6 +13,7 @@ import edu.uiuc.ncsa.security.core.exceptions.IllegalAccessException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
+import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.server.UnapprovedClientException;
@@ -38,6 +39,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.*;
 
+import static edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet.createDebugger;
 import static edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet.getServiceEnvironment;
 import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.*;
@@ -55,7 +57,7 @@ public class OA2AuthorizedServletUtil {
     }
 
     public OA2ServiceTransaction doDelegation(HttpServletRequest req, HttpServletResponse resp) throws Throwable {
-    return doDelegation(req,resp, false); // Default operation for all of OA4MP.
+        return doDelegation(req, resp, false); // Default operation for all of OA4MP.
     }
 
     /**
@@ -77,12 +79,14 @@ public class OA2AuthorizedServletUtil {
                     , "unknown client",
                     HttpStatus.SC_BAD_REQUEST, null);
         }
+        MetaDebugUtil debugger = createDebugger(client);
+
         OA2SE oa2se = (OA2SE) getServiceEnvironment();
         basicChecks(req); // Checks response type, code and such
 
         try {
             String cid = "client=" + client.getIdentifier();
-            DebugUtil.info(this, "2.a. Starting a new cert request: " + cid);
+            debugger.info(this, "2.a. Starting a new cert request: " + cid);
             servlet.checkClientApproval(client);
             // Generally the lifetime of an authorization grant is a matter of server policy, not a client request.
             AGRequest2 agRequest2 = new AGRequest2(req, oa2se.getAuthorizationGrantLifetime());
@@ -112,14 +116,13 @@ public class OA2AuthorizedServletUtil {
             transaction.setClient(client);
             transaction = (OA2ServiceTransaction) verifyAndGet(agResponse);
             transaction.setAuthTime(new Date()); // have to set the time to now.
-            DebugUtil.info(this, "Saved new transaction with id=" + transaction.getIdentifierString());
+            debugger.info(this, "Saved new transaction with id=" + transaction.getIdentifierString());
 
             Map<String, String> params = agResponse.getParameters();
 
             preprocess(new TransactionState(req, resp, params, transaction));
-            DebugUtil.trace(this, "saved transaction for " + cid + ", trans id=" + transaction.getIdentifierString());
 
-            DebugUtil.info(this, "2.b finished initial request for token =\"" + transaction.getIdentifierString() + "\".");
+            debugger.info(this, "2.b finished initial request for token =\"" + transaction.getIdentifierString() + "\".");
 
             postprocess(new IssuerTransactionState(req, resp, params, transaction, agResponse));
             servlet.getTransactionStore().save(transaction);
@@ -151,10 +154,11 @@ public class OA2AuthorizedServletUtil {
             // In this case, there is an id token hint, so processing changes.
             return t;
         }
-        ServletDebugUtil.trace(this, "Starting doDelegation");
+        MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(t.getOA2Client());
+        debugger.trace(this, "Starting doDelegation");
         t = doDelegation(httpServletRequest, httpServletResponse);
         OA2SE oa2SE = (OA2SE) getServiceEnvironment();
-        ServletDebugUtil.trace(this, "Starting done with doDelegation, creating claim util");
+        debugger.trace(this, "Starting done with doDelegation, creating claim util");
         JWTRunner jwtRunner = new JWTRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2SE, t, t.getOA2Client().getConfig()));
         OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, t, httpServletRequest);
 
@@ -317,12 +321,12 @@ public class OA2AuthorizedServletUtil {
         OA2Client client = st.getOA2Client();
         OA2ClientUtils.check(client, givenRedirect);
         // by this point it has been verified that the redirect uri is valid.
-
+        MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(client);
         String rawSecret = params.get(CLIENT_SECRET);
         if (rawSecret != null) {
-            DebugUtil.info(this, "Client is sending secret in initial request. Though not forbidden by the protocol this is discouraged.");
+            debugger.info(this, "Client is sending secret in initial request. Though not forbidden by the protocol this is discouraged.");
             if (!client.getSecret().equals(rawSecret)) {
-                DebugUtil.info(this, "And for what it is worth, the client sent along an incorrect secret too...");
+                debugger.info(this, "And for what it is worth, the client sent along an incorrect secret too...");
             }
         }
         String rawATLifetime = params.get(ACCESS_TOKEN_LIFETIME);
@@ -354,7 +358,7 @@ public class OA2AuthorizedServletUtil {
         String nonce = params.get(NONCE);
         // FIX for OAUTH-180. Server must support clients that do not use a nonce. Just log it and rock on.
         if (nonce == null || nonce.length() == 0) {
-            DebugUtil.info(this, "No nonce in initial request for " + client.getIdentifierString());
+            debugger.info(this, "No nonce in initial request for " + client.getIdentifierString());
         }
         NonceHerder.putNonce(nonce);
       /*  This checks that nonces are not re-used. Used to check for them,
@@ -382,7 +386,7 @@ public class OA2AuthorizedServletUtil {
 
         //OA2ServiceTransaction st = createNewTransaction(agResponse.getGrant());
         //st.setClient(agResponse.getClient());
-        DebugUtil.info(this, "Created new unsaved transaction with id=" + st.getIdentifierString());
+        debugger.info(this, "Created new unsaved transaction with id=" + st.getIdentifierString());
 
         st.setAuthGrantValid(false);
         st.setAccessTokenValid(false);
@@ -480,6 +484,26 @@ public class OA2AuthorizedServletUtil {
         // CIL-737 fix: accept select_account
         if (prompt.contains(PROMPT_SELECT_ACCOUNT)) return;
 
+        // CIL-1012 fix: accept prompt = consent.
+        // basically we completely ignore this and offline access
+        // EXCEPT in the case that they are asking for consent and no
+        // offline_access scope -- spec. say we should reject it.
+        // Some clients use consent to require that later operations (such as user info)
+        // force consent from the user. We don't do that and for us, consent
+        // only matters if there is an offline_access scope.
+        if(prompt.contains(PROMPT_CONSENT)) {
+            if(transaction.getScopes().contains(OA2Scopes.SCOPE_OFFLINE_ACCESS)){
+                return;
+            }
+            throw new OA2RedirectableError(OA2Errors.LOGIN_REQUIRED,
+                    PROMPT + "=" + PROMPT_CONSENT + " only allowed when a scope of " + OA2Scopes.SCOPE_OFFLINE_ACCESS +
+                            " is present.",
+                    HttpStatus.SC_BAD_REQUEST,
+                    transaction.getRequestState(),
+                    transaction.getCallback()
+            );
+        }
+
         // At this point there is neither a "none" or a "login" and we don's support anything else.
 
         throw new OA2RedirectableError(OA2Errors.LOGIN_REQUIRED,
@@ -515,18 +539,19 @@ public class OA2AuthorizedServletUtil {
      *
      * <b>Especial note:</b> The resource and audience configuration lives in the access token
      * configuration of the client.<br/><br/>
-     *
+     * <p>
      * According to 2.1 in RFC 8707: <br/>
      * "In the code flow (Section 4.1 of OAuth 2.0 [RFC6749]) where an intermediate
-     *   representation of the authorization grant (the authorization code) is
-     *   returned from the authorization endpoint, the requested resource is
-     *   applicable to the full authorization grant."
-     *  <br/><br/>
+     * representation of the authorization grant (the authorization code) is
+     * returned from the authorization endpoint, the requested resource is
+     * applicable to the full authorization grant."
+     * <br/><br/>
      * We return these in the access token. We do allow that the user can pass these in
      * as part of the authorization request, but merely record the fact for the access
      * token, since we do not have some use of resource/audience for authorization grants.
      * The spec simply (seems) to state that if it is present in the auth request, it should
      * apply to that too.
+     *
      * @param state
      */
     public void figureOutAudienceAndResource(TransactionState state) {
@@ -539,10 +564,6 @@ public class OA2AuthorizedServletUtil {
             // implies there is no such parameters.
             return; // nothing to do.
         }
-
-        ServletDebugUtil.trace(this, "raw audience = " + rawAudience);
-        ServletDebugUtil.trace(this, "raw resource = " + rawResource);
-
         LinkedList<String> resource = new LinkedList<>();
         LinkedList<String> audience = new LinkedList<>();
 
@@ -621,7 +642,5 @@ public class OA2AuthorizedServletUtil {
         Collection<String> scopes = resolveScopes(transactionState);
         t.setScopes(scopes);
         transactionState.getResponse().setHeader("X-Frame-Options", "DENY");
-
-        //t.setScopes(scopes);
     }
 }

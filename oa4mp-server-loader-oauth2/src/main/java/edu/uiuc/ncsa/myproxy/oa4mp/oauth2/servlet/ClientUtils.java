@@ -4,8 +4,10 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2ConfigurationLoader;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
+import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.delegation.servlet.TransactionState;
 import edu.uiuc.ncsa.security.oauth_2_0.*;
@@ -29,12 +31,15 @@ import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.SCOPE;
 public class ClientUtils {
     /**
      * Scorecard:
-     * server default     | oa2SE.getAccessTokenLifetime()
-     * server default max | oa2SE.getMaxATLifetime();
-     * client default max | client.getAtLifetime()
+     * <pre>
+     *              server default | oa2SE.getAccessTokenLifetime()
+     *          server default max | oa2SE.getMaxATLifetime();
+     *          client default max | client.getAtLifetime()
      * value in cfg access element | client.getAccessTokensConfig().getLifetime()
-     * value in the request | st2.getRequestedATLifetime()
-     * result = actual definitive value | st2.getAccessTokenLifetime()
+     *        value in the request | st2.getRequestedATLifetime()
+     *     actual definitive value | st2.getAccessTokenLifetime()
+     *                      result | actual definitive value
+     * </pre>
      * <p>
      * Policies: no lifetime can exceed the non-zero max of the server and client defaults. These are hard
      * limits placed there by administrators.
@@ -135,8 +140,9 @@ public class ClientUtils {
      */
     public static void verifyClientSecret(OA2Client client, String rawSecret, boolean isAT) {
         // Fix for CIL-332
+        MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(client);
         if (rawSecret == null) {
-            DebugUtil.trace(ClientUtils.class, "doIt: no secret, throwing exception.");
+            debugger.trace(ClientUtils.class, "doIt: no secret, throwing exception.");
             if (isAT) {
                 throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT, "missing secret");
             } else {
@@ -159,7 +165,7 @@ public class ClientUtils {
         }
 
         if (!client.getSecret().equals(DigestUtils.sha1Hex(rawSecret))) {
-            DebugUtil.trace(ClientUtils.class, "doIt: bad secret, throwing exception.");
+            debugger.trace(ClientUtils.class, "doIt: bad secret, throwing exception.");
             if (isAT) {
 
                 throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
@@ -212,11 +218,11 @@ public class ClientUtils {
         String rawScopes = transactionState.getRequest().getParameter(SCOPE);
 
         OA2ServiceTransaction st = (OA2ServiceTransaction) transactionState.getTransaction();
-
-        DebugUtil.trace(ClientUtils.class, ".resolveScopes: stored client scopes =" + ((OA2Client) st.getClient()).getScopes());
-        DebugUtil.trace(ClientUtils.class, ".resolveScopes: passed in scopes =" + rawScopes);
-        DebugUtil.trace(ClientUtils.class, ".resolveScopes: Scope util =" + OA2Scopes.ScopeUtil.getScopes());
-        DebugUtil.trace(ClientUtils.class, ".resolveScopes: server scopes=" + ((OA2SE) getServiceEnvironment()).getScopes());
+        MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(st.getOA2Client());
+        debugger.trace(ClientUtils.class, ".resolveScopes: stored client scopes =" + ((OA2Client) st.getClient()).getScopes());
+        debugger.trace(ClientUtils.class, ".resolveScopes: passed in scopes =" + rawScopes);
+        debugger.trace(ClientUtils.class, ".resolveScopes: Scope util =" + OA2Scopes.ScopeUtil.getScopes());
+        debugger.trace(ClientUtils.class, ".resolveScopes: server scopes=" + ((OA2SE) getServiceEnvironment()).getScopes());
         if (rawScopes == null || rawScopes.length() == 0) {
             if (isRFC8628) {
                 // It is not an error if this is the RFC8628 servlet. Just return an empty list
@@ -250,7 +256,7 @@ public class ClientUtils {
             // This also covers the case of a client made with a full set of scopes, then
             // converted to a public client but the stored scopes are not updated.
             requestedScopes.add(OA2Scopes.SCOPE_OPENID);
-            DebugUtil.trace(ClientUtils.class, ".resolveScopes: after resolution=" + requestedScopes);
+            debugger.trace(ClientUtils.class, ".resolveScopes: after resolution=" + requestedScopes);
             st.setScopes(requestedScopes); //Fix for CIL-936
             return requestedScopes;
         }
@@ -291,9 +297,9 @@ public class ClientUtils {
         if (oa2Client.useStrictScopes()) {
             Collection<String> storedClientScopes = oa2Client.getScopes();
             requestedScopes = intersection(OA2Scopes.ScopeUtil.getScopes(), intersection(requestedScopes, storedClientScopes));
-            DebugUtil.trace(ClientUtils.class, ".resolveScopes: strict scopes after resolution=" + requestedScopes);
+            debugger.trace(ClientUtils.class, ".resolveScopes: strict scopes after resolution=" + requestedScopes);
         } else {
-            DebugUtil.trace(ClientUtils.class, ".resolveScopes: non-strict scopes =" + requestedScopes);
+            debugger.trace(ClientUtils.class, ".resolveScopes: non-strict scopes =" + requestedScopes);
         }
 
         return requestedScopes;

@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.server.servlet;
 
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.server.request.ATRequest;
 import edu.uiuc.ncsa.security.delegation.server.request.ATResponse;
@@ -37,6 +38,7 @@ public abstract class AbstractAccessTokenServlet extends MyProxyDelegationServle
     protected abstract AuthorizationGrant checkAGExpiration(AuthorizationGrant ag);
 
     protected IssuerTransactionState doDelegation(Client client, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Throwable, ServletException {
+        createDebugger(client).info(this,"5.a. Starting access token exchange");
         info("5.a. Starting access token exchange");
         AuthorizationGrant ag = getServiceEnvironment().getTokenForge().getAuthorizationGrant(httpServletRequest);
         AuthorizationGrant updatedAG  = checkAGExpiration(ag);
@@ -75,6 +77,7 @@ public abstract class AbstractAccessTokenServlet extends MyProxyDelegationServle
             // This allows for maintaining version 4.x to 5.x token compatibility
             transaction.setAuthorizationGrant(updatedAG);
         }
+        MetaDebugUtil debugger = createDebugger(transaction.getClient());
         ATRequest atRequest = getATRequest(httpServletRequest, transaction);
 
         Verifier v = getServiceEnvironment().getTokenForge().getVerifier(httpServletRequest);
@@ -85,24 +88,24 @@ public abstract class AbstractAccessTokenServlet extends MyProxyDelegationServle
             transaction = verifyAndGet(atResp);
         }
         String cc = "client=" + transaction.getClient();
-        info("5.a. got access token " + cc);
+        debugger.info(this,"5.a. got access token " + cc);
 
         preprocess(new TransactionState(httpServletRequest, httpServletResponse, atResp.getParameters(), transaction));
 
-        debug("5.a. access token = " + atResp.getAccessToken() + (v!=null?(" for verifier = " + v):""));
+        debugger.trace(this,"5.a. access token = " + atResp.getAccessToken() + (v!=null?(" for verifier = " + v):""));
         transaction.setAuthGrantValid(false);
         transaction.setAccessToken(atResp.getAccessToken());
         transaction.setAccessTokenValid(true);
 
         try {
             getTransactionStore().save(transaction);
-            info("5.a. updated transaction state for " + cc + ", sending response to client");
+            debugger.info(this,"5.a. updated transaction state for " + cc + ", sending response to client");
 
         } catch (GeneralException e) {
             throw new ServletException("Error saving transaction", e);
         }
         //  atResp.write(httpServletResponse);
-        info("5.b. done with access token exchange with " + cc);
+        debugger.info(this,"5.b. done with access token exchange with " + cc);
         IssuerTransactionState transactionState = new IssuerTransactionState(httpServletRequest,
                 httpServletResponse,
                 atResp.getParameters(),

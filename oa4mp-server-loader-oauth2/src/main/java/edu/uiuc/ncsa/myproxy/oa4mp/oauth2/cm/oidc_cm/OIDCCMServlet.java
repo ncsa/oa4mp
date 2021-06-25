@@ -9,6 +9,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientKeys;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.EnvServlet;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.ACNewClientEvent;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.NewClientEvent;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.NewClientListener;
@@ -16,6 +17,7 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
+import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
@@ -287,14 +289,15 @@ public class OIDCCMServlet extends EnvServlet {
         }
         try {
             AdminClient adminClient = getAndCheckAdminClient(req);
+            MetaDebugUtil adminDebugger = MyProxyDelegationServlet.createDebugger(adminClient);
             OA2Client client = getClient(req);
             checkAdminPermission(adminClient, client);
 
-            JSON rawJSON = getPayload(req);
+            JSON rawJSON = getPayload(req, adminDebugger);
 
-            DebugUtil.trace(this, rawJSON.toString());
+            adminDebugger.trace(this, rawJSON.toString());
             if (rawJSON.isArray()) {
-                getMyLogger().info("Error: Got a JSON array rather than a request:" + rawJSON);
+                adminDebugger.info(this,"Error: Got a JSON array rather than a request:" + rawJSON);
                 throw new IllegalArgumentException("Error: incorrect argument. Not a valid JSON request");
             }
             JSONObject jsonRequest = (JSONObject) rawJSON;
@@ -302,7 +305,7 @@ public class OIDCCMServlet extends EnvServlet {
             if (jsonRequest.size() == 0) {
                 // Playing nice here. If they upload an empty object, the net effect is going to be to zero out
                 // everything for this client except the id. The assumption is they don't want to do that.
-                getMyLogger().info("Error: Got an empty JSON object. Request rejected.");
+                adminDebugger.info(this,"Error: Got an empty JSON object. Request rejected.");
                 throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
                         "invalid request",
                         HttpStatus.SC_BAD_REQUEST,
@@ -464,16 +467,18 @@ public class OIDCCMServlet extends EnvServlet {
             throw new GeneralException("Error: the given id of \"" + acID + "\" is not recognized as an admin client.");
         }
         AdminClient adminClient = getOA2SE().getAdminClientStore().get(acID);
+        MetaDebugUtil adminDebugger = MyProxyDelegationServlet.createDebugger(adminClient);
         String adminSecret = credentials[HeaderUtils.SECRET_INDEX];
         if (adminSecret == null || adminSecret.isEmpty()) {
             throw new GeneralException("Error: missing secret.");
         }
         if (!getOA2SE().getClientApprovalStore().isApproved(acID)) {
-            ServletDebugUtil.trace(this, "Admin client \"" + acID + "\" is not approved.");
+            adminDebugger.trace(this, "Admin client \"" + acID + "\" is not approved.");
             throw new GeneralException("error: This admin client has not been approved.");
         }
         String hashedSecret = DigestUtils.sha1Hex(adminSecret);
         if (!adminClient.getSecret().equals(hashedSecret)) {
+            adminDebugger.trace(this, "Admin client \"" + acID + "\" and secret do not match.");
             throw new GeneralException("error: client and secret do not match");
         }
         return adminClient;
@@ -484,15 +489,16 @@ public class OIDCCMServlet extends EnvServlet {
     @Override
     protected void doIt(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Throwable {
         AdminClient adminClient = getAndCheckAdminClient(httpServletRequest);
+        MetaDebugUtil adminDebugger = MyProxyDelegationServlet.createDebugger(adminClient);
         // Now that we have the admin client (so we can do this request), we read the payload:
-        JSON rawJSON = getPayload(httpServletRequest);
+        JSON rawJSON = getPayload(httpServletRequest, adminDebugger);
         if (adminClient.getMaxClients() < getOA2SE().getPermissionStore().getClientCount(adminClient.getIdentifier())) {
-            getMyLogger().info("Error: Max client count of " + adminClient.getMaxClients() + " exceeded.");
+            adminDebugger.info(this,"Error: Max client count of " + adminClient.getMaxClients() + " exceeded.");
             throw new GeneralException("Error: Max client count of " + adminClient.getMaxClients() + " exceeded.");
         }
-        DebugUtil.trace(this, rawJSON.toString());
+        adminDebugger.trace(this, rawJSON.toString());
         if (rawJSON.isArray()) {
-            getMyLogger().info("Error: Got a JSON array rather than a request:" + rawJSON);
+            adminDebugger.info(this,"Error: Got a JSON array rather than a request:" + rawJSON);
             throw new IllegalArgumentException("Error: incorrect argument. Not a valid JSON request");
         }
         OA2Client client = processRegistrationRequest((JSONObject) rawJSON, adminClient, httpServletResponse);
@@ -542,12 +548,12 @@ public class OIDCCMServlet extends EnvServlet {
         httpServletResponse.setStatus(HttpStatus.SC_OK);
     }
 
-    protected JSON getPayload(HttpServletRequest httpServletRequest) throws IOException {
+    protected JSON getPayload(HttpServletRequest httpServletRequest, MetaDebugUtil adminDebugger) throws IOException {
         BufferedReader br = httpServletRequest.getReader();
-        DebugUtil.trace(this, "query=" + httpServletRequest.getQueryString());
+        adminDebugger.trace(this, "query=" + httpServletRequest.getQueryString());
         StringBuffer stringBuffer = new StringBuffer();
         String line = br.readLine();
-        DebugUtil.trace(this, "line=" + line);
+        adminDebugger.trace(this, "line=" + line);
         while (line != null) {
             stringBuffer.append(line);
             line = br.readLine();

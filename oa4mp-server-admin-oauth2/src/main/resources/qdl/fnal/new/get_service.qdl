@@ -1,0 +1,20 @@
+/*
+    Gets the service record. Note that we put this in a block since we need
+    to load this to get all the LDAP machinery but do not want any of the
+    state to end up in the main program.
+*/
+block[
+                      service_cfg. := new_template('ldap');
+             service_cfg.auth_type := 'simple';
+               service_cfg.address := 'ldap-test.cilogon.org';
+                  service_cfg.port := 636;
+            service_cfg.claim_name := 'uid';
+           service_cfg.search_base := 'ou=services,o=Fermilab,o=CO,dc=cilogon,dc=org';
+                  service_cfg.type := 'ldap';
+             service_cfg.ldap_name := 'voPersonExternalID';
+    service_cfg.search_attributes. :=  [EPPN, EPE, VOPAUID];
+              service_cfg.username := script_args(0);
+              service_cfg.password := script_args(1);
+
+    return(get_claims(create_source(service_cfg.), script_args(2)));
+];

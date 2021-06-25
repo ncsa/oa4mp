@@ -15,6 +15,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.WLCGTokenHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractRegistrationServlet;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
+import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
@@ -283,11 +284,16 @@ public class OA2ClientUtils {
     }
 
     public static void setupHandlers(JWTRunner jwtRunner, OA2SE oa2SE, OA2ServiceTransaction transaction, TXRecord txRecord, HttpServletRequest req) throws Throwable {
-        DebugUtil.trace(OA2ClientUtils.class, "Setting up handlers");
+        MetaDebugUtil debugger = DebugUtil.getInstance();
+              if(transaction.getClient().isDebugOn()){
+                         debugger = new MetaDebugUtil();
+                         debugger.setIsEnabled(true);
+              }
+        debugger.trace(OA2ClientUtils.class, "Setting up handlers");
         OA2Client client = (OA2Client) transaction.getClient();
         PayloadHandlerConfigImpl idthCfg = null;
         if (client.hasIDTokenConfig()) {
-            ServletDebugUtil.trace(OA2ClientUtils.class, "has id token config, creating handler");
+            debugger.trace(OA2ClientUtils.class, "has id token config, creating handler");
             idthCfg = new PayloadHandlerConfigImpl(
                     client.getIDTokenConfig(),
                     oa2SE,
@@ -296,7 +302,7 @@ public class OA2ClientUtils {
                     req);
         } else {
             // Legacy case. Functors have no config, but need a handler to get the init and accounting information.
-            DebugUtil.trace(OA2ClientUtils.class, "Found legacy id token configuration.");
+            debugger.trace(OA2ClientUtils.class, "Found legacy id token configuration.");
 
             idthCfg = new PayloadHandlerConfigImpl(
                     new IDTokenClientConfig(),  // here is the trick: An empty object triggers a hunt for functors.
@@ -310,7 +316,7 @@ public class OA2ClientUtils {
         jwtRunner.setIdTokenHandlerInterface(idTokenHandler);
 
         if (client.hasAccessTokenConfig()) {
-            ServletDebugUtil.trace(OA2ClientUtils.class, "has access token config, creating handler, type="
+            debugger.trace(OA2ClientUtils.class, "has access token config, creating handler, type="
                     + client.getAccessTokensConfig().getType());
             PayloadHandlerConfigImpl st = new PayloadHandlerConfigImpl(
                     client.getAccessTokensConfig(),
@@ -322,21 +328,21 @@ public class OA2ClientUtils {
             switch (client.getAccessTokensConfig().getType()) {
                 case WLCGTokenHandler.WLCG_TAG:
                     sth = new WLCGTokenHandler(st);
-                    ServletDebugUtil.trace(OA2ClientUtils.class, "WLCG access token handler created");
+                    debugger.trace(OA2ClientUtils.class, "WLCG access token handler created");
                     break;
                 case SciTokenConstants.SCI_TOKEN_TAG:
                     sth = new ScitokenHandler(st);
-                    ServletDebugUtil.trace(OA2ClientUtils.class, "SciTokens access token handler created");
+                    debugger.trace(OA2ClientUtils.class, "SciTokens access token handler created");
                     break;
                 case AbstractAccessTokenHandler.AT_DEFAULT_HANDLER_TYPE:
                 default:
                     sth = new AbstractAccessTokenHandler(st);
-                    ServletDebugUtil.trace(OA2ClientUtils.class, "generic access token handler created");
+                    debugger.trace(OA2ClientUtils.class, "generic access token handler created");
             }
             jwtRunner.setAccessTokenHandler(sth);
         }
         if (client.hasRefreshTokenConfig()) {
-            ServletDebugUtil.trace(OA2ClientUtils.class, "has refresh token config, creating handler");
+            debugger.trace(OA2ClientUtils.class, "has refresh token config, creating handler");
 
             PayloadHandlerConfigImpl st = new PayloadHandlerConfigImpl(
                     client.getRefreshTokensConfig(),

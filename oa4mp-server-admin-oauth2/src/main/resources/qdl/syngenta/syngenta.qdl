@@ -33,7 +33,7 @@ if[
        return(); // naught else to do
   ];
 
-script_load('ncsa/ncsa-default.qdl', [true]); // This will process the is Member claims
+script_load('ncsa/ncsa-default.qdl', true); // This will process the is Member claims
 
 if[
     exec_phase == 'post_token' && claims.idp == idp.ncsa

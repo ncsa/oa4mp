@@ -1072,10 +1072,23 @@ public abstract class StoreCommands2 extends StoreCommands {
             return;
         }
         XMLConverter xmlConverter = getStore().getXMLConverter();
+        String primaryKey = null;
+        if(xmlConverter instanceof MapConverter) {
+            primaryKey = ((MapConverter)xmlConverter).getKeys().identifier();
+        }
         if (xmlConverter instanceof MapConverter) {
             MapConverter mc = (MapConverter) xmlConverter;
-            List<String> kk = new ArrayList<>();
+            ArrayList<String> kk = new ArrayList<>();
             kk.addAll(mc.getKeys().allKeys());
+            if(primaryKey != null){
+                for(int i =0; i < kk.size(); i++){
+                     if(kk.get(i).equals(primaryKey)){
+                         kk.remove(i);
+                         kk.set(i, primaryKey + "*");
+                         break;
+                     }
+                }
+            }
             // print them in order.
             FormatUtil.formatList(inputLine, kk);
         }
@@ -1084,6 +1097,7 @@ public abstract class StoreCommands2 extends StoreCommands {
     protected void showListKeysHelp(InputLine inputLine) {
         say("list_keys");
         sayi("Usage: This lists the keys of the current store.");
+        sayi("The primary key will have a '*' added to the end of it");
         FormatUtil.printFormatListHelp(getIoInterface(), INDENT, inputLine);
     }
 

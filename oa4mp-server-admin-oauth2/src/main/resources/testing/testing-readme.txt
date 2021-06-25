@@ -172,6 +172,7 @@ When a new version is deployed, here is the testing order
              /dune/production
              /fermilab"
           lifetime:3600 sec.
+          lifetime:3600 sec.
          refresh, exchange:
            scopes: same (since no scopes in TX request.)
          lifetime: 3600 sec.
@@ -180,8 +181,8 @@ When a new version is deployed, here is the testing order
 
         Test #4 - with wlcg capabilities for fermilab
         Set following in CLC before starting. Some of the TX scopes are bogus on purpose.
-        set_param -a scope "storage.create:/ wlcg.capabilityset:/fermilab wlcg.groups"
-        set_param -x scope "compute.modify:/foo storage.write:/fermilab/users/cilogontest/public storage.read:/dune/scratch/users/cilogon storage.read:/dune/scratch/users/swhite/temp"
+        set_param -a scope "storage.create:/ wlcg.capabilityset:/fermilab wlcg.groups offline_access"
+        set_param -x scope "compute.modify wlcg.capabilityset:/fermilab storage.create:/fermilab/users/dwd/public storage.create:/fermilab/users/dwd/public2 "
 
         get_at
            scopes: compute.modify:/foo
@@ -234,12 +235,15 @@ When a new version is deployed, here is the testing order
      IDP: Any
 
   -- dev:test/functor
+     Critical regression test.
      Has the original NCSA functor configuration on it. Many installs use this.
      IDP: NCSA only
+     exec phase: access, refresh, exchange
+     check claims after each phase to be sure something is returned.
 
   -- dev:/test/ncsa_qdl
-     Has standard ncsa/ncsa-default.qdl script with plain vanilla configuration
      Critical regression test.
+     Has standard ncsa/ncsa-default.qdl script with plain vanilla configuration
       -- Should get full claims as list
       -- check that returned id token from refresh and exchange still have isMemberOf as flat list.
   
@@ -249,8 +253,12 @@ When a new version is deployed, here is the testing order
 
   -- dev:test/vo1
      IDP: any
-     This will also create a WLCG token (barebones) to check if that is signed correctly.
-       If the CLC works, then it is ok.
+     exec phase: ALL
+     This will create a WLCG token (barebones) to check if that is signed correctly.
+     Note that his has a snippet of QDL code that hard codes the access token subject and scope.
+       The main point of this test is that the VO signs
+       the tokens with its private key and the verifications work. If the tokens display
+       in the CLC, all is good.
 
 TO DO:
   -- dev:/test/ligo

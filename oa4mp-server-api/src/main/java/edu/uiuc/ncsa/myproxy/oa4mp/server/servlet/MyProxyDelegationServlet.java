@@ -6,13 +6,16 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.MyProxyServiceEnvironment;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironment;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironmentImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.AbstractCLIApprover;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.util.ClientDebugUtil;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.cache.Cache;
 import edu.uiuc.ncsa.security.core.cache.CachedObject;
 import edu.uiuc.ncsa.security.core.cache.Cleanup;
 import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
+import edu.uiuc.ncsa.security.core.util.DebugConstants;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
+import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.server.UnapprovedClientException;
 import edu.uiuc.ncsa.security.delegation.server.issuers.AGIssuer;
@@ -20,18 +23,20 @@ import edu.uiuc.ncsa.security.delegation.server.issuers.ATIssuer;
 import edu.uiuc.ncsa.security.delegation.server.request.IssuerResponse;
 import edu.uiuc.ncsa.security.delegation.servlet.TransactionFilter;
 import edu.uiuc.ncsa.security.delegation.servlet.TransactionState;
+import edu.uiuc.ncsa.security.delegation.storage.BaseClient;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.delegation.storage.TransactionStore;
 import edu.uiuc.ncsa.security.delegation.storage.impl.BasicTransaction;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
-import edu.uiuc.ncsa.security.servlet.NotificationListener;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.util.pkcs.KeyPairPopulationThread;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceConstantKeys.CONSUMER_KEY;
 
@@ -41,7 +46,16 @@ import static edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceConstantKeys.CONSUMER_KE
  * on May 17, 2011 at  3:46:53 PM
  */
 public abstract class MyProxyDelegationServlet extends EnvServlet implements TransactionFilter {
-
+    public static MetaDebugUtil createDebugger(BaseClient client) {
+        if (client == null) return DebugUtil.getInstance();
+        if (client.isDebugOn()) {
+            MetaDebugUtil debugger = new ClientDebugUtil(client);
+            debugger.setIsEnabled(true);
+            debugger.setDebugLevel(DebugConstants.DEBUG_LEVEL_TRACE);
+            return debugger;
+        }
+        return DebugUtil.getInstance();
+    }
     /**
      * This is called after the response is received so that the system can get the approproate
      * transaction. Checks for the validity of the transaction should be done here too.

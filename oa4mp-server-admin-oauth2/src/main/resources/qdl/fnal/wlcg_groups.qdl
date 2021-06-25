@@ -15,13 +15,13 @@
 */
       scopes. ≔  script_args(0);
 found_groups. ≔  script_args(1);
+
             w ≔  'wlcg.groups';
         caput ≔  w + ':'; // head of WLCG requested group.
 group_scopes. ≔  mask(scopes., -1 < starts_with(scopes., [w])); // get things that start with w
         has_w ≔  reduce(@∨, group_scopes. ≡ w);  // check if single scope of wlcg.groups is passed in
 group_scopes. ≔  mask(group_scopes., group_scopes. ≠ w); // whack it off if it is there,
-
-if[(!has_w) && size(group_scopes.) ≡ 0][return([]);]; // no requested wlcg groups.
+if[(!has_w) && size(group_scopes.) ≡ 0][return(∅);]; // no requested wlcg groups.
 
 // Normalize results: (trick) join with an empty list to renumber the elements from 0.
 
@@ -35,7 +35,7 @@ return([]~mask(group_scopes., has_value(group_scopes., found_groups.)) - caput);
 /*
    Test:
      g. := ['wlcg.groups', 'wlcg.groups:/cms/uscms', 'wlcg.groups:/cms/ALARM','wlcg.groups:/cms/users']
-      w := 'wlcg.groups'
+     w  := 'wlcg.groups'
      s. := 'openid' ~ 'email' ~ 'profile' ~ 'wlcg.groups:/cms/uscms'.
      ss := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-admin-oauth2/src/main/resources/qdl/fnal/wlcg_groups.qdl';
 

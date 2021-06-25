@@ -68,10 +68,12 @@ fnal.search_attributes. :=  [EPE,'isMemberOf'];
 if[
    !is_defined(at_claims.EPE.)
 ]then[
+   say('*** FNAL at_claims.EPE. undefined');
    access_token.scope := ''; // return empty scopes.
    return(); // nothing to do. No capabilities ==>  no scopes.
 ]; //end if
 
+        say('*** FNAL at_claims.EPE. ok');
 
 /*
    Variable score card
@@ -111,6 +113,7 @@ if[
 if[
     is_defined(at_claims.isMemberOf.)
   ][
+   say('*** FNAL running groups');
     // Process any WLCG groups is there is member information
     wlcg_groups :='wlcg.groups';// need this later to assign stem value.
 
@@ -131,24 +134,49 @@ if[
        // remove the scope from the request, so it is not .
        requested_scopes. := mask(requested_scopes.,requested_scopes. != wlcg_groups );
  ];*/
- 
-wlcg_scopes. := script_load('fnal/wlcg_cs.qdl', [script_args(0), script_args(1)]);
+ say('*** FNAL starting cs');
+wlcg_scopesx. := script_load('fnal/wlcg_cs.qdl', [script_args(0), script_args(1)]);
+vault_id := wlcg_scopesx.0;
+at_sub := wlcg_scopesx.1;
+say('*** FNAL done with CS, got back ' + to_string(wlcg_scopesx.));
+if[
+    vault_id != null
+  ][
+          vault_uid := 'wlcg.credkey';
+   claims.vault_uid := vault_id;
+];
+if[
+   at_sub != null
+ ][
+   access_token.sub := at_sub;
+];
+
+wlcg_scopes. := wlcg_scopesx.2;
 
 if[!sys_err.ok][return();]; // If there was an error, bail.
 
+  is_uri(x)->is_defined(to_uri(x).scheme);
+
 caps. := caps. ~ wlcg_scopes.;
-say(' caps. =' + to_string(caps., true));
+  mask(caps., !for_each(@is_uri, caps.)); //
+
+say(' wlcg_scopes. =' + input_form(wlcg_scopes.));
+say(' caps. =' + input_form(caps.));
+say(' requested_scopes. =' + input_form(requested_scopes.));
 // WLCG Groups support. These are found in the claims and if present
 // are asserted in the wlcg_groups claims
 
 // case 1: Query for available scopes. Return the capabilities requested.
+
 if[
     exec_phase == 'post_token'
   ][
     output_scopes. := resolve_templates(caps., requested_scopes., true);
 ];
 
+
 // case 2: Actual scope request. Return the scope.
+
 
 if[
     exec_phase == 'post_exchange' || exec_phase == 'post_refresh'
@@ -159,7 +187,7 @@ if[
  say('new output_scopes = ' + to_string(output_scopes.));
 
 // Last thing: never return more than they initially asked for. So here this removes
-// any scopes that does not st least start with one of the original scopes.
+// any scopes that does not at least start with one of the original scopes.
 
 output_scopes. :=  mask(output_scopes., -1 < list_starts_with(output_scopes., scopes.));
 
@@ -175,3 +203,8 @@ say('access_token. = ' +  to_string(access_token., true));
 say('     tx_scope = ' +  to_string(tx_scopes.));
 say('  tx_resource = ' +  to_string(tx_resource.));
 say('  tx_audience = ' +  to_string(tx_audience.));
+/*
+          caps. :=['wlcg.capabilityset:/duneana','wlcg.capabilityset:/dunepro','wlcg.capabilityset:/fermilab','compute.modify','compute.create','compute.cancel','compute.read','storage.read:/fermilab/users/cilogontest','storage.create:/fermilab/users/cilogontest']
+
+*/
+//diff(xx.,yy.)->[]~mask(xx., reduce(@&&,for_each(@!=, yy., xx.)))

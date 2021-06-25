@@ -9,12 +9,10 @@
    in the WLCG specification.   This returns a list of the capabilites. The spec says that if they request other capabilites
    then just add these.
 
-   Updated: 2021-06-22T14:16:17.407Z
+   Updated: 2021-04-27T15:11:46.565Z
 */
 
 say('*** WLCG_CS debug script arg count = ' + to_string(script_args()));
-say('*** WLCG_CS claims defined ? ' + to_string(is_defined(claims.)));
-
 
 // Constants and such
 CS := 'wlcg.capabilityset'; // qualifier
@@ -25,31 +23,13 @@ wlcg_cs. := []; // the WLCG capabilites set we are going to return
 // N.B. this is from the scopes of the initial request (!) so even if
 // the user tries to get another capability set on an exchange, they
 // are restricted to just the initial one.
-  
-//x. := [] ~  mask(requested_scopes.,has_value(index_of(requested_scopes., CS_HEAD), 0));
+lookupName := script_args(2);
+// ********* Old stuff
 
-x. := []~mask(requested_scopes. , -1 < starts_with(requested_scopes., CS_HEAD)); //request capability sets
-
-if[size(x.) == 0][return(wlcg_cs.);]; // no request cs, nothing to do.
-
-if[
-   1 < size(x.)
-   ][
-             sys_err.ok := false;
-        sys_err.message := 'Multiple ' + CS + ' scopes are unsupported.';
-      sys_err.errorType := 'access_denied';
-        return(wlcg_cs.);
-   ];
-
- tail(s, delim)->s - head(s, delim)-delim;
 
 // So we have exactly one. Don't know which element of x it is,
 // so list the keys and get the only one
 
-c := x.0;
-
-say('*** WLCG_CS x.=  ' + to_string(x.));
-say('*** WLCG_CS c =  ' + to_string(c));
 
 // c looks like e.g., wlcg.capabilityset:/dunepro
 //remove c from the scopes
@@ -81,16 +61,12 @@ if[
     say('*** WLCG_CS  FAILED conditional');
   ];
 
-/*
 u. := to_uri(c);
 parsedPath. := tokenize(u.path, '/');
 lastIndex := size(parsedPath.) - 1;
 lookupName := parsedPath.lastIndex + '@fnal.gov'; // required to construct the vop id
-*/
-lookupName := tail(c, ':/') + '@fnal.gov';
 VOPAUID := 'voPersonApplicationUID';
 EPPN := 'eduPersonPrincipalName';
-say('*** WLCG_CS debug: lookup name: ' + lookupName);
 say('*** WLCG_CS debug: requested capabilities: ' + c);
 say('*** WLCG_CS debug: claims count = ' + to_string(size(claims.)));
 
@@ -111,22 +87,21 @@ record. := get_claims(create_source(cs.), lookupName);
 say('*** WLCG_CS debug, returned from LDAP: ' + to_string(record.));
 
 if[!is_defined(record.EPE.)][return(wlcg_cs.);]; // no capabilites means do nothing.
-
-vault_id := null;
-at_sub := null;
-
 if[
     is_defined(record.VOPAUID)
   ][
-     vault_id :=record.VOPAUID;
+          vault_uid := 'wlcg.credkey';
+   claims.vault_uid := record.VOPAUID;
 ];
 if[
    is_defined(record.EPPN)
  ][
-   at_sub := record.EPPN;
+   access_token.sub := record.EPPN;
 ];
 
 wlcg_cs. := record.EPE.;
 wlcg_cs. := template_substitution(wlcg_cs., claims.);
+// Only return the scopes they requested.
+//wlcg_cs. := mask(wlcg_cs., has_value(wlcg_cs., requested_scopes.));
 say('*** WLCG_CS debug, returning: ' + to_string(wlcg_cs., true));
-return([vault_id, at_sub, wlcg_cs.]);
+return(wlcg_cs.);
