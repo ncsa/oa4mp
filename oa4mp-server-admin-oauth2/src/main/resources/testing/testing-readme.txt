@@ -181,31 +181,29 @@ When a new version is deployed, here is the testing order
 
         Test #4 - with wlcg capabilities for fermilab
         Set following in CLC before starting. Some of the TX scopes are bogus on purpose.
-        set_param -a scope "storage.create:/ wlcg.capabilityset:/fermilab wlcg.groups offline_access"
-        set_param -x scope "compute.modify wlcg.capabilityset:/fermilab storage.create:/fermilab/users/dwd/public storage.create:/fermilab/users/dwd/public2 "
 
-        get_at
-           scopes: compute.modify:/foo
-                   storage.write:/fermilab/users/cilogontest/public
+        set_param -a scope " wlcg.capabilityset:/fermilab wlcg.groups offline_access"
+        set_param -t scope "compute.modify storage.read:/fermilab/users/cilogontest/public"
+        set_param -x scope "compute.cancel foo.bar storage.read:/fermilab/users/cilogontest/public2 storage.create:/fermilab/users/dwd/public2"
+
+        access
+           scopes: compute.modify,compute.create,compute.cancel,compute.read,storage.read:/fermilab/users/cilogontest,storage.create:/fermilab/users/cilogontest
            at lifetime 750 sec
            rt lifetime 750 sec
            which are set in the cfg configuration, overriding the values in the client config proper.
 
-        claims
-           should contain {"wlcg.credkey": "cilogontest"}
+           claims
+              should contain: {"wlcg.credkey": "cilogontest"}
+           wlcg.groups
+              should contain: [/dune,/dune/production,/fermilab]
 
-        get_rt
-           same lifetimes
-           scopes is empty (since initial request had only queries and this request actually returns scopes).
+        token
+            scopes: compute.modify storage.read:/fermilab/users/cilogontest/public
 
         exchange
-           same lifetimes
-           scopes = storage.read:/dune/scratch/users/cilogon
-                    storage.read:/dune/scratch/users/swhite/temp
-                    storage.write:/dune/scratch/users/cilogontest
-        ['storage.read:/dune/scratch/users/cilogon','storage.read:/dune/scratch/users/swhite/temp','storage.write:/dune/scratch/users/cilogontest']
-        ['org.cilogon.userinfo','openid','profile','email','wlcg.capabilityset:/duneana','storage.read:/']
-        Aim is to test passing in various things.
+          (has bogus scopes of foo.bar and storage.create:/fermilab/users/dwd/public2)
+              scopes: compute.cancel storage.read:/fermilab/users/cilogontest/public2
+
 
   Other localhost testing clients. These exist so various tests can be run.
   -- localhost:command.line

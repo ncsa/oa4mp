@@ -86,7 +86,8 @@ public class OA2SE extends ServiceEnvironmentImpl {
                  boolean qdlStrictACLs,
                  boolean safeGC,
                  boolean rfc8628Enabled,
-                 boolean notifyOnACNewClientCreate) {
+                 boolean notifyOnACNewClientCreate,
+                 boolean printTSInDebug) {
         super(logger,
                 mfp,
                 tsp,
@@ -150,7 +151,18 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.qdlStrictACLs = qdlStrictACLs;
         this.safeGC = safeGC;
         this.rfc8628Enabled = rfc8628Enabled;
+        this.printTSInDebug = printTSInDebug;
     }
+
+    public boolean isPrintTSInDebug() {
+        return printTSInDebug;
+    }
+
+    public void setPrintTSInDebug(boolean printTSInDebug) {
+        this.printTSInDebug = printTSInDebug;
+    }
+
+    boolean printTSInDebug = true;
 
     public boolean isSafeGC() {
         return safeGC;

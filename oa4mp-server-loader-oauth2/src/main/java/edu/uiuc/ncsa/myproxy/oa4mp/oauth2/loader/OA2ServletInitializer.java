@@ -21,6 +21,7 @@ import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.StateUtils;
 import edu.uiuc.ncsa.qdl.state.SymbolStack;
 import edu.uiuc.ncsa.security.core.cache.Cleanup;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.delegation.storage.impl.ClientConverter;
@@ -57,7 +58,7 @@ public class OA2ServletInitializer extends OA4MPServletInitializer {
         if (isInitRun) return;
         super.init();
         OA2SE oa2SE = (OA2SE) getEnvironment();
-
+        DebugUtil.setPrintTS(oa2SE.isPrintTSInDebug());
         if (oa2SE.isRefreshTokenEnabled()) {
             MyProxyDelegationServlet.transactionCleanup.getRetentionPolicies().clear(); // We need a different set of policies than the original one.
             MyProxyDelegationServlet.transactionCleanup.addRetentionPolicy(

@@ -6,11 +6,11 @@
 DEBUG := true; // always false on production.
 if[DEBUG][
    /* ********** These fake getting the claims and scopes from the user. ********** */
-   //    claims.eppn := 'cilogontest@fnal.gov';
-    //   claims.uid := 'cilogontest';
-       /*  To test as Dave */
-       claims.eppn := 'dwd@fnal.gov';
-       claims.uid := 'dwd';
+       claims.eppn := 'cilogontest@fnal.gov';
+       claims.uid := 'cilogontest';
+       /*  To test as Dave  -- always check he has something sane in LDAP first! */
+    //   claims.eppn := 'dwd@fnal.gov';
+    //   claims.uid := 'dwd';
 
 ]; // end debug block
 

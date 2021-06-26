@@ -92,6 +92,7 @@ import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.*;
 public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends AbstractConfigurationLoader<T> {
     public static final String STRICT_ACLS = "strict_acls";
     public static final String SAFE_GARBAGE_COLLECTION = "safe_gc";
+    public static final String PRINT_TS_IN_DEBUG = "printTSInDebug";
     public static final String NOTIFY_ON_ADMIN_CLIENT_NEW_CLIENT = "acNewClientNotify";
     /**
      * Default is 15 days. Internally the refresh lifetime (as all date-ish things) are in milliseconds
@@ -162,7 +163,8 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     isQdlStrictACLS(),
                     isSafeGC(),
                     isRFC8628Enabled(),
-                    isNotifyOnACNewClient());
+                    isNotifyOnACNewClient(),
+                    isprintTSInDebug());
 
             if (getClaimSource() instanceof BasicClaimsSourceImpl) {
                 ((BasicClaimsSourceImpl) getClaimSource()).setOa2SE((OA2SE) se);
@@ -207,6 +209,23 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         }
         return notifyOnACNewClient;
     }
+   protected Boolean printTSInDebug = false;
+    public boolean isprintTSInDebug() {
+        if(printTSInDebug == null){
+            try {
+                printTSInDebug = Boolean.parseBoolean(getFirstAttribute(cn, PRINT_TS_IN_DEBUG));
+            } catch (Throwable t) {
+                // use default which is to doo safe garbage collection.
+                // We let this be null to trigger pulling the value, if any, out of the
+                // the configuration
+                printTSInDebug = Boolean.TRUE;
+            }
+            DebugUtil.trace(this, "print TS in debug? " + printTSInDebug);
+        }
+        return printTSInDebug;
+    }
+
+
     public boolean isSafeGC() {
         if(safeGC == null){
             try {

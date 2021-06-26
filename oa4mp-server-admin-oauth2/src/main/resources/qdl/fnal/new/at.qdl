@@ -7,6 +7,8 @@
          EPPN := 'eduPersonPrincipalName';
  IS_MEMBER_OF := 'isMemberOf';
     vault_uid := 'wlcg.credkey';
+           CS := 'wlcg.capabilityset'; // qualifier
+      CS_HEAD := CS + ':/';
  say('*** FNAL args ' + to_string(script_args(-1)));
 
  if[
@@ -49,69 +51,15 @@ if[
 ];
 
 /* Scope processing starts here */
-requested_scopes. := {};
+
 if[
-     0 < size(tx_scopes.)
+   exec_phase == 'post_token' || size(tx_scopes.) == 0
   ][
-    requested_scopes. := tx_scopes.;
-  ]else[
-    requested_scopes. := scopes.;
+     script_load('fnal/new/access.qdl', script_args(0), script_args(1));
+]else[
+     script_load('fnal/new/rtx.qdl', script_args(0), script_args(1));
+
 ];
- say('*** FNAL requested scopes =' + to_string(requested_scopes.));
-
-xi. := resolve_templates(at_claims.EPE., requested_scopes., true);  // first pass, get explicitly allowed scopes
-
- say('*** FNAL xi =' + to_string(xi.));
-
-CS := 'wlcg.capabilityset'; // qualifier
-CS_HEAD := CS + ':/';
-
-// Only one capability set at most is allowed.
-cs. := mask(xi., -1 < starts_with(xi., CS_HEAD));
-
-if[
-     1 < size(cs.)
-  ][
-             sys_err.ok := false;
-        sys_err.message := 'Multiple ' + CS + ' scopes are unsupported.';
-      sys_err.errorType := 'access_denied';
-        return([]);
-];
-if[
-    1 == size(cs.)
-  ][
-   say('*** FNAL got ' + CS + ': ' + input_form(cs.));
-
-     record. :=  script_load('fnal/new/get_service.qdl', script_args(0),script_args(1), (cs.0-CS_HEAD)+'@fnal.gov');
-    say('*** FNAL record =' + to_string(record.));
-     xi. := mask(xi., xi. != cs.0); // remove capability set from returned scopes.
-    say('*** FNAL xi after CS remove =' + to_string(xi.));
-
-     if[
-       0 < size(record.)
-      ][
-         if[is_defined(record.VOPAUID)][claims.vault_uid := record.VOPAUID;];
-         if[is_defined(record.EPPN)][access_token.sub := record.EPPN;];
-         if[
-            is_defined(record.EPE.)
-          ][
-             // do any substitutions in the templates.
-             s_rec. := template_substitution(record.EPE., claims.);
-             say('*** FNAL eta. post subst =' + to_string(s_rec.));
-             // Get any specific overrides.
-             eta. := resolve_templates(s_rec., requested_scopes., true);
-             say('*** FNAL eta. =' + to_string(eta.));
-              xi. := xi. ~ eta. ~ s_rec.; // duplicates ok here, removed later
-         ]; // no capabilites means do nothing.
-     ];
-
-  ];
-
- say('*** FNAL final xi =' + to_string(xi.));
-
- access_token.scope := detokenize(unique(xi.), ' ', 2); // turn in to string, omit duplications, trailing space
-   say('*** FNAL access token = \'' + access_token.scope + '\'');
-
 
  if[0<size(tx_audience.) || 0 < size(tx_resource.)][access_token.aud. := tx_audience.~tx_resource.;];
 

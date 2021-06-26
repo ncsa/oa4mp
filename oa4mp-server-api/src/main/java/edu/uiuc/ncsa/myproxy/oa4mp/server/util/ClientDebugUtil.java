@@ -21,12 +21,12 @@ public class ClientDebugUtil extends MetaDebugUtil {
         // Standard logging format is date host service: message
         if (level <= getDebugLevel()) {
             if(host == null || host.isEmpty()) {
-                printIt(Iso8601.date2String(new Date()) + " "
+                printIt((isPrintTS()?Iso8601.date2String(new Date()):"") + " "
                         + callingClass.getSimpleName() + " "
                         + toLabel(level) + ": [" + client.getIdentifierString() + "]" +
                         " " + message);
             }else{
-                printIt(Iso8601.date2String(new Date()) + " " + host + " " + callingClass.getSimpleName() + " " + toLabel(level) + ": " + message);
+                printIt((isPrintTS()?Iso8601.date2String(new Date()):"") + " " + host + " " + callingClass.getSimpleName() + " " + toLabel(level) + ": " + message);
             }
         }
     }
