@@ -8,6 +8,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.AccessTokenConfig;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.AuthorizationPath;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.AuthorizationTemplate;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.AuthorizationTemplates;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
@@ -258,16 +259,19 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
         /*
           Make SURE the JTI gets set or token exchange, user info etc. will never work.
          */
+        MyProxyDelegationServlet.createDebugger(transaction.getOA2Client()).trace(this,"starting AT handler finish with transaction =" + transaction);
         JSONObject atData = getAtData();
         if (getPhCfg().hasTXRecord()) {
-            // Fixes CIL-971b
+            // Fixes CIL-971
             TXRecord txRecord = getPhCfg().getTxRecord();
             if (RFC8693Constants.ACCESS_TOKEN_TYPE.equals(txRecord.getTokenType())) {
                 atData.put(JWT_ID, txRecord.getIdentifierString());
             }
         } else {
+            MyProxyDelegationServlet.createDebugger(transaction.getOA2Client()).trace(this,"update condition");
             if (transaction.getAccessToken() != null) {
                 atData.put(JWT_ID, transaction.getAccessToken().getToken());
+                MyProxyDelegationServlet.createDebugger(transaction.getOA2Client()).trace(this,"update condition: TRUE, at=" + atData.get(JWT_ID));
             }
         }
         if (doTemplates) {

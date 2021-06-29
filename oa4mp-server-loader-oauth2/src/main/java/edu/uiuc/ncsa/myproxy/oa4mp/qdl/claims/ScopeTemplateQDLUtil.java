@@ -64,15 +64,16 @@ public class ScopeTemplateQDLUtil implements QDLFunction {
         doxx.add("requested_scopes = the scopes the client has requested.");
         doxx.add("is_query = true if this call is to query available scopes. ");
         doxx.add("E.g. There are two templates");
-        doxx.add("   x. :=['x.y:/abc/def','p.q:/rst']");
+        doxx.add("   cs. :=['x.y:/abc/def','p.q:/rst']");
         doxx.add("   // The requested scopes includes a super-scope of the p.q template");
-        doxx.add("   y. := ['x.y:/abc/def/ghi','x.y:/abc/defg', 'p.q:/']");
-        doxx.add("  resolve_templates(x., y., false)");
-        doxx.add("// The false flag means to resolve only sub-scopes");
+        doxx.add("   req. := ['x.y:/abc/def/ghi','x.y:/abc/defg', 'p.q:/']");
+        doxx.add("   // Setting is_query to false means resolve only sub-scopes");
+        doxx.add("  resolve_templates(cs., req., false)");
         doxx.add("[x.y:/abc/def/ghi]");
-        doxx.add("// A last argument fo true means to interpret super-scopes as requests for supported templates");
-        doxx.add("  resolve_templates(x., y., true)");
-        doxx.add("p.q:/rst,x.y:/abc/def/ghi]");
+        doxx.add("   // Setting is_query to true means to interpret super-scopes as");
+        doxx.add("   // requests for supported templates");
+        doxx.add("  resolve_templates(cs., req., true)");
+        doxx.add("[p.q:/rst,x.y:/abc/def/ghi]");
         return doxx;
     }
 }

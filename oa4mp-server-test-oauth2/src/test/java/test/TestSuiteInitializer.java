@@ -56,6 +56,10 @@ public class TestSuiteInitializer extends AbstractTestSuiteInitializer{
         return "oa4mp.oa2.memory";
     }
 
+    public String getExplicitMemoryStoreConfigName() {
+        return "oa4mp.oa2.memory2";
+    }
+
     @Override
     public String getMySQLStoreConfigName() {
         return "oa4mp.oa2.mysql";
@@ -69,7 +73,8 @@ public class TestSuiteInitializer extends AbstractTestSuiteInitializer{
     @Override
     public void init() {
         TestUtils.setBootstrapper(getBootstrapper());
-        TestUtils.setMemoryStoreProvider(getTSP(getMemoryStoreConfigName()));
+        TestUtils.setMemoryStoreProvider(getTSP(getExplicitMemoryStoreConfigName()));
+        //TestUtils.setMemoryStoreProvider(getTSP(getMemoryStoreConfigName()));
         TestStoreProvider2 fsp = getTSP(getFileStoreConfigName()); // use this later to get its client converter. Any store would do.
         TestUtils.setFsStoreProvider(fsp);
         TestUtils.setMySQLStoreProvider(getTSP(getMySQLStoreConfigName()));

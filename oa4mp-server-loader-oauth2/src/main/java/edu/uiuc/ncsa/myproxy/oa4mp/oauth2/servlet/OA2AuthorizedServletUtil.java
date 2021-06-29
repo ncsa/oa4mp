@@ -486,23 +486,11 @@ public class OA2AuthorizedServletUtil {
 
         // CIL-1012 fix: accept prompt = consent.
         // basically we completely ignore this and offline access
-        // EXCEPT in the case that they are asking for consent and no
-        // offline_access scope -- spec. say we should reject it.
-        // Some clients use consent to require that later operations (such as user info)
-        // force consent from the user. We don't do that and for us, consent
-        // only matters if there is an offline_access scope.
-        if(prompt.contains(PROMPT_CONSENT)) {
-            if(transaction.getScopes().contains(OA2Scopes.SCOPE_OFFLINE_ACCESS)){
-                return;
-            }
-            throw new OA2RedirectableError(OA2Errors.LOGIN_REQUIRED,
-                    PROMPT + "=" + PROMPT_CONSENT + " only allowed when a scope of " + OA2Scopes.SCOPE_OFFLINE_ACCESS +
-                            " is present.",
-                    HttpStatus.SC_BAD_REQUEST,
-                    transaction.getRequestState(),
-                    transaction.getCallback()
-            );
-        }
+        // Since OA4MP always requires user consent, we can just ignore this if sent.
+        // In cases where the authorization endpoint is replaced (e.g. by Tomcat
+        // or CILogon) then the new authz endpoint must handle the prompt=consent
+        // if it does anything other than always require consent.
+        if(prompt.contains(PROMPT_CONSENT)) return;
 
         // At this point there is neither a "none" or a "login" and we don's support anything else.
 

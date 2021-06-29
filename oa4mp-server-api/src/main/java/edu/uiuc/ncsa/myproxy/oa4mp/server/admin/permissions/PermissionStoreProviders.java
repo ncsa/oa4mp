@@ -99,6 +99,11 @@ public class PermissionStoreProviders {
 
         @Override
         public Object componentFound(CfgEvent configurationEvent) {
+            // Fixes CIL-1014 -- this was returning null.
+            if (checkEvent(configurationEvent)) {
+                return get();
+            }
+            
             return null;
         }
 

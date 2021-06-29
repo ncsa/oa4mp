@@ -1,5 +1,5 @@
 /*
-   For processing capabilites in the refres or token exchange phases. Here the original
+   For processing capabilites in the refresh or token exchange phases. Here the original
    capability set is used from the acess otken request, but the requests generally are
    for subset of the full set of capabilities.
 */

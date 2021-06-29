@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.functor.FunctorRuntimeEngine;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo.VirtualOrganization;
 import edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.OA2State;
 import edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.QDLRuntimeEngine;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRunRequest;
@@ -38,6 +39,12 @@ public class ScriptRuntimeEngineFactory {
             QDLRuntimeEngine qrt = new QDLRuntimeEngine(oa2SE.getQDLEnvironment(), transaction);
             OA2State state = qrt.getState();
             state.setOa2se(oa2SE);
+            VirtualOrganization vo = oa2SE.getVO(oa2Client.getIdentifier());
+            if(vo != null){
+                state.setJsonWebKeys(vo.getJsonWebKeys());
+            }else{
+                state.setJsonWebKeys(oa2SE.getJsonWebKeys());
+            }
             state.setTransaction(transaction);
             state.setTxRecord(txRecord);
             state.setLogger(oa2SE.getMyLogger()); // This lets scripts write to the log.

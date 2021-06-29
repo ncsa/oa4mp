@@ -13,25 +13,29 @@
    Created: 2021-06-18T21:36:17.458Z
 
 */
-      scopes. ≔  script_args(0);
-found_groups. ≔  script_args(1);
+        scopes. ≔  script_args(0);
+  found_groups. ≔  script_args(1);
+              w ≔  'wlcg.groups';
+          caput ≔  w + ':'; // head of WLCG requested group.
+  group_scopes. ≔  mask(scopes., ¯1 < starts_with(scopes., [w])); // get things that start with w
+          has_w ≔  reduce(@∨, group_scopes. ≡ w);  // check if single scope of wlcg.groups is passed in
+          has_w ≔  has_w ≡ ∅ ? false:has_w; // if group_scopes is gobbledy-gook, has_w may be null. Fix it.
+  group_scopes. ≔  mask(group_scopes., group_scopes. ≠ w); // whack it off if it is there,
 
-            w ≔  'wlcg.groups';
-        caput ≔  w + ':'; // head of WLCG requested group.
-group_scopes. ≔  mask(scopes., -1 < starts_with(scopes., [w])) - caput; // get things that start with w
-        has_w ≔  reduce(@∨, group_scopes. ≡ w);  // check if single scope of wlcg.groups is passed in
-group_scopes. ≔  mask(group_scopes., group_scopes. ≠ w); // whack it off if it is there,
-if[(!has_w) && size(group_scopes.) ≡ 0][return(∅);]; // no requested wlcg groups.
+  if[(¬has_w) && size(group_scopes.) ≡ 0][return(∅);]; // no requested wlcg groups.
 
-// Normalize results: (trick) join with an empty list to renumber the elements from 0.
+  // Normalize results: (trick) join with an empty list to renumber the elements from 0.
+  // caveat x.- y gets parsed as x.(-y) due to order of operations. Force minus as (x.)-y
 
-if[
-    size(group_scopes.) ≤ 0
- ][
-    return( []~mask(found_groups., found_groups. ≠ w) );
-];
+  group_scopes. ≔  ([]~group_scopes.) - caput;
 
-return([]~mask(group_scopes., has_value(group_scopes., found_groups.)) );
+  if[
+      size(group_scopes.) ≤ 0
+   ][
+      return( []~mask(found_groups., found_groups. ≠ w));
+  ];
+
+  return([]~mask(group_scopes., has_value(group_scopes., found_groups.)));
 /*
    Test:
      g. := ['wlcg.groups', '/cms/uscms', '/cms/ALARM','/cms/users']
@@ -44,4 +48,9 @@ return([]~mask(group_scopes., has_value(group_scopes., found_groups.)) );
 
      script_run(ss, [w], g.); // request all of them
 [/cms/uscms,/cms/ALARM,/cms/users]
+
+ s. := ['openid','profile','email','org.cilogon.userinfo','wlcg.capabilityset:/fermilab','wlcg.groups:/fermilab']
+     g. := ['/cms/uscms', '/fermilab']
+
+
 */

@@ -77,30 +77,6 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
     // Don't really have a better place to put this.  TXRecord is not visible except in this module.
     public static Cleanup<Identifier, TXRecord> txRecordCleanup = null;
 
-/*
-    public static LinkedList<ClaimSource> setupClaimSources(OA2ServiceTransaction transaction, OA2SE oa2SE) {
-        LinkedList<ClaimSource> scopeHandlers = new LinkedList<>();
-        debugger.trace(OA2ATServlet.class, "setting up claim sources");
-        if (oa2SE.getClaimSource() != null && oa2SE.getClaimSource().isEnabled()) {
-            debugger.trace(OA2ATServlet.class, "Adding default claim source.");
-
-            scopeHandlers.add(oa2SE.getClaimSource());
-        }
-        ClaimSourceFactory oldSHF = ClaimSourceFactoryImpl.getFactory();
-        ClaimSourceFactoryImpl.setFactory(new ClaimSourceFactoryImpl());
-
-        OA2Client client = (OA2Client) transaction.getClient();
-        
-        debugger.trace(OA2ATServlet.class, "Getting configured claim source factory " + ClaimSourceFactoryImpl.getFactory().getClass().getSimpleName());
-        debugger.trace(OA2ATServlet.class, "Adding other claim sources");
-
-        scopeHandlers.addAll(ClaimSourceFactoryImpl.createClaimSources(oa2SE, transaction));
-        debugger.trace(OA2ATServlet.class, "Total claim source count = " + scopeHandlers.size());
-
-        ClaimSourceFactoryImpl.setFactory(oldSHF);
-        return scopeHandlers;
-    }
-*/
 
     @Override
     public void destroy() {
@@ -649,8 +625,12 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         }
         if (jwtRunner.hasATHandler()) {
             AccessToken newAT = jwtRunner.getAccessTokenHandler().getSignedAT(key);
+            debugger.trace(this, "jwt has at handler: at=" + newAT + ", for claims " + st2.getATData().toString(2));
             tokenResponse.setAccessToken(newAT);
             debugger.trace(this, "Returned AT from handler:" + newAT + ", for claims " + st2.getATData().toString(2));
+        }else{
+            debugger.trace(this, "NO ATHanlder in jwtRunner");
+
         }
         tokenResponse.setClaims(st2.getUserMetaData());
         debugger.trace(this, "set token signing flag =" + tokenResponse.isSignToken());
@@ -829,17 +809,10 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         }
 
         AccessTokenImpl at = (AccessTokenImpl) t.getAccessToken();
-
+        debugger.trace(this, "old access token = " + at.getToken());
         List<String> scopes = convertToList(request, OA2Constants.SCOPE);
         List<String> audience = convertToList(request, RFC8693Constants.AUDIENCE);
         List<URI> resources = convertToURIList(request, RFC8693Constants.RESOURCE);
-        TXRecord txRecord = null;
-        if (!scopes.isEmpty() || !audience.isEmpty() || !resources.isEmpty()) {
-            txRecord = new TXRecord(t.getIdentifier());
-            txRecord.setScopes(scopes);
-            txRecord.setAudience(audience);
-            txRecord.setResource(resources);
-        }
 
         if (t == null || !t.isRefreshTokenValid()) {
             debugger.trace(this, "Missing refresh token.");
@@ -869,6 +842,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         } else {
             rtiResponse.setRefreshToken(null);
         }
+        debugger.trace(this, "rt issuer response: " + rtiResponse  );
+
         // Note for CIL-525: Here is where we need to recompute the claims. If a request comes in for a new
         // refresh token, it has to be checked against the recomputed claims. Use case is that a very long-lived
         // refresh token is issued, a user is no longer associated with a group and her access is revoked, then
@@ -879,14 +854,32 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         // is that they exist only for the initialization.
 
         t.setAccessToken(rtiResponse.getAccessToken());
+        TXRecord txRecord = (TXRecord) oa2SE.getTxStore().create();
+        txRecord.setTokenType(RFC8693Constants.ACCESS_TOKEN_TYPE);
+
+        txRecord.setParentID(t.getIdentifier());
+        txRecord.setIdentifier(BasicIdentifier.newID(rtiResponse.getAccessToken().getToken()));
+
+
+        if (!scopes.isEmpty() || !audience.isEmpty() || !resources.isEmpty()) {
+            txRecord.setScopes(scopes);
+            txRecord.setAudience(audience);
+            txRecord.setResource(resources);
+        }
+
+//        getTransactionStore().save(t); // make sure all components can find this directly
+        debugger.trace(this, "set new access token = " + rtiResponse.getAccessToken().getToken());
+
         JWTRunner jwtRunner = new JWTRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2SE, t, txRecord, t.getOA2Client().getConfig()));
         OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, t, txRecord, request);
         try {
             jwtRunner.doRefreshClaims();
         } catch (AssertionException assertionError) {
+            debugger.trace(this, "assertion exception \"" + assertionError.getMessage() + "\"");
             throw new OA2ATException(OA2Errors.INVALID_REQUEST, assertionError.getMessage(), HttpStatus.SC_BAD_REQUEST, t.getRequestState());
         } catch (ScriptRuntimeException sre) {
             // Client threw an exception.
+            debugger.trace(this, "script runtime exception \"" + sre.getMessage() + "\"");
             throw new OA2ATException(sre.getRequestedType(), sre.getMessage(), sre.getStatus(), t.getRequestState());
         } catch (IllegalAccessException iax) {
             throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
@@ -897,6 +890,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             debugger.warn(this, "Unable to update claims on token refresh: \"" + throwable.getMessage() + "\"");
         }
         setupTokens(client, rtiResponse, oa2SE, t, jwtRunner);
+        debugger.trace(this, "finished processing claims.");
+
         // At this point, key in the transaction store is the grant, so changing the access token
         // over-writes the current value. This practically invalidates the previous access token.
         getTransactionStore().remove(t.getIdentifier()); // this is necessary to clear any caches.
@@ -924,6 +919,9 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         }
         rtiResponse.setClaims(t.getUserMetaData());
         getTransactionStore().save(t);
+        oa2SE.getTxStore().save(txRecord);
+        debugger.trace(this, "transaction saved for " + t.getIdentifierString()  );
+
         rtiResponse.write(response);
         IssuerTransactionState state = new IssuerTransactionState(
                 request,

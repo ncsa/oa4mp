@@ -13,6 +13,7 @@ import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.SymbolStack;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.stream.XMLEventReader;
@@ -36,16 +37,27 @@ public class OA2State extends State {
                     MyLoggingFacade myLoggingFacade,
                     boolean isServerMode,
                     boolean assertionsOn,
-                    boolean strictACLs) {
+                    boolean strictACLs,
+                    JSONWebKeys keys) {
         super(resolver, symbolStack, opEvaluator, metaEvaluator,
                 ft, moduleMap, myLoggingFacade, isServerMode, assertionsOn);
         this.strictACLs = strictACLs;
+        this.jsonWebKeys = keys;
     }
 
     transient OA2ServiceTransaction transaction;
     transient OA2SE oa2se;
     transient HttpServletRequest request;
 
+    public JSONWebKeys getJsonWebKeys() {
+        return jsonWebKeys;
+    }
+
+    public void setJsonWebKeys(JSONWebKeys jsonWebKeys) {
+        this.jsonWebKeys = jsonWebKeys;
+    }
+
+    JSONWebKeys jsonWebKeys;
     public void setStrictACLs(boolean strictACLs) {
         this.strictACLs = strictACLs;
     }

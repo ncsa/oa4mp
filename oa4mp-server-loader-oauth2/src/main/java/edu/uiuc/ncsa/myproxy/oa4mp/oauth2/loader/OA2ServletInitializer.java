@@ -100,7 +100,8 @@ public class OA2ServletInitializer extends OA4MPServletInitializer {
                         null, // no logging at least for now
                         true,
                         false,
-                        true); // default in server mode, but can be overridden later
+                        true,
+                        null); // default in server mode, but can be overridden later
             }
         });
         if (oa2SE.isRfc8628Enabled()) {

@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.IDTokenHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.PayloadHandlerConfigImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.UITokenUtils;
+import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.server.request.IssuerResponse;
 import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
@@ -38,6 +39,7 @@ public class UserInfoServlet extends BearerTokenServlet {
         AccessTokenImpl at = UITokenUtils.getAT(getRawAT(request));
         TokenManagerServlet.State state = new TokenManagerServlet.State();
         OA2ServiceTransaction transaction = findTransaction(at, state);
+        MetaDebugUtil debugger = createDebugger(transaction.getOA2Client());
 
         OA2SE oa2SE = (OA2SE) getServiceEnvironment();
         if (!transaction.getFlowStates().userInfo) {
@@ -55,6 +57,30 @@ public class UserInfoServlet extends BearerTokenServlet {
         uireq.setUsername(getUsername(transaction));
         UIIResponse2 uiresp = (UIIResponse2) uis.process(uireq);
         // creates the token handler just to get the updated accounting information.
+
+/*        JWTRunner jwtRunner = new JWTRunner(transaction, ScriptRuntimeEngineFactory.createRTE(oa2SE, transaction, null, transaction.getOA2Client().getConfig()));
+        OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, transaction, null, request);
+        try {
+            jwtRunner.doUserInfo();
+        } catch (AssertionException assertionError) {
+            debugger.trace(this, "assertion exception \"" + assertionError.getMessage() + "\"");
+            throw new OA2ATException(OA2Errors.INVALID_REQUEST, assertionError.getMessage(), HttpStatus.SC_BAD_REQUEST, transaction.getRequestState());
+        } catch (ScriptRuntimeException sre) {
+            // Client threw an exception.
+            debugger.trace(this, "script runtime exception \"" + sre.getMessage() + "\"");
+            throw new OA2ATException(sre.getRequestedType(), sre.getMessage(), sre.getStatus(), transaction.getRequestState());
+        } catch (IllegalAccessException iax) {
+            throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
+                    "access denied",
+                    transaction.getRequestState());
+        } catch (Throwable throwable) {
+            debugger.trace(this, "Unable to update claims on token refresh", throwable);
+            debugger.warn(this, "Unable to update claims on token refresh: \"" + throwable.getMessage() + "\"");
+        }*/
+        //setupTokens(client, rtiResponse, oa2SE, t, jwtRunner);
+        debugger.trace(this, "finished processing claims.");
+
+
         IDTokenHandler idTokenHandler = new IDTokenHandler(new PayloadHandlerConfigImpl(
                 ((OA2Client) transaction.getClient()).getIDTokenConfig(),
                 oa2SE,

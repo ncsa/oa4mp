@@ -57,10 +57,10 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
             otherV.setAudience(jsonArrayToCollection(map, getCK2().audience()));
         }
         if (map.get(getCK2().resource()) != null) {
-           Collection<String> collection= jsonArrayToCollection(map, getCK2().resource()); // This is now strings.
+            Collection<String> collection = jsonArrayToCollection(map, getCK2().resource()); // This is now strings.
 
             JSONArray jsonArray = new JSONArray();
-            for(String x: collection){
+            for (String x : collection) {
                 jsonArray.add(URI.create(x));
             }
             otherV.setAudience(jsonArray);
@@ -276,11 +276,11 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
             v.setAudience(zzz);
         }
         JSON resources = (JSON) getJsonUtil().getJSONValue(json, getCK2().resource());
-        if(resources != null && !resources.isEmpty()){
+        if (resources != null && !resources.isEmpty()) {
             JSONArray array = (JSONArray) json.getJSONObject(getJSONComponentName()).get(getCK2().resource());
             Collection<String> zzz = (Collection<String>) JSONSerializer.toJava(array);
             List<URI> x = new LinkedList<>();
-            for(String s : zzz){
+            for (String s : zzz) {
                 x.add(URI.create(s));
             }
             v.setResource(x);
@@ -316,8 +316,10 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         }
         JSONArray aud = new JSONArray();
         Collection<String> audience = client.getAudience();
-        for (String x : audience) {
-            aud.add(x);
+        if (audience != null) {
+            for (String x : audience) {
+                aud.add(x);
+            }
         }
         if (aud.size() != 0) {
             getJsonUtil().setJSONValue(json, getCK2().audience(), aud);
@@ -325,11 +327,13 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
 
         JSONArray res = new JSONArray();
         List<URI> resources = client.getResource();
-        for(URI uri:resources){
-               res.add(uri.toString());
+        if (resources != null) {
+            for (URI uri : resources) {
+                res.add(uri.toString());
 
+            }
         }
-        if(res.size() != 0){
+        if (res.size() != 0) {
             getJsonUtil().setJSONValue(json, getCK2().resource(), res);
         }
 

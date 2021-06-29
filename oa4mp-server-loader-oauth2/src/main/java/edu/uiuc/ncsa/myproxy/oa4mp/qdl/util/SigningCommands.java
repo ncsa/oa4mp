@@ -1,4 +1,4 @@
-package edu.uiuc.ncsa.myproxy.oauth2.tools;
+package edu.uiuc.ncsa.myproxy.oa4mp.qdl.util;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;

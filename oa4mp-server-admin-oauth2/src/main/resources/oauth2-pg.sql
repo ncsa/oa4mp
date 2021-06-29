@@ -163,7 +163,7 @@ commit;
   \d+ tablename - lists a description of the table.
 
   E.g.
-  \c cilgon2;
+  \c oauth2;
   \dn <-- lists all schemas
   set search_path to oauth2; <-- or no meta commands work right
   \d <-- lists the tables

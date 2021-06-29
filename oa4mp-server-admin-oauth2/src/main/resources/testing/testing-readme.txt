@@ -100,42 +100,6 @@ When a new version is deployed, here is the testing order
         Test client that point to main QDL scripts.
         Note that these all use a specific test user in FNAL's LDAP, cilogontest@fnal.gov:
 
-         voPersonID: FNALcilogontest
-         voPersonExternalID: cilogontest@fnal.gov
-         sn: Test
-         cn: Cilogon Test
-         givenName: Cilogon
-         mail: cilogontest@fnal.gov
-         uid: cilogontest
-         eduPersonPrincipalName: cilogontest@fnal.gov
-         eduPersonEntitlement: storage.read:/X
-         eduPersonEntitlement: storage.read:/Y/foo
-         eduPersonEntitlement: storage.write:/X/users/cilogontest
-         eduPersonEntitlement: wlcg.capabilityset:/duneana
-         eduPersonEntitlement: wlcg.capabilityset:/dunepro
-         eduPersonEntitlement: wlcg.capabilityset:/fermilab
-
-       QDL g -- gets the capabilities for the WLCG capabilities (in fnal workspace)
-         g('duneana@fnal.gov')
-       {
-        eduPersonEntitlement: [storage.read:/dune,storage.write:/dune/scratch/users/${uid}],
-        uid:duneana@fnal.gov
-       }
-         g('dunepro@fnal.gov')
-       {
-        eduPersonEntitlement: [storage.read:/dune,storage.write:/dune/data],
-        uid:dunepro@fnal.gov,
-        voPersonApplicationUID:dunepro
-       }
-         g('fermilab@fnal.gov')
-       {
-        eduPersonEntitlement: [compute.modify:/,compute.create:/,compute.cancel:/,storage.read:/fermilab/users/${uid},
-                               storage.write:/fermilab/users/${uid}],
-        uid:fermilab@fnal.gov
-       }
-
-
-
         Test #0 -- request with no scopes.
         Claims should have
           "wlcg.credkey": "cilogontest",
@@ -159,11 +123,11 @@ When a new version is deployed, here is the testing order
            error="server_error"
            error_description="User does not have access to this capability set. Request denied."
 
-        Test #3 - with wlcg capabilities, none in TX
+        Test #3 - with wlcg capabilities, no scopes passed in refresh or TX
         Set following in CLC before starting
         clear_all_params if needed.
         set_param -a scope "storage.read:/ wlcg.capabilityset:/duneana wlcg.groups"
-        get_at:
+        access:
           scopes:
              storage.create:/dune/scratch/users/cilogontest
              storage.read:/dune
@@ -179,10 +143,29 @@ When a new version is deployed, here is the testing order
 
         Aim is that the initial set should be resolved to what was passed in.
 
-        Test #4 - with wlcg capabilities for fermilab
+        Test #4 - with wlcg capabilities for fermilab using test user.
         Set following in CLC before starting. Some of the TX scopes are bogus on purpose.
+        Do each of the following through the access phase as a quick check
 
-        set_param -a scope " wlcg.capabilityset:/fermilab wlcg.groups offline_access"
+        set_param -a scope "wlcg.capabilityset:/fermilab"
+          output: no groups, full capability set for fermilab
+        set_param -a scope "wlcg.capabilityset:/fermilab foo:/bar fnord:/baz"
+          output: no groups, full capability set for fermilab (bad scopes ignored)
+        set_param -a scope "wlcg.groups:/fermilab"
+          output: no scopes requested ==> fails
+        set_param -a scope "wlcg.groups offline_access"
+          output: no scopes requested ==> fails
+        set_param -a scope "wlcg.capabilityset:/fermilab wlcg.groups"
+          output: all groups, full capability set for fermilab
+        set_param -a scope "wlcg.groups:/woof wlcg.capabilityset:/fermilab "
+          output: no groups (only one is bogus), full capabilities for fermilab
+
+        This next one is the last one to put in, then add the refresh and transfer scopes
+        for testing:
+
+        set_param -a scope "wlcg.capabilityset:/fermilab wlcg.groups:/fermilab"
+          output: single group /fermilab, full capability set
+
         set_param -t scope "compute.modify storage.read:/fermilab/users/cilogontest/public"
         set_param -x scope "compute.cancel foo.bar storage.read:/fermilab/users/cilogontest/public2 storage.create:/fermilab/users/dwd/public2"
 
@@ -194,15 +177,18 @@ When a new version is deployed, here is the testing order
 
            claims
               should contain: {"wlcg.credkey": "cilogontest"}
-           wlcg.groups
-              should contain: [/dune,/dune/production,/fermilab]
+           wlcg.groups: [/fermilab]
 
-        token
+        refresh
             scopes: compute.modify storage.read:/fermilab/users/cilogontest/public
+            wlcg.groups: [/fermilab]
 
         exchange
           (has bogus scopes of foo.bar and storage.create:/fermilab/users/dwd/public2)
               scopes: compute.cancel storage.read:/fermilab/users/cilogontest/public2
+
+       Also, do some refreshes, do some exchanges and make sure that the expected scopes
+       are always returns faithfully.
 
 
   Other localhost testing clients. These exist so various tests can be run.

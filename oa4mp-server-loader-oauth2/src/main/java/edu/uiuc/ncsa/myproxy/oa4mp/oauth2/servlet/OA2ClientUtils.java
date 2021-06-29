@@ -80,7 +80,7 @@ public class OA2ClientUtils {
                     "invalid redirect uri for client \"" +
                             oa2Client.getIdentifierString() + "\": \"" + redirect + "\"");
             throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
-                    "The given " + OA2Constants.REDIRECT_URI +" is not valid for this client.",
+                    "The given " + OA2Constants.REDIRECT_URI + " is not valid for this client.",
                     HttpStatus.SC_BAD_REQUEST,
                     null);
         }
@@ -285,10 +285,10 @@ public class OA2ClientUtils {
 
     public static void setupHandlers(JWTRunner jwtRunner, OA2SE oa2SE, OA2ServiceTransaction transaction, TXRecord txRecord, HttpServletRequest req) throws Throwable {
         MetaDebugUtil debugger = DebugUtil.getInstance();
-              if(transaction.getClient().isDebugOn()){
-                         debugger = new MetaDebugUtil();
-                         debugger.setIsEnabled(true);
-              }
+        if (transaction.getClient().isDebugOn()) {
+            debugger = new MetaDebugUtil();
+            debugger.setIsEnabled(true);
+        }
         debugger.trace(OA2ClientUtils.class, "Setting up handlers");
         OA2Client client = (OA2Client) transaction.getClient();
         PayloadHandlerConfigImpl idthCfg = null;
@@ -354,7 +354,8 @@ public class OA2ClientUtils {
             jwtRunner.setRefreshTokenHandler(rth);
         }
     }
-    public static List<String> scopesFromTemplates(List<String> scopes, OA2ServiceTransaction t){
+
+    public static List<String> scopesFromTemplates(List<String> scopes, OA2ServiceTransaction t) {
         List<String> computedScopes = new ArrayList<>();
         return computedScopes;
 

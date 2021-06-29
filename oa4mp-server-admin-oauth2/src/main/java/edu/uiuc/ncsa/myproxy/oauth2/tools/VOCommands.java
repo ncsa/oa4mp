@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.myproxy.oauth2.tools;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo.VOStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo.VirtualOrganization;
+import edu.uiuc.ncsa.myproxy.oa4mp.qdl.util.SigningCommands;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.StoreCommands2;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
@@ -20,7 +21,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.util.Date;
 
-import static edu.uiuc.ncsa.myproxy.oauth2.tools.SigningCommands.RS_256;
+import static edu.uiuc.ncsa.myproxy.oa4mp.qdl.util.SigningCommands.RS_256;
 import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 
 /**

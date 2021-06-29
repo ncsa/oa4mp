@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.oa2.qdl;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.qdl.util.JWTModule;
 import edu.uiuc.ncsa.qdl.extensions.QDLLoader;
 import edu.uiuc.ncsa.qdl.module.Module;
 

@@ -66,45 +66,56 @@ public class TemplateSubsitutionQDLUtil implements QDLFunction {
         List<String> doxx = new ArrayList<>();
         switch (argCount) {
             case 2:
-                doxx.add(getName() + "(raw_string | stem., simple_claims.");
+                doxx.add(getName() + "(arg, scalar_claims.");
                 break;
             case 3:
-                doxx.add(getName() + "(raw_string | stem., simple_claims.[,  group_claims.]");
+                doxx.add(getName() + "(arg., scalar_claims., list_claims.");
                 break;
         }
-        doxx.add("raw_string = string to be acted upon");
-        doxx.add("stem.  = a list of strings to be acted upon");
+        doxx.add("Output is always a list with all possible substitutions done.");
+        doxx.add("arg = a string or stem to be acted upon");
+        doxx.add("scalar_claims.  = a stem of the scalar substitutions");
 
 
         switch (argCount) {
             case 2:
                 doxx.add("Note, you will get back a single string with all possible substitutions done for each argument.");
-                doxx.add("E.g. #1");
+                doxx.add("E.g. # 1 -- apply to a string");
                 doxx.add("Take the raw_string and apply templates to it. So if the string were");
-                doxx.add("'storage.read:/home/${uid} and simple_claims.uid := 'bob', the result would be");
+                doxx.add("'storage.read:/home/${uid} and scalar_claims.uid := 'bob', the result would be");
                 doxx.add("'storage.read:/home/bob");
+                doxx.add("E.g. # 2 -- a simple example for a stem");
+                doxx.add("A very simple invocation, with templates in the left argument");
+                doxx.add("and a stem consisting of a single substitution:");
+                doxx.add("   template_substitution(['a.${u}','b.${u}'],{'u':'x'})");
+                doxx.add("[a.x, b.x]");
+                doxx.add("If we had a general stem (so not just a list) as the arg, we would");
+                doxx.add("still get back a list.");
                 break;
             case 3:
+                doxx.add("list_claims.  = a stem of the list substitutions");
                 doxx.add("If there are groups (lists of strings), then the first list element that matches");
-                doxx.add("Caveat: Be sure that the group_claims. have values simple flat lists of strings,");
+                doxx.add("will be used. The groups. ");
+                doxx.add("Caveat: Be sure that the list_claims. have values simple flat lists of strings,");
                 doxx.add("        since this get handed off");
                 doxx.add("        to Java, which cannot understand complex stems.");
                 doxx.add("You will get back a list of strings for each argument, one for each group found.");
-                doxx.add("E.g. #1");
-                doxx.add("If you have claims in an stem called claims. ");
-                doxx.add("grps. := include_keys(claims., list_keys(claims., false));");
-                doxx.add("would return all groups. Similarly, ");
-                doxx.add("c2. := include_keys(claims., list_keys(claims., true))");
-                doxx.add("would return all scalar-valued claims. If you wanted to process the ");
-                doxx.add("variable named raw_string, issue");
-                doxx.add(getName() + "(raw_string, c2., grps.);");
-                doxx.add("E.g. #2");
+                doxx.add("");
+                doxx.add("E.g. # 1 - splitting up claims");
+                doxx.add("Assuming you have claims in a stem called claims. you can split off the groups by");
+                doxx.add("   grps. := include_keys(claims., list_keys(claims., false));");
+                doxx.add("Similarly, to split off the claims");
+                doxx.add("   c2. := include_keys(claims., list_keys(claims., true))");
+                doxx.add("To process the variable named raw_string:");
+                doxx.add("   "+getName() + "(raw_string, c2., grps.);");
+                doxx.add("E.g. # 2 -- a direct example");
                 doxx.add("  raw:='storage.read:/bsu/${isMemberOf}/${uid}';");
                 doxx.add("  claims.uid := 'bob';");
                 doxx.add("  grps.isMemberOf. := ['all','dune'];");
-                doxx.add("  template_substitution(raw,claims., grps.);");
+                doxx.add("  template_substitution(raw, claims., grps.);");
                 doxx.add("[storage.read:/bsu/all/bob,storage.read:/bsu/dune/bob]");
-                doxx.add("");
+                doxx.add("   template_substitution(['a.b/${uid}', 'a.c:/${isMemberOf}/${uid}'], claims., grps.);");
+                doxx.add("[a.b/bob,a.c:/all/bob,a.c:/dune/bob]");
                 break;
         }
 

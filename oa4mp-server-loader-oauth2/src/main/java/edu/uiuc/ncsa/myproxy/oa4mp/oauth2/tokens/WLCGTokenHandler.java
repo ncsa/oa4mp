@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.AbstractAccessTokenHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.PayloadHandlerConfigImpl;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2ATException;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
@@ -20,6 +21,7 @@ public class WLCGTokenHandler extends AbstractAccessTokenHandler implements WLCG
 
     public WLCGTokenHandler(PayloadHandlerConfigImpl cfg) {
         super(cfg);
+        MyProxyDelegationServlet.createDebugger(cfg.getTransaction().getClient()).trace(this, "Created handler with transaction " + cfg.getTransaction());
     }
 
     @Override

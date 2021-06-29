@@ -64,6 +64,7 @@ public class TestSuiteInitializer extends AbstractTestSuiteInitializer {
     public void init() {
         TestUtils.setBootstrapper(getBootstrapper());
            TestUtils.setMemoryStoreProvider(getTSP(getMemoryStoreConfigName()));
+           TestUtils.setMemoryStoreProvider(getTSP(getMemoryStoreConfigName()));
            TestStoreProvider fsp = getTSP(getFileStoreConfigName()); // use this later to get its client converter. Any store would do.
            TestUtils.setFsStoreProvider(fsp);
            TestUtils.setMySQLStoreProvider(getTSP(getMySQLStoreConfigName()));

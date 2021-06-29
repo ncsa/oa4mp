@@ -1,6 +1,5 @@
- acl_add('localhost:test/fnal');
- acl_add('fnal:dwd-7');
- acl_check();
+script_load('fnal/acl.qdl');
+
  // Constants for later
           EPE := 'eduPersonEntitlement';
       VOPAUID := 'voPersonApplicationUID';
@@ -11,13 +10,7 @@
       CS_HEAD := CS + ':/';
  say('*** FNAL args ' + to_string(script_args(-1)));
 
- if[
-      script_args() != 2
-   ]then[
-      sys_err.ok := false;
-      sys_err.message := 'Sorry, but you must supply both a username (principal) and password.';
-      return();
-   ];
+ ⊨ script_args() ≡ 2 : 'Script error: You must supply both a username (principal) and password.';
 
     at_claims. := script_load('fnal/new/get_user.qdl', script_args(0),script_args(1), claims.eppn);
 
@@ -45,7 +38,7 @@ if[
     if[
          size(wlcg_groups.) != 0
        ][
-           claims.wlcg_groups. := wlcg_groups.;
+           access_token.wlcg_groups. := wlcg_groups.;
            remove(at_claims.isMemberOf.);
     ];
 ];
@@ -62,4 +55,3 @@ if[
 ];
 
  if[0<size(tx_audience.) || 0 < size(tx_resource.)][access_token.aud. := tx_audience.~tx_resource.;];
-

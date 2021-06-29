@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.myproxy.oauth2.tools;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.functor.claims.OA2FunctorFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2ConfigurationLoader;
+import edu.uiuc.ncsa.myproxy.oa4mp.qdl.util.SigningCommands;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.BaseCommands;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.ClientStoreCommands;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.CopyCommands;

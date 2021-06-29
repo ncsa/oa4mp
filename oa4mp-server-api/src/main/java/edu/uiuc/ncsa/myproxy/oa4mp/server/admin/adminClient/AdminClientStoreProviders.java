@@ -84,6 +84,10 @@ public class AdminClientStoreProviders {
 
         @Override
         public Object componentFound(CfgEvent configurationEvent) {
+            if (checkEvent(configurationEvent)) {
+                return get();
+            }
+
             return null;
         }
 

@@ -1,7 +1,7 @@
-package edu.uiuc.ncsa.oa2.qdl;
+package edu.uiuc.ncsa.myproxy.oa4mp.qdl.util;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ExtendedParameters;
-import edu.uiuc.ncsa.myproxy.oauth2.tools.SigningCommands;
+import edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.OA2State;
 import edu.uiuc.ncsa.qdl.evaluate.IOEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
@@ -385,6 +385,9 @@ public class JWTCommands implements Serializable {
 
         @Override
         public Object evaluate(Object[] objects, State state) {
+            if(state instanceof OA2State){
+                jwks =  ((OA2State)state).getJsonWebKeys();
+            }
             if (jwks == null || jwks.isEmpty()) {
                 throw new IllegalStateException("Error: no keys loaded.");
             }
