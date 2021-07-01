@@ -203,7 +203,6 @@ public class OA2Client extends Client implements OA2ClientScopes {
     }
 
     public void setAccessTokenConfig(AccessTokenConfig cfg) {
-        //set(getConfig(), TOKENS_KEY, ACCESS_TOKENS_KEY, cfg.toJSON());
         setPayloadConfig(cfg, TOKENS_KEY, ACCESS_TOKENS_KEY);
     }
 

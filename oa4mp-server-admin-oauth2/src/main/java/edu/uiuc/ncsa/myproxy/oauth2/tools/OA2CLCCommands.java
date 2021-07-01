@@ -663,7 +663,7 @@ public class OA2CLCCommands extends CLCCommands {
         if (getDummyAsset().getAccessToken().isOldVersion() && getDummyAsset().getAccessToken().getLifetime() < 0) {
             getDummyAsset().getAccessToken().setLifetime(OA2ConfigurationLoader.ACCESS_TOKEN_LIFETIME_DEFAULT);
         }
-        if (getDummyAsset().getRefreshToken().isOldVersion() && getDummyAsset().getRefreshToken().getLifetime() < 0) {
+        if (getDummyAsset().hasRefreshToken() && getDummyAsset().getRefreshToken().isOldVersion() && getDummyAsset().getRefreshToken().getLifetime() < 0) {
             getDummyAsset().getRefreshToken().setLifetime(OA2ConfigurationLoader.MAX_REFRESH_TOKEN_LIFETIME_DEFAULT);
         }
         Object x = currentATResponse.getParameters().get(RAW_ID_TOKEN);
@@ -910,7 +910,9 @@ public class OA2CLCCommands extends CLCCommands {
             say(currentURI.toString());
         }
         printToken(getDummyAsset().getAccessToken(), noVerify);
-        printToken(getDummyAsset().getRefreshToken(), noVerify);
+        if(getDummyAsset().hasRefreshToken()) {
+            printToken(getDummyAsset().getRefreshToken(), noVerify);
+        }
 
 
     }

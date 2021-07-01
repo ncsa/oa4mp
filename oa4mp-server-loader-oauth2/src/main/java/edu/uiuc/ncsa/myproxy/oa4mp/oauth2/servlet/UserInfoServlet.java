@@ -4,14 +4,19 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.IDTokenHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.PayloadHandlerConfigImpl;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ScriptRuntimeEngineFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.UITokenUtils;
+import edu.uiuc.ncsa.qdl.exceptions.AssertionException;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.server.request.IssuerResponse;
 import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
+import edu.uiuc.ncsa.security.oauth_2_0.OA2ATException;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2RedirectableError;
+import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTRunner;
+import edu.uiuc.ncsa.security.oauth_2_0.jwt.ScriptRuntimeException;
 import edu.uiuc.ncsa.security.oauth_2_0.server.UII2;
 import edu.uiuc.ncsa.security.oauth_2_0.server.UIIRequest2;
 import edu.uiuc.ncsa.security.oauth_2_0.server.UIIResponse2;
@@ -57,8 +62,15 @@ public class UserInfoServlet extends BearerTokenServlet {
         uireq.setUsername(getUsername(transaction));
         UIIResponse2 uiresp = (UIIResponse2) uis.process(uireq);
         // creates the token handler just to get the updated accounting information.
+        IDTokenHandler idTokenHandler = new IDTokenHandler(new PayloadHandlerConfigImpl(
+                ((OA2Client) transaction.getClient()).getIDTokenConfig(),
+                oa2SE,
+                transaction,
+                null, // no token exchange record outside of token exchanges.
+                null));
+        idTokenHandler.refreshAccountingInformation();
 
-/*        JWTRunner jwtRunner = new JWTRunner(transaction, ScriptRuntimeEngineFactory.createRTE(oa2SE, transaction, null, transaction.getOA2Client().getConfig()));
+        JWTRunner jwtRunner = new JWTRunner(transaction, ScriptRuntimeEngineFactory.createRTE(oa2SE, transaction, null, transaction.getOA2Client().getConfig()));
         OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, transaction, null, request);
         try {
             jwtRunner.doUserInfo();
@@ -76,18 +88,18 @@ public class UserInfoServlet extends BearerTokenServlet {
         } catch (Throwable throwable) {
             debugger.trace(this, "Unable to update claims on token refresh", throwable);
             debugger.warn(this, "Unable to update claims on token refresh: \"" + throwable.getMessage() + "\"");
-        }*/
+        }
         //setupTokens(client, rtiResponse, oa2SE, t, jwtRunner);
         debugger.trace(this, "finished processing claims.");
 
+        if (jwtRunner.hasATHandler()) {
+            transaction.setUserMetaData(jwtRunner.getAccessTokenHandler().getClaims());
+        } else {
+            if (jwtRunner.hasIDTokenHander()) {
+                transaction.setUserMetaData(jwtRunner.getIdTokenHandlerInterface().getClaims());
+            }
+        }
 
-        IDTokenHandler idTokenHandler = new IDTokenHandler(new PayloadHandlerConfigImpl(
-                ((OA2Client) transaction.getClient()).getIDTokenConfig(),
-                oa2SE,
-                transaction,
-                null, // no token exchange record outside of token exchanges.
-                null));
-        idTokenHandler.refreshAccountingInformation();
         getTransactionStore().save(transaction);
         uiresp.getUserInfo().getMap().putAll(stripClaims(transaction.getUserMetaData()));
         uiresp.write(response);
@@ -125,7 +137,6 @@ public class UserInfoServlet extends BearerTokenServlet {
     public ServiceTransaction verifyAndGet(IssuerResponse iResponse) throws IOException {
         return null;
     }
-
 
 
 }

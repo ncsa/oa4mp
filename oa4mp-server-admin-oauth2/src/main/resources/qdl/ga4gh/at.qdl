@@ -1,0 +1,21 @@
+/*
+   Basic script for creating an access token for GA4GH
+   Configuration:
+   {"tokens":
+     {"access": {
+          "lifetime": 1200000,
+          "type": "scitoken"
+          "qdl":  [
+            {"load": "ga4gh/ga4gh.qdl","xmd": {"exec_phase": ["post_user_info"]}},
+            {"load": "ga4gh/at.qdl","xmd": {"exec_phase":  ["post_token","post_refresh","post_exchange"]}}
+           ]
+   }}}}
+
+  Note that this has multiple scripts that run in different phases for the handler.
+*/
+GA4GH_SCOPE := 'ga4gh_passport_v1';
+if[
+   has_value(GA4GH_SCOPE, scopes.)
+  ][
+   access_token.scope := detokenize(unique(scopes.), ' ', 2); // turn in to string, omit duplications, trailing space
+];

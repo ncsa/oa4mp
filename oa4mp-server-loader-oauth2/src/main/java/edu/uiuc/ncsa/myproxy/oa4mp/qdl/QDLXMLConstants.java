@@ -30,16 +30,4 @@ public interface QDLXMLConstants extends XMLConstants {
     String VO_DISCOVERY_PATH = "discovery_path";
     // use issuer and id_attr from above
 
-    /*
-        String tokenType;
-    List<String> audience;
-    long expiresAt = System.currentTimeMillis();
-    long lifetime = 0L;
-    long issuedAt = System.currentTimeMillis();
-    String issuer;
-    Identifier parentID;
-    List<String> scopes;
-    List<URI> resource;
-    boolean valid;
-     */
 }

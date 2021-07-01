@@ -159,4 +159,19 @@ public class OA2State extends State {
             txRecord.toXML(xsw);
         }
     }
+
+    @Override
+    public State newInstance(ImportManager resolver, SymbolStack symbolStack, OpEvaluator opEvaluator, MetaEvaluator metaEvaluator, FTStack ftStack, ModuleMap moduleMap, MyLoggingFacade myLoggingFacade, boolean isServerMode, boolean assertionsOn) {
+        return new OA2State(resolver,
+                symbolStack,
+                opEvaluator,
+                metaEvaluator,
+                ftStack,
+                moduleMap,
+                myLoggingFacade,
+                isServerMode,
+                assertionsOn,
+                isStrictACLs(),
+                getJsonWebKeys());
+    }
 }

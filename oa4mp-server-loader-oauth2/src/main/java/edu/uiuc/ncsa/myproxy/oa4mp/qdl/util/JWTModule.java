@@ -43,6 +43,7 @@ public class JWTModule extends JavaModule {
         funcs.add(jwtCommands.new CreateJWK());
         funcs.add(jwtCommands.new LoadJWK());
         funcs.add(jwtCommands.new KeyInfo());
+        funcs.add(jwtCommands.new Create_UUID());
         funcs.add(jwtCommands.new SaveKeys());
         funcs.add(jwtCommands.new CreateJWT());
         funcs.add(jwtCommands.new VerifyJWT());

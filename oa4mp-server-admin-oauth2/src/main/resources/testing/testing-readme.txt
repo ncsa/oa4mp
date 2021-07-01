@@ -6,23 +6,10 @@ When a new version is deployed, here is the testing order
   ** Note all of these authenticate  to the local tomcat instance.
 
   Main testing clients and tests
-  -- localhost kubernetes install. This is located in the ~/.kube directory.
-     1. Go to https://portal.nrp-nautilus.io
-     2. Select Login (upper right corner)
-     3. Log in with NCSA IDP
-     4. Now you should see a "Get config" button near the top right hand side. Press it.
-     5. Save the config file to the /.kube directory, overwriting the current config file.
-     6. At the command line, issue
+    -- localhost:command.line
+      This has random testing configurations in it, so never test it (unless it is
+      germane to the release).
 
-        ./kubectl get pods
-
-     If it worked, you will get the following error (since I am enrolled in no projects, I just have
-     a login):
-
-        Error from server (Forbidden): pods is forbidden: User "http://cilogon.org/serverT/users/173048"
-        cannot list resource "pods" in API group "" in the namespace "default"
-
-     Any other message, such as expired token is an error.
   -- localhost:command.line2
      Most basic virtual organization test. Configuration will return JWTs for both access and
      refesh tokens, requiring signatures for generation and verification.
@@ -101,11 +88,11 @@ When a new version is deployed, here is the testing order
         Note that these all use a specific test user in FNAL's LDAP, cilogontest@fnal.gov:
 
         Test #0 -- request with no scopes.
-        Claims should have
-          "wlcg.credkey": "cilogontest",
-         no scopes in access token (since none requested) => access_denied exception
+           no scopes in access token (since none requested) => access_denied exception
 
         Test #1 -- plain, no wlcg capability sets. Requests two storage capabilities, one good one not
+        ** INVALID** There used to be entries in LDAP to do this, but they were removed.
+                     Keep this test in case they come back, but it will fail until then.
         set_param -a scope "storage.create:/ storage.read:/"
         set_param -x scope "storage.read:/X/public storage.create:/dune/  storage.create:/X/users"
 
@@ -118,10 +105,17 @@ When a new version is deployed, here is the testing order
         scopes : storage.read:/X/public
 
         Test #2 -- request non-existent WLCG capability set
-        set_param -a scope "wlcg.capabilityset:/fubar  storage.read:/"
+        set_param -a scope "wlcg.capabilityset:/fubar "
         Output:
            error="server_error"
            error_description="User does not have access to this capability set. Request denied."
+
+        Test #2.5 -- request multiple WLCG capability set
+        set_param -a scope "wlcg.capabilityset:/fermilab wlcg.capabilityset:/dune"
+        Output:
+           error="access_denied"
+           error_description="Multiple capabilities not allowed"
+
 
         Test #3 - with wlcg capabilities, no scopes passed in refresh or TX
         Set following in CLC before starting
@@ -144,6 +138,7 @@ When a new version is deployed, here is the testing order
         Aim is that the initial set should be resolved to what was passed in.
 
         Test #4 - with wlcg capabilities for fermilab using test user.
+        Load a fresh instance of the CLC (make absolutely sure there is no stale state!!)
         Set following in CLC before starting. Some of the TX scopes are bogus on purpose.
         Do each of the following through the access phase as a quick check
 
@@ -280,9 +275,42 @@ TO DO:
        If this fails, the system is not working at a basic level.
 
 * Put on test.
+-- localhost kubernetes install. This is located in the ~/.kube directory.
+   Note that the endpoint here points to test.cilogon.org and is usually not
+   available. Contact Dmitry to enable it for testing.
+     1. Go to https://portal.nrp-nautilus.io
+     2. Select Login (upper right corner)
+     3. Log in with NCSA IDP
+     4. Now you should see a "Get config" button near the top right hand side. Press it.
+     5. Save the config file to the /.kube directory, overwriting the current config file.
+     6. At the command line, issue
+
+        ./kubectl get pods
+
+     If it worked, you will get the following error (since I am enrolled in no projects, I just have
+     a login):
+
+        Error from server (Forbidden): pods is forbidden: User "http://cilogon.org/serverT/users/173048"
+        cannot list resource "pods" in API group "" in the namespace "default"
+
+     Any other message, such as expired token is an error.
+
+
+
   -- Command line client from ashigaru (test:command.line0, id ends with 70530)
   -- Command line client from ashigaru (test:command.line)
   -- Command line client from ashigaru (test:command.line2)
+
+  -- Command line client test:test/no_userinfo
+     This is a very primitive client with no refresh and plain vanilla tokens.
+     In spite of the name, it does return claims and should work with the
+     get_user_info endpoint.
+     Basic exchange works, refresh or exchange fail
+
+  -- test:test/ucsd
+     This is a public client, very basic, that allows for refresh
+     get_user_info is naught else than the barebones subject, audience and issuer.
+
   -- Do surge test client: https://surge.ncsa.illinois.edu/cilogon-oa2-test/
         Plain vanilla, no extra configuration.
   -- Do demo0 client: https://demo0.cilogon.org/cilogon2/ (id ends with demo0)
@@ -302,38 +330,3 @@ TO DO:
        NCSA IDP aware though. (interoperability test).
    -- Farm out testing to others: LSST, LIGO, FNAL
 
-{"tokens": {
-    "access":  {
-       "audience": "https://wlcg.cern.ch/jwt/v1/access",
-         "issuer": "https://access.cilogon.org",
-      "lifetime" : 750019
-           "type": "wlcg",
-      "templates": [ {
-           "aud": "https://wlcg.cern.ch/jwt/v1/access",
-         "paths":   [
-             {"op": "read","path": "/home/${sub}"},
-             {"op": "x.y","path": "/abc/def"},
-             {"op": "x.z","path": ""},
-             {"op": "write","path": "/data/cluster"}
-           ]}]
-           }
-    "refresh":  {
-      "audience": "https://wlcg.cern.ch/jwt/refresh",
-        "issuer": "https://refresh.cilogon.org",
-      "lifetime": 3600000,
-          "type": "refresh"
-     }
-    "identity":  {"type": "identity"}
-  }}
-
-
-{"tokens": {"identity": {
-                      "qdl":  {
-                       "load": "ncsa/glick-dda9f0.qdl",
-                       "xmd": {"exec_phase":   [
-                        "pre_auth",
-                        "post_token"
-                       ]}
-                      },
-                      "type": "identity"
-                     }}}

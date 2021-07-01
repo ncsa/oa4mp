@@ -6,6 +6,8 @@ import edu.uiuc.ncsa.qdl.scripting.AnotherJSONUtil;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.util.scripting.ScriptSet;
+import net.sf.json.JSON;
+import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
 
 import java.io.Serializable;
@@ -54,14 +56,22 @@ public abstract class AbstractPayloadConfig implements Serializable {
 
     String id;
     Date creationTS;
-    JSONObject rawScripts;
+    JSON rawScripts = null;
 
     public void fromJSON(JSONObject jsonObject) {
         if (jsonObject.containsKey(LIFETIME_KEY)) {
             lifetime = jsonObject.getLong(LIFETIME_KEY);
         }
         if(jsonObject.containsKey(QDLRuntimeEngine.CONFIG_TAG)) {
-            rawScripts = jsonObject.getJSONObject(QDLRuntimeEngine.CONFIG_TAG);
+            try{
+                rawScripts = jsonObject.getJSONObject(QDLRuntimeEngine.CONFIG_TAG);
+            }catch (JSONException jsonException){
+                rawScripts = jsonObject.getJSONArray(QDLRuntimeEngine.CONFIG_TAG);
+            }
+            //rawScripts = jsonObject.getJSONObject(QDLRuntimeEngine.CONFIG_TAG);
+            if(rawScripts == null){
+                throw new IllegalArgumentException("error: no recognizable scripts found for \"" + jsonObject.getString(QDLRuntimeEngine.CONFIG_TAG) + "\"");
+            }
             setScriptSet(AnotherJSONUtil.createScripts(rawScripts));
         }
         if (jsonObject.containsKey(TYPE_KEY)) {

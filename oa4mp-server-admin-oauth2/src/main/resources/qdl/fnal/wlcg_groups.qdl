@@ -49,7 +49,7 @@
      script_run(ss, [w], g.); // request all of them
 [/cms/uscms,/cms/ALARM,/cms/users]
 
- s. := ['openid','profile','email','org.cilogon.userinfo','wlcg.capabilityset:/fermilab','wlcg.groups:/fermilab']
+     s. := ['openid','profile','email','org.cilogon.userinfo','wlcg.capabilityset:/fermilab','wlcg.groups:/fermilab']
      g. := ['/cms/uscms', '/fermilab']
 
 

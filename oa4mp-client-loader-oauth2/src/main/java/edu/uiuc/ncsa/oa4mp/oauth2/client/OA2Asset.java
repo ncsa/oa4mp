@@ -20,7 +20,9 @@ public class OA2Asset extends Asset {
     public OA2Asset(Identifier identifier) {
         super(identifier);
     }
-
+    public boolean hasRefreshToken(){
+        return refreshToken != null;
+    }
     AccessTokenImpl accessToken;
     RefreshTokenImpl refreshToken;
 

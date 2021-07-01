@@ -36,7 +36,7 @@ if[
 
     wlcg_groups. := script_run('fnal/wlcg_groups.qdl', scopes., at_claims.isMemberOf.);
     if[
-         size(wlcg_groups.) != 0
+       	 size(wlcg_groups.) != 0
        ][
            access_token.wlcg_groups. := wlcg_groups.;
            remove(at_claims.isMemberOf.);
@@ -49,7 +49,10 @@ if[
    exec_phase == 'post_token' || size(tx_scopes.) == 0
   ][
      script_load('fnal/new/access.qdl', script_args(0), script_args(1));
+     if[!sys_err.ok][return();]; // If there was an error, bail.
+
 ]else[
+      say('*** FNAL at.qdl, starting rtx');
      script_load('fnal/new/rtx.qdl', script_args(0), script_args(1));
 
 ];

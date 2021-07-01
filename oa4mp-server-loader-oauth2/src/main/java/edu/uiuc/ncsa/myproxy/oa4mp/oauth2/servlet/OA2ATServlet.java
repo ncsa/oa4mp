@@ -609,6 +609,16 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         setupTokens(client, tokenResponse, oa2SE, st2, jwtRunner, false);
     }
 
+    /**
+     * Takes the newly modified access and refresh tokens after all scripts are run
+     * and updates the transaction so that whatever the script did is not stored in the system.
+     * @param client
+     * @param tokenResponse
+     * @param oa2SE
+     * @param st2
+     * @param jwtRunner
+     * @param isTokenExchange
+     */
     private void setupTokens(OA2Client client,
                              IDTokenResponse tokenResponse,
                              OA2SE oa2SE,
@@ -629,7 +639,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             tokenResponse.setAccessToken(newAT);
             debugger.trace(this, "Returned AT from handler:" + newAT + ", for claims " + st2.getATData().toString(2));
         }else{
-            debugger.trace(this, "NO ATHanlder in jwtRunner");
+            debugger.trace(this, "NO ATHandler in jwtRunner");
 
         }
         tokenResponse.setClaims(st2.getUserMetaData());

@@ -234,6 +234,12 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
             case SRE_POST_EXCHANGE:
                 s = getScript(SRE_POST_EXCHANGE);
                 break;
+            case SRE_PRE_USER_INFO:
+                s = getScript(SRE_PRE_USER_INFO);
+                break;
+            case SRE_POST_USER_INFO:
+                s = getScript(SRE_POST_USER_INFO);
+                break;
         }
         if (s == null) {
             return noOpSRR();

@@ -1,0 +1,56 @@
+/*
+  This is the basic implementation of an GA4GH system based on
+
+  https://github.com/ga4gh-duri/ga4gh-duri.github.io/blob/master/researcher_ids/ga4gh_passport_v1.md
+
+  This is called in the user info endpoint.
+*/
+
+GA4GH_SCOPE := 'ga4gh_passport_v1';
+
+if[!is_defined(access_token.scope)][return();]; // nothing to do
+if[!has_value(GA4GH_SCOPE, tokenize(access_token.scope, ' '))][return();]; // nothing to do.
+
+// next line is for debugging on my system.
+claims.affiliation := 'member@ncsa.illinois.edu;employee@ncsa.illinois.edu;staff@ncsa.illinois.edu'; // debugging
+
+/* functions */
+define[
+    visa(x)
+   ][
+     visa.source := 'http://illinois.edu/';
+     visa.asserted := date_ms()%1000;
+     visa.by := 'system';
+     visa.type := 'AffiliationAndRole';
+     visa.value := x;
+
+     p.jti := create_uuid();
+     p.sub := claims.sub;
+     p.iat := date_ms()%1000;
+     p.'exp' := p.iat + 365*24*3600; // make it last a year
+     p.iss := claims.iss;
+     p.ga4gh_visa_v1. := visa. ;
+     return(create_jwt(p.));
+]; // end creating a single visa
+
+define[
+     visas(x.)
+  ][
+  out. := [];
+  while[for_keys(j,x.)][
+      out. := out. ~ visa(x.j);
+  ]; //end while
+  return(out.);
+]; // end creating all the visas.
+
+/* actual script: Check if they have affiliations and if so, assert the passport. */
+if[
+     is_defined(claims.affiliation)
+ ][
+     affiliations. := tokenize(claims.affiliation, ';');
+     if[
+        0 < size(affiliations.)
+      ][
+        claims.GA4GH_SCOPE. := visas(affiliations.);
+     ];
+];

@@ -1,0 +1,23 @@
+/*
+   Experimental.   Use with localhost:command.line.
+    tokens{
+     identity{
+        type=identity
+        qdl{
+            load="ncsa/ui-test.qdl"
+            xmd={exec_phase="post_user_info"}
+          }// end qdl
+        } //end identity token
+      } //end tokens
+*/
+say('phase = ' + exec_phase);
+say(' s == ' + to_string(s));
+
+// testing machinery for how a GA4GH passport might be made
+passport.foo:='bar';
+passport.baz := 'fnord';
+passport.jti := create_uuid();
+passport.iat := date_ms()%1000; // time in seconds
+passport.exp := 900; // arbitrary expiration of 900 seconds.
+s := create_jwt(passport.);
+claims.passport := [s,s];

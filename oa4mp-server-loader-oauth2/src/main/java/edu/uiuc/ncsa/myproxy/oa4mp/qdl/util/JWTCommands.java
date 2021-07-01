@@ -21,10 +21,7 @@ import java.io.Serializable;
 import java.net.URI;
 import java.nio.file.Files;
 import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ExtendedParameters.OA4MP_NS;
 
@@ -727,4 +724,31 @@ public class JWTCommands implements Serializable {
                 "  ]\n" +
                 "}";
     }
+    protected String CREATE_UUID = "create_uuid";
+   public class Create_UUID implements QDLFunction{
+       @Override
+       public String getName() {
+           return CREATE_UUID;
+       }
+
+       @Override
+       public int[] getArgCount() {
+           return new int[]{0};
+       }
+
+       @Override
+       public Object evaluate(Object[] objects, State state) {
+           UUID uuid = UUID.randomUUID();
+
+           return uuid.toString();
+       }
+
+       @Override
+       public List<String> getDocumentation(int argCount) {
+           List<String>doxx = new ArrayList<>();
+           doxx.add(getName() + " create a new uuid.");
+           doxx.add("This returns a string.");
+           return doxx;
+       }
+   }
 }

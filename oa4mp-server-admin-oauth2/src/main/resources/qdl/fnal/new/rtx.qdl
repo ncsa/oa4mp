@@ -1,3 +1,4 @@
+
 /*
    For processing capabilites in the refresh or token exchange phases. Here the original
    capability set is used from the acess otken request, but the requests generally are
@@ -16,16 +17,11 @@ block[
      if[
          1 == size(cs.)
      ][
-         say('*** FNAL rtx got ' + CS + ': ' + input_form(cs.));
+       	 say('*** FNAL rtx got ' + CS + ': ' + input_form(cs.));
 
           record. :=  script_load('fnal/new/get_service.qdl', script_args(0),script_args(1), (cs.0-CS_HEAD)+'@fnal.gov');
 
          say('*** FNAL rtx record =' + to_string(record.));
-/*
-         xi. := mask(xi., xi. != cs.0); // remove capability set from returned scopes.
-         say('*** FNAL rtx xi after CS remove =' + to_string(xi.));
-
-*/
          if[
               0 < size(record.)
          ][
@@ -49,10 +45,9 @@ block[
               ]; // end if LDAP has entries for CS.
          ]; // end if something in LDAP to process
      ]; // end if capabilities are requested.
-     
+
       say('*** FNAL rtx final xi =' + to_string(xi.));
 
       access_token.scope := detokenize(unique(xi.), ' ', 2); // turn in to string, omit duplications, trailing space
-        say('*** FNAL rtx access token = \'' + access_token.scope + '\'');
-
+      say('*** FNAL rtx access token = \'' + access_token.scope + '\'');
 ];

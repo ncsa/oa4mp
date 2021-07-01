@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
 import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.delegation.server.ExceptionWrapper;
 import edu.uiuc.ncsa.security.delegation.server.UnapprovedClientException;
@@ -85,10 +86,14 @@ public class OA2ExceptionHandler implements ExceptionHandler {
     }
 
     protected String encode(String x) throws UnsupportedEncodingException {
+        if (x == null) {
+            return "";
+        }
         return URLEncoder.encode(x, "UTF-8");
     }
 
     protected void handleOA2Error(OA2GeneralError oa2GeneralError, HttpServletResponse response) throws IOException {
+        DebugUtil.trace(this, "error = " + oa2GeneralError);
         PrintWriter writer = response.getWriter();
         response.setStatus(oa2GeneralError.getHttpStatus());
         writer.println(OA2Constants.ERROR + "=\"" + encode(oa2GeneralError.getError()) + "\"");
