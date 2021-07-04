@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.myproxy.oauth2.tools;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2ClientUtils;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientKeys;
 import edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.QDLJSONConfigUtil;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.ClientStoreCommands;
 import edu.uiuc.ncsa.qdl.scripting.JSONScriptUtil;
@@ -12,6 +13,7 @@ import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApprovalStore;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.ScriptingConstants;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfigurationUtil;
+import edu.uiuc.ncsa.security.storage.XMLMap;
 import edu.uiuc.ncsa.security.util.cli.CLIDriver;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import edu.uiuc.ncsa.security.util.scripting.ScriptSet;
@@ -61,13 +63,14 @@ public class OA2ClientCommands extends ClientStoreCommands {
     }
 
     Collection<String> supportedScopes = null;
+
     @Override
-    public void print_help(InputLine inputLine)throws Exception{
+    public void print_help(InputLine inputLine) throws Exception {
         super.print_help(inputLine);
         say("-- Client specific commands:");
         sayi("cb = manage the callbacks directly");
     }
- 
+
     protected void showCBHelp() {
         say("cb -add [cb1, cb2,...] index =  add a list of callbacks to the given list of callbacks. If no list is given, you will be prompted");
         say("cb -list /index = list the callbacks for a given client");
@@ -148,7 +151,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
                   /*  if (!tempURI.getScheme().equals("https")) {
                         say("Sorry but the protocol for \"" + nextToken + "\" is not supported. It must be https. Rejected.");
                     } else {*/
-                        cbs.add(nextToken);
+                    cbs.add(nextToken);
                     //}
                 } catch (Throwable t) {
                     say("Sorry but \"" + nextToken + "\" is not a valid URL. Skipped.");
@@ -437,7 +440,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
             // They entered a single script. Add it
             JSONObject scripts = currentConfig.getJSONObject(CONFIG_TAG);
             // {"scripts":[]}
-           scripts = JSONScriptUtil.addScript(scripts, result);
+            scripts = JSONScriptUtil.addScript(scripts, result);
             // So we have a single scripts entry. There may be others in the config, so don't change them
             currentConfig.put(CONFIG_TAG, scripts);
         }
@@ -468,4 +471,17 @@ public class OA2ClientCommands extends ClientStoreCommands {
     public OA2ClientCommands(MyLoggingFacade logger, Store store) {
         super(logger, store);
     }
+
+    @Override
+    protected boolean updateSingleValue(XMLMap map, String key) throws IOException {
+        // Fixes CIL-1025 -- recognize config attribute as JSON at all times,
+        // especially when it is null.
+        String currentValue = map.getString(key);
+        OA2ClientKeys keys = (OA2ClientKeys) getMapConverter().getKeys();
+        if (currentValue == null && key.equals(keys.cfg())) {
+            map.put(key, "{}"); // empty JSON is still JSON.
+        }
+        return super.updateSingleValue(map, key);
+    }
+
 }

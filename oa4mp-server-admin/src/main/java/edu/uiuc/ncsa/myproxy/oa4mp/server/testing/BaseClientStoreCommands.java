@@ -13,6 +13,8 @@ import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApprovalStore;
 import edu.uiuc.ncsa.security.delegation.storage.BaseClient;
+import edu.uiuc.ncsa.security.delegation.storage.BaseClientKeys;
+import edu.uiuc.ncsa.security.storage.XMLMap;
 import edu.uiuc.ncsa.security.util.cli.ExitException;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import net.sf.json.JSON;
