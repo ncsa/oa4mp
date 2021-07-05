@@ -307,8 +307,11 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
             say("Sorry, but you have specified a client id and the " + UNLINK_ALL_FLAG + " flag. aborted.");
             return;
         }
-        Identifier clientID = BasicIdentifier.newID(inputLine.getArg(1)); // arg 0 is name of command
-        inputLine.removeArgAt(1);
+        Identifier clientID = null; // arg 0 is name of command
+        if(!doAll) {
+            clientID = BasicIdentifier.newID(inputLine.getArg(1)); // arg 0 is name of command
+            inputLine.removeArgAt(1);
+        }
 
 
         AdminClient adminClient = (AdminClient) findItem(inputLine);
@@ -334,7 +337,7 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
                 pcount++;
                 permissionsStore.remove(permission.getIdentifier());
                 if (removeClient) {
-                    sayv("removing client and approval");
+                    sayv("removing client and approval: "+ permission.getClientID());
                     clientStore.remove(permission.getClientID());
                     getClientApprovalStore().remove(permission.getClientID());
                 }

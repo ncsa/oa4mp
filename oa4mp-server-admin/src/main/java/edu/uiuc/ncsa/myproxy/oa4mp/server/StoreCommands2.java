@@ -1322,52 +1322,19 @@ public abstract class StoreCommands2 extends StoreCommands {
             showArg = inputLine.getNextArgFor(ARCHIVE_SHOW_FLAG);
             inputLine.removeSwitchAndValue(ARCHIVE_SHOW_FLAG);
         }
-        Identifiable identifiable = findItem(inputLine);
-        if (identifiable == null) {
-            say("sorry, I could not find that object. Check your id.");
-            return;
-        }
+
         MapConverter mc = getMapConverter();
 
-          /*
-          Contract is that identifiers never have fragments -- these are used by the system for information.
-          In this case, a fragment of the form version_x where x is a non-negative integer is added.
-           */
-        if (inputLine.hasArg(ARCHIVE_VERSIONS_FLAG)) {
-            // Grab each client and run through information about them
-            List<Identifiable> values = getStore().search
-                    (mc.getKeys().identifier(),
-                            identifiable.getIdentifierString() + ".*",
-                            true);
-
-
-            TreeMap<Long, Identifiable> sortedMap = new TreeMap<>();
-            // There is every reason to assume that there will be gaps ion the number sequences over time.
-            // create a new set of these and manage the order manually.
-
-            for (Identifiable x : values) {
-                long version = getVersionFromID(x.getIdentifier());
-                if (-1 < version) {
-                    sortedMap.put(version, x);
-                }
-            }
-            if (sortedMap.isEmpty()) {
-                sayi("(no archived versions)");
-                return;
-            }
-            say("archived versions of " + identifiable.getIdentifierString() + ":");
-            // Now we run through them all in order
-            for (Long index : sortedMap.keySet()) {
-                say(archiveFormat(sortedMap.get(index)));
-            }
-            return;
-        }
         if (inputLine.hasArg(ARCHIVE_RESTORE_FLAG)) {
+            String rawID = inputLine.getLastArg();
+            if(rawID.startsWith("/")){
+                rawID = rawID.substring(1);
+            }
             String rawTargetVersion = inputLine.getNextArgFor(ARCHIVE_RESTORE_FLAG);
             boolean doLatest = rawTargetVersion.equals(ARCHIVE_LATEST_VERSION_ARG);
-            DoubleHashMap<URI, Long> versionNumbers = getVersions(identifiable);
+            DoubleHashMap<URI, Long> versionNumbers = getVersions(rawID);
             if (versionNumbers.isEmpty()) {
-                say("no versions found for \"" + identifiable.getIdentifierString() + "\"");
+                say("no versions found for \"" + rawID + "\"");
                 return;
             }
             long targetVersion = 0L;
@@ -1392,18 +1359,63 @@ public abstract class StoreCommands2 extends StoreCommands {
                 // Practical problem is that there is no place to necessarily put it in the general case.
                 // So version number, timestamp for version?
                 // What to do with these if the version is restored?
-                storedVersion.setIdentifier(identifiable.getIdentifier());
+                storedVersion.setIdentifier(BasicIdentifier.newID(rawID));
                 getStore().save(storedVersion);
+                say("done! Note: you may have to e.g. approve this again if it is a client.");
+                return;
             } else {
                 say("aborted.");
                 return;
             }
-
         }
+        Identifiable identifiable = findItem(inputLine);
+
+
+        /*
+                Contract is that identifiers never have fragments -- these are used by the system for information.
+                In this case, a fragment of the form version_x where x is a non-negative integer is added.
+                 */
+              if (inputLine.hasArg(ARCHIVE_VERSIONS_FLAG)) {
+                  if (identifiable == null) {
+                      say("sorry, I could not find that object. Check your id.");
+                      return;
+                  }
+                  // Grab each client and run through information about them
+                  List<Identifiable> values = getStore().search
+                          (mc.getKeys().identifier(),
+                                  identifiable.getIdentifierString() + ".*",
+                                  true);
+
+
+                  TreeMap<Long, Identifiable> sortedMap = new TreeMap<>();
+                  // There is every reason to assume that there will be gaps ion the number sequences over time.
+                  // create a new set of these and manage the order manually.
+
+                  for (Identifiable x : values) {
+                      long version = getVersionFromID(x.getIdentifier());
+                      if (-1 < version) {
+                          sortedMap.put(version, x);
+                      }
+                  }
+                  if (sortedMap.isEmpty()) {
+                      sayi("(no archived versions)");
+                      return;
+                  }
+                  say("archived versions of " + identifiable.getIdentifierString() + ":");
+                  // Now we run through them all in order
+                  for (Long index : sortedMap.keySet()) {
+                      say(archiveFormat(sortedMap.get(index)));
+                  }
+                  return;
+              }
+
         if (isShow) {
             long targetVersion = -1L;
-
-            DoubleHashMap<URI, Long> versionNumbers = getVersions(identifiable);
+            String rawID = inputLine.getLastArg();
+            if(rawID.startsWith("/")){
+                rawID = rawID.substring(1);
+            }
+            DoubleHashMap<URI, Long> versionNumbers = getVersions(rawID);
             if (showArg.equalsIgnoreCase(ARCHIVE_LATEST_VERSION_ARG)) {
                 targetVersion = getLatestVersionNumber(versionNumbers);
             } else {
@@ -1423,7 +1435,7 @@ public abstract class StoreCommands2 extends StoreCommands {
             return;
         }
         // If we are at this point, then the user wants to version the object
-        DoubleHashMap<URI, Long> versionNumbers = getVersions(identifiable);
+        DoubleHashMap<URI, Long> versionNumbers = getVersions(identifiable.getIdentifierString());
         long newIndex = getLatestVersionNumber(versionNumbers) + 1;
         if (!getInput("Archive object \"" + identifiable.getIdentifierString() + "\"?(y/n)", "n").equals("y")) {
             say("aborted.");
@@ -1487,14 +1499,14 @@ public abstract class StoreCommands2 extends StoreCommands {
      * For a given object in the store, return all the versions associated with it in a
      * {@link DoubleHashMap}.
      *
-     * @param identifiable
+     * @param identifierString
      * @return
      */
-    protected DoubleHashMap<URI, Long> getVersions(Identifiable identifiable) {
+    protected DoubleHashMap<URI, Long> getVersions(String identifierString) {
         MapConverter mc = getMapConverter();
         List<Identifiable> values = getStore().search
                 (mc.getKeys().identifier(),
-                        identifiable.getIdentifierString() + ".*",
+                        identifierString + ".*",
                         true);
 
         // now we have to look through the list of clients and determine which is the one we want
@@ -1521,7 +1533,7 @@ public abstract class StoreCommands2 extends StoreCommands {
     }
 
     protected void showArchiveHelp() {
-        say("archive [-versions] | [-restore version] [id] - archive an object");
+        say("archive [-versions] | [-restore version] | [-show] [id] - archive an object");
         say("Usage: This will either create a copy of the current version");
         sayi("   or restore a versioned object.");
         sayi("archive [id] - version the object, assigning it the last version.");
@@ -1531,6 +1543,8 @@ public abstract class StoreCommands2 extends StoreCommands {
         sayi("archive -restore (number | latest) [id] - restore the given version");
         sayi("of this. If a number is given, use that. If the word \"latest\" (no quotes)");
         sayi("is used, give back the latest version.");
+        sayi(ARCHIVE_SHOW_FLAG + " (number | latest) - show the given version. You may also use the word \"latest\"");
+        sayi("    to get the latest version.");
     }
 
     protected String archiveFormat(Identifiable id) {
