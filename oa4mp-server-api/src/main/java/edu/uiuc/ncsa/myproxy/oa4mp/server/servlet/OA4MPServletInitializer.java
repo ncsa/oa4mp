@@ -143,11 +143,6 @@ public class OA4MPServletInitializer implements Initialization {
 
                 mps.processStoreCheck(s);
             }
-/*
-            mps.processStoreCheck(mps.getTransactionStore());
-            mps.processStoreCheck(mps.getServiceEnvironment().getClientStore());
-            mps.processStoreCheck(mps.getServiceEnvironment().getClientApprovalStore());
-*/
 
         } catch ( SQLException e) {
             e.printStackTrace();
