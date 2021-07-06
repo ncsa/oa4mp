@@ -17,12 +17,12 @@
         <dependency>
             <artifactId>oa4mp-server-loader-oauth1</artifactId>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
-            <version>5.1-SNAPSHOT</version>
+            <version>5.1.4</version>
         </dependency>
         <dependency>
             <artifactId>oa4mp-server-api</artifactId>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
-            <version>5.1-SNAPSHOT</version>
+            <version>5.1.4</version>
         </dependency>
     </dependencies>
     <build>
