@@ -311,7 +311,7 @@ TO DO:
      This is a public client, very basic, that allows for refresh
      get_user_info is naught else than the barebones subject, audience and issuer.
 
-  -- Do surge test client: https://surge.ncsa.illinois.edu/cilogon-oa2-test/
+  -- Do surge test client: https://serge.ncsa.illinois.edu/cilogon-oa2-test/
         Plain vanilla, no extra configuration.
   -- Do demo0 client: https://demo0.cilogon.org/cilogon2/ (id ends with demo0)
      This has several modes supported via QDL.
@@ -328,5 +328,6 @@ TO DO:
   -- Do https://serge.ncsa.illinois.edu/cilogon-mod/
        Nothing fancy, just a non OA4MP client that returns claims. It should be
        NCSA IDP aware though. (interoperability test).
+       N.B. isMemberOf is a flat list of groups, not a JSON structure.
    -- Farm out testing to others: LSST, LIGO, FNAL
 

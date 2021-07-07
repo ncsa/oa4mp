@@ -2,7 +2,6 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.AbstractAccessTokenHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.PayloadHandlerConfigImpl;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
 import net.sf.json.JSONObject;
 
 import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.SUBJECT;
@@ -18,7 +17,8 @@ public class ScitokenHandler extends AbstractAccessTokenHandler {
 
 //    String ST_SCOPE = "scope";
     String ST_CLIENT_IDENTIFIER = "cid";
-    String VERSION_2_0 = "2.0";
+    String VERSION_2_0 = "scitoken:2.0";
+    String ST_VERSION_CLAIM = "ver";
 
 
     public String getUsernameClaimKey() {
@@ -43,13 +43,6 @@ public class ScitokenHandler extends AbstractAccessTokenHandler {
         // subject is optional
         sciTokens.put(SUBJECT, transaction.getUsername());
         sciTokens.put(ST_CLIENT_IDENTIFIER, transaction.getOA2Client().getIdentifierString());
-
+        sciTokens.put(ST_VERSION_CLAIM, getVersion()); // make sure set for inter-operability with others
     }
-
-
- /*   @Override
-    public JSONObject getExtendedAttributes() {
-        return transaction.getExtendedAttributes();
-    }*/
-
 }

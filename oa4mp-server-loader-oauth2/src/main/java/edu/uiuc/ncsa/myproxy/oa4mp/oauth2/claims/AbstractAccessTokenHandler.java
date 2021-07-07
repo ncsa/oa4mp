@@ -11,6 +11,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.AuthorizationTemplates;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
+import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
@@ -259,7 +260,8 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
         /*
           Make SURE the JTI gets set or token exchange, user info etc. will never work.
          */
-        MyProxyDelegationServlet.createDebugger(transaction.getOA2Client()).trace(this,"starting AT handler finish with transaction =" + transaction);
+        MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(transaction.getOA2Client());
+        debugger.trace(this,"starting AT handler finish with transaction =" + transaction);
         JSONObject atData = getAtData();
         if (getPhCfg().hasTXRecord()) {
             // Fixes CIL-971
@@ -268,10 +270,10 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
                 atData.put(JWT_ID, txRecord.getIdentifierString());
             }
         } else {
-            MyProxyDelegationServlet.createDebugger(transaction.getOA2Client()).trace(this,"update condition");
+            debugger.trace(this,"update condition");
             if (transaction.getAccessToken() != null) {
                 atData.put(JWT_ID, transaction.getAccessToken().getToken());
-                MyProxyDelegationServlet.createDebugger(transaction.getOA2Client()).trace(this,"update condition: TRUE, at=" + atData.get(JWT_ID));
+                debugger.trace(this,"update condition: TRUE, at=" + atData.get(JWT_ID));
             }
         }
         if (doTemplates) {
@@ -288,6 +290,9 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
             proposedLifetime = Math.min(proposedLifetime, transaction.getMaxAtLifetime());
         }
         atData.put(EXPIRATION, (atData.getLong(ISSUED_AT) * 1000 + proposedLifetime) / 1000);
+        if(!atData.containsKey(ISSUER)){
+            atData.put(ISSUER, transaction.getUserMetaData().getString(ISSUER));
+        }
         setAtData(atData);
         transaction.setAccessTokenLifetime(proposedLifetime);
     }

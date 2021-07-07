@@ -199,6 +199,18 @@ public class StoreAccessModule extends JavaModule {
             descr.add("for the object. This determines the object. Note that saving the object");
             descr.add("is not an update, i.e., if you remove properties, they will be deleted");
             descr.add("in the store.");
+            descr.add("Use.");
+            descr.add("1. use module_load(uri, component), e.g. ");
+            descr.add("module_load('oa2:/qdl/store', 'clients');");
+            descr.add("2. initialize the store");
+            descr.add("clients#init('/home/ncsa/dev/csd/config/server-oa2.xml', 'localhost:oa4mp.oa2.mariadb', 'client');");
+            descr.add("This returns true if the store intialized ok.");
+            descr.add("3. Issue commands, e.g.");
+            descr.add("  x. := store#search('client_id', '.*234.*')\n" +
+                    "  size(x.)\n" +
+                    "4\n");
+            descr.add("Indicates that 4 client records were found. The stem contains the");
+            descr.add("records themselves and may be substantial.");
             if (storeFacade != null) {
                 descr.add("Supported store types are ");
                 descr.add(storeFacade.getStoreTypes().toString());

@@ -34,7 +34,7 @@ public class StoreFacade implements Serializable {
 
     public List<String> getStoreTypes() {
         if (types == null) {
-            List<String> types = new ArrayList<>();
+            types = new ArrayList<>();
             types.add(STORE_TYPE_CLIENT);
             types.add(STORE_TYPE_APPROVALS);
             types.add(STORE_TYPE_ADMIN_CLIENT_STORE);
@@ -678,14 +678,7 @@ public class StoreFacade implements Serializable {
             if (storeTypes == null) {
                 storeTypes = new StemVariable();
                 storeTypes.addList(getStoreTypes());
-/*
-                storeTypes.listAppend(STORE_TYPE_CLIENT);
-                storeTypes.listAppend(STORE_TYPE_APPROVALS);
-                storeTypes.listAppend(STORE_TYPE_ADMIN_CLIENT_STORE);
-                storeTypes.listAppend(STORE_TYPE_PERMISSION_STORE);
-                storeTypes.listAppend(STORE_TYPE_TRANSACTION);
-                storeTypes.listAppend(STORE_TYPE_TX_STORE);
-*/
+
             }
             return storeTypes;
         }
