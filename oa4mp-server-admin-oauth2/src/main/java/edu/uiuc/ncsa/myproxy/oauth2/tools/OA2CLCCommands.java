@@ -14,6 +14,7 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.DateUtils;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.delegation.client.request.RTResponse;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.Token;
@@ -159,9 +160,11 @@ public class OA2CLCCommands extends CLCCommands {
             say("df");
             sayi("Usage: Initiate the device flow for this client");
             sayi("You will need to use a browser and the returned user code to authenticate. Then");
-            sayi("you can get that access token with the get_at command. This client does not");
+            sayi("you can get the access token with the access command. This client does not");
             sayi("do polling.");
-            sayi("See also: get_at");
+            sayi("This will follow the contract of the standard flow for extra parameters: just set them");
+            sayi("beforehand as needed and they will be added to the initial request. ");
+            sayi("See also: access");
             return;
         }
         // set up for the next round
@@ -174,7 +177,31 @@ public class OA2CLCCommands extends CLCCommands {
 
         OA2ClientEnvironment oa2ce = (OA2ClientEnvironment) getCe();
         String requestString = oa2ce.getDeviceAuthorizationUri().toString();
+
+        String scopes = oa2ce.scopesToString();
+
+        String extraParams = "";
+        boolean isFirstPass = true;
+        for(String key : requestParameters.keySet()){
+           if(key.equals(OA2Constants.SCOPE)){
+               scopes = " " + requestParameters.get(key);
+           }else{
+               String x = key + "=" + URLEncoder.encode(requestParameters.get(key), "UTF-8");
+               if(isFirstPass){
+
+                   isFirstPass = false;
+                   extraParams = x;
+               }else{
+                   extraParams = extraParams + "&" + x;
+               }
+           }
+        }
+
         requestString = requestString + "?" + OA2Constants.CLIENT_ID + "=" + oa2ce.getClientId();
+        requestString = requestString + "&" + OA2Constants.SCOPE + "=" + URLEncoder.encode(scopes, "UTF-8");
+        if(!StringUtils.isTrivial(extraParams)){
+            requestString = requestString + "&" + extraParams;
+        }
         String rawResponse = getService().getServiceClient().getRawResponse(requestString,
                 oa2ce.getClient().getIdentifierString(),
                 oa2ce.getClient().getSecret());

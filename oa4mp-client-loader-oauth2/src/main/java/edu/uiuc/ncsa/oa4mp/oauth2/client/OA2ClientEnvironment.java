@@ -152,6 +152,20 @@ public class OA2ClientEnvironment extends ClientEnvironment {
     public Collection<String> getScopes(){
         return scopes;
     }
+    public String scopesToString(){
+        String out = null;
+        boolean isFirst = true;
+        for(String s : getScopes()){
+            if(isFirst){
+                out = s;
+                isFirst = false;
+            }else{
+                out = out + " " + s;
+            }
+
+        }
+                         return out;
+    }
     String secret;
 
     public String getWellKnownURI() {

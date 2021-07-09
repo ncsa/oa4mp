@@ -81,6 +81,11 @@ public class RFC8628AuthorizationServer extends EnvServlet {
         }
     }
 
+    /**
+     * A class that is used by the authorization server to track user retries.
+     * These only exist here and are only managed here.
+     *
+     */
     public static class PendingState extends PresentationState {
         public String getUsername() {
             return username;
@@ -333,6 +338,8 @@ public class RFC8628AuthorizationServer extends EnvServlet {
         // which would display the message as the retry message.
 
     }
+
+
 
     Map<String, PendingState> pending = new HashMap<>();
 

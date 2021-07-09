@@ -120,6 +120,7 @@ public class FSClaimSource extends BasicClaimsSourceImpl {
             }
         }
         claims.putAll(json);
+        claims.remove("comment"); // strip out comment
         return super.realProcessing(claims, request, transaction);
     }
 

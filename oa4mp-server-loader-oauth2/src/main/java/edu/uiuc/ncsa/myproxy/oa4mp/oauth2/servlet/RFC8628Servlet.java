@@ -25,10 +25,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.*;
@@ -248,6 +245,29 @@ public class RFC8628Servlet extends MyProxyDelegationServlet implements RFC8628C
         return out;
     }
 
+    /**
+     * Used in the DB servlet mostly to take whatever the user types in (may or may not
+     * include the user code seperator), be in mixed case.
+     * @param x
+     * @return
+     */
+    public static String convertToCanonicalForm(String x){
+        x = x.trim().toUpperCase(Locale.ROOT).replace(""+USER_CODE_SEPERATOR_CHAR, "");
+        String out = "";
+        int i = 0;
+        boolean isFirstPass = true;
+        while(i < x.length()){
+            if(isFirstPass){
+                isFirstPass = false;
+                out = x.substring(i, Math.min(i+userCodePeriodLength, x.length()));
+            }else{
+                out = out + USER_CODE_SEPERATOR_CHAR  + x.substring(i, Math.min(i+userCodePeriodLength, x.length())) ;
+            }
+           i = i+ userCodePeriodLength;
+        }
+
+        return out;
+    }
     public static void main(String[] args) {
         long ts = System.currentTimeMillis();
         System.out.println("code =" + getUserCode(BigInteger.valueOf(ts)));
@@ -263,9 +283,11 @@ public class RFC8628Servlet extends MyProxyDelegationServlet implements RFC8628C
         String x = "    https://oa4mp.bigstate.edu:9443/oauth2/781ae055ce3ba811b05b8c9522a09d31?type=authzGrant&amp;ts=1610837891182&amp;version=v2.0&amp;lifetime=12345000";
 
         String secret = DigestUtils.sha1Hex(x);
+        BigInteger bi0 = new BigInteger(28, secureRandom);
         BigInteger bi = new BigInteger(44, secureRandom);
         //BigInteger bi = new BigInteger(secret, 16);
-        System.out.println("code =" + getUserCode(bi));
+        System.out.println("28 bit code =" + getUserCode(bi0));
+        System.out.println("44 bit code =" + getUserCode(bi));
         System.out.println(x.length());
         System.out.println(x);
 
@@ -273,6 +295,9 @@ public class RFC8628Servlet extends MyProxyDelegationServlet implements RFC8628C
         System.out.println(y.length());
         System.out.println(y);
         System.out.println(getUserCode(new BigInteger(x.getBytes(StandardCharsets.UTF_8))));
+        System.out.println("canonical form = " + convertToCanonicalForm("23bcd"));
+        System.out.println("canonical form = " + convertToCanonicalForm("abcdg0w4"));
+        System.out.println("canonical form = " + convertToCanonicalForm("a----b-c"));
 
     }
 }
