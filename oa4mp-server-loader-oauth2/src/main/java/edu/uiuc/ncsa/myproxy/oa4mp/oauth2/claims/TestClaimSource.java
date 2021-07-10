@@ -28,8 +28,9 @@ public class TestClaimSource extends BasicClaimsSourceImpl {
                                         HttpServletRequest request,  
                                         ServiceTransaction transaction) throws UnsupportedScopeException {
         claims.put("info", "Echoing configuration parameters.");
+        claims.put("username", transaction.getUsername());
         for (String key : configuration.getProperties().keySet()) {
-            claims.put("config param \"" + key + "\"", configuration.getProperties().get(key));
+            claims.put(key, configuration.getProperties().get(key));
         }
         return claims;
     }
