@@ -719,11 +719,11 @@ public class OA2CLCCommands extends CLCCommands {
     }
 
     protected void getUIHelp() {
-        say("get_user_info");
+        say("user_info");
         sayi("Usage: This will get the user info from the server.");
         sayi("You must have already authenticated");
         sayi("*and* gotten a valid access token by this point. Just a list of these it printed.");
-        sayi("What is returned is dependant upon what the server supports.");
+        sayi("What is returned is dependent upon what the server supports.");
     }
 
     public void get_user_info(InputLine inputLine) throws Exception {
@@ -737,8 +737,8 @@ public class OA2CLCCommands extends CLCCommands {
         for (String key : userInfo.getMap().keySet()) {
             say("          " + key + " = " + userInfo.getMap().get(key));
         }
-
     }
+
 
     AssetResponse assetResponse = null;
 
@@ -1563,4 +1563,8 @@ public class OA2CLCCommands extends CLCCommands {
         set_uri(inputLine);
     }
 
+
+public void user_info(InputLine inputLine) throws Exception{
+           get_user_info(inputLine);
+}
 }

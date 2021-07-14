@@ -30,8 +30,9 @@
       <a href="../../common/configuration/scopes.html">scopes</a>|
       <a href="../configuration/server-messages.html">messages</a>|
       <a href="../../common/configuration/logging.html">logging</a>|
-      <a href="../configurations/authorization-servlet.html">authorizationServlet</a>|
-      <a href="../configurations/qdl-config.html">QDL</a>|
+      <a href="../configuration/authorization-servlet-configuration.html">authorizationServlet</a>|
+      <a href="../configuration/device-flow-servlet-configuration.html">deviceFlowServlet</a>|
+      <a href="../configuration/qdl-config.html">QDL</a>|
       <span style="background-color: #ff6600;"><a href="server/configuration/ldap.html">ldap</a></span>|
       <span style="background-color: #ff6600;"><a href="server/configuration/signing.html">JSONWebKey</a></span>
     )*>
@@ -167,7 +168,7 @@
     debug CDATA #IMPLIED>
 &lt;!ELEMENT messageTemplate (#PCDATA)&gt;
 &lt;!ELEMENT subjectTemplate (#PCDATA)&gt;
-&lt;!ELEMENT <a href="../configuration/authorization-header.html">authorizationServlet</a> (#PCDATA)&gt;
+&lt;!ELEMENT <a href="../configuration/authorization-servlet-configuration.html">authorizationServlet</a> (#PCDATA)&gt;
 &lt;!ATTLIST
      useHeader CDATA #IMPLIED
      requireHeader CDATA #IMPLIED
@@ -175,6 +176,14 @@
      returnDNAsUsername CDATA #IMPLIED
      verifyUsername CDATA #IMPLIED
      showLogon CDATA #IMPLIED&gt;
+&lt;!ELEMENT <a href="../configuration/device-flow-servlet-configuration.html">deviceFlowServlet</a> (#PCDATA)&gt;
+&lt;!ATTLIST
+     verificationURI CDATA #IMPLIED
+     interval CDATA #IMPLIED
+     codeChars CDATA #IMPLIED
+     codeLength CDATA #IMPLIED
+     codeSeparator CDATA #IMPLIED
+     codePeriodLengthCDATA #IMPLIED&gt;
 &lt;!ELEMENT mail (messageTemplate|subjectTemplate)*&gt;
 &lt;!ATTLIST <a href="../configuration/server-email.html">mail</a>
     enabled CDATA #IMPLIED

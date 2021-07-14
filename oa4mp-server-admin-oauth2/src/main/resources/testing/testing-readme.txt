@@ -7,8 +7,8 @@ When a new version is deployed, here is the testing order
 
   Main testing clients and tests
     -- localhost:command.line
-      This has random testing configurations in it, so never test it (unless it is
-      germane to the release).
+      This has random testing configurations in it, so always check.
+      ** Has RFC 8628 = device flow enabled.
 
   -- localhost:command.line2
      Most basic virtual organization test. Configuration will return JWTs for both access and
@@ -21,7 +21,8 @@ When a new version is deployed, here is the testing order
      No configuration of any sort (i.e., cfg is unset, strict scopes etc)
      Most common configuration in production.
      ** Must pass **
-  Test any client for exchange, introspection and revocation.
+
+  -- Test any client for exchange, introspection and revocation.
      This will exchange sets of tokens and introspect on them.
      standard up through get_at. Then
      introspect
@@ -195,7 +196,33 @@ When a new version is deployed, here is the testing order
         Currently gets FNAL access token (set DEBUG=true in script before running).
         Check configruation first. Usually it is set to NCSA default and
         a bogus WLCG access token.
+  -- cilogon:test/df -- a client for testing the device flow against the CILogon server
+     This will require doing the DBService calls manually (that's part of the test).
+     In the CLC load the configuration and type
+     df
+     This should respond with a user code, Call it USER_CODE. Paste into this and run it
+     from the command line
 
+     curl -s -G -k --data-urlencode 'action=checkUserCode' --data-urlencode 'user_code=USER_CODE' 'https://localhost:9443/oauth2/dbService'
+
+     That should return with a status of 0 and a summary of the client. Approve it manually
+     with
+
+     curl -s -G -k --data-urlencode 'action=userCodeApproved' --data-urlencode 'user_code=USER_CODE' --data-urlencode 'approved=1' 'https://localhost:9443/oauth2/dbService'
+
+
+     Before you just issue a request for the access token in the CLC, you will need to emulate
+     the response from the IDP and set the username for the transaction.
+     In the CLC, use the
+
+     decode -32 token
+
+     command on the grant in the response. This is the id of the current transaction.
+     Set the user name there with
+
+     transactions>update >username
+
+     Does not matter to what.
   On dev, if all worked locally.
   ***
   Copy new cilogon-oa2-cli.jar to /opt/cilogon-oa2/lib and start the CLI. This
@@ -213,6 +240,11 @@ When a new version is deployed, here is the testing order
      Has no configuration. Most common case in production. Must pass all components
      IDP: Any
 
+  -- dev:test/df
+     Has basic NCSA QDL. This is for testing device flow on CILogon. Execute
+     df
+     in the CLC and follow the instructions. Once you've done that you should be
+     able to do access, refresh, exchange ahd user_info as per usual. Do them to check
   -- dev:test/functor
      Critical regression test.
      Has the original NCSA functor configuration on it. Many installs use this.
