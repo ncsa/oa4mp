@@ -25,6 +25,8 @@ public class RFC8628State {
     public long issuedAt = -1L;
     public long lastTry = -1L;
     public long interval = -1L;
+    // Used in the token endpoint. Allow the first try asap, then start waiting
+    public boolean firstTry = true;
     /**
      * If the user finished logging in, hence making the flow valid.
      */

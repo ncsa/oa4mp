@@ -608,15 +608,12 @@ public class OIDCCMServlet extends EnvServlet {
         jsonRequest.remove(OIDCCMConstants.APPLICATION_TYPE);
         handleGrants(client, jsonRequest, keys);
         handleResponseTypes(client, jsonRequest, keys);
-
-        if (!jsonRequest.containsKey(OIDCCMConstants.REDIRECT_URIS)) {
-            throw new OA2GeneralError(
-                    OA2Errors.INVALID_REQUEST,
-                    "Error: Required parameter \"" + OIDCCMConstants.REDIRECT_URIS + "\" missing.",
-                    HttpStatus.SC_BAD_REQUEST,
-                    null);
+        JSONArray redirectURIs;
+        if (jsonRequest.containsKey(OIDCCMConstants.REDIRECT_URIS)) {
+            redirectURIs = jsonRequest.getJSONArray(OIDCCMConstants.REDIRECT_URIS);
+        }else{
+            redirectURIs = new JSONArray(); // just take it as an empty list
         }
-        JSONArray redirectURIs = jsonRequest.getJSONArray(OIDCCMConstants.REDIRECT_URIS);
         // URI sanity check. Since it's JSON they could send garbage.
         // Wildcard check for CIL-871
         for (Object z : redirectURIs) {

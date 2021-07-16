@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.BasicClaimsSourceImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.CMConfigs;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8628ServletConfig;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo.VOStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo.VirtualOrganization;
@@ -85,6 +86,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
                  boolean rfc8693Enabled,
                  boolean qdlStrictACLs,
                  boolean safeGC,
+                 RFC8628ServletConfig rfc8628ServletConfig,
                  boolean rfc8628Enabled,
                  boolean notifyOnACNewClientCreate,
                  boolean printTSInDebug) {
@@ -152,8 +154,14 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.safeGC = safeGC;
         this.rfc8628Enabled = rfc8628Enabled;
         this.printTSInDebug = printTSInDebug;
+        this.rfc8628ServletConfig = rfc8628ServletConfig;
     }
 
+    public RFC8628ServletConfig getRfc8628ServletConfig() {
+        return rfc8628ServletConfig;
+    }
+
+    RFC8628ServletConfig rfc8628ServletConfig;
     public boolean isPrintTSInDebug() {
         return printTSInDebug;
     }

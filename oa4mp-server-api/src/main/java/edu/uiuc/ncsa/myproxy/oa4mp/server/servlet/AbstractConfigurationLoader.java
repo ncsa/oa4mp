@@ -66,6 +66,7 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
         return b;
     }
 
+
     public AuthorizationServletConfig getAuthorizationServletConfig() {
         if (authorizationServletConfig == null) {
             List kids = cn.getChildren(OA4MPConfigTags.AUTHORIZATION_SERVLET);

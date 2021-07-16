@@ -133,6 +133,7 @@ public class OA2TokenUtils {
                RefreshTokenStore zzz = (RefreshTokenStore) oa2SE.getTransactionStore(); // better to get a class cast exception here
                 t = zzz.get(refreshToken);
            } catch (Throwable tt) {
+               ServletDebugUtil.error(OA2TokenUtils.class, "error getting refresh token:" + refreshToken + " message:" + tt.getMessage());
                throw new OA2ATException(OA2Errors.INVALID_GRANT, "invalid refresh token");
            }
            if (t != null) {

@@ -142,14 +142,17 @@ public class ClientUtils {
         // Fix for CIL-332
         MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(client);
         if (rawSecret == null) {
-            debugger.trace(ClientUtils.class, "doIt: no secret, throwing exception.");
+            debugger.trace(ClientUtils.class, "verifyClientSecret: no secret, throwing exception.");
             if (isAT) {
                 throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT, "missing secret");
             } else {
-                throw new OA2GeneralError("missing secret");
+                throw new OA2GeneralError(OA2Errors.UNAUTHORIZED_CLIENT,
+                        "missing secret",
+                        HttpStatus.SC_UNAUTHORIZED, null);
             }
         }
         if (StringUtils.isTrivial(client.getSecret())) {
+            debugger.trace(ClientUtils.class, "verifyClientSecret: no secret, so client is not configured right.");
             // Since clients can be administered by others now, we are finding that they sometimes
             // may change their scopes. If a client is public, there is no secret, but if
             // a client later is updated to have different scopes, then trying to use it for other
@@ -158,22 +161,24 @@ public class ClientUtils {
             if (isAT) {
                 throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT, "client has no configured secret", null);
             } else {
-                throw new OA2GeneralError("client has no configured secret.");
-
+                throw new OA2GeneralError(OA2Errors.UNAUTHORIZED_CLIENT,
+                                   "client has no configured secret.",
+                                   HttpStatus.SC_UNAUTHORIZED, null);
             }
-
         }
 
         if (!client.getSecret().equals(DigestUtils.sha1Hex(rawSecret))) {
-            debugger.trace(ClientUtils.class, "doIt: bad secret, throwing exception.");
+            debugger.trace(ClientUtils.class, "verifyClientSecret: bad secret, throwing exception.");
             if (isAT) {
-
                 throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
                         "incorrect secret");
             } else {
-                throw new OA2GeneralError("incorrect secret");
+                throw new OA2GeneralError(OA2Errors.UNAUTHORIZED_CLIENT,
+                                   "incorrect secret",
+                                   HttpStatus.SC_UNAUTHORIZED, null);
             }
         }
+        debugger.trace(ClientUtils.class, "verifyClientSecret: secret ok.");
 
     }
 
@@ -242,15 +247,11 @@ public class ClientUtils {
         // Fixes github issue 8, support for public clients: https://github.com/ncsa/OA4MP/issues/8
         if (oa2Client.isPublicClient()) {
             if (!oa2Client.getScopes().contains(OA2Scopes.SCOPE_OPENID)) {
-                if (isRFC8628) {
-                    throw new OA2GeneralError("The " + OA2Scopes.SCOPE_OPENID + " scope is missing from the request.");
-                } else {
                     throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST,
                             "The " + OA2Scopes.SCOPE_OPENID + " scope is missing from the request.",
                             HttpStatus.SC_BAD_REQUEST,
                             st.getRequestState(),
                             st.getCallback());
-                }
             }
             // only allowed scope, regardless of what is requested.
             // This also covers the case of a client made with a full set of scopes, then
@@ -266,16 +267,18 @@ public class ClientUtils {
         boolean hasOpenIDScope = false;
         while (stringTokenizer.hasMoreTokens()) {
             String x = stringTokenizer.nextToken();
+            // CIL-1012 offline_access. Some clients end this along but it has no effect.
+            // Basically if get it, we don't want to throw an error.
+            if(x.equals(OA2Scopes.SCOPE_OFFLINE_ACCESS)){
+                // Basically just always ignore it.
+                continue;
+            }
             if (oa2Client.useStrictScopes() && !OA2Scopes.ScopeUtil.hasScope(x)) {
-                if (isRFC8628) {
-                    throw new OA2GeneralError("Unrecognized scope \"" + x + "\"");
-                } else {
                     throw new OA2RedirectableError(OA2Errors.INVALID_SCOPE,
                             "Unrecognized scope \"" + x + "\"",
                             HttpStatus.SC_BAD_REQUEST,
                             st.getRequestState(),
                             st.getCallback());
-                }
             }
             if (x.equals(OA2Scopes.SCOPE_OPENID)) hasOpenIDScope = true;
             requestedScopes.add(x);
@@ -283,15 +286,11 @@ public class ClientUtils {
         if (((OA2SE) getServiceEnvironment()).isOIDCEnabled()) {
 
             if (!hasOpenIDScope)
-                if (isRFC8628) {
-                    throw new OA2GeneralError("The " + OA2Scopes.SCOPE_OPENID + " scope is missing from the request.");
-                } else {
                     throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST,
                             "The " + OA2Scopes.SCOPE_OPENID + " scope is missing from the request.",
                             HttpStatus.SC_BAD_REQUEST,
                             st.getRequestState(),
                             st.getCallback());
-                }
         }
         st.setScopes(requestedScopes);
         if (oa2Client.useStrictScopes()) {

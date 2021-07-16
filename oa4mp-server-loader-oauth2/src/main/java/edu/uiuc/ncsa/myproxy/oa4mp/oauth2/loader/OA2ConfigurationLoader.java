@@ -9,6 +9,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.CMConfigs;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.ClientManagementConstants;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.json.JSONStoreProviders;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.json.MultiJSONStoreProvider;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8628ServletConfig;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.*;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientConverter;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientProvider;
@@ -43,6 +44,7 @@ import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.IdentifierProvider;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.delegation.server.issuers.AGIssuer;
 import edu.uiuc.ncsa.security.delegation.server.issuers.ATIssuer;
 import edu.uiuc.ncsa.security.delegation.server.issuers.PAIssuer;
@@ -58,6 +60,7 @@ import edu.uiuc.ncsa.security.oauth_2_0.OA2TokenForge;
 import edu.uiuc.ncsa.security.oauth_2_0.server.AGI2;
 import edu.uiuc.ncsa.security.oauth_2_0.server.ATI2;
 import edu.uiuc.ncsa.security.oauth_2_0.server.PAI2;
+import edu.uiuc.ncsa.security.oauth_2_0.server.RFC8628Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSourceConfiguration;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
@@ -162,6 +165,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     isRFC8693Enabled(),
                     isQdlStrictACLS(),
                     isSafeGC(),
+                    getRFC8628ServletConfig(),
                     isRFC8628Enabled(),
                     isNotifyOnACNewClient(),
                     isprintTSInDebug());
@@ -175,6 +179,70 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         }
     }
 
+    RFC8628ServletConfig rfc8628ServletConfig = null;
+
+    public RFC8628ServletConfig getRFC8628ServletConfig() {
+        if (rfc8628ServletConfig == null) {
+            rfc8628ServletConfig = new RFC8628ServletConfig();
+            List kids = cn.getChildren(OA4MPConfigTags.DEVICE_FLOW_SERVLET);
+            //set default
+            String address = getServiceAddress().toString();
+            if(!address.endsWith("/")){
+                address = address + "/";
+            }
+            rfc8628ServletConfig.deviceEndpoint = address + RFC8628Constants.VERIFICATION_URI_ENDPOINT;
+            rfc8628ServletConfig.deviceAuthorizationEndpoint = address + RFC8628Constants.DEVICE_AUTHORIZATION_ENDPOINT;
+            if (!kids.isEmpty()) {
+           // empty means either they have an empty entry or that they have no entry.
+                rfc8628Enabled = Boolean.TRUE; // if they supply this, then
+                ConfigurationNode sn = (ConfigurationNode) kids.get(0);
+                String x = getFirstAttribute(sn, OA4MPConfigTags.DEVICE_FLOW_SERVLET_URI);
+                if (!StringUtils.isTrivial(x)) {
+                    rfc8628ServletConfig.deviceEndpoint = x;
+                }
+
+                x = getFirstAttribute(sn, OA4MPConfigTags.DEVICE_FLOW_AUTHORIZATION_URI);
+                if (!StringUtils.isTrivial(x)) {
+                    rfc8628ServletConfig.deviceAuthorizationEndpoint = x;
+                }
+                x = getFirstAttribute(sn, OA4MPConfigTags.DEVICE_FLOW_INTERVAL);
+                if (!StringUtils.isTrivial(x)) {
+                    try {
+                        rfc8628ServletConfig.interval = ConfigUtil.getValueSecsOrMillis(x, true);
+                    } catch (NumberFormatException nfe) {
+                        // do nothing. Default is set in servlet config.
+                    }
+                }
+                x = getFirstAttribute(sn, OA4MPConfigTags.DEVICE_FLOW_USER_CODE_LENGTH);
+                if (!StringUtils.isTrivial(x)) {
+                    try {
+                        rfc8628ServletConfig.userCodeLength = Integer.parseInt(x);
+                    } catch (NumberFormatException nfx) {
+                    }
+                }
+                String separator = getFirstAttribute(sn, OA4MPConfigTags.DEVICE_FLOW_CODE_SEPARATOR);
+                if (!StringUtils.isTrivial(separator)) {
+                    rfc8628ServletConfig.userCodeSeperator = separator;
+                }
+
+                String codeChars = getFirstAttribute(sn, OA4MPConfigTags.DEVICE_FLOW_CODE_CHARS);
+                if (!StringUtils.isTrivial(codeChars)) {
+                    rfc8628ServletConfig.codeChars = codeChars.toCharArray();
+                }
+
+                x = getFirstAttribute(sn, OA4MPConfigTags.DEVICE_FLOW_CODE_PERIOD_LENGTH);
+                if (!StringUtils.isTrivial(x)) {
+                    try {
+                        rfc8628ServletConfig.userCodePeriodLength = Integer.parseInt(x);
+                    } catch (NumberFormatException nfx) {
+                    }
+                }
+
+            }
+        }
+        return rfc8628ServletConfig;
+    }
+
     protected QDLEnvironment getQDLEnvironment() {
         ConfigurationNode node = getFirstNode(cn, QDLConfigurationConstants.CONFIG_TAG_NAME);
         if (node == null) {
@@ -183,10 +251,10 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         // Note that the first argument is the name fo the file. In server mode this won't be available anyway
         // and is optional.
         String x = getFirstAttribute(node, STRICT_ACLS);
-        if(!isTrivial(x)){
-            try{
+        if (!isTrivial(x)) {
+            try {
                 qdlStrictACLS = Boolean.parseBoolean(x);
-            }catch(Throwable t){
+            } catch (Throwable t) {
                 // nothing to do.
             }
         }
@@ -195,8 +263,9 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
     }
 
     Boolean notifyOnACNewClient = null;
+
     public boolean isNotifyOnACNewClient() {
-        if(notifyOnACNewClient == null){
+        if (notifyOnACNewClient == null) {
             try {
                 notifyOnACNewClient = Boolean.parseBoolean(getFirstAttribute(cn, NOTIFY_ON_ADMIN_CLIENT_NEW_CLIENT));
             } catch (Throwable t) {
@@ -209,9 +278,11 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         }
         return notifyOnACNewClient;
     }
-   protected Boolean printTSInDebug = false;
+
+    protected Boolean printTSInDebug = false;
+
     public boolean isprintTSInDebug() {
-        if(printTSInDebug == null){
+        if (printTSInDebug == null) {
             try {
                 printTSInDebug = Boolean.parseBoolean(getFirstAttribute(cn, PRINT_TS_IN_DEBUG));
             } catch (Throwable t) {
@@ -227,7 +298,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
 
 
     public boolean isSafeGC() {
-        if(safeGC == null){
+        if (safeGC == null) {
             try {
                 safeGC = Boolean.parseBoolean(getFirstAttribute(cn, SAFE_GARBAGE_COLLECTION));
             } catch (Throwable t) {
@@ -530,27 +601,6 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         }
     }
 
-/*    long rtLifetime = -1L;
-
-    protected long getRTLifetime() {
-        if (rtLifetime < 0) {
-            String x = getFirstAttribute(cn, DEFAULT_REFRESH_TOKEN_LIFETIME);
-            if (isTrivial(x)) {
-                x = getFirstAttribute(cn, REFRESH_TOKEN_LIFETIME);
-            }
-            // Fixes OAUTH-214
-            if (isTrivial(x)) {
-                rtLifetime = REFRESH_TOKEN_LIFETIME_DEFAULT;
-            } else {
-                try {
-                    rtLifetime = Long.parseLong(x) * 1000; // The configuration file has this in seconds. Internally this is ms.
-                } catch (Throwable t) {
-                    rtLifetime = REFRESH_TOKEN_LIFETIME_DEFAULT;
-                }
-            }
-        }
-        return rtLifetime;
-    }*/
 
     // Authorization grants lifetime
     long agLifetime = -1L;
@@ -604,8 +654,8 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                 maxATLifetime = MAX_ACCESS_TOKEN_LIFETIME_DEFAULT;
             } else {
                 try {
-                    maxATLifetime =ConfigUtil.getValueSecsOrMillis(x, true);
-                //    maxATLifetime = Long.parseLong(x) * 1000; // The configuration file has this in seconds. Internally this is ms.
+                    maxATLifetime = ConfigUtil.getValueSecsOrMillis(x, true);
+                    //    maxATLifetime = Long.parseLong(x) * 1000; // The configuration file has this in seconds. Internally this is ms.
                 } catch (Throwable t) {
                     maxATLifetime = MAX_ACCESS_TOKEN_LIFETIME_DEFAULT;
                 }
@@ -903,20 +953,22 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
 
 
     protected SQLVOStoreProvider createSQLVOP(ConfigurationNode config,
-                                                     ConnectionPoolProvider<? extends ConnectionPool> cpp,
-                                                     String type,
-                                                     VOProvider<? extends VirtualOrganization> tp,
-                                                     Provider<TokenForge> tfp,
-                                                     VOConverter converter) {
+                                              ConnectionPoolProvider<? extends ConnectionPool> cpp,
+                                              String type,
+                                              VOProvider<? extends VirtualOrganization> tp,
+                                              Provider<TokenForge> tfp,
+                                              VOConverter converter) {
         return new SQLVOStoreProvider(config, cpp, type, converter, tp);
     }
 
     Provider<VOStore> voStoreProvider;
+
     protected Provider<VOStore> getVOStoreProvider() {
         VOProvider voProvider = new VOProvider(null, (OA2TokenForge) getTokenForgeProvider().get());
         VOConverter voConverter = new VOConverter(new VOSerializationKeys(), voProvider);
         return getVOStoreProvider(voProvider, voConverter);
     }
+
     protected Provider<VOStore> getVOStoreProvider(VOProvider voProvider,
                                                    VOConverter<? extends VirtualOrganization> voConverter) {
         if (voStoreProvider == null) {

@@ -22,7 +22,7 @@ import java.util.Map;
  */
 public class OA2ClientEnvironment extends ClientEnvironment {
 
-    
+
     public OA2ClientEnvironment(URI accessTokenUri,
                                 URI authorizationUri,
                                 URI callback,
@@ -39,7 +39,7 @@ public class OA2ClientEnvironment extends ClientEnvironment {
                                 boolean oidcEnabled,
                                 boolean showIDToken,
                                 boolean useBasicAuth,
-                                URI deviceAuthorizationUri ) {
+                                URI deviceAuthorizationUri) {
         super(accessTokenUri,
                 authorizationUri,
                 callback,
@@ -55,7 +55,7 @@ public class OA2ClientEnvironment extends ClientEnvironment {
         this.oidcEnabled = oidcEnabled;
         this.showIDToken = showIDToken;
         this.useBasicAuth = useBasicAuth;
-        this.deviceAuthorizationUri =  deviceAuthorizationUri;
+        this.deviceAuthorizationUri = deviceAuthorizationUri;
     }
 
     public OA2ClientEnvironment(MyLoggingFacade logger, Map<String, String> constants,
@@ -85,7 +85,7 @@ public class OA2ClientEnvironment extends ClientEnvironment {
                                 boolean oidcEnabled,
                                 boolean showIDToken,
                                 boolean useBasicAuth,
-                                Map<String,List<String>> additionalParameters,
+                                Map<String, List<String>> additionalParameters,
                                 URI deviceAuthorizationUri) {
         super(logger,
                 constants,
@@ -111,7 +111,7 @@ public class OA2ClientEnvironment extends ClientEnvironment {
                 errorPagePath,
                 redirectPagePath,
                 successPagePath
-                );
+        );
         this.secret = secret;
         this.scopes = scopes;
         this.wellKnownURI = wellKnownURI;
@@ -140,7 +140,7 @@ public class OA2ClientEnvironment extends ClientEnvironment {
         this.additionalParameters = additionalParameters;
     }
 
-    Map<String,List<String>> additionalParameters;
+    Map<String, List<String>> additionalParameters;
 
     public boolean isUseBasicAuth() {
         return useBasicAuth;
@@ -149,23 +149,26 @@ public class OA2ClientEnvironment extends ClientEnvironment {
     boolean useBasicAuth = false;
 
     Collection<String> scopes = null;
-    public Collection<String> getScopes(){
+
+    public Collection<String> getScopes() {
         return scopes;
     }
-    public String scopesToString(){
+
+    public String scopesToString() {
         String out = null;
         boolean isFirst = true;
-        for(String s : getScopes()){
-            if(isFirst){
+        for (String s : getScopes()) {
+            if (isFirst) {
                 out = s;
                 isFirst = false;
-            }else{
+            } else {
                 out = out + " " + s;
             }
 
         }
-                         return out;
+        return out;
     }
+
     String secret;
 
     public String getWellKnownURI() {
@@ -173,6 +176,7 @@ public class OA2ClientEnvironment extends ClientEnvironment {
     }
 
     String wellKnownURI = null;
+
     @Override
     public Client getClient() {
         if (client == null) {
@@ -184,9 +188,11 @@ public class OA2ClientEnvironment extends ClientEnvironment {
     }
 
     boolean oidcEnabled = true;
-    public boolean isOidcEnabled(){
+
+    public boolean isOidcEnabled() {
         return oidcEnabled;
     }
+
     public void setScopes(Collection<String> scopes) {
         this.scopes = scopes;
     }
@@ -194,6 +200,7 @@ public class OA2ClientEnvironment extends ClientEnvironment {
     /**
      * If the user enables showing the ID token, then information to be displayed on the success page will be
      * put in to the response.
+     *
      * @return
      */
     public boolean isShowIDToken() {

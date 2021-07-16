@@ -503,8 +503,13 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         OA2ServiceTransaction t = (OA2ServiceTransaction) transaction;
         // Set these in the transaction then send it along.
         t.setAccessTokenLifetime(computeATLifetime(t, (OA2SE) getServiceEnvironment()));
-        if (((OA2SE) getServiceEnvironment()).isRefreshTokenEnabled()) {
-            t.setRefreshTokenLifetime(computeRefreshLifetime(t, (OA2SE) getServiceEnvironment()));
+        OA2Client client = (OA2Client) transaction.getClient();
+        if(client.isRTLifetimeEnabled()) {
+            if (((OA2SE) getServiceEnvironment()).isRefreshTokenEnabled()) {
+                t.setRefreshTokenLifetime(computeRefreshLifetime(t, (OA2SE) getServiceEnvironment()));
+            }
+        }else{
+            t.setRefreshTokenLifetime(0L);
         }
 
         return new ATRequest(request, transaction);
@@ -552,7 +557,12 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
                     HttpStatus.SC_UNAUTHORIZED, null);
         }
         st2.setAccessToken(atResponse.getAccessToken()); // needed if there are handlers later.
-        st2.setRefreshToken(atResponse.getRefreshToken()); // ditto. Might be null.
+        if(client.isRTLifetimeEnabled()) {
+            st2.setRefreshToken(atResponse.getRefreshToken()); // ditto. Might be null.
+        }else{
+            st2.setRefreshToken(null);
+            st2.setRefreshTokenLifetime(0L);
+        }
         JWTRunner jwtRunner = new JWTRunner(st2, ScriptRuntimeEngineFactory.createRTE(oa2SE, st2, st2.getOA2Client().getConfig()));
         OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, st2, state.getRequest());
         if (state.isRfc8628() || st2.getAuthorizationGrant().getVersion() == null || st2.getAuthorizationGrant().getVersion().equals(VERSION_1_0_TAG)) {
@@ -612,6 +622,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
     /**
      * Takes the newly modified access and refresh tokens after all scripts are run
      * and updates the transaction so that whatever the script did is not stored in the system.
+     *
      * @param client
      * @param tokenResponse
      * @param oa2SE
@@ -638,7 +649,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             debugger.trace(this, "jwt has at handler: at=" + newAT + ", for claims " + st2.getATData().toString(2));
             tokenResponse.setAccessToken(newAT);
             debugger.trace(this, "Returned AT from handler:" + newAT + ", for claims " + st2.getATData().toString(2));
-        }else{
+        } else {
             debugger.trace(this, "NO ATHandler in jwtRunner");
 
         }
@@ -852,7 +863,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         } else {
             rtiResponse.setRefreshToken(null);
         }
-        debugger.trace(this, "rt issuer response: " + rtiResponse  );
+        debugger.trace(this, "rt issuer response: " + rtiResponse);
 
         // Note for CIL-525: Here is where we need to recompute the claims. If a request comes in for a new
         // refresh token, it has to be checked against the recomputed claims. Use case is that a very long-lived
@@ -930,7 +941,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         rtiResponse.setClaims(t.getUserMetaData());
         getTransactionStore().save(t);
         oa2SE.getTxStore().save(txRecord);
-        debugger.trace(this, "transaction saved for " + t.getIdentifierString()  );
+        debugger.trace(this, "transaction saved for " + t.getIdentifierString());
 
         rtiResponse.write(response);
         IssuerTransactionState state = new IssuerTransactionState(
@@ -1084,11 +1095,13 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
      */
     protected void doRFC8628(OA2Client client, HttpServletRequest request, HttpServletResponse response) throws Throwable {
         MetaDebugUtil debugger = createDebugger(client);
+        debugger.trace(this, "starting RFC 8628 access token exchange.");
         printAllParameters(request);
         long now = System.currentTimeMillis();
         String rawSecret = getClientSecret(request);
-
-        verifyClientSecret(client, rawSecret);
+        if(!client.isPublicClient()) {
+            verifyClientSecret(client, rawSecret);
+        }
         String deviceCode = request.getParameter(DEVICE_CODE);
         if (StringUtils.isTrivial(deviceCode)) {
             throw new OA2GeneralError(OA2Errors.ACCESS_DENIED,
@@ -1114,9 +1127,6 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             throw new OA2ATException("expired_token", DEVICE_CODE + " expired");
         }
         OA2ServiceTransaction transaction = (OA2ServiceTransaction) getTransaction(authorizationGrant);
-        if (!transaction.isAuthGrantValid()) {
-            throw new OA2GeneralError(OA2Errors.INVALID_GRANT, "invalid device code", HttpStatus.SC_BAD_REQUEST, null);
-        }
 
         if (transaction == null || !transaction.isRFC8628Request()) {
             debugger.info(this, "Attempt to access RFC8628 end point by client, but no pending devide flow found.");
@@ -1124,6 +1134,14 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             throw new OA2GeneralError(OA2Errors.ACCESS_DENIED,
                     "no pending request", HttpStatus.SC_UNAUTHORIZED, null);
         }
+
+        if (!transaction.isAuthGrantValid()) {
+            throw new OA2GeneralError(OA2Errors.INVALID_GRANT,
+                    "invalid device code",
+                    HttpStatus.SC_BAD_REQUEST,
+                    null);
+        }
+
         if (!transaction.getClient().getIdentifierString().equals(client.getIdentifierString())) {
             throw new OA2GeneralError(OA2Errors.UNAUTHORIZED_CLIENT,
                     "wrong client, access denied",
@@ -1134,16 +1152,21 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
             // Odd case that it has expired, but the garbage collector has not disposed of it yet, for whatever reason.
             throw new OA2ATException(OA2Errors.ACCESS_DENIED, DEVICE_CODE + " expired", HttpStatus.SC_UNAUTHORIZED, null);
         }
-
-        if (rfc8628State.lastTry + rfc8628State.interval > now) {
-            rfc8628State.lastTry = now;
+        if (rfc8628State.firstTry) {
+            rfc8628State.firstTry = false; // used it up. No more first tries
             rfc8628State.interval = rfc8628State.interval + DEFAULT_WAIT;
-            transaction.setRFC8628State(rfc8628State);
-            getTransactionStore().save(transaction);
-            throw new OA2ATException("slow_down", "slow down");
+        } else {
+            if (rfc8628State.lastTry + rfc8628State.interval > now) {
+                rfc8628State.interval = rfc8628State.interval + DEFAULT_WAIT;
+                transaction.setRFC8628State(rfc8628State);
+                getTransactionStore().save(transaction);
+                throw new OA2ATException("slow_down", "slow down");
+            }
+
         }
         rfc8628State.lastTry = now;
         transaction.setRFC8628State(rfc8628State);
+
         String scope = getFirstParameterValue(request, SCOPE);
         if (!isTrivial(scope)) {
             // scope is optional, so only take notice if they send something

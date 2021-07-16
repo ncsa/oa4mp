@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo.VirtualOrganization;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.DiscoveryServlet;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2GeneralError;
+import edu.uiuc.ncsa.security.oauth_2_0.OA2Scopes;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import net.sf.json.JSONArray;
@@ -27,7 +28,7 @@ public class OA2DiscoveryServlet extends DiscoveryServlet {
     public static final String TOKEN_ENDPOINT = "token_endpoint";
     public static final String USERINFO_ENDPOINT = "userinfo_endpoint";
     public static final String ISSUER = "issuer";
-    public static final String DEVICE_AUTHORIZATION_ENDPOINT = "device_authorization";
+    public static final String DEVICE_AUTHORIZATION_ENDPOINT = "device_authorization_endpoint";
     public static final String OPENID_CONFIG_PATH = "openid-configuration";
     public static final String OAUTH_AUTHZ_SERVER_PATH = "oauth-authorization-server";
     public static final String WELL_KNOWN_PATH = ".well-known";
@@ -203,7 +204,7 @@ public class OA2DiscoveryServlet extends DiscoveryServlet {
         json.put(TOKEN_ENDPOINT, requestURI + "/token");
         json.put(USERINFO_ENDPOINT, requestURI + "/userinfo");
         if (oa2SE.isRfc8628Enabled()) {
-            json.put(DEVICE_AUTHORIZATION_ENDPOINT, requestURI + "/device_authorization");
+            json.put(DEVICE_AUTHORIZATION_ENDPOINT, oa2SE.getRfc8628ServletConfig().deviceAuthorizationEndpoint);
         }
 
         json.put("token_endpoint_auth_methods_supported", null);
@@ -219,6 +220,9 @@ public class OA2DiscoveryServlet extends DiscoveryServlet {
         Collection<String> serverScopes = oa2SE.getScopes();
         for (String s : serverScopes) {
             scopes.add(s);
+        }
+        if(!scopes.contains(OA2Scopes.SCOPE_OFFLINE_ACCESS)){
+            scopes.add(OA2Scopes.SCOPE_OFFLINE_ACCESS);
         }
 
         json.put("scopes_supported", scopes);
