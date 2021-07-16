@@ -1104,7 +1104,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         }
         String deviceCode = request.getParameter(DEVICE_CODE);
         if (StringUtils.isTrivial(deviceCode)) {
-            throw new OA2GeneralError(OA2Errors.ACCESS_DENIED,
+            throw new OA2ATException(OA2Errors.ACCESS_DENIED,
                     "Missing " + DEVICE_CODE + " parameter",
                     HttpStatus.SC_UNAUTHORIZED,
                     null);
@@ -1115,7 +1115,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         } catch (Throwable t) {
             debugger.info(this, "Failed to create " + DEVICE_CODE + " from input \"" + deviceCode + "\"");
             info("Failed to create " + DEVICE_CODE + " from input \"" + deviceCode + "\"");
-            throw new OA2GeneralError(OA2Errors.ACCESS_DENIED,
+            throw new OA2ATException(OA2Errors.ACCESS_DENIED,
                     DEVICE_CODE + " is not a uri", HttpStatus.SC_UNAUTHORIZED, null);
         }
         AuthorizationGrantImpl authorizationGrant = new AuthorizationGrantImpl(ag);
@@ -1131,26 +1131,27 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         if (transaction == null || !transaction.isRFC8628Request()) {
             debugger.info(this, "Attempt to access RFC8628 end point by client, but no pending devide flow found.");
             info("Attempt to access RFC8628 end point by client, but no pending devide flow found.");
-            throw new OA2GeneralError(OA2Errors.ACCESS_DENIED,
+            throw new OA2ATException(OA2Errors.ACCESS_DENIED,
                     "no pending request", HttpStatus.SC_UNAUTHORIZED, null);
         }
 
         if (!transaction.isAuthGrantValid()) {
-            throw new OA2GeneralError(OA2Errors.INVALID_GRANT,
+            throw new OA2ATException(OA2Errors.INVALID_GRANT,
                     "invalid device code",
                     HttpStatus.SC_BAD_REQUEST,
                     null);
         }
 
         if (!transaction.getClient().getIdentifierString().equals(client.getIdentifierString())) {
-            throw new OA2GeneralError(OA2Errors.UNAUTHORIZED_CLIENT,
+            throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
                     "wrong client, access denied",
-                    HttpStatus.SC_UNAUTHORIZED, null);
+                    HttpStatus.SC_UNAUTHORIZED, transaction.getRequestState());
         }
         RFC8628State rfc8628State = transaction.getRFC8628State();
         if (rfc8628State.isExpired()) {
             // Odd case that it has expired, but the garbage collector has not disposed of it yet, for whatever reason.
-            throw new OA2ATException(OA2Errors.ACCESS_DENIED, DEVICE_CODE + " expired", HttpStatus.SC_UNAUTHORIZED, null);
+            throw new OA2ATException(OA2Errors.ACCESS_DENIED, DEVICE_CODE + " expired",
+                    HttpStatus.SC_UNAUTHORIZED, null);
         }
         if (rfc8628State.firstTry) {
             rfc8628State.firstTry = false; // used it up. No more first tries
@@ -1160,7 +1161,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
                 rfc8628State.interval = rfc8628State.interval + DEFAULT_WAIT;
                 transaction.setRFC8628State(rfc8628State);
                 getTransactionStore().save(transaction);
-                throw new OA2ATException("slow_down", "slow down");
+                throw new OA2ATException("slow_down", "slow down", HttpStatus.SC_BAD_REQUEST, transaction.getRequestState());
             }
 
         }
@@ -1177,7 +1178,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         getTransactionStore().save(transaction);
 
         if (!rfc8628State.valid) {
-            throw new OA2ATException("authorization_pending", "authorization pending");
+            throw new OA2ATException("authorization_pending", "authorization pending",
+                    HttpStatus.SC_BAD_REQUEST, transaction.getRequestState());
         }
         // If we make it this far, we just turn the entire thing over to the standard access token flow
         transaction.setAuthGrantValid(false);

@@ -196,20 +196,21 @@ When a new version is deployed, here is the testing order
         Currently gets FNAL access token (set DEBUG=true in script before running).
         Check configruation first. Usually it is set to NCSA default and
         a bogus WLCG access token.
-  -- cilogon:test/df -- a client for testing the device flow against the CILogon server
+  -- localhost:test/df -- a client for testing the device flow against the CILogon server
      This will require doing the DBService calls manually (that's part of the test).
      In the CLC load the configuration and type
      df
      This should respond with a user code, Call it USER_CODE. Paste into this and run it
-     from the command line
+     from the command line. There are two scripts that do this. Look at them
+     to be sure they point to localhost:9443
 
-     curl -s -G -k --data-urlencode 'action=checkUserCode' --data-urlencode 'user_code=USER_CODE' 'https://localhost:9443/oauth2/dbService'
+     bash$ cd ~/dev/ncsa-git/cilogon/cilogon2-admin-oauth2/src/main/scripts
+     bash$ test-check-user-code.sh USER_CODE
 
      That should return with a status of 0 and a summary of the client. Approve it manually
      with
 
-     curl -s -G -k --data-urlencode 'action=userCodeApproved' --data-urlencode 'user_code=USER_CODE' --data-urlencode 'approved=1' 'https://localhost:9443/oauth2/dbService'
-
+     bash$ test-user-code-approved.sh USER_CODE 1
 
      Before you just issue a request for the access token in the CLC, you will need to emulate
      the response from the IDP and set the username for the transaction.
@@ -223,7 +224,20 @@ When a new version is deployed, here is the testing order
      transactions>update >username
 
      Does not matter to what.
-  On dev, if all worked locally.
+
+     *Repeat the above, but cancel the flow using
+
+     bash$ test-user-code-approved.sh USER_CODE 0
+
+     Check in the CLI that the transaction has been removed.
+
+     One last regression test...
+     - start flow
+     - check use code. Note the scopes
+     - attempt to get access token
+     - check user code again. Scopes should not change.
+
+  -- Redo this test in toto on dev, if all worked locally, using dev:test/df
   ***
   Copy new cilogon-oa2-cli.jar to /opt/cilogon-oa2/lib and start the CLI. This
   loads the server config and spits out any error messages -- way easier to debug than

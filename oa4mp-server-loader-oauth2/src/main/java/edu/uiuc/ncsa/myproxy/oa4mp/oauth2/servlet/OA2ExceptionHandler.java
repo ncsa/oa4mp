@@ -60,10 +60,7 @@ public class OA2ExceptionHandler implements ExceptionHandler {
             throw (ServletException) t;
         }
 
-        if (t instanceof OA2GeneralError) {
-            handleOA2Error((OA2GeneralError) t, response);
-            return;
-        }
+
 
         if (t instanceof OA2ATException) {
             handleOA2Error((OA2ATException) t, response);
@@ -73,6 +70,10 @@ public class OA2ExceptionHandler implements ExceptionHandler {
             handleOA2Error((OA2RedirectableError) t, response);
             return;
         }
+        if (t instanceof OA2GeneralError) {
+             handleOA2Error((OA2GeneralError) t, response);
+             return;
+         }
         // The next couple of exceptions can be thrown when there is no client (so the callback uri cannot be verified)
         if ((t instanceof UnknownClientException) || (t instanceof UnapprovedClientException)) {
             handleOA2Error(
