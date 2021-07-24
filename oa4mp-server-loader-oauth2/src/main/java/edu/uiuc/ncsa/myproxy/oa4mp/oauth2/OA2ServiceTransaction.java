@@ -78,7 +78,7 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         return flowStates;
     }
 
-    String RFC862_STATE_KEY = "rfc8628_state";
+  public static  String RFC862_STATE_KEY = "rfc8628_state";
 
     public RFC8628State getRFC8628State() {
         JSONObject j = getState().getJSONObject(RFC862_STATE_KEY);
@@ -125,16 +125,13 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         getState().put(AUDIENCE_KEY, audience);
     }
 
-
+    boolean isRFC8628 = false;
     public boolean isRFC8628Request() {
-        if (getState().containsKey(IS_RFC8628_KEY)) {
-            return getState().getBoolean(IS_RFC8628_KEY);
-        }
-        return false;
+        return isRFC8628;
     }
 
     public void setRFC8628Request(boolean b) {
-        getState().put(IS_RFC8628_KEY, b);
+        isRFC8628 = b;
     }
 
     /**

@@ -68,6 +68,13 @@ public class OA2CLCCommands extends CLCCommands {
 
     public static final String IS_RFC_8628_KEY = "is_rfc8628";
 
+    public OA2CLCCommands(boolean silentMode, MyLoggingFacade logger,
+                          OA2CommandLineClient oa2CommandLineClient) throws Exception {
+        this(logger, oa2CommandLineClient);
+        setPrintOuput(silentMode);
+        setVerbose(silentMode);
+
+    }
     public OA2CLCCommands(MyLoggingFacade logger,
                           OA2CommandLineClient oa2CommandLineClient) throws Exception {
         super(logger, null);
@@ -182,24 +189,24 @@ public class OA2CLCCommands extends CLCCommands {
 
         String extraParams = "";
         boolean isFirstPass = true;
-        for(String key : requestParameters.keySet()){
-           if(key.equals(OA2Constants.SCOPE)){
-               scopes = " " + requestParameters.get(key);
-           }else{
-               String x = key + "=" + URLEncoder.encode(requestParameters.get(key), "UTF-8");
-               if(isFirstPass){
+        for (String key : requestParameters.keySet()) {
+            if (key.equals(OA2Constants.SCOPE)) {
+                scopes = " " + requestParameters.get(key);
+            } else {
+                String x = key + "=" + URLEncoder.encode(requestParameters.get(key), "UTF-8");
+                if (isFirstPass) {
 
-                   isFirstPass = false;
-                   extraParams = x;
-               }else{
-                   extraParams = extraParams + "&" + x;
-               }
-           }
+                    isFirstPass = false;
+                    extraParams = x;
+                } else {
+                    extraParams = extraParams + "&" + x;
+                }
+            }
         }
 
         requestString = requestString + "?" + OA2Constants.CLIENT_ID + "=" + oa2ce.getClientId();
         requestString = requestString + "&" + OA2Constants.SCOPE + "=" + URLEncoder.encode(scopes, "UTF-8");
-        if(!StringUtils.isTrivial(extraParams)){
+        if (!StringUtils.isTrivial(extraParams)) {
             requestString = requestString + "&" + extraParams;
         }
         String rawResponse = getService().getServiceClient().getRawResponse(requestString,
@@ -225,11 +232,16 @@ public class OA2CLCCommands extends CLCCommands {
     }
 
     String userCode;
+    public String getUserCode(){return  userCode;}
+
     String deviceCode;
+    public String getDeviceCode(){return deviceCode;}
+
     /**
      * What is currently from the {@link #set_uri(InputLine)}.
      */
     URI currentURI;
+    public URI getCurrentURI(){return currentURI;}
 
     /**
      * Constructs the URI
@@ -354,6 +366,10 @@ public class OA2CLCCommands extends CLCCommands {
     }
 
     AuthorizationGrantImpl grant;
+
+    public AuthorizationGrantImpl getGrant() {
+        return grant;
+    }
 
     protected void printGrant() {
         if (grant == null) {
@@ -582,6 +598,7 @@ public class OA2CLCCommands extends CLCCommands {
     }
 
     JSONObject claims = null;
+    public JSONObject getClaims(){return claims;}
 
     public void claims(InputLine inputLine) throws Exception {
         if (grant == null || showHelp(inputLine)) {
@@ -616,7 +633,7 @@ public class OA2CLCCommands extends CLCCommands {
         }
         boolean revokeRT = inputLine.hasArg("-rt");
         getService().revoke(getDummyAsset(), revokeRT);
-        say("revocation on " + (revokeRT?"refresh":"access") + " token returned ok");
+        say("revocation on " + (revokeRT ? "refresh" : "access") + " token returned ok");
     }
 
     protected void showIntrospectHelp() {
@@ -631,7 +648,7 @@ public class OA2CLCCommands extends CLCCommands {
         }
         boolean checkRT = inputLine.hasArg("-rt");
         JSONObject json = getService().introspect(getDummyAsset(), checkRT);
-        say("introspection endpoint on " + (checkRT?"refresh":"access") +" token returned:");
+        say("introspection endpoint on " + (checkRT ? "refresh" : "access") + " token returned:");
         say(json.toString(2));
 
     }
@@ -712,7 +729,16 @@ public class OA2CLCCommands extends CLCCommands {
     }
 
     ATResponse2 currentATResponse;
+    public String getAT(){
+        if(currentATResponse == null)return "";
+        return currentATResponse.getAccessToken().getToken();
+    }
 
+    public String getRT(){
+        if(currentATResponse == null)return "";
+        return currentATResponse.getRefreshToken().getToken();
+    }
+    
     protected void getCertHelp() {
         say("get_cert");
         sayi("Usage: This will get the requested cert chain from the server.");
@@ -773,7 +799,7 @@ public class OA2CLCCommands extends CLCCommands {
         sayi("See also: get_at");
     }
 
-    protected JSONObject resolveFromToken(Token token, boolean noVerify) {
+    public JSONObject resolveFromToken(Token token, boolean noVerify) {
         if (noVerify) {
             try {
                 String[] components = JWTUtil.decat(token.getToken());
@@ -937,7 +963,7 @@ public class OA2CLCCommands extends CLCCommands {
             say(currentURI.toString());
         }
         printToken(getDummyAsset().getAccessToken(), noVerify);
-        if(getDummyAsset().hasRefreshToken()) {
+        if (getDummyAsset().hasRefreshToken()) {
             printToken(getDummyAsset().getRefreshToken(), noVerify);
         }
 
@@ -1042,7 +1068,7 @@ public class OA2CLCCommands extends CLCCommands {
         // This fixes it, but this code should be moved there, along with the resolveFromToken method
         // Since it only really affects the CLC, it has a low priority though.
         if (subjectTokenIsAT) {
-  //          subjectToken = getDummyAsset().getAccessToken();
+            //          subjectToken = getDummyAsset().getAccessToken();
 
 
             JSONObject token = resolveFromToken(getDummyAsset().getAccessToken(), true);
@@ -1548,23 +1574,27 @@ public class OA2CLCCommands extends CLCCommands {
 
         }
         say("removed: " + tRemoved + " token parameters, " + rRemoved + " authz parameters, " + xRemoved + " exchange parameters");
-        ;
+
     }
+
     public void refresh(InputLine inputLine) throws Exception {
         get_rt(inputLine);
     }
-    public void access(InputLine inputLine) throws Exception{
+
+    public void access(InputLine inputLine) throws Exception {
         get_at(inputLine);
     }
-    public void grant(InputLine inputLine) throws Exception{
+
+    public void grant(InputLine inputLine) throws Exception {
         get_grant(inputLine);
     }
-    public void uri(InputLine inputLine) throws Exception{
+
+    public void uri(InputLine inputLine) throws Exception {
         set_uri(inputLine);
     }
 
 
-public void user_info(InputLine inputLine) throws Exception{
-           get_user_info(inputLine);
-}
+    public void user_info(InputLine inputLine) throws Exception {
+        get_user_info(inputLine);
+    }
 }

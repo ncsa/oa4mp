@@ -19,6 +19,7 @@ import edu.uiuc.ncsa.security.oauth_2_0.jwt.AccessTokenHandlerInterface;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTUtil2;
 import edu.uiuc.ncsa.security.oauth_2_0.server.RFC8693Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
+import edu.uiuc.ncsa.security.util.configuration.TemplateUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRunRequest;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse;
@@ -208,11 +209,24 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
         // This has the most recent exchange requests in it any of which may be empty.
         Collection<String> actualScopes;
         TXRecord txRecord = getPhCfg().getTxRecord();
+        // Have to split the computed scopes into their uri and non-uri types.
+        // E.g. if a scope is like compute.cancel it should not be processed as a template later.
+        // Take them out here, add them back later
+        Collection<String> relativeScopes = new ArrayList<>();
+
+        for(String x : computedScopes){
+            if(!x.contains(":")){
+                relativeScopes.add(x);
+            }
+        }
+        computedScopes.removeAll(relativeScopes);
         /*
+
             If there is a token exchange record, then this is being invoked as part of a token
             exchange. In that case, any supplied scopes are used and the templates are used as
             super-paths.
         */
+
         if (txRecord == null) {
             actualScopes = doCompareTemplates(computedScopes,
                     transaction.getScopes(),
@@ -223,6 +237,7 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
                     isQuery);
         }
 
+        actualScopes.addAll(relativeScopes); // add back in relative computed scopes.
         // now we convert to a scope string.
         String s = "";
         boolean firstPass = true;
@@ -293,6 +308,19 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
         if(!atData.containsKey(ISSUER)){
             atData.put(ISSUER, transaction.getUserMetaData().getString(ISSUER));
         }
+         if(!atData.containsKey(SUBJECT)){
+             // Ifthe subject has not been set some place else, see if it is configured in the
+             // client directly. If it is not configured there, there will be no subject
+             // in this token.
+             if(getATConfig().hasSubject()){
+                    String newSubject = TemplateUtil.replaceAll(getATConfig().getSubject(), atData);
+                    atData.put(SUBJECT, newSubject );
+                }else{
+                 // absolute last place option is to set it to the same subject as the
+                 // user. About half the time this works.
+                 atData.put(SUBJECT, transaction.getUserMetaData().getString(SUBJECT));
+             }
+         }
         setAtData(atData);
         transaction.setAccessTokenLifetime(proposedLifetime);
     }
@@ -412,6 +440,11 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
         if (getATConfig().getAudience() != null && !getATConfig().getAudience().isEmpty()) {
             atData.put(AUDIENCE, getATConfig().getAudience());
         }
+        // If they really asserted it
+         if(getATConfig().hasSubject()){
+             String newSubject = TemplateUtil.replaceAll(getATConfig().getSubject(), atData);
+             atData.put(SUBJECT, newSubject );
+         }
         if (0 < getATConfig().getLifetime()) {
             atData.put(EXPIRATION, (System.currentTimeMillis() + getATConfig().getLifetime()) / 1000L);
         } else {

@@ -52,11 +52,11 @@ public class WLCGTokenHandler extends AbstractAccessTokenHandler implements WLCG
         JSONObject atData = getAtData();
         // As per spec., empty scopes means we *may* throw an exception in the generic case
         // and *must* throw one if the capability set is denied.
+        super.finish(doTemplates, isQuery);
         if (!atData.containsKey(SCOPE) || StringUtils.isTrivial(atData.getString(SCOPE))) {
             throw new OA2ATException(OA2Errors.ACCESS_DENIED,
                     "No scopes found.",
                     transaction.getRequestState());
         }
-        super.finish(doTemplates, isQuery);
     }
 }

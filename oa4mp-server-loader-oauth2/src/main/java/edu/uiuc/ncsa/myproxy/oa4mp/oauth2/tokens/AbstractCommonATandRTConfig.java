@@ -22,7 +22,7 @@ public class AbstractCommonATandRTConfig extends AbstractPayloadConfig {
     public static String RESOURCE_KEY = "resource";
 
     String issuer;
-    String subject;
+    String subject = null;
     List<String> audience = new ArrayList<>();
 
     public List<URI> getResource() {
@@ -43,6 +43,9 @@ public class AbstractCommonATandRTConfig extends AbstractPayloadConfig {
         this.issuer = issuer;
     }
 
+    public boolean hasSubject(){
+        return subject != null;
+    }
     public String getSubject() {
         return subject;
     }

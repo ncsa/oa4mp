@@ -9,13 +9,11 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.SafeGCRetentionPolicy;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo.VirtualOrganization;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractAccessTokenServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.IssuerTransactionState;
 import edu.uiuc.ncsa.qdl.exceptions.AssertionException;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.cache.Cleanup;
 import edu.uiuc.ncsa.security.core.exceptions.IllegalAccessException;
-import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.exceptions.TransactionNotFoundException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DateUtils;
@@ -25,7 +23,6 @@ import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.server.request.ATRequest;
 import edu.uiuc.ncsa.security.delegation.server.request.IssuerResponse;
 import edu.uiuc.ncsa.security.delegation.servlet.TransactionState;
-import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.delegation.storage.TransactionStore;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
@@ -49,7 +46,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -65,7 +61,6 @@ import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8693Constants2.*;
 import static edu.uiuc.ncsa.security.core.util.Identifiers.VERSION_1_0_TAG;
 import static edu.uiuc.ncsa.security.core.util.Identifiers.VERSION_TAG;
 import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
-import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.CLIENT_SECRET;
 import static edu.uiuc.ncsa.security.oauth_2_0.server.RFC8628Constants.DEFAULT_WAIT;
 import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.JWT_ID;
 
@@ -73,7 +68,7 @@ import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.JWT_ID;
  * <p>Created by Jeff Gaynor<br>
  * on 10/3/13 at  2:03 PM
  */
-public class OA2ATServlet extends AbstractAccessTokenServlet {
+public class OA2ATServlet extends AbstractAccessTokenServlet2 {
     // Don't really have a better place to put this.  TXRecord is not visible except in this module.
     public static Cleanup<Identifier, TXRecord> txRecordCleanup = null;
 
@@ -116,10 +111,6 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         p.put(OA2Constants.CLIENT_ID, st.getClient().getIdentifierString());
     }
 
-
-    protected String getClientSecret(HttpServletRequest request) {
-        return ClientUtils.getClientSecret(request, getFirstParameterValue(request, CLIENT_SECRET));
-    }
 
 
     /**
@@ -550,7 +541,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
                     "access denied",
                     st2.getRequestState());
         }
-
+        // Wrong client means we just blow up since we don't want to return anything at all about
+        // the original client or the state of any transactions.
         if (!st2.getClient().getIdentifierString().equals(client.getIdentifierString())) {
             throw new OA2GeneralError(OA2Errors.UNAUTHORIZED_CLIENT,
                     "wrong client, access denied",
@@ -685,79 +677,6 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
     }
 
 
-    /**
-     * This finds the client identifier either as a parameter or in the authorization header and uses
-     * that to get the client. It will also check if the client has been approved and throw an
-     * exception if that is not the case. You must separately check the secret as needed.
-     *
-     * @param request
-     * @return
-     */
-    @Override
-    public Client getClient(HttpServletRequest request) {
-        // Check is this is in the headers. If not, fall through to checking parameters.
-        OA2Client client = null;
-        Identifier paramID = HeaderUtils.getIDFromParameters(request);
-        Identifier headerID = null;
-        try {
-            headerID = HeaderUtils.getIDFromHeaders(request);
-        } catch (UnsupportedEncodingException e) {
-            throw new NFWException("Error: internal use of UTF-8 encoding failed");
-        } catch (Throwable tt) {
-            ServletDebugUtil.trace(this.getClass(), "Got an exception checking for the header. " +
-                    "This is usually benign:\"" + tt.getMessage() + "\"");
-        }
-        // we have to check that if we get both of these they refer to the same client, so someone
-        // cannot hijack the session
-        if (paramID == null) {
-            if (headerID == null) {
-                throw new OA2ATException(OA2Errors.INVALID_REQUEST, "no client identifier given");
-            }
-            client = (OA2Client) getClient(headerID);
-        } else {
-            if (headerID == null) {
-                client = (OA2Client) getClient(paramID);
-            } else {
-                if (!paramID.equals(headerID)) {
-                    throw new OA2ATException(OA2Errors.INVALID_REQUEST, "too many client identifiers");
-                }
-                client = (OA2Client) getClient(paramID); // doesn't matter which id we use since they are equal.
-            }
-        }
-
-        checkClientApproval(client);
-
-
-        return client;
-    }
-
-    public void verifyClientSecret(OA2Client client, String rawSecret) {
-        ClientUtils.verifyClientSecret(client, rawSecret, true);
-        // Fix for CIL-332
-/*
-        if (rawSecret == null) {
-            debugger.trace(this, "doIt: no secret, throwing exception.");
-            throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT, "missing secret");
-        }
-        if (StringUtils.isTrivial(client.getSecret())) {
-            // Since clients can be administered by others now, we are finding that they sometimes
-            // may change their scopes. If a client is public, there is no secret, but if
-            // a client later is updated to have different scopes, then trying to use it for other
-            // purposes gets an NPE here. Tell them when they use their client next rather
-            // than blowing up with an NPE.
-            throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT, "client has no configured secret",null);
-        }
-
-        // TODO -- replace next call with sha1Hex(rawSecret)? Need to know side effects first!
-
-        if (!client.getSecret().equals(DigestUtils.shaHex(rawSecret))) {
-            debugger.trace(this, "doIt: bad secret, throwing exception.");
-            throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
-                    "incorrect secret");
-        }
-*/
-
-    }
 
     protected OA2ServiceTransaction getByRT(RefreshToken refreshToken) throws IOException {
         if (refreshToken == null) {
@@ -1128,7 +1047,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         }
         OA2ServiceTransaction transaction = (OA2ServiceTransaction) getTransaction(authorizationGrant);
 
-        if (transaction == null || !transaction.isRFC8628Request()) {
+        if (transaction == null) {
             debugger.info(this, "Attempt to access RFC8628 end point by client, but no pending devide flow found.");
             info("Attempt to access RFC8628 end point by client, but no pending devide flow found.");
             throw new OA2ATException(OA2Errors.ACCESS_DENIED,
@@ -1161,7 +1080,10 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
                 rfc8628State.interval = rfc8628State.interval + DEFAULT_WAIT;
                 transaction.setRFC8628State(rfc8628State);
                 getTransactionStore().save(transaction);
-                throw new OA2ATException("slow_down", "slow down", HttpStatus.SC_BAD_REQUEST, transaction.getRequestState());
+                throw new OA2ATException("slow_down",
+                        "slow down",
+                        HttpStatus.SC_BAD_REQUEST,
+                        transaction.getRequestState());
             }
 
         }
@@ -1172,7 +1094,21 @@ public class OA2ATServlet extends AbstractAccessTokenServlet {
         if (!isTrivial(scope)) {
             // scope is optional, so only take notice if they send something
             TransactionState transactionState = new TransactionState(request, response, null, transaction);
+            try{
             transaction.setScopes(ClientUtils.resolveScopes(transactionState, true));
+            }catch(OA2RedirectableError redirectableError){
+                            throw new OA2ATException(redirectableError.getError(),
+                                    redirectableError.getDescription(),
+                                    HttpStatus.SC_BAD_REQUEST,
+                                    redirectableError.getState());
+                        }
+        }else{
+            if(transaction.getScopes().isEmpty()){
+                // If there are no requested scopes any place, set the scopes to the
+                // default for the client. This should be done here since this
+                // is always assumed set henceforth.
+                transaction.setScopes(((OA2Client)transaction.getClient()).getScopes());
+            }
         }
 
         getTransactionStore().save(transaction);

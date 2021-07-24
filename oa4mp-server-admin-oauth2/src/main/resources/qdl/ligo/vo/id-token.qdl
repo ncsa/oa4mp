@@ -1,0 +1,58 @@
+/*
+   An alternate configuration for ligo for use with a VO and returns audiences
+   that maybe reduced in token exchanges ("like scopes").
+   In this case, the groups are returned in the claims, along with the uin
+
+   This is run once during the pre-auth exec phase to add this to the set of
+   claims sources for the system. It is then run at each phase automatically,
+   so no manual get is needed for other phases.
+
+     tokens{
+       identity{
+       type=identity
+       qdl{
+           load="ligo/vo/id-token.qdl"
+           xmd={exec_phase=pre_auth}
+         }// end qdl
+       } //end identity token
+       access{
+          type=sci_token
+          qdl{
+             load="ligo/vo/at.qdl"
+              xmd={exec_phase=["post_token","post_refresh","post_exchange"]}
+          } //end QDL
+       } // end access token
+     } //end tokens
+
+
+   Jeff Gaynor
+   created: 2020-09-15T16:00:55Z
+   updated: 2020-10-31T11:57:45.909Z
+ */
+
+
+/* **** Actual script **** */
+script_load('utils/init.qdl');
+        //    claims.eppn := 'jim.basney@ligo.org';
+       //     claims.idp := idp.ligo;
+
+if[
+     claims.idp != idp.ligo
+][
+     return();
+];
+
+            claims.uid := head(claims.eppn, '@');
+
+         cfg.auth_type := 'none';
+           cfg.address := 'ldap.ligo.org';
+              cfg.port := 636;
+        cfg.claim_name := 'uid';
+              cfg.type := 'ldap';
+       cfg.search_base := 'ou=people,dc=ligo,dc=org';
+         cfg.ldap_name := 'uid';
+           cfg.groups. := ['isMemberOf'];
+cfg.search_attributes. := ['email', 'uin', 'uid', 'isMemberOf'];
+
+        claim_sources. := claim_sources. ~ [create_source(cfg.)];
+

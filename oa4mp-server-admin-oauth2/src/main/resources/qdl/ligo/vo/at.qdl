@@ -1,0 +1,17 @@
+/*
+  Driver script for all post token, refresh and exchange
+*/
+//script_load('ligo/vo/acl.qdl');
+
+all_audience. := ['ANY', 'LIGO', 'segments.ligo.org'];
+
+if[
+  exec_phase == 'post_token'
+ ][
+   script_load('ligo/vo/access.qdl');
+];
+if[
+  exec_phase == 'post_exchange' || exec_phase == 'post_refresh'
+ ][
+   script_load('ligo/vo/rtx.qdl');
+];

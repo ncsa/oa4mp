@@ -2,10 +2,11 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RFC8628Store;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
-import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.server.request.AGResponse;
@@ -25,10 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.*;
@@ -39,13 +37,13 @@ import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.*;
  * <p>Created by Jeff Gaynor<br>
  * on 2/9/21 at  11:21 AM
  */
-public class RFC8628Servlet extends MyProxyDelegationServlet implements RFC8628Constants2 {
+public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants2 {
     @Override
     public ServiceTransaction verifyAndGet(IssuerResponse iResponse) throws IOException {
         return null;
     }
 
-    long lastAttemptTS = -1L; // so the first call to the servlet works, otherwise the check
+    //long lastAttemptTS = -1L; // so the first call to the servlet works, otherwise the check
 
     public static Map<String, String> getCache() {
         return cache;
@@ -62,13 +60,11 @@ public class RFC8628Servlet extends MyProxyDelegationServlet implements RFC8628C
             // do not reinitialize cache
             return;
         }
-        for (Identifier id : getServiceEnvironment().getTransactionStore().keySet()) {
-            OA2ServiceTransaction transaction = (OA2ServiceTransaction) getServiceEnvironment().getTransactionStore().get(id);
-            if (transaction != null && transaction.isRFC8628Request()) {
-                RFC8628State rfc8628State = transaction.getRFC8628State();
-                if (!isTrivial(rfc8628State.userCode) && rfc8628State.deviceCode != null) {
-                    cache.put(rfc8628State.userCode, rfc8628State.deviceCode.toString());
-                }
+        RFC8628Store rfc8628Store = (RFC8628Store) getServiceEnvironment().getTransactionStore();
+        List<RFC8628State> stateList = rfc8628Store.getPending();
+        for(RFC8628State rfc8628State : stateList){
+            if (!isTrivial(rfc8628State.userCode) && rfc8628State.deviceCode != null) {
+                cache.put(rfc8628State.userCode, rfc8628State.deviceCode.toString());
             }
         }
     }
@@ -81,7 +77,7 @@ public class RFC8628Servlet extends MyProxyDelegationServlet implements RFC8628C
 
         if (!oa2SE.isRfc8628Enabled()) {
             ServletDebugUtil.trace(this, "device flow not enabled onthis server");
-            throw new OA2GeneralError(OA2Errors.ACCESS_DENIED,
+            throw new OA2ATException(OA2Errors.ACCESS_DENIED,
                     "This service is not available on this server",
                     HttpStatus.SC_SERVICE_UNAVAILABLE,
                     null);
@@ -89,15 +85,33 @@ public class RFC8628Servlet extends MyProxyDelegationServlet implements RFC8628C
         RFC8628ServletConfig rfc8628ServletConfig = oa2SE.getRfc8628ServletConfig();
 
         // todo - have the wait period configurable.
-        long checkTime = System.currentTimeMillis() - lastAttemptTS;
+/*        long checkTime = System.currentTimeMillis() - lastAttemptTS;
         if (checkTime < rfc8628ServletConfig.interval) {
-            throw new OA2GeneralError("too many client requests");
+            throw new OA2GeneralError("too many client requests",
+                    "invalid_request", HttpStatus.SC_BAD_REQUEST, null);
         }
-        lastAttemptTS = System.currentTimeMillis();
+        */
+        // lastAttemptTS = System.currentTimeMillis();
         // Next two lines also verify that it is a client, has been approved and has the right secret.
-        OA2Client client = (OA2Client) getClient(req);
+        OA2Client client = null;
+        try {
+            client = (OA2Client) getClient(req);
+        } catch (UnknownClientException unknownClientException) {
+            throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
+                    "unknown client",
+                    HttpStatus.SC_BAD_REQUEST,
+                    null);
+        }
         if (!client.isPublicClient()) {
-            ClientUtils.verifyClientSecret(client, getClientSecret(req), false);
+            try {
+                ClientUtils.verifyClientSecret(client, getClientSecret(req), false);
+            } catch (Throwable t) {
+                DebugUtil.error(this, "Error verifying client secret", t);
+                throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
+                        "incorrect password",
+                        HttpStatus.SC_BAD_REQUEST,
+                        null);
+            }
         }
         MetaDebugUtil debugUtil = createDebugger(client);
         debugUtil.trace(this, "checked client secret.");
@@ -128,7 +142,7 @@ public class RFC8628Servlet extends MyProxyDelegationServlet implements RFC8628C
         }
         if (!gotUserCode) {
             ServletDebugUtil.error(this, "Could not get an unused user code. Cache contains " + cache.size() + " entries.");
-            throw new OA2GeneralError(OA2Errors.SERVER_ERROR, "could not create new user code", HttpStatus.SC_INTERNAL_SERVER_ERROR, null);
+            throw new OA2ATException(OA2Errors.SERVER_ERROR, "could not create new user code", HttpStatus.SC_BAD_REQUEST, null);
         }
         debugUtil.trace(this, "user_code = " + userCode);
         rfc8628State.userCode = userCode;
@@ -141,12 +155,20 @@ public class RFC8628Servlet extends MyProxyDelegationServlet implements RFC8628C
         String scope = req.getParameter(OA2Constants.SCOPE);
         if (isTrivial(scope)) {
             debugUtil.trace(this, "no scopes, using default for client");
-            t.setScopes(client.getScopes()); // use default scopes for client if none.
+            t.setScopes(new ArrayList()); 
         } else {
             // scope is optional, so only take notice if they send something
             debugUtil.trace(this, "checking scopes:" + scope + ". strict scopes " + (client.useStrictScopes() ? "on" : "off"));
             TransactionState transactionState = new TransactionState(req, resp, agResponse.getParameters(), t);
-            t.setScopes(ClientUtils.resolveScopes(transactionState, true));
+            try {
+                t.setScopes(ClientUtils.resolveScopes(transactionState, true));
+            }catch(OA2RedirectableError redirectableError){
+                throw new OA2ATException(redirectableError.getError(),
+                        redirectableError.getDescription(),
+                        HttpStatus.SC_BAD_REQUEST,
+                        redirectableError.getState());
+            }
+
         }
         t.setRFC8628State(rfc8628State);
         debugUtil.trace(this, "saving transaction");

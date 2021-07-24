@@ -1,0 +1,39 @@
+/*
+    Refresh and token exchange if there is anything to do.
+*/
+
+// Audience processing
+ requested_audience. := (size(tx_audience.) == 0)?audience.:tx_audience.;
+
+ // if the audience is still empty, they never requested anything any place, so
+ // set the aud claim
+
+ if[
+   size(requested_audience.) == 0
+  ][
+     access_token.aud. := all_audience.;
+  ]else[
+     // return only things we recognize.
+     access_token.aud. :=mask(all_audience.,  has_value(all_audience., requested_audience.));
+  ];
+
+// Scope processing
+  /*
+     If they requested different scopes, use that.
+     Note that it is possible that the request has no specific scopes in it
+     nor does any subsequence request. Teh contract for the clients is that
+     scopes are asserted based on group membership.
+  */
+  // These are the maximum scopes allowed.
+  allowed_scopes. := script_run('ligo/vo/get_scopes.qdl', claims.isMemberOf.);
+
+  requested_scopes. := (0 < size(tx_scopes.))?scopes.:tx_scopes.;
+
+ if[
+    0 < size(requested_scopes.)
+  ][
+    // If they request different scopes, honor it. Otherwise don't.
+    //allowed_scopes. := mask(allowed_scopes., has_value(allowed_scopes., requested_scopes.));
+    allowed_scopes. := resolve_scopes(allowed_scopes., requested_scopes., false);
+  ];
+ access_token.scope := detokenize(unique(allowed_scopes.), ' ', 2); // turn in to string, omit duplications, trailing space

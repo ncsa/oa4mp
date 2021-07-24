@@ -53,9 +53,25 @@ When a new version is deployed, here is the testing order
      which is as it should be. If the access token expires, then any attempts to exchange or refresh fail.
   -- localhost:test/no_qdl
         Has basic configuration for tokens, but no scripting
-        In CLC you need to set the following parameters *before* starting exchange:
+        ***************************************************************************
+        * Note that this is a critical case for clients since this is available   *
+        * to all clients. In particular, clients that are not QDL enabled should  *
+        * be able to use this exclusively.                                        *
+        ***************************************************************************
 
-        set_param -a scope "read:/home/jeff x.y: write:"
+        In the token handler document run through the various examples.
+
+        In CLC you need to set the following parameters *before* starting exchange:
+        Ex. 1
+        set_param -a scope "read: x.y: x.z write:"
+
+        Ex. 2
+        set_param -a scope "read:/home/jeff/data x.y: x.z write:data/cluster/ligo"
+        Ex. 3
+        Ex. 4
+        Ex. 5
+
+        set_param -a scope "read:/home/jeff x.y: x.z write:"
         set_param -t scope "read:/home/jeff x.y: write:/data/cluster"
         set_param -x scope "read:/home/jeffy x.y:/abc/def/ghi write:/data/cluster1 x.z:/any"
 

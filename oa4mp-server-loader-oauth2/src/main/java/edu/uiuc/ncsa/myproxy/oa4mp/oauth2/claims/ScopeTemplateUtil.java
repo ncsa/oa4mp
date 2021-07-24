@@ -1,7 +1,5 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
 
-import edu.uiuc.ncsa.security.core.util.DebugUtil;
-
 import java.net.URI;
 import java.util.*;
 

@@ -1,15 +1,20 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8628State;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
+import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.delegation.storage.impl.TransactionMemoryStore;
 import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 3/25/14 at  12:51 PM
  */
-public class OA2MTStore<V extends OA2ServiceTransaction> extends TransactionMemoryStore<V> implements RefreshTokenStore<V>, UsernameFindable<V> {
+public class OA2MTStore<V extends OA2ServiceTransaction> extends TransactionMemoryStore<V> implements RefreshTokenStore<V>, UsernameFindable<V>, RFC8628Store<V> {
     public OA2MTStore(IdentifiableProvider identifiableProvider) {
         super(identifiableProvider);
     }
@@ -58,4 +63,17 @@ public class OA2MTStore<V extends OA2ServiceTransaction> extends TransactionMemo
     public V getByUsername(String username) {
         return getUserIndex().get(username);
     }
+
+
+    @Override
+      public List<RFC8628State> getPending() {
+          List<RFC8628State> pending = new ArrayList<>();
+          for (Identifier id : keySet()) {
+              OA2ServiceTransaction transaction = get(id);
+              if (transaction != null && transaction.isRFC8628Request()) {
+                  pending.add(transaction.getRFC8628State());
+              }
+          }
+          return pending;
+      }
 }

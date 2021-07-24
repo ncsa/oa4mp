@@ -1,8 +1,10 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8628State;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.DSFSTransactionStore;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
+import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
 import edu.uiuc.ncsa.security.delegation.token.TokenForge;
@@ -10,12 +12,14 @@ import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 3/12/14 at  1:21 PM
  */
-public class OA2FSTStore<V extends OA2ServiceTransaction> extends DSFSTransactionStore<V> implements RefreshTokenStore<V>, UsernameFindable<V> {
+public class OA2FSTStore<V extends OA2ServiceTransaction> extends DSFSTransactionStore<V> implements RefreshTokenStore<V>, UsernameFindable<V>, RFC8628Store<V> {
 
     public OA2FSTStore(File storeDirectory, File indexDirectory,
                        IdentifiableProvider<V> idp,
@@ -61,5 +65,20 @@ public class OA2FSTStore<V extends OA2ServiceTransaction> extends DSFSTransactio
     @Override
     public V getByUsername(String username) {
         return getIndexEntry(username);
+    }
+
+    // Dog slow on larger stores, but there is really almost no other way than to look...
+    // If you have this many transactions, switch to an SQL store where this is
+    // optimized.
+    @Override
+    public List<RFC8628State> getPending() {
+        List<RFC8628State> pending = new ArrayList<>();
+        for (Identifier id : keySet()) {
+            OA2ServiceTransaction transaction = get(id);
+            if (transaction != null && transaction.isRFC8628Request()) {
+                pending.add(transaction.getRFC8628State());
+            }
+        }
+        return pending;
     }
 }

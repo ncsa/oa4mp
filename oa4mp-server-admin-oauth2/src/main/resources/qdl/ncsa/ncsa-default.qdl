@@ -74,6 +74,11 @@ if[
        s.j := claims.isMemberOf.j.name;
     ]; // end while
     claims.isMemberOf. := s.;
+    /* Alternately
+          query(claims.isMemberOf., '$..name')
+       converts it nicely to a list as well. Be sure to only do the cliam you want
+       so you don't get extra name attributes.
+    */
 ];
 
 

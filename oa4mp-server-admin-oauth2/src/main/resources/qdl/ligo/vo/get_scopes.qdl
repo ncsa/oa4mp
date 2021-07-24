@@ -1,0 +1,54 @@
+/*
+   Utility function to compute scopes based on group memberships.
+   arg 0 is the group (claims.isMemberOf. usually)
+*/
+
+   groups. := script_args(0);
+   allowed_scopes. := [];
+   
+   zeta.'Communities:LSCVirgoLIGOGroupMembers' := ['read:/DQSegDB' ,'read:/frames'];
+      zeta.'Communities:LVC:SegDB:SegDBWriter' := 'write:/DQSegDB';
+        zeta.'gw-astronomy:KAGRA-LIGO:members' := 'read:/frames';
+   
+   while[
+       for_keys(key, zeta.)
+     ][
+       if[
+          has_value( key, groups.)
+       ][
+          allowed_scopes. := allowed_scopes. ~ zeta.key;
+       ]; // end if
+   
+    ]; // end while
+
+    return(allowed_scopes.);
+
+    /*
+    example replacement for loop above with much simpler data:
+        zeta.'A' := ['p','q']
+        zeta.'B' := 'r'
+        zeta.'C' := 's'
+        g. := ['A','D','C','E']; g. is groups. above
+       zz. :=  reduce(@||, for_each(@has_value, g., keys(zeta.)))
+ {
+  A:true,
+  B:true,
+  C:true
+ }
+
+Need to use 1.4.1 function for values though:
+ 
+ reduce(@~, values(mask(zeta., zz.)))
+
+ define
+ [
+ check(path.)
+ ]
+ [
+ >> check(path.) this will take a list of paths to files and test the syntax of the
+ >> files for an OA4MP service, reporting any errors.
+ while[for_next(file,path.)][r:=check_syntax(file_read(file));line_out:=file+': '+(size(r)==0?'ok':'\n   '+r);say(line_out);]
+ ;
+ ];
+
+    */

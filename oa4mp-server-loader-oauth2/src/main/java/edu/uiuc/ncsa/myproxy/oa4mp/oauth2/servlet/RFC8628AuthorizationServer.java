@@ -8,8 +8,8 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.PresentationState;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.delegation.token.impl.AuthorizationGrantImpl;
+import edu.uiuc.ncsa.security.oauth_2_0.OA2ATException;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2GeneralError;
 import edu.uiuc.ncsa.security.servlet.JSPUtil;
 import edu.uiuc.ncsa.security.servlet.PresentableState;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
@@ -138,11 +138,11 @@ public class RFC8628AuthorizationServer extends EnvServlet {
                 try {
                     String id = request.getParameter("identifier");
                     if (isTrivial(id)) {
-                        throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, "no pending flow found", HttpStatus.SC_BAD_REQUEST, null);
+                        throw new OA2ATException(OA2Errors.INVALID_REQUEST, "no pending flow found", HttpStatus.SC_BAD_REQUEST, null);
                     }
                     pendingState = pending.get(id);
                     if (pendingState == null) {
-                        throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, "no pending flow found", HttpStatus.SC_BAD_REQUEST, null);
+                        throw new OA2ATException(OA2Errors.INVALID_REQUEST, "no pending flow found", HttpStatus.SC_BAD_REQUEST, null);
                     }
                     prepare(pendingState);
                     processRequest(request, response, pendingState);
@@ -207,7 +207,7 @@ public class RFC8628AuthorizationServer extends EnvServlet {
             count = Integer.parseInt(counter);
 
         } catch (Throwable t) {
-            throw new OA2GeneralError(OA2Errors.SERVER_ERROR, "counter not a number", HttpStatus.SC_INTERNAL_SERVER_ERROR, null);
+            throw new OA2ATException(OA2Errors.SERVER_ERROR, "counter not a number", HttpStatus.SC_INTERNAL_SERVER_ERROR, null);
         }
         if (count < 1) {
                       pending.remove(pendingState.id); // remove state, so they can't retry this somehow
@@ -225,13 +225,13 @@ public class RFC8628AuthorizationServer extends EnvServlet {
             } else {
                 Enumeration enumeration = request.getHeaders(headerName);
                 if (!enumeration.hasMoreElements()) {
-                    throw new OA2GeneralError(OA2Errors.ACCESS_DENIED,
+                    throw new OA2ATException(OA2Errors.ACCESS_DENIED,
                             "Error: A custom header of \"" + headerName + "\" was specified for authorization, but no value was found.",
                             HttpStatus.SC_UNAUTHORIZED, null);
                 }
                 userName = enumeration.nextElement().toString();
                 if (enumeration.hasMoreElements()) {
-                    throw new OA2GeneralError(OA2Errors.ACCESS_DENIED,
+                    throw new OA2ATException(OA2Errors.ACCESS_DENIED,
                             "Error: A custom header of \"" + headerName + "\" was specified for authorization, but multiple values were found.",
                             HttpStatus.SC_UNAUTHORIZED, null);
                 }
@@ -239,7 +239,7 @@ public class RFC8628AuthorizationServer extends EnvServlet {
             if (getServiceEnvironment().getAuthorizationServletConfig().isRequireHeader()) {
                 if (isTrivial(userName)) {
                     warn("Headers required, but none found.");
-                    throw new OA2GeneralError(OA2Errors.ACCESS_DENIED,
+                    throw new OA2ATException(OA2Errors.ACCESS_DENIED,
                             "Headers required, but none found.",
                             HttpStatus.SC_UNAUTHORIZED, null);
                 }
@@ -274,26 +274,27 @@ public class RFC8628AuthorizationServer extends EnvServlet {
         }
         AuthorizationGrantImpl ag = new AuthorizationGrantImpl(URI.create(cache.get(userCode)));
         if (ag.isExpired()) {
-            throw new OA2GeneralError(OA2Errors.INVALID_GRANT, "expired grant", HttpStatus.SC_BAD_REQUEST, null);
+            throw new OA2ATException(OA2Errors.INVALID_GRANT, "expired grant", HttpStatus.SC_BAD_REQUEST, null);
         }
         OA2ServiceTransaction trans = (OA2ServiceTransaction) getServiceEnvironment().getTransactionStore().get(ag);
         if (trans == null) {
-            throw new OA2GeneralError(OA2Errors.INVALID_GRANT, "grant is invalid", HttpStatus.SC_BAD_REQUEST, null);
+            throw new OA2ATException(OA2Errors.INVALID_GRANT, "grant is invalid", HttpStatus.SC_BAD_REQUEST, null);
         }
         if (!trans.isAuthGrantValid()) {
-            throw new OA2GeneralError(OA2Errors.INVALID_GRANT, "grant is invalid", HttpStatus.SC_BAD_REQUEST, null);
+            throw new OA2ATException(OA2Errors.INVALID_GRANT, "grant is invalid", HttpStatus.SC_BAD_REQUEST, null);
         }
 
         if (!trans.isRFC8628Request()) {
             //So there is such a grant but somehow this is not a valid rfc 8628 request. Should not happen, but if someone edited
             // the transaction itself and made a mistake, it could, in which case the state of the request itself is questionable.
-            throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, "invalid request", HttpStatus.SC_BAD_REQUEST, null);
+            throw new OA2ATException(OA2Errors.INVALID_REQUEST, "invalid request", HttpStatus.SC_BAD_REQUEST, null);
         }
         trans.setUsername(userName);
         RFC8628State rfc8628State = trans.getRFC8628State();
         rfc8628State.valid = true; // means they actually logged in
         // The JSON library copies everything no matter what, so no guarantee what's in the transaction is the same object.
         // Just replace it with the good copy.
+        trans.setRFC8628Request(false); // or it gets picked up when rebuilding the cache as outstanding.
         trans.setRFC8628State(rfc8628State);
         pending.remove(pendingState.id); // clean that out
         getServiceEnvironment().getTransactionStore().save(trans);
@@ -333,7 +334,7 @@ public class RFC8628AuthorizationServer extends EnvServlet {
         // far outside of the OAuth spec.
         // If you were checking users and there  were a problem, you would do this:
         String message = "invalid login";
-        throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, message, HttpStatus.SC_UNAUTHORIZED, null);
+        throw new OA2ATException(OA2Errors.ACCESS_DENIED, message, HttpStatus.SC_UNAUTHORIZED, null);
 
         // which would display the message as the retry message.
 

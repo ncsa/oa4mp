@@ -47,6 +47,7 @@
           <element id="library" level="project" name="Maven: org.abego.treelayout:org.abego.treelayout.core:1.0.3" />
           <element id="library" level="project" name="Maven: org.glassfish:javax.json:1.0.4" />
           <element id="library" level="project" name="Maven: com.ibm.icu:icu4j:61.1" />
+          <element id="library" level="project" name="Maven: org.jasypt:jasypt:1.9.0" />
           <element id="library" level="project" name="Maven: edu.uiuc.ncsa.security:ncsa-security-servlet:5.1-SNAPSHOT" />
           <element id="archive" name="myproxy-logon-5.1-SNAPSHOT.jar">
             <element id="module-output" name="myproxy-logon" />

@@ -13,7 +13,7 @@ import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.AuthorizationTemplates.P
  */
 public class AuthorizationPath {
     String operation;
-    String path;
+    String path = null;
 
     public String getOperation() {
         return operation;
@@ -23,9 +23,10 @@ public class AuthorizationPath {
         return path;
     }
 
-    public boolean hasPath(){
+    public boolean hasPath() {
         return !StringUtils.isTrivial(path);
     }
+
     public AuthorizationPath(JSONObject json) {
         fromJSON(json);
     }
@@ -35,6 +36,7 @@ public class AuthorizationPath {
         fromString(template);
 
     }
+
     public AuthorizationPath(String operation, String path) {
         this.operation = operation;
         this.path = path;
@@ -43,13 +45,17 @@ public class AuthorizationPath {
     public JSONObject toJSON() {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put(OPERATION_KEY, operation);
-        jsonObject.put(PATH_KEY, path);
+        if (hasPath()) {
+            jsonObject.put(PATH_KEY, path);
+        }
         return jsonObject;
     }
 
     public void fromJSON(JSONObject j) {
         operation = j.getString(OPERATION_KEY);
-        path = j.getString(PATH_KEY);
+        if (j.containsKey(PATH_KEY)) {
+            path = j.getString(PATH_KEY);
+        }
     }
 
     /**
@@ -60,12 +66,12 @@ public class AuthorizationPath {
     public void fromString(String template) {
         int colonIndex = template.indexOf(":");
         if (colonIndex < 0) {
-       //     throw new IllegalArgumentException("Error: template \"" + template + "\" cannot be parsed.");
+            //     throw new IllegalArgumentException("Error: template \"" + template + "\" cannot be parsed.");
             // edge case: no path (which is optional in some specs, such as WLCG.)
             operation = template;
             path = "";
 
-        }                                             else {
+        } else {
             operation = template.substring(0, colonIndex);
             path = template.substring(colonIndex + 1);
         }
@@ -73,7 +79,10 @@ public class AuthorizationPath {
 
     @Override
     public String toString() {
-        return operation + ":" + path;
+        if(hasPath()) {
+            return operation + ":" + path;
+        }
+        return operation;
     }
 
     @Override
@@ -84,7 +93,8 @@ public class AuthorizationPath {
         if (!BeanUtils.checkEquals(ap.path, path)) return false;
         return true;
     }
-    public static void main(String[] args){
+
+    public static void main(String[] args) {
         String template = "read:/public/${user}/***";
         AuthorizationPath at = new AuthorizationPath(template);
         // The result should look like the argument, just checking that it parsed ok.

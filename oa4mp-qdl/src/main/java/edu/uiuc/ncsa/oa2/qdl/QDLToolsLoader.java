@@ -19,6 +19,7 @@ public class QDLToolsLoader implements QDLLoader {
         ArrayList<Module> modules = new ArrayList<>();
         modules.add(new JWTModule().newInstance(null));
         modules.add(new ClientManagementModule().newInstance(null));
+        modules.add(new CLCModule().newInstance(null));
         return modules;
     }
 }

@@ -79,6 +79,8 @@ public class IsInGroup implements QDLFunction {
     public List<String> getDocumentation(int argCount) {
         List<String> docs = new ArrayList<>();
         docs.add(getName() + "(groups., group_name) - checks if a group_name is in the given set of groups.");
+        docs.add("This will work on either a flat list of group names or an isMemberOf structure,");
+        docs.add("where each entry is of the form {name,id}");
         return docs;
     }
 }

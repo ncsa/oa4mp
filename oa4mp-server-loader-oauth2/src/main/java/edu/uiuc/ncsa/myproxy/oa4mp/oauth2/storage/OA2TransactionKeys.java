@@ -24,6 +24,12 @@ public class OA2TransactionKeys extends DSTransactionKeys {
     protected String authTime = "auth_time";
     protected String states = "states";
     protected String reqState = "req_state";
+    protected String isRFC8628  = "is_rfc_8628";
+
+    public String isRFC8628(String... x) {
+        if (0 < x.length) isRFC8628 = x[0];
+        return isRFC8628;
+    }
 
     public String authzGrantLifetime(String... x) {
         if (0 < x.length) authzGrantLifetime = x[0];

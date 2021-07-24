@@ -1,0 +1,41 @@
+/*
+   Sets up the access token in the initial pass.
+*/
+
+
+if[
+      !is_defined(claims.isMemberOf.)
+  ]then[
+          sys_err.ok := false;
+     sys_err.message := 'Missing group information. Cannot determine scopes.';
+  sys_err.error_type := 'access_denied';
+     return();
+];
+
+all_audience. := ['ANY', 'LIGO', 'segments.ligo.org']; // constant
+
+// get current allowed scopes based on group memberships
+allowed_scopes. := script_run('ligo/vo/get_scopes.qdl', claims.isMemberOf.);
+
+ if[
+    0 < size(scopes.)
+  ][
+    // If they request different scopes, honor it. Otherwise don't.
+    allowed_scopes. := mask(allowed_scopes., has_value(allowed_scopes., scopes.));
+  ];
+ access_token.scope := detokenize(unique(allowed_scopes.), ' ', 2); // turn in to string, omit duplications, trailing space
+
+/*
+   Audience processing. If nonthign requested, return everything, otherwise
+   return the subset of their request that is on our list of allowed audiences.
+   There is no error in requesting audiences we do not recognize, we just
+   don't honor them.
+*/
+  if[
+    size(audience.) == 0
+   ][
+      access_token.aud. := all_audience.;
+   ]else[
+      // return only things we recognize.
+      access_token.aud. :=mask(all_audience.,  has_value(all_audience., audience.));
+   ];
