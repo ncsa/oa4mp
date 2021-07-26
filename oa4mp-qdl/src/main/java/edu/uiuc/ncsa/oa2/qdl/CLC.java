@@ -259,8 +259,141 @@ public class CLC {
         }
     }
     protected String EXCHANGE_NAME = "exchange";
+    public class Exchange implements QDLFunction{
+        @Override
+        public String getName() {
+            return EXCHANGE_NAME;
+        }
+
+        @Override
+        public int[] getArgCount() {
+            return new int[]{0};
+        }
+
+        @Override
+        public Object evaluate(Object[] objects, State state) {
+            checkInit();
+            try {
+                clcCommands.exchange(new InputLine(DUMMY_ARG));
+                return getTokens();
+            } catch (Exception e) {
+                if(DebugUtil.isEnabled()) {
+                    e.printStackTrace();
+                }
+            }
+            return QDLNull.getInstance();
+        }
+
+        @Override
+        public List<String> getDocumentation(int argCount) {
+            List<String> doxx = new ArrayList<>();
+            doxx.add(getName() + " Do the token exchange.");
+            doxx.add(checkInitMessage);
+            return doxx;
+        }
+    }
     protected String REVOKE_NAME = "revoke";
+    public class Revoke implements QDLFunction{
+        @Override
+        public String getName() {
+            return REVOKE_NAME;
+        }
+
+        @Override
+        public int[] getArgCount() {
+            return new int[]{0};
+        }
+
+        @Override
+        public Object evaluate(Object[] objects, State state) {
+            checkInit();
+            try {
+                clcCommands.revoke(new InputLine(DUMMY_ARG));
+                return Boolean.TRUE;
+            } catch (Exception e) {
+
+                if(DebugUtil.isEnabled()) {
+                    e.printStackTrace();
+                }
+            }
+            return Boolean.FALSE;
+        }
+
+        @Override
+        public List<String> getDocumentation(int argCount) {
+            return null;
+        }
+    }
     protected String DEVICE_FLOW_NAME = "df";
+    public class DeviceFlow implements QDLFunction{
+        @Override
+        public String getName() {
+            return DEVICE_FLOW_NAME;
+        }
+
+        @Override
+        public int[] getArgCount() {
+            return new int[]{0};
+        }
+
+        @Override
+        public Object evaluate(Object[] objects, State state) {
+            checkInit();
+            try {
+                clcCommands.df(new InputLine(DUMMY_ARG));
+                StemVariable stemVariable = new StemVariable();
+                stemVariable.fromJSON(clcCommands.getDfResponse());
+                return stemVariable;
+            } catch (Exception e) {
+                if(DebugUtil.isEnabled()) {
+                    e.printStackTrace();
+                }
+            }
+            return new StemVariable();
+        }
+
+        @Override
+        public List<String> getDocumentation(int argCount) {
+            List<String> doxx = new ArrayList<>();
+            doxx.add(getName() + " initialte the device flow. If possible, the user code is copied to the clipboard.");
+            doxx.add(checkInitMessage);
+            return doxx;
+        }
+    }
+    protected String INTROSPECT_NAME = "introspect";
+    public class Introspect implements  QDLFunction{
+        @Override
+        public String getName() {
+            return INTROSPECT_NAME;
+        }
+
+        @Override
+        public int[] getArgCount() {
+            return new int[]{0};
+        }
+
+        @Override
+        public Object evaluate(Object[] objects, State state) {
+            checkInit();
+            try {
+                clcCommands.introspect(new InputLine(DUMMY_ARG));
+                StemVariable stemVariable = new StemVariable();
+                stemVariable.fromJSON(clcCommands.getIntrospectResponse());
+                return stemVariable;
+            } catch (Exception e) {
+
+                if(DebugUtil.isEnabled()) {
+                    e.printStackTrace();
+                }
+            }
+            return  new StemVariable();
+        }
+
+        @Override
+        public List<String> getDocumentation(int argCount) {
+            return null;
+        }
+    }
     protected String USER_INFO_NAME = "user_info";
     protected String TOKENS_NAME = "tokens";
 

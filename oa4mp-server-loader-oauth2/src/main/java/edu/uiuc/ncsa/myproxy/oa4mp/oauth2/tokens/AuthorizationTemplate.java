@@ -88,11 +88,11 @@ public class AuthorizationTemplate {
             // show what the JSON should be.
             // Note that the template does not check for redundant entries.
             List<AuthorizationPath> paths = new ArrayList<>();
-            paths.add( new AuthorizationPath(SciTokenConstants.OPERATION_READ, "/home/${sub}"));
-            paths.add( new AuthorizationPath(SciTokenConstants.OPERATION_READ, "/home/${eppn}/${sub}"));
-            paths.add( new AuthorizationPath(SciTokenConstants.OPERATION_WRITE, "/home/${sub}"));
-            paths.add( new AuthorizationPath(SciTokenConstants.OPERATION_EXECUTE, "/home/${memberOf}/ingest.sh"));
-            paths.add( new AuthorizationPath(SciTokenConstants.OPERATION_QUEUE, "/home/${memberOf}/serialize.sh"));
+            paths.add(new AuthorizationPath(SciTokenConstants.OPERATION_READ, "/home/${sub}"));
+            paths.add(new AuthorizationPath(SciTokenConstants.OPERATION_READ, "/home/${eppn}/${sub}"));
+            paths.add(new AuthorizationPath(SciTokenConstants.OPERATION_WRITE, "/home/${sub}"));
+            paths.add(new AuthorizationPath(SciTokenConstants.OPERATION_EXECUTE, "/home/${memberOf}/ingest.sh"));
+            paths.add(new AuthorizationPath(SciTokenConstants.OPERATION_QUEUE, "/home/${memberOf}/serialize.sh"));
             AuthorizationTemplate template = new AuthorizationTemplate("https://foo.bigstate.edu", paths);
             System.out.println(template.toJSON().toString(1));
 

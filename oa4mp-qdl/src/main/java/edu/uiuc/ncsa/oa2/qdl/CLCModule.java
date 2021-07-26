@@ -32,6 +32,10 @@ public class CLCModule extends JavaModule {
         funcs.add(clc.new Grant());
         funcs.add(clc.new CreateURI());
         funcs.add(clc.new Refresh());
+        funcs.add(clc.new Revoke());
+        funcs.add(clc.new Exchange());
+        funcs.add(clc.new DeviceFlow());
+        funcs.add(clc.new Introspect());
         clcModule.addFunctions(funcs);
         if (state != null) {
             clcModule.init(state);

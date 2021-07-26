@@ -64,32 +64,69 @@ When a new version is deployed, here is the testing order
         In CLC you need to set the following parameters *before* starting exchange:
         Ex. 1
         set_param -a scope "read: x.y: x.z write:"
+        AT:
+           scopes:
+             read:/home/jeff
+             read:/public/lsst/jeff
+             x.z
+             write:/data/cluster
+             x.y:/abc/def
+           lifetime: 750 sec.
 
         Ex. 2
-        set_param -a scope "read:/home/jeff/data x.y: x.z write:data/cluster/ligo"
+        set_param -a scope "read:/home/jeff/data x.y: x.z write:/data/cluster/ligo"
+        AT:
+          scopes:
+             read:/home/jeff/data
+             x.y:/abc/def
+             x.z
+             write:/data/cluster/ligo
+          lifetime: same as 1
+
         Ex. 3
+        set_param -x scope "read: x.y: x.z write:"
+        Do exchange
+        AT:
+           scopes:
+              x.z
+           lifetime: same as #1
+
         Ex. 4
+        set_param -x scope "read:/home/jeff/data x.y: x.z write:/data/cluster/ligo"
+        do exchange
+        AT:
+           scopes:
+              read:/home/jeff/data
+              x.z
+              write:/data/cluster/ligo
+           lifetime: same as #1
+           
         Ex. 5
+        set_param -a scope "read:/home/jeff/data x.y: x.z write:/data/cluster/ligo"
+        set_param -x scope "read:/home/jeffy x.y:/abc/def/ghi write:/data/cluster1 x.z:/etc/certs"
 
-        set_param -a scope "read:/home/jeff x.y: x.z write:"
-        set_param -t scope "read:/home/jeff x.y: write:/data/cluster"
-        set_param -x scope "read:/home/jeffy x.y:/abc/def/ghi write:/data/cluster1 x.z:/any"
 
-        get_at
+        access
+          AT:
+             scopes:
+                x.z
+                read:/home/jeff/data
+                x.y:/abc/def
+                write:/data/cluster/ligo
           at lifetime 750 sec
           rt lifetime  3600 sec
-          at scopes: "read:/home/jeff write:/data/cluster x.y:/abc/def"
 
-        get_rt
+        exchange/refresh
+          AT:
+            scopes:
+               x.y:/abc/def/ghi
           same lifetimes
-          scopes: "read:/home/jeff write:/data/cluster"
 
-        exchange
-          same at lifetime
-          scopes: "x.z:/any x.y:/abc/def/ghi"
+         Example 6:
+         set_param -a scope "read:/home/bob"
 
-        get_user_info
-        get_cert "Error: No usable MyProxy service found."
+         AT:
+           fails since no scopes can be asserted.
 
   -- localhost:test/ncsa
         Test client with the basic default NCSA QDL script. Second most common configuration.

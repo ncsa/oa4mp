@@ -34,6 +34,8 @@ import static edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse.*;
  */
 public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHandlerInterface {
     protected String issuer;
+    public static final String ID_TOKEN_DEFAULT_HANDLER_TYPE = "default";
+    public static final String ID_TOKEN_BASIC_HANDLER_TYPE = "identity";
 
     public IDTokenHandler(PayloadHandlerConfigImpl payloadHandlerConfig) {
         super(payloadHandlerConfig);

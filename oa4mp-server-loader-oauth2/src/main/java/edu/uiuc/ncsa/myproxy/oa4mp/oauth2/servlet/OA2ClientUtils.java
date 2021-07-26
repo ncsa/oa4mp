@@ -300,6 +300,15 @@ public class OA2ClientUtils {
                     transaction,
                     txRecord,
                     req);
+            switch (client.getIDTokenConfig().getType()) {
+                case IDTokenHandler.ID_TOKEN_DEFAULT_HANDLER_TYPE:
+                case IDTokenHandler.ID_TOKEN_BASIC_HANDLER_TYPE:
+                    // we're good
+                    break;
+                default:
+                    throw new IllegalArgumentException("unknown identity token handler type");
+            }
+
         } else {
             // Legacy case. Functors have no config, but need a handler to get the init and accounting information.
             debugger.trace(OA2ClientUtils.class, "Found legacy id token configuration.");
@@ -335,9 +344,12 @@ public class OA2ClientUtils {
                     debugger.trace(OA2ClientUtils.class, "SciTokens access token handler created");
                     break;
                 case AbstractAccessTokenHandler.AT_DEFAULT_HANDLER_TYPE:
-                default:
+                case AbstractAccessTokenHandler.AT_BASIC_HANDLER_TYPE:
                     sth = new AbstractAccessTokenHandler(st);
                     debugger.trace(OA2ClientUtils.class, "generic access token handler created");
+                    break;
+                default:
+                    throw new IllegalArgumentException("unknown access token handler type");
             }
             jwtRunner.setAccessTokenHandler(sth);
         }
@@ -351,6 +363,14 @@ public class OA2ClientUtils {
                     txRecord,
                     req);
             BasicRefreshTokenHandler rth = new BasicRefreshTokenHandler(st);
+            switch (client.getRefreshTokensConfig().getType()) {
+                case BasicRefreshTokenHandler.REFRESH_TOKEN_DEFAULT_HANDLER_TYPE:
+                case BasicRefreshTokenHandler.REFRESH_TOKEN_BASIC_HANDLER_TYPE:
+                    break;
+                default:
+                    throw new IllegalArgumentException("unknown refresh token handler type");
+
+            }
             jwtRunner.setRefreshTokenHandler(rth);
         }
     }

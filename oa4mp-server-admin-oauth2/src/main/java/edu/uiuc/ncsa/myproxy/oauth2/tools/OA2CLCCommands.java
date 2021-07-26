@@ -213,16 +213,17 @@ public class OA2CLCCommands extends CLCCommands {
                 oa2ce.getClient().getIdentifierString(),
                 oa2ce.getClient().getSecret());
         try {
-            JSONObject resp = JSONObject.fromObject(rawResponse);
-            deviceFlowCallback = resp.getString(RFC8628Constants2.VERIFICATION_URI);
-            say("please go to :" + deviceFlowCallback);
-            userCode = resp.getString(RFC8628Constants2.USER_CODE);
-            deviceCode = resp.getString(DEVICE_CODE);
+            dfResponse = JSONObject.fromObject(rawResponse);
+            deviceFlowCallback = dfResponse.getString(RFC8628Constants2.VERIFICATION_URI);
+            say("please go to: " + deviceFlowCallback);
+            say("          or: " + dfResponse.getString(RFC8628Constants2.VERIFICATION_URI_COMPLETE));
+            userCode = dfResponse.getString(RFC8628Constants2.USER_CODE);
+            deviceCode = dfResponse.getString(DEVICE_CODE);
             say("user code: " + userCode);
-            say("code valid for " + resp.getLong(RFC8628Constants2.EXPIRES_IN) + " sec.");
+            say("code valid for " + dfResponse.getLong(RFC8628Constants2.EXPIRES_IN) + " sec.");
             copyToClipboard(userCode, "user code copied to clipboard");
             isDeviceFlow = true;
-            grant = new AuthorizationGrantImpl(URI.create(resp.getString(RFC8628Constants2.DEVICE_CODE)));
+            grant = new AuthorizationGrantImpl(URI.create(dfResponse.getString(RFC8628Constants2.DEVICE_CODE)));
         } catch (Throwable t) {
             say("sorry but the response from the service was not understood:" + rawResponse);
             if (DebugUtil.isEnabled()) {
@@ -231,6 +232,11 @@ public class OA2CLCCommands extends CLCCommands {
         }
     }
 
+    public JSONObject getDfResponse() {
+        return dfResponse;
+    }
+
+    JSONObject dfResponse;
     String userCode;
     public String getUserCode(){return  userCode;}
 
@@ -504,6 +510,8 @@ public class OA2CLCCommands extends CLCCommands {
         userCode = null;
         deviceFlowCallback = null;
         deviceCode = null;
+        dfResponse = null;
+        introspectResponse = null;
     }
 
     public static String CLEAR_PARAMETERS_FLAG = "-all";
@@ -647,12 +655,17 @@ public class OA2CLCCommands extends CLCCommands {
             return;
         }
         boolean checkRT = inputLine.hasArg("-rt");
-        JSONObject json = getService().introspect(getDummyAsset(), checkRT);
+        introspectResponse = getService().introspect(getDummyAsset(), checkRT);
         say("introspection endpoint on " + (checkRT ? "refresh" : "access") + " token returned:");
-        say(json.toString(2));
+        say(introspectResponse.toString(2));
 
     }
 
+    public JSONObject getIntrospectResponse() {
+        return introspectResponse;
+    }
+
+    JSONObject introspectResponse;
     public void asset(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
             say("asset");

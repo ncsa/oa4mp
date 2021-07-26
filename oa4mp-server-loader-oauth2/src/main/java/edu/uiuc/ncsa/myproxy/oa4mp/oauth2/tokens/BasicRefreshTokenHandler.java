@@ -30,6 +30,9 @@ import static edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse.*;
  * on 8/5/20 at  9:18 AM
  */
 public class BasicRefreshTokenHandler extends AbstractPayloadHandler implements RefreshTokenHandlerInterface {
+    public static final String REFRESH_TOKEN_DEFAULT_HANDLER_TYPE = "default";
+    public static final String REFRESH_TOKEN_BASIC_HANDLER_TYPE = "refresh";
+
     public BasicRefreshTokenHandler(PayloadHandlerConfigImpl payloadHandlerConfig) {
         super(payloadHandlerConfig);
     }

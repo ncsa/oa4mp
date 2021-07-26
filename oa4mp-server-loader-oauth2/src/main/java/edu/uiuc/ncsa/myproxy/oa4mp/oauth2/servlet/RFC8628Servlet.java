@@ -153,9 +153,10 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
 
         rfc8628State.interval = rfc8628ServletConfig.interval;
         String scope = req.getParameter(OA2Constants.SCOPE);
+        rfc8628State.originalScopes = scope;
         if (isTrivial(scope)) {
             debugUtil.trace(this, "no scopes, using default for client");
-            t.setScopes(new ArrayList()); 
+            t.setScopes(client.getScopes());
         } else {
             // scope is optional, so only take notice if they send something
             debugUtil.trace(this, "checking scopes:" + scope + ". strict scopes " + (client.useStrictScopes() ? "on" : "off"));

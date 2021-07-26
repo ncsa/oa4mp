@@ -44,6 +44,7 @@ import static edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse.*;
  */
 public class AbstractAccessTokenHandler extends AbstractPayloadHandler implements AccessTokenHandlerInterface {
     public static final String AT_DEFAULT_HANDLER_TYPE = "default";
+    public static final String AT_BASIC_HANDLER_TYPE = "access";
 
     public AbstractAccessTokenHandler(PayloadHandlerConfigImpl payloadHandlerConfig) {
         super(payloadHandlerConfig);
@@ -130,7 +131,6 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
         if (templates.size() == 0) {
             return null; // nix to do
         }
-        Collection<String> requestedScopes = transaction.getScopes();
         Collection<String> requestedAudience = transaction.getAudience();
         // check for audiences.
         if (requestedAudience == null || requestedAudience.isEmpty()) {
@@ -211,15 +211,37 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
         TXRecord txRecord = getPhCfg().getTxRecord();
         // Have to split the computed scopes into their uri and non-uri types.
         // E.g. if a scope is like compute.cancel it should not be processed as a template later.
-        // Take them out here, add them back later
+        // Take them out here. Have to avoid concurrent modification exception, so stash them
         Collection<String> relativeScopes = new ArrayList<>();
 
+
+        Collection<String> requestedScopes = (txRecord != null && txRecord.hasScopes()) ? txRecord.getScopes() : transaction.getScopes();
+        Collection<String> badRequests = new ArrayList<>();
+        Collection<String> relativeRequests = new ArrayList<>();
+        /*
+         * And for the next bit, if a capability is allowed like compute.submit
+         * and the user tries to overload it to, e.g. compute.submit:/etc/certs
+         * Do not assert the capability.
+         *
+         */
         for(String x : computedScopes){
-            if(!x.contains(":")){
+            if(!x.contains(":") ){
+                if(requestedScopes.contains(x)){
+                    relativeRequests.add(x);
+                }else{
+                    for(String bad : requestedScopes){
+                        if(bad.startsWith(x + ":")){
+                            badRequests.add(bad);
+                        }
+                    }
+                }
                 relativeScopes.add(x);
             }
+
         }
         computedScopes.removeAll(relativeScopes);
+        requestedScopes.remove(badRequests);
+
         /*
 
             If there is a token exchange record, then this is being invoked as part of a token
@@ -227,17 +249,12 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
             super-paths.
         */
 
-        if (txRecord == null) {
-            actualScopes = doCompareTemplates(computedScopes,
-                    transaction.getScopes(),
-                    isQuery);
-        } else {
-            actualScopes = doCompareTemplates(computedScopes,
-                    txRecord.hasScopes() ? txRecord.getScopes() : transaction.getScopes(),
-                    isQuery);
-        }
+        actualScopes = doCompareTemplates(computedScopes,
+                requestedScopes,
+                isQuery);
 
-        actualScopes.addAll(relativeScopes); // add back in relative computed scopes.
+
+        actualScopes.addAll(relativeRequests); // add back in relative computed scopes.
         // now we convert to a scope string.
         String s = "";
         boolean firstPass = true;

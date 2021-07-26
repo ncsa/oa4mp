@@ -61,7 +61,6 @@ import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8693Constants2.*;
 import static edu.uiuc.ncsa.security.core.util.Identifiers.VERSION_1_0_TAG;
 import static edu.uiuc.ncsa.security.core.util.Identifiers.VERSION_TAG;
 import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
-import static edu.uiuc.ncsa.security.oauth_2_0.server.RFC8628Constants.DEFAULT_WAIT;
 import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.JWT_ID;
 
 /**
@@ -110,7 +109,6 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
 
         p.put(OA2Constants.CLIENT_ID, st.getClient().getIdentifierString());
     }
-
 
 
     /**
@@ -495,11 +493,11 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         // Set these in the transaction then send it along.
         t.setAccessTokenLifetime(computeATLifetime(t, (OA2SE) getServiceEnvironment()));
         OA2Client client = (OA2Client) transaction.getClient();
-        if(client.isRTLifetimeEnabled()) {
+        if (client.isRTLifetimeEnabled()) {
             if (((OA2SE) getServiceEnvironment()).isRefreshTokenEnabled()) {
                 t.setRefreshTokenLifetime(computeRefreshLifetime(t, (OA2SE) getServiceEnvironment()));
             }
-        }else{
+        } else {
             t.setRefreshTokenLifetime(0L);
         }
 
@@ -549,9 +547,9 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                     HttpStatus.SC_UNAUTHORIZED, null);
         }
         st2.setAccessToken(atResponse.getAccessToken()); // needed if there are handlers later.
-        if(client.isRTLifetimeEnabled()) {
+        if (client.isRTLifetimeEnabled()) {
             st2.setRefreshToken(atResponse.getRefreshToken()); // ditto. Might be null.
-        }else{
+        } else {
             st2.setRefreshToken(null);
             st2.setRefreshTokenLifetime(0L);
         }
@@ -675,7 +673,6 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             tokenResponse.setRefreshToken(null);
         }
     }
-
 
 
     protected OA2ServiceTransaction getByRT(RefreshToken refreshToken) throws IOException {
@@ -1018,7 +1015,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         printAllParameters(request);
         long now = System.currentTimeMillis();
         String rawSecret = getClientSecret(request);
-        if(!client.isPublicClient()) {
+        if (!client.isPublicClient()) {
             verifyClientSecret(client, rawSecret);
         }
         String deviceCode = request.getParameter(DEVICE_CODE);
@@ -1072,51 +1069,73 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             throw new OA2ATException(OA2Errors.ACCESS_DENIED, DEVICE_CODE + " expired",
                     HttpStatus.SC_UNAUTHORIZED, null);
         }
+        // We allow for letting them try the request on the first try as soon
+        // as they get their code.
+        boolean throwSlowDown = false;
+
         if (rfc8628State.firstTry) {
             rfc8628State.firstTry = false; // used it up. No more first tries
-            rfc8628State.interval = rfc8628State.interval + DEFAULT_WAIT;
+            //    rfc8628State.interval = rfc8628State.interval + DEFAULT_WAIT;
         } else {
             if (rfc8628State.lastTry + rfc8628State.interval > now) {
+
+                // Spec in section 3.5 is unclear if we should increase the wait interval
+                // on the server, or if that is the responsibility of the client.
+                // Commented next block increases it here if we decide to do that
+                // and the commented line in the exception notifies the client.
+
+/*
                 rfc8628State.interval = rfc8628State.interval + DEFAULT_WAIT;
                 transaction.setRFC8628State(rfc8628State);
                 getTransactionStore().save(transaction);
                 throw new OA2ATException("slow_down",
-                        "slow down",
+                        "slow down, wait interval increased to " + (rfc8628State.interval/1000) + " sec.",
                         HttpStatus.SC_BAD_REQUEST,
                         transaction.getRequestState());
+*/
+                throwSlowDown = true;
             }
 
         }
         rfc8628State.lastTry = now;
         transaction.setRFC8628State(rfc8628State);
+        getTransactionStore().save(transaction);
+        if (!rfc8628State.valid) {
+            if (throwSlowDown) {
+                throw new OA2ATException("slow_down",
+                        "slow down",
+                        HttpStatus.SC_BAD_REQUEST,
+                        transaction.getRequestState());
+
+            }
+            throw new OA2ATException("authorization_pending", "authorization pending",
+                    HttpStatus.SC_BAD_REQUEST, transaction.getRequestState());
+        }
+
 
         String scope = getFirstParameterValue(request, SCOPE);
         if (!isTrivial(scope)) {
             // scope is optional, so only take notice if they send something
             TransactionState transactionState = new TransactionState(request, response, null, transaction);
-            try{
-            transaction.setScopes(ClientUtils.resolveScopes(transactionState, true));
-            }catch(OA2RedirectableError redirectableError){
-                            throw new OA2ATException(redirectableError.getError(),
-                                    redirectableError.getDescription(),
-                                    HttpStatus.SC_BAD_REQUEST,
-                                    redirectableError.getState());
-                        }
-        }else{
-            if(transaction.getScopes().isEmpty()){
+            try {
+                transaction.setScopes(ClientUtils.resolveScopes(transactionState, true));
+            } catch (OA2RedirectableError redirectableError) {
+                throw new OA2ATException(redirectableError.getError(),
+                        redirectableError.getDescription(),
+                        HttpStatus.SC_BAD_REQUEST,
+                        redirectableError.getState());
+            }
+        } else {
+            if (transaction.getScopes().isEmpty()) {
                 // If there are no requested scopes any place, set the scopes to the
                 // default for the client. This should be done here since this
                 // is always assumed set henceforth.
-                transaction.setScopes(((OA2Client)transaction.getClient()).getScopes());
+                transaction.setScopes(((OA2Client) transaction.getClient()).getScopes());
             }
         }
 
-        getTransactionStore().save(transaction);
+        //getTransactionStore().save(transaction);
 
-        if (!rfc8628State.valid) {
-            throw new OA2ATException("authorization_pending", "authorization pending",
-                    HttpStatus.SC_BAD_REQUEST, transaction.getRequestState());
-        }
         // If we make it this far, we just turn the entire thing over to the standard access token flow
         transaction.setAuthGrantValid(false);
         getTransactionStore().save(transaction);
