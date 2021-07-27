@@ -27,7 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 public abstract class AbstractAccessTokenServlet2 extends MultiAuthServlet {
     @Override
     protected void doIt(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Throwable {
-        printAllParameters(httpServletRequest);
+  //      printAllParameters(httpServletRequest);
         doDelegation(httpServletRequest, httpServletResponse);
     }
 

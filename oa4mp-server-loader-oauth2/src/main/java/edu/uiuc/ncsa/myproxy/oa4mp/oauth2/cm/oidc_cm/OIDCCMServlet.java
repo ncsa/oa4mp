@@ -84,7 +84,7 @@ public class OIDCCMServlet extends EnvServlet {
      */
     @Override
     public void doGet(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws ServletException, IOException {
-        printAllParameters(httpServletRequest);
+  //      printAllParameters(httpServletRequest);
         if (doPing(httpServletRequest, httpServletResponse)) return;
         if (!getOA2SE().getCmConfigs().hasRFC7591Config()) {
             throw new IllegalAccessError("Error: RFC 7591 not supported on this server. Request rejected.");
@@ -205,7 +205,7 @@ public class OIDCCMServlet extends EnvServlet {
      */
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        printAllParameters(req);
+   //     printAllParameters(req);
         if (!getOA2SE().getCmConfigs().hasRFC7592Config()) {
             throw new IllegalAccessError("Error: RFC 7592 not supported on this server. Request rejected.");
         }
@@ -282,7 +282,7 @@ public class OIDCCMServlet extends EnvServlet {
      */
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        printAllParameters(req);
+     //   printAllParameters(req);
 
         if (!getOA2SE().getCmConfigs().hasRFC7592Config()) {
             throw new IllegalAccessError("Error: RFC 7592 not supported on this server. Request rejected.");

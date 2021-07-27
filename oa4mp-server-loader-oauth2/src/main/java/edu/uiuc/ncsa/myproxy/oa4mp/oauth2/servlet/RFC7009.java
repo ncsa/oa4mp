@@ -23,6 +23,7 @@ public class RFC7009 extends TokenManagerServlet {
 
     @Override
     protected void doIt(HttpServletRequest req, HttpServletResponse resp) throws Throwable {
+     //   printAllParameters(req);
         OA2SE oa2SE = (OA2SE) getServiceEnvironment();
         State state;
         TokenImpl token;

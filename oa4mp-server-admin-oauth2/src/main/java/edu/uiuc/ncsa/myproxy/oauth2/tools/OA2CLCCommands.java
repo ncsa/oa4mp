@@ -49,8 +49,7 @@ import java.util.List;
 import java.util.*;
 
 import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
-import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.ID_TOKEN;
-import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.RAW_ID_TOKEN;
+import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.*;
 import static edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTUtil2.PAYLOAD_INDEX;
 import static edu.uiuc.ncsa.security.oauth_2_0.server.RFC8628Constants.*;
 
@@ -81,12 +80,20 @@ public class OA2CLCCommands extends CLCCommands {
         try {
             setCe((ClientEnvironment) oa2CommandLineClient.getEnvironment());
         } catch (Throwable t) {
-            say("No configuration loaded.");
+            if(logger != null) {
+                logger.error("could not load configuration", t);
+            }else{
+                if(DebugUtil.isEnabled()){
+                    t.printStackTrace();
+                }
+            }
         }
         this.oa2CommandLineClient = oa2CommandLineClient;
-        say(hasClipboard() ? "clipboard is supported." : "no clipboard support available.");
     }
+     public void bootMessage(){
+         say(hasClipboard() ? "clipboard is supported." : "no clipboard support available.");
 
+     }
 
     public String getConfigFile() {
         return configFile;
@@ -190,8 +197,8 @@ public class OA2CLCCommands extends CLCCommands {
         String extraParams = "";
         boolean isFirstPass = true;
         for (String key : requestParameters.keySet()) {
-            if (key.equals(OA2Constants.SCOPE)) {
-                scopes = " " + requestParameters.get(key);
+            if (key.equals(SCOPE)) {
+                scopes =scopes + " " + requestParameters.get(key); // take the default, add new ones
             } else {
                 String x = key + "=" + URLEncoder.encode(requestParameters.get(key), "UTF-8");
                 if (isFirstPass) {
@@ -205,7 +212,7 @@ public class OA2CLCCommands extends CLCCommands {
         }
 
         requestString = requestString + "?" + OA2Constants.CLIENT_ID + "=" + oa2ce.getClientId();
-        requestString = requestString + "&" + OA2Constants.SCOPE + "=" + URLEncoder.encode(scopes, "UTF-8");
+        requestString = requestString + "&" + SCOPE + "=" + URLEncoder.encode(scopes, "UTF-8");
         if (!StringUtils.isTrivial(extraParams)) {
             requestString = requestString + "&" + extraParams;
         }
@@ -704,6 +711,21 @@ public class OA2CLCCommands extends CLCCommands {
 
     private void df_get_at(InputLine inputLine) {
         if (isDeviceFlow) {
+            HashMap<String, String> copyOfParams = new HashMap<>();
+            copyOfParams.putAll(tokenParameters);
+            OA2ClientEnvironment oa2ce = (OA2ClientEnvironment) getCe();
+
+            // if the parameters are set then pass along everything including the
+            // default scopes. 
+            String scopes = oa2ce.scopesToString();
+            if(copyOfParams.containsKey(SCOPE)){
+                String ss = copyOfParams.get(SCOPE);
+                if(-1 == ss.indexOf(scopes)){
+                    ss = scopes + " " + ss;
+                    copyOfParams.put(SCOPE, ss);
+                }
+            }
+
             currentATResponse = getService().rfc8628Request(dummyAsset, deviceCode, tokenParameters);
             processATResponse(inputLine);
         } else {
@@ -809,7 +831,7 @@ public class OA2CLCCommands extends CLCCommands {
         sayi(CLAIMS_FLAG + " = the id token will be printed");
         sayi(NO_VERIFY_JWT + " = do not verify JWTs against server. Default is to verify.");
         sayi("Alias: get_rt");
-        sayi("See also: get_at");
+        sayi("See also: access, set_param -t");
     }
 
     public JSONObject resolveFromToken(Token token, boolean noVerify) {
@@ -1053,7 +1075,7 @@ public class OA2CLCCommands extends CLCCommands {
         say("E.g.");
         sayi("exchange -at -x");
         sayi("Note: you can only specify scopes for the access token. They are ignored for refresh tokens");
-        say("See also: get_at, set_param to set additional parameters (like specific scopes or the audience");
+        say("See also: access, refresh, set_param -x to set additional parameters (like specific scopes or the audience");
     }
 
     JSONObject sciToken = null;
@@ -1169,6 +1191,9 @@ public class OA2CLCCommands extends CLCCommands {
     protected String AUTHZ_PARAMETERS_KEY = "authz_parameters";
     protected String EXCHANGE_PARAMETERS_KEY = "exchange_parameters";
     protected String AT_RESPONSE_KEY = "at_response";
+    protected String INTROSPECT_RESPONSE_KEY = "introspect_response";
+    protected String DF_RESPONSE_KEY = "df_response";
+
 
 
     public void read(InputLine inputLine) throws Exception {
@@ -1245,7 +1270,13 @@ public class OA2CLCCommands extends CLCCommands {
             requestParameters = new HashMap<>();
             requestParameters.putAll(json.getJSONObject(AUTHZ_PARAMETERS_KEY));
         }
+        if(json.containsKey(INTROSPECT_RESPONSE_KEY)){
+            introspectResponse = json.getJSONObject(INTROSPECT_RESPONSE_KEY);
+        }
 
+        if(json.containsKey(DF_RESPONSE_KEY)){
+            dfResponse = json.getJSONObject(DF_RESPONSE_KEY);
+        }
         if (json.containsKey(EXCHANGE_PARAMETERS_KEY)) {
             exchangeParameters = new HashMap<>();
             exchangeParameters.putAll(json.getJSONObject(EXCHANGE_PARAMETERS_KEY));
@@ -1309,6 +1340,7 @@ public class OA2CLCCommands extends CLCCommands {
             jsonObject.put(USER_MESSAGE_KEY, lastUserMessage);
         }
 
+
         if (inputLine.getArgCount() == 0) {
             if (saveFile == null) {
                 say("sorry, no file specified.");
@@ -1362,6 +1394,13 @@ public class OA2CLCCommands extends CLCCommands {
             JSONObject jj = new JSONObject();
             jj.putAll(exchangeParameters);
             jsonObject.put(EXCHANGE_PARAMETERS_KEY, jj);
+        }
+        if(introspectResponse != null && !introspectResponse.isEmpty()){
+            jsonObject.put(INTROSPECT_RESPONSE_KEY, introspectResponse);
+        }
+
+        if(dfResponse != null && !dfResponse.isEmpty()){
+            jsonObject.put(DF_RESPONSE_KEY, dfResponse);
         }
 
         if (claims != null && !claims.isEmpty()) {
@@ -1469,6 +1508,10 @@ public class OA2CLCCommands extends CLCCommands {
             sayi("Usage: Show what additional parameters have been set.");
             sayi("If no switches are given then both token and authorization additional parameters are shown ");
             sayi("If keys are specified, only those are shown. If no keys are specified, all the given parameters are shown");
+            sayi("switches correspond to: ");
+            sayi(REQ_PARAM_SWITCH + " sent in the authorization request, i.e. uri");
+            sayi(TOKEN_PARAM_SWITCH + " sent in the access and refresh requests");
+            sayi(EXCHANGE_PARAM_SWITCH + " sent in the exchange request");
             sayi(shortSwitchBlurb);
             say("See also: set_param, clear_param, rm_param");
             return;

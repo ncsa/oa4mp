@@ -30,7 +30,7 @@ public class HeaderUtils {
     public static final String BASIC_HEADER = "Basic";
     public static final String BEARER_HEADER = "Bearer";
 
-    static boolean deepDebugOn = true; // turns on a TON of low level messages.
+    static boolean deepDebugOn = false; // turns on a TON of low level messages.
     /**
      * This gets the tokens from the authorization header. There are several types and it is possible to have several
      * values passed in, so this returns an array of string rather than a single value. A downside with passing

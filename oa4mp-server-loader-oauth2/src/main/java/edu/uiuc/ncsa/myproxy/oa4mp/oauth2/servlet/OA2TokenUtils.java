@@ -154,23 +154,27 @@ public class OA2TokenUtils {
     public static OA2ServiceTransaction getTransactionFromTX(AccessTokenImpl accessToken, OA2ServiceTransaction t, OA2SE oa2se) throws IOException {
           TXRecord oldTXR;
           oldTXR = (TXRecord) oa2se.getTxStore().get(BasicIdentifier.newID(accessToken.getJti()));
+          String state = null;
+          if(t != null){
+              state = t.getRequestState();
+          }
           if (oldTXR == null) {
               ServletDebugUtil.trace(OA2TokenUtils.class, "No transaction found, no TXRecord found for access token = " + accessToken);
 
               throw new OA2GeneralError(OA2Errors.INVALID_TOKEN,
                       "token not found",
                       HttpStatus.SC_UNAUTHORIZED,
-                      null);
+                      null); 
           }
           if (!oldTXR.isValid()) {
               throw new OA2ATException(OA2Errors.INVALID_TOKEN,
                       "invalid token",
-                      t.getRequestState());
+                      state);
           }
           if (oldTXR.getExpiresAt() < System.currentTimeMillis()) {
               throw new OA2ATException(OA2Errors.INVALID_TOKEN,
                       "token expired",
-                      t.getRequestState());
+                      state);
           }
           t = (OA2ServiceTransaction) oa2se.getTransactionStore().get(oldTXR.getParentID());
           return t;

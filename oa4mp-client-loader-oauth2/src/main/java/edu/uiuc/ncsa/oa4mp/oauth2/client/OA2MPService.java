@@ -445,10 +445,12 @@ public class OA2MPService extends OA4MPService {
 
     public boolean revoke(OA2Asset dummyAsset, boolean revokeRT) {
         RFC7009Request request = new RFC7009Request();
+        // always set the access token since it is used to create the bearer token
+        // in the request
+        request.setAccessToken(dummyAsset.getAccessToken());
+
         if (revokeRT) {
             request.setRefreshToken(dummyAsset.getRefreshToken());
-        } else {
-            request.setAccessToken(dummyAsset.getAccessToken());
         }
         DS2 ds2 = (DS2) getEnvironment().getDelegationService();
         try {

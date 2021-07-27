@@ -10,6 +10,18 @@
 <body class="composite">
 <!--#include virtual="../../header.html" -->
 <p>Changes to the OA4MP server by version.</p>
+<h2>5.2.0</h2>
+<p>Release date 2021-08-03</p>
+<ul>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-1029">CIL-1029</a>: Check RFC 8725 for JWT best
+    practices. By and large we follow them.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-1030">CIL-1030</a>: CILogon specific. Too many
+    serial strings are made. </li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-1035">CIL-1035</a>: Clients with refresh tokens disabled
+    are getting long-lived entries in the transaction table. There should be nothing there for them.</li>
+</ul>
+By and large the major innovation in 5.2.0 and above is support for RFC 8628 -- the device flow.
+
 <h2>5.1.4</h2>
 <p>Release date 2021-07-14</p>
 <ul>

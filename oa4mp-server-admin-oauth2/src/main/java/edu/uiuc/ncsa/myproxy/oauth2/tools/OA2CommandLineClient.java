@@ -39,6 +39,7 @@ public class OA2CommandLineClient extends CommandLineClient {
             OA2CLCCommands usc = new OA2CLCCommands(testCommands.getMyLogger(), testCommands);
             usc.setConfigFile(testCommands.getConfigFile());
             CLIDriver cli = new CLIDriver(usc);
+            usc.bootMessage();
             cli.start();
         } catch (Exception e) {
             e.printStackTrace();

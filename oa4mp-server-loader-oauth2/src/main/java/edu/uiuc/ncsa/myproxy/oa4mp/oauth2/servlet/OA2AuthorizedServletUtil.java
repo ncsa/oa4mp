@@ -27,7 +27,6 @@ import edu.uiuc.ncsa.security.oauth_2_0.server.AGIResponse2;
 import edu.uiuc.ncsa.security.oauth_2_0.server.AGRequest2;
 import edu.uiuc.ncsa.security.oauth_2_0.server.RFC8693Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
-import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.util.configuration.ConfigUtil;
 import net.sf.json.JSONObject;
 import org.apache.http.HttpStatus;
@@ -188,7 +187,7 @@ public class OA2AuthorizedServletUtil {
     }
 
     private String basicChecks(HttpServletRequest httpServletRequest) {
-        ServletDebugUtil.printAllParameters(this.getClass(), httpServletRequest);
+      //  ServletDebugUtil.printAllParameters(this.getClass(), httpServletRequest);
         String requestState = httpServletRequest.getParameter(OA2Constants.STATE);
         String rawcb = httpServletRequest.getParameter(OA2Constants.REDIRECT_URI);
         try {

@@ -71,7 +71,7 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
 
     @Override
     protected void doIt(HttpServletRequest req, HttpServletResponse resp) throws Throwable {
-        printAllParameters(req);
+    //    printAllParameters(req);
         ServletDebugUtil.trace(this, "starting device flow");
         OA2SE oa2SE = (OA2SE) getServiceEnvironment();
 

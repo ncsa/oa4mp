@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.PresentationState;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.delegation.token.impl.AuthorizationGrantImpl;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2ATException;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
@@ -21,10 +22,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.security.GeneralSecurityException;
 import java.sql.SQLException;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2AuthorizationServer.AUTHORIZATION_PASSWORD_KEY;
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2AuthorizationServer.AUTHORIZATION_USER_NAME_KEY;
@@ -84,7 +82,6 @@ public class RFC8628AuthorizationServer extends EnvServlet {
     /**
      * A class that is used by the authorization server to track user retries.
      * These only exist here and are only managed here.
-     *
      */
     public static class PendingState extends PresentationState {
         public String getUsername() {
@@ -145,7 +142,7 @@ public class RFC8628AuthorizationServer extends EnvServlet {
                         throw new OA2ATException(OA2Errors.INVALID_REQUEST, "no pending flow found", HttpStatus.SC_BAD_REQUEST, null);
                     }
                     prepare(pendingState);
-                    processRequest(request, response, pendingState);
+                    processRequest(request, pendingState, true);
                     JSPUtil.fwd(request, response, getOkPage());
                     return;
 
@@ -159,7 +156,7 @@ public class RFC8628AuthorizationServer extends EnvServlet {
                     info("Too many retries for user code, aborting.");
                     JSPUtil.fwd(request, response, getFailPage());
                     return;
-                } catch (UserLoginException  | UnknownUserCodeException userLoginException) {
+                } catch (UserLoginException | UnknownUserCodeException userLoginException) {
                     info("Prompting user to retry login");
                     userLoginException.printStackTrace();
                     request.setAttribute(RETRY_MESSAGE, userLoginException.getMessage());
@@ -177,6 +174,15 @@ public class RFC8628AuthorizationServer extends EnvServlet {
                 pendingState.expiresAt = System.currentTimeMillis() + getServiceEnvironment().getAuthorizationGrantLifetime();
                 pending.put(id, pendingState);
                 prepare(pendingState);
+                // If they sent the user code with the request, do it here.
+                printAllParameters(request);
+                if (!StringUtils.isTrivial(request.getParameter(RFC8628Constants2.USER_CODE))) {
+
+                    processRequest(request,  pendingState, false);
+                    JSPUtil.fwd(request, response, getOkPage());
+                    return;
+                }
+
                 break;
             default:
                 // nothing to do here either.
@@ -188,33 +194,43 @@ public class RFC8628AuthorizationServer extends EnvServlet {
      * This is where the user's log in is actually processed and the values they sent are checked.
      *
      * @param request
-     * @param httpServletResponse
+     * @param pendingState
+     * @param checkCount
      * @throws Throwable
      */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse httpServletResponse, PendingState pendingState) throws Throwable {
+    protected void processRequest(HttpServletRequest request,
+                                  PendingState pendingState,
+                                  boolean checkCount) throws Throwable {
         ServletDebugUtil.trace(this, "starting servlet");
         String userName = null;
         String password = null;
         String userCode = null;
         // Check that they have not exceeded their retry count:
-        String counter = request.getParameter("counter");
+        if(checkCount){
+            String counter = request.getParameter("counter");
 
-        if (isTrivial(counter)) {
-            throw new TooManyRetriesException("Retry attempts exceeded", "");
-        }
-        int count = 0;
-        try {
-            count = Integer.parseInt(counter);
+            if (isTrivial(counter)) {
+                throw new TooManyRetriesException("Retry attempts exceeded", "");
+            }
+            int count = 0;
+            try {
+                count = Integer.parseInt(counter);
 
-        } catch (Throwable t) {
-            throw new OA2ATException(OA2Errors.SERVER_ERROR, "counter not a number", HttpStatus.SC_INTERNAL_SERVER_ERROR, null);
+            } catch (Throwable t) {
+                throw new OA2ATException(OA2Errors.SERVER_ERROR, "counter not a number", HttpStatus.SC_INTERNAL_SERVER_ERROR, null);
+            }
+            if (count < 1) {
+                pending.remove(pendingState.id); // remove state, so they can't retry this somehow
+                ServletDebugUtil.trace(this, "user \"" + pendingState.getUsername() + "\" exceeded retry count.");
+                throw new TooManyRetriesException("retry attempts exceeded", "");
+            }
+            pendingState.count--;
+
+            userCode = request.getParameter(USER_CODE_KEY);             // we sent it
+        }else{
+           userCode = request.getParameter(RFC8628Constants2.USER_CODE);// they sent it
         }
-        if (count < 1) {
-                      pending.remove(pendingState.id); // remove state, so they can't retry this somehow
-                      ServletDebugUtil.trace(this, "user \"" + pendingState.getUsername() + "\" exceeded retry count.");
-                      throw new TooManyRetriesException("retry attempts exceeded", "");
-                  }
-        pendingState.count--;
+        userCode = RFC8628Servlet.convertToCanonicalForm(userCode, getServiceEnvironment().getRfc8628ServletConfig());
 
 
         // Fixes OAUTH-192.
@@ -261,13 +277,12 @@ public class RFC8628AuthorizationServer extends EnvServlet {
             }
             pendingState.setUsername(userName);
         }
-        userCode = request.getParameter(USER_CODE_KEY);
 
         if (!isTrivial(userCode)) {
             userCode = userCode.toUpperCase();
         }
-        if (!cache.containsKey(userCode)) {
-            if(pendingState.count == 0){
+        if (checkCount && !cache.containsKey(userCode) ) {
+            if (pendingState.count == 0) {
                 throw new TooManyRetriesException("number of retries has been been reached,", userCode);
             }
             throw new UnknownUserCodeException("unknown user code", userCode);
@@ -341,7 +356,6 @@ public class RFC8628AuthorizationServer extends EnvServlet {
     }
 
 
-
     Map<String, PendingState> pending = new HashMap<>();
 
     public void present(PresentableState state) throws Throwable {
@@ -404,11 +418,16 @@ public class RFC8628AuthorizationServer extends EnvServlet {
         if (pending == null || pending.isEmpty()) {
             return;
         }
-        Set<String> keys = pending.keySet();
-        for (String key : keys) {
+        // have to do it in stages or risk a concurrent modification exception.
+        List<String> tempKeys = new LinkedList<>();
+        for (String key : pending.keySet()) {
             if (pending.get(key).isExpired()) {
-                pending.remove(key);
+                tempKeys.add(key);
             }
+        }
+        for (String key : tempKeys) {
+            pending.remove(key);
+
         }
     }
 }

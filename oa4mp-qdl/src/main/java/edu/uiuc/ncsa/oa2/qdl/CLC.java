@@ -83,7 +83,6 @@ public class CLC {
                 clcCommands = null;
                 if (DebugUtil.isEnabled()) {
                     e.printStackTrace();
-                    ;
                 }
                 return false;
             }
@@ -94,8 +93,8 @@ public class CLC {
         @Override
         public List<String> getDocumentation(int argCount) {
             List<String> doxx = new ArrayList<>();
-            doxx.add(getName() + "(name, file) - reads the configuration file and then loads the configuration with the given name. ");
-            doxx.add("This sets the configuration and name. ");
+            doxx.add(getName() + "(file, name) - reads the configuration file and then loads the configuration with the given name. ");
+            doxx.add("This sets the configuration and name.");
             doxx.add("This must be called before any other function.");
             return doxx;
         }
@@ -163,14 +162,24 @@ public class CLC {
 
         @Override
         public int[] getArgCount() {
-            return new int[]{0};
+            return new int[]{0, 1};
         }
 
         @Override
         public Object evaluate(Object[] objects, State state) {
             checkInit();
+            String args = DUMMY_ARG;
+            if(objects.length == 1){
+                if(objects[0] instanceof Boolean){
+                      if(!(Boolean)objects[0]){
+                          args = args + " " + clcCommands.NO_VERIFY_JWT;
+                      }
+                }else{
+                    throw new IllegalArgumentException(getName() + " requires a boolean argument");
+                }
+            }
                 try {
-                    clcCommands.access(new InputLine(DUMMY_ARG));
+                    clcCommands.access(new InputLine(args));
                     return getTokens();
                 } catch (Exception e) {
                     state.getLogger().error("error getting access token", e);
@@ -184,7 +193,8 @@ public class CLC {
         @Override
         public List<String> getDocumentation(int argCount) {
             List<String> doxx = new ArrayList<>();
-            doxx.add(getName() + " get the access token.");
+            doxx.add(getName() + "([verify_jwts]) get the access token.");
+            doxx.add("verify_jwts - if true (default) verify any JWTs. If false, do not verify them.");
             doxx.add(checkInitMessage);
             return doxx;
         }
@@ -255,7 +265,10 @@ public class CLC {
 
         @Override
         public List<String> getDocumentation(int argCount) {
-            return null;
+            List<String> doxx = new ArrayList<>();
+            doxx.add(getName() + " refresh the tokens.");
+            doxx.add(checkInitMessage);
+            return doxx;
         }
     }
     protected String EXCHANGE_NAME = "exchange";
@@ -391,11 +404,178 @@ public class CLC {
 
         @Override
         public List<String> getDocumentation(int argCount) {
-            return null;
+            List<String> doxx = new ArrayList<>();
+            doxx.add(getName() + " introspect on the current token.");
+            doxx.add(checkInitMessage);
+            return doxx;
         }
     }
     protected String USER_INFO_NAME = "user_info";
+    public class UserInfo implements QDLFunction{
+        @Override
+        public String getName() {
+            return USER_INFO_NAME;
+        }
+
+        @Override
+        public int[] getArgCount() {
+            return new int[]{0};
+        }
+
+        @Override
+        public Object evaluate(Object[] objects, State state) {
+            checkInit();
+            StemVariable out = new StemVariable();
+            try {
+                clcCommands.user_info(new InputLine(DUMMY_ARG));
+                out.fromJSON(clcCommands.getClaims());
+            } catch (Exception e) {
+                if(DebugUtil.isEnabled()) {
+                    e.printStackTrace();
+                }
+            }
+            return out;
+        }
+
+        @Override
+        public List<String> getDocumentation(int argCount) {
+            List<String> doxx = new ArrayList<>();
+            doxx.add(getName() + " return the user info.");
+            doxx.add(checkInitMessage);
+            return doxx;
+        }
+    }
     protected String TOKENS_NAME = "tokens";
+    public class Tokens implements QDLFunction{
+        @Override
+        public String getName() {
+            return TOKENS_NAME;
+        }
+
+        @Override
+        public int[] getArgCount() {
+            return new int[]{0};
+        }
+
+        @Override
+        public Object evaluate(Object[] objects, State state) {
+            checkInit();
+            return getTokens();
+        }
+
+        @Override
+        public List<String> getDocumentation(int argCount) {
+            List<String> doxx = new ArrayList<>();
+            doxx.add(getName() + " initialte the device flow. If possible, the user code is copied to the clipboard.");
+            doxx.add(checkInitMessage);
+            return doxx;
+        }
+    }
+ protected String WRITE_NAME = "write";
+    public class Write implements QDLFunction{
+        @Override
+        public String getName() {
+            return WRITE_NAME;
+        }
+
+        @Override
+        public int[] getArgCount() {
+            return new int[]{1,2};
+        }
+
+        @Override
+        public Object evaluate(Object[] objects, State state) {
+            String args = DUMMY_ARG + " " + objects[0];
+            if(objects.length == 2){
+                args = args + " -m " + objects[1];
+            }
+            checkInit();
+            try {
+                clcCommands.write(new InputLine(args));
+                return Boolean.TRUE;
+            } catch (Exception e) {
+                if(DebugUtil.isEnabled()) {
+                    e.printStackTrace();
+                }
+            }
+            return Boolean.FALSE;
+        }
+
+        @Override
+        public List<String> getDocumentation(int argCount) {
+            List<String> doxx = new ArrayList<>();
+            doxx.add(getName() + "(file [,message]) - write the current state to the file");
+            switch (argCount){
+                case 1:
+                    doxx.add(getName() + "(file) writes to the file");
+                    break;
+                case 2:
+                    doxx.add(getName() + "(file, message) write to the file and includes the given message");
+                    break;
+            }
+            doxx.add(checkInitMessage);
+            return doxx;
+        }
+    }
+
+     protected String READ_NAME = "read";
+    public class Read implements QDLFunction{
+        @Override
+        public String getName() {
+            return READ_NAME;
+        }
+
+        @Override
+        public int[] getArgCount() {
+            return new int[]{1};
+        }
+
+        @Override
+        public Object evaluate(Object[] objects, State state) {
+            try {
+                clcCommands.read(new InputLine(DUMMY_ARG + " " + objects[0]));
+                return Boolean.TRUE;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return Boolean.FALSE;
+        }
+
+        @Override
+        public List<String> getDocumentation(int argCount) {
+            List<String> doxx = new ArrayList<>();
+            doxx.add(getName() + "(file) - read state previously saved by this client.");
+            doxx.add(checkInitMessage);
+            return doxx;
+        }
+    }
+
+    protected String CLEAR_NAME = "clear";
+    protected String LOAD_NAME = "load";
+    protected String GET_PARAM = "get_param";
+    public class GetParam implements QDLFunction{
+        @Override
+        public String getName() {
+            return null;
+        }
+
+        @Override
+        public int[] getArgCount() {
+            return new int[0];
+        }
+
+        @Override
+        public Object evaluate(Object[] objects, State state) {
+            return null;
+        }
+
+        @Override
+        public List<String> getDocumentation(int argCount) {
+            return null;
+        }
+    }
+    protected String SET_PARAM = "set_param";
+    protected String CLEAR_PARAMS = "clear_params";
 
 
 }

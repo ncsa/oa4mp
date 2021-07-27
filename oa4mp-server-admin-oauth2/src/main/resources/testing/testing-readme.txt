@@ -13,14 +13,35 @@ When a new version is deployed, here is the testing order
   -- localhost:command.line2
      Most basic virtual organization test. Configuration will return JWTs for both access and
      refesh tokens, requiring signatures for generation and verification.
+     set_param -a scope "read: write: x.y:"
+     set_param -x scope "read:/home/jeff write:/data/jeff/cluster x.y:/abc/def/ghi"
+
+     AT, R:
+       scopes:
+          read:/home/jeff
+          write:/data/jeff/cluster
+          x.y:/abc/def
+       lifetime: 3600000 ms
+
+      TX:
+        AT:
+          scopes:
+            read:/home/jeff
+            x.y:/abc/def/ghi
+            write:/data/jeff/cluster
+          lifetime: same
      * be sure to check get_user_info after refresh token and after TX.
      * Be sure to exchange both an access token and refresh token since these have somewhat difference
        code paths.
+         exchange
+         exchange -rt
 
   -- localhost:test/no_cfg
      No configuration of any sort (i.e., cfg is unset, strict scopes etc)
      Most common configuration in production.
      ** Must pass **
+       Generic AT with lifetime 1009 sec.
+       Generic RT with lifetime 950400 sec.
 
   -- Test any client for exchange, introspection and revocation.
      This will exchange sets of tokens and introspect on them.
@@ -51,6 +72,7 @@ When a new version is deployed, here is the testing order
        New access token (since swapping with valid one)
      At this point, the refresh token is invalid and while you can exchange ATs, you cannot ever get another RT
      which is as it should be. If the access token expires, then any attempts to exchange or refresh fail.
+
   -- localhost:test/no_qdl
         Has basic configuration for tokens, but no scripting
         ***************************************************************************
@@ -104,7 +126,6 @@ When a new version is deployed, here is the testing order
         Ex. 5
         set_param -a scope "read:/home/jeff/data x.y: x.z write:/data/cluster/ligo"
         set_param -x scope "read:/home/jeffy x.y:/abc/def/ghi write:/data/cluster1 x.z:/etc/certs"
-
 
         access
           AT:
@@ -183,11 +204,12 @@ When a new version is deployed, here is the testing order
              /dune
              /dune/production
              /fermilab"
-          lifetime:3600 sec.
-          lifetime:3600 sec.
+          lifetime:750 sec.
          refresh, exchange:
            scopes: same (since no scopes in TX request.)
-         lifetime: 3600 sec.
+           lifetime:750 sec.
+             (This is set to 1000000000 in the rt_lifetime attribute of the config but
+              overridden in the cfg for the client. This tests that works.)
 
         Aim is that the initial set should be resolved to what was passed in.
 
@@ -229,22 +251,23 @@ When a new version is deployed, here is the testing order
            wlcg.groups: [/fermilab]
 
         refresh
-            scopes: compute.modify storage.read:/fermilab/users/cilogontest/public
+            scopes:
+               compute.modify
+               storage.read:/fermilab/users/cilogontest/public
             wlcg.groups: [/fermilab]
 
         exchange
           (has bogus scopes of foo.bar and storage.create:/fermilab/users/dwd/public2)
-              scopes: compute.cancel storage.read:/fermilab/users/cilogontest/public2
+              scopes:
+                 compute.cancel
+                 storage.read:/fermilab/users/cilogontest/public2
 
        Also, do some refreshes, do some exchanges and make sure that the expected scopes
        are always returns faithfully.
 
 
   Other localhost testing clients. These exist so various tests can be run.
-  -- localhost:command.line
-        Configured with basic NCSA functor.
-  -- localhost:command.line2
-         Plain vanilla, no extra claims.
+
   -- qdl:test0
         Currently gets FNAL access token (set DEBUG=true in script before running).
         Check configruation first. Usually it is set to NCSA default and

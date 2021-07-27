@@ -1012,7 +1012,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
     protected void doRFC8628(OA2Client client, HttpServletRequest request, HttpServletResponse response) throws Throwable {
         MetaDebugUtil debugger = createDebugger(client);
         debugger.trace(this, "starting RFC 8628 access token exchange.");
-        printAllParameters(request);
+      //  printAllParameters(request);
         long now = System.currentTimeMillis();
         String rawSecret = getClientSecret(request);
         if (!client.isPublicClient()) {
@@ -1148,7 +1148,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 true);
         doAT(issuerTransactionState, client);
         OA2SE oa2se = (OA2SE) getServiceEnvironment();
-        VirtualOrganization vo = oa2se.getVO(transaction.getIdentifier());
+        VirtualOrganization vo = oa2se.getVO(transaction.getClient().getIdentifier());
         if (vo == null) {
             ((ATIResponse2) issuerTransactionState.getIssuerResponse()).setJsonWebKey((oa2se).getJsonWebKeys().getDefault());
         } else {
