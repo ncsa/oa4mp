@@ -97,6 +97,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
     public static final String SAFE_GARBAGE_COLLECTION = "safe_gc";
     public static final String PRINT_TS_IN_DEBUG = "printTSInDebug";
     public static final String NOTIFY_ON_ADMIN_CLIENT_NEW_CLIENT = "acNewClientNotify";
+    public static final String CLEANUP_INTERVAL_TAG  = "cleanup_interval";
     /**
      * Default is 15 days. Internally the refresh lifetime (as all date-ish things) are in milliseconds
      * though the configuration file is assumed to be in seconds.
@@ -111,6 +112,8 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
     //This is divisible by 3 and greater than 256,
     // so when it is base64 encoded there will be no extra characters:
     public static int CLIENT_SECRET_LENGTH_DEFAULT = 258;
+
+    public static long CLEANUP_INTERVAL_DEFAULT = 30*60*1000L; // 30 minutes
 
     public OA2ConfigurationLoader(ConfigurationNode node) {
         super(node);
@@ -168,7 +171,8 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     getRFC8628ServletConfig(),
                     isRFC8628Enabled(),
                     isNotifyOnACNewClient(),
-                    isprintTSInDebug());
+                    isprintTSInDebug(),
+                    getCleanupInterval());
 
             if (getClaimSource() instanceof BasicClaimsSourceImpl) {
                 ((BasicClaimsSourceImpl) getClaimSource()).setOa2SE((OA2SE) se);
@@ -296,6 +300,28 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         return printTSInDebug;
     }
 
+    long cleanupInterval = -1;
+
+    public long getCleanupInterval() {
+        if (cleanupInterval < 0) {
+            try {
+
+                String raw = getFirstAttribute(cn, CLEANUP_INTERVAL_TAG);
+                if(StringUtils.isTrivial(raw)){
+                    cleanupInterval = CLEANUP_INTERVAL_DEFAULT;
+                }else {
+                    cleanupInterval = ConfigUtil.getValueSecsOrMillis(raw, true);
+                }
+            } catch (Throwable t) {
+                // use default which is to doo safe garbage collection.
+                // We let this be null to trigger pulling the value, if any, out of the
+                // the configuration
+                cleanupInterval = CLEANUP_INTERVAL_DEFAULT;
+            }
+            DebugUtil.trace(this, CLEANUP_INTERVAL_TAG + " set to " + cleanupInterval);
+        }
+        return cleanupInterval;
+    }
 
     public boolean isSafeGC() {
         if (safeGC == null) {
@@ -655,7 +681,6 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
             } else {
                 try {
                     maxATLifetime = ConfigUtil.getValueSecsOrMillis(x, true);
-                    //    maxATLifetime = Long.parseLong(x) * 1000; // The configuration file has this in seconds. Internally this is ms.
                 } catch (Throwable t) {
                     maxATLifetime = MAX_ACCESS_TOKEN_LIFETIME_DEFAULT;
                 }

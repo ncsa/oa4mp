@@ -89,7 +89,8 @@ public class OA2SE extends ServiceEnvironmentImpl {
                  RFC8628ServletConfig rfc8628ServletConfig,
                  boolean rfc8628Enabled,
                  boolean notifyOnACNewClientCreate,
-                 boolean printTSInDebug) {
+                 boolean printTSInDebug,
+                 long cleanupInterval) {
         super(logger,
                 mfp,
                 tsp,
@@ -155,7 +156,15 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.rfc8628Enabled = rfc8628Enabled;
         this.printTSInDebug = printTSInDebug;
         this.rfc8628ServletConfig = rfc8628ServletConfig;
+        this.cleanupInterval = cleanupInterval;
     }
+
+    public long getCleanupInterval() {
+        return cleanupInterval;
+    }
+
+
+    long cleanupInterval = -1;
 
     public RFC8628ServletConfig getRfc8628ServletConfig() {
         return rfc8628ServletConfig;
@@ -166,9 +175,6 @@ public class OA2SE extends ServiceEnvironmentImpl {
         return printTSInDebug;
     }
 
-    public void setPrintTSInDebug(boolean printTSInDebug) {
-        this.printTSInDebug = printTSInDebug;
-    }
 
     boolean printTSInDebug = true;
 

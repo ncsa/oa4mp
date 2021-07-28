@@ -11,7 +11,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e978b12f-4441-4d62-90dd-04c86c0aa044" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-qdl/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-qdl/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-qdl/src/main/docs/token_handler_configuration.odt" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-qdl/src/main/docs/token_handler_configuration.odt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/allclasses-frame.html" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/allclasses-frame.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/allclasses-noframe.html" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/allclasses-noframe.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/constant-values.html" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/constant-values.html" afterDir="false" />
@@ -30,8 +32,18 @@
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/overview-tree.html" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/overview-tree.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/classes/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2Commands.class" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/classes/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2Commands.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/maven-archiver/pom.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin-javadoc.jar" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin-javadoc.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin-sources.jar" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin-sources.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin.jar" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/OA2SE.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/OA2SE.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/loader/OA2ConfigurationLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/loader/OA2ConfigurationLoader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/loader/OA2ServletInitializer.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/loader/OA2ServletInitializer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth1/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth1/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-test-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-test-oauth2/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-website/src/site/xhtml/server/dtd/server-dtd-service-tag.xhtml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-website/src/site/xhtml/server/dtd/server-dtd-service-tag.xhtml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-website/src/site/xhtml/server/dtd/server-dtd.xhtml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-website/src/site/xhtml/server/dtd/server-dtd.xhtml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-xsede-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-xsede-oauth2/buildNumber.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -54,7 +66,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="5.1.1" />
+        <entry key="$PROJECT_DIR$" value="master" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -117,7 +129,7 @@
       <recent name="edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.OA2 CLC">
+  <component name="RunManager" selected="JUnit.OA2 test suite">
     <configuration name="AccessTokenConfig" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.AccessTokenConfig" />
       <module name="oa4mp-server-loader-oauth2" />
@@ -474,7 +486,7 @@
       <workItem from="1624666019678" duration="118683000" />
       <workItem from="1625570254767" duration="4181000" />
       <workItem from="1625916465413" duration="89733000" />
-      <workItem from="1626695658837" duration="131600000" />
+      <workItem from="1626695658837" duration="137619000" />
     </task>
     <task id="LOCAL-00001" summary="IDE caused some version issues, lots of documentation updates. First cut of RFC8628 impl">
       <created>1613086394676</created>
@@ -777,14 +789,20 @@
       <option name="project" value="LOCAL" />
       <updated>1627414453185</updated>
     </task>
-    <option name="localTasksCounter" value="44" />
+    <task id="LOCAL-00044" summary="Updated versions for 5.2.0 release.">
+      <created>1627415081820</created>
+      <option name="number" value="00044" />
+      <option name="presentableId" value="LOCAL-00044" />
+      <option name="project" value="LOCAL" />
+      <updated>1627415081820</updated>
+    </task>
+    <option name="localTasksCounter" value="45" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixes for FNAL CIL-971" />
     <MESSAGE value="CIL-974 fixes: more exception types for various JWT verification failures so understandable error messages can be generated and logged. User info, refresh token and token exchange now have far less byzantine ways to get the signing key and to generate understandle messages for the manifold failure opportunities available now." />
     <MESSAGE value="CIL-974, CIL-976" />
     <MESSAGE value="CIL-985, CIL-947" />
@@ -809,7 +827,8 @@
     <MESSAGE value="Improved database access for cache rebuild (RFC 8628). Fixed several small issues with device flow. Had to refactor some code because inheritance was not helpful. More tests!" />
     <MESSAGE value="Mostly fixed edge cases in template resolution uncovered while documenting it." />
     <MESSAGE value="test tweaks. Updated website and documentation." />
-    <option name="LAST_COMMIT_MESSAGE" value="test tweaks. Updated website and documentation." />
+    <MESSAGE value="Updated versions for 5.2.0 release." />
+    <option name="LAST_COMMIT_MESSAGE" value="Updated versions for 5.2.0 release." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

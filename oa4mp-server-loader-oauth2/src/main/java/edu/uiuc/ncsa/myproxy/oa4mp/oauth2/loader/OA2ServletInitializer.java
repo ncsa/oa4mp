@@ -61,6 +61,7 @@ public class OA2ServletInitializer extends OA4MPServletInitializer {
         DebugUtil.setPrintTS(oa2SE.isPrintTSInDebug());
         if (oa2SE.isRefreshTokenEnabled()) {
             MyProxyDelegationServlet.transactionCleanup.getRetentionPolicies().clear(); // We need a different set of policies than the original one.
+            MyProxyDelegationServlet.transactionCleanup.setCleanupInterval(oa2SE.getCleanupInterval());
             MyProxyDelegationServlet.transactionCleanup.addRetentionPolicy(
                     new RefreshTokenRetentionPolicy(
                             (RefreshTokenStore) oa2SE.getTransactionStore(),
@@ -72,8 +73,8 @@ public class OA2ServletInitializer extends OA4MPServletInitializer {
             ClaimSourceFactory.setFactory(new ClaimSourceFactoryImpl());
         }
         if (txRecordCleanup == null) {
-
             txRecordCleanup = new Cleanup<>(getEnvironment().getMyLogger());
+            txRecordCleanup.setCleanupInterval(oa2SE.getCleanupInterval());
             txRecordCleanup.setStopThread(false);
             txRecordCleanup.setMap(oa2SE.getTxStore());
             txRecordCleanup.addRetentionPolicy(new TokenExchangeRecordRetentionPolicy(oa2SE.getServiceAddress().toString(), oa2SE.isSafeGC()));
@@ -111,16 +112,5 @@ public class OA2ServletInitializer extends OA4MPServletInitializer {
             ServletDebugUtil.trace(this, "done rebuilding RFC 8628 cache");
         }
     }
-     protected void initDBPoolingCleanup(OA2SE oa2SE){
-         if (txRecordCleanup == null) {
 
-             txRecordCleanup = new Cleanup<>(getEnvironment().getMyLogger());
-             txRecordCleanup.setStopThread(false);
-             txRecordCleanup.setMap(oa2SE.getTxStore());
-             txRecordCleanup.addRetentionPolicy(new TokenExchangeRecordRetentionPolicy(oa2SE.getServiceAddress().toString(), oa2SE.isSafeGC()));
-             txRecordCleanup.start();
-             oa2SE.getMyLogger().info("Starting token exchange record store cleanup thread");
-         }
-
-     }
 }
