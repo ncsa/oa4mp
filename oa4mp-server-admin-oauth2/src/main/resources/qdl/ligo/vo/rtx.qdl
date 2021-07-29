@@ -27,13 +27,13 @@
   // These are the maximum scopes allowed.
   allowed_scopes. := script_run('ligo/vo/get_scopes.qdl', claims.isMemberOf.);
 
-  requested_scopes. := (0 < size(tx_scopes.))?scopes.:tx_scopes.;
+  requested_scopes. := (0 < size(tx_scopes.))?tx_scopes.:scopes.;
 
  if[
     0 < size(requested_scopes.)
   ][
     // If they request different scopes, honor it. Otherwise don't.
     //allowed_scopes. := mask(allowed_scopes., has_value(allowed_scopes., requested_scopes.));
-    allowed_scopes. := resolve_scopes(allowed_scopes., requested_scopes., false);
+    allowed_scopes. := resolve_templates(allowed_scopes., requested_scopes., false);
   ];
  access_token.scope := detokenize(unique(allowed_scopes.), ' ', 2); // turn in to string, omit duplications, trailing space

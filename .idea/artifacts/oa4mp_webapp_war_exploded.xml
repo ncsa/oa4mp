@@ -1,6 +1,6 @@
 <component name="ArtifactManager">
   <artifact type="exploded-war" name="oa4mp-webapp:war exploded">
-    <output-path>$PROJECT_DIR$/oa4mp-webapp/target/oa4mp-webapp-5.1-SNAPSHOT</output-path>
+    <output-path>$PROJECT_DIR$/oa4mp-webapp/target/oa4mp-webapp-5.2.0</output-path>
     <properties id="maven-jee-properties">
       <options>
         <exploded>true</exploded>
@@ -18,7 +18,7 @@
         </element>
       </element>
       <element id="directory" name="META-INF">
-        <element id="file-copy" path="$PROJECT_DIR$/oa4mp-webapp/target/oa4mp-webapp-5.1-SNAPSHOT/META-INF/MANIFEST.MF" />
+        <element id="file-copy" path="$PROJECT_DIR$/oa4mp-webapp/target/oa4mp-webapp-5.2.0/META-INF/MANIFEST.MF" />
       </element>
       <element id="javaee-facet-resources" facet="oa4mp-webapp/web/Web" />
     </root>

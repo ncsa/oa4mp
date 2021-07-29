@@ -362,7 +362,7 @@ When a new version is deployed, here is the testing order
        in the CLC, all is good.
 
 TO DO:
-  -- dev:/test/ligo
+
   -- dev:/test/lsst/onboarding
   -- dev:/test/lsst/linking
 
@@ -432,6 +432,14 @@ TO DO:
   -- test:test/ucsd
      This is a public client, very basic, that allows for refresh
      get_user_info is naught else than the barebones subject, audience and issuer.
+  -- test:jeff/ligo
+       tests VO for ligo with a special command line test client from jeff
+       - use GitHub for logon
+       The following test for various things like scope reduction
+
+       set_param -a scope "read:/DQSegDB write:/DQSegDB read:/frames"
+       set_param -t scope "read:/DQSegDB write:/DQSegDB"
+       set_param -x scope "read:/DQSegDB/foo write:/DQSegDB read:/frames/bar"
 
   -- Do surge test client: https://serge.ncsa.illinois.edu/cilogon-oa2-test/
         Plain vanilla, no extra configuration.

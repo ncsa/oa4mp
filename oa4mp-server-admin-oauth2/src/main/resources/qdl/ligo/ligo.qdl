@@ -14,6 +14,7 @@
     qdl{
         load="ligo/ligo.qdl"
         xmd={exec_phase=pre_auth}
+        args=["USER_ID", "PASSWORD"]
       }// end qdl
     } //end identity token
     access{
@@ -41,7 +42,7 @@ if[
 
             claims.uid := caput(claims.eppn, '@');
 
-         cfg.auth_type := 'none';
+         cfg.auth_type := 'simple';
            cfg.address := 'ldap.ligo.org';
               cfg.port := 636;
         cfg.claim_name := 'uid';
@@ -50,6 +51,8 @@ if[
          cfg.ldap_name := 'uid';
            cfg.groups. := ['isMemberOf'];
 cfg.search_attributes. := ['email', 'uin', 'uid', 'isMemberOf'];
+          cfg.username := script_args(0);
+          cfg.password := script_args(1);
 
         claim_sources. := claim_sources. ~ [create_source(cfg.)];
 

@@ -1,7 +1,7 @@
 /*
   Driver script for all post token, refresh and exchange
 */
-//script_load('ligo/vo/acl.qdl');
+script_load('ligo/acl.qdl');
 
 all_audience. := ['ANY', 'LIGO', 'segments.ligo.org'];
 
