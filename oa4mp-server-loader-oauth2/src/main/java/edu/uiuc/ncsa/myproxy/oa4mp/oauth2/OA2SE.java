@@ -88,9 +88,9 @@ public class OA2SE extends ServiceEnvironmentImpl {
                  boolean safeGC,
                  RFC8628ServletConfig rfc8628ServletConfig,
                  boolean rfc8628Enabled,
-                 boolean notifyOnACNewClientCreate,
                  boolean printTSInDebug,
-                 long cleanupInterval) {
+                 long cleanupInterval,
+                 String notifyACEventEmailAddresses) {
         super(logger,
                 mfp,
                 tsp,
@@ -123,7 +123,6 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.claimSource = claimSource;
         OA2Scopes.ScopeUtil.setScopes(scopes); //Probably need a better place to do this at some point. Probably.
 
-        this.notifyOnACNewClientCreate = notifyOnACNewClientCreate;
         this.refreshTokenEnabled = isRefreshTokenEnabled;
         if (this.refreshTokenEnabled) {
             logger.info("Refresh token support enabled");
@@ -157,7 +156,14 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.printTSInDebug = printTSInDebug;
         this.rfc8628ServletConfig = rfc8628ServletConfig;
         this.cleanupInterval = cleanupInterval;
+        this.notifyACEventEmailAddresses = notifyACEventEmailAddresses;
     }
+
+    public String getNotifyACEventEmailAddresses() {
+        return notifyACEventEmailAddresses;
+    }
+
+    String notifyACEventEmailAddresses = null;
 
     public long getCleanupInterval() {
         return cleanupInterval;
@@ -474,9 +480,5 @@ public class OA2SE extends ServiceEnvironmentImpl {
         return stores;
     }
 
-    boolean notifyOnACNewClientCreate = false;
 
-    public boolean isNotifyOnACNewClientCreate() {
-        return notifyOnACNewClientCreate;
-    }
 }

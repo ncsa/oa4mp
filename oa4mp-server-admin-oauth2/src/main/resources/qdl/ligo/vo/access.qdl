@@ -15,13 +15,13 @@ if[
 all_audience. := ['ANY', 'LIGO', 'segments.ligo.org']; // constant
 
 // get current allowed scopes based on group memberships
-allowed_scopes. := script_run('ligo/vo/get_scopes.qdl', claims.isMemberOf.);
+allowed_scopes. := script_load('ligo/vo/get_scopes.qdl', claims.isMemberOf.);
 
  if[
     0 < size(scopes.)
   ][
     // If they request different scopes, honor it. Otherwise don't.
-    allowed_scopes. := mask(allowed_scopes., has_value(allowed_scopes., scopes.));
+    allowed_scopes. := resolve_templates(allowed_scopes., scopes., true);
   ];
  access_token.scope := detokenize(unique(allowed_scopes.), ' ', 2); // turn in to string, omit duplications, trailing space
 

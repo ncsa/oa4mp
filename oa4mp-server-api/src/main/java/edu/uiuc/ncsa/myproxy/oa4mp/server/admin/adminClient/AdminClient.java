@@ -179,6 +179,12 @@ public class AdminClient extends BaseClient {
                 '}';
     }
 
+    /**
+     *  CIL-607 required a better way to do this for more than new client notifications.
+     *  Use {@link #isDebugOn()} instead.
+     * @return
+     * @deprecated 
+     */
     public boolean isNotifyOnNewClientCreate() {
         return notifyOnNewClientCreate;
     }

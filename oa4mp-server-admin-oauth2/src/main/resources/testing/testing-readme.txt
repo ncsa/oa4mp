@@ -435,11 +435,27 @@ TO DO:
   -- test:jeff/ligo
        tests VO for ligo with a special command line test client from jeff
        - use GitHub for logon
+       - grants subset of all possible scopes (so limited group membership to test that
+         it doesn't just always hand back everything).
        The following test for various things like scope reduction
 
-       set_param -a scope "read:/DQSegDB write:/DQSegDB read:/frames"
-       set_param -t scope "read:/DQSegDB write:/DQSegDB"
+       set_param -a scope "read: write:"
+       set_param -r scope "read:/DQSegDB write:/DQSegDB"
        set_param -x scope "read:/DQSegDB/foo write:/DQSegDB read:/frames/bar"
+       AT:
+         scope:
+            read:/frames
+            read:/DQSegDB
+         lifetime: 21591 sec
+       RT:
+         scope:
+            read:/DQSegDB
+         lifetime: same as AT
+       TX:
+         scope:
+            read:/frames/bar
+            read:/DQSegDB/foo
+         lifetime: same as AT
 
   -- Do surge test client: https://serge.ncsa.illinois.edu/cilogon-oa2-test/
         Plain vanilla, no extra configuration.

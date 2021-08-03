@@ -3,6 +3,7 @@
    arg 0 is the group (claims.isMemberOf. usually)
 */
 
+ block[
    groups. := script_args(0);
    allowed_scopes. := [];
    
@@ -14,7 +15,7 @@
        for_keys(key, zeta.)
      ][
        if[
-          has_value( key, groups.)
+          in_group(groups., key)
        ][
           allowed_scopes. := allowed_scopes. ~ zeta.key;
        ]; // end if
@@ -22,19 +23,20 @@
     ]; // end while
 
     return(allowed_scopes.);
-
+   ]; // end block
     /*
     example replacement for loop above with much simpler data:
-        zeta.'A' := ['p','q']
-        zeta.'B' := 'r'
-        zeta.'C' := 's'
-        g. := ['A','D','C','E']; g. is groups. above
+         zeta.'Communities:LSCVirgoLIGOGroupMembers' := ['read:/DQSegDB' ,'read:/frames'];
+      zeta.'Communities:LVC:SegDB:SegDBWriter' := 'write:/DQSegDB';
+        zeta.'gw-astronomy:KAGRA-LIGO:members' := 'read:/frames';
+  g. := [{'name': 'Services:MailingLists:Testing:eligible_factor'},{'name': 'Communities:LSCVirgoLIGOGroupMembers'},{'name':'Communities:LVC:SegDB:SegDBWriter'}]
+
        zz. :=  reduce(@||, for_each(@has_value, g., keys(zeta.)))
- {
-  A:true,
-  B:true,
-  C:true
- }
+{
+ Communities:LVC:SegDB:SegDBWriter:true,
+ Communities:LSCVirgoLIGOGroupMembers:true,
+ gw-astronomy:KAGRA-LIGO:members:false
+}
 
 Need to use 1.4.1 function for values though:
  

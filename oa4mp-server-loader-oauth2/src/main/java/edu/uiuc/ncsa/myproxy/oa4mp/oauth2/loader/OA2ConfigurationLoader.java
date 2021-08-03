@@ -96,7 +96,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
     public static final String STRICT_ACLS = "strict_acls";
     public static final String SAFE_GARBAGE_COLLECTION = "safe_gc";
     public static final String PRINT_TS_IN_DEBUG = "printTSInDebug";
-    public static final String NOTIFY_ON_ADMIN_CLIENT_NEW_CLIENT = "acNewClientNotify";
+    public static final String NOTIFY_ADMIN_CLIENT_ADDRESSES = "notifyACEmailAddresses";
     public static final String CLEANUP_INTERVAL_TAG  = "cleanup_interval";
     /**
      * Default is 15 days. Internally the refresh lifetime (as all date-ish things) are in milliseconds
@@ -170,9 +170,9 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     isSafeGC(),
                     getRFC8628ServletConfig(),
                     isRFC8628Enabled(),
-                    isNotifyOnACNewClient(),
                     isprintTSInDebug(),
-                    getCleanupInterval());
+                    getCleanupInterval(),
+                    isNotifyACEventEmailAddresses());
 
             if (getClaimSource() instanceof BasicClaimsSourceImpl) {
                 ((BasicClaimsSourceImpl) getClaimSource()).setOa2SE((OA2SE) se);
@@ -266,21 +266,14 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         return loader.load();
     }
 
-    Boolean notifyOnACNewClient = null;
+    String notifyACEventEmailAddresses = null;
 
-    public boolean isNotifyOnACNewClient() {
-        if (notifyOnACNewClient == null) {
-            try {
-                notifyOnACNewClient = Boolean.parseBoolean(getFirstAttribute(cn, NOTIFY_ON_ADMIN_CLIENT_NEW_CLIENT));
-            } catch (Throwable t) {
-                // use default which is to doo safe garbage collection.
-                // We let this be null to trigger pulling the value, if any, out of the
-                // the configuration
-                notifyOnACNewClient = Boolean.FALSE;
-            }
-            DebugUtil.trace(this, "notify when any admin client creates a new client? " + notifyOnACNewClient);
+    public String isNotifyACEventEmailAddresses() {
+        if (notifyACEventEmailAddresses == null) {
+                notifyACEventEmailAddresses = getFirstAttribute(cn, NOTIFY_ADMIN_CLIENT_ADDRESSES);
+            DebugUtil.trace(this, "admin client notification addresses: " + notifyACEventEmailAddresses);
         }
-        return notifyOnACNewClient;
+        return notifyACEventEmailAddresses;
     }
 
     protected Boolean printTSInDebug = false;

@@ -511,6 +511,7 @@ public class OA2CLCCommands extends CLCCommands {
         if (clearParams) {
             requestParameters = new HashMap<>();
             tokenParameters = new HashMap<>();
+            refreshParameters = new HashMap<>();
             exchangeParameters = new HashMap<>();
         }
         isDeviceFlow = false;
@@ -1016,7 +1017,7 @@ public class OA2CLCCommands extends CLCCommands {
             say("Oops! No configuration has been loaded.");
             return;
         }
-        RTResponse rtResponse = getOA2S().refresh(dummyAsset.getIdentifier().toString(), tokenParameters);
+        RTResponse rtResponse = getOA2S().refresh(dummyAsset.getIdentifier().toString(), refreshParameters);
         dummyAsset = (OA2Asset) getCe().getAssetStore().get(dummyAsset.getIdentifier().toString());
         // Have to update the AT reponse here every time or no token state is preserved.
         currentATResponse = new ATResponse2(dummyAsset.getAccessToken(), dummyAsset.getRefreshToken());
@@ -1189,6 +1190,7 @@ public class OA2CLCCommands extends CLCCommands {
     protected String AUTHZ_GRANT_KEY = "authz_grant";
     protected String TOKEN_PARAMETERS_KEY = "token_parameters";
     protected String AUTHZ_PARAMETERS_KEY = "authz_parameters";
+    protected String REFRESH_PARAMETERS_KEY = "refresh_parameters";
     protected String EXCHANGE_PARAMETERS_KEY = "exchange_parameters";
     protected String AT_RESPONSE_KEY = "at_response";
     protected String INTROSPECT_RESPONSE_KEY = "introspect_response";
@@ -1269,6 +1271,10 @@ public class OA2CLCCommands extends CLCCommands {
         if (json.containsKey(AUTHZ_PARAMETERS_KEY)) {
             requestParameters = new HashMap<>();
             requestParameters.putAll(json.getJSONObject(AUTHZ_PARAMETERS_KEY));
+        }
+        if (json.containsKey(REFRESH_PARAMETERS_KEY)) {
+            refreshParameters = new HashMap<>();
+            refreshParameters.putAll(json.getJSONObject(REFRESH_PARAMETERS_KEY));
         }
         if(json.containsKey(INTROSPECT_RESPONSE_KEY)){
             introspectResponse = json.getJSONObject(INTROSPECT_RESPONSE_KEY);
@@ -1389,6 +1395,11 @@ public class OA2CLCCommands extends CLCCommands {
             jj.putAll(tokenParameters);
             jsonObject.put(AUTHZ_PARAMETERS_KEY, jj);
         }
+        if (!refreshParameters.isEmpty()) {
+            JSONObject jj = new JSONObject();
+            jj.putAll(refreshParameters);
+            jsonObject.put(REFRESH_PARAMETERS_KEY, jj);
+        }
 
         if (!exchangeParameters.isEmpty()) {
             JSONObject jj = new JSONObject();
@@ -1453,6 +1464,7 @@ public class OA2CLCCommands extends CLCCommands {
 
     HashMap<String, String> requestParameters = new HashMap<>();
     HashMap<String, String> tokenParameters = new HashMap<>();
+    HashMap<String, String> refreshParameters = new HashMap<>();
     HashMap<String, String> exchangeParameters = new HashMap<>();
 
     public static final String REQ_PARAM_SWITCH = "-authz";
@@ -1461,13 +1473,22 @@ public class OA2CLCCommands extends CLCCommands {
     public static final String SHORT_TOKEN_PARAM_SWITCH = "-t";
     public static final String EXCHANGE_PARAM_SWITCH = "-exchange";
     public static final String SHORT_EXCHANGE_PARAM_SWITCH = "-x";
+    public static final String REFRESH_PARAM_SWITCH = "-refresh";
+    public static final String SHORT_REFRESH_PARAM_SWITCH = "-r";
 
     public void set_param(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
-            say("set_param " + REQ_PARAM_SWITCH + " | " + TOKEN_PARAM_SWITCH + " | " + EXCHANGE_PARAM_SWITCH + " key value");
+            say("set_param " + REQ_PARAM_SWITCH +
+                    " | " + TOKEN_PARAM_SWITCH +
+                    " | " + REFRESH_PARAM_SWITCH +
+                    " | " + EXCHANGE_PARAM_SWITCH +
+                    " key value");
             sayi("Usage: Sets an additional request parameter to be send along with the request.");
+            sayi("For scopes, these are added to whatever the client is sending. For other parameters, they override");
+            sayi("what the client sends.");
             sayi(REQ_PARAM_SWITCH + " = parameters for the initial request to the authorization endpoint.");
-            sayi(TOKEN_PARAM_SWITCH + " = parameters to send in the token request");
+            sayi(TOKEN_PARAM_SWITCH + " = parameters to send in the token request. Note these supercede " + SHORT_REQ_PARAM_SWITCH + " parameters.");
+            sayi(REFRESH_PARAM_SWITCH + " = parameters for the refresh request.");
             sayi(EXCHANGE_PARAM_SWITCH + " = parameters for the token exchange request.");
             sayi(shortSwitchBlurb);
             say("See also: get_param, clear_param");
@@ -1476,10 +1497,12 @@ public class OA2CLCCommands extends CLCCommands {
         boolean setRP = inputLine.hasArg(REQ_PARAM_SWITCH, SHORT_REQ_PARAM_SWITCH);
         boolean setTP = inputLine.hasArg(TOKEN_PARAM_SWITCH, SHORT_TOKEN_PARAM_SWITCH);
         boolean setXP = inputLine.hasArg(EXCHANGE_PARAM_SWITCH, SHORT_EXCHANGE_PARAM_SWITCH);
+        boolean setRFP = inputLine.hasArg(REFRESH_PARAM_SWITCH, SHORT_REFRESH_PARAM_SWITCH);
         inputLine.removeSwitch(REQ_PARAM_SWITCH, SHORT_REQ_PARAM_SWITCH);
         inputLine.removeSwitch(TOKEN_PARAM_SWITCH, SHORT_TOKEN_PARAM_SWITCH);
         inputLine.removeSwitch(EXCHANGE_PARAM_SWITCH, SHORT_EXCHANGE_PARAM_SWITCH);
-        if (!(setRP || setTP || setXP)) {
+        inputLine.removeSwitch(REFRESH_PARAM_SWITCH, SHORT_REFRESH_PARAM_SWITCH);
+        if (!(setRP || setTP || setXP || setRFP)) {
             say("sorry, you must specify the switch for which additional parameters to set");
             return;
         }
@@ -1500,17 +1523,25 @@ public class OA2CLCCommands extends CLCCommands {
         if (setXP) {
             exchangeParameters.put(inputLine.getArg(1), inputLine.getArg(2));
         }
+        if(setRFP){
+            refreshParameters.put(inputLine.getArg(1), inputLine.getArg(2));
+        }
     }
 
     public void get_param(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
-            say("get_param [" + REQ_PARAM_SWITCH + " | " + TOKEN_PARAM_SWITCH + " | " + EXCHANGE_PARAM_SWITCH + "] key0 key1 key2 ...");
+            say("get_param [" + REQ_PARAM_SWITCH +
+                    " | " + TOKEN_PARAM_SWITCH +
+                    " | " + REFRESH_PARAM_SWITCH +
+                    " | " + EXCHANGE_PARAM_SWITCH +
+                    "] key0 key1 key2 ...");
             sayi("Usage: Show what additional parameters have been set.");
             sayi("If no switches are given then both token and authorization additional parameters are shown ");
             sayi("If keys are specified, only those are shown. If no keys are specified, all the given parameters are shown");
             sayi("switches correspond to: ");
             sayi(REQ_PARAM_SWITCH + " sent in the authorization request, i.e. uri");
-            sayi(TOKEN_PARAM_SWITCH + " sent in the access and refresh requests");
+            sayi(TOKEN_PARAM_SWITCH + " sent in the access token requests");
+            sayi(REFRESH_PARAM_SWITCH + " sent in the refesh requests");
             sayi(EXCHANGE_PARAM_SWITCH + " sent in the exchange request");
             sayi(shortSwitchBlurb);
             say("See also: set_param, clear_param, rm_param");
@@ -1519,26 +1550,34 @@ public class OA2CLCCommands extends CLCCommands {
         boolean getRP = inputLine.hasArg(REQ_PARAM_SWITCH, SHORT_REQ_PARAM_SWITCH);
         boolean getTP = inputLine.hasArg(TOKEN_PARAM_SWITCH, SHORT_TOKEN_PARAM_SWITCH);
         boolean getXP = inputLine.hasArg(EXCHANGE_PARAM_SWITCH, SHORT_EXCHANGE_PARAM_SWITCH);
+        boolean getRFP = inputLine.hasArg(REFRESH_PARAM_SWITCH, SHORT_REFRESH_PARAM_SWITCH);
         inputLine.removeSwitch(REQ_PARAM_SWITCH, SHORT_REQ_PARAM_SWITCH);
         inputLine.removeSwitch(TOKEN_PARAM_SWITCH, SHORT_TOKEN_PARAM_SWITCH);
         inputLine.removeSwitch(EXCHANGE_PARAM_SWITCH, SHORT_EXCHANGE_PARAM_SWITCH);
+        inputLine.removeSwitch(REFRESH_PARAM_SWITCH, SHORT_REFRESH_PARAM_SWITCH);
+
 
         // If nothing is specified, do both
-        if (!getRP && !getRP && !getXP) {
+        if (!getRP && !getRP && !getXP && !getRFP) {
             getTP = true;
             getRP = true;
             getXP = true;
-        }
-        if (getTP) {
-            listParams(tokenParameters, inputLine, "tokens");
+            getRFP = true;
         }
 
         if (getRP) {
             listParams(requestParameters, inputLine, "authz");
         }
+        if (getTP) {
+            listParams(tokenParameters, inputLine, "tokens");
+        }
+        if (getRFP) {
+            listParams(refreshParameters, inputLine, "refresh");
+        }
         if (getXP) {
             listParams(exchangeParameters, inputLine, "exchange");
         }
+
     }
 
     private void listParams(Map<String, String> params, InputLine inputLine, String component) {
@@ -1558,7 +1597,11 @@ public class OA2CLCCommands extends CLCCommands {
 
     public void clear_all_params(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
-            say("clear_all_params " + REQ_PARAM_SWITCH + " | " + TOKEN_PARAM_SWITCH + " | " + EXCHANGE_PARAM_SWITCH);
+            say("clear_all_params " + REQ_PARAM_SWITCH +
+                    " | " + TOKEN_PARAM_SWITCH +
+                    " | " + REFRESH_PARAM_SWITCH +
+                    " | " + EXCHANGE_PARAM_SWITCH
+            );
             say("Usage: Clear all of the additional parameters for the switch.");
             sayi("There is no default to clear all. You must invoke this with both switches or nothing will be done.");
             sayi(shortSwitchBlurb);
@@ -1568,21 +1611,27 @@ public class OA2CLCCommands extends CLCCommands {
         boolean getRP = inputLine.hasArg(REQ_PARAM_SWITCH, SHORT_REQ_PARAM_SWITCH);
         boolean getTP = inputLine.hasArg(TOKEN_PARAM_SWITCH, SHORT_TOKEN_PARAM_SWITCH);
         boolean getXP = inputLine.hasArg(EXCHANGE_PARAM_SWITCH, SHORT_EXCHANGE_PARAM_SWITCH);
+        boolean getRFP = inputLine.hasArg(REFRESH_PARAM_SWITCH, SHORT_REFRESH_PARAM_SWITCH);
         inputLine.removeSwitch(REQ_PARAM_SWITCH, SHORT_REQ_PARAM_SWITCH);
         inputLine.removeSwitch(TOKEN_PARAM_SWITCH, SHORT_TOKEN_PARAM_SWITCH);
+        inputLine.removeSwitch(REFRESH_PARAM_SWITCH, SHORT_REFRESH_PARAM_SWITCH);
         inputLine.removeSwitch(EXCHANGE_PARAM_SWITCH, SHORT_EXCHANGE_PARAM_SWITCH);
 
-        if (!(getTP || getRP || getXP)) {
+        if (!(getTP || getRP || getXP || getRFP)) {
             say("Sorry, you must specify which set of additional parameters to clear.");
             return;
+        }
+        if (getRP) {
+            requestParameters = new HashMap<>();
+            say("additional authorization parameters cleared.");
         }
         if (getTP) {
             tokenParameters = new HashMap<>();
             say("additional token parameters cleared.");
         }
-        if (getRP) {
-            requestParameters = new HashMap<>();
-            say("additional authorization parameters cleared.");
+        if (getRFP) {
+            refreshParameters = new HashMap<>();
+            say("additional refresh parameters cleared.");
         }
         if (getXP) {
             exchangeParameters = new HashMap<>();
@@ -1594,7 +1643,11 @@ public class OA2CLCCommands extends CLCCommands {
 
     public void rm_param(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
-            say("rm_param " + REQ_PARAM_SWITCH + " | " + TOKEN_PARAM_SWITCH + " | " + EXCHANGE_PARAM_SWITCH + " key0 key1 ...");
+            say("rm_param " + REQ_PARAM_SWITCH +
+                    " | " + TOKEN_PARAM_SWITCH +
+                    " | " + REFRESH_PARAM_SWITCH +
+                    " | " + EXCHANGE_PARAM_SWITCH +
+                    " key0 key1 ...");
             sayi("Usage: Remove the given key(s) from the set of additional parameters");
             sayi("If none are given, then nothing is done.");
             sayi(shortSwitchBlurb);
@@ -1603,8 +1656,10 @@ public class OA2CLCCommands extends CLCCommands {
         boolean getRP = inputLine.hasArg(REQ_PARAM_SWITCH, SHORT_REQ_PARAM_SWITCH);
         boolean getTP = inputLine.hasArg(TOKEN_PARAM_SWITCH, SHORT_TOKEN_PARAM_SWITCH);
         boolean getXP = inputLine.hasArg(EXCHANGE_PARAM_SWITCH, SHORT_EXCHANGE_PARAM_SWITCH);
+        boolean getRFP = inputLine.hasArg(REFRESH_PARAM_SWITCH, SHORT_REFRESH_PARAM_SWITCH);
         inputLine.removeSwitch(REQ_PARAM_SWITCH, SHORT_REQ_PARAM_SWITCH);
         inputLine.removeSwitch(TOKEN_PARAM_SWITCH, SHORT_TOKEN_PARAM_SWITCH);
+        inputLine.removeSwitch(REFRESH_PARAM_SWITCH, SHORT_REFRESH_PARAM_SWITCH);
         inputLine.removeSwitch(EXCHANGE_PARAM_SWITCH, SHORT_EXCHANGE_PARAM_SWITCH);
 
         if (inputLine.getArgCount() == 0) {
@@ -1614,6 +1669,7 @@ public class OA2CLCCommands extends CLCCommands {
         int tRemoved = 0;
         int rRemoved = 0;
         int xRemoved = 0;
+        int rfRemoved = 0;
         for (String k : inputLine.getArgs()) {
             if (getTP) {
                 tokenParameters.remove(k);
@@ -1627,9 +1683,16 @@ public class OA2CLCCommands extends CLCCommands {
                 exchangeParameters.remove(k);
                 xRemoved++;
             }
+            if(getRFP){
+                refreshParameters.remove(k);
+                rfRemoved++;
+            }
 
         }
-        say("removed: " + tRemoved + " token parameters, " + rRemoved + " authz parameters, " + xRemoved + " exchange parameters");
+        say("removed: " + rRemoved + " authz parameters, "
+                + tRemoved + " token parameters, "
+                + rfRemoved + " refresh parameters, "
+                +  xRemoved + " exchange parameters");
 
     }
 
