@@ -82,7 +82,9 @@ public class OA4MPCommands extends BaseCommands {
     }
 
     public ClientStoreCommands getNewClientStoreCommands() throws Exception {
-        return new ClientStoreCommands(getMyLogger(), "  ", getServiceEnvironment().getClientStore(), getServiceEnvironment().getClientApprovalStore());
+        return new ClientStoreCommands(getMyLogger(), "  ",
+                getServiceEnvironment().getClientStore(),
+                new ClientApprovalStoreCommands(getMyLogger(),"  ", getServiceEnvironment().getClientApprovalStore()));
     }
 
 

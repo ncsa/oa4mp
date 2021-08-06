@@ -530,5 +530,10 @@ public class OA2Client extends Client implements OA2ClientScopes {
         
         return rc;
     }
+
+    @Override
+    public int getType() {
+        return CLIENT_TYPE_OAUTH2;
+    }
 }
 

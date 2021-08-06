@@ -127,7 +127,7 @@ public class OA2Commands extends BaseCommands {
             oa2ClientCommands = new OA2ClientCommands(getMyLogger(),
                     "  ",
                     getServiceEnvironment().getClientStore(),
-                    getServiceEnvironment().getClientApprovalStore());
+                    getNewClientApprovalStoreCommands());
             oa2ClientCommands.setRefreshTokensEnabled(getOA2SE().isRefreshTokenEnabled());
             oa2ClientCommands.setSupportedScopes(getOA2SE().getScopes());
         }
@@ -177,7 +177,7 @@ public class OA2Commands extends BaseCommands {
             oa2AdminClientCommands = new OA2AdminClientCommands(getMyLogger(),
                     "  ",
                     getOA2SE().getAdminClientStore(),
-                    getOA2SE().getClientApprovalStore(),
+                    getNewClientApprovalStoreCommands(),
                     getOA2SE().getPermissionStore(),
                     getOA2SE().getClientStore());
         }

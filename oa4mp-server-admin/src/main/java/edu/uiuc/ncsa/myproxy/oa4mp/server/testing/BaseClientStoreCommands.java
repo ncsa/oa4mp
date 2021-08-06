@@ -10,11 +10,10 @@ import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
+import edu.uiuc.ncsa.security.delegation.server.storage.BaseClientStore;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApprovalStore;
 import edu.uiuc.ncsa.security.delegation.storage.BaseClient;
-import edu.uiuc.ncsa.security.delegation.storage.BaseClientKeys;
-import edu.uiuc.ncsa.security.storage.XMLMap;
 import edu.uiuc.ncsa.security.util.cli.ExitException;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import net.sf.json.JSON;
@@ -24,6 +23,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -37,10 +37,11 @@ import static edu.uiuc.ncsa.security.util.cli.CLIDriver.EXIT_COMMAND;
  * on 12/8/16 at  1:03 PM
  */
 public abstract class BaseClientStoreCommands extends StoreCommands2 {
-    public BaseClientStoreCommands(MyLoggingFacade logger, String defaultIndent, Store clientStore, ClientApprovalStore clientApprovalStore) {
+
+    public BaseClientStoreCommands(MyLoggingFacade logger, String defaultIndent, Store clientStore,
+                                   ClientApprovalStoreCommands clientApprovalStoreCommands) {
         super(logger, defaultIndent, clientStore);
-        this.clientApprovalStore = clientApprovalStore;
-        clientApprovalStoreCommands = new ClientApprovalStoreCommands(logger, defaultIndent, clientApprovalStore);
+        this.clientApprovalStoreCommands = clientApprovalStoreCommands;
         setSortable(new ClientSorter());
     }
 
@@ -49,15 +50,12 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
     }
 
     // used internally to approve records.
-    ClientApprovalStoreCommands clientApprovalStoreCommands = null;
+    protected ClientApprovalStoreCommands clientApprovalStoreCommands = null;
 
     public ClientApprovalStore getClientApprovalStore() {
-        return clientApprovalStore;
+        return (ClientApprovalStore) clientApprovalStoreCommands.getStore();
     }
 
-    public void setClientApprovalStore(ClientApprovalStore clientApprovalStore) {
-        this.clientApprovalStore = clientApprovalStore;
-    }
 
     protected JSON inputJSON(JSON oldJSON, String componentName) throws IOException {
         return inputJSON(oldJSON, componentName, false);
@@ -192,7 +190,9 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
                 tempA.setStatus(ClientApproval.Status.NONE);
             }
             if (useLongFormat) {
-                if(i != 0){say("-----");}
+                if (i != 0) {
+                    say("-----");
+                }
                 longFormat((BaseClient) x, tempA, false);
             } else {
                 say(i + ". " + format((BaseClient) x, tempA));
@@ -228,9 +228,9 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
         int fieldWidth = Math.max(5, version.toString().length());
         BaseClient client = (BaseClient) identifiable;
         String caput = "";
-        if(-1 < version){
+        if (-1 < version) {
             caput = StringUtils.RJustify(version.toString(), fieldWidth);
-        }else{
+        } else {
             caput = StringUtils.RJustify(" -- ", fieldWidth);
         }
         return "|" + caput + "| " + " archived on " + client.getLastModifiedTS();
@@ -252,7 +252,7 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
 
 
     protected int longFormat(BaseClient client, ClientApproval clientApproval, boolean isVerbose) {
-        int width = super.longFormat(client,isVerbose);
+        int width = super.longFormat(client, isVerbose);
         if (clientApproval == null) {
             // if it is missing, then create on and mark it pending.
             clientApproval = (ClientApproval) getClientApprovalStore().create();
@@ -271,26 +271,23 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
                 if (clientApproval.getApprover() != null) {
                     approver = clientApproval.getApprover();
                 }
-                say(formatLongLine("approved by", approver, width,isVerbose));
+                say(formatLongLine("approved by", approver, width, isVerbose));
                 break;
             case NONE:
-                say(formatLongLine("status", "none", width,isVerbose));
+                say(formatLongLine("status", "none", width, isVerbose));
                 break;
             case PENDING:
-                say(formatLongLine("status", "pending", width,isVerbose));
+                say(formatLongLine("status", "pending", width, isVerbose));
                 break;
             case DENIED:
-                say(formatLongLine("status", "approval denied", width,isVerbose));
+                say(formatLongLine("status", "approval denied", width, isVerbose));
                 break;
             case REVOKED:
-                say(formatLongLine("status", "revoked", width,isVerbose));
+                say(formatLongLine("status", "revoked", width, isVerbose));
 
         }
         return width;
     }
-
-
-
 
 
     protected void showApproveHelp() {
@@ -338,11 +335,11 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
         sayi("here is the complete client:");
         longFormat(client);
         if (!newIdentifier.equals(client.getIdentifierString())) {
-          //  sayi2(" remove client with id=\"" + client.getIdentifier() + "\" [y/n]? ");
+            //  sayi2(" remove client with id=\"" + client.getIdentifier() + "\" [y/n]? ");
             removeCurrentClient = isOk(readline(" remove client with id=\"" + client.getIdentifier() + "\" [y/n]? "));
             client.setIdentifier(BasicIdentifier.newID(newIdentifier));
         }
-      //  sayi2("save [y/n]?");
+        //  sayi2("save [y/n]?");
         if (isOk(readline("save [y/n]?"))) {
             //getStore().save(client);
             if (removeCurrentClient) {
@@ -371,5 +368,94 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
         }
     }
 
+    public static String SEARCH_STATUS_KEY = "-status";
 
+    @Override
+    public void search(InputLine inputLine) {
+        if (inputLine.hasArg(SEARCH_STATUS_KEY)) {
+            statusSearch(inputLine);
+            return;
+        }
+        super.search(inputLine);
+    }
+
+
+    protected void statusSearch(InputLine inputLine) {
+        BaseClientStore clientStore = (BaseClientStore)getStore();
+        List<Identifier> ids =clientStore.getByStatus(inputLine.getNextArgFor(SEARCH_STATUS_KEY), getClientApprovalStore());
+
+        //List<Identifier> ids = getClientApprovalStore().statusSearch(inputLine.getNextArgFor(SEARCH_STATUS_KEY));
+        List<Identifiable> acs = new ArrayList<>();
+        int i = 0;
+        for (Identifier id : ids) {
+            acs.add(new ClientApproval(id));
+        }
+        List<String> id = new ArrayList<>();
+        id.add(getMapConverter().getKeys().identifier());
+
+        if (inputLine.hasArg(SEARCH_RESULT_SET_NAME)) {
+            String name = inputLine.getNextArgFor(SEARCH_RESULT_SET_NAME);
+            if (getResultSets().containsKey(name)) {
+                getResultSets().remove(name);
+                say("warning: overwriting existing client result set \"" + name + "\"");
+            }
+            clientApprovalStoreCommands.getResultSets().put(inputLine.getNextArgFor(SEARCH_RESULT_SET_NAME), new RSRecord(acs, id));
+        }
+    }
+
+    @Override
+    public void rs(InputLine inputLine) throws Exception {
+        // Have to take into account if the result set is for a set of approvals.
+        if (inputLine.hasArg(RS_SHOW_KEY)) {
+            String name = inputLine.getLastArg();
+            if (clientApprovalStoreCommands.getResultSets().containsKey(name)) {
+                clientApprovalStoreCommands.rs(inputLine);
+                return;
+            }
+        }
+        if (inputLine.hasArg(RS_CLEAR_KEY)) {
+            clientApprovalStoreCommands.setResultSets(new HashMap());
+        }
+        if (inputLine.hasArg(RS_REMOVE_KEY)) {
+            String name = inputLine.getLastArg();
+            if (clientApprovalStoreCommands.getResultSets().containsKey(name)) {
+                clientApprovalStoreCommands.getResultSets().remove(name);
+                return;
+            }
+        }
+        if (inputLine.hasArg(RS_LIST_KEY)) {
+            clientApprovalStoreCommands.rs(inputLine);
+        }
+        super.rs(inputLine);
+    }
+
+    @Override
+    public void rm(InputLine inputLine) throws IOException {
+        if (inputLine.hasArg(SEARCH_RESULT_SET_NAME)) {
+            String name = inputLine.getNextArgFor(SEARCH_RESULT_SET_NAME);
+            RSRecord rsRecord = null;
+            // get the right result set.
+            if(clientApprovalStoreCommands.getResultSets().containsKey(name)){
+                rsRecord = clientApprovalStoreCommands.getResultSets().get(name);
+            }else {
+                rsRecord = resultSets.get(name);
+            }
+            if (rsRecord == null) {
+                say("no such stored result.");
+                return;
+            }
+            if(!"Y".equals(readline("Getting ready to remove " + rsRecord.rs.size() + " entries. Proceed?(Y/n)"))){
+                 say("aborted");
+                 return;
+            }
+            getClientApprovalStore().remove(rsRecord.rs);
+            getStore().remove(rsRecord.rs);
+
+            say("done!");
+            // now we have to remove all of the identifiers from both the
+            return;
+        }
+
+        super.rm(inputLine);
+    }
 }

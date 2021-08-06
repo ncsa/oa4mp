@@ -24,6 +24,7 @@ import java.io.StringReader;
 import java.net.URI;
 import java.security.SecureRandom;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 
 /**
@@ -51,8 +52,13 @@ public class OA2RegistrationServlet extends AbstractRegistrationServlet {
         HttpServletRequest request = state.getRequest();
 
         if (state.getState() == INITIAL_STATE) {
-            String[] scopes = new String[getOA2SE().getScopes().size()];
-            getOA2SE().getScopes().toArray(scopes);
+            Collection<String> displayScopes = new HashSet<>();
+            displayScopes.addAll(getOA2SE().getScopes());
+            if(!displayScopes.contains(OA2Scopes.SCOPE_OFFLINE_ACCESS)){
+                displayScopes.add(OA2Scopes.SCOPE_OFFLINE_ACCESS);
+            }
+            String[] scopes = new String[displayScopes.size()];
+            displayScopes.toArray(scopes);
             request.setAttribute(SCOPES_NAME, scopes);
             request.setAttribute(VO_NAME, VO_NAME);
             request.setAttribute(LDAP_NAME, LDAP_NAME);

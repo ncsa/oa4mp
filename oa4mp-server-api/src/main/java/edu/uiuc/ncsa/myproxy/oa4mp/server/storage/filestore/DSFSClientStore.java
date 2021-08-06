@@ -1,6 +1,5 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.server.storage.filestore;
 
-import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.util.IdentifiableProviderImpl;
 import edu.uiuc.ncsa.security.delegation.server.storage.impl.FSClientStore;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
@@ -29,8 +28,8 @@ public class DSFSClientStore extends FSClientStore<Client> {
     }
 
 
-    @Override
+/*    @Override
     public IdentifiableProvider getACProvider() {
         return identifiableProvider;
-    }
+    }*/
 }

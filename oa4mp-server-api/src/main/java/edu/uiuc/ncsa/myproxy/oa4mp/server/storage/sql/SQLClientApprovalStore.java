@@ -3,9 +3,12 @@ package edu.uiuc.ncsa.myproxy.oa4mp.server.storage.sql;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.storage.sql.table.ClientApprovalTable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.IdentifiableProviderImpl;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApprovalStore;
+import edu.uiuc.ncsa.security.delegation.storage.ClientApprovalKeys;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionRecord;
@@ -16,6 +19,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -93,5 +98,40 @@ public class SQLClientApprovalStore extends SQLStore<ClientApproval> implements 
             releaseConnection(cr);
         }
         return count;
+    }
+
+    @Override
+    public List<Identifier> statusSearch(String status) {
+
+        List<Identifier> ids = new ArrayList<>();
+        ClientApprovalKeys keys = (ClientApprovalKeys) getMapConverter().getKeys();
+        String idColName = keys.identifier();
+        String searchString = "select " + idColName + " from " + getTable().getFQTablename() +
+                " where " + keys.status() + " = ?";
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
+
+        try {
+            PreparedStatement stmt = c.prepareStatement(searchString);
+            stmt.setString(1, status);
+            stmt.executeQuery();
+            ResultSet rs = stmt.getResultSet();
+            // Now we have to pull in all the identifiers.
+            while (rs.next()) {
+                ids.add(new BasicIdentifier(rs.getString(idColName)));
+            }
+
+            rs.close();
+            stmt.close();
+            releaseConnection(cr);
+        } catch (SQLException e) {
+            destroyConnection(cr);
+            if(DebugUtil.isEnabled()){
+                e.printStackTrace();
+            }
+            throw new GeneralException("Error getting client approval", e);
+        }
+
+        return ids;
     }
 }

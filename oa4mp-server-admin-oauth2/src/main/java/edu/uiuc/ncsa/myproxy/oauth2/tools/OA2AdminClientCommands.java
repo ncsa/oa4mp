@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oauth2.tools;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.ClientApprovalStoreCommands;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.Permission;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionList;
@@ -13,7 +14,6 @@ import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
-import edu.uiuc.ncsa.security.delegation.server.storage.ClientApprovalStore;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.security.util.cli.ArgumentNotFoundException;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
@@ -33,10 +33,10 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
     public OA2AdminClientCommands(MyLoggingFacade logger,
                                   String defaultIndent,
                                   Store adminClientStore,
-                                  ClientApprovalStore clientApprovalStore,
+                                  ClientApprovalStoreCommands clientApprovalStoreCommands,
                                   PermissionsStore permissionsStore,
                                   ClientStore clientStore) {
-        super(logger, defaultIndent, adminClientStore, clientApprovalStore);
+        super(logger, defaultIndent, adminClientStore, clientApprovalStoreCommands);
         this.clientStore = clientStore;
         this.permissionsStore = permissionsStore;
     }

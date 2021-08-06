@@ -8,7 +8,6 @@ import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
-import edu.uiuc.ncsa.security.delegation.server.storage.ClientApprovalStore;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.util.pkcs.KeyUtil;
 
@@ -22,8 +21,8 @@ import java.io.IOException;
  * on 5/21/13 at  4:21 PM
  */
 public class ClientStoreCommands extends BaseClientStoreCommands {
-    public ClientStoreCommands(MyLoggingFacade logger, String defaultIndent, Store clientStore, ClientApprovalStore clientApprovalStore) {
-        super(logger, defaultIndent, clientStore, clientApprovalStore);
+    public ClientStoreCommands(MyLoggingFacade logger, String defaultIndent, Store clientStore, ClientApprovalStoreCommands clientApprovalStoreCommands) {
+        super(logger, defaultIndent, clientStore, clientApprovalStoreCommands);
     }
 
 

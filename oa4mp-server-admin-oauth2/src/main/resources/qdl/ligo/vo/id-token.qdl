@@ -55,11 +55,9 @@ if[
          cfg.ldap_name := 'uid';
            cfg.groups. := ['isMemberOf'];
 cfg.search_attributes. := ['email', 'uin', 'uid', 'isMemberOf'];
-         cfg.auth_type := 'none';
-    /*
-          cfg.auth_type := 'simple';
+         cfg.auth_type := 'simple';
           cfg.username := script_args(0);
           cfg.password := script_args(1);
-     */
+
         claim_sources. := claim_sources. ~ [create_source(cfg.)];
 

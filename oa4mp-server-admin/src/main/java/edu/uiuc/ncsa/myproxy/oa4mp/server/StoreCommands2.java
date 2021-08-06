@@ -11,7 +11,6 @@ import edu.uiuc.ncsa.security.core.util.*;
 import edu.uiuc.ncsa.security.delegation.token.impl.TokenUtils;
 import edu.uiuc.ncsa.security.storage.XMLMap;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
-import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
 import edu.uiuc.ncsa.security.util.cli.*;
 import edu.uiuc.ncsa.security.util.cli.editing.EditorEntry;
 import edu.uiuc.ncsa.security.util.cli.editing.EditorUtils;
@@ -24,6 +23,7 @@ import net.sf.json.JSONSerializer;
 import java.io.*;
 import java.net.URI;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static edu.uiuc.ncsa.security.core.util.StringUtils.*;
 import static edu.uiuc.ncsa.security.util.cli.CLIDriver.CLEAR_BUFFER_COMMAND;
@@ -84,15 +84,15 @@ public abstract class StoreCommands2 extends StoreCommands {
             sayi("      double quotes with \\\"");
             say("E.g.");
             sayi("clients>encode \"config \\\" foo \\\"\"\n" +
-                            "  Y29uZmlnICIgZm9vICI\n" +
-                            "  clients>decode Y29uZmlnICIgZm9vICI\n" +
-                            "  config \" foo \"");
+                    "  Y29uZmlnICIgZm9vICI\n" +
+                    "  clients>decode Y29uZmlnICIgZm9vICI\n" +
+                    "  config \" foo \"");
             say("note the embedded blanks and quotes are preserved.");
             return;
         }
         boolean doBase32 = inputLine.hasArg(BASE_32_FLAG);
         inputLine.removeSwitch(BASE_32_FLAG);
-       // Do surgery so the line acts like the user expects.
+        // Do surgery so the line acts like the user expects.
         String originalLine = inputLine.getOriginalLine();
         originalLine = originalLine.substring("encode".length()).trim();
         if (doBase32) {
@@ -103,11 +103,11 @@ public abstract class StoreCommands2 extends StoreCommands {
             say("sorry, this needs a single argument.");
             return;
         }
-        if(originalLine.startsWith("\"")){
+        if (originalLine.startsWith("\"")) {
             originalLine = originalLine.substring(1);
         }
-        if(originalLine.endsWith("\"")){
-            originalLine = originalLine.substring(0, originalLine.length()-1);
+        if (originalLine.endsWith("\"")) {
+            originalLine = originalLine.substring(0, originalLine.length() - 1);
         }
         String arg = originalLine.replace("\\\"", "\"");
 
@@ -338,27 +338,34 @@ public abstract class StoreCommands2 extends StoreCommands {
         }
     }
 
+    protected void showCommandLineSwitchesHelp() {
+        sayi(LINE_LIST_COMMAND + " (optional) print the result in long format.");
+        sayi(VERBOSE_COMMAND + " (optional) print the result in verbose format.");
+        sayi(SEARCH_SIZE_FLAG + " (optional) print *only* the number of results.");
+        sayi(SEARCH_RETURNED_ATTRIBUTES_FLAG + " [attr0,attr1,...] = return only those attributes. " +
+                "Note you may specify long or verbose format too.");
+
+    }
+
     protected void showSearchHelp() {
         say("search " +
-                KEY_FLAG + " key [ " +
-                SEARCH_REGEX_FLAG + "|" + SEARCH_SHORT_REGEX_FLAG +
-                SEARCH_SIZE_FLAG + "] [" +
-                SEARCH_LIST_KEYS_FLAG + "] [" +
-                SEARCH_DEBUG_FLAG + "] [" +
-                LINE_LIST_COMMAND + " | " + VERBOSE_COMMAND + " ] [" +
+                KEY_FLAG + " key | " + KEY_SHORTHAND_PREFIX + "key " +
+                "[" + SEARCH_REGEX_FLAG + "|" + SEARCH_SHORT_REGEX_FLAG + "] " +
+                "[" + SEARCH_SIZE_FLAG + "] " +
+                "[" + SEARCH_DEBUG_FLAG + "] " +
+                "[" + LINE_LIST_COMMAND + "] " +
+                "[" + SEARCH_RESULT_SET_NAME + " name] | " +
+                VERBOSE_COMMAND + " ] [" +
                 SEARCH_RETURNED_ATTRIBUTES_FLAG + " list] condition");
         sayi("Usage: Searches the current component for all entries satisfying the condition.");
         sayi("You may also specify that the ");
         sayi("condition is a regular expression rather than using simple equality");
         sayi("Invoking this with the -listkeys flag prints out all the keys for this store. Omit that for searches.");
-        sayi(KEY_FLAG + " = the name of the key to be searched for");
-        sayi(SEARCH_REGEX_FLAG + "|" + SEARCH_SHORT_REGEX_FLAG + " (optional) attempt to interpret the conditional as a regular expression");
-        sayi(LINE_LIST_COMMAND + " (optional) print the result in long format.");
-        sayi(VERBOSE_COMMAND + " (optional) print the result in verbose format.");
-        sayi(SEARCH_SIZE_FLAG + " (optional) print *only* the number of results.");
+        sayi(KEY_FLAG + " (required) the name of the key to be searched for");
+        sayi(SEARCH_REGEX_FLAG + "|" + SEARCH_SHORT_REGEX_FLAG + " regex (optional) attempt to interpret condition as a regular expression");
+        sayi(SEARCH_RESULT_SET_NAME + " name (optional) save the result as the name.");
         sayi(SEARCH_DEBUG_FLAG + " (optional) show stack traces. Only use this if you really need it.");
-        sayi(SEARCH_RETURNED_ATTRIBUTES_FLAG + " [attr0,attr1,...] = return only those attributes. " +
-                "Note you may specify long or verbose format too.");
+        showCommandLineSwitchesHelp();
         showKeyShorthandHelp();
         sayi("\nE.g.\n");
         sayi("search " + KEY_SHORTHAND_PREFIX + "client_id " + SEARCH_REGEX_FLAG + " \".*07028.*\"");
@@ -374,13 +381,25 @@ public abstract class StoreCommands2 extends StoreCommands {
         sayi("\nThis would search for all client id's that contain the string 237 and only print out the name and email from those.");
     }
 
-    static String SEARCH_LIST_KEYS_FLAG = "-listKeys";
-    static String SEARCH_REGEX_FLAG = "-regex";
-    static String SEARCH_SHORT_REGEX_FLAG = "-r";
-    static String SEARCH_SIZE_FLAG = "-size";
-    static String SEARCH_DEBUG_FLAG = "-debug";
-    static String SEARCH_RETURNED_ATTRIBUTES_FLAG = "-out";
+    //    static String SEARCH_LIST_KEYS_FLAG = "-listKeys";
+    public static final String SEARCH_REGEX_FLAG = "-regex";
+    public static final String SEARCH_SHORT_REGEX_FLAG = "-r";
+    public static final String SEARCH_SIZE_FLAG = "-size";
+    public static final String SEARCH_DEBUG_FLAG = "-debug";
+    public static final String SEARCH_RETURNED_ATTRIBUTES_FLAG = "-out";
+    public static final String SEARCH_RESULT_SET_NAME = "-rs";
+    public static final String SEARCH_START_TS = "-start_ts";
+    public static final String SEARCH_END_TS = "-end_ts";
 
+    public HashMap<String, RSRecord> getResultSets() {
+        return resultSets;
+    }
+
+    public void setResultSets(HashMap<String, RSRecord> resultSets) {
+        this.resultSets = resultSets;
+    }
+
+    protected HashMap<String, RSRecord> resultSets = new HashMap<>();
 
     @Override
     public void search(InputLine inputLine) {
@@ -388,63 +407,79 @@ public abstract class StoreCommands2 extends StoreCommands {
             showSearchHelp();
             return;
         }
-        SerializationKeys keys = ((MapConverter) getStore().getXMLConverter()).getKeys();
         boolean showStackTraces = inputLine.hasArg(SEARCH_DEBUG_FLAG);
-        if (inputLine.hasArg(SEARCH_LIST_KEYS_FLAG)) {
-            if (getStore().getXMLConverter() instanceof MapConverter) {
-                say("keys");
-                say("-------");
-                for (String key : keys.allKeys()) {
-                    say(key);
-                }
-            }
+        boolean storeRS = inputLine.hasArg(SEARCH_RESULT_SET_NAME);
+        String rsName = null;
+        if (storeRS) {
+            rsName = inputLine.getNextArgFor(SEARCH_RESULT_SET_NAME);
+            inputLine.removeSwitchAndValue(SEARCH_RESULT_SET_NAME);
+        }
+
+        String key = getKeyArg(inputLine);
+        if (key == null) {
+            say("Sorry, you must specify a key for the search. Use the list_keys command for all available keys");
             return;
         }
+        List<Identifiable> values = null;
         List<String> returnedAttributes = null;
+
         if (inputLine.hasArg(SEARCH_RETURNED_ATTRIBUTES_FLAG)) {
             returnedAttributes = getArgList(inputLine);
         }
-        String key = getKeyArg(inputLine);
-        if (key != null) {
-            List<Identifiable> values = null;
-            try {
-                values = getStore().search(
-                        key,
-                        inputLine.getLastArg(),
-                        inputLine.hasArg(SEARCH_REGEX_FLAG) || inputLine.hasArg(SEARCH_SHORT_REGEX_FLAG));
-            } catch (Throwable t) {
-                if (showStackTraces) {
-                    t.printStackTrace();
+        try {
+            values = getStore().search(
+                    key,
+                    inputLine.getLastArg(),
+                    inputLine.hasArg(SEARCH_REGEX_FLAG) || inputLine.hasArg(SEARCH_SHORT_REGEX_FLAG),
+                    returnedAttributes);
+            if (storeRS) {
+                resultSets.put(rsName, new RSRecord(values, returnedAttributes));
+            }
+        } catch (Throwable t) {
+            if (showStackTraces) {
+                t.printStackTrace();
+            }
+            if (t.getCause() == null) {
+                say("Sorry, that didn't work:" + t.getMessage());
+            } else {
+                say("Sorry, that didn't work:" + t.getCause().getMessage());
+            }
+            return;
+        }
+        if (printRS(inputLine, values, returnedAttributes)) return;
+        say("\ngot " + values.size() + " match" + (values.size() == 1 ? "." : "es."));
+    }
+
+    protected boolean printRS(InputLine inputLine, List<Identifiable> values, List<String> returnedAttributes) {
+        if (values.isEmpty()) {
+            say("no matches");
+            return true;
+        }
+        if (inputLine.hasArg(SEARCH_SIZE_FLAG)) {
+            say("Got " + values.size() + " results");
+            return true;
+        }
+        for (Identifiable identifiable : values) {
+            if (returnedAttributes != null) {
+                longFormat(identifiable, returnedAttributes, inputLine.hasArg(VERBOSE_COMMAND));
+                if (1 < values.size()) {
+                    say("-----"); // or the output runs together
                 }
-                if (t.getCause() == null) {
-                    say("Sorry, that didn't work:" + t.getMessage());
-                } else {
-                    say("Sorry, that didn't work:" + t.getCause().getMessage());
-                }
-                return;
+            } else {
+                say(format(identifiable));
             }
-            if (values.isEmpty()) {
-                say("no matches");
-            }
-            if (inputLine.hasArg(SEARCH_SIZE_FLAG)) {
-                say("Got " + values.size() + " results");
-                return;
-            }
-            for (Identifiable identifiable : values) {
-                if (returnedAttributes != null) {
-                    longFormat(identifiable, returnedAttributes, inputLine.hasArg(VERBOSE_COMMAND));
-                    if (1 < values.size()) {
-                        say("-----"); // or the output runs together
-                    }
-                } else {
-                    say(format(identifiable));
-                }     // search -key token_id -r -out [parent_id, valid] .*oauth2.*
-            }
-            say("\ngot " + values.size() + " match" + (values.size() == 1 ? "." : "es."));
-        } else {
-            say("Sorry, you must specify a key for the search. Try typing \nsearch " + SEARCH_LIST_KEYS_FLAG + "\n for all available keys");
+        }
+        return false;
+    }
+
+    public static class RSRecord {
+        public RSRecord(List<Identifiable> rs, List<String> fields) {
+            this.rs = rs;
+            this.fields = fields;
         }
 
+        public List<Identifiable> rs;
+        public List<String> fields;
     }
 
     @Override
@@ -514,6 +549,15 @@ public abstract class StoreCommands2 extends StoreCommands {
     public void rm(InputLine inputLine) throws IOException {
         if (showHelp(inputLine)) {
             showRMHelp();
+            return;
+        }
+        if (inputLine.hasArg(SEARCH_RESULT_SET_NAME)) {
+            RSRecord rsRecord = resultSets.get(inputLine.getNextArgFor(SEARCH_RESULT_SET_NAME));
+            if (rsRecord == null) {
+                say("no such stored result.");
+                return;
+            }
+
             return;
         }
         Identifiable identifiable = findItem(inputLine);
@@ -1073,20 +1117,20 @@ public abstract class StoreCommands2 extends StoreCommands {
         }
         XMLConverter xmlConverter = getStore().getXMLConverter();
         String primaryKey = null;
-        if(xmlConverter instanceof MapConverter) {
-            primaryKey = ((MapConverter)xmlConverter).getKeys().identifier();
+        if (xmlConverter instanceof MapConverter) {
+            primaryKey = ((MapConverter) xmlConverter).getKeys().identifier();
         }
         if (xmlConverter instanceof MapConverter) {
             MapConverter mc = (MapConverter) xmlConverter;
             ArrayList<String> kk = new ArrayList<>();
             kk.addAll(mc.getKeys().allKeys());
-            if(primaryKey != null){
-                for(int i =0; i < kk.size(); i++){
-                     if(kk.get(i).equals(primaryKey)){
-                         kk.remove(i);
-                         kk.set(i, primaryKey + "*");
-                         break;
-                     }
+            if (primaryKey != null) {
+                for (int i = 0; i < kk.size(); i++) {
+                    if (kk.get(i).equals(primaryKey)) {
+                        kk.remove(i);
+                        kk.set(i, primaryKey + "*");
+                        break;
+                    }
                 }
             }
             // print them in order.
@@ -1327,7 +1371,7 @@ public abstract class StoreCommands2 extends StoreCommands {
 
         if (inputLine.hasArg(ARCHIVE_RESTORE_FLAG)) {
             String rawID = inputLine.getLastArg();
-            if(rawID.startsWith("/")){
+            if (rawID.startsWith("/")) {
                 rawID = rawID.substring(1);
             }
             String rawTargetVersion = inputLine.getNextArgFor(ARCHIVE_RESTORE_FLAG);
@@ -1375,44 +1419,44 @@ public abstract class StoreCommands2 extends StoreCommands {
                 Contract is that identifiers never have fragments -- these are used by the system for information.
                 In this case, a fragment of the form version_x where x is a non-negative integer is added.
                  */
-              if (inputLine.hasArg(ARCHIVE_VERSIONS_FLAG)) {
-                  if (identifiable == null) {
-                      say("sorry, I could not find that object. Check your id.");
-                      return;
-                  }
-                  // Grab each client and run through information about them
-                  List<Identifiable> values = getStore().search
-                          (mc.getKeys().identifier(),
-                                  identifiable.getIdentifierString() + ".*",
-                                  true);
+        if (inputLine.hasArg(ARCHIVE_VERSIONS_FLAG)) {
+            if (identifiable == null) {
+                say("sorry, I could not find that object. Check your id.");
+                return;
+            }
+            // Grab each client and run through information about them
+            List<Identifiable> values = getStore().search
+                    (mc.getKeys().identifier(),
+                            identifiable.getIdentifierString() + ".*",
+                            true);
 
 
-                  TreeMap<Long, Identifiable> sortedMap = new TreeMap<>();
-                  // There is every reason to assume that there will be gaps ion the number sequences over time.
-                  // create a new set of these and manage the order manually.
+            TreeMap<Long, Identifiable> sortedMap = new TreeMap<>();
+            // There is every reason to assume that there will be gaps ion the number sequences over time.
+            // create a new set of these and manage the order manually.
 
-                  for (Identifiable x : values) {
-                      long version = getVersionFromID(x.getIdentifier());
-                      if (-1 < version) {
-                          sortedMap.put(version, x);
-                      }
-                  }
-                  if (sortedMap.isEmpty()) {
-                      sayi("(no archived versions)");
-                      return;
-                  }
-                  say("archived versions of " + identifiable.getIdentifierString() + ":");
-                  // Now we run through them all in order
-                  for (Long index : sortedMap.keySet()) {
-                      say(archiveFormat(sortedMap.get(index)));
-                  }
-                  return;
-              }
+            for (Identifiable x : values) {
+                long version = getVersionFromID(x.getIdentifier());
+                if (-1 < version) {
+                    sortedMap.put(version, x);
+                }
+            }
+            if (sortedMap.isEmpty()) {
+                sayi("(no archived versions)");
+                return;
+            }
+            say("archived versions of " + identifiable.getIdentifierString() + ":");
+            // Now we run through them all in order
+            for (Long index : sortedMap.keySet()) {
+                say(archiveFormat(sortedMap.get(index)));
+            }
+            return;
+        }
 
         if (isShow) {
             long targetVersion = -1L;
             String rawID = inputLine.getLastArg();
-            if(rawID.startsWith("/")){
+            if (rawID.startsWith("/")) {
                 rawID = rawID.substring(1);
             }
             DoubleHashMap<URI, Long> versionNumbers = getVersions(rawID);
@@ -1752,4 +1796,83 @@ public abstract class StoreCommands2 extends StoreCommands {
         doCopy(source, targetID, false);  // always require an explicit id for the rename.
         getStore().remove(srcID);
     }
+
+    public void rs(InputLine inputLine) throws Exception {
+        if (showHelp(inputLine)) {
+            showResultSetHelp();
+            return;
+        }
+        if (inputLine.hasArg(RS_SHOW_KEY)) {
+            inputLine.removeSwitch(RS_SHOW_KEY);
+
+            List<String> requestedKeys = getArgList(inputLine); // might be eempty
+            String name = inputLine.getLastArg();
+            if(!resultSets.containsKey(name)){
+                say("result set named \"" + name + "\" not found");
+                return;
+            }
+            List<String> foundKeys = resultSets.get(name).fields;
+            if (!requestedKeys.isEmpty()) {
+                if (foundKeys == null) {
+                    foundKeys = requestedKeys;
+                } else {
+                    // Get the intersection of the lists. Only print what is actually there.
+                    Set<String> result = foundKeys.stream()
+                            .distinct()
+                            .filter(requestedKeys::contains)
+                            .collect(Collectors.toSet());
+                    foundKeys = new ArrayList<>();
+                    foundKeys.addAll(result);
+                }
+            }
+            printRS(inputLine, resultSets.get(name).rs, foundKeys);
+            return;
+        }
+        if (inputLine.hasArg(RS_CLEAR_KEY)) {
+            resultSets = new HashMap<>();
+            say("all results cleared");
+            return;
+        }
+        if (inputLine.hasArg(RS_REMOVE_KEY)) {
+            inputLine.removeSwitch(RS_REMOVE_KEY);
+            String name = inputLine.getLastArg();
+            resultSets.remove(name);
+            say("result set named \"" + name + "\" has been removed");
+            return;
+        }
+        if (inputLine.hasArg(RS_LIST_KEY)) {
+            if (resultSets.isEmpty()) {
+                return;
+            }
+            for (String key : resultSets.keySet()) {
+                String out = key + ": " + resultSets.get(key).rs.size() + " entries";
+                if (resultSets.get(key).fields != null) {
+                    out = out + ",  fields=" + resultSets.get(key).fields;
+                }
+                // Someday use this: StringUtils.formatMap()
+                // This however gets messy for clients where there are client approvals.
+                say(out);
+            }
+            return;
+        }
+    }
+
+    public static String RS_SHOW_KEY = "-show";
+    public static String RS_REMOVE_KEY = "-rm";
+    public static String RS_CLEAR_KEY = "-clear";
+    public static String RS_LIST_KEY = "-list";
+
+    protected void showResultSetHelp() {
+        sayi("Result set management.");
+        sayi("If you save a result set using the " + SEARCH_RESULT_SET_NAME + " flag in the search");
+        sayi("command, you can display it, here or remove it.");
+        sayi("Other commands will allow for using the result set ");
+        sayi(RS_REMOVE_KEY + " remove the stored result set. This does not touch the entries.");
+        sayi(RS_LIST_KEY + " list store results sets");
+        sayi(RS_CLEAR_KEY + " clear all stored result sets.");
+        sayi(RS_SHOW_KEY + " show the given result set.");
+        sayi("The following switches are supported for the " + RS_SHOW_KEY + " command:");
+        showCommandLineSwitchesHelp();
+    }
+
 }

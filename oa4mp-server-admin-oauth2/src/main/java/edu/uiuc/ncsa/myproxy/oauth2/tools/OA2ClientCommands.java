@@ -4,13 +4,13 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2ClientUtils;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientKeys;
 import edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.QDLJSONConfigUtil;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.ClientApprovalStoreCommands;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.ClientStoreCommands;
 import edu.uiuc.ncsa.qdl.scripting.JSONScriptUtil;
 import edu.uiuc.ncsa.qdl.scripting.Scripts;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.delegation.server.storage.ClientApprovalStore;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.ScriptingConstants;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfigurationUtil;
 import edu.uiuc.ncsa.security.storage.XMLMap;
@@ -40,9 +40,10 @@ public class OA2ClientCommands extends ClientStoreCommands {
     public OA2ClientCommands(MyLoggingFacade logger,
                              String defaultIndent,
                              Store clientStore,
-                             ClientApprovalStore clientApprovalStore) {
-        super(logger, defaultIndent, clientStore, clientApprovalStore);
+                             ClientApprovalStoreCommands clientApprovalStoreCommands) {
+        super(logger, defaultIndent, clientStore, clientApprovalStoreCommands);
     }
+
 
     public boolean isRefreshTokensEnabled() {
         return refreshTokensEnabled;
@@ -481,6 +482,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
         if (currentValue == null && key.equals(keys.cfg())) {
             map.put(key, "{}"); // empty JSON is still JSON.
         }
+
         return super.updateSingleValue(map, key);
     }
 
