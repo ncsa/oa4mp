@@ -285,16 +285,33 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
 
     public static final String UNLINK_ALL_FLAG = "-all";
     public static final String UNLINK_REMOVE_FLAG = "-rm";
+    protected void unlinkRS(InputLine inputLine){
+        String rsName = inputLine.getNextArgFor(SEARCH_RESULT_SET_NAME);
+        RSRecord rsRecord = null;
+        if(isCARS(rsName)){
+            rsRecord = clientApprovalStoreCommands.getResultSets().get(rsName);
+        }else{
+            rsRecord = getResultSets().get(rsName);
+        }
+        if(rsRecord == null){
+            say("sorry, result set \"" + rsName + "\" not found");
+            return;
+        }
 
+    }
     public void unlink(InputLine inputLine) {
         if (showHelp(inputLine)) {
             say("unlink " + UNLINK_ALL_FLAG + " | client_id  + [" + UNLINK_REMOVE_FLAG + "] [admin_id]- unlink the client with the given client_id admin client");
             say(UNLINK_ALL_FLAG + " - (no client_id) unlink all clients, not just the specified one.");
             say(UNLINK_REMOVE_FLAG + " - remove clients that are unlinked.");
-            say("This means that the clients will still exist less you specifially remove it.");
+            say("This means that the clients will still exist unless you specifially remove them.");
             say("Properly speaking, you would use the " + UNLINK_ALL_FLAG + " only before removing the ");
             say("admin client itself and retiring it.");
-            say("See also: link_client");
+            say("See also: link");
+            return;
+        }
+        if(inputLine.hasArg(SEARCH_RESULT_SET_NAME)){
+            unlinkRS(inputLine);
             return;
         }
         boolean removeClient = inputLine.hasArg(UNLINK_REMOVE_FLAG);

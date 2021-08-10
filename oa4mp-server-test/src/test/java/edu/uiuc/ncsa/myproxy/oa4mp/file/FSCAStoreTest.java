@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.TestUtils;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.ClientApprovalProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.storage.filestore.DSFSClientApprovalStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.ClientApproverConverter;
+import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.FilePermissionsException;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
@@ -13,6 +14,7 @@ import edu.uiuc.ncsa.security.delegation.server.storage.impl.FSClientApprovalSto
 import edu.uiuc.ncsa.security.storage.FileStore;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * @deprecated
@@ -43,7 +45,12 @@ public class FSCAStoreTest extends CAStoreTest {
         try {
             // Make sure that if someone creates a bad one, it blows up in the constructor.
              x = new FSClientApprovalStore(null, null, null, null, true) {
-                       @Override
+                 @Override
+                 public List<Identifier> statusSearch(String status) {
+                     return null;
+                 }
+
+                 @Override
                        public Object put(Object key, Object value) {
                            return null;
                        }

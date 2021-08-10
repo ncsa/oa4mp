@@ -8,6 +8,9 @@ import edu.uiuc.ncsa.security.delegation.server.storage.ClientApprovalStore;
 import edu.uiuc.ncsa.security.storage.MemoryStore;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 7/2/18 at  2:01 PM
@@ -60,5 +63,16 @@ public class ClientApprovalMemoryStore<V extends ClientApproval> extends MemoryS
     @Override
     public MapConverter getMapConverter() {
         return converter;
+    }
+
+    @Override
+    public List<Identifier> statusSearch(String status) {
+        List<Identifier> identifiers = new ArrayList<>();
+        for(Identifier identifier : keySet()){
+            if(get(identifier).getStatus().getStatus().equals(status)){
+                identifiers.add(identifier);
+            }
+        }
+        return identifiers;
     }
 }

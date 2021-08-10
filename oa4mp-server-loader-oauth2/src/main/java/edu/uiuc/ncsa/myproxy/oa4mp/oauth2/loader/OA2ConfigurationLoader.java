@@ -93,16 +93,16 @@ import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.*;
  * on 9/23/13 at  1:50 PM
  */
 public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends AbstractConfigurationLoader<T> {
-    public static final String STRICT_ACLS = "strict_acls";
+    public static final String STRICT_ACLS = "strict_acls"; // for QDL
     public static final String SAFE_GARBAGE_COLLECTION = "safe_gc";
     public static final String PRINT_TS_IN_DEBUG = "printTSInDebug";
     public static final String NOTIFY_ADMIN_CLIENT_ADDRESSES = "notifyACEmailAddresses";
     public static final String CLEANUP_INTERVAL_TAG  = "cleanup_interval";
+
     /**
      * Default is 15 days. Internally the refresh lifetime (as all date-ish things) are in milliseconds
      * though the configuration file is assumed to be in seconds.
      */
-
     public static long REFRESH_TOKEN_LIFETIME_DEFAULT = 15 * 24 * 3600 * 1000L; // 15 days
     public static long MAX_REFRESH_TOKEN_LIFETIME_DEFAULT = 2 * REFRESH_TOKEN_LIFETIME_DEFAULT; // 30 days
 

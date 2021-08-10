@@ -1,11 +1,15 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient;
 
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
+import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.delegation.server.storage.ClientApprovalStore;
+import edu.uiuc.ncsa.security.delegation.server.storage.impl.GenericClientStoreUtils;
 import edu.uiuc.ncsa.security.storage.FileStore;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
 import java.io.File;
 import java.util.Date;
+import java.util.List;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -33,14 +37,20 @@ public class AdminClientFS<V extends AdminClient> extends FileStore<V> implement
         return converter;
     }
 
-    @Override
-    public IdentifiableProvider getACProvider() {
-        return this.identifiableProvider;
-    }
 
     @Override
     public void realSave(boolean checkExists, V t) {
         t.setLastModifiedTS(new java.sql.Timestamp(new Date().getTime()));
         super.realSave(checkExists, t);
+    }
+
+    @Override
+    public List<Identifier> getByStatus(String status, ClientApprovalStore clientApprovalStore) {
+        return GenericClientStoreUtils.getByStatus(this, status, clientApprovalStore);
+    }
+
+    @Override
+    public List<Identifier> getByApprover(String approver, ClientApprovalStore clientApprovalStore) {
+        return GenericClientStoreUtils.getByApprover(this, approver, clientApprovalStore);
     }
 }

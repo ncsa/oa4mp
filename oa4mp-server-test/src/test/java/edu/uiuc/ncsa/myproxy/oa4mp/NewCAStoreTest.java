@@ -16,6 +16,7 @@ import edu.uiuc.ncsa.security.util.TestBase;
 
 import java.io.File;
 import java.util.Date;
+import java.util.List;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -122,7 +123,12 @@ public class NewCAStoreTest extends TestBase {
           try {
               // Make sure that if someone creates a bad one, it blows up in the constructor.
                x = new FSClientApprovalStore(null, null, null, null, true) {
-                         @Override
+                   @Override
+                   public List<Identifier> statusSearch(String status) {
+                       return null;
+                   }
+
+                   @Override
                          public Object put(Object key, Object value) {
                              return null;
                          }

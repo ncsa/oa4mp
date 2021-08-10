@@ -14,6 +14,7 @@ import edu.uiuc.ncsa.security.delegation.server.storage.BaseClientStore;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApprovalStore;
 import edu.uiuc.ncsa.security.delegation.storage.BaseClient;
+import edu.uiuc.ncsa.security.delegation.storage.ClientApprovalKeys;
 import edu.uiuc.ncsa.security.util.cli.ExitException;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import net.sf.json.JSON;
@@ -27,7 +28,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval.Status.APPROVED;
+import static edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval.Status.*;
 import static edu.uiuc.ncsa.security.util.cli.CLIDriver.CLEAR_BUFFER_COMMAND;
 import static edu.uiuc.ncsa.security.util.cli.CLIDriver.EXIT_COMMAND;
 
@@ -368,39 +369,130 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
         }
     }
 
-    public static String SEARCH_STATUS_KEY = "-status";
 
-    @Override
-    public void search(InputLine inputLine) {
-        if (inputLine.hasArg(SEARCH_STATUS_KEY)) {
-            statusSearch(inputLine);
+    public void approver_search(InputLine inputLine) {
+        if (showHelp(inputLine)) {
+            sayi("approver_search [ " + SEARCH_RESULT_SET_NAME + " rs_name] approver  - search for all " +
+                    "approvals by a given approver.");
+            sayi(SEARCH_RESULT_SET_NAME + " rs_name - save the result set under then name rs_name");
+            sayi("Note that this searched for approvers restricted to current store. If you want");
+            say("to search the entire set of approvers (and have regexes and dates available)");
+            sayi("you should use the approvers component and do your searches there.");
+            sayi("See also: status_search");
             return;
         }
-        super.search(inputLine);
-    }
 
+        boolean saveRS = inputLine.hasArg(SEARCH_RESULT_SET_NAME);
+        String rsName = null;
+        if (saveRS) {
+            rsName = inputLine.getNextArgFor(SEARCH_RESULT_SET_NAME);
+            inputLine.removeSwitchAndValue(SEARCH_RESULT_SET_NAME);
+        }
+        String approver = inputLine.getLastArg();
 
-    protected void statusSearch(InputLine inputLine) {
-        BaseClientStore clientStore = (BaseClientStore)getStore();
-        List<Identifier> ids =clientStore.getByStatus(inputLine.getNextArgFor(SEARCH_STATUS_KEY), getClientApprovalStore());
-
-        //List<Identifier> ids = getClientApprovalStore().statusSearch(inputLine.getNextArgFor(SEARCH_STATUS_KEY));
+        List<Identifier> ids = ((BaseClientStore) getStore()).getByApprover(approver, getClientApprovalStore());
         List<Identifiable> acs = new ArrayList<>();
         int i = 0;
         for (Identifier id : ids) {
-            acs.add(new ClientApproval(id));
+            // We have to have an Identifiable to stash, but do not want to e.g. suck in
+            // a huge amount of information from the database. So we just get the ids and
+            // create a placeholder. We can do this since we control this.
+            ClientApproval ca = new ClientApproval(id);
+            ca.setApprover(approver);
+            acs.add(ca);
         }
-        List<String> id = new ArrayList<>();
-        id.add(getMapConverter().getKeys().identifier());
+        ClientApprovalKeys caKeys = (ClientApprovalKeys) getClientApprovalStore().getMapConverter().getKeys();
+        List<String> fields = new ArrayList<>();
+        fields.add(caKeys.identifier());
+        fields.add(caKeys.approver());
 
-        if (inputLine.hasArg(SEARCH_RESULT_SET_NAME)) {
-            String name = inputLine.getNextArgFor(SEARCH_RESULT_SET_NAME);
-            if (getResultSets().containsKey(name)) {
-                getResultSets().remove(name);
-                say("warning: overwriting existing client result set \"" + name + "\"");
+        if (saveRS) {
+            // Remove it any same named from the client's saved result sets.
+            if (getResultSets().containsKey(rsName)) {
+                getResultSets().remove(rsName);
+                say("warning: overwriting existing client result set \"" + rsName + "\"");
             }
-            clientApprovalStoreCommands.getResultSets().put(inputLine.getNextArgFor(SEARCH_RESULT_SET_NAME), new RSRecord(acs, id));
+            clientApprovalStoreCommands.getResultSets().put(rsName, new RSRecord(acs, fields));
         }
+    }
+
+    public void status_search(InputLine inputLine) {
+        if (showHelp(inputLine)) {
+            sayi("status_search [" + SEARCH_RESULT_SET_NAME + " rs_name] status - search for all clients with the given status");
+            sayi(SEARCH_RESULT_SET_NAME + " rs_name - save the result set under the given name");
+            sayi("status - the status. Allowed ones are");
+            sayi(StringUtils.RJustify(APPROVED.getStatus(), 10) + " or a = approved");
+            sayi(StringUtils.RJustify(DENIED.getStatus(), 10) + " or d = denied");
+            sayi(StringUtils.RJustify(NONE.getStatus(), 10) + " or n = none");
+            sayi(StringUtils.RJustify(PENDING.getStatus(), 10) + " or p = pending");
+            sayi(StringUtils.RJustify(REVOKED.getStatus(), 10) + " or r = revoked");
+            say("E.g.");
+            sayi("status_search -rs my_pending p");
+            sayi("would search for all pending approvals and saved them in the result set named my_pending");
+            return;
+        }
+
+        boolean saveRS = inputLine.hasArg(SEARCH_RESULT_SET_NAME);
+        String rsName = null;
+        if (saveRS) {
+            rsName = inputLine.getNextArgFor(SEARCH_RESULT_SET_NAME);
+            inputLine.removeSwitchAndValue(SEARCH_RESULT_SET_NAME);
+        }
+        String rawStatus = inputLine.getLastArg();
+        switch (rawStatus) {
+            case "a":
+                rawStatus = APPROVED.getStatus();
+                break;
+            case "d":
+                rawStatus = DENIED.getStatus();
+                break;
+            case "n":
+                rawStatus = NONE.getStatus();
+                break;
+            case "p":
+                rawStatus = PENDING.getStatus();
+                break;
+            case "r":
+                rawStatus = REVOKED.getStatus();
+                break;
+        }
+        BaseClientStore clientStore = (BaseClientStore) getStore();
+        List<Identifier> ids = clientStore.getByStatus(rawStatus, getClientApprovalStore());
+
+        List<Identifiable> acs = new ArrayList<>();
+        int i = 0;
+        for (Identifier id : ids) {
+            // We have to have an Identifiable to stash, but do not want to e.g. suck in
+            // a huge amount of information from the database. So we just get the ids and
+            // create a placeholder. We can do this since we control this.
+            ClientApproval ca = new ClientApproval(id);
+            ca.setStatus(ClientApproval.Status.resolveByStatusValue(rawStatus));
+            acs.add(ca);
+        }
+        ClientApprovalKeys caKeys = (ClientApprovalKeys) getClientApprovalStore().getMapConverter().getKeys();
+        List<String> fields = new ArrayList<>();
+        fields.add(caKeys.identifier());
+        fields.add(caKeys.status());
+
+        if (saveRS) {
+            // Remove it any same named from the client's saved result sets.
+            if (getResultSets().containsKey(rsName)) {
+                getResultSets().remove(rsName);
+                say("warning: overwriting existing client result set \"" + rsName + "\"");
+            }
+            clientApprovalStoreCommands.getResultSets().put(rsName, new RSRecord(acs, fields));
+        }
+    }
+
+    /**
+     * CARS = <b>C</b>lient <b>A</b>pproval <b>R</b>esult <b>S</b>et. Return true if the given name is stored as a result
+     * set for client approvals.
+     *
+     * @param name
+     * @return
+     */
+    protected boolean isCARS(String name) {
+        return clientApprovalStoreCommands.getResultSets().containsKey(name);
     }
 
     @Override
@@ -408,7 +500,7 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
         // Have to take into account if the result set is for a set of approvals.
         if (inputLine.hasArg(RS_SHOW_KEY)) {
             String name = inputLine.getLastArg();
-            if (clientApprovalStoreCommands.getResultSets().containsKey(name)) {
+            if (isCARS(name)) {
                 clientApprovalStoreCommands.rs(inputLine);
                 return;
             }
@@ -418,12 +510,13 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
         }
         if (inputLine.hasArg(RS_REMOVE_KEY)) {
             String name = inputLine.getLastArg();
-            if (clientApprovalStoreCommands.getResultSets().containsKey(name)) {
+            if (isCARS(name)) {
                 clientApprovalStoreCommands.getResultSets().remove(name);
                 return;
             }
         }
         if (inputLine.hasArg(RS_LIST_KEY)) {
+            // List lists all things, so no test about where the rs is stored.
             clientApprovalStoreCommands.rs(inputLine);
         }
         super.rs(inputLine);
@@ -435,18 +528,18 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
             String name = inputLine.getNextArgFor(SEARCH_RESULT_SET_NAME);
             RSRecord rsRecord = null;
             // get the right result set.
-            if(clientApprovalStoreCommands.getResultSets().containsKey(name)){
+            if (clientApprovalStoreCommands.getResultSets().containsKey(name)) {
                 rsRecord = clientApprovalStoreCommands.getResultSets().get(name);
-            }else {
+            } else {
                 rsRecord = resultSets.get(name);
             }
             if (rsRecord == null) {
                 say("no such stored result.");
                 return;
             }
-            if(!"Y".equals(readline("Getting ready to remove " + rsRecord.rs.size() + " entries. Proceed?(Y/n)"))){
-                 say("aborted");
-                 return;
+            if (!"Y".equals(readline("Getting ready to remove " + rsRecord.rs.size() + " entries. Proceed?(Y/n)"))) {
+                say("aborted");
+                return;
             }
             getClientApprovalStore().remove(rsRecord.rs);
             getStore().remove(rsRecord.rs);

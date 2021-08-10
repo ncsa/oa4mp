@@ -194,9 +194,4 @@ public class AdminClient extends BaseClient {
     }
 
     boolean notifyOnNewClientCreate = false;
-
-     @Override
-    public int getType(){
-        return CLIENT_TYPE_ADMIN;
-    }
 }
