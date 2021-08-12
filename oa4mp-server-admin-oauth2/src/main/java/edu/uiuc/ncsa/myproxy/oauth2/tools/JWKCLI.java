@@ -17,6 +17,7 @@ import java.io.FileReader;
 import java.util.List;
 import java.util.Vector;
 
+import static edu.uiuc.ncsa.security.util.cli.CommonCommands.BATCH_FILE_MODE_FLAG;
 import static edu.uiuc.ncsa.security.util.cli.CommonCommands.BATCH_MODE_FLAG;
 
 /**
@@ -110,7 +111,7 @@ public class JWKCLI extends ConfigurableCommandsImpl {
         say(SHORT_NO_OUTPUT_FLAG + ", " + LONG_NO_OUTPUT_FLAG + " = turn off all output");
         say("   You can set this in a batch file by invoking set_no_ouput true|false");
         say(BATCH_MODE_FLAG + "= interpret everything else on the command line as a command, aside from flags. Note this means you can execute a single command.");
-        say(JWKUtilCommands.BATCH_FILE_MODE_FLAG + "= this is the fully qualified path to a file of commands which will be interpreted one after the other.");
+        say(BATCH_FILE_MODE_FLAG + "= this is the fully qualified path to a file of commands which will be interpreted one after the other.");
     }
 
 
@@ -137,7 +138,7 @@ public class JWKCLI extends ConfigurableCommandsImpl {
 
         boolean isVerbose = argLine.hasArg(SHORT_VERBOSE_FLAG) || argLine.hasArg(LONG_VERBOSE_FLAG);
         // again, a batch file means every line in the file is a separate comamand, aside from comments
-        boolean hasBatchFile = argLine.hasArg(JWKUtilCommands.BATCH_FILE_MODE_FLAG);
+        boolean hasBatchFile = argLine.hasArg(BATCH_FILE_MODE_FLAG);
         // Batch mode means that the command line is interpreted as a single command. This executes one command, batch mode does many.
         boolean isBatchMode = argLine.hasArg(JWKUtilCommands.BATCH_MODE_FLAG);
         boolean isNoOuput = (argLine.hasArg(SHORT_NO_OUTPUT_FLAG) || argLine.hasArg(LONG_NO_OUTPUT_FLAG));
@@ -170,7 +171,7 @@ public class JWKCLI extends ConfigurableCommandsImpl {
             }
             jwkUtilCommands.setBatchMode(false);
             if (hasBatchFile) {
-                jwkcli.processBatchFile(argLine.getNextArgFor(JWKUtilCommands.BATCH_FILE_MODE_FLAG), cli);
+                jwkcli.processBatchFile(argLine.getNextArgFor(BATCH_FILE_MODE_FLAG), cli);
                 return;
             }
             if (isBatchMode) {
@@ -220,8 +221,8 @@ public class JWKCLI extends ConfigurableCommandsImpl {
         // need to tease out the intended line to execute. The arg line looks like
         // jwkutil -batch A B C
         // so we need to drop the name of the function and the -batch flag.
-        arg.removeSwitch(JWKUtilCommands.BATCH_FILE_MODE_FLAG);
-        arg.removeSwitch(JWKUtilCommands.BATCH_FILE_MODE_FLAG);
+        arg.removeSwitch(BATCH_MODE_FLAG);
+        arg.removeSwitch(BATCH_FILE_MODE_FLAG);
         arg.removeSwitch(DUMMY_FUNCTION);
         cli.execute(arg);
     }

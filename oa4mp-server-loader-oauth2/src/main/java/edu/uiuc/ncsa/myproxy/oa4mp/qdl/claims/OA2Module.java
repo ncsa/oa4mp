@@ -30,6 +30,7 @@ public class OA2Module extends JavaModule {
         funcs.add(new CreateSourceConfig());
         funcs.add(new NewTemplate());
         funcs.add(new IsInGroup());
+        funcs.add(new IsInGroup2());
         funcs.add(new ScopeTemplateQDLUtil());
         funcs.add(new TemplateSubsitutionQDLUtil());
         // JPath was officially incorporated into QDL.

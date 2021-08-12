@@ -4,7 +4,7 @@ echo
   Hello
   World;
 
-# Note that the echo command spans several lines. Once a semi-colong is hit, that is the end of the command
+# Note that the echo command spans several lines. Once a semi-colon is hit, that is the end of the command
 # and it is processed.
 
 # You can turn output on or off too

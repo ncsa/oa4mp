@@ -348,49 +348,33 @@ public abstract class StoreCommands2 extends StoreCommands {
 
     }
 
-    protected void showSearchHelp() {
-        say("search " +
-                KEY_FLAG + " key | " + KEY_SHORTHAND_PREFIX + "key " +
-                "[" + SEARCH_REGEX_FLAG + "|" + SEARCH_SHORT_REGEX_FLAG + " regex] " +
-                "[" + SEARCH_SIZE_FLAG + "] " +
-                "[" + SEARCH_DEBUG_FLAG + "] " +
-                "[" + LINE_LIST_COMMAND + "] " +
-                "[" + SEARCH_DATE_FLAG + " date_filed " + SEARCH_BEFORE_TS_FLAG +" time | " +SEARCH_AFTER_TS_FLAG +  " time] " +
-                "[" + SEARCH_RESULT_SET_NAME + " name] | " +
-                VERBOSE_COMMAND + " ] [" +
-                SEARCH_RETURNED_ATTRIBUTES_FLAG + " list] [condition]");
-        sayi("Usage: Searches the current component for all entries satisfying the condition.");
-        sayi("You may also specify that the ");
-        sayi("condition is a regular expression rather than using simple equality");
-        sayi("   Note that condition is used if there is no regex specified. If there is a regex");
-        sayi("   specified as well, that takes precedence.");
-        sayi("Invoking this with the -listkeys flag prints out all the keys for this store. Omit that for searches.");
-        sayi(KEY_FLAG + " (required) the name of the key to be searched for");
-        sayi(SEARCH_REGEX_FLAG + "|" + SEARCH_SHORT_REGEX_FLAG + " regex (optional) attempt to interpret regex as a regular expression");
-        sayi(SEARCH_RESULT_SET_NAME + " name (optional) save the result as the name.");
-        sayi(SEARCH_DEBUG_FLAG + " (optional) show stack traces. Only use this if you really need it.");
-        sayi(SEARCH_DATE_FLAG + " (optional) Search by date. You must have at least one time by either " + SEARCH_BEFORE_TS_FLAG + " or " + SEARCH_AFTER_TS_FLAG);
-        sayi("For date searches you may use either an ISO 8601 date in the form YYYY-MM-DD or time, e.g. 2021-04-05T13:00:00Z");
-        sayi("would at 1 pm in UTC. If you do not supply a final Z or other timezone (+/HH:mm) then your current timezone is used.");
-        sayi("To search on a date range (i.e. between two times) specify both your before and after dates");
-        showCommandLineSwitchesHelp();
-        showKeyShorthandHelp();
-        say("E.g.\n");
-        sayi("search " + KEY_SHORTHAND_PREFIX + "approver " + " junit\n");
-        sayi("(approvals component) Searches the current store for the approver that is exactly 'junit'\n");
-        say("E.g.\n");
-        sayi("search " + KEY_SHORTHAND_PREFIX + "client_id " + SEARCH_REGEX_FLAG + " \".*07028.*\"\n");
-        sayi("(clients components) This would find the clients whose identifiers contain the string 07028\n");
-        say("E.g.\n");
-        sayi("search " + KEY_FLAG + " email " + SEARCH_SHORT_REGEX_FLAG + " \".*bigstate\\.edu.*\"\n");
-        sayi("(clients or user component.) This would match all email addresses from that institution bigstate.edu.");
-        sayi("Note that the period must be escaped for a regex.\n");
-        say("E.g.\n");
+    protected void showSearchHelpExamples() {
+        say("E.g.");
+        sayi("search " + KEY_SHORTHAND_PREFIX + "approver " + " junit");
+        say("Searches for the approver keys that are exactly 'junit'");
+        say("E.g.");
+        sayi("search " + KEY_SHORTHAND_PREFIX + "client_id " + SEARCH_REGEX_FLAG + " \".*07028.*\"");
+        say("Searches for the client_id keys that contains '07028'");
+        say("E.g.");
+        sayi("search " + KEY_FLAG + " email " + SEARCH_SHORT_REGEX_FLAG + " \".*bigstate\\.edu.*\"");
+        say("Searches the email keys that contain 'bigstate.edu'.");
+        say("Note that the period must be escaped for a regex.");
+        say("E.g.");
         sayi("search " + KEY_SHORTHAND_PREFIX + "client_id " +
                 SEARCH_RETURNED_ATTRIBUTES_FLAG + " [name, email] " +
-                SEARCH_SHORT_REGEX_FLAG + " " + ".*237.*\n");
-        sayi("(clients or user component) This would search for all client id's that contain the string 237 and only print out the name and email from those.");
+                SEARCH_SHORT_REGEX_FLAG + " " + ".*237.*");
+        say("Searches the client_id keys that contain the string 237 and only print out the name and email from those.");
+        say("E.g.");
+        sayi("search " + SEARCH_DATE_FLAG + " creation_ts " + SEARCH_BEFORE_TS_FLAG  + " 2021-01-02 " + SEARCH_RESULT_SET_NAME + " last_year");
+        say("Searches the creation_ts keys as dates, returning all that are before Jan 2, 20201.");
+        say("This also stores the result under the name last_year. See also the rs command help");
+        say("E.g.");
+        sayi("search " + KEY_SHORTHAND_PREFIX + "email " + SEARCH_SHORT_REGEX_FLAG + " \".*bigstate\\.edu.*\" " + SEARCH_DATE_FLAG + " creation_ts " + SEARCH_BEFORE_TS_FLAG  + " 2021-01-02 " + SEARCH_RESULT_SET_NAME + " last_year_email");
+        say("Searches per date as in the previous example and further restricts it to matching the given key.");
+        say("This also stores the result under the name last_year_email. See also the rs command help");
+
     }
+
 
     //    static String SEARCH_LIST_KEYS_FLAG = "-listKeys";
     public static final String SEARCH_REGEX_FLAG = "-regex";
@@ -432,11 +416,61 @@ public abstract class StoreCommands2 extends StoreCommands {
         return tzOffset;
     }
 
+    protected void showSearchHelp() {
+        say("search ");
+        sayi("[" + KEY_FLAG + " key | " + KEY_SHORTHAND_PREFIX + "key] ");
+        sayi("[(" + SEARCH_REGEX_FLAG + "|" + SEARCH_SHORT_REGEX_FLAG + ") regex] ");
+        sayi("[" + SEARCH_SIZE_FLAG + "] ");
+        sayi("[" + SEARCH_DEBUG_FLAG + "] ");
+        sayi("[" + LINE_LIST_COMMAND + " | " + VERBOSE_COMMAND + "]");
+        sayi("[" + SEARCH_DATE_FLAG + " date_field (" + SEARCH_BEFORE_TS_FLAG + " time | " + SEARCH_AFTER_TS_FLAG + " time)] ");
+        sayi("[" + SEARCH_RESULT_SET_NAME + " name] ");
+        sayi("[" + SEARCH_RETURNED_ATTRIBUTES_FLAG + " list]");
+        sayi("[condition]");
+        say("----");
+        sayi("Usage: Searches the current component for all entries satisfying the condition.");
+        sayi("You may search either on a key, by date or both");
+        sayi("The key search can be with a regular expression. Use the regex flag, other wise the last argument");
+        sayi("[condition] will be matched exactly.");
+        sayi("Note that condition is used if there is no regex specified. If there is a regex");
+        sayi("specified as well, that takes precedence.");
+        say("Search options");
+        say("----");
+           int w = 15; // field with for lh side
+        String blanks = "                                                                   ";
+        String link = " - ";
+        blanks = blanks.substring(0,w+link.length()); // padding for any lines that run over
+        say(StringUtils.RJustify(KEY_FLAG + " key | " + KEY_SHORTHAND_PREFIX + "key", w) + link + "the name of the key to be searched for");
+        say(StringUtils.RJustify(SEARCH_REGEX_FLAG + "|" + SEARCH_SHORT_REGEX_FLAG + " regex",w) +link + "attempt to interpret regex as a regular expression");
+        say(StringUtils.RJustify(SEARCH_RESULT_SET_NAME + " name", w)+ link + "save the result as the name.");
+        say(StringUtils.RJustify(SEARCH_DEBUG_FLAG, w) + link + "show stack traces. Only use this if you really need it.");
+        say(StringUtils.RJustify(SEARCH_DATE_FLAG, w) + link + "search by date. You must have at least one time using either " + SEARCH_BEFORE_TS_FLAG + " or " + SEARCH_AFTER_TS_FLAG);
+        say(blanks + "For date searches you may use either an ISO 8601 date in the form ");
+        say(blanks + "YYYY-MM-DD or time, e.g. 2021-04-05T13:00:00Z");
+        say(blanks + "would at 1 pm in UTC. If you do not supply a final Z or other timezone");
+        say(blanks + "(+-HH:mm) then your current timezone is used.");
+        say(blanks + "To search on a date range (i.e. between two times) specify both your");
+        say(blanks + "before and after dates. Date searches are inclusive of the dates.");
+        say("----");
+        say("Other supported options");
+        showCommandLineSwitchesHelp();
+        showKeyShorthandHelp();
+        sayi("If you want to see examples, invoke this with --ex.");
+    }
+
     @Override
     public void search(InputLine inputLine) {
         if (showHelp(inputLine)) {
             showSearchHelp();
+            if (inputLine.hasArg("--ex")) {
+                say(""); // give it a break in wall of text
+                showSearchHelpExamples();
+            }
             return;
+        } else {
+            if (inputLine.hasArg("--ex")) {
+                showSearchHelpExamples();
+            }
         }
 
         boolean showStackTraces = inputLine.hasArg(SEARCH_DEBUG_FLAG);
@@ -454,48 +488,48 @@ public abstract class StoreCommands2 extends StoreCommands {
             dateField = inputLine.getNextArgFor(SEARCH_DATE_FLAG);
             inputLine.removeSwitchAndValue(SEARCH_DATE_FLAG);
             try {
-                if(inputLine.hasArg(SEARCH_BEFORE_TS_FLAG)) {
+                if (inputLine.hasArg(SEARCH_BEFORE_TS_FLAG)) {
                     beforeDate = getDateFromArg(inputLine, SEARCH_BEFORE_TS_FLAG);
                 }
-                if(inputLine.hasArg(SEARCH_AFTER_TS_FLAG)) {
+                if (inputLine.hasArg(SEARCH_AFTER_TS_FLAG)) {
                     afterDate = getDateFromArg(inputLine, SEARCH_AFTER_TS_FLAG);
                 }
             } catch (ParseException pe) {
                 say("Sorry, could not parse date: " + pe.getMessage());
-                if (DebugUtil.isEnabled()) {
+                if (DebugUtil.isEnabled() || showStackTraces) {
                     pe.printStackTrace();
                 }
                 return;
             }
 
         }
-        String key = getKeyArg(inputLine);
+        String key = getAndCheckKeyArg(inputLine);
         List<Identifiable> values = null;
         List<String> returnedAttributes = null;
         String condition = null;
         boolean isRegEx = false;
         boolean hasKey = key != null;
         if (hasKey) {
-        if (inputLine.hasArg(SEARCH_RETURNED_ATTRIBUTES_FLAG)) {
-            returnedAttributes = inputLine.getArgList(SEARCH_RETURNED_ATTRIBUTES_FLAG);
-            inputLine.removeSwitchAndValue(SEARCH_RETURNED_ATTRIBUTES_FLAG);
-        }
-        condition = inputLine.getLastArg(); // default
-        isRegEx = inputLine.hasArg(SEARCH_REGEX_FLAG) || inputLine.hasArg(SEARCH_SHORT_REGEX_FLAG);
-        if (isRegEx) {
-            if(inputLine.hasArg(SEARCH_REGEX_FLAG)) {
-                condition = inputLine.getNextArgFor(SEARCH_REGEX_FLAG);
-                inputLine.removeSwitchAndValue(SEARCH_REGEX_FLAG);
+            if (inputLine.hasArg(SEARCH_RETURNED_ATTRIBUTES_FLAG)) {
+                returnedAttributes = inputLine.getArgList(SEARCH_RETURNED_ATTRIBUTES_FLAG);
+                inputLine.removeSwitchAndValue(SEARCH_RETURNED_ATTRIBUTES_FLAG);
             }
-            if(inputLine.hasArg(SEARCH_SHORT_REGEX_FLAG)){
-                condition = inputLine.getNextArgFor(SEARCH_SHORT_REGEX_FLAG);
-                inputLine.removeSwitchAndValue(SEARCH_SHORT_REGEX_FLAG);
+            condition = inputLine.getLastArg(); // default
+            isRegEx = inputLine.hasArg(SEARCH_REGEX_FLAG) || inputLine.hasArg(SEARCH_SHORT_REGEX_FLAG);
+            if (isRegEx) {
+                if (inputLine.hasArg(SEARCH_REGEX_FLAG)) {
+                    condition = inputLine.getNextArgFor(SEARCH_REGEX_FLAG);
+                    inputLine.removeSwitchAndValue(SEARCH_REGEX_FLAG);
+                }
+                if (inputLine.hasArg(SEARCH_SHORT_REGEX_FLAG)) {
+                    condition = inputLine.getNextArgFor(SEARCH_SHORT_REGEX_FLAG);
+                    inputLine.removeSwitchAndValue(SEARCH_SHORT_REGEX_FLAG);
+                }
             }
-        }
         }
         try {
-            if(hasKey){
-                if(hasDate){
+            if (hasKey) {
+                if (hasDate) {
                     values = getStore().search(
                             key,
                             condition,
@@ -504,32 +538,39 @@ public abstract class StoreCommands2 extends StoreCommands {
                             dateField,
                             beforeDate, afterDate);
 
-                }else {
+                } else {
                     values = getStore().search(
                             key,
                             condition,
                             isRegEx,
                             returnedAttributes,
                             null,
-                            null, null);
+                            null,
+                            null);
                 }
-            }else{
-                 if(hasDate){
-                     values = getStore().search(
-                             null,
-                             null,
-                             false,
-                             returnedAttributes,
-                             dateField,
-                             beforeDate, afterDate);
+            } else {
+                if (hasDate) {
+                    values = getStore().search(
+                            null,
+                            null,
+                            false,
+                            returnedAttributes,
+                            dateField,
+                            beforeDate,
+                            afterDate);
 
-                 }else{
-                      // no query, do nothing.
-                 }
+                } else {
+                    // no query, do nothing.
+                }
+            }
+            if (values == null) {
+                String kk = getKeyArg(inputLine);
+                say("No searchable criteria found." + ((kk == null) ? " No key or date." : " \"" + kk + "\" is not a valid key for this store."));
+                return;
             }
             if (storeRS) {
                 resultSets.put(rsName, new RSRecord(values, returnedAttributes));
-                say("\ngot " + values.size() + " match" + (values.size() == 1 ? "." : "es."));
+                say("got " + values.size() + " match" + (values.size() == 1 ? "." : "es."));
                 return;
             }
         } catch (Throwable t) {
@@ -546,6 +587,7 @@ public abstract class StoreCommands2 extends StoreCommands {
         if (printRS(inputLine, values, returnedAttributes, null)) return;
         say("\ngot " + values.size() + " match" + (values.size() == 1 ? "." : "es."));
     }
+
     // use clients
     // search -date creation_ts -after 2020-05-01 -before 2020-05-30 -rs s2
     // search >client_id -r .*234.* -date creation_ts -after 2020-05-01 -before 2020-05-30 -rs s234
@@ -553,7 +595,7 @@ public abstract class StoreCommands2 extends StoreCommands {
     private Date getDateFromArg(InputLine inputLine, String arg) throws ParseException {
         String computedDateString = inputLine.getNextArgFor(arg);
         inputLine.removeSwitchAndValue(arg);
-        if(-1 == computedDateString.indexOf("T")){
+        if (-1 == computedDateString.indexOf("T")) {
             // then there is no time, just a date. Convert to ISO
             computedDateString = computedDateString + "T00:00:00" + getTzOffset();
         }
@@ -574,13 +616,14 @@ public abstract class StoreCommands2 extends StoreCommands {
     /**
      * If limits is empty or null, show everything. If limits has an element, that is the number of things to show
      * starting at 0. If it has two elements, the zeroth is the start, the 1st is that stop index.
+     *
      * @param inputLine
      * @param values
      * @param returnedAttributes
      * @param limits
      * @return
      */
-    protected boolean printRS(InputLine inputLine, List<Identifiable> values, List<String> returnedAttributes, List<Integer> limits) {
+    public boolean printRS(InputLine inputLine, List<Identifiable> values, List<String> returnedAttributes, List<Integer> limits) {
         if (values.isEmpty()) {
             say("no matches");
             return true;
@@ -591,18 +634,18 @@ public abstract class StoreCommands2 extends StoreCommands {
         }
         int start = 0;
         int stop = values.size();
-        if(limits != null && !limits.isEmpty()){
-            if(limits.size() == 1){
+        if (limits != null && !limits.isEmpty()) {
+            if (limits.size() == 1) {
                 stop = Math.min(values.size(), limits.get(0));
-            }else{
+            } else {
                 start = Math.max(0, limits.get(0));
                 stop = Math.min(values.size(), limits.get(1));
             }
         }
-
-        for (int i = start; i < stop;  i++) {
+        boolean longFormat = inputLine.hasArg(VERBOSE_COMMAND) || inputLine.hasArg(LINE_LIST_COMMAND);
+        for (int i = start; i < stop; i++) {
             Identifiable identifiable = values.get(i);
-            if (returnedAttributes != null) {
+            if (longFormat) {
                 longFormat(identifiable, returnedAttributes, inputLine.hasArg(VERBOSE_COMMAND));
                 if (1 < values.size()) {
                     say("-----"); // or the output runs together
@@ -611,7 +654,6 @@ public abstract class StoreCommands2 extends StoreCommands {
                 say(format(identifiable));
             }
         }
-
         return false;
     }
 
@@ -708,7 +750,7 @@ public abstract class StoreCommands2 extends StoreCommands {
             say("Object not found");
             return;
         }
-        String key = getKeyArg(inputLine);
+        String key = getAndCheckKeyArg(inputLine);
         // if the request does not have new stuff, do old stuff.
         if (key == null && !inputLine.hasArg(KEYS_FLAG)) {
             super.rm(inputLine);
@@ -746,7 +788,7 @@ public abstract class StoreCommands2 extends StoreCommands {
             showLSHelp();
             return;
         }
-        String key = getKeyArg(inputLine);
+        String key = getAndCheckKeyArg(inputLine);
         if (key == null && !inputLine.hasArg(KEYS_FLAG)) {
             super.ls(inputLine);
             return;
@@ -828,7 +870,7 @@ public abstract class StoreCommands2 extends StoreCommands {
             say("Sorry, you have specified both a value and a file for the value.");
             return;
         }
-        String key = getKeyArg(inputLine);
+        String key = getAndCheckKeyArg(inputLine);
         if (key == null && !inputLine.hasArg(KEYS_FLAG)) {
             say("sorry, but that is not a recognized key.");
             return;
@@ -1845,29 +1887,58 @@ public abstract class StoreCommands2 extends StoreCommands {
 
     /**
      * resolves key shorthand of >key_name or -key key_name
+     * returns null if no such key OR if it is not valid in the
+     * key list.
      *
      * @param inputLine
      * @return
      */
-    protected String getKeyArg(InputLine inputLine) {
-        if (inputLine.hasArg(KEY_FLAG)) {
-            return inputLine.getNextArgFor(KEY_FLAG);
+    protected String getAndCheckKeyArg(InputLine inputLine) {
+        String keyArg = getKeyArg(inputLine);
+        if (keyArg == null) {
+            return null;
         }
+
+        if (getMapConverter().getKeys().allKeys().contains(keyArg)) {
+            return keyArg;
+        }
+        return null;
+    }
+
+    protected String getKeyArg(InputLine inputLine) {
+        return getKeyArg(inputLine, false);
+    }
+
+    /**
+     * Just gets the key argument or null if not present. This does no checking if
+     * the key that is found is valid for the store.
+     *
+     * @param inputLine
+     * @param removeIt
+     * @return
+     */
+    protected String getKeyArg(InputLine inputLine, boolean removeIt) {
         if (inputLine.size() <= 1) {
             // so no actual arguments supplied.
             return null;
+        }
+        if (inputLine.hasArg(KEY_FLAG)) {
+            String k = inputLine.getNextArgFor(KEY_FLAG);
+            if (removeIt) {
+                inputLine.removeSwitchAndValue(KEYS_FLAG);
+            }
+            return k;
         }
 
         // have to search
         for (int i = 1; i < inputLine.size(); i++) {
             String arg = inputLine.getArg(i);
             if (arg.startsWith(KEY_SHORTHAND_PREFIX)) {
-                String out = arg.substring(1);
-                // check that it is a key. If not, ignore it.
-                if (getMapConverter().getKeys().allKeys().contains(out)) {
-                    inputLine.removeSwitch(arg); // or it can screw up other things.
-                    return out;
+                String k = arg.substring(1);
+                if (removeIt) {
+                    inputLine.removeSwitchAndValue(arg);
                 }
+                return k;
             }
         }
         return null;
@@ -1948,26 +2019,26 @@ public abstract class StoreCommands2 extends StoreCommands {
         if (inputLine.hasArg(RS_SHOW_KEY)) {
             String name = inputLine.getLastArg();
             inputLine.removeArgAt(inputLine.getArgCount());
-            int count =-1;
+            int count = -1;
             List<Integer> limits = new ArrayList<>();
-            if(inputLine.getArgCount() > 1){
+            if (inputLine.getArgCount() > 1) {
                 List<String> argsList = inputLine.getArgList(RS_SHOW_KEY);
-                if(argsList.isEmpty()) {
+                if (argsList.isEmpty()) {
                     limits.add(inputLine.getNextIntArg(RS_SHOW_KEY));
-                }else{
-                      for(String x : argsList){
-                          try{
-                              limits.add(Integer.parseInt(x));
-                          }catch(Throwable nfx){
-                              limits = null;
-                              break; // end the loop, no usable integers
-                          }
-                      }
+                } else {
+                    for (String x : argsList) {
+                        try {
+                            limits.add(Integer.parseInt(x));
+                        } catch (Throwable nfx) {
+                            limits = null;
+                            break; // end the loop, no usable integers
+                        }
+                    }
                 }
             }
             inputLine.removeSwitchAndValue(RS_SHOW_KEY);
             List<String> requestedKeys = null;
-            if(inputLine.hasArg(SEARCH_RETURNED_ATTRIBUTES_FLAG)){
+            if (inputLine.hasArg(SEARCH_RETURNED_ATTRIBUTES_FLAG)) {
                 requestedKeys = inputLine.getArgList(SEARCH_RETURNED_ATTRIBUTES_FLAG); // might be empty
                 inputLine.removeSwitchAndValue(SEARCH_RETURNED_ATTRIBUTES_FLAG);
             }
@@ -1976,7 +2047,7 @@ public abstract class StoreCommands2 extends StoreCommands {
                 return;
             }
             List<String> foundKeys = resultSets.get(name).fields;
-            if (requestedKeys!= null && !requestedKeys.isEmpty()) {
+            if (requestedKeys != null && !requestedKeys.isEmpty()) {
                 if (foundKeys == null) {
                     foundKeys = requestedKeys;
                 } else {

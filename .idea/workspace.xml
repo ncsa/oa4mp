@@ -12,9 +12,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e978b12f-4441-4d62-90dd-04c86c0aa044" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/qdl/claims/IsInGroup2.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-qdl/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-qdl/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2AdminClientCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2AdminClientCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/JWKCLI.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/JWKCLI.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/qdl/ligo/vo/get_scopes.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/qdl/ligo/vo/get_scopes.qdl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/scripts/jwt-scripts/ex_hello_world.cmd" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/scripts/jwt-scripts/ex_hello_world.cmd" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/allclasses-frame.html" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/allclasses-frame.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/allclasses-noframe.html" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/allclasses-noframe.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/constant-values.html" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/constant-values.html" afterDir="false" />
@@ -40,17 +43,11 @@
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin.jar" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin.jar" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/StoreCommands2.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/StoreCommands2.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/testing/BaseClientStoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/testing/BaseClientStoreCommands.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/admin/adminClient/AdminClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/admin/adminClient/AdminClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/admin/adminClient/AdminClientFS.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/admin/adminClient/AdminClientFS.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/admin/adminClient/AdminClientMemoryStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/admin/adminClient/AdminClientMemoryStore.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/util/ClientApprovalMemoryStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/util/ClientApprovalMemoryStore.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/loader/OA2ConfigurationLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/loader/OA2ConfigurationLoader.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/storage/clients/OA2Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/storage/clients/OA2Client.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/qdl/claims/IsInGroup.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/qdl/claims/IsInGroup.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/qdl/claims/OA2Module.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/qdl/claims/OA2Module.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth1/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth1/buildNumber.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-test-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-test-oauth2/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-test/src/test/java/edu/uiuc/ncsa/myproxy/oa4mp/NewCAStoreTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-test/src/test/java/edu/uiuc/ncsa/myproxy/oa4mp/NewCAStoreTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-test/src/test/java/edu/uiuc/ncsa/myproxy/oa4mp/file/FSCAStoreTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-test/src/test/java/edu/uiuc/ncsa/myproxy/oa4mp/file/FSCAStoreTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-xsede-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-xsede-oauth2/buildNumber.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -132,11 +129,12 @@
       <recent name="$PROJECT_DIR$/oa4mp-server-oauth2/src/main/webapp" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims" />
       <recent name="edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet" />
       <recent name="edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.OA2 CLI">
+  <component name="RunManager" selected="Application.QDL">
     <configuration name="AccessTokenConfig" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.AccessTokenConfig" />
       <module name="oa4mp-server-loader-oauth2" />
@@ -156,6 +154,20 @@
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="JWKCLI" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.myproxy.oauth2.tools.JWKCLI" />
+      <module name="oa4mp-server-admin-oauth2" />
+      <option name="PROGRAM_PARAMETERS" value="-batch create_keys -out /tmp/keys.jwk" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="edu.uiuc.ncsa.myproxy.oauth2.tools.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -433,15 +445,16 @@
       <item itemvalue="Application.TokenUtils" />
       <item itemvalue="Application.AuthorizationTemplates" />
       <item itemvalue="Application.AccessTokenConfig" />
+      <item itemvalue="Application.JWKCLI" />
       <item itemvalue="JUnit.OA2 test suite" />
       <item itemvalue="Tomcat Server.OA2 Server" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.JWKCLI" />
         <item itemvalue="Application.AccessTokenConfig" />
         <item itemvalue="Application.RFC8628Servlet" />
         <item itemvalue="Application.AuthorizationTemplates" />
-        <item itemvalue="Application.TokenUtils" />
         <item itemvalue="Application.TokenUtils" />
       </list>
     </recent_temporary>
@@ -501,7 +514,7 @@
       <workItem from="1625916465413" duration="89733000" />
       <workItem from="1626695658837" duration="137619000" />
       <workItem from="1627556788096" duration="120843000" />
-      <workItem from="1628522815222" duration="22526000" />
+      <workItem from="1628522815222" duration="46161000" />
     </task>
     <task id="LOCAL-00001" summary="IDE caused some version issues, lots of documentation updates. First cut of RFC8628 impl">
       <created>1613086394676</created>
@@ -832,14 +845,20 @@
       <option name="project" value="LOCAL" />
       <updated>1628279850521</updated>
     </task>
-    <option name="localTasksCounter" value="48" />
+    <task id="LOCAL-00048" summary="Mostly quality of life issues for the CLI part 2. Added more searches for clients and their approval status.">
+      <created>1628633356123</created>
+      <option name="number" value="00048" />
+      <option name="presentableId" value="LOCAL-00048" />
+      <option name="project" value="LOCAL" />
+      <updated>1628633356123</updated>
+    </task>
+    <option name="localTasksCounter" value="49" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="CIL-986" />
     <MESSAGE value="Last minute commits before branching. CIL-607." />
     <MESSAGE value="Overdue cleanup now that release is cut." />
     <MESSAGE value="Small usability tweaks." />
@@ -864,7 +883,8 @@
     <MESSAGE value="Fixes to QDL scripts for LIGO clients." />
     <MESSAGE value="CIL-607, a few improvements to the command line client." />
     <MESSAGE value="Mostly quality of life issues for the CLI. Added support for storing a result set and using it. Added tiny tweak to parser, which caused the whole thing to get rebuilt." />
-    <option name="LAST_COMMIT_MESSAGE" value="Mostly quality of life issues for the CLI. Added support for storing a result set and using it. Added tiny tweak to parser, which caused the whole thing to get rebuilt." />
+    <MESSAGE value="Mostly quality of life issues for the CLI part 2. Added more searches for clients and their approval status." />
+    <option name="LAST_COMMIT_MESSAGE" value="Mostly quality of life issues for the CLI part 2. Added more searches for clients and their approval status." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -916,17 +936,17 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/oa4mp-server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/StoreCommands2.java</url>
-          <line>1745</line>
+          <line>1787</line>
           <option name="timeStamp" value="100" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/oa4mp-server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/StoreCommands2.java</url>
-          <line>1799</line>
+          <line>1841</line>
           <option name="timeStamp" value="104" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/oa4mp-server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/StoreCommands2.java</url>
-          <line>1351</line>
+          <line>1393</line>
           <option name="timeStamp" value="110" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -1031,17 +1051,17 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/oa4mp-server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/StoreCommands2.java</url>
-          <line>908</line>
+          <line>950</line>
           <option name="timeStamp" value="257" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/oa4mp-server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/StoreCommands2.java</url>
-          <line>1519</line>
+          <line>1561</line>
           <option name="timeStamp" value="260" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/oa4mp-server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/StoreCommands2.java</url>
-          <line>1498</line>
+          <line>1540</line>
           <option name="timeStamp" value="261" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -1106,8 +1126,23 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/oa4mp-server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/testing/BaseClientStoreCommands.java</url>
-          <line>526</line>
+          <line>533</line>
           <option name="timeStamp" value="380" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/JWKCLI.java</url>
+          <line>128</line>
+          <option name="timeStamp" value="392" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/JWKCLI.java</url>
+          <line>177</line>
+          <option name="timeStamp" value="393" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/JWKCLI.java</url>
+          <line>223</line>
+          <option name="timeStamp" value="394" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

@@ -8,9 +8,12 @@
    allowed_scopes. := [];
    
    zeta.'Communities:LSCVirgoLIGOGroupMembers' := ['read:/DQSegDB' ,'read:/frames'];
-      zeta.'Communities:LVC:SegDB:SegDBWriter' := 'write:/DQSegDB';
-        zeta.'gw-astronomy:KAGRA-LIGO:members' := 'read:/frames';
-   
+   zeta.'Communities:LVC:SegDB:SegDBWriter'    := 'write:/DQSegDB';
+   zeta.'gw-astronomy:KAGRA-LIGO:members'      := 'read:/frames';
+  /*
+    replacement for loop below
+     return(reduce(@~,values(mask(zeta., in_group2(keys(zeta.),groups.)) )));
+  */
    while[
        for_keys(key, zeta.)
      ][
@@ -25,28 +28,21 @@
     return(allowed_scopes.);
    ]; // end block
     /*
-    example replacement for loop above with much simpler data:
+   // example replacement for loop above with much simpler data:
+
          zeta.'Communities:LSCVirgoLIGOGroupMembers' := ['read:/DQSegDB' ,'read:/frames'];
       zeta.'Communities:LVC:SegDB:SegDBWriter' := 'write:/DQSegDB';
         zeta.'gw-astronomy:KAGRA-LIGO:members' := 'read:/frames';
   g. := [{'name': 'Services:MailingLists:Testing:eligible_factor'},{'name': 'Communities:LSCVirgoLIGOGroupMembers'},{'name':'Communities:LVC:SegDB:SegDBWriter'}]
 
-       zz. :=  reduce(@||, for_each(@has_value, g., keys(zeta.)))
-{
- Communities:LVC:SegDB:SegDBWriter:true,
- Communities:LSCVirgoLIGOGroupMembers:true,
- gw-astronomy:KAGRA-LIGO:members:false
-}
-
-Need to use 1.4.1 function for values though:
- 
- reduce(@~, values(mask(zeta., zz.)))
+   // To get the permissions in one fell swoop:
+     reduce(@~,values(mask(zeta., in_group2(keys(zeta.),g.)) ))
+ [write:/DQSegDB,read:/DQSegDB,read:/frames]
 
  define
  [
  check(path.)
  ]
- [
  >> check(path.) this will take a list of paths to files and test the syntax of the
  >> files for an OA4MP service, reporting any errors.
  while[for_next(file,path.)][r:=check_syntax(file_read(file));line_out:=file+': '+(size(r)==0?'ok':'\n   '+r);say(line_out);]

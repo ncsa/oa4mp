@@ -378,7 +378,7 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
             sayi("Note that this searched for approvers restricted to current store. If you want");
             say("to search the entire set of approvers (and have regexes and dates available)");
             sayi("you should use the approvers component and do your searches there.");
-            sayi("See also: status_search");
+            sayi("See also: search, status_search, rs");
             return;
         }
 
@@ -413,6 +413,9 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
                 say("warning: overwriting existing client result set \"" + rsName + "\"");
             }
             clientApprovalStoreCommands.getResultSets().put(rsName, new RSRecord(acs, fields));
+            say("got " + acs.size() + " results.");
+        }else{
+            clientApprovalStoreCommands.printRS(inputLine, acs, fields,null);
         }
     }
 
@@ -428,7 +431,8 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
             sayi(StringUtils.RJustify(REVOKED.getStatus(), 10) + " or r = revoked");
             say("E.g.");
             sayi("status_search -rs my_pending p");
-            sayi("would search for all pending approvals and saved them in the result set named my_pending");
+            say("would search for all pending approvals and save them in the result set named my_pending");
+            say("See also: search, approver_search, rs");
             return;
         }
 
@@ -480,7 +484,10 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
                 getResultSets().remove(rsName);
                 say("warning: overwriting existing client result set \"" + rsName + "\"");
             }
+            say("got " + acs.size() + " results");
             clientApprovalStoreCommands.getResultSets().put(rsName, new RSRecord(acs, fields));
+        }else{
+            clientApprovalStoreCommands.printRS(inputLine, acs, fields, null);
         }
     }
 
