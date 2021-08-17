@@ -11,6 +11,7 @@ import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionRecord;
+import edu.uiuc.ncsa.security.storage.sql.internals.ColumnMap;
 import edu.uiuc.ncsa.security.storage.sql.internals.Table;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
@@ -52,7 +53,7 @@ public class OA2SQLTStore<V extends OA2ServiceTransaction> extends DSSQLTransact
     /**
      * Since this is  potentially a very intensive operation run only once at startup
      * this has been tweaked to exactly let the database grab the minimum and process it here.
-     * 
+     *
      * @return
      */
     @Override
@@ -89,4 +90,51 @@ public class OA2SQLTStore<V extends OA2ServiceTransaction> extends DSSQLTransact
         return pending;
     }
 
+    @Override
+    public V getByUserCode(String userCode) {
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
+        OA2TransactionTable oa2TT = (OA2TransactionTable) getTable();
+        V result = null;
+
+        try {
+            PreparedStatement stmt = c.prepareStatement(oa2TT.getByUserCode());
+            stmt.setString(1, userCode);
+            stmt.execute();// just execute() since executeQuery(x) would throw an exception regardless of content per JDBC spec.
+
+            ResultSet rs = stmt.getResultSet();
+            if (!rs.next()) {
+                rs.close();
+                stmt.close();
+                releaseConnection(cr);
+                return null;   // returning a null fulfills contract for this being a map.
+            }
+
+            ColumnMap map = rsToMap(rs);
+            boolean tooManyresults = rs.next();
+            rs.close();
+            stmt.close();
+            releaseConnection(cr);
+            if (tooManyresults) {
+                throw new IllegalStateException("error: Multiple transactions with the user codes \"" + userCode + "\" found.");
+            }
+            result = create();
+            populate(map, result);
+        } catch (SQLException e) {
+            destroyConnection(cr);
+            throw new GeneralException("Error: could not get database object", e);
+        }
+
+        return result;
+    }
+
+    /**
+     * TODO - Improve this with a specific query later.
+     * @param userCode
+     * @return
+     */
+    @Override
+    public boolean hasUserCode(String userCode) {
+        return getByUserCode(userCode) != null;
+    }
 }

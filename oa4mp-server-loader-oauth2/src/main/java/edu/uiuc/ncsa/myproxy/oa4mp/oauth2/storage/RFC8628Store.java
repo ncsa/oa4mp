@@ -11,4 +11,6 @@ import java.util.List;
  */
 public interface RFC8628Store<V extends Identifiable> {
     List<RFC8628State> getPending();
+    V getByUserCode(String userCode);
+    boolean hasUserCode(String userCode);
 }

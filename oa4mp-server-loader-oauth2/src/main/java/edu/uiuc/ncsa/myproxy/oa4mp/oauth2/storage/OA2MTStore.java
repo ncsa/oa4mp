@@ -76,4 +76,20 @@ public class OA2MTStore<V extends OA2ServiceTransaction> extends TransactionMemo
           }
           return pending;
       }
+
+    @Override
+    public V getByUserCode(String userCode) {
+          for (Identifier id : keySet()) {
+              V transaction = get(id);
+              if (transaction != null && transaction.getUserCode().equals(userCode)) {
+                  return transaction;
+              }
+          }
+          return null;
+    }
+
+    @Override
+    public boolean hasUserCode(String userCode) {
+        return getByUserCode(userCode) != null;
+    }
 }

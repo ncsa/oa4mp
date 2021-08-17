@@ -2,13 +2,13 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RFC8628Store;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.EnvServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.PresentationState;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
-import edu.uiuc.ncsa.security.delegation.token.impl.AuthorizationGrantImpl;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2ATException;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
 import edu.uiuc.ncsa.security.servlet.JSPUtil;
@@ -19,14 +19,12 @@ import org.apache.http.HttpStatus;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.net.URI;
 import java.security.GeneralSecurityException;
 import java.sql.SQLException;
 import java.util.*;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2AuthorizationServer.AUTHORIZATION_PASSWORD_KEY;
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2AuthorizationServer.AUTHORIZATION_USER_NAME_KEY;
-import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8628Servlet.cache;
 import static edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractAuthorizationServlet.*;
 import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 import static org.apache.commons.lang.StringEscapeUtils.escapeHtml;
@@ -281,19 +279,16 @@ public class RFC8628AuthorizationServer extends EnvServlet {
         if (!isTrivial(userCode)) {
             userCode = userCode.toUpperCase();
         }
-        if (checkCount && !cache.containsKey(userCode) ) {
+        RFC8628Store<? extends OA2ServiceTransaction> rfc8628Store = (RFC8628Store) getServiceEnvironment().getTransactionStore();
+        OA2ServiceTransaction trans = rfc8628Store.getByUserCode(userCode);
+        if (checkCount && trans == null ) {
             if (pendingState.count == 0) {
                 throw new TooManyRetriesException("number of retries has been been reached,", userCode);
             }
             throw new UnknownUserCodeException("unknown user code", userCode);
         }
-        AuthorizationGrantImpl ag = new AuthorizationGrantImpl(URI.create(cache.get(userCode)));
-        if (ag.isExpired()) {
+        if (trans.getAuthorizationGrant().isExpired()) {
             throw new OA2ATException(OA2Errors.INVALID_GRANT, "expired grant", HttpStatus.SC_BAD_REQUEST, null);
-        }
-        OA2ServiceTransaction trans = (OA2ServiceTransaction) getServiceEnvironment().getTransactionStore().get(ag);
-        if (trans == null) {
-            throw new OA2ATException(OA2Errors.INVALID_GRANT, "grant is invalid", HttpStatus.SC_BAD_REQUEST, null);
         }
         if (!trans.isAuthGrantValid()) {
             throw new OA2ATException(OA2Errors.INVALID_GRANT, "grant is invalid", HttpStatus.SC_BAD_REQUEST, null);

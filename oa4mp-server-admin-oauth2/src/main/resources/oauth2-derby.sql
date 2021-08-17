@@ -129,14 +129,14 @@ CREATE TABLE oauth2.adminClients
 CREATE TABLE oauth2.permissions
 (
     permission_id VARCHAR(255) PRIMARY KEY,
-    admin_id      VARCHAR(255),
-    client_id     VARCHAR(255),
-    can_approve   BOOLEAN,
-    can_create    BOOLEAN,
-    can_read      BOOLEAN,
-    can_remove    BOOLEAN,
-    can_write     BOOLEAN,
-    creation_ts   TIMESTAMP
+       admin_id VARCHAR(255),
+      client_id VARCHAR(255),
+    can_approve BOOLEAN,
+     can_create BOOLEAN,
+       can_read BOOLEAN,
+     can_remove BOOLEAN,
+      can_write BOOLEAN,
+    creation_ts TIMESTAMP
 );
 
 CREATE TABLE oauth2.client_approvals
@@ -181,32 +181,19 @@ CREATE TABLE oauth2.transactions
 CREATE UNIQUE INDEX access_token on oauth2.transactions (access_token);
    CREATE UNIQUE INDEX refresh_token on oauth2.transactions (refresh_token);
 
-/*
-  `auth_grant` text,
-  `refresh_token_lifetime` bigint DEFAULT NULL,
-  `authz_grant_lifetime` bigint DEFAULT NULL,
-  `req_state` text,
-  `is_rfc_8628` tinyint(1) DEFAULT NULL,
-  `user_code` text,
-  PRIMARY KEY (`temp_token`),
-  UNIQUE KEY `verifier` (`verifier_token`(255)),
-  UNIQUE KEY `accessToken` (`access_token`(255)),
-  UNIQUE KEY `refreshToken` (`refresh_token`(255))
-
- */
 CREATE TABLE oauth2.tx_records
 (
-    token_id   VARCHAR(255) PRIMARY KEY,
-    lifetime   bigint,
-    issued_at  bigint,
+      token_id VARCHAR(255) PRIMARY KEY,
+      lifetime bigint,
+     issued_at bigint,
     expires_at bigint,
-    parent_id  VARCHAR(1024),
+     parent_id VARCHAR(1024),
     token_type CLOB,
-    valid      boolean,
-    scopes     CLOB,
-    audience   CLOB,
-    issuer     CLOB,
-    resource   CLOB);
+         valid boolean,
+        scopes CLOB,
+      audience CLOB,
+        issuer CLOB,
+      resource CLOB);
    CREATE INDEX  parents on oauth2.tx_records (parent_id);
 
 

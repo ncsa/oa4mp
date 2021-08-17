@@ -26,7 +26,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Locale;
+import java.util.Map;
 
 import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.*;
@@ -45,17 +47,17 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
 
     //long lastAttemptTS = -1L; // so the first call to the servlet works, otherwise the check
 
-    public static Map<String, String> getCache() {
+/*    public static Map<String, String> getCache() {
         return cache;
     }
 
-    static Map<String, String> cache = new HashMap<>();
+    static Map<String, String> cache = new HashMap<>();*/
 
     /**
      * ONLY call this during servlet initialization.
      * This is very resource intensive and should be called only if absolutely necessary.
      */
-    public static void rebuildCache() {
+ /*   public static void rebuildCache() {
         if (!cache.isEmpty()) {
             // do not reinitialize cache
             return;
@@ -68,11 +70,10 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
                 cache.put(rfc8628State.userCode, rfc8628State.deviceCode.toString());
             }
         }
-    }
-
+    }*/
     @Override
     protected void doIt(HttpServletRequest req, HttpServletResponse resp) throws Throwable {
-    //    printAllParameters(req);
+        //    printAllParameters(req);
         ServletDebugUtil.trace(this, "starting device flow");
         OA2SE oa2SE = (OA2SE) getServiceEnvironment();
 
@@ -124,25 +125,27 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
         debugUtil.trace(this, "created transaction \"" + t.getIdentifierString() + "\"");
         t.setClient(client);
         t.setIdentifier(BasicIdentifier.newID(ag.getURIToken()));
+        t.setAuthorizationGrant(ag);
         t.setAuthGrantLifetime(lifetime);
         t.setAuthGrantValid(true);
         t.setRFC8628Request(true);
         RFC8628State rfc8628State = new RFC8628State();
         String userCode = getUserCode(rfc8628ServletConfig);
         boolean gotUserCode = false;
-        for (int i = 0; i < 5; i++) {
+        RFC8628Store rfc8628Store = (RFC8628Store) getTransactionStore();
+        int userCodeAttemptCount = 5;
+        for (int i = 0; i < userCodeAttemptCount; i++) {
             // 5 tries to come up with an unused user code.
-            if (cache.containsKey(userCode)) {
+            if (rfc8628Store.hasUserCode(userCode)) {
                 ServletDebugUtil.trace(this, "Attempt to get user code # " + i + "failed for \"" + userCode + "\".");
                 userCode = getUserCode(rfc8628ServletConfig);
             } else {
-                cache.put(userCode, ag.getToken());
                 gotUserCode = true;
                 break;
             }
         }
         if (!gotUserCode) {
-            ServletDebugUtil.error(this, "Could not get an unused user code. Cache contains " + cache.size() + " entries.");
+            ServletDebugUtil.error(this, "Could not get an unused user code after " + userCodeAttemptCount + " attempts.");
             throw new OA2ATException(OA2Errors.SERVER_ERROR, "could not create new user code", HttpStatus.SC_BAD_REQUEST, null);
         }
         debugUtil.trace(this, "user_code = " + userCode);
@@ -165,7 +168,7 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
             TransactionState transactionState = new TransactionState(req, resp, agResponse.getParameters(), t);
             try {
                 t.setScopes(ClientUtils.resolveScopes(transactionState, true));
-            }catch(OA2RedirectableError redirectableError){
+            } catch (OA2RedirectableError redirectableError) {
                 throw new OA2ATException(redirectableError.getError(),
                         redirectableError.getDescription(),
                         HttpStatus.SC_BAD_REQUEST,
