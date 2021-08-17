@@ -33,8 +33,6 @@ public class OA2Module extends JavaModule {
         funcs.add(new IsInGroup2());
         funcs.add(new ScopeTemplateQDLUtil());
         funcs.add(new TemplateSubsitutionQDLUtil());
-        // JPath was officially incorporated into QDL.
-        //funcs.add(new JPath());
         oa2Module.addFunctions(funcs);
         if (state != null) {
             oa2Module.init(state);

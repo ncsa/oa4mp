@@ -64,6 +64,7 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
         List<RFC8628State> stateList = rfc8628Store.getPending();
         for(RFC8628State rfc8628State : stateList){
             if (!isTrivial(rfc8628State.userCode) && rfc8628State.deviceCode != null) {
+                // userCode is a string, device code is the auth grant.
                 cache.put(rfc8628State.userCode, rfc8628State.deviceCode.toString());
             }
         }
@@ -145,6 +146,7 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
             throw new OA2ATException(OA2Errors.SERVER_ERROR, "could not create new user code", HttpStatus.SC_BAD_REQUEST, null);
         }
         debugUtil.trace(this, "user_code = " + userCode);
+        t.setUserCode(userCode);
         rfc8628State.userCode = userCode;
         rfc8628State.deviceCode = ag.getURIToken();
         rfc8628State.issuedAt = System.currentTimeMillis();

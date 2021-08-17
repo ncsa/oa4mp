@@ -5,15 +5,16 @@
 
  block[
    groups. := script_args(0);
-   allowed_scopes. := [];
-   
+
    zeta.'Communities:LSCVirgoLIGOGroupMembers' := ['read:/DQSegDB' ,'read:/frames'];
    zeta.'Communities:LVC:SegDB:SegDBWriter'    := 'write:/DQSegDB';
    zeta.'gw-astronomy:KAGRA-LIGO:members'      := 'read:/frames';
   /*
-    replacement for loop below
+    replacement for loop and everything else below
      return(reduce(@~,values(mask(zeta., in_group2(keys(zeta.),groups.)) )));
   */
+     allowed_scopes. := [];
+
    while[
        for_keys(key, zeta.)
      ][

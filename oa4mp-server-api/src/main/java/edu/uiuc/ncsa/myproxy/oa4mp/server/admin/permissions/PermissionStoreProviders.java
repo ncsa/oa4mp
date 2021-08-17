@@ -69,6 +69,10 @@ public class PermissionStoreProviders {
     public static SQLPermissionStoreProvider getPostgresPS(ConfigurationNode node, ConnectionPoolProvider<? extends ConnectionPool> cpp ){
         return new SQLPermissionStoreProvider(node, OA4MPConfigTags.POSTGRESQL_STORE, cpp);
     }
+    public static SQLPermissionStoreProvider getDerbyPS(ConfigurationNode node, ConnectionPoolProvider<? extends ConnectionPool> cpp ){
+        return new SQLPermissionStoreProvider(node, OA4MPConfigTags.DERBY_STORE, cpp);
+    }
+
     public static SQLPermissionStoreProvider getMysqlPS(ConfigurationNode node, ConnectionPoolProvider<? extends ConnectionPool> cpp ){
         return new SQLPermissionStoreProvider(node, OA4MPConfigTags.MYSQL_STORE, cpp);
     }

@@ -34,6 +34,8 @@ public abstract class AbstractTestSuiteInitializer {
 
     public abstract String getPostgresStoreConfigName();
 
+    public abstract String getDerbyStoreConfigName();
+
     public abstract String getAggregateStoreConfigName();
 
     public abstract void init();

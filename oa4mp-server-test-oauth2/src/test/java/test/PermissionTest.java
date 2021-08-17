@@ -18,29 +18,26 @@ import java.util.List;
  */
 public class PermissionTest extends TestBase {
     public void testFS() throws Exception {
-        TestStoreProvider2 tp2 = (TestStoreProvider2) TestUtils.getFsStoreProvider();
-        testPermission(tp2.getPermissionStore(), tp2.getClientStore(), tp2.getAdminClientStore());
-        testAttributes(tp2.getPermissionStore(), tp2.getClientStore(), tp2.getAdminClientStore());
-        testIDs(tp2.getPermissionStore(), tp2.getClientStore(), tp2.getAdminClientStore());
-
+        doTestAll((TestStoreProvider2) TestUtils.getFsStoreProvider());
     }
 
     public void testMYSQL() throws Exception {
-        TestStoreProvider2 tp2 = (TestStoreProvider2) TestUtils.getMySQLStoreProvider();
-        testPermission(tp2.getPermissionStore(), tp2.getClientStore(), tp2.getAdminClientStore());
-        testAttributes(tp2.getPermissionStore(), tp2.getClientStore(), tp2.getAdminClientStore());
-        testIDs(tp2.getPermissionStore(), tp2.getClientStore(), tp2.getAdminClientStore());
+        doTestAll((TestStoreProvider2) TestUtils.getMySQLStoreProvider());
     }
 
     public void testMemStore() throws Exception {
-        TestStoreProvider2 tp2 = (TestStoreProvider2) TestUtils.getMemoryStoreProvider();
-        testPermission(tp2.getPermissionStore(), tp2.getClientStore(), tp2.getAdminClientStore());
-        testAttributes(tp2.getPermissionStore(), tp2.getClientStore(), tp2.getAdminClientStore());
-        testIDs(tp2.getPermissionStore(), tp2.getClientStore(), tp2.getAdminClientStore());
+        doTestAll((TestStoreProvider2) TestUtils.getMemoryStoreProvider());
     }
 
     public void testPG() throws Exception {
-        TestStoreProvider2 tp2 = (TestStoreProvider2) TestUtils.getPgStoreProvider();
+        doTestAll((TestStoreProvider2) TestUtils.getPgStoreProvider());
+    }
+
+    public void testDerby() throws Exception {
+        doTestAll((TestStoreProvider2) TestUtils.getDerbyStoreProvider());
+    }
+
+    protected void doTestAll(TestStoreProvider2 tp2) throws Exception{
         testPermission(tp2.getPermissionStore(), tp2.getClientStore(), tp2.getAdminClientStore());
         testAttributes(tp2.getPermissionStore(), tp2.getClientStore(), tp2.getAdminClientStore());
         testIDs(tp2.getPermissionStore(), tp2.getClientStore(), tp2.getAdminClientStore());

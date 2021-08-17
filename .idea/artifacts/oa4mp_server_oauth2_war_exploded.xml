@@ -70,6 +70,7 @@
           </element>
           <element id="library" level="project" name="Maven: mysql:mysql-connector-java:8.0.11" />
           <element id="library" level="project" name="Maven: com.google.protobuf:protobuf-java:2.6.0" />
+          <element id="library" level="project" name="Maven: org.apache.derby:derby:10.14.1.0" />
           <element id="library" level="project" name="Maven: org.postgresql:postgresql:42.2.2.jre7" />
           <element id="library" level="project" name="Maven: org.mariadb.jdbc:mariadb-java-client:2.2.5" />
           <element id="library" level="project" name="Maven: edu.uiuc.ncsa.security.delegation:ncsa-security-oauth-1.0a:5.2-SNAPSHOT" />

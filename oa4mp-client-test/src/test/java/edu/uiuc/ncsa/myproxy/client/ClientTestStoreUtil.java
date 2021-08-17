@@ -107,7 +107,7 @@ public class ClientTestStoreUtil {
                 5432,
                 "org.postgresql.Driver",
                 false, "");
-        return new ConnectionPool(x);
+        return new ConnectionPool(x, ConnectionPool.CONNECTION_TYPE_POSTGRES);
     }
 
     public static ConnectionPool setupMySQLConnection(String databaseName, String schema) {
@@ -125,7 +125,7 @@ public class ClientTestStoreUtil {
                 3306,
                 "com.mysql.jdbc.Driver",
                 false,"");
-        return new ConnectionPool(x);
+        return new ConnectionPool(x, ConnectionPool.CONNECTION_TYPE_MYSQL);
     }
 
     public static AssetStore setupPGStore(String databaseName, String schema,

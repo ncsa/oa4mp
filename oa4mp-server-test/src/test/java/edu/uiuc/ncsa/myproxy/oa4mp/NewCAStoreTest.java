@@ -44,6 +44,11 @@ public class NewCAStoreTest extends TestBase {
         testApprovalCycle(TestUtils.getPgStoreProvider().getClientStore(), TestUtils.getPgStoreProvider().getClientApprovalStore());
     }
 
+    public void testDerby() throws Exception {
+        testApprovalStore(TestUtils.getDerbyStoreProvider().getClientStore(), TestUtils.getPgStoreProvider().getClientApprovalStore());
+        testApprovalCycle(TestUtils.getDerbyStoreProvider().getClientStore(), TestUtils.getPgStoreProvider().getClientApprovalStore());
+    }
+
 
     public void testApprovalStore(ClientStore clientStore,
                                   ClientApprovalStore caStore) throws Exception {
@@ -161,4 +166,5 @@ public class NewCAStoreTest extends TestBase {
           }
 
       }
+
 }

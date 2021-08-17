@@ -186,6 +186,8 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
             masp.addListener(new FSAssetStoreProvider(cn, getAssetProvider(), assetConverter));
             masp.addListener(new OA2SQLAssetStoreProvider(cn, ClientXMLTags.POSTGRESQL_STORE, getPgConnectionPoolProvider(),
                     getAssetProvider(), assetConverter));
+            masp.addListener(new OA2SQLAssetStoreProvider(cn, ClientXMLTags.DERBY_STORE, getDerbyConnectionPoolProvider(),
+                    getAssetProvider(), assetConverter));
             masp.addListener(new OA2SQLAssetStoreProvider(cn, ClientXMLTags.MYSQL_STORE, getMySQLConnectionPoolProvider(),
                     getAssetProvider(), assetConverter));
             masp.addListener(new OA2SQLAssetStoreProvider(cn, ClientXMLTags.MARIADB_STORE, getMariaDBConnectionPoolProvider(),

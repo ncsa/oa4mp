@@ -12,7 +12,7 @@ oa2-cli.jar
 oa2-cli (the script)
 oa2-client.jar
 oa2-client
-mysql.qsl   (db setup scripts)
+mysql.sql   (db setup scripts)
 pg.sql
 monitor.jar
 monitor (script)

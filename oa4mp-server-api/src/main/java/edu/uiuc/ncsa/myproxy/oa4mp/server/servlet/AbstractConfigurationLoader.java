@@ -219,6 +219,13 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
                     tp,
                     getTokenForgeProvider(),
                     tc));
+            storeProvider.addListener(new DSSQLTransactionStoreProvider(cn,
+                    getDerbyConnectionPoolProvider(),
+                    OA4MPConfigTags.DERBY_STORE,
+                    getCSP(),
+                    tp,
+                    getTokenForgeProvider(),
+                    tc));
             storeProvider.addListener(new DSFSTransactionStoreProvider(cn, tp, getTokenForgeProvider(), tc));
             storeProvider.addListener(new TypedProvider<TransactionStore>(cn, OA4MPConfigTags.MEMORY_STORE, OA4MPConfigTags.TRANSACTIONS_STORE) {
 
@@ -251,6 +258,7 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
             mpp.addListener(PermissionStoreProviders.getFSP(cn));
             mpp.addListener(PermissionStoreProviders.getMariaPS(cn, getMariaDBConnectionPoolProvider()));
             mpp.addListener(PermissionStoreProviders.getPostgresPS(cn, getPgConnectionPoolProvider()));
+            mpp.addListener(PermissionStoreProviders.getDerbyPS(cn, getDerbyConnectionPoolProvider()));
             mpp.addListener(PermissionStoreProviders.getMysqlPS(cn, getMySQLConnectionPoolProvider()));
         }
         return mpp;
@@ -266,6 +274,7 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
             casp.addListener(new DSSQLClientApprovalStoreProvider(cn, getMariaDBConnectionPoolProvider(), OA4MPConfigTags.MARIADB_STORE, cp));
 
             casp.addListener(new DSSQLClientApprovalStoreProvider(cn, getPgConnectionPoolProvider(), OA4MPConfigTags.POSTGRESQL_STORE, cp));
+            casp.addListener(new DSSQLClientApprovalStoreProvider(cn, getDerbyConnectionPoolProvider(), OA4MPConfigTags.DERBY_STORE, cp));
 
             casp.addListener(new TypedProvider<ClientApprovalStore>(cn, OA4MPConfigTags.MEMORY_STORE, OA4MPConfigTags.CLIENT_APPROVAL_STORE) {
 

@@ -34,16 +34,20 @@ public class RefreshTokenStoreTest extends TestBase {
         testRT(TestUtils.getPgStoreProvider().getTransactionStore());
     }
 
+    public void testDerby() throws Exception {
+         testRT(TestUtils.getDerbyStoreProvider().getTransactionStore());
+     }
 
     public void testRT(TransactionStore tStore) throws Exception {
         if (!(tStore instanceof RefreshTokenStore)) {
             // fail here if can't cast
             throw new IllegalStateException("Error: The store " + tStore.getClass().getSimpleName() + " is not of a type RefreshTokenStore");
         }
+
         RefreshTokenStore rts = (RefreshTokenStore) tStore;
         OA2ServiceTransaction st2 = (OA2ServiceTransaction) tStore.create();
 
-        OA2TokenForge tf2 = new OA2TokenForge("http://localhost/test/");
+        OA2TokenForge tf2 = new OA2TokenForge("http://localhost/test/" + getRandomString() + "/");
 
         RefreshToken rt = tf2.getRefreshToken();
         st2.setRefreshToken(rt);

@@ -33,6 +33,7 @@ public class OA2TransactionTable extends DSTransactionTable {
         getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().authTime(), Types.TIMESTAMP));
         getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().scopes(), Types.LONGVARCHAR));
         getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().reqState(), Types.LONGVARCHAR));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().userCode(), Types.LONGVARCHAR));
     }
 
     public String getByRefreshTokenStatement() {
@@ -43,5 +44,13 @@ public class OA2TransactionTable extends DSTransactionTable {
        }
     public String getRFC8628() {
            return "SELECT " + getOA2Keys().states() + " FROM " + getFQTablename() + " WHERE " + getOA2Keys().isRFC8628() + "= true";
+       }
+
+    public String getByUserCode() {
+           return "SELECT * FROM " + getFQTablename() + " WHERE " + getOA2Keys().userCode() + "= ?";
+       }
+       public String CheckUserCodeExists(){
+        // select exists(select * from client_approvals where client_id = 'oa4mp:/client_id/5d94fb8d63353ff70b2506611ef0685');
+           return "select exists(select * from " + getFQTablename() + " WHERE " + getOA2Keys().userCode() + "= ?)";
        }
 }

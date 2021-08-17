@@ -20,6 +20,7 @@ import edu.uiuc.ncsa.security.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.delegation.storage.ClientProvider;
 import edu.uiuc.ncsa.security.delegation.storage.impl.ClientConverter;
+import edu.uiuc.ncsa.security.storage.sql.derby.DerbyConnectionPoolProvider;
 import edu.uiuc.ncsa.security.storage.sql.mysql.MySQLConnectionPoolProvider;
 import edu.uiuc.ncsa.security.storage.sql.postgres.PGConnectionPoolProvider;
 import org.apache.commons.configuration.ConfigurationException;
@@ -89,6 +90,7 @@ public class ServiceConfigTest extends ConfigTest {
         csp.addListener(new DSFSClientStoreProvider(cn, converter,clientProvider));
         csp.addListener(new DSClientSQLStoreProvider(cn, new MySQLConnectionPoolProvider("oauth", "oauth"), MYSQL_STORE, converter,clientProvider));
         csp.addListener(new DSClientSQLStoreProvider(cn, new PGConnectionPoolProvider("oauth", "oauth"), POSTGRESQL_STORE, converter, clientProvider));
+        csp.addListener(new DSClientSQLStoreProvider(cn, new DerbyConnectionPoolProvider("oauth", "oauth"), DERBY_STORE, converter, clientProvider));
         ClientStore<Client> cs = (ClientStore<Client>) csp.get();
     }
 
@@ -100,6 +102,7 @@ public class ServiceConfigTest extends ConfigTest {
         dap.addListener(new DSFSClientApprovalStoreProvider(cn, cp));
         dap.addListener(new DSSQLClientApprovalStoreProvider(cn, new MySQLConnectionPoolProvider("oauth", "oauth"), MYSQL_STORE, cp));
         dap.addListener(new DSSQLClientApprovalStoreProvider(cn, new PGConnectionPoolProvider("oauth", "oauth"), POSTGRESQL_STORE, cp));
+        dap.addListener(new DSSQLClientApprovalStoreProvider(cn, new DerbyConnectionPoolProvider("oa4mp", "oauth2"), DERBY_STORE, cp));
         ClientApprovalStore<ClientApproval> as = (ClientApprovalStore<ClientApproval>) dap.get();
     }
 

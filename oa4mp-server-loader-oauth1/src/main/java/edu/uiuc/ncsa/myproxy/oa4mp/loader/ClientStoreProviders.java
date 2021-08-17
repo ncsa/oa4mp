@@ -110,6 +110,10 @@ public class ClientStoreProviders {
         return new DSClientSQLStoreProvider(node, cpp, OA4MPConfigTags.POSTGRESQL_STORE);
     }
 
+    public static DSClientSQLStoreProvider<? extends SQLClientStore> getDerbyPS(ConfigurationNode node, ConnectionPoolProvider<? extends ConnectionPool> cpp) {
+        return new DSClientSQLStoreProvider(node, cpp, OA4MPConfigTags.DERBY_STORE);
+    }
+
     public static MemoryClientStoreProvider<? extends Client> getM(ConfigurationNode node){
         return new MemoryClientStoreProvider<>(node);
     }

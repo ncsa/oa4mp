@@ -51,6 +51,9 @@ public abstract class DDServerTests extends TestCase {
         testAll(TestUtils.getPgStoreProvider());
     }
 
+    public void testDerby() throws Exception {
+        testAll(TestUtils.getDerbyStoreProvider());
+    }
     public static class CC {
         public AdminClient adminClient;
         public OA2Client client;

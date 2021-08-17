@@ -47,6 +47,9 @@ public class PermissionServerTest extends DDServerTests {
         testAll( TestUtils.getPgStoreProvider());
     }
 
+    public void testDerby() throws Exception {
+          testAll( TestUtils.getDerbyStoreProvider());
+      }
     public void testGetAdmins(TestStoreProviderInterface tp2) throws Exception {
         int clientCount = 4;
         CC cc = setupClients(tp2);

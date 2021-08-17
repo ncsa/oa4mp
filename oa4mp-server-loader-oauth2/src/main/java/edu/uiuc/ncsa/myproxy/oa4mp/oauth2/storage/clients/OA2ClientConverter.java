@@ -184,7 +184,13 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
     }
 
     protected Collection<String> jsonArrayToCollection(ConversionMap<String, Object> map, String key) {
-        JSONArray json = (JSONArray) JSONSerializer.toJSON(map.get(key));
+        JSONArray json;
+        try {
+            json = (JSONArray) JSONSerializer.toJSON(map.get(key));
+        }catch(Throwable t){
+            t.printStackTrace();
+            throw t;
+        }
         Collection<String> zzz = (Collection<String>) JSONSerializer.toJava(json);
         return zzz;
     }

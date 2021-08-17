@@ -14,6 +14,7 @@
           <element id="module-output" name="oa4mp-webapp" />
         </element>
         <element id="directory" name="lib">
+          <element id="library" level="project" name="Maven: org.apache.derby:derby:10.14.1.0" />
           <element id="library" level="project" name="Maven: javax.servlet:jstl:1.2" />
         </element>
       </element>

@@ -61,6 +61,11 @@ public class TestSuiteInitializer extends AbstractTestSuiteInitializer {
     }
 
     @Override
+    public String getDerbyStoreConfigName() {
+        return null;
+    }
+
+    @Override
     public void init() {
         TestUtils.setBootstrapper(getBootstrapper());
            TestUtils.setMemoryStoreProvider(getTSP(getMemoryStoreConfigName()));
@@ -70,6 +75,5 @@ public class TestSuiteInitializer extends AbstractTestSuiteInitializer {
            TestUtils.setMySQLStoreProvider(getTSP(getMySQLStoreConfigName()));
            TestUtils.setPgStoreProvider(getTSP(getPostgresStoreConfigName()));
            TestUtils.setAgStoreProvider(new ServiceTestSuite.AGTestStoreProvider(getAggregateStoreConfigName()));
-
     }
 }

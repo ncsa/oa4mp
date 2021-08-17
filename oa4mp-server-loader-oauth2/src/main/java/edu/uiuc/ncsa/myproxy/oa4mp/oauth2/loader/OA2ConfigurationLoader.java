@@ -518,6 +518,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
             macp.addListener(AdminClientStoreProviders.getMariaACS(cn, getMariaDBConnectionPoolProvider()));
             macp.addListener(AdminClientStoreProviders.getMysqlACS(cn, getMySQLConnectionPoolProvider()));
             macp.addListener(AdminClientStoreProviders.getPostgresACS(cn, getPgConnectionPoolProvider()));
+            macp.addListener(AdminClientStoreProviders.getDerbyACS(cn, getDerbyConnectionPoolProvider()));
             AdminClientStore acs = (AdminClientStore) macp.get();
         }
         return macp;
@@ -589,6 +590,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
             casp.addListener(new DSSQLClientApprovalStoreProvider(cn, getMySQLConnectionPoolProvider(), OA4MPConfigTags.MYSQL_STORE, cp));
             casp.addListener(new DSSQLClientApprovalStoreProvider(cn, getMariaDBConnectionPoolProvider(), OA4MPConfigTags.MARIADB_STORE, cp));
             casp.addListener(new DSSQLClientApprovalStoreProvider(cn, getPgConnectionPoolProvider(), OA4MPConfigTags.POSTGRESQL_STORE, cp));
+            casp.addListener(new DSSQLClientApprovalStoreProvider(cn, getDerbyConnectionPoolProvider(), OA4MPConfigTags.DERBY_STORE, cp));
 
             casp.addListener(new TypedProvider<ClientApprovalStore>(cn, OA4MPConfigTags.MEMORY_STORE, OA4MPConfigTags.CLIENT_APPROVAL_STORE) {
 
@@ -931,6 +933,9 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
             csp.addListener(new OA2ClientSQLStoreProvider(getPgConnectionPoolProvider(),
                     OA4MPConfigTags.POSTGRESQL_STORE,
                     converter, getClientProvider()));
+            csp.addListener(new OA2ClientSQLStoreProvider(getDerbyConnectionPoolProvider(),
+                    OA4MPConfigTags.DERBY_STORE,
+                    converter, getClientProvider()));
             csp.addListener(new TypedProvider<ClientStore>(cn, OA4MPConfigTags.MEMORY_STORE, OA4MPConfigTags.CLIENTS_STORE) {
 
                 @Override
@@ -1014,6 +1019,12 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     voProvider,
                     getTokenForgeProvider(),
                     voConverter));
+            storeProvider.addListener(createSQLVOP(cn,
+                    getDerbyConnectionPoolProvider(),
+                    OA4MPConfigTags.DERBY_STORE,
+                    voProvider,
+                    getTokenForgeProvider(),
+                    voConverter));
 
             storeProvider.addListener(new VOFSProvider(cn, voProvider, voConverter));
             storeProvider.addListener(new TypedProvider<VOStore>(cn, OA4MPConfigTags.MEMORY_STORE, OA4MPConfigTags.VIRTUAL_ORGANIZATION_STORE) {
@@ -1072,6 +1083,12 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     txRecordProvider,
                     getTokenForgeProvider(),
                     txRecordConverter));
+            storeProvider.addListener(createSQLTXRecordP(cn,
+                    getDerbyConnectionPoolProvider(),
+                    OA4MPConfigTags.DERBY_STORE,
+                    txRecordProvider,
+                    getTokenForgeProvider(),
+                    txRecordConverter));
 
             storeProvider.addListener(new TXFSProvider(cn, txRecordProvider, txRecordConverter));
             storeProvider.addListener(new TypedProvider<TXStore>(cn, OA4MPConfigTags.MEMORY_STORE, OA4MPConfigTags.TOKEN_EXCHANGE_RECORD_STORE) {
@@ -1117,6 +1134,13 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
             storeProvider.addListener(createSQLTSP(cn,
                     getPgConnectionPoolProvider(),
                     OA4MPConfigTags.POSTGRESQL_STORE,
+                    getCSP(),
+                    tp,
+                    getTokenForgeProvider(),
+                    tc));
+            storeProvider.addListener(createSQLTSP(cn,
+                    getDerbyConnectionPoolProvider(),
+                    OA4MPConfigTags.DERBY_STORE,
                     getCSP(),
                     tp,
                     getTokenForgeProvider(),

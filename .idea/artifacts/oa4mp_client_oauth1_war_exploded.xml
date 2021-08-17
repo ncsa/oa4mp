@@ -52,6 +52,7 @@
           <element id="archive" name="myproxy-logon-5.2-SNAPSHOT.jar">
             <element id="module-output" name="myproxy-logon" />
           </element>
+          <element id="library" level="project" name="Maven: org.apache.derby:derby:10.14.1.0" />
           <element id="library" level="project" name="Maven: edu.uiuc.ncsa.security.delegation:ncsa-security-oauth-1.0a:5.2-SNAPSHOT" />
           <element id="library" level="project" name="Maven: net.oauth.core:oauth-httpclient4:20090617" />
           <element id="library" level="project" name="Maven: net.oauth.core:oauth:20100527" />

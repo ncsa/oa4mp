@@ -71,25 +71,27 @@ public class TestSuiteInitializer extends AbstractTestSuiteInitializer{
     }
 
     @Override
+    public String getDerbyStoreConfigName() {
+        return "oa4mp.oa2.derby";
+    }
+
+    @Override
     public void init() {
         TestUtils.setBootstrapper(getBootstrapper());
         TestUtils.setMemoryStoreProvider(getTSP(getExplicitMemoryStoreConfigName()));
-        //TestUtils.setMemoryStoreProvider(getTSP(getMemoryStoreConfigName()));
         TestStoreProvider2 fsp = getTSP(getFileStoreConfigName()); // use this later to get its client converter. Any store would do.
         TestUtils.setFsStoreProvider(fsp);
         TestUtils.setMySQLStoreProvider(getTSP(getMySQLStoreConfigName()));
         TestUtils.setPgStoreProvider(getTSP(getPostgresStoreConfigName()));
-      //  TestUtils.setAgStoreProvider(new AGTestStoreProvider(getAggregateStoreConfigName()));
-
-        //TestUtils.setH2StoreProvider(getTSP(""h2-oa2");
-        //TestUtils.setDerbyStoreProvider(getTSP(""derby-oa2");
-
+        TestUtils.setDerbyStoreProvider(getTSP(getDerbyStoreConfigName()));
         try {
             SATFactory.setAdminClientConverter(AdminClientStoreProviders.getAdminClientConverter());
             SATFactory.setClientConverter((ClientConverter<? extends Client>) fsp.getClientStore().getMapConverter());
         } catch (Exception e) {
             e.printStackTrace();
         }
+        // setup QDL unit testing
+        edu.uiuc.ncsa.qdl.TestUtils.set_instance(new QDLTestUtils());
     }
 
 }

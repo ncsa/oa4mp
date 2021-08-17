@@ -5,10 +5,9 @@ import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.delegation.storage.TransactionStore;
-import edu.uiuc.ncsa.security.delegation.token.AccessToken;
-import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
-import edu.uiuc.ncsa.security.delegation.token.TokenForge;
-import edu.uiuc.ncsa.security.delegation.token.Verifier;
+import edu.uiuc.ncsa.security.delegation.token.*;
+import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
+import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
 import edu.uiuc.ncsa.security.util.TestBase;
 
 import java.net.URI;
@@ -42,6 +41,11 @@ public class NewTransactionTest extends TestBase {
                 TestUtils.getPgStoreProvider().getClientStore());
     }
 
+    public void testDerby() throws Exception {
+        testServiceTransaction(TestUtils.getDerbyStoreProvider().getTransactionStore(),
+                TestUtils.getDerbyStoreProvider().getTokenForge(),
+                TestUtils.getDerbyStoreProvider().getClientStore());
+    }
 
     protected AuthorizationGrant newAG(TokenForge tokenForge, String... x) {
         AuthorizationGrant ag = tokenForge.getAuthorizationGrant(x);
@@ -62,6 +66,7 @@ public class NewTransactionTest extends TestBase {
     }
 
     public void testServiceTransaction(TransactionStore transactionStore, TokenForge tokenForge, ClientStore clientStore) throws Exception {
+        String randomString =  getRandomString();
         OA4MPServiceTransaction serviceTransaction = (OA4MPServiceTransaction) transactionStore.create();
         serviceTransaction.setCallback(URI.create("http://callback"));
         AuthorizationGrant ag = tokenForge.getAuthorizationGrant(serviceTransaction.getIdentifierString());
@@ -71,10 +76,13 @@ public class NewTransactionTest extends TestBase {
         String mpUN = "myproxy username /with weird $$#@ in=it/#" + System.nanoTime();
         serviceTransaction.setMyproxyUsername(mpUN);
         Client client = (Client) clientStore.create();
-        client.setIdentifier(new BasicIdentifier(URI.create("test:client:1d/" + System.currentTimeMillis())));
+        client.setIdentifier(new BasicIdentifier(URI.create("test:client:1d/" + randomString)));
         //serviceTransaction.setAuthorizationGrant(newAG(tokenForge));
         serviceTransaction.setAuthGrantValid(false);
         client.setName("service test name #" + System.nanoTime());
+        AccessToken accessToken = new AccessTokenImpl(URI.create("access:/token/test/" + randomString));
+        serviceTransaction.setAccessToken(accessToken);
+        RefreshToken refreshToken = new RefreshTokenImpl(URI.create("refresh:/token/test/" + randomString));
         transactionStore.save(serviceTransaction);
         assert transactionStore.containsKey(serviceTransaction.getIdentifier());
         assert serviceTransaction.equals(transactionStore.get(serviceTransaction.getIdentifier()));

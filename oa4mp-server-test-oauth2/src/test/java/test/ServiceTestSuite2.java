@@ -30,6 +30,7 @@ import org.junit.runners.Suite;
 // Then start the tests for OA4MP proper.
 
 @Suite.SuiteClasses({
+        QDLTests.class,
         MultipleInheritanceTest.class,
         ConfigInheritanceTest.class,
         TemplateTest.class,

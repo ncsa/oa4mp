@@ -32,7 +32,10 @@ public class AdminClientTest extends TestBase {
         testAdminClient(((TestStoreProvider2) TestUtils.getPgStoreProvider()).getAdminClientStore());
         testAdminClientConverter(((TestStoreProvider2) TestUtils.getPgStoreProvider()).getAdminClientStore());
     }
-
+    public void testDerby() throws Exception {
+         testAdminClient(((TestStoreProvider2) TestUtils.getDerbyStoreProvider()).getAdminClientStore());
+         testAdminClientConverter(((TestStoreProvider2) TestUtils.getDerbyStoreProvider()).getAdminClientStore());
+     }
 
     /**
      * Test that creating and populating a new admin client then converting to then from JSON

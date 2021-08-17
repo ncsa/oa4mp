@@ -64,6 +64,8 @@ public abstract class AbstractClientLoader<T extends ClientEnvironment> extends 
             masp.addListener(new FSAssetStoreProvider(cn, getAssetProvider(), assetConverter));
             masp.addListener(new SQLAssetStoreProvider(cn, ClientXMLTags.POSTGRESQL_STORE, getPgConnectionPoolProvider(),
                     getAssetProvider(), assetConverter));
+            masp.addListener(new SQLAssetStoreProvider(cn, ClientXMLTags.DERBY_STORE, getDerbyConnectionPoolProvider(),
+                    getAssetProvider(), assetConverter));
             masp.addListener(new SQLAssetStoreProvider(cn, ClientXMLTags.MYSQL_STORE, getMySQLConnectionPoolProvider(),
                     getAssetProvider(), assetConverter));
             masp.addListener(new SQLAssetStoreProvider(cn, ClientXMLTags.MARIADB_STORE, getMariaDBConnectionPoolProvider(),

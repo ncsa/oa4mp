@@ -129,4 +129,8 @@ public class AdminClientStoreProviders {
         return new AdminClientSQLStoreProvider(node, OA4MPConfigTags.POSTGRESQL_STORE, cpp);
     }
 
+    public static AdminClientSQLStoreProvider getDerbyACS(ConfigurationNode node, ConnectionPoolProvider<? extends ConnectionPool> cpp ){
+        return new AdminClientSQLStoreProvider(node, OA4MPConfigTags.DERBY_STORE, cpp);
+    }
+
 }

@@ -40,6 +40,16 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
     public String RESOURCE_KEY = "resource";
     public String IS_RFC8628_KEY = "is_rfc8628";
 
+    public String getUserCode() {
+        return userCode;
+    }
+
+    public void setUserCode(String userCode) {
+        this.userCode = userCode;
+    }
+
+    String userCode;
+
     public OA2ServiceTransaction(AuthorizationGrant ag) {
         super(ag);
     }

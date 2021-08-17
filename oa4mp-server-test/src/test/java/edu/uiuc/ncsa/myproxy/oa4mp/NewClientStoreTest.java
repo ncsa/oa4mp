@@ -25,6 +25,10 @@ public class NewClientStoreTest extends TestBase {
         testBasic(TestUtils.getPgStoreProvider().getClientStore());
     }
 
+    public void testDerby() throws Exception {
+        testBasic(TestUtils.getDerbyStoreProvider().getClientStore());
+    }
+
   /*  public void testAG() throws Exception {
         testBasic(TestUtils.getAgStoreProvider().getClientStore());
     }

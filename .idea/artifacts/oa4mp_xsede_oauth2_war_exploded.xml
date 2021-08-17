@@ -38,6 +38,7 @@
           <element id="library" level="project" name="Maven: org.slf4j:slf4j-api:1.7.30" />
           <element id="library" level="project" name="Maven: com.typesafe:config:1.4.0" />
           <element id="library" level="project" name="Maven: javax.activation:javax.activation-api:1.2.0" />
+          <element id="library" level="project" name="Maven: org.apache.derby:derby:10.14.1.0" />
           <element id="library" level="project" name="Maven: javax.servlet:javax.servlet-api:3.1.0" />
           <element id="library" level="project" name="Maven: edu.uiuc.ncsa.security:ncsa-security-util:5.2-SNAPSHOT" />
           <element id="library" level="project" name="Maven: edu.uiuc.ncsa.security:ncsa-qdl:1.3-QDL-SNAPSHOT" />
