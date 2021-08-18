@@ -1,0 +1,73 @@
+{
+  "comment": [
+    "This JSON file contains a sample for a file system claims source.",
+    "It keyed on eppn and the entries are returned to the system"
+  ],
+  "bob@bigstate.edu": {
+    "capabilites": [
+      "storage.read:/store",
+      "storage.write:/store/data",
+      "compute.create:/"
+    ]
+  },
+  "aethlred@cirdicing.edu": {
+    "isMemberOf": [
+      {
+        "name": "org_ici",
+        "id": 1282
+      },
+      {
+        "name": "all_physics",
+        "id": 1097
+      },
+      {
+        "name": "admin",
+        "id": 1363
+      }
+    ],
+    "capabilites": [
+       "storage.read:/public/phys",
+       "storage.write:/public/phys/ac",
+       "compute.create",
+       "compute.execute"
+     ]
+  },
+  "kai.tadashi@ijn.jp": {
+    "comment": ["Typical record. These can be asserted as claims in the ID token or used to create",
+    "access token claims."],
+    "email": "gaynor@illinois.edu",
+    "given_name": "Tadashi",
+    "family_name": "Kai",
+    "eptid": "https://idp.ncsa.illinois.edu/idp/shibboleth!https://cilogon.org/shibboleth!i65P3o9qFNjrpS4z6+WI7Dir/4I=",
+    "name": "Jeffrey Gaynor",
+    "acr": "https://refeds.org/profile/mfa",
+    "uid": "tkai",
+    "uidNumber": "25939",
+    "capabilites": [
+           "storage.read:/public/phys",
+           "storage.write:/public/phys/tkai",
+           "compute.create",
+           "compute.execute"
+         ]
+
+  },
+  "default_claim": {
+    "comment": [
+      "This is the default claim returned by the handler **if** you specify use_default",
+      "as part of the configuration. "
+    ],
+    "eppn": "unknown@foo.bar",
+    "isMemberOf": [
+      {
+        "name": "org_baz",
+        "id": 1212
+      },
+      {
+        "name": "jira-users",
+        "id": 1163
+      }
+    ],
+    "capabilites": ["storage.read:/public/guest"]
+  }
+
+}
