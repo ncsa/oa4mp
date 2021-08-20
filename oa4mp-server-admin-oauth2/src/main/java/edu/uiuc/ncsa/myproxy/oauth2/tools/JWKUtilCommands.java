@@ -46,7 +46,12 @@ public class JWKUtilCommands extends CommonCommands {
     public static String JWK_EXTENSION = "jwk";
 
     protected void createKeysHelps() {
-        say("create_keys [" + CL_INPUT_FILE_FLAG + " set_of_keys " + CL_IS_PUBLIC_FLAG + "] | [" + CL_IS_PRIVATE_FLAG + "] " + CL_OUTPUT_FILE_FLAG + " file");
+        say("create_keys [" + CL_INPUT_FILE_FLAG + " set_of_keys " + CL_IS_PUBLIC_FLAG + "] | [" + CL_IS_PRIVATE_FLAG + "] " + FORCE_TO_STD_OUT_FLAG + "] " + CL_OUTPUT_FILE_FLAG + " file");
+        sayi(CL_INPUT_FILE_FLAG + " - and input file of keys. Implies " + CL_IS_PUBLIC_FLAG + " and will extract the public keys.");
+        sayi(CL_IS_PUBLIC_FLAG + " - extract public keys from the file specified by " + CL_INPUT_FILE_FLAG);
+        sayi(CL_IS_PRIVATE_FLAG + " - (implied) generate full set of keys. Cannot be specified with  " + CL_IS_PUBLIC_FLAG);
+        sayi(FORCE_TO_STD_OUT_FLAG + " - write the keys to standard out.");
+        sayi(CL_OUTPUT_FILE_FLAG + " - write the keys to the given file.");
         sayi("Create a set of RSA JSON Web keys and store them in the given file");
         sayi("There are several modes of operation. If you do not specify an output file, then the keys are written ");
         sayi("to the command line.");
@@ -121,6 +126,7 @@ public class JWKUtilCommands extends CommonCommands {
         say("See also, create_keys, set_keys");
     }
 
+    String FORCE_TO_STD_OUT_FLAG = "-o";
 
     public void create_keys(InputLine inputLine) throws Exception {
         // Intercept the help request here since the one in the signing utility is a bit different.
@@ -136,6 +142,8 @@ public class JWKUtilCommands extends CommonCommands {
             sg.create(inputLine);
             return;
         }
+        boolean writeToStdOut = inputLine.hasArg(FORCE_TO_STD_OUT_FLAG);
+        inputLine.removeSwitch(FORCE_TO_STD_OUT_FLAG);
         // #2 Error case that public keys are wanted, but no input file is specified.
         if (inputLine.hasArg(CL_IS_PUBLIC_FLAG) && !inputLine.hasArg(CL_INPUT_FILE_FLAG)) {
             if (isBatch()) {
@@ -146,7 +154,9 @@ public class JWKUtilCommands extends CommonCommands {
             return;
         }
         boolean isPublic = inputLine.hasArg(CL_IS_PUBLIC_FLAG);
+        inputLine.removeSwitch(CL_IS_PUBLIC_FLAG);
         boolean isPrivate = inputLine.hasArg(CL_IS_PRIVATE_FLAG);
+        inputLine.removeSwitch(CL_IS_PRIVATE_FLAG);
         if (isPrivate && isPublic) {
             String err = "Error: cannot specify both private and public keys at the same time";
             if (isBatch()) {
@@ -157,6 +167,17 @@ public class JWKUtilCommands extends CommonCommands {
             return;
         }
         boolean hasOutputFile = inputLine.hasArg(CL_OUTPUT_FILE_FLAG);
+        String outFilename = null;
+        if (hasOutputFile) {
+            outFilename = inputLine.getNextArgFor(CL_OUTPUT_FILE_FLAG);
+            inputLine.removeSwitchAndValue(CL_OUTPUT_FILE_FLAG);
+        }
+        boolean hasInputFile = inputLine.hasArg(CL_INPUT_FILE_FLAG);
+        String inFilename = null;
+        if (hasInputFile) {
+            inFilename = inputLine.getNextArgFor(CL_INPUT_FILE_FLAG);
+            inputLine.removeSwitchAndValue(CL_INPUT_FILE_FLAG);
+        }
         if (!isPublic) {
 
             // next case is to just generate the full key set
@@ -164,20 +185,21 @@ public class JWKUtilCommands extends CommonCommands {
             JSONWebKeys keys = sg.createJsonWebKeys();
             JSONObject jwks = JSONWebKeyUtil.toJSON(keys);
             if (hasOutputFile) {
-                writeFile(inputLine.getNextArgFor(CL_OUTPUT_FILE_FLAG), jwks.toString(2));
-            } else {
+                writeFile(outFilename, jwks.toString(2));
+            }
+            if (writeToStdOut) {
                 say(jwks.toString(2));
             }
             return;
         }
         // final case, generate the public keys.
-        String contents = readFile(inputLine.getNextArgFor(CL_INPUT_FILE_FLAG));
+        String contents = readFile(inFilename);
 
         JSONWebKeys keys = JSONWebKeyUtil.fromJSON(contents);
         JSONWebKeys targetKeys = JSONWebKeyUtil.makePublic(keys);
         JSONObject zzz = JSONWebKeyUtil.toJSON(targetKeys);
         if (hasOutputFile) {
-            writeFile(inputLine.getNextArgFor(CL_OUTPUT_FILE_FLAG), zzz.toString(2));
+            writeFile(outFilename, zzz.toString(2));
         } else {
             say(zzz.toString(2));
         }
@@ -417,7 +439,7 @@ public class JWKUtilCommands extends CommonCommands {
             return;
         }
         boolean showPrivateKeys = inputLine.hasArg(showAllKeys);
-            boolean hasInputFile = inputLine.hasArg(CL_INPUT_FILE_FLAG);
+        boolean hasInputFile = inputLine.hasArg(CL_INPUT_FILE_FLAG);
         JSONWebKeys localKeys = null;
         if (showPrivateKeys && !hasInputFile) {
             // try to use the defined keys
@@ -435,11 +457,11 @@ public class JWKUtilCommands extends CommonCommands {
         if (hasDefault) {
             defaultKey = localKeys.getDefaultKeyID();
         }
-      boolean isFirst = true;
+        boolean isFirst = true;
         for (String key : localKeys.keySet()) {
-            if(isFirst){
+            if (isFirst) {
                 isFirst = false;
-            }else{
+            } else {
                 say(""); // blank line between keys.
             }
             if (hasDefault) {

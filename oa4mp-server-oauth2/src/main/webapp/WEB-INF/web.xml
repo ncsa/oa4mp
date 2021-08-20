@@ -5,8 +5,7 @@
                   http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
          version="2.5">
 
-    <display-name>The MyProxy Delegation Service</display-name>
-
+    <display-name>The OA4MP Service</display-name>
 
     <servlet>
         <servlet-name>discovery</servlet-name>
@@ -229,17 +228,6 @@
         <listener-class>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2Bootstrapper</listener-class>
 
     </listener>
-
-    <!--
-        <error-page>
-            <error-code>404</error-code>
-            <location>/generalerror.jsp</location>
-        </error-page>
-
-        <error-page>
-            <error-code>500</error-code>
-            <location>/generalerror.jsp</location>
-        </error-page>-->
 
     <error-page>
         <exception-type>edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.TooManyRequestsException</exception-type>

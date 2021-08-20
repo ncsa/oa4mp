@@ -13,6 +13,7 @@ if[
 ];
 
 all_audience. := ['ANY', 'LIGO', 'segments.ligo.org']; // constant
+access_token.'ver' := 'scitoken:2.0';
 
 // get current allowed scopes based on group memberships
 allowed_scopes. := script_load('ligo/vo/get_scopes.qdl', claims.isMemberOf.);
@@ -39,3 +40,4 @@ allowed_scopes. := script_load('ligo/vo/get_scopes.qdl', claims.isMemberOf.);
       // return only things we recognize.
       access_token.aud. :=mask(all_audience.,  has_value(all_audience., audience.));
    ];
+

@@ -175,7 +175,6 @@ public class RFC8628AuthorizationServer extends EnvServlet {
                 // If they sent the user code with the request, do it here.
                 printAllParameters(request);
                 if (!StringUtils.isTrivial(request.getParameter(RFC8628Constants2.USER_CODE))) {
-
                     processRequest(request,  pendingState, false);
                     JSPUtil.fwd(request, response, getOkPage());
                     return;

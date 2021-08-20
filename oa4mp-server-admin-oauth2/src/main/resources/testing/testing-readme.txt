@@ -38,6 +38,7 @@ When a new version is deployed, here is the testing order
 
   -- localhost:test/no_cfg
      No configuration of any sort (i.e., cfg is unset, strict scopes etc)
+     Uses a Derby store for the client, just to make sure that gets tested someplace.
      Most common configuration in production.
      ** Must pass **
        Generic AT with lifetime 1009 sec.

@@ -77,29 +77,10 @@ public class FSClaimSource extends BasicClaimsSourceImpl {
      */
     @Override
     protected JSONObject realProcessing(JSONObject claims, HttpServletRequest request, ServiceTransaction transaction) throws UnsupportedScopeException {
-        Object rawfilePath = getConfiguration().getProperty(FILE_PATH_KEY);
-        if (rawfilePath == null) {
-            throw new GeneralException("ERROR:No \"" + FILE_PATH_KEY + "\" set for this claim source.");
-        }
-        String filePath = rawfilePath.toString();
-        if (filePath.isEmpty()) {
-            throw new GeneralException("ERROR:No \"" + FILE_PATH_KEY + "\" set for this claim source.");
-        }
-
-        File f = new File(filePath);
-        if (!f.exists()) {
-            throw new GeneralException("ERROR:File \"" + f + "\" does not exist on this system.");
-        }
-        if (!f.isFile()) {
-            throw new GeneralException("ERROR: \"" + f + "\" is not a file.");
-        }
-        if (!f.canRead()) {
-            throw new GeneralException("ERROR: \"" + f + "\" cannot be read.");
-        }
         // Finally, we can do something...
         String rawJSON = null;
         try {
-            rawJSON = readFile(filePath);
+            rawJSON = readRawJSON();
         } catch (IOException e) {
             DebugUtil.error(this, "Error reading file \"" + e.getMessage() + "\".", e);
             throw new GeneralException(e);
@@ -124,9 +105,43 @@ public class FSClaimSource extends BasicClaimsSourceImpl {
         return super.realProcessing(claims, request, transaction);
     }
 
-    protected String readFile(String path) throws IOException {
-        File file = new File(path);
-        FileReader fileReader = new FileReader(file);
+    public void setRawJSON(String rawJSON) {
+        this.rawJSON = rawJSON;
+    }
+
+    String rawJSON = null;
+    protected boolean hasRawJSON(){
+        return rawJSON != null;
+    }
+    protected String readRawJSON() throws IOException {
+           if(hasRawJSON()) {
+               return rawJSON;
+           }
+               return readFile();
+    }
+
+    protected String readFile() throws IOException {
+        Object rawfilePath = getConfiguration().getProperty(FILE_PATH_KEY);
+        if (rawfilePath == null) {
+            throw new GeneralException("ERROR:No \"" + FILE_PATH_KEY + "\" set for this claim source.");
+        }
+        String filePath = rawfilePath.toString();
+        if (filePath.isEmpty()) {
+            throw new GeneralException("ERROR:No \"" + FILE_PATH_KEY + "\" set for this claim source.");
+        }
+
+        File f = new File(filePath);
+        if (!f.exists()) {
+            throw new GeneralException("ERROR:File \"" + f + "\" does not exist on this system.");
+        }
+        if (!f.isFile()) {
+            throw new GeneralException("ERROR: \"" + f + "\" is not a file.");
+        }
+        if (!f.canRead()) {
+            throw new GeneralException("ERROR: \"" + f + "\" cannot be read.");
+        }
+
+        FileReader fileReader = new FileReader(f);
         BufferedReader bufferedReader = new BufferedReader(fileReader);
         StringBuffer lines = new StringBuffer();
         String inLine = bufferedReader.readLine();

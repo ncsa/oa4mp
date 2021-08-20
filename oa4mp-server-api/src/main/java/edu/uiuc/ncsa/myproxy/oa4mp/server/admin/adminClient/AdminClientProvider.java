@@ -18,6 +18,7 @@ public class AdminClientProvider<V extends AdminClient> extends IdentifiableProv
     public V get(boolean createNewIdentifier) {
         V v = (V) new AdminClient(createNewId(createNewIdentifier));
         v.setCreationTS(new Date());
+        v.setDebugOn(true); // default for admin clients
         return v;
     }
 }

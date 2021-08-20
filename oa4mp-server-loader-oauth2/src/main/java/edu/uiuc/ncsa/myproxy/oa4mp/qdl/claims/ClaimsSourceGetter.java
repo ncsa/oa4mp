@@ -2,8 +2,12 @@ package edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.*;
+import edu.uiuc.ncsa.qdl.evaluate.IOEvaluator;
+import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
+import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
 import edu.uiuc.ncsa.qdl.state.State;
+import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.StemEntry;
 import edu.uiuc.ncsa.qdl.variables.StemList;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
@@ -57,20 +61,20 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
         }
         switch (arg.getString(CS_DEFAULT_TYPE)) {
             case CS_TYPE_CODE:
-                return doCode(arg, username, headers);
+                return doCode(arg, username, headers, state);
             case CS_TYPE_FILE:
-                return doFS(arg, username);
+                return doFS(arg, username, state);
             case CS_TYPE_LDAP:
-                return doLDAP(arg, username);
+                return doLDAP(arg, username,state);
             case CS_TYPE_HEADERS:
-                return doHeaders(arg, username, headers);
+                return doHeaders(arg, username, headers,state);
             case CS_TYPE_NCSA:
-                return doNCSA(arg, username);
+                return doNCSA(arg, username,state);
         }
         return null;
     }
 
-    protected StemVariable doCode(StemVariable arg, String username, StemVariable headers) {
+    protected StemVariable doCode(StemVariable arg, String username, StemVariable headers, State state) {
         BasicClaimsSourceImpl basicClaimsSource = (BasicClaimsSourceImpl) ConfigtoCS.convert(arg);
         OA2ServiceTransaction t = new OA2ServiceTransaction((Identifier) null);
         t.setUsername(username);
@@ -83,7 +87,7 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
 
     }
 
-    protected StemVariable doNCSA(StemVariable arg, String username) {
+    protected StemVariable doNCSA(StemVariable arg, String username, State state) {
         DebugUtil.setIsEnabled(true);
         DebugUtil.setDebugLevel(DebugUtil.DEBUG_LEVEL_TRACE);
         NCSALDAPClaimSource ncsaldapClaimSource = (NCSALDAPClaimSource) ConfigtoCS.convert(arg);
@@ -98,7 +102,7 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
         return output;
     }
 
-    public StemVariable doHeaders(StemVariable arg, String username, StemVariable headers) {
+    public StemVariable doHeaders(StemVariable arg, String username, StemVariable headers, State state) {
         HTTPHeaderClaimsSource httpHeaderClaimsSource = (HTTPHeaderClaimsSource) ConfigtoCS.convert(arg);
 
         OA2ServiceTransaction t = new OA2ServiceTransaction((Identifier) null);
@@ -113,7 +117,7 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
 
     }
 
-    private StemVariable doLDAP(StemVariable arg, String username) {
+    private StemVariable doLDAP(StemVariable arg, String username, State state) {
         LDAPClaimsSource ldapClaimsSource = (LDAPClaimsSource) ConfigtoCS.convert(arg);
         OA2ServiceTransaction t = new OA2ServiceTransaction((Identifier) null);
         t.setUsername(username);
@@ -162,9 +166,36 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
         }
         return out;
     }
+        /*
+            vfs_cfg.type :='pass_through';
+  vfs_cfg.scheme := 'vfs2';
+  vfs_cfg.mount_point := '/test2';
+  vfs_cfg.access := 'rw';
+  vfs_cfg.root_dir := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-admin-oauth2/src/main/resources/qdl/weitzel';
+  vfs_mount(vfs_cfg.);
+      cfg. := new_template('file')
+  cfg.file_path := 'vfs2#/test2/test-claims.json'
+  get_claims(cfg., 'dweitzel2@unl.edu')
+         */
+    protected StemVariable doFS(StemVariable arg, String username, State state) {
+        Polyad polyad = new Polyad(IOEvaluator.READ_FILE);
+        polyad.addArgument(new ConstantNode(arg.getString(CS_FILE_FILE_PATH), Constant.STRING_TYPE));
+        state.getMetaEvaluator().evaluate(polyad,state);
+         String rawJSON = polyad.getResult().toString();
+/*
+        String qdl = "z__ := file_read('" + arg.getString(CS_FILE_FILE_PATH) + "');";
+        QDLInterpreter qi = new QDLInterpreter(state);
+        String rawJSON = null;
+        try {
+            qi.execute(qdl);
+            rawJSON = (String) state.getValue("z__");
 
-    protected StemVariable doFS(StemVariable arg, String username) {
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
+*/
         FSClaimSource fsClaimSource = (FSClaimSource) ConfigtoCS.convert(arg);
+        fsClaimSource.setRawJSON(rawJSON);
         OA2ServiceTransaction t = new OA2ServiceTransaction((Identifier) null);
         t.setUsername(username);
         JSONObject claims = fsClaimSource.process(new JSONObject(), t);

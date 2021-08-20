@@ -46,21 +46,21 @@ public class CreateSourceConfig implements QDLFunction, CSConstants {
         setBasicValues(arg, output);
         switch (arg.getString(CS_DEFAULT_TYPE)) {
             case CS_TYPE_FILE:
-               return doFS(arg, output);
+                return doFS(arg, output);
             case CS_TYPE_NCSA:
-return                doNCSA(arg, output);
+                return doNCSA(arg, output);
             case CS_TYPE_LDAP:
-return                doLDAP(arg, output);
+                return doLDAP(arg, output);
             case CS_TYPE_HEADERS:
-return                 doHeaders(arg,output);
+                return doHeaders(arg, output);
             case CS_TYPE_CODE:
-return                doCode(arg, output);
+                return doCode(arg, output);
         }
         return output;
     }
 
     private StemVariable doCode(StemVariable arg, StemVariable output) {
-        if(! arg.containsKey(CS_CODE_JAVA_CLASS)){
+        if (!arg.containsKey(CS_CODE_JAVA_CLASS)) {
             throw new IllegalArgumentException("Error:" + CS_CODE_JAVA_CLASS + " is required for a custom code configuration.");
         }
         setBasicValues(arg, output);
@@ -121,8 +121,8 @@ return                doCode(arg, output);
         if (!arg.containsKey(CS_LDAP_SERVER_ADDRESS)) {
             throw new IllegalArgumentException("Error:" + CS_LDAP_SERVER_ADDRESS + " is required for ldap configurations");
         }
-        setValue(arg,output, CS_LDAP_CONTEXT_NAME,"");
-       return output.union(arg);
+        setValue(arg, output, CS_LDAP_CONTEXT_NAME, "");
+        return output.union(arg);
     }
 
     /**
@@ -137,7 +137,6 @@ return                doCode(arg, output);
     }
 
 
-
     protected StemVariable doFS(StemVariable arg, StemVariable output) {
         if (!arg.containsKey(CS_FILE_FILE_PATH)) {
             throw new IllegalArgumentException("Error: No " + CS_FILE_FILE_PATH + " specified. You must specify this.");
@@ -146,7 +145,7 @@ return                doCode(arg, output);
         return output.union(arg);
     }
 
-   protected void setValue(StemVariable arg, StemVariable output, String key, Object defaultValue) {
+    protected void setValue(StemVariable arg, StemVariable output, String key, Object defaultValue) {
         if (arg == null) {
             output.put(key, defaultValue);
             return;
@@ -156,6 +155,7 @@ return                doCode(arg, output);
 
     /**
      * These are the basic value for every configuration.
+     *
      * @param arg
      * @param output
      */

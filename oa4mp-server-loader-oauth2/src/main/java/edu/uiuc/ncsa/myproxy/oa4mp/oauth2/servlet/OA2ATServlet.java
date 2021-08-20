@@ -1010,6 +1010,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
      * @throws Throwable
      */
     protected void doRFC8628(OA2Client client, HttpServletRequest request, HttpServletResponse response) throws Throwable {
+        printAllParameters(request);
         MetaDebugUtil debugger = createDebugger(client);
         debugger.trace(this, "starting RFC 8628 access token exchange.");
       //  printAllParameters(request);
@@ -1045,8 +1046,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         OA2ServiceTransaction transaction = (OA2ServiceTransaction) getTransaction(authorizationGrant);
 
         if (transaction == null) {
-            debugger.info(this, "Attempt to access RFC8628 end point by client, but no pending devide flow found.");
-            info("Attempt to access RFC8628 end point by client, but no pending devide flow found.");
+            debugger.info(this, "Attempt to access RFC8628 end point by client, but no pending device flow found.");
+            info("Attempt to access RFC8628 end point by client, but no pending device flow found.");
             throw new OA2ATException(OA2Errors.ACCESS_DENIED,
                     "no pending request", HttpStatus.SC_UNAUTHORIZED, null);
         }

@@ -1,5 +1,5 @@
 /*
-   This script will create the tables for a basic oa4mp install. Since MySQL has *no* varaible
+   This script will create the tables for a basic oa4mp install. Since MySQL has *no* variable
    support, everything is hard-coded. if you want something other than the default names and
    then edit the file. The only thing
 */

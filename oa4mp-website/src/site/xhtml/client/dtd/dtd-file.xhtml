@@ -37,6 +37,7 @@
     <a href="../../common/configuration/file-store.html">fileStore</a>|
     <a href="../../common/configuration/postgres-store.html">postgresql</a>|
     <a href="../../common/configuration/mysql-store.html">mysql</a>|
+    <a href="../../common/configuration/derby-store.html">apache derby</a>|
     <a href="../../common/configuration/mariadb-store.html">mariadb</a>|
     <a href="../../common/configuration/keystore.html">keystore</a>)|
     <a href="../../common/configuration/scopes.html">scopes</a>*&gt;<br/>
@@ -80,6 +81,13 @@
      tablename CDATA #IMPLIED
      tablePrefix CDATA #IMPLIED
      driver CDATA #IMPLIED&gt;
+    &lt;!ELEMENT <a href="../../common/configuration/derby-store.html">derby</a> (assetStore)*&gt;
+    &lt;!ATTLIST <a href="../../common/configuration/derby-store.html">derby</a>
+         password CDATA #REQUIRED
+         username CDATA #REQUIRED
+         bootPassword CDATA #REQUIRED
+         schema CDATA #REQUIRED
+         database CDATA #REQUIRED&gt;
 &lt;!ELEMENT <a href="../../common/configuration/mariadb-store.html">mariadb</a> (assetStore)*&gt;
 &lt;!ATTLIST <a href="../../common/configuration/mariadb-store.html">mariadb</a>
      password CDATA #REQUIRED

@@ -11,6 +11,7 @@
      DB_PASSWORD - password to the database
        USER_NAME - name of the user (created below)
    USER_PASSWORD - password for user
+          SCHEMA - schema for the database
 
    Note 1: If you want your database to live in
 
@@ -92,37 +93,37 @@ CREATE SCHEMA oauth2;
 
 CREATE TABLE oauth2.clients
 (
-    client_id        VARCHAR(255) PRIMARY KEY,
-    public_key       CLOB,
-    name             CLOB,
-    home_url         CLOB,
-    error_url        CLOB,
-    issuer           CLOB,
-    ldap             CLOB,
-    email            CLOB,
-    scopes           CLOB,
-    proxy_limited    BOOLEAN,
-    public_client    BOOLEAN,
-    creation_ts      timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+       client_id VARCHAR(255) PRIMARY KEY,
+          public_key CLOB,
+                name CLOB,
+            home_url CLOB,
+           error_url CLOB,
+              issuer CLOB,
+                ldap CLOB,
+               email CLOB,
+              scopes CLOB,
+       proxy_limited BOOLEAN,
+       public_client BOOLEAN,
+         creation_ts timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     last_modified_ts timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    rt_lifetime      bigint,
-    callback_uri     CLOB,
-    sign_tokens      BOOLEAN,
-    cfg              CLOB
+         rt_lifetime bigint,
+        callback_uri CLOB,
+         sign_tokens BOOLEAN,
+                 cfg CLOB
 );
 
 CREATE TABLE oauth2.adminClients
 (
-    admin_id         VARCHAR(255) PRIMARY KEY,
-    name             CLOB,
-    secret           CLOB,
-    email            CLOB,
-    creation_ts      timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            admin_id VARCHAR(255) PRIMARY KEY,
+                name CLOB,
+              secret CLOB,
+               email CLOB,
+         creation_ts timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     last_modified_ts timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    vo               CLOB,
-    max_clients      BIGINT,
-    issuer           CLOB,
-    config           CLOB
+                  vo CLOB,
+         max_clients BIGINT,
+              issuer CLOB,
+              config CLOB
 );
 
 
@@ -141,14 +142,13 @@ CREATE TABLE oauth2.permissions
 
 CREATE TABLE oauth2.client_approvals
 (
-    client_id   VARCHAR(255) PRIMARY KEY,
-    approver    CLOB,
-    approved    BOOLEAN,
-    status      CLOB,
+      client_id VARCHAR(255) PRIMARY KEY,
+       approver CLOB,
+       approved BOOLEAN,
+         status CLOB,
     approval_ts TIMESTAMP
 );
 
-   CREATE UNIQUE INDEX verifier on oauth2.transactions (verifier_token);
 
 CREATE TABLE oauth2.transactions
 (
@@ -178,8 +178,8 @@ CREATE TABLE oauth2.transactions
                is_rfc_8628 BOOLEAN,
                  user_code VARCHAR(1024)
 );
-CREATE UNIQUE INDEX access_token on oauth2.transactions (access_token);
-   CREATE UNIQUE INDEX refresh_token on oauth2.transactions (refresh_token);
+   CREATE INDEX access_token on oauth2.transactions (access_token);
+   CREATE INDEX refresh_token on oauth2.transactions (refresh_token);
 
 CREATE TABLE oauth2.tx_records
 (
@@ -211,38 +211,3 @@ CREATE TABLE oauth2.virtual_organizations
           resource CLOB,
              valid boolean);
   create  INDEX discovery_path on oauth2.virtual_organizations (discovery_path);
-
-/*
-    Now to grant restricted access.
- */
-
-GRANT ALL PRIVILEGES ON oauth2.client_approvals TO NEW_USER;
-GRANT ALL PRIVILEGES ON oauth2.clients TO NEW_USER;
-GRANT ALL PRIVILEGES ON oauth2.adminClients TO NEW_USER;
-GRANT ALL PRIVILEGES ON oauth2.transactions TO NEW_USER;
-GRANT ALL PRIVILEGES ON oauth2.permissions TO NEW_USER;
-GRANT ALL PRIVILEGES ON oauth2.tx_records TO NEW_USER;
-GRANT ALL PRIVILEGES ON oauth2.virtual_organizations TO NEW_USER;
-
-
-
-/*GRANT ALL PRIVILEGES ON oauth2.client_approvals TO oa4mp;
-GRANT ALL PRIVILEGES ON oauth2.clients TO oa4mp;
-GRANT ALL PRIVILEGES ON oauth2.adminClients TO oa4mp;
-GRANT ALL PRIVILEGES ON oauth2.transactions TO oa4mp;
-GRANT ALL PRIVILEGES ON oauth2.permissions TO oa4mp;
-GRANT ALL PRIVILEGES ON oauth2.tx_records TO oa4mp;
-GRANT ALL PRIVILEGES ON oauth2.virtual_organizations TO oa4mp;
-*/
-/*
- Useful commands
- ij - starts the command line tool (once installed)
-
- To connect to the database
- ij> connect 'jdbc:derby:/home/ncsa/temp/oa4mp2/derby;create=true'
-
- To run (possibly this scripts). argument is the full path to the script.
- ij> run 'myscript.sql';
-
-
- */

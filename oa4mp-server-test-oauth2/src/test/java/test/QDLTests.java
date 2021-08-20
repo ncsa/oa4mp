@@ -61,9 +61,45 @@ public class QDLTests extends AbstractQDLTester {
 
     }
 
+    public void testVFSFileClaimSource() throws Throwable {
+        OA2State state = (OA2State) getTestUtils().getNewState();
+        StringBuffer script = new StringBuffer();
+        // tests absolute path, not in server mode.
+        /*
+        cfg.type :='pass_through';
+        cfg.scheme := 'vfs';
+        cfg.mount_point := '/test';
+        cfg.access := 'rw';
+        cfg.root_dir := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources';
+        vfs_mount(cfg.);
+         */
+        String testClaimsFile = "vfs2#/test2/test-claims.json";
+        addLine(script, "module_load('edu.uiuc.ncsa.myproxy.oa4mp.qdl.OA2QDLLoader', 'java');");
+        addLine(script, "module_import('oa2:/qdl/oidc/claims');");
+        addLine(script,"vfs_cfg.type :='pass_through';");
+        addLine(script,"vfs_cfg.scheme := 'vfs2';");
+        addLine(script,"vfs_cfg.mount_point := '/test2';");
+        addLine(script,"vfs_cfg.access := 'rw';");
+        addLine(script,"vfs_cfg.root_dir := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources';");
+        addLine(script,"vfs_mount(vfs_cfg.);");  // Now we have a functional VFS with the target file in it.
+
+        addLine(script, "cfg. := new_template('file');");
+        addLine(script, "cfg.file_path := '" + testClaimsFile + "';");
+        addLine(script, "my_claims. := get_claims(create_source(cfg.), 'jgaynor');");
+        addLine(script, "ok_eppn := my_claims.eppn == 'test-eppn@foo.bar';");
+        addLine(script, "ok_name := my_claims.isMemberOf.0.name == 'org_ici';");
+        addLine(script, "ok_id := my_claims.isMemberOf.0.id == 1282;");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok_eppn", state) : "Did not get the correct eppn";
+        assert getBooleanValue("ok_name", state) : "Did not get the correct name from the zeroth group";
+        assert getBooleanValue("ok_id", state) : "Did not get the correct id from the zeroth group";
+
+    }
     public void testFileClaimSource() throws Throwable {
         OA2State state = (OA2State) getTestUtils().getNewState();
         StringBuffer script = new StringBuffer();
+        // tests absolute path, not in server mode.
         String testClaimsFile = "/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/test-claims.json";
         addLine(script, "module_load('edu.uiuc.ncsa.myproxy.oa4mp.qdl.OA2QDLLoader', 'java');");
         addLine(script, "module_import('oa2:/qdl/oidc/claims');");

@@ -38,7 +38,7 @@ public class ScitokenHandler extends AbstractAccessTokenHandler {
     @Override
     public void init() throws Throwable {
         super.init();
-        JSONObject sciTokens = getClaims();
+        JSONObject sciTokens = getAtData();
 
         // subject is optional
         sciTokens.put(SUBJECT, transaction.getUsername());

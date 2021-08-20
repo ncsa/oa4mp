@@ -43,6 +43,7 @@ public class AutoRegistrationServlet extends RegistrationServlet {
         }
         clientApproval.setApprover(approver);
         clientApproval.setApproved(true);
+        clientApproval.setStatus(ClientApproval.Status.APPROVED);
         getServiceEnvironment().getClientApprovalStore().save(clientApproval);
     }
 }

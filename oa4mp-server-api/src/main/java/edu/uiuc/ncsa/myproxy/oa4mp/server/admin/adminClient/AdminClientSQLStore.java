@@ -30,4 +30,11 @@ public class AdminClientSQLStore<V extends AdminClient> extends BaseClientSQLSto
         value.setLastModifiedTS(new java.sql.Timestamp(new Date().getTime()));
         super.save(value);
     }
+
+    @Override
+    public V create() {
+        V v= super.create();
+        v.setDebugOn(true); //default for AC's
+        return v;
+    }
 }
