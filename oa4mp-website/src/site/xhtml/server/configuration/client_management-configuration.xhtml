@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Configuring the client management (RFC 7591, 7592) servlet</title>
+    <!--#include virtual="../../head.html" -->
+</head>
+<body class="composite">
+<!--#include virtual="../../header.html" -->
+
+<h2>Using the Dynamic Client Registration and management Servlet</h2>
+
+<p>
+    There are two parts to the client management. They are RFC 7951, which
+    relates to creating a new client dynamically and RFC 7592 which
+    extends that to allow for managing clients with get, update or deletion.
+</p>
+<p>
+    There is also a native facility for oa4mp that can be used. This is kept
+    mostly for legacy purposes and can be ignored. This came in to existence
+    well before the RFC's were written and rather very similar. Generally
+    unless you have clients that are using it, ignore it.
+</p>
+<p>
+    All of the api elements below live in the clientManagement element of the
+    server configuration. Note that if you omit that element, the defaults
+    are used and the endpoint is active.
+</p>
+
+<table border="2">
+    <tbody>
+    <tr>
+        <td>Attribute</td>
+        <td>Required?</td>
+        <td>Default</td>
+        <td>Description</td>
+    </tr>
+    <tr>
+        <td>enabled</td>
+        <td>N</td>
+        <td>true</td>
+        <td>Whether to completely disable or enable this facility. Alternately, you could
+        just disable each entry, so this is a convenience.</td>
+    </tr>
+    </tbody>
+</table>
+
+<table border="2">
+    <tbody>
+    <tr>
+        <td>Attribute</td>
+        <td>Required?</td>
+        <td>Default</td>
+        <td>Description</td>
+    </tr>
+    <tr>
+        <td>anonymousOK</td>
+        <td>N</td>
+        <td>false</td>
+        <td>(RFC 7591 protocol only). Allow posts to create a new client. These will not be approved automatically.</td>
+    </tr>
+    <tr>
+        <td>autoApprove</td>
+        <td>N</td>
+        <td>false</td>
+        <td>(RFC 7591 protocol only.) Whether or not to automatically approve anonymous requests. This <b><i>may</i></b>
+            be required
+            in highly automated systems with severely restricted access. Generally though setting
+            it <code>true</code> is a terrible idea and a security risk.
+        </td>
+    </tr>
+    <tr>
+        <td>autoApproverName</td>
+        <td>N</td>
+        <td>auto-approved</td>
+        <td>(RFC 7591 protocol only.) <b><i>If</i></b> auto approve is set to <code>true</code>,
+            this will be the name of the approver in the client approval store.
+        </td>
+    </tr>
+    <tr>
+         <td>enabled</td>
+         <td>N</td>
+         <td>true</td>
+         <td>whether or not to enable this api.</td>
+     </tr>
+    <tr>
+        <td>endpoint</td>
+        <td>N</td>
+        <td>oidc-cm</td>
+        <td>The endpoint in this service. If your has address https://www.foo.bar/oauth2, then not
+        specifying this means that the endpoint would be constructed as https://foo.bar/oauth2/oidc-cm</td>
+    </tr>
+    <tr>
+        <td>protocol</td>
+        <td>Y</td>
+        <td>-</td>
+        <td>The protocol for this endpoint, one of rfc7951, rfc7952 or oa4mp.</td>
+    </tr>
+    <tr>
+        <td>template</td>
+        <td>N</td>
+        <td>-</td>
+        <td>(RFC 7591 protocol only) The id of a configured client which is to be used as a template. This means that create
+        requests will create an copy of this client and use any arguments as overrides. This allows
+        you to have a uniform registration for all clients (e.g. all of your clients use the device flow
+        and need identical configurations). This only applies to the rfc 7951 api. You would need
+        to create this client (tip: never approve it) in the CLI before setting this.</td>
+    </tr>
+    <tr>
+        <td>url</td>
+        <td>N</td>
+        <td>-</td>
+        <td>If you want to completely specify an endpoint not, e.g., on this server, you must give the complete url.
+        For instance, if you wanted a to have https://clients.foo.bar instead. </td>
+    </tr>
+    </tbody>
+</table>
+
+<h3>An Example</h3>
+
+<pre>
+    &lt;clientManagement&gt;
+        &lt;api protocol="rfc7951"
+         enabled="true"
+         url="https://clients.foo.bar"
+         anonymousOK="true"
+         template="template:/client/generic" /&gt;
+        &lt;api protocol="rfc7952" enabled="true" endpoint="oidc-cm" /&gt;
+        &lt;api protocol="oa4mp" enabled="false"  /&gt;
+    &lt;/clientManagement&gt;
+</pre>
+ <p>
+     Note that omitting a protocol means that the component will be enabled with the defaults. Therefore
+     you must explicitly disable things you do not want.
+ </p>
+<h3>Disabling all client management</h3>
+<p>
+    If you don't want any sort of dynamic client registration, simply disable everything as follows:
+</p>
+<pre>
+    &lt;clientManagement enabled="false"&gt;
+</pre>
+
+<!--#include virtual="../../footer.html" -->
+</body>
+</html>

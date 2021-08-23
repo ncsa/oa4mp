@@ -1,0 +1,41 @@
+{
+  "comment": ["This is an example to show how to send extra attributes, here the cfg parameter.",
+    "See the readme.txt for more. For anonymous client this MUST always fail since QDL is not allowed."
+    ],
+  "application_type": "web",
+  "redirect_uris": [
+    "http://localhost/callback"
+  ],
+  "grant_types": [
+    "authorization_code",
+    "refresh_token"
+  ],
+  "response_types": [
+    "code",
+    "id_token"
+  ],
+  "client_name": "OA4MP extra attributes test - creation",
+  "scope": "openid email",
+  "contacts": [
+    "bob@bigstate.edu"
+  ],
+  "extra_attribute1": "some extra attribute",
+  "extra_attribute2": "my totally cool secret thingie",
+  "cfg": {
+    "qdl": [
+      "a",
+      "b"
+    ],
+    "claims": {
+      "sourceConfig": {
+        "foo": "bar"
+      },
+      "postProcessor": {
+        "fnord": "postP"
+      },
+      "preProcessor": {
+        "fnord2": "preP"
+      }
+    }
+  }
+}

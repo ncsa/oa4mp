@@ -17,6 +17,8 @@ import java.io.IOException;
 /**
  * A claim source backed by a file system. The file simply contains a JSON object of userids and attributes
  * associated with that id. These are then returned as claims.
+ * Alternately, the JSON itself can just be set and used. This is how QDL utilities do it so
+ * they can fetch the JSON from a virtual file system.
  * <p>Created by Jeff Gaynor<br>
  * on 10/21/19 at  12:49 PM
  */

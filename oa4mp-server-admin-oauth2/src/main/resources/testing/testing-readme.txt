@@ -398,6 +398,7 @@ TO DO:
        If this fails, the system is not working at a basic level.
 
 * Put on test.
+   (Deprecated since the portal this requires was shutdown.)
 -- localhost kubernetes install. This is located in the ~/.kube directory.
    Note that the endpoint here points to test.cilogon.org and is usually not
    available. Contact Dmitry to enable it for testing.

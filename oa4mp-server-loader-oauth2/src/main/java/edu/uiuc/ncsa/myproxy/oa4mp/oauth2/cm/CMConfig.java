@@ -14,7 +14,7 @@ public class CMConfig {
     public CMConfig() {
     }
 
-    public CMConfig(String protocol,  URI uri, boolean enabled) {
+    public CMConfig(String protocol, URI uri, boolean enabled) {
         this.protocol = protocol;
         this.uri = uri;
         this.enabled = enabled;
@@ -31,8 +31,9 @@ public class CMConfig {
                 ']';
     }
 
-    public  String protocol;
-   public  URI uri;
-   public  boolean enabled = false;
-   public  boolean isConfigured = false; // if this has been properly configured.
+    public String protocol;
+    public URI uri;
+    public boolean enabled = false;
+    public boolean isConfigured = false; // if this has been properly configured.
+
 }

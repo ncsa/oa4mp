@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.BasicClaimsSourceImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.LDAPClaimsSource;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.CM7591Config;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.CMConfig;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.CMConfigs;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.ClientManagementConstants;
@@ -413,9 +414,9 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                 URI.create(serverAddress + ClientManagementConstants.DEFAULT_OA4MP_ENDPOINT),
                 true);
         cmConfigs.put(tempCfg);
-        tempCfg = new CMConfig(ClientManagementConstants.RFC_7591_VALUE,
+        tempCfg = new CM7591Config(ClientManagementConstants.RFC_7591_VALUE,
                 URI.create(serverAddress + ClientManagementConstants.DEFAULT_RFC7591_ENDPOINT),
-                true);
+                true,null, false, false);
         cmConfigs.put(tempCfg);
         // NOTE there is no difference in endpoints for RFC 7591 and 7592! The question is if
         // the client management protocol endpoint also supports RFC 7592.
@@ -431,30 +432,47 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
     A typical entry we are parsing looks like this
 
      <clientManagement>
-        <api protocol="rfc7951" enable="true" endpoint="oidc-cm"/>
+        <api protocol="rfc7951" enable="true" endpoint="oidc-cm" anonymousOK="true"/>
         <api protocol="rfc7952" enable="true" endpoint="oidc-cm"/>
         <api protocol="oa4mp" enable="true"  url="https://foo.bar/oauth2/clients"/>
      </clientManagement>
 
      Note that EITHER the endpoint is given (and the full url is then constructed here)
-     or the url is given. Giving the url has right of way. The configuration object
+     OR the complete url is given. Giving the url has right of way. The configuration object
      only has URLs and they are resolved here from the server address.
 
      In this example, the endpoints for the RFCs are constructed but the native OA4MP endpoint
-     is explicitly given. These ar eneeded since responses must include an actual address for
+     is explicitly given. These are needed since responses must include an actual address for
      clients to come to for future updates, etc. 
      */
     public CMConfigs getCmConfigs() {
         if (cmConfigs == null) {
-            List kids = cn.getChildren(ClientManagementConstants.CLIENT_MANAGEMENT_TAG);
+            List<ConfigurationNode> kids = cn.getChildren(ClientManagementConstants.CLIENT_MANAGEMENT_TAG);
+            CMConfigs defaultCMConfigs = createDefaultCMConfig();
             if (kids == null || kids.isEmpty()) {
-                cmConfigs = createDefaultCMConfig();
-                return cmConfigs; // missing element (which is fine)  so jump out...
+                cmConfigs = defaultCMConfigs;
+                return cmConfigs; // missing the entire element (which is fine)  so jump out...
+            }
+            if(1 < kids.size()){
+                throw new IllegalArgumentException("Multiple " + ClientManagementConstants.CLIENT_MANAGEMENT_TAG + " elements found.");
+            }
+            ConfigurationNode cmNode = kids.get(0); // only process first one found
+            kids = cmNode.getChildren(); // This should have the API elements in it
+            cmConfigs = new CMConfigs();
+            String e = getFirstAttribute(cmNode, ClientManagementConstants.ENABLE_SERVICE);
+            if(!isTrivial(e)){
+                try{
+                     cmConfigs.setEnabled(Boolean.parseBoolean(e));
+                }catch(Throwable t){
+                     cmConfigs.setEnabled(true); // default
+                }
+            }
+            if(!cmConfigs.isEnabled()){
+                return cmConfigs;
             }
             String serverAddress = getServiceAddress().toString();
             // need to loop through all kids.
-            for (Object object : kids) {
-                ConfigurationNode sn = (ConfigurationNode) object;
+            for (ConfigurationNode sn : kids) {
                 if (sn.getName().equals(ClientManagementConstants.API_TAG)) {
                     try {
                         CMConfig cfg = CMConfigs.createConfigEntry(
@@ -462,7 +480,11 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                                 serverAddress,
                                 getFirstAttribute(sn, ClientManagementConstants.ENDPOINT_ATTRIBUTE),
                                 getFirstAttribute(sn, ClientManagementConstants.FULL_URL_ATTRIBUTE),
-                                getFirstAttribute(sn, ClientManagementConstants.ENDPOINT_ATTRIBUTE)
+                                getFirstAttribute(sn, ClientManagementConstants.ENABLE_SERVICE),
+                                getFirstAttribute(sn, ClientManagementConstants.RFC_7591_TEMPLATE),
+                                getFirstAttribute(sn, ClientManagementConstants.RFC_7591_ANONYMOUS_OK),
+                                getFirstAttribute(sn, ClientManagementConstants.RFC_7591_AUTO_APPROVE),
+                                getFirstAttribute(sn, ClientManagementConstants.RFC_7591_AUTO_APPROVER_NAME)
                         );
                         cmConfigs.put(cfg);
                     } catch (Throwable t) {
@@ -470,12 +492,20 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     }
                 }
             }
+            // Make sure that no matter what, the configuration for this is usable. Not
+            // having an entry means use the default.
             if (cmConfigs.isEmpty()) {
-                cmConfigs = createDefaultCMConfig();
                 ServletDebugUtil.warn(this, "Warning: none of the entries in the client managment element parsed. Using defaults...");
-
             }
-
+            if(!cmConfigs.hasOA4MPConfig()){
+                cmConfigs.put(defaultCMConfigs.getOA4MPConfig());
+            }
+            if(!cmConfigs.hasRFC7592Config()){
+                cmConfigs.put(defaultCMConfigs.getRFC7592Config());
+            }
+            if(!cmConfigs.hasRFC7591Config()){
+                cmConfigs.put(defaultCMConfigs.getRFC7591Config());
+            }
         }
         return cmConfigs;
     }

@@ -135,7 +135,7 @@
     tablename CDATA #IMPLIED
     tablePrefix CDATA #IMPLIED
     driver CDATA #IMPLIED&gt;
-&lt;!ELEMENT <a href="../../common/configuration/postgres-store.html">postgresql</a> (clients|clientApprovals|transactions|permissions|adminClients|txStore)*&gt;
+&lt;!ELEMENT <a href="../../common/configuration/postgres-store.html">postgresql</a> (clients|clientApprovals|transactions|permissions|adminClients|txStore)*>
 &lt;!ATTLIST <a href="../../common/configuration/postgres-store.html">postgresql</a>
     username CDATA #REQUIRED
     password CDATA #REQUIRED
@@ -192,7 +192,20 @@
      codeChars CDATA #IMPLIED
      codeLength CDATA #IMPLIED
      codeSeparator CDATA #IMPLIED
-     codePeriodLengthCDATA #IMPLIED&gt;
+     codePeriodLength CDATA #IMPLIED&gt;
+&lt;!ELEMENT <a href="../configuration/client_management-configuration.html">clientManagement</a> (api)*>
+&lt;!ATTLIST
+     enabled CDATA #IMPLIED>
+&lt;!ELEMENT api (#PCDATA)&gt;
+&lt;!ATTLIST
+     enabled CDATA #IMPLIED
+     protocol CDATA #REQUIRED
+     endpoint CDATA #IMPLIED
+     url CDATA #IMPLIED
+     anonymousOK CDATA #IMPLIED
+     template CDATA #IMPLIED
+     autoApprove CDATA #IMPLIED
+     autoApproverName CDATA #IMPLIED>
 &lt;!ELEMENT mail (messageTemplate|subjectTemplate)*&gt;
 &lt;!ATTLIST <a href="../configuration/server-email.html">mail</a>
     enabled CDATA #IMPLIED

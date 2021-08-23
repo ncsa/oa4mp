@@ -118,13 +118,12 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
                 // Extra hoop allows us to process HOCON format in addition to JSON.
                 String tempcfg = map.getString(getCK2().cfg());
                 if (!isTrivial(tempcfg)) {
-                    //     System.out.println(map.getString(getCK2().identifier()));
-                    //     System.out.println("\"" + tempcfg + "\"");
                     StringReader stringReader = new StringReader(tempcfg);
                     Config conf = ConfigFactory.parseReader(stringReader);
                     String rawJSON = conf.root().render(ConfigRenderOptions.concise());
                     cfg = JSONObject.fromObject(rawJSON);
-                    otherV.setRawConfig(map.getString(getCK2().cfg()));
+                    otherV.setRawConfig(tempcfg);
+              //      otherV.setConfig(cfg);
                 }
             }
             //otherV.setConfig(JSONObject.fromObject(map.getString(getCK2().cfg())));

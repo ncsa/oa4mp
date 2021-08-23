@@ -16,7 +16,8 @@
     If you wish to enable the device flow (RFC 8628) then you should configure
     the servlet. You may either set a flag in the server tag to enable it,
     which means to simply accept all defaults, or you may (and probably should)
-    properly configure it
+    properly configure it. All of these attributes live in the deviceFlowServlet
+    element of the configuration.
 </p>
 
 <table border="2">
@@ -36,7 +37,7 @@
         </td>
     </tr>
     <tr>
-         <td>authroizationURI</td>
+         <td>authorizationURI</td>
          <td>N</td>
          <td>server + /device_authorization</td>
          <td>The endpoint where the user goes to <b><i>get</i></b> a code.

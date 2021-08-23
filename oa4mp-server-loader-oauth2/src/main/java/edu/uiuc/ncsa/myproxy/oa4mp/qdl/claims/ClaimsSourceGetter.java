@@ -65,11 +65,11 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
             case CS_TYPE_FILE:
                 return doFS(arg, username, state);
             case CS_TYPE_LDAP:
-                return doLDAP(arg, username,state);
+                return doLDAP(arg, username, state);
             case CS_TYPE_HEADERS:
-                return doHeaders(arg, username, headers,state);
+                return doHeaders(arg, username, headers, state);
             case CS_TYPE_NCSA:
-                return doNCSA(arg, username,state);
+                return doNCSA(arg, username, state);
         }
         return null;
     }
@@ -166,34 +166,35 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
         }
         return out;
     }
-        /*
-            vfs_cfg.type :='pass_through';
-  vfs_cfg.scheme := 'vfs2';
-  vfs_cfg.mount_point := '/test2';
-  vfs_cfg.access := 'rw';
-  vfs_cfg.root_dir := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-admin-oauth2/src/main/resources/qdl/weitzel';
-  vfs_mount(vfs_cfg.);
-      cfg. := new_template('file')
-  cfg.file_path := 'vfs2#/test2/test-claims.json'
-  get_claims(cfg., 'dweitzel2@unl.edu')
-         */
+
+    /*
+vfs_cfg.type :='pass_through';
+vfs_cfg.scheme := 'vfs2';
+vfs_cfg.mount_point := '/test2';
+vfs_cfg.access := 'rw';
+vfs_cfg.root_dir := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-admin-oauth2/src/main/resources/qdl/weitzel';
+vfs_mount(vfs_cfg.);
+cfg. := new_template('file')
+cfg.file_path := 'vfs2#/test2/test-claims.json'
+get_claims(cfg., 'dweitzel2@unl.edu')
+     */
+
+    /**
+     * Note that this needs to send a transaction to the {@link FSClaimSource},
+     * so it creates one and sets the user name. Practically then the
+     * {@link #CS_FILE_CLAIM_KEY} then is ignored, since the function accepts
+     * the username directly.
+     * @param arg
+     * @param username
+     * @param state
+     * @return
+     */
     protected StemVariable doFS(StemVariable arg, String username, State state) {
+        // resolve files against VFS's so scripts have access to them in server mode.
         Polyad polyad = new Polyad(IOEvaluator.READ_FILE);
         polyad.addArgument(new ConstantNode(arg.getString(CS_FILE_FILE_PATH), Constant.STRING_TYPE));
-        state.getMetaEvaluator().evaluate(polyad,state);
-         String rawJSON = polyad.getResult().toString();
-/*
-        String qdl = "z__ := file_read('" + arg.getString(CS_FILE_FILE_PATH) + "');";
-        QDLInterpreter qi = new QDLInterpreter(state);
-        String rawJSON = null;
-        try {
-            qi.execute(qdl);
-            rawJSON = (String) state.getValue("z__");
-
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-        }
-*/
+        state.getMetaEvaluator().evaluate(polyad, state);
+        String rawJSON = polyad.getResult().toString();
         FSClaimSource fsClaimSource = (FSClaimSource) ConfigtoCS.convert(arg);
         fsClaimSource.setRawJSON(rawJSON);
         OA2ServiceTransaction t = new OA2ServiceTransaction((Identifier) null);

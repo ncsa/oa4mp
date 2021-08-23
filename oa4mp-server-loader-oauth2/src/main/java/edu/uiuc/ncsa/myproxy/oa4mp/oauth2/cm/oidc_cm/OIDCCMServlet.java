@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.oidc_cm;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.CM7591Config;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.permissions.AddClientRequest;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.permissions.PermissionServer;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.permissions.RemoveClientRequest;
@@ -16,6 +17,7 @@ import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
+import edu.uiuc.ncsa.security.delegation.server.UnapprovedClientException;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
@@ -51,7 +53,8 @@ import static edu.uiuc.ncsa.security.oauth_2_0.server.RFC8693Constants.GRANT_TYP
  * allows access to the calls in this API. This implements both RFC 7591 and part of RFC 7592.
  * Mostly we do not allow the setting of client secrets via tha API and since we do not store them
  * (only a hash of them) we cannot return them. If a secret is lost, the only option is to register a new
- * client. RFC 7592 is not intended to become a specification since ther eis too much variance in how
+ * client. <br/><br/>
+ * Nota Bene: RFC 7592 is not intended to become a specification since there is too much variance in how
  * this can operate.
  * <p>Created by Jeff Gaynor<br>
  * on 11/28/18 at  10:04 AM
@@ -81,34 +84,68 @@ public class OIDCCMServlet extends EnvServlet {
     @Override
     public void doGet(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws ServletException, IOException {
         //      printAllParameters(httpServletRequest);
+        if (!(getOA2SE().getCmConfigs().hasRFC7592Config() && getOA2SE().getCmConfigs().getRFC7592Config().enabled) && getOA2SE().getCmConfigs().isEnabled()) {
+            throw new IllegalAccessError("Error: RFC 7592 not supported on this server. Request rejected.");
+        }
+        CM7591Config cm7591Config = getOA2SE().getCmConfigs().getRFC7591Config();
+
         if (doPing(httpServletRequest, httpServletResponse)) return;
-        if (!getOA2SE().getCmConfigs().hasRFC7591Config()) {
-            throw new IllegalAccessError("Error: RFC 7591 not supported on this server. Request rejected.");
+        if (!getOA2SE().getCmConfigs().hasRFC7592Config()) {
+            throw new IllegalAccessError("Error: RFC 7592 not supported on this server. Request rejected.");
         }
 
+        boolean isAnonymous = false;  // Meaning that a client is trying to get information
         try {
-            AdminClient adminClient = getAndCheckAdminClient(httpServletRequest); // Need this to verify admin client.
-            MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(adminClient);
+            AdminClient adminClient = null;
+            try {
+                adminClient = getAndCheckAdminClient(httpServletRequest); // Need this to verify admin client.
+            } catch (GeneralException ge) {
+                if (!getOA2SE().getCmConfigs().getRFC7591Config().anonymousOK) {
+                    throw ge;
+                }
+                isAnonymous = true;
+            }
+            OA2Client oa2Client = null;
+            MetaDebugUtil debugger;
+            if (isAnonymous) {
+                // Here's the logic: If we allow anonymous access, then a client can get itself.
+                // If the client is administered, then the request must come with an admin client
+                // Do not allow and administered client to query anything.
+                oa2Client = getAndCheckOA2Client(httpServletRequest);
+                if (!getOA2SE().getPermissionStore().getAdmins(oa2Client.getIdentifier()).isEmpty()) {
+                    throw new IllegalArgumentException("error: administered clients cannot query their properties, only their administrator can.");
+                }
+                debugger = MyProxyDelegationServlet.createDebugger(oa2Client);
+            } else {
+                debugger = MyProxyDelegationServlet.createDebugger(adminClient);
+            }
             debugger.trace(this, "Starting get");
             String rawID = getFirstParameterValue(httpServletRequest, OA2Constants.CLIENT_ID);
             if (rawID == null || rawID.isEmpty()) {
                 throw new GeneralException("Missing client id. Cannot process request");
             }
             Identifier id = BasicIdentifier.newID(rawID);
-            OA2Client client = (OA2Client) getOA2SE().getClientStore().get(id);
-            if (client == null) {
+            if (isAnonymous) {
+                if (!oa2Client.getIdentifierString().equals(rawID)) {
+                    throw new IllegalAccessException("clients cannot access information about any other client");
+                }
+            } else {
+                // so it's adminstered and is legit
+                oa2Client = (OA2Client) getOA2SE().getClientStore().get(id);
+            }
+            if (oa2Client == null) {
                 throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
                         "no such client",
                         HttpStatus.SC_BAD_REQUEST, null);
             }
-            debugger.trace(this, "   requested client is " + client.getIdentifierString());
+            debugger.trace(this, "   requested client is " + oa2Client.getIdentifierString());
 
             // One major difference is that we have an email that we store and this has to be
             // converted to a contacts array or we run the risk of inadvertantly losing this.
 
-            JSONObject json = toJSONObject(client);
-            if (adminClient.isDebugOn()) {
-                fireMessage(getOA2SE(), defaultReplacements(httpServletRequest, adminClient, client));
+            JSONObject json = toJSONObject(oa2Client);
+            if ((!isAnonymous) && adminClient.isDebugOn()) {
+                fireMessage(getOA2SE(), defaultReplacements(httpServletRequest, adminClient, oa2Client));
             }
             writeOK(httpServletResponse, json); //send it back with an ok.
         } catch (Throwable t) {
@@ -118,7 +155,9 @@ public class OIDCCMServlet extends EnvServlet {
 
     protected HashMap<String, String> defaultReplacements(HttpServletRequest req, AdminClient adminClient, OA2Client client) {
         HashMap<String, String> replacements = new HashMap<>();
-        replacements.put("admin_id", adminClient.getIdentifierString());
+        if (adminClient != null) {
+            replacements.put("admin_id", adminClient.getIdentifierString());
+        }
         replacements.put("client_id", client.getIdentifierString());
         replacements.put("action", req.getMethod());
         return replacements;
@@ -216,9 +255,10 @@ public class OIDCCMServlet extends EnvServlet {
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         //     printAllParameters(req);
-        if (!getOA2SE().getCmConfigs().hasRFC7592Config()) {
+        if (!(getOA2SE().getCmConfigs().hasRFC7592Config() && getOA2SE().getCmConfigs().getRFC7592Config().enabled) && getOA2SE().getCmConfigs().isEnabled()) {
             throw new IllegalAccessError("Error: RFC 7592 not supported on this server. Request rejected.");
         }
+
 
         try {
             AdminClient adminClient = getAndCheckAdminClient(req);
@@ -299,10 +339,10 @@ public class OIDCCMServlet extends EnvServlet {
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         //   printAllParameters(req);
-
-        if (!getOA2SE().getCmConfigs().hasRFC7592Config()) {
+        if (!(getOA2SE().getCmConfigs().hasRFC7592Config() && getOA2SE().getCmConfigs().getRFC7592Config().enabled) && getOA2SE().getCmConfigs().isEnabled()) {
             throw new IllegalAccessError("Error: RFC 7592 not supported on this server. Request rejected.");
         }
+
         try {
             AdminClient adminClient = getAndCheckAdminClient(req);
             MetaDebugUtil adminDebugger = MyProxyDelegationServlet.createDebugger(adminClient);
@@ -431,9 +471,10 @@ public class OIDCCMServlet extends EnvServlet {
 
     @Override
     public void doPost(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws ServletException, IOException {
-        if (!getOA2SE().getCmConfigs().hasRFC7591Config()) {
+        if (!(getOA2SE().getCmConfigs().hasRFC7591Config() && getOA2SE().getCmConfigs().getRFC7591Config().enabled) && getOA2SE().getCmConfigs().isEnabled()) {
             throw new IllegalAccessError("Error: RFC 7591 not supported on this server. Request rejected.");
         }
+
         try {
             // The super class rejects anything that does not have an encoding type of
             // application/x-www-form-urlencoded
@@ -500,64 +541,136 @@ public class OIDCCMServlet extends EnvServlet {
         return adminClient;
     }
 
+
+    protected OA2Client getAndCheckOA2Client(HttpServletRequest request) throws Throwable {
+        String[] credentials = HeaderUtils.getCredentialsFromHeaders(request, "Bearer");
+        // need to verify that this is an admin client.
+        Identifier clientID = BasicIdentifier.newID(credentials[HeaderUtils.ID_INDEX]);
+        if (!getOA2SE().getClientStore().containsKey(clientID)) {
+            throw new GeneralException("Error: the given id of \"" + clientID + "\" is not recognized as a  client.");
+        }
+        OA2Client oa2Client = (OA2Client) getOA2SE().getClientStore().get(clientID);
+        MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(oa2Client);
+        String clientSecret = credentials[HeaderUtils.SECRET_INDEX];
+        if (clientSecret == null || clientSecret.isEmpty()) {
+            throw new GeneralException("Error: missing secret.");
+        }
+        if (!getOA2SE().getClientApprovalStore().isApproved(clientID)) {
+            debugger.trace(this, "Client \"" + clientID + "\" is not approved.");
+            throw new UnapprovedClientException("error: This client has not been approved.", oa2Client);
+        }
+        String hashedSecret = DigestUtils.sha1Hex(clientSecret);
+        if (!oa2Client.getSecret().equals(hashedSecret)) {
+            debugger.trace(this, "Client \"" + clientID + "\" and secret do not match.");
+            throw new GeneralException("error: client and secret do not match");
+        }
+        return oa2Client;
+    }
+
     PermissionServer permissionServer = null;
 
+    /*
+    Note that this is only called in the doPost method.
+     */
     @Override
     protected void doIt(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Throwable {
+        if (!getOA2SE().getCmConfigs().isEnabled()) {
+            throw new ServletException("unsupported service");
+        }
+        CM7591Config cm7591Config = getOA2SE().getCmConfigs().getRFC7591Config();
+        boolean isAnonymous = false;
+        AdminClient adminClient = null;
+        try {
+            adminClient = getAndCheckAdminClient(httpServletRequest);
+        } catch (Throwable ge) {
+            if (!cm7591Config.anonymousOK) {
+                throw ge;
+            }
+            isAnonymous = true;
+        }
 
-        AdminClient adminClient = getAndCheckAdminClient(httpServletRequest);
-        MetaDebugUtil adminDebugger = MyProxyDelegationServlet.createDebugger(adminClient);
-        adminDebugger.trace(this, "Starting to process " + httpServletRequest.getMethod());
+        MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(adminClient);
+        debugger.trace(this, "Starting to process " + httpServletRequest.getMethod());
         // Now that we have the admin client (so we can do this request), we read the payload:
-        JSON rawJSON = getPayload(httpServletRequest, adminDebugger);
-        if (adminClient.getMaxClients() < getOA2SE().getPermissionStore().getClientCount(adminClient.getIdentifier())) {
-            adminDebugger.info(this, "Error: Max client count of " + adminClient.getMaxClients() + " exceeded.");
+        JSON rawJSON = getPayload(httpServletRequest, debugger);
+        if ((!isAnonymous) && adminClient.getMaxClients() < getOA2SE().getPermissionStore().getClientCount(adminClient.getIdentifier())) {
+            debugger.info(this, "Error: Max client count of " + adminClient.getMaxClients() + " exceeded.");
             throw new GeneralException("Error: Max client count of " + adminClient.getMaxClients() + " exceeded.");
         }
-        adminDebugger.trace(this, rawJSON.toString());
+        debugger.trace(this, rawJSON.toString());
         if (rawJSON.isArray()) {
-            adminDebugger.info(this, "Error: Got a JSON array rather than a request:" + rawJSON);
+            debugger.info(this, "Error: Got a JSON array rather than a request:" + rawJSON);
             throw new IllegalArgumentException("Error: incorrect argument. Not a valid JSON request");
         }
-        OA2Client client = processRegistrationRequest((JSONObject) rawJSON, adminClient, httpServletResponse);
-        if (adminClient.isDebugOn()) {
-            // CIL-607
-            fireMessage(getOA2SE(), defaultReplacements(httpServletRequest, adminClient, client));
+        OA2Client template = null;
+        template = (OA2Client) getOA2SE().getClientStore().create();
+        if (cm7591Config.template != null) {
+            Identifier newID = template.getIdentifier();
+            Date createTS = template.getCreationTS();
+            template = (OA2Client) getOA2SE().getClientStore().get(cm7591Config.template);
+            template.setIdentifier(newID);
+            template.setCreationTS(createTS);
+        }
+
+        OA2Client newClient = processRegistrationRequest((JSONObject) rawJSON, adminClient, httpServletResponse, template);
+        if (isAnonymous) {
+            // All anonymous requests send a notification.
+            fireMessage(getOA2SE(), defaultReplacements(httpServletRequest, adminClient, newClient));
+        } else {
+            if (adminClient.isDebugOn()) {
+                // CIL-607
+                fireMessage(getOA2SE(), defaultReplacements(httpServletRequest, adminClient, newClient));
+            }
         }
 
         JSONObject jsonResp = new JSONObject(); // The response object.
-        jsonResp.put(CLIENT_ID, client.getIdentifierString());
-        if (!StringUtils.isTrivial(client.getSecret())) {
+        jsonResp.put(CLIENT_ID, newClient.getIdentifierString());
+        if (!StringUtils.isTrivial(newClient.getSecret())) {
 
-            jsonResp.put(CLIENT_SECRET, client.getSecret());
-            String hashedSecret = DigestUtils.sha1Hex(client.getSecret());
+            jsonResp.put(CLIENT_SECRET, newClient.getSecret());
+            String hashedSecret = DigestUtils.sha1Hex(newClient.getSecret());
             // Now make a hash of the secret and store it.
-            jsonResp.put(OIDCCMConstants.CLIENT_ID_ISSUED_AT, client.getCreationTS().getTime() / 1000);
-            String secret = DigestUtils.sha1Hex(client.getSecret());
-            client.setSecret(secret);
+            jsonResp.put(OIDCCMConstants.CLIENT_ID_ISSUED_AT, newClient.getCreationTS().getTime() / 1000);
+            String secret = DigestUtils.sha1Hex(newClient.getSecret());
+            newClient.setSecret(secret);
             jsonResp.put(OIDCCMConstants.CLIENT_SECRET_EXPIRES_AT, 0L);
 
         }
         String registrationURI = getOA2SE().getCmConfigs().getRFC7591Config().uri.toString();
         // Next, we have to construct the registration URI by adding in the client ID.
         // Spec says we can add parameters here, but not elsewhere.
-        jsonResp.put(OIDCCMConstants.REGISTRATION_CLIENT_URI, registrationURI + "?" + OA2Constants.CLIENT_ID + "=" + client.getIdentifierString());
+        jsonResp.put(OIDCCMConstants.REGISTRATION_CLIENT_URI, registrationURI + "?" + OA2Constants.CLIENT_ID + "=" + newClient.getIdentifierString());
 
-        adminDebugger.trace(this, "saving this client");
-        getOA2SE().getClientStore().save(client);
+        debugger.trace(this, "saving this client");
+        getOA2SE().getClientStore().save(newClient);
 
         // this adds the client to the list of clients managed by the admin
-        adminDebugger.trace(this, "Adding permissions for this client");
-        AddClientRequest addClientRequest = new AddClientRequest(adminClient, client);
-        getPermissionServer().addClient(addClientRequest);
-
+        if (!isAnonymous) {
+            debugger.trace(this, "Adding permissions for this client");
+            AddClientRequest addClientRequest = new AddClientRequest(adminClient, newClient);
+            getPermissionServer().addClient(addClientRequest);
+        }
         // Finally, approve it since it was created with and admin client, which is assumed to be trusted
-        adminDebugger.trace(this, "Setting approval record for this client");
-        ClientApproval approval = new ClientApproval(client.getIdentifier());
+        debugger.trace(this, "Setting approval record for this client");
+        ClientApproval approval = new ClientApproval(newClient.getIdentifier());
         approval.setApprovalTimestamp(new Date());
-        approval.setApprover(adminClient.getIdentifierString());
-        approval.setApproved(true);
-        approval.setStatus(ClientApproval.Status.APPROVED);
+        if (isAnonymous) {
+            if (cm7591Config.autoApprove) {
+                approval.setApprover(cm7591Config.autoApproverName);
+                approval.setApproved(true);
+                approval.setStatus(ClientApproval.Status.APPROVED);
+
+            } else {
+                approval.setApproved(false);
+                approval.setStatus(ClientApproval.Status.PENDING);
+
+            }
+        } else {
+            approval.setApprover(adminClient.getIdentifierString());
+            approval.setApproved(true);
+            approval.setStatus(ClientApproval.Status.APPROVED);
+
+        }
         getOA2SE().getClientApprovalStore().save(approval);
 
         writeOK(httpServletResponse, jsonResp);
@@ -801,8 +914,10 @@ public class OIDCCMServlet extends EnvServlet {
             jsonRequest.remove("cfg");
             client.setConfig(jsonObject);
         } else {
-            // CIL-735 if not config object, remove it. 
-            client.setConfig(null);
+            // CIL-735 if no config object, remove it.
+            if(!newClient) {
+                client.setConfig(null);
+            }
         }
 
         if (jsonRequest.containsKey(REFRESH_LIFETIME)) {
@@ -958,9 +1073,11 @@ public class OIDCCMServlet extends EnvServlet {
         }
     }
 
-    protected OA2Client processRegistrationRequest(JSONObject jsonRequest, AdminClient adminClient, HttpServletResponse httpResponse) {
+    protected OA2Client processRegistrationRequest(JSONObject jsonRequest,
+                                                   AdminClient adminClient,
+                                                   HttpServletResponse httpResponse,
+                                                   OA2Client client) {
 
-        OA2Client client = (OA2Client) getOA2SE().getClientStore().create();
         return updateClient(client, adminClient, jsonRequest, true, httpResponse);
     }
 
