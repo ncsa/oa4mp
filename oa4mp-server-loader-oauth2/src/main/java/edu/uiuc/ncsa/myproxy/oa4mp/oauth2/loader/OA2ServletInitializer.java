@@ -63,9 +63,10 @@ public class OA2ServletInitializer extends OA4MPServletInitializer {
             MyProxyDelegationServlet.transactionCleanup.addRetentionPolicy(
                     new RefreshTokenRetentionPolicy(
                             (RefreshTokenStore) oa2SE.getTransactionStore(),
+                            oa2SE.getTxStore(),
                             oa2SE.getServiceAddress().toString(),
                             oa2SE.isSafeGC()));
-            oa2SE.getMyLogger().info("Initialized refresh token cleanup thread");
+            oa2SE.getMyLogger().info("Initialized refresh token cleanup thread with interval " + oa2SE.getCleanupInterval());
         }
         if (!ClaimSourceFactory.isFactorySet()) {
             ClaimSourceFactory.setFactory(new ClaimSourceFactoryImpl());
@@ -77,7 +78,7 @@ public class OA2ServletInitializer extends OA4MPServletInitializer {
             txRecordCleanup.setMap(oa2SE.getTxStore());
             txRecordCleanup.addRetentionPolicy(new TokenExchangeRecordRetentionPolicy(oa2SE.getServiceAddress().toString(), oa2SE.isSafeGC()));
             txRecordCleanup.start();
-            oa2SE.getMyLogger().info("Starting token exchange record store cleanup thread");
+            oa2SE.getMyLogger().info("Starting token exchange record store cleanup thread with interval " + oa2SE.getCleanupInterval());
         }
 
         try {

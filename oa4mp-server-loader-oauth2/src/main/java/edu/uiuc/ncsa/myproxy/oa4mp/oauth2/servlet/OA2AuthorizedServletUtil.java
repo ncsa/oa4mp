@@ -25,6 +25,7 @@ import edu.uiuc.ncsa.security.oauth_2_0.*;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTRunner;
 import edu.uiuc.ncsa.security.oauth_2_0.server.AGIResponse2;
 import edu.uiuc.ncsa.security.oauth_2_0.server.AGRequest2;
+import edu.uiuc.ncsa.security.oauth_2_0.server.RFC7636Util;
 import edu.uiuc.ncsa.security.oauth_2_0.server.RFC8693Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
 import edu.uiuc.ncsa.security.util.configuration.ConfigUtil;
@@ -85,7 +86,7 @@ public class OA2AuthorizedServletUtil {
 
         try {
             String cid = "client=" + client.getIdentifier();
-            debugger.info(this, "2.a. Starting a new cert request: " + cid);
+            debugger.info(this, "2.a. Start a new request: " + cid);
             servlet.checkClientApproval(client);
             // Generally the lifetime of an authorization grant is a matter of server policy, not a client request.
             AGRequest2 agRequest2 = new AGRequest2(req, oa2se.getAuthorizationGrantLifetime());
@@ -116,6 +117,30 @@ public class OA2AuthorizedServletUtil {
             transaction = (OA2ServiceTransaction) verifyAndGet(agResponse);
             transaction.setAuthTime(new Date()); // have to set the time to now.
             debugger.info(this, "Saved new transaction with id=" + transaction.getIdentifierString());
+            /*
+            RFC 7636 support. can't do it until here because we need most of the transaction done first
+            to get state, callback etc.
+             */
+            String codeChallenge = req.getParameter(RFC7636Util.CODE_CHALLENGE);
+            if(StringUtils.isTrivial(codeChallenge)){
+                if(oa2se.isRfc7636Required() && client.isPublicClient()){
+                    throw new OA2RedirectableError(OA2Errors.ACCESS_DENIED,
+                            "access denied",
+                            HttpStatus.SC_UNAUTHORIZED,
+                            transaction.getRequestState(),
+                            transaction.getCallback());
+
+                }
+            }else{
+                debugger.trace(this, "Setting code challenge to codeChallenge");
+                transaction.setCodeChallenge(codeChallenge);
+                String codeChallengeMethod = req.getParameter(RFC7636Util.CODE_CHALLENGE_METHOD);
+                if(StringUtils.isTrivial(codeChallengeMethod)){
+                    transaction.setCodeChallengeMethod(RFC7636Util.METHOD_PLAIN);
+                }  else{
+                    transaction.setCodeChallengeMethod(codeChallengeMethod);
+                }
+            }
 
             Map<String, String> params = agResponse.getParameters();
 

@@ -98,7 +98,8 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
     public static final String SAFE_GARBAGE_COLLECTION = "safe_gc";
     public static final String PRINT_TS_IN_DEBUG = "printTSInDebug";
     public static final String NOTIFY_ADMIN_CLIENT_ADDRESSES = "notifyACEmailAddresses";
-    public static final String CLEANUP_INTERVAL_TAG  = "cleanup_interval";
+    public static final String CLEANUP_INTERVAL_TAG = "cleanupInterval";
+    public static final String RFC7636_REQUIRED_TAG = "rfc7636Required";
 
     /**
      * Default is 15 days. Internally the refresh lifetime (as all date-ish things) are in milliseconds
@@ -114,7 +115,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
     // so when it is base64 encoded there will be no extra characters:
     public static int CLIENT_SECRET_LENGTH_DEFAULT = 258;
 
-    public static long CLEANUP_INTERVAL_DEFAULT = 30*60*1000L; // 30 minutes
+    public static long CLEANUP_INTERVAL_DEFAULT = 30 * 60 * 1000L; // 30 minutes
 
     public OA2ConfigurationLoader(ConfigurationNode node) {
         super(node);
@@ -173,7 +174,8 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     isRFC8628Enabled(),
                     isprintTSInDebug(),
                     getCleanupInterval(),
-                    isNotifyACEventEmailAddresses());
+                    isNotifyACEventEmailAddresses(),
+                    isRFC7636Required());
 
             if (getClaimSource() instanceof BasicClaimsSourceImpl) {
                 ((BasicClaimsSourceImpl) getClaimSource()).setOa2SE((OA2SE) se);
@@ -192,13 +194,13 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
             List kids = cn.getChildren(OA4MPConfigTags.DEVICE_FLOW_SERVLET);
             //set default
             String address = getServiceAddress().toString();
-            if(!address.endsWith("/")){
+            if (!address.endsWith("/")) {
                 address = address + "/";
             }
             rfc8628ServletConfig.deviceEndpoint = address + RFC8628Constants.VERIFICATION_URI_ENDPOINT;
             rfc8628ServletConfig.deviceAuthorizationEndpoint = address + RFC8628Constants.DEVICE_AUTHORIZATION_ENDPOINT;
             if (!kids.isEmpty()) {
-           // empty means either they have an empty entry or that they have no entry.
+                // empty means either they have an empty entry or that they have no entry.
                 rfc8628Enabled = Boolean.TRUE; // if they supply this, then
                 ConfigurationNode sn = (ConfigurationNode) kids.get(0);
                 String x = getFirstAttribute(sn, OA4MPConfigTags.DEVICE_FLOW_SERVLET_URI);
@@ -271,10 +273,24 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
 
     public String isNotifyACEventEmailAddresses() {
         if (notifyACEventEmailAddresses == null) {
-                notifyACEventEmailAddresses = getFirstAttribute(cn, NOTIFY_ADMIN_CLIENT_ADDRESSES);
+            notifyACEventEmailAddresses = getFirstAttribute(cn, NOTIFY_ADMIN_CLIENT_ADDRESSES);
             DebugUtil.trace(this, "admin client notification addresses: " + notifyACEventEmailAddresses);
         }
         return notifyACEventEmailAddresses;
+    }
+
+    protected Boolean rfc7636Required = null;
+
+    public Boolean isRFC7636Required() {
+        if (rfc7636Required == null) {
+            String raw = getFirstAttribute(cn, RFC7636_REQUIRED_TAG);
+            try {
+                rfc7636Required = Boolean.parseBoolean(raw);
+            } catch (Throwable t) {
+                rfc7636Required = Boolean.FALSE;// default
+            }
+        }
+        return rfc7636Required;
     }
 
     protected Boolean printTSInDebug = false;
@@ -301,9 +317,9 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
             try {
 
                 String raw = getFirstAttribute(cn, CLEANUP_INTERVAL_TAG);
-                if(StringUtils.isTrivial(raw)){
+                if (StringUtils.isTrivial(raw)) {
                     cleanupInterval = CLEANUP_INTERVAL_DEFAULT;
-                }else {
+                } else {
                     cleanupInterval = ConfigUtil.getValueSecsOrMillis(raw, true);
                 }
             } catch (Throwable t) {
@@ -416,7 +432,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         cmConfigs.put(tempCfg);
         tempCfg = new CM7591Config(ClientManagementConstants.RFC_7591_VALUE,
                 URI.create(serverAddress + ClientManagementConstants.DEFAULT_RFC7591_ENDPOINT),
-                true,null, false, false);
+                true, null, false, false);
         cmConfigs.put(tempCfg);
         // NOTE there is no difference in endpoints for RFC 7591 and 7592! The question is if
         // the client management protocol endpoint also supports RFC 7592.
@@ -453,21 +469,21 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                 cmConfigs = defaultCMConfigs;
                 return cmConfigs; // missing the entire element (which is fine)  so jump out...
             }
-            if(1 < kids.size()){
+            if (1 < kids.size()) {
                 throw new IllegalArgumentException("Multiple " + ClientManagementConstants.CLIENT_MANAGEMENT_TAG + " elements found.");
             }
             ConfigurationNode cmNode = kids.get(0); // only process first one found
             kids = cmNode.getChildren(); // This should have the API elements in it
             cmConfigs = new CMConfigs();
             String e = getFirstAttribute(cmNode, ClientManagementConstants.ENABLE_SERVICE);
-            if(!isTrivial(e)){
-                try{
-                     cmConfigs.setEnabled(Boolean.parseBoolean(e));
-                }catch(Throwable t){
-                     cmConfigs.setEnabled(true); // default
+            if (!isTrivial(e)) {
+                try {
+                    cmConfigs.setEnabled(Boolean.parseBoolean(e));
+                } catch (Throwable t) {
+                    cmConfigs.setEnabled(true); // default
                 }
             }
-            if(!cmConfigs.isEnabled()){
+            if (!cmConfigs.isEnabled()) {
                 return cmConfigs;
             }
             String serverAddress = getServiceAddress().toString();
@@ -497,13 +513,13 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
             if (cmConfigs.isEmpty()) {
                 ServletDebugUtil.warn(this, "Warning: none of the entries in the client managment element parsed. Using defaults...");
             }
-            if(!cmConfigs.hasOA4MPConfig()){
+            if (!cmConfigs.hasOA4MPConfig()) {
                 cmConfigs.put(defaultCMConfigs.getOA4MPConfig());
             }
-            if(!cmConfigs.hasRFC7592Config()){
+            if (!cmConfigs.hasRFC7592Config()) {
                 cmConfigs.put(defaultCMConfigs.getRFC7592Config());
             }
-            if(!cmConfigs.hasRFC7591Config()){
+            if (!cmConfigs.hasRFC7591Config()) {
                 cmConfigs.put(defaultCMConfigs.getRFC7591Config());
             }
         }
@@ -578,7 +594,13 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         if (keys == null) {
             throw new IllegalStateException("Error: Could not load signing keys");
         }
-        keys.setDefaultKeyID(getFirstAttribute(node, "defaultKeyID"));
+        if (keys.size() == 1) {
+            // CIL-1067
+            // If there is a single key in the file, use that as the default.
+            keys.setDefaultKeyID(keys.keySet().iterator().next());
+        } else {
+            keys.setDefaultKeyID(getFirstAttribute(node, "defaultKeyID"));
+        }
         return keys;
     }
 

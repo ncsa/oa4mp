@@ -24,6 +24,8 @@ import java.security.SecureRandom;
 import java.util.Date;
 import java.util.StringTokenizer;
 
+import static edu.uiuc.ncsa.myproxy.oa4mp.qdl.util.SigningCommands.RS_256;
+import static edu.uiuc.ncsa.myproxy.oa4mp.qdl.util.SigningCommands.createJWK;
 import static edu.uiuc.ncsa.security.oauth_2_0.JWTUtil.decat;
 import static edu.uiuc.ncsa.security.oauth_2_0.JWTUtil.getJsonWebKeys;
 
@@ -52,6 +54,7 @@ public class JWKUtilCommands extends CommonCommands {
         sayi(CL_IS_PRIVATE_FLAG + " - (implied) generate full set of keys. Cannot be specified with  " + CL_IS_PUBLIC_FLAG);
         sayi(FORCE_TO_STD_OUT_FLAG + " - write the keys to standard out.");
         sayi(CL_OUTPUT_FILE_FLAG + " - write the keys to the given file.");
+        sayi(CREATE_SINGLE_KEY_FLAG + " - create only a single RSA 256 key.");
         sayi("Create a set of RSA JSON Web keys and store them in the given file");
         sayi("There are several modes of operation. If you do not specify an output file, then the keys are written ");
         sayi("to the command line.");
@@ -127,6 +130,7 @@ public class JWKUtilCommands extends CommonCommands {
     }
 
     String FORCE_TO_STD_OUT_FLAG = "-o";
+    String CREATE_SINGLE_KEY_FLAG = "-single";
 
     public void create_keys(InputLine inputLine) throws Exception {
         // Intercept the help request here since the one in the signing utility is a bit different.
@@ -142,6 +146,8 @@ public class JWKUtilCommands extends CommonCommands {
             sg.create(inputLine);
             return;
         }
+        boolean createSingleKey = inputLine.hasArg(CREATE_SINGLE_KEY_FLAG);
+        inputLine.removeSwitch(CREATE_SINGLE_KEY_FLAG);
         boolean writeToStdOut = inputLine.hasArg(FORCE_TO_STD_OUT_FLAG);
         inputLine.removeSwitch(FORCE_TO_STD_OUT_FLAG);
         // #2 Error case that public keys are wanted, but no input file is specified.
@@ -182,7 +188,13 @@ public class JWKUtilCommands extends CommonCommands {
 
             // next case is to just generate the full key set
             SigningCommands sg = new SigningCommands(null);
-            JSONWebKeys keys = sg.createJsonWebKeys();
+            JSONWebKeys keys;
+            if (createSingleKey) {
+                keys = new JSONWebKeys(null);
+            } else {
+                keys = sg.createJsonWebKeys();
+            }
+            keys.put(createJWK(RS_256));
             JSONObject jwks = JSONWebKeyUtil.toJSON(keys);
             if (hasOutputFile) {
                 writeFile(outFilename, jwks.toString(2));
@@ -221,13 +233,42 @@ public class JWKUtilCommands extends CommonCommands {
 
     }
 
+    public void create_password(InputLine inputLine) {
+        if (showHelp(inputLine)) {
+            sayi("create_password [length] - create a password with the given length in bytes.");
+            sayi("No argument implies an 8 byte password. Result is printed to standard out.");
+            say("E.g.");
+            say("\njwk>create_password 6");
+            say("9DbPhjwB");
+            sayi("\n6 bytes creates a password that is 6*(4/3) = 8 characters long.");
+            return;
+        }
+        SigningCommands signingCommands = new SigningCommands(null);
+        int defaultLength = 8;
+        try {
+            defaultLength = Integer.parseInt(inputLine.getLastArg()); // if it works, it works
+        } catch (Throwable t) {
+            // do nothing
+        }
+        // make sure these get propagated
+        signingCommands.setBatchMode(true);
+        signingCommands.setBatchFile(true);
+        InputLine inputLine1 = new InputLine("x " + signingCommands.SYMMETRIC_KEY_ARG + " " + defaultLength + " " + signingCommands.SYMMETRIC_KEY_COUNT_ARG + " 1");
+        signingCommands.create_symmetric_keys(inputLine1);
+    }
+
+ 
     public void create_symmetric_keys(InputLine inputLine) {
         SigningCommands signingCommands = new SigningCommands(null);
+        // make sure these get propagated
+        signingCommands.setBatchMode(isBatchMode());
+        signingCommands.setBatchFile(isBatchFile());
 
         if (showHelp(inputLine)) {
             showSymmetricKeyHelp(signingCommands);
             return;
         }
+
         signingCommands.create_symmetric_keys(inputLine);
     }
 

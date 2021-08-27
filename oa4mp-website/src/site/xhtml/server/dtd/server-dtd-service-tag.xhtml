@@ -121,7 +121,7 @@
         <td style="vertical-align: top;">N</td>
         <td style="vertical-align: top;">false</td>
         <td style="vertical-align: top;">Boolean value. If true, the support for the device authorization flow as per RFC 8628 is enabled
-            with defaults. Alternately there is a <a href = "../configuration/device-flow-servlet-configuration.xhtml">device flow servlet configuration</a>
+            with defaults. Alternately there is a <a href = "../configuration/device-flow-servlet-configuration.html">device flow servlet configuration</a>
             that will be used.
         </td>
     </tr>
@@ -268,6 +268,16 @@
         <td style="vertical-align: top;">N</td>
         <td style="vertical-align: top;">1296000</td>
         <td style="vertical-align: top;">deprecated. Use maxRefreshTokenLifetime instead.
+        </td>
+    </tr>
+    <tr id="rfc7636Required">
+        <td style="vertical-align: top;">rfc7636Required</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">false</td>
+        <td style="vertical-align: top;">Set to <code>true</code> if you want to <b>require</b> all
+            public clients to use code challenges as per <a href="https://datatracker.ietf.org/doc/html/rfc7636">RFC 7636</a>.
+            Note that OA4MP will allow <i>any</i> client to send along a challenge. If this flag is set
+            to true though, public clients will be required to use it or will be denied access.
         </td>
     </tr>
     <tr id="safe_gc">

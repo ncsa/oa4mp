@@ -13,7 +13,11 @@ When a new version is deployed, here is the testing order
   -- localhost:command.line2
      Most basic virtual organization test. Configuration will return JWTs for both access and
      refesh tokens, requiring signatures for generation and verification.
+     Also tests code challenge (RFC 7636) machinery.
      set_param -a scope "read: write: x.y:"
+     set_param -a code_challenge "N_zjM2czxZIWNar-lWUiuS7-Pacwh-k-L_Akpje6AmY"
+     set_param -a code_challenge_method S256
+     set_param -t code_verifier "qBdfP8Wmpomgkq6aJwcvZQMHx553RK4P7LAYxmzMAkmo8cM7MlE8ViJSOx38nlHr"
      set_param -x scope "read:/home/jeff write:/data/jeff/cluster x.y:/abc/def/ghi"
 
      AT, R:

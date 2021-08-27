@@ -68,11 +68,11 @@
           <element id="archive" name="myproxy-logon-5.2-SNAPSHOT.jar">
             <element id="module-output" name="myproxy-logon" />
           </element>
-          <element id="library" level="project" name="Maven: mysql:mysql-connector-java:8.0.11" />
-          <element id="library" level="project" name="Maven: com.google.protobuf:protobuf-java:2.6.0" />
+          <element id="library" level="project" name="Maven: mysql:mysql-connector-java:8.0.26" />
+          <element id="library" level="project" name="Maven: com.google.protobuf:protobuf-java:3.11.4" />
           <element id="library" level="project" name="Maven: org.apache.derby:derby:10.14.1.0" />
-          <element id="library" level="project" name="Maven: org.postgresql:postgresql:42.2.2.jre7" />
-          <element id="library" level="project" name="Maven: org.mariadb.jdbc:mariadb-java-client:2.2.5" />
+          <element id="library" level="project" name="Maven: org.postgresql:postgresql:42.2.23.jre7" />
+          <element id="library" level="project" name="Maven: org.mariadb.jdbc:mariadb-java-client:2.7.3" />
           <element id="library" level="project" name="Maven: edu.uiuc.ncsa.security.delegation:ncsa-security-oauth-1.0a:5.2-SNAPSHOT" />
           <element id="library" level="project" name="Maven: net.oauth.core:oauth-httpclient4:20090617" />
           <element id="library" level="project" name="Maven: net.oauth.core:oauth:20100527" />

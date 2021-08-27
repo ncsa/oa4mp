@@ -13,6 +13,7 @@ import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.FlowStates;
 import edu.uiuc.ncsa.security.oauth_2_0.server.OA2TransactionScopes;
 import edu.uiuc.ncsa.security.oauth_2_0.server.OIDCServiceTransactionInterface;
+import edu.uiuc.ncsa.security.oauth_2_0.server.RFC7636Util;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import net.sf.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
@@ -88,7 +89,7 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         return flowStates;
     }
 
-  public static  String RFC862_STATE_KEY = "rfc8628_state";
+    public static String RFC862_STATE_KEY = "rfc8628_state";
 
     public RFC8628State getRFC8628State() {
         JSONObject j = getState().getJSONObject(RFC862_STATE_KEY);
@@ -98,7 +99,8 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         }
         return state;
     }
-    public void setRFC8628State(RFC8628State rfc8628State){
+
+    public void setRFC8628State(RFC8628State rfc8628State) {
         getState().put(RFC862_STATE_KEY, rfc8628State.toJSON());
     }
 
@@ -136,6 +138,7 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
     }
 
     boolean isRFC8628 = false;
+
     public boolean isRFC8628Request() {
         return isRFC8628;
     }
@@ -416,6 +419,29 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         return getState().containsKey(MAX_RT_LIFETIME_KEY);
     }
 
+    /*
+    The next 5 methods are for RFC 7636 support.
+     */
+
+    public boolean hasCodeChallenge() {
+        return getState().containsKey(RFC7636Util.CODE_CHALLENGE);
+    }
+
+    public String getCodeChallenge() {
+        return getState().getString(RFC7636Util.CODE_CHALLENGE);
+    }
+
+    public void setCodeChallenge(String codeChallenge) {
+        getState().put(RFC7636Util.CODE_CHALLENGE, codeChallenge);
+    }
+
+    public String getCodeChallengeMethod() {
+        return getState().getString(RFC7636Util.CODE_CHALLENGE_METHOD);
+    }
+
+    public void setCodeChallengeMethod(String codeChallengeMethod) {
+        getState().put(RFC7636Util.CODE_CHALLENGE_METHOD, codeChallengeMethod);
+    }
 
     RefreshToken refreshToken;
     long refreshTokenLifetime = 0L;

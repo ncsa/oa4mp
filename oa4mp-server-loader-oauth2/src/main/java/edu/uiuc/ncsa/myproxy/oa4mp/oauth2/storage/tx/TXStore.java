@@ -1,7 +1,10 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx;
 
+import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
+
+import java.util.List;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -10,4 +13,12 @@ import edu.uiuc.ncsa.security.storage.data.MapConverter;
 public interface TXStore<V extends TXRecord> extends Store<V> {
     public MapConverter<V> getMapConverter();
 
+    /**
+     * Get a list of all records for a given parent.
+     * @param parentID
+     * @return
+     */
+    List<V> getByParentID(Identifier parentID);
+
+    int getCountByParent(Identifier parentID);
 }

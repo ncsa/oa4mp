@@ -2,11 +2,15 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXStore;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.security.core.exceptions.InvalidTimestampException;
 import edu.uiuc.ncsa.security.core.util.DateUtils;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
+import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
 
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -14,12 +18,15 @@ import java.util.Map;
  * on 3/26/14 at  3:39 PM
  */
 public class RefreshTokenRetentionPolicy extends SafeGCRetentionPolicy {
-    public RefreshTokenRetentionPolicy(RefreshTokenStore rts, String serviceAddress, boolean safeGC) {
+    public RefreshTokenRetentionPolicy(RefreshTokenStore rts, TXStore txStore, String serviceAddress, boolean safeGC) {
         super(serviceAddress, safeGC);
         this.rts = rts;
+        this.txStore = txStore;
     }
 
     RefreshTokenStore rts;
+
+    TXStore txStore;
 
     /**
      * Always true for every element in the cache.
@@ -50,6 +57,7 @@ public class RefreshTokenRetentionPolicy extends SafeGCRetentionPolicy {
             return true;
         }
         OA2ServiceTransaction st2 = (OA2ServiceTransaction) value;
+
         String token = null;
 
         //RefreshToken rt = st2.getRefreshToken();
@@ -98,12 +106,18 @@ public class RefreshTokenRetentionPolicy extends SafeGCRetentionPolicy {
 
         } catch (InvalidTimestampException its) {
 
-            trace("***Removing token " + token + " with time out " + timeout + " at " + System.currentTimeMillis());
-
+            if(0 < txStore.getCountByParent(st2.getIdentifier())){
+                // If there are ANY outstanding TX records, do not GC. Let the TX store
+                // figure out what to keep.
+                return true;
+            }
+            if (st2.getClient().isDebugOn()) {
+                MetaDebugUtil debugUtil = MyProxyDelegationServlet.createDebugger(st2.getOA2Client());
+                String msg = (new Date(System.currentTimeMillis())) + ": ***Removing token " + token + " with time out " + timeout;
+                debugUtil.trace(this, msg);
+            }
             return false;
         }
-
-
     }
 
     @Override

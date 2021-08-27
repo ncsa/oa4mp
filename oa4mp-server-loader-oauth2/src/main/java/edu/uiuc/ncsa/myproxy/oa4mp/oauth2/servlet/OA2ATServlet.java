@@ -30,6 +30,7 @@ import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
 import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
 import edu.uiuc.ncsa.security.delegation.token.impl.AuthorizationGrantImpl;
 import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
+import edu.uiuc.ncsa.security.delegation.token.impl.TokenUtils;
 import edu.uiuc.ncsa.security.oauth_2_0.*;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTRunner;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTUtil2;
@@ -47,10 +48,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
+import java.util.*;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.ClientUtils.computeATLifetime;
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.ClientUtils.computeRefreshLifetime;
@@ -132,10 +130,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         }
         MetaDebugUtil debugger = createDebugger(client);
         debugger.trace(this, "starting execute by grant, grant = \"" + grantType + "\"");
-        debugger.trace(this, "stored grant type is \"" + GRANT_TYPE_TOKEN_EXCHANGE + "\"");
         OA2SE oa2SE = (OA2SE) getServiceEnvironment();
-        debugger.trace(this, "8693 support enabled? " + oa2SE.isRfc8693Enabled());
-        debugger.trace(this, "grants equal? " + grantType.equals(GRANT_TYPE_TOKEN_EXCHANGE));
         if (!client.isPublicClient()) {
             verifyClientSecret(client, getClientSecret(request));
         }
@@ -192,6 +187,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         //   printAllParameters(request);
         String subjectToken = getFirstParameterValue(request, SUBJECT_TOKEN);
         MetaDebugUtil debugger = createDebugger(client);
+        debugger.trace(this, "Starting RFC 8693 token exchange");
         if (subjectToken == null) {
             throw new OA2ATException(OA2Errors.INVALID_REQUEST, "missing subject token");
         }
@@ -520,9 +516,29 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         }
         return null;
     }
+                                             protected OA2SE getOA2SE(){return (OA2SE) getServiceEnvironment();}
 
     protected IssuerTransactionState doAT(HttpServletRequest request, HttpServletResponse response, OA2Client client) throws Throwable {
         IssuerTransactionState state = doDelegation(client, request, response);
+        OA2ServiceTransaction serviceTransaction = (OA2ServiceTransaction) state.getTransaction();
+
+        if(serviceTransaction.hasCodeChallenge()){
+            String verifier = request.getParameter(RFC7636Util.CODE_VERIFIER);
+            String codeChallenge = RFC7636Util.createChallenge(verifier, serviceTransaction.getCodeChallengeMethod());
+            if(!codeChallenge.equals(serviceTransaction.getCodeChallenge())){
+                createDebugger(client).trace(this,"code challenge failed");
+                throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
+                        "code challenge failed, access denied",
+                        serviceTransaction.getRequestState());
+            }
+        }else{
+            if(getOA2SE().isRfc7636Required() && client.isPublicClient()){
+                createDebugger(client).trace(this,"public client failed to send required code challenge.");
+                throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
+                        "code challenge failed, access denied",
+                        serviceTransaction.getRequestState());
+            }
+        }
         return doAT(state, client);
     }
 
@@ -709,14 +725,24 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         if (client == null) {
             throw new OA2ATException(OA2Errors.INVALID_REQUEST, "Could not find the client associated with refresh token \"" + rawRefreshToken + "\"");
         }
+        debugger.trace(this, "starting token refresh at " + (new Date()));
         // Check if its a token or JWT
         OA2SE oa2SE = (OA2SE) getServiceEnvironment();
         //CIL-974:
         JSONWebKeys keys = OA2TokenUtils.getKeys(oa2SE, client);
-
+        RefreshTokenImpl oldRT;
         boolean tokenVersion1 = false;
-        RefreshTokenImpl oldRT = OA2TokenUtils.getRT(rawRefreshToken, oa2SE, keys);
+        try {
+            oldRT = OA2TokenUtils.getRT(rawRefreshToken, oa2SE, keys);
+        }catch(OA2ATException oa2ATException){
+            String token = rawRefreshToken;
+            if (TokenUtils.isBase32(rawRefreshToken)) {
+                  token = TokenUtils.b32DecodeToken(rawRefreshToken);
+              }
 
+            debugger.trace(this, "refresh failed for token " + token + " at " + (new Date()));
+            throw oa2ATException;
+        }
         OA2ServiceTransaction t = null;
         if (oldRT.isExpired()) {
             debugger.trace(this, "expired refresh token \"" + oldRT.getToken() + "\" for client " + client.getIdentifierString());
@@ -1021,6 +1047,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         }
         String deviceCode = request.getParameter(DEVICE_CODE);
         if (StringUtils.isTrivial(deviceCode)) {
+            debugger.trace(this, "missing " + DEVICE_CODE + " parameter");
             throw new OA2ATException(OA2Errors.ACCESS_DENIED,
                     "Missing " + DEVICE_CODE + " parameter",
                     HttpStatus.SC_UNAUTHORIZED,
@@ -1041,6 +1068,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         } catch (OA2ATException atException) {
             // even though the token endpoint has a perfectly good way of communicating
             // that the token is expired, the RFC requires this instead
+            debugger.trace(this, "expired token " + authorizationGrant.getToken());
             throw new OA2ATException("expired_token", DEVICE_CODE + " expired");
         }
         OA2ServiceTransaction transaction = (OA2ServiceTransaction) getTransaction(authorizationGrant);

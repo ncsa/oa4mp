@@ -34,4 +34,12 @@ public class TXRecordTable extends Table {
         getColumnDescriptor().add(new ColumnDescriptorEntry(tkeys().parentID(), Types.LONGVARCHAR));
         getColumnDescriptor().add(new ColumnDescriptorEntry(tkeys().tokenType(), Types.LONGVARCHAR));
     }
+
+    public String getSearchByParentIDStatement(){
+        return "select * from " + getFQTablename() + " where " + tkeys().parentID + " = ?";
+    }
+
+    public String getCountByParentIDStatement(){
+        return "select count(*) from " + getFQTablename() + " where " + tkeys().parentID + " = ?";
+    }
 }

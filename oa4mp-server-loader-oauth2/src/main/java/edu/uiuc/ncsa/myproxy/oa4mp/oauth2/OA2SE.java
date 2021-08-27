@@ -90,7 +90,9 @@ public class OA2SE extends ServiceEnvironmentImpl {
                  boolean rfc8628Enabled,
                  boolean printTSInDebug,
                  long cleanupInterval,
-                 String notifyACEventEmailAddresses) {
+                 String notifyACEventEmailAddresses,
+                 boolean rfc7636Required) {
+
         super(logger,
                 mfp,
                 tsp,
@@ -157,6 +159,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.rfc8628ServletConfig = rfc8628ServletConfig;
         this.cleanupInterval = cleanupInterval;
         this.notifyACEventEmailAddresses = notifyACEventEmailAddresses;
+        this.rfc7636Required = rfc7636Required;
     }
 
     public String getNotifyACEventEmailAddresses() {
@@ -480,5 +483,14 @@ public class OA2SE extends ServiceEnvironmentImpl {
         return stores;
     }
 
+    public boolean isRfc7636Required() {
+        return rfc7636Required;
+    }
+
+    public void setRfc7636Required(boolean rfc7636Required) {
+        this.rfc7636Required = rfc7636Required;
+    }
+
+    boolean rfc7636Required = false;
 
 }

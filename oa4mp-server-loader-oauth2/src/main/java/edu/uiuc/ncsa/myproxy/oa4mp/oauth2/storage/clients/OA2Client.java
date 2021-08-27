@@ -175,7 +175,6 @@ public class OA2Client extends Client implements OA2ClientScopes {
     protected String TOKENS_KEY = "/tokens";
     protected String ACCESS_TOKENS_KEY = "access";
     protected String REFRESH_TOKENS_KEY = "refresh";
-    protected String WLCG_TOKENS_KEY = "wlcg_token";
     protected String ID_TOKENS_KEY = "identity";
 
     protected boolean hasPayloadConfig(String root, String path) {
@@ -347,6 +346,8 @@ public class OA2Client extends Client implements OA2ClientScopes {
         }
         getNamedAttributes(component).put(key, ja);
     }
+
+
 
     public List<String> getGrantTypes() {
         return getNamedList(xoauth_attributes, OA2Constants.GRANT_TYPE);

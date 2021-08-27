@@ -220,7 +220,7 @@ public class SigningCommands extends CommonCommands {
      */
     static SecureRandom random = new SecureRandom();
 
-    protected static JSONWebKey createJWK(String algorithm) throws NoSuchProviderException, NoSuchAlgorithmException {
+    public static JSONWebKey createJWK(String algorithm) throws NoSuchProviderException, NoSuchAlgorithmException {
         byte[] byteArray = new byte[16];
         random.nextBytes(byteArray);
         String id = DatatypeConverter.printHexBinary(byteArray);

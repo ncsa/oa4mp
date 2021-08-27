@@ -1,9 +1,19 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx;
 
+import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
+import edu.uiuc.ncsa.security.storage.sql.ConnectionRecord;
 import edu.uiuc.ncsa.security.storage.sql.SQLStore;
+import edu.uiuc.ncsa.security.storage.sql.internals.ColumnMap;
 
 import javax.inject.Provider;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Note that the identifier is simple the JTI of the token and may be either an access or refresh
@@ -20,5 +30,58 @@ public class SQLTXRecordStore<V extends TXRecord> extends SQLStore<V>  implement
         super(connectionPool, table, identifiableProvider, converter);
     }
 
+    protected TXRecordTable getTXRTable(){
+        return (TXRecordTable) getTable();
+    }
+    @Override
+    public List<V> getByParentID(Identifier parentID) {
+        List<V> values = new ArrayList<>();
+             ConnectionRecord cr = getConnection();
+             Connection c = cr.connection;
 
+             V t = null;
+             try {
+                 PreparedStatement stmt = c.prepareStatement(getTXRTable().getSearchByParentIDStatement());
+                 stmt.setString(1, parentID.toString());
+                 stmt.executeQuery();
+                 ResultSet rs = stmt.getResultSet();
+                 // Now we have to pull in all the values.
+                 while (rs.next()) {
+                     ColumnMap map = rsToMap(rs);
+                     t = create();
+                     populate(map, t);
+                     values.add(t);
+                 }
+
+                 rs.close();
+                 stmt.close();
+                 releaseConnection(cr);
+             } catch (SQLException e) {
+                 destroyConnection(cr);
+                 throw new GeneralException("Error getting TX records that have parent \"" + parentID + "\"", e);
+             }
+             return values;
+    }
+
+    @Override
+    public int getCountByParent(Identifier parentID) {
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
+        int rowCount = 0;
+        try {
+                 PreparedStatement stmt = c.prepareStatement(getTXRTable().getCountByParentIDStatement());
+                 stmt.executeQuery();
+                 ResultSet rs = stmt.getResultSet();
+                 if (rs.next()) {
+                     rowCount = rs.getInt(1); // *trick* to get the row count
+                 }
+                 rs.close();
+                 stmt.close();
+                 releaseConnection(cr);
+             } catch (SQLException e) {
+                 destroyConnection(cr);
+                 throw new GeneralException("Error getting the number of tx records for a parent id", e);
+             }
+        return rowCount;
+    }
 }

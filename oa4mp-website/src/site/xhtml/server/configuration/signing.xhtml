@@ -40,8 +40,10 @@
     </tbody>
 </table>
 <p>
-    There is one <b><i>required</i></b> attribute and that is <code>defaultKeyID</code> which tells which
-    key should be used for signing.
+    There is one  attribute and that is <code>defaultKeyID</code> which tells which
+    key should be used for signing. If you have a single key, then that will
+    be used as the default, otherwise you must specify the default key or there
+    will be an error at boot.
 </p>
 
 <h3>An example configuration</h3>
@@ -55,7 +57,8 @@
 &lt;/service&gt;
 </pre>
 <p>
-    This sets the path to the file keys.jwks in the given directory. If you do not the defaultKeyID an error will
+    This sets the path to the file keys.jwks in the given directory. This file contains
+    multiple keys, so if you do not set the defaultKeyID, an error will
     be generated on server startup. Within that file is an entry that has a unique
     key identifier ("kid"):
 </p>

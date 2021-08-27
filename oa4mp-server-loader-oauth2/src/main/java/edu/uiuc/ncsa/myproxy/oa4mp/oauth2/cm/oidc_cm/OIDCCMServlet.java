@@ -144,9 +144,12 @@ public class OIDCCMServlet extends EnvServlet {
             // converted to a contacts array or we run the risk of inadvertantly losing this.
 
             JSONObject json = toJSONObject(oa2Client);
-            if ((!isAnonymous) && adminClient.isDebugOn()) {
+            // This next block would turn on messages every time a get is issued. Since
+            // COManage has a groovy GUI that lets people surf clients, the output
+            // was getting intolerable. Maybe someday re-enable this? Maybe.
+  /*          if ((!isAnonymous) && adminClient.isDebugOn()) {
                 fireMessage(getOA2SE(), defaultReplacements(httpServletRequest, adminClient, oa2Client));
-            }
+            }*/
             writeOK(httpServletResponse, json); //send it back with an ok.
         } catch (Throwable t) {
             handleException(t, httpServletRequest, httpServletResponse);
