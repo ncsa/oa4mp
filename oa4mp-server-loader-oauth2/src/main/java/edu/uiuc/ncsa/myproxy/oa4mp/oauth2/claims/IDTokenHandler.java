@@ -304,7 +304,9 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
         DebugUtil.trace(this, ".saveState: starting save.");
         switch (getResponseCode()) {
             case RC_NOT_RUN:
-                break;
+                // CIL-1072 fix -- have it always fall through and save the metadata and claims.
+                // Actually, this handler *always* runs since the token handler updates the id token timestamps.
+         //       break;
             case RC_OK:
                 if (transaction != null && oa2se != null) {
                     transaction.setUserMetaData(getClaims());

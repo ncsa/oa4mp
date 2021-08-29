@@ -625,6 +625,9 @@ public class OA2CLCCommands extends CLCCommands {
             say("(no claims found)");
         } else {
             say(claims.toString(2));
+            Date exp = new Date();
+            exp.setTime(claims.getInt(OA2Claims.EXPIRATION)*1000L);
+            say(exp.getTime() - System.currentTimeMillis()<0?"expired at ":"valid until " + exp);
         }
 
     }

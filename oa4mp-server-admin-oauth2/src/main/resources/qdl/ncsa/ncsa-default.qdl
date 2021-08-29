@@ -42,6 +42,7 @@ if[
      cfg. := new_template('ncsa');
      claims.uid := head(claims.eppn, '@'); // set search key
      claim_sources. := claim_sources. ~ [create_source(cfg.)]; // add it to any claims
+     say('*** NCSA set claim_sources. to ' + to_string(claim_sources.));
 ]; //end if
 
 /* This replaces the next block if QDL is at 1.3.2 or above.
@@ -52,6 +53,7 @@ if[
      if[convert][claims.isMemberOf. ≔ query(claims.isMemberOf., '$..name');];
  ];
  */
+ say('*** ncsa-default ' + to_string(claims.));
 if[
    exec_phase == 'post_token' ||exec_phase == 'post_refresh' || exec_phase == 'post_exchange'
 ]then[
@@ -67,6 +69,12 @@ if[
 
    // then take the isMemberOf claims and return them as a flat list, not as a JSON structure.
     s. := null; // initialize it
+
+    if[
+       !is_defined(claims.isMemberOf.)
+      ][
+       return();
+    ];
      n := size(claims.isMemberOf.);
     while[
        for_next(j,n)
