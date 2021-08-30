@@ -155,12 +155,23 @@ When a new version is deployed, here is the testing order
            fails since no scopes can be asserted.
 
   -- localhost:test/ncsa
-        Test client with the basic default NCSA QDL script. Second most common configuration.
+     **************************************
+     * Second most common configuration.  *
+     **************************************
+        Test client with the basic default NCSA QDL script.
         Be sure NCSA VPN is active or it will hang forever (many minutes) waiting.
-        get_at
-           at_lifetime 1009 sec.
-           rt_lifetime 950400 sec
-        get_rt, get_user_info, exchange ok
+        access:
+           at lifetime 1009 sec.
+           rt lifetime 950400 sec
+           user_info
+           CIL-1072 check: check claims expiration 20 minutes
+             >> wait a few minutes <<
+        refresh:
+            same access, rt lifetimes, user_info
+            CIL-1072 check: Make sure the new expiration time has been updated
+        exchange:
+            do both tokens (-rt switch for refresh)
+            No id token is returned from here, so no check for its expiration.
         get_cert fails
 
   -- localhost:test/fnal

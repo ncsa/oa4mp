@@ -1,2 +1,1 @@
-error="invalid_request"
-error_description="no+such+client"
+{"registration_client_uri":"https://localhost:9443/oauth2/oidc-cm?client_id=oa4mp:/client_id/3ab66a975055cc7384f88a296499b8b7","client_id":"oa4mp:/client_id/3ab66a975055cc7384f88a296499b8b7","client_name":"New Test name","redirect_uris":["https://client.example.org/callback","https://client.example.org/callback2"],"rt_lifetime":0,"at_lifetime":0,"scope":["openid","email","profile"],"client_uri":"","strict_scopes":true,"client_id_issued_at":1630344970,"cfg":{"new":"config"}}

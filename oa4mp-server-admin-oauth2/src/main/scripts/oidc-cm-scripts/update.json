@@ -2,5 +2,6 @@
     ["https://client.example.org/callback",
      "https://client.example.org/callback2"],
   "client_name":"New Test name",
-  "cfg": {"new": "config"}
+  "cfg": {"new": "config"},
+  "scope":["openid","email","profile"]
 }

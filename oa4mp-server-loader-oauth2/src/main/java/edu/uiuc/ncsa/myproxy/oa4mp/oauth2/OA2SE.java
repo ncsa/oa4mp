@@ -40,6 +40,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
+import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2ConfigurationLoader.ACCESS_TOKEN_LIFETIME_DEFAULT;
+import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2ConfigurationLoader.AUTHORIZATION_GRANT_LIFETIME_DEFAULT;
+
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 3/27/14 at  4:16 PM
@@ -52,6 +55,9 @@ public class OA2SE extends ServiceEnvironmentImpl {
                  Provider<ClientStore> csp,
                  int maxAllowedNewClientRequests,
                  long agLifetime,
+                 long maxAGLifetime,
+                 long idTokenLifetime,
+                 long maxIDTokenLifetime,
                  long maxATLifetime,
                  long atLifetime,
                  long maxRTLifetime,
@@ -116,7 +122,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
         if (0 < atLifetime) {
             this.accessTokenLifetime = atLifetime;
         }
-
+         this.maxAuthorizationGrantLifetime = maxAGLifetime;
         if (clientSecretLength < 0) {
             throw new MyConfigurationException("Error: The client secret length (=" + clientSecretLength + ") is invalid. It must be a positive integer.");
         }
@@ -150,6 +156,8 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.rfc8693Enabled = rfc8693Enabled;
         this.txStore = txStoreProvider.get();
         this.voStore = voStoreProvider.get();
+        this.maxIdTokenLifetime = maxIDTokenLifetime;
+        this.idTokenLifetime = idTokenLifetime;
         this.maxATLifetime = maxATLifetime;
         this.maxRTLifetime = maxRTLifetime;
         this.qdlStrictACLs = qdlStrictACLs;
@@ -331,6 +339,17 @@ public class OA2SE extends ServiceEnvironmentImpl {
         return maxClientRefreshTokenLifetime;
     }
 
+    long maxIdTokenLifetime = 0L;
+    long idTokenLifetime = 0L;
+
+    public long getMaxIdTokenLifetime() {
+        return maxIdTokenLifetime;
+    }
+
+    public long getIdTokenLifetime() {
+        return idTokenLifetime;
+    }
+
     long maxClientRefreshTokenLifetime = 0L;
 
     boolean twoFactorSupportEnabled = false;
@@ -413,8 +432,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
 
     boolean oidcEnabled = true;
 
-    //FIXME Default.
-    long accessTokenLifetime = 15 * 60 * 1000L;
+    long accessTokenLifetime = ACCESS_TOKEN_LIFETIME_DEFAULT;
 
     public long getAccessTokenLifetime() {
         return accessTokenLifetime;
@@ -424,6 +442,14 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.accessTokenLifetime = accessTokenLifetime;
     }
 
+    // This is a nod towards allowing device flow clients to set their df lifetimes.
+    // not used yet.
+    public long getMaxAuthorizationGrantLifetime() {
+        return maxAuthorizationGrantLifetime;
+    }
+
+    long maxAuthorizationGrantLifetime;
+
     public long getAuthorizationGrantLifetime() {
         return authorizationGrantLifetime;
     }
@@ -432,7 +458,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.authorizationGrantLifetime = authorizationGrantLifetime;
     }
 
-    long authorizationGrantLifetime = 15 * 60 * 1000L;
+    long authorizationGrantLifetime = AUTHORIZATION_GRANT_LIFETIME_DEFAULT;
 
     /**
      * Given the client id, look up the admin and determine what (if any) the VO is.

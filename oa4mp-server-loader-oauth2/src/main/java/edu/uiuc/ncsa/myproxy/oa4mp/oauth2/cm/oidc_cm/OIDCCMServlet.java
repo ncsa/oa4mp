@@ -11,7 +11,9 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientKeys;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.EnvServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
+import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
@@ -24,6 +26,7 @@ import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2GeneralError;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Scopes;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
+import edu.uiuc.ncsa.security.storage.XMLMap;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -155,6 +158,21 @@ public class OIDCCMServlet extends EnvServlet {
             handleException(t, httpServletRequest, httpServletResponse);
         }
     }
+    protected String formatIdentifiable(Store store, Identifiable identifiable){
+        XMLMap map = new XMLMap();
+        store.getXMLConverter().toMap(identifiable, map);
+        List<String> outputList = StringUtils.formatMap(map,
+                null,
+                true,
+                false,
+                2,
+                120);
+        StringBuffer stringBuffer = new StringBuffer();
+        for (String x : outputList) {
+            stringBuffer.append(x+"\n");
+        }
+        return stringBuffer.toString();
+    }
 
     protected HashMap<String, String> defaultReplacements(HttpServletRequest req, AdminClient adminClient, OA2Client client) {
         HashMap<String, String> replacements = new HashMap<>();
@@ -162,7 +180,25 @@ public class OIDCCMServlet extends EnvServlet {
             replacements.put("admin_id", adminClient.getIdentifierString());
         }
         replacements.put("client_id", client.getIdentifierString());
-        replacements.put("action", req.getMethod());
+        replacements.put("client", formatIdentifiable(getOA2SE().getClientStore(), client));
+        String actionString;
+        switch(req.getMethod()){
+            case "PUT":
+                actionString = "updated the following registered client";
+                break;
+            case "POST":
+                actionString = "registered the following new client";
+                break;
+            case "DELETE":
+                actionString = "deleted the following registered client";
+                break;
+            case "GET":
+                actionString = "got the following existing client";
+                break;
+                default:
+                    actionString = "did a " + req.getMethod() + " on the following registered client";
+        }
+        replacements.put("action", actionString);
         return replacements;
     }
 
@@ -455,7 +491,10 @@ public class OIDCCMServlet extends EnvServlet {
             newClient.setConfig(client.getConfig());
             try {
                 newClient = updateClient(newClient, adminClient, jsonRequest, false, resp);
-
+                if (adminClient.isDebugOn()) {
+                       // CIL-607
+                       fireMessage(getOA2SE(), defaultReplacements(req, adminClient, newClient));
+                   }
                 getOA2SE().getClientStore().save(newClient);
                 writeOK(resp, toJSONObject(newClient));
                 //     writeOK(resp, resp);
@@ -1086,8 +1125,7 @@ public class OIDCCMServlet extends EnvServlet {
 
     SecureRandom random = new SecureRandom();
     String subjectTemplate = "Client Management servlet ${action} notification";
-    String messageTemplate = "The admin client with id ${admin_id} has performed a ${action}\n" +
-            "for client with id ${client_id}";
+    String messageTemplate = "The admin client with id ${admin_id} ${action}:\n\n${client} ";
 
     //CIL-607
     protected void fireMessage(OA2SE oa2SE, HashMap<String, String> replacements) {

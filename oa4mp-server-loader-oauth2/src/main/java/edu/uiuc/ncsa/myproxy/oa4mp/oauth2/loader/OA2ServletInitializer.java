@@ -104,6 +104,9 @@ public class OA2ServletInitializer extends OA4MPServletInitializer {
                         null); // default in server mode, but can be overridden later
             }
         });
+ //       oa2SE.getMyLogger().info("Starting email notification thread.");
+
+ //       oa2SE.getMailUtil().start();  // Have this run in its own thread.
     }
 
 }

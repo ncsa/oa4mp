@@ -99,7 +99,17 @@
             much shorter lifetime than refresh tokens. The reason is that access tokens allow access to a resource
             and refresh tokens let a client get access tokens. Best practices is that an access token is gotten
             for a specific task and should be therefore short lived. Clients may request different lifetimes, but
-            are limited to this value as a maximum. See note below on units.
+            are limited to the maximum value as set below. See note below on units.
+        </td>
+    </tr>
+    <tr id="defaultIDTokenLifetime">
+        <td style="vertical-align: top;">defaultIDTokenLifetime</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">900</td>
+        <td style="vertical-align: top;"><span style="background-color: #ff6600;">OAuth 2</span>
+            specific. This will set the lifetime of id tokens, in seconds, issued by
+            the server. The default is 900 seconds = 15 minutes. Clients may request different lifetimes, but
+            are limited to the maximum value as st below. See note below on units.
         </td>
     </tr>
 
@@ -169,6 +179,30 @@
             be rejected. This is to prevent denial of service attacks for thousands of client requests.
             Since such requests are normally not too frequent, this number can realistically be set low
             to 10 or 20 with no issue on a production system.
+        </td>
+    </tr>
+    <tr id="maxAuthorizationGrantLifetime">
+        <td style="vertical-align: top;">maxAuthorizationGrantLifetime</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">1800</td>
+        <td style="vertical-align: top;">This is the largest authorization grant lifetime, in seconds, that the server will
+            permit,
+            regardless of what is requested. Note that there is no way for clients to request this
+            except as part of a device flow. Contrast this with the defaultAuthorizationGrantLifetime property
+            which is used if clients specify nothing. The default is 30 minutes or 1800 seconds.
+            See note below on units.
+        </td>
+    </tr>
+    <tr id="maxIDTokenLifetime">
+        <td style="vertical-align: top;">maxIDTokenLifetime</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">maxAccessTokenLifetime</td>
+        <td style="vertical-align: top;">This is the largest ID token lifetime, in seconds, that the server will
+            permit,
+            regardless of what is requested. Contrast this with the defaultIDTokenLifetime property
+            which is used if clients specify nothing. The default is the same as for access tokens
+            since that most often conforms to use patterns.
+            See note below on units.
         </td>
     </tr>
     <tr id="maxClientRefreshTokenLifetime">

@@ -194,9 +194,10 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
         trace(this, "Refreshing the accounting information for the claims");
         if (0 < getPhCfg().getPayloadConfig().getLifetime()) {
             // CIL-708 fix: Make sure the refresh endpoint hands back the right expiration.
-            getClaims().put(EXPIRATION, (getPhCfg().getPayloadConfig().getLifetime() + System.currentTimeMillis()) / 1000); // expiration is in SECONDS from the epoch.
+            long actualAllowedLifetime = Math.min(getPhCfg().getPayloadConfig().getLifetime(), oa2se.getMaxIdTokenLifetime());
+            getClaims().put(EXPIRATION, (actualAllowedLifetime + System.currentTimeMillis()) / 1000); // expiration is in SECONDS from the epoch.
         } else {
-            getClaims().put(EXPIRATION, System.currentTimeMillis() / 1000 + 15 * 60); // expiration is in SECONDS from the epoch.
+            getClaims().put(EXPIRATION, (System.currentTimeMillis() + oa2se.getIdTokenLifetime()) / 1000); // expiration is in SECONDS from the epoch.
         }
         getClaims().put(ISSUED_AT, System.currentTimeMillis() / 1000); // issued at = current time in seconds.
     }
