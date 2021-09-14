@@ -643,7 +643,7 @@ public class OA2AuthorizedServletUtil {
     }
 
     protected Collection<String> resolveScopes(TransactionState transactionState) {
-        return ClientUtils.resolveScopes(transactionState, false);
+        return ClientUtils.resolveScopes(transactionState, false,false);
     }
 
     public void postprocess(TransactionState transactionState) {
@@ -653,6 +653,7 @@ public class OA2AuthorizedServletUtil {
         OA2ServiceTransaction t = (OA2ServiceTransaction) transactionState.getTransaction();
         Collection<String> scopes = resolveScopes(transactionState);
         t.setScopes(scopes);
+        t.setValidatedScopes(scopes);
         transactionState.getResponse().setHeader("X-Frame-Options", "DENY");
     }
 }

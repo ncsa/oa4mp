@@ -109,6 +109,8 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
             }
         }
         state.setServerMode(qe.isServerModeOn());
+        // next line allows for debugging individual clients.
+        state.setRestrictedIO(qe.isRestrictedIO() || transaction.getClient().isDebugOn());
         state.getOpEvaluator().setNumericDigits(qe.getNumericDigits());
         state.setScriptPaths(qe.getScriptPath());  // Be sure script paths are read.
         state.setAssertionsOn(qe.isAssertionsOn());
@@ -164,7 +166,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
             Reader r = new InputStreamReader(gzipInputStream);
 /*
             Debug stuff to recreate the XML exactly and print it out. Otherwise it is
-            squirreled away inside a zgip stream someplace.
+            squirreled away inside a gzip stream someplace.
 */
 /*
             BufferedReader br = new BufferedReader(r);

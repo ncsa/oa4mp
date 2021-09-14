@@ -77,6 +77,11 @@ public class OA2TConverter<V extends OA2ServiceTransaction> extends TransactionC
         st.setCallback(map.getURI(getTCK().callbackUri()));
         st.setNonce(map.getString(getTCK().nonce()));
         st.setRequestState(map.getString(getTCK().reqState()));
+        if(map.get(getTCK().validatedScopes())!=null){
+            net.sf.json.JSONArray json = (JSONArray) JSONSerializer.toJSON(map.get(getTCK().validatedScopes()));
+            Collection<String> zzz = (Collection<String>) JSONSerializer.toJava(json);
+            st.setValidatedScopes(zzz);
+        }
         if (map.get(getTCK().scopes()) != null) {
             net.sf.json.JSONArray json = (JSONArray) JSONSerializer.toJSON(map.get(getTCK().scopes()));
             Collection<String> zzz = (Collection<String>) JSONSerializer.toJava(json);
@@ -147,7 +152,11 @@ public class OA2TConverter<V extends OA2ServiceTransaction> extends TransactionC
         if (!isTrivial(t.getUserCode())) {
             map.put(getTCK().userCode(), t.getUserCode());
         }
-
+        if(!t.getValidatedScopes().isEmpty()){
+            JSONArray jsonArray = new JSONArray();
+            jsonArray.addAll(t.getValidatedScopes());
+            map.put(getTCK().validatedScopes(), jsonArray.toString());
+        }
         if (!isTrivial(t.getNonce())) {
             map.put(getTCK().nonce(), t.getNonce());
         }

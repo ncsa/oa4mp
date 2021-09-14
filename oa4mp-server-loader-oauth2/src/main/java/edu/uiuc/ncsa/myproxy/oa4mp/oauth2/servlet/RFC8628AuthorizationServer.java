@@ -120,6 +120,7 @@ public class RFC8628AuthorizationServer extends EnvServlet {
     }
 
     public void postprocess(PendingState pendingState) throws Throwable {
+
         pendingState.getResponse().setHeader("X-Frame-Options", "DENY");
     }
 
@@ -306,6 +307,7 @@ public class RFC8628AuthorizationServer extends EnvServlet {
         trans.setRFC8628Request(false); // or it gets picked up when rebuilding the cache as outstanding.
         trans.setRFC8628State(rfc8628State);
         pending.remove(pendingState.id); // clean that out
+        trans.setValidatedScopes(trans.getScopes()); // At this point they accepted the scopes on the consent page, so stash them.
         getServiceEnvironment().getTransactionStore().save(trans);
     }
 

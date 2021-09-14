@@ -117,7 +117,10 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
         }
         MetaDebugUtil debugUtil = createDebugger(client);
         debugUtil.trace(this, "checked client secret.");
-        long lifetime = oa2SE.getAuthorizationGrantLifetime();
+
+
+        long lifetime = 0 < client.getDfLifetime() ? client.getDfLifetime() : rfc8628ServletConfig.lifetime;
+        lifetime = 0 < lifetime ? lifetime : oa2SE.getAuthorizationGrantLifetime(); // if nothing is set, default to AG lifetime.
         AGRequest2 agRequest2 = new AGRequest2(req, lifetime);
         AGResponse agResponse = (AGResponse) getAGI().process(agRequest2);
         AuthorizationGrantImpl ag = ((OA2TokenForge) oa2SE.getTokenForge()).createToken(agRequest2);
@@ -155,8 +158,12 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
         rfc8628State.issuedAt = System.currentTimeMillis();
         rfc8628State.lastTry = System.currentTimeMillis(); // so it has a reasonable value
         rfc8628State.lifetime = lifetime;
-
-        rfc8628State.interval = rfc8628ServletConfig.interval;
+        if (0 < client.getDfInterval()) {
+            rfc8628State.interval = client.getDfInterval();
+        } else {
+            // interval not set in client, use default.
+            rfc8628State.interval = rfc8628ServletConfig.interval;
+        }
         String scope = req.getParameter(OA2Constants.SCOPE);
         rfc8628State.originalScopes = scope;
         if (isTrivial(scope)) {
@@ -167,7 +174,7 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
             debugUtil.trace(this, "checking scopes:" + scope + ". strict scopes " + (client.useStrictScopes() ? "on" : "off"));
             TransactionState transactionState = new TransactionState(req, resp, agResponse.getParameters(), t);
             try {
-                t.setScopes(ClientUtils.resolveScopes(transactionState, true));
+                t.setScopes(ClientUtils.resolveScopes(transactionState, true, true));
             } catch (OA2RedirectableError redirectableError) {
                 throw new OA2ATException(redirectableError.getError(),
                         redirectableError.getDescription(),

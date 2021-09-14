@@ -191,10 +191,10 @@ public class JWKUtilCommands extends CommonCommands {
             JSONWebKeys keys;
             if (createSingleKey) {
                 keys = new JSONWebKeys(null);
+                keys.put(createJWK(RS_256)); // make one
             } else {
-                keys = sg.createJsonWebKeys();
+                keys = sg.createJsonWebKeys(); // make full set
             }
-            keys.put(createJWK(RS_256));
             JSONObject jwks = JSONWebKeyUtil.toJSON(keys);
             if (hasOutputFile) {
                 writeFile(outFilename, jwks.toString(2));

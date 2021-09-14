@@ -29,6 +29,19 @@ public class OA2ClientKeys extends ClientKeys {
     String strictScopes="strict_scopes";
     String audience="audience";
     String resource="resource";
+    String dfLifetime="df_lifetime";
+    String dfInterval="df_interval";
+
+
+    public String dfLifetime(String... x) {
+           if (0 < x.length) dfLifetime= x[0];
+           return dfLifetime;
+       }
+
+    public String dfInterval(String... x) {
+           if (0 < x.length) dfInterval= x[0];
+           return dfInterval;
+       }
 
     public String audience(String... x) {
            if (0 < x.length) audience= x[0];

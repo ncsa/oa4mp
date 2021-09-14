@@ -63,8 +63,8 @@
           <element id="library" level="project" name="Maven: com.ibm.icu:icu4j:61.1" />
           <element id="library" level="project" name="Maven: org.jasypt:jasypt:1.9.0" />
           <element id="library" level="project" name="Maven: edu.uiuc.ncsa.security:ncsa-security-servlet:5.2-SNAPSHOT" />
-          <element id="library" level="project" name="Maven: org.apache.logging.log4j:log4j-core:2.5" />
-          <element id="library" level="project" name="Maven: org.apache.logging.log4j:log4j-api:2.5" />
+          <element id="library" level="project" name="Maven: org.apache.logging.log4j:log4j-core:2.13.2" />
+          <element id="library" level="project" name="Maven: org.apache.logging.log4j:log4j-api:2.13.2" />
           <element id="archive" name="myproxy-logon-5.2-SNAPSHOT.jar">
             <element id="module-output" name="myproxy-logon" />
           </element>

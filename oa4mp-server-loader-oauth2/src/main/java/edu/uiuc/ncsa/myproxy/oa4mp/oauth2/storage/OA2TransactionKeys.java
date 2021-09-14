@@ -26,10 +26,16 @@ public class OA2TransactionKeys extends DSTransactionKeys {
     protected String reqState = "req_state";
     protected String isRFC8628  = "is_rfc_8628";
     protected String userCode  = "user_code";
+    protected String validatedScopes  = "validated_scopes";
 
     public String userCode(String... x) {
         if (0 < x.length) userCode = x[0];
         return userCode;
+    }
+
+    public String validatedScopes(String... x) {
+        if (0 < x.length) validatedScopes = x[0];
+        return validatedScopes;
     }
 
     public String isRFC8628(String... x) {

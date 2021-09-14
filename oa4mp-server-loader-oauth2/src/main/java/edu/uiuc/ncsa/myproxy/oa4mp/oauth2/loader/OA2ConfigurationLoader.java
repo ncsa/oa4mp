@@ -115,7 +115,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
     public static long MAX_ID_TOKEN_LIFETIME_DEFAULT = MAX_ACCESS_TOKEN_LIFETIME_DEFAULT; // 30 minutes
 
     public static long AUTHORIZATION_GRANT_LIFETIME_DEFAULT = 15 * 60 * 1000L; // 15 minutes
-    public static long MAX_AUTHORIZATION_GRANT_LIFETIME_DEFAULT = 2*AUTHORIZATION_GRANT_LIFETIME_DEFAULT; // 30 minutes
+    public static long MAX_AUTHORIZATION_GRANT_LIFETIME_DEFAULT = 2 * AUTHORIZATION_GRANT_LIFETIME_DEFAULT; // 30 minutes
 
     //This is divisible by 3 and greater than 256,
     // so when it is base64 encoded there will be no extra characters:
@@ -220,6 +220,12 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                 x = getFirstAttribute(sn, OA4MPConfigTags.DEVICE_FLOW_AUTHORIZATION_URI);
                 if (!StringUtils.isTrivial(x)) {
                     rfc8628ServletConfig.deviceAuthorizationEndpoint = x;
+                }
+                x = getFirstAttribute(sn, OA4MPConfigTags.DEVICE_FLOW_LIFETIME);
+                try {
+                    rfc8628ServletConfig.lifetime = ConfigUtil.getValueSecsOrMillis(x, true);
+                } catch (NumberFormatException numberFormatException) {
+
                 }
                 x = getFirstAttribute(sn, OA4MPConfigTags.DEVICE_FLOW_INTERVAL);
                 if (!StringUtils.isTrivial(x)) {
@@ -704,22 +710,24 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         }
         return agLifetime;
     }
+
     long idTokenLifetime = -1L;
+
     protected long getIDTokenLifetime() {
-           if (idTokenLifetime < 0) {
-               String x = getFirstAttribute(cn, DEFAULT_ID_TOKEN_LIFETIME);
-               if (isTrivial(x)) {
-                   idTokenLifetime = ID_TOKEN_LIFETIME_DEFAULT;
-               } else {
-                   try {
-                       idTokenLifetime = ConfigUtil.getValueSecsOrMillis(x, true);
-                   } catch (Throwable t) {
-                       idTokenLifetime = ID_TOKEN_LIFETIME_DEFAULT;
-                   }
-               }
-           }
-           return idTokenLifetime;
-       }
+        if (idTokenLifetime < 0) {
+            String x = getFirstAttribute(cn, DEFAULT_ID_TOKEN_LIFETIME);
+            if (isTrivial(x)) {
+                idTokenLifetime = ID_TOKEN_LIFETIME_DEFAULT;
+            } else {
+                try {
+                    idTokenLifetime = ConfigUtil.getValueSecsOrMillis(x, true);
+                } catch (Throwable t) {
+                    idTokenLifetime = ID_TOKEN_LIFETIME_DEFAULT;
+                }
+            }
+        }
+        return idTokenLifetime;
+    }
 
     public long getMaxIDTokenLifetime() {
         if (maxIDTokenLifetime < 0) {
@@ -743,7 +751,6 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
     // access token lifetime
 
 
-
     long atLifetime = -1L;
 
     protected long getATLifetime() {
@@ -765,6 +772,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         }
         return atLifetime;
     }
+
     long maxAGLifetime = -1L;
 
     public long getMaxAGLifetime() {

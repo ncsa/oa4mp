@@ -178,25 +178,26 @@ public class OIDCCMServlet extends EnvServlet {
         HashMap<String, String> replacements = new HashMap<>();
         if (adminClient != null) {
             replacements.put("admin_id", adminClient.getIdentifierString());
+            replacements.put("admin_name", adminClient.getName());
         }
         replacements.put("client_id", client.getIdentifierString());
         replacements.put("client", formatIdentifiable(getOA2SE().getClientStore(), client));
         String actionString;
         switch(req.getMethod()){
             case "PUT":
-                actionString = "updated the following registered client";
+                actionString = "updated";
                 break;
             case "POST":
-                actionString = "registered the following new client";
+                actionString = "registered";
                 break;
             case "DELETE":
-                actionString = "deleted the following registered client";
+                actionString = "deleted";
                 break;
             case "GET":
-                actionString = "got the following existing client";
+                actionString = "got";
                 break;
                 default:
-                    actionString = "did a " + req.getMethod() + " on the following registered client";
+                    actionString = "did a " + req.getMethod();
         }
         replacements.put("action", actionString);
         return replacements;
@@ -1124,8 +1125,8 @@ public class OIDCCMServlet extends EnvServlet {
     }
 
     SecureRandom random = new SecureRandom();
-    String subjectTemplate = "Client Management servlet ${action} notification";
-    String messageTemplate = "The admin client with id ${admin_id} ${action}:\n\n${client} ";
+    String subjectTemplate = "CILogon client ${action} for ${admin_name}";
+    String messageTemplate = "The \"${admin_name}\" (${admin_id}) ${action} the following client:\n\n${client} ";
 
     //CIL-607
     protected void fireMessage(OA2SE oa2SE, HashMap<String, String> replacements) {

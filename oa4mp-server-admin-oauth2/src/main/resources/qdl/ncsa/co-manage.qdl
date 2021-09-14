@@ -56,7 +56,7 @@ cfg.search_attributes. := ['givenName'];
   cfg.rename.givenName := 'given_name';
 
 // Just add it to any existing claim sources.
-claim_sources. := claims_sources.~ [create_surce(cfg.)];
+claim_sources. := claims_sources.~ [create_source(cfg.)];
 
 
 /*

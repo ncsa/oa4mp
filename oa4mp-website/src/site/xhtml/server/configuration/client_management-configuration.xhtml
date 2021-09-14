@@ -87,7 +87,8 @@
         <td>-</td>
         <td>(RFC 7591 protocol only) The id of a configured client which is to be used as a template. This means that create
         requests will create an copy of this client and use any arguments as overrides. This allows
-        you to have a uniform registration for all clients (e.g. all of your clients use the device flow
+        you to have a uniform registration for all clients (e.g. all of your clients use the device flow,
+        are auto-approved,     
         and need identical configurations). This only applies to the rfc 7951 api. You would need
         to create this client (tip: never approve it) in the CLI before setting this.</td>
     </tr>
@@ -125,6 +126,7 @@
 <pre>
     &lt;clientManagement enabled="false"&gt;
 </pre>
+<p>Any other attributes will be ignored, so you can just turn it on or off.</p>
 
 <!--#include virtual="../../footer.html" -->
 </body>

@@ -69,6 +69,8 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
             otherV.setPublicClient(map.getBoolean(getCK2().publicClient()));
         }
         otherV.setRtLifetime(map.getLong(getCK2().rtLifetime()));
+        otherV.setDfLifetime(map.getLong(getCK2().dfLifetime()));
+        otherV.setDfInterval(map.getLong(getCK2().dfInterval()));
         // In certain legacy cases, this may end up being populated with a null. Treat it like
         // a -1 (which means it isn't set, so don't use this in calculations)
         if (map.containsKey(getCK2().atLifetime()) && map.get(getCK2().atLifetime()) != null) {
@@ -200,6 +202,8 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         super.toMap(client, map);
         map.put(getCK2().rtLifetime(), client.getRtLifetime());
         map.put(getCK2().atLifetime(), client.getAtLifetime());
+        map.put(getCK2().dfLifetime(), client.getDfLifetime());
+        map.put(getCK2().dfInterval(), client.getDfInterval());
         if (client.getCallbackURIs() == null) {
             return;
         }
@@ -252,9 +256,16 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
     public V fromJSON(JSONObject json) {
         V v = super.fromJSON(json);
         v.setRtLifetime(getJsonUtil().getJSONValueLong(json, getCK2().rtLifetime()));
-        if (json.containsKey(getCK2().atLifetime)) {
+        if (json.containsKey(getCK2().atLifetime())) {
             v.setAtLifetime(getJsonUtil().getJSONValueLong(json, getCK2().atLifetime()));
         }
+        if (json.containsKey(getCK2().dfLifetime())) {
+            v.setDfLifetime(getJsonUtil().getJSONValueLong(json, getCK2().dfLifetime()));
+        }
+        if (json.containsKey(getCK2().dfInterval())) {
+            v.setDfInterval(getJsonUtil().getJSONValueLong(json, getCK2().dfInterval()));
+        }
+
         v.setIssuer(getJsonUtil().getJSONValueString(json, getCK2().issuer()));
         v.setSignTokens(getJsonUtil().getJSONValueBoolean(json, getCK2().signTokens()));
         v.setPublicClient(getJsonUtil().getJSONValueBoolean(json, getCK2().publicClient())); // JSON util returns false if missing key
@@ -311,6 +322,8 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
     public void toJSON(V client, JSONObject json) {
         super.toJSON(client, json);
         getJsonUtil().setJSONValue(json, getCK2().rtLifetime(), client.getRtLifetime());
+        getJsonUtil().setJSONValue(json, getCK2().dfLifetime(), client.getDfLifetime());
+        getJsonUtil().setJSONValue(json, getCK2().dfInterval(), client.getDfInterval());
         JSONArray callbacks = new JSONArray();
         Collection<String> callbackList = client.getCallbackURIs();
         for (String x : callbackList) {

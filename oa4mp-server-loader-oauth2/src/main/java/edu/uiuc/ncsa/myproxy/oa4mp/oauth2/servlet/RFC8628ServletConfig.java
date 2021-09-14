@@ -9,6 +9,8 @@ import edu.uiuc.ncsa.security.oauth_2_0.server.RFC8628Constants;
 public class RFC8628ServletConfig implements RFC8628Constants{
    public String deviceEndpoint;
    public String deviceAuthorizationEndpoint;
+   public long lifetime = -1L;
+
     public long interval = DEFAULT_WAIT;
     // For later -- make a bunch more stuff configurable, such as the code chars, length etc/
     // This will require some little retooling of the servlet:

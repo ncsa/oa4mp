@@ -531,5 +531,25 @@ public class OA2Client extends Client implements OA2ClientScopes {
         
         return rc;
     }
+
+    long dfLifetime = 1000000L; // device flow configured lifetime.
+
+    public long getDfLifetime() {
+        return dfLifetime;
+    }
+
+    public void setDfLifetime(long dfLifetime) {
+        this.dfLifetime = dfLifetime;
+    }
+
+    public long getDfInterval() {
+        return dfInterval;
+    }
+
+    public void setDfInterval(long dfInterval) {
+        this.dfInterval = dfInterval;
+    }
+
+    long dfInterval = 5000L; // device flow interval in ms
 }
 

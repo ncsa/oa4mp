@@ -36,11 +36,12 @@ public class OA2State extends State {
                     ModuleMap moduleMap,
                     MyLoggingFacade myLoggingFacade,
                     boolean isServerMode,
+                    boolean isRestrictedIO,
                     boolean assertionsOn,
                     boolean strictACLs,
                     JSONWebKeys keys) {
         super(resolver, symbolStack, opEvaluator, metaEvaluator,
-                ft, moduleMap, myLoggingFacade, isServerMode, assertionsOn);
+                ft, moduleMap, myLoggingFacade, isServerMode, isRestrictedIO, assertionsOn);
         this.strictACLs = strictACLs;
         this.jsonWebKeys = keys;
     }
@@ -161,7 +162,16 @@ public class OA2State extends State {
     }
 
     @Override
-    public State newInstance(ImportManager resolver, SymbolStack symbolStack, OpEvaluator opEvaluator, MetaEvaluator metaEvaluator, FTStack ftStack, ModuleMap moduleMap, MyLoggingFacade myLoggingFacade, boolean isServerMode, boolean assertionsOn) {
+    public State newInstance(ImportManager resolver,
+                             SymbolStack symbolStack,
+                             OpEvaluator opEvaluator,
+                             MetaEvaluator metaEvaluator,
+                             FTStack ftStack,
+                             ModuleMap moduleMap,
+                             MyLoggingFacade myLoggingFacade,
+                             boolean isServerMode,
+                             boolean isRestrictedIO,
+                             boolean assertionsOn) {
         return new OA2State(resolver,
                 symbolStack,
                 opEvaluator,
@@ -170,6 +180,7 @@ public class OA2State extends State {
                 moduleMap,
                 myLoggingFacade,
                 isServerMode,
+                isRestrictedIO,
                 assertionsOn,
                 isStrictACLs(),
                 getJsonWebKeys());

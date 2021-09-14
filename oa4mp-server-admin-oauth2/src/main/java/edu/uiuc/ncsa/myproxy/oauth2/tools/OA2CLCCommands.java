@@ -227,7 +227,9 @@ public class OA2CLCCommands extends CLCCommands {
             userCode = dfResponse.getString(RFC8628Constants2.USER_CODE);
             deviceCode = dfResponse.getString(DEVICE_CODE);
             say("user code: " + userCode);
-            say("code valid for " + dfResponse.getLong(RFC8628Constants2.EXPIRES_IN) + " sec.");
+            Date exp = new Date();
+            exp.setTime(exp.getTime()+dfResponse.getLong(RFC8628Constants2.EXPIRES_IN)*1000);
+            say("code valid until " + exp + " (" + dfResponse.getLong(RFC8628Constants2.EXPIRES_IN) + " sec.)");
             copyToClipboard(userCode, "user code copied to clipboard");
             isDeviceFlow = true;
             grant = new AuthorizationGrantImpl(URI.create(dfResponse.getString(RFC8628Constants2.DEVICE_CODE)));

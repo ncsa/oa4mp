@@ -99,6 +99,7 @@ public class OA2ServletInitializer extends OA4MPServletInitializer {
                         new ModuleMap(),
                         null, // no logging at least for now
                         true,
+                        true,
                         false,
                         true,
                         null); // default in server mode, but can be overridden later

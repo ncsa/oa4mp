@@ -326,7 +326,7 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
             atData.put(ISSUER, transaction.getUserMetaData().getString(ISSUER));
         }
          if(!atData.containsKey(SUBJECT)){
-             // Ifthe subject has not been set some place else, see if it is configured in the
+             // If the subject has not been set some place else, see if it is configured in the
              // client directly. If it is not configured there, there will be no subject
              // in this token.
              if(getATConfig().hasSubject()){

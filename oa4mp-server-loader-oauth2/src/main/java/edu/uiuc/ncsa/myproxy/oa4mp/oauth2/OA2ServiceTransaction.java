@@ -19,10 +19,7 @@ import net.sf.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ExtendedParameters.EXTENDED_ATTRIBUTES_KEY;
 
@@ -39,7 +36,7 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
     public String SCRIPT_STATE_KEY = "script_state";
     public String AUDIENCE_KEY = "audience";
     public String RESOURCE_KEY = "resource";
-    public String IS_RFC8628_KEY = "is_rfc8628";
+    public String QUERIED_ACCESS_TOKEN_SCOPES_KEY = "queriedATScopes";
 
     public String getUserCode() {
         return userCode;
@@ -568,5 +565,33 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         }
         if (isRefreshTokenValid() != st2.isRefreshTokenValid()) return false;
         return true;
+    }
+
+    /**
+     * The scopes that the user actually consented to on the user consent page. These are set
+     * once and never updated to prevent up scoping.
+     * @return
+     */
+    public Collection<String> getValidatedScopes() {
+        if(validatedScopes == null){
+            validatedScopes = new HashSet<>();
+        }
+        return validatedScopes;
+    }
+
+    public void setValidatedScopes(Collection<String> validatedScopes) {
+        this.validatedScopes = validatedScopes;
+    }
+
+    Collection<String> validatedScopes;
+    public Collection<String> getQueriedATScopes(){
+        if(!getState().containsKey(QUERIED_ACCESS_TOKEN_SCOPES_KEY)){
+            return null;
+        }
+        return getState().getJSONArray(QUERIED_ACCESS_TOKEN_SCOPES_KEY);
+
+    }
+    public void setQueriedATScopes(Collection<String> queriedATScopes){
+        getState().put(QUERIED_ACCESS_TOKEN_SCOPES_KEY, queriedATScopes);
     }
 }

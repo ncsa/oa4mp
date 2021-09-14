@@ -48,10 +48,10 @@ public class ClaimSourceConfigConverter implements CSConstants {
                 if (cfg.getProperty(CS_CODE_JAVA_CLASS) == null) {
                     throw new IllegalStateException("Error: No java class has been set for a custom claim source.");
                 }
-                for(String key: cfg.getProperties().keySet()){
+                for (String key : cfg.getProperties().keySet()) {
                     stem.put(key, cfg.getProperty(key)); // First cut is just use strings
                 }
-                
+
                 break;
             case CS_TYPE_FILE:
                 FSClaimSource fsClaimSource = (FSClaimSource) claimsSource;
@@ -147,7 +147,7 @@ public class ClaimSourceConfigConverter implements CSConstants {
         switch (arg.getString(CS_DEFAULT_TYPE)) {
             case CS_TYPE_CODE:
                 cfg = new ClaimSourceConfiguration();
-                cfg.setProperties((JSONObject)arg.toJSON());
+                cfg.setProperties((JSONObject) arg.toJSON());
                 return cfg;
             case CS_TYPE_FILE:
                 cfg = new ClaimSourceConfiguration();
@@ -171,7 +171,7 @@ public class ClaimSourceConfigConverter implements CSConstants {
                 LDAPConfigurationUtil cUtil = new LDAPConfigurationUtil();
                 ldapCfg.setSearchNameKey(arg.getString(CS_LDAP_SEARCH_NAME));
                 ldapCfg.setServer(arg.getString(CS_LDAP_SERVER_ADDRESS));
-                if(arg.containsKey(CS_LDAP_SEARCH_FILTER_ATTRIBUTE)) {
+                if (arg.containsKey(CS_LDAP_SEARCH_FILTER_ATTRIBUTE)) {
                     ldapCfg.setSearchFilterAttribute(arg.getString(CS_LDAP_SEARCH_FILTER_ATTRIBUTE));
                 }
                 if (arg.containsKey(CS_DEFAULT_IS_ENABLED)) {
@@ -206,28 +206,49 @@ public class ClaimSourceConfigConverter implements CSConstants {
                 }
                 ldapCfg.setSearchBase(arg.getString(CS_LDAP_SEARCH_BASE));
                 // now to construct the search attributes.
+                /*
+                      Example. Have to specify search_attributes explicitly or no rename possible
+                      Omitting search_attributes means to get them all.
+               {
+                 'auth_type':'simple',
+                 'password':'XXXX',
+                 'address':'ldap.cilogon.org',
+                 'port':636,
+                 'rename':{'sn':'title'},
+                 'claim_name':'uid',
+                 'search_base':'ou=people,o=Fermilab,o=CO,dc=cilogon,dc=org',
+                 'search_attributes':['isMemberOf','sn','cn','voPersonID'],
+                 'rename' :{'isMemberOf':'is_member_of'},
+                 'type':'ldap',
+                 'ldap_name':'voPersonExternalID',
+                 'username':'uid=oa4mp_user,ou=system,o=Fermilab,o=CO,dc=cilogon,dc=org'
+               }
+                 */
+                StemVariable renames = null;
+                if (arg.containsKey(CS_LDAP_RENAME)) {
+                    renames = (StemVariable) arg.get(CS_LDAP_RENAME);
+                }
+                Collection lists = null;
+                if (arg.containsKey(CS_LDAP_LISTS)) {
+                    StemVariable listNames = (StemVariable) arg.get(CS_LDAP_LISTS);
+                    lists = listNames.values();
+                } else {
+                    lists = new ArrayList();
+                }
+
+                Collection groups;
+                if (arg.containsKey(CS_LDAP_GROUP_NAMES)) {
+                    StemVariable groupStem = (StemVariable) arg.get(CS_LDAP_GROUP_NAMES);
+                    groups = groupStem.values();
+                } else {
+                    groups = new ArrayList();
+                }
+
                 if (arg.containsKey(CS_LDAP_SEARCH_ATTRIBUTES)) {
                     // no attribute means they are getting everything. Let them.
                     StemVariable searchAttr = (StemVariable) arg.get(CS_LDAP_SEARCH_ATTRIBUTES);
                     Map<String, LDAPConfigurationUtil.AttributeEntry> attrs = new HashMap<>();
-                    Collection groups;
-                    Collection lists;
-                    if (arg.containsKey(CS_LDAP_GROUP_NAMES)) {
-                        StemVariable groupStem = (StemVariable) arg.get(CS_LDAP_GROUP_NAMES);
-                        groups = groupStem.values();
-                    } else {
-                        groups = new ArrayList();
-                    }
-                    StemVariable renames = null;
-                    if (arg.containsKey(CS_LDAP_RENAME)) {
-                        renames = (StemVariable) arg.get(CS_LDAP_RENAME);
-                    }
-                    if (arg.containsKey(CS_LDAP_LISTS)) {
-                        StemVariable listNames = (StemVariable) arg.get(CS_LDAP_LISTS);
-                        lists = listNames.values();
-                    } else {
-                        lists = new ArrayList();
-                    }
+
                     for (String key : searchAttr.keySet()) {
                         String attrName = searchAttr.getString(key);
                         boolean isGroup = groups.contains(attrName);
@@ -245,7 +266,9 @@ public class ClaimSourceConfigConverter implements CSConstants {
                                 new LDAPConfigurationUtil.AttributeEntry(attrName, rename, isList, isGroup);
                         attrs.put(attrName, attributeEntry);
                     }
-                    ldapCfg.setSearchAttributes(attrs);
+                    if (!attrs.isEmpty()) {
+                        ldapCfg.setSearchAttributes(attrs);
+                    }
                 }
 
 
@@ -265,6 +288,14 @@ public class ClaimSourceConfigConverter implements CSConstants {
         return null;
     }
 
+    /*
+    In fnal QDL workspace
+        ldap.users.search_attributes. := ['isMemberOf','sn','cn','voPersonID']
+        ldap.users.rename.'isMemberOf' := 'is_member_of'
+        ldap.users.rename.'sn' := 'title'
+        get_user(user.test)
+
+     */
     protected static void setDefaultsinCfg(StemVariable arg, ClaimSourceConfiguration cfg) {
         if (arg.containsKey(CS_DEFAULT_ID)) cfg.setId(arg.getString(CS_DEFAULT_ID));
         if (arg.containsKey(CS_DEFAULT_FAIL_ON_ERROR)) cfg.setFailOnError(arg.getBoolean(CS_DEFAULT_FAIL_ON_ERROR));

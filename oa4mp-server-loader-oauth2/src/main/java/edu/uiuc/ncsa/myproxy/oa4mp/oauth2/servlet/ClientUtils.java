@@ -134,6 +134,7 @@ public class ClientUtils {
      * This verifies secrets only call if the client has a secret (e.g. do not call this
      * if the client is public). This is because it will do various checks in the assumption
      * that the client <b>must</b> have a secret and raise errors if it is missing, etc.
+     *
      * @param client
      * @param rawSecret
      * @param isAT
@@ -162,8 +163,8 @@ public class ClientUtils {
                 throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT, "client has no configured secret", null);
             } else {
                 throw new OA2GeneralError(OA2Errors.UNAUTHORIZED_CLIENT,
-                                   "client has no configured secret.",
-                                   HttpStatus.SC_UNAUTHORIZED, null);
+                        "client has no configured secret.",
+                        HttpStatus.SC_UNAUTHORIZED, null);
             }
         }
 
@@ -174,8 +175,8 @@ public class ClientUtils {
                         "incorrect secret");
             } else {
                 throw new OA2GeneralError(OA2Errors.UNAUTHORIZED_CLIENT,
-                                   "incorrect secret",
-                                   HttpStatus.SC_UNAUTHORIZED, null);
+                        "incorrect secret",
+                        HttpStatus.SC_UNAUTHORIZED, null);
             }
         }
         debugger.trace(ClientUtils.class, "verifyClientSecret: secret ok.");
@@ -219,6 +220,10 @@ public class ClientUtils {
      * @return
      */
     public static Collection<String> resolveScopes(TransactionState transactionState, boolean isRFC8628) {
+        return resolveScopes(transactionState, false, isRFC8628);
+    }
+
+    public static Collection<String> resolveScopes(TransactionState transactionState, boolean isNew, boolean isRFC8628) {
         // Next 2 parameters are so error messages can be reasonably constructed, naught else
         String rawScopes = transactionState.getRequest().getParameter(SCOPE);
 
@@ -228,6 +233,7 @@ public class ClientUtils {
         debugger.trace(ClientUtils.class, ".resolveScopes: passed in scopes =" + rawScopes);
         debugger.trace(ClientUtils.class, ".resolveScopes: Scope util =" + OA2Scopes.ScopeUtil.getScopes());
         debugger.trace(ClientUtils.class, ".resolveScopes: server scopes=" + ((OA2SE) getServiceEnvironment()).getScopes());
+        debugger.trace(ClientUtils.class, ".resolveScopes: user validated scopes=" + st.getValidatedScopes());
         if (rawScopes == null || rawScopes.length() == 0) {
             if (isRFC8628) {
                 // It is not an error if this is the RFC8628 servlet. Just return an empty list
@@ -247,11 +253,11 @@ public class ClientUtils {
         // Fixes github issue 8, support for public clients: https://github.com/ncsa/OA4MP/issues/8
         if (oa2Client.isPublicClient()) {
             if (!oa2Client.getScopes().contains(OA2Scopes.SCOPE_OPENID)) {
-                    throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST,
-                            "The " + OA2Scopes.SCOPE_OPENID + " scope is missing from the request.",
-                            HttpStatus.SC_BAD_REQUEST,
-                            st.getRequestState(),
-                            st.getCallback());
+                throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST,
+                        "The " + OA2Scopes.SCOPE_OPENID + " scope is missing from the request.",
+                        HttpStatus.SC_BAD_REQUEST,
+                        st.getRequestState(),
+                        st.getCallback());
             }
             // only allowed scope, regardless of what is requested.
             // This also covers the case of a client made with a full set of scopes, then
@@ -269,16 +275,16 @@ public class ClientUtils {
             String x = stringTokenizer.nextToken();
             // CIL-1012 offline_access. Some clients end this along but it has no effect.
             // Basically if get it, we don't want to throw an error.
-            if(x.equals(OA2Scopes.SCOPE_OFFLINE_ACCESS)){
+            if (x.equals(OA2Scopes.SCOPE_OFFLINE_ACCESS)) {
                 // Basically just always ignore it.
                 continue;
             }
             if (oa2Client.useStrictScopes() && !OA2Scopes.ScopeUtil.hasScope(x)) {
-                    throw new OA2RedirectableError(OA2Errors.INVALID_SCOPE,
-                            "Unrecognized scope \"" + x + "\"",
-                            HttpStatus.SC_BAD_REQUEST,
-                            st.getRequestState(),
-                            st.getCallback());
+                throw new OA2RedirectableError(OA2Errors.INVALID_SCOPE,
+                        "Unrecognized scope \"" + x + "\"",
+                        HttpStatus.SC_BAD_REQUEST,
+                        st.getRequestState(),
+                        st.getCallback());
             }
             if (x.equals(OA2Scopes.SCOPE_OPENID)) hasOpenIDScope = true;
             requestedScopes.add(x);
@@ -286,11 +292,11 @@ public class ClientUtils {
         if (((OA2SE) getServiceEnvironment()).isOIDCEnabled()) {
 
             if (!hasOpenIDScope)
-                    throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST,
-                            "The " + OA2Scopes.SCOPE_OPENID + " scope is missing from the request.",
-                            HttpStatus.SC_BAD_REQUEST,
-                            st.getRequestState(),
-                            st.getCallback());
+                throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST,
+                        "The " + OA2Scopes.SCOPE_OPENID + " scope is missing from the request.",
+                        HttpStatus.SC_BAD_REQUEST,
+                        st.getRequestState(),
+                        st.getCallback());
         }
         st.setScopes(requestedScopes);
         if (oa2Client.useStrictScopes()) {
@@ -300,10 +306,12 @@ public class ClientUtils {
         } else {
             debugger.trace(ClientUtils.class, ".resolveScopes: non-strict scopes =" + requestedScopes);
         }
-
+/*     Does not really work for access token scopes
+       if(!isNew){
+             requestedScopes = ScopeTemplateUtil.doCompareTemplates(st.getValidatedScopes(), requestedScopes, false);
+         }*/
         return requestedScopes;
     }
-
 
 
 }

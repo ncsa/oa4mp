@@ -200,6 +200,9 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
             getClaims().put(EXPIRATION, (System.currentTimeMillis() + oa2se.getIdTokenLifetime()) / 1000); // expiration is in SECONDS from the epoch.
         }
         getClaims().put(ISSUED_AT, System.currentTimeMillis() / 1000); // issued at = current time in seconds.
+        trace(this, "saving the transaction with claims.");
+        transaction.setUserMetaData(getClaims());
+        oa2se.getTransactionStore().save(transaction);
     }
 
 

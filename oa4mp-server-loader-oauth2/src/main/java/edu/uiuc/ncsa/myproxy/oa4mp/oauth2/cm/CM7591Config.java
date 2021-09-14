@@ -4,7 +4,10 @@ import edu.uiuc.ncsa.security.core.Identifier;
 
 import java.net.URI;
 
-/**
+/**  Configuration object for RFC 7591 (dynamic client registration) support. This operates
+ * at the server level, not as an attribute of a given client.
+ * See the <a href="https://cilogon.github.io/oa4mp/server/configuration/client_management-configuration.html">online documentation</a>
+ * for details. A simple, global level template is available.
  * <p>Created by Jeff Gaynor<br>
  * on 8/21/21 at  4:58 PM
  */

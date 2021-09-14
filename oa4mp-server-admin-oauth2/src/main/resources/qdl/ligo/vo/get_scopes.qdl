@@ -7,10 +7,10 @@
    groups. := script_args(0);
 
    zeta.'Communities:LSCVirgoLIGOGroupMembers' := ['read:/DQSegDB' ,'read:/frames'];
-   zeta.'Communities:LVC:SegDB:SegDBWriter'    := 'write:/DQSegDB';
-   zeta.'gw-astronomy:KAGRA-LIGO:members'      := 'read:/frames';
+      zeta.'Communities:LVC:SegDB:SegDBWriter' := 'write:/DQSegDB';
+        zeta.'gw-astronomy:KAGRA-LIGO:members' := 'read:/frames';
   /*
-    replacement for loop and everything else below
+    replacement for loop and everything else below  version 1.4.2+
      return(reduce(@~,values(mask(zeta., in_group2(keys(zeta.),groups.)) )));
   */
      allowed_scopes. := [];

@@ -33,6 +33,7 @@ public interface OA4MPConfigTags extends StorageConfigurationTags, MailConfigura
     String DEVICE_FLOW_AUTHORIZATION_URI = "authorizationURI"; // Where the user goes to get a code
     String DEVICE_FLOW_SERVLET_URI = "verificationURI"; // Where the user goes give their code
     String DEVICE_FLOW_INTERVAL = "interval"; // If there is a different DF uri than the standard
+    String DEVICE_FLOW_LIFETIME = "lifetime"; // If this is <= 0 , then the authorization grant lifetime is used.
     /**
      * The characters allowed for user codes.
      */
