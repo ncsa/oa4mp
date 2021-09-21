@@ -8,7 +8,7 @@ import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 
 /**
  * <p>Created by Jeff Gaynor<br>
- * on 11/21/16 at  3:44 PM
+ * on 11/21/20 at  3:44 PM
  */
 public class QDLTests extends AbstractQDLTester {
     /**
@@ -54,7 +54,7 @@ public class QDLTests extends AbstractQDLTester {
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         try {
             interpreter.execute(script.toString());
-            assert false : "Was able to execute in_group test against bad list";
+            assert false : "Was able to execute in_group2 test against bad list";
         } catch (IllegalArgumentException iax) {
             assert true;
         }

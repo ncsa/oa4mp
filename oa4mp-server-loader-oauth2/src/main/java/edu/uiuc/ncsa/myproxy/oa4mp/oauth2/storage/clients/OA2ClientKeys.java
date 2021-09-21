@@ -128,6 +128,8 @@ public class OA2ClientKeys extends ClientKeys {
         allKeys.add(signTokens());
         allKeys.add(ea());
         allKeys.add(strictScopes());
+        allKeys.add(dfLifetime());
+        allKeys.add(dfInterval());
         return allKeys;
     }
 }

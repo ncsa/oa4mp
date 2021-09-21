@@ -4,15 +4,18 @@
 */
 
  block[
-   groups. := script_args(0);
+   γ. := script_args(0);
 
-   zeta.'Communities:LSCVirgoLIGOGroupMembers' := ['read:/DQSegDB' ,'read:/frames'];
-      zeta.'Communities:LVC:SegDB:SegDBWriter' := 'write:/DQSegDB';
-        zeta.'gw-astronomy:KAGRA-LIGO:members' := 'read:/frames';
+   ζ.'Communities:LSCVirgoLIGOGroupMembers' := ['read:/DQSegDB' ,'read:/frames'];
+      ζ.'Communities:LVC:SegDB:SegDBWriter' := 'write:/DQSegDB';
+        ζ.'gw-astronomy:KAGRA-LIGO:members' := 'read:/frames';
+
+   return(reduce(⊗~,values(mask(ζ., in_group2(keys(ζ.),γ.)) )));
+
   /*
     replacement for loop and everything else below  version 1.4.2+
-     return(reduce(@~,values(mask(zeta., in_group2(keys(zeta.),groups.)) )));
   */
+  /*
      allowed_scopes. := [];
 
    while[
@@ -23,10 +26,11 @@
        ][
           allowed_scopes. := allowed_scopes. ~ zeta.key;
        ]; // end if
-   
+
     ]; // end while
 
     return(allowed_scopes.);
+  */
    ]; // end block
     /*
    // example replacement for loop above with much simpler data:

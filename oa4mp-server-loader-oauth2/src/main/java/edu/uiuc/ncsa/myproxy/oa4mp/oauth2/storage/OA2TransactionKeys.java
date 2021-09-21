@@ -91,15 +91,18 @@ public class OA2TransactionKeys extends DSTransactionKeys {
     @Override
     public List<String> allKeys() {
         List<String> allKeys =  super.allKeys();
+        allKeys.add(authTime());
+        allKeys.add(authzGrantLifetime());
+        allKeys.add(expiresIn());
+        allKeys.add(isRFC8628());
         allKeys.add(refreshToken());
         allKeys.add(refreshTokenLifetime());
         allKeys.add(refreshTokenValid());
-        allKeys.add(expiresIn());
-        allKeys.add(scopes());
-        allKeys.add(nonce());
-        allKeys.add(authTime());
-        allKeys.add(states());
         allKeys.add(reqState());
+        allKeys.add(states());
+        allKeys.add(scopes());
+        allKeys.add(userCode());
+        allKeys.add(validatedScopes());
         return allKeys;
 
     }

@@ -222,10 +222,12 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     rfc8628ServletConfig.deviceAuthorizationEndpoint = x;
                 }
                 x = getFirstAttribute(sn, OA4MPConfigTags.DEVICE_FLOW_LIFETIME);
-                try {
-                    rfc8628ServletConfig.lifetime = ConfigUtil.getValueSecsOrMillis(x, true);
-                } catch (NumberFormatException numberFormatException) {
+                if(!isTrivial(x)) {
+                    try {
+                        rfc8628ServletConfig.lifetime = ConfigUtil.getValueSecsOrMillis(x, true);
+                    } catch (NumberFormatException numberFormatException) {
 
+                    }
                 }
                 x = getFirstAttribute(sn, OA4MPConfigTags.DEVICE_FLOW_INTERVAL);
                 if (!StringUtils.isTrivial(x)) {

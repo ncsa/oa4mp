@@ -52,6 +52,17 @@
             This is enforced after the first attempt, which may be done immediately.
         </td>
     </tr>
+    <tr>
+        <td>lifetime</td>
+        <td>N</td>
+        <td>current server default for authorization grant lifetimes</td>
+        <td>Value (default is seconds, though you can specify units for sec or ms if you like)
+            for the number of seconds that a request to this service is valid. This will be
+            the lifetime of the authorization grant for this request. Note that if this is
+            not set, the server-wide default for authorization grants is used. It may also
+            be set on a per client basis, which supercedes all other values.
+        </td>
+    </tr>
 
     <tr>
         <td>codeChars</td>
@@ -101,6 +112,7 @@ This has all of the defaults in a configuration
         authorizationURI="https://dev.cilogon.org/device_authorization"
         verificationURI="https://dev.cilogon.org/device"
         interval="5 sec."
+        lifetime="1200 sec."
         codeChars="234679CDFGHJKLMNPQRTVWXZ"
         codeLength="9"
         codeSeparator="-"

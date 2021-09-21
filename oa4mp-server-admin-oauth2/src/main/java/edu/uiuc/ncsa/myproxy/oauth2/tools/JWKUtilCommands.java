@@ -482,6 +482,22 @@ public class JWKUtilCommands extends CommonCommands {
         boolean showPrivateKeys = inputLine.hasArg(showAllKeys);
         boolean hasInputFile = inputLine.hasArg(CL_INPUT_FILE_FLAG);
         JSONWebKeys localKeys = null;
+        if(showPrivateKeys){
+            if(hasInputFile){
+                  // ok.
+            }else{
+               say("warning, there are no private keys to display.");
+               showPrivateKeys = false;
+            }
+        }
+        if(hasInputFile){
+            File publicKeyFile = new File(inputLine.getNextArgFor(CL_INPUT_FILE_FLAG));
+                        localKeys = readKeys(publicKeyFile);
+
+        }else{
+            localKeys = keys;
+        }
+/*
         if (showPrivateKeys && !hasInputFile) {
             // try to use the defined keys
             if (keys == null || keys.isEmpty()) {
@@ -493,6 +509,7 @@ public class JWKUtilCommands extends CommonCommands {
             File publicKeyFile = new File(inputLine.getNextArgFor(CL_INPUT_FILE_FLAG));
             localKeys = readKeys(publicKeyFile);
         }
+*/
         boolean hasDefault = localKeys.hasDefaultKey();
         String defaultKey = null;
         if (hasDefault) {

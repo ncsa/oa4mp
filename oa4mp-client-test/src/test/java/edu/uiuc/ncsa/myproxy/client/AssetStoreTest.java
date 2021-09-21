@@ -75,12 +75,16 @@ public class AssetStoreTest extends TestCase {
         asset.setIdentifier(id2);
         // Updating the identifier should fail as per the contract with the store, since an unknown
         // identifier means the object needs to be registered first.
+        boolean bad = true;
         try {
             store.update(asset);
-            assert false : "Error: was able to update the identifier.";
         } catch (UnregisteredObjectException t) {
-            assert true;
+            bad = false;
         }
+        if(bad){
+            assert false : "Error: was able to update the identifier.";
+        }
+
         // ok, set the id back since that worked.
         asset.setIdentifier(id1);
         // now for everything else.

@@ -250,13 +250,47 @@ public class OA2AuthorizedServletUtil {
                     HttpStatus.SC_BAD_REQUEST,
                     requestState);
         }
-
-        if (!httpServletRequest.getParameter(RESPONSE_TYPE).equals(RESPONSE_TYPE_CODE)) {
+           // CIL-833 fix?
+        // Use may send
+        // "code" or "code id_token" or "id_token code"
+        // A response that includes token, indicating implicit flow, must be rejected.
+        String rawResponseType = httpServletRequest.getParameter(RESPONSE_TYPE);
+        StringTokenizer st = new StringTokenizer(rawResponseType, " ");
+        TreeSet<String> responseTypes = new TreeSet<>();
+        while(st.hasMoreTokens()){
+            responseTypes.add(st.nextToken()); // cuts out duplicates since spec, apparently, allows them
+        }
+        if(responseTypes.size() == 0 || 2 <  responseTypes.size()){
+            DebugUtil.trace(this, "unrecognized response type \"" + httpServletRequest.getParameter(RESPONSE_TYPE));
             throw new OA2GeneralError(OA2Errors.UNSUPPORTED_RESPONSE_TYPE,
                     "The given " + RESPONSE_TYPE + " is not supported.",
                     HttpStatus.SC_BAD_REQUEST,
                     requestState);
         }
+
+        if(responseTypes.contains(RESPONSE_TYPE_CODE)){
+            if(responseTypes.size() == 1){
+                // ok
+            }else{
+                if(!responseTypes.contains(RESPONSE_TYPE_ID_TOKEN)){
+                    DebugUtil.trace(this, "unrecognized response type \"" + httpServletRequest.getParameter(RESPONSE_TYPE));
+                    throw new OA2GeneralError(OA2Errors.UNSUPPORTED_RESPONSE_TYPE,
+                            "The given " + RESPONSE_TYPE + " is not supported.",
+                            HttpStatus.SC_BAD_REQUEST,
+                            requestState);
+                }
+            }
+            // response type of code is all we support. They may also ask for a response
+            // type of id_token
+        }else{
+            DebugUtil.trace(this, "unrecognized response type \"" + httpServletRequest.getParameter(RESPONSE_TYPE));
+            throw new OA2GeneralError(OA2Errors.UNSUPPORTED_RESPONSE_TYPE,
+                    "The given " + RESPONSE_TYPE + " is not supported.",
+                    HttpStatus.SC_BAD_REQUEST,
+                    requestState);
+
+        }
+
         return rawcb;
     }
 

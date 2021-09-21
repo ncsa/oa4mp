@@ -109,6 +109,8 @@ CREATE TABLE oauth2.clients
          rt_lifetime bigint,
         callback_uri CLOB,
          sign_tokens BOOLEAN,
+         df_interval bigint,
+         df_lifetime bigint,
                  cfg CLOB
 );
 

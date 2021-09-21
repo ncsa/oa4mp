@@ -228,7 +228,7 @@ public class OA2DiscoveryServlet extends DiscoveryServlet {
         json.put("scopes_supported", scopes);
         JSONArray responseTypes = new JSONArray();
         responseTypes.add("code");
-        responseTypes.add("token");
+     //   responseTypes.add("token");
         responseTypes.add("id_token");
         json.put("response_types_supported", responseTypes);
 
