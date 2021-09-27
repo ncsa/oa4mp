@@ -27,6 +27,7 @@ public class OA2DiscoveryServlet extends DiscoveryServlet {
 
     public static final String TOKEN_ENDPOINT = "token_endpoint";
     public static final String USERINFO_ENDPOINT = "userinfo_endpoint";
+    public static final String TOKEN_INTROSPECTION_ENDPOINT = "introspection_endpoint";
     public static final String ISSUER = "issuer";
     public static final String DEVICE_AUTHORIZATION_ENDPOINT = "device_authorization_endpoint";
     public static final String OPENID_CONFIG_PATH = "openid-configuration";
@@ -201,8 +202,10 @@ public class OA2DiscoveryServlet extends DiscoveryServlet {
         } else {
             json.put(ISSUER, vo.getIssuer());
         }
-        json.put(TOKEN_ENDPOINT, requestURI + "/token");
-        json.put(USERINFO_ENDPOINT, requestURI + "/userinfo");
+        json.put(TOKEN_ENDPOINT, requestURI + "/token"); // spec
+        json.put(USERINFO_ENDPOINT, requestURI + "/userinfo"); // spec
+        //CIL-738 fix
+        json.put(TOKEN_INTROSPECTION_ENDPOINT, requestURI + "/introspect"); //spec
         if (oa2SE.isRfc8628Enabled()) {
             json.put(DEVICE_AUTHORIZATION_ENDPOINT, oa2SE.getRfc8628ServletConfig().deviceAuthorizationEndpoint);
         }

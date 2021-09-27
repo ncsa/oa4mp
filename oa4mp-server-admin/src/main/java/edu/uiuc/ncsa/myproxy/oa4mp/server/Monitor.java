@@ -45,7 +45,7 @@ public class Monitor extends CLITool {
             // Quick comment: In the service client, a response with HTML status code of 204 (status=ok, no body) is
             // processed and if correct, returns a raw response of length zero. If another code occurs and there is
             // no body, then an exception is raised. This is why the check below is the right one for the current case.
-            String response = serviceClient.getRawResponse(map);
+            String response = serviceClient.doGet(map);
             if (response.length() == 0) {
                 // then all is ok. Maybe do some logging
                 info("ping ok");

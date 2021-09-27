@@ -386,7 +386,7 @@ public class OA2MPService extends OA4MPService {
         }
         parameterMap.put(OA2Constants.GRANT_TYPE, GRANT_TYPE_TOKEN_EXCHANGE);
         Client client = getEnvironment().getClient();
-        String rawResponse = serviceClient.getRawResponse(parameterMap, client.getIdentifierString(), client.getSecret());
+        String rawResponse = serviceClient.doGet(parameterMap, client.getIdentifierString(), client.getSecret());
 
         DebugUtil.trace(this, "raw response = " + rawResponse);
         JSONObject json = JSONObject.fromObject(rawResponse);

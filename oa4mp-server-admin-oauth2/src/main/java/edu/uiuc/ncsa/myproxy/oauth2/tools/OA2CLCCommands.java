@@ -216,7 +216,7 @@ public class OA2CLCCommands extends CLCCommands {
         if (!StringUtils.isTrivial(extraParams)) {
             requestString = requestString + "&" + extraParams;
         }
-        String rawResponse = getService().getServiceClient().getRawResponse(requestString,
+        String rawResponse = getService().getServiceClient().doGet(requestString,
                 oa2ce.getClient().getIdentifierString(),
                 oa2ce.getClient().getSecret());
         try {
@@ -865,13 +865,13 @@ public class OA2CLCCommands extends CLCCommands {
         String rawResponse = null;
         try {
             if (inputLine.hasArgs()) {
-                rawResponse = getService().getServiceClient().getRawResponse(inputLine.getLastArg());
+                rawResponse = getService().getServiceClient().doGet(inputLine.getLastArg());
             } else {
                 if (currentURI == null) {
                     say("sorry, you did not specify a URL and no default was found.");
                     return;
                 } else {
-                    rawResponse = getService().getServiceClient().getRawResponse(currentURI.toString());
+                    rawResponse = getService().getServiceClient().doGet(currentURI.toString());
                 }
 
             }
