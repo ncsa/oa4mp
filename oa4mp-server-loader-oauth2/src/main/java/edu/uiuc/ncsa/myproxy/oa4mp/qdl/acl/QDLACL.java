@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.qdl.acl;
 import edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.OA2State;
 import edu.uiuc.ncsa.qdl.exceptions.QDLIllegalAccessException;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
+import edu.uiuc.ncsa.qdl.extensions.QDLModuleMetaClass;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
@@ -10,7 +11,6 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 
-import java.io.Serializable;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +19,7 @@ import java.util.List;
  * <p>Created by Jeff Gaynor<br>
  * on 1/25/21 at  7:44 AM
  */
-public class QDLACL implements Serializable {
+public class QDLACL implements QDLModuleMetaClass {
 
 
     public static String ACL_REJECT_NAME = "acl_reject";

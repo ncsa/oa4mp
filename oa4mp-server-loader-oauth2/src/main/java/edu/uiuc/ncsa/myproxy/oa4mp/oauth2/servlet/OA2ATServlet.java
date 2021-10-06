@@ -206,7 +206,6 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         }
         AccessTokenImpl accessToken = null;
         RefreshTokenImpl refreshToken = null;
-        JSONObject sciTokens = null;
         OA2ServiceTransaction t = null;
         OA2SE oa2se = (OA2SE) getServiceEnvironment();
         OA2TokenForge tokenForge = ((OA2TokenForge) getServiceEnvironment().getTokenForge());
@@ -246,6 +245,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 RefreshTokenStore rts = (RefreshTokenStore) getTransactionStore();
                 t = rts.get(refreshToken);
                 break;
+            case ID_TOKEN_TYPE:
+                throw new OA2ATException(OA2Errors.INVALID_GRANT, "ID token exchange not supported",t.getRequestState());
         }
 
         if (t == null) {
@@ -339,15 +340,25 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 newTXR.setIdentifier(BasicIdentifier.newID(rtiResponse.getRefreshToken().getToken()));
                 //t.setRefreshToken(rtiResponse.getRefreshToken()); // Update to new RT
                 break;
+   /*         case ID_TOKEN_TYPE:
+                rfcClaims.put(ISSUED_TOKEN_TYPE, ID_TOKEN_TYPE); // Required. This is the type of token issued.
+                rfcClaims.put(OA2Constants.TOKEN_TYPE, TOKEN_TYPE_N_A); // Required. This is how the issued token can be used, mostly. BY RFC 6750 spec.
+                break;*/
         }
         newTXR.setExpiresAt(newTXR.getIssuedAt() + newTXR.getLifetime());
         JWTRunner jwtRunner = new JWTRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2se, t, newTXR, t.getOA2Client().getConfig()));
+    //    JSONObject updatedIDToken = null;
         try {
             OA2ClientUtils.setupHandlers(jwtRunner, oa2se, t, newTXR, request);
             // NOTE WELL that the next two lines are where our identifiers are used to create JWTs (like SciTokens)
             // so if this is not done, the wrong token type will be returned.
             jwtRunner.doTokenExchange();
-
+/*
+            if (requestedTokenType.equals(ID_TOKEN_TYPE)) {
+                jwtRunner.getIdTokenHandlerInterface().refreshAccountingInformation();
+                updatedIDToken = jwtRunner.getIdTokenHandlerInterface().getClaims();
+            }
+*/
         } catch (AssertionException assertionError) {
             throw new OA2ATException(OA2Errors.INVALID_REQUEST,
                     assertionError.getMessage(),
@@ -516,24 +527,27 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         }
         return null;
     }
-                                             protected OA2SE getOA2SE(){return (OA2SE) getServiceEnvironment();}
+
+    protected OA2SE getOA2SE() {
+        return (OA2SE) getServiceEnvironment();
+    }
 
     protected IssuerTransactionState doAT(HttpServletRequest request, HttpServletResponse response, OA2Client client) throws Throwable {
         IssuerTransactionState state = doDelegation(client, request, response);
         OA2ServiceTransaction serviceTransaction = (OA2ServiceTransaction) state.getTransaction();
 
-        if(serviceTransaction.hasCodeChallenge()){
+        if (serviceTransaction.hasCodeChallenge()) {
             String verifier = request.getParameter(RFC7636Util.CODE_VERIFIER);
             String codeChallenge = RFC7636Util.createChallenge(verifier, serviceTransaction.getCodeChallengeMethod());
-            if(!codeChallenge.equals(serviceTransaction.getCodeChallenge())){
-                createDebugger(client).trace(this,"code challenge failed");
+            if (!codeChallenge.equals(serviceTransaction.getCodeChallenge())) {
+                createDebugger(client).trace(this, "code challenge failed");
                 throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
                         "code challenge failed, access denied",
                         serviceTransaction.getRequestState());
             }
-        }else{
-            if(getOA2SE().isRfc7636Required() && client.isPublicClient()){
-                createDebugger(client).trace(this,"public client failed to send required code challenge.");
+        } else {
+            if (getOA2SE().isRfc7636Required() && client.isPublicClient()) {
+                createDebugger(client).trace(this, "public client failed to send required code challenge.");
                 throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
                         "code challenge failed, access denied",
                         serviceTransaction.getRequestState());
@@ -734,11 +748,11 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         boolean tokenVersion1 = false;
         try {
             oldRT = OA2TokenUtils.getRT(rawRefreshToken, oa2SE, keys);
-        }catch(OA2ATException oa2ATException){
+        } catch (OA2ATException oa2ATException) {
             String token = rawRefreshToken;
             if (TokenUtils.isBase32(rawRefreshToken)) {
-                  token = TokenUtils.b32DecodeToken(rawRefreshToken);
-              }
+                token = TokenUtils.b32DecodeToken(rawRefreshToken);
+            }
 
             debugger.trace(this, "refresh failed for token " + token + " at " + (new Date()));
             throw oa2ATException;
@@ -1039,7 +1053,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         printAllParameters(request);
         MetaDebugUtil debugger = createDebugger(client);
         debugger.trace(this, "starting RFC 8628 access token exchange.");
-      //  printAllParameters(request);
+        //  printAllParameters(request);
         long now = System.currentTimeMillis();
         String rawSecret = getClientSecret(request);
         if (!client.isPublicClient()) {

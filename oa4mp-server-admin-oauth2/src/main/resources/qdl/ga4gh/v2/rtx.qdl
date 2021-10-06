@@ -1,0 +1,63 @@
+/*
+   Basic script for creating an access token for GA4GH
+   Configuration:
+   {"tokens":
+     {"access": {
+          "lifetime": 1200000,
+          "type": "sci_token"
+          "qdl":  [
+            {"load": "ga4gh/v2/rtx.qdl","xmd": {"exec_phase":  ["post_refresh","post_exchange"]}}
+           ]
+         }
+     }
+   }
+
+  Note that this has multiple scripts that run in different phases for the handler.
+*/
+GA4GH_SCOPE_V2 := 'ga4gh_passport_v2';
+if[
+   // If they did not initially request it, AND do not request it here, do nothing.
+   !(has_value(GA4GH_SCOPE_V2, scopes.) ∧ has_value(GA4GH_SCOPE_V2, tx_scopes.))
+  ][
+    return();
+];
+
+  // Get the information from the RESTful servive
+source_host := 'https://didact-patto.dev.umccr.org';
+q := module_load('edu.uiuc.ncsa.qdl.extensions.http.QDLHTTPLoader','java');
+module_import(q);
+http#host(source_host + '/api/visa');
+http#open();
+z. := http#get({'sub':'https://nagim.dev/p/wjaha-ppqrg-10000'});
+http#close();
+if[z.status.code != 200
+  ][
+  log_entry('could not get passport, status = ' + to_string(z.status));
+   // then something went wrong
+                    sys_err.ok := false;
+               sys_err.message := 'Could not get the passport.';
+            sys_err.error_type := 'access_denied';
+               return(∅);
+
+
+];
+   passport.'iss' := {source_host : z.content};
+   access_token.GA4GH_SCOPE_V2 := passport.;
+   access_token.scope := GA4GH_SCOPE_V2; // only one they want.
+
+/*
+
+https://didact-patto.dev.umccr.org/api/visa?sub=https://nagim.dev/p/wjaha-ppqrg-10000
+{
+  other jwt boilerplate
+  "ga4gh_passport_v2": {
+    "iss": {
+      "http://didact-patto.dev.umccr.org": [ the array result returned
+from the DAC as above ]
+      "<any other visa source/dac>": [ visas returned ]
+    }
+
+  }
+  “scope”: [“ga4gh_passport_v2”]
+}
+*/

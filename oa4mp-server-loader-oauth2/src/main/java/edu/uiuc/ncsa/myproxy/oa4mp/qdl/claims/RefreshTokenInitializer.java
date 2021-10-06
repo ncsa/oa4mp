@@ -2,11 +2,11 @@ package edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.AbstractPayloadConfig;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.BasicRefreshTokenHandler;
+import edu.uiuc.ncsa.qdl.extensions.QDLModuleMetaClass;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import net.sf.json.JSONObject;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +16,7 @@ import static edu.uiuc.ncsa.security.oauth_2_0.jwt.ScriptingConstants.*;
  * <p>Created by Jeff Gaynor<br>
  * on 10/12/20 at  6:16 AM
  */
-public class RefreshTokenInitializer implements Serializable {
+public class RefreshTokenInitializer implements QDLModuleMetaClass {
     public static String RT_INIT_METHOD     = "rt_init";
     public static String RT_FINISH_METHOD = "rt_finish";
     public static String RT_REFRESH_METHOD = "rt_refresh";

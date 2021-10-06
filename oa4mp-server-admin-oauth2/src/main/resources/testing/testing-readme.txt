@@ -8,6 +8,7 @@ When a new version is deployed, here is the testing order
   Main testing clients and tests
     -- localhost:command.line
       This has random testing configurations in it, so always check.
+      Does NOT have refresh tokens.
       ** Has RFC 8628 = device flow enabled.
 
   -- localhost:command.line2

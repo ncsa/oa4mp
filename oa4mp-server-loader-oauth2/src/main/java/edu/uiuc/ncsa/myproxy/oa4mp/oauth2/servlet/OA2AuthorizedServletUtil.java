@@ -122,8 +122,8 @@ public class OA2AuthorizedServletUtil {
             to get state, callback etc.
              */
             String codeChallenge = req.getParameter(RFC7636Util.CODE_CHALLENGE);
-            if(StringUtils.isTrivial(codeChallenge)){
-                if(oa2se.isRfc7636Required() && client.isPublicClient()){
+            if (StringUtils.isTrivial(codeChallenge)) {
+                if (oa2se.isRfc7636Required() && client.isPublicClient()) {
                     throw new OA2RedirectableError(OA2Errors.ACCESS_DENIED,
                             "access denied",
                             HttpStatus.SC_UNAUTHORIZED,
@@ -131,13 +131,13 @@ public class OA2AuthorizedServletUtil {
                             transaction.getCallback());
 
                 }
-            }else{
+            } else {
                 debugger.trace(this, "Setting code challenge to codeChallenge");
                 transaction.setCodeChallenge(codeChallenge);
                 String codeChallengeMethod = req.getParameter(RFC7636Util.CODE_CHALLENGE_METHOD);
-                if(StringUtils.isTrivial(codeChallengeMethod)){
+                if (StringUtils.isTrivial(codeChallengeMethod)) {
                     transaction.setCodeChallengeMethod(RFC7636Util.METHOD_PLAIN);
-                }  else{
+                } else {
                     transaction.setCodeChallengeMethod(codeChallengeMethod);
                 }
             }
@@ -212,7 +212,7 @@ public class OA2AuthorizedServletUtil {
     }
 
     private String basicChecks(HttpServletRequest httpServletRequest) {
-      //  ServletDebugUtil.printAllParameters(this.getClass(), httpServletRequest);
+        //  ServletDebugUtil.printAllParameters(this.getClass(), httpServletRequest);
         String requestState = httpServletRequest.getParameter(OA2Constants.STATE);
         String rawcb = httpServletRequest.getParameter(OA2Constants.REDIRECT_URI);
         try {
@@ -250,17 +250,17 @@ public class OA2AuthorizedServletUtil {
                     HttpStatus.SC_BAD_REQUEST,
                     requestState);
         }
-           // CIL-833 fix?
+        // CIL-833 fix?
         // Use may send
         // "code" or "code id_token" or "id_token code"
         // A response that includes token, indicating implicit flow, must be rejected.
         String rawResponseType = httpServletRequest.getParameter(RESPONSE_TYPE);
         StringTokenizer st = new StringTokenizer(rawResponseType, " ");
         TreeSet<String> responseTypes = new TreeSet<>();
-        while(st.hasMoreTokens()){
+        while (st.hasMoreTokens()) {
             responseTypes.add(st.nextToken()); // cuts out duplicates since spec, apparently, allows them
         }
-        if(responseTypes.size() == 0 || 2 <  responseTypes.size()){
+        if (responseTypes.size() == 0 || 2 < responseTypes.size()) {
             DebugUtil.trace(this, "unrecognized response type \"" + httpServletRequest.getParameter(RESPONSE_TYPE));
             throw new OA2GeneralError(OA2Errors.UNSUPPORTED_RESPONSE_TYPE,
                     "The given " + RESPONSE_TYPE + " is not supported.",
@@ -268,11 +268,11 @@ public class OA2AuthorizedServletUtil {
                     requestState);
         }
 
-        if(responseTypes.contains(RESPONSE_TYPE_CODE)){
-            if(responseTypes.size() == 1){
+        if (responseTypes.contains(RESPONSE_TYPE_CODE)) {
+            if (responseTypes.size() == 1) {
                 // ok
-            }else{
-                if(!responseTypes.contains(RESPONSE_TYPE_ID_TOKEN)){
+            } else {
+                if (!responseTypes.contains(RESPONSE_TYPE_ID_TOKEN)) {
                     DebugUtil.trace(this, "unrecognized response type \"" + httpServletRequest.getParameter(RESPONSE_TYPE));
                     throw new OA2GeneralError(OA2Errors.UNSUPPORTED_RESPONSE_TYPE,
                             "The given " + RESPONSE_TYPE + " is not supported.",
@@ -282,7 +282,7 @@ public class OA2AuthorizedServletUtil {
             }
             // response type of code is all we support. They may also ask for a response
             // type of id_token
-        }else{
+        } else {
             DebugUtil.trace(this, "unrecognized response type \"" + httpServletRequest.getParameter(RESPONSE_TYPE));
             throw new OA2GeneralError(OA2Errors.UNSUPPORTED_RESPONSE_TYPE,
                     "The given " + RESPONSE_TYPE + " is not supported.",
@@ -323,16 +323,27 @@ public class OA2AuthorizedServletUtil {
         String username = null;
         if (idToken.containsKey(OA2Claims.SUBJECT)) {
             username = idToken.getString(OA2Claims.SUBJECT);
-        } else {
-
+            if (StringUtils.isTrivial(username)) {
+                throw new OA2GeneralError(OA2Errors.REQUEST_NOT_SUPPORTED,
+                        "Missing username parameter in the ID token. This request is not supported on this server",
+                        HttpStatus.SC_BAD_REQUEST,
+                        null);
+            }
         }
         try {
 
             ufStore = (UsernameFindable) servlet.getTransactionStore();
-            OA2ServiceTransaction t = ufStore.getByUsername(username);
+            List<? extends OA2ServiceTransaction> list = ufStore.getByUsername(username);
 
-            if (t != null) {
-                // Then there is a transaction, so the user authenticated successfully.
+            if (!list.isEmpty()) {
+                OA2ServiceTransaction t = null;
+                // Then there is a transaction, so the user authenticated successfully some place.
+                // No guarantees though that they didn't log in under another identity, so this
+                // is not the best (though it is what the spec wants which does not take into
+                // account multiple identities like CILogon).
+
+                t = list.get(0);
+
                 if (idToken.containsKey(OA2Claims.AUDIENCE)) {
                     if (!t.getClient().getIdentifierString().equals(idToken.getString(OA2Claims.AUDIENCE))) {
                         // The wrong client for this user is attempting the request. That is not allowed.
@@ -366,6 +377,7 @@ public class OA2AuthorizedServletUtil {
                 "Login required.",
                 HttpStatus.SC_UNAUTHORIZED,
                 null);
+
     }
 
     protected ServiceTransaction verifyAndGet(IssuerResponse iResponse) throws UnsupportedEncodingException {
@@ -548,7 +560,7 @@ public class OA2AuthorizedServletUtil {
         // In cases where the authorization endpoint is replaced (e.g. by Tomcat
         // or CILogon) then the new authz endpoint must handle the prompt=consent
         // if it does anything other than always require consent.
-        if(prompt.contains(PROMPT_CONSENT)) return;
+        if (prompt.contains(PROMPT_CONSENT)) return;
 
         // At this point there is neither a "none" or a "login" and we don's support anything else.
 
@@ -677,7 +689,7 @@ public class OA2AuthorizedServletUtil {
     }
 
     protected Collection<String> resolveScopes(TransactionState transactionState) {
-        return ClientUtils.resolveScopes(transactionState, false,false);
+        return ClientUtils.resolveScopes(transactionState, false, false);
     }
 
     public void postprocess(TransactionState transactionState) {

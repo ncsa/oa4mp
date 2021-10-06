@@ -1,1 +1,2 @@
-{"registration_client_uri":"https://dev.cilogon.org/oauth2/oidc-cm?client_id=cilogon:/client_id/3ba641e9860d3abc0e900765f0a0391d","client_id":"cilogon:/client_id/3ba641e9860d3abc0e900765f0a0391d","client_name":"New Test name","redirect_uris":["https://client.example.org/callback","https://client.example.org/callback2"],"rt_lifetime":0,"at_lifetime":0,"scope":["openid","email","profile"],"client_uri":"","strict_scopes":true,"client_id_issued_at":1631723797,"cfg":{"new":"config"}}
+error="server_error"
+error_description="Missing+client+id.+Cannot+process+request"

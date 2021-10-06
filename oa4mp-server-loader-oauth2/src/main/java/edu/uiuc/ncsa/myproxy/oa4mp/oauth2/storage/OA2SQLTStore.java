@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8628State;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.DSSQLTransactionStore;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.core.exceptions.TransactionNotFoundException;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
 import edu.uiuc.ncsa.security.delegation.token.TokenForge;
@@ -46,10 +47,42 @@ public class OA2SQLTStore<V extends OA2ServiceTransaction> extends DSSQLTransact
     }
 
     @Override
-    public V getByUsername(String username) {
-        return getTransaction(username, ((OA2TransactionTable) getTransactionTable()).getByUsernameStatement());
-    }
+    public List<V> getByUsername(String username) {
+        String statement = ((OA2TransactionTable) getTransactionTable()).getByUsernameStatement();
+        if (username == null) {
+            throw new IllegalStateException("Error: a null identifier was supplied");
+        }
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
+        List<V> list = new ArrayList<>();
+        V t = null;
+        try {
+            PreparedStatement stmt = c.prepareStatement(statement);
+            stmt.setString(1, username);
+            stmt.executeQuery();
+            ResultSet rs = stmt.getResultSet();
+            while (rs.next()) {
+                ColumnMap map = rsToMap(rs);
+                t = create();
+                populate(map, t);
+                list.add(t);
+            }
+            if (!rs.next()) {
+                rs.close();
+                stmt.close();
+                releaseConnection(cr);
+                throw new TransactionNotFoundException("No transaction found for identifier \"" + username + "\"");
+            }
 
+            rs.close();
+            stmt.close();
+            releaseConnection(cr);
+        } catch (SQLException e) {
+            throw new GeneralException("Error getting transaction with identifier \"" + username + "\"", e);
+        }
+        return list;
+
+    }
     /**
      * Since this is  potentially a very intensive operation run only once at startup
      * this has been tweaked to exactly let the database grab the minimum and process it here.

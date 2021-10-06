@@ -2,12 +2,15 @@ package edu.uiuc.ncsa.oa2.qdl;
 
 import edu.uiuc.ncsa.myproxy.oauth2.tools.OA2CLCCommands;
 import edu.uiuc.ncsa.myproxy.oauth2.tools.OA2CommandLineClient;
+import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
+import edu.uiuc.ncsa.qdl.extensions.QDLModuleMetaClass;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
+import net.sf.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,45 +19,46 @@ import java.util.List;
  * <p>Created by Jeff Gaynor<br>
  * on 7/22/21 at  10:41 AM
  */
-public class CLC {
+public class CLC implements QDLModuleMetaClass {
     OA2CLCCommands clcCommands;
 
     boolean initCalled = false;
 
     protected void checkInit() {
-        if ((clcCommands == null ) || !initCalled) {
+        if ((clcCommands == null) || !initCalled) {
             throw new IllegalStateException("Error: You must call " + INIT_NAME + " before calling this function");
         }
     }
 
-    protected StemVariable getTokens(){
+    protected StemVariable getTokens() {
         StemVariable result = new StemVariable();
 
         StemVariable at = new StemVariable();
 
         at.fromJSON(clcCommands.getDummyAsset().getAccessToken().toJSON());
-        try{
+        try {
             StemVariable jwt = new StemVariable();
             jwt.fromJSON(clcCommands.resolveFromToken(clcCommands.getDummyAsset().getAccessToken(), false));
             at.put("jwt", jwt);
-        }catch(Throwable t){
+        } catch (Throwable t) {
 
         }
         result.put("access_token", at);
-        if(clcCommands.getDummyAsset().hasRefreshToken()){
+        if (clcCommands.getDummyAsset().hasRefreshToken()) {
             StemVariable rt = new StemVariable();
             rt.fromJSON(clcCommands.getDummyAsset().getRefreshToken().toJSON());
-            try{
+            try {
                 StemVariable jwt = new StemVariable();
                 jwt.fromJSON(clcCommands.resolveFromToken(clcCommands.getDummyAsset().getRefreshToken(), false));
                 rt.put("jwt", jwt);
-            }catch(Throwable t){
+            } catch (Throwable t) {
 
             }
             result.put("refresh_token", rt);
         }
         return result;
     }
+
     protected String DUMMY_ARG = "dummy"; // when creating input lines, need dummy arg for method name
     protected String INIT_NAME = "init";
 
@@ -96,6 +100,44 @@ public class CLC {
             doxx.add(getName() + "(file, name) - reads the configuration file and then loads the configuration with the given name. ");
             doxx.add("This sets the configuration and name.");
             doxx.add("This must be called before any other function.");
+            return doxx;
+        }
+    }
+
+    protected String CLAIMS_NAME = "claims";
+
+    public class GetClaim implements QDLFunction {
+        @Override
+        public String getName() {
+            return CLAIMS_NAME;
+        }
+
+        @Override
+        public int[] getArgCount() {
+            return new int[]{0};
+        }
+
+        @Override
+        public Object evaluate(Object[] objects, State state) {
+            StemVariable claims = new StemVariable();
+            if (objects.length == 0) {
+                try {
+                    JSONObject jsonObject = clcCommands.getClaims();
+                    claims.fromJSON(jsonObject);
+                } catch (Exception e) {
+                    throw new QDLException(getName() + " could not get the claims:'" + e.getMessage() + "'");
+
+                }
+            }
+            return claims;
+        }
+
+        @Override
+        public List<String> getDocumentation(int argCount) {
+            List<String> doxx = new ArrayList<>();
+            doxx.add(getName() + "() - set the current set of user claims.");
+          doxx.add("This is the same information as returned by the " + USER_INFO_NAME + " function.");
+            doxx.add(checkInitMessage);
             return doxx;
         }
     }
@@ -169,24 +211,24 @@ public class CLC {
         public Object evaluate(Object[] objects, State state) {
             checkInit();
             String args = DUMMY_ARG;
-            if(objects.length == 1){
-                if(objects[0] instanceof Boolean){
-                      if(!(Boolean)objects[0]){
-                          args = args + " " + clcCommands.NO_VERIFY_JWT;
-                      }
-                }else{
+            if (objects.length == 1) {
+                if (objects[0] instanceof Boolean) {
+                    if (!(Boolean) objects[0]) {
+                        args = args + " " + clcCommands.NO_VERIFY_JWT;
+                    }
+                } else {
                     throw new IllegalArgumentException(getName() + " requires a boolean argument");
                 }
             }
-                try {
-                    clcCommands.access(new InputLine(args));
-                    return getTokens();
-                } catch (Exception e) {
-                    state.getLogger().error("error getting access token", e);
-                    if (DebugUtil.isEnabled()) {
-                        e.printStackTrace();
-                    }
+            try {
+                clcCommands.access(new InputLine(args));
+                return getTokens();
+            } catch (Exception e) {
+                state.getLogger().error("error getting access token", e);
+                if (DebugUtil.isEnabled()) {
+                    e.printStackTrace();
                 }
+            }
             return QDLNull.getInstance();
         }
 
@@ -214,10 +256,10 @@ public class CLC {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {  
+        public Object evaluate(Object[] objects, State state) {
             checkInit();
             try {
-               clcCommands.uri(new InputLine(DUMMY_ARG));
+                clcCommands.uri(new InputLine(DUMMY_ARG));
                 return clcCommands.getCurrentURI().toString();
             } catch (Exception e) {
                 if (DebugUtil.isEnabled()) {
@@ -237,7 +279,8 @@ public class CLC {
     }
 
     protected String REFRESH_NAME = "refresh";
-    public class Refresh implements QDLFunction{
+
+    public class Refresh implements QDLFunction {
         @Override
         public String getName() {
             return REFRESH_NAME;
@@ -256,7 +299,7 @@ public class CLC {
                 return getTokens();
             } catch (Exception e) {
 
-                if(DebugUtil.isEnabled()) {
+                if (DebugUtil.isEnabled()) {
                     e.printStackTrace();
                 }
             }
@@ -271,8 +314,10 @@ public class CLC {
             return doxx;
         }
     }
+
     protected String EXCHANGE_NAME = "exchange";
-    public class Exchange implements QDLFunction{
+
+    public class Exchange implements QDLFunction {
         @Override
         public String getName() {
             return EXCHANGE_NAME;
@@ -290,7 +335,7 @@ public class CLC {
                 clcCommands.exchange(new InputLine(DUMMY_ARG));
                 return getTokens();
             } catch (Exception e) {
-                if(DebugUtil.isEnabled()) {
+                if (DebugUtil.isEnabled()) {
                     e.printStackTrace();
                 }
             }
@@ -305,8 +350,10 @@ public class CLC {
             return doxx;
         }
     }
+
     protected String REVOKE_NAME = "revoke";
-    public class Revoke implements QDLFunction{
+
+    public class Revoke implements QDLFunction {
         @Override
         public String getName() {
             return REVOKE_NAME;
@@ -325,7 +372,7 @@ public class CLC {
                 return Boolean.TRUE;
             } catch (Exception e) {
 
-                if(DebugUtil.isEnabled()) {
+                if (DebugUtil.isEnabled()) {
                     e.printStackTrace();
                 }
             }
@@ -337,8 +384,10 @@ public class CLC {
             return null;
         }
     }
+
     protected String DEVICE_FLOW_NAME = "df";
-    public class DeviceFlow implements QDLFunction{
+
+    public class DeviceFlow implements QDLFunction {
         @Override
         public String getName() {
             return DEVICE_FLOW_NAME;
@@ -358,7 +407,7 @@ public class CLC {
                 stemVariable.fromJSON(clcCommands.getDfResponse());
                 return stemVariable;
             } catch (Exception e) {
-                if(DebugUtil.isEnabled()) {
+                if (DebugUtil.isEnabled()) {
                     e.printStackTrace();
                 }
             }
@@ -373,8 +422,10 @@ public class CLC {
             return doxx;
         }
     }
+
     protected String INTROSPECT_NAME = "introspect";
-    public class Introspect implements  QDLFunction{
+
+    public class Introspect implements QDLFunction {
         @Override
         public String getName() {
             return INTROSPECT_NAME;
@@ -395,11 +446,11 @@ public class CLC {
                 return stemVariable;
             } catch (Exception e) {
 
-                if(DebugUtil.isEnabled()) {
+                if (DebugUtil.isEnabled()) {
                     e.printStackTrace();
                 }
             }
-            return  new StemVariable();
+            return new StemVariable();
         }
 
         @Override
@@ -410,8 +461,10 @@ public class CLC {
             return doxx;
         }
     }
+
     protected String USER_INFO_NAME = "user_info";
-    public class UserInfo implements QDLFunction{
+
+    public class UserInfo implements QDLFunction {
         @Override
         public String getName() {
             return USER_INFO_NAME;
@@ -430,7 +483,7 @@ public class CLC {
                 clcCommands.user_info(new InputLine(DUMMY_ARG));
                 out.fromJSON(clcCommands.getClaims());
             } catch (Exception e) {
-                if(DebugUtil.isEnabled()) {
+                if (DebugUtil.isEnabled()) {
                     e.printStackTrace();
                 }
             }
@@ -445,8 +498,10 @@ public class CLC {
             return doxx;
         }
     }
+
     protected String TOKENS_NAME = "tokens";
-    public class Tokens implements QDLFunction{
+
+    public class Tokens implements QDLFunction {
         @Override
         public String getName() {
             return TOKENS_NAME;
@@ -471,8 +526,10 @@ public class CLC {
             return doxx;
         }
     }
- protected String WRITE_NAME = "write";
-    public class Write implements QDLFunction{
+
+    protected String WRITE_NAME = "write";
+
+    public class Write implements QDLFunction {
         @Override
         public String getName() {
             return WRITE_NAME;
@@ -480,13 +537,13 @@ public class CLC {
 
         @Override
         public int[] getArgCount() {
-            return new int[]{1,2};
+            return new int[]{1, 2};
         }
 
         @Override
         public Object evaluate(Object[] objects, State state) {
             String args = DUMMY_ARG + " " + objects[0];
-            if(objects.length == 2){
+            if (objects.length == 2) {
                 args = args + " -m " + objects[1];
             }
             checkInit();
@@ -494,7 +551,7 @@ public class CLC {
                 clcCommands.write(new InputLine(args));
                 return Boolean.TRUE;
             } catch (Exception e) {
-                if(DebugUtil.isEnabled()) {
+                if (DebugUtil.isEnabled()) {
                     e.printStackTrace();
                 }
             }
@@ -505,7 +562,7 @@ public class CLC {
         public List<String> getDocumentation(int argCount) {
             List<String> doxx = new ArrayList<>();
             doxx.add(getName() + "(file [,message]) - write the current state to the file");
-            switch (argCount){
+            switch (argCount) {
                 case 1:
                     doxx.add(getName() + "(file) writes to the file");
                     break;
@@ -518,8 +575,9 @@ public class CLC {
         }
     }
 
-     protected String READ_NAME = "read";
-    public class Read implements QDLFunction{
+    protected String READ_NAME = "read";
+
+    public class Read implements QDLFunction {
         @Override
         public String getName() {
             return READ_NAME;
@@ -553,7 +611,8 @@ public class CLC {
     protected String CLEAR_NAME = "clear";
     protected String LOAD_NAME = "load";
     protected String GET_PARAM = "get_param";
-    public class GetParam implements QDLFunction{
+
+    public class GetParam implements QDLFunction {
         @Override
         public String getName() {
             return null;
@@ -574,6 +633,7 @@ public class CLC {
             return null;
         }
     }
+
     protected String SET_PARAM = "set_param";
     protected String CLEAR_PARAMS = "clear_params";
 

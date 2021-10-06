@@ -44,9 +44,9 @@ public class UserInfoServlet extends BearerTokenServlet {
         AccessTokenImpl at = UITokenUtils.getAT(getRawAT(request));
         TokenManagerServlet.State state = new TokenManagerServlet.State();
         OA2ServiceTransaction transaction = findTransaction(at, state);
+        OA2SE oa2SE = (OA2SE) getServiceEnvironment();
         MetaDebugUtil debugger = createDebugger(transaction.getOA2Client());
 
-        OA2SE oa2SE = (OA2SE) getServiceEnvironment();
         if (!transaction.getFlowStates().userInfo) {
             throw new OA2RedirectableError(OA2Errors.ACCESS_DENIED,
                     "access denied", HttpStatus.SC_UNAUTHORIZED,

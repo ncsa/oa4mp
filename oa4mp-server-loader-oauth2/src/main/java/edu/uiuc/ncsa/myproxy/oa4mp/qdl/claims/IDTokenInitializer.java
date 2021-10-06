@@ -2,11 +2,11 @@ package edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.AbstractPayloadConfig;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.IDTokenHandler;
+import edu.uiuc.ncsa.qdl.extensions.QDLModuleMetaClass;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import net.sf.json.JSONObject;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +16,7 @@ import static edu.uiuc.ncsa.security.oauth_2_0.jwt.ScriptingConstants.*;
  * <p>Created by Jeff Gaynor<br>
  * on 10/12/20 at  6:12 AM
  */
-public class IDTokenInitializer implements Serializable {
+public class IDTokenInitializer implements QDLModuleMetaClass {
     public static String ID_TOKEN_INIT_METHOD = "id_init";
     public static String ID_TOKEN_FINISH_METHOD = "id_finish";
     public static String ID_TOKEN_REFRESH_METHOD = "id_refresh";

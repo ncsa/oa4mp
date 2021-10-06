@@ -6,11 +6,11 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.SciTokenConstants;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.ScitokenHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.WLCGConstants;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.WLCGTokenHandler;
+import edu.uiuc.ncsa.qdl.extensions.QDLModuleMetaClass;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import net.sf.json.JSONObject;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +18,7 @@ import java.util.List;
  * <p>Created by Jeff Gaynor<br>
  * on 10/9/20 at  9:40 AM
  */
-public class AccessTokenInitializer implements Serializable {
+public class AccessTokenInitializer implements QDLModuleMetaClass {
     public static String AT_INIT_METHOD     = "at_init";
     public static String AT_FINISH_METHOD = "at_finish";
     public static String AT_REFRESH_METHOD = "at_refresh";

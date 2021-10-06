@@ -2,9 +2,10 @@ package edu.uiuc.ncsa.oa2.qdl.storage;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2ConfigurationLoader;
-import edu.uiuc.ncsa.qdl.evaluate.ControlEvaluator;
+import edu.uiuc.ncsa.qdl.evaluate.SystemEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
+import edu.uiuc.ncsa.qdl.extensions.QDLModuleMetaClass;
 import edu.uiuc.ncsa.qdl.extensions.QDLVariable;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
@@ -18,7 +19,6 @@ import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.util.configuration.ConfigUtil;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +29,7 @@ import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
  * <p>Created by Jeff Gaynor<br>
  * on 12/18/20 at  7:05 AM
  */
-public class StoreFacade implements Serializable {
+public class StoreFacade implements QDLModuleMetaClass {
     List<String> types;
 
     public List<String> getStoreTypes() {
@@ -725,7 +725,7 @@ public class StoreFacade implements Serializable {
                 s.append("*" + PermissionStoreFacade.CLIENTS_NAME + " Lists the clients for a given admin\n");
                 s.append("*" + PermissionStoreFacade.CLIENT_COUNT_NAME + " Return the number of clients this associated with the admin.\n");
                 s.append("* = only available in permission stores.\n");
-                s.append("\nNote that you should create a module for each type of store you want and each store using the " + ControlEvaluator.MODULE_IMPORT + " command\n");
+                s.append("\nNote that you should create a module for each type of store you want and each store using the " + SystemEvaluator.MODULE_IMPORT + " command\n");
                 s.append("The alias should be descriptive, so something like 'client' or 'trans' and yes, you may have as many\n");
                 s.append("imports as you like talking to different stores -- this is an easy way to move objects from one store to another\n");
                 s.append("\n");

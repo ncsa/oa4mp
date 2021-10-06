@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientConverter;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
+import edu.uiuc.ncsa.qdl.extensions.QDLModuleMetaClass;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.Identifier;
@@ -20,7 +21,6 @@ import net.sf.json.JSON;
 import net.sf.json.JSONObject;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +28,7 @@ import java.util.List;
  * <p>Created by Jeff Gaynor<br>
  * on 3/31/20 at  11:07 AM
  */
-public class ClientManagementCommands implements Serializable {
+public class ClientManagementCommands implements QDLModuleMetaClass {
     public MyLoggingFacade getLogger() {
         return logger;
     }

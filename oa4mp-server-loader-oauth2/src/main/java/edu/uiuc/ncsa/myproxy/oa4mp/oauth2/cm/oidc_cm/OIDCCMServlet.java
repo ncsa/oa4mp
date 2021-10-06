@@ -113,7 +113,7 @@ public class OIDCCMServlet extends EnvServlet {
             if (isAnonymous) {
                 // Here's the logic: If we allow anonymous access, then a client can get itself.
                 // If the client is administered, then the request must come with an admin client
-                // Do not allow and administered client to query anything.
+                // Do not allow an administered client to query anything.
                 oa2Client = getAndCheckOA2Client(httpServletRequest);
                 if (!getOA2SE().getPermissionStore().getAdmins(oa2Client.getIdentifier()).isEmpty()) {
                     throw new IllegalArgumentException("error: administered clients cannot query their properties, only their administrator can.");
@@ -124,8 +124,15 @@ public class OIDCCMServlet extends EnvServlet {
             }
             debugger.trace(this, "Starting get");
             String rawID = getFirstParameterValue(httpServletRequest, OA2Constants.CLIENT_ID);
+            DebugUtil.trace(this, "raw id = " + rawID);
             if (rawID == null || rawID.isEmpty()) {
-                throw new GeneralException("Missing client id. Cannot process request");
+                List<Identifier> clients = getOA2SE().getPermissionStore().getClients(adminClient.getIdentifier());
+                JSONArray array = new JSONArray();
+                for (Identifier id : clients) {
+                    array.add(id.toString()); // adding in Identifiers turns them into fugly beans. Return strings.
+                }
+                writeOK(httpServletResponse, array); //send it back with an ok.
+                return;
             }
             Identifier id = BasicIdentifier.newID(rawID);
             if (isAnonymous) {
@@ -158,7 +165,8 @@ public class OIDCCMServlet extends EnvServlet {
             handleException(t, httpServletRequest, httpServletResponse);
         }
     }
-    protected String formatIdentifiable(Store store, Identifiable identifiable){
+
+    protected String formatIdentifiable(Store store, Identifiable identifiable) {
         XMLMap map = new XMLMap();
         store.getXMLConverter().toMap(identifiable, map);
         List<String> outputList = StringUtils.formatMap(map,
@@ -169,7 +177,7 @@ public class OIDCCMServlet extends EnvServlet {
                 120);
         StringBuffer stringBuffer = new StringBuffer();
         for (String x : outputList) {
-            stringBuffer.append(x+"\n");
+            stringBuffer.append(x + "\n");
         }
         return stringBuffer.toString();
     }
@@ -183,7 +191,7 @@ public class OIDCCMServlet extends EnvServlet {
         replacements.put("client_id", client.getIdentifierString());
         replacements.put("client", formatIdentifiable(getOA2SE().getClientStore(), client));
         String actionString;
-        switch(req.getMethod()){
+        switch (req.getMethod()) {
             case "PUT":
                 actionString = "updated";
                 break;
@@ -196,8 +204,8 @@ public class OIDCCMServlet extends EnvServlet {
             case "GET":
                 actionString = "got";
                 break;
-                default:
-                    actionString = "did a " + req.getMethod();
+            default:
+                actionString = "did a " + req.getMethod();
         }
         replacements.put("action", actionString);
         return replacements;
@@ -493,9 +501,9 @@ public class OIDCCMServlet extends EnvServlet {
             try {
                 newClient = updateClient(newClient, adminClient, jsonRequest, false, resp);
                 if (adminClient.isDebugOn()) {
-                       // CIL-607
-                       fireMessage(getOA2SE(), defaultReplacements(req, adminClient, newClient));
-                   }
+                    // CIL-607
+                    fireMessage(getOA2SE(), defaultReplacements(req, adminClient, newClient));
+                }
                 getOA2SE().getClientStore().save(newClient);
                 writeOK(resp, toJSONObject(newClient));
                 //     writeOK(resp, resp);
@@ -719,7 +727,7 @@ public class OIDCCMServlet extends EnvServlet {
         writeOK(httpServletResponse, jsonResp);
     }
 
-    private void writeOK(HttpServletResponse httpServletResponse, JSONObject resp) throws IOException {
+    private void writeOK(HttpServletResponse httpServletResponse, JSON resp) throws IOException {
         httpServletResponse.setContentType("application/json");
         httpServletResponse.getWriter().println(resp.toString());
         httpServletResponse.getWriter().flush(); // commit it
@@ -958,7 +966,7 @@ public class OIDCCMServlet extends EnvServlet {
             client.setConfig(jsonObject);
         } else {
             // CIL-735 if no config object, remove it.
-            if(!newClient) {
+            if (!newClient) {
                 client.setConfig(null);
             }
         }

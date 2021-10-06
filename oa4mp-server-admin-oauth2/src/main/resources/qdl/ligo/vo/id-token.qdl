@@ -36,7 +36,7 @@
 script_load('ligo/acl.qdl');
 script_load('utils/init.qdl');
 
-        //    claims.eppn := 'jim.basney@ligo.org';
+        //    claims.eppn := 'jim.basney@ligo.org'; // gets truncated to head for lookup
        //     claims.idp := idp.ligo;
 
 if[
@@ -58,6 +58,7 @@ cfg.search_attributes. := ['email', 'uin', 'uid', 'isMemberOf'];
          cfg.auth_type := 'simple';
           cfg.username := script_args(0);
           cfg.password := script_args(1);
+     cfg.fail_on_error := true;
 
         claim_sources. := claim_sources. ~ [create_source(cfg.)];
 

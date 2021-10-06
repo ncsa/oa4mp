@@ -60,32 +60,39 @@ public class OA2MTStore<V extends OA2ServiceTransaction> extends TransactionMemo
     }
 
     @Override
-    public V getByUsername(String username) {
-        return getUserIndex().get(username);
+    public List<V> getByUsername(String username) {
+        List<V> list = new ArrayList<>();
+        for (Identifier id : keySet()) {
+            V transaction = get(id);
+            if (transaction != null) {
+                list.add(transaction);
+            }
+        }
+        return list;
     }
 
 
     @Override
-      public List<RFC8628State> getPending() {
-          List<RFC8628State> pending = new ArrayList<>();
-          for (Identifier id : keySet()) {
-              OA2ServiceTransaction transaction = get(id);
-              if (transaction != null && transaction.isRFC8628Request()) {
-                  pending.add(transaction.getRFC8628State());
-              }
-          }
-          return pending;
-      }
+    public List<RFC8628State> getPending() {
+        List<RFC8628State> pending = new ArrayList<>();
+        for (Identifier id : keySet()) {
+            OA2ServiceTransaction transaction = get(id);
+            if (transaction != null && transaction.isRFC8628Request()) {
+                pending.add(transaction.getRFC8628State());
+            }
+        }
+        return pending;
+    }
 
     @Override
     public V getByUserCode(String userCode) {
-          for (Identifier id : keySet()) {
-              V transaction = get(id);
-              if (transaction != null && transaction.getUserCode().equals(userCode)) {
-                  return transaction;
-              }
-          }
-          return null;
+        for (Identifier id : keySet()) {
+            V transaction = get(id);
+            if (transaction != null && transaction.getUserCode().equals(userCode)) {
+                return transaction;
+            }
+        }
+        return null;
     }
 
     @Override

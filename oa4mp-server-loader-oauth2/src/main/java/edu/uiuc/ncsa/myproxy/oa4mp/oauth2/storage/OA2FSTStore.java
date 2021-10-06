@@ -63,8 +63,15 @@ public class OA2FSTStore<V extends OA2ServiceTransaction> extends DSFSTransactio
 
 
     @Override
-    public V getByUsername(String username) {
-        return getIndexEntry(username);
+    public List<V> getByUsername(String username) {
+        List<V> list = new ArrayList<>();
+        for (Identifier id : keySet()) {
+            V transaction = get(id);
+            if (transaction != null ) {
+                list.add(transaction);
+            }
+        }
+        return list;
     }
 
     // Dog slow on larger stores, but there is really almost no other way than to look...

@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.OA2State;
 import edu.uiuc.ncsa.qdl.evaluate.IOEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
+import edu.uiuc.ncsa.qdl.extensions.QDLModuleMetaClass;
 import edu.uiuc.ncsa.qdl.extensions.QDLVariable;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
@@ -17,7 +18,6 @@ import net.sf.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
 import java.net.URI;
 import java.nio.file.Files;
 import java.security.SecureRandom;
@@ -29,7 +29,7 @@ import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ExtendedParameters.OA4MP_
  * <p>Created by Jeff Gaynor<br>
  * on 4/7/20 at  1:06 PM
  */
-public class JWTCommands implements Serializable {
+public class JWTCommands implements QDLModuleMetaClass {
     JSONWebKeys jwks;
 
     public JWTCommands(MyLoggingFacade logger) {
@@ -317,7 +317,7 @@ public class JWTCommands implements Serializable {
                     docs.add(getName() + "(count, length) - creates count keys of the " +
                             "given length (in bytes, not characters)");
             }
-            docs.add("To save these to a file, use the " + IOEvaluator.IO_WRITE_FILE + " command.");
+            docs.add("To save these to a file, use the " + IOEvaluator.WRITE_FILE + " command.");
             return docs;
         }
     }

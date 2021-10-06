@@ -365,11 +365,11 @@ public abstract class StoreCommands2 extends StoreCommands {
                 SEARCH_SHORT_REGEX_FLAG + " " + ".*237.*");
         say("Searches the client_id keys that contain the string 237 and only print out the name and email from those.");
         say("E.g.");
-        sayi("search " + SEARCH_DATE_FLAG + " creation_ts " + SEARCH_BEFORE_TS_FLAG  + " 2021-01-02 " + SEARCH_RESULT_SET_NAME + " last_year");
+        sayi("search " + SEARCH_DATE_FLAG + " creation_ts " + SEARCH_BEFORE_TS_FLAG + " 2021-01-02 " + SEARCH_RESULT_SET_NAME + " last_year");
         say("Searches the creation_ts keys as dates, returning all that are before Jan 2, 20201.");
         say("This also stores the result under the name last_year. See also the rs command help");
         say("E.g.");
-        sayi("search " + KEY_SHORTHAND_PREFIX + "email " + SEARCH_SHORT_REGEX_FLAG + " \".*bigstate\\.edu.*\" " + SEARCH_DATE_FLAG + " creation_ts " + SEARCH_BEFORE_TS_FLAG  + " 2021-01-02 " + SEARCH_RESULT_SET_NAME + " last_year_email");
+        sayi("search " + KEY_SHORTHAND_PREFIX + "email " + SEARCH_SHORT_REGEX_FLAG + " \".*bigstate\\.edu.*\" " + SEARCH_DATE_FLAG + " creation_ts " + SEARCH_BEFORE_TS_FLAG + " 2021-01-02 " + SEARCH_RESULT_SET_NAME + " last_year_email");
         say("Searches per date as in the previous example and further restricts it to matching the given key.");
         say("This also stores the result under the name last_year_email. See also the rs command help");
 
@@ -436,13 +436,13 @@ public abstract class StoreCommands2 extends StoreCommands {
         sayi("specified as well, that takes precedence.");
         say("Search options");
         say("----");
-           int w = 15; // field with for lh side
+        int w = 15; // field with for lh side
         String blanks = "                                                                   ";
         String link = " - ";
-        blanks = blanks.substring(0,w+link.length()); // padding for any lines that run over
+        blanks = blanks.substring(0, w + link.length()); // padding for any lines that run over
         say(StringUtils.RJustify(KEY_FLAG + " key | " + KEY_SHORTHAND_PREFIX + "key", w) + link + "the name of the key to be searched for");
-        say(StringUtils.RJustify(SEARCH_REGEX_FLAG + "|" + SEARCH_SHORT_REGEX_FLAG + " regex",w) +link + "attempt to interpret regex as a regular expression");
-        say(StringUtils.RJustify(SEARCH_RESULT_SET_NAME + " name", w)+ link + "save the result as the name.");
+        say(StringUtils.RJustify(SEARCH_REGEX_FLAG + "|" + SEARCH_SHORT_REGEX_FLAG + " regex", w) + link + "attempt to interpret regex as a regular expression");
+        say(StringUtils.RJustify(SEARCH_RESULT_SET_NAME + " name", w) + link + "save the result as the name.");
         say(StringUtils.RJustify(SEARCH_DEBUG_FLAG, w) + link + "show stack traces. Only use this if you really need it.");
         say(StringUtils.RJustify(SEARCH_DATE_FLAG, w) + link + "search by date. You must have at least one time using either " + SEARCH_BEFORE_TS_FLAG + " or " + SEARCH_AFTER_TS_FLAG);
         say(blanks + "For date searches you may use either an ISO 8601 date in the form ");
@@ -1640,10 +1640,42 @@ public abstract class StoreCommands2 extends StoreCommands {
 
         if (isShow) {
             long targetVersion = -1L;
-            String rawID = inputLine.getLastArg();
-            if (rawID.startsWith("/")) {
-                rawID = rawID.substring(1);
+            URI uri = null;
+            String rawID = null;
+            if(inputLine.getArgCount() == 0){
+                if(!hasID()){
+                    say("sorry, no id found. Either set it with set_id or supply it as the final argument" );
+                    return;
+                }
+                rawID = getID().toString();
+            }else{
+                // possibly an argument that is the id.
+                // Supplying a final argument over-rides the id.
+                rawID = inputLine.getLastArg();
+               
+               if (rawID.startsWith("/")) {
+                   rawID = rawID.substring(1);
+               }
+               try{
+                    uri = URI.create(rawID);
+               }catch(Throwable urx){
+                   // no argument, no set id.
+                    if(!hasID()){
+                        say("sorry, no id found. Either set it with set_id or supply it as the final argument" );
+                             return; 
+                    }
+               }
+                
             }
+            String ss = (uri==null)?null:uri.getSchemeSpecificPart();
+            if(StringUtils.isTrivial(ss)){
+                if(!hasID()){
+                    say("sorry, no id found. Either set it with set_id or supply it as the final argument" );
+                    return;
+                }
+                
+            }
+            
             DoubleHashMap<URI, Long> versionNumbers = getVersions(rawID);
             if (showArg.equalsIgnoreCase(ARCHIVE_LATEST_VERSION_ARG)) {
                 targetVersion = getLatestVersionNumber(versionNumbers);
@@ -1723,6 +1755,7 @@ public abstract class StoreCommands2 extends StoreCommands {
         }
         return maxValue;
     }
+    // testScheme:oa4md,2018:\/client_id\/5adabf74ba28e4234ca6fa70f87f1ffe
 
     /**
      * For a given object in the store, return all the versions associated with it in a
@@ -1733,6 +1766,7 @@ public abstract class StoreCommands2 extends StoreCommands {
      */
     protected DoubleHashMap<URI, Long> getVersions(String identifierString) {
         MapConverter mc = getMapConverter();
+      //  identifierString = escapeRegex(identifierString);
         List<Identifiable> values = getStore().search
                 (mc.getKeys().identifier(),
                         identifierString + ".*",
@@ -1759,6 +1793,16 @@ public abstract class StoreCommands2 extends StoreCommands {
 
         }
         return versionNumbers;
+    }
+
+    String[] regexSpeciaChars = new String[]{".", "^", "$", "*", "+", "-", "?", "(", ")", "[", "]", "{", "}", "\\", "|", "—", "/",};
+
+    protected String escapeRegex(String x) {
+        String y = x;
+        for (int i = 0; i < regexSpeciaChars.length; i++) {
+            y = y.replace(regexSpeciaChars[i], "\\" + regexSpeciaChars[i]);
+        }
+        return y;
     }
 
     protected void showArchiveHelp() {
