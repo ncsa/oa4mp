@@ -21,6 +21,7 @@ import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.delegation.server.UnapprovedClientException;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
+import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2GeneralError;
@@ -124,14 +125,28 @@ public class OIDCCMServlet extends EnvServlet {
             }
             debugger.trace(this, "Starting get");
             String rawID = getFirstParameterValue(httpServletRequest, OA2Constants.CLIENT_ID);
-            DebugUtil.trace(this, "raw id = " + rawID);
             if (rawID == null || rawID.isEmpty()) {
+                // CIL-1092
+                debugger.trace(this, "id = \"" + rawID + "\" for client listing");
                 List<Identifier> clients = getOA2SE().getPermissionStore().getClients(adminClient.getIdentifier());
+                JSONObject jsonObject = new JSONObject();
                 JSONArray array = new JSONArray();
                 for (Identifier id : clients) {
-                    array.add(id.toString()); // adding in Identifiers turns them into fugly beans. Return strings.
+                    Client client = (Client) getOA2SE().getClientStore().get(id);
+                    if (client == null) {
+                        continue; // this means that the permission table has an orphan.
+                    }
+                    JSONObject j2 = new JSONObject();
+                    // adding in Identifiers turns them into fugly beans. Return strings.
+                    j2.put(OA2Constants.CLIENT_ID, id.toString());
+                    String name = client.getName();
+                    if (!StringUtils.isTrivial(name)) {
+                        j2.put("name", name);
+                    }
+                    array.add(j2);
                 }
-                writeOK(httpServletResponse, array); //send it back with an ok.
+                jsonObject.put("clients", array);
+                writeOK(httpServletResponse, jsonObject); //send it back with an ok.
                 return;
             }
             Identifier id = BasicIdentifier.newID(rawID);
