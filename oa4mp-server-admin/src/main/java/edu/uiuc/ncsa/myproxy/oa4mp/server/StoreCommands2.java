@@ -1552,23 +1552,20 @@ public abstract class StoreCommands2 extends StoreCommands {
             inputLine.removeSwitchAndValue(ARCHIVE_SHOW_FLAG);
         }
 
-        MapConverter mc = getMapConverter();
 
         if (inputLine.hasArg(ARCHIVE_RESTORE_FLAG)) {
             String rawID = inputLine.getLastArg();
             if (rawID.startsWith("/")) {
                 rawID = rawID.substring(1);
             }
-            String rawTargetVersion = inputLine.getNextArgFor(ARCHIVE_RESTORE_FLAG);
-            boolean doLatest = rawTargetVersion.equals(ARCHIVE_LATEST_VERSION_ARG);
-            DoubleHashMap<URI, Long> versionNumbers = getVersions(rawID);
-            if (versionNumbers.isEmpty()) {
-                say("no versions found for \"" + rawID + "\"");
-                return;
-            }
-            long targetVersion = 0L;
+              String rawTargetVersion = inputLine.getNextArgFor(ARCHIVE_RESTORE_FLAG);
+
+             boolean doLatest = rawTargetVersion.equals(ARCHIVE_LATEST_VERSION_ARG);
+             long targetVersion = 0;
+            //DoubleHashMap<URI, Long> versionNumbers = getVersions(rawID);
+
             if (doLatest) {
-                targetVersion = getLatestVersionNumber(versionNumbers);
+                targetVersion = -1L;
             } else {
                 try {
                     targetVersion = Long.parseLong(rawTargetVersion);
@@ -1577,12 +1574,11 @@ public abstract class StoreCommands2 extends StoreCommands {
                     return;
                 }
             }
-            URI id = versionNumbers.getByValue(targetVersion);
-            if (id == null) {
-                say("sorry, but the version you requested \"" + rawTargetVersion + "\" does not exist.");
-                return;
+
+            Identifiable storedVersion= getStoredVersion(rawID, targetVersion );
+            if(storedVersion == null){
+                say("sorry, but the version you requested for id \"" + rawID  + "\" does not exist.");
             }
-            Identifiable storedVersion = (Identifiable) getStore().get(BasicIdentifier.newID(id));
             if (getInput("Are you sure that you want to replace the current version with version \"" + targetVersion + "\"?(y/n)", "n").equals("y")) {
                 // TODO Maybe put some version information inside the object?????
                 // Practical problem is that there is no place to necessarily put it in the general case.
@@ -1594,8 +1590,8 @@ public abstract class StoreCommands2 extends StoreCommands {
                 return;
             } else {
                 say("aborted.");
-                return;
             }
+            return;
         }
         Identifiable identifiable = findItem(inputLine);
 
@@ -1605,33 +1601,8 @@ public abstract class StoreCommands2 extends StoreCommands {
                 In this case, a fragment of the form version_x where x is a non-negative integer is added.
                  */
         if (inputLine.hasArg(ARCHIVE_VERSIONS_FLAG)) {
-            if (identifiable == null) {
-                say("sorry, I could not find that object. Check your id.");
-                return;
-            }
-            // Grab each client and run through information about them
-            List<Identifiable> values = getStore().search
-                    (mc.getKeys().identifier(),
-                            identifiable.getIdentifierString() + ".*",
-                            true);
-
-
-            TreeMap<Long, Identifiable> sortedMap = new TreeMap<>();
-            // There is every reason to assume that there will be gaps ion the number sequences over time.
-            // create a new set of these and manage the order manually.
-
-            for (Identifiable x : values) {
-                long version = getVersionFromID(x.getIdentifier());
-                if (-1 < version) {
-                    sortedMap.put(version, x);
-                }
-            }
-            if (sortedMap.isEmpty()) {
-                sayi("(no archived versions)");
-                return;
-            }
-            say("archived versions of " + identifiable.getIdentifierString() + ":");
-            // Now we run through them all in order
+            TreeMap<Long, Identifiable> sortedMap = getVersionsMap(identifiable);
+            if (sortedMap == null) return;
             for (Long index : sortedMap.keySet()) {
                 say(archiveFormat(sortedMap.get(index)));
             }
@@ -1639,59 +1610,8 @@ public abstract class StoreCommands2 extends StoreCommands {
         }
 
         if (isShow) {
-            long targetVersion = -1L;
-            URI uri = null;
-            String rawID = null;
-            if(inputLine.getArgCount() == 0){
-                if(!hasID()){
-                    say("sorry, no id found. Either set it with set_id or supply it as the final argument" );
-                    return;
-                }
-                rawID = getID().toString();
-            }else{
-                // possibly an argument that is the id.
-                // Supplying a final argument over-rides the id.
-                rawID = inputLine.getLastArg();
-               
-               if (rawID.startsWith("/")) {
-                   rawID = rawID.substring(1);
-               }
-               try{
-                    uri = URI.create(rawID);
-               }catch(Throwable urx){
-                   // no argument, no set id.
-                    if(!hasID()){
-                        say("sorry, no id found. Either set it with set_id or supply it as the final argument" );
-                             return; 
-                    }
-               }
-                
-            }
-            String ss = (uri==null)?null:uri.getSchemeSpecificPart();
-            if(StringUtils.isTrivial(ss)){
-                if(!hasID()){
-                    say("sorry, no id found. Either set it with set_id or supply it as the final argument" );
-                    return;
-                }
-                
-            }
-            
-            DoubleHashMap<URI, Long> versionNumbers = getVersions(rawID);
-            if (showArg.equalsIgnoreCase(ARCHIVE_LATEST_VERSION_ARG)) {
-                targetVersion = getLatestVersionNumber(versionNumbers);
-            } else {
-                try {
-                    targetVersion = Long.parseLong(showArg);
-                } catch (NumberFormatException nfx) {
-                    say("sorry but the version number you supplied \"" + targetVersion + "\" is not a number.");
-                    return;
-                }
-            }
-            if (versionNumbers.getByValue(targetVersion) == null) {
-                say("sorry, but " + targetVersion + " is not the number of a version for \"" + identifiable.getIdentifierString() + "\".");
-                return;
-            }
-            Identifiable target = (Identifiable) getStore().get(BasicIdentifier.newID(versionNumbers.getByValue(targetVersion)));
+            Identifiable target = showVersion(inputLine, showArg, identifiable);
+            if (target == null) return;
             longFormat(target, true); // show everything!
             return;
         }
@@ -1711,6 +1631,9 @@ public abstract class StoreCommands2 extends StoreCommands {
         // to and from map are charged with being faithful at all times, so we use these to clone the
         Identifiable newVersion = getStore().create();
         XMLMap map = new XMLMap();
+
+        MapConverter mc = getMapConverter();
+
         mc.toMap(identifiable, map);
 
         mc.fromMap(map, newVersion);
@@ -1720,6 +1643,128 @@ public abstract class StoreCommands2 extends StoreCommands {
         getStore().save(newVersion);
 
 
+    }
+
+    private Identifiable showVersion(InputLine inputLine, String showArg, Identifiable identifiable) {
+        long targetVersion = -1L;
+        URI uri = null;
+        String rawID = null;
+        if (inputLine.getArgCount() == 0) {
+            if (!hasID()) {
+                say("sorry, no id found. Either set it with set_id or supply it as the final argument");
+                return null;
+            }
+            rawID = getID().toString();
+        } else {
+            // possibly an argument that is the id.
+            // Supplying a final argument over-rides the id.
+            rawID = inputLine.getLastArg();
+
+            if (rawID.startsWith("/")) {
+                rawID = rawID.substring(1);
+            }
+            try {
+                uri = URI.create(rawID);
+            } catch (Throwable urx) {
+                // no argument, no set id.
+                if (!hasID()) {
+                    say("sorry, no id found. Either set it with set_id or supply it as the final argument");
+                    return null;
+                }
+            }
+
+        }
+        String ss = (uri == null) ? null : uri.getSchemeSpecificPart();
+        if (StringUtils.isTrivial(ss)) {
+            if (!hasID()) {
+                say("sorry, no id found. Either set it with set_id or supply it as the final argument");
+                return null;
+            }
+
+        }
+
+        DoubleHashMap<URI, Long> versionNumbers = getVersions(rawID);
+        if (showArg.equalsIgnoreCase(ARCHIVE_LATEST_VERSION_ARG)) {
+            targetVersion = getLatestVersionNumber(versionNumbers);
+        } else {
+            try {
+                targetVersion = Long.parseLong(showArg);
+            } catch (NumberFormatException nfx) {
+                say("sorry but the version number you supplied \"" + targetVersion + "\" is not a number.");
+                return null;
+            }
+        }
+        if (versionNumbers.getByValue(targetVersion) == null) {
+            say("sorry, but " + targetVersion + " is not the number of a version for \"" + identifiable.getIdentifierString() + "\".");
+            return null;
+        }
+        Identifiable target = (Identifiable) getStore().get(BasicIdentifier.newID(versionNumbers.getByValue(targetVersion)));
+        return target;
+    }
+
+    /**
+     * Given the raw id and a version number (which may be -1 to indicate using the latest)
+     * get the stored version. Might return null of there is no such version.
+     * @param rawID
+     * @param version
+     * @return
+     * @throws IOException
+     */
+    public Identifiable getStoredVersion(String rawID, long version) throws IOException {
+
+        boolean doLatest = version == -1;
+     //   DoubleHashMap<URI, Long> versionNumbers = getVersions(rawID);
+        DoubleHashMap<URI, Long> versionNumbers = getVersions(rawID);
+
+         if (version == -1L) {
+             version = getLatestVersionNumber(versionNumbers);
+         }
+        URI id = versionNumbers.getByValue(version);
+
+        if (id == null) {
+            return null;
+        }
+        return (Identifiable) getStore().get(BasicIdentifier.newID(id));
+
+    }
+
+    /**
+     * For a given object, get all the versions (not just their identifiers) and
+     * return in a map keyed by version number.
+     * @param identifiable
+     * @return
+     */
+    public TreeMap<Long, Identifiable> getVersionsMap(Identifiable identifiable) {
+        MapConverter mc = getMapConverter();
+
+        if (identifiable == null) {
+            say("sorry, I could not find that object. Check your id.");
+            return null;
+        }
+        // Grab each client and run through information about them
+        List<Identifiable> values = getStore().search
+                (mc.getKeys().identifier(),
+                        identifiable.getIdentifierString() + ".*",
+                        true);
+
+
+        TreeMap<Long, Identifiable> sortedMap = new TreeMap<>();
+        // There is every reason to assume that there will be gaps ion the number sequences over time.
+        // create a new set of these and manage the order manually.
+
+        for (Identifiable x : values) {
+            long version = getVersionFromID(x.getIdentifier());
+            if (-1 < version) {
+                sortedMap.put(version, x);
+            }
+        }
+        if (sortedMap.isEmpty()) {
+            sayi("(no archived versions)");
+            return null;
+        }
+        say("archived versions of " + identifiable.getIdentifierString() + ":");
+        // Now we run through them all in order
+        return sortedMap;
     }
 
     String ARCHIVE_VERSION_TAG = "version";
@@ -1766,7 +1811,7 @@ public abstract class StoreCommands2 extends StoreCommands {
      */
     protected DoubleHashMap<URI, Long> getVersions(String identifierString) {
         MapConverter mc = getMapConverter();
-      //  identifierString = escapeRegex(identifierString);
+        //  identifierString = escapeRegex(identifierString);
         List<Identifiable> values = getStore().search
                 (mc.getKeys().identifier(),
                         identifierString + ".*",
@@ -1818,6 +1863,7 @@ public abstract class StoreCommands2 extends StoreCommands {
         sayi("is used, give back the latest version.");
         sayi(ARCHIVE_SHOW_FLAG + " (number | latest) - show the given version. You may also use the word \"latest\"");
         sayi("    to get the latest version.");
+        sayi("Note that archive version numbers increase, so the highest number is the most recent.");
     }
 
     protected String archiveFormat(Identifiable id) {

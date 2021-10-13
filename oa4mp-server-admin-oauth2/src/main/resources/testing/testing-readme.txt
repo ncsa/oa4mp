@@ -289,7 +289,8 @@ When a new version is deployed, here is the testing order
         Currently gets FNAL access token (set DEBUG=true in script before running).
         Check configruation first. Usually it is set to NCSA default and
         a bogus WLCG access token.
-  -- localhost:test/df -- a client for testing the device flow against the CILogon server
+  -- localhost:test/df -- ** local CILogon test **
+     a client for testing the device flow against the CILogon server
      This will require doing the DBService calls manually (that's part of the test).
      In the CLC load the configuration and type
      df

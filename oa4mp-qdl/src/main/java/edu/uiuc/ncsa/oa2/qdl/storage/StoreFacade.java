@@ -735,4 +735,28 @@ public class StoreFacade implements QDLModuleMetaClass {
             return help;
         }
     }
+
+    protected String ARCHIVE_NAME = "archive";
+    public class Archive implements QDLFunction{
+        @Override
+        public String getName() {
+            return ARCHIVE_NAME;
+        }
+
+        @Override
+        public int[] getArgCount() {
+            return new int[0];
+        }
+
+        @Override
+        public Object evaluate(Object[] objects, State state) {
+            return null;
+        }
+
+        @Override
+        public List<String> getDocumentation(int argCount) {
+            return null;
+        }
+    }
+
 }

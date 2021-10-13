@@ -1069,7 +1069,13 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         }
         URI ag;
         try {
-            ag = URI.create(deviceCode);
+            if(TokenUtils.isBase32(deviceCode)){
+                // CIL-1102 fix
+                ag = URI.create(TokenUtils.b32DecodeToken(deviceCode));
+
+            }   else {
+                ag = URI.create(deviceCode);
+            }
         } catch (Throwable t) {
             debugger.info(this, "Failed to create " + DEVICE_CODE + " from input \"" + deviceCode + "\"");
             info("Failed to create " + DEVICE_CODE + " from input \"" + deviceCode + "\"");

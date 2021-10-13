@@ -355,7 +355,8 @@ public class OIDCCMServlet extends EnvServlet {
             resp.setStatus(HttpStatus.SC_NO_CONTENT); // no content is as per spec
             if (adminClient.isDebugOn()) {
                 // CIL-607
-                fireMessage(getOA2SE(), defaultReplacements(req, adminClient, client));
+                // Never an anonymous client for a delete
+                fireMessage(false, getOA2SE(), defaultReplacements(req, adminClient, client));
             }
             return;
         } catch (Throwable t) {
@@ -517,7 +518,8 @@ public class OIDCCMServlet extends EnvServlet {
                 newClient = updateClient(newClient, adminClient, jsonRequest, false, resp);
                 if (adminClient.isDebugOn()) {
                     // CIL-607
-                    fireMessage(getOA2SE(), defaultReplacements(req, adminClient, newClient));
+                    // Never an anonymous client for a put.
+                    fireMessage(false, getOA2SE(), defaultReplacements(req, adminClient, newClient));
                 }
                 getOA2SE().getClientStore().save(newClient);
                 writeOK(resp, toJSONObject(newClient));
@@ -681,11 +683,11 @@ public class OIDCCMServlet extends EnvServlet {
         OA2Client newClient = processRegistrationRequest((JSONObject) rawJSON, adminClient, httpServletResponse, template);
         if (isAnonymous) {
             // All anonymous requests send a notification.
-            fireMessage(getOA2SE(), defaultReplacements(httpServletRequest, adminClient, newClient));
+            fireMessage(isAnonymous, getOA2SE(), defaultReplacements(httpServletRequest, adminClient, newClient));
         } else {
             if (adminClient.isDebugOn()) {
                 // CIL-607
-                fireMessage(getOA2SE(), defaultReplacements(httpServletRequest, adminClient, newClient));
+                fireMessage(false, getOA2SE(), defaultReplacements(httpServletRequest, adminClient, newClient));
             }
         }
 
@@ -717,10 +719,11 @@ public class OIDCCMServlet extends EnvServlet {
             getPermissionServer().addClient(addClientRequest);
         }
         // Finally, approve it since it was created with and admin client, which is assumed to be trusted
+
         debugger.trace(this, "Setting approval record for this client");
         ClientApproval approval = new ClientApproval(newClient.getIdentifier());
         approval.setApprovalTimestamp(new Date());
-        if (isAnonymous) {
+        if (isAnonymous && newClient.isPublicClient()) {
             if (cm7591Config.autoApprove) {
                 approval.setApprover(cm7591Config.autoApproverName);
                 approval.setApproved(true);
@@ -1079,7 +1082,9 @@ public class OIDCCMServlet extends EnvServlet {
             // Fixes CIL-701
             JSONArray grantTypes = toJA(jsonRequest, OIDCCMConstants.GRANT_TYPES);
             String[] supportedGrants = new String[]{OA2Constants.GRANT_TYPE_AUTHORIZATION_CODE,
-                    OA2Constants.GRANT_TYPE_REFRESH_TOKEN, GRANT_TYPE_TOKEN_EXCHANGE};
+                    OA2Constants.GRANT_TYPE_REFRESH_TOKEN,
+                    GRANT_TYPE_DEVICE_FLOW, // CIL-1101 fix
+                    GRANT_TYPE_TOKEN_EXCHANGE};
             if (!areAllGrantsSupported(grantTypes, supportedGrants)) {
                 throw new OA2GeneralError(OA2Errors.REGISTRATION_NOT_SUPPORTED,
                         "unsupported grant type ",
@@ -1148,11 +1153,17 @@ public class OIDCCMServlet extends EnvServlet {
     }
 
     SecureRandom random = new SecureRandom();
+    String anonSubjectTemplate = "CILogon anonymous client ${action}";
+    String anonMessageTemplate = "An anonymous client was ${action}:\n\n${client} ";
     String subjectTemplate = "CILogon client ${action} for ${admin_name}";
     String messageTemplate = "The \"${admin_name}\" (${admin_id}) ${action} the following client:\n\n${client} ";
 
     //CIL-607
-    protected void fireMessage(OA2SE oa2SE, HashMap<String, String> replacements) {
-        oa2SE.getMailUtil().sendMessage(subjectTemplate, messageTemplate, replacements, oa2SE.getNotifyACEventEmailAddresses());
+    protected void fireMessage(boolean isAnonymous, OA2SE oa2SE, HashMap<String, String> replacements) {
+        if(isAnonymous) {
+            oa2SE.getMailUtil().sendMessage(anonSubjectTemplate, anonMessageTemplate, replacements, oa2SE.getNotifyACEventEmailAddresses());
+        }else{
+            oa2SE.getMailUtil().sendMessage(subjectTemplate, messageTemplate, replacements, oa2SE.getNotifyACEventEmailAddresses());
+        }
     }
 }

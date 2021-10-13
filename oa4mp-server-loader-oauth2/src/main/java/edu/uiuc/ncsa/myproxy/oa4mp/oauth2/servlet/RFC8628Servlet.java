@@ -13,6 +13,7 @@ import edu.uiuc.ncsa.security.delegation.server.request.AGResponse;
 import edu.uiuc.ncsa.security.delegation.server.request.IssuerResponse;
 import edu.uiuc.ncsa.security.delegation.servlet.TransactionState;
 import edu.uiuc.ncsa.security.delegation.token.impl.AuthorizationGrantImpl;
+import edu.uiuc.ncsa.security.delegation.token.impl.TokenUtils;
 import edu.uiuc.ncsa.security.oauth_2_0.*;
 import edu.uiuc.ncsa.security.oauth_2_0.server.AGRequest2;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
@@ -45,32 +46,6 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
         return null;
     }
 
-    //long lastAttemptTS = -1L; // so the first call to the servlet works, otherwise the check
-
-/*    public static Map<String, String> getCache() {
-        return cache;
-    }
-
-    static Map<String, String> cache = new HashMap<>();*/
-
-    /**
-     * ONLY call this during servlet initialization.
-     * This is very resource intensive and should be called only if absolutely necessary.
-     */
- /*   public static void rebuildCache() {
-        if (!cache.isEmpty()) {
-            // do not reinitialize cache
-            return;
-        }
-        RFC8628Store rfc8628Store = (RFC8628Store) getServiceEnvironment().getTransactionStore();
-        List<RFC8628State> stateList = rfc8628Store.getPending();
-        for(RFC8628State rfc8628State : stateList){
-            if (!isTrivial(rfc8628State.userCode) && rfc8628State.deviceCode != null) {
-                // userCode is a string, device code is the auth grant.
-                cache.put(rfc8628State.userCode, rfc8628State.deviceCode.toString());
-            }
-        }
-    }*/
     @Override
     protected void doIt(HttpServletRequest req, HttpServletResponse resp) throws Throwable {
         //    printAllParameters(req);
@@ -191,7 +166,8 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
         resp.setContentType("application/json;charset=UTF-8");
         resp.setCharacterEncoding("UTF-8");
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put(DEVICE_CODE, ag.getToken());
+        // CIL-1102 fix
+        jsonObject.put(DEVICE_CODE, TokenUtils.b32EncodeToken(ag.getToken()));
         jsonObject.put(USER_CODE, userCode);
         jsonObject.put(EXPIRES_IN, lifetime / 1000); // must be returned in seconds.
         jsonObject.put(INTERVAL, rfc8628State.interval / 1000); // must be returned in seconds.
