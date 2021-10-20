@@ -14,8 +14,9 @@
   "scope": "openid",
   "token_endpoint_auth_method": "none",
   "contacts": [
-    "your.email@here.org"
+    "test-client@test.org"
   ],
+  "grant_types":["refresh_token","urn:ietf:params:oauth:grant-type:device_code"],
   "rt_lifetime" :2592000,
   "at_lifetime" :900
 }

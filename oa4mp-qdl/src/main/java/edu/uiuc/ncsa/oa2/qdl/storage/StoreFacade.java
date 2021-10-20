@@ -8,18 +8,19 @@ import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
 import edu.uiuc.ncsa.qdl.extensions.QDLModuleMetaClass;
 import edu.uiuc.ncsa.qdl.extensions.QDLVariable;
 import edu.uiuc.ncsa.qdl.state.State;
+import edu.uiuc.ncsa.qdl.variables.QDLNull;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
-import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
-import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
-import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
-import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.core.util.*;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.util.configuration.ConfigUtil;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
+import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
@@ -399,6 +400,7 @@ public class StoreFacade implements QDLModuleMetaClass {
             try {
                 return getStoreAccessor().get(BasicIdentifier.newID(objects[0].toString()));
             } catch (Throwable t) {
+                t.printStackTrace();
                 throw new QDLException("Error: Could not find the object with id \"" + objects[0].toString() + "\"");
             }
         }
@@ -736,26 +738,443 @@ public class StoreFacade implements QDLModuleMetaClass {
         }
     }
 
-    protected String ARCHIVE_NAME = "archive";
-    public class Archive implements QDLFunction{
+    protected StemVariable convertArgsToVersionIDs(Object[] objects, String name) {
+        StemVariable out = null;
+        if (2 < objects.length) {
+            throw new IllegalArgumentException("too many arguments for " + name + ".");
+        }
+        if (objects.length == 2) {
+            out = new StemVariable();
+            StemVariable id = new StemVariable();
+            if (!(objects[0] instanceof String)) {
+                throw new IllegalArgumentException("dyadic " + name + " requires a string as its first argument");
+            }
+            id.put(0L, objects[0]);
+            if (!(objects[1] instanceof Long)) {
+                throw new IllegalArgumentException("dyadic " + name + " requires an integer as its second argument");
+            }
+            id.put(1L, objects[1]);
+            out.put(0L, id);
+            return out;
+        }
+        // So a single argument
+        if (!(objects[0] instanceof StemVariable)) {
+            throw new IllegalArgumentException("monadic " + name + " requires stem as its argument");
+        }
+
+        StemVariable temp = (StemVariable) objects[0];
+        if (temp.isList() && temp.size() == 2) {
+            if ((temp.get(0L) instanceof String) && (temp.get(1L) instanceof Long)) {
+                out = new StemVariable();
+                out.put(0L, temp);
+            }
+        }
+        return (StemVariable) objects[0]; // It was the right format
+    }
+
+    protected String VERSION_CREATE_NAME = "v_create";
+
+    /**
+     * Create the archived version of an object. There are several cases.
+     */
+    public class VCreate implements QDLFunction {
         @Override
         public String getName() {
-            return ARCHIVE_NAME;
+            return VERSION_CREATE_NAME;
         }
 
         @Override
         public int[] getArgCount() {
-            return new int[0];
+            return new int[]{1};
         }
 
         @Override
         public Object evaluate(Object[] objects, State state) {
-            return null;
+            checkInit();
+            StemVariable arg;
+            switch (objects.length) {
+                case 1:
+                    if (objects[0] instanceof StemVariable) {
+                        arg = (StemVariable) objects[0];
+                    } else {
+                        if (objects[0] instanceof String) {
+                            arg = new StemVariable();
+                            arg.put(0L, objects[0]);
+                        } else {
+                            throw new IllegalArgumentException(getName() + " requires stem or string argument");
+                        }
+                    }
+                    break;
+                case 0:
+                    throw new IllegalArgumentException(getName() + " requires an argument");
+                default:
+                    throw new IllegalArgumentException(getName() + " requires at most a single argument");
+            }
+            return getStoreAccessor().archive(arg);
         }
 
         @Override
         public List<String> getDocumentation(int argCount) {
+            List<String> doxx = new ArrayList<>();
+            doxx.add(getName() + "(id | ids.) - archive the stored client(s) whose ids are given.");
+            doxx.add("Either supply an id for the object or a list of ids. ");
+            doxx.add(checkInitMessage);
+            return doxx;
+        }
+    }
+
+    protected String VERSION_GET_NAME = "v_get";
+
+    public class VGet implements QDLFunction {
+        @Override
+        public String getName() {
+            return VERSION_GET_NAME;
+        }
+
+        @Override
+        public Object evaluate(Object[] objects, State state) {
+            checkInit();
+
+            StemVariable arg = convertArgsToVersionIDs(objects, getName());
+            // now this is a list of [id, version] entries.
+            StemVariable out = new StemVariable();
+            for (String key : arg.keySet()) {
+                VID vid = toVID(arg.get(key));
+                if (vid == null) {
+                    out.put(key, QDLNull.getInstance());
+                    continue;
+                }
+                try {
+                    out.put(key, getStoreAccessor().getVersion(vid.id, vid.version));
+                } catch (Throwable t) {
+                    DebugUtil.trace(this, "unable to get version ", t);
+                    logger.warn("unable to get version", t);
+                    out.put(key, QDLNull.getInstance());
+                }
+
+            }
+            return out;
+        }
+
+        @Override
+        public int[] getArgCount() {
+            return new int[]{1, 2};
+        }
+
+        @Override
+        public List<String> getDocumentation(int argCount) {
+            List<String> doxx = new ArrayList<>();
+            switch (argCount) {
+                case 1:
+                    doxx.add(getName() + "(id. | ids.) - get the versions for the id. or list of them");
+                    break;
+                case 2:
+                    doxx.add(getName() + "(id, version) - get the version numbered for the identifier");
+                    break;
+            }
+            doxx.add("Versioned ids are either of the form [uri, integer] where the uri is the ");
+            doxx.add("identifier of the obeject and version a valid version number.");
+            doxx.add("Note that version are numbered starting at 0, so the highest");
+            doxx.add("value is the most recent. You may specify the version using a signed");
+            doxx.add("number, with -1 meaning the highest number, -2 meaning next highest.");
+            doxx.add("(Same as index addressing in QDL.)");
+            doxx.add(checkInitMessage);
+            return doxx;
+        }
+    }
+
+    protected String VERSION_REMOVE_NAME = "v_rm";
+
+    public class VRemove implements QDLFunction {
+        @Override
+        public String getName() {
+            return VERSION_REMOVE_NAME;
+        }
+
+        @Override
+        public int[] getArgCount() {
+            return new int[]{1, 2};
+        }
+
+        @Override
+        public Object evaluate(Object[] objects, State state) {
+            checkInit();
+
+            StemVariable args = convertArgsToVersionIDs(objects, getName());
+            StemVariable out = new StemVariable();
+            for (String key : args.keySet()) {
+                VID vid = toVID(args.get(key));
+                if (vid == null) {
+                    out.put(key, Boolean.FALSE);
+                    continue;
+                }
+                getStoreAccessor().getStoreArchiver().remove(vid.id, vid.version);
+                out.put(key, Boolean.TRUE);
+            }
+            return out;
+        }
+
+        @Override
+        public List<String> getDocumentation(int argCount) {
+            List<String> doxx = new ArrayList<>();
+            switch (argCount) {
+                case 1:
+                    doxx.add(getName() + "(id. | ids.) - remove the versions for the id. or list of them");
+                    break;
+                case 2:
+                    doxx.add(getName() + "(id, version) - remove the version numbered for the identifier");
+                    break;
+            }
+            doxx.add("This returns a stem of booleans with a true for each removed item and a false otherwise.");
+            doxx.add("If you send things that are not version ids, they are ignored.");
+            doxx.add("E.g.");
+            doxx.add("   " + getName() + "(true, false); // not a validway to identify a version");
+            doxx.add("[false]");
+            doxx.add("Meaning nothing was done. Note also that a true means that such a thing does not");
+            doxx.add("exist in the store any longer, so a true means the entry could");
+            doxx.add("be valid but is not there after this returns.");
+            doxx.add(checkInitMessage);
+            return doxx;
+        }
+    }
+
+
+    /**
+     * For a stem variable, checks that it is of the form
+     * <pre>
+     *     [id, version] (in QDL)
+     * </pre>
+     * and returns an versioned id, {@link VID}.
+     * <p>
+     * If the argument is not in the right format, a null is returned instead.<br/><br/>
+     * This may throw other exceptions if, e.g., the id is not a valid identifier
+     *
+     * @param stemVariable
+     * @return
+     */
+    protected VID toVID(StemVariable stemVariable) {
+        if (stemVariable.size() != 2 || !stemVariable.isList()) {
             return null;
+        }
+        Object rawID = stemVariable.get(0L);
+        if (!(rawID instanceof String)) {
+            return null;
+        }
+        Identifier id = BasicIdentifier.newID(rawID.toString());
+        Object v = stemVariable.get(1L);
+        if (!(v instanceof Long)) {
+            return null;
+        }
+
+        return new VID(id, (Long) v);
+    }
+
+    public class VID {
+        Identifier id;
+        Long version;
+
+        public VID(Identifier id, Long version) {
+            this.id = id;
+            this.version = version;
+        }
+    }
+    protected VID toVID(Object obj) {
+        if(!(obj instanceof StemVariable)){
+            return null;
+        }
+        return toVID((StemVariable) obj);
+    }
+    protected String VERSION_GET_VERSIONS_NAME = "v_versions";
+    public class VGetVersions implements QDLFunction{
+        @Override
+        public String getName() {
+            return VERSION_GET_VERSIONS_NAME;
+        }
+
+        @Override
+        public int[] getArgCount() {
+            return new int[]{1};
+        }
+
+        @Override
+        public Object evaluate(Object[] objects, State state) {
+            checkInit();
+
+            if(objects.length != 1){
+                throw new IllegalArgumentException(getName() + " requires a single argument");
+            }
+            StemVariable args = null;
+            boolean hasStringArg = false;
+            if(objects[0] instanceof String){
+                args = new StemVariable();
+                args.put(0L, objects[0]);
+                hasStringArg = true;
+            }
+            if(objects[0] instanceof StemVariable){
+                args = (StemVariable) objects[0];
+            }
+            if(args == null){
+                throw new IllegalArgumentException(getName() + " requires either an id or stem of them as its argument.");
+            }
+            StemVariable out = new StemVariable();
+            for(String key : args.keySet()){
+                Identifier id = toIdentifier(args.get(key));
+                if(id == null){
+                    out.put(key, QDLNull.getInstance()); // no valid id means a null
+                    continue;
+                }
+                StemVariable entry = new StemVariable();
+                entry.addList(getStoreAccessor().getStoreArchiver().getVersionNumbers(id));
+                out.put(key, entry);
+            }
+            if(hasStringArg){
+                return out.get(0L); // preserve shape.
+            }
+            return out;
+        }
+
+        @Override
+        public List<String> getDocumentation(int argCount) {
+            List<String> doxx = new ArrayList<>();
+            doxx.add(getName() + "(id | ids.) - get the versions associated with the id or stem of them.");
+            doxx.add("This returns a list for each version numbers available for each identifier.");
+            doxx.add("If you submit a stem of them, then each returned valus is a stem. If you submit");
+            doxx.add("A single ID, then the result is a simple list.");
+            doxx.add("E.g.");
+            doxx.add("   " + getName() + "('uri:/my/object');");
+            doxx.add("[0,1,3,7]");
+            doxx.add("This is the list of valid version numbers for that object");
+            doxx.add("   " + getName() + "({'client0':'uri:/my/object0', 'client42':'uri:/my/object42'});");
+            doxx.add("{'client0':[1,3],'client42':[0,1,2,3,5]}");
+            doxx.add("These are the valid version of each of these.");
+            doxx.add(checkInitMessage);
+            return doxx;
+        }
+    }
+     protected Identifier toIdentifier(Object obj){
+        if(!(obj instanceof String)){
+            return null;
+        }
+        try{
+            return BasicIdentifier.newID(URI.create(obj.toString()));
+        }catch(Throwable t) {
+            logger.warn("Could not make identifier for '" + obj + "'", t);
+        }
+        return null;
+     }
+
+    protected String VERSION_RESTORE_NAME = "v_restore";
+
+    public class VRestore implements QDLFunction{
+        @Override
+        public String getName() {
+            return VERSION_RESTORE_NAME;
+        }
+
+        @Override
+        public int[] getArgCount() {
+            return new int[]{1,2};
+        }
+
+        @Override
+        public Object evaluate(Object[] objects, State state) {
+            StemVariable args = convertArgsToVersionIDs(objects, getName());
+            StemVariable out = new StemVariable();
+            for(String key : args.keySet()){
+                VID vid = toVID(args.get(key));
+                if(vid == null){
+                    out.put(key, Boolean.FALSE);
+                    continue;
+                }
+                 out.put(key, getStoreAccessor().getStoreArchiver().restore(vid.id, vid.version));
+            }
+            return out;
+        }
+
+        @Override
+        public List<String> getDocumentation(int argCount) {
+            List<String> doxx = new ArrayList<>();
+            switch (argCount) {
+                case 1:
+                    doxx.add(getName() + "(id. | ids.) - restore the versions for the id. or list of them");
+                    break;
+                case 2:
+                    doxx.add(getName() + "(id, version) - restore the version numbered for the identifier");
+                    break;
+            }
+            doxx.add("Restores the given version to be to active one.");
+            doxx.add("NOTE: This overwrites the currently active object and replaces it!");
+            doxx.add("Good practice is to version whatever you are going to restore.");
+            doxx.add("");
+            doxx.add("");
+            return doxx;
+        }
+    }
+
+    protected String VERSION_DIFFERENCE_NAME = "v_diff";
+
+    /**
+     * Not implemented yet because it is unclear how a difference of such stems should be represented.
+     * This seems to me it should be a generic function rather than being buried in a utility.
+     */
+    public class VDiff implements QDLFunction{
+        @Override
+        public String getName() {
+            return VERSION_DIFFERENCE_NAME;
+        }
+
+        @Override
+        public int[] getArgCount() {
+            return new int[]{1,2};
+        }
+
+        @Override
+        public Object evaluate(Object[] objects, State state) {
+            checkInit();
+            StemVariable args = convertArgsToVersionIDs(objects, getName());
+            StemVariable out = new StemVariable();
+            HashMap<Identifier, StemVariable> baseObjects = new HashMap<>();
+            for(String key : args.keySet()){
+                VID vid = toVID(args.get(key));
+                if(vid == null){
+                    out.put(key, QDLNull.getInstance());
+                    continue;
+                }
+                StemVariable baseObject;
+                if(baseObjects.containsKey(vid.id)){
+                    baseObject = baseObjects.get(vid.id);
+                }else{
+                    baseObject = getStoreAccessor().get(vid.id);
+                }
+/*
+                try {
+                  StemVariable target = getStoreAccessor().getStoreArchiver().getVersion(vid.id ,vid.version);
+                } catch (IOException e) {
+                    getLogger().warn("Unable to get versioned object with id + " + vid);
+                    out.put(key, QDLNull.getInstance());
+                }
+*/
+            }
+            return out;
+        }
+
+        @Override
+        public List<String> getDocumentation(int argCount) {
+            List<String> doxx = new ArrayList<>();
+            switch (argCount){
+                case 1:
+                    doxx.add(getName() + " (id | ids.) - give differences between stored object and the version(s).");
+                    break;
+                case 2:
+                    doxx.add(getName() + " (id, version) - give differences between stored object and the version.");
+                    break;
+            }
+            doxx.add("This returns a partial object -- just the elements that are not the same");
+            doxx.add("");
+            doxx.add("");
+            doxx.add("");
+            doxx.add(checkInitMessage);
+            return doxx;
         }
     }
 

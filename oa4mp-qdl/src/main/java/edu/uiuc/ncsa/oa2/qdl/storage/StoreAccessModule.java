@@ -78,10 +78,16 @@ public class StoreAccessModule extends JavaModule {
         functions.add(sf.new Keys());
         functions.add(sf.new ReadObject());
         functions.add(sf.new Remove());
+        functions.add(sf.new SaveObject());
         functions.add(sf.new Search());
         functions.add(sf.new Size());
-        functions.add(sf.new SaveObject());
         functions.add(sf.new ToXML());
+        functions.add(sf.new UpdateObject());
+        functions.add(sf.new VCreate());
+        functions.add(sf.new VGet());
+        functions.add(sf.new VGetVersions());
+        functions.add(sf.new VRemove());
+        functions.add(sf.new VRestore());
         return functions;
     }
 

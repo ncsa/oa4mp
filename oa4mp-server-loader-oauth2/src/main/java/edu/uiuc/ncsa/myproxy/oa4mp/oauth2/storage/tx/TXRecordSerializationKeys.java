@@ -24,6 +24,7 @@ public class TXRecordSerializationKeys extends SerializationKeys {
     String resource = "resource";
     String scopes = "scopes";
     String tokenType = "token_type";
+    // If attributes get added or deleted, update TXRStemMC or you will break QDL support.
 
     public String audience(String... x) {
         if (0 < x.length) audience = x[0];

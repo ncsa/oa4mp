@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.DiscoveryServlet;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2GeneralError;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Scopes;
+import edu.uiuc.ncsa.security.oauth_2_0.server.RFC7636Util;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import net.sf.json.JSONArray;
@@ -23,20 +24,26 @@ import java.util.StringTokenizer;
  * <p>Created by Jeff Gaynor<br>
  * on 12/12/16 at  1:18 PM
  */
+/*
+   Canonical example: https://accounts.google.com/.well-known/openid-configuration
+ */
 public class OA2DiscoveryServlet extends DiscoveryServlet {
 
     public static final String TOKEN_ENDPOINT = "token_endpoint";
     public static final String USERINFO_ENDPOINT = "userinfo_endpoint";
     public static final String TOKEN_INTROSPECTION_ENDPOINT = "introspection_endpoint";
     public static final String TOKEN_REVOCATION_ENDPOINT = "revocation_endpoint";
+    public static final String TOKEN_REVOCATION_ENDPOINT_AUTH_METHODS_SUPPORTED = "revocation_endpoint_auth_methods_supported";
     public static final String ISSUER = "issuer";
     public static final String DEVICE_AUTHORIZATION_ENDPOINT = "device_authorization_endpoint";
     public static final String OPENID_CONFIG_PATH = "openid-configuration";
     public static final String OAUTH_AUTHZ_SERVER_PATH = "oauth-authorization-server";
     public static final String WELL_KNOWN_PATH = ".well-known";
+    public static final String CODE_CHALLENGE_METHOD_SUPPORTED = "code_challenge_method_supported"; // RFC 7636
     public static final String CERTS = "/certs";
 
-    public static String  DISCOVERY_PATH_SEPARATOR = "/";
+    public static String DISCOVERY_PATH_SEPARATOR = "/";
+
     protected VirtualOrganization getVO(HttpServletRequest req, String requestUri) {
         VirtualOrganization vo = null;
         String host = getOA2SE().getServiceAddress().getHost();
@@ -57,7 +64,7 @@ public class OA2DiscoveryServlet extends DiscoveryServlet {
                 if (st.hasMoreTokens()) {
                     String component = st.nextToken();
                     // Fix for CIL-976
-                    vo = getOA2SE().getVOStore().findByPath(host+DISCOVERY_PATH_SEPARATOR + component);
+                    vo = getOA2SE().getVOStore().findByPath(host + DISCOVERY_PATH_SEPARATOR + component);
                     if (vo == null) {
                         // Then this is not recognized.
                         throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
@@ -71,7 +78,7 @@ public class OA2DiscoveryServlet extends DiscoveryServlet {
                 }
             }
         }
-       // getOA2SE().getAdminClientStore();
+        // getOA2SE().getAdminClientStore();
         if (!st.hasMoreTokens()) {
             throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
                     "unsupported discovery url",
@@ -87,7 +94,7 @@ public class OA2DiscoveryServlet extends DiscoveryServlet {
         // case 3, vo component comes first
         if (nextToken.equals(WELL_KNOWN_PATH) && st.nextToken().equals(OPENID_CONFIG_PATH) && !st.hasMoreTokens()) {
             // Fix for CIL-976
-            vo = getOA2SE().getVOStore().findByPath(host+DISCOVERY_PATH_SEPARATOR + x);
+            vo = getOA2SE().getVOStore().findByPath(host + DISCOVERY_PATH_SEPARATOR + x);
         } else {
             throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
                     "unsupported discovery url for \"" + x + "\"",
@@ -117,21 +124,21 @@ public class OA2DiscoveryServlet extends DiscoveryServlet {
      */
     @Override
     protected void doIt(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Throwable {
-   //     ServletDebugUtil.printAllParameters(this.getClass(), httpServletRequest);
+        //     ServletDebugUtil.printAllParameters(this.getClass(), httpServletRequest);
 
         String requestUri = httpServletRequest.getRequestURI();
         boolean isCerts = false;
         if (requestUri.contains(CERTS)) {
             isCerts = true;
-            if(requestUri.endsWith(CERTS)){
+            if (requestUri.endsWith(CERTS)) {
                 requestUri = requestUri.substring(0, requestUri.length() - CERTS.length()); // whack off certs part
-            }else{
+            } else {
                 requestUri = requestUri.substring(requestUri.indexOf(CERTS) + CERTS.length()); // whack off leading certs part (vo suffix case)
             }
         }
         // normalize the uri
         if (isCerts) {
-            String discoveryPath = requestUri.substring(1+requestUri.lastIndexOf("/"));
+            String discoveryPath = requestUri.substring(1 + requestUri.lastIndexOf("/"));
             // Fix for CIL-976
             VirtualOrganization vo = getOA2SE().getVOStore().findByPath(getOA2SE().getServiceAddress().getHost() + DISCOVERY_PATH_SEPARATOR + discoveryPath);
             JSONWebKeys publicKeys;
@@ -189,13 +196,13 @@ public class OA2DiscoveryServlet extends DiscoveryServlet {
             requestURI = requestURI.substring(0, requestURI.length() - 1); // shave off trailing slash
         }
         JSONObject json = super.setValues(request, jsonObject);
-        if(vo == null) {
+        if (vo == null) {
             json.put("jwks_uri", requestURI + "/certs");
-        }else{
+        } else {
             // has to go at the end since there is no way Tomcat can have it specified otherwise
             // without a lot of gyrations in the web.xml file.
             String p = vo.getDiscoveryPath().substring(vo.getDiscoveryPath().lastIndexOf("/") + 1);
-            json.put("jwks_uri", requestURI  + "/certs" + "/" + p);
+            json.put("jwks_uri", requestURI + "/certs" + "/" + p);
 
         }
         if (vo == null) {
@@ -208,7 +215,9 @@ public class OA2DiscoveryServlet extends DiscoveryServlet {
         //CIL-738 fix
         json.put(TOKEN_INTROSPECTION_ENDPOINT, requestURI + "/introspect"); //spec
         json.put(TOKEN_REVOCATION_ENDPOINT, requestURI + "/revoke"); //spec
-
+        JSONArray revAuthMethods = new JSONArray();
+        revAuthMethods.add("client_secret_basic");
+        json.put(TOKEN_REVOCATION_ENDPOINT_AUTH_METHODS_SUPPORTED, revAuthMethods);
 
         if (oa2SE.isRfc8628Enabled()) {
             json.put(DEVICE_AUTHORIZATION_ENDPOINT, oa2SE.getRfc8628ServletConfig().deviceAuthorizationEndpoint);
@@ -228,14 +237,18 @@ public class OA2DiscoveryServlet extends DiscoveryServlet {
         for (String s : serverScopes) {
             scopes.add(s);
         }
-        if(!scopes.contains(OA2Scopes.SCOPE_OFFLINE_ACCESS)){
+        if (!scopes.contains(OA2Scopes.SCOPE_OFFLINE_ACCESS)) {
             scopes.add(OA2Scopes.SCOPE_OFFLINE_ACCESS);
         }
 
+        JSONArray ccm = new JSONArray();
+        ccm.add(RFC7636Util.METHOD_PLAIN);
+        ccm.add(RFC7636Util.METHOD_S256);
+        json.put(CODE_CHALLENGE_METHOD_SUPPORTED, ccm);
         json.put("scopes_supported", scopes);
         JSONArray responseTypes = new JSONArray();
         responseTypes.add("code");
-     //   responseTypes.add("token");
+        //   responseTypes.add("token");
         responseTypes.add("id_token");
         json.put("response_types_supported", responseTypes);
 

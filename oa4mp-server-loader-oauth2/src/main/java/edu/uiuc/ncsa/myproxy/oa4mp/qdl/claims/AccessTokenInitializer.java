@@ -63,6 +63,7 @@ public class AccessTokenInitializer implements QDLModuleMetaClass {
                     atHandler = new WLCGTokenHandler(getPayloadHandlerConfig());
                     break;
                 case SciTokenConstants.SCI_TOKEN_TAG:
+                case SciTokenConstants.SCI_TOKEN_TAG2:
                     atHandler = new ScitokenHandler(getPayloadHandlerConfig());
                     break;
                 default:

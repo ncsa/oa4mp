@@ -1517,20 +1517,7 @@ public abstract class StoreCommands2 extends StoreCommands {
         return mapConverter;
     }
 
-    protected long getVersionFromID(Identifier id) {
-        URI uri = id.getUri();
-        String fragment = uri.getFragment();
-        if (StringUtils.isTrivial(fragment)) {
-            return -1L;
-        }
-        try {
-            return Long.parseLong(fragment.substring(fragment.indexOf(ARCHIVE_VERSION_SEPARATOR_TAG) + 1));
-        } catch (NumberFormatException nfx) {
-            return -1L;
-        }
 
-
-    }
 
     /**
      * @param inputLine
@@ -1575,7 +1562,7 @@ public abstract class StoreCommands2 extends StoreCommands {
                 }
             }
 
-            Identifiable storedVersion= getStoredVersion(rawID, targetVersion );
+            Identifiable storedVersion= getStoreArchiver().getVersion(BasicIdentifier.newID(rawID), targetVersion );
             if(storedVersion == null){
                 say("sorry, but the version you requested for id \"" + rawID  + "\" does not exist.");
             }
@@ -1601,7 +1588,7 @@ public abstract class StoreCommands2 extends StoreCommands {
                 In this case, a fragment of the form version_x where x is a non-negative integer is added.
                  */
         if (inputLine.hasArg(ARCHIVE_VERSIONS_FLAG)) {
-            TreeMap<Long, Identifiable> sortedMap = getVersionsMap(identifiable);
+            TreeMap<Long, Identifiable> sortedMap = getStoreArchiver().getVersionsMap(identifiable);
             if (sortedMap == null) return;
             for (Long index : sortedMap.keySet()) {
                 say(archiveFormat(sortedMap.get(index)));
@@ -1616,8 +1603,12 @@ public abstract class StoreCommands2 extends StoreCommands {
             return;
         }
         // If we are at this point, then the user wants to version the object
-        DoubleHashMap<URI, Long> versionNumbers = getVersions(identifiable.getIdentifierString());
-        long newIndex = getLatestVersionNumber(versionNumbers) + 1;
+        DoubleHashMap<URI, Long> versionNumbers = getStoreArchiver().getVersions(identifiable.getIdentifier());
+        if(versionNumbers== null || versionNumbers.isEmpty()){
+            say("no versions found");
+            return;
+        }
+        long newIndex = getStoreArchiver().getLatestVersionNumber(versionNumbers) + 1;
         if (!getInput("Archive object \"" + identifiable.getIdentifierString() + "\"?(y/n)", "n").equals("y")) {
             say("aborted.");
             return;
@@ -1638,7 +1629,7 @@ public abstract class StoreCommands2 extends StoreCommands {
 
         mc.fromMap(map, newVersion);
 
-        Identifier newID = createdVersionedID(identifiable.getIdentifier(), newIndex);
+        Identifier newID = getStoreArchiver().createVersionedID(identifiable.getIdentifier(), newIndex);
         newVersion.setIdentifier(newID);
         getStore().save(newVersion);
 
@@ -1683,9 +1674,9 @@ public abstract class StoreCommands2 extends StoreCommands {
 
         }
 
-        DoubleHashMap<URI, Long> versionNumbers = getVersions(rawID);
+        DoubleHashMap<URI, Long> versionNumbers = getStoreArchiver().getVersions(BasicIdentifier.newID(uri));
         if (showArg.equalsIgnoreCase(ARCHIVE_LATEST_VERSION_ARG)) {
-            targetVersion = getLatestVersionNumber(versionNumbers);
+            targetVersion = getStoreArchiver().getLatestVersionNumber(versionNumbers);
         } else {
             try {
                 targetVersion = Long.parseLong(showArg);
@@ -1702,143 +1693,12 @@ public abstract class StoreCommands2 extends StoreCommands {
         return target;
     }
 
-    /**
-     * Given the raw id and a version number (which may be -1 to indicate using the latest)
-     * get the stored version. Might return null of there is no such version.
-     * @param rawID
-     * @param version
-     * @return
-     * @throws IOException
-     */
-    public Identifiable getStoredVersion(String rawID, long version) throws IOException {
 
-        boolean doLatest = version == -1;
-     //   DoubleHashMap<URI, Long> versionNumbers = getVersions(rawID);
-        DoubleHashMap<URI, Long> versionNumbers = getVersions(rawID);
-
-         if (version == -1L) {
-             version = getLatestVersionNumber(versionNumbers);
-         }
-        URI id = versionNumbers.getByValue(version);
-
-        if (id == null) {
-            return null;
-        }
-        return (Identifiable) getStore().get(BasicIdentifier.newID(id));
-
-    }
-
-    /**
-     * For a given object, get all the versions (not just their identifiers) and
-     * return in a map keyed by version number.
-     * @param identifiable
-     * @return
-     */
-    public TreeMap<Long, Identifiable> getVersionsMap(Identifiable identifiable) {
-        MapConverter mc = getMapConverter();
-
-        if (identifiable == null) {
-            say("sorry, I could not find that object. Check your id.");
-            return null;
-        }
-        // Grab each client and run through information about them
-        List<Identifiable> values = getStore().search
-                (mc.getKeys().identifier(),
-                        identifiable.getIdentifierString() + ".*",
-                        true);
-
-
-        TreeMap<Long, Identifiable> sortedMap = new TreeMap<>();
-        // There is every reason to assume that there will be gaps ion the number sequences over time.
-        // create a new set of these and manage the order manually.
-
-        for (Identifiable x : values) {
-            long version = getVersionFromID(x.getIdentifier());
-            if (-1 < version) {
-                sortedMap.put(version, x);
-            }
-        }
-        if (sortedMap.isEmpty()) {
-            sayi("(no archived versions)");
-            return null;
-        }
-        say("archived versions of " + identifiable.getIdentifierString() + ":");
-        // Now we run through them all in order
-        return sortedMap;
-    }
-
-    String ARCHIVE_VERSION_TAG = "version";
-    String ARCHIVE_VERSION_SEPARATOR_TAG = "=";
     String ARCHIVE_VERSIONS_FLAG = "-versions";
     String ARCHIVE_RESTORE_FLAG = "-restore";
     String ARCHIVE_SHOW_FLAG = "-show";
     String ARCHIVE_LATEST_VERSION_ARG = "latest";
 
-    protected Identifier createdVersionedID(Identifier id, long version) {
-        URI uri = id.getUri();
-        String rawURI = uri.toString();
-        rawURI = rawURI.substring(rawURI.indexOf("#") + 1);
-        rawURI = rawURI + "#" + ARCHIVE_VERSION_TAG + ARCHIVE_VERSION_SEPARATOR_TAG + Long.toString(version);
-        uri = URI.create(rawURI);
-        return BasicIdentifier.newID(uri);
-
-    }
-
-    /**
-     * Get the latest version number or return a -1 if no versions present.
-     *
-     * @param versionNumbers
-     * @return
-     */
-    protected Long getLatestVersionNumber(DoubleHashMap<URI, Long> versionNumbers) {
-        if (versionNumbers.isEmpty()) {
-            return -1L;
-        }
-        long maxValue = 0L;
-        for (URI key : versionNumbers.keySet()) {
-            maxValue = Math.max(maxValue, versionNumbers.get(key));
-        }
-        return maxValue;
-    }
-    // testScheme:oa4md,2018:\/client_id\/5adabf74ba28e4234ca6fa70f87f1ffe
-
-    /**
-     * For a given object in the store, return all the versions associated with it in a
-     * {@link DoubleHashMap}.
-     *
-     * @param identifierString
-     * @return
-     */
-    protected DoubleHashMap<URI, Long> getVersions(String identifierString) {
-        MapConverter mc = getMapConverter();
-        //  identifierString = escapeRegex(identifierString);
-        List<Identifiable> values = getStore().search
-                (mc.getKeys().identifier(),
-                        identifierString + ".*",
-                        true);
-
-        // now we have to look through the list of clients and determine which is the one we want
-        DoubleHashMap<URI, Long> versionNumbers = new DoubleHashMap<>();
-        for (Identifiable value : values) {
-            URI uri = value.getIdentifier().getUri();
-            String fragment = uri.getFragment();
-            if (!StringUtils.isTrivial(fragment)) {
-                // This does two things. First, it will no show the base version as archived
-                // and secondly, will only add those with a valid versioning fragment
-                String rawIndex = fragment.substring(1 + fragment.indexOf(ARCHIVE_VERSION_SEPARATOR_TAG));
-
-                try {
-                    if (!StringUtils.isTrivial(rawIndex)) {
-                        versionNumbers.put(uri, Long.parseLong(rawIndex));
-                    }
-                } catch (Throwable t) {
-
-                }
-            }
-
-        }
-        return versionNumbers;
-    }
 
     String[] regexSpeciaChars = new String[]{".", "^", "$", "*", "+", "-", "?", "(", ")", "[", "]", "{", "}", "\\", "|", "—", "/",};
 
@@ -2203,4 +2063,12 @@ public abstract class StoreCommands2 extends StoreCommands {
         showCommandLineSwitchesHelp();
     }
 
+    public StoreArchiver getStoreArchiver() {
+        if(storeArchiver == null){
+            storeArchiver = new StoreArchiver(getStore());
+        }
+        return storeArchiver;
+    }
+
+    StoreArchiver storeArchiver;
 }

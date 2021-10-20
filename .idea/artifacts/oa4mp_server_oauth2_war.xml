@@ -3,8 +3,10 @@
     <output-path>$PROJECT_DIR$/oa4mp-server-oauth2/target</output-path>
     <properties id="maven-jee-properties">
       <options>
+        <exploded>false</exploded>
         <module>oa4mp-server-oauth2</module>
         <packaging>war</packaging>
+        <unpackNestedArchives>false</unpackNestedArchives>
       </options>
     </properties>
     <root id="archive" name="oauth2.war">

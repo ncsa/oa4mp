@@ -5,9 +5,8 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientConverter;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientKeys;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
-import net.sf.json.JSON;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import net.sf.json.JSONSerializer;
 
 /**
  * A {@link edu.uiuc.ncsa.qdl.variables.StemConverter} to convert stems and clients.
@@ -46,7 +45,7 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
         }
 
         if (isStringKeyOK(stem, kk().errorURL())) {
-            v.setHomeUri(stem.getString(kk().errorURL()));
+            v.setErrorUri(stem.getString(kk().errorURL()));
         }
 
         // no way to check booleans...
@@ -62,35 +61,37 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
             v.setPublicClient(stem.getBoolean(kk().publicClient()));
         }
 
-        String cb_key = kk().callbackUri() + StemVariable.STEM_INDEX_MARKER;
-        if (stem.containsKey(cb_key)) {
-            v.setCallbackURIs(toList(stem, cb_key));
+        if (stem.containsKey(kk().callbackUri())) {
+            v.setCallbackURIs(toList(stem, kk().callbackUri()));
         }
         if (isStringKeyOK(stem, kk().issuer())) {
             v.setIssuer(stem.getString(kk().issuer()));
         }
 
-        if(stem.containsKey(kk().signTokens())){
+        if (stem.containsKey(kk().signTokens())) {
             v.setSignTokens(stem.getBoolean(kk().signTokens()));
         }
-        if(stem.containsKey(kk().strictScopes())){
+        if (stem.containsKey(kk().strictScopes())) {
             v.setStrictscopes(stem.getBoolean(kk().strictScopes()));
         }
 
-        String scopes_key = kk().scopes() + StemVariable.STEM_INDEX_MARKER;
-        if(stem.containsKey(scopes_key)){
-            v.setScopes(toList(stem, scopes_key));
+        if (stem.containsKey(kk().scopes())) {
+            v.setScopes(toList(stem, kk().scopes()));
         }
-        if(isStringKeyOK(stem, kk().ldap())){
-            JSON temp = JSONSerializer.toJSON(stem.getString(kk().ldap()));
-            getCC().getLdapConfigurationUtil().fromJSON(temp);
+        if (stem.containsKey(kk().ldap())) {
+            if (stem.get(kk().ldap()) instanceof StemVariable) {
+                StemVariable ldap = (StemVariable) stem.get(kk().ldap());
+                JSONArray array = (JSONArray) ldap.toJSON();
+                v.setLdaps(getCC().getLdapConfigurationUtil().fromJSON(array));
+            }
         }
-        if(isStringKeyOK(stem, kk().cfg())){
-            JSONObject json = JSONObject.fromObject(stem.getString(kk().cfg()));
-            v.setConfig(json);
+        if (stem.containsKey(kk().cfg())) {
+            StemVariable j = (StemVariable) stem.get(kk().cfg());
+            v.setConfig((JSONObject) j.toJSON());
         }
-        if(isStringKeyOK(stem, kk().ea())){
-            JSONObject json = JSONObject.fromObject(stem.getString(kk().ea()));
+        if (stem.containsKey( kk().ea())) {
+            StemVariable j = (StemVariable) stem.get(kk().ea());
+            v.setExtendedAttributes((JSONObject) j.toJSON());
         }
 
         return v;
@@ -102,46 +103,66 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
 
     @Override
     public StemVariable toMap(V v, StemVariable stem) {
-     stem =   super.toMap(v, stem);
+        stem = super.toMap(v, stem);
         // basic client attributes
-        stem.put(kk().secret(), v.getSecret());
-        stem.put(kk().email(), v.getEmail());
-        stem.put(kk().name(), v.getName());
-        stem.put(kk().creationTS(), v.getCreationTS().getTime());
-        stem.put(kk().lastModifiedTS(), v.getLastModifiedTS().getTime());
+        setNonNullStemValue(stem, kk().secret(), v.getSecret());
+        setNonNullStemValue(stem, kk().email(), v.getEmail());
+        setNonNullStemValue(stem, kk().name(), v.getName());
+        setNonNullStemValue(stem, kk().creationTS(), v.getCreationTS().getTime());
+        setNonNullStemValue(stem, kk().lastModifiedTS(), v.getLastModifiedTS().getTime());
 
-        stem.put(kk().homeURL(), v.getHomeUri());
-        stem.put(kk().errorURL(), v.getErrorUri());
-        stem.put(kk().proxyLimited(), v.isProxyLimited());
+        setNonNullStemValue(stem, kk().homeURL(), v.getHomeUri());
+        setNonNullStemValue(stem, kk().errorURL(), v.getErrorUri());
+        setNonNullStemValue(stem, kk().proxyLimited(), v.isProxyLimited());
 
         // OA2 client attributes
-        stem.put(kk().rtLifetime(), v.getRtLifetime());
-             /* if (v.getCallbackURIs() == null) {
-                  return;
-              }*/
-        stem.put(kk().publicClient(), v.isPublicClient());
-        // callbacks should be a stem list
+        setNonNullStemValue(stem, kk().atLifetime(), v.getAtLifetime());
+        fromList(v.getAudience(), stem, kk().audience());
         fromList(v.getCallbackURIs(), stem, kk().callbackUri());
-
-        if (v.getIssuer() != null) {
-            stem.put(kk().issuer(), v.getIssuer());
+        if(v.getConfig() != null){
+            StemVariable cfg = new StemVariable();
+            cfg.fromJSON(v.getConfig());
+            stem.put(kk().cfg(), cfg);
         }
-
-        stem.put(kk().signTokens(), v.isSignTokens());
-        stem.put(kk().strictScopes(), v.useStrictScopes());
-
-        // scopes is a stem list
+        stem.put(kk().dfInterval(), v.getDfInterval());
+        stem.put(kk().dfLifetime(), v.getDfLifetime());
+        if(v.getExtendedAttributes() != null){
+            StemVariable ea = new StemVariable();
+            ea.fromJSON(v.getExtendedAttributes());
+            stem.put(kk().ea(), ea);
+        }
+        setNonNullStemValue(stem, kk().issuer(), v.getIssuer());
+        if (v.getLdaps() != null) {
+            JSONArray jsonArray = getCC().getLdapConfigurationUtil().toJSON(v.getLdaps());
+            StemVariable ldap = new StemVariable();
+            ldap.fromJSON(jsonArray);
+            stem.put(kk().ldap(), ldap);
+        }
+        setNonNullStemValue(stem, kk().publicClient(), v.isPublicClient());
+        setNonNullStemValue(stem, kk().rtLifetime(), v.getRtLifetime());
+        fromList(v.getResource(), stem, kk().resource());
+        setNonNullStemValue(stem, kk().signTokens(), v.isSignTokens());
         fromList(v.getScopes(), stem, kk().scopes());
+        setNonNullStemValue(stem, kk().strictScopes(), v.useStrictScopes());
 
-        if (v.getLdaps() != null && !v.getLdaps().isEmpty()) {
-            stem.put(kk().ldap(), getCC().getLdapConfigurationUtil().toJSON(v.getLdaps()).toString());
-        }
-        if (v.getConfig() != null && !v.getConfig().isEmpty()) {
-            stem.put(kk().cfg(), v.getConfig().toString()); // make it pretty at least...
-        }
-        if (v.getExtendedAttributes() != null && !v.getExtendedAttributes().isEmpty()) {
-            stem.put(kk().ea(), v.getExtendedAttributes().toString());
-        }
+        /* Alphabetical list of OA2 client attributes.
+         String atLifetime = "at_lifetime";
+         String audience="audience";
+         String callback_uri = "callback_uri";
+         String config = "cfg";
+         String dfInterval="df_interval";
+         String dfLifetime="df_lifetime";
+         String extended_attributes = "extended_attributes";
+         String issuer = "issuer";
+         String ldap = "ldap";
+         String publicClient="public_client";
+         String rtLifetime = "rt_lifetime";
+         String resource="resource";
+         String signTokens="sign_tokens";
+         String scopes = "scopes";
+         String strictScopes="strict_scopes";
+
+         */
         return stem;
     }
 

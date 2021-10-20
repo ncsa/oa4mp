@@ -15,6 +15,7 @@ import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2ATException;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2RedirectableError;
+import edu.uiuc.ncsa.security.oauth_2_0.OA2Scopes;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTRunner;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.ScriptRuntimeException;
 import edu.uiuc.ncsa.security.oauth_2_0.server.UII2;
@@ -44,6 +45,15 @@ public class UserInfoServlet extends BearerTokenServlet {
         AccessTokenImpl at = UITokenUtils.getAT(getRawAT(request));
         TokenManagerServlet.State state = new TokenManagerServlet.State();
         OA2ServiceTransaction transaction = findTransaction(at, state);
+        // CIL-1104 fix. Only give back user info if the original request asked for openid
+        // We do not do this for subsequent requests because, since this is private information,
+        // the user must consent to it, so this scope *has* to be in the initial request.
+        if(!transaction.getScopes().contains(OA2Scopes.SCOPE_OPENID)){
+            throw new OA2RedirectableError(OA2Errors.ACCESS_DENIED,
+                     "access denied", HttpStatus.SC_UNAUTHORIZED,
+                     transaction.getRequestState(),
+                     transaction.getCallback());
+        }
         OA2SE oa2SE = (OA2SE) getServiceEnvironment();
         MetaDebugUtil debugger = createDebugger(transaction.getOA2Client());
 

@@ -23,8 +23,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
+import java.util.Date;
 
-import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 import static edu.uiuc.ncsa.security.util.pkcs.CertUtil.fromPEM;
 
 /**
@@ -47,45 +47,45 @@ public class TransactionStemMC<V extends OA2ServiceTransaction> extends StemConv
     public V fromMap(StemVariable stem, V v) {
         v = super.fromMap(stem, v);
         Identifier id = v.getIdentifier();
-        if (stem.containsKey(kk().authGrant())) {
-            v.setAuthorizationGrant(new AuthorizationGrantImpl(URI.create(stem.getString(kk().authGrant()))));
-        }
-        if (stem.containsKey(kk().authzGrantLifetime())) {
-            v.setAuthGrantLifetime(stem.getLong(kk().authzGrantLifetime()));
-        }
-        if (stem.containsKey(kk().tempCredValid())) {
-            v.setAuthGrantValid(stem.getBoolean(kk().tempCredValid()));
-        }
+        /*
+          Each block of attributes is by subclass.
+         */
+        // =====
+        /*
+                String accessToken = "access_token";
+        String authGrant = "auth_grant"; // Changes require that temp_token be used solely as the id.
+        String verifier = "oauth_verifier";
+        String tempCred = "temp_token";
+         */
+        if (stem.containsKey(kk().accessToken())) {v.setAccessToken(new AccessTokenImpl(URI.create(stem.getString(kk().accessToken()))));}
+        if (stem.containsKey(kk().authGrant())) {v.setAuthorizationGrant(new AuthorizationGrantImpl(URI.create(stem.getString(kk().authGrant()))));}
+        if(stem.containsKey(kk().verifier())){v.setVerifier(new VerifierImpl(URI.create(stem.getString(kk().verifier()))));}
+        // ======
+        /*
+        String accessTokenValid = "access_token_valid";
+        String lifetime = "certlifetime";
+        String callbackUri = "oauth_callback";
+        String nonce = "nonce";
+        String tempCredValid = "temp_token_valid";
+         */
+        if (stem.containsKey(kk().accessTokenValid())) {v.setAccessTokenValid(stem.getBoolean(kk().accessTokenValid()));}
+        if (stem.containsKey(kk().lifetime())) {v.setLifetime(stem.getLong(kk().lifetime()));}
+        if(stem.containsKey(kk().callbackUri())){v.setCallback(URI.create(stem.getString(kk().callbackUri())));}
+        if(isStringKeyOK(stem, kk().nonce())){v.setNonce(stem.getString(kk().nonce()));}
+        if (stem.containsKey(kk().tempCredValid())) {v.setAuthGrantValid(stem.getBoolean(kk().tempCredValid()));}
+        if (stem.containsKey(kk().tempCredValid())) {v.setAuthGrantValid(stem.getBoolean(kk().tempCredValid()));}
 
-        if (stem.containsKey(kk().accessToken())) {
-            v.setAccessToken(new AccessTokenImpl(URI.create(stem.getString(kk().accessToken()))));
-        }
-        if (stem.containsKey(kk().accessTokenValid())) {
-            v.setAccessTokenValid(stem.getBoolean(kk().accessTokenValid()));
-        }
-        if (stem.containsKey(kk().expiresIn())) {
-            v.setAccessTokenLifetime(stem.getLong(kk().expiresIn()));
-        }
+      // ===
+        /*
+                 String certReq = "certreq";
+                String cert = "certificate";
+                String clientKey = "oauth_consumer_key";
+                String username = "username";
+                String myproxyUsername = "myproxyUsername";
 
-        if (stem.containsKey(kk().refreshToken())) {
-            v.setRefreshToken(new RefreshTokenImpl(URI.create(stem.getString(kk().refreshToken()))));
-        }
-        if (stem.containsKey(kk().refreshTokenLifetime())) {
-            v.setRefreshTokenLifetime(stem.getLong(kk().refreshTokenLifetime()));
-        }
-        if (stem.containsKey(kk().refreshTokenValid())) {
-            v.setRefreshTokenValid(stem.getBoolean(kk().refreshTokenValid()));
-        }
+         */
 
-        if (stem.containsKey(kk().verifier())) {
-            v.setVerifier(new VerifierImpl(URI.create(stem.getString(kk().verifier()))));
-        }
-        if (stem.containsKey(kk().lifetime())) {
-            v.setLifetime(stem.getLong(kk().lifetime()));
-        }
-        if (isStringKeyOK(stem, kk().certReq())) {
-            v.setCertReq(CertUtil.fromStringToCertReq(stem.getString(kk().certReq())));
-        }
+        if (isStringKeyOK(stem, kk().certReq())) {v.setCertReq(CertUtil.fromStringToCertReq(stem.getString(kk().certReq())));}
         if (isStringKeyOK(stem, kk().cert())) {
             try {
                 ByteArrayInputStream baos = new ByteArrayInputStream(stem.getString(kk().cert()).getBytes("UTF-8"));
@@ -97,54 +97,59 @@ public class TransactionStemMC<V extends OA2ServiceTransaction> extends StemConv
                 e.printStackTrace();
             }
         }
-        if(stem.containsKey(kk().clientKey())){
-            v.setClient((OA2Client) clientStore.get(BasicIdentifier.newID(stem.getString(kk().clientKey()))));
-        }
-        if(isStringKeyOK(stem,kk().username())){
-               v.setUsername(stem.getString(kk().username()));
-        }
-        if(isStringKeyOK(stem, kk().myproxyUsername())){
-            v.setMyproxyUsername(stem.getString(kk().myproxyUsername()));
-        }
-        if(isStringKeyOK(stem, kk().nonce())){
-            v.setNonce(stem.getString(kk().nonce()));
-        }
-        if(isStringKeyOK(stem, kk().states())){
-            v.setState(JSONObject.fromObject(stem.getString(kk().states())));
-        }
+        if(stem.containsKey(kk().clientKey())){v.setClient((OA2Client) clientStore.get(BasicIdentifier.newID(stem.getString(kk().clientKey()))));}
+        if(isStringKeyOK(stem,kk().username())){v.setUsername(stem.getString(kk().username()));}
+        if(isStringKeyOK(stem, kk().myproxyUsername())){v.setMyproxyUsername(stem.getString(kk().myproxyUsername()));}
 
+      // ===
         /*
+        protected String authTime = "auth_time";
+        protected String authzGrantLifetime = "authz_grant_lifetime";
+        protected String expiresIn = "expires_in";
+        protected String isRFC8628  = "is_rfc_8628";
+        protected String refreshToken = "refresh_token";
+        protected String refreshTokenLifetime = "refresh_token_lifetime";
+        protected String refreshTokenValid = "refresh_token_valid";
+        protected String reqState = "req_state";
+        protected String scopes = "scopes";
+        protected String states = "states";
+        protected String userCode  = "user_code";
+        protected String validatedScopes  = "validated_scopes";
 
          */
+        if (stem.containsKey(kk().authTime())) {
+            Date date = new Date(stem.getLong(kk().authTime()));
+            v.setAuthTime(date);
+        }
+        if (stem.containsKey(kk().authzGrantLifetime())) {v.setAuthGrantLifetime(stem.getLong(kk().authzGrantLifetime()));}
+        if (stem.containsKey(kk().expiresIn())) {v.setAccessTokenLifetime(stem.getLong(kk().expiresIn()));}
+        if(stem.containsKey(kk().isRFC8628())){v.setRFC8628Request(stem.getBoolean(kk().isRFC8628()));        }
+        if (stem.containsKey(kk().refreshToken())) {v.setRefreshToken(new RefreshTokenImpl(URI.create(stem.getString(kk().refreshToken()))));}
+        if (stem.containsKey(kk().refreshTokenLifetime())) {v.setRefreshTokenLifetime(stem.getLong(kk().refreshTokenLifetime()));}
+        if (stem.containsKey(kk().refreshTokenValid())) {v.setRefreshTokenValid(stem.getBoolean(kk().refreshTokenValid()));}
+        if(stem.containsKey(kk().reqState())){v.setRequestState(stem.getString(kk().reqState()));}
+        if(stem.containsKey(kk().scopes())){v.setScopes(toList(stem,kk().scopes()));}
+        if(isStringKeyOK(stem, kk().states())){v.setState(JSONObject.fromObject(stem.getString(kk().states())));}
+        if(stem.containsKey(kk().userCode())){v.setUserCode(stem.getString(kk().userCode()));}
+        if(stem.containsKey(kk().validatedScopes())){v.setValidatedScopes(toList(stem,kk().validatedScopes()));}
         v.setIdentifier(id); // Be SURE it is right.
         return v;
     }
 
-    /*
-       protected String authzGrantLifetime = "authz_grant_lifetime";
-  protected String refreshToken = "refresh_token";
-  protected String refreshTokenLifetime = "refresh_token_lifetime";
-  protected String refreshTokenValid = "refresh_token_valid";
-  protected String expiresIn = "expires_in";
-  protected String scopes = "scopes";
-  protected String authTime = "auth_time";
-  protected String states = "states";
-     */
+
     @Override
     public StemVariable toMap(V v, StemVariable stem) {
         stem = super.toMap(v, stem);
-        if (v.hasAuthorizationGrant()) {
-            stem.put(kk().authGrant(), v.getAuthorizationGrant().getToken());
-        }
-        if (v.hasVerifier()) {
-            stem.put(kk().verifier(), v.getVerifier().getToken());
-        }
-        stem.put(kk().tempCredValid(), v.isAuthGrantValid());
+        if(v.getAccessToken() != null){stem.put(kk().accessToken(), v.getAccessToken().getToken());}
+        if(v.getAuthorizationGrant()!=null) {stem.put(kk().authGrant(), v.getAuthorizationGrant().getToken());}
+        if(v.getVerifier()!=null) {stem.put(kk().verifier(), v.getVerifier().getToken());}
+        stem.put(kk().accessTokenValid(), v.isAccessTokenValid());
         stem.put(kk().lifetime(), v.getLifetime());
+        if(v.getCallback()!=null) {setNonNullStemValue(stem, kk().callbackUri(), v.getCallback().toString());}
+        setNonNullStemValue(stem,kk().nonce(), v.getNonce());
+        stem.put(kk().tempCredValid(), v.isAuthGrantValid());
 
-        if (v.getCertReq() != null) {
-            stem.put(kk().certReq(), CertUtil.fromCertReqToString(v.getCertReq()));
-        }
+        if (v.getCertReq() != null) {stem.put(kk().certReq(), CertUtil.fromCertReqToString(v.getCertReq()));}
         MyX509Certificates myCert = (MyX509Certificates) v.getProtectedAsset();
         if (!(myCert == null || myCert.getX509Certificates() == null || myCert.getX509Certificates().length == 0)) {
             try {
@@ -154,40 +159,46 @@ public class TransactionStemMC<V extends OA2ServiceTransaction> extends StemConv
             }
 
         }
-        if (v.getClient() != null) {
-            stem.put(kk().clientKey(), v.getClient().getIdentifierString());
+        if(v.getClient()!=null) {setNonNullStemValue(stem, kk().clientKey(), v.getClient().getIdentifierString());}
+        setNonNullStemValue(stem,kk().username(), v.getUsername());
+        setNonNullStemValue(stem,kk().myproxyUsername(), v.getMyproxyUsername());
+
+        /*
+    protected String authTime = "auth_time";
+    protected String authzGrantLifetime = "authz_grant_lifetime";
+    protected String expiresIn = "expires_in";
+    protected String isRFC8628  = "is_rfc_8628";
+    protected String refreshToken = "refresh_token";
+    protected String refreshTokenLifetime = "refresh_token_lifetime";
+    protected String refreshTokenValid = "refresh_token_valid";
+    protected String reqState = "req_state";
+    protected String scopes = "scopes";
+    protected String states = "states";
+    protected String userCode  = "user_code";
+    protected String validatedScopes  = "validated_scopes";
+
+         */
+        if(v.getAuthTime() != null) {
+            stem.put(kk().authTime(), v.getAuthTime().getTime());
         }
-        if (!isTrivial(v.getUsername())) {
-            stem.put(kk().username(), v.getUsername());
-        }
-        if (!isTrivial(v.getMyproxyUsername())) {
-            stem.put(kk().myproxyUsername(), v.getMyproxyUsername());
-        }
+        stem.put(kk().authzGrantLifetime(), v.getAuthzGrantLifetime());
+        // NOTE this is very old. expires in now refers to access token lifetime
+        stem.put(kk().expiresIn(), v.getAccessTokenLifetime());
+        stem.put(kk().isRFC8628(), v.isRFC8628Request());
 
         if (v.getRefreshToken() != null) {
             stem.put(kk().refreshToken(), v.getRefreshToken().getToken());
         }
-        stem.put(kk().refreshTokenValid(), v.isRefreshTokenValid());
         stem.put(kk().refreshTokenLifetime(), v.getRefreshTokenLifetime());
-
-        if (v.getAccessToken() != null) {
-            stem.put(kk().accessToken(), v.getAccessToken().getToken());
-        }
-        stem.put(kk().accessTokenValid(), v.isAccessTokenValid());
-        stem.put(kk().expiresIn(), v.getAccessTokenLifetime());
-        if (v.getCallback() != null) {
-            stem.put(kk().callbackUri(), v.getCallback().toString());
-        }
-        if (!isTrivial(v.getNonce())) {
-            stem.put(kk().nonce(), v.getNonce());
-        }
+        stem.put(kk().refreshTokenValid(), v.isRefreshTokenValid());
+        setNonNullStemValue(stem, kk().reqState(), v.getRequestState());
         fromList(v.getScopes(), stem, kk().scopes());
-        if (v.hasAuthTime()) {
-            stem.put(kk().authTime(), v.getAuthTime().getTime());
-        }
         if (v.getState() != null) {
             stem.put(kk().states(), v.getState().toString());
         }
+        setNonNullStemValue(stem, kk().userCode(), v.getUserCode());
+        if(v.getValidatedScopes()!=null && !v.getValidatedScopes().isEmpty()){fromList(v.getValidatedScopes(), stem, kk().validatedScopes());}
+
         return stem;
     }
 }

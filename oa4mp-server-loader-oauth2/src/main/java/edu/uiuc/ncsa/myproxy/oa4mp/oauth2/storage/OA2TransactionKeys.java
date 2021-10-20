@@ -15,18 +15,21 @@ public class OA2TransactionKeys extends DSTransactionKeys {
         clientKey("client_id");
     }
 
+    protected String authTime = "auth_time";
     protected String authzGrantLifetime = "authz_grant_lifetime";
+    protected String expiresIn = "expires_in";
+    protected String isRFC8628  = "is_rfc_8628";
     protected String refreshToken = "refresh_token";
     protected String refreshTokenLifetime = "refresh_token_lifetime";
     protected String refreshTokenValid = "refresh_token_valid";
-    protected String expiresIn = "expires_in";
-    protected String scopes = "scopes";
-    protected String authTime = "auth_time";
-    protected String states = "states";
     protected String reqState = "req_state";
-    protected String isRFC8628  = "is_rfc_8628";
+    protected String scopes = "scopes";
+    protected String states = "states";
     protected String userCode  = "user_code";
     protected String validatedScopes  = "validated_scopes";
+    /*
+     If you add keys or change these, you need to up date TransactionStemMC or QDL support will break
+     */
 
     public String userCode(String... x) {
         if (0 < x.length) userCode = x[0];

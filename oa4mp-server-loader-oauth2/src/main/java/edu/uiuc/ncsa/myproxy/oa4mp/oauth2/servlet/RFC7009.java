@@ -64,28 +64,6 @@ public class RFC7009 extends TokenManagerServlet {
         oa2SE.getTransactionStore().save(state.transaction);
         resp.setStatus(HttpStatus.SC_OK);
         return;
-
-        // now we check that the token is a JWT.
-/*
-        JSONObject jwt;
-        try {
-            jwt = JWTUtil2.verifyAndReadJWT(token, oa2SE.getJsonWebKeys());
-            // Since we only validate against our own keys (note we supply them rather than snooping the header for them)
-            // if it passes here, this is valid for us.
-        } catch (Throwable throwable) {
-            ServletDebugUtil.info(this, "Attempt to invalidate token \"" + token + "\" as a JWT failed:" + throwable.getMessage());
-            // at this point we are out of options. This is not a JWT and it is not a basic token.
-            // The correct response (as per spec( is an ok in that this token is not on valid.
-            resp.setStatus(HttpStatus.SC_OK);
-            return;
-        }
-        // now we have to check that the JWT was issued by us.
-        String id = jwt.getString(OA2Claims.JWT_ID);
-        if (checkToken(client, id)) {
-            resp.setStatus(HttpStatus.SC_OK);
-            return;
-        }
-*/
     }
 
 

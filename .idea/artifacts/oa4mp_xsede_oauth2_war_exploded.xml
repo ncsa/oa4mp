@@ -6,6 +6,7 @@
         <exploded>true</exploded>
         <module>oa4mp-xsede-oauth2</module>
         <packaging>war</packaging>
+        <unpackNestedArchives>false</unpackNestedArchives>
       </options>
     </properties>
     <root id="root">

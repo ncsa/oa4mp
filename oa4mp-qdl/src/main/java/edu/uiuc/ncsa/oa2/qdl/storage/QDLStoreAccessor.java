@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.oa2.qdl.storage;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.StoreArchiver;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
@@ -12,6 +13,7 @@ import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.delegation.token.impl.AuthorizationGrantImpl;
 import edu.uiuc.ncsa.security.storage.XMLMap;
+import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 
@@ -38,7 +40,8 @@ public class QDLStoreAccessor {
         this.store = store;
         this.logger = myLogger;
     }
-     MyLoggingFacade logger;
+
+    MyLoggingFacade logger;
 
     public String getAccessorType() {
         return accessorType;
@@ -60,6 +63,15 @@ public class QDLStoreAccessor {
 
     Store<Identifiable> store;
 
+    public StoreArchiver getStoreArchiver() {
+        if (storeArchiver == null) {
+            storeArchiver = new StoreArchiver(getStore());
+        }
+        return storeArchiver;
+    }
+
+    StoreArchiver storeArchiver;
+
     public StemVariable get(Identifier id) {
         return toStem((Identifiable) getStore().get(id));
     }
@@ -67,6 +79,7 @@ public class QDLStoreAccessor {
 
     /**
      * Save OR update the store from a stem or list of them.
+     *
      * @param stemVariable
      * @param doSave
      * @return
@@ -80,21 +93,21 @@ public class QDLStoreAccessor {
                     StemVariable stemVariable1 = (StemVariable) obj;
                     if (!stemVariable1.isList()) {
                         try {
-                            if(doSave) {
+                            if (doSave) {
                                 getStore().save(fromStem(stemVariable1));
-                            }else{
+                            } else {
                                 getStore().update(fromStem(stemVariable1));
                             }
                             out.add(Boolean.TRUE);
-                        }catch(Throwable t){
+                        } catch (Throwable t) {
                             String msg = t.getMessage();
-                            if(t.getCause() != null){
+                            if (t.getCause() != null) {
                                 msg = t.getCause().getMessage();
                             }
-                            warn("Could not "+ (doSave?"save":"update") + " object:" + msg);
+                            warn("Could not " + (doSave ? "save" : "update") + " object:" + msg);
                             out.add(Boolean.FALSE);
                         }
-                    }else{
+                    } else {
                         out.add(Boolean.FALSE);
                     }
                 }
@@ -110,7 +123,8 @@ public class QDLStoreAccessor {
 
     /**
      * Does the same as the {@link edu.uiuc.ncsa.myproxy.oa4mp.server.StoreCommands2#serialize(InputLine)}
-     *  Take a stem and convert it to an object then to XML format.
+     * Take a stem and convert it to an object then to XML format.
+     *
      * @param stem
      * @return
      */
@@ -132,7 +146,8 @@ public class QDLStoreAccessor {
 
     /**
      * Does the same as {@link edu.uiuc.ncsa.myproxy.oa4mp.server.StoreCommands2#deserialize(InputLine)}
-     *  Take a string and turn it into an object (in this case, a stem)
+     * Take a string and turn it into an object (in this case, a stem)
+     *
      * @param x
      * @return
      */
@@ -202,7 +217,7 @@ public class QDLStoreAccessor {
     }
 
     protected Identifiable fromStem(StemVariable stem) {
-        return mapConverter.fromMap(stem, null);
+        return getConverter().fromMap(stem, null);
     }
 
     public StemVariable create(String id) {
@@ -231,12 +246,16 @@ public class QDLStoreAccessor {
         List<Identifiable> result = getStore().search(key, condition, isregex);
         List<StemVariable> stems = new ArrayList<>();
         for (Identifiable identifiable : result) {
-            stems.add(toStem(identifiable));
+            if(!isVersionID(identifiable.getIdentifier())) {
+                stems.add(toStem(identifiable));
+            }
         }
         output.addList(stems);
         return output;
     }
-
+    protected boolean isVersionID(Identifier id){
+        return id.getUri().getFragment()==null?false:id.getUri().getFragment().contains(StoreArchiver.ARCHIVE_VERSION_TAG + StoreArchiver.ARCHIVE_VERSION_SEPARATOR_TAG);
+    }
     //  store#init('/home/ncsa/dev/csd/config/server-oa2.xml', 'localhost:oa4mp.oa2.mariadb', 'transaction')
     //  t. :=  store#search('temp_token', '.*23.*')
     public StemVariable listKeys() {
@@ -257,19 +276,76 @@ public class QDLStoreAccessor {
         getConverter().fromMap(map, identifiable);
         return identifiable;
     }
-    public void warn(String x){
-       if(logger == null){
-           System.err.println(x);
-       }else{
-           logger.warn(x);
-       }
-    }
-    public void info(String x){
-        if(logger == null){
+
+    public void warn(String x) {
+        if (logger == null) {
             System.err.println(x);
-        }else{
+        } else {
+            logger.warn(x);
+        }
+    }
+
+    public void info(String x) {
+        if (logger == null) {
+            System.err.println(x);
+        } else {
             logger.info(x);
         }
 
     }
+
+    /**
+     * Archive the elements (all ids) in the stem list.  Returns stem of version numberss created.
+     *
+     *
+     * @param arg
+     */
+    public StemVariable archive(StemVariable arg) {
+        StemVariable output = new StemVariable();
+        for (String key : arg.keySet()) {
+            String s = arg.getString(key);
+            Identifiable oldVersion = (Identifiable) getStore().get(BasicIdentifier.newID(s));
+            MapConverter mc = (MapConverter) getStore().getXMLConverter();
+            XMLMap map = new XMLMap();
+            Identifiable newVersion = getStore().create();
+            mc.toMap(oldVersion, map);
+            Long newIndex = getStoreArchiver().create(oldVersion.getIdentifier());
+            output.put(key, newIndex);
+        }
+        return output;
+    }
+
+    /**
+     * Remove pairs of version ids. A version ID is a list of the form
+     * <pre>
+     *     ['uri', integer]
+     * </pre>
+     *
+     */
+/*    public StemVariable remove(StemVariable ids){
+        StemVariable output= new StemVariable();
+        for(String key : ids.keySet()){
+            Object obj = ids.get(key);
+            if(!(obj instanceof StemVariable)){
+               output.put(key, Boolean.FALSE);
+               continue;
+            }
+            StemVariable targetID = (StemVariable) ids.get(key);
+
+            try{
+                Identifier id = BasicIdentifier.newID(targetID.getString(0L));
+                Long version = targetID.getLong(1L);
+                 getStoreArchiver().remove(id, version);
+                 output.put(key, Boolean.TRUE);
+            }catch(Throwable t){
+                warn("unable to remove version object with id '" + targetID + "':" + t.getMessage());
+                output.put(key, Boolean.FALSE);
+            }
+        }
+        return output;
+    }*/
+       public StemVariable getVersion(Identifier id, Long version) throws IOException {
+          return toStem( getStoreArchiver().getVersion(id, version));
+
+       }
 }

@@ -14,13 +14,13 @@ public class AdminClientKeys extends BaseClientKeys {
         identifier("admin_id");
         secret("secret");
     }
-    String maxClients = "max_clients";
-    String issuer = "issuer";
-    String config = "config";
     String allowQDL = "allow_qdl";
+    String config = "config";
+    String issuer = "issuer";
+    String maxClients = "max_clients";
+    String notifyOnNewClientCreate="new_client_notify";
     String vo="vo";
     String voURI="vo_uri";
-    String notifyOnNewClientCreate="new_client_notify";
 
     public String notifyOnNewClientCreate(String... x) {
            if (0 < x.length) notifyOnNewClientCreate= x[0];

@@ -140,4 +140,11 @@ public abstract class StemConverter<V extends Identifiable> extends MapConverter
             stem.put(key + StemVariable.STEM_INDEX_MARKER, target);
         }
     }
+
+
+    protected void setNonNullStemValue(StemVariable stem, String key, Object value){
+        if(value != null){
+            stem.put(key, value);
+        }
+    }
 }

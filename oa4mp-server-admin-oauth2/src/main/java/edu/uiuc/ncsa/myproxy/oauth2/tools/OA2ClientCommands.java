@@ -24,10 +24,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.StringTokenizer;
+import java.util.*;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.QDLRuntimeEngine.CONFIG_TAG;
 import static edu.uiuc.ncsa.qdl.scripting.JSONScriptUtil.SCRIPTS_TAG;
@@ -484,6 +481,61 @@ public class OA2ClientCommands extends ClientStoreCommands {
         }
 
         return super.updateSingleValue(map, key);
+    }
+     public static String NO_STILE_FLAG = "-noStile";
+    public void get_comment(InputLine inputLine) throws Throwable {
+        if(showHelp(inputLine)){
+            say("get_comment [" + NO_STILE_FLAG + "- display the comment for a give object");
+            say(NO_STILE_FLAG + " - do not show the stile (|) when printing comments");
+            say("See also: set_comment");
+            return;
+        }
+        Identifiable x = findItem(inputLine);
+        if (x == null) {
+            say("Object not found");
+            return;
+        }
+        boolean noStile = inputLine.hasArg(NO_STILE_FLAG);
+        OA2Client oa2Client = (OA2Client) x;
+        JSONArray array;
+        List<String> comments = oa2Client.getComment();
+        if (comments == null || comments.isEmpty()) {
+            say("(no comments)");
+            return;
+        }
+        for (String comment : comments)
+            say((noStile?"":"|")+comment);
+    }
+    public static String END_COMMENT_INPUT_CHAR = ".";
+    public static String ABORT_COMMENT_INPUT_CHAR = ")";
+    public void set_comment(InputLine inputLine) throws Throwable{
+        if(showHelp(inputLine)){
+            say("set_comment - input a comment line by line");
+            say("Note that input ends when the very first character on a line is a " + END_COMMENT_INPUT_CHAR);
+            say("Note that if you want to abort, the first character on a line is a " + ABORT_COMMENT_INPUT_CHAR);
+            say("See also: get_comment");
+            return;
+        }
+        Identifiable x = findItem(inputLine);
+        if (x == null) {
+            say("Object not found");
+            return;
+        }
+        OA2Client oa2Client = (OA2Client) x;
+
+        say("Input your comment. Starting a line with a " + END_COMMENT_INPUT_CHAR + " ends input, " + ABORT_COMMENT_INPUT_CHAR + " aborts input.");
+        List<String> comments = new ArrayList<>();
+        String comment = readline();
+        while(!comment.startsWith(END_COMMENT_INPUT_CHAR)){
+            if(comment.startsWith(ABORT_COMMENT_INPUT_CHAR)){
+                say("input aborted. returning...");
+                return;
+            }
+            comments.add(comment);
+            comment = readline();
+        }
+        oa2Client.setComment(comments);
+        getStore().save(oa2Client);
     }
 
 }

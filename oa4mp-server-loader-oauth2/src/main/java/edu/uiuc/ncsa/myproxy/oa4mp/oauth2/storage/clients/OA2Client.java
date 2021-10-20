@@ -356,7 +356,13 @@ public class OA2Client extends Client implements OA2ClientScopes {
     public void setGrantTypes(List<String> grantTypes) {
         setNamedList(xoauth_attributes, OA2Constants.GRANT_TYPE, grantTypes);
     }
-
+     public static String CLIENT_COMMENT_TAG = "comment";
+    public void setComment(List<String> comments){
+        setNamedList(oa4mp_attributes, CLIENT_COMMENT_TAG, comments);
+    }
+    public List<String> getComment(){
+        return getNamedList(oa4mp_attributes, CLIENT_COMMENT_TAG);
+    }
     public List<String> getResponseTypes() {
         return getNamedList(xoauth_attributes, OA2Constants.RESPONSE_TYPE);
     }
@@ -461,13 +467,13 @@ public class OA2Client extends Client implements OA2ClientScopes {
         return extended_attributes;
     }
 
-    protected void setExtendedAttributes(JSONObject eas) {
+    public void setExtendedAttributes(JSONObject eas) {
         this.extended_attributes = eas;
     }
 
     protected JSONObject extended_attributes;
 
-    protected boolean hasExtendedAttributes() {
+    public boolean hasExtendedAttributes() {
         return extended_attributes != null;
     }
 

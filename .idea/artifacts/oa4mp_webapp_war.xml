@@ -3,8 +3,10 @@
     <output-path>$PROJECT_DIR$/oa4mp-webapp/target</output-path>
     <properties id="maven-jee-properties">
       <options>
+        <exploded>false</exploded>
         <module>oa4mp-webapp</module>
         <packaging>war</packaging>
+        <unpackNestedArchives>false</unpackNestedArchives>
       </options>
     </properties>
     <root id="archive" name="oa4mp-webapp-5.2-SNAPSHOT.war">

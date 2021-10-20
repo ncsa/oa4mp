@@ -339,6 +339,7 @@ public class OA2ClientUtils {
                     sth = new WLCGTokenHandler(st);
                     debugger.trace(OA2ClientUtils.class, "WLCG access token handler created");
                     break;
+                case SciTokenConstants.SCI_TOKEN_TAG2:
                 case SciTokenConstants.SCI_TOKEN_TAG:
                     sth = new ScitokenHandler(st);
                     debugger.trace(OA2ClientUtils.class, "SciTokens access token handler created");
@@ -349,6 +350,7 @@ public class OA2ClientUtils {
                     debugger.trace(OA2ClientUtils.class, "generic access token handler created");
                     break;
                 default:
+                    debugger.trace(OA2ClientUtils.class, "unknown handler of type \"" + client.getAccessTokensConfig().getType() + "\" requested.");
                     throw new IllegalArgumentException("unknown access token handler type");
             }
             jwtRunner.setAccessTokenHandler(sth);

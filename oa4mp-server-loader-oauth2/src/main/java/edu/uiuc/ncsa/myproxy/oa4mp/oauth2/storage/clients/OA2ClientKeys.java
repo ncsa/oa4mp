@@ -15,22 +15,25 @@ public class OA2ClientKeys extends ClientKeys {
         identifier("client_id");
         secret("public_key");
     }
-    String issuer = "issuer";
-    String callback_uri = "callback_uri";
-    String rtLifetime = "rt_lifetime";
     String atLifetime = "at_lifetime";
-    String scopes = "scopes";
-    String ldap = "ldap";
-
-    String config = "cfg";
-    String extended_attributes = "extended_attributes";
-    String signTokens="sign_tokens";
-    String publicClient="public_client";
-    String strictScopes="strict_scopes";
     String audience="audience";
-    String resource="resource";
-    String dfLifetime="df_lifetime";
+    String callback_uri = "callback_uri";
+    String config = "cfg";
     String dfInterval="df_interval";
+    String dfLifetime="df_lifetime";
+    String extended_attributes = "extended_attributes";
+    String issuer = "issuer";
+    String ldap = "ldap";
+    String publicClient="public_client";
+    String rtLifetime = "rt_lifetime";
+    String resource="resource";
+    String signTokens="sign_tokens";
+    String scopes = "scopes";
+    String strictScopes="strict_scopes";
+    /*
+    If you add attributes, make sure you update ClientStemMC or you may break the QDL module that handles clients.
+     */
+
 
 
     public String dfLifetime(String... x) {
