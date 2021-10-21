@@ -14,9 +14,7 @@ import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * Class to encapsulate archive CRUD operations for a store. Having it here lets
@@ -297,6 +295,8 @@ public class StoreArchiver {
         DoubleHashMap<URI, Long> versions = getVersions(id);
         List<Long> out = new ArrayList<>();
         out.addAll(versions.values());
+        // sort list because generic store does not necessarily return versions in order
+        Collections.sort(out);
         return out;
     }
 
@@ -318,7 +318,7 @@ public class StoreArchiver {
 
     }
     /*
-        For testing
+        For testing -- get a couple of stores
     m:='oa2:/qdl/store';
     ini. := file_read('/home/ncsa/apps/qdl/apps/apps.ini', 2);
     a:=module_import(m, 'clients'); // don't want output
@@ -327,17 +327,29 @@ public class StoreArchiver {
     trans#init(ini.stores.file, ini.stores.name, 'transaction');
     // bunch of test clients. All are dummy clients
     clients#search('client_id', '.*234.*') =: c.
-    trans#search('temp_token', '.*234.*') =: t.;
+    trans#search('temp_token', '.*23.*') =: t.;
 
     cid := 'testScheme:oa4md,2018:/client_id/70e46ba17e8c4d00d30dd2345da83abe'
     clients#read(cid) =: x.
+    clients#v_versions(c.6.client_id)
 
+
+    // single store
+     m:='oa2:/qdl/store';
+    ini. := file_read('/home/ncsa/apps/qdl/apps/apps.ini', 2);
+    a:=module_import(m, 'clients'); // don't want output
+    clients#init(ini.stores.file, ini.stores.name, 'client');
+    c. :=clients#search('client_id', '.*234.*')
+
+     z := to_xml(c.0)
+     c.0 == from_xml(z)
 
   x.error_uri := 'https://foo/error'
   x.scopes. := ['openid', 'info']
   x.callback_uri. := ['https://localhost/ready1','https://localhost/ready2']
 
-      for_each(@==, clients#v_get(id,0), clients#v_get(id,1))
+// This computes for each, but sticks the result x. inside a [[x.]], hence the .0.0 at the end
+      for_each(@==, clients#v_get(cid,0), clients#v_get(cid,1)).0.0
 
      */
 }

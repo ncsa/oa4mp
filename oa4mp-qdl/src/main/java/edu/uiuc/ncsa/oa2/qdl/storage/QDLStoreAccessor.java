@@ -158,7 +158,8 @@ public class QDLStoreAccessor {
             map.fromXML(fis);
             fis.close();
             Identifiable newId = store.create();
-            getConverter().fromMap(map, newId);
+            StemConverter stemConverter = getConverter();
+            stemConverter.fromMap(map, newId);
             return toStem(newId);
         } catch (IOException iox) {
 

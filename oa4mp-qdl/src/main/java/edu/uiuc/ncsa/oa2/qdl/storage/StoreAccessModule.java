@@ -88,6 +88,7 @@ public class StoreAccessModule extends JavaModule {
         functions.add(sf.new VGetVersions());
         functions.add(sf.new VRemove());
         functions.add(sf.new VRestore());
+    //    functions.add(sf.new Diff());
         return functions;
     }
 

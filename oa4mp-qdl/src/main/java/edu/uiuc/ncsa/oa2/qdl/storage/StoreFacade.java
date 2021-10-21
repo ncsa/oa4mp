@@ -2,8 +2,11 @@ package edu.uiuc.ncsa.oa2.qdl.storage;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2ConfigurationLoader;
+import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.SystemEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
+import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
+import edu.uiuc.ncsa.qdl.expressions.Dyad;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
 import edu.uiuc.ncsa.qdl.extensions.QDLModuleMetaClass;
 import edu.uiuc.ncsa.qdl.extensions.QDLVariable;
@@ -260,7 +263,7 @@ public class StoreFacade implements QDLModuleMetaClass {
         return storeAccessor;
     }
 
-    public String TO_XML_NAME = "toXML";
+    public String TO_XML_NAME = "to_xml";
 
     public class ToXML implements QDLFunction {
         @Override
@@ -282,18 +285,35 @@ public class StoreFacade implements QDLModuleMetaClass {
                 throw new IllegalArgumentException("Error: " + getName() + " requires a stem argument.");
             }
             StemVariable stem = (StemVariable) objects[0];
-            // last hurdle, make sure it's not just a list of stems
-            if (stem.isList()) {
-                throw new IllegalArgumentException("Error: " + getName() + " does not accept lists.");
+            if(stem.isEmpty()){
+                return "";
             }
-            return getStoreAccessor().toXML((StemVariable) objects[0]);
+            // last hurdle, make sure it's not just a list of stems
+            if (!stem.isList()) {
+                return getStoreAccessor().toXML((StemVariable) objects[0]);
+            }
+            StemVariable out = new StemVariable();
+            for(String key : stem.keySet()){
+                try {
+                    out.put(key,getStoreAccessor().toXML((StemVariable) stem.get(key)));
+                }catch(Throwable t){
+                    getLogger().warn("Could not convert object to XML:" + t.getMessage() , t);
+                    out.put(key, QDLNull.getInstance());
+                }
+            }
+            return out;
         }
 
         @Override
         public List<String> getDocumentation(int argCount) {
             List<String> doxx = new ArrayList<>();
-            doxx.add(getName() + "(stem.) - converts the objec to its XML (serialization) format.");
+            doxx.add(getName() + "(stem. | [stem0., stem1.,...]) - converts the object(s)  XML (serialization) format.");
             doxx.add("Serialization format is a good way to store, backup or send configurations.");
+            doxx.add("If you supply a single stem for an object, that is processed, or you may supply a list of");
+            doxx.add("object. The result is either a string (of XML) or a null if the conversion failed.");
+            doxx.add("E.g.");
+            doxx.add("   x. := clients#to_xml(clients#search('client_id','.*ligo.*))");
+            doxx.add("would search for all client ids that contain 'ligo' and serialize them the XML");
             doxx.add("See also: " + FROM_XML_NAME);
             return doxx;
         }
@@ -315,12 +335,24 @@ public class StoreFacade implements QDLModuleMetaClass {
             if (objects.length != 1) {
                 throw new IllegalArgumentException("Error: " + getName() + " requires a single argument.");
             }
-            if (!(objects[0] instanceof String)) {
-                throw new IllegalArgumentException("Error: " + getName() + " requires a string argument.");
+            if ((objects[0] instanceof String)) {
+                return getStoreAccessor().fromXML((String) objects[0]);
             }
+            if(!(objects[0] instanceof StemVariable)) {
+                throw new IllegalArgumentException("Error: " + getName() + " requires a string argument or stem of them,.");
+            }
+            StemVariable arg = (StemVariable) objects[0];
+            StemVariable out = new StemVariable();
+                  for(String key: arg.keySet()){
+                      Object obj = arg.get(key);
+                      if(obj instanceof String){
+                          out.put(key, getStoreAccessor().fromXML((String) obj));
+                      }else{
+                          out.put(key, QDLNull.getInstance());
+                      }
 
-
-            return getStoreAccessor().fromXML((String) objects[0]);
+                  }
+            return out;
         }
 
         @Override
@@ -332,7 +364,7 @@ public class StoreFacade implements QDLModuleMetaClass {
         }
     }
 
-    public String FROM_XML_NAME = "fromXML";
+    public String FROM_XML_NAME = "from_xml";
 
     public QDLStoreAccessor getStoreAccessor() {
         return storeAccessor;
@@ -569,7 +601,7 @@ public class StoreFacade implements QDLModuleMetaClass {
         @Override
         public List<String> getDocumentation(int argCount) {
             List<String> doxx = new ArrayList<>();
-            doxx.add(getName() + "([includeVersions) - returns a count of how many clients there are in this store.");
+            doxx.add(getName() + "({includeVersion}) - returns a count of how many clients there are in this store.");
             doxx.add(getName() + "includeVersions will count the versions in the store too if true, and ignore them if false.");
             doxx.add(checkInitMessage);
             return doxx;
@@ -598,6 +630,8 @@ public class StoreFacade implements QDLModuleMetaClass {
                     if ((Boolean) objects[0]) {
                         return getStoreAccessor().getStoreKeys().identifier();
                     }
+                }else{
+                    throw new IllegalArgumentException(getName() + " requires a boolean as its argument if present");
                 }
             }
             return getStoreAccessor().listKeys();
@@ -607,7 +641,16 @@ public class StoreFacade implements QDLModuleMetaClass {
         @Override
         public List<String> getDocumentation(int argCount) {
             List<String> doxx = new ArrayList<>();
-            doxx.add(getName() + "() - list the keys (names of properties) for the objects in the store.");
+            switch(argCount){
+                case 0:
+                    doxx.add(getName() + "() - list the keys (names of properties) for the objects in the store.");
+                    break;
+                case 1:
+                    doxx.add(getName() + "(show_primary_key) - list the primary keys this store.");
+                    doxx.add("show_primary_key - boolean, if true show the key, if false, show all keys");
+                    break;
+
+            }
             doxx.add(checkInitMessage);
             return doxx;
         }
@@ -1111,49 +1154,46 @@ public class StoreFacade implements QDLModuleMetaClass {
         }
     }
 
-    protected String VERSION_DIFFERENCE_NAME = "v_diff";
+    protected String DIFFERENCE_NAME = "diff";
 
     /**
-     * Not implemented yet because it is unclear how a difference of such stems should be represented.
-     * This seems to me it should be a generic function rather than being buried in a utility.
+     * Not currently used because it is unclear what the contract should actually be.
+     * Leaving this here for future (possible) use. left. == right. actually covers most cases fine.
      */
-    public class VDiff implements QDLFunction{
+    public class Diff implements QDLFunction{
         @Override
         public String getName() {
-            return VERSION_DIFFERENCE_NAME;
+            return DIFFERENCE_NAME;
         }
 
         @Override
         public int[] getArgCount() {
-            return new int[]{1,2};
+            return new int[]{2};
         }
 
         @Override
         public Object evaluate(Object[] objects, State state) {
-            checkInit();
-            StemVariable args = convertArgsToVersionIDs(objects, getName());
+            if(objects.length != 2){
+                throw new IllegalArgumentException(getName() + " requires two arguments");
+            }
+            if(!(objects[0] instanceof StemVariable) || !(objects[1] instanceof StemVariable)){
+                throw new IllegalArgumentException(getName() + " requires both arguments be stems");
+            }
+
+            StemVariable left = (StemVariable)objects[0];
+            StemVariable right = (StemVariable)objects[1];
+
             StemVariable out = new StemVariable();
             HashMap<Identifier, StemVariable> baseObjects = new HashMap<>();
-            for(String key : args.keySet()){
-                VID vid = toVID(args.get(key));
-                if(vid == null){
-                    out.put(key, QDLNull.getInstance());
-                    continue;
-                }
-                StemVariable baseObject;
-                if(baseObjects.containsKey(vid.id)){
-                    baseObject = baseObjects.get(vid.id);
+            for(String key : left.keySet()){
+                if(right.containsKey(key)){
+                    Dyad eq = new Dyad(OpEvaluator.EQUALS_VALUE);
+                    eq.setLeftArgument(new ConstantNode(left.get(key)));
+                    eq.setRightArgument(new ConstantNode(right.get(key)));
+                    out.put(key,eq.evaluate(state));
                 }else{
-                    baseObject = getStoreAccessor().get(vid.id);
-                }
-/*
-                try {
-                  StemVariable target = getStoreAccessor().getStoreArchiver().getVersion(vid.id ,vid.version);
-                } catch (IOException e) {
-                    getLogger().warn("Unable to get versioned object with id + " + vid);
                     out.put(key, QDLNull.getInstance());
                 }
-*/
             }
             return out;
         }
@@ -1161,19 +1201,9 @@ public class StoreFacade implements QDLModuleMetaClass {
         @Override
         public List<String> getDocumentation(int argCount) {
             List<String> doxx = new ArrayList<>();
-            switch (argCount){
-                case 1:
-                    doxx.add(getName() + " (id | ids.) - give differences between stored object and the version(s).");
-                    break;
-                case 2:
-                    doxx.add(getName() + " (id, version) - give differences between stored object and the version.");
-                    break;
-            }
-            doxx.add("This returns a partial object -- just the elements that are not the same");
-            doxx.add("");
-            doxx.add("");
-            doxx.add("");
-            doxx.add(checkInitMessage);
+            doxx.add(getName() + " (left., right.) - give differences between left. and right.");
+            doxx.add("This is left conformable. Missing elements on right are returned with a null");
+            doxx.add("value. If the value on the right is found, then it is compared and a boolean is returned");
             return doxx;
         }
     }

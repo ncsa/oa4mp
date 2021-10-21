@@ -20,18 +20,19 @@ public class TXRStemMC<V extends TXRecord> extends StemConverter<V> {
         return (TXRecordSerializationKeys) keys;
     }
 
+
     /*
-        String audience = "audience";
-  String expiresAt = "expires_at";
-  String lifetime = "lifetime";
-  String issuedAt = "issued_at";
-  String issuer = "issuer";
-  String isValid = "valid";
-  String parentID = "parent_id";
-  String resource = "resource";
-  String scopes = "scopes";
-  String tokenType = "token_type";
-     */
+            String audience = "audience";
+      String expiresAt = "expires_at";
+      String lifetime = "lifetime";
+      String issuedAt = "issued_at";
+      String issuer = "issuer";
+      String isValid = "valid";
+      String parentID = "parent_id";
+      String resource = "resource";
+      String scopes = "scopes";
+      String tokenType = "token_type";
+         */
     @Override
     public V fromMap(StemVariable stem, V v) {
         v = super.fromMap(stem, v);

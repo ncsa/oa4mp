@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
+import edu.uiuc.ncsa.security.storage.data.ConversionMap;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
 
@@ -23,11 +24,21 @@ public abstract class StemConverter<V extends Identifiable> extends MapConverter
         super(mapConverter.getKeys(), mapConverter.getProvider());
         parentMC = mapConverter;
     }
-
     public StemConverter(SerializationKeys keys, IdentifiableProvider<V> provider) {
         super(keys, provider);
     }
 
+    @Override
+    public V fromMap(ConversionMap<String, Object> map, V v) {
+        return (V) getParentMC().fromMap(map, v);
+    }
+
+
+    /**
+     * Parent map converter is the converter for the base object, i.e.. a {@link ConversionMap}
+     * to a stored object.
+     * @return
+     */
     public MapConverter getParentMC() {
         return parentMC;
     }

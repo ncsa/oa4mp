@@ -294,30 +294,39 @@ When a new version is deployed, here is the testing order
      This will require doing the DBService calls manually (that's part of the test).
      In the CLC load the configuration and type
      df
-     This should respond with a user code, Call it USER_CODE. Paste into this and run it
-     from the command line. There are two scripts that do this. Look at them
-     to be sure they point to localhost:9443
 
-     bash$ cd ~/dev/ncsa-git/cilogon/cilogon2-admin-oauth2/src/main/scripts
-     bash$ test-check-user-code.sh USER_CODE
+     Approval methods
+     A.
+     Run the QDL script with the user_code:
 
-     That should return with a status of 0 and a summary of the client. Approve it manually
-     with
+     ~/apps/qdl/apps/approve.qdl USER_CODE
 
-     bash$ test-user-code-approved.sh USER_CODE 1
+     B.
+     1. This should respond with a user code, Call it USER_CODE. Paste into this and run it
+        from the command line. There are two scripts that do this. Look at them
+        to be sure they point to localhost:9443
 
-     Before you just issue a request for the access token in the CLC, you will need to emulate
-     the response from the IDP and set the username for the transaction.
-     In the CLC, use the
+        bash$ cd ~/dev/ncsa-git/cilogon/cilogon2-admin-oauth2/src/main/scripts
+        bash$ test-check-user-code.sh USER_CODE
 
-     decode -32 token
+        That should return with a status of 0 and a summary of the client.
+     2. Approve it manually with
 
-     command on the grant in the response. This is the id of the current transaction.
-     Set the user name there with
+        bash$ test-user-code-approved.sh USER_CODE 1
 
-     transactions>update >username
+     3. Before you just issue a request for the access token in the CLC, you will need to emulate
+        the response from the IDP and set the username for the transaction.
+        In the CILogon CLC (talk to the right store!), search for the user code:
 
-     Does not matter to what.
+        search >user_code USER_CODE
+
+        This gets the id (temp token) of the current transaction.
+
+     4. Set the user name there with
+
+        update >username
+
+        Does not matter to what.
 
      *Repeat the above, but cancel the flow using
 
