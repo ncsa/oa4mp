@@ -13,8 +13,6 @@
     <list default="true" id="e978b12f-4441-4d62-90dd-04c86c0aa044" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-qdl/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-qdl/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-qdl/src/main/docs/claim_source_examples.odt" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-qdl/src/main/docs/claim_source_examples.odt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/testing/testing-readme.txt" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/testing/testing-readme.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/allclasses-frame.html" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/allclasses-frame.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/allclasses-noframe.html" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/allclasses-noframe.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/constant-values.html" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/constant-values.html" afterDir="false" />
@@ -62,7 +60,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="5.2.0" />
+        <entry key="$PROJECT_DIR$" value="master" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -96,7 +94,6 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
     <property name="extract.method.default.visibility" value="protected" />
@@ -514,13 +511,7 @@
       <workItem from="1633839810727" duration="56253000" />
       <workItem from="1634641537970" duration="97305000" />
       <workItem from="1634903982831" duration="3245000" />
-    </task>
-    <task id="LOCAL-00014" summary="reworked all of the online help in the CLI. Changed which database field is used for VOs rather than deal with possible collisions. Added command to the approval component of the CLI to list approved or unapproved clients.">
-      <created>1616708318578</created>
-      <option name="number" value="00014" />
-      <option name="presentableId" value="LOCAL-00014" />
-      <option name="project" value="LOCAL" />
-      <updated>1616708318578</updated>
+      <workItem from="1635174727461" duration="5867000" />
     </task>
     <task id="LOCAL-00015" summary="Added some more telemetry to track down how issuer was set.">
       <created>1616796218389</created>
@@ -858,14 +849,20 @@
       <option name="project" value="LOCAL" />
       <updated>1634853537971</updated>
     </task>
-    <option name="localTasksCounter" value="63" />
+    <task id="LOCAL-00063" summary="Updated QDL snapshot version number, improved the test readme.">
+      <created>1635175026708</created>
+      <option name="number" value="00063" />
+      <option name="presentableId" value="LOCAL-00063" />
+      <option name="project" value="LOCAL" />
+      <updated>1635175026708</updated>
+    </task>
+    <option name="localTasksCounter" value="64" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="CIL-934 (device flow) and CIL-1035 (refresh tokens created when client does not allow them). Documented device flow servlet configuration too." />
     <MESSAGE value="CIL-934 (device flow) part 2" />
     <MESSAGE value="CIL-934 (device flow) part 3" />
     <MESSAGE value="Improved database access for cache rebuild (RFC 8628). Fixed several small issues with device flow. Had to refactor some code because inheritance was not helpful. More tests!" />
@@ -890,7 +887,8 @@
     <MESSAGE value="CIL-1101, CIL-1102 fixes." />
     <MESSAGE value="Lots of cleanup with QDL utils." />
     <MESSAGE value="Better support in QDL utilities for using stores." />
-    <option name="LAST_COMMIT_MESSAGE" value="Better support in QDL utilities for using stores." />
+    <MESSAGE value="Updated QDL snapshot version number, improved the test readme." />
+    <option name="LAST_COMMIT_MESSAGE" value="Updated QDL snapshot version number, improved the test readme." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
