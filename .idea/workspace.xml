@@ -13,14 +13,7 @@
     <list default="true" id="e978b12f-4441-4d62-90dd-04c86c0aa044" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-qdl/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-qdl/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-qdl/src/main/java/edu/uiuc/ncsa/oa2/qdl/storage/ApprovalStemMC.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-qdl/src/main/java/edu/uiuc/ncsa/oa2/qdl/storage/ApprovalStemMC.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-qdl/src/main/java/edu/uiuc/ncsa/oa2/qdl/storage/ClientStemMC.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-qdl/src/main/java/edu/uiuc/ncsa/oa2/qdl/storage/ClientStemMC.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-qdl/src/main/java/edu/uiuc/ncsa/oa2/qdl/storage/QDLStoreAccessor.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-qdl/src/main/java/edu/uiuc/ncsa/oa2/qdl/storage/QDLStoreAccessor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-qdl/src/main/java/edu/uiuc/ncsa/oa2/qdl/storage/StemConverter.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-qdl/src/main/java/edu/uiuc/ncsa/oa2/qdl/storage/StemConverter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-qdl/src/main/java/edu/uiuc/ncsa/oa2/qdl/storage/StoreAccessModule.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-qdl/src/main/java/edu/uiuc/ncsa/oa2/qdl/storage/StoreAccessModule.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-qdl/src/main/java/edu/uiuc/ncsa/oa2/qdl/storage/StoreFacade.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-qdl/src/main/java/edu/uiuc/ncsa/oa2/qdl/storage/StoreFacade.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-qdl/src/main/java/edu/uiuc/ncsa/oa2/qdl/storage/TXRStemMC.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-qdl/src/main/java/edu/uiuc/ncsa/oa2/qdl/storage/TXRStemMC.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-qdl/src/main/java/edu/uiuc/ncsa/oa2/qdl/storage/TransactionStemMC.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-qdl/src/main/java/edu/uiuc/ncsa/oa2/qdl/storage/TransactionStemMC.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-qdl/src/main/docs/claim_source_examples.odt" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-qdl/src/main/docs/claim_source_examples.odt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/testing/testing-readme.txt" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/testing/testing-readme.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/allclasses-frame.html" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/allclasses-frame.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/allclasses-noframe.html" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/allclasses-noframe.html" afterDir="false" />
@@ -44,7 +37,6 @@
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin-javadoc.jar" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin-javadoc.jar" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin-sources.jar" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin-sources.jar" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin.jar" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/StoreArchiver.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/StoreArchiver.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth1/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth1/buildNumber.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-test-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-test-oauth2/buildNumber.properties" afterDir="false" />
@@ -139,7 +131,7 @@
       <recent name="edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.QDL">
+  <component name="RunManager" selected="Application.OA2 CLC">
     <configuration default="true" type="ArquillianJUnit" factoryName="" nameIsGenerated="true">
       <option name="arquillianRunConfiguration">
         <value>
@@ -438,10 +430,10 @@
       <item itemvalue="Application.JWKCLI" />
       <item itemvalue="Application.NewCAStoreTest" />
       <item itemvalue="Application.QDLTestUtils" />
+      <item itemvalue="Application.StoreArchiver" />
       <item itemvalue="Java Scratch.Scratch" />
       <item itemvalue="JUnit.OA2 test suite" />
       <item itemvalue="Tomcat Server.OA2 Server" />
-      <item itemvalue="Application.StoreArchiver" />
     </list>
     <recent_temporary>
       <list>
@@ -520,14 +512,8 @@
       <workItem from="1633709588721" duration="1878000" />
       <workItem from="1633724020926" duration="1884000" />
       <workItem from="1633839810727" duration="56253000" />
-      <workItem from="1634641537970" duration="96809000" />
-    </task>
-    <task id="LOCAL-00013" summary="Fixed bad help entry.">
-      <created>1616607986710</created>
-      <option name="number" value="00013" />
-      <option name="presentableId" value="LOCAL-00013" />
-      <option name="project" value="LOCAL" />
-      <updated>1616607986710</updated>
+      <workItem from="1634641537970" duration="97305000" />
+      <workItem from="1634903982831" duration="3245000" />
     </task>
     <task id="LOCAL-00014" summary="reworked all of the online help in the CLI. Changed which database field is used for VOs rather than deal with possible collisions. Added command to the approval component of the CLI to list approved or unapproved clients.">
       <created>1616708318578</created>
@@ -865,14 +851,20 @@
       <option name="project" value="LOCAL" />
       <updated>1634767714711</updated>
     </task>
-    <option name="localTasksCounter" value="62" />
+    <task id="LOCAL-00062" summary="Better support in QDL utilities for using stores.">
+      <created>1634853537971</created>
+      <option name="number" value="00062" />
+      <option name="presentableId" value="LOCAL-00062" />
+      <option name="project" value="LOCAL" />
+      <updated>1634853537971</updated>
+    </task>
+    <option name="localTasksCounter" value="63" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="More documentation updates. Changed an example class." />
     <MESSAGE value="CIL-934 (device flow) and CIL-1035 (refresh tokens created when client does not allow them). Documented device flow servlet configuration too." />
     <MESSAGE value="CIL-934 (device flow) part 2" />
     <MESSAGE value="CIL-934 (device flow) part 3" />
@@ -897,7 +889,8 @@
     <MESSAGE value="CIL-1092 support. Updated GA4GH version 2 script. CIL-646, discovery entry for revocation and introspection endpoints." />
     <MESSAGE value="CIL-1101, CIL-1102 fixes." />
     <MESSAGE value="Lots of cleanup with QDL utils." />
-    <option name="LAST_COMMIT_MESSAGE" value="Lots of cleanup with QDL utils." />
+    <MESSAGE value="Better support in QDL utilities for using stores." />
+    <option name="LAST_COMMIT_MESSAGE" value="Better support in QDL utilities for using stores." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

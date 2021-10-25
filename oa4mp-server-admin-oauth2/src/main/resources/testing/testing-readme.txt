@@ -372,10 +372,10 @@ When a new version is deployed, here is the testing order
   -- dev:/test/ncsa_qdl
      Critical regression test.
      Has standard ncsa/ncsa-default.qdl script with plain vanilla configuration
-      -- Should get full claims as list
-      -- check that returned id token from refresh and exchange still have isMemberOf as flat list.
+      -- Should get full claims as list (not a structure)
+      -- check that returned id token from refresh still has isMemberOf as flat list.
   
-  -- dev:/test/fnal
+  -- dev:test/fnal
      IDP: Github
      See above for localhost.
 

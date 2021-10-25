@@ -57,7 +57,7 @@
             <element id="module-output" name="myproxy-logon" />
           </element>
           <element id="library" level="project" name="Maven: edu.uiuc.ncsa.security.delegation:ncsa-security-oauth-2.0:5.2-SNAPSHOT" />
-          <element id="library" level="project" name="Maven: edu.uiuc.ncsa.security:ncsa-qdl:1.3-QDL-SNAPSHOT" />
+          <element id="library" level="project" name="Maven: edu.uiuc.ncsa.security:ncsa-qdl:1.4-QDL-SNAPSHOT" />
           <element id="library" level="project" name="Maven: com.jayway.jsonpath:json-path:2.4.0" />
           <element id="library" level="project" name="Maven: net.minidev:json-smart:2.3" />
           <element id="library" level="project" name="Maven: net.minidev:accessors-smart:1.2" />
