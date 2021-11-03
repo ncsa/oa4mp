@@ -22,7 +22,7 @@
 DEBUG := true;
 debug(0, 'first debug message');
 log_entry('log message');
-// Debug stuff --  uncomment if running on my dev box. Should not be in store.
+// Debug stuff --  enable if running on my dev box. Should not be in store.
 if[DEBUG][
   say('In debug = ON');
   claims.idp := 'https://idp.ncsa.illinois.edu/idp/shibboleth';

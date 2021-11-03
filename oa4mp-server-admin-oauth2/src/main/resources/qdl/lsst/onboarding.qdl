@@ -20,12 +20,13 @@
 /* Onboarding for LSST (CIL-523): Create a voPersonExternalID (VOP) for them. This is run in a special
   client by LSST just when a person needs to create it. Effectively this just assert VOP as a  claim,
   so the only difference between this and their regular logon is a single VOP claim.
-  This will trivially create a VOP if the IDP is from the NCSA which si just the eppn.
+  This will trivially create a VOP if the IDP is from the NCSA which is just the eppn.
   Also note that the eppn or eptid may be set for various other IDP (e.g. XSEDE) and VOP is
   created for those too.
 */
 
 // Some constants for later.
+// Do NCSA stuff if they log in through that IDP.
 script_load('utils/init.qdl');
 script_load('ncsa/ncsa-default');
 

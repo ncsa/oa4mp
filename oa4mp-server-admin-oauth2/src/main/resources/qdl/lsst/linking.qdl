@@ -19,6 +19,37 @@
     "type": "identity"
    }}}
 
+  tokens{
+     identity{
+        type=identity
+        qdl{
+            load="lsst/linking.qdl"
+            xmd={exec_phase=["pre_auth","post_token"]}
+          }// end qdl
+        } //end identity token
+  } //end tokens
+
+    tokens{
+     identity{
+        type=identity
+        qdl{
+            load="lsst/linking.qdl"
+            xmd={exec_phase="post_token"}
+          }// end qdl
+        } //end identity token
+        access{
+           type=wlcg
+           issuer="https:cilogon.org"
+           audience="https://wlcg.cern.ch/jwt/v1/any"
+           lifetime=3600000
+           qdl{
+              load="fnal/fnal-at.qdl"
+              xmd={exec_phase=["post_token","post_refresh","post_exchange"]}
+              args=["USER_ID", "PASSWORD"]
+           } //end QDL
+        } // end access token
+      } //end tokens
+
 */
 
 // Linking for LSST (CIL-523): Do two stage lookup if the user did not use the NCSA LDAP
@@ -27,9 +58,13 @@
 script_load('utils/init.qdl');
 
 v := null;
-if[claims.idp == idp.github][v:=claims.oidc+'@github.com';];
-if[claims.idp == idp.google][v:=claims.oidc+'@accounts.google.com';];
-if[claims.idp == idp.orcid][v:=replace(claims.oidc,'http://', 'https://');];
+switch[
+  if[claims.idp == idp.github][v:=claims.oidc+'@github.com';];
+  if[claims.idp == idp.google][v:=claims.oidc+'@accounts.google.com';];
+  if[claims.idp == idp.orcid][v:=replace(claims.oidc,'http://', 'https://');];
+  if[is_defined(claims.eppn)][v:=claims.eppn;];
+  if[is_defined(claims.eptid)][v:=claims.eptid;];
+];
 if[
      v != null
    ][
@@ -55,11 +90,9 @@ say('***QDL: got VOP claims:' + to_string(c.));
         claims.uid := head(claims.eppn, '@');
      ];
 ];
-
-
+// now add any of these claim we got to the result.
 say('***QDL: getting claims');
              cfg. := new_template('ncsa');
              cfg. := create_source(cfg.);
           claims. := claims. ~ get_claims(cfg., claims.uid);
 say('***QDL: Returning claims:' + to_string(claims.));
-

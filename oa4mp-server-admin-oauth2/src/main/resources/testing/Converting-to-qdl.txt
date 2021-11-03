@@ -1,0 +1,306 @@
+There are several clients that use the old functor system. These must be converted to QDL at some point since they
+are just a maintence nightmare. Quick listing is
+
+ 0.cilogon:/client_id/12b77745770e646765d4ec35427bd6c6               | NCSA Internal (Savannah)                 | [0]
+ 1.cilogon:/client_id/12fec51db55c36b208dfbe2dee78065c               | LSST development LSP instance SSO        | [1,2,5,8,9,10,12,15,16,17,19,20,22]
+ 2.cilogon:/client_id/15352006fec091e45e1425bce7c3c352               | Rubin Observatory LSP - Test Environment | [1,2,5,8,9,10,12,15,16,17,19,20,22]
+ 3.cilogon:/client_id/1a9a1f87cbc824028e37e246b26078ea               | Black Hole Router                        | [3,7]
+ 4.cilogon:/client_id/1e3cc73c9027808c6573c2a90586b35b               | Secops Portal - production               | [4,6,29]
+ 5.cilogon:/client_id/232eaabf026dab8b26f9c9770873cb7e               | Rubin Observatory LSP SQuaSH sandbox ins | [1,2,5,8,9,10,12,15,16,17,19,20,22]
+ 6.cilogon:/client_id/33f89281bae8ff81655c89d80d3f542c               | Secops BHR - production                  | [4,6,29]
+ 7.cilogon:/client_id/3565fbac508557e62390799c62de3798               | Test Black Hole Router                   | [3,7]
+ 8.cilogon:/client_id/4fb3456c6d99009d975450af19bee94                | Rubin Observatory LSP - Internal Bleed E | [1,2,5,8,9,10,12,15,16,17,19,20,22]
+ 9.cilogon:/client_id/51ea95a5fac24d5a6f33e658d7d77d2a               | Rubin Observatory LSP - Test Environment | [1,2,5,8,9,10,12,15,16,17,19,20,22]
+10.cilogon:/client_id/537ab5b211d0ddacb05964e5adf9a4dc               | Rubin Observatory LSP - Test Environment | [1,2,5,8,9,10,12,15,16,17,19,20,22]
+11.cilogon:/client_id/5c1e8e00c6d79d8cd081e45a17574741               | Test LSST client                         | [11]
+12.cilogon:/client_id/5d4d96afd3f1acf896a2b5a7a2e94277               | Rubin Observatory LSP (NCSA Test Stand i | [1,2,5,8,9,10,12,15,16,17,19,20,22]
+13.cilogon:/client_id/6566e4f7fb094a1f91c5548b1d4532d9               | Secops RPZ - production                  | [13]
+14.cilogon:/client_id/68a1b20c7a29978e3af579301d74d871               | NCSA Identity                            | [14,21,23]
+15.cilogon:/client_id/6ca7b54ac075b65bccb9c885f9ba4a75               | LSST LSP Integration (Domain Ingress Cli | [1,2,5,8,9,10,12,15,16,17,19,20,22]
+16.cilogon:/client_id/705adcc6f8420359cbfbd55734d28ba2               | LSST Science Platform (Test)             | [1,2,5,8,9,10,12,15,16,17,19,20,22]
+17.cilogon:/client_id/74e865cd71a3a327096d36081166b739               | Rubin Observatory LSP - Test Local Minik | [1,2,5,8,9,10,12,15,16,17,19,20,22]
+18.cilogon:/client_id/79d280aef88dd3c97bb1cd92f8217286               | SIMPL                                    | [18]
+19.cilogon:/client_id/7ae419868b97e81644ced9886ffbcec                | LSST LSP Stable SSO                      | [1,2,5,8,9,10,12,15,16,17,19,20,22]
+20.cilogon:/lsst/prod/linking                                        | LSST LSP Stable SSO                      | [1,2,5,8,9,10,12,15,16,17,19,20,22]
+21.cilogon:/lsst/prod/onboarding                                     | LSST production onboarding client.       | [14,21,23]
+22.cilogon:/lsst/test/linking                                        | LSST LSP Stable SSO                      | [1,2,5,8,9,10,12,15,16,17,19,20,22]
+23.cilogon:/lsst/test/onboarding                                     | LSST test onboarding client.             | [14,21,23]
+24.cilogon:test/surge/polo1                                          | Test Client for Surge on Production      | [24,25,26]
+25.cilogon:test/surge/polo2                                          | Test client for Surge on Production      | [24,25,26]
+26.cilogon:test/surge/prod                                           | Test client for Surge on Production      | [24,25,26]
+27.myproxy:oa4mp,2012:/client_id/1dc8255229400b1375490ce48e3c5b2e    | The LSST Science Platform                | [27,31]
+28.myproxy:oa4mp,2012:/client_id/3089d7c41fb49224bd3faa3eb4de8dc     | clowder                                  | [28]
+29.myproxy:oa4mp,2012:/client_id/382e3cf39d55fb9ba4234ba3e3e93dd2    | Secops Portal - Dev                      | [4,6,29]
+30.myproxy:oa4mp,2012:/client_id/e94d6f51bec554e6c7dfbf8f53eebdb     | NCSA Identity dev/test                   | [30]
+31.myproxy:oa4mp,2012:/client_id/f81eb58eb79ecd002e3de77cf1593942    | The LSST Science Platform (integration t | [27,31]
+
+Here is a break down as equivalence classes
+Indices                            | ldap |      Comment                              |  internal ID
+[0]                                |   4  | NCSA, cn, isMemberOf*, uid uidNumber      | 2f98a0298b27c2d8
+[1,2,5,8,9,10,12,15,16,17,19,20,22]|      | LSST linking                              | 3258ed63b62d1a78
+[3,7]                              |   4  | NCSA email, cn, isMemberOf, uid uidNumber | 2f98a0298b27c2d8
+[4,6,29]                           |   1  |    "       "                              | 2f98a0298b27c2d8
+[11]                               |   -  | LSST onboarding                           | 3258ed63b62d1a78
+[13]                               |   4  | NCSA email, cn, isMemberOf, uid uidNumber | 3258ed63b62d1a78
+                                          | onboarding for LSST                       |
+[14,21,23]                         |   1  | LSST onboarding                           |
+[18]                               |   4  | Syngenta, cn, isMemberOf*, email          | 58a170bfe4a59c05
+[24,25,26]                         |   4  | LSST linking                              |
+[27,31]                            |   4  | NCSA email, cn, isMemberOf*, uid          | 2f98a0298b27c2d8
+                                          |  uidNumber                                |
+[28]                               |   4  | ? mail, cn, isMemberOf                    | 1eb569a2c60c62ab
+                                          | Very odd one. Says it was auto-converted  |
+                                          | from old LDAP, so this might be out of    |
+                                          | use.                                      |
+[30]                               | test2| Old and very strange. Doubt it even works.|
+
+* = return this as a JSON structure
++ = return this as a list
+
+List of admins and addresses
+   email                               | last modified
+ 0.web@ncsa.illinois.edu               | 2020-10-05T21:46:46.000Z
+ 1.rra@lsst.org                        | 2020-03-24T18:16:40.000Z
+ 2.sqre-admin@lists.lsst.org           | 2020-06-08T18:57:25.000Z
+ 3.security-admin@ncsa.illinois.edu    | 2020-03-30T18:39:47.000Z
+ 4.security-admin@ncsa.illinois.edu    | 2019-10-18T13:58:05.000Z
+ 5.afausti@lsst.org                    | 2020-09-10T18:11:39.000Z
+ 6.security-admin@ncsa.illinois.edu    | 2019-10-28T22:24:28.000Z
+ 7.security-admin@ncsa.illinois.edu    | 2020-03-10T21:11:37.000Z
+ 8.sqre-admin@lists.lsst.org           | 2020-05-11T16:24:42.000Z
+ 9.sqre-admin@lists.lsst.org           | 2020-06-08T18:54:36.000Z
+10.sqre-admin@lists.lsst.org           | 2020-06-08T18:55:55.000Z
+11.gaynor@illinois.edu                 | 2021-02-16T21:22:55.000Z
+12.athornton@lsst.org                  | 2020-04-29T17:06:22.000Z
+13.security-admin@ncsa.illinois.edu    | 2019-10-18T13:58:05.000Z
+14.help+its@ncsa.illinois.edu          | 2019-10-18T13:58:05.000Z
+15.bvan@slac.stanford.edu              | 2019-10-18T13:58:05.000Z
+16.bvan@slac.stanford.edu              | 2019-10-18T13:58:05.000Z
+17.cbanek@lsst.org                     | 2020-12-17T12:51:35.000Z
+18.kooper@illinois.edu                 | 2020-12-02T20:51:15.000Z
+19.bvan@slac.stanford.edu              | 2019-10-18T13:58:05.000Z
+20.bvan@slac.stanford.edu              | 2021-02-17T16:27:13.000Z
+21.help+its@ncsa.illinois.edu          | 2021-02-17T15:46:39.000Z
+22.bvan@slac.stanford.edu              | 2021-02-17T16:26:19.000Z
+23.help+its@ncsa.illinois.edu          | 2021-02-17T15:47:38.000Z
+24.gaynor@illinois.edu                 | 2020-04-21T19:11:35.000Z
+25.gaynor@illinois.edu                 | 2019-10-18T13:58:05.000Z
+26.gaynor@illinois.edu                 | 2020-05-15T14:40:23.000Z
+27.athornton@lsst.org                  | 2019-10-18T13:58:05.000Z
+28.kooper@illinois.edu                 | 2020-05-05T00:39:55.000Z
+29.security-admin@ncsa.illinois.edu    | 2019-10-18T13:58:05.000Z
+30.tolbert@illinois.edu                | 2019-10-18T13:58:05.000Z
+31.athornton@lsst.org                  | 2019-10-18T13:58:05.000Z
+
+--- OLD LSST linking
+{
+ "claims":  {
+  "preProcessing": {"script":   [
+   "setEnv('vo','voPersonExternalID');",
+   "setEnv('ncsa','https://idp.ncsa.illinois.edu/idp/shibboleth');",
+   "# if the IDP is NCSA, just set the uid and do the second LDAP search, otherwise, search first on voPersonExternalID to set it.",
+   "if[",
+     "equals(get('idp'),'${ncsa}')",
+   "]then[",
+     "set('uid',drop('@ncsa.illinois.edu',get('eppn'))),",
+     "set('${vo}',get('eppn'))",
+   "]else[",
+     "set_claim_source('LDAP','3258ed63b62d1a78')",
+   "];",
+   "set_claim_source('ncsa-default','uid');"
+  ]},
+  "sourceConfig": [{"ldap":   {
+   "address": "ldap4.ncsa.illinois.edu",
+   "authorizationType": "none",
+   "contextName": "",
+   "enabled": "true",
+   "failOnError": "true",
+   "id": "3258ed63b62d1a78",
+   "port": 636,
+   "preProcessing":    {
+    "script":     [
+     "# Set some variables to keep the verbosity down. These are mostly the IDPs.",
+     "# Note that this must run only before the first LDAP query.",
+     "setEnv('vo','voPersonExternalID');",
+     "setEnv('github','http://github.com/login/oauth/authorize');",
+     "setEnv('google','http://google.com/accounts/o8/id');",
+     "setEnv('orcid','http://orcid.org/oauth/authorize');",
+     "setEnv('ncsa','https://idp.ncsa.illinois.edu/idp/shibboleth');",
+     "#  Now figure out which IDP was used and set voPersonExternalID so it may be searched for.",
+     "xor{",
+     "    if[equals(get('idp'),'${github}')]then[set('${vo}',concat(get('oidc'),'@github.com'))],",
+     "    if[equals(get('idp'),'${google}')]then[set('${vo}',concat(get('oidc'),'@accounts.google.com'))],",
+     "    if[equals(get('idp'),'${orcid}')]then[set('${vo}',replace(get('oidc'),'http://','https://'))],",
+     "    if[hasClaim('eppn')]then[set('${vo}',get('eppn'))],",
+     "    if[hasClaim('eptid')]then[set('${vo}',get('eptid'))]",
+     "};"
+    ],
+    "version": "1.0"
+   },
+   "searchAttributes": [   {
+    "name": "uid",
+    "returnAsList": false,
+    "returnName": "uid"
+   }],
+   "searchBase": "ou=People,dc=ncsa,dc=illinois,dc=edu",
+   "searchFilterAttribute": "voPersonExternalID",
+   "searchName": "voPersonExternalID",
+   "ssl":    {
+    "tlsVersion": "TLS",
+    "useJavaTrustStore": true
+   }
+  }}]
+ },
+ "config":  [
+  "Configuration that contains new scripting notation 2/25/2019",
+  "This is currently deployed on production for LSST clients to link users, setting voPersonExternalID",
+  "then searching ldap for this value."
+ ],
+ "isSaved": true
+}
+
+--- OLD LSST onboarding
+{
+ "claims":  {
+  "postProcessing": {"$xor":   [
+      {
+    "$if": [{"$hasClaim": ["eppn"]}],
+    "$then": [{"$set":     [
+     "voPersonExternalID",
+     {"$get": ["eppn"]}
+    ]}]
+   },
+      {
+    "$if": [{"$hasClaim": ["eptid"]}],
+    "$then": [{"$set":     [
+     "voPersonExternalID",
+     {"$get": ["eptid"]}
+    ]}]
+   },
+      {
+    "$if": [{"$equals":     [
+     {"$get": ["idp"]},
+     "http://github.com/login/oauth/authorize"
+    ]}],
+    "$then": [{"$set":     [
+     "voPersonExternalID",
+     {"$concat":      [
+      {"$get": ["oidc"]},
+      "@github.com"
+     ]}
+    ]}]
+   },
+      {
+    "$if": [{"$equals":     [
+     {"$get": ["idp"]},
+     "http://google.com/accounts/o8/id"
+    ]}],
+    "$then": [{"$set":     [
+     "voPersonExternalID",
+     {"$concat":      [
+      {"$get": ["oidc"]},
+      "@accounts.google.com"
+     ]}
+    ]}]
+   },
+      {
+    "$if": [{"$equals":     [
+     {"$get": ["idp"]},
+     "http://orcid.org/oauth/authorize"
+    ]}],
+    "$then": [{"$set":     [
+     "voPersonExternalID",
+     {"$replace":      [
+      {"$get": ["oidc"]},
+      "http://",
+      "https://"
+     ]}
+    ]}]
+   }
+  ]},
+  "preProcessing": [  {
+   "$if": ["$true"],
+   "$then": [{"$set_claim_source":    [
+    "LDAP",
+    "3258ed63b62d1a78"
+   ]}]
+  }],
+  "sourceConfig": [{"ldap":   {
+   "address": "ldap1.ncsa.illinois.edu",
+   "authorizationType": "none",
+   "contextName": "",
+   "enabled": "true",
+   "failOnError": "false",
+   "name": "3258ed63b62d1a78",
+   "port": 636,
+   "postProcessing": [   {
+    "$if": [{"$match":     [
+     "${idp}",
+     "https://idp.ncsa.illinois.edu/idp/shibboleth"
+    ]}],
+    "$then":     [
+     {"$set":      [
+      "sub",
+      {"$get": ["eppn"]}
+     ]},
+     {"$exclude": ["foo"]}
+    ]
+   }],
+   "preProcessing": [   {
+    "$else": [{"$get_claims": ["$false"]}],
+    "$if": [{"$match":     [
+     "${idp}",
+     "https://idp.ncsa.illinois.edu/idp/shibboleth"
+    ]}],
+    "$then": [{"$set":     [
+     "foo",
+     {"$drop":      [
+      "@ncsa.illinois.edu",
+      "${eppn}"
+     ]}
+    ]}]
+   }],
+   "searchAttributes":    [
+        {
+     "name": "mail",
+     "returnAsList": false,
+     "returnName": "email"
+    },
+        {
+     "name": "uid",
+     "returnAsList": false,
+     "returnName": "uid"
+    },
+        {
+     "name": "uid",
+     "returnAsList": false,
+     "returnName": "uid"
+    },
+        {
+     "name": "uidNumber",
+     "returnAsList": false,
+     "returnName": "uidNumber"
+    },
+        {
+     "name": "cn",
+     "returnAsList": false,
+     "returnName": "name"
+    },
+        {
+     "isGroup": true,
+     "name": "memberOf",
+     "returnAsList": false,
+     "returnName": "isMemberOf"
+    }
+   ],
+   "searchBase": "ou=People,dc=ncsa,dc=illinois,dc=edu",
+   "searchName": "foo",
+   "ssl":    {
+    "tlsVersion": "TLS",
+    "useJavaTrustStore": true
+   }
+  }}]
+ },
+ "config": "LSST client configuration, created by Jeff Gaynor 6/19/2018",
+ "isSaved": true
+}

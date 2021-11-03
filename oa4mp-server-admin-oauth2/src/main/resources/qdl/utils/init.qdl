@@ -1,5 +1,7 @@
 /*
-   Standard initialization for most scripts.
+   Standard initialization for most scripts.  Since many scripts use this,
+   it may be called multiple times, so it is best to keep this simple and mostly
+   set useful constants in it.
 
    Jeff Gaynor
    created: 2020-10-31T11:57:45.909Z

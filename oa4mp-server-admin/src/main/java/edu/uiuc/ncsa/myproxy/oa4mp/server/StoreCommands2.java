@@ -1561,17 +1561,21 @@ public abstract class StoreCommands2 extends StoreCommands {
                     return;
                 }
             }
-
-            Identifiable storedVersion= getStoreArchiver().getVersion(BasicIdentifier.newID(rawID), targetVersion );
+             Identifiable identifiable = findItem(inputLine);
+            if(identifiable == null){
+                say("sorry, no such object");
+                return;
+            }
+            Identifiable storedVersion= getStoreArchiver().getVersion(identifiable.getIdentifier(), targetVersion );
             if(storedVersion == null){
                 say("sorry, but the version you requested for id \"" + rawID  + "\" does not exist.");
             }
-            if (getInput("Are you sure that you want to replace the current version with version \"" + targetVersion + "\"?(y/n)", "n").equals("y")) {
+            if (getInput("Are you sure that you want to replace the current version with version \"" + (targetVersion==-1?"latest":targetVersion) + "\"?(y/n)", "n").equals("y")) {
                 // TODO Maybe put some version information inside the object?????
                 // Practical problem is that there is no place to necessarily put it in the general case.
                 // So version number, timestamp for version?
                 // What to do with these if the version is restored?
-                storedVersion.setIdentifier(BasicIdentifier.newID(rawID));
+                storedVersion.setIdentifier(identifiable.getIdentifier());
                 getStore().save(storedVersion);
                 say("done! Note: you may have to e.g. approve this again if it is a client.");
                 return;
@@ -1603,12 +1607,17 @@ public abstract class StoreCommands2 extends StoreCommands {
             return;
         }
         // If we are at this point, then the user wants to version the object
-        DoubleHashMap<URI, Long> versionNumbers = getStoreArchiver().getVersions(identifiable.getIdentifier());
-        if(versionNumbers== null || versionNumbers.isEmpty()){
-            say("no versions found");
+        if(identifiable == null){
+            // they supplied non-existent id
+            say("object not found.");
             return;
         }
-        long newIndex = getStoreArchiver().getLatestVersionNumber(versionNumbers) + 1;
+        DoubleHashMap<URI, Long> versionNumbers = getStoreArchiver().getVersions(identifiable.getIdentifier());
+        long newIndex =0L; // for first version if none found
+        if(versionNumbers!= null && !versionNumbers.isEmpty()){
+            newIndex = getStoreArchiver().getLatestVersionNumber(versionNumbers) + 1;
+        }
+        // archive /testScheme:oa4md,2018:/client_id/f25ffda14af7100284c0234c8fb836a
         if (!getInput("Archive object \"" + identifiable.getIdentifierString() + "\"?(y/n)", "n").equals("y")) {
             say("aborted.");
             return;
@@ -1674,7 +1683,7 @@ public abstract class StoreCommands2 extends StoreCommands {
 
         }
 
-        DoubleHashMap<URI, Long> versionNumbers = getStoreArchiver().getVersions(BasicIdentifier.newID(uri));
+        DoubleHashMap<URI, Long> versionNumbers = getStoreArchiver().getVersions(identifiable.getIdentifier());
         if (showArg.equalsIgnoreCase(ARCHIVE_LATEST_VERSION_ARG)) {
             targetVersion = getStoreArchiver().getLatestVersionNumber(versionNumbers);
         } else {

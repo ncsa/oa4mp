@@ -172,7 +172,7 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
             say("Sorry, there is no admin client for this identifier.");
             return;
         }
-        say("This admin client manages " + permissionsStore.getClientCount(adminClient.getIdentifier()) + " out of " + adminClient.getMaxClients() + ".");
+        say("This admin client manages " + permissionsStore.getClientCount(adminClient.getIdentifier()) + " out of a possible " + adminClient.getMaxClients() + ".");
     }
 
 

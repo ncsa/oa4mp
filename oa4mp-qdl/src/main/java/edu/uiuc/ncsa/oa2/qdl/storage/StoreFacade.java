@@ -215,12 +215,15 @@ public class StoreFacade implements QDLModuleMetaClass {
         try {
             setStoreAccessor(createAccessor(storeType));
         } catch (Exception x) {
+            if(x instanceof RuntimeException){
+                throw (RuntimeException)x;
+            }
             // If loading the store blows up,
             throw new QDLException("Error loading store: for file " + file + ", config " + cfgName + ", type " + storeType);
         }
         if (storeAccessor == null) {
             // If there is no such store.
-            throw new QDLException("Error loading store: for file " + file + ", config " + cfgName + ", type " + storeType);
+            throw new QDLException("unsupported type for store '" + storeType + "': config file =" + file + ", config name= " + cfgName );
         }
     }
 
@@ -258,6 +261,8 @@ public class StoreFacade implements QDLModuleMetaClass {
                 storeAccessor = new QDLStoreAccessor(storeType, getEnvironment().getTxStore(), getEnvironment().getMyLogger());
                 storeAccessor.setMapConverter(new TXRStemMC(getEnvironment().getTxStore().getMapConverter()));
                 break;
+            default:
+                throw new QDLException("unsupported store '" + storeType + "'");
 
         }
         return storeAccessor;
