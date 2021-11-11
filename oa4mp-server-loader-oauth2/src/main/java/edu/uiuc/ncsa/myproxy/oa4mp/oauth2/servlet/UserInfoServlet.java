@@ -45,6 +45,13 @@ public class UserInfoServlet extends BearerTokenServlet {
         AccessTokenImpl at = UITokenUtils.getAT(getRawAT(request));
         TokenManagerServlet.State state = new TokenManagerServlet.State();
         OA2ServiceTransaction transaction = findTransaction(at, state);
+        // Fix for CIL-1124
+        if(!transaction.isAccessTokenValid()){
+            throw new OA2RedirectableError(OA2Errors.ACCESS_DENIED,
+                     "access denied", HttpStatus.SC_UNAUTHORIZED,
+                     transaction.getRequestState(),
+                     transaction.getCallback());
+        }
         // CIL-1104 fix. Only give back user info if the original request asked for openid
         // We do not do this for subsequent requests because, since this is private information,
         // the user must consent to it, so this scope *has* to be in the initial request.

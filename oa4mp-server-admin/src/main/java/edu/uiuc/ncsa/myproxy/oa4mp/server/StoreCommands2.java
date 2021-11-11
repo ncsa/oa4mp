@@ -372,7 +372,12 @@ public abstract class StoreCommands2 extends StoreCommands {
         sayi("search " + KEY_SHORTHAND_PREFIX + "email " + SEARCH_SHORT_REGEX_FLAG + " \".*bigstate\\.edu.*\" " + SEARCH_DATE_FLAG + " creation_ts " + SEARCH_BEFORE_TS_FLAG + " 2021-01-02 " + SEARCH_RESULT_SET_NAME + " last_year_email");
         say("Searches per date as in the previous example and further restricts it to matching the given key.");
         say("This also stores the result under the name last_year_email. See also the rs command help");
-
+        say("E.g. A date search");
+        say("This searches by client id for clients created between the given dates. It stores the result");
+        say("in the result set named 's234'");
+        say("clients>search >client_id -r .*234.* -date creation_ts -after 2020-05-01 -before 2020-05-30 -rs s234");
+        say("got 4 matches");
+        say("\nSee also: rs");
     }
 
 
@@ -470,6 +475,7 @@ public abstract class StoreCommands2 extends StoreCommands {
         } else {
             if (inputLine.hasArg("--ex")) {
                 showSearchHelpExamples();
+                return;
             }
         }
 
@@ -594,6 +600,9 @@ public abstract class StoreCommands2 extends StoreCommands {
     // search >client_id -r .*234.* -rs all-234
     private Date getDateFromArg(InputLine inputLine, String arg) throws ParseException {
         String computedDateString = inputLine.getNextArgFor(arg);
+        if(computedDateString.equals("now")){
+            return new Date();
+        }
         inputLine.removeSwitchAndValue(arg);
         if (-1 == computedDateString.indexOf("T")) {
             // then there is no time, just a date. Convert to ISO

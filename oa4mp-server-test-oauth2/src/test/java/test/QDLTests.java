@@ -4,6 +4,7 @@ package test;
 import edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.OA2State;
 import edu.uiuc.ncsa.qdl.AbstractQDLTester;
 import edu.uiuc.ncsa.qdl.TestUtils;
+import edu.uiuc.ncsa.qdl.exceptions.QDLStatementExecutionException;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 
 /**
@@ -52,12 +53,13 @@ public class QDLTests extends AbstractQDLTester {
         addLine(script, "groups3. := ['test0', 'test1', 42, 'test3']; // should fail");
         addLine(script, "in_group2(['test0', 'foo', 'test2'], groups3.);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        boolean good=false;
         try {
             interpreter.execute(script.toString());
-            assert false : "Was able to execute in_group2 test against bad list";
-        } catch (IllegalArgumentException iax) {
-            assert true;
+        } catch (QDLStatementExecutionException iax) {
+            good = iax.getCause() instanceof IllegalArgumentException;
         }
+        assert good : "Was able to execute in_group2 test against bad list";
 
     }
 

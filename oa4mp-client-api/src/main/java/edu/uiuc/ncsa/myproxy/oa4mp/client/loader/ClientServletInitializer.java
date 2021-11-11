@@ -59,7 +59,7 @@ public class ClientServletInitializer implements Initialization {
             }
             Cleanup<Identifier, Asset> assetCleanup = ClientServlet.assetCleanup;
             if (ce.isEnableAssetCleanup() && assetCleanup == null) {
-                assetCleanup = new Cleanup<Identifier, Asset>(logger);
+                assetCleanup = new Cleanup<Identifier, Asset>(logger, "asset cleanup");
                 assetCleanup.setStopThread(false);
                 assetCleanup.setMap(ce.getAssetStore());
                 assetCleanup.addRetentionPolicy(new ValidTimestampPolicy(ce.getMaxAssetLifetime()));

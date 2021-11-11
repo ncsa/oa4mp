@@ -15,10 +15,7 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.cache.Cleanup;
 import edu.uiuc.ncsa.security.core.exceptions.IllegalAccessException;
 import edu.uiuc.ncsa.security.core.exceptions.TransactionNotFoundException;
-import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
-import edu.uiuc.ncsa.security.core.util.DateUtils;
-import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
-import edu.uiuc.ncsa.security.core.util.StringUtils;
+import edu.uiuc.ncsa.security.core.util.*;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.server.request.ATRequest;
 import edu.uiuc.ncsa.security.delegation.server.request.IssuerResponse;
@@ -1211,14 +1208,22 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         public TokenExchangeRecordRetentionPolicy(String serviceAddress, boolean safeGC) {
             super(serviceAddress, safeGC);
         }
+        boolean rttracing = true; // This turns on tracing of cleanup independent of the debug state or the log fills.
 
+        protected void trace(String x) {
+            if (rttracing) {
+                DebugUtil.trace(this, x);
+            }
+        }
         @Override
         public boolean retain(Object key, Object value) {
+            TXRecord txr = (TXRecord) value;
+            trace("checking tr_record " + txr.getIdentifierString());
             if (safeGCSkipIt(key.toString())) {
+                trace("safe GFC, skipping...");
                 return true;
             }
             // key is the identifier, values is the TXRecord
-            TXRecord txr = (TXRecord) value;
             if (System.currentTimeMillis() <= txr.getExpiresAt()) {
                 return true; // so keep it.
             }

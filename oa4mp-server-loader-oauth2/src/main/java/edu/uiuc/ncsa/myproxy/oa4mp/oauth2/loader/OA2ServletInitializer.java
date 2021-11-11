@@ -14,8 +14,8 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.util.NewClientNotifier;
 import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.functions.FTStack;
-import edu.uiuc.ncsa.qdl.module.ModuleMap;
-import edu.uiuc.ncsa.qdl.state.ImportManager;
+import edu.uiuc.ncsa.qdl.module.MAliases;
+import edu.uiuc.ncsa.qdl.module.MTemplates;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.StateUtils;
 import edu.uiuc.ncsa.qdl.state.SymbolStack;
@@ -59,21 +59,26 @@ public class OA2ServletInitializer extends OA4MPServletInitializer {
         DebugUtil.setPrintTS(oa2SE.isPrintTSInDebug());
         if (oa2SE.isRefreshTokenEnabled()) {
             MyProxyDelegationServlet.transactionCleanup.getRetentionPolicies().clear(); // We need a different set of policies than the original one.
+
             MyProxyDelegationServlet.transactionCleanup.setCleanupInterval(oa2SE.getCleanupInterval());
+            DebugUtil.trace(this, "setting transaction cleanup interval to " + oa2SE.getCleanupInterval() + " ms.");
             MyProxyDelegationServlet.transactionCleanup.addRetentionPolicy(
                     new RefreshTokenRetentionPolicy(
                             (RefreshTokenStore) oa2SE.getTransactionStore(),
                             oa2SE.getTxStore(),
                             oa2SE.getServiceAddress().toString(),
                             oa2SE.isSafeGC()));
-            oa2SE.getMyLogger().info("Initialized refresh token cleanup thread with interval " + oa2SE.getCleanupInterval());
+            MyProxyDelegationServlet.transactionCleanup.setStopThread(false);
+            MyProxyDelegationServlet.transactionCleanup.start(); // start it here.
+            oa2SE.getMyLogger().info("Started refresh token cleanup thread with interval " + oa2SE.getCleanupInterval());
         }
         if (!ClaimSourceFactory.isFactorySet()) {
             ClaimSourceFactory.setFactory(new ClaimSourceFactoryImpl());
         }
         if (txRecordCleanup == null) {
-            txRecordCleanup = new Cleanup<>(getEnvironment().getMyLogger());
+            txRecordCleanup = new Cleanup<>(getEnvironment().getMyLogger(), "TX record cleanup");
             txRecordCleanup.setCleanupInterval(oa2SE.getCleanupInterval());
+            DebugUtil.trace(this, "setting tx record cleanup interval to " + oa2SE.getCleanupInterval() + " ms.");
             txRecordCleanup.setStopThread(false);
             txRecordCleanup.setMap(oa2SE.getTxStore());
             txRecordCleanup.addRetentionPolicy(new TokenExchangeRecordRetentionPolicy(oa2SE.getServiceAddress().toString(), oa2SE.isSafeGC()));
@@ -91,12 +96,12 @@ public class OA2ServletInitializer extends OA4MPServletInitializer {
         StateUtils.setFactory(new StateUtils() {
             @Override
             public State create() {
-                return new OA2State(ImportManager.getResolver(),
+                return new OA2State(MAliases.newMInstances(),
                         new SymbolStack(),
                         new OpEvaluator(),
                         MetaEvaluator.getInstance(),
                         new FTStack(),
-                        new ModuleMap(),
+                        new MTemplates(),
                         null, // no logging at least for now
                         true,
                         true,
@@ -105,9 +110,6 @@ public class OA2ServletInitializer extends OA4MPServletInitializer {
                         null); // default in server mode, but can be overridden later
             }
         });
- //       oa2SE.getMyLogger().info("Starting email notification thread.");
-
- //       oa2SE.getMailUtil().start();  // Have this run in its own thread.
     }
 
 }

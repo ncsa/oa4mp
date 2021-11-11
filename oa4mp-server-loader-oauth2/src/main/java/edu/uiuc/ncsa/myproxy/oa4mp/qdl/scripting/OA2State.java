@@ -7,8 +7,8 @@ import edu.uiuc.ncsa.myproxy.oa4mp.qdl.QDLXMLConstants;
 import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.functions.FTStack;
-import edu.uiuc.ncsa.qdl.module.ModuleMap;
-import edu.uiuc.ncsa.qdl.state.ImportManager;
+import edu.uiuc.ncsa.qdl.module.MAliases;
+import edu.uiuc.ncsa.qdl.module.MTemplates;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.SymbolStack;
 import edu.uiuc.ncsa.security.core.Identifier;
@@ -28,20 +28,20 @@ import java.util.List;
  * on 10/9/20 at  4:45 PM
  */
 public class OA2State extends State {
-    public OA2State(ImportManager resolver,
+    public OA2State(MAliases mAliases,
                     SymbolStack symbolStack,
                     OpEvaluator opEvaluator,
                     MetaEvaluator metaEvaluator,
                     FTStack ft,
-                    ModuleMap moduleMap,
+                    MTemplates mTemplates,
                     MyLoggingFacade myLoggingFacade,
                     boolean isServerMode,
                     boolean isRestrictedIO,
                     boolean assertionsOn,
                     boolean strictACLs,
                     JSONWebKeys keys) {
-        super(resolver, symbolStack, opEvaluator, metaEvaluator,
-                ft, moduleMap, myLoggingFacade, isServerMode, isRestrictedIO, assertionsOn);
+        super(mAliases, symbolStack, opEvaluator, metaEvaluator,
+                ft, mTemplates, myLoggingFacade, isServerMode, isRestrictedIO, assertionsOn);
         this.strictACLs = strictACLs;
         this.jsonWebKeys = keys;
     }
@@ -162,22 +162,22 @@ public class OA2State extends State {
     }
 
     @Override
-    public State newInstance(ImportManager resolver,
+    public State newInstance(MAliases mAliases,
                              SymbolStack symbolStack,
                              OpEvaluator opEvaluator,
                              MetaEvaluator metaEvaluator,
                              FTStack ftStack,
-                             ModuleMap moduleMap,
+                             MTemplates mTemplates,
                              MyLoggingFacade myLoggingFacade,
                              boolean isServerMode,
                              boolean isRestrictedIO,
                              boolean assertionsOn) {
-        return new OA2State(resolver,
+        return new OA2State(mAliases,
                 symbolStack,
                 opEvaluator,
                 metaEvaluator,
                 ftStack,
-                moduleMap,
+                mTemplates,
                 myLoggingFacade,
                 isServerMode,
                 isRestrictedIO,

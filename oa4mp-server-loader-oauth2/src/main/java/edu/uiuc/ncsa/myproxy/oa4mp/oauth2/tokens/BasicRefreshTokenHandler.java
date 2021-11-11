@@ -226,7 +226,7 @@ public class BasicRefreshTokenHandler extends AbstractPayloadHandler implements 
 */
 
         rtData.put(NOT_VALID_BEFORE, (currentTS - 5000L) / 1000L); // not before is 5 minutes before current
-        DebugUtil.trace(this, "@@Setting refresh lifetime = " + transaction.getRefreshTokenLifetime());
+        DebugUtil.trace(this, "Setting refresh lifetime = " + transaction.getRefreshTokenLifetime());
         rtData.put(ISSUED_AT, currentTS / 1000L);
       //  rtData.put(EXPIRATION, (currentTS + transaction.getRefreshTokenLifetime()) / 1000L);
         if (transaction.getRefreshToken() != null) {

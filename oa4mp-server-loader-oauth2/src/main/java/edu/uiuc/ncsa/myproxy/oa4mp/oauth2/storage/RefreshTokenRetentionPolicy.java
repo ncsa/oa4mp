@@ -38,7 +38,7 @@ public class RefreshTokenRetentionPolicy extends SafeGCRetentionPolicy {
         return true;
     }
 
-    boolean rttracing = false; // This turns on tracing of cleanup independent of the debug state or the log fills.
+    boolean rttracing = true; // This turns on tracing of cleanup independent of the debug state or the log fills.
 
     protected void trace(String x) {
         if (rttracing) {
@@ -53,15 +53,23 @@ public class RefreshTokenRetentionPolicy extends SafeGCRetentionPolicy {
      */
     @Override
     public boolean retain(Object key, Object value) {
+        OA2ServiceTransaction st2 = (OA2ServiceTransaction) value;
+        trace("client " + st2.getClient().getIdentifierString() + ", checking transaction " + st2.getAuthorizationGrant().getToken());
+
         if (safeGCSkipIt(key.toString())) {
+            trace( "safe GC skipping...");
             return true;
         }
-        OA2ServiceTransaction st2 = (OA2ServiceTransaction) value;
 
         String token = null;
-
-        //RefreshToken rt = st2.getRefreshToken();
-        //long timeout = st2.getRefreshTokenLifetime();
+        //CIL-1121 CIL-1122. Keeping pending device flows managed to break cleaning up
+        // abandoned flows.
+        // Check for abandoned flows: In that case, the authz grant has expired
+        // and there is a null access token.
+        if((st2.getAuthorizationGrant().isExpired() || !st2.isAuthGrantValid()) && (st2.getAccessToken() == null)){
+            trace( "found abandoned transaction for " + st2.getAuthorizationGrant().getToken());
+            return false;
+        }
         long timeout = -1L;
         if (st2.hasRefreshToken()) {
             RefreshTokenImpl rt = (RefreshTokenImpl) st2.getRefreshToken();
@@ -84,6 +92,7 @@ public class RefreshTokenRetentionPolicy extends SafeGCRetentionPolicy {
             }
             token = rt.getToken();
         } else {
+            trace("Checking AT or Authz");
 
             if (st2.hasAccessToken()) {
                 trace("Checking access token");
@@ -96,19 +105,26 @@ public class RefreshTokenRetentionPolicy extends SafeGCRetentionPolicy {
                 timeout = st2.getAuthzGrantLifetime();
             }
         }
+        trace("timeout: " + timeout);
+
         try {
             if (timeout <= 0) {
+                trace("check timeout for token " + token + " with default timeout");
                 DateUtils.checkTimestamp(token); // use default????
             } else {
+                trace("check timeout for token " + token + " with issue date " + DateUtils.getDate(token));
                 DateUtils.checkTimestamp(token, timeout);
             }
             return true;
 
         } catch (InvalidTimestampException its) {
-
-            if(0 < txStore.getCountByParent(st2.getIdentifier())){
+            trace("timestamp expired");
+            int parentCount = txStore.getCountByParent(st2.getIdentifier());
+            trace("              parent count=" + parentCount);
+            if(0 < parentCount){
                 // If there are ANY outstanding TX records, do not GC. Let the TX store
                 // figure out what to keep.
+                trace("tx store parent count: 0<" + parentCount + ", returning true (retain it) ");
                 return true;
             }
             if (st2.getClient().isDebugOn()) {
@@ -116,6 +132,8 @@ public class RefreshTokenRetentionPolicy extends SafeGCRetentionPolicy {
                 String msg = (new Date(System.currentTimeMillis())) + ": ***Removing token " + token + " with time out " + timeout;
                 debugUtil.trace(this, msg);
             }
+            trace("tx store parent count: 0, returning false (do NOT retain it) ");
+
             return false;
         }
     }

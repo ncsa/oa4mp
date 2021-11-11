@@ -157,19 +157,22 @@ public class OA4MPServletInitializer implements Initialization {
 
         if (transactionCleanup == null) {
 
-            transactionCleanup = new Cleanup<>(logger);
+            transactionCleanup = new Cleanup<>(logger, "transaction cleanup");
+
             MyProxyDelegationServlet.transactionCleanup = transactionCleanup; // set it in the servlet
+
             transactionCleanup.setStopThread(false);
             transactionCleanup.setMap(env.getTransactionStore());
             transactionCleanup.addRetentionPolicy(new ValidTimestampPolicy());
-            transactionCleanup.start();
-            logger.info("Starting transaction store cleanup thread");
+            // Part of migration away from OAuth 1.0a. Do not start this here
+       //     transactionCleanup.start();
+       //     logger.info("Starting transaction store cleanup thread");
         }
         Cleanup<Identifier, CachedObject> myproxyConnectionCleanup = MyProxyDelegationServlet.myproxyConnectionCleanup;
         int i = 0;
 
         if (myproxyConnectionCleanup == null) {
-            myproxyConnectionCleanup = new Cleanup<Identifier, CachedObject>(logger) {
+            myproxyConnectionCleanup = new Cleanup<Identifier, CachedObject>(logger, "myproxy connection cleanup") {
                 @Override
                 public List<CachedObject> age() {
                     List<CachedObject> x = super.age();
@@ -190,6 +193,10 @@ public class OA4MPServletInitializer implements Initialization {
                 }
             };
             MyProxyDelegationServlet.myproxyConnectionCleanup = myproxyConnectionCleanup; // set it in the servlet
+            // Set the cleanup interval much higher than the default (1 minute). We don't service
+            // MyProxy requests much any more, so it can be set a lot lower.
+            MyProxyDelegationServlet.myproxyConnectionCleanup.setCleanupInterval(6*60*1000L);
+            DebugUtil.trace(this, "setting MyProxy connection cleanup interval to 6 hours.");
             myproxyConnectionCleanup.setStopThread(false);
             Cache myproxyConnectionCache = MyProxyDelegationServlet.myproxyConnectionCache;
 
