@@ -4,9 +4,11 @@ import edu.uiuc.ncsa.myproxy.oa4mp.client.Asset;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.XMLConverter;
+import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
 import edu.uiuc.ncsa.security.storage.MemoryStore;
 
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -49,6 +51,11 @@ public class MemoryAssetStore extends MemoryStore<Asset> implements AssetStore {
     @Override
     public XMLConverter<Asset> getXMLConverter() {
         return new AssetConverter(new AssetSerializationKeys(), identifiableProvider);
+    }
+
+    @Override
+    public List<Asset> getMostRecent(int n, List<String> attributes) {
+        return GenericStoreUtils.getMostRecent(this, n,attributes);
     }
 }
 

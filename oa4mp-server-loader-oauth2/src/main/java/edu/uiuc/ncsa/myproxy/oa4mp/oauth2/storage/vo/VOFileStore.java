@@ -4,10 +4,12 @@ import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.FileStore;
+import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -59,5 +61,10 @@ public class VOFileStore<V extends VirtualOrganization> extends FileStore<V> imp
         } catch (IOException e) {
             throw new GeneralException("Error serializing item " + t + "to file ");
         }
+    }
+
+    @Override
+    public List<V> getMostRecent(int n, List<String> attributes) {
+        return GenericStoreUtils.getMostRecent(this, n, attributes);
     }
 }

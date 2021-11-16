@@ -5,10 +5,12 @@ import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.storage.FileStore;
+import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -63,4 +65,8 @@ public class FSAssetStore extends FileStore<Asset> implements AssetStore {
         realSave(false, asset); // just save this which updates the index.
     }
 
+    @Override
+    public List<Asset> getMostRecent(int n, List<String> attributes) {
+        return GenericStoreUtils.getMostRecent(this, n, attributes);
+    }
 }

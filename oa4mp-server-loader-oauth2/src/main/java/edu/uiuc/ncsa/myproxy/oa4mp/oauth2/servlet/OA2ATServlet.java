@@ -503,6 +503,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             }
         } else {
             t.setRefreshTokenLifetime(0L);
+            t.setMaxRTLifetime(0L);
         }
 
         return new ATRequest(request, transaction);

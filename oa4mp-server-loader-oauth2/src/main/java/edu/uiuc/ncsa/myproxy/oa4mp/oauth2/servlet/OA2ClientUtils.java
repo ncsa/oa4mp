@@ -8,10 +8,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.IDTokenHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.PayloadHandlerConfigImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.BasicRefreshTokenHandler;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.SciTokenConstants;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.ScitokenHandler;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.WLCGTokenHandler;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.*;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractRegistrationServlet;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
@@ -21,6 +18,7 @@ import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2GeneralError;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTRunner;
+import edu.uiuc.ncsa.security.oauth_2_0.server.RFC9068Constants;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import org.apache.http.HttpStatus;
 
@@ -343,6 +341,11 @@ public class OA2ClientUtils {
                 case SciTokenConstants.SCI_TOKEN_TAG:
                     sth = new ScitokenHandler(st);
                     debugger.trace(OA2ClientUtils.class, "SciTokens access token handler created");
+                    break;
+                case RFC9068Constants.RFC9068_TAG:
+                case RFC9068Constants.RFC9068_TAG2:
+                    sth = new RFC9068ATHandler(st);
+                    debugger.trace(OA2ClientUtils.class, "RFC 9068 access token handler created");
                     break;
                 case AbstractAccessTokenHandler.AT_DEFAULT_HANDLER_TYPE:
                 case AbstractAccessTokenHandler.AT_BASIC_HANDLER_TYPE:

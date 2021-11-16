@@ -8,12 +8,18 @@ import edu.uiuc.ncsa.security.util.json.JSONStore;
 
 import java.io.File;
 import java.util.Date;
+import java.util.List;
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 2/20/19 at  10:13 AM
  */
 public class JSONFileStore<V extends JSONEntry> extends FileStore<V> implements JSONStore<V> {
+    @Override
+    public List<V> getMostRecent(int n, List<String> attributes) {
+        throw new UnsupportedOperationException();
+    }
+
     public JSONFileStore(File storeDirectory,
                          File indexDirectory,
                          IdentifiableProvider<V> identifiableProvider,

@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo;
 
 import edu.uiuc.ncsa.qdl.xml.XMLUtils;
+import edu.uiuc.ncsa.security.core.DateComparable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.IdentifiableImpl;
@@ -17,6 +18,7 @@ import javax.xml.stream.events.XMLEvent;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.Date;
 import java.util.Iterator;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.qdl.QDLXMLConstants.*;
@@ -26,7 +28,12 @@ import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
  * <p>Created by Jeff Gaynor<br>
  * on 2/16/21 at  6:59 AM
  */
-public class VirtualOrganization extends IdentifiableImpl {
+public class VirtualOrganization extends IdentifiableImpl implements DateComparable {
+    @Override
+    public Date getCreationTS() {
+        return new Date(getCreated());
+    }
+
     public VirtualOrganization(Identifier identifier) {
         super(identifier);
     }

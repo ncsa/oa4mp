@@ -70,5 +70,10 @@ public class SQLVOStore<V extends VirtualOrganization> extends SQLStore<V> imple
         value.setLastModified(System.currentTimeMillis());
         super.update(value);
     }
+
+    @Override
+    public String getCreationTSField() {
+        return ((VOSerializationKeys)getMapConverter().getKeys()).created();
+    }
 }
 

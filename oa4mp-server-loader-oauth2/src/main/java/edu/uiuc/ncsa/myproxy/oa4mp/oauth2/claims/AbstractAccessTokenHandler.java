@@ -360,6 +360,9 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
         finish(true, isQuery);
     }
 
+    public AccessToken getSignedAT(JSONWebKey key) {
+            return getSignedAT(key, JWTUtil2.DEFAULT_TYPE);
+    }
     /**
      * Gets the AT data object (which has all the claims in it) and returns a signed access token.
      * This does <b>not</b> set the access token in the transaction but leaves up to the calling
@@ -368,7 +371,7 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
      * @return
      */
     @Override
-    public AccessToken getSignedAT(JSONWebKey key) {
+    public AccessToken getSignedAT(JSONWebKey key, String headerType) {
         if (key == null) {
             oa2se.warn("Error: Null or missing key for signing encountered processing client \"" + transaction.getOA2Client().getIdentifierString() + "\"");
             throw new IllegalArgumentException("Error: Missing JSON web key. Cannto sign access token.");
@@ -390,7 +393,7 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
             throw new IllegalStateException("Error: no JTI. Cannot create access token");
         }
         try {
-            String at = JWTUtil2.createJWT(getAtData(), key);
+            String at = JWTUtil2.createJWT(getAtData(), key,headerType);
             URI jti = URI.create(getAtData().getString(JWT_ID));
             AccessTokenImpl at0 = new AccessTokenImpl(at, jti);
             at0.setLifetime(1000 * (getAtData().getLong(EXPIRATION) - getAtData().getLong(ISSUED_AT)));

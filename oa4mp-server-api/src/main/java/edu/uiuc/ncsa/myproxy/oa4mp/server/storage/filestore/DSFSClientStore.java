@@ -3,9 +3,11 @@ package edu.uiuc.ncsa.myproxy.oa4mp.server.storage.filestore;
 import edu.uiuc.ncsa.security.core.util.IdentifiableProviderImpl;
 import edu.uiuc.ncsa.security.delegation.server.storage.impl.FSClientStore;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
+import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -27,9 +29,8 @@ public class DSFSClientStore extends FSClientStore<Client> {
         super(storeDirectory, indexDirectory, idp, cp, removeEmptyFiles);
     }
 
-
-/*    @Override
-    public IdentifiableProvider getACProvider() {
-        return identifiableProvider;
-    }*/
+    @Override
+    public List<Client> getMostRecent(int n, List<String> attributes) {
+        return GenericStoreUtils.getMostRecent(this, n, attributes);
+    }
 }

@@ -360,6 +360,7 @@ When a new version is deployed, here is the testing order
   -- dev:test/df
      Has basic NCSA QDL. This is for testing device flow on CILogon. Execute
      df
+     Has refresh lifetime 2 hours
      in the CLC and follow the instructions. Once you've done that you should be
      able to do access, refresh, exchange ahd user_info as per usual. Do them to check
   -- dev:test/functor

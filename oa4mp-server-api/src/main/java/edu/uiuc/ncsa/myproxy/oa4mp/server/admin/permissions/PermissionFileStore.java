@@ -14,6 +14,11 @@ import java.util.List;
  * on 10/11/16 at  1:57 PM
  */
 public class PermissionFileStore<V extends Permission> extends FileStore<V> implements PermissionsStore<V> {
+    @Override
+    public List<V> getMostRecent(int n, List<String> attributes) {
+        throw new UnsupportedOperationException("get most recent not supported for permissions");
+    }
+
     public PermissionFileStore(File directory,
                                IdentifiableProvider<V> idp,
                                MapConverter<V> cp,

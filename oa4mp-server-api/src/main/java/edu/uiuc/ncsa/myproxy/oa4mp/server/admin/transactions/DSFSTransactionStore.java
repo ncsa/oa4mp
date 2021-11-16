@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.security.delegation.token.TokenForge;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -29,4 +30,8 @@ public class DSFSTransactionStore<V extends OA4MPServiceTransaction> extends FST
                                 boolean removeEmptyFiles) {
         super(storeDirectory, indexDirectory, idp, tokenForge, cp, removeEmptyFiles);                                                                 }
 
+    @Override
+    public List<V> getMostRecent(int n, List<String> attributes) {
+        return null;
+    }
 }

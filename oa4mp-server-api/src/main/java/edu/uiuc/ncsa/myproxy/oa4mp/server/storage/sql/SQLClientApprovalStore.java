@@ -27,6 +27,11 @@ import java.util.List;
  * on May 26, 2011 at  9:39:26 AM
  */
 public class SQLClientApprovalStore extends SQLStore<ClientApproval> implements ClientApprovalStore<ClientApproval> {
+    @Override
+    public String getCreationTSField() {
+        return ((ClientApprovalKeys)getMapConverter().getKeys()).approvalTS();
+    }
+
     public static final String DEFAULT_TABLENAME = "client_approvals";
 
     public SQLClientApprovalStore(ConnectionPool connectionPool,

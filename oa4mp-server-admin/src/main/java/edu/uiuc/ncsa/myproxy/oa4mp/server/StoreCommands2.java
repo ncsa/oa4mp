@@ -11,6 +11,7 @@ import edu.uiuc.ncsa.security.core.util.*;
 import edu.uiuc.ncsa.security.delegation.token.impl.TokenUtils;
 import edu.uiuc.ncsa.security.storage.XMLMap;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
+import edu.uiuc.ncsa.security.storage.sql.SQLStore;
 import edu.uiuc.ncsa.security.util.cli.*;
 import edu.uiuc.ncsa.security.util.cli.editing.EditorEntry;
 import edu.uiuc.ncsa.security.util.cli.editing.EditorUtils;
@@ -21,6 +22,7 @@ import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
 
 import java.io.*;
+import java.math.BigDecimal;
 import java.net.URI;
 import java.text.ParseException;
 import java.util.*;
@@ -377,6 +379,11 @@ public abstract class StoreCommands2 extends StoreCommands {
         say("in the result set named 's234'");
         say("clients>search >client_id -r .*234.* -date creation_ts -after 2020-05-01 -before 2020-05-30 -rs s234");
         say("got 4 matches");
+        say("E.g. getting the most recent entries");
+        say("search " + NEXT_N_COMMAND + " 15");
+        say("This returns the most recent 15 entries to this store. An argument of -15 woudl return the oldest 15.");
+        say("E.g. search for a subset");
+        say("search -n 5 -out [name, creation_ts, client_id]");
         say("\nSee also: rs");
     }
 
@@ -449,6 +456,7 @@ public abstract class StoreCommands2 extends StoreCommands {
         say(StringUtils.RJustify(SEARCH_REGEX_FLAG + "|" + SEARCH_SHORT_REGEX_FLAG + " regex", w) + link + "attempt to interpret regex as a regular expression");
         say(StringUtils.RJustify(SEARCH_RESULT_SET_NAME + " name", w) + link + "save the result as the name.");
         say(StringUtils.RJustify(SEARCH_DEBUG_FLAG, w) + link + "show stack traces. Only use this if you really need it.");
+        sayi(StringUtils.RJustify(NEXT_N_COMMAND + " = [n]", w) + link + "lists most recent n (0<n) or first n (n<0) entries. No argument implies n = 10.");
         say(StringUtils.RJustify(SEARCH_DATE_FLAG, w) + link + "search by date. You must have at least one time using either " + SEARCH_BEFORE_TS_FLAG + " or " + SEARCH_AFTER_TS_FLAG);
         say(blanks + "For date searches you may use either an ISO 8601 date in the form ");
         say(blanks + "YYYY-MM-DD or time, e.g. 2021-04-05T13:00:00Z");
@@ -462,6 +470,8 @@ public abstract class StoreCommands2 extends StoreCommands {
         showKeyShorthandHelp();
         sayi("If you want to see examples, invoke this with --ex.");
     }
+
+    protected final String NEXT_N_COMMAND = "-n";
 
     @Override
     public void search(InputLine inputLine) {
@@ -478,7 +488,29 @@ public abstract class StoreCommands2 extends StoreCommands {
                 return;
             }
         }
+        int list_n = 10; // default
+        boolean hasListN = inputLine.hasArg(NEXT_N_COMMAND);
 
+        if (hasListN) {
+            if (getStore() instanceof SQLStore) {
+                SQLStore s = (SQLStore) getStore();
+                if (s.getCreationTSField() == null) {
+                    say("Sorry, but this is not supported for this type of store");
+                    return;
+                }
+
+            } else {
+                // Not supported (yet) for memory or file stores...
+                say("Sorry, but this is not supported for this type of store");
+                return;
+            }
+            try {
+                list_n = inputLine.getNextIntArg(NEXT_N_COMMAND);
+            } catch (ArgumentNotFoundException t) {
+
+            }
+
+        }
         boolean showStackTraces = inputLine.hasArg(SEARCH_DEBUG_FLAG);
         boolean storeRS = inputLine.hasArg(SEARCH_RESULT_SET_NAME);
         String rsName = null;
@@ -515,11 +547,12 @@ public abstract class StoreCommands2 extends StoreCommands {
         String condition = null;
         boolean isRegEx = false;
         boolean hasKey = key != null;
+        if (inputLine.hasArg(SEARCH_RETURNED_ATTRIBUTES_FLAG)) {
+            returnedAttributes = inputLine.getArgList(SEARCH_RETURNED_ATTRIBUTES_FLAG);
+            inputLine.removeSwitchAndValue(SEARCH_RETURNED_ATTRIBUTES_FLAG);
+        }
         if (hasKey) {
-            if (inputLine.hasArg(SEARCH_RETURNED_ATTRIBUTES_FLAG)) {
-                returnedAttributes = inputLine.getArgList(SEARCH_RETURNED_ATTRIBUTES_FLAG);
-                inputLine.removeSwitchAndValue(SEARCH_RETURNED_ATTRIBUTES_FLAG);
-            }
+
             condition = inputLine.getLastArg(); // default
             isRegEx = inputLine.hasArg(SEARCH_REGEX_FLAG) || inputLine.hasArg(SEARCH_SHORT_REGEX_FLAG);
             if (isRegEx) {
@@ -534,41 +567,8 @@ public abstract class StoreCommands2 extends StoreCommands {
             }
         }
         try {
-            if (hasKey) {
-                if (hasDate) {
-                    values = getStore().search(
-                            key,
-                            condition,
-                            isRegEx,
-                            returnedAttributes,
-                            dateField,
-                            beforeDate, afterDate);
+            values = getSearchValues(list_n, hasListN, hasDate, dateField, afterDate, beforeDate, key, values, returnedAttributes, condition, isRegEx, hasKey);
 
-                } else {
-                    values = getStore().search(
-                            key,
-                            condition,
-                            isRegEx,
-                            returnedAttributes,
-                            null,
-                            null,
-                            null);
-                }
-            } else {
-                if (hasDate) {
-                    values = getStore().search(
-                            null,
-                            null,
-                            false,
-                            returnedAttributes,
-                            dateField,
-                            beforeDate,
-                            afterDate);
-
-                } else {
-                    // no query, do nothing.
-                }
-            }
             if (values == null) {
                 String kk = getKeyArg(inputLine);
                 say("No searchable criteria found." + ((kk == null) ? " No key or date." : " \"" + kk + "\" is not a valid key for this store."));
@@ -594,13 +594,53 @@ public abstract class StoreCommands2 extends StoreCommands {
         say("\ngot " + values.size() + " match" + (values.size() == 1 ? "." : "es."));
     }
 
+    private List<Identifiable> getSearchValues(int list_n, boolean hasListN, boolean hasDate, String dateField, Date afterDate, Date beforeDate, String key, List<Identifiable> values, List<String> returnedAttributes, String condition, boolean isRegEx, boolean hasKey) {
+        if (hasListN) {
+            return getStore().getMostRecent(list_n, returnedAttributes);
+        }
+        if (hasKey) {
+            if (hasDate) {
+                return getStore().search(
+                        key,
+                        condition,
+                        isRegEx,
+                        returnedAttributes,
+                        dateField,
+                        beforeDate, afterDate);
+            }
+            return getStore().search(
+                    key,
+                    condition,
+                    isRegEx,
+                    returnedAttributes,
+                    null,
+                    null,
+                    null);
+        }
+        if (hasDate) {
+            return getStore().search(
+                    null,
+                    null,
+                    false,
+                    returnedAttributes,
+                    dateField,
+                    beforeDate,
+                    afterDate);
+        } else {
+            // no query, do nothing.
+            return null;
+        }
+
+
+    }
+
     // use clients
     // search -date creation_ts -after 2020-05-01 -before 2020-05-30 -rs s2
     // search >client_id -r .*234.* -date creation_ts -after 2020-05-01 -before 2020-05-30 -rs s234
     // search >client_id -r .*234.* -rs all-234
     private Date getDateFromArg(InputLine inputLine, String arg) throws ParseException {
         String computedDateString = inputLine.getNextArgFor(arg);
-        if(computedDateString.equals("now")){
+        if (computedDateString.equals("now")) {
             return new Date();
         }
         inputLine.removeSwitchAndValue(arg);
@@ -632,7 +672,10 @@ public abstract class StoreCommands2 extends StoreCommands {
      * @param limits
      * @return
      */
-    public boolean printRS(InputLine inputLine, List<Identifiable> values, List<String> returnedAttributes, List<Integer> limits) {
+    public boolean printRS(InputLine inputLine,
+                           List<Identifiable> values,
+                           List<String> returnedAttributes,
+                           List<Integer> limits) {
         if (values.isEmpty()) {
             say("no matches");
             return true;
@@ -641,6 +684,7 @@ public abstract class StoreCommands2 extends StoreCommands {
             say("Got " + values.size() + " results");
             return true;
         }
+        boolean hasAttributes = !(returnedAttributes == null || returnedAttributes.isEmpty());
         int start = 0;
         int stop = values.size();
         if (limits != null && !limits.isEmpty()) {
@@ -652,6 +696,11 @@ public abstract class StoreCommands2 extends StoreCommands {
             }
         }
         boolean longFormat = inputLine.hasArg(VERBOSE_COMMAND) || inputLine.hasArg(LINE_LIST_COMMAND);
+        List<List<String>> table = null;
+        if (hasAttributes) {
+            table = new ArrayList<>();
+        }
+
         for (int i = start; i < stop; i++) {
             Identifiable identifiable = values.get(i);
             if (longFormat) {
@@ -660,11 +709,40 @@ public abstract class StoreCommands2 extends StoreCommands {
                     say("-----"); // or the output runs together
                 }
             } else {
-                say(format(identifiable));
+                if (hasAttributes) {
+                    List<String> row = new ArrayList<>();
+                    XMLMap map = new XMLMap();
+                    getMapConverter().toMap(identifiable, map);
+
+                    for (int j = 0; j < returnedAttributes.size(); j++) {
+                        Object obj = map.get(returnedAttributes.get(j));
+                        if (obj == null) {
+                            row.add(null);
+                        } else {
+                            row.add(obj.toString());
+                        }
+                    }
+                    table.add(row);
+                } else {
+                    say(format(identifiable));
+                }
+
+            }
+        }
+        if (hasAttributes) {
+            List<String> formattedTable = StringUtils.formatTable(returnedAttributes, table, 40, true);
+            // **(%@ Java and its Math functions.
+            BigDecimal bigDecimal = new BigDecimal(Double.toString(Math.ceil(Math.log(formattedTable.size()) + 0.1)));
+
+            int indexWidth = bigDecimal.intValue();
+            say("             ".substring(0, indexWidth + 2) + formattedTable.get(0)); // print out headers
+            for (int i = 1; i < formattedTable.size(); i++) {
+                say(StringUtils.RJustify(Integer.toString(i - 1), indexWidth) + ". " + formattedTable.get(i));
             }
         }
         return false;
     }
+
 
     public static class RSRecord {
         public RSRecord(List<Identifiable> rs, List<String> fields) {
@@ -1321,7 +1399,7 @@ public abstract class StoreCommands2 extends StoreCommands {
             if (primaryKey != null) {
                 for (int i = 0; i < kk.size(); i++) {
                     if (kk.get(i).equals(primaryKey)) {
-                        kk.remove(i);
+                       // kk.remove(i);
                         kk.set(i, primaryKey + "*");
                         break;
                     }
@@ -1527,7 +1605,6 @@ public abstract class StoreCommands2 extends StoreCommands {
     }
 
 
-
     /**
      * @param inputLine
      * @throws Exception
@@ -1554,10 +1631,10 @@ public abstract class StoreCommands2 extends StoreCommands {
             if (rawID.startsWith("/")) {
                 rawID = rawID.substring(1);
             }
-              String rawTargetVersion = inputLine.getNextArgFor(ARCHIVE_RESTORE_FLAG);
+            String rawTargetVersion = inputLine.getNextArgFor(ARCHIVE_RESTORE_FLAG);
 
-             boolean doLatest = rawTargetVersion.equals(ARCHIVE_LATEST_VERSION_ARG);
-             long targetVersion = 0;
+            boolean doLatest = rawTargetVersion.equals(ARCHIVE_LATEST_VERSION_ARG);
+            long targetVersion = 0;
             //DoubleHashMap<URI, Long> versionNumbers = getVersions(rawID);
 
             if (doLatest) {
@@ -1570,16 +1647,16 @@ public abstract class StoreCommands2 extends StoreCommands {
                     return;
                 }
             }
-             Identifiable identifiable = findItem(inputLine);
-            if(identifiable == null){
+            Identifiable identifiable = findItem(inputLine);
+            if (identifiable == null) {
                 say("sorry, no such object");
                 return;
             }
-            Identifiable storedVersion= getStoreArchiver().getVersion(identifiable.getIdentifier(), targetVersion );
-            if(storedVersion == null){
-                say("sorry, but the version you requested for id \"" + rawID  + "\" does not exist.");
+            Identifiable storedVersion = getStoreArchiver().getVersion(identifiable.getIdentifier(), targetVersion);
+            if (storedVersion == null) {
+                say("sorry, but the version you requested for id \"" + rawID + "\" does not exist.");
             }
-            if (getInput("Are you sure that you want to replace the current version with version \"" + (targetVersion==-1?"latest":targetVersion) + "\"?(y/n)", "n").equals("y")) {
+            if (getInput("Are you sure that you want to replace the current version with version \"" + (targetVersion == -1 ? "latest" : targetVersion) + "\"?(y/n)", "n").equals("y")) {
                 // TODO Maybe put some version information inside the object?????
                 // Practical problem is that there is no place to necessarily put it in the general case.
                 // So version number, timestamp for version?
@@ -1616,14 +1693,14 @@ public abstract class StoreCommands2 extends StoreCommands {
             return;
         }
         // If we are at this point, then the user wants to version the object
-        if(identifiable == null){
+        if (identifiable == null) {
             // they supplied non-existent id
             say("object not found.");
             return;
         }
         DoubleHashMap<URI, Long> versionNumbers = getStoreArchiver().getVersions(identifiable.getIdentifier());
-        long newIndex =0L; // for first version if none found
-        if(versionNumbers!= null && !versionNumbers.isEmpty()){
+        long newIndex = 0L; // for first version if none found
+        if (versionNumbers != null && !versionNumbers.isEmpty()) {
             newIndex = getStoreArchiver().getLatestVersionNumber(versionNumbers) + 1;
         }
         // archive /testScheme:oa4md,2018:/client_id/f25ffda14af7100284c0234c8fb836a
@@ -2082,7 +2159,7 @@ public abstract class StoreCommands2 extends StoreCommands {
     }
 
     public StoreArchiver getStoreArchiver() {
-        if(storeArchiver == null){
+        if (storeArchiver == null) {
             storeArchiver = new StoreArchiver(getStore());
         }
         return storeArchiver;

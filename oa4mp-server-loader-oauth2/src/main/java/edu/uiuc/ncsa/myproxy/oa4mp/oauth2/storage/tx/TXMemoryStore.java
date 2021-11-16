@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx;
 
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.XMLConverter;
+import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
 import edu.uiuc.ncsa.security.storage.MemoryStore;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
@@ -44,5 +45,10 @@ public class TXMemoryStore<V extends TXRecord> extends MemoryStore<V> implements
     @Override
     public int getCountByParent(Identifier parentID) {
         return getByParentID(parentID).size();
+    }
+
+    @Override
+    public List<V> getMostRecent(int n, List<String> attributes) {
+        return GenericStoreUtils.getMostRecent(this, n, attributes);
     }
 }

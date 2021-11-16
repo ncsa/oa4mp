@@ -96,4 +96,9 @@ public class SQLTXRecordStore<V extends TXRecord> extends SQLStore<V> implements
         }
         return rowCount;
     }
+
+    @Override
+    public String getCreationTSField() {
+        return ((TXRecordSerializationKeys)getMapConverter().getKeys()).issuedAt();
+    }
 }

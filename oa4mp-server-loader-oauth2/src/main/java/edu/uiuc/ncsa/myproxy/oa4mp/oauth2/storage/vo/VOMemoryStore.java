@@ -2,10 +2,12 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo;
 
 import edu.uiuc.ncsa.security.core.XMLConverter;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
+import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
 import edu.uiuc.ncsa.security.storage.MemoryStore;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -87,5 +89,10 @@ public class VOMemoryStore<V extends VirtualOrganization> extends MemoryStore<V>
             removeIndex(item);
         }
         return item;
+    }
+
+    @Override
+    public List<V> getMostRecent(int n, List<String> attributes) {
+        return GenericStoreUtils.getMostRecent(this, n, attributes);
     }
 }

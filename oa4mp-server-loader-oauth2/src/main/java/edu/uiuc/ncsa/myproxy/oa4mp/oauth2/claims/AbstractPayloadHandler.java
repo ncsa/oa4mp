@@ -126,7 +126,6 @@ public abstract class AbstractPayloadHandler implements PayloadHandler {
         if (getClaims() == null || getClaims().isEmpty()) {
             return "";
         }
-
         try {
             return JWTUtil2.createJWT(getClaims(), key);
         } catch (Throwable e) {

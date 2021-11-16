@@ -51,6 +51,11 @@ public class FSCAStoreTest extends CAStoreTest {
                  }
 
                  @Override
+                 public List getMostRecent(int n, List attributes) {
+                     throw new UnsupportedOperationException("get most recent not supported for this test store");
+                 }
+
+                 @Override
                        public Object put(Object key, Object value) {
                            return null;
                        }

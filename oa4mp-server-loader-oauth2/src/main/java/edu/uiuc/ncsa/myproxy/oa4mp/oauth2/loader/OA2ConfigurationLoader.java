@@ -173,7 +173,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     getIssuer(),
                     isUtilServerEnabled(),
                     isOIDCEnabled(),
-                    getMultiJSONStoreProvider(),
+             //       getMultiJSONStoreProvider(),
                     getCmConfigs(),
                     getQDLEnvironment(),
                     isRFC8693Enabled(),

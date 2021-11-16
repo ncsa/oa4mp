@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.security.core.util.IdentifiableProviderImpl;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.delegation.server.storage.impl.FSClientApprovalStore;
 import edu.uiuc.ncsa.security.delegation.storage.ClientApprovalKeys;
+import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
 import java.io.File;
@@ -47,5 +48,10 @@ public class DSFSClientApprovalStore extends FSClientApprovalStore<ClientApprova
             }
         }
         return results;
+    }
+
+    @Override
+    public List<ClientApproval> getMostRecent(int n, List<String> attributes) {
+       return GenericStoreUtils.getMostRecent(this, n, attributes);
     }
 }

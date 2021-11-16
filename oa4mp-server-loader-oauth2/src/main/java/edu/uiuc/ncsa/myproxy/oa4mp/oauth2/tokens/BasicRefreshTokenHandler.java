@@ -140,6 +140,9 @@ public class BasicRefreshTokenHandler extends AbstractPayloadHandler implements 
 
     @Override
     public void finish(String execPhase) throws Throwable {
+        if(transaction.getMaxRtLifetime() == 0L){
+            throw new IllegalStateException("refresh lifetime disabled for this client");
+        }
         JSONObject rtData = transaction.getRTData();
         // if the token identifier has been updated, record this.
         if(getPhCfg().hasTXRecord()){

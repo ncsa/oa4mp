@@ -19,6 +19,7 @@ import org.apache.commons.configuration.tree.ConfigurationNode;
 
 import java.io.File;
 import java.util.Date;
+import java.util.List;
 
 /**
  * This centralized (and simplifies) the creation of the various stores needed to support JSON. 
@@ -35,6 +36,11 @@ public class JSONStoreProviders {
     public static class JSONMemoryStore<V extends JSONEntry> extends MemoryStore<V> implements JSONStore<V>{
         public JSONMemoryStore(IdentifiableProvider<V> identifiableProvider) {
             super(identifiableProvider);
+        }
+
+        @Override
+        public List<V> getMostRecent(int n, List<String> attributes) {
+            throw new UnsupportedOperationException();
         }
 
         JSONConverter jc = null;

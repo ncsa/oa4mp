@@ -85,4 +85,9 @@ public class SQLAssetStore extends SQLStore<Asset> implements AssetStore {
     public void putByToken(Asset asset) {
         save(asset);
     }
+
+    @Override
+    public String getCreationTSField() {
+        return ((AssetSerializationKeys)getMapConverter().getKeys()).creationTime();
+    }
 }

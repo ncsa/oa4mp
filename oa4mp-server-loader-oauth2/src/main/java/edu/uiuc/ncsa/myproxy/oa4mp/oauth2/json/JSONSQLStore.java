@@ -20,8 +20,14 @@ public class JSONSQLStore<V extends JSONEntry> extends SQLStore<V> implements JS
     }
 
     @Override
+    public String getCreationTSField() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public void save(V value) {
         value.setLastModified(new Date());
         super.save(value);
+
     }
 }

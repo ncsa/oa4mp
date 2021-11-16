@@ -2,13 +2,11 @@ package edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.AbstractAccessTokenHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.AbstractPayloadConfig;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.SciTokenConstants;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.ScitokenHandler;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.WLCGConstants;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.WLCGTokenHandler;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.*;
 import edu.uiuc.ncsa.qdl.extensions.QDLModuleMetaClass;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.security.oauth_2_0.server.RFC9068Constants;
 import net.sf.json.JSONObject;
 
 import java.util.ArrayList;
@@ -65,6 +63,10 @@ public class AccessTokenInitializer implements QDLModuleMetaClass {
                 case SciTokenConstants.SCI_TOKEN_TAG:
                 case SciTokenConstants.SCI_TOKEN_TAG2:
                     atHandler = new ScitokenHandler(getPayloadHandlerConfig());
+                    break;
+                case RFC9068Constants.RFC9068_TAG:
+                case RFC9068Constants.RFC9068_TAG2:
+                    atHandler = new RFC9068ATHandler(getPayloadHandlerConfig());
                     break;
                 default:
                 case AbstractAccessTokenHandler.AT_DEFAULT_HANDLER_TYPE:

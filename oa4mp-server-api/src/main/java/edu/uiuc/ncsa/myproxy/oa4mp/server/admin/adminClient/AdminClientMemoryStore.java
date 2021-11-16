@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.XMLConverter;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApprovalStore;
 import edu.uiuc.ncsa.security.delegation.server.storage.impl.GenericClientStoreUtils;
+import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
 import edu.uiuc.ncsa.security.storage.MemoryStore;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
@@ -47,5 +48,10 @@ public class AdminClientMemoryStore<V extends AdminClient> extends MemoryStore<V
     @Override
     public List<Identifier> getByApprover(String approver, ClientApprovalStore clientApprovalStore) {
         return GenericClientStoreUtils.getByApprover(this, approver, clientApprovalStore);
+    }
+
+    @Override
+    public List<V> getMostRecent(int n, List<String> attributes) {
+        return GenericStoreUtils.getMostRecent(this, n, attributes);
     }
 }

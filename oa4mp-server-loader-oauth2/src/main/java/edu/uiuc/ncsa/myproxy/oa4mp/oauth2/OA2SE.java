@@ -86,7 +86,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
                  String issuer,
                  boolean utilServletEnabled,
                  boolean oidcEnabled,
-                 Provider<JSONStore> jsonStoreProvider,
+               //  Provider<JSONStore> jsonStoreProvider,
                  CMConfigs cmConfigs,
                  QDLEnvironment qdlEnvironment,
                  boolean rfc8693Enabled,
@@ -150,7 +150,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.acs = acs;
         this.utilServletEnabled = utilServletEnabled;
         this.oidcEnabled = oidcEnabled;
-        this.jsonStoreProvider = jsonStoreProvider;
+   //     this.jsonStoreProvider = jsonStoreProvider;
         this.cmConfigs = cmConfigs;
         this.qdlEnvironment = qdlEnvironment;
         this.rfc8693Enabled = rfc8693Enabled;

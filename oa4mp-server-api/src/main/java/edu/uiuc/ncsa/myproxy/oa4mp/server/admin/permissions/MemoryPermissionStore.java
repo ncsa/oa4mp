@@ -16,6 +16,11 @@ import static edu.uiuc.ncsa.security.core.util.BeanUtils.checkEquals;
  * on 10/10/16 at  4:18 PM
  */
 public class MemoryPermissionStore<V extends Permission> extends MemoryStore<V> implements PermissionsStore<V> {
+    @Override
+    public List<V> getMostRecent(int n, List<String> attributes) {
+        throw new UnsupportedOperationException("get most recent not supported for permissions");
+    }
+
     public static class IDTriple {
         public IDTriple(Permission p) {
             pID = p.getIdentifier();

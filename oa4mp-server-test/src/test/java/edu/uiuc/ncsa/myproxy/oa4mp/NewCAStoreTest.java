@@ -12,6 +12,7 @@ import edu.uiuc.ncsa.security.delegation.server.storage.ClientApprovalStore;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.security.delegation.server.storage.impl.FSClientApprovalStore;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
+import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
 import edu.uiuc.ncsa.security.util.TestBase;
 
 import java.io.File;
@@ -131,6 +132,11 @@ public class NewCAStoreTest extends TestBase {
                    @Override
                    public List<Identifier> statusSearch(String status) {
                        return null;
+                   }
+
+                   @Override
+                   public List getMostRecent(int n, List attributes) {
+                       return GenericStoreUtils.getMostRecent(this, n, attributes);
                    }
 
                    @Override

@@ -23,5 +23,8 @@ public class DSSQLTransactionStore<V extends OA4MPServiceTransaction> extends SQ
         super(tokenForge, connectionPool, table, idp, converter);
     }
 
-   
+    @Override
+    public String getCreationTSField() {
+        return super.getCreationTSField();
+    }
 }

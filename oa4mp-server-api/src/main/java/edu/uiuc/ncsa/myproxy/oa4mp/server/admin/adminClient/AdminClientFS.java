@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApprovalStore;
 import edu.uiuc.ncsa.security.delegation.server.storage.impl.GenericClientStoreUtils;
 import edu.uiuc.ncsa.security.storage.FileStore;
+import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
 import java.io.File;
@@ -52,5 +53,10 @@ public class AdminClientFS<V extends AdminClient> extends FileStore<V> implement
     @Override
     public List<Identifier> getByApprover(String approver, ClientApprovalStore clientApprovalStore) {
         return GenericClientStoreUtils.getByApprover(this, approver, clientApprovalStore);
+    }
+
+    @Override
+    public List<V> getMostRecent(int n, List<String> attributes) {
+        return GenericStoreUtils.getMostRecent(this, n, attributes);
     }
 }

@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx;
 
 import edu.uiuc.ncsa.qdl.xml.XMLUtils;
+import edu.uiuc.ncsa.security.core.DateComparable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.IdentifiableImpl;
@@ -12,10 +13,7 @@ import javax.xml.stream.XMLStreamWriter;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.XMLEvent;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.qdl.QDLXMLConstants.*;
 import static edu.uiuc.ncsa.qdl.xml.XMLUtils.readStemAsStrings;
@@ -24,7 +22,12 @@ import static edu.uiuc.ncsa.qdl.xml.XMLUtils.readStemAsStrings;
  * <p>Created by Jeff Gaynor<br>
  * on 12/14/20 at  8:54 AM
  */
-public class TXRecord extends IdentifiableImpl {
+public class TXRecord extends IdentifiableImpl implements DateComparable {
+    @Override
+    public Date getCreationTS() {
+        return new Date(getIssuedAt());
+    }
+
     public TXRecord(Identifier identifier) {
         super(identifier);
     }

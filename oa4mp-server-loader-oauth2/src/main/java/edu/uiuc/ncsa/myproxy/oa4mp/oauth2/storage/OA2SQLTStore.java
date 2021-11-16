@@ -32,6 +32,11 @@ import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction.RFC862_ST
  * on 3/25/14 at  10:30 AM
  */
 public class OA2SQLTStore<V extends OA2ServiceTransaction> extends DSSQLTransactionStore<V> implements RFC8628Store<V>, RefreshTokenStore<V>, UsernameFindable<V> {
+    @Override
+    public String getCreationTSField() {
+        return ((OA2TransactionKeys)getMapConverter().getKeys()).authTime();
+    }
+
     public OA2SQLTStore(TokenForge tokenForge, ConnectionPool connectionPool, Table table, Provider<V> idp, MapConverter converter) {
         super(tokenForge, connectionPool, table, idp, converter);
     }

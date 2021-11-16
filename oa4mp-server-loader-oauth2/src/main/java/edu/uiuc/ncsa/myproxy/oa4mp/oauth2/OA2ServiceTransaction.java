@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowStates2;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8628State;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.OA4MPServiceTransaction;
+import edu.uiuc.ncsa.security.core.DateComparable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
@@ -27,7 +28,7 @@ import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ExtendedParameters.EXTEND
  * <p>Created by Jeff Gaynor<br>
  * on 2/28/14 at  1:46 PM
  */
-public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA2TransactionScopes, OIDCServiceTransactionInterface {
+public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA2TransactionScopes, OIDCServiceTransactionInterface, DateComparable {
     public String FLOW_STATE_KEY = "flow_state";
     public String CLAIMS_SOURCES_STATE_KEY = "claims_sources";
     public String STATE_KEY = "state";
@@ -37,6 +38,11 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
     public String AUDIENCE_KEY = "audience";
     public String RESOURCE_KEY = "resource";
     public String QUERIED_ACCESS_TOKEN_SCOPES_KEY = "queriedATScopes";
+
+    @Override
+    public Date getCreationTS() {
+        return getAuthTime();
+    }
 
     public String getUserCode() {
         return userCode;
@@ -394,7 +400,10 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
     }
 
     public void setMaxATLifetime(long max) {
-        getState().put(MAX_AT_LIFETIME_KEY, max);
+        Long ll = new Long(max);
+        // weirdly enough, the JSON library converts it to an integer at times
+        // which then fails later on the getMaxLifetime.
+        getState().put(MAX_AT_LIFETIME_KEY, ll);
     }
 
     public boolean hasMaxATLifetime() {
@@ -403,7 +412,11 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
 
     public long getMaxRtLifetime() {
         if (hasMaxATLifetime()) {
-            return getState().getLong(MAX_RT_LIFETIME_KEY);
+            if (getState().containsKey(MAX_RT_LIFETIME_KEY)) {
+                return getState().getLong(MAX_RT_LIFETIME_KEY);
+            } else {
+                throw new IllegalStateException(MAX_RT_LIFETIME_KEY + " not set for this transaction");
+            }
         }
         return -1L;
     }
@@ -570,10 +583,11 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
     /**
      * The scopes that the user actually consented to on the user consent page. These are set
      * once and never updated to prevent up scoping.
+     *
      * @return
      */
     public Collection<String> getValidatedScopes() {
-        if(validatedScopes == null){
+        if (validatedScopes == null) {
             validatedScopes = new HashSet<>();
         }
         return validatedScopes;
@@ -584,14 +598,16 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
     }
 
     Collection<String> validatedScopes;
-    public Collection<String> getQueriedATScopes(){
-        if(!getState().containsKey(QUERIED_ACCESS_TOKEN_SCOPES_KEY)){
+
+    public Collection<String> getQueriedATScopes() {
+        if (!getState().containsKey(QUERIED_ACCESS_TOKEN_SCOPES_KEY)) {
             return null;
         }
         return getState().getJSONArray(QUERIED_ACCESS_TOKEN_SCOPES_KEY);
 
     }
-    public void setQueriedATScopes(Collection<String> queriedATScopes){
+
+    public void setQueriedATScopes(Collection<String> queriedATScopes) {
         getState().put(QUERIED_ACCESS_TOKEN_SCOPES_KEY, queriedATScopes);
     }
 }
