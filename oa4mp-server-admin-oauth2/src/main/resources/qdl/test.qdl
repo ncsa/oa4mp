@@ -1,0 +1,33 @@
+/*
+   A script for testing server side utilities (such as the token handlers) that require a running
+   service with all its state. Drop your code here and run it with
+
+
+{"tokens": {
+    "access":  {
+     "aud": "https://localhost/test",
+     "audience": "https://localhost/test",
+     "lifetime": 300000,
+     "type": "rfc9068",
+      qdl{
+                load="test.qdl"
+                xmd={exec_phase=["post_token","post_refresh","post_exchange"]}
+                args=["USER_ID", "PASSWORD"]
+             }
+    },
+    "refresh":  {
+     "audience": "https://localhost/test",
+     "lifetime": 900000,
+     "type": "refresh"
+    }
+   }}
+
+
+*/
+
+say('*** QDL test script');
+z.'sub' := 'foo';
+z.'baz' := 'bar';
+z. := at_init('wlcg', z.);
+access_token. := z.;
+say('z ==' + to_string(z.)) ;

@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.AbstractPayloadConfig;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.IDTokenHandler;
+import edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.OA2State;
 import edu.uiuc.ncsa.qdl.extensions.QDLModuleMetaClass;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
@@ -31,6 +32,10 @@ public class IDTokenInitializer implements QDLModuleMetaClass {
     boolean isInit = false;
 
     public abstract class IDMethods extends TokenHandlerMethod {
+        public IDMethods(OA2State oa2State) {
+            super(oa2State);
+        }
+
         protected Boolean isQuery(String execPhase) {
             boolean isQuery = false;
             switch (execPhase) {
@@ -83,6 +88,10 @@ public class IDTokenInitializer implements QDLModuleMetaClass {
 
 
     public class idInit extends IDMethods {
+        public idInit(OA2State oa2State) {
+            super(oa2State);
+        }
+
         @Override
         public String getName() {
             return ID_TOKEN_INIT_METHOD;
@@ -115,6 +124,10 @@ public class IDTokenInitializer implements QDLModuleMetaClass {
     }
 
     public class idFinish extends IDMethods {
+        public idFinish(OA2State oa2State) {
+            super(oa2State);
+        }
+
         @Override
         public String getName() {
             return ID_TOKEN_FINISH_METHOD;
@@ -147,6 +160,10 @@ public class IDTokenInitializer implements QDLModuleMetaClass {
     }
 
     public class idRefresh extends IDMethods {
+        public idRefresh(OA2State oa2State) {
+            super(oa2State);
+        }
+
         @Override
         public String getName() {
             return ID_TOKEN_REFRESH_METHOD;
@@ -178,6 +195,10 @@ public class IDTokenInitializer implements QDLModuleMetaClass {
     }
 
     public class idCheckClaims extends IDMethods {
+        public idCheckClaims(OA2State oa2State) {
+            super(oa2State);
+        }
+
         @Override
         public String getName() {
             return ID_TOKEN_CHECK_CLAIM_METHOD;

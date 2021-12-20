@@ -6,7 +6,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
 import edu.uiuc.ncsa.myproxy.oa4mp.qdl.QDLXMLConstants;
 import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
-import edu.uiuc.ncsa.qdl.functions.FTStack;
+import edu.uiuc.ncsa.qdl.functions.FStack;
 import edu.uiuc.ncsa.qdl.module.MAliases;
 import edu.uiuc.ncsa.qdl.module.MTemplates;
 import edu.uiuc.ncsa.qdl.state.State;
@@ -32,7 +32,7 @@ public class OA2State extends State {
                     SymbolStack symbolStack,
                     OpEvaluator opEvaluator,
                     MetaEvaluator metaEvaluator,
-                    FTStack ft,
+                    FStack ft,
                     MTemplates mTemplates,
                     MyLoggingFacade myLoggingFacade,
                     boolean isServerMode,
@@ -166,7 +166,7 @@ public class OA2State extends State {
                              SymbolStack symbolStack,
                              OpEvaluator opEvaluator,
                              MetaEvaluator metaEvaluator,
-                             FTStack ftStack,
+                             FStack fStack,
                              MTemplates mTemplates,
                              MyLoggingFacade myLoggingFacade,
                              boolean isServerMode,
@@ -176,7 +176,7 @@ public class OA2State extends State {
                 symbolStack,
                 opEvaluator,
                 metaEvaluator,
-                ftStack,
+                fStack,
                 mTemplates,
                 myLoggingFacade,
                 isServerMode,

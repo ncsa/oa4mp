@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.AbstractPayloadConfig;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.BasicRefreshTokenHandler;
+import edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.OA2State;
 import edu.uiuc.ncsa.qdl.extensions.QDLModuleMetaClass;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
@@ -22,6 +23,10 @@ public class RefreshTokenInitializer implements QDLModuleMetaClass {
     public static String RT_REFRESH_METHOD = "rt_refresh";
 
     public abstract class IDMethods extends TokenHandlerMethod {
+        public IDMethods(OA2State oa2State) {
+            super(oa2State);
+        }
+
         protected Boolean isQuery(String execPhase) {
             boolean isQuery = false;
             switch (execPhase) {
@@ -39,6 +44,10 @@ public class RefreshTokenInitializer implements QDLModuleMetaClass {
     }
 
     public abstract class RTMethod extends TokenHandlerMethod {
+        public RTMethod(OA2State oa2State) {
+            super(oa2State);
+        }
+
         @Override
         protected AbstractPayloadConfig getPayloadConfig() {
             return getClient().getRefreshTokensConfig();
@@ -82,6 +91,10 @@ public class RefreshTokenInitializer implements QDLModuleMetaClass {
 
 
     public class rtInit extends RTMethod {
+        public rtInit(OA2State oa2State) {
+            super(oa2State);
+        }
+
         @Override
         public String getName() {
             return RT_INIT_METHOD;
@@ -110,6 +123,10 @@ public class RefreshTokenInitializer implements QDLModuleMetaClass {
     }
 
     public class rtFinish extends RTMethod {
+        public rtFinish(OA2State oa2State) {
+            super(oa2State);
+        }
+
         @Override
         public String getName() {
             return RT_FINISH_METHOD;
@@ -137,6 +154,10 @@ public class RefreshTokenInitializer implements QDLModuleMetaClass {
     }
 
     public class rtRefresh extends RTMethod {
+        public rtRefresh(OA2State oa2State) {
+            super(oa2State);
+        }
+
         @Override
         public String getName() {
             return RT_REFRESH_METHOD;

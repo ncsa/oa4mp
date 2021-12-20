@@ -1,11 +1,19 @@
 package test;
 
 
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2ConfigurationLoader;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.OA2State;
 import edu.uiuc.ncsa.qdl.AbstractQDLTester;
 import edu.uiuc.ncsa.qdl.TestUtils;
 import edu.uiuc.ncsa.qdl.exceptions.QDLStatementExecutionException;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
+import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
+import net.sf.json.JSONObject;
+
+import static edu.uiuc.ncsa.myproxy.oa4mp.TestUtils.findConfigNode;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -23,7 +31,8 @@ public class QDLTests extends AbstractQDLTester {
     }
 
     protected TestUtils getTestUtils() {
-        return TestUtils.newInstance();
+        QDLTestUtils.set_instance(new QDLTestUtils());
+        return QDLTestUtils.newInstance();
     }
 
     public void testInGroup2() throws Throwable {
@@ -147,5 +156,32 @@ public class QDLTests extends AbstractQDLTester {
         interpreter.execute(script.toString());
         assert getBooleanValue("ok_false", state) : "resolve template failed for non-query";
         assert getBooleanValue("ok_true", state) : "resolve template failed for query";
+    }
+    // next test is a good idea, but was impossible to get running in practice -- just too much
+    // configuration needed to bootstrap it. May revisit it later.
+/*    public void testATHandler() throws Throwable{
+        OA2State state = (OA2State) getTestUtils().getNewState();
+        setFakeState(state);
+        StringBuffer script = new StringBuffer();
+        addLine(script, "module_load('edu.uiuc.ncsa.myproxy.oa4mp.qdl.OA2QDLLoader', 'java');");
+        //addLine(script, "module_load('edu.uiuc.ncsa.oa2.qdl.QDLToolsLoader', 'java');");
+        addLine(script, "module_import('oa2:/qdl/oidc/claims');");
+        addLine(script, "module_import('oa2:/qdl/oidc/token');");
+        addLine(script, "z.:=[];");
+        addLine(script, "at_init('wlcg',z.);");
+        addLine(script, "say(z.);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+    }*/
+
+    protected void setFakeState(OA2State oa2State){
+        OA2ServiceTransaction oa2ServiceTransaction = new OA2ServiceTransaction(BasicIdentifier.randomID());
+        OA2Client oa2Client = new OA2Client(BasicIdentifier.randomID());
+        OA2ConfigurationLoader loader = new OA2ConfigurationLoader(findConfigNode("/home/ncsa/dev/csd/config/server-oa2.xml","localhost:oa4mp.oa2.mariadb"));
+        OA2SE oa2SE = (OA2SE) loader.load();
+        oa2State.setOa2se(oa2SE);
+        oa2Client.setConfig(new JSONObject());
+        oa2ServiceTransaction.setClient(oa2Client);
+        oa2State.setTransaction(oa2ServiceTransaction);
     }
 }

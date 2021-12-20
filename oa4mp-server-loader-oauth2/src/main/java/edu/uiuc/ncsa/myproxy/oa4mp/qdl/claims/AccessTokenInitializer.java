@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.AbstractAccessTokenHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.AbstractPayloadConfig;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.*;
+import edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.OA2State;
 import edu.uiuc.ncsa.qdl.extensions.QDLModuleMetaClass;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
@@ -17,7 +18,7 @@ import java.util.List;
  * on 10/9/20 at  9:40 AM
  */
 public class AccessTokenInitializer implements QDLModuleMetaClass {
-    public static String AT_INIT_METHOD     = "at_init";
+    public static String AT_INIT_METHOD = "at_init";
     public static String AT_FINISH_METHOD = "at_finish";
     public static String AT_REFRESH_METHOD = "at_refresh";
 
@@ -31,6 +32,10 @@ public class AccessTokenInitializer implements QDLModuleMetaClass {
      * Super class to collect common methods and tasks.
      */
     public abstract class ATMethod extends TokenHandlerMethod {
+        public ATMethod(OA2State oa2State) {
+            super(oa2State);
+        }
+
         @Override
         public Object evaluate(Object[] objects, State state) {
             super.evaluate(objects, state);
@@ -39,16 +44,18 @@ public class AccessTokenInitializer implements QDLModuleMetaClass {
             StemVariable at = checkArg(objects, getName(), 1);
             setupHandler(objects);
             JSONObject j = (JSONObject) at.toJSON();
-            getAtHandler().setAtData(j);
-            at = new StemVariable();
+            getAtHandler().setAtData(new JSONObject()); // handler won't set accounting info unless this is empty.
             try {
                 doMethod();
             } catch (Throwable throwable) {
                 handleException(throwable);
             }
-            at.fromJSON(getAtHandler().getAtData());
-
-            return at;
+            StemVariable newAT = new StemVariable();
+            JSONObject newToken = getAtHandler().getAtData();
+            newToken.putAll(j);
+            getAtHandler().setAtData(newToken);
+            newAT.fromJSON(newToken);
+            return newAT;
         }
 
         protected void setupHandler(Object[] objects) {
@@ -68,9 +75,9 @@ public class AccessTokenInitializer implements QDLModuleMetaClass {
                 case RFC9068Constants.RFC9068_TAG2:
                     atHandler = new RFC9068ATHandler(getPayloadHandlerConfig());
                     break;
-                default:
                 case AbstractAccessTokenHandler.AT_DEFAULT_HANDLER_TYPE:
                     atHandler = new AbstractAccessTokenHandler(getPayloadHandlerConfig());
+                default:
                     throw new IllegalArgumentException("Unknown token type.");
             }
         }
@@ -93,6 +100,9 @@ public class AccessTokenInitializer implements QDLModuleMetaClass {
     }
 
     public class atInit extends ATMethod {
+        public atInit(OA2State oa2State) {
+            super(oa2State);
+        }
 
         @Override
         public String getName() {
@@ -118,6 +128,8 @@ public class AccessTokenInitializer implements QDLModuleMetaClass {
                 doxx.add(getName() + "(type, access_token.) - initialize an access token.");
                 addTypeDoc(doxx);
                 doxx.add("Every access token type has a specific set of required claims that it must contain.");
+                doxx.add("the second argument is a stem of claims of whatever you want. This adds the accounting information to that stem, ");
+                doxx.add("and returns a new stem of the result.");
                 doxx.add("See also: " + AT_FINISH_METHOD);
             }
             return doxx;
@@ -125,6 +137,9 @@ public class AccessTokenInitializer implements QDLModuleMetaClass {
     }
 
     public class atRefresh extends ATMethod {
+        public atRefresh(OA2State oa2State) {
+            super(oa2State);
+        }
 
         @Override
         protected void doMethod() throws Throwable {
@@ -156,6 +171,9 @@ public class AccessTokenInitializer implements QDLModuleMetaClass {
     }
 
     public class atFinish extends ATMethod {
+        public atFinish(OA2State oa2State) {
+            super(oa2State);
+        }
 
         @Override
         public String getName() {

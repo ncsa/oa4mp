@@ -13,7 +13,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.OA4MPServletInitializer;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.NewClientNotifier;
 import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
-import edu.uiuc.ncsa.qdl.functions.FTStack;
+import edu.uiuc.ncsa.qdl.functions.FStack;
 import edu.uiuc.ncsa.qdl.module.MAliases;
 import edu.uiuc.ncsa.qdl.module.MTemplates;
 import edu.uiuc.ncsa.qdl.state.State;
@@ -55,6 +55,11 @@ public class OA2ServletInitializer extends OA4MPServletInitializer {
     public void init() throws ServletException {
         if (isInitRun) return;
         super.init();
+        // 12/14/2021 log4shell vulnerability. This should ensure that no dependency
+        // can even try to do lookups.
+        System.setProperty("log4j2.formatMsgNoLookups", "true");
+        System.setProperty("LOG4J_FORMAT_MSG_NO_LOOKUPS", "true");
+
         OA2SE oa2SE = (OA2SE) getEnvironment();
         DebugUtil.setPrintTS(oa2SE.isPrintTSInDebug());
         if (oa2SE.isRefreshTokenEnabled()) {
@@ -100,7 +105,7 @@ public class OA2ServletInitializer extends OA4MPServletInitializer {
                         new SymbolStack(),
                         new OpEvaluator(),
                         MetaEvaluator.getInstance(),
-                        new FTStack(),
+                        new FStack(),
                         new MTemplates(),
                         null, // no logging at least for now
                         true,

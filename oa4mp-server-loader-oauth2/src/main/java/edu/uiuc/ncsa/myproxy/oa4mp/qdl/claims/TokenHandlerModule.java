@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.OA2State;
 import edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.QDLRuntimeEngine;
 import edu.uiuc.ncsa.qdl.extensions.JavaModule;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
@@ -23,24 +24,25 @@ public class TokenHandlerModule extends JavaModule {
     }
 
     @Override
-    public Module newInstance(State state) {
+    public Module newInstance(State state1) {
+        OA2State state = (OA2State)state1;
         TokenHandlerModule thm = new TokenHandlerModule(URI.create("oa2:/qdl/oidc/token"), "tokens");
         ArrayList<QDLFunction> funcs = new ArrayList<>();
         IDTokenInitializer ida = new IDTokenInitializer();
-        funcs.add(ida.new idInit());
-        funcs.add(ida.new idFinish());
-        funcs.add(ida.new idCheckClaims());
-        funcs.add(ida.new idRefresh());
+        funcs.add(ida.new idInit(state));
+        funcs.add(ida.new idFinish(state));
+        funcs.add(ida.new idCheckClaims(state));
+        funcs.add(ida.new idRefresh(state));
 
         AccessTokenInitializer ai = new AccessTokenInitializer();
-        funcs.add(ai.new atInit());
-        funcs.add(ai.new atFinish());
-        funcs.add(ai.new atRefresh());
+        funcs.add(ai.new atInit(state));
+        funcs.add(ai.new atFinish(state));
+        funcs.add(ai.new atRefresh(state));
 
         RefreshTokenInitializer rt = new RefreshTokenInitializer();
-        funcs.add(rt.new rtInit());
-        funcs.add(rt.new rtFinish());
-        funcs.add(rt.new rtRefresh());
+        funcs.add(rt.new rtInit(state));
+        funcs.add(rt.new rtFinish(state));
+        funcs.add(rt.new rtRefresh(state));
 
 
         thm.addFunctions(funcs);

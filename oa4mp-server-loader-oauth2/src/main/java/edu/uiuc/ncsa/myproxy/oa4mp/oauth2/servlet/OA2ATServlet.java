@@ -1219,7 +1219,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         @Override
         public boolean retain(Object key, Object value) {
             TXRecord txr = (TXRecord) value;
-            trace("checking tr_record " + txr.getIdentifierString());
+            trace("checking tx_record " + txr.getIdentifierString());
             if (safeGCSkipIt(key.toString())) {
                 trace("safe GFC, skipping...");
                 return true;

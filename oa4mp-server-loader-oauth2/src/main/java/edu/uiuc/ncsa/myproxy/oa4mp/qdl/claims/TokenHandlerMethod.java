@@ -60,7 +60,8 @@ public abstract class TokenHandlerMethod implements QDLFunction {
 
     PayloadHandlerConfigImpl payloadHandlerConfig;
 
-    public TokenHandlerMethod() {
+    public TokenHandlerMethod(OA2State oa2State) {
+        this.oa2State = oa2State;
 
     }
 
