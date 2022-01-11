@@ -11,4 +11,4 @@
 
 ## Docs
 
-http://grid.ncsa.illinois.edu/myproxy/oauth/
+https://cilogon.github.io/oa4mp/
