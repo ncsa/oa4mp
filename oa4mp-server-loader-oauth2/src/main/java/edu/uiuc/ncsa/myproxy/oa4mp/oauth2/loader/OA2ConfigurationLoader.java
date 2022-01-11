@@ -100,6 +100,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
     public static final String NOTIFY_ADMIN_CLIENT_ADDRESSES = "notifyACEmailAddresses";
     public static final String CLEANUP_INTERVAL_TAG = "cleanupInterval";
     public static final String RFC7636_REQUIRED_TAG = "rfc7636Required";
+    public static final String DEMO_MODE_TAG = "demoModeEnabled";
 
     /**
      * Default is 15 days. Internally the refresh lifetime (as all date-ish things) are in milliseconds
@@ -184,7 +185,8 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     isprintTSInDebug(),
                     getCleanupInterval(),
                     isNotifyACEventEmailAddresses(),
-                    isRFC7636Required());
+                    isRFC7636Required(),
+                    isDemoModeEnabled());
 
             if (getClaimSource() instanceof BasicClaimsSourceImpl) {
                 ((BasicClaimsSourceImpl) getClaimSource()).setOa2SE((OA2SE) se);
@@ -327,6 +329,18 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         return printTSInDebug;
     }
 
+    Boolean demoModeEnabled = null;
+    public Boolean isDemoModeEnabled(){
+        if(demoModeEnabled == null){
+            String raw = getFirstAttribute(cn, DEMO_MODE_TAG);
+             if(StringUtils.isTrivial(raw)){
+                 demoModeEnabled = Boolean.FALSE;
+             }else{
+                 demoModeEnabled = Boolean.parseBoolean(raw);
+             }
+        }
+        return demoModeEnabled;
+    }
     long cleanupInterval = -1;
 
     public long getCleanupInterval() {

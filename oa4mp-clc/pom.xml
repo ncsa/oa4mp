@@ -10,8 +10,8 @@
         <version>5.2-SNAPSHOT</version>
     </parent>
 
-    <artifactId>oa4mp-server-admin-oauth2</artifactId>
-    <name>OAuth 2.0 for MyProxy administrative tools</name>
+    <artifactId>oa4mp-clc</artifactId>
+    <name>OAMP Command Line Client</name>
     <packaging>jar</packaging>
     <dependencies>
         <!-- Need this for the monitor -->
@@ -20,12 +20,12 @@
             <artifactId>oa4mp-client-loader-oauth2</artifactId>
             <version>5.2-SNAPSHOT</version>
         </dependency>
-
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
-            <artifactId>oa4mp-clc</artifactId>
+            <artifactId>oa4mp-client-api</artifactId>
             <version>5.2-SNAPSHOT</version>
         </dependency>
+	<!--
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>oa4mp-server-admin</artifactId>
@@ -35,7 +35,8 @@
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>oa4mp-server-loader-oauth2</artifactId>
             <version>5.2-SNAPSHOT</version>
-        </dependency>
+		</dependency>
+	-->
         <dependency>
             <groupId>edu.uiuc.ncsa.security.delegation</groupId>
             <artifactId>ncsa-security-oauth-2.0</artifactId>
@@ -82,7 +83,7 @@
     <build>
         <finalName>oa2-admin</finalName>
     </build>
-    <profiles>
+    <!--   <profiles>
         <profile>
             <id>cli</id>
             <build>
@@ -285,12 +286,13 @@
 
             </build>
         </profile>
-    </profiles>
+	    </profiles>
+    
     <pluginRepositories>
         <pluginRepository>
             <id>onejar-maven-plugin.googlecode.com</id>
             <url>http://onejar-maven-plugin.googlecode.com/svn/mavenrepo</url>
         </pluginRepository>
     </pluginRepositories>
-
+    -->
 </project>

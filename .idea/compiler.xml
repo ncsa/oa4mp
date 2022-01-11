@@ -2,7 +2,6 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <wildcardResourcePatterns>
-      <entry name="?*.fxml" />
       <entry name="?*.properties" />
       <entry name="?*.xml" />
       <entry name="?*.gif" />
@@ -19,73 +18,33 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="oa4mp-skin" />
-        <module name="oa4mp-client-api" />
-        <module name="oa4mp-webapp" />
-        <module name="myproxy-website" />
-        <module name="scitokens-client" />
-        <module name="oa4mp-server-loader-oauth2" />
-        <module name="oa4mp-server-loader-oauth1" />
-        <module name="oa4mp-qdl" />
-        <module name="oa4mp-gui" />
-        <module name="scitokens" />
-        <module name="oa4mp-client-oauth2" />
-        <module name="oa4mp-client-oauth1" />
-        <module name="oa4mp-server-test" />
-        <module name="oa4mp-client-webapp" />
-        <module name="oa4mp-client-loader-oauth2" />
-        <module name="oa4mp-client-loader-oauth1" />
-        <module name="oa4mp-client-test" />
-        <module name="oa4mp-server-admin" />
-        <module name="oa4mp-server-oauth2" />
-        <module name="oa4mp-server-oauth1" />
-        <module name="oa4mp-oidc-twofactor" />
         <module name="oa4mp-website" />
-        <module name="oa4mp-xsede-oauth2" />
-        <module name="oa4mp-server-admin-oauth1" />
-        <module name="myproxy-logon" />
-        <module name="oa4mp-server-test-oauth2" />
-        <module name="oa4mp-server-test-auth2" />
-        <module name="oa4mp-server-api" />
-        <module name="scitokens-server" />
+        <module name="oa4mp-clc" />
+        <module name="oa4mp-client-test" />
+        <module name="oa4mp-webapp" />
+        <module name="oa4mp-server-test" />
+        <module name="oa4mp-server-loader-oauth1" />
         <module name="oa4mp-server-admin-oauth2" />
+        <module name="oa4mp-server-loader-oauth2" />
+        <module name="oa4mp-server-admin-oauth1" />
+        <module name="oa4mp-server-test-oauth2" />
+        <module name="oa4mp-skin" />
+        <module name="oa4mp-client-webapp" />
+        <module name="oa4mp-server-oauth1" />
+        <module name="oa4mp-client-loader-oauth2" />
+        <module name="oa4mp-server-api" />
+        <module name="oa4mp-server-oauth2" />
+        <module name="oa4mp-client-loader-oauth1" />
+        <module name="myproxy-logon" />
+        <module name="oa4mp-client-api" />
+        <module name="oa4mp-gui" />
+        <module name="oa4mp-qdl" />
+        <module name="oa4mp-client-oauth1" />
+        <module name="oa4mp-client-oauth2" />
+        <module name="oa4mp-xsede-oauth2" />
+        <module name="myproxy-website" />
+        <module name="oa4mp-server-admin" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="myproxy" target="1.8" />
-      <module name="myproxy-logon" target="1.8" />
-      <module name="myproxy-website" target="1.5" />
-      <module name="oa4mp-client-api" target="1.8" />
-      <module name="oa4mp-client-loader-oauth1" target="1.8" />
-      <module name="oa4mp-client-loader-oauth2" target="1.8" />
-      <module name="oa4mp-client-oauth1" target="1.8" />
-      <module name="oa4mp-client-oauth2" target="1.8" />
-      <module name="oa4mp-client-test" target="1.8" />
-      <module name="oa4mp-client-webapp" target="1.8" />
-      <module name="oa4mp-co-oidc" target="1.8" />
-      <module name="oa4mp-gui" target="1.8" />
-      <module name="oa4mp-oidc-twofactor" target="1.8" />
-      <module name="oa4mp-qdl" target="1.8" />
-      <module name="oa4mp-server-admin" target="1.8" />
-      <module name="oa4mp-server-admin-oauth1" target="1.8" />
-      <module name="oa4mp-server-admin-oauth2" target="1.8" />
-      <module name="oa4mp-server-api" target="1.8" />
-      <module name="oa4mp-server-loader-oauth1" target="1.8" />
-      <module name="oa4mp-server-loader-oauth2" target="1.8" />
-      <module name="oa4mp-server-oauth1" target="1.8" />
-      <module name="oa4mp-server-oauth2" target="1.8" />
-      <module name="oa4mp-server-test" target="1.8" />
-      <module name="oa4mp-server-test-auth2" target="1.7" />
-      <module name="oa4mp-server-test-oauth2" target="1.8" />
-      <module name="oa4mp-skin" target="1.8" />
-      <module name="oa4mp-twofactor" target="1.8" />
-      <module name="oa4mp-webapp" target="1.8" />
-      <module name="oa4mp-website" target="1.5" />
-      <module name="oa4mp-xsede" target="1.8" />
-      <module name="oa4mp-xsede-oauth2" target="1.8" />
-      <module name="scitokens" target="1.7" />
-      <module name="scitokens-client" target="1.7" />
-      <module name="scitokens-server" target="1.7" />
-    </bytecodeTargetLevel>
   </component>
 </project>

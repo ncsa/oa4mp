@@ -6,7 +6,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.client.OA4MPResponse;
 import edu.uiuc.ncsa.myproxy.oa4mp.client.storage.AssetStoreUtil;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2ConfigurationLoader;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8628Constants2;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.testing.CLCCommands;
+import edu.uiuc.ncsa.oa4mp.clc.CLCCommands;
 import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2Asset;
 import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2ClientEnvironment;
 import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2MPService;
@@ -92,7 +92,16 @@ public class OA2CLCCommands extends CLCCommands {
     }
      public void bootMessage(){
          say(hasClipboard() ? "clipboard is supported." : "no clipboard support available.");
+     }
 
+    protected OA2MPService service;
+
+     @Override
+     public OA2MPService getService() {
+         if (service == null) {
+             service = new OA2MPService(getCe());
+         }
+         return service;
      }
 
     public String getConfigFile() {
@@ -104,19 +113,7 @@ public class OA2CLCCommands extends CLCCommands {
     }
 
     String configFile;
-    protected OA2MPService service;
 
-    protected OA2MPService getOA2S() {
-        return (OA2MPService) getService();
-    }
-
-    @Override
-    public OA2MPService getService() {
-        if (service == null) {
-            service = new OA2MPService(getCe());
-        }
-        return service;
-    }
 
     public void getURIHelp() {
         say("uri");
@@ -740,7 +737,7 @@ public class OA2CLCCommands extends CLCCommands {
     }
 
     private void standard_get_at(InputLine inputLine) {
-        currentATResponse = getOA2S().getAccessToken(getDummyAsset(), grant, tokenParameters);
+        currentATResponse = getService().getAccessToken(getDummyAsset(), grant, tokenParameters);
         processATResponse(inputLine);
     }
 
@@ -799,7 +796,7 @@ public class OA2CLCCommands extends CLCCommands {
             return;
         }
 
-        UserInfo userInfo = getOA2S().getUserInfo(dummyAsset.getIdentifier().toString());
+        UserInfo userInfo = getService().getUserInfo(dummyAsset.getIdentifier().toString());
         say("user info:");
         for (String key : userInfo.getMap().keySet()) {
             say("          " + key + " = " + userInfo.getMap().get(key));
@@ -818,7 +815,7 @@ public class OA2CLCCommands extends CLCCommands {
             say("Oops! No configuration has been loaded.");
             return;
         }
-        assetResponse = getOA2S().getCert(dummyAsset, currentATResponse);
+        assetResponse = getService().getCert(dummyAsset, currentATResponse);
         if (assetResponse.getUsername() != null) {
             say("returned username=" + assetResponse.getUsername());
         }
@@ -1022,7 +1019,7 @@ public class OA2CLCCommands extends CLCCommands {
             say("Oops! No configuration has been loaded.");
             return;
         }
-        RTResponse rtResponse = getOA2S().refresh(dummyAsset.getIdentifier().toString(), refreshParameters);
+        RTResponse rtResponse = getService().refresh(dummyAsset.getIdentifier().toString(), refreshParameters);
         dummyAsset = (OA2Asset) getCe().getAssetStore().get(dummyAsset.getIdentifier().toString());
         // Have to update the AT reponse here every time or no token state is preserved.
         currentATResponse = new ATResponse2(dummyAsset.getAccessToken(), dummyAsset.getRefreshToken());

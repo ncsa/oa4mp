@@ -1,70 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding">
-    <file url="file://$PROJECT_DIR$" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/myproxy-logon" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/myproxy-logon/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/myproxy-website" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/oa4mp-client-api" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/oa4mp-clc/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-client-api/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-client-api/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/oa4mp-client-loader-oauth1" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-client-loader-oauth1/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/oa4mp-client-loader-oauth2" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-client-loader-oauth2/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/oa4mp-client-oauth1" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-client-oauth1/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/oa4mp-client-oauth2" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-client-oauth2/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/oa4mp-client-test" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-client-test/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-client-test/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/oa4mp-client-webapp" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-client-webapp/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-client-webapp/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/oa4mp-co-oidc" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-gui/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/oa4mp-oidc-twofactor" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/oa4mp-oidc-twofactor/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-qdl/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-qdl/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/oa4mp-server-admin" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/oa4mp-server-admin-oauth1" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-server-admin-oauth1/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-server-admin-oauth1/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/oa4mp-server-admin-oauth2" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-server-admin/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-server-admin/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/oa4mp-server-api" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-server-api/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-server-api/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/oa4mp-server-loader-oauth1" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-server-loader-oauth1/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/oa4mp-server-loader-oauth2" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/oa4mp-server-oauth1" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-server-oauth1/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/oa4mp-server-oauth2" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-server-oauth2/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/oa4mp-server-test" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/oa4mp-server-test-oauth2" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-server-test-oauth2/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-server-test/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/oa4mp-skin" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-skin/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/oa4mp-twofactor" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/oa4mp-twofactor/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/oa4mp-webapp" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-webapp/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-webapp/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/oa4mp-website" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/oa4mp-xsede" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/oa4mp-xsede-oauth2" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-xsede-oauth2/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-xsede-oauth2/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/oa4mp-xsede/src/main/resources" charset="UTF-8" />
   </component>
 </project>

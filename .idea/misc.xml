@@ -16,32 +16,33 @@
   <component name="ClearCaseSharedConfig">
     <option name="myUseUcmModel" value="true" />
   </component>
+  <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="FrameworkDetectionExcludesConfiguration">
-    <file url="file://$PROJECT_DIR$/oa4mp-client-oauth1/overlays" />
-    <file url="file://$PROJECT_DIR$/oa4mp-client-oauth2/overlays" />
-    <file url="file://$PROJECT_DIR$/oa4mp-co-oidc/overlays" />
-    <file url="file://$PROJECT_DIR$/oa4mp-server-oauth1/overlays" />
-    <file url="file://$PROJECT_DIR$/oa4mp-server-oauth2/overlays" />
-    <file url="file://$PROJECT_DIR$/oa4mp-xsede-oauth2/overlays" />
-    <file url="file://$PROJECT_DIR$/scitokens-client/overlays" />
-    <file url="file://$PROJECT_DIR$/scitokens-server/overlays" />
     <file type="web" url="file://$PROJECT_DIR$/oa4mp-client-oauth1" />
     <file type="web" url="file://$PROJECT_DIR$/oa4mp-client-oauth2" />
     <file type="web" url="file://$PROJECT_DIR$/oa4mp-client-webapp" />
-    <file type="web" url="file://$PROJECT_DIR$/oa4mp-co-oidc" />
-    <file type="web" url="file://$PROJECT_DIR$/oa4mp-oidc-twofactor" />
     <file type="web" url="file://$PROJECT_DIR$/oa4mp-server-oauth1" />
     <file type="web" url="file://$PROJECT_DIR$/oa4mp-server-oauth2" />
-    <file type="web" url="file://$PROJECT_DIR$/oa4mp-twofactor" />
     <file type="web" url="file://$PROJECT_DIR$/oa4mp-webapp" />
-    <file type="web" url="file://$PROJECT_DIR$/oa4mp-xsede" />
     <file type="web" url="file://$PROJECT_DIR$/oa4mp-xsede-oauth2" />
-    <file type="web" url="file://$PROJECT_DIR$/scitokens-client" />
-    <file type="web" url="file://$PROJECT_DIR$/scitokens-server" />
   </component>
   <component name="IdProvider" IDEtalkID="215A14033C971CCE717D28767B12EEA0" />
   <component name="JavadocGenerationManager">
+    <option name="OUTPUT_DIRECTORY" />
+    <option name="OPTION_SCOPE" value="protected" />
+    <option name="OPTION_HIERARCHY" value="true" />
+    <option name="OPTION_NAVIGATOR" value="true" />
+    <option name="OPTION_INDEX" value="true" />
+    <option name="OPTION_SEPARATE_INDEX" value="true" />
+    <option name="OPTION_DOCUMENT_TAG_USE" value="false" />
+    <option name="OPTION_DOCUMENT_TAG_AUTHOR" value="false" />
+    <option name="OPTION_DOCUMENT_TAG_VERSION" value="false" />
+    <option name="OPTION_DOCUMENT_TAG_DEPRECATED" value="true" />
+    <option name="OPTION_DEPRECATED_LIST" value="true" />
     <option name="OTHER_OPTIONS" value="" />
+    <option name="HEAP_SIZE" />
+    <option name="LOCALE" />
+    <option name="OPEN_IN_BROWSER" value="true" />
   </component>
   <component name="MavenProjectsManager">
     <option name="originalFiles">
@@ -54,10 +55,5 @@
     <option name="LAST_EDITED_MODULE_NAME" />
     <option name="LAST_EDITED_TAB_NAME" />
   </component>
-  <component name="ProjectReloadState">
-    <option name="STATE" value="0" />
-  </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="false" project-jdk-name="1.8" project-jdk-type="JavaSDK">
-    <output url="file://$PROJECT_DIR$/classes" />
-  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_15" default="true" project-jdk-name="openjdk-15" project-jdk-type="JavaSDK" />
 </project>

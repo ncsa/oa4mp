@@ -84,6 +84,8 @@ at the start of the interaction. </p>
                 <input type="hidden" id="status" name="${action}"
                        value="${actionOk}"/>
                 <input type="hidden" id="token" name="identifier" value="${identifier}"/>
+                <input type="hidden" id="counter" name="counter" value="${count}"/>
+
             </td>
         </tr>
     </table>

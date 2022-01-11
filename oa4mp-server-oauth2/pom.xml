@@ -76,17 +76,6 @@
             <artifactId>ncsa-security-servlet</artifactId>
             <version>5.2-SNAPSHOT</version>
         </dependency>
-<!--        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-api</artifactId>
-            <version>2.5</version>
-        </dependency>-->
-<!--        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-core</artifactId>
-            <version>2.16.0</version>
-        </dependency>-->
-
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>myproxy-logon</artifactId>

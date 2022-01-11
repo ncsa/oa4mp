@@ -175,10 +175,21 @@ public class RFC8628AuthorizationServer extends EnvServlet {
                 prepare(pendingState);
                 // If they sent the user code with the request, do it here.
                 printAllParameters(request);
-                if (!StringUtils.isTrivial(request.getParameter(RFC8628Constants2.USER_CODE))) {
-                    processRequest(request,  pendingState, false);
-                    JSPUtil.fwd(request, response, getOkPage());
-                    return;
+                if(getServiceEnvironment().isDemoModeEnabled()){
+/*
+                    if (!StringUtils.isTrivial(request.getParameter(RFC8628Constants2.USER_CODE))) {
+                        processRequest(request, pendingState, false);
+                        JSPUtil.fwd(request, response, getOkPage());
+                        return;
+                    }
+
+*/
+                }else{
+                    if (!StringUtils.isTrivial(request.getParameter(RFC8628Constants2.USER_CODE))) {
+                        processRequest(request, pendingState, false);
+                        JSPUtil.fwd(request, response, getOkPage());
+                        return;
+                    }
                 }
 
                 break;
@@ -204,7 +215,7 @@ public class RFC8628AuthorizationServer extends EnvServlet {
         String password = null;
         String userCode = null;
         // Check that they have not exceeded their retry count:
-        if(checkCount){
+        if (checkCount) {
             String counter = request.getParameter("counter");
 
             if (isTrivial(counter)) {
@@ -225,8 +236,8 @@ public class RFC8628AuthorizationServer extends EnvServlet {
             pendingState.count--;
 
             userCode = request.getParameter(USER_CODE_KEY);             // we sent it
-        }else{
-           userCode = request.getParameter(RFC8628Constants2.USER_CODE);// they sent it
+        } else {
+            userCode = request.getParameter(RFC8628Constants2.USER_CODE);// they sent it
         }
         userCode = RFC8628Servlet.convertToCanonicalForm(userCode, getServiceEnvironment().getRfc8628ServletConfig());
 
@@ -281,7 +292,7 @@ public class RFC8628AuthorizationServer extends EnvServlet {
         }
         RFC8628Store<? extends OA2ServiceTransaction> rfc8628Store = (RFC8628Store) getServiceEnvironment().getTransactionStore();
         OA2ServiceTransaction trans = rfc8628Store.getByUserCode(userCode);
-        if (checkCount && trans == null ) {
+        if (checkCount && trans == null) {
             if (pendingState.count == 0) {
                 throw new TooManyRetriesException("number of retries has been been reached,", userCode);
             }
@@ -339,16 +350,24 @@ public class RFC8628AuthorizationServer extends EnvServlet {
         }
     }
 
+
+
     public void checkUser(String username, String password) throws GeneralSecurityException {
         // At this point in the basic servlet, there is no system for passwords.
         // This is because OA4MP has no native concept of managing users, it being
         // far outside of the OAuth spec.
-        // If you were checking users and there  were a problem, you would do this:
-        String message = "invalid login";
-        throw new OA2ATException(OA2Errors.ACCESS_DENIED, message, HttpStatus.SC_UNAUTHORIZED, null);
-
-        // which would display the message as the retry message.
-
+        if (getServiceEnvironment().isDemoModeEnabled()) {
+            // In demo mode, this will display the pages and accept the username (so the subject
+            // gets set
+            // but no password protection of any sort is done. Demo mode really is just intended
+            // so that an admin can set up an instance of OA4MP to evaluate if it fits their needs.
+            info("demo mode enabled, no authorization is being used.");
+        } else {
+            // If you were checking users and there  were a problem, you would do this:
+            String message = "invalid login";
+            throw new OA2ATException(OA2Errors.ACCESS_DENIED, message, HttpStatus.SC_UNAUTHORIZED, null);
+            // which would display the message as the retry message.
+        }
     }
 
 

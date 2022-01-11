@@ -97,7 +97,8 @@ public class OA2SE extends ServiceEnvironmentImpl {
                  boolean printTSInDebug,
                  long cleanupInterval,
                  String notifyACEventEmailAddresses,
-                 boolean rfc7636Required) {
+                 boolean rfc7636Required,
+                 boolean demoModeEnabled) {
 
         super(logger,
                 mfp,
@@ -168,6 +169,17 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.cleanupInterval = cleanupInterval;
         this.notifyACEventEmailAddresses = notifyACEventEmailAddresses;
         this.rfc7636Required = rfc7636Required;
+        this.demoModeEnabled = demoModeEnabled;
+    }
+
+    boolean demoModeEnabled = false;
+
+    public boolean isDemoModeEnabled() {
+        return demoModeEnabled;
+    }
+
+    public void setDemoModeEnabled(boolean demoModeEnabled) {
+        this.demoModeEnabled = demoModeEnabled;
     }
 
     public String getNotifyACEventEmailAddresses() {

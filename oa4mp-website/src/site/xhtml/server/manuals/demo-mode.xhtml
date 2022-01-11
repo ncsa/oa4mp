@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Using Demo Mode</title>
+    <!--#include virtual="../../head.html" -->
+
+</head>
+<body class="composite">
+<!--#include virtual="../../header.html" -->
+
+<h2>Introduction</h2>
+<p>
+    The intent with demo mode is to set up OA4MP with a minimal but usable system for evaluation.
+    This is done by setting the service tag attribute of <b><code>demoModeEnabled</code></b> to <code>true</code>.
+    You will need to make sure that Tomcat is set up correctly for this.
+</p>
+
+<h2>What does this do?</h2>
+<p>
+    Normally OA4MP needs to have some authorization mechanism, such as replacing the authorize
+    endpoint completely (e.g. CILogon) or perhaps enabling Tomcat's native logins to operate.
+    Many organizations as of this writing have been using X509 certificates for years and are
+    interesting in migrating to JWT signed tokens, which OA4MP handles with aplomb. But
+    this is potentially a very large structural change to an organization and needs to be evaluated and
+    tested.
+</p>
+<p>
+    The problem for a quick demo then is finding all the users (and there may be many, many in an organization)
+    that want to test this. Signing them up may be a daunting task. Enabling demo mode, however, allows an admin
+    to set policies for the tokens and lets users use both authorization code flow and device code flow. The user
+    will be prompted for user name and password, but the password is ignored and the entire purpose of the username is
+    to set the subject for any tokens issued.
+</p>
+
+<p>
+    The effect of configuring this (as per below) will be that the standard authorization code flow
+    works as expected, and the device code flow will too <i>except</i> that the user must go to the
+    webpage and type in the user code (rather than use the link that has it embedded.)
+</p>
+<p>
+    Again it should be stressed that this demo mode is not for production, but mostly to let administrators easily set up
+    a system and have many testers use the system to see how information flows in it. For production, options are then
+    to either enable Tomcat's authorization or simply replace OA4MP's entire authorization module either with your own
+    or with the CILogon proxy.
+</p>
+
+<h3>Tomcat configuration</h3>
+<p>Tomcat is configured as if this were a standalone OA4MP install but without configuring the
+    <a href="../manuals/remote-user.xhtml">remote user</a> machinery. You need to comment out any
+    password protection for the web pages and instead simply require transport of SSL as follows
+</p>
+<pre>
+
+    &lt;security-constraint&gt;
+        &lt;web-resource-collection&gt;
+            &lt;web-resource-name&gt;portalSecurity&lt;/web-resource-name&gt;
+            &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
+            &lt;http-method&gt;GET&lt;/http-method&gt;
+            &lt;http-method&gt;POST&lt;/http-method&gt;
+        &lt;/web-resource-collection&gt;
+        &lt;user-data-constraint&gt;
+            &lt;transport-guarantee&gt;CONFIDENTIAL&lt;/transport-guarantee&gt;
+        &lt;/user-data-constraint&gt;
+    &lt;/security-constraint&gt;
+</pre>
+
+<h3>Server configuration</h3>
+<p>The <code><b>demoModeEnabled</b></code> attribute in the server tag must be set to <code>true</code>.</p>
+
+
+<!--#include virtual="../../footer.html" -->
+</body>
+</html>

@@ -102,13 +102,13 @@ public abstract class AbstractOA4MPService {
      * @return
      */
     public OA4MPResponse requestCert(Identifier identifier, Map additionalParameters) {
-        // DOn't just add stuff to the argument since the caller might not want it changed.
+        // Don't just add stuff to the argument since the caller might not want it changed.
         Map newAP = new HashMap();
         newAP.putAll(additionalParameters);
         AssetProvider assetProvider = getEnvironment().getAssetProvider();
         Asset asset = null;
         if (identifier == null) {
-            asset = assetProvider.get(false); // no id
+            asset = assetProvider.get(false); // no id ==> stash in temp asset
         } else {
             asset = assetProvider.get(identifier);
         }
