@@ -651,9 +651,12 @@ public class OIDCCMServlet extends EnvServlet {
         try {
             adminClient = getAndCheckAdminClient(httpServletRequest);
         } catch (Throwable ge) {
+
             if (!cm7591Config.anonymousOK) {
+                DebugUtil.trace(this, "anonymous mode not enabled, exception thrown.");
                 throw ge;
             }
+            DebugUtil.trace(this, "anonymous ok");
             isAnonymous = true;
         }
 
@@ -708,6 +711,10 @@ public class OIDCCMServlet extends EnvServlet {
         // Next, we have to construct the registration URI by adding in the client ID.
         // Spec says we can add parameters here, but not elsewhere.
         jsonResp.put(OIDCCMConstants.REGISTRATION_CLIENT_URI, registrationURI + "?" + OA2Constants.CLIENT_ID + "=" + newClient.getIdentifierString());
+        // oidc-client expects the scopes which we may return.
+        JSONArray xxx = new JSONArray();
+        xxx.addAll(newClient.getScopes())        ;
+        jsonResp.put(SCOPE, xxx);
 
         debugger.trace(this, "saving this client");
         getOA2SE().getClientStore().save(newClient);
@@ -922,20 +929,30 @@ public class OIDCCMServlet extends EnvServlet {
             */
         } else {
             JSONArray newScopes = toJA(jsonRequest, OA2Constants.SCOPE);
+            // issue is that some client registrations can send along redundant scopes
+            // and may send along things like offline access, e.g. ["openid","openid","offline_access"]
+            //
+            HashSet<String> unique = new HashSet<>();
+            unique.addAll(newScopes);
+
             if (client.isPublicClient()) {
                 // public clients cannot reset their scopes ever.
                 // They must, however, send along a single openid scope or this gets flagged as an error
-                if (!newScopes.contains(OA2Scopes.SCOPE_OPENID)) {
+                if (!unique.contains(OA2Scopes.SCOPE_OPENID)) {
                     throw new OA2GeneralError(OA2Errors.INVALID_REQUEST_OBJECT,
                             "cannot decrease scope on a public client.",
                             HttpStatus.SC_BAD_REQUEST, null);
                 }
                 if (1 < newScopes.size()) {
-                    throw new OA2GeneralError(OA2Errors.INVALID_REQUEST_OBJECT,
-                            "cannot increase scopes on a public client.",
-                            HttpStatus.SC_BAD_REQUEST, null);
+                    if(!unique.contains(OA2Scopes.SCOPE_OFFLINE_ACCESS)){
+                        throw new OA2GeneralError(OA2Errors.INVALID_REQUEST_OBJECT,
+                                "cannot increase scopes on a public client.",
+                                HttpStatus.SC_BAD_REQUEST, null);
+                    }
                 }
             }
+            newScopes.clear();
+            newScopes.addAll(unique);
             client.setScopes(newScopes);
         }
         jsonRequest.remove(OA2Constants.SCOPE);
@@ -1024,25 +1041,28 @@ public class OIDCCMServlet extends EnvServlet {
     protected void handleResponseTypes(OA2Client client, JSONObject jsonRequest, OA2ClientKeys keys) {
         if (jsonRequest.containsKey(RESPONSE_TYPES)) {
             JSONArray responseTypes = toJA(jsonRequest, RESPONSE_TYPES);
-            if (!responseTypes.contains(OA2Constants.RESPONSE_TYPE_CODE)) {
-                throw new OA2GeneralError(OA2Errors.UNSUPPORTED_RESPONSE_TYPE,
-                        "unsupported response type",
-                        HttpStatus.SC_BAD_REQUEST, null);
-            }
-            if (responseTypes.contains(OA2Constants.RESPONSE_TYPE_TOKEN)) {
-                // This is required for implicit flow, which we do not support.
-                throw new OA2GeneralError(OA2Errors.UNSUPPORTED_RESPONSE_TYPE,
-                        "unsupported response type",
-                        HttpStatus.SC_BAD_REQUEST, null);
+            if(!responseTypes.isEmpty()){
+                // oidc-agent sends an empty list. Don't have it bomb later.
+                if (!responseTypes.contains(OA2Constants.RESPONSE_TYPE_CODE)) {
+                    throw new OA2GeneralError(OA2Errors.UNSUPPORTED_RESPONSE_TYPE,
+                            "unsupported response type",
+                            HttpStatus.SC_BAD_REQUEST, null);
+                }
+                if (responseTypes.contains(OA2Constants.RESPONSE_TYPE_TOKEN)) {
+                    // This is required for implicit flow, which we do not support.
+                    throw new OA2GeneralError(OA2Errors.UNSUPPORTED_RESPONSE_TYPE,
+                            "unsupported response type",
+                            HttpStatus.SC_BAD_REQUEST, null);
 
-            }
-            if (1 < responseTypes.size() && !checkJAEntry(responseTypes, OA2Constants.RESPONSE_TYPE_ID_TOKEN)) {
-                throw new OA2GeneralError(OA2Errors.UNSUPPORTED_RESPONSE_TYPE,
-                        "unsupported response type",
-                        HttpStatus.SC_BAD_REQUEST, null);
+                }
+                if (1 < responseTypes.size() && !checkJAEntry(responseTypes, OA2Constants.RESPONSE_TYPE_ID_TOKEN)) {
+                    throw new OA2GeneralError(OA2Errors.UNSUPPORTED_RESPONSE_TYPE,
+                            "unsupported response type",
+                            HttpStatus.SC_BAD_REQUEST, null);
 
+                }
+                client.setResponseTypes(responseTypes);
             }
-            client.setResponseTypes(responseTypes);
         } else {
             // Maybe add in defaults at some point if omitted? Now this works since we only have a single flow.
         }

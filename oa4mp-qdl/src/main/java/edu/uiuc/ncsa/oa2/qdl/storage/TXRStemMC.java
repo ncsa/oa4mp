@@ -22,11 +22,13 @@ public class TXRStemMC<V extends TXRecord> extends StemConverter<V> {
 
 
     /*
-            String audience = "audience";
+      10 attributes
+      String audience = "audience";
       String expiresAt = "expires_at";
       String lifetime = "lifetime";
       String issuedAt = "issued_at";
       String issuer = "issuer";
+
       String isValid = "valid";
       String parentID = "parent_id";
       String resource = "resource";
@@ -41,11 +43,13 @@ public class TXRStemMC<V extends TXRecord> extends StemConverter<V> {
         if(stem.containsKey(kk().lifetime())){v.setLifetime(stem.getLong(kk().lifetime()));}
         if(stem.containsKey(kk().issuedAt())){v.setIssuedAt(stem.getLong(kk().issuedAt()));}
         if(isStringKeyOK(stem, kk().issuer())){v.setIssuer(stem.getString(kk().issuer()));}
+        // 5
         if (stem.containsKey(kk().isValid())) {v.setValid(stem.getBoolean(kk().isValid()));}
         if(stem.containsKey(kk().parentID())){v.setParentID(BasicIdentifier.newID(stem.getString(kk().parentID())));}
         if (stem.containsKey(kk().resource())) {v.setResource(toList(stem, kk().resource()));}
         if (stem.containsKey(kk().scopes())) {v.setScopes(toList(stem, kk().scopes()));}
         if(isStringKeyOK(stem, kk().tokenType())){v.setTokenType(stem.getString(kk().tokenType()));}
+        // 10 attributes
         return v;
     }
     @Override
@@ -58,6 +62,7 @@ public class TXRStemMC<V extends TXRecord> extends StemConverter<V> {
         if (!StringUtils.isTrivial(v.getIssuer())) {
             stem.put(kk().issuer(), v.getIssuer());
         }
+        // 5
         stem.put(kk().isValid(), v.isValid());
         if (v.getParentID() != null) {
             stem.put(kk().parentID(), v.getParentID().getUri().toString());
@@ -67,6 +72,7 @@ public class TXRStemMC<V extends TXRecord> extends StemConverter<V> {
         if (!StringUtils.isTrivial(v.getTokenType())) {
             stem.put(kk().tokenType(), v.getTokenType());
         }
+        // 10 attributes
         return stem;
     }
 }

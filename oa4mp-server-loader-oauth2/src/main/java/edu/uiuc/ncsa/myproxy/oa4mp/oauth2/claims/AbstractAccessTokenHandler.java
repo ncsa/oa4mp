@@ -224,13 +224,13 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
          * Do not assert the capability.
          *
          */
-        for(String x : computedScopes){
-            if(!x.contains(":") ){
-                if(requestedScopes.contains(x)){
+        for (String x : computedScopes) {
+            if (!x.contains(":")) {
+                if (requestedScopes.contains(x)) {
                     relativeRequests.add(x);
-                }else{
-                    for(String bad : requestedScopes){
-                        if(bad.startsWith(x + ":")){
+                } else {
+                    for (String bad : requestedScopes) {
+                        if (bad.startsWith(x + ":")) {
                             badRequests.add(bad);
                         }
                     }
@@ -293,7 +293,7 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
           Make SURE the JTI gets set or token exchange, user info etc. will never work.
          */
         MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(transaction.getOA2Client());
-        debugger.trace(this,"starting AT handler finish with transaction =" + transaction);
+        debugger.trace(this, "starting AT handler finish with transaction =" + transaction);
         JSONObject atData = getAtData();
         if (getPhCfg().hasTXRecord()) {
             // Fixes CIL-971
@@ -302,10 +302,10 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
                 atData.put(JWT_ID, txRecord.getIdentifierString());
             }
         } else {
-            debugger.trace(this,"update condition");
+            debugger.trace(this, "update condition");
             if (transaction.getAccessToken() != null) {
                 atData.put(JWT_ID, transaction.getAccessToken().getToken());
-                debugger.trace(this,"update condition: TRUE, at=" + atData.get(JWT_ID));
+                debugger.trace(this, "update condition: TRUE, at=" + atData.get(JWT_ID));
             }
         }
         if (doTemplates) {
@@ -322,25 +322,29 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
             proposedLifetime = Math.min(proposedLifetime, transaction.getMaxAtLifetime());
         }
         atData.put(EXPIRATION, (atData.getLong(ISSUED_AT) * 1000 + proposedLifetime) / 1000);
-        if(!atData.containsKey(ISSUER)){
+        if (!atData.containsKey(ISSUER)) {
             atData.put(ISSUER, transaction.getUserMetaData().getString(ISSUER));
         }
-         if(!atData.containsKey(SUBJECT)){
-             // If the subject has not been set some place else, see if it is configured in the
-             // client directly. If it is not configured there, there will be no subject
-             // in this token.
-             if(getATConfig().hasSubject()){
-                    String newSubject = TemplateUtil.replaceAll(getATConfig().getSubject(), atData);
-                    atData.put(SUBJECT, newSubject );
-                }else{
-                 // absolute last place option is to set it to the same subject as the
-                 // user. About half the time this works.
-                 atData.put(SUBJECT, transaction.getUserMetaData().getString(SUBJECT));
-             }
-         }
+
+        if (!atData.containsKey(SUBJECT)) {
+            // If the subject has not been set some place else, see if it is configured in the
+            // client directly. If it is not configured there, there will be no subject
+            // in this token.
+            if (getATConfig().hasSubject()) {
+                String newSubject = TemplateUtil.replaceAll(getATConfig().getSubject(), atData);
+                atData.put(SUBJECT, newSubject);
+            } else {
+                // absolute last place option is to set it to the same subject as the
+                // user. About half the time this works.
+                atData.put(SUBJECT, transaction.getUserMetaData().getString(SUBJECT));
+            }
+        }
+        
+        doServerVariables(atData);
         setAtData(atData);
         transaction.setAccessTokenLifetime(proposedLifetime);
     }
+
 
     @Override
     public void finish(String execPhase) throws Throwable {
@@ -361,8 +365,9 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
     }
 
     public AccessToken getSignedAT(JSONWebKey key) {
-            return getSignedAT(key, JWTUtil2.DEFAULT_TYPE);
+        return getSignedAT(key, JWTUtil2.DEFAULT_TYPE);
     }
+
     /**
      * Gets the AT data object (which has all the claims in it) and returns a signed access token.
      * This does <b>not</b> set the access token in the transaction but leaves up to the calling
@@ -393,7 +398,7 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
             throw new IllegalStateException("Error: no JTI. Cannot create access token");
         }
         try {
-            String at = JWTUtil2.createJWT(getAtData(), key,headerType);
+            String at = JWTUtil2.createJWT(getAtData(), key, headerType);
             URI jti = URI.create(getAtData().getString(JWT_ID));
             AccessTokenImpl at0 = new AccessTokenImpl(at, jti);
             at0.setLifetime(1000 * (getAtData().getLong(EXPIRATION) - getAtData().getLong(ISSUED_AT)));
@@ -410,7 +415,7 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
 
     @Override
     public void saveState() throws Throwable {
-  //      DebugUtil.trace(this, ".saveState: claims = " + getClaims().toString(2));
+        //      DebugUtil.trace(this, ".saveState: claims = " + getClaims().toString(2));
         switch (getResponseCode()) {
             case RC_NOT_RUN:
                 break;
@@ -418,7 +423,7 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
                 if (transaction != null && oa2se != null) {
                     transaction.setUserMetaData(getClaims());  // It is possible that the claims were updated. Save them.
                     transaction.setATData(getAtData());
-    //                DebugUtil.trace(this, ".saveState: done updating transaction.");
+                    //                DebugUtil.trace(this, ".saveState: done updating transaction.");
                 }
             case RC_OK_NO_SCRIPTS:
                 oa2se.getTransactionStore().save(transaction);
@@ -461,14 +466,14 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
             atData.put(AUDIENCE, getATConfig().getAudience());
         }
         // If they really asserted it
-         if(getATConfig().hasSubject()){
-             String newSubject = TemplateUtil.replaceAll(getATConfig().getSubject(), atData);
-             atData.put(SUBJECT, newSubject );
-         }
+        if (getATConfig().hasSubject()) {
+            String newSubject = TemplateUtil.replaceAll(getATConfig().getSubject(), atData);
+            atData.put(SUBJECT, newSubject);
+        }
         if (0 < getATConfig().getLifetime()) {
             atData.put(EXPIRATION, (System.currentTimeMillis() + getATConfig().getLifetime()) / 1000L);
         } else {
-            atData.put(EXPIRATION, (System.currentTimeMillis() / 1000L) + OA2ConfigurationLoader.ACCESS_TOKEN_LIFETIME_DEFAULT); // 15 minutes.
+            atData.put(EXPIRATION, (System.currentTimeMillis() + OA2ConfigurationLoader.ACCESS_TOKEN_LIFETIME_DEFAULT) / 1000L); // 15 minutes.
         }
         atData.put(NOT_VALID_BEFORE, (System.currentTimeMillis() - 5000L) / 1000L); // not before is 5 minutes before current
         atData.put(ISSUED_AT, System.currentTimeMillis() / 1000L);

@@ -213,7 +213,9 @@ public class QDLStoreAccessor {
 
     protected StemVariable toStem(Identifiable identifiable) {
         StemVariable stem = new StemVariable();
-        getConverter().toMap(identifiable, stem);
+        if(identifiable != null) {
+            getConverter().toMap(identifiable, stem);
+        }
         return stem;
     }
 

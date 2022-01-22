@@ -435,7 +435,11 @@ public class StoreFacade implements QDLModuleMetaClass {
         public Object evaluate(Object[] objects, State state) {
             checkInit();
             try {
-                return getStoreAccessor().get(BasicIdentifier.newID(objects[0].toString()));
+                StemVariable stemVariable =  getStoreAccessor().get(BasicIdentifier.newID(objects[0].toString()));
+                if(stemVariable.isEmpty()){
+                    return QDLNull.getInstance();
+                }
+                return stemVariable;
             } catch (Throwable t) {
                 t.printStackTrace();
                 throw new QDLException("Error: Could not find the object with id \"" + objects[0].toString() + "\"");
@@ -447,6 +451,7 @@ public class StoreFacade implements QDLModuleMetaClass {
             List<String> doxx = new ArrayList<>();
             doxx.add(getName() + "(id) - read the stored object with the given identifier. This will return a stem representation. ");
             doxx.add("You may have several active objects at once.");
+            doxx.add("If there is no such element, a null will be returned");
             doxx.add(checkInitMessage);
             return doxx;
         }
@@ -487,7 +492,7 @@ public class StoreFacade implements QDLModuleMetaClass {
         @Override
         public List<String> getDocumentation(int argCount) {
             List<String> doxx = new ArrayList<>();
-            doxx.add(getName() + " (stem.) updates and existing object in the store. If the object exists, this will fail.");
+            doxx.add(getName() + " (stem.) updates and existing object in the store. If the object does not exist, this will fail.");
             doxx.add("See also: " + SAVE_NAME);
             return doxx;
         }
@@ -564,8 +569,8 @@ public class StoreFacade implements QDLModuleMetaClass {
         public List<String> getDocumentation(int argCount) {
             List<String> doxx = new ArrayList<>();
             doxx.add(getName() + "(key, regex) -  search for all clients with the given key whose values satisfy the regex.");
-            doxx.add("Note especially #1: This returns a bunch of stems, one for each object that is found, so it is equivalent to a multi-read");
-            doxx.add("Note especially #2: This may be a huge result if the regex is too general. Do eb careful.");
+            doxx.add("Note #1: This returns a bunch of stems, one for each object that is found, so it is equivalent to a multi-read");
+            doxx.add("Note #2: This may be a huge result if the regex is too general. Do be careful.");
             doxx.add(checkInitMessage);
             return doxx;
         }

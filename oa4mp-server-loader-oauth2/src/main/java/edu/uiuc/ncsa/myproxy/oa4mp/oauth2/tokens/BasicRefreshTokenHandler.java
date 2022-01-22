@@ -166,6 +166,8 @@ public class BasicRefreshTokenHandler extends AbstractPayloadHandler implements 
         }
         rtData.put(EXPIRATION, (rtData.getLong(ISSUED_AT) * 1000 + proposedLifetime) / 1000);
         transaction.setRefreshTokenLifetime(proposedLifetime);
+        doServerVariables(rtData);
+
         setRTData(rtData);
 
     }

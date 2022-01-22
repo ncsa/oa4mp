@@ -29,14 +29,9 @@ any needed subdirectories.
             one.
         </td>
     </tr>
-    <tr>
-        <td style="vertical-align: top;">dataPath</td>
-        <td style="vertical-align: top;">Location of items</td>
-    </tr>
-    <tr>
-        <td style="vertical-align: top;">indexPath</td>
-        <td style="vertical-align: top;">Location of system-built indices.</td>
-    </tr>
+<!--
+     CIL-1153: dataPath and indexPath should not be used since they no longer correspond to the inner
+     workings of the store -->
     <tr>
            <td style="vertical-align: top;">removeEmptyFiles</td>
            <td style="vertical-align: top;">Remove any empty files in the store. The default is <b>true</b> meaning that empty files will
@@ -45,8 +40,10 @@ any needed subdirectories.
     </tbody>
 
 </table>
-<p>Again you specify either the <span style="font-weight: bold;">path</span> or both the <span
-        style="font-weight: bold;">dataPath</span> and <span style="font-weight: bold;">indexPath</span>.</p>
+<p>
+    You <b>must</b> specify  the <span style="font-weight: bold;">path</span>. The effect will be to create (and manage)
+    directories for each store.
+</p>
 
 <p>A file-based store system is a great, easy way to set up your storage. It require nothing more than the correct
     permissions. Remember though that you should do the usual administrative tasks of backing it up as needed and
@@ -63,30 +60,18 @@ any needed subdirectories.
    &lt;/fileStore&gt;
 &lt;/service&gt;
 </pre>
-<p>This sets up a fully functioning service with local storage and using the default MyProxy service.</p>
+<p>This sets up a fully functioning service with local storage and using the default MyProxy service. This
+would create the following:</p>
+<ul>
+    <li>/var/www/storage/transactions/dataPath</li>
+    <li>/var/www/storage/transactions/indexPath</li>
+    <li>/var/www/storage/clients/dataPath</li>
+    <li>/var/www/storage/clients/indexPath</li>
+    <li>/var/www/storage/clientApprovals/dataPath</li>
+    <li>/var/www/storage/clientApprovals/indexPath</li>
+</ul>
 
-<h3>Example 2.</h3>
-
-<p>An alternate version of this would be to specify the data and index paths for each store:</p>
-<pre>
-&lt;service name="default" address="https://myservice.org:8443/oauth"&gt;
-   &lt;fileStore dataPath="/var/www/storage/transactions/data"
-               indexPath="/var/www/storage/transactions/index"&gt;
-      &lt;transactions/&gt;
-   &lt;/fileStore&gt;
-   &lt;fileStore dataPath="/var/www/storage/clients/data"
-               indexPath="/var/www/storage/clients/index"&gt;
-      &lt;clients/&gt;
-   &lt;/fileStore&gt;
-   &lt;fileStore dataPath="/var/www/storage/clientApprovals/data"
-               indexPath="/var/www/storage/clientApprovals/index"&gt;
-      &lt;clientApprovals/&gt;
-   &lt;/fileStore&gt;
-&lt;/service&gt;
-</pre>
-
-    This is equivalent to the first example.
-<h2>Client examples</h2>
+<h2>A client example</h2>
 <h3>Using a file store in a client</h3>
 A client file store can be applied to
 <pre>

@@ -29,6 +29,9 @@ import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ExtendedParameters.EXTEND
  * on 2/28/14 at  1:46 PM
  */
 public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA2TransactionScopes, OIDCServiceTransactionInterface, DateComparable {
+    /*
+      These keys are used internally as keys for the state JSON object. All you need to do is grab the state as a unit.
+     */
     public String FLOW_STATE_KEY = "flow_state";
     public String CLAIMS_SOURCES_STATE_KEY = "claims_sources";
     public String STATE_KEY = "state";

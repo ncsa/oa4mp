@@ -35,7 +35,7 @@ import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.*;
 
 /**
- * Servlet that starts RFC 8628 a.a device flow .This issues a user code that the user
+ * Servlet that <b>starts</b> RFC 8628 a.a device flow .This issues a user code that the user
  * must present to an authroization endpoint.
  * <p>Created by Jeff Gaynor<br>
  * on 2/9/21 at  11:21 AM

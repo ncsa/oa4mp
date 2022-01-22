@@ -20,6 +20,16 @@ public class PermissionStemMC<V extends Permission> extends StemConverter<V> {
         return (PermissionKeys) keys;
     }
 
+    /*
+    7 attributes
+    String adminID = "admin_id";
+    String clientID = "client_id";
+    String readable = "can_read";
+    String writable = "can_write";
+    String canCreate = "can_create";
+    String canRemove = "can_remove";
+    String canApprove = "can_approve";
+     */
     @Override
     public V fromMap(StemVariable stem, V v) {
         v = super.fromMap(stem, v);
@@ -38,13 +48,14 @@ public class PermissionStemMC<V extends Permission> extends StemConverter<V> {
         if(stem.containsKey(kk().canRemove())){
             v.setDelete(stem.getBoolean(kk().canRemove()));
         }
+        // 5
         if(stem.containsKey(kk().canCreate())){
             v.setCreate(stem.getBoolean(kk().canCreate()));
         }
         if(stem.containsKey(kk().canApprove())){
             v.setApprove(stem.getBoolean(kk().canApprove()));
         }
-
+        // 7 attributes
         return v;
     }
     /*
@@ -69,8 +80,10 @@ public class PermissionStemMC<V extends Permission> extends StemConverter<V> {
         stem.put(kk().canApprove(), v.isApprove());
         stem.put(kk().canCreate(), v.isCreate());
         stem.put(kk().canRemove(), v.isDelete());
+        // 5
         stem.put(kk().readable(), v.isRead());
         stem.put(kk().writeable(), v.isWrite());
+        // 7 attributes
         return stem;
     }
 }

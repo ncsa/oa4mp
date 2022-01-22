@@ -43,6 +43,10 @@ When a new version is deployed, here is the testing order
 
   -- localhost:test/no_cfg
      No configuration of any sort (i.e., cfg is unset, strict scopes etc)
+     issue
+         cleanr_all_params -a -t -x
+     before hand to remove any state from other client tests. This accepts no additional
+     scopes in the request.
      Uses a Derby store for the client, just to make sure that gets tested someplace.
      Most common configuration in production.
      ** Must pass **
@@ -51,7 +55,10 @@ When a new version is deployed, here is the testing order
 
   -- Test any client for exchange, introspection and revocation.
      This will exchange sets of tokens and introspect on them.
-     standard up through get_at. Then
+     Look for the "active" attribute in the token. That is what is
+     true or false.
+
+     Standard up through get_at. Then
      introspect
        > true
      introspect -rt
@@ -211,7 +218,7 @@ When a new version is deployed, here is the testing order
 
         Test #3 - with wlcg capabilities, no scopes passed in refresh or TX
         Set following in CLC before starting
-        clear_all_params if needed.
+        clear_all_params -a -t -x // if needed.
         set_param -a scope "storage.read:/ wlcg.capabilityset:/duneana wlcg.groups"
         access:
           scopes:

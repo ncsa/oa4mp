@@ -34,8 +34,8 @@
       ]
     },
     "refresh": {
-      "audience": "https://wlcg.cern.ch/jwt/refresh",
-      "issuer": "https://refresh.cilogon.org",
+      "audience": "${client_id}/refresh",
+      "issuer": "${host}/refresh",
       "lifetime": 3600000,
       "type": "refresh"
     },

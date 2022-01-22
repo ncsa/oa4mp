@@ -207,8 +207,8 @@ public class StoreAccessModule extends JavaModule {
             descr.add("is not an update, i.e., if you remove properties, they will be deleted");
             descr.add("in the store.");
             descr.add("Use.");
-            descr.add("1. use module_load(uri, component), e.g. ");
-            descr.add("module_load('oa2:/qdl/store', 'clients');");
+            descr.add("1. use module_import(uri, component), e.g. ");
+            descr.add("module_import('oa2:/qdl/store', 'clients');");
             descr.add("2. initialize the store");
             descr.add("clients#init('/home/ncsa/dev/csd/config/server-oa2.xml', 'localhost:oa4mp.oa2.mariadb', 'client');");
             descr.add("This returns true if the store intialized ok.");

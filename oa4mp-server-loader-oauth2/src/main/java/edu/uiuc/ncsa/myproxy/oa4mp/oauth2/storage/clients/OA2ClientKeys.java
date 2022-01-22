@@ -31,7 +31,10 @@ public class OA2ClientKeys extends ClientKeys {
     String scopes = "scopes";
     String strictScopes="strict_scopes";
     /*
-    If you add attributes, make sure you update ClientStemMC or you may break the QDL module that handles clients.
+      If you add attributes, make sure you update
+           edu.uiuc.ncsa.oa2.qdl.storage.ClientStemMC
+           (in  oa4mp-qdl)
+      or you may break the QDL module that handles clients.
      */
 
 

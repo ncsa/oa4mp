@@ -174,7 +174,7 @@ public class RFC8628AuthorizationServer extends EnvServlet {
                 pending.put(id, pendingState);
                 prepare(pendingState);
                 // If they sent the user code with the request, do it here.
-                printAllParameters(request);
+              //  printAllParameters(request);
                 if(getServiceEnvironment().isDemoModeEnabled()){
 /*
                     if (!StringUtils.isTrivial(request.getParameter(RFC8628Constants2.USER_CODE))) {

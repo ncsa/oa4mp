@@ -36,10 +36,7 @@ public interface ClientManagementConstants {
     public String RFC_7591_VALUE = "rfc7591";
     public String RFC_7592_VALUE = "rfc7592";
     public String OA4MP_VALUE = "oa4mp";
-    /**
-     * A client id to use as a template for all request from a client.
-     */
-    public String RFC_7591_AUTO_TEMPLATE = "template";
+
     /**
      * Whether or not to automatically approve anonymous requests. This <b><i>may</i></b> happen
      * in highly automated systems with severely restricted access. Generally though setting

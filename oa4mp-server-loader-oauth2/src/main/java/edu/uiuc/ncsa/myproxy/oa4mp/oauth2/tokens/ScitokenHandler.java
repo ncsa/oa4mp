@@ -2,8 +2,10 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.AbstractAccessTokenHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.PayloadHandlerConfigImpl;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
+import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.AUDIENCE;
 import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.SUBJECT;
 
 /**
@@ -44,5 +46,22 @@ public class ScitokenHandler extends AbstractAccessTokenHandler {
         sciTokens.put(SUBJECT, transaction.getUsername());
         sciTokens.put(ST_CLIENT_IDENTIFIER, transaction.getOA2Client().getIdentifierString());
         sciTokens.put(ST_VERSION_CLAIM, getVersion()); // make sure set for inter-operability with others
+    }
+
+    @Override
+    public void finish(boolean doTemplates, boolean isQuery) throws Throwable {
+        super.finish(doTemplates, isQuery);
+        // SciTokens specification has a special value for the audience of ANY that is a string.
+        // As per spec., do not return an array like ["ANY"] but replace it with the single
+        // string "ANY"
+        // First time it hits this the audience is converted. Only SciTokens allows for this specific
+        // value.
+        if(getAtData().get(AUDIENCE) instanceof JSONArray){
+            JSONArray audience = getAtData().getJSONArray(AUDIENCE);
+            if(audience.size() == 1 && audience.getString(0).equals("ANY")){
+                getAtData().put(AUDIENCE, "ANY");
+            }
+
+        }
     }
 }

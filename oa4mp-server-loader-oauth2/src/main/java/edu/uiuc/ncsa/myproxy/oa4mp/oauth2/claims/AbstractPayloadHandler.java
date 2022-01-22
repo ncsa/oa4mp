@@ -3,18 +3,23 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.core.util.Iso8601;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTUtil2;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.PayloadHandler;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.PayloadHandlerConfig;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
+import edu.uiuc.ncsa.security.util.configuration.TemplateUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
+import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.*;
+import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.AUDIENCE;
 import static edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse.RC_NOT_RUN;
 
 /**
@@ -186,4 +191,61 @@ public abstract class AbstractPayloadHandler implements PayloadHandler {
         }
         return getPhCfg().getScriptSet() != null && !getPhCfg().getScriptSet().isEmpty();
     }
+
+    /**
+     * Used by access tokens and refresh tokens. This allows for certain substitutions for various server
+     * variables.
+     * @param targetClaims
+     */
+    protected void doServerVariables(JSONObject targetClaims) {
+        JSONObject serverVariableTemplates = new JSONObject();
+        // Allow for substitutions in audience, subject, issuer and resource
+        serverVariableTemplates.putAll(getClaims());
+        long now = System.currentTimeMillis();
+        serverVariableTemplates.put("client_id", getPhCfg().getTransaction().getClient().getIdentifierString());
+        serverVariableTemplates.put("host", getPhCfg().getOa2se().getServiceAddress().toString());
+        serverVariableTemplates.put("now", now);
+        serverVariableTemplates.put("now_iso", Iso8601.date2String(now));
+        serverVariableTemplates.put("now_sec", Iso8601.date2String(now / 1000));
+        if (serverVariableTemplates.containsKey("eppn")) {
+            serverVariableTemplates.put("eppn_2", serverVariableTemplates.getString("eppn").substring(0, serverVariableTemplates.getString("eppn").indexOf("@")));
+        }
+        doSubstitution(SUBJECT, targetClaims, serverVariableTemplates);
+        doSubstitution(RESOURCE, targetClaims, serverVariableTemplates);
+        doSubstitution(ISSUER, targetClaims, serverVariableTemplates);
+        doSubstitution(AUDIENCE, targetClaims, serverVariableTemplates);
+    }
+
+    /**
+     * Do template substitutions for subject, audience, resource and issuer.
+     *
+     * @param key
+     * @param targetClaims
+     * @param x
+     */
+    protected void doSubstitution(String key, JSONObject targetClaims, JSONObject x) {
+        if (!targetClaims.containsKey(key)) {
+            return;
+        }
+        Object obj = targetClaims.getString(key);
+        if (obj instanceof JSONArray) {
+            JSONArray jsonArray = (JSONArray) obj;
+            for (int i = 0; i < jsonArray.size(); i++) {
+                Object y = jsonArray.get(i);
+                if (y instanceof String) {
+                    String s = (String) obj;
+                    String newSubject = TemplateUtil.replaceAll(s, x);
+                    jsonArray.set(i, newSubject);
+                }
+            }
+            targetClaims.put(key, jsonArray);
+        } else {
+            if (obj instanceof String) {
+                String s = (String) obj;
+                String newSubject = TemplateUtil.replaceAll(s, x);
+                targetClaims.put(key, newSubject);
+            }
+        }
+    }
+
 }

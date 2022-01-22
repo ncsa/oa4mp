@@ -28,6 +28,4 @@
 say('*** QDL test script');
 z.'sub' := 'foo';
 z.'baz' := 'bar';
-z. := at_init('wlcg', z.);
-access_token. := z.;
-say('z ==' + to_string(z.)) ;
+say('test: ' + to_string(z.));

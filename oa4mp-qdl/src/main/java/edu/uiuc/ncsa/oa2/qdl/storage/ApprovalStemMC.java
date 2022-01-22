@@ -18,7 +18,13 @@ public class ApprovalStemMC<V extends ClientApproval> extends StemConverter<V> {
     ClientApprovalKeys kk() {
         return (ClientApprovalKeys) keys;
     }
-
+    /*
+      4 attributes
+    String approved = "approved";
+    String approvalTS = "approval_ts";
+    String approver = "approver";
+    String status = "status";
+     */
 
     @Override
     public V fromMap(StemVariable stem, V v) {

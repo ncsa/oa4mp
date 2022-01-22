@@ -2,7 +2,8 @@ Client scripts for the client management API.
 
 Introduction.
 -------------
-This directory contains a full set of scripts to exercise the client management API from the command line.
+This directory contains a full set of scripts to exercise the native OA4MP client management API from the command line.
+These are NOT for RFC7591, 7592.
 
 Requirements.
 -------------

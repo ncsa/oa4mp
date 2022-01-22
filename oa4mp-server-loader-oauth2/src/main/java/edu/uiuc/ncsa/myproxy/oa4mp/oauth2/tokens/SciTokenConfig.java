@@ -16,10 +16,6 @@ public class SciTokenConfig extends AccessTokenConfig {
         if (jsonObject.containsKey(USERNAME_CLAIM_KEY)) {
             usernameClaimKey = jsonObject.getString(USERNAME_CLAIM_KEY);
         }
-      /*  if (jsonObject.containsKey(TEMPLATES_KEY)) {
-            authorizationTemplates = new AuthorizationTemplates();
-            authorizationTemplates.fromJSON(jsonObject.getJSONArray(TEMPLATES_KEY));
-        }*/
         setScriptSet(AnotherJSONUtil.createScripts(jsonObject));
 
     }
@@ -29,11 +25,6 @@ public class SciTokenConfig extends AccessTokenConfig {
         if (!StringUtils.isTrivial(usernameClaimKey)) {
             jsonObject.put(USERNAME_CLAIM_KEY, usernameClaimKey);
         }
-/*
-        if (!authorizationTemplates.isEmpty()) {
-            jsonObject.put(TEMPLATES_KEY, authorizationTemplates.toJSON());
-        }
-*/
         return jsonObject;
     }
 
@@ -52,22 +43,4 @@ public class SciTokenConfig extends AccessTokenConfig {
 
     String usernameClaimKey;
 
-/*
-    public AuthorizationTemplates getAuthorizationTemplates() {
-        return authorizationTemplates;
-    }
-
-    public void setAuthorizationTemplates(AuthorizationTemplates authorizationTemplates) {
-        this.authorizationTemplates = authorizationTemplates;
-    }
-
-    AuthorizationTemplates authorizationTemplates;
-*/
-
-/*
-    @Override
-    public ScriptSet getScriptSet() {
-        return null;
-    }
-*/
 }

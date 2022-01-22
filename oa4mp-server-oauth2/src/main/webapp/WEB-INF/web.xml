@@ -107,7 +107,7 @@
 
     <servlet>
         <servlet-name>clientVetting</servlet-name>
-        <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2RegistrationServlet</servlet-class>
+        <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2AutoRegistrationServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
     <servlet-mapping>
@@ -175,7 +175,6 @@
        Uncomment the next section if you are replacing the built-in authorization module with your own.
        Look here for the details: http://grid.ncsa.illinois.edu/myproxy/oauth/server/manuals/remote-user.xhtml
     -->
-    <!--
       <security-constraint>
          <web-resource-collection>
            <web-resource-name>OAuth Security</web-resource-name>
@@ -209,7 +208,7 @@
        <login-config>
           <auth-method>BASIC</auth-method>
         </login-config>
- -->
+
     <resource-ref>
         <description>
             Resource reference to a factory for javax.mail.Session
