@@ -7,7 +7,7 @@
     <parent>
         <groupId>edu.uiuc.ncsa.myproxy</groupId>
         <artifactId>myproxy</artifactId>
-        <version>5.2-SNAPSHOT</version>
+        <version>5.2.4</version>
     </parent>
 
     <artifactId>oa4mp-qdl</artifactId>
@@ -22,17 +22,17 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>ncsa-qdl</artifactId>
-            <version>1.4-QDL-SNAPSHOT</version>
+            <version>1.4.4</version>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>ncsa-qdl-gui</artifactId>
-            <version>1.4-QDL-SNAPSHOT</version>
+            <version>1.4.4</version>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>ncsa-qdl</artifactId>
-            <version>1.4-QDL-SNAPSHOT</version>
+            <version>1.4.4</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
@@ -40,21 +40,21 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>ncsa-security-core</artifactId>
-            <version>5.2-SNAPSHOT</version>
+            <version>5.2.4</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>ncsa-security-util</artifactId>
-            <version>5.2-SNAPSHOT</version>
+            <version>5.2.4</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <artifactId>oa4mp-server-admin-oauth2</artifactId>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
-            <version>5.2-SNAPSHOT</version>
+            <version>5.2.4</version>
         </dependency>
 
     </dependencies>
