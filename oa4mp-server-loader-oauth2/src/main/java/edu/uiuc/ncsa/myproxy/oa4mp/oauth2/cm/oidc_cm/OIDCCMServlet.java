@@ -918,20 +918,11 @@ public class OIDCCMServlet extends EnvServlet {
             // then that should just mean it accepts the openid scope and if missing
             // does not return much (like no subject or id token), For some clients
             // that just want an access token, that is fine.
-
-            // ---------- old stuff. Keep for a bit.
-            // no scopes and this is an OIDC server implies just the openid scope and this is a public client
-           /*
-            if (getOA2SE().isOIDCEnabled()) {
-                client.getScopes().add(OA2Scopes.SCOPE_OPENID);
-                client.setPublicClient(true);
-            }
-            */
         } else {
             JSONArray newScopes = toJA(jsonRequest, OA2Constants.SCOPE);
             // issue is that some client registrations can send along redundant scopes
             // and may send along things like offline access, e.g. ["openid","openid","offline_access"]
-            //
+            //  Fix for CIL-1159
             HashSet<String> unique = new HashSet<>();
             unique.addAll(newScopes);
 

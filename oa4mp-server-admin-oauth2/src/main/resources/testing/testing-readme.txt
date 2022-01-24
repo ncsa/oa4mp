@@ -373,6 +373,7 @@ When a new version is deployed, here is the testing order
   -- dev:test/functor
      Critical regression test.
      Has the original NCSA functor configuration on it. Many installs use this.
+     Claims isMemberOf is a structure.
      IDP: NCSA only
      exec phase: access, refresh, exchange
      check claims after each phase to be sure something is returned.

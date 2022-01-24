@@ -751,7 +751,6 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             if (TokenUtils.isBase32(rawRefreshToken)) {
                 token = TokenUtils.b32DecodeToken(rawRefreshToken);
             }
-
             debugger.trace(this, "refresh failed for token " + token + " at " + (new Date()));
             throw oa2ATException;
         }
