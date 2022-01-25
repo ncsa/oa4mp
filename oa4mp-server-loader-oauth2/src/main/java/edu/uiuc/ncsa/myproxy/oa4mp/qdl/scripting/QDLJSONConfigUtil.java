@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting;
 
 
+import edu.uiuc.ncsa.qdl.evaluate.AbstractFunctionEvaluator;
 import edu.uiuc.ncsa.qdl.scripting.JSONScriptUtil;
 import edu.uiuc.ncsa.qdl.scripting.QDLScript;
 import edu.uiuc.ncsa.qdl.scripting.Scripts;
@@ -237,7 +238,7 @@ public class QDLJSONConfigUtil implements ScriptingConstants {
                     QDLScript qdlScript = createCfg(relative, file.getAbsolutePath());
                     JSONScriptUtil.addScript(repo, qdlScript);
                 } else {
-                    FileEntries.addFile(repo, relative, file);
+                    FileEntries.addFile(repo, relative, file, AbstractFunctionEvaluator.FILE_OP_AUTO);
                 }
             }
         }
@@ -256,7 +257,7 @@ public class QDLJSONConfigUtil implements ScriptingConstants {
                     QDLScript qdlScript = createCfg(relative, file.getAbsolutePath());
                     JSONScriptUtil.addScript(repo, qdlScript);
                 } else {
-                    FileEntries.addFile(repo, relative, file);
+                    FileEntries.addFile(repo, relative, file, AbstractFunctionEvaluator.FILE_OP_AUTO);
                 }
             }
         }
