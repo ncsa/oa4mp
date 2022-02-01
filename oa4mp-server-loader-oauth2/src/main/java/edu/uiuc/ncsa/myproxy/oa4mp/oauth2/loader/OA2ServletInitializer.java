@@ -14,8 +14,8 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.util.NewClientNotifier;
 import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.functions.FStack;
-import edu.uiuc.ncsa.qdl.module.MAliases;
-import edu.uiuc.ncsa.qdl.module.MTemplates;
+import edu.uiuc.ncsa.qdl.module.MIStack;
+import edu.uiuc.ncsa.qdl.module.MTStack;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.StateUtils;
 import edu.uiuc.ncsa.qdl.state.SymbolStack;
@@ -101,12 +101,13 @@ public class OA2ServletInitializer extends OA4MPServletInitializer {
         StateUtils.setFactory(new StateUtils() {
             @Override
             public State create() {
-                return new OA2State(MAliases.newMInstances(),
+                return new OA2State(
                         new SymbolStack(),
                         new OpEvaluator(),
                         MetaEvaluator.getInstance(),
                         new FStack(),
-                        new MTemplates(),
+                        new MTStack(),
+                        new MIStack(),
                         null, // no logging at least for now
                         true,
                         true,

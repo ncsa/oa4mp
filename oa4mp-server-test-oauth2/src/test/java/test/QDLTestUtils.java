@@ -5,8 +5,8 @@ import edu.uiuc.ncsa.qdl.TestUtils;
 import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.functions.FStack;
-import edu.uiuc.ncsa.qdl.module.MAliases;
-import edu.uiuc.ncsa.qdl.module.MTemplates;
+import edu.uiuc.ncsa.qdl.module.MIStack;
+import edu.uiuc.ncsa.qdl.module.MTStack;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.SymbolStack;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
@@ -18,21 +18,23 @@ import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 public class QDLTestUtils extends TestUtils {
 
     @Override
-    public State createStateObject(MAliases mAliases,
+    public State createStateObject(
                                    SymbolStack symbolStack,
                                    OpEvaluator opEvaluator,
                                    MetaEvaluator metaEvaluator,
                                    FStack fStack,
-                                   MTemplates mTemplates,
+                                   MTStack mTemplates,
+                                   MIStack mInstance,
                                    MyLoggingFacade myLoggingFacade,
                                    boolean isServerMode,
                                    boolean assertionsOn) {
-        return new OA2State(new MAliases(),
+        return new OA2State(
                 symbolStack,
                 new OpEvaluator(),
                 MetaEvaluator.getInstance(),
                 new FStack(),
-                new MTemplates(),
+                new MTStack(),
+                new MIStack(),
                 null,
                 false,
                 false,

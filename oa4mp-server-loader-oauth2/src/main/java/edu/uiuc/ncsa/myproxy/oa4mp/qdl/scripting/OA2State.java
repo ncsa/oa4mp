@@ -7,8 +7,8 @@ import edu.uiuc.ncsa.myproxy.oa4mp.qdl.QDLXMLConstants;
 import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.functions.FStack;
-import edu.uiuc.ncsa.qdl.module.MAliases;
-import edu.uiuc.ncsa.qdl.module.MTemplates;
+import edu.uiuc.ncsa.qdl.module.MIStack;
+import edu.uiuc.ncsa.qdl.module.MTStack;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.SymbolStack;
 import edu.uiuc.ncsa.security.core.Identifier;
@@ -28,20 +28,21 @@ import java.util.List;
  * on 10/9/20 at  4:45 PM
  */
 public class OA2State extends State {
-    public OA2State(MAliases mAliases,
+    public OA2State(
                     SymbolStack symbolStack,
                     OpEvaluator opEvaluator,
                     MetaEvaluator metaEvaluator,
                     FStack ft,
-                    MTemplates mTemplates,
+                    MTStack mTemplates,
+                    MIStack mInstance,
                     MyLoggingFacade myLoggingFacade,
                     boolean isServerMode,
                     boolean isRestrictedIO,
                     boolean assertionsOn,
                     boolean strictACLs,
                     JSONWebKeys keys) {
-        super(mAliases, symbolStack, opEvaluator, metaEvaluator,
-                ft, mTemplates, myLoggingFacade, isServerMode, isRestrictedIO, assertionsOn);
+        super( symbolStack, opEvaluator, metaEvaluator,
+                ft, mTemplates, mInstance, myLoggingFacade, isServerMode, isRestrictedIO, assertionsOn);
         this.strictACLs = strictACLs;
         this.jsonWebKeys = keys;
     }
@@ -162,22 +163,24 @@ public class OA2State extends State {
     }
 
     @Override
-    public State newInstance(MAliases mAliases,
+    public State newInstance(
                              SymbolStack symbolStack,
                              OpEvaluator opEvaluator,
                              MetaEvaluator metaEvaluator,
                              FStack fStack,
-                             MTemplates mTemplates,
+                             MTStack  mTemplates,
+                             MIStack mInstances,
                              MyLoggingFacade myLoggingFacade,
                              boolean isServerMode,
                              boolean isRestrictedIO,
                              boolean assertionsOn) {
-        return new OA2State(mAliases,
+        return new OA2State(
                 symbolStack,
                 opEvaluator,
                 metaEvaluator,
                 fStack,
                 mTemplates,
+                mInstances,
                 myLoggingFacade,
                 isServerMode,
                 isRestrictedIO,
