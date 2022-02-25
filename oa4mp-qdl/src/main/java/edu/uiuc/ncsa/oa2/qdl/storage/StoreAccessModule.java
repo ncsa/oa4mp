@@ -43,6 +43,7 @@ public class StoreAccessModule extends JavaModule {
         StoreAccessModule storeAccessModule = new StoreAccessModule(URI.create("oa2:/qdl/store"), "store");
         storeAccessModule.storeFacade = newStoreFacade();
         doIt(storeAccessModule, state);
+        setupModule(storeAccessModule);
         return storeAccessModule;
     }
 

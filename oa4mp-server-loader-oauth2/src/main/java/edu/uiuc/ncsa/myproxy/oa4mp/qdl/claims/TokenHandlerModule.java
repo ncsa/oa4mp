@@ -49,6 +49,7 @@ public class TokenHandlerModule extends JavaModule {
         if (state != null) {
             thm.init(state);
         }
+        setupModule(thm);
         return thm;
     }
 

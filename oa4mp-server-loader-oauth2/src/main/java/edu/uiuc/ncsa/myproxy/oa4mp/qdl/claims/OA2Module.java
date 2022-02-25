@@ -37,6 +37,7 @@ public class OA2Module extends JavaModule {
         if (state != null) {
             oa2Module.init(state);
         }
+        setupModule(oa2Module);
         return oa2Module;
     }
         List<String> descr = new ArrayList<>();

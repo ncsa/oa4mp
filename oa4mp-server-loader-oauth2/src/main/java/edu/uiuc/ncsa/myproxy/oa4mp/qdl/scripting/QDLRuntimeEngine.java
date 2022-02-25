@@ -13,6 +13,7 @@ import edu.uiuc.ncsa.qdl.scripting.Scripts;
 import edu.uiuc.ncsa.qdl.state.StateUtils;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.workspace.WorkspaceCommands;
 import edu.uiuc.ncsa.qdl.xml.XMLUtils;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
@@ -131,9 +132,14 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
             StringWriter w = new StringWriter();
             XMLOutputFactory xof = XMLOutputFactory.newInstance();
             XMLStreamWriter xsw = xof.createXMLStreamWriter(w);
+            // Easiest way still is to make a baby workspace and save it...
+            WorkspaceCommands workspaceCommands = new WorkspaceCommands();
+            workspaceCommands.setState(state);
+            workspaceCommands.toXML(xsw);
 
-            state.toXML(xsw);
+
             String xml2 = XMLUtils.prettyPrint(w.toString()); // We do this because whitespace matters. This controls it.
+            System.out.println(getClass().getSimpleName() + ":" + xml2);
             //    DebugUtil.trace(this, "\nSerialized state\n:" + xml2);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             GZIPOutputStream gzipOutputStream = new GZIPOutputStream(baos);
@@ -142,11 +148,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
             gzipOutputStream.close();
             xsw.close();
             return Base64.encodeBase64String(baos.toByteArray());
-
-
-//            return XMLUtils.prettyPrint(w.toString());
-            // Old way:
-            //   return StateUtils.saveb64(state);
+            //return Base64.encodeBase64String(xml2.getBytes(StandardCharsets.UTF_8));
         } catch (Throwable e) {
             e.printStackTrace();
             throw new QDLException("Error: could not serialize the state:" + e.getMessage(), e);
@@ -154,7 +156,29 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
     }
 
     OA2State state;
-
+      protected void deserializeStateOLD(String rawState){
+          if (rawState == null || rawState.isEmpty()) return;
+             try {
+                 byte[] xx = Base64.decodeBase64(rawState);
+                 ByteArrayInputStream bais = new ByteArrayInputStream(xx);
+                 // Reconstruct the XML as a string, preserving whitespace.
+                 GZIPInputStream gzipInputStream = new GZIPInputStream(bais, 65536);
+                 Reader r = new InputStreamReader(gzipInputStream);
+                 XMLInputFactory xmlif = XMLInputFactory.newInstance();
+                 XMLEventReader xer = xmlif.createXMLEventReader(r);
+                 // Moar debug, if using the string, replace preceeding line with this.
+                 // XMLEventReader xer = xmlif.createXMLEventReader(reader);
+                 // state = (OA2State) StateUtils.newInstance();
+                 state.fromXML(xer, null); // No XProperties in serialization.
+                 xer.close();
+             } catch (Throwable e) {
+                 DebugUtil.trace(this, "error deserializing state", e);
+                 if (e instanceof RuntimeException) {
+                     throw (RuntimeException) e;
+                 }
+                 throw new QDLException("Error deserializing state", e);
+             }
+      }
     @Override
     public void deserializeState(String rawState) {
         if (rawState == null || rawState.isEmpty()) return;
@@ -164,6 +188,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
             // Reconstruct the XML as a string, preserving whitespace.
             GZIPInputStream gzipInputStream = new GZIPInputStream(bais, 65536);
             Reader r = new InputStreamReader(gzipInputStream);
+
 /*
             Debug stuff to recreate the XML exactly and print it out. Otherwise it is
             squirreled away inside a gzip stream someplace.
@@ -172,6 +197,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
             BufferedReader br = new BufferedReader(r);
             StringBuffer stringBuffer = new StringBuffer();
             String lineIn = br.readLine();
+            lineIn = lineIn.replace("?><", "?>\n<"); // issue with whitespace?
             while(lineIn != null){
                 stringBuffer.append(lineIn + "\n");
                 System.out.println(lineIn);
@@ -179,16 +205,19 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
             }
             DebugUtil.trace(this, "De-zipped XML:\n" + stringBuffer.toString());
             StringReader reader = new StringReader(stringBuffer.toString());
-*/
+            */
+
             XMLInputFactory xmlif = XMLInputFactory.newInstance();
             XMLEventReader xer = xmlif.createXMLEventReader(r);
-            // Moar debug, if using the string, replace preceeding line with this.
-            // XMLEventReader xer = xmlif.createXMLEventReader(reader);
-            // state = (OA2State) StateUtils.newInstance();
-            state.fromXML(xer, null); // No XProperties in serialization.
-            xer.close();
-            // Old way
-            // this.state = (OA2State) StateUtils.loadb64(state);
+            try {
+                WorkspaceCommands workspaceCommands = new WorkspaceCommands();
+                workspaceCommands.setDebugOn(true);
+                workspaceCommands.fromXML(xer);
+                state = (OA2State) workspaceCommands.getInterpreter().getState();
+            }catch (Throwable t){
+                // That didn't work. Try it in old format.
+                deserializeStateOLD(rawState);
+            }
         } catch (Throwable e) {
             DebugUtil.trace(this, "error deserializing state", e);
             if (e instanceof RuntimeException) {
@@ -280,50 +309,50 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
      */
     protected void setupState(ScriptRunRequest req) {
 
-        state.getSymbolStack().setValue(Scripts.EXEC_PHASE, req.getAction()); // set what is being executed
+        state.setValue(Scripts.EXEC_PHASE, req.getAction()); // set what is being executed
         StemVariable sysErr = new StemVariable();
         // Set sys_err.ok  here so scripts don't have to keep checking if it is defined.
         sysErr.put(SYS_ERR_OK, Boolean.TRUE);
-        state.getSymbolStack().setValue(SYS_ERR_VAR, sysErr);
+        state.setValue(SYS_ERR_VAR, sysErr);
 
         FlowStates2 flowStates = (FlowStates2) req.getArgs().get(SRE_REQ_FLOW_STATES);
-        state.getSymbolStack().setValue(FLOW_STATE_VAR, toStem(flowStates));
+        state.setValue(FLOW_STATE_VAR, toStem(flowStates));
 
         JSONObject claims = (JSONObject) req.getArgs().get(SRE_REQ_CLAIMS);
         StemVariable claimStem = new StemVariable();
         claimStem.fromJSON(claims);
-        state.getSymbolStack().setValue(CLAIMS_VAR, claimStem);
+        state.setValue(CLAIMS_VAR, claimStem);
 
         if (req.getArgs().containsKey(SRE_REQ_ACCESS_TOKEN)) {
             JSONObject at = (JSONObject) req.getArgs().get(SRE_REQ_ACCESS_TOKEN);
             StemVariable atStem = new StemVariable();
             atStem.fromJSON(at);
-            state.getSymbolStack().setValue(ACCESS_TOKEN_VAR, atStem);
+            state.setValue(ACCESS_TOKEN_VAR, atStem);
 
         }
         List<String> scopes = (List<String>) req.getArgs().get(SRE_REQ_SCOPES);
         if (scopes != null && !scopes.isEmpty()) {
             // It is possible for a minimal OAuth 2 client to have no scopes.
-            state.getSymbolStack().setValue(SCOPES_VAR, listToStem(scopes));
+            state.setValue(SCOPES_VAR, listToStem(scopes));
         } else {
-            state.getSymbolStack().setValue(SCOPES_VAR, new StemVariable());
+            state.setValue(SCOPES_VAR, new StemVariable());
 
         }
 
         List<String> audience = (List<String>) req.getArgs().get(SRE_REQ_AUDIENCE);
         if (audience != null && !audience.isEmpty()) {
-            state.getSymbolStack().setValue(AUDIENCE_VAR, listToStem(audience));
+            state.setValue(AUDIENCE_VAR, listToStem(audience));
         } else {
-            state.getSymbolStack().setValue(AUDIENCE_VAR, new StemVariable());
+            state.setValue(AUDIENCE_VAR, new StemVariable());
         }
 
         Object eas = req.getArgs().get(SRE_REQ_EXTENDED_ATTRIBUTES);
         if (eas != null && (eas instanceof JSONObject)) {
             StemVariable eaStem = new StemVariable();
             eaStem.fromJSON((JSONObject) eas);
-            state.getSymbolStack().setValue(EXTENDED_ATTRIBUTES_VAR, eaStem);
+            state.setValue(EXTENDED_ATTRIBUTES_VAR, eaStem);
         } else {
-            state.getSymbolStack().setValue(EXTENDED_ATTRIBUTES_VAR, new StemVariable());
+            state.setValue(EXTENDED_ATTRIBUTES_VAR, new StemVariable());
         }
 
         StemVariable sources = new StemVariable();
@@ -336,7 +365,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
                 i++;
             }
         }
-        state.getSymbolStack().setValue(CLAIM_SOURCES_VAR, sources);
+        state.setValue(CLAIM_SOURCES_VAR, sources);
         // Now do access control
         // gives variable
         // access_control.
@@ -353,7 +382,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         StemVariable adminStem = new StemVariable();
         adminStem.addList(adminIDs);
         acl.put("admins.", adminStem);
-        state.getSymbolStack().setValue(ACCESS_CONTROL, acl);
+        state.setValue(ACCESS_CONTROL, acl);
         // these are always defined.
         StemVariable txScopes = new StemVariable();
         StemVariable txRes = new StemVariable();
@@ -372,9 +401,9 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
                 }
             }
         }
-        state.getSymbolStack().setValue(TX_SCOPES_VAR, txScopes);
-        state.getSymbolStack().setValue(TX_AUDIENCE_VAR, txAud);
-        state.getSymbolStack().setValue(TX_RESOURCE_VAR, txRes);
+        state.setValue(TX_SCOPES_VAR, txScopes);
+        state.setValue(TX_AUDIENCE_VAR, txAud);
+        state.setValue(TX_RESOURCE_VAR, txRes);
 
 
     }

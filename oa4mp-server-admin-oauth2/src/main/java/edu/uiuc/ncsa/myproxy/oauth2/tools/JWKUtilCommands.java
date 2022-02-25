@@ -20,6 +20,7 @@ import org.apache.commons.codec.binary.Base64;
 import java.io.*;
 import java.math.BigInteger;
 import java.net.URI;
+import java.security.KeyPair;
 import java.security.SecureRandom;
 import java.util.Date;
 import java.util.StringTokenizer;
@@ -257,7 +258,7 @@ public class JWKUtilCommands extends CommonCommands {
         signingCommands.create_symmetric_keys(inputLine1);
     }
 
- 
+
     public void create_symmetric_keys(InputLine inputLine) {
         SigningCommands signingCommands = new SigningCommands(null);
         // make sure these get propagated
@@ -359,6 +360,45 @@ public class JWKUtilCommands extends CommonCommands {
         return JSONWebKeyUtil.fromJSON(file);
     }
 
+    public static String LOAD_KEY = "-load";
+    public static String PEM_KEY = "-pem";
+
+    public void read_key(InputLine inputLine) throws Exception {
+        if (showHelp(inputLine)) {
+            say("read_key [" + LOAD_KEY + "][" + PEM_KEY + "] file_path - read a single JWK format key.");
+            say(LOAD_KEY + " = load the key and set as the default");
+            say(PEM_KEY + " = read the key in PEM (PKCS 1) format.");
+            say("Not loading the key will simply print it out.");
+            return;
+        }
+        boolean isLoad = inputLine.hasArg(LOAD_KEY);
+        boolean isPem = inputLine.hasArg(PEM_KEY);
+        inputLine.removeSwitch(LOAD_KEY);
+        inputLine.removeSwitch(PEM_KEY);
+        JSONWebKeys jsonWebKeys;
+        if (isPem) {
+            KeyPair keyPair = KeyUtil.keyPairFromPKCS1(new FileReader(inputLine.getLastArg()));
+            JSONWebKey jwk = new JSONWebKey();
+            jwk.id = "dummy";
+            jwk.privateKey = keyPair.getPrivate();
+            jwk.publicKey = keyPair.getPublic();
+            jwk.type = "RSA";
+            jwk.use = "sig";
+            jwk.algorithm = "RS256"; //safe bet, but no actual way to tell.
+
+            //jwk.algorithm;
+            jsonWebKeys = new JSONWebKeys("dummy");
+            jsonWebKeys.put(jwk);
+        } else {
+            jsonWebKeys = JSONWebKeyUtil.fromJSON(new File(inputLine.getLastArg()));
+        }
+        if (isLoad) {
+            keys = jsonWebKeys;
+        } else {
+            say(JSONWebKeyUtil.toJSON(jsonWebKeys).toString(1));
+        }
+
+    }
 
     protected void listKeysHelp() {
         say("list_keys [" + showAllKeys + " " + CL_INPUT_FILE_FLAG + " file]:This will list all the public keys " +
@@ -482,19 +522,19 @@ public class JWKUtilCommands extends CommonCommands {
         boolean showPrivateKeys = inputLine.hasArg(showAllKeys);
         boolean hasInputFile = inputLine.hasArg(CL_INPUT_FILE_FLAG);
         JSONWebKeys localKeys = null;
-        if(showPrivateKeys){
-            if(hasInputFile){
-                  // ok.
-            }else{
-               say("warning, there are no private keys to display.");
-               showPrivateKeys = false;
+        if (showPrivateKeys) {
+            if (hasInputFile) {
+                // ok.
+            } else {
+                say("warning, there are no private keys to display.");
+                showPrivateKeys = false;
             }
         }
-        if(hasInputFile){
+        if (hasInputFile) {
             File publicKeyFile = new File(inputLine.getNextArgFor(CL_INPUT_FILE_FLAG));
-                        localKeys = readKeys(publicKeyFile);
+            localKeys = readKeys(publicKeyFile);
 
-        }else{
+        } else {
             localKeys = keys;
         }
 /*

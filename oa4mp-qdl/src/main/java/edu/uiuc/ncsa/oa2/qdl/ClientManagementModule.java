@@ -41,6 +41,7 @@ public class ClientManagementModule extends JavaModule {
         if(state != null){
             cmm.init(state);
         }
+        setupModule(cmm);
         return cmm;
     }
     List<String> descr = new ArrayList<>();

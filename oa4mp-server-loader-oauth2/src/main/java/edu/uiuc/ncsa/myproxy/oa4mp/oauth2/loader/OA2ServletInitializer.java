@@ -18,7 +18,7 @@ import edu.uiuc.ncsa.qdl.module.MIStack;
 import edu.uiuc.ncsa.qdl.module.MTStack;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.StateUtils;
-import edu.uiuc.ncsa.qdl.state.SymbolStack;
+import edu.uiuc.ncsa.qdl.variables.VStack;
 import edu.uiuc.ncsa.security.core.cache.Cleanup;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
@@ -102,7 +102,7 @@ public class OA2ServletInitializer extends OA4MPServletInitializer {
             @Override
             public State create() {
                 return new OA2State(
-                        new SymbolStack(),
+                        new VStack(),
                         new OpEvaluator(),
                         MetaEvaluator.getInstance(),
                         new FStack(),

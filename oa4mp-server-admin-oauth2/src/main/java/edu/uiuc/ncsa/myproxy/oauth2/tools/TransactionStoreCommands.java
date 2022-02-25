@@ -1,17 +1,32 @@
 package edu.uiuc.ncsa.myproxy.oauth2.tools;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RefreshTokenStore;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.StoreCommands2;
 import edu.uiuc.ncsa.security.core.Identifiable;
+import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
+import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DateUtils;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
+import edu.uiuc.ncsa.security.delegation.storage.TransactionStore;
+import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
+import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
 import edu.uiuc.ncsa.security.delegation.token.impl.TokenImpl;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import net.sf.json.JSONObject;
+import org.apache.commons.codec.binary.Base64;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.URI;
 import java.util.Date;
+import java.util.zip.GZIPInputStream;
 
 import static edu.uiuc.ncsa.security.core.util.StringUtils.pad2;
 
@@ -20,9 +35,16 @@ import static edu.uiuc.ncsa.security.core.util.StringUtils.pad2;
  * on 11/16/20 at  3:16 PM
  */
 public class TransactionStoreCommands extends StoreCommands2 {
-    public TransactionStoreCommands(MyLoggingFacade logger, String defaultIndent, Store store) {
+    public TransactionStoreCommands(MyLoggingFacade logger, String defaultIndent, Store store, TXStore txStore) {
         super(logger, defaultIndent, store);
+        this.txStore = txStore;
     }
+
+    public TXStore getTxStore() {
+        return txStore;
+    }
+
+    TXStore<? extends TXRecord> txStore;
 
     public TransactionStoreCommands(MyLoggingFacade logger, Store store) {
         super(logger, store);
@@ -183,6 +205,175 @@ public class TransactionStoreCommands extends StoreCommands2 {
     private void showClaimsHelp() {
         say("claims");
         sayi("Show the claims associated with this transaction. These are mostly used to create the id token");
+    }
 
+    public static final String LS_AT_FLAG = "-at";
+    public static final String LS_RT_FLAG = "-rt";
+
+    protected Identifier getIDbyAT(InputLine inputLine) {
+        String rawAT = inputLine.getNextArgFor(LS_AT_FLAG);
+        if (StringUtils.isTrivial(rawAT)) {
+            return null;
+        }
+        AccessTokenImpl at = new AccessTokenImpl(URI.create(rawAT));
+        OA2ServiceTransaction serviceTransaction = (OA2ServiceTransaction) ((TransactionStore) getStore()).get(at);
+        if (serviceTransaction != null) {
+            return serviceTransaction.getIdentifier();
+        } else {
+            // try to get it from the TXStore
+            TXRecord txRecord = (TXRecord) getTxStore().get(BasicIdentifier.newID(rawAT));
+            if (txRecord != null) {
+                return txRecord.getParentID();
+            }
+        }
+        return null;
+    }
+
+    protected Identifier getIDByRT(InputLine inputLine) {
+        String rawRT = inputLine.getNextArgFor(LS_RT_FLAG);
+        if (StringUtils.isTrivial(rawRT)) {
+            return null;
+        }
+        // Do the same thing as per above but with refresh tokens.
+        RefreshTokenImpl rt = new RefreshTokenImpl(URI.create(rawRT));
+        OA2ServiceTransaction serviceTransaction = ((RefreshTokenStore) getStore()).get(rt);
+        if (serviceTransaction != null) {
+            return serviceTransaction.getIdentifier();
+        } else {
+            // try to get it from the TXStore
+            TXRecord txRecord = (TXRecord) getTxStore().get(BasicIdentifier.newID(rawRT));
+            if (txRecord != null) {
+                return txRecord.getParentID();
+            }
+        }
+
+        return null;
+    }
+
+    @Override
+    public void ls(InputLine inputLine) {
+        // strategy is to fund the actual id and use that to construct the right input line
+        // and pass it off to the super function so we don't have to re-invent the wheel.
+        if (showHelp(inputLine)) {
+            showLSHelp();
+            say("For transaction stores, you may also specify listing by using the access token or refresh token:");
+            say("ls [" + LS_AT_FLAG + " | " + LS_RT_FLAG + " token]");
+            say("Note that other switches, such as " + VERBOSE_COMMAND + " work as well.");
+            return;
+        }
+        if (inputLine.hasArg(LS_AT_FLAG)) {
+            Identifier identifier = getIDbyAT(inputLine);
+            if (identifier == null) {
+                say("sorry, but no argument supplied.");
+                return;
+            }
+            inputLine.removeSwitchAndValue(LS_AT_FLAG);
+            inputLine.appendArg("/" + identifier);
+        }
+
+        if (inputLine.hasArg(LS_RT_FLAG)) {
+            Identifier identifier = getIDByRT(inputLine);
+            if (identifier == null) {
+                say("sorry, but no argument supplied.");
+                return;
+            }
+            inputLine.removeSwitchAndValue(LS_RT_FLAG);
+            inputLine.appendArg("/" + identifier);
+        }
+
+        super.ls(inputLine);
+    }
+
+
+    public void show_qdl_state(InputLine inputLine) throws Exception{
+        if (showHelp(inputLine)) {
+            say("show_qdl_state [" + LS_AT_FLAG + "|" + LS_RT_FLAG + "] id");
+            say("Find the given transaction, get the current state from QDL and decode it.");
+            return;
+        }
+        if (inputLine.hasArg(LS_AT_FLAG)) {
+            Identifier identifier = getIDbyAT(inputLine);
+            if (identifier == null) {
+                say("sorry, but no argument supplied.");
+                return;
+            }
+            inputLine.removeSwitchAndValue(LS_AT_FLAG);
+            inputLine.appendArg("/" + identifier);
+        }else{
+            if (inputLine.hasArg(LS_RT_FLAG)) {
+                Identifier identifier = getIDByRT(inputLine);
+                if (identifier == null) {
+                    say("sorry, but no argument supplied.");
+                    return;
+                }
+                inputLine.removeSwitchAndValue(LS_RT_FLAG);
+                inputLine.appendArg("/" + identifier);
+            }else{
+                // no flag, just an id or integer.
+                String lastArg = inputLine.getLastArg();
+                if(lastArg.startsWith("/")){
+                    // do nothing
+                }else{
+                   if(lastArg.matches("^[0-9]*$")){
+                       //digits only, do nothing
+                   }else{
+                       inputLine.removeArgAt(inputLine.getArgCount());
+                       lastArg = "/" + lastArg;
+                       inputLine.appendArg(lastArg);
+                   }
+                }
+            }
+
+        }
+
+
+        OA2ServiceTransaction transaction = (OA2ServiceTransaction) findItem(inputLine);
+        if(transaction == null){
+            say("transaction not found.");
+            return;
+        }
+        String rawState = transaction.getScriptState();
+
+        if(StringUtils.isTrivial(rawState)){
+            return; // nothing to show
+        }
+        // now the hard bit. This is base 64 encoded, gzipped XML.
+        byte[] xx = Base64.decodeBase64(rawState);
+        ByteArrayInputStream bais = new ByteArrayInputStream(xx);
+        // Reconstruct the XML as a string, preserving whitespace.
+        GZIPInputStream gzipInputStream = new GZIPInputStream(bais, 65536);
+        Reader in = new InputStreamReader(gzipInputStream);
+
+        final int bufferSize = 1024;
+        final char[] buffer = new char[bufferSize];
+        final StringBuilder out = new StringBuilder();
+        for (; ; ) {
+          int rsz = in.read(buffer, 0, buffer.length);
+          if (rsz < 0)
+            break;
+          out.append(buffer, 0, rsz);
+        }
+        say(out.toString());
+    }
+
+    public void get_by_at(InputLine inputLine) throws Exception {
+        if (showHelp(inputLine)) {
+            say("get_by_at access_token - get a transaction by its access token");
+            return;
+        }
+        AccessTokenImpl at = new AccessTokenImpl(URI.create(inputLine.getLastArg()));
+        OA2ServiceTransaction serviceTransaction = (OA2ServiceTransaction) ((TransactionStore) getStore()).get(at);
+        if (serviceTransaction == null) {
+            // look in tx store
+            TXRecord txRecord = (TXRecord) getTxStore().get(at);
+            Identifier parentID = txRecord.getParentID();
+            serviceTransaction = (OA2ServiceTransaction) getStore().get(parentID);
+        }
+        if (serviceTransaction == null) {
+            say("no transaction found");
+            return;
+        }
+
+        format(serviceTransaction);
     }
 }

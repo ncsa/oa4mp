@@ -25,6 +25,7 @@ public class PStoreAccessModule extends StoreAccessModule {
         PStoreAccessModule storeAccessModule = new PStoreAccessModule(URI.create("oa2:/qdl/p_store"), "p_store");
         storeAccessModule.storeFacade = newStoreFacade();
         doIt(storeAccessModule, state);
+        setupModule(storeAccessModule);
         return storeAccessModule;
     }
 

@@ -233,6 +233,13 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
             providerUrl = providerUrl + ":" + cfg.getPort();
         }
         env.put(Context.PROVIDER_URL, providerUrl);
+        env.put("com.sun.jndi.ldap.read.timeout", "10000"); // time is in ms.
+
+        /*
+        Great. For OpenJDK java 8  this is broken over SSL:
+        https://bugs.openjdk.java.net/browse/JDK-8173451
+         */
+
         switch (cfg.getAuthType()) {
             case LDAPConfigurationUtil.LDAP_AUTH_NONE_KEY:
                 env.put(Context.SECURITY_AUTHENTICATION, LDAPConfigurationUtil.LDAP_AUTH_NONE);

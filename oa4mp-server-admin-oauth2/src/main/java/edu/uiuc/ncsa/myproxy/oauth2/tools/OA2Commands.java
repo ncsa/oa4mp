@@ -163,7 +163,9 @@ public class OA2Commands extends BaseCommands {
     @Override
     protected CommonCommands getTransactionCommands() throws Exception {
         if (transactionStoreCommands == null) {
-            transactionStoreCommands = new TransactionStoreCommands(getMyLogger(), "  ", getOA2SE().getTransactionStore());
+            transactionStoreCommands = new TransactionStoreCommands(getMyLogger(), "  ",
+                    getOA2SE().getTransactionStore(),
+                    getOA2SE().getTxStore());
         }
 
         return transactionStoreCommands;

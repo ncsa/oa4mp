@@ -4,13 +4,17 @@ import edu.uiuc.ncsa.qdl.extensions.JavaModule;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.xml.XMLMissingCloseTagException;
+import edu.uiuc.ncsa.qdl.xml.XMLUtilsV2;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
+import org.apache.commons.codec.binary.Base64;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.stream.events.XMLEvent;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,21 +65,31 @@ public class JWTModule extends JavaModule {
         if (state != null) {
             jwtModule.init(state);
         }
+        setupModule(jwtModule);
         return jwtModule;
     }
 
     @Override
     public void writeExtraXMLElements(XMLStreamWriter xsw) throws XMLStreamException {
+        writeExtraXMLElementsNEW(xsw);
+    }
+
+    public void writeExtraXMLElementsNEW(XMLStreamWriter xsw) throws XMLStreamException {
         super.writeExtraXMLElements(xsw);
-        if (jwtCommands != null && jwtCommands.jwks!=null) {
+        if (jwtCommands != null && jwtCommands.jwks != null) {
             xsw.writeStartElement(JWT_COMMANDS_TAG);
-            JSONWebKeyUtil.toXML(jwtCommands.jwks, xsw);
+            xsw.writeCData(Base64.encodeBase64URLSafeString(JSONWebKeyUtil.toJSON(jwtCommands.jwks).toString().getBytes(StandardCharsets.UTF_8)));
             xsw.writeEndElement();
         }
     }
 
+
     @Override
     public void readExtraXMLElements(XMLEvent xe, XMLEventReader xer) throws XMLStreamException {
+        readExtraXMLElementsNEW(xe, xer);
+    }
+
+    public void readExtraXMLElementsOLD(XMLEvent xe, XMLEventReader xer) throws XMLStreamException {
         super.readExtraXMLElements(xe, xer);
         xe = xer.peek();
         while (xer.hasNext()) {
@@ -92,7 +106,43 @@ public class JWTModule extends JavaModule {
                     break;
                 case XMLEvent.END_ELEMENT:
                     if (xe.asEndElement().getName().getLocalPart().equals(JWT_COMMANDS_TAG)) {
-                           return;
+                        return;
+                    }
+                    break;
+            }
+            xe = xer.nextEvent();
+        }
+        throw new XMLMissingCloseTagException(JWT_COMMANDS_TAG);
+    }
+
+    public void readExtraXMLElementsNEW(XMLEvent xe, XMLEventReader xer) throws XMLStreamException {
+        super.readExtraXMLElements(xe, xer);
+        if (!xe.asStartElement().getName().getLocalPart().equals(JWT_COMMANDS_TAG)) {
+            return; // do nothing, do not search/advance cursor. Contract is that it is exactly at the start tag
+        }
+        xe = xer.peek();
+        while (xer.hasNext()) {
+            switch (xe.getEventType()) {
+                case XMLEvent.START_ELEMENT:
+                    switch (xe.asStartElement().getName().getLocalPart()) {
+                        case JWT_COMMANDS_TAG:
+                            try {
+                                // This is base 64 encoded JSON.
+                                String raw = new String(Base64.decodeBase64(XMLUtilsV2.getText(xer, JWT_COMMANDS_TAG)));
+                                if (StringUtils.isTrivial(raw)) {
+                                    // the tag is empty.
+                                    return;
+                                }
+                                jwtCommands.jwks = JSONWebKeyUtil.fromJSON(raw);
+                                //jwtCommands.jwks = JSONWebKeyUtil.fromXML(xer);
+                            } catch (Throwable e) {
+                                System.out.println("Error: Could not deserialize the JWT module. " + e.getMessage());
+                            }
+                    }
+                    break;
+                case XMLEvent.END_ELEMENT:
+                    if (xe.asEndElement().getName().getLocalPart().equals(JWT_COMMANDS_TAG)) {
+                        return;
                     }
                     break;
 
@@ -102,11 +152,12 @@ public class JWTModule extends JavaModule {
         }
         throw new XMLMissingCloseTagException(JWT_COMMANDS_TAG);
     }
+
     List<String> descr = new ArrayList<>();
 
     @Override
     public List<String> getDescription() {
-        if(descr.isEmpty()){
+        if (descr.isEmpty()) {
             descr.add("The module for JWT (JSON Web Token) support. This will allow you to create them,");
             descr.add("validate them, create and save keys, etc.");
         }

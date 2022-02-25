@@ -44,6 +44,7 @@ public class CLCModule extends JavaModule {
         if (state != null) {
             clcModule.init(state);
         }
+        setupModule(clcModule);
         return clcModule;
     }
 
