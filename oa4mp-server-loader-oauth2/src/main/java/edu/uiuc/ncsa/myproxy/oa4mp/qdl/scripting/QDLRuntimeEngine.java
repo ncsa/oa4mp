@@ -139,8 +139,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
 
 
             String xml2 = XMLUtils.prettyPrint(w.toString()); // We do this because whitespace matters. This controls it.
-            System.out.println(getClass().getSimpleName() + ":" + xml2);
-            //    DebugUtil.trace(this, "\nSerialized state\n:" + xml2);
+     //       System.out.println(getClass().getSimpleName() + ":" + xml2);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             GZIPOutputStream gzipOutputStream = new GZIPOutputStream(baos);
             gzipOutputStream.write(xml2.getBytes("UTF-8"));
@@ -148,7 +147,6 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
             gzipOutputStream.close();
             xsw.close();
             return Base64.encodeBase64String(baos.toByteArray());
-            //return Base64.encodeBase64String(xml2.getBytes(StandardCharsets.UTF_8));
         } catch (Throwable e) {
             e.printStackTrace();
             throw new QDLException("Error: could not serialize the state:" + e.getMessage(), e);
@@ -289,6 +287,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
     protected String SYS_ERR_OK = "ok";
     protected String SYS_ERR_MESSAGE = "message";
     protected String SYS_ERR_ERROR_TYPE = "error_type";
+    protected String SYS_ERR_ERROR_URI = "error_uri";
     protected String SYS_ERR_STATUS_CODE = "status";
     protected String FLOW_STATE_VAR = "flow_states" + STEM_INDEX_MARKER;
     protected String CLAIMS_VAR = "claims" + STEM_INDEX_MARKER;
@@ -475,22 +474,33 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         return ScriptRuntimeEngineFactory.NoOpRuntimeEngine.srr;
     }
 
+    /**
+     * <b>After</b> QDL has run, convert the response into something Java can understand.
+     * @return
+     */
     protected ScriptRunResponse createSRR() {
         Object x = state.getValue(SYS_ERR_VAR);
         if (x != null && x instanceof StemVariable) {
             StemVariable sysErr = (StemVariable) x;
             if (sysErr.containsKey(SYS_ERR_OK) && !sysErr.getBoolean(SYS_ERR_OK)) {
+                // In OAuth this is the error_description
                 String message = sysErr.getString(SYS_ERR_MESSAGE);
                 ScriptRuntimeException scriptRuntimeException = new ScriptRuntimeException(message == null ? "(no message)" : message);
+                // in OAuth this is the error
                 if (sysErr.containsKey(SYS_ERR_ERROR_TYPE)) {
                     scriptRuntimeException.setRequestedType(sysErr.getString(SYS_ERR_ERROR_TYPE));
                 } else{
                     scriptRuntimeException.setRequestedType(sysErr.getString(OA2Errors.ACCESS_DENIED));
                 }
+                // In OAuth this is the HTTP status code
                 if(sysErr.containsKey(SYS_ERR_STATUS_CODE)){
                     scriptRuntimeException.setStatus(sysErr.getLong(SYS_ERR_STATUS_CODE).intValue());
                 }else{
                     scriptRuntimeException.setStatus(HttpStatus.SC_UNAUTHORIZED);
+                }
+                // If the status is 302, then this is the redirect for the user's browser.
+                if (sysErr.containsKey(SYS_ERR_ERROR_URI)) {
+                    scriptRuntimeException.setErrorURI(URI.create(sysErr.getString(SYS_ERR_ERROR_URI)));
                 }
                 throw scriptRuntimeException;
             }

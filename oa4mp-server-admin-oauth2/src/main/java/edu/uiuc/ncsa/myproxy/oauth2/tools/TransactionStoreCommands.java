@@ -309,19 +309,24 @@ public class TransactionStoreCommands extends StoreCommands2 {
                 inputLine.removeSwitchAndValue(LS_RT_FLAG);
                 inputLine.appendArg("/" + identifier);
             }else{
-                // no flag, just an id or integer.
-                String lastArg = inputLine.getLastArg();
-                if(lastArg.startsWith("/")){
-                    // do nothing
-                }else{
-                   if(lastArg.matches("^[0-9]*$")){
-                       //digits only, do nothing
-                   }else{
-                       inputLine.removeArgAt(inputLine.getArgCount());
-                       lastArg = "/" + lastArg;
-                       inputLine.appendArg(lastArg);
-                   }
+                // arg count of zero implies use the currently set id. If they supplied an
+                // identifier, try to unscramble that.
+                if(0 < inputLine.getArgCount()){
+                    // no flag, just an id or integer.
+                    String lastArg = inputLine.getLastArg();
+                                    if(lastArg.startsWith("/")){
+                                        // do nothing
+                                    }else{
+                                       if(lastArg.matches("^[0-9]*$")){
+                                           //digits only, do nothing
+                                       }else{
+                                           inputLine.removeArgAt(inputLine.getArgCount());
+                                           lastArg = "/" + lastArg;
+                                           inputLine.appendArg(lastArg);
+                                       }
+                                    }
                 }
+
             }
 
         }

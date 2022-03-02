@@ -303,12 +303,18 @@ When a new version is deployed, here is the testing order
      df
 
      Approval methods
-     A.
-     Run the QDL script with the user_code:
+     A. Use QDL
+     Run the QDL scripts with the user_code and the user name. These are in
 
-     ~/apps/qdl/apps/approve.qdl USER_CODE
+     /home/ncsa/dev/ncsa-git/cilogon/cilogon2-admin-oauth2/src/main/scripts
 
-     B.
+     Set the username in the transaction directly (takes place of CILogon backend calls):
+     ./set-user.qdl USER_CODE username
+
+     Manually approve the user code:
+     ./approve.qdl USER_CODE
+
+     B. Use Terry's scripts
      1. This should respond with a user code, Call it USER_CODE. Paste into this and run it
         from the command line. There are two scripts that do this. Look at them
         to be sure they point to localhost:9443
@@ -323,10 +329,10 @@ When a new version is deployed, here is the testing order
 
      3. Before you just issue a request for the access token in the CLC, you will need to emulate
         the response from the IDP and set the username for the transaction.
-        In the CILogon CLC (talk to the right store!), search for the user code:
+        In the CILogon CLC (talk to the right store, usually cilogon.oa2.mysql), search for the user code:
 
-        search >user_code USER_CODE
-
+        search >states -r .*USER_CODE.*
+        
         This gets the id (temp token) of the current transaction.
 
      4. Set the user name there with
