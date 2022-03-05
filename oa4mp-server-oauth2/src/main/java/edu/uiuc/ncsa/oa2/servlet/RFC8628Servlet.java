@@ -1,7 +1,8 @@
-package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
+package edu.uiuc.ncsa.oa2.servlet;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.*;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RFC8628Store;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;
@@ -108,37 +109,6 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
         t.setAuthGrantValid(true);
         t.setRFC8628Request(true);
         RFC8628State rfc8628State = new RFC8628State();
-        String userCode = getUserCode(rfc8628ServletConfig);
-        boolean gotUserCode = false;
-        RFC8628Store rfc8628Store = (RFC8628Store) getTransactionStore();
-        int userCodeAttemptCount = 5;
-        for (int i = 0; i < userCodeAttemptCount; i++) {
-            // 5 tries to come up with an unused user code.
-            if (rfc8628Store.hasUserCode(userCode)) {
-                ServletDebugUtil.trace(this, "Attempt to get user code # " + i + "failed for \"" + userCode + "\".");
-                userCode = getUserCode(rfc8628ServletConfig);
-            } else {
-                gotUserCode = true;
-                break;
-            }
-        }
-        if (!gotUserCode) {
-            ServletDebugUtil.error(this, "Could not get an unused user code after " + userCodeAttemptCount + " attempts.");
-            throw new OA2ATException(OA2Errors.SERVER_ERROR, "could not create new user code", HttpStatus.SC_BAD_REQUEST, null);
-        }
-        debugUtil.trace(this, "user_code = " + userCode);
-        t.setUserCode(userCode);
-        rfc8628State.userCode = userCode;
-        rfc8628State.deviceCode = ag.getURIToken();
-        rfc8628State.issuedAt = System.currentTimeMillis();
-        rfc8628State.lastTry = System.currentTimeMillis(); // so it has a reasonable value
-        rfc8628State.lifetime = lifetime;
-        if (0 < client.getDfInterval()) {
-            rfc8628State.interval = client.getDfInterval();
-        } else {
-            // interval not set in client, use default.
-            rfc8628State.interval = rfc8628ServletConfig.interval;
-        }
         String scope = req.getParameter(OA2Constants.SCOPE);
         rfc8628State.originalScopes = scope;
         if (isTrivial(scope)) {
@@ -158,6 +128,48 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
             }
 
         }
+
+        String userCode;
+        if(oa2SE.getAuthorizationServletConfig().isUseProxy()){
+            userCode = ProxyUtils.getProxyUserCode(oa2SE, t, rfc8628State);
+            lifetime = rfc8628State.lifetime; // This is set from the proxy and must be propagated to the user.
+
+        }else{
+            userCode = getUserCode(rfc8628ServletConfig);
+            // Make sure it is not in use, since the configuration might make collisions possible.
+            boolean gotUserCode = false;
+            RFC8628Store rfc8628Store = (RFC8628Store) getTransactionStore();
+            int userCodeAttemptCount = 5;
+            for (int i = 0; i < userCodeAttemptCount; i++) {
+                // 5 tries to come up with an unused user code.
+                if (rfc8628Store.hasUserCode(userCode)) {
+                    ServletDebugUtil.trace(this, "Attempt to get user code # " + i + "failed for \"" + userCode + "\".");
+                    userCode = getUserCode(rfc8628ServletConfig);
+                } else {
+                    gotUserCode = true;
+                    break;
+                }
+            }
+            if (!gotUserCode) {
+                ServletDebugUtil.error(this, "Could not get an unused user code after " + userCodeAttemptCount + " attempts.");
+                throw new OA2ATException(OA2Errors.SERVER_ERROR, "could not create new user code", HttpStatus.SC_BAD_REQUEST, null);
+            }
+            rfc8628State.lifetime = lifetime;
+            if (0 < client.getDfInterval()) {
+                rfc8628State.interval = client.getDfInterval();
+            } else {
+                // interval not set in client, use default.
+                rfc8628State.interval = rfc8628ServletConfig.interval;
+            }
+            rfc8628State.userCode = userCode;
+        }
+        debugUtil.trace(this, "user_code = " + userCode);
+        t.setUserCode(userCode);
+        rfc8628State.issuedAt = System.currentTimeMillis();
+        rfc8628State.deviceCode = ag.getURIToken();
+        rfc8628State.lastTry = System.currentTimeMillis(); // so it has a reasonable value
+
+
         t.setRFC8628State(rfc8628State);
         debugUtil.trace(this, "saving transaction");
         getTransactionStore().save(t);

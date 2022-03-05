@@ -70,39 +70,41 @@ public class OA2CLCCommands extends CLCCommands {
     public OA2CLCCommands(boolean silentMode, MyLoggingFacade logger,
                           OA2CommandLineClient oa2CommandLineClient) throws Exception {
         this(logger, oa2CommandLineClient);
-        setPrintOuput(silentMode);
-        setVerbose(silentMode);
+        setPrintOuput(!silentMode);
+        setVerbose(!silentMode);
 
     }
+
     public OA2CLCCommands(MyLoggingFacade logger,
                           OA2CommandLineClient oa2CommandLineClient) throws Exception {
         super(logger, null);
         try {
             setCe((ClientEnvironment) oa2CommandLineClient.getEnvironment());
         } catch (Throwable t) {
-            if(logger != null) {
+            if (logger != null) {
                 logger.error("could not load configuration", t);
-            }else{
-                if(DebugUtil.isEnabled()){
+            } else {
+                if (DebugUtil.isEnabled()) {
                     t.printStackTrace();
                 }
             }
         }
         this.oa2CommandLineClient = oa2CommandLineClient;
     }
-     public void bootMessage(){
-         say(hasClipboard() ? "clipboard is supported." : "no clipboard support available.");
-     }
+
+    public void bootMessage() {
+        say(hasClipboard() ? "clipboard is supported." : "no clipboard support available.");
+    }
 
     protected OA2MPService service;
 
-     @Override
-     public OA2MPService getService() {
-         if (service == null) {
-             service = new OA2MPService(getCe());
-         }
-         return service;
-     }
+    @Override
+    public OA2MPService getService() {
+        if (service == null) {
+            service = new OA2MPService(getCe());
+        }
+        return service;
+    }
 
     public String getConfigFile() {
         return configFile;
@@ -195,7 +197,7 @@ public class OA2CLCCommands extends CLCCommands {
         boolean isFirstPass = true;
         for (String key : requestParameters.keySet()) {
             if (key.equals(SCOPE)) {
-                scopes =scopes + " " + requestParameters.get(key); // take the default, add new ones
+                scopes = scopes + " " + requestParameters.get(key); // take the default, add new ones
             } else {
                 String x = key + "=" + URLEncoder.encode(requestParameters.get(key), "UTF-8");
                 if (isFirstPass) {
@@ -225,8 +227,10 @@ public class OA2CLCCommands extends CLCCommands {
             deviceCode = dfResponse.getString(DEVICE_CODE);
             say("user code: " + userCode);
             Date exp = new Date();
-            exp.setTime(exp.getTime()+dfResponse.getLong(RFC8628Constants2.EXPIRES_IN)*1000);
-            say("code valid until " + exp + " (" + dfResponse.getLong(RFC8628Constants2.EXPIRES_IN) + " sec.)");
+            dfExpiresIn = dfResponse.getLong(RFC8628Constants2.EXPIRES_IN);
+            dfInterval = dfResponse.getLong(INTERVAL);
+            exp.setTime(exp.getTime() + dfExpiresIn * 1000);
+            say("code valid until " + exp + " (" + dfExpiresIn + " sec.)");
             copyToClipboard(userCode, "user code copied to clipboard");
             isDeviceFlow = true;
             grant = new AuthorizationGrantImpl(URI.create(dfResponse.getString(RFC8628Constants2.DEVICE_CODE)));
@@ -238,22 +242,41 @@ public class OA2CLCCommands extends CLCCommands {
         }
     }
 
+    public long getDfInterval() {
+        return dfInterval;
+    }
+
+    public long getDfExpiresIn() {
+        return dfExpiresIn;
+    }
+
+    long dfInterval = -1L;
+    long dfExpiresIn = -1L;
     public JSONObject getDfResponse() {
         return dfResponse;
     }
 
     JSONObject dfResponse;
     String userCode;
-    public String getUserCode(){return  userCode;}
+
+    public String getUserCode() {
+        return userCode;
+    }
 
     String deviceCode;
-    public String getDeviceCode(){return deviceCode;}
+
+    public String getDeviceCode() {
+        return deviceCode;
+    }
 
     /**
      * What is currently from the {@link #set_uri(InputLine)}.
      */
     URI currentURI;
-    public URI getCurrentURI(){return currentURI;}
+
+    public URI getCurrentURI() {
+        return currentURI;
+    }
 
     /**
      * Constructs the URI
@@ -394,11 +417,21 @@ public class OA2CLCCommands extends CLCCommands {
         say("    grant = " + (grant.getJti()));
     }
 
+    /**
+     * This is a specific flag for use in proxying only. It turns off the verification that the callback
+     * uri is the correct one. The reason is that proxies might have to go through a few forwards etc and
+     * there is no way to recover what the original URI was in Tomcat -- it would have to be reconstructed.
+     * Therefore, turn off checking this. It is not listed in help and is not normally a user-facing feature.
+     */
+    public static String NO_VERIFY_GRANT_FLAG = "-no_verify";
+
     public void get_grant(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
             setGrantHelp();
             return;
         }
+        boolean noCheck = inputLine.hasArg(NO_VERIFY_GRANT_FLAG);
+        inputLine.removeSwitch(NO_VERIFY_GRANT_FLAG);
         if (getCe() == null) {
             say("Oops! No configuration has been loaded.");
             return;
@@ -432,7 +465,7 @@ public class OA2CLCCommands extends CLCCommands {
             return;
         }
         // now we parse this.
-        if (!x.startsWith(getCe().getCallback().toString())) {
+        if ((!noCheck) && (!x.startsWith(getCe().getCallback().toString()))) {
             say("The callback in the configuration does not match that in the argument you gave");
             return;
         }
@@ -613,7 +646,10 @@ public class OA2CLCCommands extends CLCCommands {
     }
 
     JSONObject claims = null;
-    public JSONObject getClaims(){return claims;}
+
+    public JSONObject getClaims() {
+        return claims;
+    }
 
     public void claims(InputLine inputLine) throws Exception {
         if (grant == null || showHelp(inputLine)) {
@@ -625,8 +661,8 @@ public class OA2CLCCommands extends CLCCommands {
         } else {
             say(claims.toString(2));
             Date exp = new Date();
-            exp.setTime(claims.getInt(OA2Claims.EXPIRATION)*1000L);
-            say(exp.getTime() - System.currentTimeMillis()<0?"expired at ":"valid until " + exp);
+            exp.setTime(claims.getInt(OA2Claims.EXPIRATION) * 1000L);
+            say(exp.getTime() - System.currentTimeMillis() < 0 ? "expired at " : "valid until " + exp);
         }
 
     }
@@ -676,6 +712,7 @@ public class OA2CLCCommands extends CLCCommands {
     }
 
     JSONObject introspectResponse;
+
     public void asset(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
             say("asset");
@@ -721,9 +758,9 @@ public class OA2CLCCommands extends CLCCommands {
             // if the parameters are set then pass along everything including the
             // default scopes. 
             String scopes = oa2ce.scopesToString();
-            if(copyOfParams.containsKey(SCOPE)){
+            if (copyOfParams.containsKey(SCOPE)) {
                 String ss = copyOfParams.get(SCOPE);
-                if(-1 == ss.indexOf(scopes)){
+                if (-1 == ss.indexOf(scopes)) {
                     ss = scopes + " " + ss;
                     copyOfParams.put(SCOPE, ss);
                 }
@@ -763,20 +800,23 @@ public class OA2CLCCommands extends CLCCommands {
                 say(claims.toString(2));
             }
         }
-        printTokens(inputLine.hasArg(NO_VERIFY_JWT));
+        if (isPrintOuput()) {
+            printTokens(inputLine.hasArg(NO_VERIFY_JWT));
+        }
     }
 
     ATResponse2 currentATResponse;
-    public String getAT(){
-        if(currentATResponse == null)return "";
+
+    public String getAT() {
+        if (currentATResponse == null) return "";
         return currentATResponse.getAccessToken().getToken();
     }
 
-    public String getRT(){
-        if(currentATResponse == null)return "";
+    public String getRT() {
+        if (currentATResponse == null) return "";
         return currentATResponse.getRefreshToken().getToken();
     }
-    
+
     protected void getCertHelp() {
         say("get_cert");
         sayi("Usage: This will get the requested cert chain from the server.");
@@ -1033,7 +1073,9 @@ public class OA2CLCCommands extends CLCCommands {
                 say(json.toString(2));
             }
         }
-        printTokens(inputLine.hasArg(NO_VERIFY_JWT));
+        if (isPrintOuput()) {
+            printTokens(inputLine.hasArg(NO_VERIFY_JWT));
+        }
     }
 
 
@@ -1182,58 +1224,26 @@ public class OA2CLCCommands extends CLCCommands {
 
     }
 
+    protected String ASSET_KEY = "asset";
+    protected String AT_RESPONSE_KEY = "at_response";
+    protected String AUTHZ_GRANT_KEY = "authz_grant";
+    protected String AUTHZ_PARAMETERS_KEY = "authz_parameters";
+    public String CLAIMS_KEY = "claims";
     protected String CONFIG_NAME_KEY = "config_name";
     protected String CONFIG_FILE_KEY = "config_file";
-    protected String SYSTEM_MESSAGE_KEY = "system_message";
-    protected String USER_MESSAGE_KEY = "user_message";
-    protected String ASSET_KEY = "asset";
-    protected String CLAIMS_KEY = "claims";
     protected String CURRENT_URI_KEY = "current_uri";
-    protected String AUTHZ_GRANT_KEY = "authz_grant";
-    protected String TOKEN_PARAMETERS_KEY = "token_parameters";
-    protected String AUTHZ_PARAMETERS_KEY = "authz_parameters";
-    protected String REFRESH_PARAMETERS_KEY = "refresh_parameters";
-    protected String EXCHANGE_PARAMETERS_KEY = "exchange_parameters";
-    protected String AT_RESPONSE_KEY = "at_response";
-    protected String INTROSPECT_RESPONSE_KEY = "introspect_response";
     protected String DF_RESPONSE_KEY = "df_response";
+    protected String EXCHANGE_PARAMETERS_KEY = "exchange_parameters";
+    protected String INTROSPECT_RESPONSE_KEY = "introspect_response";
+    protected String PRINT_OUTPUT_ON_KEY = "print_output_on";
+    protected String REFRESH_PARAMETERS_KEY = "refresh_parameters";
+    protected String SYSTEM_MESSAGE_KEY = "system_message";
+    protected String TOKEN_PARAMETERS_KEY = "token_parameters";
+    protected String USER_MESSAGE_KEY = "user_message";
+    protected String VERBOSE_ON_KEY = "verbose_on";
 
 
-
-    public void read(InputLine inputLine) throws Exception {
-        if (showHelp(inputLine)) {
-            showReadHelp();
-            return;
-        }
-        if (0 == inputLine.getArgCount()) {
-            if (saveFile == null) {
-                say("sorry, but you must specify a file");
-                return;
-            }
-        } else {
-            saveFile = new File(inputLine.getLastArg());
-        }
-
-        if (!saveFile.exists()) {
-            say("sorry, but \"" + saveFile.getAbsolutePath() + "\" does not exist");
-            return;
-        }
-        if (saveFile.isDirectory()) {
-            say("sorry, but \"" + saveFile.getAbsolutePath() + "\" is a directory");
-            return;
-        }
-
-        StringBuffer stringBuffer = new StringBuffer();
-        Path path = Paths.get(saveFile.getAbsolutePath());
-        say("reading file \"" + saveFile.getAbsolutePath() + "\"");
-        List<String> contents = Files.readAllLines(path);
-        int i = 0;
-        //Read from the stream
-        for (String content : contents) {
-            stringBuffer.append(content + "\n");
-        }
-
-        JSONObject json = JSONObject.fromObject(stringBuffer.toString());
+    public void fromJSON(JSONObject json) throws Exception {
         if (json.containsKey(CONFIG_FILE_KEY)) {
             // make a fake input line for loading the last configuration and run it.
             // Do this first since it clears the current state and anything loaded before it is lost.
@@ -1248,6 +1258,12 @@ public class OA2CLCCommands extends CLCCommands {
 
         if (json.containsKey(SYSTEM_MESSAGE_KEY)) {
             say(json.getString(SYSTEM_MESSAGE_KEY));
+        }
+        if (json.containsKey(PRINT_OUTPUT_ON_KEY)) {
+            setPrintOuput(json.getBoolean(PRINT_OUTPUT_ON_KEY));
+        }
+        if (json.containsKey(VERBOSE_ON_KEY)) {
+            setVerbose(json.getBoolean(VERBOSE_ON_KEY));
         }
 
         if (json.containsKey(USER_MESSAGE_KEY)) {
@@ -1278,11 +1294,11 @@ public class OA2CLCCommands extends CLCCommands {
             refreshParameters = new HashMap<>();
             refreshParameters.putAll(json.getJSONObject(REFRESH_PARAMETERS_KEY));
         }
-        if(json.containsKey(INTROSPECT_RESPONSE_KEY)){
+        if (json.containsKey(INTROSPECT_RESPONSE_KEY)) {
             introspectResponse = json.getJSONObject(INTROSPECT_RESPONSE_KEY);
         }
 
-        if(json.containsKey(DF_RESPONSE_KEY)){
+        if (json.containsKey(DF_RESPONSE_KEY)) {
             dfResponse = json.getJSONObject(DF_RESPONSE_KEY);
         }
         if (json.containsKey(EXCHANGE_PARAMETERS_KEY)) {
@@ -1320,6 +1336,43 @@ public class OA2CLCCommands extends CLCCommands {
         } else {
             //say("warning -- no stored asset found.");
         }
+
+    }
+
+    public void read(InputLine inputLine) throws Exception {
+        if (showHelp(inputLine)) {
+            showReadHelp();
+            return;
+        }
+        if (0 == inputLine.getArgCount()) {
+            if (saveFile == null) {
+                say("sorry, but you must specify a file");
+                return;
+            }
+        } else {
+            saveFile = new File(inputLine.getLastArg());
+        }
+
+        if (!saveFile.exists()) {
+            say("sorry, but \"" + saveFile.getAbsolutePath() + "\" does not exist");
+            return;
+        }
+        if (saveFile.isDirectory()) {
+            say("sorry, but \"" + saveFile.getAbsolutePath() + "\" is a directory");
+            return;
+        }
+
+        StringBuffer stringBuffer = new StringBuffer();
+        Path path = Paths.get(saveFile.getAbsolutePath());
+        say("reading file \"" + saveFile.getAbsolutePath() + "\"");
+        List<String> contents = Files.readAllLines(path);
+        int i = 0;
+        //Read from the stream
+        for (String content : contents) {
+            stringBuffer.append(content + "\n");
+        }
+        JSONObject json = JSONObject.fromObject(stringBuffer.toString());
+        fromJSON(json);
         say("done!");
     }
 
@@ -1333,55 +1386,28 @@ public class OA2CLCCommands extends CLCCommands {
     String lastUserMessage = null;
     File saveFile = null;
 
-    public void write(InputLine inputLine) throws Exception {
-        if (showHelp(inputLine)) {
-            showWriteHelp();
-            return;
-        }
+    public JSONObject toJSON() {
+        /*
+        NOTE that other programs are now starting to use this client for Proxies, hence are expecting the
+        state (in particular the claims) to be findable. If you change how the claims are stashed,
+        here, this may have consequences elsewhere. Generally, just adding stuff here is fine.
+         */
         JSONObject jsonObject = new JSONObject();
-
-        if (inputLine.hasArg(MESSAGE_SWITCH)) {
-            lastUserMessage = inputLine.getNextArgFor(MESSAGE_SWITCH);
-            inputLine.removeSwitchAndValue(MESSAGE_SWITCH);
-        }
         if (!isTrivial(lastUserMessage)) {
             jsonObject.put(USER_MESSAGE_KEY, lastUserMessage);
-        }
-
-
-        if (inputLine.getArgCount() == 0) {
-            if (saveFile == null) {
-                say("sorry, no file specified.");
-                return;
-            }
-        } else {
-            saveFile = new File(inputLine.getLastArg());
         }
         jsonObject.put(SYSTEM_MESSAGE_KEY, "OA4MP command line client state stored on " + (new Date()));
         if (grant != null) {
             jsonObject.put(AUTHZ_GRANT_KEY, grant.toJSON());
         }
+        jsonObject.put(PRINT_OUTPUT_ON_KEY, isPrintOuput());
+        jsonObject.put(VERBOSE_ON_KEY, isVerbose());
         if (currentURI != null) {
             jsonObject.put(CURRENT_URI_KEY, currentURI.toString());
         }
 
         if (dummyAsset != null) {
             jsonObject.put(ASSET_KEY, dummyAsset.toJSON());
-        }
-        if (saveFile.isDirectory()) {
-            say("sorry, but \"" + saveFile.getAbsolutePath() + "\" is a directory");
-            return;
-        }
-        if (!saveFile.isAbsolute()) {
-            say("Sorry, but " + saveFile.getName() + " needs the path.");
-            return;
-        }
-        if (saveFile.exists()) {
-            String r = readline("\"" + saveFile.getAbsolutePath() + "\" exists. Overwrite?[y/n]");
-            if (!r.equals("y")) {
-                say("aborted. Returning...");
-                return;
-            }
         }
         jsonObject.put(CONFIG_NAME_KEY, oa2CommandLineClient.getConfigName());
         jsonObject.put(CONFIG_FILE_KEY, oa2CommandLineClient.getConfigFile());
@@ -1408,11 +1434,11 @@ public class OA2CLCCommands extends CLCCommands {
             jj.putAll(exchangeParameters);
             jsonObject.put(EXCHANGE_PARAMETERS_KEY, jj);
         }
-        if(introspectResponse != null && !introspectResponse.isEmpty()){
+        if (introspectResponse != null && !introspectResponse.isEmpty()) {
             jsonObject.put(INTROSPECT_RESPONSE_KEY, introspectResponse);
         }
 
-        if(dfResponse != null && !dfResponse.isEmpty()){
+        if (dfResponse != null && !dfResponse.isEmpty()) {
             jsonObject.put(DF_RESPONSE_KEY, dfResponse);
         }
 
@@ -1443,8 +1469,47 @@ public class OA2CLCCommands extends CLCCommands {
         }
         // End RFC8628 attributes
 
+        return jsonObject;
+    }
+
+    public void write(InputLine inputLine) throws Exception {
+        if (showHelp(inputLine)) {
+            showWriteHelp();
+            return;
+        }
+
+        if (inputLine.hasArg(MESSAGE_SWITCH)) {
+            lastUserMessage = inputLine.getNextArgFor(MESSAGE_SWITCH);
+            inputLine.removeSwitchAndValue(MESSAGE_SWITCH);
+        }
+
+
+        if (inputLine.getArgCount() == 0) {
+            if (saveFile == null) {
+                say("sorry, no file specified.");
+                return;
+            }
+        } else {
+            saveFile = new File(inputLine.getLastArg());
+        }
+        if (saveFile.isDirectory()) {
+            say("sorry, but \"" + saveFile.getAbsolutePath() + "\" is a directory");
+            return;
+        }
+        if (!saveFile.isAbsolute()) {
+            say("Sorry, but " + saveFile.getName() + " needs the path.");
+            return;
+        }
+        if (saveFile.exists()) {
+            String r = readline("\"" + saveFile.getAbsolutePath() + "\" exists. Overwrite?[y/n]");
+            if (!r.equals("y")) {
+                say("aborted. Returning...");
+                return;
+            }
+        }
+
         FileWriter fileWriter = new FileWriter(saveFile);
-        fileWriter.write(jsonObject.toString(1));
+        fileWriter.write(toJSON().toString(1));
         fileWriter.flush();
         fileWriter.close();
         say("done! Saved to \"" + saveFile.getAbsolutePath() + "\".");
@@ -1525,7 +1590,7 @@ public class OA2CLCCommands extends CLCCommands {
         if (setXP) {
             exchangeParameters.put(inputLine.getArg(1), inputLine.getArg(2));
         }
-        if(setRFP){
+        if (setRFP) {
             refreshParameters.put(inputLine.getArg(1), inputLine.getArg(2));
         }
     }
@@ -1685,7 +1750,7 @@ public class OA2CLCCommands extends CLCCommands {
                 exchangeParameters.remove(k);
                 xRemoved++;
             }
-            if(getRFP){
+            if (getRFP) {
                 refreshParameters.remove(k);
                 rfRemoved++;
             }
@@ -1694,7 +1759,7 @@ public class OA2CLCCommands extends CLCCommands {
         say("removed: " + rRemoved + " authz parameters, "
                 + tRemoved + " token parameters, "
                 + rfRemoved + " refresh parameters, "
-                +  xRemoved + " exchange parameters");
+                + xRemoved + " exchange parameters");
 
     }
 

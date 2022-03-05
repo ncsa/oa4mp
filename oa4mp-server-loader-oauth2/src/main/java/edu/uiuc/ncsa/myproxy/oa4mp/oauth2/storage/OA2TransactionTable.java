@@ -26,6 +26,7 @@ public class OA2TransactionTable extends DSTransactionTable {
         getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().refreshTokenValid(), Types.BOOLEAN));
         getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().isRFC8628(), Types.BOOLEAN));
         getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().expiresIn(), Types.BIGINT));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().proxyID(), Types.LONGVARCHAR));
         getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().refreshTokenLifetime(), Types.BIGINT));
         getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().authzGrantLifetime(), Types.BIGINT));
         getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().nonce(), Types.LONGVARCHAR));
@@ -53,5 +54,9 @@ public class OA2TransactionTable extends DSTransactionTable {
        public String CheckUserCodeExists(){
         // select exists(select * from client_approvals where client_id = 'oa4mp:/client_id/5d94fb8d63353ff70b2506611ef0685');
            return "select exists(select * from " + getFQTablename() + " WHERE " + getOA2Keys().userCode() + "= ?)";
+       }
+
+    public String getByProxyID() {
+           return "SELECT * FROM " + getFQTablename() + " WHERE " + getOA2Keys().proxyID() + "= ?";
        }
 }

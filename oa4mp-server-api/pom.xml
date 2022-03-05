@@ -86,6 +86,12 @@
             <artifactId>JGlobus-Core</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>edu.uiuc.ncsa.myproxy</groupId>
+            <artifactId>oa4mp-client-loader-oauth2</artifactId>
+            <version>5.2-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
 

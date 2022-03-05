@@ -66,6 +66,12 @@ public interface OA4MPConfigTags extends StorageConfigurationTags, MailConfigura
     String AUTHORIZATION_SERVLET = "authorizationServlet"; // The name of the authz servlet
 
 
+    // for proxy authorization
+    String AUTHORIZATION_SERVLET_USE_PROXY = "useProxy"; // Use a proxy for authorization
+    String AUTHORIZATION_SERVLET_PROXY_CONFIG_FILE = "cfgFile"; // The full path to the proxy configuration file
+    String AUTHORIZATION_SERVLET_PROXY_CONFIG_NAME = "cfgName"; // The name of the configuration  to use.
+
+    // For tomcat and remote header configuration
     String AUTHORIZATION_SERVLET_URI = "authorizationURI"; // If there is a different authorization uri than the standard, specify it here
     String AUTHORIZATION_SERVLET_HEADER_USE = "useHeader"; // If there is a header present, use it, otherwise ignore it.
     String AUTHORIZATION_SERVLET_HEADER_REQUIRE = "requireHeader"; // Require the header. This will cause an exception to be thrown if there is no header.

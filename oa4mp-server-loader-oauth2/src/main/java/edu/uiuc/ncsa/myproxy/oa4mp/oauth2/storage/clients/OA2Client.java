@@ -557,5 +557,26 @@ public class OA2Client extends Client implements OA2ClientScopes {
     }
 
     long dfInterval = -1L; // device flow interval in ms
+
+    /**
+     * This is a string that tells what claims <b>in addition to the subject</b> to take from
+     * the proxy claims. Default is just to take the subject. Options are
+     * <ul>
+     *     <li>(empty) - default = just take the sub claim</li>
+     *     <li>[*] - all</li>
+     *     <li>[c0, c1, c2,...] - a list</li>
+     * </ul>
+     * @return
+     */
+    public Collection<String> getProxyClaimsList() {
+        return proxyClaimsList;
+    }
+
+    public void setProxyClaimsList(Collection<String> proxyClaimsList) {
+        this.proxyClaimsList = proxyClaimsList;
+    }
+
+    Collection<String> proxyClaimsList = new ArrayList<>();
+
 }
 

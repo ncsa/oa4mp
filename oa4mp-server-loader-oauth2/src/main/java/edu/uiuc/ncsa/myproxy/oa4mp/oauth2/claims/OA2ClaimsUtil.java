@@ -167,6 +167,13 @@ public class OA2ClaimsUtil implements ScriptingConstants {
             public Map<String, Object> getArgs() {
                 HashMap<String, Object> map = new HashMap<>();
                 map.put(SRE_REQ_CLAIMS, transaction.getUserMetaData());
+                JSONObject proxyState = transaction.getProxyState();
+                if(proxyState.isEmpty()){
+                    map.put(SRE_REQ_PROXY_CLAIMS, new JSONObject()); // it is empty
+                }else{
+                    proxyState.getJSONObject("claims");
+                    map.put(SRE_REQ_PROXY_CLAIMS, proxyState.getJSONObject("claims"));
+                }
                 map.put(SRE_REQ_SCOPES, transaction.getScopes());
                 map.put(SRE_REQ_AUDIENCE, transaction.getAudience());
                 map.put(SRE_REQ_EXTENDED_ATTRIBUTES, transaction.getExtendedAttributes());

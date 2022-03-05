@@ -1,7 +1,9 @@
-package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
+package edu.uiuc.ncsa.oa2.servlet;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8628Constants2;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8628State;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RFC8628Store;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.EnvServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
@@ -23,8 +25,6 @@ import java.security.GeneralSecurityException;
 import java.sql.SQLException;
 import java.util.*;
 
-import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2AuthorizationServer.AUTHORIZATION_PASSWORD_KEY;
-import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2AuthorizationServer.AUTHORIZATION_USER_NAME_KEY;
 import static edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractAuthorizationServlet.*;
 import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 import static org.apache.commons.lang.StringEscapeUtils.escapeHtml;
@@ -379,6 +379,10 @@ public class RFC8628AuthorizationServer extends EnvServlet {
 
         switch (pendingState.getState()) {
             case AUTHORIZATION_ACTION_START:
+    /*            if (getServiceEnvironment().getAuthorizationServletConfig().isUseProxy()) {
+                    ProxyUtils.doProxy(getServiceEnvironment(), pendingState);
+                    return;
+                }*/
                 String initPage = getInitialPage();
                 info("*** STARTING present");
                 if (getServiceEnvironment().getAuthorizationServletConfig().isUseHeader()) {
@@ -428,6 +432,8 @@ public class RFC8628AuthorizationServer extends EnvServlet {
                 debug("Hit default case in " + this.getClass().getSimpleName() + " servlet");
         }
     }
+
+
 
     protected void cleanupPending() {
         if (pending == null || pending.isEmpty()) {

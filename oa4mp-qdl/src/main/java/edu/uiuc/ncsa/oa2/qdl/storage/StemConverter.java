@@ -152,7 +152,12 @@ public abstract class StemConverter<V extends Identifiable> extends MapConverter
         }
     }
 
-
+    /**
+     * Convenience. If the value is not null, this will put it in the stem.
+     * @param stem
+     * @param key
+     * @param value
+     */
     protected void setNonNullStemValue(StemVariable stem, String key, Object value){
         if(value != null){
             stem.put(key, value);

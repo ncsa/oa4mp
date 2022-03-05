@@ -1,10 +1,12 @@
-package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
+package edu.uiuc.ncsa.oa2.servlet;
 
 
 import edu.uiuc.ncsa.myproxy.MPSingleConnectionProvider;
 import edu.uiuc.ncsa.myproxy.MyProxyConnectable;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2AuthorizedServletUtil;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2ClientUtils;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ScriptRuntimeEngineFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractAuthorizationServlet;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
@@ -18,13 +20,8 @@ import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTRunner;
 import edu.uiuc.ncsa.security.servlet.PresentableState;
 import net.sf.json.JSONObject;
 
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletResponseWrapper;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.security.GeneralSecurityException;
@@ -48,7 +45,7 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
     public String AUTHORIZED_ENDPOINT = "/authorized";
     public String AUTHORIZATION_REFRESH_TOKEN_LIFETIME_VALUE = "rtLifetime";
 
-    protected String scopesToString(OA2ServiceTransaction t) {
+    protected static String scopesToString(OA2ServiceTransaction t) {
         String scopeString = "";
         for (String x : t.getScopes()) {
             scopeString = scopeString + x + " ";
@@ -67,67 +64,6 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
 
     }
 
-    /**
-     * This class is needed to pass information between servlets, where one servlet
-     * calls another. It intercepts the calls from the target servlet and passes
-     * it back to the calling servlet for processing. This way we can keep straight who
-     * did what.
-     */
-    public static class MyHttpServletResponseWrapper
-            extends HttpServletResponseWrapper {
-
-        private StringWriter sw = new StringWriter();
-
-        public MyHttpServletResponseWrapper(HttpServletResponse response) {
-            super(response);
-        }
-
-        int internalStatus = 0;
-
-        @Override
-        public void setStatus(int sc) {
-            internalStatus = sc;
-            super.setStatus(sc);
-            if (!(200 <= sc && sc < 300)) {
-                setExceptionEncountered(true);
-            }
-        }
-
-
-        public int getStatus() {
-            return internalStatus;
-        }
-
-        public PrintWriter getWriter() throws IOException {
-            return new PrintWriter(sw);
-        }
-
-        public ServletOutputStream getOutputStream() throws IOException {
-            throw new UnsupportedOperationException();
-        }
-
-        public String toString() {
-            return sw.toString();
-        }
-
-        /**
-         * If in the course of processing an exception is encountered, set this to be true. This class
-         * is made to be passed between servlets and the results harvested, but if one of the servlets encounters
-         * an exception, that is handled with a redirect (in OAuth 2) so nothing ever gets propagated back up the
-         * stack to show that. This should be checked to ensure that did not happen.
-         *
-         * @return
-         */
-        boolean isExceptionEncountered() {
-            return exceptionEncountered;
-        }
-
-        void setExceptionEncountered(boolean exceptionEncountered) {
-            this.exceptionEncountered = exceptionEncountered;
-        }
-
-        boolean exceptionEncountered = false;
-    }
 
     protected OA2AuthorizedServletUtil getInitUtil() {
         return new OA2AuthorizedServletUtil(this);
@@ -175,12 +111,6 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
         }
     }
 
-
-    @Override
-    public void present(PresentableState state) throws Throwable {
-        super.present(state);
-
-    }
 
     @Override
     protected void createRedirect(HttpServletRequest request, HttpServletResponse response, ServiceTransaction trans) throws Throwable {
@@ -268,6 +198,33 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
                 getMPConnection(trans.getIdentifier()).close();
             }
         }
+    }
+
+    @Override
+    protected void doProxy(AuthorizedState state) throws Throwable {
+        ProxyUtils.doProxy((OA2SE) getServiceEnvironment(), state);
+/*
+        AuthorizationServletConfig asc = getServiceEnvironment().getAuthorizationServletConfig();
+                              OA2ServiceTransaction t = (OA2ServiceTransaction)state.getTransaction();
+        OA2CLCCommands clcCommands = new OA2CLCCommands(true, getMyLogger(), new OA2CommandLineClient(getMyLogger()));
+        // Construct a dummy argument to load the client configuration. Calling load() means the first argument has been
+        // processed to locate the method (via introspection) and is ignored in the method.
+        clcCommands.load(new InputLine("dummy " + asc.getCfgName() + "  " + asc.getCfgFile()));
+        MyHttpServletResponseWrapper wrapper = new MyHttpServletResponseWrapper(state.getResponse());
+        // set the specific scopes.
+        clcCommands.set_param(new InputLine("set_param -a scope \"" +scopesToString(t) + "\""));
+        Identifier identifier = BasicIdentifier.randomID();
+        String id = Base64.getEncoder().encodeToString(identifier.toString().getBytes(StandardCharsets.UTF_8));
+        t.setProxyId(identifier.toString());
+        t.setAuthGrantValid(true);
+        clcCommands.set_param(new InputLine("set_param -a state " + id));
+        clcCommands.uri(new InputLine("uri")); // side effect is to set the uri
+        URI uri = clcCommands.getCurrentURI();
+         t.setProxyState(clcCommands.toJSON());
+        // Here's where we need to poke at this.
+        getServiceEnvironment().getTransactionStore().save(t); // save that proxy id!
+        wrapper.sendRedirect(uri.toString());
+*/
     }
 }
 

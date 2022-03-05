@@ -5,6 +5,18 @@ package edu.uiuc.ncsa.myproxy.oa4mp.server.servlet;
  * on 12/4/12 at  11:28 AM
  */
 public class AuthorizationServletConfig {
+    /**
+     * Constructor if a proxy is to be used for authorization. This points to a file
+     * with the configuration in it and the name of the configuration to use.
+     * @param cfgFile
+     * @param cfgName
+     */
+    public AuthorizationServletConfig(String cfgFile, String cfgName){
+        this.cfgFile = cfgFile;
+        this.cfgName = cfgName;
+        setUseProxy(true);
+    }
+
     public AuthorizationServletConfig(String authorizationURI,
                                       boolean useHeader,
                                       boolean requireHeader,
@@ -21,7 +33,36 @@ public class AuthorizationServletConfig {
         this.verifyUsername = verifyUsername;
         this.convertDNToGlobusID = convertDNToGlobusID;
         this.authorizationURI = authorizationURI;
+        setUseProxy(false);
     }
+
+    public boolean isUseProxy() {
+        return useProxy;
+    }
+
+    public void setUseProxy(boolean useProxy) {
+        this.useProxy = useProxy;
+    }
+
+    public String getCfgFile() {
+        return cfgFile;
+    }
+
+    public void setCfgFile(String cfgFile) {
+        this.cfgFile = cfgFile;
+    }
+
+    public String getCfgName() {
+        return cfgName;
+    }
+
+    public void setCfgName(String cfgName) {
+        this.cfgName = cfgName;
+    }
+
+    boolean useProxy = false;
+    String cfgFile = null;
+    String cfgName = null;
 
     boolean showLogon;
 

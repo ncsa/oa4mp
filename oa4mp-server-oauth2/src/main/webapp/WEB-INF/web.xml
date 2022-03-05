@@ -19,7 +19,18 @@
         <servlet-name>discovery</servlet-name>
         <url-pattern>/certs/*</url-pattern>
     </servlet-mapping>
-  
+
+    <servlet>
+        <servlet-name>callback</servlet-name>
+        <servlet-class>edu.uiuc.ncsa.oa2.servlet.ProxyCallbackServlet</servlet-class>
+        <load-on-startup>0</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>callback</servlet-name>
+        <url-pattern>/ready</url-pattern>
+    </servlet-mapping>
+
+
     <servlet>
         <servlet-name>accessToken</servlet-name>
         <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2ATServlet</servlet-class>
@@ -70,7 +81,7 @@
 
     <servlet>
         <servlet-name>authorize</servlet-name>
-        <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2AuthorizationServer</servlet-class>
+        <servlet-class>edu.uiuc.ncsa.oa2.servlet.OA2AuthorizationServer</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>authorize</servlet-name>
@@ -79,7 +90,7 @@
 
     <servlet>
         <servlet-name>device_authorization</servlet-name>
-        <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8628Servlet</servlet-class>
+        <servlet-class>edu.uiuc.ncsa.oa2.servlet.RFC8628Servlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>device_authorization</servlet-name>
@@ -88,7 +99,7 @@
 
     <servlet>
         <servlet-name>device</servlet-name>
-        <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8628AuthorizationServer</servlet-class>
+        <servlet-class>edu.uiuc.ncsa.oa2.servlet.RFC8628AuthorizationServer</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>device</servlet-name>
@@ -190,6 +201,7 @@
          </user-data-constraint>
        </security-constraint>
 
+<!--
     <security-constraint>
         <web-resource-collection>
           <web-resource-name>OAuth Security</web-resource-name>
@@ -208,6 +220,7 @@
        <login-config>
           <auth-method>BASIC</auth-method>
         </login-config>
+-->
 
     <resource-ref>
         <description>

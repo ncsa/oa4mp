@@ -24,6 +24,7 @@ public class OA2ClientKeys extends ClientKeys {
     String extended_attributes = "extended_attributes";
     String issuer = "issuer";
     String ldap = "ldap";
+    String proxyClaimsList ="proxy_claims_list";
     String publicClient="public_client";
     String rtLifetime = "rt_lifetime";
     String resource="resource";
@@ -37,6 +38,10 @@ public class OA2ClientKeys extends ClientKeys {
       or you may break the QDL module that handles clients.
      */
 
+    public String proxyClaimsList(String... x) {
+           if (0 < x.length) proxyClaimsList = x[0];
+           return proxyClaimsList;
+       }
 
 
     public String dfLifetime(String... x) {
@@ -128,6 +133,7 @@ public class OA2ClientKeys extends ClientKeys {
         allKeys.add(issuer());
         allKeys.add(ldap());
         allKeys.add(publicClient());
+        allKeys.add(proxyClaimsList());
         allKeys.add(rtLifetime());
         allKeys.add(atLifetime());
         allKeys.add(scopes());

@@ -21,6 +21,7 @@ import edu.uiuc.ncsa.security.core.configuration.provider.TypedProvider;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.IdentifierProvider;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApprovalStore;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
@@ -72,7 +73,7 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
             List kids = cn.getChildren(OA4MPConfigTags.AUTHORIZATION_SERVLET);
             String headFieldName = null;
             boolean requiredHeader = false;
-            boolean useheader = false;
+            boolean useHeader = false;
             boolean showLogon = true;
             boolean verifyUsername = true;
             boolean returnDnAsUsername = false;
@@ -81,29 +82,58 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
             if (!kids.isEmpty()) {
                 ConfigurationNode sn = (ConfigurationNode) kids.get(0);
                 try {
-
+                    boolean useProxy =getCfgBoolean(sn, OA4MPConfigTags.AUTHORIZATION_SERVLET_USE_PROXY, useHeader);
                     // implicitly uses the fact that null (so missing parameter) parses to false.
-                    authorizationURI = getFirstAttribute(sn, OA4MPConfigTags.AUTHORIZATION_SERVLET_URI);
-                    useheader = getCfgBoolean(sn, OA4MPConfigTags.AUTHORIZATION_SERVLET_HEADER_USE, useheader);
-                    requiredHeader = getCfgBoolean(sn, OA4MPConfigTags.AUTHORIZATION_SERVLET_HEADER_REQUIRE, requiredHeader);
-                    headFieldName = getFirstAttribute(sn, OA4MPConfigTags.AUTHORIZATION_SERVLET_HEADER_FIELD_NAME);
-                    returnDnAsUsername = getCfgBoolean(sn, OA4MPConfigTags.AUTHORIZATION_SERVLET_RETURN_DN_AS_USERNAME, returnDnAsUsername);
-                    showLogon = getCfgBoolean(sn, OA4MPConfigTags.AUTHORIZATION_SERVLET_SHOW_LOGON, showLogon);
-                    verifyUsername = getCfgBoolean(sn, OA4MPConfigTags.AUTHORIZATION_SERVLET_VERIFY_USERNAME, verifyUsername);
-                    convertDNToGlobusID = getCfgBoolean(sn, OA4MPConfigTags.CONVERT_DN_TO_GLOBUS_ID, convertDNToGlobusID);
+                    // If the useHeader tag is missing, then this is effectively false.
+                    useHeader = getCfgBoolean(sn, OA4MPConfigTags.AUTHORIZATION_SERVLET_HEADER_USE, useHeader);
+                    if(useProxy){
+                        String cfgFile = getFirstAttribute(sn, OA4MPConfigTags.AUTHORIZATION_SERVLET_PROXY_CONFIG_FILE);
+                        if(StringUtils.isTrivial(cfgFile)){
+                            throw new IllegalArgumentException("Missing config file for the authorization proxy.");
+                        }
+                        File f = new File(cfgFile);
+                        // check that this works before we load the configuration
+                        if(!f.exists()){
+                             throw new IllegalArgumentException("The file \"" + cfgFile + "\" does not exist. Check your path.");
+                        }
+                        if(!f.isFile()){
+                            throw new IllegalArgumentException("\"" + cfgFile + "\" is not a file.");
+                        }
+                        if(!f.canRead()){
+                            throw new IllegalArgumentException("The file \"" + cfgFile + "\" cannot be read. Check your permissions");
+                        }
+                        String cfgName = getFirstAttribute(sn, OA4MPConfigTags.AUTHORIZATION_SERVLET_PROXY_CONFIG_NAME);
+                        // A missing config file is bad. However, if there is exactly one configuration in the file
+                        // it does not need to be named, so the cfgName can be omitted.
+                      authorizationServletConfig = new AuthorizationServletConfig(cfgFile, cfgName==null?"":cfgName);
+                    }else {
+                        if (useHeader) {
+                            authorizationURI = getFirstAttribute(sn, OA4MPConfigTags.AUTHORIZATION_SERVLET_URI);
+                            requiredHeader = getCfgBoolean(sn, OA4MPConfigTags.AUTHORIZATION_SERVLET_HEADER_REQUIRE, requiredHeader);
+                            headFieldName = getFirstAttribute(sn, OA4MPConfigTags.AUTHORIZATION_SERVLET_HEADER_FIELD_NAME);
+                            returnDnAsUsername = getCfgBoolean(sn, OA4MPConfigTags.AUTHORIZATION_SERVLET_RETURN_DN_AS_USERNAME, returnDnAsUsername);
+                            showLogon = getCfgBoolean(sn, OA4MPConfigTags.AUTHORIZATION_SERVLET_SHOW_LOGON, showLogon);
+                            verifyUsername = getCfgBoolean(sn, OA4MPConfigTags.AUTHORIZATION_SERVLET_VERIFY_USERNAME, verifyUsername);
+                            convertDNToGlobusID = getCfgBoolean(sn, OA4MPConfigTags.CONVERT_DN_TO_GLOBUS_ID, convertDNToGlobusID);
+                        }
+                        // Fall through. If  useHeader is true, then all the above values will be set.
+                        // Otherwise, the previous defaults will be used.
+                        authorizationServletConfig = new AuthorizationServletConfig(
+                                authorizationURI,
+                                useHeader,
+                                requiredHeader,
+                                headFieldName,
+                                returnDnAsUsername,
+                                showLogon,
+                                verifyUsername,
+                                convertDNToGlobusID);
+                    }
                 } catch (Throwable t) {
                     info("Error loading authorization configuration. Disabling use of headers");
                 }
             }
-            authorizationServletConfig = new AuthorizationServletConfig(
-                    authorizationURI,
-                    useheader,
-                    requiredHeader,
-                    headFieldName,
-                    returnDnAsUsername,
-                    showLogon,
-                    verifyUsername,
-                    convertDNToGlobusID);
+
+
         }
         return authorizationServletConfig;
     }

@@ -1,6 +1,8 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.server.OA4MPServiceTransaction;
+import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.delegation.server.storage.SQLServiceTransactionStore;
 import edu.uiuc.ncsa.security.delegation.token.TokenForge;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
@@ -26,5 +28,11 @@ public class DSSQLTransactionStore<V extends OA4MPServiceTransaction> extends SQ
     @Override
     public String getCreationTSField() {
         return super.getCreationTSField();
+    }
+
+    @Override
+    public V getByProxyID(Identifier proxyID) {
+        // Must be implemented in a subclass. Throws and exception here mostly as a head's up something is off.
+        throw new NotImplementedException("Error: This is not yet implemented.");
     }
 }

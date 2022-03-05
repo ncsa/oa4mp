@@ -42,6 +42,16 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
     public String RESOURCE_KEY = "resource";
     public String QUERIED_ACCESS_TOKEN_SCOPES_KEY = "queriedATScopes";
 
+    public String getProxyId() {
+        return proxyId;
+    }
+
+    public void setProxyId(String proxyId) {
+        this.proxyId = proxyId;
+    }
+
+    public String proxyId;
+
     @Override
     public Date getCreationTS() {
         return getAuthTime();
@@ -97,6 +107,7 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
 
     public static String RFC862_STATE_KEY = "rfc8628_state";
 
+
     public RFC8628State getRFC8628State() {
         JSONObject j = getState().getJSONObject(RFC862_STATE_KEY);
         RFC8628State state = new RFC8628State();
@@ -104,6 +115,18 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
             state.fromJSON(j);
         }
         return state;
+    }
+
+    static String PROXY_STATE_KEY = "proxy_state";
+    public void setProxyState(JSONObject proxyState){
+        getState().put(PROXY_STATE_KEY, proxyState);
+    }
+
+    public JSONObject getProxyState(){
+        if(getState().containsKey(PROXY_STATE_KEY)){
+             return getState().getJSONObject(PROXY_STATE_KEY);
+        }
+        return new JSONObject();
     }
 
     public void setRFC8628State(RFC8628State rfc8628State) {

@@ -53,6 +53,9 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         if (map.get(getCK2().scopes()) != null) {
             otherV.setScopes(jsonArrayToCollection(map, getCK2().scopes()));
         }
+        if(map.get(getCK2().proxyClaimsList())!=null){
+            otherV.setProxyClaimsList(jsonArrayToCollection(map, getCK2().proxyClaimsList()));
+        }
         if (map.get(getCK2().audience()) != null) {
             otherV.setAudience(jsonArrayToCollection(map, getCK2().audience()));
         }
@@ -225,6 +228,11 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
                 scopes.add(s);
             }
             map.put(getCK2().scopes(), scopes.toString());
+        }
+        if(client.getProxyClaimsList()!=  null){
+            JSONArray jsonArray = new JSONArray();
+            jsonArray.addAll(client.getProxyClaimsList());
+            map.put(getCK2().proxyClaimsList(), jsonArray.toString());
         }
         if (client.getAudience() != null) {
             JSONArray aud = new JSONArray();

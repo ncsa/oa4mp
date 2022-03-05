@@ -43,6 +43,10 @@ public class OA2FSTStore<V extends OA2ServiceTransaction> extends DSFSTransactio
         if(thingie.getUsername() != null){
             removeIndexEntry(thingie.getUsername());
         }
+        if(thingie.getProxyId() != null){
+            removeIndexEntry(thingie.getProxyId());
+        }
+
         return thingie;
     }
 
@@ -55,6 +59,9 @@ public class OA2FSTStore<V extends OA2ServiceTransaction> extends DSFSTransactio
             }
             if (t.getUsername() != null) {
                 createIndexEntry(t.getUsername(), t.getIdentifierString());
+            }
+            if(t.getProxyId() != null){
+                createIndexEntry(t.getProxyId(), t.getIdentifierString());
             }
         } catch (IOException e) {
             throw new GeneralException("Error serializing item " + t + "to file ");
@@ -99,8 +106,22 @@ public class OA2FSTStore<V extends OA2ServiceTransaction> extends DSFSTransactio
             }
             return null;
       }
+
+    @Override
+    public V getByProxyID(Identifier proxyID) {
+        for (Identifier id : keySet()) {
+            V transaction = getByProxyID(id);
+            if (transaction != null && transaction.getProxyId().equals(id)) {
+                return transaction;
+            }
+        }
+        return null;
+    }
+
     @Override
     public boolean hasUserCode(String userCode) {
         return getByUserCode(userCode) != null;
     }
+
+
 }

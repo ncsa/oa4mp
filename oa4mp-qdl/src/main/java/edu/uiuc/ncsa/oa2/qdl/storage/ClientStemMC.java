@@ -66,7 +66,7 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
             v.setSecret(stem.getString(kk().secret()));
         }
         // 9 attributes
-        /* Alphabetical list of OA2 client attributes. (15 of these)
+        /* Alphabetical list of OA2 client attributes. (16 of these)
          String atLifetime = "at_lifetime";
          String audience="audience";
          String callback_uri = "callback_uri";
@@ -77,6 +77,7 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
          String extended_attributes = "extended_attributes";
          String issuer = "issuer";
          String ldap = "ldap";
+         String proxyClaims="proxy_claims";
          String publicClient="public_client";
 
          String resource="resource";
@@ -121,7 +122,9 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
                 v.setLdaps(getCC().getLdapConfigurationUtil().fromJSON(array));
             }
         }
-
+        if(stem.containsKey(kk().proxyClaimsList())){
+            v.setProxyClaimsList(toList(stem, kk().proxyClaimsList()));
+        }
         if (stem.containsKey(kk().publicClient())) {
             v.setPublicClient(stem.getBoolean(kk().publicClient()));
         }

@@ -9,7 +9,9 @@ import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2MPService;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
+import edu.uiuc.ncsa.security.core.util.TokenUtil;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.delegation.token.impl.AuthorizationGrantImpl;
@@ -57,6 +59,9 @@ public class OA2ReadyServlet extends ClientServlet {
         // to complete the request.
         info("2.a.0 Getting token and verifier.");
         String token = request.getParameter(CONST(ClientEnvironment.TOKEN));
+        if(TokenUtil.isBase32(token)){
+            token = TokenUtil.b32DecodeToken(token);
+        }
         String state = request.getParameter(OA2Constants.STATE);
         if (token == null) {
             warn("2.a.1 The token is " + (token == null ? "null" : token) + ".");
@@ -66,6 +71,8 @@ public class OA2ReadyServlet extends ClientServlet {
             return;
         }
         info("2.a.2 Token found.");
+        DebugUtil.trace(this, "token = '" + token + "'");
+        DebugUtil.trace(this, "state = '" + state + "'");
         OA2ClientEnvironment oa2ce = (OA2ClientEnvironment) getCE();
 
         AuthorizationGrant grant = new AuthorizationGrantImpl(URI.create(token));

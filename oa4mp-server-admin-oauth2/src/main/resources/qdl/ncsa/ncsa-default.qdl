@@ -21,6 +21,7 @@
 */
 DEBUG := true;
 debug(0, 'first debug message');
+is_defined(proxy_claims.)?say('*** proxy_claims'+to_string(proxy_claims.)):say('*** NO PROXY CLAIMS');
 log_entry('log message');
 // Debug stuff --  enable if running on my dev box. Should not be in store.
 if[DEBUG][

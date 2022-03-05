@@ -2,6 +2,8 @@ package edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.server.OA4MPServiceTransaction;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
+import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.delegation.storage.impl.FSTransactionStore;
 import edu.uiuc.ncsa.security.delegation.token.TokenForge;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
@@ -33,5 +35,12 @@ public class DSFSTransactionStore<V extends OA4MPServiceTransaction> extends FST
     @Override
     public List<V> getMostRecent(int n, List<String> attributes) {
         return null;
+    }
+
+    // This should ALWAYS be overridden since at this point in the inheritance hierarchy it
+    // isn't aware of OA2 service transactions.
+    @Override
+    public V getByProxyID(Identifier proxyID) {
+        throw new NotImplementedException("Error: This is not yet implemented for cache");
     }
 }

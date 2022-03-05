@@ -70,6 +70,7 @@ public class OA2TConverter<V extends OA2ServiceTransaction> extends TransactionC
         }
         st.setUserCode(map.getString(getTCK().userCode()));
         st.setRFC8628Request(map.getBoolean(getTCK().isRFC8628()));
+        st.setProxyId(map.getString(getTCK().proxyID()));
         st.setAuthGrantLifetime(map.getLong(getTCK().authzGrantLifetime()));
         st.setRefreshTokenValid(map.getBoolean(getTCK().refreshTokenValid()));
         st.setRefreshTokenLifetime(map.getLong(getTCK().refreshTokenLifetime()));
@@ -149,6 +150,9 @@ public class OA2TConverter<V extends OA2ServiceTransaction> extends TransactionC
         map.put(getTCK().expiresIn(), t.getAccessTokenLifetime());
         map.put(getTCK().refreshTokenLifetime(), t.getRefreshTokenLifetime());
         map.put(getTCK().isRFC8628(), t.isRFC8628Request());
+        if(!isTrivial(t.getProxyId())){
+            map.put(getTCK().proxyID(), t.getProxyId());
+        }
         if (!isTrivial(t.getUserCode())) {
             map.put(getTCK().userCode(), t.getUserCode());
         }

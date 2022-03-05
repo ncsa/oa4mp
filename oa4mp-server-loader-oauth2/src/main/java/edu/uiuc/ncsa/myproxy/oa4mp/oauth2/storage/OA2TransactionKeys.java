@@ -19,6 +19,7 @@ public class OA2TransactionKeys extends DSTransactionKeys {
     protected String authzGrantLifetime = "authz_grant_lifetime";
     protected String expiresIn = "expires_in";
     protected String isRFC8628  = "is_rfc_8628";
+    protected String proxyID  = "proxy_id";
     protected String refreshToken = "refresh_token";
     protected String refreshTokenLifetime = "refresh_token_lifetime";
     protected String refreshTokenValid = "refresh_token_valid";
@@ -28,9 +29,13 @@ public class OA2TransactionKeys extends DSTransactionKeys {
     protected String userCode  = "user_code";
     protected String validatedScopes  = "validated_scopes";
     /*
-     If you add keys or change these, you need to up date TransactionStemMC or QDL support will break
+     If you add keys or change these, you need to update TransactionStemMC or QDL support will break
      */
 
+    public String proxyID(String... x) {
+        if (0 < x.length) proxyID = x[0];
+        return proxyID;
+    }
     public String userCode(String... x) {
         if (0 < x.length) userCode = x[0];
         return userCode;
@@ -106,6 +111,7 @@ public class OA2TransactionKeys extends DSTransactionKeys {
         allKeys.add(scopes());
         allKeys.add(userCode());
         allKeys.add(validatedScopes());
+        allKeys.add(proxyID());
         return allKeys;
 
     }

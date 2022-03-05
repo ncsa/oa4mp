@@ -291,6 +291,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
     protected String SYS_ERR_STATUS_CODE = "status";
     protected String FLOW_STATE_VAR = "flow_states" + STEM_INDEX_MARKER;
     protected String CLAIMS_VAR = "claims" + STEM_INDEX_MARKER;
+    protected String PROXY_CLAIMS_VAR = "proxy_claims" + STEM_INDEX_MARKER;
     protected String ACCESS_TOKEN_VAR = "access_token" + STEM_INDEX_MARKER;
     protected String SCOPES_VAR = "scopes" + STEM_INDEX_MARKER;
     protected String EXTENDED_ATTRIBUTES_VAR = "xas" + STEM_INDEX_MARKER;
@@ -321,6 +322,11 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         StemVariable claimStem = new StemVariable();
         claimStem.fromJSON(claims);
         state.setValue(CLAIMS_VAR, claimStem);
+
+        JSONObject proxyClaims = (JSONObject) req.getArgs().get(SRE_REQ_PROXY_CLAIMS);
+        StemVariable proxyClaimsStem = new StemVariable();
+        proxyClaimsStem.fromJSON(proxyClaims);
+        state.setValue(PROXY_CLAIMS_VAR, proxyClaimsStem);
 
         if (req.getArgs().containsKey(SRE_REQ_ACCESS_TOKEN)) {
             JSONObject at = (JSONObject) req.getArgs().get(SRE_REQ_ACCESS_TOKEN);
@@ -524,12 +530,28 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         } else {
             stemClaims = (StemVariable) state.getValue(CLAIMS_VAR);
         }
-
         JSON j = stemClaims.toJSON();
         if (j.isArray()) {
             throw new NFWException("Internal error: The returned claims object was not a JSON Object.");
         }
         respMap.put(SRE_REQ_CLAIMS, j);
+
+        // Now handle proxy_claims the same way
+        // Actually we probably do not want to return any updated proxy_claims.
+        // This effectively makes them read only which is the right call.
+       /* StemVariable proxyClaims;
+        z = state.getValue(PROXY_CLAIMS_VAR);
+        if (z instanceof QDLNull) {
+            proxyClaims = new StemVariable();
+        } else {
+            proxyClaims = (StemVariable) state.getValue(PROXY_CLAIMS_VAR);
+        }
+        j = proxyClaims.toJSON();
+        if (j.isArray()) {
+            throw new NFWException("Internal error: The returned claims object was not a JSON Object.");
+        }
+        respMap.put(SRE_REQ_PROXY_CLAIMS, j);
+*/
         DebugUtil.trace(this, "QDL updates response map:" + j.toString(1));
 
         /*
@@ -563,6 +585,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
                     TX_AUDIENCE_VAR,
                     TX_RESOURCE_VAR,
                     CLAIMS_VAR,
+                    PROXY_CLAIMS_VAR,
                     CLAIM_SOURCES_VAR,
                     FLOW_STATE_VAR,
                     SCOPES_VAR,

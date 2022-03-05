@@ -45,6 +45,9 @@ public class OA2MTStore<V extends OA2ServiceTransaction> extends TransactionMemo
         if (v.getUsername() != null) {
             getUserIndex().put(v.getUsername(), v);
         }
+        if(v.getProxyId()!=null){
+            getProxyIDIndex().put(v.getProxyId(), v);
+        }
     }
 
     @Override
@@ -52,6 +55,7 @@ public class OA2MTStore<V extends OA2ServiceTransaction> extends TransactionMemo
         super.removeItem(value);
         getRTIndex().remove(value.getRefreshToken());
         getUserIndex().remove(value.getUsername());
+        getProxyIDIndex().remove(value.getProxyId());
     }
 
     @Override

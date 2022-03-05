@@ -271,7 +271,8 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
     /**
      * For calls the client makes to the service, use HTTP Basic Authorization rather than passing in the
      * credentials as parameters. Both should be supported, but some other services might only allow for this.
-     *
+     * This feature is (probably) unused and should be removed at some point.
+     * @deprecated
      * @return
      */
     public Boolean isUseBasicAuth() {

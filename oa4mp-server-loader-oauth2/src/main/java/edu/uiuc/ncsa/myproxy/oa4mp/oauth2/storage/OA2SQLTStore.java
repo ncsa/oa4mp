@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8628State;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.DSSQLTransactionStore;
+import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.TransactionNotFoundException;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
@@ -129,15 +130,25 @@ public class OA2SQLTStore<V extends OA2ServiceTransaction> extends DSSQLTransact
     }
 
     @Override
+    public V getByProxyID(Identifier proxyID) {
+        OA2TransactionTable oa2TT = (OA2TransactionTable) getTable();
+              return getSingleValue(proxyID.toString(), oa2TT.getByProxyID());
+    }
+
+    @Override
     public V getByUserCode(String userCode) {
+        OA2TransactionTable oa2TT = (OA2TransactionTable) getTable();
+              return getSingleValue(userCode, oa2TT.getByUserCode());
+    }
+    public V getSingleValue(String targetString, String preparedStatement) {
         ConnectionRecord cr = getConnection();
         Connection c = cr.connection;
         OA2TransactionTable oa2TT = (OA2TransactionTable) getTable();
         V result = null;
 
         try {
-            PreparedStatement stmt = c.prepareStatement(oa2TT.getByUserCode());
-            stmt.setString(1, userCode);
+            PreparedStatement stmt = c.prepareStatement(preparedStatement);
+            stmt.setString(1, targetString);
             stmt.execute();// just execute() since executeQuery(x) would throw an exception regardless of content per JDBC spec.
 
             ResultSet rs = stmt.getResultSet();
@@ -154,7 +165,7 @@ public class OA2SQLTStore<V extends OA2ServiceTransaction> extends DSSQLTransact
             stmt.close();
             releaseConnection(cr);
             if (tooManyresults) {
-                throw new IllegalStateException("error: Multiple transactions with the user codes \"" + userCode + "\" found.");
+                throw new IllegalStateException("error: Multiple transactions with \"" + targetString + "\" found.");
             }
             result = create();
             populate(map, result);

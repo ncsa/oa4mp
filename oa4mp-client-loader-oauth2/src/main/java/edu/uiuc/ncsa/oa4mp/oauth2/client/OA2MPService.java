@@ -160,7 +160,6 @@ public class OA2MPService extends OA4MPService {
             parameters.put(getEnvironment().getConstants().get(CALLBACK_URI_KEY), getEnvironment().getCallback().toString());
         }
         OA2Asset a = (OA2Asset) asset;
-        a.setState(NonceHerder.createNonce());
         a.setNonce(NonceHerder.createNonce());
         // Next is for testing exception handling on the server. This creates an unsupported request which should fail everytime.
         //parameters.put(OA2Constants.REQUEST, "My_request");
@@ -173,9 +172,21 @@ public class OA2MPService extends OA4MPService {
         }
         parameters.put(SCOPE, s);
 
-        //parameters.put(OA2Constants.REDIRECT_URI, delegationRequest.getParameters().get(OA2Constants.REDIRECT_URI));
-        parameters.put(STATE, a.getState()); // random state is ok.
-        parameters.put(NONCE, a.getNonce());
+        // Allow the user to specify this in case they really need to track it themselves.
+        if (parameters.containsKey(STATE)) {
+            a.setState((String) parameters.get(STATE));
+        } else {
+            String state = NonceHerder.createNonce();
+            a.setState(state);
+            parameters.put(STATE, state); // random state is ok.
+        }
+        if (parameters.containsKey(NONCE)) {
+            a.setNonce((String) parameters.get(NONCE));
+        } else {
+            String none = NonceHerder.createNonce();
+            parameters.put(NONCE, none);
+            a.setNonce(none);
+        }
         parameters.put(PROMPT, PROMPT_LOGIN);
         parameters.putAll(((OA2ClientEnvironment) getEnvironment()).getAdditionalParameters());
     }
@@ -335,9 +346,9 @@ public class OA2MPService extends OA4MPService {
                                            boolean subjectTokenIsAT) {
         HashMap<String, String> parameterMap = new HashMap<>();
         parameterMap.put(SUBJECT_TOKEN, subjectToken.getToken());
-        if(subjectTokenIsAT){
+        if (subjectTokenIsAT) {
             parameterMap.put(SUBJECT_TOKEN_TYPE, ACCESS_TOKEN_TYPE);
-        }else{
+        } else {
             parameterMap.put(SUBJECT_TOKEN_TYPE, REFRESH_TOKEN_TYPE);
         }
         if (getAT) {
@@ -467,9 +478,9 @@ public class OA2MPService extends OA4MPService {
 
     public JSONObject introspect(OA2Asset asset, boolean doRT) {
         RFC7662Request request = new RFC7662Request();
-        if(doRT){
+        if (doRT) {
             request.setRefreshToken(asset.getRefreshToken());
-        }else{
+        } else {
             request.setAccessToken(asset.getAccessToken());
         }
         request.setClient(getEnvironment().getClient());

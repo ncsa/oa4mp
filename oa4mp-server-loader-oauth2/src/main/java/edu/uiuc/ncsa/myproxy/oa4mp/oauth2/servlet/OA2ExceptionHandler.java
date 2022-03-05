@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractAuthorizationServlet;
 import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
@@ -136,9 +137,9 @@ public class OA2ExceptionHandler implements ExceptionHandler {
             return;
         }
         // Check is the response has been wrapped in a helper class and do a wee bit of management on said class.
-        OA2AuthorizationServer.MyHttpServletResponseWrapper wrapper = null;
-        if (response instanceof OA2AuthorizationServer.MyHttpServletResponseWrapper) {
-            wrapper = (OA2AuthorizationServer.MyHttpServletResponseWrapper) response;
+        AbstractAuthorizationServlet.MyHttpServletResponseWrapper wrapper = null;
+        if (response instanceof AbstractAuthorizationServlet.MyHttpServletResponseWrapper) {
+            wrapper = (AbstractAuthorizationServlet.MyHttpServletResponseWrapper) response;
             // set this so that other components know a redirect occurred and can handle that themselves (usually by just returning).
             wrapper.setExceptionEncountered(true);
         }

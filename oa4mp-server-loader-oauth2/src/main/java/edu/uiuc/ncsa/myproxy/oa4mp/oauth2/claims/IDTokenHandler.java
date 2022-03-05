@@ -161,11 +161,13 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
         if (IDP_DEBUG_ON) {
             addDebugClaims();
         }
-        claims.put(OA2Claims.ISSUER, issuer);
-        claims.put(OA2Claims.SUBJECT, transaction.getUsername());
+        // It is possible that the claims are already somewhat populated. Only initialize
+        // claims that have not been set.
+        setClaimIfNeeded(claims, ISSUER, issuer);
+        setClaimIfNeeded(claims,OA2Claims.SUBJECT, transaction.getUsername());
 
-        claims.put(AUDIENCE, transaction.getClient().getIdentifierString());
-        claims.put(OA2Constants.ID_TOKEN_IDENTIFIER, ((OA2TokenForge) oa2se.getTokenForge()).getIDToken().getToken());
+        setClaimIfNeeded(claims,AUDIENCE, transaction.getClient().getIdentifierString());
+        setClaimIfNeeded(claims, OA2Constants.ID_TOKEN_IDENTIFIER, ((OA2TokenForge) oa2se.getTokenForge()).getIDToken().getToken());
         // now set all the timestamps and such.
         setAccountingInformation();
         checkRequiredScopes(transaction);
@@ -187,6 +189,12 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
             trace(this, "Service environment has a claims no source enabled during authorization");
         }
         transaction.setUserMetaData(claims); // make sure this is available to the next handler
+    }
+
+    private void setClaimIfNeeded(JSONObject claims, String claimName, Object claimValue) {
+        if(!claims.containsKey(claimName)) {
+            claims.put(claimName, claimValue);
+        }
     }
 
     @Override

@@ -15,9 +15,13 @@ import edu.uiuc.ncsa.security.servlet.PresentableState;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponseWrapper;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.security.GeneralSecurityException;
 import java.util.Enumeration;
 import java.util.Map;
@@ -30,6 +34,68 @@ import static org.apache.commons.lang.StringEscapeUtils.escapeHtml;
  * on 1/14/14 at  11:50 AM
  */
 public abstract class AbstractAuthorizationServlet extends CRServlet implements Presentable {
+
+    /**
+     * This class is needed to pass information between servlets, where one servlet
+     * calls another. It intercepts the calls from the target servlet and passes
+     * it back to the calling servlet for processing. This way we can keep straight who
+     * did what.
+     */
+    public static class MyHttpServletResponseWrapper
+            extends HttpServletResponseWrapper {
+
+        private StringWriter sw = new StringWriter();
+
+        public MyHttpServletResponseWrapper(HttpServletResponse response) {
+            super(response);
+        }
+
+        int internalStatus = 0;
+
+        @Override
+        public void setStatus(int sc) {
+            internalStatus = sc;
+            super.setStatus(sc);
+            if (!(200 <= sc && sc < 300)) {
+                setExceptionEncountered(true);
+            }
+        }
+
+
+        public int getStatus() {
+            return internalStatus;
+        }
+
+        public PrintWriter getWriter() throws IOException {
+            return new PrintWriter(sw);
+        }
+
+        public ServletOutputStream getOutputStream() throws IOException {
+            throw new UnsupportedOperationException();
+        }
+
+        public String toString() {
+            return sw.toString();
+        }
+
+        /**
+         * If in the course of processing an exception is encountered, set this to be true. This class
+         * is made to be passed between servlets and the results harvested, but if one of the servlets encounters
+         * an exception, that is handled with a redirect (in OAuth 2) so nothing ever gets propagated back up the
+         * stack to show that. This should be checked to ensure that did not happen.
+         *
+         * @return
+         */
+        public boolean isExceptionEncountered() {
+            return exceptionEncountered;
+        }
+
+        public void setExceptionEncountered(boolean exceptionEncountered) {
+            this.exceptionEncountered = exceptionEncountered;
+        }
+
+        boolean exceptionEncountered = false;
+    }
     @Override
     public ServiceTransaction verifyAndGet(IssuerResponse iResponse) throws IOException {
         return null;
@@ -114,23 +180,32 @@ public abstract class AbstractAuthorizationServlet extends CRServlet implements 
     public static String OK_PAGE = "/authorize-ok.jsp";
     public static String ERROR_PAGE = "/authorize-error.jsp";
 
-   protected String getInitialPage(){
-       return INITIAL_PAGE;
-   }
+    protected String getInitialPage() {
+        return INITIAL_PAGE;
+    }
 
-   protected String getRemoteUserInitialPage(){
-       return REMOTE_USER_INITIAL_PAGE;
-   }
+    protected String getRemoteUserInitialPage() {
+        return REMOTE_USER_INITIAL_PAGE;
+    }
 
-   protected String getOkPage(){
-       return OK_PAGE;
-   }
+    protected String getOkPage() {
+        return OK_PAGE;
+    }
+
+    protected void doProxy(AuthorizedState state) throws Throwable {
+
+    }
+
     public void present(PresentableState state) throws Throwable {
         AuthorizedState aState = (AuthorizedState) state;
         postprocess(new TransactionState(state.getRequest(), aState.getResponse(), null, aState.getTransaction()));
 
         switch (aState.getState()) {
             case AUTHORIZATION_ACTION_START:
+                if (getServiceEnvironment().getAuthorizationServletConfig().isUseProxy()) {
+                    doProxy(aState);
+                    return;
+                }
                 String initPage = getInitialPage();
                 info("*** STARTING present");
                 if (getServiceEnvironment().getAuthorizationServletConfig().isUseHeader()) {
@@ -202,7 +277,7 @@ public abstract class AbstractAuthorizationServlet extends CRServlet implements 
 
     @Override
     protected void doIt(HttpServletRequest request, HttpServletResponse response) throws Throwable {
-        info( "starting request");
+        info("starting request");
         //String ag = request.getParameter(CONST(TOKEN_KEY));
         String ag = getParam(request, CONST(TOKEN_KEY));
         ServiceTransaction trans = null;
@@ -277,7 +352,7 @@ public abstract class AbstractAuthorizationServlet extends CRServlet implements 
         String userName = null;
         String password = null;
         // Fixes OAUTH-192.
-        // Note this regets it from the heade rif present to check that the user got here legitimately
+        // Note this regets it from the header if present to check that the user got here legitimately
         if (getServiceEnvironment().getAuthorizationServletConfig().isUseHeader()) {
             String headerName = getServiceEnvironment().getAuthorizationServletConfig().getHeaderFieldName();
             if (isEmpty(headerName) || headerName.toLowerCase().equals("remote_user")) {
@@ -305,11 +380,11 @@ public abstract class AbstractAuthorizationServlet extends CRServlet implements 
                 trans.setUsername(userName);
             }
         } else {
-            // Headers not used, just pull it off the form the user POSTs.
-            userName = request.getParameter(AUTHORIZATION_USER_NAME_KEY);
-            password = request.getParameter(AUTHORIZATION_PASSWORD_KEY);
-            checkUser(userName, password);
-            trans.setUsername(userName);
+                // Headers not used, just pull it off the form the user POSTs.
+                userName = request.getParameter(AUTHORIZATION_USER_NAME_KEY);
+                password = request.getParameter(AUTHORIZATION_PASSWORD_KEY);
+                checkUser(userName, password);
+                trans.setUsername(userName);
         }
 
         userName = trans.getUsername();
@@ -329,6 +404,7 @@ public abstract class AbstractAuthorizationServlet extends CRServlet implements 
         response.sendRedirect(cb);
         info("4.b. Redirect to callback " + cb + " ok, " + statusString);
     }
+
     public void checkUser(String username, String password) throws GeneralSecurityException {
         // At this point in the basic servlet, there is no system for passwords.
         // This is because OA4MP has no native concept of managing users, it being
@@ -341,7 +417,8 @@ public abstract class AbstractAuthorizationServlet extends CRServlet implements 
         // which would display the message as the retry message.
 
     }
-    public static class UserLoginException extends GeneralException{
+
+    public static class UserLoginException extends GeneralException {
         String username;
         String password;
 
