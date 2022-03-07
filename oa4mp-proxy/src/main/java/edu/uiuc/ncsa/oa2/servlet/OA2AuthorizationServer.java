@@ -9,6 +9,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2AuthorizedServletUtil;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2ClientUtils;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ScriptRuntimeEngineFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractAuthorizationServlet;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
@@ -19,6 +20,7 @@ import edu.uiuc.ncsa.security.oauth_2_0.OA2GeneralError;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTRunner;
 import edu.uiuc.ncsa.security.servlet.PresentableState;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang.StringEscapeUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -27,8 +29,6 @@ import java.net.URLEncoder;
 import java.security.GeneralSecurityException;
 import java.util.Date;
 import java.util.Map;
-
-import static org.apache.commons.lang.StringEscapeUtils.escapeHtml;
 
 
 /**
@@ -60,7 +60,7 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
         HttpServletRequest request = aState.getRequest();
 
         OA2ServiceTransaction t = (OA2ServiceTransaction) aState.getTransaction();
-        request.setAttribute("clientScopes", escapeHtml(scopesToString(t)));
+        request.setAttribute("clientScopes", StringEscapeUtils.escapeHtml(scopesToString(t)));
 
     }
 
@@ -102,10 +102,10 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
     @Override
     public void prepare(PresentableState state) throws Throwable {
         super.prepare(state);
-        if (state.getState() == AUTHORIZATION_ACTION_START) {
+        if (state.getState() == AbstractAuthorizationServlet.AUTHORIZATION_ACTION_START) {
             state.getRequest().setAttribute(AUTHORIZATION_REFRESH_TOKEN_LIFETIME_KEY, AUTHORIZATION_REFRESH_TOKEN_LIFETIME_KEY);
         }
-        if (state.getState() == AUTHORIZATION_ACTION_OK) {
+        if (state.getState() == AbstractAuthorizationServlet.AUTHORIZATION_ACTION_OK) {
             AuthorizedState authorizedState = (AuthorizedState) state;
             ((OA2ServiceTransaction) authorizedState.getTransaction()).setAuthTime(new Date());
         }
@@ -115,7 +115,7 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
     @Override
     protected void createRedirect(HttpServletRequest request, HttpServletResponse response, ServiceTransaction trans) throws Throwable {
         String rawrtl = request.getParameter(AUTHORIZATION_REFRESH_TOKEN_LIFETIME_KEY);
-        OA2SE oa2SE = (OA2SE) getServiceEnvironment();
+        OA2SE oa2SE = (OA2SE) MyProxyDelegationServlet.getServiceEnvironment();
 
         OA2ServiceTransaction st2 = (OA2ServiceTransaction) trans;
         try {
@@ -184,14 +184,14 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
 
     @Override
     protected void setupMPConnection(ServiceTransaction trans, String username, String password) throws GeneralSecurityException {
-        if (((OA2SE) getServiceEnvironment()).isTwoFactorSupportEnabled()) {
+        if (((OA2SE) MyProxyDelegationServlet.getServiceEnvironment()).isTwoFactorSupportEnabled()) {
             // Stash username and password in an bogus MyProxy logon instance.
             MyMyProxyLogon myProxyLogon = new MyMyProxyLogon();
             myProxyLogon.setUsername(username);
             myProxyLogon.setPassphrase(password);
             MyProxyConnectable mpc = new MPSingleConnectionProvider.MyProxyLogonConnection(myProxyLogon);
             mpc.setIdentifier(trans.getIdentifier());
-            getMyproxyConnectionCache().add(mpc);
+            MyProxyDelegationServlet.getMyproxyConnectionCache().add(mpc);
         } else {
             createMPConnection(trans.getIdentifier(), username, password, trans.getLifetime());
             if (hasMPConnection(trans.getIdentifier())) {
@@ -202,29 +202,8 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
 
     @Override
     protected void doProxy(AuthorizedState state) throws Throwable {
-        ProxyUtils.doProxy((OA2SE) getServiceEnvironment(), state);
-/*
-        AuthorizationServletConfig asc = getServiceEnvironment().getAuthorizationServletConfig();
-                              OA2ServiceTransaction t = (OA2ServiceTransaction)state.getTransaction();
-        OA2CLCCommands clcCommands = new OA2CLCCommands(true, getMyLogger(), new OA2CommandLineClient(getMyLogger()));
-        // Construct a dummy argument to load the client configuration. Calling load() means the first argument has been
-        // processed to locate the method (via introspection) and is ignored in the method.
-        clcCommands.load(new InputLine("dummy " + asc.getCfgName() + "  " + asc.getCfgFile()));
-        MyHttpServletResponseWrapper wrapper = new MyHttpServletResponseWrapper(state.getResponse());
-        // set the specific scopes.
-        clcCommands.set_param(new InputLine("set_param -a scope \"" +scopesToString(t) + "\""));
-        Identifier identifier = BasicIdentifier.randomID();
-        String id = Base64.getEncoder().encodeToString(identifier.toString().getBytes(StandardCharsets.UTF_8));
-        t.setProxyId(identifier.toString());
-        t.setAuthGrantValid(true);
-        clcCommands.set_param(new InputLine("set_param -a state " + id));
-        clcCommands.uri(new InputLine("uri")); // side effect is to set the uri
-        URI uri = clcCommands.getCurrentURI();
-         t.setProxyState(clcCommands.toJSON());
-        // Here's where we need to poke at this.
-        getServiceEnvironment().getTransactionStore().save(t); // save that proxy id!
-        wrapper.sendRedirect(uri.toString());
-*/
+        ProxyUtils.doProxy((OA2SE) MyProxyDelegationServlet.getServiceEnvironment(), state);
+
     }
 }
 

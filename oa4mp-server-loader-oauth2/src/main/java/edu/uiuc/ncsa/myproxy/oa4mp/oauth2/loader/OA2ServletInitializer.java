@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.ClaimSourceFactoryImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2ExceptionHandler;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.TokenExchangeRecordRetentionPolicy;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RefreshTokenRetentionPolicy;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RefreshTokenStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.OA2State;
@@ -30,8 +31,7 @@ import edu.uiuc.ncsa.security.util.mail.MailUtil;
 
 import javax.servlet.ServletException;
 
-import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2ATServlet.TokenExchangeRecordRetentionPolicy;
-import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2ATServlet.txRecordCleanup;
+import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.AbstractAccessTokenServlet2.txRecordCleanup;
 
 /**
  * <p>Created by Jeff Gaynor<br>

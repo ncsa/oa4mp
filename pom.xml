@@ -38,7 +38,7 @@
             <email>gaynor@illinois.edu</email>
         </developer>
     </developers>
-  
+
     <issueManagement>
         <system>Jira</system>
         <url>https://gateways.atlassian.net/browse/OAUTH</url>
@@ -55,14 +55,15 @@
         <module>oa4mp-client-api</module>
         <module>oa4mp-client-loader-oauth1</module>
         <module>oa4mp-client-oauth1</module>
-	<module>oa4mp-client-loader-oauth2</module>
-	<module>oa4mp-clc</module>	
+        <module>oa4mp-client-loader-oauth2</module>
+        <module>oa4mp-clc</module>
         <module>oa4mp-client-oauth2</module>
         <module>oa4mp-server-admin-oauth1</module>
         <module>oa4mp-server-admin-oauth2</module>
         <module>oa4mp-client-webapp</module>
         <module>oa4mp-client-test</module>
         <module>oa4mp-webapp</module>
+        <module>oa4mp-proxy</module>
         <module>oa4mp-server-admin</module>
         <!--
                <module>oa4mp-xsede</module>
@@ -86,6 +87,12 @@
             <version>4.13.1</version>
             <scope>test</scope>
         </dependency>
+<!--        <dependency>
+            <groupId>edu.uiuc.ncsa.myproxy</groupId>
+            <artifactId>oa4mp-server-loader-oauth2</artifactId>
+            <version>5.2-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>-->
     </dependencies>
     <distributionManagement>
         <repository>

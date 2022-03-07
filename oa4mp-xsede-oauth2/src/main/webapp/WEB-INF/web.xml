@@ -9,7 +9,7 @@
 
     <servlet>
         <servlet-name>accessToken</servlet-name>
-        <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2ATServlet</servlet-class>
+        <servlet-class>edu.uiuc.ncsa.oa2.servlet.OA2ATServlet</servlet-class>
         <load-on-startup>0</load-on-startup>
     </servlet>
     <servlet-mapping>

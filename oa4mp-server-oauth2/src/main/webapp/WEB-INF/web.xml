@@ -33,7 +33,7 @@
 
     <servlet>
         <servlet-name>accessToken</servlet-name>
-        <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2ATServlet</servlet-class>
+        <servlet-class>edu.uiuc.ncsa.oa2.servlet.OA2ATServlet</servlet-class>
         <load-on-startup>0</load-on-startup>
     </servlet>
     <servlet-mapping>
@@ -186,7 +186,7 @@
        Uncomment the next section if you are replacing the built-in authorization module with your own.
        Look here for the details: http://grid.ncsa.illinois.edu/myproxy/oauth/server/manuals/remote-user.xhtml
     -->
-      <security-constraint>
+<!--      <security-constraint>
          <web-resource-collection>
            <web-resource-name>OAuth Security</web-resource-name>
            <url-pattern>/authorize</url-pattern>
@@ -199,7 +199,7 @@
          <user-data-constraint>
            <transport-guarantee>NONE</transport-guarantee>
          </user-data-constraint>
-       </security-constraint>
+       </security-constraint>-->
 
 <!--
     <security-constraint>

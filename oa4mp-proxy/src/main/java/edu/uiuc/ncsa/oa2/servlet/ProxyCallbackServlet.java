@@ -13,17 +13,19 @@ import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.server.request.IssuerResponse;
+import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTRunner;
-import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import net.sf.json.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.*;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
 
-import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.STATE;
+import static edu.uiuc.ncsa.oa2.servlet.ProxyUtils.setClaimsFromProxy;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -35,24 +37,36 @@ public class ProxyCallbackServlet extends OA2AuthorizationServer {
         return null;
     }
 
+    /**
+     * Processes the callback <i>from the proxy</i>. This will take the proxy's callback and transform it
+     * into the correct transactioin at our end, then get the access token from the proxy.
+     * <br/>
+     * The access token also includes the user's meta data (such as subject) and the is used to
+     * populate the username in the server. When this is done, the server is ready to do its callback.
+     *
+     * @param request
+     * @param response
+     * @throws Throwable
+     */
     @Override
     protected void doIt(HttpServletRequest request, HttpServletResponse response) throws Throwable {
         //https://localhost:9443/client/not-ready?
         // code=NB2HI4DTHIXS6ZDFOYXGG2LMN5TW63RON5ZGOL3PMF2XI2BSF4YTANTGGBQWMNBRMU3WEOLFMQ4TQNTGGE3WGMZYGYYTOZRZMFSGKP3UPFYGKPLBOV2GQ6SHOJQW45BGORZT2MJWGQ3DGNBWG42DGNRUGATHMZLSONUW63R5OYZC4MBGNRUWMZLUNFWWKPJZGAYDAMBQ&
         // state=dXJuOmlkOjUyZjBjMGU3LWE4YzYtNDIxNy05Y2YxLWJjOTJmNzQwNGQ2NQ%3D%3D
+
         Map<String, String[]> parameters = request.getParameterMap();
         System.out.println(getClass().getSimpleName() + ": request uri= " + request.getRequestURI());
 
-        if (!parameters.containsKey(STATE)) {
+        if (!parameters.containsKey(OA2Constants.STATE)) {
             throw new IllegalStateException("No state");
         }
-        String[] states = parameters.get(STATE);
+        String[] states = parameters.get(OA2Constants.STATE);
         if (states.length == 0) {
             throw new IllegalStateException("No state");
         }
         // only use the first state parameter.
         Identifier proxyID = BasicIdentifier.newID(new String(Base64.getDecoder().decode(states[0])));
-        OA2SE oa2SE = (OA2SE) getServiceEnvironment();
+        OA2SE oa2SE = (OA2SE) MyProxyDelegationServlet.getServiceEnvironment();
         OA2ServiceTransaction t = (OA2ServiceTransaction) oa2SE.getTransactionStore().getByProxyID(proxyID);
         if (t == null) {
             throw new IllegalStateException("No transaction for proxy ID \"" + proxyID + "\"");
@@ -73,28 +87,10 @@ public class ProxyCallbackServlet extends OA2AuthorizationServer {
         clcCommands.access(new InputLine("access")); // This gets the
         // At the least, do this
         JSONObject proxyClaims = clcCommands.getClaims();
-        JSONObject claims = t.getUserMetaData();
-        claims.put(OA2Claims.SUBJECT, proxyClaims.get(OA2Claims.SUBJECT));
         t.setProxyState(clcCommands.toJSON());
 
-        Collection<String> proxyClaimKeys = t.getOA2Client().getProxyClaimsList();
-        if (proxyClaimKeys.isEmpty()) {
-            // do nothing -- default is just to return the subject
-        } else {
-            if (proxyClaimKeys.contains("*")) {
-                proxyClaimKeys = new ArrayList<>();
-                proxyClaimKeys.addAll(proxyClaims.keySet());
-                // do all of them.
-            }
-            // This is supposed to be a list
-            for (String claim : proxyClaimKeys) {
-                if (proxyClaims.containsKey(claim)) {
-                    claims.put(claim, proxyClaims.get(claim));
-                }
-            }
-        }
-        t.setUserMetaData(claims);
-        // oa2SE.getTransactionStore().save(t);
+        setClaimsFromProxy(t, proxyClaims);
+
         // Do any scripting
         JWTRunner jwtRunner = new JWTRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2SE, t, t.getOA2Client().getConfig()));
         OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, t, request);
@@ -105,13 +101,11 @@ public class ProxyCallbackServlet extends OA2AuthorizationServer {
         // At this point, the user has logged in, the transaction state should be correct, so we need to
         // create the correct callback and return it.
         Map<String, String> cbParams = new HashMap<>();
-        cbParams.put(STATE, t.getRequestState()); // Make sure that the original state that was sent is returned to the client callback
+        cbParams.put(OA2Constants.STATE, t.getRequestState()); // Make sure that the original state that was sent is returned to the client callback
         String cb = createCallback(t, cbParams);
         response.sendRedirect(cb);
-
-        // createRedirect(request, response, t);
-        //       super.doIt(request, response);
-
     }
+
+
 
 }

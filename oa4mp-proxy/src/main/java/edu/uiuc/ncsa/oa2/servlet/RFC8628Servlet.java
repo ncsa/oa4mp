@@ -5,10 +5,12 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.*;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RFC8628Store;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.server.request.AGResponse;
 import edu.uiuc.ncsa.security.delegation.server.request.IssuerResponse;
@@ -17,6 +19,7 @@ import edu.uiuc.ncsa.security.delegation.token.impl.AuthorizationGrantImpl;
 import edu.uiuc.ncsa.security.delegation.token.impl.TokenUtils;
 import edu.uiuc.ncsa.security.oauth_2_0.*;
 import edu.uiuc.ncsa.security.oauth_2_0.server.AGRequest2;
+import edu.uiuc.ncsa.security.oauth_2_0.server.RFC8628Constants;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.util.configuration.ConfigUtil;
 import net.sf.json.JSONObject;
@@ -31,9 +34,6 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Map;
-
-import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
-import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.*;
 
 /**
  * Servlet that <b>starts</b> RFC 8628 a.a device flow .This issues a user code that the user
@@ -51,7 +51,7 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
     protected void doIt(HttpServletRequest req, HttpServletResponse resp) throws Throwable {
         //    printAllParameters(req);
         ServletDebugUtil.trace(this, "starting device flow");
-        OA2SE oa2SE = (OA2SE) getServiceEnvironment();
+        OA2SE oa2SE = (OA2SE) MyProxyDelegationServlet.getServiceEnvironment();
 
         if (!oa2SE.isRfc8628Enabled()) {
             ServletDebugUtil.trace(this, "device flow not enabled onthis server");
@@ -91,7 +91,7 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
                         null);
             }
         }
-        MetaDebugUtil debugUtil = createDebugger(client);
+        MetaDebugUtil debugUtil = MyProxyDelegationServlet.createDebugger(client);
         debugUtil.trace(this, "checked client secret.");
 
 
@@ -111,7 +111,7 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
         RFC8628State rfc8628State = new RFC8628State();
         String scope = req.getParameter(OA2Constants.SCOPE);
         rfc8628State.originalScopes = scope;
-        if (isTrivial(scope)) {
+        if (StringUtils.isTrivial(scope)) {
             debugUtil.trace(this, "no scopes, using default for client");
             t.setScopes(client.getScopes());
         } else {
@@ -129,7 +129,7 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
 
         }
 
-        String userCode;
+        String userCode; //what the user is presented with
         if(oa2SE.getAuthorizationServletConfig().isUseProxy()){
             userCode = ProxyUtils.getProxyUserCode(oa2SE, t, rfc8628State);
             lifetime = rfc8628State.lifetime; // This is set from the proxy and must be propagated to the user.
@@ -162,9 +162,9 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
                 rfc8628State.interval = rfc8628ServletConfig.interval;
             }
             rfc8628State.userCode = userCode;
+            t.setUserCode(userCode);
         }
         debugUtil.trace(this, "user_code = " + userCode);
-        t.setUserCode(userCode);
         rfc8628State.issuedAt = System.currentTimeMillis();
         rfc8628State.deviceCode = ag.getURIToken();
         rfc8628State.lastTry = System.currentTimeMillis(); // so it has a reasonable value
@@ -179,12 +179,12 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
         resp.setCharacterEncoding("UTF-8");
         JSONObject jsonObject = new JSONObject();
         // CIL-1102 fix
-        jsonObject.put(DEVICE_CODE, TokenUtils.b32EncodeToken(ag.getToken()));
-        jsonObject.put(USER_CODE, userCode);
-        jsonObject.put(EXPIRES_IN, lifetime / 1000); // must be returned in seconds.
-        jsonObject.put(INTERVAL, rfc8628State.interval / 1000); // must be returned in seconds.
-        jsonObject.put(VERIFICATION_URI, rfc8628ServletConfig.deviceEndpoint);
-        jsonObject.put(VERIFICATION_URI_COMPLETE, rfc8628ServletConfig.deviceEndpoint + "?" + USER_CODE + "=" + userCode);
+        jsonObject.put(RFC8628Constants.DEVICE_CODE, TokenUtils.b32EncodeToken(ag.getToken()));
+        jsonObject.put(RFC8628Constants.USER_CODE, userCode);
+        jsonObject.put(RFC8628Constants.EXPIRES_IN, lifetime / 1000); // must be returned in seconds.
+        jsonObject.put(RFC8628Constants.INTERVAL, rfc8628State.interval / 1000); // must be returned in seconds.
+        jsonObject.put(RFC8628Constants.VERIFICATION_URI, rfc8628ServletConfig.deviceEndpoint);
+        jsonObject.put(RFC8628Constants.VERIFICATION_URI_COMPLETE, rfc8628ServletConfig.deviceEndpoint + "?" + RFC8628Constants.USER_CODE + "=" + userCode);
         debugUtil.trace(this, "done, writing response for " + jsonObject);
         resp.getWriter().println(jsonObject.toString(1));
         resp.getWriter().flush();
@@ -194,7 +194,7 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
     }
 
     protected String getClientSecret(HttpServletRequest request) {
-        return ClientUtils.getClientSecret(request, getFirstParameterValue(request, CLIENT_SECRET));
+        return ClientUtils.getClientSecret(request, getFirstParameterValue(request, OA2Constants.CLIENT_SECRET));
     }
 
     protected void checkParameters(OA2ServiceTransaction t,
@@ -202,26 +202,26 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
                                    AGResponse agResponse, HttpServletRequest req) throws Throwable {
         Map<String, String> params = agResponse.getParameters();
 
-        String rawATLifetime = params.get(ACCESS_TOKEN_LIFETIME);
-        if (!isTrivial(rawATLifetime)) {
+        String rawATLifetime = params.get(OA2Constants.ACCESS_TOKEN_LIFETIME);
+        if (!StringUtils.isTrivial(rawATLifetime)) {
             try {
                 long at = ConfigUtil.getValueSecsOrMillis(rawATLifetime);
                 //               long at = Long.parseLong(rawATLifetime);
                 t.setRequestedATLifetime(at);
             } catch (Throwable throwable) {
-                getServiceEnvironment().info("Could not set request access token lifetime to \"" + rawATLifetime
+                MyProxyDelegationServlet.getServiceEnvironment().info("Could not set request access token lifetime to \"" + rawATLifetime
                         + "\" for client " + client.getIdentifierString());
                 // do nothing.
             }
         }
-        String rawRefreshLifetime = params.get(REFRESH_LIFETIME);
-        if (!isTrivial(rawRefreshLifetime)) {
+        String rawRefreshLifetime = params.get(OA2Constants.REFRESH_LIFETIME);
+        if (!StringUtils.isTrivial(rawRefreshLifetime)) {
             try {
                 long rt = ConfigUtil.getValueSecsOrMillis(rawRefreshLifetime);
                 //long rt = Long.parseLong(rawRefreshLifetime);
                 t.setRequestedRTLifetime(rt);
             } catch (Throwable throwable) {
-                getServiceEnvironment().info("Could not set request refresh token lifetime to \"" + rawRefreshLifetime
+                MyProxyDelegationServlet.getServiceEnvironment().info("Could not set request refresh token lifetime to \"" + rawRefreshLifetime
                         + "\" for client " + client.getIdentifierString());
                 // do nothing.
             }

@@ -1,6 +1,9 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.IssuerTransactionState;
+import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.cache.Cleanup;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
@@ -25,6 +28,9 @@ import javax.servlet.http.HttpServletResponse;
  and using Authorization Basic, This has to be put here.
  */
 public abstract class AbstractAccessTokenServlet2 extends MultiAuthServlet {
+    // Ends up here because of Java package and module visibility requirements.
+    public static Cleanup<Identifier, TXRecord> txRecordCleanup = null;
+
     @Override
     protected void doIt(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Throwable {
   //      printAllParameters(httpServletRequest);

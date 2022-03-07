@@ -72,7 +72,7 @@ public class OA2CLCCommands extends CLCCommands {
         this(logger, oa2CommandLineClient);
         setPrintOuput(!silentMode);
         setVerbose(!silentMode);
-
+        oa2CommandLineClient.setVerbose(!silentMode);
     }
 
     public OA2CLCCommands(MyLoggingFacade logger,
@@ -227,8 +227,7 @@ public class OA2CLCCommands extends CLCCommands {
             deviceCode = dfResponse.getString(DEVICE_CODE);
             say("user code: " + userCode);
             Date exp = new Date();
-            dfExpiresIn = dfResponse.getLong(RFC8628Constants2.EXPIRES_IN);
-            dfInterval = dfResponse.getLong(INTERVAL);
+            long dfExpiresIn = dfResponse.getLong(RFC8628Constants2.EXPIRES_IN);
             exp.setTime(exp.getTime() + dfExpiresIn * 1000);
             say("code valid until " + exp + " (" + dfExpiresIn + " sec.)");
             copyToClipboard(userCode, "user code copied to clipboard");
@@ -243,15 +242,19 @@ public class OA2CLCCommands extends CLCCommands {
     }
 
     public long getDfInterval() {
-        return dfInterval;
+        if(dfResponse == null || !dfResponse.containsKey(INTERVAL)){
+            return -1L;
+        }
+        return dfResponse.getLong(INTERVAL);
     }
 
     public long getDfExpiresIn() {
-        return dfExpiresIn;
+        if(dfResponse == null || !dfResponse.containsKey(RFC8628Constants2.EXPIRES_IN)){
+            return -1L;
+        }
+        return dfResponse.getLong(RFC8628Constants2.EXPIRES_IN);
     }
 
-    long dfInterval = -1L;
-    long dfExpiresIn = -1L;
     public JSONObject getDfResponse() {
         return dfResponse;
     }
@@ -749,7 +752,26 @@ public class OA2CLCCommands extends CLCCommands {
 
     }
 
+    public Throwable getLastException() {
+        return lastException;
+    }
+
+    public void setLastException(Throwable lastException) {
+        this.lastException = lastException;
+    }
+
+    /**
+     * The last execption. This is generally not of interest except for a few cases (such as proxying)
+     * and should not be serialized, being mostly informational and transitory.
+     */
+    Throwable lastException;
+
+    public boolean hadException(){
+        return lastException!=null;
+    }
+
     private void df_get_at(InputLine inputLine) {
+        lastException = null;
         if (isDeviceFlow) {
             HashMap<String, String> copyOfParams = new HashMap<>();
             copyOfParams.putAll(tokenParameters);
@@ -765,9 +787,13 @@ public class OA2CLCCommands extends CLCCommands {
                     copyOfParams.put(SCOPE, ss);
                 }
             }
-
-            currentATResponse = getService().rfc8628Request(dummyAsset, deviceCode, tokenParameters);
-            processATResponse(inputLine);
+            try {
+                currentATResponse = getService().rfc8628Request(dummyAsset, deviceCode, tokenParameters);
+                processATResponse(inputLine);
+            }catch(Throwable t){
+                lastException = t;
+                throw t;
+            }
         } else {
             say("sorry, but there is no device flow active");
         }
