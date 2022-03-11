@@ -1,0 +1,14 @@
+{
+  "comment": ["This is a test proxy client"],
+  "redirect_uris": [
+    "http://localhost:9443/oauth2/ready"
+  ],
+  "client_name": "OA4MP test proxy",
+  "scope": "openid email profile edu.uiuc.ncsa.myproxy.getcert org.cilogon.userinfo",
+  "contacts": [
+    "jgaynor@illinois.edu"
+  ],
+  "rt_lifetime" :2592000,
+  "at_lifetime" :900,
+  "strict_scopes": "false"
+}

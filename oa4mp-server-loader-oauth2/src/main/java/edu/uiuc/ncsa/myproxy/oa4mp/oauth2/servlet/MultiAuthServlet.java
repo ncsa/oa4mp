@@ -28,7 +28,8 @@ public abstract class MultiAuthServlet extends MyProxyDelegationServlet {
     /**
        * This finds the client identifier either as a parameter or in the authorization header and uses
        * that to get the client. It will also check if the client has been approved and throw an
-       * exception if that is not the case. You must separately check the secret as needed.
+       * exception if that is not the case. You must separately check the secret as needed
+       * using {@link #getClientSecret(HttpServletRequest)} then {@link #verifyClientSecret(OA2Client, String)}.
        *
        * @param request
        * @return

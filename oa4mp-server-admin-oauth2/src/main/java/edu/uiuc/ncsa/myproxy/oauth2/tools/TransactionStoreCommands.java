@@ -8,10 +8,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.StoreCommands2;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
-import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
-import edu.uiuc.ncsa.security.core.util.DateUtils;
-import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.core.util.StringUtils;
+import edu.uiuc.ncsa.security.core.util.*;
 import edu.uiuc.ncsa.security.delegation.storage.TransactionStore;
 import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
 import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
@@ -20,13 +17,11 @@ import edu.uiuc.ncsa.security.util.cli.InputLine;
 import net.sf.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.*;
 import java.net.URI;
 import java.util.Date;
 import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 import static edu.uiuc.ncsa.security.core.util.StringUtils.pad2;
 
@@ -284,12 +279,48 @@ public class TransactionStoreCommands extends StoreCommands2 {
         super.ls(inputLine);
     }
 
-
-    public void show_qdl_state(InputLine inputLine) throws Exception{
+   public void set_qdl_state(InputLine inputLine) throws Throwable {
+       if (showHelp(inputLine)) {
+           say("set_qdl_state " + CL_INPUT_FILE_FLAG + " file_path id");
+           say("replace the qdl state in the transaction with the contents of the file.");
+           say("Note that the file is XML and will be converted as needed.");
+           say("See also: show_qdl_state");
+           return;
+       }
+       if(!inputLine.hasArg(CL_INPUT_FILE_FLAG)){
+           say("sorry, but you must specify a file");
+           return;
+       }
+        String f = inputLine.getNextArgFor(CL_INPUT_FILE_FLAG);
+       inputLine.removeSwitchAndValue(CL_OUTPUT_FILE_FLAG);
+       OA2ServiceTransaction t = (OA2ServiceTransaction) findItem(inputLine);
+       if(t == null){
+           say("sorry, I cannot find that transaction.");
+           return;
+       }
+       String rawFile = FileUtil.readFileAsString(f);
+       ByteArrayOutputStream baos = new ByteArrayOutputStream();
+       GZIPOutputStream gzipOutputStream = new GZIPOutputStream(baos);
+       gzipOutputStream.write(rawFile.getBytes("UTF-8"));
+       gzipOutputStream.flush();
+       gzipOutputStream.close();
+       String encoded = Base64.encodeBase64URLSafeString(baos.toByteArray());
+       t.setScriptState(encoded);
+       say("done!");
+   }
+    public void show_qdl_state(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
-            say("show_qdl_state [" + LS_AT_FLAG + "|" + LS_RT_FLAG + "] id");
+            say("show_qdl_state [" + LS_AT_FLAG + "|" + LS_RT_FLAG + " " + CL_OUTPUT_FILE_FLAG + " file_path] id");
             say("Find the given transaction, get the current state from QDL and decode it.");
+            say(CL_OUTPUT_FILE_FLAG + " file_path = You may optionally save it to a file.");
             return;
+        }
+        String f = null;
+        boolean saveFile = false;
+        if (inputLine.hasArg(CL_OUTPUT_FILE_FLAG)) {
+            saveFile = true;
+            f = inputLine.getNextArgFor(CL_OUTPUT_FILE_FLAG);
+            inputLine.removeSwitchAndValue(CL_OUTPUT_FILE_FLAG);
         }
         if (inputLine.hasArg(LS_AT_FLAG)) {
             Identifier identifier = getIDbyAT(inputLine);
@@ -299,7 +330,7 @@ public class TransactionStoreCommands extends StoreCommands2 {
             }
             inputLine.removeSwitchAndValue(LS_AT_FLAG);
             inputLine.appendArg("/" + identifier);
-        }else{
+        } else {
             if (inputLine.hasArg(LS_RT_FLAG)) {
                 Identifier identifier = getIDByRT(inputLine);
                 if (identifier == null) {
@@ -308,23 +339,23 @@ public class TransactionStoreCommands extends StoreCommands2 {
                 }
                 inputLine.removeSwitchAndValue(LS_RT_FLAG);
                 inputLine.appendArg("/" + identifier);
-            }else{
+            } else {
                 // arg count of zero implies use the currently set id. If they supplied an
                 // identifier, try to unscramble that.
-                if(0 < inputLine.getArgCount()){
+                if (0 < inputLine.getArgCount()) {
                     // no flag, just an id or integer.
                     String lastArg = inputLine.getLastArg();
-                                    if(lastArg.startsWith("/")){
-                                        // do nothing
-                                    }else{
-                                       if(lastArg.matches("^[0-9]*$")){
-                                           //digits only, do nothing
-                                       }else{
-                                           inputLine.removeArgAt(inputLine.getArgCount());
-                                           lastArg = "/" + lastArg;
-                                           inputLine.appendArg(lastArg);
-                                       }
-                                    }
+                    if (lastArg.startsWith("/")) {
+                        // do nothing
+                    } else {
+                        if (lastArg.matches("^[0-9]*$")) {
+                            //digits only, do nothing
+                        } else {
+                            inputLine.removeArgAt(inputLine.getArgCount());
+                            lastArg = "/" + lastArg;
+                            inputLine.appendArg(lastArg);
+                        }
+                    }
                 }
 
             }
@@ -333,13 +364,13 @@ public class TransactionStoreCommands extends StoreCommands2 {
 
 
         OA2ServiceTransaction transaction = (OA2ServiceTransaction) findItem(inputLine);
-        if(transaction == null){
+        if (transaction == null) {
             say("transaction not found.");
             return;
         }
         String rawState = transaction.getScriptState();
 
-        if(StringUtils.isTrivial(rawState)){
+        if (StringUtils.isTrivial(rawState)) {
             return; // nothing to show
         }
         // now the hard bit. This is base 64 encoded, gzipped XML.
@@ -353,12 +384,25 @@ public class TransactionStoreCommands extends StoreCommands2 {
         final char[] buffer = new char[bufferSize];
         final StringBuilder out = new StringBuilder();
         for (; ; ) {
-          int rsz = in.read(buffer, 0, buffer.length);
-          if (rsz < 0)
-            break;
-          out.append(buffer, 0, rsz);
+            int rsz = in.read(buffer, 0, buffer.length);
+            if (rsz < 0)
+                break;
+            out.append(buffer, 0, rsz);
         }
-        say(out.toString());
+        if(saveFile){
+            try {
+                FileUtil.writeStringToFile(f, out.toString());
+                say("saved QDL state to '" + f + "'");
+            } catch (Throwable e) {
+                say("saving to '" + f + " failed:" + e.getMessage());
+                if(isVerbose() && isPrintOuput()){
+                    e.printStackTrace();
+                }
+            }
+
+        } else {
+            say(out.toString());
+        }
     }
 
     public void get_by_at(InputLine inputLine) throws Exception {

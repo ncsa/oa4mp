@@ -17,6 +17,8 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.*;
+import edu.uiuc.ncsa.security.delegation.server.storage.ClientStore;
+import edu.uiuc.ncsa.security.delegation.storage.TransactionStore;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.util.configuration.ConfigUtil;
 import org.apache.commons.configuration.tree.ConfigurationNode;
@@ -215,15 +217,15 @@ public class StoreFacade implements QDLModuleMetaClass {
         try {
             setStoreAccessor(createAccessor(storeType));
         } catch (Exception x) {
-            if(x instanceof RuntimeException){
-                throw (RuntimeException)x;
+            if (x instanceof RuntimeException) {
+                throw (RuntimeException) x;
             }
             // If loading the store blows up,
             throw new QDLException("Error loading store: for file " + file + ", config " + cfgName + ", type " + storeType);
         }
         if (storeAccessor == null) {
             // If there is no such store.
-            throw new QDLException("unsupported type for store '" + storeType + "': config file =" + file + ", config name= " + cfgName );
+            throw new QDLException("unsupported type for store '" + storeType + "': config file =" + file + ", config name= " + cfgName);
         }
     }
 
@@ -255,7 +257,7 @@ public class StoreFacade implements QDLModuleMetaClass {
                 break;
             case STORE_TYPE_TRANSACTION:
                 storeAccessor = new QDLStoreAccessor(storeType, (Store) getEnvironment().getTransactionStore(), getEnvironment().getMyLogger());
-                storeAccessor.setMapConverter(new TransactionStemMC((getEnvironment().getTransactionStore()).getMapConverter(), getEnvironment().getClientStore()));
+                storeAccessor.setMapConverter(createTransactionStemMC(getEnvironment().getTransactionStore(), getEnvironment().getClientStore()));
                 break;
             case STORE_TYPE_TX_STORE:
                 storeAccessor = new QDLStoreAccessor(storeType, getEnvironment().getTxStore(), getEnvironment().getMyLogger());
@@ -266,6 +268,10 @@ public class StoreFacade implements QDLModuleMetaClass {
 
         }
         return storeAccessor;
+    }
+
+    protected TransactionStemMC createTransactionStemMC(TransactionStore transactionStore, ClientStore clientStore) {
+        return new TransactionStemMC(transactionStore.getMapConverter(), clientStore);
     }
 
     public String TO_XML_NAME = "to_xml";
@@ -290,7 +296,7 @@ public class StoreFacade implements QDLModuleMetaClass {
                 throw new IllegalArgumentException("Error: " + getName() + " requires a stem argument.");
             }
             StemVariable stem = (StemVariable) objects[0];
-            if(stem.isEmpty()){
+            if (stem.isEmpty()) {
                 return "";
             }
             // last hurdle, make sure it's not just a list of stems
@@ -298,11 +304,11 @@ public class StoreFacade implements QDLModuleMetaClass {
                 return getStoreAccessor().toXML((StemVariable) objects[0]);
             }
             StemVariable out = new StemVariable();
-            for(String key : stem.keySet()){
+            for (String key : stem.keySet()) {
                 try {
-                    out.put(key,getStoreAccessor().toXML((StemVariable) stem.get(key)));
-                }catch(Throwable t){
-                    getLogger().warn("Could not convert object to XML:" + t.getMessage() , t);
+                    out.put(key, getStoreAccessor().toXML((StemVariable) stem.get(key)));
+                } catch (Throwable t) {
+                    getLogger().warn("Could not convert object to XML:" + t.getMessage(), t);
                     out.put(key, QDLNull.getInstance());
                 }
             }
@@ -343,20 +349,20 @@ public class StoreFacade implements QDLModuleMetaClass {
             if ((objects[0] instanceof String)) {
                 return getStoreAccessor().fromXML((String) objects[0]);
             }
-            if(!(objects[0] instanceof StemVariable)) {
+            if (!(objects[0] instanceof StemVariable)) {
                 throw new IllegalArgumentException("Error: " + getName() + " requires a string argument or stem of them,.");
             }
             StemVariable arg = (StemVariable) objects[0];
             StemVariable out = new StemVariable();
-                  for(String key: arg.keySet()){
-                      Object obj = arg.get(key);
-                      if(obj instanceof String){
-                          out.put(key, getStoreAccessor().fromXML((String) obj));
-                      }else{
-                          out.put(key, QDLNull.getInstance());
-                      }
+            for (String key : arg.keySet()) {
+                Object obj = arg.get(key);
+                if (obj instanceof String) {
+                    out.put(key, getStoreAccessor().fromXML((String) obj));
+                } else {
+                    out.put(key, QDLNull.getInstance());
+                }
 
-                  }
+            }
             return out;
         }
 
@@ -435,8 +441,8 @@ public class StoreFacade implements QDLModuleMetaClass {
         public Object evaluate(Object[] objects, State state) {
             checkInit();
             try {
-                StemVariable stemVariable =  getStoreAccessor().get(BasicIdentifier.newID(objects[0].toString()));
-                if(stemVariable.isEmpty()){
+                StemVariable stemVariable = getStoreAccessor().get(BasicIdentifier.newID(objects[0].toString()));
+                if (stemVariable.isEmpty()) {
                     return QDLNull.getInstance();
                 }
                 return stemVariable;
@@ -640,7 +646,7 @@ public class StoreFacade implements QDLModuleMetaClass {
                     if ((Boolean) objects[0]) {
                         return getStoreAccessor().getStoreKeys().identifier();
                     }
-                }else{
+                } else {
                     throw new IllegalArgumentException(getName() + " requires a boolean as its argument if present");
                 }
             }
@@ -651,7 +657,7 @@ public class StoreFacade implements QDLModuleMetaClass {
         @Override
         public List<String> getDocumentation(int argCount) {
             List<String> doxx = new ArrayList<>();
-            switch(argCount){
+            switch (argCount) {
                 case 0:
                     doxx.add(getName() + "() - list the keys (names of properties) for the objects in the store.");
                     break;
@@ -1031,14 +1037,17 @@ public class StoreFacade implements QDLModuleMetaClass {
             this.version = version;
         }
     }
+
     protected VID toVID(Object obj) {
-        if(!(obj instanceof StemVariable)){
+        if (!(obj instanceof StemVariable)) {
             return null;
         }
         return toVID((StemVariable) obj);
     }
+
     protected String VERSION_GET_VERSIONS_NAME = "v_versions";
-    public class VGetVersions implements QDLFunction{
+
+    public class VGetVersions implements QDLFunction {
         @Override
         public String getName() {
             return VERSION_GET_VERSIONS_NAME;
@@ -1053,26 +1062,26 @@ public class StoreFacade implements QDLModuleMetaClass {
         public Object evaluate(Object[] objects, State state) {
             checkInit();
 
-            if(objects.length != 1){
+            if (objects.length != 1) {
                 throw new IllegalArgumentException(getName() + " requires a single argument");
             }
             StemVariable args = null;
             boolean hasStringArg = false;
-            if(objects[0] instanceof String){
+            if (objects[0] instanceof String) {
                 args = new StemVariable();
                 args.put(0L, objects[0]);
                 hasStringArg = true;
             }
-            if(objects[0] instanceof StemVariable){
+            if (objects[0] instanceof StemVariable) {
                 args = (StemVariable) objects[0];
             }
-            if(args == null){
+            if (args == null) {
                 throw new IllegalArgumentException(getName() + " requires either an id or stem of them as its argument.");
             }
             StemVariable out = new StemVariable();
-            for(String key : args.keySet()){
+            for (String key : args.keySet()) {
                 Identifier id = toIdentifier(args.get(key));
-                if(id == null){
+                if (id == null) {
                     out.put(key, QDLNull.getInstance()); // no valid id means a null
                     continue;
                 }
@@ -1080,7 +1089,7 @@ public class StoreFacade implements QDLModuleMetaClass {
                 entry.addList(getStoreAccessor().getStoreArchiver().getVersionNumbers(id));
                 out.put(key, entry);
             }
-            if(hasStringArg){
+            if (hasStringArg) {
                 return out.get(0L); // preserve shape.
             }
             return out;
@@ -1104,21 +1113,22 @@ public class StoreFacade implements QDLModuleMetaClass {
             return doxx;
         }
     }
-     protected Identifier toIdentifier(Object obj){
-        if(!(obj instanceof String)){
+
+    protected Identifier toIdentifier(Object obj) {
+        if (!(obj instanceof String)) {
             return null;
         }
-        try{
+        try {
             return BasicIdentifier.newID(URI.create(obj.toString()));
-        }catch(Throwable t) {
+        } catch (Throwable t) {
             logger.warn("Could not make identifier for '" + obj + "'", t);
         }
         return null;
-     }
+    }
 
     protected String VERSION_RESTORE_NAME = "v_restore";
 
-    public class VRestore implements QDLFunction{
+    public class VRestore implements QDLFunction {
         @Override
         public String getName() {
             return VERSION_RESTORE_NAME;
@@ -1126,20 +1136,20 @@ public class StoreFacade implements QDLModuleMetaClass {
 
         @Override
         public int[] getArgCount() {
-            return new int[]{1,2};
+            return new int[]{1, 2};
         }
 
         @Override
         public Object evaluate(Object[] objects, State state) {
             StemVariable args = convertArgsToVersionIDs(objects, getName());
             StemVariable out = new StemVariable();
-            for(String key : args.keySet()){
+            for (String key : args.keySet()) {
                 VID vid = toVID(args.get(key));
-                if(vid == null){
+                if (vid == null) {
                     out.put(key, Boolean.FALSE);
                     continue;
                 }
-                 out.put(key, getStoreAccessor().getStoreArchiver().restore(vid.id, vid.version));
+                out.put(key, getStoreAccessor().getStoreArchiver().restore(vid.id, vid.version));
             }
             return out;
         }
@@ -1170,7 +1180,7 @@ public class StoreFacade implements QDLModuleMetaClass {
      * Not currently used because it is unclear what the contract should actually be.
      * Leaving this here for future (possible) use. left. == right. actually covers most cases fine.
      */
-    public class Diff implements QDLFunction{
+    public class Diff implements QDLFunction {
         @Override
         public String getName() {
             return DIFFERENCE_NAME;
@@ -1183,25 +1193,25 @@ public class StoreFacade implements QDLModuleMetaClass {
 
         @Override
         public Object evaluate(Object[] objects, State state) {
-            if(objects.length != 2){
+            if (objects.length != 2) {
                 throw new IllegalArgumentException(getName() + " requires two arguments");
             }
-            if(!(objects[0] instanceof StemVariable) || !(objects[1] instanceof StemVariable)){
+            if (!(objects[0] instanceof StemVariable) || !(objects[1] instanceof StemVariable)) {
                 throw new IllegalArgumentException(getName() + " requires both arguments be stems");
             }
 
-            StemVariable left = (StemVariable)objects[0];
-            StemVariable right = (StemVariable)objects[1];
+            StemVariable left = (StemVariable) objects[0];
+            StemVariable right = (StemVariable) objects[1];
 
             StemVariable out = new StemVariable();
             HashMap<Identifier, StemVariable> baseObjects = new HashMap<>();
-            for(String key : left.keySet()){
-                if(right.containsKey(key)){
+            for (String key : left.keySet()) {
+                if (right.containsKey(key)) {
                     Dyad eq = new Dyad(OpEvaluator.EQUALS_VALUE);
                     eq.setLeftArgument(new ConstantNode(left.get(key)));
                     eq.setRightArgument(new ConstantNode(right.get(key)));
-                    out.put(key,eq.evaluate(state));
-                }else{
+                    out.put(key, eq.evaluate(state));
+                } else {
                     out.put(key, QDLNull.getInstance());
                 }
             }

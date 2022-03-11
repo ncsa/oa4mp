@@ -150,7 +150,30 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             return true;
         }
 
+        // For CIL-771
+        if (grantType.equals(OA2Constants.GRANT_TYPE_TOKEN_INFO)) {
+              //doTokenInfo(client, request, response);
+              return true;
+        }
+
         return false;
+    }
+
+    /**
+     * Contract is that the request contains a valid access token. Look up the transaction
+     * then search for the user's other transactions by username.
+     * @param client
+     * @param request
+     * @param response
+     */
+    private void doTokenInfo(OA2Client client, HttpServletRequest request, HttpServletResponse response) {
+        if(!client.isPublicClient()) {
+            verifyClientSecret(client, getClientSecret(request));
+        }
+        String[] userids = request.getParameterValues("user_uid");
+        // Look up by client id and user name(s).
+        // This means searching for transactions and snooping through TX records too. Only return valid
+        // tokens.
     }
 
     private void writeATResponse(HttpServletResponse response, IssuerTransactionState state) throws IOException {

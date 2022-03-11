@@ -123,7 +123,8 @@ public class QDLStoreAccessor {
 
     /**
      * Does the same as the {@link edu.uiuc.ncsa.myproxy.oa4mp.server.StoreCommands2#serialize(InputLine)}
-     * Take a stem and convert it to an object then to XML format.
+     * Take a stem and convert it to an object then to XML format.<br/><br/>
+     * Note this is <b>not</b> used for serialization of the store, just to exchange entries in the store.
      *
      * @param stem
      * @return

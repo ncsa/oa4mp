@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.permissions.PermissionServer;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.permissions.RemoveClientRequest;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.HeaderUtils;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientConverter;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientKeys;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.EnvServlet;
@@ -184,6 +185,10 @@ public class OIDCCMServlet extends EnvServlet {
     protected String formatIdentifiable(Store store, Identifiable identifiable) {
         XMLMap map = new XMLMap();
         store.getXMLConverter().toMap(identifiable, map);
+        if(identifiable instanceof OA2Client){
+            OA2ClientConverter cc = (OA2ClientConverter) store.getXMLConverter();
+            map.remove(cc.getCK2().secret()); // Remove the secret from the email!
+        }
         List<String> outputList = StringUtils.formatMap(map,
                 null,
                 true,

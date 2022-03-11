@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Using Proxies</title>
+    <!--#include virtual="../../head.html" -->
+
+</head>
+<body class="composite">
+<!--#include virtual="../../header.html" -->
+
+<h2>Introduction</h2>
+<p>
+   The authorization module for OA4MP can be replaced by various means, such as using Tomcat's built in
+    management. However, this means that you will need to have separate logins that you manage for each
+    user. Another option is using a <i>proxy</i> service. This is an OIDC service that allows for logins.
+    Your OS4MP can simply forward all requests to that service (inclding the device flow) and if the
+    service allowing your users to effectively log in there.
+</p>
+
+<h2>How does this do it?</h2>
+<p>
+    You need to register a client with the proxy service (hencefroth known as <b>the proxy</b>), then enable
+    using proxies in your server configuration (see below). Since the service is a client of the proxy,
+    you need to enable the callback servlet and register that as the callback.
+</p>
+
+<h3>Configuring the server</h3>
+<h4>The Tomcat deployment descriptor (web.xml)</h4>
+<p>
+    There is an included web.xml file, called <b><code>proxy.xml</code></b> that has a complete setup. Copy that over your web.xml
+    file. The major point is that it enables the callback servlet (with endpoint <b>ready</b>) at
+</p>
+<pre>/oauth2/ready</pre>
+<p>and when you are registering your client with the proxy, you need to set this callback to </p>
+<pre>https://host:port/oauth2/ready</pre>
+<p>in a standard install. Key points are that https should be available, and that your server
+    should be at host:port. </p>
+
+<h4>The server configuration proper</h4>
+<p>
+    You need to have using the proxy enabled within the <b><code>authorizationServlet</code></b>
+    tag and set the configuration file as well as the name of the configuration for the client.
+    Remember that this file is the configuration for a complete OAuth 2 client. If you need to,
+    read up on the <a href="https://cilogon.github.io/oa4mp/client/configuration/index.html">client configuration</a>
+    file syntax. A very typical entry in the server configuration file would be
+</p>
+<pre>
+    &lt;authorizationServlet useProxy="true"
+                          cfgFile="/opt/oa4mp/etc/client.xml"
+                          cfgName="cilogon-proxy"
+                        /&gt;
+</pre>
+
+<!--#include virtual="../../footer.html" -->
+</body>
+</html>

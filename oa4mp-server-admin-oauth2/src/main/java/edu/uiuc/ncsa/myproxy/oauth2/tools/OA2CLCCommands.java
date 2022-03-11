@@ -786,9 +786,11 @@ public class OA2CLCCommands extends CLCCommands {
                     ss = scopes + " " + ss;
                     copyOfParams.put(SCOPE, ss);
                 }
+            }else{
+                copyOfParams.put(SCOPE, scopes);
             }
             try {
-                currentATResponse = getService().rfc8628Request(dummyAsset, deviceCode, tokenParameters);
+                currentATResponse = getService().rfc8628Request(dummyAsset, deviceCode, copyOfParams);
                 processATResponse(inputLine);
             }catch(Throwable t){
                 lastException = t;
@@ -861,11 +863,16 @@ public class OA2CLCCommands extends CLCCommands {
             getUIHelp();
             return;
         }
-
-        UserInfo userInfo = getService().getUserInfo(dummyAsset.getIdentifier().toString());
-        say("user info:");
-        for (String key : userInfo.getMap().keySet()) {
-            say("          " + key + " = " + userInfo.getMap().get(key));
+        lastException = null;
+        try {
+            UserInfo userInfo = getService().getUserInfo(dummyAsset.getIdentifier().toString());
+            say("user info:");
+            for (String key : userInfo.getMap().keySet()) {
+                say("          " + key + " = " + userInfo.getMap().get(key));
+            }
+        }catch (Throwable t){
+            lastException = t;
+            throw t;
         }
     }
 
@@ -1085,22 +1092,28 @@ public class OA2CLCCommands extends CLCCommands {
             say("Oops! No configuration has been loaded.");
             return;
         }
-        RTResponse rtResponse = getService().refresh(dummyAsset.getIdentifier().toString(), refreshParameters);
-        dummyAsset = (OA2Asset) getCe().getAssetStore().get(dummyAsset.getIdentifier().toString());
-        // Have to update the AT reponse here every time or no token state is preserved.
-        currentATResponse = new ATResponse2(dummyAsset.getAccessToken(), dummyAsset.getRefreshToken());
-        currentATResponse.setParameters(rtResponse.getParameters());
-        JSONObject json = JSONObject.fromObject(currentATResponse.getParameters());
-        claims = json;
-        if (inputLine.hasArg(CLAIMS_FLAG)) {
-            if (json.isEmpty()) {
-                say("(no claims found)");
-            } else {
-                say(json.toString(2));
+        lastException = null;
+        try {
+            RTResponse rtResponse = getService().refresh(dummyAsset.getIdentifier().toString(), refreshParameters);
+            dummyAsset = (OA2Asset) getCe().getAssetStore().get(dummyAsset.getIdentifier().toString());
+            // Have to update the AT reponse here every time or no token state is preserved.
+            currentATResponse = new ATResponse2(dummyAsset.getAccessToken(), dummyAsset.getRefreshToken());
+            currentATResponse.setParameters(rtResponse.getParameters());
+            JSONObject json = JSONObject.fromObject(currentATResponse.getParameters());
+            claims = json;
+            if (inputLine.hasArg(CLAIMS_FLAG)) {
+                if (json.isEmpty()) {
+                    say("(no claims found)");
+                } else {
+                    say(json.toString(2));
+                }
             }
-        }
-        if (isPrintOuput()) {
-            printTokens(inputLine.hasArg(NO_VERIFY_JWT));
+            if (isPrintOuput()) {
+                printTokens(inputLine.hasArg(NO_VERIFY_JWT));
+            }
+        }catch(Throwable t){
+            lastException = t;
+            throw t;
         }
     }
 
@@ -1160,94 +1173,58 @@ public class OA2CLCCommands extends CLCCommands {
             say("Oops! No configuration has been loaded.");
             return;
         }
+        lastException = null;
+        try {
+            boolean requestAT = 1 == inputLine.size() || inputLine.hasArg("-at"); // if default or no args
 
-        boolean requestAT = 1 == inputLine.size() || inputLine.hasArg("-at"); // if default or no args
-
-        boolean subjectTokenIsAT = true;
-        if (inputLine.hasArg("-x")) {
-            subjectTokenIsAT = false;
-        } else {
-            subjectTokenIsAT = requestAT;
-        }
-        TokenImpl subjectToken = null;
-        // NOTE ATServer2 class is slightly broken in that it sets the JTI to be the token
-        // This fixes it, but this code should be moved there, along with the resolveFromToken method
-        // Since it only really affects the CLC, it has a low priority though.
-        if (subjectTokenIsAT) {
-            //          subjectToken = getDummyAsset().getAccessToken();
-
-
-            JSONObject token = resolveFromToken(getDummyAsset().getAccessToken(), true);
-            if (token == null) {
-                subjectToken = getDummyAsset().getAccessToken();
+            boolean subjectTokenIsAT = true;
+            if (inputLine.hasArg("-x")) {
+                subjectTokenIsAT = false;
             } else {
-                subjectToken = new AccessTokenImpl(getDummyAsset().getAccessToken().getToken(),
-                        URI.create(token.getString(OA2Claims.JWT_ID)));
+                subjectTokenIsAT = requestAT;
+            }
+            TokenImpl subjectToken = null;
+            // NOTE ATServer2 class is slightly broken in that it sets the JTI to be the token
+            // This fixes it, but this code should be moved there, along with the resolveFromToken method
+            // Since it only really affects the CLC, it has a low priority though.
+            if (subjectTokenIsAT) {
+                //          subjectToken = getDummyAsset().getAccessToken();
+
+
+                JSONObject token = resolveFromToken(getDummyAsset().getAccessToken(), true);
+                if (token == null) {
+                    subjectToken = getDummyAsset().getAccessToken();
+                } else {
+                    subjectToken = new AccessTokenImpl(getDummyAsset().getAccessToken().getToken(),
+                            URI.create(token.getString(OA2Claims.JWT_ID)));
+                }
+
+            } else {
+
+                JSONObject token = resolveFromToken(getDummyAsset().getRefreshToken(), true);
+                if (token == null) {
+                    subjectToken = getDummyAsset().getRefreshToken();
+                } else {
+                    subjectToken = new RefreshTokenImpl(getDummyAsset().getRefreshToken().getToken(),
+                            URI.create(token.getString(OA2Claims.JWT_ID)));
+                }
             }
 
-        } else {
-//            subjectToken = getDummyAsset().getRefreshToken();
-
-
-            JSONObject token = resolveFromToken(getDummyAsset().getRefreshToken(), true);
-            if (token == null) {
-                subjectToken = getDummyAsset().getRefreshToken();
+            getService().exchangeRefreshToken(getDummyAsset(),
+                    subjectToken,
+                    exchangeParameters,
+                    requestAT, subjectTokenIsAT);
+            // Note that the call updates the asset, so we don't need to look at the response,
+            // just print th right thing.
+            if (requestAT) {
+                printToken(getDummyAsset().getAccessToken(), false);
             } else {
-                subjectToken = new RefreshTokenImpl(getDummyAsset().getRefreshToken().getToken(),
-                        URI.create(token.getString(OA2Claims.JWT_ID)));
+                printToken(getDummyAsset().getRefreshToken(), false);
             }
-
-
+        }catch (Throwable t){
+            lastException = t;
+            throw t;
         }
-
-        getService().exchangeRefreshToken(getDummyAsset(),
-                subjectToken,
-                exchangeParameters,
-                requestAT, subjectTokenIsAT);
-        // Note that the call updates the asset, so we don't need to look at the response,
-        // just print th right thing.
-        if (requestAT) {
-            printToken(getDummyAsset().getAccessToken(), false);
-        } else {
-            printToken(getDummyAsset().getRefreshToken(), false);
-        }
-/*
-        if (1 == inputLine.size() || inputLine.hasArg("-at")) {
-            // use the access token to get access token. This is legal in the spec
-            // and this ensures it gets tested
-            didIt = true;
-            // Note in the next call, the asset is updated by the call since it has all of the information
-            // for the token types. We just need to grab the raw token since we also stash it.
-            JSONObject response;
-                response = getService().exchangeRefreshToken(getDummyAsset(),
-                       accessToken,
-                       exchangeParameters,
-                       true,true);
-            sciToken = response;
-            //    AccessTokenImpl newAt = new AccessTokenImpl(sciToken.getString(RFC8693Constants.ACCESS_TOKEN));
-            //  newAt.isExpired()
-
-            printToken(getDummyAsset().getAccessToken(), false);
-        }
-*/
-
-/*
-        if (inputLine.hasArg("-rt")) {
-            didIt = true;
-            RefreshTokenImpl rt = null;
-            //RefreshToken rt = getDummyAsset().getRefreshToken();
-            JSONObject response = getService().exchangeRefreshToken(getDummyAsset(), rt, null, false, false);
-            sciToken = response;
-
-            printToken(getDummyAsset().getRefreshToken(), false);
-        }
-        if (!didIt) {
-            sayi("Sorry, argument not understood");
-            exchangeHelp();
-        }
-*/
-
-
     }
 
     protected String ASSET_KEY = "asset";

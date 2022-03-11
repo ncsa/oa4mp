@@ -111,7 +111,16 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         }
         state.setServerMode(qe.isServerModeOn());
         // next line allows for debugging individual clients.
-        state.setRestrictedIO(qe.isRestrictedIO() || transaction.getClient().isDebugOn());
+        if(!qe.isRestrictedIO()){
+            state.setRestrictedIO(false);
+        }else{
+            if(transaction.getClient().isDebugOn()){
+               state.setRestrictedIO(false);
+            }else{
+                state.setRestrictedIO(true);
+            }
+        }
+      //  state.setRestrictedIO(qe.isRestrictedIO() || transaction.getClient().isDebugOn());
         state.getOpEvaluator().setNumericDigits(qe.getNumericDigits());
         state.setScriptPaths(qe.getScriptPath());  // Be sure script paths are read.
         state.setAssertionsOn(qe.isAssertionsOn());

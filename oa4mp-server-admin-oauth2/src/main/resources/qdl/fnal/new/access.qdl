@@ -5,6 +5,8 @@
 */
 block[
     theta. := []~mask(scopes. , -1 < starts_with(scopes., CS_HEAD)); //requested capability sets
+    say('*** FNAL CS_HEAD ==' + to_string(CS_HEAD));
+    say('*** FNAL scopes. ==' + to_string(scopes.));
     say('*** FNAL theta. == ' + to_string(theta.));
     if[
        	 0 == size(theta.) // no requested capabilities

@@ -1,11 +1,13 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx;
 
-import edu.uiuc.ncsa.qdl.xml.XMLUtils;
+import edu.uiuc.ncsa.qdl.xml.XMLConstants;
+import edu.uiuc.ncsa.qdl.xml.XMLUtilsV2;
 import edu.uiuc.ncsa.security.core.DateComparable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.IdentifiableImpl;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
+import net.sf.json.JSONArray;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
@@ -23,10 +25,19 @@ import static edu.uiuc.ncsa.qdl.xml.XMLUtils.readStemAsStrings;
  * on 12/14/20 at  8:54 AM
  */
 public class TXRecord extends IdentifiableImpl implements DateComparable {
+    /*
+    Note that this should not be serialized since it is really just the date form of the issued at attribute
+     */
     @Override
     public Date getCreationTS() {
-        return new Date(getIssuedAt());
+        if (createdAt == null) {
+
+            createdAt = new Date(getIssuedAt());
+        }
+        return createdAt;
     }
+
+    Date createdAt = null;
 
     public TXRecord(Identifier identifier) {
         super(identifier);
@@ -78,6 +89,7 @@ public class TXRecord extends IdentifiableImpl implements DateComparable {
 
     /**
      * The requested token type from the TX request.
+     *
      * @return
      */
     public String getTokenType() {
@@ -150,8 +162,6 @@ public class TXRecord extends IdentifiableImpl implements DateComparable {
     boolean valid;
 
 
-
-
     /**
      * This and {@link #fromXML(XMLEventReader)} are needed for QDL state storage.
      *
@@ -159,7 +169,10 @@ public class TXRecord extends IdentifiableImpl implements DateComparable {
      * @throws XMLStreamException
      */
     public void toXML(XMLStreamWriter xsw) throws XMLStreamException {
+        // Note that the creation TS is just the issued at value converted
+        // to a date, so do not serialize the creation TS.
         xsw.writeStartElement(TX_RECORD);
+        xsw.writeAttribute(XMLConstants.SERIALIZATION_VERSION_TAG, XMLConstants.VERSION_2_0_TAG);
         xsw.writeAttribute(ID_ATTR, getIdentifierString());
         xsw.writeAttribute(EXPIRES_AT_ATTR, Long.toString(expiresAt));
         xsw.writeAttribute(LIFETIME_ATTR, Long.toString(lifetime));
@@ -176,18 +189,26 @@ public class TXRecord extends IdentifiableImpl implements DateComparable {
         }
         if (scopes != null && !scopes.isEmpty()) {
             xsw.writeStartElement(SCOPES);
-            XMLUtils.write(xsw, scopes);
+            XMLUtilsV2.toCDATA(xsw, scopes);
+            //XMLUtils.write(xsw, scopes);
             xsw.writeEndElement(); // close scopes
         }
         if (audience != null && !audience.isEmpty()) {
             xsw.writeStartElement(AUDIENCE);
-            XMLUtils.write(xsw, audience);
+            XMLUtilsV2.toCDATA(xsw, audience);
+            //XMLUtils.write(xsw, audience);
             xsw.writeEndElement(); // close audience
         }
 
         if (resource != null && !resource.isEmpty()) {
             xsw.writeStartElement(RESOURCES);
-            XMLUtils.write(xsw, resource);
+            // resources are all URIs so convert to strings or JSON does very nasty things
+            List<String> ll = new ArrayList<>();
+            for (URI x : resource) {
+                ll.add(x.toString());
+            }
+            XMLUtilsV2.toCDATA(xsw, ll);
+            //XMLUtils.write(xsw, resource);
             xsw.writeEndElement(); // close scopes
         }
 
@@ -197,10 +218,22 @@ public class TXRecord extends IdentifiableImpl implements DateComparable {
     public void fromXML(XMLEventReader xer) throws XMLStreamException {
         XMLEvent xe = xer.nextEvent();
         // process all the attributes
-        doXMLAttributes(xe);
+        String versionNumber = doXMLAttributes(xe);
+
+        switch (versionNumber) {
+            case XMLConstants.VERSION_2_0_TAG:
+                fromXMLNEW(xer);
+                break;
+            default:
+                fromXMLOLD(xer);
+        }
+    }
+
+    protected void fromXMLOLD(XMLEventReader xer) throws XMLStreamException {
+        XMLEvent xe;
         while (xer.hasNext()) {
             xe = xer.peek();
-
+            JSONArray j;
             switch (xe.getEventType()) {
                 case XMLEvent.START_ELEMENT:
                     switch (xe.asStartElement().getName().getLocalPart()) {
@@ -208,6 +241,7 @@ public class TXRecord extends IdentifiableImpl implements DateComparable {
                             audience = readStemAsStrings(xer);
                             break;
                         case SCOPES:
+                            xer.nextEvent(); // reposition the cursor
                             scopes = readStemAsStrings(xer);
                             break;
                         case RESOURCES:
@@ -217,7 +251,55 @@ public class TXRecord extends IdentifiableImpl implements DateComparable {
                                 resource.add(URI.create(s));
                             }
                             break;
+                    }
+                    break;
+                case XMLEvent.END_ELEMENT:
+                    if (xe.asEndElement().getName().getLocalPart().equals(TX_RECORD)) {
+                        return;
+                    }
+                    break;
+            }
+            xer.next();
+        }
+        throw new IllegalStateException("Error: XML file corrupt. No end tag for " + TX_RECORD);
 
+
+    }
+
+    protected void fromXMLNEW(XMLEventReader xer) throws XMLStreamException {
+        XMLEvent xe;
+/*
+        // process all the attributes
+        doXMLAttributes(xe);
+*/
+        while (xer.hasNext()) {
+            xe = xer.peek();
+            JSONArray j;
+            switch (xe.getEventType()) {
+                case XMLEvent.START_ELEMENT:
+                    switch (xe.asStartElement().getName().getLocalPart()) {
+                        case AUDIENCE:
+                            j = JSONArray.fromObject(XMLUtilsV2.getText(xer, AUDIENCE));
+                            audience = new ArrayList<>();
+                            audience.addAll(j);
+                            //audience = readStemAsStrings(xer);
+                            break;
+                        case SCOPES:
+                            j = JSONArray.fromObject(XMLUtilsV2.getText(xer, SCOPES));
+                            scopes = new ArrayList<>();
+                            scopes.addAll(j);
+                            //scopes = readStemAsStrings(xer);
+                            break;
+                        case RESOURCES:
+                            j = JSONArray.fromObject(XMLUtilsV2.getText(xer, RESOURCES));
+                            List<String> ll = new ArrayList<>();
+                            ll.addAll(j);
+                            //List<String> ll = readStemAsStrings(xer);
+                            resource = new ArrayList<URI>();
+                            for (String s : ll) {
+                                resource.add(URI.create(s));
+                            }
+                            break;
                     }
                     break;
                 case XMLEvent.END_ELEMENT:
@@ -232,12 +314,16 @@ public class TXRecord extends IdentifiableImpl implements DateComparable {
 
     }
 
-    private void doXMLAttributes(XMLEvent xe) {
+    private String doXMLAttributes(XMLEvent xe) {
+        String versionNumber = "";
         Iterator iterator = xe.asStartElement().getAttributes(); // Use iterator since it tracks state
         while (iterator.hasNext()) {
             Attribute a = (Attribute) iterator.next();
             String v = a.getValue();
             switch (a.getName().getLocalPart()) {
+                case XMLConstants.SERIALIZATION_VERSION_TAG:
+                    versionNumber = v;
+                    break;
                 case TOKEN_TYPE:
                     tokenType = v;
                     break;
@@ -264,7 +350,7 @@ public class TXRecord extends IdentifiableImpl implements DateComparable {
                     break;
             }
         }
-
+        return versionNumber;
     }
 
 }

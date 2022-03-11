@@ -934,7 +934,7 @@ public abstract class StoreCommands2 extends StoreCommands {
         sayi("A few notes.");
         sayi("1. If the value of the property is a JSON object, you can edit it.");
         sayi("2. If the value of the property is an array, then you may add a value, delete a value,");
-        sayi("   replace the entire contents (new entries are comma separated) or simply clear the .");
+        sayi("   replace the entire contents (new entries are comma separated, blanks removed) or simply clear the");
         sayi("   entire list of entries. You may also back out of the update request.");
         sayi("3. What you type in is stored without change, so if you need to save the hash of something,");
         sayi("    e.g. a password, use create_hash to make the hash first and save that.");
@@ -1070,10 +1070,14 @@ public abstract class StoreCommands2 extends StoreCommands {
                 }
                 StringTokenizer st = new StringTokenizer(newValue, ",");
                 while (st.hasMoreElements()) {
-                    currentValue.add(st.nextToken());
+                    String x = st.nextToken().trim();
+                    if(!x.isEmpty()){
+                        // don't add missing elements
+                        // so 'a,  ,, ,,b' is the same as 'a,b'
+                        currentValue.add(x);
+                    }
                 }
                 return currentValue;
-
         }
         say("sorry, I did not understand what you want to do.");
         return null;

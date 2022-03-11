@@ -43,6 +43,7 @@ public class ProxyUtils {
         OA2ServiceTransaction t = rfc8628Store.getByUserCode("");
         doProxyRedirect(oa2SE, t, pendingState.getResponse());
     }
+
     protected static void doProxy(OA2SE oa2SE, AbstractAuthorizationServlet.AuthorizedState state) throws Throwable {
         OA2ServiceTransaction t = (OA2ServiceTransaction) state.getTransaction();
         doProxyRedirect(oa2SE, t, state.getResponse());
@@ -50,17 +51,15 @@ public class ProxyUtils {
 
     /**
      * In the Authorization servlet, this creates the redirect to the proxy and redirects the user's browser.
+     *
      * @param oa2SE
      * @param t
      * @param response
      * @throws Throwable
      */
     protected static void doProxyRedirect(OA2SE oa2SE, OA2ServiceTransaction t, HttpServletResponse response) throws Throwable {
-        AuthorizationServletConfig asc = oa2SE.getAuthorizationServletConfig();
-        OA2CLCCommands clcCommands = new OA2CLCCommands(true, oa2SE.getMyLogger(), new OA2CommandLineClient(oa2SE.getMyLogger()));
-        // Construct a dummy argument to load the client configuration. Calling load() means the first argument has been
-        // processed to locate the method (via introspection) and is ignored in the method.
-        clcCommands.load(new InputLine("load " + asc.getCfgName() + "  " + asc.getCfgFile()));
+        OA2CLCCommands clcCommands = createCLC(oa2SE, t);
+
         AbstractAuthorizationServlet.MyHttpServletResponseWrapper wrapper = new AbstractAuthorizationServlet.MyHttpServletResponseWrapper(response);
         // set the specific scopes.
         clcCommands.set_param(new InputLine("set_param -a scope \"" + scopesToString(t) + "\""));
@@ -81,6 +80,7 @@ public class ProxyUtils {
     /**
      * Sets up device flow with proxy and populates the {@link RFC8628State} with the information
      * from the proxy. This returns the proxy's user code.
+     *
      * @param oa2SE
      * @param t
      * @param rfc8628State
@@ -88,17 +88,15 @@ public class ProxyUtils {
      * @throws Exception
      */
     protected static String getProxyUserCode(OA2SE oa2SE, OA2ServiceTransaction t, RFC8628State rfc8628State) throws Exception {
-        AuthorizationServletConfig asc = oa2SE.getAuthorizationServletConfig();
-        OA2CLCCommands clcCommands = new OA2CLCCommands(true, oa2SE.getMyLogger(), new OA2CommandLineClient(oa2SE.getMyLogger()));
-        clcCommands.load(new InputLine("dummy " + asc.getCfgName() + "  " + asc.getCfgFile()));
+        OA2CLCCommands clcCommands = createCLC(oa2SE, t);
         clcCommands.set_param(new InputLine("set_param " + OA2CLCCommands.SHORT_REQ_PARAM_SWITCH + " " + OA2Constants.SCOPE + " \"" + scopesToString(t) + "\""));
         clcCommands.df(new InputLine("df"));
         // Caveat. The device code is the auth grant from the proxy. We have to manage the one from
         // the proxy (to talk to that service) and the one from this server.
         // Do not set the device code here, let the CLC manage the one from the proxy.
-        rfc8628State.userCode   = clcCommands.getUserCode();
-        rfc8628State.lifetime = clcCommands.getDfExpiresIn()*1000;
-        rfc8628State.interval = clcCommands.getDfInterval()*1000;
+        rfc8628State.userCode = clcCommands.getUserCode();
+        rfc8628State.lifetime = clcCommands.getDfExpiresIn() * 1000;
+        rfc8628State.interval = clcCommands.getDfInterval() * 1000;
         rfc8628State.issuedAt = System.currentTimeMillis();
         t.setProxyState(clcCommands.toJSON());
         /*
@@ -127,68 +125,91 @@ public class ProxyUtils {
     }
 
 
-
     /**
      * Takes the user code in the service transaction (which has been found) and does
      * the redirect to the proxy for login. For RFC8628
+     *
      * @param oa2SE
      * @param t
      * @return
      */
-    protected static void userCodeToProxyRedirect(OA2SE oa2SE, OA2ServiceTransaction t, RFC8628AuthorizationServer.PendingState pendingState) throws Exception{
+    protected static void userCodeToProxyRedirect(OA2SE oa2SE, OA2ServiceTransaction t, RFC8628AuthorizationServer.PendingState pendingState) throws Exception {
         HttpServletResponse response = pendingState.getResponse();
-        OA2CLCCommands clcCommands = new OA2CLCCommands(oa2SE.getMyLogger(), new OA2CommandLineClient(oa2SE.getMyLogger()));
         MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(t.getOA2Client());
 
         // Now we have determined that this is a pending transaction
         debugger.trace(ProxyUtils.class, "loading proxy client");
 
-        JSONObject proxyState = t.getProxyState();
-        if (proxyState.isEmpty()) {
-            throw new TransactionNotFoundException("No pending proxy transaction was found");
-        }
         AbstractAuthorizationServlet.MyHttpServletResponseWrapper wrapper = new AbstractAuthorizationServlet.MyHttpServletResponseWrapper(response);
 
-        clcCommands.fromJSON(proxyState);
+        OA2CLCCommands clcCommands = getCLC(oa2SE, t);
         JSONObject dfResponse = clcCommands.getDfResponse();
         String rawCB = dfResponse.getString(RFC8628Constants2.VERIFICATION_URI_COMPLETE);
         wrapper.sendRedirect(rawCB);
 
     }
 
-    protected static void doRFC8628AT(OA2SE oa2SE, OA2ServiceTransaction t) throws Throwable{
+    /**
+     * Get the fully functional CLC (Command Line Client) associated with this transaction.
+     * Note that if you update the client, you must save the state
+     *
+     * @param oa2SE
+     * @param t
+     * @return
+     * @throws Exception
+     */
+    protected static OA2CLCCommands getCLC(OA2SE oa2SE, OA2ServiceTransaction t) throws Exception {
         OA2CLCCommands clcCommands = new OA2CLCCommands(oa2SE.getMyLogger(), new OA2CommandLineClient(oa2SE.getMyLogger()));
+        JSONObject proxyState = t.getProxyState();
+        if (proxyState.isEmpty()) {
+            throw new TransactionNotFoundException("No pending proxy transaction was found");
+        }
+        clcCommands.fromJSON(proxyState);
+        return clcCommands;
+    }
+
+    /**
+     * Create a completely new CLC and load the configuration into it.
+     *
+     * @param oa2SE
+     * @param t
+     * @return
+     * @throws Exception
+     */
+    protected static OA2CLCCommands createCLC(OA2SE oa2SE, OA2ServiceTransaction t) throws Exception {
+        AuthorizationServletConfig asc = oa2SE.getAuthorizationServletConfig();
+        // next line is where the CLC is first created in the flow, so can't call getCLC
+        OA2CLCCommands clcCommands = new OA2CLCCommands(true, oa2SE.getMyLogger(), new OA2CommandLineClient(oa2SE.getMyLogger()));
+        clcCommands.load(new InputLine("dummy " + asc.getCfgName() + "  " + asc.getCfgFile()));
+        return clcCommands;
+    }
+
+    protected static void doRFC8628AT(OA2SE oa2SE, OA2ServiceTransaction t) throws Throwable {
         MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(t.getOA2Client());
 
         // Now we have determined that this is a pending transaction
         debugger.trace(ProxyUtils.class, "loading proxy client");
 
-        JSONObject proxyState = t.getProxyState();
-        if (proxyState.isEmpty()) {
-            throw new TransactionNotFoundException("No pending proxy transaction was found");
-        }
-        //AbstractAuthorizationServlet.MyHttpServletResponseWrapper wrapper = new AbstractAuthorizationServlet.MyHttpServletResponseWrapper(response);
-
-        clcCommands.fromJSON(proxyState);
-        clcCommands.set_param(new InputLine("set_param " + OA2CLCCommands.SHORT_REQ_PARAM_SWITCH  +" " + OA2Constants.SCOPE + " \"" + scopesToString(t) + "\"" ));
+        OA2CLCCommands clcCommands = getCLC(oa2SE, t);
+        clcCommands.set_param(new InputLine("set_param " + OA2CLCCommands.SHORT_REQ_PARAM_SWITCH + " " + OA2Constants.SCOPE + " \"" + scopesToString(t) + "\""));
         clcCommands.access(new InputLine("access "));
-        if(clcCommands.hadException()){
-             Throwable throwable = clcCommands.getLastException();
-             if(throwable instanceof ServiceClientHTTPException){
-                 ServiceClientHTTPException serviceClientHTTPException = (ServiceClientHTTPException)throwable;
-                 JSONObject content = JSONObject.fromObject(serviceClientHTTPException.getContent());
-                 throw new OA2ATException(content.getString("error"),
-                                     content.getString("description"),
-                                     serviceClientHTTPException.getStatus(), t.getRequestState());
-             }
-             debugger.trace(ProxyUtils.class, "error contacting proxy", throwable);
-             throw throwable;
+        if (clcCommands.hadException()) {
+            Throwable throwable = clcCommands.getLastException();
+            if (throwable instanceof ServiceClientHTTPException) {
+                ServiceClientHTTPException serviceClientHTTPException = (ServiceClientHTTPException) throwable;
+                JSONObject content = JSONObject.fromObject(serviceClientHTTPException.getContent());
+                throw new OA2ATException(content.getString("error"),
+                        content.getString("description"),
+                        serviceClientHTTPException.getStatus(), t.getRequestState());
+            }
+            debugger.trace(ProxyUtils.class, "error contacting proxy", throwable);
+            throw throwable;
         }
         // So this worked. Rock on!
         t.setProxyState(clcCommands.toJSON());
         setClaimsFromProxy(t, clcCommands.getClaims());
 
-         oa2SE.getTransactionStore().save(t);
+        oa2SE.getTransactionStore().save(t);
     }
 
     protected static void setClaimsFromProxy(OA2ServiceTransaction t, JSONObject proxyClaims) {
@@ -212,5 +233,23 @@ public class ProxyUtils {
             }
         }
         t.setUserMetaData(claims); // Get might have created a new one, so be sure it gets stashed right.
+    }
+
+    /**
+     * Attempt to do a refresh of the claims from the proxy server.
+     *
+     * @param oa2SE
+     * @param t
+     * @throws Exception
+     */
+    protected static void doProxyClaimsRefresh(OA2SE oa2SE, OA2ServiceTransaction t) throws Exception {
+        OA2CLCCommands clcCommands = getCLC(oa2SE, t);
+        clcCommands.refresh(new InputLine("user_info "));
+        if (!clcCommands.hadException()) {
+            setClaimsFromProxy(t, clcCommands.getClaims());
+        }
+        t.setProxyState(clcCommands.toJSON());
+        oa2SE.getTransactionStore().save(t);
+
     }
 }

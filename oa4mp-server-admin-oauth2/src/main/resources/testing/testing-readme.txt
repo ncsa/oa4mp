@@ -44,7 +44,7 @@ When a new version is deployed, here is the testing order
   -- localhost:test/no_cfg
      No configuration of any sort (i.e., cfg is unset, strict scopes etc)
      issue
-         cleanr_all_params -a -t -x
+         clear_all_params -a -t -x
      before hand to remove any state from other client tests. This accepts no additional
      scopes in the request.
      Uses a Derby store for the client, just to make sure that gets tested someplace.

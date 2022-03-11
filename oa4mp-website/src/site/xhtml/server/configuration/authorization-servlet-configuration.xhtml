@@ -29,6 +29,32 @@
         <td>Description</td>
     </tr>
     <tr>
+        <td>useProxy</td>
+        <td>N</td>
+        <td>false</td>
+        <td>Valid values are "true" or "false".
+            This flag determines whether or not to use a proxy for authorization. <br/>
+            See also cfgFile and cfgName
+        </td>
+    </tr>
+    <tr>
+        <td>cfgFile</td>
+        <td>N</td>
+        <td></td>
+        <td>This is required if <b>useProxy</b> is true and ignored otherwise. This is the path
+            to the <a href="https://cilogon.github.io/oa4mp/client/configuration/index.html">
+                client configuration</a> file.
+        </td>
+    </tr>
+    <tr>
+        <td>cfgName</td>
+        <td>N</td>
+        <td></td>
+        <td>This is required if <b>useProxy</b> is true and ignored otherwise.
+            The name of the configuration within the cfgFile to use.
+        </td>
+    </tr>
+    <tr>
         <td>useHeader</td>
         <td>N</td>
         <td>false</td>
@@ -77,14 +103,33 @@
     </tbody>
 </table>
 
-<h3>An Example</h3>
+<h3>An Example of using a proxy</h3>
 <pre>
-&lt;config&gt;
-   &lt;server name="my-config"&gt;
-      &lt;authorizationServlet useHeader="true" headerFieldName="REMOTE_USER"&gt;
-      &lt;!-- rest of config --&gt;
-   &lt;\server&gt;
-&lt;\config&gt;
+&ltconfig&gt
+   &lt;server name="my-config"&gt
+      &lt;authorizationServlet useProxy="true"
+           cfgFile="/opt/oa4mp/etc/clients.xml"&gt
+           cfgName="cilogon-proxy"&gt
+      &lt!-- rest of config --&gt
+   &lt\server&gt
+&lt\config&gt
+</pre>
+<p>
+    In this case, there is a service configured (you have registered a client with it)
+    and you need to have calls for authorization forwarded to it. All you need to do
+    is ensure the configuration in the file is correct and that your Tomcat web.xml
+    file is set right and you are good to go. See more at
+    <a href="../manuals/using-proxies.xhtml.xhtml">using prooxies</a>
+</p>
+
+<h3>An Example of using remote user</h3>
+<pre>
+&ltconfig&gt
+   &lt;server name="my-config"&gt
+      &lt;authorizationServlet useHeader="true" headerFieldName="REMOTE_USER"&gt
+      &lt!-- rest of config --&gt
+   &lt\server&gt
+&lt\config&gt
 </pre>
 In this case, use of authorization headers is enabled and a header named <code>REMOTE_USER</code>
 will be used. If it is missing though, no exception will be raised. By default, the header field will
@@ -93,7 +138,7 @@ be shown to the user along with client information and the user will be prompted
 <h3>Use cases</h3>
 There are three main use cases which should be discussed in more depth. The particulars of how to configure
 and authorization module are best dealt with elsewhere and a discussion can be found
-<a href="../manuals/remote-user.html">here</a>.
+<a href="../manuals/remote-user.xhtml">here</a>.
 <h4>Using the OA4MP authorization module</h4>
 
 <p>This is the default. In this case a logon will be shown to the user who will be prompted for the

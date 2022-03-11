@@ -27,6 +27,8 @@ public class RFC7009 extends TokenManagerServlet {
         OA2SE oa2SE = (OA2SE) getServiceEnvironment();
         State state;
         TokenImpl token;
+        // Reminder: The next calls check that the requesting client is the same as the
+        // one in the transaction, thus preventing hijacking.
         try {
             if (!HeaderUtils.getAuthHeader(req, HeaderUtils.BASIC_HEADER).isEmpty()) {
                 state = checkBasic(req);
@@ -44,6 +46,7 @@ public class RFC7009 extends TokenManagerServlet {
          // By this point the state object has the original transaction and request information in it,
         // plus it has the TX record if there is one.
         // Now we have enough to do what we need to.
+
         if(state.txRecord != null){
             state.txRecord.setValid(false);
             oa2SE.getTxStore().save(state.txRecord);
