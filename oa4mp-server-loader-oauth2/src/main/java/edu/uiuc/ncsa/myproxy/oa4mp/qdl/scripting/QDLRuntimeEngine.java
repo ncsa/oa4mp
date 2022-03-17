@@ -219,7 +219,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
             try {
                 WorkspaceCommands workspaceCommands = new WorkspaceCommands();
                 workspaceCommands.setDebugOn(true);
-                workspaceCommands.fromXML(xer);
+                workspaceCommands.fromXML(xer,false);
                 state = (OA2State) workspaceCommands.getInterpreter().getState();
             }catch (Throwable t){
                 // That didn't work. Try it in old format.
@@ -588,6 +588,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         }
         try {
             // Don't serialize anything the system manages since that may cause confusion later.
+            // I.e. This renders all of these variables as transient vis a vis serialization.
             cleanUpState(new String[]{
                     SYS_ERR_VAR,
                     TX_SCOPES_VAR,

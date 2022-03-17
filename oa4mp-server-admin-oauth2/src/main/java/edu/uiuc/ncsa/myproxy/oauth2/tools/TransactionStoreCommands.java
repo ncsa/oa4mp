@@ -205,6 +205,12 @@ public class TransactionStoreCommands extends StoreCommands2 {
     public static final String LS_AT_FLAG = "-at";
     public static final String LS_RT_FLAG = "-rt";
 
+    /**
+     * note that this (and {@link #getIDByRT(InputLine)} are a bit specific in that they look things up
+     * by the JTI of the  token, so quite a bit of proessign has been done already to get to this point.
+     * @param inputLine
+     * @return
+     */
     protected Identifier getIDbyAT(InputLine inputLine) {
         String rawAT = inputLine.getNextArgFor(LS_AT_FLAG);
         if (StringUtils.isTrivial(rawAT)) {

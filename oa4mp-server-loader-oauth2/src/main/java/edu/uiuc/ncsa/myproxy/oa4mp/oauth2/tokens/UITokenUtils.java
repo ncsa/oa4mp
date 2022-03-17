@@ -85,9 +85,8 @@ public class UITokenUtils {
 
 
     /**
-     * Gets the current raw access token from the header or throws an exception none is found.
-     * <h1>NOTE</h1>
-     * OA4MP uses either JWTs or base32 encoded access tokens, so no further encoding to base 64 is needed.
+     * Gets the current raw access token from either  the header or as a parameter. This throws an exception none is found.
+     * Pass the result off to {@link #getAT(String)} to ferret out the actual
      * @param request
      * @return
      */

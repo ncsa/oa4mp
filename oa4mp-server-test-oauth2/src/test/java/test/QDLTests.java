@@ -11,7 +11,6 @@ import edu.uiuc.ncsa.qdl.AbstractQDLTester;
 import edu.uiuc.ncsa.qdl.TestUtils;
 import edu.uiuc.ncsa.qdl.exceptions.QDLStatementExecutionException;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
-import edu.uiuc.ncsa.qdl.xml.XMLUtils;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.oauth_2_0.server.RFC8693Constants;
@@ -243,7 +242,7 @@ public class QDLTests extends AbstractQDLTester {
         XMLStreamWriter xsw = xof.createXMLStreamWriter(w);
         txRecord.toXML(xsw);
         String a = w.toString();
-        System.out.println(XMLUtils.prettyPrint(a));
+        //System.out.println(XMLUtils.prettyPrint(a));
 
         // Read it
         StringReader stringReader = new StringReader(a);
@@ -251,15 +250,15 @@ public class QDLTests extends AbstractQDLTester {
         XMLEventReader xer = xmlif.createXMLEventReader(stringReader);
         xer.nextEvent(); //start it
         TXRecord txRecord1 = new TXRecord(BasicIdentifier.randomID());
-        txRecord.fromXML(xer);
+        txRecord1.fromXML(xer);
 
-        assert txRecord1.getLifetime() == txRecord.getLifetime();
+        assert txRecord1.getLifetime() == txRecord.getLifetime() : "expected " + txRecord.getLifetime() + " but got " + txRecord1.getLifetime();
         assert txRecord1.getIssuedAt() == txRecord.getIssuedAt();
-        assert txRecord1.getTokenType() == txRecord.getTokenType();
+        assert txRecord1.getTokenType().equals(txRecord.getTokenType()) : "expected '" + txRecord.getTokenType() + "' but got '" + txRecord1.getTokenType() + "'";
         assert txRecord1.getParentID().equals(txRecord.getParentID());
         assert txRecord1.getIdentifier().equals(txRecord.getIdentifier());
         assert txRecord1.getExpiresAt() == txRecord.getExpiresAt();
-        assert txRecord1.getIssuer() == txRecord.getIssuer();
+        assert txRecord1.getIssuer().equals(txRecord.getIssuer());
         assert txRecord1.getScopes().size() == txRecord.getScopes().size();
         assert txRecord1.getAudience().size() == txRecord.getAudience().size();
         assert txRecord1.getResource().size() == txRecord.getResource().size();
@@ -329,6 +328,7 @@ public class QDLTests extends AbstractQDLTester {
      * Tests that the older serialized form of the TXRecord is readable. This is critical for
      * any upgrades since there may be very long-lived outstanding TXrecords that need to be read.
      * <br/><br/>CIL-1206 regression test after fix.
+     *
      * @throws Throwable
      */
     public void testTXRecordOLD() throws Throwable {
@@ -338,11 +338,13 @@ public class QDLTests extends AbstractQDLTester {
         XMLEventReader xer = xmlif.createXMLEventReader(stringReader);
         xer.nextEvent();
         txRecord.fromXML(xer);
-
+        String id = "https://test.cilogon.org/oauth2/4d0034722ec53ee4da7825b9b89ddb57?type=accessToken&ts=1646856623934&version=v2.0&lifetime=10800000";
+        String parentID = "https://test.cilogon.org/oauth2/7b8e151e4c6d0f371bd90def043cefbc?type=authzGrant&ts=1646855546449&version=v2.0&lifetime=900000";
         assert txRecord.getTokenType().equals(RFC8693Constants.ACCESS_TOKEN_TYPE);
         assert !txRecord.isValid();
-        assert txRecord.getIdentifier().toString().equals("https://test.cilogon.org/oauth2/4d0034722ec53ee4da7825b9b89ddb57?type=accessToken&amp;ts=1646856623934&amp;version=v2.0&amp;lifetime=10800000");
-        assert txRecord.getParentID().toString().equals("https://test.cilogon.org/oauth2/7b8e151e4c6d0f371bd90def043cefbc?type=authzGrant&amp;ts=1646855546449&amp;version=v2.0&amp;lifetime=900000");
+        assert (txRecord.getIdentifier().toString()).equals(id) :
+                "expected '" + id  + "' but got '" + txRecord.getIdentifier() + "'";
+        assert txRecord.getParentID().toString().equals(parentID);
         assert txRecord.getIssuedAt() == 1646856623934L;
         assert txRecord.getExpiresAt() == 1646856623934L;
         assert txRecord.getLifetime() == 0L;

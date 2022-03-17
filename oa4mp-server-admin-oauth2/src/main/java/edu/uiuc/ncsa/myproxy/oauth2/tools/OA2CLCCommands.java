@@ -829,7 +829,7 @@ public class OA2CLCCommands extends CLCCommands {
             }
         }
         if (isPrintOuput()) {
-            printTokens(inputLine.hasArg(NO_VERIFY_JWT));
+            printTokens(inputLine.hasArg(NO_VERIFY_JWT), false);
         }
     }
 
@@ -964,9 +964,12 @@ public class OA2CLCCommands extends CLCCommands {
             showTokensHelp();
             return;
         }
-        printTokens(inputLine.hasArg(NO_VERIFY_JWT));
-    }
+        boolean printRaw = inputLine.hasArg(RAW_FLAG);
+        inputLine.removeSwitch(RAW_FLAG);
 
+        printTokens(inputLine.hasArg(NO_VERIFY_JWT), printRaw);
+    }
+                                                 public static final String RAW_FLAG = "-raw";
     private void showTokensHelp() {
         say("tokens [" + NO_VERIFY_JWT + "]");
         sayi("Usage: Print the current list of tokens");
@@ -975,7 +978,7 @@ public class OA2CLCCommands extends CLCCommands {
         sayi("displayed.");
     }
 
-    protected void printToken(AccessToken accessToken, boolean noVerify) {
+    protected void printToken(AccessToken accessToken, boolean noVerify, boolean printRaw) {
 
         if (accessToken != null) {
             JSONObject token = null;
@@ -1007,6 +1010,9 @@ public class OA2CLCCommands extends CLCCommands {
             } else {
                 sayi("JWT access token:" + token.toString(1));
                 AccessTokenImpl at = (AccessTokenImpl) accessToken;
+                if(printRaw){
+                   sayi("raw token=" + at.getToken());
+                }
                 if (token.containsKey(OA2Claims.EXPIRATION)) {
                     Date d = new Date();
                     d.setTime(token.getLong(OA2Claims.EXPIRATION) * 1000L);
@@ -1023,7 +1029,7 @@ public class OA2CLCCommands extends CLCCommands {
 
     }
 
-    protected void printToken(RefreshTokenImpl refreshToken, boolean noVerify) {
+    protected void printToken(RefreshTokenImpl refreshToken, boolean noVerify, boolean printRaw) {
         if (refreshToken != null) {
             JSONObject token = null;
             try {
@@ -1052,6 +1058,8 @@ public class OA2CLCCommands extends CLCCommands {
 
             } else {
                 say("JWT refresh token = " + token.toString(1));
+                sayi("raw token=" + refreshToken.getToken());
+
                 if (token.containsKey(OA2Claims.EXPIRATION)) {
                     Date d = new Date();
                     d.setTime(token.getLong(OA2Claims.EXPIRATION) * 1000L);
@@ -1067,15 +1075,15 @@ public class OA2CLCCommands extends CLCCommands {
         }
     }
 
-    protected void printTokens(boolean noVerify) {
+    protected void printTokens(boolean noVerify, boolean printRaw) {
         // It is possible that the service is down in which case the tokens can't be verified.
         if (isVerbose() && currentURI != null) {
             say("Current request URI:");
             say(currentURI.toString());
         }
-        printToken(getDummyAsset().getAccessToken(), noVerify);
+        printToken(getDummyAsset().getAccessToken(), noVerify, printRaw);
         if (getDummyAsset().hasRefreshToken()) {
-            printToken(getDummyAsset().getRefreshToken(), noVerify);
+            printToken(getDummyAsset().getRefreshToken(), noVerify, printRaw);
         }
 
 
@@ -1109,7 +1117,7 @@ public class OA2CLCCommands extends CLCCommands {
                 }
             }
             if (isPrintOuput()) {
-                printTokens(inputLine.hasArg(NO_VERIFY_JWT));
+                printTokens(inputLine.hasArg(NO_VERIFY_JWT), false);
             }
         }catch(Throwable t){
             lastException = t;
@@ -1217,9 +1225,9 @@ public class OA2CLCCommands extends CLCCommands {
             // Note that the call updates the asset, so we don't need to look at the response,
             // just print th right thing.
             if (requestAT) {
-                printToken(getDummyAsset().getAccessToken(), false);
+                printToken(getDummyAsset().getAccessToken(), false, false);
             } else {
-                printToken(getDummyAsset().getRefreshToken(), false);
+                printToken(getDummyAsset().getRefreshToken(), false, false);
             }
         }catch (Throwable t){
             lastException = t;
@@ -1786,4 +1794,5 @@ public class OA2CLCCommands extends CLCCommands {
     public void user_info(InputLine inputLine) throws Exception {
         get_user_info(inputLine);
     }
+
 }

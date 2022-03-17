@@ -5,14 +5,21 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2ConfigurationLoader;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.*;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ScriptRuntimeEngineFactory;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.OA2TStoreInterface;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RefreshTokenStore;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.TokenInfoRecord;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo.VirtualOrganization;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.UITokenUtils;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.IssuerTransactionState;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.qdl.exceptions.AssertionException;
+import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.exceptions.TransactionNotFoundException;
+import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;
 import edu.uiuc.ncsa.security.core.util.*;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.server.request.ATRequest;
@@ -22,10 +29,7 @@ import edu.uiuc.ncsa.security.delegation.storage.TransactionStore;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
-import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
-import edu.uiuc.ncsa.security.delegation.token.impl.AuthorizationGrantImpl;
-import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
-import edu.uiuc.ncsa.security.delegation.token.impl.TokenUtils;
+import edu.uiuc.ncsa.security.delegation.token.impl.*;
 import edu.uiuc.ncsa.security.oauth_2_0.*;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTRunner;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTUtil2;
@@ -35,6 +39,7 @@ import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.http.HttpStatus;
 
@@ -43,6 +48,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Writer;
 import java.net.URI;
 import java.util.*;
 
@@ -104,7 +110,18 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
     protected boolean executeByGrant(String grantType,
                                      HttpServletRequest request,
                                      HttpServletResponse response) throws Throwable {
+        // For CIL-771
+        if (grantType.equals(OA2Constants.GRANT_TYPE_TOKEN_INFO)) {
+            // Options are that the client is null (which means that this should be an admin client)
+            // or that the client is not null, in which case we can only return information about the user
+            // for this client.
+            doTokenInfo(request, response);
+            return true;
+        }
         OA2Client client = (OA2Client) getClient(request);
+        OA2SE oa2SE = (OA2SE) MyProxyDelegationServlet.getServiceEnvironment();
+
+        // In all other cases, the client credentials must be sent.
         if (client == null) {
             warn("executeByGrant encountered a null client");
             throw new OA2ATException(OA2Errors.INVALID_REQUEST, "no such client");
@@ -112,7 +129,6 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         }
         MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(client);
         debugger.trace(this, "starting execute by grant, grant = \"" + grantType + "\"");
-        OA2SE oa2SE = (OA2SE) MyProxyDelegationServlet.getServiceEnvironment();
         if (!client.isPublicClient()) {
             verifyClientSecret(client, getClientSecret(request));
         }
@@ -150,11 +166,6 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             return true;
         }
 
-        // For CIL-771
-        if (grantType.equals(OA2Constants.GRANT_TYPE_TOKEN_INFO)) {
-              //doTokenInfo(client, request, response);
-              return true;
-        }
 
         return false;
     }
@@ -162,18 +173,176 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
     /**
      * Contract is that the request contains a valid access token. Look up the transaction
      * then search for the user's other transactions by username.
-     * @param client
+     *
      * @param request
      * @param response
      */
-    private void doTokenInfo(OA2Client client, HttpServletRequest request, HttpServletResponse response) {
-        if(!client.isPublicClient()) {
-            verifyClientSecret(client, getClientSecret(request));
+    private void doTokenInfo(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        /*
+        Most of the machinery here is figuring out what type of token (JWT, default), looking up
+        the transacation which may be in a TX record and finally verifying the token if sent.
+         */
+        OA2SE oa2SE = (OA2SE) MyProxyDelegationServlet.getServiceEnvironment();
+
+        AdminClient adminClient = null;
+        OA2Client oa2Client = null;
+        boolean isAdminClient = false;
+        try {
+            adminClient = getAdminClient(request);
+            if (!adminClient.isListUsers()) {
+                throw new IllegalArgumentException("The given admin client does not have listing permissions");
+            }
+            isAdminClient = true; // if we get here, we have one.
+        } catch (UnknownClientException unknownClientException) {
+            oa2Client = (OA2Client) getClient(request);
         }
-        String[] userids = request.getParameterValues("user_uid");
+        // So the test is this: One of the above gets for a client has to work. If getClient fails
+        // it will be because of an unknown client exception. At this point, one of the two clients
+        //exists
+        // Check the token
+        AccessTokenImpl at = null;
+        RefreshTokenImpl rt = null;
+        OA2ServiceTransaction t = null;
+        boolean sentAT = false;
+        if (request.getParameterMap().containsKey(OA2Constants.ACCESS_TOKEN)) {
+            String rawAT = request.getParameter(OA2Constants.ACCESS_TOKEN);
+            if (StringUtils.isTrivial(rawAT)) {
+                throw new IllegalArgumentException("missing " + OA2Constants.ACCESS_TOKEN);
+            }
+            at = UITokenUtils.getAT(rawAT);// gets the token, but no verification
+            if (at.isExpired()) {
+                throw new IllegalArgumentException("access token is expired");
+            }
+            t = (OA2ServiceTransaction) getOA2SE().getTransactionStore().get(at);
+            if (t == null) {
+                t = OA2TokenUtils.getTransactionFromTX(oa2SE, at);
+            }
+            sentAT = true;
+        }
+        if (request.getParameterMap().containsKey(OA2Constants.REFRESH_TOKEN)) {
+            String rawRT = request.getParameter(OA2Constants.REFRESH_TOKEN);
+            if (StringUtils.isTrivial(rawRT)) {
+                throw new IllegalArgumentException("missing " + OA2Constants.REFRESH_TOKEN);
+            }
+            rt = UITokenUtils.getRT(rawRT);
+            if (rt.isExpired()) {
+                throw new IllegalArgumentException("refresh token is expired");
+            }
+            t = ((OA2TStoreInterface) getOA2SE().getTransactionStore()).get(rt);
+            if (t == null) {
+                t = OA2TokenUtils.getTransactionFromTX(oa2SE, rt);
+            }
+        }
+
+        // So if after figuring out the token type and snooping through TX records we can't get a transaction
+        // one does not actually exist.
+        if (t == null) throw new IllegalArgumentException("transaction not found");
+
+        if (sentAT) {
+            if (!t.isAccessTokenValid()) throw new IllegalArgumentException("invalid access token");
+        } else {
+            if (!t.isRefreshTokenValid()) throw new IllegalArgumentException("invalid refresh token");
+        }
+
+        Identifier clientID = t.getClient().getIdentifier();
+        // At this point we need to check signatures which involve
+
+        // FINALLY, we have the client so we can unscramble the signatures and make sure that
+        // they work.
+        TokenImpl token = at == null ? rt : at;
+        if (isAdminClient) {
+            if (token.isJWT()) {
+                JSONWebKeys jsonWebKeys;
+                if (adminClient.getVirtualOrganization() == null) {
+                    jsonWebKeys = oa2SE.getJsonWebKeys();
+                } else {
+                    VirtualOrganization vo = (VirtualOrganization) oa2SE.getVOStore().get(adminClient.getVirtualOrganization());
+                    if (vo == null) {
+                        // Admin client is in a VO but no such VO is found. This implies an internal error
+                        throw new NFWException("Virtual organization \"" + adminClient.getVirtualOrganization() + "\"not found.");
+                    }
+                    jsonWebKeys = vo.getJsonWebKeys();
+                }
+                JWTUtil.verifyAndReadJWT(token.getToken(), jsonWebKeys); // might throw an exception
+            }
+        } else {
+            if (at.isJWT()) {
+                JSONWebKeys jsonWebKeys;
+                VirtualOrganization vo = getOA2SE().getVO(clientID);
+                if (vo == null) {
+                    jsonWebKeys = oa2SE.getJsonWebKeys();
+                } else {
+                    jsonWebKeys = vo.getJsonWebKeys();
+                }
+                JWTUtil.verifyAndReadJWT(at.getToken(), jsonWebKeys); // might throw an exception
+            }
+        }
+
+
+        if (isAdminClient) {
+            List<Identifier> admins = oa2SE.getPermissionStore().getAdmins(clientID);
+             /* The admin client, even if it can list other users, cannot just send along an
+                access token from any place. There must be a relationship of the token to at
+                least one of the clients managed by this.
+              */
+            if (!admins.contains(adminClient.getIdentifier())) {
+                throw new IllegalArgumentException("client is not associated with this admin.");
+            }
+
+        } else {
+            if (!clientID.equals(oa2Client.getIdentifier())) {
+                throw new IllegalArgumentException("client is not associated with this access token.");
+            }
+        }
+        OA2TStoreInterface tStore = (OA2TStoreInterface) getOA2SE().getTransactionStore();
+        // This is everything the system knows about tokens for this user. Now we need to filter
+        /*
+        Response is a JSON object of the form
+        [{clientid:[list of tokens]}, {clientid:[list of tokens]}]
+         */
+        Map<Identifier, List<TokenInfoRecord>> tirs = tStore.getTokenInfo(t.getUsername());
+        JSONObject json = new JSONObject();
+        json.put("user_uid", t.getUsername());
+        JSONArray array = new JSONArray();
+        Set<Identifier> keys;
+        if (isAdminClient) {
+            if (adminClient.isListUsersInOtherClients()) {
+                keys = tirs.keySet();
+            } else {
+                keys = new HashSet<>(oa2SE.getPermissionStore().getClients(adminClient.getIdentifier())); // has to be a set4
+            }
+            for (Identifier cid : keys) {
+                if (tirs.containsKey(cid)) {
+                    array.add(formatTokenInfoEntry(cid, tirs.get(cid)));
+                }
+            }
+
+        } else {
+            if (tirs.containsKey(clientID)) {
+                array.add(formatTokenInfoEntry(clientID, tirs.get(clientID)));
+            }
+        }
+
+        json.put("clients", array);
         // Look up by client id and user name(s).
         // This means searching for transactions and snooping through TX records too. Only return valid
         // tokens.
+        response.setContentType("application/json;charset=UTF-8");
+        response.setCharacterEncoding("UTF-8");
+        Writer osw = response.getWriter();
+        json.write(osw);
+        osw.flush();
+        osw.close();
+    }
+
+    private JSONObject formatTokenInfoEntry(Identifier clientID, List<TokenInfoRecord> records) {
+        JSONObject jsonObject = new JSONObject();
+        JSONArray array = new JSONArray();
+        for (TokenInfoRecord tir : records) {
+            array.add(tir.toJSON());
+        }
+        jsonObject.put(clientID.toString(), array);
+        return jsonObject;
     }
 
     private void writeATResponse(HttpServletResponse response, IssuerTransactionState state) throws IOException {
@@ -236,8 +405,6 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         List<String> audience = convertToList(request, RFC8693Constants.AUDIENCE);
         List<String> resources = convertToList(request, RFC8693Constants.RESOURCE);
 
-        TXRecord oldTXR = null;
-
         //CIL-974
         JSONWebKeys keys = OA2TokenUtils.getKeys(oa2se, client);
         switch (subjectTokenType) {
@@ -256,7 +423,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
 
         if (t == null) {
             // if there is no such transaction found, then this is probably from a previous exchange. Go find it
-            t = OA2TokenUtils.getTransactionFromTX(accessToken, t, oa2se);
+            t = OA2TokenUtils.getTransactionFromTX(oa2se, accessToken);
         }
         if (t == null) {
             // Still null. Ain't one no place. Bail.
@@ -395,15 +562,20 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             if (rtiResponse.getRefreshToken().isJWT()) {
                 rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getRefreshToken().getToken()); // Required
                 rfcClaims.put(OA2Constants.REFRESH_TOKEN, rtiResponse.getRefreshToken().getToken()); // Optional
+                newTXR.setStoredToken(rtiResponse.getRefreshToken().getToken());
             } else {
                 rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getRefreshToken().encodeToken()); // Required
                 rfcClaims.put(OA2Constants.REFRESH_TOKEN, rtiResponse.getRefreshToken().encodeToken()); // Optional
+                newTXR.setStoredToken(rtiResponse.getRefreshToken().encodeToken());
             }
         } else {
             if (((AccessTokenImpl) rtiResponse.getAccessToken()).isJWT()) {
                 rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getAccessToken().getToken()); // Required.
+                newTXR.setStoredToken(rtiResponse.getRefreshToken().getToken());
+
             } else {
                 rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getAccessToken().encodeToken()); // Required.
+                newTXR.setStoredToken(rtiResponse.getRefreshToken().encodeToken());
             }
             // create scope string  Remember that these may have been changed by a script,
             // so here is the right place to set it.
@@ -612,6 +784,14 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             atResponse.setRefreshToken(null);
         }
         setupTokens(client, atResponse, oa2SE, st2, jwtRunner);
+        AccessTokenImpl tempAT = (AccessTokenImpl)atResponse.getAccessToken();
+        if(tempAT.isJWT()){
+            st2.setATJWT(tempAT.getToken());
+        }
+        RefreshTokenImpl tempRT = (RefreshTokenImpl) atResponse.getRefreshToken();
+        if(tempRT != null && tempRT.isJWT()){
+            st2.setRTJWT(tempRT.getToken());
+        }
 
         getTransactionStore().save(st2);
         // Check again after doing token claims in case a script changed it.

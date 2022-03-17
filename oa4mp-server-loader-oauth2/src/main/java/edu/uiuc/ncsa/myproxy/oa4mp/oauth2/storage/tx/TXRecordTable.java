@@ -31,6 +31,7 @@ public class TXRecordTable extends Table {
         getColumnDescriptor().add(new ColumnDescriptorEntry(tkeys().resource(), Types.LONGVARCHAR));
         getColumnDescriptor().add(new ColumnDescriptorEntry(tkeys().issuer(), Types.LONGVARCHAR));
         getColumnDescriptor().add(new ColumnDescriptorEntry(tkeys().scopes(), Types.LONGVARCHAR));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(tkeys().storedToken(), Types.LONGVARCHAR));
         getColumnDescriptor().add(new ColumnDescriptorEntry(tkeys().parentID(), Types.LONGVARCHAR));
         getColumnDescriptor().add(new ColumnDescriptorEntry(tkeys().tokenType(), Types.LONGVARCHAR));
     }

@@ -151,32 +151,43 @@ public class OA2TokenUtils {
            }
            return refreshToken;
     }
-    public static OA2ServiceTransaction getTransactionFromTX(AccessTokenImpl accessToken, OA2ServiceTransaction t, OA2SE oa2se) throws IOException {
-          TXRecord oldTXR;
-          oldTXR = (TXRecord) oa2se.getTxStore().get(BasicIdentifier.newID(accessToken.getJti()));
-          String state = null;
-          if(t != null){
-              state = t.getRequestState();
-          }
-          if (oldTXR == null) {
-              ServletDebugUtil.trace(OA2TokenUtils.class, "No transaction found, no TXRecord found for access token = " + accessToken);
 
+    /**
+     * Given an access token (and transaction if available), Find the actual transaction. This may involve a look up
+     * in the tx store
+     * @param accessToken
+     * @param oa2se
+     * @return
+     * @throws IOException
+     */
+    public static OA2ServiceTransaction getTransactionFromTX(OA2SE oa2se, AccessTokenImpl accessToken) throws IOException {
+        return getTransactionFromTX(oa2se, accessToken.getJti());
+      }
+
+    public static OA2ServiceTransaction getTransactionFromTX(OA2SE oa2se, RefreshTokenImpl refreshToken) throws IOException {
+        return getTransactionFromTX(oa2se, refreshToken.getJti());
+      }
+
+    protected static OA2ServiceTransaction getTransactionFromTX(OA2SE oa2se, URI jti) throws IOException {
+          TXRecord txRecord= (TXRecord) oa2se.getTxStore().get(BasicIdentifier.newID(jti));
+          if (txRecord == null) {
+              ServletDebugUtil.trace(OA2TokenUtils.class, "No transaction found, no TXRecord found for token with id = " + jti);
               throw new OA2GeneralError(OA2Errors.INVALID_TOKEN,
                       "token not found",
                       HttpStatus.SC_UNAUTHORIZED,
-                      null); 
+                      null);
           }
-          if (!oldTXR.isValid()) {
+          if (!txRecord.isValid()) {
               throw new OA2ATException(OA2Errors.INVALID_TOKEN,
                       "invalid token",
-                      state);
+                      null);
           }
-          if (oldTXR.getExpiresAt() < System.currentTimeMillis()) {
+          if (txRecord.getExpiresAt() < System.currentTimeMillis()) {
               throw new OA2ATException(OA2Errors.INVALID_TOKEN,
                       "token expired",
-                      state);
+                      null);
           }
-          t = (OA2ServiceTransaction) oa2se.getTransactionStore().get(oldTXR.getParentID());
-          return t;
+          return (OA2ServiceTransaction) oa2se.getTransactionStore().get(txRecord.getParentID());
       }
+
 }

@@ -215,7 +215,7 @@ public class ProxyUtils {
     protected static void setClaimsFromProxy(OA2ServiceTransaction t, JSONObject proxyClaims) {
         JSONObject claims = t.getUserMetaData();
         claims.put(OA2Claims.SUBJECT, proxyClaims.get(OA2Claims.SUBJECT));  // always
-
+        t.setUsername(proxyClaims.getString(OA2Claims.SUBJECT)); // This is where this is set.
         Collection<String> proxyClaimKeys = t.getOA2Client().getProxyClaimsList();
         if (proxyClaimKeys.isEmpty()) {
             // do nothing -- default is just to return the subject

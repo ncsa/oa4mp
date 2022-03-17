@@ -43,6 +43,20 @@ public class TXRecord extends IdentifiableImpl implements DateComparable {
         super(identifier);
     }
 
+    /**
+     * The actual token (including any encodings, signatures etc.) returned to the user.
+     * @return
+     */
+    public String getStoredToken() {
+        return storedToken;
+    }
+
+    public void setStoredToken(String storedToken) {
+        this.storedToken = storedToken;
+    }
+
+    String storedToken = null;
+
     public Identifier getParentID() {
         return parentID;
     }
@@ -178,6 +192,9 @@ public class TXRecord extends IdentifiableImpl implements DateComparable {
         xsw.writeAttribute(LIFETIME_ATTR, Long.toString(lifetime));
         xsw.writeAttribute(ISSUED_AT_ATTR, Long.toString(issuedAt));
         xsw.writeAttribute(IS_VALID_ATTR, Boolean.toString(valid));
+        if(!StringUtils.isTrivial(storedToken)){
+            xsw.writeAttribute(STORED_TOKEN, storedToken);
+        }
         if (!StringUtils.isTrivial(issuer)) {
             xsw.writeAttribute(ISSUER, issuer);
         }
@@ -323,6 +340,9 @@ public class TXRecord extends IdentifiableImpl implements DateComparable {
             switch (a.getName().getLocalPart()) {
                 case XMLConstants.SERIALIZATION_VERSION_TAG:
                     versionNumber = v;
+                    break;
+                case STORED_TOKEN:
+                    storedToken = v;
                     break;
                 case TOKEN_TYPE:
                     tokenType = v;

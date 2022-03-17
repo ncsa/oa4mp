@@ -41,6 +41,9 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
     public String AUDIENCE_KEY = "audience";
     public String RESOURCE_KEY = "resource";
     public String QUERIED_ACCESS_TOKEN_SCOPES_KEY = "queriedATScopes";
+    public String RETURNED_ACCESS_TOKEN_JWT_KEY = "atJWT";
+    public String RETURNED_REFRESH_TOKEN_JWT_KEY = "rtJWT";
+
 
     public String getProxyId() {
         return proxyId;
@@ -118,13 +121,14 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
     }
 
     static String PROXY_STATE_KEY = "proxy_state";
-    public void setProxyState(JSONObject proxyState){
+
+    public void setProxyState(JSONObject proxyState) {
         getState().put(PROXY_STATE_KEY, proxyState);
     }
 
-    public JSONObject getProxyState(){
-        if(getState().containsKey(PROXY_STATE_KEY)){
-             return getState().getJSONObject(PROXY_STATE_KEY);
+    public JSONObject getProxyState() {
+        if (getState().containsKey(PROXY_STATE_KEY)) {
+            return getState().getJSONObject(PROXY_STATE_KEY);
         }
         return new JSONObject();
     }
@@ -636,4 +640,35 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
     public void setQueriedATScopes(Collection<String> queriedATScopes) {
         getState().put(QUERIED_ACCESS_TOKEN_SCOPES_KEY, queriedATScopes);
     }
+
+    /**
+     * If an JWT access token was returned, a copy is saved here.
+     * @return
+     */
+    public String getATJWT() {
+        if (!getState().containsKey(RETURNED_ACCESS_TOKEN_JWT_KEY)) {
+            return null;
+        }
+        return getState().getString(RETURNED_ACCESS_TOKEN_JWT_KEY);
+    }
+
+    public void setATJWT(String atJWT) {
+        getState().put(RETURNED_ACCESS_TOKEN_JWT_KEY, atJWT);
+    }
+
+    /**
+     * If an JWT refresh token was returned, a copy is saved here.
+     * @return
+     */
+    public String getRTJWT() {
+        if (!getState().containsKey(RETURNED_REFRESH_TOKEN_JWT_KEY)) {
+            return null;
+        }
+        return getState().getString(RETURNED_REFRESH_TOKEN_JWT_KEY);
+    }
+
+    public void setRTJWT(String rtJWT) {
+        getState().put(RETURNED_REFRESH_TOKEN_JWT_KEY, rtJWT);
+    }
+
 }

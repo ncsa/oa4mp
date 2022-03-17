@@ -193,7 +193,7 @@ public abstract class MyProxyDelegationServlet extends EnvServlet implements Tra
         Client c = getServiceEnvironment().getClientStore().get(identifier);
         if (c == null) {
             if (getServiceEnvironment().getClientStore().size() == 0) {
-                // This tries to show if, perhpas, the wrong store wa loaded by printing out a little information about it.
+                // This tries to show if, perhaps, the wrong store wa loaded by printing out a little information about it.
                 DebugUtil.trace(this,"CLIENT STORE HAS NO ENTRIES!");
                 DebugUtil.trace(this, "client name is " + getServiceEnvironment().getClientStore().getClass().getSimpleName());
                 DebugUtil.trace(this, "client store is a " + getServiceEnvironment().getClientStore());
@@ -205,6 +205,7 @@ public abstract class MyProxyDelegationServlet extends EnvServlet implements Tra
         checkClientApproval(c);
         return c;
     }
+
 
     public ServiceTransaction newTransaction() throws IOException {
         return getServiceEnvironment().getTransactionStore().create();
@@ -230,7 +231,7 @@ public abstract class MyProxyDelegationServlet extends EnvServlet implements Tra
      *
      * @param client
      */
-    public void checkClientApproval(Client client) {
+    public void checkClientApproval(BaseClient client) {
         if (!getServiceEnvironment().getClientApprovalStore().isApproved(client.getIdentifier())) {
             String ww = "The client with identifier \"" + client.getIdentifier() + "\" has not been approved. Request rejected. Please contact your administrator.";
             warn(ww);

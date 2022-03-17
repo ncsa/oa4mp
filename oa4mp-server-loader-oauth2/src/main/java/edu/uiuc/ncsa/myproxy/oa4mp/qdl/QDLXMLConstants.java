@@ -17,6 +17,7 @@ public interface QDLXMLConstants extends XMLConstants {
     String ISSUER = "issuer";
     String PARENT_ID = "parent_id";
     String SCOPES = "scopes";
+    String STORED_TOKEN = "stored_token";
     String RESOURCES = "resources";
     String STATE = "state";
     String ID_ATTR = "id";

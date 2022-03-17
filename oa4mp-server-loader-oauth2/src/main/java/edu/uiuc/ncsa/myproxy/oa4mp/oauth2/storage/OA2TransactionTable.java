@@ -44,6 +44,20 @@ public class OA2TransactionTable extends DSTransactionTable {
     public String getByUsernameStatement() {
            return "SELECT * FROM " + getFQTablename() + " WHERE " + getOA2Keys().username() + "=?";
        }
+
+
+    public String getTokenInfoStatement() {
+           return "SELECT " +
+                   getOA2Keys().identifier() + ", " +
+                   getOA2Keys().clientKey() + ", " +
+                   getOA2Keys().accessToken() + ", " +
+                   getOA2Keys().accessTokenValid() + ", " +
+                   getOA2Keys().expiresIn() + ", " +
+                   getOA2Keys().refreshToken() + ", " +
+                   getOA2Keys().refreshTokenValid() + ", " +
+                   getOA2Keys().refreshTokenLifetime() + 
+                   " FROM " + getFQTablename() + " WHERE " + getOA2Keys().username() + "=?";
+       }
     public String getRFC8628() {
            return "SELECT " + getOA2Keys().states() + " FROM " + getFQTablename() + " WHERE " + getOA2Keys().isRFC8628() + "= true";
        }

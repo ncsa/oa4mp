@@ -56,6 +56,14 @@ public class AdminClientStemMC<V extends AdminClient> extends StemConverter<V> {
         if (stem.containsKey(kk().allowQDL())) {
             v.setAllowQDL(stem.getBoolean(kk().allowQDL()));
         }
+        if (stem.containsKey(kk().listUsers())) {
+            v.setListUsers(stem.getBoolean(kk().listUsers()));
+        }
+        if (stem.containsKey(kk().listUsersInOtherClients())) {
+            v.setListUsersInOtherClients(stem.getBoolean(kk().listUsersInOtherClients()));
+        }
+
+
         if (isStringKeyOK(stem, kk().config())) {
             v.setConfig(JSONObject.fromObject(stem.getString(kk().config())));
         }
@@ -89,6 +97,8 @@ public class AdminClientStemMC<V extends AdminClient> extends StemConverter<V> {
         setNonNullStemValue(stem, kk().secret(), v.getSecret());
 
         stem.put(kk().allowQDL(), v.isAllowQDL());
+        stem.put(kk().listUsers(), v.isListUsers());
+        stem.put(kk().listUsersInOtherClients(), v.isListUsersInOtherClients());
         setNonNullStemValue(stem, kk().config(), v.getConfig().toString());
         setNonNullStemValue(stem, kk().issuer(), v.getIssuer());
         stem.put(kk().maxClients(), Long.valueOf(v.getMaxClients()));

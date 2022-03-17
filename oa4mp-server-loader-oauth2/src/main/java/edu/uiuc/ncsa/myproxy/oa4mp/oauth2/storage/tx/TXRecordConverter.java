@@ -37,6 +37,9 @@ public class TXRecordConverter<V extends TXRecord> extends MapConverter<V> {
         txr.setLifetime(map.getLong(tkeys().lifetime()));
         txr.setIssuedAt(map.getLong(tkeys().issuedAt()));
         txr.setTokenType(map.getString(tkeys().tokenType()));
+        if(map.containsKey(tkeys().storedToken())){
+            txr.setStoredToken(map.getString(tkeys().storedToken()));
+        }
         if (map.containsKey(tkeys().issuer()) && map.get(tkeys().issuer()) != null) {
             txr.setIssuer(map.getString(tkeys().issuer()));
         }
@@ -72,7 +75,9 @@ public class TXRecordConverter<V extends TXRecord> extends MapConverter<V> {
         data.put(tkeys().expiresAt(), value.getExpiresAt());
         data.put(tkeys().isValid(), value.isValid());
         data.put(tkeys().tokenType(), value.getTokenType());
-
+       if(value.getStoredToken()!=null){
+           data.put(tkeys().storedToken(), value.getStoredToken());
+       }
         if (value.hasScopes()) {
             JSONArray array;
             if (value.getScopes() instanceof JSONArray) {

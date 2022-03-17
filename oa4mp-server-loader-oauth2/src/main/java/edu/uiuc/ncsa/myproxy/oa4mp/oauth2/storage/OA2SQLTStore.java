@@ -24,7 +24,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction.RFC862_STATE_KEY;
 
@@ -32,10 +34,10 @@ import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction.RFC862_ST
  * <p>Created by Jeff Gaynor<br>
  * on 3/25/14 at  10:30 AM
  */
-public class OA2SQLTStore<V extends OA2ServiceTransaction> extends DSSQLTransactionStore<V> implements RFC8628Store<V>, RefreshTokenStore<V>, UsernameFindable<V> {
+public class OA2SQLTStore<V extends OA2ServiceTransaction> extends DSSQLTransactionStore<V> implements OA2TStoreInterface<V> {
     @Override
     public String getCreationTSField() {
-        return ((OA2TransactionKeys)getMapConverter().getKeys()).authTime();
+        return ((OA2TransactionKeys) getMapConverter().getKeys()).authTime();
     }
 
     public OA2SQLTStore(TokenForge tokenForge, ConnectionPool connectionPool, Table table, Provider<V> idp, MapConverter converter) {
@@ -77,18 +79,58 @@ public class OA2SQLTStore<V extends OA2ServiceTransaction> extends DSSQLTransact
                 rs.close();
                 stmt.close();
                 releaseConnection(cr);
-                throw new TransactionNotFoundException("No transaction found for identifier \"" + username + "\"");
+                throw new TransactionNotFoundException("No transaction found for username \"" + username + "\"");
             }
 
             rs.close();
             stmt.close();
             releaseConnection(cr);
         } catch (SQLException e) {
-            throw new GeneralException("Error getting transaction with identifier \"" + username + "\"", e);
+            throw new GeneralException("Error getting transaction with username \"" + username + "\"", e);
         }
         return list;
 
     }
+
+    @Override
+    public Map<Identifier, List<TokenInfoRecord>> getTokenInfo(String username) {
+        OA2TransactionTable table = (OA2TransactionTable) getTransactionTable();
+        String statement = table.getTokenInfoStatement();
+        if (username == null) {
+            throw new IllegalStateException("Error: a null identifier was supplied");
+        }
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
+        HashMap<Identifier, List<TokenInfoRecord>> records = new HashMap<>();
+        List<TokenInfoRecord> list;
+        TokenInfoRecord tir = null;
+        try {
+            PreparedStatement stmt = c.prepareStatement(statement);
+            stmt.setString(1, username);
+            stmt.executeQuery();
+            ResultSet rs = stmt.getResultSet();
+
+            while (rs.next()) {
+                ColumnMap map = rsToMap(rs);
+                tir = new TokenInfoRecord();
+                tir.fromMap(map, table.getOA2Keys());
+                Identifier clientID = tir.clientID;
+                if (!records.containsKey(clientID)) {
+                    records.put(clientID, new ArrayList<>());
+                }
+                records.get(clientID).add(tir);
+            }
+
+            rs.close();
+            stmt.close();
+            releaseConnection(cr);
+        } catch (SQLException e) {
+            throw new GeneralException("Error getting transaction with username \"" + username + "\"", e);
+        }
+        return records;
+
+    }
+
     /**
      * Since this is  potentially a very intensive operation run only once at startup
      * this has been tweaked to exactly let the database grab the minimum and process it here.
@@ -132,14 +174,15 @@ public class OA2SQLTStore<V extends OA2ServiceTransaction> extends DSSQLTransact
     @Override
     public V getByProxyID(Identifier proxyID) {
         OA2TransactionTable oa2TT = (OA2TransactionTable) getTable();
-              return getSingleValue(proxyID.toString(), oa2TT.getByProxyID());
+        return getSingleValue(proxyID.toString(), oa2TT.getByProxyID());
     }
 
     @Override
     public V getByUserCode(String userCode) {
         OA2TransactionTable oa2TT = (OA2TransactionTable) getTable();
-              return getSingleValue(userCode, oa2TT.getByUserCode());
+        return getSingleValue(userCode, oa2TT.getByUserCode());
     }
+
     public V getSingleValue(String targetString, String preparedStatement) {
         ConnectionRecord cr = getConnection();
         Connection c = cr.connection;
@@ -179,6 +222,7 @@ public class OA2SQLTStore<V extends OA2ServiceTransaction> extends DSSQLTransact
 
     /**
      * TODO - Improve this with a specific query later.
+     *
      * @param userCode
      * @return
      */

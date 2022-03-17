@@ -30,6 +30,8 @@ public class AdminClientConverter<V extends AdminClient> extends BaseClientConve
     @Override
     public V fromJSON(JSONObject json) {
         V v = super.fromJSON(json);
+        v.setListUsers(getJsonUtil().getJSONValueBoolean(json, getACK().listUsers()));
+        v.setListUsersInOtherClients(getJsonUtil().getJSONValueBoolean(json, getACK().listUsersInOtherClients()));
         v.setNotifyOnNewClientCreate(getJsonUtil().getJSONValueBoolean(json, getACK().notifyOnNewClientCreate()));
         v.setIssuer(getJsonUtil().getJSONValueString(json, getACK().issuer()));
         v.setExternalVOName(getJsonUtil().getJSONValueString(json, getACK().vo()));
@@ -49,18 +51,27 @@ public class AdminClientConverter<V extends AdminClient> extends BaseClientConve
         value.setExternalVOName(map.getString(getACK().vo()));
         try {
             value.setVirtualOrganization(BasicIdentifier.newID(map.getString(getACK().voURI())));
-        }catch(Throwable t){
+        } catch (Throwable t) {
             throw new GeneralException("Error reading " + getACK().voURI() + " field in database: \"" + t.getMessage() + "\"");
         }
 
         value.setIssuer(map.getString(getACK().issuer()));
-        if(map.containsKey(getACK().allowQDL())) {
+        if (map.containsKey(getACK().allowQDL())) {
             // older clients won't have this, so don't force the issue.
             value.setAllowQDL(map.getBoolean(getACK().allowQDL()));
         }
-        if(map.containsKey(getACK().notifyOnNewClientCreate())){
+        if (map.containsKey(getACK().notifyOnNewClientCreate())) {
             value.setNotifyOnNewClientCreate(map.getBoolean(getACK().notifyOnNewClientCreate()));
         }
+
+        if (map.containsKey(getACK().listUsers())) {
+            value.setListUsers(map.getBoolean(getACK().listUsers()));
+        }
+
+        if (map.containsKey(getACK().listUsersInOtherClients())) {
+            value.setListUsersInOtherClients(map.getBoolean(getACK().listUsersInOtherClients()));
+        }
+
         // implies that this might be a legacy admin client and has a database entry that is null
         // rather than an integer. In that case, set it to the default.
         if (!map.containsKey(getACK().maxClients()) || map.get(getACK().maxClients()) == null) {
@@ -83,13 +94,15 @@ public class AdminClientConverter<V extends AdminClient> extends BaseClientConve
     public void toJSON(V client, JSONObject json) {
         super.toJSON(client, json);
         getJsonUtil().setJSONValue(json, getACK().vo(), client.getExternalVOName());
-        if(client.getVirtualOrganization() != null) {
+        if (client.getVirtualOrganization() != null) {
             getJsonUtil().setJSONValue(json, getACK().voURI(), client.getVirtualOrganization().toString());
         }
         getJsonUtil().setJSONValue(json, getACK().issuer(), client.getIssuer());
         getJsonUtil().setJSONValue(json, getACK().maxClients(), client.getMaxClients());
         getJsonUtil().setJSONValue(json, getACK().allowQDL(), client.isAllowQDL());
         getJsonUtil().setJSONValue(json, getACK().notifyOnNewClientCreate(), client.isNotifyOnNewClientCreate());
+        getJsonUtil().setJSONValue(json, getACK().listUsers(), client.isListUsers());
+        getJsonUtil().setJSONValue(json, getACK().listUsersInOtherClients(), client.isListUsersInOtherClients());
         if (client.getConfig() != null && !client.getConfig().isEmpty()) {
             json.put(getACK().config(), client.getConfig());
         }
@@ -103,6 +116,8 @@ public class AdminClientConverter<V extends AdminClient> extends BaseClientConve
         map.put(getACK().maxClients(), client.getMaxClients());
         map.put(getACK().allowQDL(), client.isAllowQDL());
         map.put(getACK().notifyOnNewClientCreate(), client.isNotifyOnNewClientCreate());
+        map.put(getACK().listUsers(), client.isListUsers());
+        map.put(getACK().listUsersInOtherClients(), client.isListUsersInOtherClients());
         if (client.getConfig() != null && !client.getConfig().isEmpty()) {
             map.put(getACK().config(), client.getConfig().toString(1)); // make it pretty at least...
         }

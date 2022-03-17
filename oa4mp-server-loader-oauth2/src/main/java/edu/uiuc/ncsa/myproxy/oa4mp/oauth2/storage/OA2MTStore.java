@@ -8,13 +8,15 @@ import edu.uiuc.ncsa.security.delegation.storage.impl.TransactionMemoryStore;
 import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 3/25/14 at  12:51 PM
  */
-public class OA2MTStore<V extends OA2ServiceTransaction> extends TransactionMemoryStore<V> implements RefreshTokenStore<V>, UsernameFindable<V>, RFC8628Store<V> {
+public class OA2MTStore<V extends OA2ServiceTransaction> extends TransactionMemoryStore<V> implements OA2TStoreInterface<V> {
     public OA2MTStore(IdentifiableProvider identifiableProvider) {
         super(identifiableProvider);
     }
@@ -59,7 +61,7 @@ public class OA2MTStore<V extends OA2ServiceTransaction> extends TransactionMemo
     }
 
     @Override
-    public OA2ServiceTransaction get(RefreshToken refreshToken) {
+    public V get(RefreshToken refreshToken) {
         return getRTIndex().get(refreshToken.getToken());
     }
 
@@ -74,7 +76,23 @@ public class OA2MTStore<V extends OA2ServiceTransaction> extends TransactionMemo
         }
         return list;
     }
-
+    @Override
+    public Map<Identifier, List<TokenInfoRecord>> getTokenInfo(String username) {
+        Map<Identifier, List<TokenInfoRecord>> records = new HashMap<>();
+        for (Identifier id : keySet()) {
+            V transaction = get(id);
+            if (transaction != null ) {
+                TokenInfoRecord tir = new TokenInfoRecord();
+                tir.fromTransaction(transaction);
+                Identifier clientID = tir.clientID;
+                if (!records.containsKey(clientID)) {
+                    records.put(clientID, new ArrayList<>());
+                }
+                records.get(clientID).add(tir);
+            }
+        }
+        return records;
+    }
 
     @Override
     public List<RFC8628State> getPending() {

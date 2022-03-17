@@ -194,4 +194,32 @@ public class AdminClient extends BaseClient {
     }
 
     boolean notifyOnNewClientCreate = false;
+
+    boolean listUsers = false;
+    boolean listUserInOtherClients = false;
+
+    /**
+     * If this client can list information about a given users tokens.
+     * @return
+     */
+    public boolean isListUsers() {
+        return listUsers;
+    }
+
+    public void setListUsers(boolean listUsers) {
+        this.listUsers = listUsers;
+    }
+
+    /**
+     * If this client can list information about a given user's tokens from <i>other</i>
+     * clients. This implies that {@link #isListUsers()} is <b>true</b>.
+     * @return
+     */
+    public boolean isListUsersInOtherClients() {
+        return listUserInOtherClients;
+    }
+
+    public void setListUsersInOtherClients(boolean listUserInOtherClients) {
+        this.listUserInOtherClients = listUserInOtherClients;
+    }
 }

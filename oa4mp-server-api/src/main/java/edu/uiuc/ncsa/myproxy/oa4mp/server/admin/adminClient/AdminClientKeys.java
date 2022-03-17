@@ -21,6 +21,18 @@ public class AdminClientKeys extends BaseClientKeys {
     String notifyOnNewClientCreate="new_client_notify";
     String vo="vo";
     String voURI="vo_uri";
+    String listUsers = "list_users";
+    String listUsersInOtherClients = "list_users_other_clients";
+
+    public String listUsers(String... x) {
+        if (0 < x.length) listUsers= x[0];
+        return listUsers;
+    }
+
+    public String listUsersInOtherClients(String... x) {
+        if (0 < x.length) listUsersInOtherClients= x[0];
+        return listUsersInOtherClients;
+    }
 
     public String notifyOnNewClientCreate(String... x) {
            if (0 < x.length) notifyOnNewClientCreate= x[0];
@@ -68,6 +80,8 @@ public class AdminClientKeys extends BaseClientKeys {
         allKeys.add(voURI());
         allKeys.add(allowQDL());
         allKeys.add(notifyOnNewClientCreate());
+        allKeys.add(listUsers());
+        allKeys.add(listUsersInOtherClients());
         return allKeys;
     }
 }

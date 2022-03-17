@@ -23,6 +23,7 @@ public class TXRecordSerializationKeys extends SerializationKeys {
     String parentID = "parent_id";
     String resource = "resource";
     String scopes = "scopes";
+    String storedToken = "stored_token";
     String tokenType = "token_type";
     // If attributes get added or deleted, update TXRStemMC or you will break QDL support.
 
@@ -65,7 +66,10 @@ public class TXRecordSerializationKeys extends SerializationKeys {
         return scopes;
     }
 
-
+    public String storedToken(String... x) {
+        if (0 < x.length) storedToken = x[0];
+        return storedToken;
+    }
 
     public String tokenType(String... x) {
         if (0 < x.length) tokenType = x[0];

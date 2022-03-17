@@ -13,13 +13,15 @@ import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 3/12/14 at  1:21 PM
  */
-public class OA2FSTStore<V extends OA2ServiceTransaction> extends DSFSTransactionStore<V> implements RefreshTokenStore<V>, UsernameFindable<V>, RFC8628Store<V> {
+public class OA2FSTStore<V extends OA2ServiceTransaction> extends DSFSTransactionStore<V> implements OA2TStoreInterface<V> {
 
     public OA2FSTStore(File storeDirectory, File indexDirectory,
                        IdentifiableProvider<V> idp,
@@ -79,6 +81,24 @@ public class OA2FSTStore<V extends OA2ServiceTransaction> extends DSFSTransactio
             }
         }
         return list;
+    }
+
+    @Override
+    public Map<Identifier, List<TokenInfoRecord>> getTokenInfo(String username) {
+        Map<Identifier, List<TokenInfoRecord>> records = new HashMap<>();
+        for (Identifier id : keySet()) {
+            V transaction = get(id);
+            if (transaction != null ) {
+                TokenInfoRecord tir = new TokenInfoRecord();
+                tir.fromTransaction(transaction);
+                Identifier clientID = tir.clientID;
+                if (!records.containsKey(clientID)) {
+                    records.put(clientID, new ArrayList<>());
+                }
+                records.get(clientID).add(tir);
+            }
+        }
+        return records;
     }
 
     // Dog slow on larger stores, but there is really almost no other way than to look...
