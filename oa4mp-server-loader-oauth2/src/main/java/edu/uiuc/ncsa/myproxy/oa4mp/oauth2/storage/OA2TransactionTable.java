@@ -36,6 +36,8 @@ public class OA2TransactionTable extends DSTransactionTable {
         getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().validatedScopes(), Types.LONGVARCHAR));
         getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().reqState(), Types.LONGVARCHAR));
         getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().userCode(), Types.LONGVARCHAR));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().atJWT(), Types.LONGVARCHAR));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().rtJWT(), Types.LONGVARCHAR));
     }
 
     public String getByRefreshTokenStatement() {
@@ -49,6 +51,8 @@ public class OA2TransactionTable extends DSTransactionTable {
     public String getTokenInfoStatement() {
            return "SELECT " +
                    getOA2Keys().identifier() + ", " +
+                   getOA2Keys().atJWT() + ", " +
+                   getOA2Keys().rtJWT() + ", " +
                    getOA2Keys().clientKey() + ", " +
                    getOA2Keys().accessToken() + ", " +
                    getOA2Keys().accessTokenValid() + ", " +

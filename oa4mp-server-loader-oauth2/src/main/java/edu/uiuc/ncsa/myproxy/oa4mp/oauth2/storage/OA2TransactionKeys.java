@@ -16,6 +16,7 @@ public class OA2TransactionKeys extends DSTransactionKeys {
     }
 
     protected String authTime = "auth_time";
+    protected String atJWT = "at_jwt";
     protected String authzGrantLifetime = "authz_grant_lifetime";
     protected String expiresIn = "expires_in";
     protected String isRFC8628  = "is_rfc_8628";
@@ -24,6 +25,7 @@ public class OA2TransactionKeys extends DSTransactionKeys {
     protected String refreshTokenLifetime = "refresh_token_lifetime";
     protected String refreshTokenValid = "refresh_token_valid";
     protected String reqState = "req_state";
+    protected String rtJWT = "rt_jwt";
     protected String scopes = "scopes";
     protected String states = "states";
     protected String userCode  = "user_code";
@@ -31,6 +33,15 @@ public class OA2TransactionKeys extends DSTransactionKeys {
     /*
      If you add keys or change these, you need to update TransactionStemMC or QDL support will break
      */
+    public String rtJWT(String... x) {
+        if (0 < x.length) rtJWT = x[0];
+        return rtJWT;
+    }
+
+    public String atJWT(String... x) {
+        if (0 < x.length) atJWT = x[0];
+        return atJWT;
+    }
 
     public String proxyID(String... x) {
         if (0 < x.length) proxyID = x[0];

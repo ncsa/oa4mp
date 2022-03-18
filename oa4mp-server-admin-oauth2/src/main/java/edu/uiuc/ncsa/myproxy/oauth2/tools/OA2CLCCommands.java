@@ -829,7 +829,7 @@ public class OA2CLCCommands extends CLCCommands {
             }
         }
         if (isPrintOuput()) {
-            printTokens(inputLine.hasArg(NO_VERIFY_JWT), false);
+            printTokens(inputLine.hasArg(NO_VERIFY_JWT), true);
         }
     }
 
@@ -1225,9 +1225,9 @@ public class OA2CLCCommands extends CLCCommands {
             // Note that the call updates the asset, so we don't need to look at the response,
             // just print th right thing.
             if (requestAT) {
-                printToken(getDummyAsset().getAccessToken(), false, false);
+                printToken(getDummyAsset().getAccessToken(), false, true);
             } else {
-                printToken(getDummyAsset().getRefreshToken(), false, false);
+                printToken(getDummyAsset().getRefreshToken(), false, true);
             }
         }catch (Throwable t){
             lastException = t;

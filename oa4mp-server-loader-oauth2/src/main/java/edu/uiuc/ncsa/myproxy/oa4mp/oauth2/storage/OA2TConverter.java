@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.TransactionConverter;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
@@ -68,6 +69,13 @@ public class OA2TConverter<V extends OA2ServiceTransaction> extends TransactionC
                 st.setAuthorizationGrant(ag);
             }
         }
+        if(map.containsKey(getTCK().atJWT())){
+            st.setATJWT(map.getString(getTCK().atJWT()));
+        }
+        if(map.containsKey(getTCK().rtJWT())){
+            st.setRTJWT(map.getString(getTCK().rtJWT()));
+        }
+
         st.setUserCode(map.getString(getTCK().userCode()));
         st.setRFC8628Request(map.getBoolean(getTCK().isRFC8628()));
         st.setProxyId(map.getString(getTCK().proxyID()));
@@ -144,6 +152,12 @@ public class OA2TConverter<V extends OA2ServiceTransaction> extends TransactionC
         map.put(getTCK().refreshTokenValid(), t.isRefreshTokenValid());
         if (t.getCallback() != null) {
             map.put(getTCK().callbackUri(), t.getCallback().toString());
+        }
+        if(!StringUtils.isTrivial(t.getATJWT())){
+            map.put(getTCK().atJWT(), t.getATJWT());
+        }
+        if(!StringUtils.isTrivial(t.getRTJWT())){
+            map.put(getTCK().rtJWT(), t.getRTJWT());
         }
 
         map.put(getTCK().authzGrantLifetime(), t.getAuthzGrantLifetime());

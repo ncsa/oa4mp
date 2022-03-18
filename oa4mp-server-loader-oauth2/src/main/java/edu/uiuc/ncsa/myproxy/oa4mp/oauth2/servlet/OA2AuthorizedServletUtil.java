@@ -62,7 +62,7 @@ public class OA2AuthorizedServletUtil {
 
     /**
      * Main entry point for this class. Call this. It does <b>not</b> do claims processing. That is done in the
-     * {@link OA2AuthorizationServer#createRedirect(HttpServletRequest, HttpServletResponse, ServiceTransaction)}
+     * createRedirect(HttpServletRequest, HttpServletResponse, ServiceTransaction)
      * which is the last possible point to do it.
      *
      * @param req

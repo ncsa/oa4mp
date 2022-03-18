@@ -566,16 +566,16 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             } else {
                 rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getRefreshToken().encodeToken()); // Required
                 rfcClaims.put(OA2Constants.REFRESH_TOKEN, rtiResponse.getRefreshToken().encodeToken()); // Optional
-                newTXR.setStoredToken(rtiResponse.getRefreshToken().encodeToken());
+                //newTXR.setStoredToken(rtiResponse.getRefreshToken().encodeToken());
             }
         } else {
             if (((AccessTokenImpl) rtiResponse.getAccessToken()).isJWT()) {
                 rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getAccessToken().getToken()); // Required.
-                newTXR.setStoredToken(rtiResponse.getRefreshToken().getToken());
+                newTXR.setStoredToken(rtiResponse.getAccessToken().getToken());
 
             } else {
                 rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getAccessToken().encodeToken()); // Required.
-                newTXR.setStoredToken(rtiResponse.getRefreshToken().encodeToken());
+                //newTXR.setStoredToken(rtiResponse.getAccessToken().encodeToken());
             }
             // create scope string  Remember that these may have been changed by a script,
             // so here is the right place to set it.
@@ -1052,6 +1052,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             debugger.warn(this, "Unable to update claims on token refresh: \"" + throwable.getMessage() + "\"");
         }
         setupTokens(client, rtiResponse, oa2SE, t, jwtRunner);
+
         debugger.trace(this, "finished processing claims.");
 
         // At this point, key in the transaction store is the grant, so changing the access token
@@ -1080,6 +1081,16 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             rtiResponse.setJsonWebKey(vo.getJsonWebKeys().get(vo.getDefaultKeyID()));
         }
         rtiResponse.setClaims(t.getUserMetaData());
+        // In refresh, both the access token and refresh token are replaced in the transaction,
+        // and a new TXRecord pointing to the AT is made. If these are JWTs, stash them for use later
+        // when getting token_info. Cannot do that until all other processing is done.
+        if(((AccessTokenImpl)rtiResponse.getAccessToken()).isJWT()){
+            t.setATJWT(rtiResponse.getAccessToken().getToken());
+            txRecord.setStoredToken(rtiResponse.getAccessToken().getToken());
+        }
+        if(rtiResponse.getRefreshToken().isJWT()){
+            t.setRTJWT(rtiResponse.getRefreshToken().getToken());
+        }
         getTransactionStore().save(t);
         oa2SE.getTxStore().save(txRecord);
         debugger.trace(this, "transaction saved for " + t.getIdentifierString());

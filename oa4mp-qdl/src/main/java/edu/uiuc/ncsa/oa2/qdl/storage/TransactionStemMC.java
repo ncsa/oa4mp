@@ -64,13 +64,15 @@ public class TransactionStemMC<V extends OA2ServiceTransaction> extends StemConv
     String username = "username";
     String myproxyUsername = "myproxyUsername";
 
-    OA2 specific keys (12)
+    OA2 specific keys (14)
     protected String authTime = "auth_time";
+    protected String atJWT = "at_jwt";
     protected String authzGrantLifetime = "authz_grant_lifetime";
     protected String expiresIn = "expires_in";
     protected String isRFC8628  = "is_rfc_8628";
     protected String proxyID  = "proxy_id";
     protected String refreshToken = "refresh_token";
+    protected String rtJWT = "rt_jwt";
 
     protected String refreshTokenLifetime = "refresh_token_lifetime";
     protected String refreshTokenValid = "refresh_token_valid";
@@ -162,11 +164,13 @@ public class TransactionStemMC<V extends OA2ServiceTransaction> extends StemConv
             Date date = new Date(stem.getLong(kk().authTime()));
             v.setAuthTime(date);
         }
+        if (stem.containsKey(kk().atJWT())) {v.setATJWT(stem.getString(kk().atJWT()));}
         if (stem.containsKey(kk().authzGrantLifetime())) {v.setAuthGrantLifetime(stem.getLong(kk().authzGrantLifetime()));}
         if (stem.containsKey(kk().expiresIn())) {v.setAccessTokenLifetime(stem.getLong(kk().expiresIn()));}
         if(stem.containsKey(kk().isRFC8628())){v.setRFC8628Request(stem.getBoolean(kk().isRFC8628()));        }
         if(stem.containsKey(kk().proxyID())){v.setProxyId(stem.getString(kk().proxyID()));        }
         if (stem.containsKey(kk().refreshToken())) {v.setRefreshToken(new RefreshTokenImpl(URI.create(stem.getString(kk().refreshToken()))));}
+        if (stem.containsKey(kk().rtJWT())) {v.setRTJWT(stem.getString(kk().rtJWT()));}
         // 5
         if (stem.containsKey(kk().refreshTokenLifetime())) {v.setRefreshTokenLifetime(stem.getLong(kk().refreshTokenLifetime()));}
         if (stem.containsKey(kk().refreshTokenValid())) {v.setRefreshTokenValid(stem.getBoolean(kk().refreshTokenValid()));}
@@ -211,6 +215,7 @@ public class TransactionStemMC<V extends OA2ServiceTransaction> extends StemConv
         // 5 attributes
         /*
     protected String authTime = "auth_time";
+    protected String atJWT = "at_jwt";
     protected String authzGrantLifetime = "authz_grant_lifetime";
     protected String expiresIn = "expires_in";
     protected String isRFC8628  = "is_rfc_8628";
@@ -219,6 +224,7 @@ public class TransactionStemMC<V extends OA2ServiceTransaction> extends StemConv
     protected String refreshTokenLifetime = "refresh_token_lifetime";
     protected String refreshTokenValid = "refresh_token_valid";
     protected String reqState = "req_state";
+    protected String rtJWT = "rt_jwt";
     protected String scopes = "scopes";
     protected String states = "states";
     protected String userCode  = "user_code";
@@ -234,6 +240,8 @@ public class TransactionStemMC<V extends OA2ServiceTransaction> extends StemConv
         stem.put(kk().isRFC8628(), v.isRFC8628Request());
 
         setNonNullStemValue(stem, kk().proxyID(), v.getProxyId());
+        setNonNullStemValue(stem, kk().atJWT(), v.getATJWT());
+        setNonNullStemValue(stem, kk().rtJWT(), v.getRTJWT());
         if (v.getRefreshToken() != null) {
             stem.put(kk().refreshToken(), v.getRefreshToken().getToken());
         }

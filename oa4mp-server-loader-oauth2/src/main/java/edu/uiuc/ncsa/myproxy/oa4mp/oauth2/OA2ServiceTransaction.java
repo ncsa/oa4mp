@@ -643,32 +643,32 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
 
     /**
      * If an JWT access token was returned, a copy is saved here.
+     *
      * @return
      */
     public String getATJWT() {
-        if (!getState().containsKey(RETURNED_ACCESS_TOKEN_JWT_KEY)) {
-            return null;
-        }
-        return getState().getString(RETURNED_ACCESS_TOKEN_JWT_KEY);
+        return atJWT;
     }
 
+    String atJWT = null;
+
     public void setATJWT(String atJWT) {
-        getState().put(RETURNED_ACCESS_TOKEN_JWT_KEY, atJWT);
+        this.atJWT = atJWT;
     }
 
     /**
      * If an JWT refresh token was returned, a copy is saved here.
+     *
      * @return
      */
     public String getRTJWT() {
-        if (!getState().containsKey(RETURNED_REFRESH_TOKEN_JWT_KEY)) {
-            return null;
-        }
-        return getState().getString(RETURNED_REFRESH_TOKEN_JWT_KEY);
+        return rtJWT;
     }
 
+    String rtJWT = null;
+
     public void setRTJWT(String rtJWT) {
-        getState().put(RETURNED_REFRESH_TOKEN_JWT_KEY, rtJWT);
+        this.rtJWT = rtJWT;
     }
 
 }
