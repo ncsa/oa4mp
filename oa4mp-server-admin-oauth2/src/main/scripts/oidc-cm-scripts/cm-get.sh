@@ -3,6 +3,7 @@
 # the properties for the client.
 # You MUST register and have approved an admin client for this to work.  This script sets all the headers and such
 # you need to do and monitors the response.
+# An empty REGISTRATION_URI will result in retrieving all the clients created by the admin client.
 #
 # E.g.
 # ./cm-get.sh create.json
