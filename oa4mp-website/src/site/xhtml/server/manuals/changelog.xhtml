@@ -10,8 +10,35 @@
 <body class="composite">
 <!--#include virtual="../../header.html" -->
 <p>Changes to the OA4MP server by version.</p>
+
+<h2>5.2.5</h2>
+<p>Release date 2022-03-29</p>
+<ul>
+    <li><a href="https://github.com/ncsa/OA4MP/issues/44">issue #44</a>: Document querying client management endpoint for all clients
+        associated with a given admin client.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-771">CIL-771</a>: (experimental) token info endpoint.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-869">CIL-869</a>: Documented extra parameters for the
+        <a href="../manuals/dynamic-client-registration.html">dynamic client registration endpoint.</a></li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-1145">CIL-1145</a>: All references to log 4 java have been removed.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-1146">CIL-1146</a>: Client server proxying has been implemented. Read up on it
+    <a href="../manuals/using-proxies.html">here</a></li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-1166">CIL-1166</a>: Python library interoperability issue,</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-1184">CIL-1184</a>: Wrong entry in listing the cleanup interval property in the server properties table.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-1187">CIL-1187</a>: Errors in setTransactionState should be more descriptive</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-1193">CIL-1193</a>: Support for CRT (Chinese Remainder Theorem) when
+        generating public/private key pairs.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-1206">CIL-1206</a>: QDL state serialization bug involving whitespace for token exchange
+    records.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-1208">CIL-1208</a>: Dependabot alerts for PostGreSQL version. Does not impact us,
+    but there is no update to the version they require for Java 8 libraries.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-1211">CIL-1211</a>: Garbage collection race condition. If a user starts an auth flow, their
+    code is invalid until they log in. If the garbage collector runs between the time the flow starts and they finish their login, the transaction
+    will have been garbage collected.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-1088">CIL-1088</a>: </li>
+</ul>
+
 <h2>5.2.4</h2>
-<p>Release Date 2022-02-01</p>
+<p>Release date 2022-02-01</p>
 <ul>
     <li><a href="https://github.com/ncsa/OA4MP/issues/16">issue #16</a>: Remove GPG signing for maven.</li>
     <li><a href="https://github.com/ncsa/OA4MP/issues/17">issue #17</a>: Fix scope documentation.</li>

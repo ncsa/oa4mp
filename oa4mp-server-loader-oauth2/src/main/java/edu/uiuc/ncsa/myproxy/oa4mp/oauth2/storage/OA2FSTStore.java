@@ -13,9 +13,7 @@ import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -84,18 +82,14 @@ public class OA2FSTStore<V extends OA2ServiceTransaction> extends DSFSTransactio
     }
 
     @Override
-    public Map<Identifier, List<TokenInfoRecord>> getTokenInfo(String username) {
-        Map<Identifier, List<TokenInfoRecord>> records = new HashMap<>();
+    public TokenInfoRecordMap getTokenInfo(String username) {
+        TokenInfoRecordMap records = new TokenInfoRecordMap();
         for (Identifier id : keySet()) {
             V transaction = get(id);
             if (transaction != null ) {
                 TokenInfoRecord tir = new TokenInfoRecord();
                 tir.fromTransaction(transaction);
-                Identifier clientID = tir.clientID;
-                if (!records.containsKey(clientID)) {
-                    records.put(clientID, new ArrayList<>());
-                }
-                records.get(clientID).add(tir);
+                records.put(tir);
             }
         }
         return records;

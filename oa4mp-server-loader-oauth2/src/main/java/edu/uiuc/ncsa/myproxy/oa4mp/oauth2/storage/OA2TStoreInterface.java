@@ -8,7 +8,6 @@ import edu.uiuc.ncsa.security.delegation.storage.TransactionStore;
 import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -25,7 +24,7 @@ public interface OA2TStoreInterface<V extends OA2ServiceTransaction> extends Sto
     @Override
     List<V> getByUsername(String username);
 
-    Map<Identifier, List<TokenInfoRecord>> getTokenInfo(String username);
+    TokenInfoRecordMap getTokenInfo(String username);
 
     @Override
     List<RFC8628State> getPending();

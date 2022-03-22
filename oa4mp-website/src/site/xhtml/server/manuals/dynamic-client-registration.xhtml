@@ -50,6 +50,11 @@
     <li><b>DELETE</b> will remove the client and all of its information from the server</li>
 </ul>
 
+<p>
+    <b>Note:</b> OA4MP does have one nice little extension for querying clients.
+    If you do a GET with no client id, then a list of all client ids and their
+    names will be returned.</p>
+
 <h3>The toolkit</h3>
 <p>Included with the latest release on <a href="https://github.com/ncsa/OA4MP">GitHub</a>
     are a suite of associated command line scripts in oidc-cm-scripts.tar aka the <b><i>toolkit</i></b>
@@ -62,6 +67,19 @@
     and many examples. There is also a very detailed
     <a href="https://github.com/ncsa/OA4MP/blob/master/oa4mp-server-admin-oauth2/src/main/scripts/oidc-cm-scripts/readme.txt">readme.txt</a>
     in the toolkit.</p>
+
+<h3>Parameters specific to OA4MP</h3>
+<p>OA4MP allows you to specify several client properties that it uses which are not in the specification.
+These are</p>
+<ul>
+    <li>rt_lifetime = the lifetime in seconds that a refresh token may have</li>
+    <li>at_lifetime = the lifetime in seconds that an access token may have</li>
+    <li>strict_scopes = a boolean that when <b>true</b> (default) will reject any scopes not explicitly set.
+    When <b>false</b>, any scope may be sent. This is typically set to <b>false</b> for clients that return
+    JWTs as access tokens.</li>
+</ul>
+<p>Note that all of these are subject to server policies. You may request an outlandish refresh token
+lifetime, e.g., but if serverpolicy restricts it, then the server will make the final determination.</p>
 
 <h3>Notes on Legal Requests</h3>
 <p>What values can be sent and are accepted?</p>

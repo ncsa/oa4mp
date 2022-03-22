@@ -1,15 +1,19 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
 import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
 import edu.uiuc.ncsa.security.delegation.token.impl.TokenImpl;
 import edu.uiuc.ncsa.security.delegation.token.impl.TokenUtils;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
+import edu.uiuc.ncsa.security.oauth_2_0.server.RFC8693Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnMap;
 import net.sf.json.JSONObject;
+
+import java.net.URI;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -40,9 +44,9 @@ public class TokenInfoRecord {
             accessToken = new AccessTokenImpl(map.getURI(keys.accessToken()));
         }
         atValid = map.getBoolean(keys.accessTokenValid());
-        rtValid = map.getBoolean(keys.refreshTokenValid());
         atLifetime = map.getLong(keys.expiresIn());
         rtLifetime = map.getLong(keys.refreshTokenLifetime());
+        rtValid = map.getBoolean(keys.refreshTokenValid());
         if(map.containsKey(keys.rtJWT()) && null!=map.get(keys.rtJWT())) {
             // Its a JWT
             refreshToken = new RefreshTokenImpl(map.getString(keys.rtJWT()),map.getURI(keys.refreshToken()));
@@ -77,8 +81,12 @@ public class TokenInfoRecord {
 
     public JSONObject toJSON(){
         JSONObject tokens = new JSONObject();
-        tokens.put(OA2Constants.ACCESS_TOKEN,  formatToken(accessToken, atLifetime,  atValid));
-        tokens.put(OA2Constants.REFRESH_TOKEN,  formatToken(refreshToken, rtLifetime, rtValid));
+        if(accessToken!=null) {
+            tokens.put(OA2Constants.ACCESS_TOKEN, formatToken(accessToken, atLifetime, atValid));
+        }
+        if(refreshToken != null) {
+            tokens.put(OA2Constants.REFRESH_TOKEN, formatToken(refreshToken, rtLifetime, rtValid));
+        }
         return tokens;
     }
     protected JSONObject formatToken(TokenImpl token, long lifetime,boolean isValid){
@@ -93,5 +101,63 @@ public class TokenInfoRecord {
         json.put("issued_at" , token.getIssuedAt());
         json.put("is_valid",isValid);
         return json;
+    }
+    public boolean hasAccessToken(){
+        return accessToken != null;
+    }
+    public boolean hasRefreshToken(){
+        return refreshToken != null;
+    }
+
+    /**
+     * This has either a refresh or an access token
+     * @param txr
+     */
+    public void fromTXRecord(Identifier clientID, TXRecord txr){
+        if(txr == null){
+            return; // nixx to do
+        }
+        this.clientID = clientID;
+        if(txr.getTokenType().equals(RFC8693Constants.ACCESS_TOKEN_TYPE)){
+            if(txr.getStoredToken()==null){
+                // its a JWT
+                accessToken = new AccessTokenImpl(URI.create(txr.getIdentifierString()));
+            }else{
+                accessToken = new AccessTokenImpl(txr.getStoredToken(), URI.create(txr.getIdentifierString()));
+            }
+            atLifetime = accessToken.getLifetime();
+            atValid = txr.isValid();
+        }
+        if(txr.getTokenType().equals(RFC8693Constants.REFRESH_TOKEN_TYPE)){
+            if(txr.getStoredToken()==null){
+                // its a JWT
+                refreshToken = new RefreshTokenImpl(URI.create(txr.getIdentifierString()));
+            }else{
+                refreshToken = new RefreshTokenImpl(txr.getStoredToken(), URI.create(txr.getIdentifierString()));
+            }
+            rtLifetime = refreshToken.getLifetime();
+            rtValid = txr.isValid();
+
+        }
+
+        transactionID= txr.getParentID();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(!(obj instanceof TokenInfoRecord)){
+            return false;
+        }
+        if(obj == null){
+            return false;
+        }
+        TokenInfoRecord tir = (TokenInfoRecord) obj;
+        if(hasAccessToken()){
+            return accessToken.equals(tir.accessToken);
+        }
+        if(hasRefreshToken()){
+            return refreshToken.equals(tir.refreshToken);
+        }
+        return false;
     }
 }

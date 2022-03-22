@@ -229,11 +229,13 @@ public class ClientUtils {
 
         OA2ServiceTransaction st = (OA2ServiceTransaction) transactionState.getTransaction();
         MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(st.getOA2Client());
+        /*
         debugger.trace(ClientUtils.class, ".resolveScopes: stored client scopes =" + ((OA2Client) st.getClient()).getScopes());
         debugger.trace(ClientUtils.class, ".resolveScopes: passed in scopes =" + rawScopes);
         debugger.trace(ClientUtils.class, ".resolveScopes: Scope util =" + OA2Scopes.ScopeUtil.getScopes());
         debugger.trace(ClientUtils.class, ".resolveScopes: server scopes=" + ((OA2SE) getServiceEnvironment()).getScopes());
         debugger.trace(ClientUtils.class, ".resolveScopes: user validated scopes=" + st.getValidatedScopes());
+        */
         if (rawScopes == null || rawScopes.length() == 0) {
             if (isRFC8628) {
                 // It is not an error if this is the RFC8628 servlet. Just return an empty list

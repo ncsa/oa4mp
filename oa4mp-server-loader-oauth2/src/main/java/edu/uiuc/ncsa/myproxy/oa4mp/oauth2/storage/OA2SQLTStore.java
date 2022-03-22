@@ -24,9 +24,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction.RFC862_STATE_KEY;
 
@@ -93,7 +91,7 @@ public class OA2SQLTStore<V extends OA2ServiceTransaction> extends DSSQLTransact
     }
 
     @Override
-    public Map<Identifier, List<TokenInfoRecord>> getTokenInfo(String username) {
+    public TokenInfoRecordMap getTokenInfo(String username) {
         OA2TransactionTable table = (OA2TransactionTable) getTransactionTable();
         String statement = table.getTokenInfoStatement();
         if (username == null) {
@@ -101,8 +99,7 @@ public class OA2SQLTStore<V extends OA2ServiceTransaction> extends DSSQLTransact
         }
         ConnectionRecord cr = getConnection();
         Connection c = cr.connection;
-        HashMap<Identifier, List<TokenInfoRecord>> records = new HashMap<>();
-        List<TokenInfoRecord> list;
+        TokenInfoRecordMap records = new TokenInfoRecordMap();
         TokenInfoRecord tir = null;
         try {
             PreparedStatement stmt = c.prepareStatement(statement);
@@ -114,11 +111,14 @@ public class OA2SQLTStore<V extends OA2ServiceTransaction> extends DSSQLTransact
                 ColumnMap map = rsToMap(rs);
                 tir = new TokenInfoRecord();
                 tir.fromMap(map, table.getOA2Keys());
-                Identifier clientID = tir.clientID;
+
+                records.put(tir);
+/*
                 if (!records.containsKey(clientID)) {
                     records.put(clientID, new ArrayList<>());
                 }
                 records.get(clientID).add(tir);
+*/
             }
 
             rs.close();

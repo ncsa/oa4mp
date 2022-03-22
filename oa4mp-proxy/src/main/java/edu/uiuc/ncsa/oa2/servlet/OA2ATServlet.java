@@ -8,6 +8,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ScriptRuntimeEngineFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.OA2TStoreInterface;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RefreshTokenStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.TokenInfoRecord;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.TokenInfoRecordMap;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo.VirtualOrganization;
@@ -296,34 +297,64 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         }
         OA2TStoreInterface tStore = (OA2TStoreInterface) getOA2SE().getTransactionStore();
         // This is everything the system knows about tokens for this user. Now we need to filter
-        /*
-        Response is a JSON object of the form
-        [{clientid:[list of tokens]}, {clientid:[list of tokens]}]
-         */
-        Map<Identifier, List<TokenInfoRecord>> tirs = tStore.getTokenInfo(t.getUsername());
-        JSONObject json = new JSONObject();
-        json.put("user_uid", t.getUsername());
-        JSONArray array = new JSONArray();
-        Set<Identifier> keys;
+        TokenInfoRecordMap tirs = tStore.getTokenInfo(t.getUsername());
+        // Now we have to pull out every token record and add them.
+
+        Set<Identifier> keys = null;
+        // Figure out the set of client IDs that can be returned.
         if (isAdminClient) {
             if (adminClient.isListUsersInOtherClients()) {
-                keys = tirs.keySet();
             } else {
-                keys = new HashSet<>(oa2SE.getPermissionStore().getClients(adminClient.getIdentifier())); // has to be a set4
+                keys = new HashSet<>(oa2SE.getPermissionStore().getClients(adminClient.getIdentifier())); // has to be a set
             }
-            for (Identifier cid : keys) {
-                if (tirs.containsKey(cid)) {
-                    array.add(formatTokenInfoEntry(cid, tirs.get(cid)));
-                }
-            }
-
         } else {
-            if (tirs.containsKey(clientID)) {
-                array.add(formatTokenInfoEntry(clientID, tirs.get(clientID)));
+            keys = new HashSet();
+            keys.add(clientID);
+        }
+        tirs.reduceTo(keys);
+
+        for (Identifier tID : tirs.getTransactionIDs()) {
+            Identifier tempCID = tirs.getClientID(tID);
+            for (Object txRecord : oa2SE.getTxStore().getByParentID(tID)) {
+                TokenInfoRecord tir = new TokenInfoRecord();
+                tir.fromTXRecord(tempCID, (TXRecord) txRecord);
+                tirs.put(tir);
             }
         }
 
-        json.put("clients", array);
+
+        JSONObject json = new JSONObject(); //top level object
+        json.put("user_uid", t.getUsername());
+        JSONArray clientArray = new JSONArray();
+        /*
+        Response is a JSON object of the form
+        {"user_id":uid,
+          "clients":[
+             {clientid:[{tid:[list of tokens]}, {tid:[list of tokens]}}*]
+            ]
+          }
+         */
+        for(Identifier cid : tirs.getClientIDs()){
+            Map<Identifier, List<TokenInfoRecord>> records = tirs.sortByClientID(cid);
+            JSONObject currentTrans = new JSONObject();
+            JSONArray allTokenArray = new JSONArray();
+
+            for(Identifier transactionID: records.keySet()){
+                List<TokenInfoRecord> list = records.get(transactionID);
+                JSONArray a = new JSONArray();
+                for(TokenInfoRecord tokenInfoRecord : list){
+                    a.add(tokenInfoRecord.toJSON());
+                }
+                currentTrans.put(transactionID.toString(), a);
+                allTokenArray.add(currentTrans);
+            }
+
+            JSONObject x = new JSONObject();
+            x.put(cid.toString(), allTokenArray);
+            clientArray.add(x);
+        }
+
+        json.put("clients", clientArray);
         // Look up by client id and user name(s).
         // This means searching for transactions and snooping through TX records too. Only return valid
         // tokens.
@@ -784,12 +815,12 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             atResponse.setRefreshToken(null);
         }
         setupTokens(client, atResponse, oa2SE, st2, jwtRunner);
-        AccessTokenImpl tempAT = (AccessTokenImpl)atResponse.getAccessToken();
-        if(tempAT.isJWT()){
+        AccessTokenImpl tempAT = (AccessTokenImpl) atResponse.getAccessToken();
+        if (tempAT.isJWT()) {
             st2.setATJWT(tempAT.getToken());
         }
         RefreshTokenImpl tempRT = (RefreshTokenImpl) atResponse.getRefreshToken();
-        if(tempRT != null && tempRT.isJWT()){
+        if (tempRT != null && tempRT.isJWT()) {
             st2.setRTJWT(tempRT.getToken());
         }
 
@@ -1084,11 +1115,11 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         // In refresh, both the access token and refresh token are replaced in the transaction,
         // and a new TXRecord pointing to the AT is made. If these are JWTs, stash them for use later
         // when getting token_info. Cannot do that until all other processing is done.
-        if(((AccessTokenImpl)rtiResponse.getAccessToken()).isJWT()){
+        if (((AccessTokenImpl) rtiResponse.getAccessToken()).isJWT()) {
             t.setATJWT(rtiResponse.getAccessToken().getToken());
             txRecord.setStoredToken(rtiResponse.getAccessToken().getToken());
         }
-        if(rtiResponse.getRefreshToken().isJWT()){
+        if (rtiResponse.getRefreshToken().isJWT()) {
             t.setRTJWT(rtiResponse.getRefreshToken().getToken());
         }
         getTransactionStore().save(t);
