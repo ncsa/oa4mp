@@ -22,7 +22,7 @@ user information or initiate an OAuth/OIDC flow.
 
 For all scripts you need to set
 ADMIN_ID = the identifier you received at registration
-ADMIN_SECRET = the secret yuo received at registration
+ADMIN_SECRET = the secret you received at registration
 REGISTRATION_URI = (get, put, delete) the specific endpoint (usually with some embedded information) for this client
 SERVER = (post) the endpoint for creating a new client.
 
@@ -80,6 +80,28 @@ A few things to note about the response. We do NOT return the secret since, once
 and do not have it. Also, the first example did not specify any scopes and (since this request is to an OIDC server)
 only the openid scope is issued. If the OA4MP server is not configured to be OIDC compliant, no scopes will be returned.
 Finally, the comment (and any other unknown parameters) in the request are ignored, but preserved and returned.
+
+**A GET example -- retrieving all the clients created by the administrative client
+
+Note that not setting the REGISTRATION_URI before running the cm-get.sh script will result in retrieving all the clients
+created by the admininstrative client identified through ADMIN_ID and ADMIN_SECRET.
+
+>./cm-get.sh
+{
+ 'clients':
+  [
+   {
+    "registration_client_uri":"https://dev.cilogon.org/oauth2/oidc-cm?client_id=oa4mp:/client_id/3da958ee9bf53cf4183302c890f4f517",
+    "client_id":"oa4mp:/client_id/3da958ee9bf53cf4183302c890f4f517",
+    "client_name":"My Example",
+    "redirect_uris":["https://client.example.org/callback"],
+    "grant_types":["authorization_code"],
+    "scope":["openid"],
+    "client_id_issued_at":1571348271,
+    "comment":"This is a the minimal request object required for creation: a set of URIs and a name"
+   }
+  ]
+}
 
 ************************************************************
 Comment on uploading cfg elements and extra attributes.
