@@ -91,6 +91,22 @@ run '/full/path/to/oauth2-derby.qdl';
 CREATE SCHEMA oauth2;
 */
 
+CREATE TABLE oauth2.adminClients
+(
+    admin_id VARCHAR(255) PRIMARY KEY,
+    name CLOB,
+    secret CLOB,
+    email CLOB,
+    creation_ts timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    last_modified_ts timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    vo CLOB,
+    list_users_other_clients boolean,
+    list_users boolean,
+    max_clients BIGINT,
+    issuer CLOB,
+    config CLOB
+);
+
 CREATE TABLE oauth2.clients
 (
        client_id VARCHAR(255) PRIMARY KEY,
@@ -102,6 +118,7 @@ CREATE TABLE oauth2.clients
                 ldap CLOB,
                email CLOB,
               scopes CLOB,
+   proxy_claims_list CLOB,
        proxy_limited BOOLEAN,
        public_client BOOLEAN,
          creation_ts timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -112,20 +129,6 @@ CREATE TABLE oauth2.clients
          df_interval bigint,
          df_lifetime bigint,
                  cfg CLOB
-);
-
-CREATE TABLE oauth2.adminClients
-(
-            admin_id VARCHAR(255) PRIMARY KEY,
-                name CLOB,
-              secret CLOB,
-               email CLOB,
-         creation_ts timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    last_modified_ts timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                  vo CLOB,
-         max_clients BIGINT,
-              issuer CLOB,
-              config CLOB
 );
 
 
@@ -166,6 +169,7 @@ CREATE TABLE oauth2.transactions
        refresh_token_valid BOOLEAN,
                 expires_in BIGINT,
                     states CLOB,
+                  proxy_id CLOB,
                certificate CLOB,
                   username VARCHAR(8192),
            myproxyUsername CLOB,
