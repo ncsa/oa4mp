@@ -345,12 +345,14 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 for(TokenInfoRecord tokenInfoRecord : list){
                     a.add(tokenInfoRecord.toJSON());
                 }
-                currentTrans.put(transactionID.toString(), a);
+                currentTrans.put(OA2Constants.AUTHORIZATION_CODE, transactionID.toString());
+                currentTrans.put("tokens", a);
                 allTokenArray.add(currentTrans);
             }
 
             JSONObject x = new JSONObject();
-            x.put(cid.toString(), allTokenArray);
+            x.put(OA2Constants.CLIENT_ID, cid.toString());
+            x.put("transactions", allTokenArray);
             clientArray.add(x);
         }
 

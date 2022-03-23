@@ -65,6 +65,9 @@ import static edu.uiuc.ncsa.security.oauth_2_0.server.RFC8693Constants.GRANT_TYP
  * on 11/28/18 at  10:04 AM
  */
 public class OIDCCMServlet extends EnvServlet {
+
+    public static final String PROXY_CLAIMS_LIST = "proxy_claims_list";
+
     @Override
     public void storeUpdates() throws IOException, SQLException {
         if (storeUpdatesDone) return; // run this once
@@ -288,6 +291,8 @@ public class OIDCCMServlet extends EnvServlet {
         json.put(STRICT_SCOPES, client.useStrictScopes());
         // Note that a contact email is something specific to OA4MP and does not occur in
         // either RFC 7591 or 7592.
+        // CIL-1221
+        json.put(PROXY_CLAIMS_LIST, client.getProxyClaimsList());
         json.put("email", client.getEmail());
         // This is in seconds since the epoch
         json.put(OIDCCMConstants.CLIENT_ID_ISSUED_AT, client.getCreationTS().getTime() / 1000);
@@ -1015,6 +1020,12 @@ public class OIDCCMServlet extends EnvServlet {
         if (jsonRequest.containsKey(STRICT_SCOPES)) {
             client.setStrictscopes(jsonRequest.getBoolean(STRICT_SCOPES));
             jsonRequest.remove(STRICT_SCOPES);
+        }
+        // CIL-1221
+        if(jsonRequest.containsKey(PROXY_CLAIMS_LIST)){
+            client.setProxyClaimsList(jsonRequest.getJSONArray(PROXY_CLAIMS_LIST));
+            jsonRequest.remove(PROXY_CLAIMS_LIST);
+
         }
         // Fix for CIL-734: now handle everything else left over
         client.removeOIDC_CM_Attributes();

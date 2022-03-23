@@ -1,0 +1,107 @@
+This is implemented as of 5.2.5. To test this, link to the
+
+   ~/dev/csd/config/token-info.qdl
+
+script which defines a few functions:
+
+   * rt()  = read token just reads the token from the clipboard.
+   * a(at) = do an http get using the call for the access token
+   * r(rt) = do http get using the call for the refresh token
+
+You run a(at) or r(rt) depending on which token you have, since the backing calls
+are different.
+
+Setup
+------
+  In QDL
+  ------
+  Create an linked buffer. Remember you can have this open in an editor as needed.
+  Run the buffer (say it is numbered 0) with
+   )b link temp /home/ncsa/dev/csd/config/token-info.qdl
+0|? |temp --> /home/ncsa/dev/csd/config/token-info.qdl
+
+   ) 0
+ok
+
+  In the CLC
+  ------
+  Use the CLC with the client localhost:command.line2. You will need to set the parameters for it:
+
+load localhost:command.line2
+set_param -a scope "read: write: x.y:"
+set_param -a code_challenge "N_zjM2czxZIWNar-lWUiuS7-Pacwh-k-L_Akpje6AmY"
+set_param -a code_challenge_method S256
+set_param -t code_verifier "qBdfP8Wmpomgkq6aJwcvZQMHx553RK4P7LAYxmzMAkmo8cM7MlE8ViJSOx38nlHr"
+set_param -t scope "read: write: x.y:"
+set_param -x scope "read:/home/jeff write:/data/jeff/cluster x.y:/abc/def/ghi"
+
+
+  After issuing each command (e.g. access, refresh, exchange)
+  you can copy the token into the clipboard and invoke e.g. for an access token
+
+  at := at(); // save the output in case clipboard changes.
+  qq.:=a(at);
+
+Generally you want to read in the token and then use it since the clipboard tends to get junk stuck in it.
+Just hit
+   )r
+To repeat the command as much as you want.
+
+Output format
+-------------
+
+Typical response is
+
+{
+ headers: {
+  Transfer-Encoding:chunked,
+  Server:Apache-Coyote/1.1,
+  Cache-Control:private,
+  Expires:Wed, 31 Dec 1969 18:00:00 CST,
+  Date:Wed, 23 Mar 2022 21:32:29 GMT,
+  Content-Type:application/json;charset=UTF-8
+ },
+ content: {
+  clients:  [
+      {
+    transactions:    [
+          {
+      code:https://localhost:9443/oauth2/a933f1d8c6cc907d8522712189a1abe?type=authzGrant&ts=1648071101269&version=v2.0&lifetime=750000,
+      tokens:      [
+              {
+        access_token:        {
+         is_valid:true,
+         lifetime:300000,
+         issued_at:1648071127631,
+         jti:https://localhost:9443/oauth2/263f1d2c3688297b3dbbbdd687975d95?type=accessToken&ts=1648071127631&version=v2.0&lifetime=300000,
+         token:eyJ0eXAiOiJKV1QiLCJraWQiOiIyOTc4RkY1NDhBNTVBNzM5NTAyRTNCQzY0QTU4RTJCMiIsImFsZyI6IlJTMjU2In0.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0Ojk0NDMvY3VzdG9tL2lzc3VlciIsImF1ZCI6Imh0dHBzOi8vbG9jYWxob3N0L2Zlcm1pbGFiIiwiZXhwIjoxNjQ4MDcxNDI3LCJuYmYiOjE2NDgwNzExMjIsImlhdCI6MTY0ODA3MTEyNywid2xjZy52ZXIiOiIxLjAiLCJqdGkiOiJodHRwczovL2xvY2FsaG9zdDo5NDQzL29hdXRoMi8yNjNmMWQyYzM2ODgyOTdiM2RiYmJkZDY4Nzk3NWQ5NT90eXBlPWFjY2Vzc1Rva2VuJnRzPTE2NDgwNzExMjc2MzEmdmVyc2lvbj12Mi4wJmxpZmV0aW1lPTMwMDAwMCIsInNjb3BlIjoicmVhZDovaG9tZS9odHRwOi8vY2lsb2dvbi5vcmcvc2VydmVyQS91c2Vycy82ODQ5IHdyaXRlOi9kYXRhL2h0dHA6Ly9jaWxvZ29uLm9yZy9zZXJ2ZXJBL3VzZXJzLzY4NDkvY2x1c3RlciB4Lnk6L2FiYy9kZWYiLCJzdWIiOiJodHRwOi8vY2lsb2dvbi5vcmcvc2VydmVyQS91c2Vycy82ODQ5In0.YG4WloAX8nlAiyAc6uolJ_AyNKWxJX7bLY5w6T-jdXCU9obxOqg48XRllqZj9btGxUZ8e5InXRv3wnGrH9v-DLOtyrvVLtKfNNPgx33UUkjrI-R4bgG_SZSOd-fgT7nnn4kUTnw_3nr-RL5Vx49CY507QSnVKNEnPWFUOBtvk6Uxh3Ad-RRjU0RoijXgYulEO_NPTq0vj2nXWHlYwYqAuzDlIHvQRPcgMQPLJk9rVaP2swj6ZScvFi74iSwnBBHrRH3HsQqqQt8O2a5otcQS1U1NPQVJ6OuA45rEs5UH9BjJzBf-LUT6_y-U8FH6PFCWyRI5iKQw0AarpeMQp39qww
+        },
+        refresh_token:        {
+         is_valid:true,
+         lifetime:900000,
+         issued_at:1648071127632,
+         jti:https://localhost:9443/oauth2/11ab6d421d2b9f2562ef30f571bbbeb9?type=refreshToken&ts=1648071127632&version=v2.0&lifetime=900000,
+         token:eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJhdWQiOiJodHRwczovL2xvY2FsaG9zdC90ZXN0IiwiZXhwIjoxNjQ4MDcyMDI3LCJuYmYiOjE2NDgwNzExMjIsImlhdCI6MTY0ODA3MTEyNywianRpIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6OTQ0My9vYXV0aDIvMTFhYjZkNDIxZDJiOWYyNTYyZWYzMGY1NzFiYmJlYjk_dHlwZT1yZWZyZXNoVG9rZW4mdHM9MTY0ODA3MTEyNzYzMiZ2ZXJzaW9uPXYyLjAmbGlmZXRpbWU9OTAwMDAwIn0.
+        }
+       }
+       ]
+     }
+     ],
+    client_id:localhost:command.line2
+   }
+   ],
+  user_uid:http://cilogon.org/serverA/users/6849
+ },
+ status: {
+  code:200,
+  message:OK
+ }
+}
+
+  Typical calls are
+
+   qq.content.clients.0.transactions.0.code
+https://localhost:9443/oauth2/a933f1d8c6cc907d8522712189a1abe?type=authzGrant&ts=1648071101269&version=v2.0&lifetime=750000
+
+   qq.content.user_uid
+http://cilogon.org/serverA/users/6849
