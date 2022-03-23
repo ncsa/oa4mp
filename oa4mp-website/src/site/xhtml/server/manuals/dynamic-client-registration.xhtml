@@ -72,14 +72,16 @@
 <p>OA4MP allows you to specify several client properties that it uses which are not in the specification.
 These are</p>
 <ul>
-    <li>rt_lifetime = the lifetime in seconds that a refresh token may have</li>
     <li>at_lifetime = the lifetime in seconds that an access token may have</li>
+    <li>cfg = a configuration (JSON) for managing ID, access and refresh tokens and for running QDL scripts.</li>
+    <li>rt_lifetime = the lifetime in seconds that a refresh token may have</li>
     <li>strict_scopes = a boolean that when <b>true</b> (default) will reject any scopes not explicitly set.
     When <b>false</b>, any scope may be sent. This is typically set to <b>false</b> for clients that return
     JWTs as access tokens.</li>
 </ul>
 <p>Note that all of these are subject to server policies. You may request an outlandish refresh token
-lifetime, e.g., but if serverpolicy restricts it, then the server will make the final determination.</p>
+lifetime, e.g., but if serverpolicy restricts it, then the server will make the final determination.
+See the table below for the specifics.</p>
 
 <h3>Notes on Legal Requests</h3>
 <p>What values can be sent and are accepted?</p>
@@ -165,16 +167,6 @@ lifetime, e.g., but if serverpolicy restricts it, then the server will make the 
         </td>
     </tr>
     <tr align="left" valign="top">
-        <td>rt_lifetime</td>
-        <td>N</td>
-        <td>A integer (in seconds)</td>
-        <td><b>(OA4MP specific!!)</b> If you request a grant_type of refresh_token, this specifies the maximum lifetime,
-            in seconds, that
-            it will be valid. Normally this is set for a very long time, as in weeks if not months. If this is omitted
-            or set to 0 (zero) then no refresh tokens will be created.
-        </td>
-    </tr>
-    <tr align="left" valign="top">
         <td>at_lifetime</td>
         <td>N</td>
         <td>A integer (in seconds)</td>
@@ -195,6 +187,31 @@ lifetime, e.g., but if serverpolicy restricts it, then the server will make the 
             <b>Public clients:</b>This parameter is not supported and will result in the rejection of any request.
         </td>
     </tr>
+    <tr align="left" valign="top">
+        <td>rt_lifetime</td>
+        <td>N</td>
+        <td>A integer (in seconds)</td>
+        <td><b>(OA4MP specific!!)</b> If you request a grant_type of refresh_token, this specifies the maximum lifetime,
+            in seconds, that
+            it will be valid. Normally this is set for a very long time, as in weeks if not months. If this is omitted
+            or set to 0 (zero) then no refresh tokens will be created.
+        </td>
+    </tr>
+    <tr align="left" valign="top">
+        <td>strict_scopes</td>
+        <td>N</td>
+        <td>true</td>
+        <td><b>(OA4MP specific!!)</b> If set to <b>true</b> (default) only scopes explicitly
+            set at registration will be allowed. If <b>false</b>  then any unrecognized scopes
+            in the initial request will cause the request to be rejected.
+            If set to <b>true</b> you may send anything as a scope
+            and allowed scopes will be processed, unknown scopes will be passed along for later processing
+            and if not used, simply ignored.
+            In the case that the access tokens is a JWT (such as SciTokens or WLCG tokens) set this
+            true since the access token scopes would be passed in.
+        </td>
+    </tr>
+
 </table>
 <!--#include virtual="../../footer.html" -->
 </body>

@@ -105,14 +105,14 @@
 
 <h3>An Example of using a proxy</h3>
 <pre>
-&ltconfig&gt
-   &lt;server name="my-config"&gt
+&lt;config&gt;
+   &lt;server name="my-config"&gt;
       &lt;authorizationServlet useProxy="true"
-           cfgFile="/opt/oa4mp/etc/clients.xml"&gt
-           cfgName="cilogon-proxy"&gt
-      &lt!-- rest of config --&gt
-   &lt\server&gt
-&lt\config&gt
+           cfgFile="/opt/oa4mp/etc/clients.xml"&gt;
+           cfgName="cilogon-proxy"&gt;
+      &lt;!-- rest of config --&gt;
+   &lt;\server&gt;
+&lt;\config&gt;
 </pre>
 <p>
     In this case, there is a service configured (you have registered a client with it)
@@ -124,12 +124,12 @@
 
 <h3>An Example of using remote user</h3>
 <pre>
-&ltconfig&gt
-   &lt;server name="my-config"&gt
-      &lt;authorizationServlet useHeader="true" headerFieldName="REMOTE_USER"&gt
-      &lt!-- rest of config --&gt
-   &lt\server&gt
-&lt\config&gt
+&lt;config&gt;
+   &lt;server name="my-config"&gt;
+      &lt;authorizationServlet useHeader="true" headerFieldName="REMOTE_USER"&gt;
+      &lt;!-- rest of config --&gt;
+   &lt;\server&gt;
+&lt;\config&gt;
 </pre>
 In this case, use of authorization headers is enabled and a header named <code>REMOTE_USER</code>
 will be used. If it is missing though, no exception will be raised. By default, the header field will
