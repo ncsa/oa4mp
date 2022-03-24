@@ -68,6 +68,30 @@
         </td>
     </tr>
     <tr>
+        <td style="vertical-align: top;">useStrictHostnames</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">true</td>
+        <td style="vertical-align: top;">Strictly check hostnames (this is the default). Do <b>not</b>
+            set to <i>false</i> without an excellent reason, since this creates a security
+            hole. The reason this exists is that sometimes during development it is necessary to
+            work with self-signed certs whose hostnames are not quite right.
+            The aim in such cases should be to get the system working while you are
+            waiting for your good certificates.
+            Under no circumstances should this ever be used in a production environment!
+            <br/>
+            <i>Generally ignore this unless you <b>must</b> explicitly set it.</i>
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">useDefaultTrustManager</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">true</td>
+        <td style="vertical-align: top;">(optional) Use the default trust manager for Java rather than the OA4MP specific one.
+        If there is a trustManager block, then that will be used <i>unless</i> this is set
+        false. This flag is a convenience to let you toggle a custom trust manager on or off.
+        No trustManager block means the system will, by default, try to use the default Java trust manager.</td>
+    </tr>
+    <tr>
          <td style="vertical-align: top;">tlsVersion</td>
          <td style="vertical-align: top;">N</td>
          <td style="vertical-align: top;">--</td>

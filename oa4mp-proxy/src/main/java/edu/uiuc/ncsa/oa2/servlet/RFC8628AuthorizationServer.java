@@ -11,6 +11,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.PresentationState;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2ATException;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
@@ -120,12 +121,12 @@ public class RFC8628AuthorizationServer extends EnvServlet {
     }
 
     public void postprocess(PendingState pendingState) throws Throwable {
-
         pendingState.getResponse().setHeader("X-Frame-Options", "DENY");
     }
 
     @Override
     protected void doIt(HttpServletRequest request, HttpServletResponse response) throws Throwable {
+        printAllParameters(request);
         PendingState pendingState = null;
 
         switch (AbstractAuthorizationServlet.getState(request)) {
@@ -164,6 +165,7 @@ public class RFC8628AuthorizationServer extends EnvServlet {
                 }
                 break;
             case AbstractAuthorizationServlet.AUTHORIZATION_ACTION_START:
+                DebugUtil.trace(this, "Authz action start");
                 String id = BasicIdentifier.randomID().toString();
                 pendingState = new PendingState(AbstractAuthorizationServlet.getState(request),
                         request,
@@ -176,7 +178,9 @@ public class RFC8628AuthorizationServer extends EnvServlet {
                 // If they sent the user code with the request, do it here.
                 //  printAllParameters(request);
                 if (getServiceEnvironment().getAuthorizationServletConfig().isUseProxy()) {
+                    DebugUtil.trace(this, "use proxy");
                     String userCode = request.getParameter(RFC8628Constants2.USER_CODE);
+                    DebugUtil.trace(this, "user code = " + userCode);
                     if (StringUtils.isTrivial(userCode)) {
                         // Have to forward to a page to get it
                         // Set some attributes like the id
@@ -190,20 +194,13 @@ public class RFC8628AuthorizationServer extends EnvServlet {
                         userCode = RFC8628Servlet.convertToCanonicalForm(userCode, getServiceEnvironment().getRfc8628ServletConfig());
                         RFC8628Store<? extends OA2ServiceTransaction> rfc8628Store = (RFC8628Store) getServiceEnvironment().getTransactionStore();
                         OA2ServiceTransaction trans = rfc8628Store.getByUserCode(userCode);
-                                                                                                  
+                        DebugUtil.trace(this, "got transaction = " + trans);
+
                         ProxyUtils.userCodeToProxyRedirect(getServiceEnvironment(), trans, pendingState);
                         return;
                     }
                 }
                 if (getServiceEnvironment().isDemoModeEnabled()) {
-/*
-                    if (!StringUtils.isTrivial(request.getParameter(RFC8628Constants2.USER_CODE))) {
-                        processRequest(request, pendingState, false);
-                        JSPUtil.fwd(request, response, getOkPage());
-                        return;
-                    }
-
-*/
                 } else {
                     if (!StringUtils.isTrivial(request.getParameter(RFC8628Constants2.USER_CODE))) {
                         processRequest(request, pendingState, false);

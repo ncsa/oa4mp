@@ -9,6 +9,8 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.*;
 
 import java.io.IOException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * This class is the top-level class for running tests against an http endpoint. It assumes that
@@ -41,7 +43,7 @@ public class HTTPTester extends TestBase {
     }
 
 
-    protected HttpResponse doRequest(HttpUriRequest request) throws IOException {
+    protected HttpResponse doRequest(HttpUriRequest request) throws IOException, NoSuchAlgorithmException, KeyStoreException {
         HttpClient client = newClient();
         return client.execute(request);
 
@@ -53,35 +55,35 @@ public class HTTPTester extends TestBase {
 
     }
 
-    protected HttpResponse doDelete() throws IOException {
+    protected HttpResponse doDelete() throws IOException, NoSuchAlgorithmException, KeyStoreException {
         HttpDelete deleteReq = new HttpDelete(getAddress());
         deleteReq.setHeader("Authorization: Bearer", createCreds());
         return doRequest(deleteReq);
     }
 
 
-    protected HttpResponse doGet() throws IOException {
+    protected HttpResponse doGet() throws IOException, NoSuchAlgorithmException, KeyStoreException {
         HttpGet getReq = new HttpGet(getAddress());
         getReq.setHeader("Authorization: Bearer", createCreds());
         return doRequest(getReq);
     }
 
 
-    protected HttpResponse doPut() throws IOException {
+    protected HttpResponse doPut() throws IOException, NoSuchAlgorithmException, KeyStoreException {
         HttpPut putReq = new HttpPut(getAddress());
         putReq.setHeader("Authorization: Bearer", createCreds());
         putReq.setHeader("Content-Type", "application/json; charset=UTF-8");
         return doRequest(putReq);
     }
 
-    protected HttpResponse doPost() throws IOException {
+    protected HttpResponse doPost() throws IOException, NoSuchAlgorithmException, KeyStoreException {
         HttpPost postReq = new HttpPost(getAddress());
         postReq.setHeader("Authorization: Bearer", createCreds());
         postReq.setHeader("Content-Type", "application/json; charset=UTF-8");
         return doRequest(postReq);
     }
 
-    protected HttpClient newClient() throws IOException {
+    protected HttpClient newClient() throws IOException, NoSuchAlgorithmException, KeyStoreException {
         HttpClient client = vcf.getClient(getAddress());
         return client;
     }

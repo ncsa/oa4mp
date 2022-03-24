@@ -145,6 +145,7 @@ public class ProxyUtils {
         OA2CLCCommands clcCommands = getCLC(oa2SE, t);
         JSONObject dfResponse = clcCommands.getDfResponse();
         String rawCB = dfResponse.getString(RFC8628Constants2.VERIFICATION_URI_COMPLETE);
+        debugger.trace(ProxyUtils.class, "raw callback =" + rawCB);
         wrapper.sendRedirect(rawCB);
 
     }

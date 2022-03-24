@@ -105,3 +105,6 @@ https://localhost:9443/oauth2/a933f1d8c6cc907d8522712189a1abe?type=authzGrant&ts
 
    qq.content.user_uid
 http://cilogon.org/serverA/users/6849
+
+   // And the list of tokens for transaction j of client i
+   qq.content.clients.i.transactions.j.tokens.
