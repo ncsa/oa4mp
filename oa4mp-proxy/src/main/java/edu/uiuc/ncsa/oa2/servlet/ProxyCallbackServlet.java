@@ -89,7 +89,7 @@ public class ProxyCallbackServlet extends OA2AuthorizationServer {
         JSONObject proxyClaims = clcCommands.getClaims();
         t.setProxyState(clcCommands.toJSON());
 
-        setClaimsFromProxy(t, proxyClaims);
+        setClaimsFromProxy(t, proxyClaims, debugger);
 
         // Do any scripting
         JWTRunner jwtRunner = new JWTRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2SE, t, t.getOA2Client().getConfig()));

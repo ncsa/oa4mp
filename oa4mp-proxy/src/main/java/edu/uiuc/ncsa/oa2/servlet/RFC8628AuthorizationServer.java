@@ -12,6 +12,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.PresentationState;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
+import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2ATException;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
@@ -127,10 +128,13 @@ public class RFC8628AuthorizationServer extends EnvServlet {
     @Override
     protected void doIt(HttpServletRequest request, HttpServletResponse response) throws Throwable {
         printAllParameters(request);
+        DebugUtil.trace(this, "in RFC 8628 Authz server");
+        System.err.println(getClass().getSimpleName()+ " starting with response committed?" + response.isCommitted());
         PendingState pendingState = null;
 
         switch (AbstractAuthorizationServlet.getState(request)) {
             case AbstractAuthorizationServlet.AUTHORIZATION_ACTION_OK:
+                DebugUtil.trace(this, "in RFC 8628 Authz server: auth ok");
                 cleanupPending(); // get rid of any old ones before looking.
                 try {
                     String id = request.getParameter("identifier");
@@ -143,7 +147,7 @@ public class RFC8628AuthorizationServer extends EnvServlet {
                     }
                     prepare(pendingState);
                     processRequest(request, pendingState, true);
-                    JSPUtil.fwd(request, response, getOkPage());
+                 //   JSPUtil.fwd(request, response, getOkPage());
                     return;
 
                 } catch (GeneralSecurityException t) {
@@ -195,8 +199,13 @@ public class RFC8628AuthorizationServer extends EnvServlet {
                         RFC8628Store<? extends OA2ServiceTransaction> rfc8628Store = (RFC8628Store) getServiceEnvironment().getTransactionStore();
                         OA2ServiceTransaction trans = rfc8628Store.getByUserCode(userCode);
                         DebugUtil.trace(this, "got transaction = " + trans);
-
-                        ProxyUtils.userCodeToProxyRedirect(getServiceEnvironment(), trans, pendingState);
+                        try {
+                            ProxyUtils.userCodeToProxyRedirect(getServiceEnvironment(), trans, pendingState);
+                        }catch(Throwable t){
+                            throw new OA2ATException("internal_error", t.getMessage(),
+                                    HttpStatus.SC_BAD_REQUEST, null);
+                            
+                        }
                         return;
                     }
                 }
@@ -228,6 +237,7 @@ public class RFC8628AuthorizationServer extends EnvServlet {
                                   PendingState pendingState,
                                   boolean checkCount) throws Throwable {
         ServletDebugUtil.trace(this, "starting servlet");
+        System.err.println(getClass().getSimpleName() + " starting, pending state response committed?" + pendingState.getResponse().isCommitted());
         String userName = null;
         String password = null;
         String userCode = null;
@@ -290,7 +300,6 @@ public class RFC8628AuthorizationServer extends EnvServlet {
                 if (StringUtils.isTrivial(userName)) {
                     userName = request.getParameter(AbstractAuthorizationServlet.AUTHORIZATION_USER_NAME_KEY);
                 }
-
             }
         } else {
             if (!getServiceEnvironment().getAuthorizationServletConfig().isUseProxy()) {
@@ -309,6 +318,8 @@ public class RFC8628AuthorizationServer extends EnvServlet {
         if (!StringUtils.isTrivial(userCode)) {
             userCode = userCode.toUpperCase();
         }
+        System.err.println(getClass().getSimpleName() + " getting transaction, pending state response committed?" + pendingState.getResponse().isCommitted());
+
         RFC8628Store<? extends OA2ServiceTransaction> rfc8628Store = (RFC8628Store) getServiceEnvironment().getTransactionStore();
         OA2ServiceTransaction trans = rfc8628Store.getByUserCode(userCode);
         if (checkCount && trans == null) {
@@ -323,7 +334,8 @@ public class RFC8628AuthorizationServer extends EnvServlet {
         if (!trans.isAuthGrantValid()) {
             throw new OA2ATException(OA2Errors.INVALID_GRANT, "grant is invalid", HttpStatus.SC_BAD_REQUEST, null);
         }
-
+        MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(trans.getOA2Client());
+        debugger.trace(this, "processRequest committed?" + pendingState.getResponse().isCommitted());
         if (!trans.isRFC8628Request()) {
             //So there is such a grant but somehow this is not a valid rfc 8628 request. Should not happen, but if someone edited
             // the transaction itself and made a mistake, it could, in which case the state of the request itself is questionable.
@@ -332,8 +344,15 @@ public class RFC8628AuthorizationServer extends EnvServlet {
         if (getServiceEnvironment().getAuthorizationServletConfig().isUseProxy()) {
             // If this is a proxy, forward the user to do the login. we have to have gotten the transaction
             // to do this.
-            ProxyUtils.userCodeToProxyRedirect(getServiceEnvironment(), trans, pendingState);
-            return;
+            try {
+                debugger.trace(this, "processRequest calling userCodeToProxy");
+                ProxyUtils.userCodeToProxyRedirect(getServiceEnvironment(), trans, pendingState);
+                return;
+            }catch(Throwable t){
+                throw new OA2ATException("internal_error", t.getMessage(),
+                        HttpStatus.SC_BAD_REQUEST, null);
+
+            }
         }
         trans.setUsername(userName);
         RFC8628State rfc8628State = trans.getRFC8628State();

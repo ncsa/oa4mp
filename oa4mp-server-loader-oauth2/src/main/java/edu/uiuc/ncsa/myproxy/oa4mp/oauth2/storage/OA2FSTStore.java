@@ -114,7 +114,7 @@ public class OA2FSTStore<V extends OA2ServiceTransaction> extends DSFSTransactio
       public V getByUserCode(String userCode) {
             for (Identifier id : keySet()) {
                 V transaction = get(id);
-                if (transaction != null && transaction.getUserCode().equals(userCode)) {
+                if (transaction != null && userCode.equals(transaction.getUserCode())) {
                     return transaction;
                 }
             }

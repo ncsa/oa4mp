@@ -48,10 +48,9 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
     protected static String scopesToString(OA2ServiceTransaction t) {
         String scopeString = "";
         for (String x : t.getScopes()) {
-            scopeString = scopeString + x + " ";
+            scopeString =  scopeString + x + " ";
         }
-        return scopeString;
-
+        return scopeString.trim(); // don't return trailing blank(s)
     }
 
     @Override
@@ -203,7 +202,6 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
     @Override
     protected void doProxy(AuthorizedState state) throws Throwable {
         ProxyUtils.doProxy((OA2SE) MyProxyDelegationServlet.getServiceEnvironment(), state);
-
     }
 }
 

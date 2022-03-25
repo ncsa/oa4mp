@@ -1458,14 +1458,21 @@ public class OA2CLCCommands extends CLCCommands {
         }
         if (currentATResponse != null) {
             JSONObject atr = new JSONObject();
-            atr.put("access_token", currentATResponse.getAccessToken().toJSON());
-            atr.put("refresh_token", currentATResponse.getRefreshToken().toJSON());
+            //Only serialize things that exist.
+            if(currentATResponse.getAccessToken()!=null) {
+                atr.put("access_token", currentATResponse.getAccessToken().toJSON());
+            }
+            if(currentATResponse.getRefreshToken()!=null) {
+                atr.put("refresh_token", currentATResponse.getRefreshToken().toJSON());
+            }
             if (currentATResponse.getParameters() != null && !currentATResponse.getParameters().isEmpty()) {
                 JSONObject atState = new JSONObject();
                 atState.putAll(currentATResponse.getParameters());
                 atr.put("parameters", atState);
             }
-            jsonObject.put(AT_RESPONSE_KEY, atr);
+            if(!atr.isEmpty()) {
+                jsonObject.put(AT_RESPONSE_KEY, atr);
+            }
         }
         // RFC8628 attributes
         jsonObject.put(IS_RFC_8628_KEY, isDeviceFlow);

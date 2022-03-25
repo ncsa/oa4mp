@@ -391,7 +391,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                            HttpServletResponse response) throws IOException {
         // https://tools.ietf.org/html/rfc8693
 
-        //   printAllParameters(request);
+        printAllParameters(request);
         String subjectToken = getFirstParameterValue(request, RFC8693Constants.SUBJECT_TOKEN);
         MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(client);
         debugger.trace(this, "Starting RFC 8693 token exchange");
@@ -1352,7 +1352,12 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         // otherwise, manage all the state for retries.
         if (getOA2SE().getAuthorizationServletConfig().isUseProxy()) {
             //forward to the proxy. If it succeeds there, set the rfc state to valid.
-            ProxyUtils.doRFC8628AT(getOA2SE(), transaction);
+            try {
+                ProxyUtils.doRFC8628AT(getOA2SE(), transaction);
+            }catch(Throwable throwable){
+                throw new OA2ATException("server_error", throwable.getMessage(),
+                        HttpStatus.SC_INTERNAL_SERVER_ERROR, transaction.getRequestState());
+            }
             /*
             It is possible this will throw an exception at this point, since the proxy
             might (all the standard failure modes for retry, e.g. are in effect).

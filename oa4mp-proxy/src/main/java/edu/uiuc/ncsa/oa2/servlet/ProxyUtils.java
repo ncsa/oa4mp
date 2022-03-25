@@ -58,22 +58,29 @@ public class ProxyUtils {
      * @throws Throwable
      */
     protected static void doProxyRedirect(OA2SE oa2SE, OA2ServiceTransaction t, HttpServletResponse response) throws Throwable {
-        OA2CLCCommands clcCommands = createCLC(oa2SE, t);
 
+        OA2CLCCommands clcCommands = createCLC(oa2SE, t);
+        MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(t.getOA2Client());
+        debugger.trace(ProxyUtils.class, "doProxyRedirect, response committed? " + response.isCommitted());
         AbstractAuthorizationServlet.MyHttpServletResponseWrapper wrapper = new AbstractAuthorizationServlet.MyHttpServletResponseWrapper(response);
         // set the specific scopes.
-        clcCommands.set_param(new InputLine("set_param -a scope \"" + scopesToString(t) + "\""));
+        InputLine inputLine = new InputLine("set_param", OA2CLCCommands.SHORT_REQ_PARAM_SWITCH, OA2Constants.SCOPE, scopesToString(t));
+        clcCommands.set_param(inputLine);
+        debugger.trace(ProxyUtils.class, "doProxyRedirect setting input:" + inputLine);
         Identifier identifier = BasicIdentifier.randomID();
         String id = Base64.getEncoder().encodeToString(identifier.toString().getBytes(StandardCharsets.UTF_8));
         t.setProxyId(identifier.toString());
         t.setAuthGrantValid(true);
-        clcCommands.set_param(new InputLine("set_param -a state " + id));
+        InputLine inputLine2 = new InputLine("set_param", OA2CLCCommands.SHORT_REQ_PARAM_SWITCH, OA2Constants.STATE, id);
+        debugger.trace(ProxyUtils.class, "doProxyRedirect setting input:" + inputLine2);
+        clcCommands.set_param(inputLine2);
         clcCommands.uri(new InputLine("uri")); // side effect is to set the uri
         DebugUtil.trace(ProxyUtils.class, "uri to proxy=" + clcCommands.getCurrentURI());
         URI uri = clcCommands.getCurrentURI();
         t.setProxyState(clcCommands.toJSON());
         // Here's where we need to poke at this.
         oa2SE.getTransactionStore().save(t); // save that proxy id!
+        debugger.trace(ProxyUtils.class, "doProxyRedirect, rapper committed? " + wrapper.isCommitted());
         wrapper.sendRedirect(uri.toString());
     }
 
@@ -88,8 +95,14 @@ public class ProxyUtils {
      * @throws Exception
      */
     protected static String getProxyUserCode(OA2SE oa2SE, OA2ServiceTransaction t, RFC8628State rfc8628State) throws Exception {
+        MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(t.getOA2Client());
+        debugger.trace(ProxyUtils.class, "starting getProxyUserCode");
         OA2CLCCommands clcCommands = createCLC(oa2SE, t);
-        clcCommands.set_param(new InputLine("set_param " + OA2CLCCommands.SHORT_REQ_PARAM_SWITCH + " " + OA2Constants.SCOPE + " \"" + scopesToString(t) + "\""));
+
+
+        InputLine inputLine = new InputLine("set_param", OA2CLCCommands.SHORT_REQ_PARAM_SWITCH, OA2Constants.SCOPE, scopesToString(t));
+        debugger.trace(ProxyUtils.class, "getProxyUserCode input line=" + inputLine);
+        clcCommands.set_param(inputLine);
         clcCommands.df(new InputLine("df"));
         // Caveat. The device code is the auth grant from the proxy. We have to manage the one from
         // the proxy (to talk to that service) and the one from this server.
@@ -107,9 +120,9 @@ public class ProxyUtils {
          that there is one.
          */
         /*
-         The look up at our end is in whatever canonical form we have set. The user may type iin
+         The look up at our end is in whatever canonical form we have set. The user may type in
          whatever they want as long as the letters are (up to case) the same, so a user code
-         of "abc-def-g" might come back as "aBc DE+fg". We have to look this up on on ourside
+         of "abc-def-g" might come back as "aBc DE+fg". We have to look this up on on our side
          so we always set the user code in the transaction (which is actually a unique key in
          the store) to the uppercase canonical form.
 
@@ -120,6 +133,7 @@ public class ProxyUtils {
         String userCodeKey = RFC8628Servlet.convertToCanonicalForm(rfc8628State.userCode, oa2SE.getRfc8628ServletConfig());
         userCodeKey = userCodeKey.toUpperCase();
         t.setUserCode(userCodeKey);
+        debugger.trace(ProxyUtils.class, "getProxyUserCode setting user code = " + userCodeKey);
         oa2SE.getTransactionStore().save(t); // save that proxy id!
         return rfc8628State.userCode; // what the proxy sent.
     }
@@ -138,14 +152,15 @@ public class ProxyUtils {
         MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(t.getOA2Client());
 
         // Now we have determined that this is a pending transaction
-        debugger.trace(ProxyUtils.class, "loading proxy client");
-
+        debugger.trace(ProxyUtils.class, "userCodeToProxyRedirect loading proxy client");
+        debugger.trace(ProxyUtils.class, "userCodeToProxyRedirect response committed? " + response.isCommitted());
         AbstractAuthorizationServlet.MyHttpServletResponseWrapper wrapper = new AbstractAuthorizationServlet.MyHttpServletResponseWrapper(response);
 
         OA2CLCCommands clcCommands = getCLC(oa2SE, t);
         JSONObject dfResponse = clcCommands.getDfResponse();
         String rawCB = dfResponse.getString(RFC8628Constants2.VERIFICATION_URI_COMPLETE);
-        debugger.trace(ProxyUtils.class, "raw callback =" + rawCB);
+        debugger.trace(ProxyUtils.class, "userCodeToProxyRedirect got DF response, raw callback =" + rawCB);
+        debugger.trace(ProxyUtils.class, "userCodeToProxyRedirect wrapper committed? " + wrapper.isCommitted());
         wrapper.sendRedirect(rawCB);
 
     }
@@ -166,6 +181,9 @@ public class ProxyUtils {
             throw new TransactionNotFoundException("No pending proxy transaction was found");
         }
         clcCommands.fromJSON(proxyState);
+        clcCommands.setPrintOuput(t.getOA2Client().isDebugOn());
+        clcCommands.setVerbose(t.getOA2Client().isDebugOn());
+        clcCommands.setDebugOn(t.getOA2Client().isDebugOn());
         return clcCommands;
     }
 
@@ -181,7 +199,13 @@ public class ProxyUtils {
         AuthorizationServletConfig asc = oa2SE.getAuthorizationServletConfig();
         // next line is where the CLC is first created in the flow, so can't call getCLC
         OA2CLCCommands clcCommands = new OA2CLCCommands(true, oa2SE.getMyLogger(), new OA2CommandLineClient(oa2SE.getMyLogger()));
-        clcCommands.load(new InputLine("dummy " + asc.getCfgName() + "  " + asc.getCfgFile()));
+        if (t.getOA2Client().isDebugOn()) {
+            // Turn it all on if the client is in debug mode.
+            clcCommands.setVerbose(true);
+            clcCommands.setDebugOn(true);
+            clcCommands.setPrintOuput(true);
+        }
+        clcCommands.load(new InputLine("dummy ", asc.getCfgName(), asc.getCfgFile()));
         return clcCommands;
     }
 
@@ -189,12 +213,21 @@ public class ProxyUtils {
         MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(t.getOA2Client());
 
         // Now we have determined that this is a pending transaction
-        debugger.trace(ProxyUtils.class, "loading proxy client");
+        debugger.trace(ProxyUtils.class, "doRFC8628AT, loading proxy client");
 
         OA2CLCCommands clcCommands = getCLC(oa2SE, t);
-        clcCommands.set_param(new InputLine("set_param " + OA2CLCCommands.SHORT_REQ_PARAM_SWITCH + " " + OA2Constants.SCOPE + " \"" + scopesToString(t) + "\""));
-        clcCommands.access(new InputLine("access "));
+        InputLine inputLine = new InputLine("set_param", OA2CLCCommands.SHORT_REQ_PARAM_SWITCH, OA2Constants.SCOPE, scopesToString(t));
+        debugger.trace(ProxyUtils.class, "doRFC8628AT input line: " + inputLine);
+        clcCommands.set_param(inputLine);
+        try {
+            clcCommands.access(new InputLine("access "));
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+            debugger.trace(ProxyUtils.class, "error contacting proxy", throwable);
+            throw throwable;
+        }
         if (clcCommands.hadException()) {
+            debugger.trace(ProxyUtils.class, "doRFC8628AT got an exception in CLC");
             Throwable throwable = clcCommands.getLastException();
             if (throwable instanceof ServiceClientHTTPException) {
                 ServiceClientHTTPException serviceClientHTTPException = (ServiceClientHTTPException) throwable;
@@ -203,21 +236,30 @@ public class ProxyUtils {
                         content.getString("description"),
                         serviceClientHTTPException.getStatus(), t.getRequestState());
             }
-            debugger.trace(ProxyUtils.class, "error contacting proxy", throwable);
+            debugger.trace(ProxyUtils.class, "doRFC8628AT error contacting proxy", throwable);
             throw throwable;
         }
+        debugger.trace(ProxyUtils.class, "doRFC8628AT finished getting access token.");
         // So this worked. Rock on!
-        t.setProxyState(clcCommands.toJSON());
-        setClaimsFromProxy(t, clcCommands.getClaims());
-
-        oa2SE.getTransactionStore().save(t);
+        try {
+            t.setProxyState(clcCommands.toJSON());
+            debugger.trace(ProxyUtils.class, "doRFC8628AT saving proxy state.");
+            setClaimsFromProxy(t, clcCommands.getClaims(), debugger);
+            oa2SE.getTransactionStore().save(t);
+        }catch(Throwable throwable){
+            throwable.printStackTrace();
+            throw throwable;
+        }
+        debugger.trace(ProxyUtils.class, "doRFC8628AT done.");
     }
 
-    protected static void setClaimsFromProxy(OA2ServiceTransaction t, JSONObject proxyClaims) {
+    protected static void setClaimsFromProxy(OA2ServiceTransaction t, JSONObject proxyClaims, MetaDebugUtil debugger) {
+        debugger.trace(ProxyUtils.class, "setClaimsFromProxy starting");
         JSONObject claims = t.getUserMetaData();
         claims.put(OA2Claims.SUBJECT, proxyClaims.get(OA2Claims.SUBJECT));  // always
         t.setUsername(proxyClaims.getString(OA2Claims.SUBJECT)); // This is where this is set.
         Collection<String> proxyClaimKeys = t.getOA2Client().getProxyClaimsList();
+        debugger.trace(ProxyUtils.class, "setClaimsFromProxy populating proxy claims. list=" + proxyClaimKeys);
         if (proxyClaimKeys.isEmpty()) {
             // do nothing -- default is just to return the subject
         } else {
@@ -229,7 +271,9 @@ public class ProxyUtils {
             // This is supposed to be a list
             for (String claim : proxyClaimKeys) {
                 if (proxyClaims.containsKey(claim)) {
-                    claims.put(claim, proxyClaims.get(claim));
+                    Object x = proxyClaims.get(claim);
+                    debugger.trace(ProxyUtils.class, "setClaimsFromProxy adding claim \"" + claim + "\" " + "with value " + x);
+                    claims.put(claim, x);
                 }
             }
         }
@@ -237,7 +281,10 @@ public class ProxyUtils {
     }
 
     /**
-     * Attempt to do a refresh of the claims from the proxy server.
+     * Attempt to do a refresh of the claims from the proxy server. This is not sued yet since there are a
+     * lot of policy type decisions to make. For instance, what if the lifetimes of tokens on the proxy
+     * are much shorter than on the server? Then there has to be some way to communicate that no updates
+     * to the claims are possible.
      *
      * @param oa2SE
      * @param t
@@ -247,7 +294,7 @@ public class ProxyUtils {
         OA2CLCCommands clcCommands = getCLC(oa2SE, t);
         clcCommands.refresh(new InputLine("user_info "));
         if (!clcCommands.hadException()) {
-            setClaimsFromProxy(t, clcCommands.getClaims());
+            setClaimsFromProxy(t, clcCommands.getClaims(), MyProxyDelegationServlet.createDebugger(t.getOA2Client()));
         }
         t.setProxyState(clcCommands.toJSON());
         oa2SE.getTransactionStore().save(t);

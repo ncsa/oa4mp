@@ -37,7 +37,7 @@ import java.util.Map;
 
 /**
  * Servlet that <b>starts</b> RFC 8628 a.a device flow .This issues a user code that the user
- * must present to an authroization endpoint.
+ * must present to an authorization endpoint.
  * <p>Created by Jeff Gaynor<br>
  * on 2/9/21 at  11:21 AM
  */
@@ -49,7 +49,7 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
 
     @Override
     protected void doIt(HttpServletRequest req, HttpServletResponse resp) throws Throwable {
-        //    printAllParameters(req);
+        printAllParameters(req);
         ServletDebugUtil.trace(this, "starting device flow");
         OA2SE oa2SE = (OA2SE) MyProxyDelegationServlet.getServiceEnvironment();
 
@@ -130,11 +130,11 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
         }
 
         String userCode; //what the user is presented with
-        if(oa2SE.getAuthorizationServletConfig().isUseProxy()){
+        if (oa2SE.getAuthorizationServletConfig().isUseProxy()) {
             userCode = ProxyUtils.getProxyUserCode(oa2SE, t, rfc8628State);
             lifetime = rfc8628State.lifetime; // This is set from the proxy and must be propagated to the user.
 
-        }else{
+        } else {
             userCode = getUserCode(rfc8628ServletConfig);
             // Make sure it is not in use, since the configuration might make collisions possible.
             boolean gotUserCode = false;
@@ -185,7 +185,7 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
         jsonObject.put(RFC8628Constants.INTERVAL, rfc8628State.interval / 1000); // must be returned in seconds.
         jsonObject.put(RFC8628Constants.VERIFICATION_URI, rfc8628ServletConfig.deviceEndpoint);
         jsonObject.put(RFC8628Constants.VERIFICATION_URI_COMPLETE, rfc8628ServletConfig.deviceEndpoint + "?" + RFC8628Constants.USER_CODE + "=" + userCode);
-        debugUtil.trace(this, "done, writing response for " + jsonObject);
+        debugUtil.trace(this, "done, writing response for " + jsonObject + "\n"); // add a line so logs are cleaner
         resp.getWriter().println(jsonObject.toString(1));
         resp.getWriter().flush();
         resp.getWriter().close();

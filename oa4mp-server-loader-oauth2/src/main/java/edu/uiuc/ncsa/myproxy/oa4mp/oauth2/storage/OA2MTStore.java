@@ -8,9 +8,7 @@ import edu.uiuc.ncsa.security.delegation.storage.impl.TransactionMemoryStore;
 import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -106,7 +104,7 @@ public class OA2MTStore<V extends OA2ServiceTransaction> extends TransactionMemo
     public V getByUserCode(String userCode) {
         for (Identifier id : keySet()) {
             V transaction = get(id);
-            if (transaction != null && transaction.getUserCode().equals(userCode)) {
+            if (transaction != null && userCode.equals(transaction.getUserCode())) {
                 return transaction;
             }
         }

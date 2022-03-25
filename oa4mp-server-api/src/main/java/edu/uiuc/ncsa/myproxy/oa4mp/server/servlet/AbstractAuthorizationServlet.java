@@ -193,7 +193,7 @@ public abstract class AbstractAuthorizationServlet extends CRServlet implements 
     }
 
     protected void doProxy(AuthorizedState state) throws Throwable {
-
+       // nothing here. It must be overridden
     }
 
     public void present(PresentableState state) throws Throwable {
