@@ -152,7 +152,7 @@ public class ClientLoader<T extends ClientEnvironment> extends AbstractClientLoa
         constants.put(ClientEnvironment.VERIFIER, OAuth.OAUTH_VERIFIER);
 
         T t =  createInstance(tokenForgeProvider, clientProvider, constants);
-        loadDebug();
+      //  getDebugger();
 
         t.setDebugOn(DebugUtil.isEnabled());
         return t;

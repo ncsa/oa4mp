@@ -16,6 +16,7 @@ import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2ATException;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
+import edu.uiuc.ncsa.security.oauth_2_0.OA2GeneralError;
 import edu.uiuc.ncsa.security.servlet.JSPUtil;
 import edu.uiuc.ncsa.security.servlet.PresentableState;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
@@ -129,7 +130,7 @@ public class RFC8628AuthorizationServer extends EnvServlet {
     protected void doIt(HttpServletRequest request, HttpServletResponse response) throws Throwable {
         printAllParameters(request);
         DebugUtil.trace(this, "in RFC 8628 Authz server");
-        System.err.println(getClass().getSimpleName()+ " starting with response committed?" + response.isCommitted());
+        DebugUtil.trace(this, " starting with response committed #1?" + response.isCommitted());
         PendingState pendingState = null;
 
         switch (AbstractAuthorizationServlet.getState(request)) {
@@ -138,14 +139,22 @@ public class RFC8628AuthorizationServer extends EnvServlet {
                 cleanupPending(); // get rid of any old ones before looking.
                 try {
                     String id = request.getParameter("identifier");
+                    DebugUtil.trace(this, " starting with response committed #2?" + response.isCommitted());
                     if (StringUtils.isTrivial(id)) {
                         throw new OA2ATException(OA2Errors.INVALID_REQUEST, "no pending flow found", HttpStatus.SC_BAD_REQUEST, null);
                     }
+                    DebugUtil.trace(this, " starting with response committed #3?" + response.isCommitted());
                     pendingState = pending.get(id);
+                    DebugUtil.trace(this, " starting with PS response committed #3a?" + pendingState.getResponse().isCommitted());
                     if (pendingState == null) {
                         throw new OA2ATException(OA2Errors.INVALID_REQUEST, "no pending flow found", HttpStatus.SC_BAD_REQUEST, null);
                     }
+                    DebugUtil.trace(this, " starting with PS response committed #4?" + pendingState.getResponse().isCommitted());
                     prepare(pendingState);
+                    DebugUtil.trace(this, " starting with PS response committed #5?" + pendingState.getResponse().isCommitted());
+
+                    pendingState.setResponse(response);
+                    DebugUtil.trace(this, " starting with PS response committed #6?" + pendingState.getResponse().isCommitted());
                     processRequest(request, pendingState, true);
                  //   JSPUtil.fwd(request, response, getOkPage());
                     return;
@@ -202,6 +211,9 @@ public class RFC8628AuthorizationServer extends EnvServlet {
                         try {
                             ProxyUtils.userCodeToProxyRedirect(getServiceEnvironment(), trans, pendingState);
                         }catch(Throwable t){
+                            if(t instanceof OA2GeneralError){
+                                throw t;
+                            }
                             throw new OA2ATException("internal_error", t.getMessage(),
                                     HttpStatus.SC_BAD_REQUEST, null);
                             
@@ -237,7 +249,7 @@ public class RFC8628AuthorizationServer extends EnvServlet {
                                   PendingState pendingState,
                                   boolean checkCount) throws Throwable {
         ServletDebugUtil.trace(this, "starting servlet");
-        System.err.println(getClass().getSimpleName() + " starting, pending state response committed?" + pendingState.getResponse().isCommitted());
+        ServletDebugUtil.trace(this, " starting, pending state response committed?" + pendingState.getResponse().isCommitted());
         String userName = null;
         String password = null;
         String userCode = null;
@@ -318,7 +330,7 @@ public class RFC8628AuthorizationServer extends EnvServlet {
         if (!StringUtils.isTrivial(userCode)) {
             userCode = userCode.toUpperCase();
         }
-        System.err.println(getClass().getSimpleName() + " getting transaction, pending state response committed?" + pendingState.getResponse().isCommitted());
+        DebugUtil.trace(this, " getting transaction, pending state response committed?" + pendingState.getResponse().isCommitted());
 
         RFC8628Store<? extends OA2ServiceTransaction> rfc8628Store = (RFC8628Store) getServiceEnvironment().getTransactionStore();
         OA2ServiceTransaction trans = rfc8628Store.getByUserCode(userCode);
@@ -349,6 +361,9 @@ public class RFC8628AuthorizationServer extends EnvServlet {
                 ProxyUtils.userCodeToProxyRedirect(getServiceEnvironment(), trans, pendingState);
                 return;
             }catch(Throwable t){
+                if(t instanceof OA2GeneralError){
+                    throw t;
+                }
                 throw new OA2ATException("internal_error", t.getMessage(),
                         HttpStatus.SC_BAD_REQUEST, null);
 

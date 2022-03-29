@@ -185,6 +185,10 @@ When a new version is deployed, here is the testing order
             No id token is returned from here, so no check for its expiration.
         get_cert fails
 
+  -- localhost:scitokens
+     test for SciTokens using a user config. Log in with IDP Google and use identity "j g"
+     
+
   -- localhost:test/fnal
         Test client that point to main QDL scripts.
         Note that these all use a specific test user in FNAL's LDAP, cilogontest@fnal.gov:
@@ -299,7 +303,10 @@ When a new version is deployed, here is the testing order
         Currently gets FNAL access token (set DEBUG=true in script before running).
         Check configruation first. Usually it is set to NCSA default and
         a bogus WLCG access token.
-  -- localhost:test/df -- ** local CILogon test **
+  -- localhost:test/df --
+    *************************
+    ** local CILogon test! **
+    *************************
      a client for testing the device flow against the CILogon server
      This will require doing the DBService calls manually (that's part of the test).
      In the CLC load the configuration and type
@@ -485,7 +492,7 @@ TO DO:
          it doesn't just always hand back everything).
        The following test for various things like scope reduction
 
-       set_param -a scope "read: write:"
+       set_param -a scope "read: write: aud:FOO"
        set_param -r scope "read:/DQSegDB write:/DQSegDB"
        set_param -x scope "read:/DQSegDB/foo write:/DQSegDB read:/frames/bar"
        AT:

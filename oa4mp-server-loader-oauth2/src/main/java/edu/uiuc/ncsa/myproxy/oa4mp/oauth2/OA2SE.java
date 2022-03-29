@@ -18,6 +18,7 @@ import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
+import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.delegation.server.issuers.AGIssuer;
 import edu.uiuc.ncsa.security.delegation.server.issuers.ATIssuer;
@@ -98,7 +99,8 @@ public class OA2SE extends ServiceEnvironmentImpl {
                  long cleanupInterval,
                  String notifyACEventEmailAddresses,
                  boolean rfc7636Required,
-                 boolean demoModeEnabled) {
+                 boolean demoModeEnabled,
+                 MetaDebugUtil debugger) {
 
         super(logger,
                 mfp,
@@ -170,8 +172,18 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.notifyACEventEmailAddresses = notifyACEventEmailAddresses;
         this.rfc7636Required = rfc7636Required;
         this.demoModeEnabled = demoModeEnabled;
+        this.debugger = debugger;
     }
 
+    public MetaDebugUtil getDebugger() {
+        return debugger;
+    }
+
+    public void setDebugger(MetaDebugUtil debugger) {
+        this.debugger = debugger;
+    }
+
+    MetaDebugUtil debugger;
     boolean demoModeEnabled = false;
 
     public boolean isDemoModeEnabled() {

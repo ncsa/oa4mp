@@ -14,8 +14,26 @@
      access_token.aud. := all_audience.;
   ]else[
      // return only things we recognize.
-     access_token.aud. :=mask(all_audience.,  has_value(all_audience., requested_audience.));
+     //access_token.aud. :=mask(all_audience.,  has_value(all_audience., requested_audience.));
+     // all_audience has ANY, so just allow any.
+     access_token.aud. :=requested_audience.;
+
   ];
+
+// Since this is a SciTokens, they may have sent over their requests in the original scope
+// too. Or in the tx scope request.
+/*define[stAud(x.)][
+  aud_caput := 'aud:';
+  xi. := mask(x., starts_with(x., aud_caput) == 0);
+  return(substring(xi., size(aud_caput)));
+];
+if[
+  0 < size(xi.)
+ ][
+// then they made a request in the scopes.
+  access_token.aud. := substring(xi., size(aud_caput));
+];*/
+
 
 // Scope processing
   /*

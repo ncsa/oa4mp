@@ -61,4 +61,3 @@ cfg.search_attributes. := ['email', 'uin', 'uid', 'isMemberOf'];
      cfg.fail_on_error := true;
 
         claim_sources. := claim_sources. ~ [create_source(cfg.)];
-

@@ -1,0 +1,41 @@
+/*
+  Testing scipt for scitokens. This is quite similar to the script on the SciAuth issuer
+
+  {
+    "tokens": {
+      "access": {
+        "audience": "ANY",
+        "qdl": {
+          "load": "scitokens/st.qdl",
+          "xmd": {
+            "exec_phase": [
+              "pre_auth",
+              "post_token"
+            ]
+          }
+        },
+        "type": "sci_token"
+      }
+    }
+  }
+*/
+
+               EPE := 'eduPersonEntitlement';
+
+              cfg. := new_template('file');
+   cfg.'file_path' := 'vfs#/scripts/scitokens/user-config.json';
+   /* Uncomment next two lines if you want to enable default user support
+   cfg.use_default := true;
+ cfg.default_claim := 'default_claim';
+   */
+
+   // Snarf up the exactly the EPE from the claims using the subject.
+              eta. := get_claims(create_source(cfg.), claims.'sub');
+
+access_token.scope := detokenize(unique(eta.EPE), ' ', 2); // turn in to string, omit duplications, trailing space
+if[
+    is_defined(eta.'audience')
+   ][
+   access_token.'aud' := eta.'audience';
+];
+say('scopes ' + to_string(scopes.));

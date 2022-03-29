@@ -17,14 +17,15 @@ public class ScitokenHandler extends AbstractAccessTokenHandler {
         super(payloadHandlerConfig);
     }
 
-//    String ST_SCOPE = "scope";
+    //    String ST_SCOPE = "scope";
     String ST_CLIENT_IDENTIFIER = "cid";
     String VERSION_2_0 = "scitoken:2.0";
     String ST_VERSION_CLAIM = "ver";
+    String ST_AUDIENCE_SCOPE_CAPUT = "aud:";
 
 
     public String getUsernameClaimKey() {
-        return ((SciTokenConfig)getPhCfg().getPayloadConfig()).getUsernameClaimKey();
+        return ((SciTokenConfig) getPhCfg().getPayloadConfig()).getUsernameClaimKey();
     }
 
     /**
@@ -46,6 +47,21 @@ public class ScitokenHandler extends AbstractAccessTokenHandler {
         sciTokens.put(SUBJECT, transaction.getUsername());
         sciTokens.put(ST_CLIENT_IDENTIFIER, transaction.getOA2Client().getIdentifierString());
         sciTokens.put(ST_VERSION_CLAIM, getVersion()); // make sure set for inter-operability with others
+        // strip off audience requests. These are passed in as scopes as per
+        // https://scitokens.org/technical_docs/Claims
+        // This is probably going away in the SciTokens spec and, it seems, nobody ever did it.
+        // Keep for a bit until we are sure it is dead, then remove it.
+/*        List<String> aud = new JSONArray();
+        for (String x : transaction.getScopes()) {
+            if (x.startsWith(ST_AUDIENCE_SCOPE_CAPUT)) {
+                // Be really dumb about this. They say an audience scope starts with a given string,
+                // so just amputate the marker.
+                aud.add(x.substring(ST_AUDIENCE_SCOPE_CAPUT.length()));
+            }
+        }
+        if (0 < aud.size()) {
+            getAtData().put(AUDIENCE, aud);
+        }*/
     }
 
     @Override
@@ -56,11 +72,19 @@ public class ScitokenHandler extends AbstractAccessTokenHandler {
         // string "ANY"
         // First time it hits this the audience is converted. Only SciTokens allows for this specific
         // value.
-        if(getAtData().get(AUDIENCE) instanceof JSONArray){
+        // Update 3/29/2022 -- in practice, a lot of SciToken clients that send a long a string as the audience
+        // will only process a simple string in the response. They are supposed to accept an array
+        // of them, but do not. If it's a singleton, convert it to a string.
+        if (getAtData().get(AUDIENCE) instanceof JSONArray) {
             JSONArray audience = getAtData().getJSONArray(AUDIENCE);
-            if(audience.size() == 1 && audience.getString(0).equals("ANY")){
+            if(audience.size() == 1){
+                getAtData().put(AUDIENCE, audience.get(0));
+            }
+/*
+            if (audience.size() == 1 && audience.getString(0).equals("ANY")) {
                 getAtData().put(AUDIENCE, "ANY");
             }
+*/
 
         }
     }

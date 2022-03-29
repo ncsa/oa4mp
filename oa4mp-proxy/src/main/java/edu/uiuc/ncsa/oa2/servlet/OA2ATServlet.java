@@ -37,6 +37,7 @@ import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTUtil2;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.ScriptRuntimeException;
 import edu.uiuc.ncsa.security.oauth_2_0.server.*;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
+import edu.uiuc.ncsa.security.servlet.ServiceClientHTTPException;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
@@ -691,7 +692,6 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
     @Override
     protected void doIt(HttpServletRequest request, HttpServletResponse response) throws Throwable {
         String grantType = getFirstParameterValue(request, OA2Constants.GRANT_TYPE);
-
         if (isEmpty(grantType)) {
             warn("Error servicing request. No grant type was given. Rejecting request.");
             throw new OA2ATException(OA2Errors.INVALID_REQUEST, "missing grant type");
@@ -817,6 +817,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             atResponse.setRefreshToken(null);
         }
         setupTokens(client, atResponse, oa2SE, st2, jwtRunner);
+
         AccessTokenImpl tempAT = (AccessTokenImpl) atResponse.getAccessToken();
         if (tempAT.isJWT()) {
             st2.setATJWT(tempAT.getToken());
@@ -1355,6 +1356,13 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             try {
                 ProxyUtils.doRFC8628AT(getOA2SE(), transaction);
             }catch(Throwable throwable){
+                if(throwable instanceof OA2GeneralError){
+                    throw throwable;
+                }
+
+                if(throwable instanceof ServiceClientHTTPException){
+                    throw ProxyUtils.toOA2X((ServiceClientHTTPException) throwable, transaction);
+                }
                 throw new OA2ATException("server_error", throwable.getMessage(),
                         HttpStatus.SC_INTERNAL_SERVER_ERROR, transaction.getRequestState());
             }
@@ -1403,13 +1411,18 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 transaction,
                 true);
         doAT(issuerTransactionState, client);
+        debugger.trace(this, "returns from doAT");
         OA2SE oa2se = (OA2SE) MyProxyDelegationServlet.getServiceEnvironment();
         VirtualOrganization vo = oa2se.getVO(transaction.getClient().getIdentifier());
         if (vo == null) {
+            debugger.trace(this, "no vo");
             ((ATIResponse2) issuerTransactionState.getIssuerResponse()).setJsonWebKey((oa2se).getJsonWebKeys().getDefault());
         } else {
+            debugger.trace(this, "has vo");
             ((ATIResponse2) issuerTransactionState.getIssuerResponse()).setJsonWebKey(vo.getJsonWebKeys().get(vo.getDefaultKeyID()));
         }
+        debugger.trace(this, "writing AT response");
+
         writeATResponse(response, issuerTransactionState);
 
     }

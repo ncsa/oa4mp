@@ -155,7 +155,7 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
             // It is possible to suppress this component by passing in an empty string.
             IdentifierProvider.setSchemeSpecificPart(spp);
         }
-
+        DebugUtil.setInstance(getDebugger());
     }
 
     protected AuthorizationServletConfig authorizationServletConfig;
@@ -435,7 +435,7 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
         // now peel off the service address
 
         se2.setServiceAddress(getServiceAddress());
-        loadDebug();
+        getDebugger();
         se2.setDebugOn(DebugUtil.isEnabled());
         se2.info("Debugging is " + (se2.isDebugOn() ? "on" : "off"));
 

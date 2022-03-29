@@ -61,7 +61,9 @@ public class OA2ServletInitializer extends OA4MPServletInitializer {
         System.setProperty("LOG4J_FORMAT_MSG_NO_LOOKUPS", "true");
 
         OA2SE oa2SE = (OA2SE) getEnvironment();
+        DebugUtil.setInstance(oa2SE.getDebugger()); // sets global debugger.
         DebugUtil.setPrintTS(oa2SE.isPrintTSInDebug());
+
         if (oa2SE.isRefreshTokenEnabled()) {
             MyProxyDelegationServlet.transactionCleanup.getRetentionPolicies().clear(); // We need a different set of policies than the original one.
 

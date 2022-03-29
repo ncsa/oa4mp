@@ -186,7 +186,9 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     getCleanupInterval(),
                     isNotifyACEventEmailAddresses(),
                     isRFC7636Required(),
-                    isDemoModeEnabled());
+                    isDemoModeEnabled(),
+                    getDebugger()
+                    );
 
             if (getClaimSource() instanceof BasicClaimsSourceImpl) {
                 ((BasicClaimsSourceImpl) getClaimSource()).setOa2SE((OA2SE) se);

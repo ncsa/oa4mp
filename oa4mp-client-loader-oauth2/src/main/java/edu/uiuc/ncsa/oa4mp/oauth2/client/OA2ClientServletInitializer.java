@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.oa4mp.oauth2.client;
 import edu.uiuc.ncsa.myproxy.oa4mp.client.loader.ClientServletInitializer;
 import edu.uiuc.ncsa.myproxy.oa4mp.client.servlet.ClientServlet;
 import edu.uiuc.ncsa.oa4mp.oauth2.client.servlet.OA2ClientExceptionHandler;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.servlet.ExceptionHandler;
 
 import javax.servlet.ServletException;
@@ -30,5 +31,6 @@ public class OA2ClientServletInitializer extends ClientServletInitializer {
             ClientServlet.assetCleanup.addRetentionPolicy(new AssetRetentionPolicy(ce.getAssetStore()));
             ce.getMyLogger().info("Finished setting up asset store retention policies");
         }
+        DebugUtil.setInstance(ce.getMetaDebugUtil());
     }
 }

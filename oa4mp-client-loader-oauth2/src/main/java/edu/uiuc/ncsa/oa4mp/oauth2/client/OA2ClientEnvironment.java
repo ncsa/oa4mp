@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.client.ClientEnvironment;
 import edu.uiuc.ncsa.myproxy.oa4mp.client.storage.AssetProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.client.storage.AssetStore;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
+import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.delegation.client.DelegationService;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
@@ -39,7 +40,8 @@ public class OA2ClientEnvironment extends ClientEnvironment {
                                 boolean oidcEnabled,
                                 boolean showIDToken,
                                 boolean useBasicAuth,
-                                URI deviceAuthorizationUri) {
+                                URI deviceAuthorizationUri,
+                                MetaDebugUtil metaDebugUtil) {
         super(accessTokenUri,
                 authorizationUri,
                 callback,
@@ -56,6 +58,7 @@ public class OA2ClientEnvironment extends ClientEnvironment {
         this.showIDToken = showIDToken;
         this.useBasicAuth = useBasicAuth;
         this.deviceAuthorizationUri = deviceAuthorizationUri;
+        this.metaDebugUtil = metaDebugUtil;
     }
 
     public OA2ClientEnvironment(MyLoggingFacade logger, Map<String, String> constants,
@@ -86,7 +89,8 @@ public class OA2ClientEnvironment extends ClientEnvironment {
                                 boolean showIDToken,
                                 boolean useBasicAuth,
                                 Map<String, List<String>> additionalParameters,
-                                URI deviceAuthorizationUri) {
+                                URI deviceAuthorizationUri,
+                                MetaDebugUtil metaDebugUtil) {
         super(logger,
                 constants,
                 accessTokenUri,
@@ -120,6 +124,7 @@ public class OA2ClientEnvironment extends ClientEnvironment {
         this.useBasicAuth = useBasicAuth;
         this.additionalParameters = additionalParameters;
         this.deviceAuthorizationUri = deviceAuthorizationUri;
+        this.metaDebugUtil = metaDebugUtil;
     }
 
     public URI getDeviceAuthorizationUri() {
@@ -208,5 +213,16 @@ public class OA2ClientEnvironment extends ClientEnvironment {
     }
 
     boolean showIDToken = false;
+
+    public MetaDebugUtil getMetaDebugUtil() {
+        return metaDebugUtil;
+    }
+
+    public void setMetaDebugUtil(MetaDebugUtil metaDebugUtil) {
+        this.metaDebugUtil = metaDebugUtil;
+    }
+
+    MetaDebugUtil metaDebugUtil = null;
+
 
 }

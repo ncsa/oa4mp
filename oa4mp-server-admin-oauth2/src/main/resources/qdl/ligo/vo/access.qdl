@@ -27,7 +27,7 @@ allowed_scopes. := script_load('ligo/vo/get_scopes.qdl', claims.isMemberOf.);
  access_token.scope := detokenize(unique(allowed_scopes.), ' ', 2); // turn in to string, omit duplications, trailing space
 
 /*
-   Audience processing. If nonthign requested, return everything, otherwise
+   Audience processing. If nothign requested, return everything, otherwise
    return the subset of their request that is on our list of allowed audiences.
    There is no error in requesting audiences we do not recognize, we just
    don't honor them.
@@ -41,3 +41,14 @@ allowed_scopes. := script_load('ligo/vo/get_scopes.qdl', claims.isMemberOf.);
       access_token.aud. :=mask(all_audience.,  has_value(all_audience., audience.));
    ];
 
+// Issue: SciTokens allows for requesting audience in the scopes, so we have to
+// snoop there too.
+
+xi. := stAud(scopes.);
+
+if[
+  0 < size(xi.)
+ ][
+// then they made a request in the scopes.
+  access_token.aud. := xi.;
+];

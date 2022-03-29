@@ -181,9 +181,9 @@ public class ProxyUtils {
             throw new TransactionNotFoundException("No pending proxy transaction was found");
         }
         clcCommands.fromJSON(proxyState);
-        clcCommands.setPrintOuput(t.getOA2Client().isDebugOn());
+/*        clcCommands.setPrintOuput(t.getOA2Client().isDebugOn());
         clcCommands.setVerbose(t.getOA2Client().isDebugOn());
-        clcCommands.setDebugOn(t.getOA2Client().isDebugOn());
+        clcCommands.setDebugOn(t.getOA2Client().isDebugOn());*/
         return clcCommands;
     }
 
@@ -222,20 +222,20 @@ public class ProxyUtils {
         try {
             clcCommands.access(new InputLine("access "));
         } catch (Throwable throwable) {
-            throwable.printStackTrace();
             debugger.trace(ProxyUtils.class, "error contacting proxy", throwable);
+            if (throwable instanceof ServiceClientHTTPException) {
+                throw toOA2X((ServiceClientHTTPException) throwable, t);
+            }
             throw throwable;
         }
         if (clcCommands.hadException()) {
             debugger.trace(ProxyUtils.class, "doRFC8628AT got an exception in CLC");
-            Throwable throwable = clcCommands.getLastException();
+            Throwable throwable = clcCommands.getLastException(); // This is a ServiceClientHTTPException so just pass it along
+
             if (throwable instanceof ServiceClientHTTPException) {
-                ServiceClientHTTPException serviceClientHTTPException = (ServiceClientHTTPException) throwable;
-                JSONObject content = JSONObject.fromObject(serviceClientHTTPException.getContent());
-                throw new OA2ATException(content.getString("error"),
-                        content.getString("description"),
-                        serviceClientHTTPException.getStatus(), t.getRequestState());
+             throw toOA2X((ServiceClientHTTPException) throwable, t);
             }
+
             debugger.trace(ProxyUtils.class, "doRFC8628AT error contacting proxy", throwable);
             throw throwable;
         }
@@ -246,13 +246,20 @@ public class ProxyUtils {
             debugger.trace(ProxyUtils.class, "doRFC8628AT saving proxy state.");
             setClaimsFromProxy(t, clcCommands.getClaims(), debugger);
             oa2SE.getTransactionStore().save(t);
-        }catch(Throwable throwable){
+        } catch (Throwable throwable) {
             throwable.printStackTrace();
             throw throwable;
         }
         debugger.trace(ProxyUtils.class, "doRFC8628AT done.");
     }
 
+    protected static OA2ATException toOA2X(ServiceClientHTTPException serviceClientHTTPException, OA2ServiceTransaction t){
+            JSONObject content = JSONObject.fromObject(serviceClientHTTPException.getContent());
+            throw new OA2ATException(content.getString(OA2Constants.ERROR),
+                    content.getString(OA2Constants.ERROR_DESCRIPTION),
+                    serviceClientHTTPException.getStatus(), t.getRequestState());
+
+    }
     protected static void setClaimsFromProxy(OA2ServiceTransaction t, JSONObject proxyClaims, MetaDebugUtil debugger) {
         debugger.trace(ProxyUtils.class, "setClaimsFromProxy starting");
         JSONObject claims = t.getUserMetaData();
@@ -277,6 +284,7 @@ public class ProxyUtils {
                 }
             }
         }
+        debugger.trace(ProxyUtils.class, "created claims, returning " + claims.toString(2));
         t.setUserMetaData(claims); // Get might have created a new one, so be sure it gets stashed right.
     }
 

@@ -11,10 +11,7 @@ import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2Asset;
 import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2ClientEnvironment;
 import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2MPService;
 import edu.uiuc.ncsa.security.core.Identifier;
-import edu.uiuc.ncsa.security.core.util.DateUtils;
-import edu.uiuc.ncsa.security.core.util.DebugUtil;
-import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.core.util.StringUtils;
+import edu.uiuc.ncsa.security.core.util.*;
 import edu.uiuc.ncsa.security.delegation.client.request.RTResponse;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.Token;
@@ -74,7 +71,9 @@ public class OA2CLCCommands extends CLCCommands {
         setVerbose(!silentMode);
         oa2CommandLineClient.setVerbose(!silentMode);
     }
-
+    protected MetaDebugUtil getDebugger() throws Exception {
+        return ((OA2ClientEnvironment)oa2CommandLineClient.getEnvironment()).getMetaDebugUtil();
+    }
     public OA2CLCCommands(MyLoggingFacade logger,
                           OA2CommandLineClient oa2CommandLineClient) throws Exception {
         super(logger, null);
@@ -84,7 +83,7 @@ public class OA2CLCCommands extends CLCCommands {
             if (logger != null) {
                 logger.error("could not load configuration", t);
             } else {
-                if (DebugUtil.isEnabled()) {
+                if (getDebugger().isEnabled()) {
                     t.printStackTrace();
                 }
             }
@@ -235,7 +234,7 @@ public class OA2CLCCommands extends CLCCommands {
             grant = new AuthorizationGrantImpl(URI.create(dfResponse.getString(RFC8628Constants2.DEVICE_CODE)));
         } catch (Throwable t) {
             say("sorry but the response from the service was not understood:" + rawResponse);
-            if (DebugUtil.isEnabled()) {
+            if (getDebugger().isEnabled()) {
                 t.printStackTrace(); // in case /trace on
             }
         }
@@ -315,7 +314,7 @@ public class OA2CLCCommands extends CLCCommands {
         clear(inputLine, false); //clear out everything except any set parameters
         Identifier id = AssetStoreUtil.createID();
         OA4MPResponse resp = getService().requestCert(id, requestParameters);
-        DebugUtil.trace(this, "client id = " + getCe().getClientId());
+        getDebugger().trace(this, "client id = " + getCe().getClientId());
         currentURI = resp.getRedirect();
 
         dummyAsset = (OA2Asset) getCe().getAssetStore().get(id.toString());
@@ -743,7 +742,7 @@ public class OA2CLCCommands extends CLCCommands {
             say("Oops! No configuration has been loaded.");
             return;
         }
-        DebugUtil.trace(this, "Getting AT, grant=" + grant);
+        getDebugger().trace(this, "Getting AT, grant=" + grant);
         if (!isDeviceFlow) {
             standard_get_at(inputLine);
         } else {
@@ -1270,6 +1269,11 @@ public class OA2CLCCommands extends CLCCommands {
         if (json.containsKey(SYSTEM_MESSAGE_KEY)) {
             say(json.getString(SYSTEM_MESSAGE_KEY));
         }
+        if(json.containsKey("debugger")){
+            if(getDebugger() != null) {
+                getDebugger().fromJSON(json.getJSONObject("debugger"));
+            }
+        }
         if (json.containsKey(PRINT_OUTPUT_ON_KEY)) {
             setPrintOuput(json.getBoolean(PRINT_OUTPUT_ON_KEY));
         }
@@ -1407,6 +1411,20 @@ public class OA2CLCCommands extends CLCCommands {
         if (!isTrivial(lastUserMessage)) {
             jsonObject.put(USER_MESSAGE_KEY, lastUserMessage);
         }
+
+        try {
+            if(getDebugger() != null) {
+                jsonObject.put("debugger", getDebugger().toJSON());
+            }
+        } catch (Exception e) {
+            if(isPrintOuput()){
+                say("warn -- could not serialize debugger:" + e.getMessage());
+            }
+            if(isVerbose()){
+                e.printStackTrace();
+            }
+        }
+
         jsonObject.put(SYSTEM_MESSAGE_KEY, "OA4MP command line client state stored on " + (new Date()));
         if (grant != null) {
             jsonObject.put(AUTHZ_GRANT_KEY, grant.toJSON());

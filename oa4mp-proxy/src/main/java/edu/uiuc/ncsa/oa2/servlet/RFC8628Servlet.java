@@ -49,7 +49,6 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
 
     @Override
     protected void doIt(HttpServletRequest req, HttpServletResponse resp) throws Throwable {
-        printAllParameters(req);
         ServletDebugUtil.trace(this, "starting device flow");
         OA2SE oa2SE = (OA2SE) MyProxyDelegationServlet.getServiceEnvironment();
 
@@ -91,8 +90,9 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
                         null);
             }
         }
-        MetaDebugUtil debugUtil = MyProxyDelegationServlet.createDebugger(client);
-        debugUtil.trace(this, "checked client secret.");
+        MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(client);
+        debugger.trace(this, "is response committed?" + resp.isCommitted());
+        debugger.trace(this, "checked client secret.");
 
 
         long lifetime = 0 < client.getDfLifetime() ? client.getDfLifetime() : rfc8628ServletConfig.lifetime;
@@ -101,7 +101,7 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
         AGResponse agResponse = (AGResponse) getAGI().process(agRequest2);
         AuthorizationGrantImpl ag = ((OA2TokenForge) oa2SE.getTokenForge()).createToken(agRequest2);
         OA2ServiceTransaction t = (OA2ServiceTransaction) getTransactionStore().create();
-        debugUtil.trace(this, "created transaction \"" + t.getIdentifierString() + "\"");
+        debugger.trace(this, "created transaction \"" + t.getIdentifierString() + "\"");
         t.setClient(client);
         t.setIdentifier(BasicIdentifier.newID(ag.getURIToken()));
         t.setAuthorizationGrant(ag);
@@ -112,11 +112,11 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
         String scope = req.getParameter(OA2Constants.SCOPE);
         rfc8628State.originalScopes = scope;
         if (StringUtils.isTrivial(scope)) {
-            debugUtil.trace(this, "no scopes, using default for client");
+            debugger.trace(this, "no scopes, using default for client");
             t.setScopes(client.getScopes());
         } else {
             // scope is optional, so only take notice if they send something
-            debugUtil.trace(this, "checking scopes:" + scope + ". strict scopes " + (client.useStrictScopes() ? "on" : "off"));
+            debugger.trace(this, "checking scopes:" + scope + ". strict scopes " + (client.useStrictScopes() ? "on" : "off"));
             TransactionState transactionState = new TransactionState(req, resp, agResponse.getParameters(), t);
             try {
                 t.setScopes(ClientUtils.resolveScopes(transactionState, true, true));
@@ -164,14 +164,14 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
             rfc8628State.userCode = userCode;
             t.setUserCode(userCode);
         }
-        debugUtil.trace(this, "user_code = " + userCode);
+        debugger.trace(this, "user_code = " + userCode);
         rfc8628State.issuedAt = System.currentTimeMillis();
         rfc8628State.deviceCode = ag.getURIToken();
         rfc8628State.lastTry = System.currentTimeMillis(); // so it has a reasonable value
 
 
         t.setRFC8628State(rfc8628State);
-        debugUtil.trace(this, "saving transaction");
+        debugger.trace(this, "saving transaction");
         getTransactionStore().save(t);
 
         //write the response
@@ -185,7 +185,7 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
         jsonObject.put(RFC8628Constants.INTERVAL, rfc8628State.interval / 1000); // must be returned in seconds.
         jsonObject.put(RFC8628Constants.VERIFICATION_URI, rfc8628ServletConfig.deviceEndpoint);
         jsonObject.put(RFC8628Constants.VERIFICATION_URI_COMPLETE, rfc8628ServletConfig.deviceEndpoint + "?" + RFC8628Constants.USER_CODE + "=" + userCode);
-        debugUtil.trace(this, "done, writing response for " + jsonObject + "\n"); // add a line so logs are cleaner
+        debugger.trace(this, "done, writing response for " + jsonObject + "\n"); // add a line so logs are cleaner
         resp.getWriter().println(jsonObject.toString(1));
         resp.getWriter().flush();
         resp.getWriter().close();

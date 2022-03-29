@@ -60,6 +60,7 @@ create table :oa4mpSchema.:oa4mpClientTable  (
     issuer              text,
     ldap                text,
     scopes              text,
+    proxy_claims_list   text,
     public_client       boolean,
     sign_tokens         boolean,
     cfg                 text,
@@ -77,14 +78,16 @@ create table :oa4mpSchema.:oa4mpPermissionsTable  (
   creation_ts   TIMESTAMP
   );
 create table :oa4mpSchema.:oa4mpAdminClientTable  (
-    admin_id    text PRIMARY KEY,
-    name        text,
-    email       text,
-    secret      text,
-    vo          text,
-    vo_uri      text,
-    issuer      text,
-    max_clients integer,
+                 admin_id    text PRIMARY KEY,
+                 name        text,
+                 email       text,
+                 secret      text,
+                 vo          text,
+    list_users_other_clients boolean,
+                  list_users boolean,
+                  vo_uri     text,
+                  issuer     text,
+                  max_clients integer,
     creation_ts TIMESTAMP);
 
 
@@ -127,6 +130,7 @@ create table :oa4mpSchema.:oa4mpTransactionTable  (
    refresh_token_valid  boolean,
    expires_in           bigint,
    myproxyusername      text,
+   PROXY_ID             text,
    at_lifetime          bigint,
    username             text,
    auth_time            TIMESTAMP DEFAULT now(),

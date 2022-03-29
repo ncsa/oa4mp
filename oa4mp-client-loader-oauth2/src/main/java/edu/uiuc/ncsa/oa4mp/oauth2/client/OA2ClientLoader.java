@@ -109,7 +109,8 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
                     isShowIDToken(),
                     isUseBasicAuth(),
                     getAdditionalParameters(),
-                    getDeviceAuthorizationURI()
+                    getDeviceAuthorizationURI(),
+                    getDebugger()
             );
         } catch (Throwable e) {
             throw new GeneralException("Unable to create client environment", e);
@@ -261,10 +262,10 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
         constants.put(ClientEnvironment.TOKEN, OA2Constants.AUTHORIZATION_CODE);
         // no verifier in this protocol.
         T t = createInstance(tokenForgeProvider, clientProvider, constants);
-        loadDebug();
         t.setDebugOn(DebugUtil.isEnabled());
         return t;
     }
+
 
     Boolean useBasicAuth = null;
 

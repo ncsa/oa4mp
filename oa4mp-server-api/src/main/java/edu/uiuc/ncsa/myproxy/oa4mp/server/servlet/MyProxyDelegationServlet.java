@@ -52,7 +52,6 @@ public abstract class MyProxyDelegationServlet extends EnvServlet implements Tra
             MetaDebugUtil debugger = new ClientDebugUtil(client);
             debugger.setIsEnabled(true);
             debugger.setDebugLevel(DebugConstants.DEBUG_LEVEL_TRACE);
-            //debugger.setPrintTS(DebugUtil.getInstance().isPrintTS());
             debugger.setPrintTS(true); // just for this client
             return debugger;
         }
