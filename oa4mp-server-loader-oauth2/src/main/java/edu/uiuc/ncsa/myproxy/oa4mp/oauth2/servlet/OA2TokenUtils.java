@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RefreshTokenStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo.VirtualOrganization;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.security.core.exceptions.InvalidAlgorithmException;
 import edu.uiuc.ncsa.security.core.exceptions.InvalidSignatureException;
 import edu.uiuc.ncsa.security.core.exceptions.UnsupportedJWTTypeException;
@@ -63,7 +64,6 @@ public class OA2TokenUtils {
           }
         AccessTokenImpl accessToken;
         JSONObject sciTokens;
-        OA2TokenForge tokenForge = (OA2TokenForge) oa2se.getTokenForge();
         try {
             sciTokens = JWTUtil.verifyAndReadJWT(subjectToken, keys);
             //accessToken = tokenForge.getAccessToken(sciTokens.getString(JWT_ID));
@@ -87,11 +87,13 @@ public class OA2TokenUtils {
         if (t != null) {
             // Must present a valid token to get one.
             if (!t.isAccessTokenValid()) {
+                MyProxyDelegationServlet.createDebugger(t.getOA2Client()).trace(OA2TokenUtils.class, "Invalid access token \"" + accessToken.getJti() + "\"");
                 throw new OA2ATException(OA2Errors.INVALID_TOKEN,
                         "token invalid",
                         t.getRequestState());
             }
             if (accessToken.isExpired()) {
+                MyProxyDelegationServlet.createDebugger(t.getOA2Client()).trace(OA2TokenUtils.class, "expired access token \"" + accessToken.getJti() + "\"");
                 throw new OA2ATException(OA2Errors.INVALID_TOKEN,
                         "token expired",
                         t.getRequestState());
@@ -139,11 +141,13 @@ public class OA2TokenUtils {
            if (t != null) {
                // Must present a valid token to get one.
                if (!t.isRefreshTokenValid()) {
+                   MyProxyDelegationServlet.createDebugger(t.getOA2Client()).trace(OA2TokenUtils.class, "invalid refresh token \"" + refreshToken.getJti() + "\"");
                    throw new OA2ATException(OA2Errors.INVALID_GRANT,
                            "invalid refresh token",
                            t.getRequestState());
                }
                if (refreshToken.isExpired()) {
+                   MyProxyDelegationServlet.createDebugger(t.getOA2Client()).trace(OA2TokenUtils.class, "expired refresh token \"" + refreshToken.getJti() + "\"");
                    throw new OA2ATException(OA2Errors.INVALID_GRANT,
                            "expired refresh token",
                            t.getRequestState());

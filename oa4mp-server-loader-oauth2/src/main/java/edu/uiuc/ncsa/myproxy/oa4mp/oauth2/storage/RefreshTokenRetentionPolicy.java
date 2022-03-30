@@ -38,7 +38,7 @@ public class RefreshTokenRetentionPolicy extends SafeGCRetentionPolicy {
         return true;
     }
 
-    boolean rttracing = false; // This turns on tracing of cleanup independent of the debug state or the log fills.
+    boolean rttracing = true; // This turns on tracing of cleanup independent of the debug state or the log fills.
 
     protected void trace(String x) {
         if (rttracing) {
@@ -70,6 +70,7 @@ public class RefreshTokenRetentionPolicy extends SafeGCRetentionPolicy {
         // and there is a null access token.
         // CIL-1211 do not check validity of the grant since that is set asynchronously if the
         // authorization servlet has been replaced (e.g. in CILogon or proxying).
+        trace("expired?" + st2.getAuthorizationGrant().isExpired() + ", at null?" +(st2.getAccessToken()==null) );
         if (st2.getAuthorizationGrant().isExpired() && (st2.getAccessToken() == null)) {
             trace("abandoned transaction: " + id);
             return false;
@@ -148,4 +149,6 @@ public class RefreshTokenRetentionPolicy extends SafeGCRetentionPolicy {
     public Map getMap() {
         return rts;
     }
+
+
 }

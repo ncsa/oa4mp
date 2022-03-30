@@ -181,7 +181,7 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl implements C
         say(COPY + " - copy an entire store.\n");
         say(PARSER_COMMAND+ " - debug/use/try out the parser for scripting.\n");
         say("e.g.\n\nuse " + CLIENTS + "\n\nwill call up the client management component.");
-        say("Type 'exit' when you wish to exit the component and return to the main menu");
+        say("Type 'exit' or /q when you wish to exit the component and return to the main menu");
     }
 
 }

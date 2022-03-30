@@ -99,7 +99,7 @@ public class OA2Commands extends BaseCommands {
         say(VIRTUAL_ORGANIZATION + " - manage virtual organizations");
 //        say(JSON + " - enter JSON snippets to be used by the system in client configurations.\n");
         say("e.g.\n\nuse " + CLIENTS + "\n\nwill call up the client management component.");
-        say("Type 'exit' when you wish to exit the component and return to the main menu");
+        say("Type 'exit' or /q when you wish to exit the component and return to the main menu");
         say(" --> and /h prints your command history, /r runs the last command");
 
     }

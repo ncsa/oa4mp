@@ -26,15 +26,21 @@
 
 */
 block[
-     xi. := resolve_templates(at_claims.EPE., tx_scopes., false); // resolves any scopes explicitly granted to user
-
-     say('*** FNAL rtx xi. =' + to_string(xi.));
-
      // Only one capability set at most is allowed.
-     // At this point in the code. There is no CS ever passed
+     // At this point in the code there is no CS ever passed
      // (as per Dave on 6/27/2021), hence we must recover any from
      // the original scope request.
+     // 3/20/2022 -- Oopsie! Dave switched to using another client which *always* sends the capability
+     // set every time. Remove it if present since these would normally be removed in the access.qdl script.
+     say('*** FNAL tx_scopes.=' + to_string(tx_scopes.));
+     tx_scopes. := mask(tx_scopes., starts_with(tx_scopes., CS_HEAD)!= 0) ;
+     tx_scopes. := mask(tx_scopes., starts_with(tx_scopes., 'wlcg.groups:')!= 0) ;
+     
+     xi. := resolve_templates(at_claims.EPE., tx_scopes., false); // resolves any scopes explicitly granted to user
+     say('*** FNAL rtx xi. =' + to_string(xi.));
+
      cs. := []~mask(scopes., -1 < starts_with(scopes., CS_HEAD));
+     say('*** FNAL rtx cs.=' + to_string(cs.));
      if[
          1 == size(cs.)
      ][

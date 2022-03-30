@@ -191,7 +191,8 @@ When a new version is deployed, here is the testing order
 
   -- localhost:test/fnal
         Test client that point to main QDL scripts.
-        Note that these all use a specific test user in FNAL's LDAP, cilogontest@fnal.gov:
+        Note that these all use a specific test user in FNAL's LDAP, cilogontest@fnal.gov
+        so that it does not matter what identity you log on with, just that you can log on
 
         Test #0 -- request with no scopes.
            no scopes in access token (since none requested) => access_denied exception
@@ -295,6 +296,18 @@ When a new version is deployed, here is the testing order
 
        Also, do some refreshes, do some exchanges and make sure that the expected scopes
        are always returns faithfully.
+
+      ** OIDC Agent regression test for Dave. His client, oidc-agent simply resends the same scopes at each
+      phase. He can't really reconfigure it to do anything else. Load a clean CLC and set
+
+      set_param -a scope "wlcg.capabilityset:/fermilab wlcg.groups:/fermilab"
+      set_param -t scope "wlcg.capabilityset:/fermilab wlcg.groups:/fermilab"
+      set_param -x scope "wlcg.capabilityset:/fermilab wlcg.groups:/fermilab"
+      set_param -t scope "compute.modify storage.read:/fermilab/users/cilogontest/public"
+      set_param -x scope "compute.cancel foo.bar storage.read:/fermilab/users/cilogontest/public2 storage.create:/fermilab/users/dwd/public2 wlcg.capabilityset:/fermilab wlcg.groups:/fermilab"
+
+      Use device flow, since that is all Dave is interested in.
+
 
 
   Other localhost testing clients. These exist so various tests can be run.

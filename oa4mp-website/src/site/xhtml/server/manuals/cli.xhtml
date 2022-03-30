@@ -120,6 +120,89 @@ invoke the jar directly, the invocation options they are listed here.
 This would load the configuration named "myConfig" from the given file, write the log to a file called
 "mylog.xml" and bring up the approvals component.
 
+<h2>Help!</h2>
+<p>For every command you may add the switch <code>--help</code> and you will get
+the most up to date information on the topic available. The interactive help (as it
+is called) is always up to date. E.g. if you are using transactions and want to
+view the help for the <b>ls</b> command:</p>
+<pre>
+    transactions> ls --help
+    ls [-l  | -v | -E] | [-key key | -keys array] id
+      Usage: Lists information about the contents of the store, an entry and
+         individual values of the entry.
+      When listing multiple entries, tools will use the most numbers from the most recent call to this.
+      A line listing is tabular and will shorten entries that are too long, ending them with ...
+      A verbose command will format every bit of every entry within the margins.
+      Note: The argument idiom '-key key_name' may be replaced with '>key_name' as a shorthand
+    E.g.
+      ls -l  -E
+      Prints out the line form of *every* object in this store. This may be simply huge
+    E.g.
+      ls
+      Prints out the short form of *every* object in this store. This may also be huge.
+      If you are using this to find things, you probably want to look at the search command
+    E.g.
+      ls -l  /foo:bar
+      Prints a line format for the entry with id foo:bar
+    E.g.
+      ls -v /foo:bar
+      prints out a verbose listing of the entry with id foo:bar.
+    E.g.
+      ls -key id /foo:bar
+      >   foo:bar
+      Prints out the id property for the object with identifier foo:bar
+
+      You may also supply a list of keys in an array of the form [key0,key1,...].
+    E.g.
+      ls -keys [id,callback_uris,create_ts] /foo:bar
+      would print the id, callback_uri and create_ts properties for the object with id
+      foo:bar.
+
+  See also list_keys, search, archive
+    For transaction stores, you may also specify listing by using the access token or refresh token:
+    ls [-at | -rt token]
+    Note that other switches, such as -v work as well.
+</pre>
+<p>
+    You see that this contains the command line switches, various examples, specific switchs (<b>-at</b>)
+    only found in the transactions component and a <i>See also</i> block the point you at related
+    or useful other commands.
+</p>
+
+<h2>Meta commands</h2>
+<p>There are commands to do tasks and there are <i>meta-commands</i> that control how the
+CLI itself operates. These are prefixed with a backslash <b>/</b>. E.g. to quit a component,
+issue</p>
+<pre>/q</pre>
+<p>A full listing of meta commands is done with the ?:</p>
+<pre>/?</pre>
+<p>Extremely use meta-commands are a command history, executing a command in another component
+with out switching from the current one, saving you command history (useful if you want
+to use a set of commands as a basis for some scripting). To list the commands available for
+the admin component, you would issue</p>
+<pre>
+admin>/commands
+    approve          copy             deserialize      get_id           ls               rm               set_env          status_search
+    approver_search  count_clients    echo             link             print_env        rs               set_id           unlink
+     .
+     . (more commands)
+     .
+</pre>
+<h3>An example of using the // command</h3>
+<p>One specific meta command that is quite useful is the <b>//</b> which will execute a
+command for another component.For example, if you are working with transactions
+and want to check how many there are then see how many token exchanges there are,
+you would do this:</p>
+<pre>
+    transactions>size
+        Current store has 10 entries (excluding versions).
+    transactions>//tokens size
+        Current store has 3 entries (excluding versions).
+</pre>
+<p>Here the <b>//</b> tells the CLI to take the token component then the rest of the line
+(in this case just the size command) is passed to the component. Note that no argument
+will just change to that component and exiting it will return to you the original component.</p>
+
 <h2>Running the tool</h2>
 The CLI consists of utilities for each component that can be used. Once invoked you will see
 the startup banner and prompt:
@@ -127,7 +210,7 @@ the startup banner and prompt:
 [mybox bin]# ./oa4mp-cli
 **********************************************************
 * OA4MP CLI (Command Line Interpreter)                   *
-* Version 5.0.3                                          *
+* Version 5.2-SNAPSHOT                                          *
 * By Jeff Gaynor  NCSA                                   *
 *  (National Center for Supercomputing Applications)     *
 *                                                        *
@@ -156,20 +239,25 @@ Basic supported commands are
 
 To see the help for, say, the use command you would issue
 <pre>
- oa2> use --help
-
- Choose the component you wish to use.
- you specify the component as use + name. Supported components are
- clients - edit client records
- approvals - edit client approval records
- copy - copy an entire store.
-
+   oa2>use --help
+    Choose the component you wish to use.
+    you specify the component as use + name. Supported components are
+    clients - edit client records
+    approvals - edit client approval records
+    copy - copy an entire store.
+    keys - create a set of signing keys.
+    permissions - basic permission management.
+    admins - create or manage administrative clients.
+    parser - write/debug scripts from the command line.
+    tokens - manage tokens created in the token exchange endpoint
+    vo - manage virtual organizations
  e.g.
 
  use clients
 
  will call up the client management component.
- Type 'exit' when you wish to exit the component and return to the main menu
+ Type 'exit' or /q when you wish to exit the component and return to the main menu
+ --> and /h prints your command history, /r runs the last command
 </pre>
 
 Each of these components; <a href="cli.html#clients">clients</a>,
@@ -251,13 +339,15 @@ oa2>
 </pre>
 <p>This lists every element in the current component. The default is to sort by
 the given identifier, except clients which are sorted by creation date. At this point,
-sorting behavior cannot be changed. Each record is recorded on a single line.
+sorting behavior cannot be changed. The default format is the <i>short form</i>
+    where the identifier and a little information is shown. This is for quick perusal.
 No argument prints out everything in the store.
 Giving the optional index or unique identifier will
-    print a detailed listing of the object. Here are the command line switches that this understands:</p>>
+    print a listing of the object. Here are the command line switches that control how
+    much is printed:</p>>
 <ul>
-    <li>-l = long form of the listing. This means that entries longer than a line are truncated.</li>
-    <li>-E = list <b><i>ALL</i></b> the elements in the store. Default is short form</li>
+    <li>-l = line form of the listing. This means that entries longer than a line are truncated.</li>
+    <li>-E = (default) list <b><i>ALL</i></b> the elements in the store. Default is short form</li>
     <li>-v = verbose form of the listing. Entries longer than a line will be wrapped.</li>
 </ul>
 <i>Example.</i> Listing a specific object by unique identifier
@@ -270,8 +360,9 @@ oa4mp >use approvals
     3. (?) myproxy:oa4mp,2012:/adminClient/1332c1e8775d827e66e77c5c4c47d23f/1581513221096 by "junit" on 2020-02-12 07:13:41.0
   approvals >
 </pre>
-<p>By default (no arguments) it prints out the short form of every item in the store.
-    To now print out the details on number 1:</p>>
+<p>By default (no arguments) it prints out the short form of every item in the store. This is the same
+    as using the -E option.
+    To now print out the details on number 2:</p>>
 <pre>
     approvals >ls -l 2
     approval_ts : 2020-02-07 16:14:07.0
@@ -290,17 +381,15 @@ to keep typing it in.)
   clients> set_id oa4mp:/client_id/52d39e92ab5347c880fa19f3b9cb4204
   clients> ls -v
     callback_uri : ["https://client.example.org/callback","https://client.example.org/callback2"]
-             cfg : {"new":"config"}
+             cfg : {"new":
+                      "config"}
        client_id : oa4mp:/client_id/52d39e92ab5347c880fa19f3b9cb4204
      creation_ts : 2020-05-04 13:47:41.0
 last_modified_ts : 2020-05-04 13:48:21.0
             name : New Test name
    proxy_limited : false
    public_client : true
-      public_key : ZOq88bMz4wIxYDbqfPPSzW0Wv5lIZWnEX5yEAOjJTZn838wSrwa-Wh6xF4Vvi4MnBJ7eQuz0QLorDoKYt
-                   LEW6LV-u7sCbhEb3koXnysQE8dKnf4ykJoiCKsuIrMisYTXgnN2n76-q3qXzGB87TkPQbDav_U7Ql6K9q
-                   -f-G9coKpU2d4CTMx8vcXL2aYy1_XvkV1yZva1M0fHUFIqPRyZPrWapiTqeEzoXk2sJVzByDJgLp7psBa
-                   ghosJfkqVTDQX_M17FBLYXZv7M
+      public_key : ZOq88bMz4wIxYDbqfPPSzW0Wv5lIZWnEX5yE
      rt_lifetime : 0
           scopes : ["openid"]
      sign_tokens : true

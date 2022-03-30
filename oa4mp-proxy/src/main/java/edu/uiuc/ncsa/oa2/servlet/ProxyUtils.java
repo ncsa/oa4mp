@@ -80,7 +80,7 @@ public class ProxyUtils {
         t.setProxyState(clcCommands.toJSON());
         // Here's where we need to poke at this.
         oa2SE.getTransactionStore().save(t); // save that proxy id!
-        debugger.trace(ProxyUtils.class, "doProxyRedirect, rapper committed? " + wrapper.isCommitted());
+        debugger.trace(ProxyUtils.class, "doProxyRedirect, wrapper committed? " + wrapper.isCommitted());
         wrapper.sendRedirect(uri.toString());
     }
 
