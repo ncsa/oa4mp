@@ -8,6 +8,7 @@ import edu.uiuc.ncsa.security.core.exceptions.InvalidTimestampException;
 import edu.uiuc.ncsa.security.core.util.DateUtils;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
+import edu.uiuc.ncsa.security.delegation.token.MyX509Certificates;
 import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
 
 import java.util.Date;
@@ -54,6 +55,14 @@ public class RefreshTokenRetentionPolicy extends SafeGCRetentionPolicy {
     @Override
     public boolean retain(Object key, Object value) {
         OA2ServiceTransaction st2 = (OA2ServiceTransaction) value;
+        // First stop. If there are certificates then we will keep this around since the user can
+        // come back to reget it.
+        if(st2.getProtectedAsset()!=null && (st2.getProtectedAsset() instanceof MyX509Certificates)){
+            if(System.currentTimeMillis() < st2.getLifetime() + st2.getAuthTime().getTime()){
+                return true;
+            }
+
+        }
         String id = "id=" + (st2.getClient()!=null?st2.getClient().getIdentifierString():"(no id)") +
                 ", trans = " + ((st2.hasAuthorizationGrant()?st2.getAuthorizationGrant().getToken():"no auth grant"));
         trace("starting check: " + id);
@@ -134,7 +143,10 @@ public class RefreshTokenRetentionPolicy extends SafeGCRetentionPolicy {
                 trace("tx store parent count: 0<" + parentCount + ", returning true (retain it) ");
                 return true;
             }
-            if (st2.getClient().isDebugOn()) {
+            // edge case: Client generates a transaction (maybe very long lived refresh token) but
+            // client gets deleted. Check if there is a client first or this will bomb with an NPE and
+            // the transaction will never get garbage collected.
+            if (st2.getClient()!=null && st2.getClient().isDebugOn()) {
                 MetaDebugUtil debugUtil = MyProxyDelegationServlet.createDebugger(st2.getOA2Client());
                 String msg = (new Date(System.currentTimeMillis())) + ": ***Removing token " + token + " with time out " + timeout;
                 debugUtil.trace(this, msg);

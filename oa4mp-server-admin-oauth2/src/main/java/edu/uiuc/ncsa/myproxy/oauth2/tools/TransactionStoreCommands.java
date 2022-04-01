@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oauth2.tools;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RefreshTokenRetentionPolicy;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RefreshTokenStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXStore;
@@ -208,6 +209,7 @@ public class TransactionStoreCommands extends StoreCommands2 {
     /**
      * note that this (and {@link #getIDByRT(InputLine)} are a bit specific in that they look things up
      * by the JTI of the  token, so quite a bit of proessign has been done already to get to this point.
+     *
      * @param inputLine
      * @return
      */
@@ -285,35 +287,36 @@ public class TransactionStoreCommands extends StoreCommands2 {
         super.ls(inputLine);
     }
 
-   public void set_qdl_state(InputLine inputLine) throws Throwable {
-       if (showHelp(inputLine)) {
-           say("set_qdl_state " + CL_INPUT_FILE_FLAG + " file_path id");
-           say("replace the qdl state in the transaction with the contents of the file.");
-           say("Note that the file is XML and will be converted as needed.");
-           say("See also: show_qdl_state");
-           return;
-       }
-       if(!inputLine.hasArg(CL_INPUT_FILE_FLAG)){
-           say("sorry, but you must specify a file");
-           return;
-       }
+    public void set_qdl_state(InputLine inputLine) throws Throwable {
+        if (showHelp(inputLine)) {
+            say("set_qdl_state " + CL_INPUT_FILE_FLAG + " file_path id");
+            say("replace the qdl state in the transaction with the contents of the file.");
+            say("Note that the file is XML and will be converted as needed.");
+            say("See also: show_qdl_state");
+            return;
+        }
+        if (!inputLine.hasArg(CL_INPUT_FILE_FLAG)) {
+            say("sorry, but you must specify a file");
+            return;
+        }
         String f = inputLine.getNextArgFor(CL_INPUT_FILE_FLAG);
-       inputLine.removeSwitchAndValue(CL_OUTPUT_FILE_FLAG);
-       OA2ServiceTransaction t = (OA2ServiceTransaction) findItem(inputLine);
-       if(t == null){
-           say("sorry, I cannot find that transaction.");
-           return;
-       }
-       String rawFile = FileUtil.readFileAsString(f);
-       ByteArrayOutputStream baos = new ByteArrayOutputStream();
-       GZIPOutputStream gzipOutputStream = new GZIPOutputStream(baos);
-       gzipOutputStream.write(rawFile.getBytes("UTF-8"));
-       gzipOutputStream.flush();
-       gzipOutputStream.close();
-       String encoded = Base64.encodeBase64URLSafeString(baos.toByteArray());
-       t.setScriptState(encoded);
-       say("done!");
-   }
+        inputLine.removeSwitchAndValue(CL_OUTPUT_FILE_FLAG);
+        OA2ServiceTransaction t = (OA2ServiceTransaction) findItem(inputLine);
+        if (t == null) {
+            say("sorry, I cannot find that transaction.");
+            return;
+        }
+        String rawFile = FileUtil.readFileAsString(f);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        GZIPOutputStream gzipOutputStream = new GZIPOutputStream(baos);
+        gzipOutputStream.write(rawFile.getBytes("UTF-8"));
+        gzipOutputStream.flush();
+        gzipOutputStream.close();
+        String encoded = Base64.encodeBase64URLSafeString(baos.toByteArray());
+        t.setScriptState(encoded);
+        say("done!");
+    }
+
     public void show_qdl_state(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
             say("show_qdl_state [" + LS_AT_FLAG + "|" + LS_RT_FLAG + " " + CL_OUTPUT_FILE_FLAG + " file_path] id");
@@ -395,13 +398,13 @@ public class TransactionStoreCommands extends StoreCommands2 {
                 break;
             out.append(buffer, 0, rsz);
         }
-        if(saveFile){
+        if (saveFile) {
             try {
                 FileUtil.writeStringToFile(f, out.toString());
                 say("saved QDL state to '" + f + "'");
             } catch (Throwable e) {
                 say("saving to '" + f + " failed:" + e.getMessage());
-                if(isVerbose() && isPrintOuput()){
+                if (isVerbose() && isPrintOuput()) {
                     e.printStackTrace();
                 }
             }
@@ -430,5 +433,29 @@ public class TransactionStoreCommands extends StoreCommands2 {
         }
 
         format(serviceTransaction);
+    }
+
+    /**
+     * Does a basic garbage collection check against the {@link RefreshTokenRetentionPolicy}.
+     * This component does not have access to the full service environment so cannot quite
+     * reconstruct the exact call: It will assume safeGC mode is set to false.
+     * @param inputLine
+     * @throws Exception
+     */
+    public void gc_check(InputLine inputLine) throws Exception {
+        if (showHelp(inputLine)) {
+            say("gc_check [id|index] = check if the transaction would get garbage collected");
+            say("                      in the current environment.");
+            say("Note that the check is done assuming safe GC mode on the server is false.");
+            return;
+        }
+        Identifiable identifiable = findItem(inputLine);
+        if (identifiable == null) {
+            say("Sorry, transaction not found");
+            return;
+        }
+        RefreshTokenRetentionPolicy refreshTokenRetentionPolicy =
+                new RefreshTokenRetentionPolicy((RefreshTokenStore) getStore(), getTxStore(), "", false);
+        say("retain? " + refreshTokenRetentionPolicy.retain(identifiable.getIdentifier(), identifiable));
     }
 }

@@ -48,6 +48,8 @@ public class OA2TConverter<V extends OA2ServiceTransaction> extends TransactionC
         Object refreshToken = map.get(getTCK().refreshToken());
 
         if (refreshToken != null) {
+            st.setRefreshToken(null);
+        }else{
             if (refreshToken instanceof RefreshToken) {
                 st.setRefreshToken((RefreshToken) refreshToken);
             } else {

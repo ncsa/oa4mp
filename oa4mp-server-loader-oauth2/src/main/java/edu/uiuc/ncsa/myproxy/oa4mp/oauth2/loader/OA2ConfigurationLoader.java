@@ -381,7 +381,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         return safeGC;
     }
 
-    Boolean safeGC = true;
+    Boolean safeGC = null;
 
     public boolean isQdlStrictACLS() {
         return qdlStrictACLS;
