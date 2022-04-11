@@ -68,6 +68,20 @@
         <td style="vertical-align: top;">20 minutes</td>
         <td style="vertical-align: top;">How often should the cleanup thread run (in seconds).</td>
     </tr>
+    <tr id="cleanupAlarms">
+        <td style="vertical-align: top;">cleanupAlarms</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">N/A</td>
+        <td style="vertical-align: top;">Comma delimited list of times of the form hh:mm:ss.
+        Times are on a 24 hour clock and fractions of seconds are ignored.
+        Cleanups will happen daily at these times.
+        Note that alarms have right of way in that if you define alarms
+        and a cleanupInterval, the alarms will be done. If you do too want alarms,
+        do not have this entry. <br/><br/>
+        E.g.<br/>
+        cleanupAlarms="06:00:00, 18:30:00"<br/><br/>
+        Would have garbage collection run daily at 6:00 am and 6:30 pm.</td>
+    </tr>
     <tr id="clientSecretLength">
         <td style="vertical-align: top;">clientSecretLength</td>
         <td style="vertical-align: top;">N</td>

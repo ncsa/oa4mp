@@ -247,7 +247,7 @@ public class ProxyUtils {
             setClaimsFromProxy(t, clcCommands.getClaims(), debugger);
             oa2SE.getTransactionStore().save(t);
         } catch (Throwable throwable) {
-            throwable.printStackTrace();
+           if(debugger.isEnabled()){ throwable.printStackTrace();}
             throw throwable;
         }
         debugger.trace(ProxyUtils.class, "doRFC8628AT done.");

@@ -8,10 +8,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.util.ExceptionEventNotifier;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.NewClientNotifier;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
-import edu.uiuc.ncsa.security.core.cache.Cache;
-import edu.uiuc.ncsa.security.core.cache.CachedObject;
-import edu.uiuc.ncsa.security.core.cache.Cleanup;
-import edu.uiuc.ncsa.security.core.cache.ValidTimestampPolicy;
+import edu.uiuc.ncsa.security.core.cache.*;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
@@ -148,22 +145,22 @@ public class OA4MPServletInitializer implements Initialization {
             e.printStackTrace();
             throw new ServletException("Could not update table", e);
         }
-        Cleanup transactionCleanup = MyProxyDelegationServlet.transactionCleanup;
+//        Cleanup transactionCleanup = MyProxyDelegationServlet.transactionCleanup;
         ServiceEnvironmentImpl env = (ServiceEnvironmentImpl) getEnvironment();
 
         MyLoggingFacade logger = env.getMyLogger();
         logger.info("Cleaning up incomplete client registrations");
 
 
-        if (transactionCleanup == null) {
+        if (MyProxyDelegationServlet.transactionCleanup == null) {
+            LockingCleanup lc =  new LockingCleanup<>(logger, "transaction cleanup");
+            //transactionCleanup = new Cleanup<>(logger, "transaction cleanup");
 
-            transactionCleanup = new Cleanup<>(logger, "transaction cleanup");
 
-            MyProxyDelegationServlet.transactionCleanup = transactionCleanup; // set it in the servlet
-
-            transactionCleanup.setStopThread(false);
-            transactionCleanup.setMap(env.getTransactionStore());
-            transactionCleanup.addRetentionPolicy(new ValidTimestampPolicy());
+            lc.setStopThread(false);
+            lc.setStore(env.getTransactionStore());
+            lc.addRetentionPolicy(new ValidTimestampPolicy());
+            MyProxyDelegationServlet.transactionCleanup = lc; // set it in the servlet
             // Part of migration away from OAuth 1.0a. Do not start this here
        //     transactionCleanup.start();
        //     logger.info("Starting transaction store cleanup thread");

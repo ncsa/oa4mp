@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.client.servlet;
 
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.servlet.ExceptionHandler;
 import edu.uiuc.ncsa.security.servlet.JSPUtil;
@@ -29,7 +30,7 @@ public class ClientExceptionHandler implements ExceptionHandler {
     }
     @Override
     public void handleException(Throwable t, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        t.printStackTrace();
+        if(DebugUtil.isEnabled()){t.printStackTrace();}
         if (t.getCause() == null) {
             clientServlet.warn("2.a. Exception from the server: (no other cause)");
             request.setAttribute("cause", "(none)");

@@ -20,7 +20,7 @@ import edu.uiuc.ncsa.qdl.module.MTStack;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.StateUtils;
 import edu.uiuc.ncsa.qdl.variables.VStack;
-import edu.uiuc.ncsa.security.core.cache.Cleanup;
+import edu.uiuc.ncsa.security.core.cache.LockingCleanup;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
@@ -63,12 +63,23 @@ public class OA2ServletInitializer extends OA4MPServletInitializer {
         OA2SE oa2SE = (OA2SE) getEnvironment();
         DebugUtil.setInstance(oa2SE.getDebugger()); // sets global debugger.
         DebugUtil.setPrintTS(oa2SE.isPrintTSInDebug());
-
+        // Let the older myproxy connection clean up use alarms.
+         if(MyProxyDelegationServlet.myproxyConnectionCleanup != null){
+             if(oa2SE.hasCleanupAlarms()){
+                 MyProxyDelegationServlet.myproxyConnectionCleanup.setAlarms(oa2SE.getCleanupAlarms());
+             }else{
+                 MyProxyDelegationServlet.myproxyConnectionCleanup.setCleanupInterval(oa2SE.getCleanupInterval());
+             }
+         }
         if (oa2SE.isRefreshTokenEnabled()) {
             MyProxyDelegationServlet.transactionCleanup.getRetentionPolicies().clear(); // We need a different set of policies than the original one.
-
-            MyProxyDelegationServlet.transactionCleanup.setCleanupInterval(oa2SE.getCleanupInterval());
-            DebugUtil.trace(this, "setting transaction cleanup interval to " + oa2SE.getCleanupInterval() + " ms.");
+            if(oa2SE.hasCleanupAlarms()){
+                MyProxyDelegationServlet.transactionCleanup.setAlarms(oa2SE.getCleanupAlarms());
+                DebugUtil.trace(this, "setting transaction cleanup alarms " + oa2SE.getCleanupAlarms());
+            } else{
+                MyProxyDelegationServlet.transactionCleanup.setCleanupInterval(oa2SE.getCleanupInterval());
+                DebugUtil.trace(this, "setting transaction cleanup interval to " + oa2SE.getCleanupInterval() + " ms.");
+            }
             MyProxyDelegationServlet.transactionCleanup.addRetentionPolicy(
                     new RefreshTokenRetentionPolicy(
                             (RefreshTokenStore) oa2SE.getTransactionStore(),
@@ -83,12 +94,20 @@ public class OA2ServletInitializer extends OA4MPServletInitializer {
             ClaimSourceFactory.setFactory(new ClaimSourceFactoryImpl());
         }
         if (txRecordCleanup == null) {
-            txRecordCleanup = new Cleanup<>(getEnvironment().getMyLogger(), "TX record cleanup");
-            txRecordCleanup.setCleanupInterval(oa2SE.getCleanupInterval());
-            DebugUtil.trace(this, "setting tx record cleanup interval to " + oa2SE.getCleanupInterval() + " ms.");
-            txRecordCleanup.setStopThread(false);
-            txRecordCleanup.setMap(oa2SE.getTxStore());
-            txRecordCleanup.addRetentionPolicy(new TokenExchangeRecordRetentionPolicy(oa2SE.getServiceAddress().toString(), oa2SE.isSafeGC()));
+            LockingCleanup lc = new LockingCleanup(getEnvironment().getMyLogger(), "TX record cleanup");
+            //txRecordCleanup = new Cleanup<>(getEnvironment().getMyLogger(), "TX record cleanup");
+              lc.setStore(oa2SE.getTxStore());
+            if(oa2SE.hasCleanupAlarms()){
+                lc.setAlarms(oa2SE.getCleanupAlarms());
+                DebugUtil.trace(this, "setting tx record cleanup alarms to " + oa2SE.getCleanupAlarms());
+            } else{
+                lc.setCleanupInterval(oa2SE.getCleanupInterval());
+                DebugUtil.trace(this, "setting tx record cleanup interval to " + oa2SE.getCleanupInterval() + " ms.");
+            }
+            lc.setStopThread(false);
+            //txRecordCleanup.setMap(oa2SE.getTxStore());
+            lc.addRetentionPolicy(new TokenExchangeRecordRetentionPolicy(oa2SE.getServiceAddress().toString(), oa2SE.isSafeGC()));
+            txRecordCleanup = lc;
             txRecordCleanup.start();
             oa2SE.getMyLogger().info("Starting token exchange record store cleanup thread with interval " + oa2SE.getCleanupInterval());
         }

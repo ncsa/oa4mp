@@ -1,6 +1,8 @@
 package edu.uiuc.ncsa.myproxy.oauth2.tools;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.TokenExchangeRecordRetentionPolicy;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RefreshTokenRetentionPolicy;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RefreshTokenStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
@@ -9,6 +11,8 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.StoreCommands2;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
+import edu.uiuc.ncsa.security.core.cache.Cleanup;
+import edu.uiuc.ncsa.security.core.cache.LockingCleanup;
 import edu.uiuc.ncsa.security.core.util.*;
 import edu.uiuc.ncsa.security.delegation.storage.TransactionStore;
 import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
@@ -21,9 +25,11 @@ import org.apache.commons.codec.binary.Base64;
 import java.io.*;
 import java.net.URI;
 import java.util.Date;
+import java.util.List;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+import static edu.uiuc.ncsa.security.core.cache.LockingCleanup.lockID;
 import static edu.uiuc.ncsa.security.core.util.StringUtils.pad2;
 
 /**
@@ -31,10 +37,13 @@ import static edu.uiuc.ncsa.security.core.util.StringUtils.pad2;
  * on 11/16/20 at  3:16 PM
  */
 public class TransactionStoreCommands extends StoreCommands2 {
-    public TransactionStoreCommands(MyLoggingFacade logger, String defaultIndent, Store store, TXStore txStore) {
-        super(logger, defaultIndent, store);
-        this.txStore = txStore;
+    public TransactionStoreCommands(MyLoggingFacade logger, String defaultIndent, OA2SE oa2se) {
+        super(logger, defaultIndent, oa2se.getTransactionStore());
+        this.oa2se = oa2se;
+        this.txStore = oa2se.getTxStore();
     }
+
+    OA2SE oa2se;
 
     public TXStore getTxStore() {
         return txStore;
@@ -439,6 +448,7 @@ public class TransactionStoreCommands extends StoreCommands2 {
      * Does a basic garbage collection check against the {@link RefreshTokenRetentionPolicy}.
      * This component does not have access to the full service environment so cannot quite
      * reconstruct the exact call: It will assume safeGC mode is set to false.
+     *
      * @param inputLine
      * @throws Exception
      */
@@ -458,4 +468,180 @@ public class TransactionStoreCommands extends StoreCommands2 {
                 new RefreshTokenRetentionPolicy((RefreshTokenStore) getStore(), getTxStore(), "", false);
         say("retain? " + refreshTokenRetentionPolicy.retain(identifiable.getIdentifier(), identifiable));
     }
+
+    public static String GC_SAFE_MODE_FLAG = "-safe_gc";
+    public static String GC_TEST_FLAG = "-test";
+    public static String GC_SIZE_FLAG = "-size";
+    public static String GC_FILE_FLAG = "-file";
+
+    public void gc_run(InputLine inputLine) throws Exception {
+        if (showHelp(inputLine)) {
+            say("gc -run [" +
+                    GC_SAFE_MODE_FLAG + " address] [" +
+                    GC_TEST_FLAG + "]  [" +
+                    GC_FILE_FLAG + " output_file]  [" +
+                    GC_SIZE_FLAG + "] - run garbage collection on the transaction store");
+            say(GC_SAFE_MODE_FLAG + " - if present, run in safe mode so that only those transactions in the ");
+            say("        correct scheme and host will be garbage collected");
+            say(GC_TEST_FLAG + " - if present, only test which would be garbage collected");
+            say(GC_SIZE_FLAG + " - if present, print  number of transactions found ");
+            say(GC_FILE_FLAG + " file - writes the ids to the output file.");
+            say("E.g.");
+            say("gc_run " + GC_SAFE_MODE_FLAG + " https://cilogon.org");
+            say("would only remove transactions that start with https://cilogon.org ");
+            say("\nThe default is to apply garbage collection to every entry in the transaction store");
+            return;
+        }
+        boolean printSize = inputLine.hasArg(GC_SIZE_FLAG);
+        inputLine.removeSwitch(GC_SIZE_FLAG);
+        boolean testMode = inputLine.hasArg(GC_TEST_FLAG);
+        inputLine.removeSwitch(GC_TEST_FLAG);
+        boolean doOutput = inputLine.hasArg(GC_FILE_FLAG);
+        String outFile = null;
+        if (doOutput) {
+            outFile = inputLine.getNextArgFor(GC_FILE_FLAG);
+            inputLine.removeSwitchAndValue(GC_FILE_FLAG);
+        }
+        if (!testMode && !isBatchMode()) {
+            if (!readline("Are you SURE? (yes/no)").equals("yes")) {
+                say("aborting...");
+                return;
+            }
+        }
+        boolean safeGC = false;
+        String address = "";
+        if (inputLine.hasArg(GC_SAFE_MODE_FLAG)) {
+            safeGC = true;
+            address = inputLine.getNextArgFor(GC_SAFE_MODE_FLAG);
+            inputLine.removeSwitchAndValue(GC_SAFE_MODE_FLAG);
+        }
+        if (testMode) {
+            say("testing transaction record cleanup");
+        } else {
+            say("cleaning up transaction records");
+        }
+
+        LockingCleanup transactionCleanup = new LockingCleanup(null, "transaction cleanup");
+        transactionCleanup.setCleanupInterval(0L); // run it now
+        transactionCleanup.setStore(getStore());
+        transactionCleanup.setTestMode(testMode);
+        transactionCleanup.addRetentionPolicy(
+                new RefreshTokenRetentionPolicy(
+                        (RefreshTokenStore) getStore(),
+                        getTxStore(),
+                        address,
+                        safeGC));
+        transactionCleanup.setStopThread(false);
+        List<OA2ServiceTransaction> transactions = transactionCleanup.age();
+        FileWriter fileWriter = null;
+        File file = null;
+
+        if (doOutput) {
+            file = new File(outFile);
+            fileWriter = new FileWriter(file);
+            for (OA2ServiceTransaction t : transactions) {
+                fileWriter.write(t.getIdentifierString() + "\n");
+            }
+            //   fileWriter.flush();
+            //    fileWriter.close();
+            say("wrote transaction ids to " + file.getAbsolutePath());
+            if (printSize) {
+                say(transactions.size() + " transactions found of " + getStore().size() + " to garbage collect");
+            }
+        } else {
+            if (!printSize) {
+                for (OA2ServiceTransaction t : transactions) {
+                    say(t.getIdentifierString());
+                }
+            }
+            say(transactions.size() + " transactions found of " + getStore().size() + " to garbage collect");
+        }
+
+        if (testMode) {
+            say("testing token exchange record cleanup");
+        } else {
+            say("cleaning up token exchange records");
+        }
+        Cleanup txRecordCleanup = new Cleanup<>(null, "TX record cleanup");
+        txRecordCleanup.setCleanupInterval(0);
+        txRecordCleanup.setStopThread(false);
+        txRecordCleanup.setMap(getTxStore());
+        txRecordCleanup.setTestMode(testMode);
+        txRecordCleanup.addRetentionPolicy(new TokenExchangeRecordRetentionPolicy(address, safeGC));
+        List<TXRecord> txRecords = txRecordCleanup.age();
+        if (doOutput) {
+            fileWriter.write(""); // blank line between
+            for (TXRecord t : txRecords) {
+                fileWriter.write(t.getIdentifierString() + "\n");
+            }
+            fileWriter.flush();
+            fileWriter.close();
+            say("wrote tx record ids to " + file.getAbsolutePath());
+            if (printSize) {
+                say(txRecords.size() + " tx records found of " + getTxStore().size() + " to garbage collect");
+            }
+        } else {
+            if (!printSize) {
+                for (TXRecord t : txRecords) {
+                    say(t.getIdentifierString());
+                }
+            }
+            say(txRecords.size() + " tx records found of " + getTxStore().size() + " to garbage collect");
+
+        }
+    }
+
+    // Todo: Have a general gc facility to test, lock, unlock, etc???
+    public static String GC_CHECK_FLAG = "-check";
+    public static String GC_RUN_FLAG = "-run";
+    public static String GC_IS_LOCKED_FLAG = "-?";
+    public static String GC_IS_UNLOCK_FLAG = "-unlock";
+    public static String GC_IS_LOCK_FLAG = "-lock";
+    public static String GC_IS_ALARMS_FLAG = "-alarms";
+
+
+    public void gc_lock(InputLine inputLine) throws Exception{
+        if(showHelp(inputLine)){
+            say("gc_lock [-rm | ? | -alarms]");
+            say("(no arg) - lock the transaction and TX stores");
+            say("-rm - remove any locks");
+            say("? - report if stores are locked.");
+            say("-alarms - show configured alarms");
+            return;
+        }
+        if(inputLine.hasArg("-alarms")){
+            if(oa2se.hasCleanupAlarms()){
+                say("alarms set for " + oa2se.getCleanupAlarms());
+            }else{
+                   say("no configured alarms. Cleanup interval is " + oa2se.getCleanupInterval());
+            }
+            return;
+        }
+        if(inputLine.hasArg("?")){
+            say("transactions locked? " + getStore().containsKey(lockID));
+            say("TX store locked? " + getTxStore().containsKey(lockID));
+            return;
+        }
+        if(inputLine.hasArg("-rm")){
+            say("removing locks...");
+            boolean t = null == getStore().remove(lockID);
+            boolean tx = null == getTxStore().remove(lockID);
+            say((t?"did not remove":"removed")+ " transaction store lock");
+            say((tx?"did not remove":"removed")+ " TX store store lock");
+            return;
+        }
+        Identifiable tLock = getStore().create();
+        tLock.setIdentifier(lockID);
+        getStore().save(tLock);
+        say("transaction store locked");
+
+        tLock = getTxStore().create();
+        tLock.setIdentifier(lockID);
+        getTxStore().save(tLock);
+        say("TX store locked");
+        // lock, unlock, is locked
+    }
+
+
+
 }

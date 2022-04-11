@@ -78,9 +78,11 @@ import org.apache.commons.configuration.tree.ConfigurationNode;
 import javax.inject.Provider;
 import java.io.File;
 import java.net.URI;
+import java.time.LocalTime;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.TreeSet;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.OA4MPIdentifierProvider.TRANSACTION_ID;
 import static edu.uiuc.ncsa.security.core.configuration.Configurations.*;
@@ -99,6 +101,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
     public static final String PRINT_TS_IN_DEBUG = "printTSInDebug";
     public static final String NOTIFY_ADMIN_CLIENT_ADDRESSES = "notifyACEmailAddresses";
     public static final String CLEANUP_INTERVAL_TAG = "cleanupInterval";
+    public static final String CLEANUP_ALARMS_TAG = "cleanupAlarms";
     public static final String RFC7636_REQUIRED_TAG = "rfc7636Required";
     public static final String DEMO_MODE_TAG = "demoModeEnabled";
 
@@ -184,6 +187,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     isRFC8628Enabled(),
                     isprintTSInDebug(),
                     getCleanupInterval(),
+                    getAlarms(),
                     isNotifyACEventEmailAddresses(),
                     isRFC7636Required(),
                     isDemoModeEnabled(),
@@ -201,6 +205,28 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
 
     RFC8628ServletConfig rfc8628ServletConfig = null;
 
+   Collection<LocalTime> alarms = null;
+   public Collection<LocalTime> getAlarms(){
+       if(alarms == null) {
+           String raw = getFirstAttribute(cn, CLEANUP_ALARMS_TAG);
+           alarms = new TreeSet<>();  // sorts them.
+           if (!StringUtils.isTrivial(raw)) {
+               String[] ta = raw.split(",");
+               // get all the times that parse correctly
+               for (String time : ta) {
+                   try {
+                       alarms.add(LocalTime.parse(time.trim()));
+                   } catch (Throwable t) {
+                       loggerProvider.get().warn("cannot parse alarm date \"" + ta + "\"");
+                       // do nothing
+                   }
+               }
+           }
+
+           DebugUtil.trace(this, CLEANUP_ALARMS_TAG + " found: " + alarms );
+       }
+       return alarms;
+   }
     public RFC8628ServletConfig getRFC8628ServletConfig() {
         if (rfc8628ServletConfig == null) {
             rfc8628ServletConfig = new RFC8628ServletConfig();

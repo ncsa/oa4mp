@@ -875,6 +875,10 @@ public abstract class StoreCommands2 extends StoreCommands {
             showLSHelp();
             return;
         }
+        if(inputLine.hasArg(NEXT_N_COMMAND)){
+            say(NEXT_N_COMMAND + " not supported in ls. Use search.");
+            return;
+        }
         String key = getAndCheckKeyArg(inputLine);
         if (key == null && !inputLine.hasArg(KEYS_FLAG)) {
             super.ls(inputLine);

@@ -124,7 +124,7 @@ public class OA2FSTStore<V extends OA2ServiceTransaction> extends DSFSTransactio
     @Override
     public V getByProxyID(Identifier proxyID) {
         for (Identifier id : keySet()) {
-            V transaction = getByProxyID(id);
+            V transaction = get(id);
             if (transaction != null && transaction.getProxyId().equals(id)) {
                 return transaction;
             }

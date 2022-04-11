@@ -163,7 +163,7 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
             }
 
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            e.printStackTrace(); // now way this can happen, but if it does, we want to know about it.
         }
         return cb;
     }

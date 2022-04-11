@@ -19,10 +19,10 @@
           caput ≔  w + ':'; // head of WLCG requested group.
   group_scopes. ≔  mask(scopes., ¯1 < starts_with(scopes., [w])); // get things that start with w
           has_w ≔  reduce(@∨, group_scopes. ≡ w);  // check if single scope of wlcg.groups is passed in
-          has_w ≔  has_w ≡ ∅ ? false:has_w; // if group_scopes is gobbledy-gook, has_w may be null. Fix it.
+          has_w ≔  has_w ≡ null ? false:has_w; // if group_scopes is gobbledy-gook, has_w may be null. Fix it.
   group_scopes. ≔  mask(group_scopes., group_scopes. ≠ w); // whack it off if it is there,
 
-  if[(¬has_w) && size(group_scopes.) ≡ 0][return(∅);]; // no requested wlcg groups.
+  if[(¬has_w) && size(group_scopes.) ≡ 0][return([]);]; // no requested wlcg groups.
 
   // Normalize results: (trick) join with an empty list to renumber the elements from 0.
   // caveat x.- y gets parsed as x.(-y) due to order of operations. Force minus as (x.)-y

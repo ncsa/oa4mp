@@ -37,6 +37,7 @@ import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import edu.uiuc.ncsa.security.util.mail.MailUtilProvider;
 
 import javax.inject.Provider;
+import java.time.LocalTime;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -97,6 +98,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
                  boolean rfc8628Enabled,
                  boolean printTSInDebug,
                  long cleanupInterval,
+                 Collection<LocalTime> cleanupAlarms,
                  String notifyACEventEmailAddresses,
                  boolean rfc7636Required,
                  boolean demoModeEnabled,
@@ -173,6 +175,16 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.rfc7636Required = rfc7636Required;
         this.demoModeEnabled = demoModeEnabled;
         this.debugger = debugger;
+        this.cleanupAlarms = cleanupAlarms;
+    }
+
+    public Collection<LocalTime> getCleanupAlarms() {
+        return cleanupAlarms;
+    }
+
+    Collection<LocalTime> cleanupAlarms;
+    public boolean hasCleanupAlarms(){
+        return cleanupAlarms!= null && (!cleanupAlarms.isEmpty());
     }
 
     public MetaDebugUtil getDebugger() {

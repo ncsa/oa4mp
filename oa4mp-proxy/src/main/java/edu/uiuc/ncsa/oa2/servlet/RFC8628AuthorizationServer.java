@@ -171,7 +171,7 @@ public class RFC8628AuthorizationServer extends EnvServlet {
                     return;
                 } catch (UserLoginException | UnknownUserCodeException userLoginException) {
                     info("Prompting user to retry login");
-                    userLoginException.printStackTrace();
+                  if(DebugUtil.isEnabled()){  userLoginException.printStackTrace();}
                     request.setAttribute(AbstractAuthorizationServlet.RETRY_MESSAGE, userLoginException.getMessage());
                     pendingState.setState(AbstractAuthorizationServlet.AUTHORIZATION_ACTION_START);
                     prepare(pendingState);

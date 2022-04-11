@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.client.servlet.ClientExceptionHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.client.servlet.ClientServlet;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.cache.Cleanup;
+import edu.uiuc.ncsa.security.core.cache.LockingCleanup;
 import edu.uiuc.ncsa.security.core.cache.ValidTimestampPolicy;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
@@ -59,11 +60,13 @@ public class ClientServletInitializer implements Initialization {
             }
             Cleanup<Identifier, Asset> assetCleanup = ClientServlet.assetCleanup;
             if (ce.isEnableAssetCleanup() && assetCleanup == null) {
-                assetCleanup = new Cleanup<Identifier, Asset>(logger, "asset cleanup");
-                assetCleanup.setStopThread(false);
-                assetCleanup.setMap(ce.getAssetStore());
-                assetCleanup.addRetentionPolicy(new ValidTimestampPolicy(ce.getMaxAssetLifetime()));
+                //assetCleanup = new Cleanup<Identifier, Asset>(logger, "asset cleanup");
+                LockingCleanup ac = new LockingCleanup<Identifier, Asset>(logger, "asset cleanup");
+                ac.setStopThread(false);
+                ac.setStore(ce.getAssetStore());
+                ac.addRetentionPolicy(new ValidTimestampPolicy(ce.getMaxAssetLifetime()));
                 logger.info("Starting asset cleanup thread");
+                assetCleanup = ac;
                 assetCleanup.start();
                 ClientServlet.assetCleanup = assetCleanup;
             }
