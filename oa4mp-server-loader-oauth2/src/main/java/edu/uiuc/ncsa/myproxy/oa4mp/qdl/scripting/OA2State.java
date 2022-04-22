@@ -47,6 +47,27 @@ public class OA2State extends State {
         this.jsonWebKeys = keys;
     }
 
+    @Override
+    public State newLocalState() {
+        OA2State oa2State = (OA2State) super.newLocalState();
+        oa2State.setOa2se(getOa2se());
+        return oa2State;
+    }
+
+    @Override
+    public State newFunctionState() {
+        OA2State oa2State = (OA2State) super.newFunctionState();
+        oa2State.setOa2se(getOa2se());
+        return oa2State;
+    }
+
+    @Override
+    public State newCleanState() {
+        OA2State oa2State = (OA2State) super.newCleanState();
+        oa2State.setOa2se(getOa2se());
+        return oa2State;
+    }
+
     transient OA2ServiceTransaction transaction;
     transient OA2SE oa2se;
     transient HttpServletRequest request;

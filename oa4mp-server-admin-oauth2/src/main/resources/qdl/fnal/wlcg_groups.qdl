@@ -24,18 +24,15 @@
 
   if[(¬has_w) && size(group_scopes.) ≡ 0][return([]);]; // no requested wlcg groups.
 
-  // Normalize results: (trick) join with an empty list to renumber the elements from 0.
-  // caveat x.- y gets parsed as x.(-y) due to order of operations. Force minus as (x.)-y
-
-  group_scopes. ≔  ([]~group_scopes.) - caput;
+  group_scopes. ≔  ~group_scopes. - caput;
 
   if[
       size(group_scopes.) ≤ 0
    ][
-      return( []~mask(found_groups., found_groups. ≠ w));
+      return(~mask(found_groups., found_groups. ≠ w));
   ];
 
-  return([]~mask(group_scopes., has_value(group_scopes., found_groups.)));
+  return(~mask(group_scopes., has_value(group_scopes., found_groups.)));
 /*
    Test:
      g. := ['wlcg.groups', '/cms/uscms', '/cms/ALARM','/cms/users']

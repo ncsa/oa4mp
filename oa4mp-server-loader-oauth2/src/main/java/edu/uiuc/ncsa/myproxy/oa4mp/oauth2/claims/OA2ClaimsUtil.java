@@ -150,9 +150,21 @@ public class OA2ClaimsUtil implements ScriptingConstants {
      * @throws Throwable
      */
     protected void checkRequiredScopes(OA2ServiceTransaction t) throws Throwable {
-        if (oa2se.isOIDCEnabled() && !t.getScopes().contains(OA2Scopes.SCOPE_OPENID)) {
+        if(oa2se.isOIDCEnabled()){
+            if(t.getOA2Client().isPublicClient() && !t.getScopes().contains(OA2Scopes.SCOPE_OPENID)){
+                throw new OA2GeneralError(OA2Errors.INVALID_SCOPE, "invalid scope: no open id scope", HttpStatus.SC_UNAUTHORIZED,null);
+            }
+            if(t.getOA2Client().getScopes().contains(OA2Scopes.SCOPE_OPENID) && !t.getScopes().contains(OA2Scopes.SCOPE_OPENID)){
+                throw new OA2GeneralError(OA2Errors.INVALID_SCOPE, "invalid scope: no open id scope", HttpStatus.SC_UNAUTHORIZED,null);
+            }
+        }else{
+             // no scopes are possible in certain OAuth 2 cases.
+        }
+/*
+        if (oa2se.isOIDCEnabled() &&  !t.getScopes().contains(OA2Scopes.SCOPE_OPENID)) {
             throw new OA2GeneralError(OA2Errors.INVALID_SCOPE, "invalid scope: no open id scope", HttpStatus.SC_UNAUTHORIZED,null);
         }
+*/
     }
 
     /**

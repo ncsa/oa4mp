@@ -14,7 +14,7 @@ block[
             fnal_cfg.search_base := 'ou=people,o=Fermilab,o=CO,dc=cilogon,dc=org';
                    fnal_cfg.type := 'ldap';
               fnal_cfg.ldap_name := 'voPersonExternalID';
-     fnal_cfg.search_attributes. :=  [EPE,IS_MEMBER_OF];
+     fnal_cfg.search_attributes. :=  [EPPN,EPE,IS_MEMBER_OF];  // ⍝
                fnal_cfg.username := script_args(0);
                fnal_cfg.password := script_args(1);
 

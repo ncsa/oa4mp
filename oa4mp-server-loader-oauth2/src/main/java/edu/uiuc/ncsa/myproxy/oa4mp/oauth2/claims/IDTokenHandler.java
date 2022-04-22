@@ -342,13 +342,34 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
      * @throws Throwable
      */
     protected void checkRequiredScopes(OA2ServiceTransaction t) throws Throwable {
-        if (oa2se.isOIDCEnabled() && !t.getScopes().contains(OA2Scopes.SCOPE_OPENID)) {
+        if(oa2se.isOIDCEnabled()){
+            if(t.getOA2Client().isPublicClient() && !t.getScopes().contains(OA2Scopes.SCOPE_OPENID)){
+                throw new OA2RedirectableError(OA2Errors.INVALID_SCOPE,
+                        "invalid scope: no open id scope",
+                        HttpStatus.SC_UNAUTHORIZED,
+                        t.getRequestState(),
+                        t.getCallback());
+
+            }
+            if(t.getOA2Client().getScopes().contains(OA2Scopes.SCOPE_OPENID) && !t.getScopes().contains(OA2Scopes.SCOPE_OPENID)){
+                throw new OA2RedirectableError(OA2Errors.INVALID_SCOPE,
+                        "invalid scope: no open id scope",
+                        HttpStatus.SC_UNAUTHORIZED,
+                        t.getRequestState(),
+                        t.getCallback());
+
+            }
+
+        }
+/*
+        if (oa2se.isOIDCEnabled() && !t.getScopes().contains(OA2Scopes.SCOPE_OPENID) ) {
             throw new OA2RedirectableError(OA2Errors.INVALID_SCOPE,
                     "invalid scope: no open id scope",
                     HttpStatus.SC_UNAUTHORIZED,
                     t.getRequestState(),
                     t.getCallback());
         }
+*/
     }
 
     protected void checkClaim(JSONObject claims, String claimKey) {

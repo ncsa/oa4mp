@@ -99,8 +99,8 @@ When a new version is deployed, here is the testing order
 
         In the token handler document run through the various examples.
 
-        In CLC you need to set the following parameters *before* starting exchange:
-        Ex. 1
+        In CLC you need to set the following parameters *before* starting exchange (uri):
+        Ex. 1   using the web flow
         set_param -a scope "read: x.y: x.z write:"
         AT:
            scopes:
@@ -110,6 +110,16 @@ When a new version is deployed, here is the testing order
              write:/data/cluster
              x.y:/abc/def
            lifetime: 750 sec.
+
+        Ex 1a - using the device flow, google login
+         AT:
+           scopes:
+              x.z write:/data/cluster
+              read:/home/http://cilogon.org/serverA/users/6849
+              read:/public/lsst/http://cilogon.org/serverA/users/6849
+              x.y:/abc/def,
+
+        set_param -t scope "read: x.y: x.z write:"
 
         Ex. 2
         set_param -a scope "read:/home/jeff/data x.y: x.z write:/data/cluster/ligo"

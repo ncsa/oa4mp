@@ -2,6 +2,17 @@
     Gets the service record. Note that we put this in a block since we need
     to load this to get all the LDAP machinery but do not want any of the
     state to end up in the main program.
+
+       args are
+       0 - username  - for ldap access
+       1 - password  - for ldap access
+       2 - user eppn to get from ldap
+*/
+/*
+    09-05-2022 update on production:
+    * add EPPN to get_user.qdl
+    * add single lines in access, at and rtx.
+    look for \u235d ⍝
 */
 block[
                       service_cfg. := new_template('ldap');

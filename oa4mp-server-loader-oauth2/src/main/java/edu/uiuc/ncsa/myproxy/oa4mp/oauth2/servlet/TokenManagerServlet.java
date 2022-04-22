@@ -6,9 +6,13 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RefreshTokenStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.UITokenUtils;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
+import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.server.request.IssuerResponse;
 import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
@@ -74,6 +78,7 @@ public abstract class TokenManagerServlet extends BearerTokenServlet implements 
     /**
      * This will process a request with basic authorization, peel off the supplied token and resolve it.
      * It will then find the transaction or token exchange (TX) record for the given token.
+     *
      * @param req
      * @return
      * @throws Throwable
@@ -89,43 +94,7 @@ public abstract class TokenManagerServlet extends BearerTokenServlet implements 
         JSONWebKeys keys = OA2TokenUtils.getKeys(oa2SE, client);
         String token = req.getParameter(TOKEN);
         String tokenTypeHint = req.getParameter(TOKEN_TYPE_HINT);
-        switch (tokenTypeHint) {
-            case TYPE_ACCESS_TOKEN:
-                at = OA2TokenUtils.getAT(token, oa2SE, keys);
-                state.accessToken = at;
-                state.isAT = true;
-                transaction = (OA2ServiceTransaction) oa2SE.getTransactionStore().get(at);
-                if(transaction == null){
-                    TXRecord txr = (TXRecord) oa2SE.getTxStore().get(BasicIdentifier.newID(at.getJti()));
-                    transaction = (OA2ServiceTransaction) oa2SE.getTransactionStore().get(txr.getParentID());
-                    state.txRecord = txr;
-                    state.transaction = transaction;
-                }
-                break;
-            case TYPE_REFRESH_TOKEN:
-                rt = OA2TokenUtils.getRT(token, oa2SE, keys);
-                state.refreshToken = rt;
-                state.isAT = false;
-                transaction = ((RefreshTokenStore)oa2SE.getTransactionStore()).get(rt);
-                if(transaction == null){
-                    TXRecord txr = (TXRecord) oa2SE.getTxStore().get(BasicIdentifier.newID(rt.getJti()));
-                    transaction = (OA2ServiceTransaction) oa2SE.getTransactionStore().get(txr.getParentID());
-                    state.txRecord = txr;
-                    state.transaction = transaction;
-
-                }
-                break;
-            default:
-                // as per spec, throw the only exception this servlet is allowed
-                throw new OA2GeneralError(
-                        "unsupported_token_type", // special value in spec.
-                        "The token type of \"" + tokenTypeHint + "\" is not supported on this server.",
-                        HttpStatus.SC_FORBIDDEN,
-                        null);
-                // if we throw a status of 503, this means that while the token type was wrong, the
-                // token still exists on the server.
-
-        }
+        transaction = getOA2ServiceTransactionBasic(state, oa2SE, keys, token, tokenTypeHint);
         state.transaction = transaction;
         // Final check. If the supplied transaction's client does not match the client credentials in the
         // headers. This prevents a malicious valid client from snooping other client's transactions.
@@ -135,9 +104,70 @@ public abstract class TokenManagerServlet extends BearerTokenServlet implements 
                     HttpStatus.SC_UNAUTHORIZED,
                     null);
         }
-
+        MyProxyDelegationServlet.createDebugger(transaction.getOA2Client()).trace(this, "introspection endpoint basic auth ok.");
         return state;
     }
+
+    private OA2ServiceTransaction getOA2ServiceTransactionBasic(State state, OA2SE oa2SE, JSONWebKeys keys, String token, String tokenTypeHint) {
+        RefreshTokenImpl rt = null;
+        AccessTokenImpl at = null;
+        if (StringUtils.isTrivial(tokenTypeHint)) {
+            // Fix CIL-1253
+            try {
+                rt = OA2TokenUtils.getRT(token, oa2SE, keys);
+
+            } catch (Throwable t) {
+                at = OA2TokenUtils.getAT(token, oa2SE, keys);
+            }
+        } else {
+            switch (tokenTypeHint) {
+                case TYPE_ACCESS_TOKEN:
+                    at = OA2TokenUtils.getAT(token, oa2SE, keys);
+                    break;
+                case TYPE_REFRESH_TOKEN:
+                    rt = OA2TokenUtils.getRT(token, oa2SE, keys);
+                    break;
+                default:
+                    // as per spec, throw the only exception this servlet is allowed
+                    throw new OA2GeneralError(
+                            "unsupported_token_type", // special value in spec.
+                            "The token type of \"" + tokenTypeHint + "\" is not supported on this server.",
+                            HttpStatus.SC_FORBIDDEN,
+                            null);
+            }
+        }
+        OA2ServiceTransaction transaction = null;
+        if (at == null && rt == null) {
+            throw new NFWException("could not determine token type");
+        }
+
+        if (at != null) {
+            state.accessToken = at;
+            state.isAT = true;
+            transaction = (OA2ServiceTransaction) oa2SE.getTransactionStore().get(at);
+
+        }
+        if (rt != null) {
+            state.refreshToken = rt;
+            state.isAT = false;
+            transaction = ((RefreshTokenStore) oa2SE.getTransactionStore()).get(rt);
+        }
+
+        if (transaction == null) {
+            TXRecord txr = (TXRecord) oa2SE.getTxStore().get(BasicIdentifier.newID(at.getJti()));
+            if (txr == null) {
+                throw new OA2GeneralError(
+                        OA2Errors.INVALID_TOKEN,
+                        "invalid token",
+                        HttpStatus.SC_BAD_REQUEST,
+                        null);
+            }
+            transaction = (OA2ServiceTransaction) oa2SE.getTransactionStore().get(txr.getParentID());
+            state.txRecord = txr;
+        }
+        return transaction;
+    }
+
 
     public static class State {
         OA2ServiceTransaction transaction;
@@ -149,6 +179,7 @@ public abstract class TokenManagerServlet extends BearerTokenServlet implements 
 
     /**
      * Checks the case that the request uses a bearer token. Same contract as{@link #checkBasic(HttpServletRequest)}
+     *
      * @param req
      * @return
      * @throws Throwable
@@ -167,42 +198,70 @@ public abstract class TokenManagerServlet extends BearerTokenServlet implements 
         // So we have the access token used as a bearer token
         transaction = findTransaction(atBearer, state);
         client = transaction.getOA2Client();
+        MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(client);
+        debugger.trace(this, "checked client, verifying access token is bearer token");
         JSONWebKeys keys = OA2TokenUtils.getKeys(oa2SE, client);
 
         state.transaction = transaction;
 
         String token = req.getParameter(TOKEN);
         String tokenTypeHint = req.getParameter(TOKEN_TYPE_HINT);
-        switch (tokenTypeHint) {
-            case TYPE_ACCESS_TOKEN:
-                atPayload = OA2TokenUtils.getAT(token, oa2SE, keys);
-                if (atBearer.equals(atPayload)) {
+
+        finishState(state, oa2SE, atBearer, keys, token, tokenTypeHint);
+        debugger.trace(this, "access token is the bearer token");
+        return state;
+        // Finally, we have to check that the bearer and payload tokens match
+        // This is, near as can be told, not in the spec., but makes perfectly good sense
+        // that we don't want people revoking other's tokens.
+    }
+
+    private void finishState(State state, OA2SE oa2SE, AccessTokenImpl atBearer, JSONWebKeys keys, String token, String tokenTypeHint) {
+        AccessTokenImpl accessToken = null;
+        RefreshTokenImpl refreshToken = null;
+        if (StringUtils.isTrivial(tokenTypeHint)) {
+            // Fix CIL-1253.
+            try {
+                refreshToken = OA2TokenUtils.getRT(token, oa2SE, keys);
+            } catch (Throwable t) {
+                accessToken = OA2TokenUtils.getAT(token, oa2SE, keys);
+            }
+        } else {
+            switch (tokenTypeHint) {
+                case TYPE_ACCESS_TOKEN:
+                    accessToken = OA2TokenUtils.getAT(token, oa2SE, keys);
+                    break;
+                case TYPE_REFRESH_TOKEN:
+                    refreshToken = OA2TokenUtils.getRT(token, oa2SE, keys);
+                    break;
+                default:
+                    // as per spec, throw the only exception this servlet is allowed
+                    throw new OA2GeneralError(
+                            "unsupported_token_type", // special value in spec.
+                            "The token type of \"" + tokenTypeHint + "\" is not supported on this server.",
+                            HttpStatus.SC_FORBIDDEN,
+                            null);
+                    // if we throw a status of 503, this means that while the token type was wrong, the
+                    // token still exists on the server.
+
+            }
+            if (accessToken == null && refreshToken == null) {
+                throw new NFWException("could not determine token type");
+            }
+            if (accessToken != null) {
+                if (atBearer.equals(accessToken)) {
                     state.accessToken = atBearer;
                     state.isAT = true;
                 } else {
                     throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "bearer and requested token must match",
                             HttpStatus.SC_UNAUTHORIZED, null);
                 }
-                break;
-            case TYPE_REFRESH_TOKEN:
-                state.refreshToken = OA2TokenUtils.getRT(token, oa2SE, keys);
+            }
+            if (refreshToken != null) {
+                state.refreshToken = refreshToken;
                 state.isAT = false;
-                break;
-            default:
-                // as per spec, throw the only exception this servlet is allowed
-                throw new OA2GeneralError(
-                        "unsupported_token_type", // special value in spec.
-                        "The token type of \"" + tokenTypeHint + "\" is not supported on this server.",
-                        HttpStatus.SC_FORBIDDEN,
-                        null);
-                // if we throw a status of 503, this means that while the token type was wrong, the
-                // token still exists on the server.
+            }
 
         }
-        return state;
-        // Finally, we have to check that the bearer and payload tokens match
-        // This is, near as can be told, not in the spec., but makes perfectly good sense
-        // that we don't want people revoking other's tokens.
     }
 
     @Override
@@ -211,7 +270,8 @@ public abstract class TokenManagerServlet extends BearerTokenServlet implements 
     }
 
     @Override
-    public void doGet(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws ServletException, IOException {
+    public void doGet(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws
+            ServletException, IOException {
         httpServletResponse.setStatus(HttpStatus.SC_SERVICE_UNAVAILABLE);
         throw new ServletException("Unsupported operation");
     }

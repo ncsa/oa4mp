@@ -17,7 +17,7 @@ script_load('fnal/acl.qdl');
     say('*** FNAL at_claims. =' + to_string(at_claims.));
 
     access_token.sub := claims.eppn; // set this no matter what.
-
+    if[is_defined(at_claims.EPPN)][access_token.sub := at_claims.EPPN;]; // ⍝
 if[
    !is_defined(at_claims.EPE.)
 ]then[

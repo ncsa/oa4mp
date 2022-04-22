@@ -4,7 +4,6 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.GroupHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.NCSAGroupHandler;
 import edu.uiuc.ncsa.security.core.Logable;
-import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
@@ -38,7 +37,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
     public LDAPClaimsSource(LDAPConfiguration ldapConfiguration, MyLoggingFacade myLogger) {
         super();
         if (ldapConfiguration == null) {
-            throw new IllegalArgumentException("Error: null ldap config");
+            throw new LDAPException("Error: null ldap config");
         }
         setConfiguration(ldapConfiguration);
         this.myLogger = myLogger;
@@ -53,7 +52,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
     public LDAPClaimsSource(OA2SE oa2SE) {
         super(oa2SE);
         if (oa2SE == null) {
-            throw new IllegalArgumentException("Error: null service env");
+            throw new LDAPException("Error: null service env");
         }
         this.myLogger = oa2SE.getMyLogger();
         loggingEnabled = (this.myLogger != null);
@@ -76,7 +75,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
         DebugUtil.trace(this, dbgname);
         LDAPConfigurationUtil ldapConfigurationUtil = new LDAPConfigurationUtil();
         JSONObject xxx = ldapConfigurationUtil.toJSON(getLDAPCfg());
-        if(xxx.getJSONObject("ldap").containsKey("ssl")) {
+        if (xxx.getJSONObject("ldap").containsKey("ssl")) {
             xxx.getJSONObject("ldap").getJSONObject("ssl").put("keystore", "");
         }
         if (getLDAPCfg().getSearchNameKey() == null) {
@@ -84,21 +83,21 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
             return transaction.getUsername();
         }
         if (getLDAPCfg().getSearchNameKey().equals(LDAPConfigurationUtil.SEARCH_NAME_USERNAME)) {
-            DebugUtil.trace(this, dbgname+" searching using the username");
+            DebugUtil.trace(this, dbgname + " searching using the username");
             return transaction.getUsername();
         }
         if (!claims.containsKey(getLDAPCfg().getSearchNameKey()) || claims.get(getLDAPCfg().getSearchNameKey()) == null) {
             String message = "Error: no recognized search name key was found in the claims for config with id=" + getLDAPCfg().getId() +
                     ". Requested was \"" + getLDAPCfg().getSearchNameKey() + "\"";
             DebugUtil.trace(this, message);
-            throw new IllegalStateException(message);
+            throw new LDAPException(message);
         }
         String searchName = (String) claims.get(getLDAPCfg().getSearchNameKey());
-        if(searchName == null || searchName.isEmpty()){
+        if (searchName == null || searchName.isEmpty()) {
             // If the configuration file has an error, this will be the one place it shows first.
             // Best to trap it here and fail rather than have LDAP do the query (which it will and
             // return nothing) and inexplicably have no result.
-            throw new IllegalArgumentException("Error: no search name found for LDAP query.");
+            throw new LDAPException("Error: no search name found for LDAP query.");
         }
         return searchName;
     }
@@ -115,32 +114,35 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
     }
 
     public void handleException(Throwable throwable) {
-        ServletDebugUtil.error(this,"Error accessing LDAP", throwable);
+        ServletDebugUtil.error(this, "Error accessing LDAP", throwable);
 
         if (throwable instanceof CommunicationException) {
             warn("Communication exception talking to LDAP.");
             return;
         }
         if (getLDAPCfg().isFailOnError()) {
-            String message = (throwable instanceof NullPointerException)?"(null pointer)": throwable.getMessage();
-            getMyLogger().warn("Could not get LDAP information:" + message);
-            String subjectTemplate = "Error on ${host} contacting LDAP server";
-            String messageTemplate = "The following error message was received attempting to contact the " +
-                    "LDAP server at ${ldap_host}:\n\n${message}\n\n. The operation did not complete.";
-            Map<String, String> replacements = new HashMap<>();
-            URI address = getOa2SE().getServiceAddress();
-            String x = "localhost";
-            if (address != null) {
-                x = address.getHost();
+            String message = (throwable instanceof NullPointerException) ? "(null pointer)" : throwable.getMessage();
+            if (getMyLogger() != null) {
+                getMyLogger().warn("Could not get LDAP information:" + message);
             }
-            replacements.put("host", x);
-            replacements.put("ldap_host", getLDAPCfg().getServer());
-            replacements.put("message", throwable.getMessage());
             if (getLDAPCfg().isNotifyOnFail()) {
+                String subjectTemplate = "Error on ${host} contacting LDAP server";
+                String messageTemplate = "The following error message was received attempting to contact the " +
+                        "LDAP server at ${ldap_host}:\n\n${message}\n\n. The operation did not complete.";
+                Map<String, String> replacements = new HashMap<>();
+                URI address = getOa2SE().getServiceAddress();
+                String x = "localhost";
+                if (address != null) {
+                    x = address.getHost();
+                }
+                replacements.put("host", x);
+                replacements.put("ldap_host", getLDAPCfg().getServer());
+                replacements.put("message", throwable.getMessage());
+
                 getOa2SE().getMailUtil().sendMessage(subjectTemplate, messageTemplate, replacements);
             }
 
-            throw new GeneralException("Error: Could not communicate with LDAP server. \"" + (throwable.getMessage()==null?"(no message)": throwable.getMessage())  + "\"");
+            throw new LDAPException("Error: Could not communicate with LDAP server. \"" + (throwable.getMessage() == null ? "(no message)" : throwable.getMessage()) + "\"");
         }
 
     }
@@ -161,14 +163,14 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
 
     @Override
     protected JSONObject realProcessing(JSONObject claims, HttpServletRequest request, ServiceTransaction transaction) throws UnsupportedScopeException {
-        String name="realProcessing(id=" + getLDAPCfg().getId() + "):" ;
+        String name = "realProcessing(id=" + getLDAPCfg().getId() + "):";
 
 
-        DebugUtil.trace(this,name + " preparing to do processing.");
-        DebugUtil.trace(this,name + " initial claims = " + claims);
+        DebugUtil.trace(this, name + " preparing to do processing.");
+        DebugUtil.trace(this, name + " initial claims = " + claims);
 
         if (!isEnabled()) {
-            DebugUtil.trace(this,name + " Claims source not enabled." );
+            DebugUtil.trace(this, name + " Claims source not enabled.");
             return claims;
         }
 
@@ -177,8 +179,8 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
         }
         try {
             String searchName = getSearchName(claims, request, transaction);
-     //       String searchName = "jgaynor";
-            DebugUtil.trace(this,name + " search name=" + searchName);
+            //       String searchName = "jgaynor";
+            DebugUtil.trace(this, name + " search name=" + searchName);
 
             if (searchName != null) {
                 Map tempMap = simpleSearch(context, searchName, getLDAPCfg().getSearchAttributes());
@@ -226,8 +228,8 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
         Hashtable<String, String> env = new Hashtable<String, String>();
         env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
         String providerUrl = host.trim();
-        if(!host.startsWith("ldaps://")){
-             providerUrl = "ldaps://" + providerUrl;
+        if (!host.startsWith("ldaps://")) {
+            providerUrl = "ldaps://" + providerUrl;
         }
         if (0 <= cfg.getPort()) {
             providerUrl = providerUrl + ":" + cfg.getPort();
@@ -267,7 +269,8 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
     /**
      * This is needed later when checking which address was successful.
      */
-   String currentServerAddress = null;
+    String currentServerAddress = null;
+
     public LdapContext createConnection() {
         // Set up the environment for creating the initial context
         StringTokenizer stringTokenizer = new StringTokenizer(getLDAPCfg().getServer(), ",");
@@ -278,12 +281,12 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
             try {
                 currentServerAddress = stringTokenizer.nextToken();
                 dirContext = new InitialDirContext(createEnv(currentServerAddress, getLDAPCfg()));
-                ServletDebugUtil.trace(this, "Found LDAP server for address=\"" + currentServerAddress +"\"");
+                ServletDebugUtil.trace(this, "Found LDAP server for address=\"" + currentServerAddress + "\"");
                 return (LdapContext) dirContext.lookup(getLDAPCfg().getSearchBase());
 
             } catch (Throwable e) {
                 // Do nothing. Allow for errors.
-                ServletDebugUtil.trace(this,"failed to get any LDAP directory context",e);
+                ServletDebugUtil.trace(this, "failed to get any LDAP directory context", e);
 
             }
         }
@@ -318,7 +321,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
                                    String userID,
                                    Map<String, LDAPConfigurationUtil.AttributeEntry> attributes) throws NamingException {
         if (ctx == null) {
-            throw new IllegalStateException("Error: Could not create the LDAP context");
+            throw new LDAPException("Error: Could not create the LDAP context");
         }
 
         SearchControls searchControls = new SearchControls();
@@ -331,12 +334,12 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
         }
         String addFilter = "";
         // For all questions about the filter, refer to https://tools.ietf.org/search/rfc4515
-        if(!StringUtils.isTrivial(getLDAPCfg().getAdditionalFilter())){
+        if (!StringUtils.isTrivial(getLDAPCfg().getAdditionalFilter())) {
             addFilter = "(" + getLDAPCfg().getAdditionalFilter() + ")";
         }
         String filter = "(&(" + getSearchFilterAttribute() + "=" + userID + ")" + addFilter + ")";
         String contextName = getLDAPCfg().getContextName();
-        if(contextName == null){
+        if (contextName == null) {
             // You could use this with the search base but that gets complicated. We lookup the context
             // using the search base elsewhere so there is nothing usually for this parameter to do
             // in cases where this has to be set, the search base has been found which simplifies this
@@ -367,9 +370,9 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
         if (!e.hasMoreElements()) {
             DebugUtil.trace(this, "LDAP SEARCH RESULT IS EMPTY");
         }
-        if(attributes.isEmpty()){
-          // no attribute specified means return everything
-          return doEmptyAttrs(e);
+        if (attributes.isEmpty()) {
+            // no attribute specified means return everything
+            return doEmptyAttrs(e);
         }
 
         while (e.hasMoreElements()) {
@@ -420,22 +423,23 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
 
     /**
      * In this case, the configuration specified no attributes and this should be interpreted as just getting everything.
+     *
      * @param e
      * @return
      */
-    private JSONObject doEmptyAttrs(NamingEnumeration e) throws NamingException{
-          JSONObject all = new JSONObject();
+    private JSONObject doEmptyAttrs(NamingEnumeration e) throws NamingException {
+        JSONObject all = new JSONObject();
         while (e.hasMoreElements()) {
             SearchResult entry = (SearchResult) e.next();
             Attributes attributes = entry.getAttributes();
             NamingEnumeration aNE = attributes.getAll();
-            while(aNE.hasMoreElements()){
-               Attribute attribute = (Attribute) aNE.next();
-               JSONArray array = new JSONArray();
-               for(int i = 0; i < attribute.size(); i++){
-                   array.add(attribute.get(i));
-               }
-               all.put(attribute.getID(), array);
+            while (aNE.hasMoreElements()) {
+                Attribute attribute = (Attribute) aNE.next();
+                JSONArray array = new JSONArray();
+                for (int i = 0; i < attribute.size(); i++) {
+                    array.add(attribute.get(i));
+                }
+                all.put(attribute.getID(), array);
             }
 
         }
@@ -543,11 +547,11 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
         while (stringTokenizer.hasMoreTokens()) {
             try {
                 dirContext = new InitialDirContext(claimsSource.createEnv(stringTokenizer.nextToken(), cfg));
-            }catch(Throwable t){
+            } catch (Throwable t) {
                 // go until one works. If we have run out of tokens, then throw the exception.
-                 if(!stringTokenizer.hasMoreTokens()){
-                     throw t;
-                 }
+                if (!stringTokenizer.hasMoreTokens()) {
+                    throw t;
+                }
             }
         }
         LdapContext ctx = (LdapContext) dirContext.lookup(cfg.getSearchBase());

@@ -77,4 +77,6 @@ block[
 
       access_token.scope := detokenize(unique(xi.), ' ', 2); // turn in to string, omit duplications, trailing space
       say('*** FNAL rtx access token = \'' + access_token.scope + '\'');
+      if[is_defined(record.EPPN)][access_token.sub := record.EPPN;]; // ⍝
+
 ];

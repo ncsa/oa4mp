@@ -236,21 +236,26 @@ public class ClientUtils {
         debugger.trace(ClientUtils.class, ".resolveScopes: server scopes=" + ((OA2SE) getServiceEnvironment()).getScopes());
         debugger.trace(ClientUtils.class, ".resolveScopes: user validated scopes=" + st.getValidatedScopes());
         */
+        OA2Client oa2Client = (OA2Client) st.getClient();
+        Collection<String> requestedScopes = new ArrayList<>();
+
         if (rawScopes == null || rawScopes.length() == 0) {
             if (isRFC8628) {
                 // It is not an error if this is the RFC8628 servlet. Just return an empty list
                 return new ArrayList<>();
             } else {
-                throw new OA2RedirectableError(OA2Errors.INVALID_SCOPE,
-                        "Missing scopes parameter.",
-                        HttpStatus.SC_BAD_REQUEST,
-                        st.getRequestState(),
-                        st.getCallback());
+                // It is possible that there are no scopes at all for a pure OAuth 2 client.
+                if (!oa2Client.getScopes().isEmpty()) {
+                    throw new OA2RedirectableError(OA2Errors.INVALID_SCOPE,
+                            "Missing scopes parameter.",
+                            HttpStatus.SC_BAD_REQUEST,
+                            st.getRequestState(),
+                            st.getCallback());
+                }
+                return requestedScopes;
             }
         }
         // The scopes the client wants:
-        OA2Client oa2Client = (OA2Client) st.getClient();
-        Collection<String> requestedScopes = new ArrayList<>();
 
         // Fixes github issue 8, support for public clients: https://github.com/ncsa/OA4MP/issues/8
         if (oa2Client.isPublicClient()) {

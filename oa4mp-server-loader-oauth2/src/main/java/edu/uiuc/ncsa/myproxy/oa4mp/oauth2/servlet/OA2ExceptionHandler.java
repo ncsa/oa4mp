@@ -1,6 +1,8 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.LDAPException;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractAuthorizationServlet;
+import edu.uiuc.ncsa.qdl.exceptions.QDLExceptionWithTrace;
 import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
@@ -39,6 +41,15 @@ public class OA2ExceptionHandler implements ExceptionHandler {
     @Override
     public void handleException(Throwable t, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         ServletDebugUtil.trace(this, "Error", t);
+        if (t instanceof QDLExceptionWithTrace) {
+            if (t.getCause() != null) {
+                t = t.getCause();
+            }
+
+        }
+        if (t instanceof LDAPException) {
+            t = new OA2GeneralError(OA2Errors.SERVER_ERROR, "LDAP error", HttpStatus.SC_INTERNAL_SERVER_ERROR, null);
+        }
         if ((t instanceof NullPointerException)) {
             getLogger().error("Null pointer", t);
             t = new OA2GeneralError(OA2Errors.SERVER_ERROR, "Null pointer", HttpStatus.SC_INTERNAL_SERVER_ERROR, null);
@@ -62,7 +73,6 @@ public class OA2ExceptionHandler implements ExceptionHandler {
         }
 
 
-
         if (t instanceof OA2ATException) {
             handleOA2Error((OA2ATException) t, response);
             return;
@@ -72,9 +82,9 @@ public class OA2ExceptionHandler implements ExceptionHandler {
             return;
         }
         if (t instanceof OA2GeneralError) {
-             handleOA2Error((OA2GeneralError) t, response);
-             return;
-         }
+            handleOA2Error((OA2GeneralError) t, response);
+            return;
+        }
         // The next couple of exceptions can be thrown when there is no client (so the callback uri cannot be verified)
         if ((t instanceof UnknownClientException) || (t instanceof UnapprovedClientException)) {
             handleOA2Error(

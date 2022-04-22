@@ -1,0 +1,62 @@
+/*
+    Access token support for Jefferson Lab. Typical configuration for the client
+    is
+
+     tokens{
+       access{
+          type=sci_token
+          qdl{
+             load="jlab/access.qdl"
+              args=["eic"]
+              xmd={exec_phase=["post_token","post_refresh","post_exchange"]}
+          } //end QDL
+       } // end access token
+     } //end tokens
+
+NOTE that the args are "eic" or "jlab" for EIC and everything else.
+
+*/
+//script_load('jlab/acl.qdl');
+
+
+     DEBUG := true; // set false everywhere but on my test server.
+        γ. := null; // groups
+        α. := null; // permissions
+ if[
+   script_args(0) == 'eic'
+   ][
+        γ. := ['eic computing'];
+        α. := ['read:/eic/'];
+   ]else[
+        γ. := ['clas12 computing', 'gluex computing','moller computing'];
+        α. := ['read:/clas12/','read:/gluex/', 'read:/moller/'];
+   ];
+  user := DEBUG?'http://cilogon.org/serverT/users/27326098':claims.sub;
+
+  results. := script_load('jlab/get_user.qdl', user); // user == claims.sub
+  
+  say('*** JLAB result of query =' + to_string(results.));
+    if[
+       	 !is_defined(results.isMemberOf) // indicates something is wrong with their LDAP (?)
+      ][
+                 sys_err.ok := false;
+            sys_err.message := 'no group memberships found.';
+         sys_err.error_type := 'access_denied';
+            return([]);
+    ];
+
+    say('*** JLAB results.isMemberOf=' + to_string(results.isMemberOf));
+
+        ξ. := mask(α., γ. ∈ results.isMemberOf);
+
+    say('*** JLAB scopes=' + to_string(scopes.));
+    say('*** JLAB ξ.=' + to_string(ξ.));
+
+    if[exec_phase == 'post_token'][
+        if[size(scopes.) != 0][ξ. := ~(⊢scopes.∩⊢ξ.);]; // return only those requested in first token exchange.
+    ]else[
+        if[size(tx_scopes.) != 0][ξ. := ~(⊢tx_scopes.∩⊢ξ.);]; // return only those requested in refresh of exchange
+    ];
+
+access_token.scope := detokenize(ξ., ' ', 2); // turn in to string, omit duplications, trailing space
+

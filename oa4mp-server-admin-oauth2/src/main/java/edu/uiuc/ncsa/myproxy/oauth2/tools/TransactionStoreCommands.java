@@ -563,8 +563,9 @@ public class TransactionStoreCommands extends StoreCommands2 {
             say("cleaning up token exchange records");
         }
         Cleanup txRecordCleanup = new Cleanup<>(null, "TX record cleanup");
-        txRecordCleanup.setCleanupInterval(0);
+        txRecordCleanup.setCleanupInterval(1);
         txRecordCleanup.setStopThread(false);
+
         txRecordCleanup.setMap(getTxStore());
         txRecordCleanup.setTestMode(testMode);
         txRecordCleanup.addRetentionPolicy(new TokenExchangeRecordRetentionPolicy(address, safeGC));

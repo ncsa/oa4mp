@@ -335,15 +335,15 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             ]
           }
          */
-        for(Identifier cid : tirs.getClientIDs()){
+        for (Identifier cid : tirs.getClientIDs()) {
             Map<Identifier, List<TokenInfoRecord>> records = tirs.sortByClientID(cid);
             JSONObject currentTrans = new JSONObject();
             JSONArray allTokenArray = new JSONArray();
 
-            for(Identifier transactionID: records.keySet()){
+            for (Identifier transactionID : records.keySet()) {
                 List<TokenInfoRecord> list = records.get(transactionID);
                 JSONArray a = new JSONArray();
-                for(TokenInfoRecord tokenInfoRecord : list){
+                for (TokenInfoRecord tokenInfoRecord : list) {
                     a.add(tokenInfoRecord.toJSON());
                 }
                 currentTrans.put(OA2Constants.AUTHORIZATION_CODE, transactionID.toString());
@@ -1027,7 +1027,6 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                     "Refresh tokens are not supported on this server.",
                     t.getRequestState());
         }
-        t.setRefreshTokenValid(false); // this way if it fails at some point we know it is invalid.
         RTIRequest rtiRequest = new RTIRequest(request, t, at, oa2SE.isOIDCEnabled());
         RTI2 rtIssuer = new RTI2(getTF2(), MyProxyDelegationServlet.getServiceEnvironment().getServiceAddress());
 
@@ -1125,6 +1124,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         if (rtiResponse.getRefreshToken().isJWT()) {
             t.setRTJWT(rtiResponse.getRefreshToken().getToken());
         }
+        t.setRefreshTokenValid(false); // About the last thing to do here is set this invalid.
+
         getTransactionStore().save(t);
         oa2SE.getTxStore().save(txRecord);
         debugger.trace(this, "transaction saved for " + t.getIdentifierString());
@@ -1355,12 +1356,12 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             //forward to the proxy. If it succeeds there, set the rfc state to valid.
             try {
                 ProxyUtils.doRFC8628AT(getOA2SE(), transaction);
-            }catch(Throwable throwable){
-                if(throwable instanceof OA2GeneralError){
+            } catch (Throwable throwable) {
+                if (throwable instanceof OA2GeneralError) {
                     throw throwable;
                 }
 
-                if(throwable instanceof ServiceClientHTTPException){
+                if (throwable instanceof ServiceClientHTTPException) {
                     throw ProxyUtils.toOA2X((ServiceClientHTTPException) throwable, transaction);
                 }
                 throw new OA2ATException("server_error", throwable.getMessage(),

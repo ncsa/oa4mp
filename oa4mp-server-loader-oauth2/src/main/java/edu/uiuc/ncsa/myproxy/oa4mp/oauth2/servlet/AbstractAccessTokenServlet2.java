@@ -4,7 +4,6 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.IssuerTransactionState;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.cache.Cleanup;
-import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.server.request.ATRequest;
@@ -109,13 +108,13 @@ public abstract class AbstractAccessTokenServlet2 extends MultiAuthServlet {
         transaction.setAccessToken(atResp.getAccessToken());
         transaction.setAccessTokenValid(true);
 
-        try {
+/*        try {
             getTransactionStore().save(transaction);
             debugger.info(this,"5.a. updated transaction state for " + cc + ", sending response to client");
 
         } catch (GeneralException e) {
             throw new ServletException("Error saving transaction", e);
-        }
+        }*/
         //  atResp.write(httpServletResponse);
         debugger.info(this,"5.b. done with access token exchange with " + cc);
         IssuerTransactionState transactionState = new IssuerTransactionState(httpServletRequest,

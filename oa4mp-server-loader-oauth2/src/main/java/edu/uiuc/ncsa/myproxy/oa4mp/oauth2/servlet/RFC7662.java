@@ -2,7 +2,8 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
-import edu.uiuc.ncsa.security.core.util.DebugUtil;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
+import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.impl.TokenImpl;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
@@ -33,7 +34,7 @@ public class RFC7662 extends TokenManagerServlet {
                 state = checkBearer(req);
             }
         } catch (OA2GeneralError x) {
-            DebugUtil.error(this, "Got exception checking bearer/basic header ", x);
+            info("Got exception checking bearer/basic header:" + x.getMessage() );
 
             // This means that the token supplied does not exist (usually) or it is not really
             // a valid token. This servlet is not to throw exceptions except in very narrow cases
@@ -44,18 +45,21 @@ public class RFC7662 extends TokenManagerServlet {
             return;
 
         }
-
+        MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(state.transaction.getOA2Client());
         if (state.txRecord != null) {
+            debugger.trace(this, "introspect, token in exchange record = \"" + state.txRecord.getIdentifier() + "\"");
             JSONObject jsonObject = new JSONObject();
             jsonObject.put(ACTIVE, state.txRecord.isValid());
             if (jsonObject.getBoolean(ACTIVE)) {
                 populateResponse(state, jsonObject);
             }
+            debugger.trace(this, "token is " + (jsonObject.getBoolean(ACTIVE)?"":"not") + " active");
             writeOK(resp, jsonObject);
             return;
         }
 
         if (state.transaction != null) {
+            debugger.trace(this, "introspec, from transaction = \"" + state.transaction.getIdentifier() + "\"");
             JSONObject jsonObject = new JSONObject();
             if (state.isAT) {
                 jsonObject.put(ACTIVE, state.transaction.isAccessTokenValid());
@@ -65,10 +69,13 @@ public class RFC7662 extends TokenManagerServlet {
             if (jsonObject.getBoolean(ACTIVE)) {
                 populateResponse(state, jsonObject);
             }
+            debugger.trace(this, "token is " + (jsonObject.getBoolean(ACTIVE)?"":"not") + " active");
 
             writeOK(resp, jsonObject);
             return;
         }
+
+        debugger.trace(this, "default case: token is not active");
 
         JSONObject jsonObject = new JSONObject();
         jsonObject.put(ACTIVE, false);
@@ -134,7 +141,6 @@ public class RFC7662 extends TokenManagerServlet {
         json.put(USERNAME, state.transaction.getUsername());
         json.put(OA2Constants.CLIENT_ID, state.transaction.getOA2Client().getIdentifierString());
         json.put(TOKEN_TYPE, (token instanceof AccessToken) ? RFC8693Constants.ACCESS_TOKEN_TYPE : RFC8693Constants.REFRESH_TOKEN_TYPE);
-
     }
 
 }

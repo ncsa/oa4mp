@@ -9,7 +9,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
 import edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.OA2State;
 import edu.uiuc.ncsa.qdl.AbstractQDLTester;
 import edu.uiuc.ncsa.qdl.TestUtils;
-import edu.uiuc.ncsa.qdl.exceptions.QDLStatementExecutionException;
+import edu.uiuc.ncsa.qdl.exceptions.QDLExceptionWithTrace;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
@@ -79,7 +79,7 @@ public class QDLTests extends AbstractQDLTester {
         boolean good = false;
         try {
             interpreter.execute(script.toString());
-        } catch (QDLStatementExecutionException iax) {
+        } catch (QDLExceptionWithTrace iax) {
             good = iax.getCause() instanceof IllegalArgumentException;
         }
         assert good : "Was able to execute in_group2 test against bad list";

@@ -447,7 +447,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
             // if they added extra stuff, skip it. 
             if (stemVariable.containsKey((long) i)) {
                 StemVariable cfg = (StemVariable) stemVariable.get((long) i);
-                claimSources.add(ConfigtoCS.convert(cfg));
+                claimSources.add(ConfigtoCS.convert(cfg, state.getOa2se()));
             }
         }
         return claimSources;
