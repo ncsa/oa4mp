@@ -41,7 +41,6 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
 
     @Override
     public Object evaluate(Object[] objects, State state) {
-        OA2State oa2State = (OA2State)  state;
         if (objects.length < 2) {
             throw new IllegalArgumentException("Error: " + getName() + " requires at least two arguments");
         }
@@ -63,23 +62,25 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
         }
         switch (arg.getString(CS_DEFAULT_TYPE)) {
             case CS_TYPE_CODE:
-                return doCode(arg, username, headers, oa2State);
+                return doCode(arg, username, headers, state);
             case CS_TYPE_FILE:
-                return doFS(arg, username, oa2State);
+                return doFS(arg, username, state);
             case CS_TYPE_LDAP:
-                return doLDAP(arg, username, oa2State);
+                return doLDAP(arg, username, state);
             case CS_TYPE_HEADERS:
-                return doHeaders(arg, username, headers, oa2State);
+                return doHeaders(arg, username, headers, state);
             case CS_TYPE_NCSA:
-                return doNCSA(arg, username, oa2State);
+                return doNCSA(arg, username, state);
         }
         return null;
     }
 
-    protected StemVariable doCode(StemVariable arg, String username, StemVariable headers, OA2State state) {
-        OA2State oa2State = (OA2State)state;
-
-        BasicClaimsSourceImpl basicClaimsSource = (BasicClaimsSourceImpl) ConfigtoCS.convert(arg, state.getOa2se());
+    protected StemVariable doCode(StemVariable arg, String username, StemVariable headers, State state) {
+        OA2State oa2State = null;
+        if(state instanceof OA2State) {
+            oa2State = (OA2State) state;
+        }
+        BasicClaimsSourceImpl basicClaimsSource = (BasicClaimsSourceImpl) ConfigtoCS.convert(arg, oa2State==null?null:oa2State.getOa2se());
         OA2ServiceTransaction t = new OA2ServiceTransaction((Identifier) null);
         t.setUsername(username);
         JSONObject claims = new JSONObject();
@@ -91,10 +92,14 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
 
     }
 
-    protected StemVariable doNCSA(StemVariable arg, String username, OA2State state) {
+    protected StemVariable doNCSA(StemVariable arg, String username, State state) {
+        OA2State oa2State = null;
+        if(state instanceof OA2State) {
+             oa2State = (OA2State) state;
+        }
         DebugUtil.setIsEnabled(true);
         DebugUtil.setDebugLevel(DebugUtil.DEBUG_LEVEL_TRACE);
-        NCSALDAPClaimSource ncsaldapClaimSource = (NCSALDAPClaimSource) ConfigtoCS.convert(arg, state.getOa2se());
+        NCSALDAPClaimSource ncsaldapClaimSource = (NCSALDAPClaimSource) ConfigtoCS.convert(arg, (oa2State==null?null:oa2State.getOa2se()));
         OA2ServiceTransaction t = new OA2ServiceTransaction((Identifier) null);
         t.setUsername(username);
         JSONObject protoClaims = new JSONObject();
@@ -106,8 +111,12 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
         return output;
     }
 
-    public StemVariable doHeaders(StemVariable arg, String username, StemVariable headers, OA2State state) {
-        HTTPHeaderClaimsSource httpHeaderClaimsSource = (HTTPHeaderClaimsSource) ConfigtoCS.convert(arg, state.getOa2se());
+    public StemVariable doHeaders(StemVariable arg, String username, StemVariable headers, State state) {
+        OA2State oa2State = null;
+        if(state instanceof OA2State){
+            oa2State = (OA2State) state;
+        }
+        HTTPHeaderClaimsSource httpHeaderClaimsSource = (HTTPHeaderClaimsSource) ConfigtoCS.convert(arg, oa2State==null?null:oa2State.getOa2se());
 
         OA2ServiceTransaction t = new OA2ServiceTransaction((Identifier) null);
         t.setUsername(username);
@@ -121,8 +130,13 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
 
     }
 
-    private StemVariable doLDAP(StemVariable arg, String username, OA2State state) {
-        LDAPClaimsSource ldapClaimsSource = (LDAPClaimsSource) ConfigtoCS.convert(arg, state.getOa2se());
+
+    private StemVariable doLDAP(StemVariable arg, String username, State state) {
+        OA2State oa2State = null;
+        if(state instanceof OA2State){
+            oa2State = (OA2State) state;
+        }
+        LDAPClaimsSource ldapClaimsSource = (LDAPClaimsSource) ConfigtoCS.convert(arg, oa2State==null?null:oa2State.getOa2se());
         OA2ServiceTransaction t = new OA2ServiceTransaction((Identifier) null);
         t.setUsername(username);
         JSONObject protoClaims = new JSONObject();
@@ -193,13 +207,17 @@ get_claims(cfg., 'dweitzel2@unl.edu')
      * @param state
      * @return
      */
-    protected StemVariable doFS(StemVariable arg, String username, OA2State state) {
+    protected StemVariable doFS(StemVariable arg, String username, State state) {
+        OA2State oa2State = null;
+        if(state instanceof OA2State){
+            oa2State = (OA2State) state;
+        }
         // resolve files against VFS's so scripts have access to them in server mode.
         Polyad polyad = new Polyad(IOEvaluator.READ_FILE);
         polyad.addArgument(new ConstantNode(arg.getString(CS_FILE_FILE_PATH), Constant.STRING_TYPE));
         state.getMetaEvaluator().evaluate(polyad, state);
         String rawJSON = polyad.getResult().toString();
-        FSClaimSource fsClaimSource = (FSClaimSource) ConfigtoCS.convert(arg, state.getOa2se());
+        FSClaimSource fsClaimSource = (FSClaimSource) ConfigtoCS.convert(arg, oa2State == null?null:oa2State.getOa2se());
         fsClaimSource.setRawJSON(rawJSON);
         OA2ServiceTransaction t = new OA2ServiceTransaction((Identifier) null);
         t.setUsername(username);

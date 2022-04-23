@@ -108,14 +108,8 @@ public abstract class AbstractAccessTokenServlet2 extends MultiAuthServlet {
         transaction.setAccessToken(atResp.getAccessToken());
         transaction.setAccessTokenValid(true);
 
-/*        try {
-            getTransactionStore().save(transaction);
-            debugger.info(this,"5.a. updated transaction state for " + cc + ", sending response to client");
+        // CIL-1268 fix: Removed transaction save here that was too early.
 
-        } catch (GeneralException e) {
-            throw new ServletException("Error saving transaction", e);
-        }*/
-        //  atResp.write(httpServletResponse);
         debugger.info(this,"5.b. done with access token exchange with " + cc);
         IssuerTransactionState transactionState = new IssuerTransactionState(httpServletRequest,
                 httpServletResponse,

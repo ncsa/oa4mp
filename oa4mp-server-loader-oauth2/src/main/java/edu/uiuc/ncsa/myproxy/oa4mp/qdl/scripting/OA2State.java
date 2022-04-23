@@ -29,19 +29,19 @@ import java.util.List;
  */
 public class OA2State extends State {
     public OA2State(
-                    VStack vStack,
-                    OpEvaluator opEvaluator,
-                    MetaEvaluator metaEvaluator,
-                    FStack ft,
-                    MTStack mTemplates,
-                    MIStack mInstance,
-                    MyLoggingFacade myLoggingFacade,
-                    boolean isServerMode,
-                    boolean isRestrictedIO,
-                    boolean assertionsOn,
-                    boolean strictACLs,
-                    JSONWebKeys keys) {
-        super( vStack, opEvaluator, metaEvaluator,
+            VStack vStack,
+            OpEvaluator opEvaluator,
+            MetaEvaluator metaEvaluator,
+            FStack ft,
+            MTStack mTemplates,
+            MIStack mInstance,
+            MyLoggingFacade myLoggingFacade,
+            boolean isServerMode,
+            boolean isRestrictedIO,
+            boolean assertionsOn,
+            boolean strictACLs,
+            JSONWebKeys keys) {
+        super(vStack, opEvaluator, metaEvaluator,
                 ft, mTemplates, mInstance, myLoggingFacade, isServerMode, isRestrictedIO, assertionsOn);
         this.strictACLs = strictACLs;
         this.jsonWebKeys = keys;
@@ -50,22 +50,32 @@ public class OA2State extends State {
     @Override
     public State newLocalState() {
         OA2State oa2State = (OA2State) super.newLocalState();
+        return oa2StateInit(oa2State);
+    }
+
+    private OA2State oa2StateInit(OA2State oa2State) {
         oa2State.setOa2se(getOa2se());
+        oa2State.setTransaction(getTransaction());
+        oa2State.setStrictACLs(isStrictACLs());
+        oa2State.setJsonWebKeys(getJsonWebKeys());
+        oa2State.setTxRecord(getTxRecord());
+        oa2State.setAclList(getAclList());
+        oa2State.setAclBlackList(getAclBlackList());
+        oa2State.setRequest(getRequest());
         return oa2State;
     }
 
     @Override
     public State newFunctionState() {
         OA2State oa2State = (OA2State) super.newFunctionState();
-        oa2State.setOa2se(getOa2se());
-        return oa2State;
+        return oa2StateInit(oa2State);
     }
 
     @Override
     public State newCleanState() {
+        // Note that clean state refers to the QDL state -- the OA2 service environment does not change!
         OA2State oa2State = (OA2State) super.newCleanState();
-        oa2State.setOa2se(getOa2se());
-        return oa2State;
+        return oa2StateInit(oa2State);
     }
 
     transient OA2ServiceTransaction transaction;
@@ -81,6 +91,7 @@ public class OA2State extends State {
     }
 
     JSONWebKeys jsonWebKeys;
+
     public void setStrictACLs(boolean strictACLs) {
         this.strictACLs = strictACLs;
     }
@@ -109,7 +120,7 @@ public class OA2State extends State {
         this.aclList = aclList;
     }
 
-    transient List<Identifier> aclList =new ArrayList<>();
+    transient List<Identifier> aclList = new ArrayList<>();
 
     public List<Identifier> getAclBlackList() {
         return aclBlackList;
@@ -119,7 +130,7 @@ public class OA2State extends State {
         this.aclBlackList = aclBlackList;
     }
 
-    transient List<Identifier> aclBlackList =new ArrayList<>();
+    transient List<Identifier> aclBlackList = new ArrayList<>();
 
     public TXRecord getTxRecord() {
         return txRecord;
@@ -178,23 +189,23 @@ public class OA2State extends State {
     @Override
     public void writeExtraXMLElements(XMLStreamWriter xsw) throws XMLStreamException {
         super.writeExtraXMLElements(xsw);
-        if(txRecord != null){
+        if (txRecord != null) {
             txRecord.toXML(xsw);
         }
     }
 
     @Override
     public State newInstance(
-                             VStack vStack,
-                             OpEvaluator opEvaluator,
-                             MetaEvaluator metaEvaluator,
-                             FStack fStack,
-                             MTStack  mTemplates,
-                             MIStack mInstances,
-                             MyLoggingFacade myLoggingFacade,
-                             boolean isServerMode,
-                             boolean isRestrictedIO,
-                             boolean assertionsOn) {
+            VStack vStack,
+            OpEvaluator opEvaluator,
+            MetaEvaluator metaEvaluator,
+            FStack fStack,
+            MTStack mTemplates,
+            MIStack mInstances,
+            MyLoggingFacade myLoggingFacade,
+            boolean isServerMode,
+            boolean isRestrictedIO,
+            boolean assertionsOn) {
         return new OA2State(
                 vStack,
                 opEvaluator,

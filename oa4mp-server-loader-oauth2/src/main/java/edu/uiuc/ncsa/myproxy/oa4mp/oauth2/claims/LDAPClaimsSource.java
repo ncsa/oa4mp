@@ -97,7 +97,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
             // If the configuration file has an error, this will be the one place it shows first.
             // Best to trap it here and fail rather than have LDAP do the query (which it will and
             // return nothing) and inexplicably have no result.
-            throw new LDAPException("Error: no search name found for LDAP query.");
+            throw new LDAPException("No search name found for LDAP query.");
         }
         return searchName;
     }
@@ -142,7 +142,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
                 getOa2SE().getMailUtil().sendMessage(subjectTemplate, messageTemplate, replacements);
             }
 
-            throw new LDAPException("Error: Could not communicate with LDAP server. \"" + (throwable.getMessage() == null ? "(no message)" : throwable.getMessage()) + "\"");
+            throw new LDAPException("Could not communicate with LDAP server: \"" + (throwable.getMessage() == null ? "(no message)" : throwable.getMessage()) + "\"");
         }
 
     }

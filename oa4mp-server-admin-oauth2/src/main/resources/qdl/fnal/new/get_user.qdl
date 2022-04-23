@@ -11,6 +11,7 @@ block[
                 fnal_cfg.address := 'ldap-test.cilogon.org';
                    fnal_cfg.port := 636;
              fnal_cfg.claim_name := 'uid';
+          fnal_cfg.fail_on_error := true;
             fnal_cfg.search_base := 'ou=people,o=Fermilab,o=CO,dc=cilogon,dc=org';
                    fnal_cfg.type := 'ldap';
               fnal_cfg.ldap_name := 'voPersonExternalID';

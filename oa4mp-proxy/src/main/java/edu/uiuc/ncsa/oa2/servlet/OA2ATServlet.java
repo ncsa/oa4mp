@@ -17,6 +17,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.IssuerTransactionState;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.qdl.exceptions.AssertionException;
+import edu.uiuc.ncsa.qdl.exceptions.QDLExceptionWithTrace;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.exceptions.TransactionNotFoundException;
@@ -536,7 +537,6 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
 
                 rtiResponse.setRefreshToken(null); // no refresh token should get processed
                 newTXR.setIdentifier(BasicIdentifier.newID(rtiResponse.getAccessToken().getToken()));
-                //t.setAccessToken(rtiResponse.getAccessToken()); // update to new AT
                 break;
             case RFC8693Constants.REFRESH_TOKEN_TYPE:
                 rfcClaims.put(RFC8693Constants.ISSUED_TOKEN_TYPE, RFC8693Constants.REFRESH_TOKEN_TYPE); // Required. This is the type of token issued (mostly access tokens). Must be as per TX spec.
@@ -544,27 +544,27 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 rfcClaims.put(OA2Constants.EXPIRES_IN, t.getRefreshTokenLifetime() / 1000); // internal in ms., external in sec.
                 newTXR.setLifetime(t.getRefreshTokenLifetime());
                 newTXR.setIdentifier(BasicIdentifier.newID(rtiResponse.getRefreshToken().getToken()));
-                //t.setRefreshToken(rtiResponse.getRefreshToken()); // Update to new RT
                 break;
-   /*         case ID_TOKEN_TYPE:
-                rfcClaims.put(ISSUED_TOKEN_TYPE, ID_TOKEN_TYPE); // Required. This is the type of token issued.
-                rfcClaims.put(OA2Constants.TOKEN_TYPE, TOKEN_TYPE_N_A); // Required. This is how the issued token can be used, mostly. BY RFC 6750 spec.
-                break;*/
         }
         newTXR.setExpiresAt(newTXR.getIssuedAt() + newTXR.getLifetime());
         JWTRunner jwtRunner = new JWTRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2se, t, newTXR, t.getOA2Client().getConfig()));
-        //    JSONObject updatedIDToken = null;
         try {
             OA2ClientUtils.setupHandlers(jwtRunner, oa2se, t, newTXR, request);
             // NOTE WELL that the next two lines are where our identifiers are used to create JWTs (like SciTokens)
             // so if this is not done, the wrong token type will be returned.
             jwtRunner.doTokenExchange();
-/*
-            if (requestedTokenType.equals(ID_TOKEN_TYPE)) {
-                jwtRunner.getIdTokenHandlerInterface().refreshAccountingInformation();
-                updatedIDToken = jwtRunner.getIdTokenHandlerInterface().getClaims();
+
+        } catch (QDLExceptionWithTrace qdlExceptionWithTrace) {
+            // CIL-1267 make sure error propagate.
+            // This can happen if something very deep in the stack (non QDL) blows up and QDL
+            // has caught it.
+            Throwable throwable = qdlExceptionWithTrace;
+            if (qdlExceptionWithTrace.getCause() != null) {
+                throwable = qdlExceptionWithTrace.getCause();
             }
-*/
+            debugger.trace(this, "Server exception \"" + throwable.getMessage() + "\"");
+            throw new OA2ATException(OA2Errors.INVALID_REQUEST, throwable.getMessage(), HttpStatus.SC_BAD_REQUEST, t.getRequestState());
+
         } catch (AssertionException assertionError) {
             throw new OA2ATException(OA2Errors.INVALID_REQUEST,
                     assertionError.getMessage(),
@@ -826,7 +826,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         if (tempRT != null && tempRT.isJWT()) {
             st2.setRTJWT(tempRT.getToken());
         }
-
+        // only do this before last save, so if the whole thing bombs, they can try again
+        st2.setAuthGrantValid(false);
         getTransactionStore().save(st2);
         // Check again after doing token claims in case a script changed it.
         if (!st2.getFlowStates().acceptRequests || !st2.getFlowStates().accessToken || !st2.getFlowStates().idToken) {
@@ -974,6 +975,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 token = TokenUtils.b32DecodeToken(rawRefreshToken);
             }
             debugger.trace(this, "refresh failed for token " + token + " at " + (new Date()));
+            oa2ATException.printStackTrace();
             throw oa2ATException;
         }
         OA2ServiceTransaction t = null;
@@ -1032,11 +1034,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
 
         RTIResponse rtiResponse = (RTIResponse) rtIssuer.process(rtiRequest);
         rtiResponse.setSignToken(client.isSignTokens());
-        if (client.isRTLifetimeEnabled() && oa2SE.isRefreshTokenEnabled()) {
-            t.setRefreshToken(rtiResponse.getRefreshToken());
-        } else {
-            rtiResponse.setRefreshToken(null);
-        }
+
         debugger.trace(this, "rt issuer response: " + rtiResponse);
 
         // Note for CIL-525: Here is where we need to recompute the claims. If a request comes in for a new
@@ -1069,6 +1067,16 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, t, txRecord, request);
         try {
             jwtRunner.doRefreshClaims();
+        } catch (QDLExceptionWithTrace qdlExceptionWithTrace) {
+            // This can happen if something very deep in the stack (non QDL) blows up and QDL
+            // has caught it.
+            Throwable throwable = qdlExceptionWithTrace;
+            if (qdlExceptionWithTrace.getCause() != null) {
+                throwable = qdlExceptionWithTrace.getCause();
+            }
+            debugger.trace(this, "Server exception \"" + throwable.getMessage() + "\"");
+            throw new OA2ATException(OA2Errors.INVALID_REQUEST, throwable.getMessage(), HttpStatus.SC_BAD_REQUEST, t.getRequestState());
+
         } catch (AssertionException assertionError) {
             debugger.trace(this, "assertion exception \"" + assertionError.getMessage() + "\"");
             throw new OA2ATException(OA2Errors.INVALID_REQUEST, assertionError.getMessage(), HttpStatus.SC_BAD_REQUEST, t.getRequestState());
@@ -1117,14 +1125,19 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         // In refresh, both the access token and refresh token are replaced in the transaction,
         // and a new TXRecord pointing to the AT is made. If these are JWTs, stash them for use later
         // when getting token_info. Cannot do that until all other processing is done.
+        // CIL-1268 moving this here fixed that.
+        if (client.isRTLifetimeEnabled() && oa2SE.isRefreshTokenEnabled()) {
+            t.setRefreshToken(rtiResponse.getRefreshToken());
+            if (rtiResponse.getRefreshToken().isJWT()) {
+                t.setRTJWT(rtiResponse.getRefreshToken().getToken());
+            }
+        } else {
+            rtiResponse.setRefreshToken(null);
+        }
         if (((AccessTokenImpl) rtiResponse.getAccessToken()).isJWT()) {
             t.setATJWT(rtiResponse.getAccessToken().getToken());
             txRecord.setStoredToken(rtiResponse.getAccessToken().getToken());
         }
-        if (rtiResponse.getRefreshToken().isJWT()) {
-            t.setRTJWT(rtiResponse.getRefreshToken().getToken());
-        }
-        t.setRefreshTokenValid(false); // About the last thing to do here is set this invalid.
 
         getTransactionStore().save(t);
         oa2SE.getTxStore().save(txRecord);

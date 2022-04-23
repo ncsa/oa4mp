@@ -43,7 +43,12 @@ public class ConfigtoCS implements CSConstants {
                 return new FSClaimSource(cfg);
             case CS_TYPE_LDAP:
                 LDAPConfiguration ldapCfg = (LDAPConfiguration) ClaimSourceConfigConverter.convert(arg);
-                LDAPClaimsSource ldapClaimsSource = new LDAPClaimsSource(oa2SE);
+                LDAPClaimsSource ldapClaimsSource;
+                if(oa2SE ==null){
+                    ldapClaimsSource = new LDAPClaimsSource();
+                }else{
+                    ldapClaimsSource = new LDAPClaimsSource(oa2SE);
+                }
                 ldapClaimsSource.setConfiguration(ldapCfg);
                 return ldapClaimsSource;
             case CS_TYPE_HEADERS:
@@ -59,7 +64,13 @@ public class ConfigtoCS implements CSConstants {
                 } else {
                     searchName = NCSALDAPClaimSource.DEFAULT_SEACH_NAME;
                 }
-                NCSALDAPClaimSource ncsaldapClaimSource = new NCSALDAPClaimSource(oa2SE);
+                NCSALDAPClaimSource ncsaldapClaimSource;
+                if(oa2SE == null){
+                    ncsaldapClaimSource = new NCSALDAPClaimSource();
+                }else{
+                    ncsaldapClaimSource = new NCSALDAPClaimSource(oa2SE);
+                }
+                return ncsaldapClaimSource;
 
         }
         throw new IllegalArgumentException("Error: Unrecognized claim source type \"" + arg.getString(CS_DEFAULT_TYPE) + "\"");

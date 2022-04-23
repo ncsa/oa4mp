@@ -21,6 +21,7 @@ block[
                   service_cfg.port := 636;
             service_cfg.claim_name := 'uid';
            service_cfg.search_base := 'ou=services,o=Fermilab,o=CO,dc=cilogon,dc=org';
+         service_cfg.fail_on_error := true;
                   service_cfg.type := 'ldap';
              service_cfg.ldap_name := 'voPersonExternalID';
     service_cfg.search_attributes. :=  [EPPN, EPE, VOPAUID];
