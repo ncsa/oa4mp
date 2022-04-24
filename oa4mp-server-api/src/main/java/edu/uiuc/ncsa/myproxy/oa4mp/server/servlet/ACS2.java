@@ -2,12 +2,15 @@ package edu.uiuc.ncsa.myproxy.oa4mp.server.servlet;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceConstantKeys;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.server.issuers.PAIssuer;
 import edu.uiuc.ncsa.security.delegation.server.request.PARequest;
 import edu.uiuc.ncsa.security.delegation.server.request.PAResponse;
 import edu.uiuc.ncsa.security.delegation.servlet.TransactionState;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
+import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
+import edu.uiuc.ncsa.security.storage.XMLMap;
 import edu.uiuc.ncsa.security.util.pkcs.CertUtil;
 import edu.uiuc.ncsa.security.util.pkcs.MyPKCS10CertRequest;
 
@@ -37,6 +40,7 @@ public abstract class ACS2 extends CRServlet {
         info("6.a. Starting to process cert request");
         AccessToken accessToken = getAccessToken(httpServletRequest);
         ServiceTransaction serviceTransaction = (ServiceTransaction) getTransactionStore().get(accessToken);
+        XMLMap backup = GenericStoreUtils.toXML(getTransactionStore(), serviceTransaction);
         PARequest paRequest = new PARequest(httpServletRequest, serviceTransaction);
         String statusString = "client = " + paRequest.getClient().getIdentifier();
         // The next call will pull the access token off of any parameters. The result may be null if there is
@@ -62,7 +66,10 @@ public abstract class ACS2 extends CRServlet {
             try {
                 certReq = CertUtil.fromStringToCertReq(rawCR);
             } catch (Throwable throwable) {
-                throwable.printStackTrace();
+                if(DebugUtil.isEnabled()) {
+                    throwable.printStackTrace();
+                }
+                GenericStoreUtils.fromXMLAndSave(getTransactionStore(), backup); // back out of it, let them try again later
                 throw new GeneralException("Error: cert request is bad/not understandable:" + (rawCR == null ? "(null)" : rawCR), throwable);
             }
             t.setCertReq(certReq);
@@ -79,7 +86,7 @@ public abstract class ACS2 extends CRServlet {
         info("6.a. Processing request for transaction " + t.getIdentifier());
         doRealCertRequest(t, statusString);
         t.setAccessTokenValid(false);
-        preprocess(new TransactionState(httpServletRequest, httpServletResponse, paResponse.getParameters(), t));
+        preprocess(new TransactionState(httpServletRequest, httpServletResponse, paResponse.getParameters(), t, backup));
 
         debug("6.a. protected asset:" + (t.getProtectedAsset() == null ? "(null)" : "ok") + ", " + statusString);
         HashMap<String, String> username = new HashMap<String, String>();
@@ -95,7 +102,7 @@ public abstract class ACS2 extends CRServlet {
         info("6.b. Done with cert request " + statusString);
         paResponse.write(httpServletResponse);
         info("6.b. Completed transaction " + t.getIdentifierString() + ", " + statusString);
-        postprocess(new TransactionState(httpServletRequest, httpServletResponse, paResponse.getParameters(), t));
+        postprocess(new TransactionState(httpServletRequest, httpServletResponse, paResponse.getParameters(), t, backup));
     }
 
 }

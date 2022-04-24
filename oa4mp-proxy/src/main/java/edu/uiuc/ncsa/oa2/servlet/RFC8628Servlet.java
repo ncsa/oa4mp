@@ -117,7 +117,7 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
         } else {
             // scope is optional, so only take notice if they send something
             debugger.trace(this, "checking scopes:" + scope + ". strict scopes " + (client.useStrictScopes() ? "on" : "off"));
-            TransactionState transactionState = new TransactionState(req, resp, agResponse.getParameters(), t);
+            TransactionState transactionState = new TransactionState(req, resp, agResponse.getParameters(), t, null);
             try {
                 t.setScopes(ClientUtils.resolveScopes(transactionState, true, true));
             } catch (OA2RedirectableError redirectableError) {

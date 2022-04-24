@@ -28,6 +28,8 @@ import edu.uiuc.ncsa.security.oauth_2_0.server.AGRequest2;
 import edu.uiuc.ncsa.security.oauth_2_0.server.RFC7636Util;
 import edu.uiuc.ncsa.security.oauth_2_0.server.RFC8693Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
+import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
+import edu.uiuc.ncsa.security.storage.XMLMap;
 import edu.uiuc.ncsa.security.util.configuration.ConfigUtil;
 import net.sf.json.JSONObject;
 import org.apache.http.HttpStatus;
@@ -143,12 +145,12 @@ public class OA2AuthorizedServletUtil {
             }
 
             Map<String, String> params = agResponse.getParameters();
-
-            preprocess(new TransactionState(req, resp, params, transaction));
+            XMLMap backup = GenericStoreUtils.toXML(getServiceEnvironment().getTransactionStore(), transaction);
+            preprocess(new TransactionState(req, resp, params, transaction, backup));
 
             debugger.info(this, "2.b finished initial request for token =\"" + transaction.getIdentifierString() + "\".");
 
-            postprocess(new IssuerTransactionState(req, resp, params, transaction, agResponse));
+            postprocess(new IssuerTransactionState(req, resp, params, transaction, backup, agResponse));
             servlet.getTransactionStore().save(transaction);
             agResponse.write(resp);
             return transaction;

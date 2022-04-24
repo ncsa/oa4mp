@@ -24,7 +24,7 @@ block[
                jlab_cfg.username := ini.jlab.'name';
                jlab_cfg.password := ini.jlab.'pwd';
      // return(get_claims(create_source(jlab_cfg.), ''));
-      return(get_claims(create_source(jlab_cfg.), user));
+     return(get_claims(create_source(jlab_cfg.), user));
 ];
 
 

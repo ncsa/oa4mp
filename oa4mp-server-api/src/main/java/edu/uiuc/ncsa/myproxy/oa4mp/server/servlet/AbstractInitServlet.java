@@ -6,6 +6,8 @@ import edu.uiuc.ncsa.security.delegation.server.request.AGRequest;
 import edu.uiuc.ncsa.security.delegation.server.request.AGResponse;
 import edu.uiuc.ncsa.security.delegation.servlet.TransactionState;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
+import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
+import edu.uiuc.ncsa.security.storage.XMLMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -55,14 +57,14 @@ public abstract class AbstractInitServlet extends MyProxyDelegationServlet{
                info("Saved new transaction with id=" + transaction.getIdentifierString());
 
                Map<String, String> params = agResponse.getParameters();
-
-               preprocess(new TransactionState(req, resp, params, transaction));
+               XMLMap backup = GenericStoreUtils.toXML(getTransactionStore(), transaction);
+               preprocess(new TransactionState(req, resp, params, transaction, backup));
                debug("saved transaction for " + cid + ", trans id=" + transaction.getIdentifierString());
 
                agResponse.write(resp);
                info("2.b finished initial request for token =\"" + transaction.getIdentifierString() + "\".");
 
-               postprocess(new IssuerTransactionState(req, resp, params, transaction, agResponse));
+               postprocess(new IssuerTransactionState(req, resp, params, transaction, backup, agResponse));
                return transaction;
            }
            catch (Throwable t) {

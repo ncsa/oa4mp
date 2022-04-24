@@ -6,6 +6,8 @@ import edu.uiuc.ncsa.security.delegation.server.request.PARequest;
 import edu.uiuc.ncsa.security.delegation.server.request.PAResponse;
 import edu.uiuc.ncsa.security.delegation.servlet.TransactionState;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
+import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
+import edu.uiuc.ncsa.security.storage.XMLMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -29,7 +31,9 @@ public abstract class AbstractCertServlet extends MyProxyDelegationServlet {
 
     protected void doDelegation(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Throwable {
         info("6.a. Starting to process cert request");
-        PARequest paRequest = new PARequest(httpServletRequest, getTransactionByGrantID(httpServletRequest));
+        ServiceTransaction originalTransaction = getTransactionByGrantID(httpServletRequest);
+        PARequest paRequest = new PARequest(httpServletRequest, originalTransaction);
+        XMLMap backup = GenericStoreUtils.toXML(getTransactionStore(), originalTransaction);
         String cc = "client = " + paRequest.getClient().getIdentifier();
         paRequest.setAccessToken(getServiceEnvironment().getTokenForge().getAccessToken(httpServletRequest));
 
@@ -40,7 +44,7 @@ public abstract class AbstractCertServlet extends MyProxyDelegationServlet {
         ServiceTransaction t = verifyAndGet(paResponse);
         info("6.a. Processing request for transaction " + t.getIdentifier());
         t.setAccessTokenValid(false);
-        preprocess(new TransactionState(httpServletRequest, httpServletResponse, paResponse.getParameters(), t));
+        preprocess(new TransactionState(httpServletRequest, httpServletResponse, paResponse.getParameters(), t, backup));
 
         debug("6.a. protected asset:" + (t.getProtectedAsset() == null ? "(null)" : "ok") + ", " + cc);
         HashMap<String, String> username = new HashMap<String, String>();
@@ -54,7 +58,7 @@ public abstract class AbstractCertServlet extends MyProxyDelegationServlet {
         info("6.b. Done with cert request " + cc);
         paResponse.write(httpServletResponse);
         info("6.b. Completed transaction " + t.getIdentifierString() + ", " + cc);
-        postprocess(new TransactionState(httpServletRequest, httpServletResponse, paResponse.getParameters(), t));
+        postprocess(new TransactionState(httpServletRequest, httpServletResponse, paResponse.getParameters(), t, backup));
     }
 
 }

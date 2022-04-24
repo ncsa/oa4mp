@@ -198,7 +198,11 @@ public abstract class AbstractAuthorizationServlet extends CRServlet implements 
 
     public void present(PresentableState state) throws Throwable {
         AuthorizedState aState = (AuthorizedState) state;
-        postprocess(new TransactionState(state.getRequest(), aState.getResponse(), null, aState.getTransaction()));
+        postprocess(new TransactionState(state.getRequest(),
+                aState.getResponse(),
+                null,
+                aState.getTransaction(),
+                null));
 
         switch (aState.getState()) {
             case AUTHORIZATION_ACTION_START:
@@ -288,7 +292,7 @@ public abstract class AbstractAuthorizationServlet extends CRServlet implements 
         trans = getAndCheckTransaction(ag);
         AuthorizedState pState = new AuthorizedState(getState(request), request, response, trans);
         prepare(pState);
-        preprocess(new TransactionState(request, response, null, trans));
+        preprocess(new TransactionState(request, response, null, trans, null));
 
         switch (pState.getState()) {
             case AUTHORIZATION_ACTION_OK:
@@ -390,7 +394,7 @@ public abstract class AbstractAuthorizationServlet extends CRServlet implements 
         userName = trans.getUsername();
         info("3.b. transaction has user name = " + userName);
         // The right place to invoke the pre-processor.
-        preprocess(new TransactionState(request, response, null, trans));
+        preprocess(new TransactionState(request, response, null, trans, null));
         String statusString = " transaction =" + trans.getIdentifierString() + " and client=" + trans.getClient().getIdentifierString();
         trans.setVerifier(MyProxyDelegationServlet.getServiceEnvironment().getTokenForge().getVerifier());
         MyProxyDelegationServlet.getServiceEnvironment().getTransactionStore().save(trans);

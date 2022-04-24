@@ -58,7 +58,7 @@ public abstract class AbstractRegistrationServlet extends MyProxyDelegationServl
     }
 
     public void prepare(PresentableState state) throws Throwable {
-        preprocess(new TransactionState(state.getRequest(), state.getResponse(), null, null));
+        preprocess(new TransactionState(state.getRequest(), state.getResponse(), null, null, null));
         switch (state.getState()) {
             case INITIAL_STATE:
                 HttpServletRequest request = state.getRequest();
@@ -113,7 +113,7 @@ public abstract class AbstractRegistrationServlet extends MyProxyDelegationServl
 
 
     public void present(PresentableState state) throws Throwable {
-        postprocess(new TransactionState(state.getRequest(), state.getResponse(), null, null));
+        postprocess(new TransactionState(state.getRequest(), state.getResponse(), null, null, null));
 
         switch (state.getState()) {
             case INITIAL_STATE:

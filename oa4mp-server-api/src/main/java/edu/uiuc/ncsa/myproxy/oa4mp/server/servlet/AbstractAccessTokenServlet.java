@@ -9,6 +9,8 @@ import edu.uiuc.ncsa.security.delegation.servlet.TransactionState;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.delegation.token.Verifier;
+import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
+import edu.uiuc.ncsa.security.storage.XMLMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -43,7 +45,7 @@ public abstract class AbstractAccessTokenServlet extends MyProxyDelegationServle
         AuthorizationGrant ag = getServiceEnvironment().getTokenForge().getAuthorizationGrant(httpServletRequest);
         AuthorizationGrant updatedAG  = checkAGExpiration(ag);
         ServiceTransaction transaction = getTransaction(ag, httpServletRequest);
-        return getIssuerTransactionState(httpServletRequest, httpServletResponse,  updatedAG, transaction);
+        return getIssuerTransactionState(httpServletRequest, httpServletResponse,  updatedAG, transaction, GenericStoreUtils.toXML(getTransactionStore(), transaction));
     }
 
     /**
@@ -58,18 +60,21 @@ public abstract class AbstractAccessTokenServlet extends MyProxyDelegationServle
     protected IssuerTransactionState getIssuerTransactionState(HttpServletRequest httpServletRequest,
                                                              HttpServletResponse httpServletResponse,
                                                              AuthorizationGrant updatedAG,
-                                                             ServiceTransaction transaction) throws Throwable {
+                                                             ServiceTransaction transaction,
+                                                               XMLMap backup) throws Throwable {
          return getIssuerTransactionState(
                  httpServletRequest,
                  httpServletResponse,
                  updatedAG,
                  transaction,
+                 backup,
                  false);
     }
     protected IssuerTransactionState getIssuerTransactionState(HttpServletRequest httpServletRequest,
                                                              HttpServletResponse httpServletResponse,
                                                              AuthorizationGrant updatedAG,
                                                              ServiceTransaction transaction,
+                                                               XMLMap backup,
                                                                boolean isRFC8628) throws Throwable {
 
 
@@ -90,7 +95,7 @@ public abstract class AbstractAccessTokenServlet extends MyProxyDelegationServle
         String cc = "client=" + transaction.getClient();
         debugger.info(this,"5.a. got access token " + cc);
 
-        preprocess(new TransactionState(httpServletRequest, httpServletResponse, atResp.getParameters(), transaction));
+        preprocess(new TransactionState(httpServletRequest, httpServletResponse, atResp.getParameters(), transaction, backup));
 
         debugger.trace(this,"5.a. access token = " + atResp.getAccessToken() + (v!=null?(" for verifier = " + v):""));
         transaction.setAuthGrantValid(false);
@@ -110,6 +115,7 @@ public abstract class AbstractAccessTokenServlet extends MyProxyDelegationServle
                 httpServletResponse,
                 atResp.getParameters(),
                 transaction,
+                backup,
                 atResp);
         transactionState.setRfc8628(isRFC8628);
         postprocess(transactionState);
