@@ -141,7 +141,7 @@ public class OA2TConverter<V extends OA2ServiceTransaction> extends TransactionC
     public void toMap(V t, ConversionMap<String, Object> map) {
         super.toMap(t, map);
         if (t.getRefreshToken() != null) {
-            map.put(getTCK().refreshToken(), t.getRefreshToken().getToken());
+            map.put(getTCK().refreshToken(), t.getRefreshToken().getJti().toString());
         }
         if (t.getAuthorizationGrant() == null) {
             // If the transaction is old, this will be missing. Create it from the

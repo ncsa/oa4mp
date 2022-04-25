@@ -9,7 +9,6 @@ block[
 
     // ini. := file_read('vfs#/scripts/jlab/ldap.ini',2);
     ini. := file_read('/home/ncsa/dev/csd/config/jlab-ldap.ini',2);
-    //user := ini.jlab.'uid'; // user is script_args(0)
     user := script_args(0);
                        jlab_cfg. := new_template('ldap');
               jlab_cfg.auth_type := 'simple';

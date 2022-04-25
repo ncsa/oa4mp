@@ -561,8 +561,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             // CIL-1267 make sure error propagate.
             // This can happen if something very deep in the stack (non QDL) blows up and QDL
             // has caught it.
-            getOA2SE().getTxStore().remove(newTXR.getIdentifier());
-            GenericStoreUtils.fromXMLAndSave(getTransactionStore(), tBackup);
+            rollback(tBackup, newTXR);
             Throwable throwable = qdlExceptionWithTrace;
             if (qdlExceptionWithTrace.getCause() != null) {
                 throwable = qdlExceptionWithTrace.getCause();
@@ -571,18 +570,19 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             throw new OA2ATException(OA2Errors.INVALID_REQUEST, throwable.getMessage(), HttpStatus.SC_BAD_REQUEST, t.getRequestState());
 
         } catch (AssertionException assertionError) {
+            rollback(tBackup, newTXR);
             throw new OA2ATException(OA2Errors.INVALID_REQUEST,
                     assertionError.getMessage(),
                     HttpStatus.SC_BAD_REQUEST, t.getRequestState());
         } catch (ScriptRuntimeException sre) {
             // Client threw an exception.
-            getOA2SE().getTxStore().remove(newTXR.getIdentifier());
-            GenericStoreUtils.fromXMLAndSave(getTransactionStore(), tBackup);
+            rollback(tBackup, newTXR);
             throw new OA2ATException(sre.getRequestedType(), sre.getMessage(),
                     sre.getStatus(), t.getRequestState());
         } catch (IllegalAccessException iax) {
             // implies that the at some point there was a change in access allowed, e.g. a script
             // set a policy that denied it.
+            rollback(tBackup, newTXR);
             throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
                     "access denied",
                     t.getRequestState());
@@ -607,7 +607,6 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             } else {
                 rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getRefreshToken().encodeToken()); // Required
                 rfcClaims.put(OA2Constants.REFRESH_TOKEN, rtiResponse.getRefreshToken().encodeToken()); // Optional
-                //newTXR.setStoredToken(rtiResponse.getRefreshToken().encodeToken());
             }
         } else {
             if (((AccessTokenImpl) rtiResponse.getAccessToken()).isJWT()) {
@@ -616,7 +615,6 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
 
             } else {
                 rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getAccessToken().encodeToken()); // Required.
-                //newTXR.setStoredToken(rtiResponse.getAccessToken().encodeToken());
             }
             // create scope string  Remember that these may have been changed by a script,
             // so here is the right place to set it.
@@ -814,7 +812,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             // CIL-1267 make sure error propagate.
             // This can happen if something very deep in the stack (non QDL) blows up and QDL
             // has caught it.
-            GenericStoreUtils.fromXMLAndSave(getTransactionStore(), tBackup);
+            rollback(tBackup);
             Throwable throwable = qdlExceptionWithTrace;
             if (qdlExceptionWithTrace.getCause() != null) {
                 throwable = qdlExceptionWithTrace.getCause();
@@ -823,11 +821,14 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             throw new OA2ATException(OA2Errors.INVALID_REQUEST, throwable.getMessage(), HttpStatus.SC_BAD_REQUEST, st2.getRequestState());
 
         } catch (AssertionException assertionError) {
+            rollback(tBackup);
             throw new OA2ATException(OA2Errors.INVALID_REQUEST, assertionError.getMessage(), HttpStatus.SC_BAD_REQUEST, st2.getRequestState());
         } catch (ScriptRuntimeException sre) {
             // Client threw an exception.
+            rollback(tBackup);
             throw new OA2ATException(sre.getRequestedType(), sre.getMessage(), sre.getStatus(), st2.getRequestState());
         } catch (IllegalAccessException iax) {
+            rollback(tBackup);
             throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
                     "access denied",
                     st2.getRequestState());
@@ -850,6 +851,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         st2.setAuthGrantValid(false);
         getTransactionStore().save(st2);
         // Check again after doing token claims in case a script changed it.
+        // If they fail at this point, access it denied and the tokens are invalidated.
         if (!st2.getFlowStates().acceptRequests || !st2.getFlowStates().accessToken || !st2.getFlowStates().idToken) {
             throw new OA2ATException(
                     OA2Errors.UNAUTHORIZED_CLIENT,
@@ -1093,8 +1095,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         } catch (QDLExceptionWithTrace qdlExceptionWithTrace) {
             // This can happen if something very deep in the stack (non QDL) blows up and QDL
             // has caught it.
-            GenericStoreUtils.fromXMLAndSave(getTransactionStore(), backup);
-            getOA2SE().getTxStore().remove(txRecord.getIdentifier());
+            rollback(backup, txRecord);
             Throwable throwable = qdlExceptionWithTrace;
             if (qdlExceptionWithTrace.getCause() != null) {
                 throwable = qdlExceptionWithTrace.getCause();
@@ -1103,12 +1104,13 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             throw new OA2ATException(OA2Errors.INVALID_REQUEST, throwable.getMessage(), HttpStatus.SC_BAD_REQUEST, t.getRequestState());
 
         } catch (AssertionException assertionError) {
+            // they passed a bad argument to a QDL script
+            rollback(backup, txRecord);
             debugger.trace(this, "assertion exception \"" + assertionError.getMessage() + "\"");
             throw new OA2ATException(OA2Errors.INVALID_REQUEST, assertionError.getMessage(), HttpStatus.SC_BAD_REQUEST, t.getRequestState());
         } catch (ScriptRuntimeException sre) {
             // Client threw an exception.
-            GenericStoreUtils.fromXMLAndSave(getTransactionStore(), backup);
-            getOA2SE().getTxStore().remove(txRecord.getIdentifier());
+            rollback(backup, txRecord);
             debugger.trace(this, "script runtime exception \"" + sre.getMessage() + "\"");
             throw new OA2ATException(sre.getRequestedType(), sre.getMessage(), sre.getStatus(), t.getRequestState());
         } catch (IllegalAccessException iax) {
@@ -1116,6 +1118,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                     "access denied",
                     t.getRequestState());
         } catch (Throwable throwable) {
+            rollback(backup, txRecord);
             debugger.trace(this, "Unable to update claims on token refresh", throwable);
             debugger.warn(this, "Unable to update claims on token refresh: \"" + throwable.getMessage() + "\"");
         }
@@ -1181,6 +1184,16 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 rtiResponse);
         debugger.trace(this, "done with token refresh, returning.");
         return state;
+    }
+
+    protected void rollback(XMLMap backup) throws IOException {
+       rollback(backup, null);
+    }
+    protected void rollback(XMLMap backup, TXRecord txRecord) throws IOException {
+        GenericStoreUtils.fromXMLAndSave(getTransactionStore(), backup);
+        if(txRecord != null) {
+            getOA2SE().getTxStore().remove(txRecord.getIdentifier());
+        }
     }
 
     @Override
@@ -1399,7 +1412,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             try {
                 ProxyUtils.doRFC8628AT(getOA2SE(), transaction);
             } catch (Throwable throwable) {
-                GenericStoreUtils.fromXMLAndSave(getTransactionStore(), backup);
+                rollback(backup); // something blew up in the proxy. Let someone fix it and retry
                 if (throwable instanceof OA2GeneralError) {
                     throw throwable;
                 }
@@ -1455,7 +1468,12 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 transaction,
                 backup,
                 true);
-        doAT(issuerTransactionState, client);
+        try {
+            doAT(issuerTransactionState, client);
+        }catch(Throwable t){
+            rollback(backup);
+            throw t;
+        }
         debugger.trace(this, "returns from doAT");
         OA2SE oa2se = (OA2SE) MyProxyDelegationServlet.getServiceEnvironment();
         VirtualOrganization vo = oa2se.getVO(transaction.getClient().getIdentifier());
