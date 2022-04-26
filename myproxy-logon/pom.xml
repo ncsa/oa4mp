@@ -6,11 +6,11 @@
     <parent>
         <groupId>edu.uiuc.ncsa.myproxy</groupId>
         <artifactId>myproxy</artifactId>
-        <version>5.2-SNAPSHOT</version>
+        <version>5.2.6</version>
     </parent>
     <groupId>edu.uiuc.ncsa.myproxy</groupId>
     <artifactId>myproxy-logon</artifactId>
-    <version>5.2-SNAPSHOT</version>
+    <version>5.2.6</version>
     <name>MyProxy Logon</name>
     <packaging>jar</packaging>
     <properties>
@@ -57,7 +57,7 @@
         <dependency>
             <artifactId>ncsa-security-util</artifactId>
             <groupId>edu.uiuc.ncsa.security</groupId>
-            <version>5.2-SNAPSHOT</version>
+            <version>5.2.6</version>
         </dependency>
         <dependency>
             <groupId>commons-codec</groupId>

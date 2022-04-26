@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>edu.uiuc.ncsa.myproxy</groupId>
     <artifactId>myproxy</artifactId>
-    <version>5.2-SNAPSHOT</version>
+    <version>5.2.6</version>
     <packaging>pom</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -90,7 +90,7 @@
 <!--        <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>oa4mp-server-loader-oauth2</artifactId>
-            <version>5.2-SNAPSHOT</version>
+            <version>5.2.6</version>
             <scope>compile</scope>
         </dependency>-->
     </dependencies>
