@@ -16,8 +16,6 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.UITokenUtils;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.IssuerTransactionState;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
-import edu.uiuc.ncsa.qdl.exceptions.AssertionException;
-import edu.uiuc.ncsa.qdl.exceptions.QDLExceptionWithTrace;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.exceptions.TransactionNotFoundException;
@@ -35,7 +33,6 @@ import edu.uiuc.ncsa.security.delegation.token.impl.*;
 import edu.uiuc.ncsa.security.oauth_2_0.*;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTRunner;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTUtil2;
-import edu.uiuc.ncsa.security.oauth_2_0.jwt.ScriptRuntimeException;
 import edu.uiuc.ncsa.security.oauth_2_0.server.*;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
 import edu.uiuc.ncsa.security.servlet.ServiceClientHTTPException;
@@ -557,7 +554,9 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             // so if this is not done, the wrong token type will be returned.
             jwtRunner.doTokenExchange();
 
-        } catch (QDLExceptionWithTrace qdlExceptionWithTrace) {
+        } catch (Throwable throwable) {
+            OA2ServletUtils.handleScriptEngineException(this, oa2se, throwable, debugger, t, tBackup, newTXR);
+        } /*catch (QDLExceptionWithTrace qdlExceptionWithTrace) {
             // CIL-1267 make sure error propagate.
             // This can happen if something very deep in the stack (non QDL) blows up and QDL
             // has caught it.
@@ -587,14 +586,15 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                     "access denied",
                     t.getRequestState());
 
-        } catch (Throwable throwable) {
+        } catch (Throwable throwable) {*/
             /*
             NOTE: If there is some other error (such as a bad QDL script) and this fails, then as a fallback position
             this will return the token with the same claims as are currently available in the handler.
             There is no good way to communicate this to the user though.
-             */
-            ServletDebugUtil.warn(this, "*** Unable to update claims on token exchange: \"" + throwable.getMessage() + "\"");
-        }
+
+        ServletDebugUtil.warn(this, "*** Unable to update claims on token exchange: \"" + throwable.getMessage() + "\"");
+    }          */
+
         setupTokens(client, rtiResponse, oa2se, t, jwtRunner);
 
         if (rtiResponse.hasRefreshToken()) {
@@ -639,8 +639,14 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         response.setCharacterEncoding("UTF-8");
 
         newTXR.setValid(true); // automatically.
-        oa2se.getTxStore().save(newTXR);
-        getTransactionStore().save(t);
+        oa2se.getTxStore().
+
+                save(newTXR);
+
+        getTransactionStore().
+
+                save(t);
+
         PrintWriter osw = response.getWriter();
         rfcClaims.write(osw);
         osw.flush();
@@ -808,7 +814,10 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         }
         try {
             jwtRunner.doTokenClaims();
-        } catch (QDLExceptionWithTrace qdlExceptionWithTrace) {
+        } catch (Throwable throwable) {
+            OA2ServletUtils.handleScriptEngineException(this, oa2SE, throwable, createDebugger(st2.getClient()), st2, tBackup);
+        }
+        /* catch (QDLExceptionWithTrace qdlExceptionWithTrace) {
             // CIL-1267 make sure error propagate.
             // This can happen if something very deep in the stack (non QDL) blows up and QDL
             // has caught it.
@@ -833,7 +842,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                     "access denied",
                     st2.getRequestState());
         }
-
+*/
         if (!client.isRTLifetimeEnabled()) {
             atResponse.setRefreshToken(null);
         }
@@ -1092,7 +1101,10 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, t, txRecord, request);
         try {
             jwtRunner.doRefreshClaims();
-        } catch (QDLExceptionWithTrace qdlExceptionWithTrace) {
+        } catch (Throwable throwable) {
+            OA2ServletUtils.handleScriptEngineException(this, oa2SE, throwable, createDebugger(t.getClient()), t, backup, txRecord);
+        }
+        /* catch (QDLExceptionWithTrace qdlExceptionWithTrace) {
             // This can happen if something very deep in the stack (non QDL) blows up and QDL
             // has caught it.
             rollback(backup, txRecord);
@@ -1101,7 +1113,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 throwable = qdlExceptionWithTrace.getCause();
             }
             debugger.trace(this, "Server exception \"" + throwable.getMessage() + "\"");
-            throw new OA2ATException(OA2Errors.INVALID_REQUEST, throwable.getMessage(), HttpStatus.SC_BAD_REQUEST, t.getRequestState());
+            throw new OA2ATException(OA2Errors.SERVER_ERROR, "internal error", HttpStatus.SC_INTERNAL_SERVER_ERROR, t.getRequestState());
 
         } catch (AssertionException assertionError) {
             // they passed a bad argument to a QDL script
@@ -1118,10 +1130,13 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                     "access denied",
                     t.getRequestState());
         } catch (Throwable throwable) {
+            // Everything else. Allow to fix the problem. Proceeding means that the transaction will complete
+            // and the old tokens will be invalid, replaced by new ones.
             rollback(backup, txRecord);
             debugger.trace(this, "Unable to update claims on token refresh", throwable);
             debugger.warn(this, "Unable to update claims on token refresh: \"" + throwable.getMessage() + "\"");
-        }
+            throw new OA2ATException(OA2Errors.INVALID_REQUEST, "invalid request", HttpStatus.SC_BAD_REQUEST, t.getRequestState());
+        }*/
         setupTokens(client, rtiResponse, oa2SE, t, jwtRunner);
 
         debugger.trace(this, "finished processing claims.");
@@ -1187,11 +1202,12 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
     }
 
     protected void rollback(XMLMap backup) throws IOException {
-       rollback(backup, null);
+        rollback(backup, null);
     }
+
     protected void rollback(XMLMap backup, TXRecord txRecord) throws IOException {
         GenericStoreUtils.fromXMLAndSave(getTransactionStore(), backup);
-        if(txRecord != null) {
+        if (txRecord != null) {
             getOA2SE().getTxStore().remove(txRecord.getIdentifier());
         }
     }
@@ -1385,7 +1401,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             throw new OA2ATException(OA2Errors.ACCESS_DENIED,
                     "no pending request", HttpStatus.SC_UNAUTHORIZED, null);
         }
-         XMLMap backup = GenericStoreUtils.toXML(getTransactionStore(), transaction);
+        XMLMap backup = GenericStoreUtils.toXML(getTransactionStore(), transaction);
         if (!transaction.isAuthGrantValid()) {
             throw new OA2ATException(OA2Errors.INVALID_GRANT,
                     "invalid device code",
@@ -1470,7 +1486,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 true);
         try {
             doAT(issuerTransactionState, client);
-        }catch(Throwable t){
+        } catch (Throwable t) {
             rollback(backup);
             throw t;
         }

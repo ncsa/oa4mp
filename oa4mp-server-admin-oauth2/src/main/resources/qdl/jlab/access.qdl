@@ -13,7 +13,7 @@
        } // end access token
      } //end tokens
 
-NOTE that the args are "eic" or "jlab" for EIC and everything else.
+NOTE that the args are "eic" for EIC or "jlab" for everything else.
 
 */
 //script_load('jlab/acl.qdl');

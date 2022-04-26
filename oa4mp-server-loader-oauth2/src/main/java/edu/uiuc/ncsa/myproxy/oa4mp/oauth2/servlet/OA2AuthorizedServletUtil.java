@@ -47,7 +47,7 @@ import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.*;
 
 /**
- * This is set of calls to replace the old Authorized Servlet. It should be invoked by t
+ * This is set of calls to replace the old Authorized Servlet.
  * <p>Created by Jeff Gaynor<br>
  * on 5/14/18 at  12:14 PM
  */

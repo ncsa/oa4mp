@@ -22,7 +22,7 @@ block[
      jlab_cfg.search_attributes. :=  ['sn','dn','voPersonID','isMemberOf'];
                jlab_cfg.username := ini.jlab.'name';
                jlab_cfg.password := ini.jlab.'pwd';
-     // return(get_claims(create_source(jlab_cfg.), ''));
+     // return(get_claims(create_source(jlab_cfg.), ''));  // trick for faking LDAP failure.
      return(get_claims(create_source(jlab_cfg.), user));
 ];
 

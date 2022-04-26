@@ -426,6 +426,22 @@ When a new version is deployed, here is the testing order
   -- dev:test/fnal
      IDP: Github
      See above for localhost.
+     The file fnal/fnal-idtoken.qdl has a DEBUG section that will change users logons to
+     another user, strictly for debugging. For me login on Github I can be the test user
+     or Dave Dykstra.
+
+     To test as Dave for dunepro (not just fermilab) use this, switch the DEBUG block and set
+        set_param -a scope "wlcg.capabilityset:/dunepro wlcg.groups:/dunepro"
+        set_param -t scope "storage.create:/dune/data storage.read:/dune"
+        set_param -x scope "storage.create:/dune/data storage.read:/dune"
+
+     NOTA BENA: The rtx.qdl script won't run unless you pass in at least scopes or in refresh
+                or exchange.
+
+     FNAL Rollback Test:
+     To emulate a problem, get an access token, then edit rtx.qdl by adding any illegal
+     syntax. Next attempts at token refresh or exchange will fail. Revert back ("fixes problem")
+     and the flow should just pick up where it left off.
 
   -- dev:test/vo1
      IDP: any
