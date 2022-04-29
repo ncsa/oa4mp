@@ -361,15 +361,6 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
             }
 
         }
-/*
-        if (oa2se.isOIDCEnabled() && !t.getScopes().contains(OA2Scopes.SCOPE_OPENID) ) {
-            throw new OA2RedirectableError(OA2Errors.INVALID_SCOPE,
-                    "invalid scope: no open id scope",
-                    HttpStatus.SC_UNAUTHORIZED,
-                    t.getRequestState(),
-                    t.getCallback());
-        }
-*/
     }
 
     protected void checkClaim(JSONObject claims, String claimKey) {

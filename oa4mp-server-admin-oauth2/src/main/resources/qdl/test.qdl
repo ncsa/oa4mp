@@ -28,4 +28,5 @@
 say('*** QDL test script');
 z.'sub' := 'foo';
 z.'baz' := 'bar';
-say('test: ' + to_string(z.));
+say('test z: ' + to_string(z.));
+say('script args: ' +to_string(script_args(-1)));

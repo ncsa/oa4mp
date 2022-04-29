@@ -107,7 +107,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
         return currentServerAddress.endsWith(".ncsa.illinois.edu");
     }
 
-    MyLoggingFacade myLogger = null;
+    transient MyLoggingFacade myLogger = null;
 
     protected MyLoggingFacade getMyLogger() {
         return myLogger;

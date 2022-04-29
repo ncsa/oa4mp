@@ -7,7 +7,6 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ScriptRuntimeEngineFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
 import edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims.ConfigtoCS;
 import edu.uiuc.ncsa.qdl.config.QDLConfigurationLoaderUtils;
-import edu.uiuc.ncsa.qdl.config.QDLEnvironment;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.scripting.Scripts;
 import edu.uiuc.ncsa.qdl.state.StateUtils;
@@ -55,7 +54,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
     public static String CONFIG_TAG = "qdl";
     public static String SCRIPTS_TAG = "scripts";
 
-    public QDLRuntimeEngine(QDLEnvironment qe, OA2ServiceTransaction transaction) {
+    public QDLRuntimeEngine(OA2QDLEnvironment qe, OA2ServiceTransaction transaction) {
         this.qe = qe;
         init(transaction);
         setInitialized(false);
@@ -66,25 +65,15 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         return (OA2State) state; // only thing it can create
     }
 
-/*
-    public QDLRuntimeEngine(QDLEnvironment qe, JSONObject config) {
-        this.qe = qe;
-        init();
-        setInitialized(true);
-    }
-*/
-
-    public QDLEnvironment getQE() {
+    public OA2QDLEnvironment getQE() {
         return qe;
     }
 
-    public void setQE(QDLEnvironment qe) {
+    public void setQE(OA2QDLEnvironment qe) {
         this.qe = qe;
     }
 
-    // {"qdl": { "code": ["claims.debug:='test';"], "xmd": {"exec_phase": "pre_auth"}}}
-    // {"qdl": { "run": "vfs#/scripts/test0.qdl", "xmd": {"exec_phase": "pre_auth"}}}
-    QDLEnvironment qe;
+    OA2QDLEnvironment qe;
 
     /**
      * The structure of the configuration file (for backwards compatibility) is
@@ -111,16 +100,16 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         }
         state.setServerMode(qe.isServerModeOn());
         // next line allows for debugging individual clients.
-        if(!qe.isRestrictedIO()){
+        if (!qe.isRestrictedIO()) {
             state.setRestrictedIO(false);
-        }else{
-            if(transaction.getClient().isDebugOn()){
-               state.setRestrictedIO(false);
-            }else{
+        } else {
+            if (transaction.getClient().isDebugOn()) {
+                state.setRestrictedIO(false);
+            } else {
                 state.setRestrictedIO(true);
             }
         }
-      //  state.setRestrictedIO(qe.isRestrictedIO() || transaction.getClient().isDebugOn());
+        //  state.setRestrictedIO(qe.isRestrictedIO() || transaction.getClient().isDebugOn());
         state.getOpEvaluator().setNumericDigits(qe.getNumericDigits());
         state.setScriptPaths(qe.getScriptPath());  // Be sure script paths are read.
         state.setAssertionsOn(qe.isAssertionsOn());
@@ -148,7 +137,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
 
 
             String xml2 = XMLUtils.prettyPrint(w.toString()); // We do this because whitespace matters. This controls it.
-     //       System.out.println(getClass().getSimpleName() + ":" + xml2);
+            //       System.out.println(getClass().getSimpleName() + ":" + xml2);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             GZIPOutputStream gzipOutputStream = new GZIPOutputStream(baos);
             gzipOutputStream.write(xml2.getBytes("UTF-8"));
@@ -163,29 +152,31 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
     }
 
     OA2State state;
-      protected void deserializeStateOLD(String rawState){
-          if (rawState == null || rawState.isEmpty()) return;
-             try {
-                 byte[] xx = Base64.decodeBase64(rawState);
-                 ByteArrayInputStream bais = new ByteArrayInputStream(xx);
-                 // Reconstruct the XML as a string, preserving whitespace.
-                 GZIPInputStream gzipInputStream = new GZIPInputStream(bais, 65536);
-                 Reader r = new InputStreamReader(gzipInputStream);
-                 XMLInputFactory xmlif = XMLInputFactory.newInstance();
-                 XMLEventReader xer = xmlif.createXMLEventReader(r);
-                 // Moar debug, if using the string, replace preceeding line with this.
-                 // XMLEventReader xer = xmlif.createXMLEventReader(reader);
-                 // state = (OA2State) StateUtils.newInstance();
-                 state.fromXML(xer, null); // No XProperties in serialization.
-                 xer.close();
-             } catch (Throwable e) {
-                 DebugUtil.trace(this, "error deserializing state", e);
-                 if (e instanceof RuntimeException) {
-                     throw (RuntimeException) e;
-                 }
-                 throw new QDLException("Error deserializing state", e);
-             }
-      }
+
+    protected void deserializeStateOLD(String rawState) {
+        if (rawState == null || rawState.isEmpty()) return;
+        try {
+            byte[] xx = Base64.decodeBase64(rawState);
+            ByteArrayInputStream bais = new ByteArrayInputStream(xx);
+            // Reconstruct the XML as a string, preserving whitespace.
+            GZIPInputStream gzipInputStream = new GZIPInputStream(bais, 65536);
+            Reader r = new InputStreamReader(gzipInputStream);
+            XMLInputFactory xmlif = XMLInputFactory.newInstance();
+            XMLEventReader xer = xmlif.createXMLEventReader(r);
+            // Moar debug, if using the string, replace preceeding line with this.
+            // XMLEventReader xer = xmlif.createXMLEventReader(reader);
+            // state = (OA2State) StateUtils.newInstance();
+            state.fromXML(xer, null); // No XProperties in serialization.
+            xer.close();
+        } catch (Throwable e) {
+            DebugUtil.trace(this, "error deserializing state", e);
+            if (e instanceof RuntimeException) {
+                throw (RuntimeException) e;
+            }
+            throw new QDLException("Error deserializing state", e);
+        }
+    }
+
     @Override
     public void deserializeState(String rawState) {
         if (rawState == null || rawState.isEmpty()) return;
@@ -219,9 +210,9 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
             try {
                 WorkspaceCommands workspaceCommands = new WorkspaceCommands();
                 workspaceCommands.setDebugOn(true);
-                workspaceCommands.fromXML(xer,false);
+                workspaceCommands.fromXML(xer, false);
                 state = (OA2State) workspaceCommands.getInterpreter().getState();
-            }catch (Throwable t){
+            } catch (Throwable t) {
                 // That didn't work. Try it in old format.
                 deserializeStateOLD(rawState);
             }
@@ -240,51 +231,31 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         return getScriptSet().get(Scripts.EXEC_PHASE, phase);
     }
 
+
+    protected ScriptInterface getServerScript(String phase) {
+        if(getQE().getServerScripts() == null || getQE().getServerScripts().isEmpty()){
+            return null;
+        }
+        return getQE().getServerScripts().get(Scripts.EXEC_PHASE, phase);
+    }
+
+
     @Override
     public ScriptRunResponse run(ScriptRunRequest request) {
-        ScriptInterface s = null;
+        ScriptInterface  s = getScript(request.getAction());
+        ScriptInterface serverScript = getServerScript(request.getAction());
 
-        switch (request.getAction()) {
-            case SRE_EXEC_INIT:
-                s = getScript(SRE_EXEC_INIT);
-                break;
-            case SRE_PRE_AUTH:
-                s = getScript(SRE_PRE_AUTH);
-                break;
-            case SRE_POST_AT:
-                s = getScript(SRE_POST_AT);
-                break;
-            case SRE_POST_AUTH:
-                s = getScript(SRE_POST_AUTH);
-                break;
-            case SRE_PRE_AT:
-                s = getScript(SRE_PRE_AT);
-                break;
-            case SRE_PRE_REFRESH:
-                s = getScript(SRE_PRE_REFRESH);
-                break;
-            case SRE_POST_REFRESH:
-                s = getScript(SRE_POST_REFRESH);
-                break;
-            case SRE_PRE_EXCHANGE:
-                s = getScript(SRE_PRE_EXCHANGE);
-                break;
-            case SRE_POST_EXCHANGE:
-                s = getScript(SRE_POST_EXCHANGE);
-                break;
-            case SRE_PRE_USER_INFO:
-                s = getScript(SRE_PRE_USER_INFO);
-                break;
-            case SRE_POST_USER_INFO:
-                s = getScript(SRE_POST_USER_INFO);
-                break;
-        }
-        if (s == null) {
+        if (s == null && serverScript == null) {
             return noOpSRR();
         }
-        //
+        
         setupState(request);
-        s.execute(state);
+        if (serverScript != null) {
+            serverScript.execute(state);
+        }
+        if (s != null) {
+            s.execute(state);
+        }
         return createSRR();
     }
 
@@ -375,8 +346,10 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         // Some handlers inject them later because they need more state than is available.
         if (req.getArgs().containsKey(SRE_REQ_CLAIM_SOURCES)) {
             for (ClaimSource source : (List<ClaimSource>) req.getArgs().get(SRE_REQ_CLAIM_SOURCES)) {
-                sources.put(i + ".", ConfigtoCS.convert(source));
-                i++;
+                if(source.hasConfiguration()) {
+                    sources.put(i + ".", ConfigtoCS.convert(source));
+                    i++;
+                }
             }
         }
         state.setValue(CLAIM_SOURCES_VAR, sources);
@@ -491,6 +464,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
 
     /**
      * <b>After</b> QDL has run, convert the response into something Java can understand.
+     *
      * @return
      */
     protected ScriptRunResponse createSRR() {
@@ -504,13 +478,13 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
                 // in OAuth this is the error
                 if (sysErr.containsKey(SYS_ERR_ERROR_TYPE)) {
                     scriptRuntimeException.setRequestedType(sysErr.getString(SYS_ERR_ERROR_TYPE));
-                } else{
+                } else {
                     scriptRuntimeException.setRequestedType(sysErr.getString(OA2Errors.ACCESS_DENIED));
                 }
                 // In OAuth this is the HTTP status code
-                if(sysErr.containsKey(SYS_ERR_STATUS_CODE)){
+                if (sysErr.containsKey(SYS_ERR_STATUS_CODE)) {
                     scriptRuntimeException.setStatus(sysErr.getLong(SYS_ERR_STATUS_CODE).intValue());
-                }else{
+                } else {
                     scriptRuntimeException.setStatus(HttpStatus.SC_UNAUTHORIZED);
                 }
                 // If the status is 302, then this is the redirect for the user's browser.

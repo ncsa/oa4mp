@@ -16,6 +16,8 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientConverter;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.*;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo.*;
+import edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.OA2QDLConfigurationLoader;
+import edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.OA2QDLEnvironment;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.ClientApprovalProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.OA4MPConfigTags;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceConstantKeys;
@@ -34,8 +36,6 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.storage.sql.provider.DSSQLClientApprov
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.ClientApprovalMemoryStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.ClientApproverConverter;
 import edu.uiuc.ncsa.qdl.config.QDLConfigurationConstants;
-import edu.uiuc.ncsa.qdl.config.QDLConfigurationLoader;
-import edu.uiuc.ncsa.qdl.config.QDLEnvironment;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.configuration.Configurations;
@@ -177,7 +177,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     getIssuer(),
                     isUtilServerEnabled(),
                     isOIDCEnabled(),
-             //       getMultiJSONStoreProvider(),
+                    //       getMultiJSONStoreProvider(),
                     getCmConfigs(),
                     getQDLEnvironment(),
                     isRFC8693Enabled(),
@@ -192,7 +192,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     isRFC7636Required(),
                     isDemoModeEnabled(),
                     getDebugger()
-                    );
+            );
 
             if (getClaimSource() instanceof BasicClaimsSourceImpl) {
                 ((BasicClaimsSourceImpl) getClaimSource()).setOa2SE((OA2SE) se);
@@ -205,28 +205,30 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
 
     RFC8628ServletConfig rfc8628ServletConfig = null;
 
-   Collection<LocalTime> alarms = null;
-   public Collection<LocalTime> getAlarms(){
-       if(alarms == null) {
-           String raw = getFirstAttribute(cn, CLEANUP_ALARMS_TAG);
-           alarms = new TreeSet<>();  // sorts them.
-           if (!StringUtils.isTrivial(raw)) {
-               String[] ta = raw.split(",");
-               // get all the times that parse correctly
-               for (String time : ta) {
-                   try {
-                       alarms.add(LocalTime.parse(time.trim()));
-                   } catch (Throwable t) {
-                       loggerProvider.get().warn("cannot parse alarm date \"" + ta + "\"");
-                       // do nothing
-                   }
-               }
-           }
+    Collection<LocalTime> alarms = null;
 
-           DebugUtil.trace(this, CLEANUP_ALARMS_TAG + " found: " + alarms );
-       }
-       return alarms;
-   }
+    public Collection<LocalTime> getAlarms() {
+        if (alarms == null) {
+            String raw = getFirstAttribute(cn, CLEANUP_ALARMS_TAG);
+            alarms = new TreeSet<>();  // sorts them.
+            if (!StringUtils.isTrivial(raw)) {
+                String[] ta = raw.split(",");
+                // get all the times that parse correctly
+                for (String time : ta) {
+                    try {
+                        alarms.add(LocalTime.parse(time.trim()));
+                    } catch (Throwable t) {
+                        loggerProvider.get().warn("cannot parse alarm date \"" + ta + "\"");
+                        // do nothing
+                    }
+                }
+            }
+
+            DebugUtil.trace(this, CLEANUP_ALARMS_TAG + " found: " + alarms);
+        }
+        return alarms;
+    }
+
     public RFC8628ServletConfig getRFC8628ServletConfig() {
         if (rfc8628ServletConfig == null) {
             rfc8628ServletConfig = new RFC8628ServletConfig();
@@ -252,7 +254,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     rfc8628ServletConfig.deviceAuthorizationEndpoint = x;
                 }
                 x = getFirstAttribute(sn, OA4MPConfigTags.DEVICE_FLOW_LIFETIME);
-                if(!isTrivial(x)) {
+                if (!isTrivial(x)) {
                     try {
                         rfc8628ServletConfig.lifetime = ConfigUtil.getValueSecsOrMillis(x, true);
                     } catch (NumberFormatException numberFormatException) {
@@ -297,10 +299,25 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         return rfc8628ServletConfig;
     }
 
-    protected QDLEnvironment getQDLEnvironment() {
-        ConfigurationNode node = getFirstNode(cn, QDLConfigurationConstants.CONFIG_TAG_NAME);
+    public static String QDL_DEFAULT_CONFIGURATION_NAME = "qdl-default";
+
+    protected OA2QDLEnvironment getQDLEnvironment() {
+        List<ConfigurationNode> kids = cn.getChildren(QDLConfigurationConstants.CONFIG_TAG_NAME);
+        ConfigurationNode node = null;
+        if (kids.size() == 1) {
+            node = kids.get(0);
+        } else {
+            // hunt for the default named node.
+            for (ConfigurationNode tempNode : kids) {
+                String x = getFirstAttribute(tempNode, QDLConfigurationConstants.CONFG_ATTR_NAME);
+                if (QDL_DEFAULT_CONFIGURATION_NAME.equals(x)) {
+                    node = tempNode;
+                    break;
+                }
+            }
+        }
         if (node == null) {
-            return new QDLEnvironment();// no op. This is disabled.
+            return new OA2QDLEnvironment();// no op. This is disabled.
         }
         // Note that the first argument is the name fo the file. In server mode this won't be available anyway
         // and is optional.
@@ -312,8 +329,8 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                 // nothing to do.
             }
         }
-        QDLConfigurationLoader loader = new QDLConfigurationLoader("(none)", node, loggerProvider.get());
-        return loader.load();
+        OA2QDLConfigurationLoader loader = new OA2QDLConfigurationLoader("(none)", node, loggerProvider.get());
+        return (OA2QDLEnvironment) loader.load();
     }
 
     String notifyACEventEmailAddresses = null;
@@ -358,17 +375,19 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
     }
 
     Boolean demoModeEnabled = null;
-    public Boolean isDemoModeEnabled(){
-        if(demoModeEnabled == null){
+
+    public Boolean isDemoModeEnabled() {
+        if (demoModeEnabled == null) {
             String raw = getFirstAttribute(cn, DEMO_MODE_TAG);
-             if(StringUtils.isTrivial(raw)){
-                 demoModeEnabled = Boolean.FALSE;
-             }else{
-                 demoModeEnabled = Boolean.parseBoolean(raw);
-             }
+            if (StringUtils.isTrivial(raw)) {
+                demoModeEnabled = Boolean.FALSE;
+            } else {
+                demoModeEnabled = Boolean.parseBoolean(raw);
+            }
         }
         return demoModeEnabled;
     }
+
     long cleanupInterval = -1;
 
     public long getCleanupInterval() {

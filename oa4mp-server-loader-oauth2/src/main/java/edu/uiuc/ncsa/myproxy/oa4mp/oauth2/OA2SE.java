@@ -6,13 +6,13 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8628ServletConfig;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo.VOStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo.VirtualOrganization;
+import edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.OA2QDLEnvironment;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.MyProxyFacadeProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironmentImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionsStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AuthorizationServletConfig;
-import edu.uiuc.ncsa.qdl.config.QDLEnvironment;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
@@ -90,7 +90,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
                  boolean oidcEnabled,
                //  Provider<JSONStore> jsonStoreProvider,
                  CMConfigs cmConfigs,
-                 QDLEnvironment qdlEnvironment,
+                 OA2QDLEnvironment qdlEnvironment,
                  boolean rfc8693Enabled,
                  boolean qdlStrictACLs,
                  boolean safeGC,
@@ -274,15 +274,15 @@ public class OA2SE extends ServiceEnvironmentImpl {
 
     TXStore txStore;
 
-    public QDLEnvironment getQDLEnvironment() {
+    public OA2QDLEnvironment getQDLEnvironment() {
         return qdlEnvironment;
     }
 
-    public void setQDLEnvironment(QDLEnvironment qdlEnvironment) {
+    public void setQDLEnvironment(OA2QDLEnvironment qdlEnvironment) {
         this.qdlEnvironment = qdlEnvironment;
     }
 
-    QDLEnvironment qdlEnvironment;
+    OA2QDLEnvironment qdlEnvironment;
     CMConfigs cmConfigs = null;
 
     public CMConfigs getCmConfigs() {
