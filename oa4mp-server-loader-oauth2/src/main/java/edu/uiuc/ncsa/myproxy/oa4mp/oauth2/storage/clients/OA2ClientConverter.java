@@ -74,6 +74,7 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         otherV.setRtLifetime(map.getLong(getCK2().rtLifetime()));
         otherV.setDfLifetime(map.getLong(getCK2().dfLifetime()));
         otherV.setDfInterval(map.getLong(getCK2().dfInterval()));
+        otherV.setSkipServerScripts(map.getBoolean(getCK2().skipServerScripts()));
         // In certain legacy cases, this may end up being populated with a null. Treat it like
         // a -1 (which means it isn't set, so don't use this in calculations)
         if (map.containsKey(getCK2().atLifetime()) && map.get(getCK2().atLifetime()) != null) {
@@ -207,6 +208,7 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         map.put(getCK2().atLifetime(), client.getAtLifetime());
         map.put(getCK2().dfLifetime(), client.getDfLifetime());
         map.put(getCK2().dfInterval(), client.getDfInterval());
+        map.put(getCK2().skipServerScripts(), client.isSkipServerScripts());
         if (client.getCallbackURIs() == null) {
             return;
         }

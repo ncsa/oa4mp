@@ -9,9 +9,9 @@
 <body>
 
 <h1>Configuring QDL.</h1>
-<p>There is really nothing to say here, except to point to the
-    <a href="https://cilogon.github.io/qdl/docs/qdl_configuration.pdf">documentation</a> on
-the main website, and to list the allowed additional attributes in the qdl tag</p>
+<p>A great place to start is in the base system's configuration
+    <a href="https://cilogon.github.io/qdl/docs/qdl_configuration.pdf">documentation</a>.
+All of that is supported as well as extensions specific to OA4MP, which are documented here.</p>
 <table style="text-align: left; width: 1148px; height: 165px;" border="1" cellspacing="2" cellpadding="2">
     <tbody>
     <tr>
@@ -27,11 +27,36 @@ the main website, and to list the allowed additional attributes in the qdl tag</
     </tr>
     </tbody>
 </table>
+<h2>Server mode and restricted IO</h2>
+<p>In the standard QDL configuration there are two parameters that bear special mention here.</p>
+<ul>
+    <li><b>server_mode</b>: limits various operations to the underlying OS, such as file reads and writes.</li>
+    <li><b>restricted_io</b>: Allows printing (when false) and logging. </li>
+</ul>
+<p></p>
 <h2>Naming</h2>
 <p>If there is a single configuration, that may be named anything you like and it
-will be used. If there are multiple configurations, then only the one named
-<b>qdl-default</b> will be loaded. This allows you to have several for testing
-and just activate the one you need.</p>
-
+will be used. If there are multiple configurations, then you should set the
+attribute for <b>qdlConfigName</b> to be whatever the active configuration is.
+If it is omitted, the default name of <b>qdl-default</b> will be used.</p>
+<h2>Server scripts</h2>
+<p>You may also have scripts specified in the QDL configuration. These are
+JSON objects. (Is it ugly to have JSON inside XML? Sure. But it's consistent
+with client configurations. <i>shrug.</i>) </p>
+<h3>Purpose</h3>
+<p>There are many reasons to have them.</p>
+<ul>
+    <li><b>Asserting claims for all clients.</b> There is no </li>
+    <li><b>Administrative tasks</b> such as regularizing all the returned claims.</li>
+</ul>
+<h3>Lifecycle</h3>
+<p>If you give a script a specific exec_phase, the server scripts are run before any
+other scripts. This may take a bit of planning. If you want to so something in the
+post_auth phase after all clients have run their handlers, then you should
+actually set the script for the pre_token phase to run before any other processing
+in the next round.</p>
+<h3>Clients may opt out</h3>
+<p>Clients may skip server scripts if their <b>skipServerScripts</b> flag is
+set.</p>
 </body>
 </html>

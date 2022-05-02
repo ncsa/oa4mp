@@ -20,6 +20,7 @@ public class NCSALDAPClaimSource extends LDAPClaimsSource {
      * No arg constructor is needed for invocation by reflection. 
      */
     public NCSALDAPClaimSource() {
+        init();
     }
 
     /**
@@ -43,12 +44,14 @@ public class NCSALDAPClaimSource extends LDAPClaimsSource {
 
     public NCSALDAPClaimSource(LDAPConfiguration ldapConfiguration, MyLoggingFacade myLogger) {
         super(ldapConfiguration, myLogger);
+        init();
     }
 
 
 
     public NCSALDAPClaimSource(OA2SE oa2SE) {
         super(oa2SE);
+        init();
     }
     // This is to test that this works.
     String rawConfig = " {\n" +
@@ -109,5 +112,12 @@ public class NCSALDAPClaimSource extends LDAPClaimsSource {
         LDAPConfiguration x = util.fromJSON(cfg);
         ServletDebugUtil.trace(this, "In init(). Setting configuration");
         setConfiguration(x);
+    }
+
+    @Override
+    public String toString() {
+        return "NCSALDAPClaimSource{" +
+                "currentServerAddress='" + currentServerAddress + '\'' +
+                '}';
     }
 }

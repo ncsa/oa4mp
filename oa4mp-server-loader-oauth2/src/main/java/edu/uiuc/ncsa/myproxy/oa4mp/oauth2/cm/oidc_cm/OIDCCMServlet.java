@@ -289,6 +289,7 @@ public class OIDCCMServlet extends EnvServlet {
         json.put(OA2Constants.ERROR_URI, client.getErrorUri());
         // CIL-931 fix.
         json.put(STRICT_SCOPES, client.useStrictScopes());
+        json.put(SKIP_SERVER_SCRIPTS, client.isSkipServerScripts());
         // Note that a contact email is something specific to OA4MP and does not occur in
         // either RFC 7591 or 7592.
         // CIL-1221
@@ -1020,6 +1021,10 @@ public class OIDCCMServlet extends EnvServlet {
         if (jsonRequest.containsKey(STRICT_SCOPES)) {
             client.setStrictscopes(jsonRequest.getBoolean(STRICT_SCOPES));
             jsonRequest.remove(STRICT_SCOPES);
+        }
+        if (jsonRequest.containsKey(SKIP_SERVER_SCRIPTS)) {
+            client.setStrictscopes(jsonRequest.getBoolean(SKIP_SERVER_SCRIPTS));
+            jsonRequest.remove(SKIP_SERVER_SCRIPTS);
         }
         // CIL-1221
         if(jsonRequest.containsKey(PROXY_CLAIMS_LIST)){

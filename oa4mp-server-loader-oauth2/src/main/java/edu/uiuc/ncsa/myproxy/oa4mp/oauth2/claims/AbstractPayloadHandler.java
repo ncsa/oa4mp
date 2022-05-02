@@ -45,7 +45,6 @@ public abstract class AbstractPayloadHandler implements PayloadHandler {
      *
      * @param payloadHandlerConfig
      */
-
     public AbstractPayloadHandler(PayloadHandlerConfigImpl payloadHandlerConfig) {
         phCfg = payloadHandlerConfig;
         oa2se = phCfg.getOa2se();

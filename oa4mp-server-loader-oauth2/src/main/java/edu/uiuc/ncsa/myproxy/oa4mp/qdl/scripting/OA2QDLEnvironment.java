@@ -57,6 +57,9 @@ public class OA2QDLEnvironment extends QDLEnvironment {
         }
     }
 
+    public boolean hasServerScripts(){
+        return serverScripts != null && !serverScripts.isEmpty();
+    }
     public ScriptSet getServerScripts() {
         return serverScripts;
     }

@@ -2,10 +2,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.AbstractAccessTokenHandler;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.IDTokenClientConfig;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.IDTokenHandler;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.PayloadHandlerConfigImpl;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.*;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.*;
@@ -289,6 +286,12 @@ public class OA2ClientUtils {
         }
         debugger.trace(OA2ClientUtils.class, "Setting up handlers");
         OA2Client client = (OA2Client) transaction.getClient();
+        // Allow a client to skip any server scripts on a case by case basis.
+        if (!client.isSkipServerScripts() && oa2SE.getQDLEnvironment().hasServerScripts()) {
+            ServerQDLScriptHandlerConfig qdlScriptHandlerConfig = new ServerQDLScriptHandlerConfig(oa2SE, transaction, txRecord, req);
+            ServerQDLScriptHandler qdlScriptHandler = new ServerQDLScriptHandler(qdlScriptHandlerConfig);
+            jwtRunner.addHandler(qdlScriptHandler);
+        }
         PayloadHandlerConfigImpl idthCfg = null;
         if (client.hasIDTokenConfig()) {
             debugger.trace(OA2ClientUtils.class, "has id token config, creating handler");

@@ -89,78 +89,11 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
 
     boolean IDP_DEBUG_ON = false;
 
-    /**
-     * *****************
-     * KEEP THIS!   *
-     * *****************
-     * This lets you turn on or off claims that can emulate coming in from other IDPs with
-     * any information you want. Simply add a call to it in the {@link #init()} method.
-     * Be sure to turn it off before release since it will put a large ugly warning message in
-     * the claims. Look in OA2FunctorTests for more examples.
-     */
-    void addDebugClaims() {
-        // Keep the next two line no matter what, that way you don't leave it in test mode
-        // since the claims will tell you.
-//        getClaims().put("DEBUG", "If you see this, the server is in test mode. Tell the admin ASAP!");
-
-        DebugUtil.info(this, "addDebugClaims: Testing claims added. ");
-
-        // Uncomment the pair of these you need.
-
-        // NCSA IDP
-        //getClaims().put("idp", "https://idp.ncsa.illinois.edu/idp/shibboleth");
-        //getClaims().put("eppn", "jgaynor@illinois.edu");
-        //getClaims().put("eptid", "jgaynor@rndom3453.eptid");
-
-        // ORCID IDP
-        // getClaims().put("idp", "http://orcid.org/oauth/authorize");
-        // getClaims().put("oidc", "httpAnoth://orcid.org/5437-7582-1853-4673");
-
-        //FNAL (FermiLab) testing.
-        /* *******************
-             Note that his has to match the kludge in the OA2ClientUtils or it won't work right.
-         *********************/
-        boolean jeffTest =
-                transaction.getUsername().equals("http://cilogon.org/serverD/users/55") // me via NCSA IDP on polod
-                        ||
-                        transaction.getUsername().equals("http://cilogon.org/serverA/users/16316"); // me via Google IDP, cilogon.org email on poloc
-
-        boolean jimTest =
-                transaction.getUsername().equals("http://cilogon.org/serverD/users/65") // jim Basney NCSA IDP on polod
-                        ||
-                        transaction.getUsername().equals("http://cilogon.org/serverT/users/37233"); // jim Basney NCSA IDP on poloc
-
-
-        DebugUtil.trace(this, "In add debug claims. Username = " + transaction.getUsername() +
-                ", myproxy username = " + transaction.getMyproxyUsername());
-        if (jimTest || jeffTest) {
-            getClaims().put("DEBUG", "If you see this message, the server is in test mode!");
-            getClaims().put("idp", "https://idp.fnal.gov/idp/shibboleth");
-            getClaims().put("eppn", (jimTest ? "jbasney" : "jgaynor") + "@fnal.gov");
-            DebugUtil.trace(this, "set debug claims for FNAL testing...");
-        }
-
-
-        // GITHub IDP
-        //getClaims().put("idp","http://github.com/login/oauth/authorize");
-        // getClaims().put("oidc","oidc-43455756756");
-
-        // Google IDP
-        //getClaims().put("idp","http://google.com/accounts/o8/id");
-        // getClaims().put("oidc","oidc-43455756756");
-
-    }
-    // Enables IDP debugging for testing. Only have it set true for a specific test since it will override
-    // the IDP information and identity for every request!!!
-
 
     @Override
     public void init() throws Throwable {
         claims = getClaims();
         trace(this, "Starting to process basic claims");
-        if (IDP_DEBUG_ON) {
-            addDebugClaims();
-        }
         // It is possible that the claims are already somewhat populated. Only initialize
         // claims that have not been set.
         setClaimIfNeeded(claims, ISSUER, issuer);

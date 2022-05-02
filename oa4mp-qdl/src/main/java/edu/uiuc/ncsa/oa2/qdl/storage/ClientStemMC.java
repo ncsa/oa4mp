@@ -84,6 +84,7 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
          String rtLifetime = "rt_lifetime";
          String scopes = "scopes";
          String signTokens="sign_tokens";
+         String signTokens="skipServerScripts";
          String strictScopes="strict_scopes";
          */
 
@@ -141,6 +142,10 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
         if (stem.containsKey(kk().signTokens())) {
             v.setSignTokens(stem.getBoolean(kk().signTokens()));
         }
+        if (stem.containsKey(kk().skipServerScripts())) {
+            v.setSkipServerScripts(stem.getBoolean(kk().skipServerScripts()));
+        }
+
         if (stem.containsKey(kk().strictScopes())) {
             v.setStrictscopes(stem.getBoolean(kk().strictScopes()));
         }
@@ -206,6 +211,7 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
             fromList(v.getScopes(), stem, kk().scopes());
         }
         setNonNullStemValue(stem, kk().signTokens(), v.isSignTokens());
+        setNonNullStemValue(stem, kk().skipServerScripts(), v.isSkipServerScripts());
         setNonNullStemValue(stem, kk().strictScopes(), v.useStrictScopes());
         // 15 attributes
         return stem;

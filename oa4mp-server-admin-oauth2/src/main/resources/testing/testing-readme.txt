@@ -197,7 +197,19 @@ When a new version is deployed, here is the testing order
 
   -- localhost:scitokens
      test for SciTokens using a user config. Log in with IDP Google and use identity "j g"
-     
+     NOTE That this has to have scopes of the form
+     read:/home/${sub}
+     x.y:/abc/def
+     write:/data/${sub}/cluster
+     passed in or it will fail with a "no scopes found" exception.
+
+     Safe testing is to request x.y:/abc/def  with
+
+     set_param -a scope "x.y:/abc/def"
+     set_param -t scope "x.y:/abc/def"
+     set_param -x scope "x.y:/abc/def"
+
+     So that you can use pretty much any IDP
 
   -- localhost:test/fnal
         Test client that point to main QDL scripts.
@@ -404,21 +416,24 @@ When a new version is deployed, here is the testing order
      IDP: Any
 
   -- dev:test/df
+     IDP: NCSA
      Has basic NCSA QDL. This is for testing device flow on CILogon. Execute
      df
      Has refresh lifetime 2 hours
      in the CLC and follow the instructions. Once you've done that you should be
      able to do access, refresh, exchange ahd user_info as per usual. Do them to check
   -- dev:test/functor
+     IDP: NCSA
      Critical regression test.
      Has the original NCSA functor configuration on it. Many installs use this.
      Claims isMemberOf is a structure.
-     IDP: NCSA only
      exec phase: access, refresh, exchange
      check claims after each phase to be sure something is returned.
+     refresh will update claims, exchange does not.
 
   -- dev:/test/ncsa_qdl
      Critical regression test.
+     IDP: NCSA
      Has standard ncsa/ncsa-default.qdl script with plain vanilla configuration
       -- Should get full claims as list (not a structure)
       -- check that returned id token from refresh still has isMemberOf as flat list.
@@ -444,10 +459,11 @@ When a new version is deployed, here is the testing order
      and the flow should just pick up where it left off.
 
   -- dev:test/vo1
-     IDP: any
+     IDP: NCSA -- needs an EPPN
      exec phase: ALL
      This will create a WLCG token (barebones) to check if that is signed correctly.
      Note that his has a snippet of QDL code that hard codes the access token subject and scope.
+       from the EPPN.
        The main point of this test is that the VO signs
        the tokens with its private key and the verifications work. If the tokens display
        in the CLC, all is good.

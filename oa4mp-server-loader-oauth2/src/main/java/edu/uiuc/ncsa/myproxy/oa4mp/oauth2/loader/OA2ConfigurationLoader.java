@@ -104,6 +104,8 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
     public static final String CLEANUP_ALARMS_TAG = "cleanupAlarms";
     public static final String RFC7636_REQUIRED_TAG = "rfc7636Required";
     public static final String DEMO_MODE_TAG = "demoModeEnabled";
+    public static final String QDL_CONFIG_NAME_ATTR = "qdlConfigName";
+    public static final String QDL_DEFAULT_CONFIGURATION_NAME = "qdl-default";
 
     /**
      * Default is 15 days. Internally the refresh lifetime (as all date-ish things) are in milliseconds
@@ -299,18 +301,22 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         return rfc8628ServletConfig;
     }
 
-    public static String QDL_DEFAULT_CONFIGURATION_NAME = "qdl-default";
 
     protected OA2QDLEnvironment getQDLEnvironment() {
         List<ConfigurationNode> kids = cn.getChildren(QDLConfigurationConstants.CONFIG_TAG_NAME);
         ConfigurationNode node = null;
         if (kids.size() == 1) {
             node = kids.get(0);
+            String x = getFirstAttribute(node, QDLConfigurationConstants.CONFG_ATTR_NAME);
+            if (!getQdlConfigurationName().equals(x)) {
+                DebugUtil.trace(this, "note that a default QDL configuration of " + getQdlConfigurationName() +
+                        " was specified, but the actual name of the only configuration was \"" + "\", which was loaded.");
+            }
         } else {
             // hunt for the default named node.
             for (ConfigurationNode tempNode : kids) {
                 String x = getFirstAttribute(tempNode, QDLConfigurationConstants.CONFG_ATTR_NAME);
-                if (QDL_DEFAULT_CONFIGURATION_NAME.equals(x)) {
+                if (getQdlConfigurationName().equals(x)) {
                     node = tempNode;
                     break;
                 }
@@ -387,6 +393,20 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         }
         return demoModeEnabled;
     }
+
+    public String getQdlConfigurationName() {
+        if(qdlConfigurationName == null){
+            String raw = getFirstAttribute(cn, QDL_CONFIG_NAME_ATTR);
+            if(StringUtils.isTrivial(raw)){
+                qdlConfigurationName = QDL_DEFAULT_CONFIGURATION_NAME;
+            }else{
+                qdlConfigurationName = raw;
+            }
+        }
+        return qdlConfigurationName;
+    }
+
+    String qdlConfigurationName = null;
 
     long cleanupInterval = -1;
 

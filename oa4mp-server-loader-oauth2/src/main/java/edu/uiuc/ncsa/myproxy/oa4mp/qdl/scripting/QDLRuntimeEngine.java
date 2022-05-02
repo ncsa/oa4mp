@@ -243,20 +243,10 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
     @Override
     public ScriptRunResponse run(ScriptRunRequest request) {
         ScriptInterface  s = getScript(request.getAction());
-        ScriptInterface serverScript = getServerScript(request.getAction());
-
-        if (s == null && serverScript == null) {
-            return noOpSRR();
-        }
-        
-        setupState(request);
-        if (serverScript != null) {
-            serverScript.execute(state);
-        }
-        if (s != null) {
-            s.execute(state);
-        }
-        return createSRR();
+        if (s == null) {return noOpSRR();}
+        createSRRequest(request);
+        s.execute(state);
+        return createSRResponse();
     }
 
     /*
@@ -273,6 +263,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
     protected String CLAIMS_VAR = "claims" + STEM_INDEX_MARKER;
     protected String PROXY_CLAIMS_VAR = "proxy_claims" + STEM_INDEX_MARKER;
     protected String ACCESS_TOKEN_VAR = "access_token" + STEM_INDEX_MARKER;
+    protected String REFRESH_TOKEN_VAR = "refresh_token" + STEM_INDEX_MARKER;
     protected String SCOPES_VAR = "scopes" + STEM_INDEX_MARKER;
     protected String EXTENDED_ATTRIBUTES_VAR = "xas" + STEM_INDEX_MARKER;
     protected String AUDIENCE_VAR = "audience" + STEM_INDEX_MARKER;
@@ -284,10 +275,17 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
 
     /**
      * This injects the values in the request in to the current state so they are available.
+     * <h3>What this does</h3>
+     * <ul>
+     *     <li>Converts Java to QDL and injects into the {@link OA2State}.</li>
+     *     <li>This converts everything, claims, sources, access tokens, refresg token, TX objects, etc. (if present)</li>
+     *     <li>All objects are present in the resulting {@link OA2State} even
+     *     if they are empty or trivial.</li>
+     * </ul>
      *
      * @param req
      */
-    protected void setupState(ScriptRunRequest req) {
+    protected void createSRRequest(ScriptRunRequest req) {
 
         state.setValue(Scripts.EXEC_PHASE, req.getAction()); // set what is being executed
         StemVariable sysErr = new StemVariable();
@@ -315,6 +313,13 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
             state.setValue(ACCESS_TOKEN_VAR, atStem);
 
         }
+        if (req.getArgs().containsKey(SRE_REQ_REFRESH_TOKEN)) {
+                    JSONObject at = (JSONObject) req.getArgs().get(SRE_REQ_REFRESH_TOKEN);
+                    StemVariable atStem = new StemVariable();
+                    atStem.fromJSON(at);
+                    state.setValue(REFRESH_TOKEN_VAR, atStem);
+
+                }
         List<String> scopes = (List<String>) req.getArgs().get(SRE_REQ_SCOPES);
         if (scopes != null && !scopes.isEmpty()) {
             // It is possible for a minimal OAuth 2 client to have no scopes.
@@ -464,10 +469,16 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
 
     /**
      * <b>After</b> QDL has run, convert the response into something Java can understand.
+     * <h3>What this does</h3>
+     * <ul>
+     *     <li>Checks for exceptions thrown in QDL and propagates them</li>
+     *     <li>Converts stems to Java and puts in the respone map of the {@link ScriptRunResponse}</li>
+     *     <li>Removes various things from the {@link OA2State} object so that they are not serialized</li>
+     * </ul>
      *
      * @return
      */
-    protected ScriptRunResponse createSRR() {
+    protected ScriptRunResponse createSRResponse() {
         Object x = state.getValue(SYS_ERR_VAR);
         if (x != null && x instanceof StemVariable) {
             StemVariable sysErr = (StemVariable) x;
@@ -504,6 +515,9 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         if (state.getValue(ACCESS_TOKEN_VAR) != null) {
             respMap.put(SRE_REQ_ACCESS_TOKEN, ((StemVariable) state.getValue(ACCESS_TOKEN_VAR)).toJSON());
         }
+        if (state.getValue(REFRESH_TOKEN_VAR) != null) {
+            respMap.put(SRE_REQ_REFRESH_TOKEN, ((StemVariable) state.getValue(REFRESH_TOKEN_VAR)).toJSON());
+        }
         respMap.put(SRE_REQ_AUDIENCE, stemToList((StemVariable) state.getValue(AUDIENCE_VAR)));
         Object z = state.getValue(CLAIMS_VAR);
         DebugUtil.trace(this, "QDL returned claims from state:" + z);
@@ -518,23 +532,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
             throw new NFWException("Internal error: The returned claims object was not a JSON Object.");
         }
         respMap.put(SRE_REQ_CLAIMS, j);
-
-        // Now handle proxy_claims the same way
-        // Actually we probably do not want to return any updated proxy_claims.
-        // This effectively makes them read only which is the right call.
-       /* StemVariable proxyClaims;
-        z = state.getValue(PROXY_CLAIMS_VAR);
-        if (z instanceof QDLNull) {
-            proxyClaims = new StemVariable();
-        } else {
-            proxyClaims = (StemVariable) state.getValue(PROXY_CLAIMS_VAR);
-        }
-        j = proxyClaims.toJSON();
-        if (j.isArray()) {
-            throw new NFWException("Internal error: The returned claims object was not a JSON Object.");
-        }
-        respMap.put(SRE_REQ_PROXY_CLAIMS, j);
-*/
+        
         DebugUtil.trace(this, "QDL updates response map:" + j.toString(1));
 
         /*
@@ -575,6 +573,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
                     SCOPES_VAR,
                     EXTENDED_ATTRIBUTES_VAR,
                     ACCESS_TOKEN_VAR,
+                    REFRESH_TOKEN_VAR,
                     AUDIENCE_VAR,
                     Scripts.EXEC_PHASE
 

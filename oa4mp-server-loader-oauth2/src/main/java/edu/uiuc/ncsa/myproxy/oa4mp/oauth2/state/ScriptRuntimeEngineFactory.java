@@ -26,9 +26,9 @@ public class ScriptRuntimeEngineFactory {
         }
 
         OA2Client oa2Client = (OA2Client) transaction.getClient();
-        if(!oa2Client.hasScript()){
+/*        if(!oa2Client.hasScript()){
             return null; // Only create QDL runtime environment if there is a reason to do so.
-        }
+        }*/
 
         if (oa2SE.getQDLEnvironment() == null || !oa2SE.getQDLEnvironment().isEnabled()) {
             oa2SE.getMyLogger().warn("**********************************");

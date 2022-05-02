@@ -29,6 +29,7 @@ public class OA2ClientKeys extends ClientKeys {
     String rtLifetime = "rt_lifetime";
     String resource="resource";
     String signTokens="sign_tokens";
+    String skipServerScripts="skip_server_scripts";
     String scopes = "scopes";
     String strictScopes="strict_scopes";
     /*
@@ -41,6 +42,11 @@ public class OA2ClientKeys extends ClientKeys {
     public String proxyClaimsList(String... x) {
            if (0 < x.length) proxyClaimsList = x[0];
            return proxyClaimsList;
+       }
+
+    public String skipServerScripts(String... x) {
+           if (0 < x.length) skipServerScripts = x[0];
+           return skipServerScripts;
        }
 
 
@@ -142,6 +148,7 @@ public class OA2ClientKeys extends ClientKeys {
         allKeys.add(strictScopes());
         allKeys.add(dfLifetime());
         allKeys.add(dfInterval());
+        allKeys.add(skipServerScripts());
         return allKeys;
     }
 }

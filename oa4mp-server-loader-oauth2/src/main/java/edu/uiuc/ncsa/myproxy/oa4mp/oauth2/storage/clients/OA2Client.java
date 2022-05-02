@@ -53,6 +53,16 @@ public class OA2Client extends Client implements OA2ClientScopes {
         client.setSignTokens(isSignTokens());
     }
 
+    public boolean isSkipServerScripts() {
+        return skipServerScripts;
+    }
+
+    public void setSkipServerScripts(boolean skipServerScripts) {
+        this.skipServerScripts = skipServerScripts;
+    }
+
+    boolean skipServerScripts = false;
+
     public boolean isPublicClient() {
         return publicClient;
     }

@@ -33,5 +33,6 @@ public class OA2ClientTable extends ClientStoreTable {
         getColumnDescriptor().add(new ColumnDescriptorEntry(k.proxyClaimsList(), LONGVARCHAR));
         getColumnDescriptor().add(new ColumnDescriptorEntry(k.publicClient(), BOOLEAN));
         getColumnDescriptor().add(new ColumnDescriptorEntry(k.strictScopes(), BOOLEAN));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(k.skipServerScripts(), BOOLEAN));
     }
 }

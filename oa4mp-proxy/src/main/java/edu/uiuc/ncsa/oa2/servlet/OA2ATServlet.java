@@ -556,44 +556,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
 
         } catch (Throwable throwable) {
             OA2ServletUtils.handleScriptEngineException(this, oa2se, throwable, debugger, t, tBackup, newTXR);
-        } /*catch (QDLExceptionWithTrace qdlExceptionWithTrace) {
-            // CIL-1267 make sure error propagate.
-            // This can happen if something very deep in the stack (non QDL) blows up and QDL
-            // has caught it.
-            rollback(tBackup, newTXR);
-            Throwable throwable = qdlExceptionWithTrace;
-            if (qdlExceptionWithTrace.getCause() != null) {
-                throwable = qdlExceptionWithTrace.getCause();
-            }
-            debugger.trace(this, "Server exception \"" + throwable.getMessage() + "\"");
-            throw new OA2ATException(OA2Errors.INVALID_REQUEST, throwable.getMessage(), HttpStatus.SC_BAD_REQUEST, t.getRequestState());
-
-        } catch (AssertionException assertionError) {
-            rollback(tBackup, newTXR);
-            throw new OA2ATException(OA2Errors.INVALID_REQUEST,
-                    assertionError.getMessage(),
-                    HttpStatus.SC_BAD_REQUEST, t.getRequestState());
-        } catch (ScriptRuntimeException sre) {
-            // Client threw an exception.
-            rollback(tBackup, newTXR);
-            throw new OA2ATException(sre.getRequestedType(), sre.getMessage(),
-                    sre.getStatus(), t.getRequestState());
-        } catch (IllegalAccessException iax) {
-            // implies that the at some point there was a change in access allowed, e.g. a script
-            // set a policy that denied it.
-            rollback(tBackup, newTXR);
-            throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
-                    "access denied",
-                    t.getRequestState());
-
-        } catch (Throwable throwable) {*/
-            /*
-            NOTE: If there is some other error (such as a bad QDL script) and this fails, then as a fallback position
-            this will return the token with the same claims as are currently available in the handler.
-            There is no good way to communicate this to the user though.
-
-        ServletDebugUtil.warn(this, "*** Unable to update claims on token exchange: \"" + throwable.getMessage() + "\"");
-    }          */
+        }
 
         setupTokens(client, rtiResponse, oa2se, t, jwtRunner);
 
@@ -817,32 +780,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         } catch (Throwable throwable) {
             OA2ServletUtils.handleScriptEngineException(this, oa2SE, throwable, createDebugger(st2.getClient()), st2, tBackup);
         }
-        /* catch (QDLExceptionWithTrace qdlExceptionWithTrace) {
-            // CIL-1267 make sure error propagate.
-            // This can happen if something very deep in the stack (non QDL) blows up and QDL
-            // has caught it.
-            rollback(tBackup);
-            Throwable throwable = qdlExceptionWithTrace;
-            if (qdlExceptionWithTrace.getCause() != null) {
-                throwable = qdlExceptionWithTrace.getCause();
-            }
-            MyProxyDelegationServlet.createDebugger(st2.getOA2Client()).trace(this, "Server exception \"" + throwable.getMessage() + "\"");
-            throw new OA2ATException(OA2Errors.INVALID_REQUEST, throwable.getMessage(), HttpStatus.SC_BAD_REQUEST, st2.getRequestState());
 
-        } catch (AssertionException assertionError) {
-            rollback(tBackup);
-            throw new OA2ATException(OA2Errors.INVALID_REQUEST, assertionError.getMessage(), HttpStatus.SC_BAD_REQUEST, st2.getRequestState());
-        } catch (ScriptRuntimeException sre) {
-            // Client threw an exception.
-            rollback(tBackup);
-            throw new OA2ATException(sre.getRequestedType(), sre.getMessage(), sre.getStatus(), st2.getRequestState());
-        } catch (IllegalAccessException iax) {
-            rollback(tBackup);
-            throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
-                    "access denied",
-                    st2.getRequestState());
-        }
-*/
         if (!client.isRTLifetimeEnabled()) {
             atResponse.setRefreshToken(null);
         }
@@ -1104,39 +1042,6 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         } catch (Throwable throwable) {
             OA2ServletUtils.handleScriptEngineException(this, oa2SE, throwable, createDebugger(t.getClient()), t, backup, txRecord);
         }
-        /* catch (QDLExceptionWithTrace qdlExceptionWithTrace) {
-            // This can happen if something very deep in the stack (non QDL) blows up and QDL
-            // has caught it.
-            rollback(backup, txRecord);
-            Throwable throwable = qdlExceptionWithTrace;
-            if (qdlExceptionWithTrace.getCause() != null) {
-                throwable = qdlExceptionWithTrace.getCause();
-            }
-            debugger.trace(this, "Server exception \"" + throwable.getMessage() + "\"");
-            throw new OA2ATException(OA2Errors.SERVER_ERROR, "internal error", HttpStatus.SC_INTERNAL_SERVER_ERROR, t.getRequestState());
-
-        } catch (AssertionException assertionError) {
-            // they passed a bad argument to a QDL script
-            rollback(backup, txRecord);
-            debugger.trace(this, "assertion exception \"" + assertionError.getMessage() + "\"");
-            throw new OA2ATException(OA2Errors.INVALID_REQUEST, assertionError.getMessage(), HttpStatus.SC_BAD_REQUEST, t.getRequestState());
-        } catch (ScriptRuntimeException sre) {
-            // Client threw an exception.
-            rollback(backup, txRecord);
-            debugger.trace(this, "script runtime exception \"" + sre.getMessage() + "\"");
-            throw new OA2ATException(sre.getRequestedType(), sre.getMessage(), sre.getStatus(), t.getRequestState());
-        } catch (IllegalAccessException iax) {
-            throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
-                    "access denied",
-                    t.getRequestState());
-        } catch (Throwable throwable) {
-            // Everything else. Allow to fix the problem. Proceeding means that the transaction will complete
-            // and the old tokens will be invalid, replaced by new ones.
-            rollback(backup, txRecord);
-            debugger.trace(this, "Unable to update claims on token refresh", throwable);
-            debugger.warn(this, "Unable to update claims on token refresh: \"" + throwable.getMessage() + "\"");
-            throw new OA2ATException(OA2Errors.INVALID_REQUEST, "invalid request", HttpStatus.SC_BAD_REQUEST, t.getRequestState());
-        }*/
         setupTokens(client, rtiResponse, oa2SE, t, jwtRunner);
 
         debugger.trace(this, "finished processing claims.");
