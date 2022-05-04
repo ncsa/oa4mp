@@ -59,15 +59,15 @@ public abstract class AbstractPayloadHandler implements PayloadHandler {
 
     @Override
     public JSONObject getClaims() {
-        if (claims == null) {
+/*        if (claims == null) {
             claims = transaction.getUserMetaData();
         }
-        return claims;
+        return claims;*/
+        return transaction.getUserMetaData();
     }
 
     public void setClaims(JSONObject claims) {
         transaction.setUserMetaData(claims);
-        this.claims = claims;
     }
 
     public void setExtendedAttributes(JSONObject extendedAttributes) {
@@ -83,10 +83,11 @@ public abstract class AbstractPayloadHandler implements PayloadHandler {
      * @return
      */
     public JSONObject getExtendedAttributes() {
-        if (extendedAttributes == null) {
+/*        if (extendedAttributes == null) {
             extendedAttributes = transaction.getExtendedAttributes();
         }
-        return extendedAttributes;
+        return extendedAttributes;*/
+        return transaction.getExtendedAttributes();
     }
 
     protected boolean isEmpty(String x) {

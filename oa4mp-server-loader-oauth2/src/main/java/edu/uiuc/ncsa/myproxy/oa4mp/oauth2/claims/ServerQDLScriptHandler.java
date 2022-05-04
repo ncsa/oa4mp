@@ -2,7 +2,6 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
-import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.PayloadHandler;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.PayloadHandlerConfig;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
@@ -15,7 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static edu.uiuc.ncsa.security.oauth_2_0.jwt.ScriptingConstants.*;
-import static edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse.*;
+import static edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse.RC_NOT_RUN;
+import static edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse.RC_OK;
 
 /**
  * This is a handler for all scripts that the user may set in the configuration. These
@@ -46,6 +46,7 @@ public class ServerQDLScriptHandler implements PayloadHandler {
      * as needed, so if a script, e.g., wants to set up all values
      * in the pre_auth stage, it can do it once and be done, rather than
      * require it to set it in increments.
+     *
      * @param req
      * @throws Throwable
      */
@@ -60,7 +61,7 @@ public class ServerQDLScriptHandler implements PayloadHandler {
 
 
     public JSONObject getRTData() {
-            return  cfg.transaction.getRTData();
+        return cfg.transaction.getRTData();
     }
 
     public void setRTData(JSONObject rtData) {
@@ -83,14 +84,7 @@ public class ServerQDLScriptHandler implements PayloadHandler {
      */
     @Override
     public List<ClaimSource> getSources() throws Throwable {
-        if (cfg.transaction.getOA2Client().isPublicClient()) {
-            // Public clients do not get more than basic claims.
-            return new ArrayList<>();
-        }
-        if (sources == null) {
-            sources = cfg.transaction.getClaimSources(cfg.oa2SE);
-        }
-        return sources;
+        return cfg.transaction.getClaimSources(cfg.oa2SE);
     }
 
     @Override
@@ -121,46 +115,19 @@ public class ServerQDLScriptHandler implements PayloadHandler {
 
     @Override
     public void saveState() throws Throwable {
-        DebugUtil.trace(this, ".saveState: starting save.");
-        switch (getResponseCode()) {
-            case RC_NOT_RUN:
-                // CIL-1072 fix -- have it always fall through and save the metadata and claims.
-                // Actually, this handler *always* runs since the token handler updates the id token timestamps.
-                //       break;
-            case RC_OK:
-                if (cfg.transaction != null && cfg.oa2SE != null) {
-                    cfg.transaction.setUserMetaData(getClaims());
-                    cfg.transaction.setClaimsSources(getSources());
-                    cfg.transaction.setATData(getAtData());
-                    cfg.transaction.setRTData(getRTData());
-
-                    DebugUtil.trace(this, ".saveState: done updating transaction.");
-                }
-            case RC_OK_NO_SCRIPTS:
-                cfg.oa2SE.getTransactionStore().save(cfg.transaction);
-                break;
-
-        }
 
     }
-    JSONObject claims = null;
+
+
     @Override
     public JSONObject getClaims() {
-        if (claims == null) {
-            claims = cfg.transaction.getUserMetaData();
-        }
-        return claims;
+        return cfg.transaction.getUserMetaData();
     }
 
     public void setClaims(JSONObject claims) {
         cfg.transaction.setUserMetaData(claims);
-        this.claims = claims;
     }
 
-
-
-
-    JSONObject extendedAttributes = null;
 
     /**
      * Gets the extended attributes from the current transaction. See {@link OA2ServiceTransaction#getExtendedAttributes()}
@@ -169,14 +136,10 @@ public class ServerQDLScriptHandler implements PayloadHandler {
      * @return
      */
     public JSONObject getExtendedAttributes() {
-        if (extendedAttributes == null) {
-            extendedAttributes = cfg.transaction.getExtendedAttributes();
-        }
-        return extendedAttributes;
+        return cfg.transaction.getExtendedAttributes();
     }
 
     public void setExtendedAttributes(JSONObject extendedAttributes) {
-        this.extendedAttributes = extendedAttributes;
         cfg.transaction.setExtendedAttributes(extendedAttributes);
     }
 
@@ -222,17 +185,12 @@ public class ServerQDLScriptHandler implements PayloadHandler {
     int responseCode = RC_NOT_RUN;
 
     public JSONObject getAtData() {
-        if (atData == null) {
-            atData = cfg.transaction.getATData();
-        }
-        return atData;
+        return cfg.transaction.getATData();
     }
 
-    JSONObject atData;
 
     public void setAtData(JSONObject atData) {
         cfg.transaction.setATData(atData);
-        this.atData = atData;
     }
 
 
@@ -240,28 +198,17 @@ public class ServerQDLScriptHandler implements PayloadHandler {
     public void handleResponse(ScriptRunResponse resp) throws Throwable {
         responseCode = resp.getReturnCode();
         switch (resp.getReturnCode()) {
-                  case RC_OK:
-                      // Note that the returned values from a script are very unlikely to be the same object we sent
-                      // even if the contents are the same, since scripts may have to change these in to other data structures
-                      // to make them accessible to their machinery, then convert them back.
-                      setClaims((JSONObject) resp.getReturnedValues().get(SRE_REQ_CLAIMS));
-                      DebugUtil.trace(this, "Setting claims to " + claims.toString(2));
-                      // If the script is made before access tokens exist, don't do anything with them.
-                  //    if(resp.getReturnedValues().containsKey(SRE_REQ_ACCESS_TOKEN)) {
-                          setAtData((JSONObject) resp.getReturnedValues().get(SRE_REQ_ACCESS_TOKEN));
-                          DebugUtil.trace(this, "Setting at_data to " + atData.toString(2));
-                    //  }
-                      //if(resp.getReturnedValues().containsKey(SRE_REQ_EXTENDED_ATTRIBUTES)) {
-                        //  setExtendedAttributes((JSONObject) resp.getReturnedValues().get(SRE_REQ_EXTENDED_ATTRIBUTES));
-                     // }
-                    //  if(resp.getReturnedValues().containsKey(SRE_REQ_REFRESH_TOKEN)) {
-                          setRTData((JSONObject) resp.getReturnedValues().get(SRE_REQ_REFRESH_TOKEN));
-                          resp.getReturnedValues().get(SRE_REQ_CLAIM_SOURCES);
-                    //  }
-
-                      return;
-                  case RC_NOT_RUN:
-                      return;
-              }
+            case RC_OK:
+                // Note that the returned values from a script are very unlikely to be the same object we sent
+                // even if the contents are the same, since scripts may have to change these in to other data structures
+                // to make them accessible to their machinery, then convert them back.
+                setClaims((JSONObject) resp.getReturnedValues().get(SRE_REQ_CLAIMS));
+                setAtData((JSONObject) resp.getReturnedValues().get(SRE_REQ_ACCESS_TOKEN));
+                setRTData((JSONObject) resp.getReturnedValues().get(SRE_REQ_REFRESH_TOKEN));
+                resp.getReturnedValues().get(SRE_REQ_CLAIM_SOURCES);
+                return;
+            case RC_NOT_RUN:
+                return;
+        }
     }
 }

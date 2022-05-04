@@ -117,8 +117,6 @@ public class BasicRefreshTokenHandler extends AbstractPayloadHandler implements 
                 // to make them accessible to their machinery, then convert them back.
                 setClaims((JSONObject) resp.getReturnedValues().get(SRE_REQ_CLAIMS));
                 DebugUtil.trace(this, "Setting claims to " + claims.toString(2));
-                //sources = (List<ClaimSource>) resp.getReturnedValues().get(SRE_REQ_CLAIM_SOURCES);
-                setExtendedAttributes((JSONObject) resp.getReturnedValues().get(SRE_REQ_EXTENDED_ATTRIBUTES));
                 setRTData((JSONObject) resp.getReturnedValues().get(SRE_REQ_ACCESS_TOKEN));
                 return;
             case RC_NOT_RUN:
@@ -174,23 +172,9 @@ public class BasicRefreshTokenHandler extends AbstractPayloadHandler implements 
 
     @Override
     public void saveState() throws Throwable {
-        DebugUtil.trace(this, ".saveState: starting");
 
-        switch (getResponseCode()) {
-            case RC_NOT_RUN:
-                break;
-            case RC_OK:
-                if (transaction != null && oa2se != null) {
-                    transaction.setUserMetaData(getClaims());  // It is possible that the claims were updated. Save them.
-                    transaction.setRTData(getRTData());
-                    DebugUtil.trace(this, ".saveState: done updating transaction.");
-                }
-            case RC_OK_NO_SCRIPTS:
-                oa2se.getTransactionStore().save(transaction);
-                break;
-
-        }
     }
+
 
     protected RefreshTokenConfig getRTConfig() {
         return (RefreshTokenConfig) getPhCfg().getClientConfig();

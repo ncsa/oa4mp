@@ -92,7 +92,7 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
 
     @Override
     public void init() throws Throwable {
-        claims = getClaims();
+        JSONObject claims = getClaims();
         trace(this, "Starting to process basic claims");
         // It is possible that the claims are already somewhat populated. Only initialize
         // claims that have not been set.
@@ -121,7 +121,6 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
         } else {
             trace(this, "Service environment has a claims no source enabled during authorization");
         }
-        transaction.setUserMetaData(claims); // make sure this is available to the next handler
     }
 
     private void setClaimIfNeeded(JSONObject claims, String claimName, Object claimValue) {
@@ -182,8 +181,6 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
                 setClaims((JSONObject) resp.getReturnedValues().get(SRE_REQ_CLAIMS));
                 sources = (List<ClaimSource>) resp.getReturnedValues().get(SRE_REQ_CLAIM_SOURCES);
                 transaction.setClaimsSources(sources);
-                extendedAttributes = (JSONObject) resp.getReturnedValues().get(SRE_REQ_EXTENDED_ATTRIBUTES);
-                // Note that as per our contract, extended attributes are not updateable.
                 return;
             case RC_NOT_RUN:
                 return;
@@ -199,6 +196,8 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
         // Remove empty claims. One should not assert empty claims.
         // Get the keys to remove then remove them or you get a concurrent modification exception.
         ArrayList<String> keysToRemove = new ArrayList<>();
+        JSONObject claims = getClaims();
+
         for (Object key : claims.keySet()) {
             if (key == null) {
                 keysToRemove.add(null);
@@ -221,14 +220,7 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
 
     @Override
     public List<ClaimSource> getSources() throws Throwable {
-        if (transaction.getOA2Client().isPublicClient()) {
-            // Public clients do not get more than basic claims. 
-            return new ArrayList<>();
-        }
-        if (sources == null) {
-            sources = transaction.getClaimSources(oa2se);
-        }
-        return sources;
+        return transaction.getClaimSources(oa2se);
     }
 
 
@@ -246,25 +238,10 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
 
     @Override
     public void saveState() throws Throwable {
-        DebugUtil.trace(this, ".saveState: starting save.");
-        switch (getResponseCode()) {
-            case RC_NOT_RUN:
-                // CIL-1072 fix -- have it always fall through and save the metadata and claims.
-                // Actually, this handler *always* runs since the token handler updates the id token timestamps.
-         //       break;
-            case RC_OK:
-                if (transaction != null && oa2se != null) {
-                    transaction.setUserMetaData(getClaims());
-                    transaction.setClaimsSources(getSources());
-                    DebugUtil.trace(this, ".saveState: done updating transaction.");
-                }
-            case RC_OK_NO_SCRIPTS:
-                oa2se.getTransactionStore().save(transaction);
-                break;
-
-        }
 
     }
+
+
 
 
     /**

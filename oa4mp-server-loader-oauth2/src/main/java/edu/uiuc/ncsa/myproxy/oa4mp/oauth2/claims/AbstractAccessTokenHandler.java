@@ -59,17 +59,13 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
      * @return
      */
     public JSONObject getAtData() {
-        if (atData == null) {
-            atData = transaction.getATData();
-        }
-        return atData;
+        return transaction.getATData();
     }
 
     JSONObject atData;
 
     public void setAtData(JSONObject atData) {
         transaction.setATData(atData);
-        this.atData = atData;
     }
 
     @Override
@@ -415,22 +411,9 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
 
     @Override
     public void saveState() throws Throwable {
-        //      DebugUtil.trace(this, ".saveState: claims = " + getClaims().toString(2));
-        switch (getResponseCode()) {
-            case RC_NOT_RUN:
-                break;
-            case RC_OK:
-                if (transaction != null && oa2se != null) {
-                    transaction.setUserMetaData(getClaims());  // It is possible that the claims were updated. Save them.
-                    transaction.setATData(getAtData());
-                    //                DebugUtil.trace(this, ".saveState: done updating transaction.");
-                }
-            case RC_OK_NO_SCRIPTS:
-                oa2se.getTransactionStore().save(transaction);
-                break;
 
-        }
     }
+
 
     @Override
     public void setAccountingInformation() {

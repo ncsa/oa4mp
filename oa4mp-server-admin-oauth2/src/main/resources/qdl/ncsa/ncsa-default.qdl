@@ -41,9 +41,11 @@ if[
      exec_phase == 'pre_auth'
 ]then[
      cfg. := new_template('ncsa');
+     say('*** NCSA claims=' + to_string(claims.,1));
      claims.uid := head(claims.eppn, '@'); // set search key
      claim_sources. := claim_sources. ~ [create_source(cfg.)]; // add it to any claims
-     say('*** NCSA set claim_sources. to ' + to_string(claim_sources.));
+     say('*** NCSA set claim_sources. # ' + size(claim_sources.));
+     say('*** NCSA updated claims=' + to_string(claims., 1));
 ]; //end if
 
 /* This replaces the next block if QDL is at 1.3.2 or above.
@@ -54,7 +56,7 @@ if[
      if[convert][claims.isMemberOf. ≔ query(claims.isMemberOf., '$..name');];
  ];
  */
- say('*** ncsa-default ' + to_string(claims.));
+ say('*** ncsa-default claims=' + to_string(claims.,1));
 if[
    exec_phase == 'post_token' ||exec_phase == 'post_refresh' || exec_phase == 'post_exchange'
 ]then[

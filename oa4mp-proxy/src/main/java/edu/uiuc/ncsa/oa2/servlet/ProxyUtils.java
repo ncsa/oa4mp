@@ -273,9 +273,13 @@ public class ProxyUtils {
             if (proxyClaimKeys.contains("*")) {
                 proxyClaimKeys = new ArrayList<>();
                 proxyClaimKeys.addAll(proxyClaims.keySet());
-                // do all of them.
+                proxyClaimKeys.remove(OA2Claims.AUDIENCE);
+                proxyClaimKeys.remove(OA2Claims.ISSUER);
+                proxyClaimKeys.remove(OA2Claims.ISSUED_AT);
+                proxyClaimKeys.remove(OA2Claims.EXPIRATION);
+                proxyClaimKeys.remove(OA2Constants.ID_TOKEN_IDENTIFIER);
             }
-            // This is supposed to be a list
+
             for (String claim : proxyClaimKeys) {
                 if (proxyClaims.containsKey(claim)) {
                     Object x = proxyClaims.get(claim);
