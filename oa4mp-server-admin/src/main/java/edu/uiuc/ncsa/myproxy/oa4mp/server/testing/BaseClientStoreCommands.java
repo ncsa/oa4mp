@@ -24,6 +24,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -557,5 +558,44 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
         }
 
         super.rm(inputLine);
+    }
+
+    public void password(InputLine inputLine) throws Exception{
+        if(showHelp(inputLine)){
+            say("password [byte_count] - create a new random password and show its hash. ");
+            say("if 0 < byte_count is given, then that will be the number of bytes in the password");
+            say("The default is 64 bytes if this is omitted");
+            say("E.g. from the clients component (results will vary):");
+            say("  clients>password 32\n" +
+                    "  password : dmYJJZo82JUPq4ZhAM3zVWWQHjE2A9rEdqeHxRtT-d4\n" +
+                    "      hash : 2f11426429bb7ef99d8162d4e0b3a865c2ef796c");
+            return;
+
+        }
+        int count = 64;
+        SecureRandom random = new SecureRandom();
+        switch (inputLine.getArgCount()){
+            case 0:
+                break;
+            case 1:
+                try{
+                    count  = Integer.parseInt(inputLine.getLastArg());
+                }catch(Throwable t){
+                    // do nothing
+                    say("Could not parse the argument \"" + inputLine.getLastArg() + "\"");
+                    return;
+
+                }
+                break;
+            default:
+                say("Sorry, too many arguments");
+                return;
+        }
+        byte[] b = new byte[count];
+        random.nextBytes(b);
+        String password = org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(b);
+        say("password : " + password);
+        say("    hash : " + DigestUtils.sha1Hex(password));
+
     }
 }
