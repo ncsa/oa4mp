@@ -129,7 +129,7 @@ public abstract class StemConverter<V extends Identifiable> extends MapConverter
      */
     protected List toList(StemVariable stem, String key) {
         StemVariable target = (StemVariable) stem.get(key);
-        return target.getStemList().toJSON();  // returns a JSONArray
+        return target.getQDLList().toJSON();  // returns a JSONArray
     }
 
     /**

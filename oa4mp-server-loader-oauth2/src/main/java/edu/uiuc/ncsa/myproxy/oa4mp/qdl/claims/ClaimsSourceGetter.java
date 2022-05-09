@@ -9,8 +9,7 @@ import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.Constant;
-import edu.uiuc.ncsa.qdl.variables.StemEntry;
-import edu.uiuc.ncsa.qdl.variables.StemList;
+import edu.uiuc.ncsa.qdl.variables.QDLList;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
@@ -163,7 +162,7 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
                 if (obj instanceof JSONArray) {
                     JSONArray array = (JSONArray) obj;
                     // turn in to stemList
-                    StemList<StemEntry> sl = new StemList<>();
+                    QDLList sl = new QDLList();
                     for (int i = 0; i < array.size(); i++) {
                         Object obj1 = array.get(i);
                         StemVariable out1 = null;
@@ -175,7 +174,7 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
                         }
                     }
                     StemVariable st1 = new StemVariable();
-                    st1.setStemList(sl);
+                    st1.setQDLList(sl);
                     out.put(key + STEM_INDEX_MARKER, st1);
                 } else {
                     out.put(key, obj.toString());

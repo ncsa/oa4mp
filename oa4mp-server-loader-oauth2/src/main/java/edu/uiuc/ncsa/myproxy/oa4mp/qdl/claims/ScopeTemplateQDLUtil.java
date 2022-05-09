@@ -46,8 +46,8 @@ public class ScopeTemplateQDLUtil implements QDLFunction {
         }
 
         Boolean isTX = (Boolean)objects[2];
-        List<String> computedScopes = computedStem.getStemList().toJSON();
-        List<String> requestedScopes = requestedStem.getStemList().toJSON();
+        List<String> computedScopes = computedStem.getQDLList().toJSON();
+        List<String> requestedScopes = requestedStem.getQDLList().toJSON();
         Collection<String> returnedScopes = ScopeTemplateUtil.doCompareTemplates(computedScopes,requestedScopes,isTX);
         List<String> rc = new ArrayList<>();
         rc.addAll(returnedScopes);

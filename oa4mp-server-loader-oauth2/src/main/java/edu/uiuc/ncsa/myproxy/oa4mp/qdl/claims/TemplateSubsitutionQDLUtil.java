@@ -47,7 +47,7 @@ public class TemplateSubsitutionQDLUtil implements QDLFunction {
             StemVariable groupClaimStem = (StemVariable) objects[2];
             for (String key : groupClaimStem.keySet()) {
                 StemVariable ss = (StemVariable) groupClaimStem.get(key);
-                groups.put(key, ss.getStemList().toJSON());
+                groups.put(key, ss.getQDLList().toJSON());
             }
         }
         List<String> out = new ArrayList<>();

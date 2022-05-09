@@ -63,7 +63,7 @@ public class QDLACL implements QDLModuleMetaClass {
         List<Object> ids;
         switch (Constant.getType(objects[0])) {
             case Constant.STEM_TYPE:
-                ids = ((StemVariable) objects[0]).getStemList().toJSON();
+                ids = ((StemVariable) objects[0]).getQDLList().toJSON();
                 break;
             case Constant.STRING_TYPE:
                 ids = new ArrayList<>();
