@@ -71,10 +71,10 @@ public class IsInGroup2 implements QDLFunction {
             groupNames = (StemVariable) objects[0];
         }
         StemVariable result = new StemVariable();
-        for (String keys : groupNames.keySet()) {
-            String name = groupNames.getString(keys);
+        for (Object keys : groupNames.keySet()) {
+            String name = String.valueOf(groupNames.get(keys));
             Boolean rValue = Boolean.FALSE;
-            for (String key : groups.keySet()) {
+            for (Object key : groups.keySet()) {
                 Object obj = groups.get(key);
                 // two options, either they parsed it in to a group structure OR its just a raw list of strings
                 if (obj instanceof StemVariable) {
@@ -93,8 +93,13 @@ public class IsInGroup2 implements QDLFunction {
                         break;
                     }
                 }
+            }    if(keys instanceof Long){
+                result.put((Long)keys, rValue);
+
+            } else{
+                result.put((String)keys, rValue);
+
             }
-                result.put(keys, rValue);
         }
         if (isScalar) {
             return result.get(0L);

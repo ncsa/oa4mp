@@ -74,6 +74,7 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
          String dfInterval="df_interval";
 
          String dfLifetime="df_lifetime";
+         String ersatzClient = "ersatz_client";
          String extended_attributes = "extended_attributes";
          String issuer = "issuer";
          String ldap = "ldap";
@@ -109,6 +110,10 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
         if (stem.containsKey(kk().dfLifetime())) {
             v.setDfLifetime(stem.getLong(kk().dfLifetime()));
         }
+        if (stem.containsKey(kk().ersatzClient())) {
+            v.setErsatzClient(stem.getBoolean(kk().ersatzClient()));
+        }
+
         if (stem.containsKey(kk().ea())) {
             StemVariable j = (StemVariable) stem.get(kk().ea());
             v.setExtendedAttributes((JSONObject) j.toJSON());
@@ -129,7 +134,7 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
         if (stem.containsKey(kk().publicClient())) {
             v.setPublicClient(stem.getBoolean(kk().publicClient()));
         }
-        //  10
+        //  11
         if (stem.containsKey(kk().resource())) {
             v.setResource(toList(stem, kk().resource()));
         }
@@ -194,6 +199,8 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
             ea.fromJSON(v.getExtendedAttributes());
             stem.put(kk().ea(), ea);
         }
+        stem.put(kk().ersatzClient(), v.isErsatzClient());
+
         setNonNullStemValue(stem, kk().issuer(), v.getIssuer());
         if (v.getLdaps() != null && !v.getLdaps().isEmpty()) {
             JSONArray jsonArray = getCC().getLdapConfigurationUtil().toJSON(v.getLdaps());
@@ -202,7 +209,7 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
             stem.put(kk().ldap(), ldap);
         }
         setNonNullStemValue(stem, kk().publicClient(), v.isPublicClient());
-        // 10
+        // 11
         setNonNullStemValue(stem, kk().rtLifetime(), v.getRtLifetime());
         if (v.getResource() != null && !v.getResource().isEmpty()) {
             fromList(v.getResource(), stem, kk().resource());

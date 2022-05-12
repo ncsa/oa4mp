@@ -21,6 +21,7 @@ public class OA2ClientKeys extends ClientKeys {
     String config = "cfg";
     String dfInterval="df_interval";
     String dfLifetime="df_lifetime";
+    String ersatzClient="ersatz_client";
     String extended_attributes = "extended_attributes";
     String issuer = "issuer";
     String ldap = "ldap";
@@ -38,6 +39,11 @@ public class OA2ClientKeys extends ClientKeys {
            (in  oa4mp-qdl)
       or you may break the QDL module that handles clients.
      */
+
+    public String ersatzClient(String... x) {
+           if (0 < x.length) ersatzClient = x[0];
+           return ersatzClient;
+       }
 
     public String proxyClaimsList(String... x) {
            if (0 < x.length) proxyClaimsList = x[0];
@@ -148,7 +154,8 @@ public class OA2ClientKeys extends ClientKeys {
         allKeys.add(strictScopes());
         allKeys.add(dfLifetime());
         allKeys.add(dfInterval());
-        allKeys.add(skipServerScripts());
+        allKeys.add(dfInterval());
+        allKeys.add(ersatzClient());
         return allKeys;
     }
 }

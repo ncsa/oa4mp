@@ -1,6 +1,7 @@
-package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage;
+package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.TokenInfoRecord;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.TokenInfoRecordMap;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8628State;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.DSSQLTransactionStore;
 import edu.uiuc.ncsa.security.core.Identifier;
@@ -26,7 +27,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction.RFC862_STATE_KEY;
+import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction.RFC862_STATE_KEY;
 
 /**
  * <p>Created by Jeff Gaynor<br>

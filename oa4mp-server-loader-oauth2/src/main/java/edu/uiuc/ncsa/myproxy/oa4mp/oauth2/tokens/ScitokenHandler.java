@@ -30,7 +30,7 @@ public class ScitokenHandler extends AbstractAccessTokenHandler {
 
     /**
      * NOTE that the SciTokens spec. changed substantially form version 1.0 to 2.0. we  do
-     * not support 1.0.
+     * not support 1.0. Then again, nobody does really.
      *
      * @return
      */

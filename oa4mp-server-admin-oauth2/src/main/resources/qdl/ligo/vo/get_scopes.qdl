@@ -10,30 +10,11 @@
       ζ.'Communities:LVC:SegDB:SegDBWriter' := 'write:/DQSegDB';
         ζ.'gw-astronomy:KAGRA-LIGO:members' := 'read:/frames';
 
-   return(reduce(⊗~,values(mask(ζ., in_group2(keys(ζ.),γ.)) )));
-
-  /*
-    replacement for loop and everything else below  version 1.4.2+
-  */
-  /*
-     allowed_scopes. := [];
-
-   while[
-       for_keys(key, zeta.)
-     ][
-       if[
-          in_group(groups., key)
-       ][
-          allowed_scopes. := allowed_scopes. ~ zeta.key;
-       ]; // end if
-
-    ]; // end while
-
-    return(allowed_scopes.);
-  */
+   return(~values(mask(ζ., in_group2(keys(ζ.),γ.))));
    ]; // end block
+
     /*
-   // example replacement for loop above with much simpler data:
+   // example replacement for above with much simpler data:
 
          zeta.'Communities:LSCVirgoLIGOGroupMembers' := ['read:/DQSegDB' ,'read:/frames'];
       zeta.'Communities:LVC:SegDB:SegDBWriter' := 'write:/DQSegDB';
@@ -41,7 +22,7 @@
   g. := [{'name': 'Services:MailingLists:Testing:eligible_factor'},{'name': 'Communities:LSCVirgoLIGOGroupMembers'},{'name':'Communities:LVC:SegDB:SegDBWriter'}]
 
    // To get the permissions in one fell swoop:
-     reduce(@~,values(mask(zeta., in_group2(keys(zeta.),g.)) ))
+     ~values(mask(zeta., in_group2(keys(zeta.),g.)))
  [write:/DQSegDB,read:/DQSegDB,read:/frames]
 
  define

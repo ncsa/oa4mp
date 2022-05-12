@@ -20,8 +20,12 @@ public class PermissionConverter<V extends Permission> extends MapConverter<V> {
     @Override
     public V fromMap(ConversionMap<String, Object> map, V v) {
         V value =  super.fromMap(map, v);
-        value.setAdminID(map.getIdentifier(pk().adminID));
-        value.setClientID(map.getIdentifier(pk().clientID));
+        value.setAdminID(map.getIdentifier(pk().adminID()));
+        value.setClientID(map.getIdentifier(pk().clientID()));
+        if(map.containsKey(pk().ersatzID())){
+            value.setClientID(map.getIdentifier(pk().ersatzID()));
+        }
+        value.setSubstitute(map.getBoolean(pk().substitute()));
         value.setApprove(map.getBoolean(pk().canApprove()));
         value.setCreate(map.getBoolean(pk().canCreate()));
         value.setDelete(map.getBoolean(pk().canRemove()));
@@ -35,6 +39,10 @@ public class PermissionConverter<V extends Permission> extends MapConverter<V> {
         super.toMap(value, data);
         data.put(pk().adminID(), value.getAdminID());
         data.put(pk().clientID(), value.getClientID());
+        if(value.getErsatzID()!= null){
+            data.put(pk().ersatzID(), value.getErsatzID());
+        }
+        data.put(pk().substitute(), value.canSubstitute());
         data.put(pk().canApprove(), value.isApprove());
         data.put(pk().canRemove(), value.isDelete());
         data.put(pk().writeable(), value.isWrite());

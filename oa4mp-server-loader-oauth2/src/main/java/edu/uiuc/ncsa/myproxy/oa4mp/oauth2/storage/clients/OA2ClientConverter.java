@@ -5,7 +5,6 @@ import com.typesafe.config.ConfigFactory;
 import com.typesafe.config.ConfigRenderOptions;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.delegation.storage.impl.ClientConverter;
-import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfigurationUtil;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.storage.data.ConversionMap;
@@ -70,6 +69,9 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         }
         if (map.get(getCK2().publicClient()) != null) {
             otherV.setPublicClient(map.getBoolean(getCK2().publicClient()));
+        }
+        if (map.get(getCK2().ersatzClient()) != null) {
+            otherV.setErsatzClient(map.getBoolean(getCK2().ersatzClient()));
         }
         otherV.setRtLifetime(map.getLong(getCK2().rtLifetime()));
         otherV.setDfLifetime(map.getLong(getCK2().dfLifetime()));
@@ -180,13 +182,13 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
 
     LDAPConfigurationUtil ldapConfigurationUtil;
 
-    protected Collection<LDAPConfiguration> mapToLDAPS(ConversionMap<String, Object> map, String key) {
+  /*  protected Collection<LDAPConfiguration> mapToLDAPS(ConversionMap<String, Object> map, String key) {
         JSONObject json = new JSONObject();
         JSON j = JSONSerializer.toJSON(map.get(key));
         json.put("ldap", j);
 
         return getLdapConfigurationUtil().fromJSON(j);
-    }
+    }*/
 
     protected Collection<String> jsonArrayToCollection(ConversionMap<String, Object> map, String key) {
         JSONArray json;
@@ -213,6 +215,7 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
             return;
         }
         map.put(getCK2().publicClient(), client.isPublicClient());
+        map.put(getCK2().ersatzClient(), client.isErsatzClient());
         JSONArray callbacks = new JSONArray();
         for (String s : client.getCallbackURIs()) {
             callbacks.add(s);

@@ -1,4 +1,4 @@
-package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage;
+package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.DSTransactionTable;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnDescriptorEntry;

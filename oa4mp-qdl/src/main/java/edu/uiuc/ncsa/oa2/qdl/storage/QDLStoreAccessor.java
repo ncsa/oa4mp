@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.oa2.qdl.storage;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.StoreArchiver;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.Identifiable;
@@ -306,15 +306,19 @@ public class QDLStoreAccessor {
      */
     public StemVariable archive(StemVariable arg) {
         StemVariable output = new StemVariable();
-        for (String key : arg.keySet()) {
-            String s = arg.getString(key);
+        for (Object key : arg.keySet()) {
+            String s = String.valueOf(arg.get(key));
             Identifiable oldVersion = (Identifiable) getStore().get(BasicIdentifier.newID(s));
             MapConverter mc = (MapConverter) getStore().getXMLConverter();
             XMLMap map = new XMLMap();
             Identifiable newVersion = getStore().create();
             mc.toMap(oldVersion, map);
             Long newIndex = getStoreArchiver().create(oldVersion.getIdentifier());
-            output.put(key, newIndex);
+            if(key instanceof Long){
+                output.put((Long)key, newIndex);
+            }else{
+                output.put((String)key, newIndex);
+            }
         }
         return output;
     }

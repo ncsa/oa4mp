@@ -27,6 +27,26 @@ public class Permission extends IdentifiableImpl {
 
     Identifier clientID;
     Identifier adminID;
+
+    public Identifier getErsatzID() {
+        return ersatzID;
+    }
+
+    public void setErsatzID(Identifier ersatzID) {
+        this.ersatzID = ersatzID;
+    }
+
+    Identifier ersatzID;
+
+    public boolean canSubstitute() {
+        return substitute;
+    }
+
+    public void setSubstitute(boolean substitute) {
+        this.substitute = substitute;
+    }
+
+    boolean substitute = false;
     boolean read = true;
     boolean write = true;
     boolean create = true;

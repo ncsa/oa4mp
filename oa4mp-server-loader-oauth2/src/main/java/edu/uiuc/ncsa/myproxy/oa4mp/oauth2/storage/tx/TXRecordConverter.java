@@ -1,7 +1,10 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
+import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
+import edu.uiuc.ncsa.security.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.security.storage.data.ConversionMap;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
@@ -16,13 +19,16 @@ import java.util.ArrayList;
  */
 public class TXRecordConverter<V extends TXRecord> extends MapConverter<V> {
     public TXRecordConverter(SerializationKeys keys,
-                             IdentifiableProvider<V> provider) {
+                             IdentifiableProvider<V> provider,
+                             ClientStore<? extends OA2Client> clientStore) {
         super(keys, provider);
+        this.clientStore = clientStore;
     }
 
     protected TXRecordSerializationKeys tkeys() {
         return (TXRecordSerializationKeys) getKeys();
     }
+    ClientStore<? extends OA2Client> clientStore;
 
     @Override
     public V fromMap(ConversionMap<String, Object> map, V v) {
@@ -33,6 +39,9 @@ public class TXRecordConverter<V extends TXRecord> extends MapConverter<V> {
             txr.setAudience(a);
         }
         txr.setParentID(map.getIdentifier(tkeys().parentID()));
+        if(map.containsKey(tkeys().ersatzID())){
+            txr.setErsatzClient(clientStore.get(BasicIdentifier.newID(map.getString(tkeys().ersatzID()))));
+        }
         txr.setExpiresAt(map.getLong(tkeys().expiresAt()));
         txr.setLifetime(map.getLong(tkeys().lifetime()));
         txr.setIssuedAt(map.getLong(tkeys().issuedAt()));
@@ -75,6 +84,9 @@ public class TXRecordConverter<V extends TXRecord> extends MapConverter<V> {
         data.put(tkeys().expiresAt(), value.getExpiresAt());
         data.put(tkeys().isValid(), value.isValid());
         data.put(tkeys().tokenType(), value.getTokenType());
+        if(value.getErsatzClient()!=null){
+            data.put(tkeys().ersatzID(), value.getErsatzClient().getIdentifierString());
+        }
        if(value.getStoredToken()!=null){
            data.put(tkeys().storedToken(), value.getStoredToken());
        }

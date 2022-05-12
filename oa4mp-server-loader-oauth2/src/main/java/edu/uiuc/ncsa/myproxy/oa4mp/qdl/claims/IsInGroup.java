@@ -58,7 +58,7 @@ public class IsInGroup implements QDLFunction {
             throw new IllegalArgumentException("Error: The second argument of " + getName() + " must be a string.");
         }
         String name = (String) objects[1];
-        for (String key : groups.keySet()) {
+        for (Object key : groups.keySet()) {
             Object obj = groups.get(key);
             // two options, either they parsed it in to a group structure OR its just a raw string
             if (obj instanceof StemVariable) {

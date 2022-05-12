@@ -16,11 +16,25 @@ public class PermissionKeys extends SerializationKeys {
 
     String adminID = "admin_id";
     String clientID = "client_id";
+    String ersatzID = "ersatz_id";
+    String substitute = "can_substitute";
     String readable = "can_read";
     String writable = "can_write";
     String canCreate = "can_create";
     String canRemove = "can_remove";
     String canApprove = "can_approve";
+
+    /*
+        If you change this, update the QDL store PermissionStemMC or you will break it!
+     */
+    public String ersatzID(String... x) {
+        if (0 < x.length) ersatzID = x[0];
+        return ersatzID;
+    }
+    public String substitute(String... x) {
+        if (0 < x.length) substitute = x[0];
+        return substitute;
+    }
 
     public String adminID(String... x) {
         if (0 < x.length) adminID = x[0];
@@ -66,6 +80,8 @@ public class PermissionKeys extends SerializationKeys {
         allKeys.add(clientID());
         allKeys.add(readable());
         allKeys.add(writeable());
+        allKeys.add(ersatzID());
+        allKeys.add(substitute());
         return allKeys;
     }
 }

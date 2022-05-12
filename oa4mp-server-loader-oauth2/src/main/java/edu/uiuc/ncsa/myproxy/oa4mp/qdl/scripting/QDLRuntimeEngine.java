@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowStates2;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowType;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ScriptRuntimeEngineFactory;
@@ -411,8 +411,8 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
 
     public List<String> stemToList(StemVariable arg) {
         ArrayList<String> scopes = new ArrayList<>();
-        for (String key : arg.keySet()) {
-            scopes.add(arg.getString(key));
+        for (Object key : arg.keySet()) {
+            scopes.add(String.valueOf(arg.get(key)));
         }
         return scopes;
     }

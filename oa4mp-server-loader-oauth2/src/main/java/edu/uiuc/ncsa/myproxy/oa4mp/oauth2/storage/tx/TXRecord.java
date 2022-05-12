@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.qdl.xml.XMLConstants;
 import edu.uiuc.ncsa.qdl.xml.XMLUtilsV2;
 import edu.uiuc.ncsa.security.core.DateComparable;
@@ -175,7 +176,15 @@ public class TXRecord extends IdentifiableImpl implements DateComparable {
     List<URI> resource;
     boolean valid;
 
+    public OA2Client getErsatzClient() {
+        return ersatzClient;
+    }
 
+    public void setErsatzClient(OA2Client ersatzClient) {
+        this.ersatzClient = ersatzClient;
+    }
+
+    OA2Client ersatzClient;
     /**
      * This and {@link #fromXML(XMLEventReader)} are needed for QDL state storage.
      *

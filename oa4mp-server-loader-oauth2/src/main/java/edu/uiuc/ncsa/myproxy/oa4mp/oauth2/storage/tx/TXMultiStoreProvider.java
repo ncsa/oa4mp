@@ -32,5 +32,4 @@ public class TXMultiStoreProvider<T extends TXStore<? extends TXRecord>> extends
         }
         return (T) new TXMemoryStore(txRecordProvider, txRecordConverter);
     }
-    // public abstract class TransactionStoreProvider<T extends TransactionStore<? extends BasicTransaction>> extends MultiTypeProvider<T> {
 }

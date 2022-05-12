@@ -1,7 +1,9 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientMemoryStore;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientSQLStoreProvider;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.*;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.BasicClaimsSourceImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.LDAPClaimsSource;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.CM7591Config;
@@ -11,7 +13,6 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.ClientManagementConstants;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.json.JSONStoreProviders;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.json.MultiJSONStoreProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8628ServletConfig;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.*;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientConverter;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.*;
@@ -1258,7 +1259,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
 
     protected Provider<TXStore> getTXStoreProvider() {
         TXRecordProvider txRecordProvider = new TXRecordProvider(null, (OA2TokenForge) getTokenForgeProvider().get());
-        TXRecordConverter txRecordConverter = new TXRecordConverter(new TXRecordSerializationKeys(), txRecordProvider);
+        TXRecordConverter txRecordConverter = new TXRecordConverter(new TXRecordSerializationKeys(), txRecordProvider, getClientStoreProvider().get());
         return getTXStoreProvider(txRecordProvider, txRecordConverter);
     }
 

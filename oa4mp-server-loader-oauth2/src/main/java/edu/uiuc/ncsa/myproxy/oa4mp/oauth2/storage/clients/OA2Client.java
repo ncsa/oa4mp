@@ -53,6 +53,16 @@ public class OA2Client extends Client implements OA2ClientScopes {
         client.setSignTokens(isSignTokens());
     }
 
+    public boolean isErsatzClient() {
+        return ersatzClient;
+    }
+
+    public void setErsatzClient(boolean ersatzClient) {
+        this.ersatzClient = ersatzClient;
+    }
+
+    boolean ersatzClient = false;
+
     public boolean isSkipServerScripts() {
         return skipServerScripts;
     }

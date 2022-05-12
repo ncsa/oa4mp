@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
 import edu.uiuc.ncsa.qdl.exceptions.AssertionException;
 import edu.uiuc.ncsa.qdl.exceptions.QDLExceptionWithTrace;
@@ -58,9 +58,9 @@ public class OA2ServletUtils {
             if (qdlExceptionWithTrace.getCause() != null) {
                 throwable = qdlExceptionWithTrace.getCause();
             }
-            debugger.trace(callingObject, "Server exception \"" + throwable.getMessage() + "\"");
+            debugger.error(callingObject, "Server exception \"" + throwable.getMessage() + "\"", exception);
             throw new OA2ATException(OA2Errors.SERVER_ERROR,
-                    "internal error",
+                    "internal error:" + exception.getMessage(),
                     HttpStatus.SC_INTERNAL_SERVER_ERROR,
                     transaction.getRequestState());
         }
@@ -98,42 +98,6 @@ public class OA2ServletUtils {
                 "invalid request",
                 HttpStatus.SC_BAD_REQUEST,
                 transaction.getRequestState());
-
-        /*
-        catch (QDLExceptionWithTrace qdlExceptionWithTrace) {
-                    // This can happen if something very deep in the stack (non QDL) blows up and QDL
-                    // has caught it.
-                    rollback(backup, txRecord);
-                    Throwable throwable = qdlExceptionWithTrace;
-                    if (qdlExceptionWithTrace.getCause() != null) {
-                        throwable = qdlExceptionWithTrace.getCause();
-                    }
-                    debugger.trace(this, "Server exception \"" + throwable.getMessage() + "\"");
-                    throw new OA2ATException(OA2Errors.SERVER_ERROR, "internal error", HttpStatus.SC_INTERNAL_SERVER_ERROR, t.getRequestState());
-
-                } catch (AssertionException assertionError) {
-                    // they passed a bad argument to a QDL script
-                    rollback(backup, txRecord);
-                    debugger.trace(this, "assertion exception \"" + assertionError.getMessage() + "\"");
-                    throw new OA2ATException(OA2Errors.INVALID_REQUEST, assertionError.getMessage(), HttpStatus.SC_BAD_REQUEST, t.getRequestState());
-                } catch (ScriptRuntimeException sre) {
-                    // Client threw an exception.
-                    rollback(backup, txRecord);
-                    debugger.trace(this, "script runtime exception \"" + sre.getMessage() + "\"");
-                    throw new OA2ATException(sre.getRequestedType(), sre.getMessage(), sre.getStatus(), t.getRequestState());
-                } catch (IllegalAccessException iax) {
-                    throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
-                            "access denied",
-                            t.getRequestState());
-                } catch (Throwable throwable) {
-                    // Everything else. Allow to fix the problem. Proceeding means that the transaction will complete
-                    // and the old tokens will be invalid, replaced by new ones.
-                    rollback(backup, txRecord);
-                    debugger.trace(this, "Unable to update claims on token refresh", throwable);
-                    debugger.warn(this, "Unable to update claims on token refresh: \"" + throwable.getMessage() + "\"");
-                    throw new OA2ATException(OA2Errors.INVALID_REQUEST, "invalid request", HttpStatus.SC_BAD_REQUEST, t.getRequestState());
-                }
-         */
 
     }
 

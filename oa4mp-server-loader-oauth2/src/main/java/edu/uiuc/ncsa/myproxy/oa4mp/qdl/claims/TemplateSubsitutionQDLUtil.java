@@ -45,14 +45,14 @@ public class TemplateSubsitutionQDLUtil implements QDLFunction {
 
         if (objects.length == 3) {
             StemVariable groupClaimStem = (StemVariable) objects[2];
-            for (String key : groupClaimStem.keySet()) {
+            for (Object key : groupClaimStem.keySet()) {
                 StemVariable ss = (StemVariable) groupClaimStem.get(key);
-                groups.put(key, ss.getQDLList().toJSON());
+                groups.put(String.valueOf(key), ss.getQDLList().toJSON());
             }
         }
         List<String> out = new ArrayList<>();
-        for(String key: arg.keySet()){
-            String rawString = arg.getString(key);
+        for(Object key: arg.keySet()){
+            String rawString = String.valueOf(arg.get(key));
             out.addAll( ScopeTemplateUtil.replaceTemplate(rawString, groups, otherClaimStem));
         }
         StemVariable outStem = new StemVariable();

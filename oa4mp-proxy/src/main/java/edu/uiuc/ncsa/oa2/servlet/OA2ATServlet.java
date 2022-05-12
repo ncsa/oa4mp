@@ -1,11 +1,11 @@
 package edu.uiuc.ncsa.oa2.servlet;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2ConfigurationLoader;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.*;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ScriptRuntimeEngineFactory;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.OA2TStoreInterface;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2TStoreInterface;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RefreshTokenStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.TokenInfoRecord;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.TokenInfoRecordMap;
@@ -469,9 +469,21 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         if (!t.getClient().getIdentifierString().equals(client.getIdentifierString())) {
             // NOTE don't throw an OA2 AT Exception here since that returns some state about
             // the original client. Wrong client means it bombs.
-            throw new OA2GeneralError(OA2Errors.UNAUTHORIZED_CLIENT,
-                    "wrong client, access denied",
-                    HttpStatus.SC_UNAUTHORIZED, null);
+            if (!client.isErsatzClient()) {
+                // no substitutions allowed. Fail outright.
+                throw new OA2GeneralError(OA2Errors.UNAUTHORIZED_CLIENT,
+                        "wrong client, access denied",
+                        HttpStatus.SC_UNAUTHORIZED, null);
+            }
+
+            List<Identifier> originalClients = getOA2SE().getPermissionStore().getAllOriginalClient(client.getIdentifier());
+            if (originalClients.isEmpty()) {
+                // no substitutions allowed. Fail outright.
+                throw new OA2GeneralError(OA2Errors.UNAUTHORIZED_CLIENT,
+                        "wrong client, access denied",
+                        HttpStatus.SC_UNAUTHORIZED, null);
+            }
+
         }
         // Finally can check access here. Access for exchange is same as for refresh token.
         if (!t.getFlowStates().acceptRequests || !t.getFlowStates().refreshToken) {

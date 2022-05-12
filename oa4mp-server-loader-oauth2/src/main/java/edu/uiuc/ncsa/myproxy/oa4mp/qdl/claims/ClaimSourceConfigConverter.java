@@ -268,8 +268,8 @@ public class ClaimSourceConfigConverter implements CSConstants {
                     StemVariable searchAttr = (StemVariable) arg.get(CS_LDAP_SEARCH_ATTRIBUTES);
                     Map<String, LDAPConfigurationUtil.AttributeEntry> attrs = new HashMap<>();
 
-                    for (String key : searchAttr.keySet()) {
-                        String attrName = searchAttr.getString(key);
+                    for (Object key : searchAttr.keySet()) {
+                        String attrName = String.valueOf(searchAttr.get(key));
                         boolean isGroup = groups.contains(attrName);
                         boolean isList = lists.contains(attrName);
                         if (isList && isGroup) {

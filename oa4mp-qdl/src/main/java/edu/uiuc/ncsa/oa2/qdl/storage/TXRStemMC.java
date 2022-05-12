@@ -1,10 +1,12 @@
 package edu.uiuc.ncsa.oa2.qdl.storage;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecordSerializationKeys;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
+import edu.uiuc.ncsa.security.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
 /**
@@ -12,10 +14,11 @@ import edu.uiuc.ncsa.security.storage.data.MapConverter;
  * on 12/21/20 at  6:33 AM
  */
 public class TXRStemMC<V extends TXRecord> extends StemConverter<V> {
-    public TXRStemMC(MapConverter<V> mapConverter) {
+    public TXRStemMC(MapConverter<V> mapConverter, ClientStore clientStore) {
         super(mapConverter);
+        this.clientStore = clientStore;
     }
-
+     ClientStore clientStore;
     protected TXRecordSerializationKeys kk() {
         return (TXRecordSerializationKeys) keys;
     }
@@ -24,6 +27,7 @@ public class TXRStemMC<V extends TXRecord> extends StemConverter<V> {
     /*
       10 attributes
       String audience = "audience";
+      String ersatzID = "ersatz_id";
       String expiresAt = "expires_at";
       String lifetime = "lifetime";
       String issuedAt = "issued_at";
@@ -40,6 +44,8 @@ public class TXRStemMC<V extends TXRecord> extends StemConverter<V> {
         v = super.fromMap(stem, v);
         if (stem.containsKey(kk().audience())) {v.setAudience(toList(stem, kk().audience()));}
         if(stem.containsKey(kk().expiresAt())){v.setExpiresAt(stem.getLong(kk().expiresAt()));}
+        if(stem.containsKey(kk().ersatzID())){v.setErsatzClient((OA2Client) clientStore.get(BasicIdentifier.newID(stem.getString(kk().ersatzID()))));}
+
         if(stem.containsKey(kk().lifetime())){v.setLifetime(stem.getLong(kk().lifetime()));}
         if(stem.containsKey(kk().issuedAt())){v.setIssuedAt(stem.getLong(kk().issuedAt()));}
         if(isStringKeyOK(stem, kk().issuer())){v.setIssuer(stem.getString(kk().issuer()));}
@@ -62,6 +68,8 @@ public class TXRStemMC<V extends TXRecord> extends StemConverter<V> {
         if (!StringUtils.isTrivial(v.getIssuer())) {
             stem.put(kk().issuer(), v.getIssuer());
         }
+        if(v.getErsatzClient()!=null) {setNonNullStemValue(stem, kk().ersatzID(), v.getErsatzClient().getIdentifierString());}
+
         // 5
         stem.put(kk().isValid(), v.isValid());
         if (v.getParentID() != null) {

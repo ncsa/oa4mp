@@ -82,5 +82,19 @@ public class PermissionFileStore<V extends Permission> extends FileStore<V> impl
         return !get(adminID,clientID).isEmpty();
     }
 
+    @Override
+    public List<Identifier> getErsatzClients(Identifier clientID) {
+        return null;
+    }
+
+    @Override
+    public List<Identifier> getAllOriginalClient(Identifier ersatzID) {
+        return null;
+    }
+
+    @Override
+    public Identifier getOriginalClient(Identifier ersatzID) {
+        return null;
+    }
 }
 

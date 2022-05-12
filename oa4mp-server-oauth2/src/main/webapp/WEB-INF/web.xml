@@ -118,7 +118,7 @@
 
     <servlet>
         <servlet-name>clientVetting</servlet-name>
-        <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2AutoRegistrationServlet</servlet-class>
+        <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2RegistrationServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
     <servlet-mapping>

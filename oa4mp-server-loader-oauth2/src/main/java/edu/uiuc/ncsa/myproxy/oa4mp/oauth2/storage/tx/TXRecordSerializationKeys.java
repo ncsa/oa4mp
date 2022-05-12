@@ -16,6 +16,7 @@ public class TXRecordSerializationKeys extends SerializationKeys {
 
     String audience = "audience";
     String expiresAt = "expires_at";
+    String ersatzID = "ersatz_id";
     String lifetime = "lifetime";
     String issuedAt = "issued_at";
     String issuer = "issuer";
@@ -35,6 +36,11 @@ public class TXRecordSerializationKeys extends SerializationKeys {
         if (0 < x.length) expiresAt = x[0];
         return expiresAt;
     }
+    public String ersatzID(String... x) {
+        if (0 < x.length) ersatzID = x[0];
+        return ersatzID;
+    }
+
     public String lifetime(String... x) {
         if (0 < x.length) lifetime = x[0];
         return lifetime;

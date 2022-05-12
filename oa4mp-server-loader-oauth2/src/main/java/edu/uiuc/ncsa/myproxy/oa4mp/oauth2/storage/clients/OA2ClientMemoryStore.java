@@ -1,4 +1,4 @@
-package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage;
+package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientConverter;

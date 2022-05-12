@@ -18,7 +18,7 @@ are more modular and should be used hencforth (from 7/12/2021 CILogon release 5.
          fnal/new/at.qdl - entry point (in client cfg) for token, refresh and exchange phase.
 fnal/new/get_service.qdl - gets the service record (e.g. dunpro) from LDAP
    fnal/new/get_user.qdl - gets the user's record (e/g/ bob@fnal.gov) from LDAP
-        fnal/new/rtx.qdl - actual processing of refreh and exchange phases.
+        fnal/new/rtx.qdl - actual processing of refresh and exchange phases.
 
 There was a bug in versions of QDL before 1.4 that would not propagate the script args
 quite faithfully in calls to other scripts. This meant that lots of little scripts wouldn't

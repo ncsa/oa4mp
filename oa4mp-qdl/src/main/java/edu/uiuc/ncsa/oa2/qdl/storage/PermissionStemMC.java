@@ -21,9 +21,11 @@ public class PermissionStemMC<V extends Permission> extends StemConverter<V> {
     }
 
     /*
-    7 attributes
+    9 attributes
     String adminID = "admin_id";
     String clientID = "client_id";
+    String ersatzID = "ersatzID";
+    String substitute = "substitute";
     String readable = "can_read";
     String writable = "can_write";
     String canCreate = "can_create";
@@ -39,12 +41,20 @@ public class PermissionStemMC<V extends Permission> extends StemConverter<V> {
         if(isStringKeyOK(stem, kk().clientID())){
             v.setClientID(newID(stem.getString(kk().clientID())));
         }
+        if(isStringKeyOK(stem, kk().ersatzID())){
+            v.setErsatzID(newID(stem.getString(kk().ersatzID())));
+        }
+
         if(stem.containsKey(kk().readable())){
             v.setRead(stem.getBoolean(kk().readable()));
         }
         if(stem.containsKey(kk().writeable())){
             v.setWrite(stem.getBoolean(kk().writeable()));
         }
+        if(stem.containsKey(kk().substitute())){
+            v.setSubstitute(stem.getBoolean(kk().substitute()));
+        }
+
         if(stem.containsKey(kk().canRemove())){
             v.setDelete(stem.getBoolean(kk().canRemove()));
         }
@@ -61,6 +71,8 @@ public class PermissionStemMC<V extends Permission> extends StemConverter<V> {
     /*
         String adminID = "admin_id";
     String clientID = "client_id";
+    String ersatzID = "ersatzID";
+    String substitute = "substitute";
     String readable = "can_read";
     String writable = "can_write";
     String canCreate = "can_create";
@@ -77,13 +89,18 @@ public class PermissionStemMC<V extends Permission> extends StemConverter<V> {
         if (v.getClientID() != null) {
             stem.put(kk().clientID(), v.getClientID().toString());
         }
+        if (v.getErsatzID() != null) {
+            stem.put(kk().ersatzID(), v.getErsatzID().toString());
+        }
+
+        stem.put(kk().substitute(), v.canSubstitute());
         stem.put(kk().canApprove(), v.isApprove());
         stem.put(kk().canCreate(), v.isCreate());
         stem.put(kk().canRemove(), v.isDelete());
-        // 5
+        // 7
         stem.put(kk().readable(), v.isRead());
         stem.put(kk().writeable(), v.isWrite());
-        // 7 attributes
+        // 8 attributes
         return stem;
     }
 }

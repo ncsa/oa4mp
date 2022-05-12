@@ -24,11 +24,13 @@ public class PermissionsTable extends Table {
         super.createColumnDescriptors();
         getColumnDescriptor().add(new ColumnDescriptorEntry(pk().adminID(), LONGVARCHAR, false, false));
         getColumnDescriptor().add(new ColumnDescriptorEntry(pk().clientID(), LONGVARCHAR, true, false));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(pk().ersatzID(), LONGVARCHAR, true, false));
         getColumnDescriptor().add(new ColumnDescriptorEntry(pk().readable(), BOOLEAN, true, false));
         getColumnDescriptor().add(new ColumnDescriptorEntry(pk().writeable(), BOOLEAN, true, false));
         getColumnDescriptor().add(new ColumnDescriptorEntry(pk().canCreate(), BOOLEAN, true, false));
         getColumnDescriptor().add(new ColumnDescriptorEntry(pk().canRemove(), BOOLEAN, true, false));
         getColumnDescriptor().add(new ColumnDescriptorEntry(pk().canApprove(), BOOLEAN, true, false));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(pk().substitute(), BOOLEAN, true, false));
 
     }
 }

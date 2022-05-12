@@ -1,6 +1,5 @@
-package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage;
+package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.TransactionConverter;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;

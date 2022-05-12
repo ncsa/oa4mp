@@ -70,6 +70,21 @@ public class MemoryPermissionStore<V extends Permission> extends MemoryStore<V> 
     }
 
     @Override
+    public List<Identifier> getErsatzClients(Identifier clientID) {
+        return null;
+    }
+
+    @Override
+    public List<Identifier> getAllOriginalClient(Identifier ersatzID) {
+        return null;
+    }
+
+    @Override
+    public Identifier getOriginalClient(Identifier ersatzID) {
+        return null;
+    }
+
+    @Override
     public List<Identifier> getClients(Identifier adminID) {
 
         List<IDTriple> ids = adminMap.get(adminID);
