@@ -91,8 +91,6 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
                 // even if the contents are the same, since scripts may have to change these in to other data structures
                 // to make them accessible to their machinery, then convert them back.
                 setClaims((JSONObject) resp.getReturnedValues().get(SRE_REQ_CLAIMS));
-                DebugUtil.trace(this, "Setting claims to " + claims.toString(2));
-                //sources = (List<ClaimSource>) resp.getReturnedValues().get(SRE_REQ_CLAIM_SOURCES);
                 setExtendedAttributes((JSONObject) resp.getReturnedValues().get(SRE_REQ_EXTENDED_ATTRIBUTES));
                 setAtData((JSONObject) resp.getReturnedValues().get(SRE_REQ_ACCESS_TOKEN));
                 return;

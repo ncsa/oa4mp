@@ -130,16 +130,18 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
                 String messageTemplate = "The following error message was received attempting to contact the " +
                         "LDAP server at ${ldap_host}:\n\n${message}\n\n. The operation did not complete.";
                 Map<String, String> replacements = new HashMap<>();
-                URI address = getOa2SE().getServiceAddress();
                 String x = "localhost";
-                if (address != null) {
-                    x = address.getHost();
-                }
-                replacements.put("host", x);
-                replacements.put("ldap_host", getLDAPCfg().getServer());
-                replacements.put("message", throwable.getMessage());
+                if(getOa2SE() != null){
+                    URI address = getOa2SE().getServiceAddress();
+                    if (address != null) {
+                        x = address.getHost();
+                    }
+                    replacements.put("host", x);
+                    replacements.put("ldap_host", getLDAPCfg().getServer());
+                    replacements.put("message", throwable.getMessage());
 
-                getOa2SE().getMailUtil().sendMessage(subjectTemplate, messageTemplate, replacements);
+                    getOa2SE().getMailUtil().sendMessage(subjectTemplate, messageTemplate, replacements);
+                }
             }
 
             throw new LDAPException("Could not communicate with LDAP server: \"" + (throwable.getMessage() == null ? "(no message)" : throwable.getMessage()) + "\"");
@@ -164,7 +166,6 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
     @Override
     protected JSONObject realProcessing(JSONObject claims, HttpServletRequest request, ServiceTransaction transaction) throws UnsupportedScopeException {
         String name = "realProcessing(id=" + getLDAPCfg().getId() + "):";
-
 
         DebugUtil.trace(this, name + " preparing to do processing.");
         DebugUtil.trace(this, name + " initial claims = " + claims);

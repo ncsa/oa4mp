@@ -289,10 +289,9 @@ When a new version is deployed, here is the testing order
         for testing:
 
         set_param -a scope "wlcg.capabilityset:/fermilab wlcg.groups:/fermilab"
-          output: single group /fermilab, full capability set
-
         set_param -t scope "compute.modify storage.read:/fermilab/users/cilogontest/public"
         set_param -x scope "compute.cancel foo.bar storage.read:/fermilab/users/cilogontest/public2 storage.create:/fermilab/users/dwd/public2"
+          output: single group /fermilab, full capability set
 
         access
            scopes: compute.modify,compute.create,compute.cancel,compute.read,storage.read:/fermilab/users/cilogontest,storage.create:/fermilab/users/cilogontest
