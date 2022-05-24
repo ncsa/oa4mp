@@ -16,6 +16,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -47,7 +48,7 @@ public class SQLPermissionStore<V extends Permission> extends SQLStore<V> implem
         try {
             PreparedStatement stmt = c.prepareStatement("select * from " +
                     getTable().getFQTablename() + " where " + permissionKeys.clientID() + "=? AND " +
-            permissionKeys.adminID() + "=?");
+                    permissionKeys.adminID() + "=?");
             stmt.setString(1, clientID.toString());
             stmt.setString(2, adminID.toString());
             stmt.execute();// just execute() since executeQuery(x) would throw an exception regardless of content per JDBC spec.
@@ -71,92 +72,133 @@ public class SQLPermissionStore<V extends Permission> extends SQLStore<V> implem
     }
 
     @Override
+    public PermissionList getErsatzChains(Identifier adminID, Identifier clientID) {
+        PermissionList allOfThem = new PermissionList();
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
+
+        PermissionKeys permissionKeys = new PermissionKeys();
+        try {
+            PreparedStatement stmt = c.prepareStatement("select * from " +
+                    getTable().getFQTablename() + " where " + permissionKeys.clientID() + "=? AND " +
+                    permissionKeys.adminID() + "=? AND " + permissionKeys.substitute() + "=1");
+            stmt.setString(1, clientID.toString());
+            stmt.setString(2, adminID.toString());
+            stmt.execute();// just execute() since executeQuery(x) would throw an exception regardless of content per JDBC spec.
+
+            ResultSet rs = stmt.getResultSet();
+            while (rs.next()) {
+                V newOne = create();
+                ColumnMap map = rsToMap(rs);
+                populate(map, newOne);
+                allOfThem.add(newOne);
+            }
+            rs.close();
+            stmt.close();
+        } catch (SQLException e) {
+            destroyConnection(cr);
+            throw new GeneralException("Error: could not get database object", e);
+        } finally {
+            releaseConnection(cr);
+        }
+        return allOfThem;
+    }
+
+    @Override
+    public Permission getErsatzChain(Identifier adminID, Identifier clientID, Identifier ersatzID) {
+        return PermissionStoreUtil.getErsatzChain(this, adminID, clientID, ersatzID);
+    }
+
+    @Override
     public int getClientCount(Identifier adminID) {
         ArrayList<Identifier> clients = new ArrayList<>();
-          if(adminID == null) return 0;
+        if (adminID == null) return 0;
 
         ConnectionRecord cr = getConnection();
         Connection c = cr.connection;
-            PermissionKeys permissionKeys = new PermissionKeys();
-            try {
-                PreparedStatement stmt = c.prepareStatement("select COUNT(*)  from " +
-                        getTable().getFQTablename() + " where " +permissionKeys.adminID() + "=?");
-                stmt.setString(1, adminID.toString());
-                stmt.execute();// just execute() since executeQuery(x) would throw an exception regardless of content per JDBC spec.
+        PermissionKeys permissionKeys = new PermissionKeys();
+        try {
+            PreparedStatement stmt = c.prepareStatement("select COUNT(*)  from " +
+                    getTable().getFQTablename() + " where " + permissionKeys.adminID() + "=?");
+            stmt.setString(1, adminID.toString());
+            stmt.execute();// just execute() since executeQuery(x) would throw an exception regardless of content per JDBC spec.
 
-                ResultSet rs = stmt.getResultSet();
-                rs.next();
-                int totalClients = rs.getInt(1);
-                rs.close();
-                stmt.close();
-                return totalClients;
-            } catch (SQLException e) {
-                destroyConnection(cr);
-                throw new GeneralException("Error: could not get database object", e);
-            } finally {
-                releaseConnection(cr);
-            }
+            ResultSet rs = stmt.getResultSet();
+            rs.next();
+            int totalClients = rs.getInt(1);
+            rs.close();
+            stmt.close();
+            return totalClients;
+        } catch (SQLException e) {
+            destroyConnection(cr);
+            throw new GeneralException("Error: could not get database object", e);
+        } finally {
+            releaseConnection(cr);
+        }
     }
 
     @Override
     public List<Identifier> getClients(Identifier adminID) {
         ArrayList<Identifier> clients = new ArrayList<>();
-        if(adminID == null) return clients;
+        if (adminID == null) return clients;
 
         ConnectionRecord cr = getConnection();
         Connection c = cr.connection;
-          PermissionKeys permissionKeys = new PermissionKeys();
-          try {
-              PreparedStatement stmt = c.prepareStatement("select " + permissionKeys.clientID() + "  from " +
-                      getTable().getFQTablename() + " where " +permissionKeys.adminID() + "=?");
-              stmt.setString(1, adminID.toString());
-              stmt.execute();// just execute() since executeQuery(x) would throw an exception regardless of content per JDBC spec.
+        PermissionKeys permissionKeys = new PermissionKeys();
+        try {
+            PreparedStatement stmt = c.prepareStatement("select " + permissionKeys.clientID() + "  from " +
+                    getTable().getFQTablename() + " where " + permissionKeys.adminID() + "=?");
+            stmt.setString(1, adminID.toString());
+            stmt.execute();// just execute() since executeQuery(x) would throw an exception regardless of content per JDBC spec.
 
-              ResultSet rs = stmt.getResultSet();
-              while (rs.next()) {
-                  String clientID = rs.getString(permissionKeys.clientID());
-                  clients.add(BasicIdentifier.newID(clientID));
-              }
-              rs.close();
-              stmt.close();
-          } catch (SQLException e) {
-              destroyConnection(cr);
-              throw new GeneralException("Error: could not get database object", e);
-          } finally {
-              releaseConnection(cr);
-          }
-          return clients;
+            ResultSet rs = stmt.getResultSet();
+            while (rs.next()) {
+                String clientID = rs.getString(permissionKeys.clientID());
+                clients.add(BasicIdentifier.newID(clientID));
+            }
+            rs.close();
+            stmt.close();
+        } catch (SQLException e) {
+            destroyConnection(cr);
+            throw new GeneralException("Error: could not get database object", e);
+        } finally {
+            releaseConnection(cr);
+        }
+        return clients;
     }
 
     @Override
     public List<Identifier> getAdmins(Identifier clientID) {
-            ArrayList<Identifier> admins = new ArrayList<>();
-        if(clientID == null) return admins;
+        ArrayList<Identifier> admins = new ArrayList<>();
+        // With the advent of ersatz clients, there may be multiple entries for a given client
+        HashSet<Identifier> uniqueIDs = new HashSet<>();
+        if (clientID == null) return admins;
 
         ConnectionRecord cr = getConnection();
         Connection c = cr.connection;
 
         PermissionKeys permissionKeys = new PermissionKeys();
-               try {
-                   PreparedStatement stmt = c.prepareStatement("select " + permissionKeys.adminID() + "  from " +
-                           getTable().getFQTablename() + " where " +permissionKeys.clientID() + "=?");
-                   stmt.setString(1, clientID.toString());
-                   stmt.execute();// just execute() since executeQuery(x) would throw an exception regardless of content per JDBC spec.
+        try {
+            PreparedStatement stmt = c.prepareStatement("select " + permissionKeys.adminID() + "  from " +
+                    getTable().getFQTablename() + " where " + permissionKeys.clientID() + "=?");
+            stmt.setString(1, clientID.toString());
+            stmt.execute();// just execute() since executeQuery(x) would throw an exception regardless of content per JDBC spec.
 
-                   ResultSet rs = stmt.getResultSet();
-                   while (rs.next()) {
-                       String adminID = rs.getString(permissionKeys.adminID());
-                       admins.add(BasicIdentifier.newID(adminID));
-                   }
-                   rs.close();
-                   stmt.close();
-               } catch (SQLException e) {
-                   destroyConnection(cr);
-                   throw new GeneralException("Error: could not get database object", e);
-               } finally {
-                   releaseConnection(cr);
-               }
-               return admins;
+            ResultSet rs = stmt.getResultSet();
+            while (rs.next()) {
+                String adminID = rs.getString(permissionKeys.adminID());
+                uniqueIDs.add(BasicIdentifier.newID(adminID));
+            }
+            rs.close();
+            stmt.close();
+        } catch (SQLException e) {
+            destroyConnection(cr);
+            throw new GeneralException("Error: could not get database object", e);
+        } finally {
+            releaseConnection(cr);
+        }
+        admins.addAll(uniqueIDs);
+        return admins;
     }
 
     @Override
@@ -164,18 +206,66 @@ public class SQLPermissionStore<V extends Permission> extends SQLStore<V> implem
         return !get(adminID, clientID).isEmpty();
     }
 
+/*
     @Override
-    public List<Identifier> getErsatzClients(Identifier clientID) {
-        return null;
-    }
+    public PermissionList getErsatzChains(Identifier clientID) {
 
-    @Override
-    public List<Identifier> getAllOriginalClient(Identifier ersatzID) {
-        return null;
-    }
+        PermissionList pList = new PermissionList();
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
 
-    @Override
-    public Identifier getOriginalClient(Identifier ersatzID) {
-        return null;
+        PermissionKeys permissionKeys = new PermissionKeys();
+        try {
+            PreparedStatement stmt = c.prepareStatement("select * from " +
+                    getTable().getFQTablename() + " where " + permissionKeys.clientID() + "=? AND " + permissionKeys.substitute() + "=1");
+            stmt.setString(1, clientID.toString());
+            stmt.execute();// just execute() since executeQuery(x) would throw an exception regardless of content per JDBC spec.
+
+            ResultSet rs = stmt.getResultSet();
+            while (rs.next()) {
+                V newOne = create();
+                ColumnMap map = rsToMap(rs);
+                populate(map, newOne);
+                pList.add(newOne);
+            }
+            rs.close();
+            stmt.close();
+        } catch (SQLException e) {
+            destroyConnection(cr);
+            throw new GeneralException("Error: could not get database object", e);
+        } finally {
+            releaseConnection(cr);
+        }
+        return pList;
     }
+*/
+
+   /* @Override
+    public List<Identifier> getAntecessors(Identifier ersatzID) {
+        List<Identifier> ids = new ArrayList<>();
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
+
+        PermissionKeys permissionKeys = new PermissionKeys();
+        try {
+            PreparedStatement stmt = c.prepareStatement("select " + permissionKeys.clientID() + " from " +
+                    getTable().getFQTablename() + " where " + permissionKeys.ersatzID() + "=? AND " + permissionKeys.substitute() + "=1");
+            stmt.setString(1, ersatzID.toString());
+            stmt.execute();// just execute() since executeQuery(x) would throw an exception regardless of content per JDBC spec.
+
+            ResultSet rs = stmt.getResultSet();
+            while (rs.next()) {
+                ids.add(BasicIdentifier.newID(rs.getString(permissionKeys.clientID())));
+            }
+            rs.close();
+            stmt.close();
+        } catch (SQLException e) {
+            destroyConnection(cr);
+            throw new GeneralException("Error: could not get database object", e);
+        } finally {
+            releaseConnection(cr);
+        }
+        return ids;
+    }
+*/
 }

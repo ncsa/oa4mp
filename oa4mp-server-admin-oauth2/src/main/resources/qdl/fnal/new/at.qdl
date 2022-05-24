@@ -10,9 +10,8 @@ script_load('fnal/acl.qdl');
       CS_HEAD := CS + ':/';
  say('*** FNAL args ' + to_string(script_args(-1)));
 
- ⊨ script_args() ≡ 2 : 'Script error: You must supply both a username (principal) and password.';
 
-    at_claims. := script_load('fnal/new/get_user.qdl', script_args(0),script_args(1), claims.eppn);
+    at_claims. := script_load('fnal/new/get_user.qdl', claims.eppn);
 
     say('*** FNAL at_claims. =' + to_string(at_claims.));
 
@@ -48,12 +47,12 @@ if[
 if[
    exec_phase == 'post_token' || size(tx_scopes.) == 0
   ][
-     script_load('fnal/new/access.qdl', script_args(0), script_args(1));
+     script_load('fnal/new/access.qdl');
      if[!sys_err.ok][return();]; // If there was an error, bail.
 
 ]else[
       say('*** FNAL at.qdl, starting rtx2');
-     script_load('fnal/new/rtx.qdl', script_args(0), script_args(1));
+     script_load('fnal/new/rtx.qdl');
 ];
 
  if[0<size(tx_audience.) || 0 < size(tx_resource.)][access_token.aud. := tx_audience.~tx_resource.;];

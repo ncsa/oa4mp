@@ -38,7 +38,7 @@ block[
     xi. := resolve_templates(at_claims.EPE., scopes., true);  // first pass, get explicitly allowed scopes
 
     ccc := theta.0 - CS_HEAD;
-    record. :=  script_load('fnal/new/get_service.qdl', script_args(0),script_args(1), ccc+'@fnal.gov');
+    record. :=  script_load('fnal/new/get_service.qdl',  ccc+'@fnal.gov');
          // Check that the user does indeed have access to this capability set.
 
     say('*** FNAL record =' + to_string(record.));

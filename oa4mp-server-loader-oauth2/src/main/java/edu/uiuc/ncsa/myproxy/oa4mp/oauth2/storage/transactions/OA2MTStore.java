@@ -1,12 +1,15 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8628State;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.TokenInfoRecord;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.TokenInfoRecordMap;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8628State;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.delegation.storage.impl.TransactionMemoryStore;
 import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
+import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
+import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
+import org.apache.commons.codec.digest.DigestUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +33,16 @@ public class OA2MTStore<V extends OA2ServiceTransaction> extends TransactionMemo
         return rtIndex;
     }
 
+    @Override
+    public V get(AccessTokenImpl accessToken, Identifier clientID) {
+        return getAtIndex().get(getSubIndexKey(accessToken.getJti().toString(), clientID));
+    }
+
+    @Override
+    public V get(RefreshTokenImpl refreshToken, Identifier clientID) {
+        return getRTIndex().get(getSubIndexKey(refreshToken.getJti().toString(), clientID));
+    }
+
     public TokenIndex getUserIndex() {
         if (userIndex == null) {
             userIndex = new TokenIndex();
@@ -49,14 +62,30 @@ public class OA2MTStore<V extends OA2ServiceTransaction> extends TransactionMemo
         if(v.getProxyId()!=null){
             getProxyIDIndex().put(v.getProxyId(), v);
         }
+        if(v.getAccessToken() != null){
+            getAtIndex().put(getSubIndexKey(v.getAccessToken().getJti().toString(), v.getOA2Client().getIdentifier()), v);
+        }
+        if(v.getRefreshToken() != null){
+            getRTIndex().put(getSubIndexKey(v.getRefreshToken().getJti().toString(), v.getOA2Client().getIdentifier()), v);
+        }
+
     }
 
+    protected String getSubIndexKey(String token, Identifier clientID){
+        return DigestUtils.sha1Hex(clientID + "#" + token);
+    }
     @Override
     protected void removeItem(V value) {
         super.removeItem(value);
         getRTIndex().remove(value.getRefreshToken());
         getUserIndex().remove(value.getUsername());
         getProxyIDIndex().remove(value.getProxyId());
+        if(value.hasAccessToken()) {
+            getAtIndex().remove(getSubIndexKey(value.getAccessToken().getJti().toString(), value.getOA2Client().getIdentifier()));
+        }
+        if(value.hasRefreshToken()) {
+            getAtIndex().remove(getSubIndexKey(value.getRefreshToken().getJti().toString(), value.getOA2Client().getIdentifier()));
+        }
     }
 
     @Override

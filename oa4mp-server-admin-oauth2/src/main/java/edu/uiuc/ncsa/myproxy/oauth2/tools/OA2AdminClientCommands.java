@@ -17,6 +17,7 @@ import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.security.util.cli.ArgumentNotFoundException;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.codec.digest.DigestUtils;
 
@@ -285,20 +286,22 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
 
     public static final String UNLINK_ALL_FLAG = "-all";
     public static final String UNLINK_REMOVE_FLAG = "-rm";
-    protected void unlinkRS(InputLine inputLine){
+
+    protected void unlinkRS(InputLine inputLine) {
         String rsName = inputLine.getNextArgFor(SEARCH_RESULT_SET_NAME);
         RSRecord rsRecord = null;
-        if(isCARS(rsName)){
+        if (isCARS(rsName)) {
             rsRecord = clientApprovalStoreCommands.getResultSets().get(rsName);
-        }else{
+        } else {
             rsRecord = getResultSets().get(rsName);
         }
-        if(rsRecord == null){
+        if (rsRecord == null) {
             say("sorry, result set \"" + rsName + "\" not found");
             return;
         }
 
     }
+
     public void unlink(InputLine inputLine) {
         if (showHelp(inputLine)) {
             say("unlink " + UNLINK_ALL_FLAG + " | client_id  + [" + UNLINK_REMOVE_FLAG + "] [admin_id]- unlink the client with the given client_id admin client");
@@ -310,7 +313,7 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
             say("See also: link");
             return;
         }
-        if(inputLine.hasArg(SEARCH_RESULT_SET_NAME)){
+        if (inputLine.hasArg(SEARCH_RESULT_SET_NAME)) {
             unlinkRS(inputLine);
             return;
         }
@@ -325,7 +328,7 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
             return;
         }
         Identifier clientID = null; // arg 0 is name of command
-        if(!doAll) {
+        if (!doAll) {
             clientID = BasicIdentifier.newID(inputLine.getArg(1)); // arg 0 is name of command
             inputLine.removeArgAt(1);
         }
@@ -354,7 +357,7 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
                 pcount++;
                 permissionsStore.remove(permission.getIdentifier());
                 if (removeClient) {
-                    sayv("removing client and approval: "+ permission.getClientID());
+                    sayv("removing client and approval: " + permission.getClientID());
                     clientStore.remove(permission.getClientID());
                     getClientApprovalStore().remove(permission.getClientID());
                 }
@@ -363,4 +366,81 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
         say("done. Removed " + count + " clients and processed " + pcount + " permissions");
     }
 
+/*    public void list_originals(InputLine inputLine) throws Exception {
+        if (showHelp(inputLine)) {
+            say("list_originals ersatz_id [admin_id] = list all of the clients the this may be a substitute for.");
+            return;
+        }
+        AdminClient adminClient = (AdminClient) findItem(inputLine);
+         if (adminClient == null) {
+             say("Sorry, there is no admin client for this identifier.");
+             return;
+         }
+         Identifier ersatzID = BasicIdentifier.newID(inputLine.getArg(1));
+          permissionsStore.getErsatzChains(adminClient.getIdentifier(), ersatzID);
+        List<Identifier> ids = permissionsStore.getAntecessors(ersatzID);
+
+         if (ids == null || ids.isEmpty()) {
+             say("(none)");
+             return;
+         }
+         int count = 0;
+         for (Identifier identifier : ids) {
+                 say(identifier.toString());
+         }
+         say(ids.size() + " total original clients");
+    }*/
+
+    public void list_ersatz(InputLine inputLine)throws Exception{
+        if (showHelp(inputLine)) {
+            say("list_ersatz client_id [admin_id] = list all of the clients granted substitute privilege.");
+            return;
+        }
+        AdminClient adminClient = (AdminClient) findItem(inputLine);
+         if (adminClient == null) {
+             say("Sorry, there is no admin client for this identifier.");
+             return;
+         }
+         Identifier clientID = BasicIdentifier.newID(inputLine.getArg(1));
+
+        PermissionList ersatzClients = permissionsStore.getErsatzChains(adminClient.getIdentifier(), clientID);
+
+         if (ersatzClients == null || ersatzClients.isEmpty()) {
+             say("(none)");
+             return;
+         }
+         int count = 0;
+         for (Permission p : ersatzClients) {
+             say(p.getErsatzChain().toString());
+         }
+         say(count + " total ersatz clients for " + clientID);
+    }
+    public void set_ersatz(InputLine inputLine) throws Exception{
+        if(showHelp(inputLine)){
+            say("set_ersatz client_id ersatz_id [admin_id] = simple case, that sets permission for a single ersatz_id  for client_id");
+            say("in token exchanges. Onus is on the user of the CLI not to set something goofy.");
+            return;
+        }
+        AdminClient adminClient = (AdminClient) findItem(inputLine);
+        if(inputLine.getArgCount() < 3){
+            say("missing argument. You need both a client id and its ersatz id");
+            return;
+        }
+        Identifier ersatzID = BasicIdentifier.newID(inputLine.getArg(1));
+        Identifier clientID = BasicIdentifier.newID(inputLine.getArg(2));
+        Permission permission = (Permission) permissionsStore.create();
+        permission.setAdminID(adminClient.getIdentifier());
+        permission.setClientID(clientID);
+        JSONArray array = new JSONArray();
+        array.add(ersatzID);
+        permission.setErsatzChain(array);
+        permission.setSubstitute(true);
+        permissionsStore.save(permission);
+        say("done");
+    }
+    /*
+    adminID = admin:test/vo_1
+    client_id = localhost:command.line2
+    ersatz_id = client:/my_ersatz
+     */
 }

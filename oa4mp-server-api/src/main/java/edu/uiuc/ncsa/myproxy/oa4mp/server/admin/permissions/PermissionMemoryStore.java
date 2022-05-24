@@ -15,7 +15,7 @@ import static edu.uiuc.ncsa.security.core.util.BeanUtils.checkEquals;
  * <p>Created by Jeff Gaynor<br>
  * on 10/10/16 at  4:18 PM
  */
-public class MemoryPermissionStore<V extends Permission> extends MemoryStore<V> implements PermissionsStore<V> {
+public class PermissionMemoryStore<V extends Permission> extends MemoryStore<V> implements PermissionsStore<V> {
     @Override
     public List<V> getMostRecent(int n, List<String> attributes) {
         throw new UnsupportedOperationException("get most recent not supported for permissions");
@@ -49,11 +49,11 @@ public class MemoryPermissionStore<V extends Permission> extends MemoryStore<V> 
      */
     HashMap<Identifier, List<IDTriple>> adminMap = new HashMap(); // map for admin to client lookup.
     /**
-      * The map of all client ids. The key is a client id, the values are lists of cilent, permission and admin triples.
-      */
+     * The map of all client ids. The key is a client id, the values are lists of cilent, permission and admin triples.
+     */
     HashMap<Identifier, List<IDTriple>> clientMap = new HashMap();
 
-    public MemoryPermissionStore(IdentifiableProvider<V> identifiableProvider) {
+    public PermissionMemoryStore(IdentifiableProvider<V> identifiableProvider) {
         super(identifiableProvider);
     }
 
@@ -69,20 +69,46 @@ public class MemoryPermissionStore<V extends Permission> extends MemoryStore<V> 
         return admins;
     }
 
-    @Override
-    public List<Identifier> getErsatzClients(Identifier clientID) {
-        return null;
-    }
 
-    @Override
-    public List<Identifier> getAllOriginalClient(Identifier ersatzID) {
-        return null;
-    }
 
+/*    @Override
+    public PermissionList getErsatzChains(Identifier clientID) {
+        PermissionList permissions = new PermissionList();
+        for (Identifier id : keySet()) {
+            V permission = get(id);
+            if (permission.canSubstitute() &&  permission.getClientID().equals(clientID)) {
+                permissions.add(permission);
+            }
+        }
+        return permissions;
+    }*/
+
+/*    @Override
+    public List<Identifier> getAntecessors(Identifier ersatzID) {
+        List<Identifier> ids = new ArrayList<>();
+        PermissionList permissions = new PermissionList();
+        for (Identifier id : keySet()) {
+            V permission = get(id);
+            if (permission.canSubstitute() &&  permission.getErsatzChain().equals(ersatzID)) {
+                permissions.add(permission);
+            }
+        }
+        return ids;
+    }*/
+
+/*
     @Override
     public Identifier getOriginalClient(Identifier ersatzID) {
+        PermissionList permissions = new PermissionList();
+        for (Identifier id : keySet()) {
+            V permission = get(id);
+            if (permission.canSubstitute() &&  permission.getErsatzID().equals(ersatzID)) {
+                permissions.add(permission);
+            }
+        }
         return null;
     }
+*/
 
     @Override
     public List<Identifier> getClients(Identifier adminID) {
@@ -110,13 +136,20 @@ public class MemoryPermissionStore<V extends Permission> extends MemoryStore<V> 
         if (clients == null) return permissions;
         for (IDTriple id : clients) {
             if (id.clientID != null && id.clientID.equals(clientID)) {
-
                 permissions.add(get(id.pID));
             }
         }
         return permissions;
     }
+    @Override
+    public PermissionList getErsatzChains(Identifier adminID, Identifier clientID) {
+        return PermissionStoreUtil.getErsatzChains(this, adminID, clientID);
+    }
 
+    @Override
+    public Permission getErsatzChain(Identifier adminID, Identifier clientID, Identifier ersatzID) {
+        return PermissionStoreUtil.getErsatzChain(this, adminID, clientID, ersatzID);
+    }
     @Override
     public boolean hasEntry(Identifier adminID, Identifier clientID) {
         return !get(adminID, clientID).isEmpty();
@@ -155,11 +188,11 @@ public class MemoryPermissionStore<V extends Permission> extends MemoryStore<V> 
         super.clear();
     }
 
-    protected void removeFromClients(V p){
+    protected void removeFromClients(V p) {
         List<IDTriple> clients = clientMap.get(p.getClientID());
-        if(clients == null) return;
-        for(IDTriple triple : clients){
-            if(triple.pID.equals(p.getIdentifier())){
+        if (clients == null) return;
+        for (IDTriple triple : clients) {
+            if (triple.pID.equals(p.getIdentifier())) {
                 clients.remove(triple);
             }
         }
@@ -170,16 +203,17 @@ public class MemoryPermissionStore<V extends Permission> extends MemoryStore<V> 
      * Part of the contract for this store is that saving a permission with an updated ID (AC or client)
      * should remove the old value, which means we have to clean out stale entries from the clientMpa
      * and adminMap. The problem with a memory store is that the permission
+     *
      * @param p
      */
-    protected void removeFromAdmins(V p){
+    protected void removeFromAdmins(V p) {
         List<IDTriple> admins = adminMap.get(p.getAdminID());
-            if(admins == null) return;
-            for(IDTriple triple : admins){
-                if(triple.pID.equals(p.getIdentifier())){
-                    admins.remove(triple);
-                }
+        if (admins == null) return;
+        for (IDTriple triple : admins) {
+            if (triple.pID.equals(p.getIdentifier())) {
+                admins.remove(triple);
             }
+        }
     }
 
     @Override
@@ -190,10 +224,10 @@ public class MemoryPermissionStore<V extends Permission> extends MemoryStore<V> 
         // store interface and you cannot track who has permissions to what.
 
         V value = (V) value2.clone();
-        if(containsKey(key)){
+        if (containsKey(key)) {
             // remove the current value (in case, say, the admin client ID changes) because otherwise you
             // will get orphans in the admin and client maps.
-            V p = get (key);
+            V p = get(key);
             removeFromAdmins(p);
             removeFromClients(p);
             remove(key);
@@ -222,10 +256,10 @@ public class MemoryPermissionStore<V extends Permission> extends MemoryStore<V> 
 
     @Override
     public V remove(Object key) {
-        if(containsKey(key)){
+        if (containsKey(key)) {
             V p = get(key);
-         removeFromAdmins(p);
-         removeFromClients(p);
+            removeFromAdmins(p);
+            removeFromClients(p);
 
         }
         return super.remove(key);

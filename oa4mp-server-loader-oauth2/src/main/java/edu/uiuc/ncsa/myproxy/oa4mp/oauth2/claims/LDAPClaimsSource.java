@@ -333,12 +333,17 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
             String[] searchAttributes = attributes.keySet().toArray(new String[]{});
             searchControls.setReturningAttributes(searchAttributes);
         }
-        String addFilter = "";
+        //String addFilter = "";
         // For all questions about the filter, refer to https://tools.ietf.org/search/rfc4515
+        String filter;
         if (!StringUtils.isTrivial(getLDAPCfg().getAdditionalFilter())) {
-            addFilter = "(" + getLDAPCfg().getAdditionalFilter() + ")";
+            // If they specify it, use the whole thing.
+            //filter = "(" + getLDAPCfg().getAdditionalFilter() + ")";
+            filter = getLDAPCfg().getAdditionalFilter();
+        }else{
+            // if the filter is not specified,, try to construct it.
+            filter = "(" + getSearchFilterAttribute() + "=" + userID + ")";
         }
-        String filter = "(&(" + getSearchFilterAttribute() + "=" + userID + ")" + addFilter + ")";
         String contextName = getLDAPCfg().getContextName();
         if (contextName == null) {
             // You could use this with the search base but that gets complicated. We lookup the context

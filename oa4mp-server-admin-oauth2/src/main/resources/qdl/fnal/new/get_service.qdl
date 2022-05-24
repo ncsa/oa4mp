@@ -15,21 +15,23 @@
     look for \u235d ⍝
 */
 block[
-            // ini. := file_read('vfs#/scripts/fnal/ldap.ini',2);
-            ini. := file_read('/home/ncsa/dev/csd/config/fnal-ldap.ini',2);
+            // ini. := file_read('vfs#/scripts/fnal/ldap.ini',2).'dev';
+            ini. := file_read('/home/ncsa/dev/csd/config/fnal-ldap.ini',2).'prod';
+            say(to_string(ini.));
                       service_cfg. := new_template('ldap');
              service_cfg.auth_type := 'simple';
-               service_cfg.address := 'ldap-test.cilogon.org';
+               //service_cfg.address := 'ldap-test.cilogon.org';
+               service_cfg.address := ini.'server';
                   service_cfg.port := 636;
             service_cfg.claim_name := 'uid';
-//           service_cfg.search_base := 'ou=services,o=Fermilab,o=CO,dc=cilogon,dc=org';
-           service_cfg.search_base := 'ou=services,o=Fermilab,o=CO,dc=dev,dc=fnal,dc=gov';
+           //service_cfg.search_base := 'ou=services,o=Fermilab,o=CO,dc=dev,dc=fnal,dc=gov';
+           service_cfg.search_base := ini.'service_search_base';
          service_cfg.fail_on_error := true;
                   service_cfg.type := 'ldap';
              service_cfg.ldap_name := 'voPersonExternalID';
     service_cfg.search_attributes. :=  [EPPN, EPE, VOPAUID];
-              service_cfg.username := ini.dev.name;
-              service_cfg.password := ini.dev.pwd;
+              service_cfg.username := ini.'name';
+              service_cfg.password := ini.'pwd';
 
-    return(get_claims(create_source(service_cfg.), script_args(script_args()-1)));
+    return(get_claims(create_source(service_cfg.), script_args(0)));
 ];

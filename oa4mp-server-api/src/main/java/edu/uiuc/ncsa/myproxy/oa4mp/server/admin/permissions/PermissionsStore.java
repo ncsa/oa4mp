@@ -25,12 +25,7 @@ public interface PermissionsStore<V extends Permission> extends Store<V> {
      */
      public List<Identifier> getAdmins(Identifier clientID);
 
-    /**
-     * For a given client id, return all of the substitutes allowed.
-     * @param clientID
-     * @return
-     */
-     public List<Identifier> getErsatzClients(Identifier clientID);
+
 
     /**
      * Given an ersatz client's ID, find the original client. This may
@@ -41,21 +36,35 @@ public interface PermissionsStore<V extends Permission> extends Store<V> {
      * @param ersatzID
      * @return
      */
-     public List<Identifier> getAllOriginalClient(Identifier ersatzID);
+   //  public List<Identifier> getAntecessors(Identifier ersatzID);
 
-    /**
-     * Get the client that precedes this in the substitution hierarchy.
-     * @param ersatzID
-     * @return
-     */
-     public Identifier getOriginalClient(Identifier ersatzID);
+
     /**
      * Retrieve a permission from the admin and client identifier.
      * @param adminID
      * @param clientID
      * @return
      */
+
     public PermissionList get(Identifier adminID, Identifier clientID);
+
+    /**
+     * Returns the chain of ersatz clients for a given admin and provisioning client.
+     * Access the list using {@link Permission#getErsatzChain()}.
+     * @param adminID
+     * @param clientID
+     * @return
+     */
+    public PermissionList getErsatzChains(Identifier adminID, Identifier clientID);
+
+    /**
+     * Get the specific permission with the chain starting with clientID and ending with ersatzID.
+     * @param adminID
+     * @param clientID
+     * @param ersatzID
+     * @return
+     */
+    public Permission getErsatzChain(Identifier adminID, Identifier clientID, Identifier ersatzID);
 
     /**
      * Returns whether or not there is an entry for this pair of identifiers. There is at most

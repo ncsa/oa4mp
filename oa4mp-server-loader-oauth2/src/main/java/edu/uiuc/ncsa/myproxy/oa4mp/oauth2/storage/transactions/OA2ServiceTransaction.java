@@ -8,6 +8,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.OA4MPServiceTransaction;
 import edu.uiuc.ncsa.security.core.DateComparable;
 import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
 import edu.uiuc.ncsa.security.delegation.token.impl.AuthorizationGrantImpl;
@@ -359,6 +360,45 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
 
     public void setATData(JSONObject atData) {
         getState().put(AT_DATA_KEY, atData);
+    }
+
+    String PROVISIONING_ADMIN_ID = "provisioning_admin_id";
+
+    public Identifier getProvisioningAdminID() {
+        if (!getState().containsKey(PROVISIONING_ADMIN_ID)) {
+            return null;
+        }
+        return BasicIdentifier.newID(getState().getString(PROVISIONING_ADMIN_ID));
+    }
+
+    /**
+     * Sets the provisioning admin partly so we don't have to look it up again and partly so
+     * that for very, very long lived transactions, there is absolutely no possibility
+     * that the VO can change.
+     *
+     * @param provisioningAdminID
+     */
+    public void setProvisioningAdminID(Identifier provisioningAdminID) {
+        getState().put(PROVISIONING_ADMIN_ID, provisioningAdminID.toString());
+    }
+
+    String PROVISIONING_CLIENT_ID = "provisioning_client_id";
+
+    /**
+     * Set if this transaction is from a substitution. This is the ID of the client
+     * that originally started the flow.
+     *
+     * @return
+     */
+    public Identifier getProvisioningClientID() {
+        if (!getState().containsKey(PROVISIONING_CLIENT_ID)) {
+            return null;
+        }
+        return BasicIdentifier.newID(getState().getString(PROVISIONING_CLIENT_ID));
+    }
+
+    public void setProvisioningClientID(Identifier provisioningClientID) {
+        getState().put(PROVISIONING_CLIENT_ID, provisioningClientID.toString());
     }
 
     String RT_DATA_KEY = "rt_data"; // refresh token contents

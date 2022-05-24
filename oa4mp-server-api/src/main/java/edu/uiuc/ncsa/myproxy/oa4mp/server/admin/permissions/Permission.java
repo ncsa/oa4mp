@@ -3,6 +3,8 @@ package edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.IdentifiableImpl;
 
+import java.util.List;
+
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 10/11/16 at  11:00 AM
@@ -28,16 +30,25 @@ public class Permission extends IdentifiableImpl {
     Identifier clientID;
     Identifier adminID;
 
-    public Identifier getErsatzID() {
-        return ersatzID;
+    /**
+     * The chain (i.e. list) of ersatz clients. Note that this does not contain the
+     * provisioning client, so if A ≻ α ≻ β ≻ γ , the A is the provisioning client
+     * and the returned result is the list of ids [α, β, γ]
+     * @return
+     */
+    public List<Identifier> getErsatzChain() {
+        return ersatzChain;
     }
 
-    public void setErsatzID(Identifier ersatzID) {
-        this.ersatzID = ersatzID;
+    public void setErsatzChain(List<Identifier> ersatzID) {
+        this.ersatzChain = ersatzID;
     }
 
-    Identifier ersatzID;
+    List<Identifier> ersatzChain;
 
+    public boolean hasErsatzChain(){
+        return ersatzChain !=null && !ersatzChain.isEmpty();
+    }
     public boolean canSubstitute() {
         return substitute;
     }

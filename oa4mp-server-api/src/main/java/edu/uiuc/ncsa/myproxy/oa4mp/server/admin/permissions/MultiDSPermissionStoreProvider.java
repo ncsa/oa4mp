@@ -25,6 +25,6 @@ public class MultiDSPermissionStoreProvider<V extends Permission> extends MultiT
     @Override
     public PermissionsStore<V> getDefaultStore() {
         logger.info("Using default in memory permission store.");
-        return new MemoryPermissionStore<>(permissionProvider);
+        return new PermissionMemoryStore<>(permissionProvider);
     }
 }

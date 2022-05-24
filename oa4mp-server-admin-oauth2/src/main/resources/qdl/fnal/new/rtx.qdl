@@ -45,7 +45,7 @@ block[
      ][
        	 say('*** FNAL rtx got ' + CS + ': ' + input_form(cs.));
 
-          record. :=  script_load('fnal/new/get_service.qdl', script_args(0),script_args(1), (cs.0-CS_HEAD)+'@fnal.gov');
+          record. :=  script_load('fnal/new/get_service.qdl',  (cs.0-CS_HEAD)+'@fnal.gov');
 
          say('*** FNAL rtx record =' + to_string(record.));
          if[

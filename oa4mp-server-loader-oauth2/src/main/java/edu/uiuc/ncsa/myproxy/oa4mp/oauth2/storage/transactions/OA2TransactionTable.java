@@ -77,4 +77,12 @@ public class OA2TransactionTable extends DSTransactionTable {
     public String getByProxyID() {
            return "SELECT * FROM " + getFQTablename() + " WHERE " + getOA2Keys().proxyID() + "= ?";
        }
+
+    public String getByAccessTokenAndClientStatement() {
+           return "SELECT * FROM " + getFQTablename() + " WHERE " + getOA2Keys().accessToken() + "=? AND " + getOA2Keys().clientKey() + "=?";
+       }
+    public String getByRefreshTokenAndClientStatement() {
+           return "SELECT * FROM " + getFQTablename() + " WHERE " + getOA2Keys().refreshToken() + "=? AND " + getOA2Keys().clientKey() + "=?";
+       }
+
 }

@@ -1,19 +1,21 @@
 package edu.uiuc.ncsa.oa2.servlet;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2ConfigurationLoader;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.*;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ScriptRuntimeEngineFactory;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2TStoreInterface;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RefreshTokenStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.TokenInfoRecord;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.TokenInfoRecordMap;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2TStoreInterface;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo.VirtualOrganization;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.UITokenUtils;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.Permission;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionsStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.IssuerTransactionState;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.security.core.Identifier;
@@ -39,6 +41,7 @@ import edu.uiuc.ncsa.security.servlet.ServiceClientHTTPException;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
 import edu.uiuc.ncsa.security.storage.XMLMap;
+import edu.uiuc.ncsa.security.storage.sql.internals.ColumnMap;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import net.sf.json.JSONArray;
@@ -444,15 +447,114 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         switch (subjectTokenType) {
             case RFC8693Constants.ACCESS_TOKEN_TYPE:
                 accessToken = OA2TokenUtils.getAT(subjectToken, oa2se, keys);
-                t = (OA2ServiceTransaction) getTransactionStore().get(accessToken);
+                t = ((OA2TStoreInterface) getTransactionStore()).get(accessToken, client.getIdentifier());
                 break;
             case RFC8693Constants.REFRESH_TOKEN_TYPE:
                 refreshToken = OA2TokenUtils.getRT(subjectToken, oa2se, keys);
                 RefreshTokenStore rts = (RefreshTokenStore) getTransactionStore();
-                t = rts.get(refreshToken);
+                t = (OA2ServiceTransaction) rts.get(refreshToken, client.getIdentifier());
                 break;
             case RFC8693Constants.ID_TOKEN_TYPE:
                 throw new OA2ATException(OA2Errors.INVALID_GRANT, "ID token exchange not supported", t.getRequestState());
+        }
+        /*
+         New 𝕰𝖗s𝖆𝖙𝖟 clients: It is possible that if there is no transaction at this point, a substitution
+         is starting. In that case we have to see if there is a transaction at all with this
+         token, then check if the original client on the token delegates to the given requesting
+         client.
+         If so, clone the transaction, change the temp_token (which MUST be unique since it is the primary key)
+         update the client and save it. Continue as if this were a regular request.
+         */
+        /*
+        Topography of the store. Auth grants (called temp_token for historical reasons) are
+        unique identifiers. If there are for aflow with AG == A, then the new flow has
+        AG A&eid=hash where the has is a hash of the ersatz client ID (ensuring that the identifier
+        is unique and not too long to hit database limits for primary keys). Access tokens
+        and refresh tokens, however, are NOT unique in the database
+         */
+        if (t == null) {
+            switch (subjectTokenType) {
+                case RFC8693Constants.ACCESS_TOKEN_TYPE:
+                    t = (OA2ServiceTransaction) getTransactionStore().get(accessToken);
+                    break;
+                case RFC8693Constants.REFRESH_TOKEN_TYPE:
+                    RefreshTokenStore rts = (RefreshTokenStore) getTransactionStore();
+                    t = rts.get(refreshToken);
+                    break;
+            }
+            if (t != null) {
+                // found something under another client id. Check for substitution
+                PermissionsStore<? extends Permission> pStore = getOA2SE().getPermissionStore();
+                List<Identifier> adminIDS = pStore.getAdmins(client.getIdentifier());
+                if (adminIDS.isEmpty()) {
+                    // If the client is not managed, it should not be substituting for anything.
+                    throw new OA2GeneralError(OA2Errors.UNAUTHORIZED_CLIENT,
+                            "no substitutions allowed for unmanaged clients",
+                            HttpStatus.SC_UNAUTHORIZED, null);
+                }
+                if (1 < adminIDS.size()) {
+                    // So if there is a client managed by multiple admins, we don't just switch
+                    // virtual organizations in the middle. No hijacking allowed. This is possible to do, but generally
+                    // admins do not share clients, so we'll flag it as an exception here and if this
+                    // ever needs to change, this tells us it is not working.
+                    throw new OA2GeneralError(OA2Errors.UNAUTHORIZED_CLIENT,
+                            "multiple administrators for a managed client is not allowed",
+                            HttpStatus.SC_UNAUTHORIZED, null);
+
+                }
+
+                Permission p = pStore.getErsatzChain(adminIDS.get(0), t.getOA2Client().getIdentifier(), client.getIdentifier());
+
+                if (p == null) {
+                    // This client cannot sub in the original flow.
+                    log("client \"" + client.getIdentifier() + "\" does not have permission to sub for \"" + t.getOA2Client().getIdentifier() + "\".");
+                    throw new OA2GeneralError(OA2Errors.UNAUTHORIZED_CLIENT,
+                            "client does not have permission to substitute, access denied",
+                            HttpStatus.SC_UNAUTHORIZED, null);
+
+                }
+                // now we can clone the transaction
+                ColumnMap map = new ColumnMap();
+                getTransactionStore().getXMLConverter().toMap(t, map);
+                OA2ServiceTransaction t2 = (OA2ServiceTransaction) getTransactionStore().getXMLConverter().fromMap(map, null);
+                //Identifier id = t2.getIdentifier();
+                //id = BasicIdentifier.newID(id.toString() + "&eid=" + DigestUtils.sha1Hex(client.getIdentifierString()));
+                //t2.setIdentifier(id);
+                // These must be unique to go into the store, but are immediately replaced below with a TX record.
+                // All that matters is they exist and be different from anything else present.
+                AuthorizationGrantImpl ag = (AuthorizationGrantImpl) getTF2().getAuthorizationGrant();
+                AccessTokenImpl at = getTF2().getAccessToken();
+                RefreshTokenImpl rt = getTF2().getRefreshToken();
+                t2.setIdentifier(BasicIdentifier.newID(ag.getJti()));
+                t2.setAccessToken(at);
+                t2.setRefreshToken(rt);
+                // Need inheritance from provisioning client,
+                try {
+                    client = createErsatz(t.getOA2Client(), p.getErsatzChain());
+                } catch (UnknownClientException ucx) {
+                    throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
+                            ucx.getMessage(), HttpStatus.SC_INTERNAL_SERVER_ERROR,
+                            t.getRequestState());
+                }
+                t2.setProvisioningClientID(t.getOA2Client().getIdentifier()); // So we can find it later
+                t2.setProvisioningAdminID(adminIDS.get(0));
+                t2.setClient(client);
+                getTransactionStore().save(t2);
+                // rock on. A new transaction has been created for this and the flow from the original may now diverge.
+                t = t2;
+            }
+        }
+        if (t != null && t.getOA2Client().isErsatzClient()) {
+            // fix the client with inheritance
+            try {
+                Permission p = getOA2SE().getPermissionStore().getErsatzChain(t.getProvisioningAdminID(), t.getProvisioningClientID(), client.getIdentifier());
+                client = createErsatz(t.getOA2Client(), p.getErsatzChain());
+                t.setClient(client);
+            } catch (UnknownClientException ucx) {
+                throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
+                        ucx.getMessage(), HttpStatus.SC_INTERNAL_SERVER_ERROR,
+                        t.getRequestState());
+            }
         }
 
         if (t == null) {
@@ -466,7 +568,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         // Don't let an authorized client access anything unless it is the client
         // of record in the transaction -- that way a valid client can't send someone else's
         // token and get information.
-        if (!t.getClient().getIdentifierString().equals(client.getIdentifierString())) {
+/*        if (!t.getClient().getIdentifierString().equals(client.getIdentifierString())) {
             // NOTE don't throw an OA2 AT Exception here since that returns some state about
             // the original client. Wrong client means it bombs.
             if (!client.isErsatzClient()) {
@@ -484,7 +586,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                         HttpStatus.SC_UNAUTHORIZED, null);
             }
 
-        }
+        }*/
         // Finally can check access here. Access for exchange is same as for refresh token.
         if (!t.getFlowStates().acceptRequests || !t.getFlowStates().refreshToken) {
             throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
@@ -614,14 +716,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         response.setCharacterEncoding("UTF-8");
 
         newTXR.setValid(true); // automatically.
-        oa2se.getTxStore().
-
-                save(newTXR);
-
-        getTransactionStore().
-
-                save(t);
-
+        oa2se.getTxStore().save(newTXR);
+        getTransactionStore().save(t);
         PrintWriter osw = response.getWriter();
         rfcClaims.write(osw);
         osw.flush();
@@ -630,6 +726,48 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
 
     }
 
+    /**
+     * Takes a substitution chain and does the overrides. Any int or long < 0 is assumed unset
+     * and is skipped.
+     *
+     * @param provisioningClient
+     * @param ersatzClientList
+     * @return
+     */
+    protected OA2Client createErsatz(OA2Client provisioningClient, List<Identifier> ersatzClientList) {
+        ColumnMap provisioningMap = new ColumnMap();
+        getOA2SE().getClientStore().getMapConverter().toMap(provisioningClient, provisioningMap);
+        for (Identifier id : ersatzClientList) {
+            OA2Client currentClient = (OA2Client) getClient(id);
+            if (currentClient == null) {
+                throw new UnknownClientException("client \"" + id + "\" does not exist");
+            }
+            ColumnMap map = new ColumnMap();
+            getOA2SE().getClientStore().getMapConverter().toMap(currentClient, map);
+            for (String key : map.keySet()) {
+                Object obj = map.get(key);
+                if (obj instanceof Long) {
+                    long value = (Long) obj;
+                    if (0 <= value) {
+                        provisioningMap.put(key, value);
+                    }
+                } else {
+                    if (obj instanceof Integer) {
+                        int value = (Integer) obj;
+                        if (0 <= value) {
+                            provisioningMap.put(key, value);
+                        }
+                    } else {
+                        provisioningMap.put(key, obj);
+                    }
+                }
+            }
+        }
+
+        OA2Client client = (OA2Client) getOA2SE().getClientStore().getMapConverter().fromMap(provisioningMap, null);
+
+        return client;
+    }
 
     /**
      * Convert a string or list of strings to a list of them. This is for lists of space delimited values

@@ -9,6 +9,7 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.delegation.storage.TransactionStore;
 import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
+import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
 
 import java.util.List;
 
@@ -22,7 +23,9 @@ public interface OA2TStoreInterface<V extends OA2ServiceTransaction> extends Sto
     @Override
     V get(RefreshToken refreshToken);
 
- //   V getByRefreshToken(RefreshToken refreshToken);
+
+
+    V get(AccessTokenImpl accessToken, Identifier clientID);
 
     @Override
     List<V> getByUsername(String username);

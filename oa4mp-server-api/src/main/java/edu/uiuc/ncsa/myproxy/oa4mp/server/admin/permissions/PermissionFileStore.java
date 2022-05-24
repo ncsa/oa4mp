@@ -37,12 +37,12 @@ public class PermissionFileStore<V extends Permission> extends FileStore<V> impl
     @Override
     public List<Identifier> getAdmins(Identifier clientID) {
         LinkedList<Identifier> admins = new LinkedList<>();
-        for(Permission p: values()){
-                   if(p.getClientID()!= null && p.getClientID().equals(clientID)){
-                       if(p.getAdminID()!=null) {
-                           admins.add(p.getAdminID());
-                       }
-                   }
+        for (Permission p : values()) {
+            if (p.getClientID() != null && p.getClientID().equals(clientID)) {
+                if (p.getAdminID() != null) {
+                    admins.add(p.getAdminID());
+                }
+            }
         }
         return admins;
     }
@@ -50,14 +50,14 @@ public class PermissionFileStore<V extends Permission> extends FileStore<V> impl
     @Override
     public List<Identifier> getClients(Identifier adminID) {
         LinkedList<Identifier> clients = new LinkedList<>();
-         for(Permission p: values()){
-                    if(p.getAdminID()!= null && p.getAdminID().equals(adminID)){
-                        if(p.getClientID()!=null) {
-                            clients.add(p.getClientID());
-                        }
-                    }
-         }
-         return clients;
+        for (Permission p : values()) {
+            if (p.getAdminID() != null && p.getAdminID().equals(adminID)) {
+                if (p.getClientID() != null) {
+                    clients.add(p.getClientID());
+                }
+            }
+        }
+        return clients;
     }
 
     @Override
@@ -68,33 +68,56 @@ public class PermissionFileStore<V extends Permission> extends FileStore<V> impl
     @Override
     public PermissionList get(Identifier adminID, Identifier clientID) {
         PermissionList permissions = new PermissionList();
-         for(Permission p: values()){
-                    if(p.getAdminID()!= null && p.getClientID()!=null){
-                        if(p.getClientID().equals(clientID) && p.getAdminID().equals(adminID)) {
-                            permissions.add(p);
-                        }
-                    }
-         }
-         return permissions;
+        for (Permission p : values()) {
+            if (p.getAdminID() != null && p.getClientID() != null) {
+                if (p.getClientID().equals(clientID) && p.getAdminID().equals(adminID)) {
+                    permissions.add(p);
+                }
+            }
+        }
+        return permissions;
     }
+
+    @Override
+    public PermissionList getErsatzChains(Identifier adminID, Identifier clientID) {
+        return PermissionStoreUtil.getErsatzChains(this, adminID, clientID);
+    }
+
     @Override
     public boolean hasEntry(Identifier adminID, Identifier clientID) {
-        return !get(adminID,clientID).isEmpty();
+        return !get(adminID, clientID).isEmpty();
     }
 
     @Override
-    public List<Identifier> getErsatzClients(Identifier clientID) {
-        return null;
+    public Permission getErsatzChain(Identifier adminID, Identifier clientID, Identifier ersatzID) {
+        return PermissionStoreUtil.getErsatzChain(this, adminID, clientID, ersatzID);
     }
 
-    @Override
-    public List<Identifier> getAllOriginalClient(Identifier ersatzID) {
-        return null;
-    }
+/*    @Override
+    public PermissionList getErsatzChains(Identifier clientID) {
+        PermissionList permissions = new PermissionList();
+        for (Identifier id : keySet()) {
+            V permission = get(id);
+            if (permission.canSubstitute() &&  permission.getClientID().equals(clientID)) {
+                permissions.add(permission);
+            }
+        }
+        return permissions;
+    }*/
 
-    @Override
-    public Identifier getOriginalClient(Identifier ersatzID) {
-        return null;
-    }
+/*    @Override
+    public List<Identifier> getAntecessors(Identifier ersatzID) {
+        List<Identifier> ids = new ArrayList<>();
+        PermissionList permissions = new PermissionList();
+        for (Identifier id : keySet()) {
+            V permission = get(id);
+            if (permission.canSubstitute() &&  permission.getErsatzChain().equals(ersatzID)) {
+                permissions.add(permission);
+            }
+        }
+        return ids;
+    }*/
+
+
 }
 

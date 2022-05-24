@@ -1,15 +1,18 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8628State;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.TokenInfoRecord;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.TokenInfoRecordMap;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8628State;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.DSFSTransactionStore;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
 import edu.uiuc.ncsa.security.delegation.token.TokenForge;
+import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
+import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
+import org.apache.commons.codec.digest.DigestUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,16 +39,36 @@ public class OA2FSTStore<V extends OA2ServiceTransaction> extends DSFSTransactio
     }
 
     @Override
+    public V get(AccessTokenImpl accessToken, Identifier clientID) {
+        //String newKey = accessToken.getJti().toString() + "#" + clientID;
+        return getIndexEntry(getSubIndexKey(accessToken.getJti().toString(), clientID));
+    }
+
+    @Override
+    public V get(RefreshTokenImpl refreshToken, Identifier clientID) {
+        return getIndexEntry(getSubIndexKey(refreshToken.getJti().toString(), clientID));
+    }
+
+    protected String getSubIndexKey(String token, Identifier clientID){
+        return DigestUtils.sha1Hex(clientID + "#" + token);
+    }
+    @Override
     public V realRemove(V thingie) {
         super.realRemove(thingie);
         if (thingie.getRefreshToken() != null) {
             removeIndexEntry(thingie.getRefreshToken().getToken());
         }
-        if(thingie.getUsername() != null){
+        if (thingie.getUsername() != null) {
             removeIndexEntry(thingie.getUsername());
         }
-        if(thingie.getProxyId() != null){
+        if (thingie.getProxyId() != null) {
             removeIndexEntry(thingie.getProxyId());
+        }
+        if(thingie.hasAccessToken()){
+            removeIndexEntry(getSubIndexKey(thingie.getAccessToken().getJti().toString(), thingie.getOA2Client().getIdentifier()));
+        }
+        if(thingie.hasRefreshToken()){
+            removeIndexEntry(getSubIndexKey(thingie.getRefreshToken().getJti().toString(), thingie.getOA2Client().getIdentifier()));
         }
 
         return thingie;
@@ -57,13 +80,20 @@ public class OA2FSTStore<V extends OA2ServiceTransaction> extends DSFSTransactio
         try {
             if (t.hasRefreshToken()) {
                 createIndexEntry(t.getRefreshToken().getToken(), t.getIdentifierString());
+                // The next is for creating an index entry to track substitution clients
+                createIndexEntry(getSubIndexKey(t.getRefreshToken().getJti().toString(), t.getOA2Client().getIdentifier()), t.getIdentifierString());
             }
             if (t.getUsername() != null) {
                 createIndexEntry(t.getUsername(), t.getIdentifierString());
             }
-            if(t.getProxyId() != null){
+            if (t.getProxyId() != null) {
                 createIndexEntry(t.getProxyId(), t.getIdentifierString());
             }
+            // The next is for creating an index entry to track substitution clients
+            if (t.hasAccessToken()) {
+                createIndexEntry(getSubIndexKey(t.getAccessToken().getJti().toString(), t.getOA2Client().getIdentifier()), t.getIdentifierString());
+            }
+
         } catch (IOException e) {
             throw new GeneralException("Error serializing item " + t + "to file ");
         }
@@ -75,7 +105,7 @@ public class OA2FSTStore<V extends OA2ServiceTransaction> extends DSFSTransactio
         List<V> list = new ArrayList<>();
         for (Identifier id : keySet()) {
             V transaction = get(id);
-            if (transaction != null ) {
+            if (transaction != null) {
                 list.add(transaction);
             }
         }
@@ -87,7 +117,7 @@ public class OA2FSTStore<V extends OA2ServiceTransaction> extends DSFSTransactio
         TokenInfoRecordMap records = new TokenInfoRecordMap();
         for (Identifier id : keySet()) {
             V transaction = get(id);
-            if (transaction != null ) {
+            if (transaction != null) {
                 TokenInfoRecord tir = new TokenInfoRecord();
                 tir.fromTransaction(transaction);
                 records.put(tir);
@@ -112,15 +142,15 @@ public class OA2FSTStore<V extends OA2ServiceTransaction> extends DSFSTransactio
     }
 
     @Override
-      public V getByUserCode(String userCode) {
-            for (Identifier id : keySet()) {
-                V transaction = get(id);
-                if (transaction != null && userCode.equals(transaction.getUserCode())) {
-                    return transaction;
-                }
+    public V getByUserCode(String userCode) {
+        for (Identifier id : keySet()) {
+            V transaction = get(id);
+            if (transaction != null && userCode.equals(transaction.getUserCode())) {
+                return transaction;
             }
-            return null;
-      }
+        }
+        return null;
+    }
 
     @Override
     public V getByProxyID(Identifier proxyID) {

@@ -11,7 +11,10 @@ import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2Asset;
 import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2ClientEnvironment;
 import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2MPService;
 import edu.uiuc.ncsa.security.core.Identifier;
-import edu.uiuc.ncsa.security.core.util.*;
+import edu.uiuc.ncsa.security.core.util.DateUtils;
+import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
+import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.delegation.client.request.RTResponse;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.Token;
@@ -71,9 +74,11 @@ public class OA2CLCCommands extends CLCCommands {
         setVerbose(!silentMode);
         oa2CommandLineClient.setVerbose(!silentMode);
     }
+
     protected MetaDebugUtil getDebugger() throws Exception {
-        return ((OA2ClientEnvironment)oa2CommandLineClient.getEnvironment()).getMetaDebugUtil();
+        return ((OA2ClientEnvironment) oa2CommandLineClient.getEnvironment()).getMetaDebugUtil();
     }
+
     public OA2CLCCommands(MyLoggingFacade logger,
                           OA2CommandLineClient oa2CommandLineClient) throws Exception {
         super(logger, null);
@@ -241,14 +246,14 @@ public class OA2CLCCommands extends CLCCommands {
     }
 
     public long getDfInterval() {
-        if(dfResponse == null || !dfResponse.containsKey(INTERVAL)){
+        if (dfResponse == null || !dfResponse.containsKey(INTERVAL)) {
             return -1L;
         }
         return dfResponse.getLong(INTERVAL);
     }
 
     public long getDfExpiresIn() {
-        if(dfResponse == null || !dfResponse.containsKey(RFC8628Constants2.EXPIRES_IN)){
+        if (dfResponse == null || !dfResponse.containsKey(RFC8628Constants2.EXPIRES_IN)) {
             return -1L;
         }
         return dfResponse.getLong(RFC8628Constants2.EXPIRES_IN);
@@ -765,8 +770,8 @@ public class OA2CLCCommands extends CLCCommands {
      */
     Throwable lastException;
 
-    public boolean hadException(){
-        return lastException!=null;
+    public boolean hadException() {
+        return lastException != null;
     }
 
     private void df_get_at(InputLine inputLine) {
@@ -785,13 +790,13 @@ public class OA2CLCCommands extends CLCCommands {
                     ss = scopes + " " + ss;
                     copyOfParams.put(SCOPE, ss);
                 }
-            }else{
+            } else {
                 copyOfParams.put(SCOPE, scopes);
             }
             try {
                 currentATResponse = getService().rfc8628Request(dummyAsset, deviceCode, copyOfParams);
                 processATResponse(inputLine);
-            }catch(Throwable t){
+            } catch (Throwable t) {
                 lastException = t;
                 throw t;
             }
@@ -869,7 +874,7 @@ public class OA2CLCCommands extends CLCCommands {
             for (String key : userInfo.getMap().keySet()) {
                 say("          " + key + " = " + userInfo.getMap().get(key));
             }
-        }catch (Throwable t){
+        } catch (Throwable t) {
             lastException = t;
             throw t;
         }
@@ -968,7 +973,9 @@ public class OA2CLCCommands extends CLCCommands {
 
         printTokens(inputLine.hasArg(NO_VERIFY_JWT), printRaw);
     }
-                                                 public static final String RAW_FLAG = "-raw";
+
+    public static final String RAW_FLAG = "-raw";
+
     private void showTokensHelp() {
         say("tokens [" + NO_VERIFY_JWT + "]");
         sayi("Usage: Print the current list of tokens");
@@ -1009,8 +1016,8 @@ public class OA2CLCCommands extends CLCCommands {
             } else {
                 sayi("JWT access token:" + token.toString(1));
                 AccessTokenImpl at = (AccessTokenImpl) accessToken;
-                if(printRaw){
-                   sayi("raw token=" + at.getToken());
+                if (printRaw) {
+                    sayi("raw token=" + at.getToken());
                 }
                 if (token.containsKey(OA2Claims.EXPIRATION)) {
                     Date d = new Date();
@@ -1118,7 +1125,7 @@ public class OA2CLCCommands extends CLCCommands {
             if (isPrintOuput()) {
                 printTokens(inputLine.hasArg(NO_VERIFY_JWT), false);
             }
-        }catch(Throwable t){
+        } catch (Throwable t) {
             lastException = t;
             throw t;
         }
@@ -1228,7 +1235,7 @@ public class OA2CLCCommands extends CLCCommands {
             } else {
                 printToken(getDummyAsset().getRefreshToken(), false, true);
             }
-        }catch (Throwable t){
+        } catch (Throwable t) {
             lastException = t;
             throw t;
         }
@@ -1254,7 +1261,11 @@ public class OA2CLCCommands extends CLCCommands {
 
 
     public void fromJSON(JSONObject json) throws Exception {
-        if (json.containsKey(CONFIG_FILE_KEY)) {
+        fromJSON(json, true);
+    }
+
+    protected void fromJSON(JSONObject json, boolean loadStoredConfig) throws Exception {
+        if (loadStoredConfig && json.containsKey(CONFIG_FILE_KEY)) {
             // make a fake input line for loading the last configuration and run it.
             // Do this first since it clears the current state and anything loaded before it is lost.
 
@@ -1269,8 +1280,8 @@ public class OA2CLCCommands extends CLCCommands {
         if (json.containsKey(SYSTEM_MESSAGE_KEY)) {
             say(json.getString(SYSTEM_MESSAGE_KEY));
         }
-        if(json.containsKey("debugger")){
-            if(getDebugger() != null) {
+        if (json.containsKey("debugger")) {
+            if (getDebugger() != null) {
                 getDebugger().fromJSON(json.getJSONObject("debugger"));
             }
         }
@@ -1359,6 +1370,9 @@ public class OA2CLCCommands extends CLCCommands {
             showReadHelp();
             return;
         }
+        boolean loadStoredCfg = !(inputLine.hasArg(PROVISION_ONLY_FLAG) || inputLine.hasArg(PROVISION_ONLY_SHORT_FLAG));
+        inputLine.removeSwitch(PROVISION_ONLY_FLAG);
+        inputLine.removeSwitch(PROVISION_ONLY_SHORT_FLAG);
         if (0 == inputLine.getArgCount()) {
             if (saveFile == null) {
                 say("sorry, but you must specify a file");
@@ -1387,13 +1401,18 @@ public class OA2CLCCommands extends CLCCommands {
             stringBuffer.append(content + "\n");
         }
         JSONObject json = JSONObject.fromObject(stringBuffer.toString());
-        fromJSON(json);
+        fromJSON(json, loadStoredCfg);
         say("done!");
     }
 
+    public static String PROVISION_ONLY_FLAG = "-provision";
+    public static String PROVISION_ONLY_SHORT_FLAG = "-p";
+
     private void showReadHelp() {
-        say("read  path");
+        say("read  path [" + PROVISION_ONLY_SHORT_FLAG + " | " + PROVISION_ONLY_FLAG + " ]");
         sayi("Usage: Reads a saved session from a given file.");
+        sayi(PROVISION_ONLY_SHORT_FLAG + " | " + PROVISION_ONLY_FLAG + " = for erstaz clients, only provision from the configuration,");
+        sayi("   do not reload the client configuration there (i.e. keep the current client, load the tokens etc from the stored state)");
         sayi("See also: write");
     }
 
@@ -1413,14 +1432,14 @@ public class OA2CLCCommands extends CLCCommands {
         }
 
         try {
-            if(getDebugger() != null) {
+            if (getDebugger() != null) {
                 jsonObject.put("debugger", getDebugger().toJSON());
             }
         } catch (Exception e) {
-            if(isPrintOuput()){
+            if (isPrintOuput()) {
                 say("warn -- could not serialize debugger:" + e.getMessage());
             }
-            if(isVerbose()){
+            if (isVerbose()) {
                 e.printStackTrace();
             }
         }
@@ -1477,10 +1496,10 @@ public class OA2CLCCommands extends CLCCommands {
         if (currentATResponse != null) {
             JSONObject atr = new JSONObject();
             //Only serialize things that exist.
-            if(currentATResponse.getAccessToken()!=null) {
+            if (currentATResponse.getAccessToken() != null) {
                 atr.put("access_token", currentATResponse.getAccessToken().toJSON());
             }
-            if(currentATResponse.getRefreshToken()!=null) {
+            if (currentATResponse.getRefreshToken() != null) {
                 atr.put("refresh_token", currentATResponse.getRefreshToken().toJSON());
             }
             if (currentATResponse.getParameters() != null && !currentATResponse.getParameters().isEmpty()) {
@@ -1488,7 +1507,7 @@ public class OA2CLCCommands extends CLCCommands {
                 atState.putAll(currentATResponse.getParameters());
                 atr.put("parameters", atState);
             }
-            if(!atr.isEmpty()) {
+            if (!atr.isEmpty()) {
                 jsonObject.put(AT_RESPONSE_KEY, atr);
             }
         }

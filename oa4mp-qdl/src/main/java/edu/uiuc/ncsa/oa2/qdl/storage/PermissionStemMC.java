@@ -2,8 +2,14 @@ package edu.uiuc.ncsa.oa2.qdl.storage;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.Permission;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionKeys;
+import edu.uiuc.ncsa.qdl.variables.QDLList;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static edu.uiuc.ncsa.security.core.util.BasicIdentifier.newID;
 
@@ -41,8 +47,20 @@ public class PermissionStemMC<V extends Permission> extends StemConverter<V> {
         if(isStringKeyOK(stem, kk().clientID())){
             v.setClientID(newID(stem.getString(kk().clientID())));
         }
-        if(isStringKeyOK(stem, kk().ersatzID())){
-            v.setErsatzID(newID(stem.getString(kk().ersatzID())));
+        if(stem.containsKey(kk().ersatzID())){
+            List<Identifier> ids = new ArrayList<>();
+            Object obj = stem.get(kk().ersatzID());
+            // Should be a QDL list of identifiers
+            if(obj instanceof StemVariable){
+                QDLList list = ((StemVariable)obj).getQDLList();
+                for(Object element : list){
+                    if(element instanceof String){
+                        ids.add(BasicIdentifier.newID((String)element));
+
+                    }
+                }
+            }
+            v.setErsatzChain(ids);
         }
 
         if(stem.containsKey(kk().readable())){
@@ -89,8 +107,16 @@ public class PermissionStemMC<V extends Permission> extends StemConverter<V> {
         if (v.getClientID() != null) {
             stem.put(kk().clientID(), v.getClientID().toString());
         }
-        if (v.getErsatzID() != null) {
-            stem.put(kk().ersatzID(), v.getErsatzID().toString());
+        if (v.getErsatzChain() != null && !v.getErsatzChain().isEmpty()) {
+            List<Identifier> ids = v.getErsatzChain();
+            QDLList list = new QDLList();
+            // have to convert each to a string
+            for(Identifier id : ids){
+                list.add(id.toString());
+            }
+            StemVariable e = new StemVariable();
+            e.setQDLList(list);
+            stem.put(kk().ersatzID(), list);
         }
 
         stem.put(kk().substitute(), v.canSubstitute());

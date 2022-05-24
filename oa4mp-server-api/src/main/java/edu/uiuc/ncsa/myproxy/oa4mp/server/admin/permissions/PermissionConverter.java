@@ -1,9 +1,15 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions;
 
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
+import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.storage.data.ConversionMap;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
+import net.sf.json.JSONArray;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -14,16 +20,25 @@ public class PermissionConverter<V extends Permission> extends MapConverter<V> {
         super(keys, provider);
     }
 
-    protected PermissionKeys pk(){
+    protected PermissionKeys pk() {
         return (PermissionKeys) keys;
     }
+
     @Override
     public V fromMap(ConversionMap<String, Object> map, V v) {
-        V value =  super.fromMap(map, v);
+        V value = super.fromMap(map, v);
         value.setAdminID(map.getIdentifier(pk().adminID()));
         value.setClientID(map.getIdentifier(pk().clientID()));
-        if(map.containsKey(pk().ersatzID())){
-            value.setClientID(map.getIdentifier(pk().ersatzID()));
+        if (map.containsKey(pk().ersatzID()) && map.get(pk().ersatzID())!=null) {
+             JSONArray ids = JSONArray.fromObject(map.getString(pk().ersatzID()));
+             // convert back to identifiers
+            List<Identifier> x = new ArrayList<>();
+            for(Object obj: ids){
+                  if(obj instanceof String){
+                      x.add(BasicIdentifier.newID((String)obj));
+                  }
+            }
+            value.setErsatzChain(x);
         }
         value.setSubstitute(map.getBoolean(pk().substitute()));
         value.setApprove(map.getBoolean(pk().canApprove()));
@@ -39,8 +54,14 @@ public class PermissionConverter<V extends Permission> extends MapConverter<V> {
         super.toMap(value, data);
         data.put(pk().adminID(), value.getAdminID());
         data.put(pk().clientID(), value.getClientID());
-        if(value.getErsatzID()!= null){
-            data.put(pk().ersatzID(), value.getErsatzID());
+        if (value.hasErsatzChain()) {
+            // must be serialized as an array of strings
+            JSONArray array = new JSONArray();
+
+            for (Identifier id : value.getErsatzChain()) {
+                array.add(id.toString());
+            }
+            data.put(pk().ersatzID(), array.toString());
         }
         data.put(pk().substitute(), value.canSubstitute());
         data.put(pk().canApprove(), value.isApprove());

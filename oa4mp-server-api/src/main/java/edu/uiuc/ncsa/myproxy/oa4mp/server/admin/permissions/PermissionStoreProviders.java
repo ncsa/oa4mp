@@ -95,7 +95,7 @@ public class PermissionStoreProviders {
         }
     }
 
-    public static class MemoryPermissionStoreProvider<V> extends TypedProvider<MemoryPermissionStore> implements OA4MPConfigTags {
+    public static class MemoryPermissionStoreProvider<V> extends TypedProvider<PermissionMemoryStore> implements OA4MPConfigTags {
         public MemoryPermissionStoreProvider(ConfigurationNode config) {
             super(config, OA4MPConfigTags.MEMORY_STORE, OA4MPConfigTags.PERMISSION_STORE);
         }
@@ -112,13 +112,13 @@ public class PermissionStoreProviders {
         }
 
         @Override
-        public MemoryPermissionStore get() {
-            return new MemoryPermissionStore(getPermissionProvider());
+        public PermissionMemoryStore get() {
+            return new PermissionMemoryStore(getPermissionProvider());
         }
     }
 
-    public static MemoryPermissionStoreProvider<? extends MemoryPermissionStore> getM(ConfigurationNode node) {
-        MemoryPermissionStoreProvider<? extends MemoryPermissionStore> mpp = new MemoryPermissionStoreProvider<>(node);
+    public static MemoryPermissionStoreProvider<? extends PermissionMemoryStore> getM(ConfigurationNode node) {
+        MemoryPermissionStoreProvider<? extends PermissionMemoryStore> mpp = new MemoryPermissionStoreProvider<>(node);
         return mpp;
     }
 

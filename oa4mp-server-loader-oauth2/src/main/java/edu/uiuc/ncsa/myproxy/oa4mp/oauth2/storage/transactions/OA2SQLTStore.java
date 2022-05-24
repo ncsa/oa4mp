@@ -1,8 +1,8 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8628State;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.TokenInfoRecord;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.TokenInfoRecordMap;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8628State;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.DSSQLTransactionStore;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
@@ -10,6 +10,7 @@ import edu.uiuc.ncsa.security.core.exceptions.TransactionNotFoundException;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
 import edu.uiuc.ncsa.security.delegation.token.TokenForge;
+import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
 import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
@@ -34,6 +35,7 @@ import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2Service
  * on 3/25/14 at  10:30 AM
  */
 public class OA2SQLTStore<V extends OA2ServiceTransaction> extends DSSQLTransactionStore<V> implements OA2TStoreInterface<V> {
+
     @Override
     public String getCreationTSField() {
         return ((OA2TransactionKeys) getMapConverter().getKeys()).authTime();
@@ -51,6 +53,59 @@ public class OA2SQLTStore<V extends OA2ServiceTransaction> extends DSSQLTransact
     public V getByRefreshToken(RefreshToken refreshToken) {
         String identifier = ((RefreshTokenImpl) refreshToken).getJti().toString();
         return getTransaction(identifier, ((OA2TransactionTable) getTransactionTable()).getByRefreshTokenStatement());
+    }
+
+    @Override
+    public V get(AccessTokenImpl accessToken, Identifier clientID) {
+        if (accessToken == null) {
+            throw new IllegalStateException("Error: a null access token was supplied");
+        }
+          return get(accessToken.getJti().toString(), clientID.toString(), true);
+    }
+
+    @Override
+    public V get(RefreshTokenImpl refreshToken, Identifier clientID) {
+        if (refreshToken == null) {
+            throw new IllegalStateException("Error: a null access token was supplied");
+        }
+          return get(refreshToken.getJti().toString(), clientID.toString(), false);
+    }
+
+    protected V get(String token, String clientID, boolean isAccessToken) {
+
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
+        String statement;
+        if (isAccessToken) {
+            statement = ((OA2TransactionTable) getTransactionTable()).getByAccessTokenAndClientStatement();
+        } else {
+            statement = ((OA2TransactionTable) getTransactionTable()).getByRefreshTokenAndClientStatement();
+        }
+
+        V t = null;
+        try {
+            PreparedStatement stmt = c.prepareStatement(statement);
+            stmt.setString(1, token);
+            stmt.setString(2, clientID);
+            stmt.executeQuery();
+            ResultSet rs = stmt.getResultSet();
+            if (!rs.next()) {
+                rs.close();
+                stmt.close();
+                releaseConnection(cr);
+                return null; // Different contract than normal get, since this is quite possible.
+            }
+
+            ColumnMap map = rsToMap(rs);
+            rs.close();
+            stmt.close();
+            releaseConnection(cr);
+            t = create();
+            populate(map, t);
+        } catch (SQLException e) {
+            throw new GeneralException("Error getting transaction with token \"" + token + "\" + and client id =" + clientID, e);
+        }
+        return t;
     }
 
     @Override
@@ -231,4 +286,6 @@ public class OA2SQLTStore<V extends OA2ServiceTransaction> extends DSSQLTransact
     public boolean hasUserCode(String userCode) {
         return getByUserCode(userCode) != null;
     }
+
+
 }
