@@ -1,0 +1,26 @@
+/*
+curl -X 'GET' \
+  'https://hgpp-rems.dev.umccr.org/api/permissions/oidc%7CCADRE%7Chttp%3A%2F%2Fcilogon.org%2FserverT%2Fusers%2F27326098' \
+  -H 'accept: application/json' \
+  -H 'x-rems-api-key: Pugmu7KJ4mMzQp7y' \
+  -H 'x-rems-user-id: auth0|624298a822636000687ecc5d'
+*/
+url_encode(x)->encode(x, 1);
+id := url_encode('oidc|CADRE|http://cilogon.org/serverT/users/27326098');
+ini. := file_read('/home/ncsa/dev/csd/config/ini/ga4gh.ini',2).'ga4gh';
+
+/*
+ini. := file_read('vfs#/scripts/ga4gh/v1/ga4gh.ini',2);
+url_encode(x)->replace(vencode(x), '$','%'); // version <=  1.4.6
+id := url_encode( 'oidc|CADRE|' + script_args(0));
+*/
+
+source_host := 'https://hgpp-rems.dev.umccr.org/api/permissions/';
+q := module_load('edu.uiuc.ncsa.qdl.extensions.http.QDLHTTPLoader','java');
+module_import(q);
+http#host(source_host + id);
+http#open();
+http#headers({'x-rems-api-key': ini.'x_rems_api_key','accept': 'application/json','x-rems-user-id': ini.'x_rems_user_id'});
+z. := http#get();
+http#close();
+return(z.'content'.'ga4gh_passport_v1');

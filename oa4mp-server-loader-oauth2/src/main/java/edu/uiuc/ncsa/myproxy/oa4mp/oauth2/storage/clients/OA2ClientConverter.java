@@ -4,6 +4,8 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import com.typesafe.config.ConfigRenderOptions;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
+import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.delegation.storage.impl.ClientConverter;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfigurationUtil;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
@@ -16,6 +18,7 @@ import net.sf.json.JSONSerializer;
 
 import java.io.StringReader;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -52,11 +55,38 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         if (map.get(getCK2().scopes()) != null) {
             otherV.setScopes(jsonArrayToCollection(map, getCK2().scopes()));
         }
-        if(map.get(getCK2().proxyClaimsList())!=null){
+        if (map.get(getCK2().proxyClaimsList()) != null) {
             otherV.setProxyClaimsList(jsonArrayToCollection(map, getCK2().proxyClaimsList()));
         }
         if (map.get(getCK2().audience()) != null) {
             otherV.setAudience(jsonArrayToCollection(map, getCK2().audience()));
+        }
+        if(map.containsKey(getCK2().extendsProvisioners())){
+            otherV.setExtendsProvisioners(map.getBoolean(getCK2().extendsProvisioners()));
+        }
+        if (map.get(getCK2().prototypes()) != null) {
+            String raw = map.getString(getCK2().prototypes());
+            JSONArray array;
+            try {
+                array = JSONArray.fromObject(raw);
+            } catch (Throwable t) {
+                array = new JSONArray();
+                array.add(raw);
+            }
+            // Now, the type is List<Identifier> so convert as needed
+            ArrayList<Identifier> ids = new ArrayList<>();
+            for(Object obj : array){
+                if(obj instanceof Identifier){
+                    ids.add((Identifier) obj);
+                }else{
+                    if(obj instanceof String){
+                        ids.add(BasicIdentifier.newID((String)obj));
+                    }else{
+                        throw new IllegalArgumentException("Expected string or identifier, got \"" + obj + "\" of type " + obj.getClass().getSimpleName());
+                    }
+                }
+            }
+            otherV.setPrototypes(ids);
         }
         if (map.get(getCK2().resource()) != null) {
             Collection<String> collection = jsonArrayToCollection(map, getCK2().resource()); // This is now strings.
@@ -77,6 +107,7 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         otherV.setDfLifetime(map.getLong(getCK2().dfLifetime()));
         otherV.setDfInterval(map.getLong(getCK2().dfInterval()));
         otherV.setSkipServerScripts(map.getBoolean(getCK2().skipServerScripts()));
+
         // In certain legacy cases, this may end up being populated with a null. Treat it like
         // a -1 (which means it isn't set, so don't use this in calculations)
         if (map.containsKey(getCK2().atLifetime()) && map.get(getCK2().atLifetime()) != null) {
@@ -131,7 +162,7 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
                     String rawJSON = conf.root().render(ConfigRenderOptions.concise());
                     cfg = JSONObject.fromObject(rawJSON);
                     otherV.setRawConfig(tempcfg);
-              //      otherV.setConfig(cfg);
+                    //      otherV.setConfig(cfg);
                 }
             }
             //otherV.setConfig(JSONObject.fromObject(map.getString(getCK2().cfg())));
@@ -194,7 +225,7 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         JSONArray json;
         try {
             json = (JSONArray) JSONSerializer.toJSON(map.get(key));
-        }catch(Throwable t){
+        } catch (Throwable t) {
             t.printStackTrace();
             throw t;
         }
@@ -216,6 +247,17 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         }
         map.put(getCK2().publicClient(), client.isPublicClient());
         map.put(getCK2().ersatzClient(), client.isErsatzClient());
+        map.put(getCK2().extendsProvisioners(), client.isExtendsProvisioners());
+        if (client.hasPrototypes()) {
+            if (!client.getPrototypes().isEmpty()) {
+                // These are ids. Return as strings or they get serizalized wrong
+                JSONArray array = new JSONArray();
+                for (Identifier id : client.getPrototypes()) {
+                    array.add(id.toString());
+                }
+                map.put(getCK2().prototypes(), array.toString());
+            }
+        }
         JSONArray callbacks = new JSONArray();
         for (String s : client.getCallbackURIs()) {
             callbacks.add(s);
@@ -234,7 +276,7 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
             }
             map.put(getCK2().scopes(), scopes.toString());
         }
-        if(client.getProxyClaimsList()!=  null){
+        if (client.getProxyClaimsList() != null) {
             JSONArray jsonArray = new JSONArray();
             jsonArray.addAll(client.getProxyClaimsList());
             map.put(getCK2().proxyClaimsList(), jsonArray.toString());
@@ -278,7 +320,22 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         if (json.containsKey(getCK2().dfInterval())) {
             v.setDfInterval(getJsonUtil().getJSONValueLong(json, getCK2().dfInterval()));
         }
+        if (json.containsKey(getCK2().prototypes())) {
+            if (!json.getJSONArray(getCK2().prototypes()).isEmpty()) {
+                JSONArray array = json.getJSONArray(getCK2().prototypes());
 
+                ArrayList<Identifier> ids = new ArrayList<>();
+                for (Object obj : array) {
+                    if (obj instanceof String) {
+                        ids.add(BasicIdentifier.newID((String) obj));
+                    }
+                }
+                v.setPrototypes(ids);
+            }
+        }
+        if(json.containsKey(getCK2().extendsProvisioners())){
+            v.setExtendsProvisioners(json.getBoolean(getCK2().extendsProvisioners()));
+        }
         v.setIssuer(getJsonUtil().getJSONValueString(json, getCK2().issuer()));
         v.setSignTokens(getJsonUtil().getJSONValueBoolean(json, getCK2().signTokens()));
         v.setPublicClient(getJsonUtil().getJSONValueBoolean(json, getCK2().publicClient())); // JSON util returns false if missing key
@@ -342,6 +399,16 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         for (String x : callbackList) {
             callbacks.add(x);
         }
+        getJsonUtil().setJSONValue(json, getCK2().extendsProvisioners(), client.isExtendsProvisioners());
+
+        if (client.hasPrototypes()) {
+            JSONArray array = new JSONArray();
+            for(Identifier identifier : client.getPrototypes()){
+                     array.add(identifier.toString());
+            }
+            getJsonUtil().setJSONValue(json, getCK2().prototypes(), array);
+        }
+
         if (callbacks.size() != 0) {
             getJsonUtil().setJSONValue(json, getCK2().callbackUri(), callbacks);
         }

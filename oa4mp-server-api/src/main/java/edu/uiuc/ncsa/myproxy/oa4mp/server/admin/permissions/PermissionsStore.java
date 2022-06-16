@@ -25,20 +25,6 @@ public interface PermissionsStore<V extends Permission> extends Store<V> {
      */
      public List<Identifier> getAdmins(Identifier clientID);
 
-
-
-    /**
-     * Given an ersatz client's ID, find the original client. This may
-     * be a list since there may be multiple substitutions allowed
-     * So A < B < C w/< = "substitutes for" would return the list
-     * [C,B] given A. Element 0 on the list is always the client that
-     * actually started the flow.
-     * @param ersatzID
-     * @return
-     */
-   //  public List<Identifier> getAntecessors(Identifier ersatzID);
-
-
     /**
      * Retrieve a permission from the admin and client identifier.
      * @param adminID

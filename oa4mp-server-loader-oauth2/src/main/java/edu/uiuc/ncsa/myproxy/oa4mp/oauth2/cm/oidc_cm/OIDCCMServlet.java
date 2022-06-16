@@ -993,11 +993,24 @@ public class OIDCCMServlet extends EnvServlet {
             }
             JSONObject jsonObject = jsonRequest.getJSONObject("cfg");
             // CIL-889 fix
-            if (!adminClient.isAllowQDL() && jsonRequest.getString("cfg").contains("qdl")) {
-                // Pretty draconian test -- any tag for QDL gets booted.
-                throw new OA2GeneralError(OA2Errors.INVALID_REQUEST_OBJECT,
-                        "QDL scripting is not allowed for this client.",
-                        HttpStatus.SC_BAD_REQUEST, null);
+            if(adminClient.isAllowQDL()){
+                // CIL-1031
+                if(adminClient.allowQDLCodeBlocks()){
+                   if(jsonRequest.getString("cfg").contains("qdl") && jsonRequest.getString("cfg").contains("qdl")){
+                       if(jsonRequest.getString("cfg").contains("\"code\"")){
+                           throw new OA2GeneralError(OA2Errors.INVALID_REQUEST_OBJECT,
+                                     "QDL code blocks are not allowed for this client.",
+                                     HttpStatus.SC_BAD_REQUEST, null);
+                       }
+                   }
+                }
+            }else{
+                if(jsonRequest.getString("cfg").contains("qdl")){
+                    // Pretty draconian test -- any tag for QDL gets booted.
+                    throw new OA2GeneralError(OA2Errors.INVALID_REQUEST_OBJECT,
+                              "QDL scripting is not allowed for this client.",
+                              HttpStatus.SC_BAD_REQUEST, null);
+                  }
             }
             jsonRequest.remove("cfg");
             client.setConfig(jsonObject);

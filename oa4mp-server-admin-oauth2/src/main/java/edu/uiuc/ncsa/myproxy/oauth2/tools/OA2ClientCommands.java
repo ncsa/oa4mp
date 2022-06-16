@@ -11,12 +11,13 @@ import edu.uiuc.ncsa.qdl.scripting.Scripts;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.oauth_2_0.jwt.ScriptingConstants;
+import edu.uiuc.ncsa.security.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfigurationUtil;
 import edu.uiuc.ncsa.security.storage.XMLMap;
 import edu.uiuc.ncsa.security.util.cli.CLIDriver;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import edu.uiuc.ncsa.security.util.scripting.ScriptSet;
+import edu.uiuc.ncsa.security.util.scripting.ScriptingConstants;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -538,4 +539,45 @@ public class OA2ClientCommands extends ClientStoreCommands {
         getStore().save(oa2Client);
     }
 
+    public void resolve(InputLine inputLine)throws Exception{
+        if(showHelp(inputLine)){
+            sayi("resolve [id] - resolve a client and show it");
+            sayi("See also: serialize");
+            return;
+        }
+        Identifiable identifiable = findItem(inputLine);
+        if(identifiable == null){
+            say("no such client");
+            return;
+        }
+        OA2Client oa2Client = OA2ClientUtils.resolvePrototypes((ClientStore) getStore(), (OA2Client) identifiable);
+        longFormat(oa2Client, true);
+    }
+
+    @Override
+    protected void showSerializeHelp() {
+            say("serialize  [-file path] [-resolve] index");
+            sayi("Usage: XML serializes an object and either shows it on the ");
+            sayi("   command line or put it in a file. Cf. deserialize.");
+            sayi("-resolve - if this has prototypes, resolve them all and serialize the ");
+            sayi("   resulting object");
+            sayi("See also: deserialize.");
+    }
+
+    @Override
+    public void serialize(InputLine inputLine) {
+        if (showHelp(inputLine)) {
+            showSerializeHelp();
+            return;
+        }
+        Identifiable x = findItem(inputLine);
+        if (x == null) {
+            say("object not found");
+            return;
+        }
+        if(inputLine.hasArg("-resolve")){
+            x = OA2ClientUtils.resolvePrototypes((ClientStore) getStore(), (OA2Client) x);
+        }
+        serialize(inputLine, x);
+    }
 }

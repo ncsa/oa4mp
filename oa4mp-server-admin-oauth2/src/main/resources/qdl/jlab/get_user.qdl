@@ -1,18 +1,16 @@
 /*
    Gets the user record
    args are
-   0 - username  - for ldap access
-   1 - password  - for ldap access
-   2 - user eppn to get from ldap
+   0 - user eppn to get from ldap
  */
 block[
 
     // ini. := file_read('vfs#/scripts/jlab/ldap.ini',2);
-    ini. := file_read('/home/ncsa/dev/csd/config/jlab-ldap.ini',2);
+    ini. := file_read('/home/ncsa/dev/csd/config/ini/jlab-ldap.ini',2).'jlab';
     user := script_args(0);
                        jlab_cfg. := new_template('ldap');
               jlab_cfg.auth_type := 'simple';
-                jlab_cfg.address := ini.jlab.'address';
+                jlab_cfg.address := ini.'address';
                    jlab_cfg.port := 636;
           jlab_cfg.fail_on_error := true;
              jlab_cfg.claim_name := 'uid';
@@ -20,9 +18,8 @@ block[
                    jlab_cfg.type := 'ldap';
               jlab_cfg.ldap_name := 'uid';
      jlab_cfg.search_attributes. :=  ['sn','dn','voPersonID','isMemberOf'];
-               jlab_cfg.username := ini.jlab.'name';
-               jlab_cfg.password := ini.jlab.'pwd';
-     // return(get_claims(create_source(jlab_cfg.), ''));  // trick for faking LDAP failure.
+               jlab_cfg.username := ini.'name';
+               jlab_cfg.password := ini.'pwd';
      return(get_claims(create_source(jlab_cfg.), user));
 ];
 

@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.server.util;
 
 import edu.uiuc.ncsa.security.core.util.Iso8601;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
+import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.storage.BaseClient;
 
 import java.util.Date;
@@ -29,5 +30,27 @@ public class ClientDebugUtil extends MetaDebugUtil {
                 printIt((isPrintTS()?Iso8601.date2String(new Date()):"") + " " + host + " " + callingClass.getSimpleName() + " " + toLabel(level) + ": " + message);
             }
         }
+    }
+
+
+    public ServiceTransaction getTransaction() {
+        return transaction;
+    }
+
+    public void setTransaction(ServiceTransaction transaction) {
+        this.transaction = transaction;
+    }
+
+    ServiceTransaction transaction = null;
+    public boolean hasTransaction(){
+        return transaction != null;
+    }
+    String tID = null;
+    String tID(){
+      if(tID == null){
+            String p = transaction.getIdentifier().getUri().getPath();
+            tID = p.substring(p.lastIndexOf("/"));
+      }
+      return tID;
     }
 }

@@ -63,7 +63,6 @@ public class UserInfoServlet extends BearerTokenServlet {
         }
         OA2SE oa2SE = (OA2SE) getServiceEnvironment();
         MetaDebugUtil debugger = createDebugger(transaction.getOA2Client());
-
         if (!transaction.getFlowStates().userInfo) {
             throw new OA2RedirectableError(OA2Errors.ACCESS_DENIED,
                     "access denied", HttpStatus.SC_UNAUTHORIZED,
@@ -73,6 +72,7 @@ public class UserInfoServlet extends BearerTokenServlet {
         // if we get to here, then the access token checked out, so we can just get it and use it.
 
         // Need to look this up by its jti if its not a basic access token.
+        OA2Client resolvedClient = OA2ClientUtils.resolvePrototypes(oa2SE, transaction.getOA2Client());
 
         UII2 uis = new UII2(oa2SE.getTokenForge(), getServiceEnvironment().getServiceAddress());
         UIIRequest2 uireq = new UIIRequest2(request, at);
@@ -80,7 +80,7 @@ public class UserInfoServlet extends BearerTokenServlet {
         UIIResponse2 uiresp = (UIIResponse2) uis.process(uireq);
         // creates the token handler just to get the updated accounting information.
         IDTokenHandler idTokenHandler = new IDTokenHandler(new PayloadHandlerConfigImpl(
-                ((OA2Client) transaction.getClient()).getIDTokenConfig(),
+                resolvedClient.getIDTokenConfig(),
                 oa2SE,
                 transaction,
                 null, // no token exchange record outside of token exchanges.
@@ -88,7 +88,7 @@ public class UserInfoServlet extends BearerTokenServlet {
         idTokenHandler.refreshAccountingInformation();
 
         JWTRunner jwtRunner = new JWTRunner(transaction, ScriptRuntimeEngineFactory.createRTE(oa2SE, transaction, null, transaction.getOA2Client().getConfig()));
-        OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, transaction, null, request);
+        OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, transaction, resolvedClient,null, request);
         try {
             jwtRunner.doUserInfo();
         } catch (AssertionException assertionError) {

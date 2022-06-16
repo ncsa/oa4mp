@@ -23,6 +23,7 @@ public class OA2ClientKeys extends ClientKeys {
     String dfLifetime="df_lifetime";
     String ersatzClient="ersatz_client";
     String extended_attributes = "extended_attributes";
+    String extendsProvisioners = "extends_provisioners";
     String issuer = "issuer";
     String ldap = "ldap";
     String proxyClaimsList ="proxy_claims_list";
@@ -33,12 +34,24 @@ public class OA2ClientKeys extends ClientKeys {
     String skipServerScripts="skip_server_scripts";
     String scopes = "scopes";
     String strictScopes="strict_scopes";
+    String prototypes ="prototypes";
+
     /*
       If you add attributes, make sure you update
            edu.uiuc.ncsa.oa2.qdl.storage.ClientStemMC
            (in  oa4mp-qdl)
       or you may break the QDL module that handles clients.
      */
+
+    public String prototypes(String... x) {
+           if (0 < x.length) prototypes = x[0];
+           return prototypes;
+       }
+
+    public String extendsProvisioners(String... x) {
+           if (0 < x.length) extendsProvisioners = x[0];
+           return extendsProvisioners;
+       }
 
     public String ersatzClient(String... x) {
            if (0 < x.length) ersatzClient = x[0];
@@ -156,6 +169,8 @@ public class OA2ClientKeys extends ClientKeys {
         allKeys.add(dfInterval());
         allKeys.add(dfInterval());
         allKeys.add(ersatzClient());
+        allKeys.add(prototypes());
+        allKeys.add(extendsProvisioners());
         return allKeys;
     }
 }

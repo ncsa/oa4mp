@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.*;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RFC8628Store;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.util.ClientDebugUtil;
 import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
@@ -103,6 +104,7 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
         OA2ServiceTransaction t = (OA2ServiceTransaction) getTransactionStore().create();
         debugger.trace(this, "created transaction \"" + t.getIdentifierString() + "\"");
         t.setClient(client);
+        OA2Client resolvedClient = OA2ClientUtils.resolvePrototypes(oa2SE, client);
         t.setIdentifier(BasicIdentifier.newID(ag.getURIToken()));
         t.setAuthorizationGrant(ag);
         t.setAuthGrantLifetime(lifetime);
@@ -111,6 +113,9 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
         RFC8628State rfc8628State = new RFC8628State();
         String scope = req.getParameter(OA2Constants.SCOPE);
         rfc8628State.originalScopes = scope;
+        if(debugger instanceof ClientDebugUtil){
+            ((ClientDebugUtil)debugger).setTransaction(t);
+        }
         if (StringUtils.isTrivial(scope)) {
             debugger.trace(this, "no scopes, using default for client");
             t.setScopes(client.getScopes());
@@ -119,7 +124,7 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
             debugger.trace(this, "checking scopes:" + scope + ". strict scopes " + (client.useStrictScopes() ? "on" : "off"));
             TransactionState transactionState = new TransactionState(req, resp, agResponse.getParameters(), t, null);
             try {
-                t.setScopes(ClientUtils.resolveScopes(transactionState, true, true));
+                t.setScopes(ClientUtils.resolveScopes(transactionState, resolvedClient, true, true));
             } catch (OA2RedirectableError redirectableError) {
                 throw new OA2ATException(redirectableError.getError(),
                         redirectableError.getDescription(),

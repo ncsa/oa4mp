@@ -15,9 +15,14 @@
 */
         scopes. ≔  script_args(0);
   found_groups. ≔  script_args(1);
+  say(to_string(scopes.));
+  say(to_string(found_groups.));
               w ≔  'wlcg.groups';
           caput ≔  w + ':'; // head of WLCG requested group.
   group_scopes. ≔  mask(scopes., ¯1 < starts_with(scopes., [w])); // get things that start with w
+    say(to_string(group_scopes.));
+    //if[(w∉group_scopes.) && size(group_scopes.) ≡ 0][return([]);]; // no requested wlcg groups.
+  //        has_w ≔  w ∈ group_scopes.;  // check if single scope of wlcg.groups is passed in
           has_w ≔  reduce(@∨, group_scopes. ≡ w);  // check if single scope of wlcg.groups is passed in
           has_w ≔  has_w ≡ null ? false:has_w; // if group_scopes is gobbledy-gook, has_w may be null. Fix it.
   group_scopes. ≔  mask(group_scopes., group_scopes. ≠ w); // whack it off if it is there,

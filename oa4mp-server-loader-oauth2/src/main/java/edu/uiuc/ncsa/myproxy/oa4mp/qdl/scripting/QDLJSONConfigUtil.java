@@ -10,8 +10,8 @@ import edu.uiuc.ncsa.qdl.vfs.FileEntries;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.util.FileUtil;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
-import edu.uiuc.ncsa.security.oauth_2_0.jwt.ScriptingConstants;
 import edu.uiuc.ncsa.security.util.scripting.ScriptSet;
+import edu.uiuc.ncsa.security.util.scripting.ScriptingConstants;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 

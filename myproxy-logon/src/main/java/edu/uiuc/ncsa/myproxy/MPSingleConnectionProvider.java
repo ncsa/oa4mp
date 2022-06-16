@@ -83,6 +83,16 @@ public class MPSingleConnectionProvider<T extends MyProxyConnectable> implements
     }
 
     public static class MyProxyLogonConnection implements MyProxyConnectable {
+        @Override
+        public boolean isReadOnly() {
+            return false;
+        }
+
+        @Override
+        public void setReadOnly(boolean readOnly) {
+
+        }
+
         public MyProxyLogonConnection(MyProxyLogon myProxyLogon) {
             this.myProxyLogon = myProxyLogon;
         }

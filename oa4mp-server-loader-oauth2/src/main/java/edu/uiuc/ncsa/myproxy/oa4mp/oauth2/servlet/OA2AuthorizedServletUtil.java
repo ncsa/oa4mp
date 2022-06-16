@@ -99,6 +99,9 @@ public class OA2AuthorizedServletUtil {
             transaction.setAuthGrantLifetime(oa2se.getAuthorizationGrantLifetime()); // make sure these match.
             String requestState = req.getParameter(OA2Constants.STATE);
             transaction.setRequestState(requestState);
+            transaction.setClient(client); // set the actual client, not the resolved one
+            OA2Client resolvedClient = OA2ClientUtils.resolvePrototypes(oa2se, client);
+
             /*
             Fixes CIL-644
             Extended attribute support means that a client may send fully qualifies (FQ) request parameters
@@ -106,7 +109,7 @@ public class OA2AuthorizedServletUtil {
             (most likely by a script, so we can avoid server changes). Nothing is done with these here, they
             are stashed and forwarded at the correct time.
              */
-            if (client.hasExtendedAttributeSupport()) {
+            if (resolvedClient.hasExtendedAttributeSupport()) {
                 ExtendedParameters xp = new ExtendedParameters();
                 // Take the parameters and parse them into configuration objects,
                 JSONObject extAttr = xp.snoopParameters(req.getParameterMap());
@@ -115,7 +118,6 @@ public class OA2AuthorizedServletUtil {
                 }
             }
             agResponse.setServiceTransaction(transaction);
-            transaction.setClient(client);
             transaction = (OA2ServiceTransaction) verifyAndGet(agResponse);
             transaction.setAuthTime(new Date()); // have to set the time to now.
             debugger.info(this, "Saved new transaction with id=" + transaction.getIdentifierString());
@@ -125,7 +127,7 @@ public class OA2AuthorizedServletUtil {
              */
             String codeChallenge = req.getParameter(RFC7636Util.CODE_CHALLENGE);
             if (StringUtils.isTrivial(codeChallenge)) {
-                if (oa2se.isRfc7636Required() && client.isPublicClient()) {
+                if (oa2se.isRfc7636Required() && resolvedClient.isPublicClient()) {
                     throw new OA2RedirectableError(OA2Errors.ACCESS_DENIED,
                             "access denied",
                             HttpStatus.SC_UNAUTHORIZED,
@@ -150,7 +152,7 @@ public class OA2AuthorizedServletUtil {
 
             debugger.info(this, "2.b finished initial request for token =\"" + transaction.getIdentifierString() + "\".");
 
-            postprocess(new IssuerTransactionState(req, resp, params, transaction, backup, agResponse));
+            postprocess(new IssuerTransactionState(req, resp, params, transaction, backup, agResponse), resolvedClient);
             servlet.getTransactionStore().save(transaction);
             agResponse.write(resp);
             return transaction;
@@ -184,9 +186,10 @@ public class OA2AuthorizedServletUtil {
         debugger.trace(this, "Starting doDelegation");
         t = doDelegation(httpServletRequest, httpServletResponse);
         OA2SE oa2SE = (OA2SE) getServiceEnvironment();
+        OA2Client resolvedClient = OA2ClientUtils.resolvePrototypes(oa2SE, t.getOA2Client());
         debugger.trace(this, "Starting done with doDelegation, creating claim util");
-        JWTRunner jwtRunner = new JWTRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2SE, t, t.getOA2Client().getConfig()));
-        OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, t, httpServletRequest);
+        JWTRunner jwtRunner = new JWTRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2SE, t, resolvedClient.getConfig()));
+        OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, t, resolvedClient, httpServletRequest);
 
         DebugUtil.trace(this, "starting to process claims, creating basic claims:");
         try {
@@ -390,14 +393,14 @@ public class OA2AuthorizedServletUtil {
         OA2ServiceTransaction st = (OA2ServiceTransaction) agResponse.getServiceTransaction();
         //Spec says that the redirect must match one of the ones stored and if not, the request is rejected.
         String givenRedirect = params.get(REDIRECT_URI);
-        OA2Client client = st.getOA2Client();
-        OA2ClientUtils.check(client, givenRedirect);
+        OA2Client resolvedClient = OA2ClientUtils.resolvePrototypes((OA2SE) getServiceEnvironment(), st.getOA2Client());
+        OA2ClientUtils.check(resolvedClient, givenRedirect);
         // by this point it has been verified that the redirect uri is valid.
-        MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(client);
+        MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(resolvedClient);
         String rawSecret = params.get(CLIENT_SECRET);
         if (rawSecret != null) {
             debugger.info(this, "Client is sending secret in initial request. Though not forbidden by the protocol this is discouraged.");
-            if (!client.getSecret().equals(rawSecret)) {
+            if (!resolvedClient.getSecret().equals(rawSecret)) {
                 debugger.info(this, "And for what it is worth, the client sent along an incorrect secret too...");
             }
         }
@@ -410,7 +413,7 @@ public class OA2AuthorizedServletUtil {
                 st.setRequestedATLifetime(at);
             } catch (Throwable t) {
                 getServiceEnvironment().info("Could not set request access token lifetime to \"" + rawATLifetime
-                        + "\" for client " + client.getIdentifierString());
+                        + "\" for client " + resolvedClient.getIdentifierString());
                 // do nothing.
             }
         }
@@ -422,7 +425,7 @@ public class OA2AuthorizedServletUtil {
                 st.setRequestedRTLifetime(rt);
             } catch (Throwable t) {
                 getServiceEnvironment().info("Could not set request refresh token lifetime to \"" + rawRefreshLifetime
-                        + "\" for client " + client.getIdentifierString());
+                        + "\" for client " + resolvedClient.getIdentifierString());
                 // do nothing.
             }
 
@@ -430,7 +433,7 @@ public class OA2AuthorizedServletUtil {
         String nonce = params.get(NONCE);
         // FIX for OAUTH-180. Server must support clients that do not use a nonce. Just log it and rock on.
         if (nonce == null || nonce.length() == 0) {
-            debugger.info(this, "No nonce in initial request for " + client.getIdentifierString());
+            debugger.info(this, "No nonce in initial request for " + resolvedClient.getIdentifierString());
         }
         NonceHerder.putNonce(nonce);
       /*  This checks that nonces are not re-used. Used to check for them,
@@ -456,8 +459,6 @@ public class OA2AuthorizedServletUtil {
         }
 
 
-        //OA2ServiceTransaction st = createNewTransaction(agResponse.getGrant());
-        //st.setClient(agResponse.getClient());
         debugger.info(this, "Created new unsaved transaction with id=" + st.getIdentifierString());
 
         st.setAuthGrantValid(false);
@@ -663,7 +664,7 @@ public class OA2AuthorizedServletUtil {
               */
         if (resource.size() == 0 && audience.size() == 0) {
             // try to special case it
-            OA2Client client = (OA2Client) t.getClient();
+            OA2Client client = OA2ClientUtils.resolvePrototypes((OA2SE) getServiceEnvironment(), (OA2Client) t.getClient());
             AccessTokenConfig atCfg = client.getAccessTokensConfig();
 
             if (atCfg.getTemplates().size() == 1) {
@@ -690,16 +691,16 @@ public class OA2AuthorizedServletUtil {
 
     }
 
-    protected Collection<String> resolveScopes(TransactionState transactionState) {
-        return ClientUtils.resolveScopes(transactionState, false, false);
+    protected Collection<String> resolveScopes(TransactionState transactionState, OA2Client client) {
+        return ClientUtils.resolveScopes(transactionState, client, false, false);
     }
 
-    public void postprocess(TransactionState transactionState) {
+    public void postprocess(TransactionState transactionState, OA2Client client) {
         // Order of operations: The audience and resources must be determined before the scopes can
         // be resolved since they are required for that and this bit must be done as the absolutely last thing.
         figureOutAudienceAndResource(transactionState);
         OA2ServiceTransaction t = (OA2ServiceTransaction) transactionState.getTransaction();
-        Collection<String> scopes = resolveScopes(transactionState);
+        Collection<String> scopes = resolveScopes(transactionState, client);
         t.setScopes(scopes);
         t.setValidatedScopes(scopes);
         transactionState.getResponse().setHeader("X-Frame-Options", "DENY");

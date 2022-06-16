@@ -60,6 +60,9 @@ public class AdminClientConverter<V extends AdminClient> extends BaseClientConve
             // older clients won't have this, so don't force the issue.
             value.setAllowQDL(map.getBoolean(getACK().allowQDL()));
         }
+        if (map.containsKey(getACK().allowQDLCodeBlocks())) {
+            value.setAllowQDLCodeBlocks(map.getBoolean(getACK().allowQDLCodeBlocks()));
+        }
         if (map.containsKey(getACK().notifyOnNewClientCreate())) {
             value.setNotifyOnNewClientCreate(map.getBoolean(getACK().notifyOnNewClientCreate()));
         }
@@ -115,6 +118,8 @@ public class AdminClientConverter<V extends AdminClient> extends BaseClientConve
         map.put(getACK().voURI(), client.getVirtualOrganization());
         map.put(getACK().maxClients(), client.getMaxClients());
         map.put(getACK().allowQDL(), client.isAllowQDL());
+        map.put(getACK().allowQDLCodeBlocks(), client.allowQDLCodeBlocks());
+
         map.put(getACK().notifyOnNewClientCreate(), client.isNotifyOnNewClientCreate());
         map.put(getACK().listUsers(), client.isListUsers());
         map.put(getACK().listUsersInOtherClients(), client.isListUsersInOtherClients());

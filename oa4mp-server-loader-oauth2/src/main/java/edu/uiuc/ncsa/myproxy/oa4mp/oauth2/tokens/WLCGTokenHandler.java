@@ -21,7 +21,7 @@ public class WLCGTokenHandler extends AbstractAccessTokenHandler implements WLCG
 
     public WLCGTokenHandler(PayloadHandlerConfigImpl cfg) {
         super(cfg);
-        MyProxyDelegationServlet.createDebugger(cfg.getTransaction().getClient()).trace(this, "Created handler with transaction " + cfg.getTransaction());
+        MyProxyDelegationServlet.createDebugger(cfg.getTransaction().getClient()).trace(this, "Created WLCG handler with transaction " + cfg.getTransaction().summary());
     }
 
     @Override

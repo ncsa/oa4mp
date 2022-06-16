@@ -21,9 +21,10 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-import static edu.uiuc.ncsa.security.oauth_2_0.jwt.ScriptingConstants.*;
 import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.*;
-import static edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse.*;
+import static edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse.RC_NOT_RUN;
+import static edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse.RC_OK;
+import static edu.uiuc.ncsa.security.util.scripting.ScriptingConstants.*;
 
 /**
  * <p>Created by Jeff Gaynor<br>

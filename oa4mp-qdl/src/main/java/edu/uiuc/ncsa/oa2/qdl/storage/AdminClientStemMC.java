@@ -56,6 +56,9 @@ public class AdminClientStemMC<V extends AdminClient> extends StemConverter<V> {
         if (stem.containsKey(kk().allowQDL())) {
             v.setAllowQDL(stem.getBoolean(kk().allowQDL()));
         }
+        if(stem.containsKey(kk().allowQDLCodeBlocks())){
+               v.setAllowQDLCodeBlocks(stem.getBoolean(kk().allowQDLCodeBlocks()));
+           }
         if (stem.containsKey(kk().listUsers())) {
             v.setListUsers(stem.getBoolean(kk().listUsers()));
         }
@@ -102,6 +105,7 @@ public class AdminClientStemMC<V extends AdminClient> extends StemConverter<V> {
         setNonNullStemValue(stem, kk().config(), v.getConfig().toString());
         setNonNullStemValue(stem, kk().issuer(), v.getIssuer());
         stem.put(kk().maxClients(), Long.valueOf(v.getMaxClients()));
+        setNonNullStemValue(stem, kk().allowQDLCodeBlocks(), v.allowQDLCodeBlocks());
 
         setNonNullStemValue(stem, kk().voURI(), v.getVirtualOrganization().toString());
         setNonNullStemValue(stem, kk().vo(), v.getExternalVOName());

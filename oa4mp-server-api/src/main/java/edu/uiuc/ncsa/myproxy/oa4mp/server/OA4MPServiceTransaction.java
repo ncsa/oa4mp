@@ -42,6 +42,17 @@ public class OA4MPServiceTransaction extends ServiceTransaction {
         OA4MPServiceTransaction st = (OA4MPServiceTransaction) obj;
         if (!checkEquals(getMyproxyUsername(), st.getMyproxyUsername())) return false;
         if (!checkEquals(getUsername(), st.getUsername())) return false;
-        return true;
+        if(st.getClient() == null && getClient() == null) return true;
+        if(st.getClient() == null){
+            if(getClient() == null){
+                return true;
+            }
+            return false;
+        }else{
+            if(getClient() ==null){
+                return false;
+            }
+            return st.getClient().getIdentifier().equals(getClient().getIdentifier());
+        }
     }
 }

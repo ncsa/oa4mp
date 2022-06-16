@@ -1,0 +1,61 @@
+/*
+    Access token support for Jefferson Lab. Typical configuration for the client
+    is
+
+     tokens{
+       access{
+          type=wlcg
+          qdl{
+             load="bnal/access.qdl"
+              xmd={exec_phase=["post_token","post_refresh","post_exchange"]}
+          } //end QDL
+       } // end access token
+     } //end tokens
+
+
+*/
+//script_load('bnal/acl.qdl');
+
+/*
+ Please configure cilogon:/client_id/8e718657741cc54785321b06bbfdc9 to issue WLCG tokens
+ with "https://test.cilogon.org/bnlsdcc" for the issuer and audience,
+ and with "storage.read:/test" for the scope
+ if the user is a member of the tokentesters group in
+ COmanage.
+ See: https://registry.cilogon.org/registry/co_groups/index/co:5
+*/
+     DEBUG := true; // set false everywhere but on my test server.
+        γ := 'tokentesters'; // groups
+   // Me in GitHub for testing
+   // Robert Hancock's uid.
+  user := DEBUG?'http://cilogon.org/serverA/users/1774626':claims.sub;
+
+  results. := script_load('bnl/get_user.qdl', user); // user == claims.sub
+
+
+  say('*** BNL result of query =' + to_string(results.));
+    if[
+       	 !is_defined(results.isMemberOf) // indicates something is wrong with their LDAP (?)
+      ][
+                 sys_err.ok := false;
+            sys_err.message := 'no group memberships found.';
+         sys_err.error_type := 'access_denied';
+            return([]);
+    ];
+
+    say('*** BNL results.isMemberOf=' + to_string(results.isMemberOf));
+
+        if[ γ ∈ to_lower(results.isMemberOf)][
+              access_token.'iss' := 'https://test.cilogon.org/bnlsdcc'; // turn in to string, omit duplications, trailing space
+              access_token.'aud' := 'https://test.cilogon.org/bnlsdcc'; // turn in to string, omit duplications, trailing space
+              access_token.'scope' := 'storage.read:/test'; // turn in to string, omit duplications, trailing space
+              return();
+        ];
+
+          sys_err.ok := false;
+     sys_err.message := 'no group memberships found.';
+  sys_err.error_type := 'access_denied';
+     return([]);
+
+
+

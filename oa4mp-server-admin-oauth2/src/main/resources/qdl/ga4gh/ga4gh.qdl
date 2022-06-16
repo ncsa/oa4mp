@@ -6,6 +6,8 @@
   This is called in the user info endpoint.
 */
 
+//script_load('ga4gh/acl.qdl');
+
 GA4GH_SCOPE := 'ga4gh_passport_v1';
 
 if[!is_defined(access_token.scope)][return();]; // nothing to do

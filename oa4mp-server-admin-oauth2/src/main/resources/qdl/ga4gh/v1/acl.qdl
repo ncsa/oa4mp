@@ -1,0 +1,2 @@
+ //acl_add('cilogon:/client_id/7224152acf9d00f4be9d023a8e623c34');
+ //acl_check();

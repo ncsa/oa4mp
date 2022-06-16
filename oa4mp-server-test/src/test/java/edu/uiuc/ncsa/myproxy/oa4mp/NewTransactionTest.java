@@ -79,11 +79,13 @@ public class NewTransactionTest extends TestBase {
         client.setIdentifier(new BasicIdentifier(URI.create("test:client:1d/" + randomString)));
         //serviceTransaction.setAuthorizationGrant(newAG(tokenForge));
         serviceTransaction.setAuthGrantValid(false);
+        serviceTransaction.setClient(client);
         client.setName("service test name #" + System.nanoTime());
         AccessToken accessToken = new AccessTokenImpl(URI.create("access:/token/test/" + randomString));
         serviceTransaction.setAccessToken(accessToken);
         RefreshToken refreshToken = new RefreshTokenImpl(URI.create("refresh:/token/test/" + randomString));
         transactionStore.save(serviceTransaction);
+        clientStore.save(client);
         assert transactionStore.containsKey(serviceTransaction.getIdentifier());
         assert serviceTransaction.equals(transactionStore.get(serviceTransaction.getIdentifier()));
         // Contract has changed in version 5.0+, so auth grant is now
@@ -91,7 +93,6 @@ public class NewTransactionTest extends TestBase {
         // now emulate doing oauth type transactions with it.
         // First leg sets the verifier and user
 
-        String r = getRandomString(12);
         serviceTransaction.setVerifier(newVerifier(tokenForge));
         transactionStore.save(serviceTransaction);
 
@@ -107,7 +108,9 @@ public class NewTransactionTest extends TestBase {
         transactionStore.save(serviceTransaction);
         assert serviceTransaction.equals(transactionStore.get(serviceTransaction.getIdentifier()));
         //and we're done
+        serviceTransaction.setClient(client);
         transactionStore.remove(serviceTransaction.getIdentifier());
         assert !transactionStore.containsKey(serviceTransaction.getIdentifier());
+        clientStore.remove(client.getIdentifier());
     }
 }

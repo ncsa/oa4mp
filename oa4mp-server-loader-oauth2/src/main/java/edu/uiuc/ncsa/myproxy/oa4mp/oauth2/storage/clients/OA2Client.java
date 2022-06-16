@@ -53,6 +53,23 @@ public class OA2Client extends Client implements OA2ClientScopes {
         client.setSignTokens(isSignTokens());
     }
 
+    public List<Identifier> getPrototypes() {
+        if(prototypes == null){
+            prototypes = new ArrayList<>();
+        }
+        return prototypes;
+    }
+
+    public void setPrototypes(List<Identifier> prototypes) {
+        this.prototypes = prototypes;
+    }
+
+    List<Identifier> prototypes = null;
+
+    public boolean hasPrototypes() {
+        return !(prototypes == null || prototypes.isEmpty());
+    }
+
     public boolean isErsatzClient() {
         return ersatzClient;
     }
@@ -62,6 +79,22 @@ public class OA2Client extends Client implements OA2ClientScopes {
     }
 
     boolean ersatzClient = false;
+
+    /**
+     * If the ersatz client should simply extend all provisioners. This means you do not have to set the
+     * {@link #setPrototypes(List)} for this object. If you do set it, those will be processed first
+     * then the provisioners.
+     * @return
+     */
+    public boolean isExtendsProvisioners() {
+        return extendsProvisioners;
+    }
+
+    public void setExtendsProvisioners(boolean extendsProvisioners) {
+        this.extendsProvisioners = extendsProvisioners;
+    }
+
+    boolean extendsProvisioners = false;
 
     public boolean isSkipServerScripts() {
         return skipServerScripts;
@@ -327,6 +360,7 @@ public class OA2Client extends Client implements OA2ClientScopes {
      * Strict scopes means that the list of scopes must match exactly for the given client.
      * Typically this is <code>false</code> for WLCG and other clients that can pass in arbitrary
      * scopes.
+     *
      * @return
      */
     public boolean useStrictScopes() {
@@ -368,7 +402,6 @@ public class OA2Client extends Client implements OA2ClientScopes {
     }
 
 
-
     public List<String> getGrantTypes() {
         return getNamedList(xoauth_attributes, OA2Constants.GRANT_TYPE);
     }
@@ -376,13 +409,17 @@ public class OA2Client extends Client implements OA2ClientScopes {
     public void setGrantTypes(List<String> grantTypes) {
         setNamedList(xoauth_attributes, OA2Constants.GRANT_TYPE, grantTypes);
     }
-     public static String CLIENT_COMMENT_TAG = "comment";
-    public void setComment(List<String> comments){
+
+    public static String CLIENT_COMMENT_TAG = "comment";
+
+    public void setComment(List<String> comments) {
         setNamedList(oa4mp_attributes, CLIENT_COMMENT_TAG, comments);
     }
-    public List<String> getComment(){
+
+    public List<String> getComment() {
         return getNamedList(oa4mp_attributes, CLIENT_COMMENT_TAG);
     }
+
     public List<String> getResponseTypes() {
         return getNamedList(xoauth_attributes, OA2Constants.RESPONSE_TYPE);
     }
@@ -549,12 +586,13 @@ public class OA2Client extends Client implements OA2ClientScopes {
         client.setResponseTypes(rst);
         System.out.println(client.getExtendedAttributes().toString(2));
     }
-    public boolean hasScript(){
+
+    public boolean hasScript() {
         boolean rc = false;
         rc = rc || hasIDTokenConfig() && !getIDTokenConfig().getScriptSet().isEmpty();
         rc = rc || hasAccessTokenConfig() && !getAccessTokensConfig().getScriptSet().isEmpty();
         rc = rc || hasRefreshTokenConfig() && !getRefreshTokensConfig().getScriptSet().isEmpty();
-        
+
         return rc;
     }
 
@@ -586,6 +624,7 @@ public class OA2Client extends Client implements OA2ClientScopes {
      *     <li>[*] - all</li>
      *     <li>[c0, c1, c2,...] - a list</li>
      * </ul>
+     *
      * @return
      */
     public Collection<String> getProxyClaimsList() {
@@ -597,6 +636,7 @@ public class OA2Client extends Client implements OA2ClientScopes {
     }
 
     Collection<String> proxyClaimsList = new ArrayList<>();
+
 
 }
 

@@ -1,15 +1,19 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.*;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientKeys;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.*;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractRegistrationServlet;
+import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
+import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
+import edu.uiuc.ncsa.security.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
@@ -17,6 +21,8 @@ import edu.uiuc.ncsa.security.oauth_2_0.OA2GeneralError;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTRunner;
 import edu.uiuc.ncsa.security.oauth_2_0.server.RFC9068Constants;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
+import edu.uiuc.ncsa.security.storage.data.MapConverter;
+import edu.uiuc.ncsa.security.storage.sql.internals.ColumnMap;
 import org.apache.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
@@ -24,10 +30,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.StringTokenizer;
+import java.util.*;
 
 /**
  * A budding set of utilities for working with clients.
@@ -274,18 +277,29 @@ public class OA2ClientUtils {
         return false;
     }
 
-    public static void setupHandlers(JWTRunner jwtRunner, OA2SE oa2SE, OA2ServiceTransaction transaction, HttpServletRequest req) throws Throwable {
-        setupHandlers(jwtRunner, oa2SE, transaction, null, req);
+
+    public static void setupHandlers(JWTRunner jwtRunner,
+                                     OA2SE oa2SE,
+                                     OA2ServiceTransaction transaction,
+                                     OA2Client client,
+                                     HttpServletRequest req) throws Throwable {
+        setupHandlers(jwtRunner, oa2SE, transaction, client, null, req);
     }
 
-    public static void setupHandlers(JWTRunner jwtRunner, OA2SE oa2SE, OA2ServiceTransaction transaction, TXRecord txRecord, HttpServletRequest req) throws Throwable {
+
+    public static void setupHandlers(JWTRunner jwtRunner,
+                                     OA2SE oa2SE,
+                                     OA2ServiceTransaction transaction,
+                                     OA2Client client,
+                                     TXRecord txRecord,
+                                     HttpServletRequest req) throws Throwable {
         MetaDebugUtil debugger = DebugUtil.getInstance();
         if (transaction.getClient().isDebugOn()) {
             debugger = new MetaDebugUtil();
             debugger.setIsEnabled(true);
         }
         debugger.trace(OA2ClientUtils.class, "Setting up handlers");
-        OA2Client client = (OA2Client) transaction.getClient();
+        //OA2Client client = (OA2Client) transaction.getClient();
         // Allow a client to skip any server scripts on a case by case basis.
         if (!client.isSkipServerScripts() && oa2SE.getQDLEnvironment().hasServerScripts()) {
             ServerQDLScriptHandlerConfig qdlScriptHandlerConfig = new ServerQDLScriptHandlerConfig(oa2SE, transaction, txRecord, req);
@@ -387,5 +401,60 @@ public class OA2ClientUtils {
         List<String> computedScopes = new ArrayList<>();
         return computedScopes;
 
+    }
+
+    public static OA2Client resolvePrototypes(OA2SE oa2SE, OA2Client baseClient) {
+        return resolvePrototypes(oa2SE.getClientStore(), baseClient);
+    }
+
+    public static OA2Client resolvePrototypes(ClientStore store, OA2Client baseClient) {
+        if (!baseClient.hasPrototypes()) {
+            return baseClient; // end of story
+        }
+        ColumnMap clientMap = new ColumnMap();
+        MapConverter mapConverter = store.getMapConverter();
+        mapConverter.toMap(baseClient, clientMap);
+        OA2ClientKeys oa2ClientKeys = (OA2ClientKeys) mapConverter.getKeys();
+        // If a key is in the following, skip it. Clients keep their secret, id and name
+        // generally
+        HashSet<String> skipSet = new HashSet<>();
+        skipSet.add(oa2ClientKeys.secret());
+        skipSet.add(oa2ClientKeys.identifier());
+        skipSet.add(oa2ClientKeys.name());
+
+        for (Identifier id : baseClient.getPrototypes()) {
+            OA2Client currentClient = (OA2Client) store.get(id);
+            if (currentClient == null) {
+                throw new UnknownClientException("client \"" + id + "\" does not exist");
+            }
+            ColumnMap map = new ColumnMap();
+            mapConverter.toMap(currentClient, map);
+            for (String key : map.keySet()) {
+                // skip secrets and identifiers!!!
+                if (skipSet.contains(key)) {
+                    continue;
+                }
+                Object obj = map.get(key);
+                if (obj instanceof Long) {
+                    long value = (Long) obj;
+                    if (0 <= value) {
+                        clientMap.put(key, value);
+                    }
+                } else {
+                    if (obj instanceof Integer) {
+                        int value = (Integer) obj;
+                        if (0 <= value) {
+                            clientMap.put(key, value);
+                        }
+                    } else {
+                        clientMap.put(key, obj);
+                    }
+                }
+            }
+        }
+
+        OA2Client client = (OA2Client) store.getMapConverter().fromMap(clientMap, null);
+        client.setReadOnly(true);
+        return client;
     }
 }

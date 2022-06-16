@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.IssuerTransactionState;
 import edu.uiuc.ncsa.security.core.Identifier;
@@ -38,7 +39,7 @@ public abstract class AbstractAccessTokenServlet2 extends MultiAuthServlet {
         doDelegation(httpServletRequest, httpServletResponse);
     }
 
-    protected abstract ATRequest getATRequest(HttpServletRequest request, ServiceTransaction transaction);
+    protected abstract ATRequest getATRequest(HttpServletRequest request, ServiceTransaction transaction, OA2Client client);
 
     protected abstract ServiceTransaction getTransaction(AuthorizationGrant ag, HttpServletRequest req) throws ServletException;
 
@@ -57,8 +58,11 @@ public abstract class AbstractAccessTokenServlet2 extends MultiAuthServlet {
         AuthorizationGrant updatedAG  = checkAGExpiration(ag);
         ServiceTransaction transaction = getTransaction(ag, httpServletRequest);
 
-        return getIssuerTransactionState(httpServletRequest, httpServletResponse,  updatedAG,
+        return getIssuerTransactionState(httpServletRequest,
+                httpServletResponse,
+                updatedAG,
                 transaction,
+                (OA2Client)client,
                 GenericStoreUtils.toXML(getTransactionStore(), transaction));
     }
 
@@ -75,12 +79,14 @@ public abstract class AbstractAccessTokenServlet2 extends MultiAuthServlet {
                                                              HttpServletResponse httpServletResponse,
                                                              AuthorizationGrant updatedAG,
                                                              ServiceTransaction transaction,
+                                                               OA2Client client,
                                                                XMLMap backup) throws Throwable {
          return getIssuerTransactionState(
                  httpServletRequest,
                  httpServletResponse,
                  updatedAG,
                  transaction,
+                 client,
                  backup,
                  false);
     }
@@ -88,6 +94,7 @@ public abstract class AbstractAccessTokenServlet2 extends MultiAuthServlet {
                                                              HttpServletResponse httpServletResponse,
                                                              AuthorizationGrant updatedAG,
                                                              ServiceTransaction transaction,
+                                                               OA2Client client,
                                                                XMLMap backup,
                                                                boolean isRFC8628) throws Throwable {
 
@@ -97,7 +104,7 @@ public abstract class AbstractAccessTokenServlet2 extends MultiAuthServlet {
             transaction.setAuthorizationGrant(updatedAG);
         }
         MetaDebugUtil debugger = createDebugger(transaction.getClient());
-        ATRequest atRequest = getATRequest(httpServletRequest, transaction);
+        ATRequest atRequest = getATRequest(httpServletRequest, transaction, client);
 
         Verifier v = getServiceEnvironment().getTokenForge().getVerifier(httpServletRequest);
         atRequest.setVerifier(v); // can be null

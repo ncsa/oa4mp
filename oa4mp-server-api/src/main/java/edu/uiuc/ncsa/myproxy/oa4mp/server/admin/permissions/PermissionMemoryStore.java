@@ -70,46 +70,6 @@ public class PermissionMemoryStore<V extends Permission> extends MemoryStore<V> 
     }
 
 
-
-/*    @Override
-    public PermissionList getErsatzChains(Identifier clientID) {
-        PermissionList permissions = new PermissionList();
-        for (Identifier id : keySet()) {
-            V permission = get(id);
-            if (permission.canSubstitute() &&  permission.getClientID().equals(clientID)) {
-                permissions.add(permission);
-            }
-        }
-        return permissions;
-    }*/
-
-/*    @Override
-    public List<Identifier> getAntecessors(Identifier ersatzID) {
-        List<Identifier> ids = new ArrayList<>();
-        PermissionList permissions = new PermissionList();
-        for (Identifier id : keySet()) {
-            V permission = get(id);
-            if (permission.canSubstitute() &&  permission.getErsatzChain().equals(ersatzID)) {
-                permissions.add(permission);
-            }
-        }
-        return ids;
-    }*/
-
-/*
-    @Override
-    public Identifier getOriginalClient(Identifier ersatzID) {
-        PermissionList permissions = new PermissionList();
-        for (Identifier id : keySet()) {
-            V permission = get(id);
-            if (permission.canSubstitute() &&  permission.getErsatzID().equals(ersatzID)) {
-                permissions.add(permission);
-            }
-        }
-        return null;
-    }
-*/
-
     @Override
     public List<Identifier> getClients(Identifier adminID) {
 

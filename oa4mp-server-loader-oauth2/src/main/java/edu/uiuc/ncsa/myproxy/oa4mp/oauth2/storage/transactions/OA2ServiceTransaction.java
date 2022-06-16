@@ -22,6 +22,7 @@ import net.sf.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
 
 import java.io.*;
+import java.net.URI;
 import java.util.*;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ExtendedParameters.EXTENDED_ATTRIBUTES_KEY;
@@ -712,4 +713,36 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         this.rtJWT = rtJWT;
     }
 
+    /**
+     * Get the last 6 characters of the unique part of an identifer
+     *
+     * @param id
+     * @return
+     */
+    protected String firstSix(URI id) {
+        String agID = id.getPath();
+        if(agID == null){
+            // custom ids like foo:bar won't work with this, so return it all.
+            return id.toString();
+        }
+        agID = agID.substring(agID.lastIndexOf("/")+1);
+        return agID.substring(0, 6);
+    }
+
+    /**
+     * Summary for debugging.
+     *
+     * @return
+     */
+    public String summary() {
+        String out = "Transaction[id=" + firstSix(getIdentifier().getUri());
+        if (hasAccessToken()) {
+            out = out + ", at=" + firstSix(getAccessToken().getJti());
+        }
+        if (hasRefreshToken()) {
+            out = out + ", rt=" + firstSix(getRefreshToken().getJti());
+        }
+        out = out + ", client=" + firstSix(getClient().getIdentifier().getUri());
+        return out + "]";
+    }
 }

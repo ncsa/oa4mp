@@ -10,7 +10,6 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.AuthorizationTemplate;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.AuthorizationTemplates;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
-import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
@@ -32,9 +31,10 @@ import java.util.*;
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.ScopeTemplateUtil.doCompareTemplates;
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.ScopeTemplateUtil.replaceTemplate;
 import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
-import static edu.uiuc.ncsa.security.oauth_2_0.jwt.ScriptingConstants.*;
 import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.*;
-import static edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse.*;
+import static edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse.RC_NOT_RUN;
+import static edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse.RC_OK;
+import static edu.uiuc.ncsa.security.util.scripting.ScriptingConstants.*;
 
 /**
  * Only create an access token handler if you need some special handling, otherwise the
@@ -287,7 +287,7 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
           Make SURE the JTI gets set or token exchange, user info etc. will never work.
          */
         MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(transaction.getOA2Client());
-        debugger.trace(this, "starting AT handler finish with transaction =" + transaction);
+        debugger.trace(this, "starting AT handler finish with transaction =" + transaction.summary());
         JSONObject atData = getAtData();
         if (getPhCfg().hasTXRecord()) {
             // Fixes CIL-971

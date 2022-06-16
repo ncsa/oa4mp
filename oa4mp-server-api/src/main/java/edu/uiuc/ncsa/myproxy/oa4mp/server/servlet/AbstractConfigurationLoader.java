@@ -106,9 +106,15 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
                         // A missing config file is bad. However, if there is exactly one configuration in the file
                         // it does not need to be named, so the cfgName can be omitted.
                       authorizationServletConfig = new AuthorizationServletConfig(cfgFile, cfgName==null?"":cfgName);
+                      // Grab any authz URI or the discovery page does not get set right!
+                        authorizationURI = getFirstAttribute(sn, OA4MPConfigTags.AUTHORIZATION_SERVLET_URI);
+                        if(authorizationURI != null){
+                            authorizationServletConfig.authorizationURI = authorizationURI;
+                        }
+
                     }else {
+                        authorizationURI = getFirstAttribute(sn, OA4MPConfigTags.AUTHORIZATION_SERVLET_URI);
                         if (useHeader) {
-                            authorizationURI = getFirstAttribute(sn, OA4MPConfigTags.AUTHORIZATION_SERVLET_URI);
                             requiredHeader = getCfgBoolean(sn, OA4MPConfigTags.AUTHORIZATION_SERVLET_HEADER_REQUIRE, requiredHeader);
                             headFieldName = getFirstAttribute(sn, OA4MPConfigTags.AUTHORIZATION_SERVLET_HEADER_FIELD_NAME);
                             returnDnAsUsername = getCfgBoolean(sn, OA4MPConfigTags.AUTHORIZATION_SERVLET_RETURN_DN_AS_USERNAME, returnDnAsUsername);

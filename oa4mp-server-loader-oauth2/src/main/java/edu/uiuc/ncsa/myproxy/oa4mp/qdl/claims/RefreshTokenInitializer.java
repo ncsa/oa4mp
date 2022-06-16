@@ -11,8 +11,7 @@ import net.sf.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-import static edu.uiuc.ncsa.security.oauth_2_0.jwt.ScriptingConstants.*;
-
+import static edu.uiuc.ncsa.security.util.scripting.ScriptingConstants.*;
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 10/12/20 at  6:16 AM

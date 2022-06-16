@@ -168,6 +168,16 @@ public class AdminClient extends BaseClient {
 
     boolean allowQDL = false;
 
+    public boolean allowQDLCodeBlocks() {
+        return allowQDLCodeBlocks;
+    }
+
+    public void setAllowQDLCodeBlocks(boolean allowQDLCodeBlocks) {
+        this.allowQDLCodeBlocks = allowQDLCodeBlocks;
+    }
+
+    boolean allowQDLCodeBlocks = false;
+
     @Override
     public String toString() {
         return "AdminClient{" +

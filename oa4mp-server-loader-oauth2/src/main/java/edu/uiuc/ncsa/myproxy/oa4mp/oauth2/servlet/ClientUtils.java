@@ -219,11 +219,11 @@ public class ClientUtils {
      * @param transactionState
      * @return
      */
-    public static Collection<String> resolveScopes(TransactionState transactionState, boolean isRFC8628) {
-        return resolveScopes(transactionState, false, isRFC8628);
+    public static Collection<String> resolveScopes(TransactionState transactionState, OA2Client oa2Client, boolean isRFC8628) {
+        return resolveScopes(transactionState, oa2Client, false, isRFC8628);
     }
 
-    public static Collection<String> resolveScopes(TransactionState transactionState, boolean isNew, boolean isRFC8628) {
+    public static Collection<String> resolveScopes(TransactionState transactionState, OA2Client oa2Client, boolean isNew, boolean isRFC8628) {
         // Next 2 parameters are so error messages can be reasonably constructed, naught else
         String rawScopes = transactionState.getRequest().getParameter(SCOPE);
 
@@ -236,7 +236,6 @@ public class ClientUtils {
         debugger.trace(ClientUtils.class, ".resolveScopes: server scopes=" + ((OA2SE) getServiceEnvironment()).getScopes());
         debugger.trace(ClientUtils.class, ".resolveScopes: user validated scopes=" + st.getValidatedScopes());
         */
-        OA2Client oa2Client = (OA2Client) st.getClient();
         Collection<String> requestedScopes = new ArrayList<>();
 
         if (rawScopes == null || rawScopes.length() == 0) {

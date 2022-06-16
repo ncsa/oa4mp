@@ -51,18 +51,13 @@ public abstract class AbstractPayloadHandler implements PayloadHandler {
         transaction = phCfg.getTransaction();
         request = phCfg.getRequest();
         ServletDebugUtil.trace(this, "payload handler cfg=" + phCfg);
-        ServletDebugUtil.trace(this, "transaction =" + transaction);
+        ServletDebugUtil.trace(this, "transaction =" + transaction.summary());
         ServletDebugUtil.trace(this, "has OA2SE? " + (oa2se != null));
-        //   claims = new JSONObject();
         claims = null; // use lazy initialization
     }
 
     @Override
     public JSONObject getClaims() {
-/*        if (claims == null) {
-            claims = transaction.getUserMetaData();
-        }
-        return claims;*/
         return transaction.getUserMetaData();
     }
 

@@ -13,9 +13,9 @@ import net.sf.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-import static edu.uiuc.ncsa.security.oauth_2_0.jwt.ScriptingConstants.*;
 import static edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse.RC_NOT_RUN;
 import static edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse.RC_OK;
+import static edu.uiuc.ncsa.security.util.scripting.ScriptingConstants.*;
 
 /**
  * This is a handler for all scripts that the user may set in the configuration. These

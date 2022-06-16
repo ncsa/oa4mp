@@ -13,6 +13,9 @@ import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
 import edu.uiuc.ncsa.security.storage.XMLMap;
 import org.apache.http.HttpStatus;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 /**
  * Utilities for various servlets. These handle the exceptions from the script runtime engine and perform
  * a full rollback. These are messy, but unavoidable.
@@ -20,6 +23,8 @@ import org.apache.http.HttpStatus;
  * on 4/26/22 at  6:52 AM
  */
 public class OA2ServletUtils {
+    public static int stackTraceMaxLines = 5;
+
     public static void handleScriptEngineException(Object callingObject,
                                                    OA2SE oa2SE,
                                                    Throwable t,
@@ -31,7 +36,6 @@ public class OA2ServletUtils {
     }
 
     /**
-
      * @param callingObject
      * @param oa2SE
      * @param exception
@@ -58,57 +62,103 @@ public class OA2ServletUtils {
             if (qdlExceptionWithTrace.getCause() != null) {
                 throwable = qdlExceptionWithTrace.getCause();
             }
-            debugger.error(callingObject, "Server exception \"" + throwable.getMessage() + "\"", exception);
-            throw new OA2ATException(OA2Errors.SERVER_ERROR,
-                    "internal error:" + exception.getMessage(),
-                    HttpStatus.SC_INTERNAL_SERVER_ERROR,
-                    transaction.getRequestState());
-        }
-        if(exception instanceof AssertionException){
-            // they passed a bad argument to a QDL script
-            AssertionException assertionException = (AssertionException)exception;
-            debugger.trace(callingObject, "assertion exception \"" + assertionException.getMessage() + "\"");
+            String message = "error processing request:" + exception.getMessage();
+            ppξ(throwable, callingObject, oa2SE, debugger, message);
+
             throw new OA2ATException(OA2Errors.INVALID_REQUEST,
-                    assertionException.getMessage(),
+                    message,
                     HttpStatus.SC_BAD_REQUEST,
                     transaction.getRequestState());
         }
-        if(exception instanceof ScriptRuntimeException){
+        if (exception instanceof AssertionException) {
+            // they passed a bad argument to a QDL script
+            String message = "assertion exception:" + exception.getMessage();
+            ppξ(exception, callingObject, oa2SE, debugger, message);
+            throw new OA2ATException(OA2Errors.INVALID_REQUEST,
+                    message,
+                    HttpStatus.SC_BAD_REQUEST,
+                    transaction.getRequestState());
+        }
+        if (exception instanceof ScriptRuntimeException) {
             // QDL script threw an exception. Usually this means there is missing information from e.g. LDAP.
             // Let the user try and figure everything out and try again.
             ScriptRuntimeException sre = (ScriptRuntimeException) exception;
-            debugger.trace(callingObject, "script runtime exception \"" + sre.getMessage() + "\"");
+            String message = "script runtime exception: \"" + sre.getMessage() + "\"";
+            ppξ(exception, callingObject, oa2SE, debugger, message);
+            // message in the exception should be exactly what the script threw, but we add a note about its origin.
             throw new OA2ATException(sre.getRequestedType(), sre.getMessage(), sre.getStatus(), transaction.getRequestState());
         }
-        if(exception instanceof IllegalAccessException){
+        if (exception instanceof IllegalAccessException) {
+            // Most generic exception possible.
             // *Possible* from servlet. Mostly catching it here since otherwise the user gets something
             // completely confusing.
-            debugger.trace(callingObject, "internal illegal access exception \"" + exception.getMessage() + "\"", exception);
-            // Most generic exception possible.
+            String message = "illegal access exception \"" + exception.getMessage() + "\"";
+            ppξ(exception, callingObject, oa2SE, debugger, message);
             throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
                     "access denied",
                     transaction.getRequestState());
         }
 
         // Everything else. Allow to fix the problem. Proceeding means that the transaction will complete
-        // and the old tokens will be invalid, replaced by new ones.
-        debugger.trace(callingObject, "Unable to update claims on token refresh", exception);
-        debugger.warn(callingObject, "Unable to update claims on token refresh: \"" + exception.getMessage() + "\"");
+        // and the old tokens will be invalid, replaced by new ones, so don't do that. Let someone have
+        // a chance to fix the issue.
+        String message = "unable to update claims on token refresh: \"" + exception.getMessage() + "\"";
+        ppξ(exception, callingObject,oa2SE, null, message);
         throw new OA2ATException(OA2Errors.INVALID_REQUEST,
-                "invalid request",
+                message,
                 HttpStatus.SC_BAD_REQUEST,
                 transaction.getRequestState());
-
-    }
-
-    protected static void rollback(OA2SE oa2SE, XMLMap backup) {
-        rollback(oa2SE, backup, null);
     }
 
     protected static void rollback(OA2SE oa2SE, XMLMap backup, TXRecord txRecord) {
         GenericStoreUtils.fromXMLAndSave(oa2SE.getTransactionStore(), backup);
         if (txRecord != null) {
             oa2SE.getTxStore().remove(txRecord.getIdentifier());
+        }
+    }
+
+    /**
+     * Take a stack trace and print the first n lines of it.
+     *
+     * @param e
+     * @param n
+     * @return the truncated stack trace
+     */
+    public static String truncateStackTrace(Throwable e, int n, boolean printIt) {
+        StringWriter writer = new StringWriter();
+        e.printStackTrace(new PrintWriter(writer));
+        String[] lines = writer.toString().split("\n");
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < Math.min(lines.length, n); i++) {
+            sb.append(lines[i]).append("\n");
+        }
+        if(printIt) {
+            System.err.println(sb);
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Pretty print the exception. This decides what to print and shortens the stack trace.
+     *
+     * @param throwable
+     * @param callingObject
+     * @param debugger
+     * @param message
+     */
+    protected static void ppξ(Throwable throwable,
+                              Object callingObject,
+                              OA2SE oa2SE,
+                              MetaDebugUtil debugger,  // if null, forces output.
+                              String message) {
+        if (debugger == null) {
+            oa2SE.warn(message);
+            oa2SE.warn(truncateStackTrace(throwable, stackTraceMaxLines, false));
+            return;
+        }
+        if (debugger.isEnabled()) {
+            debugger.trace(callingObject, message);
+            debugger.trace(callingObject, truncateStackTrace(throwable, stackTraceMaxLines, false));
         }
     }
 }

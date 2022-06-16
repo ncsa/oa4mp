@@ -16,6 +16,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * <H2>ACL Use</H2>
+ * <p>Access Control Lists for QDL Scripts in OA4MP. You may do </p>
+ * <ul>
+ *     <li>acl_reject(id|id.) - blacklist these</li>
+ *     <li>acl_add(id|id.) - allow access for the ids.</li>
+ * </ul>
+ * <p>Note that you may specify either client ids individually,  admin IDs. or * (to allow
+ * unlimited access for, e.g., some library that is widely used). Setting an admin id
+ * will allow all clients managed by the admin to have access.
+ * </p>
  * <p>Created by Jeff Gaynor<br>
  * on 1/25/21 at  7:44 AM
  */
@@ -24,7 +34,7 @@ public class QDLACL implements QDLModuleMetaClass {
 
     public static String ACL_REJECT_NAME = "acl_reject";
 
-    public class ACLReject implements QDLFunction{
+    public class ACLReject implements QDLFunction {
         @Override
         public String getName() {
             return ACL_REJECT_NAME;
@@ -37,19 +47,20 @@ public class QDLACL implements QDLModuleMetaClass {
 
         @Override
         public Object evaluate(Object[] objects, State state) {
-            acceptOrReject(objects,state,getName(), false);
+            acceptOrReject(objects, state, getName(), false);
             return null;
         }
 
         @Override
 
-       public List<String> getDocumentation(int argCount) {
+        public List<String> getDocumentation(int argCount) {
             List<String> doxx = new ArrayList<>();
             doxx.add(getName() + "(id | id.) block for this object or objects. AKA blacklist them.");
 
             return null;
         }
     }
+
     public static String ADD_TO_ACL_NAME = "acl_add";
 
     protected Boolean acceptOrReject(Object[] objects, State state, String name, boolean accept) {
@@ -76,10 +87,10 @@ public class QDLACL implements QDLModuleMetaClass {
         for (Object id : ids) {
             Identifier identifier;
             try {
-                if(!(id instanceof String)){
+                if (!(id instanceof String)) {
                     throw new IllegalArgumentException("Error: '" + id + "' is not a valid identifier");
                 }
-                URI uri = URI.create((String)id);
+                URI uri = URI.create((String) id);
                 identifier = BasicIdentifier.newID(uri);
                 boolean isClientID = oa2State.getOa2se().getClientStore().containsKey(identifier);
                 boolean isAdminID = oa2State.getOa2se().getAdminClientStore().containsKey(identifier);
@@ -89,9 +100,9 @@ public class QDLACL implements QDLModuleMetaClass {
                 if (!isAdminID && !isClientID) {
                     throw new QDLIllegalAccessException("Error: There is a no such client with id '" + identifier.toString() + "'. Access denied.");
                 }
-                if(accept){
-                oa2State.getAclList().add(identifier);
-                }else{
+                if (accept) {
+                    oa2State.getAclList().add(identifier);
+                } else {
                     oa2State.getAclBlackList().add(identifier);
                 }
 
@@ -137,6 +148,8 @@ public class QDLACL implements QDLModuleMetaClass {
     }
 
     public static String CHECK_ACL_NAME = "acl_check";
+    public static Identifier ACL_ACCEPT_ALL = BasicIdentifier.newID("*");
+
 
     public class CheckACL implements QDLFunction {
         @Override
@@ -158,12 +171,12 @@ public class QDLACL implements QDLModuleMetaClass {
             OA2State oa2State = (OA2State) state;
             // Check blacklist first
 
-            if(oa2State.getAclBlackList().contains(oa2State.getClientID())){
+            if (oa2State.getAclBlackList().contains(oa2State.getClientID())) {
                 // Full stop.
                 throw new QDLIllegalAccessException("Error: client '" + oa2State.getClientID() + "' does not have permission to access this resource.");
             }
-            for(Identifier adminID : oa2State.getAdminIDs()){
-                if(oa2State.getAclBlackList().contains(adminID)){
+            for (Identifier adminID : oa2State.getAdminIDs()) {
+                if (oa2State.getAclBlackList().contains(adminID)) {
                     throw new QDLIllegalAccessException("Error: client '" + oa2State.getClientID() + "' does not have permission to access this resource.");
                 }
             }
@@ -173,13 +186,15 @@ public class QDLACL implements QDLModuleMetaClass {
                 }
                 return Boolean.FALSE;
             }
-
-            // Direct check.
-            if(oa2State.getAclList().contains(oa2State.getClientID())){
+            if (oa2State.getAclList().contains(ACL_ACCEPT_ALL)) {
                 return Boolean.TRUE;
             }
-            for(Identifier adminID : oa2State.getAdminIDs()){
-                if(oa2State.getAclList().contains(adminID)){
+            // Direct check.
+            if (oa2State.getAclList().contains(oa2State.getClientID())) {
+                return Boolean.TRUE;
+            }
+            for (Identifier adminID : oa2State.getAdminIDs()) {
+                if (oa2State.getAclList().contains(adminID)) {
                     return Boolean.TRUE;
                 }
             }

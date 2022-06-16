@@ -58,7 +58,6 @@ public class ClientServlet extends EnvServlet {
 
             //   printAllParameters(httpServletRequest);
             if (doPing(httpServletRequest, httpServletResponse)) return;
-            System.err.println("ENCODING is of type " + httpServletRequest.getContentType());
             // TODO Probably should parse the encoding type. 'application/json; charset=UTF-8' would be standard.
             if (!httpServletRequest.getContentType().contains("application/json")) {
                 httpServletResponse.setStatus(HttpStatus.SC_UNSUPPORTED_MEDIA_TYPE);

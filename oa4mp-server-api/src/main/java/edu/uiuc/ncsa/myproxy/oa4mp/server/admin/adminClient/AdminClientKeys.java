@@ -15,6 +15,8 @@ public class AdminClientKeys extends BaseClientKeys {
         secret("secret");
     }
     String allowQDL = "allow_qdl";
+    String allowQDLCodeBlocks = "allow_qdl_code_blocks";
+
     String config = "config";
     String issuer = "issuer";
     String maxClients = "max_clients";
@@ -28,7 +30,10 @@ public class AdminClientKeys extends BaseClientKeys {
         if (0 < x.length) listUsers= x[0];
         return listUsers;
     }
-
+    public String allowQDLCodeBlocks(String... x) {
+           if (0 < x.length) allowQDLCodeBlocks = x[0];
+           return allowQDLCodeBlocks;
+       }
     public String listUsersInOtherClients(String... x) {
         if (0 < x.length) listUsersInOtherClients= x[0];
         return listUsersInOtherClients;

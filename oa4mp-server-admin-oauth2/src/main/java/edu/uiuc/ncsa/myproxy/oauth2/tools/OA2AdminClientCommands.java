@@ -366,30 +366,6 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
         say("done. Removed " + count + " clients and processed " + pcount + " permissions");
     }
 
-/*    public void list_originals(InputLine inputLine) throws Exception {
-        if (showHelp(inputLine)) {
-            say("list_originals ersatz_id [admin_id] = list all of the clients the this may be a substitute for.");
-            return;
-        }
-        AdminClient adminClient = (AdminClient) findItem(inputLine);
-         if (adminClient == null) {
-             say("Sorry, there is no admin client for this identifier.");
-             return;
-         }
-         Identifier ersatzID = BasicIdentifier.newID(inputLine.getArg(1));
-          permissionsStore.getErsatzChains(adminClient.getIdentifier(), ersatzID);
-        List<Identifier> ids = permissionsStore.getAntecessors(ersatzID);
-
-         if (ids == null || ids.isEmpty()) {
-             say("(none)");
-             return;
-         }
-         int count = 0;
-         for (Identifier identifier : ids) {
-                 say(identifier.toString());
-         }
-         say(ids.size() + " total original clients");
-    }*/
 
     public void list_ersatz(InputLine inputLine)throws Exception{
         if (showHelp(inputLine)) {

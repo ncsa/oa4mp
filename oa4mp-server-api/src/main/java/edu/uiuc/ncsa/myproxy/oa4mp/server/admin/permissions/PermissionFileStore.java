@@ -93,31 +93,5 @@ public class PermissionFileStore<V extends Permission> extends FileStore<V> impl
         return PermissionStoreUtil.getErsatzChain(this, adminID, clientID, ersatzID);
     }
 
-/*    @Override
-    public PermissionList getErsatzChains(Identifier clientID) {
-        PermissionList permissions = new PermissionList();
-        for (Identifier id : keySet()) {
-            V permission = get(id);
-            if (permission.canSubstitute() &&  permission.getClientID().equals(clientID)) {
-                permissions.add(permission);
-            }
-        }
-        return permissions;
-    }*/
-
-/*    @Override
-    public List<Identifier> getAntecessors(Identifier ersatzID) {
-        List<Identifier> ids = new ArrayList<>();
-        PermissionList permissions = new PermissionList();
-        for (Identifier id : keySet()) {
-            V permission = get(id);
-            if (permission.canSubstitute() &&  permission.getErsatzChain().equals(ersatzID)) {
-                permissions.add(permission);
-            }
-        }
-        return ids;
-    }*/
-
-
 }
 

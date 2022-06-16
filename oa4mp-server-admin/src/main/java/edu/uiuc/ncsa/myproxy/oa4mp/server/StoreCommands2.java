@@ -20,12 +20,10 @@ import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
-import org.apache.commons.codec.digest.DigestUtils;
 
 import java.io.*;
 import java.math.BigDecimal;
 import java.net.URI;
-import java.security.SecureRandom;
 import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -292,6 +290,15 @@ public abstract class StoreCommands2 extends StoreCommands {
             showSerializeHelp();
             return;
         }
+        Identifiable x = findItem(inputLine);
+        if (x == null) {
+            say("object not found");
+            return;
+        }
+      serialize(inputLine, x);
+    }
+    protected void serialize(InputLine inputLine, Identifiable x ) {
+
         OutputStream os = System.out;
         boolean hasFile = false;
         if (inputLine.hasArg(FILE_FLAG)) {
@@ -303,13 +310,6 @@ public abstract class StoreCommands2 extends StoreCommands {
             }
             inputLine.removeSwitchAndValue(FILE_FLAG);
         }
-
-        Identifiable x = findItem(inputLine);
-        if (x == null) {
-            say("Object not found");
-            return;
-        }
-
 
         XMLMap c = new XMLMap();
         getStore().getXMLConverter().toMap(x, c);
@@ -353,27 +353,26 @@ public abstract class StoreCommands2 extends StoreCommands {
     }
 
     protected void showSearchHelpExamples() {
-        say("E.g.");
-        sayi("search " + KEY_SHORTHAND_PREFIX + "approver " + " junit");
-        say("Searches for the approver keys that are exactly 'junit'");
-        say("E.g.");
-        sayi("search " + KEY_SHORTHAND_PREFIX + "client_id " + SEARCH_REGEX_FLAG + " \".*07028.*\"");
+        say("All of these examples are in the client store, but the syntax works in any store.");
+        say("Be aware that different stores have difference attributes.");
+        say("E.g. ");
+        sayi("clients>search " + KEY_SHORTHAND_PREFIX + "client_id " + SEARCH_REGEX_FLAG + " \".*07028.*\"");
         say("Searches for the client_id keys that contains '07028'");
         say("E.g.");
-        sayi("search " + KEY_FLAG + " email " + SEARCH_SHORT_REGEX_FLAG + " \".*bigstate\\.edu.*\"");
+        sayi("clients> search " + KEY_FLAG + " email " + SEARCH_SHORT_REGEX_FLAG + " \".*bigstate\\.edu.*\"");
         say("Searches the email keys that contain 'bigstate.edu'.");
         say("Note that the period must be escaped for a regex.");
         say("E.g.");
-        sayi("search " + KEY_SHORTHAND_PREFIX + "client_id " +
+        sayi("clients>search " + KEY_SHORTHAND_PREFIX + "client_id " +
                 SEARCH_RETURNED_ATTRIBUTES_FLAG + " [name, email] " +
                 SEARCH_SHORT_REGEX_FLAG + " " + ".*237.*");
         say("Searches the client_id keys that contain the string 237 and only print out the name and email from those.");
         say("E.g.");
-        sayi("search " + SEARCH_DATE_FLAG + " creation_ts " + SEARCH_BEFORE_TS_FLAG + " 2021-01-02 " + SEARCH_RESULT_SET_NAME + " last_year");
+        sayi("clients>search " + SEARCH_DATE_FLAG + " creation_ts " + SEARCH_BEFORE_TS_FLAG + " 2021-01-02 " + SEARCH_RESULT_SET_NAME + " last_year");
         say("Searches the creation_ts keys as dates, returning all that are before Jan 2, 20201.");
         say("This also stores the result under the name last_year. See also the rs command help");
         say("E.g.");
-        sayi("search " + KEY_SHORTHAND_PREFIX + "email " + SEARCH_SHORT_REGEX_FLAG + " \".*bigstate\\.edu.*\" " + SEARCH_DATE_FLAG + " creation_ts " + SEARCH_BEFORE_TS_FLAG + " 2021-01-02 " + SEARCH_RESULT_SET_NAME + " last_year_email");
+        sayi("clients>search " + KEY_SHORTHAND_PREFIX + "email " + SEARCH_SHORT_REGEX_FLAG + " \".*bigstate\\.edu.*\" " + SEARCH_DATE_FLAG + " creation_ts " + SEARCH_BEFORE_TS_FLAG + " 2021-01-02 " + SEARCH_RESULT_SET_NAME + " last_year_email");
         say("Searches per date as in the previous example and further restricts it to matching the given key.");
         say("This also stores the result under the name last_year_email. See also the rs command help");
         say("E.g. A date search");
@@ -382,10 +381,10 @@ public abstract class StoreCommands2 extends StoreCommands {
         say("clients>search >client_id -r .*234.* -date creation_ts -after 2020-05-01 -before 2020-05-30 -rs s234");
         say("got 4 matches");
         say("E.g. getting the most recent entries");
-        say("search " + NEXT_N_COMMAND + " 15");
+        say("clients>search " + NEXT_N_COMMAND + " 15");
         say("This returns the most recent 15 entries to this store. An argument of -15 woudl return the oldest 15.");
         say("E.g. search for a subset");
-        say("search -n 5 -out [name, creation_ts, client_id]");
+        say("clients>search -n 5 -out [name, creation_ts, client_id]");
         say("\nSee also: rs");
     }
 

@@ -9,6 +9,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractAuthorizationServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.EnvServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.PresentationState;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.util.ClientDebugUtil;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
@@ -347,6 +348,9 @@ public class RFC8628AuthorizationServer extends EnvServlet {
             throw new OA2ATException(OA2Errors.INVALID_GRANT, "grant is invalid", HttpStatus.SC_BAD_REQUEST, null);
         }
         MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(trans.getOA2Client());
+        if(debugger instanceof ClientDebugUtil){
+            ((ClientDebugUtil)debugger).setTransaction(trans);
+        }
         debugger.trace(this, "processRequest committed?" + pendingState.getResponse().isCommitted());
         if (!trans.isRFC8628Request()) {
             //So there is such a grant but somehow this is not a valid rfc 8628 request. Should not happen, but if someone edited

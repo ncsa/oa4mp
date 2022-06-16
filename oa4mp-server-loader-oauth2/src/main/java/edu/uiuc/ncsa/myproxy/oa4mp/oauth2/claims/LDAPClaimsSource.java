@@ -322,7 +322,11 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
                                    String userID,
                                    Map<String, LDAPConfigurationUtil.AttributeEntry> attributes) throws NamingException {
         if (ctx == null) {
-            throw new LDAPException("Error: Could not create the LDAP context");
+            // CIL-1306: This is a little tricky. An LDAP configuration can have several alternate
+            // hosts to try, so failures are expected and considered benign. Only if the very last one
+            // fails is it considered a failure. This tries to construct a more helpful message.
+            throw new LDAPException("Error: Could not create the LDAP context on " + (new Date()) +
+                    " server=" + getLDAPCfg().getServer() + ", base=" + getLDAPCfg().getSearchBase());
         }
 
         SearchControls searchControls = new SearchControls();
@@ -336,6 +340,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
         //String addFilter = "";
         // For all questions about the filter, refer to https://tools.ietf.org/search/rfc4515
         String filter;
+        // CIL-1296. the filter attribute should replace the simple default constructed filter.
         if (!StringUtils.isTrivial(getLDAPCfg().getAdditionalFilter())) {
             // If they specify it, use the whole thing.
             //filter = "(" + getLDAPCfg().getAdditionalFilter() + ")";

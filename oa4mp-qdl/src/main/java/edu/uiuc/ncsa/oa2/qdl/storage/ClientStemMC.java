@@ -3,10 +3,16 @@ package edu.uiuc.ncsa.oa2.qdl.storage;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientConverter;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientKeys;
+import edu.uiuc.ncsa.qdl.variables.QDLList;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A {@link edu.uiuc.ncsa.qdl.variables.StemConverter} to convert stems and clients.
@@ -72,6 +78,7 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
          String callback_uri = "callback_uri";
          String config = "cfg";
          String dfInterval="df_interval";
+         String allowQDLCodeBlocks;
 
          String dfLifetime="df_lifetime";
          String ersatzClient = "ersatz_client";
@@ -87,6 +94,7 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
          String signTokens="sign_tokens";
          String signTokens="skipServerScripts";
          String strictScopes="strict_scopes";
+         String superTypes="super_types";
          */
 
         // OA2 client attributes
@@ -103,10 +111,11 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
             StemVariable j = (StemVariable) stem.get(kk().cfg());
             v.setConfig((JSONObject) j.toJSON());
         }
+
         if (stem.containsKey(kk().dfInterval())) {
             v.setDfInterval(stem.getLong(kk().dfInterval()));
         }
-        // 5
+        // 6
         if (stem.containsKey(kk().dfLifetime())) {
             v.setDfLifetime(stem.getLong(kk().dfLifetime()));
         }
@@ -128,7 +137,24 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
                 v.setLdaps(getCC().getLdapConfigurationUtil().fromJSON(array));
             }
         }
-        if(stem.containsKey(kk().proxyClaimsList())){
+        if (stem.containsKey(kk().extendsProvisioners())) {
+            v.setExtendsProvisioners(stem.getBoolean(kk().extendsProvisioners()));
+        }
+
+        if (stem.containsKey(kk().prototypes())) {
+            ArrayList<Identifier> ids = new ArrayList<>();
+            List list = toList(stem, kk().prototypes()); // generic list of strings
+            for (Object obj : list) {
+                if (obj instanceof String) {
+                    ids.add(BasicIdentifier.newID((String) obj));
+                }
+            }
+            if (!ids.isEmpty()) {
+                v.setPrototypes(ids);
+            }
+        }
+
+        if (stem.containsKey(kk().proxyClaimsList())) {
             v.setProxyClaimsList(toList(stem, kk().proxyClaimsList()));
         }
         if (stem.containsKey(kk().publicClient())) {
@@ -176,7 +202,8 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
         setNonNullStemValue(stem, kk().homeURL(), v.getHomeUri());
         setNonNullStemValue(stem, kk().errorURL(), v.getErrorUri());
         setNonNullStemValue(stem, kk().proxyLimited(), v.isProxyLimited());
-        // 9 attributes
+        setNonNullStemValue(stem, kk().extendsProvisioners(), v.isExtendsProvisioners());
+        // 10 attributes
 
         // OA2 client attributes
         setNonNullStemValue(stem, kk().atLifetime(), v.getAtLifetime());
@@ -209,7 +236,7 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
             stem.put(kk().ldap(), ldap);
         }
         setNonNullStemValue(stem, kk().publicClient(), v.isPublicClient());
-        // 11
+        // 12
         setNonNullStemValue(stem, kk().rtLifetime(), v.getRtLifetime());
         if (v.getResource() != null && !v.getResource().isEmpty()) {
             fromList(v.getResource(), stem, kk().resource());
@@ -220,6 +247,13 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
         setNonNullStemValue(stem, kk().signTokens(), v.isSignTokens());
         setNonNullStemValue(stem, kk().skipServerScripts(), v.isSkipServerScripts());
         setNonNullStemValue(stem, kk().strictScopes(), v.useStrictScopes());
+        if(v.hasPrototypes()){
+            QDLList list = new QDLList();
+            for(Identifier id : v.getPrototypes()){
+                list.add(id.toString());
+            }
+            stem.put(kk().prototypes(), list);
+        }
         // 15 attributes
         return stem;
     }

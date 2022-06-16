@@ -4,6 +4,7 @@ package edu.uiuc.ncsa.oa2.servlet;
 import edu.uiuc.ncsa.myproxy.MPSingleConnectionProvider;
 import edu.uiuc.ncsa.myproxy.MyProxyConnectable;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2AuthorizedServletUtil;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2ClientUtils;
@@ -117,6 +118,7 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
         OA2SE oa2SE = (OA2SE) MyProxyDelegationServlet.getServiceEnvironment();
 
         OA2ServiceTransaction st2 = (OA2ServiceTransaction) trans;
+        OA2Client resolvedClient = OA2ClientUtils.resolvePrototypes(oa2SE, st2.getOA2Client());
         try {
             if (rawrtl != null) {
                 st2.setRefreshTokenLifetime(Long.parseLong(rawrtl) * 1000);
@@ -127,8 +129,8 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
         super.createRedirect(request, response, trans);
         // At this point, all authentication has been done, everything is set up and the next stop in the flow is the
         // redirect back to the client.
-        JWTRunner jwtRunner = new JWTRunner(st2, ScriptRuntimeEngineFactory.createRTE(oa2SE, st2, st2.getOA2Client().getConfig()));
-        OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, st2, request);
+        JWTRunner jwtRunner = new JWTRunner(st2, ScriptRuntimeEngineFactory.createRTE(oa2SE, st2, resolvedClient.getConfig()));
+        OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, st2, resolvedClient, request);
 
 
         jwtRunner.doAuthClaims();

@@ -142,11 +142,11 @@ public class OA2TokenUtils {
             t = zzz.get(refreshToken);
         } catch (TransactionNotFoundException tnfx) {
             // No such token found for the refresh token.
-            oa2SE.getMyLogger().error("transaction not found for \"" + refreshToken + "\"", tnfx);
+            //oa2SE.getMyLogger().error("transaction not found for \"" + refreshToken + "\"", tnfx);
             throw new OA2ATException(OA2Errors.INVALID_GRANT, "invalid refresh token");
         } catch (Throwable tt) {
             // This is serious. It means that there was a problem getting the transaction vs. the transaction did not exist.
-            oa2SE.getMyLogger().error("error getting refresh token:" + refreshToken + " message:" + tt.getMessage(), tt);
+            oa2SE.getMyLogger().error("error getting refresh token:" + refreshToken + " message:" + tt.getMessage());
             throw new OA2ATException(OA2Errors.INVALID_GRANT, "invalid refresh token");
         }
         if (t != null) {
