@@ -21,14 +21,15 @@ impersonate, substitute etc. are so overloaded in English that discourse
 is getting hard -- more time is spent on what the word means in context than anything
 else. An ersatz client has a very specific, narrow definition
 and there should be few if any conflicts with other nomenclature.</p>
-<p><i><b>Definition:</b></i> An <i>ersatz client</i> in OA4MP is a specific type of
+<h3>Definition of an ersatz client</h3>
+<p>An <i>ersatz client</i> in OA4MP is a specific type of
 client which may substitute for another in a flow. A client that starts a flow is called
 the <i>provisioning client.</i> A provisioning client is just a standard client
 in OA4MP and may be confidential or public. If A is the provisioning client and α is an ersatz client
 we say write A ≻ α and refer to "A provisions α" or that "α can substitute for A". ≺ 	≻  </p>
 <ul>
     <li>All substitution relations are explicit and must be set.</li>
-    <li>Ersatz clients cannot start a flow and can only be used at the token exchange endpoint.</li>
+    <li>Ersatz clients cannot start a flow and can only be used at the token exchange (RFC 8693) endpoint.</li>
     <li>Ersatz clients are restricted in their scopes to whatever the provisioning client has and may only downscope.</li>
     <li>If A ≻ α, then α inherits the configuration (lifetimes, scripts etc.) from A unless explicitly overridden.</li>
     <li>These may be chained as A ≻ α ≻ β ≻ γ ... which connotes an inheritance chain for abilities, not necessarily a custodial chain.</li>

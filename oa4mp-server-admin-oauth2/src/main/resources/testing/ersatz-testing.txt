@@ -1,0 +1,26 @@
+The local set up for testing 𝕰𝖗s𝖆𝖙𝖟 clients.
+
+This requires a client be in a VO and administered by it. On my local machine
+admin id: admin:test/vo_1
+provisioner id: localhost:command.line2
+𝕰𝖗s𝖆𝖙𝖟 id: client:/my_ersatz
+
+How to test.
+You will need two running instances of oa2-client. One to provision and the other to
+do the substitution.
+** Make sure you do a valid flow for localhost:command.line2. Check the testing-readme.txt
+** to see what the current state is!
+
+1. Start flow for localhost:command.line2
+   a. get the access token(s)
+   b. save it to $ERSATZ
+
+2. Start 𝕰𝖗s𝖆𝖙𝖟 client issue
+   a. load  client:/my_ersatz
+   b. read $ERSATZ -p
+      (NOTE THE -p flag, which tells the system to provision from the stored state, rather than
+       replace current state with it.)
+   c. do token exchanges with -at (default) and -xt
+
+You should be able to go to the oa2-cli and search for the transactions and tokens
+that are associated with these clients.

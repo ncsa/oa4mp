@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Server-wide client configurations</title>
+    <!--#include virtual="../../head.html" -->
+</head>
+
+<body class="composite">
+<!--#include virtual="../../header.html" -->
+
+<h1>Server-wide client configurations</h1>
+<p>There are times that practically all of the clients for a server use the same policies. OA4MP allows for specifying
+QDL scripts to be run for various phases.</p>
+<h2>Example</h2>
+<p>OA4MP is to be run as a token issuer. This means that auto register is enabled (so anyone/anything may register a
+public client and it is immediately approved). The security at that point is that the login prevents unwanted
+access (<a href="using-proxies.html">proxies</a> to a secure service such as CILogon are a great idea.)
+Each user then has some set of access rights granted based on, e.g., a lookup of their user name in LDAP.
+Since the identical configuration will be used for each and every client, it would be a very bad idea to
+boilerplate the code into each and every configuration, just set it in the server configuration.</p>
+<h2>Basic structure</h2>                                    
+<p>These scripts reside inside the server &lt;qdl&gt; element. The basic format is</p>
+<pre>
+    &lt;qdl&gt;
+    &lt;!-- bunch of configuration for QDL to run --&gt;
+    &lt;scripts&gt;
+      &lt;script&gt;
+        &lt;!-- standard QDL JSON element, exactly like a client script  --&gt;
+      &lt;/script&gt;
+    &lt;scripts&gt;
+    &lt;!-- As many script elements as you need. --&gt;
+    &lt;/scripts&gt;
+    &lt;/qdl&gt;
+</pre>
+<p>Note that server scripts may contain code blocks if you just need a line or two of QDL.
+and conform to the <a href="https://cilogon.github.io/qdl/docs/qdl_server_scripts.pdf">scripting syntax.</a></p>
+<h3>An example</h3>
+<p>Here the first script is run only in the post_token phase and explicitly sets a couple of claims.
+It also prints out a debug message saying it is running. The second one loads a test script
+(and since this runs inside QDL, the script path is used to resolve it). It is only run in the pre_auth
+phase. The token_type means that the machinery used is the access token, hence access and refresh tokens
+are availble and changes to them will be saved.</p>
+<pre>
+    &lt;scripts&gt;
+       &lt;script&gt;
+       {"qdl":{"code":[
+              "x:='my_custom_claim';",
+              "say('*** IN SERVER SCRIPT');",
+              "claims.'my_claim':=x;",
+              "access_token.'my_at_claim':='my_at_claim';",
+              "refresh_token.'my_rt_claim':='my_rt_claim';"
+            ],
+
+         "xmd":{"exec_phase":"post_token"}}}
+       &lt;/script&gt;
+
+       &lt;script&gt;
+        {"qdl":
+           {
+            "load":"test.qdl",
+            "xmd":{"exec_phase":"pre_auth","token_type":"access"},
+            "args":[4,true,{"server":"localhost","port":443}]
+           }
+        }
+       &lt;/script&gt;
+    &lt;/scripts&gt;
+
+</pre>
+<h2>Relationship to client scripts</h2>
+<p>Generally all server scripts are run first, then client scripts. Clients, however,
+may opt to set the attribute skip_server_scripts (also settable using the client
+management API), thereby not processing any server hooks.</p>
+
+<!--#include virtual="../../footer.html" -->
+</body>
+</html>

@@ -1,0 +1,8 @@
+{
+   "comment":["This is a the minimal request object required for creation: a set of URIs and a name",
+     "This also sets prototypes, so that all the settings will be taken from them."
+     ],
+   "redirect_uris":["https://client.example.org/callback"],
+   "client_name": "My Example",
+   "prototypes": ["client:/ldap_0", "client:/ligo/onboarding"]
+  }

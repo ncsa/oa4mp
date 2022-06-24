@@ -123,7 +123,7 @@ public class ClientTestStoreUtil {
                 schema,
                 "localhost",
                 3306,
-                "com.mysql.jdbc.Driver",
+                "com.mysql.cj.jdbc.Driver",
                 false,"");
         return new ConnectionPool(x, ConnectionPool.CONNECTION_TYPE_MYSQL);
     }

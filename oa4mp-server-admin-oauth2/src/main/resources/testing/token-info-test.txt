@@ -1,4 +1,15 @@
-This is implemented as of 5.2.5. To test this, link to the
+This is implemented as of 5.2.5.
+The token info endpoint as per https://jira.ncsa.illinois.edu/browse/CIL-771. This allows for
+an admin client to come to the token endpoint with a custom token-info scope and a (valid) token
+from the user. Using basic authorization, the user id and a list of clients
+which contains a list of transactions  associated with this
+user uid are returned. If the user has been active, this may be a very large
+list indeed.
+
+The QDL script contains credentials for the admin, so it is not in GitHub.
+---------
+
+To test this, link to the
 
    ~/dev/csd/config/token-info.qdl
 

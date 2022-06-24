@@ -527,6 +527,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 AccessTokenImpl at = getTF2().getAccessToken();
                 RefreshTokenImpl rt = getTF2().getRefreshToken();
                 t2.setIdentifier(BasicIdentifier.newID(ag.getJti()));
+                t2.setAuthorizationGrant(ag); // This is used as the !key in the store.
                 t2.setAccessToken(at);
                 t2.setRefreshToken(rt);
                 // Need inheritance from provisioning client,
@@ -1104,6 +1105,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
 
     protected TransactionState doRefresh(OA2Client client, HttpServletRequest request, HttpServletResponse response) throws Throwable {
         // Grants are checked in the doIt method
+        printAllParameters(request);
         MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(client);
         String rawRefreshToken = request.getParameter(OA2Constants.REFRESH_TOKEN);
         if (client == null) {

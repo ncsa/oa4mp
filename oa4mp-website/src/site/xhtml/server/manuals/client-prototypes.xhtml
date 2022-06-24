@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Client Inheritance</title>
+    <!--#include virtual="../../head.html" -->
+</head>
+
+<body class="composite">
+<!--#include virtual="../../header.html" -->
+
+<h1>Clients and Prototypes</h1>
+<p>Clients have the ability to take the non-trivial settings from other clients, called
+<i>prototypes</i>. Non-trivial settings are those that are greater than equal to zero (if
+a number, like a token lifetime), non-empty if a string or date. The names
+of clients are never overwritten.
+The list of prototypes  are processed in order,
+the values of each override the previous.  The current client is the final
+one processed, then the resulting client is used.
+</p>
+
+
+<h2>Ersatz clients and inheritance</h2>
+<p>If a client is an ersatz client (so it has a provisioner or possibly many) a
+common situation is that the client should really just inherit everything from the
+provisioner. In that case, the <b>extendsProvisioners</b> attribute of the client
+is set to true and any provisioners will be treated as prototypes.</p>
+
+<h2>Using the client management API</h2>
+<p>You may set prototypes as a list of identifiers in the client management
+API. This is the content of the sample prototype-minimal.json configuration
+bundled with the oidc-cm toolkit</p>
+<pre>
+    {
+       "comment":["This is a the minimal request object required for creation: a set of URIs and a name",
+         "This also sets prototypes, so that all the settings will be taken from them."
+         ],
+       "redirect_uris":["https://client.example.org/callback"],
+       "client_name": "My Example",
+       "prototypes": ["client:/ldap_0", "client:/ligo/onboarding"]
+      }
+</pre>
+<p>Here a very minimal client (callback, name) is specified and there are two prototypes.
+All of the settings from these are taken so that in effect, this client is merely an
+extension of these.</p>
+<!--#include virtual="../../footer.html" -->
+</body>
+</html>

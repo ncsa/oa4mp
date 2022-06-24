@@ -1,13 +1,21 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.functor.FunctorRuntimeEngine;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo.VirtualOrganization;
 import edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.OA2State;
 import edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.QDLRuntimeEngine;
+import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
+import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
+import edu.uiuc.ncsa.qdl.functions.FStack;
+import edu.uiuc.ncsa.qdl.module.MIStack;
+import edu.uiuc.ncsa.qdl.module.MTStack;
+import edu.uiuc.ncsa.qdl.state.State;
+import edu.uiuc.ncsa.qdl.state.StateUtils;
+import edu.uiuc.ncsa.qdl.variables.VStack;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRunRequest;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRuntimeEngine;
@@ -36,13 +44,33 @@ public class ScriptRuntimeEngineFactory {
             oa2SE.getMyLogger().warn("No QDL scripts will be run.");
             oa2SE.getMyLogger().warn("**********************************");
         } else {
+            if (!StateUtils.isFactorySet()) {
+                StateUtils.setFactory(new StateUtils() {
+                    @Override
+                    public State create() {
+                        return new OA2State(
+                                new VStack(),
+                                new OpEvaluator(),
+                                MetaEvaluator.getInstance(),
+                                new FStack(),
+                                new MTStack(),
+                                new MIStack(),
+                                null, // no logging at least for now
+                                true,
+                                true,
+                                false,
+                                true,
+                                null); // default in server mode, but can be overridden later
+                    }
+                });
+            }
             QDLRuntimeEngine qrt = new QDLRuntimeEngine(oa2SE.getQDLEnvironment(), transaction);
             OA2State state = qrt.getState();
             state.setOa2se(oa2SE);
             VirtualOrganization vo = oa2SE.getVO(oa2Client.getIdentifier());
-            if(vo != null){
+            if (vo != null) {
                 state.setJsonWebKeys(vo.getJsonWebKeys());
-            }else{
+            } else {
                 state.setJsonWebKeys(oa2SE.getJsonWebKeys());
             }
             state.setTransaction(transaction);

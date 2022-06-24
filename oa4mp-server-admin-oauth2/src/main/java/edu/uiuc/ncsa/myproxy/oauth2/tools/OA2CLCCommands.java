@@ -1359,6 +1359,17 @@ public class OA2CLCCommands extends CLCCommands {
         dummyAsset = new OA2Asset(null);
         if (json.containsKey(ASSET_KEY)) {
             dummyAsset.fromJSON(json.getJSONObject(ASSET_KEY));
+            if (!loadStoredConfig) {
+                // Must give the asset a new id or the state of the provisioning client
+                // will not be distinct and you will get very bizarre errors from the server
+                Identifier id = AssetStoreUtil.createID();
+                if(isVerbose()){
+                    say("created new asset with id " + id);
+                }
+                dummyAsset.setIdentifier(id);
+                getCe().getAssetStore().save(dummyAsset);
+
+            }
         } else {
             //say("warning -- no stored asset found.");
         }

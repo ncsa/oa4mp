@@ -82,10 +82,10 @@ public class TokenInfoRecord {
 
     public JSONObject toJSON(){
         JSONObject tokens = new JSONObject();
-        if(accessToken!=null) {
+        if(accessToken!=null && accessToken.getJti()!=null) {
             tokens.put(OA2Constants.ACCESS_TOKEN, formatToken(accessToken, atLifetime, atValid));
         }
-        if(refreshToken != null) {
+        if(refreshToken != null && refreshToken.getJti()!=null) {
             tokens.put(OA2Constants.REFRESH_TOKEN, formatToken(refreshToken, rtLifetime, rtValid));
         }
         return tokens;

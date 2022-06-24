@@ -295,13 +295,23 @@ public class OIDCCMServlet extends EnvServlet {
         // CIL-1221
         json.put(PROXY_CLAIMS_LIST, client.getProxyClaimsList());
         json.put("email", client.getEmail());
+        OA2ClientKeys clientKeys = (OA2ClientKeys) getOA2SE().getClientStore().getMapConverter().getKeys();
+        json.put(clientKeys.extendsProvisioners(), client.isExtendsProvisioners());
+        json.put(clientKeys.ersatzClient(), client.isErsatzClient());
+        //CIL-1321 inheritance
+        if(client.hasPrototypes()){
+            JSONArray jsonArray = new JSONArray();
+            for(Identifier id : client.getPrototypes()){
+                jsonArray.add(id.toString());
+            }
+            json.put(clientKeys.prototypes(), jsonArray);
+        }
         // This is in seconds since the epoch
         json.put(OIDCCMConstants.CLIENT_ID_ISSUED_AT, client.getCreationTS().getTime() / 1000);
         if (client.getConfig() != null && !client.getConfig().isEmpty()) {
 
             json.put("cfg", client.getConfig());
         }
-        OA2ClientKeys clientKeys = (OA2ClientKeys) getOA2SE().getClientStore().getMapConverter().getKeys();
         if (json.containsKey(clientKeys.email())) {
             JSONArray jsonArray = new JSONArray();
             jsonArray.add(json.get(clientKeys.email()));
@@ -871,6 +881,24 @@ public class OIDCCMServlet extends EnvServlet {
             jsonRequest.remove(OIDCCMConstants.CLIENT_URI);
         } else {
             client.setHomeUri(""); // not great, but...
+        }
+        //CIL-1321
+        OA2ClientKeys clientKeys = (OA2ClientKeys) getOA2SE().getClientStore().getMapConverter().getKeys();
+
+        if(jsonRequest.containsKey(clientKeys.prototypes())){
+            JSONArray jsonArray = jsonRequest.getJSONArray(clientKeys.prototypes());
+            List<Identifier> prototypes = new ArrayList<>();
+            for(int i = 0; i < jsonArray.size(); i++){
+                prototypes.add(BasicIdentifier.newID(jsonArray.getString(i)));
+            }
+            client.setPrototypes(prototypes);
+        }
+
+        if(jsonRequest.containsKey(clientKeys.extendsProvisioners())){
+            client.setExtendsProvisioners(jsonRequest.getBoolean(clientKeys.extendsProvisioners()));
+        }
+        if(jsonRequest.containsKey(clientKeys.ersatzClient())){
+            client.setErsatzClient(jsonRequest.getBoolean(clientKeys.ersatzClient()));
         }
         if (jsonRequest.containsKey(TOKEN_ENDPOINT_AUTH_METHOD)) {
             // not required, but if present, we support exactly two nontrivial options.

@@ -128,7 +128,7 @@ public class OA2TokenUtils {
             ServletDebugUtil.trace(OA2TokenUtils.class, "Failed to parse refresh token as JWT:" + tt.getMessage());
             refreshToken = tokenForge.getRefreshToken(subjectToken);
         } catch (InvalidSignatureException | InvalidAlgorithmException | UnsupportedJWTTypeException tt) {
-            // This is benign and may just mean that the format of the token is not a JWT. Only log it on debug
+            // This is benign and may just mean that the format of the token is not a JWT. Only flog it on debug
             oa2SE.getMyLogger().info("Failed to verify refresh token JWT: \"" + tt.getMessage());
             throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
                     "invalid refresh token",

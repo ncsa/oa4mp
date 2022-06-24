@@ -171,6 +171,7 @@ public class OA2ClientKeys extends ClientKeys {
         allKeys.add(ersatzClient());
         allKeys.add(prototypes());
         allKeys.add(extendsProvisioners());
+        allKeys.add(skipServerScripts());
         return allKeys;
     }
 }

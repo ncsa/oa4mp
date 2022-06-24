@@ -3,10 +3,12 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo.VirtualOrganization;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.DiscoveryServlet;
+import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2GeneralError;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Scopes;
 import edu.uiuc.ncsa.security.oauth_2_0.server.RFC7636Util;
+import edu.uiuc.ncsa.security.oauth_2_0.server.RFC8693Constants;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import net.sf.json.JSONArray;
@@ -33,6 +35,7 @@ public class OA2DiscoveryServlet extends DiscoveryServlet {
     public static final String USERINFO_ENDPOINT = "userinfo_endpoint";
     public static final String TOKEN_INTROSPECTION_ENDPOINT = "introspection_endpoint";
     public static final String TOKEN_REVOCATION_ENDPOINT = "revocation_endpoint";
+    public static final String RESPONSE_MODES_SUPPORTED = "response_modes_supported";
     public static final String TOKEN_REVOCATION_ENDPOINT_AUTH_METHODS_SUPPORTED = "revocation_endpoint_auth_methods_supported";
     public static final String ISSUER = "issuer";
     public static final String DEVICE_AUTHORIZATION_ENDPOINT = "device_authorization_endpoint";
@@ -253,11 +256,37 @@ public class OA2DiscoveryServlet extends DiscoveryServlet {
         json.put("response_types_supported", responseTypes);
 
         JSONArray grantTypes = new JSONArray();
+        // CIL-1312
         grantTypes.add("web");
+        grantTypes.add(OA2Constants.GRANT_TYPE_TOKEN_INFO);
+        if (oa2SE.isRfc8693Enabled()) {
+            grantTypes.add(RFC8693Constants.GRANT_TYPE_TOKEN_EXCHANGE);
+        }
+
+        grantTypes.add(OA2Constants.GRANT_TYPE_REFRESH_TOKEN);
+        grantTypes.add(OA2Constants.GRANT_TYPE_AUTHORIZATION_CODE);
         if (oa2SE.isRfc8628Enabled()) {
             grantTypes.add(RFC8628Constants2.GRANT_TYPE_DEVICE_CODE);
         }
         json.put("grant_types_supported", grantTypes);
+        /*
+        https://openid.net/specs/oauth-v2-multiple-response-types-1_0.html
+        talks about response modes and types, viz., response modes are optional
+        and
+
+           "The Response Type request parameter response_type informs the Authorization
+            Server of the desired authorization processing flow, including what parameters
+            are returned from the endpoints used. The Response Mode request parameter
+            response_mode informs the Authorization Server of the mechanism to be
+            used for returning Authorization Response parameters from the Authorization Endpoint.
+            Each Response Type value also defines a default Response Mode mechanism to be used,
+            if no Response Mode is specified using the request parameter."
+         */
+        JSONArray responseModesSupported = new JSONArray();
+        responseModesSupported.add("query");
+        responseModesSupported.add("fragment");
+        responseModesSupported.add("form_post"); // https://openid.net/specs/oauth-v2-form-post-response-mode-1_0.html
+        json.put(RESPONSE_MODES_SUPPORTED, responseModesSupported);
 
         JSONArray claimsSupported = new JSONArray();
         if (oa2SE.getClaimSource() != null) {

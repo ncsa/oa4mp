@@ -276,8 +276,8 @@ public class OA2MPService extends OA4MPService {
         return refresh(identifier, null);
     }
 
-    public RTResponse refresh(String identifier, Map additionalParameters) {
-        OA2Asset asset = (OA2Asset) getAssetStore().get(identifier);
+    public RTResponse refresh(String assetID, Map additionalParameters) {
+        OA2Asset asset = (OA2Asset) getAssetStore().get(assetID);
         if (asset == null) return null;
         DS2 ds2 = (DS2) getEnvironment().getDelegationService();
         RTRequest rtRequest = new RTRequest(getEnvironment().getClient(), additionalParameters);
