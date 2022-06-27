@@ -7,7 +7,7 @@ import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
 import edu.uiuc.ncsa.qdl.extensions.QDLModuleMetaClass;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import net.sf.json.JSONObject;
@@ -30,14 +30,14 @@ public class CLC implements QDLModuleMetaClass {
         }
     }
 
-    protected StemVariable getTokens() {
-        StemVariable result = new StemVariable();
+    protected QDLStem getTokens() {
+        QDLStem result = new QDLStem();
 
-        StemVariable at = new StemVariable();
+        QDLStem at = new QDLStem();
 
         at.fromJSON(clcCommands.getDummyAsset().getAccessToken().toJSON());
         try {
-            StemVariable jwt = new StemVariable();
+            QDLStem jwt = new QDLStem();
             jwt.fromJSON(clcCommands.resolveFromToken(clcCommands.getDummyAsset().getAccessToken(), false));
             at.put("jwt", jwt);
         } catch (Throwable t) {
@@ -45,10 +45,10 @@ public class CLC implements QDLModuleMetaClass {
         }
         result.put("access_token", at);
         if (clcCommands.getDummyAsset().hasRefreshToken()) {
-            StemVariable rt = new StemVariable();
+            QDLStem rt = new QDLStem();
             rt.fromJSON(clcCommands.getDummyAsset().getRefreshToken().toJSON());
             try {
-                StemVariable jwt = new StemVariable();
+                QDLStem jwt = new QDLStem();
                 jwt.fromJSON(clcCommands.resolveFromToken(clcCommands.getDummyAsset().getRefreshToken(), false));
                 rt.put("jwt", jwt);
             } catch (Throwable t) {
@@ -119,7 +119,7 @@ public class CLC implements QDLModuleMetaClass {
 
         @Override
         public Object evaluate(Object[] objects, State state) {
-            StemVariable claims = new StemVariable();
+            QDLStem claims = new QDLStem();
             if (objects.length == 0) {
                 try {
                     JSONObject jsonObject = clcCommands.getClaims();
@@ -165,7 +165,7 @@ public class CLC implements QDLModuleMetaClass {
                 if (objects.length == 1) {
                     clcCommands.grant(new InputLine(DUMMY_ARG + " " + objects[0]));
                 }
-                StemVariable g = new StemVariable();
+                QDLStem g = new QDLStem();
 
                 g.fromJSON(clcCommands.getGrant().toJSON());
                 return g;
@@ -403,15 +403,15 @@ public class CLC implements QDLModuleMetaClass {
             checkInit();
             try {
                 clcCommands.df(new InputLine(DUMMY_ARG));
-                StemVariable stemVariable = new StemVariable();
-                stemVariable.fromJSON(clcCommands.getDfResponse());
-                return stemVariable;
+                QDLStem QDLStem = new QDLStem();
+                QDLStem.fromJSON(clcCommands.getDfResponse());
+                return QDLStem;
             } catch (Exception e) {
                 if (DebugUtil.isEnabled()) {
                     e.printStackTrace();
                 }
             }
-            return new StemVariable();
+            return new QDLStem();
         }
 
         @Override
@@ -441,16 +441,16 @@ public class CLC implements QDLModuleMetaClass {
             checkInit();
             try {
                 clcCommands.introspect(new InputLine(DUMMY_ARG));
-                StemVariable stemVariable = new StemVariable();
-                stemVariable.fromJSON(clcCommands.getIntrospectResponse());
-                return stemVariable;
+                QDLStem QDLStem = new QDLStem();
+                QDLStem.fromJSON(clcCommands.getIntrospectResponse());
+                return QDLStem;
             } catch (Exception e) {
 
                 if (DebugUtil.isEnabled()) {
                     e.printStackTrace();
                 }
             }
-            return new StemVariable();
+            return new QDLStem();
         }
 
         @Override
@@ -478,7 +478,7 @@ public class CLC implements QDLModuleMetaClass {
         @Override
         public Object evaluate(Object[] objects, State state) {
             checkInit();
-            StemVariable out = new StemVariable();
+            QDLStem out = new QDLStem();
             try {
                 clcCommands.user_info(new InputLine(DUMMY_ARG));
                 out.fromJSON(clcCommands.getClaims());

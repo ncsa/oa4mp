@@ -6,7 +6,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.*;
 import edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.OA2State;
 import edu.uiuc.ncsa.qdl.extensions.QDLModuleMetaClass;
 import edu.uiuc.ncsa.qdl.state.State;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.security.oauth_2_0.server.RFC9068Constants;
 import net.sf.json.JSONObject;
 
@@ -41,7 +41,7 @@ public class AccessTokenInitializer implements QDLModuleMetaClass {
             super.evaluate(objects, state);
             // init(type, access_token.);
 
-            StemVariable at = checkArg(objects, getName(), 1);
+            QDLStem at = checkArg(objects, getName(), 1);
             setupHandler(objects);
             JSONObject j = (JSONObject) at.toJSON();
             getAtHandler().setAtData(new JSONObject()); // handler won't set accounting info unless this is empty.
@@ -50,7 +50,7 @@ public class AccessTokenInitializer implements QDLModuleMetaClass {
             } catch (Throwable throwable) {
                 handleException(throwable);
             }
-            StemVariable newAT = new StemVariable();
+            QDLStem newAT = new QDLStem();
             JSONObject newToken = getAtHandler().getAtData();
             newToken.putAll(j);
             getAtHandler().setAtData(newToken);
@@ -201,8 +201,8 @@ public class AccessTokenInitializer implements QDLModuleMetaClass {
             oa2State = checkState(state);
             setupHandler(objects);
 
-            StemVariable at = checkArg(objects, getName(), 1);
-            StemVariable output = new StemVariable();
+            QDLStem at = checkArg(objects, getName(), 1);
+            QDLStem output = new QDLStem();
             Boolean doTemplates = Boolean.TRUE;
             Boolean isQuery = Boolean.FALSE;
             if (objects.length == 3) {

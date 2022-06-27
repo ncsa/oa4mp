@@ -2,7 +2,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims;
 
 import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
 import edu.uiuc.ncsa.qdl.state.State;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,14 +36,14 @@ public class NewTemplate implements QDLFunction, CSConstants {
             throw new IllegalArgumentException("Error:" + getName() + " requires the type of the claim source");
         }
         String type = (String) objects[0];
-        StemVariable output = new StemVariable();
+        QDLStem output = new QDLStem();
         switch (type) {
             case CS_TYPE_FILE:
                 output.put(CS_DEFAULT_TYPE, CS_TYPE_FILE);
                 output.put(CS_FILE_FILE_PATH, REQUIRED_TEMPLATE);
                 return output;
             case CS_TYPE_LDAP:
-                output = new StemVariable();
+                output = new QDLStem();
                 output.put(CS_DEFAULT_TYPE, CS_TYPE_LDAP);
 
                 output.put(CS_LDAP_SERVER_ADDRESS, REQUIRED_TEMPLATE);

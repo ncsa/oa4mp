@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.oa2.qdl.storage;
 
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
@@ -49,15 +49,15 @@ public abstract class StemConverter<V extends Identifiable> extends MapConverter
         return parentMC != null;
     }
 
-    public V fromMap(StemVariable stem, V v) {
+    public V fromMap(QDLStem stem, V v) {
         v = createIfNeeded(v);
         v.setIdentifier(BasicIdentifier.newID(stem.getString(getKeys().identifier())));
         return v;
     }
 
-    public StemVariable toMap(V v, StemVariable stem) {
+    public QDLStem toMap(V v, QDLStem stem) {
         if (stem == null) {
-            stem = new StemVariable();
+            stem = new QDLStem();
         }
         stem.put(getKeys().identifier(), v.getIdentifierString());
         return stem;
@@ -70,7 +70,7 @@ public abstract class StemConverter<V extends Identifiable> extends MapConverter
      * @param key
      * @return
      */
-    protected boolean isStringKeyOK(StemVariable stem, String key) {
+    protected boolean isStringKeyOK(QDLStem stem, String key) {
         return stem.containsKey(key) && !StringUtils.isTrivial(stem.getString(key));
     }
 
@@ -78,18 +78,18 @@ public abstract class StemConverter<V extends Identifiable> extends MapConverter
      * Checks if the time (as a long) is non-negative. If this is supposed to be a bona fide date,
      * then it cannot be negative.
      *
-     * @param stemVariable
+     * @param QDLStem
      * @param key
      * @return
      */
-    protected boolean isTimeOk(StemVariable stemVariable, String key) {
-        return stemVariable.containsKey(key) && -1L < stemVariable.getLong(key);
+    protected boolean isTimeOk(QDLStem QDLStem, String key) {
+        return QDLStem.containsKey(key) && -1L < QDLStem.getLong(key);
     }
 
     @Override
     public V fromMap(Map<String, Object> map, V v) {
-        if (map instanceof StemVariable) {
-            return fromMap((StemVariable) map, v);
+        if (map instanceof QDLStem) {
+            return fromMap((QDLStem) map, v);
         }
         System.err.print("MapConverter.fromMap(): failed for " + v);
         throw new NotImplementedException("Error: not implement for non ConversionMap objects");
@@ -98,8 +98,8 @@ public abstract class StemConverter<V extends Identifiable> extends MapConverter
 
     @Override
     public void toMap(V value, Map<String, Object> data) {
-        if (data instanceof StemVariable) {
-            toMap(value, (StemVariable) data);
+        if (data instanceof QDLStem) {
+            toMap(value, (QDLStem) data);
             return;
         }
         System.err.print("MapConverter.fromMap(): failed for " + data);
@@ -109,12 +109,12 @@ public abstract class StemConverter<V extends Identifiable> extends MapConverter
 
     /**
      * Convert a long in a stem entry to a date.
-     *  <br/><b>Used in {@link #fromMap(StemVariable, Identifiable)}</b>
+     *  <br/><b>Used in {@link #fromMap(QDLStem, Identifiable)}</b>
      * @param stem
      * @param key
      * @return
      */
-    protected Date toDate(StemVariable stem, String key) {
+    protected Date toDate(QDLStem stem, String key) {
         Date date = new Date();
         date.setTime(stem.getLong(key));
         return date;
@@ -122,25 +122,25 @@ public abstract class StemConverter<V extends Identifiable> extends MapConverter
 
     /**
      * Get an attribute that is a stem list and convert it to a Java (generic) list
-     *  <br/><b>Used in {@link #fromMap(StemVariable, Identifiable)}</b>
+     *  <br/><b>Used in {@link #fromMap(QDLStem, Identifiable)}</b>
      * @param stem
      * @param key
      * @return
      */
-    protected List toList(StemVariable stem, String key) {
-        StemVariable target = (StemVariable) stem.get(key);
+    protected List toList(QDLStem stem, String key) {
+        QDLStem target = (QDLStem) stem.get(key);
         return target.getQDLList().toJSON();  // returns a JSONArray
     }
 
     /**
      * Convert a list in java object to a stem entry, setting it correctly.
-     *  <br/><b>Used in {@link #toMap(Identifiable, StemVariable)}</b>
+     *  <br/><b>Used in {@link #toMap(Identifiable, QDLStem)}</b>
      * @param c
      * @param stem
      * @param key
      */
-    protected void fromList(Collection c, StemVariable stem, String key) {
-        StemVariable target = new StemVariable();
+    protected void fromList(Collection c, QDLStem stem, String key) {
+        QDLStem target = new QDLStem();
         if (c != null) {
 
             for (Object s : c) {
@@ -148,7 +148,7 @@ public abstract class StemConverter<V extends Identifiable> extends MapConverter
                     target.listAppend(s.toString());
                 }
             }
-            stem.put(key + StemVariable.STEM_INDEX_MARKER, target);
+            stem.put(key + QDLStem.STEM_INDEX_MARKER, target);
         }
     }
 
@@ -158,7 +158,7 @@ public abstract class StemConverter<V extends Identifiable> extends MapConverter
      * @param key
      * @param value
      */
-    protected void setNonNullStemValue(StemVariable stem, String key, Object value){
+    protected void setNonNullStemValue(QDLStem stem, String key, Object value){
         if(value != null){
             stem.put(key, value);
         }

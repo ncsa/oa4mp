@@ -2,7 +2,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims;
 
 import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
 import edu.uiuc.ncsa.qdl.state.State;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.security.core.exceptions.IllegalAccessException;
 
 import java.util.ArrayList;
@@ -35,14 +35,14 @@ public class CreateSourceConfig implements QDLFunction, CSConstants {
             throw new IllegalArgumentException("Error:" + getName() + " requires one argument");
         }
 
-        if (!(objects[0] instanceof StemVariable)) {
+        if (!(objects[0] instanceof QDLStem)) {
             throw new IllegalAccessException("Error:" + getName() + " requires a stem variable as its argument.");
         }
-        StemVariable arg = (StemVariable) objects[0];
+        QDLStem arg = (QDLStem) objects[0];
         if (!arg.containsKey(CS_DEFAULT_TYPE)) {
             throw new IllegalArgumentException("Error: You must specify a type for the claim source");
         }
-        StemVariable output = new StemVariable();
+        QDLStem output = new QDLStem();
         setBasicValues(arg, output);
         switch (arg.getString(CS_DEFAULT_TYPE)) {
             case CS_TYPE_FILE:
@@ -59,7 +59,7 @@ public class CreateSourceConfig implements QDLFunction, CSConstants {
         return output;
     }
 
-    private StemVariable doCode(StemVariable arg, StemVariable output) {
+    private QDLStem doCode(QDLStem arg, QDLStem output) {
         if (!arg.containsKey(CS_CODE_JAVA_CLASS)) {
             throw new IllegalArgumentException("Error:" + CS_CODE_JAVA_CLASS + " is required for a custom code configuration.");
         }
@@ -89,7 +89,7 @@ public class CreateSourceConfig implements QDLFunction, CSConstants {
     }
 
      */
-    protected StemVariable doNCSA(StemVariable arg, StemVariable output) {
+    protected QDLStem doNCSA(QDLStem arg, QDLStem output) {
         output.put(CS_LDAP_SERVER_ADDRESS, "ldap4.ncsa.illinois.edu,ldap2.ncsa.illinois.edu,ldap1.ncsa.illinois.edu");
         output.put(CS_LDAP_PORT, 636L);
         output.put(CS_DEFAULT_TYPE, "ldap");
@@ -99,25 +99,25 @@ public class CreateSourceConfig implements QDLFunction, CSConstants {
         output.put(CS_DEFAULT_FAIL_ON_ERROR, Boolean.FALSE); // failures are not show stoppers
         output.put(CS_DEFAULT_NOTIFY_ON_FAIL, Boolean.TRUE); // tell us all about it though.
         output.put(CS_LDAP_SEARCH_BASE, "ou=People,dc=ncsa,dc=illinois,dc=edu");
-        StemVariable searchAtt = new StemVariable();
+        QDLStem searchAtt = new QDLStem();
         searchAtt.put(0L, "mail");
         searchAtt.put(1L, "uid");
         searchAtt.put(2L, "uidNumber");
         searchAtt.put(3L, "cn");
         searchAtt.put(4L, "memberOf");
         output.put("search_attributes.", searchAtt);
-        StemVariable groups = new StemVariable();
+        QDLStem groups = new QDLStem();
         groups.put(0L, "memberOf");
         output.put("groups.", groups);
         return output.union(arg);
     }
 
-    private StemVariable doHeaders(StemVariable arg, StemVariable output) {
+    private QDLStem doHeaders(QDLStem arg, QDLStem output) {
         return output.union(arg);
     }
 
 
-    protected StemVariable doLDAP(StemVariable arg, StemVariable output) {
+    protected QDLStem doLDAP(QDLStem arg, QDLStem output) {
         if (!arg.containsKey(CS_LDAP_SERVER_ADDRESS)) {
             throw new IllegalArgumentException("Error:" + CS_LDAP_SERVER_ADDRESS + " is required for ldap configurations");
         }
@@ -132,12 +132,12 @@ public class CreateSourceConfig implements QDLFunction, CSConstants {
      * @param config
      * @param argKey
      */
-    protected void setValue(StemVariable arg, StemVariable config, String argKey) {
+    protected void setValue(QDLStem arg, QDLStem config, String argKey) {
         setValue(arg, config, argKey, argKey);
     }
 
 
-    protected StemVariable doFS(StemVariable arg, StemVariable output) {
+    protected QDLStem doFS(QDLStem arg, QDLStem output) {
         if (!arg.containsKey(CS_FILE_FILE_PATH)) {
             throw new IllegalArgumentException("Error: No " + CS_FILE_FILE_PATH + " specified. You must specify this.");
         }
@@ -145,7 +145,7 @@ public class CreateSourceConfig implements QDLFunction, CSConstants {
         return output.union(arg);
     }
 
-    protected void setValue(StemVariable arg, StemVariable output, String key, Object defaultValue) {
+    protected void setValue(QDLStem arg, QDLStem output, String key, Object defaultValue) {
         if (arg == null) {
             output.put(key, defaultValue);
             return;
@@ -159,7 +159,7 @@ public class CreateSourceConfig implements QDLFunction, CSConstants {
      * @param arg
      * @param output
      */
-    protected void setBasicValues(StemVariable arg, StemVariable output) {
+    protected void setBasicValues(QDLStem arg, QDLStem output) {
         setValue(arg, output, CS_DEFAULT_TYPE, CS_DEFAULT_TYPE);
         setValue(arg, output, CS_DEFAULT_IS_ENABLED, Boolean.TRUE);
         setValue(arg, output, CS_DEFAULT_FAIL_ON_ERROR, Boolean.FALSE);
@@ -178,7 +178,7 @@ public class CreateSourceConfig implements QDLFunction, CSConstants {
     }
 
     public static void main(String[] args) {
-        StemVariable mystem = new StemVariable();
+        QDLStem mystem = new QDLStem();
         mystem.put(CS_DEFAULT_TYPE, CS_TYPE_LDAP);
         mystem.put(CS_LDAP_SERVER_ADDRESS, "ldap-test2.ncsa.illinois.edu");
         mystem.put(CS_LDAP_AUTHZ_TYPE, "none");
@@ -189,17 +189,17 @@ public class CreateSourceConfig implements QDLFunction, CSConstants {
         searchAttr.add("uidNumber");
         searchAttr.add("cn");
         searchAttr.add("memberOf");
-        StemVariable sa = new StemVariable();
+        QDLStem sa = new QDLStem();
         sa.addList(searchAttr);
-        StemVariable groupNames = new StemVariable();
+        QDLStem groupNames = new QDLStem();
         groupNames.put("0", "memberOf");
         mystem.put(CS_LDAP_SEARCH_ATTRIBUTES, sa);
         mystem.put(CS_LDAP_GROUP_NAMES, groupNames);
         mystem.put(CS_LDAP_SEARCH_BASE, "ou=People,dc=ncsa,dc=illinois,dc=edu");
 
         CreateSourceConfig csc = new CreateSourceConfig();
-        System.out.println(((StemVariable) csc.evaluate(new Object[]{"ldap"}, null)).toJSON().toString(1));
-        StemVariable out = (StemVariable) csc.evaluate(new Object[]{mystem}, null);
+        System.out.println(((QDLStem) csc.evaluate(new Object[]{"ldap"}, null)).toJSON().toString(1));
+        QDLStem out = (QDLStem) csc.evaluate(new Object[]{mystem}, null);
         System.out.println(out.toJSON().toString(2));
 
     }

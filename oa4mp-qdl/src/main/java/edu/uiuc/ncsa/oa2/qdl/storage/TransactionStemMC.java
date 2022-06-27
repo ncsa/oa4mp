@@ -4,7 +4,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransac
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2TransactionKeys;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
@@ -86,7 +86,7 @@ public class TransactionStemMC<V extends OA2ServiceTransaction> extends StemConv
      */
 
     @Override
-    public V fromMap(StemVariable stem, V v) {
+    public V fromMap(QDLStem stem, V v) {
         v = super.fromMap(stem, v);
         Identifier id = v.getIdentifier();
         /*
@@ -187,7 +187,7 @@ public class TransactionStemMC<V extends OA2ServiceTransaction> extends StemConv
 
 
     @Override
-    public StemVariable toMap(V v, StemVariable stem) {
+    public QDLStem toMap(V v, QDLStem stem) {
         stem = super.toMap(v, stem);
         if(v.getAccessToken() != null){stem.put(kk().accessToken(), v.getAccessToken().getToken());}
         if(v.getAuthorizationGrant()!=null) {stem.put(kk().authGrant(), v.getAuthorizationGrant().getToken());}

@@ -6,7 +6,7 @@ import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
 import edu.uiuc.ncsa.qdl.extensions.QDLModuleMetaClass;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.Constant;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
@@ -74,7 +74,7 @@ public class QDLACL implements QDLModuleMetaClass {
         List<Object> ids;
         switch (Constant.getType(objects[0])) {
             case Constant.STEM_TYPE:
-                ids = ((StemVariable) objects[0]).getQDLList().toJSON();
+                ids = ((QDLStem) objects[0]).getQDLList().toJSON();
                 break;
             case Constant.STRING_TYPE:
                 ids = new ArrayList<>();

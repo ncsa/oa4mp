@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims;
 
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import org.apache.commons.collections.iterators.IteratorEnumeration;
 
 import javax.servlet.*;
@@ -38,11 +38,11 @@ public class TestHTTPRequest implements HttpServletRequest {
         return headers.getString(name);
     }
 
-    public TestHTTPRequest(StemVariable headers) {
+    public TestHTTPRequest(QDLStem headers) {
         this.headers = headers;
     }
 
-    StemVariable headers;
+    QDLStem headers;
     @Override
     public Enumeration<String> getHeaders(String name) {
         return new IteratorEnumeration(headers.keySet().iterator());

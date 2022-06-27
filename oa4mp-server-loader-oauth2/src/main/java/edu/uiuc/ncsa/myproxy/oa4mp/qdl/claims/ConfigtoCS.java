@@ -2,7 +2,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.*;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSourceConfiguration;
@@ -13,7 +13,7 @@ import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
  * on 2/12/20 at  11:30 AM
  */
 public class ConfigtoCS implements CSConstants {
-    public static StemVariable convert(ClaimSource source) {
+    public static QDLStem convert(ClaimSource source) {
         if (source instanceof FSClaimSource) {
             return ClaimSourceConfigConverter.convert(source, CSConstants.CS_TYPE_FILE);
         }
@@ -34,7 +34,7 @@ public class ConfigtoCS implements CSConstants {
         throw new IllegalArgumentException("Error: Unknown claims source type");
     }
 
-    public static ClaimSource convert(StemVariable arg, OA2SE oa2SE) {
+    public static ClaimSource convert(QDLStem arg, OA2SE oa2SE) {
         switch (arg.getString(CS_DEFAULT_TYPE)) {
             case CS_TYPE_CODE:
                 return doCode(arg);
@@ -76,7 +76,7 @@ public class ConfigtoCS implements CSConstants {
         throw new IllegalArgumentException("Error: Unrecognized claim source type \"" + arg.getString(CS_DEFAULT_TYPE) + "\"");
     }
 
-    private static ClaimSource doCode(StemVariable arg) {
+    private static ClaimSource doCode(QDLStem arg) {
         BasicClaimsSourceImpl claimsSource = null;
         ClaimSourceConfiguration cfg = ClaimSourceConfigConverter.convert(arg);
 

@@ -3,7 +3,7 @@ package edu.uiuc.ncsa.oa2.qdl.storage;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecordSerializationKeys;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientStore;
@@ -40,7 +40,7 @@ public class TXRStemMC<V extends TXRecord> extends StemConverter<V> {
       String tokenType = "token_type";
          */
     @Override
-    public V fromMap(StemVariable stem, V v) {
+    public V fromMap(QDLStem stem, V v) {
         v = super.fromMap(stem, v);
         if (stem.containsKey(kk().audience())) {v.setAudience(toList(stem, kk().audience()));}
         if(stem.containsKey(kk().expiresAt())){v.setExpiresAt(stem.getLong(kk().expiresAt()));}
@@ -59,7 +59,7 @@ public class TXRStemMC<V extends TXRecord> extends StemConverter<V> {
         return v;
     }
     @Override
-    public StemVariable toMap(V v, StemVariable stem) {
+    public QDLStem toMap(V v, QDLStem stem) {
         stem = super.toMap(v, stem);
         fromList(v.getAudience(), stem, kk().audience());
         stem.put(kk().expiresAt(), v.getExpiresAt());

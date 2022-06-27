@@ -5,7 +5,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.BasicRefreshTokenHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.OA2State;
 import edu.uiuc.ncsa.qdl.extensions.QDLModuleMetaClass;
 import edu.uiuc.ncsa.qdl.state.State;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import net.sf.json.JSONObject;
 
 import java.util.ArrayList;
@@ -66,8 +66,8 @@ public class RefreshTokenInitializer implements QDLModuleMetaClass {
         @Override
         public Object evaluate(Object[] objects, State state) {
             super.evaluate(objects, state);
-            StemVariable rt = checkArg(objects, getName(), 0);
-            StemVariable output = new StemVariable();
+            QDLStem rt = checkArg(objects, getName(), 0);
+            QDLStem output = new QDLStem();
             getRtHandler().setRTData((JSONObject) rt.toJSON());
             String execPhase = null;
             if (1 < objects.length) {

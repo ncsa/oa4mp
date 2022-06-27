@@ -3,7 +3,7 @@ package edu.uiuc.ncsa.oa2.qdl.storage;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.Permission;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionKeys;
 import edu.uiuc.ncsa.qdl.variables.QDLList;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
@@ -39,7 +39,7 @@ public class PermissionStemMC<V extends Permission> extends StemConverter<V> {
     String canApprove = "can_approve";
      */
     @Override
-    public V fromMap(StemVariable stem, V v) {
+    public V fromMap(QDLStem stem, V v) {
         v = super.fromMap(stem, v);
         if(isStringKeyOK(stem, kk().adminID())){
             v.setAdminID(newID(stem.getString(kk().adminID())));
@@ -51,8 +51,8 @@ public class PermissionStemMC<V extends Permission> extends StemConverter<V> {
             List<Identifier> ids = new ArrayList<>();
             Object obj = stem.get(kk().ersatzID());
             // Should be a QDL list of identifiers
-            if(obj instanceof StemVariable){
-                QDLList list = ((StemVariable)obj).getQDLList();
+            if(obj instanceof QDLStem){
+                QDLList list = ((QDLStem)obj).getQDLList();
                 for(Object element : list){
                     if(element instanceof String){
                         ids.add(BasicIdentifier.newID((String)element));
@@ -99,7 +99,7 @@ public class PermissionStemMC<V extends Permission> extends StemConverter<V> {
      */
 
     @Override
-    public StemVariable toMap(V v, StemVariable stem) {
+    public QDLStem toMap(V v, QDLStem stem) {
         stem = super.toMap(v, stem);
         if (v.getAdminID() != null) {
             stem.put(kk().adminID(), v.getAdminID().toString());
@@ -114,7 +114,7 @@ public class PermissionStemMC<V extends Permission> extends StemConverter<V> {
             for(Identifier id : ids){
                 list.add(id.toString());
             }
-            StemVariable e = new StemVariable();
+            QDLStem e = new QDLStem();
             e.setQDLList(list);
             stem.put(kk().ersatzID(), list);
         }

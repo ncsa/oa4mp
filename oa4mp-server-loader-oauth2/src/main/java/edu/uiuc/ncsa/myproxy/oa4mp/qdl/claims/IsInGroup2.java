@@ -2,7 +2,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims;
 
 import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
 import edu.uiuc.ncsa.qdl.state.State;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +44,7 @@ public class IsInGroup2 implements QDLFunction {
         if (objects.length != 2) {
             throw new IllegalArgumentException("Error: This function requires two arguments, a stem and a string.");
         }
-        if (objects[0] == null || (!(objects[0] instanceof StemVariable) && !(objects[0] instanceof String))) {
+        if (objects[0] == null || (!(objects[0] instanceof QDLStem) && !(objects[0] instanceof String))) {
             throw new IllegalArgumentException("Error: The first argument of " + getName() + " must be a string or stem of them.");
         }
         if (objects[1] == null) {
@@ -52,33 +52,33 @@ public class IsInGroup2 implements QDLFunction {
             throw new IllegalArgumentException("Error: Undefined second argument for " + getName());
         }
 
-        if (!(objects[1] instanceof StemVariable)) {
+        if (!(objects[1] instanceof QDLStem)) {
             // This indicates that something wrong was passed, so flag it as a bona fide error.
             throw new IllegalArgumentException("Error: The second argument of " + getName() + " must be a stem list of groups.");
         }
-        StemVariable groups = (StemVariable) objects[1];
+        QDLStem groups = (QDLStem) objects[1];
         if (groups.size() == 0) {
             return Boolean.FALSE;
         }
 
-        StemVariable groupNames;
+        QDLStem groupNames;
         boolean isScalar = objects[0] instanceof String;
         if (isScalar) {
-            groupNames = new StemVariable();
+            groupNames = new QDLStem();
             groupNames.listAppend(objects[0]);
 
         } else {
-            groupNames = (StemVariable) objects[0];
+            groupNames = (QDLStem) objects[0];
         }
-        StemVariable result = new StemVariable();
+        QDLStem result = new QDLStem();
         for (Object keys : groupNames.keySet()) {
             String name = String.valueOf(groupNames.get(keys));
             Boolean rValue = Boolean.FALSE;
             for (Object key : groups.keySet()) {
                 Object obj = groups.get(key);
                 // two options, either they parsed it in to a group structure OR its just a raw list of strings
-                if (obj instanceof StemVariable) {
-                    StemVariable group = (StemVariable) obj;
+                if (obj instanceof QDLStem) {
+                    QDLStem group = (QDLStem) obj;
                     if (group.containsKey(GROUP_ENTRY_NAME) && group.getString(GROUP_ENTRY_NAME).equals(name)) {
                         rValue = Boolean.TRUE;
                         break;

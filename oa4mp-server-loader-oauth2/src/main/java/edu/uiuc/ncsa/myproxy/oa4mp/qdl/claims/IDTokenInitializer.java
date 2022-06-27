@@ -5,7 +5,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.IDTokenHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.OA2State;
 import edu.uiuc.ncsa.qdl.extensions.QDLModuleMetaClass;
 import edu.uiuc.ncsa.qdl.state.State;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import net.sf.json.JSONObject;
 
 import java.util.ArrayList;
@@ -60,8 +60,8 @@ public class IDTokenInitializer implements QDLModuleMetaClass {
         @Override
         public Object evaluate(Object[] objects, State state) {
             super.evaluate(objects, state);
-            StemVariable idtoken = checkArg(objects, getName(), 0);
-            StemVariable output = new StemVariable();
+            QDLStem idtoken = checkArg(objects, getName(), 0);
+            QDLStem output = new QDLStem();
             if (idTokenHandler == null) {
                 idTokenHandler = new IDTokenHandler(getPayloadHandlerConfig());
             }

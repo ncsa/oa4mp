@@ -3,7 +3,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.ScopeTemplateUtil;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
 import edu.uiuc.ncsa.qdl.state.State;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,15 +32,15 @@ public class ScopeTemplateQDLUtil implements QDLFunction {
         if(objects.length != 3){
             throw new IllegalArgumentException(getName() + " requires 3 arguments");
         }
-        if(!(objects[0] instanceof StemVariable)){
+        if(!(objects[0] instanceof QDLStem)){
             throw new IllegalArgumentException("Error: The first argument (for the computed scopes) must be a stem.");
         }
-        StemVariable computedStem =   (StemVariable )objects[0];
-        if(!(objects[1] instanceof StemVariable)){
+        QDLStem computedStem =   (QDLStem )objects[0];
+        if(!(objects[1] instanceof QDLStem)){
             throw new IllegalArgumentException("Error: The second argument (for the requested scopes) must be a stem.");
         }
 
-        StemVariable requestedStem =   (StemVariable )objects[1];
+        QDLStem requestedStem =   (QDLStem )objects[1];
         if(!(objects[2] instanceof Boolean)){
             throw new IllegalArgumentException("Error: The third argument (if the operation queries available scopes) must be a boolean.");
         }
@@ -51,7 +51,7 @@ public class ScopeTemplateQDLUtil implements QDLFunction {
         Collection<String> returnedScopes = ScopeTemplateUtil.doCompareTemplates(computedScopes,requestedScopes,isTX);
         List<String> rc = new ArrayList<>();
         rc.addAll(returnedScopes);
-        StemVariable output = new StemVariable();
+        QDLStem output = new QDLStem();
         output.addList(rc);
         return output;
     }

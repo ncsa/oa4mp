@@ -2,7 +2,7 @@ package edu.uiuc.ncsa.oa2.qdl.storage;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.StoreArchiver;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
@@ -72,7 +72,7 @@ public class QDLStoreAccessor {
 
     StoreArchiver storeArchiver;
 
-    public StemVariable get(Identifier id) {
+    public QDLStem get(Identifier id) {
         return toStem((Identifiable) getStore().get(id));
     }
 
@@ -80,23 +80,23 @@ public class QDLStoreAccessor {
     /**
      * Save OR update the store from a stem or list of them.
      *
-     * @param stemVariable
+     * @param QDLStem
      * @param doSave
      * @return
      */
-    public List<Boolean> saveOrUpdate(StemVariable stemVariable, boolean doSave) {
+    public List<Boolean> saveOrUpdate(QDLStem QDLStem, boolean doSave) {
         List<Boolean> out = new ArrayList<>();
-        if (stemVariable.isList()) {
-            for (int i = 0; i < stemVariable.size(); i++) {
-                Object obj = stemVariable.get(i);
-                if (obj instanceof StemVariable) {
-                    StemVariable stemVariable1 = (StemVariable) obj;
-                    if (!stemVariable1.isList()) {
+        if (QDLStem.isList()) {
+            for (int i = 0; i < QDLStem.size(); i++) {
+                Object obj = QDLStem.get(i);
+                if (obj instanceof QDLStem) {
+                    QDLStem QDLStem1 = (QDLStem) obj;
+                    if (!QDLStem1.isList()) {
                         try {
                             if (doSave) {
-                                getStore().save(fromStem(stemVariable1));
+                                getStore().save(fromStem(QDLStem1));
                             } else {
-                                getStore().update(fromStem(stemVariable1));
+                                getStore().update(fromStem(QDLStem1));
                             }
                             out.add(Boolean.TRUE);
                         } catch (Throwable t) {
@@ -113,7 +113,7 @@ public class QDLStoreAccessor {
                 }
             }
         } else {
-            getStore().save(fromStem(stemVariable));
+            getStore().save(fromStem(QDLStem));
             out.add(Boolean.TRUE);
 
         }
@@ -129,7 +129,7 @@ public class QDLStoreAccessor {
      * @param stem
      * @return
      */
-    public String toXML(StemVariable stem) {
+    public String toXML(QDLStem stem) {
         XMLMap c = new XMLMap();
         store.getXMLConverter().toMap(fromStem(stem), c);
         try {
@@ -152,7 +152,7 @@ public class QDLStoreAccessor {
      * @param x
      * @return
      */
-    public StemVariable fromXML(String x) {
+    public QDLStem fromXML(String x) {
         try {
             ByteArrayInputStream fis = new ByteArrayInputStream(x.getBytes());
             XMLMap map = new XMLMap();
@@ -212,19 +212,19 @@ public class QDLStoreAccessor {
         return Long.valueOf(x);
     }
 
-    protected StemVariable toStem(Identifiable identifiable) {
-        StemVariable stem = new StemVariable();
+    protected QDLStem toStem(Identifiable identifiable) {
+        QDLStem stem = new QDLStem();
         if(identifiable != null) {
             getConverter().toMap(identifiable, stem);
         }
         return stem;
     }
 
-    protected Identifiable fromStem(StemVariable stem) {
+    protected Identifiable fromStem(QDLStem stem) {
         return getConverter().fromMap(stem, null);
     }
 
-    public StemVariable create(String id) {
+    public QDLStem create(String id) {
         Identifiable newObject = getStore().create();
         if (!StringUtils.isTrivial(id)) {
             newObject.setIdentifier(BasicIdentifier.newID(id));
@@ -245,10 +245,10 @@ public class QDLStoreAccessor {
      * @param isregex
      * @return
      */
-    public StemVariable search(String key, String condition, Boolean isregex) {
-        StemVariable output = new StemVariable();
+    public QDLStem search(String key, String condition, Boolean isregex) {
+        QDLStem output = new QDLStem();
         List<Identifiable> result = getStore().search(key, condition, isregex);
-        List<StemVariable> stems = new ArrayList<>();
+        List<QDLStem> stems = new ArrayList<>();
         for (Identifiable identifiable : result) {
             if(!isVersionID(identifiable.getIdentifier())) {
                 stems.add(toStem(identifiable));
@@ -262,11 +262,11 @@ public class QDLStoreAccessor {
     }
     //  store#init('/home/ncsa/dev/csd/config/server-oa2.xml', 'localhost:oa4mp.oa2.mariadb', 'transaction')
     //  t. :=  store#search('temp_token', '.*23.*')
-    public StemVariable listKeys() {
+    public QDLStem listKeys() {
         List<String> keys = getStoreKeys().allKeys();
-        StemVariable stemVariable = new StemVariable();
-        stemVariable.addList(keys);
-        return stemVariable;
+        QDLStem QDLStem = new QDLStem();
+        QDLStem.addList(keys);
+        return QDLStem;
     }
 
     /**
@@ -304,8 +304,8 @@ public class QDLStoreAccessor {
      *
      * @param arg
      */
-    public StemVariable archive(StemVariable arg) {
-        StemVariable output = new StemVariable();
+    public QDLStem archive(QDLStem arg) {
+        QDLStem output = new QDLStem();
         for (Object key : arg.keySet()) {
             String s = String.valueOf(arg.get(key));
             Identifiable oldVersion = (Identifiable) getStore().get(BasicIdentifier.newID(s));
@@ -330,15 +330,15 @@ public class QDLStoreAccessor {
      * </pre>
      *
      */
-/*    public StemVariable remove(StemVariable ids){
-        StemVariable output= new StemVariable();
+/*    public QDLStem remove(QDLStem ids){
+        QDLStem output= new QDLStem();
         for(String key : ids.keySet()){
             Object obj = ids.get(key);
-            if(!(obj instanceof StemVariable)){
+            if(!(obj instanceof QDLStem)){
                output.put(key, Boolean.FALSE);
                continue;
             }
-            StemVariable targetID = (StemVariable) ids.get(key);
+            QDLStem targetID = (QDLStem) ids.get(key);
 
             try{
                 Identifier id = BasicIdentifier.newID(targetID.getString(0L));
@@ -352,7 +352,7 @@ public class QDLStoreAccessor {
         }
         return output;
     }*/
-       public StemVariable getVersion(Identifier id, Long version) throws IOException {
+       public QDLStem getVersion(Identifier id, Long version) throws IOException {
           return toStem( getStoreArchiver().getVersion(id, version));
 
        }

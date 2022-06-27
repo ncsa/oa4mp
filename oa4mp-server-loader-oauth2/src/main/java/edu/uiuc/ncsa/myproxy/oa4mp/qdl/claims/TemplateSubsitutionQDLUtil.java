@@ -3,7 +3,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.ScopeTemplateUtil;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
 import edu.uiuc.ncsa.qdl.state.State;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,23 +30,23 @@ public class TemplateSubsitutionQDLUtil implements QDLFunction {
 
     @Override
     public Object evaluate(Object[] objects, State state) {
-        StemVariable arg = null;
+        QDLStem arg = null;
         if(objects[0] instanceof String){
-            arg = new StemVariable();
+            arg = new QDLStem();
             arg.listAppend(objects[0]);
-        }else if(objects[0] instanceof StemVariable){
-            arg = (StemVariable) objects[0];
+        }else if(objects[0] instanceof QDLStem){
+            arg = (QDLStem) objects[0];
         }
         if(arg == null){
             throw new IllegalArgumentException("error: The first argument must be a string or list of strings");
         }
-        StemVariable otherClaimStem = (StemVariable) objects[1];
+        QDLStem otherClaimStem = (QDLStem) objects[1];
         Map<String, List<String>> groups = new HashMap<>();
 
         if (objects.length == 3) {
-            StemVariable groupClaimStem = (StemVariable) objects[2];
+            QDLStem groupClaimStem = (QDLStem) objects[2];
             for (Object key : groupClaimStem.keySet()) {
-                StemVariable ss = (StemVariable) groupClaimStem.get(key);
+                QDLStem ss = (QDLStem) groupClaimStem.get(key);
                 groups.put(String.valueOf(key), ss.getQDLList().toJSON());
             }
         }
@@ -55,7 +55,7 @@ public class TemplateSubsitutionQDLUtil implements QDLFunction {
             String rawString = String.valueOf(arg.get(key));
             out.addAll( ScopeTemplateUtil.replaceTemplate(rawString, groups, otherClaimStem));
         }
-        StemVariable outStem = new StemVariable();
+        QDLStem outStem = new QDLStem();
         outStem.addList(out);
 
         return outStem;

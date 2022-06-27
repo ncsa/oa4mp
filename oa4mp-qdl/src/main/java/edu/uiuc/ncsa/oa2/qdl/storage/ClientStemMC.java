@@ -4,7 +4,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientConverter;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientKeys;
 import edu.uiuc.ncsa.qdl.variables.QDLList;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
@@ -26,7 +26,7 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
 
 
     @Override
-    public V fromMap(StemVariable stem, V v) {
+    public V fromMap(QDLStem stem, V v) {
         v = super.fromMap(stem, v);
         // Since these are created interactively, we have no choice really but to check each attribute.
         // We don't want cruft getting in to the store.
@@ -108,7 +108,7 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
             v.setCallbackURIs(toList(stem, kk().callbackUri()));
         }
         if (stem.containsKey(kk().cfg())) {
-            StemVariable j = (StemVariable) stem.get(kk().cfg());
+            QDLStem j = (QDLStem) stem.get(kk().cfg());
             v.setConfig((JSONObject) j.toJSON());
         }
 
@@ -124,15 +124,15 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
         }
 
         if (stem.containsKey(kk().ea())) {
-            StemVariable j = (StemVariable) stem.get(kk().ea());
+            QDLStem j = (QDLStem) stem.get(kk().ea());
             v.setExtendedAttributes((JSONObject) j.toJSON());
         }
         if (isStringKeyOK(stem, kk().issuer())) {
             v.setIssuer(stem.getString(kk().issuer()));
         }
         if (stem.containsKey(kk().ldap())) {
-            if (stem.get(kk().ldap()) instanceof StemVariable) {
-                StemVariable ldap = (StemVariable) stem.get(kk().ldap());
+            if (stem.get(kk().ldap()) instanceof QDLStem) {
+                QDLStem ldap = (QDLStem) stem.get(kk().ldap());
                 JSONArray array = (JSONArray) ldap.toJSON();
                 v.setLdaps(getCC().getLdapConfigurationUtil().fromJSON(array));
             }
@@ -189,7 +189,7 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
     }
 
     @Override
-    public StemVariable toMap(V v, StemVariable stem) {
+    public QDLStem toMap(V v, QDLStem stem) {
         stem = super.toMap(v, stem);
         // basic client attributes
         setNonNullStemValue(stem, kk().secret(), v.getSecret());
@@ -214,7 +214,7 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
             fromList(v.getCallbackURIs(), stem, kk().callbackUri());
         }
         if (v.getConfig() != null && !v.getConfig().isEmpty()) {
-            StemVariable cfg = new StemVariable();
+            QDLStem cfg = new QDLStem();
             cfg.fromJSON(v.getConfig());
             stem.put(kk().cfg(), cfg);
         }
@@ -222,7 +222,7 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
         // 5
         stem.put(kk().dfLifetime(), v.getDfLifetime());
         if (v.getExtendedAttributes() != null && !v.getExtendedAttributes().isEmpty()) {
-            StemVariable ea = new StemVariable();
+            QDLStem ea = new QDLStem();
             ea.fromJSON(v.getExtendedAttributes());
             stem.put(kk().ea(), ea);
         }
@@ -231,7 +231,7 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
         setNonNullStemValue(stem, kk().issuer(), v.getIssuer());
         if (v.getLdaps() != null && !v.getLdaps().isEmpty()) {
             JSONArray jsonArray = getCC().getLdapConfigurationUtil().toJSON(v.getLdaps());
-            StemVariable ldap = new StemVariable();
+            QDLStem ldap = new QDLStem();
             ldap.fromJSON(jsonArray);
             stem.put(kk().ldap(), ldap);
         }

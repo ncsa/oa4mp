@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.oa2.qdl.storage;
 
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.delegation.storage.ClientApprovalKeys;
@@ -27,7 +27,7 @@ public class ApprovalStemMC<V extends ClientApproval> extends StemConverter<V> {
      */
 
     @Override
-    public V fromMap(StemVariable stem, V v) {
+    public V fromMap(QDLStem stem, V v) {
         v = super.fromMap(stem, v);
         if (stem.containsKey(kk().approved())) {
             v.setApproved(stem.getBoolean(kk().approved()));
@@ -48,7 +48,7 @@ public class ApprovalStemMC<V extends ClientApproval> extends StemConverter<V> {
     }
 
     @Override
-    public StemVariable toMap(V v, StemVariable stem) {
+    public QDLStem toMap(V v, QDLStem stem) {
        stem =  super.toMap(v, stem);
 
         if (v.getStatus() == null) {

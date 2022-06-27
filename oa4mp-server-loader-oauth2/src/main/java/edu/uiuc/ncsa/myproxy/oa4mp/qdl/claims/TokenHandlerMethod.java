@@ -11,7 +11,7 @@ import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -73,14 +73,14 @@ public abstract class TokenHandlerMethod implements QDLFunction {
      * @param argIndex
      * @return
      */
-    protected StemVariable checkArg(Object[] objects, String name, int argIndex) {
+    protected QDLStem checkArg(Object[] objects, String name, int argIndex) {
 
         if(objects[argIndex] == null || (objects[argIndex] instanceof QDLNull)){
             // just make one
-            return new StemVariable();
+            return new QDLStem();
         }
-        if (objects[argIndex] instanceof StemVariable) {
-            return (StemVariable) objects[argIndex];
+        if (objects[argIndex] instanceof QDLStem) {
+            return (QDLStem) objects[argIndex];
         }
         throw new IllegalArgumentException("Error: " + name + " requires a stem argument #" + argIndex);
     }

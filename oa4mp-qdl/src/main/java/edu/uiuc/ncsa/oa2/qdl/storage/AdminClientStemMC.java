@@ -2,7 +2,7 @@ package edu.uiuc.ncsa.oa2.qdl.storage;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientKeys;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import net.sf.json.JSONObject;
@@ -21,7 +21,7 @@ public class AdminClientStemMC<V extends AdminClient> extends StemConverter<V> {
     }
 
     @Override
-    public V fromMap(StemVariable stem, V v) {
+    public V fromMap(QDLStem stem, V v) {
         v = super.fromMap(stem, v);
         /*
         String allowQDL = "allow_qdl";
@@ -90,7 +90,7 @@ public class AdminClientStemMC<V extends AdminClient> extends StemConverter<V> {
     }
 
     @Override
-    public StemVariable toMap(V v, StemVariable stem) {
+    public QDLStem toMap(V v, QDLStem stem) {
         stem = super.toMap(v, stem);
         setNonNullStemValue(stem, kk().creationTS(), v.getCreationTS().getTime());
         setNonNullStemValue(stem, kk().email(), v.getEmail());

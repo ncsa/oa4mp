@@ -2,7 +2,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims;
 
 import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
 import edu.uiuc.ncsa.qdl.state.State;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,11 +46,11 @@ public class IsInGroup implements QDLFunction {
         if (objects[0]==null) {
             return Boolean.FALSE;
         }
-        if(!(objects[0] instanceof StemVariable)){
+        if(!(objects[0] instanceof QDLStem)){
             // This indicates that something wrong was passed, so flag it as a bona fide error.
             throw new IllegalArgumentException("Error: The first argument of " + getName() + " must be a stem list of groups.");
         }
-        StemVariable groups = (StemVariable) objects[0];
+        QDLStem groups = (QDLStem) objects[0];
         if(groups.size() == 0){
             return Boolean.FALSE;
         }
@@ -61,8 +61,8 @@ public class IsInGroup implements QDLFunction {
         for (Object key : groups.keySet()) {
             Object obj = groups.get(key);
             // two options, either they parsed it in to a group structure OR its just a raw string
-            if (obj instanceof StemVariable) {
-                StemVariable group = (StemVariable) obj;
+            if (obj instanceof QDLStem) {
+                QDLStem group = (QDLStem) obj;
                 if (group.containsKey(GROUP_ENTRY_NAME) && group.getString(GROUP_ENTRY_NAME).equals(name)) {
                     return Boolean.TRUE;
                 }

@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state;
 
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
@@ -164,9 +164,9 @@ public class ExtendedParameters {
         JSONObject jsonObject = xp.snoopParameters(pmap);
 
         System.out.println(jsonObject.toString(2));
-        StemVariable stemVariable = new StemVariable();
-        stemVariable.fromJSON(jsonObject);
-        System.out.println(stemVariable.toString(2));
+        QDLStem QDLStem = new QDLStem();
+        QDLStem.fromJSON(jsonObject);
+        System.out.println(QDLStem.toString(2));
         // Now an integrity check for the existing configuration.
         JSONObject jsonObject2 = (JSONObject) JSONSerializer.toJSON(rawJ);
         JSONObject cmExtra = (JSONObject) JSONSerializer.toJSON(cmextra);

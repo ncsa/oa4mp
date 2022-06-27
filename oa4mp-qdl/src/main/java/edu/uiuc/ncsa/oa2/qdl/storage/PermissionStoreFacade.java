@@ -2,7 +2,7 @@ package edu.uiuc.ncsa.oa2.qdl.storage;
 
 import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
 import edu.uiuc.ncsa.qdl.state.State;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 
@@ -76,7 +76,7 @@ public class PermissionStoreFacade extends StoreFacade {
             }
             List<Identifier> ids = getPS().getClients(BasicIdentifier.newID((String) objects[0]));
 
-            StemVariable stem = new StemVariable();
+            QDLStem stem = new QDLStem();
             for (Identifier id : ids) {
                 stem.listAppend(id.toString());
             }
@@ -112,7 +112,7 @@ public class PermissionStoreFacade extends StoreFacade {
             }
             List<Identifier> ids = getPS().getAdmins(BasicIdentifier.newID((String) objects[0]));
 
-            StemVariable stem = new StemVariable();
+            QDLStem stem = new QDLStem();
             for (Identifier id : ids) {
                 stem.listAppend(id.toString());
             }

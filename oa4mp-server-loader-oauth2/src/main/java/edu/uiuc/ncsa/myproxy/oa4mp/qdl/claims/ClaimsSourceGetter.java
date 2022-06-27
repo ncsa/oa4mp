@@ -10,7 +10,7 @@ import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.QDLList;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import net.sf.json.JSONArray;
@@ -19,7 +19,7 @@ import net.sf.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-import static edu.uiuc.ncsa.qdl.variables.StemVariable.STEM_INDEX_MARKER;
+import static edu.uiuc.ncsa.qdl.variables.QDLStem.STEM_INDEX_MARKER;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -43,11 +43,11 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
         if (objects.length < 2) {
             throw new IllegalArgumentException("Error: " + getName() + " requires at least two arguments");
         }
-        if (!(objects[0] instanceof StemVariable)) {
+        if (!(objects[0] instanceof QDLStem)) {
             throw new IllegalArgumentException("Error: " + getName() + " requires a stem variable as its first argument");
         }
 
-        StemVariable arg = (StemVariable) objects[0];
+        QDLStem arg = (QDLStem) objects[0];
         if (objects[1] == null || !(objects[1] instanceof String)) {
             throw new IllegalArgumentException("Error: " + getName() + " requires the name of the user as its second argument");
         }
@@ -55,9 +55,9 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
         if (!arg.containsKey(CS_DEFAULT_TYPE)) {
             throw new IllegalStateException("Error: " + getName() + " must have the type of claim source");
         }
-        StemVariable headers = null;
+        QDLStem headers = null;
         if (arg.getString(CS_DEFAULT_TYPE).equals(CS_TYPE_HEADERS)) {
-            headers = (StemVariable) arg.get("headers.");
+            headers = (QDLStem) arg.get("headers.");
         }
         switch (arg.getString(CS_DEFAULT_TYPE)) {
             case CS_TYPE_CODE:
@@ -74,7 +74,7 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
         return null;
     }
 
-    protected StemVariable doCode(StemVariable arg, String username, StemVariable headers, State state) {
+    protected QDLStem doCode(QDLStem arg, String username, QDLStem headers, State state) {
         OA2State oa2State = null;
         if(state instanceof OA2State) {
             oa2State = (OA2State) state;
@@ -85,13 +85,13 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
         JSONObject claims = new JSONObject();
         TestHTTPRequest req = new TestHTTPRequest(headers);
         claims = basicClaimsSource.process(claims, req, t);
-        StemVariable output = new StemVariable();
+        QDLStem output = new QDLStem();
         output.fromJSON(claims);
         return output;
 
     }
 
-    protected StemVariable doNCSA(StemVariable arg, String username, State state) {
+    protected QDLStem doNCSA(QDLStem arg, String username, State state) {
         OA2State oa2State = null;
         if(state instanceof OA2State) {
              oa2State = (OA2State) state;
@@ -105,12 +105,12 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
         protoClaims.put(NCSALDAPClaimSource.DEFAULT_SEACH_NAME, username);
 
         JSONObject j = ncsaldapClaimSource.process(protoClaims, t);
-        StemVariable output = new StemVariable();
+        QDLStem output = new QDLStem();
         output.fromJSON(j);
         return output;
     }
 
-    public StemVariable doHeaders(StemVariable arg, String username, StemVariable headers, State state) {
+    public QDLStem doHeaders(QDLStem arg, String username, QDLStem headers, State state) {
         OA2State oa2State = null;
         if(state instanceof OA2State){
             oa2State = (OA2State) state;
@@ -123,14 +123,14 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
 
         TestHTTPRequest req = new TestHTTPRequest(headers);
         JSONObject j = httpHeaderClaimsSource.process(protoClaims, req, t);
-        StemVariable output = new StemVariable();
+        QDLStem output = new QDLStem();
         output.fromJSON(j);
         return output;
 
     }
 
 
-    private StemVariable doLDAP(StemVariable arg, String username, State state) {
+    private QDLStem doLDAP(QDLStem arg, String username, State state) {
         OA2State oa2State = null;
         if(state instanceof OA2State){
             oa2State = (OA2State) state;
@@ -141,7 +141,7 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
         JSONObject protoClaims = new JSONObject();
         protoClaims.put(arg.getString(CS_LDAP_SEARCH_NAME), username);
         JSONObject j = ldapClaimsSource.process(protoClaims, t);
-        StemVariable output = claimsToStem(j);
+        QDLStem output = claimsToStem(j);
         return output;
     }
 
@@ -151,8 +151,8 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
      * @param claims
      * @return
      */
-    protected StemVariable claimsToStem(JSONObject claims) {
-        StemVariable out = new StemVariable();
+    protected QDLStem claimsToStem(JSONObject claims) {
+        QDLStem out = new QDLStem();
         for (Object k : claims.keySet()) {
             String key = k.toString();
             Object obj = claims.get(k);
@@ -165,7 +165,7 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
                     QDLList sl = new QDLList();
                     for (int i = 0; i < array.size(); i++) {
                         Object obj1 = array.get(i);
-                        StemVariable out1 = null;
+                        QDLStem out1 = null;
                         if (obj1 instanceof JSONObject) {
                             out1 = claimsToStem((JSONObject) obj1);
                             sl.append(out1);
@@ -173,7 +173,7 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
                             sl.append(array.get(i));
                         }
                     }
-                    StemVariable st1 = new StemVariable();
+                    QDLStem st1 = new QDLStem();
                     st1.setQDLList(sl);
                     out.put(key + STEM_INDEX_MARKER, st1);
                 } else {
@@ -206,7 +206,7 @@ get_claims(cfg., 'dweitzel2@unl.edu')
      * @param state
      * @return
      */
-    protected StemVariable doFS(StemVariable arg, String username, State state) {
+    protected QDLStem doFS(QDLStem arg, String username, State state) {
         OA2State oa2State = null;
         if(state instanceof OA2State){
             oa2State = (OA2State) state;
@@ -221,7 +221,7 @@ get_claims(cfg., 'dweitzel2@unl.edu')
         OA2ServiceTransaction t = new OA2ServiceTransaction((Identifier) null);
         t.setUsername(username);
         JSONObject claims = fsClaimSource.process(new JSONObject(), t);
-        StemVariable output = new StemVariable();
+        QDLStem output = new QDLStem();
         output.fromJSON(claims);
         return output;
 
@@ -229,22 +229,22 @@ get_claims(cfg., 'dweitzel2@unl.edu')
 
 
     protected static void testFS() {
-        StemVariable mystem = new StemVariable();
+        QDLStem mystem = new QDLStem();
         mystem.put(CS_DEFAULT_TYPE, CS_TYPE_FILE);
         mystem.put(CS_FILE_FILE_PATH, "/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/test-claims.json");
         CreateSourceConfig csc = new CreateSourceConfig();
-        StemVariable out = (StemVariable) csc.evaluate(new Object[]{mystem}, null);
+        QDLStem out = (QDLStem) csc.evaluate(new Object[]{mystem}, null);
         System.out.println(out.toJSON().toString(2));
 
 
         ClaimsSourceGetter cst = new ClaimsSourceGetter();
-        StemVariable claims = (StemVariable) cst.evaluate(new Object[]{mystem, "jeff"}, null);
+        QDLStem claims = (QDLStem) cst.evaluate(new Object[]{mystem, "jeff"}, null);
         System.out.println("File claim source configuration:");
         System.out.println(claims.toJSON().toString(2));
     }
 
     protected static void testLDAP2() {
-        StemVariable mystem = new StemVariable();
+        QDLStem mystem = new QDLStem();
 
         mystem.put(CS_DEFAULT_TYPE, CS_TYPE_LDAP);
         mystem.put(CS_LDAP_SERVER_ADDRESS, "ldap1.ncsa.illinois.edu,ldap2.ncsa.illinois.edu");
@@ -253,28 +253,28 @@ get_claims(cfg., 'dweitzel2@unl.edu')
         mystem.put(CS_LDAP_SEARCH_NAME, "uid");
         mystem.put(CS_LDAP_AUTHZ_TYPE, "none");
         CreateSourceConfig createSourceConfig = new CreateSourceConfig();
-        StemVariable cfg = (StemVariable) createSourceConfig.evaluate(new Object[]{mystem}, null);
+        QDLStem cfg = (QDLStem) createSourceConfig.evaluate(new Object[]{mystem}, null);
 
         ClaimsSourceGetter cst = new ClaimsSourceGetter();
-        StemVariable claims = (StemVariable) cst.evaluate(new Object[]{cfg, "jgaynor"}, null);
+        QDLStem claims = (QDLStem) cst.evaluate(new Object[]{cfg, "jgaynor"}, null);
         System.out.println(claims.toJSON().toString(2));
 
     }
 
     protected static void testNCSA() {
         CreateSourceConfig csc = new CreateSourceConfig();
-        StemVariable cfg = new StemVariable();
+        QDLStem cfg = new QDLStem();
 
-        csc.doNCSA(new StemVariable(), cfg); // populates the cfg
+        csc.doNCSA(new QDLStem(), cfg); // populates the cfg
         System.out.println("NCSA default config:" + cfg.toString(1));
         ClaimsSourceGetter cst = new ClaimsSourceGetter();
-        StemVariable claims = (StemVariable) cst.evaluate(new Object[]{cfg, "jgaynor"}, null);
+        QDLStem claims = (QDLStem) cst.evaluate(new Object[]{cfg, "jgaynor"}, null);
         System.out.println(claims.toString(2));
 
     }
 
     protected static void testLDAP() {
-        StemVariable mystem = new StemVariable();
+        QDLStem mystem = new QDLStem();
         mystem.put(CS_DEFAULT_TYPE, CS_TYPE_LDAP);
         mystem.put(CS_LDAP_SERVER_ADDRESS, "ldap4.ncsa.illinois.edu,ldap2.ncsa.illinois.edu,ldap1.ncsa.illinois.edu");
         mystem.put(CS_LDAP_AUTHZ_TYPE, "none");
@@ -289,16 +289,16 @@ get_claims(cfg., 'dweitzel2@unl.edu')
         searchAttr.add("uidNumber");
         searchAttr.add("cn");
         searchAttr.add("memberOf");
-        StemVariable sa = new StemVariable();
+        QDLStem sa = new QDLStem();
         sa.addList(searchAttr);
-        StemVariable groupNames = new StemVariable();
+        QDLStem groupNames = new QDLStem();
 
         groupNames.put("0", "memberOf");
         mystem.put(CS_LDAP_SEARCH_ATTRIBUTES, sa);
         mystem.put(CS_LDAP_GROUP_NAMES, groupNames);
         System.out.println("\n-----\nldap cfg:\n-----\n" + mystem.toString(1));
         ClaimsSourceGetter cst = new ClaimsSourceGetter();
-        StemVariable claims = (StemVariable) cst.evaluate(new Object[]{mystem, "jgaynor"}, null);
+        QDLStem claims = (QDLStem) cst.evaluate(new Object[]{mystem, "jgaynor"}, null);
         System.out.println(claims.toString(2));
 
     }

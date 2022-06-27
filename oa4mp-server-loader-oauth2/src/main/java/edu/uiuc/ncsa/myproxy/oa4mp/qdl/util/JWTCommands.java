@@ -8,7 +8,7 @@ import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
 import edu.uiuc.ncsa.qdl.extensions.QDLModuleMetaClass;
 import edu.uiuc.ncsa.qdl.extensions.QDLVariable;
 import edu.uiuc.ncsa.qdl.state.State;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.oauth_2_0.JWTUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
@@ -281,9 +281,9 @@ public class JWTCommands implements QDLModuleMetaClass {
             }
             List<Object> dummy = new ArrayList<>();
             dummy.addAll(sKeys); // how to cast a list of strings to a list of objects.
-            StemVariable stemVariable = new StemVariable();
-            stemVariable.addList(dummy);
-            return stemVariable;
+            QDLStem QDLStem = new QDLStem();
+            QDLStem.addList(dummy);
+            return QDLStem;
         }
 
         protected List<String> createKeys(int count, int length) {
@@ -398,7 +398,7 @@ public class JWTCommands implements QDLModuleMetaClass {
                 kid = jwks.getDefaultKeyID();
 
             }
-            StemVariable arg = (StemVariable) objects[0];
+            QDLStem arg = (QDLStem) objects[0];
 
 
             try {
@@ -448,19 +448,19 @@ public class JWTCommands implements QDLModuleMetaClass {
             if (jwks == null || jwks.isEmpty()) {
                 throw new IllegalStateException("Error: No keys have been set.");
             }
-            StemVariable stemVariable = new StemVariable();
+            QDLStem QDLStem = new QDLStem();
             if (jwks.hasDefaultKey()) {
-                stemVariable.put("default", jwks.getDefaultKeyID());
+                QDLStem.put("default", jwks.getDefaultKeyID());
             }
             for (String id : jwks.keySet()) {
                 JSONWebKey jwk = jwks.get(id);
-                StemVariable entry = new StemVariable();
+                QDLStem entry = new QDLStem();
                 entry.put(JSONWebKeyUtil.ALGORITHM, jwk.algorithm);
                 entry.put(JSONWebKeyUtil.KEY_TYPE, jwk.use);
                 entry.put(JSONWebKeyUtil.KEY_TYPE, jwk.type);
-                stemVariable.put(id, entry);
+                QDLStem.put(id, entry);
             }
-            return stemVariable;
+            return QDLStem;
         }
 
         @Override
@@ -507,9 +507,9 @@ public class JWTCommands implements QDLModuleMetaClass {
 
                 json = JWTUtil.verifyAndReadJWT(token, well_known);
             }
-            StemVariable stemVariable = new StemVariable();
-            stemVariable.fromJSON(json);
-            return stemVariable;
+            QDLStem QDLStem = new QDLStem();
+            QDLStem.fromJSON(json);
+            return QDLStem;
         }
 
         @Override
@@ -547,9 +547,9 @@ public class JWTCommands implements QDLModuleMetaClass {
             String token = objects[0].toString();
 
             JSONObject[] array = JWTUtil.readJWT(token);
-            StemVariable stemVariable = new StemVariable();
-            stemVariable.fromJSON(array[JWTUtil.HEADER_INDEX]);
-            return stemVariable;
+            QDLStem QDLStem = new QDLStem();
+            QDLStem.fromJSON(array[JWTUtil.HEADER_INDEX]);
+            return QDLStem;
         }
 
         @Override
@@ -580,9 +580,9 @@ public class JWTCommands implements QDLModuleMetaClass {
             String token = objects[0].toString();
 
             JSONObject[] array = JWTUtil.readJWT(token);
-            StemVariable stemVariable = new StemVariable();
-            stemVariable.fromJSON(array[JWTUtil.PAYLOAD_INDEX]);
-            return stemVariable;
+            QDLStem QDLStem = new QDLStem();
+            QDLStem.fromJSON(array[JWTUtil.PAYLOAD_INDEX]);
+            return QDLStem;
         }
 
         @Override
@@ -604,21 +604,21 @@ public class JWTCommands implements QDLModuleMetaClass {
             return "test_scopes.";
         }
 
-        StemVariable stemVariable = null;
+        QDLStem QDLStem = null;
 
         @Override
         public Object getValue() {
-            if (stemVariable == null) {
-                stemVariable = new StemVariable();
+            if (QDLStem == null) {
+                QDLStem = new QDLStem();
                 List<Object> scopes = new ArrayList<>();
                 scopes.add("wlcg");
                 scopes.add("compute.exec:/");
                 scopes.add("compute.create:/");
                 scopes.add("storage.write:/store/data");
                 scopes.add("storage.read:/store ");
-                stemVariable.addList(scopes);
+                QDLStem.addList(scopes);
             }
-            return stemVariable;
+            return QDLStem;
         }
     }
 
@@ -628,21 +628,21 @@ public class JWTCommands implements QDLModuleMetaClass {
             return "test_xas.";
         }
 
-        StemVariable stemVariable = null;
+        QDLStem QDLStem = null;
 
         @Override
         public Object getValue() {
-            if (stemVariable == null) {
-                stemVariable = new StemVariable();
+            if (QDLStem == null) {
+                QDLStem = new QDLStem();
                 HashMap<String, String[]> pmap = new HashMap<>();
                 pmap.put(OA4MP_NS + ":/roles/", new String[]{"A", "B", "C"});
                 pmap.put(OA4MP_NS + ":/tokens/id/lifetime", new String[]{"100000000"});
                 pmap.put(OA4MP_NS + ":/tokens/access/lifetime", new String[]{"500000"});
                 ExtendedParameters xp = new ExtendedParameters();
                 JSONObject jsonObject = xp.snoopParameters(pmap);
-                stemVariable.fromJSON(jsonObject);
+                QDLStem.fromJSON(jsonObject);
             }
-            return stemVariable;
+            return QDLStem;
         }
     }
 
@@ -653,18 +653,18 @@ public class JWTCommands implements QDLModuleMetaClass {
             return "test_audience.";
         }
 
-        StemVariable stemVariable = null;
+        QDLStem QDLStem = null;
 
         @Override
         public Object getValue() {
-            if (stemVariable == null) {
-                stemVariable = new StemVariable();
+            if (QDLStem == null) {
+                QDLStem = new QDLStem();
                 List<Object> audience = new ArrayList<>();
                 audience.add("https://foo.edu/bar");
                 audience.add("https://foo.edu/baz");
-                stemVariable.addList(audience);
+                QDLStem.addList(audience);
             }
-            return stemVariable;
+            return QDLStem;
         }
 
     }
@@ -675,15 +675,15 @@ public class JWTCommands implements QDLModuleMetaClass {
             return "test_claims.";
         }
 
-        StemVariable stemVariable = null;
+        QDLStem QDLStem = null;
 
         @Override
         public Object getValue() {
-            if (stemVariable == null) {
-                stemVariable = new StemVariable();
-                stemVariable.fromJSON(JSONObject.fromObject(rawJSON));
+            if (QDLStem == null) {
+                QDLStem = new QDLStem();
+                QDLStem.fromJSON(JSONObject.fromObject(rawJSON));
             }
-            return stemVariable;
+            return QDLStem;
         }
 
         String rawJSON = "{\n" +

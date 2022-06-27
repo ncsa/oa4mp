@@ -3,7 +3,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.BasicClaimsSourceImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.FSClaimSource;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.HTTPHeaderClaimsSource;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSourceConfiguration;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
@@ -31,8 +31,8 @@ public class ClaimSourceConfigConverter implements CSConstants {
      * @param type
      * @return
      */
-    public static StemVariable convert(ClaimSource claimsSource, String type) {
-        StemVariable stem = new StemVariable();
+    public static QDLStem convert(ClaimSource claimsSource, String type) {
+        QDLStem stem = new QDLStem();
         ClaimSourceConfiguration cfg = claimsSource.getConfiguration();
         setDefaultsInStem(cfg, stem);
         stem.put(CS_DEFAULT_TYPE, type); // set the type in the stem for later.
@@ -94,7 +94,7 @@ public class ClaimSourceConfigConverter implements CSConstants {
                     List<Object> groups = new ArrayList<>();
                     List<Object> names = new ArrayList<>();
                     List<Object> isList = new ArrayList<>();
-                    StemVariable renames = new StemVariable();
+                    QDLStem renames = new QDLStem();
                     for (String key : cfg2.getSearchAttributes().keySet()) {
                         LDAPConfigurationUtil.AttributeEntry attributeEntry = cfg2.getSearchAttributes().get(key);
                         names.add(attributeEntry.sourceName);
@@ -107,17 +107,17 @@ public class ClaimSourceConfigConverter implements CSConstants {
                         if (attributeEntry.isList) {
                             isList.add(attributeEntry.sourceName);
                         }
-                        StemVariable nameStem = new StemVariable();
+                        QDLStem nameStem = new QDLStem();
                         nameStem.addList(names);
                         stem.put(CS_LDAP_SEARCH_ATTRIBUTES, nameStem);
 
                         if (groups.size() != 0) {
-                            StemVariable groupStem = new StemVariable();
+                            QDLStem groupStem = new QDLStem();
                             groupStem.addList(groups);
                             stem.put(CS_LDAP_GROUP_NAMES, groupStem);
                         }
                         if (isList.size() != 0) {
-                            StemVariable listStem = new StemVariable();
+                            QDLStem listStem = new QDLStem();
                             listStem.addList(isList);
                             stem.put(CS_LDAP_LISTS, listStem);
                         }
@@ -141,7 +141,7 @@ public class ClaimSourceConfigConverter implements CSConstants {
      * @param arg
      * @return
      */
-    public static ClaimSourceConfiguration convert(StemVariable arg) {
+    public static ClaimSourceConfiguration convert(QDLStem arg) {
         ClaimSourceConfiguration cfg = null;
         HashMap<String, Object> xp = new HashMap<>();
         switch (arg.getString(CS_DEFAULT_TYPE)) {
@@ -243,13 +243,13 @@ public class ClaimSourceConfigConverter implements CSConstants {
                  'username':'uid=oa4mp_user,ou=system,o=Fermilab,o=CO,dc=cilogon,dc=org'
                }
                  */
-                StemVariable renames = null;
+                QDLStem renames = null;
                 if (arg.containsKey(CS_LDAP_RENAME)) {
-                    renames = (StemVariable) arg.get(CS_LDAP_RENAME);
+                    renames = (QDLStem) arg.get(CS_LDAP_RENAME);
                 }
                 Collection lists = null;
                 if (arg.containsKey(CS_LDAP_LISTS)) {
-                    StemVariable listNames = (StemVariable) arg.get(CS_LDAP_LISTS);
+                    QDLStem listNames = (QDLStem) arg.get(CS_LDAP_LISTS);
                     lists = listNames.values();
                 } else {
                     lists = new ArrayList();
@@ -257,7 +257,7 @@ public class ClaimSourceConfigConverter implements CSConstants {
 
                 Collection groups;
                 if (arg.containsKey(CS_LDAP_GROUP_NAMES)) {
-                    StemVariable groupStem = (StemVariable) arg.get(CS_LDAP_GROUP_NAMES);
+                    QDLStem groupStem = (QDLStem) arg.get(CS_LDAP_GROUP_NAMES);
                     groups = groupStem.values();
                 } else {
                     groups = new ArrayList();
@@ -265,7 +265,7 @@ public class ClaimSourceConfigConverter implements CSConstants {
 
                 if (arg.containsKey(CS_LDAP_SEARCH_ATTRIBUTES)) {
                     // no attribute means they are getting everything. Let them.
-                    StemVariable searchAttr = (StemVariable) arg.get(CS_LDAP_SEARCH_ATTRIBUTES);
+                    QDLStem searchAttr = (QDLStem) arg.get(CS_LDAP_SEARCH_ATTRIBUTES);
                     Map<String, LDAPConfigurationUtil.AttributeEntry> attrs = new HashMap<>();
 
                     for (Object key : searchAttr.keySet()) {
@@ -307,7 +307,7 @@ public class ClaimSourceConfigConverter implements CSConstants {
         return null;
     }
     
-    protected static void setDefaultsinCfg(StemVariable arg, ClaimSourceConfiguration cfg) {
+    protected static void setDefaultsinCfg(QDLStem arg, ClaimSourceConfiguration cfg) {
         if (arg.containsKey(CS_DEFAULT_ID)) cfg.setId(arg.getString(CS_DEFAULT_ID));
         if (arg.containsKey(CS_DEFAULT_FAIL_ON_ERROR)) cfg.setFailOnError(arg.getBoolean(CS_DEFAULT_FAIL_ON_ERROR));
         if (arg.containsKey(CS_DEFAULT_NOTIFY_ON_FAIL)) cfg.setNotifyOnFail(arg.getBoolean(CS_DEFAULT_NOTIFY_ON_FAIL));
@@ -315,7 +315,7 @@ public class ClaimSourceConfigConverter implements CSConstants {
         if (arg.containsKey(CS_DEFAULT_NAME)) cfg.setName(arg.getString(CS_DEFAULT_NAME));
     }
 
-    protected static void setDefaultsInStem(ClaimSourceConfiguration cfg, StemVariable arg) {
+    protected static void setDefaultsInStem(ClaimSourceConfiguration cfg, QDLStem arg) {
         arg.put(CS_DEFAULT_ID, cfg.getId());
         arg.put(CS_DEFAULT_FAIL_ON_ERROR, cfg.isFailOnError());
         arg.put(CS_DEFAULT_IS_ENABLED, cfg.isEnabled());

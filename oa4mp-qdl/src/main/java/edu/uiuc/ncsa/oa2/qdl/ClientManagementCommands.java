@@ -8,7 +8,7 @@ import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
 import edu.uiuc.ncsa.qdl.extensions.QDLModuleMetaClass;
 import edu.uiuc.ncsa.qdl.state.State;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
@@ -153,14 +153,14 @@ public class ClientManagementCommands implements QDLModuleMetaClass {
         }
     }
 
-    protected StemVariable toStem(OA2Client client) throws Exception {
+    protected QDLStem toStem(OA2Client client) throws Exception {
         if (client == null) {
-            return new StemVariable();
+            return new QDLStem();
         }
         OA2ClientConverter converter = (OA2ClientConverter) getEnvironment().getClientStore().getMapConverter();
         JSONObject jsonObject = new JSONObject();
         converter.toJSON(client, jsonObject);
-        StemVariable output = new StemVariable();
+        QDLStem output = new QDLStem();
         if (jsonObject.isEmpty()) {
             return output;
         }
@@ -191,11 +191,11 @@ public class ClientManagementCommands implements QDLModuleMetaClass {
         @Override
         public Object evaluate(Object[] objects, State state) {
             checkInit();
-            if (!(objects[0] instanceof StemVariable)) {
+            if (!(objects[0] instanceof QDLStem)) {
                 throw new IllegalArgumentException("Error: The argument must be a stem variable");
             }
-            StemVariable stemVariable = (StemVariable) objects[0];
-            JSON jj = stemVariable.toJSON();
+            QDLStem QDLStem = (QDLStem) objects[0];
+            JSON jj = QDLStem.toJSON();
             if (jj.isArray()) {
                 throw new IllegalArgumentException("Error: The client is not in the expected format.");
             }
@@ -248,7 +248,7 @@ public class ClientManagementCommands implements QDLModuleMetaClass {
             String key = objects[0].toString();
             String regex = objects[1].toString();
             int index = 0;
-            StemVariable output = new StemVariable();
+            QDLStem output = new QDLStem();
 
             try {
                 List<OA2Client> clients = getEnvironment().getClientStore().search(key, regex, true);
@@ -365,9 +365,9 @@ public class ClientManagementCommands implements QDLModuleMetaClass {
             }
             List<Object> x = new ArrayList<>();
             x.addAll(cc.getKeys().allKeys());
-            StemVariable stemVariable = new StemVariable();
-            stemVariable.addList(x);
-            return stemVariable;
+            QDLStem QDLStem = new QDLStem();
+            QDLStem.addList(x);
+            return QDLStem;
         }
 
 
