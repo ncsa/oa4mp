@@ -1,0 +1,33 @@
+/*
+   This is a test for the user info endpoint. What should happen is that this
+   file is called in the post_auth phase, It only sets up a file claim source
+   and adds it to the list of sources.
+   Then in the access, refresh and user_info phases, the process.qdl file is called.
+
+
+ tokens{
+  identity{
+     type=identity
+     qdl{
+         load="ui-test/id-token.qdl"
+         xmd={exec_phase="post_auth"}
+       }// end qdl
+     } //end identity token
+     access{
+        type=default
+        qdl{
+           load="ui-test/process.qdl"
+           xmd={exec_phase=["post_token","post_refresh","post_user_info"]}
+        } //end QDL
+     } // end access token
+   } //end tokens
+
+*/
+
+cfg. := new_template('file');
+say(to_string('*** user_info dir = ' + to_string(dir('vfs#/scripts/'))));
+//cfg.file_path := 'vfs#/scripts/ui-test/test-claims.json';
+cfg.file_path := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-admin-oauth2/src/main/resources/qdl/ui-test/test-claims.json';
+cfg.'claim_key' := 'eppn'; 
+claims.'eppn' := 'test-eppn@foo.bar'; // set it for testing later. Use GitHub for IDP so this can be set here.
+claim_sources. := claim_sources. ~ [create_source(cfg.)];

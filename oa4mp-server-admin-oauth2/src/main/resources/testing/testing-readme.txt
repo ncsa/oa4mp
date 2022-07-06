@@ -338,6 +338,21 @@ When a new version is deployed, here is the testing order
         Check configruation first. Usually it is set to NCSA default and
         a bogus WLCG access token.
   -- localhost:test/df --
+
+  -- localhost:test/user_info
+     Tests that the user info endpoint will update the claims when accessed. This has no parameters
+     * any IDP (tested mostly with GitHub)
+     * use uri not device flow
+     * the file
+         /home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-admin-oauth2/src/main/resources/qdl/ui-test/test-claims.json
+       contains the claims under the user jgaynor@foo.bar. Twiddle these. The test consists of getting
+       the claims and two in this file, isMemberOf and test_claim with be asserted.
+     Test:
+       1.  get an access token and look at the claims.
+       2.  Change the claims in the file
+       3.  get the user info. Changes in the file should be reflected in the returned claims
+       4.  Change file back
+
     *************************
     ** local CILogon test! **
     *************************

@@ -1,0 +1,76 @@
+{
+  "comment": [
+    "This JSON file contains meta data for testing user refresh tokens."
+  ],
+  "test-eppn@foo.bar": {
+    "test_claim" : "my3 test 33cl33aim42",
+    "isMemberOf": [
+      {
+        "name": "org_ici",
+        "id": 1282
+      },
+      {
+        "name": "all_ncsa_employe",
+        "id": 1097
+      },
+      {
+        "name": "jira-users",
+        "id": 1363
+      }
+    ]
+  },
+
+  "jgaynor@fnal.gov": {
+    "comment": [
+      "This is for testing the capabilities mechanism. The access token handler gets this",
+      "and then peels off the eduPersonEntitlement, each entry is a and may be returned in the scopes",
+      "claim of the access token."
+    ],
+    "dn": "voPersonID=MESS100005,ou=people,o=MESS,o=CO,dc=cilogon,dc=org",
+    "sn": "Gaynor",
+    "cn": "Jeff Gaynor",
+    "givenName": "Jeff",
+    "displayName": "Jeff Gaynor",
+    "mail": "jgaynor@fnal.gov",
+    "uid": "jgaynor@fnal.gov",
+    "isMemberOf": [
+      {
+        "name": "CO:members:all"
+      },
+      {
+        "name": "CO:members:active"
+      },
+      {
+        "name": "CO:COU:MESS Employee:members:active"
+      },
+      {
+        "name": "CO:COU:MESS Employee:members:all"
+      }
+    ],
+    "voPersonExternalID": "jgaynor@fnal.gov",
+    "voPersonID": "MESS12345",
+    "eduPersonEntitlement": [
+      "storage.read:/store/vo3",
+      "storage.write:/store/vo3/data",
+      "compute.create:/vo3-production-queue"
+    ]
+  },
+  "default_claim": {
+    "comment": [
+      "This is the default claim returned by the handler **if** you specify use_default",
+      "as part of the "
+    ],
+    "eppn": "unknown@foo.bar",
+    "isMemberOf": [
+      {
+        "name": "org_baz",
+        "id": 1212
+      },
+      {
+        "name": "jira-users",
+        "id": 1163
+      }
+    ]
+  }
+
+}

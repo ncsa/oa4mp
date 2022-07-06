@@ -63,8 +63,8 @@ public class OA2ServletUtils {
                 throwable = qdlExceptionWithTrace.getCause();
             }
             String message = "error processing request:" + exception.getMessage();
-            ppξ(throwable, callingObject, oa2SE, debugger, message);
 
+            ppξ(throwable, callingObject, oa2SE, debugger, message);
             throw new OA2ATException(OA2Errors.INVALID_REQUEST,
                     message,
                     HttpStatus.SC_BAD_REQUEST,
@@ -103,7 +103,8 @@ public class OA2ServletUtils {
         // and the old tokens will be invalid, replaced by new ones, so don't do that. Let someone have
         // a chance to fix the issue.
         String message = "unable to update claims on token refresh: \"" + exception.getMessage() + "\"";
-        ppξ(exception, callingObject,oa2SE, null, message);
+
+        ppξ(exception, callingObject, oa2SE, null, message);
         throw new OA2ATException(OA2Errors.INVALID_REQUEST,
                 message,
                 HttpStatus.SC_BAD_REQUEST,
@@ -132,7 +133,7 @@ public class OA2ServletUtils {
         for (int i = 0; i < Math.min(lines.length, n); i++) {
             sb.append(lines[i]).append("\n");
         }
-        if(printIt) {
+        if (printIt) {
             System.err.println(sb);
         }
         return sb.toString();
@@ -156,9 +157,7 @@ public class OA2ServletUtils {
             oa2SE.warn(truncateStackTrace(throwable, stackTraceMaxLines, false));
             return;
         }
-        if (debugger.isEnabled()) {
-            debugger.trace(callingObject, message);
-            debugger.trace(callingObject, truncateStackTrace(throwable, stackTraceMaxLines, false));
-        }
+        debugger.trace(callingObject, message);
+        debugger.trace(callingObject, truncateStackTrace(throwable, stackTraceMaxLines, false));
     }
 }

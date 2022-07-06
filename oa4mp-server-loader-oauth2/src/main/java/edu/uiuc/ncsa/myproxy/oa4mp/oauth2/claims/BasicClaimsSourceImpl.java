@@ -253,7 +253,12 @@ public class BasicClaimsSourceImpl implements ClaimSource {
         return claims;
     }
 
-
+    /**
+     * This should usually be false. It is true only for those sources that can <b>ONLY</b>
+     * run at authorization, such as {@link HTTPHeaderClaimsSource}, where the information
+     * is simply not available in later phases.
+     * @return
+     */
     @Override
     public boolean isRunAtAuthorization() {
         return false;

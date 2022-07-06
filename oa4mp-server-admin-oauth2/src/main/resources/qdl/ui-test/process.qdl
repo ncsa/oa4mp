@@ -1,0 +1,11 @@
+/*
+    This does some processing on the retrieved claims from the test-claims.json file
+    This
+*/
+
+say('*** in process.qdl');
+say('***    has claims=' + to_string(claims.));
+say(' *** file =' + file_read('vfs#/scripts/ui-test/test-claims.json'));
+claims.'test_claim' :=  claims.'test_claim'-'3';
+claims.isMemberOf. := (claims.isMemberOf.)\*\'name';
+say('***    final claims=' + to_string(claims.));

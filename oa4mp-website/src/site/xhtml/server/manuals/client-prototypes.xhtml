@@ -22,12 +22,6 @@ one processed, then the resulting client is used.
 </p>
 
 
-<h2>Ersatz clients and inheritance</h2>
-<p>If a client is an ersatz client (so it has a provisioner or possibly many) a
-common situation is that the client should really just inherit everything from the
-provisioner. In that case, the <b>extendsProvisioners</b> attribute of the client
-is set to true and any provisioners will be treated as prototypes.</p>
-
 <h2>Using the client management API</h2>
 <p>You may set prototypes as a list of identifiers in the client management
 API. This is the content of the sample prototype-minimal.json configuration
@@ -45,6 +39,18 @@ bundled with the oidc-cm toolkit</p>
 <p>Here a very minimal client (callback, name) is specified and there are two prototypes.
 All of the settings from these are taken so that in effect, this client is merely an
 extension of these.</p>
+<p>Prototypes do not need to be approved. As a matter of fact,
+there is a good argument for not approving them if they simply are used by other
+clients. A final aside is that while this allows for multiple inheritance,
+the progression is linear and hence the order you specify the clients determines
+which has priority: Each overrides the one before. This effectively sidesteps certain
+potential issues with inheritance, such as the Diamond Problem.</p>
+
+<h2>Ersatz clients and inheritance</h2>
+<p>If a client is an ersatz client (so it has a provisioner or possibly many) a
+common situation is that the client should really just inherit everything from the
+provisioner. In that case, the <b>extendsProvisioners</b> attribute of the client
+is set to true and any provisioners will be treated as prototypes.</p>
 <!--#include virtual="../../footer.html" -->
 </body>
 </html>
