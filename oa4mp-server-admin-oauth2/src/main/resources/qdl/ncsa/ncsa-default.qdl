@@ -89,5 +89,7 @@ if[
           query(claims.isMemberOf., '$..name')
        converts it nicely to a list as well. Be sure to only do the claim you want
        so you don't get extra name attributes.
+       OR as of 1.4.7
+       claims.isMemberOf. := (claims.isMemberOf.)\*\'name';
     */
 ];
