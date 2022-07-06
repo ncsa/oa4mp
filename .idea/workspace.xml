@@ -10,11 +10,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b728426b-c50e-4343-893b-175387fad5cf" name="Changes" comment="">
+    <list default="true" id="b728426b-c50e-4343-893b-175387fad5cf" name="Changes" comment="Re-committing.">
       <change afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/qdl/ui-test/id-token.qdl" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/qdl/ui-test/process.qdl" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/qdl/ui-test/test-claims.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-qdl/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-qdl/buildNumber.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-qdl/src/main/docs/creating_claim_sources2.odt" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-qdl/src/main/docs/creating_claim_sources2.odt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/testing/testing-readme.txt" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/testing/testing-readme.txt" afterDir="false" />
@@ -762,7 +761,6 @@
     <option name="version" value="3" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Updated documentation. Fixed TXRecord serialization issue." />
     <MESSAGE value="CIL-771. Test cleanup." />
     <MESSAGE value="CIL-771. CIL-1211" />
     <MESSAGE value="CIL-771. Updated changelog and improved documentation." />
@@ -787,7 +785,8 @@
     <MESSAGE value="CIL-1313, CIL-1312, CIL-1310 Tweaked logging messages to make them clearer." />
     <MESSAGE value="Added a lot of documentation. Some clean up related to that." />
     <MESSAGE value="Class rename part 2." />
-    <option name="LAST_COMMIT_MESSAGE" value="Class rename part 2." />
+    <MESSAGE value="Re-committing." />
+    <option name="LAST_COMMIT_MESSAGE" value="Re-committing." />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
