@@ -2,7 +2,11 @@ package edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.*;
+import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.QDLStem;
+import edu.uiuc.ncsa.qdl.vfs.VFSFileProvider;
+import edu.uiuc.ncsa.qdl.vfs.VFSPassThruFileProvider;
+import edu.uiuc.ncsa.qdl.vfs.VFSPaths;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSourceConfiguration;
@@ -27,7 +31,7 @@ public class ConfigtoCS implements CSConstants {
         if (source instanceof LDAPClaimsSource) {
             return ClaimSourceConfigConverter.convert(source, CSConstants.CS_TYPE_LDAP);
         }
-        if(source instanceof BasicClaimsSourceImpl){
+        if (source instanceof BasicClaimsSourceImpl) {
             throw new GeneralException("Error: This probably means you instantiated a class using the code type, but handling it has not been implement yet.");
         }
 
@@ -35,18 +39,42 @@ public class ConfigtoCS implements CSConstants {
     }
 
     public static ClaimSource convert(QDLStem arg, OA2SE oa2SE) {
+        return convert(arg, null, oa2SE);
+    }
+
+    public static ClaimSource convert(QDLStem arg, State qdlState, OA2SE oa2SE) {
         switch (arg.getString(CS_DEFAULT_TYPE)) {
             case CS_TYPE_CODE:
                 return doCode(arg);
             case CS_TYPE_FILE:
+                // If the user has defined the path in a QDL VFS pass through file system, then try to
+                // resolve it here since the FSClaimSource knows nothing of such file systems
+                if (qdlState != null) {
+                    VFSFileProvider provider = null;
+                    String path = arg.getString(CS_FILE_FILE_PATH);
+                    if (path.contains(VFSPaths.SCHEME_DELIMITER)) {
+                        try {
+                            provider = qdlState.getVFS(path);
+                        } catch (Throwable e) {
+                            e.printStackTrace();
+                        }
+                        if (provider instanceof VFSPassThruFileProvider) {
+
+                            VFSPassThruFileProvider passThruFileProvider = (VFSPassThruFileProvider) provider;
+                            arg.put(CS_FILE_FILE_PATH, passThruFileProvider.getRealPath(arg.getString(CS_FILE_FILE_PATH)));
+                        }
+                    } else {
+                        throw new IllegalArgumentException("error: the VFS path '" + path + "' cannot be resolved oputside of QDL.");
+                    }
+                }
                 ClaimSourceConfiguration cfg = ClaimSourceConfigConverter.convert(arg);
                 return new FSClaimSource(cfg);
             case CS_TYPE_LDAP:
                 LDAPConfiguration ldapCfg = (LDAPConfiguration) ClaimSourceConfigConverter.convert(arg);
                 LDAPClaimsSource ldapClaimsSource;
-                if(oa2SE ==null){
+                if (oa2SE == null) {
                     ldapClaimsSource = new LDAPClaimsSource();
-                }else{
+                } else {
                     ldapClaimsSource = new LDAPClaimsSource(oa2SE);
                 }
                 ldapClaimsSource.setConfiguration(ldapCfg);
@@ -65,9 +93,9 @@ public class ConfigtoCS implements CSConstants {
                     searchName = NCSALDAPClaimSource.DEFAULT_SEACH_NAME;
                 }
                 NCSALDAPClaimSource ncsaldapClaimSource;
-                if(oa2SE == null){
+                if (oa2SE == null) {
                     ncsaldapClaimSource = new NCSALDAPClaimSource();
-                }else{
+                } else {
                     ncsaldapClaimSource = new NCSALDAPClaimSource(oa2SE);
                 }
                 return ncsaldapClaimSource;

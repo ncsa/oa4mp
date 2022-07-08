@@ -79,6 +79,7 @@ public class ClaimSourceConfigConverter implements CSConstants {
                 cfg2 = (LDAPConfiguration) claimsSource.getConfiguration();
                 stem.put(CS_LDAP_SEARCH_NAME, cfg2.getSearchNameKey());
                 stem.put(CS_LDAP_SERVER_ADDRESS, cfg2.getServer());
+                stem.put(CS_LDAP_SEARCH_BASE, cfg2.getSearchBase()); // Fixes CIL-1328
                 stem.put(CS_LDAP_CONTEXT_NAME, cfg2.getContextName());
                 stem.put(CS_LDAP_ADDITIONAL_FILTER, cfg2.getAdditionalFilter());
                 stem.put(CS_LDAP_PORT, new Long(cfg2.getPort()));
@@ -196,20 +197,7 @@ public class ClaimSourceConfigConverter implements CSConstants {
                 } else {
                     ldapCfg.setPort(LDAPConfigurationUtil.DEFAULT_PORT);
                 }
-/*
-                if(arg.containsKey(CS_DEFAULT_FAIL_ON_ERROR)){
-                    ldapCfg.setFailOnError(arg.getBoolean(CS_DEFAULT_FAIL_ON_ERROR));
-                }
-                if(arg.containsKey(CS_DEFAULT_NOTIFY_ON_FAIL)){
-                    ldapCfg.setFailOnError(arg.getBoolean(CS_DEFAULT_NOTIFY_ON_FAIL));
-                }
 
-                if (arg.containsKey(CS_DEFAULT_ID)) {
-                    ldapCfg.setId(arg.getString(CS_DEFAULT_ID));
-                } else {
-                    ldapCfg.setId(CS_DEFAULT_ID_VALUE);
-                }
-*/
                 ldapCfg.setAuthType(cUtil.getAuthType(arg.getString(CS_LDAP_AUTHZ_TYPE)));
                 if (ldapCfg.getAuthType() == LDAPConfigurationUtil.LDAP_AUTH_SIMPLE_KEY) {
                     ldapCfg.setPassword(arg.getString(CS_LDAP_PASSWORD));
@@ -217,16 +205,7 @@ public class ClaimSourceConfigConverter implements CSConstants {
                 }
                 ldapCfg.setSearchBase(arg.getString(CS_LDAP_SEARCH_BASE));
                 // now to construct the search attributes.
-                /*
-                    public String CS_DEFAULT_FAIL_ON_ERROR = "fail_on_error";
-    public String CS_DEFAULT_NOTIFY_ON_FAIL = "notify_on_fail";
-    public String CS_DEFAULT_IS_ENABLED = "enabled";
-    public String CS_DEFAULT_ID = "id";
-    public String CS_DEFAULT_NAME = "name";
-    public String CS_DEFAULT_ID_VALUE = "qdl_claim_source";
-    public String CS_DEFAULT_TYPE = "type";
-
-                      Example. Have to specify search_attributes explicitly or no rename possible
+/*                    Example. Have to specify search_attributes explicitly or no rename possible
                       Omitting search_attributes means to get them all.
                {
                  'auth_type':'simple',
@@ -289,7 +268,6 @@ public class ClaimSourceConfigConverter implements CSConstants {
                         ldapCfg.setSearchAttributes(attrs);
                     }
                 }
-
 
                 return ldapCfg;
             case CS_TYPE_HEADERS:

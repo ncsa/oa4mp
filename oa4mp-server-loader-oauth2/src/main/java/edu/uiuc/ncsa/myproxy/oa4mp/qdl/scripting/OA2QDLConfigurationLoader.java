@@ -3,7 +3,6 @@ package edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting;
 import edu.uiuc.ncsa.qdl.config.QDLConfigurationLoader;
 import edu.uiuc.ncsa.qdl.scripting.AnotherJSONUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.util.scripting.ScriptSet;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -11,8 +10,6 @@ import org.apache.commons.configuration.tree.ConfigurationNode;
 
 import java.util.List;
 
-import static edu.uiuc.ncsa.qdl.scripting.Scripts.CODE;
-import static edu.uiuc.ncsa.qdl.scripting.Scripts.RUN;
 import static edu.uiuc.ncsa.security.core.configuration.Configurations.getFirstNode;
 import static edu.uiuc.ncsa.security.core.configuration.Configurations.getNodeValue;
 
@@ -103,7 +100,7 @@ public class OA2QDLConfigurationLoader<T extends OA2QDLEnvironment> extends QDLC
         return getNodeValue(node, WS_ENV, "");
     }
 
-    public ScriptSet getServerScriptSet2() {
+ /*   public ScriptSet getServerScriptSet2() {
         ConfigurationNode node = getFirstNode(cn, SCRIPTS_TAG);
         List<ConfigurationNode> scripts = node.getChildren(SCRIPT_TAG);
         if (scripts == null || scripts.isEmpty()) {
@@ -145,7 +142,7 @@ public class OA2QDLConfigurationLoader<T extends OA2QDLEnvironment> extends QDLC
         }
         return AnotherJSONUtil.createScripts(allScripts);
     }
-
+*/
 
     public ScriptSet getServerScriptSet() {
         ConfigurationNode node = getFirstNode(cn, SCRIPTS_TAG);

@@ -216,7 +216,7 @@ get_claims(cfg., 'dweitzel2@unl.edu')
         polyad.addArgument(new ConstantNode(arg.getString(CS_FILE_FILE_PATH), Constant.STRING_TYPE));
         state.getMetaEvaluator().evaluate(polyad, state);
         String rawJSON = polyad.getResult().toString();
-        FSClaimSource fsClaimSource = (FSClaimSource) ConfigtoCS.convert(arg, oa2State == null?null:oa2State.getOa2se());
+        FSClaimSource fsClaimSource = (FSClaimSource) ConfigtoCS.convert(arg, oa2State, oa2State == null?null:oa2State.getOa2se());
         fsClaimSource.setRawJSON(rawJSON);
         OA2ServiceTransaction t = new OA2ServiceTransaction((Identifier) null);
         t.setUsername(username);

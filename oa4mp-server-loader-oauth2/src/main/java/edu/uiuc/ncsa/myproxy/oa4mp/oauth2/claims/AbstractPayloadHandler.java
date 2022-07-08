@@ -2,8 +2,10 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
+import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTUtil2;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.PayloadHandler;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.PayloadHandlerConfig;
@@ -78,10 +80,6 @@ public abstract class AbstractPayloadHandler implements PayloadHandler {
      * @return
      */
     public JSONObject getExtendedAttributes() {
-/*        if (extendedAttributes == null) {
-            extendedAttributes = transaction.getExtendedAttributes();
-        }
-        return extendedAttributes;*/
         return transaction.getExtendedAttributes();
     }
 
@@ -92,10 +90,10 @@ public abstract class AbstractPayloadHandler implements PayloadHandler {
     @Override
     public JSONObject execute(ClaimSource source, JSONObject claims) throws Throwable {
         // If this is disabled, return the claims unaltered -- do not execute.
+        MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(transaction.getClient());
+
         if (!source.isEnabled()) {
-            return claims;
-        }
-        if (!source.isEnabled()) {
+            debugger.trace(this, "source disabled");
             return claims; // do nothing if the source is enabled.
         }
         // Fix for CIL-693:
