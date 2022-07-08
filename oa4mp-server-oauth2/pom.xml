@@ -7,7 +7,7 @@
     <parent>
         <groupId>edu.uiuc.ncsa.myproxy</groupId>
         <artifactId>myproxy</artifactId>
-        <version>5.2-SNAPSHOT</version>
+        <version>5.2.7.1</version>
     </parent>
 
     <artifactId>oa4mp-server-oauth2</artifactId>
@@ -22,7 +22,7 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>oa4mp-webapp</artifactId>
-            <version>5.2-SNAPSHOT</version>
+            <version>5.2.7.1</version>
             <type>war</type>
             <scope>runtime</scope>
         </dependency>
@@ -34,38 +34,38 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>oa4mp-server-api</artifactId>
-            <version>5.2-SNAPSHOT</version>
+            <version>5.2.7.1</version>
         </dependency>
 <!--
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>oa4mp-server-loader-oauth2</artifactId>
-            <version>5.2-SNAPSHOT</version>
+            <version>5.2.7.1</version>
         </dependency>
 -->
 <!--        <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>oa4mp-server-admin-oauth2</artifactId>
-            <version>5.2-SNAPSHOT</version>
+            <version>5.2.7.1</version>
         </dependency>-->
 
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>oa4mp-proxy</artifactId>
-            <version>5.2-SNAPSHOT</version>
+            <version>5.2.7.1</version>
         </dependency>
         
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>ncsa-security-core</artifactId>
-            <version>5.2-SNAPSHOT</version>
+            <version>5.2.7.1</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security.delegation</groupId>
             <artifactId>ncsa-security-delegation-common</artifactId>
-            <version>5.2-SNAPSHOT</version>
+            <version>5.2.7.1</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
@@ -74,7 +74,7 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>oa4mp-server-test</artifactId>
-            <version>5.2-SNAPSHOT</version>
+            <version>5.2.7.1</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
@@ -83,7 +83,7 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.security.delegation</groupId>
             <artifactId>ncsa-security-oauth-2.0</artifactId>
-            <version>5.2-SNAPSHOT</version>
+            <version>5.2.7.1</version>
         </dependency>
 -->
 
@@ -91,19 +91,19 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>ncsa-security-util</artifactId>
-            <version>5.2-SNAPSHOT</version>
+            <version>5.2.7.1</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>ncsa-security-servlet</artifactId>
-            <version>5.2-SNAPSHOT</version>
+            <version>5.2.7.1</version>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>myproxy-logon</artifactId>
-            <version>5.2-SNAPSHOT</version>
+            <version>5.2.7.1</version>
         </dependency>
 
         <dependency>
@@ -132,7 +132,7 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.security.delegation</groupId>
             <artifactId>ncsa-security-oauth-1.0a</artifactId>
-            <version>5.2-SNAPSHOT</version>
+            <version>5.2.7.1</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
