@@ -1,6 +1,5 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens;
 
-import edu.uiuc.ncsa.qdl.scripting.AnotherJSONUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import net.sf.json.JSONObject;
 
@@ -13,10 +12,11 @@ public class SciTokenConfig extends AccessTokenConfig {
   //  public static String TEMPLATES_KEY = "templates";
 
     public void fromJSON(JSONObject jsonObject) {
+        super.fromJSON(jsonObject);
         if (jsonObject.containsKey(USERNAME_CLAIM_KEY)) {
             usernameClaimKey = jsonObject.getString(USERNAME_CLAIM_KEY);
         }
-        setScriptSet(AnotherJSONUtil.createScripts(jsonObject));
+        //setScriptSet(AnotherJSONUtil.createScripts(jsonObject));
 
     }
 

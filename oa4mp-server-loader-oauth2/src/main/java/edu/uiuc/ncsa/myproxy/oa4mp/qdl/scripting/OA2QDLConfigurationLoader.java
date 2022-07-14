@@ -63,35 +63,6 @@ public class OA2QDLConfigurationLoader<T extends OA2QDLEnvironment> extends QDLC
                 getServerScriptSet());
     }
 
-    /*
-            <scripts>
-              <qdl>
-                 <load>y.qdl</load>
-                 <xmd>{"exec_phase":"pre_auth":,"token_type":"access"}</xmd>
-                 <args>[4,true,{"server":"localhost","port":443"}]</args>
-              </qdl>
-
-            {"qdl":
-               {
-                 "load":"y.qdl",
-                  "xmd":{"exec_phase":"pre_auth":,"token_type":"access"},
-                 "args":[4,true,{"server":"localhost","port":443"}]
-              }}
-
-             <qdl>
-                <code>["x:=to_uri(claims.uid).path;","claims.my_id:=x-'/server'-'/users/';"]</code>
-                <xmd>{"exec_phase":"pre_token"}</xmd>
-              </qdl>
-            </scripts>
-
-            {"qdl":{
-               "code":["x:=to_uri(claims.uid).path;","claims.my_id:=x-'/server'-'/users/';"],
-               "xmd":{"exec_phase":"pre_token"}
-            }}
-
-
-
-             */
     public static String SCRIPTS_TAG = "scripts";
     public static String SCRIPT_TAG = "script";
 
@@ -99,50 +70,6 @@ public class OA2QDLConfigurationLoader<T extends OA2QDLEnvironment> extends QDLC
         ConfigurationNode node = getFirstNode(cn, WS_TAG);
         return getNodeValue(node, WS_ENV, "");
     }
-
- /*   public ScriptSet getServerScriptSet2() {
-        ConfigurationNode node = getFirstNode(cn, SCRIPTS_TAG);
-        List<ConfigurationNode> scripts = node.getChildren(SCRIPT_TAG);
-        if (scripts == null || scripts.isEmpty()) {
-            return null;
-        }
-        JSONArray allScripts = new JSONArray();
-
-        for (ConfigurationNode scriptNode : scripts) {
-
-            String run = getNodeValue(scriptNode, RUN);
-            String code = getNodeValue(scriptNode, CODE);
-            String xmd = getNodeValue(scriptNode, AnotherJSONUtil.XMD_TAG); // JSON
-            String args = getNodeValue(scriptNode, AnotherJSONUtil.ARGS_TAG); // JSON
-            JSONObject inner = new JSONObject();
-
-            if (!StringUtils.isTrivial(xmd)) {
-                inner.put(AnotherJSONUtil.XMD_TAG, JSONObject.fromObject(xmd));
-            }
-            if (!StringUtils.isTrivial(args)) {
-                inner.put(AnotherJSONUtil.ARGS_TAG, JSONArray.fromObject(args));
-            }
-            if (!StringUtils.isTrivial(run)) {
-                inner.put(RUN, run);
-            }
-            if (!StringUtils.isTrivial(code)) {
-                // cases are that it is a single line or that it is a JSON array of lines.
-                JSONArray lines;
-                try {
-                    lines = JSONArray.fromObject(code);
-                } catch (Throwable t) {
-                    lines = new JSONArray();
-                    lines.add(code);// wrap the line. It's QDL's problem now
-                }
-                inner.put(CODE, lines);
-            }
-            JSONObject s = new JSONObject();
-            s.put("qdl", inner);
-            allScripts.add(s);
-        }
-        return AnotherJSONUtil.createScripts(allScripts);
-    }
-*/
 
     public ScriptSet getServerScriptSet() {
         ConfigurationNode node = getFirstNode(cn, SCRIPTS_TAG);

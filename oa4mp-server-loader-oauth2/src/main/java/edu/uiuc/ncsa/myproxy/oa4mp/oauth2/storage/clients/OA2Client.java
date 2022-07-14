@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.AbstractPayloadConfig;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.IDTokenClientConfig;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.AccessTokenConfig;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.RefreshTokenConfig;
+import edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.QDLRuntimeEngine;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
@@ -251,9 +252,21 @@ public class OA2Client extends Client implements OA2ClientScopes {
 
     public AccessTokenConfig getAccessTokensConfig() {
         AccessTokenConfig atConfig = new AccessTokenConfig(); // empty
+        if(hasDriverConfig()){
+            // driver configuration is a single entry of th form {"qdl":{"load":"driver.qdl","args":[...]}}
+            // and applies to all handlers.
+            return (AccessTokenConfig) setupDriverPayloadConfig(atConfig, getConfig());
+        }
         return (AccessTokenConfig) setupPayloadConfig(atConfig, TOKENS_KEY, ACCESS_TOKENS_KEY);
     }
 
+    private Object setupDriverPayloadConfig(AccessTokenConfig atConfig, JSONObject config) {
+        return null;
+    }
+
+    public boolean hasDriverConfig(){
+        return getConfig().containsKey(QDLRuntimeEngine.CONFIG_TAG);
+   }
     public void setAccessTokenConfig(AccessTokenConfig cfg) {
         setPayloadConfig(cfg, TOKENS_KEY, ACCESS_TOKENS_KEY);
     }

@@ -12,7 +12,7 @@
     type=identity
     qdl{
         load="ncsa/ncsa-default.qdl"
-        xmd={exec_phase=["pre_auth","post_token", "post_exchange","post_refresh"]}
+        xmd={exec_phase=["pre_auth","post_token","post_refresh"]}
         args=["true"] // true if the member of claim is just a list. Default is false.
       }// end qdl
     } //end identity token
@@ -48,17 +48,17 @@ if[
      say('*** NCSA updated claims=' + to_string(claims., 1));
 ]; //end if
 
-/* This replaces the next block if QDL is at 1.3.2 or above.
-if[
-     reduce(@∨,exec_phase ≡ ['post_token','post_refresh','post_exchange'])
- ][
-     convert ≔ 0 < script_args() ? to_boolean(script_args(0)) : false;
-     if[convert][claims.isMemberOf. ≔ query(claims.isMemberOf., '$..name');];
- ];
- */
  say('*** ncsa-default claims=' + to_string(claims.,1));
+ if[exec_phase ∉ ['post_token', 'post_refresh']][return();];
+ if[0==script_args()][return();]; // do not process claims
+
+ if[!is_defined(claims.isMemberOf.)][return();];
+ if[to_boolean(script_args(0))][claims.isMemberOf. := claims.isMemberOf\*\name;];
+ return();
+ // rest of this is now ignored.
+
 if[
-   exec_phase == 'post_token' ||exec_phase == 'post_refresh' || exec_phase == 'post_exchange'
+   exec_phase == 'post_token' ||exec_phase == 'post_refresh' // CIL-1327 only do this in token/refresh
 ]then[
      // default is false -- return whole list
     convert := false;
@@ -85,9 +85,4 @@ if[
        s.j := claims.isMemberOf.j.name;
     ]; // end while
     claims.isMemberOf. := s.;
-    /* Alternately
-          query(claims.isMemberOf., '$..name')
-       converts it nicely to a list as well. Be sure to only do the claim you want
-       so you don't get extra name attributes.
-    */
 ];

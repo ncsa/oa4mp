@@ -28,8 +28,8 @@ NOTE that the args are "eic" for EIC or "jlab" for everything else.
         γ. := ['eic computing'];
         α. := ['read:/eic/'];
    ]else[
-        γ. := ['clas12 computing', 'gluex computing','moller computing'];
-        α. := ['read:/clas12/','read:/gluex/', 'read:/moller/'];
+        γ. := ['clas12 computing', 'gluex computing','gluex computing', 'moller computing'];
+        α. := ['read:/clas12/','read:/gluex/', 'write:/gluex/', 'read:/moller/'];
    ];
   user := DEBUG?'http://cilogon.org/serverT/users/27326098':claims.sub;
 
@@ -59,4 +59,6 @@ NOTE that the args are "eic" for EIC or "jlab" for everything else.
     ];
 
 access_token.scope := detokenize(ξ., ' ', 2); // turn in to string, omit duplications, trailing space
+access_token.'aud' := 'ANY'; 
 
+//x. := ['CO:members:all','CO:COU:gluex:members:all','CO:members:active','CO:COU:gluex:members:active','gluex computing']

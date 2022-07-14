@@ -11,6 +11,10 @@
         ζ.'gw-astronomy:KAGRA-LIGO:members' := 'read:/frames';
 
    return(~values(mask(ζ., in_group2(keys(ζ.),γ.))));
+   /*
+   Alternate as of 1.4.7 if γ is structured as per g. in the example below
+   return(reduce(@~,ζ\(γ\*\name)));
+   */
    ]; // end block
 
     /*
