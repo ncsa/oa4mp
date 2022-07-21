@@ -1,5 +1,27 @@
 The local set up for testing 𝕰𝖗s𝖆𝖙𝖟 clients.
 
+To make an 𝕰𝖗s𝖆𝖙𝖟 client
+1. Select an admin client. All provisioners and 𝕰𝖗s𝖆𝖙𝖟 clients are under an admin
+2. Create a new provisioning client, P
+3. Create the 𝕰𝖗s𝖆𝖙𝖟 client, E
+4. Set the attribute ersatz_client to true in the CLI
+5. Create the permission with client_ID == E and ersatz_id =[E] (list with a single entry)
+
+E.g. of a permssion is
+
+        admin_id : admin:test/vo_1
+     can_approve : true
+      can_create : true
+        can_read : true
+      can_remove : true
+  can_substitute : true
+       can_write : true
+       client_id : localhost:command.line2
+       ersatz_id : ["client:/my_ersatz"]
+   permission_id : oa4mp:/permission/60090db325f8773875141b2084e7dad2/1652704979860
+
+=================
+
 This requires a client be in a VO and administered by it. On my local machine
 admin id: admin:test/vo_1
 provisioner id: localhost:command.line2

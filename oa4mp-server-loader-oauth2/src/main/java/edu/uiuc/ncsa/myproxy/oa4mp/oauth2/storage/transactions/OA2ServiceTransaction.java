@@ -726,7 +726,11 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
             return id.toString();
         }
         agID = agID.substring(agID.lastIndexOf("/")+1);
-        return agID.substring(0, 6);
+        // CIL-1348 fix:
+        if(6< agID.length()) {
+            return agID.substring(0, 6);
+        }
+        return id.toString();
     }
 
     /**

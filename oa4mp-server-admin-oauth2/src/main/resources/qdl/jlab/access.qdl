@@ -51,12 +51,21 @@ NOTE that the args are "eic" for EIC or "jlab" for everything else.
 
     say('*** JLAB scopes=' + to_string(scopes.));
     say('*** JLAB ξ.=' + to_string(ξ.));
-
+    if[
+      size(tx_scopes.) == 0
+    ][
+       ξ. := ~(⊢scopes.∩⊢ξ.);
+    ]else[
+       ξ. := ~(⊢tx_scopes.∩⊢ξ.);
+    ];
+/*
     if[exec_phase == 'post_token'][
         if[size(scopes.) != 0][ξ. := ~(⊢scopes.∩⊢ξ.);]; // return only those requested in first token exchange.
     ]else[
         if[size(tx_scopes.) != 0][ξ. := ~(⊢tx_scopes.∩⊢ξ.);]; // return only those requested in refresh of exchange
     ];
+*/
+    say('*** JLAB returning ξ.=' + to_string(ξ.));
 
 access_token.scope := detokenize(ξ., ' ', 2); // turn in to string, omit duplications, trailing space
 access_token.'aud' := 'ANY'; 
