@@ -16,7 +16,7 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.Map;
 
-import static edu.uiuc.ncsa.security.util.pkcs.KeyUtil.toPKCS8PEM;
+import static edu.uiuc.ncsa.security.util.crypto.KeyUtil.toPKCS8PEM;
 
 /**
  * Environment under which a client instance runs. Generally this is called by the loader and populated

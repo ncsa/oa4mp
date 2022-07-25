@@ -11,8 +11,8 @@ import edu.uiuc.ncsa.security.delegation.servlet.TransactionState;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
 import edu.uiuc.ncsa.security.storage.XMLMap;
-import edu.uiuc.ncsa.security.util.pkcs.CertUtil;
-import edu.uiuc.ncsa.security.util.pkcs.MyPKCS10CertRequest;
+import edu.uiuc.ncsa.security.util.crypto.CertUtil;
+import edu.uiuc.ncsa.security.util.crypto.MyPKCS10CertRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

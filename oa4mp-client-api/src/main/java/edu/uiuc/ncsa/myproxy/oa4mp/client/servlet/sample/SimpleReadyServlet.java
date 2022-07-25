@@ -7,7 +7,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.client.servlet.ClientServlet;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.servlet.JSPUtil;
-import edu.uiuc.ncsa.security.util.pkcs.CertUtil;
+import edu.uiuc.ncsa.security.util.crypto.CertUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

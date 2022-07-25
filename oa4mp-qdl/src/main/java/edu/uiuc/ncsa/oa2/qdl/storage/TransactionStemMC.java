@@ -15,7 +15,7 @@ import edu.uiuc.ncsa.security.delegation.token.impl.AuthorizationGrantImpl;
 import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
 import edu.uiuc.ncsa.security.delegation.token.impl.VerifierImpl;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
-import edu.uiuc.ncsa.security.util.pkcs.CertUtil;
+import edu.uiuc.ncsa.security.util.crypto.CertUtil;
 import net.sf.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
@@ -25,7 +25,7 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.util.Date;
 
-import static edu.uiuc.ncsa.security.util.pkcs.CertUtil.fromPEM;
+import static edu.uiuc.ncsa.security.util.pkcs.MyCertUtil.fromPEM;
 
 /**
  * <p>Created by Jeff Gaynor<br>

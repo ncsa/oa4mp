@@ -36,10 +36,21 @@
         <option value="$PROJECT_DIR$/pom.xml" />
       </list>
     </option>
+    <option name="ignoredFiles">
+      <set>
+        <option value="$PROJECT_DIR$/oa4mp-client-loader-oauth1/pom.xml" />
+        <option value="$PROJECT_DIR$/oa4mp-client-oauth1/pom.xml" />
+        <option value="$PROJECT_DIR$/oa4mp-gui/pom.xml" />
+        <option value="$PROJECT_DIR$/oa4mp-server-admin-oauth1/pom.xml" />
+        <option value="$PROJECT_DIR$/oa4mp-server-loader-oauth1/pom.xml" />
+        <option value="$PROJECT_DIR$/oa4mp-server-oauth1/pom.xml" />
+        <option value="$PROJECT_DIR$/oa4mp-xsede-oauth2/pom.xml" />
+      </set>
+    </option>
   </component>
   <component name="ModuleEditorState">
     <option name="LAST_EDITED_MODULE_NAME" />
     <option name="LAST_EDITED_TAB_NAME" />
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="true" project-jdk-name="1.8_261" project-jdk-type="JavaSDK" />
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="11.0.8" project-jdk-type="JavaSDK" />
 </project>

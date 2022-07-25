@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oauth2.tools;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.server.CopyTool;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.CopyToolVerifier;
+import edu.uiuc.ncsa.myproxy.oauth2.base.CopyTool;
+import edu.uiuc.ncsa.myproxy.oauth2.base.CopyToolVerifier;
 
 /**
  * <p>Created by Jeff Gaynor<br>

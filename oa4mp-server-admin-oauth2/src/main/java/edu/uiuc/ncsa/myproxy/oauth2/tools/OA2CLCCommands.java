@@ -29,7 +29,7 @@ import edu.uiuc.ncsa.security.servlet.ServiceClientHTTPException;
 import edu.uiuc.ncsa.security.util.cli.ConfigurableCommandsImpl;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
-import edu.uiuc.ncsa.security.util.pkcs.CertUtil;
+import edu.uiuc.ncsa.security.util.crypto.CertUtil;
 import net.sf.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
 

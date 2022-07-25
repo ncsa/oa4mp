@@ -1,8 +1,8 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.client;
 
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
-import edu.uiuc.ncsa.security.util.pkcs.CertUtil;
-import edu.uiuc.ncsa.security.util.pkcs.MyPKCS10CertRequest;
+import edu.uiuc.ncsa.security.util.crypto.CertUtil;
+import edu.uiuc.ncsa.security.util.crypto.MyPKCS10CertRequest;
 import org.apache.commons.codec.binary.Base64;
 
 import java.security.KeyPair;

@@ -11,8 +11,8 @@ import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.MyX509Certificates;
-import edu.uiuc.ncsa.security.util.pkcs.CertUtil;
-import edu.uiuc.ncsa.security.util.pkcs.MyPKCS10CertRequest;
+import edu.uiuc.ncsa.security.util.crypto.CertUtil;
+import edu.uiuc.ncsa.security.util.crypto.MyPKCS10CertRequest;
 
 import javax.security.auth.x500.X500Principal;
 import javax.servlet.http.HttpServletRequest;

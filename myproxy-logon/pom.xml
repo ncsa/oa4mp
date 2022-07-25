@@ -59,12 +59,19 @@
             <groupId>edu.uiuc.ncsa.security</groupId>
             <version>5.2-SNAPSHOT</version>
         </dependency>
-        <dependency>
+<!--        <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
             <version>1.10</version>
             <scope>compile</scope>
+        </dependency>-->
+        <dependency>
+            <groupId>edu.uiuc.ncsa.security
+            </groupId>
+            <artifactId>java-8</artifactId>
+            <version>5.2-SNAPSHOT</version>
         </dependency>
+
 
     </dependencies>
     <pluginRepositories>

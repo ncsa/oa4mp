@@ -6,8 +6,8 @@ import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.storage.data.ConversionMap;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
-import edu.uiuc.ncsa.security.util.pkcs.CertUtil;
-import edu.uiuc.ncsa.security.util.pkcs.KeyUtil;
+import edu.uiuc.ncsa.security.util.crypto.CertUtil;
+import edu.uiuc.ncsa.security.util.crypto.KeyUtil;
 
 import java.security.cert.CertificateException;
 
@@ -40,7 +40,7 @@ public class AssetConverter extends MapConverter<Asset> {
         }
         String temp = map.getString(getAR().privateKey());
         if(temp != null){
-            asset.setPrivateKey(KeyUtil.fromPKCS8PEM(temp));
+                asset.setPrivateKey(KeyUtil.fromPKCS8PEM(temp));
         }
 
         asset.setRedirect(map.getURI(getAR().redirect()));

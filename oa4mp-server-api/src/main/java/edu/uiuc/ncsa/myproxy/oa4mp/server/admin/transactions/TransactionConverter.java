@@ -12,14 +12,14 @@ import edu.uiuc.ncsa.security.delegation.token.MyX509Certificates;
 import edu.uiuc.ncsa.security.delegation.token.TokenForge;
 import edu.uiuc.ncsa.security.storage.data.ConversionMap;
 import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
-import edu.uiuc.ncsa.security.util.pkcs.CertUtil;
+import edu.uiuc.ncsa.security.util.crypto.CertUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 
-import static edu.uiuc.ncsa.security.util.pkcs.CertUtil.fromPEM;
+import static edu.uiuc.ncsa.security.util.pkcs.MyCertUtil.fromPEM;
 
 /**
  * <p>Created by Jeff Gaynor<br>

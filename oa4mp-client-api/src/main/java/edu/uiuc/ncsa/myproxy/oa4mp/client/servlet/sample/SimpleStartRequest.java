@@ -7,7 +7,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.client.storage.AssetStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.client.storage.AssetStoreUtil;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.servlet.JSPUtil;
-import edu.uiuc.ncsa.security.util.pkcs.KeyUtil;
+import edu.uiuc.ncsa.security.util.crypto.KeyUtil;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;

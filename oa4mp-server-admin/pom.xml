@@ -40,17 +40,19 @@
             <artifactId>oa4mp-server-loader-oauth1</artifactId>
             <version>5.2-SNAPSHOT</version>
         </dependency>
+<!--
         <dependency>
             <groupId>edu.uiuc.ncsa.security.delegation</groupId>
             <artifactId>ncsa-security-oauth-1.0a</artifactId>
             <version>5.2-SNAPSHOT</version>
         </dependency>
-        <dependency>
+-->
+<!--        <dependency>
             <groupId>com.sun.mail</groupId>
              <artifactId>javax.mail</artifactId>
             <version>1.6.2</version>
             <scope>provided</scope>
-        </dependency>
+        </dependency>-->
 <!--        <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>ncsa-qdl</artifactId>

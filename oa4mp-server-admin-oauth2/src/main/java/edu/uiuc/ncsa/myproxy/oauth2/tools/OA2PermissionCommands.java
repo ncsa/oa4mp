@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oauth2.tools;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.server.StoreCommands2;
+import edu.uiuc.ncsa.myproxy.oauth2.base.StoreCommands2;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.Permission;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionsStore;
 import edu.uiuc.ncsa.security.core.Identifiable;

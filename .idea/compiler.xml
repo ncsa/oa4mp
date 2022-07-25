@@ -24,28 +24,30 @@
         <module name="oa4mp-client-test" />
         <module name="oa4mp-webapp" />
         <module name="oa4mp-server-test" />
-        <module name="oa4mp-server-loader-oauth1" />
         <module name="oa4mp-server-admin-oauth2" />
         <module name="oa4mp-server-loader-oauth2" />
-        <module name="oa4mp-server-admin-oauth1" />
         <module name="oa4mp-server-test-oauth2" />
         <module name="oa4mp-skin" />
         <module name="oa4mp-client-webapp" />
-        <module name="oa4mp-server-oauth1" />
         <module name="oa4mp-client-loader-oauth2" />
         <module name="oa4mp-server-api" />
         <module name="oa4mp-server-oauth2" />
-        <module name="oa4mp-client-loader-oauth1" />
         <module name="myproxy-logon" />
         <module name="oa4mp-client-api" />
-        <module name="oa4mp-gui" />
         <module name="oa4mp-qdl" />
-        <module name="oa4mp-client-oauth1" />
         <module name="oa4mp-client-oauth2" />
-        <module name="oa4mp-xsede-oauth2" />
         <module name="myproxy-website" />
         <module name="oa4mp-server-admin" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="oa4mp-client-loader-oauth1" target="1.8" />
+      <module name="oa4mp-client-oauth1" target="1.8" />
+      <module name="oa4mp-gui" target="1.8" />
+      <module name="oa4mp-server-admin-oauth1" target="1.8" />
+      <module name="oa4mp-server-loader-oauth1" target="1.8" />
+      <module name="oa4mp-server-oauth1" target="1.8" />
+      <module name="oa4mp-xsede-oauth2" target="1.8" />
+    </bytecodeTargetLevel>
   </component>
 </project>

@@ -28,10 +28,10 @@ import edu.uiuc.ncsa.security.oauth_2_0.server.InvalidNonceException;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
 import edu.uiuc.ncsa.security.servlet.ServiceClient;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
-import edu.uiuc.ncsa.security.util.pkcs.CertUtil;
-import edu.uiuc.ncsa.security.util.pkcs.KeyUtil;
-import edu.uiuc.ncsa.security.util.pkcs.MyPKCS10CertRequest;
-import edu.uiuc.ncsa.security.util.pkcs.PEMFormatUtil;
+import edu.uiuc.ncsa.security.util.crypto.CertUtil;
+import edu.uiuc.ncsa.security.util.crypto.KeyUtil;
+import edu.uiuc.ncsa.security.util.crypto.MyPKCS10CertRequest;
+import edu.uiuc.ncsa.security.util.crypto.PEMFormatUtil;
 import net.sf.json.JSONObject;
 
 import java.net.URI;

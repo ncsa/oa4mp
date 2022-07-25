@@ -16,8 +16,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <additionalparam>-Xdoclint:none</additionalparam>
     </properties>
-    <name>Open Authorization for MyProxy</name>
-    <description>Open Authorization (OAuth) client and server code for MyProxy</description>
+    <name>Top level OA4MP</name>
+    <description>Top level OAuth client and server code for MyProxy</description>
     <url>http://grid.ncsa.illinois.edu/myproxy/oauth</url>
     <licenses>
         <license>
@@ -48,36 +48,22 @@
         <module>myproxy-logon</module>
         <module>oa4mp-server-api</module>
         <module>oa4mp-server-test</module>
-        <module>oa4mp-server-loader-oauth1</module>
-        <module>oa4mp-server-oauth1</module>
         <module>oa4mp-server-loader-oauth2</module>
         <module>oa4mp-server-oauth2</module>
         <module>oa4mp-client-api</module>
-        <module>oa4mp-client-loader-oauth1</module>
-        <module>oa4mp-client-oauth1</module>
         <module>oa4mp-client-loader-oauth2</module>
         <module>oa4mp-clc</module>
         <module>oa4mp-client-oauth2</module>
-        <module>oa4mp-server-admin-oauth1</module>
         <module>oa4mp-server-admin-oauth2</module>
         <module>oa4mp-client-webapp</module>
         <module>oa4mp-client-test</module>
         <module>oa4mp-webapp</module>
         <module>oa4mp-proxy</module>
         <module>oa4mp-server-admin</module>
-        <!--
-               <module>oa4mp-xsede</module>
-               <module>oa4mp-twofactor</module>
-               <module>oa4mp-oidc-twofactor</module>
-        -->
-        <module>oa4mp-xsede-oauth2</module>
         <module>oa4mp-website</module>
-        <!--     <module>oa4mp-co-oidc</module>
-        -->
         <module>oa4mp-server-test-oauth2</module>
         <module>oa4mp-skin</module>
         <module>myproxy-website</module>
-        <module>oa4mp-gui</module>
         <module>oa4mp-qdl</module>
     </modules>
     <dependencies>
@@ -160,12 +146,14 @@
                         <goals>
                             <goal>jar</goal>
                         </goals>
+                        <!-- Java 8 specific or empty javadoc tags make the build fail -->
+<!--
                         <configuration>
-                            <!-- Java 8 specific or empty javadoc tags make the build fail -->
                             <additionalparam>-Xdoclint:none</additionalparam>
                             <javadocVersion>1.5</javadocVersion>
 
                         </configuration>
+-->
 
                     </execution>
                 </executions>
@@ -178,26 +166,26 @@
                 <version>6.1.26</version>
             </plugin>
 
-            <plugin>
+<!--            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.1.1</version>
+                <version>3.4.0</version>
                 <configuration>
                     <aggregate>true</aggregate>
                 </configuration>
-            </plugin>
+            </plugin>-->
         </plugins>
     </build>
     <reporting>
         <plugins>
-            <plugin>
+<!--            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.1.1</version>
+                <version>3.4.0</version>
                 <configuration>
                     <aggregate>true</aggregate>
                 </configuration>
-            </plugin>
+            </plugin>-->
         </plugins>
     </reporting>
 </project>

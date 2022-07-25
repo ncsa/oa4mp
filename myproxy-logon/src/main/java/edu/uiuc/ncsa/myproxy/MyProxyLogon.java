@@ -41,10 +41,10 @@ package edu.uiuc.ncsa.myproxy;
 
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.HostUtil;
+import edu.uiuc.ncsa.security.util.crypto.CertUtil;
+import edu.uiuc.ncsa.security.util.crypto.KeyUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.util.pkcs.CertUtil;
-import edu.uiuc.ncsa.security.util.pkcs.KeyUtil;
-import edu.uiuc.ncsa.security.util.pkcs.MyPKCS10CertRequest;
+import edu.uiuc.ncsa.security.util.crypto.MyPKCS10CertRequest;
 import edu.uiuc.ncsa.security.util.ssl.MyTrustManager;
 import org.apache.commons.codec.binary.Base64;
 

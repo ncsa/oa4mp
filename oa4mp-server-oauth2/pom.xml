@@ -183,8 +183,8 @@
                             <addClasspath>true</addClasspath>
                         </manifest>
                         <manifestEntries>
-                            <application-version>${pom.version}</application-version>
-                            <application-name>${pom.name}</application-name>
+                            <application-version>${project.version}</application-version>
+                            <application-name>${project.name}</application-name>
                             <build-time>${timestamp}</build-time>
                             <implementation-version>${project.version}</implementation-version>
                             <implementation-build>${buildNumber}</implementation-build>

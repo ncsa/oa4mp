@@ -14,7 +14,7 @@ import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.delegation.token.MyX509Certificates;
 import edu.uiuc.ncsa.security.delegation.token.Verifier;
 import edu.uiuc.ncsa.security.util.pkcs.Base64String;
-import edu.uiuc.ncsa.security.util.pkcs.KeyUtil;
+import edu.uiuc.ncsa.security.util.crypto.KeyUtil;
 
 import java.net.URI;
 import java.security.KeyPair;
@@ -149,14 +149,7 @@ public abstract class AbstractOA4MPService {
 
     protected KeyPair getNextKeyPair() {
         if (keyPair == null || (getEnvironment().getKeypairLifetime() <= 0) || (keypairExpiration < System.currentTimeMillis())) {
-            try {
                 keyPair = KeyUtil.generateKeyPair();
-            } catch (NoSuchProviderException e) {
-                e.printStackTrace();
-            } catch (NoSuchAlgorithmException e) {
-                e.printStackTrace();
-            }
-
             keypairExpiration = System.currentTimeMillis() + getEnvironment().getKeypairLifetime();
         }
         return keyPair;

@@ -1,9 +1,9 @@
 package edu.uiuc.ncsa.myproxy.oa4mp;
 
-import edu.uiuc.ncsa.security.util.pkcs.CertUtil;
-import edu.uiuc.ncsa.security.util.pkcs.KeyUtil;
-import edu.uiuc.ncsa.security.util.pkcs.MyPKCS10CertRequest;
-import edu.uiuc.ncsa.security.util.pkcs.PEMFormatUtil;
+import edu.uiuc.ncsa.security.util.crypto.CertUtil;
+import edu.uiuc.ncsa.security.util.crypto.KeyUtil;
+import edu.uiuc.ncsa.security.util.crypto.MyPKCS10CertRequest;
+import edu.uiuc.ncsa.security.util.crypto.PEMFormatUtil;
 import junit.framework.TestCase;
 import org.junit.Test;
 
@@ -14,7 +14,6 @@ import java.net.URL;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.Security;
 import java.security.cert.X509Certificate;
 
 /**

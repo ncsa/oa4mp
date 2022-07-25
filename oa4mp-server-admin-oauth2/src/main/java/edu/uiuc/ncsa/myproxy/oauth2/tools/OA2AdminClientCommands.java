@@ -1,12 +1,12 @@
 package edu.uiuc.ncsa.myproxy.oauth2.tools;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.ClientApprovalStoreCommands;
+import edu.uiuc.ncsa.myproxy.oauth2.base.ClientApprovalStoreCommands;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.Permission;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionList;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionsStore;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.testing.BaseClientStoreCommands;
+import edu.uiuc.ncsa.myproxy.oauth2.base.BaseClientStoreCommands;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;

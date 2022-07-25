@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oauth2.tools;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2ConfigurationLoader;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.CopyTool;
+import edu.uiuc.ncsa.myproxy.oauth2.base.CopyTool;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
 

@@ -5,9 +5,9 @@ import edu.uiuc.ncsa.myproxy.oa4mp.client.storage.AssetStore;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.UnregisteredObjectException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
-import edu.uiuc.ncsa.security.util.pkcs.CertUtil;
-import edu.uiuc.ncsa.security.util.pkcs.KeyUtil;
-import edu.uiuc.ncsa.security.util.pkcs.MyPKCS10CertRequest;
+import edu.uiuc.ncsa.security.util.crypto.CertUtil;
+import edu.uiuc.ncsa.security.util.crypto.KeyUtil;
+import edu.uiuc.ncsa.security.util.crypto.MyPKCS10CertRequest;
 import junit.framework.TestCase;
 import org.junit.Test;
 

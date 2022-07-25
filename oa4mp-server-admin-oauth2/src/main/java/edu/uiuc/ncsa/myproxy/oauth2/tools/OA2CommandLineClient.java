@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oauth2.tools;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.server.testing.CommandLineClient;
+import edu.uiuc.ncsa.myproxy.oauth2.base.CommandLineClient;
 import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2ClientLoader;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;

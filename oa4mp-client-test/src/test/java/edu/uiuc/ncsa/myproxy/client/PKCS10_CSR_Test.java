@@ -1,8 +1,8 @@
 package edu.uiuc.ncsa.myproxy.client;
 
 import edu.uiuc.ncsa.security.core.exceptions.InvalidCertRequestException;
-import edu.uiuc.ncsa.security.util.pkcs.CertUtil;
-import edu.uiuc.ncsa.security.util.pkcs.MyPKCS10CertRequest;
+import edu.uiuc.ncsa.security.util.crypto.CertUtil;
+import edu.uiuc.ncsa.security.util.crypto.MyPKCS10CertRequest;
 import junit.framework.TestCase;
 import org.junit.Test;
 

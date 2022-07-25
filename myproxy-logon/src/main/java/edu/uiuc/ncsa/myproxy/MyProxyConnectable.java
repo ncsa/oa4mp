@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.myproxy;
 
 import edu.uiuc.ncsa.security.core.cache.Cacheable;
-import edu.uiuc.ncsa.security.util.pkcs.MyPKCS10CertRequest;
+import edu.uiuc.ncsa.security.util.crypto.MyPKCS10CertRequest;
 
 import java.security.cert.X509Certificate;
 import java.util.LinkedList;
