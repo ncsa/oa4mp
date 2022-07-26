@@ -37,13 +37,13 @@
         <module name="oa4mp-qdl" />
         <module name="oa4mp-client-oauth2" />
         <module name="myproxy-website" />
-        <module name="oa4mp-server-admin" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="oa4mp-client-loader-oauth1" target="1.8" />
       <module name="oa4mp-client-oauth1" target="1.8" />
       <module name="oa4mp-gui" target="1.8" />
+      <module name="oa4mp-server-admin" target="1.8" />
       <module name="oa4mp-server-admin-oauth1" target="1.8" />
       <module name="oa4mp-server-loader-oauth1" target="1.8" />
       <module name="oa4mp-server-oauth1" target="1.8" />

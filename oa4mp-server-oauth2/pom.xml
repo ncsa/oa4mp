@@ -36,19 +36,6 @@
             <artifactId>oa4mp-server-api</artifactId>
             <version>5.2-SNAPSHOT</version>
         </dependency>
-<!--
-        <dependency>
-            <groupId>edu.uiuc.ncsa.myproxy</groupId>
-            <artifactId>oa4mp-server-loader-oauth2</artifactId>
-            <version>5.2-SNAPSHOT</version>
-        </dependency>
--->
-<!--        <dependency>
-            <groupId>edu.uiuc.ncsa.myproxy</groupId>
-            <artifactId>oa4mp-server-admin-oauth2</artifactId>
-            <version>5.2-SNAPSHOT</version>
-        </dependency>-->
-
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>oa4mp-proxy</artifactId>
@@ -69,25 +56,6 @@
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
-
-<!--
-        <dependency>
-            <groupId>edu.uiuc.ncsa.myproxy</groupId>
-            <artifactId>oa4mp-server-test</artifactId>
-            <version>5.2-SNAPSHOT</version>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
--->
-<!--
-        <dependency>
-            <groupId>edu.uiuc.ncsa.security.delegation</groupId>
-            <artifactId>ncsa-security-oauth-2.0</artifactId>
-            <version>5.2-SNAPSHOT</version>
-        </dependency>
--->
-
-
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>ncsa-security-util</artifactId>
@@ -156,7 +124,8 @@
                     <includes>
                         <include>**/*Suite.java</include>
                     </includes>
-                    <forkMode>perTest</forkMode>
+                    <forkCount>1</forkCount>
+                    <reuseForks>false</reuseForks>
                 </configuration>
             </plugin>
             <plugin>

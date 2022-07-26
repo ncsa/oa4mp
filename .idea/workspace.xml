@@ -10,281 +10,51 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b728426b-c50e-4343-893b-175387fad5cf" name="Changes" comment="Re-committing.">
+    <list default="true" id="b728426b-c50e-4343-893b-175387fad5cf" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/qdl/access/acl.qdl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/qdl/access/id-token.qdl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/myproxy-logon/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/myproxy-logon/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/myproxy-logon/src/main/java/edu/uiuc/ncsa/myproxy/MPSingleConnectionProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/myproxy-logon/src/main/java/edu/uiuc/ncsa/myproxy/MPSingleConnectionProvider.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/myproxy-logon/src/main/java/edu/uiuc/ncsa/myproxy/MyProxyConnectable.java" beforeDir="false" afterPath="$PROJECT_DIR$/myproxy-logon/src/main/java/edu/uiuc/ncsa/myproxy/MyProxyConnectable.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/myproxy-logon/src/main/java/edu/uiuc/ncsa/myproxy/MyProxyLogon.java" beforeDir="false" afterPath="$PROJECT_DIR$/myproxy-logon/src/main/java/edu/uiuc/ncsa/myproxy/MyProxyLogon.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-clc/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-clc/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-client-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/client/AbstractOA4MPService.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-client-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/client/AbstractOA4MPService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-client-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/client/Asset.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-client-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/client/Asset.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-client-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/client/ClientEnvironment.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-client-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/client/ClientEnvironment.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-client-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/client/OA4MPService.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-client-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/client/OA4MPService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-client-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/client/servlet/sample/SimpleReadyServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-client-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/client/servlet/sample/SimpleReadyServlet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-client-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/client/servlet/sample/SimpleStartRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-client-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/client/servlet/sample/SimpleStartRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-client-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/client/storage/AssetConverter.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-client-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/client/storage/AssetConverter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-client-loader-oauth1/pom.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-client-loader-oauth1/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/client/loader/ClientBootstrapper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-client-loader-oauth1/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/client/loader/ClientEnvironmentUtil.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-client-loader-oauth1/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/client/loader/ClientLoader.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-client-loader-oauth2/src/main/java/edu/uiuc/ncsa/oa4mp/oauth2/client/OA2AssetConverter.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-client-loader-oauth2/src/main/java/edu/uiuc/ncsa/oa4mp/oauth2/client/OA2AssetConverter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-client-loader-oauth2/src/main/java/edu/uiuc/ncsa/oa4mp/oauth2/client/OA2MPService.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-client-loader-oauth2/src/main/java/edu/uiuc/ncsa/oa4mp/oauth2/client/OA2MPService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-client-loader-oauth2/src/main/java/edu/uiuc/ncsa/oa4mp/oauth2/client/servlet/OA2ReadyServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-client-loader-oauth2/src/main/java/edu/uiuc/ncsa/oa4mp/oauth2/client/servlet/OA2ReadyServlet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-client-oauth1/pom.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-client-oauth1/src/main/resources/mysql.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-client-oauth1/src/main/resources/postgres.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-client-oauth1/src/main/webapp/WEB-INF/web.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-client-oauth1/src/test/java/ClientTestSuite.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-client-test/src/test/java/edu/uiuc/ncsa/myproxy/client/AssetStoreTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-client-test/src/test/java/edu/uiuc/ncsa/myproxy/client/AssetStoreTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-client-test/src/test/java/edu/uiuc/ncsa/myproxy/client/PKCS10_CSR_Test.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-client-test/src/test/java/edu/uiuc/ncsa/myproxy/client/PKCS10_CSR_Test.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-co-oidc/buildNumber.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-co-oidc/pom.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-co-oidc/src/main/webapp/WEB-INF/web.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-gui/pom.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-oidc-twofactor/buildNumber.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-oidc-twofactor/pom.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-oidc-twofactor/src/main/java/edu/uiuc/ncsa/myproxy/loader/OIDC2FABootstrapper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-oidc-twofactor/src/main/java/edu/uiuc/ncsa/myproxy/loader/OIDC2FAConfigLoader.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-oidc-twofactor/src/main/webapp/WEB-INF/web.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-oidc-twofactor/src/main/webapp/assets/css/font-awesome.min.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-oidc-twofactor/src/main/webapp/assets/css/fonts/fontawesome-webfont.eot" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-oidc-twofactor/src/main/webapp/assets/css/fonts/fontawesome-webfont.ttf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-oidc-twofactor/src/main/webapp/assets/css/fonts/fontawesome-webfont.woff" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-oidc-twofactor/src/main/webapp/assets/css/gsce-search.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-oidc-twofactor/src/main/webapp/assets/css/home.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-oidc-twofactor/src/main/webapp/assets/css/second.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-oidc-twofactor/src/main/webapp/assets/img/candycane_bg.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-oidc-twofactor/src/main/webapp/assets/img/candycane_bg2.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-oidc-twofactor/src/main/webapp/assets/img/candycane_bg3.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-oidc-twofactor/src/main/webapp/assets/img/candycane_bg6.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-oidc-twofactor/src/main/webapp/assets/img/favicon.ico" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-oidc-twofactor/src/main/webapp/assets/img/footer_ncsa.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-oidc-twofactor/src/main/webapp/assets/img/logos_ncsa.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-oidc-twofactor/src/main/webapp/assets/img/logos_uiuc.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-oidc-twofactor/src/main/webapp/assets/img/top_banner.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-oidc-twofactor/src/main/webapp/assets/includes/end.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-oidc-twofactor/src/main/webapp/assets/includes/start.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-oidc-twofactor/src/main/webapp/assets/js/enquire.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-oidc-twofactor/src/main/webapp/assets/js/general.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-oidc-twofactor/src/main/webapp/assets/js/menu.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-oidc-twofactor/src/main/webapp/assets/js/response.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-oidc-twofactor/src/main/webapp/authorize-error.jsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-oidc-twofactor/src/main/webapp/authorize-init.jsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-oidc-twofactor/src/main/webapp/errorPage.jsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-oidc-twofactor/src/main/webapp/generalerror.jsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-oidc-twofactor/src/main/webapp/images/favicon.ico" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-oidc-twofactor/src/main/webapp/images/logos_ncsa.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-oidc-twofactor/src/main/webapp/images/logos_uiuc.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-oidc-twofactor/src/main/webapp/index.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-oidc-twofactor/src/main/webapp/noClientErrorPage.jsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-oidc-twofactor/src/main/webapp/oops.jsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-oidc-twofactor/src/main/webapp/registration-error.jsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-oidc-twofactor/src/main/webapp/registration-init.jsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-oidc-twofactor/src/main/webapp/registration-ok.jsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-oidc-twofactor/src/main/webapp/tooManyClientRequests.jsp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-client-oauth2/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-client-oauth2/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-client-test/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-client-test/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-proxy/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-proxy/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-qdl/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-qdl/buildNumber.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-qdl/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-qdl/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-qdl/src/main/java/edu/uiuc/ncsa/oa2/qdl/storage/QDLStoreAccessor.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-qdl/src/main/java/edu/uiuc/ncsa/oa2/qdl/storage/QDLStoreAccessor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-qdl/src/main/java/edu/uiuc/ncsa/oa2/qdl/storage/TransactionStemMC.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-qdl/src/main/java/edu/uiuc/ncsa/oa2/qdl/storage/TransactionStemMC.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth1/pom.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth1/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/OA4MPCommands.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth1/src/main/resources/log4j.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth1/src/main/resources/mariadb.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth1/src/main/resources/monitor-message.template" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth1/src/main/resources/monitor-subject.template" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth1/src/main/resources/mysql.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth1/src/main/resources/pg.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth1/src/main/scripts/oa4mp-cli" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth1/src/main/scripts/oa4mp-cp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth1/src/main/scripts/oa4mp-cp-verifier" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth1/src/main/scripts/oa4mp-monitor" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/JSONStoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/JSONStoreCommands.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/JWKUtilCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/JWKUtilCommands.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2AdminClientCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2AdminClientCommands.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2CLCCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2CLCCommands.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2ClientApprovalCommands.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2ClientCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2ClientCommands.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2CommandLineClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2CommandLineClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2Commands.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2Commands.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2CopyTool.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2CopyTool.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2CopyToolVerifier.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2CopyToolVerifier.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2Monitor.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2Monitor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2PermissionCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2PermissionCommands.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/TokenStoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/TokenStoreCommands.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/TransactionStoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/TransactionStoreCommands.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/VOCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/VOCommands.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/allclasses-frame.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/allclasses-noframe.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/constant-values.html" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/constant-values.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/deprecated-list.html" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/deprecated-list.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2ClientApprovalCommands.html" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2ClientApprovalCommands.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2ClientCommands.html" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2ClientCommands.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2Commands.html" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2Commands.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2CopyTool.html" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2CopyTool.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2CopyToolVerifier.html" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2CopyToolVerifier.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2Monitor.html" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2Monitor.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/edu/uiuc/ncsa/myproxy/oauth2/tools/package-frame.html" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/edu/uiuc/ncsa/myproxy/oauth2/tools/package-summary.html" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/edu/uiuc/ncsa/myproxy/oauth2/tools/package-summary.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/edu/uiuc/ncsa/myproxy/oauth2/tools/package-tree.html" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/edu/uiuc/ncsa/myproxy/oauth2/tools/package-tree.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/help-doc.html" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/help-doc.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/index-all.html" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/index-all.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/overview-tree.html" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/overview-tree.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/package-list" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/script.js" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/script.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/stylesheet.css" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/stylesheet.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/classes/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2ClientApprovalCommands.class" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/classes/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2ClientCommands.class" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/classes/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2ClientCommands.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/classes/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2Commands.class" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/classes/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2Commands.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/classes/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2CopyTool.class" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/classes/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2CopyTool.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/classes/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2CopyToolVerifier.class" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/classes/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2CopyToolVerifier.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/classes/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2Monitor.class" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/classes/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2Monitor.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/javadoc-bundle-options/package-list" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/maven-archiver/pom.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin-javadoc.jar" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin-javadoc.jar" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin-sources.jar" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin-sources.jar" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin.jar" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/BaseCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/base/BaseCommands.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/CLIApprover.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/base/CLIApprover.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/ClientApprovalStoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/base/ClientApprovalStoreCommands.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/ClientSorter.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/base/ClientSorter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/ClientStoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/base/ClientStoreCommands.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/ClientStoreUtil.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/CopyCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/base/CopyCommands.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/CopyExtension.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/base/CopyExtension.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/CopyTool.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/base/CopyTool.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/CopyToolVerifier.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/base/CopyToolVerifier.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/Monitor.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/base/Monitor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/ServerCLI.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/StoreArchiver.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/base/StoreArchiver.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/StoreCommands2.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/base/StoreCommands2.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/testing/BaseClientStoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/base/BaseClientStoreCommands.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/testing/CommandLineClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/base/CommandLineClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/admin/adminClient/AdminClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/admin/adminClient/AdminClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/admin/transactions/TransactionConverter.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/admin/transactions/TransactionConverter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/servlet/ACS2.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/servlet/ACS2.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/servlet/CRServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/servlet/CRServlet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/servlet/RegistrationServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/servlet/RegistrationServlet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-loader-oauth1/buildNumber.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-loader-oauth1/pom.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-loader-oauth1/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/loader/ClientStoreProviders.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-loader-oauth1/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/loader/OA4MPBootstrapper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-loader-oauth1/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/loader/OA4MPConfigurationLoader.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-loader-oauth1/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/servlet/ACS2Impl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-loader-oauth1/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/servlet/AbstractAuthorizationServletImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-loader-oauth1/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/servlet/AccessTokenServlet.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-loader-oauth1/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/servlet/CertServlet.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-loader-oauth1/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/servlet/InitServlet.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin/src/main/resources/derby.sql" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/qdl/util/SigningCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/qdl/util/SigningCommands.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth1/buildNumber.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth1/overlays/edu.uiuc.ncsa.myproxy.oa4mp-webapp-4.5-SNAPSHOT.info" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth1/pom.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth1/src/main/webapp/WEB-INF/web.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth1/src/test/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth1/ServiceTestSuite.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth1/src/test/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth1/TestSuiteInitializer.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/src/main/resources/META-INF/MANIFEST.MF" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/src/main/resources/META-INF/MANIFEST.MF" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/src/main/resources/application.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-test-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-test-oauth2/buildNumber.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-test-oauth2/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-test-oauth2/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-test/src/test/java/edu/uiuc/ncsa/myproxy/oa4mp/CertAndKeyUtilTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-test/src/test/java/edu/uiuc/ncsa/myproxy/oa4mp/CertAndKeyUtilTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-twofactor/buildNumber.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-twofactor/pom.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-twofactor/src/main/resources/log4j.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-twofactor/src/main/resources/logging.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-twofactor/src/main/webapp/WEB-INF/web.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-twofactor/src/main/webapp/assets/css/font-awesome.min.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-twofactor/src/main/webapp/assets/css/fonts/fontawesome-webfont.eot" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-twofactor/src/main/webapp/assets/css/fonts/fontawesome-webfont.ttf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-twofactor/src/main/webapp/assets/css/fonts/fontawesome-webfont.woff" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-twofactor/src/main/webapp/assets/css/gsce-search.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-twofactor/src/main/webapp/assets/css/home.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-twofactor/src/main/webapp/assets/css/second.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-twofactor/src/main/webapp/assets/img/candycane_bg.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-twofactor/src/main/webapp/assets/img/candycane_bg2.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-twofactor/src/main/webapp/assets/img/candycane_bg3.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-twofactor/src/main/webapp/assets/img/candycane_bg6.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-twofactor/src/main/webapp/assets/img/favicon.ico" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-twofactor/src/main/webapp/assets/img/footer_ncsa.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-twofactor/src/main/webapp/assets/img/logos_ncsa.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-twofactor/src/main/webapp/assets/img/logos_uiuc.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-twofactor/src/main/webapp/assets/img/top_banner.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-twofactor/src/main/webapp/assets/includes/end.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-twofactor/src/main/webapp/assets/includes/start.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-twofactor/src/main/webapp/assets/js/enquire.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-twofactor/src/main/webapp/assets/js/general.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-twofactor/src/main/webapp/assets/js/menu.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-twofactor/src/main/webapp/assets/js/response.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-twofactor/src/main/webapp/authorize-error.jsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-twofactor/src/main/webapp/authorize-init.jsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-twofactor/src/main/webapp/errorPage.jsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-twofactor/src/main/webapp/generalerror.jsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-twofactor/src/main/webapp/images/favicon.ico" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-twofactor/src/main/webapp/images/logos_ncsa.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-twofactor/src/main/webapp/images/logos_uiuc.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-twofactor/src/main/webapp/index.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-twofactor/src/main/webapp/noClientErrorPage.jsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-twofactor/src/main/webapp/oops.jsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-twofactor/src/main/webapp/registration-error.jsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-twofactor/src/main/webapp/registration-init.jsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-twofactor/src/main/webapp/registration-ok.jsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-twofactor/src/main/webapp/tooManyClientRequests.jsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-website/src/site/xhtml/server/manuals/extending-the-server.xhtml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-website/src/site/xhtml/server/manuals/extending-the-server.xhtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-xsede-oauth2/buildNumber.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-xsede-oauth2/overlays/edu.uiuc.ncsa.myproxy.oa4mp-server-oauth2-4.5-SNAPSHOT.info" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-xsede-oauth2/pom.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-xsede-oauth2/src/main/java/org/xsede/oa4mp/XsedeBootstrapper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-xsede-oauth2/src/main/java/org/xsede/oa4mp/XsedeClaimsSource.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-xsede-oauth2/src/main/java/org/xsede/oa4mp/XsedeConfigurationLoader.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-xsede-oauth2/src/main/resources/cfg.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-xsede-oauth2/src/main/resources/email.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-xsede-oauth2/src/main/resources/log4j.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-xsede-oauth2/src/main/resources/subject.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-xsede-oauth2/src/main/resources/xup-mysql.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-xsede-oauth2/src/main/webapp/WEB-INF/web.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-xsede-oauth2/src/main/webapp/authorize-error.jsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-xsede-oauth2/src/main/webapp/authorize-init.jsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-xsede-oauth2/src/main/webapp/authorize-remote-user.jsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-xsede-oauth2/src/main/webapp/errorPage.jsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-xsede-oauth2/src/main/webapp/foo.bar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-xsede-oauth2/src/main/webapp/images/background.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-xsede-oauth2/src/main/webapp/images/favicon.ico" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-xsede-oauth2/src/main/webapp/images/logo.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-xsede-oauth2/src/main/webapp/index.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-xsede-oauth2/src/main/webapp/noClientErrorPage.jsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-xsede-oauth2/src/main/webapp/oops.jsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-xsede-oauth2/src/main/webapp/registration-error.jsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-xsede-oauth2/src/main/webapp/registration-init.jsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-xsede-oauth2/src/main/webapp/registration-ok.jsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-xsede-oauth2/src/main/webapp/tooManyClientRequests.jsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-xsede-oauth2/src/main/webapp/xup.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-xsede/buildNumber.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-xsede/pom.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-xsede/src/main/resources/cfg.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-xsede/src/main/resources/email.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-xsede/src/main/resources/subject.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-xsede/src/main/resources/xup-mysql.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-xsede/src/main/webapp/WEB-INF/web.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-xsede/src/main/webapp/authorize-error.jsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-xsede/src/main/webapp/authorize-init.jsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-xsede/src/main/webapp/errorPage.jsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-xsede/src/main/webapp/foo.bar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-xsede/src/main/webapp/images/background.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-xsede/src/main/webapp/images/favicon.ico" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-xsede/src/main/webapp/images/logo.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-xsede/src/main/webapp/index.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-xsede/src/main/webapp/noClientErrorPage.jsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-xsede/src/main/webapp/oops.jsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-xsede/src/main/webapp/registration-error.jsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-xsede/src/main/webapp/registration-init.jsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-xsede/src/main/webapp/registration-ok.jsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-xsede/src/main/webapp/tooManyClientRequests.jsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-xsede/src/main/webapp/xup.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-test/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-test/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-website/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-website/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -371,7 +141,7 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File" value="HOCON" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/qdl" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/qdl/access" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
@@ -379,18 +149,18 @@
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="nodejs_package_manager_path" value="npm" />
-    <property name="project.structure.last.edited" value="Facets" />
+    <property name="project.structure.last.edited" value="Project" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.6877193" />
     <property name="settings.editor.selected.configurable" value="reference.settings.project.maven.runner" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/qdl/access" />
       <recent name="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/qdl" />
       <recent name="$PROJECT_DIR$/oa4mp-website/src/site/xhtml/server/manuals" />
       <recent name="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/scripts/oidc-cm-scripts" />
       <recent name="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/qdl/ga4gh/v1" />
-      <recent name="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/qdl/ga4gh" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/qdl/ui-test" />
@@ -760,7 +530,7 @@
       <workItem from="1657550119168" duration="22854000" />
       <workItem from="1657896189118" duration="2086000" />
       <workItem from="1657916014649" duration="594000" />
-      <workItem from="1658058921525" duration="41018000" />
+      <workItem from="1658058921525" duration="50577000" />
     </task>
     <task id="LOCAL-00001" summary="Removed all references to log4j in comments from poms since dependabot was still flagging them.">
       <created>1641936988674</created>
@@ -1021,14 +791,20 @@
       <option name="project" value="LOCAL" />
       <updated>1658422040105</updated>
     </task>
-    <option name="localTasksCounter" value="38" />
+    <task id="LOCAL-00038" summary="Migrate to Java 11, restructure maven modules, remove OAuth 1.0a code from build.">
+      <created>1658786698138</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1658786698138</updated>
+    </task>
+    <option name="localTasksCounter" value="39" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="CIL-771. Updated changelog and improved documentation." />
     <MESSAGE value="Merge from 5.2.5. CIL-1225." />
     <MESSAGE value="CIL-1174. Use default Java trust manager as the default. Updated a testing readme." />
     <MESSAGE value="Support for SciAuth" />
@@ -1053,7 +829,8 @@
     <MESSAGE value="Re-committing." />
     <MESSAGE value="pre-trave checkin" />
     <MESSAGE value="Updated documentation, some scripts and fixed CIL-1348" />
-    <option name="LAST_COMMIT_MESSAGE" value="Updated documentation, some scripts and fixed CIL-1348" />
+    <MESSAGE value="Migrate to Java 11, restructure maven modules, remove OAuth 1.0a code from build." />
+    <option name="LAST_COMMIT_MESSAGE" value="Migrate to Java 11, restructure maven modules, remove OAuth 1.0a code from build." />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">

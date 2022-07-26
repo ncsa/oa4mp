@@ -1,0 +1,54 @@
+/*
+ tokens{
+  identity{
+     type=identity
+     qdl{
+         load="access/id-token.qdl"
+         xmd={exec_phase="post_all"}
+       }// end qdl
+     } //end identity token
+   } //end tokens
+
+Created by Jeff Gaynor
+2022-07-26T14:43:49.023Z
+*/
+
+script_load('access/acl.qdl');
+
+if[
+    is_defined(claims.'eppn')
+  ][
+    claims.'sub':=(claims.'idp'=='https://access-ci.org/idp')?claims.'eppn':claims.'sub';
+  ];
+
+
+
+/*
+
+CIL-1349 note:
+
+
+
+Jeff, we're going to receive a request soon from Andrew Pasquale asking for his OIDC client to get the "ACCESS configuration". ACCESS is a CILogon Full Service subscriber, through the ACCESS Track 3 CONECT project at NCSA.
+
+In the short term (i.e., before August), the "ACCESS configuration" means:
+
+    If the user logs in with the "ACCESS CI" IdP (entityid: "https://access-ci.org/idp"), set the sub claim equal to ePPN.
+    Otherwise, default behavior.
+
+In the longer term (i.e., in August, when Scott has done CIL-1325), the "ACCESS configuration" means:
+
+    The OIDC client is managed by COmanage.
+    If the user logs in with the "ACCESS CI" IdP, set the sub claim equal to ePPN and look them up in
+    LDAP and set their email & profile claims from the corresponding LDAP values.
+
+    If the user logs in with any other IdP, look them up in LDAP and set sub, email, and profile claims accordingly.
+
+    In any case, also set a claim containing their "institutional affiliation" from LDAP. Details TBD.
+
+    If the user isn't in LDAP, redirect to https://identity.access-ci.org/user-not-registered
+    (which is a page I will create). This depends on CIL-1342.
+
+So, please set up Andrew with the short term config (when requested) and coordinate with Scott on the longer term plan.
+
+*/

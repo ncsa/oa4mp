@@ -90,7 +90,8 @@
                         <exclude>**/Test*.java</exclude>
                         <exclude>**/*Suite.java</exclude>
                     </excludes>
-                    <forkMode>perTest</forkMode>
+                    <forkCount>1</forkCount>
+                    <reuseForks>false</reuseForks>
                 </configuration>
             </plugin>
 

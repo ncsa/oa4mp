@@ -1,0 +1,2 @@
+ acl_add('cilogon:/client_id/6e6bcf2881796b725f80c26ad05b3e3c');
+ acl_check();

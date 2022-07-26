@@ -119,7 +119,7 @@
             </build>
         </profile>
 
-        <profile>
+    <!--    <profile>
             <id>verifier</id>
             <build>
                 <plugins>
@@ -219,7 +219,7 @@
 
             </build>
         </profile>
-
+-->
 
         <profile>
             <id>client</id>
