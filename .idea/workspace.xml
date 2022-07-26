@@ -11,16 +11,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b728426b-c50e-4343-893b-175387fad5cf" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/qdl/access/acl.qdl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/qdl/access/id-token.qdl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-clc/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-clc/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-client-oauth2/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-client-oauth2/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-client-test/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-client-test/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-proxy/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-proxy/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-qdl/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-qdl/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-qdl/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-qdl/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/constant-values.html" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/constant-values.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/deprecated-list.html" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/deprecated-list.html" afterDir="false" />
@@ -46,16 +42,12 @@
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin-javadoc.jar" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin-javadoc.jar" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin-sources.jar" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin-sources.jar" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin.jar" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin/pom.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin/src/main/resources/derby.sql" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-test-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-test-oauth2/buildNumber.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-test-oauth2/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-test-oauth2/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-test/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-test/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-website/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-website/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-webapp/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-webapp/pom.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -530,7 +522,7 @@
       <workItem from="1657550119168" duration="22854000" />
       <workItem from="1657896189118" duration="2086000" />
       <workItem from="1657916014649" duration="594000" />
-      <workItem from="1658058921525" duration="50577000" />
+      <workItem from="1658058921525" duration="52650000" />
     </task>
     <task id="LOCAL-00001" summary="Removed all references to log4j in comments from poms since dependabot was still flagging them.">
       <created>1641936988674</created>
@@ -798,14 +790,20 @@
       <option name="project" value="LOCAL" />
       <updated>1658786698138</updated>
     </task>
-    <option name="localTasksCounter" value="39" />
+    <task id="LOCAL-00039" summary="CIL-627: Build is now done with Java 17 targeting Java 11 output. This allows for completely updating all Maven plugins.&#10;CIL-1349, QDL scripts for ACCESS.">
+      <created>1658866229563</created>
+      <option name="number" value="00039" />
+      <option name="presentableId" value="LOCAL-00039" />
+      <option name="project" value="LOCAL" />
+      <updated>1658866229563</updated>
+    </task>
+    <option name="localTasksCounter" value="40" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Merge from 5.2.5. CIL-1225." />
     <MESSAGE value="CIL-1174. Use default Java trust manager as the default. Updated a testing readme." />
     <MESSAGE value="Support for SciAuth" />
     <MESSAGE value="Improved debugging, making it more modular. Lots of updates to scripts and testing." />
@@ -830,7 +828,8 @@
     <MESSAGE value="pre-trave checkin" />
     <MESSAGE value="Updated documentation, some scripts and fixed CIL-1348" />
     <MESSAGE value="Migrate to Java 11, restructure maven modules, remove OAuth 1.0a code from build." />
-    <option name="LAST_COMMIT_MESSAGE" value="Migrate to Java 11, restructure maven modules, remove OAuth 1.0a code from build." />
+    <MESSAGE value="CIL-627: Build is now done with Java 17 targeting Java 11 output. This allows for completely updating all Maven plugins.&#10;CIL-1349, QDL scripts for ACCESS." />
+    <option name="LAST_COMMIT_MESSAGE" value="CIL-627: Build is now done with Java 17 targeting Java 11 output. This allows for completely updating all Maven plugins.&#10;CIL-1349, QDL scripts for ACCESS." />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
