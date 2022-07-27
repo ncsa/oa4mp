@@ -11,12 +11,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b728426b-c50e-4343-893b-175387fad5cf" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/build.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-clc/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-clc/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-client-oauth2/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-client-oauth2/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-client-test/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-client-test/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-proxy/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-proxy/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/myproxy-logon/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/myproxy-logon/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/myproxy-website/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/myproxy-website/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-qdl/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-qdl/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-qdl/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-qdl/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/constant-values.html" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/constant-values.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/deprecated-list.html" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/deprecated-list.html" afterDir="false" />
@@ -44,10 +46,11 @@
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin.jar" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin.jar" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-test-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-test-oauth2/buildNumber.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-test-oauth2/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-test-oauth2/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-webapp/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-webapp/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-skin/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-skin/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-website/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-website/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -166,7 +169,7 @@
       <recent name="edu.uiuc.ncsa.oa2.servlet" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.QDL">
+  <component name="RunManager" selected="Shell Script.build.sh">
     <configuration default="true" type="Applet" factoryName="Applet">
       <option name="WIDTH" value="400" />
       <option name="HEIGHT" value="300" />
@@ -229,20 +232,6 @@
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="edu.uiuc.ncsa.qdl.scripting.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="TXRecord" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord" />
-      <module name="oa4mp-server-loader-oauth2" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -337,6 +326,21 @@
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
+    </configuration>
+    <configuration name="build.sh" type="ShConfigurationType" temporary="true">
+      <option name="SCRIPT_TEXT" value="" />
+      <option name="INDEPENDENT_SCRIPT_PATH" value="true" />
+      <option name="SCRIPT_PATH" value="$PROJECT_DIR$/build.sh" />
+      <option name="SCRIPT_OPTIONS" value="" />
+      <option name="INDEPENDENT_SCRIPT_WORKING_DIRECTORY" value="true" />
+      <option name="SCRIPT_WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="INDEPENDENT_INTERPRETER_PATH" value="true" />
+      <option name="INTERPRETER_PATH" value="/bin/bash" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="EXECUTE_IN_TERMINAL" value="true" />
+      <option name="EXECUTE_SCRIPT_FILE" value="true" />
+      <envs />
+      <method v="2" />
     </configuration>
     <configuration name="OA4MP server" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local" APPLICATION_SERVER_NAME="Tomcat 8.0" ALTERNATIVE_JRE_ENABLED="true" ALTERNATIVE_JRE_PATH="1.8_261">
       <option name="OPEN_IN_BROWSER_URL" value="https://localhost:9443/client2/" />
@@ -437,21 +441,21 @@
       <item itemvalue="Application.CLC" />
       <item itemvalue="Application.CLI" />
       <item itemvalue="Application.QDL" />
-      <item itemvalue="Application.TXRecord" />
       <item itemvalue="Application.RefreshTokenRetentionPolicy" />
       <item itemvalue="Application.Scripts" />
       <item itemvalue="JUnit.Test Suite" />
       <item itemvalue="JUnit.QDLTests" />
       <item itemvalue="JUnit.QDLTests (1)" />
       <item itemvalue="Tomcat Server.OA4MP server" />
+      <item itemvalue="Shell Script.build.sh" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Shell Script.build.sh" />
         <item itemvalue="Application.Scripts" />
         <item itemvalue="Application.RefreshTokenRetentionPolicy" />
         <item itemvalue="JUnit.QDLTests (1)" />
         <item itemvalue="JUnit.QDLTests" />
-        <item itemvalue="Application.TXRecord" />
       </list>
     </recent_temporary>
   </component>
@@ -522,7 +526,8 @@
       <workItem from="1657550119168" duration="22854000" />
       <workItem from="1657896189118" duration="2086000" />
       <workItem from="1657916014649" duration="594000" />
-      <workItem from="1658058921525" duration="52650000" />
+      <workItem from="1658058921525" duration="52710000" />
+      <workItem from="1658935111326" duration="8968000" />
     </task>
     <task id="LOCAL-00001" summary="Removed all references to log4j in comments from poms since dependabot was still flagging them.">
       <created>1641936988674</created>
@@ -797,14 +802,20 @@
       <option name="project" value="LOCAL" />
       <updated>1658866229563</updated>
     </task>
-    <option name="localTasksCounter" value="40" />
+    <task id="LOCAL-00040" summary="Update driver versions.">
+      <created>1658873777370</created>
+      <option name="number" value="00040" />
+      <option name="presentableId" value="LOCAL-00040" />
+      <option name="project" value="LOCAL" />
+      <updated>1658873777370</updated>
+    </task>
+    <option name="localTasksCounter" value="41" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="CIL-1174. Use default Java trust manager as the default. Updated a testing readme." />
     <MESSAGE value="Support for SciAuth" />
     <MESSAGE value="Improved debugging, making it more modular. Lots of updates to scripts and testing." />
     <MESSAGE value="CIL-1206. Updated CLI documentation." />
@@ -829,7 +840,8 @@
     <MESSAGE value="Updated documentation, some scripts and fixed CIL-1348" />
     <MESSAGE value="Migrate to Java 11, restructure maven modules, remove OAuth 1.0a code from build." />
     <MESSAGE value="CIL-627: Build is now done with Java 17 targeting Java 11 output. This allows for completely updating all Maven plugins.&#10;CIL-1349, QDL scripts for ACCESS." />
-    <option name="LAST_COMMIT_MESSAGE" value="CIL-627: Build is now done with Java 17 targeting Java 11 output. This allows for completely updating all Maven plugins.&#10;CIL-1349, QDL scripts for ACCESS." />
+    <MESSAGE value="Update driver versions." />
+    <option name="LAST_COMMIT_MESSAGE" value="Update driver versions." />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">

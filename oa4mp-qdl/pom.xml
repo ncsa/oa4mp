@@ -15,8 +15,8 @@
     <packaging>jar</packaging>
     <dependencies>
         <dependency>
-            <groupId>edu.uiuc.ncsa.security</groupId>
-            <artifactId>ncsa-qdl</artifactId>
+            <groupId>edu.uiuc.ncsa.qdl</groupId>
+            <artifactId>language</artifactId>
             <version>1.4-QDL-SNAPSHOT</version>
         </dependency>
 

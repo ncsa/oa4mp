@@ -5,27 +5,21 @@
     <file url="file://$PROJECT_DIR$/oa4mp-clc/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-client-api/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-client-api/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/oa4mp-client-loader-oauth1/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-client-loader-oauth2/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-client-oauth2/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-client-test/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-client-test/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-client-webapp/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-client-webapp/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/oa4mp-gui/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-proxy/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-qdl/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-qdl/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/oa4mp-server-admin/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/oa4mp-server-admin/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-server-api/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-server-api/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/oa4mp-server-loader-oauth1/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/oa4mp-server-oauth1/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-server-oauth2/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-server-oauth2/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-server-test-oauth2/src/main/resources" charset="UTF-8" />
@@ -33,7 +27,5 @@
     <file url="file://$PROJECT_DIR$/oa4mp-skin/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-webapp/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-webapp/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/oa4mp-xsede-oauth2/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/oa4mp-xsede-oauth2/src/main/resources" charset="UTF-8" />
   </component>
 </project>
