@@ -4,10 +4,10 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.BasicClaimsSourceImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.FSClaimSource;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.HTTPHeaderClaimsSource;
 import edu.uiuc.ncsa.qdl.variables.QDLStem;
-import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
-import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSourceConfiguration;
-import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
-import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfigurationUtil;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSource;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSourceConfiguration;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.LDAPConfiguration;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.LDAPConfigurationUtil;
 import net.sf.json.JSONObject;
 
 import java.util.*;
@@ -15,7 +15,7 @@ import java.util.*;
 /**
  * The claim source configurations made for QDL are really just the barebones defaults. The actual configurations
  * are large and sometimes nastily complex Java objects, so this configuration will convert a stem
- * variable to an actual usable {@link edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSourceConfiguration}
+ * variable to an actual usable {@link edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSourceConfiguration}
  * on a type by type basis.<br/><br/>
  * <b>NOTE</b> it is assumed that the argument has been properly created. That is why this is not a QDL
  * function.

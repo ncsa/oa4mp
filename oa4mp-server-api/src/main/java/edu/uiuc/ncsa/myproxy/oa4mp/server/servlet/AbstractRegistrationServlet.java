@@ -3,12 +3,12 @@ package edu.uiuc.ncsa.myproxy.oa4mp.server.servlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.NewClientEvent;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.NewClientListener;
 import edu.uiuc.ncsa.security.core.exceptions.RetryException;
-import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
-import edu.uiuc.ncsa.security.delegation.server.request.IssuerResponse;
-import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
-import edu.uiuc.ncsa.security.delegation.servlet.TransactionState;
-import edu.uiuc.ncsa.security.delegation.storage.BaseClient;
-import edu.uiuc.ncsa.security.delegation.storage.Client;
+import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
+import edu.uiuc.ncsa.oa4mp.delegation.server.request.IssuerResponse;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval;
+import edu.uiuc.ncsa.oa4mp.delegation.common.servlet.TransactionState;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.BaseClient;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
 import edu.uiuc.ncsa.security.servlet.*;
 
 import javax.servlet.ServletException;

@@ -3,8 +3,8 @@ package edu.uiuc.ncsa.myproxy.oauth2.tools;
 import edu.uiuc.ncsa.myproxy.oa4mp.qdl.util.SigningCommands;
 import edu.uiuc.ncsa.security.core.util.FileUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.oauth_2_0.JWTUtil;
-import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.JWTUtil;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims;
 import edu.uiuc.ncsa.security.servlet.ServiceClient;
 import edu.uiuc.ncsa.security.util.cli.CommonCommands;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
@@ -27,8 +27,8 @@ import java.util.StringTokenizer;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.qdl.util.SigningCommands.RS_256;
 import static edu.uiuc.ncsa.myproxy.oa4mp.qdl.util.SigningCommands.createJWK;
-import static edu.uiuc.ncsa.security.oauth_2_0.JWTUtil.decat;
-import static edu.uiuc.ncsa.security.oauth_2_0.JWTUtil.getJsonWebKeys;
+import static edu.uiuc.ncsa.oa4mp.delegation.oa2.JWTUtil.decat;
+import static edu.uiuc.ncsa.oa4mp.delegation.oa2.JWTUtil.getJsonWebKeys;
 
 /**
  * <p>Created by Jeff Gaynor<br>

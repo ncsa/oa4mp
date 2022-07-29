@@ -4,13 +4,13 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransac
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2TransactionKeys;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
 import edu.uiuc.ncsa.security.core.Identifier;
-import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
-import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
-import edu.uiuc.ncsa.security.delegation.token.impl.TokenImpl;
-import edu.uiuc.ncsa.security.delegation.token.impl.TokenUtils;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
-import edu.uiuc.ncsa.security.oauth_2_0.server.RFC8693Constants;
-import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AccessTokenImpl;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.RefreshTokenImpl;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenImpl;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenUtils;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.RFC8693Constants;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnMap;
 import net.sf.json.JSONObject;
 

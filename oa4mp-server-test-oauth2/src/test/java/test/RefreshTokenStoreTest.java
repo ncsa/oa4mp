@@ -5,11 +5,11 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RefreshTokenStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
-import edu.uiuc.ncsa.security.delegation.server.storage.ClientStore;
-import edu.uiuc.ncsa.security.delegation.storage.TransactionStore;
-import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
-import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2TokenForge;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.TransactionStore;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.AuthorizationGrant;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.RefreshToken;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2TokenForge;
 import edu.uiuc.ncsa.security.util.TestBase;
 
 import java.util.Date;

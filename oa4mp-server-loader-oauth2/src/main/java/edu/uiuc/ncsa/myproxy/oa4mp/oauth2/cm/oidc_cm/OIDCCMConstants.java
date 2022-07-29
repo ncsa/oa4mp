@@ -1,7 +1,5 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.oidc_cm;
 
-import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
-
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 11/6/18 at  9:54 AM

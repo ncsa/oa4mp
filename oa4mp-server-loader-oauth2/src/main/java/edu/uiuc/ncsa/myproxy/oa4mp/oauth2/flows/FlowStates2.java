@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows;
 
-import edu.uiuc.ncsa.security.oauth_2_0.jwt.FlowStates;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.FlowStates;
 
 /**
  * A container for the states that are permitted. These change the control flow, e.g. access no refresh tokens

@@ -2,7 +2,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.functor.claims;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.Groups;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
-import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims;
 import edu.uiuc.ncsa.security.util.functor.JFunctor;
 import net.sf.json.JSONArray;
 

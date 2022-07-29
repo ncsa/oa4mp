@@ -6,7 +6,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecordSerializationKeys;
 import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
-import edu.uiuc.ncsa.security.delegation.server.storage.ClientStore;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
 /**

@@ -12,7 +12,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.ServiceConfigTest;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2Bootstrapper;
 import edu.uiuc.ncsa.security.core.configuration.ConfigInheritanceTest;
 import edu.uiuc.ncsa.security.core.configuration.MultipleInheritanceTest;
-import edu.uiuc.ncsa.security.delegation.storage.FileStoreTest;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.FileStoreTest;
 import edu.uiuc.ncsa.security.util.*;
 import edu.uiuc.ncsa.security.util.cache.CacheTest;
 import junit.framework.TestSuite;

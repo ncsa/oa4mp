@@ -7,7 +7,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.OA2State;
 import edu.uiuc.ncsa.qdl.extensions.QDLModuleMetaClass;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.QDLStem;
-import edu.uiuc.ncsa.security.oauth_2_0.server.RFC9068Constants;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.RFC9068Constants;
 import net.sf.json.JSONObject;
 
 import java.util.ArrayList;

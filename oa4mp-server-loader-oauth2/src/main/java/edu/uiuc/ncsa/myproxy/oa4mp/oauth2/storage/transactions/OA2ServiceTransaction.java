@@ -6,18 +6,19 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowStates2;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8628State;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.OA4MPServiceTransaction;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims;
 import edu.uiuc.ncsa.security.core.DateComparable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
-import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
-import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
-import edu.uiuc.ncsa.security.delegation.token.impl.AuthorizationGrantImpl;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
-import edu.uiuc.ncsa.security.oauth_2_0.jwt.FlowStates;
-import edu.uiuc.ncsa.security.oauth_2_0.server.OA2TransactionScopes;
-import edu.uiuc.ncsa.security.oauth_2_0.server.OIDCServiceTransactionInterface;
-import edu.uiuc.ncsa.security.oauth_2_0.server.RFC7636Util;
-import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.AuthorizationGrant;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.RefreshToken;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AuthorizationGrantImpl;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.FlowStates;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.OA2TransactionScopes;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.OIDCServiceTransactionInterface;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.RFC7636Util;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSource;
 import net.sf.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
 
@@ -153,7 +154,7 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
     /**
      * Clients may send an audience which is used by some components (notable SciTokens) but
      * is generally optional. This is a list of them. This is returned as the
-     * {@link edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims#AUDIENCE } claim
+     * {@link OA2Claims#AUDIENCE } claim
      * in JWT access tokens.
      * <br/><br/>
      * <b>Note:</b> These are simply logical names that describe the audience, such as "ALL"

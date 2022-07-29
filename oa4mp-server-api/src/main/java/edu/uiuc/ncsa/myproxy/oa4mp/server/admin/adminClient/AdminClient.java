@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient;
 
 import edu.uiuc.ncsa.security.core.Identifier;
-import edu.uiuc.ncsa.security.delegation.storage.BaseClient;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.BaseClient;
 import edu.uiuc.ncsa.security.util.crypto.KeyUtil;
 import net.sf.json.JSONObject;
 

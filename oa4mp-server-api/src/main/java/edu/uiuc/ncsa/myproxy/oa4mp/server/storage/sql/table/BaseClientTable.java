@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.server.storage.sql.table;
 
-import edu.uiuc.ncsa.security.delegation.storage.BaseClientKeys;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.BaseClientKeys;
 import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnDescriptorEntry;
 import edu.uiuc.ncsa.security.storage.sql.internals.Table;

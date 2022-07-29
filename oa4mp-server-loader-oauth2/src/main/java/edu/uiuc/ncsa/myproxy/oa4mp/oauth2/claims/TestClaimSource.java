@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
 
-import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
-import edu.uiuc.ncsa.security.oauth_2_0.server.UnsupportedScopeException;
+import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.UnsupportedScopeException;
 import net.sf.json.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;

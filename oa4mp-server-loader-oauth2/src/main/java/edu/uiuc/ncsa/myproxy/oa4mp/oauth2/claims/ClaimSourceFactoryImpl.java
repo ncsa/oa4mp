@@ -5,9 +5,9 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransac
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientFunctorScriptsUtil;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
-import edu.uiuc.ncsa.security.oauth_2_0.server.claims.*;
-import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
-import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfigurationUtil;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.*;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.LDAPConfiguration;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.LDAPConfigurationUtil;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;

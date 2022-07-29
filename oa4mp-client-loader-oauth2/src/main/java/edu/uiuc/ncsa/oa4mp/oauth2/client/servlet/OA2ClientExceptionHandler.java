@@ -4,8 +4,8 @@ import edu.uiuc.ncsa.myproxy.oa4mp.client.servlet.ClientExceptionHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.client.servlet.ClientServlet;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2RedirectableError;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2RedirectableError;
 import edu.uiuc.ncsa.security.servlet.JSPUtil;
 import edu.uiuc.ncsa.security.servlet.ServiceClientHTTPException;
 

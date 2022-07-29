@@ -8,15 +8,15 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
-import edu.uiuc.ncsa.security.delegation.storage.Client;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2ATException;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2ATException;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Errors;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 
-import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.CLIENT_SECRET;
+import static edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants.CLIENT_SECRET;
 
 /**
  * This class has the machinery for processing the various types of

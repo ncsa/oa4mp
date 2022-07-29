@@ -7,9 +7,9 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.TokenInfoRecordMap;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.UsernameFindable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
-import edu.uiuc.ncsa.security.delegation.storage.TransactionStore;
-import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
-import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.TransactionStore;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.RefreshToken;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AccessTokenImpl;
 
 import java.util.List;
 
@@ -18,12 +18,8 @@ import java.util.List;
  * on 3/16/22 at  6:58 AM
  */
 public interface OA2TStoreInterface<V extends OA2ServiceTransaction> extends Store<V>, TransactionStore<V>, RFC8628Store<V>, RefreshTokenStore<V>, UsernameFindable<V> {
- //   String getCreationTSField();
-
     @Override
     V get(RefreshToken refreshToken);
-
-
 
     V get(AccessTokenImpl accessToken, Identifier clientID);
 
@@ -40,8 +36,6 @@ public interface OA2TStoreInterface<V extends OA2ServiceTransaction> extends Sto
 
     @Override
     V getByUserCode(String userCode);
-
-  //  V getSingleValue(String targetString, String preparedStatement);
 
     @Override
     boolean hasUserCode(String userCode);

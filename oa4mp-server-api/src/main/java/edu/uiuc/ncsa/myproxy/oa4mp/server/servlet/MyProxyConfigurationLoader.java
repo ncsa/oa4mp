@@ -5,7 +5,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.OA4MPConfigTags;
 import edu.uiuc.ncsa.security.core.configuration.Configurations;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.delegation.servlet.DBConfigLoader;
+import edu.uiuc.ncsa.oa4mp.delegation.common.servlet.DBConfigLoader;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
 import java.util.LinkedList;

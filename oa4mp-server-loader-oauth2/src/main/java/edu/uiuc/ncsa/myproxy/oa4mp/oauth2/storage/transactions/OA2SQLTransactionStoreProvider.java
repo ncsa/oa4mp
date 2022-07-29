@@ -3,7 +3,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.storage.MultiDSClientStoreProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.DSSQLTransactionStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.DSSQLTransactionStoreProvider;
-import edu.uiuc.ncsa.security.delegation.token.TokenForge;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.TokenForge;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPoolProvider;

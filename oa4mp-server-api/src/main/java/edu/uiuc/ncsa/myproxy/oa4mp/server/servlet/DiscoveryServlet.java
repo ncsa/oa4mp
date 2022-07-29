@@ -1,8 +1,8 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.server.servlet;
 
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
-import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
-import edu.uiuc.ncsa.security.delegation.server.request.IssuerResponse;
+import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
+import edu.uiuc.ncsa.oa4mp.delegation.server.request.IssuerResponse;
 import net.sf.json.JSONObject;
 import net.sf.json.util.JSONUtils;
 

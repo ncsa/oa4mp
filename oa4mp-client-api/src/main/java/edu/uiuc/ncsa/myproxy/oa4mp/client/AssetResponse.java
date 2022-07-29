@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.client;
 
-import edu.uiuc.ncsa.security.delegation.services.Response;
+import edu.uiuc.ncsa.oa4mp.delegation.common.services.Response;
 
 import java.security.cert.X509Certificate;
 

@@ -4,8 +4,8 @@ import edu.uiuc.ncsa.myproxy.oa4mp.client.Asset;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
-import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
-import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AccessTokenImpl;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.RefreshTokenImpl;
 import net.sf.json.JSONObject;
 
 import java.net.URI;

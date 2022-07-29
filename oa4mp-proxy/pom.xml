@@ -57,8 +57,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>edu.uiuc.ncsa.security.delegation</groupId>
-            <artifactId>ncsa-security-oauth-2.0</artifactId>
+            <groupId>edu.uiuc.ncsa.myproxy</groupId>
+            <artifactId>d-oauth2</artifactId>
             <version>5.2-SNAPSHOT</version>
         </dependency>
 
@@ -104,11 +104,12 @@
             <version>3.0.6</version>
         </dependency>
 
-        <dependency>
+<!--        <dependency>
             <groupId>edu.uiuc.ncsa.security.delegation</groupId>
             <artifactId>ncsa-security-oauth-1.0a</artifactId>
             <version>5.2-SNAPSHOT</version>
         </dependency>
+        -->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>

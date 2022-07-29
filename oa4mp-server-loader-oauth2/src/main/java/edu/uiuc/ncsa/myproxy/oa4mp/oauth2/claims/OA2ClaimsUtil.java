@@ -11,11 +11,11 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2GeneralError;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2Scopes;
-import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
-import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Errors;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2GeneralError;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Scopes;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSource;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRunRequest;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRuntimeEngine;
@@ -30,9 +30,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.AUTHORIZATION_TIME;
-import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.NONCE;
-import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.*;
+import static edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants.AUTHORIZATION_TIME;
+import static edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants.NONCE;
+import static edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims.*;
 
 /**
  * This used to be the main claims processing engine until scripting was improved

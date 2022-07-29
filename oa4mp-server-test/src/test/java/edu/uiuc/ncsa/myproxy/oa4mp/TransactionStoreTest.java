@@ -3,11 +3,11 @@ package edu.uiuc.ncsa.myproxy.oa4mp;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.server.OA4MPServiceTransaction;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
-import edu.uiuc.ncsa.security.delegation.storage.Client;
-import edu.uiuc.ncsa.security.delegation.storage.TransactionStore;
-import edu.uiuc.ncsa.security.delegation.token.AccessToken;
-import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
-import edu.uiuc.ncsa.security.delegation.token.Verifier;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.TransactionStore;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.AuthorizationGrant;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.Verifier;
 import org.junit.Test;
 
 import java.net.URI;

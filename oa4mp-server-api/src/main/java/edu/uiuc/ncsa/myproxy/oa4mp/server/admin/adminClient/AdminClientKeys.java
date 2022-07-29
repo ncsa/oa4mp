@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient;
 
-import edu.uiuc.ncsa.security.delegation.storage.BaseClientKeys;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.BaseClientKeys;
 
 import java.util.List;
 

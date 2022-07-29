@@ -4,13 +4,13 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.AbstractAccessTokenHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.PayloadHandlerConfigImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2ATException;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2ATException;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Errors;
 import net.sf.json.JSONObject;
 
-import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.SCOPE;
-import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.AUDIENCE;
-import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.SUBJECT;
+import static edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants.SCOPE;
+import static edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims.AUDIENCE;
+import static edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims.SUBJECT;
 
 /**
  * <p>Created by Jeff Gaynor<br>

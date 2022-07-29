@@ -9,8 +9,8 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.util.ClientApproverConverter;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.FilePermissionsException;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
-import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
-import edu.uiuc.ncsa.security.delegation.server.storage.impl.FSClientApprovalStore;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.impl.FSClientApprovalStore;
 import edu.uiuc.ncsa.security.storage.FileStore;
 
 import java.io.File;

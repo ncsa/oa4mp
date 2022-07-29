@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.server.storage.sql.table;
 
-import edu.uiuc.ncsa.security.delegation.storage.ClientKeys;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.ClientKeys;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnDescriptorEntry;
 
 import static java.sql.Types.*;

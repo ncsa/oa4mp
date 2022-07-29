@@ -1,12 +1,12 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.HeaderUtils;
-import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
-import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
-import edu.uiuc.ncsa.security.delegation.token.impl.TokenUtils;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2GeneralError;
-import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTUtil2;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AccessTokenImpl;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.RefreshTokenImpl;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenUtils;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Errors;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2GeneralError;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.JWTUtil2;
 import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
 import org.apache.http.HttpStatus;
@@ -14,8 +14,8 @@ import org.apache.http.HttpStatus;
 import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
 
-import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.ACCESS_TOKEN;
-import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.JWT_ID;
+import static edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants.ACCESS_TOKEN;
+import static edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims.JWT_ID;
 
 /**
  * Mostly this is used in the {@link edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.UserInfoServlet}

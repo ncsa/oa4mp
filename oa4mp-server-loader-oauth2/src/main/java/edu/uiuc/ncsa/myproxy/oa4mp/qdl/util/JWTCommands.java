@@ -10,7 +10,7 @@ import edu.uiuc.ncsa.qdl.extensions.QDLVariable;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.oauth_2_0.JWTUtil;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.JWTUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;

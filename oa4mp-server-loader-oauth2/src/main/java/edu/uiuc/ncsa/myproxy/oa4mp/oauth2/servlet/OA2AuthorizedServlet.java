@@ -2,8 +2,8 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractInitServlet;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
-import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
-import edu.uiuc.ncsa.security.delegation.server.request.IssuerResponse;
+import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
+import edu.uiuc.ncsa.oa4mp.delegation.server.request.IssuerResponse;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

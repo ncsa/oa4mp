@@ -4,7 +4,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.client.storage.AssetStore;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.cache.RetentionPolicy;
 import edu.uiuc.ncsa.security.core.util.DateUtils;
-import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.RefreshToken;
 
 import java.util.Date;
 import java.util.Map;

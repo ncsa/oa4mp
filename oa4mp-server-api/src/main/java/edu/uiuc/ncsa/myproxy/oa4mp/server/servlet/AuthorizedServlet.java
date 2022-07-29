@@ -2,8 +2,8 @@ package edu.uiuc.ncsa.myproxy.oa4mp.server.servlet;
 
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.DateUtils;
-import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
-import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
+import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.AuthorizationGrant;
 import org.apache.http.HttpStatus;
 
 import javax.servlet.ServletException;

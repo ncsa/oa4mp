@@ -3,10 +3,10 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
-import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
-import edu.uiuc.ncsa.security.delegation.token.impl.TokenImpl;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2GeneralError;
+import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenImpl;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Errors;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2GeneralError;
 import org.apache.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;

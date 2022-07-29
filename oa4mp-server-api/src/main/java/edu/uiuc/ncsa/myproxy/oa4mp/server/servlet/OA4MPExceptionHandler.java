@@ -5,7 +5,7 @@ import edu.uiuc.ncsa.security.core.exceptions.InvalidTimestampException;
 import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;
 import edu.uiuc.ncsa.security.core.util.HostUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.delegation.server.UnapprovedClientException;
+import edu.uiuc.ncsa.oa4mp.delegation.server.UnapprovedClientException;
 import edu.uiuc.ncsa.security.servlet.ExceptionHandler;
 import edu.uiuc.ncsa.security.servlet.JSPUtil;
 

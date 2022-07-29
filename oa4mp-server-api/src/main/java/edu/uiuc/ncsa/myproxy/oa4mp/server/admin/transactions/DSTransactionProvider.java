@@ -3,7 +3,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.OA4MPServiceTransaction;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.IdentifierProvider;
-import edu.uiuc.ncsa.security.delegation.server.ServiceTransactionProvider;
+import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransactionProvider;
 
 /**
  * <p>Created by Jeff Gaynor<br>

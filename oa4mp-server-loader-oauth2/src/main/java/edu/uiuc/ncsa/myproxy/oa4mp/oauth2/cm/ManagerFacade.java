@@ -16,9 +16,9 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.types.TypePermission;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
-import edu.uiuc.ncsa.security.delegation.server.storage.BaseClientStore;
-import edu.uiuc.ncsa.security.delegation.services.Response;
-import edu.uiuc.ncsa.security.delegation.storage.BaseClient;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.BaseClientStore;
+import edu.uiuc.ncsa.oa4mp.delegation.common.services.Response;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.BaseClient;
 import net.sf.json.JSONObject;
 import org.apache.commons.codec.digest.DigestUtils;
 

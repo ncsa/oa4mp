@@ -54,12 +54,7 @@
             <artifactId>javax.servlet-api</artifactId>
             <version>3.1.0</version>
         </dependency>
-<!--        <dependency>
-            <groupId>edu.uiuc.ncsa.security.delegation</groupId>
-            <artifactId>ncsa-security-oauth-2.0</artifactId>
-            <version>5.2-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>-->
+
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>ncsa-security-util</artifactId>

@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions;
 
-import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
+import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
 
 /**
  * <p>Created by Jeff Gaynor<br>

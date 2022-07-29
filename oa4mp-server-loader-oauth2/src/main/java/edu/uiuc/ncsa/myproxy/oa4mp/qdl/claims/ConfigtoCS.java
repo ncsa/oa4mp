@@ -8,9 +8,9 @@ import edu.uiuc.ncsa.qdl.vfs.VFSFileProvider;
 import edu.uiuc.ncsa.qdl.vfs.VFSPassThruFileProvider;
 import edu.uiuc.ncsa.qdl.vfs.VFSPaths;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
-import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
-import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSourceConfiguration;
-import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSource;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSourceConfiguration;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.LDAPConfiguration;
 
 /**
  * <p>Created by Jeff Gaynor<br>

@@ -4,8 +4,8 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransac
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
-import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
-import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.RefreshToken;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.RefreshTokenImpl;
 
 /**
  * <p>Created by Jeff Gaynor<br>

@@ -9,18 +9,18 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.UITokenUtils;
 import edu.uiuc.ncsa.qdl.exceptions.AssertionException;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
-import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
-import edu.uiuc.ncsa.security.delegation.server.request.IssuerResponse;
-import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2ATException;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2RedirectableError;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2Scopes;
-import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTRunner;
-import edu.uiuc.ncsa.security.oauth_2_0.jwt.ScriptRuntimeException;
-import edu.uiuc.ncsa.security.oauth_2_0.server.UII2;
-import edu.uiuc.ncsa.security.oauth_2_0.server.UIIRequest2;
-import edu.uiuc.ncsa.security.oauth_2_0.server.UIIResponse2;
+import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
+import edu.uiuc.ncsa.oa4mp.delegation.server.request.IssuerResponse;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AccessTokenImpl;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2ATException;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Errors;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2RedirectableError;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Scopes;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.JWTRunner;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.ScriptRuntimeException;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.UII2;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.UIIRequest2;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.UIIResponse2;
 import net.sf.json.JSONObject;
 import org.apache.http.HttpStatus;
 
@@ -29,9 +29,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.UITokenUtils.getRawAT;
-import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.*;
-import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.EXPIRATION;
-import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.ISSUED_AT;
+import static edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants.*;
+import static edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims.EXPIRATION;
+import static edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims.ISSUED_AT;
 
 /**
  * <p>Created by Jeff Gaynor<br>

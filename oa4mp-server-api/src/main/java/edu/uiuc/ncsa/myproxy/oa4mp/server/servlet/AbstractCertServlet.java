@@ -1,11 +1,11 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.server.servlet;
 
-import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
-import edu.uiuc.ncsa.security.delegation.server.issuers.PAIssuer;
-import edu.uiuc.ncsa.security.delegation.server.request.PARequest;
-import edu.uiuc.ncsa.security.delegation.server.request.PAResponse;
-import edu.uiuc.ncsa.security.delegation.servlet.TransactionState;
-import edu.uiuc.ncsa.security.delegation.token.AccessToken;
+import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
+import edu.uiuc.ncsa.oa4mp.delegation.server.issuers.PAIssuer;
+import edu.uiuc.ncsa.oa4mp.delegation.server.request.PARequest;
+import edu.uiuc.ncsa.oa4mp.delegation.server.request.PAResponse;
+import edu.uiuc.ncsa.oa4mp.delegation.common.servlet.TransactionState;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken;
 import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
 import edu.uiuc.ncsa.security.storage.XMLMap;
 

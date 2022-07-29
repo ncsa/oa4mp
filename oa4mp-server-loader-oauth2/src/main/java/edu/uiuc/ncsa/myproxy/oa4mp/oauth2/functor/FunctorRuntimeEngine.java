@@ -6,7 +6,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.functor.claims.OA2FunctorFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientFunctorScripts;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientFunctorScriptsFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ScriptRuntimeEngineFactory;
-import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.util.functor.JFunctor;
 import edu.uiuc.ncsa.security.util.functor.logic.FunctorMap;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRunRequest;

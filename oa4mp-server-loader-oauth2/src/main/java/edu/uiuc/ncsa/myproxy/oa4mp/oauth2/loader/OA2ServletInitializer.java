@@ -23,9 +23,9 @@ import edu.uiuc.ncsa.qdl.variables.VStack;
 import edu.uiuc.ncsa.security.core.cache.LockingCleanup;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.delegation.storage.Client;
-import edu.uiuc.ncsa.security.delegation.storage.impl.ClientConverter;
-import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSourceFactory;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl.ClientConverter;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSourceFactory;
 import edu.uiuc.ncsa.security.servlet.ExceptionHandler;
 import edu.uiuc.ncsa.security.util.mail.MailUtil;
 

@@ -3,7 +3,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.IdentifiableProviderImpl;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2TokenForge;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2TokenForge;
 
 import javax.inject.Provider;
 

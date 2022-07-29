@@ -4,15 +4,15 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransac
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.AbstractAccessTokenHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.PayloadHandlerConfigImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2ConfigurationLoader;
-import edu.uiuc.ncsa.security.delegation.token.AccessToken;
-import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
-import edu.uiuc.ncsa.security.delegation.token.impl.TokenUtils;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AccessTokenImpl;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenUtils;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import net.sf.json.JSONObject;
 
 import java.net.URI;
 
-import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.JWT_ID;
+import static edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims.JWT_ID;
 
 /**
  * For an opaque token. This is <b>NOT</b> a JWT, but does allow for setting a few parameters, viz.,

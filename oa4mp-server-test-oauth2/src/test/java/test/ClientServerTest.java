@@ -14,7 +14,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions.*;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.types.TypeClient;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.types.TypePermission;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
-import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnMap;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;

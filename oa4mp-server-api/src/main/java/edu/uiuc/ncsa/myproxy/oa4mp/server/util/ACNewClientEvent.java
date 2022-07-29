@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.server.util;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
-import edu.uiuc.ncsa.security.delegation.storage.BaseClient;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.BaseClient;
 
 /**
  * <p>Created by Jeff Gaynor<br>

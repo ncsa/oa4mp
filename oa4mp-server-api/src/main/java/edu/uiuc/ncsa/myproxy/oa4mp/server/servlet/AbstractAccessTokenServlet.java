@@ -2,13 +2,13 @@ package edu.uiuc.ncsa.myproxy.oa4mp.server.servlet;
 
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
-import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
-import edu.uiuc.ncsa.security.delegation.server.request.ATRequest;
-import edu.uiuc.ncsa.security.delegation.server.request.ATResponse;
-import edu.uiuc.ncsa.security.delegation.servlet.TransactionState;
-import edu.uiuc.ncsa.security.delegation.storage.Client;
-import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
-import edu.uiuc.ncsa.security.delegation.token.Verifier;
+import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
+import edu.uiuc.ncsa.oa4mp.delegation.server.request.ATRequest;
+import edu.uiuc.ncsa.oa4mp.delegation.server.request.ATResponse;
+import edu.uiuc.ncsa.oa4mp.delegation.common.servlet.TransactionState;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.AuthorizationGrant;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.Verifier;
 import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
 import edu.uiuc.ncsa.security.storage.XMLMap;
 

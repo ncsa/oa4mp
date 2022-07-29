@@ -2,9 +2,9 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
-import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
-import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfigurationUtil;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.LDAPConfiguration;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.LDAPConfigurationUtil;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import net.sf.json.JSONObject;
 

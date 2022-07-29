@@ -186,7 +186,6 @@
                 <version>3.4.0</version>
 
                 <configuration>
-                    <aggregate>true</aggregate>
                     <includeDependencySources>true</includeDependencySources>
                     <failOnError>false</failOnError>
                 </configuration>
@@ -242,7 +241,6 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.4.0</version>
                 <configuration>
-                    <aggregate>true</aggregate>
                     <includeDependencySources>true</includeDependencySources>
                     <dependencySourceIncludes>
                         <dependencySourceInclude>edu.uiuc.ncsa:*</dependencySourceInclude>

@@ -3,7 +3,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.DSFSTransactionStoreProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.TransactionConverter;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
-import edu.uiuc.ncsa.security.delegation.token.TokenForge;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.TokenForge;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
 import javax.inject.Provider;

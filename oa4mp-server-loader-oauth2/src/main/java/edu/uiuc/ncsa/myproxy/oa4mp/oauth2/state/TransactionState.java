@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowStates2;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants;
 import net.sf.json.JSONObject;
 
 /**

@@ -2,10 +2,10 @@ package edu.uiuc.ncsa.myproxy.oa4mp.server.storage;
 
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.delegation.server.storage.ClientStore;
-import edu.uiuc.ncsa.security.delegation.server.storage.impl.ClientMemoryStore;
-import edu.uiuc.ncsa.security.delegation.server.storage.impl.ClientStoreProvider;
-import edu.uiuc.ncsa.security.delegation.storage.Client;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.impl.ClientMemoryStore;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.impl.ClientStoreProvider;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
 /**

@@ -7,10 +7,10 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.DSFSTransactionStor
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
-import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
-import edu.uiuc.ncsa.security.delegation.token.TokenForge;
-import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
-import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.RefreshToken;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.TokenForge;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AccessTokenImpl;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.RefreshTokenImpl;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import org.apache.commons.codec.digest.DigestUtils;
 

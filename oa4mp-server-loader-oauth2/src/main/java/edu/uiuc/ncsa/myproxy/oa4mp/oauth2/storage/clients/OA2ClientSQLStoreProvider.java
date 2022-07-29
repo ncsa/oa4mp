@@ -3,7 +3,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.storage.sql.SQLClientStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.storage.sql.provider.DSClientSQLStoreProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.storage.sql.table.ClientStoreTable;
-import edu.uiuc.ncsa.security.delegation.storage.Client;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPoolProvider;

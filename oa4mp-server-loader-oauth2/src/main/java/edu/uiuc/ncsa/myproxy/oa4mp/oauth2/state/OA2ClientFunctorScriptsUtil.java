@@ -3,7 +3,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.jSetClaimSource;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.functor.claims.OA2FunctorFactory;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
-import edu.uiuc.ncsa.security.oauth_2_0.server.scripts.functor.ClientFunctorScriptsUtil;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.scripts.functor.ClientFunctorScriptsUtil;
 import edu.uiuc.ncsa.security.util.functor.FunctorTypeImpl;
 import edu.uiuc.ncsa.security.util.functor.LogicBlock;
 import edu.uiuc.ncsa.security.util.functor.LogicBlocks;
@@ -17,8 +17,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSourceConfigurationUtil.ID_TAG;
-import static edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfigurationUtil.LDAP_TAG;
+import static edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSourceConfigurationUtil.ID_TAG;
+import static edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.LDAPConfigurationUtil.LDAP_TAG;
 
 /**
  * This helps work with the configuration for a client. The basic format is

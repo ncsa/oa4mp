@@ -3,7 +3,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.server.util;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.cache.Cache;
 import edu.uiuc.ncsa.security.core.cache.RetentionPolicy;
-import edu.uiuc.ncsa.security.delegation.storage.TransactionStore;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.TransactionStore;
 
 import java.util.Map;
 

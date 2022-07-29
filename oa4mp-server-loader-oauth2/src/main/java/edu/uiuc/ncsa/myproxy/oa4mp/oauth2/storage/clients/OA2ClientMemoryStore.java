@@ -1,9 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientConverter;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.impl.ClientMemoryStore;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
-import edu.uiuc.ncsa.security.delegation.server.storage.impl.ClientMemoryStore;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
 /**

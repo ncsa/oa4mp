@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
-import edu.uiuc.ncsa.security.oauth_2_0.server.RFC8693Constants;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.RFC8693Constants;
 
 /**
  * Constants for RFC 8693: The token exchange endpoint. This has been replaced with the

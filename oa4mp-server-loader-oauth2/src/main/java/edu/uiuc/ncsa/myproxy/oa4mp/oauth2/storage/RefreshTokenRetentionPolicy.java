@@ -8,7 +8,7 @@ import edu.uiuc.ncsa.security.core.exceptions.InvalidTimestampException;
 import edu.uiuc.ncsa.security.core.util.DateUtils;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
-import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.RefreshTokenImpl;
 
 import java.util.Date;
 import java.util.Map;

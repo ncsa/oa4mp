@@ -3,7 +3,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.OA4MPConfigTags;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.OA4MPServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.storage.MultiDSClientStoreProvider;
-import edu.uiuc.ncsa.security.delegation.token.TokenForge;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.TokenForge;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPoolProvider;
@@ -13,7 +13,7 @@ import org.apache.commons.configuration.tree.ConfigurationNode;
 
 import javax.inject.Provider;
 
-import static edu.uiuc.ncsa.security.delegation.server.storage.SQLServiceTransactionStore.DEFAULT_TABLENAME;
+import static edu.uiuc.ncsa.oa4mp.delegation.server.storage.SQLServiceTransactionStore.DEFAULT_TABLENAME;
 
 /**
  * <p>Created by Jeff Gaynor<br>

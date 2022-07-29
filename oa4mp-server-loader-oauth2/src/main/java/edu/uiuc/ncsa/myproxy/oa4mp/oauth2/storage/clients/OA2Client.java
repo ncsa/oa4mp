@@ -8,12 +8,12 @@ import edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.QDLRuntimeEngine;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
-import edu.uiuc.ncsa.security.delegation.storage.BaseClient;
-import edu.uiuc.ncsa.security.delegation.storage.Client;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2Scopes;
-import edu.uiuc.ncsa.security.oauth_2_0.server.OA2ClientScopes;
-import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.BaseClient;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Scopes;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.OA2ClientScopes;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.LDAPConfiguration;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -460,7 +460,7 @@ public class OA2Client extends Client implements OA2ClientScopes {
      * <p>Note that the "claims" entry is deprecated and mostly refers to the old JFunctor scripting. Don't use in new
      * configurations. The isSaved entry too relates to JFunctors and is ignored by all other components.</p>
      * <p>
-     * See the {@link edu.uiuc.ncsa.security.oauth_2_0.server.scripts.ClientJSONConfigUtil}
+     * See the {@link edu.uiuc.ncsa.oa4mp.delegation.oa2.server.scripts.ClientJSONConfigUtil}
      * JSON may be either a single JSON object or an array of them. If a single, it is
      * converted to an array of a single object before processing.
      * <p>

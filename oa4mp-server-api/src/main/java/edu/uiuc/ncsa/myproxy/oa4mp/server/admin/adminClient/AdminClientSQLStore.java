@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient;
 
-import edu.uiuc.ncsa.security.delegation.server.storage.BaseClientSQLStore;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.BaseClientSQLStore;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
 import edu.uiuc.ncsa.security.storage.sql.internals.Table;

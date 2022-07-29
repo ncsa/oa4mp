@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.attributes;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
-import edu.uiuc.ncsa.security.delegation.services.Response;
+import edu.uiuc.ncsa.oa4mp.delegation.common.services.Response;
 
 /**
  * <p>Created by Jeff Gaynor<br>

@@ -6,10 +6,10 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
-import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTUtil2;
-import edu.uiuc.ncsa.security.oauth_2_0.jwt.PayloadHandler;
-import edu.uiuc.ncsa.security.oauth_2_0.jwt.PayloadHandlerConfig;
-import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.JWTUtil2;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.PayloadHandler;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.PayloadHandlerConfig;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.util.configuration.TemplateUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
@@ -20,8 +20,8 @@ import net.sf.json.JSONObject;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
-import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.*;
-import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.AUDIENCE;
+import static edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims.*;
+import static edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims.AUDIENCE;
 import static edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse.RC_NOT_RUN;
 
 /**

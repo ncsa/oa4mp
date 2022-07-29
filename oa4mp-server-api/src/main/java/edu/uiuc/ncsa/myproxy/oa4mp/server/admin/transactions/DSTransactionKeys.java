@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions;
 
-import edu.uiuc.ncsa.security.delegation.server.storage.support.ServiceTransactionKeys;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.support.ServiceTransactionKeys;
 
 import java.util.List;
 

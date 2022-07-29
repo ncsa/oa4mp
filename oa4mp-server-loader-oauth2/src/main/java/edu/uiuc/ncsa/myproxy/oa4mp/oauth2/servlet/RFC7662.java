@@ -4,12 +4,12 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransac
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
-import edu.uiuc.ncsa.security.delegation.token.AccessToken;
-import edu.uiuc.ncsa.security.delegation.token.impl.TokenImpl;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2GeneralError;
-import edu.uiuc.ncsa.security.oauth_2_0.server.RFC8693Constants;
-import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenImpl;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2GeneralError;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.RFC8693Constants;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims;
 import net.sf.json.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;

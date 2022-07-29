@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state;
 
-import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
-import edu.uiuc.ncsa.security.oauth_2_0.server.scripts.functor.ClientFunctorScripts;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSource;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.scripts.functor.ClientFunctorScripts;
 import edu.uiuc.ncsa.security.util.functor.parser.FunctorScript;
 
 import java.util.List;

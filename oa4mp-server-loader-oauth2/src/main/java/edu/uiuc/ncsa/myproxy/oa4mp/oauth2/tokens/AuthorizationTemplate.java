@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens;
 
 import edu.uiuc.ncsa.security.core.util.BeanUtils;
-import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 

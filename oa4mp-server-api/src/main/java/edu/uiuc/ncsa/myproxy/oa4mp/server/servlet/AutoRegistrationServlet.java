@@ -2,8 +2,8 @@ package edu.uiuc.ncsa.myproxy.oa4mp.server.servlet;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.NewClientEvent;
 import edu.uiuc.ncsa.security.core.Identifier;
-import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
-import edu.uiuc.ncsa.security.delegation.storage.Client;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

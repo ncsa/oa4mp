@@ -9,19 +9,19 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractAuthorizationServlet.M
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
-import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
-import edu.uiuc.ncsa.security.delegation.server.request.IssuerResponse;
-import edu.uiuc.ncsa.security.delegation.servlet.TransactionState;
-import edu.uiuc.ncsa.security.delegation.storage.Client;
-import edu.uiuc.ncsa.security.delegation.token.AccessToken;
-import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
-import edu.uiuc.ncsa.security.delegation.token.impl.TokenUtils;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2GeneralError;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2Scopes;
-import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTUtil2;
-import edu.uiuc.ncsa.security.oauth_2_0.server.PAIResponse2;
+import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
+import edu.uiuc.ncsa.oa4mp.delegation.server.request.IssuerResponse;
+import edu.uiuc.ncsa.oa4mp.delegation.common.servlet.TransactionState;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AccessTokenImpl;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenUtils;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Errors;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2GeneralError;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Scopes;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.JWTUtil2;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.PAIResponse2;
 import net.sf.json.JSONObject;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.http.HttpStatus;
@@ -34,8 +34,8 @@ import java.util.List;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceConstantKeys.CONSUMER_KEY;
 import static edu.uiuc.ncsa.security.core.util.DateUtils.checkTimestamp;
-import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.CLIENT_SECRET;
-import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.JWT_ID;
+import static edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants.CLIENT_SECRET;
+import static edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims.JWT_ID;
 
 /**
  * <p>Created by Jeff Gaynor<br>

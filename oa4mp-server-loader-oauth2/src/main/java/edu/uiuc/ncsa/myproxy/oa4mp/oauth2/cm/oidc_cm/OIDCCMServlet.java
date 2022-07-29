@@ -20,13 +20,13 @@ import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
-import edu.uiuc.ncsa.security.delegation.server.UnapprovedClientException;
-import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
-import edu.uiuc.ncsa.security.delegation.storage.Client;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2GeneralError;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2Scopes;
+import edu.uiuc.ncsa.oa4mp.delegation.server.UnapprovedClientException;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Errors;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2GeneralError;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Scopes;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.storage.XMLMap;
 import net.sf.json.JSON;
@@ -49,8 +49,8 @@ import java.util.*;
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.oidc_cm.OIDCCMConstants.CLIENT_ID;
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.oidc_cm.OIDCCMConstants.CLIENT_SECRET;
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.oidc_cm.OIDCCMConstants.*;
-import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.*;
-import static edu.uiuc.ncsa.security.oauth_2_0.server.RFC8693Constants.GRANT_TYPE_TOKEN_EXCHANGE;
+import static edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants.*;
+import static edu.uiuc.ncsa.oa4mp.delegation.oa2.server.RFC8693Constants.GRANT_TYPE_TOKEN_EXCHANGE;
 
 /**
  * Note that in all of these calls, the assumption is that an admin client has been requested and

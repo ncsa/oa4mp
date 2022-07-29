@@ -7,11 +7,11 @@ import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
-import edu.uiuc.ncsa.security.delegation.server.storage.BaseClientStore;
-import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
-import edu.uiuc.ncsa.security.delegation.server.storage.ClientApprovalStore;
-import edu.uiuc.ncsa.security.delegation.storage.BaseClient;
-import edu.uiuc.ncsa.security.delegation.storage.ClientApprovalKeys;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.BaseClientStore;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApprovalStore;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.BaseClient;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.ClientApprovalKeys;
 import edu.uiuc.ncsa.security.util.cli.ExitException;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import net.sf.json.JSON;
@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval.Status.*;
+import static edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval.Status.*;
 import static edu.uiuc.ncsa.security.util.cli.CLIDriver.CLEAR_BUFFER_COMMAND;
 import static edu.uiuc.ncsa.security.util.cli.CLIDriver.EXIT_COMMAND;
 

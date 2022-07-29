@@ -16,15 +16,15 @@ import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.oa4mp.delegation.client.request.RTResponse;
-import edu.uiuc.ncsa.security.delegation.token.AccessToken;
-import edu.uiuc.ncsa.security.delegation.token.Token;
-import edu.uiuc.ncsa.security.delegation.token.impl.*;
-import edu.uiuc.ncsa.security.oauth_2_0.JWTUtil;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
-import edu.uiuc.ncsa.security.oauth_2_0.UserInfo;
-import edu.uiuc.ncsa.security.oauth_2_0.client.ATResponse2;
-import edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTUtil2;
-import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.Token;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.*;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.JWTUtil;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.UserInfo;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.client.ATResponse2;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.JWTUtil2;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims;
 import edu.uiuc.ncsa.security.servlet.ServiceClientHTTPException;
 import edu.uiuc.ncsa.security.util.cli.ConfigurableCommandsImpl;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
@@ -49,9 +49,9 @@ import java.util.List;
 import java.util.*;
 
 import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
-import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.*;
-import static edu.uiuc.ncsa.security.oauth_2_0.jwt.JWTUtil2.PAYLOAD_INDEX;
-import static edu.uiuc.ncsa.security.oauth_2_0.server.RFC8628Constants.*;
+import static edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants.*;
+import static edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.JWTUtil2.PAYLOAD_INDEX;
+import static edu.uiuc.ncsa.oa4mp.delegation.oa2.server.RFC8628Constants.*;
 
 /**
  * A command line client. Invoke help as needed, but the basic operation is to create the initial

@@ -2,9 +2,9 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
-import edu.uiuc.ncsa.security.oauth_2_0.jwt.PayloadHandler;
-import edu.uiuc.ncsa.security.oauth_2_0.jwt.PayloadHandlerConfig;
-import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.PayloadHandler;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.PayloadHandlerConfig;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRunRequest;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse;

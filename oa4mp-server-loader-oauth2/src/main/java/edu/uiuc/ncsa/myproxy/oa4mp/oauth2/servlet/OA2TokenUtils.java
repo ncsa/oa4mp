@@ -12,10 +12,10 @@ import edu.uiuc.ncsa.security.core.exceptions.InvalidSignatureException;
 import edu.uiuc.ncsa.security.core.exceptions.TransactionNotFoundException;
 import edu.uiuc.ncsa.security.core.exceptions.UnsupportedJWTTypeException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
-import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
-import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
-import edu.uiuc.ncsa.security.delegation.token.impl.TokenUtils;
-import edu.uiuc.ncsa.security.oauth_2_0.*;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AccessTokenImpl;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.RefreshTokenImpl;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenUtils;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.*;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import net.sf.json.JSONException;
@@ -26,7 +26,7 @@ import java.io.IOException;
 import java.net.URI;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet.getServiceEnvironment;
-import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.JWT_ID;
+import static edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims.JWT_ID;
 
 /**
  * <p>Created by Jeff Gaynor<br>

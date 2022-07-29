@@ -2,10 +2,10 @@ package edu.uiuc.ncsa.myproxy.oa4mp;
 
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
-import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
-import edu.uiuc.ncsa.security.delegation.server.storage.ClientApprovalStore;
-import edu.uiuc.ncsa.security.delegation.server.storage.ClientStore;
-import edu.uiuc.ncsa.security.delegation.storage.Client;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApprovalStore;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
 import org.junit.Test;
 
 import java.util.Date;

@@ -2,7 +2,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients;
 
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.IdentifierProvider;
-import edu.uiuc.ncsa.security.delegation.storage.ClientProvider;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.ClientProvider;
 
 /**
  * <p>Created by Jeff Gaynor<br>

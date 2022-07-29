@@ -1,11 +1,11 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.server.servlet;
 
-import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
-import edu.uiuc.ncsa.security.delegation.server.UnapprovedClientException;
-import edu.uiuc.ncsa.security.delegation.server.request.AGRequest;
-import edu.uiuc.ncsa.security.delegation.server.request.AGResponse;
-import edu.uiuc.ncsa.security.delegation.servlet.TransactionState;
-import edu.uiuc.ncsa.security.delegation.storage.Client;
+import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
+import edu.uiuc.ncsa.oa4mp.delegation.server.UnapprovedClientException;
+import edu.uiuc.ncsa.oa4mp.delegation.server.request.AGRequest;
+import edu.uiuc.ncsa.oa4mp.delegation.server.request.AGResponse;
+import edu.uiuc.ncsa.oa4mp.delegation.common.servlet.TransactionState;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
 import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
 import edu.uiuc.ncsa.security.storage.XMLMap;
 

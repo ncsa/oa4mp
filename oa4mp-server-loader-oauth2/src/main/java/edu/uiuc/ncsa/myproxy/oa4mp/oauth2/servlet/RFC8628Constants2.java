@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
 
-import edu.uiuc.ncsa.security.oauth_2_0.server.RFC8628Constants;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.RFC8628Constants;
 
 /**
  * <p>Created by Jeff Gaynor<br>

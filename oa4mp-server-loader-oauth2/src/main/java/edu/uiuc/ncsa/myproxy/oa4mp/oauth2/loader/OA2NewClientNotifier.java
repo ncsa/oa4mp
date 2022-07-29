@@ -7,8 +7,8 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.util.NewAdminClientEvent;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.NewClientEvent;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.NewClientNotifier;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.delegation.storage.BaseClient;
-import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfigurationUtil;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.BaseClient;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.LDAPConfigurationUtil;
 import edu.uiuc.ncsa.security.util.mail.MailUtil;
 
 import java.util.Map;

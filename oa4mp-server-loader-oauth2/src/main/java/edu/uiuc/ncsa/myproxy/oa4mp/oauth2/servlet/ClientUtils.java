@@ -9,8 +9,8 @@ import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
-import edu.uiuc.ncsa.security.delegation.servlet.TransactionState;
-import edu.uiuc.ncsa.security.oauth_2_0.*;
+import edu.uiuc.ncsa.oa4mp.delegation.common.servlet.TransactionState;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.*;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.http.HttpStatus;
 
@@ -22,7 +22,7 @@ import java.util.StringTokenizer;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2AuthorizedServletUtil.intersection;
 import static edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet.getServiceEnvironment;
-import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.SCOPE;
+import static edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants.SCOPE;
 
 /**
  * <p>Created by Jeff Gaynor<br>

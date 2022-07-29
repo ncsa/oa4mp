@@ -4,7 +4,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.OA4MPConfigTags;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.OA4MPServiceTransaction;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.configuration.provider.CfgEvent;
-import edu.uiuc.ncsa.security.delegation.token.TokenForge;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.TokenForge;
 import edu.uiuc.ncsa.security.storage.FSProvider;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 

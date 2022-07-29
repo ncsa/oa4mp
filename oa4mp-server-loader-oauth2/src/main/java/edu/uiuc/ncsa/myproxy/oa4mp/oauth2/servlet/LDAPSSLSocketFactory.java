@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
-import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.LDAPConfiguration;
 import edu.uiuc.ncsa.security.util.ssl.MyTrustManager;
 import edu.uiuc.ncsa.security.util.ssl.SSLConfiguration;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
@@ -20,7 +20,7 @@ import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * A factory that creats SSL sockets as required by LDAP.
+ * A factory that creates SSL sockets as required by LDAP.
  * <p>Created by Jeff Gaynor<br>
  * on 7/13/17 at  11:02 AM
  */

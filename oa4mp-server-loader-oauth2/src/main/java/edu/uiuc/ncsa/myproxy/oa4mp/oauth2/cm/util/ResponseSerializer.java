@@ -20,7 +20,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientConverter;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientKeys;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
-import edu.uiuc.ncsa.security.delegation.services.Response;
+import edu.uiuc.ncsa.oa4mp.delegation.common.services.Response;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 

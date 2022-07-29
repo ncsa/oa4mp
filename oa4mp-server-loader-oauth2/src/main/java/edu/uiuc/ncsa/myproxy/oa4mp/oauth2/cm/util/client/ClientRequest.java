@@ -4,8 +4,8 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.AbstractDDRequest;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
-import edu.uiuc.ncsa.security.delegation.services.Response;
-import edu.uiuc.ncsa.security.delegation.services.Server;
+import edu.uiuc.ncsa.oa4mp.delegation.common.services.Response;
+import edu.uiuc.ncsa.oa4mp.delegation.common.services.Server;
 
 /**
  * <p>Created by Jeff Gaynor<br>

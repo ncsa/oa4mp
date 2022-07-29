@@ -1,8 +1,8 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.server.storage.filestore;
 
 import edu.uiuc.ncsa.security.core.util.IdentifiableProviderImpl;
-import edu.uiuc.ncsa.security.delegation.server.storage.impl.FSClientStore;
-import edu.uiuc.ncsa.security.delegation.storage.Client;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.impl.FSClientStore;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
 import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 

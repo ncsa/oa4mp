@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.server.storage.sql.table;
 
-import edu.uiuc.ncsa.security.delegation.storage.ClientApprovalKeys;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.ClientApprovalKeys;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnDescriptorEntry;
 import edu.uiuc.ncsa.security.storage.sql.internals.Table;
 

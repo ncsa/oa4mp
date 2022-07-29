@@ -7,8 +7,8 @@ import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.oa4mp.delegation.client.DelegationService;
-import edu.uiuc.ncsa.security.delegation.storage.Client;
-import edu.uiuc.ncsa.security.delegation.token.TokenForge;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.TokenForge;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 
 import javax.inject.Provider;

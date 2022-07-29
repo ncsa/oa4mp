@@ -6,7 +6,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.ResponseSerializer;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.EnvServlet;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
-import edu.uiuc.ncsa.security.delegation.services.Response;
+import edu.uiuc.ncsa.oa4mp.delegation.common.services.Response;
 import net.sf.json.JSON;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;

@@ -2,9 +2,9 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.admin;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
-import edu.uiuc.ncsa.security.delegation.services.Request;
-import edu.uiuc.ncsa.security.delegation.services.Response;
-import edu.uiuc.ncsa.security.delegation.services.Server;
+import edu.uiuc.ncsa.oa4mp.delegation.common.services.Request;
+import edu.uiuc.ncsa.oa4mp.delegation.common.services.Response;
+import edu.uiuc.ncsa.oa4mp.delegation.common.services.Server;
 
 /**
  * <p>Created by Jeff Gaynor<br>

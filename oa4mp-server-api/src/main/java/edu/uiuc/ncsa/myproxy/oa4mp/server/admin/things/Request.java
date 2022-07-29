@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things;
 
-import edu.uiuc.ncsa.security.delegation.storage.BaseClient;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.BaseClient;
 import net.sf.json.JSONObject;
 
 /**

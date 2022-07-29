@@ -4,7 +4,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.MultiDSTransactionS
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.delegation.storage.TransactionStore;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.TransactionStore;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
 /**
