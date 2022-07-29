@@ -5,8 +5,8 @@ import edu.uiuc.ncsa.myproxy.oa4mp.client.storage.AssetStore;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.delegation.client.AbstractClientEnvironment;
-import edu.uiuc.ncsa.security.delegation.client.DelegationService;
+import edu.uiuc.ncsa.oa4mp.delegation.client.AbstractClientEnvironment;
+import edu.uiuc.ncsa.oa4mp.delegation.client.DelegationService;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.delegation.token.TokenForge;
 

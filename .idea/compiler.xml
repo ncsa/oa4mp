@@ -19,6 +19,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="oa4mp-proxy" />
+        <module name="d-oauth2" />
         <module name="oa4mp-client-loader-oauth2" />
         <module name="oa4mp-server-api" />
         <module name="oa4mp-server-oauth2" />
@@ -29,6 +30,8 @@
         <module name="oa4mp-client-test" />
         <module name="oa4mp-webapp" />
         <module name="oa4mp-qdl" />
+        <module name="d-client" />
+        <module name="common" />
         <module name="oa4mp-server-test" />
         <module name="oa4mp-server-admin-oauth2" />
         <module name="oa4mp-server-loader-oauth2" />
@@ -36,6 +39,7 @@
         <module name="oa4mp-server-test-oauth2" />
         <module name="oa4mp-skin" />
         <module name="myproxy-website" />
+        <module name="d-server" />
         <module name="oa4mp-client-webapp" />
       </profile>
     </annotationProcessing>

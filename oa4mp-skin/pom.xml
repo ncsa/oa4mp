@@ -4,7 +4,7 @@
     <groupId>edu.uiuc.ncsa.maven.skin</groupId>
     <parent>
          <groupId>edu.uiuc.ncsa.myproxy</groupId>
-         <artifactId>myproxy</artifactId>
+         <artifactId>oa4mp</artifactId>
          <version>5.2-SNAPSHOT</version>
      </parent>
 

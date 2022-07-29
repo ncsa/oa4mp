@@ -9,7 +9,7 @@ import edu.uiuc.ncsa.security.core.configuration.provider.CfgEvent;
 import edu.uiuc.ncsa.security.core.configuration.provider.TypedProvider;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.delegation.client.DelegationService;
+import edu.uiuc.ncsa.oa4mp.delegation.client.DelegationService;
 import edu.uiuc.ncsa.security.delegation.servlet.DBConfigLoader;
 import edu.uiuc.ncsa.security.servlet.ServiceClient;
 import edu.uiuc.ncsa.security.util.ssl.SSLConfiguration;

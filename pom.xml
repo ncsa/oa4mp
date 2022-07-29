@@ -9,7 +9,7 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>edu.uiuc.ncsa.myproxy</groupId>
-    <artifactId>myproxy</artifactId>
+    <artifactId>oa4mp</artifactId>
     <version>5.2-SNAPSHOT</version>
     <packaging>pom</packaging>
     <properties>
@@ -66,6 +66,10 @@
         <module>oa4mp-skin</module>
         <module>myproxy-website</module>
         <module>oa4mp-qdl</module>
+        <module>common</module>
+        <module>d-client</module>
+        <module>d-server</module>
+        <module>d-oauth2</module>
     </modules>
     <dependencies>
         <dependency>

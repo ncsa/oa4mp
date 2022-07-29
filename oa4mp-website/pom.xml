@@ -78,14 +78,14 @@
     </distributionManagement>
     <dependencies>
         <dependency>
-            <groupId>edu.uiuc.ncsa.security.delegation</groupId>
-            <artifactId>ncsa-security-delegation-client</artifactId>
+            <groupId>edu.uiuc.ncsa.myproxy</groupId>
+            <artifactId>d-client</artifactId>
             <version>5.2-SNAPSHOT</version>
         </dependency>
 
         <dependency>
-            <groupId>edu.uiuc.ncsa.security.delegation</groupId>
-            <artifactId>ncsa-security-delegation-common</artifactId>
+            <groupId>edu.uiuc.ncsa.myproxy</groupId>
+            <artifactId>common</artifactId>
             <version>5.2-SNAPSHOT</version>
         </dependency>
         <dependency>
@@ -101,13 +101,13 @@
             <version>5.2-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>edu.uiuc.ncsa.security.delegation</groupId>
-            <artifactId>ncsa-security-delegation-server</artifactId>
+            <groupId>edu.uiuc.ncsa.myproxy</groupId>
+            <artifactId>d-server</artifactId>
             <version>5.2-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>edu.uiuc.ncsa.security.delegation</groupId>
-            <artifactId>ncsa-security-delegation-common</artifactId>
+            <groupId>edu.uiuc.ncsa.myproxy</groupId>
+            <artifactId>common</artifactId>
             <version>5.2-SNAPSHOT</version>
             <type>test-jar</type>
             <scope>test</scope>

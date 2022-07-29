@@ -10,12 +10,14 @@ import edu.uiuc.ncsa.myproxy.oa4mp.client.OA4MPServiceProvider;
  * on 2/25/14 at  10:17 AM
  */
 public class OA2MPServiceProvider extends OA4MPServiceProvider {
-    public OA2MPServiceProvider(ClientEnvironment OA2ClientEnvironment) {
-        super(OA2ClientEnvironment);
+    ClientEnvironment oa2ClientEnvironment;
+    public OA2MPServiceProvider(ClientEnvironment oa2ClientEnvironment) {
+        super();
+        this.oa2ClientEnvironment = oa2ClientEnvironment;
     }
 
     @Override
     public OA4MPService get() {
-        return new OA2MPService(clientEnvironment);
+        return new OA2MPService(oa2ClientEnvironment);
     }
 }

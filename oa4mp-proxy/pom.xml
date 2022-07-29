@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>edu.uiuc.ncsa.myproxy</groupId>
-        <artifactId>myproxy</artifactId>
+        <artifactId>oa4mp</artifactId>
         <version>5.2-SNAPSHOT</version>
     </parent>
 
@@ -42,8 +42,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>edu.uiuc.ncsa.security.delegation</groupId>
-            <artifactId>ncsa-security-delegation-common</artifactId>
+            <groupId>edu.uiuc.ncsa.myproxy</groupId>
+            <artifactId>common</artifactId>
             <version>5.2-SNAPSHOT</version>
             <type>test-jar</type>
             <scope>test</scope>

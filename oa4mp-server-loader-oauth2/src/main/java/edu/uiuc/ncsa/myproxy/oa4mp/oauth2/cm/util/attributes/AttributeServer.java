@@ -6,8 +6,8 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientConverter;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientConverter;
+import edu.uiuc.ncsa.oa4mp.delegation.common.services.Response;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
-import edu.uiuc.ncsa.security.delegation.services.Response;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnMap;
 import org.apache.commons.codec.digest.DigestUtils;
 
