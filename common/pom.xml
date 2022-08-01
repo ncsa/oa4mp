@@ -38,12 +38,12 @@
     <dependencies>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
-            <artifactId>ncsa-security-util</artifactId>
+            <artifactId>util</artifactId>
             <version>5.2-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
-            <artifactId>ncsa-security-util</artifactId>
+            <artifactId>util</artifactId>
             <version>5.2-SNAPSHOT</version>
             <scope>test</scope>
             <type>test-jar</type>
@@ -69,7 +69,7 @@
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
-            <artifactId>ncsa-security-storage</artifactId>
+            <artifactId>storage</artifactId>
             <version>5.2-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>

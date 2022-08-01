@@ -16,7 +16,7 @@
     <dependencies>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
-            <artifactId>ncsa-security-servlet</artifactId>
+            <artifactId>servlet</artifactId>
             <version>5.2-SNAPSHOT</version>
         </dependency>
         <dependency>

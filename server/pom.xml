@@ -32,7 +32,7 @@
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
-            <artifactId>ncsa-security-storage</artifactId>
+            <artifactId>storage</artifactId>
             <version>5.2-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>

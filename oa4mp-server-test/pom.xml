@@ -22,7 +22,7 @@
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
-            <artifactId>ncsa-security-core</artifactId>
+            <artifactId>core</artifactId>
             <version>5.2-SNAPSHOT</version>
             <type>test-jar</type>
             <scope>test</scope>
@@ -36,14 +36,14 @@
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
-            <artifactId>ncsa-security-util</artifactId>
+            <artifactId>util</artifactId>
             <version>5.2-SNAPSHOT</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
-            <artifactId>ncsa-security-servlet</artifactId>
+            <artifactId>servlet</artifactId>
             <version>5.2-SNAPSHOT</version>
         </dependency>
 

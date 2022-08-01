@@ -67,9 +67,9 @@
         <module>myproxy-website</module>
         <module>oa4mp-qdl</module>
         <module>common</module>
-        <module>d-client</module>
-        <module>d-server</module>
-        <module>d-oauth2</module>
+        <module>client</module>
+        <module>server</module>
+        <module>oauth2</module>
     </modules>
     <dependencies>
         <dependency>

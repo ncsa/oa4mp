@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/client/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/common/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/d-client/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/d-oauth2/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/d-server/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/myproxy-logon/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-clc/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-client-api/src/main/java" charset="UTF-8" />
@@ -31,5 +29,7 @@
     <file url="file://$PROJECT_DIR$/oa4mp-skin/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-webapp/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-webapp/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/oauth2/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/server/src/main/java" charset="UTF-8" />
   </component>
 </project>

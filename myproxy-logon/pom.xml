@@ -55,7 +55,7 @@
             <version>1.10</version>
         </dependency>
         <dependency>
-            <artifactId>ncsa-security-util</artifactId>
+            <artifactId>util</artifactId>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <version>5.2-SNAPSHOT</version>
         </dependency>

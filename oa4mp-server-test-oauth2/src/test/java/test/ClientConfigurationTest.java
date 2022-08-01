@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientFunctorScriptsUtil.*;
-import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.AUDIENCE;
+import static edu.uiuc.ncsa.oa4mp.delegation.oa2.server.RFC8693Constants.AUDIENCE;
 
 /**
  * <p>Created by Jeff Gaynor<br>
