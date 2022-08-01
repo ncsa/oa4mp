@@ -21,7 +21,7 @@
     <dependencies>
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
-            <artifactId>d-client</artifactId>
+            <artifactId>client</artifactId>
             <version>5.2-SNAPSHOT</version>
         </dependency>
 
@@ -30,6 +30,13 @@
             <artifactId>common</artifactId>
             <version>5.2-SNAPSHOT</version>
         </dependency>
+
+        <dependency>
+            <groupId>edu.uiuc.ncsa.myproxy</groupId>
+            <artifactId>oauth2</artifactId>
+            <version>5.2-SNAPSHOT</version>
+        </dependency>
+
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>core</artifactId>

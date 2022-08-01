@@ -38,7 +38,7 @@
         </dependency>-->
         <dependency>
                 <groupId>edu.uiuc.ncsa.myproxy</groupId>
-                <artifactId>d-oauth2</artifactId>
+                <artifactId>oauth2</artifactId>
                 <version>5.2-SNAPSHOT</version>
             </dependency>
         <dependency>
@@ -65,7 +65,7 @@
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
-            <artifactId>d-oauth2</artifactId>
+            <artifactId>oauth2</artifactId>
             <version>5.2-SNAPSHOT</version>
         </dependency>
 

@@ -18,17 +18,28 @@
   </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="FrameworkDetectionExcludesConfiguration">
-    <file type="web" url="file://$PROJECT_DIR$/oa4mp-client-oauth1" />
     <file type="web" url="file://$PROJECT_DIR$/oa4mp-client-oauth2" />
     <file type="web" url="file://$PROJECT_DIR$/oa4mp-client-webapp" />
-    <file type="web" url="file://$PROJECT_DIR$/oa4mp-server-oauth1" />
     <file type="web" url="file://$PROJECT_DIR$/oa4mp-server-oauth2" />
     <file type="web" url="file://$PROJECT_DIR$/oa4mp-webapp" />
-    <file type="web" url="file://$PROJECT_DIR$/oa4mp-xsede-oauth2" />
   </component>
   <component name="IdProvider" IDEtalkID="215A14033C971CCE717D28767B12EEA0" />
   <component name="JavadocGenerationManager">
+    <option name="OUTPUT_DIRECTORY" />
+    <option name="OPTION_SCOPE" value="protected" />
+    <option name="OPTION_HIERARCHY" value="true" />
+    <option name="OPTION_NAVIGATOR" value="true" />
+    <option name="OPTION_INDEX" value="true" />
+    <option name="OPTION_SEPARATE_INDEX" value="true" />
+    <option name="OPTION_DOCUMENT_TAG_USE" value="false" />
+    <option name="OPTION_DOCUMENT_TAG_AUTHOR" value="false" />
+    <option name="OPTION_DOCUMENT_TAG_VERSION" value="false" />
+    <option name="OPTION_DOCUMENT_TAG_DEPRECATED" value="true" />
+    <option name="OPTION_DEPRECATED_LIST" value="true" />
     <option name="OTHER_OPTIONS" value="" />
+    <option name="HEAP_SIZE" />
+    <option name="LOCALE" />
+    <option name="OPEN_IN_BROWSER" value="true" />
   </component>
   <component name="MavenProjectsManager">
     <option name="originalFiles">
@@ -36,22 +47,10 @@
         <option value="$PROJECT_DIR$/pom.xml" />
       </list>
     </option>
-    <option name="ignoredFiles">
-      <set>
-        <option value="$PROJECT_DIR$/oa4mp-client-loader-oauth1/pom.xml" />
-        <option value="$PROJECT_DIR$/oa4mp-client-oauth1/pom.xml" />
-        <option value="$PROJECT_DIR$/oa4mp-gui/pom.xml" />
-        <option value="$PROJECT_DIR$/oa4mp-server-admin-oauth1/pom.xml" />
-        <option value="$PROJECT_DIR$/oa4mp-server-admin/pom.xml" />
-        <option value="$PROJECT_DIR$/oa4mp-server-loader-oauth1/pom.xml" />
-        <option value="$PROJECT_DIR$/oa4mp-server-oauth1/pom.xml" />
-        <option value="$PROJECT_DIR$/oa4mp-xsede-oauth2/pom.xml" />
-      </set>
-    </option>
   </component>
   <component name="ModuleEditorState">
     <option name="LAST_EDITED_MODULE_NAME" />
     <option name="LAST_EDITED_TAB_NAME" />
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" project-jdk-name="17" project-jdk-type="JavaSDK" />
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_17" default="true" project-jdk-name="17" project-jdk-type="JavaSDK" />
 </project>

@@ -241,7 +241,7 @@ public class StoreArchiver {
     /**
      * Removed the version of the object from the store. This either returns
      * or throws a runtime exception from the store.
-     * <h3>Note</h3>>
+     * <h3>Note</h3>
      * There is not a version with signature remove(Identifier) because of the
      * risk of removing the base object if the wrong .
      *

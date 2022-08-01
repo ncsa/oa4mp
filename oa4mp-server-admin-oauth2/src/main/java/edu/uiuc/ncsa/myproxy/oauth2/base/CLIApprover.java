@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oauth2.base;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.loader.OA4MPConfigurationLoader;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2ConfigurationLoader;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironmentImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.AbstractCLIApprover;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
@@ -14,7 +14,7 @@ import java.io.File;
 public class CLIApprover extends AbstractCLIApprover {
     @Override
     public ConfigurationLoader<? extends ServiceEnvironmentImpl> getLoader() {
-        return new OA4MPConfigurationLoader(getConfigurationNode());
+        return new OA2ConfigurationLoader<>(getConfigurationNode());
     }
 
     public static void main(String[] args) {

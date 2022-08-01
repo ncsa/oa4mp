@@ -1,8 +1,8 @@
 package edu.uiuc.ncsa.myproxy.oauth2.base;
 
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.BaseClient;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
-import edu.uiuc.ncsa.security.delegation.storage.BaseClient;
 import edu.uiuc.ncsa.security.util.cli.BasicSorter;
 
 import java.util.ArrayList;

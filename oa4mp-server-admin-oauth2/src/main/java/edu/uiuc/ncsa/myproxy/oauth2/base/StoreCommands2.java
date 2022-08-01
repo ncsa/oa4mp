@@ -3,12 +3,12 @@ package edu.uiuc.ncsa.myproxy.oauth2.base;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import com.typesafe.config.ConfigRenderOptions;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenUtils;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.XMLConverter;
 import edu.uiuc.ncsa.security.core.util.*;
-import edu.uiuc.ncsa.security.delegation.token.impl.TokenUtils;
 import edu.uiuc.ncsa.security.storage.XMLMap;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.sql.SQLStore;
@@ -145,7 +145,6 @@ public abstract class StoreCommands2 extends StoreCommands {
     /**
      * Get the {@link MapConverter} for the store.
      *
-     * @return
      */
 
     @Override
@@ -1940,7 +1939,7 @@ public abstract class StoreCommands2 extends StoreCommands {
     public static String FORCE_COPY_FLAG = "-f";
 
     /**
-     * resolves key shorthand of >key_name or -key key_name
+     * resolves key shorthand of &amp;key_name or -key key_name
      * returns null if no such key OR if it is not valid in the
      * key list.
      *

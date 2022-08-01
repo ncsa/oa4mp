@@ -1,0 +1,20 @@
+<qdl name="qdl-default"
+     enabled="true"
+     debug="trace"
+     server_mode="false"
+     script_path="vfs#/scripts/">
+    <virtual_file_systems>
+        <vfs type="pass_through"
+             access="r">
+            <root_dir>/opt/cilogon-oa2/var/qdl/scripts</root_dir>
+            <scheme><![CDATA[vfs]]></scheme>
+            <mount_point>/scripts</mount_point>
+        </vfs>
+    </virtual_file_systems>
+    <modules>
+        <module type="java"
+                import_on_start="true">
+            <class_name>edu.uiuc.ncsa.myproxy.oa4mp.qdl.OA2QDLLoader</class_name>
+        </module>
+    </modules>
+</qdl>

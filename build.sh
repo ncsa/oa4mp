@@ -11,16 +11,7 @@ export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
 DEPLOY_ROOT=/home/ncsa/dev/temp-deploy
 SVN_ROOT=/home/ncsa/dev/ncsa-git
 
-GITHUB_ROOT=/home/ncsa/dev/ncsa-git/cilogon.github.io.git
-# convert pdfs
-cd $GITHUB_ROOT/qdl/docs
-echo "converting docs to PDF"
 
-lowriter --headless --convert-to pdf ~/dev/ncsa-git/oa4mp/oa4mp-qdl/src/main/docs/qdl_oa4mp_store_access.odt
-lowriter --headless --convert-to pdf ~/dev/ncsa-git/oa4mp/oa4mp-qdl/src/main/docs/creating_claim_sources2.odt
-lowriter --headless --convert-to pdf ~/dev/ncsa-git/oa4mp/oa4mp-qdl/src/main/docs/claim_source_examples.odt
-lowriter --headless --convert-to pdf ~/dev/ncsa-git/oa4mp/oa4mp-qdl/src/main/docs/token_handler_configuration.odt
-echo "done converting PDFs"
 
 
 OA4MP_ROOT=$SVN_ROOT/oa4mp

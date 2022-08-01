@@ -27,7 +27,7 @@
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
-            <artifactId>d-server</artifactId>
+            <artifactId>server</artifactId>
             <version>5.2-SNAPSHOT</version>
         </dependency>
         <dependency>

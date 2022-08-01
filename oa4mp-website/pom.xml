@@ -79,7 +79,7 @@
     <dependencies>
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
-            <artifactId>d-client</artifactId>
+            <artifactId>client</artifactId>
             <version>5.2-SNAPSHOT</version>
         </dependency>
 
@@ -102,7 +102,7 @@
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
-            <artifactId>d-server</artifactId>
+            <artifactId>server</artifactId>
             <version>5.2-SNAPSHOT</version>
         </dependency>
         <dependency>
@@ -130,11 +130,7 @@
             <artifactId>oa4mp-client-api</artifactId>
             <version>5.2-SNAPSHOT</version>
         </dependency>
-        <dependency>
-            <groupId>edu.uiuc.ncsa.myproxy</groupId>
-            <artifactId>oa4mp-client-loader-oauth1</artifactId>
-            <version>5.2-SNAPSHOT</version>
-        </dependency>
+
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>oa4mp-client-loader-oauth2</artifactId>
@@ -146,25 +142,15 @@
             <artifactId>oa4mp-server-api</artifactId>
             <version>5.2-SNAPSHOT</version>
         </dependency>
-        <dependency>
-            <groupId>edu.uiuc.ncsa.myproxy</groupId>
-            <artifactId>oa4mp-server-loader-oauth1</artifactId>
-            <version>5.2-SNAPSHOT</version>
-        </dependency>
+
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>oa4mp-server-loader-oauth2</artifactId>
             <version>5.2-SNAPSHOT</version>
         </dependency>
-
-<!--        <dependency>
-            <groupId>edu.uiuc.ncsa.security.delegation</groupId>
-            <artifactId>ncsa-security-oauth-1.0a</artifactId>
-            <version>5.2-SNAPSHOT</version>
-        </dependency>-->
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
-            <artifactId>d-oauth2</artifactId>
+            <artifactId>oauth2</artifactId>
             <version>5.2-SNAPSHOT</version>
         </dependency>
         <dependency>

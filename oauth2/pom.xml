@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>d-oauth2</artifactId>
+    <artifactId>oauth2</artifactId>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
@@ -28,13 +28,13 @@
     <dependencies>
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
-            <artifactId>d-server</artifactId>
+            <artifactId>server</artifactId>
             <version>5.2-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
-            <artifactId>d-client</artifactId>
+            <artifactId>client</artifactId>
             <version>5.2-SNAPSHOT</version>
         </dependency>
         <dependency>
@@ -66,8 +66,8 @@
       next dependency is needed for testing the JWT runner scripting framework
 -->
            <dependency>
-            <groupId>edu.uiuc.ncsa.security</groupId>
-            <artifactId>ncsa-qdl</artifactId>
+            <groupId>edu.uiuc.ncsa.qdl</groupId>
+            <artifactId>language</artifactId>
             <version>1.4-QDL-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
