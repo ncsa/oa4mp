@@ -30,7 +30,7 @@ public class RFC7009 extends TokenManagerServlet {
         // Reminder: The next calls check that the requesting client is the same as the
         // one in the transaction, thus preventing hijacking.
         try {
-            if (!HeaderUtils.getAuthHeader(req, HeaderUtils.BASIC_HEADER).isEmpty()) {
+            if (!OA2HeaderUtils.getAuthHeader(req, OA2HeaderUtils.BASIC_HEADER).isEmpty()) {
                 state = checkBasic(req);
             } else {
                 state = checkBearer(req);

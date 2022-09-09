@@ -17,22 +17,17 @@
 
 <h2>Prerequisites</h2>
 <ul>
-    <li>Tomcat 6 or 7. SSL should be configured and enabled.</li>
-    <li>Java <b>1.8</b> or above. Only the Oracle VM is officially supported. Do not use OpenJDK. Note that versions previous
+    <li>Tomcat 9 or above. SSL should be configured and enabled. Tomcat 8 will no longer work with the
+    compiler version of Java (11 or above) we are using.</li>
+    <li>Java <b>1.9</b> or above. Note that versions previous
     to Java 1.7 will not work due to internal changes by Sun to their security APIs.</li>
-    <li>(Optional) Maven 3.0+ or higher (only if building from the source)</li>
+    <li>(Optional) Maven 3.3+ or higher (only if building from the source)</li>
     <li>(Optional) Apache 2, configured to work with Tomcat.</li>
 </ul>
 <h2>Getting and deploying from the war.</h2>
 
 <p>You may most easily a bare-bones version for testing by downloading the current reference war:</p>
-<h5>OAuth 1.0a</h5>
-<p><a title="OA4MP client war"
-      href="https://svn.code.sf.net/p/cilogon/code/tags/latest/client/client.war">client.war</a>
-     <br></br>
-      <a title="PGP signature file" href="https://svn.code.sf.net/p/cilogon/code/tags/latest/client/client.war.asc">(PGP signature)</a>
-</p>
-<h5>OAuth 2.0</h5>
+
 <p><a title="OA4MP client war"
       href="https://github.com/ncsa/OA4MP/releases/latest/client2.war">client2.war</a>
      <br></br>
@@ -52,29 +47,17 @@ use the pre-compiled war.
 
 <h3>Getting and building the source</h3>
 If you need/want to customize the basic package, you would download the source from
-<a title="oa4mp oauth 1.0a sources" href="https://github.com/ncsa/OA4MP">Git Hub</a>
+<a title="oa4mp sources" href="https://github.com/ncsa/OA4MP">Git Hub</a>
 This will resolve the correct dependencies. Build the module you want by issuing
 <pre>mvn clean install</pre>
 and you should end up with a deployable war.
 
-<h5>OAuth 1.0a</h5>
-<p>If you decide to write your own OAuth 1.0a webapp, you should use the following module:</p>
-<pre>
-    &lt;dependency&gt;
-        &lt;artifactId&gt;oa4mp-client-oauth1&lt;/artifactId&gt;
-        &lt;groupId&gt;edu.uiuc.ncsa.myproxy&lt;/groupId&gt;
-        &lt;version&gt;4.3&lt;/version&gt;
-    &lt;/dependency&gt;
-</pre>
-
-
-<h5>OAuth 2.0</h5>
-<p>If you decide to write your own OAuth 2.0 webapp, you should use the following module:</p>
+<p>If you decide to write your own OA4MP webapp, you should use the following module:</p>
 <pre>
     &lt;dependency&gt;
         &lt;artifactId&gt;oa4mp-client-oauth2&lt;/artifactId&gt;
         &lt;groupId&gt;edu.uiuc.ncsa.myproxy&lt;/groupId&gt;
-        &lt;version&gt;4.3&lt;/version&gt;
+        &lt;version&gt;5.2-SNAPSHOT&lt;/version&gt;
     &lt;/dependency&gt;
 </pre>
 

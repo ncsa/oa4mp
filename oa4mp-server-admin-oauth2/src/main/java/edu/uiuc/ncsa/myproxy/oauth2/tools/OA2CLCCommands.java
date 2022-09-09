@@ -327,7 +327,20 @@ public class OA2CLCCommands extends CLCCommands {
         say(currentURI.toString());
     }
 
+    // CIL-1464
+    public boolean isUseClipboard() {
+        return useClipboard;
+    }
+
+    public void setUseClipboard(boolean useClipboard) {
+        this.useClipboard = useClipboard;
+    }
+
+    boolean useClipboard = true;
     protected void copyToClipboard(String target, String s) {
+        if(!isUseClipboard()){
+            return;
+        }
         try {
             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
             if (clipboard != null) {
@@ -359,6 +372,9 @@ public class OA2CLCCommands extends CLCCommands {
      * @return
      */
     protected boolean hasClipboard() {
+        if(!isUseClipboard()){
+            return false;
+        }
         // Annoying thing #42. we check if the clipboard exists by trying to read from it
         // this is the most reliable cross platform way to do it. The problem is that
         // error messages can be generated very deep in the stack that cannot be intercepted
@@ -452,6 +468,10 @@ public class OA2CLCCommands extends CLCCommands {
                 return;
             }
             // no arg. get it from the clipboard
+            if(!isUseClipboard()){
+                say("Clipboard use disabled");
+                return;
+            }
             try {
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
                 x = (String) clipboard.getData(DataFlavor.stringFlavor);
@@ -1850,4 +1870,8 @@ public class OA2CLCCommands extends CLCCommands {
         get_user_info(inputLine);
     }
 
+    @Override
+    public OA2ClientEnvironment getCe() {
+        return (OA2ClientEnvironment) super.getCe();
+    }
 }

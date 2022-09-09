@@ -19,13 +19,13 @@
         <maven.javadoc.skip>true</maven.javadoc.skip>
     </properties>
     <dependencies>
-        <dependency>
+ <!--       <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>oa4mp-webapp</artifactId>
             <version>5.2-SNAPSHOT</version>
             <type>war</type>
             <scope>runtime</scope>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>jstl</groupId>
             <artifactId>jstl</artifactId>
@@ -89,19 +89,14 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.4.0</version>
+            <version>42.4.1</version>
         </dependency>
         <dependency>
             <groupId>org.mariadb.jdbc</groupId>
             <artifactId>mariadb-java-client</artifactId>
             <version>3.0.6</version>
         </dependency>
-<!--
-        <dependency>
-            <groupId>edu.uiuc.ncsa.security.delegation</groupId>
-            <artifactId>ncsa-security-oauth-1.0a</artifactId>
-            <version>5.2-SNAPSHOT</version>
-        </dependency>-->
+
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>

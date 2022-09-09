@@ -1,0 +1,66 @@
+/*
+ ldapsearch \
+  -LLL \
+  -H ldaps://ldap.cilogon.org \
+  -x \
+  -b 'ou=people,o=KAGRA-LIGO,o=CO,dc=gwastronomy-data,dc=cgca,dc=uwm,dc=edu'
+  '(eduPersonPrincipalName=duncan.meacher@shibbi.pki.itc.u-tokyo.ac.jp)'
+
+
+ ldapsearch -LLL -H ldaps://ldap.cilogon.org  -x  -b 'ou=people,o=KAGRA-LIGO,o=CO,dc=gwastronomy-data,dc=cgca,dc=uwm,dc=edu'  '(eduPersonPrincipalName=duncan.meacher@shibbi.pki.itc.u-tokyo.ac.jp)'
+ */
+
+     ini. := file_read('/home/ncsa/dev/csd/config/ini/ligo-ldap.ini',2).'ligo_prod';
+     //ini. := file_read('vfs#/scripts/ligo/ldap.ini',2).'ligo';
+     user := script_args(0); // This is actually the EPPN for the user.
+
+           kagra_cfg.'address' := 'ldap.cilogon.org';
+              kagra_cfg.'port' := 636;
+        kagra_cfg.'claim_name' := 'uid';
+              kagra_cfg.'type' := 'ldap';
+       kagra_cfg.'search_base' := 'ou=people,o=KAGRA-LIGO,o=CO,dc=gwastronomy-data,dc=cgca,dc=uwm,dc=edu';
+         kagra_cfg.'ldap_name' := 'eduPersonPrincipalName';
+             kagra_cfg.groups. := ['isMemberOf'];
+  kagra_cfg.search_attributes. := ['isMemberOf'];
+         kagra_cfg.'auth_type' := 'none';
+     kagra_cfg.'fail_on_error' := true;';
+               kagra_response. := get_claims(create_source(kagra_cfg.), user);
+            γ. :=  is_defined(kagra_response.'isMemberOf')?kagra_response.'isMemberOf':[];
+
+            ligo_cfg.'address' := ini.'address';
+               ligo_cfg.'port' := 636;
+         ligo_cfg.'claim_name' := 'uid';
+               ligo_cfg.'type' := 'ldap';
+        ligo_cfg.'search_base' := 'ou=people,dc=ligo,dc=org';
+          ligo_cfg.'ldap_name' := 'uid';
+              ligo_cfg.groups. := ['isMemberOf'];
+   ligo_cfg.search_attributes. := ['isMemberOf'];
+          ligo_cfg.'auth_type' := 'simple';
+           ligo_cfg.'username' := ini.'username';
+           ligo_cfg.'password' := ini.'password';
+      ligo_cfg.'fail_on_error' := true;
+                ligo_response. := get_claims(create_source(ligo_cfg.), head(user, '@'));
+             γ. := γ. ~ (is_defined(ligo_response.'isMemberOf')?ligo_response.'isMemberOf':[]);
+
+if[
+      size(γ.) == 0
+  ]then[
+          sys_err.ok := false;
+     sys_err.message := 'Missing group information. Cannot determine scopes.';
+  sys_err.error_type := 'access_denied';
+     return();
+];
+
+
+                ζ.'Communities:LSCVirgoLIGOGroupMembers' := ['read:/DQSegDB' ,'read:/frames', 'read:/GraceDB','write:/GraceDB'];   //CIL-1345
+                   ζ.'Communities:LVC:SegDB:SegDBWriter' := ['write:/DQSegDB'];
+                     ζ.'gw-astronomy:KAGRA-LIGO:members' := ['read:/GraceDB', 'read:/frames','write:/GraceDB']; //CIL-1345, CIL-1427
+   ζ.'Services:XRootD:SciTokens:write-frames:authorized' := ['write:/frames']; //CIL-1414,
+    ζ.'Services:XRootD:SciTokens:read-frames:authorized' := ['read:/frames']; //CIL-1415
+
+ //  return(reduce(@~,ζ\(γ\*\name)));
+     return(~values(mask(ζ., in_group2(keys(ζ.),γ.))));
+
+     /*
+g. := script_load('/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-admin-oauth2/src/main/resources/qdl/ligo/vo2/get_user.qdl', 'duncan.meacher@shibbi.pki.itc.u-tokyo.ac.jp')
+     */

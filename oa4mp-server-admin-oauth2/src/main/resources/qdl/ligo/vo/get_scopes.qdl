@@ -6,11 +6,33 @@
  block[
    γ. := script_args(0);
 
-   ζ.'Communities:LSCVirgoLIGOGroupMembers' := ['read:/DQSegDB' ,'read:/frames', 'read:/GraceDB','write:/GraceDB'];   //CIL-1345
-      ζ.'Communities:LVC:SegDB:SegDBWriter' := 'write:/DQSegDB';
-        ζ.'gw-astronomy:KAGRA-LIGO:members' := ['read:/GraceDB', 'read:/frames','write:/GraceDB']; //CIL-1345
-
+                ζ.'Communities:LSCVirgoLIGOGroupMembers' := ['read:/DQSegDB' ,'read:/frames', 'read:/GraceDB','write:/GraceDB'];   //CIL-1345
+                   ζ.'Communities:LVC:SegDB:SegDBWriter' := 'write:/DQSegDB';
+                     ζ.'gw-astronomy:KAGRA-LIGO:members' := ['read:/GraceDB', 'read:/frames','write:/GraceDB']; //CIL-1345
+   ζ.'Services:XRootD:SciTokens:write-frames:authorized' := ['write:/frames']; //CIL-1414
+    ζ.'Services:XRootD:SciTokens:read-frames:authorized' := ['read:/frames']; //CIL-1415
         /*
+
+CIL-1414:
+
+Please enable the "write:/frames" scope for LIGO users in the Services:XRootD:SciTokens:write-frames:authorized LIGO LDAP group.
+
+CIL-1415:
+
+Set "scope" to "read:/frames" if:
+
+    user is in the "Communities:LSCVirgoLIGOGroupMembers" group in ldap.ligo.org
+    user is in the "gw-astronomy:KAGRA-LIGO:members" group in ldap.gw-astronomy.cilogon.org
+
+Warren Anderson requests that we use "Services:XRootD:SciTokens:read-frames:authorized" instead of "Communities:LSCVirgoLIGOGroupMembers".
+
+So please update the policy as follows.
+
+Set "scope" to "read:/frames" if:
+
+    user is in the "Services:XRootD:SciTokens:read-frames:authorized" group in ldap.ligo.org
+    user is in the "gw-astronomy:KAGRA-LIGO:members" group in ldap.gw-astronomy.cilogon.org
+
 
 CIL-1345:
 For LIGO users in either:
@@ -26,11 +48,10 @@ existing scopes are unchanged.
 
         */
 
-   return(~values(mask(ζ., in_group2(keys(ζ.),γ.))));
-   /*
-   Alternate as of 1.4.7 if γ is structured as per g. in the example below
+ //  return(~values(mask(ζ., in_group2(keys(ζ.),γ.))));
+
+ //  Alternate as of 1.4.7 if γ is structured as per g. in the example below
    return(reduce(@~,ζ\(γ\*\name)));
-   */
    ]; // end block
 
     /*

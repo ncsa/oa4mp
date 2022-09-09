@@ -1,0 +1,59 @@
+/*
+{"tokens": {"access": {
+ "qdl":  {
+  "load": "ligo/vo2/at.qdl",
+  "xmd": {"exec_phase":   [
+   "post_token",
+   "post_exchange",
+   "post_refresh"
+  ]}
+ },
+ "type": "sci_token"
+}}}
+
+   Sets up the access token in the initial pass.
+*/
+
+ if[
+       !is_defined(claims.'eppn')
+   ]then[
+           sys_err.ok := false;
+      sys_err.message := 'Missing EPPN. Cannot determine scopes.';
+   sys_err.error_type := 'invalid_request';
+      return();
+ ];
+
+all_audience. := ['ANY', 'LIGO', 'segments.ligo.org']; // constant
+access_token.'ver' := 'scitoken:2.0';
+
+// get current allowed scopes based on group memberships
+  allowed_scopes. := script_load('ligo/vo2/get_scopes.qdl', claims.'eppn');
+    sys_err.ok?null:return(); 
+
+ if[
+    0 < size(scopes.)
+  ][
+    // If they request different scopes, honor it. Otherwise don't.
+    allowed_scopes. := resolve_templates(allowed_scopes., scopes., true);
+  ];
+ access_token.scope := detokenize(unique(allowed_scopes.), ' ', 2); // turn in to string, omit duplications, trailing space
+
+/*
+   Audience processing. If nothing requested, return everything, otherwise
+   return the subset of their request that is on our list of allowed audiences.
+   There is no error in requesting audiences we do not recognize, we just
+   don't honor them.
+*/
+  if[
+    size(audience.) == 0
+   ][
+      access_token.aud. := all_audience.;
+   ]else[
+      // return only things we recognize.
+      access_token.aud. :=mask(all_audience.,  has_value(all_audience., audience.));
+   ];
+
+claims.'sub' := claims.'eppn';
+access_token.'sub' := claims.'eppn';
+ say('*** LIGO: final access token = ' + to_string(access_token.));
+ say('*** LIGO: final claims  = ' + to_string(claims.));

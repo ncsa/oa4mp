@@ -42,10 +42,10 @@ public abstract class MultiAuthServlet extends MyProxyDelegationServlet {
       public Client getClient(HttpServletRequest request) {
           // Check is this is in the headers. If not, fall through to checking parameters.
           OA2Client client = null;
-          Identifier paramID = HeaderUtils.getIDFromParameters(request);
+          Identifier paramID = OA2HeaderUtils.getIDFromParameters(request);
           Identifier headerID = null;
           try {
-              headerID = HeaderUtils.getIDFromHeaders(request);
+              headerID = OA2HeaderUtils.getIDFromHeaders(request);
           } catch (UnsupportedEncodingException e) {
               throw new NFWException("Error: internal use of UTF-8 encoding failed");
           } catch (Throwable tt) {
@@ -84,10 +84,10 @@ public abstract class MultiAuthServlet extends MyProxyDelegationServlet {
     public AdminClient getAdminClient(HttpServletRequest request) {
         // Check is this is in the headers. If not, fall through to checking parameters.
         AdminClient adminClient = null;
-        Identifier paramID = HeaderUtils.getIDFromParameters(request);
+        Identifier paramID = OA2HeaderUtils.getIDFromParameters(request);
         Identifier headerID = null;
         try {
-            headerID = HeaderUtils.getIDFromHeaders(request);
+            headerID = OA2HeaderUtils.getIDFromHeaders(request);
         } catch (UnsupportedEncodingException e) {
             throw new NFWException("Error: internal use of UTF-8 encoding failed");
         } catch (Throwable tt) {

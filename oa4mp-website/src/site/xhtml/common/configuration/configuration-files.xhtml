@@ -50,42 +50,37 @@
     <tr>
         <th>Component</th>
         <th>Parameter</th>
-        <th>OAuth 1.0a</th>
-        <th>OAuth 2.0</th>
+        <th>Value</th>
     </tr>
     <tr>
         <th rowspan="2">client</th>
         <td>file</td>
-        <td>oa4mp:client.config.file</td>
         <td>oa4mp:oauth2.client.config.file</td>
     </tr>
     <tr>
         <td>name</td>
-        <td>oa4mp:client.config.name</td>
         <td>oa4mp:oauth2.client.config.name</td>
     </tr>
     <tr>
         <th rowspan="2">server</th>
         <td>file</td>
-        <td>oa4mp:server.config.file</td>
         <td>oa4mp:oauth2.server.config.file</td>
     </tr>
     <tr>
         <td>name</td>
-        <td>oa4mp:server.config.name</td>
         <td>oa4mp:oauth2.server.config.name</td>
     </tr>
 </table>
-<h4>A server example for OAuth 1.0a</h4>
+<h4>A server example.</h4>
 This how the the file and name parameters would be specified in the web.xml file:
 <pre>
 &lt;context-param&gt;
-    &lt;param-name&gt;oa4mp:server.config.file&lt;/param-name&gt;
+    &lt;param-name&gt;oa4mp:oauth2.server.config.file&lt;/param-name&gt;
     &lt;param-value&gt;/path/to/cfg.xml&lt;/param-value&gt;
 &lt;/context-param&gt;
 
 &lt;context-param&gt;
-    &lt;param-name&gt;oa4mp:server.config.name&lt;/param-name&gt;
+    &lt;param-name&gt;oa4mp:oauth2.server.config.name&lt;/param-name&gt;
     &lt;param-value&gt;default&lt;/param-value&gt;
 &lt;/context-param&gt;
 </pre>
@@ -118,7 +113,7 @@ server.
 </pre>
 
 <h3>Included files.</h3>
-As of OA4MP 1.1, configuration files may now be included in other configuration files. Note that
+Configuration files may now be included in other configuration files. Note that
 <ul>
     <li>the other files must be completely correct syntactically. So no snippets.</li>
     <li>there is no limit on the number of files that may be included and referenced files can reference other files.

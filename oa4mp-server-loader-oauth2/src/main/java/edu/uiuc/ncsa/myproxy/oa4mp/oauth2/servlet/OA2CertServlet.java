@@ -48,7 +48,7 @@ public class OA2CertServlet extends ACS2 {
         if (rawAT == null) {
             // this just means that the access token was not sent as a parameter. It
             // might have been sent as a bearer token.
-            List<String> bearerTokens = HeaderUtils.getAuthHeader(request, "Bearer");
+            List<String> bearerTokens = OA2HeaderUtils.getAuthHeader(request, "Bearer");
             if (bearerTokens.isEmpty()) {
                 throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
                         "missing access token",
@@ -107,7 +107,7 @@ public class OA2CertServlet extends ACS2 {
         String rawID = req.getParameter(CONST(CONSUMER_KEY));
         String rawSecret = getFirstParameterValue(req, CLIENT_SECRET);
         // According to the spec. this must be in a Basic Authz header if it is not sent as parameter
-        List<String> basicTokens = HeaderUtils.getAuthHeader(req, "Basic");
+        List<String> basicTokens = OA2HeaderUtils.getAuthHeader(req, "Basic");
         if (2 < basicTokens.size()) {
             // too many tokens to unscramble
             throw new OA2GeneralError(OA2Errors.INVALID_TOKEN,

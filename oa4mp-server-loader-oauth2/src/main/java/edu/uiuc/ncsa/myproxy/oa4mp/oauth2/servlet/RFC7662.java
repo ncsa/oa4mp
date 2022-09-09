@@ -28,7 +28,7 @@ public class RFC7662 extends TokenManagerServlet {
         State state;
         TokenImpl token;
         try {
-            if (!HeaderUtils.getAuthHeader(req, HeaderUtils.BASIC_HEADER).isEmpty()) {
+            if (!OA2HeaderUtils.getAuthHeader(req, OA2HeaderUtils.BASIC_HEADER).isEmpty()) {
                 state = checkBasic(req);
             } else {
                 state = checkBearer(req);

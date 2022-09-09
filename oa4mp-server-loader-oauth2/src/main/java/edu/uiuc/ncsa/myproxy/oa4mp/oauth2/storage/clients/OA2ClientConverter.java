@@ -380,7 +380,6 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         JSONObject config = (JSONObject) getJsonUtil().getJSONValue(json, getCK2().cfg());
         if (config != null) {
             v.setConfig(config);
-
             v.setRawConfig(config.toString());
         }
         v.setExtendedAttributes(json.getJSONObject(getCK2().ea()));

@@ -4,6 +4,8 @@ import net.sf.json.JSONObject;
 
 import java.util.ArrayList;
 
+import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.AbstractAccessTokenHandler.AT_DEFAULT_HANDLER_TYPE;
+
 /**
  * Common configuration for all access tokens. This includes things like the lifetime,
  * issuer and what not.
@@ -81,5 +83,13 @@ public class AccessTokenConfig extends AbstractCommonATandRTConfig {
         acc2.fromJSON(acc.toJSON());
         System.out.println(acc2.toJSON().toString(1));
 
+    }
+
+    @Override
+    public String getType() {
+        if(type == null){
+           type =  AT_DEFAULT_HANDLER_TYPE;
+        }
+        return type;
     }
 }

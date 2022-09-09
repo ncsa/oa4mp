@@ -107,25 +107,4 @@ public interface OA2Errors {
 
     String INVALID_TARGET = "invalid_target";
 
-/*    public static class ErrorUtil {
-        public static int lookupErrorCode(String errorDescription) {
-            if (errorDescription == null && errorDescription.length() == 0) return INVALID_ERROR;
-            if (errorDescription.equals(INTERACTION_REQUIRED)) return INTERACTION_REQUIRED_CODE;
-            if(errorDescription.equals(LOGIN_REQUIRED)) return LOGIN_REQUIRED_CODE;
-            if(errorDescription.equals(ACCOUNT_SELECTION_REQUIRED)) return ACCOUNT_SELECTION_REQUIRED_CODE;
-            if(errorDescription.equals(CONSENT_REQUIRED)) return CONSENT_REQUIRED_CODE;
-            if(errorDescription.equals(INVALID_REQUEST_OBJECT)) return INVALID_REQUEST_OBJECT_CODE;
-            if(errorDescription.equals(INVALID_REQUEST)) return INVALID_REQUEST_CODE;
-            if(errorDescription.equals(INVALID_REQUEST_URI)) return INVALID_REQUEST_URI_CODE;
-            if(errorDescription.equals(UNAUTHORIZED_CLIENT)) return UNAUTHORIZED_CLIENT_CODE;
-            if(errorDescription.equals(ACCESS_DENIED)) return ACCESS_DENIED_CODE;
-            if(errorDescription.equals(UNSUPPORTED_RESPONSE_TYPE)) return UNSUPPORTED_RESPONSE_TYPE_CODE;
-            if(errorDescription.equals(INVALID_SCOPE)) return INVALID_SCOPE_CODE;
-            if(errorDescription.equals(TEMPORARILY_UNAVAILABLE)) return TEMPORARILY_UNAVAILABLE_CODE;
-            if(errorDescription.equals(SERVER_ERROR)) return SERVER_ERROR_CODE;
-            if(errorDescription.equals(INVALID_TOKEN)) return INVALID_TOKEN_CODE;
-            if(errorDescription.equals(INVALID_TARGET)) return INVALID_TARGET_CODE;
-            return UNKNOWN_ERROR;
-        }
-    }*/
 }

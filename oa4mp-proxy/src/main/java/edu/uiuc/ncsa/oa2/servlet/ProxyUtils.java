@@ -199,6 +199,7 @@ public class ProxyUtils {
         AuthorizationServletConfig asc = oa2SE.getAuthorizationServletConfig();
         // next line is where the CLC is first created in the flow, so can't call getCLC
         OA2CLCCommands clcCommands = new OA2CLCCommands(true, oa2SE.getMyLogger(), new OA2CommandLineClient(oa2SE.getMyLogger()));
+        clcCommands.setUseClipboard(false); // Don't put stuff in the clipboard.
         if (t.getOA2Client().isDebugOn()) {
             // Turn it all on if the client is in debug mode.
             clcCommands.setVerbose(true);
@@ -206,6 +207,7 @@ public class ProxyUtils {
             clcCommands.setPrintOuput(true);
         }
         clcCommands.load(new InputLine("dummy ", asc.getCfgName(), asc.getCfgFile()));
+        clcCommands.getCe().setScopes(t.getScopes()); // CIL-1419 make sure requests match allowed scopes
         return clcCommands;
     }
 

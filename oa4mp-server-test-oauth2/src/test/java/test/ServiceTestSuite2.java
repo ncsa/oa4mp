@@ -31,7 +31,6 @@ import org.junit.runners.Suite;
 
 @Suite.SuiteClasses({
         QDLTests.class,
-        KeyTest.class,
         MultipleInheritanceTest.class,
         ConfigInheritanceTest.class,
         TemplateTest.class,

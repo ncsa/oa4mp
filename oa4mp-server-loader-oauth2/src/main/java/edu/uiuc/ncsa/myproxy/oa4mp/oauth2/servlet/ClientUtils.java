@@ -194,10 +194,10 @@ public class ClientUtils {
     public static String getClientSecret(HttpServletRequest request, String raw) {
         String rawSecret = null;
         // Fix for CIL-430. Check the header and decode as needed.
-        if (HeaderUtils.hasBasicHeader(request)) {
+        if (OA2HeaderUtils.hasBasicHeader(request)) {
             DebugUtil.trace(ClientUtils.class, "doIt: Got the header.");
             try {
-                rawSecret = HeaderUtils.getSecretFromHeaders(request);
+                rawSecret = OA2HeaderUtils.getSecretFromHeaders(request);
             } catch (UnsupportedEncodingException e) {
                 throw new NFWException("Error: internal use of UTF-8 encoding failed");
             }

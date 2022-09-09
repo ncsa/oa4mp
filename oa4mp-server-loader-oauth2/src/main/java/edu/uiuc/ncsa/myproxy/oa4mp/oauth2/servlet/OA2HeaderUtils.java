@@ -1,21 +1,12 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2ATException;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Errors;
 import edu.uiuc.ncsa.security.servlet.AbstractServlet;
-import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
-import org.apache.commons.codec.binary.Base64;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceConstantKeys.CONSUMER_KEY;
 
@@ -26,11 +17,14 @@ import static edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceConstantKeys.CONSUMER_KE
  * <p>Created by Jeff Gaynor<br>
  * on 9/25/17 at  5:33 PM
  */
-public class HeaderUtils {
+public class OA2HeaderUtils extends edu.uiuc.ncsa.security.servlet.HeaderUtils {
+
+/*
     public static final String BASIC_HEADER = "Basic";
     public static final String BEARER_HEADER = "Bearer";
 
     static boolean deepDebugOn = false; // turns on a TON of low level messages.
+*/
     /**
      * This gets the tokens from the authorization header. There are several types and it is possible to have several
      * values passed in, so this returns an array of string rather than a single value. A downside with passing
@@ -39,9 +33,10 @@ public class HeaderUtils {
      * empty list.
      *
      * @param request
-     * @param type    The type of token, e.g. "Bearer" or "Basic"
+     * @ param type    The type of token, e.g. "Bearer" or "Basic"
      * @return
      */
+/*
     public static List<String> getAuthHeader(HttpServletRequest request, String type) {
         if(deepDebugOn) {
             ServletDebugUtil.printAllParameters(HeaderUtils.class, request);
@@ -161,8 +156,9 @@ public class HeaderUtils {
 
 
     }
+*/
 
-    public static String[] getCredentialsFromHeaders(HttpServletRequest request) throws UnsupportedEncodingException {
+ /*   public static String[] getCredentialsFromHeaders(HttpServletRequest request) throws UnsupportedEncodingException {
         return getCredentialsFromHeaders(request, "Basic"); // default
     }
 
@@ -178,6 +174,7 @@ public class HeaderUtils {
         return BasicIdentifier.newID(creds[ID_INDEX]);
 
     }
+*/
 
     public static String getATFromParameter(HttpServletRequest request) {
         String rawID = request.getParameter(OA2Constants.ACCESS_TOKEN);

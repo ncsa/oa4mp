@@ -95,7 +95,7 @@ public class QDLTests extends AbstractQDLTester {
         cfg.scheme := 'vfs';
         cfg.mount_point := '/test';
         cfg.access := 'rw';
-        cfg.root_dir := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources';
+        cfg.root_dir := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-`server`-test-oauth2/src/main/resources';
         vfs_mount(cfg.);
          */
         String testClaimsFile = "vfs2#/test2/test-claims.json";

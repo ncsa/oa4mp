@@ -1,19 +1,19 @@
 package edu.uiuc.ncsa.myproxy.oauth2.base;
 
-import edu.uiuc.ncsa.security.core.Identifiable;
-import edu.uiuc.ncsa.security.core.Identifier;
-import edu.uiuc.ncsa.security.core.Store;
-import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
-import edu.uiuc.ncsa.security.core.util.Iso8601;
-import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.core.util.StringUtils;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.BaseClient;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.ClientApprovalKeys;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.BaseClientStore;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApprovalStore;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.BaseClient;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.ClientApprovalKeys;
+import edu.uiuc.ncsa.security.core.Identifiable;
+import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.Store;
+import edu.uiuc.ncsa.security.core.util.Iso8601;
+import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.util.cli.ExitException;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
+import edu.uiuc.ncsa.security.util.cli.Sortable;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -59,6 +59,13 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
     protected JSON inputJSON(JSON oldJSON, String componentName) throws IOException {
         return inputJSON(oldJSON, componentName, false);
     }
+    protected Sortable getSortable() {
+        if(sortable == null){
+            sortable = new ClientSorter();
+        }
+        return sortable;
+    }
+
 
     @Override
     public void print_help(InputLine inputLine) throws Exception {
@@ -311,50 +318,7 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
         clientApprovalStoreCommands.approve(ca);
 
     }
-
-    @Override
-    public boolean update(Identifiable identifiable) throws IOException {
-
-        BaseClient client = (BaseClient) identifiable;
-
-        String newIdentifier = null;
-
-        info("Starting client update for id = " + client.getIdentifierString());
-        say("Update the values. A return accepts the existing or default value in []'s");
-
-        newIdentifier = getInput("enter the identifier", client.getIdentifierString());
-        boolean removeCurrentClient = false;
-        Identifier oldID = client.getIdentifier();
-
-        // no clean way to do this.
-        client.setName(getInput("enter the name", client.getName()));
-        client.setEmail(getInput("enter email", client.getEmail()));
-        // set file not found message.
-        extraUpdates(client);
-        sayi("here is the complete client:");
-        longFormat(client);
-        if (!newIdentifier.equals(client.getIdentifierString())) {
-            //  sayi2(" remove client with id=\"" + client.getIdentifier() + "\" [y/n]? ");
-            removeCurrentClient = isOk(readline(" remove client with id=\"" + client.getIdentifier() + "\" [y/n]? "));
-            client.setIdentifier(BasicIdentifier.newID(newIdentifier));
-        }
-        //  sayi2("save [y/n]?");
-        if (isOk(readline("save [y/n]?"))) {
-            //getStore().save(client);
-            if (removeCurrentClient) {
-                info("removing client with id = " + oldID);
-                getStore().remove(client.getIdentifier());
-                sayi("client with id " + oldID + " removed. Be sure to save any changes.");
-            }
-            sayi("client updated.");
-            info("Client with id " + client.getIdentifierString() + " saving...");
-
-            return true;
-        }
-        sayi("client not updated, losing changes...");
-        info("User terminated updates for client with id " + client.getIdentifierString());
-        return false;
-    }
+    
 
     @Override
     protected void rmCleanup(Identifiable x) {

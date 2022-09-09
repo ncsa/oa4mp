@@ -21,6 +21,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2ConfigurationLoader.REFRESH_TOKEN_LIFETIME_DEFAULT;
 import static edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims.*;
 import static edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse.RC_NOT_RUN;
 import static edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse.RC_OK;
@@ -117,8 +118,7 @@ public class BasicRefreshTokenHandler extends AbstractPayloadHandler implements 
                 // even if the contents are the same, since scripts may have to change these in to other data structures
                 // to make them accessible to their machinery, then convert them back.
                 setClaims((JSONObject) resp.getReturnedValues().get(SRE_REQ_CLAIMS));
-                DebugUtil.trace(this, "Setting claims to " + claims.toString(2));
-                setRTData((JSONObject) resp.getReturnedValues().get(SRE_REQ_ACCESS_TOKEN));
+                setRTData((JSONObject) resp.getReturnedValues().get(SRE_REQ_REFRESH_TOKEN));
                 return;
             case RC_NOT_RUN:
                 return;
@@ -210,10 +210,10 @@ public class BasicRefreshTokenHandler extends AbstractPayloadHandler implements 
 
         if (0 < getRTConfig().getLifetime()) {
             rtData.put(EXPIRATION, (System.currentTimeMillis() + getRTConfig().getLifetime()) / 1000L);
-        } /*else {
-            rtData.put(EXPIRATION, (System.currentTimeMillis() / 1000L) + 900L); // 15 minutes.
+        } else {
+            rtData.put(EXPIRATION, REFRESH_TOKEN_LIFETIME_DEFAULT); // Half the max.
         }
-*/
+
 
         rtData.put(NOT_VALID_BEFORE, (currentTS - 5000L) / 1000L); // not before is 5 minutes before current
         DebugUtil.trace(this, "Setting refresh lifetime = " + transaction.getRefreshTokenLifetime());

@@ -53,13 +53,13 @@ public abstract class TokenManagerServlet extends BearerTokenServlet implements 
      */
     protected OA2Client verifyClient(HttpServletRequest req, String headerAuthz) throws UnsupportedEncodingException {
         OA2SE oa2SE = (OA2SE) getServiceEnvironment();
-        String[] credentials = HeaderUtils.getCredentialsFromHeaders(req, headerAuthz);
+        String[] credentials = OA2HeaderUtils.getCredentialsFromHeaders(req, headerAuthz);
         // need to verify that this is an admin client.
-        Identifier acID = BasicIdentifier.newID(credentials[HeaderUtils.ID_INDEX]);
+        Identifier acID = BasicIdentifier.newID(credentials[OA2HeaderUtils.ID_INDEX]);
         if (!oa2SE.getClientStore().containsKey(acID)) {
             throw new GeneralException("Error: the given id of \"" + acID + "\" is not recognized as valid client.");
         }
-        String adminSecret = credentials[HeaderUtils.SECRET_INDEX];
+        String adminSecret = credentials[OA2HeaderUtils.SECRET_INDEX];
         if (adminSecret == null || adminSecret.isEmpty()) {
             throw new GeneralException("Error: missing secret.");
         }

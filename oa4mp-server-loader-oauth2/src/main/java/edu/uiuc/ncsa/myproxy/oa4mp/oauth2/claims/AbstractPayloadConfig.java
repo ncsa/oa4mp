@@ -32,7 +32,7 @@ public abstract class AbstractPayloadConfig implements Serializable {
     public static String CREATE_TS_KEY = "creation_ts";
     public static String LIFETIME_KEY = "lifetime";
 
-    String type;
+    protected String type = null;
     List<String> versions;
 
     public String getId() {

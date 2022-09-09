@@ -1,1 +1,75 @@
-{"status":0,"content":{"client":{"client_id":"cilogon:/client_id/6b5581efa80c9ec99fc0a81e8c4c0c00","name":"SCOTT MESS test client","creation_ts":"2020-06-04T20:07:01.000Z","last_modified_ts":"2020-06-04T20:07:56.000Z","home_url":"https://a.b.c/client","proxy_limited":true,"rt_lifetime":0,"callback_uri":["https://a.b.c/client/my/other/ready1","https://a.b.c/client/my/other/ready2"],"sign_tokens":true,"public_client":false,"scopes":["openid","profile","email","edu.uiuc.ncsa.myproxy.getcert"]},"cfg":{"config":"Created by COmanage Oa4mpClient Plugin","claims":{"sourceConfig":[{"ldap":{"id":"03145c7c3e50f9602f484925003ab837c1306d16","enabled":"true","authorizationType":"simple","address":"ldap-test.cilogon.org","port":636,"principal":"uid=oa4mp_user,ou=system,o=MESS,o=CO,dc=cilogon,dc=org","password":"958L9GJF5atVhixvP9vf","searchBase":"ou=people,o=MESS,o=CO,dc=cilogon,dc=org","searchName":"username","searchAttributes":[{"name":"givenName","returnName":"given_name","returnAsList":"false"},{"name":"sn","returnName":"family_name","returnAsList":"false"}]}}],"preProcessing":[{"$if":["$true"],"$then":[{"$set_claim_source":["LDAP","03145c7c3e50f9602f484925003ab837c1306d16"]}]}]},"isSaved":true}},"approved":false}
+{
+  "status": 0,
+  "content": {
+    "client": {
+      "client_id": "cilogon:/client_id/6b5581efa80c9ec99fc0a81e8c4c0c00",
+      "name": "SCOTT MESS test client",
+      "creation_ts": "2020-06-04T20:07:01.000Z",
+      "last_modified_ts": "2020-06-04T20:07:56.000Z",
+      "home_url": "https://a.b.c/client",
+      "proxy_limited": true,
+      "rt_lifetime": 0,
+      "callback_uri": [
+        "https://a.b.c/client/my/other/ready1",
+        "https://a.b.c/client/my/other/ready2"
+      ],
+      "sign_tokens": true,
+      "public_client": false,
+      "scopes": [
+        "openid",
+        "profile",
+        "email",
+        "edu.uiuc.ncsa.myproxy.getcert"
+      ]
+    },
+    "cfg": {
+      "config": "Created by COmanage Oa4mpClient Plugin",
+      "claims": {
+        "sourceConfig": [
+          {
+            "ldap": {
+              "id": "03145c7c3e50f9602f484925003ab837c1306d16",
+              "enabled": "true",
+              "authorizationType": "simple",
+              "address": "ldap-test.cilogon.org",
+              "port": 636,
+              "principal": "uid=oa4mp_user,ou=system,o=MESS,o=CO,dc=cilogon,dc=org",
+              "password": "958L9GJF5atVhixvP9vf",
+              "searchBase": "ou=people,o=MESS,o=CO,dc=cilogon,dc=org",
+              "searchName": "username",
+              "searchAttributes": [
+                {
+                  "name": "givenName",
+                  "returnName": "given_name",
+                  "returnAsList": "false"
+                },
+                {
+                  "name": "sn",
+                  "returnName": "family_name",
+                  "returnAsList": "false"
+                }
+              ]
+            }
+          }
+        ],
+        "preProcessing": [
+          {
+            "$if": [
+              "$true"
+            ],
+            "$then": [
+              {
+                "$set_claim_source": [
+                  "LDAP",
+                  "03145c7c3e50f9602f484925003ab837c1306d16"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "isSaved": true
+    }
+  },
+  "approved": false
+}

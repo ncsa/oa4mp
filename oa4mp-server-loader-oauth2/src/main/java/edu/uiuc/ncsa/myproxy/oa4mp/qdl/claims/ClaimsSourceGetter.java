@@ -129,7 +129,14 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
 
     }
 
-
+    /**
+     * This does the get and makes a dummy transaction with the right name. This means a claim name
+     * of uid should always be used.
+     * @param arg
+     * @param username
+     * @param state
+     * @return
+     */
     private QDLStem doLDAP(QDLStem arg, String username, State state) {
         OA2State oa2State = null;
         if(state instanceof OA2State){
@@ -142,6 +149,15 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
         protoClaims.put(arg.getString(CS_LDAP_SEARCH_NAME), username);
         JSONObject j = ldapClaimsSource.process(protoClaims, t);
         QDLStem output = claimsToStem(j);
+        // CIL-1426 -- we do not want to return the parameter we created,
+        // HOWEVER there is nothing at all stopping them from searching for this parameter and getting it back
+        // THEREFORE, only return it if it changed.
+        // This way, if there are no hits, the user gets an empty claim list, showing nothing was found,
+        // rather than a false positive that there was a single attribute (actually the one we passed in)
+        // in the claim source.
+        if(output.containsKey(arg.getString(CS_LDAP_SEARCH_NAME)) && output.getString(arg.getString(CS_LDAP_SEARCH_NAME)).equals(username)) {
+            output.remove(arg.getString(CS_LDAP_SEARCH_NAME));
+        }
         return output;
     }
 

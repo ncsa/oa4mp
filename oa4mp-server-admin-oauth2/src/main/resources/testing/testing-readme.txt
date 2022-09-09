@@ -556,7 +556,7 @@ TO DO:
      get_user_info is naught else than the barebones subject, audience and issuer.
   -- test:jeff/ligo
        tests VO for ligo with a special command line test client from jeff
-       - use GitHub for logon
+       - use LIGO IDP for logon
        - grants subset of all possible scopes (so limited group membership to test that
          it doesn't just always hand back everything).
        The following test for various things like scope reduction

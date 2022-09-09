@@ -235,6 +235,18 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
         if (oa2se.isOIDCEnabled()) {
             checkClaim(getClaims(), SUBJECT);
         }
+        // CIL-1411 -- remove any claims not specifically requested by the user.
+        // We need this here since a policy set  may add claims that the user
+        // did not request.
+        if(!transaction.getScopes().contains(OA2Scopes.SCOPE_EMAIL)){
+            getClaims().remove(EMAIL);
+        }
+        if(!transaction.getScopes().contains(OA2Scopes.SCOPE_PROFILE)){
+                    getClaims().remove(NAME);
+                    getClaims().remove(GIVEN_NAME);
+                    getClaims().remove(FAMILY_NAME);
+                    getClaims().remove(PREFERRED_USERNAME);
+                }
     }
 
     @Override

@@ -5,7 +5,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.CM7591Config;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.permissions.AddClientRequest;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.permissions.PermissionServer;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.permissions.RemoveClientRequest;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.HeaderUtils;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2HeaderUtils;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientConverter;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientKeys;
@@ -606,15 +606,15 @@ public class OIDCCMServlet extends EnvServlet {
      * @throws Throwable
      */
     protected AdminClient getAndCheckAdminClient(HttpServletRequest request) throws Throwable {
-        String[] credentials = HeaderUtils.getCredentialsFromHeaders(request, "Bearer");
+        String[] credentials = OA2HeaderUtils.getCredentialsFromHeaders(request, "Bearer");
         // need to verify that this is an admin client.
-        Identifier acID = BasicIdentifier.newID(credentials[HeaderUtils.ID_INDEX]);
+        Identifier acID = BasicIdentifier.newID(credentials[OA2HeaderUtils.ID_INDEX]);
         if (!getOA2SE().getAdminClientStore().containsKey(acID)) {
             throw new GeneralException("Error: the given id of \"" + acID + "\" is not recognized as an admin client.");
         }
         AdminClient adminClient = getOA2SE().getAdminClientStore().get(acID);
         MetaDebugUtil adminDebugger = MyProxyDelegationServlet.createDebugger(adminClient);
-        String adminSecret = credentials[HeaderUtils.SECRET_INDEX];
+        String adminSecret = credentials[OA2HeaderUtils.SECRET_INDEX];
         if (adminSecret == null || adminSecret.isEmpty()) {
             throw new GeneralException("Error: missing secret.");
         }
@@ -632,15 +632,15 @@ public class OIDCCMServlet extends EnvServlet {
 
 
     protected OA2Client getAndCheckOA2Client(HttpServletRequest request) throws Throwable {
-        String[] credentials = HeaderUtils.getCredentialsFromHeaders(request, "Bearer");
+        String[] credentials = OA2HeaderUtils.getCredentialsFromHeaders(request, "Bearer");
         // need to verify that this is an admin client.
-        Identifier clientID = BasicIdentifier.newID(credentials[HeaderUtils.ID_INDEX]);
+        Identifier clientID = BasicIdentifier.newID(credentials[OA2HeaderUtils.ID_INDEX]);
         if (!getOA2SE().getClientStore().containsKey(clientID)) {
             throw new GeneralException("Error: the given id of \"" + clientID + "\" is not recognized as a  client.");
         }
         OA2Client oa2Client = (OA2Client) getOA2SE().getClientStore().get(clientID);
         MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(oa2Client);
-        String clientSecret = credentials[HeaderUtils.SECRET_INDEX];
+        String clientSecret = credentials[OA2HeaderUtils.SECRET_INDEX];
         if (clientSecret == null || clientSecret.isEmpty()) {
             throw new GeneralException("Error: missing secret.");
         }

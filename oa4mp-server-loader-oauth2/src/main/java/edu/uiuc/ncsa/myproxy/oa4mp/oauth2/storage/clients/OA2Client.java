@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.AbstractPayloadConfig;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.IDTokenClientConfig;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2ClientUtils;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.AccessTokenConfig;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.RefreshTokenConfig;
 import edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.QDLRuntimeEngine;
@@ -236,6 +237,9 @@ public class OA2Client extends Client implements OA2ClientScopes {
     }
 
     protected AbstractPayloadConfig setupPayloadConfig(AbstractPayloadConfig pc, String root, String path) {
+        if(hasDriverConfig()){
+            OA2ClientUtils.setupDriverPayloadConfig(pc, this);
+        }
         if (hasPayloadConfig(root, path)) {
             pc.fromJSON(getJSONObject(getConfig(), root, path));
         }
@@ -247,16 +251,11 @@ public class OA2Client extends Client implements OA2ClientScopes {
     }
 
     public boolean hasAccessTokenConfig() {
-        return hasPayloadConfig(TOKENS_KEY, ACCESS_TOKENS_KEY);
+        return hasPayloadConfig(TOKENS_KEY, ACCESS_TOKENS_KEY) || hasDriverConfig();
     }
 
     public AccessTokenConfig getAccessTokensConfig() {
         AccessTokenConfig atConfig = new AccessTokenConfig(); // empty
-        if(hasDriverConfig()){
-            // driver configuration is a single entry of th form {"qdl":{"load":"driver.qdl","args":[...]}}
-            // and applies to all handlers.
-            return (AccessTokenConfig) setupDriverPayloadConfig(atConfig, getConfig());
-        }
         return (AccessTokenConfig) setupPayloadConfig(atConfig, TOKENS_KEY, ACCESS_TOKENS_KEY);
     }
 
@@ -267,6 +266,7 @@ public class OA2Client extends Client implements OA2ClientScopes {
     public boolean hasDriverConfig(){
         return getConfig().containsKey(QDLRuntimeEngine.CONFIG_TAG);
    }
+
     public void setAccessTokenConfig(AccessTokenConfig cfg) {
         setPayloadConfig(cfg, TOKENS_KEY, ACCESS_TOKENS_KEY);
     }
@@ -278,7 +278,7 @@ public class OA2Client extends Client implements OA2ClientScopes {
     }
 
     public boolean hasRefreshTokenConfig() {
-        return hasPayloadConfig(TOKENS_KEY, REFRESH_TOKENS_KEY);
+        return hasPayloadConfig(TOKENS_KEY, REFRESH_TOKENS_KEY) ||  hasDriverConfig();
     }
 
     public RefreshTokenConfig getRefreshTokensConfig() {
@@ -288,7 +288,7 @@ public class OA2Client extends Client implements OA2ClientScopes {
     }
 
     public boolean hasIDTokenConfig() {
-        return hasPayloadConfig(TOKENS_KEY, ID_TOKENS_KEY);
+        return hasPayloadConfig(TOKENS_KEY, ID_TOKENS_KEY) || hasDriverConfig();
     }
 
     public IDTokenClientConfig getIDTokenConfig() {

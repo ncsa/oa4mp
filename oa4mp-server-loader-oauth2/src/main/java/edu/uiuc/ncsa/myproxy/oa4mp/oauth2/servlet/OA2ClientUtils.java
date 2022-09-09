@@ -8,21 +8,26 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransac
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.*;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractRegistrationServlet;
-import edu.uiuc.ncsa.security.core.Identifier;
-import edu.uiuc.ncsa.security.core.exceptions.NFWException;
-import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;
-import edu.uiuc.ncsa.security.core.util.DebugUtil;
-import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Errors;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2GeneralError;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.JWTRunner;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.RFC9068Constants;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
+import edu.uiuc.ncsa.qdl.scripting.AnotherJSONUtil;
+import edu.uiuc.ncsa.qdl.scripting.QDLScript;
+import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.exceptions.NFWException;
+import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
+import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnMap;
+import edu.uiuc.ncsa.security.util.scripting.ScriptSet;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import org.apache.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
@@ -31,6 +36,10 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.net.URI;
 import java.util.*;
+
+import static edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.QDLRuntimeEngine.CONFIG_TAG;
+import static edu.uiuc.ncsa.security.util.scripting.ScriptingConstants.ALL_PHASES;
+import static edu.uiuc.ncsa.security.util.scripting.ScriptingConstants.SRE_EXEC_PHASE;
 
 /**
  * A budding set of utilities for working with clients.
@@ -456,5 +465,29 @@ public class OA2ClientUtils {
         OA2Client client = (OA2Client) store.getMapConverter().fromMap(clientMap, null);
         client.setReadOnly(true);
         return client;
+    }
+
+    /**
+     * Assumes that the configuration for the client is just a qdl script element or list of them.
+     * @param pc
+     * @param client
+     */
+    public static void setupDriverPayloadConfig(AbstractPayloadConfig pc, OA2Client client){
+        JSONObject cfg = client.getConfig();
+        ScriptSet<? extends QDLScript> scriptSet;
+        // Options are it is a single QDL load command or an array of them.
+        if(cfg.get(CONFIG_TAG) instanceof JSONArray){
+            scriptSet = AnotherJSONUtil.createScripts(cfg.getJSONArray(CONFIG_TAG));
+        }else{
+            scriptSet = AnotherJSONUtil.createScripts(cfg.getJSONObject(CONFIG_TAG));
+        }
+        Iterator<? extends QDLScript> iterator = scriptSet.iterator();
+        while(iterator.hasNext()){
+            QDLScript script = iterator.next();
+            if(!script.getProperties().containsKey(SRE_EXEC_PHASE)){
+                script.getProperties().put(SRE_EXEC_PHASE, ALL_PHASES);
+            }
+        }
+        pc.setScriptSet(scriptSet);
     }
 }

@@ -1,0 +1,47 @@
+/*
+   This script gets the user record. It takes as its arguments
+   0 - the user name (usually the EPPN)
+   1 - the name of the LDAP attribute to search on whose value is the user name
+
+*/
+         ini. := file_read('/home/ncsa/dev/csd/config/ini/access-ldap.ini',2).'access';
+                //  user := ini.'test_user';
+                 // ini. := file_read('vfs#/scripts/access/ldap.ini',2).'access';
+                  user := script_args(0);
+
+
+                  cfg. := new_template('ldap');
+         cfg.auth_type := 'simple';
+           cfg.address := ini.'address';
+              cfg.port := 636;
+        cfg.claim_name := 'uid';
+       cfg.search_base := 'ou=people,o=Users,o=CO,dc=access-ci,dc=org';
+     cfg.fail_on_error := true;
+              cfg.type := 'ldap';
+         cfg.ldap_name := 'voPersonExternalID';
+cfg.search_attributes. :=  ['uid',
+                            'givenName',
+                            'sn',
+                            'cn',
+                            'mail',
+                            'o',
+                            'isMemberOf'
+                            ];
+           cfg.rename. := {'givenName':'given_name', // 'old':'new'
+                           'sn':'family_name',
+                           'cn':'name',
+                           'mail':'email',
+                           'o':'organization',
+                           'uid':'preferred_username'
+                           };
+          cfg.username := ini.'name';
+          cfg.password := ini.'pwd';
+
+              results. := get_claims(create_source(cfg.), user);
+          say('*** ACCESS results = ' + to_string(results.), true);
+          
+              if[(size(results.)<=1) && has_keys(results., 'uid')][return([]);];
+              
+         results.'sub' := results.'preferred_username' + '@access-ci.org';
+    return(results.);
+

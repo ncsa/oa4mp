@@ -20,6 +20,7 @@
     </properties>
     <name>Top level OA4MP</name>
     <description>Top level OAuth client and server code for MyProxy</description>
+    <!--
     <url>http://grid.ncsa.illinois.edu/myproxy/oauth</url>
     <licenses>
         <license>
@@ -45,7 +46,59 @@
         <system>Jira</system>
         <url>https://gateways.atlassian.net/browse/OAUTH</url>
     </issueManagement>
+       -->
+    <licenses>
+          <license>
+              <name>Apache license</name>
+              <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+              <distribution>repo</distribution>
+          </license>
+      </licenses>
+      <scm>
+          <developerConnection>scm:git:https://github.com/ncsa/OA4MP.git</developerConnection>
+          <connection>scm:git:https://github.com/ncsa/OA4MP.git</connection>
+          <url>https://github.com/ncsa/OA4MP</url>
+      </scm>
+      <issueManagement>
+          <system>GitHub</system>
+          <url>https://github.com/ncsa/OA4MP/issues</url>
+      </issueManagement>
+      <developers>
+          <developer>
+              <name>Jeff Gaynor</name>
+              <email>gaynor@illinois.edu</email>
+          </developer>
+          <developer>
+              <name>Jim Basney</name>
+              <email>jbasney@illinois.edu</email>
+          </developer>
+      </developers>
 
+      <mailingLists>
+          <mailingList>
+              <name>MyProxy User List</name>
+              <subscribe>myproxy-user-request@lists.globus.org?subject=subscribe</subscribe>
+              <unsubscribe>myproxy-user-request@lists.globus.org?subject=unsubscribe</unsubscribe>
+              <archive>http://lists.globus.org/pipermail/myproxy-user/</archive>
+              <post>myproxy-user@lists.globus.org</post>
+              <otherArchives/>
+          </mailingList>
+      </mailingLists>
+
+      <distributionManagement>
+          <repository>
+              <id>sonatype-nexus-staging</id>
+              <name>sonatype</name>
+              <url>https://oss.sonatype.org/service/local/staging/deploy/maven2
+              </url>
+          </repository>
+          <snapshotRepository>
+              <id>sonatype-nexus-snapshots</id>
+              <name>sonatype</name>
+              <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+              <uniqueVersion>false</uniqueVersion>
+          </snapshotRepository>
+      </distributionManagement>
     <modules>
         <module>myproxy-logon</module>
         <module>oa4mp-server-api</module>
@@ -79,33 +132,9 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-    <distributionManagement>
-        <repository>
-            <id>sonatype-nexus-staging</id>
-            <name>sonatype</name>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2
-            </url>
-        </repository>
-        <snapshotRepository>
-            <id>sonatype-nexus-snapshots</id>
-            <name>sonatype</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-            <uniqueVersion>false</uniqueVersion>
-        </snapshotRepository>
-    </distributionManagement>
+
     <build>
         <plugins>
-<!--            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.8</source>
-
-                    <target>1.8</target>
-                    <forceJavacCompilerUse>true</forceJavacCompilerUse>
-                </configuration>
-                <version>3.5.1</version>
-            </plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>

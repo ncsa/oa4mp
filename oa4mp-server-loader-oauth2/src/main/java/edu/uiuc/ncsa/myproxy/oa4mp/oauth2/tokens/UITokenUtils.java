@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.HeaderUtils;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2HeaderUtils;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AccessTokenImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.RefreshTokenImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenUtils;
@@ -91,7 +91,7 @@ public class UITokenUtils {
      * @return
      */
     public static String getRawAT(HttpServletRequest request) {
-        String headerAT = HeaderUtils.getBearerAuthHeader(request);
+        String headerAT = OA2HeaderUtils.getBearerAuthHeader(request);
         String paramAT = request.getParameter(ACCESS_TOKEN);
         //String paramAT = getFirstParameterValue(request, ACCESS_TOKEN);
         if(headerAT == null && paramAT == null){

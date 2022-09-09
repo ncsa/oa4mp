@@ -4,8 +4,8 @@
 export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
 OA4MP_ROOT=/home/ncsa/dev/ncsa-git/oa4mp
 
-GITHUB_ROOT=$OA4MP_ROOT/docs
-cd $GITHUB_ROOT/pdf
+WEBSITE_ROOT=$OA4MP_ROOT/docs
+cd $WEBSITE_ROOT/pdf
 
 echo "converting docs to PDF"
 
@@ -18,9 +18,9 @@ echo "done converting PDFs"
 # ===============
 cd $OA4MP_ROOT
 mvn javadoc:javadoc
-cp -r $OA4MP_ROOT/language/target/site/apidocs/* $GITHUB_ROOT/apidocs
+cp -r $OA4MP_ROOT/language/target/site/apidocs/* $WEBSITE_ROOT/apidocs
 cd $OA4MP_ROOT/website
 mvn clean site
 # Note the source directory in the next command has no apidocs subdirectory, so this overlays
 # without overwriting.
-cp -r $OA4MP_ROOT/website/target/site/* $GITHUB_ROOT
+cp -r $OA4MP_ROOT/website/target/site/* $WEBSITE_ROOT

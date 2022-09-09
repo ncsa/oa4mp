@@ -2,15 +2,12 @@ package edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.*;
-import edu.uiuc.ncsa.qdl.state.State;
-import edu.uiuc.ncsa.qdl.variables.QDLStem;
-import edu.uiuc.ncsa.qdl.vfs.VFSFileProvider;
-import edu.uiuc.ncsa.qdl.vfs.VFSPassThruFileProvider;
-import edu.uiuc.ncsa.qdl.vfs.VFSPaths;
-import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSource;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSourceConfiguration;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.LDAPConfiguration;
+import edu.uiuc.ncsa.qdl.state.State;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
+import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -47,26 +44,6 @@ public class ConfigtoCS implements CSConstants {
             case CS_TYPE_CODE:
                 return doCode(arg);
             case CS_TYPE_FILE:
-                // If the user has defined the path in a QDL VFS pass through file system, then try to
-                // resolve it here since the FSClaimSource knows nothing of such file systems
-                if (qdlState != null) {
-                    VFSFileProvider provider = null;
-                    String path = arg.getString(CS_FILE_FILE_PATH);
-                    if (path.contains(VFSPaths.SCHEME_DELIMITER)) {
-                        try {
-                            provider = qdlState.getVFS(path);
-                        } catch (Throwable e) {
-                            e.printStackTrace();
-                        }
-                        if (provider instanceof VFSPassThruFileProvider) {
-
-                            VFSPassThruFileProvider passThruFileProvider = (VFSPassThruFileProvider) provider;
-                            arg.put(CS_FILE_FILE_PATH, passThruFileProvider.getRealPath(arg.getString(CS_FILE_FILE_PATH)));
-                        }
-                    } else {
-                        throw new IllegalArgumentException("error: the VFS path '" + path + "' cannot be resolved oputside of QDL.");
-                    }
-                }
                 ClaimSourceConfiguration cfg = ClaimSourceConfigConverter.convert(arg);
                 return new FSClaimSource(cfg);
             case CS_TYPE_LDAP:

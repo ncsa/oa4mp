@@ -1,9 +1,8 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.server.storage.filestore;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.server.OA4MPConfigTags;
-import edu.uiuc.ncsa.security.core.util.DebugUtil;
-import edu.uiuc.ncsa.security.core.util.IdentifiableProviderImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
+import edu.uiuc.ncsa.security.core.util.IdentifiableProviderImpl;
 import edu.uiuc.ncsa.security.storage.FSProvider;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import org.apache.commons.configuration.tree.ConfigurationNode;
@@ -28,15 +27,15 @@ public class DSFSClientStoreProvider extends FSProvider<DSFSClientStore> impleme
 
     @Override
     protected DSFSClientStore produce(File dataPath, File indexPath, boolean removeEmptyFiles) {
-        DebugUtil.trace(this, "dataPath=" + dataPath + ", indexPath=" + indexPath);
+    //    DebugUtil.trace(this, "dataPath=" + dataPath + ", indexPath=" + indexPath);
         DSFSClientStore store = new DSFSClientStore(dataPath, indexPath, (IdentifiableProviderImpl<Client>) clientProvider, converter, removeEmptyFiles);
-        DebugUtil.trace(this, "client name is " + store.getClass().getSimpleName());
-        DebugUtil.trace(this, "client store is a " + store);
-        if (store.size() == 0) {
+  //      DebugUtil.trace(this, "client name is " + store.getClass().getSimpleName());
+//        DebugUtil.trace(this, "client store is a " + store);
+/*        if (store.size() == 0) {
             System.err.println("NO ENTRIES IN CLIENT STORE");
         } else {
             System.err.println("Store contains " + store.size() + " entries.");
-        }
+        }*/
         return store;
     }
 }

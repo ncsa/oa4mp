@@ -21,6 +21,7 @@ NOTE that the args are "eic" for EIC or "jlab" for everything else.
 
      DEBUG := true; // set false everywhere but on my test server.
         γ. := null; // groups
+       γ2. := null; // other groups
         α. := null; // permissions
  if[
    script_args(0) == 'eic'
@@ -46,28 +47,13 @@ NOTE that the args are "eic" for EIC or "jlab" for everything else.
     ];
 
     say('*** JLAB results.isMemberOf=' + to_string(results.isMemberOf));
+        σ. := size(tx_scopes.) == 0?scopes.:tx_scopes.; // current requested scopes.
+        β. := mask(α., γ. ∈ results.isMemberOf)∈ σ.; // bit mask of allowed scopes, groups
 
-        ξ. := mask(α., γ. ∈ results.isMemberOf);
-
-    say('*** JLAB scopes=' + to_string(scopes.));
-    say('*** JLAB ξ.=' + to_string(ξ.));
-    if[
-      size(tx_scopes.) == 0
-    ][
-       ξ. := ~(⊢scopes.∩⊢ξ.);
-    ]else[
-       ξ. := ~(⊢tx_scopes.∩⊢ξ.);
-    ];
-/*
-    if[exec_phase == 'post_token'][
-        if[size(scopes.) != 0][ξ. := ~(⊢scopes.∩⊢ξ.);]; // return only those requested in first token exchange.
-    ]else[
-        if[size(tx_scopes.) != 0][ξ. := ~(⊢tx_scopes.∩⊢ξ.);]; // return only those requested in refresh of exchange
-    ];
-*/
-    say('*** JLAB returning ξ.=' + to_string(ξ.));
-
-access_token.scope := detokenize(ξ., ' ', 2); // turn in to string, omit duplications, trailing space
-access_token.'aud' := 'ANY'; 
+      access_token.'aud' := 'ANY';
+    access_token.'scope' := detokenize(mask(α.,β.), ' ', 2); // turn in to string, omit trailing space
+// 2022-08-23 add group.
+                     γ2. := γ. - ' computing';
+    access_token.'group' := unique(mask(γ2.,β.)).0; // turn in to string should be unique.
 
 //x. := ['CO:members:all','CO:COU:gluex:members:all','CO:members:active','CO:COU:gluex:members:active','gluex computing']
