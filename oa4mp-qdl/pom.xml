@@ -17,7 +17,7 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.qdl</groupId>
             <artifactId>language</artifactId>
-            <version>1.4-QDL-SNAPSHOT</version>
+            <version>1.4.8</version>
         </dependency>
 
         <dependency>
