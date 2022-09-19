@@ -149,7 +149,6 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.jsonWebKeys = jsonWebKeys;
         this.issuer = issuer;
         if (claimSource instanceof BasicClaimsSourceImpl) {
-            DebugUtil.trace(this, "***Setting runtime environment in the scope handler:" + claimSource.getClass().getSimpleName());
             ((BasicClaimsSourceImpl) claimSource).setOa2SE(this);
         }
         this.acs = acs;

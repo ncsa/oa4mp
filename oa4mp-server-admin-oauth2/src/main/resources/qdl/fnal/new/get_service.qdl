@@ -16,7 +16,7 @@
 */
 block[
             // ini. := file_read('vfs#/scripts/fnal/ldap.ini',2).'dev';
-            ini. := file_read('/home/ncsa/dev/csd/config/fnal-ldap.ini',2).'prod';
+            ini. := file_read('/home/ncsa/dev/csd/config/ini/fnal-ldap.ini',2).'prod';
             say(to_string(ini.));
                       service_cfg. := new_template('ldap');
              service_cfg.auth_type := 'simple';

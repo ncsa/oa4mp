@@ -10,6 +10,42 @@
 <body class="composite">
 <!--#include virtual="../../header.html" -->
 <p>Changes to the OA4MP server by version.</p>
+<h2>5.2.8</h2>
+<p>Release date 2022-09-20</p>
+<ul>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-627">CIL-627</a>: Migrate to Java 11, split off MyProxy code.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-630">CIL-630</a>: Retire CILogon archived user table.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-1014">CIL-1014</a>: Explicit creation of memory stores does not work.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-1088">CIL-1088</a>: Compact logging of expired access or refresh token.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-1178">CIL-1178</a>: Shorter LDAP timeouts. These were set to 10 seconds, but since OA4MP was
+        running Java 8, a known bug there prevented this from being effective. As of this release, it should work.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-1327">CIL-1327</a>: NCSA QDl scripts should be invoked in post_userinfo
+        but not post_exchange phases.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-1330">CIL-1330</a>: Related to CIL-1342.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-1339">CIL-1339</a>: Simple configuration for clients using a QDL
+        <a href="driver-config.html">driver script.</a></li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-1342">CIL-1342</a>: Custom redirects added in cases of error. QDL supports
+    throwing an error now and returning a custom redirect so that it can tell OA4MP where to send the user.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-1346">CIL-1346</a>: Certain returned errors in CILogon were not OAuth 2 compliant.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-1347">CIL-1347</a>: Side effect of CIL-1348.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-1348">CIL-1348</a>: Debug print for clients with custom short IDs did not work right,
+        resulting in an error rather than a log entry.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-1366">CIL-1366</a>: exec_phase post_all was not working.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-1388">CIL-1388</a>: CILogon did not get custom error uri in DBService layer.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-1419">CIL-1419</a>: Proxy client sending extra scopes. It should request the exact same
+    scopes the user has granted.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-1423">CIL-1423</a>: metadata tag is officially ignored any place in a client
+        cfg element. This allows management of clients by external systems (e.g. COManage) to insert their own accounting information.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-1426">CIL-1426</a>: XRAS client errors. This was, in fact, a manisfestation of
+        a provisioning error from COManage.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-1464">CIL-1464</a>: Disable clipboard use by Command Line Client when used
+        as a proxy.</li>
+
+
+
+
+</ul>
+
 <h2>5.2.7</h2>
 <p>Release date 2022-07-18</p>
 <ul>

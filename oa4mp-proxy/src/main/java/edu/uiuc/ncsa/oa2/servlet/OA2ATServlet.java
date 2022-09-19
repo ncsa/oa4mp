@@ -395,10 +395,12 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                            HttpServletResponse response) throws IOException {
         // https://tools.ietf.org/html/rfc8693
 
-        printAllParameters(request);
         String subjectToken = getFirstParameterValue(request, RFC8693Constants.SUBJECT_TOKEN);
         MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(client);
         debugger.trace(this, "Starting RFC 8693 token exchange");
+        if(debugger.isEnabled()){
+            ServletDebugUtil.printAllParameters(this.getClass(), request, true);
+        }
         if (subjectToken == null) {
             throw new OA2ATException(OA2Errors.INVALID_REQUEST, "missing subject token");
         }
@@ -412,6 +414,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         // We don't support the actor token, and the spec says that we can ignore it
         // *but* if it is missing and the actor token type is there, reject the request
         if ((actorToken == null && actorTokenType != null)) {
+            debugger.trace(this, "actor token not allowed");
             throw new OA2ATException(OA2Errors.INVALID_REQUEST,
                     "actor token type is not allowed");
         }
@@ -419,9 +422,9 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         RefreshTokenImpl refreshToken = null;
         OA2ServiceTransaction t = null;
         OA2SE oa2se = (OA2SE) MyProxyDelegationServlet.getServiceEnvironment();
-        OA2TokenForge tokenForge = ((OA2TokenForge) MyProxyDelegationServlet.getServiceEnvironment().getTokenForge());
         String subjectTokenType = getFirstParameterValue(request, RFC8693Constants.SUBJECT_TOKEN_TYPE);
         if (subjectTokenType == null) {
+            debugger.trace(this, "missing subject token type");
             throw new OA2ATException(OA2Errors.INVALID_REQUEST, "missing subject token type");
         }
 
@@ -444,6 +447,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
 
         //CIL-974
         JSONWebKeys keys = OA2TokenUtils.getKeys(oa2se, client);
+        debugger.trace(this, "got web keys, getting transaction from the client id in the request");
+        
         switch (subjectTokenType) {
             case RFC8693Constants.ACCESS_TOKEN_TYPE:
                 accessToken = OA2TokenUtils.getAT(subjectToken, oa2se, keys);
@@ -474,6 +479,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
          */
 
         if (t == null) {
+            debugger.trace(this, "transaction not found, attempting to get transaction from given token");
+            
             switch (subjectTokenType) {
                 case RFC8693Constants.ACCESS_TOKEN_TYPE:
                     t = (OA2ServiceTransaction) getTransactionStore().get(accessToken);
@@ -484,11 +491,15 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                     break;
             }
             if (t != null) {
+                
+                debugger.trace(this, "transaction found, checking for ersatz client");
+                
                 // found something under another client id. Check for substitution
                 PermissionsStore<? extends Permission> pStore = getOA2SE().getPermissionStore();
                 List<Identifier> adminIDS = pStore.getAdmins(client.getIdentifier());
                 if (adminIDS.isEmpty()) {
                     // If the client is not managed, it should not be substituting for anything.
+                    debugger.trace(this, "client is not managed, any place");
                     throw new OA2GeneralError(OA2Errors.UNAUTHORIZED_CLIENT,
                             "no substitutions allowed for unmanaged clients",
                             HttpStatus.SC_UNAUTHORIZED, null);
@@ -498,17 +509,17 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                     // virtual organizations in the middle. No hijacking allowed. This is possible to do, but generally
                     // admins do not share clients, so we'll flag it as an exception here and if this
                     // ever needs to change, this tells us it is not working.
+                    debugger.trace(this, "multiple admins for client " + client.getIdentifierString());
                     throw new OA2GeneralError(OA2Errors.UNAUTHORIZED_CLIENT,
                             "multiple administrators for a managed client is not allowed",
                             HttpStatus.SC_UNAUTHORIZED, null);
-
                 }
 
                 Permission p = pStore.getErsatzChain(adminIDS.get(0), t.getOA2Client().getIdentifier(), client.getIdentifier());
 
                 if (p == null) {
                     // This client cannot sub in the original flow.
-                    log("client \"" + client.getIdentifier() + "\" does not have permission to sub for \"" + t.getOA2Client().getIdentifier() + "\".");
+                    debugger.trace(this,"client \"" + client.getIdentifier() + "\" does not have permission to sub for \"" + t.getOA2Client().getIdentifier() + "\".");
                     throw new OA2GeneralError(OA2Errors.UNAUTHORIZED_CLIENT,
                             "client does not have permission to substitute, access denied",
                             HttpStatus.SC_UNAUTHORIZED, null);
@@ -517,6 +528,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 // now we can clone the transaction
                 ColumnMap map = new ColumnMap();
                 getTransactionStore().getXMLConverter().toMap(t, map);
+                debugger.trace(this, "cloning transaction, setting up new flow");
+
                 OA2ServiceTransaction t2 = (OA2ServiceTransaction) getTransactionStore().getXMLConverter().fromMap(map, null);
                 //Identifier id = t2.getIdentifier();
                 //id = BasicIdentifier.newID(id.toString() + "&eid=" + DigestUtils.sha1Hex(client.getIdentifierString()));
@@ -534,6 +547,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 try {
                     client = createErsatz(t.getOA2Client().getIdentifier(), client, p.getErsatzChain());
                 } catch (UnknownClientException ucx) {
+                    debugger.trace(this, "ersatz client has unknown provisioner in chain.");
+
                     throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
                             ucx.getMessage(), HttpStatus.SC_INTERNAL_SERVER_ERROR,
                             t.getRequestState());
@@ -541,6 +556,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 t2.setProvisioningClientID(t.getOA2Client().getIdentifier()); // So we can find it later
                 t2.setProvisioningAdminID(adminIDS.get(0));
                 t2.setClient(client);
+                debugger = MyProxyDelegationServlet.createDebugger(client); // switch over to logging for the 𝕰𝖗s𝖆𝖙𝖟 client.
                 getTransactionStore().save(t2);
                 // rock on. A new transaction has been created for this and the flow from the original may now diverge.
                 t = t2;
@@ -555,15 +571,18 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         }
         if (t == null) {
             // Still null. Ain't one no place. Bail.
+            debugger.trace(this, "No pending transactions found");
             throw new OA2ATException(OA2Errors.INVALID_GRANT, "no pending transaction found.");
         }
         if (client.isErsatzClient() && !client.isReadOnly()) {
             // Gotten this far and there is an ersatz client. Read only is a good as "has been resolved"
+            debugger.trace(this, "resolving ersatz client");
             try {
                 Permission p = getOA2SE().getPermissionStore().getErsatzChain(t.getProvisioningAdminID(), t.getProvisioningClientID(), client.getIdentifier());
                 client = createErsatz(t.getProvisioningClientID(), client, p.getErsatzChain());
                 t.setClient(client);
             } catch (UnknownClientException ucx) {
+                debugger.trace(this, "No ersatz client found");
                 throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
                         ucx.getMessage(), HttpStatus.SC_INTERNAL_SERVER_ERROR,
                         t.getRequestState());
@@ -596,6 +615,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         }
         // Finally can check access here. Access for exchange is same as for refresh token.
         if (!t.getFlowStates().acceptRequests || !t.getFlowStates().refreshToken) {
+            debugger.trace(this, "Flow denied");
+
             throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
                     "token exchange access denied",
                     t.getRequestState());
@@ -766,8 +787,9 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
      * Takes a substitution chain and does the overrides. Any int or long < 0 is assumed unset
      * and is skipped.
      *
-     * @param provisioningClient
-     * @param ersatzClientList
+     * @param provisioningClientID
+     * @param ersatzClient
+     * @param ersatzChain
      * @return
      */
     protected OA2Client createErsatz(Identifier provisioningClientID, OA2Client ersatzClient, List<Identifier> ersatzChain) {
@@ -1121,21 +1143,22 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         try {
             oldRT = OA2TokenUtils.getRT(rawRefreshToken, oa2SE, keys);
         } catch (OA2ATException oa2ATException) {
-            String token = rawRefreshToken;
+ /*           String token = rawRefreshToken;
             if (TokenUtils.isBase32(rawRefreshToken)) {
                 token = TokenUtils.b32DecodeToken(rawRefreshToken);
             }
 
             String message = client.getIdentifierString() + ": refresh failed for token " + token + "issued at " + " on " + (new Date());
-            info(message);
-        //    oa2ATException.printStackTrace();
+            info(message);*/
             throw oa2ATException;
         }
         OA2ServiceTransaction t = null;
+/*
         if (oldRT.isExpired()) {
             debugger.trace(this, "expired refresh token \"" + oldRT.getToken() + "\" for client " + client.getIdentifierString());
             throw new OA2ATException(OA2Errors.INVALID_GRANT, "expired refresh token", HttpStatus.SC_BAD_REQUEST, null);
         }
+*/
         try {
             // Fix for CIL-882
             t = getByRT(oldRT);

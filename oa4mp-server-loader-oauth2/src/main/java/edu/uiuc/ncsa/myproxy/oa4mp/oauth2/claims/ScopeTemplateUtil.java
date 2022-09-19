@@ -1,5 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
 
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Scopes;
+
 import java.net.URI;
 import java.util.*;
 
@@ -13,17 +15,44 @@ import static edu.uiuc.ncsa.security.util.configuration.TemplateUtil.*;
  * on 1/21/21 at  10:32 AM
  */
 public class ScopeTemplateUtil {
+    /*
+    resolve_templates(c.:=['insert:/DQSegDB',
+                                'read:/frames',
+                                'read:/GraceDB',
+                                'compute.create'
+                                'compute.create2'
+                                ],
+    r.:=['openid',
+        'profile',
+        'email',
+        'org.cilogon.userinfo',
+        'read:/DQSegDB',
+        'write:/DQSegDB',
+        'query:/DQSegDB',
+        'insert:/DQSegDB',
+        'read:/frames',
+        'read:/GraceDB',
+        'compute.create',
+        'compute.cancel',
+        'compute.read',
+        'compute.modify'
+       ],false
+    	)
+     */
+    static List<String> basicScopes = Arrays.asList(OA2Scopes.basicScopes);
+
     public static Collection<String> doCompareTemplates(Collection<String> computedScopes,
                                                         Collection<String> requestedScopes,
                                                         boolean isQuery) {
         //boolean isTX = ! isQuery;
+        // CIL-1490
         Collection<String> returnedScopes = new HashSet<>();
         for (String r : requestedScopes) {
             if(r.contains(",")){
                 throw new IllegalArgumentException("error: got embedded comma in scope \"" + r +"\"");
             }
-            if (!r.contains(":")) {
-                // This is a quick and dirty check that the requested scope is a relative URI
+            //if (!r.contains(":")) {
+            if (basicScopes.contains(r)) {
                 // we don't want to check, e.g. "profile" against all the stored templates.
                 continue;
             }

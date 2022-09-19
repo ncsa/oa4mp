@@ -172,6 +172,49 @@ public class QDLTests extends AbstractQDLTester {
         assert getBooleanValue("ok_false", state) : "resolve template failed for non-query";
         assert getBooleanValue("ok_true", state) : "resolve template failed for query";
     }
+
+    /**
+     * This checks that scopes like compute.modify (so just a string, not a uri with
+     * path components) is processed. It should not treat such scopes as super scopes
+     * @throws Throwable
+     */
+    public void testResolveTemplates2() throws Throwable {
+        OA2State state = (OA2State) getTestUtils().getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "module_load('edu.uiuc.ncsa.myproxy.oa4mp.qdl.OA2QDLLoader', 'java');");
+        addLine(script, "module_import('oa2:/qdl/oidc/claims');");
+        addLine(script, "c.:=['insert:/DQSegDB',\n" +
+                "                 'read:/frames',\n" +
+                "                 'read:/GraceDB',\n" +
+                "                 'compute.create',\n" +
+                "                 'compute.create2'\n" +
+                "                 ];");
+        addLine(script, "    r.:=['openid',\n" +
+                "        'profile',\n" +
+                "        'email',\n" +
+                "        'org.cilogon.userinfo',\n" +
+                "        'read:/DQSegDB',\n" +
+                "        'write:/DQSegDB',\n" +
+                "        'query:/DQSegDB',\n" +
+                "        'insert:/DQSegDB',\n" +
+                "        'read:/frames',\n" +
+                "        'read:/GraceDB',\n" +
+                "        'compute.create',\n" +
+                "        'compute.cancel',\n" +
+                "        'compute.read',\n" +
+                "        'compute.modify'\n" +
+                "       ];");
+        addLine(script, "out. := ['read:/frames','compute.create','read:/GraceDB','insert:/DQSegDB'];"); // expected, note no compute.create2
+        addLine(script, "resolved.:= resolve_templates(c., r., false);");
+        addLine(script, "size_resolved := size(resolved.);");
+        addLine(script, "size_out := size(out.);");
+        addLine(script, "size_ok := size_resolved ≡ size_out;");
+        addLine(script, "ok ≔ reduce(@∧,out.∈ resolved.);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("size_ok", state) : "expect  " + getLongValue("size_out", state) + " but got " + getLongValue("size_resolved", state) + " elements";
+        assert getBooleanValue("ok", state) : "incorrect result.";
+    }
     // next test is a good idea, but was impossible to get running in practice -- just too much
     // configuration needed to bootstrap it. May revisit it later.
 /*    public void testATHandler() throws Throwable{

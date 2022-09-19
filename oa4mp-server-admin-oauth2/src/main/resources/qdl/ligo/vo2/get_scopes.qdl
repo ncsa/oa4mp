@@ -26,6 +26,7 @@
      kagra_cfg.'fail_on_error' := true;';
                kagra_response. := get_claims(create_source(kagra_cfg.), user);
             γ. :=  is_defined(kagra_response.'isMemberOf')?kagra_response.'isMemberOf':[];
+             say('kagra_response.==' + kagra_response.);
 
             ligo_cfg.'address' := ini.'address';
                ligo_cfg.'port' := 636;
@@ -41,6 +42,7 @@
       ligo_cfg.'fail_on_error' := true;
                 ligo_response. := get_claims(create_source(ligo_cfg.), head(user, '@'));
              γ. := γ. ~ (is_defined(ligo_response.'isMemberOf')?ligo_response.'isMemberOf':[]);
+             say('ligo_response.==' + ligo_response.);
 
 if[
       size(γ.) == 0
@@ -50,13 +52,21 @@ if[
   sys_err.error_type := 'access_denied';
      return();
 ];
+                   if[is_defined(ligo_response.'uid')][claims.'uid' := ligo_response.'uid';]else[claims.'uid':=claims.'eppn';];
 
+                   if[is_defined(ligo_response.'uin')][claims.'uin' := ligo_response.'uin';];
 
                 ζ.'Communities:LSCVirgoLIGOGroupMembers' := ['read:/DQSegDB' ,'read:/frames', 'read:/GraceDB','write:/GraceDB'];   //CIL-1345
                    ζ.'Communities:LVC:SegDB:SegDBWriter' := ['write:/DQSegDB'];
                      ζ.'gw-astronomy:KAGRA-LIGO:members' := ['read:/GraceDB', 'read:/frames','write:/GraceDB']; //CIL-1345, CIL-1427
    ζ.'Services:XRootD:SciTokens:write-frames:authorized' := ['write:/frames']; //CIL-1414,
     ζ.'Services:XRootD:SciTokens:read-frames:authorized' := ['read:/frames']; //CIL-1415
+        ζ.'Services:OSGPilotTest:SciTokens:scope_create' := ['scope_create'];
+      ζ.'Services:OSGPilotTest:SciTokens:compute_create' := ['compute_create'];
+      ζ.'Services:OSGPilotTest:SciTokens:compute_cancel' := ['compute_cancel'];
+      ζ.'Services:OSGPilotTest:SciTokens:compute_modify' := ['compute_modify'];
+        ζ.'Services:OSGPilotTest:SciTokens:compute_read' := ['compute_read'];
+
 
  //  return(reduce(@~,ζ\(γ\*\name)));
      return(~values(mask(ζ., in_group2(keys(ζ.),γ.))));

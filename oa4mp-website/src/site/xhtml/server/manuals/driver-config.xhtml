@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Simple driver configurations</title>
+    <!--#include virtual="../../head.html" -->
+
+</head>
+<body class="composite">
+<!--#include virtual="../../header.html" -->
+<h1>What is it?</h1>
+<p>One request is to allow for a single QDL script to be used in place of all
+token configurations. </p>
+<h2>How's it work?</h2>
+<p>Rather than have the cfg attribute of a client configuration be something like
+this (in HOCON/JSON):</p>
+<pre>
+    tokens{
+     identity{
+        type=identity
+        qdl{
+            load="bgsu/idtoken.qdl"
+            xmd={exec_phase="post_token"}
+          }// end qdl
+        } //end identity token
+        access{
+           type=wlcg
+           issuer="https:cilogon.org"
+           audience="https://bgsu.edu/jwt/v1/any"
+           lifetime=3600000
+           qdl{
+              load="bgsu/at.qdl"
+              xmd={exec_phase=["post_token","post_refresh","post_exchange"]}
+              args=["USER_ID", "PASSWORD"]
+           } //end QDL
+        } // end access token
+       refresh{
+         issuer="https:cilogon.org"
+         audience="https://bgsu.edu/jwt/v1/any"
+         lifetime=3600000000
+          qdl{
+             load="bgsu/rt.qdl"
+             xmd={exec_phase=["post_token","post_refresh","post_exchange"]}
+          } //end QDL
+      }// end refresh
+    } //end tokens
+</pre>
+<p>You could have a <i>driver script</i> that is loaded for all phases and allow the script to dispatch
+the execution. The plus with this is, obviously, you manage the script and once set the client
+configuration never need be touched. The most important point is that the client cfg then is a
+single QDL invocation element:</p>
+<pre>
+    qdl{
+        load="bgsu/driver.qdl"
+        xmd={exec_phase="post_all"}
+      }// end qdl
+</pre>
+<p>In this case, the driver script might start like</p>
+<pre>
+    if[
+      exec_phase=='post_auth'
+    ][
+      script_load('bgsu/idtoken.qdl');
+    ];
+    if[
+      exec_phase == 'post_token'
+    ][
+    // ... etc.
+    ];
+</pre>
+<p>
+    What this does under the hood is create a handler (id token, access and refresh with
+    gerenic defaults) and sets the script to the single driver.
+</p>
+<h2>Caveats</h2>
+<p>Each invocation of QDL requires marshalling resource, starting an interpreter etc.,
+so while you may certainly request that the exec_phase be "all", there is apt to be
+an awful lot of extra work done</p>
+<p>
+    In the driver, load scripts do not run them, since the ambient scope contains all
+    access tokens, claims etc. and script_run creates a new clean scope with none of that.
+</p>
+<!--#include virtual="../../footer.html" -->
+</body>
+</html>

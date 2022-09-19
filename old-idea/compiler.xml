@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <wildcardResourcePatterns>
+      <entry name="?*.properties" />
+      <entry name="?*.xml" />
+      <entry name="?*.gif" />
+      <entry name="?*.png" />
+      <entry name="?*.jpeg" />
+      <entry name="?*.jpg" />
+      <entry name="?*.html" />
+      <entry name="?*.dtd" />
+      <entry name="?*.tld" />
+      <entry name="?*.ftl" />
+    </wildcardResourcePatterns>
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="oa4mp-proxy" />
+        <module name="server" />
+        <module name="oa4mp-client-loader-oauth2" />
+        <module name="oa4mp-server-api" />
+        <module name="oa4mp-server-oauth2" />
+        <module name="myproxy-logon" />
+        <module name="oa4mp-client-api" />
+        <module name="oa4mp-website" />
+        <module name="oauth2" />
+        <module name="oa4mp-clc" />
+        <module name="oa4mp-client-test" />
+        <module name="oa4mp-webapp" />
+        <module name="oa4mp-qdl" />
+        <module name="common" />
+        <module name="oa4mp-server-test" />
+        <module name="oa4mp-server-admin-oauth2" />
+        <module name="oa4mp-server-loader-oauth2" />
+        <module name="oa4mp-client-oauth2" />
+        <module name="oa4mp-server-test-oauth2" />
+        <module name="client" />
+        <module name="oa4mp-skin" />
+        <module name="myproxy-website" />
+        <module name="oa4mp-client-webapp" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="oa4mp-client-loader-oauth1" target="1.8" />
+      <module name="oa4mp-client-oauth1" target="1.8" />
+      <module name="oa4mp-gui" target="1.8" />
+      <module name="oa4mp-server-admin" target="1.8" />
+      <module name="oa4mp-server-admin-oauth1" target="1.8" />
+      <module name="oa4mp-server-loader-oauth1" target="1.8" />
+      <module name="oa4mp-server-oauth1" target="1.8" />
+      <module name="oa4mp-xsede-oauth2" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

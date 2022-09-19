@@ -1,21 +1,20 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RefreshTokenStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo.VirtualOrganization;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AccessTokenImpl;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.RefreshTokenImpl;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenUtils;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.*;
 import edu.uiuc.ncsa.security.core.exceptions.InvalidAlgorithmException;
 import edu.uiuc.ncsa.security.core.exceptions.InvalidSignatureException;
 import edu.uiuc.ncsa.security.core.exceptions.TransactionNotFoundException;
 import edu.uiuc.ncsa.security.core.exceptions.UnsupportedJWTTypeException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
-import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AccessTokenImpl;
-import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.RefreshTokenImpl;
-import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenUtils;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.*;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import net.sf.json.JSONException;
@@ -91,13 +90,15 @@ public class OA2TokenUtils {
         if (t != null) {
             // Must present a valid token to get one.
             if (!t.isAccessTokenValid()) {
-                MyProxyDelegationServlet.createDebugger(t.getOA2Client()).trace(OA2TokenUtils.class, "Invalid access token \"" + accessToken.getJti() + "\"");
+             //   MyProxyDelegationServlet.createDebugger(t.getOA2Client()).trace(OA2TokenUtils.class, "Invalid access token \"" + accessToken.getJti() + "\"");
+                oa2se.getMyLogger().info("Access token invalid: " + t.summary());
                 throw new OA2ATException(OA2Errors.INVALID_TOKEN,
                         "token invalid",
                         t.getRequestState());
             }
             if (accessToken.isExpired()) {
-                MyProxyDelegationServlet.createDebugger(t.getOA2Client()).trace(OA2TokenUtils.class, "expired access token \"" + accessToken.getJti() + "\"");
+//                MyProxyDelegationServlet.createDebugger(t.getOA2Client()).trace(OA2TokenUtils.class, "expired access token \"" + accessToken.getJti() + "\"");
+                oa2se.getMyLogger().info("Access token expired: " + t.summary());
                 throw new OA2ATException(OA2Errors.INVALID_TOKEN,
                         "token expired",
                         t.getRequestState());
@@ -129,7 +130,7 @@ public class OA2TokenUtils {
             refreshToken = tokenForge.getRefreshToken(subjectToken);
         } catch (InvalidSignatureException | InvalidAlgorithmException | UnsupportedJWTTypeException tt) {
             // This is benign and may just mean that the format of the token is not a JWT. Only flog it on debug
-            oa2SE.getMyLogger().info("Failed to verify refresh token JWT: \"" + tt.getMessage());
+            ServletDebugUtil.trace(OA2TokenUtils.class,"Failed to verify refresh token JWT: \"" + tt.getMessage());
             throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
                     "invalid refresh token",
                     HttpStatus.SC_BAD_REQUEST,
@@ -143,16 +144,19 @@ public class OA2TokenUtils {
         } catch (TransactionNotFoundException tnfx) {
             // No such token found for the refresh token.
             //oa2SE.getMyLogger().error("transaction not found for \"" + refreshToken + "\"", tnfx);
+            ServletDebugUtil.trace(OA2TokenUtils.class,"Transaction not found for \"" + refreshToken.getJti() + "\"");
             throw new OA2ATException(OA2Errors.INVALID_GRANT, "invalid refresh token");
         } catch (Throwable tt) {
             // This is serious. It means that there was a problem getting the transaction vs. the transaction did not exist.
-            oa2SE.getMyLogger().error("error getting refresh token:" + refreshToken + " message:" + tt.getMessage());
+            oa2SE.getMyLogger().error("error getting refresh token:" + refreshToken.getJti() + " message:" + tt.getMessage());
             throw new OA2ATException(OA2Errors.INVALID_GRANT, "invalid refresh token");
         }
         if (t != null) {
             // Must present a valid token to get one.
             if (!t.isRefreshTokenValid()) {
-                MyProxyDelegationServlet.createDebugger(t.getOA2Client()).trace(OA2TokenUtils.class, "invalid refresh token \"" + refreshToken.getJti() + "\"");
+                //MyProxyDelegationServlet.createDebugger(t.getOA2Client()).trace(OA2TokenUtils.class, "invalid refresh token \"" + refreshToken.getJti() + "\"");
+                oa2SE.getMyLogger().info("Refresh token invalid: " + t.summary());
+
                 throw new OA2ATException(OA2Errors.INVALID_GRANT,
                         "invalid refresh token",
                         t.getRequestState());
@@ -160,7 +164,8 @@ public class OA2TokenUtils {
             // we wait until here to check if it is expired, since we want to return the correct
             // type of error with the state of the transaction.
             if (refreshToken.isExpired()) {
-                MyProxyDelegationServlet.createDebugger(t.getOA2Client()).trace(OA2TokenUtils.class, "expired refresh token \"" + refreshToken.getJti() + "\"");
+//                MyProxyDelegationServlet.createDebugger(t.getOA2Client()).trace(OA2TokenUtils.class, "expired refresh token \"" + refreshToken.getJti() + "\"");
+                oa2SE.getMyLogger().info("Refresh token expired: " + t.summary());
                 throw new OA2ATException(OA2Errors.INVALID_GRANT,
                         "expired refresh token",
                         t.getRequestState());

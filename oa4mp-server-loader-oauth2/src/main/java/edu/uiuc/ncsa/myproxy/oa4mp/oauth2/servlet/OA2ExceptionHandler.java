@@ -2,15 +2,14 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.LDAPException;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractAuthorizationServlet;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.*;
+import edu.uiuc.ncsa.oa4mp.delegation.server.ExceptionWrapper;
+import edu.uiuc.ncsa.oa4mp.delegation.server.UnapprovedClientException;
 import edu.uiuc.ncsa.qdl.exceptions.QDLExceptionWithTrace;
 import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.oa4mp.delegation.server.ExceptionWrapper;
-import edu.uiuc.ncsa.oa4mp.delegation.server.UnapprovedClientException;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.*;
 import edu.uiuc.ncsa.security.servlet.ExceptionHandler;
-import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import net.sf.json.JSONObject;
 import org.apache.http.HttpStatus;
 
@@ -40,7 +39,7 @@ public class OA2ExceptionHandler implements ExceptionHandler {
 
     @Override
     public void handleException(Throwable t, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        ServletDebugUtil.trace(this, "Error", t);
+   //     ServletDebugUtil.trace(this, "Error", t);
         if (t instanceof QDLExceptionWithTrace) {
             if (t.getCause() != null) {
                 t = t.getCause();
