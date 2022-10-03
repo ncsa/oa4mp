@@ -12,7 +12,7 @@
          The version number reflects the currently released project.
          THIS WILL BE DISPLAYED ON THE SITE AS THE CURRENT VERSION NUMBER AT THE TOP OF EACH PAGE!
      -->
-    <version>5.2-SNAPSHOT</version>
+    <version>5.2.8.1</version>
 
     <artifactId>oa4mp-website</artifactId>
     <packaging>jar</packaging>
@@ -29,78 +29,78 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>client</artifactId>
-            <version>5.2-SNAPSHOT</version>
+            <version>5.2.8.1</version>
         </dependency>
 
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>common</artifactId>
-            <version>5.2-SNAPSHOT</version>
+            <version>5.2.8.1</version>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>core</artifactId>
-            <version>5.2-SNAPSHOT</version>
+            <version>5.2.8.1</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>servlet</artifactId>
-            <version>5.2-SNAPSHOT</version>
+            <version>5.2.8.1</version>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>server</artifactId>
-            <version>5.2-SNAPSHOT</version>
+            <version>5.2.8.1</version>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>common</artifactId>
-            <version>5.2-SNAPSHOT</version>
+            <version>5.2.8.1</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>util</artifactId>
-            <version>5.2-SNAPSHOT</version>
+            <version>5.2.8.1</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>myproxy-logon</artifactId>
-            <version>5.2-SNAPSHOT</version>
+            <version>5.2.8.1</version>
         </dependency>
 
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>oa4mp-client-api</artifactId>
-            <version>5.2-SNAPSHOT</version>
+            <version>5.2.8.1</version>
         </dependency>
 
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>oa4mp-client-loader-oauth2</artifactId>
-            <version>5.2-SNAPSHOT</version>
+            <version>5.2.8.1</version>
         </dependency>
 
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>oa4mp-server-api</artifactId>
-            <version>5.2-SNAPSHOT</version>
+            <version>5.2.8.1</version>
         </dependency>
 
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>oa4mp-server-loader-oauth2</artifactId>
-            <version>5.2-SNAPSHOT</version>
+            <version>5.2.8.1</version>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>oauth2</artifactId>
-            <version>5.2-SNAPSHOT</version>
+            <version>5.2.8.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.velocity</groupId>
@@ -173,7 +173,7 @@
                     <dependency>
                         <groupId>edu.uiuc.ncsa.maven.skin</groupId>
                         <artifactId>oa4mp-skin</artifactId>
-                        <version>5.2-SNAPSHOT</version>
+                        <version>5.2.8.1</version>
                     </dependency>
                 </dependencies>
             </plugin>
