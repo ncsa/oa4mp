@@ -229,7 +229,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
 
 
     protected ScriptInterface getServerScript(String phase) {
-        if(getQE().getServerScripts() == null || getQE().getServerScripts().isEmpty()){
+        if (getQE().getServerScripts() == null || getQE().getServerScripts().isEmpty()) {
             return null;
         }
         return getQE().getServerScripts().get(Scripts.EXEC_PHASE, phase);
@@ -238,8 +238,10 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
 
     @Override
     public ScriptRunResponse run(ScriptRunRequest request) {
-        ScriptInterface  s = getScript(request.getAction());
-        if (s == null) {return noOpSRR();}
+        ScriptInterface s = getScript(request.getAction());
+        if (s == null) {
+            return noOpSRR();
+        }
         createSRRequest(request);
         s.execute(state);
         return createSRResponse();
@@ -254,7 +256,9 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
     protected String SYS_ERR_MESSAGE = "message";
     protected String SYS_ERR_ERROR_TYPE = "error_type";
     protected String SYS_ERR_ERROR_URI = "error_uri";
-    protected String SYS_ERR_STATUS_CODE = "status";
+    protected String SYS_ERR_CUSTOM_ERROR_URI = "custom_error_uri";
+    protected String SYS_ERR_HTTP_STATUS_CODE = "status";
+    protected String SYS_ERR_CODE = "code";
     protected String FLOW_STATE_VAR = "flow_states" + STEM_INDEX_MARKER;
     protected String CLAIMS_VAR = "claims" + STEM_INDEX_MARKER;
     protected String PROXY_CLAIMS_VAR = "proxy_claims" + STEM_INDEX_MARKER;
@@ -310,12 +314,12 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
 
         }
         if (req.getArgs().containsKey(SRE_REQ_REFRESH_TOKEN)) {
-                    JSONObject at = (JSONObject) req.getArgs().get(SRE_REQ_REFRESH_TOKEN);
-                    QDLStem atStem = new QDLStem();
-                    atStem.fromJSON(at);
-                    state.setValue(REFRESH_TOKEN_VAR, atStem);
+            JSONObject at = (JSONObject) req.getArgs().get(SRE_REQ_REFRESH_TOKEN);
+            QDLStem atStem = new QDLStem();
+            atStem.fromJSON(at);
+            state.setValue(REFRESH_TOKEN_VAR, atStem);
 
-                }
+        }
         List<String> scopes = (List<String>) req.getArgs().get(SRE_REQ_SCOPES);
         if (scopes != null && !scopes.isEmpty()) {
             // It is possible for a minimal OAuth 2 client to have no scopes.
@@ -347,7 +351,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         // Some handlers inject them later because they need more state than is available.
         if (req.getArgs().containsKey(SRE_REQ_CLAIM_SOURCES)) {
             for (ClaimSource source : (List<ClaimSource>) req.getArgs().get(SRE_REQ_CLAIM_SOURCES)) {
-                if(source.hasConfiguration()) {
+                if (source.hasConfiguration()) {
                     sources.put(i + ".", ConfigtoCS.convert(source));
                     i++;
                 }
@@ -489,14 +493,28 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
                     scriptRuntimeException.setRequestedType(sysErr.getString(OA2Errors.ACCESS_DENIED));
                 }
                 // In OAuth this is the HTTP status code
-                if (sysErr.containsKey(SYS_ERR_STATUS_CODE)) {
-                    scriptRuntimeException.setStatus(sysErr.getLong(SYS_ERR_STATUS_CODE).intValue());
+                if (sysErr.containsKey(SYS_ERR_HTTP_STATUS_CODE)) {
+                    scriptRuntimeException.setHttpStatus(sysErr.getLong(SYS_ERR_HTTP_STATUS_CODE).intValue());
                 } else {
-                    scriptRuntimeException.setStatus(HttpStatus.SC_UNAUTHORIZED);
+                    scriptRuntimeException.setHttpStatus(HttpStatus.SC_UNAUTHORIZED);
                 }
+                if (sysErr.containsKey(SYS_ERR_CODE)) {
+                    scriptRuntimeException.setCode(sysErr.getLong(SYS_ERR_CODE).intValue());
+                    // This has a default value of -1 if uninitialized.
+                }
+
                 // If the status is 302, then this is the redirect for the user's browser.
                 if (sysErr.containsKey(SYS_ERR_ERROR_URI)) {
                     scriptRuntimeException.setErrorURI(URI.create(sysErr.getString(SYS_ERR_ERROR_URI)));
+                }
+                // CIL-1342, since error_uri alone might conflict with the OAuth2 spec, we add another one
+                // that allows differentiating the error URI as something not in the spec., E.g.,
+                // A user starts a flow, but at log in they are not found to be registered. Nothing in the OAuth
+                // spec about what to do, but one would expect a redirect to some page where they can register.
+                // The custom_error_uri would be used for that and would tell the consumer of this error to not
+                // just try to use the standard OAuth error handling (call to callback_uri) to handle this.
+                if (sysErr.containsKey(SYS_ERR_CUSTOM_ERROR_URI)) {
+                    scriptRuntimeException.setCustomErrorURI(URI.create(sysErr.getString(SYS_ERR_CUSTOM_ERROR_URI)));
                 }
                 throw scriptRuntimeException;
             }
@@ -528,7 +546,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
             throw new NFWException("Internal error: The returned claims object was not a JSON Object.");
         }
         respMap.put(SRE_REQ_CLAIMS, j);
-        
+
         DebugUtil.trace(this, "QDL updates response map:" + j.toString(1));
 
         /*

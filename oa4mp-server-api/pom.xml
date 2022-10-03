@@ -21,7 +21,7 @@
     <dependencies>
         <dependency>
             <groupId>org.jglobus</groupId>
-            <version>RELEASE</version>
+            <version>2.1.0</version>
             <artifactId>jsse</artifactId>
             <scope>provided</scope>
         </dependency>
@@ -82,7 +82,7 @@
         </dependency>
         <dependency>
             <groupId>org.jglobus</groupId>
-            <version>RELEASE</version>
+            <version>2.0.4</version>
             <artifactId>JGlobus-Core</artifactId>
             <scope>provided</scope>
         </dependency>

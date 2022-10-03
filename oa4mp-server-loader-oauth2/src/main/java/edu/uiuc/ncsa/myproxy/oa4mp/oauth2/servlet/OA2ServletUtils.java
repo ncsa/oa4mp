@@ -86,7 +86,7 @@ public class OA2ServletUtils {
             String message = "script runtime exception: \"" + sre.getMessage() + "\"";
             ppξ(exception, callingObject, oa2SE, debugger, message);
             // message in the exception should be exactly what the script threw, but we add a note about its origin.
-            throw new OA2ATException(sre.getRequestedType(), sre.getMessage(), sre.getStatus(), transaction.getRequestState());
+            throw new OA2ATException(sre.getRequestedType(), sre.getMessage(), sre.getHttpStatus(), transaction.getRequestState());
         }
         if (exception instanceof IllegalAccessException) {
             // Most generic exception possible.

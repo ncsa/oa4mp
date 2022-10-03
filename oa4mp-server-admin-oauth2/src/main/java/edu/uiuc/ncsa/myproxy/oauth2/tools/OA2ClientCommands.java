@@ -340,20 +340,38 @@ public class OA2ClientCommands extends ClientStoreCommands {
             }
 
         }
-        boolean loadQDL = getInput("Load only a QDL script or edit the JSON? (q/j)", "j").equalsIgnoreCase("q");
-        if (loadQDL) {
-            JSONObject oldCfg = client.getConfig();
-            JSONObject qdlcfg = loadQDLScript(oldCfg);
-            if (qdlcfg == null) {
-                // do nothing
-            }
-
-        } else {
-            JSONObject newConfig = (JSONObject) inputJSON(client.getConfig(), "client configuration");
+        // CIL-1507 simplify cfg entry
+        OA2ClientKeys keys = (OA2ClientKeys) getMapConverter().getKeys();
+        boolean doCfg = getInput("Edit the " + keys.cfg() + " (as JSON)? (y/n)", "n").equalsIgnoreCase("y");
+        if(doCfg){
+            JSONObject newConfig = inputJSON(client.getConfig(), "client configuration");
             if (newConfig != null) {
                 client.setConfig(newConfig);
             }
+        } else{
+            say("skipped");
         }
+/*    old way -- allowed for editing components of QDL script reference. Now that is way too complex
+      so don't do that any more. Just paste the whole thing or don't.
+        switch (xx){
+            case "q":
+                JSONObject oldCfg = client.getConfig();
+                JSONObject qdlcfg = loadQDLScript(oldCfg);
+                if (qdlcfg == null) {
+                    // do nothing
+                }
+                break;
+            case "j":
+                JSONObject newConfig = (JSONObject) inputJSON(client.getConfig(), "client configuration");
+                if (newConfig != null) {
+                    client.setConfig(newConfig);
+                }
+                break;
+            default:
+                say("skipped");
+        }
+*/
+
     }
 
     @Override
@@ -361,7 +379,14 @@ public class OA2ClientCommands extends ClientStoreCommands {
         return true;
     }
 
-
+    /**
+     * Attempt to let users construct qdl script references on the fly from components.
+     * This is turning into a bad idea (too complex and clunky to really bother with)
+     * vis-a-vis just pasting the thing.
+     * @param currentConfig
+     * @return
+     * @throws IOException
+     */
     @Override
     protected JSONObject loadQDLScript(JSONObject currentConfig) throws IOException {
        /* The configuration is the entire qdl object , i.e.

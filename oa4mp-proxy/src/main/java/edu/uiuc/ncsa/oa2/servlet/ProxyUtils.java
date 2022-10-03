@@ -207,7 +207,11 @@ public class ProxyUtils {
             clcCommands.setPrintOuput(true);
         }
         clcCommands.load(new InputLine("dummy ", asc.getCfgName(), asc.getCfgFile()));
-        clcCommands.getCe().setScopes(t.getScopes()); // CIL-1419 make sure requests match allowed scopes
+        //   This was to fix CIL-1419 but the actual issue was not that the client should dictate the proxy's
+        //   scopes, but that the client and proxy scopes need to be independent (done in CIL-1212) and configured
+        //   correctly.
+        //   CIL-1419 make sure requests match allowed scopes
+        //   clcCommands.getCe().setScopes(t.getScopes());
         return clcCommands;
     }
 

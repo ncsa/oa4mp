@@ -37,15 +37,26 @@ public class ScriptRuntimeException extends GeneralException {
 
     String requestedType;
 
-    public int getStatus() {
-        return status;
+    public int getHttpStatus() {
+        return httpStatus;
     }
 
-    public void setStatus(int status) {
-        this.status = status;
+    public void setHttpStatus(int httpStatus) {
+        this.httpStatus = httpStatus;
     }
 
-    int status;
+    int httpStatus;
+
+    public int getCode() {
+        return code;
+    }
+
+    public void setCode(int code) {
+        this.code = code;
+    }
+
+    public static int DEFAULT_NO_OP_CODE = -1;
+    int code = DEFAULT_NO_OP_CODE;
 
     /**
      * An error URI if one is needed. (Optional!)
@@ -61,4 +72,25 @@ public class ScriptRuntimeException extends GeneralException {
     }
 
     URI errorURI = null;
+
+    public URI getCustomErrorURI() {
+        return customErrorURI;
+    }
+
+    public void setCustomErrorURI(URI customErrorURI) {
+        this.customErrorURI = customErrorURI;
+    }
+
+    URI customErrorURI = null;
+
+    @Override
+    public String toString() {
+        return "ScriptRuntimeException{" +
+                "requestedType='" + requestedType + '\'' +
+                ", httpStatus=" + httpStatus +
+                ", code=" + code +
+                ", errorURI=" + errorURI +
+                ", customErrorURI=" + customErrorURI +
+                '}';
+    }
 }

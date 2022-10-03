@@ -63,11 +63,11 @@
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
-        <dependency>
+  <!--      <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>oauth2</artifactId>
             <version>5.2-SNAPSHOT</version>
-        </dependency>
+        </dependency>-->
 
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>

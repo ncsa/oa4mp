@@ -56,7 +56,6 @@ public class ProxyCallbackServlet extends OA2AuthorizationServer {
         // state=dXJuOmlkOjUyZjBjMGU3LWE4YzYtNDIxNy05Y2YxLWJjOTJmNzQwNGQ2NQ%3D%3D
 
         Map<String, String[]> parameters = request.getParameterMap();
-        System.out.println(getClass().getSimpleName() + ": request uri= " + request.getRequestURI());
 
         if (!parameters.containsKey(OA2Constants.STATE)) {
             throw new IllegalStateException("No state");
@@ -73,6 +72,7 @@ public class ProxyCallbackServlet extends OA2AuthorizationServer {
             throw new IllegalStateException("No transaction for proxy ID \"" + proxyID + "\"");
         }
         MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(t.getOA2Client());
+        debugger.trace(this , "request uri= " + request.getRequestURI());
 
         // Now we have determined that this is a pending transaction
         debugger.trace(this, "loading proxy client");

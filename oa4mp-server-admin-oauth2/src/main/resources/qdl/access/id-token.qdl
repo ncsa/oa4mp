@@ -33,7 +33,7 @@ if[
       say('*** ACCESS warning. No idp but scopes were ' + to_string(scopes.));
     ];
               sys_err.ok := false;
-       sys_err.errorType := 'invalid_request';
+       sys_err.error_type := 'invalid_request';
          sys_err.message := 'the org.cilogon.userinfo scope is required.';
          return([]);
   ];
@@ -44,7 +44,7 @@ if[
     size(user.) == 0
   ][
              sys_err.ok := false;
-      sys_err.errorType := 'user_not_found';
+      sys_err.error_type := 'user_not_found';
         sys_err.message := 'user not found';
       sys_err.error_uri := 'https://identity.access-ci.org/user-not-registered';
         return([]);
@@ -54,7 +54,7 @@ if[
    ('AccessDenied' ∈ user.'isMemberOf') ∨ ('CO:members:active' ∉ user.'isMemberOf') // CIL-1428
 ][
              sys_err.ok := false;
-      sys_err.errorType := 'access_denied';
+      sys_err.error_type := 'access_denied';
         sys_err.message := 'access denied';
       sys_err.error_uri := 'https://identity.access-ci.org/user-access-denied';
         return([]);         

@@ -46,3 +46,18 @@ do the substitution.
 
 You should be able to go to the oa2-cli and search for the transactions and tokens
 that are associated with these clients.
+
+===========
+Testing on dev
+
+- Generic client, all tokens are simple
+  Provisioner: dev:test/vo1
+Ersatz client: dev:test/my_ersatz
+No special scopes.
+Any IDP
+
+- client with WLCG, all tokens are simple
+  Provisioner: dev:test/vo1
+Ersatz client: dev:test/my_ersatz2
+No special scopes.
+IDP: NCSA (Needs to have an eppn)

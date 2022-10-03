@@ -25,7 +25,8 @@
     <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-1339">CIL-1339</a>: Simple configuration for clients using a QDL
         <a href="driver-config.html">driver script.</a></li>
     <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-1342">CIL-1342</a>: Custom redirects added in cases of error. QDL supports
-    throwing an error now and returning a custom redirect so that it can tell OA4MP where to send the user.</li>
+    throwing an basic error now, a specific OAuth 2 error and a CILogon specific error in the course of running
+        server scripts.</li>
     <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-1346">CIL-1346</a>: Certain returned errors in CILogon were not OAuth 2 compliant.</li>
     <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-1347">CIL-1347</a>: Side effect of CIL-1348.</li>
     <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-1348">CIL-1348</a>: Debug print for clients with custom short IDs did not work right,
@@ -40,9 +41,11 @@
         a provisioning error from COManage.</li>
     <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-1464">CIL-1464</a>: Disable clipboard use by Command Line Client when used
         as a proxy.</li>
-
-
-
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-1490">CIL-1490</a>: Scope matching for templates was too simple-minded, assuming every scope was
+    a uri or ignored. With scopes like compute.modify, better matching is needed.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-1493">CIL-1493</a>: Remove non standard cid claim in SciTokens.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-1498">CIL-1498</a>: is_defined failing on stem elements in QDL.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-1507">CIL-1507</a>: Simplify setting cfg attribute in the CLI.</li>
 
 </ul>
 

@@ -37,7 +37,7 @@ if[
    ][
              sys_err.ok := false;
         sys_err.message := 'Multiple ' + CS + ' scopes are unsupported.';
-      sys_err.errorType := 'access_denied';
+      sys_err.error_type := 'access_denied';
         return(wlcg_cs.);
    ];
 

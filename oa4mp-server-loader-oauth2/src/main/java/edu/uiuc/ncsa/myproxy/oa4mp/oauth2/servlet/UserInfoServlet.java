@@ -97,7 +97,7 @@ public class UserInfoServlet extends BearerTokenServlet {
         } catch (ScriptRuntimeException sre) {
             // Client threw an exception.
             debugger.trace(this, "script runtime exception \"" + sre.getMessage() + "\"");
-            throw new OA2ATException(sre.getRequestedType(), sre.getMessage(), sre.getStatus(), transaction.getRequestState());
+            throw new OA2ATException(sre.getRequestedType(), sre.getMessage(), sre.getHttpStatus(), transaction.getRequestState());
         } catch (IllegalAccessException iax) {
             throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
                     "access denied",
