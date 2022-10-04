@@ -1080,12 +1080,12 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             debugger.trace(this, "Returned AT from handler:" + newAT + ", for claims " + st2.getATData().toString(2));
         } else {
             debugger.trace(this, "NO ATHandler in jwtRunner");
-
         }
         tokenResponse.setClaims(st2.getUserMetaData());
         debugger.trace(this, "set token signing flag =" + tokenResponse.isSignToken());
         // no processing of the refresh token is needed if there is none.
         if (!tokenResponse.hasRefreshToken()) {
+            debugger.info(this, "token response has no refresh token");
             return;
         }
         if (!client.isRTLifetimeEnabled() && oa2SE.isRefreshTokenEnabled()) {

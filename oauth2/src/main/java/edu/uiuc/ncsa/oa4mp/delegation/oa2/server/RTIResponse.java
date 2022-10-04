@@ -13,4 +13,15 @@ public class RTIResponse extends IDTokenResponse {
                        boolean isOIDC) {
         super(accessToken, refreshToken,isOIDC);
     }
+
+    @Override
+    public String toString() {
+        return "RTIResponse{" +
+                "accessToken=" + accessToken +
+                ", refreshToken=" + refreshToken +
+                ", signToken=" + signToken +
+                ", claims=" + claims +
+                ", supportedScopes=" + supportedScopes +
+                '}';
+    }
 }
