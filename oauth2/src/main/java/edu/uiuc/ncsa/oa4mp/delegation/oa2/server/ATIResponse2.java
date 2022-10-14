@@ -38,4 +38,5 @@ public class ATIResponse2 extends IDTokenResponse implements ATResponse {
     public void setVerifier(Verifier verifier) {
         this.verifier = verifier;
     }
+
 }

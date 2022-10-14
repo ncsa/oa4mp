@@ -16,6 +16,7 @@ import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.servlet.AbstractServlet;
 import edu.uiuc.ncsa.security.servlet.ExceptionHandler;
 import edu.uiuc.ncsa.security.servlet.Initialization;
+import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.util.mail.MailUtil;
 import edu.uiuc.ncsa.security.util.pkcs.KeyPairPopulationThread;
 
@@ -24,7 +25,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
-import java.sql.SQLException;
 import java.util.List;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet.ERROR_NOTIFICATION_BODY_KEY;
@@ -118,9 +118,11 @@ public class OA4MPServletInitializer implements Initialization {
         MyProxyDelegationServlet.addNotificationListener(exceptionNotifier);
         notifiersSet = true;
     }
-   protected void realInit() throws ServletException{
 
-   }
+    protected void realInit() throws ServletException {
+
+    }
+
     @Override
     public void init() throws ServletException {
         if (isInitRun) return;
@@ -134,18 +136,18 @@ public class OA4MPServletInitializer implements Initialization {
         if (serviceAddress != null) {
             DebugUtil.setHost(serviceAddress.getHost());
         }
-        try {
-            //mps.storeUpdates();
-            for(Store s : mps.getServiceEnvironment().listStores()){
-
+        for (Store s : mps.getServiceEnvironment().listStores()) {
+            try {
+                ServletDebugUtil.info(this, "updating store table for " + s);
                 mps.processStoreCheck(s);
+            } catch (Throwable e) {
+                ServletDebugUtil.error(this, "could not update table for store " + s, e);
+                if (ServletDebugUtil.isEnabled()) {
+                    e.printStackTrace();
+                }
             }
-
-        } catch ( SQLException e) {
-            e.printStackTrace();
-            throw new ServletException("Could not update table", e);
         }
-//        Cleanup transactionCleanup = MyProxyDelegationServlet.transactionCleanup;
+
         ServiceEnvironmentImpl env = (ServiceEnvironmentImpl) getEnvironment();
 
         MyLoggingFacade logger = env.getMyLogger();
@@ -153,8 +155,7 @@ public class OA4MPServletInitializer implements Initialization {
 
 
         if (MyProxyDelegationServlet.transactionCleanup == null) {
-            LockingCleanup lc =  new LockingCleanup<>(logger, "transaction cleanup");
-            //transactionCleanup = new Cleanup<>(logger, "transaction cleanup");
+            LockingCleanup lc = new LockingCleanup<>(logger, "transaction cleanup");
 
 
             lc.setStopThread(false);
@@ -162,8 +163,8 @@ public class OA4MPServletInitializer implements Initialization {
             lc.addRetentionPolicy(new ValidTimestampPolicy());
             MyProxyDelegationServlet.transactionCleanup = lc; // set it in the servlet
             // Part of migration away from OAuth 1.0a. Do not start this here
-       //     transactionCleanup.start();
-       //     logger.info("Starting transaction store cleanup thread");
+            //     transactionCleanup.start();
+            //     logger.info("Starting transaction store cleanup thread");
         }
         Cleanup<Identifier, CachedObject> myproxyConnectionCleanup = MyProxyDelegationServlet.myproxyConnectionCleanup;
         int i = 0;
@@ -192,7 +193,7 @@ public class OA4MPServletInitializer implements Initialization {
             MyProxyDelegationServlet.myproxyConnectionCleanup = myproxyConnectionCleanup; // set it in the servlet
             // Set the cleanup interval much higher than the default (1 minute). We don't service
             // MyProxy requests much any more, so it can be set a lot lower.
-            MyProxyDelegationServlet.myproxyConnectionCleanup.setCleanupInterval(6*60*1000L);
+            MyProxyDelegationServlet.myproxyConnectionCleanup.setCleanupInterval(6 * 60 * 1000L);
             DebugUtil.trace(this, "setting MyProxy connection cleanup interval to 6 hours.");
             myproxyConnectionCleanup.setStopThread(false);
             Cache myproxyConnectionCache = MyProxyDelegationServlet.myproxyConnectionCache;

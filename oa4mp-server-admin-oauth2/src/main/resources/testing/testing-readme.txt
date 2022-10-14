@@ -356,6 +356,8 @@ When a new version is deployed, here is the testing order
     *************************
     ** local CILogon test! **
     *************************
+    Client ID: localhost:test/df
+
      a client for testing the device flow against the CILogon server
      This will require doing the DBService calls manually (that's part of the test).
      In the CLC load the configuration and type
@@ -365,7 +367,7 @@ When a new version is deployed, here is the testing order
      A. Use QDL
      Run the QDL scripts with the user_code and the user name. These are in
 
-     /home/ncsa/dev/ncsa-git/cilogon/cilogon2-admin-oauth2/src/main/scripts
+     /home/ncsa/dev/ncsa-git/cilogon/cilogon-admin/src/main/scripts
 
      Set the username in the transaction directly (takes place of CILogon backend calls):
      ./set-user.qdl USER_CODE username
@@ -378,7 +380,7 @@ When a new version is deployed, here is the testing order
         from the command line. There are two scripts that do this. Look at them
         to be sure they point to localhost:9443
 
-        bash$ cd ~/dev/ncsa-git/cilogon/cilogon2-admin-oauth2/src/main/scripts
+        bash$ cd ~/dev/ncsa-git/cilogon/cilogon-admin/src/main/scripts
         bash$ test-check-user-code.sh USER_CODE
 
         That should return with a status of 0 and a summary of the client.

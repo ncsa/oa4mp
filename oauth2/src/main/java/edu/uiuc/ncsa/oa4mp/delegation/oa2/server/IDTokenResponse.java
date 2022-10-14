@@ -181,7 +181,7 @@ public abstract class IDTokenResponse extends IResponse2 {
 
     @Override
     public String toString() {
-        return "IDTokenResponse{" +
+        return getClass().getSimpleName() + "{" +
                 "accessToken=" + accessToken +
                 ", refreshToken=" + refreshToken +
                 ", signToken=" + signToken +

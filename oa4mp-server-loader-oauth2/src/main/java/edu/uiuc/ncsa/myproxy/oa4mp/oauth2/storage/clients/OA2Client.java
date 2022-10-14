@@ -55,6 +55,11 @@ public class OA2Client extends Client implements OA2ClientScopes {
         client.setSignTokens(isSignTokens());
     }
 
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    String comment;
     public List<Identifier> getPrototypes() {
         if(prototypes == null){
             prototypes = new ArrayList<>();

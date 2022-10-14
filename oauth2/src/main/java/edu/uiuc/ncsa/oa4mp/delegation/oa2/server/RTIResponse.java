@@ -13,4 +13,6 @@ public class RTIResponse extends IDTokenResponse {
                        boolean isOIDC) {
         super(accessToken, refreshToken,isOIDC);
     }
+
+
 }

@@ -894,6 +894,9 @@ public class OA2CLCCommands extends CLCCommands {
             for (String key : userInfo.getMap().keySet()) {
                 say("          " + key + " = " + userInfo.getMap().get(key));
             }
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.putAll(userInfo.getMap());
+            claims = jsonObject;
         } catch (Throwable t) {
             lastException = t;
             throw t;

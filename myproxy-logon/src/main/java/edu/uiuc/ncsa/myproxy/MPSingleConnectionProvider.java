@@ -30,6 +30,7 @@ public class MPSingleConnectionProvider<T extends MyProxyConnectable> implements
     MyLoggingFacade facade;
     String serverDN;
 
+
     public MPSingleConnectionProvider(MyLoggingFacade logger,
                                       String username,
                                       String password,
@@ -170,6 +171,15 @@ public class MPSingleConnectionProvider<T extends MyProxyConnectable> implements
         public LinkedList<X509Certificate> getCerts(MyPKCS10CertRequest pkcs10CertRequest) {
             return getCerts(pkcs10CertRequest.getEncoded());
         }
+        public String getDescription() {
+            return description;
+        }
+
+        public void setDescription(String description) {
+            this.description = description;
+        }
+
+        String description;
 
         Identifier identifier;
 

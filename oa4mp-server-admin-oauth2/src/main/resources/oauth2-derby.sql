@@ -91,6 +91,8 @@ run '/full/path/to/oauth2-derby.qdl';
 CREATE SCHEMA oauth2;
 */
 
+alter table oauth2.tx_records add column description CLOB;
+
 CREATE TABLE oauth2.adminClients
 (
     admin_id VARCHAR(255) PRIMARY KEY,
