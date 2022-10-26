@@ -225,11 +225,14 @@ public class ClientUtils {
         return resolveScopes(transactionState, oa2Client, false, isRFC8628);
     }
 
-    public static Collection<String> resolveScopes(TransactionState transactionState, OA2Client oa2Client, boolean isNew, boolean isRFC8628) {
-        // Next 2 parameters are so error messages can be reasonably constructed, naught else
-        String rawScopes = transactionState.getRequest().getParameter(SCOPE);
-
-        OA2ServiceTransaction st = (OA2ServiceTransaction) transactionState.getTransaction();
+    public static Collection<String> resolveScopes(HttpServletRequest request, OA2ServiceTransaction st, OA2Client oa2Client, boolean isNew, boolean isRFC8628) {
+        String rawScopes = request.getParameter(SCOPE);
+        if(StringUtils.isTrivial(rawScopes) ){
+            // It is possible that there are no scopes set for this client at all, e.g.
+            // a pure OAuth 2 client that only later will use scopes to exclusively
+            // request access token scopes.
+            return new ArrayList<>();
+        }
         MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(st.getOA2Client());
         /*
         debugger.trace(ClientUtils.class, ".resolveScopes: stored client scopes =" + ((OA2Client) st.getClient()).getScopes());
@@ -240,7 +243,7 @@ public class ClientUtils {
         */
         Collection<String> requestedScopes = new ArrayList<>();
 
-        if (rawScopes == null || rawScopes.length() == 0) {
+        if (StringUtils.isTrivial(rawScopes)) {
             if (isRFC8628) {
                 // It is not an error if this is the RFC8628 servlet. Just return an empty list
                 return new ArrayList<>();
@@ -314,11 +317,12 @@ public class ClientUtils {
         } else {
             debugger.trace(ClientUtils.class, ".resolveScopes: non-strict scopes =" + requestedScopes);
         }
-/*     Does not really work for access token scopes
-       if(!isNew){
-             requestedScopes = ScopeTemplateUtil.doCompareTemplates(st.getValidatedScopes(), requestedScopes, false);
-         }*/
         return requestedScopes;
+
+    }
+    public static Collection<String> resolveScopes(TransactionState transactionState, OA2Client oa2Client, boolean isNew, boolean isRFC8628) {
+        // Next 2 parameters are so error messages can be reasonably constructed, naught else
+        return resolveScopes(transactionState.getRequest(), (OA2ServiceTransaction) transactionState.getTransaction(), oa2Client, isNew, isRFC8628);
     }
 
 

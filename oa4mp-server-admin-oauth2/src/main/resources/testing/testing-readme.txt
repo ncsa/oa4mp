@@ -15,7 +15,7 @@ When a new version is deployed, here is the testing order
      Most basic virtual organization test. Configuration will return JWTs for both access and
      refesh tokens, requiring signatures for generation and verification.
      Also tests code challenge (RFC 7636) machinery.
-     set_param -a scope "read: write: x.y:"
+     set_param -a scope "read: write:"
      set_param -a code_challenge "N_zjM2czxZIWNar-lWUiuS7-Pacwh-k-L_Akpje6AmY"
      set_param -a code_challenge_method S256
      set_param -t code_verifier "qBdfP8Wmpomgkq6aJwcvZQMHx553RK4P7LAYxmzMAkmo8cM7MlE8ViJSOx38nlHr"
@@ -24,7 +24,7 @@ When a new version is deployed, here is the testing order
 
      (The -t option for scopes is set so this works with device flow).
      
-     AT, R:
+     AT, R: (Note that his overrides the authz scopes, so check that all of these scopes are present!)
        scopes:
           read:/home/jeff
           write:/data/jeff/cluster
@@ -45,12 +45,12 @@ When a new version is deployed, here is the testing order
          exchange -rt
 
   -- localhost:test/no_cfg
+     *** Uses a Derby store for the client, just to make sure that gets tested someplace. ***
      No configuration of any sort (i.e., cfg is unset, strict scopes etc)
      issue
          clear_all_params -a -t -x
      before hand to remove any state from other client tests. This accepts no additional
      scopes in the request.
-     Uses a Derby store for the client, just to make sure that gets tested someplace.
      Most common configuration in production.
      ** Must pass **
        Generic AT with lifetime 1009 sec.
@@ -99,19 +99,20 @@ When a new version is deployed, here is the testing order
 
         In the token handler document run through the various examples.
 
-        In CLC you need to set the following parameters *before* starting exchange (uri):
+        In CLC you need to set parameters *before* starting exchange (uri).
+        $SUB is the subject from the IDP
         Ex. 1   using the web flow
         set_param -a scope "read: x.y: x.z write:"
         AT:
            scopes:
-             read:/home/jeff
-             read:/public/lsst/jeff
+             read:/home/$SUB
+             read:/public/lsst/$SUB
              x.z
              write:/data/cluster
              x.y:/abc/def
            lifetime: 750 sec.
 
-        Ex 1a - using the device flow, google login
+        Ex 1a - using the device flow, IDP is Google
          AT:
            scopes:
               x.z write:/data/cluster
@@ -121,11 +122,18 @@ When a new version is deployed, here is the testing order
 
         set_param -t scope "read: x.y: x.z write:"
 
+        You will only get back scope of x.z (unqualified) for refresh and exchange since no paths
+        are specified and otherwise they would be upscoped. To get specific scopes (for Google IDP,
+        using "j g" as identity) set
+
+        set_param -x scope "read:/home/http://cilogon.org/serverA/users/6849 read:/home/http://cilogon.org/serverA/users/6849/baz x.y:/abc/def/pqr"
+
+
         Ex. 2
-        set_param -a scope "read:/home/jeff/data x.y: x.z write:/data/cluster/ligo"
+        set_param -a scope "read:/home/$SUB/data x.y: x.z write:/data/cluster/ligo"
         AT:
           scopes:
-             read:/home/jeff/data
+             read:/home/$SUB/data
              x.y:/abc/def
              x.z
              write:/data/cluster/ligo
@@ -140,24 +148,26 @@ When a new version is deployed, here is the testing order
            lifetime: same as #1
 
         Ex. 4
-        set_param -x scope "read:/home/jeff/data x.y: x.z write:/data/cluster/ligo"
+        set_param -x scope "read:/home/$SUB/data x.y: x.z write:/data/cluster/ligo"
         do exchange
         AT:
            scopes:
-              read:/home/jeff/data
+              read:/home/$SUB/data
               x.z
               write:/data/cluster/ligo
            lifetime: same as #1
            
         Ex. 5
-        set_param -a scope "read:/home/jeff/data x.y: x.z write:/data/cluster/ligo"
-        set_param -x scope "read:/home/jeffy x.y:/abc/def/ghi write:/data/cluster1 x.z:/etc/certs"
+        set_param -a scope "read:/home/$SUB/data x.y: x.z write:/data/cluster/ligo"
+        set_param -x scope "read:/home/$SUBy x.y:/abc/def/ghi write:/data/cluster1 x.z:/etc/certs"
+        (add extra character to -x read scope to test that e.g. jeffy does not get granted if jeff
+         is allowed.)
 
         access
           AT:
              scopes:
                 x.z
-                read:/home/jeff/data
+                read:/home/$SUB/data
                 x.y:/abc/def
                 write:/data/cluster/ligo
           at lifetime 750 sec
@@ -210,6 +220,20 @@ When a new version is deployed, here is the testing order
      set_param -x scope "x.y:/abc/def"
 
      So that you can use pretty much any IDP
+  -- localhost:test/qdl
+     Any IDP
+     This has 3 sequential scripts in /home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-admin-oauth2/src/main/resources/qdl
+     /seq0.qdl, /seq1.qdl, /seq2.qdl each of which is configured with its own set of arguments,
+     which print out stuff to the log (have to test logging works)
+     and puts in claims based on the arguments.
+
+     Check that the logs have the names seqx and the arguments passed in printed.
+     The claims should have the following assertions:
+     seq0 = 636 (an integer)
+     seq1 = 'is_member_of'
+     seq2 ='seq 2 passed ' + exec_phase
+
+     You can stick other stuff into the scripts too as a quick test.
 
   -- localhost:test/fnal
         Test client that point to main QDL scripts.
@@ -219,19 +243,19 @@ When a new version is deployed, here is the testing order
         Test #0 -- request with no scopes.
            no scopes in access token (since none requested) => access_denied exception
 
-        Test #1 -- plain, no wlcg capability sets. Requests two storage capabilities, one good one not
-        ** INVALID** There used to be entries in LDAP to do this, but they were removed.
-                     Keep this test in case they come back, but it will fail until then.
-        set_param -a scope "storage.create:/ storage.read:/"
-        set_param -x scope "storage.read:/X/public storage.create:/dune/  storage.create:/X/users"
-
-        get_at returns:
-                scopes : storage.read:/X,  storage.read:/Y/foo
-           at lifetime : 550 sec
-           rt lifetime : 750 sec
-
-        exchange returns
-        scopes : storage.read:/X/public
+        | Test #1 -- plain, no wlcg capability sets. Requests two storage capabilities, one good one not
+        | ** INVALID** There used to be entries in LDAP to do this, but they were removed.
+        |              Keep this test in case they come back, but it will fail until then.
+        | set_param -a scope "storage.create:/ storage.read:/"
+        | set_param -x scope "storage.read:/X/public storage.create:/dune/  storage.create:/X/users"
+        |
+        | get_at returns:
+        |         scopes : storage.read:/X,  storage.read:/Y/foo
+        |    at lifetime : 550 sec
+        |    rt lifetime : 750 sec
+        |
+        | exchange returns
+        | scopes : storage.read:/X/public
 
         Test #2 -- request non-existent WLCG capability set
         set_param -a scope "wlcg.capabilityset:/fubar "
@@ -338,11 +362,12 @@ When a new version is deployed, here is the testing order
         Check configruation first. Usually it is set to NCSA default and
         a bogus WLCG access token.
   -- localhost:test/df --
+         This is actually a CILogon test. See below.
 
   -- localhost:test/user_info
      Tests that the user info endpoint will update the claims when accessed. This has no parameters
      * any IDP (tested mostly with GitHub)
-     * use uri not device flow
+     * use uri not device flow, since the setup happens in the pre-auth QDL script
      * the file
          /home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-admin-oauth2/src/main/resources/qdl/ui-test/test-claims.json
        contains the claims under the user jgaynor@foo.bar. Twiddle these. The test consists of getting
@@ -357,6 +382,9 @@ When a new version is deployed, here is the testing order
     ** local CILogon test! **
     *************************
     Client ID: localhost:test/df
+
+     (Caveat -- this client needs to be recreated by copying the df test client configuration
+      for OA4MP and tweaking it. This is because a database crash lost the client configuration.)
 
      a client for testing the device flow against the CILogon server
      This will require doing the DBService calls manually (that's part of the test).

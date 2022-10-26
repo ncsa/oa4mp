@@ -26,8 +26,17 @@
 
 cfg. := new_template('file');
 say(to_string('*** user_info dir = ' + to_string(dir('vfs#/scripts/'))));
-cfg.file_path := 'vfs#/scripts/ui-test/test-claims.json';
-//cfg.file_path := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-admin-oauth2/src/main/resources/qdl/ui-test/test-claims.json';
+/*
+
+   ╔══════════════════════════════════════════════════════════════════════════════╗
+   ║  NOTE: You CANNOT use a QDL path for file_path since the last line hands     ║
+   ║  over control of the claim source to OA4MP, which is then invoked by the     ║
+   ║  FSClaimSource handler there -- i.e., it is given to a non-QDL               ║
+   ║ component to manage.                                                         ║
+   ╚══════════════════════════════════════════════════════════════════════════════╝
+
+*/
+cfg.file_path := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-admin-oauth2/src/main/resources/qdl/ui-test/test-claims.json';
 cfg.'claim_key' := 'eppn'; 
 claims.'eppn' := 'test-eppn@foo.bar'; // set it for testing later. Use GitHub for IDP so this can be set here.
 claim_sources. := claim_sources. ~ [create_source(cfg.)];

@@ -337,8 +337,9 @@ public class OA2CLCCommands extends CLCCommands {
     }
 
     boolean useClipboard = true;
+
     protected void copyToClipboard(String target, String s) {
-        if(!isUseClipboard()){
+        if (!isUseClipboard()) {
             return;
         }
         try {
@@ -372,7 +373,7 @@ public class OA2CLCCommands extends CLCCommands {
      * @return
      */
     protected boolean hasClipboard() {
-        if(!isUseClipboard()){
+        if (!isUseClipboard()) {
             return false;
         }
         // Annoying thing #42. we check if the clipboard exists by trying to read from it
@@ -468,7 +469,7 @@ public class OA2CLCCommands extends CLCCommands {
                 return;
             }
             // no arg. get it from the clipboard
-            if(!isUseClipboard()){
+            if (!isUseClipboard()) {
                 say("Clipboard use disabled");
                 return;
             }
@@ -1386,7 +1387,7 @@ public class OA2CLCCommands extends CLCCommands {
                 // Must give the asset a new id or the state of the provisioning client
                 // will not be distinct and you will get very bizarre errors from the server
                 Identifier id = AssetStoreUtil.createID();
-                if(isVerbose()){
+                if (isVerbose()) {
                     say("created new asset with id " + id);
                 }
                 dummyAsset.setIdentifier(id);
@@ -1756,10 +1757,11 @@ public class OA2CLCCommands extends CLCCommands {
             say("clear_all_params " + REQ_PARAM_SWITCH +
                     " | " + TOKEN_PARAM_SWITCH +
                     " | " + REFRESH_PARAM_SWITCH +
-                    " | " + EXCHANGE_PARAM_SWITCH
+                    " | " + EXCHANGE_PARAM_SWITCH +
+                    " | -all"
             );
             say("Usage: Clear all of the additional parameters for the switch.");
-            sayi("There is no default to clear all. You must invoke this with both switches or nothing will be done.");
+            sayi("-all will clear everything . You must invoke this a switch or nothing will be done.");
             sayi(shortSwitchBlurb);
             say("See also: set_param, get_param, rm_param");
             return;
@@ -1772,6 +1774,14 @@ public class OA2CLCCommands extends CLCCommands {
         inputLine.removeSwitch(TOKEN_PARAM_SWITCH, SHORT_TOKEN_PARAM_SWITCH);
         inputLine.removeSwitch(REFRESH_PARAM_SWITCH, SHORT_REFRESH_PARAM_SWITCH);
         inputLine.removeSwitch(EXCHANGE_PARAM_SWITCH, SHORT_EXCHANGE_PARAM_SWITCH);
+
+        if (inputLine.hasArg("-all")) {
+            getRP = true;
+            getTP = true;
+            getXP = true;
+            getRFP = true;
+            inputLine.removeSwitch("-all");
+        }
 
         if (!(getTP || getRP || getXP || getRFP)) {
             say("Sorry, you must specify which set of additional parameters to clear.");

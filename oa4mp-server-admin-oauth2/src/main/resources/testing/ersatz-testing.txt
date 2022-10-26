@@ -30,8 +30,8 @@ provisioner id: localhost:command.line2
 How to test.
 You will need two running instances of oa2-client. One to provision and the other to
 do the substitution.
-** Make sure you do a valid flow for localhost:command.line2. Check the testing-readme.txt
-** to see what the current state is!
+** Make sure you do a valid flow for localhost:command.line2.
+** Check the testing-readme.txt for the correct parameters!
 
 1. Start flow for localhost:command.line2
    a. get the access token(s)

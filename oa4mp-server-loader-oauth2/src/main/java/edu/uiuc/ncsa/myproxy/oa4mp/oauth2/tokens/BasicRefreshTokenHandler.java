@@ -144,19 +144,18 @@ public class BasicRefreshTokenHandler extends AbstractPayloadHandler implements 
         }
         JSONObject rtData = transaction.getRTData();
         // if the token identifier has been updated, record this.
+        String rt ;
+        if(transaction.getRefreshToken() != null){
+            // default
+                rtData.put(JWT_ID, transaction.getRefreshToken().getToken());
+        }
         if(getPhCfg().hasTXRecord()){
             // Fixes CIL-971
             TXRecord txRecord = getPhCfg().getTxRecord();
             if(RFC8693Constants.REFRESH_TOKEN_TYPE.equals(txRecord.getTokenType())){
                 rtData.put(JWT_ID, txRecord.getIdentifierString());
             }
-        }else{
-            if (transaction.getRefreshToken() != null) {
-                rtData.put(JWT_ID, transaction.getRefreshToken().getToken());
-            }
-
         }
-
         long proposedLifetime = (rtData.getLong(EXPIRATION) - rtData.getLong(ISSUED_AT))*1000;
         if (proposedLifetime <= 0) {
             proposedLifetime = transaction.getMaxRtLifetime();

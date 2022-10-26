@@ -506,6 +506,8 @@ public class OIDCCMServlet extends EnvServlet {
                 }
                 client.setScopes(newScopeList);
             }
+            boolean isDebugOn = client.isDebugOn(); // CIL-1538
+
             // so we create a new client, set the secret and id, then update that. This way if
             // this fails we can just back out.
             OA2Client newClient = (OA2Client) getOA2SE().getClientStore().create();
@@ -542,6 +544,7 @@ public class OIDCCMServlet extends EnvServlet {
                     // Never an anonymous client for a put.
                     fireMessage(false, getOA2SE(), defaultReplacements(req, adminClient, newClient));
                 }
+                newClient.setDebugOn(isDebugOn); // CIL-1538
                 getOA2SE().getClientStore().save(newClient);
                 writeOK(resp, toJSONObject(newClient));
                 //     writeOK(resp, resp);
@@ -1062,6 +1065,10 @@ public class OIDCCMServlet extends EnvServlet {
         if (jsonRequest.containsKey(STRICT_SCOPES)) {
             client.setStrictscopes(jsonRequest.getBoolean(STRICT_SCOPES));
             jsonRequest.remove(STRICT_SCOPES);
+        }
+        if(jsonRequest.containsKey(DESCRIPTION)){
+            client.setDescription(jsonRequest.getString(DESCRIPTION));
+            jsonRequest.remove(DESCRIPTION);
         }
         if (jsonRequest.containsKey(SKIP_SERVER_SCRIPTS)) {
             client.setStrictscopes(jsonRequest.getBoolean(SKIP_SERVER_SCRIPTS));

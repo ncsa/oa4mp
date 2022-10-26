@@ -41,16 +41,18 @@ public class DiscoveryServlet extends MyProxyDelegationServlet {
             jsonObject = new JSONObject();
         }
         String requestURI = getRequestURI(httpServletRequest);
+        String authzEndpoint;
         if (!isEmpty(getServiceEnvironment().getAuthorizationServletConfig().getAuthorizationURI())) {
-            jsonObject.put(AUTHORIZATION_ENDPOINT, getServiceEnvironment().getAuthorizationServletConfig().getAuthorizationURI());
+            authzEndpoint = getServiceEnvironment().getAuthorizationServletConfig().getAuthorizationURI();
         } else {
-            jsonObject.put(AUTHORIZATION_ENDPOINT, requestURI + "/authorize");
+            authzEndpoint = requestURI + "/authorize";
         }
+        jsonObject.put(AUTHORIZATION_ENDPOINT, authzEndpoint);
         // The next line points to the native OA4MP registration protocol
         //jsonObject.put(REGISTRATION_ENDPOINT, requestURI + "/register");
         // The next line points to the RFC 7591/7592 protocol.
         // Should be the same as in ClientManagementConstants.DEFAULT_RFC7591_ENDPOINT
-        jsonObject.put(REGISTRATION_ENDPOINT, requestURI + "/oidc-cm" );
+        jsonObject.put(REGISTRATION_ENDPOINT, requestURI + "/oidc-cm");
         return jsonObject;
     }
 
@@ -67,8 +69,9 @@ public class DiscoveryServlet extends MyProxyDelegationServlet {
         //httpServletRequest.setAttribute(DISCOVERY_CONTENT, out);
         //JSPUtil.fwd(httpServletRequest, httpServletResponse, getDiscoveryPagePath());
     }
+
     protected static String getRequestURI(HttpServletRequest request, boolean includePort) {
-        String requestURI = request.getScheme() + "://" + request.getServerName() + (includePort?(":" + request.getServerPort()):"")  + request.getRequestURI();
+        String requestURI = request.getScheme() + "://" + request.getServerName() + (includePort ? (":" + request.getServerPort()) : "") + request.getRequestURI();
         //  String requestURI = request.getRequestURI();
         if (requestURI.endsWith("/")) {
             requestURI = requestURI.substring(0, requestURI.length() - 1);
@@ -78,6 +81,7 @@ public class DiscoveryServlet extends MyProxyDelegationServlet {
         }
         return requestURI;
     }
+
     protected static String getRequestURI(HttpServletRequest request) {
         return getRequestURI(request, true);
     }

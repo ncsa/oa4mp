@@ -1,0 +1,51 @@
+/*
+
+  Test to show that sequences of QDL scripts can be loaded and run in order.
+
+{"tokens": {"identity": {
+   "qdl":  [
+      {
+     "load": "seq0.qdl",
+     "args":    {
+      "bind_dn": "bind_dn",
+      "bind_password": "abcdefghijkl",
+      "return_attributes": ["isMemberOf"],
+      "search_attribute": "uid",
+      "port": 636
+     },
+     "xmd": {"exec_phase":    [
+      "post_auth",
+      "post_refresh",
+      "post_token",
+      "post_user_info"
+     ]}
+    },
+      {
+     "load": "seq1.qdl",
+     "args": {"isMemberOf": "is_member_of"},
+     "xmd": {"exec_phase":    [
+      "post_auth",
+      "post_refresh",
+      "post_token",
+      "post_user_info"
+     ]}
+    },
+          {
+         "load": "seq2.qdl",
+         "args": {"isMemberOf": "is_member_of"},
+         "xmd": {"exec_phase":    [
+          "post_auth",
+          "post_refresh",
+          "post_token",
+          "post_user_info"
+         ]}
+        }
+
+   ],
+  "type": "identity"
+}}}
+*/
+say('seq 0');
+say(script_args(-1));
+claims.'seq0' := script_args(0).'port'; // returns 636
+claims.'seq0_phase' := exec_phase; // returns current exec phase

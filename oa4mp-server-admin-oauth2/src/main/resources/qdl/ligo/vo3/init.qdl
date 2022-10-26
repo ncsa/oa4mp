@@ -1,0 +1,75 @@
+/* ********
+     Sets up all constants. At the end of this the following are ready for use
+     requested_audience. - The audience (w/ overrides)
+       requested_scopes. - the scopes (w/ overrides)
+                 robots. - list of robots (may be empty)
+               is_robot - if size(robots.) == 1
+    get_permissions(g.) - AT scopes from the claims.
+     This checks for any number of error conditions (wrong IDP, no EPPN,...)
+     so after this is called, check sys_err.
+
+     This does not do to logic for using the robot. That is in access.qdl.
+******** */
+
+
+     all_audience. := ['ANY', 'LIGO', 'segments.ligo.org'];
+       robot_caput := 'igwn.robot:'; // marker in scopes for robots
+access_token.'ver' := 'scitoken:2.0';
+
+ if[
+       !is_defined(claims.'eppn')
+   ]then[
+           sys_err.ok := false;
+      sys_err.message := 'Missing EPPN. Cannot determine scopes.';
+   sys_err.error_type := 'invalid_request';
+      return();
+ ];
+
+                ζ.'Communities:LSCVirgoLIGOGroupMembers' := ['read:/DQSegDB' ,'read:/frames', 'read:/GraceDB','write:/GraceDB'];   //CIL-1345
+                   ζ.'Communities:LVC:SegDB:SegDBWriter' := ['write:/DQSegDB'];
+                     ζ.'gw-astronomy:KAGRA-LIGO:members' := ['read:/GraceDB', 'read:/frames','write:/GraceDB']; //CIL-1345, CIL-1427
+   ζ.'Services:XRootD:SciTokens:write-frames:authorized' := ['write:/frames']; //CIL-1414,
+    ζ.'Services:XRootD:SciTokens:read-frames:authorized' := ['read:/frames']; //CIL-1415
+        ζ.'Services:OSGPilotTest:SciTokens:scope_create' := ['scope_create'];
+      ζ.'Services:OSGPilotTest:SciTokens:compute_create' := ['compute_create'];
+      ζ.'Services:OSGPilotTest:SciTokens:compute_cancel' := ['compute_cancel'];
+      ζ.'Services:OSGPilotTest:SciTokens:compute_modify' := ['compute_modify'];
+        ζ.'Services:OSGPilotTest:SciTokens:compute_read' := ['compute_read'];
+
+
+        get_permissions(γ.) -> reduce(@~,ζ\(γ\*\name));
+   //   get_permissions(γ.) -> ~values(mask(ζ., in_group2(keys(ζ.),γ.)));
+
+     //  Setup robots. Robot scope is always in the initial request and
+     //  ignored elsewhere, so scopes. is the authoritative source.
+
+         robots. := ~mask(scopes., 0 == starts_with(scopes., robot_caput));
+
+          if[
+             1 < size(robots.);
+          ][
+                    sys_err.ok := false;
+               sys_err.message := 'too many robots (' + size(robots.) +')';
+            sys_err.error_type := 'access_denied';
+               return([]);
+          ];
+
+          is_robot := 1 == size(robots.);
+
+         if[
+              is_robot][
+          if[
+            claims.'idp' != idp.'ligo'
+            ][
+                    sys_err.ok := false;
+               sys_err.message := 'IDP must be ligo, not ' + claims.'idp';
+            sys_err.error_type := 'access_denied';
+               return();
+             ];
+          ];
+   // Audience setup
+   // If there is no audience, use all_audience. Otherwise check if there is an override in tx_audience and use that.
+    requested_audience. := (size(tx_audience.) == 0)?(size(audience.)==0?all_audience.:audience.):tx_audience.;
+
+     // Scope setup.
+    requested_scopes. := (0 < size(tx_scopes.))?tx_scopes.:scopes.;

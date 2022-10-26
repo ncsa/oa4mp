@@ -1,0 +1,33 @@
+/*
+    Refresh and token exchange if there is anything to do.
+*/
+
+ if[
+       !is_defined(claims.'eppn')
+   ]then[
+           sys_err.ok := false;
+      sys_err.message := 'Missing EPPN. Cannot determine scopes.';
+   sys_err.error_type := 'invalid_request';
+      return();
+ ];
+
+
+// Audience processing
+ requested_audience. := (size(tx_audience.) == 0)?audience.:tx_audience.;
+ access_token.aud. := (size(requested_audience.) == 0)?all_audience.:requested_audience.;
+
+// Scope processing
+    allowed_scopes. := script_load('ligo/vo3/get_attributes.qdl', claims.'eppn');
+    sys_err.ok?null:return(); // check for error and propagate if needed.
+
+  requested_scopes. := (0 < size(tx_scopes.))?tx_scopes.:scopes.;
+
+ if[
+    0 < size(requested_scopes.)
+  ][
+    // If they request different scopes, honor it. Otherwise don't.
+    //allowed_scopes. := mask(allowed_scopes., has_value(allowed_scopes., requested_scopes.));
+ //   allowed_scopes. := resolve_templates(allowed_scopes., requested_scopes., false);
+     allowed_scopes. := mask(allowed_scopes., allowed_scopes. ∈ requested_scopes.);
+  ];
+ access_token.scope := detokenize(unique(allowed_scopes.), ' ', 2); // turn in to string, omit duplications, trailing space

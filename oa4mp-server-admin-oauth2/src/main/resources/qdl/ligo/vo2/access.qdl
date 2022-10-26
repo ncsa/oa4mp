@@ -45,6 +45,8 @@ access_token.'ver' := 'scitoken:2.0';
    There is no error in requesting audiences we do not recognize, we just
    don't honor them.
 */
+  access_token.aud. := (size(audience.) == 0)?all_audience.:audience.;
+/*
   if[
     size(audience.) == 0
    ][
@@ -53,6 +55,7 @@ access_token.'ver' := 'scitoken:2.0';
       // return only things we recognize.
       access_token.aud. :=mask(all_audience.,  has_value(all_audience., audience.));
    ];
+*/
 
 claims.'sub' := claims.'eppn';
 access_token.'sub' := claims.'eppn';

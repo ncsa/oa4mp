@@ -1,0 +1,85 @@
+/*
+{"tokens": {"access": {
+ "qdl":  {
+  "load": "ligo/vo2/at.qdl",
+  "xmd": {"exec_phase":   [
+   "post_token",
+   "post_exchange",
+   "post_refresh"
+  ]}
+ },
+ "type": "sci_token"
+}}}
+
+   Sets up the access token in the initial pass.
+*/
+
+
+
+
+
+
+// get current allowed scopes based on group memberships
+  attributes. := script_load('ligo/vo3/get_attributes.qdl', claims.'eppn');
+    sys_err.ok?null:return();
+
+
+/*
+ If the uid value from the LIGO EPPN (e.g., "jim.basney" from "jim.basney@ligo.org") is a member
+ of the "Services:Robots:<robot-name>:SciTokens:authorized"
+ (e.g., "Services:Robots:ligorobot:SciTokens:authorized") group in ldap.ligo.org,
+ then set "sub":"<robot-name>@ligo.org"
+ (e.g., "ligorobot@ligo.org") and apply the LIGO authorization rules on the
+ remaining requested scopes. For example, if "ligorobot@ligo.org"
+ is a member of "Services:XRootD:SciTokens:write-frames:authorized" then it
+ may receive a SciToken with the "write:/frames" scope.
+*/
+   permissions. := null;
+   robot_name := null;
+  if[
+     is_robot
+   ][
+       robot_name := robots.0 - robot_caput;
+       if[
+        'Services:Robots:'; + robot_name + ':SciTokens:authorized' ∈ attributes.'isMemberOf'
+       ][
+                  moniker := robot_name + '@ligo.org';
+       access_token.'sub' :=   claims.'sub' := moniker ;
+            r_attributes. := script_load('ligo/vo3/get_attributes.qdl', moniker);
+             permissions. := get_permissions(r_attributes.'isMemberOf'));
+        ]else[
+           // they request a robot but do not have permission to do so. Raise an error
+               sys_err.ok := false;
+          sys_err.message := 'you do not have permission to use the robot named "' + robot_name + '"';
+       sys_err.error_type := 'access_denied';
+         return();
+        ];
+    ]else[
+      permissions. := get_permissions(attributes.'isMemberOf');
+      if[is_defined(attributes.'uid')][claims.'uid' := attributes.'uid';];
+      if[is_defined(attributes.'uin')][claims.'uin' := attributes.'uin';];
+   ]; // end robots
+
+
+
+ if[
+    0 < size(scopes.)
+  ][
+    // If they request different scopes, honor it. Otherwise don't.
+    //permissions. := resolve_templates(permissions., scopes., true);
+     permissions. := mask(permissions., permissions. ∈ scopes.);
+  ];
+
+   access_token.scope := detokenize(unique(permissions.), ' ', 2); // turn in to string, omit duplications, trailing space
+  requested_audience. := (size(tx_audience.) == 0)?audience.:tx_audience.;
+    access_token.aud. := (size(requested_audience.) == 0)?all_audience.:requested_audience.;
+
+/*
+   Audience processing.
+*/
+  access_token.aud. := (size(audience.) == 0)?all_audience.:audience.;
+
+claims.'sub' := claims.'eppn';
+access_token.'sub' := claims.'eppn';
+ say('*** LIGO: final access token = ' + to_string(access_token.));
+ say('*** LIGO: final claims  = ' + to_string(claims.));

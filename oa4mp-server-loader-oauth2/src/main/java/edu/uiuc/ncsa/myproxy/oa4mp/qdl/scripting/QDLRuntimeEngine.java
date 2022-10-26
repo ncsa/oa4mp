@@ -222,13 +222,13 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
     }
 
     // Idiom. If no scripts at all, then just return null;
-    protected ScriptInterface getScript(String phase) {
+    protected List<ScriptInterface> getScript(String phase) {
         if (getScriptSet() == null) return null;
         return getScriptSet().get(Scripts.EXEC_PHASE, phase);
     }
 
 
-    protected ScriptInterface getServerScript(String phase) {
+    protected List<ScriptInterface> getServerScript(String phase) {
         if (getQE().getServerScripts() == null || getQE().getServerScripts().isEmpty()) {
             return null;
         }
@@ -238,12 +238,14 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
 
     @Override
     public ScriptRunResponse run(ScriptRunRequest request) {
-        ScriptInterface s = getScript(request.getAction());
-        if (s == null) {
+        List<ScriptInterface> scripts = getScript(request.getAction());
+        if (scripts == null || scripts.isEmpty()) {
             return noOpSRR();
         }
         createSRRequest(request);
-        s.execute(state);
+        for(ScriptInterface s : scripts) {
+            s.execute(state);
+        }
         return createSRResponse();
     }
 
@@ -534,7 +536,6 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         }
         respMap.put(SRE_REQ_AUDIENCE, stemToList((QDLStem) state.getValue(AUDIENCE_VAR)));
         Object z = state.getValue(CLAIMS_VAR);
-        DebugUtil.trace(this, "QDL returned claims from state:" + z);
         QDLStem stemClaims;
         if (z instanceof QDLNull) {
             stemClaims = new QDLStem();

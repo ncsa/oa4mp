@@ -2,17 +2,14 @@
   Driver script for all post token, refresh and exchange
 */
 script_load('ligo/acl.qdl');
+script_load('utils/init.qdl'); // bunch of constants.
+script_load('ligo/vo3/init.qdl');
+sys_err.ok?null:return(); // if something went wrong in init.qdl, return.
+
 //claims.'eppn':= 'jeffrey.gaynor@ligo.org'; // debugging only
 
-all_audience. := ['ANY', 'LIGO', 'segments.ligo.org'];
-
-if[
-  exec_phase == 'post_token'
- ][
-   script_load('ligo/vo2/access.qdl');
-];
-if[
-  exec_phase == 'post_exchange' || exec_phase == 'post_refresh'
- ][
-   script_load('ligo/vo2/rtx.qdl');
-];
+   if[
+      exec_phase ∈ ['post_token', 'post_refresh', 'post_exchange']
+    ][
+      script_load('ligo/vo3/access.qdl');
+   ];

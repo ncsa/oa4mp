@@ -941,14 +941,77 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                     HttpStatus.SC_UNAUTHORIZED, null);
         }
         st2.setAccessToken(atResponse.getAccessToken()); // needed if there are handlers later.
+
+
+        /* *************** */
+        // CIL-1536 -- use tx record for forwarding any parameters to the runtime engine.
+
+        List<String> scopes = convertToList(state.getRequest(), OA2Constants.SCOPE);
+        List<String> audience = convertToList(state.getRequest(), RFC8693Constants.AUDIENCE);
+        List<String> resources = convertToList(state.getRequest(), RFC8693Constants.RESOURCE);
+        boolean gotRequestParam = !(scopes.isEmpty() && audience.isEmpty() && resources.isEmpty());
+        TXRecord txRecord = null;
+        if (gotRequestParam) {
+            // Big thing is the scopes. If the scopes requested are the same as the original scopes,
+            // skip processing scopes.
+            // Case to handle: NO scopes in AuthZ, but scopes here. Perfectly legal from OAuth 2 spec.
+
+            if (!scopes.isEmpty()) {
+                if(st2.getScopes().isEmpty()){
+                    st2.setScopes( ClientUtils.resolveScopes(state, st2.getOA2Client(), false, false));
+                }else{
+                    // actual check if requested scopes are a subset of authz scopes
+                    HashSet<String> originalScopes = new HashSet<>();
+                    HashSet<String> requestedScopes = new HashSet<>();
+                    originalScopes.addAll(st2.getScopes());
+                    requestedScopes.addAll(scopes);
+                    if(!originalScopes.equals(requestedScopes)){
+                        txRecord = (TXRecord) oa2SE.getTxStore().create();
+                        txRecord.setScopes(scopes);
+                    }
+                }
+            }
+            if (!audience.isEmpty()) {
+                if (txRecord == null) {
+                    txRecord = (TXRecord) oa2SE.getTxStore().create();
+                }
+                txRecord.setAudience(audience);
+            }
+            if (!resources.isEmpty()) {
+                // convert to URIs
+                ArrayList<URI> r = new ArrayList<>();
+                for (String x : resources) {
+                    try {
+                        r.add(URI.create(x));
+                    } catch (Throwable throwable) {
+                        debugger.info(this, "rejected resource request \"" + x + "\"");
+                        info("rejected resource request \"" + x + "\"");
+                    }
+                }
+                if (txRecord == null) {
+                    txRecord = (TXRecord) oa2SE.getTxStore().create();
+                }
+                txRecord.setResource(r);
+            }
+        }
+        if(txRecord != null){
+            // We are not going to save the TX record because we don't need it for mare than transmitting
+            // overrides in scope, audience and resource to the handlers to QDL. It does have to look exactly
+            // like any other TXRecords, so set the identifier and type.
+
+            txRecord.setTokenType(RFC8693Constants.ACCESS_TOKEN_TYPE); // Ensure that handlers can recognize this for access tokens.
+            txRecord.setIdentifier(BasicIdentifier.newID(atResponse.getAccessToken().getToken()));
+        }
+        /* *************** */
+
         if (client.isRTLifetimeEnabled()) {
             st2.setRefreshToken(atResponse.getRefreshToken()); // ditto. Might be null.
         } else {
             st2.setRefreshToken(null);
             st2.setRefreshTokenLifetime(0L);
         }
-        JWTRunner jwtRunner = new JWTRunner(st2, ScriptRuntimeEngineFactory.createRTE(oa2SE, st2, st2.getOA2Client().getConfig()));
-        OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, st2, client, state.getRequest());
+        JWTRunner jwtRunner = new JWTRunner(st2, ScriptRuntimeEngineFactory.createRTE(oa2SE, st2, txRecord, st2.getOA2Client().getConfig()));
+        OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, st2, client, txRecord, state.getRequest());
         if (state.isRfc8628() || st2.getAuthorizationGrant().getVersion() == null || st2.getAuthorizationGrant().getVersion().equals(Identifiers.VERSION_1_0_TAG)) {
             // Handlers have not been initialized yet. Either because of old tokens or rfc 8628 (so no tokens).
             jwtRunner.initializeHandlers();
