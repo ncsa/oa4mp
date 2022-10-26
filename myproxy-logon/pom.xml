@@ -6,10 +6,10 @@
     <parent>
         <groupId>edu.uiuc.ncsa.myproxy</groupId>
         <artifactId>oa4mp</artifactId>
-        <version>5.2-SNAPSHOT</version>
+        <version>5.2.8.2</version>
     </parent>
     <artifactId>myproxy-logon</artifactId>
-    <version>5.2-SNAPSHOT</version>
+    <version>5.2.8.2</version>
     <name>MyProxy Logon</name>
     <packaging>jar</packaging>
     <properties>
@@ -57,13 +57,13 @@
         <dependency>
             <artifactId>util</artifactId>
             <groupId>edu.uiuc.ncsa.security</groupId>
-            <version>5.2-SNAPSHOT</version>
+            <version>5.2.8.2</version>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security
             </groupId>
             <artifactId>crypto</artifactId>
-            <version>5.2-SNAPSHOT</version>
+            <version>5.2.8</version>
         </dependency>
 
 
