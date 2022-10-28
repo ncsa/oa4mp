@@ -37,16 +37,16 @@ access_token.'ver' := 'scitoken:2.0';
         ζ.'Services:OSGPilotTest:SciTokens:compute_read' := ['compute_read'];
 
 
-        get_permissions(γ.) -> reduce(@~,ζ\(γ\*\name));
-   //   get_permissions(γ.) -> ~values(mask(ζ., in_group2(keys(ζ.),γ.)));
+ //       get_permissions(γ.) -> reduce(@~,ζ\(γ\*\name));
+      get_permissions(γ.) -> ~values(mask(ζ., in_group2(keys(ζ.),γ.)));
 
      //  Setup robots. Robot scope is always in the initial request and
      //  ignored elsewhere, so scopes. is the authoritative source.
 
          robots. := ~mask(scopes., 0 == starts_with(scopes., robot_caput));
-
+say('*** LIGO -- robots = ' + to_string(robots.));
           if[
-             1 < size(robots.);
+             1 < size(robots.)
           ][
                     sys_err.ok := false;
                sys_err.message := 'too many robots (' + size(robots.) +')';
@@ -73,3 +73,4 @@ access_token.'ver' := 'scitoken:2.0';
 
      // Scope setup.
     requested_scopes. := (0 < size(tx_scopes.))?tx_scopes.:scopes.;
+

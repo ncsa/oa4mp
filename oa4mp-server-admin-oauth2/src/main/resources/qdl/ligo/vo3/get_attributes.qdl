@@ -13,7 +13,7 @@
      ini. := file_read('/home/ncsa/dev/csd/config/ini/ligo-ldap.ini',2).'ligo_prod';
      //ini. := file_read('vfs#/scripts/ligo/ldap.ini',2).'ligo';
      user := script_args(0); // This is actually the EPPN for the user.
-
+say('*** LIGO get_attributes, user=' + user);
            kagra_cfg.'address' := 'ldap.cilogon.org';
               kagra_cfg.'port' := 636;
         kagra_cfg.'claim_name' := 'uid';
@@ -60,6 +60,6 @@ if[
 
      if[is_defined(ligo_response.'uid')][response.'uid' := ligo_response.'uid';];
      if[is_defined(ligo_response.'uin')][response.'uin' := ligo_response.'uin';];
-
+say('*** LIGO access.qdl returns ' + to_string(response.));
 return(response.);
 
