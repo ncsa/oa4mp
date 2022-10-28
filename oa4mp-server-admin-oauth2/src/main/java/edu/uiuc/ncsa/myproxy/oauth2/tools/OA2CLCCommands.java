@@ -225,8 +225,11 @@ public class OA2CLCCommands extends CLCCommands {
         try {
             dfResponse = JSONObject.fromObject(rawResponse);
             deviceFlowCallback = dfResponse.getString(RFC8628Constants2.VERIFICATION_URI);
+            String uriComplete = dfResponse.getString(RFC8628Constants2.VERIFICATION_URI_COMPLETE);
             say("please go to: " + deviceFlowCallback);
-            say("          or: " + dfResponse.getString(RFC8628Constants2.VERIFICATION_URI_COMPLETE));
+            if ( uriComplete != null){
+                say("          or: " + uriComplete);
+            }
             userCode = dfResponse.getString(RFC8628Constants2.USER_CODE);
             deviceCode = dfResponse.getString(DEVICE_CODE);
             say("user code: " + userCode);
@@ -234,15 +237,21 @@ public class OA2CLCCommands extends CLCCommands {
             long dfExpiresIn = dfResponse.getLong(RFC8628Constants2.EXPIRES_IN);
             exp.setTime(exp.getTime() + dfExpiresIn * 1000);
             say("code valid until " + exp + " (" + dfExpiresIn + " sec.)");
-            copyToClipboard(userCode, "user code copied to clipboard");
+            if(uriComplete == null){
+                copyToClipboard(userCode, "user code copied to clipboard");
+            } else{
+                copyToClipboard(uriComplete, "verification uri copied to clipboard");
+            }
             isDeviceFlow = true;
             grant = new AuthorizationGrantImpl(URI.create(dfResponse.getString(RFC8628Constants2.DEVICE_CODE)));
-        } catch (Throwable t) {
+        } catch (
+                Throwable t) {
             say("sorry but the response from the service was not understood:" + rawResponse);
             if (getDebugger().isEnabled()) {
                 t.printStackTrace(); // in case /trace on
             }
         }
+
     }
 
     public long getDfInterval() {
@@ -938,6 +947,13 @@ public class OA2CLCCommands extends CLCCommands {
         sayi("See also: access, set_param -t");
     }
 
+    /**
+     * Turns a token into a JSONObject if it is a JWT. Otherwise, it returns a null.
+     *
+     * @param token
+     * @param noVerify
+     * @return
+     */
     public JSONObject resolveFromToken(Token token, boolean noVerify) {
         if (noVerify) {
             try {
@@ -950,7 +966,6 @@ public class OA2CLCCommands extends CLCCommands {
         JSONWebKeys keys = JWTUtil2.getJsonWebKeys(getService().getServiceClient(), ((OA2ClientEnvironment) getService().getEnvironment()).getWellKnownURI());
         try {
             JSONObject json = JWTUtil.verifyAndReadJWT(token.getToken(), keys);
-
             return json;
         } catch (Throwable t) {
             // do nothing.
@@ -1008,7 +1023,7 @@ public class OA2CLCCommands extends CLCCommands {
         sayi("displayed.");
     }
 
-    protected void printToken(AccessToken accessToken, boolean noVerify, boolean printRaw) {
+    public void printToken(AccessToken accessToken, boolean noVerify, boolean printRaw) {
 
         if (accessToken != null) {
             JSONObject token = null;
@@ -1618,6 +1633,38 @@ public class OA2CLCCommands extends CLCCommands {
         say("See also: read");
     }
 
+
+    public HashMap<String, String> getRequestParameters() {
+        return requestParameters;
+    }
+
+    public void setRequestParameters(HashMap<String, String> requestParameters) {
+        this.requestParameters = requestParameters;
+    }
+
+    public HashMap<String, String> getTokenParameters() {
+        return tokenParameters;
+    }
+
+    public void setTokenParameters(HashMap<String, String> tokenParameters) {
+        this.tokenParameters = tokenParameters;
+    }
+
+    public HashMap<String, String> getRefreshParameters() {
+        return refreshParameters;
+    }
+
+    public void setRefreshParameters(HashMap<String, String> refreshParameters) {
+        this.refreshParameters = refreshParameters;
+    }
+
+    public HashMap<String, String> getExchangeParameters() {
+        return exchangeParameters;
+    }
+
+    public void setExchangeParameters(HashMap<String, String> exchangeParameters) {
+        this.exchangeParameters = exchangeParameters;
+    }
 
     HashMap<String, String> requestParameters = new HashMap<>();
     HashMap<String, String> tokenParameters = new HashMap<>();

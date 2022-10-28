@@ -1,0 +1,50 @@
+/*
+   Basic driver script. This prints the description, sets up the client
+   for the initial leg, manages the login. One return, the CLC is fully
+   ready for testing. Arguments are
+   0 - configuration
+   1 - (optional) any parameters, passed to the set_param call in the CLC.
+
+   0-th argument is a stem with the following entries
+          file - the FQ path to the configuration file
+            id - the identifier for the client configuration
+           idp - the IDP the user should use
+   description - user understandable description of what is being tested
+     flow_type - one of 'uri' or 'df' flow authorization code flow resp. device flow
+
+
+     This returns
+      0 - flow worked
+      1 - unable to initiate flow
+     -1 - user aborted
+*/
+
+⊨ 0 < script_args() < 3 : 'incorrect number of arguments, expected 1 or 2 and got ' + script_args();
+
+cfg. := script_args(0);
+
+clc#init(cfg.'file', cfg.'id');
+if[script_args() == 2][set_param(script_args(1));];
+say('Client test for ' + cfg.'id');
+say(cfg.'description');
+say(' IDP: ' + cfg.'idp');
+flow_ok := 1;
+  if[
+     cfg.'flow_type' == 'df'
+    ][
+     say('Flow: device');
+     clc#df();
+    out := scan('verfication URI is in clipboard. Login, then hit any key when done, q to abort.');
+    flow_ok := out=='q'?-1:0;
+    ]; // end device flow
+  if[
+     cfg.'flow_type' == 'uri'
+   ][
+     say('Flow: auth code');
+     clc#uri();
+    out :=  scan('authorization URI is in clipboard. Login, copy callback uri to clipboard. Hit any key when done, q to abort.');
+    flow_ok := out=='q'?-1:0;
+    if[flow_ok != 0][return(flow_ok);];
+     grant();
+   ]; //end auth code flow
+return(flow_ok);

@@ -2,18 +2,26 @@ package edu.uiuc.ncsa.oa2.qdl;
 
 import edu.uiuc.ncsa.myproxy.oauth2.tools.OA2CLCCommands;
 import edu.uiuc.ncsa.myproxy.oauth2.tools.OA2CommandLineClient;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenImpl;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenUtils;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims;
+import edu.uiuc.ncsa.qdl.exceptions.BadArgException;
+import edu.uiuc.ncsa.qdl.exceptions.MissingArgException;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
 import edu.uiuc.ncsa.qdl.extensions.QDLModuleMetaClass;
 import edu.uiuc.ncsa.qdl.state.State;
+import edu.uiuc.ncsa.qdl.variables.QDLList;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
 import edu.uiuc.ncsa.qdl.variables.QDLStem;
+import edu.uiuc.ncsa.security.core.util.DateUtils;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
+import edu.uiuc.ncsa.security.servlet.ServiceClientHTTPException;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import net.sf.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -32,29 +40,9 @@ public class CLC implements QDLModuleMetaClass {
 
     protected QDLStem getTokens() {
         QDLStem result = new QDLStem();
-
-        QDLStem at = new QDLStem();
-
-        at.fromJSON(clcCommands.getDummyAsset().getAccessToken().toJSON());
-        try {
-            QDLStem jwt = new QDLStem();
-            jwt.fromJSON(clcCommands.resolveFromToken(clcCommands.getDummyAsset().getAccessToken(), false));
-            at.put("jwt", jwt);
-        } catch (Throwable t) {
-
-        }
-        result.put("access_token", at);
+        result.put("access_token", tokenToStem(clcCommands.getDummyAsset().getAccessToken()));
         if (clcCommands.getDummyAsset().hasRefreshToken()) {
-            QDLStem rt = new QDLStem();
-            rt.fromJSON(clcCommands.getDummyAsset().getRefreshToken().toJSON());
-            try {
-                QDLStem jwt = new QDLStem();
-                jwt.fromJSON(clcCommands.resolveFromToken(clcCommands.getDummyAsset().getRefreshToken(), false));
-                rt.put("jwt", jwt);
-            } catch (Throwable t) {
-
-            }
-            result.put("refresh_token", rt);
+            result.put("refresh_token", tokenToStem(clcCommands.getDummyAsset().getRefreshToken()));
         }
         return result;
     }
@@ -78,7 +66,7 @@ public class CLC implements QDLModuleMetaClass {
         @Override
         public Object evaluate(Object[] objects, State state) {
             try {
-                clcCommands = new OA2CLCCommands(false, state.getLogger(), new OA2CommandLineClient(state.getLogger()));
+                clcCommands = new OA2CLCCommands(true, state.getLogger(), new OA2CommandLineClient(state.getLogger()));
                 clcCommands.load(new InputLine(DUMMY_ARG + " " + objects[1].toString() + "  " + objects[0].toString()));
                 initCalled = true;
             } catch (Exception e) {
@@ -98,7 +86,7 @@ public class CLC implements QDLModuleMetaClass {
         public List<String> getDocumentation(int argCount) {
             List<String> doxx = new ArrayList<>();
             doxx.add(getName() + "(file, name) - reads the configuration file and then loads the configuration with the given name. ");
-            doxx.add("This sets the configuration and name.");
+            doxx.add("This sets the configuration and name and resets the state completely.");
             doxx.add("This must be called before any other function.");
             return doxx;
         }
@@ -136,7 +124,7 @@ public class CLC implements QDLModuleMetaClass {
         public List<String> getDocumentation(int argCount) {
             List<String> doxx = new ArrayList<>();
             doxx.add(getName() + "() - set the current set of user claims.");
-          doxx.add("This is the same information as returned by the " + USER_INFO_NAME + " function.");
+            doxx.add("This is the same information as returned by the " + USER_INFO_NAME + " function.");
             doxx.add(checkInitMessage);
             return doxx;
         }
@@ -157,6 +145,7 @@ public class CLC implements QDLModuleMetaClass {
 
         @Override
         public Object evaluate(Object[] objects, State state) {
+            QDLStem g = new QDLStem();
             try {
                 if (objects.length == 0) {
 
@@ -165,17 +154,13 @@ public class CLC implements QDLModuleMetaClass {
                 if (objects.length == 1) {
                     clcCommands.grant(new InputLine(DUMMY_ARG + " " + objects[0]));
                 }
-                QDLStem g = new QDLStem();
 
                 g.fromJSON(clcCommands.getGrant().toJSON());
-                return g;
             } catch (Exception e) {
                 state.getLogger().error("error getting grant", e);
-                if (DebugUtil.isEnabled()) {
-                    e.printStackTrace();
-                }
-                return QDLNull.getInstance();
+                handleException(e);
             }
+            return g;
         }
 
         @Override
@@ -222,14 +207,11 @@ public class CLC implements QDLModuleMetaClass {
             }
             try {
                 clcCommands.access(new InputLine(args));
-                return getTokens();
             } catch (Exception e) {
                 state.getLogger().error("error getting access token", e);
-                if (DebugUtil.isEnabled()) {
-                    e.printStackTrace();
-                }
+                handleException(e);
             }
-            return QDLNull.getInstance();
+            return getTokens();
         }
 
         @Override
@@ -296,14 +278,10 @@ public class CLC implements QDLModuleMetaClass {
             checkInit();
             try {
                 clcCommands.refresh(new InputLine(DUMMY_ARG));
-                return getTokens();
             } catch (Exception e) {
-
-                if (DebugUtil.isEnabled()) {
-                    e.printStackTrace();
-                }
+                handleException(e);
             }
-            return QDLNull.getInstance();
+            return getTokens();
         }
 
         @Override
@@ -331,24 +309,52 @@ public class CLC implements QDLModuleMetaClass {
         @Override
         public Object evaluate(Object[] objects, State state) {
             checkInit();
-            try {
-                clcCommands.exchange(new InputLine(DUMMY_ARG));
-                return getTokens();
-            } catch (Exception e) {
-                if (DebugUtil.isEnabled()) {
-                    e.printStackTrace();
+            ArrayList<String> args = new ArrayList<>();
+            args.add("exchange");// name of function
+            for(Object ooo : objects){
+                if(ooo instanceof String){
+                    args.add((String) ooo);
                 }
             }
-            return QDLNull.getInstance();
+            String[] strings = new String[]{};
+            strings = args.toArray(strings);
+            try {
+                clcCommands.exchange(new InputLine(strings));
+            } catch (Exception e) {
+                handleException(e);
+            }
+            return getTokens();
         }
 
         @Override
         public List<String> getDocumentation(int argCount) {
             List<String> doxx = new ArrayList<>();
-            doxx.add(getName() + " Do the token exchange.");
+            doxx.add(getName() + "([-rt | [-at ]] [-x] Do the token exchange.");
+            doxx.add("Arguments:");
+            doxx.add("(None) = exchange the access token using the access token as the bearer token. Make sure it has not expired.");
+            doxx.add("-at = same as no arguments");
+            doxx.add("-rt = exchange refresh token, using the refresh token as the bearer token");
+            doxx.add("-x = force using the refresh token as the bearer token");
+            doxx.add("E.g.");
+            doxx.add("exchange('-at', 'x');");
+            doxx.add("would exchange the access token (possibly expired) using the (valid) refresh token.");
             doxx.add(checkInitMessage);
             return doxx;
         }
+    }
+
+    protected void handleException(Throwable t) throws QDLException {
+        if (DebugUtil.isEnabled()) {
+            t.printStackTrace();
+        }
+        if (t instanceof ServiceClientHTTPException) {
+            ServiceClientHTTPException serviceClientHTTPException = (ServiceClientHTTPException) t;
+            throw new QDLException(serviceClientHTTPException.getContent());
+        }
+        if (t instanceof QDLException) {
+            throw (QDLException) t;
+        }
+        throw new QDLException(t.getMessage(), t);
     }
 
     protected String REVOKE_NAME = "revoke";
@@ -401,17 +407,14 @@ public class CLC implements QDLModuleMetaClass {
         @Override
         public Object evaluate(Object[] objects, State state) {
             checkInit();
+            QDLStem QDLStem = new QDLStem();
             try {
                 clcCommands.df(new InputLine(DUMMY_ARG));
-                QDLStem QDLStem = new QDLStem();
                 QDLStem.fromJSON(clcCommands.getDfResponse());
-                return QDLStem;
             } catch (Exception e) {
-                if (DebugUtil.isEnabled()) {
-                    e.printStackTrace();
-                }
+                handleException(e);
             }
-            return new QDLStem();
+            return QDLStem;
         }
 
         @Override
@@ -439,18 +442,15 @@ public class CLC implements QDLModuleMetaClass {
         @Override
         public Object evaluate(Object[] objects, State state) {
             checkInit();
+            QDLStem QDLStem = new QDLStem();
             try {
                 clcCommands.introspect(new InputLine(DUMMY_ARG));
-                QDLStem QDLStem = new QDLStem();
                 QDLStem.fromJSON(clcCommands.getIntrospectResponse());
-                return QDLStem;
             } catch (Exception e) {
-
-                if (DebugUtil.isEnabled()) {
-                    e.printStackTrace();
-                }
+                handleException(e);
             }
-            return new QDLStem();
+            return QDLStem;
+            //return new QDLStem();
         }
 
         @Override
@@ -483,9 +483,7 @@ public class CLC implements QDLModuleMetaClass {
                 clcCommands.user_info(new InputLine(DUMMY_ARG));
                 out.fromJSON(clcCommands.getClaims());
             } catch (Exception e) {
-                if (DebugUtil.isEnabled()) {
-                    e.printStackTrace();
-                }
+                handleException(e);
             }
             return out;
         }
@@ -608,34 +606,286 @@ public class CLC implements QDLModuleMetaClass {
         }
     }
 
-    protected String CLEAR_NAME = "clear";
+    protected String CLEAR_NAME = "clear_param";
+
+    public class ClearParam implements QDLFunction {
+        @Override
+        public String getName() {
+            return CLEAR_NAME;
+        }
+
+        @Override
+        public int[] getArgCount() {
+            return new int[]{0, 1};
+        }
+
+        @Override
+        public Object evaluate(Object[] objects, State state) {
+            if (objects.length == 0) {
+                try {
+                    clcCommands.clear(new InputLine(), true);
+                } catch (Exception e) {
+
+                }
+            }
+            return Boolean.TRUE;
+        }
+
+        List<String> doxx = new ArrayList<>();
+
+        @Override
+        public List<String> getDocumentation(int argCount) {
+            if (doxx.isEmpty()) {
+                doxx.add(getName() + "() = clear all the state inluding any parameters. ");
+                doxx.add("You can also recall " + INIT_NAME);
+            }
+            return doxx;
+        }
+    }
+
     protected String LOAD_NAME = "load";
     protected String GET_PARAM = "get_param";
 
     public class GetParam implements QDLFunction {
         @Override
         public String getName() {
-            return null;
+            return GET_PARAM;
         }
 
         @Override
         public int[] getArgCount() {
-            return new int[0];
+            return new int[]{0, 1};
         }
 
         @Override
         public Object evaluate(Object[] objects, State state) {
-            return null;
+            QDLStem stem = new QDLStem();
+            QDLList qdlList = null;
+            boolean isScalar = false;
+            if (objects.length == 0) {
+                qdlList = new QDLList();
+                qdlList.appendAll(Arrays.asList(PARAM_FLAG_AUTHZ_SHORT, PARAM_FLAG_TOKEN, PARAM_FLAG_REFRESH, PARAM_FLAG_EXCHANGE));
+            }
+            if (objects.length == 1) {
+                if (objects[0] instanceof String) {
+                    isScalar = true;
+                    qdlList = new QDLList();
+                    qdlList.add(objects[0]);
+                } else {
+                    if (!(objects[0] instanceof QDLStem)) {
+                        throw new BadArgException(getName() + " requires a stem or list as its argument", null);
+                    }
+                    qdlList = ((QDLStem) objects[0]).getQDLList();
+                }
+            }
+            for (Object key : qdlList.values()) {
+                HashMap<String, String> params = null;
+                switch (key.toString()) {
+                    case PARAM_FLAG_AUTHZ:
+                    case PARAM_FLAG_AUTHZ_SHORT:
+                        params = clcCommands.getRequestParameters();
+                        break;
+                    case PARAM_FLAG_TOKEN:
+                    case PARAM_FLAG_TOKEN_SHORT:
+                        params = clcCommands.getTokenParameters();
+                        break;
+                    case PARAM_FLAG_REFRESH:
+                    case PARAM_FLAG_REFRESH_SHORT:
+                        params = clcCommands.getRefreshParameters();
+                        break;
+                    case PARAM_FLAG_EXCHANGE:
+                    case PARAM_FLAG_EXCHANGE_SHORT:
+                        params = clcCommands.getExchangeParameters();
+                        break;
+                    default:
+                        // do nothing.
+                }
+                if (params != null) {
+                    QDLStem v = new QDLStem();
+                    for (String key2 : params.keySet()) {
+                        v.put(key2, params.get(key2));
+                    }
+                    if (isScalar) {
+                        return v; // only one.
+                    }
+                    stem.put(key.toString(), v);
+                }
+            }
+            return stem;
         }
+
+        List<String> doxx = new ArrayList<>();
 
         @Override
         public List<String> getDocumentation(int argCount) {
-            return null;
+
+            if (doxx.isEmpty()) {
+                doxx.add(getName() + "([flag | flags.]) = return the parameters. If no argument, return all parameters as a stem");
+                doxx.add("Otherwise, the flag or list of flags is");
+                doxx.add(PARAM_FLAG_AUTHZ_SHORT + " | " + PARAM_FLAG_AUTHZ + " = authorization");
+                doxx.add(PARAM_FLAG_TOKEN_SHORT + " | " + PARAM_FLAG_TOKEN + " = (access) token)");
+                doxx.add(PARAM_FLAG_REFRESH_SHORT + " | " + PARAM_FLAG_REFRESH + " = refresh");
+                doxx.add(PARAM_FLAG_EXCHANGE_SHORT + " | " + PARAM_FLAG_EXCHANGE + " = exchange");
+                doxx.add("");
+                doxx.add("");
+
+                doxx.add("E.g.");
+                doxx.add(getName() + "(" + PARAM_FLAG_AUTHZ + ")");
+            }
+            return doxx;
         }
     }
 
     protected String SET_PARAM = "set_param";
     protected String CLEAR_PARAMS = "clear_params";
 
+    protected static final String PARAM_FLAG_AUTHZ = "authz";
+    protected static final String PARAM_FLAG_AUTHZ_SHORT = "a";
+    protected static final String PARAM_FLAG_TOKEN = "token";
+    protected static final String PARAM_FLAG_TOKEN_SHORT = "t";
+
+    protected static final String PARAM_FLAG_REFRESH = "refresh";
+    protected static final String PARAM_FLAG_REFRESH_SHORT = "r";
+
+    protected static final String PARAM_FLAG_EXCHANGE = "exchange";
+    protected static final String PARAM_FLAG_EXCHANGE_SHORT = "e";
+
+    public class SetParam implements QDLFunction {
+        @Override
+        public String getName() {
+            return SET_PARAM;
+        }
+
+        @Override
+        public int[] getArgCount() {
+            return new int[]{1};
+        }
+
+        @Override
+        public Object evaluate(Object[] objects, State state) {
+            if (objects.length != 1) {
+                throw new MissingArgException(getName() + " requires an argument", null);
+            }
+            if (!(objects[0] instanceof QDLStem)) {
+                throw new BadArgException(getName() + " requires a stem as its argument", null);
+            }
+            QDLStem stem = (QDLStem) objects[0];
+            for (Object key : stem.keySet()) {
+                HashMap<String, String> params = null;
+                switch (key.toString()) {
+                    case PARAM_FLAG_AUTHZ:
+                    case PARAM_FLAG_AUTHZ_SHORT:
+                        params = clcCommands.getRequestParameters();
+                        break;
+                    case PARAM_FLAG_TOKEN:
+                    case PARAM_FLAG_TOKEN_SHORT:
+                        params = clcCommands.getTokenParameters();
+                        break;
+                    case PARAM_FLAG_REFRESH:
+                    case PARAM_FLAG_REFRESH_SHORT:
+                        params = clcCommands.getRefreshParameters();
+                        break;
+                    case PARAM_FLAG_EXCHANGE:
+                    case PARAM_FLAG_EXCHANGE_SHORT:
+                        params = clcCommands.getExchangeParameters();
+                        break;
+                    default:
+                        // do nothing.
+                }
+                if (params != null) {
+                    Object obj = stem.get(key);
+                    if (obj instanceof QDLStem) {
+                        QDLStem args = (QDLStem) obj;
+                        for (Object keyArg : args.keySet()) {
+                            if (keyArg instanceof String) {
+                                params.put((String) keyArg, args.getString((String) keyArg));
+                            }
+                        }
+                    }
+                }
+            }
+            return Boolean.TRUE;
+        }
+
+        List<String> doc = new ArrayList<>();
+
+        @Override
+        public List<String> getDocumentation(int argCount) {
+            if (doc.isEmpty()) {
+                doc.add(getName() + "(arg.) - set the parameters for this client.");
+                doc.add("keys are a | authz, e | exchange, t | token, r | refresh");
+                doc.add(PARAM_FLAG_AUTHZ_SHORT + " | " + PARAM_FLAG_AUTHZ + " = authorization");
+                doc.add(PARAM_FLAG_TOKEN_SHORT + " | " + PARAM_FLAG_TOKEN + " = (access) token)");
+                doc.add(PARAM_FLAG_REFRESH_SHORT + " | " + PARAM_FLAG_REFRESH + " = refresh");
+                doc.add(PARAM_FLAG_EXCHANGE_SHORT + " | " + PARAM_FLAG_EXCHANGE + " = exchange");
+                doc.add("and each consists of a stem of key-value pairs");
+                doc.add("E.g. set scope and code_challenge_method for the authz leg:");
+                doc.add("param.'" + PARAM_FLAG_AUTHZ_SHORT + "' := {'scope':'read: write:','code_challenge_method':'256'};");
+                doc.add(getName() + "(param.);");
+                doc.add("You could also use '" + PARAM_FLAG_AUTHZ + "' for the key rather than '" + PARAM_FLAG_AUTHZ_SHORT + "'");
+                doc.add("See also:" + GET_PARAM);
+            }
+            return doc;
+        }
+    }
+
+    /**
+     * This is rather similar to the {@link OA2CLCCommands#printToken(AccessToken, boolean, boolean)} and similar
+     * commands, except rather than spitting it all out as print statements, the information about the token
+     * is organized into a stem for further processing.
+     *
+     * @param token
+     * @return
+     */
+    protected QDLStem tokenToStem(TokenImpl token) {
+        QDLStem stem = new QDLStem();
+        JSONObject json = clcCommands.resolveFromToken(token, false);
+        stem.put("raw_token", token.getToken()); // always get this
+        if (json == null) {
+            // was not a JWT. No other way to tell except to try it.
+            if (TokenUtils.isBase32(token.getToken())) {
+                // Or we over-write the access token and lose base 64 encoding.
+                TokenImpl accessToken2 = new TokenImpl(null);
+
+                accessToken2.decodeToken(token.getToken());
+                token = accessToken2;
+                stem.put("decoded", token.getToken());
+                //say("   decoded token:" + accessToken.getToken());
+            }
+            Date startDate = DateUtils.getDate(token.getToken());
+            startDate.setTime(startDate.getTime() + token.getLifetime());
+            Boolean isExpired = startDate.getTime() < System.currentTimeMillis();
+            stem.put("expired", isExpired);
+            if (!isExpired) {
+                stem.put("lifetime", token.getLifetime());
+                stem.put("ts", token.getIssuedAt());
+                stem.put("expires", token.getIssuedAt() + token.getLifetime());
+            }
+        } else {
+            // It is a JWT
+            QDLStem jwt = new QDLStem();
+            jwt.fromJSON(json);
+            stem.put("jwt", jwt);
+            Long expiration = -1L;
+            Long timestamp = -1L;
+            if (json.containsKey(OA2Claims.ISSUED_AT)) {
+                timestamp = json.getLong(OA2Claims.ISSUED_AT) * 1000L;
+                stem.put("ts", timestamp); // since its in sec., convert to ms.
+            }
+            if (json.containsKey(OA2Claims.EXPIRATION)) {
+                expiration = json.getLong(OA2Claims.EXPIRATION) * 1000L;
+                stem.put("expires", expiration);
+                stem.put("lifetime", expiration - timestamp);
+            }
+            if (0 < expiration && 0 < timestamp) {
+                if (System.currentTimeMillis() < expiration) {
+                    stem.put("expired", Boolean.TRUE);
+                } else {
+                    stem.put("expired", Boolean.FALSE);
+                }
+            }
+        }
+        return stem;
+    }
 
 }

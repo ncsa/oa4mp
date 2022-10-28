@@ -591,7 +591,7 @@ TO DO:
          it doesn't just always hand back everything).
        The following test for various things like scope reduction
 
-       set_param -a scope "read: write: aud:FOO"
+       set_param -a scope "read: write:"
        set_param -r scope "read:/DQSegDB write:/DQSegDB"
        set_param -x scope "read:/DQSegDB/foo write:/DQSegDB read:/frames/bar"
        AT:

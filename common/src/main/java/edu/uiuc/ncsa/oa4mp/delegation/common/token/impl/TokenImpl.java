@@ -217,12 +217,12 @@ public class TokenImpl implements NewToken {
     @Override
     public JSONObject toJSON() {
         JSONObject json = new JSONObject();
-        json.put(TIMESTAMP_TAG, issuedAt);
-        json.put(LIFETIME_TAG, lifetime);
+        json.put(TIMESTAMP_TAG, getIssuedAt());
+        json.put(LIFETIME_TAG, getLifetime());
         if (isJWT) {
             json.put("jwt", token.toString());
         }
-        json.put("token", jti.toString());
+        json.put("token", getJti().toString());
         return json;
     }
 

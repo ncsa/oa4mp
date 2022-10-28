@@ -1,0 +1,14 @@
+root:= '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests/';
+config_file := '/home/ncsa/dev/csd/config/client-oa2.xml';
+// Names of scripts to run.
+test_list. := root +  [
+      'no_config'
+  ];
+
+for[x ∈ test_list.][
+      try[
+        script_run(x, config_file);
+      ]catch[
+      say('test failed:' + x);
+      ]; // end catch
+]; //end for

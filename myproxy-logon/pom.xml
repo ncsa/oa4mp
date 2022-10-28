@@ -63,7 +63,7 @@
             <groupId>edu.uiuc.ncsa.security
             </groupId>
             <artifactId>crypto</artifactId>
-            <version>5.2-SNAPSHOT</version>
+            <version>5.2.8</version>
         </dependency>
 
 

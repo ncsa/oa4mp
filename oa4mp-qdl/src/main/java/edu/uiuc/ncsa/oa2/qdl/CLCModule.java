@@ -12,6 +12,8 @@ import java.util.List;
  * <p>Created by Jeff Gaynor<br>
  * on 7/22/21 at  11:47 AM
  */
+
+// clc#init(config_file := '/home/ncsa/dev/csd/config/client-oa2.xml', 'localhost:test/qdl');
 public class CLCModule extends JavaModule {
     public CLCModule() {
     }
@@ -32,6 +34,9 @@ public class CLCModule extends JavaModule {
         funcs.add(clc.new Exchange());
         funcs.add(clc.new GetClaim());
         funcs.add(clc.new Grant());
+        funcs.add(clc.new ClearParam());
+        funcs.add(clc.new GetParam());
+        funcs.add(clc.new SetParam());
         funcs.add(clc.new InitMethod());
         funcs.add(clc.new Introspect());
         funcs.add(clc.new Read());

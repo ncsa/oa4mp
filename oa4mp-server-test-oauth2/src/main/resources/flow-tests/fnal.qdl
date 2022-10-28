@@ -1,0 +1,134 @@
+#! /usr/bin/env -S qdl-run
+
+script_path('/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests' ~ script_path());
+
+cfg.'id'  := 'localhost:test/fnal';
+cfg.'idp'  := 'GitHub';
+cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';
+cfg.'description' :=  'Test FNAL with no scopes -- fails';
+cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token endpoint
+
+rc := script_load('driver.qdl', cfg.);
+⊨ rc == 0: (rc==-1?'user aborted':'there was an error initiating the flow');
+tokens. := null;
+try[
+  tokens. := access(); // fails.
+]catch[
+  ⊨'access_denied' < error_message:'unknown error:' + error_message;
+];
+say('ok');
+
+// Next test -- request bogus capability set.
+params.'authz' :=  {'scope': 'wlcg.capabilityset:/fubar'};
+cfg.'description' :=  'Test FNAL with bad scope -- fails';
+rc := script_load('driver.qdl', cfg., params.);
+⊨ rc == 0: (rc==-1?'user aborted':'there was an error initiating the flow');
+tokens. := null;
+try[
+  tokens. := access(); // fails.
+]catch[
+  ⊨'access_denied' < error_message:'unknown error:' + error_message;
+];
+say('ok');
+
+// Next test -- request multiple capability sets.
+params.'authz' :=  {'scope': 'wlcg.capabilityset:/fermilab wlcg.capabilityset:/dune'};
+cfg.'description' :=  'Test FNAL with multiple scopes -- fails';
+rc := script_load('driver.qdl', cfg., params.);
+⊨ rc == 0: (rc==-1?'user aborted':'there was an error initiating the flow');
+tokens. := null;
+try[
+  tokens. := access(); // fails.
+]catch[
+  ⊨'access_denied' < error_message:'unknown error:' + error_message;
+];
+say('ok');
+
+cfg.'description' :=  'Test FNAL with basic scopes';
+
+params.'authz' :=  {'scope': 'storage.read:/ wlcg.capabilityset:/duneana wlcg.groups'};
+rc := script_load('driver.qdl', cfg., params.);
+⊨ rc == 0: (rc==-1?'user aborted':'there was an error initiating the flow');
+tokens. := access();
+at. := tokens.'access_token'.'jwt';
+rt. := tokens.'refresh_token'.'jwt';
+claims. := claims();
+iat := claims.'iat'; // for later, to check it changes
+⊨ claims.'eppn' == 'cilogontest@fnal.gov' : 'wrong eppn';
+⊨ is_defined(claims.'wlcg.credkey')  : 'missing wlcg.credkey';
+⊨ 'cilogontest' == claims.'wlcg.credkey'  : 'wrong wlcg.credkey';
+⊨ is_defined(at.'wlcg.ver') : 'Not a WLCG token';
+⊨ at.'aud' == 'https://wlcg.cern.ch/jwt/v1/any' : 'incorrect access token audience';
+⊨ rt.'aud' == 'https://wlcg.cern.ch/jwt/v1/any' : 'incorrect refresh token audience';
+⊨ at.'sub' == 'cilogontest@fnal.gov': 'wrong subject';
+expected_scopes. := ['compute.create', 'compute.read', 'compute.cancel', 'compute.modify', 'storage.create:/dune/scratch/users/cilogontest', 'storage.read:/dune'];
+ss. := tokenize(at.'scope', ' ');
+⊨ reduce(@&&, expected_scopes. ∈ ss.) : 'incorrect access token scopes';
+⊨ 0< tokens.'access_token'.'lifetime' <= 750000 : 'wrong lifetime, expected 750000, got ' + (tokens.'access_token'.'lifetime');
+
+tokens. := refresh();
+at. := tokens.'access_token'.'jwt';
+rt. := tokens.'refresh_token'.'jwt';
+claims. := claims();
+⊨ claims.'iat' != iat : 'id token timestamp did not change. This implies the token is not updating.';
+⊨ claims.'eppn' == 'cilogontest@fnal.gov' : 'wrong eppn';
+⊨ is_defined(claims.'wlcg.credkey')  : 'missing wlcg.credkey';
+⊨ 'cilogontest' == claims.'wlcg.credkey'  : 'wrong wlcg.credkey';
+⊨ is_defined(at.'wlcg.ver') : 'Not a WLCG token';
+⊨ at.'aud' == 'https://wlcg.cern.ch/jwt/v1/any' : 'incorrect access token audience';
+⊨ rt.'aud' == 'https://wlcg.cern.ch/jwt/v1/any' : 'incorrect refresh token audience';
+⊨ at.'sub' == 'cilogontest@fnal.gov': 'wrong subject';
+expected_scopes. := ['compute.create', 'compute.read', 'compute.cancel', 'compute.modify', 'storage.create:/dune/scratch/users/cilogontest', 'storage.read:/dune'];
+ss. := tokenize(at.'scope', ' ');
+⊨ reduce(@&&, expected_scopes. ∈ ss.) : 'incorrect access token scopes';
+⊨ 0< tokens.'access_token'.'lifetime' <= 750000 : 'wrong lifetime, expected 750000, got ' + (tokens.'access_token'.'lifetime');
+
+at. := exchange('-at');
+rt. := exchange('-rt');
+expected_scopes. := ['compute.create', 'compute.read', 'compute.cancel', 'compute.modify', 'storage.create:/dune/scratch/users/cilogontest', 'storage.read:/dune'];
+ss. := tokenize(at.'scope', ' ');
+⊨ reduce(@&&, expected_scopes. ∈ ss.) : 'incorrect access token scopes';
+⊨ 0< tokens.'access_token'.'lifetime' <= 750000 : 'wrong lifetime, expected 750000, got ' + (tokens.'access_token'.'lifetime');
+
+/*
+    JWT access token:{
+   "wlcg.ver": "1.0",
+   "aud": "https://wlcg.cern.ch/jwt/v1/any",
+   "sub": "cilogontest@fnal.gov",
+   "nbf": 1666968472,
+   "scope": "compute.create compute.read compute.cancel compute.modify storage.create:/dune/scratch/users/cilogontest storage.read:/dune",
+   "iss": "https://localhost:9443/oauth2",
+   "exp": 1666969227,
+   "iat": 1666968477,
+   "jti": "https://localhost:9443/oauth2/2f4634de64a3fef0714c761d1f876555?type=accessToken&ts=1666968489841&version=v2.0&lifetime=750019"
+  }
+    raw token=eyJ0eXAiOiJKV1QiLCJraWQiOiJFQzlGQ0ZDQjM3MTZBQzRDMjI3OURGNDJFQzk4Q0FCRiIsImFsZyI6IlJTMjU2In0.eyJ3bGNnLnZlciI6IjEuMCIsImF1ZCI6Imh0dHBzOi8vd2xjZy5jZXJuLmNoL2p3dC92MS9hbnkiLCJzdWIiOiJjaWxvZ29udGVzdEBmbmFsLmdvdiIsIm5iZiI6MTY2Njk2ODQ3Miwic2NvcGUiOiJjb21wdXRlLmNyZWF0ZSBjb21wdXRlLnJlYWQgY29tcHV0ZS5jYW5jZWwgY29tcHV0ZS5tb2RpZnkgc3RvcmFnZS5jcmVhdGU6L2R1bmUvc2NyYXRjaC91c2Vycy9jaWxvZ29udGVzdCBzdG9yYWdlLnJlYWQ6L2R1bmUiLCJpc3MiOiJodHRwczovL2xvY2FsaG9zdDo5NDQzL29hdXRoMiIsImV4cCI6MTY2Njk2OTIyNywiaWF0IjoxNjY2OTY4NDc3LCJqdGkiOiJodHRwczovL2xvY2FsaG9zdDo5NDQzL29hdXRoMi8yZjQ2MzRkZTY0YTNmZWYwNzE0Yzc2MWQxZjg3NjU1NT90eXBlPWFjY2Vzc1Rva2VuJnRzPTE2NjY5Njg0ODk4NDEmdmVyc2lvbj12Mi4wJmxpZmV0aW1lPTc1MDAxOSJ9.f7romA7rD8rpMcK4vRFUXTqNrK5-YOjb74RRSUI-OjvDtyo7fpuSTXZ47wjJZ-c8Tn9MSG43QqJSdQsO26Vjozl0NjZxOr8JIhnSW4DnuK1njmcmQJo8cGKDYtiodxJ8VnTbPUbk9f8AdoxBBEsRyAm31IR3CF9u8pildjDNC0W5lcE2_mI0bwCFPAbUmAdF94BQZxf4dMmwtxgkX6bE3iImRGp7NOHyo1hvZgiUkVSDKp03neFnVUveeZ-Z9aQ1GX44sKHleOPDbisImolRfNYS2od_HAkqZ7d2_FxYA4PVZDcEeYTHtMRdbGGzZAALE8hBd8TP6afm93xOlhSZtA
+     expires in = 729855 ms.
+
+  JWT refresh token = {
+   "iss": "https://test.cilogon.org",
+   "aud": "https://wlcg.cern.ch/jwt/v1/any",
+   "exp": 1666969227,
+   "nbf": 1666968472,
+   "iat": 1666968477,
+   "jti": "https://localhost:9443/oauth2/427c8e1040f6695bc4453b18da00df9b?type=refreshToken&ts=1666968489841&version=v2.0&lifetime=750019"
+  }
+    raw token=eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJpc3MiOiJodHRwczovL3Rlc3QuY2lsb2dvbi5vcmciLCJhdWQiOiJodHRwczovL3dsY2cuY2Vybi5jaC9qd3QvdjEvYW55IiwiZXhwIjoxNjY2OTY5MjI3LCJuYmYiOjE2NjY5Njg0NzIsImlhdCI6MTY2Njk2ODQ3NywianRpIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6OTQ0My9vYXV0aDIvNDI3YzhlMTA0MGY2Njk1YmM0NDUzYjE4ZGEwMGRmOWI_dHlwZT1yZWZyZXNoVG9rZW4mdHM9MTY2Njk2ODQ4OTg0MSZ2ZXJzaW9uPXYyLjAmbGlmZXRpbWU9NzUwMDE5In0.
+     expires in = 729841 ms.
+{
+  "sub": "http://cilogon.org/serverT/users/21340363",
+  "aud": "localhost:test/fnal",
+  "uid": "cilogontest",
+  "idp": "http://github.com/login/oauth/authorize",
+  "eppn": "cilogontest@fnal.gov",
+  "auth_time": 1666933200,
+  "iss": "https://localhost:9443/oauth2",
+  "wlcg.credkeywlcg.credkey": "cilogontest",
+  "exp": 1666969375,
+  "nonce": "5zI3m2bUPOvICLBbjUIs9PjkLfJccCdBPKSt3hl2ejo",
+  "iat": 1666968475,
+  "jti": "https://localhost:9443/oauth2/idToken/6ec59de11d45279cbd038c7d1e77c6a3/1666968473466"
+}
+valid until Fri Oct 28 10:02:55 CDT 2022
+
+*/
