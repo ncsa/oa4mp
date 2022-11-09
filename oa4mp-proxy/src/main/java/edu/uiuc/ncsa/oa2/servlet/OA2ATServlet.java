@@ -957,15 +957,15 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             // Case to handle: NO scopes in AuthZ, but scopes here. Perfectly legal from OAuth 2 spec.
 
             if (!scopes.isEmpty()) {
-                if(st2.getScopes().isEmpty()){
-                    st2.setScopes( ClientUtils.resolveScopes(state, st2.getOA2Client(), false, false));
-                }else{
+                if (st2.getScopes().isEmpty()) {
+                    st2.setScopes(ClientUtils.resolveScopes(state, st2.getOA2Client(), false, false));
+                } else {
                     // actual check if requested scopes are a subset of authz scopes
                     HashSet<String> originalScopes = new HashSet<>();
                     HashSet<String> requestedScopes = new HashSet<>();
                     originalScopes.addAll(st2.getScopes());
                     requestedScopes.addAll(scopes);
-                    if(!originalScopes.equals(requestedScopes)){
+                    if (!originalScopes.equals(requestedScopes)) {
                         txRecord = (TXRecord) oa2SE.getTxStore().create();
                         txRecord.setScopes(scopes);
                     }
@@ -994,7 +994,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 txRecord.setResource(r);
             }
         }
-        if(txRecord != null){
+        if (txRecord != null) {
             // We are not going to save the TX record because we don't need it for mare than transmitting
             // overrides in scope, audience and resource to the handlers to QDL. It does have to look exactly
             // like any other TXRecords, so set the identifier and type.
@@ -1189,6 +1189,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         try {
             oldRT = OA2TokenUtils.getRT(rawRefreshToken, oa2SE, keys);
         } catch (OA2ATException oa2ATException) {
+            info(oa2ATException.getError() + " in refresh for client " + client.getIdentifierString());
             throw oa2ATException;
         }
         OA2ServiceTransaction t = null;

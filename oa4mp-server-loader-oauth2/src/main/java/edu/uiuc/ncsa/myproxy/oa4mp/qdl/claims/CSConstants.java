@@ -62,6 +62,11 @@ public interface CSConstants {
     String CS_LDAP_SEARCH_NAME = "claim_name"; // The name of the claim to use. If not present in the claims, an exception is thrown
     String CS_LDAP_SEARCH_ATTRIBUTES = "search_attributes"; // attributes in LDAP to get. Omitting means get ALL of them
     String CS_LDAP_SEARCH_BASE = "search_base"; // The path in LDAP to start the search.
+
+    String CS_LDAP_SEARCH_SCOPE = "search_scope"; // The  LDAP search scope.
+    String CS_LDAP_SEARCH_SCOPE_OBJECT = "object"; // The  LDAP search scope.
+    String CS_LDAP_SEARCH_SCOPE_ONE_LEVEL = "one_level"; // The  LDAP search scope.
+    String CS_LDAP_SEARCH_SCOPE_SUBTREE = "subtree"; // The  LDAP search scope.
     String CS_LDAP_SEARCH_FILTER_ATTRIBUTE = "ldap_name"; // the name of the attribute in LDAP to search on.
     String CS_LDAP_SECURITY_PRINCIPAL = "username"; // only needed if authz type is simple or strong
     String CS_LDAP_SERVER_ADDRESS = "address"; // required

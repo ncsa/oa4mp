@@ -1,0 +1,60 @@
+#! /usr/bin/env -S qdl-run
+
+/*
+   Tests the revocation (and introspection) machinery for a client.
+
+*/
+
+script_path('/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests' ~ script_path());
+
+cfg.'id'  := 'dev:/test/ncsa_qdl';
+cfg.'idp'  := 'NCSA';
+cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';
+cfg.'description' :=  'Test revocation and introspection machinery for a client.';
+cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token endpoint
+
+rc := script_load('driver.qdl', cfg.);
+tokens. := clc#access();
+
+⊨ introspect().'active':'access token not active';
+⊨ introspect('-rt').'active':'refresh token not active';
+⊨ revoke():'token not revoked';
+⊨ !introspect().'active';
+try[
+ ⊨ 'invalid_token' < exchange():'was able to refresh a revoked access token';
+]catch[
+
+];
+exchange('-at', 'x');
+⊨ introspect().'active':'access token not active';
+
+
+say('ok');
+/*
+   introspect
+       > true
+     introspect -rt
+       > true
+     revoke // invalidates access token
+       > ok
+     introspect // invalidated access token should not be valid
+       > false
+     exchange
+       FAILS (because access token should be invalid and that is used as bearer token)
+     exchange -at -x // Have to use refresh token to get back new access token
+     introspect
+       > true
+     exchange -rt // get a new refresh token
+     introspect -rt
+       > true
+     revoke -rt
+       > ok
+     introspect -rt
+       > false
+     exchange -rt
+       FAILS
+     exchange -at
+       New access token (since swapping with valid one)
+     At this point, the refresh token is invalid and while you can exchange ATs, you cannot ever get another RT
+     which is as it should be. If the access token expires, then any attempts to exchange or refresh fail.
+*/

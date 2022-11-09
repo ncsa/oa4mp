@@ -49,7 +49,7 @@ if[
 ]; //end if
 
  say('*** ncsa-default claims=' + to_string(claims.,1));
- if[exec_phase ∉ ['post_token', 'post_refresh']][return();];
+ if[exec_phase ∉ ['post_token', 'post_refresh', 'post_user_info']][return();];
  if[0==script_args()][return();]; // do not process claims
 
  if[!is_defined(claims.isMemberOf.)][return();];
@@ -58,7 +58,7 @@ if[
  // rest of this is now ignored.
 
 if[
-   exec_phase == 'post_token' ||exec_phase == 'post_refresh' // CIL-1327 only do this in token/refresh
+   exec_phase ∈ ['post_token' ,'post_refresh', 'post_user_info'] // CIL-1327 only do this in token/refresh/user info
 ]then[
      // default is false -- return whole list
     convert := false;

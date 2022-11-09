@@ -1,0 +1,45 @@
+/*
+ ldapsearch \
+  -LLL \
+  -H ldaps://ldap.cilogon.org \
+  -x \
+  -b 'ou=people,o=KAGRA-LIGO,o=CO,dc=gwastronomy-data,dc=cgca,dc=uwm,dc=edu'
+  '(eduPersonPrincipalName=duncan.meacher@shibbi.pki.itc.u-tokyo.ac.jp)'
+
+
+ ldapsearch -LLL -H ldaps://ldap.cilogon.org  -x  -b 'ou=people,o=KAGRA-LIGO,o=CO,dc=gwastronomy-data,dc=cgca,dc=uwm,dc=edu'  '(eduPersonPrincipalName=duncan.meacher@shibbi.pki.itc.u-tokyo.ac.jp)'
+ */
+
+     ini. := file_read('/home/ncsa/dev/csd/config/ini/ligo-ldap.ini',2).'ligo_prod';
+     //ini. := file_read('vfs#/scripts/ligo/ldap.ini',2).'ligo';
+     user := script_args(0); // This is actually the EPPN for the user.
+
+
+            ligo_cfg.'address' := ini.'address';
+               ligo_cfg.'port' := 636;
+         ligo_cfg.'claim_name' := 'uid';
+               ligo_cfg.'type' := 'ldap';
+        ligo_cfg.'search_base' := 'ou=robots,dc=ligo,dc=org';
+          ligo_cfg.'ldap_name' := 'uid';
+              ligo_cfg.groups. := ['isMemberOf'];
+   ligo_cfg.search_attributes. := ['isMemberOf', 'uin', 'uid'];
+          ligo_cfg.'auth_type' := 'simple';
+           ligo_cfg.'username' := ini.'username';
+           ligo_cfg.'password' := ini.'password';
+      ligo_cfg.'fail_on_error' := true;
+                ligo_response. := get_claims(create_source(ligo_cfg.), head(user, '@'));
+                   say('ligo_response.==' + to_string(ligo_response., true));
+
+
+if[
+      size(ligo.'isMemberOf') == 0
+  ]then[
+          sys_err.ok := false;
+     sys_err.message := 'Missing group information. Cannot determine scopes.';
+  sys_err.error_type := 'access_denied';
+     return([]);
+];
+
+say('*** LIGO access.qdl returns ' + to_string(ligo_response.));
+return(ligo_response.);
+

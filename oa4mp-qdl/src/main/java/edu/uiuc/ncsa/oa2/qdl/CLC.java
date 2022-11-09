@@ -67,6 +67,7 @@ public class CLC implements QDLModuleMetaClass {
         public Object evaluate(Object[] objects, State state) {
             try {
                 clcCommands = new OA2CLCCommands(true, state.getLogger(), new OA2CommandLineClient(state.getLogger()));
+                // note that the order of the arguments swaps.
                 clcCommands.load(new InputLine(DUMMY_ARG + " " + objects[1].toString() + "  " + objects[0].toString()));
                 initCalled = true;
             } catch (Exception e) {
@@ -147,14 +148,15 @@ public class CLC implements QDLModuleMetaClass {
         public Object evaluate(Object[] objects, State state) {
             QDLStem g = new QDLStem();
             try {
-                if (objects.length == 0) {
-
-                    clcCommands.grant(new InputLine(DUMMY_ARG));
-                }
+//                if (objects.length == 0) {
+                    clcCommands.grant(argsToInputLine(getName(), objects));
+  //              }
+/*
                 if (objects.length == 1) {
                     clcCommands.grant(new InputLine(DUMMY_ARG + " " + objects[0]));
                 }
 
+*/
                 g.fromJSON(clcCommands.getGrant().toJSON());
             } catch (Exception e) {
                 state.getLogger().error("error getting grant", e);
@@ -241,7 +243,7 @@ public class CLC implements QDLModuleMetaClass {
         public Object evaluate(Object[] objects, State state) {
             checkInit();
             try {
-                clcCommands.uri(new InputLine(DUMMY_ARG));
+                clcCommands.uri(argsToInputLine(getName(), objects));
                 return clcCommands.getCurrentURI().toString();
             } catch (Exception e) {
                 if (DebugUtil.isEnabled()) {
@@ -277,7 +279,7 @@ public class CLC implements QDLModuleMetaClass {
         public Object evaluate(Object[] objects, State state) {
             checkInit();
             try {
-                clcCommands.refresh(new InputLine(DUMMY_ARG));
+                clcCommands.refresh(argsToInputLine(getName(), objects));
             } catch (Exception e) {
                 handleException(e);
             }
@@ -303,23 +305,14 @@ public class CLC implements QDLModuleMetaClass {
 
         @Override
         public int[] getArgCount() {
-            return new int[]{0};
+            return new int[]{0, 1, 2};
         }
 
         @Override
         public Object evaluate(Object[] objects, State state) {
             checkInit();
-            ArrayList<String> args = new ArrayList<>();
-            args.add("exchange");// name of function
-            for(Object ooo : objects){
-                if(ooo instanceof String){
-                    args.add((String) ooo);
-                }
-            }
-            String[] strings = new String[]{};
-            strings = args.toArray(strings);
             try {
-                clcCommands.exchange(new InputLine(strings));
+                clcCommands.exchange(argsToInputLine(getName(), objects));
             } catch (Exception e) {
                 handleException(e);
             }
@@ -330,6 +323,7 @@ public class CLC implements QDLModuleMetaClass {
         public List<String> getDocumentation(int argCount) {
             List<String> doxx = new ArrayList<>();
             doxx.add(getName() + "([-rt | [-at ]] [-x] Do the token exchange.");
+            doxx.add("returns: Both tokens, but the requested token is updated.");
             doxx.add("Arguments:");
             doxx.add("(None) = exchange the access token using the access token as the bearer token. Make sure it has not expired.");
             doxx.add("-at = same as no arguments");
@@ -338,11 +332,32 @@ public class CLC implements QDLModuleMetaClass {
             doxx.add("E.g.");
             doxx.add("exchange('-at', 'x');");
             doxx.add("would exchange the access token (possibly expired) using the (valid) refresh token.");
+            doxx.add("The result contains both access_token and refresh_token, but note that only the access token");
+            doxx.add("has changed.");
             doxx.add(checkInitMessage);
             return doxx;
         }
     }
 
+    /**
+     * Convert an array of strings (passed to the function) into an {@link InputLine} to be
+     * consumed by the CLC.
+     * @param name
+     * @param objects
+     * @return
+     */
+    protected InputLine argsToInputLine(String name, Object[] objects){
+        ArrayList<String> args = new ArrayList<>();
+         args.add(name);// name of function
+         for(Object ooo : objects){
+             if(ooo instanceof String){
+                 args.add((String) ooo);
+             }
+         }
+         String[] strings = new String[]{};
+         strings = args.toArray(strings);
+         return new InputLine(strings);
+    }
     protected void handleException(Throwable t) throws QDLException {
         if (DebugUtil.isEnabled()) {
             t.printStackTrace();
@@ -367,14 +382,14 @@ public class CLC implements QDLModuleMetaClass {
 
         @Override
         public int[] getArgCount() {
-            return new int[]{0};
+            return new int[]{0,1};
         }
 
         @Override
         public Object evaluate(Object[] objects, State state) {
             checkInit();
             try {
-                clcCommands.revoke(new InputLine(DUMMY_ARG));
+                clcCommands.revoke(argsToInputLine(getName(), objects));
                 return Boolean.TRUE;
             } catch (Exception e) {
 
@@ -409,7 +424,7 @@ public class CLC implements QDLModuleMetaClass {
             checkInit();
             QDLStem QDLStem = new QDLStem();
             try {
-                clcCommands.df(new InputLine(DUMMY_ARG));
+                clcCommands.df(argsToInputLine(getName(), objects));
                 QDLStem.fromJSON(clcCommands.getDfResponse());
             } catch (Exception e) {
                 handleException(e);
@@ -436,7 +451,7 @@ public class CLC implements QDLModuleMetaClass {
 
         @Override
         public int[] getArgCount() {
-            return new int[]{0};
+            return new int[]{0,1};
         }
 
         @Override
@@ -444,13 +459,12 @@ public class CLC implements QDLModuleMetaClass {
             checkInit();
             QDLStem QDLStem = new QDLStem();
             try {
-                clcCommands.introspect(new InputLine(DUMMY_ARG));
+                clcCommands.introspect(argsToInputLine(getName(), objects));
                 QDLStem.fromJSON(clcCommands.getIntrospectResponse());
             } catch (Exception e) {
                 handleException(e);
             }
             return QDLStem;
-            //return new QDLStem();
         }
 
         @Override
@@ -480,7 +494,7 @@ public class CLC implements QDLModuleMetaClass {
             checkInit();
             QDLStem out = new QDLStem();
             try {
-                clcCommands.user_info(new InputLine(DUMMY_ARG));
+                clcCommands.user_info(argsToInputLine(getName(), objects));
                 out.fromJSON(clcCommands.getClaims());
             } catch (Exception e) {
                 handleException(e);
@@ -589,7 +603,7 @@ public class CLC implements QDLModuleMetaClass {
         @Override
         public Object evaluate(Object[] objects, State state) {
             try {
-                clcCommands.read(new InputLine(DUMMY_ARG + " " + objects[0]));
+                clcCommands.read(argsToInputLine(getName(), objects));
                 return Boolean.TRUE;
             } catch (Exception e) {
                 e.printStackTrace();

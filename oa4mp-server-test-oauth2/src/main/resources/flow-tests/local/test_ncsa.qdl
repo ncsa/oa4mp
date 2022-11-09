@@ -1,0 +1,41 @@
+#! /usr/bin/env -S qdl-run
+
+/*
+   Tests the client with no configuration
+   Client config 2022-11-09
+   {"tokens": {"identity": {
+       "qdl":  {
+        "args": ["true"],
+        "load": "ncsa/ncsa-default.qdl",
+        "xmd": {"exec_phase":   [
+         "pre_auth",
+         "post_all"                           ]}
+       },
+       "type": "identity"
+      }}}
+*/
+
+script_path('/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests' ~ script_path());
+
+cfg.'id'  := 'localhost:test/ncsa'; // name of the configuration, not the id
+cfg.'idp'  := 'NCSA';
+cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';
+cfg.'description' :=  'Basic NCSA test using default QDL script.';
+cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token endpoint
+rc := script_load('driver.qdl', cfg.);
+tokens. := clc#access();
+claims. := claims();
+⊨ tokens.'access_token'.'lifetime' == 1009000 : 'wrong access token lifetime';
+⊨ tokens.'refresh_token'.'lifetime' == 950400000 : 'wrong refresh token lifetime';
+⊨ claims.'aud' == cfg.'id' : 'wrong audience';  // Audience is a little different than usual.
+⊨ claims.'eppn' == 'jgaynor@illinois.edu' : 'wrong eppn';
+⊨ claims.'isMemberOf' << List : 'isMemberOf claim is not a simple list';
+⊨ claims.'isMemberOf'.0 << String  : ' isMemberOf should be a list';
+issued_at := claims.'iat'; // store for future use.
+tokens. := refresh();
+⊨ issued_at < claims().'iat' : 'id tokens should be issued at different time to show they are different';
+user_info. := user_info();
+⊨ user_info.'isMemberOf' << List : 'isMemberOf claim in user info is not a simple list';
+⊨ user_info.'isMemberOf'.0 << String  : ' isMemberOf in user info should be a list';
+
+say('ok');

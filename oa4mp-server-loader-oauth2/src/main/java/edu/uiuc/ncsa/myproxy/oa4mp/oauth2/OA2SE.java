@@ -94,6 +94,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
                  boolean rfc8693Enabled,
                  boolean qdlStrictACLs,
                  boolean safeGC,
+                 boolean cleanupLockingEnabled,
                  RFC8628ServletConfig rfc8628ServletConfig,
                  boolean rfc8628Enabled,
                  boolean printTSInDebug,
@@ -166,6 +167,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.maxRTLifetime = maxRTLifetime;
         this.qdlStrictACLs = qdlStrictACLs;
         this.safeGC = safeGC;
+        this.cleanupLockingEnabled = cleanupLockingEnabled;
         this.rfc8628Enabled = rfc8628Enabled;
         this.printTSInDebug = printTSInDebug;
         this.rfc8628ServletConfig = rfc8628ServletConfig;
@@ -176,6 +178,16 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.debugger = debugger;
         this.cleanupAlarms = cleanupAlarms;
     }
+
+    public boolean isCleanupLockingEnabled() {
+        return cleanupLockingEnabled;
+    }
+
+    public void setCleanupLockingEnabled(boolean cleanupLockingEnabled) {
+        this.cleanupLockingEnabled = cleanupLockingEnabled;
+    }
+
+    boolean cleanupLockingEnabled = false; // default
 
     public Collection<LocalTime> getCleanupAlarms() {
         return cleanupAlarms;

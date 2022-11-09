@@ -1,0 +1,37 @@
+#! /usr/bin/env -S qdl-run
+
+/*
+   Tests the client with no configuration
+
+*/
+
+script_path('/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests' ~ script_path());
+
+cfg.'id'  := 'dev:/test/ncsa_qdl';
+cfg.'idp'  := 'NCSA';
+cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';
+cfg.'description' :=  'Test standard NCSA claims processing using QDL. Critical regression test.';
+cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token endpoint
+
+rc := script_load('driver.qdl', cfg.);
+tokens. := clc#access();
+claims. := claims();
+
+⊨ claims.'aud' == cfg.'id' : 'wrong audience';
+groups. := claims.'isMemberOf';
+⊨ groups. << List : 'is member of claim is not a group';
+⊨ groups.0 << String : 'is member of claim is not a flat list';
+⊨ tokens.'access_token'.'lifetime' == 1009000 : 'wrong access token lifetime';
+⊨ tokens.'refresh_token'.'lifetime' == 1000000 : 'wrong refresh token lifetime';
+
+tokens. := refresh();
+claims. := claims();
+⊨ claims.'aud' == cfg.'id' : 'wrong audience';
+groups. := claims.'isMemberOf';
+⊨ groups. << List : 'is member of claim is not a group';
+⊨ groups.0 << String : 'is member of claim is not a list';
+⊨ tokens.'access_token'.'lifetime' == 1009000 : 'wrong access token lifetime';
+⊨ tokens.'refresh_token'.'lifetime' == 1000000 : 'wrong refresh token lifetime';
+
+say('ok');
+

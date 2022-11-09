@@ -212,6 +212,19 @@ public class LDAPConfiguration extends JSONClaimSourceConfig {
                 '}';
     }
 
+    public String getSearchScope() {
+        return searchScope;
+    }
+
+    public void setSearchScope(String searchScope) {
+        this.searchScope = searchScope;
+    }
+
+    String searchScope;
+
+    public boolean hasSearchScope(){
+        return searchScope!=null && searchScope.trim().length()!=0;
+    }
     /**
      * This is used as part of the search filter. A normal one would be
      * <pre>

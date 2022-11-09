@@ -118,6 +118,7 @@ public class OA2ServletUtils {
         }
     }
 
+
     /**
      * Take a stack trace and print the first n lines of it.
      *
@@ -126,6 +127,21 @@ public class OA2ServletUtils {
      * @return the truncated stack trace
      */
     public static String truncateStackTrace(Throwable e, int n, boolean printIt) {
+        String current = truncateStackTrace2(e, n, printIt);
+        Throwable nextE = e.getCause();
+        if(nextE != null) {
+            for (int i = 1; i < n; i++) {
+                current = current + "\n" + truncateStackTrace2(nextE, n, printIt);
+               nextE = nextE.getCause();
+               if(nextE == null){
+                   break; // jump out, we are done.
+               }
+            }
+        }
+        return current;
+    }
+
+    protected static String truncateStackTrace2(Throwable e, int n, boolean printIt) {
         StringWriter writer = new StringWriter();
         e.printStackTrace(new PrintWriter(writer));
         String[] lines = writer.toString().split("\n");
@@ -138,7 +154,6 @@ public class OA2ServletUtils {
         }
         return sb.toString();
     }
-
     /**
      * Pretty print the exception. This decides what to print and shortens the stack trace.
      *

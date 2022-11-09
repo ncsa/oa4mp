@@ -173,11 +173,11 @@ When a new version is deployed, here is the testing order
           at lifetime 750 sec
           rt lifetime  3600 sec
 
-        exchange/refresh
-          AT:
-            scopes:
-               x.y:/abc/def/ghi
-          same lifetimes
+       exchange/refresh
+             AT:
+               scopes:
+                  x.y:/abc/def/ghi
+             same lifetimes
 
          Example 6:
          set_param -a scope "read:/home/bob"
@@ -591,7 +591,7 @@ TO DO:
          it doesn't just always hand back everything).
        The following test for various things like scope reduction
 
-       set_param -a scope "read: write:"
+       set_param -a scope "read: write: igwn.robot:ligorobot"
        set_param -r scope "read:/DQSegDB write:/DQSegDB"
        set_param -x scope "read:/DQSegDB/foo write:/DQSegDB read:/frames/bar"
        AT:

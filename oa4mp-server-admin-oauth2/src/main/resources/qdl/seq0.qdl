@@ -46,6 +46,6 @@
 }}}
 */
 say('seq 0');
-say(script_args(-1));
-claims.'seq0' := script_args(0).'port'; // returns 636
+say(size(args()));
+claims.'seq0' := args().0.'port'; // returns 636
 claims.'seq0_phase' := exec_phase; // returns current exec phase

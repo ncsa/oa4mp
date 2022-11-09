@@ -38,6 +38,16 @@ import java.util.List;
  * on 8/17/15 at  4:10 PM
  */
 public class BasicClaimsSourceImpl implements ClaimSource {
+    // CIL-1550 fix (pending) The actual error message is below.
+    private static final long serialVersionUID = -6997152589138221711L;
+    /*
+    time="2022-11-03T15:21:54Z" level=error msg="failed to refresh identity: oidc: failed to get refresh token:
+    oauth2: cannot fetch token: 400 Bad Request\nResponse: {\"error\":\"invalid_request\",\"error_description\":\"
+    unable to update claims on token refresh: \\\"edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.BasicClaimsSourceImpl;
+    local class incompatible: stream classdesc serialVersionUID = 7915876204663027,
+    local class serialVersionUID = -6997152589138221711
+    \\\"\",\"state\":\"hbhf2fu7m7bif6j3s6xvbmtou\"}"
+     */
 
     /**
      * This is the list of claims from the headers to omit. In other words, this module will reject these out of hand
@@ -57,7 +67,6 @@ public class BasicClaimsSourceImpl implements ClaimSource {
     public void setOmitList(List<String> omitList) {
         getConfiguration().setOmitList(omitList);
     }
-
 
     ClaimSourceConfiguration configuration = null;
 

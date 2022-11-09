@@ -1,0 +1,37 @@
+#! /usr/bin/env -S qdl-run
+
+/*
+   Tests the client with no configuration
+
+*/
+
+script_path('/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests' ~ script_path());
+
+cfg.'id'  := 'dev:test/df';
+cfg.'idp'  := 'NCSA';
+cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';
+cfg.'description' :=  'Test basic device flow on DEV.';
+cfg.'flow_type' := 'df'; 
+
+rc := script_load('driver.qdl', cfg.);
+tokens. := clc#access();
+at. := tokens.'access_token';
+rt. := tokens.'refresh_token';
+⊨ claims().'aud' == cfg.'id' : 'wrong audience';
+⊨ at.'lifetime' == 900000 : 'wrong access token lifetime';
+⊨ rt.'lifetime' == 7200000 : 'wrong refresh token lifetime';
+
+tokens. := refresh();
+at. := tokens.'access_token';
+rt. := tokens.'refresh_token';
+
+⊨ claims().'aud' == cfg.'id' : 'wrong audience';
+⊨ at.'lifetime' == 900000 : 'wrong access token lifetime';
+⊨ rt.'lifetime' == 7200000 : 'wrong refresh token lifetime';
+
+at. := exchange().'access_token';
+rt. := exchange('-rt').'refresh_token';
+⊨ at.'lifetime' == 900000 : 'wrong access token lifetime';
+⊨ rt.'lifetime' == 7200000 : 'wrong refresh token lifetime';
+
+say('ok');

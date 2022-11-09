@@ -103,6 +103,8 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
     public static final String NOTIFY_ADMIN_CLIENT_ADDRESSES = "notifyACEmailAddresses";
     public static final String CLEANUP_INTERVAL_TAG = "cleanupInterval";
     public static final String CLEANUP_ALARMS_TAG = "cleanupAlarms";
+    public static final String CLEANUP_LOCKING_ENABLED = "cleanupLockingEnabled";
+
     public static final String RFC7636_REQUIRED_TAG = "rfc7636Required";
     public static final String DEMO_MODE_TAG = "demoModeEnabled";
     public static final String QDL_CONFIG_NAME_ATTR = "qdlConfigName";
@@ -129,6 +131,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
     public static int CLIENT_SECRET_LENGTH_DEFAULT = 258;
 
     public static long CLEANUP_INTERVAL_DEFAULT = 30 * 60 * 1000L; // 30 minutes
+    public static boolean CLEANUP_LOCKING_ENABLED_DEFAULT = false; // Don't lock tables by default
 
     public OA2ConfigurationLoader(ConfigurationNode node) {
         super(node);
@@ -187,6 +190,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     isRFC8693Enabled(),
                     isQdlStrictACLS(),
                     isSafeGC(),
+                    isCleanupLockingEnabled(),
                     getRFC8628ServletConfig(),
                     isRFC8628Enabled(),
                     isprintTSInDebug(),
@@ -423,8 +427,8 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     cleanupInterval = ConfigUtil.getValueSecsOrMillis(raw, true);
                 }
             } catch (Throwable t) {
-                // use default which is to doo safe garbage collection.
-                // We let this be null to trigger pulling the value, if any, out of the
+                // use default which is to do safe garbage collection.
+                // We let this be null to trigger pulling the value, if any, out of
                 // the configuration
                 cleanupInterval = CLEANUP_INTERVAL_DEFAULT;
             }
@@ -432,6 +436,25 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         }
         return cleanupInterval;
     }
+     Boolean cleanupLockingEnabled = null;
+
+    public Boolean isCleanupLockingEnabled() {
+            if (cleanupLockingEnabled == null) {
+
+                    String raw = getFirstAttribute(cn, CLEANUP_LOCKING_ENABLED);
+                    if (StringUtils.isTrivial(raw)) {
+                        cleanupLockingEnabled = CLEANUP_LOCKING_ENABLED_DEFAULT;
+                    } else {
+                        try{
+                            cleanupLockingEnabled = Boolean.parseBoolean(raw);
+                        }catch (Throwable t){
+                            cleanupLockingEnabled = CLEANUP_LOCKING_ENABLED_DEFAULT;
+                        }
+                    }
+                DebugUtil.trace(this, CLEANUP_LOCKING_ENABLED + " set to " + cleanupLockingEnabled);
+            }
+            return cleanupLockingEnabled;
+        }
 
     public boolean isSafeGC() {
         if (safeGC == null) {

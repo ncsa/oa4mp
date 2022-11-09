@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.JSONUtil;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSourceConfiguration;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSourceConfigurationUtil;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.util.ssl.SSLConfiguration;
 import edu.uiuc.ncsa.security.util.ssl.SSLConfigurationUtil;
 import net.sf.json.JSON;
@@ -36,6 +37,11 @@ public class LDAPConfigurationUtil extends ClaimSourceConfigurationUtil {
     public static final String SEARCH_FILTER_ATTRIBUTE_KEY = "searchFilterAttribute"; // This is the name of the attribute in LDAP to search for
     // The search is done by searchFilterAttribute=searchName, e.g. uid=eppn. The defaut filter attribute is uid.
     public static final String SEARCH_FILTER_ATTRIBUTE_DEFAULT = "uid"; // This is the default attribute name for the search
+    // CIL-1553/
+    public static final String SEARCH_SCOPE = "searchScope";
+    public static final String SEARCH_SCOPE_SUBTREE = "subtree";
+    public static final String SEARCH_SCOPE_OBJECT = "object";
+    public static final String SEARCH_SCOPE_ONE_LEVEL = "one_level";
 
     public static final String LDAP_SEARCH_ATTRIBUTES_TAG = "searchAttributes";
     public static final String LDAP_SEARCH_ATTRIBUTE_TAG = "attribute";
@@ -173,7 +179,10 @@ public class LDAPConfigurationUtil extends ClaimSourceConfigurationUtil {
         } catch (Throwable t) {
             logger.warn("Could not parse port \"" + port + "\" for the LDAP handler. Using default of no port.");
         }
-
+        String searchScope = getNodeValue(ldapNode, SEARCH_SCOPE);
+        if(!StringUtils.isTrivial(searchScope)){
+            ldapConfiguration.setSearchScope(searchScope);
+        }
         ldapConfiguration.setPassword(getNodeValue(ldapNode, LDAP_PASSWORD_TAG));
 
         x = getFirstAttribute(ldapNode, LDAP_AUTH_TYPE);
@@ -247,11 +256,12 @@ public class LDAPConfigurationUtil extends ClaimSourceConfigurationUtil {
         }
         if (configuration.getAuthType() == LDAP_AUTH_SIMPLE_KEY) {
             getJSONUtil().setJSONValue(ldap, LDAP_AUTH_TYPE, LDAP_AUTH_SIMPLE);
-
             getJSONUtil().setJSONValue(ldap, LDAP_PASSWORD_TAG, configuration.getPassword());
             getJSONUtil().setJSONValue(ldap, LDAP_SECURITY_PRINCIPAL_TAG, configuration.getSecurityPrincipal());
         }
-
+        if(configuration.hasSearchScope()){
+            getJSONUtil().setJSONValue(ldap, SEARCH_SCOPE, configuration.getSearchScope());
+        }
         // Now for the search attributes
         JSONArray searchAttributes = new JSONArray();
         for (String key : configuration.getSearchAttributes().keySet()) {
@@ -347,7 +357,9 @@ public class LDAPConfigurationUtil extends ClaimSourceConfigurationUtil {
             config.setContextName(contextName);
         }
 
-
+        if(json.containsKey(SEARCH_SCOPE)){
+            config.setSearchScope(json.getString(SEARCH_SCOPE));
+        }
         String x = jsonUtil.getJSONValueString(json, LDAP_AUTH_TYPE);
         config.setAuthType(getAuthType(x)); // default
         config.setServer(jsonUtil.getJSONValueString(json, LDAP_ADDRESS_TAG));

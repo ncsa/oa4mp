@@ -64,7 +64,7 @@ iat := claims.'iat'; // for later, to check it changes
 expected_scopes. := ['compute.create', 'compute.read', 'compute.cancel', 'compute.modify', 'storage.create:/dune/scratch/users/cilogontest', 'storage.read:/dune'];
 ss. := tokenize(at.'scope', ' ');
 ⊨ reduce(@&&, expected_scopes. ∈ ss.) : 'incorrect access token scopes';
-⊨ 0< tokens.'access_token'.'lifetime' <= 750000 : 'wrong lifetime, expected 750000, got ' + (tokens.'access_token'.'lifetime');
+⊨ tokens.'access_token'.'lifetime' == 750000 : 'wrong lifetime, expected 750000, got ' + (tokens.'access_token'.'lifetime');
 
 tokens. := refresh();
 at. := tokens.'access_token'.'jwt';
@@ -81,14 +81,14 @@ claims. := claims();
 expected_scopes. := ['compute.create', 'compute.read', 'compute.cancel', 'compute.modify', 'storage.create:/dune/scratch/users/cilogontest', 'storage.read:/dune'];
 ss. := tokenize(at.'scope', ' ');
 ⊨ reduce(@&&, expected_scopes. ∈ ss.) : 'incorrect access token scopes';
-⊨ 0< tokens.'access_token'.'lifetime' <= 750000 : 'wrong lifetime, expected 750000, got ' + (tokens.'access_token'.'lifetime');
+⊨ tokens.'access_token'.'lifetime' == 750000 : 'wrong lifetime, expected 750000, got ' + (tokens.'access_token'.'lifetime');
 
 at. := exchange('-at');
 rt. := exchange('-rt');
 expected_scopes. := ['compute.create', 'compute.read', 'compute.cancel', 'compute.modify', 'storage.create:/dune/scratch/users/cilogontest', 'storage.read:/dune'];
 ss. := tokenize(at.'scope', ' ');
 ⊨ reduce(@&&, expected_scopes. ∈ ss.) : 'incorrect access token scopes';
-⊨ 0< tokens.'access_token'.'lifetime' <= 750000 : 'wrong lifetime, expected 750000, got ' + (tokens.'access_token'.'lifetime');
+⊨ tokens.'access_token'.'lifetime' ==750000 : 'wrong lifetime, expected 750000, got ' + (tokens.'access_token'.'lifetime');
 
 /*
     JWT access token:{

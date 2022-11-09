@@ -1,0 +1,22 @@
+#! /usr/bin/env -S qdl-run
+
+/*
+   Tests the client with no configuration
+
+*/
+
+script_path('/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests' ~ script_path());
+
+cfg.'id'  := 'dev:test/no_cfg';
+cfg.'idp'  := 'ANY';
+cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';
+cfg.'description' :=  'Test with no configuration -- most basic test.';
+cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token endpoint
+
+rc := script_load('driver.qdl', cfg.);
+tokens. := clc#access();
+say(tokens., true);
+⊨ claims().'aud' == cfg.'id' : 'wrong audience';
+⊨ tokens.'access_token'.'lifetime' == 1009000 : 'wrong access token lifetime';
+⊨ tokens.'refresh_token'.'lifetime' == 1000000000 : 'wrong refresh token lifetime';
+say('ok');

@@ -45,7 +45,7 @@ public class ScitokenHandler extends AbstractAccessTokenHandler {
 
         // subject is optional
         sciTokens.put(SUBJECT, transaction.getUsername());
-        sciTokens.put(ST_CLIENT_IDENTIFIER, transaction.getOA2Client().getIdentifierString());
+        //sciTokens.put(ST_CLIENT_IDENTIFIER, transaction.getOA2Client().getIdentifierString());
         sciTokens.put(ST_VERSION_CLAIM, getVersion()); // make sure set for inter-operability with others
         // strip off audience requests. These are passed in as scopes as per
         // https://scitokens.org/technical_docs/Claims

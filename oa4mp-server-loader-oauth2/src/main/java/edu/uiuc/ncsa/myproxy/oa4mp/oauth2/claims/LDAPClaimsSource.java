@@ -4,16 +4,16 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.GroupHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.NCSAGroupHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.UnsupportedScopeException;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.LDAPConfiguration;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.LDAPConfigurationUtil;
+import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.core.Logable;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
-import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.UnsupportedScopeException;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.LDAPConfiguration;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.LDAPConfigurationUtil;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -33,6 +33,9 @@ import java.util.*;
  * on 4/26/16 at  3:32 PM
  */
 public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
+
+    private static final long serialVersionUID = 7590118446767325062L;
+
     public LDAPClaimsSource() {
     }
 
@@ -134,7 +137,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
                         "LDAP server at ${ldap_host}:\n\n${message}\n\n. The operation did not complete.";
                 Map<String, String> replacements = new HashMap<>();
                 String x = "localhost";
-                if(getOa2SE() != null){
+                if (getOa2SE() != null) {
                     URI address = getOa2SE().getServiceAddress();
                     if (address != null) {
                         x = address.getHost();
@@ -256,6 +259,8 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
                 env.put(Context.SECURITY_AUTHENTICATION, LDAPConfigurationUtil.LDAP_AUTH_SIMPLE);
                 env.put(Context.SECURITY_PRINCIPAL, cfg.getSecurityPrincipal());
                 env.put(Context.SECURITY_CREDENTIALS, cfg.getPassword());
+                env.put("javax.security.sasl.server.authentication", "true");
+
                 env.put(Context.SECURITY_PROTOCOL, "ssl");
                 break;
             case LDAPConfigurationUtil.LDAP_AUTH_STRONG_KEY:
@@ -341,6 +346,23 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
             String[] searchAttributes = attributes.keySet().toArray(new String[]{});
             searchControls.setReturningAttributes(searchAttributes);
         }
+        // CIL-1553 = add search scope
+        if (getLDAPCfg().hasSearchScope()) {
+
+            switch (getLDAPCfg().getSearchScope()) {
+                case LDAPConfigurationUtil.SEARCH_SCOPE_OBJECT:
+                    searchControls.setSearchScope(SearchControls.OBJECT_SCOPE);
+                    break;
+                case LDAPConfigurationUtil.SEARCH_SCOPE_ONE_LEVEL:
+                    searchControls.setSearchScope(SearchControls.ONELEVEL_SCOPE);
+                    break;
+                case LDAPConfigurationUtil.SEARCH_SCOPE_SUBTREE:
+                    searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
+                    break;
+                default:
+                    throw new IllegalArgumentException("unknown search scope \"" + getLDAPCfg().getSearchScope() + "\"");
+            }
+        }
         //String addFilter = "";
         // For all questions about the filter, refer to https://tools.ietf.org/search/rfc4515
         String filter;
@@ -349,7 +371,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
             // If they specify it, use the whole thing.
             //filter = "(" + getLDAPCfg().getAdditionalFilter() + ")";
             filter = getLDAPCfg().getAdditionalFilter();
-        }else{
+        } else {
             // if the filter is not specified,, try to construct it.
             filter = "(" + getSearchFilterAttribute(debugger) + "=" + userID + ")";
         }
@@ -364,6 +386,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
         }
         debugger.trace(this, "filter = " + filter);
         NamingEnumeration e = ctx.search(contextName, filter, searchControls);
+
         return toJSON(attributes, e, userID);
     }
 

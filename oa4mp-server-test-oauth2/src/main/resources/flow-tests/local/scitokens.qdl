@@ -1,0 +1,79 @@
+#! /usr/bin/env -S qdl-run
+
+/*
+   Tests the client with scitokens configuratioin
+   Client config 2022-11-09
+{"tokens": {
+   "access":  {
+    "audience": "https://localhost/fermilab",
+    "lifetime": 300000,
+    "templates": [  {
+     "aud": "https://localhost/fermilab",
+     "paths":    [
+          {"op": "read", "path": "/home/${sub}"},
+          {"op": "x.y","path": "/abc/def"},
+          {"op": "write","path": "/data/${sub}/cluster"}
+     ]
+    }],
+    "type": "scitoken"
+   },
+   "refresh":  {
+    "audience": "https://localhost/test",
+    "lifetime": 900000,
+    "type": "refresh"
+   }
+  }}
+
+*/
+
+script_path('/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests' ~ script_path());
+
+cfg.'id'  := 'localhost:scitokens'; // name of the configuration, not the id
+cfg.'idp'  := 'Github';
+cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';
+cfg.'description' :=  'Test basic configuration for Scitokens, no scripting.';
+cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token endpoint
+user_id := 'http://cilogon.org/serverT/users/21340363'; // id from Github on test.cilogon.org
+
+params.'authz' :=  {'scope': 'read: x.y: x.z write:'}; // initial request is query
+params.'token' :=  {'scope': 'read:/foo read:/home/' + user_id  + ' x.y:/abc/def/pqr write:/data/' + user_id + '/cluster/node47'};
+
+expected_token_scopes. :=  ['read:/home/' + user_id , 'x.y:/abc/def/pqr', 'write:/data/' + user_id + '/cluster/node47'];
+params.'exchange' :=  {'scope': 'read:/home/'+user_id  + // read
+                                ' write:/home/'+user_id + // write -- wrong, not granted
+                                ' read:/public/lsst/' + user_id + // ok
+                                ' x.y:/abc/def/pqr' + // works since it add component to path
+                                ' x.y:/abc/defpqr'}; // not granted since the path is wrong
+
+expected_exchange_scopes. := ['read:/home/' + user_id  , // read
+                             'write:/home/' + user_id,
+                             'x.y:/abc/def/pqr',  // works since it add component to path
+                             'x.y:/abc/defpqr',
+                             'x.y:/xyz/qrs'];
+
+define[test(tokens., expected_scopes., user_id)][
+    // Define the tests to run after access and refresh.
+    issuer := 'https://localhost:9443/oauth2';
+    at. := tokens.'access_token'.'jwt';
+    s. := tokenize(at.'scope', ' ');
+    rt. := tokens.'refresh_token'.'jwt';
+    ⊨ tokens.'access_token'.'lifetime' - 300000 < 2000 : 'wrong access token lifetime';
+    ⊨ at.'sub' ≡ user_id : 'wrong AT subject';
+    ⊨ at.'iss' ≡ issuer : 'wrong AT issuer';
+    ⊨ at.'aud' ≡ 'https://localhost/fermilab' : 'wrong AT audience';
+    ⊨ ¬is_defined(at.'cid') : 'Still getting cid claim in scitoken'; // regression test. No cid claim
+    ⊨ at.'ver' ≡ 'scitoken:2.0' : 'incorrect scitokens version claim';
+    ⊨ reduce(@∧, expected_scopes. ∈ s.) : 'incorrect AT scopes';
+    ⊨ rt.'aud' ≡ 'https://localhost/test' : 'wrong RT audience';
+    ⊨ tokens.'refresh_token'.'lifetime' - 900000 < 2000 : 'wrong refresh token lifetime';
+];
+
+rc := script_load('driver.qdl', cfg., params.);
+tokens. := clc#access();
+test(tokens., expected_token_scopes., user_id);
+issued_at := claims().'iat';
+tokens. := refresh();
+⊨ issued_at <= claims().'iat' : 'ID token not updated';
+test(tokens., expected_token_scopes., user_id);
+
+say('ok');

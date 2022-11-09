@@ -5,11 +5,8 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.BasicClaimsSourceImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.FlowStates2;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8628State;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
+import edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims.ConfigtoCS;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.OA4MPServiceTransaction;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims;
-import edu.uiuc.ncsa.security.core.DateComparable;
-import edu.uiuc.ncsa.security.core.Identifier;
-import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.AuthorizationGrant;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.RefreshToken;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AuthorizationGrantImpl;
@@ -19,6 +16,14 @@ import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.OA2TransactionScopes;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.OIDCServiceTransactionInterface;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.RFC7636Util;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSource;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
+import edu.uiuc.ncsa.security.core.DateComparable;
+import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
+import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
 
@@ -185,7 +190,7 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
     }
 
     /**
-     * Resources are URIs that are used as part of the {@link edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims#AUDIENCE}
+     * Resources are URIs that are used as part of the {@link OA2Claims#AUDIENCE}
      * claim in a (compound) access token.
      *
      * @return
@@ -267,41 +272,81 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         getState().put(FLOW_STATE_KEY, flowStates.toJSON());
     }
 
-    public void setClaimsSources(List<ClaimSource> sources) throws IOException {
-        /*
-           At this point, serializing the sources to JSON is a daunting task in general, since
-           turning them in to JSON, e.g., requires figuring out JSON serializations for
-           things like the Java LDAP library, which is massive and I have no control over.
-           Since the objects here
-           exist for only the duration of the transaction, there should never be a deserialization issue.
-           AND it has been said that roughly half of all Java security bugs relate to object serialization.
-           This is probably true, except that this when object are serialized, sent over a network and
-           intercepted -- nothing internal to the serialized object prevents tinkering.
-           These object go straight to a database, never to see the light of day, so security
-           is not an issue here. 
-        */
+    public void setClaimsSources(List<ClaimSource> sources)  {
         if (sources == null || sources.isEmpty()) {
             return;
         }
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ObjectOutputStream out = new ObjectOutputStream(baos);
-        out.writeObject(sources);
-        out.flush();
-        out.close();
-        String s = Base64.encodeBase64URLSafeString(baos.toByteArray());
-        getState().put(CLAIMS_SOURCES_STATE_KEY, s);
+        // CIL-1550
+        newCSSerialize(sources);
+   //     oldCSSerialize(sources);
+    }
+
+    protected void  newCSSerialize(List<ClaimSource> sources) {
+       JSONArray array = new JSONArray();
+        for (ClaimSource claimSource : sources) {
+            array.add(ConfigtoCS.convert(claimSource).toJSON());
+        }
+        getState().put(CLAIMS_SOURCES_STATE_KEY, array);
+    }
+
+    protected void oldCSSerialize(List<ClaimSource> sources)  {
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ObjectOutputStream out = new ObjectOutputStream(baos);
+            out.writeObject(sources);
+            out.flush();
+            out.close();
+            getState().put(CLAIMS_SOURCES_STATE_KEY, Base64.encodeBase64URLSafeString(baos.toByteArray()));
+        }catch(Throwable t){
+            if(t instanceof RuntimeException){
+                throw (RuntimeException)t;
+            }
+            throw new GeneralException("error serializing claims:" + t.getMessage(), t);
+        }
     }
 
 
-    public List<ClaimSource> getClaimSources(OA2SE oa2SE) throws IOException, ClassNotFoundException {
+    public List<ClaimSource> getClaimSources(OA2SE oa2SE) {
+       // CIL-1550 with a vengeance.
         if (!getState().containsKey(CLAIMS_SOURCES_STATE_KEY)) {
             return new ArrayList<>();
         }
-        String state = getState().getString(CLAIMS_SOURCES_STATE_KEY);
-        byte[] bytes = Base64.decodeBase64(state);
+        try{
+             return newCSDeserialize(oa2SE);
+        }catch(Throwable t){
+            // try the old way.
+            ServletDebugUtil.info(this, "could not deserialize claim sources new way, reverting to Java serialization");
+        }
+        try {
+            return oldCSDeserialize(oa2SE);
+        }catch(Throwable tt){
+            // ok, some work to do.
+            if(ServletDebugUtil.isEnabled()){
+                ServletDebugUtil.info(this, "could not deserialize claim sources in any way:" + tt.getMessage());
+                tt.printStackTrace();
+            }
+            if(tt instanceof RuntimeException){
+                throw (RuntimeException)tt;
+            }
+            throw new GeneralException("Error deserializing claim source:" + tt.getMessage(), tt);
+        }
+    }
+
+    protected List<ClaimSource> newCSDeserialize(OA2SE oa2SE) throws Throwable {
+          // Assumed to be a serialized JSON Array
+        JSONArray array = getState().getJSONArray(CLAIMS_SOURCES_STATE_KEY);
+        ArrayList<ClaimSource> claimSources = new ArrayList<>();
+        for(int i =0; i < array.size(); i++){
+                 QDLStem stem = new QDLStem();
+                 claimSources.add(ConfigtoCS.convert(stem.fromJSON(array.getJSONObject(0)), oa2SE));
+             }
+        return claimSources;
+    }
+
+    protected List<ClaimSource> oldCSDeserialize(OA2SE oa2SE) throws Throwable {
+        byte[] bytes = Base64.decodeBase64(getState().getString(CLAIMS_SOURCES_STATE_KEY));
         ByteArrayInputStream baos = new ByteArrayInputStream(bytes);
         ObjectInputStream in = new ObjectInputStream(baos);
-
         // Method for deserialization of object
         Object object = in.readObject();
         List<ClaimSource> sources = (List<ClaimSource>) object;
@@ -547,7 +592,7 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
     /**
      * The <b><i>resolved</i></b> scopes for this transaction. This means that the intersection of the client's allowed
      * scopes, the client's requested scopes and the scopes enabled on the server are placed here. This should be passed
-     * to anything that needs the scopes (e.g. a {@link edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource}.
+     * to anything that needs the scopes (e.g. a {@link ClaimSource}.
      *
      * @return
      */
@@ -722,13 +767,13 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
      */
     protected String firstSix(URI id) {
         String agID = id.getPath();
-        if(agID == null){
+        if (agID == null) {
             // custom ids like foo:bar won't work with this, so return it all.
             return id.toString();
         }
-        agID = agID.substring(agID.lastIndexOf("/")+1);
+        agID = agID.substring(agID.lastIndexOf("/") + 1);
         // CIL-1348 fix:
-        if(6< agID.length()) {
+        if (6 < agID.length()) {
             int l = agID.length();
             // problem with first 6 is that some of these components end up being
             // timestamps so the first 6 is not even remotely unique.

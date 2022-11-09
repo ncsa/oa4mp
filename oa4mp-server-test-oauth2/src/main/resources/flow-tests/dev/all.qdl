@@ -1,0 +1,15 @@
+#! /usr/bin/env -S qdl-run
+path := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests';
+script_path(path ~ script_path());
+
+test.:=(path + '/dev/') + ['df.qdl',
+                           'functor.qdl', 'ncsa_qdl.qdl', 'no_config.qdl', 'revoke.qdl'];
+say('Running all tests. Remember to follow the instructions to repeatedly login using the specified IDP.');
+while[x∈test.][
+try[
+  script_load(x);
+  ]catch[
+     say('error running script ' + x);
+     say('error message:' + error_message);
+  ];
+];

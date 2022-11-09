@@ -85,7 +85,9 @@ public class ClaimSourceConfigConverter implements CSConstants {
                 stem.put(CS_LDAP_PORT, new Long(cfg2.getPort()));
                 stem.put(CS_LDAP_AUTHZ_TYPE, cUtil.getAuthName(cfg2.getAuthType()));
                 stem.put(CS_LDAP_SEARCH_FILTER_ATTRIBUTE, cfg2.getSearchFilterAttribute());
-
+                 if(cfg2.hasSearchScope()){
+                     stem.put(CS_LDAP_SEARCH_SCOPE, cfg2.getSearchScope());
+                 }
                 if (cfg2.getAuthType() == LDAPConfigurationUtil.LDAP_AUTH_SIMPLE_KEY) {
                     stem.put(CS_LDAP_PASSWORD, cfg2.getPassword());
                     stem.put(CS_LDAP_SECURITY_PRINCIPAL, cfg2.getSecurityPrincipal());
@@ -176,6 +178,9 @@ public class ClaimSourceConfigConverter implements CSConstants {
                 ldapCfg.setServer(arg.getString(CS_LDAP_SERVER_ADDRESS));
                 if (arg.containsKey(CS_LDAP_SEARCH_FILTER_ATTRIBUTE)) {
                     ldapCfg.setSearchFilterAttribute(arg.getString(CS_LDAP_SEARCH_FILTER_ATTRIBUTE));
+                }
+                if(arg.containsKey(CS_LDAP_SEARCH_SCOPE)){
+                    ldapCfg.setSearchScope(arg.getString(CS_LDAP_SEARCH_SCOPE));
                 }
                 if (arg.containsKey(CS_DEFAULT_IS_ENABLED)) {
                     ldapCfg.setEnabled(arg.getBoolean(CS_DEFAULT_IS_ENABLED));

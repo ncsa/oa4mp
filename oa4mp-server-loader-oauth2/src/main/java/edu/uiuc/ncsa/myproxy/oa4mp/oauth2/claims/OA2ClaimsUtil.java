@@ -7,15 +7,14 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ScriptRuntimeEngineFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
-import edu.uiuc.ncsa.security.core.Identifier;
-import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
-import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
-import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Errors;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2GeneralError;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Scopes;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSource;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims;
+import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRunRequest;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRuntimeEngine;
@@ -40,8 +39,8 @@ import static edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims.*;
  * If you are using it, there is probably something wrong. It is kept since there is some
  * good code in it, mostly for reference if something ever breaks, I can refer to this
  * to see if it had something better.
- * @deprecated 
- * <p>Created by Jeff Gaynor<br>
+ *
+ * @deprecated <p>Created by Jeff Gaynor<br>
  * on 4/24/18 at  11:13 AM
  */
 public class OA2ClaimsUtil implements ScriptingConstants {
@@ -150,21 +149,16 @@ public class OA2ClaimsUtil implements ScriptingConstants {
      * @throws Throwable
      */
     protected void checkRequiredScopes(OA2ServiceTransaction t) throws Throwable {
-        if(oa2se.isOIDCEnabled()){
-            if(t.getOA2Client().isPublicClient() && !t.getScopes().contains(OA2Scopes.SCOPE_OPENID)){
-                throw new OA2GeneralError(OA2Errors.INVALID_SCOPE, "invalid scope: no open id scope", HttpStatus.SC_UNAUTHORIZED,null);
+        if (oa2se.isOIDCEnabled()) {
+            if (t.getOA2Client().isPublicClient() && !t.getScopes().contains(OA2Scopes.SCOPE_OPENID)) {
+                throw new OA2GeneralError(OA2Errors.INVALID_SCOPE, "invalid scope: no open id scope", HttpStatus.SC_UNAUTHORIZED, null);
             }
-            if(t.getOA2Client().getScopes().contains(OA2Scopes.SCOPE_OPENID) && !t.getScopes().contains(OA2Scopes.SCOPE_OPENID)){
-                throw new OA2GeneralError(OA2Errors.INVALID_SCOPE, "invalid scope: no open id scope", HttpStatus.SC_UNAUTHORIZED,null);
+            if (t.getOA2Client().getScopes().contains(OA2Scopes.SCOPE_OPENID) && !t.getScopes().contains(OA2Scopes.SCOPE_OPENID)) {
+                throw new OA2GeneralError(OA2Errors.INVALID_SCOPE, "invalid scope: no open id scope", HttpStatus.SC_UNAUTHORIZED, null);
             }
-        }else{
-             // no scopes are possible in certain OAuth 2 cases.
+        } else {
+            // no scopes are possible in certain OAuth 2 cases.
         }
-/*
-        if (oa2se.isOIDCEnabled() &&  !t.getScopes().contains(OA2Scopes.SCOPE_OPENID)) {
-            throw new OA2GeneralError(OA2Errors.INVALID_SCOPE, "invalid scope: no open id scope", HttpStatus.SC_UNAUTHORIZED,null);
-        }
-*/
     }
 
     /**
@@ -180,9 +174,9 @@ public class OA2ClaimsUtil implements ScriptingConstants {
                 HashMap<String, Object> map = new HashMap<>();
                 map.put(SRE_REQ_CLAIMS, transaction.getUserMetaData());
                 JSONObject proxyState = transaction.getProxyState();
-                if(proxyState.isEmpty()){
+                if (proxyState.isEmpty()) {
                     map.put(SRE_REQ_PROXY_CLAIMS, new JSONObject()); // it is empty
-                }else{
+                } else {
                     proxyState.getJSONObject("claims");
                     map.put(SRE_REQ_PROXY_CLAIMS, proxyState.getJSONObject("claims"));
                 }
@@ -190,11 +184,7 @@ public class OA2ClaimsUtil implements ScriptingConstants {
                 map.put(SRE_REQ_AUDIENCE, transaction.getAudience());
                 map.put(SRE_REQ_EXTENDED_ATTRIBUTES, transaction.getExtendedAttributes());
                 map.put(SRE_REQ_FLOW_STATES, transaction.getFlowStates()); // so its a map
-                try {
-                    map.put(SRE_REQ_CLAIM_SOURCES, transaction.getClaimSources(oa2se)); // so its a map
-                } catch (IOException | ClassNotFoundException e) {
-                    throw new GeneralException("Error: Could not get the claim sources from the transaction", e);
-                }
+                map.put(SRE_REQ_CLAIM_SOURCES, transaction.getClaimSources(oa2se)); // so its a map
                 return map;
             }
 
@@ -345,7 +335,7 @@ public class OA2ClaimsUtil implements ScriptingConstants {
                         transaction.setUserMetaData(claims);
                         transaction.setFlowStates(flowStates);
                         oa2se.getTransactionStore().save(transaction);
-                        throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "access denied", HttpStatus.SC_UNAUTHORIZED,null);
+                        throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "access denied", HttpStatus.SC_UNAUTHORIZED, null);
                     }
                     dbg(this, "user info for claim source #" + claimSource + " = " + claims.toString(1));
                 }
@@ -398,7 +388,7 @@ public class OA2ClaimsUtil implements ScriptingConstants {
         FlowStates2 flowStates = transaction.getFlowStates();
         // save everything up to this point since there are no guarantees that processing will continue:
         if (!flowStates.acceptRequests) {
-            throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "access denied", HttpStatus.SC_UNAUTHORIZED,null);
+            throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "access denied", HttpStatus.SC_UNAUTHORIZED, null);
         }
         OA2Client client = getOA2Client();
 
@@ -456,7 +446,7 @@ public class OA2ClaimsUtil implements ScriptingConstants {
         // This is the first place we can check. If they are not allowed to make further requests, an access denied exception is thrown.
         if (!flowStates.acceptRequests) {
             dbg(this, "Access denied for user name = " + transaction.getUsername());
-            throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "access denied", HttpStatus.SC_UNAUTHORIZED,null);
+            throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "access denied", HttpStatus.SC_UNAUTHORIZED, null);
         }
         return transaction.getUserMetaData();
     }
@@ -465,10 +455,10 @@ public class OA2ClaimsUtil implements ScriptingConstants {
         if (claims.containsKey(claimKey)) {
             if (isEmpty(claims.getString(claimKey))) {
                 //           DebugUtil.trace(this, "Missing \"" + claimKey+ "\" claim= " );
-                throw new OA2GeneralError(OA2Errors.SERVER_ERROR, "Missing " + claimKey + " claim", HttpStatus.SC_INTERNAL_SERVER_ERROR,null);
+                throw new OA2GeneralError(OA2Errors.SERVER_ERROR, "Missing " + claimKey + " claim", HttpStatus.SC_INTERNAL_SERVER_ERROR, null);
             }
         } else {
-            throw new OA2GeneralError(OA2Errors.SERVER_ERROR, "Missing " + claimKey + " claim", HttpStatus.SC_INTERNAL_SERVER_ERROR,null);
+            throw new OA2GeneralError(OA2Errors.SERVER_ERROR, "Missing " + claimKey + " claim", HttpStatus.SC_INTERNAL_SERVER_ERROR, null);
         }
 
     }
@@ -489,16 +479,16 @@ public class OA2ClaimsUtil implements ScriptingConstants {
         for (Object key : claims.keySet()) {
 
             if (key == null) {
-                DebugUtil.error(this,"Null claim key encountered.");
+                DebugUtil.error(this, "Null claim key encountered.");
                 claims.remove(null);
             }
             String k = key.toString();
             if (k.isEmpty()) {
-                DebugUtil.error(this,"Empty claim key encountered.");
+                DebugUtil.error(this, "Empty claim key encountered.");
                 claims.remove(key);
             }
             if (claims.get(key) == null || claims.getString(k).isEmpty()) {
-                DebugUtil.trace(this,"Removed empty claim \"" + key + "\"");
+                DebugUtil.trace(this, "Removed empty claim \"" + key + "\"");
                 claims.remove(key);
             }
         }

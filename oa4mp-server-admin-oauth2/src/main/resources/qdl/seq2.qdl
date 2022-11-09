@@ -1,4 +1,5 @@
 say('seq 2');
-say(script_args(-1));
-⊨ script_args() == 1;
+say(size(args()));
+say('exec_phase=' + exec_phase);
+⊨ size(args()) == 1;
 claims.'seq2' := 'seq 2 passed ' + exec_phase;

@@ -19,12 +19,12 @@
      -1 - user aborted
 */
 
-⊨ 0 < script_args() < 3 : 'incorrect number of arguments, expected 1 or 2 and got ' + script_args();
+⊨ 0 < size(args()) < 3 : 'incorrect number of arguments, expected 1 or 2 and got ' + size(args());
 
-cfg. := script_args(0);
+cfg. := args().0;
 
 clc#init(cfg.'file', cfg.'id');
-if[script_args() == 2][set_param(script_args(1));];
+if[size(args()) == 2][set_param(args().1);];
 say('Client test for ' + cfg.'id');
 say(cfg.'description');
 say(' IDP: ' + cfg.'idp');

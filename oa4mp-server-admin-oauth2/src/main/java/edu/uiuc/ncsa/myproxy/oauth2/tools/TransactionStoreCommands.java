@@ -476,7 +476,7 @@ public class TransactionStoreCommands extends StoreCommands2 {
 
     public void gc_run(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
-            say("gc -run [" +
+            say("gc_run [" +
                     GC_SAFE_MODE_FLAG + " address] [" +
                     GC_TEST_FLAG + "]  [" +
                     GC_FILE_FLAG + " output_file]  [" +
@@ -503,7 +503,7 @@ public class TransactionStoreCommands extends StoreCommands2 {
             inputLine.removeSwitchAndValue(GC_FILE_FLAG);
         }
         if (!testMode && !isBatchMode()) {
-            if (!readline("Are you SURE? (yes/no)").equals("yes")) {
+            if (!readline("Are you SURE? (Yes/no)").equals("Yes")) {
                 say("aborting...");
                 return;
             }
@@ -601,48 +601,95 @@ public class TransactionStoreCommands extends StoreCommands2 {
     public static String GC_IS_ALARMS_FLAG = "-alarms";
 
 
-    public void gc_lock(InputLine inputLine) throws Exception{
-        if(showHelp(inputLine)){
+    public void gc_lock(InputLine inputLine) throws Exception {
+        if (showHelp(inputLine)) {
             say("gc_lock [-rm | ? | -alarms]");
-            say("(no arg) - lock the transaction and TX stores");
-            say("-rm - remove any locks");
+            say("-set [T|TX|all] - lock the transaction and TX stores");
+            say("-rm [T|TX|all] - remove given locks");
             say("? - report if stores are locked.");
             say("-alarms - show configured alarms");
             return;
         }
-        if(inputLine.hasArg("-alarms")){
-            if(oa2se.hasCleanupAlarms()){
-                say("alarms set for " + oa2se.getCleanupAlarms());
-            }else{
-                   say("no configured alarms. Cleanup interval is " + oa2se.getCleanupInterval());
+        boolean hasSet = inputLine.hasArg("-set");
+        if (hasSet) {
+            String arg = inputLine.getNextArgFor("-set");
+            inputLine.removeSwitchAndValue("-set");
+            boolean lockT = false;
+            boolean lockTX = false;
+            switch (arg) {
+                case "T":
+                    lockT = true;
+                    break;
+                case "TX":
+                    lockTX = true;
+                    break;
+                case "all":
+                    lockTX = true;
+                    lockT = true;
+                    break;
+                default:
+                    say("sorry, unknown option to set lock:\"" + arg + "\"");
+                    return;
+            }
+            if (lockT) {
+                Identifiable tLock = getStore().create();
+                tLock.setIdentifier(lockID);
+                getStore().save(tLock);
+                say("transaction store locked");
+            }
+
+            if (lockTX) {
+                Identifiable tLock = getTxStore().create();
+                tLock.setIdentifier(lockID);
+                getTxStore().save(tLock);
+                say("TX store locked");
             }
             return;
         }
-        if(inputLine.hasArg("?")){
-            say("transactions locked? " + getStore().containsKey(lockID));
-            say("TX store locked? " + getTxStore().containsKey(lockID));
+        if (inputLine.hasArg("-alarms")) {
+            if (oa2se.hasCleanupAlarms()) {
+                say("alarms set for " + oa2se.getCleanupAlarms());
+            } else {
+                say("no configured alarms. Cleanup interval is " + oa2se.getCleanupInterval());
+            }
             return;
         }
-        if(inputLine.hasArg("-rm")){
+        if (inputLine.hasArg("-rm")) {
+            boolean unlockT = false;
+            boolean unlockTX = false;
+            String arg = inputLine.getNextArgFor("-rm");
+            switch (arg) {
+                case "T":
+                    unlockT = true;
+                    break;
+                case "TX":
+                    unlockTX = true;
+                    break;
+                case "all":
+                    unlockTX = true;
+                    unlockT = true;
+                    break;
+                default:
+                    say("sorry, unknown option to unlock:\"" + arg + "\"");
+                    return;
+            }
+
             say("removing locks...");
-            boolean t = null == getStore().remove(lockID);
-            boolean tx = null == getTxStore().remove(lockID);
-            say((t?"did not remove":"removed")+ " transaction store lock");
-            say((tx?"did not remove":"removed")+ " TX store store lock");
+            if (unlockT) {
+                boolean t = null == getStore().remove(lockID);
+                say((t ? "did not remove" : "removed") + " transaction store lock");
+            }
+            if (unlockTX) {
+                boolean tx = null == getTxStore().remove(lockID);
+                say((tx ? "did not remove" : "removed") + " TX store store lock");
+            }
             return;
         }
-        Identifiable tLock = getStore().create();
-        tLock.setIdentifier(lockID);
-        getStore().save(tLock);
-        say("transaction store locked");
-
-        tLock = getTxStore().create();
-        tLock.setIdentifier(lockID);
-        getTxStore().save(tLock);
-        say("TX store locked");
-        // lock, unlock, is locked
+        // Default case.
+        say("transactions locked? " + getStore().containsKey(lockID));
+        say("TX store locked? " + getTxStore().containsKey(lockID));
+        return;
     }
-
 
 
 }

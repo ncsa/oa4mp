@@ -1,0 +1,57 @@
+{
+  "redirect_uris": [
+    "https:\/\/localhost\/callback"
+  ],
+  "token_endpoint_auth_method": "client_secret_basic",
+  "grant_types": [
+    "authorization_code"
+  ],
+  "response_types": "code",
+  "client_name": "MESS TEST 15",
+  "client_uri": "https:\/\/www.messproject.org",
+  "scope": "openid profile email org.cilogon.userinfo",
+  "strict_scopes": true,
+  "contacts": [
+    "skoranda@illinois.edu"
+  ],
+  "comment": "Created by COmanage Oa4mpClient Plugin",
+  "cfg": {
+    "tokens": {
+      "identity": {
+        "type": "identity",
+        "qdl": [
+          {
+            "load": "COmanageRegistry\/default\/ldap_claims.qdl",
+            "xmd": {
+              "exec_phase": [
+                "post_auth",
+                "post_refresh",
+                "post_token",
+                "post_user_info"
+              ]
+            },
+            "args": {
+              "server_fqdn": "ldap-test.cilogon.org",
+              "server_port": 636,
+              "bind_dn": "uid=oa4mp_user,ou=system,o=MESS,o=CO,dc=cilogon,dc=org",
+              "bind_password": "958L9GJF5atVhixvP9vf",
+              "search_base": "ou=people,o=MESS,o=CO,dc=cilogon,dc=org",
+              "search_attribute": "uid",
+              "return_attributes": [
+                "isMemberOf",
+                "voPersonID"
+              ],
+              "list_attributes": [
+                "isMemberOf"
+              ],
+              "ldap_to_claim_mappings": {
+                "isMemberOf": "is_member_of",
+                "voPersonID": "voPersonID"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

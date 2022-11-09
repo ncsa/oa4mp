@@ -1,0 +1,22 @@
+#! /usr/bin/env -S qdl-run
+
+/*
+   Tests the client with no configuration
+
+*/
+
+script_path('/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests' ~ script_path());
+
+cfg.'id'  := 'localhost:cil1550'; // name of the configuration, not the id
+cfg.'idp'  := 'NCSA';
+cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';
+cfg.'description' :=  'Test with Tiger Dev Functor script. This tests that the claim source serialization works.';
+cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token endpoint
+
+rc := script_load('driver.qdl', cfg.);
+tokens. := clc#access();
+⊨ tokens.'access_token'.'lifetime' == 900000 : 'wrong access token lifetime';
+⊨ tokens.'refresh_token'.'lifetime' == 2592000000 : 'wrong refresh token lifetime';
+⊨ claims().'aud' == 'test:cil1550' : 'wrong audience';  // Audience is a little different than usual.
+⊨ claims().'eppn' == 'jgaynor@ncsa.illinois.edu' : 'wrong eppn';
+say('ok');

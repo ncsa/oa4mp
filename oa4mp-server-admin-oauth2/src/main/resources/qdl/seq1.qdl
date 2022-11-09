@@ -1,3 +1,2 @@
 say('seq 1');
-say(script_args(-1));
-claims.'seq1' := script_args(0).'isMemberOf'; // returns 'is_member_of'
+claims.'seq1' := args().0.'isMemberOf'; // returns 'is_member_of'

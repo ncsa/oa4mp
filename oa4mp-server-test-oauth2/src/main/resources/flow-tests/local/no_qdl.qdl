@@ -1,0 +1,110 @@
+#! /usr/bin/env -S qdl-run
+
+/*
+   Tests the client with handler configurations, but no QDL or other claim sources.
+   This is a pretty long andcomprehensive test. 
+   Current client config (2022-11-09):
+  {"tokens": {
+   "access":  {
+    "audience": "https://wlcg.cern.ch/jwt/v1/access",
+    "issuer": "https://access.cilogon.org",
+    "lifetime": 750019,
+    "templates": [  {
+     "aud": "https://wlcg.cern.ch/jwt/v1/access",
+     "paths":    [
+          {"op": "read","path": "/home/${sub}"},
+          {"op": "read","path": "/public/lsst/${sub}"},
+          {"op": "x.y","path": "/abc/def"},
+          {"op": "x.z"},
+          {"op": "write","path": "/data/cluster"}
+     ]
+    }],
+    "type": "wlcg"
+   },
+   "identity":  {
+    "lifetime": 2400000,
+    "type": "identity"
+   },
+   "refresh":  {
+    "audience": "https://wlcg.cern.ch/jwt/refresh",
+    "issuer": "https://refresh.cilogon.org",
+    "lifetime": 3600000,
+    "type": "default"
+   }
+  }}
+
+
+*/
+
+script_path('/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests' ~ script_path());
+
+cfg.'id'  := 'localhost:test/no_qdl'; //
+cfg.'idp'  := 'Google -- use "j g" identity';
+cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';
+cfg.'description' :=  'Test that a plain handler configuration (no qdl or other) works.';
+cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token endpoint
+user_id := 'http://cilogon.org/serverA/users/6849'; // for given IDP and identitu
+params.'authz' :=  {'scope': 'read: x.y: x.z write:'}; // initial request is query
+params.'token' :=  {'scope': 'read: x.y: x.z write:'}; // token exchange attempts to upscope.
+params.'exchange' :=  {'scope': 'read:/home/'+user_id  + // read
+                                ' write:/home/'+user_id + // write -- wrong, not granted
+                                ' read:/public/lsst/' + user_id + // ok
+                                ' x.y:/abc/def/pqr' + // works since it add component to path
+                                ' x.y:/abc/defpqr'}; // not granted since the path is wrong
+
+rc := script_load('driver.qdl', cfg., params.);
+tokens. := clc#access();
+at. := tokens.'access_token'.'jwt';
+rt. := tokens.'refresh_token'.'jwt';
+
+// check scopes
+s. := tokenize(at.'scope', ' ');
+⊨ reduce(@∧, ['x.z', 'write:/data/cluster',
+               'read:/home/' + user_id,
+               'read:/public/lsst/' + user_id,
+               'x.y:/abc/def'] ∈ s.) : 'Wrong scopes in access token';
+⊨ tokens.'access_token'.'lifetime' - 750000 ≤ 2000 : 'wrong access token lifetime';
+⊨ at.'iss' == 'https://access.cilogon.org' : 'wrong access token issuer';
+⊨ at.'aud' == 'https://wlcg.cern.ch/jwt/v1/access' : 'wrong access token audience';
+⊨ at.'sub' == user_id : 'wrong access token subject';
+⊨ at.'wlcg.ver' == '1.0' : 'wrong access token wlcg version';
+
+⊨ tokens.'refresh_token'.'lifetime' == 3600000 : 'wrong refresh token lifetime';
+⊨ rt.'iss' == 'https://refresh.cilogon.org' : 'wrong refresh token issuer';
+
+⊨ claims().'aud' == cfg.'id' : 'wrong audience';  // Audience is a little different than usual.
+⊨ claims().'sub' == user_id: 'wrong user id';
+
+tokens. := refresh();
+at. := tokens.'access_token'.'jwt';
+rt. := tokens.'refresh_token'.'jwt';
+⊨ 'x.z'== at.'scope' : 'Wrong scopes in access token. Expected only x.z and got ' + at.'scope';
+⊨ tokens.'access_token'.'lifetime' - 750000 ≤ 2000 : 'wrong access token lifetime'; // some skew may happen. Allow a couple of seconds.
+⊨ at.'iss' == 'https://access.cilogon.org' : 'wrong access token issuer';
+⊨ at.'aud' == 'https://wlcg.cern.ch/jwt/v1/access' : 'wrong access token audience';
+⊨ tokens.'refresh_token'.'lifetime' == 3600000 : 'wrong refresh token lifetime';
+
+// now to test the exchange
+
+tokens. := exchange();
+at. := tokens.'access_token'.'jwt';
+s. := tokenize(at.'scope', ' ');
+/*
+params.'exchange' :=  {'scope': '"read:/home/'+user_id  + // read
+                                ' write:/home/'+user_id + // write -- wrong, not granted
+                                ' read:/public/lsst/' + user_id + // ok
+                                ' x.y:/abc/def/pqr' + // works since it add component to path
+                                ' x.y:/abc/defpqr"'}; // not granted since the path is wrong
+*/
+⊨ reduce(@∧, [ 'read:/home/' + user_id,
+               'read:/public/lsst/' + user_id,
+               'x.y:/abc/def/pqr'] ∈ s.) : 'Wrong scopes in access token';
+⊨ tokens.'access_token'.'lifetime' == 750000 : 'wrong access token lifetime';
+⊨ at.'iss' == 'https://access.cilogon.org' : 'wrong access token issuer';
+⊨ at.'aud' == 'https://wlcg.cern.ch/jwt/v1/access' : 'wrong access token audience';
+
+tokens. := exchange('-rt');
+rt. := tokens.'refresh_token'.'jwt';
+⊨ tokens.'refresh_token'.'lifetime' == 3600000 : 'wrong refresh token lifetime';
+
+say('ok');

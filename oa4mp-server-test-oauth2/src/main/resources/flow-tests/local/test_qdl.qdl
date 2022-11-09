@@ -1,0 +1,39 @@
+#! /usr/bin/env -S qdl-run
+
+/*
+   Tests the client with no configuration
+
+*/
+
+script_path('/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests' ~ script_path());
+
+cfg.'id'  := 'localhost:test/qdl';
+cfg.'idp'  := 'ANY';
+cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';
+cfg.'description' :=  'Test chained QDL scripts in a single handler.';
+cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token endpoint
+
+rc := script_load('driver.qdl', cfg.);
+tokens. := clc#access();
+claims. := claims();
+//say(introspect());
+
+⊨ tokens.'access_token'.'lifetime' ≡ 900000 : 'wrong access token lifetime';
+⊨ tokens.'refresh_token'.'lifetime' ≡ 1000000 : 'wrong refresh token lifetime';
+⊨ claims.'seq0' ≡ 636 : 'wrong seq 0 value';
+⊨ claims.'seq0_phase' ≡ 'post_token' : 'wrong seq0_phase value';
+⊨ claims.'seq1' ≡ 'is_member_of' : 'wrong seq 1 value';
+⊨ claims.'seq2' ≡ 'seq 2 passed post_token' : 'wrong seq 2 value';
+
+old_claims. := claims.;
+tokens. := refresh();
+claims. := claims();
+⊨ tokens.'access_token'.'lifetime' ≡ 900000 : 'wrong access token lifetime';
+⊨ tokens.'refresh_token'.'lifetime' ≡ 1000000 : 'wrong refresh token lifetime';
+⊨ claims.'seq0' ≡ 636 : 'wrong seq 0 value';
+⊨ claims.'seq0_phase' ≡ 'post_refresh' : 'wrong seq0_phase value';
+⊨ claims.'seq1' ≡ 'is_member_of' : 'wrong seq 1 value';
+⊨ claims.'seq2' ≡ 'seq 2 passed post_refresh' : 'wrong seq 2 value';
+
+// No exchange at this point since that does nothing to the claims.
+say('ok');

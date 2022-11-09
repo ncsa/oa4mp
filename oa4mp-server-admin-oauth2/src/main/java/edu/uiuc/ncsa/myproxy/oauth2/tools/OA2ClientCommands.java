@@ -13,6 +13,7 @@ import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.LDAPConfigurationUtil;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.XMLMap;
 import edu.uiuc.ncsa.security.util.cli.CLIDriver;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
@@ -297,7 +298,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
         }
         String uris = getInput("enter a comma separated list of callback uris. These must start with https or they will be ignored.", currentUris);
 
-        if (!uris.isEmpty()) {
+        if (!StringUtils.isTrivial(uris)) {
             StringTokenizer stringTokenizer = new StringTokenizer(uris, ",");
             LinkedList<String> rawCBs = new LinkedList<>();
             while (stringTokenizer.hasMoreTokens()) {

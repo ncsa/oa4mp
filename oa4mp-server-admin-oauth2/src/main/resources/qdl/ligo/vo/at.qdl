@@ -3,7 +3,7 @@
 */
 script_load('ligo/acl.qdl');
 script_load('utils/init.qdl'); // bunch of constants.
-script_load('ligo/vo3/init.qdl');
+script_load('ligo/vo3/init.qdl', script_args(-1));
 sys_err.ok?null:return(); // if something went wrong in init.qdl, return.
 
 //claims.'eppn':= 'jeffrey.gaynor@ligo.org'; // debugging only
