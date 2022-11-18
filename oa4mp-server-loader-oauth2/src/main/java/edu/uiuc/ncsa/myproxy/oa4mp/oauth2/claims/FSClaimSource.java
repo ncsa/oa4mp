@@ -63,11 +63,11 @@ public class FSClaimSource extends BasicClaimsSourceImpl {
         return useDefaultClaims;
     }
 
-     public String getDefaultClaimName(){
-         Object raw =  getConfiguration().getProperty(DEFAULT_CLAIM_KEY);
-         if(raw == null) return null;
-         return raw.toString();
-     }
+    public String getDefaultClaimName() {
+        Object raw = getConfiguration().getProperty(DEFAULT_CLAIM_KEY);
+        if (raw == null) return null;
+        return raw.toString();
+    }
 
     /*
     The test file contains a JSON object of properties, e.g. of the form
@@ -82,7 +82,7 @@ public class FSClaimSource extends BasicClaimsSourceImpl {
         // Finally, we can do something...
         String rawJSON = null;
         try {
-            rawJSON = readRawJSON();
+            rawJSON = readFile();
         } catch (IOException e) {
             DebugUtil.error(this, "Error reading file \"" + e.getMessage() + "\".", e);
             throw new GeneralException(e);
@@ -94,11 +94,11 @@ public class FSClaimSource extends BasicClaimsSourceImpl {
         } else {
             json = jsonObject.getJSONObject((String) claims.get(getConfiguration().getProperty(FILE_CLAIM_KEY)));
         }
-        if(isUseDefaultClaims() && (json == null || json.isEmpty())){
-            if(getDefaultClaimName() == null){
+        if (isUseDefaultClaims() && (json == null || json.isEmpty())) {
+            if (getDefaultClaimName() == null) {
                 throw new GeneralException("ERROR: \"" + DEFAULT_CLAIM_KEY + "\" has not been set.");
             }
-            if(jsonObject.containsKey(getDefaultClaimName())){
+            if (jsonObject.containsKey(getDefaultClaimName())) {
                 json = jsonObject.getJSONObject(getDefaultClaimName());
             }
         }
@@ -112,15 +112,7 @@ public class FSClaimSource extends BasicClaimsSourceImpl {
     }
 
     String rawJSON = null;
-    protected boolean hasRawJSON(){
-        return rawJSON != null;
-    }
-    protected String readRawJSON() throws IOException {
-           if(hasRawJSON()) {
-               return rawJSON;
-           }
-               return readFile();
-    }
+
 
     protected String readFile() throws IOException {
         Object rawfilePath = getConfiguration().getProperty(FILE_PATH_KEY);

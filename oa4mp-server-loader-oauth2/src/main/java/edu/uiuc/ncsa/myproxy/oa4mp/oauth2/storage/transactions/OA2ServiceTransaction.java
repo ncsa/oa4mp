@@ -43,6 +43,7 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
      */
     public String FLOW_STATE_KEY = "flow_state";
     public String CLAIMS_SOURCES_STATE_KEY = "claims_sources";
+    public String CLAIMS_SOURCES_STATE_KEY2 = "claims_sources2";
     public String STATE_KEY = "state";
     public String STATE_COMMENT_KEY = "comment";
     public String CLAIMS_KEY = "claims";
@@ -278,6 +279,9 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         }
         // CIL-1550
         newCSSerialize(sources);
+        // We don't use this nor need it going forward.
+        // It is maintained starting in 5.2.8.3 for backwards compatibility and will be removed at some point.
+        oldCSSerialize(sources);
    //     oldCSSerialize(sources);
     }
 
@@ -286,7 +290,7 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         for (ClaimSource claimSource : sources) {
             array.add(ConfigtoCS.convert(claimSource).toJSON());
         }
-        getState().put(CLAIMS_SOURCES_STATE_KEY, array);
+        getState().put(CLAIMS_SOURCES_STATE_KEY2, array);
     }
 
     protected void oldCSSerialize(List<ClaimSource> sources)  {
@@ -308,33 +312,36 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
 
     public List<ClaimSource> getClaimSources(OA2SE oa2SE) {
        // CIL-1550 with a vengeance.
-        if (!getState().containsKey(CLAIMS_SOURCES_STATE_KEY)) {
-            return new ArrayList<>();
-        }
-        try{
-             return newCSDeserialize(oa2SE);
-        }catch(Throwable t){
-            // try the old way.
-            ServletDebugUtil.info(this, "could not deserialize claim sources new way, reverting to Java serialization");
-        }
-        try {
-            return oldCSDeserialize(oa2SE);
-        }catch(Throwable tt){
-            // ok, some work to do.
-            if(ServletDebugUtil.isEnabled()){
-                ServletDebugUtil.info(this, "could not deserialize claim sources in any way:" + tt.getMessage());
-                tt.printStackTrace();
+        if (getState().containsKey(CLAIMS_SOURCES_STATE_KEY2)) {
+            try{
+                 return newCSDeserialize(oa2SE);
+            }catch(Throwable t){
+                // try the old way.
+                ServletDebugUtil.info(this, "could not deserialize claim sources new way, reverting to Java serialization");
             }
-            if(tt instanceof RuntimeException){
-                throw (RuntimeException)tt;
-            }
-            throw new GeneralException("Error deserializing claim source:" + tt.getMessage(), tt);
         }
+
+        if (getState().containsKey(CLAIMS_SOURCES_STATE_KEY)) {
+            try {
+                return oldCSDeserialize(oa2SE);
+            }catch(Throwable tt){
+                // ok, some work to do. really blow up since there is no state stored.
+                if(ServletDebugUtil.isEnabled()){
+                    ServletDebugUtil.info(this, "could not deserialize claim sources in any way:" + tt.getMessage());
+                    tt.printStackTrace();
+                }
+                if(tt instanceof RuntimeException){
+                    throw (RuntimeException)tt;
+                }
+                throw new GeneralException("Error deserializing claim source:" + tt.getMessage(), tt);
+            }
+        }
+        return new ArrayList<>();
     }
 
     protected List<ClaimSource> newCSDeserialize(OA2SE oa2SE) throws Throwable {
           // Assumed to be a serialized JSON Array
-        JSONArray array = getState().getJSONArray(CLAIMS_SOURCES_STATE_KEY);
+        JSONArray array = getState().getJSONArray(CLAIMS_SOURCES_STATE_KEY2);
         ArrayList<ClaimSource> claimSources = new ArrayList<>();
         for(int i =0; i < array.size(); i++){
                  QDLStem stem = new QDLStem();

@@ -5,8 +5,6 @@
 
 */
 
-script_path('/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests' ~ script_path());
-
 cfg.'id'  := 'dev:/test/ncsa_qdl';
 cfg.'idp'  := 'NCSA';
 cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';

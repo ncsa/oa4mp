@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Garbage Collection from the Command Line</title>
+    <!--#include virtual="../../head.html" -->
+
+</head>
+<body class="composite">
+<!--#include virtual="../../header.html" -->
+<h1>>Garbage Collection from the command line</h1>
+<h2>What is Garbage Collection?</h2>
+<p><b>What is garbage collection?</b>
+    <p>As OA4MP runs and services requests, transactions and exchange records are created and managed.
+    These are automatically checked periodically for validity and expiration. If they have expired,
+    they will be removed from the system automatically. This is known as <b><i>garbage collection</i></b>.</p>
+
+<h2>Anatomy of tokens</h2>
+<p>Every OA4MP identifier contains information about itself. A typical token would be the following:</p>
+
+<pre>https://test.cilogon.org/oauth2/429ad35ac99ab5bf8c7383e7499191e4?type=accessToken&amp;ts=1668697283098&amp;version=v2.0&amp;lifetime=900000</pre>
+
+<p>This has various parts.</p>
+<ol>
+    <li><b>https://test.cilogon.org/oauth2</b> -- this is the address of the service.</li>
+    <li><b>429ad35ac99ab5bf8c7383e7499191e4</b> -- a unique identifier for this token</li>
+    <li><b>type=accessToken</b> -- the type of token</li>
+    <li><b>ts=1668697283098</b> -- the unique timestamp in ms</li>
+    <li><b>version=v2.0</b> -- the version of this token</li>
+    <li><b>lifetime=900000</b> -- the lifetime in ms</li>
+</ol>
+<p>Note that in compound tokens, such as any JWT (JSON Web Token) there is always a unique identifier.
+The identifier will be an OA4MP token.</p>
+
+<h2>How to forge a token</h2>
+<p>You can't. These tokens exist for a prescribed time and must match exactly as strings once created. If the system
+does not have a record of a given token, it will reject it. In this way, tokens are unique.</p>
+
+<h2>How is Garbage Collection done?</h2>
+<p>Normally you configure it to either work with an interval pause (e.g. Every 4 hours) or
+can set alarms so that the system will wake up and do garbage collection.</p>
+
+<h2>Manual intervention</h2>
+<p>It is possible to do this
+manually for various reasons. There are tools to let you manage it. </p>
+
+<p>Assuming you have a functional command line (CLI, see the <a href="cli.html">CLI blurb</a>,
+you may invoke it from the transactions component. Here are the commands and what they do</p>
+<h3>gc_check</h3>
+<p>Check if the current item would get garbage collected.</p>
+gc_check [id|index] = check if the transaction would get garbage collected
+                       in the current environment.
+
+<h3>gc_run</h3>
+<p>Run the garbage collector or test what would get garbage collected. This will print out
+a list of ids to the console that were removed. Alternately, it allows you to pipe these
+to a file.</p>
+gc_run [-safe_gc address] [-test]  [-file output_file]  [-size] - run garbage collection on the transaction store
+-safe_gc - if present, run in safe mode so that only those transactions in the
+        correct scheme and host will be garbage collected
+-test - if present, only test which would be garbage collected
+-size - if present, print  number of transactions found
+-file file - writes the ids to the output file.
+E.g.
+gc_run -safe_gc https://cilogon.org
+would only remove transactions that start with https://cilogon.org
+
+The default is to apply garbage collection to every entry in the transaction store
+<h3>gc_lock</h3>
+<p>Lock or unlock the stores. If locking is enabled (in the configuration) then stores will
+be locked during GC. By <i>locked</i> we mean that a special record is written and no
+GC is allowed to the store until it is removed. Since a lock may remain in certain cases
+this allows you to set or remove locks. It also allows you to display alarms for locking.</p>
+gc_lock [-rm | ? | -alarms]
+-set [T|TX|all] - lock the transaction and TX stores
+-rm [T|TX|all] - remove given locks
+? - report if stores are locked.
+-alarms - show configured alarms
+<!--#include virtual="../../footer.html" -->
+</body>
+</html>

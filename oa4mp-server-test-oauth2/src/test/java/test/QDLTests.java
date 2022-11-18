@@ -92,10 +92,10 @@ public class QDLTests extends AbstractQDLTester {
         // tests absolute path, not in server mode.
         /*
         cfg.type :='pass_through';
-        cfg.scheme := 'vfs';
-        cfg.mount_point := '/test';
+        cfg.scheme := 'vfs2';
+        cfg.mount_point := '/test2';
         cfg.access := 'rw';
-        cfg.root_dir := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-`server`-test-oauth2/src/main/resources';
+        cfg.root_dir := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-admin-oauth2/src/main/resources/qdl/ui-test';
         vfs_mount(cfg.);
          */
         String testClaimsFile = "vfs2#/test2/test-claims.json";
@@ -105,7 +105,7 @@ public class QDLTests extends AbstractQDLTester {
         addLine(script, "vfs_cfg.scheme := 'vfs2';");
         addLine(script, "vfs_cfg.mount_point := '/test2';");
         addLine(script, "vfs_cfg.access := 'rw';");
-        addLine(script, "vfs_cfg.root_dir := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources';");
+        addLine(script, "vfs_cfg.root_dir := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-admin-oauth2/src/main/resources/qdl/ui-test';");
         addLine(script, "vfs_mount(vfs_cfg.);");  // Now we have a functional VFS with the target file in it.
 
         addLine(script, "cfg. := new_template('file');");

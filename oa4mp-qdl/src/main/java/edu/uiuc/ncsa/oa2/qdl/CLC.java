@@ -597,7 +597,7 @@ public class CLC implements QDLModuleMetaClass {
 
         @Override
         public int[] getArgCount() {
-            return new int[]{1};
+            return new int[]{1,2};
         }
 
         @Override
@@ -615,6 +615,7 @@ public class CLC implements QDLModuleMetaClass {
         public List<String> getDocumentation(int argCount) {
             List<String> doxx = new ArrayList<>();
             doxx.add(getName() + "(file) - read state previously saved by this client.");
+            doxx.add(getName() + "(file, '-p') - provision current client from this saved state (used by ersatz clients).");
             doxx.add(checkInitMessage);
             return doxx;
         }
@@ -866,9 +867,9 @@ public class CLC implements QDLModuleMetaClass {
                 stem.put("decoded", token.getToken());
                 //say("   decoded token:" + accessToken.getToken());
             }
-            Date startDate = DateUtils.getDate(token.getToken());
-            startDate.setTime(startDate.getTime() + token.getLifetime());
-            Boolean isExpired = startDate.getTime() < System.currentTimeMillis();
+            Date expirationDate = DateUtils.getDate(token.getToken());
+            expirationDate.setTime(expirationDate.getTime() + token.getLifetime());
+            Boolean isExpired = expirationDate.getTime() < System.currentTimeMillis();
             stem.put("expired", isExpired);
             if (!isExpired) {
                 stem.put("lifetime", token.getLifetime());
@@ -893,9 +894,9 @@ public class CLC implements QDLModuleMetaClass {
             }
             if (0 < expiration && 0 < timestamp) {
                 if (System.currentTimeMillis() < expiration) {
-                    stem.put("expired", Boolean.TRUE);
-                } else {
                     stem.put("expired", Boolean.FALSE);
+                } else {
+                    stem.put("expired", Boolean.TRUE);
                 }
             }
         }

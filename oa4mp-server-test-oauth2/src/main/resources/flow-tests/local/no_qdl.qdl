@@ -36,8 +36,6 @@
 
 */
 
-script_path('/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests' ~ script_path());
-
 cfg.'id'  := 'localhost:test/no_qdl'; //
 cfg.'idp'  := 'Google -- use "j g" identity';
 cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';
@@ -107,4 +105,4 @@ tokens. := exchange('-rt');
 rt. := tokens.'refresh_token'.'jwt';
 ⊨ tokens.'refresh_token'.'lifetime' == 3600000 : 'wrong refresh token lifetime';
 
-say('ok');
+say('Test basic client configuration: ok');

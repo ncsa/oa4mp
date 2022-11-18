@@ -1,0 +1,86 @@
+#! /usr/bin/env -S qdl-run
+
+/*
+   Tests the client with no configuration
+
+*/
+
+cfg.'id'  := 'dev:test/vo1';
+cfg.'idp'  := 'NCSA';
+cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';
+cfg.'description' :=  'Basic VO test.';
+cfg.'flow_type' := 'df'; // Note to use df you need to set param for the token endpoint
+
+rc := script_load('driver.qdl', cfg.);
+tokens. := clc#access();
+at. := tokens.'access_token'.'jwt';
+⊨ is_defined(tokens.'refresh_token') : 'Missing refresh token';
+rt. := tokens.'refresh_token'; // This is not a JWT, but a basic token
+⊨ tokens.'refresh_token'.'lifetime' == 1000000000: ' wrong RT lifetime';
+⊨ tokens.'access_token'.'lifetime' == 900000: ' wrong AT lifetime';
+⊨ is_defined(at.'wlcg.ver')  : 'Not an WLCG token';
+⊨ at.'wlcg.ver' == '1.0' : 'Wrong WLCG version';
+⊨ at.'aud' == 'https://wlcg.cern.ch/jwt/v1/any' : 'incorrect audience';
+⊨ at.'scope' == '/home/jeff' : ' incorrect scope';
+⊨ at.'iss' == 'https://dev.cilogon.org/oauth2/myVO' : 'wrong issuer';
+⊨ claims().'aud' == cfg.'id' : 'wrong audience';
+⊨ claims().'iss' == 'https://dev.cilogon.org/oauth2/myVO' : 'wrong issuer';
+⊨ claims().'eppn' == 'jgaynor@ncsa.illinois.edu' : 'wrong eppn (did you use NCSA as the IDP?)';
+//⊨ tokens.'access_token'.'lifetime' == 1009000 : 'wrong access token lifetime';
+//⊨ tokens.'refresh_token'.'lifetime' == 1000000000 : 'wrong refresh token lifetime';
+say('Basic VO test ok');
+
+/*
+{
+ subject_id:jgaynor@ncsa.illinois.edu,
+ sub:http://cilogon.org/serverD/users/55,
+ idp_name:National Center for Supercomputing Applications,
+ eppn:jgaynor@ncsa.illinois.edu,
+ cert_subject_dn:/DC=org/DC=cilogon/C=US/O=National Center for Supercomputing Applications/CN=Jeffrey Gaynor D12920,
+ eptid:https://idp.ncsa.illinois.edu/idp/shibboleth!https://cilogon.org/shibboleth!i65P3o9qFNjrpS4z6+WI7Dir/4I=,
+ iss:https://dev.cilogon.org/oauth2/myVO,
+ given_name:Jeffrey,
+ acr:https://refeds.org/profile/mfa,
+ aud:dev:test/vo1,
+ pairwise_id:QLpDnWqZhENoPiPpl1RrIA1IRwg=@ncsa.illinois.edu,
+ idp:https://idp.ncsa.illinois.edu/idp/shibboleth,
+ affiliation:member@ncsa.illinois.edu;employee@ncsa.illinois.edu;staff@ncsa.illinois.edu,
+ auth_time:1668727071,
+ name:Jeffrey Gaynor,
+ exp:1668727975,
+ family_name:Gaynor,
+ iat:1668727075,
+ email:gaynor@illinois.edu,
+ jti:https://dev.cilogon.org/oauth2/idToken/6f6e72fd8f6489bc0da71f87e114f89d/1668727072209
+}
+
+
+{
+ access_token: {
+  expires:1668727975000,
+  expired:false,
+  raw_token:eyJ0eXAiOiJKV1QiLCJraWQiOiJCRDUzMENGMEU5RTU1NzRGRjUwRUJFRkZGNTg3NkQxMCIsImFsZyI6IlJTMjU2In0.eyJ3bGNnLnZlciI6IjEuMCIsImF1ZCI6Imh0dHBzOi8vd2xjZy5jZXJuLmNoL2p3dC92MS9hbnkiLCJzdWIiOiJqZ2F5bm9yIiwibmJmIjoxNjY4NzI3MDcwLCJzY29wZSI6Ii9ob21lL2plZmYiLCJpc3MiOiJodHRwczovL2Rldi5jaWxvZ29uLm9yZy9vYXV0aDIvbXlWTyIsImV4cCI6MTY2ODcyNzk3NSwiaWF0IjoxNjY4NzI3MDc1LCJqdGkiOiJodHRwczovL2Rldi5jaWxvZ29uLm9yZy9vYXV0aDIvMTFkNDY3MDNhOTE5YzNlMGZlMzM3YTc2YTliYmEwZj90eXBlPWFjY2Vzc1Rva2VuJnRzPTE2Njg3MjcwNzU1MjMmdmVyc2lvbj12Mi4wJmxpZmV0aW1lPTEwMDkwMDAifQ.fQALeXoOkxQ8ttnJPL2uVbPQsFaA9Ohnv1XGAmdBEZForLcnsIAK44-EJe9mzmGzYdRWeq1bG0JTGa-Kxh3tJMUXoWkTAMW-iBcDGa9N4dZcWzMdvJKagKGzucoq8lsWIcWkhNiUQgBdOq3nARjV_Q_Xv2mAz15Yg2DUViiYqS6tVd5dsI6kd_39JpdTgZ41xWvOw-8X6v8oo4pL02bB-JzVb-kVy9V_I6NWuAbv8PV_CxkkQ1WFegpCymfMYfplmbDoJUI1qPsyiV3I7rIKoIOV350pVRSM4ay_t4zBW0tEmwYKmyvYHq1KP2TWd0jPEboB7JM9e9zv9BTt1OmBGw,
+  jwt:  {
+   wlcg.ver:1.0,
+   aud:https://wlcg.cern.ch/jwt/v1/any,
+   sub:jgaynor,
+   nbf:1668727070,
+   scope:/home/jeff,
+   iss:https://dev.cilogon.org/oauth2/myVO,
+   exp:1668727975,
+   iat:1668727075,
+   jti:https://dev.cilogon.org/oauth2/11d46703a919c3e0fe337a76a9bba0f?type=accessToken&ts=1668727075523&version=v2.0&lifetime=1009000
+  },
+  lifetime:900000,
+  ts:1668727075000
+ },
+ refresh_token: {
+  expires:1669727075523,
+  expired:false,
+  raw_token:NB2HI4DTHIXS6ZDFOYXGG2LMN5TW63RON5ZGOL3PMF2XI2BSF4YTINJXMVTDIZRYHBSDAZRVGVSTEY3FGA2DAODDGYYWCZBQGM2T65DZOBST24TFMZZGK43IKRXWWZLOEZ2HGPJRGY3DQNZSG4YDONJVGIZSM5TFOJZWS33OHV3DELRQEZWGSZTFORUW2ZJ5GEYDAMBQGAYDAMBQ,
+  lifetime:1000000000,
+  decoded:https://dev.cilogon.org/oauth2/1457ef4f88d0f55e2ce0408c61ad035?type=refreshToken&ts=1668727075523&version=v2.0&lifetime=1000000000,
+  ts:1668727075523
+ }
+}
+*/

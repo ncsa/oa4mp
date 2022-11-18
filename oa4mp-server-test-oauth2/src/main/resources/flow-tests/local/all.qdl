@@ -3,19 +3,33 @@ path := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resourc
 script_path(path ~ script_path());
 
 test.:=(path + '/local/') + ['cil1550.qdl',
-                             'command_line2.qdl',
-                             'fnal.qdl',
+                             'file_claims.qdl',
+                             'fnal-0.qdl',
+                             'fnal-1.qdl',
+                             'fnal-2.qdl',
+                             'fnal-3.qdl',
                              'no_config.qdl',
                              'no_qdl.qdl',
+                             'prototype.qdl',
                              'scitokens.qdl',
                              'test_ncsa.qdl',
-                             'test_qdl.qdl'];
+                             'test_qdl.qdl',
+                             'vo_test.qdl'];
 say('Running all tests. Remember to follow the instructions to repeatedly login using the specified IDP.');
+counter.'pass' := 0;
+counter.'fail' := 0;
 while[x∈test.][
 try[
   script_load(x);
+  say(''); // blank line for clean display.
+  counter.'pass' += 1;
   ]catch[
      say('error running script ' + x);
      say('error message:' + error_message);
+    counter.'fail' += 1;
   ];
 ];
+
+say(counter.'pass' + ' passed');
+say(counter.'fail' + ' failed');
+say('total tests run =' + (counter.'pass' + counter.'fail'));

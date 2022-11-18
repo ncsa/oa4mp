@@ -566,7 +566,7 @@ public class TransactionStoreCommands extends StoreCommands2 {
         txRecordCleanup.setCleanupInterval(1);
         txRecordCleanup.setStopThread(false);
 
-        txRecordCleanup.setMap(getTxStore());
+        txRecordCleanup.setStore(getTxStore());
         txRecordCleanup.setTestMode(testMode);
         txRecordCleanup.addRetentionPolicy(new TokenExchangeRecordRetentionPolicy(address, safeGC));
         List<TXRecord> txRecords = txRecordCleanup.age();

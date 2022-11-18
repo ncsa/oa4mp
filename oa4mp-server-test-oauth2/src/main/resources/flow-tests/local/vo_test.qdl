@@ -1,0 +1,11 @@
+#! /usr/bin/env -S qdl-run
+
+/* Next should be set in the main.qdl script.*/
+cfg.'id'  := 'localhost:command.line2';
+cfg.'idp'  := 'ANY';
+cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';
+cfg.'flow_type' := 'df';
+cfg.'description' :=  'This tests code challenge machinery, AT permissions, device flow and exchanges.';
+script_load('local/vo_test-suite.qdl', cfg.);
+say('VO test: ok!');
+

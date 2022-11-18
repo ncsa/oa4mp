@@ -1,0 +1,62 @@
+/*
+   This is not a stand alone test. Several clients either extend this or are provisioned from it, so
+   this just runs the tests against localhost:command.line2 and my be invoked as needed.
+   The assumption is that the authorization has been done and then the client is simply used
+*/
+/* Next should be set in the main.qdl script.*/
+
+params.'authz' :=  {
+                    'scope': 'read: write: x.y',
+          'code_challenge' : 'N_zjM2czxZIWNar-lWUiuS7-Pacwh-k-L_Akpje6AmY',
+   'code_challenge_method' : 'S256'
+   };
+params.'token' := {
+  'code_verifier' : 'qBdfP8Wmpomgkq6aJwcvZQMHx553RK4P7LAYxmzMAkmo8cM7MlE8ViJSOx38nlHr',
+          'scope' : 'read: write: x.y'
+   };
+params.'exchange':={'scope':'read:/home/jeff write:/data/jeff/cluster x.y:/abc/def/ghi'};
+rc := script_load('driver.qdl', args().0, params.);
+⊨ rc == 0: (rc==-1?'user aborted':'there was an error initiating the flow');
+
+tokens. := clc#access();
+
+at. := tokens.'access_token'.'jwt';
+rt. := tokens.'access_token'.'jwt';
+
+claims. := claims();
+
+user := claims.'sub';
+expected_scopes. :=['read:/home/'+user,'write:/data/'+user+'/cluster', 'x.y:/abc/def'];
+
+define[test_lifetime(at., rt.)][
+   // Not the same at and rt as in the test(). These are the complete token response with their states.
+   ⊨ at.'lifetime' == 900000 : 'wrong lifetime, expected 900000, got ' + (tokens.'access_token'.'lifetime');
+   ⊨ rt.'lifetime' == 1800000 : 'wrong rt lifetime, expected 1800000, got ' + (tokens.'refresh_token'.'lifetime');
+];
+
+define[test(at., rt., user, expected_scopes.)][
+   ss. := tokenize(at.'scope', ' ');
+   ⊨ at.'iss' == 'http://localhost:9443/custom/issuer' : 'wrong issuer';
+   ⊨ is_defined(at.'wlcg.ver')  : 'not an WLCG token';
+   ⊨ at.'wlcg.ver' == '1.0' : 'wrong WLCG version';
+   ⊨ user == at.'sub' : 'subject in id and access token do not match';
+   ⊨ reduce(@&&, ss.∈ expected_scopes.) :  'incorrect access scopes';
+   ⊨ rt.'aud' == 'https://localhost/test' : 'wrong rt audience';
+];
+
+tokens. := refresh();
+at. := tokens.'access_token';
+rt. := tokens.'refresh_token';
+expected_scopes. :=['read:/home/'+user,'write:/data/'+user+'/cluster', 'x.y:/abc/def/ghi'];
+test_lifetime(at., rt.);
+test(at.'jwt', rt.'jwt', user, expected_scopes.);
+
+
+tokens. := exchange();
+at. := tokens.'access_token';
+
+tokens. := exchange('-rt');
+rt. := tokens.'refresh_token';
+
+test_lifetime(at., rt.);
+test(at.'jwt', rt.'jwt', user, expected_scopes.);

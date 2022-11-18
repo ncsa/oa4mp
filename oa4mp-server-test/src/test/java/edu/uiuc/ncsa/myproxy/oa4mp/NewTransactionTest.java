@@ -1,13 +1,15 @@
 package edu.uiuc.ncsa.myproxy.oa4mp;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.server.OA4MPServiceTransaction;
-import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.TransactionStore;
-import edu.uiuc.ncsa.oa4mp.delegation.common.token.*;
-import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AccessTokenImpl;
-import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.RefreshTokenImpl;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.AuthorizationGrant;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.TokenForge;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.Verifier;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2TokenForge;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
+import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.util.TestBase;
 
 import java.net.URI;
@@ -81,9 +83,9 @@ public class NewTransactionTest extends TestBase {
         serviceTransaction.setAuthGrantValid(false);
         serviceTransaction.setClient(client);
         client.setName("service test name #" + System.nanoTime());
-        AccessToken accessToken = new AccessTokenImpl(URI.create("access:/token/test/" + randomString));
-        serviceTransaction.setAccessToken(accessToken);
-        RefreshToken refreshToken = new RefreshTokenImpl(URI.create("refresh:/token/test/" + randomString));
+        // Add current time or the semantics are off and these do not get garbage collected
+        OA2TokenForge  tf = new OA2TokenForge("https://localhost/" + randomString);
+        serviceTransaction.setAccessToken(tf.getAccessToken());
         transactionStore.save(serviceTransaction);
         clientStore.save(client);
         assert transactionStore.containsKey(serviceTransaction.getIdentifier());

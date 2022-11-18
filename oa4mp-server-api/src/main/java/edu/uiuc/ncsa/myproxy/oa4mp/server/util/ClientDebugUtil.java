@@ -53,4 +53,12 @@ public class ClientDebugUtil extends MetaDebugUtil {
       }
       return tID;
     }
+
+    public BaseClient getClient() {
+        return client;
+    }
+
+    public void setClient(BaseClient client) {
+        this.client = client;
+    }
 }

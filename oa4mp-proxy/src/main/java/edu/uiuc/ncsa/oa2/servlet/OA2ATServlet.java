@@ -218,7 +218,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             }
             t = (OA2ServiceTransaction) getOA2SE().getTransactionStore().get(at);
             if (t == null) {
-                t = OA2TokenUtils.getTransactionFromTX(oa2SE, at);
+                t = OA2TokenUtils.getTransactionFromTX(oa2SE, at, null);
             }
             sentAT = true;
         }
@@ -233,7 +233,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             }
             t = ((OA2TStoreInterface) getOA2SE().getTransactionStore()).get(rt);
             if (t == null) {
-                t = OA2TokenUtils.getTransactionFromTX(oa2SE, rt);
+                t = OA2TokenUtils.getTransactionFromTX(oa2SE, rt, null);
             }
         }
 
@@ -396,9 +396,12 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         String subjectToken = getFirstParameterValue(request, RFC8693Constants.SUBJECT_TOKEN);
         MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(client);
         debugger.trace(this, "Starting RFC 8693 token exchange");
+        printAllParameters(request, debugger);
+/*
         if (debugger.isEnabled()) {
             ServletDebugUtil.printAllParameters(this.getClass(), request, true);
         }
+*/
         if (subjectToken == null) {
             throw new OA2ATException(OA2Errors.INVALID_REQUEST, "missing subject token");
         }
@@ -451,11 +454,11 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
 
         switch (subjectTokenType) {
             case RFC8693Constants.ACCESS_TOKEN_TYPE:
-                accessToken = OA2TokenUtils.getAT(subjectToken, oa2se, keys);
+                accessToken = OA2TokenUtils.getAT(subjectToken, oa2se, keys, debugger);
                 t = ((OA2TStoreInterface) getTransactionStore()).get(accessToken, client.getIdentifier());
                 break;
             case RFC8693Constants.REFRESH_TOKEN_TYPE:
-                refreshToken = OA2TokenUtils.getRT(subjectToken, oa2se, keys);
+                refreshToken = OA2TokenUtils.getRT(subjectToken, oa2se, keys, debugger);
                 RefreshTokenStore rts = (RefreshTokenStore) getTransactionStore();
                 t = (OA2ServiceTransaction) rts.get(refreshToken, client.getIdentifier());
                 break;
@@ -479,7 +482,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
          */
 
         if (t == null) {
-            debugger.trace(this, "transaction not found, attempting to get transaction from given token");
+            debugger.trace(this, "transaction not found from credentials for client \"" + client.getIdentifierString() + "\", attempting to get transaction from the token itself");
 
             switch (subjectTokenType) {
                 case RFC8693Constants.ACCESS_TOKEN_TYPE:
@@ -568,12 +571,20 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
 
         if (t == null) {
             // if there is no such transaction found, then this is probably from a previous exchange. Go find it
-            t = OA2TokenUtils.getTransactionFromTX(oa2se, accessToken);
+            try {
+                t = OA2TokenUtils.getTransactionFromTX(oa2se, accessToken, debugger);
+            }catch (OA2GeneralError oa2GeneralError){
+                if(!(debugger instanceof ClientDebugUtil)){
+                    // last ditch effort to tell us what client is doing this.
+                    info("Could not find transaction for client " + client.getIdentifierString());
+                }
+                throw oa2GeneralError;
+            }
 
         }
         if (t == null) {
             // Still null. Ain't one no place. Bail.
-            debugger.trace(this, "No pending transactions found");
+            info("No pending transactions found anywhere for client \"" + client.getIdentifierString() + "\".");
             throw new OA2ATException(OA2Errors.INVALID_GRANT, "no pending transaction found.");
         }
         if (client.isErsatzClient() && !client.isReadOnly()) {
@@ -1173,8 +1184,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
 
     protected TransactionState doRefresh(OA2Client client, HttpServletRequest request, HttpServletResponse response) throws Throwable {
         // Grants are checked in the doIt method
-        printAllParameters(request);
         MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(client);
+        printAllParameters(request,debugger);
         String rawRefreshToken = request.getParameter(OA2Constants.REFRESH_TOKEN);
         if (client == null) {
             throw new OA2ATException(OA2Errors.INVALID_REQUEST, "Could not find the client associated with refresh token \"" + rawRefreshToken + "\"");
@@ -1187,7 +1198,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         RefreshTokenImpl oldRT;
         boolean tokenVersion1 = false;
         try {
-            oldRT = OA2TokenUtils.getRT(rawRefreshToken, oa2SE, keys);
+            oldRT = OA2TokenUtils.getRT(rawRefreshToken, oa2SE, keys, debugger);
         } catch (OA2ATException oa2ATException) {
             info(oa2ATException.getError() + " in refresh for client " + client.getIdentifierString());
             throw oa2ATException;
@@ -1501,8 +1512,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
      * @throws Throwable
      */
     protected void doRFC8628(OA2Client client, HttpServletRequest request, HttpServletResponse response) throws Throwable {
-        printAllParameters(request);
         MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(client);
+        printAllParameters(request,debugger);
         debugger.trace(this, "starting RFC 8628 access token exchange.");
         //  printAllParameters(request);
         long now = System.currentTimeMillis();

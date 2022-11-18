@@ -2,7 +2,6 @@
 
 /*
    Tests the client with no configuration
-
 */
 
 script_path('/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests' ~ script_path());
@@ -19,4 +18,4 @@ tokens. := clc#access();
 ⊨ tokens.'refresh_token'.'lifetime' == 2592000000 : 'wrong refresh token lifetime';
 ⊨ claims().'aud' == 'test:cil1550' : 'wrong audience';  // Audience is a little different than usual.
 ⊨ claims().'eppn' == 'jgaynor@ncsa.illinois.edu' : 'wrong eppn';
-say('ok');
+say('CIL1550 (serialization of claims sources) test: ok');

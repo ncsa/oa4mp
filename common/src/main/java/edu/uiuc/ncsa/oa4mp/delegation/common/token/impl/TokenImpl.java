@@ -169,7 +169,6 @@ public class TokenImpl implements NewToken {
         if (DebugUtil.isEnabled()) {
             Date expireTS = new Date();
             expireTS.setTime(getLifetime() + getIssuedAt());
-            DebugUtil.trace(this, "current time " + (new Date()) + " exp at " + expireTS);
         }
         if (getLifetime() + getIssuedAt() < System.currentTimeMillis()) {
             return true;

@@ -4,8 +4,7 @@
 */
 
 say('*** in process.qdl');
+say('*** in process.qdl exec_phase=' + exec_phase);
 say('***    has claims=' + to_string(claims.));
-say(' *** file =' + file_read('vfs#/scripts/ui-test/test-claims.json'));
 claims.'test_claim' :=  claims.'test_claim'-'3';
-claims.isMemberOf. := (claims.isMemberOf.)\*\'name';
 say('***    final claims=' + to_string(claims.));

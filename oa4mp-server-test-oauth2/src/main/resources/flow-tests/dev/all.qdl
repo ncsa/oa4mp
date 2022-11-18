@@ -3,7 +3,11 @@ path := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resourc
 script_path(path ~ script_path());
 
 test.:=(path + '/dev/') + ['df.qdl',
-                           'functor.qdl', 'ncsa_qdl.qdl', 'no_config.qdl', 'revoke.qdl'];
+                           'functor.qdl',
+                           'ncsa_qdl.qdl',
+                           'no_config.qdl',
+                           'revoke.qdl',
+                           'vo_1.qdl'];
 say('Running all tests. Remember to follow the instructions to repeatedly login using the specified IDP.');
 while[x∈test.][
 try[

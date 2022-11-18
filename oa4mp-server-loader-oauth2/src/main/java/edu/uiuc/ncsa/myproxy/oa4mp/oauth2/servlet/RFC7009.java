@@ -2,15 +2,17 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
-import edu.uiuc.ncsa.security.core.util.DebugUtil;
-import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Errors;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2GeneralError;
+import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import org.apache.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * Token Revocation endpoint.  This implements <a href="https://tools.ietf.org/html/rfc7009">RFC7009</a>.
@@ -34,34 +36,54 @@ public class RFC7009 extends TokenManagerServlet {
                 state = checkBasic(req);
             } else {
                 state = checkBearer(req);
+                // The previous call uses the bearer token (which is an access token) to recover the transactions
+                // and any corresponding TXRecord. If this is for a refresh token, that has to be tracked down.
+                if (!state.isAT && state.transaction != null) {
+                    List<? extends TXRecord> records = oa2SE.getTxStore().getByParentID(state.transaction.getIdentifier());
+                    for (TXRecord txRecord : records) {
+                        if (txRecord.getIdentifierString().equals(state.refreshToken.getJti().toString())) {
+                            state.txRecord = txRecord;
+                            break;
+                        }
+                    }
+                }
             }
-        }catch(OA2GeneralError x){
-            DebugUtil.error(this, "Got exception checking bearer/basic header ",x);
+        } catch (OA2GeneralError x) {
+            DebugUtil.error(this, "Got exception checking bearer/basic header ", x);
             // if the token does not exist, return an OK == whatever it was they sent is
             // revoked.
             resp.setStatus(HttpStatus.SC_OK);
             return;
         }
 
-         // By this point the state object has the original transaction and request information in it,
+        // By this point the state object has the original transaction and request information in it,
         // plus it has the TX record if there is one.
         // Now we have enough to do what we need to.
 
-        if(state.txRecord != null){
+        if (state.txRecord != null) {
             state.txRecord.setValid(false);
             oa2SE.getTxStore().save(state.txRecord);
+            if(!state.isAT){
+                if(state.transaction.getRefreshToken().getJti().toString().equals(state.txRecord.getIdentifierString())){
+                    // Then there is a redundant record. Make sure both are marked.
+                    // This can happen in very complex cases of multiple refreshes and exchanges, so just check here
+                    // once and for all.
+                    state.transaction.setRefreshTokenValid(false);
+                    oa2SE.getTransactionStore().save(state.transaction);
+                }
+            }
             resp.setStatus(HttpStatus.SC_OK);
             return;
         }
-        if(state.transaction == null){
-            // no such record
-            oa2SE.getTxStore().save(state.txRecord);
+        if (state.transaction == null) {
+            // No such record. Contract is to return ok.
+            //oa2SE.getTxStore().save(state.txRecord);
             resp.setStatus(HttpStatus.SC_OK);
             return;
         }
-        if(state.isAT) {
+        if (state.isAT) {
             state.transaction.setAccessTokenValid(false);
-        }else{
+        } else {
             state.transaction.setRefreshTokenValid(false);
         }
         oa2SE.getTransactionStore().save(state.transaction);

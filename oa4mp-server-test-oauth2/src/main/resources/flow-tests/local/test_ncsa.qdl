@@ -15,8 +15,6 @@
       }}}
 */
 
-script_path('/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests' ~ script_path());
-
 cfg.'id'  := 'localhost:test/ncsa'; // name of the configuration, not the id
 cfg.'idp'  := 'NCSA';
 cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';
@@ -38,4 +36,4 @@ user_info. := user_info();
 ⊨ user_info.'isMemberOf' << List : 'isMemberOf claim in user info is not a simple list';
 ⊨ user_info.'isMemberOf'.0 << String  : ' isMemberOf in user info should be a list';
 
-say('ok');
+say('test NCSA QDL script: ok');

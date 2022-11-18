@@ -102,13 +102,14 @@ public class RefreshTokenRetentionPolicy extends SafeGCRetentionPolicy {
             } else {
                 timeout = st2.getRefreshTokenLifetime();
             }
-            token = rt.getToken();
+            //token = rt.getToken();
+            token = rt.getJti().toString();
         } else {
             trace("  Checking AT or Authz");
 
             if (st2.hasAccessToken()) {
                 trace("  Checking access token");
-                token = st2.getAccessToken().getToken();
+                token = st2.getAccessToken().getJti().toString();
                 timeout = st2.getAccessTokenLifetime();
             } else {
                 trace("  Checking authz grant");

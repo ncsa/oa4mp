@@ -1,0 +1,53 @@
+#! /usr/bin/env -S qdl-run
+ path := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests';
+ script_path(path ~ script_path());
+cfg.'id'  := 'localhost:test/fnal';
+cfg.'idp'  := 'GitHub';
+cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';
+cfg.'description' :=  'Test FNAL with no scopes -- fails';
+cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token endpoint
+cfg.'description' :=  'Test FNAL with basic scopes';
+
+params.'authz' :=  {'scope': 'storage.read:/ wlcg.capabilityset:/duneana wlcg.groups'};
+rc := script_load('driver.qdl', cfg., params.);
+⊨ rc == 0: (rc==-1?'user aborted':'there was an error initiating the flow');
+tokens. := access();
+at. := tokens.'access_token'.'jwt';
+rt. := tokens.'refresh_token'.'jwt';
+claims. := claims();
+iat := claims.'iat'; // for later, to check it changes
+⊨ claims.'eppn' == 'cilogontest@fnal.gov' : 'wrong eppn';
+⊨ is_defined(claims.'wlcg.credkey')  : 'missing wlcg.credkey';
+⊨ 'cilogontest' == claims.'wlcg.credkey'  : 'wrong wlcg.credkey';
+⊨ is_defined(at.'wlcg.ver') : 'Not a WLCG token';
+⊨ at.'aud' == 'https://wlcg.cern.ch/jwt/v1/any' : 'incorrect access token audience';
+⊨ rt.'aud' == 'https://wlcg.cern.ch/jwt/v1/any' : 'incorrect refresh token audience';
+⊨ at.'sub' == 'cilogontest@fnal.gov': 'wrong subject';
+expected_scopes. := ['compute.create', 'compute.read', 'compute.cancel', 'compute.modify', 'storage.create:/dune/scratch/users/cilogontest', 'storage.read:/dune'];
+ss. := tokenize(at.'scope', ' ');
+⊨ reduce(@&&, expected_scopes. ∈ ss.) : 'incorrect access token scopes';
+⊨ abs(tokens.'access_token'.'lifetime' - 750000)<2000 : 'wrong lifetime, expected 750000, got ' + (tokens.'access_token'.'lifetime');
+
+tokens. := refresh();
+at. := tokens.'access_token'.'jwt';
+rt. := tokens.'refresh_token'.'jwt';
+claims. := claims();
+⊨ claims.'iat' != iat : 'id token timestamp did not change. This implies the token is not updating.';
+⊨ claims.'eppn' == 'cilogontest@fnal.gov' : 'wrong eppn';
+⊨ is_defined(claims.'wlcg.credkey')  : 'missing wlcg.credkey';
+⊨ 'cilogontest' == claims.'wlcg.credkey'  : 'wrong wlcg.credkey';
+⊨ is_defined(at.'wlcg.ver') : 'Not a WLCG token';
+⊨ at.'aud' == 'https://wlcg.cern.ch/jwt/v1/any' : 'incorrect access token audience';
+⊨ rt.'aud' == 'https://wlcg.cern.ch/jwt/v1/any' : 'incorrect refresh token audience';
+⊨ at.'sub' == 'cilogontest@fnal.gov': 'wrong subject';
+expected_scopes. := ['compute.create', 'compute.read', 'compute.cancel', 'compute.modify', 'storage.create:/dune/scratch/users/cilogontest', 'storage.read:/dune'];
+ss. := tokenize(at.'scope', ' ');
+⊨ reduce(@&&, expected_scopes. ∈ ss.) : 'incorrect access token scopes';
+⊨ abs(tokens.'access_token'.'lifetime' - 750000)<2000 : 'wrong lifetime, expected 750000, got ' + (tokens.'access_token'.'lifetime');
+at.'access_token' := exchange('-at');
+rt.'refresh_token' := exchange('-rt');
+expected_scopes. := ['compute.create', 'compute.read', 'compute.cancel', 'compute.modify', 'storage.create:/dune/scratch/users/cilogontest', 'storage.read:/dune'];
+ss. := tokenize(at.'scope', ' ');
+⊨ reduce(@&&, expected_scopes. ∈ ss.) : 'incorrect access token scopes';
+⊨ abs(tokens.'access_token'.'lifetime' -750000)<2000 : 'wrong lifetime, expected 750000, got ' + (tokens.'access_token'.'lifetime');
+say('FNAL test: ok');

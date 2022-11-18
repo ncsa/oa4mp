@@ -91,41 +91,45 @@ public abstract class TokenManagerServlet extends BearerTokenServlet implements 
         AccessTokenImpl at = null;
         RefreshTokenImpl rt = null;
         client = verifyClient(req, "Basic");// all that matters is it passes muster
+        MetaDebugUtil debugger =         MyProxyDelegationServlet.createDebugger(client);
+
         JSONWebKeys keys = OA2TokenUtils.getKeys(oa2SE, client);
         String token = req.getParameter(TOKEN);
         String tokenTypeHint = req.getParameter(TOKEN_TYPE_HINT);
-        transaction = getOA2ServiceTransactionBasic(state, oa2SE, keys, token, tokenTypeHint);
+        transaction = getOA2ServiceTransactionBasic(state, oa2SE, keys, token, tokenTypeHint, debugger);
         state.transaction = transaction;
         // Final check. If the supplied transaction's client does not match the client credentials in the
         // headers. This prevents a malicious valid client from snooping other client's transactions.
         if (!client.getIdentifier().equals(transaction.getOA2Client().getIdentifier())) {
+            debugger.info(this, "unauthorized client");
             throw new OA2GeneralError(OA2Errors.UNAUTHORIZED_CLIENT,
                     "Unauthorized client",
                     HttpStatus.SC_UNAUTHORIZED,
                     null);
         }
-        MyProxyDelegationServlet.createDebugger(transaction.getOA2Client()).trace(this, "introspection endpoint basic auth ok.");
+        debugger.trace(this, "introspection endpoint basic auth ok.");
         return state;
     }
 
-    private OA2ServiceTransaction getOA2ServiceTransactionBasic(State state, OA2SE oa2SE, JSONWebKeys keys, String token, String tokenTypeHint) {
+    private OA2ServiceTransaction getOA2ServiceTransactionBasic(State state, OA2SE oa2SE, JSONWebKeys keys, String token, String tokenTypeHint,
+                                                                MetaDebugUtil debugger) {
         RefreshTokenImpl rt = null;
         AccessTokenImpl at = null;
         if (StringUtils.isTrivial(tokenTypeHint)) {
             // Fix CIL-1253
             try {
-                rt = OA2TokenUtils.getRT(token, oa2SE, keys);
+                rt = OA2TokenUtils.getRT(token, oa2SE, keys, debugger);
 
             } catch (Throwable t) {
-                at = OA2TokenUtils.getAT(token, oa2SE, keys);
+                at = OA2TokenUtils.getAT(token, oa2SE, keys,debugger);
             }
         } else {
             switch (tokenTypeHint) {
                 case TYPE_ACCESS_TOKEN:
-                    at = OA2TokenUtils.getAT(token, oa2SE, keys);
+                    at = OA2TokenUtils.getAT(token, oa2SE, keys, debugger);
                     break;
                 case TYPE_REFRESH_TOKEN:
-                    rt = OA2TokenUtils.getRT(token, oa2SE, keys);
+                    rt = OA2TokenUtils.getRT(token, oa2SE, keys,debugger);
                     break;
                 default:
                     // as per spec, throw the only exception this servlet is allowed
@@ -207,7 +211,7 @@ public abstract class TokenManagerServlet extends BearerTokenServlet implements 
         String token = req.getParameter(TOKEN);
         String tokenTypeHint = req.getParameter(TOKEN_TYPE_HINT);
 
-        finishState(state, oa2SE, atBearer, keys, token, tokenTypeHint);
+        finishState(state, oa2SE, atBearer, keys, token, tokenTypeHint, debugger);
         debugger.trace(this, "access token is the bearer token");
         return state;
         // Finally, we have to check that the bearer and payload tokens match
@@ -215,23 +219,24 @@ public abstract class TokenManagerServlet extends BearerTokenServlet implements 
         // that we don't want people revoking other's tokens.
     }
 
-    private void finishState(State state, OA2SE oa2SE, AccessTokenImpl atBearer, JSONWebKeys keys, String token, String tokenTypeHint) {
+    private void finishState(State state, OA2SE oa2SE, AccessTokenImpl atBearer, JSONWebKeys keys, String token, String tokenTypeHint,
+                             MetaDebugUtil debugger) {
         AccessTokenImpl accessToken = null;
         RefreshTokenImpl refreshToken = null;
         if (StringUtils.isTrivial(tokenTypeHint)) {
             // Fix CIL-1253.
             try {
-                refreshToken = OA2TokenUtils.getRT(token, oa2SE, keys);
+                refreshToken = OA2TokenUtils.getRT(token, oa2SE, keys,debugger);
             } catch (Throwable t) {
-                accessToken = OA2TokenUtils.getAT(token, oa2SE, keys);
+                accessToken = OA2TokenUtils.getAT(token, oa2SE, keys,debugger);
             }
         } else {
             switch (tokenTypeHint) {
                 case TYPE_ACCESS_TOKEN:
-                    accessToken = OA2TokenUtils.getAT(token, oa2SE, keys);
+                    accessToken = OA2TokenUtils.getAT(token, oa2SE, keys, debugger);
                     break;
                 case TYPE_REFRESH_TOKEN:
-                    refreshToken = OA2TokenUtils.getRT(token, oa2SE, keys);
+                    refreshToken = OA2TokenUtils.getRT(token, oa2SE, keys,debugger);
                     break;
                 default:
                     // as per spec, throw the only exception this servlet is allowed

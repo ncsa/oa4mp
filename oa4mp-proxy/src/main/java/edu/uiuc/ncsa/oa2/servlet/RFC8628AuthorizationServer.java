@@ -129,7 +129,6 @@ public class RFC8628AuthorizationServer extends EnvServlet {
 
     @Override
     protected void doIt(HttpServletRequest request, HttpServletResponse response) throws Throwable {
-        printAllParameters(request);
         DebugUtil.trace(this, "in RFC 8628 Authz server");
         DebugUtil.trace(this, " starting with response committed #1?" + response.isCommitted());
         PendingState pendingState = null;
@@ -208,7 +207,9 @@ public class RFC8628AuthorizationServer extends EnvServlet {
                         userCode = RFC8628Servlet.convertToCanonicalForm(userCode, getServiceEnvironment().getRfc8628ServletConfig());
                         RFC8628Store<? extends OA2ServiceTransaction> rfc8628Store = (RFC8628Store) getServiceEnvironment().getTransactionStore();
                         OA2ServiceTransaction trans = rfc8628Store.getByUserCode(userCode);
-                        DebugUtil.trace(this, "got transaction = " + trans);
+                        MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(trans.getOA2Client());
+                        debugger.trace(this, "got transaction = " + trans);
+                        printAllParameters(request, debugger);
                         try {
                             ProxyUtils.userCodeToProxyRedirect(getServiceEnvironment(), trans, pendingState);
                         }catch(Throwable t){

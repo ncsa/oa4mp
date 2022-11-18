@@ -83,7 +83,7 @@ public class JWTUtil2 {
             signature = ""; // as per spec
 
         } else {
-            DebugUtil.trace(JWTUtil.class, "Signing ID token with algorithm=" + jsonWebKey.algorithm);
+       //     DebugUtil.trace(JWTUtil.class, "Signing ID token with algorithm=" + jsonWebKey.algorithm);
             signature = sign(header, payload, jsonWebKey);
         }
         String x = concat(header, payload);
@@ -174,7 +174,7 @@ public class JWTUtil2 {
             throw new IllegalStateException("Unknown algorithm");
         }
         String algorithm = (String) alg;
-        DebugUtil.trace(JWTUtil.class, "Verifying JWT with algorithm =" + algorithm);
+      //  DebugUtil.trace(JWTUtil.class, "Verifying JWT with algorithm =" + algorithm);
         Signature signature = null;
         if (algorithm.equals(NONE_JWT)) {
             if (!isTrivial(sig)) {
@@ -191,7 +191,7 @@ public class JWTUtil2 {
         signature.initVerify(pubKey);
         signature.update(concat(header, payload).getBytes());
         boolean rc = signature.verify(Base64.decodeBase64(sig));
-        DebugUtil.trace(JWTUtil.class, "Verification ok?" + rc);
+     //   DebugUtil.trace(JWTUtil.class, "Verification ok?" + rc);
         return rc;
     }
 
@@ -266,8 +266,8 @@ public class JWTUtil2 {
         String[] x = decat(jwt);
         JSONObject h = JSONObject.fromObject(new String(Base64.decodeBase64(x[HEADER_INDEX])));
         JSONObject p = JSONObject.fromObject(new String(Base64.decodeBase64(x[PAYLOAD_INDEX])));
-        DebugUtil.trace(JWTUtil.class, "header=" + h);
-        DebugUtil.trace(JWTUtil.class, "payload=" + p);
+    //    DebugUtil.trace(JWTUtil.class, "header=" + h);
+   //     DebugUtil.trace(JWTUtil.class, "payload=" + p);
         if (h.get(ALGORITHM) == null) {
             throw new InvalidAlgorithmException("Error: no algorithm.");
         } else {
@@ -279,7 +279,7 @@ public class JWTUtil2 {
         }
         if (!(h.get(TYPE).equals(DEFAULT_TYPE)||h.get(TYPE).equals(RFC9068Constants.HEADER_TYPE))) throw new UnsupportedJWTTypeException("Unsupported token type.");
         Object keyID = h.get(KEY_ID);
-        DebugUtil.trace(JWTUtil.class, "key_id=" + keyID);
+      //  DebugUtil.trace(JWTUtil.class, "key_id=" + keyID);
 
         if (keyID == null || !(keyID instanceof String)) {
             throw new InvalidAlgorithmException("Error: Unknown algorithm");

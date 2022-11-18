@@ -1,0 +1,88 @@
+#! /usr/bin/env -S qdl-run
+/*
+   In this test, there is a file that contains the claims source. The test
+   is to get tokens, verify that the claim in that file are returned,
+   alter the file, get more claims and check that these all are updated,
+   then revert the file for the next time.
+
+  The configuration in the client is
+{"tokens": {
+  "access":  {
+   "qdl":   {
+    "load": "ui-test/process.qdl",
+    "xmd": {"exec_phase":    [
+     "post_token",
+     "post_refresh",
+     "post_user_info"
+    ]}
+   },
+   "type": "default"
+  },
+  "identity":  {
+   "qdl":   {
+    "load": "ui-test/id-token.qdl",
+    "xmd": {"exec_phase": "post_auth"}
+   },
+   "type": "identity"
+  }
+ }}
+
+
+*/
+
+
+original_file := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-admin-oauth2/src/main/resources/qdl/ui-test/test-claims.json';
+claims_file := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-admin-oauth2/src/main/resources/qdl/ui-test/ui-test.json';
+file_write(claims_file, file_read(original_file)); // initialize it
+
+cfg.'id'  := 'localhost:test/user_info'; // name of the configuration, not the id
+cfg.'idp'  := 'Github';
+cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';
+cfg.'description' :=  'Claim source test. Show that changing the claims in the source between calls is reported.';
+cfg.'flow_type' := 'uri'; // Don't run DF since this requires the post_auth phase to initialize
+user_id := 'http://cilogon.org/serverT/users/21340363';
+
+rc := script_load('driver.qdl', cfg.);
+⊨ rc == 0: (rc==-1?'user aborted':'there was an error initiating the flow');
+tokens. := clc#access();
+claims. := claims();
+⊨ reduce(@∧, [1282,1097,1363] ∈ claims.'isMemberOf'\*\'id') : 'incorrect group id number(s)';
+⊨ reduce(@∧, ['org_ici','all_ncsa_employe','jira-users' ] ∈ claims.'isMemberOf'\*\'name') : 'incorrect group name(s)';
+⊨ claims.'sub' == 'http://cilogon.org/serverT/users/21340363' : 'incorrect subject' ;
+⊨ claims.'aud' == cfg.'id' : 'wrong audience';
+⊨ claims.'iss' == 'https://localhost:9443/oauth2/fermilab' : 'wrong issuer';
+⊨ claims.'test_claim' == 'my test claim42' : 'wrong test_claim assertion';
+
+ new_claims. := {'isMemberOf':[{'id':1200, 'name':'org_xxx'},{'id':1400, 'name':'all_ncsa_employees'},{'id':1363, 'name':'jira-users'}],
+     'test_claim':'m3y o3t3h3e3r test cl33aim 41'};
+ say('writing new claims');
+ file_write(claims_file, to_json({'test-eppn@foo.bar':new_claims.}) );
+
+tokens. := refresh();
+⊨ tokens.'access_token'.'lifetime' == 900000 : 'wrong access token lifetime';
+⊨ tokens.'refresh_token'.'lifetime' == 1800000 : 'wrong refresh token lifetime';
+claims. := claims();
+⊨ reduce(@∧, [1200,1400,1363] ∈ claims.'isMemberOf'\*\'id') : 'incorrect group id number(s)';
+⊨ reduce(@∧, ['org_xxx','all_ncsa_employees','jira-users' ] ∈ claims.'isMemberOf'\*\'name') : 'incorrect group name(s)';
+⊨ claims.'sub' == 'http://cilogon.org/serverT/users/21340363' : 'incorrect subject' ;
+⊨ claims.'aud' == cfg.'id' : 'wrong audience';
+⊨ claims.'iss' == 'https://localhost:9443/oauth2/fermilab' : 'wrong issuer';
+⊨ claims.'test_claim' == new_claims.'test_claim'-'3' : 'wrong test_claim assertion';
+
+
+new_claims. := {'isMemberOf':[{'id':100, 'name':'org_yyy'},{'id':200, 'name':'all_ncsa_staff'},{'id':300, 'name':'ldap-users'}],
+    'test_claim':'33m3y33 o3t3h3e3rtest c3l3a3i3m3430',
+    'new_claim':'new claim 12345'};
+
+file_write(claims_file, to_json({'test-eppn@foo.bar':new_claims.}));
+user_info();
+claims. := claims();
+⊨ reduce(@∧, [100,200,300] ∈ claims.'isMemberOf'\*\'id') : 'incorrect group id number(s)';
+⊨ reduce(@∧, ['org_yyy','all_ncsa_staff','ldap-users' ] ∈ claims.'isMemberOf'\*\'name') : 'incorrect group name(s)';
+⊨ claims.'sub' == 'http://cilogon.org/serverT/users/21340363' : 'incorrect subject' ;
+⊨ claims.'aud' == cfg.'id' : 'wrong audience';
+⊨ claims.'iss' == 'https://localhost:9443/oauth2/fermilab' : 'wrong issuer';
+⊨ claims.'test_claim' == new_claims.'test_claim'-'3' : 'wrong test_claim assertion';
+⊨ claims.'new_claim' == new_claims.'new_claim': 'wrong new_claim assertion';
+
+say('file claims test: ok');

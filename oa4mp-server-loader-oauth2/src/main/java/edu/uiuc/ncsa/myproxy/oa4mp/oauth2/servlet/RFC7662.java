@@ -59,7 +59,7 @@ public class RFC7662 extends TokenManagerServlet {
         }
 
         if (state.transaction != null) {
-            debugger.trace(this, "introspec, from transaction = \"" + state.transaction.getIdentifier() + "\"");
+            debugger.trace(this, "introspect, from transaction = \"" + state.transaction.getIdentifier() + "\"");
             JSONObject jsonObject = new JSONObject();
             if (state.isAT) {
                 jsonObject.put(ACTIVE, state.transaction.isAccessTokenValid());
