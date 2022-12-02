@@ -1,0 +1,23 @@
+<html>
+
+</html>
+    <!--
+ entry templates, without and with examples. These are not indented since
+ we need to control whitespace and our ever so helpful editor adds it when
+ any is detected, leading to bad output.
+
+<entry id="">
+<body>
+<![CDATA[]]>
+</body>
+</entry>
+
+<entry id="">
+<body>
+<![CDATA[]]>
+</body>
+<example>
+<![CDATA[]]>
+</example>
+</entry>
+          -->

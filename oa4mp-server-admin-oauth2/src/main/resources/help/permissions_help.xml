@@ -1,0 +1,112 @@
+<html>
+    <entry id="admin_id">
+    <body>
+    <![CDATA[Property: Identifier (--)
+The id of the admin client for this permission.]]>
+    </body>
+    </entry>
+    <entry id="can_approve">
+    <body>
+    <![CDATA[Property: Boolean (true)
+If this admin client can approve its own clients.]]>
+    </body>
+    </entry>
+    <entry id="can_create">
+    <body>
+    <![CDATA[Property: Boolean (true)
+If this admin client can create new clients.]]>
+    </body>
+    </entry>
+    <entry id="can_read">
+    <body>
+    <![CDATA[Property: Boolean (true)
+If the admin client can read the given client. ]]>
+    </body>
+    </entry>
+    <entry id="can_remove">
+    <body>
+    <![CDATA[Property: Boolean (true)
+If the admin client can remove the given client.]]>
+    </body>
+    </entry>
+    <entry id="can_substitute">
+    <body>
+    <![CDATA[Property: Boolean (false)
+If the client in ersatz_id can substitute for the client in client_id.]]>
+    </body>
+    </entry>
+    <entry id="can_write">
+    <body>
+    <![CDATA[Property: Boolean (true)
+If the admin client can write to the configuration of the client (i.e. update it).]]>
+    </body>
+    </entry>
+    <entry id="client_id">
+    <body>
+    <![CDATA[Property: Identifier (--)
+The target of this permission. This permission grants access to this client_id.]]>
+    </body>
+    </entry>
+    <entry id="ersatz_id">
+    <body>
+    <![CDATA[Property: Identifier (--)
+The id of the client that can substitute for a given client. Permissions are where this relationship is
+given and if there is not a permission object relating a client and and ersatz client, then no
+substitutions can happen.
+
+Note that a permission to substitute for a given client is created in the admin component
+using the set_ersatz command.]]>
+    </body>
+    </entry>
+    <entry id="permission_id">
+    <body>
+    <![CDATA[Property:Identifier (**)
+The unique identifier of this permission.]]>
+    </body>
+    </entry>
+    <entry id="about">
+    <body>
+    <![CDATA[Permissions are grants for various operations between an admin client and
+its charges. Administrative clients also can grant the ability to substitute from
+one of its clients to an ersatz client. ]]>
+    </body>
+    </entry>
+
+</html>
+    <!--
+
+oa2>use permissions
+permissions>list_keys
+admin_id  can_approve  can_create  can_read  can_remove  can_substitute  can_write  client_id  description  ersatz_id  permission_id*
+permissions>/commands
+archive         create          edit            list_keys       read_env        save_env        set_id          update
+clear_env       decode          encode          ls              rename          search          set_output_on   version
+clear_id        deserialize     get_env         print_env       rm              serialize       set_verbose_on
+copy            echo            get_id          print_help      rs              set_env         size
+
+To get help on the CLI, type /?
+To get general information on the current component in use, type --help at the prompt.
+To get more information on a specific command
+
+command --help
+
+
+ entry templates, without and with examples. These are not indented since
+ we need to control whitespace and our ever so helpful editor adds it when
+ any is detected, leading to bad output.
+
+<entry id="">
+<body>
+<![CDATA[]]>
+</body>
+</entry>
+
+<entry id="">
+<body>
+<![CDATA[]]>
+</body>
+<example>
+<![CDATA[]]>
+</example>
+</entry>
+          -->

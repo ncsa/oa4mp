@@ -24,6 +24,8 @@ public class OA2ClientTable extends ClientStoreTable {
         getColumnDescriptor().add(new ColumnDescriptorEntry(k.cfg(), LONGVARCHAR));
         getColumnDescriptor().add(new ColumnDescriptorEntry(k.dfInterval(), BIGINT));
         getColumnDescriptor().add(new ColumnDescriptorEntry(k.dfLifetime(), BIGINT));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(k.maxATLifetime(), BIGINT));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(k.maxRTLifetime(), BIGINT));
         getColumnDescriptor().add(new ColumnDescriptorEntry(k.ea(), LONGVARCHAR));
         getColumnDescriptor().add(new ColumnDescriptorEntry(k.ersatzClient(), BOOLEAN));
         getColumnDescriptor().add(new ColumnDescriptorEntry(k.extendsProvisioners(), BOOLEAN));

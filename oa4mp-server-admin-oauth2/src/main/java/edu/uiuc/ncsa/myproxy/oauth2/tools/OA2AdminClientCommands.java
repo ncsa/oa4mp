@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oauth2.tools;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientKeys;
 import edu.uiuc.ncsa.myproxy.oauth2.base.ClientApprovalStoreCommands;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.Permission;
@@ -36,7 +37,7 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
                                   Store adminClientStore,
                                   ClientApprovalStoreCommands clientApprovalStoreCommands,
                                   PermissionsStore permissionsStore,
-                                  ClientStore clientStore) {
+                                  ClientStore clientStore) throws Throwable {
         super(logger, defaultIndent, adminClientStore, clientApprovalStoreCommands);
         this.clientStore = clientStore;
         this.permissionsStore = permissionsStore;
@@ -63,13 +64,14 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
     @Override
     public void extraUpdates(Identifiable identifiable) throws IOException {
         AdminClient client = (AdminClient) identifiable;
+        AdminClientKeys keys = (AdminClientKeys)getMapConverter().getKeys();
         String secret = client.getSecret();
         String input;
         boolean askForSecret = true;
 
 
         while (askForSecret) {
-            input = getInput("enter a new secret (this will be hashed, not stored) or return to skip.", secret);
+            input = getPropertyHelp(keys.secret(),"enter a new secret (this will be hashed, not stored) or return to skip.", secret);
             if (isEmpty(input)) {
                 sayi("Nothing entered. Client secret entry skipped.");
                 break;
@@ -83,15 +85,15 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
             client.setSecret(secret);
             askForSecret = false;
         }
-        String issuer = getInput("Give the issuer", client.getIssuer());
+        String issuer = getPropertyHelp(keys.issuer(),"Give the issuer", client.getIssuer());
         if (!isEmpty(issuer)) {
             client.setIssuer(issuer);
         }
         String voURI;
         if (client.getVirtualOrganization() == null) {
-            voURI = getInput("Give the VO", null);
+            voURI = getPropertyHelp(keys.voURI(), "Give the VO URI", null);
         } else {
-            voURI = getInput("Give the VO", client.getVirtualOrganization().toString());
+            voURI = getPropertyHelp(keys.voURI(), "Give the VO URI", client.getVirtualOrganization().toString());
         }
 
         if (!isEmpty(voURI)) {
@@ -109,9 +111,9 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
 
         String vo;
         if (client.getExternalVOName() == null) {
-            vo = getInput("Give the VO", null);
+            vo = getPropertyHelp(keys.vo(), "Give the VO", null);
         } else {
-            vo = getInput("Give the VO", client.getExternalVOName().toString());
+            vo = getPropertyHelp(keys.vo(), "Give the VO", client.getExternalVOName().toString());
         }
 
         if (!isEmpty(vo)) {
@@ -119,7 +121,7 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
         }
 
 
-        String max = getInput("Enter new maximum number of clients allowed", Integer.toString(client.getMaxClients()));
+        String max = getPropertyHelp(keys.maxClients(), "Enter new maximum number of clients allowed", Integer.toString(client.getMaxClients()));
         if (!isEmpty(max)) {
             client.setMaxClients(Integer.parseInt(max));
         }
@@ -419,4 +421,10 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
     client_id = localhost:command.line2
     ersatz_id = client:/my_ersatz
      */
+
+    @Override
+    public void bootstrap() throws Throwable {
+        super.bootstrap();
+        getHelpUtil().load("/help/admin_help.xml");
+    }
 }

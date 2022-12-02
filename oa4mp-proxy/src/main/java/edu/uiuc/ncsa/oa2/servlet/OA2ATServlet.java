@@ -693,6 +693,17 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                     ersatzTXR.setLifetime(t.getAccessTokenLifetime());
                 }*/
                 break;
+            case RFC8693Constants.ID_TOKEN_TYPE:
+                rfcClaims.put(RFC8693Constants.ISSUED_TOKEN_TYPE, RFC8693Constants.ID_TOKEN_TYPE); // Required. This is the type of token issued (mostly access tokens). Must be as per TX spec.
+                rfcClaims.put(OA2Constants.TOKEN_TYPE, RFC8693Constants.TOKEN_TYPE_N_A); // Required. This is how the issued token can be used, mostly. BY RFC 6750 spec.
+                JSONObject md = t.getUserMetaData();
+                if(md.containsKey(OA2Claims.EXPIRATION) && md.containsKey(OA2Claims.ISSUED_AT)) {
+                    long exp = md.getLong(OA2Claims.EXPIRATION) - md.getLong(OA2Claims.ISSUED_AT);
+                    rfcClaims.put(OA2Constants.EXPIRES_IN, exp / 1000); // internal in ms., external in sec.
+                    newTXR.setLifetime(exp); // in ms.
+                }
+                newTXR.setIdentifier(BasicIdentifier.newID(md.getString(OA2Claims.JWT_ID)));
+                break;
             default:
                 throw new OA2ATException(OA2Errors.INVALID_REQUEST,
                         "unknown requested token type",
@@ -711,7 +722,33 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
 
         setupTokens(client, rtiResponse, oa2se, t, jwtRunner, debugger);
         debugger.trace(this, "rtiResponse after token setup:" + rtiResponse);
+        switch (requestedTokenType) {
+            case RFC8693Constants.ACCESS_TOKEN_TYPE:
+                if (((AccessTokenImpl) rtiResponse.getAccessToken()).isJWT()) {
+                    rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getAccessToken().getToken()); // Required.
+                    newTXR.setStoredToken(rtiResponse.getAccessToken().getToken());
 
+                } else {
+                    rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getAccessToken().encodeToken()); // Required.
+                }
+                // create scope string  Remember that these may have been changed by a script,
+                // so here is the right place to set it.
+                rfcClaims.put(OA2Constants.SCOPE, listToString(newTXR.getScopes()));
+                break;
+            case RFC8693Constants.REFRESH_TOKEN_TYPE:
+                if (rtiResponse.getRefreshToken().isJWT()) {
+                    rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getRefreshToken().getToken()); // Required
+                    rfcClaims.put(OA2Constants.REFRESH_TOKEN, rtiResponse.getRefreshToken().getToken()); // Optional
+                    newTXR.setStoredToken(rtiResponse.getRefreshToken().getToken());
+                } else {
+                    rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getRefreshToken().encodeToken()); // Required
+                    rfcClaims.put(OA2Constants.REFRESH_TOKEN, rtiResponse.getRefreshToken().encodeToken()); // Optional
+                }
+                break;
+            case RFC8693Constants.ID_TOKEN_TYPE:
+                rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getClaims());
+        }
+/*
         if (rtiResponse.hasRefreshToken()) {
             // Maddening part of the spec is that the access token claim can be a refresh token.
             // User has to look at the returned token type.
@@ -738,6 +775,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             rfcClaims.put(OA2Constants.SCOPE, listToString(newTXR.getScopes()));
 
         }
+*/
         debugger.trace(this, "rfc claims returned:" + rfcClaims.toString(1));
         /*
 

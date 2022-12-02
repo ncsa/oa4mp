@@ -41,6 +41,35 @@ public class OA2Client extends Client implements OA2ClientScopes {
         return client;
     }
 
+    long maxATLifetime = 0L;
+    long maxRTLifetime = 0L;
+    /**
+     * The maximum lifetime, if different from the server max, for this client. Note that once set,
+     * no AT lifetime can exceed this. Set to <= 0 to use the server max. as the client max.
+     * @return
+     */
+
+    public long getMaxATLifetime() {
+        return maxATLifetime;
+    }
+
+    public void setMaxATLifetime(long maxATLifetime) {
+        this.maxATLifetime = maxATLifetime;
+    }
+
+    /**
+     * The maximum lifetime, if different from the server max, for this client. Note that once set,
+     * no RT lifetime can exceed this. Set to <= 0 to use the server max. as the client max.
+     * @return
+     */
+    public long getMaxRTLifetime() {
+        return maxRTLifetime;
+    }
+
+    public void setMaxRTLifetime(long maxRTLifetime) {
+        this.maxRTLifetime = maxRTLifetime;
+    }
+
     @Override
     protected void populateClone(BaseClient c) {
         OA2Client client = (OA2Client) c;
@@ -53,6 +82,8 @@ public class OA2Client extends Client implements OA2ClientScopes {
         client.setRawConfig(getRawConfig());
         client.setIssuer(getIssuer());
         client.setSignTokens(isSignTokens());
+        client.setMaxRTLifetime(getMaxRTLifetime());
+        client.setMaxATLifetime(getMaxATLifetime());
     }
 
     public void setComment(String comment) {
@@ -182,6 +213,7 @@ public class OA2Client extends Client implements OA2ClientScopes {
 
     /**
      * This returns whether or not this client is configured to return refresh tokens.
+     * Disabled means the lifetime is set to zero. See also {@link #getMaxRTLifetime()}
      *
      * @return
      */

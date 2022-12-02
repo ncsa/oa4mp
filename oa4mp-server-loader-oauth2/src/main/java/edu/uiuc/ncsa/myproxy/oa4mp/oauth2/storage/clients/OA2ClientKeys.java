@@ -26,6 +26,8 @@ public class OA2ClientKeys extends ClientKeys {
     String extendsProvisioners = "extends_provisioners";
     String issuer = "issuer";
     String ldap = "ldap";
+    String maxATLifetime = "at_max_Lifetime";
+    String maxRTLifetime = "rt_max_Lifetime";
     String proxyClaimsList ="proxy_claims_list";
     String publicClient="public_client";
     String rtLifetime = "rt_lifetime";
@@ -47,6 +49,17 @@ public class OA2ClientKeys extends ClientKeys {
            if (0 < x.length) prototypes = x[0];
            return prototypes;
        }
+
+    public String maxATLifetime(String... x) {
+           if (0 < x.length) maxATLifetime = x[0];
+           return maxATLifetime;
+       }
+
+    public String maxRTLifetime(String... x) {
+           if (0 < x.length) maxRTLifetime = x[0];
+           return maxRTLifetime;
+       }
+
 
     public String extendsProvisioners(String... x) {
            if (0 < x.length) extendsProvisioners = x[0];
@@ -168,6 +181,8 @@ public class OA2ClientKeys extends ClientKeys {
         allKeys.add(dfLifetime());
         allKeys.add(dfInterval());
         allKeys.add(dfInterval());
+        allKeys.add(maxATLifetime());
+        allKeys.add(maxRTLifetime());
         allKeys.add(ersatzClient());
         allKeys.add(prototypes());
         allKeys.add(extendsProvisioners());

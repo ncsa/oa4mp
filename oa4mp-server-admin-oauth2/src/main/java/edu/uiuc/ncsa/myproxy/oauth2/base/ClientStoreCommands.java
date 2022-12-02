@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oauth2.base;
 
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.ClientKeys;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
@@ -21,12 +22,15 @@ import java.io.IOException;
  * on 5/21/13 at  4:21 PM
  */
 public class ClientStoreCommands extends BaseClientStoreCommands {
-    public ClientStoreCommands(MyLoggingFacade logger, String defaultIndent, Store clientStore, ClientApprovalStoreCommands clientApprovalStoreCommands) {
+    public ClientStoreCommands(MyLoggingFacade logger,
+                               String defaultIndent,
+                               Store clientStore,
+                               ClientApprovalStoreCommands clientApprovalStoreCommands) throws Throwable {
         super(logger, defaultIndent, clientStore, clientApprovalStoreCommands);
     }
 
 
-    public ClientStoreCommands(MyLoggingFacade logger, Store store) {
+    public ClientStoreCommands(MyLoggingFacade logger, Store store) throws Throwable{
         super(logger, store);
         setSortable(new ClientSorter());
     }
@@ -44,10 +48,9 @@ public class ClientStoreCommands extends BaseClientStoreCommands {
     @Override
     public void extraUpdates(Identifiable identifiable) throws IOException {
         Client client = (Client) identifiable;
-        client.setErrorUri(getInput("enter error uri", client.getErrorUri()));
+/*        client.setErrorUri(getInput("enter error uri", client.getErrorUri()));
         client.setHomeUri(getInput("enter home uri", client.getHomeUri()));
-        client.setProxyLimited(isOk(getInput("does this client require limited proxies?", client.isProxyLimited() ? "y" : "n")));
-
+        client.setProxyLimited(isOk(getInput("does this client require limited proxies?", client.isProxyLimited() ? "y" : "n")));*/
         getPublicKeyFile((Client) identifiable);
     }
 
@@ -55,22 +58,23 @@ public class ClientStoreCommands extends BaseClientStoreCommands {
     public boolean update(Identifiable identifiable) throws IOException {
 
         Client client = (Client) identifiable;
+        ClientKeys keys = (ClientKeys)getMapConverter().getKeys();
 
         String newIdentifier = null;
 
         info("Starting client update for id = " + client.getIdentifierString());
         say("Update the values. A return accepts the existing or default value in []'s");
 
-        newIdentifier = getInput("enter the identifier", client.getIdentifierString());
+        newIdentifier = getPropertyHelp(keys.identifier(),"enter the identifier", client.getIdentifierString());
         boolean removeCurrentClient = false;
         Identifier oldID = client.getIdentifier();
 
         // no clean way to do this.
-        client.setName(getInput("enter the name", client.getName()));
-        client.setEmail(getInput("enter email", client.getEmail()));
-        client.setErrorUri(getInput("enter error uri", client.getErrorUri()));
-        client.setHomeUri(getInput("enter home uri", client.getHomeUri()));
-        client.setProxyLimited(isOk(getInput("does this client require limited proxies?", client.isProxyLimited() ? "y" : "n")));
+        client.setName(getPropertyHelp(keys.name(),"enter the name", client.getName()));
+        client.setEmail(getPropertyHelp(keys.email(),"enter email", client.getEmail()));
+        client.setErrorUri(getPropertyHelp(keys.errorURL(),"enter error url", client.getErrorUri()));
+        client.setHomeUri(getPropertyHelp(keys.homeURL(),"enter home url", client.getHomeUri()));
+        client.setProxyLimited(isOk(getPropertyHelp(keys.proxyLimited(),"does this client require limited proxies?", client.isProxyLimited() ? "y" : "n")));
         // set file not found message.
         extraUpdates(client);
         sayi("here is the complete client:");

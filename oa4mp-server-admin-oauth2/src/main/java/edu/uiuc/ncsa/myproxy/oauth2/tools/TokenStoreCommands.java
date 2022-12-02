@@ -19,11 +19,11 @@ import java.util.List;
  * on 12/14/20 at  2:38 PM
  */
 public class TokenStoreCommands extends StoreCommands2 {
-    public TokenStoreCommands(MyLoggingFacade logger, String defaultIndent, Store store) {
+    public TokenStoreCommands(MyLoggingFacade logger, String defaultIndent, Store store) throws Throwable {
         super(logger, defaultIndent, store);
     }
 
-    public TokenStoreCommands(MyLoggingFacade logger, Store store) {
+    public TokenStoreCommands(MyLoggingFacade logger, Store store) throws Throwable {
         super(logger, store);
     }
 
@@ -73,5 +73,11 @@ public class TokenStoreCommands extends StoreCommands2 {
             say((i++) + ". " + (new Date(txRecord.getExpiresAt())) + ": " + txRecord.getIdentifierString() ) ;
         }
         say(i + " exchange records found");
+    }
+
+    @Override
+    public void bootstrap() throws Throwable {
+        super.bootstrap();
+        getHelpUtil().load("/help/token_help.xml");
     }
 }

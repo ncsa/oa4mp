@@ -18,11 +18,11 @@ import java.util.Vector;
 public abstract class StoreCommands2 extends StoreCommands {
 
 
-    public StoreCommands2(MyLoggingFacade logger, String defaultIndent, Store store) {
+    public StoreCommands2(MyLoggingFacade logger, String defaultIndent, Store store) throws Throwable{
         super(logger, defaultIndent, store);
     }
 
-    public StoreCommands2(MyLoggingFacade logger, Store store) {
+    public StoreCommands2(MyLoggingFacade logger, Store store)throws Throwable {
         super(logger, store);
     }
 

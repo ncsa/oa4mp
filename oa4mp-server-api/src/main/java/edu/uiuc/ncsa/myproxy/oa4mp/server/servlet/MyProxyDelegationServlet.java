@@ -7,6 +7,19 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironment;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironmentImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.AbstractCLIApprover;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.ClientDebugUtil;
+import edu.uiuc.ncsa.oa4mp.delegation.common.servlet.TransactionFilter;
+import edu.uiuc.ncsa.oa4mp.delegation.common.servlet.TransactionState;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.BaseClient;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.TransactionStore;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl.BasicTransaction;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.AuthorizationGrant;
+import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
+import edu.uiuc.ncsa.oa4mp.delegation.server.UnapprovedClientException;
+import edu.uiuc.ncsa.oa4mp.delegation.server.issuers.AGIssuer;
+import edu.uiuc.ncsa.oa4mp.delegation.server.issuers.ATIssuer;
+import edu.uiuc.ncsa.oa4mp.delegation.server.request.IssuerResponse;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.cache.Cache;
 import edu.uiuc.ncsa.security.core.cache.CachedObject;
@@ -16,18 +29,6 @@ import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DebugConstants;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
-import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
-import edu.uiuc.ncsa.oa4mp.delegation.server.UnapprovedClientException;
-import edu.uiuc.ncsa.oa4mp.delegation.server.issuers.AGIssuer;
-import edu.uiuc.ncsa.oa4mp.delegation.server.issuers.ATIssuer;
-import edu.uiuc.ncsa.oa4mp.delegation.server.request.IssuerResponse;
-import edu.uiuc.ncsa.oa4mp.delegation.common.servlet.TransactionFilter;
-import edu.uiuc.ncsa.oa4mp.delegation.common.servlet.TransactionState;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.BaseClient;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.TransactionStore;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl.BasicTransaction;
-import edu.uiuc.ncsa.oa4mp.delegation.common.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.util.pkcs.KeyPairPopulationThread;
 
@@ -57,6 +58,7 @@ public abstract class MyProxyDelegationServlet extends EnvServlet implements Tra
         }
         return DebugUtil.getInstance();
     }
+
     /**
      * This is called after the response is received so that the system can get the approproate
      * transaction. Checks for the validity of the transaction should be done here too.
@@ -120,10 +122,11 @@ public abstract class MyProxyDelegationServlet extends EnvServlet implements Tra
      * If you have store updates that need to get done, put them in this method,
      * invoking super. Calls to this are managed by the servlet to make sure
      * nothing get called more than once.
+     *
      * @throws IOException
      * @throws SQLException
      */
-    protected void realStoreUpdates() throws IOException, SQLException{
+    protected void realStoreUpdates() throws IOException, SQLException {
         ServletDebugUtil.trace(this, "starting store updates");
         processStoreCheck(getTransactionStore());
         processStoreCheck(getServiceEnvironment().getClientStore());
@@ -171,19 +174,19 @@ public abstract class MyProxyDelegationServlet extends EnvServlet implements Tra
     protected ServiceTransaction getTransactionByGrantID(HttpServletRequest request) throws IOException {
         Identifier id = getGrantIDFromRequest(request);
         ServletDebugUtil.trace(this, "getting transaction from id \"" + id + "\"");
-        ServiceTransaction t= (ServiceTransaction) getTransactionStore().get(id);
+        ServiceTransaction t = (ServiceTransaction) getTransactionStore().get(id);
         ServletDebugUtil.trace(this, "got transaction \"" + t + "\"");
 
         return t;
     }
-    
-   protected Identifier getGrantIDFromRequest(HttpServletRequest req){
-       if(req.getParameter(CONST(CONSUMER_KEY)) == null){
-           throw new UnknownClientException("Error: no client identifier has been supplied. Have you registered this client with the service?");
-       }
-       return BasicIdentifier.newID(req.getParameter(CONST(CONSUMER_KEY)));
 
-   }
+    protected Identifier getGrantIDFromRequest(HttpServletRequest req) {
+        if (req.getParameter(CONST(CONSUMER_KEY)) == null) {
+            throw new UnknownClientException("Error: no client identifier has been supplied. Have you registered this client with the service?");
+        }
+        return BasicIdentifier.newID(req.getParameter(CONST(CONSUMER_KEY)));
+
+    }
 
     public Client getClient(Identifier identifier) {
         if (identifier == null) {
@@ -193,7 +196,7 @@ public abstract class MyProxyDelegationServlet extends EnvServlet implements Tra
         if (c == null) {
             if (getServiceEnvironment().getClientStore().size() == 0) {
                 // This tries to show if, perhaps, the wrong store wa loaded by printing out a little information about it.
-                DebugUtil.trace(this,"CLIENT STORE HAS NO ENTRIES!");
+                DebugUtil.trace(this, "CLIENT STORE HAS NO ENTRIES!");
                 DebugUtil.trace(this, "client name is " + getServiceEnvironment().getClientStore().getClass().getSimpleName());
                 DebugUtil.trace(this, "client store is a " + getServiceEnvironment().getClientStore());
             }
@@ -231,11 +234,40 @@ public abstract class MyProxyDelegationServlet extends EnvServlet implements Tra
      * @param client
      */
     public void checkClientApproval(BaseClient client) {
+        ClientApproval clientApproval = getServiceEnvironment().getClientApprovalStore().get(client.getIdentifier());
+        String ww = null;
+        if (clientApproval == null) {
+            // Generally the client should have an approval record auto-created with the right status
+            // however, if an admin creates one manually,, there may not be such a record.
+            // In that case, treat it as if the approval is still pending.
+            ww = "The client with identifier \"" + client.getIdentifier() + "\" has not been approved. Request rejected. Please contact your administrator.";
+        } else {
+            switch (clientApproval.getStatus()) {
+                case APPROVED:
+                    // do nothing
+                    return;
+                case NONE:
+                case PENDING:
+                    ww = "The client with identifier \"" + client.getIdentifier() + "\" is pending approval. Request rejected. Please contact your administrator.";
+                    break;
+                case REVOKED:
+                    ww = "The client with identifier \"" + client.getIdentifier() + "\" has been revoked. Request rejected. Please contact your administrator.";
+                    break;
+                case DENIED:
+                    ww = "The client with identifier \"" + client.getIdentifier() + "\" has been denied. Request rejected. Please contact your administrator.";
+                    break;
+                default:
+                    // In practice, if it gets here there is something seriously wrong with the internal state of this client.
+                    ww = "The client with identifier \"" + client.getIdentifier() + "\" has unknown status. Request rejected. Please contact your administrator.";
+            }
+        }
+        warn(ww);
+        throw new UnapprovedClientException("Error: " + ww, client);
+/*
         if (!getServiceEnvironment().getClientApprovalStore().isApproved(client.getIdentifier())) {
             String ww = "The client with identifier \"" + client.getIdentifier() + "\" has not been approved. Request rejected. Please contact your administrator.";
-            warn(ww);
-            throw new UnapprovedClientException("Error: " + ww, client);
         }
+*/
     }
 
     protected boolean isEmpty(String x) {

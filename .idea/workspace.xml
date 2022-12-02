@@ -11,26 +11,42 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5411e17b-ec11-4108-bbe8-161078e2291b" name="Changes" comment="QDL dependencies">
-      <change afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/qdl/ui-test/ui-test.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/oa4mp-server-test-oauth2/src/main/resources/flow-tests/dev/vo_1.qdl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/oa4mp-server-test-oauth2/src/main/resources/flow-tests/local/ersatz.qdl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/oa4mp-server-test-oauth2/src/main/resources/flow-tests/local/file_claims.qdl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/oa4mp-server-test-oauth2/src/main/resources/flow-tests/local/fnal-0.qdl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/oa4mp-server-test-oauth2/src/main/resources/flow-tests/local/fnal-1.qdl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/oa4mp-server-test-oauth2/src/main/resources/flow-tests/local/fnal-2.qdl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/oa4mp-server-test-oauth2/src/main/resources/flow-tests/local/prototype.qdl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/oa4mp-server-test-oauth2/src/main/resources/flow-tests/local/readme.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/oa4mp-server-test-oauth2/src/main/resources/flow-tests/local/vo_test.qdl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/oa4mp-website/src/site/xhtml/server/manuals/gc.xhtml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/help/admin_help.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/help/approver_help.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/help/client_help.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/help/help_template.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/help/permissions_help.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/help/token_help.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/help/transaction_help.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/help/vo_help.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/common/token/impl/TokenImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/common/token/impl/TokenImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-clc/src/main/java/edu/uiuc/ncsa/oa4mp/clc/CLCCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-clc/src/main/java/edu/uiuc/ncsa/oa4mp/clc/CLCCommands.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-proxy/src/main/java/edu/uiuc/ncsa/oa2/servlet/OA2ATServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-proxy/src/main/java/edu/uiuc/ncsa/oa2/servlet/OA2ATServlet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-proxy/src/main/java/edu/uiuc/ncsa/oa2/servlet/RFC8628AuthorizationServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-proxy/src/main/java/edu/uiuc/ncsa/oa2/servlet/RFC8628AuthorizationServer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-proxy/src/main/java/edu/uiuc/ncsa/oa2/servlet/ProxyUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-proxy/src/main/java/edu/uiuc/ncsa/oa2/servlet/ProxyUtils.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-qdl/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-qdl/buildNumber.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-qdl/src/main/java/edu/uiuc/ncsa/oa2/qdl/CLC.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-qdl/src/main/java/edu/uiuc/ncsa/oa2/qdl/CLC.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-qdl/src/main/java/edu/uiuc/ncsa/oa2/qdl/storage/ClientStemMC.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-qdl/src/main/java/edu/uiuc/ncsa/oa2/qdl/storage/ClientStemMC.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/base/BaseClientStoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/base/BaseClientStoreCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/base/BaseCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/base/BaseCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/base/ClientApprovalStoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/base/ClientApprovalStoreCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/base/ClientStoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/base/ClientStoreCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/base/CopyCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/base/CopyCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/base/StoreCommands2.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/base/StoreCommands2.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/ClientCfgCreator.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/JSONStoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/JSONStoreCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/JWKCLI.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/JWKCLI.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/JWKUtilCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/JWKUtilCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2AdminClientCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2AdminClientCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2CLCCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2CLCCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2ClientCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2ClientCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2CommandLineClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2CommandLineClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2Commands.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2Commands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2PermissionCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2PermissionCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/QDLCLICommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/QDLCLICommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/TokenStoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/TokenStoreCommands.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/TransactionStoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/TransactionStoreCommands.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/qdl/ui-test/id-token.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/qdl/ui-test/id-token.qdl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/qdl/ui-test/process.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/qdl/ui-test/process.qdl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/VOCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/VOCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/qdl/seq0.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/qdl/seq0.qdl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/constant-values.html" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/constant-values.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/deprecated-list.html" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/deprecated-list.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2ClientCommands.html" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2ClientCommands.html" afterDir="false" />
@@ -44,40 +60,27 @@
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/index-all.html" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/index-all.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/overview-tree.html" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/overview-tree.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/stylesheet.css" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/stylesheet.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/classes/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2ClientCommands.class" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/classes/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2ClientCommands.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/classes/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2Commands.class" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/classes/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2Commands.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/maven-archiver/pom.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin-javadoc.jar" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin-javadoc.jar" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin-sources.jar" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin-sources.jar" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin.jar" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/util/ClientDebugUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/util/ClientDebugUtil.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/claims/FSClaimSource.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/claims/FSClaimSource.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/servlet/OA2TokenUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/servlet/OA2TokenUtils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/servlet/RFC7009.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/servlet/RFC7009.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/servlet/RFC7662.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/servlet/RFC7662.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/servlet/TokenManagerServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/servlet/TokenManagerServlet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/storage/RefreshTokenRetentionPolicy.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/storage/RefreshTokenRetentionPolicy.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/storage/transactions/OA2ServiceTransaction.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/storage/transactions/OA2ServiceTransaction.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/servlet/MyProxyDelegationServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/servlet/MyProxyDelegationServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/servlet/ClientUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/servlet/ClientUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/servlet/OA2ClientUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/servlet/OA2ClientUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/storage/clients/OA2Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/storage/clients/OA2Client.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/storage/clients/OA2ClientConverter.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/storage/clients/OA2ClientConverter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/storage/clients/OA2ClientKeys.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/storage/clients/OA2ClientKeys.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/storage/clients/OA2ClientTable.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/storage/clients/OA2ClientTable.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/qdl/util/JWTCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/qdl/util/JWTCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/qdl/util/SigningCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/qdl/util/SigningCommands.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-test-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-test-oauth2/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-test-oauth2/src/main/resources/flow-tests/dev/all.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-test-oauth2/src/main/resources/flow-tests/dev/all.qdl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-test-oauth2/src/main/resources/flow-tests/dev/df.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-test-oauth2/src/main/resources/flow-tests/dev/df.qdl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-test-oauth2/src/main/resources/flow-tests/dev/functor.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-test-oauth2/src/main/resources/flow-tests/dev/functor.qdl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-test-oauth2/src/main/resources/flow-tests/dev/ncsa_qdl.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-test-oauth2/src/main/resources/flow-tests/dev/ncsa_qdl.qdl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-test-oauth2/src/main/resources/flow-tests/dev/no_config.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-test-oauth2/src/main/resources/flow-tests/dev/no_config.qdl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-test-oauth2/src/main/resources/flow-tests/dev/revoke.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-test-oauth2/src/main/resources/flow-tests/dev/revoke.qdl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-test-oauth2/src/main/resources/flow-tests/local/all.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-test-oauth2/src/main/resources/flow-tests/local/all.qdl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-test-oauth2/src/main/resources/flow-tests/local/cil1550.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-test-oauth2/src/main/resources/flow-tests/local/cil1550.qdl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-test-oauth2/src/main/resources/flow-tests/local/command_line2.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-test-oauth2/src/main/resources/flow-tests/local/vo_test-suite.qdl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-test-oauth2/src/main/resources/flow-tests/local/fnal.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-test-oauth2/src/main/resources/flow-tests/local/fnal-3.qdl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-test-oauth2/src/main/resources/flow-tests/local/no_config.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-test-oauth2/src/main/resources/flow-tests/local/no_config.qdl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-test-oauth2/src/main/resources/flow-tests/local/no_qdl.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-test-oauth2/src/main/resources/flow-tests/local/no_qdl.qdl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-test-oauth2/src/main/resources/flow-tests/local/scitokens.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-test-oauth2/src/main/resources/flow-tests/local/scitokens.qdl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-test-oauth2/src/main/resources/flow-tests/local/test_ncsa.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-test-oauth2/src/main/resources/flow-tests/local/test_ncsa.qdl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-test-oauth2/src/main/resources/flow-tests/local/test_qdl.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-test-oauth2/src/main/resources/flow-tests/local/test_qdl.qdl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-test-oauth2/src/test/java/test/QDLTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-test-oauth2/src/test/java/test/QDLTests.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-test/src/test/java/edu/uiuc/ncsa/myproxy/oa4mp/NewTransactionTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-test/src/test/java/edu/uiuc/ncsa/myproxy/oa4mp/NewTransactionTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-website/src/site/xhtml/server/manuals/changelog.xhtml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-website/src/site/xhtml/server/manuals/changelog.xhtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oauth2/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/oa2/jwt/JWTUtil2.java" beforeDir="false" afterPath="$PROJECT_DIR$/oauth2/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/oa2/jwt/JWTUtil2.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-test-oauth2/src/main/resources/flow-tests/local/vo_test-suite.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-test-oauth2/src/main/resources/flow-tests/local/vo_test-suite.qdl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/server/storage/ClientApproval.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/server/storage/ClientApproval.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -134,37 +137,37 @@
     <option name="showMembers" value="true" />
     <option name="showModules" value="false" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "DefaultHtmlFileTemplate": "HTML File",
-    "WebServerToolWindowFactoryState": "false",
-    "last_opened_file_path": "/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests/dev",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Libraries",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.508046",
-    "settings.editor.selected.configurable": "preferences.pluginManager"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-admin-oauth2/src/main/resources/help&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Libraries&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.508046&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;
   },
-  "keyToStringList": {
-    "DatabaseDriversLRU": [
-      "postgresql"
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;postgresql&quot;
     ],
-    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
-      "TEXT"
+    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
+      &quot;TEXT&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/help" />
       <recent name="$PROJECT_DIR$/oa4mp-server-test-oauth2/src/main/resources/flow-tests/dev" />
       <recent name="$PROJECT_DIR$/oa4mp-website/src/site/xhtml/server/manuals" />
       <recent name="$PROJECT_DIR$/oa4mp-server-test-oauth2/src/main/resources/flow-tests/local" />
       <recent name="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/qdl/ui-test" />
-      <recent name="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/qdl/ligo/vo3" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/oa4mp-server-test-oauth2/src/main/resources/flow-tests/local" />
@@ -174,7 +177,7 @@
       <recent name="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/qdl/ligo/vo2" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.QDL">
+  <component name="RunManager" selected="Application.CLI">
     <configuration default="true" type="Applet" factoryName="Applet">
       <option name="WIDTH" value="400" />
       <option name="HEIGHT" value="300" />
@@ -200,6 +203,17 @@
       <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.myproxy.oauth2.tools.OA2Commands" />
       <module name="oa4mp-server-admin-oauth2" />
       <option name="PROGRAM_PARAMETERS" value="-cfg $PROJECT_DIR$/../../csd/config/server-oa2.xml -name localhost:oa4mp.oa2.mariadb" />
+      <method v="2" />
+    </configuration>
+    <configuration name="ExtendedParameters" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ExtendedParameters" />
+      <module name="oa4mp-server-loader-oauth2" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
       <method v="2" />
     </configuration>
     <configuration name="LDAPClaimsSource" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
@@ -282,21 +296,6 @@
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
-    </configuration>
-    <configuration name="build.sh" type="ShConfigurationType" temporary="true">
-      <option name="SCRIPT_TEXT" value="" />
-      <option name="INDEPENDENT_SCRIPT_PATH" value="true" />
-      <option name="SCRIPT_PATH" value="$PROJECT_DIR$/build.sh" />
-      <option name="SCRIPT_OPTIONS" value="" />
-      <option name="INDEPENDENT_SCRIPT_WORKING_DIRECTORY" value="true" />
-      <option name="SCRIPT_WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="INDEPENDENT_INTERPRETER_PATH" value="true" />
-      <option name="INTERPRETER_PATH" value="/bin/bash" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="EXECUTE_IN_TERMINAL" value="true" />
-      <option name="EXECUTE_SCRIPT_FILE" value="true" />
-      <envs />
-      <method v="2" />
     </configuration>
     <configuration name="OA4MP" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local" APPLICATION_SERVER_NAME="Tomcat 9.0.65" ALTERNATIVE_JRE_ENABLED="true" ALTERNATIVE_JRE_PATH="/usr/lib/jvm/amazon-corretto-11.0.17.8.1-linux-x86">
       <option name="OPEN_IN_BROWSER_URL" value="https://localhost:9443/client2/" />
@@ -390,21 +389,21 @@
       <item itemvalue="Application.CLI" />
       <item itemvalue="Application.CLC" />
       <item itemvalue="Application.QDL" />
+      <item itemvalue="Application.ExtendedParameters" />
       <item itemvalue="Application.OA2ServletUtils" />
       <item itemvalue="Application.LDAPClaimsSource" />
       <item itemvalue="Java Scratch.Scratch (1)" />
       <item itemvalue="Java Scratch.Scratch" />
       <item itemvalue="JUnit.OA4MP test Suite" />
-      <item itemvalue="Shell Script.build.sh" />
       <item itemvalue="Tomcat Server.OA4MP" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.ExtendedParameters" />
         <item itemvalue="Java Scratch.Scratch (1)" />
         <item itemvalue="Application.OA2ServletUtils" />
         <item itemvalue="Application.LDAPClaimsSource" />
         <item itemvalue="Java Scratch.Scratch" />
-        <item itemvalue="Shell Script.build.sh" />
       </list>
     </recent_temporary>
   </component>
@@ -455,7 +454,10 @@
       <workItem from="1666972715444" duration="7619000" />
       <workItem from="1666995627766" duration="3222000" />
       <workItem from="1667132973506" duration="102600000" />
-      <workItem from="1668090877922" duration="91987000" />
+      <workItem from="1668090877922" duration="129223000" />
+      <workItem from="1669639274294" duration="6099000" />
+      <workItem from="1669677350151" duration="31875000" />
+      <workItem from="1669829505242" duration="32096000" />
     </task>
     <task id="LOCAL-00001" summary="CIL-627 increments to get working with Tomcat 10 under Java 11">
       <created>1659378884898</created>
@@ -527,7 +529,14 @@
       <option name="project" value="LOCAL" />
       <updated>1668035055940</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="CIL-1088. More flow tests and found an edge case for token revocation.">
+      <created>1668813057133</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1668813057133</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -543,7 +552,8 @@
     <MESSAGE value="CIL-1537 -- automate flow testing with QDL." />
     <MESSAGE value="CIL-1532 changes." />
     <MESSAGE value="CIL-1550, more flow tests in QDL." />
-    <option name="LAST_COMMIT_MESSAGE" value="CIL-1550, more flow tests in QDL." />
+    <MESSAGE value="CIL-1088. More flow tests and found an edge case for token revocation." />
+    <option name="LAST_COMMIT_MESSAGE" value="CIL-1088. More flow tests and found an edge case for token revocation." />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
@@ -556,7 +566,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2ClientCommands.java</url>
-          <line>345</line>
+          <line>344</line>
           <option name="timeStamp" value="36" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -566,7 +576,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2CLCCommands.java</url>
-          <line>901</line>
+          <line>911</line>
           <option name="timeStamp" value="45" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -601,7 +611,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2CLCCommands.java</url>
-          <line>1150</line>
+          <line>1160</line>
           <option name="timeStamp" value="105" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -616,7 +626,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2CLCCommands.java</url>
-          <line>1422</line>
+          <line>1432</line>
           <option name="timeStamp" value="110" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -650,11 +660,6 @@
           <option name="timeStamp" value="134" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2CLCCommands.java</url>
-          <line>967</line>
-          <option name="timeStamp" value="135" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/servlet/RFC7009.java</url>
           <line>95</line>
           <option name="timeStamp" value="138" />
@@ -669,6 +674,60 @@
           <line>47</line>
           <option name="timeStamp" value="146" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/storage/clients/OA2ClientConverter.java</url>
+          <line>323</line>
+          <option name="timeStamp" value="148" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/storage/clients/OA2Client.java</url>
+          <line>402</line>
+          <option name="timeStamp" value="152" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/5.2-SNAPSHOT/storage-5.2-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java</url>
+          <line>1776</line>
+          <option name="timeStamp" value="153" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/5.2-SNAPSHOT/storage-5.2-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java</url>
+          <line>289</line>
+          <option name="timeStamp" value="154" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/5.2-SNAPSHOT/storage-5.2-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java</url>
+          <line>1228</line>
+          <option name="timeStamp" value="169" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/base/BaseClientStoreCommands.java</url>
+          <line>584</line>
+          <option name="timeStamp" value="172" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/5.2-SNAPSHOT/storage-5.2-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java</url>
+          <line>651</line>
+          <option name="timeStamp" value="174" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/util/5.2-SNAPSHOT/util-5.2-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/util/cli/CommonCommands.java</url>
+          <line>240</line>
+          <option name="timeStamp" value="175" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/util/5.2-SNAPSHOT/util-5.2-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/util/cli/CLIDriver.java</url>
+          <line>582</line>
+          <option name="timeStamp" value="177" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/util/5.2-SNAPSHOT/util-5.2-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/util/cli/CLIDriver.java</url>
+          <line>354</line>
+          <option name="timeStamp" value="178" />
+        </line-breakpoint>
+        <breakpoint enabled="true" type="java-exception">
+          <properties class="java.lang.NullPointerException" package="java.lang" />
+          <option name="timeStamp" value="176" />
+        </breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>

@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oauth2.tools;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionKeys;
 import edu.uiuc.ncsa.myproxy.oauth2.base.StoreCommands2;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.Permission;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionsStore;
@@ -18,11 +19,11 @@ import java.util.HashMap;
  * on 4/7/17 at  3:11 PM
  */
 public class OA2PermissionCommands extends StoreCommands2 {
-    public OA2PermissionCommands(MyLoggingFacade logger, String defaultIndent, Store store) {
+    public OA2PermissionCommands(MyLoggingFacade logger, String defaultIndent, Store store) throws Throwable {
         super(logger, defaultIndent, store);
     }
 
-    public OA2PermissionCommands(MyLoggingFacade logger, Store store) {
+    public OA2PermissionCommands(MyLoggingFacade logger, Store store) throws Throwable {
         super(logger, store);
     }
 
@@ -50,27 +51,29 @@ public class OA2PermissionCommands extends StoreCommands2 {
     @Override
     public boolean update(Identifiable identifiable) throws IOException {
         Permission p = (Permission) identifiable;
+        PermissionKeys keys = (PermissionKeys)getMapConverter().getKeys();
         String input;
         if (p.getClientID() == null) {
-            input = getInput("Enter new client id", "");
+            input = getPropertyHelp(keys.clientID(),"Enter new client id", "");
 
         } else {
-            input = getInput("Enter new client id", p.getClientID().toString());
+            input = getPropertyHelp(keys.clientID(),"Enter new client id", p.getClientID().toString());
         }
 
         if (!isEmpty(input)) {
             p.setClientID(BasicIdentifier.newID(input));
         }
         if (p.getAdminID() == null) {
-            input = getInput("Enter new admin id", "");
+            input = getPropertyHelp(keys.adminID(),"Enter new admin id", "");
 
         } else {
-            input = getInput("Enter new admin id", p.getAdminID().toString());
+            input = getPropertyHelp(keys.adminID(),"Enter new admin id", p.getAdminID().toString());
         }
         if (!isEmpty(input)) {
             p.setAdminID(BasicIdentifier.newID(input));
         }
-        input = getInput("set all permissions (y/n):", "y");
+        // For the next, the help is just general help for permissions rather than each permission.
+        input = getPropertyHelp("permissions","set all permissions (y/n):", "y");
         if (!isEmpty(input)) {
             if (input.toLowerCase().equals("y")) {
                 p.setApprove(true);
@@ -115,5 +118,11 @@ public class OA2PermissionCommands extends StoreCommands2 {
         Permission p = (Permission) mc.fromMap(map, identifiable);
         getPStore().save(p);
 
+    }
+
+    @Override
+    public void bootstrap() throws Throwable {
+        super.bootstrap();
+        getHelpUtil().load("/help/permission_help.xml");
     }
 }

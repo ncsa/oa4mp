@@ -11,7 +11,7 @@ import edu.uiuc.ncsa.security.util.cli.CommonCommands;
  * on 5/11/16 at  1:35 PM
  */
 public abstract class CLCCommands extends CommonCommands {
-    public CLCCommands(MyLoggingFacade logger, ClientEnvironment ce) {
+    public CLCCommands(MyLoggingFacade logger, ClientEnvironment ce) throws Throwable {
         super(logger);
         this.ce = ce;
     }

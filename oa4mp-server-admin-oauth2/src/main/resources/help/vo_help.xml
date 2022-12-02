@@ -1,0 +1,180 @@
+<html>
+    <entry id="at_issuer">
+    <body>
+    <![CDATA[Property: String (--)
+The issuer that will be put in every access token in the VO unless locally
+overridden.]]>
+    </body>
+    </entry>
+    <entry id="created">
+    <body>
+    <![CDATA[Property: Integer (**)
+The time in ms. at which this VO was created.]]>
+    </body>
+    </entry>
+    <entry id="default_key_id">
+    <body>
+    <![CDATA[Property: String (--)
+The id of the JSON Web Key that will be used for signing. ]]>
+    </body>
+    </entry>
+    <entry id="discovery_path">
+    <body>
+    <![CDATA[Property: String (--)
+Used in the discovery endpoint for constructing and resolving the
+well-known page. This is *not* a complete path, but is of the form
+
+host/vo
+
+So for instance, if your site is at
+
+https://login.bgsu.edu/oauth2
+
+and you have a discover_path of
+
+login.bgsu.edu/my_issuer
+
+then the resulting constructed well-known page would reside at
+
+https://login.bgsu.edu/oauth2/.well-known/openid-configuration.my_issuer
+
+and various entries in it would have their paths constructed from this as well, such
+as the jwks_uri (which is where all the custom signing keys for this VO might
+reside at
+
+https://login.bgsu.org:8443/oauth2/certs/my_issuer
+
+in some cases depending upon other configuration in the server, this may vary a bit with
+the addition of port numbers.]]>
+    </body>
+    </entry>
+    <entry id="issuer">
+    <body>
+    <![CDATA[Property: String (--)
+The default issuer for every client in this VO, unless locally overridden.]]>
+    </body>
+    </entry>
+    <entry id="json_web_keys">
+    <body>
+    <![CDATA[Property: JSON (--)
+A set of keys as per RFC 7515 (https://www.rfc-editor.org/rfc/rfc7517). These
+can/should be auto generated for the VO.
+
+See also: default_key_id]]>
+    </body>
+    </entry>
+    <entry id="last_modified">
+    <body>
+    <![CDATA[Property: Integer (**)
+The timestamp in milliseconds that this VO was last saved.]]>
+    </body>
+    </entry>
+    <entry id="title">
+    <body>
+    <![CDATA[Property: String (--)
+A human-readable string. Generally this should make sense to whoever administers this VO.]]>
+    </body>
+    </entry>
+    <entry id="valid">
+    <body>
+    <![CDATA[Property: Boolean (true)
+Is this VO valid/enabled? Setting this flag to false -- a serious step -- immediately shuts down
+use of this VO and any attempt by any client to start a flow will fail. Mostly this exists as a
+drastic tool in case, e.g., the VO has somehow been compromised.]]>
+    </body>
+    </entry>
+    <entry id="vo_id">
+    <body>
+    <![CDATA[Property: Identifier (**)
+A standard unique identifier for this VO. Note that any admin client in the VO should use this
+and set it to both the client's vo and vo_uri.]]>
+    </body>
+    </entry>
+    <entry id="print_keys">
+    <body>
+    <![CDATA[Command.
+Print a short report on the current set of JSON web keys for this VO, if any.]]>
+    </body>
+    <example>
+        <![CDATA[ vo>print_keys /prod:fnal/vo_1
+Found keys are:
+  89F07558E2304FB6891C94A0E573C385: alg =RS384, use=sig
+  79E85A32A61FF5E979A3FDEF30A0BCF4: alg =RS512, use=sig
+  2978FF548A55A739502E3BC64A58E2B2: alg =RS256, use=sig
+
+In this case, the ids, algorithm and use (sig means signature, which is the most common
+use in OA4MP).]]>
+    </example>
+    </entry>
+    <entry id="new_keys">
+    <body>
+    <![CDATA[Command.
+Creates a completely new set of keys for this VO.]]>
+    </body>
+    </entry>
+    <entry id="about">
+    <body>
+    <![CDATA[Virtual Organization.
+OA4MP supports multiple issuers through its "virtual organization" mechanism.
+A VO (virtual organization) has its own issuer, discovery endpoint and signing keys.
+
+How's it work?
+--------------
+A VO exists outside of all clients. Admin clients may be added to the VO in which case all
+of the VO environment (keys, issuers, etc.) is automatically inherited by any client.
+It is possible to locally override this either in the client's cfg property or in a script.
+
+How to make one?
+----------------
+Choose an id (that is a url) and use that. This identifier is only ever used internally,
+so something like
+
+production:/vo/caltech/igwn
+
+is just fine. Then use this with the create command and select Y to edit the client. The
+reason is that the logic flow for the client is followed. Read the prompts and do what
+they say and you should have a fully functional VO at the end. You can test this by going to
+your new well-known endpoint, which should be live at this point.
+
+Uses
+----
+Any admin client is added to the VO by setting its vo_uri (and vo) property to be
+the same as the vo_uri property here. Again, this is live and should be available for
+testing immediately.
+]]>
+    </body>
+    </entry>
+    <entry id="test 1">
+    <body>
+    <![CDATA[Yo!]]>
+    </body>
+    </entry>
+
+</html>
+    <!--
+oa2>use vo
+  vo>list_keys
+at_issuer  created  default_key_id  description  discovery_path  issuer  json_web_keys  last_modified  title  valid  vo_id*
+  vo>/commands
+                 print_keys
+ new_keys
+
+ entry templates, without and with examples. These are not indented since
+ we need to control whitespace and our ever so helpful editor adds it when
+ any is detected, leading to bad output.
+
+<entry id="">
+<body>
+<![CDATA[]]>
+</body>
+</entry>
+
+<entry id="">
+<body>
+<![CDATA[]]>
+</body>
+<example>
+<![CDATA[]]>
+</example>
+</entry>
+          -->

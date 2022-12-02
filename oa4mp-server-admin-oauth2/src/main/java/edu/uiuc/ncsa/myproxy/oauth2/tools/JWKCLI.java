@@ -3,10 +3,7 @@ package edu.uiuc.ncsa.myproxy.oauth2.tools;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.*;
-import edu.uiuc.ncsa.security.util.cli.CLIDriver;
-import edu.uiuc.ncsa.security.util.cli.Commands;
-import edu.uiuc.ncsa.security.util.cli.ConfigurableCommandsImpl;
-import edu.uiuc.ncsa.security.util.cli.InputLine;
+import edu.uiuc.ncsa.security.util.cli.*;
 import edu.uiuc.ncsa.security.util.configuration.TemplateUtil;
 import edu.uiuc.ncsa.security.util.functor.parser.event.ParserUtil;
 import org.apache.commons.lang.StringUtils;
@@ -27,6 +24,17 @@ import static edu.uiuc.ncsa.security.util.cli.CommonCommands.BATCH_MODE_FLAG;
  * on 5/6/19 at  2:37 PM
  */
 public class JWKCLI extends ConfigurableCommandsImpl {
+
+    @Override
+    public void bootstrap() throws Throwable {
+
+    }
+
+    @Override
+    public HelpUtil getHelpUtil() {
+        return null;
+    }
+
     public JWKCLI(MyLoggingFacade logger) {
         super(logger);
     }
@@ -125,7 +133,7 @@ public class JWKCLI extends ConfigurableCommandsImpl {
     public static String LONG_NO_OUTPUT_FLAG = "--noOuput";
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Throwable{
         Vector<String> vector = new Vector<>();
         vector.add(DUMMY_FUNCTION); // Dummy zero-th arg.
         for (String arg : args) {

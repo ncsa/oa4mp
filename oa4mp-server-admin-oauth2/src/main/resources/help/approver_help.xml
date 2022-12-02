@@ -1,0 +1,96 @@
+<html>
+    <entry id="approval_ts">
+    <body>
+    <![CDATA[Property: Timestamp (**)
+The time of the most recent approval.]]>
+    </body>
+    </entry>
+    <entry id="approved">
+    <body>
+    <![CDATA[Property: Boolean (false)
+(Archaic) if this is approved or not. This has been replaced with the
+status property but is updated in tandem with it. Use status instead.
+
+See also: status]]>
+    </body>
+    </entry>
+    <entry id="approver">
+    <body>
+    <![CDATA[Property: String (--)
+The name of the approver. Generally this ought to be something that does identify
+the person or process doing the approval. In the case of humans, this can
+be their email or something similar, like their EPPN. In the case of admin
+clients, it should be the unique identifier for that client.
+
+The aim of this is to allow for auditing and tracking in case there is
+some question about how or why a client was approved, revoked, etc.]]>
+    </body>
+    </entry>
+
+    <entry id="status">
+    <body>
+    <![CDATA[Property: String ("none")
+The status of this approval. The recognized values are
+
+    none : No operations have been done on the approvals
+  denied : The appoval is explicitly denied
+approved : The approval is accepted
+ revoked : The approval was accepted, then revoked.
+ pending : The approval is still awaiting approval.
+
+In the course of operation of OA4MP, if a status of "none" or "denied" is
+found, attempts to use the client are rejected with a message that the client
+is not approved. If a client attempts to register itself through the client management
+endpoint, then it has a status of "pending". ]]>
+    </body>
+    </entry>
+    <entry id="approve">
+    <body>
+    <![CDATA[Command.
+Approve the current record.]]>
+    </body>
+    </entry>
+    <entry id="client_id">
+    <body>
+    <![CDATA[Property: Identifier (**)
+This is the identifier of the client associated with this approval record.
+When a client is created, an approval record should be created with a
+status of "none". ]]>
+    </body>
+    </entry>
+    <entry id="about">
+    <body>
+    <![CDATA[This store manages the approval for all clients. The approvals
+are separate to allow more flexibility. All clients -- regular, admin, ersatz
+have their approvals stored here.]]>
+    </body>
+    </entry>
+</html>
+<!--
+   approval_ts  approved  approver  client_id*  description  status
+
+approve          show
+
+
+
+-->
+    <!--
+ entry templates, without and with examples. These are not indented since
+ we need to control whitespace and our ever so helpful editor adds it when
+ any is detected, leading to bad output.
+
+<entry id="">
+<body>
+<![CDATA[]]>
+</body>
+</entry>
+
+<entry id="">
+<body>
+<![CDATA[]]>
+</body>
+<example>
+<![CDATA[]]>
+</example>
+</entry>
+          -->

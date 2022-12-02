@@ -215,6 +215,11 @@ public class OA2ClientUtils {
 
     }
 
+    /**
+     * Used when resolving which network from its dotted quad address.
+     * @param address
+     * @return
+     */
     protected static int[] toQuad(String address) {
         StringTokenizer stringTokenizer = new StringTokenizer(address, ".");
         if (!stringTokenizer.hasMoreTokens()) {

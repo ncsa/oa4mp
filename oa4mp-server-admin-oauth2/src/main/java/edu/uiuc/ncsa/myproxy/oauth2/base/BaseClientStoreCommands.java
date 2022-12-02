@@ -17,6 +17,7 @@ import edu.uiuc.ncsa.security.util.cli.Sortable;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.io.FileReader;
@@ -38,13 +39,13 @@ import static edu.uiuc.ncsa.security.util.cli.CLIDriver.EXIT_COMMAND;
 public abstract class BaseClientStoreCommands extends StoreCommands2 {
 
     public BaseClientStoreCommands(MyLoggingFacade logger, String defaultIndent, Store clientStore,
-                                   ClientApprovalStoreCommands clientApprovalStoreCommands) {
+                                   ClientApprovalStoreCommands clientApprovalStoreCommands) throws Throwable {
         super(logger, defaultIndent, clientStore);
         this.clientApprovalStoreCommands = clientApprovalStoreCommands;
         setSortable(new ClientSorter());
     }
 
-    public BaseClientStoreCommands(MyLoggingFacade logger, Store store) {
+    public BaseClientStoreCommands(MyLoggingFacade logger, Store store) throws Throwable {
         super(logger, store);
     }
 
@@ -59,8 +60,9 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
     protected JSON inputJSON(JSON oldJSON, String componentName) throws IOException {
         return inputJSON(oldJSON, componentName, false);
     }
+
     protected Sortable getSortable() {
-        if(sortable == null){
+        if (sortable == null) {
             sortable = new ClientSorter();
         }
         return sortable;
@@ -318,7 +320,7 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
         clientApprovalStoreCommands.approve(ca);
 
     }
-    
+
 
     @Override
     protected void rmCleanup(Identifiable x) {
@@ -376,8 +378,8 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
             }
             clientApprovalStoreCommands.getResultSets().put(rsName, new RSRecord(acs, fields));
             say("got " + acs.size() + " results.");
-        }else{
-            clientApprovalStoreCommands.printRS(inputLine, acs, fields,null);
+        } else {
+            clientApprovalStoreCommands.printRS(inputLine, acs, fields, null);
         }
     }
 
@@ -448,7 +450,7 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
             }
             say("got " + acs.size() + " results");
             clientApprovalStoreCommands.getResultSets().put(rsName, new RSRecord(acs, fields));
-        }else{
+        } else {
             clientApprovalStoreCommands.printRS(inputLine, acs, fields, null);
         }
     }
@@ -484,7 +486,7 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
                 return;
             }
         }
-        if (inputLine.hasArg(RS_LIST_KEY)) {
+        if (inputLine.hasArg(RS_LIST_INFO_KEY)) {
             // List lists all things, so no test about where the rs is stored.
             clientApprovalStoreCommands.rs(inputLine);
         }
@@ -521,8 +523,8 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
         super.rm(inputLine);
     }
 
-    public void password(InputLine inputLine) throws Exception{
-        if(showHelp(inputLine)){
+    public void password(InputLine inputLine) throws Exception {
+        if (showHelp(inputLine)) {
             say("password [byte_count] - create a new random password and show its hash. ");
             say("if 0 < byte_count is given, then that will be the number of bytes in the password");
             say("The default is 64 bytes if this is omitted");
@@ -535,13 +537,13 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
         }
         int count = 64;
         SecureRandom random = new SecureRandom();
-        switch (inputLine.getArgCount()){
+        switch (inputLine.getArgCount()) {
             case 0:
                 break;
             case 1:
-                try{
-                    count  = Integer.parseInt(inputLine.getLastArg());
-                }catch(Throwable t){
+                try {
+                    count = Integer.parseInt(inputLine.getLastArg());
+                } catch (Throwable t) {
                     // do nothing
                     say("Could not parse the argument \"" + inputLine.getLastArg() + "\"");
                     return;
@@ -557,6 +559,76 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
         String password = org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(b);
         say("password : " + password);
         say("    hash : " + DigestUtils.sha1Hex(password));
+
+    }
+
+    public static String RESET_SECRET_SIZE_FLAG = "-size";
+    public static String RESET_SECRET_NEW_FLAG = "-new";
+
+    public static int RESET_SECRET_DEFAULT_SIZE = 64;
+
+    public void reset_secret(InputLine inputLine) throws Exception {
+        if (showHelp(inputLine)) {
+            say("reset_secret [" + RESET_SECRET_NEW_FLAG + " password] [" + RESET_SECRET_SIZE_FLAG + " byte_count] [id]");
+            say("resets the current secret. This creates the hash of the new password.");
+            say(RESET_SECRET_SIZE_FLAG + " = create a random secret with the given number of bytes.");
+            say(RESET_SECRET_NEW_FLAG + " = explicitly give the secret and hash it.");
+            say("If you specify both a secret and a size, the size is ignored.");
+            say("No parameters mean a random secret of " + RESET_SECRET_DEFAULT_SIZE + " bytes (" + (RESET_SECRET_DEFAULT_SIZE * 8) + " bits) is created.");
+            say("The password and secret are always printed.");
+            say("\nE.g. setting the password, be sure to put it in quotes to get the whole thing:\n");
+            say("clients>reset_secret " + RESET_SECRET_NEW_FLAG + " \"miarzy doats and dozey doats\"");
+            say("  password : miarzy doats and dozey doats");
+            say("      hash : 4d6e44b6ddceeccfe15e2f67f356cc09bbcec411");
+            return;
+        }
+        int size = RESET_SECRET_DEFAULT_SIZE;
+        boolean hasSize = inputLine.hasArg(RESET_SECRET_SIZE_FLAG);
+        if (hasSize) {
+            String x = inputLine.getNextArgFor(RESET_SECRET_SIZE_FLAG);
+            inputLine.removeSwitchAndValue(RESET_SECRET_SIZE_FLAG);
+            try {
+                size = Integer.parseInt(x);
+            } catch (Throwable t) {
+                say("sorry, could not interpret a size of \"" + x + "\". aborting...");
+                return;
+            }
+            if (size <= 0) {
+                say("sorry,  size of \"" + size + "\" must be positive. aborting...");
+                return;
+            }
+        }
+
+        String secret = null;
+        boolean hasPassword = inputLine.hasArg(RESET_SECRET_NEW_FLAG);
+        if (hasPassword) {
+            secret = inputLine.getNextArgFor(RESET_SECRET_NEW_FLAG);
+            inputLine.removeSwitchAndValue(RESET_SECRET_NEW_FLAG);
+        }
+        Identifiable identifiable = findItem(inputLine);
+        if (identifiable == null) {
+            say("no client specified.");
+        }
+        BaseClient client = (BaseClient) identifiable;
+
+        if (!hasPassword) {
+            byte[] y = new byte[size];
+            SecureRandom secureRandom = new SecureRandom();
+            secureRandom.nextBytes(y);
+            secret = Base64.encodeBase64URLSafeString(y);
+        }
+
+
+        if (StringUtils.isTrivial(secret)) {
+            say("sorry but could not determine a secret");  // test just in case.
+            return;
+        }
+        String hash = DigestUtils.sha1Hex(secret);
+        client.setSecret(hash);
+        getStore().save(client);
+        say("password : " + secret);
+        say("    hash : " + hash);
+
 
     }
 }

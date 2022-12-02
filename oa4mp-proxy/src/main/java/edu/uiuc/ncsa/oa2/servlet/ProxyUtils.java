@@ -94,7 +94,7 @@ public class ProxyUtils {
      * @return
      * @throws Exception
      */
-    protected static String getProxyUserCode(OA2SE oa2SE, OA2ServiceTransaction t, RFC8628State rfc8628State) throws Exception {
+    protected static String getProxyUserCode(OA2SE oa2SE, OA2ServiceTransaction t, RFC8628State rfc8628State) throws Throwable {
         MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(t.getOA2Client());
         debugger.trace(ProxyUtils.class, "starting getProxyUserCode");
         OA2CLCCommands clcCommands = createCLC(oa2SE, t);
@@ -147,7 +147,7 @@ public class ProxyUtils {
      * @param t
      * @return
      */
-    protected static void userCodeToProxyRedirect(OA2SE oa2SE, OA2ServiceTransaction t, RFC8628AuthorizationServer.PendingState pendingState) throws Exception {
+    protected static void userCodeToProxyRedirect(OA2SE oa2SE, OA2ServiceTransaction t, RFC8628AuthorizationServer.PendingState pendingState) throws Throwable {
         HttpServletResponse response = pendingState.getResponse();
         MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(t.getOA2Client());
 
@@ -174,7 +174,7 @@ public class ProxyUtils {
      * @return
      * @throws Exception
      */
-    protected static OA2CLCCommands getCLC(OA2SE oa2SE, OA2ServiceTransaction t) throws Exception {
+    protected static OA2CLCCommands getCLC(OA2SE oa2SE, OA2ServiceTransaction t) throws Throwable {
         OA2CLCCommands clcCommands = new OA2CLCCommands(oa2SE.getMyLogger(), new OA2CommandLineClient(oa2SE.getMyLogger()));
         JSONObject proxyState = t.getProxyState();
         if (proxyState.isEmpty()) {
@@ -195,7 +195,7 @@ public class ProxyUtils {
      * @return
      * @throws Exception
      */
-    protected static OA2CLCCommands createCLC(OA2SE oa2SE, OA2ServiceTransaction t) throws Exception {
+    protected static OA2CLCCommands createCLC(OA2SE oa2SE, OA2ServiceTransaction t) throws Throwable {
         AuthorizationServletConfig asc = oa2SE.getAuthorizationServletConfig();
         // next line is where the CLC is first created in the flow, so can't call getCLC
         OA2CLCCommands clcCommands = new OA2CLCCommands(true, oa2SE.getMyLogger(), new OA2CommandLineClient(oa2SE.getMyLogger()));
@@ -308,7 +308,7 @@ public class ProxyUtils {
      * @param t
      * @throws Exception
      */
-    protected static void doProxyClaimsRefresh(OA2SE oa2SE, OA2ServiceTransaction t) throws Exception {
+    protected static void doProxyClaimsRefresh(OA2SE oa2SE, OA2ServiceTransaction t) throws Throwable {
         OA2CLCCommands clcCommands = getCLC(oa2SE, t);
         clcCommands.refresh(new InputLine("user_info "));
         if (!clcCommands.hadException()) {

@@ -39,7 +39,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
     public OA2ClientCommands(MyLoggingFacade logger,
                              String defaultIndent,
                              Store clientStore,
-                             ClientApprovalStoreCommands clientApprovalStoreCommands) {
+                             ClientApprovalStoreCommands clientApprovalStoreCommands) throws Throwable{
         super(logger, defaultIndent, clientStore, clientApprovalStoreCommands);
     }
 
@@ -190,14 +190,14 @@ public class OA2ClientCommands extends ClientStoreCommands {
      */
     @Override
     public void extraUpdates(Identifiable identifiable) throws IOException {
+        OA2ClientKeys keys = (OA2ClientKeys)getMapConverter().getKeys();
         OA2Client client = (OA2Client) identifiable;
         String secret = client.getSecret();
         String input;
         boolean askForSecret = true;
 
-
         while (askForSecret) {
-            input = getInput("enter a new secret or return to skip.", secret);
+            input = getPropertyHelp(keys.secret(),"enter a new secret or return to skip.", secret);
             if (isEmpty(input)) {
                 sayi("Nothing entered. Client secret entry skipped.");
                 break;
@@ -216,7 +216,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
             // so at this point the server actually allows for refresh tokens
             String NONE = "none";
             String rtString = oa2Client.isRTLifetimeEnabled() ? Long.toString(oa2Client.getRtLifetime() / 1000) : NONE;
-            String rawLifetime = getInput("enter the refresh lifetime in sec.", rtString);
+            String rawLifetime = getPropertyHelp(keys.rtLifetime(),"enter the refresh lifetime in sec.", rtString);
 
             if (rawLifetime == null || rawLifetime.length() == 0 || rawLifetime.toLowerCase().equals(NONE)) {
                 oa2Client.setRtLifetime(0);
@@ -229,7 +229,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
             }
         }
         boolean publicClient = oa2Client.isPublicClient();
-        String rawPC = getInput("is this client public?", Boolean.toString(publicClient));
+        String rawPC = getPropertyHelp(keys.publicClient(),"is this client public?", Boolean.toString(publicClient));
         if (rawPC != null && rawPC.toLowerCase().equalsIgnoreCase("y") || rawPC.toLowerCase().equalsIgnoreCase("yes")) {
             rawPC = "true";
         }
@@ -240,12 +240,12 @@ public class OA2ClientCommands extends ClientStoreCommands {
             sayi("Sorry, but unable to parse the response of \"" + rawPC + "\". No change.");
         }
 
-        String issuer = getInput("enter the issuer (optional)", oa2Client.getIssuer());
+        String issuer = getPropertyHelp(keys.issuer(),"enter the issuer (optional)", oa2Client.getIssuer());
         if (!isEmpty(issuer)) {
             oa2Client.setIssuer(issuer);
         }
 
-        String signTokens = getInput("Enable ID token signing (true/false)?", Boolean.toString(oa2Client.isSignTokens()));
+        String signTokens = getPropertyHelp(keys.signTokens(),"Enable ID token signing (true/false)?", Boolean.toString(oa2Client.isSignTokens()));
         if (!isEmpty(signTokens)) {
             try {
                 oa2Client.setSignTokens(Boolean.parseBoolean(signTokens));
@@ -267,7 +267,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
                 }
             }
         }
-        String scopes = getInput("enter a comma separated list of scopes. Scopes to this server will be rejected.", currentScopes);
+        String scopes = getPropertyHelp(keys.scopes(),"enter a comma separated list of scopes. Scopes to this server will be rejected.", currentScopes);
 
         if (!(scopes == null || scopes.isEmpty())) {
             LinkedList<String> list = new LinkedList<>();
@@ -296,7 +296,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
                 }
             }
         }
-        String uris = getInput("enter a comma separated list of callback uris. These must start with https or they will be ignored.", currentUris);
+        String uris = getPropertyHelp(keys.callbackUri(),"enter a comma separated list of callback uris. These must start with https or they will be ignored.", currentUris);
 
         if (!StringUtils.isTrivial(uris)) {
             StringTokenizer stringTokenizer = new StringTokenizer(uris, ",");
@@ -342,14 +342,13 @@ public class OA2ClientCommands extends ClientStoreCommands {
 
         }
         // CIL-1507 simplify cfg entry
-        OA2ClientKeys keys = (OA2ClientKeys) getMapConverter().getKeys();
-        boolean doCfg = getInput("Edit the " + keys.cfg() + " (as JSON)? (y/n)", "n").equalsIgnoreCase("y");
-        if(doCfg){
+        boolean doCfg = getPropertyHelp(keys.cfg(),"Edit the " + keys.cfg() + " (as JSON)? (y/n)", "n").equalsIgnoreCase("y");
+        if (doCfg) {
             JSONObject newConfig = inputJSON(client.getConfig(), "client configuration");
             if (newConfig != null) {
                 client.setConfig(newConfig);
             }
-        } else{
+        } else {
             say("skipped");
         }
 /*    old way -- allowed for editing components of QDL script reference. Now that is way too complex
@@ -384,6 +383,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
      * Attempt to let users construct qdl script references on the fly from components.
      * This is turning into a bad idea (too complex and clunky to really bother with)
      * vis-a-vis just pasting the thing.
+     *
      * @param currentConfig
      * @return
      * @throws IOException
@@ -407,10 +407,14 @@ public class OA2ClientCommands extends ClientStoreCommands {
                 break;*/
             case "e":
                 ScriptSet scriptSet = QDLJSONConfigUtil.readScriptSet(currentConfig);
-                QDLCLICommands qdlcliCommands = new QDLCLICommands(logger, scriptSet);
-                CLIDriver driver = new CLIDriver(qdlcliCommands);
-                driver.start();
-                result = QDLJSONConfigUtil.scriptSetToJSON(qdlcliCommands.getScriptSet());
+                try {
+                    QDLCLICommands qdlcliCommands = new QDLCLICommands(logger, scriptSet);
+                    CLIDriver driver = new CLIDriver(qdlcliCommands);
+                    driver.start();
+                    result = QDLJSONConfigUtil.scriptSetToJSON(qdlcliCommands.getScriptSet());
+                }catch(Throwable t){
+                    say("failed to start QDL CLI. This is deprecated too...");
+                }
                 break;
             case "f":
                 say("Enter the name of a QDL script. Generally if the name is the same as the execution phase");
@@ -493,7 +497,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
         say("If you need to create a hash of a secret, invoke the create_hash method on the secret");
     }
 
-    public OA2ClientCommands(MyLoggingFacade logger, Store store) {
+    public OA2ClientCommands(MyLoggingFacade logger, Store store) throws Throwable {
         super(logger, store);
     }
 
@@ -509,9 +513,11 @@ public class OA2ClientCommands extends ClientStoreCommands {
 
         return super.updateSingleValue(map, key);
     }
-     public static String NO_STILE_FLAG = "-noStile";
+
+    public static String NO_STILE_FLAG = "-noStile";
+
     public void get_comment(InputLine inputLine) throws Throwable {
-        if(showHelp(inputLine)){
+        if (showHelp(inputLine)) {
             say("get_comment [" + NO_STILE_FLAG + "- display the comment for a give object");
             say(NO_STILE_FLAG + " - do not show the stile (|) when printing comments");
             say("See also: set_comment");
@@ -531,12 +537,14 @@ public class OA2ClientCommands extends ClientStoreCommands {
             return;
         }
         for (String comment : comments)
-            say((noStile?"":"|")+comment);
+            say((noStile ? "" : "|") + comment);
     }
+
     public static String END_COMMENT_INPUT_CHAR = ".";
     public static String ABORT_COMMENT_INPUT_CHAR = ")";
-    public void set_comment(InputLine inputLine) throws Throwable{
-        if(showHelp(inputLine)){
+
+    public void set_comment(InputLine inputLine) throws Throwable {
+        if (showHelp(inputLine)) {
             say("set_comment - input a comment line by line");
             say("Note that input ends when the very first character on a line is a " + END_COMMENT_INPUT_CHAR);
             say("Note that if you want to abort, the first character on a line is a " + ABORT_COMMENT_INPUT_CHAR);
@@ -553,8 +561,8 @@ public class OA2ClientCommands extends ClientStoreCommands {
         say("Input your comment. Starting a line with a " + END_COMMENT_INPUT_CHAR + " ends input, " + ABORT_COMMENT_INPUT_CHAR + " aborts input.");
         List<String> comments = new ArrayList<>();
         String comment = readline();
-        while(!comment.startsWith(END_COMMENT_INPUT_CHAR)){
-            if(comment.startsWith(ABORT_COMMENT_INPUT_CHAR)){
+        while (!comment.startsWith(END_COMMENT_INPUT_CHAR)) {
+            if (comment.startsWith(ABORT_COMMENT_INPUT_CHAR)) {
                 say("input aborted. returning...");
                 return;
             }
@@ -565,14 +573,14 @@ public class OA2ClientCommands extends ClientStoreCommands {
         getStore().save(oa2Client);
     }
 
-    public void resolve(InputLine inputLine)throws Exception{
-        if(showHelp(inputLine)){
-            sayi("resolve [id] - resolve a client and show it");
+    public void resolve(InputLine inputLine) throws Exception {
+        if (showHelp(inputLine)) {
+            sayi("resolve [id] - resolve a client from its prototypes (if any) and show it");
             sayi("See also: serialize");
             return;
         }
         Identifiable identifiable = findItem(inputLine);
-        if(identifiable == null){
+        if (identifiable == null) {
             say("no such client");
             return;
         }
@@ -582,12 +590,12 @@ public class OA2ClientCommands extends ClientStoreCommands {
 
     @Override
     protected void showSerializeHelp() {
-            say("serialize  [-file path] [-resolve] index");
-            sayi("Usage: XML serializes an object and either shows it on the ");
-            sayi("   command line or put it in a file. Cf. deserialize.");
-            sayi("-resolve - if this has prototypes, resolve them all and serialize the ");
-            sayi("   resulting object");
-            sayi("See also: deserialize.");
+        say("serialize  [-file path] [-resolve] index");
+        sayi("Usage: XML serializes an object and either shows it on the ");
+        sayi("   command line or put it in a file. Cf. deserialize.");
+        sayi("-resolve - if this has prototypes, resolve them all and serialize the ");
+        sayi("   resulting object");
+        sayi("See also: deserialize.");
     }
 
     @Override
@@ -601,9 +609,60 @@ public class OA2ClientCommands extends ClientStoreCommands {
             say("object not found");
             return;
         }
-        if(inputLine.hasArg("-resolve")){
+        if (inputLine.hasArg("-resolve")) {
             x = OA2ClientUtils.resolvePrototypes((ClientStore) getStore(), (OA2Client) x);
         }
         serialize(inputLine, x);
     }
+
+    public void ea_support(InputLine inputLine) throws Exception {
+        if (showHelp(inputLine)) {
+            say("ea_support [arg] - show or toggle client extended attribute support");
+            say(" if arg is missing, show the current value");
+            say(" if arg is present it must be one of on|true or off|false");
+            say("extended attributes are namespace qualified attributes that a client may");
+            say("pass in and are simply forwarded to the scripting engine in the variable xas.");
+            say("E.g.");
+            say("A typical use would be to pass along the parameter oa4mp:/tokens/access/lifetime=900000");
+            say("which would result in the value for xas. of ");
+            say("{oa4mp:\n" +
+                    "  {/tokens/access/lifetime:900000}\n" +
+                    "}");
+            say("in the QDL runtime environment. OA4MP does nothing with these except pass them through.");
+            return;
+        }
+        Identifiable x = findItem(inputLine);
+        if (x == null) {
+            say("object not found");
+            return;
+        }
+        OA2Client client = (OA2Client) x;
+        if (!inputLine.hasArgs()) {
+            say("has extended attribute support? " + ((OA2Client) x).hasExtendedAttributeSupport());
+            return;
+        }
+        boolean enable = inputLine.getLastArg().equalsIgnoreCase("on") || inputLine.getLastArg().equalsIgnoreCase("true");
+        boolean disable = inputLine.getLastArg().equalsIgnoreCase("off") || inputLine.getLastArg().equalsIgnoreCase("false");
+        if (enable || disable) {
+            if (enable) {
+                client.setExtendedAttributeSupport(true);
+                say("extended attribute support enabled");
+            }
+            if (disable) {
+                client.setExtendedAttributeSupport(false);
+                say("extended attribute support disabled");
+            }
+            getStore().save(client);
+            return;
+        } else {
+            say("unrecognized option \"" + inputLine.getLastArg() + "\"");
+        }
+    }
+
+    @Override
+    public void bootstrap() throws Throwable {
+        super.bootstrap();
+        getHelpUtil().load("/help/client_help.xml");
+    }
+
 }

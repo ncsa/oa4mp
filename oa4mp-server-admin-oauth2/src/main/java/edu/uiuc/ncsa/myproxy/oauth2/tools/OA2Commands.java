@@ -3,7 +3,6 @@ package edu.uiuc.ncsa.myproxy.oauth2.tools;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.functor.claims.OA2FunctorFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2ConfigurationLoader;
-import edu.uiuc.ncsa.myproxy.oa4mp.qdl.util.SigningCommands;
 import edu.uiuc.ncsa.myproxy.oauth2.base.BaseCommands;
 import edu.uiuc.ncsa.myproxy.oauth2.base.ClientStoreCommands;
 import edu.uiuc.ncsa.myproxy.oauth2.base.CopyCommands;
@@ -11,10 +10,7 @@ import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
 import edu.uiuc.ncsa.security.core.util.LoggingConfigLoader;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.util.cli.CLIDriver;
-import edu.uiuc.ncsa.security.util.cli.CommonCommands;
-import edu.uiuc.ncsa.security.util.cli.InputLine;
-import edu.uiuc.ncsa.security.util.cli.ParserCommands;
+import edu.uiuc.ncsa.security.util.cli.*;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.HashMap;
@@ -63,7 +59,7 @@ public class OA2Commands extends BaseCommands {
     }
 
     @Override
-    public ParserCommands getNewParserCommands() throws Exception {
+    public ParserCommands getNewParserCommands() throws Throwable {
         OA2FunctorFactory ff = new OA2FunctorFactory(new HashMap<String, Object>(), new LinkedList<String>());
         ff.setVerboseOn(true);
         return new ParserCommands(getMyLogger(), ff);
@@ -90,11 +86,11 @@ public class OA2Commands extends BaseCommands {
         say("you specify the component as use + name. Supported components are");
         say(CLIENTS + " - edit client records");
         say(CLIENT_APPROVALS + " - edit client approval records");
-        say(COPY + " - copy an entire store.");
-        say(KEYS + " - create a set of signing keys.");
+    //    say(COPY + " - copy an entire store.");
+    //    say(KEYS + " - create a set of signing keys.");
         say(PERMISSIONS + " - basic permission management.");
         say(ADMINS + " - create or manage administrative clients.");
-        say(PARSER_COMMAND + " - write/debug scripts from the command line.");
+    //    say(PARSER_COMMAND + " - write/debug scripts from the command line.");
         say(TOKENS + " - manage tokens created in the token exchange endpoint");
         say(VIRTUAL_ORGANIZATION + " - manage virtual organizations");
 //        say(JSON + " - enter JSON snippets to be used by the system in client configurations.\n");
@@ -122,7 +118,7 @@ public class OA2Commands extends BaseCommands {
     OA2ClientCommands oa2ClientCommands = null;
 
     @Override
-    public ClientStoreCommands getNewClientStoreCommands() throws Exception {
+    public ClientStoreCommands getNewClientStoreCommands() throws Throwable{
         if (oa2ClientCommands == null) {
             oa2ClientCommands = new OA2ClientCommands(getMyLogger(),
                     "  ",
@@ -135,13 +131,13 @@ public class OA2Commands extends BaseCommands {
     }
 
     @Override
-    public CopyCommands getNewCopyCommands() throws Exception {
+    public CopyCommands getNewCopyCommands() throws Throwable {
         return new CopyCommands(getMyLogger(), new OA2CopyTool(), new OA2CopyToolVerifier(), getConfigFile());
     }
 
     TokenStoreCommands tokenStoreCommands = null;
 
-    protected CommonCommands getTokenCommands() throws Exception {
+    protected CommonCommands getTokenCommands() throws Throwable {
         if (tokenStoreCommands == null) {
             tokenStoreCommands = new TokenStoreCommands(getMyLogger(), "  ", getOA2SE().getTxStore());
         }
@@ -151,7 +147,7 @@ public class OA2Commands extends BaseCommands {
 
     VOCommands voCommands;
 
-    protected VOCommands getVOCommands() throws Exception {
+    protected VOCommands getVOCommands() throws Throwable {
         if (voCommands == null) {
             voCommands = new VOCommands(getMyLogger(), "  ", getOA2SE().getVOStore());
         }
@@ -161,7 +157,7 @@ public class OA2Commands extends BaseCommands {
     TransactionStoreCommands transactionStoreCommands = null;
 
     @Override
-    protected CommonCommands getTransactionCommands() throws Exception {
+    protected CommonCommands getTransactionCommands() throws Throwable {
         if (transactionStoreCommands == null) {
             transactionStoreCommands = new TransactionStoreCommands(getMyLogger(),
                     "  ",
@@ -174,7 +170,7 @@ public class OA2Commands extends BaseCommands {
 
     OA2AdminClientCommands oa2AdminClientCommands = null;
 
-    public OA2AdminClientCommands getAdminClientCommands() throws Exception {
+    public OA2AdminClientCommands getAdminClientCommands() throws Throwable {
         if (oa2AdminClientCommands == null) {
             oa2AdminClientCommands = new OA2AdminClientCommands(getMyLogger(),
                     "  ",
@@ -188,7 +184,7 @@ public class OA2Commands extends BaseCommands {
 
     OA2PermissionCommands oa2PermissionCommands = null;
 
-    public OA2PermissionCommands getPermissionCommands() throws Exception {
+    public OA2PermissionCommands getPermissionCommands() throws Throwable {
         if (oa2PermissionCommands == null) {
             oa2PermissionCommands = new OA2PermissionCommands(getMyLogger(), "  ", getOA2SE().getPermissionStore());
         }
@@ -196,14 +192,14 @@ public class OA2Commands extends BaseCommands {
     }
 
     @Override
-    public boolean use(InputLine inputLine) throws Exception {
+    public boolean use(InputLine inputLine) throws Throwable {
         CommonCommands commands = null;
         if (inputLine.hasArg(ADMINS)) {
             commands = getAdminClientCommands();
         }
-        if (inputLine.hasArg(KEYS)) {
+  /*      if (inputLine.hasArg(KEYS)) {
             commands = new SigningCommands(getOA2SE());
-        }
+        }*/
         if (inputLine.hasArg(PERMISSIONS)) {
             commands = getPermissionCommands();
         }
@@ -222,5 +218,15 @@ public class OA2Commands extends BaseCommands {
         }
         say("(no such component)");
         return false;
+    }
+
+    @Override
+    public void bootstrap() throws Throwable {
+
+    }
+      HelpUtil helpUtil = new HelpUtil();
+    @Override
+    public HelpUtil getHelpUtil() {
+        return helpUtil;
     }
 }

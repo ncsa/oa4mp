@@ -1,16 +1,17 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2ConfigurationLoader;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
+import edu.uiuc.ncsa.oa4mp.delegation.common.servlet.TransactionState;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.*;
+import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
-import edu.uiuc.ncsa.oa4mp.delegation.common.servlet.TransactionState;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.*;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.http.HttpStatus;
 
@@ -60,6 +61,10 @@ public class ClientUtils {
     server default 97
      */
     public static long computeATLifetime(OA2ServiceTransaction st2, OA2SE oa2SE) {
+     return computeATLifetimeOLD(st2, oa2SE);
+    }
+
+    protected static long computeATLifetimeOLD(OA2ServiceTransaction st2, OA2SE oa2SE) {
 //        OA2SE oa2SE = (OA2SE) getServiceEnvironment();
         // If the server default is <= 0 that implies there is some misconfiguration. Better to find that out here than
         // get squirrelly results later.
@@ -93,6 +98,41 @@ public class ClientUtils {
 
     }
 
+    protected static long computeATLifetimeNEW(OA2ServiceTransaction st2, OA2SE oa2SE) {
+//        OA2SE oa2SE = (OA2SE) getServiceEnvironment();
+        // If the server default is <= 0 that implies there is some misconfiguration. Better to find that out here than
+        // get squirrelly results later.
+        if (oa2SE.getMaxATLifetime() <= 0) {
+            throw new NFWException("Internal error: the server-wide default for the access token lifetime has not been set.");
+        }
+        OA2Client client = (OA2Client) st2.getClient();
+        if(0<client.getMaxATLifetime()){
+            st2.setMaxATLifetime(Math.min(client.getMaxATLifetime(), oa2SE.getMaxATLifetime())); // absolute max allowed on this server for this request
+        }else{
+            st2.setMaxATLifetime(oa2SE.getMaxATLifetime()); // absolute max allowed on this server for this request
+        }
+
+        long lifetime = -1L;
+        if (0 < client.getAtLifetime()) {
+            lifetime = Math.min(st2.getMaxAtLifetime(),client.getAtLifetime());
+        } else {
+            lifetime = Math.min(st2.getMaxAtLifetime(), OA2ConfigurationLoader.ACCESS_TOKEN_LIFETIME_DEFAULT);
+        }
+
+        if (client.hasAccessTokenConfig()) {
+            if (0 < client.getAccessTokensConfig().getLifetime()) {
+                lifetime = Math.min(client.getAccessTokensConfig().getLifetime(), st2.getMaxAtLifetime());
+            }
+        }
+
+        // If the transaction has a specific request, take it in to account.
+        if (0 < st2.getRequestedATLifetime()) {
+            lifetime = Math.min(st2.getRequestedATLifetime(), st2.getMaxAtLifetime());
+        }
+        return lifetime;
+
+    }
+
     /**
      * The lifetime of the refresh token. This is the non-zero minimum of the client's requested
      * lifetime, the user's request at authorization time and the server global limit.
@@ -101,37 +141,84 @@ public class ClientUtils {
      * @return
      */
     public static long computeRefreshLifetime(OA2ServiceTransaction st2, OA2SE oa2SE) {
-//        OA2SE oa2SE = (OA2SE) getServiceEnvironment();
-        if (!oa2SE.isRefreshTokenEnabled()) {
-            throw new NFWException("Internal error: Refresh tokens are disabled for this server.");
-        }
-        if (oa2SE.getMaxRTLifetime() <= 0) {
-            throw new NFWException("Internal error: Either refresh tokens are disabled for this server, or the server-wide default for the refresh token lifetime has not been set.");
-        }
-        long lifetime = -1L;
-
-        OA2Client client = (OA2Client) st2.getClient();
-        if (0 < client.getRtLifetime()) {
-            lifetime = Math.min(oa2SE.getMaxRTLifetime(), client.getRtLifetime());
-        }else{
-            lifetime = OA2ConfigurationLoader.REFRESH_TOKEN_LIFETIME_DEFAULT;
-        }
-        st2.setMaxRTLifetime(lifetime);// absolute max allowed on this server for this request
-
-        if (client.hasRefreshTokenConfig()) {
-            if (0 < client.getRefreshTokensConfig().getLifetime()) {
-                lifetime = Math.min(client.getRefreshTokensConfig().getLifetime(), lifetime);
-            }
-        }
-        if (0 < st2.getRequestedRTLifetime()) {
-            // IF they specified a refresh token lifetime in the request, take the minimum of that
-            // and whatever they client is allowed.
-            lifetime = Math.min(st2.getRequestedRTLifetime(), lifetime);
-        }
-
-        return lifetime;
+        return computeRefreshLifetimeNEW(st2, oa2SE);
+        //return computeRefreshLifetimeOLD(st2, oa2SE);
     }
 
+    public static long computeRefreshLifetimeOLD(OA2ServiceTransaction st2, OA2SE oa2SE) {
+ //        OA2SE oa2SE = (OA2SE) getServiceEnvironment();
+         if (!oa2SE.isRefreshTokenEnabled()) {
+             throw new NFWException("Internal error: Refresh tokens are disabled for this server.");
+         }
+         if (oa2SE.getMaxRTLifetime() <= 0) {
+             throw new NFWException("Internal error: Either refresh tokens are disabled for this server, or the server-wide default for the refresh token lifetime has not been set.");
+         }
+         long lifetime = -1L;
+
+         OA2Client client = (OA2Client) st2.getClient();
+         if (0 < client.getRtLifetime()) {
+             lifetime = Math.min(oa2SE.getMaxRTLifetime(), client.getRtLifetime());
+         }else{
+             lifetime = OA2ConfigurationLoader.REFRESH_TOKEN_LIFETIME_DEFAULT;
+         }
+         st2.setMaxRTLifetime(lifetime);// absolute max allowed on this server for this request
+
+         if (client.hasRefreshTokenConfig()) {
+             if (0 < client.getRefreshTokensConfig().getLifetime()) {
+                 lifetime = Math.min(client.getRefreshTokensConfig().getLifetime(), lifetime);
+             }
+         }
+         if (0 < st2.getRequestedRTLifetime()) {
+             // IF they specified a refresh token lifetime in the request, take the minimum of that
+             // and whatever they client is allowed.
+             lifetime = Math.min(st2.getRequestedRTLifetime(), lifetime);
+         }
+
+         return lifetime;
+     }
+
+    public static long computeRefreshLifetimeNEW(OA2ServiceTransaction st2, OA2SE oa2SE) {
+ //        OA2SE oa2SE = (OA2SE) getServiceEnvironment();
+         if (!oa2SE.isRefreshTokenEnabled()) {
+             throw new NFWException("Internal error: Refresh tokens are disabled for this server.");
+         }
+         if (oa2SE.getMaxRTLifetime() <= 0) {
+             throw new NFWException("Internal error: Either refresh tokens are disabled for this server, or the server-wide default for the refresh token lifetime has not been set.");
+         }
+
+
+         OA2Client client = (OA2Client) st2.getClient();
+         if(!client.isRTLifetimeEnabled()){
+             throw new GeneralException("refresh tokens are not enabled for this client");
+         }
+
+         if(0<client.getMaxRTLifetime()){
+             st2.setMaxRTLifetime(Math.min(oa2SE.getMaxRTLifetime(), client.getMaxRTLifetime()));
+         }else{
+             st2.setMaxRTLifetime(oa2SE.getMaxRTLifetime());
+         }
+
+        long lifetime = -1L; // just to get started
+
+         if (0 < client.getRtLifetime()) {
+             // Always check against the server max, since that may change without warning and you do not
+             // want to issue tokens that exceed it.
+             lifetime = Math.min(st2.getMaxRtLifetime(), client.getRtLifetime());
+         }else{
+             lifetime = Math.min(st2.getMaxRtLifetime(), OA2ConfigurationLoader.REFRESH_TOKEN_LIFETIME_DEFAULT);
+         }
+
+         if (client.hasRefreshTokenConfig()) {
+             if (0 < client.getRefreshTokensConfig().getLifetime()) {
+                 lifetime = Math.min(st2.getMaxRtLifetime(), client.getRefreshTokensConfig().getLifetime());
+             }
+         }
+         if (0 < st2.getRequestedRTLifetime()) {
+             lifetime = Math.min(st2.getMaxRtLifetime(), st2.getRequestedRTLifetime());
+         }
+         // AND QDL scripts can just reset it directly.
+         return lifetime;
+     }
     /**
      * This verifies secrets only call if the client has a secret (e.g. do not call this
      * if the client is public). This is because it will do various checks in the assumption

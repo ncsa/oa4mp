@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oauth2.base;
 
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.ClientApprovalKeys;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
@@ -22,11 +23,11 @@ public class ClientApprovalStoreCommands extends StoreCommands2 {
     public void extraUpdates(Identifiable identifiable) {
     }
 
-    public ClientApprovalStoreCommands(MyLoggingFacade logger, String defaultIndent, Store store) {
+    public ClientApprovalStoreCommands(MyLoggingFacade logger, String defaultIndent, Store store) throws Throwable {
         super(logger, defaultIndent, store);
     }
 
-    public ClientApprovalStoreCommands(MyLoggingFacade logger, Store store) {
+    public ClientApprovalStoreCommands(MyLoggingFacade logger, Store store) throws Throwable {
         super(logger, store);
     }
 
@@ -41,8 +42,10 @@ public class ClientApprovalStoreCommands extends StoreCommands2 {
                 statusString = "A";
                 break;
             case DENIED:
-            case REVOKED:
                 statusString = "D";
+                break;
+            case REVOKED:
+                statusString = "R";
                 break;
             case PENDING:
             case NONE:
@@ -62,10 +65,11 @@ public class ClientApprovalStoreCommands extends StoreCommands2 {
     @Override
     public boolean update(Identifiable identifiable) throws IOException {
         ClientApproval clientApproval = (ClientApproval) identifiable;
+        ClientApprovalKeys keys = (ClientApprovalKeys)getMapConverter().getKeys();
         info("Starting update for client approval id=" + identifiable.getIdentifierString());
         sayi("Enter the information for the client approval");
-        clientApproval.setApprover(getInput("name of the approver", clientApproval.getApprover()));
-        boolean isapproved = isOk(getInput("set approved?", clientApproval.isApproved() ? "y" : "n"));
+        clientApproval.setApprover(getPropertyHelp(keys.approver(),"name of the approver", clientApproval.getApprover()));
+        boolean isapproved = isOk(getPropertyHelp(keys.approved(),"set approved?", clientApproval.isApproved() ? "y" : "n"));
         if (isapproved) {
             clientApproval.setApproved(true);
             clientApproval.setStatus(ClientApproval.Status.APPROVED);
@@ -95,11 +99,13 @@ public class ClientApprovalStoreCommands extends StoreCommands2 {
     }
 
     public void showApproveHelp() {
-        say("This will write the correct approval record for a given client. ");
+        say("This is the simple case of approving a client.");
+        say("If you need to set the status to something other than 'approved',");
+        say("use the set_status command.");
         say("Syntax:\n");
-        say("approve [number]\n");
-        say("where number refers to the index of the client entry. The approval record will be for that client");
-        say("If you do not supply the number, then the list of clients will be displayed and you may choose then");
+        say("approve [id | number]\n");
+        say("The approval record will be for that client");
+        say("\nSee also: set_status");
     }
 
     public void approve(InputLine inputLine) throws IOException {
@@ -110,6 +116,66 @@ public class ClientApprovalStoreCommands extends StoreCommands2 {
 
         ClientApproval ca = (ClientApproval) findItem(inputLine);
         approve(ca);
+    }
+
+    public void set_status(InputLine inputLine) throws IOException {
+        if (showHelp(inputLine)) {
+            say("set_status [id] [new_status] will set the status for the given/current record.");
+            say("This is more reliable than simply updating the status property manually.");
+            say("If new_status is given, then it will be set to that and the previous status displayed.");
+            say("If new_status is missing, you will be prompted. Allowed values for new_status are");
+            say("a | approved");
+            say("d | denied");
+            say("n | none");
+            say("p | pending");
+            say("r | revoked");
+            say("\nand any value not on this list is rejected.");
+            return;
+        }
+        Identifiable item = findItem(inputLine);
+        if (item == null) {
+            say("sorry, no record found.");
+            return;
+        }
+        ClientApproval approval = (ClientApproval) item;
+        String newStatus = null;
+        if (inputLine.getArgCount() == 0) {
+            newStatus = getInput("enter new status", "a");
+        } else {
+            newStatus = inputLine.getLastArg();
+        }
+        switch (newStatus) {
+            case "a":
+            case "approved":
+                approval.setStatus(ClientApproval.Status.APPROVED);
+                approval.setApproved(true);
+                break;
+            case "d":
+            case "denied":
+                approval.setStatus(ClientApproval.Status.DENIED);
+                approval.setApproved(false);
+                break;
+            case "n":
+            case "none":
+                approval.setStatus(ClientApproval.Status.NONE);
+                approval.setApproved(false);
+                break;
+            case "p":
+            case "pending":
+                approval.setStatus(ClientApproval.Status.PENDING);
+                approval.setApproved(false);
+                break;
+            case "r":
+            case "revoked":
+                approval.setStatus(ClientApproval.Status.REVOKED);
+                approval.setApproved(false);
+                break;
+            default:
+                say("unrecognized status \"" + newStatus + "\".");
+                return;
+        }
+        getStore().save(approval);
+        say("done!");
     }
 
     public void approve(ClientApproval ca) throws IOException {
@@ -188,18 +254,24 @@ public class ClientApprovalStoreCommands extends StoreCommands2 {
             sayi(SHOW_UNAPPROVED_FLAG + " - show only unapproved records");
             sayi(SEARCH_SHORT_REGEX_FLAG + " - apply the regular expression to the identifier");
             say("E.g.");
-            sayi("show " + SEARCH_SHORT_REGEX_FLAG +  " qdl.*");
+            sayi("show " + SEARCH_SHORT_REGEX_FLAG + " qdl.*");
             sayi("shows all approved clients whose identifier starts with qdl");
-            sayi("show " + SHOW_UNAPPROVED_FLAG + " "  + SEARCH_SHORT_REGEX_FLAG +" qdl.*");
+            sayi("show " + SHOW_UNAPPROVED_FLAG + " " + SEARCH_SHORT_REGEX_FLAG + " qdl.*");
             sayi("shows all UNapproved clients whose identifier starts with qdl");
         }
         boolean showApproved = !inputLine.hasArg(SHOW_UNAPPROVED_FLAG);
         inputLine.removeSwitch(SHOW_UNAPPROVED_FLAG);
         String regex = null;
-        if(inputLine.hasArg(SEARCH_SHORT_REGEX_FLAG)){
+        if (inputLine.hasArg(SEARCH_SHORT_REGEX_FLAG)) {
             regex = inputLine.getNextArgFor(SEARCH_SHORT_REGEX_FLAG);
             inputLine.removeSwitchAndValue(SEARCH_SHORT_REGEX_FLAG);
         }
         show(showApproved, regex);
+    }
+
+    @Override
+    public void bootstrap() throws Throwable {
+        super.bootstrap();
+        getHelpUtil().load("/help/approver_help.xml");
     }
 }

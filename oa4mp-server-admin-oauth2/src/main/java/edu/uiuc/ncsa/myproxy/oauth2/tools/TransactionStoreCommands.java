@@ -37,7 +37,7 @@ import static edu.uiuc.ncsa.security.core.util.StringUtils.pad2;
  * on 11/16/20 at  3:16 PM
  */
 public class TransactionStoreCommands extends StoreCommands2 {
-    public TransactionStoreCommands(MyLoggingFacade logger, String defaultIndent, OA2SE oa2se) {
+    public TransactionStoreCommands(MyLoggingFacade logger, String defaultIndent, OA2SE oa2se) throws Throwable {
         super(logger, defaultIndent, oa2se.getTransactionStore());
         this.oa2se = oa2se;
         this.txStore = oa2se.getTxStore();
@@ -51,7 +51,7 @@ public class TransactionStoreCommands extends StoreCommands2 {
 
     TXStore<? extends TXRecord> txStore;
 
-    public TransactionStoreCommands(MyLoggingFacade logger, Store store) {
+    public TransactionStoreCommands(MyLoggingFacade logger, Store store) throws Throwable {
         super(logger, store);
     }
 
@@ -691,5 +691,9 @@ public class TransactionStoreCommands extends StoreCommands2 {
         return;
     }
 
-
+    @Override
+    public void bootstrap() throws Throwable {
+        super.bootstrap();
+        getHelpUtil().load("/help/transaction_help.xml");
+    }
 }

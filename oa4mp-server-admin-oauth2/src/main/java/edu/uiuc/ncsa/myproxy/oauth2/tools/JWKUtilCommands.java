@@ -1,17 +1,20 @@
 package edu.uiuc.ncsa.myproxy.oauth2.tools;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.qdl.util.SigningCommands;
-import edu.uiuc.ncsa.security.core.util.FileUtil;
-import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.JWTUtil;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims;
+import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.core.util.FileUtil;
+import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.servlet.ServiceClient;
 import edu.uiuc.ncsa.security.util.cli.CommonCommands;
+import edu.uiuc.ncsa.security.util.cli.HelpUtil;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
+import edu.uiuc.ncsa.security.util.crypto.KeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
-import edu.uiuc.ncsa.security.util.crypto.KeyUtil;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -35,15 +38,24 @@ import static edu.uiuc.ncsa.oa4mp.delegation.oa2.JWTUtil.getJsonWebKeys;
  * on 5/6/19 at  2:39 PM
  */
 public class JWKUtilCommands extends CommonCommands {
-    // END OF Batch File processing stuff.
 
-    public JWKUtilCommands(MyLoggingFacade logger) {
+    public JWKUtilCommands(MyLoggingFacade logger) throws Throwable {
         super(logger);
     }
 
     @Override
     public String getPrompt() {
         return "jwk>";
+    }
+
+    @Override
+    public void bootstrap() throws Throwable {
+
+    }
+
+    @Override
+    public HelpUtil getHelpUtil() {
+        return null;
     }
 
     public static String JWK_EXTENSION = "jwk";
@@ -75,6 +87,27 @@ public class JWKUtilCommands extends CommonCommands {
     }
 
     /**
+     * Little fudging of Throwable vs Exceptions. Introspection requires that certain methods
+     * only throw {@link Exception} and the constructor throws {@link Throwable}.
+     *
+     * @param oa2SE
+     * @return
+     * @throws Exception
+     */
+    protected SigningCommands createSG(OA2SE oa2SE) throws Exception {
+        SigningCommands sg;
+        try {
+            sg = new SigningCommands(oa2SE);
+            return sg;
+        } catch (Throwable t) {
+            if (t instanceof Exception) {
+                throw (Exception) t;
+            }
+            throw new GeneralException("error creating signing commands", t);
+        }
+    }
+
+    /**
      * Generate and add keys to an existing key set. If the key set is empty or missing, it will be created.
      * Note that this generates full sets of keys. If a file is specified, then that will be updated rather than
      * the currently active set of keys.
@@ -103,8 +136,7 @@ public class JWKUtilCommands extends CommonCommands {
             String contents = readFile(inputLine.getNextArgFor(CL_INPUT_FILE_FLAG));
             sourceKeys = JSONWebKeyUtil.fromJSON(contents);
         }
-
-        SigningCommands sg = new SigningCommands(null);
+        SigningCommands sg = createSG(null);
         JSONWebKeys keys = sg.createJsonWebKeys();
         JSONObject jwks = JSONWebKeyUtil.toJSON(keys);
         // While really unlikely that there would be a key collision, having one could be catastrophic
@@ -142,7 +174,7 @@ public class JWKUtilCommands extends CommonCommands {
         // Fingers and toes cases
         // #1 no arguments, create the keys and dump to std out
         if (!inputLine.hasArgs()) {
-            SigningCommands sg = new SigningCommands(null);
+            SigningCommands sg = createSG(null);
             sg.setBatchMode(isBatchMode());
             sg.create(inputLine);
             return;
@@ -188,7 +220,7 @@ public class JWKUtilCommands extends CommonCommands {
         if (!isPublic) {
 
             // next case is to just generate the full key set
-            SigningCommands sg = new SigningCommands(null);
+            SigningCommands sg = createSG(null);
             JSONWebKeys keys;
             if (createSingleKey) {
                 keys = new JSONWebKeys(null);
@@ -234,7 +266,7 @@ public class JWKUtilCommands extends CommonCommands {
 
     }
 
-    public void create_password(InputLine inputLine) {
+    public void create_password(InputLine inputLine) throws Exception{
         if (showHelp(inputLine)) {
             sayi("create_password [length] - create a password with the given length in bytes.");
             sayi("No argument implies an 8 byte password. Result is printed to standard out.");
@@ -244,7 +276,7 @@ public class JWKUtilCommands extends CommonCommands {
             sayi("\n6 bytes creates a password that is 6*(4/3) = 8 characters long.");
             return;
         }
-        SigningCommands signingCommands = new SigningCommands(null);
+        SigningCommands signingCommands = createSG(null);
         int defaultLength = 8;
         try {
             defaultLength = Integer.parseInt(inputLine.getLastArg()); // if it works, it works
@@ -259,8 +291,8 @@ public class JWKUtilCommands extends CommonCommands {
     }
 
 
-    public void create_symmetric_keys(InputLine inputLine) {
-        SigningCommands signingCommands = new SigningCommands(null);
+    public void create_symmetric_keys(InputLine inputLine) throws Exception{
+        SigningCommands signingCommands = createSG(null);
         // make sure these get propagated
         signingCommands.setBatchMode(isBatchMode());
         signingCommands.setBatchFile(isBatchFile());

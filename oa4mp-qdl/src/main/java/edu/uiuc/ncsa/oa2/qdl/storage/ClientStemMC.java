@@ -72,7 +72,7 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
             v.setSecret(stem.getString(kk().secret()));
         }
         // 9 attributes
-        /* Alphabetical list of OA2 client attributes. (16 of these)
+        /* Alphabetical list of OA2 client attributes. (18 of these)
          String atLifetime = "at_lifetime";
          String audience="audience";
          String callback_uri = "callback_uri";
@@ -85,6 +85,8 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
          String extended_attributes = "extended_attributes";
          String issuer = "issuer";
          String ldap = "ldap";
+         String maxATLifetime = "maxATLifetime";
+         String maxRTLifetime = "maxRTLifetime";
          String proxyClaims="proxy_claims";
          String publicClient="public_client";
 
@@ -167,6 +169,14 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
         if (stem.containsKey(kk().rtLifetime())) {
             v.setRtLifetime(stem.getLong(kk().rtLifetime()));
         }
+        if (stem.containsKey(kk().maxATLifetime())) {
+            v.setMaxATLifetime(stem.getLong(kk().maxATLifetime()));
+        }
+        if (stem.containsKey(kk().maxRTLifetime())) {
+            v.setMaxRTLifetime(stem.getLong(kk().maxRTLifetime()));
+        }
+
+
         if (stem.containsKey(kk().scopes())) {
             v.setScopes(toList(stem, kk().scopes()));
         }
@@ -226,6 +236,9 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
             ea.fromJSON(v.getExtendedAttributes());
             stem.put(kk().ea(), ea);
         }
+        stem.put(kk().maxATLifetime(), v.getMaxATLifetime());
+        stem.put(kk().maxRTLifetime(), v.getMaxRTLifetime());
+
         stem.put(kk().ersatzClient(), v.isErsatzClient());
 
         setNonNullStemValue(stem, kk().issuer(), v.getIssuer());

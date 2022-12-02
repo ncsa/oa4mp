@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oauth2.tools;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo.VOSerializationKeys;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo.VOStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo.VirtualOrganization;
 import edu.uiuc.ncsa.myproxy.oa4mp.qdl.util.SigningCommands;
@@ -29,7 +30,7 @@ import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
  * on 2/22/21 at  8:01 AM
  */
 public class VOCommands extends StoreCommands2 {
-    public VOCommands(MyLoggingFacade logger, String defaultIndent, Store store) {
+    public VOCommands(MyLoggingFacade logger, String defaultIndent, Store store) throws Throwable{
         super(logger, defaultIndent, store);
     }
 
@@ -37,7 +38,7 @@ public class VOCommands extends StoreCommands2 {
         return (VOStore) getStore();
     }
 
-    public VOCommands(MyLoggingFacade logger, Store store) {
+    public VOCommands(MyLoggingFacade logger, Store store) throws Throwable {
         super(logger, store);
     }
 
@@ -49,17 +50,18 @@ public class VOCommands extends StoreCommands2 {
     @Override
     public boolean update(Identifiable identifiable) throws IOException {
         VirtualOrganization vo = (VirtualOrganization) identifiable;
+        VOSerializationKeys keys = (VOSerializationKeys) getMapConverter().getKeys();
         String newIdentifier = null;
         info("Starting VO update for id = " + vo.getIdentifierString());
         say("Update the values. A return accepts the existing or default value in []'s");
-        newIdentifier = getInput("enter the identifier", vo.getIdentifierString());
+        newIdentifier = getPropertyHelp(keys.identifier(),"enter the identifier", vo.getIdentifierString());
         boolean removeCurrentVO = false;
         Identifier oldID = vo.getIdentifier();
 
-        vo.setTitle(getInput("enter the title", vo.getTitle()));
-        vo.setIssuer(getInput("enter the issuer", vo.getIssuer()));
-        vo.setAtIssuer(getInput("enter the access token issuer (if different)", vo.getAtIssuer()));
-        vo.setDiscoveryPath(getInput("enter the discovery path. NOTE this should be of the form host/path e.g.cilogon.org/ligo:", vo.getDiscoveryPath()));
+        vo.setTitle(getPropertyHelp(keys.title(),"enter the title", vo.getTitle()));
+        vo.setIssuer(getPropertyHelp(keys.issuer(),"enter the issuer", vo.getIssuer()));
+        vo.setAtIssuer(getPropertyHelp(keys.atIssuer(),"enter the access token issuer (if different)", vo.getAtIssuer()));
+        vo.setDiscoveryPath(getPropertyHelp(keys.discoveryPath(), "enter the discovery path. NOTE this should be of the form host/path e.g.cilogon.org/ligo:", vo.getDiscoveryPath()));
         String ok = getInput("Did you want to specify a file with the JSON web keys(y/n)", "n");
         if (!isTrivial(ok)) {
             if (ok.trim().toLowerCase().equals("y")) {
@@ -89,7 +91,7 @@ public class VOCommands extends StoreCommands2 {
                 }
 
             } else {
-                String rc = getInput("Did you want to create a new set?", "n");
+                String rc = getPropertyHelp(keys.jsonWebKeys(),"Did you want to create a new set?", "n");
                 if (rc.trim().toLowerCase().equals("y")) {
                     try {
                         newKeys(vo);
@@ -111,7 +113,7 @@ public class VOCommands extends StoreCommands2 {
                 }
             }
         }
-        vo.setDefaultKeyID(getInput("enter the default key id", defaultKey));
+        vo.setDefaultKeyID(getPropertyHelp(keys.defaultKeyID(),"enter the default key id", defaultKey));
         extraUpdates(vo);
         sayi("here is the complete virtual organization (VO):");
         longFormat(vo);
@@ -218,5 +220,11 @@ public class VOCommands extends StoreCommands2 {
     protected String format(Identifiable identifiable) {
         VirtualOrganization vo = (VirtualOrganization) identifiable;
         return vo.getIdentifierString() + " title:" + vo.getTitle() + " create time: " + (new Date(vo.getCreated()));
+    }
+
+    @Override
+    public void bootstrap() throws Throwable {
+        super.bootstrap();
+        getHelpUtil().load("/help/vo_help.xml");
     }
 }

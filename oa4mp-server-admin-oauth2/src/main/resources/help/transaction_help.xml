@@ -1,0 +1,353 @@
+<html>
+    <entry id="access_token">
+       <body>
+  <![CDATA[Property: Identifier (--) 
+The current access token. Note that this means the OA4MP unique identifier.
+The configuration may specify that a JWT is returned, but that is not this.]]>
+       </body>
+    </entry>
+    <entry id="access_token_valid">
+       <body>
+  <![CDATA[Property: Boolean (false) 
+If the current access token is valid. This may be set false using the
+revocation endpoint, for instance.]]>
+       </body>
+    </entry>
+    <entry id="auth_grant">
+       <body>
+  <![CDATA[Property: Identifier (--) 
+The authorization grant issued at the start of the flow. This is usually
+the same as the temp_token.
+
+See also: temp_token]]>
+       </body>
+    </entry>
+    <entry id="auth_time">
+       <body>
+  <![CDATA[Property: Timestamp (**) 
+The authorization time for this transaction. This may not be the same as the
+time the transaction was created if, e.g., there is a device flow and the user takes some time
+to authorize it. It does, however, give an fixed point for when the transaction starts to be used.]]>
+       </body>
+    </entry>
+    <entry id="authz_grant_lifetime">
+       <body>
+  <![CDATA[Property: Integer (-1) 
+The lifetime in milliseconds that the authorization grant is valid.
+N.B. That this is used in garbage collection if there is no access token. In that case,
+an expired authorization grant and missing access token means that the flow has been abandoned,
+since no access token will be issued after this lifetime.]]>
+       </body>
+    </entry>
+    <entry id="callback_uri">
+       <body>
+  <![CDATA[Property: String (--) 
+Not a list! As per the OAuth spec., the authorization code flow is started
+with a valid callback uri (meaning, it matches, as a string exactly one of the callbacks that
+the client has registered), and subsequent call to the token endpoint must contain exactly the
+same callback or the request is rejected. This attribute records the callback, if applicable,
+the user started the flow with. Note that there is not callback specified in the
+device flow.]]>
+       </body>
+    </entry>
+    <entry id="certificate">
+       <body>
+  <![CDATA[Property: String (--) 
+The PEM encoded X509 certificate, if any, for this user. If the user was permitted
+to get a certificate and got one through the getCert endpoint, then it would be cached here,
+so subsequent calls to the getCert endpoint would return the same certificate.]]>
+       </body>
+    </entry>
+    <entry id="certlifetime">
+       <body>
+  <![CDATA[Property: Integer (0) 
+The lifetime of the cert as requested by the lifetime parameter in the initial request.]]>
+       </body>
+    </entry>
+    <entry id="certreq">
+       <body>
+  <![CDATA[Property: String (--) 
+The PEM encoded X509 certificate request.]]>
+       </body>
+    </entry>
+    <entry id="client_id">
+       <body>
+  <![CDATA[Property: Identifier (--) 
+The identifier of the client making this request. This will be set by the system and managed
+by it eventually, but initially it is not set.]]>
+       </body>
+    </entry>
+    <entry id="expires_in">
+       <body>
+  <![CDATA[Property: Integer (0) 
+The lifetime *of the access token* in milliseconds. This was named long ago
+in OAuth 1 when there were not refresh tokens or other such things and the expiration of the
+access token was synonomous with the lifetime of the entire flow.]]>
+       </body>
+    </entry>
+    <entry id="is_rfc_8628">
+       <body>
+  <![CDATA[Property: Boolean (false) 
+Internal flag if this transaction is part of a device flow. This has no
+reason to ever be altered and exists as a separate flag in the store so outstanding device flows
+may be searched for and evaluted at garbage collection, e.g.]]>
+       </body>
+    </entry>
+    <entry id="myproxyUsername">
+       <body>
+  <![CDATA[Property: String (--) 
+For X509 certificates, there is a trust relationship with the MyProxy servers
+that issue certificates. They may require this and it may be set by the system to fulfill any
+contract.]]>
+       </body>
+    </entry>
+    <entry id="nonce">
+       <body>
+  <![CDATA[Property: String (--) 
+If the client sends a nonce in the initial (authorization code) flow, we stash
+it here, since as per the spec we return it at times. OA4MP does not care about it and does nothing
+but hand it back at the required times so the client can use it for its own internal bookkeeping. ]]>
+       </body>
+    </entry>
+    <entry id="proxy_id">
+       <body>
+  <![CDATA[Property: Identifier (--) 
+The identifier of the proxy used in authorization. This is needed (and managed by
+the system) in the course of constructing callbacks to the proxy server.]]>
+       </body>
+    </entry>
+    <entry id="refresh_token">
+       <body>
+  <![CDATA[Property: Identifier (--) 
+The unqiue identifier for the refresh token.]]>
+       </body>
+    </entry>
+    <entry id="refresh_token_lifetime">
+       <body>
+  <![CDATA[Property: Integer (0) 
+The lifetime of the refresh token in milliseconds.]]>
+       </body>
+    </entry>
+    <entry id="refresh_token_valid">
+       <body>
+  <![CDATA[Property: Boolean (false) 
+If this refresh token is valid. It may be set to false in the revocation endpoint.]]>
+       </body>
+    </entry>
+    <entry id="req_state">
+       <body>
+  <![CDATA[Property: String (--) 
+Clients may include a state parameter in their request. This is stored here and
+returned as needed. For instance, all standard OAuth errors (to the callback endpoint)
+require that the state parameter be included.]]>
+       </body>
+    </entry>
+    <entry id="scopes">
+       <body>
+  <![CDATA[Property: List of strings. ([]) 
+The complete set of scopes in the original request.
+
+See also: validated_scopes]]>
+       </body>
+    </entry>
+    <entry id="states">
+       <body>
+  <![CDATA[Property: JSON (--) A very complex object with "no user serviceable parts". This may include
+the following:
+       comment : a comment from the system to help make sense of this
+   proxy_state : The state object for the proxy. This includes all of the access and refresh tokens,
+                 for instance, that are necesarry to manage the proxy. This may be quite large.
+                 It will also, for instance, include its own set of claims asserted by the proxy.
+        claims : the claims that are asserted in the id token.
+    flow_state : the flow state, i.e., a state object that tells the system how the flow should
+                 be managed. This can be set in scripts (where it is a stem) to do things like
+                 deny all access from that point forward.
+claims_sources : A list of serialized state objects for claim sources.
+  script_state : The serialized state of the QDL interpreter. This is stashed between execution
+                 phases. This is what allows you to, e.g., set a variable in the pre_auth phases
+                 and have it seamlessly available in the post_token phase.
+                 It may be viewed with the show_qdl_state command and may be set with the set_qdl_state
+                 commmand, but that is triage, properly.
+
+See also: show_qdl_state, set_qdl_state, claims, tokens
+    ]]>
+       </body>
+    </entry>
+    <entry id="temp_token">
+       <body>
+  <![CDATA[Property: Identifier (**)
+This is the unique identifier for this transaction. It is the same as the authorization grant,
+and the name of the field comes from OAuth 1 and remains for historical reasons.
+
+See also: temp_token_valid ]]>
+       </body>
+    </entry>
+    <entry id="temp_token_valid">
+       <body>
+  <![CDATA[Property: Boolean (false)
+Flag for vailidity of the authorization grant.]]>
+       </body>
+    </entry>
+    <entry id="usercode">
+       <body>
+  <![CDATA[Property: String (--)
+Device Flow.
+This is the usercode generated in the device flow. It exists as a separate property so that is
+may be searched on more easily.]]>
+       </body>
+    </entry>
+    <entry id="username">
+       <body>
+  <![CDATA[Property: String (--)
+The name that the user used in their log on.]]>
+       </body>
+    </entry>
+    <entry id="validated_scopes">
+       <body>
+  <![CDATA[Property: List of strings (--)
+If the client has strict_scopes set to false, then this is the intersection of those and the
+scopes that are stored in the scopes property. ]]>
+   <example>
+   <![CDATA[E.g.
+In the initial request the user sends
+openid profile email read:/frames write:segDB
+
+and the scopes property contains
+openid profile email org.cilogon.userinfo
+
+Then this property contains
+openig profile email
+
+This is used later to determine which mutable scopes are requested.]]>
+   </example>
+       </body>
+    </entry>
+
+    <entry id="verifier_token">
+       <body>
+  <![CDATA[Property: Identifier (--)
+Deprecated!
+This was used in OAuth 1. ]]>
+       </body>
+    </entry>
+
+    <entry id="show_qdl_state">
+       <body>
+  <![CDATA[Command. 
+This will show the serialized QDL state for this transaction. ]]>
+       </body>
+    </entry>
+    <entry id="set_qdl_state">
+       <body>
+  <![CDATA[Command. 
+Set the QDL state for this transaction. This is a very low-level command
+that allows you to change the stored state. Mostly this is used in emergencies, such as a bad
+script has written some nonsense to the state which is preventing the flow from working.
+
+See also: show_qdl_state]]>
+       </body>
+    </entry>
+    <entry id="claims">
+       <body>
+  <![CDATA[Command. 
+Show the current claims for this transaction. This looks it up in the state and prints it.]]>
+       </body>
+    </entry>
+    <entry id="tokens">
+       <body>
+  <![CDATA[Command. 
+Print the current tokens for this transaction. See the --help for this command.]]>
+       </body>
+    </entry>
+
+    <entry id="GC">
+       <body>
+  <![CDATA[Garbage Collection. Transactions are automatically deleted once they are not
+longer used. The logic for this may be quite complex, since a transaction may have a variety
+of tokens that are associated with it. There are tools for running GC and querying it.
+
+See also: gc_check, gc_run. gc_lock]]>
+       </body>
+    </entry>
+    <entry id="get_by_at">
+       <body>
+  <![CDATA[Command.
+Get a transaction using its access token.]]>
+       </body>
+    </entry>
+    <entry id="about">
+    <body>
+    <![CDATA[Transactions are the major workhorse for OA4MP. These are largely managed
+by the system and do not really require anything. The tools are supplied, however, in
+cases where there is an issue that needs to be addressed, so there is access to the complete
+state of any flow. Note that exchange records refer to transactions, so there are tools supplied
+here that allows you to do looks ups there too.]]>
+    </body>
+    </entry>
+    <entry id="gc_check">
+       <body>
+  <![CDATA[Command.
+Checks if the current transaction can be garbage collected]]>
+       </body>
+    </entry>
+    <entry id="gc_lock">
+       <body>
+  <![CDATA[Command.
+Set, query or remove locks from the transaction table or from the token table.
+
+A lock is a special object with a reserved id, usually gc:lock. When garbage collection
+starts, this is written to the table and remains until the garbage collection has finished,
+at which point the lock is removed. The reason for this is that in cases where there are multiple
+instances of OA4MP accessing the same store (e.g. a load balancer) or that there is an enormous
+number of transactions (hence so slow that GC has not ended before the thread to start the next
+round of clean up begins), this ensures that there will be no race conditions or other errors.
+
+It is possible though that there may be instances where the JVM exits unexpectedly in which case
+the lock will remain, preventing garbage collection. This command will let you check if there is
+such a lock and remove it. ]]>
+       </body>
+    </entry>
+</html>
+<entry id="gc_run">
+   <body>
+<![CDATA[Command.
+Run garbage collection manually on the store. This may be advisable in certain edge cases,
+such as recovering from some calamity, but generally this should be treated as a triage tool,
+not a standard one.]]>
+   </body>
+</entry>
+    <!--  List of attributes
+       access_token            callback_uri            description             proxy_id                scopes                  user_code
+       access_token_valid      certificate             expires_in              refresh_token           states                  username
+       auth_grant              certlifetime            is_rfc_8628             refresh_token_lifetime  temp_token              validated_scopes
+       auth_time               certreq                 myproxyUsername         refresh_token_valid     temp_token*             verifier_token
+       authz_grant_lifetime    client_id               nonce                   req_state               temp_token_valid
+
+       list of commands
+encode
+gc_check   tokens
+gc_lock    set_qdl_state
+gc_run
+get_by_at  show_qdl_state
+    -->
+    <!--
+        entry template
+    <entry id="">
+       <body>
+  <![CDATA[]]>
+       </body>
+    </entry>
+
+    -->
+    <!--
+    <entry id="">
+       <body>
+  <![CDATA[]]>
+       </body>
+       <example>
+   <![CDATA[
+   ]]>
+        </example>
+    </entry>
+          -->
+

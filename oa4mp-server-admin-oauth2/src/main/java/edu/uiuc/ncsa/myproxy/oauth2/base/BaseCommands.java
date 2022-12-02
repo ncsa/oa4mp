@@ -37,11 +37,11 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl implements C
 
     public abstract void about();
 
-    public abstract ClientStoreCommands getNewClientStoreCommands() throws Exception;
+    public abstract ClientStoreCommands getNewClientStoreCommands() throws Throwable;
 
-    public abstract CopyCommands getNewCopyCommands() throws Exception;
+    public abstract CopyCommands getNewCopyCommands() throws Throwable;
 
-    protected abstract CommonCommands getTransactionCommands() throws Exception;
+    protected abstract CommonCommands getTransactionCommands() throws Throwable;
 
 
     protected BaseCommands(MyLoggingFacade logger) {
@@ -70,12 +70,12 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl implements C
     }
 
 
-    public ClientApprovalStoreCommands getNewClientApprovalStoreCommands() throws Exception {
+    public ClientApprovalStoreCommands getNewClientApprovalStoreCommands() throws Throwable {
         return new ClientApprovalStoreCommands(getMyLogger(), "  ", getServiceEnvironment().getClientApprovalStore());
     }
 
     @Override
-    public boolean use(InputLine inputLine) throws Exception {
+    public boolean use(InputLine inputLine) throws Throwable {
         CommonCommands commands = null;
 
         if (inputLine.hasArg(CLIENTS)) {
@@ -84,12 +84,12 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl implements C
         if (inputLine.hasArg(CLIENT_APPROVALS)) {
             commands = getNewClientApprovalStoreCommands();
         }
-        if (inputLine.hasArg(COPY)) {
+/*        if (inputLine.hasArg(COPY)) {
             commands = getNewCopyCommands();
         }
         if (inputLine.hasArg(PARSER_COMMAND)) {
             commands = getNewParserCommands();
-        }
+        }*/
         if(inputLine.hasArg(TRANSACTION_COMMAND)){
             commands = getTransactionCommands();
         }
@@ -135,7 +135,7 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl implements C
                 componentName.equals(PARSER_COMMAND);
     }
 
-    protected void runComponent(String componentName) throws Exception {
+    protected void runComponent(String componentName) throws Throwable {
         CommonCommands commonCommands = null;
         if (componentName.equals(PARSER_COMMAND)) {
             commonCommands = getNewParserCommands();
@@ -156,9 +156,9 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl implements C
         }
     }
 
-    public abstract ParserCommands getNewParserCommands() throws Exception ;
+    public abstract ParserCommands getNewParserCommands() throws Throwable ;
 
-    protected boolean executeComponent() throws Exception {
+    protected boolean executeComponent() throws Throwable {
         if (hasOption(USE_COMPONENT_OPTION, USE_COMPONENT_LONG_OPTION)) {
             String component = getCommandLine().getOptionValue(USE_COMPONENT_OPTION);
             if (component != null && 0 < component.length()) {

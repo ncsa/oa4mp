@@ -106,6 +106,8 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         otherV.setRtLifetime(map.getLong(getCK2().rtLifetime()));
         otherV.setDfLifetime(map.getLong(getCK2().dfLifetime()));
         otherV.setDfInterval(map.getLong(getCK2().dfInterval()));
+        otherV.setMaxATLifetime(map.getLong(getCK2().maxATLifetime()));
+        otherV.setMaxRTLifetime(map.getLong(getCK2().maxRTLifetime()));
         otherV.setSkipServerScripts(map.getBoolean(getCK2().skipServerScripts()));
 
         // In certain legacy cases, this may end up being populated with a null. Treat it like
@@ -241,6 +243,8 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         map.put(getCK2().atLifetime(), client.getAtLifetime());
         map.put(getCK2().dfLifetime(), client.getDfLifetime());
         map.put(getCK2().dfInterval(), client.getDfInterval());
+        map.put(getCK2().maxATLifetime(), client.getMaxATLifetime());
+        map.put(getCK2().maxRTLifetime(), client.getMaxRTLifetime());
         map.put(getCK2().skipServerScripts(), client.isSkipServerScripts());
         if (client.getCallbackURIs() == null) {
             return;
@@ -320,6 +324,13 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         if (json.containsKey(getCK2().dfInterval())) {
             v.setDfInterval(getJsonUtil().getJSONValueLong(json, getCK2().dfInterval()));
         }
+        if (json.containsKey(getCK2().maxATLifetime())) {
+            v.setMaxATLifetime(getJsonUtil().getJSONValueLong(json, getCK2().maxATLifetime()));
+        }
+        if (json.containsKey(getCK2().maxRTLifetime())) {
+            v.setMaxRTLifetime(getJsonUtil().getJSONValueLong(json, getCK2().maxRTLifetime()));
+        }
+
         if (json.containsKey(getCK2().prototypes())) {
             if (!json.getJSONArray(getCK2().prototypes()).isEmpty()) {
                 JSONArray array = json.getJSONArray(getCK2().prototypes());
@@ -393,6 +404,8 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         getJsonUtil().setJSONValue(json, getCK2().rtLifetime(), client.getRtLifetime());
         getJsonUtil().setJSONValue(json, getCK2().dfLifetime(), client.getDfLifetime());
         getJsonUtil().setJSONValue(json, getCK2().dfInterval(), client.getDfInterval());
+        getJsonUtil().setJSONValue(json, getCK2().maxATLifetime(), client.getMaxATLifetime());
+        getJsonUtil().setJSONValue(json, getCK2().maxRTLifetime(), client.getMaxRTLifetime());
         JSONArray callbacks = new JSONArray();
         Collection<String> callbackList = client.getCallbackURIs();
         for (String x : callbackList) {

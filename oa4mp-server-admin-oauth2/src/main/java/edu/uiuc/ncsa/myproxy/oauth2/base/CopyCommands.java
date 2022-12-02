@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.myproxy.oauth2.base;
 
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.util.cli.CommonCommands;
+import edu.uiuc.ncsa.security.util.cli.HelpUtil;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 
 /**
@@ -11,7 +12,7 @@ import edu.uiuc.ncsa.security.util.cli.InputLine;
 public class CopyCommands extends CommonCommands {
     String configFile;
 
-    public CopyCommands(MyLoggingFacade logger, CopyTool copyTool, CopyToolVerifier verifier, String configFile) {
+    public CopyCommands(MyLoggingFacade logger, CopyTool copyTool, CopyToolVerifier verifier, String configFile) throws Throwable{
         super(logger);
         this.configFile = configFile;
         this.copyTool = copyTool;
@@ -24,6 +25,16 @@ public class CopyCommands extends CommonCommands {
     @Override
     public String getPrompt() {
         return "  copy>";
+    }
+
+    @Override
+    public void bootstrap() throws Throwable {
+
+    }
+
+    @Override
+    public HelpUtil getHelpUtil() {
+        return null;
     }
 
     protected void showCpHelp() {

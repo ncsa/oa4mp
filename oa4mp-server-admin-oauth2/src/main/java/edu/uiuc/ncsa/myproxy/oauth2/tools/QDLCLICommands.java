@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.util.cli.CommonCommands;
+import edu.uiuc.ncsa.security.util.cli.HelpUtil;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import edu.uiuc.ncsa.security.util.cli.editing.LineEditor;
 import edu.uiuc.ncsa.security.util.scripting.ScriptSet;
@@ -25,15 +26,25 @@ import static edu.uiuc.ncsa.qdl.scripting.Scripts.*;
  */
 public class QDLCLICommands extends CommonCommands {
     @Override
+    public void bootstrap() throws Throwable {
+
+    }
+
+    @Override
+    public HelpUtil getHelpUtil() {
+        return null;
+    }
+
+    @Override
     public String getPrompt() {
         return "qdl>";
     }
 
-    public QDLCLICommands(MyLoggingFacade logger) {
+    public QDLCLICommands(MyLoggingFacade logger) throws Throwable {
         super(logger);
     }
 
-    public QDLCLICommands(MyLoggingFacade logger, ScriptSet scriptSet) {
+    public QDLCLICommands(MyLoggingFacade logger, ScriptSet scriptSet) throws Throwable {
         super(logger);
         this.scriptSet = scriptSet;
     }

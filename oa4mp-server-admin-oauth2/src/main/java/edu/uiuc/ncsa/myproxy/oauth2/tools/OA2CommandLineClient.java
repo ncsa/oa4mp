@@ -8,6 +8,7 @@ import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
 import edu.uiuc.ncsa.security.core.util.LoggingConfigLoader;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.util.cli.CLIDriver;
+import edu.uiuc.ncsa.security.util.cli.HelpUtil;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import org.apache.commons.lang.StringUtils;
 
@@ -18,6 +19,16 @@ import java.util.List;
  * on 5/11/16 at  2:51 PM
  */
 public class OA2CommandLineClient extends CommandLineClient {
+    @Override
+    public void bootstrap() throws Throwable {
+
+    }
+
+    @Override
+    public HelpUtil getHelpUtil() {
+        return null;
+    }
+
     public OA2CommandLineClient(MyLoggingFacade logger) {
         super(logger);
     }
@@ -41,7 +52,7 @@ public class OA2CommandLineClient extends CommandLineClient {
             CLIDriver cli = new CLIDriver(usc);
             usc.bootMessage();
             cli.start();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             e.printStackTrace();
         }
     }

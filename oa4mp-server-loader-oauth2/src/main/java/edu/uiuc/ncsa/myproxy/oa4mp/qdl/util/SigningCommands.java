@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.qdl.util;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.util.cli.CommonCommands;
+import edu.uiuc.ncsa.security.util.cli.HelpUtil;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
@@ -28,12 +29,21 @@ import java.util.List;
  * on 1/6/17 at  9:27 AM
  */
 public class SigningCommands extends CommonCommands {
+    @Override
+    public void bootstrap() throws Throwable {
+         // no-op at this point
+    }
+
+    @Override
+    public HelpUtil getHelpUtil() {
+        return null;
+    }
 
     public static final String RS_256 = "RS256";
     public static final String RS_384 = "RS384";
     public static final String RS_512 = "RS512";
 
-    public SigningCommands(OA2SE oa2se) {
+    public SigningCommands(OA2SE oa2se) throws Throwable{
         super(oa2se == null ? null : oa2se.getMyLogger());
         this.oa2SE = oa2se;
     }

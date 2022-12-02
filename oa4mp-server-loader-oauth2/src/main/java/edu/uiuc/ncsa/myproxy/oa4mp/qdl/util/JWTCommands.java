@@ -46,7 +46,7 @@ public class JWTCommands implements QDLModuleMetaClass {
 
     transient MyLoggingFacade logger = null;
 
-    public SigningCommands getSigningCommands() {
+    public SigningCommands getSigningCommands() throws Throwable {
         if (signingCommands == null) {
             signingCommands = new SigningCommands(null);
 

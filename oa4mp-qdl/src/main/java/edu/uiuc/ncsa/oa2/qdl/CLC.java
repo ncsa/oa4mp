@@ -70,7 +70,7 @@ public class CLC implements QDLModuleMetaClass {
                 // note that the order of the arguments swaps.
                 clcCommands.load(new InputLine(DUMMY_ARG + " " + objects[1].toString() + "  " + objects[0].toString()));
                 initCalled = true;
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 state.getLogger().error("error initializing client", e);
                 initCalled = false;
                 clcCommands = null;

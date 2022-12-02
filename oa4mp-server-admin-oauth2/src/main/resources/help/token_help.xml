@@ -1,0 +1,117 @@
+<html>
+    <entry id="get_by_parent">
+    <body>
+    <![CDATA[Command.
+This will take an identifier (*not* the current one) or a parent transaction and return all
+tokens that are associated with it. ]]>
+    </body>
+    </entry>
+    <entry id="audience">
+    <body>
+    <![CDATA[Property: List of strings.
+The list of audiences in the request for this exchange, if any.]]>
+    </body>
+    </entry>
+    <entry id="expires_at">
+    <body>
+    <![CDATA[Property: Integer (0)
+The time at which this token expires in milliseconds.]]>
+    </body>
+    </entry>
+    <entry id="issued_at">
+    <body>
+    <![CDATA[Property: Integer (0)
+The time this token was issued in milliseconds.]]>
+    </body>
+    </entry>
+    <entry id="issuer">
+    <body>
+    <![CDATA[Property: String (--)
+The issuer (if custom and different from the standard issuer) for this token.]]>
+    </body>
+    </entry>
+    <entry id="lifetime">
+    <body>
+    <![CDATA[Property: Integer (0)
+The lifetime in milliseconds for this token.]]>
+    </body>
+    </entry>
+    <entry id="parent_id">
+    <body>
+    <![CDATA[Property: Identifier (**)
+The unique identifier of the transaction associated with this exchange record.]]>
+    </body>
+    </entry>
+
+    <entry id="resource">
+    <body>
+    <![CDATA[Property: List of URIs
+The list of resources that were in the request for this exchange.]]>
+    </body>
+    </entry>
+    <entry id="scopes">
+    <body>
+    <![CDATA[Property: JSON (--)
+The list of scopes in the request for this exchange, if any.]]>
+    </body>
+    </entry>
+    <entry id="token_id">
+    <body>
+    <![CDATA[Property: Identifier (**)
+The unique identifier for this token. It is the id (asserted as jti in
+the tiken itself) for this token.]]>
+    </body>
+    </entry>
+    <entry id="token_type">
+    <body>
+    <![CDATA[Property: String (--)
+The type of the token as per the specification,
+e.g.
+urn:ietf:params:oauth:token-type:refresh_token]]>
+    </body>
+    </entry>
+    <entry id="valid">
+    <body>
+    <![CDATA[Property: Boolean (true)
+If the token is valid.]]>
+    </body>
+    </entry>
+
+    <entry id="about">
+    <body>
+    <![CDATA[This store contains all of the exchange records. Exchange records
+are created from the refresh and exchange endpoint and are associated with a transaction.]]>
+    </body>
+    </entry>
+</html>
+    <!--
+
+    oa2>use tokens
+      tokens>list_keys
+    audience  description  expires_at  issued_at  issuer  lifetime  parent_id  resource  scopes  token_id*  token_type  valid
+      tokens>/commands
+         edit
+         encode
+         get_by_parent
+         get_env
+
+
+ entry templates, without and with examples. These are not indented since
+ we need to control whitespace and our ever so helpful editor adds it when
+ any is detected, leading to bad output.
+
+<entry id="">
+<body>
+<![CDATA[]]>
+</body>
+</entry>
+
+<entry id="">
+<body>
+<![CDATA[]]>
+</body>
+<example>
+<![CDATA[]]>
+</example>
+</entry>
+          -->

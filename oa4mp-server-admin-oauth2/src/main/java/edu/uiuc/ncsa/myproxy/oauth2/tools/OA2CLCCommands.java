@@ -27,6 +27,7 @@ import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.JWTUtil2;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims;
 import edu.uiuc.ncsa.security.servlet.ServiceClientHTTPException;
 import edu.uiuc.ncsa.security.util.cli.ConfigurableCommandsImpl;
+import edu.uiuc.ncsa.security.util.cli.HelpUtil;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import edu.uiuc.ncsa.security.util.crypto.CertUtil;
@@ -64,11 +65,20 @@ import static edu.uiuc.ncsa.oa4mp.delegation.oa2.server.RFC8628Constants.*;
  * on 5/11/16 at  2:57 PM
  */
 public class OA2CLCCommands extends CLCCommands {
+    @Override
+    public void bootstrap() throws Throwable {
+       // no op
+    }
+
+    @Override
+    public HelpUtil getHelpUtil() {
+        return null;
+    }
 
     public static final String IS_RFC_8628_KEY = "is_rfc8628";
 
     public OA2CLCCommands(boolean silentMode, MyLoggingFacade logger,
-                          OA2CommandLineClient oa2CommandLineClient) throws Exception {
+                          OA2CommandLineClient oa2CommandLineClient) throws Throwable {
         this(logger, oa2CommandLineClient);
         setPrintOuput(!silentMode);
         setVerbose(!silentMode);
@@ -80,7 +90,7 @@ public class OA2CLCCommands extends CLCCommands {
     }
 
     public OA2CLCCommands(MyLoggingFacade logger,
-                          OA2CommandLineClient oa2CommandLineClient) throws Exception {
+                          OA2CommandLineClient oa2CommandLineClient) throws Throwable {
         super(logger, null);
         try {
             setCe((ClientEnvironment) oa2CommandLineClient.getEnvironment());

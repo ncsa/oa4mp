@@ -30,7 +30,7 @@ public class JSONStoreCommands extends StoreCommands2 {
         return (JSONStore<JSONEntry>) getStore();
     }
 
-    public JSONStoreCommands(MyLoggingFacade logger, String defaultIndent, Store store) {
+    public JSONStoreCommands(MyLoggingFacade logger, String defaultIndent, Store store) throws Throwable {
         super(logger, defaultIndent, store);
     }
 

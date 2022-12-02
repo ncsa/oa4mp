@@ -1,0 +1,221 @@
+<html>
+    <entry id="admin_id">
+    <body>
+    <![CDATA[Property: Identifier (**)
+The unique identifier for this administrative client.]]>
+    </body>
+    </entry>
+    <entry id="allow_qdl">
+    <body>
+    <![CDATA[Property: Boolean (false)
+Can this admin client set calling QDL scripts in client configurations? (I.e. in the cfg
+property for the client). ]]>
+    </body>
+    </entry>
+    <entry id="config">
+    <body>
+    <![CDATA[Property: JSON (--)
+(Unused) A possible configuration object for this admin client.]]>
+    </body>
+    </entry>
+    <entry id="creation_ts">
+    <body>
+    <![CDATA[Property: Timestamp (**)
+The time at which this admin client was created.]]>
+    </body>
+    </entry>
+    <entry id="debug_on">
+    <body>
+    <![CDATA[Property: Boolean (false)
+If true, a great deal of information about the operation of this admin will
+be printed to the logs. ]]>
+    </body>
+    </entry>
+    <entry id="email">
+    <body>
+    <![CDATA[Property: String (--)
+A contact address for the person responsible for this admin.]]>
+    </body>
+    </entry>
+    <entry id="issuer">
+    <body>
+    <![CDATA[Property: String (--)
+If present, a default issuer to be used by every client this admin manages.]]>
+    </body>
+    </entry>
+    <entry id="last_modified_ts">
+    <body>
+    <![CDATA[Property: Timestamp (**)
+The last time that this admin was saved.]]>
+    </body>
+    </entry>
+    <entry id="list_users">
+    <body>
+    <![CDATA[Property: Boolean (true)
+If this admin can list information about users from the token information endpoint.
+The token information endpoint will typically get a request with a bearer (access) token,
+then this is used to query other outstanding transactions. ]]>
+    </body>
+    </entry>
+    <entry id="list_users_other_clients">
+    <body>
+    <![CDATA[Property: Boolean (false)
+If this admin can search for a user in flows other than ones it manages.
+This implies list_users is true. This is effectively a superuser privilege
+and is only granted to certain admins.]]>
+    </body>
+    </entry>
+    <entry id="max_clients">
+    <body>
+    <![CDATA[Property: Intger (50)
+The maximum number of clients this admin may manage. If this number is exceeded, attempts
+to create more will raise an error.]]>
+    </body>
+    </entry>
+    <entry id="name">
+    <body>
+    <![CDATA[Property: String (--)
+A human-readable name for this client.]]>
+    </body>
+    </entry>
+    <entry id="new_client_notify">
+    <body>
+    <![CDATA[Property: Boolean (false)
+Send email notification whenever this admin registers a new client with the
+client management API.]]>
+    </body>
+    </entry>
+    <entry id="secret">
+    <body>
+    <![CDATA[Property: String (--)
+The secret for this client.]]>
+    </body>
+    </entry>
+    <entry id="vo">
+    <body>
+    <![CDATA[Property: URI (--)
+The identifier for the virtual organization. This is redundant with vo_uri for historical reasons
+and they should be the same going forward.
+
+(At one point early on VO were given simple names. They morphed into full fledged OA4MP objects
+and at that point got a unique identifier. This and vo_uri should match the vo_uri property of the VO
+this admin belongs to. Removing properties from an object is actually rather hard to engineer, so
+until the day comes there is time to do it, this just is deprecated.)
+
+See also: vo_uri]]>
+    </body>
+    </entry>
+    <entry id="vo_uri">
+    <body>
+    <![CDATA[Property: URI (--)
+Should be identical to vo. The unique identifier for the virtual organization
+to which this admin belongs.]]>
+    </body>
+    </entry>
+    <entry id="approve">
+    <body>
+    <![CDATA[Command.
+Approve a given client managed by an admin.]]>
+    </body>
+    </entry>
+    <entry id="approver_search">
+    <body>
+    <![CDATA[Command.
+Search for all approvers by a given approver name.]]>
+    </body>
+    </entry>
+    <entry id="count_clients">
+    <body>
+    <![CDATA[Command.
+Count the number of clients this admin manages.]]>
+    </body>
+    </entry>
+    <entry id="list_clients">
+    <body>
+    <![CDATA[Command.
+List all of the clients for the given admin.]]>
+    </body>
+    </entry>
+    <entry id="list_ersatz">
+    <body>
+    <![CDATA[Command.
+List all of the clients granted substitute privilege for a given client and its admin.]]>
+    </body>
+    </entry>
+    <entry id="list_admins">
+    <body>
+    <![CDATA[Command.
+For a given client id, list all admins (if any). ]]>
+    </body>
+    </entry>
+    <entry id="link">
+    <body>
+    <![CDATA[Command.
+Link a client to this admin, meaning that the client is henceforth administered. ]]>
+    </body>
+    </entry>
+    <entry id="set_ersatz">
+    <body>
+    <![CDATA[Command.
+Create an ersatz relationship between clients administered by this admin. This effectively
+created the permission object relating them.]]>
+    </body>
+    </entry>
+    <entry id="unlink">
+    <body>
+    <![CDATA[Command.
+Unlink a client from this admin, i.e., this admin no longer administers the given client.
+There are options for deleting the client as well.
+
+See also: link]]>
+    </body>
+    </entry>
+    <entry id="status_search">
+    <body>
+    <![CDATA[Command.
+Search all clients for this admin with a given status (e.g. pending).]]>
+    </body>
+    </entry>
+    <entry id="about">
+    <body>
+    <![CDATA[This store contains all of the administrative clients for the system.
+Administrative clients manage other clients. They may create and configure them
+via the client management endpoint.]]>
+    </body>
+    </entry>
+</html>
+    <!--
+
+oa2>use admins
+  admins>list_keys
+admin_id*                 debug_on                  last_modified_ts          name                      vo_uri
+allow_qdl                 description               list_users                new_client_notify
+config                    email                     list_users_other_clients  secret
+creation_ts               issuer                    max_clients               vo
+  admins>/commands
+approve          count_clients   list_clients
+approver_search                  list_ersatz
+                                 status_search
+                                 link             set_ersatz
+                                 list_admins      unlink
+
+
+ entry templates, without and with examples. These are not indented since
+ we need to control whitespace and our ever so helpful editor adds it when
+ any is detected, leading to bad output.
+
+<entry id="">
+<body>
+<![CDATA[]]>
+</body>
+</entry>
+
+<entry id="">
+<body>
+<![CDATA[]]>
+</body>
+<example>
+<![CDATA[]]>
+</example>
+</entry>
+          -->

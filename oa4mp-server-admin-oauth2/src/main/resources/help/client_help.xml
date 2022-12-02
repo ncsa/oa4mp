@@ -1,0 +1,490 @@
+<help>
+    <entry id="client_id">
+       <body>
+<![CDATA[Property: Identifier. (--)
+The unique identifier for this client.
+See: identifiers]]>
+       </body>
+    </entry>
+    <entry id="at_lifetime">
+       <body>
+<![CDATA[Property: Integer. (-1)
+The access token lifetime in ms. Default means use the server default, whatever
+that is.
+
+ See also: lifetimes]]>
+       </body>
+    </entry>
+    <entry id="lifetimes">
+       <body>
+<![CDATA[Lifetimes internally are always managed in milliseconds. Many times
+(such as in a SciToken) the specification requires they be converted to seconds.
+This is generally always done for you, so we only discuss using milliseconds here.
+
+ The lifetime of a token created for this client is determined by the following:
+ 1. Server policy. This can never be exceeded.
+ 2. The client max_XX_lifetime. XX is at or rt. If this is <= 0 then the server max is used,
+    otherwise this will be used to determine the maximum granted lifetime for these tokens
+    in all cases. The max lifetime will be the minimum of the server max amd this (if positive).
+ 3. Specific client configuration (e.g. from the at_lifetime, rt_lifetime attributes)
+ 4. Lifetimes as requested in the client cfg element.
+ 4. Requested lifetime. The initial request for a token may include either an at_lifetime or
+    rt_lifetime parameter (in seconds) that will be used.
+ 5. QDL scripts may always set the lifetimes to anything they want, although the final value will
+    again be limited by any set maximums.]]>
+       </body>
+       <example>
+   <![CDATA[A client has the following configuration snippet:
+clients>ls -v
+           rt_lifetime : 1800000
+       rt_max_lifetime : -1
+                  cfg : tokens{
+                        "refresh":  {
+                           "audience": "https://localhost/test",
+                           "lifetime": 3600000,
+                           "type": "refresh"
+                          }}
+
+What is the resulting refresh token lifetime?
+Answer: The cfg element has a configured lifetime of 3600000 ms. This overrides
+the rt_lifetime of 1800000 so the final granted refresh token lifetime is 3600000 ms
+
+if the initial request includes the parameter rt_lifetime=2000 (this is in seconds)
+then the resulting granted lifetime would be 2000000 ms.]]>
+        </example>
+    </entry>
+    <entry id="callback_uri">
+        <body>
+<![CDATA[Property: List of URIs. (--)
+Used in authorization code flows, not in other flows.
+
+The callbacks that the system should honor. These are
+generally required to be  https protocol, unless the host is a local host
+(which includes IP addresses such as 127.0.0.1).  As per the OAuth specification,
+once these are set, requests must match them exactly as strings, so that if a
+client sets one with parameters, it is possible their requests will fail if the
+parameters are shuffled.]]>
+        </body>
+        <example>
+    <![CDATA[
+    ]]>
+         </example>
+     </entry>
+    <entry id="cfg">
+       <body>
+<![CDATA[Property: JSON object. (--)
+The configuration element for this client. Note that this controls all
+scripting. The system will look for very specific format, detailed in
+
+https://cilogon.github.io/qdl/docs/token_handler_configuration.pdf]]>
+       </body>
+    </entry>
+    <entry id="creation_ts">
+       <body>
+<![CDATA[Property: Integer. (--)
+The timestamp in ms when this object was created.]]>
+       </body>
+    </entry>
+    <entry id="debug_on">
+       <body>
+<![CDATA[Property: Boolean. (false)
+When true this will enable a great deal of logging
+and tracking for this client. The default is false. Use this carefully
+since the amount of logging is quite high. The intent is that if there is
+a problem with a client, this allows quite complete telemetry.
+
+Best practice is to turn it on if there is a problem, then turn it off
+when done.
+
+N.B: This operates independently of the server logging level, so that even if
+the server is set to be quite restrictive in its output, this will allow for full
+logging.]]>
+       </body>
+       <example>
+<![CDATA[To turn on debugging:
+clients>update >debug_on
+Enter new value for debug_on [false]:true]]>
+        </example>
+    </entry>
+    <entry id="df_interval">
+       <body>
+<![CDATA[Property: Integer. (-1)
+Device flow only.
+This is the minimum time (in milliseconds) that a client must wait between
+polling attempts. This is usually set at the server level to 5000, which is the suggested value
+in the specification. Ignored if <= zero.]]>
+       </body>
+    </entry>
+    <entry id="df_lifetime">
+       <body>
+  <![CDATA[Property: Integer. (-1)
+Device flow only.
+The lifetime of the user code. Generally set at the server level. Ignored if <= zero. ]]>
+       </body>
+    </entry>
+    <entry id="email">
+       <body>
+<![CDATA[Property: String. ("")
+A single email address that is the point of contact for this client. Note that you
+should require that this be a human being, not a service, since it may well be used
+in emergencies.]]>
+       </body>
+    </entry>
+    <entry id="error_url">
+       <body>
+<![CDATA[Property: URL. (--)
+OAuth 1, deprecated.
+formerly used in cases of error.]]>
+       </body>
+    </entry>
+    <entry id="ersatz_client">
+       <body>
+<![CDATA[Property: Boolean. (false)
+This denotes that this client is an ersatz client and may be used
+to take over a flow from a provisioning client. Note that if this is set true, then
+attempts to start a flow with this client will fail. Ersatz clients cannot start flows.
+  ]]>
+       </body>
+    </entry>
+<entry id="XAs">
+<body>
+<![CDATA[Extended Attributes.
+OA4MP does support pass-through of attributes to scripts. So if a client makes
+a request with an parameter prefixed with oa4mp: or cilogon:  it will be
+processed and passed along to the script engine. OA4MP does nothing with
+these except store them for later use then forward them.
+
+XAs unfortunately have a similar name to the object property
+extended_attributes but are quite different.
+
+See also: ea_support]]>
+</body>
+<example>
+<![CDATA[The client has the following parameters in the initial request
+(before encoding, that is):
+
+...?oa4mp:/roles=admin,all-user&oa4mp:/tokens/access/lifetime=100000...
+
+Then in the corresponding scripting envirnoment these would be the stems xas. with
+the following values:
+
+{oa4mp:{/roles:[admin,all-user], /tokens/access/lifetime:[1000000]}}
+
+Note that the values are always lists.
+
+Finally, XA support is only available to clients that have it enabled. If you
+need it for a client, use the CLI command ea_support to toggle it.]]>
+</example>
+</entry>
+
+    <entry id="extended_attributes">
+       <body>
+<![CDATA[Property: JSON. ({})
+This  holds extra attributes that are managed
+or used in ways that do not really affect OA4MP. For instance, if an admin client
+registers a new client, the specification states that un-used parameters be noted
+and returned untouched. They would end up here in a JSON blob.]]>
+       </body>
+    </entry>
+
+   <entry id="home_url">
+       <body>
+<![CDATA[Property: URL. (--)
+The home URL of the client. What this means is that in certain cases,
+the user will be forwarded to this endpoint.. Situations where this happens are
+that the user cancels the logon or there is some internal error that prevents the
+flow from proceeding. Note especially that OA4MP has extensive error handling
+capabilities and that the standard OAuth 2 error pattern of redirecting to the
+callback will be used whenever possible. This URL will therefore only be used
+in cases where there is a bonafide issue that cannot be resolved, so it should
+be informative for the user in that case.
+  ]]>
+       </body>
+    </entry>
+    <entry id="issuer">
+       <body>
+<![CDATA[Property: String.  ("")
+Sets a default issuer for every request.]]>
+       </body>
+    </entry>
+    <entry id="last_modified_ts">
+       <body>
+<![CDATA[Property: Timestamp. (**)
+The timestamp of the last time this client was saved.]]>
+       </body>
+    </entry>
+    <entry id="ldap">
+       <body>
+<![CDATA[Property: JSON. (--)
+Deprecated!
+This used to be for old-style LDAP configurations. It is
+resolutely ignored now and exists merely to help older clients migrate to newer
+ways.]]>
+       </body>
+    </entry>
+    <entry id="at_max_lifetime">
+       <body>
+<![CDATA[Property: Integer. (-1)
+The maximum lifetime of any access token for this client. This does
+not override the server value and the resulting actual maximum lifetime will be the minimum
+of these. Default is <=0 which means use the server default.
+
+This is useful in certain cases where the client needs to limit its issued lifetimes. For instance
+if the client provisions other clients and wants to enforce some limit for all of those.
+
+See also: rt_max_lifetime
+  ]]>
+       </body>
+    </entry>
+    <entry id="rt_max_lifetime">
+       <body>
+<![CDATA[Property: Integer. (-1)
+The maximum lifetime of any refresh token for this client. This does
+not override the server value and the resulting actual maximum lifetime will be the minimum
+of these. Default is <= 0 which means use the server default.
+
+See note in at_max_lifetime entry.
+
+See also:at_max_lifetime
+  ]]>
+       </body>
+    </entry>
+    <entry id="name">
+       <body>
+<![CDATA[Property: String. (--)
+The human-readable name for this client. This is displayed on the consent
+screen, so it really should make sense to the user so they know exactly what they are
+consenting too.]]>
+       </body>
+    </entry>
+    <entry id="prototypes">
+       <body>
+<![CDATA[Property: List identifiers. (--)
+The prototypes for this client.
+
+A prototype is a template. Each prototype's configuration is read in turn and overwritten
+by its predecessor. This allows for a type of inheritance. Since this is just a list, this
+effectively means that OA4MP clients support multiple inheritance.
+
+See also: resolve]]>
+       </body>
+    </entry>
+    <entry id="proxy_claims_list">
+       <body>
+<![CDATA[Property: List of strings. (--)
+If there is a proxy used for logon, it will return a list of claims.
+This attribute allows you to specify which claims are passed back in the id token.
+The default is no claims from the proxy are asserted to the user.
+If you set any entry in  this list to *, then all claims except the following
+will be passed back in the ID token:
+
+audience
+issuer
+issuer at
+expiration
+jti
+
+since these must be asserted by the server itself,  and would potentially invalidate the token.
+(e.g. you want the ID token to have the server as its issuer, not the proxy which might not
+be recognized by the consumer of this token.)]]>
+       </body>
+<example>
+<![CDATA[A few typical examples:
+[]
+(Empty list) return nothing from the proxy. This is the default.
+
+["*"]
+Means to return everything except the claims listed above.
+
+["eppn","eptid","pairwise_id","isMemberOf"]
+Means to assert only these from the proxy.]]>
+</example>
+
+    </entry>
+    <entry id="proxy_limited">
+       <body>
+<![CDATA[Property: Boolean. (false)
+Used in certain clients for limited X509 proxy certificates. This is mostly
+supported for older installations. Do not  enable unless you have a very good reason.]]>
+       </body>
+    </entry>
+    <entry id="public_client">
+       <body>
+<![CDATA[Property: Boolean. (false)
+If true, then this is a public client which means that it does not use nor require
+a secret. Public clients are the most minimal client possible and convey little more than the
+use successfully logged on to the system.]]>
+       </body>
+    </entry>
+    <entry id="public_key">
+       <body>
+<![CDATA[Property: String. (--)
+This is the SHA-1 hash of the secret for this client. Note that you may has any
+string  using the create_hash command (invoke it with --help for more). If you create a client
+at the command line and are inputting all of the attributes, the system will allow you to pass
+in the actual secret you created and store the hash. Otherwise, this is just another attribute
+and setting it will not invoke any processing.
+
+See also: create_hash, password
+]]>
+       </body>
+    </entry>
+    <entry id="rt_lifetime">
+       <body>
+<![CDATA[Property: Integer.  (0)
+The refresh lifetime in milliseconds for this client. If set to 0 (zero)
+then refresh tokens are disabled for this client. It may be overridden in th cfg attribute. ]]>
+       </body>
+    </entry>
+    <entry id="scopes">
+       <body>
+<![CDATA[Property: List of strings. (--)
+The scopes that this client may request.
+
+See also: strict_scopes  ]]>
+       </body>
+    </entry>
+    <entry id="sign_tokens">
+       <body>
+<![CDATA[Property: Boolean (true).
+Sign JWTs using the current key (true) or use unsigned tokens (false).
+Default is true and you should probably leave it that way.
+
+Once upon a time, JWTs were not signed
+as a matter of course (this was while the web was starting to adpot them) so this option was
+given to let those clients that could not handle signing and verification use them.
+Unless you have a very old client that needs this, it should not be altered.]]>
+       </body>
+    </entry>
+    <entry id="skip_server_scripts">
+       <body>
+<![CDATA[Property: Boolean (false).
+The server may have global scripts set that will be invoked for all clients.
+A typical scenario is that OA4MP is a dedicated issuer for public clients (so every client
+is auto-approved and has an identical set of policies). This flag if set true in such an
+environment means this client will not process server scripts and simply run its own policies.
+
+If your server is not set up to invoke server scripts, ignore this.]]>
+       </body>
+    </entry>
+    <entry id="strict_scopes">
+       <body>
+<![CDATA[Property: Boolean (true).
+If true, allows only scopes specified in the scopes property.
+This means that if the client requests a scope not in the
+scopes attribute, the request is refused. For clients that require complex access tokens
+(such as WLCG or SciTokens) this MUST be set false.
+
+Note that OA4MP's default policy is to strictly enforce scopes. we have the option (as per the spec)
+of simply ignoring them but do not, since in practice clients that specify a prescribed set of scopes
+and send something else have configuration issue. It is better that the request fail and they are
+told why rather than let it complete and be e.g., missing claims.]]>
+       </body>
+    </entry>
+    <entry id="approve">
+       <body>
+<![CDATA[Command.
+Approve/unapprove this client.]]>
+       </body>
+    </entry>
+    <entry id="approver_search">
+       <body>
+<![CDATA[Command.
+Search for all clients approved by a given admin. ]]>
+       </body>
+    </entry>
+    <entry id="create_hash">
+       <body>
+<![CDATA[Command.
+Create the SHA-1 hash of a string. This is used to reset passwords.]]>
+       </body>
+    </entry>
+    <entry id="ea_support">
+       <body>
+<![CDATA[Command.
+Query or toggle if this client can use extended attributes.
+
+See also: XAs]]>
+       </body>
+    </entry>
+    <entry id="password">
+       <body>
+<![CDATA[Command.
+Create a new random password and display its hash, Very useful in resetting passwords.]]>
+       </body>
+    </entry>
+    <entry id="resolve">
+       <body>
+  <![CDATA[Command.
+If a client specifies prototypes, then this command will resolve it from those
+and display the resulting prototype. This is the actual client OA4MP uses.]]>
+       </body>
+        <entry id="set_comment">
+        <body>
+<![CDATA[Command.
+(Old) Set a comment in the extended_attributes property. Now this is replaced with
+the explicit description property which should be used.]]>
+        </body>
+        </entry>
+<entry id="status_search">
+<body>
+<![CDATA[Command.
+Search for clients based on status (such as approved or denied).]]>
+</body>
+</entry>
+    </entry>
+    <entry id="reset_secret">
+    <body>
+    <![CDATA[Command.
+Creates the hash of a secret and sets it in the current client. You may
+specify a secret or have a random one generated.
+
+Compare with the password command which lets you generate passwords and has them,
+but does not update the client.
+
+See also: password, create_hash]]>
+    </body>
+    </entry>
+
+    <entry id="about">
+    <body>
+    <![CDATA[The clients for OA4MP. This store contains regular and ersatz clients,
+but admin clients have their own store and management interface.]]>
+    </body>
+    </entry>
+<!--
+at_lifetime           description           extended_attributes   maxATLifetime         public_client         strict_scopes
+callback_uri          df_interval           extends_provisioners  maxRTLifetime         public_key
+cfg                   df_lifetime           home_url              name                  rt_lifetime
+client_id*            email                 issuer                prototypes            scopes
+creation_ts           error_url             last_modified_ts      proxy_claims_list     sign_tokens
+debug_on              ersatz_client         ldap                  proxy_limited         skip_server_scripts
+
+approve          clear_id         deserialize      get_comment      oldUpdate        rename           search           set_output_on    version
+approver_search  copy             ea_support       get_env          password         resolve          serialize        set_verbose_on
+archive          create           echo             get_id           print_env        rm               set_comment      size
+cb               create_hash      edit             list_keys        print_help       rs               set_env          status_search
+clear_env        decode           encode           ls               read_env         save_env         set_id           update
+-->
+    <!--
+        entry template
+<entry id="">
+<body>
+<![CDATA[]]>
+</body>
+</entry>
+
+    -->
+    <!--
+<entry id="">
+<body>
+<![CDATA[]]>
+</body>
+<example>
+<![CDATA[]]>
+</example>
+</entry>
+          -->
+</help>
+
+
