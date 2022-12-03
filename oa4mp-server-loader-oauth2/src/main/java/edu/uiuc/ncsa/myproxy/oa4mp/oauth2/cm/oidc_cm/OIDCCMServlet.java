@@ -754,7 +754,7 @@ public class OIDCCMServlet extends EnvServlet {
         debugger.trace(this, "Setting approval record for this client");
         ClientApproval approval = new ClientApproval(newClient.getIdentifier());
         approval.setApprovalTimestamp(new Date());
-        if (isAnonymous && newClient.isPublicClient()) {
+        if (isAnonymous) {
             if (cm7591Config.autoApprove) {
                 approval.setApprover(cm7591Config.autoApproverName);
                 approval.setApproved(true);
