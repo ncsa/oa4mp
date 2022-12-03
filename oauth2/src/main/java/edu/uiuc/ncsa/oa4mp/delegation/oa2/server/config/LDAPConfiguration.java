@@ -228,11 +228,11 @@ public class LDAPConfiguration extends JSONClaimSourceConfig {
     /**
      * This is used as part of the search filter. A normal one would be
      * <pre>
-     *     ((& + {@link #getSearchFilterAttribute} + claim + )({@link #getAdditionalFilter}))
+     *     ((&amp; + {@link #getSearchFilterAttribute} + claim + )({@link #getAdditionalFilter}))
      * </pre>
      * So one might look like
      * <pre>
-     *     (&(uid=bob)(isMemberOf=Communities:LVC:SegDB:SegDBWriter))
+     *     (&amp;(uid=bob)(isMemberOf=Communities:LVC:SegDB:SegDBWriter))
      * </pre>
      * Generally this will be dropped verbatim in the slot, so include parentheses.
      * @return

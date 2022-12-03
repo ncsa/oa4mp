@@ -57,7 +57,7 @@ public class ClaimSourceConfigurationUtil {
      * is the claim source, e.g. ldap that is used. The default is "default". The vlaue is the actual configuration.
      * This lets you stick these all over
      * the place and they stay encapsulated nicely in JSON configuration files.
-     * <p/>
+     * <p>
      * The value will be of the form {"enabled":"true",...} (so all the tags are top-level in it).
      *
      * @param logger

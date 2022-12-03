@@ -13,7 +13,7 @@ import java.util.Map;
  * Clients will need to send along parameters in their requests. This is done with a standard {@link Map}.
  * The Map will have every key value pair appended to the request. No formatting or other processing
  * will be done to these so be sure to do this first.
- * <p/>
+ * <p><br>
  * <p>Created by Jeff Gaynor<br>
  * on Apr 26, 2011 at  1:58:56 PM
  */

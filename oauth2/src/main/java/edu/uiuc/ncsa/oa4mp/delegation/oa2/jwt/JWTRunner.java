@@ -312,7 +312,7 @@ public class JWTRunner {
      * called after all claims sources have been processed  and the script just massages the claims or flow states.
      *
      * @param scriptRunResponse
-     * @return
+     *
      */
 
     protected void handleSREResponse(OIDCServiceTransactionInterface transaction, ScriptRunResponse scriptRunResponse) throws IOException {
