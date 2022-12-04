@@ -32,6 +32,7 @@ import edu.uiuc.ncsa.security.storage.XMLMap;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import net.sf.json.JSONException;
 import net.sf.json.JSONSerializer;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -707,6 +708,14 @@ public class OIDCCMServlet extends EnvServlet {
             template.setCreationTS(createTS);
         }
 
+        // A conforming client should expect the scopes as a string; if that's how we
+        // were given the requested scopes, return that.  Otherwise, return a (non-conforming) list.
+        boolean returnStringScopes = false;
+        try {
+            ((JSONObject)rawJSON).getString(SCOPE);
+            returnStringScopes = true;
+        } catch (JSONException jse) {}
+
         OA2Client newClient = processRegistrationRequest((JSONObject) rawJSON, adminClient, httpServletResponse, template);
         if (isAnonymous) {
             // All anonymous requests send a notification.
@@ -736,9 +745,14 @@ public class OIDCCMServlet extends EnvServlet {
         // Spec says we can add parameters here, but not elsewhere.
         jsonResp.put(OIDCCMConstants.REGISTRATION_CLIENT_URI, registrationURI + "?" + OA2Constants.CLIENT_ID + "=" + newClient.getIdentifierString());
         // oidc-client expects the scopes which we may return.
-        JSONArray xxx = new JSONArray();
-        xxx.addAll(newClient.getScopes())        ;
-        jsonResp.put(SCOPE, xxx);
+
+        if (returnStringScopes) {
+            jsonResp.put(SCOPE, String.join(" ", newClient.getScopes()));
+        } else {
+            JSONArray xxx = new JSONArray();
+            xxx.addAll(newClient.getScopes())        ;
+            jsonResp.put(SCOPE, xxx);
+        }
 
         debugger.trace(this, "saving this client");
         getOA2SE().getClientStore().save(newClient);
@@ -754,7 +768,7 @@ public class OIDCCMServlet extends EnvServlet {
         debugger.trace(this, "Setting approval record for this client");
         ClientApproval approval = new ClientApproval(newClient.getIdentifier());
         approval.setApprovalTimestamp(new Date());
-        if (isAnonymous && newClient.isPublicClient()) {
+        if (isAnonymous) {
             if (cm7591Config.autoApprove) {
                 approval.setApprover(cm7591Config.autoApproverName);
                 approval.setApproved(true);
@@ -773,14 +787,18 @@ public class OIDCCMServlet extends EnvServlet {
         }
         getOA2SE().getClientApprovalStore().save(approval);
 
-        writeOK(httpServletResponse, jsonResp);
+        writeOK(httpServletResponse, jsonResp, HttpStatus.SC_CREATED);
     }
 
     private void writeOK(HttpServletResponse httpServletResponse, JSON resp) throws IOException {
+        writeOK(httpServletResponse, resp, HttpStatus.SC_OK);
+    }
+
+    private void writeOK(HttpServletResponse httpServletResponse, JSON resp, int statusCode) throws IOException {
+        httpServletResponse.setStatus(statusCode);
         httpServletResponse.setContentType("application/json");
         httpServletResponse.getWriter().println(resp.toString());
         httpServletResponse.getWriter().flush(); // commit it
-        httpServletResponse.setStatus(HttpStatus.SC_OK);
     }
 
     protected JSON getPayload(HttpServletRequest httpServletRequest, MetaDebugUtil adminDebugger) throws IOException {
