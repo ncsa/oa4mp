@@ -64,6 +64,8 @@ import static edu.uiuc.ncsa.oa4mp.delegation.oa2.server.RFC8693Constants.GRANT_T
 public class OIDCCMServlet extends EnvServlet {
 
     public static final String PROXY_CLAIMS_LIST = "proxy_claims_list";
+    public static final String FORWARD_REQUEST_SCOPES_TO_PROXY = "forward_scopes_to_proxy";
+    public static final String PROXY_REQUEST_SCOPES = "proxy_request_scopes";
 
     @Override
     public void storeUpdates() throws IOException, SQLException {
@@ -291,6 +293,8 @@ public class OIDCCMServlet extends EnvServlet {
         // either RFC 7591 or 7592.
         // CIL-1221
         json.put(PROXY_CLAIMS_LIST, client.getProxyClaimsList());
+        json.put(FORWARD_REQUEST_SCOPES_TO_PROXY, client.isForwardScopesToProxy());
+        json.put(PROXY_REQUEST_SCOPES, client.getProxyRequestScopes());
         json.put("email", client.getEmail());
         OA2ClientKeys clientKeys = (OA2ClientKeys) getOA2SE().getClientStore().getMapConverter().getKeys();
         json.put(clientKeys.extendsProvisioners(), client.isExtendsProvisioners());
@@ -535,7 +539,7 @@ public class OIDCCMServlet extends EnvServlet {
             newClient.setIdentifier(client.getIdentifier());
             newClient.setConfig(client.getConfig());
             try {
-                newClient = updateClient(newClient, adminClient, jsonRequest, false, resp);
+                newClient = updateClient(newClient, adminClient, false, jsonRequest, false, resp);
                 if (adminClient.isDebugOn()) {
                     // CIL-607
                     // Never an anonymous client for a put.
@@ -711,7 +715,7 @@ public class OIDCCMServlet extends EnvServlet {
             returnStringScopes = true;
         } catch (JSONException jse) {}
 
-        OA2Client newClient = processRegistrationRequest((JSONObject) rawJSON, adminClient, httpServletResponse, template);
+        OA2Client newClient = processRegistrationRequest((JSONObject) rawJSON, adminClient, isAnonymous, httpServletResponse, template);
         if (isAnonymous) {
             // All anonymous requests send a notification.
             fireMessage(isAnonymous, getOA2SE(), defaultReplacements(httpServletRequest, adminClient, newClient));
@@ -832,6 +836,7 @@ public class OIDCCMServlet extends EnvServlet {
 
     protected OA2Client updateClient(OA2Client client,
                                      AdminClient adminClient,
+                                     boolean isAnonymous,
                                      JSONObject jsonRequest,
                                      boolean newClient,
                                      HttpServletResponse httpResponse) {
@@ -840,7 +845,7 @@ public class OIDCCMServlet extends EnvServlet {
         /*
         NOTE that this will check for required attributes, process them, then remove them from the JSON.
         This allows us to store the non-essential parameters in the request. At this point we keep
-        them in case we need them, but we are not going to allocated actual storage for them, just folding them
+        them in case we need them, but we are not going to allocate actual storage for them, just folding them
         into the extra attributes of the client's configuration.
          */
 
@@ -1076,23 +1081,33 @@ public class OIDCCMServlet extends EnvServlet {
             client.setAtLifetime(jsonRequest.getLong(ACCESS_TOKEN_LIFETIME) * 1000);
             jsonRequest.remove(ACCESS_TOKEN_LIFETIME);
         }
-        if (jsonRequest.containsKey(STRICT_SCOPES)) {
-            client.setStrictscopes(jsonRequest.getBoolean(STRICT_SCOPES));
-            jsonRequest.remove(STRICT_SCOPES);
+        // Remember that for updates (via PUT) there is no anonymous mode.
+        if(!isAnonymous){
+            if (jsonRequest.containsKey(STRICT_SCOPES)) {
+                client.setStrictscopes(jsonRequest.getBoolean(STRICT_SCOPES));
+                jsonRequest.remove(STRICT_SCOPES);
+            }
+            if (jsonRequest.containsKey(SKIP_SERVER_SCRIPTS)) {
+                client.setStrictscopes(jsonRequest.getBoolean(SKIP_SERVER_SCRIPTS));
+                jsonRequest.remove(SKIP_SERVER_SCRIPTS);
+            }
+            // CIL-1221
+            if(jsonRequest.containsKey(PROXY_CLAIMS_LIST)){
+                client.setProxyClaimsList(jsonRequest.getJSONArray(PROXY_CLAIMS_LIST));
+                jsonRequest.remove(PROXY_CLAIMS_LIST);
+            }
+            if(jsonRequest.containsKey(FORWARD_REQUEST_SCOPES_TO_PROXY)){
+                client.setForwardScopesToProxy(jsonRequest.getBoolean(FORWARD_REQUEST_SCOPES_TO_PROXY));
+                jsonRequest.remove(FORWARD_REQUEST_SCOPES_TO_PROXY);
+            }
+            if(jsonRequest.containsKey(PROXY_REQUEST_SCOPES)){
+                client.setProxyRequestScopes(jsonRequest.getJSONArray(PROXY_REQUEST_SCOPES));
+                jsonRequest.remove(PROXY_REQUEST_SCOPES);
+            }
         }
         if(jsonRequest.containsKey(DESCRIPTION)){
             client.setDescription(jsonRequest.getString(DESCRIPTION));
             jsonRequest.remove(DESCRIPTION);
-        }
-        if (jsonRequest.containsKey(SKIP_SERVER_SCRIPTS)) {
-            client.setStrictscopes(jsonRequest.getBoolean(SKIP_SERVER_SCRIPTS));
-            jsonRequest.remove(SKIP_SERVER_SCRIPTS);
-        }
-        // CIL-1221
-        if(jsonRequest.containsKey(PROXY_CLAIMS_LIST)){
-            client.setProxyClaimsList(jsonRequest.getJSONArray(PROXY_CLAIMS_LIST));
-            jsonRequest.remove(PROXY_CLAIMS_LIST);
-
         }
         // Fix for CIL-734: now handle everything else left over
         client.removeOIDC_CM_Attributes();
@@ -1240,10 +1255,11 @@ public class OIDCCMServlet extends EnvServlet {
 
     protected OA2Client processRegistrationRequest(JSONObject jsonRequest,
                                                    AdminClient adminClient,
+                                                   boolean isAnonymous,
                                                    HttpServletResponse httpResponse,
                                                    OA2Client client) {
 
-        return updateClient(client, adminClient, jsonRequest, true, httpResponse);
+        return updateClient(client, adminClient, isAnonymous, jsonRequest, true, httpResponse);
     }
 
     SecureRandom random = new SecureRandom();

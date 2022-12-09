@@ -186,6 +186,7 @@ public class OA2ClientKeys extends ClientKeys {
         allKeys.add(publicClient());
         allKeys.add(proxyClaimsList());
         allKeys.add(proxyRequestScopes());
+        allKeys.add(forwardScopesToProxy());
         allKeys.add(rtLifetime());
         allKeys.add(atLifetime());
         allKeys.add(scopes());
