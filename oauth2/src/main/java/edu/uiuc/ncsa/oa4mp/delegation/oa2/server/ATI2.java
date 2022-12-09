@@ -24,7 +24,7 @@ public class ATI2 extends AbstractIssuer implements ATIssuer {
     /**
     Constructor
     @param tokenForge Token forge to use
-    @address URI of access token endpoint
+    @param address URI of access token endpoint
      */
     public ATI2(TokenForge tokenForge, URI address,boolean isOIDC) {
         super(tokenForge, address);

@@ -26,16 +26,16 @@ public class OA2ConfigurationLoaderUtils extends ConfigUtil {
      * &lt;/parameters&gt;
      * </pre>
      * where the keys and values will be properly encoded (so you don't have to do it). These
-     * will end up in the request as <code&gt;...&key0=value0&key1=value1&...</code>. Note that
+     * will end up in the request as <code>...&amp;key0=value0&amp;key1=value1&amp;...</code>. Note that
      * the value sent is the body of the element, so you can literally send anything if you include it
      * in a CDATA tag.
-     * </p>
+     *
      * <p>
      * There is an <i>optional</i> flag to enable these. No flag means it is enabled. Disabling will
      * prevent it from being included. This allows you to turn on and off parameters in the file
      * without having to comment things out or remove them. Note that at this point, these are only
      * sent in the initial request.
-     * </p>
+     *
      *
      * @param cn
      * @return

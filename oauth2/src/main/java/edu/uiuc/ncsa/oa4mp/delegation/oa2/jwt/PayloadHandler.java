@@ -34,7 +34,7 @@ public interface PayloadHandler extends Serializable {
      * Marshall any resources this script needs to make a request.
      * I.e., add specific state (if needed) from this handler
      * to the {@link ScriptRunRequest}.
-     * @return
+     *
      */
     void addRequestState(ScriptRunRequest req)  throws Throwable;
 
@@ -95,7 +95,7 @@ public interface PayloadHandler extends Serializable {
     /**
      * This is used on refresh only. It will reset all the standard accounting information
      * (such as timestamps) for an existing claims object.
-     * <h4>Usage</h4>
+     * <h3>Usage</h3>
      * Create an instance of the handler with the constructor for any state, then invoke this method.
      */
     void refreshAccountingInformation();

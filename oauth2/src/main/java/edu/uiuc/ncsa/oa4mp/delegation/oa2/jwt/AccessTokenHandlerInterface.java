@@ -10,7 +10,7 @@ import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 public interface AccessTokenHandlerInterface extends PayloadHandler {
     /**
      * The actual simple access token (usually used as the identifier for the claims-based AT.
-     * To get the signed claims, invoke {@link #getSignedAT(JSONWebKey}.
+     * To get the signed claims, invoke {@link #getSignedAT(JSONWebKey)}.
      * @return
      */
     AccessToken getAccessToken();

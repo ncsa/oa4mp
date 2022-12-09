@@ -28,7 +28,7 @@ public class PAI2 extends AbstractIssuer implements PAIssuer {
     /**
     Process cert request
     @param paRequest Protected asset request object
-    @response Protected asset response object
+    @return Protected asset response object
     */
     public PAResponse processProtectedAsset(PARequest paRequest) {
         try {

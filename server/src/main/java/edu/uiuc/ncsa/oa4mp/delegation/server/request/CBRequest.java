@@ -11,7 +11,7 @@ import java.net.URI;
 
 /**
  * Request to a callback server.
- * <br/>OAuth 1 specific.
+ * <br>OAuth 1 specific.
  * <p>Created by Jeff Gaynor<br>
  * on May 23, 2011 at  11:30:10 AM
  */

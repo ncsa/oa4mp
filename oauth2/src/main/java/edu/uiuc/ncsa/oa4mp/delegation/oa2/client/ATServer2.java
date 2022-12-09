@@ -34,7 +34,7 @@ public class ATServer2 extends TokenAwareServer implements ATServer {
      * get them back, they are checked for validity and passed along to the client. The problem is that
      * many applications (such as Kubernetes) are using them as a "poor man's SciToken", necessitating
      * that we keep them around for at least a bit. This store holds the raw token (as a string) and
-     * the corresponding {@link net.sf.json.JSONObject} keyed by {@link edu.uiuc.ncsa.security.delegation.token.AccessToken}.
+     * the corresponding {@link net.sf.json.JSONObject} keyed by {@link edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken}.
      */
 
     public static class IDTokenEntry {
