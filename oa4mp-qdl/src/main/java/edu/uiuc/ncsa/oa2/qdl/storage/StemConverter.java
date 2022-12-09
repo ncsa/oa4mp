@@ -133,7 +133,8 @@ public abstract class StemConverter<V extends Identifiable> extends MapConverter
     }
 
     /**
-     * Convert a list in java object to a stem entry, setting it correctly.
+     * Convert a list in java object to a stem entry, setting it correctly. <br/><br/>
+     * I.e. The result will be stem.key := c
      *  <br/><b>Used in {@link #toMap(Identifiable, QDLStem)}</b>
      * @param c
      * @param stem

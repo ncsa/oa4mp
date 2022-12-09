@@ -452,7 +452,67 @@ See also: password, create_hash]]>
 but admin clients have their own store and management interface.]]>
     </body>
     </entry>
-<!--
+    <entry id="proxy_request_scopes">
+    <body>
+    <![CDATA[Property: list of strings (--)
+If the server uses a proxy, it must have a set of scopes it requests (found in the proxy client
+configuration). Normally, all of these are used. You may specify a subset of these with this
+property, which is a list. The contract is that if this list is missing (default) or empty
+then all scopes from the proxy are requested. Otherwise, the intersection of this list
+and the proxy's scopes are taken.
+
+There is a reserved scope of "--" which if present in the list means that no scopes
+should be requested. This is because we want the default to be that no special
+scopes should mean this is ignored and all the default scopes are used rather
+than requiring the client to fill in every scope all the time.
+
+Note that this property is ignored if forward_scopes_to_proxy is true.
+
+E.g.'s
+The proxy client is registered with the proxy server with the following scopes:
+  [openid, email, profile, org.cilogon.userinfo]
+
+A few examples are this property => what is sent by the proxy client
+
+E.g. 1: [openid, profile]  => [openid, profile]
+
+E.g.. 2: [openid, offline_access] => [openid] (since other is not configured)
+
+E.g. 3: []  => [openid, email, profile, org.cilogon.userinfo]  (send them all)
+
+E.g. 4: [--] => [] (special case, scope of -- means send none)
+
+See also: forward_scopes_to_proxy.]]>
+    </body>
+    </entry>
+    <entry id="forward_scopes_to_proxy">
+    <body>
+    <![CDATA[Property: Boolean (false)
+Forward scopes in requests to the proxy if true. If false (default), then
+the proxy will receive only scopes for which it is configured. In that case
+you may restrict the scopes even further to the subset in the
+proxy_request_scopes list.
+
+Note especially that this will work for both the initial request and for
+acquiring the access token. It will not work in token refreshes and exchanges,
+since that would require possibly enormous introspection on the generated tokens.
+
+Quick summary of the logic for sending scopes to the proxy
+forward_scopes_to_proxy is true:
+    The same scopes the user sends in the initial request and to the token endpoint to
+    get an access token are simply forwarded to the proxy
+
+forward_scopes_to_proxy is false:
+     proxy_request_scopes is empty
+         Send all the configured scopes to the proxy
+     proxy_request_scopes is not empty
+          Send the intersection of the configured scopes and this
+          list to the proxy
+See also: proxy_request_scopes]]>
+    </body>
+    </entry>
+
+    <!--
 at_lifetime           description           extended_attributes   maxATLifetime         public_client         strict_scopes
 callback_uri          df_interval           extends_provisioners  maxRTLifetime         public_key
 cfg                   df_lifetime           home_url              name                  rt_lifetime

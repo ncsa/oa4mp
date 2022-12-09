@@ -52,12 +52,18 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         if (map.get(getCK2().strictScopes()) != null) {
             otherV.setStrictscopes(map.getBoolean(getCK2().strictScopes()));
         }
+        if(map.containsKey(getCK2().forwardScopesToProxy())){
+            otherV.setForwardScopesToProxy(map.getBoolean(getCK2().forwardScopesToProxy()));
+        }
         if (map.get(getCK2().scopes()) != null) {
             otherV.setScopes(jsonArrayToCollection(map, getCK2().scopes()));
         }
         if (map.get(getCK2().proxyClaimsList()) != null) {
             otherV.setProxyClaimsList(jsonArrayToCollection(map, getCK2().proxyClaimsList()));
         }
+        if (map.get(getCK2().proxyRequestScopes()) != null) {
+               otherV.setProxyRequestScopes(jsonArrayToCollection(map, getCK2().proxyRequestScopes()));
+           }
         if (map.get(getCK2().audience()) != null) {
             otherV.setAudience(jsonArrayToCollection(map, getCK2().audience()));
         }
@@ -246,6 +252,7 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         map.put(getCK2().maxATLifetime(), client.getMaxATLifetime());
         map.put(getCK2().maxRTLifetime(), client.getMaxRTLifetime());
         map.put(getCK2().skipServerScripts(), client.isSkipServerScripts());
+        map.put(getCK2().forwardScopesToProxy(), client.isForwardScopesToProxy());
         if (client.getCallbackURIs() == null) {
             return;
         }
@@ -285,6 +292,12 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
             jsonArray.addAll(client.getProxyClaimsList());
             map.put(getCK2().proxyClaimsList(), jsonArray.toString());
         }
+
+        if (client.getProxyRequestScopes() != null) {
+               JSONArray jsonArray = new JSONArray();
+               jsonArray.addAll(client.getProxyRequestScopes());
+               map.put(getCK2().proxyRequestScopes(), jsonArray.toString());
+           }
         if (client.getAudience() != null) {
             JSONArray aud = new JSONArray();
             for (String s : client.getAudience()) {
@@ -330,7 +343,12 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         if (json.containsKey(getCK2().maxRTLifetime())) {
             v.setMaxRTLifetime(getJsonUtil().getJSONValueLong(json, getCK2().maxRTLifetime()));
         }
-
+        if(json.containsKey(getCK2().forwardScopesToProxy())){
+            v.setForwardScopesToProxy(getJsonUtil().getJSONValueBoolean(json, getCK2().forwardScopesToProxy()));
+        }
+        if(json.containsKey(getCK2().proxyRequestScopes())){
+            v.setProxyRequestScopes(getJsonUtil().getJSONArray(json, getCK2().proxyRequestScopes()));
+        }
         if (json.containsKey(getCK2().prototypes())) {
             if (!json.getJSONArray(getCK2().prototypes()).isEmpty()) {
                 JSONArray array = json.getJSONArray(getCK2().prototypes());
@@ -350,7 +368,7 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         v.setIssuer(getJsonUtil().getJSONValueString(json, getCK2().issuer()));
         v.setSignTokens(getJsonUtil().getJSONValueBoolean(json, getCK2().signTokens()));
         v.setPublicClient(getJsonUtil().getJSONValueBoolean(json, getCK2().publicClient())); // JSON util returns false if missing key
-        if (json.containsKey(getCK2().strictScopes)) {
+        if (json.containsKey(getCK2().strictScopes())) {
             v.setStrictscopes(getJsonUtil().getJSONValueBoolean(json, getCK2().strictScopes())); // JSON util returns false if missing key
         }
         JSON cbs = (JSON) getJsonUtil().getJSONValue(json, getCK2().callbackUri());
@@ -406,13 +424,19 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         getJsonUtil().setJSONValue(json, getCK2().dfInterval(), client.getDfInterval());
         getJsonUtil().setJSONValue(json, getCK2().maxATLifetime(), client.getMaxATLifetime());
         getJsonUtil().setJSONValue(json, getCK2().maxRTLifetime(), client.getMaxRTLifetime());
+        getJsonUtil().setJSONValue(json, getCK2().forwardScopesToProxy(), client.isForwardScopesToProxy());
+
         JSONArray callbacks = new JSONArray();
         Collection<String> callbackList = client.getCallbackURIs();
         for (String x : callbackList) {
             callbacks.add(x);
         }
         getJsonUtil().setJSONValue(json, getCK2().extendsProvisioners(), client.isExtendsProvisioners());
-
+        if(client.hasRequestScopes()){
+            JSONArray jsonArray = new JSONArray();
+            jsonArray.addAll(client.getProxyRequestScopes());
+            getJsonUtil().setJSONValue(json, getCK2().prototypes(), jsonArray);
+        }
         if (client.hasPrototypes()) {
             JSONArray array = new JSONArray();
             for(Identifier identifier : client.getPrototypes()){

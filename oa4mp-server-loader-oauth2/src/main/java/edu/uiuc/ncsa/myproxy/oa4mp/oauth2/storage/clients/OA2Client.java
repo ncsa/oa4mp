@@ -43,9 +43,11 @@ public class OA2Client extends Client implements OA2ClientScopes {
 
     long maxATLifetime = 0L;
     long maxRTLifetime = 0L;
+
     /**
      * The maximum lifetime, if different from the server max, for this client. Note that once set,
      * no AT lifetime can exceed this. Set to <= 0 to use the server max. as the client max.
+     *
      * @return
      */
 
@@ -60,6 +62,7 @@ public class OA2Client extends Client implements OA2ClientScopes {
     /**
      * The maximum lifetime, if different from the server max, for this client. Note that once set,
      * no RT lifetime can exceed this. Set to <= 0 to use the server max. as the client max.
+     *
      * @return
      */
     public long getMaxRTLifetime() {
@@ -71,7 +74,8 @@ public class OA2Client extends Client implements OA2ClientScopes {
     }
 
     @Override
-    protected void populateClone(BaseClient c) {
+    protected void
+    populateClone(BaseClient c) {
         OA2Client client = (OA2Client) c;
         super.populateClone(client);
         client.setRtLifetime(getRtLifetime());
@@ -84,6 +88,10 @@ public class OA2Client extends Client implements OA2ClientScopes {
         client.setSignTokens(isSignTokens());
         client.setMaxRTLifetime(getMaxRTLifetime());
         client.setMaxATLifetime(getMaxATLifetime());
+        client.setPrototypes(getPrototypes());
+        client.setProxyClaimsList(getProxyClaimsList());
+        client.setProxyRequestScopes(getProxyRequestScopes());
+        client.setForwardScopesToProxy(isForwardScopesToProxy());
     }
 
     public void setComment(String comment) {
@@ -91,8 +99,9 @@ public class OA2Client extends Client implements OA2ClientScopes {
     }
 
     String comment;
+
     public List<Identifier> getPrototypes() {
-        if(prototypes == null){
+        if (prototypes == null) {
             prototypes = new ArrayList<>();
         }
         return prototypes;
@@ -122,6 +131,7 @@ public class OA2Client extends Client implements OA2ClientScopes {
      * If the ersatz client should simply extend all provisioners. This means you do not have to set the
      * {@link #setPrototypes(List)} for this object. If you do set it, those will be processed first
      * then the provisioners.
+     *
      * @return
      */
     public boolean isExtendsProvisioners() {
@@ -274,7 +284,7 @@ public class OA2Client extends Client implements OA2ClientScopes {
     }
 
     protected AbstractPayloadConfig setupPayloadConfig(AbstractPayloadConfig pc, String root, String path) {
-        if(hasDriverConfig()){
+        if (hasDriverConfig()) {
             OA2ClientUtils.setupDriverPayloadConfig(pc, this);
         }
         if (hasPayloadConfig(root, path)) {
@@ -300,9 +310,9 @@ public class OA2Client extends Client implements OA2ClientScopes {
         return null;
     }
 
-    public boolean hasDriverConfig(){
+    public boolean hasDriverConfig() {
         return getConfig().containsKey(QDLRuntimeEngine.CONFIG_TAG);
-   }
+    }
 
     public void setAccessTokenConfig(AccessTokenConfig cfg) {
         setPayloadConfig(cfg, TOKENS_KEY, ACCESS_TOKENS_KEY);
@@ -315,7 +325,7 @@ public class OA2Client extends Client implements OA2ClientScopes {
     }
 
     public boolean hasRefreshTokenConfig() {
-        return hasPayloadConfig(TOKENS_KEY, REFRESH_TOKENS_KEY) ||  hasDriverConfig();
+        return hasPayloadConfig(TOKENS_KEY, REFRESH_TOKENS_KEY) || hasDriverConfig();
     }
 
     public RefreshTokenConfig getRefreshTokensConfig() {
@@ -687,6 +697,35 @@ public class OA2Client extends Client implements OA2ClientScopes {
 
     Collection<String> proxyClaimsList = new ArrayList<>();
 
+    /**
+     * If the client needs a subset of scopes from the proxy, they go here.
+     *
+     * @return
+     */
+    // CIL-1584
+    public Collection<String> getProxyRequestScopes() {
+        return proxyRequestScopes;
+    }
 
+    public void setProxyRequestScopes(Collection<String> proxyRequestScopes) {
+        this.proxyRequestScopes = proxyRequestScopes;
+    }
+
+    Collection<String> proxyRequestScopes = new ArrayList<>();
+
+    public boolean hasRequestScopes() {
+        return proxyRequestScopes != null && !proxyRequestScopes.isEmpty();
+    }
+
+    // CIL-1584
+    public boolean isForwardScopesToProxy() {
+        return forwardScopesToProxy;
+    }
+
+    public void setForwardScopesToProxy(boolean forwardScopesToProxy) {
+        this.forwardScopesToProxy = forwardScopesToProxy;
+    }
+
+    boolean forwardScopesToProxy = false;
 }
 

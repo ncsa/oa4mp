@@ -24,11 +24,13 @@ public class OA2ClientKeys extends ClientKeys {
     String ersatzClient="ersatz_client";
     String extended_attributes = "extended_attributes";
     String extendsProvisioners = "extends_provisioners";
+    String forwardScopesToProxy = "forward_scopes_to_proxy";
     String issuer = "issuer";
     String ldap = "ldap";
     String maxATLifetime = "at_max_Lifetime";
     String maxRTLifetime = "rt_max_Lifetime";
     String proxyClaimsList ="proxy_claims_list";
+    String proxyRequestScopes ="proxy_request_scopes";
     String publicClient="public_client";
     String rtLifetime = "rt_lifetime";
     String resource="resource";
@@ -44,6 +46,17 @@ public class OA2ClientKeys extends ClientKeys {
            (in  oa4mp-qdl)
       or you may break the QDL module that handles clients.
      */
+
+    public String proxyRequestScopes(String... x) {
+           if (0 < x.length) proxyRequestScopes = x[0];
+           return proxyRequestScopes;
+       }
+
+    public String forwardScopesToProxy(String... x) {
+           if (0 < x.length) forwardScopesToProxy = x[0];
+           return forwardScopesToProxy;
+       }
+
 
     public String prototypes(String... x) {
            if (0 < x.length) prototypes = x[0];
@@ -172,6 +185,7 @@ public class OA2ClientKeys extends ClientKeys {
         allKeys.add(ldap());
         allKeys.add(publicClient());
         allKeys.add(proxyClaimsList());
+        allKeys.add(proxyRequestScopes());
         allKeys.add(rtLifetime());
         allKeys.add(atLifetime());
         allKeys.add(scopes());

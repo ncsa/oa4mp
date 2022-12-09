@@ -12,6 +12,13 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientKeys;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.EnvServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Errors;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2GeneralError;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Scopes;
+import edu.uiuc.ncsa.oa4mp.delegation.server.UnapprovedClientException;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
@@ -20,19 +27,9 @@ import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
-import edu.uiuc.ncsa.oa4mp.delegation.server.UnapprovedClientException;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Errors;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2GeneralError;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Scopes;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.storage.XMLMap;
-import net.sf.json.JSON;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import net.sf.json.JSONSerializer;
+import net.sf.json.*;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.http.HttpStatus;
@@ -706,6 +703,13 @@ public class OIDCCMServlet extends EnvServlet {
             template.setIdentifier(newID);
             template.setCreationTS(createTS);
         }
+        // https://github.com/ncsa/OA4MP/pull/85 -- clients (such as a few in GoLang) that upload scopes as
+        // strings expect them back as strings, not JSON arrays. Return them in the format sent.
+        boolean returnStringScopes = false;
+        try {
+            ((JSONObject)rawJSON).getString(SCOPE);
+            returnStringScopes = true;
+        } catch (JSONException jse) {}
 
         OA2Client newClient = processRegistrationRequest((JSONObject) rawJSON, adminClient, httpServletResponse, template);
         if (isAnonymous) {
@@ -736,10 +740,13 @@ public class OIDCCMServlet extends EnvServlet {
         // Spec says we can add parameters here, but not elsewhere.
         jsonResp.put(OIDCCMConstants.REGISTRATION_CLIENT_URI, registrationURI + "?" + OA2Constants.CLIENT_ID + "=" + newClient.getIdentifierString());
         // oidc-client expects the scopes which we may return.
-        JSONArray xxx = new JSONArray();
-        xxx.addAll(newClient.getScopes())        ;
-        jsonResp.put(SCOPE, xxx);
-
+        if (returnStringScopes) {
+                  jsonResp.put(SCOPE, String.join(" ", newClient.getScopes()));
+              } else {
+                  JSONArray xxx = new JSONArray();
+                  xxx.addAll(newClient.getScopes())        ;
+                  jsonResp.put(SCOPE, xxx);
+              }
         debugger.trace(this, "saving this client");
         getOA2SE().getClientStore().save(newClient);
 

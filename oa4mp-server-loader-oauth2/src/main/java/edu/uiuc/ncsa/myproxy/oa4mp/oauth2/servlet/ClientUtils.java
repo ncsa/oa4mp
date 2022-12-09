@@ -371,7 +371,7 @@ public class ClientUtils {
         boolean hasOpenIDScope = false;
         while (stringTokenizer.hasMoreTokens()) {
             String x = stringTokenizer.nextToken();
-            // CIL-1012 offline_access. Some clients end this along but it has no effect.
+            // CIL-1012 offline_access. Some clients end this along, but it has no effect.
             // Basically if get it, we don't want to throw an error.
             if (x.equals(OA2Scopes.SCOPE_OFFLINE_ACCESS)) {
                 // Basically just always ignore it.

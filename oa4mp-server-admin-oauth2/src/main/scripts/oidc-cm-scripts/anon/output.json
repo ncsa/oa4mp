@@ -1,1 +1,1 @@
-{"client_id":"oa4mp:/client_id/22d9139ee3bcf2488ea27247a705a33c","registration_client_uri":"https://hcc-anvil-175-26.unl.edu/scitokens-server/oidc-cm?client_id=oa4mp:/client_id/22d9139ee3bcf2488ea27247a705a33c","scope":["openid"]}
+{"client_id":"oa4mp:/client_id/6dcc258243700a10e7052e1f3ac23c2a","registration_client_uri":"https://localhost:9443/oauth2/oidc-cm?client_id=oa4mp:/client_id/6dcc258243700a10e7052e1f3ac23c2a","scope":["openid"]}

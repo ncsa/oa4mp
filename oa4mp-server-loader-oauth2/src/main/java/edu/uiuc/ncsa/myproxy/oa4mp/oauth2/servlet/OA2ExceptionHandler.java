@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.oa4mp.delegation.oa2.*;
 import edu.uiuc.ncsa.oa4mp.delegation.server.ExceptionWrapper;
 import edu.uiuc.ncsa.oa4mp.delegation.server.UnapprovedClientException;
 import edu.uiuc.ncsa.qdl.exceptions.QDLExceptionWithTrace;
+import edu.uiuc.ncsa.security.core.exceptions.MissingContentException;
 import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
@@ -45,6 +46,11 @@ public class OA2ExceptionHandler implements ExceptionHandler {
                 t = t.getCause();
             }
 
+        }
+
+        if(t instanceof MissingContentException){
+            // CIL-1582
+            t = new OA2GeneralError(OA2Errors.SERVER_ERROR, t.getMessage(), HttpStatus.SC_BAD_REQUEST, null);
         }
         if (t instanceof LDAPException) {
             t = new OA2GeneralError(OA2Errors.SERVER_ERROR, "LDAP error", HttpStatus.SC_INTERNAL_SERVER_ERROR, null);

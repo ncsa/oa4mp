@@ -49,6 +49,9 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
         if (stem.containsKey(kk().debugOn())) {
             v.setDebugOn(stem.getBoolean(kk().debugOn()));
         }
+        if(stem.containsKey(kk().forwardScopesToProxy())){
+            v.setForwardScopesToProxy(stem.getBoolean(kk().forwardScopesToProxy()));
+        }
         if (isStringKeyOK(stem, kk().email())) {
             v.setEmail(stem.getString(kk().email()));
         }
@@ -105,6 +108,7 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
         }
         if (stem.containsKey(kk().audience())) {
             v.setAudience(toList(stem, kk().audience()));
+            v.setAudience(toList(stem, kk().audience()));
         }
         if (stem.containsKey(kk().callbackUri())) {
             v.setCallbackURIs(toList(stem, kk().callbackUri()));
@@ -159,6 +163,9 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
         if (stem.containsKey(kk().proxyClaimsList())) {
             v.setProxyClaimsList(toList(stem, kk().proxyClaimsList()));
         }
+        if (stem.containsKey(kk().proxyRequestScopes())) {
+                 v.setProxyRequestScopes(toList(stem, kk().proxyRequestScopes()));
+             }
         if (stem.containsKey(kk().publicClient())) {
             v.setPublicClient(stem.getBoolean(kk().publicClient()));
         }
@@ -204,6 +211,7 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
         // basic client attributes
         setNonNullStemValue(stem, kk().secret(), v.getSecret());
         setNonNullStemValue(stem, kk().debugOn(), v.isDebugOn());
+        setNonNullStemValue(stem, kk().forwardScopesToProxy(), v.isForwardScopesToProxy());
         setNonNullStemValue(stem, kk().email(), v.getEmail());
         setNonNullStemValue(stem, kk().name(), v.getName());
         setNonNullStemValue(stem, kk().creationTS(), v.getCreationTS().getTime());
@@ -222,6 +230,12 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
         }
         if (v.getCallbackURIs() != null && !v.getCallbackURIs().isEmpty()) {
             fromList(v.getCallbackURIs(), stem, kk().callbackUri());
+        }
+        if (v.getProxyClaimsList() != null && !v.getProxyClaimsList().isEmpty()) {
+            fromList(v.getProxyClaimsList(), stem, kk().proxyClaimsList());
+        }
+        if (v.getProxyRequestScopes() != null && !v.getProxyRequestScopes().isEmpty()) {
+            fromList(v.getProxyRequestScopes(), stem, kk().proxyRequestScopes());
         }
         if (v.getConfig() != null && !v.getConfig().isEmpty()) {
             QDLStem cfg = new QDLStem();

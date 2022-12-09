@@ -4,21 +4,21 @@ package edu.uiuc.ncsa.oa2.servlet;
 import edu.uiuc.ncsa.myproxy.MPSingleConnectionProvider;
 import edu.uiuc.ncsa.myproxy.MyProxyConnectable;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2AuthorizedServletUtil;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2ClientUtils;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ScriptRuntimeEngineFactory;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractAuthorizationServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
-import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
-import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenUtils;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Errors;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2GeneralError;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.JWTRunner;
+import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
+import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.servlet.PresentableState;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringEscapeUtils;
@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.security.GeneralSecurityException;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 
@@ -47,13 +48,23 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
     public String AUTHORIZATION_REFRESH_TOKEN_LIFETIME_VALUE = "rtLifetime";
 
     protected static String scopesToString(OA2ServiceTransaction t) {
+        return scopesToString(t.getScopes());
+/*
         String scopeString = "";
         for (String x : t.getScopes()) {
             scopeString =  scopeString + x + " ";
         }
         return scopeString.trim(); // don't return trailing blank(s)
+*/
     }
 
+    protected static String scopesToString(Collection<String> listOfScopes) {
+        String scopeString = "";
+        for (String x : listOfScopes) {
+            scopeString =  scopeString + x + " ";
+        }
+        return scopeString.trim(); // don't return trailing blank(s)
+    }
     @Override
     protected void setClientRequestAttributes(AuthorizedState aState) {
         super.setClientRequestAttributes(aState);

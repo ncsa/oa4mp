@@ -21,7 +21,6 @@ rc := script_load('driver.qdl', args().0, params.);
 tokens. := clc#access();
 
 ⊨ is_defined(tokens.) : 'uh-oh, access endpoint failed:' + to_string(tokens., true);
-say('tokens. #0 ==' + to_string(tokens., true));
 
 at. := tokens.'access_token'.'jwt';
 rt. := tokens.'access_token'.'jwt';

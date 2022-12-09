@@ -1,23 +1,24 @@
 package edu.uiuc.ncsa.oa2.servlet;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8628Constants2;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8628State;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RFC8628Store;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractAuthorizationServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AuthorizationServletConfig;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.myproxy.oauth2.tools.OA2CLCCommands;
 import edu.uiuc.ncsa.myproxy.oauth2.tools.OA2CommandLineClient;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2ATException;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.TransactionNotFoundException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2ATException;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims;
 import edu.uiuc.ncsa.security.servlet.ServiceClientHTTPException;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import net.sf.json.JSONObject;
@@ -25,9 +26,7 @@ import net.sf.json.JSONObject;
 import javax.servlet.http.HttpServletResponse;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Collection;
+import java.util.*;
 
 import static edu.uiuc.ncsa.oa2.servlet.OA2AuthorizationServer.scopesToString;
 
@@ -64,7 +63,18 @@ public class ProxyUtils {
         debugger.trace(ProxyUtils.class, "doProxyRedirect, response committed? " + response.isCommitted());
         AbstractAuthorizationServlet.MyHttpServletResponseWrapper wrapper = new AbstractAuthorizationServlet.MyHttpServletResponseWrapper(response);
         // set the specific scopes.
-        InputLine inputLine = new InputLine("set_param", OA2CLCCommands.SHORT_REQ_PARAM_SWITCH, OA2Constants.SCOPE, scopesToString(t));
+        //InputLine inputLine = new InputLine("set_param", OA2CLCCommands.SHORT_REQ_PARAM_SWITCH, OA2Constants.SCOPE, scopesToString(t));
+        // Github#86 https://github.com/ncsa/OA4MP/issues/86 request max configured scopes.
+        /*OA2Client oa2Client = t.getOA2Client();
+        Set<String> requestScopes = new HashSet<>();
+        requestScopes.addAll(clcCommands.getCe().getScopes());
+        if (oa2Client.hasRequestScopes()) {
+            requestScopes.retainAll(oa2Client.getProxyRequestScopes());
+        }*/
+        Collection<String> requestScopes = getRequestScopes(t, clcCommands);
+
+        //InputLine inputLine = new InputLine("set_param", OA2CLCCommands.SHORT_REQ_PARAM_SWITCH, OA2Constants.SCOPE, scopesToString(clcCommands.getCe().getScopes()));
+        InputLine inputLine = new InputLine("set_param", OA2CLCCommands.SHORT_REQ_PARAM_SWITCH, OA2Constants.SCOPE, scopesToString(requestScopes));
         clcCommands.set_param(inputLine);
         debugger.trace(ProxyUtils.class, "doProxyRedirect setting input:" + inputLine);
         Identifier identifier = BasicIdentifier.randomID();
@@ -100,7 +110,20 @@ public class ProxyUtils {
         OA2CLCCommands clcCommands = createCLC(oa2SE, t);
 
 
-        InputLine inputLine = new InputLine("set_param", OA2CLCCommands.SHORT_REQ_PARAM_SWITCH, OA2Constants.SCOPE, scopesToString(t));
+        //InputLine inputLine = new InputLine("set_param", OA2CLCCommands.SHORT_REQ_PARAM_SWITCH, OA2Constants.SCOPE, scopesToString(t));
+        // Github#86 https://github.com/ncsa/OA4MP/issues/86 request max configured scopes.
+/*
+        OA2Client oa2Client = t.getOA2Client();
+        HashSet<String> requestScopes = new HashSet<>();
+        requestScopes.addAll(clcCommands.getCe().getScopes());
+        if (oa2Client.hasRequestScopes()) {
+            requestScopes.retainAll(oa2Client.getProxyRequestScopes());
+        }
+*/
+        //InputLine inputLine = new InputLine("set_param", OA2CLCCommands.SHORT_REQ_PARAM_SWITCH, OA2Constants.SCOPE, scopesToString(clcCommands.getCe().getScopes()));
+        Collection<String> requestScopes = getRequestScopes(t, clcCommands);
+
+        InputLine inputLine = new InputLine("set_param", OA2CLCCommands.SHORT_REQ_PARAM_SWITCH, OA2Constants.SCOPE, scopesToString(requestScopes));
         debugger.trace(ProxyUtils.class, "getProxyUserCode input line=" + inputLine);
         clcCommands.set_param(inputLine);
         clcCommands.df(new InputLine("df"));
@@ -222,7 +245,11 @@ public class ProxyUtils {
         debugger.trace(ProxyUtils.class, "doRFC8628AT, loading proxy client");
 
         OA2CLCCommands clcCommands = getCLC(oa2SE, t);
-        InputLine inputLine = new InputLine("set_param", OA2CLCCommands.SHORT_REQ_PARAM_SWITCH, OA2Constants.SCOPE, scopesToString(t));
+        Collection<String> requestScopes = getRequestScopes(t, clcCommands);
+
+        //InputLine inputLine = new InputLine("set_param", OA2CLCCommands.SHORT_REQ_PARAM_SWITCH, OA2Constants.SCOPE, scopesToString(t));
+
+        InputLine inputLine = new InputLine("set_param", OA2CLCCommands.SHORT_REQ_PARAM_SWITCH, OA2Constants.SCOPE, scopesToString(requestScopes));
         debugger.trace(ProxyUtils.class, "doRFC8628AT input line: " + inputLine);
         clcCommands.set_param(inputLine);
         try {
@@ -239,7 +266,7 @@ public class ProxyUtils {
             Throwable throwable = clcCommands.getLastException(); // This is a ServiceClientHTTPException so just pass it along
 
             if (throwable instanceof ServiceClientHTTPException) {
-             throw toOA2X((ServiceClientHTTPException) throwable, t);
+                throw toOA2X((ServiceClientHTTPException) throwable, t);
             }
 
             debugger.trace(ProxyUtils.class, "doRFC8628AT error contacting proxy", throwable);
@@ -253,19 +280,22 @@ public class ProxyUtils {
             setClaimsFromProxy(t, clcCommands.getClaims(), debugger);
             oa2SE.getTransactionStore().save(t);
         } catch (Throwable throwable) {
-           if(debugger.isEnabled()){ throwable.printStackTrace();}
+            if (debugger.isEnabled()) {
+                throwable.printStackTrace();
+            }
             throw throwable;
         }
         debugger.trace(ProxyUtils.class, "doRFC8628AT done.");
     }
 
-    protected static OA2ATException toOA2X(ServiceClientHTTPException serviceClientHTTPException, OA2ServiceTransaction t){
-            JSONObject content = JSONObject.fromObject(serviceClientHTTPException.getContent());
-            throw new OA2ATException(content.getString(OA2Constants.ERROR),
-                    content.getString(OA2Constants.ERROR_DESCRIPTION),
-                    serviceClientHTTPException.getStatus(), t.getRequestState());
+    protected static OA2ATException toOA2X(ServiceClientHTTPException serviceClientHTTPException, OA2ServiceTransaction t) {
+        JSONObject content = JSONObject.fromObject(serviceClientHTTPException.getContent());
+        throw new OA2ATException(content.getString(OA2Constants.ERROR),
+                content.getString(OA2Constants.ERROR_DESCRIPTION),
+                serviceClientHTTPException.getStatus(), t.getRequestState());
 
     }
+
     protected static void setClaimsFromProxy(OA2ServiceTransaction t, JSONObject proxyClaims, MetaDebugUtil debugger) {
         debugger.trace(ProxyUtils.class, "setClaimsFromProxy starting");
         JSONObject claims = t.getUserMetaData();
@@ -318,4 +348,50 @@ public class ProxyUtils {
         oa2SE.getTransactionStore().save(t);
 
     }
+
+    /**
+     * This will take the various bits and determine the actual scopes that should be in the request to the proxy.
+     * <h3>Logic</h3>
+     * <ul>
+     *     <li>forward scopes to proxy: <b>true</b> <br/>
+     *          ⇒ forward everything allowed</li>
+     *     <li>forward scopes to proxy: <b>false</b></li>
+     *     <ul>
+     *         <li>{@link OA2Client#getProxyRequestScopes()} is trivial<br/>
+     *                 ⇒ forward full set of configured scopes for the proxy</li>
+     *            <li>else<br/>
+     *                 ⇒ forward intersection of this list with the configured scopes for the proxy</li>
+     *            <li>If the proxy requests scopes contains the reserved scope of {@link #NO_PROXY_SCOPES},
+     *            then request no scopes at all from the proxy server.</li>
+     *     </ul>
+     * </ul>
+     * When we say above to forward everything allowed, we mean that the policies for scopes are applied
+     * to the request as per usual (e.g. a public client with strict scopes on cannot even
+     * make a request with extra scopes). On top of this, even if the client requests forwarding, the proxy itself
+     * may restrict scopes and is free to reject them. 
+     *
+     * @param t
+     * @param clcCommands
+     * @return
+     */
+    // CIL-1584
+    protected static Collection<String> getRequestScopes(OA2ServiceTransaction t, OA2CLCCommands clcCommands) {
+        OA2Client oa2Client = t.getOA2Client();
+        if (oa2Client.isForwardScopesToProxy()) {
+            // Remember that server policies have been applied to this list of scopes already.
+            return t.getScopes();
+        }
+        Set<String> requestScopes = new HashSet<>();
+        requestScopes.addAll(clcCommands.getCe().getScopes());
+        if(oa2Client.hasRequestScopes()){
+            if(oa2Client.getProxyRequestScopes().contains(NO_PROXY_SCOPES)){
+                // How to get NO scopes is with a reserved scope of --
+                return new HashSet<>();
+            }
+            requestScopes.retainAll(oa2Client.getProxyRequestScopes());
+        }
+        return requestScopes;
+    }
+
+    public static final String NO_PROXY_SCOPES = "--";
 }
