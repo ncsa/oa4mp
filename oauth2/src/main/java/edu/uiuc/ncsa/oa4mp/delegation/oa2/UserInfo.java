@@ -13,7 +13,7 @@ import static edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims.*;
  * The only required field is "sub" -- all others are optional.  The
  * getJSON() method should return a JSON response string based on the
  * class variables.  Can be subclassed to support getting user info
- * from different sources> This uses a map internally
+ * from different sources. This uses a map internally
  * since otherwise it is much trickier to
  * turn this into a valid JSON object.
  */

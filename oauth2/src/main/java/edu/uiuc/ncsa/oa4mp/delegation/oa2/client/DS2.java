@@ -66,7 +66,7 @@ public class DS2 extends DelegationService {
 
     /**
      * As per spec., issue request for refresh from server. Returned {@link RTResponse} has the associated
-     * {@link edu.uiuc.ncsa.security.delegation.token.RefreshToken} and {@link AccessToken}.
+     * {@link edu.uiuc.ncsa.oa4mp.delegation.common.token.RefreshToken} and {@link AccessToken}.
      *
      * @return
      */

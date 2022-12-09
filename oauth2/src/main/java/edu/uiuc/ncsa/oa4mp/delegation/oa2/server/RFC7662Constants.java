@@ -4,7 +4,7 @@ package edu.uiuc.ncsa.oa4mp.delegation.oa2.server;
  * Constants for <a href="https://datatracker.ietf.org/doc/html/rfc7662">RFC 7662</a>,
  * the token introspection endpoint.
  * <h2>Note</h2>
- * These are also used in <a href="https://datatracker.ietf.org/doc/html/rfc7009"></a>RFC 7009</a>,
+ * These are also used in <a href="https://datatracker.ietf.org/doc/html/rfc7009">RFC 7009</a>,
  * for token revocation.
  * <p>Created by Jeff Gaynor<br>
  * on 5/19/21 at  7:18 AM

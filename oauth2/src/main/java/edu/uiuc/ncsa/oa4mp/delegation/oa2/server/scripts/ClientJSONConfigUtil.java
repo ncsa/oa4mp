@@ -11,7 +11,7 @@ import net.sf.json.JSONObject;
  * to modularize operations on the JSON. Note that the "thingy" refers to a JSON idiom, often used here <i>viz.</i>,
  * a configuration entry of the form {"topLevelKey":JSON} where JSON is either an array or json object.
  * These may be done at any level of the configuration file, so be sure to send in the right JSON object with the topLevelKey.
- * <p/>
+ * <p><br>
  * <p>Created by Jeff Gaynor<br>
  * on 8/30/17 at  3:37 PM
  */
@@ -60,7 +60,7 @@ public class ClientJSONConfigUtil {
 
     /**
      * Return the {@link JSONObject} for the given key. This will fail if there is not a single object there,
-     * <p/>
+     * <p>
      * <pre>
      *  Z=   {"key0":{
      *         "key1':X

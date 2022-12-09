@@ -90,9 +90,9 @@ public abstract class DelegationService implements Server {
      * Gets the asset once the delegation has been approved. This will typically involve getting tokens as
      * needed from the authorization server then accessing the resource server, so this actually does two
      * legs in the protocol in quick succession. If you need to do these separately, then invoke
-     * them as <br/><br/>
-     * getAT<br/>
-     * getCert<br/><br/>
+     * them as <br><br>
+     * getAT<br>
+     * getCert<br><br>
      * with the correct parameters.
      *
      * @return

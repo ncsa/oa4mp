@@ -35,8 +35,8 @@ import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
  * Creates JWT tokens. This will create both signed and unsigned tokens
  * if requested. The format is to have a header that describes the
  * content, including algorithm (fixed at "none" here) and a payload of claims. Both of these
- * are in JSON. The token then consists of based64 encoding both of these and <br/><br>
- * encoded header + "."   + encoded payload + "." + signature<br/><br>
+ * are in JSON. The token then consists of based64 encoding both of these and <br><br>
+ * encoded header + "."   + encoded payload + "." + signature<br><br>
  * If the token is unsigned, the last period is still manadatory and must end this.
  *
  * <p>Created by Jeff Gaynor<br>
