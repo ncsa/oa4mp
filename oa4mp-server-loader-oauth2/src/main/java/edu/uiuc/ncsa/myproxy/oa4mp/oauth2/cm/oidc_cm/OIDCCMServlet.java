@@ -754,7 +754,8 @@ public class OIDCCMServlet extends EnvServlet {
         debugger.trace(this, "Setting approval record for this client");
         ClientApproval approval = new ClientApproval(newClient.getIdentifier());
         approval.setApprovalTimestamp(new Date());
-        if (isAnonymous && newClient.isPublicClient()) {
+        // https://github.com/ncsa/OA4MP/pull/81
+        if (isAnonymous) {
             if (cm7591Config.autoApprove) {
                 approval.setApprover(cm7591Config.autoApproverName);
                 approval.setApproved(true);
@@ -772,8 +773,8 @@ public class OIDCCMServlet extends EnvServlet {
 
         }
         getOA2SE().getClientApprovalStore().save(approval);
-
-        writeOK(httpServletResponse, jsonResp);
+        // Github 84 https://github.com/ncsa/OA4MP/issues/84
+        writeCreateOK(httpServletResponse, jsonResp);
     }
 
     private void writeOK(HttpServletResponse httpServletResponse, JSON resp) throws IOException {
@@ -781,6 +782,12 @@ public class OIDCCMServlet extends EnvServlet {
         httpServletResponse.getWriter().println(resp.toString());
         httpServletResponse.getWriter().flush(); // commit it
         httpServletResponse.setStatus(HttpStatus.SC_OK);
+    }
+    private void writeCreateOK(HttpServletResponse httpServletResponse, JSON resp) throws IOException {
+        httpServletResponse.setContentType("application/json");
+        httpServletResponse.getWriter().println(resp.toString());
+        httpServletResponse.getWriter().flush(); // commit it
+        httpServletResponse.setStatus(HttpStatus.SC_CREATED);
     }
 
     protected JSON getPayload(HttpServletRequest httpServletRequest, MetaDebugUtil adminDebugger) throws IOException {
