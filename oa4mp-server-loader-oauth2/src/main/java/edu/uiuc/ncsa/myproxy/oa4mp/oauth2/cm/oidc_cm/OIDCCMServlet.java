@@ -268,15 +268,15 @@ public class OIDCCMServlet extends EnvServlet {
         if (client.isPublicClient()) {
             json.put(TOKEN_ENDPOINT_AUTH_METHOD, TOKEN_ENDPOINT_AUTH_NONE);
         }
-        if (client.getRtLifetime() != 0) {
+        if (0 < client.getRtLifetime() ) {
             // Stored in ms., sent/received in sec. Convert to seconds.
             json.put(REFRESH_LIFETIME, client.getRtLifetime() / 1000);
         } else {
             json.put(REFRESH_LIFETIME, 0L);
         }
-        if (0 != client.getAtLifetime()) {
+        if (0 < client.getAtLifetime()) {
             // Stored in ms., sent/received in sec. Convert to seconds.
-            json.put(ACCESS_TOKEN_LIFETIME, client.getRtLifetime() / 1000);
+            json.put(ACCESS_TOKEN_LIFETIME, client.getAtLifetime() / 1000);
         } else {
             json.put(ACCESS_TOKEN_LIFETIME, 0L);
         }
@@ -711,9 +711,11 @@ public class OIDCCMServlet extends EnvServlet {
         // strings expect them back as strings, not JSON arrays. Return them in the format sent.
         boolean returnStringScopes = false;
         try {
-            ((JSONObject)rawJSON).getString(SCOPE);
+            ((JSONObject)rawJSON).getJSONArray(SCOPE);
+            returnStringScopes = false;
+        } catch (JSONException jse) {
             returnStringScopes = true;
-        } catch (JSONException jse) {}
+        }
 
         OA2Client newClient = processRegistrationRequest((JSONObject) rawJSON, adminClient, isAnonymous, httpServletResponse, template);
         if (isAnonymous) {
@@ -789,16 +791,17 @@ public class OIDCCMServlet extends EnvServlet {
     }
 
     private void writeOK(HttpServletResponse httpServletResponse, JSON resp) throws IOException {
+        httpServletResponse.setStatus(HttpStatus.SC_OK);
         httpServletResponse.setContentType("application/json");
         httpServletResponse.getWriter().println(resp.toString());
         httpServletResponse.getWriter().flush(); // commit it
-        httpServletResponse.setStatus(HttpStatus.SC_OK);
     }
     private void writeCreateOK(HttpServletResponse httpServletResponse, JSON resp) throws IOException {
+        // write first since after flush(), no updates work and the status is set as SC_OK, regardless.
+        httpServletResponse.setStatus(HttpStatus.SC_CREATED);
         httpServletResponse.setContentType("application/json");
         httpServletResponse.getWriter().println(resp.toString());
         httpServletResponse.getWriter().flush(); // commit it
-        httpServletResponse.setStatus(HttpStatus.SC_CREATED);
     }
 
     protected JSON getPayload(HttpServletRequest httpServletRequest, MetaDebugUtil adminDebugger) throws IOException {

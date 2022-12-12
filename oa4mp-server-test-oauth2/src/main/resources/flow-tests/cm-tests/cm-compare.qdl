@@ -1,0 +1,26 @@
+/*
+   Script to take 3 args
+   original JSON to create client
+   returned JSON from get
+   list of any properties to skip.
+*/
+
+client. := args().0;
+payload. := args().1;
+skip_list := args().2;
+key_set := ⊢ keys(payload.);
+key_set := key_set/skip_list;
+while[
+  key ∈ key_set
+   ][
+/*
+   say('key=' + key);
+   say(client.key);
+   say(payload.key);
+*/
+   if[payload.key << List][
+     ⊨ reduce(@&&, payload.key∈client.key):'failed check for list attribute ' + key;
+   ]else[
+     ⊨ payload.key == client.key : ' failed check for attribute ' + key;
+   ];
+];

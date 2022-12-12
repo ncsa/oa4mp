@@ -1,0 +1,27 @@
+#! /usr/bin/env -S qdl-run  
+path := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests/cm-tests';
+script_path(path ~ script_path());
+
+script_load('anon-init.qdl');
+
+payload. := from_json(file_read(ini.'payloads' + 'create-public.json'));
+resp. := http#post(payload.);
+⊨ resp.'status'.'code' == 201 : 'incorrect returned status of ' + resp.'status'.'code';
+⊨ resp.'content'.'scope' == 'openid' : 'incorrect scope, expect openid got ' + resp.'content'.'scope';
+try[
+  r. := http#get({'client_id':resp.'content'.'client_id'});
+  ⊨ false : 'was able to get anonymous client';
+]catch[];
+
+try[
+  r. := http#post(payload.);
+  ⊨ false : 'was able to delete anonymous client';
+]catch[];
+
+
+try[
+  r. := http#delete({'client_id':resp.'content'.'client_id'});
+  ⊨ false : 'was able to delete anonymous client';
+]catch[];
+
+say('ok');

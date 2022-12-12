@@ -1,0 +1,25 @@
+{
+  "comment": "This is a basic example from the specification to test if a client has been created correctly",
+  "redirect_uris": [
+    "https://client.example.org/callback0",
+    "https://client.example.org/callback2"
+  ],
+  "client_name": "My New Example",
+  "logo_uri": "https://client.example.org/logo2.png",
+  "scope": ["openid", "email", "profile", "org.cilogon.userinfo"],
+  "subject_type": "pairwise",
+  "sector_identifier_uri": "https://other.example.net/file_of_redirect_uris2.json",
+  "token_endpoint_auth_method": "client_secret_basic",
+  "jwks_uri": "https://client.example.org/my_public_keys2.jwks",
+  "userinfo_encrypted_response_alg": "RSA1_5",
+  "userinfo_encrypted_response_enc": "A128CBC-HS256",
+  "contacts": [
+    "mary2@example.org"
+  ],
+  "request_uris": [
+    "https://client.example.org/rf2.txt#qpXaRLh_n93TTR9F252ValdatUQvQiJi5BDub2BeznA"
+  ],
+  "at_lifetime":1200,
+  "rt_lifetime":1500000,
+  "strict_scopes":true
+}

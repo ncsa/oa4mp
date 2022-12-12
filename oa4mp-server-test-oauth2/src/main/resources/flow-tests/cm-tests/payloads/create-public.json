@@ -1,0 +1,22 @@
+{
+  "comment": [
+    "This is a basic example from the specification to test if a public client has been created correctly",
+    "Note that this also includes a refresh token lifetime parameter (rt_lifetime). Omitting this disables refresh tokens.",
+    "The lifetime is in seconds.",
+    "To create a public client, the scope must be 'openid' and the auth method must be 'none'."
+    ],
+  "redirect_uris": [
+    "http://localhost/callback",
+        "http://localhost/callback2",
+        "http://localhost/callback3"
+  ],
+  "client_name": "Another test client",
+  "scope": "openid",
+  "token_endpoint_auth_method": "none",
+  "contacts": [
+    "test-client@test.org"
+  ],
+  "grant_types":["refresh_token","urn:ietf:params:oauth:grant-type:device_code"],
+  "rt_lifetime" :2592000,
+  "at_lifetime" :900
+}

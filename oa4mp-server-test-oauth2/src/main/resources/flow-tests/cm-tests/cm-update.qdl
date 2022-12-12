@@ -1,0 +1,17 @@
+#! /usr/bin/env -S qdl-run  
+path := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests/cm-tests';
+script_path(path ~ script_path());
+
+script_load('init.qdl');
+
+payload. := from_json(file_read(ini.'payloads' + 'create.json'));
+resp. := http#post(payload.);
+update. := from_json(file_read(ini.'payloads' + 'update.json'));
+resp. := http#post(update.);
+⊨ resp.'status'.'code' == 201 : 'incorrect returned status of ' + resp.'status'.'code';
+r. := http#get({'client_id':resp.'content'.'client_id'});
+// r. now contains the uploaded client
+script_load('cm-compare.qdl', r.'content', update., {'application_type', 'token_endpoint_auth_method'});
+r. := http#delete({'client_id':resp.'content'.'client_id'});
+say('ok');
+

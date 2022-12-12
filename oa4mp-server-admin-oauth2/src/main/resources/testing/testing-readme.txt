@@ -1,3 +1,9 @@
+**************************************
+* Note that there are now QDL scripts that do all of this automatically
+* You should run those. They are located in
+* $MAVEN_ROOT/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests
+**************************************
+
 When a new version is deployed, here is the testing order
 * On localhost
   ** Make SURE VPN to NCSA is working. **
