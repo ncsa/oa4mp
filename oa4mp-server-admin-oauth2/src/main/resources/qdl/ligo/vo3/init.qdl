@@ -92,11 +92,11 @@ is_igwn := script_args()==1?script_args(0)=='igwn':false;
     ζ.'Services:XRootD:SciTokens:scopes:read-frames:authorized' := ['read:/frames'];
    ζ.'Services:XRootD:SciTokens:scopes:write-frames:authorized' := ['write:/frames'];
     ]else[
-                  ζ.'Communities:LSCVirgoLIGOGroupMembers' := ['read:/DQSegDB' ,'read:/frames', 'read:/GraceDB','write:/GraceDB'];   //CIL-1345
-                     ζ.'Communities:LVC:SegDB:SegDBWriter' := ['write:/DQSegDB'];
                        ζ.'gw-astronomy:KAGRA-LIGO:members' := ['read:/GraceDB', 'read:/frames','write:/GraceDB']; //CIL-1345, CIL-1427
-     ζ.'Services:XRootD:SciTokens:write-frames:authorized' := ['write:/frames']; //CIL-1414,
+                     ζ.'Communities:LVC:SegDB:SegDBWriter' := ['write:/DQSegDB'];
+                  ζ.'Communities:LSCVirgoLIGOGroupMembers' := ['read:/DQSegDB' ,'read:/frames', 'read:/GraceDB','write:/GraceDB'];   //CIL-1345
       ζ.'Services:XRootD:SciTokens:read-frames:authorized' := ['read:/frames']; //CIL-1415
+     ζ.'Services:XRootD:SciTokens:write-frames:authorized' := ['write:/frames']; //CIL-1414,
     ];
 
  //       get_permissions(γ.) -> reduce(@~,ζ\(γ\*\name));
