@@ -3,9 +3,6 @@
    This does a get for the test admin client and removes all clients for it. The admin
    client proper should have no clients ever since it is merely for testing.
 */
-path := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests/cm-tests';
-script_path(path ~ script_path());
-
 script_load('init.qdl');
 
 resp. := http#get();

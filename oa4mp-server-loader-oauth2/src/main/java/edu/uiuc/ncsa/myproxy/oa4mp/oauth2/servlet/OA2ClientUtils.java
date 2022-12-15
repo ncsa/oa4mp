@@ -217,6 +217,7 @@ public class OA2ClientUtils {
 
     /**
      * Used when resolving which network from its dotted quad address.
+     *
      * @param address
      * @return
      */
@@ -260,16 +261,17 @@ public class OA2ClientUtils {
         if (quad[0] == 10) {
             return true;
         }
-        if (quad[0] == 192 && quad[1] == 168) return true;
-        if (quad[0] == 172 && (16 <= quad[1] && quad[1] <= 31)) return true;
-        if (quad[0] == 127 && quad[1] == 0 && quad[2] == 0 && quad[3] == 1) return true;
 
         // This just checked that it is a dotted quad address. We could have used InetAddress which
         // only checks a valid dotted quad for format, **but** might also do an actual address lookup
         // if there is a question, so that really doesn't help.
 
-        // now we have to check that address in the range 172.16.x.x to 172.31.x.x are included.
-        // Do the easy ones first.
+        // We have to check that address in the range 192.168.x.x  are included. (standard home network)
+        // We have to check that address in the range 172.16.x.x to 172.31.x.x are included.
+        if (quad[0] == 192 && quad[1] == 168) return true;
+        if (quad[0] == 172 && (16 <= quad[1] && quad[1] <= 31)) return true;
+        if (quad[0] == 127 && quad[1] == 0 && quad[2] == 0 && quad[3] == 1) return true;
+
         return false;
     }
 
@@ -450,15 +452,27 @@ public class OA2ClientUtils {
                 }
                 Object obj = map.get(key);
                 if (obj instanceof Long) {
-                    long value = (Long) obj;
-                    if (0 <= value) {
-                        clientMap.put(key, value);
+                    long pValue = (Long) obj;
+                    long eValue = -1L; // means override
+                    if(clientMap.containsKey(key)){
+                        eValue = clientMap.getLong(key);
+                    }
+                    if(eValue <0){
+                        // use the original value
+                        clientMap.put(key, pValue);
+                    }else{
                     }
                 } else {
                     if (obj instanceof Integer) {
-                        int value = (Integer) obj;
-                        if (0 <= value) {
-                            clientMap.put(key, value);
+                        int pValue = (Integer) obj;
+                        int eValue = -1;
+                        if(clientMap.containsKey(key)){
+                            eValue = clientMap.getInteger(key);
+                        }
+                        if(eValue < 0){
+                            // use original
+                            clientMap.put(key, pValue);
+                        }else{
                         }
                     } else {
                         clientMap.put(key, obj);
@@ -474,22 +488,23 @@ public class OA2ClientUtils {
 
     /**
      * Assumes that the configuration for the client is just a qdl script element or list of them.
+     *
      * @param pc
      * @param client
      */
-    public static void setupDriverPayloadConfig(AbstractPayloadConfig pc, OA2Client client){
+    public static void setupDriverPayloadConfig(AbstractPayloadConfig pc, OA2Client client) {
         JSONObject cfg = client.getConfig();
         ScriptSet<? extends QDLScript> scriptSet;
         // Options are it is a single QDL load command or an array of them.
-        if(cfg.get(CONFIG_TAG) instanceof JSONArray){
+        if (cfg.get(CONFIG_TAG) instanceof JSONArray) {
             scriptSet = AnotherJSONUtil.createScripts(cfg.getJSONArray(CONFIG_TAG));
-        }else{
+        } else {
             scriptSet = AnotherJSONUtil.createScripts(cfg.getJSONObject(CONFIG_TAG));
         }
         Iterator<? extends QDLScript> iterator = scriptSet.iterator();
-        while(iterator.hasNext()){
+        while (iterator.hasNext()) {
             QDLScript script = iterator.next();
-            if(!script.getProperties().containsKey(SRE_EXEC_PHASE)){
+            if (!script.getProperties().containsKey(SRE_EXEC_PHASE)) {
                 script.getProperties().put(SRE_EXEC_PHASE, ALL_PHASES);
             }
         }

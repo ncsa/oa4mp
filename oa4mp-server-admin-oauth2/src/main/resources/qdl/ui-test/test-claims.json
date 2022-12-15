@@ -2,8 +2,9 @@
   "comment": [
     "This JSON file contains meta data for testing user refresh tokens."
   ],
-  "test-eppn@foo.bar": {
+  "jgaynor@foo.bar": {
     "test_claim" : "my3 test 33cl33aim42",
+    "eppn":"jgaynor@foo.bar",
     "isMemberOf": [
       {
         "name": "org_ici",

@@ -78,12 +78,19 @@ is_igwn := script_args()==1?script_args(0)=='igwn':false;
           ζ.'Services:OSGPilotTest:SciTokens:compute_read' := ['compute_read'];
 
     if[is_igwn][
-     all_audience. := ['ANY'];
-                  ζ.'Communities:LSCVirgoLIGOGroupMembers' := ['qsegdb.read' ,'gwdatafind.read', 'read:/frames', 'gracedb.read'];   //CIL-1345
-                     ζ.'Communities:LVC:SegDB:SegDBWriter' := ['dqsegdb.create'];
-                       ζ.'gw-astronomy:KAGRA-LIGO:members' := ['dqsegdb.read', 'gwdatafind.read', 'gracedb.read']; //CIL-1345, CIL-1427
-     ζ.'Services:XRootD:SciTokens:write-frames:authorized' := ['write:/frames']; //CIL-1414,
-   //   ζ.'Services:XRootD:SciTokens:read-frames:authorized' := ['read:/frames']; //CIL-1415
+    // These are documented in https://git.ligo.org/computing/igwnscitokenscopes/-/blob/main/SciTokenScopes.json
+
+                                                  all_audience. := ['ANY'];
+                            ζ.'gw-astronomy:KAGRA-LIGO:members' := ['read:/frames','dqsegdb.read', 'gracedb.read'];
+          ζ.'Services:Compute:SciTokens:scopes:read:authorized' := ['compute.read'];
+          ζ.'Services:DQSegDB:SciTokens:scopes:read:authorized' := ['dqsegdb.read','gracedb.read'];
+        ζ.'Services:Compute:SciTokens:scopes:cancel:authorized' := ['compute.cancel'];
+        ζ.'Services:Compute:SciTokens:scopes:create:authorized' := ['compute.create'];
+        ζ.'Services:Compute:SciTokens:scopes:modify:authorized' := ['compute.modify'];
+        ζ.'Services:DQSegDB:SciTokens:scopes:create:authorized' := ['dqsegdb.create'];
+        ζ.'Services:DQSegDB:SciTokens:scopes:modify:authorized' := ['dqsegdb.modify'];
+    ζ.'Services:XRootD:SciTokens:scopes:read-frames:authorized' := ['read:/frames'];
+   ζ.'Services:XRootD:SciTokens:scopes:write-frames:authorized' := ['write:/frames'];
     ]else[
                   ζ.'Communities:LSCVirgoLIGOGroupMembers' := ['read:/DQSegDB' ,'read:/frames', 'read:/GraceDB','write:/GraceDB'];   //CIL-1345
                      ζ.'Communities:LVC:SegDB:SegDBWriter' := ['write:/DQSegDB'];

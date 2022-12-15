@@ -1,0 +1,14 @@
+{
+  "comment": "This is a basic example from the specification to test that an anonymous client cannot upload QDL references",
+  "application_type": "web",
+  "redirect_uris": [
+    "https://client.example.org/callback",
+    "https://client.example.org/callback2"
+  ],
+  "client_name": "My Example",
+  "scope": ["openid", "email", "profile"],
+  "contacts": [
+    "ve7jtb@example.org"
+  ],
+  "cfg" : {"qdl": "foo"}
+}

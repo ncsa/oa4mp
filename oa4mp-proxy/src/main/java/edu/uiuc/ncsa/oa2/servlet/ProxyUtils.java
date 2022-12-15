@@ -384,9 +384,10 @@ public class ProxyUtils {
         Set<String> requestScopes = new HashSet<>();
         requestScopes.addAll(clcCommands.getCe().getScopes());
         if(oa2Client.hasRequestScopes()){
-            if(oa2Client.getProxyRequestScopes().contains(NO_PROXY_SCOPES)){
-                // How to get NO scopes is with a reserved scope of --
-                return new HashSet<>();
+
+            if(oa2Client.getProxyRequestScopes().contains("*")){
+                // Asks for all scopes.
+                return clcCommands.getCe().getScopes();
             }
             requestScopes.retainAll(oa2Client.getProxyRequestScopes());
         }

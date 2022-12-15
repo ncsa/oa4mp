@@ -34,6 +34,8 @@ import static edu.uiuc.ncsa.security.util.json.MyJPathUtil.*;
  * on 3/14/14 at  11:04 AM
  */
 public class OA2Client extends Client implements OA2ClientScopes {
+    // CIL-1586. Have a default "use the server value" and explicitly use it.
+    public static final long USE_SERVER_DEFAULT = -1L;
     @Override
     public OA2Client clone() {
         OA2Client client = new OA2Client(getIdentifier());
@@ -41,8 +43,8 @@ public class OA2Client extends Client implements OA2ClientScopes {
         return client;
     }
 
-    long maxATLifetime = 0L;
-    long maxRTLifetime = 0L;
+    long maxATLifetime = USE_SERVER_DEFAULT;
+    long maxRTLifetime = USE_SERVER_DEFAULT;
 
     /**
      * The maximum lifetime, if different from the server max, for this client. Note that once set,
@@ -201,7 +203,7 @@ public class OA2Client extends Client implements OA2ClientScopes {
 
     Collection<String> callbackURIs = new LinkedList<>();
 
-    long rtLifetime = 0L;
+    long rtLifetime = USE_SERVER_DEFAULT;
 
     public long getRtLifetime() {
         return rtLifetime;
@@ -219,10 +221,12 @@ public class OA2Client extends Client implements OA2ClientScopes {
         this.atLifetime = atLifetime;
     }
 
-    long atLifetime = -1L;
+    long atLifetime = USE_SERVER_DEFAULT;
 
     /**
      * This returns whether or not this client is configured to return refresh tokens.
+     * Zero means no refresh tokens, positive is the lifetime, negative {@link #USE_SERVER_DEFAULT}
+     * means to use the server default.
      * Disabled means the lifetime is set to zero. See also {@link #getMaxRTLifetime()}
      *
      * @return
@@ -656,7 +660,7 @@ public class OA2Client extends Client implements OA2ClientScopes {
         return rc;
     }
 
-    long dfLifetime = -1L; // device flow configured lifetime.
+    long dfLifetime = USE_SERVER_DEFAULT; // device flow configured lifetime.
 
     public long getDfLifetime() {
         return dfLifetime;
@@ -674,7 +678,7 @@ public class OA2Client extends Client implements OA2ClientScopes {
         this.dfInterval = dfInterval;
     }
 
-    long dfInterval = -1L; // device flow interval in ms
+    long dfInterval = USE_SERVER_DEFAULT; // device flow interval in ms
 
     /**
      * This is a string that tells what claims <b>in addition to the subject</b> to take from
@@ -704,6 +708,10 @@ public class OA2Client extends Client implements OA2ClientScopes {
      */
     // CIL-1584
     public Collection<String> getProxyRequestScopes() {
+        if(proxyRequestScopes == null){
+            proxyRequestScopes = new ArrayList<>();
+            proxyRequestScopes.add("*"); // default is all of them
+        }
         return proxyRequestScopes;
     }
 

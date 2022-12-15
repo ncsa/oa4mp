@@ -1,0 +1,17 @@
+#! /usr/bin/env -S qdl-run
+/*
+  This is an anonyumous attempt to set several things that are off limits, such
+  as a cfg property with the letter qdl in it, or whether to change the server policies
+  for skipping server scripts.
+*/
+path := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests/cm-tests/';
+script_path(path ~ script_path());
+script_load('anon-init.qdl');
+
+payload. := from_json(file_read(ini.'payloads' + 'create-cfg.json'));
+try[
+  resp. := http#post(payload.);
+  ⊨ false : 'was able to create an anonymous client with a qdl cfg';
+]catch[];
+
+say('ok');

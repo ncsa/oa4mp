@@ -4,7 +4,6 @@
    Tests the client with no configuration
 */
 
-script_path('/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests' ~ script_path());
 
 cfg.'id'  := 'localhost:cil1550'; // name of the configuration, not the id
 cfg.'idp'  := 'NCSA';

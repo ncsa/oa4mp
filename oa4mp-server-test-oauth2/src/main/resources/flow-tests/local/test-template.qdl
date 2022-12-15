@@ -1,8 +1,11 @@
 #! /usr/bin/env -S qdl-run
 
 /*
-   Tests the client with handler configurations, but no QDL or other claim sources.
-   This is a pretty long andcomprehensive test. 
+   Tests the client with handler configurations and templates,
+   but no QDL or other claim sources.
+   This is a pretty long and comprehensive test.
+   It also tests various types of downscoping and upscoping
+
    Current client config (2022-11-09):
   {"tokens": {
    "access":  {
@@ -36,10 +39,10 @@
 
 */
 
-cfg.'id'  := 'localhost:test/no_qdl'; //
+cfg.'id'  := 'localhost:test/no_qdl'; //id
 cfg.'idp'  := 'Google -- use "j g" identity';
 cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';
-cfg.'description' :=  'Test that a plain handler configuration (no qdl or other) works.';
+cfg.'description' :=  'Test that a plain handler configuration (w/ templates, no qdl) works.';
 cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token endpoint
 user_id := 'http://cilogon.org/serverA/users/6849'; // for given IDP and identitu
 params.'authz' :=  {'scope': 'read: x.y: x.z write:'}; // initial request is query
@@ -88,11 +91,8 @@ tokens. := exchange();
 at. := tokens.'access_token'.'jwt';
 s. := tokenize(at.'scope', ' ');
 /*
-params.'exchange' :=  {'scope': '"read:/home/'+user_id  + // read
-                                ' write:/home/'+user_id + // write -- wrong, not granted
-                                ' read:/public/lsst/' + user_id + // ok
-                                ' x.y:/abc/def/pqr' + // works since it add component to path
-                                ' x.y:/abc/defpqr"'}; // not granted since the path is wrong
+ Exchange tests down-scoping (works for scopes that are uris and have paths)
+ and up-scoping (fails).
 */
 ⊨ reduce(@∧, [ 'read:/home/' + user_id,
                'read:/public/lsst/' + user_id,

@@ -38,6 +38,9 @@ define[test_lifetime(at., rt.)][
 
 define[test(at., rt., user, expected_scopes.)][
    ss. := tokenize(at.'scope', ' ');
+   say(at., true);
+   say(rt., true);
+
    ⊨ at.'iss' == 'http://localhost:9443/custom/issuer' : 'wrong issuer';
    ⊨ is_defined(at.'wlcg.ver')  : 'not an WLCG token';
    ⊨ at.'wlcg.ver' == '1.0' : 'wrong WLCG version';

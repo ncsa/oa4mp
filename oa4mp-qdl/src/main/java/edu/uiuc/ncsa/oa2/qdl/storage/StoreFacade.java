@@ -2,6 +2,8 @@ package edu.uiuc.ncsa.oa2.qdl.storage;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2ConfigurationLoader;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.TransactionStore;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.SystemEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
@@ -17,12 +19,12 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.*;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.TransactionStore;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.util.configuration.ConfigUtil;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -79,7 +81,14 @@ public class StoreFacade implements QDLModuleMetaClass {
 
     public OA2SE getEnvironment() throws Exception {
         if (environment == null) {
+            // pipe all startup messages to dev null, essentially.
+            PrintStream out = System.out;
+            PrintStream err = System.err;
+            System.setOut(new PrintStream(OutputStream.nullOutputStream()));
+            System.setErr(new PrintStream(OutputStream.nullOutputStream()));
             environment = (OA2SE) getLoader().load();
+            System.setOut(out);
+            System.setErr(err);
         }
         return environment;
     }
@@ -122,6 +131,7 @@ public class StoreFacade implements QDLModuleMetaClass {
     String FILE_ARG = "file";
     String NAME_ARG = "name";
     String TYPE_ARG = "type";
+    String VERBOSE_ON_ARG = "verbose_on";
 
     public class InitMethod implements QDLFunction {
         @Override
@@ -136,7 +146,7 @@ public class StoreFacade implements QDLModuleMetaClass {
 
         @Override
         public Object evaluate(Object[] objects, State state) {
-
+            boolean verboseOn = false;
             if (objects.length == 1) {
                 if (!(objects[0] instanceof QDLStem)) {
                     throw new IllegalArgumentException("Error: A single argument must be a stem.");
@@ -145,6 +155,9 @@ public class StoreFacade implements QDLModuleMetaClass {
                 file = stem.getString(FILE_ARG);
                 cfgName = stem.getString(NAME_ARG);
                 storeType = stem.getString(TYPE_ARG);
+                if (stem.containsKey(VERBOSE_ON_ARG)) {
+                    verboseOn = stem.getBoolean(VERBOSE_ON_ARG);
+                }
             }
 
             if (objects.length == 3) {
@@ -162,7 +175,7 @@ public class StoreFacade implements QDLModuleMetaClass {
                 throw new IllegalArgumentException("Error: Missing argument");
             }
 
-            doSetup();
+            doSetup(verboseOn);
             return true;
         }
 
@@ -208,12 +221,25 @@ public class StoreFacade implements QDLModuleMetaClass {
         }
     }
 
-    protected void doSetup() {
+    protected void doSetup(boolean verboseOn) {
         if (isTrivial(file) || isTrivial(cfgName) || isTrivial(storeType)) {
             // case is that init is not called. This should be benign at this point.
             return;
         }
+        // Since loading the system may print out a ton of random messages to the console,
+        // this captures everything and suppresses it.
+
+        PrintStream out = System.out;
+        PrintStream err = System.err;
+        if (!verboseOn) {
+            System.setOut(new PrintStream(OutputStream.nullOutputStream()));
+            System.setErr(new PrintStream(OutputStream.nullOutputStream()));
+        }
         init(file, cfgName);
+        if (!verboseOn) {
+            System.setOut(out);
+            System.setErr(err);
+        }
         try {
             setStoreAccessor(createAccessor(storeType));
         } catch (Exception x) {

@@ -1046,6 +1046,14 @@ public class OIDCCMServlet extends EnvServlet {
             }
             JSONObject jsonObject = jsonRequest.getJSONObject("cfg");
             // CIL-889 fix
+            if(isAnonymous){
+                if(jsonRequest.getString("cfg").toLowerCase().contains("qdl")){
+                    // Pretty draconian test -- any tag for QDL gets booted.
+                    throw new OA2GeneralError(OA2Errors.INVALID_REQUEST_OBJECT,
+                              "QDL scripting is not allowed for this client.",
+                              HttpStatus.SC_BAD_REQUEST, null);
+                  }
+            }
             if(adminClient.isAllowQDL()){
                 // CIL-1031
                 if(adminClient.allowQDLCodeBlocks()){
@@ -1058,7 +1066,7 @@ public class OIDCCMServlet extends EnvServlet {
                    }
                 }
             }else{
-                if(jsonRequest.getString("cfg").contains("qdl")){
+                if(jsonRequest.getString("cfg").toLowerCase().contains("qdl")){
                     // Pretty draconian test -- any tag for QDL gets booted.
                     throw new OA2GeneralError(OA2Errors.INVALID_REQUEST_OBJECT,
                               "QDL scripting is not allowed for this client.",
@@ -1091,7 +1099,7 @@ public class OIDCCMServlet extends EnvServlet {
                 jsonRequest.remove(STRICT_SCOPES);
             }
             if (jsonRequest.containsKey(SKIP_SERVER_SCRIPTS)) {
-                client.setStrictscopes(jsonRequest.getBoolean(SKIP_SERVER_SCRIPTS));
+                client.setSkipServerScripts(jsonRequest.getBoolean(SKIP_SERVER_SCRIPTS));
                 jsonRequest.remove(SKIP_SERVER_SCRIPTS);
             }
             // CIL-1221

@@ -2,7 +2,7 @@
 
 script_load('init.qdl');
 
-payload. := from_json(file_read(ini.'payloads' + 'create.json'));
+payload. := from_json(file_read(ini.'payloads' + 'create-extra.json'));
 resp. := http#post(payload.);
 ⊨ resp.'status'.'code' == 201 : 'incorrect returned status of ' + resp.'status'.'code';
 r. := http#get({'client_id':resp.'content'.'client_id'});

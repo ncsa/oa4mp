@@ -892,10 +892,10 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                                      OA2Client client) {
         OA2ServiceTransaction t = (OA2ServiceTransaction) transaction;
         // Set these in the transaction then send it along.
-        t.setAccessTokenLifetime(ClientUtils.computeATLifetime(t, (OA2SE) MyProxyDelegationServlet.getServiceEnvironment()));
+        t.setAccessTokenLifetime(ClientUtils.computeATLifetime(t, client, (OA2SE) MyProxyDelegationServlet.getServiceEnvironment()));
         if (client.isRTLifetimeEnabled()) {
             if (((OA2SE) MyProxyDelegationServlet.getServiceEnvironment()).isRefreshTokenEnabled()) {
-                t.setRefreshTokenLifetime(ClientUtils.computeRefreshLifetime(t, (OA2SE) MyProxyDelegationServlet.getServiceEnvironment()));
+                t.setRefreshTokenLifetime(ClientUtils.computeRefreshLifetime(t, client, (OA2SE) MyProxyDelegationServlet.getServiceEnvironment()));
             }
         } else {
             t.setRefreshTokenLifetime(0L);
@@ -1265,8 +1265,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         }
         if (tokenVersion1) {
             // Can't fix it until we have the right transaction.
-            t.setRefreshTokenLifetime(ClientUtils.computeRefreshLifetime(t, oa2SE));
-            t.setAccessTokenLifetime(ClientUtils.computeATLifetime(t, oa2SE));
+            t.setRefreshTokenLifetime(ClientUtils.computeRefreshLifetime(t, client, oa2SE));
+            t.setAccessTokenLifetime(ClientUtils.computeATLifetime(t, client, oa2SE));
         }
 
         if (t == null || !t.isRefreshTokenValid()) {

@@ -1,0 +1,22 @@
+#! /usr/bin/env -S qdl-run
+
+/*
+   This script takes the client id as the argument and tries to remove the client
+   and its approval record. 
+*/
+client_id := args().0;
+module_import('oa2:/qdl/store', 'clients');
+module_import('oa2:/qdl/store', 'approvals');
+
+  cfg.'file' := '/home/ncsa/dev/csd/config/server-oa2.xml';
+  cfg.'name' := 'localhost:oa4mp.oa2.mariadb';
+  cfg.'type' := 'client';
+clients#init(cfg.);
+
+  cfg.type := 'client_approval';
+approvals#init(cfg.);
+
+say('removing client and approval for ' + client_id);
+
+clients#remove(client_id);
+approvals#remove(client_id);

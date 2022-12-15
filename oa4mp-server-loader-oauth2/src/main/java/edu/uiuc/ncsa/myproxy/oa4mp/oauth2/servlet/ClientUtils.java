@@ -60,11 +60,11 @@ public class ClientUtils {
     needed. Setting these in the configurations will let you track exactly what values are used.
     server default 97
      */
-    public static long computeATLifetime(OA2ServiceTransaction st2, OA2SE oa2SE) {
-     return computeATLifetimeOLD(st2, oa2SE);
+    public static long computeATLifetime(OA2ServiceTransaction st2, OA2Client client, OA2SE oa2SE) {
+     return computeATLifetimeOLD(st2, client, oa2SE);
     }
 
-    protected static long computeATLifetimeOLD(OA2ServiceTransaction st2, OA2SE oa2SE) {
+    protected static long computeATLifetimeOLD(OA2ServiceTransaction st2, OA2Client client, OA2SE oa2SE) {
 //        OA2SE oa2SE = (OA2SE) getServiceEnvironment();
         // If the server default is <= 0 that implies there is some misconfiguration. Better to find that out here than
         // get squirrelly results later.
@@ -73,7 +73,7 @@ public class ClientUtils {
         }
         st2.setMaxATLifetime(oa2SE.getMaxATLifetime()); // absolute max allowed on this server for this request
 
-        OA2Client client = (OA2Client) st2.getClient();
+//        OA2Client client = (OA2Client) st2.getClient();
         long lifetime = -1L;
         if (0 < client.getAtLifetime()) {
             lifetime = Math.min(client.getAtLifetime(), oa2SE.getMaxATLifetime());
@@ -140,8 +140,8 @@ public class ClientUtils {
      * @param st2
      * @return
      */
-    public static long computeRefreshLifetime(OA2ServiceTransaction st2, OA2SE oa2SE) {
-        return computeRefreshLifetimeNEW(st2, oa2SE);
+    public static long computeRefreshLifetime(OA2ServiceTransaction st2, OA2Client client, OA2SE oa2SE) {
+        return computeRefreshLifetimeNEW(st2, client, oa2SE);
         //return computeRefreshLifetimeOLD(st2, oa2SE);
     }
 
@@ -177,7 +177,7 @@ public class ClientUtils {
          return lifetime;
      }
 
-    public static long computeRefreshLifetimeNEW(OA2ServiceTransaction st2, OA2SE oa2SE) {
+    public static long computeRefreshLifetimeNEW(OA2ServiceTransaction st2, OA2Client client, OA2SE oa2SE) {
  //        OA2SE oa2SE = (OA2SE) getServiceEnvironment();
          if (!oa2SE.isRefreshTokenEnabled()) {
              throw new NFWException("Internal error: Refresh tokens are disabled for this server.");
@@ -187,7 +187,7 @@ public class ClientUtils {
          }
 
 
-         OA2Client client = (OA2Client) st2.getClient();
+         //OA2Client client = (OA2Client) st2.getClient();
          if(!client.isRTLifetimeEnabled()){
              throw new GeneralException("refresh tokens are not enabled for this client");
          }

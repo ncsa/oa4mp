@@ -454,17 +454,12 @@ but admin clients have their own store and management interface.]]>
     </entry>
     <entry id="proxy_request_scopes">
     <body>
-    <![CDATA[Property: list of strings (--)
+    <![CDATA[Property: list of strings (*)
 If the server uses a proxy, it must have a set of scopes it requests (found in the proxy client
 configuration). Normally, all of these are used. You may specify a subset of these with this
-property, which is a list. The contract is that if this list is missing (default) or empty
-then all scopes from the proxy are requested. Otherwise, the intersection of this list
-and the proxy's scopes are taken.
-
-There is a reserved scope of "--" which if present in the list means that no scopes
-should be requested. This is because we want the default to be that no special
-scopes should mean this is ignored and all the default scopes are used rather
-than requiring the client to fill in every scope all the time.
+property, which is a list. The contract is that if this list is missing (default) or contains
+the wildcard "*" then all scopes from the proxy are requested.
+Otherwise, the intersection of this list and the proxy's scopes are taken.
 
 Note that this property is ignored if forward_scopes_to_proxy is true.
 
@@ -478,9 +473,9 @@ E.g. 1: [openid, profile]  => [openid, profile]
 
 E.g.. 2: [openid, offline_access] => [openid] (since other is not configured)
 
-E.g. 3: []  => [openid, email, profile, org.cilogon.userinfo]  (send them all)
+E.g. 3: [*]  => [openid, email, profile, org.cilogon.userinfo]  (send them all)
 
-E.g. 4: [--] => [] (special case, scope of -- means send none)
+E.g. 4: [] => [] (special case, empty list means send none)
 
 See also: forward_scopes_to_proxy.]]>
     </body>

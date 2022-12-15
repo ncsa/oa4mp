@@ -1,7 +1,9 @@
-#! /usr/bin/env -S qdl-run  
-path := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests/cm-tests';
+#! /usr/bin/env -S qdl-run
+/*
+ say('args=' + args());
+path := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests/cm-tests/';
 script_path(path ~ script_path());
-
+*/
 script_load('anon-init.qdl');
 
 payload. := from_json(file_read(ini.'payloads' + 'create.json'));
@@ -9,8 +11,9 @@ resp. := http#post(payload.);
 ⊨ resp.'status'.'code' == 201 : 'incorrect returned status of ' + resp.'status'.'code';
 ⊨ reduce(@∧, resp.'content'.'scope' ∈ payload.'scope') : 'incorrect scopes, got ' + resp.'content'.'scope';
 
+client_id := resp.'content'.'client_id';
 try[
-  r. := http#get({'client_id':resp.'content'.'client_id'});
+  r. := http#get({'client_id':client_id});
   ⊨ false : 'was able to get anonymous client';
 ]catch[];
 
@@ -21,8 +24,13 @@ try[
 
 
 try[
-  r. := http#delete({'client_id':resp.'content'.'client_id'});
+  r. := http#delete({'client_id':client_id});
   ⊨ false : 'was able to delete anonymous client';
 ]catch[];
 
+try[
+  script_load('anon-cleanup.qdl', client_id);
+]catch[
+  say('there was a problem deleting the client with id ' + client_id);
+];
 say('ok');

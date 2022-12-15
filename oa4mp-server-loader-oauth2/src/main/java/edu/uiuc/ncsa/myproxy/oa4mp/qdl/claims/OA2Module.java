@@ -31,7 +31,10 @@ public class OA2Module extends JavaModule {
         funcs.add(new NewTemplate());
         funcs.add(new IsInGroup());
         funcs.add(new IsInGroup2());
-        funcs.add(new ScopeTemplateQDLUtil());
+        ScopeTemplateQDLUtil qdlUtil= new ScopeTemplateQDLUtil();
+        funcs.add(qdlUtil.new ResolveTemplates());
+        funcs.add(qdlUtil.new Downscope());
+        funcs.add(qdlUtil.new QueryScopes());
         funcs.add(new TemplateSubsitutionQDLUtil());
         oa2Module.addFunctions(funcs);
         if (state != null) {

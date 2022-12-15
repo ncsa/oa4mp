@@ -183,7 +183,7 @@ public class StoreAccessModule extends JavaModule {
                             if (storeFacade == null) {
                                 storeFacade = newStoreFacade(); // get the right type of store facade
                             }
-                            storeFacade.doSetup();
+                            storeFacade.doSetup(false);
                         } catch (Throwable t) {
                             System.out.println("Could not re-initialize store facade for alias " + getAlias());
                         }

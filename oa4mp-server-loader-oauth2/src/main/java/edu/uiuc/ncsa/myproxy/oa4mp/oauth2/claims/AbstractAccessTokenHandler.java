@@ -198,7 +198,7 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
                 computedScopes.addAll(z);
             }
         }
-        // Scorecard: we have all of the templates resolved for this resource/audience.
+        // Scorecard: we have all the templates resolved for this resource/audience.
         // The question is what do we return?
         // This has the most recent exchange requests in it any of which may be empty.
         Collection<String> actualScopes;

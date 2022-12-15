@@ -1,11 +1,17 @@
-#! /usr/bin/env -S qdl-run  
+#! /usr/bin/env -S qdl-run
+/*
+  This is an anonyumous attempt to set several things that are off limits, such
+  as a cfg property with the letter qdl in it, or whether to change the server policies
+  for skipping server scripts.
+*/
 
 script_load('anon-init.qdl');
 
-payload. := from_json(file_read(ini.'payloads' + 'create-public.json'));
+payload. := from_json(file_read(ini.'payloads' + 'create-extra.json'));
 resp. := http#post(payload.);
 ⊨ resp.'status'.'code' == 201 : 'incorrect returned status of ' + resp.'status'.'code';
-⊨ resp.'content'.'scope' == 'openid' : 'incorrect scope, expect openid got ' + resp.'content'.'scope';
+⊨ reduce(@∧, resp.'content'.'scope' ∈ payload.'scope') : 'incorrect scopes, got ' + resp.'content'.'scope';
+
 client_id := resp.'content'.'client_id';
 try[
   r. := http#get({'client_id':client_id});
@@ -28,5 +34,4 @@ try[
 ]catch[
   say('there was a problem deleting the client with id ' + client_id);
 ];
-
 say('ok');
