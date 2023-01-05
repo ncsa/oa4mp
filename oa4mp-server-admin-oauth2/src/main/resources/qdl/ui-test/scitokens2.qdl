@@ -1,0 +1,27 @@
+
+cfg. := new_template('file');
+/*
+
+   ╔══════════════════════════════════════════════════════════════════════════════╗
+   ║  NOTE: You CANNOT use a QDL path for file_path since the last line hands     ║
+   ║  over control of the claim source to OA4MP, which is then invoked by the     ║
+   ║  FSClaimSource handler there -- i.e., it is given to a non-QDL               ║
+   ║ component to manage.                                                         ║
+   ╚══════════════════════════════════════════════════════════════════════════════╝
+
+*/
+path := 'vfs#/scripts/ui-test/ui-test.json';
+
+//cfg.file_path := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-admin-oauth2/src/main/resources/qdl/ui-test/ui-test.json';
+cfg.file_path := 'vfs#/scripts/ui-test/ui-test.json';
+at_claims. := get_claims(create_source(cfg.));
+    requested_scopes. := (0 < size(tx_scopes.))?tx_scopes.:scopes.;
+
+computed_scopes. := scopes.;
+
+if[
+  'bgsu-astronomy:xrootd:read-frames' ∈ at_claims.'isMemberOf'
+  ][
+   computed_scopes. := computed_scopes.~ 'read:"/home/' + at_claims.'username';
+  ;]
+

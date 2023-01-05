@@ -3,8 +3,8 @@
     "This JSON file contains meta data for testing user refresh tokens."
   ],
   "jgaynor@foo.bar": {
-    "test_claim" : "my3 test 33cl33aim42",
-    "eppn":"jgaynor@foo.bar",
+    "test_claim": "my3 test 33cl33aim42",
+    "eppn": "jgaynor@foo.bar",
     "isMemberOf": [
       {
         "name": "org_ici",
@@ -20,7 +20,16 @@
       }
     ]
   },
+  "http://cilogon.org/serverT/users/21340363": {
+    "isMemberOf": [
+      "bgsu-astronomy:members",
+      "bgsu-astronomy:all-staff",
+      "bgsu-astronomy:xrootd:read-frames",
+      "bgsu-astronomy:xrootd:write-frames"
+    ],
+    "username" : "gaynor"
 
+  },
   "jgaynor@fnal.gov": {
     "comment": [
       "This is for testing the capabilities mechanism. The access token handler gets this",
@@ -73,5 +82,4 @@
       }
     ]
   }
-
 }

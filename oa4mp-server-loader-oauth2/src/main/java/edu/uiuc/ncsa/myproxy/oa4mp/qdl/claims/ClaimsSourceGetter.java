@@ -76,10 +76,10 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
 
     protected QDLStem doCode(QDLStem arg, String username, QDLStem headers, State state) {
         OA2State oa2State = null;
-        if(state instanceof OA2State) {
+        if (state instanceof OA2State) {
             oa2State = (OA2State) state;
         }
-        BasicClaimsSourceImpl basicClaimsSource = (BasicClaimsSourceImpl) ConfigtoCS.convert(arg, oa2State==null?null:oa2State.getOa2se());
+        BasicClaimsSourceImpl basicClaimsSource = (BasicClaimsSourceImpl) ConfigtoCS.convert(arg, oa2State == null ? null : oa2State.getOa2se());
         OA2ServiceTransaction t = new OA2ServiceTransaction((Identifier) null);
         t.setUsername(username);
         JSONObject claims = new JSONObject();
@@ -93,12 +93,12 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
 
     protected QDLStem doNCSA(QDLStem arg, String username, State state) {
         OA2State oa2State = null;
-        if(state instanceof OA2State) {
-             oa2State = (OA2State) state;
+        if (state instanceof OA2State) {
+            oa2State = (OA2State) state;
         }
         DebugUtil.setIsEnabled(true);
         DebugUtil.setDebugLevel(DebugUtil.DEBUG_LEVEL_TRACE);
-        NCSALDAPClaimSource ncsaldapClaimSource = (NCSALDAPClaimSource) ConfigtoCS.convert(arg, (oa2State==null?null:oa2State.getOa2se()));
+        NCSALDAPClaimSource ncsaldapClaimSource = (NCSALDAPClaimSource) ConfigtoCS.convert(arg, (oa2State == null ? null : oa2State.getOa2se()));
         OA2ServiceTransaction t = new OA2ServiceTransaction((Identifier) null);
         t.setUsername(username);
         JSONObject protoClaims = new JSONObject();
@@ -112,10 +112,10 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
 
     public QDLStem doHeaders(QDLStem arg, String username, QDLStem headers, State state) {
         OA2State oa2State = null;
-        if(state instanceof OA2State){
+        if (state instanceof OA2State) {
             oa2State = (OA2State) state;
         }
-        HTTPHeaderClaimsSource httpHeaderClaimsSource = (HTTPHeaderClaimsSource) ConfigtoCS.convert(arg, oa2State==null?null:oa2State.getOa2se());
+        HTTPHeaderClaimsSource httpHeaderClaimsSource = (HTTPHeaderClaimsSource) ConfigtoCS.convert(arg, oa2State == null ? null : oa2State.getOa2se());
 
         OA2ServiceTransaction t = new OA2ServiceTransaction((Identifier) null);
         t.setUsername(username);
@@ -132,6 +132,7 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
     /**
      * This does the get and makes a dummy transaction with the right name. This means a claim name
      * of uid should always be used.
+     *
      * @param arg
      * @param username
      * @param state
@@ -139,10 +140,10 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
      */
     private QDLStem doLDAP(QDLStem arg, String username, State state) {
         OA2State oa2State = null;
-        if(state instanceof OA2State){
+        if (state instanceof OA2State) {
             oa2State = (OA2State) state;
         }
-        LDAPClaimsSource ldapClaimsSource = (LDAPClaimsSource) ConfigtoCS.convert(arg, oa2State==null?null:oa2State.getOa2se());
+        LDAPClaimsSource ldapClaimsSource = (LDAPClaimsSource) ConfigtoCS.convert(arg, oa2State == null ? null : oa2State.getOa2se());
         OA2ServiceTransaction t = new OA2ServiceTransaction((Identifier) null);
         t.setUsername(username);
         JSONObject protoClaims = new JSONObject();
@@ -155,7 +156,7 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
         // This way, if there are no hits, the user gets an empty claim list, showing nothing was found,
         // rather than a false positive that there was a single attribute (actually the one we passed in)
         // in the claim source.
-        if(output.containsKey(arg.getString(CS_LDAP_SEARCH_NAME)) && output.getString(arg.getString(CS_LDAP_SEARCH_NAME)).equals(username)) {
+        if (output.containsKey(arg.getString(CS_LDAP_SEARCH_NAME)) && output.getString(arg.getString(CS_LDAP_SEARCH_NAME)).equals(username)) {
             output.remove(arg.getString(CS_LDAP_SEARCH_NAME));
         }
         return output;
@@ -217,6 +218,7 @@ get_claims(cfg., 'dweitzel2@unl.edu')
      * so it creates one and sets the user name. Practically then the
      * {@link #CS_FILE_CLAIM_KEY} then is ignored, since the function accepts
      * the username directly.
+     *
      * @param arg
      * @param username
      * @param state
@@ -224,15 +226,29 @@ get_claims(cfg., 'dweitzel2@unl.edu')
      */
     protected QDLStem doFS(QDLStem arg, String username, State state) {
         OA2State oa2State = null;
-        if(state instanceof OA2State){
+        if (state instanceof OA2State) {
             oa2State = (OA2State) state;
         }
+        String rawJSON = null;
         // resolve files against VFS's so scripts have access to them in server mode.
-        Polyad polyad = new Polyad(IOEvaluator.READ_FILE);
-        polyad.addArgument(new ConstantNode(arg.getString(CS_FILE_FILE_PATH), Constant.STRING_TYPE));
-        state.getMetaEvaluator().evaluate(polyad, state);
-        String rawJSON = polyad.getResult().toString();
-        FSClaimSource fsClaimSource = (FSClaimSource) ConfigtoCS.convert(arg, oa2State, oa2State == null?null:oa2State.getOa2se());
+        if (arg.containsKey(CS_FILE_FILE_PATH)) {
+            Polyad polyad = new Polyad(IOEvaluator.READ_FILE);
+            polyad.addArgument(new ConstantNode(arg.getString(CS_FILE_FILE_PATH), Constant.STRING_TYPE));
+            state.getMetaEvaluator().evaluate(polyad, state);
+            rawJSON = polyad.getResult().toString();
+        } else {
+            if (arg.containsKey(CS_FILE_STEM_CLAIMS)) {
+                Object ooo = arg.get(CS_FILE_STEM_CLAIMS);
+                if (!(ooo instanceof QDLStem)) {
+                    throw new IllegalArgumentException("the " + CS_FILE_STEM_CLAIMS + " argument must be a stem of claims");
+                }
+                rawJSON = ((QDLStem) ooo).toJSON().toString();
+            }
+        }
+        if (rawJSON == null) {
+            throw new IllegalStateException("neither a path to the claims nor a stem of claims has been given");
+        }
+        FSClaimSource fsClaimSource = (FSClaimSource) ConfigtoCS.convert(arg, oa2State, oa2State == null ? null : oa2State.getOa2se());
         fsClaimSource.setRawJSON(rawJSON);
         OA2ServiceTransaction t = new OA2ServiceTransaction((Identifier) null);
         t.setUsername(username);

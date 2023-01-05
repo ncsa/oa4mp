@@ -19,7 +19,8 @@
                ligo_cfg.'port' := 636;
          ligo_cfg.'claim_name' := 'uid';
                ligo_cfg.'type' := 'ldap';
-        ligo_cfg.'search_base' := 'ou=robots,dc=ligo,dc=org';
+        //ligo_cfg.'search_base' := 'ou=robots,dc=ligo,dc=org';
+        ligo_cfg.'search_base' := 'ou=scitoken,ou=robot,dc=ligo,dc=org';
           ligo_cfg.'ldap_name' := 'uid';
               ligo_cfg.groups. := ['isMemberOf'];
    ligo_cfg.search_attributes. := ['isMemberOf', 'uin', 'uid'];

@@ -194,7 +194,7 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
             }
             AuthorizationTemplate template = templates.get(aud);
             for (AuthorizationPath authorizationPath : template.getPaths()) {
-                List<String> z = replaceTemplate(authorizationPath.toString(), groupMap, claimsNoGroups);
+                List<String> z = replaceTemplate(authorizationPath.toPath(), groupMap, claimsNoGroups);
                 computedScopes.addAll(z);
             }
         }

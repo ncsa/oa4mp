@@ -29,4 +29,4 @@ try[
   say('there was a problem deleting the client with id ' + client_id);
 ];
 
-say('ok');
+say('ok: Anonymous creation of a public client');

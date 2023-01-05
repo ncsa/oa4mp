@@ -26,8 +26,8 @@ NOTE that the args are "eic" for EIC or "jlab" for everything else.
  if[
    script_args(0) == 'eic'
    ][
-        γ. := ['eic computing'];
-        α. := ['read:/eic/'];
+        γ. := ['eic computing', 'eic computing'];
+        α. := ['read:/eic/', 'write:/eic/'];
    ]else[
         γ. := ['clas12 computing', 'gluex computing','gluex computing', 'moller computing'];
         α. := ['read:/clas12/','read:/gluex/', 'write:/gluex/', 'read:/moller/'];

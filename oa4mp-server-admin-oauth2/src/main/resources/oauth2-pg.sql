@@ -171,5 +171,13 @@ commit;
   \dn <-- lists all schemas
   set search_path to oauth2; <-- or no meta commands work right
   \d <-- lists the tables
-  
+  \d tablename <-- shows all columns and their types. Almost show create table
+
+  select * from sys.syscolumns where referenceid = (select tableid from sys.systables where tablename = 'ciloa2.clients') order by columnnumber
+
+  select ciloa2.clients  from sys.systables st LEFT OUTER join sys.sysschemas ss on (st.schemaid = ss.schemaid) where ss.schemaname ='ciloa2';
+
+  select clients  from sys.systables st LEFT OUTER join sys.sysschemas ss on (st.schemaid = ss.schemaid) where ss.schemaname ='ciloa2';
+
+
 */

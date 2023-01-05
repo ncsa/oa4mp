@@ -16,7 +16,5 @@ clients#init(cfg.);
   cfg.type := 'client_approval';
 approvals#init(cfg.);
 
-say('removing client and approval for ' + client_id);
-
 clients#remove(client_id);
 approvals#remove(client_id);

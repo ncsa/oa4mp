@@ -23,6 +23,5 @@ while[
    count++;
  r. := http#delete({'client_id':x.'client_id'});
 ];
-say('removed ' + count + ' clients');
 
 

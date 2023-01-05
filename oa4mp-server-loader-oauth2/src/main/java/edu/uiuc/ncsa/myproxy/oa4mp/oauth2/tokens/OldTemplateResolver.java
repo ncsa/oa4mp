@@ -51,6 +51,9 @@ public class OldTemplateResolver {
                     String path = parts[1];
                     AuthorizationTemplate authorizationTemplate = authorizationTemplates.get(key);
                     for (AuthorizationPath authorizationPath : authorizationTemplate.getPaths()) {
+                        if(!authorizationPath.isExtensible()){
+                            continue;
+                        }
                         if (operation.equals(authorizationPath.operation)) {
                             if (check(authorizationPath.path, path)) {
                                 returnedScopes.add(operation + ":" + path);

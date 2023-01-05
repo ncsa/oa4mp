@@ -1,10 +1,12 @@
 #! /usr/bin/env -S qdl-run
-    path := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests';
-    script_path(path ~ script_path());
+path := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests';
+if[path∉script_path()][script_path(path ~ script_path());];
 /* Next should be set in the main.qdl script.*/
 cfg.'id'  := 'localhost:test/prototype';
 cfg.'idp'  := 'ANY';
 cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';
 cfg.'flow_type' := 'df';
 cfg.'description' :=  'This tests prototype, i.e., inheritance. The client inherits from localhost:command.line2';
-script_load('local/vo_test-suite.qdl', cfg.);
+script_load('local/vo_test-suite.qdl', cfg., 'https://localhost:9443/oauth2');
+say('Prototype test: ok!');
+

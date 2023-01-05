@@ -4,8 +4,7 @@ import edu.uiuc.ncsa.security.core.util.BeanUtils;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import net.sf.json.JSONObject;
 
-import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.AuthorizationTemplates.OPERATION_KEY;
-import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.AuthorizationTemplates.PATH_KEY;
+import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.AuthorizationTemplates.*;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -14,6 +13,16 @@ import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.AuthorizationTemplates.P
 public class AuthorizationPath {
     String operation;
     String path = null;
+
+    public boolean isExtensible() {
+        return extensible;
+    }
+
+    public void setExtensible(boolean extensible) {
+        this.extensible = extensible;
+    }
+
+    boolean extensible = true;
 
     public String getOperation() {
         return operation;
@@ -31,15 +40,26 @@ public class AuthorizationPath {
         fromJSON(json);
     }
 
-    public AuthorizationPath(String template) {
-        super();
-        fromString(template);
+
+    public AuthorizationPath(String operation,
+                             String path,
+                             boolean isExtensible) {
+        this.operation = operation;
+        this.path = path;
+        this.extensible = isExtensible;
 
     }
 
+    /**
+     * Constructor for a fixed scope (e.g. compute.modify) that has no path and should
+     * never be downscoped.
+     * @param operation
+     */
+    public AuthorizationPath(String operation) {
+        this(operation, null, false);
+    }
     public AuthorizationPath(String operation, String path) {
-        this.operation = operation;
-        this.path = path;
+        this(operation, path, true);
     }
 
     public JSONObject toJSON() {
@@ -48,14 +68,21 @@ public class AuthorizationPath {
         if (hasPath()) {
             jsonObject.put(PATH_KEY, path);
         }
+        jsonObject.put(EXTENSIBLE_KEY, extensible);
         return jsonObject;
     }
 
     public void fromJSON(JSONObject j) {
         operation = j.getString(OPERATION_KEY);
+        if(j.containsKey(EXTENSIBLE_KEY)){
+               this.extensible = j.getBoolean(EXTENSIBLE_KEY);
+        }
         if (j.containsKey(PATH_KEY)) {
             path = j.getString(PATH_KEY);
+        }else{
+            this.extensible = false;
         }
+
     }
 
     /**
@@ -79,10 +106,20 @@ public class AuthorizationPath {
 
     @Override
     public String toString() {
-        if(hasPath()) {
-            return operation + ":" + path;
-        }
-        return operation;
+        return "AuthorizationPath{" +
+                "operation='" + operation + '\'' +
+                ", path='" + path + '\'' +
+                ", extensible=" + extensible +
+                '}';
+    }
+
+    /**
+     * Return this as path representation of this object. Note that this is used
+     * in comparisons, while {@link #toString()} is used for printing and such.
+     * @return
+     */
+    public String toPath(){
+          return operation +  (StringUtils.isTrivial(path)?"":(":" + path));
     }
 
     @Override
@@ -91,15 +128,7 @@ public class AuthorizationPath {
         AuthorizationPath ap = (AuthorizationPath) obj;
         if (!BeanUtils.checkEquals(ap.operation, operation)) return false;
         if (!BeanUtils.checkEquals(ap.path, path)) return false;
-        return true;
+        return ap.extensible != this.extensible;
     }
 
-    public static void main(String[] args) {
-        String template = "read:/public/${user}/***";
-        AuthorizationPath at = new AuthorizationPath(template);
-        // The result should look like the argument, just checking that it parsed ok.
-        System.out.println(at);
-        at = new AuthorizationPath("compute.queue");
-        System.out.println(at);
-    }
 }

@@ -90,25 +90,7 @@ public class QDLTests extends AbstractQDLTester {
         OA2State state = (OA2State) getTestUtils().getNewState();
         StringBuffer script = new StringBuffer();
         // tests absolute path, not in server mode.
-        /*
-        cfg.type :='pass_through';
-        cfg.scheme := 'vfs2';
-        cfg.mount_point := '/test2';
-        cfg.access := 'rw';
-        cfg.root_dir := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-admin-oauth2/src/main/resources/qdl/ui-test';
-        vfs_mount(cfg.);
-         */
-        String testClaimsFile = "vfs2#/test2/test-claims.json";
         String realPath = "/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-admin-oauth2/src/main/resources/qdl/ui-test/test-claims.json";
-/*
-        addLine(script, "     vfs_cfg.scheme := 'vfs2';");
-        addLine(script, "       vfs_cfg.type := 'pass_through';");
-        addLine(script, "vfs_cfg.mount_point := '/test2';");
-        addLine(script, "     vfs_cfg.access := 'rw';");
-        addLine(script, "   vfs_cfg.root_dir := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-admin-oauth2/src/main/resources/qdl/ui-test';");
-        addLine(script, "vfs_mount(vfs_cfg.);");  // Now we have a functional VFS with the target file in it.
-*/
-
         addLine(script, "module_load('edu.uiuc.ncsa.myproxy.oa4mp.qdl.OA2QDLLoader', 'java');");
         addLine(script, "module_import('oa2:/qdl/oidc/claims');");
         addLine(script, "cfg. := new_template('file');");

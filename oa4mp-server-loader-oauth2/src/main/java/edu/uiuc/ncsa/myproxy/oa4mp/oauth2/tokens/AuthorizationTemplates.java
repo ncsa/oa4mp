@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens;
 
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
@@ -19,6 +20,7 @@ import java.util.List;
 public class AuthorizationTemplates extends HashMap<String, AuthorizationTemplate> {
     public static final String OPERATION_KEY = "op";
     public static final String PATH_KEY = "path";
+    public static final String EXTENSIBLE_KEY = "isExtensible";
 
     public AuthorizationTemplate put(AuthorizationTemplate value) {
         return super.put(value.getAudience(), value);
@@ -132,6 +134,8 @@ public class AuthorizationTemplates extends HashMap<String, AuthorizationTemplat
         authorizationTemplates.put(template);
 
         System.out.println(authorizationTemplates.toJSON().toString(1));
-
+        QDLStem stem = new QDLStem();
+        stem.fromJSON(authorizationTemplates.toJSON());
+        System.out.println(stem.toString(1));
     }
 }

@@ -30,6 +30,8 @@
 
 */
 
+path := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests';
+if[path∉script_path()][script_path(path ~ script_path());];
 
 original_file := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-admin-oauth2/src/main/resources/qdl/ui-test/test-claims.json';
 claims_file := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-admin-oauth2/src/main/resources/qdl/ui-test/ui-test.json';
@@ -46,7 +48,7 @@ rc := script_load('driver.qdl', cfg.);
 ⊨ rc == 0: (rc==-1?'user aborted':'there was an error initiating the flow');
 tokens. := clc#access();
 claims. := claims();
-⊨ reduce(@∧, [1282,1097,1363] ∈ claims.'isMemberOf'\*\'id') : 'incorrect group id number(s)';
+⊨ reduce(@∧, [1282,1097,1363] ∈ claims.'isMemberOf'\*\'id') : 'incorrect group id number(s):' + to_string(claims.'isMemberOf'\*\'id');
 ⊨ reduce(@∧, ['org_ici','all_ncsa_employe','jira-users' ] ∈ claims.'isMemberOf'\*\'name') : 'incorrect group name(s)';
 ⊨ claims.'sub' == 'http://cilogon.org/serverT/users/21340363' : 'incorrect subject' ;
 ⊨ claims.'aud' == cfg.'id' : 'wrong audience';
@@ -56,13 +58,13 @@ claims. := claims();
  new_claims. := {'isMemberOf':[{'id':1200, 'name':'org_xxx'},{'id':1400, 'name':'all_ncsa_employees'},{'id':1363, 'name':'jira-users'}],
      'test_claim':'m3y o3t3h3e3r test cl33aim 41'};
  say('writing new claims');
- file_write(claims_file, to_json({'test-eppn@foo.bar':new_claims.}) );
+ file_write(claims_file, to_json({'jgaynor@foo.bar':new_claims.}) );
 
 tokens. := refresh();
 ⊨ tokens.'access_token'.'lifetime' == 900000 : 'wrong access token lifetime';
 ⊨ tokens.'refresh_token'.'lifetime' == 1800000 : 'wrong refresh token lifetime';
 claims. := claims();
-⊨ reduce(@∧, [1200,1400,1363] ∈ claims.'isMemberOf'\*\'id') : 'incorrect group id number(s)';
+⊨ reduce(@∧, [1200,1400,1363] ∈ claims.'isMemberOf'\*\'id') : 'incorrect group id number(s), got ' + to_string(claims.'isMemberOf'\*\'id');
 ⊨ reduce(@∧, ['org_xxx','all_ncsa_employees','jira-users' ] ∈ claims.'isMemberOf'\*\'name') : 'incorrect group name(s)';
 ⊨ claims.'sub' == 'http://cilogon.org/serverT/users/21340363' : 'incorrect subject' ;
 ⊨ claims.'aud' == cfg.'id' : 'wrong audience';
@@ -74,7 +76,7 @@ new_claims. := {'isMemberOf':[{'id':100, 'name':'org_yyy'},{'id':200, 'name':'al
     'test_claim':'33m3y33 o3t3h3e3rtest c3l3a3i3m3430',
     'new_claim':'new claim 12345'};
 
-file_write(claims_file, to_json({'test-eppn@foo.bar':new_claims.}));
+file_write(claims_file, to_json({'jgaynor@foo.bar':new_claims.}));
 user_info();
 claims. := claims();
 ⊨ reduce(@∧, [100,200,300] ∈ claims.'isMemberOf'\*\'id') : 'incorrect group id number(s)';

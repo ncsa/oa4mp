@@ -1,12 +1,20 @@
 #! /usr/bin/env -S qdl-run
 
 /*
-   Tests the client with scitokens configuratioin
+   Tests the client with scitokens configuration AND QDL claim sources
    Client config 2022-11-09
 {"tokens": {
    "access":  {
     "audience": "https://localhost/fermilab",
     "lifetime": 300000,
+       "qdl":   {
+        "load": "ui-test/process.qdl",
+        "xmd": {"exec_phase":    [
+         "post_token",
+         "post_refresh",
+         "post_user_info"
+        ]}
+       }
     "templates": [  {
      "aud": "https://localhost/fermilab",
      "paths":    [
@@ -28,10 +36,10 @@
 path := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests';
 if[path∉script_path()][script_path(path ~ script_path());];
 
-cfg.'id'  := 'localhost:scitokens'; // name of the configuration, not the id
+cfg.'id'  := 'localhost:scitokens2'; // name of the configuration, not the id
 cfg.'idp'  := 'Github';
 cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';
-cfg.'description' :=  'Test basic configuration for Scitokens, no scripting.';
+cfg.'description' :=  'Test basic configuration for Scitokens, with scripting.';
 cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token endpoint
 user_id := 'http://cilogon.org/serverT/users/21340363'; // id from Github on test.cilogon.org
 

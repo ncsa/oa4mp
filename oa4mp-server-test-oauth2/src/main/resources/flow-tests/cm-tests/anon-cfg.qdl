@@ -14,4 +14,4 @@ try[
   ⊨ false : 'was able to create an anonymous client with a qdl cfg';
 ]catch[];
 
-say('ok');
+say('ok: Anonymous client with cfg property (which is rejected w/ error)');

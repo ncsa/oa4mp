@@ -1,6 +1,6 @@
 #! /usr/bin/env -S qdl-run
- path := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests';
- script_path(path ~ script_path());
+path := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests';
+if[path∉script_path()][script_path(path ~ script_path());];
 cfg.'id'  := 'localhost:test/fnal';
 cfg.'idp'  := 'GitHub';
 cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';

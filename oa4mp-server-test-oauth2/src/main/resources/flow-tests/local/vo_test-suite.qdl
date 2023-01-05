@@ -4,7 +4,7 @@
    The assumption is that the authorization has been done and then the client is simply used
 */
 /* Next should be set in the main.qdl script.*/
-
+issuer := args().1;
 params.'authz' :=  {
                     'scope': 'read: write: x.y',
           'code_challenge' : 'N_zjM2czxZIWNar-lWUiuS7-Pacwh-k-L_Akpje6AmY',
@@ -36,12 +36,10 @@ define[test_lifetime(at., rt.)][
    ⊨ rt.'lifetime' == 3600000 : 'wrong rt lifetime, expected 3600000, got ' + (rt.'lifetime');
 ];
 
-define[test(at., rt., user, expected_scopes.)][
+define[test(at., rt., user, expected_scopes., issuer)][
    ss. := tokenize(at.'scope', ' ');
-   say(at., true);
-   say(rt., true);
-
-   ⊨ at.'iss' == 'http://localhost:9443/custom/issuer' : 'wrong issuer';
+   //⊨ at.'iss' == 'http://localhost:9443/custom/issuer' : 'wrong issuer';
+   ⊨ at.'iss' == issuer : 'wrong issuer';
    ⊨ is_defined(at.'wlcg.ver')  : 'not an WLCG token';
    ⊨ at.'wlcg.ver' == '1.0' : 'wrong WLCG version';
    ⊨ user == at.'sub' : 'subject in id and access token do not match';
@@ -54,7 +52,7 @@ at. := tokens.'access_token';
 rt. := tokens.'refresh_token';
 expected_scopes. :=['read:/home/'+user,'write:/data/'+user+'/cluster', 'x.y:/abc/def/ghi'];
 test_lifetime(at., rt.);
-test(at.'jwt', rt.'jwt', user, expected_scopes.);
+test(at.'jwt', rt.'jwt', user, expected_scopes., issuer);
 
 tokens. := exchange();
 at. := tokens.'access_token';
@@ -63,4 +61,4 @@ tokens. := exchange('-rt');
 rt. := tokens.'refresh_token';
 
 test_lifetime(at., rt.);
-test(at.'jwt', rt.'jwt', user, expected_scopes.);
+test(at.'jwt', rt.'jwt', user, expected_scopes., issuer);

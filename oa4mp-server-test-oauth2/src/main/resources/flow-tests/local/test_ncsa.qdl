@@ -14,6 +14,8 @@
        "type": "identity"
       }}}
 */
+path := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests';
+if[path∉script_path()][script_path(path ~ script_path());];
 
 cfg.'id'  := 'localhost:test/ncsa'; // name of the configuration, not the id
 cfg.'idp'  := 'NCSA';

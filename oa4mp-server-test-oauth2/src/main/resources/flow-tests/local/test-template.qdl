@@ -38,6 +38,8 @@
 
 
 */
+path := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests';
+if[path∉script_path()][script_path(path ~ script_path());];
 
 cfg.'id'  := 'localhost:test/no_qdl'; //id
 cfg.'idp'  := 'Google -- use "j g" identity';
@@ -63,7 +65,7 @@ s. := tokenize(at.'scope', ' ');
 ⊨ reduce(@∧, ['x.z', 'write:/data/cluster',
                'read:/home/' + user_id,
                'read:/public/lsst/' + user_id,
-               'x.y:/abc/def'] ∈ s.) : 'Wrong scopes in access token';
+               'x.y:/abc/def'] ∈ s.) : 'Wrong scopes in access token:' + to_string(s.);
 ⊨ tokens.'access_token'.'lifetime' - 750000 ≤ 2000 : 'wrong access token lifetime';
 ⊨ at.'iss' == 'https://access.cilogon.org' : 'wrong access token issuer';
 ⊨ at.'aud' == 'https://wlcg.cern.ch/jwt/v1/access' : 'wrong access token audience';

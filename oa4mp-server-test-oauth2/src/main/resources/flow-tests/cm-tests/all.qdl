@@ -17,7 +17,6 @@ counter.'fail' := 0;
 while[x∈test.][
 try[
   script_load(x);
-  say(''); // blank line for clean display.
   counter.'pass' += 1;
   ]catch[
      say('error running script ' + x);
@@ -28,4 +27,4 @@ try[
 
 say(counter.'pass' + ' passed');
 say(counter.'fail' + ' failed');
-say('total tests run =' + (counter.'pass' + counter.'fail'));
+say('total tests run = ' + (counter.'pass' + counter.'fail'));

@@ -307,7 +307,6 @@ the lock will remain, preventing garbage collection. This command will let you c
 such a lock and remove it. ]]>
        </body>
     </entry>
-</html>
 <entry id="gc_run">
    <body>
 <![CDATA[Command.
@@ -316,6 +315,19 @@ such as recovering from some calamity, but generally this should be treated as a
 not a standard one.]]>
    </body>
 </entry>
+    <entry id="gc">
+       <body>
+    <![CDATA[GC stands for garbage collection and refers to all of the mechanisms
+involved. There are three main commands that control GC. These are
+
+  gc_run - manually run GC
+gc_check - Check if the current transaction can be GC'd
+ gc_lock - lock/unlock/query the store.
+
+Please invoke help for each of these as needed.]]>
+       </body>
+    </entry>
+
     <!--  List of attributes
        access_token            callback_uri            description             proxy_id                scopes                  user_code
        access_token_valid      certificate             expires_in              refresh_token           states                  username
@@ -351,3 +363,4 @@ get_by_at  show_qdl_state
     </entry>
           -->
 
+</html>
