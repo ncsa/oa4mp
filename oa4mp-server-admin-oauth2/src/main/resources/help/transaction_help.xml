@@ -262,7 +262,7 @@ Print the current tokens for this transaction. See the --help for this command.]
 
     <entry id="GC">
        <body>
-  <![CDATA[Garbage Collection. Transactions are automatically deleted once they are not
+  <![CDATA[Garbage Collection. Transactions are automatically deleted once they are no
 longer used. The logic for this may be quite complex, since a transaction may have a variety
 of tokens that are associated with it. There are tools for running GC and querying it.
 
