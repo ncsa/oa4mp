@@ -71,21 +71,28 @@
 
 <h3>Parameters specific to OA4MP</h3>
 <p>OA4MP allows you to specify several client properties that it uses which are not in the specification.
-These are</p>
-<ul>
-    <li>at_lifetime = the lifetime in seconds that an access token may have</li>
-    <li>cfg = a configuration (JSON) for managing ID, access and refresh tokens and for running QDL scripts.</li>
-    <li>rt_lifetime = the lifetime in seconds that a refresh token may have</li>
-    <li>strict_scopes = a boolean that when <b>true</b> (default) will reject any scopes not explicitly set.
-    When <b>false</b>, any scope may be sent. This is typically set to <b>false</b> for clients that return
-    JWTs as access tokens.</li>
-</ul>
+These are listed below in a table</p>
 <p>Note that all of these are subject to server policies. You may request an outlandish refresh token
-lifetime, e.g., but if serverpolicy restricts it, then the server will make the final determination.
-See the table below for the specifics.</p>
+lifetime, e.g., but if server policy restricts it, then the server will make the final determination.
+</p>
 
-<h3>Notes on Legal Requests</h3>
-<p>What values can be sent and are accepted?</p>
+<h2>Anonymous registration</h2>
+<p>An <b><i>anonymous registration</i></b> is simply creating a standard client without an associated admin client.
+In other words
+it is pretty much exactly like creating a basic client using the registration endpoint, although
+various OA4MP attributes are available that are not at the registration endpoint. This still
+restricts certain things you can configure, such as the cfg attribute.
+(Remember that an admin client has a vetted trust relationship with the server,
+so it has much wider latitude to create a standard client.)</p>
+
+<h2>Public clients</h2>
+<p>A <b><i>public client</i></b> is a standard client that is allowed only the user metadata openid scope
+    (so not the org.cilogon.userinfo scope, e.g.). The primary function of a public client is to
+    answer if the user has logged in to the system. If the client is anonymous, that is the only scope allowed.
+    If the client is managed, it is possible the admin may allow other scopes for access tokens as well.</p>
+
+<h1>Legal Request Attributes</h1>
+<h2>Standard attributes</h2>
 <table>
     <caption>Valid values</caption>
     <tr>
@@ -94,12 +101,7 @@ See the table below for the specifics.</p>
         <th>Values</th>
         <th>Comments</th>
     </tr>
-    <tr align="left" valign="top">
-         <td>name</td>
-         <td>Y</td>
-         <td>The human readable name for this client, to be displayed on the consent screen.</td>
-         <td>Note that the RFC's do not require this, but OA4MP does.</td>
-     </tr>
+
     <tr align="left" valign="top">
          <td>callback_uri</td>
          <td>Y</td>
@@ -114,6 +116,17 @@ See the table below for the specifics.</p>
          guaranteed to be returned to you unchanged as a parameter in the callback.</td>
      </tr>
     <tr align="left" valign="top">
+        <td>contacts</td>
+        <td>N</td>
+        <td>A list or string</td>
+        <td>This should contain the valid email for a <b>person</b> to contact in case there is an issue with the
+            client. You should assume that if you are going to be contacted at this address it will only be
+            because of some dire issue. Supplying a generic institutional email is useless.
+            The spec. allows for multiples but we only support a single (at this writing) so only the first will be
+            used if a list is sent.
+        </td>
+    </tr>
+    <tr align="left" valign="top">
         <td>grant_type</td>
         <td>N</td>
         <td>Either a JSON array of blank delimited list which may contain
@@ -127,6 +140,12 @@ See the table below for the specifics.</p>
         </td>
     </tr>
     <tr align="left" valign="top">
+         <td>name</td>
+         <td>Y</td>
+         <td>The human-readable name for this client, to be displayed on the consent screen.</td>
+         <td>Note that the RFC's do not require this, but OA4MP does.</td>
+     </tr>
+    <tr align="left" valign="top">
         <td>response_type</td>
         <td>N</td>
         <td>code (default), id_token.</td>
@@ -138,81 +157,190 @@ See the table below for the specifics.</p>
         </td>
     </tr>
     <tr align="left" valign="top">
-        <td>contacts</td>
-        <td>N</td>
-        <td>A list or string</td>
-        <td>This should contain the valid email for a <b>person</b> to contact in case there is an issue with the
-            client. You should assume that if you are going to be contacted at this address it will only be
-            because of some dire issue. Supplying a generic institutional email is useless.
-            The spec. allows for multiples but we only support a single (at this writing) so only the first will be
-            used if a list is sent.
-        </td>
-    </tr>
-    <tr align="left" valign="top">
         <td>scope</td>
         <td>N</td>
         <td>Either a JSON array or blank delimited list of scopes</td>
         <td>If you wish to use OIDC, you must at least supply a scope of openid. All supported scopes
             are <br/>
-            openid<br/>
-            email<br/>
-            profile<br/>
-            org.cilogon.userinfo<br/>
-            edu.uiuc.ncsa.myproxy.getcert<br/>
+            <ul>
+                <li>openid</li>
+                <li>email</li>
+                <li>profile</li>
+                <li>org.cilogon.userinfo</li>
+                <li>edu.uiuc.ncsa.myproxy.getcert</li>
+            </ul>
             Note that
             the getcert scope requires you be able to get X509 certs via a MyProxy server, so only specify that if
-            you really need it.
+            the service supports X509 certs and you really need it.
             <br/><b>Public clients:</b> Only openid scope is allowed and attempts to change the scopes will result in
             an error. It is not possible to change a public client to a confidential client. You must
             register a new client instead (This is due to our policies regarding creation of client secrets.).
         </td>
     </tr>
+</table>
+
+<h2>OA4MP specific attributes</h2>
+<p>In the table below are attributes that are specific to OA4MP and may be sent as well.
+In particular, note the <b>Anon?</b> column which if <b>Y</b> means than an anonymous client
+can set this.</p>
+<table>
+    <caption>Valid values</caption>
+    <tr>
+        <th>Parameter</th>
+        <th>Required?</th>
+        <th>Default</th>
+        <th>Anon?</th>
+        <th>Values</th>
+        <th>Comments</th>
+    </tr>
     <tr align="left" valign="top">
         <td>at_lifetime</td>
         <td>N</td>
-        <td>A integer (in seconds)</td>
-        <td><b>(OA4MP specific!!)</b>This sets the access token lifetime for all subsequent access tokens. Note
+        <td>-1</td>
+        <td>Y</td>
+        <td>Integer (in seconds)</td>
+        <td>This sets the access token lifetime for all subsequent access tokens. Note
             that is <i>must be less than or equal to the server's default</i>. You should only set this if
-            you have a specific need for it an knowledge of what values will work.
+            you have a specific need for it an knowledge of what values will work. The default means to use
+            the server default.
         </td>
     </tr>
     <tr align="left" valign="top">
-        <td>cfg</td>
+        <td>description</td>
         <td>N</td>
-        <td>A JSON object</td>
-        <td><b>(OA4MP specific!!)</b>This is a configuration that includes scripting for gettign and processing
-            additional claims.
-            Generally you do not need one of these unless you have a very, very specific requirement. If you
-            send attributes that do not fall within the spec., they will be put in this object for you.
-            Generally if you do not know you need it and know what it does, you can safely ignore it.<br/>
-            <b>Public clients:</b>This parameter is not supported and will result in the rejection of any request.
+        <td>--</td>
+        <td>Y</td>
+        <td>String</td>
+        <td>This is an opaque string that contains a description of this client. It may or
+            may not be human-readable, so "Jeff's test client" is fine as is "42-1455-35:4566-255"
+            if that helps your admin client manage these.
         </td>
     </tr>
     <tr align="left" valign="top">
-        <td>rt_lifetime</td>
+        <td>ersatz_client</td>
         <td>N</td>
-        <td>A integer (in seconds)</td>
-        <td><b>(OA4MP specific!!)</b> If you request a grant_type of refresh_token, this specifies the maximum lifetime,
-            in seconds, that
-            it will be valid. Normally this is set for a very long time, as in weeks if not months. If this is omitted
-            or set to 0 (zero) then no refresh tokens will be created.
+        <td>false</td>
+        <td>N</td>
+        <td>Boolean</td>
+        <td>If this client can be used as an <a href="ersatz_clients.html">ersatz client</a>.
         </td>
     </tr>
     <tr align="left" valign="top">
-        <td>strict_scopes</td>
+        <td>extends_provisioners</td>
         <td>N</td>
-        <td>true</td>
-        <td><b>(OA4MP specific!!)</b> If set to <b>true</b> (default) only scopes explicitly
-            set at registration will be allowed. If <b>false</b>  then any unrecognized scopes
-            in the initial request will cause the request to be rejected.
-            If set to <b>true</b> you may send anything as a scope
-            and allowed scopes will be processed, unknown scopes will be passed along for later processing
-            and if not used, simply ignored.
-            In the case that the access tokens is a JWT (such as SciTokens or WLCG tokens) set this
-            false since the access token scopes would be passed in.
+        <td>false</td>
+        <td>N</td>
+        <td>Boolean</td>
+        <td>The clients that provision this may be used as prototypes as well. Set this
+            <b>true</b> if you want this (ersatz) client to inherit the settings of its
+            provisioners. See <a href="ersatz_clients.html">ersatz clients</a> for more.
         </td>
     </tr>
-
+    <tr align="left" valign="top">
+          <td>cfg</td>
+          <td>N</td>
+          <td>--</td>
+          <td>Y</td>
+          <td>JSON object</td>
+          <td>This is a configuration that includes scripting for getting and processing
+              additional claims. The admin client <b><i>must</i></b> have been approved to allow QDL
+              if that will be used, otherwise only standard handlers may be configured.
+              Generally you do not need to set this unless you have a very, very specific requirement. If you
+              send attributes that do not fall within the spec., they will be put in this object for you.
+              Generally if you do not know you need it and know what it does, you can safely ignore it.<br/>
+              <b>Public clients:</b>This parameter is not supported and will result in the rejection of any request.
+          </td>
+      </tr>
+    <tr align="left" valign="top">
+        <td>forward_scopes_to_proxy</td>
+        <td>N</td>
+        <td>false</td>
+        <td>N</td>
+        <td>Boolean</td>
+        <td>For servers that use a proxy to handle authorization, you may forward the scopes in the
+            user's request to the proxy server. Generally this is not needed except in special cases
+            and it overrides the proxy_request_scopes attribute.
+            See <a href="using-proxies.html">using proxies</a> for more information.
+        </td>
+    </tr>
+    <tr align="left" valign="top">
+        <td>prototypes</td>
+        <td>N</td>
+        <td>--</td>
+        <td>N</td>
+        <td>List of client identifiers</td>
+        <td>Any client may inherit the configuration of other clients. If set, then the list of
+            client identifiers is used in sequence. See <a href="client-prototypes.html">prototypes</a> for more.
+        </td>
+    </tr>
+    <tr align="left" valign="top">
+        <td>proxy_claims_list</td>
+        <td>N</td>
+        <td>--</td>
+        <td>N</td>
+        <td>List of claims</td>
+        <td>For servers that use a proxy to handle authorization. These are the claims from the
+            proxy server that are to be asserted in the id token. See <a href="using-proxies.html">using proxies</a>
+            for more information.<br/><br/>
+            Note that this is sent in the request to dynamic registration endpoint as a standard JSON array of strings
+        </td>
+    </tr>
+    <tr align="left" valign="top">
+        <td>proxy_request_scopes</td>
+        <td>N</td>
+        <td>[*]</td>
+        <td>N</td>
+        <td>List of claims</td>
+        <td>This is ignored if forward_scopes_to_proxy is set to true.
+            For servers that use a proxy to handle authorization, there is a list of claims this client
+            will request from the proxy server. The default is all claims, but you may restrict it to
+            a subset (e.g. if the proxy server allows all claims but the current client is public,
+            you may wish to restrict requests to the openid scope only.) Alternately,
+            the client can simply use the claims in its request.<br/><br/>
+            The default (*) means to send all configured scopes. Note that if this is empty, <i>no</i>
+            scopes will be sent to the proxy server (quite possible in a basic OAuth 2 use case).
+            If See <a href="using-proxies.html">using proxies</a> for more information.<br/><br/>
+            Note that this is sent in the request to dynamic registration endpoint as a standard JSON array of strings
+        </td>
+    </tr>
+      <tr align="left" valign="top">
+          <td>rt_lifetime</td>
+          <td>N</td>
+          <td>-1</td>
+          <td>Y</td>
+          <td>Integer (in seconds)</td>
+          <td>If you request a grant_type of refresh_token, this specifies the maximum lifetime,
+              in seconds, that
+              it will be valid. Normally this is set for a very long time, as in weeks if not months. If this is omitted
+              or set to 0 (zero) then no refresh tokens will be created. The default value means to use whatever the
+              server deefaults are.
+          </td>
+      </tr>
+    <tr align="left" valign="top">
+        <td>skip_server_scripts</td>
+        <td>N</td>
+        <td>false</td>
+        <td>Y</td>
+        <td>Boolean</td>
+        <td>Servers may have system-wide scripts that are configured. Setting this true will skip those.
+        </td>
+    </tr>
+      <tr align="left" valign="top">
+          <td>strict_scopes</td>
+          <td>N</td>
+          <td>true</td>
+          <td>N</td>
+          <td>true</td>
+          <td>If set to <b>true</b> (default) only scopes explicitly
+              set at registration will be allowed. Note that any unrecognized scopes
+              in the initial request will cause the request to be rejected.
+              If set to <b>true</b> you may send anything as a scope
+              and allowed scopes will be processed, unknown scopes will be passed along for later processing
+              and if not used, simply ignored.
+              In the case that the access tokens is a JWT (such as SciTokens or WLCG tokens) set this
+              false since the access token scopes would be passed in.
+          </td>
+      </tr>
 </table>
 <!--#include virtual="../../footer.html" -->
 </body>

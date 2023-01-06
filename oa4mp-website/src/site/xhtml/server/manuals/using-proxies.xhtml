@@ -16,9 +16,9 @@
    The authorization module for OA4MP can be replaced by various means, such as using Tomcat's built in
     management. However, this means that you will need to have separate logins that you manage for each
     user. Another option is using a <i>proxy</i> service. This is an OIDC service that allows for logins.
-    Your OA4MP can simply forward all requests to that service (including the device flow) and use the
+    Your OA4MP can simply forward all requested scopes to that service (including the device flow) and use the
     service, allowing your users to effectively log in there. In short, it allows some other service to
-    do all your used management.
+    do all your user management.
 </p>
 
 <h2>How does this do it?</h2>
@@ -82,12 +82,20 @@
     }
 </pre>
 <p>
-    Then at the least the the server returns the "sub" claim. If you set the client's
+    Then at the least the server returns the "sub" claim. If you set the client's
     proxy_claims_list
     to do so, you may also return the idp or is_member_of claim.  If you set
     the proxy_claims_list to be "*" then all relevant the claims will be passed along.
 </p>
 
+<h2>Configuring your clients</h2>
+<p>Each client may be configured to request specific scopes from the proxy. These are in the
+attribute <b>proxy_request_scopes</b>. An empty list means to request no scopes. A list
+that contains an asterisk ("*") means to request all configured scopes. If there is an
+asterisk anywhere on the list, all are requested. It is also possible that the client
+should simply forward scopes in the user request. In that case, set the attribute
+<b>forward_scopes_to_proxy</b> to true. If this flag is true, then any list of scopes
+you have will be ignored.</p>
 <!--#include virtual="../../footer.html" -->
 </body>
 </html>

@@ -910,21 +910,7 @@ public class OIDCCMServlet extends EnvServlet {
         //CIL-1321
         OA2ClientKeys clientKeys = (OA2ClientKeys) getOA2SE().getClientStore().getMapConverter().getKeys();
 
-        if(jsonRequest.containsKey(clientKeys.prototypes())){
-            JSONArray jsonArray = jsonRequest.getJSONArray(clientKeys.prototypes());
-            List<Identifier> prototypes = new ArrayList<>();
-            for(int i = 0; i < jsonArray.size(); i++){
-                prototypes.add(BasicIdentifier.newID(jsonArray.getString(i)));
-            }
-            client.setPrototypes(prototypes);
-        }
 
-        if(jsonRequest.containsKey(clientKeys.extendsProvisioners())){
-            client.setExtendsProvisioners(jsonRequest.getBoolean(clientKeys.extendsProvisioners()));
-        }
-        if(jsonRequest.containsKey(clientKeys.ersatzClient())){
-            client.setErsatzClient(jsonRequest.getBoolean(clientKeys.ersatzClient()));
-        }
         if (jsonRequest.containsKey(TOKEN_ENDPOINT_AUTH_METHOD)) {
             // not required, but if present, we support exactly two nontrivial options.
             JSONArray jsonArray = toJA(jsonRequest, TOKEN_ENDPOINT_AUTH_METHOD);
@@ -937,7 +923,7 @@ public class OIDCCMServlet extends EnvServlet {
                 } else {
                     if (client.isPublicClient()) {
                         // CIL-884.
-                        // do nothing -- let them udpdate everything else but the
+                        // do nothing -- let them udpdate everything else but
                         // their confidentiality status.
                         gotSupportedAuthMethod = true;
 
@@ -1094,6 +1080,21 @@ public class OIDCCMServlet extends EnvServlet {
         }
         // Remember that for updates (via PUT) there is no anonymous mode.
         if(!isAnonymous){
+            if(jsonRequest.containsKey(clientKeys.prototypes())){
+                JSONArray jsonArray = jsonRequest.getJSONArray(clientKeys.prototypes());
+                List<Identifier> prototypes = new ArrayList<>();
+                for(int i = 0; i < jsonArray.size(); i++){
+                    prototypes.add(BasicIdentifier.newID(jsonArray.getString(i)));
+                }
+                client.setPrototypes(prototypes);
+            }
+
+            if(jsonRequest.containsKey(clientKeys.extendsProvisioners())){
+                client.setExtendsProvisioners(jsonRequest.getBoolean(clientKeys.extendsProvisioners()));
+            }
+            if(jsonRequest.containsKey(clientKeys.ersatzClient())){
+                client.setErsatzClient(jsonRequest.getBoolean(clientKeys.ersatzClient()));
+            }
             if (jsonRequest.containsKey(STRICT_SCOPES)) {
                 client.setStrictscopes(jsonRequest.getBoolean(STRICT_SCOPES));
                 jsonRequest.remove(STRICT_SCOPES);
