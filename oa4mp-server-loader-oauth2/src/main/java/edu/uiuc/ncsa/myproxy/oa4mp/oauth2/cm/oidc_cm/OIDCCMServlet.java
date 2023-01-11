@@ -786,8 +786,9 @@ public class OIDCCMServlet extends EnvServlet {
 
         }
         getOA2SE().getClientApprovalStore().save(approval);
-        // Github 84 https://github.com/ncsa/OA4MP/issues/84
-        writeCreateOK(httpServletResponse, jsonResp);
+        // Github 84 https://github.com/ncsa/OA4MP/issues/84 -- Do not support for CILogon 5.2.8.3
+        //writeCreateOK(httpServletResponse, jsonResp);
+        writeOK(httpServletResponse, jsonResp);
     }
 
     private void writeOK(HttpServletResponse httpServletResponse, JSON resp) throws IOException {
