@@ -630,6 +630,10 @@ TO DO:
           be set in the claims or this fails.
        ** NOTE: uidNumber must be asserted or this fails.
        ** NOTE: This is NOT QDL but functor scripting and is a critical regression test.
+
+  --> The clients lsst-*-* are for migrating from functors to QDL and are properly part of <--
+  --> development. lsst-*-linking should work just like lsst-client.                       <--
+
   -- Do https://serge.ncsa.illinois.edu/cilogon-mod/
        Nothing fancy, just a non OA4MP client that returns claims. It should be
        NCSA IDP aware though. (interoperability test).

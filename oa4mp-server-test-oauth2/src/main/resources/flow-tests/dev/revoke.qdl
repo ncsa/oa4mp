@@ -3,9 +3,9 @@
 /*
    Tests the revocation (and introspection) machinery for a client.
 */
-
-//cfg.'id'  := 'dev:/test/ncsa_qdl';
-cfg.'id'  := 'localhost:test/no_cfg';
+path := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests';
+if[path∉script_path()][script_path(path ~ script_path());];
+cfg.'id'  := 'dev:test/no_cfg';
 cfg.'idp'  := 'NCSA';
 cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';
 cfg.'description' :=  'Test revocation and introspection machinery for a client.';
@@ -20,68 +20,29 @@ tokens. := clc#access();
 ⊨ !introspect().'active' : 'AT is not active';
 
 try[
-  say('trying TX 0');
   exchange();
   ⊨ false : 'token should be invalid.';
 ]catch[
-  say('caught TX 0 exception');
+  say('caught TX exception');
 ];
 
-say('trying TX 1');
 say(exchange('-at', '-x')); // Get a new access token for later before we invalidate the refresh token
 
 // RT tests
 tokens. := exchange('-rt');
-say('RT after TX:' + to_string(tokens.,true)); // works still
-say('trying TX 1a');
 ⊨ introspect('-rt').'active':'refresh token not active';
 
-say('trying TX 1b');
 ⊨ revoke('-rt'): 'refresh token not revoked';
-say('trying TX 1c');
-say('introspect on RT = ' + to_string(introspect('-rt')));
 ⊨ !introspect('-rt').'active':'refresh token not active';
-say('trying TX 1d');
 try[
-  say('trying TX 2');
   exchange('-rt');
   ⊨ false : 'token should be invalid.';
 ]catch[
- say('caught TX 2 exception');
+ say('caught TX  exception');
 ];
 
  exchange('-at'); // can still get an access token
 
-say('trying TX 3');
 ⊨ introspect().'active':'access token not active';
 
-
 say('ok');
-/*
-   introspect
-       > true
-     introspect -rt
-       > true
-     revoke // invalidates access token
-       > ok
-     introspect // invalidated access token should not be valid
-       > false
-     exchange
-       FAILS (because access token should be invalid and that is used as bearer token)
-     exchange -at -x // Have to use refresh token to get back new access token
-     introspect
-       > true
-     exchange -rt // get a new refresh token
-     introspect -rt
-       > true
-     revoke -rt
-       > ok
-     introspect -rt
-       > false
-     exchange -rt
-       FAILS
-     exchange -at
-       New access token (since swapping with valid one)
-     At this point, the refresh token is invalid and while you can exchange ATs, you cannot ever get another RT
-     which is as it should be. If the access token expires, then any attempts to exchange or refresh fail.
-*/
