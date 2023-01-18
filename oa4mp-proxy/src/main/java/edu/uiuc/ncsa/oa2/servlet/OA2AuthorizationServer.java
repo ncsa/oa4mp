@@ -102,8 +102,13 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
             JSONObject j = JSONObject.fromObject(content);
             String code = j.get("code").toString();
             String state = j.get("state").toString();
-            request.setAttribute("code", code);
-            request.setAttribute("state", state);
+            // Fix RCAuth https://github.com/rcauth-eu/OA4MP/commit/d052e0a64fe527adb7636fe146179ffbac472380
+            if(code != null) {
+                request.setAttribute("code", code);
+            }
+            if(state != null) {
+                request.setAttribute("state", state);
+            }
         }
         super.doIt(request, response);
 

@@ -267,8 +267,9 @@ public class OA2ClientCommands extends ClientStoreCommands {
                 }
             }
         }
-        String scopes = getPropertyHelp(keys.scopes(),"enter a comma separated list of scopes. Scopes to this server will be rejected.", currentScopes);
-
+        //String scopes = getPropertyHelp(keys.scopes(),"enter a comma separated list of scopes. Scopes to this server will be rejected.", currentScopes);
+        // https://github.com/rcauth-eu/OA4MP/commit/67141fd26ac001d8bc38be21219cbb72e2bdd011
+        String scopes = getInput("enter a comma separated list of scopes. Other scopes to this server will be rejected.", currentScopes);
         if (!(scopes == null || scopes.isEmpty())) {
             LinkedList<String> list = new LinkedList<>();
             StringTokenizer stringTokenizer = new StringTokenizer(scopes, ",");

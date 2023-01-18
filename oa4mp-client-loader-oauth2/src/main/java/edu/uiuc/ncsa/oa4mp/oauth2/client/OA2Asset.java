@@ -79,6 +79,17 @@ public class OA2Asset extends Asset {
     protected String NONCE_KEY = "nonce";
     protected String ISSUED_AT_KEY = "issued_at";
 
+    protected String ID_TOKEN_KEY = "id_token";
+
+    public JSONObject getIdToken() {
+        return idToken;
+    }
+
+    public void setIdToken(JSONObject idToken) {
+        this.idToken = idToken;
+    }
+
+    JSONObject idToken;
     @Override
     public JSONObject toJSON() {
         JSONObject json = super.toJSON();
@@ -96,6 +107,9 @@ public class OA2Asset extends Asset {
         }
         if (getIssuedAt() != null) {
             json.put(ISSUED_AT_KEY, Iso8601.date2String(getIssuedAt()));
+        }
+        if(idToken != null){
+            json.put(ID_TOKEN_KEY, idToken);
         }
         return json;
     }
@@ -120,6 +134,9 @@ public class OA2Asset extends Asset {
             }
             //at.fromJSON(jsonObject.getJSONObject(ACCESS_TOKEN_KEY));
             setAccessToken(at);
+        }
+        if(jsonObject.containsKey(ID_TOKEN_KEY)){
+            setIdToken(jsonObject.getJSONObject(ID_TOKEN_KEY));
         }
         if (jsonObject.containsKey(REFRESH_TOKEN_KEY)) {
             RefreshTokenImpl rt = null;

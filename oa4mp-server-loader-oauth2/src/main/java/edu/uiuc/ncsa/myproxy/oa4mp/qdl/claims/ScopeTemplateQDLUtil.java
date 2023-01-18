@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
 import edu.uiuc.ncsa.qdl.state.State;
+import edu.uiuc.ncsa.qdl.variables.QDLList;
 import edu.uiuc.ncsa.qdl.variables.QDLStem;
 
 import java.util.ArrayList;
@@ -38,15 +39,27 @@ public class ScopeTemplateQDLUtil {
             if (objects.length != 3) {
                 throw new IllegalArgumentException(getName() + " requires 3 arguments");
             }
+            if(objects[0] instanceof QDLList){
+                if(((QDLList)objects[0]).isEmpty()){
+                    return new QDLStem();
+                }
+            }
+
             if (!(objects[0] instanceof QDLStem)) {
                 throw new IllegalArgumentException("Error: The first argument (for the computed scopes) must be a stem.");
             }
             QDLStem allowedStem = (QDLStem) objects[0];
+            if(allowedStem.isEmpty()){
+                return new QDLStem();
+            }
             if (!(objects[1] instanceof QDLStem)) {
                 throw new IllegalArgumentException("Error: The second argument (for the requested scopes) must be a stem.");
             }
 
             QDLStem requestedStem = (QDLStem) objects[1];
+            if(requestedStem.isEmpty()){
+                return new QDLStem();
+            }
             if (!(objects[2] instanceof Boolean)) {
                 throw new IllegalArgumentException("Error: The third argument (if the operation queries available scopes) must be a boolean.");
             }

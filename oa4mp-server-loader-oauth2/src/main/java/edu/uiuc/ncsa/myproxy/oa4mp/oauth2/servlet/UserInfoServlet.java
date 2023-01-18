@@ -30,8 +30,7 @@ import java.io.IOException;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.UITokenUtils.getRawAT;
 import static edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants.*;
-import static edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims.EXPIRATION;
-import static edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims.ISSUED_AT;
+import static edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims.*;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -131,7 +130,9 @@ public class UserInfoServlet extends BearerTokenServlet {
      */
     protected JSONObject stripClaims(JSONObject json) {
         JSONObject r = new JSONObject();
-        r.putAll(json);// new json object so we don't lose information and so we don't get concurrent update error
+        r.putAll(json);// new json object so we don't lose information, and so we don't get concurrent update error
+        // Request to strip issuer and audience as well https://github.com/rcauth-eu/OA4MP/commit/2c0ee22994de22d557fedd29203fdb9e6edb7a44
+        // However, some installations require the issuer and audience to accept the token, so must keep.
         String[] x = new String[]{ISSUED_AT, NONCE, EXPIRATION, EXPIRES_IN, AUTHORIZATION_TIME};
         for (String y : x) {
             r.remove(y);

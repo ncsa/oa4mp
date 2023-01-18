@@ -703,12 +703,15 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         String json = getNodeValue(node, "json", null); // if the whole thing is included
         JSONWebKeys keys = null;
         try {
-            if (json != null) {
+            if (json == null) {
+                String path = getNodeValue(node, "path", null); // points to a file that contains it all
+                if (path != null) {
+                    keys = JSONWebKeyUtil.fromJSON(new File(path));
+                    info("loaded JSON web keys from file \"" + path + "\"");
+                }
+            }else{
                 keys = JSONWebKeyUtil.fromJSON(json);
-            }
-            String path = getNodeValue(node, "path", null); // points to a file that contains it all
-            if (path != null) {
-                keys = JSONWebKeyUtil.fromJSON(new File(path));
+                info("loaded JSON web keys directly from configuration");
             }
         } catch (Throwable t) {
             throw new GeneralException("Error reading signing keys", t);

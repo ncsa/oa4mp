@@ -16,6 +16,11 @@ public class OA2AssetSerializationKeys extends AssetSerializationKeys {
         return accessToken;
     }
 
+    String idToken = "id_token";
+    public String idToken(String... x){
+        if(0 < x.length) idToken= x[0];
+        return idToken;
+    }
 
     String refreshToken  = "refresh_token";
     public String refreshToken(String... x){
@@ -54,6 +59,7 @@ public class OA2AssetSerializationKeys extends AssetSerializationKeys {
         allKeys.add(state());
         allKeys.add(nonce());
         allKeys.add(issuedAt());
+        allKeys.add(idToken());
         return allKeys;
     }
 

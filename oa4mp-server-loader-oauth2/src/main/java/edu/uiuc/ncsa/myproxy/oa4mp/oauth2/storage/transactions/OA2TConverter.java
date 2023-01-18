@@ -87,13 +87,14 @@ public class OA2TConverter<V extends OA2ServiceTransaction> extends TransactionC
         st.setCallback(map.getURI(getTCK().callbackUri()));
         st.setNonce(map.getString(getTCK().nonce()));
         st.setRequestState(map.getString(getTCK().reqState()));
+        // https://github.com/rcauth-eu/OA4MP/commit/9dc129a679d7d701fdbba7173363e4aa82adcd2a
         if(map.get(getTCK().validatedScopes())!=null){
-            net.sf.json.JSONArray json = (JSONArray) JSONSerializer.toJSON(map.get(getTCK().validatedScopes()));
+            JSONArray json = (JSONArray) JSONSerializer.toJSON(map.get(getTCK().validatedScopes()));
             Collection<String> zzz = (Collection<String>) JSONSerializer.toJava(json);
             st.setValidatedScopes(zzz);
         }
         if (map.get(getTCK().scopes()) != null) {
-            net.sf.json.JSONArray json = (JSONArray) JSONSerializer.toJSON(map.get(getTCK().scopes()));
+            JSONArray json = (JSONArray) JSONSerializer.toJSON(map.get(getTCK().scopes()));
             Collection<String> zzz = (Collection<String>) JSONSerializer.toJava(json);
             st.setScopes(zzz);
         }

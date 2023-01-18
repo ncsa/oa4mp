@@ -466,7 +466,6 @@ public class OA2SE extends ServiceEnvironmentImpl {
 
     LDAPConfiguration ldapConfiguration2;
 
-    // TODO make this configurable.
 
     /**
      * Returns <code>true</code> if this server has OIDC support enabled.

@@ -239,6 +239,10 @@ public class ServiceEnvironmentImpl extends MyProxyServiceEnvironment implements
     public MailUtil getMailUtil() {
         if (mailUtil == null) {
             mailUtil = mup.get();
+            // https://github.com/rcauth-eu/OA4MP/commit/f7e984a6d1c7c63d17c870de9dafaad39f5852d1
+            if(getMyLogger()!= null) {
+                mailUtil.setMyLogger(getMyLogger());
+            }
         }
         return mailUtil;
     }

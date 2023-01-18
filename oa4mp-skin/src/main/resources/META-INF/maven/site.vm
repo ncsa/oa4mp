@@ -327,7 +327,8 @@
         ## Workaround for DOXIA-150 due to a non-desired behaviour in p-u
         ## @see org.codehaus.plexus.util.xml.Xpp3Dom#toString()
         ## @see org.codehaus.plexus.util.xml.Xpp3Dom#toUnescapedString()
-            #set ( $documentHeader = "<?xml version=""1.0"" encoding=""UTF-8""?>" )
+        ## https://github.com/rcauth-eu/OA4MP/commit/9a100b1d6ec9d99444969516bc0e90f9715262ff
+            #set ( $documentHeader = '<?xml version="1.0" encoding="UTF-8"?>' )
             #set ( $documentHeader = $documentHeader.replaceAll( "\\", "" ) )
             #if ( $item.name == "script" )
                 $StringUtils.replace( $item.toUnescapedString(), $documentHeader, "" )

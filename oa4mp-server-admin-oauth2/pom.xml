@@ -290,11 +290,12 @@
             </build>
         </profile>
     </profiles>
-    <pluginRepositories>
+    <!-- https://github.com/rcauth-eu/OA4MP/commit/7ac0df1ec894b1ace00c027a270f5341a452b753 -->
+ <!--   <pluginRepositories>
         <pluginRepository>
             <id>onejar-maven-plugin.googlecode.com</id>
             <url>http://onejar-maven-plugin.googlecode.com/svn/mavenrepo</url>
         </pluginRepository>
     </pluginRepositories>
-
+-->
 </project>

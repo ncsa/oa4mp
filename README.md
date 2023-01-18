@@ -9,8 +9,9 @@ for science gateways. Initially deployed in 2011, it is a mature, stable and ext
 
 ## Prerequisites
 
-* Java 11+
+* Java 11
 * [Maven](https://maven.apache.org/) 3.5+
+* [Tomcat 9](https://tomcat.apache.org/download-90.cgi)
 
 ## Docs
 

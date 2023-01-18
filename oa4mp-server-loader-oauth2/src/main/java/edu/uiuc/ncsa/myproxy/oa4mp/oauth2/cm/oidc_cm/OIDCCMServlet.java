@@ -783,7 +783,6 @@ public class OIDCCMServlet extends EnvServlet {
             approval.setApprover(adminClient.getIdentifierString());
             approval.setApproved(true);
             approval.setStatus(ClientApproval.Status.APPROVED);
-
         }
         getOA2SE().getClientApprovalStore().save(approval);
         // Github 84 https://github.com/ncsa/OA4MP/issues/84

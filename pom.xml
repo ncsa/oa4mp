@@ -132,7 +132,19 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
+    <!--
+        CIL-1607, centralize dependency management, use javax.servlet 3.1+
+    -->
+    <dependencyManagement>
+         <dependencies>
+             <dependency>
+                 <groupId>javax.servlet</groupId>
+                 <artifactId>javax.servlet-api</artifactId>
+                 <version>3.1.0</version>
+                 <scope>provided</scope>
+             </dependency>
+         </dependencies>
+     </dependencyManagement>
     <build>
         <plugins>
             <plugin>

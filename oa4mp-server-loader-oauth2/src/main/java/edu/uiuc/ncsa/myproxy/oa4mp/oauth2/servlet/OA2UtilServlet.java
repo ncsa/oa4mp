@@ -18,8 +18,10 @@ import java.util.StringTokenizer;
 /**
  * A servlet to allow for certain utilities, such as checking if claims contain a given value.
  * <p>Created by Jeff Gaynor<br>
+ * @deprecated
  * on 1/4/18 at  11:19 AM
  */
+// CIL-1606 This servlet should be deprecated and removed
 public class OA2UtilServlet extends EnvServlet {
     public static String ACTION_KEY = "action";
     public static String ACTION_CHECK_CLAIM = "check_claim";
@@ -71,14 +73,20 @@ public class OA2UtilServlet extends EnvServlet {
             spitOutMessage(httpServletResponse, CODE_ERROR, "claim named \"" + claimName + "\" not found.");
             return;
         }
-        // simple case is its just a string
+        // simple case it's just a string
         Object rawClaims = json.get(claimName);
+        // https://github.com/rcauth-eu/OA4MP/commit/8be53d367e9b07d39a91cbd2043547642316de34
+        if (rawClaims instanceof String) {
+            rawClaims = JSONArray.fromObject("[\""+rawClaims+"\"]");
+        }
         if (rawClaims instanceof JSONArray) {
             JSONArray array = (JSONArray) rawClaims;
             for (int i = 0; i < array.size(); i++) {
                 String nextString = array.getString(i);
                 // first cut, parse by , as delimiter.
                 StringTokenizer st = new StringTokenizer(nextString, ",", false);
+                // https://github.com/rcauth-eu/OA4MP/commit/8be53d367e9b07d39a91cbd2043547642316de34 Won't parse by " "
+                // since the only user of this does not do that and this is deprecated.
                 while(st.hasMoreTokens()){
                     String x = st.nextToken();
                     if(claimValue.equals(x)){

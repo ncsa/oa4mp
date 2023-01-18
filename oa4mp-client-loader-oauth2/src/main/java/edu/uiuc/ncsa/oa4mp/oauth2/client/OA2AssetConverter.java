@@ -9,6 +9,7 @@ import edu.uiuc.ncsa.security.storage.data.ConversionMap;
 import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
 import edu.uiuc.ncsa.security.util.crypto.CertUtil;
 import edu.uiuc.ncsa.security.util.crypto.MyPKCS10CertRequest;
+import net.sf.json.JSONObject;
 
 import java.net.URI;
 
@@ -47,13 +48,14 @@ public class OA2AssetConverter extends AssetConverter {
             a.setState(state);
         }
         a.setNonce(map.getString(getASK().nonce()));
-/*
-        if (map.containsKey(OA2Claims.ISSUED_AT)) {
-            a.setIssuedAt(map.getDate(OA2Claims.ISSUED_AT));
-        }
-*/
         if (map.containsKey(getASK().issuedAt())) {
             a.setIssuedAt(map.getDate(getASK().issuedAt()));
+        }
+
+        if (map.containsKey(getASK().idToken())) {
+            String idt = map.getString(getASK().idToken());
+            JSONObject idToken = JSONObject.fromObject(idt);
+            a.setIdToken(idToken);
         }
 
         return a;
@@ -75,11 +77,9 @@ public class OA2AssetConverter extends AssetConverter {
             map.put(getASK().state(), a.getState());
         }
         map.put(getASK().nonce(), a.getNonce());
-/*
-        if (a.getIssuedAt() != null) {
-            map.put(OA2Claims.ISSUED_AT, a.getIssuedAt());
+        if(a.getIdToken() != null){
+            map.put(getASK().idToken(), a.getIdToken().toString());
         }
-*/
         if (a.getIssuedAt() != null) {
             map.put(getASK().issuedAt(), a.getIssuedAt());
         }

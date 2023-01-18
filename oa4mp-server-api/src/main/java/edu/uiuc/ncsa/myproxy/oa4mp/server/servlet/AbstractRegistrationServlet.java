@@ -32,8 +32,8 @@ public abstract class AbstractRegistrationServlet extends MyProxyDelegationServl
     public static final String CLIENT_HOME_URL = "clientHomeUrl";
     public static final String CLIENT_ERROR_URL = "clientErrorUrl";
     public static final String CLIENT_EMAIL = "clientEmail";
-    public static final String CLIENT_CALLBACK_URI = "callbackURI";
     public static final String CLIENT_PROXY_LIMITED = "clientProxyLimited";
+    // https://github.com/rcauth-eu/OA4MP/commit/9d6c3afa87adadb48c9c7df2d078f3890b8ae9b0 -- removed unused constant
     public static final String CLIENT_IS_PUBLIC = "clientIsPublic";
     public static final String CLIENT_ACTION_KEY = "action";
     public static final String CLIENT_ACTION_REQUEST_VALUE = "request";
@@ -175,8 +175,8 @@ public abstract class AbstractRegistrationServlet extends MyProxyDelegationServl
         // Addresses
         if (state == INITIAL_STATE) {
             if (getServiceEnvironment().getMaxAllowedNewClientRequests() <= getServiceEnvironment().getClientApprovalStore().getPendingCount()) {
-                //   throw new TooManyRequestsException("Error: Max number of new client requests reached. Request rejected.");
-                log("Too many client approvals pending. Max allowed unapproved count is " + getServiceEnvironment().getMaxAllowedNewClientRequests());
+                // https://github.com/rcauth-eu/OA4MP/commit/153177ccd0a2f5d0aa558cca4d4b7c4dc442065a change to send to the log.
+                error("Too many client approvals pending. Max allowed unapproved count is " + getServiceEnvironment().getMaxAllowedNewClientRequests());
                 // Fixes CIL-414, CIL-426 (send email notification), CIL-427
 
                 getServiceEnvironment().getMailUtil().sendMessage("Too many pending approvals",
@@ -290,8 +290,10 @@ public abstract class AbstractRegistrationServlet extends MyProxyDelegationServl
         }
         client.setEmail(x);
 
-        client.setProxyLimited(getBooleanParam(request, CLIENT_PROXY_LIMITED));
-
+        //client.setProxyLimited(getBooleanParam(request, CLIENT_PROXY_LIMITED));
+        //https://github.com/rcauth-eu/OA4MP/commit/4d80fe4969d487719a35cda1faa8d603340b19b3
+        String limitedChecked=getParameter(request, CLIENT_PROXY_LIMITED);
+         client.setProxyLimited(limitedChecked != null && limitedChecked.equals("on"));
 
         getServiceEnvironment().getClientStore().save(client);
         info("Adding approval record for client=" + client.getIdentifierString());

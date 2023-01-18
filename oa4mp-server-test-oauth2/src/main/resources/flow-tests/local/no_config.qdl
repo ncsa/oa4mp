@@ -10,7 +10,7 @@ if[path∉script_path()][script_path(path ~ script_path());];
 cfg.'id'  := 'localhost:test/no_cfg';
 cfg.'idp'  := 'ANY';
 cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';
-cfg.'description' :=  'Test with no configuration -- most basic test.';
+cfg.'description' :=  'Test with no configuration -- most basic test. (Uses Derby)';
 cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token endpoint
 
 rc := script_load('driver.qdl', cfg.);

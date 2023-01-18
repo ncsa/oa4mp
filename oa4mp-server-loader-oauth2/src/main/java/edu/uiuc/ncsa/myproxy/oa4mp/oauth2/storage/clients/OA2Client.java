@@ -80,20 +80,22 @@ public class OA2Client extends Client implements OA2ClientScopes {
     populateClone(BaseClient c) {
         OA2Client client = (OA2Client) c;
         super.populateClone(client);
-        client.setRtLifetime(getRtLifetime());
         client.setCallbackURIs(getCallbackURIs());
-        client.setScopes(getScopes());
-        client.setLdaps(getLdaps());
         client.setConfig(getConfig());
-        client.setRawConfig(getRawConfig());
+        client.setForwardScopesToProxy(isForwardScopesToProxy());
         client.setIssuer(getIssuer());
-        client.setSignTokens(isSignTokens());
-        client.setMaxRTLifetime(getMaxRTLifetime());
+        client.setLdaps(getLdaps());
         client.setMaxATLifetime(getMaxATLifetime());
+        client.setMaxRTLifetime(getMaxRTLifetime());
         client.setPrototypes(getPrototypes());
         client.setProxyClaimsList(getProxyClaimsList());
         client.setProxyRequestScopes(getProxyRequestScopes());
-        client.setForwardScopesToProxy(isForwardScopesToProxy());
+        // https://github.com/rcauth-eu/OA4MP/commit/38f0f2ca7e2ef5609006794b96485ae1a7e00ff0
+        client.setPublicClient(isPublicClient());
+        client.setRawConfig(getRawConfig());
+        client.setRtLifetime(getRtLifetime());
+        client.setScopes(getScopes());
+        client.setSignTokens(isSignTokens());
     }
 
     public void setComment(String comment) {
@@ -604,9 +606,9 @@ public class OA2Client extends Client implements OA2ClientScopes {
         x = x.substring(0, x.lastIndexOf("]"));
         x = x + "scopes=" + ((getScopes() == null) ? "[]" : getScopes().toString());
         x = x + ",callbacks=" + (getCallbackURIs() == null ? "[]" : getCallbackURIs().toString());
-        x = x + ",refresh token lifetime=" + getRtLifetime();
         x = x + ",issuer=" + getIssuer();
         x = x + ",is public?=" + isPublicClient();
+        // https://github.com/rcauth-eu/OA4MP/commit/bf2ea509aebbf90da74ed529e701a0db44bcac96 remove redundant printing of rt lifetime
         x = x + ",rt lifetime=" + getRtLifetime();
         x = x + ",rt lifetime enabled?=" + isRTLifetimeEnabled();
         x = x + ",sign ID tokens?=" + isSignTokens();
