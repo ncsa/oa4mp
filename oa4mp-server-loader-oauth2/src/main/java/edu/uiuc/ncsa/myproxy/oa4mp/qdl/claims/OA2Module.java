@@ -21,10 +21,10 @@ public class OA2Module extends JavaModule {
     protected OA2Module(URI namespace, String alias) {
         super(namespace, alias);
     }
-
+    public static final String NAMESPACE ="oa2:/qdl/oidc/claims";
     @Override
     public Module newInstance(State state) {
-        OA2Module oa2Module = new OA2Module(URI.create("oa2:/qdl/oidc/claims"), "claims");
+        OA2Module oa2Module = new OA2Module(URI.create(NAMESPACE), "claims");
         ArrayList<QDLFunction> funcs = new ArrayList<>();
         funcs.add(new ClaimsSourceGetter());
         funcs.add(new CreateSourceConfig());

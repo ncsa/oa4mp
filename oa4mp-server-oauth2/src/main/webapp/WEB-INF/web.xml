@@ -41,14 +41,7 @@
         <url-pattern>/token</url-pattern>
     </servlet-mapping>
 
-    <servlet>
-        <servlet-name>util</servlet-name>
-        <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2UtilServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>util</servlet-name>
-        <url-pattern>/util</url-pattern>
-    </servlet-mapping>
+
 
     <servlet>
         <servlet-name>oidc-cm</servlet-name>

@@ -26,6 +26,8 @@ public class JWTModule extends JavaModule {
 
     public static final String JWT_COMMANDS_TAG = "jwt_commands";
 
+    public static final String NAMESPACE =  "oa2:/qdl/jwt";
+
     public JWTModule() {
     }
 
@@ -37,7 +39,7 @@ public class JWTModule extends JavaModule {
 
     @Override
     public Module newInstance(State state) {
-        JWTModule jwtModule = new JWTModule(URI.create("oa2:/qdl/jwt"), "jwt");
+        JWTModule jwtModule = new JWTModule(URI.create(NAMESPACE), "jwt");
         JWTCommands jwtCommands = new JWTCommands(null);
         if (state != null) {
             jwtCommands.setLogger(state.getLogger());
