@@ -110,6 +110,12 @@ public class PermissionMemoryStore<V extends Permission> extends MemoryStore<V> 
     public Permission getErsatzChain(Identifier adminID, Identifier clientID, Identifier ersatzID) {
         return PermissionStoreUtil.getErsatzChain(this, adminID, clientID, ersatzID);
     }
+
+    @Override
+    public PermissionList getProvisioners(Identifier adminID, Identifier ersatzID) {
+        return PermissionStoreUtil.getProvisioners(this, adminID, ersatzID);
+    }
+
     @Override
     public boolean hasEntry(Identifier adminID, Identifier clientID) {
         return !get(adminID, clientID).isEmpty();

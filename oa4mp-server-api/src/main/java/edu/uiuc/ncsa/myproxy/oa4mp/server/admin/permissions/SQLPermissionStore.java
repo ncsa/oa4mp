@@ -72,6 +72,39 @@ public class SQLPermissionStore<V extends Permission> extends SQLStore<V> implem
     }
 
     @Override
+    public PermissionList getProvisioners(Identifier adminID, Identifier ersatzID) {
+        PermissionList allOfThem = new PermissionList();
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
+
+        PermissionKeys permissionKeys = new PermissionKeys();
+        try {
+            String searchTerm = "0 < LOCATE('" + ersatzID + "'," + permissionKeys.ersatzID() + ")";
+            PreparedStatement stmt = c.prepareStatement("select * from " +
+                            getTable().getFQTablename() + " where " + searchTerm + " AND " +
+                            permissionKeys.adminID() + "=? AND " + permissionKeys.substitute() + "=1");
+            stmt.setString(1, adminID.toString());
+            stmt.execute();// just execute() since executeQuery(x) would throw an exception regardless of content per JDBC spec.
+
+            ResultSet rs = stmt.getResultSet();
+            while (rs.next()) {
+                V newOne = create();
+                ColumnMap map = rsToMap(rs);
+                populate(map, newOne);
+                allOfThem.add(newOne);
+            }
+            rs.close();
+            stmt.close();
+        } catch (SQLException e) {
+            destroyConnection(cr);
+            throw new GeneralException("Error: could not get database object", e);
+        } finally {
+            releaseConnection(cr);
+        }
+        return allOfThem;
+    }
+
+    @Override
     public PermissionList getErsatzChains(Identifier adminID, Identifier clientID) {
         PermissionList allOfThem = new PermissionList();
         ConnectionRecord cr = getConnection();

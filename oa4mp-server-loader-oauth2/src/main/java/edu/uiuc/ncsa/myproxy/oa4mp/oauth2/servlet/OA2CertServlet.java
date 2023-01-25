@@ -20,6 +20,7 @@ import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.PAIResponse2;
 import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.oa4mp.delegation.server.request.IssuerResponse;
 import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.exceptions.InvalidTimestampException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.servlet.HeaderUtils;
@@ -223,7 +224,16 @@ public class OA2CertServlet extends ACS2 {
         checkClientApproval(t.getClient());
         // Access tokens must be valid in order to get a cert. If the token is invalid, the user must
         // get a valid one using the refresh token.
-        checkTimestamp(accessToken.getToken());
+        try {
+            checkTimestamp(accessToken.getToken());
+        }catch(InvalidTimestampException invalidTimestampException){
+            throw new OA2GeneralError(OA2Errors.INVALID_TOKEN,
+                    "expired token",
+                    HttpStatus.SC_BAD_REQUEST,
+                    t.getRequestState()
+            );
+
+        }
         return t;
     }
 

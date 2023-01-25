@@ -1,24 +1,23 @@
 package edu.uiuc.ncsa.myproxy.oauth2.tools;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientKeys;
-import edu.uiuc.ncsa.myproxy.oauth2.base.ClientApprovalStoreCommands;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientKeys;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.Permission;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionList;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionsStore;
 import edu.uiuc.ncsa.myproxy.oauth2.base.BaseClientStoreCommands;
+import edu.uiuc.ncsa.myproxy.oauth2.base.ClientApprovalStoreCommands;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.security.util.cli.ArgumentNotFoundException;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
-import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.codec.digest.DigestUtils;
 
@@ -64,14 +63,14 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
     @Override
     public void extraUpdates(Identifiable identifiable) throws IOException {
         AdminClient client = (AdminClient) identifiable;
-        AdminClientKeys keys = (AdminClientKeys)getMapConverter().getKeys();
+        AdminClientKeys keys = (AdminClientKeys) getMapConverter().getKeys();
         String secret = client.getSecret();
         String input;
         boolean askForSecret = true;
 
 
         while (askForSecret) {
-            input = getPropertyHelp(keys.secret(),"enter a new secret (this will be hashed, not stored) or return to skip.", secret);
+            input = getPropertyHelp(keys.secret(), "enter a new secret (this will be hashed, not stored) or return to skip.", secret);
             if (isEmpty(input)) {
                 sayi("Nothing entered. Client secret entry skipped.");
                 break;
@@ -85,7 +84,7 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
             client.setSecret(secret);
             askForSecret = false;
         }
-        String issuer = getPropertyHelp(keys.issuer(),"Give the issuer", client.getIssuer());
+        String issuer = getPropertyHelp(keys.issuer(), "Give the issuer", client.getIssuer());
         if (!isEmpty(issuer)) {
             client.setIssuer(issuer);
         }
@@ -368,50 +367,90 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
         say("done. Removed " + count + " clients and processed " + pcount + " permissions");
     }
 
+    public void list_provisioners(InputLine inputLine) throws Exception {
+        if (showHelp(inputLine)) {
+            say("list_provisioners ersatz_id [admin_id] = list all of the clients that are provisioners for this ersatz client.");
+            return;
+        }
+        AdminClient adminClient = (AdminClient) findItem(inputLine);
+        if (adminClient == null) {
+            say("Sorry, there is no admin client for this identifier.");
+            return;
+        }
+        if (inputLine.getArgCount() == 0) {
+            say("you must supply the ersatz client id");
+            return;
+        }
+        Identifier ersatzID = BasicIdentifier.newID(inputLine.getArg(1));
 
-    public void list_ersatz(InputLine inputLine)throws Exception{
+        PermissionList provisioners = permissionsStore.getProvisioners(adminClient.getIdentifier(), ersatzID);
+
+        if (provisioners == null || provisioners.isEmpty()) {
+            say("(none)");
+            return;
+        }
+        int count = 0;
+        for (Permission p : provisioners) {
+            count++;
+            say(p.getClientID().toString());
+        }
+        say(count + " total provisioners for " + ersatzID);
+
+    }
+
+    public void list_ersatz(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
             say("list_ersatz client_id [admin_id] = list all of the clients granted substitute privilege.");
             return;
         }
         AdminClient adminClient = (AdminClient) findItem(inputLine);
-         if (adminClient == null) {
-             say("Sorry, there is no admin client for this identifier.");
-             return;
-         }
-         Identifier clientID = BasicIdentifier.newID(inputLine.getArg(1));
+        if (adminClient == null) {
+            say("Sorry, there is no admin client for this identifier.");
+            return;
+        }
+        if (inputLine.getArgCount() == 0) {
+            say("you must supply the client id");
+            return;
+        }
+        Identifier clientID = BasicIdentifier.newID(inputLine.getArg(1));
 
         PermissionList ersatzClients = permissionsStore.getErsatzChains(adminClient.getIdentifier(), clientID);
 
-         if (ersatzClients == null || ersatzClients.isEmpty()) {
-             say("(none)");
-             return;
-         }
-         int count = 0;
-         for (Permission p : ersatzClients) {
-             say(p.getErsatzChain().toString());
-         }
-         say(count + " total ersatz clients for " + clientID);
+        if (ersatzClients == null || ersatzClients.isEmpty()) {
+            say("(none)");
+            return;
+        }
+        int count = 0;
+        for (Permission p : ersatzClients) {
+            count++;
+            if (p.getErsatzChain().size() == 1) {
+                say(p.getErsatzChain().get(0).toString());
+            } else {
+                say(p.getErsatzChain().toString());
+            }
+        }
+        say(count + " total ersatz clients for " + clientID);
     }
-    public void set_ersatz(InputLine inputLine) throws Exception{
-        if(showHelp(inputLine)){
+
+    public void set_ersatz(InputLine inputLine) throws Exception {
+        if (showHelp(inputLine)) {
             say("set_ersatz client_id ersatz_id [admin_id] = simple case, that sets permission for a single ersatz_id  for client_id");
             say("in token exchanges. Onus is on the user of the CLI not to set something goofy.");
             return;
         }
         AdminClient adminClient = (AdminClient) findItem(inputLine);
-        if(inputLine.getArgCount() < 3){
+        if (inputLine.getArgCount() < 2) {
             say("missing argument. You need both a client id and its ersatz id");
             return;
         }
-        Identifier ersatzID = BasicIdentifier.newID(inputLine.getArg(1));
-        Identifier clientID = BasicIdentifier.newID(inputLine.getArg(2));
+        Identifier clientID = BasicIdentifier.newID(inputLine.getArg(1));
+        Identifier ersatzID = BasicIdentifier.newID(inputLine.getArg(2));
         Permission permission = (Permission) permissionsStore.create();
         permission.setAdminID(adminClient.getIdentifier());
         permission.setClientID(clientID);
-        JSONArray array = new JSONArray();
-        array.add(ersatzID);
-        permission.setErsatzChain(array);
+        List<Identifier> eChain = new ArrayList<>();
+        eChain.add(ersatzID);
+        permission.setErsatzChain(eChain);
         permission.setSubstitute(true);
         permissionsStore.save(permission);
         say("done");

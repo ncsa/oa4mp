@@ -43,6 +43,8 @@ public interface PermissionsStore<V extends Permission> extends Store<V> {
      */
     public PermissionList getErsatzChains(Identifier adminID, Identifier clientID);
 
+    public PermissionList getProvisioners(Identifier adminID, Identifier ersatzID);
+
     /**
      * Get the specific permission with the chain starting with clientID and ending with ersatzID.
      * @param adminID

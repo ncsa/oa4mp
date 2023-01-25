@@ -603,9 +603,11 @@ public class CLC implements QDLModuleMetaClass {
         @Override
         public Object evaluate(Object[] objects, State state) {
             try {
+                clcCommands = new OA2CLCCommands(true, state.getLogger(), new OA2CommandLineClient(state.getLogger()));
                 clcCommands.read(argsToInputLine(getName(), objects));
+                initCalled = true;
                 return Boolean.TRUE;
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 e.printStackTrace();
             }
             return Boolean.FALSE;

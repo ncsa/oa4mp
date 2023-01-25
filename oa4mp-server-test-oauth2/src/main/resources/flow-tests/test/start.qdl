@@ -1,0 +1,31 @@
+#! /usr/bin/env -S qdl-run
+
+/*
+   Starts a bunch of flows, saves them and waits for restart.qdl
+*/
+path := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests';
+script_path(path ~ script_path());
+ids. := script_load(path + '/test/ids.qdl');
+say('ids=' + to_string(ids.));
+save_path := '/home/ncsa/dev/flow-test';
+
+cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';
+cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token endpoint
+
+
+while[x∈ids.][
+   cfg.'id' := x;
+   cfg.'description' :=  'Test of ' + x;
+   cfg.'idp'  := 'ligo'<x?'LIGO':'NCSA';
+
+   rc := script_load('driver.qdl', cfg.);
+   tokens. := clc#access();
+   save_to := save_path+'/' +encode(x, 32) + '.xml';
+   try[
+   rm(save_to);     // get rid of it if it is there so user is not repeatedly prompted.
+   ]catch[
+   // ok if it doesn't exist.
+   ];
+   clc#write(save_to);
+   say('write ok for ' + x + ' (' + tokens.'refresh_token'.'lifetime'+ ' ms.)');
+];

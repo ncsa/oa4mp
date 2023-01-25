@@ -37,4 +37,16 @@ public class PermissionStoreUtil {
         }
         return permissions;
     }
+
+    public static PermissionList getProvisioners(PermissionsStore<? extends Permission> pStore, Identifier adminID, Identifier ersatzID) {
+        PermissionList permissions = new PermissionList();
+        for (Identifier id : pStore.keySet()) {
+            Permission permission = pStore.get(id);
+            if (permission.canSubstitute() && permission.getAdminID().equals(adminID) && permission.getErsatzChain().contains(ersatzID)) {
+                permissions.add(permission);
+            }
+        }
+        return permissions;
+    }
+
 }

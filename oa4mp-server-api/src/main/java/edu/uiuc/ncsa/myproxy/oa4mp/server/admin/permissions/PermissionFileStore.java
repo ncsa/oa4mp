@@ -84,6 +84,11 @@ public class PermissionFileStore<V extends Permission> extends FileStore<V> impl
     }
 
     @Override
+    public PermissionList getProvisioners(Identifier adminID, Identifier ersatzID) {
+        return PermissionStoreUtil.getProvisioners(this, adminID, ersatzID);
+    }
+
+    @Override
     public boolean hasEntry(Identifier adminID, Identifier clientID) {
         return !get(adminID, clientID).isEmpty();
     }
