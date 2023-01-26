@@ -1,12 +1,15 @@
 package edu.uiuc.ncsa.myproxy.oauth2.tools;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.TokenExchangeRecordRetentionPolicy;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RefreshTokenRetentionPolicy;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RefreshTokenStore;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2TStoreInterface;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2TransactionKeys;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXStore;
+import edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims.ConfigtoCS;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.StoreCommands2;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
@@ -18,12 +21,15 @@ import edu.uiuc.ncsa.security.delegation.storage.TransactionStore;
 import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
 import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
 import edu.uiuc.ncsa.security.delegation.token.impl.TokenImpl;
+import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
 
 import java.io.*;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
@@ -601,8 +607,8 @@ public class TransactionStoreCommands extends StoreCommands2 {
     public static String GC_IS_ALARMS_FLAG = "-alarms";
 
 
-    public void gc_lock(InputLine inputLine) throws Exception{
-        if(showHelp(inputLine)){
+    public void gc_lock(InputLine inputLine) throws Exception {
+        if (showHelp(inputLine)) {
             say("gc_lock [-rm | ? | -alarms]");
             say("(no arg) - lock the transaction and TX stores");
             say("-rm - remove any locks");
@@ -610,25 +616,25 @@ public class TransactionStoreCommands extends StoreCommands2 {
             say("-alarms - show configured alarms");
             return;
         }
-        if(inputLine.hasArg("-alarms")){
-            if(oa2se.hasCleanupAlarms()){
+        if (inputLine.hasArg("-alarms")) {
+            if (oa2se.hasCleanupAlarms()) {
                 say("alarms set for " + oa2se.getCleanupAlarms());
-            }else{
-                   say("no configured alarms. Cleanup interval is " + oa2se.getCleanupInterval());
+            } else {
+                say("no configured alarms. Cleanup interval is " + oa2se.getCleanupInterval());
             }
             return;
         }
-        if(inputLine.hasArg("?")){
+        if (inputLine.hasArg("?")) {
             say("transactions locked? " + getStore().containsKey(lockID));
             say("TX store locked? " + getTxStore().containsKey(lockID));
             return;
         }
-        if(inputLine.hasArg("-rm")){
+        if (inputLine.hasArg("-rm")) {
             say("removing locks...");
             boolean t = null == getStore().remove(lockID);
             boolean tx = null == getTxStore().remove(lockID);
-            say((t?"did not remove":"removed")+ " transaction store lock");
-            say((tx?"did not remove":"removed")+ " TX store store lock");
+            say((t ? "did not remove" : "removed") + " transaction store lock");
+            say((tx ? "did not remove" : "removed") + " TX store store lock");
             return;
         }
         Identifiable tLock = getStore().create();
@@ -643,6 +649,82 @@ public class TransactionStoreCommands extends StoreCommands2 {
         // lock, unlock, is locked
     }
 
+    public void patch(InputLine inputLine) throws Exception {
+        if (showHelp(inputLine)) {
+            say("patch [-all] [-v] [-test] [id]");
+            say("(no arg) - if an id is set, patch the transaction. Otherwise do nothing.");
+            say("-all - If present, finds ALL transaction to patch.");
+            say("[-v] - verbose mode. Print out the id of every transaction as processed.");
+            say("[-test] - simply carry out the operation but do not save it. ");
+            say("This command will patch the transaction from version 5.7.1 to 5.2.8. It will");
+            say("add a single JSON serialized claims_sources element labelled claims_sources2");
+            return;
+        }
+        boolean doAll = inputLine.hasArg("-all");
+        inputLine.removeSwitch("-all");
+        boolean isVerbose = inputLine.hasArg("-v");
+        inputLine.removeSwitch("-v");
+        boolean isTest = inputLine.hasArg("-test");
+        inputLine.removeSwitch("-test");
+        List<OA2ServiceTransaction> transactions;
+        OA2ServiceTransaction transaction;
 
+        if (doAll) {
+            // Now need to get in the trenches... Lots of casts...
+            // Goal is to not change anything but what is in this one class
+            OA2TransactionKeys tKeys = (OA2TransactionKeys) getMapConverter().getKeys();
+            OA2TStoreInterface<? extends OA2ServiceTransaction> tStore = (OA2TStoreInterface) getStore();
+            // need dummy transaction to get fields.
+            OA2ServiceTransaction dummy = tStore.create();
+            transactions = (List<OA2ServiceTransaction>) tStore.search(tKeys.states(), ".*" + dummy.CLAIMS_SOURCES_STATE_KEY + ".*", true);
+        } else {
+            // do the one specified only.
+            transaction = (OA2ServiceTransaction) findItem(inputLine);
+            if (transaction == null) {
+                say("sorry, no transaction specified.");
+                return;
+            }
+            transactions = new ArrayList<>();
+            transactions.add(transaction);
+        }
+        int count = 0;
+
+        for (OA2ServiceTransaction oa2ServiceTransaction : transactions) {
+            try {
+                doPatch(oa2ServiceTransaction, isTest, isVerbose);
+                count++;
+            } catch (Throwable t) {
+                say("error processing claim source: " + t.getMessage());
+                if (isVerbose) {
+                    t.printStackTrace();
+                }
+                return;
+            }
+        }
+        if (doAll) {
+            say("done! " + count + " transactions processed");
+        } else {
+            say("done!");
+        }
+    }
+
+    public String CLAIMS_SOURCES_STATE_KEY2 = "claims_sources2";
+
+    protected void doPatch(OA2ServiceTransaction transaction, boolean isTest, boolean isVerbose) throws Exception {
+        JSONArray array = new JSONArray();
+        for (ClaimSource claimSource : transaction.getClaimSources(null)) {
+            array.add(ConfigtoCS.convert(claimSource).toJSON());
+        }
+        transaction.getState().put(CLAIMS_SOURCES_STATE_KEY2, array);
+
+        if (isVerbose) {
+            say("processing " + transaction.getIdentifierString());
+        }
+        if (!isTest) {
+            getStore().save(transaction);
+        } else {
+            say("converted to " + array);
+        }
+    }
 
 }

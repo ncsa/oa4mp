@@ -7,7 +7,7 @@ When a new version is deployed, here is the testing order
 
   Main testing clients and tests
     -- localhost:command.line
-      This has random testing configurations in it, so always check.
+      This has random testing configurations in it, shttps://localhost:9443/oauth2/6530ca364152e60c3453b24a5f2cc35e?type=authzGrant&ts=1674753653787&version=v2.0&lifetime=750000ncsao always check.
       Does NOT have refresh tokens.
       ** Has RFC 8628 = device flow enabled.
 

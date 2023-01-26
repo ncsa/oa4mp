@@ -47,5 +47,11 @@
         <module name="oa4mp-server-admin" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="client" target="11" />
+      <module name="common" target="11" />
+      <module name="oauth2" target="11" />
+      <module name="server" target="11" />
+    </bytecodeTargetLevel>
   </component>
 </project>

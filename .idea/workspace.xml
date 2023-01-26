@@ -11,6 +11,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b728426b-c50e-4343-893b-175387fad5cf" name="Changes" comment="Re-committing.">
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-qdl/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-qdl/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/TransactionStoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/TransactionStoreCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/testing/testing-readme.txt" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/testing/testing-readme.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/allclasses-frame.html" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/allclasses-frame.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/allclasses-noframe.html" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/allclasses-noframe.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/constant-values.html" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/apidocs/constant-values.html" afterDir="false" />
@@ -33,6 +39,10 @@
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin-javadoc.jar" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin-javadoc.jar" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin-sources.jar" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin-sources.jar" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin.jar" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/target/oa2-admin.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth1/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth1/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-test-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-test-oauth2/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-xsede-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-xsede-oauth2/buildNumber.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -54,7 +64,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="5.2.4" />
+        <entry key="$PROJECT_DIR$" value="master" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -68,10 +78,6 @@
     </file-type-list>
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/delegation/ncsa-security-oauth-2.0/5.2-SNAPSHOT/ncsa-security-oauth-2.0-5.2-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/oauth_2_0/jwt/PayloadHandler.java" root0="SKIP_INSPECTION" />
-    <setting file="jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/delegation/ncsa-security-oauth-2.0/5.2-SNAPSHOT/ncsa-security-oauth-2.0-5.2-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/oauth_2_0/jwt/JWTRunner.java" root0="SKIP_INSPECTION" />
-    <setting file="jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/ncsa-security-util/5.2-SNAPSHOT/ncsa-security-util-5.2-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/util/scripting/ScriptRunRequest.java" root0="SKIP_INSPECTION" />
-    <setting file="jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/delegation/ncsa-security-oauth-2.0/5.2-SNAPSHOT/ncsa-security-oauth-2.0-5.2-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/oauth_2_0/server/IDTokenResponse.java" root0="SKIP_INSPECTION" />
     <setting file="file://$PROJECT_DIR$/oa4mp-proxy/src/main/java/edu/uiuc/ncsa/oa2/servlet/OA2ATServlet.java" root0="SKIP_INSPECTION" />
   </component>
   <component name="LogFilters">
@@ -96,33 +102,15 @@
     <option name="showMembers" value="true" />
     <option name="showModules" value="false" />
   </component>
-  <component name="PropertiesComponent">
-    <property name="DefaultHtmlFileTemplate" value="XHTML File" />
-    <property name="GoToClass.includeLibraries" value="false" />
-    <property name="GoToClass.toSaveIncludeLibraries" value="false" />
-    <property name="GoToFile.includeJavaFiles" value="false" />
-    <property name="JavaMethodFindUsagesOptions.isImplementingMethods" value="true" />
-    <property name="MemberChooser.copyJavadoc" value="false" />
-    <property name="MemberChooser.showClasses" value="true" />
-    <property name="MemberChooser.sorted" value="false" />
-    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
-    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File" value="HOCON" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/qdl" />
-    <property name="node.js.detected.package.eslint" value="true" />
-    <property name="node.js.detected.package.tslint" value="true" />
-    <property name="node.js.selected.package.eslint" value="(autodetect)" />
-    <property name="node.js.selected.package.tslint" value="(autodetect)" />
-    <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
-    <property name="nodejs_npm_path_reset_for_default_project" value="true" />
-    <property name="nodejs_package_manager_path" value="npm" />
-    <property name="project.structure.last.edited" value="Libraries" />
-    <property name="project.structure.proportion" value="0.15" />
-    <property name="project.structure.side.proportion" value="0.6877193" />
-    <property name="settings.editor.selected.configurable" value="editor.preferences.tabs" />
-  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "node.js.selected.package.tslint": "(autodetect)",
+    "project.structure.last.edited": "Libraries",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.7022989",
+    "settings.editor.selected.configurable": "build.tools"
+  }
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/qdl" />
@@ -143,7 +131,7 @@
       <recent name="edu.uiuc.ncsa.oa2.servlet" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.Test Suite">
+  <component name="RunManager" selected="Application.CLC">
     <configuration default="true" type="Applet" factoryName="Applet">
       <option name="WIDTH" value="400" />
       <option name="HEIGHT" value="300" />
@@ -161,9 +149,7 @@
       <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.myproxy.oauth2.tools.OA2CommandLineClient" />
       <module name="oa4mp-server-admin-oauth2" />
       <option name="PROGRAM_PARAMETERS" value="-cfg $PROJECT_DIR$/../../csd/config/clients.xml -name localhost:command.line" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
+      <method v="2" />
     </configuration>
     <configuration name="CLI" type="Application" factoryName="Application">
       <option name="ALTERNATIVE_JRE_PATH" value="/usr/java/jdk1.8.0_231/jre" />
@@ -171,9 +157,7 @@
       <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.myproxy.oauth2.tools.OA2Commands" />
       <module name="oa4mp-server-admin-oauth2" />
       <option name="PROGRAM_PARAMETERS" value="-cfg $PROJECT_DIR$/../../csd/config/servers.xml -name localhost:oa4mp.oa2.mariadb" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
+      <method v="2" />
     </configuration>
     <configuration name="QDL" type="Application" factoryName="Application">
       <option name="ALTERNATIVE_JRE_PATH" value="11.0.8" />
@@ -424,10 +408,10 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.Scripts" />
-        <item itemvalue="Application.RefreshTokenRetentionPolicy" />
         <item itemvalue="JUnit.QDLTests (1)" />
         <item itemvalue="JUnit.QDLTests" />
+        <item itemvalue="Application.Scripts" />
+        <item itemvalue="Application.RefreshTokenRetentionPolicy" />
         <item itemvalue="Application.TXRecord" />
       </list>
     </recent_temporary>
@@ -844,7 +828,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/TransactionStoreCommands.java</url>
-          <line>329</line>
+          <line>335</line>
           <option name="timeStamp" value="54" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -856,11 +840,6 @@
           <url>file://$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/claims/OA2ClaimsUtil.java</url>
           <line>181</line>
           <option name="timeStamp" value="80" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/oa4mp-server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/StoreCommands2.java</url>
-          <line>1042</line>
-          <option name="timeStamp" value="102" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/oa4mp-proxy/src/main/java/edu/uiuc/ncsa/oa2/servlet/RFC8628AuthorizationServer.java</url>
@@ -968,16 +947,6 @@
           <option name="timeStamp" value="405" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/servlet/UserInfoServlet.java</url>
-          <line>105</line>
-          <option name="timeStamp" value="406" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/servlet/UserInfoServlet.java</url>
-          <line>92</line>
-          <option name="timeStamp" value="407" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/delegation/ncsa-security-oauth-2.0/5.2-SNAPSHOT/ncsa-security-oauth-2.0-5.2-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/oauth_2_0/jwt/JWTRunner.java</url>
           <line>154</line>
           <option name="timeStamp" value="411" />
@@ -998,9 +967,9 @@
           <option name="timeStamp" value="415" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/qdl/scripting/QDLRuntimeEngine.java</url>
-          <line>423</line>
-          <option name="timeStamp" value="416" />
+          <url>file://$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/TransactionStoreCommands.java</url>
+          <line>662</line>
+          <option name="timeStamp" value="418" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
