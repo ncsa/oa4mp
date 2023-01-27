@@ -11,6 +11,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims.ConfigtoCS;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.StoreCommands2;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
@@ -43,6 +44,14 @@ import static edu.uiuc.ncsa.security.core.util.StringUtils.pad2;
  * on 11/16/20 at  3:16 PM
  */
 public class TransactionStoreCommands extends StoreCommands2 {
+
+    public static final String ALL = "-all";
+    public static final String VERBOSE = "-v";
+    public static final String TEST = "-test";
+    public static final String FORCE = "-force";
+    public static final String HOST = "-host";
+    public static final String ROLLBACK = "-rollback";
+
     public TransactionStoreCommands(MyLoggingFacade logger, String defaultIndent, OA2SE oa2se) {
         super(logger, defaultIndent, oa2se.getTransactionStore());
         this.oa2se = oa2se;
@@ -476,7 +485,7 @@ public class TransactionStoreCommands extends StoreCommands2 {
     }
 
     public static String GC_SAFE_MODE_FLAG = "-safe_gc";
-    public static String GC_TEST_FLAG = "-test";
+    public static String GC_TEST_FLAG = TEST;
     public static String GC_SIZE_FLAG = "-size";
     public static String GC_FILE_FLAG = "-file";
 
@@ -649,23 +658,84 @@ public class TransactionStoreCommands extends StoreCommands2 {
         // lock, unlock, is locked
     }
 
+    void showPatchHelp() {
+        say("patch [" + ALL + "] [" + VERBOSE + "] [" + TEST + "] [" + FORCE + "] [" + HOST + " address] [" + ROLLBACK + "] [id]");
+        say("(no arg) - if an id is set, patch the current transaction. Otherwise do nothing.");
+        say(ALL + " - If present, finds ALL transaction to patch. May be restricted by " + HOST);
+        say(FORCE + " - if the target exists overwrite. Default is to not overwrite an existing target.");
+        say(HOST + " address - restrict ids to those with the given address for the host, e.g. -host test.cilogon.org ");
+        say(ROLLBACK + " - normal operation takes 5.2.7 serialization and converts to JSON. If -rollback is given,");
+        say("            then the JSON serialization is used to create the Java 5.2.7 serialization.");
+        say(TEST + " - simply carry out the operation but do not save it. Print what would happen.");
+        say(VERBOSE + " - verbose mode. Print out a note for id of every transaction as processed.");
+        say("5.2.7 stashed the serialized claim sources in the states attribute (a JSON object) with the");
+        say("key claims_sources. 5.2.8 adds it own key, claims_sources2, and uses that. Normal operation");
+        say("of this command takes what in claims_sources converts it to JSON then stashes is in claims_sources2.");
+        say("The rollback option reads claims_sources2 and recreates claims_sources.");
+        say("Note that this is intended to only run under 5.2.7.1. Everything is very version sensitive.");
+
+    }
+
+    void showMorePatchHelp() {
+        say("The problem ");
+        say("-----------");
+        say("Until 5.2.7 OA4MP serialized the claim sources when creating the transaction");
+        say("using Java 8 and standard Java object serialization.");
+        say("5.2.8 uses Java 11 and Oracle changed the serialization mechanism for security reasons.");
+        say("»Therefore such transactions are not forward compatible from 5.2.7 to 5.2.8«");
+        say("The solution is to start using JSON for serialization, requiring 5.2.7 transactions");
+        say("to be converted. This one-time operation is done with this command.");
+        say("");
+        say("You can view the states property in the CLI by using the transactions component, setting the id you want listing it");
+        say(">transactions set_id XXX");
+        say(">transactions ls -v -keys [states]");
+        say("   states : {\"comment\":\"State for object id...(whole buncha stuff)");
+        say("");
+        say("Normal operation");
+        say("----------------");
+        say("This converts 5.2.7 transactions to 5.2.8.  A typical invocation would be");
+        say("\npatch -all -host \"cilogon.org\" -v\n");
+        say("which would convert all of the transactions for the given host and be relatively chatty about it.");
+        say("If you have already run this and need to run it again, it will skip any transactions it thinks were converted");
+        say("You can force it to process everything using the " + FORCE + " option.");
+        say("\nUsing Rollback");
+        say("--------------");
+        say("In the case that OA4MP is at 5.2.8 and needs to be reverted to 5.2.7, any transactions created by it");
+        say("must be converted to 5.2.7. This is the function of the " + ROLLBACK + " option.");
+        say("To use it, downgrade the server and as soon as it is up, run ");
+        say("\npatch -force -rollback -all\n");
+        say("This converts every outstanding transaction, you might also want to restrict it using the -host option.");
+        say("You need to force this, to overwrite the Java serialized object, since that is for Java 11, not Java 8. ");
+
+    }
+
     public void patch(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
-            say("patch [-all] [-v] [-test] [id]");
-            say("(no arg) - if an id is set, patch the transaction. Otherwise do nothing.");
-            say("-all - If present, finds ALL transaction to patch.");
-            say("[-v] - verbose mode. Print out the id of every transaction as processed.");
-            say("[-test] - simply carry out the operation but do not save it. ");
-            say("This command will patch the transaction from version 5.7.1 to 5.2.8. It will");
-            say("add a single JSON serialized claims_sources element labelled claims_sources2");
+            if (inputLine.hasArg("-more")) {
+                showMorePatchHelp();
+            } else {
+                showPatchHelp();
+                say("To see more on this topic, re-run this command with --help -more");
+            }
             return;
         }
-        boolean doAll = inputLine.hasArg("-all");
-        inputLine.removeSwitch("-all");
-        boolean isVerbose = inputLine.hasArg("-v");
-        inputLine.removeSwitch("-v");
-        boolean isTest = inputLine.hasArg("-test");
-        inputLine.removeSwitch("-test");
+        boolean doAll = inputLine.hasArg(ALL);
+        inputLine.removeSwitch(ALL);
+        boolean isVerbose = inputLine.hasArg(VERBOSE);
+        inputLine.removeSwitch(VERBOSE);
+        boolean isTest = inputLine.hasArg(TEST);
+        inputLine.removeSwitch(TEST);
+        boolean isForce = inputLine.hasArg(FORCE);
+        inputLine.removeSwitch(FORCE);
+        String host = null;
+        boolean hasHost = inputLine.hasArg(HOST);
+        if (hasHost) {
+            host = inputLine.getNextArgFor(HOST);
+            inputLine.removeSwitchAndValue(HOST);
+        }
+        boolean doRollback = inputLine.hasArg(ROLLBACK);
+
+
         List<OA2ServiceTransaction> transactions;
         OA2ServiceTransaction transaction;
 
@@ -676,55 +746,152 @@ public class TransactionStoreCommands extends StoreCommands2 {
             OA2TStoreInterface<? extends OA2ServiceTransaction> tStore = (OA2TStoreInterface) getStore();
             // need dummy transaction to get fields.
             OA2ServiceTransaction dummy = tStore.create();
-            transactions = (List<OA2ServiceTransaction>) tStore.search(tKeys.states(), ".*" + dummy.CLAIMS_SOURCES_STATE_KEY + ".*", true);
+            if (doRollback) {
+                transactions = (List<OA2ServiceTransaction>) tStore.search(tKeys.states(), ".*" + CLAIMS_SOURCES_STATE_KEY2 + ".*", true);
+            } else {
+                transactions = (List<OA2ServiceTransaction>) tStore.search(tKeys.states(), ".*" + dummy.CLAIMS_SOURCES_STATE_KEY + ".*", true);
+            }
+            if (hasHost) {
+                // Have to filter the transactions
+                List<OA2ServiceTransaction> filtered = new ArrayList<>();
+                for (OA2ServiceTransaction oa2ServiceTransaction : transactions) {
+                    if (oa2ServiceTransaction.getIdentifier().getUri().getHost().equals(host)) {
+                        filtered.add(oa2ServiceTransaction);
+                    }
+                }
+                transactions = filtered;
+            }
+            if (transactions.isEmpty()) {
+                say("no transactions to process");
+                return;
+            }
+            tStore.remove(dummy.getIdentifier()); // clean it up.
         } else {
             // do the one specified only.
             transaction = (OA2ServiceTransaction) findItem(inputLine);
+
             if (transaction == null) {
                 say("sorry, no transaction specified.");
                 return;
+            }
+
+            if (hasHost && !transaction.getIdentifier().getUri().getHost().equals(host)) {
+                if (!readline("Host of the id is " + transaction.getIdentifier().getUri().getHost() + " but you specified a host of " + host + " Continue? (yes/no)").equals("yes")) {
+                    say("aborting...");
+                    return;
+                }
             }
             transactions = new ArrayList<>();
             transactions.add(transaction);
         }
         int count = 0;
-
+        List<OA2ServiceTransaction> unprocessed = new ArrayList<>();
         for (OA2ServiceTransaction oa2ServiceTransaction : transactions) {
             try {
-                doPatch(oa2ServiceTransaction, isTest, isVerbose);
+                if (doRollback) {
+                    if (!doRollback(oa2ServiceTransaction, isForce, isTest, isVerbose)) {
+                        unprocessed.add(oa2ServiceTransaction);
+                    }
+                } else {
+                    if (!doPatch(oa2ServiceTransaction, isForce, isTest, isVerbose)) {
+                        unprocessed.add(oa2ServiceTransaction);
+                    }
+                }
                 count++;
             } catch (Throwable t) {
-                say("error processing claim source: " + t.getMessage());
-                if (isVerbose) {
-                    t.printStackTrace();
-                }
-                return;
+                unprocessed.add(oa2ServiceTransaction);
+                say("error processing claim source for transaction " + oa2ServiceTransaction.getIdentifierString() + ": " + t.getMessage());
             }
         }
         if (doAll) {
-            say("done! " + count + " transactions processed");
+            if (unprocessed.size() == 0) {
+                say("done! " + count + " transactions processed.");
+            } else {
+                say("done! " + (count - unprocessed.size()) + " transactions processed, " + unprocessed.size() + " skipped");
+                if (isVerbose) {
+                    say("Unprocessed transactions are");
+                    for (OA2ServiceTransaction ttt : unprocessed) {
+                        say(ttt.getIdentifierString());
+                    }
+                }
+            }
         } else {
-            say("done!");
+            if (unprocessed.size() == 1) {
+                say("was unable to convert the transaction.");
+            } else {
+                say("done!");
+            }
         }
     }
 
     public String CLAIMS_SOURCES_STATE_KEY2 = "claims_sources2";
 
-    protected void doPatch(OA2ServiceTransaction transaction, boolean isTest, boolean isVerbose) throws Exception {
+    protected boolean doPatch(OA2ServiceTransaction transaction,
+                              boolean isForce,
+                              boolean isTest,
+                              boolean isVerbose) throws Exception {
         JSONArray array = new JSONArray();
+        if (!transaction.getState().containsKey(transaction.CLAIMS_SOURCES_STATE_KEY)) {
+            if (isVerbose) {
+                say("No claims to convert to JSON, for " + transaction.getIdentifierString() + ", skipping");
+            }
+            return false;
+        }
+        if (!isForce && transaction.getState().containsKey(CLAIMS_SOURCES_STATE_KEY2)) {
+            if (isVerbose) {
+                say("Transaction " + transaction.getIdentifierString() + " already contains a converted claim source. Skipping. Invoke with " + FORCE + " to override this.");
+            }
+            return false;
+        }
         for (ClaimSource claimSource : transaction.getClaimSources(null)) {
             array.add(ConfigtoCS.convert(claimSource).toJSON());
         }
+
         transaction.getState().put(CLAIMS_SOURCES_STATE_KEY2, array);
 
-        if (isVerbose) {
-            say("processing " + transaction.getIdentifierString());
-        }
         if (!isTest) {
             getStore().save(transaction);
+            if (isVerbose) {
+                say("processed " + transaction.getIdentifierString());
+            }
         } else {
             say("converted to " + array);
         }
+        return true;
     }
 
+    protected boolean doRollback(OA2ServiceTransaction transaction,
+                                 boolean isForce,
+                                 boolean isTest,
+                                 boolean isVerbose) throws Exception {
+        if (!transaction.getState().containsKey(CLAIMS_SOURCES_STATE_KEY2)) {
+            if (isVerbose) {
+                say("No JSON claims source to convert to Java for" + transaction.getIdentifierString() + ", skipping");
+            }
+            return false;
+        }
+        if (!isForce && transaction.getState().containsKey(transaction.CLAIMS_SOURCES_STATE_KEY)) {
+            if (isVerbose) {
+                say("Transaction " + transaction.getIdentifierString() + " already contains a claim source. Skipping. Invoke with " + FORCE + " to override this.");
+            }
+            return false;
+        }
+        JSONArray array = transaction.getState().getJSONArray(CLAIMS_SOURCES_STATE_KEY2);
+        ArrayList<ClaimSource> claimSources = new ArrayList<>();
+        for (int i = 0; i < array.size(); i++) {
+            QDLStem stem = new QDLStem();
+            claimSources.add(ConfigtoCS.convert(stem.fromJSON(array.getJSONObject(0)), null));
+        }
+        transaction.setClaimsSources(claimSources); // this will set the claims_sources as a serialized object.
+        int byteCount = transaction.getState().getString(transaction.CLAIMS_SOURCES_STATE_KEY).length();
+        if (!isTest) {
+            getStore().save(transaction);
+            if (isVerbose) {
+                say("wrote " + byteCount + " bytes for " + transaction.getIdentifierString());
+            }
+        } else {
+            say("converted " + byteCount + " bytes for " + transaction.getIdentifierString());
+        }
+        return true;
+    }
 }
