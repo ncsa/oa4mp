@@ -50,7 +50,7 @@ public class TransactionStoreCommands extends StoreCommands2 {
     public static final String TEST = "-test";
     public static final String FORCE = "-force";
     public static final String HOST = "-host";
-    public static final String ROLLBACK = "-rollback";
+    public static final String ROLLBACK = "-O7";
 
     public TransactionStoreCommands(MyLoggingFacade logger, String defaultIndent, OA2SE oa2se) {
         super(logger, defaultIndent, oa2se.getTransactionStore());
@@ -659,31 +659,30 @@ public class TransactionStoreCommands extends StoreCommands2 {
     }
 
     void showPatchHelp() {
-        say("patch [" + ALL + "] [" + VERBOSE + "] [" + TEST + "] [" + FORCE + "] [" + HOST + " address] [" + ROLLBACK + "] [id]");
-        say("(no arg) - if an id is set, patch the current transaction. Otherwise do nothing.");
-        say(ALL + " - If present, finds ALL transaction to patch. May be restricted by " + HOST);
+        say(PATCH_NAME + " [" + ALL + "] [" + VERBOSE + "] [" + TEST + "] [" + FORCE + "] [" + HOST + " address] [" + ROLLBACK + "] [id]");
+        say("(no arg) - if an id is set, reconcile the current transaction. Otherwise do nothing.");
+        say(ALL + " - If present, finds ALL transaction to reconcile. May be restricted by " + HOST);
         say(FORCE + " - if the target exists overwrite. Default is to not overwrite an existing target.");
         say(HOST + " address - restrict ids to those with the given address for the host, e.g. -host test.cilogon.org ");
-        say(ROLLBACK + " - normal operation takes 5.2.7 serialization and converts to JSON. If -rollback is given,");
-        say("            then the JSON serialization is used to create the Java 5.2.7 serialization.");
+        say(ROLLBACK + " - normal operation takes O7 serialization and converts to O8. If " + ROLLBACK + " is given,");
+        say("            then the JSON serialization is used to create the O7 serialization.");
+        say("            I.e. Normal is O7 --> O8, this switch does O8 --> O7.");
         say(TEST + " - simply carry out the operation but do not save it. Print what would happen.");
         say(VERBOSE + " - verbose mode. Print out a note for id of every transaction as processed.");
-        say("5.2.7 stashed the serialized claim sources in the states attribute (a JSON object) with the");
-        say("key claims_sources. 5.2.8 adds it own key, claims_sources2, and uses that. Normal operation");
+        say("O7 stashed the serialized claim sources in the states attribute (a JSON object) with the");
+        say("key claims_sources. O8 adds it own key, claims_sources2, and uses that. Normal operation");
         say("of this command takes what in claims_sources converts it to JSON then stashes is in claims_sources2.");
-        say("The rollback option reads claims_sources2 and recreates claims_sources.");
+        say("The " + ROLLBACK + " switch reads claims_sources2 and recreates claims_sources.");
         say("Note that this is intended to only run under 5.2.7.1. Everything is very version sensitive.");
-
     }
 
     void showMorePatchHelp() {
         say("The problem ");
         say("-----------");
-        say("Until 5.2.7 OA4MP serialized the claim sources when creating the transaction");
-        say("using Java 8 and standard Java object serialization.");
-        say("5.2.8 uses Java 11 and Oracle changed the serialization mechanism for security reasons.");
+        say("Until O7 (=5.2.7 OA4MP) claim sources used java serialization when creating the transaction");
+        say("O8 (=5.2.8+) uses Java 11 and Oracle changed the serialization mechanism for security reasons.");
         say("»Therefore such transactions are not forward compatible from 5.2.7 to 5.2.8«");
-        say("The solution is to start using JSON for serialization, requiring 5.2.7 transactions");
+        say("The solution is to start using JSON for serialization, requiring O7 transactions");
         say("to be converted. This one-time operation is done with this command.");
         say("");
         say("You can view the states property in the CLI by using the transactions component, setting the id you want listing it");
@@ -693,23 +692,26 @@ public class TransactionStoreCommands extends StoreCommands2 {
         say("");
         say("Normal operation");
         say("----------------");
-        say("This converts 5.2.7 transactions to 5.2.8.  A typical invocation would be");
-        say("\npatch -all -host \"cilogon.org\" -v\n");
+        say("This converts O7 transactions to O8.  A typical invocation would be");
+        say("\n" + PATCH_NAME + " " + ALL + " " + HOST + " \"cilogon.org\" -v\n");
         say("which would convert all of the transactions for the given host and be relatively chatty about it.");
         say("If you have already run this and need to run it again, it will skip any transactions it thinks were converted");
         say("You can force it to process everything using the " + FORCE + " option.");
-        say("\nUsing Rollback");
+        say("\nUsing the " + ROLLBACK + " switch ('rollback')");
         say("--------------");
-        say("In the case that OA4MP is at 5.2.8 and needs to be reverted to 5.2.7, any transactions created by it");
-        say("must be converted to 5.2.7. This is the function of the " + ROLLBACK + " option.");
+        say("In the case that O8 is deployed and needs to be downgraded to O7, any transactions created by it");
+        say("must be made compatible with O7. This is the function of the " + ROLLBACK + " option.");
         say("To use it, downgrade the server and as soon as it is up, run ");
-        say("\npatch -force -rollback -all\n");
+        say("\n" + PATCH_NAME + " " + FORCE + " " +  ROLLBACK + " "  + ALL +"\n");
         say("This converts every outstanding transaction, you might also want to restrict it using the -host option.");
         say("You need to force this, to overwrite the Java serialized object, since that is for Java 11, not Java 8. ");
 
     }
+    // must be same as next function so documentation is correct.
+    // MUST BE A VERB like reconcile, patch or some such or the English in the documentation gets hinky.
+    String PATCH_NAME = "reconcile";
 
-    public void patch(InputLine inputLine) throws Exception {
+    public void reconcile(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
             if (inputLine.hasArg("-more")) {
                 showMorePatchHelp();
@@ -855,7 +857,7 @@ public class TransactionStoreCommands extends StoreCommands2 {
                 say("processed " + transaction.getIdentifierString());
             }
         } else {
-            say("converted to " + array);
+            say(transaction.getIdentifierString() + " --> " + array);
         }
         return true;
     }
@@ -890,7 +892,7 @@ public class TransactionStoreCommands extends StoreCommands2 {
                 say("wrote " + byteCount + " bytes for " + transaction.getIdentifierString());
             }
         } else {
-            say("converted " + byteCount + " bytes for " + transaction.getIdentifierString());
+            say(transaction.getIdentifierString() + " --> " + byteCount + " bytes.");
         }
         return true;
     }
