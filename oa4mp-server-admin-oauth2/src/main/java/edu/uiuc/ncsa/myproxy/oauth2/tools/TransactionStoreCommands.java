@@ -874,7 +874,7 @@ public class TransactionStoreCommands extends StoreCommands2 {
                 array.add(ConfigtoCS.convert(claimSource).toJSON());
             }
 
-        } catch (ClassCastException cce) {
+        } catch (InvalidClassException cce) {
             // In this case, the serialized claim sources cannot be deserialized under Java 8.
             // This implies that they were created in Java 11 and that the tool us being used out of sync
             // somehow with the Java version. Just tell them about it.
