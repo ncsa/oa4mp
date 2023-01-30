@@ -748,7 +748,9 @@ public class TransactionStoreCommands extends StoreCommands2 {
 
         List<OA2ServiceTransaction> transactions;
         OA2ServiceTransaction transaction;
-
+        if(isTest){
+             say("** test mode enabled **");
+         }
         if (doAll) {
             // Now need to get in the trenches... Lots of casts...
             // Goal is to not change anything but what is in this one class
@@ -823,11 +825,12 @@ public class TransactionStoreCommands extends StoreCommands2 {
             getResultSets().put("good", new RSRecord(processed, null));
             say("result set created");
         }
+
         if (doAll) {
             if (unprocessed.size() == 0) {
                 say("done! " + count + " transactions processed.");
             } else {
-                say("done! " + (count - unprocessed.size()) + " transactions processed, " + unprocessed.size() + " skipped");
+                say("done! " + count  + " transactions processed, " + unprocessed.size() + " skipped");
                 if (isVerbose && !resultSets) {
                     say("Unprocessed transactions are");
                     for (Identifiable ttt : unprocessed) {
@@ -842,7 +845,9 @@ public class TransactionStoreCommands extends StoreCommands2 {
                 say("done!");
             }
         }
-
+       if(isTest){
+           say("** test complete **");
+       }
     }
 
     public String CLAIMS_SOURCES_STATE_KEY2 = "claims_sources2";
