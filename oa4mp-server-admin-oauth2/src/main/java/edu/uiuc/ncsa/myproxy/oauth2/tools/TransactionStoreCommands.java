@@ -51,6 +51,7 @@ public class TransactionStoreCommands extends StoreCommands2 {
     public static final String FORCE = "-force";
     public static final String HOST = "-host";
     public static final String ROLLBACK = "-O7";
+    public static final String RESULT_SET = "-rs";
 
     public TransactionStoreCommands(MyLoggingFacade logger, String defaultIndent, OA2SE oa2se) {
         super(logger, defaultIndent, oa2se.getTransactionStore());
@@ -659,14 +660,17 @@ public class TransactionStoreCommands extends StoreCommands2 {
     }
 
     void showPatchHelp() {
-        say(PATCH_NAME + " [" + ALL + "] [" + VERBOSE + "] [" + TEST + "] [" + FORCE + "] [" + HOST + " address] [" + ROLLBACK + "] [id]");
+        say(PATCH_NAME + " [" + ALL + "] [" + VERBOSE + "] [" + TEST + "] [" + FORCE + "] [" + HOST + " address] [" + ROLLBACK + "] [" + RESULT_SET + "] id]");
         say("(no arg) - if an id is set, reconcile the current transaction. Otherwise do nothing.");
         say(ALL + " - If present, finds ALL transaction to reconcile. May be restricted by " + HOST);
         say(FORCE + " - if the target exists overwrite. Default is to not overwrite an existing target.");
         say(HOST + " address - restrict ids to those with the given address for the host, e.g. -host test.cilogon.org ");
         say(ROLLBACK + " - normal operation takes O7 serialization and converts to O8. If " + ROLLBACK + " is given,");
-        say("            then the JSON serialization is used to create the O7 serialization.");
-        say("            I.e. Normal is O7 --> O8, this switch does O8 --> O7.");
+        say("         then the JSON serialization is used to create the O7 serialization.");
+        say("         I.e. Normal is O7 --> O8, this switch does O8 --> O7.");
+        say(RESULT_SET + " - store the processed and unprocessed transactions in results sets named");
+        say("         resp. 'good' and 'bad'. You may then explore them like any other result set.");
+        say("         See help for the rs command for more.");
         say(TEST + " - simply carry out the operation but do not save it. Print what would happen.");
         say(VERBOSE + " - verbose mode. Print out a note for id of every transaction as processed.");
         say("O7 stashed the serialized claim sources in the states attribute (a JSON object) with the");
@@ -702,11 +706,12 @@ public class TransactionStoreCommands extends StoreCommands2 {
         say("In the case that O8 is deployed and needs to be downgraded to O7, any transactions created by it");
         say("must be made compatible with O7. This is the function of the " + ROLLBACK + " option.");
         say("To use it, downgrade the server and as soon as it is up, run ");
-        say("\n" + PATCH_NAME + " " + FORCE + " " +  ROLLBACK + " "  + ALL +"\n");
+        say("\n" + PATCH_NAME + " " + FORCE + " " + ROLLBACK + " " + ALL + "\n");
         say("This converts every outstanding transaction, you might also want to restrict it using the -host option.");
         say("You need to force this, to overwrite the Java serialized object, since that is for Java 11, not Java 8. ");
 
     }
+
     // must be same as next function so documentation is correct.
     // MUST BE A VERB like reconcile, patch or some such or the English in the documentation gets hinky.
     String PATCH_NAME = "reconcile";
@@ -736,6 +741,9 @@ public class TransactionStoreCommands extends StoreCommands2 {
             inputLine.removeSwitchAndValue(HOST);
         }
         boolean doRollback = inputLine.hasArg(ROLLBACK);
+        inputLine.removeSwitch(ROLLBACK);
+        boolean resultSets = inputLine.hasArg(RESULT_SET);
+        inputLine.removeSwitch(RESULT_SET);
 
 
         List<OA2ServiceTransaction> transactions;
@@ -787,32 +795,42 @@ public class TransactionStoreCommands extends StoreCommands2 {
             transactions.add(transaction);
         }
         int count = 0;
-        List<OA2ServiceTransaction> unprocessed = new ArrayList<>();
+        List<Identifiable> unprocessed = new ArrayList<>();
+        List<Identifiable> processed = new ArrayList<>();
         for (OA2ServiceTransaction oa2ServiceTransaction : transactions) {
             try {
                 if (doRollback) {
                     if (!doRollback(oa2ServiceTransaction, isForce, isTest, isVerbose)) {
                         unprocessed.add(oa2ServiceTransaction);
+                    } else {
+                        processed.add(oa2ServiceTransaction);
                     }
                 } else {
                     if (!doPatch(oa2ServiceTransaction, isForce, isTest, isVerbose)) {
                         unprocessed.add(oa2ServiceTransaction);
+                    } else {
+                        processed.add(oa2ServiceTransaction);
                     }
                 }
                 count++;
             } catch (Throwable t) {
                 unprocessed.add(oa2ServiceTransaction);
-                say("error processing claim source for transaction " + oa2ServiceTransaction.getIdentifierString() + ": " + t.getMessage());
+                say("error " + oa2ServiceTransaction.getIdentifierString() + ": " + t.getMessage());
             }
+        }
+        if (resultSets) {
+            getResultSets().put("bad", new RSRecord(unprocessed, null));
+            getResultSets().put("good", new RSRecord(processed, null));
+            say("result set created");
         }
         if (doAll) {
             if (unprocessed.size() == 0) {
                 say("done! " + count + " transactions processed.");
             } else {
                 say("done! " + (count - unprocessed.size()) + " transactions processed, " + unprocessed.size() + " skipped");
-                if (isVerbose) {
+                if (isVerbose && !resultSets) {
                     say("Unprocessed transactions are");
-                    for (OA2ServiceTransaction ttt : unprocessed) {
+                    for (Identifiable ttt : unprocessed) {
                         say(ttt.getIdentifierString());
                     }
                 }
@@ -824,6 +842,7 @@ public class TransactionStoreCommands extends StoreCommands2 {
                 say("done!");
             }
         }
+
     }
 
     public String CLAIMS_SOURCES_STATE_KEY2 = "claims_sources2";
@@ -835,29 +854,41 @@ public class TransactionStoreCommands extends StoreCommands2 {
         JSONArray array = new JSONArray();
         if (!transaction.getState().containsKey(transaction.CLAIMS_SOURCES_STATE_KEY)) {
             if (isVerbose) {
-                say("No claims to convert to JSON, for " + transaction.getIdentifierString() + ", skipping");
+                say(transaction.getIdentifierString() + " --> skipped, no claims to convert to JSON");
             }
             return false;
         }
         if (!isForce && transaction.getState().containsKey(CLAIMS_SOURCES_STATE_KEY2)) {
             if (isVerbose) {
-                say("Transaction " + transaction.getIdentifierString() + " already contains a converted claim source. Skipping. Invoke with " + FORCE + " to override this.");
+                say(transaction.getIdentifierString() + " --> skipped, claim source already converted. (Invoke with " + FORCE + " to override this.)");
             }
             return false;
         }
-        for (ClaimSource claimSource : transaction.getClaimSources(null)) {
-            array.add(ConfigtoCS.convert(claimSource).toJSON());
-        }
+        try {
+            for (ClaimSource claimSource : transaction.getClaimSources(null)) {
+                array.add(ConfigtoCS.convert(claimSource).toJSON());
+            }
 
+        } catch (ClassCastException cce) {
+            // In this case, the serialized claim sources cannot be deserialized under Java 8.
+            // This implies that they were created in Java 11 and that the tool us being used out of sync
+            // somehow with the Java version. Just tell them about it.
+            if (isVerbose) {
+                say(transaction.getIdentifierString() + " --> skipped, wrong version, cannot convert"  + ": " + cce.getMessage());
+            }
+            return false;
+        }
         transaction.getState().put(CLAIMS_SOURCES_STATE_KEY2, array);
 
-        if (!isTest) {
-            getStore().save(transaction);
-            if (isVerbose) {
-                say("processed " + transaction.getIdentifierString());
-            }
-        } else {
+        if (isTest) {
             say(transaction.getIdentifierString() + " --> " + array);
+        } else {
+            getStore().save(transaction);
+/*
+            if (isVerbose) {
+                say(transaction.getIdentifierString() + " --> done!");
+            }
+*/
         }
         return true;
     }
@@ -868,13 +899,13 @@ public class TransactionStoreCommands extends StoreCommands2 {
                                  boolean isVerbose) throws Exception {
         if (!transaction.getState().containsKey(CLAIMS_SOURCES_STATE_KEY2)) {
             if (isVerbose) {
-                say("No JSON claims source to convert to Java for" + transaction.getIdentifierString() + ", skipping");
+                say(transaction.getIdentifierString() + " --> skipped, no JSON claims source");
             }
             return false;
         }
         if (!isForce && transaction.getState().containsKey(transaction.CLAIMS_SOURCES_STATE_KEY)) {
             if (isVerbose) {
-                say("Transaction " + transaction.getIdentifierString() + " already contains a claim source. Skipping. Invoke with " + FORCE + " to override this.");
+                say(transaction.getIdentifierString() + " --> already contains a claim source. Skipping. Invoke with " + FORCE + " to override this.");
             }
             return false;
         }
@@ -886,13 +917,13 @@ public class TransactionStoreCommands extends StoreCommands2 {
         }
         transaction.setClaimsSources(claimSources); // this will set the claims_sources as a serialized object.
         int byteCount = transaction.getState().getString(transaction.CLAIMS_SOURCES_STATE_KEY).length();
-        if (!isTest) {
+        if (isTest) {
+            say(transaction.getIdentifierString() + " --> " + byteCount + " bytes.");
+        } else {
             getStore().save(transaction);
             if (isVerbose) {
-                say("wrote " + byteCount + " bytes for " + transaction.getIdentifierString());
+                say(transaction.getIdentifierString() + " -> "+ byteCount + " bytes written.");
             }
-        } else {
-            say(transaction.getIdentifierString() + " --> " + byteCount + " bytes.");
         }
         return true;
     }
