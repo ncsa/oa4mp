@@ -95,6 +95,7 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
 
          String resource="resource";
          String rtLifetime = "rt_lifetime";
+         String rtGracePeriod = "rt_grace_period";
          String scopes = "scopes";
          String signTokens="sign_tokens";
          String signTokens="skipServerScripts";
@@ -121,7 +122,11 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
         if (stem.containsKey(kk().dfInterval())) {
             v.setDfInterval(stem.getLong(kk().dfInterval()));
         }
-        // 6
+        // 7
+        if (stem.containsKey(kk().rtGracePeriod())) {
+            v.setRtGracePeriod(stem.getLong(kk().rtGracePeriod()));
+        }
+
         if (stem.containsKey(kk().dfLifetime())) {
             v.setDfLifetime(stem.getLong(kk().dfLifetime()));
         }
@@ -252,7 +257,7 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
         }
         stem.put(kk().maxATLifetime(), v.getMaxATLifetime());
         stem.put(kk().maxRTLifetime(), v.getMaxRTLifetime());
-
+        stem.put(kk().rtGracePeriod(), v.getRtGracePeriod());
         stem.put(kk().ersatzClient(), v.isErsatzClient());
 
         setNonNullStemValue(stem, kk().issuer(), v.getIssuer());

@@ -33,6 +33,7 @@ public class OA2ClientKeys extends ClientKeys {
     String proxyRequestScopes ="proxy_request_scopes";
     String publicClient="public_client";
     String rtLifetime = "rt_lifetime";
+    String rtGracePeriod = "rt_grace_period";
     String resource="resource";
     String signTokens="sign_tokens";
     String skipServerScripts="skip_server_scripts";
@@ -157,7 +158,10 @@ public class OA2ClientKeys extends ClientKeys {
         if (0 < x.length) rtLifetime = x[0];
         return rtLifetime;
     }
-
+    public String rtGracePeriod(String... x) {
+        if (0 < x.length) rtGracePeriod = x[0];
+        return rtGracePeriod;
+    }
 
     public String scopes(String... x) {
         if (0 < x.length) scopes = x[0];
@@ -202,6 +206,7 @@ public class OA2ClientKeys extends ClientKeys {
         allKeys.add(prototypes());
         allKeys.add(extendsProvisioners());
         allKeys.add(skipServerScripts());
+        allKeys.add(rtGracePeriod());
         return allKeys;
     }
 }

@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.AbstractPayloadConfig;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.IDTokenClientConfig;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2ConfigurationLoader;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2ClientUtils;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.AccessTokenConfig;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.RefreshTokenConfig;
@@ -737,5 +738,16 @@ public class OA2Client extends Client implements OA2ClientScopes {
     }
 
     boolean forwardScopesToProxy = false;
+
+    public long getRtGracePeriod() {
+        return rtGracePeriod;
+    }
+
+    public void setRtGracePeriod(long rtGracePeriod) {
+        this.rtGracePeriod = rtGracePeriod;
+    }
+
+    long rtGracePeriod = OA2ConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_USE_SERVER_DEFAULT;
+
 }
 

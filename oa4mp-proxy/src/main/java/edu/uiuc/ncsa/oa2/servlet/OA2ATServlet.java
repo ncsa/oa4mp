@@ -573,8 +573,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             // if there is no such transaction found, then this is probably from a previous exchange. Go find it
             try {
                 t = OA2TokenUtils.getTransactionFromTX(oa2se, accessToken, debugger);
-            }catch (OA2GeneralError oa2GeneralError){
-                if(!(debugger instanceof ClientDebugUtil)){
+            } catch (OA2GeneralError oa2GeneralError) {
+                if (!(debugger instanceof ClientDebugUtil)) {
                     // last ditch effort to tell us what client is doing this.
                     info("Could not find transaction for client " + client.getIdentifierString());
                 }
@@ -621,36 +621,60 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
            service and swap them willy nilly.
          */
         XMLMap tBackup = GenericStoreUtils.toXML(getTransactionStore(), t);
-
-        TXRecord newTXR = (TXRecord) oa2se.getTxStore().create();
-
-        newTXR.setTokenType(requestedTokenType);
-        newTXR.setParentID(t.getIdentifier());
-        if (!audience.isEmpty()) {
-            newTXR.setAudience(audience);
-        }
-        if (!scopes.isEmpty()) {
-            debugger.trace(this, "user requested scopes:" + scopes);
-            newTXR.setScopes(scopes);
-        } else {
-            // If no scopes sent with request, revert to scopes in original request.
-            debugger.trace(this, "NO user requested scopes");
-            //   newTXR.setScopes(t.getScopes());
-        }
-
-        if (!resources.isEmpty()) {
-            // convert to URIs
-            ArrayList<URI> r = new ArrayList<>();
-            for (String x : resources) {
-                try {
-                    r.add(URI.create(x));
-                } catch (Throwable throwable) {
-                    debugger.info(this, "rejected resource request \"" + x + "\"");
-                    info("rejected resource request \"" + x + "\"");
+        // In practice exactly one of these is active at any given time
+        TXRecord newIDTX = null;
+        TXRecord newATTX = null;
+        TXRecord newRTTX = null;
+        TXRecord activeTX = null;
+        switch (requestedTokenType) {
+            case RFC8693Constants.ID_TOKEN_TYPE:
+                newIDTX = (TXRecord) oa2se.getTxStore().create();
+                newIDTX.setTokenType(requestedTokenType);
+                newIDTX.setParentID(t.getIdentifier());
+                newIDTX.setIssuedAt(System.currentTimeMillis());
+                activeTX = newIDTX;
+                break;
+            case RFC8693Constants.ACCESS_TOKEN_TYPE:
+                newATTX = (TXRecord) oa2se.getTxStore().create();
+                activeTX = newATTX;
+                newATTX.setTokenType(requestedTokenType);
+                newATTX.setParentID(t.getIdentifier());
+                if (!audience.isEmpty()) {
+                    newATTX.setAudience(audience);
                 }
-            }
-            newTXR.setResource(r);
+                if (!scopes.isEmpty()) {
+                    debugger.trace(this, "user requested scopes:" + scopes);
+                    newATTX.setScopes(scopes);
+                } else {
+                    // If no scopes sent with request, revert to scopes in original request.
+                    debugger.trace(this, "NO user requested scopes");
+                    //   newTXR.setScopes(t.getScopes());
+                }
+
+                if (!resources.isEmpty()) {
+                    // convert to URIs
+                    ArrayList<URI> r = new ArrayList<>();
+                    for (String x : resources) {
+                        try {
+                            r.add(URI.create(x));
+                        } catch (Throwable throwable) {
+                            debugger.info(this, "rejected resource request \"" + x + "\"");
+                            info("rejected resource request \"" + x + "\"");
+                        }
+                    }
+                    newATTX.setResource(r);
+                }
+                newATTX.setIssuedAt(System.currentTimeMillis());
+                break;
+            case RFC8693Constants.REFRESH_TOKEN_TYPE:
+                newRTTX = (TXRecord) oa2se.getTxStore().create();
+                activeTX = newRTTX;
+                newRTTX.setTokenType(requestedTokenType);
+                newRTTX.setParentID(t.getIdentifier());
+                newRTTX.setIssuedAt(System.currentTimeMillis());
+                break;
         }
+
 
         RTIRequest rtiRequest = new RTIRequest(request, t, t.getAccessToken(), oa2se.isOIDCEnabled());
         RTI2 rtIssuer = new RTI2(getTF2(), MyProxyDelegationServlet.getServiceEnvironment().getServiceAddress());
@@ -660,7 +684,6 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         // These are the claims that are returned in the RFC's required response. They have nothing to do
         // with id token claims, fyi.
         JSONObject rfcClaims = new JSONObject();
-        newTXR.setIssuedAt(System.currentTimeMillis());
 
         debugger.trace(this, "requested token type = " + requestedTokenType);
         switch (requestedTokenType) {
@@ -671,9 +694,9 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 rfcClaims.put(RFC8693Constants.ISSUED_TOKEN_TYPE, RFC8693Constants.ACCESS_TOKEN_TYPE); // Required. This is the type of token issued (mostly access tokens). Must be as per TX spec.
                 rfcClaims.put(OA2Constants.TOKEN_TYPE, RFC8693Constants.TOKEN_TYPE_BEARER); // Required. This is how the issued token can be used, mostly. BY RFC 6750 spec.
                 rfcClaims.put(OA2Constants.EXPIRES_IN, t.getAccessTokenLifetime() / 1000); // internal in ms., external in sec.
-                newTXR.setLifetime(t.getAccessTokenLifetime());
+                activeTX.setLifetime(t.getAccessTokenLifetime());
 
-                newTXR.setIdentifier(BasicIdentifier.newID(rtiResponse.getAccessToken().getToken()));
+                activeTX.setIdentifier(BasicIdentifier.newID(rtiResponse.getAccessToken().getToken()));
           /*      if(provisionErsatz){
                      ersatzTXR.setLifetime(t.getRefreshTokenLifetime());
                      ersatzTXR.setIdentifier(BasicIdentifier.newID(rtiResponse.getAccessToken().getToken()));
@@ -685,9 +708,9 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 rfcClaims.put(RFC8693Constants.ISSUED_TOKEN_TYPE, RFC8693Constants.REFRESH_TOKEN_TYPE); // Required. This is the type of token issued (mostly access tokens). Must be as per TX spec.
                 rfcClaims.put(OA2Constants.TOKEN_TYPE, RFC8693Constants.TOKEN_TYPE_N_A); // Required. This is how the issued token can be used, mostly. BY RFC 6750 spec.
                 rfcClaims.put(OA2Constants.EXPIRES_IN, t.getRefreshTokenLifetime() / 1000); // internal in ms., external in sec.
-                newTXR.setLifetime(t.getRefreshTokenLifetime());
-                newTXR.setIdentifier(BasicIdentifier.newID(rtiResponse.getRefreshToken().getToken()));
-                debugger.trace(this, "Processed access token return type");
+                activeTX.setLifetime(t.getRefreshTokenLifetime());
+                activeTX.setIdentifier(BasicIdentifier.newID(rtiResponse.getRefreshToken().getToken()));
+                debugger.trace(this, "Processed refresh token return type");
           /*      if(provisionErsatz){
                     ersatzTXR.setIdentifier(BasicIdentifier.newID(rtiResponse.getAccessToken().getToken()));
                     ersatzTXR.setLifetime(t.getAccessTokenLifetime());
@@ -697,49 +720,50 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 rfcClaims.put(RFC8693Constants.ISSUED_TOKEN_TYPE, RFC8693Constants.ID_TOKEN_TYPE); // Required. This is the type of token issued (mostly access tokens). Must be as per TX spec.
                 rfcClaims.put(OA2Constants.TOKEN_TYPE, RFC8693Constants.TOKEN_TYPE_N_A); // Required. This is how the issued token can be used, mostly. BY RFC 6750 spec.
                 JSONObject md = t.getUserMetaData();
-                if(md.containsKey(OA2Claims.EXPIRATION) && md.containsKey(OA2Claims.ISSUED_AT)) {
+                if (md.containsKey(OA2Claims.EXPIRATION) && md.containsKey(OA2Claims.ISSUED_AT)) {
                     long exp = md.getLong(OA2Claims.EXPIRATION) - md.getLong(OA2Claims.ISSUED_AT);
                     rfcClaims.put(OA2Constants.EXPIRES_IN, exp / 1000); // internal in ms., external in sec.
-                    newTXR.setLifetime(exp); // in ms.
+                    activeTX.setLifetime(exp); // in ms.
                 }
-                newTXR.setIdentifier(BasicIdentifier.newID(md.getString(OA2Claims.JWT_ID)));
+                activeTX.setIdentifier(BasicIdentifier.newID(md.getString(OA2Claims.JWT_ID)));
+                debugger.trace(this, "Processed id token return type");
                 break;
             default:
                 throw new OA2ATException(OA2Errors.INVALID_REQUEST,
                         "unknown requested token type",
                         t.getRequestState());
         }
-        newTXR.setExpiresAt(newTXR.getIssuedAt() + newTXR.getLifetime());
-        JWTRunner jwtRunner = new JWTRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2se, t, newTXR, t.getOA2Client().getConfig()));
+        activeTX.setExpiresAt(activeTX.getIssuedAt() + activeTX.getLifetime());
+        JWTRunner jwtRunner = new JWTRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2se, t, activeTX, t.getOA2Client().getConfig()));
         try {
-            OA2ClientUtils.setupHandlers(jwtRunner, oa2se, t, client, newTXR, request);
+            OA2ClientUtils.setupHandlers(jwtRunner, oa2se, t, client, newIDTX, newATTX, newRTTX, request);
             // NOTE WELL that the next two lines are where our identifiers are used to create JWTs (like SciTokens)
             // so if this is not done, the wrong token type will be returned.
             jwtRunner.doTokenExchange();
         } catch (Throwable throwable) {
-            OA2ServletUtils.handleScriptEngineException(this, oa2se, throwable, debugger, t, tBackup, newTXR);
+            OA2ServletUtils.handleScriptEngineException(this, oa2se, throwable, debugger, t, tBackup, activeTX);
         }
 
-        setupTokens(client, rtiResponse, oa2se, t, jwtRunner, debugger);
+        setupTokens(client, rtiResponse, oa2se, t, jwtRunner, true, debugger);
         debugger.trace(this, "rtiResponse after token setup:" + rtiResponse);
         switch (requestedTokenType) {
             case RFC8693Constants.ACCESS_TOKEN_TYPE:
                 if (((AccessTokenImpl) rtiResponse.getAccessToken()).isJWT()) {
                     rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getAccessToken().getToken()); // Required.
-                    newTXR.setStoredToken(rtiResponse.getAccessToken().getToken());
+                    newATTX.setStoredToken(rtiResponse.getAccessToken().getToken());
 
                 } else {
                     rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getAccessToken().encodeToken()); // Required.
                 }
                 // create scope string  Remember that these may have been changed by a script,
                 // so here is the right place to set it.
-                rfcClaims.put(OA2Constants.SCOPE, listToString(newTXR.getScopes()));
+                rfcClaims.put(OA2Constants.SCOPE, listToString(newATTX.getScopes()));
                 break;
             case RFC8693Constants.REFRESH_TOKEN_TYPE:
                 if (rtiResponse.getRefreshToken().isJWT()) {
                     rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getRefreshToken().getToken()); // Required
                     rfcClaims.put(OA2Constants.REFRESH_TOKEN, rtiResponse.getRefreshToken().getToken()); // Optional
-                    newTXR.setStoredToken(rtiResponse.getRefreshToken().getToken());
+                    newRTTX.setStoredToken(rtiResponse.getRefreshToken().getToken());
                 } else {
                     rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getRefreshToken().encodeToken()); // Required
                     rfcClaims.put(OA2Constants.REFRESH_TOKEN, rtiResponse.getRefreshToken().encodeToken()); // Optional
@@ -748,34 +772,6 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             case RFC8693Constants.ID_TOKEN_TYPE:
                 rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getClaims());
         }
-/*
-        if (rtiResponse.hasRefreshToken()) {
-            // Maddening part of the spec is that the access token claim can be a refresh token.
-            // User has to look at the returned token type.
-            debugger.trace(this, "has refresh token");
-            if (rtiResponse.getRefreshToken().isJWT()) {
-                rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getRefreshToken().getToken()); // Required
-                rfcClaims.put(OA2Constants.REFRESH_TOKEN, rtiResponse.getRefreshToken().getToken()); // Optional
-                newTXR.setStoredToken(rtiResponse.getRefreshToken().getToken());
-            } else {
-                rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getRefreshToken().encodeToken()); // Required
-                rfcClaims.put(OA2Constants.REFRESH_TOKEN, rtiResponse.getRefreshToken().encodeToken()); // Optional
-            }
-        } else {
-            debugger.trace(this, "no refresh token");
-            if (((AccessTokenImpl) rtiResponse.getAccessToken()).isJWT()) {
-                rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getAccessToken().getToken()); // Required.
-                newTXR.setStoredToken(rtiResponse.getAccessToken().getToken());
-
-            } else {
-                rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getAccessToken().encodeToken()); // Required.
-            }
-            // create scope string  Remember that these may have been changed by a script,
-            // so here is the right place to set it.
-            rfcClaims.put(OA2Constants.SCOPE, listToString(newTXR.getScopes()));
-
-        }
-*/
         debugger.trace(this, "rfc claims returned:" + rfcClaims.toString(1));
         /*
 
@@ -793,12 +789,19 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         response.setContentType("application/json;charset=UTF-8");
         response.setCharacterEncoding("UTF-8");
 
-        newTXR.setValid(true); // automatically.
-/*        if(provisionErsatz){
-            ersatzTXR.setValid(true);
-            oa2se.getTxStore().save(ersatzTXR);
-        }*/
-        oa2se.getTxStore().save(newTXR);
+
+        if (newIDTX != null) {
+            newIDTX.setValid(true);
+            oa2se.getTxStore().save(newIDTX);
+        }
+        if (newATTX != null) {
+            newATTX.setValid(true);
+            oa2se.getTxStore().save(newATTX);
+        }
+        if (newRTTX != null) {
+            newRTTX.setValid(true);
+            oa2se.getTxStore().save(newRTTX);
+        }
         getTransactionStore().save(t);
         PrintWriter osw = response.getWriter();
         rfcClaims.write(osw);
@@ -999,7 +1002,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         List<String> audience = convertToList(state.getRequest(), RFC8693Constants.AUDIENCE);
         List<String> resources = convertToList(state.getRequest(), RFC8693Constants.RESOURCE);
         boolean gotRequestParam = !(scopes.isEmpty() && audience.isEmpty() && resources.isEmpty());
-        TXRecord txRecord = null;
+        TXRecord atTX = null;
+        TXRecord rtTX = null;
         if (gotRequestParam) {
             // Big thing is the scopes. If the scopes requested are the same as the original scopes,
             // skip processing scopes.
@@ -1015,16 +1019,16 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                     originalScopes.addAll(st2.getScopes());
                     requestedScopes.addAll(scopes);
                     if (!originalScopes.equals(requestedScopes)) {
-                        txRecord = (TXRecord) oa2SE.getTxStore().create();
-                        txRecord.setScopes(scopes);
+                        atTX = (TXRecord) oa2SE.getTxStore().create();
+                        atTX.setScopes(scopes);
                     }
                 }
             }
             if (!audience.isEmpty()) {
-                if (txRecord == null) {
-                    txRecord = (TXRecord) oa2SE.getTxStore().create();
+                if (atTX == null) {
+                    atTX = (TXRecord) oa2SE.getTxStore().create();
                 }
-                txRecord.setAudience(audience);
+                atTX.setAudience(audience);
             }
             if (!resources.isEmpty()) {
                 // convert to URIs
@@ -1037,30 +1041,30 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                         info("rejected resource request \"" + x + "\"");
                     }
                 }
-                if (txRecord == null) {
-                    txRecord = (TXRecord) oa2SE.getTxStore().create();
+                if (atTX == null) {
+                    atTX = (TXRecord) oa2SE.getTxStore().create();
                 }
-                txRecord.setResource(r);
+                atTX.setResource(r);
             }
         }
-        if (txRecord != null) {
+        if (atTX != null) {
             // We are not going to save the TX record because we don't need it for mare than transmitting
             // overrides in scope, audience and resource to the handlers to QDL. It does have to look exactly
             // like any other TXRecords, so set the identifier and type.
 
-            txRecord.setTokenType(RFC8693Constants.ACCESS_TOKEN_TYPE); // Ensure that handlers can recognize this for access tokens.
-            txRecord.setIdentifier(BasicIdentifier.newID(atResponse.getAccessToken().getToken()));
+            atTX.setTokenType(RFC8693Constants.ACCESS_TOKEN_TYPE); // Ensure that handlers can recognize this for access tokens.
+            atTX.setIdentifier(BasicIdentifier.newID(atResponse.getAccessToken().getToken()));
         }
         /* *************** */
 
         if (client.isRTLifetimeEnabled()) {
-            st2.setRefreshToken(atResponse.getRefreshToken()); // ditto. Might be null.
+           st2.setRefreshToken(atResponse.getRefreshToken()); // ditto. Might be null.
         } else {
             st2.setRefreshToken(null);
             st2.setRefreshTokenLifetime(0L);
         }
-        JWTRunner jwtRunner = new JWTRunner(st2, ScriptRuntimeEngineFactory.createRTE(oa2SE, st2, txRecord, st2.getOA2Client().getConfig()));
-        OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, st2, client, txRecord, state.getRequest());
+        JWTRunner jwtRunner = new JWTRunner(st2, ScriptRuntimeEngineFactory.createRTE(oa2SE, st2, atTX, st2.getOA2Client().getConfig()));
+        OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, st2, client, null, atTX, rtTX, state.getRequest());
         if (state.isRfc8628() || st2.getAuthorizationGrant().getVersion() == null || st2.getAuthorizationGrant().getVersion().equals(Identifiers.VERSION_1_0_TAG)) {
             // Handlers have not been initialized yet. Either because of old tokens or rfc 8628 (so no tokens).
             jwtRunner.initializeHandlers();
@@ -1175,8 +1179,10 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         if (client.isRTLifetimeEnabled() && oa2SE.isRefreshTokenEnabled()) {
             RefreshTokenImpl rt = tokenResponse.getRefreshToken();
             // rt is used as a key in the database. If the refresh token is  JWT, it will be used as the jti.
-            st2.setRefreshToken(rt);
-            st2.setRefreshTokenValid(true);
+            if(!isTokenExchange) {
+                st2.setRefreshToken(rt);
+                st2.setRefreshTokenValid(true);
+            }
             if (jwtRunner.hasRTHandler()) {
                 RefreshTokenImpl newRT = (RefreshTokenImpl) jwtRunner.getRefreshTokenHandler().getSignedRT(null); // unsigned, for now
                 tokenResponse.setRefreshToken(newRT);
@@ -1223,7 +1229,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
     protected TransactionState doRefresh(OA2Client client, HttpServletRequest request, HttpServletResponse response) throws Throwable {
         // Grants are checked in the doIt method
         MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(client);
-        printAllParameters(request,debugger);
+        printAllParameters(request, debugger);
         String rawRefreshToken = request.getParameter(OA2Constants.REFRESH_TOKEN);
         if (client == null) {
             throw new OA2ATException(OA2Errors.INVALID_REQUEST, "Could not find the client associated with refresh token \"" + rawRefreshToken + "\"");
@@ -1311,29 +1317,49 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         // is that they exist only for the initialization.
 
         // have to set the AT here or the meta data won't get updated in the handler
+        // CIL-1266
+
+        TXRecord txAT = (TXRecord) oa2SE.getTxStore().create();
+        txAT.setTokenType(RFC8693Constants.ACCESS_TOKEN_TYPE);
+        txAT.setParentID(t.getIdentifier());
+        txAT.setIdentifier(BasicIdentifier.newID(t.getAccessToken().getToken()));
+        txAT.setExpiresAt(t.getAccessToken().getIssuedAt() + t.getAccessTokenLifetime());
+
+        TXRecord txRT = (TXRecord) oa2SE.getTxStore().create();
+        txRT.setTokenType(RFC8693Constants.REFRESH_TOKEN_TYPE);
+        txRT.setParentID(t.getIdentifier());
+        txRT.setIdentifier(BasicIdentifier.newID(t.getRefreshToken().getToken()));
+        if (0 <= oa2SE.getRtGracePeriod()) {
+            // If this is non-negative, then it has been configured. Not configured = let everything expire normally.
+            txRT.setExpiresAt(System.currentTimeMillis() + oa2SE.getRtGracePeriod());
+        }else{
+            RefreshTokenImpl rt = (RefreshTokenImpl) t.getRefreshToken();
+            txRT.setExpiresAt(rt.getIssuedAt() + t.getRefreshTokenLifetime());
+        }
+        // Make sure everything that needs it is updated.
         t.setAccessToken(rtiResponse.getAccessToken());
-        TXRecord txRecord = (TXRecord) oa2SE.getTxStore().create();
-        txRecord.setTokenType(RFC8693Constants.ACCESS_TOKEN_TYPE);
-
-        txRecord.setParentID(t.getIdentifier());
-        txRecord.setIdentifier(BasicIdentifier.newID(rtiResponse.getAccessToken().getToken()));
-
+        t.getATData().put(OA2Claims.JWT_ID, rtiResponse.getAccessToken().getToken());
+        t.setRefreshToken(rtiResponse.getRefreshToken());
+        t.getRTData().put(OA2Claims.JWT_ID, rtiResponse.getRefreshToken().getToken());
 
         if (!scopes.isEmpty() || !audience.isEmpty() || !resources.isEmpty()) {
-            txRecord.setScopes(scopes);
-            txRecord.setAudience(audience);
-            txRecord.setResource(resources);
+            txAT.setScopes(scopes);
+            txAT.setAudience(audience);
+            txAT.setResource(resources);
         }
 
 //        getTransactionStore().save(t); // make sure all components can find this directly
         debugger.trace(this, "set new access token = " + rtiResponse.getAccessToken().getToken());
 
-        JWTRunner jwtRunner = new JWTRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2SE, t, txRecord, t.getOA2Client().getConfig()));
-        OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, t, client, txRecord, request);
+        // JWTRunner jwtRunner = new JWTRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2SE, t, txAT, t.getOA2Client().getConfig()));
+        // OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, t, client, txAT, request);
+        JWTRunner jwtRunner = new JWTRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2SE, t, null, t.getOA2Client().getConfig()));
+        OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, t, client, request);
+
         try {
             jwtRunner.doRefreshClaims();
         } catch (Throwable throwable) {
-            OA2ServletUtils.handleScriptEngineException(this, oa2SE, throwable, createDebugger(t.getClient()), t, backup, txRecord);
+            OA2ServletUtils.handleScriptEngineException(this, oa2SE, throwable, createDebugger(t.getClient()), t, backup, txAT);
         }
         setupTokens(client, rtiResponse, oa2SE, t, jwtRunner, debugger);
 
@@ -1380,11 +1406,12 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         }
         if (((AccessTokenImpl) rtiResponse.getAccessToken()).isJWT()) {
             t.setATJWT(rtiResponse.getAccessToken().getToken());
-            txRecord.setStoredToken(rtiResponse.getAccessToken().getToken());
+            txAT.setStoredToken(rtiResponse.getAccessToken().getToken());
         }
 
         getTransactionStore().save(t);
-        oa2SE.getTxStore().save(txRecord);
+        oa2SE.getTxStore().save(txAT);
+        oa2SE.getTxStore().save(txRT);
         debugger.trace(this, "transaction saved for " + t.getIdentifierString());
 
         rtiResponse.write(response);
@@ -1551,7 +1578,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
      */
     protected void doRFC8628(OA2Client client, HttpServletRequest request, HttpServletResponse response) throws Throwable {
         MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(client);
-        printAllParameters(request,debugger);
+        printAllParameters(request, debugger);
         debugger.trace(this, "starting RFC 8628 access token exchange.");
         //  printAllParameters(request);
         long now = System.currentTimeMillis();

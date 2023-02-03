@@ -28,4 +28,4 @@ clients.
 
 4. File names are base 32 encoded:
 ['ORSXG5B2MNXW23LBNZSC43DJNZSTE','ORSXG5B2NJSWMZRPNRUWO3Y','ORSXG5B2ORSXG5BPMZ2W4Y3UN5ZA','ORSXG5B2ORSXG5BPOVRXGZA']
-[test:command.line2,              test:jeff/ligo,            test:test/functor,             test:test/ucsd]
+[test:command.line2,              test:jeff/ligo,           test:test/functor,             test:test/ucsd]

@@ -299,7 +299,7 @@ public class OA2ClientUtils {
                                      OA2ServiceTransaction transaction,
                                      OA2Client client,
                                      HttpServletRequest req) throws Throwable {
-        setupHandlers(jwtRunner, oa2SE, transaction, client, null, req);
+        setupHandlers(jwtRunner, oa2SE, transaction, client, null, null, null, req);
     }
 
 
@@ -307,7 +307,9 @@ public class OA2ClientUtils {
                                      OA2SE oa2SE,
                                      OA2ServiceTransaction transaction,
                                      OA2Client client,
-                                     TXRecord txRecord,
+                                     TXRecord idTX,
+                                     TXRecord atTX,
+                                     TXRecord rtTX,
                                      HttpServletRequest req) throws Throwable {
         MetaDebugUtil debugger = DebugUtil.getInstance();
         if (transaction.getClient().isDebugOn()) {
@@ -318,7 +320,7 @@ public class OA2ClientUtils {
         //OA2Client client = (OA2Client) transaction.getClient();
         // Allow a client to skip any server scripts on a case by case basis.
         if (!client.isSkipServerScripts() && oa2SE.getQDLEnvironment().hasServerScripts()) {
-            ServerQDLScriptHandlerConfig qdlScriptHandlerConfig = new ServerQDLScriptHandlerConfig(oa2SE, transaction, txRecord, req);
+            ServerQDLScriptHandlerConfig qdlScriptHandlerConfig = new ServerQDLScriptHandlerConfig(oa2SE, transaction, atTX, req);
             ServerQDLScriptHandler qdlScriptHandler = new ServerQDLScriptHandler(qdlScriptHandlerConfig);
             jwtRunner.addHandler(qdlScriptHandler);
         }
@@ -329,7 +331,7 @@ public class OA2ClientUtils {
                     client.getIDTokenConfig(),
                     oa2SE,
                     transaction,
-                    txRecord,
+                    idTX,
                     req);
             switch (client.getIDTokenConfig().getType()) {
                 case IDTokenHandler.ID_TOKEN_DEFAULT_HANDLER_TYPE:
@@ -348,7 +350,7 @@ public class OA2ClientUtils {
                     new IDTokenClientConfig(),  // here is the trick: An empty object triggers a hunt for functors.
                     oa2SE,
                     transaction,
-                    txRecord,
+                    atTX,
                     req);
             idthCfg.setLegacyHandler(true);
         }
@@ -362,7 +364,7 @@ public class OA2ClientUtils {
                     client.getAccessTokensConfig(),
                     oa2SE,
                     transaction,
-                    txRecord,
+                    atTX,
                     req);
             AbstractAccessTokenHandler sth = null;
             switch (client.getAccessTokensConfig().getType()) {
@@ -398,7 +400,7 @@ public class OA2ClientUtils {
                     client.getRefreshTokensConfig(),
                     oa2SE,
                     transaction,
-                    txRecord,
+                    rtTX,
                     req);
             BasicRefreshTokenHandler rth = new BasicRefreshTokenHandler(st);
             switch (client.getRefreshTokensConfig().getType()) {

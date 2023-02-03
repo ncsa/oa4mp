@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.BasicClaimsSourceImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.CMConfigs;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2ConfigurationLoader;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8628ServletConfig;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo.VOStore;
@@ -103,6 +104,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
                  String notifyACEventEmailAddresses,
                  boolean rfc7636Required,
                  boolean demoModeEnabled,
+                 long rtGracePeriod,
                  MetaDebugUtil debugger) {
 
         super(logger,
@@ -177,6 +179,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.demoModeEnabled = demoModeEnabled;
         this.debugger = debugger;
         this.cleanupAlarms = cleanupAlarms;
+        this.rtGracePeriod = rtGracePeriod;
     }
 
     public boolean isCleanupLockingEnabled() {
@@ -565,4 +568,17 @@ public class OA2SE extends ServiceEnvironmentImpl {
 
     boolean rfc7636Required = false;
 
+    public long getRtGracePeriod() {
+        return rtGracePeriod;
+    }
+
+    public void setRtGracePeriod(long rtGracePeriod) {
+        this.rtGracePeriod = rtGracePeriod;
+    }
+
+    long rtGracePeriod = -1L ;
+
+    public boolean isRTGracePeriodEnabled(){
+        return rtGracePeriod == OA2ConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_DISABLED;
+    }
 }

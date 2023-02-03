@@ -87,7 +87,7 @@ public class UserInfoServlet extends BearerTokenServlet {
         idTokenHandler.refreshAccountingInformation();
 
         JWTRunner jwtRunner = new JWTRunner(transaction, ScriptRuntimeEngineFactory.createRTE(oa2SE, transaction, null, transaction.getOA2Client().getConfig()));
-        OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, transaction, resolvedClient,null, request);
+        OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, transaction, resolvedClient, request);
         try {
             jwtRunner.doUserInfo();
         } catch (AssertionException assertionError) {

@@ -6,8 +6,12 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ScriptRuntimeEngineFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
 import edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims.ConfigtoCS;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Errors;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.ScriptRuntimeException;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSource;
 import edu.uiuc.ncsa.qdl.config.QDLConfigurationLoaderUtils;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
+import edu.uiuc.ncsa.qdl.exceptions.RaiseErrorException;
 import edu.uiuc.ncsa.qdl.scripting.Scripts;
 import edu.uiuc.ncsa.qdl.state.StateUtils;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
@@ -17,9 +21,6 @@ import edu.uiuc.ncsa.qdl.xml.XMLUtils;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Errors;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.ScriptRuntimeException;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.util.scripting.*;
 import net.sf.json.JSON;
 import net.sf.json.JSONObject;
@@ -243,37 +244,75 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
             return noOpSRR();
         }
         createSRRequest(request);
-        for(ScriptInterface s : scripts) {
-            s.execute(state);
+        try {
+            for (ScriptInterface s : scripts) {
+                s.execute(state);
+            }
+        } catch (RaiseErrorException rex) {
+            // Allow for throwing sys_err as a regular error, rather than having specialized machinery
+            processSRX(rex);
         }
         return createSRResponse();
+    }
+
+    void processSRX(RaiseErrorException raiseErrorException) {
+        if (raiseErrorException.getErrorCode() == QDLRuntimeEngine.OA4MP_ERROR_CODE) {
+            QDLStem sysErr = raiseErrorException.getState();
+            // In OAuth this is the error_description
+            //String message = sysErr.getString(SYS_ERR_MESSAGE);
+            String message = raiseErrorException.getMessage();
+            // in OAuth this is the error
+            String requestedType = sysErr.containsKey(SYS_ERR_ERROR_TYPE) ? sysErr.getString(SYS_ERR_ERROR_TYPE) : OA2Errors.ACCESS_DENIED;
+            // In OAuth this is the HTTP status code
+            int httpStatus = sysErr.containsKey(SYS_ERR_HTTP_STATUS_CODE) ? sysErr.getLong(SYS_ERR_HTTP_STATUS_CODE).intValue() : HttpStatus.SC_UNAUTHORIZED;
+            int errorCode = sysErr.containsKey(SYS_ERR_CODE) ? sysErr.getLong(SYS_ERR_CODE).intValue() : -1; // For CILogon , actually
+            URI errorURI = sysErr.containsKey(SYS_ERR_ERROR_URI) ? URI.create(sysErr.getString(SYS_ERR_ERROR_URI)) : null;
+            // If the status is 302, then this is the redirect for the user's browser.
+            // CIL-1342, since error_uri alone might conflict with the OAuth2 spec, we add another one
+            // that allows differentiating the error URI as something not in the spec., E.g.,
+            // A user starts a flow, but at log in they are not found to be registered. Nothing in the OAuth
+            // spec about what to do, but one would expect a redirect to some page where they can register.
+            // The custom_error_uri would be used for that and would tell the consumer of this error to not
+            // just try to use the standard OAuth error handling (call to callback_uri) to handle this.
+            URI customErrorURI = sysErr.containsKey(SYS_ERR_CUSTOM_ERROR_URI) ? URI.create(sysErr.getString(SYS_ERR_CUSTOM_ERROR_URI)) : null;
+            ScriptRuntimeException scriptRuntimeException = new ScriptRuntimeException(message == null ? "(no message)" : message);
+            scriptRuntimeException.setCode(errorCode);
+            scriptRuntimeException.setErrorURI(errorURI);
+            scriptRuntimeException.setCustomErrorURI(customErrorURI);
+            scriptRuntimeException.setHttpStatus(httpStatus);
+            scriptRuntimeException.setRequestedType(requestedType);
+            throw scriptRuntimeException;
+        }
     }
 
     /*
     Note that these are the names of the variable in the QDL symbol table and since they are stems
     they must end with periods.
      */
-    protected String SYS_ERR_VAR = "sys_err" + STEM_INDEX_MARKER;
-    protected String SYS_ERR_OK = "ok";
-    protected String SYS_ERR_MESSAGE = "message";
-    protected String SYS_ERR_ERROR_TYPE = "error_type";
-    protected String SYS_ERR_ERROR_URI = "error_uri";
-    protected String SYS_ERR_CUSTOM_ERROR_URI = "custom_error_uri";
-    protected String SYS_ERR_HTTP_STATUS_CODE = "status";
-    protected String SYS_ERR_CODE = "code";
-    protected String FLOW_STATE_VAR = "flow_states" + STEM_INDEX_MARKER;
-    protected String CLAIMS_VAR = "claims" + STEM_INDEX_MARKER;
-    protected String PROXY_CLAIMS_VAR = "proxy_claims" + STEM_INDEX_MARKER;
-    protected String ACCESS_TOKEN_VAR = "access_token" + STEM_INDEX_MARKER;
-    protected String REFRESH_TOKEN_VAR = "refresh_token" + STEM_INDEX_MARKER;
-    protected String SCOPES_VAR = "scopes" + STEM_INDEX_MARKER;
-    protected String EXTENDED_ATTRIBUTES_VAR = "xas" + STEM_INDEX_MARKER;
-    protected String AUDIENCE_VAR = "audience" + STEM_INDEX_MARKER;
-    protected String TX_SCOPES_VAR = "tx_scopes" + STEM_INDEX_MARKER;
-    protected String TX_AUDIENCE_VAR = "tx_audience" + STEM_INDEX_MARKER;
-    protected String TX_RESOURCE_VAR = "tx_resource" + STEM_INDEX_MARKER;
-    protected String CLAIM_SOURCES_VAR = "claim_sources" + STEM_INDEX_MARKER;
-    protected String ACCESS_CONTROL = "access_control" + STEM_INDEX_MARKER;
+    public static String SYS_ERR_VAR = "sys_err" + STEM_INDEX_MARKER;
+    public static String SYS_ERR_OK = "ok";
+    public static String SYS_ERR_MESSAGE = "message";
+    public static String SYS_ERR_ERROR_TYPE = "error_type";
+    public static String SYS_ERR_ERROR_URI = "error_uri";
+    public static String SYS_ERR_CUSTOM_ERROR_URI = "custom_error_uri";
+    public static String SYS_ERR_HTTP_STATUS_CODE = "status";
+    public static String SYS_ERR_CODE = "code";
+    public static String FLOW_STATE_VAR = "flow_states" + STEM_INDEX_MARKER;
+    public static String CLAIMS_VAR = "claims" + STEM_INDEX_MARKER;
+    public static String PROXY_CLAIMS_VAR = "proxy_claims" + STEM_INDEX_MARKER;
+    public static String ACCESS_TOKEN_VAR = "access_token" + STEM_INDEX_MARKER;
+    public static String REFRESH_TOKEN_VAR = "refresh_token" + STEM_INDEX_MARKER;
+    public static String SCOPES_VAR = "scopes" + STEM_INDEX_MARKER;
+    public static String EXTENDED_ATTRIBUTES_VAR = "xas" + STEM_INDEX_MARKER;
+    public static String AUDIENCE_VAR = "audience" + STEM_INDEX_MARKER;
+    public static String TX_SCOPES_VAR = "tx_scopes" + STEM_INDEX_MARKER;
+    public static String TX_AUDIENCE_VAR = "tx_audience" + STEM_INDEX_MARKER;
+    public static String TX_RESOURCE_VAR = "tx_resource" + STEM_INDEX_MARKER;
+    public static String CLAIM_SOURCES_VAR = "claim_sources" + STEM_INDEX_MARKER;
+    public static String ACCESS_CONTROL = "access_control" + STEM_INDEX_MARKER;
+
+    public static Long OA4MP_ERROR_CODE = 1000L; // reserved error code by OA4MP.
+    public static String OA4MP_ERROR_CODE_NAME = "oa4mp_error";
 
     /**
      * This injects the values in the request in to the current state so they are available.
@@ -292,8 +331,11 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         state.setValue(Scripts.EXEC_PHASE, req.getAction()); // set what is being executed
         QDLStem sysErr = new QDLStem();
         // Set sys_err.ok  here so scripts don't have to keep checking if it is defined.
+        // Old script error handling by setting a global variable
         sysErr.put(SYS_ERR_OK, Boolean.TRUE);
         state.setValue(SYS_ERR_VAR, sysErr);
+        // New way, raise an error with this reserved error code.
+        state.setValue(OA4MP_ERROR_CODE_NAME, OA4MP_ERROR_CODE);
 
         FlowStates2 flowStates = (FlowStates2) req.getArgs().get(SRE_REQ_FLOW_STATES);
         state.setValue(FLOW_STATE_VAR, toStem(flowStates));
@@ -492,7 +534,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
                 if (sysErr.containsKey(SYS_ERR_ERROR_TYPE)) {
                     scriptRuntimeException.setRequestedType(sysErr.getString(SYS_ERR_ERROR_TYPE));
                 } else {
-                    scriptRuntimeException.setRequestedType(sysErr.getString(OA2Errors.ACCESS_DENIED));
+                    scriptRuntimeException.setRequestedType(OA2Errors.ACCESS_DENIED);
                 }
                 // In OAuth this is the HTTP status code
                 if (sysErr.containsKey(SYS_ERR_HTTP_STATUS_CODE)) {

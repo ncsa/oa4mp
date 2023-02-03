@@ -2,20 +2,23 @@ package edu.uiuc.ncsa.oa2.servlet;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2ClientUtils;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2ServletUtils;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ScriptRuntimeEngineFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.myproxy.oauth2.tools.OA2CLCCommands;
 import edu.uiuc.ncsa.myproxy.oauth2.tools.OA2CommandLineClient;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.JWTRunner;
+import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
+import edu.uiuc.ncsa.oa4mp.delegation.server.request.IssuerResponse;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.TransactionNotFoundException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
-import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
-import edu.uiuc.ncsa.oa4mp.delegation.server.request.IssuerResponse;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.JWTRunner;
+import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
+import edu.uiuc.ncsa.security.storage.XMLMap;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import net.sf.json.JSONObject;
 
@@ -72,7 +75,7 @@ public class ProxyCallbackServlet extends OA2AuthorizationServer {
             throw new IllegalStateException("No transaction for proxy ID \"" + proxyID + "\"");
         }
         MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(t.getOA2Client());
-        debugger.trace(this , "request uri= " + request.getRequestURI());
+        debugger.trace(this, "request uri= " + request.getRequestURI());
 
         // Now we have determined that this is a pending transaction
         debugger.trace(this, "loading proxy client");
@@ -91,13 +94,16 @@ public class ProxyCallbackServlet extends OA2AuthorizationServer {
         t.setProxyState(clcCommands.toJSON());
 
         setClaimsFromProxy(t, proxyClaims, debugger);
-         OA2Client resolvedClient = OA2ClientUtils.resolvePrototypes(oa2SE, t.getOA2Client());
+        OA2Client resolvedClient = OA2ClientUtils.resolvePrototypes(oa2SE, t.getOA2Client());
         // Do any scripting
         JWTRunner jwtRunner = new JWTRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2SE, t, resolvedClient.getConfig()));
         OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, t, resolvedClient, request);
-
-        jwtRunner.doAuthClaims();
-
+        XMLMap backup = GenericStoreUtils.toXML(getTransactionStore(), t);
+        try {
+            jwtRunner.doAuthClaims();
+        } catch (Throwable throwable) {
+            OA2ServletUtils.handleScriptEngineException(this, oa2SE, throwable, createDebugger(t.getClient()), t, backup);
+        }
         oa2SE.getTransactionStore().save(t);
         // At this point, the user has logged in, the transaction state should be correct, so we need to
         // create the correct callback and return it.
@@ -106,7 +112,6 @@ public class ProxyCallbackServlet extends OA2AuthorizationServer {
         String cb = createCallback(t, cbParams);
         response.sendRedirect(cb);
     }
-
 
 
 }

@@ -12,6 +12,10 @@ tokens. := null;
 try[
   tokens. := access(); // fails.
 ]catch[
-  ⊨'access_denied' < error_message:'unknown error:' + error_message;
+ // The exception is an OAuth 2 one, hence the error message is the entire
+ // JSON payload as a string. Convert this to a stem and test it.
+  msg. := from_json(error_message);
+  ⊨ msg.'error' == 'access_denied';
+  ⊨ msg.'error_description' == 'No scopes found.';
 ];
 say('FNAL missing CS test: ok');

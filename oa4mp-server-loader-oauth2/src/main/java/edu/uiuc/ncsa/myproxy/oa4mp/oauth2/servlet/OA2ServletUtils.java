@@ -3,12 +3,12 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
-import edu.uiuc.ncsa.qdl.exceptions.AssertionException;
-import edu.uiuc.ncsa.qdl.exceptions.QDLExceptionWithTrace;
-import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2ATException;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Errors;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.ScriptRuntimeException;
+import edu.uiuc.ncsa.qdl.exceptions.AssertionException;
+import edu.uiuc.ncsa.qdl.exceptions.QDLExceptionWithTrace;
+import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
 import edu.uiuc.ncsa.security.storage.XMLMap;
 import org.apache.http.HttpStatus;
@@ -51,64 +51,75 @@ public class OA2ServletUtils {
                                                    OA2ServiceTransaction transaction,
                                                    XMLMap tBackup,
                                                    TXRecord txRecord) {
-        rollback(oa2SE, tBackup, txRecord); // everything here gets a rollback
+        // Rollback and allow someone to fix the problem. Proceeding (i.e. catching the exception rather than
+        // rethrowing it) would mean that the transaction will complete
+        // and the old tokens would be invalid, replaced by new ones, so don't do that.
+        // Hard stop here and let someone have a chance to fix the issue.
+        rollback(oa2SE, tBackup, txRecord);
+        OA2ATException atException = null;
+        String message = null;
+        if (exception instanceof OA2ATException) {
+            // if the exception is already an OA2ATException, just pass it along, but take care
+            // of error logging first.
+            ppξ(exception, callingObject, oa2SE, debugger, exception.getMessage()); // decide what to print in the logs.
+            throw (OA2ATException) exception;
+
+        }
         if (exception instanceof QDLExceptionWithTrace) {
-            // CIL-1267 make sure error propagate.
+            // CIL-1267 make sure error propagates.
             // This can happen if something very deep in the stack (non QDL) blows up and QDL
             // has caught it.
 
-            QDLExceptionWithTrace qdlExceptionWithTrace = (QDLExceptionWithTrace) exception;
-            Throwable throwable = qdlExceptionWithTrace;
-            if (qdlExceptionWithTrace.getCause() != null) {
-                throwable = qdlExceptionWithTrace.getCause();
-            }
-            String message = "error processing request:" + exception.getMessage();
-
-            ppξ(throwable, callingObject, oa2SE, debugger, message);
-            throw new OA2ATException(OA2Errors.INVALID_REQUEST,
+            message = "error processing request:" + exception.getMessage();
+            atException = new OA2ATException(OA2Errors.INVALID_REQUEST,
                     message,
                     HttpStatus.SC_BAD_REQUEST,
                     transaction.getRequestState());
         }
         if (exception instanceof AssertionException) {
             // they passed a bad argument to a QDL script
-            String message = "assertion exception:" + exception.getMessage();
-            ppξ(exception, callingObject, oa2SE, debugger, message);
-            throw new OA2ATException(OA2Errors.INVALID_REQUEST,
+            message = "assertion exception:" + exception.getMessage();
+            atException = new OA2ATException(OA2Errors.INVALID_REQUEST,
                     message,
                     HttpStatus.SC_BAD_REQUEST,
                     transaction.getRequestState());
         }
+
         if (exception instanceof ScriptRuntimeException) {
             // QDL script threw an exception. Usually this means there is missing information from e.g. LDAP.
             // Let the user try and figure everything out and try again.
             ScriptRuntimeException sre = (ScriptRuntimeException) exception;
-            String message = "script runtime exception: \"" + sre.getMessage() + "\"";
-            ppξ(exception, callingObject, oa2SE, debugger, message);
+
+            message = "script runtime exception: \"" + sre.getMessage() + "\"";
             // message in the exception should be exactly what the script threw, but we add a note about its origin.
-            throw new OA2ATException(sre.getRequestedType(), sre.getMessage(), sre.getHttpStatus(), transaction.getRequestState());
+            if (sre.getErrorURI() == null) {
+                atException = new OA2ATException(sre.getRequestedType(), sre.getMessage(), sre.getHttpStatus(), transaction.getRequestState());
+            } else {
+                atException = new OA2ATException(sre.getRequestedType(), sre.getMessage(), sre.getHttpStatus(), sre.getErrorURI(), transaction.getRequestState());
+            }
         }
         if (exception instanceof IllegalAccessException) {
             // Most generic exception possible.
             // *Possible* from servlet. Mostly catching it here since otherwise the user gets something
             // completely confusing.
-            String message = "illegal access exception \"" + exception.getMessage() + "\"";
-            ppξ(exception, callingObject, oa2SE, debugger, message);
-            throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
+            message = "illegal access exception \"" + exception.getMessage() + "\"";
+            atException = new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
                     "access denied",
                     transaction.getRequestState());
         }
+        // Everything else.
+        if (atException == null) {
+            // fall-through case.
+            message = "unable to update claims on token refresh: \"" + exception.getMessage() + "\"";
+            atException = new OA2ATException(OA2Errors.INVALID_REQUEST,
+                    message,
+                    HttpStatus.SC_BAD_REQUEST,
+                    transaction.getRequestState());
 
-        // Everything else. Allow to fix the problem. Proceeding means that the transaction will complete
-        // and the old tokens will be invalid, replaced by new ones, so don't do that. Let someone have
-        // a chance to fix the issue.
-        String message = "unable to update claims on token refresh: \"" + exception.getMessage() + "\"";
+        }
 
-        ppξ(exception, callingObject, oa2SE, null, message);
-        throw new OA2ATException(OA2Errors.INVALID_REQUEST,
-                message,
-                HttpStatus.SC_BAD_REQUEST,
-                transaction.getRequestState());
+        ppξ(exception, callingObject, oa2SE, debugger, message); // decide what to print in the logs.
+        throw atException;
     }
 
     protected static void rollback(OA2SE oa2SE, XMLMap backup, TXRecord txRecord) {
@@ -129,13 +140,13 @@ public class OA2ServletUtils {
     public static String truncateStackTrace(Throwable e, int n, boolean printIt) {
         String current = truncateStackTrace2(e, n, printIt);
         Throwable nextE = e.getCause();
-        if(nextE != null) {
+        if (nextE != null) {
             for (int i = 1; i < n; i++) {
                 current = current + "\n" + truncateStackTrace2(nextE, n, printIt);
-               nextE = nextE.getCause();
-               if(nextE == null){
-                   break; // jump out, we are done.
-               }
+                nextE = nextE.getCause();
+                if (nextE == null) {
+                    break; // jump out, we are done.
+                }
             }
         }
         return current;
@@ -154,6 +165,7 @@ public class OA2ServletUtils {
         }
         return sb.toString();
     }
+
     /**
      * Pretty print the exception. This decides what to print and shortens the stack trace.
      *

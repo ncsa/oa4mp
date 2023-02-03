@@ -114,6 +114,7 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
             otherV.setErsatzClient(map.getBoolean(getCK2().ersatzClient()));
         }
         otherV.setRtLifetime(map.getLong(getCK2().rtLifetime()));
+        otherV.setRtGracePeriod(map.getLong(getCK2().rtGracePeriod()));
         otherV.setDfLifetime(map.getLong(getCK2().dfLifetime()));
         otherV.setDfInterval(map.getLong(getCK2().dfInterval()));
         otherV.setMaxATLifetime(map.getLong(getCK2().maxATLifetime()));
@@ -250,6 +251,7 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
     public void toMap(V client, ConversionMap<String, Object> map) {
         super.toMap(client, map);
         map.put(getCK2().rtLifetime(), client.getRtLifetime());
+        map.put(getCK2().rtGracePeriod(), client.getRtGracePeriod());
         map.put(getCK2().atLifetime(), client.getAtLifetime());
         map.put(getCK2().dfLifetime(), client.getDfLifetime());
         map.put(getCK2().dfInterval(), client.getDfInterval());
@@ -337,6 +339,7 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
     public V fromJSON(JSONObject json) {
         V v = super.fromJSON(json);
         v.setRtLifetime(getJsonUtil().getJSONValueLong(json, getCK2().rtLifetime()));
+        v.setRtGracePeriod(getJsonUtil().getJSONValueLong(json, getCK2().rtGracePeriod()));
         if (json.containsKey(getCK2().atLifetime())) {
             v.setAtLifetime(getJsonUtil().getJSONValueLong(json, getCK2().atLifetime()));
         }
@@ -429,6 +432,7 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
     public void toJSON(V client, JSONObject json) {
         super.toJSON(client, json);
         getJsonUtil().setJSONValue(json, getCK2().rtLifetime(), client.getRtLifetime());
+        getJsonUtil().setJSONValue(json, getCK2().rtGracePeriod(), client.getRtGracePeriod());
         getJsonUtil().setJSONValue(json, getCK2().dfLifetime(), client.getDfLifetime());
         getJsonUtil().setJSONValue(json, getCK2().dfInterval(), client.getDfInterval());
         getJsonUtil().setJSONValue(json, getCK2().maxATLifetime(), client.getMaxATLifetime());

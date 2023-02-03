@@ -2,6 +2,8 @@ package edu.uiuc.ncsa.oa4mp.delegation.oa2;
 
 import org.apache.http.HttpStatus;
 
+import java.net.URI;
+
 /**
  * This is thrown by the AT servlet and is used to construct the response which
  * must include JSON.  Mostly we need this for the type to make sure it can
@@ -9,6 +11,8 @@ import org.apache.http.HttpStatus;
  * is never a redirect to the client's error endpoint, but the response is always
  * a JSON object. The  default status code for all of these is 400, bad request,
  * unless the spec. states otherwise.
+ * <p>The {@link #errorURI}</p> will be returned in the body of the response
+ * as per <a href="https://www.rfc-editor.org/rfc/rfc6749#section-4.2.2.1">OAuth2 error</a>.
  * <p>Created by Jeff Gaynor<br>
  * on 9/14/16 at  12:26 PM
  */
@@ -49,6 +53,10 @@ public class OA2ATException extends OA2GeneralError {
     public OA2ATException(String error, String description, int httpStatus, String state) {
         super(error, description, httpStatus, state);
     }
+    public OA2ATException(String error, String description, int httpStatus, URI errorURI, String state) {
+         super(error, description, httpStatus, state);
+         this.errorURI = errorURI;
+     }
 
     @Override
     public String toString() {
@@ -56,7 +64,18 @@ public class OA2ATException extends OA2GeneralError {
                 "httpStatus=" + httpStatus +
                 ", error='" + error + '\'' +
                 ", description='" + description + '\'' +
+                ", errorURI='" + errorURI + "\'" +
                 ", state='" + state + '\'' +
                 '}';
     }
+
+    public URI getErrorURI() {
+        return errorURI;
+    }
+
+    public void setErrorURI(URI errorURI) {
+        this.errorURI = errorURI;
+    }
+
+    URI errorURI;
 }

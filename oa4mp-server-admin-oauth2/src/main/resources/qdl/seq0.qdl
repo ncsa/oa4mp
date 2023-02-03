@@ -51,3 +51,8 @@ say('xas.=' + to_string(xas.));
 claims.'seq0' := args().0.'port'; // returns 636
 claims.'seq0_phase' := exec_phase; // returns current exec phase
 claims.'roles' := xas.'oa4mp'.'/roles';
+/*  Uncomment to test error handling. */
+/*
+  raise_error('raise_error test', oa4mp_code, {'message':'error test', 'error_type' :
+     'error_type_message','error_uri':'https://localhost/oops'});
+*/

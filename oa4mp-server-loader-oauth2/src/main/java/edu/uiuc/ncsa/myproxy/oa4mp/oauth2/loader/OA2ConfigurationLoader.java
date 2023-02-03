@@ -126,6 +126,12 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
     public static long AUTHORIZATION_GRANT_LIFETIME_DEFAULT = 15 * 60 * 1000L; // 15 minutes
     public static long MAX_AUTHORIZATION_GRANT_LIFETIME_DEFAULT = 2 * AUTHORIZATION_GRANT_LIFETIME_DEFAULT; // 30 minutes
 
+    public static String REFRESH_TOKEN_GRACE_PERIOD_TAG = "rtGracePeriod";
+    public static long REFRESH_TOKEN_GRACE_PERIOD_DEFAULT = 6*3600*1000L; // 6 hours
+    public static long REFRESH_TOKEN_GRACE_PERIOD_DISABLED = -1L;
+    public static long REFRESH_TOKEN_GRACE_PERIOD_NOT_CONFIGURED = -2L;
+    public static long REFRESH_TOKEN_GRACE_PERIOD_USE_SERVER_DEFAULT = -3L;
+
     //This is divisible by 3 and greater than 256,
     // so when it is base64 encoded there will be no extra characters:
     public static int CLIENT_SECRET_LENGTH_DEFAULT = 258;
@@ -199,6 +205,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     isNotifyACEventEmailAddresses(),
                     isRFC7636Required(),
                     isDemoModeEnabled(),
+                    getRTGracePeriod(),
                     getDebugger()
             );
 
@@ -800,6 +807,23 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         }
     }
 
+    long rtGracePeriod = REFRESH_TOKEN_GRACE_PERIOD_NOT_CONFIGURED; // == -1
+
+    public long getRTGracePeriod() {
+        if (rtGracePeriod == REFRESH_TOKEN_GRACE_PERIOD_NOT_CONFIGURED) {
+            String x = getFirstAttribute(cn, REFRESH_TOKEN_GRACE_PERIOD_TAG);
+            if (isTrivial(x)) {
+                rtGracePeriod = REFRESH_TOKEN_GRACE_PERIOD_DISABLED;
+            } else {
+                try {
+                    rtGracePeriod = ConfigUtil.getValueSecsOrMillis(x, true);
+                } catch (Throwable t) {
+                    rtGracePeriod = REFRESH_TOKEN_GRACE_PERIOD_DEFAULT;
+                }
+            }
+        }
+        return rtGracePeriod;
+    }
 
     // Authorization grants lifetime
     long agLifetime = -1L;
@@ -857,10 +881,6 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
     }
 
     long maxIDTokenLifetime = -1L;
-
-
-    // access token lifetime
-
 
     long atLifetime = -1L;
 

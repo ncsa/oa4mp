@@ -131,6 +131,9 @@ public class OA2ExceptionHandler implements ExceptionHandler {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put(OA2Constants.ERROR, oa2ATException.getError());
         jsonObject.put(OA2Constants.ERROR_DESCRIPTION, oa2ATException.getDescription());
+        if(oa2ATException.getErrorURI() != null){
+            jsonObject.put(OA2Constants.ERROR_URI, oa2ATException.getErrorURI().toString());
+        }
         if (oa2ATException.getState() != null) {
             // not quite the spec., but clients may need this.
             jsonObject.put(OA2Constants.STATE, oa2ATException.getState());

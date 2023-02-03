@@ -11,10 +11,13 @@ block[
     if[
        	 0 == size(theta.) // no requested capabilities
       ][
+      raise_error('No requested capabilities.', 1000, {'error_type':'access_denied'});
+/*
                  sys_err.ok := false;
             sys_err.message := 'No requested capabilities.';
          sys_err.error_type := 'access_denied';
             return(∅);
+*/
     ];
 
     if[
