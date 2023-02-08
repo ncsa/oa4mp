@@ -1,11 +1,13 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.UnsupportedScopeException;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSourceConfiguration;
+import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
-import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.UnsupportedScopeException;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSourceConfiguration;
 import net.sf.json.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
@@ -13,6 +15,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashMap;
+
+import static edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims.CSConstants.*;
 
 /**
  * A claim source backed by a file system. The file simply contains a JSON object of userids and attributes
@@ -23,6 +28,14 @@ import java.io.IOException;
  * on 10/21/19 at  12:49 PM
  */
 public class FSClaimSource extends BasicClaimsSourceImpl {
+    public FSClaimSource(QDLStem stem) {
+        super(stem);
+    }
+
+    public FSClaimSource(QDLStem stem, OA2SE oa2SE) {
+          super(stem, oa2SE);
+      }
+
     public FSClaimSource(ClaimSourceConfiguration config) {
         setConfiguration(config);
     }
@@ -150,5 +163,41 @@ public class FSClaimSource extends BasicClaimsSourceImpl {
     @Override
     public boolean isRunAtAuthorization() {
         return false; // run this only when access tokens are being created, not in the authorization step.
+    }
+
+    @Override
+    public void fromQDL(QDLStem stem) {
+        super.fromQDL(stem);
+        ClaimSourceConfiguration cfg = getConfiguration();
+        HashMap<String, Object> xp = new HashMap<>();
+
+        // Next is required, although it has to be put in the properties
+        xp.put(FSClaimSource.FILE_PATH_KEY, stem.getString(CS_FILE_FILE_PATH)); //  wee bit of translation
+        if (stem.containsKey(CS_FILE_CLAIM_KEY)) {
+            xp.put(FSClaimSource.FILE_CLAIM_KEY, stem.getString(CS_FILE_CLAIM_KEY));
+        }
+        if (stem.containsKey(CS_USE_DEFAULT_KEY)) {
+            xp.put(FSClaimSource.USE_DEFAULT_KEY, stem.getBoolean(CS_USE_DEFAULT_KEY));
+        }
+        if (stem.containsKey(CS_DEFAULT_CLAIM_NAME_KEY)) {
+            xp.put(FSClaimSource.DEFAULT_CLAIM_KEY, stem.getString(CS_DEFAULT_CLAIM_NAME_KEY));
+        }
+        cfg.setProperties(xp);
+    }
+
+    @Override
+    public QDLStem toQDL() {
+        QDLStem stem = super.toQDL();
+        stem.put(CS_DEFAULT_TYPE, CS_TYPE_FILE);
+
+        stem.put(CS_FILE_FILE_PATH, getConfiguration().getProperty(FSClaimSource.FILE_PATH_KEY));
+        if (getConfiguration().getProperty(FSClaimSource.FILE_CLAIM_KEY) != null) {
+            stem.put(CS_FILE_CLAIM_KEY, getConfiguration().getProperty(FSClaimSource.FILE_CLAIM_KEY));
+        }
+        stem.put(CS_USE_DEFAULT_KEY, isUseDefaultClaims());
+        if (getDefaultClaimName() != null) {
+            stem.put(CS_DEFAULT_CLAIM_NAME_KEY, getDefaultClaimName());
+        }
+        return stem;
     }
 }

@@ -396,7 +396,8 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         if (req.getArgs().containsKey(SRE_REQ_CLAIM_SOURCES)) {
             for (ClaimSource source : (List<ClaimSource>) req.getArgs().get(SRE_REQ_CLAIM_SOURCES)) {
                 if (source.hasConfiguration()) {
-                    sources.put(i + ".", ConfigtoCS.convert(source));
+                    //sources.put(i + ".", ConfigtoCS.convert(source));
+                    sources.put(i + ".", source.toQDL());
                     i++;
                 }
             }
@@ -461,6 +462,18 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         return scopes;
     }
 
+    public ConfigtoCS getConfigToCS() {
+        if(configToCS == null){
+            configToCS = new ConfigtoCS();
+        }
+        return configToCS;
+    }
+
+    public void setConfigToCS(ConfigtoCS configToCS) {
+        this.configToCS = configToCS;
+    }
+
+    protected ConfigtoCS configToCS;
     protected List<ClaimSource> toSources(QDLStem QDLStem) {
         ArrayList<ClaimSource> claimSources = new ArrayList<>();
 
@@ -469,7 +482,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
             // if they added extra stuff, skip it. 
             if (QDLStem.containsKey((long) i)) {
                 QDLStem cfg = (QDLStem) QDLStem.get((long) i);
-                claimSources.add(ConfigtoCS.convert(cfg, state, state.getOa2se()));
+                claimSources.add(getConfigToCS().convert(cfg, state, state.getOa2se()));
             }
         }
         return claimSources;

@@ -29,6 +29,9 @@ claims. := claims();
 
 old_claims. := claims.;
 tokens. := refresh();
+say(display(tokens.'access_token'));
+say(display(tokens.'refresh_token'));
+say(' ');
 claims. := claims();
 ⊨ tokens.'access_token'.'lifetime' ≡ 900000 : 'wrong access token lifetime';
 ⊨ tokens.'refresh_token'.'lifetime' ≡ 1000000 : 'wrong refresh token lifetime';

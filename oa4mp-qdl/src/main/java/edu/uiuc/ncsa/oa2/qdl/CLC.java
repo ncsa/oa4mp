@@ -3,6 +3,8 @@ package edu.uiuc.ncsa.oa2.qdl;
 import edu.uiuc.ncsa.myproxy.oauth2.tools.OA2CLCCommands;
 import edu.uiuc.ncsa.myproxy.oauth2.tools.OA2CommandLineClient;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AccessTokenImpl;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.RefreshTokenImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenUtils;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims;
@@ -21,6 +23,7 @@ import edu.uiuc.ncsa.security.servlet.ServiceClientHTTPException;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import net.sf.json.JSONObject;
 
+import java.net.URI;
 import java.util.*;
 
 /**
@@ -149,8 +152,8 @@ public class CLC implements QDLModuleMetaClass {
             QDLStem g = new QDLStem();
             try {
 //                if (objects.length == 0) {
-                    clcCommands.grant(argsToInputLine(getName(), objects));
-  //              }
+                clcCommands.grant(argsToInputLine(getName(), objects));
+                //              }
 /*
                 if (objects.length == 1) {
                     clcCommands.grant(new InputLine(DUMMY_ARG + " " + objects[0]));
@@ -342,22 +345,24 @@ public class CLC implements QDLModuleMetaClass {
     /**
      * Convert an array of strings (passed to the function) into an {@link InputLine} to be
      * consumed by the CLC.
+     *
      * @param name
      * @param objects
      * @return
      */
-    protected InputLine argsToInputLine(String name, Object[] objects){
+    protected InputLine argsToInputLine(String name, Object[] objects) {
         ArrayList<String> args = new ArrayList<>();
-         args.add(name);// name of function
-         for(Object ooo : objects){
-             if(ooo instanceof String){
-                 args.add((String) ooo);
-             }
-         }
-         String[] strings = new String[]{};
-         strings = args.toArray(strings);
-         return new InputLine(strings);
+        args.add(name);// name of function
+        for (Object ooo : objects) {
+            if (ooo instanceof String) {
+                args.add((String) ooo);
+            }
+        }
+        String[] strings = new String[]{};
+        strings = args.toArray(strings);
+        return new InputLine(strings);
     }
+
     protected void handleException(Throwable t) throws QDLException {
         if (DebugUtil.isEnabled()) {
             t.printStackTrace();
@@ -382,7 +387,7 @@ public class CLC implements QDLModuleMetaClass {
 
         @Override
         public int[] getArgCount() {
-            return new int[]{0,1};
+            return new int[]{0, 1};
         }
 
         @Override
@@ -451,7 +456,7 @@ public class CLC implements QDLModuleMetaClass {
 
         @Override
         public int[] getArgCount() {
-            return new int[]{0,1};
+            return new int[]{0, 1};
         }
 
         @Override
@@ -597,7 +602,7 @@ public class CLC implements QDLModuleMetaClass {
 
         @Override
         public int[] getArgCount() {
-            return new int[]{1,2};
+            return new int[]{1, 2};
         }
 
         @Override
@@ -866,7 +871,7 @@ public class CLC implements QDLModuleMetaClass {
 
                 accessToken2.decodeToken(token.getToken());
                 token = accessToken2;
-                stem.put("decoded", token.getToken());
+                stem.put("jti", token.getToken());
                 //say("   decoded token:" + accessToken.getToken());
             }
             Date expirationDate = DateUtils.getDate(token.getToken());
@@ -883,6 +888,7 @@ public class CLC implements QDLModuleMetaClass {
             QDLStem jwt = new QDLStem();
             jwt.fromJSON(json);
             stem.put("jwt", jwt);
+            stem.put("jti", jwt.getString("jti"));
             Long expiration = -1L;
             Long timestamp = -1L;
             if (json.containsKey(OA2Claims.ISSUED_AT)) {
@@ -905,4 +911,151 @@ public class CLC implements QDLModuleMetaClass {
         return stem;
     }
 
+    /*
+          Typical OA4MP access token
+     expired : false
+     expires : 1675711991120
+         jti : https://localhost:9443/oauth2/352fca7395ff11ecbf2e7e1b1c6b5feb?type=accessToken&ts=1675711091120&version=v2.0&lifetime=900000
+    lifetime : 900000
+   raw_token : NB2HI4DTHIXS63DPMNQWY2DPON2DUOJUGQZS633BOV2GQMRPGM2TEZTDME3TGOJVMZTDCMLFMNRGMMTFG5STCYRRMM3GENLGMVRD65DZOBST2YLDMNSXG42UN5VWK3RGORZT2MJWG42TOMJRGA4TCMJSGATHMZLSONUW63R5OYZC4MBGNRUWMZLUNFWWKPJZGAYDAMBQ
+          ts : 1675711091120
+
+       Typical OA4MP JWT
+     expired : false
+     expires : 1675711409000
+         jti : https://localhost:9443/oauth2/6a677121d5745b0c21df43b1e50ddabf?type=accessToken&ts=1675711115672&version=v2.0&lifetime=300000
+         jwt :   aud : https://localhost/fermilab
+                 exp : 1675711409, iat:1675711109
+                 iss : https://localhost:9443/oauth2
+                 jti : https://localhost:9443/oauth2/6a677121d5745b0c21df43b1e50ddabf?type=accessToken&ts=1675711115672&version=v2.0&lifetime=300000
+                 nbf : 1675711104
+               scope : read:/home/http://cilogon.org/serverT/users/21340363 write:/data/http://cilogon.org/serverT/users/21340363/cluster/node47 x.y:/abc/def/pqr
+                 sub : http://cilogon.org/serverT/users/21340363,
+                 ver : scitoken:2.0}
+    lifetime : 300000
+   raw_token : eyJ0eXAiOiJKV1QiLCJraWQiOiJFQzlGQ0ZDQjM3MTZBQzRDMjI3OURGNDJFQzk4Q0FCRiIsImFsZyI6IlJTMjU2In0.eyJpc3MiOiJodHRwczovL2xvY2FsaG9zdDo5NDQzL29hdXRoMiIsImF1ZCI6Imh0dHBzOi8vbG9jYWxob3N0L2Zlcm1pbGFiIiwiZXhwIjoxNjc1NzExNDA5LCJuYmYiOjE2NzU3MTExMDQsImlhdCI6MTY3NTcxMTEwOSwic3ViIjoiaHR0cDovL2NpbG9nb24ub3JnL3NlcnZlclQvdXNlcnMvMjEzNDAzNjMiLCJ2ZXIiOiJzY2l0b2tlbjoyLjAiLCJqdGkiOiJodHRwczovL2xvY2FsaG9zdDo5NDQzL29hdXRoMi82YTY3NzEyMWQ1NzQ1YjBjMjFkZjQzYjFlNTBkZGFiZj90eXBlPWFjY2Vzc1Rva2VuJnRzPTE2NzU3MTExMTU2NzImdmVyc2lvbj12Mi4wJmxpZmV0aW1lPTMwMDAwMCIsInNjb3BlIjoicmVhZDovaG9tZS9odHRwOi8vY2lsb2dvbi5vcmcvc2VydmVyVC91c2Vycy8yMTM0MDM2MyB3cml0ZTovZGF0YS9odHRwOi8vY2lsb2dvbi5vcmcvc2VydmVyVC91c2Vycy8yMTM0MDM2My9jbHVzdGVyL25vZGU0NyB4Lnk6L2FiYy9kZWYvcHFyIn0.TjSe9rIifXk0LLF7lPfJNxbSm9kcEXjT9Rk4ULBd-9AFP72rjdM_gqrBW-FXDD7ta0wKbU7XByhuQanA_cPdPkfXpZPx4PbRR9fNENXM2pMFHSIJbawh64setnThC0eLoNCgbEzAYxEibkoA7PtD8pvvjz-7sh8PUuKrHFt3OSOSrK7IY05PN8ZdlRJN1zYaM7XO7p1GnXCgB_Q21jKl5XgzrnFAq0-2vUcGlPhQI4aUBqDyw6CJV2esiqcxs9RTmJ4D60F1cC1EewGry9jGJmuvA1Sbn5ZRNnjSAdP8QJcCnMMeJW1gLlfa-ZIc2N9MkjX9Sun4jPqGsl0FSh8PWA
+          ts : 1675711109000
+     */
+    protected AccessTokenImpl stemToAT(QDLStem stem) {
+        if(stem.containsKey("jwt")){
+                    return new AccessTokenImpl(stem.getString("raw_token"), URI.create(stem.getString("jti")));
+                }
+                 return new AccessTokenImpl(stem.getString("raw_token"), URI.create(stem.getString("jti")));
+    }
+
+    /*
+          Typical OA4MP refresh token
+     expired : false
+     expires : 1675712091120
+         jti : https://localhost:9443/oauth2/149dfd710908158d4b32ac430dd7c3df?type=refreshToken&ts=1675711091120&version=v2.0&lifetime=1000000
+    lifetime : 1000000
+   raw_token : NB2HI4DTHIXS63DPMNQWY2DPON2DUOJUGQZS633BOV2GQMRPGE2DSZDGMQ3TCMBZGA4DCNJYMQ2GEMZSMFRTIMZQMRSDOYZTMRTD65DZOBST24TFMZZGK43IKRXWWZLOEZ2HGPJRGY3TKNZRGEYDSMJRGIYCM5TFOJZWS33OHV3DELRQEZWGSZTFORUW2ZJ5GEYDAMBQGAYA
+          ts : 1675711091120
+
+
+     Typical JWT refresh token
+     expired : false
+     expires : 1675712009000
+         jti : https://localhost:9443/oauth2/1ebc84fb89e63ab6c4a39bd827af16c3?type=refreshToken&ts=1675711115672&version=v2.0&lifetime=900000
+         jwt : {aud:https://localhost/test, exp:1675712009, iat:1675711109, jti:https://localhost:9443/oauth2/1ebc84fb89e63ab6c4a39bd827af16c3?type=refreshToken&ts=1675711115672&version=v2.0&lifetime=900000, nbf:1675711104}
+    lifetime : 900000
+   raw_token : eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJhdWQiOiJodHRwczovL2xvY2FsaG9zdC90ZXN0IiwiZXhwIjoxNjc1NzEyMDA5LCJuYmYiOjE2NzU3MTExMDQsImlhdCI6MTY3NTcxMTEwOSwianRpIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6OTQ0My9vYXV0aDIvMWViYzg0ZmI4OWU2M2FiNmM0YTM5YmQ4MjdhZjE2YzM_dHlwZT1yZWZyZXNoVG9rZW4mdHM9MTY3NTcxMTExNTY3MiZ2ZXJzaW9uPXYyLjAmbGlmZXRpbWU9OTAwMDAwIn0.
+          ts : 1675711109000
+     */
+    protected RefreshTokenImpl stemToRT(QDLStem stem) {
+        if(stem.containsKey("jwt")){
+            return new RefreshTokenImpl(stem.getString("raw_token"), URI.create(stem.getString("jti")));
+        }
+         return new RefreshTokenImpl(stem.getString("raw_token"), URI.create(stem.getString("jti")));
+    }
+
+    public static String ACCESS_TOKEN_ACCESSOR = "at";
+    public static String REFRESH_TOKEN_ACCESSOR = "rt";
+
+    public class AccessAT implements QDLFunction {
+        @Override
+        public String getName() {
+            return ACCESS_TOKEN_ACCESSOR;
+        }
+
+        @Override
+        public int[] getArgCount() {
+            return new int[]{0, 1};
+        }
+
+        @Override
+        public Object evaluate(Object[] objects, State state) {
+            if (1 < objects.length) {
+                throw new IllegalArgumentException(getName() + " takes at most one argument.");
+            }
+            if (objects.length == 0) {
+                return tokenToStem(clcCommands.getDummyAsset().getAccessToken());
+            }
+            if (!(objects[0] instanceof QDLStem)) {
+                throw new IllegalArgumentException("The argument to " + getName() + " must be a stem.");
+            }
+            QDLStem newAT = (QDLStem) objects[0];
+            QDLStem oldAT = tokenToStem(clcCommands.getDummyAsset().getAccessToken());
+            clcCommands.getDummyAsset().setAccessToken(stemToAT(newAT));
+            return oldAT;
+        }
+
+        List<String> dd = null;
+
+        @Override
+        public List<String> getDocumentation(int argCount) {
+            if (dd == null) {
+                dd = new ArrayList<>();
+                dd.add(getName() + "({new_access_token.}) - get or set the current access token");
+                dd.add("If no argument, return the current token or null of none.");
+                dd.add("Otherwise, the argument is the new access token, which is used hencforth. ");
+                dd.add("if you set the token, the previous one is returned.");
+            }
+            return dd;
+        }
+    }
+
+    public class AccessRT implements QDLFunction {
+        @Override
+        public String getName() {
+            return REFRESH_TOKEN_ACCESSOR;
+        }
+
+        @Override
+        public int[] getArgCount() {
+            return new int[]{0, 1};
+        }
+
+        @Override
+        public Object evaluate(Object[] objects, State state) {
+            if (1 < objects.length) {
+                throw new IllegalArgumentException(getName() + " takes at most one argument.");
+            }
+            if (objects.length == 0) {
+                return tokenToStem(clcCommands.getDummyAsset().getRefreshToken());
+            }
+            if (!(objects[0] instanceof QDLStem)) {
+                throw new IllegalArgumentException("The argument to " + getName() + " must be a stem.");
+            }
+            QDLStem newRT = (QDLStem) objects[0];
+            QDLStem oldRT = tokenToStem(clcCommands.getDummyAsset().getRefreshToken());
+            clcCommands.getDummyAsset().setRefreshToken(stemToRT(newRT));
+            return oldRT;
+        }
+
+        List<String> dd = null;
+
+        @Override
+        public List<String> getDocumentation(int argCount) {
+            if (dd == null) {
+                dd = new ArrayList<>();
+                dd.add(getName() + "({new_refresh_token.}) - get or set the current refresh token");
+                dd.add("If no argument, return the current token or null of none.");
+                dd.add("Otherwise, the argument is the new refresh token, which is used hencforth. ");
+                dd.add("if you set the token, the previous one is returned.");
+
+            }
+            return dd;
+        }
+    }
 }

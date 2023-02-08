@@ -10,7 +10,7 @@ import java.net.URI;
  */
 public class AccessTokenImpl extends TokenImpl implements AccessToken {
     /**
-     * For tokens that a reno complex (e.g. not a WLCG token)
+     * For tokens that are not complex (e.g. not a WLCG token)
      * @param token
      */
     public AccessTokenImpl(URI token) {
@@ -20,7 +20,7 @@ public class AccessTokenImpl extends TokenImpl implements AccessToken {
     /**
      *
      * @param sciToken an opaque string that is the encoded complex token.
-     * @param jti the unique id for th e token. Used to get lifetime etc.
+     * @param jti the unique id for the token. Used to get lifetime etc.
      */
     public AccessTokenImpl(String sciToken, URI jti) {
         super(sciToken, jti);

@@ -14,6 +14,7 @@ import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSourceConfiguration
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.JSONClaimSourceConfig;
 import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.util.functor.parser.FunctorScript;
 import net.sf.json.JSONObject;
@@ -24,20 +25,23 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
+import static edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims.CSConstants.*;
+
 /**
  * The most basic implementation of a {@link ClaimSource}.
  * <h3>Extending this class</h3>
  * <p>
- *    If you want to write your own custom Java claim source and invoke it, you must extend this class
- *    and over-right the {@link #realProcessing(JSONObject, HttpServletRequest, ServiceTransaction)}
- *    method. Generally when claims are being gotten, the configuration that is created is passed
- *    along faithfully and you may access your custom parameters by invoking {@link ClaimSourceConfiguration#getProperty(String)}.
- *    An example is in {@link TestClaimSource}.
+ * If you want to write your own custom Java claim source and invoke it, you must extend this class
+ * and over-right the {@link #realProcessing(JSONObject, HttpServletRequest, ServiceTransaction)}
+ * method. Generally when claims are being gotten, the configuration that is created is passed
+ * along faithfully and you may access your custom parameters by invoking {@link ClaimSourceConfiguration#getProperty(String)}.
+ * An example is in {@link TestClaimSource}.
  * </p>
  * <p>Created by Jeff Gaynor<br>
  * on 8/17/15 at  4:10 PM
  */
 public class BasicClaimsSourceImpl implements ClaimSource {
+
     // CIL-1550 fix (pending) The actual error message is below.
     private static final long serialVersionUID = -6997152589138221711L;
     /*
@@ -107,10 +111,16 @@ public class BasicClaimsSourceImpl implements ClaimSource {
 
     public BasicClaimsSourceImpl() {
     }
-
+    public BasicClaimsSourceImpl(QDLStem stem) {
+        fromQDL(stem);
+      }
+    public BasicClaimsSourceImpl(QDLStem stem, OA2SE oa2SE) {
+        this(stem);
+        setOa2SE(oa2SE);
+      }
 
     public boolean isEnabled() {
-        if(getConfiguration() == null){
+        if (getConfiguration() == null) {
             return false;
         }
         return getConfiguration().isEnabled();
@@ -205,7 +215,7 @@ public class BasicClaimsSourceImpl implements ClaimSource {
             t.setFlowStates(f);
             t.setUserMetaData(claims);
         }
-        debugger.trace(this,"returned claims=:" + claims );
+        debugger.trace(this, "returned claims=:" + claims);
 
         return claims;
     }
@@ -268,6 +278,7 @@ public class BasicClaimsSourceImpl implements ClaimSource {
      * This should usually be false. It is true only for those sources that can <b>ONLY</b>
      * run at authorization, such as {@link HTTPHeaderClaimsSource}, where the information
      * is simply not available in later phases.
+     *
      * @return
      */
     @Override
@@ -288,4 +299,24 @@ public class BasicClaimsSourceImpl implements ClaimSource {
         return preProcessor;
     }
 
+    @Override
+    public void fromQDL(QDLStem stem) {
+        if (stem.containsKey(CS_DEFAULT_ID)) getConfiguration().setId(stem.getString(CS_DEFAULT_ID));
+        if (stem.containsKey(CS_DEFAULT_FAIL_ON_ERROR)) getConfiguration().setFailOnError(stem.getBoolean(CS_DEFAULT_FAIL_ON_ERROR));
+        if (stem.containsKey(CS_DEFAULT_NOTIFY_ON_FAIL)) getConfiguration().setNotifyOnFail(stem.getBoolean(CS_DEFAULT_NOTIFY_ON_FAIL));
+        if (stem.containsKey(CS_DEFAULT_IS_ENABLED)) getConfiguration().setEnabled(stem.getBoolean(CS_DEFAULT_IS_ENABLED));
+        if (stem.containsKey(CS_DEFAULT_NAME)) getConfiguration().setName(stem.getString(CS_DEFAULT_NAME));
+    }
+
+    @Override
+    public QDLStem toQDL() {
+        QDLStem stem = new QDLStem();
+        stem.put(CS_DEFAULT_TYPE, CS_TYPE_BASIC);
+        stem.put(CS_DEFAULT_ID, getConfiguration().getId());
+        stem.put(CS_DEFAULT_FAIL_ON_ERROR, getConfiguration().isFailOnError());
+        stem.put(CS_DEFAULT_IS_ENABLED, getConfiguration().isEnabled());
+        stem.put(CS_DEFAULT_NOTIFY_ON_FAIL, getConfiguration().isNotifyOnFail());
+        stem.put(CS_DEFAULT_NAME, getConfiguration().getName());
+        return stem;
+    }
 }

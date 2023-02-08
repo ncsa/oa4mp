@@ -288,7 +288,8 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
     protected void  newCSSerialize(List<ClaimSource> sources) {
        JSONArray array = new JSONArray();
         for (ClaimSource claimSource : sources) {
-            array.add(ConfigtoCS.convert(claimSource).toJSON());
+            //array.add(ConfigtoCS.convert(claimSource).toJSON());
+            array.add(claimSource.toQDL().toJSON());
         }
         getState().put(CLAIMS_SOURCES_STATE_KEY2, array);
     }
@@ -338,6 +339,13 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         }
         return new ArrayList<>();
     }
+    protected ConfigtoCS configtoCS;
+    public ConfigtoCS getConfigToCS(){
+        if(configtoCS == null){
+            configtoCS = new ConfigtoCS();
+        }
+        return configtoCS;
+    }
 
     protected List<ClaimSource> newCSDeserialize(OA2SE oa2SE) throws Throwable {
           // Assumed to be a serialized JSON Array
@@ -345,7 +353,7 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         ArrayList<ClaimSource> claimSources = new ArrayList<>();
         for(int i =0; i < array.size(); i++){
                  QDLStem stem = new QDLStem();
-                 claimSources.add(ConfigtoCS.convert(stem.fromJSON(array.getJSONObject(0)), oa2SE));
+                 claimSources.add(getConfigToCS().convert(stem.fromJSON(array.getJSONObject(0)), oa2SE));
              }
         return claimSources;
     }

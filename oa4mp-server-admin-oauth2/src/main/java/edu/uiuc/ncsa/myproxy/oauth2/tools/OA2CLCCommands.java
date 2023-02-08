@@ -1,20 +1,10 @@
 package edu.uiuc.ncsa.myproxy.oauth2.tools;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.client.AssetResponse;
-import edu.uiuc.ncsa.myproxy.oa4mp.client.ClientEnvironment;
 import edu.uiuc.ncsa.myproxy.oa4mp.client.OA4MPResponse;
 import edu.uiuc.ncsa.myproxy.oa4mp.client.storage.AssetStoreUtil;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2ConfigurationLoader;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8628Constants2;
-import edu.uiuc.ncsa.oa4mp.clc.CLCCommands;
-import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2Asset;
-import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2ClientEnvironment;
-import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2MPService;
-import edu.uiuc.ncsa.security.core.Identifier;
-import edu.uiuc.ncsa.security.core.util.DateUtils;
-import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
-import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.oa4mp.delegation.client.request.RTResponse;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.Token;
@@ -25,12 +15,21 @@ import edu.uiuc.ncsa.oa4mp.delegation.oa2.UserInfo;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.client.ATResponse2;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.JWTUtil2;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims;
+import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2Asset;
+import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2ClientEnvironment;
+import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2MPService;
+import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.util.DateUtils;
+import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
+import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.servlet.ServiceClientHTTPException;
+import edu.uiuc.ncsa.security.util.cli.CommonCommands;
 import edu.uiuc.ncsa.security.util.cli.ConfigurableCommandsImpl;
 import edu.uiuc.ncsa.security.util.cli.HelpUtil;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
-import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import edu.uiuc.ncsa.security.util.crypto.CertUtil;
+import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import net.sf.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
 
@@ -49,10 +48,10 @@ import java.security.SecureRandom;
 import java.util.List;
 import java.util.*;
 
-import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 import static edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants.*;
 import static edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.JWTUtil2.PAYLOAD_INDEX;
 import static edu.uiuc.ncsa.oa4mp.delegation.oa2.server.RFC8628Constants.*;
+import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 
 /**
  * A command line client. Invoke help as needed, but the basic operation is to create the initial
@@ -64,7 +63,20 @@ import static edu.uiuc.ncsa.oa4mp.delegation.oa2.server.RFC8628Constants.*;
  * <p>Created by Jeff Gaynor<br>
  * on 5/11/16 at  2:57 PM
  */
-public class OA2CLCCommands extends CLCCommands {
+public class OA2CLCCommands extends CommonCommands {
+    public String getPrompt() {
+         return "client>";
+     }
+
+    public OA2ClientEnvironment getCe() {
+        return ce;
+    }
+
+    public void setCe(OA2ClientEnvironment ce) {
+        this.ce = ce;
+    }
+
+    protected OA2ClientEnvironment ce;
     @Override
     public void bootstrap() throws Throwable {
        // no op
@@ -91,9 +103,9 @@ public class OA2CLCCommands extends CLCCommands {
 
     public OA2CLCCommands(MyLoggingFacade logger,
                           OA2CommandLineClient oa2CommandLineClient) throws Throwable {
-        super(logger, null);
+        super(logger);
         try {
-            setCe((ClientEnvironment) oa2CommandLineClient.getEnvironment());
+            setCe((OA2ClientEnvironment) oa2CommandLineClient.getEnvironment());
         } catch (Throwable t) {
             if (logger != null) {
                 logger.error("could not load configuration", t);
@@ -112,7 +124,6 @@ public class OA2CLCCommands extends CLCCommands {
 
     protected OA2MPService service;
 
-    @Override
     public OA2MPService getService() {
         if (service == null) {
             service = new OA2MPService(getCe());
@@ -175,7 +186,7 @@ public class OA2CLCCommands extends CLCCommands {
             return;
         }
         clear(inputLine); // only thing used in clear is --help. If that is present won't get here.
-        setCe((ClientEnvironment) oa2CommandLineClient.getEnvironment());
+        setCe((OA2ClientEnvironment) oa2CommandLineClient.getEnvironment());
         service = null;
     }
 
@@ -887,6 +898,18 @@ public class OA2CLCCommands extends CLCCommands {
     public String getRT() {
         if (currentATResponse == null) return "";
         return currentATResponse.getRefreshToken().getToken();
+    }
+
+    public void setAT(AccessTokenImpl at){
+        if(currentATResponse != null){
+            currentATResponse.setAccessToken(at);
+        }
+    }
+
+    public void setRT(RefreshTokenImpl rt){
+        if(currentATResponse != null){
+            currentATResponse.setRefreshToken(rt);
+        }
     }
 
     protected void getCertHelp() {
@@ -1940,8 +1963,5 @@ public class OA2CLCCommands extends CLCCommands {
         get_user_info(inputLine);
     }
 
-    @Override
-    public OA2ClientEnvironment getCe() {
-        return (OA2ClientEnvironment) super.getCe();
-    }
+
 }

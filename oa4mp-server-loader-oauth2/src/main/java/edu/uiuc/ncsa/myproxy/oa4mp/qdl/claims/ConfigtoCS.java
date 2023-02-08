@@ -3,18 +3,16 @@ package edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.*;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSource;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSourceConfiguration;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.LDAPConfiguration;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.QDLStem;
-import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 2/12/20 at  11:30 AM
  */
 public class ConfigtoCS implements CSConstants {
-    public static QDLStem convert(ClaimSource source) {
+
+/*    public static QDLStem convert(ClaimSource source) {
         if (source instanceof FSClaimSource) {
             return ClaimSourceConfigConverter.convert(source, CSConstants.CS_TYPE_FILE);
         }
@@ -28,18 +26,38 @@ public class ConfigtoCS implements CSConstants {
         if (source instanceof LDAPClaimsSource) {
             return ClaimSourceConfigConverter.convert(source, CSConstants.CS_TYPE_LDAP);
         }
+
         if (source instanceof BasicClaimsSourceImpl) {
             throw new GeneralException("Error: This probably means you instantiated a class using the code type, but handling it has not been implement yet.");
         }
 
         throw new IllegalArgumentException("Error: Unknown claims source type");
-    }
+    }*/
 
-    public static ClaimSource convert(QDLStem arg, OA2SE oa2SE) {
+    public  ClaimSource convert(QDLStem arg, OA2SE oa2SE) {
         return convert(arg, null, oa2SE);
     }
 
-    public static ClaimSource convert(QDLStem arg, State qdlState, OA2SE oa2SE) {
+    public  ClaimSource convert(QDLStem arg, State qdlState, OA2SE oa2SE) {
+        switch (arg.getString(CS_DEFAULT_TYPE)) {
+            case CS_TYPE_BASIC:
+                return new BasicClaimsSourceImpl(arg);
+            case CS_TYPE_CODE:
+                return new CodeClaimSource(arg);
+            case CS_TYPE_FILE:
+                return new FSClaimSource(arg);
+            case CS_TYPE_LDAP:
+                return new LDAPClaimsSource(arg, oa2SE);
+            case CS_TYPE_HEADERS:
+                return new HTTPHeaderClaimsSource(arg);
+            case CS_TYPE_NCSA:
+                return new NCSALDAPClaimSource(arg, oa2SE);
+        }
+        throw new IllegalArgumentException("Error: Unrecognized claim source type \"" + arg.getString(CS_DEFAULT_TYPE) + "\"");
+    }
+
+    /*
+      public static ClaimSource convert(QDLStem arg, State qdlState, OA2SE oa2SE) {
         switch (arg.getString(CS_DEFAULT_TYPE)) {
             case CS_TYPE_CODE:
                 return doCode(arg);
@@ -80,8 +98,8 @@ public class ConfigtoCS implements CSConstants {
         }
         throw new IllegalArgumentException("Error: Unrecognized claim source type \"" + arg.getString(CS_DEFAULT_TYPE) + "\"");
     }
-
-    private static ClaimSource doCode(QDLStem arg) {
+     */
+/*    private static ClaimSource doCode(QDLStem arg) {
         BasicClaimsSourceImpl claimsSource = null;
         ClaimSourceConfiguration cfg = ClaimSourceConfigConverter.convert(arg);
 
@@ -101,5 +119,5 @@ public class ConfigtoCS implements CSConstants {
         }
         claimsSource.setConfiguration(cfg);
         return claimsSource;
-    }
+    }*/
 }

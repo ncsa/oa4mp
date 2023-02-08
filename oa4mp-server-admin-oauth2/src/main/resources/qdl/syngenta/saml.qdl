@@ -1,0 +1,55 @@
+#! /usr/bin/env -S qdl-run
+
+/*
+   Replaces the CILogon SAMLAttributeClaimSource with pure QDL.
+*/
+
+    // ini. := file_read('vfs#/scripts/syngenta/ldap.ini',2);
+
+    ini. := file_read('/home/ncsa/dev/csd/config/ini/syngenta-ldap.ini',2).'syngenta';
+user_uid := script_args(0); // call with the user's sub
+
+/*
+'http://cilogon.org/serverE/users/8114';  // PROD, Nicole Hofer
+'http://cilogon.org/serverD/users/4620'; // DEV, me
+*/
+q := module_load('edu.uiuc.ncsa.qdl.extensions.database.QDLDBModule', 'java');
+module_import(q);
+cfg.'username' := ini.'username';
+cfg.'password' := ini.'password';
+  cfg.'schema' := ini.'schema';
+cfg.'database' := ini.'database';
+    cfg.'host' := ini.'host';
+    cfg.'port' := ini.'port';
+    cfg.'type' := ini.'type';
+db#connect(cfg.);
+user. := db#read('select * from user where user_uid=\'' + user_uid + '\'');
+out. := [];
+if[size(user.) == 0 || (!is_defined(user.'attr_json'))][return(out.);]; // nothing to do
+
+
+//user.'attr_json' := '{"member_of":"09895d05-1b79-4529-9f9d-9367752a1d0a;d0c60b10-66e1-45fd-914d-441e66239c88;a5891511-700b-402e-81b9-8b8e6debd67b;ac286412-f123-431e-8545-5131ceeb406b;ce503b1d-4053-4752-9efe-7fc29c1ceb2a;0357d51d-1cbf-483e-a17c-9e70e690ccee;90db3a29-e8cf-4f7a-872d-7f5115cceb23;9328f22a-51b8-426e-a9ae-295440da303b;5406672d-e52e-4da3-ab4f-6ac7cb3da1e6;d2757533-1927-41ed-ae53-831b2967f503;5d6a343d-216d-4189-89aa-79e4a11ab914;3055b43d-caed-4fd1-9c88-8c72e2e2dca2;888c6646-ef15-4d25-b9aa-9a8b59faccd0;52be6457-8b61-48e3-8f58-93fbe2f78256;f68b7e5f-1490-4fee-ba49-d8acc5392f77;cde30e62-9eb7-4cea-91a1-4c063b8433e8;2fa49369-2b39-4557-945e-07052673e943;cd21d06d-2990-4232-81d2-b956bcbe42c4;47337570-8a16-4ed0-8a7c-66561d86c7fc;7d9ec675-435c-4fb0-840c-7928f54aeb80;c164ae76-2af3-456a-9fa0-2a63d47a5dd6;3dee0e7a-c30a-4841-9f96-c617e7ef68dd;ab99ba80-d159-4e7a-b349-76f08e0934dd;a8ec1681-07bf-48a1-8949-8436bc540944;c290c786-2a44-4f72-80d6-08e1a4088ba0;104f7288-2bb1-440e-ae4a-31f1b4bbf71d;6f2dd088-cfca-49ea-8de5-7e60f94cba9a;079b438d-3afb-432a-8971-5cb1bb19893e;daabef90-ea15-40e7-a136-b89169487ed6;8e9d4f91-1676-43f1-947b-7c50c41a94c4;c93100a0-58e4-4f93-a739-c6bfb6baaa44;024de4a1-8bbb-46d0-a941-a33bb64f35b5;c13b7ba3-b038-4abb-b062-4491d1f9f12b;de235da5-b963-45b2-b8d5-60a98212d57e;6b7756a8-cf88-41e1-b0c0-2b3a878ed4fb;d3dee8b1-3f46-4b0e-8564-9e3b193c365c;ad4ff8b7-adcf-473a-b872-05476e1b1997;c73a43bc-fb26-4452-9191-0879ba22f05c;125327be-524b-4106-9bd5-f1278a561683;317617c1-6dbf-4b2b-93df-0c9ea5c3d008;776a19c6-9df6-41c0-be28-72f39701060d;9d91d9cb-c26c-4e2a-a390-e3d78f6de728;5af227cd-6e59-4302-b077-e7c43ac8f970;e5f729ce-bb51-4984-bb97-6add551a293b;084ca6d4-bffe-49dd-9b94-d33fd889a88e;449789d6-ed88-4aa8-a040-047e9f2fefd6;663d59e0-f1fe-405d-8013-50c865bed1df;151bdce8-957c-422e-9708-59eb8db2f053;fcbc58eb-9c49-41ec-92d4-e56f164cbe8e;3a70d5ec-ae55-4270-8cf9-771535c7f477;42d5f2ef-1755-4fbe-81de-5008cfa41888;efbf51f6-bd23-409b-aa0d-5a7ece9f90c0;994ce4f6-9bf7-4321-80a6-92ecf6d062c6;5653eff7-9aec-4117-8be3-32deea4138e4;2672a9fa-e7c7-4a7a-9bd0-f242c29ec5ba;7e2fccfe-de64-4c59-810b-53370bb070f9","acr":"urn:oasis:names:tc:SAML:2.0:ac:classes:Password"}';
+attr. := from_json(user.'attr_json');
+while[
+  key ∈ keys(attr.)
+ ][
+   if[
+       key == 'member_of'
+    ][
+     // have to parse it and return a flat list
+       out.'isMemberOf' := tokenize(attr.key, ';');
+     ]else[
+       out.key := attr.key;
+      ];
+ ]; // end while
+ return(out.);
+
+ /*
+
+ Typical attr_json is the string
+ {"member_of":"09895d05-1b79-4529-9f9d-9367752a1d0a;d0c60b10-66e1-45fd-914d-441e66239c88;a5891511-700b-402e-81b9-8b8e6debd67b;ac286412-f123-431e-8545-5131ceeb406b",
+ "acr":"urn:oasis:names:tc:SAML:2.0:ac:classes:Password"}
+
+The contract is to return every attribute that is not member_of unchanged, but to parse member_of into a
+flat list of groups and change the key to isMemberOf.
+*/

@@ -29,6 +29,8 @@ public class CLCModule extends JavaModule {
 
         funcs = new ArrayList<>();
         funcs.add(clc.new Access());
+        funcs.add(clc.new AccessAT());
+        funcs.add(clc.new AccessRT());
         funcs.add(clc.new CreateURI());
         funcs.add(clc.new DeviceFlow());
         funcs.add(clc.new Exchange());

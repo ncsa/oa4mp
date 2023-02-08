@@ -26,6 +26,7 @@ public interface CSConstants {
     public String CS_TYPE_NCSA = "ncsa";
     public String CS_TYPE_HEADERS = "http";
     public String CS_TYPE_CODE = "code";
+    public String CS_TYPE_BASIC = "basic";
     /*
     Specific values for specific configurations
      */
@@ -65,9 +66,6 @@ public interface CSConstants {
     String CS_LDAP_SEARCH_BASE = "search_base"; // The path in LDAP to start the search.
 
     String CS_LDAP_SEARCH_SCOPE = "search_scope"; // The  LDAP search scope.
-    String CS_LDAP_SEARCH_SCOPE_OBJECT = "object"; // The  LDAP search scope.
-    String CS_LDAP_SEARCH_SCOPE_ONE_LEVEL = "one_level"; // The  LDAP search scope.
-    String CS_LDAP_SEARCH_SCOPE_SUBTREE = "subtree"; // The  LDAP search scope.
     String CS_LDAP_SEARCH_FILTER_ATTRIBUTE = "ldap_name"; // the name of the attribute in LDAP to search on.
     String CS_LDAP_SECURITY_PRINCIPAL = "username"; // only needed if authz type is simple or strong
     String CS_LDAP_SERVER_ADDRESS = "address"; // required

@@ -107,7 +107,7 @@
         <module>oa4mp-server-oauth2</module>
         <module>oa4mp-client-api</module>
         <module>oa4mp-client-loader-oauth2</module>
-        <module>oa4mp-clc</module>
+<!--        <module>oa4mp-clc</module> -->
         <module>oa4mp-client-oauth2</module>
         <module>oa4mp-server-admin-oauth2</module>
         <module>oa4mp-client-webapp</module>

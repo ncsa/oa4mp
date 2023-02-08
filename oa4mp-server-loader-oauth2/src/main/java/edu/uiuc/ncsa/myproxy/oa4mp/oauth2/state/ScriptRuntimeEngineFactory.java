@@ -65,6 +65,7 @@ public class ScriptRuntimeEngineFactory {
                 });
             }
             QDLRuntimeEngine qrt = new QDLRuntimeEngine(oa2SE.getQDLEnvironment(), transaction);
+            qrt.setConfigToCS(transaction.getConfigToCS());
             OA2State state = qrt.getState();
             state.setOa2se(oa2SE);
             VirtualOrganization vo = oa2SE.getVO(oa2Client.getIdentifier());

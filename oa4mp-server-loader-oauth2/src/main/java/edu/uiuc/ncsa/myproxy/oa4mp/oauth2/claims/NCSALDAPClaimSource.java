@@ -1,10 +1,11 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
-import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.LDAPConfiguration;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.LDAPConfigurationUtil;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
+import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import net.sf.json.JSONObject;
 
@@ -22,7 +23,13 @@ public class NCSALDAPClaimSource extends LDAPClaimsSource {
     public NCSALDAPClaimSource() {
         init();
     }
+    public NCSALDAPClaimSource(QDLStem stem) {
+        super(stem);
+    }
 
+    public NCSALDAPClaimSource(QDLStem stem, OA2SE oa2SE) {
+         super(stem, oa2SE);
+     }
     /**
      * NOTE that his uses the search filter attribute == the name of the claim to look up and
      * search on (like sub, uid) and if it is missing will default to using the

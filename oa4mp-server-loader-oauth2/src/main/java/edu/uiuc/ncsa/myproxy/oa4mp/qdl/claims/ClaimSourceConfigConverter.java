@@ -155,7 +155,7 @@ public class ClaimSourceConfigConverter implements CSConstants {
             case CS_TYPE_FILE:
                 cfg = new ClaimSourceConfiguration();
                 setDefaultsinCfg(arg, cfg);
-                // Next is required although it has to be put in the properties
+                // Next is required, although it has to be put in the properties
                 xp.put(FSClaimSource.FILE_PATH_KEY, arg.getString(CS_FILE_FILE_PATH)); //  wee bit of translation
                 if (arg.containsKey(CS_FILE_CLAIM_KEY)) {
                     xp.put(FSClaimSource.FILE_CLAIM_KEY, arg.getString(CS_FILE_CLAIM_KEY));

@@ -27,9 +27,10 @@ script_load('utils/init.qdl');
 if[
     exec_phase == 'pre_auth' && claims.idp == idp.syngenta
   ][
-       cfg. := new_template('code');
+/*       cfg. := new_template('code');
        cfg.java_class := 'org.cilogon.oauth2.servlet.claims.SAMLAttributeClaimSource';
-       claim_sources. := claim_sources. ~ [create_source(cfg.)];
+       claim_sources. := claim_sources. ~ [create_source(cfg.)];*/
+       claims. := claims. ~ script_load('syngenta/saml.qdl', claims.'sub');
        return(); // naught else to do
   ];
 
@@ -38,5 +39,6 @@ script_load('ncsa/ncsa-default.qdl', true); // This will process the is Member c
 if[
     exec_phase == 'post_token' && claims.idp == idp.ncsa
 ][
+    // if the user is NOT in the prj_sprout group for NCSA, reject them.
     flow_states.accept_requests == has_value('prj_sprout', claims.isMemberOf.);
 ];

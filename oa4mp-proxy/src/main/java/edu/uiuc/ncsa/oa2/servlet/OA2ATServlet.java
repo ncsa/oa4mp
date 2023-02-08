@@ -1332,9 +1332,10 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         if (0 <= oa2SE.getRtGracePeriod()) {
             // If this is non-negative, then it has been configured. Not configured = let everything expire normally.
             txRT.setExpiresAt(System.currentTimeMillis() + oa2SE.getRtGracePeriod());
+            txRT.setValid(0 != oa2SE.getRtGracePeriod()); // Valid if non-zero
         }else{
             RefreshTokenImpl rt = (RefreshTokenImpl) t.getRefreshToken();
-            txRT.setExpiresAt(rt.getIssuedAt() + t.getRefreshTokenLifetime());
+            txRT.setExpiresAt(rt.getIssuedAt() + t.getRefreshTokenLifetime()); // use what it has.
         }
         // Make sure everything that needs it is updated.
         t.setAccessToken(rtiResponse.getAccessToken());

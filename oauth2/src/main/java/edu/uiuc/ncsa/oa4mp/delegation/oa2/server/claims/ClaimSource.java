@@ -1,8 +1,9 @@
 package edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims;
 
-import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.UserInfo;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.UnsupportedScopeException;
+import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.security.util.functor.parser.FunctorScript;
 import net.sf.json.JSONObject;
 
@@ -94,5 +95,9 @@ public interface ClaimSource  extends Serializable {
      * @return
      */
     public FunctorScript getPostProcessor();
+
+    public void fromQDL(QDLStem stem);
+
+    public QDLStem toQDL();
     
 }

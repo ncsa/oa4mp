@@ -8,6 +8,7 @@ import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.UnsupportedScopeException;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.LDAPConfiguration;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.LDAPConfigurationUtil;
 import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.security.core.Logable;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
@@ -28,6 +29,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.util.*;
 
+import static edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims.CSConstants.*;
+
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 4/26/16 at  3:32 PM
@@ -38,7 +41,12 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
 
     public LDAPClaimsSource() {
     }
-
+    public LDAPClaimsSource(QDLStem stem) {
+        super(stem);
+      }
+    public LDAPClaimsSource(QDLStem stem, OA2SE oa2SE) {
+         super(stem, oa2SE);
+       }
     public LDAPClaimsSource(LDAPConfiguration ldapConfiguration, MyLoggingFacade myLogger) {
         super();
         if (ldapConfiguration == null) {
@@ -648,4 +656,174 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
 
     }
 
+    @Override
+    public void fromQDL(QDLStem arg) {
+        super.fromQDL(arg);
+        LDAPConfiguration ldapCfg = new LDAPConfiguration();
+        setConfiguration(ldapCfg);
+        LDAPConfigurationUtil cUtil = new LDAPConfigurationUtil();
+        ldapCfg.setSearchNameKey(arg.getString(CS_LDAP_SEARCH_NAME));
+        ldapCfg.setServer(arg.getString(CS_LDAP_SERVER_ADDRESS));
+        if (arg.containsKey(CS_LDAP_SEARCH_FILTER_ATTRIBUTE)) {
+            ldapCfg.setSearchFilterAttribute(arg.getString(CS_LDAP_SEARCH_FILTER_ATTRIBUTE));
+        }
+        if (arg.containsKey(CS_LDAP_SEARCH_SCOPE)) {
+            ldapCfg.setSearchScope(arg.getString(CS_LDAP_SEARCH_SCOPE));
+        }
+        if (arg.containsKey(CS_DEFAULT_IS_ENABLED)) {
+            ldapCfg.setEnabled(arg.getBoolean(CS_DEFAULT_IS_ENABLED));
+        } else {
+            ldapCfg.setEnabled(true);
+        }
+        if (arg.containsKey(CS_LDAP_ADDITIONAL_FILTER)) {
+            ldapCfg.setAdditionalFilter(arg.getString(CS_LDAP_ADDITIONAL_FILTER));
+        } else {
+            ldapCfg.setAdditionalFilter("");
+        }
+        if (arg.containsKey(CS_LDAP_CONTEXT_NAME)) {
+            ldapCfg.setContextName(arg.getString(CS_LDAP_CONTEXT_NAME));
+        } else {
+            ldapCfg.setContextName("");// default. MUST be present of the search internally throws an NPE...
+        }
+        if (arg.containsKey(CS_LDAP_PORT)) {
+            ldapCfg.setPort(arg.getLong(CS_LDAP_PORT).intValue());
+        } else {
+            ldapCfg.setPort(LDAPConfigurationUtil.DEFAULT_PORT);
+        }
+
+        ldapCfg.setAuthType(cUtil.getAuthType(arg.getString(CS_LDAP_AUTHZ_TYPE)));
+        if (ldapCfg.getAuthType() == LDAPConfigurationUtil.LDAP_AUTH_SIMPLE_KEY) {
+            ldapCfg.setPassword(arg.getString(CS_LDAP_PASSWORD));
+            ldapCfg.setSecurityPrincipal(arg.getString(CS_LDAP_SECURITY_PRINCIPAL));
+        }
+        ldapCfg.setSearchBase(arg.getString(CS_LDAP_SEARCH_BASE));
+        // now to construct the search attributes.
+/*                    Example. Have to specify search_attributes explicitly or no rename possible
+                  Omitting search_attributes means to get them all.
+           {
+             'auth_type':'simple',
+             'password':'XXXX',
+             'address':'ldap.cilogon.org',
+             'port':636,
+             'rename':{'sn':'title'},
+             'claim_name':'uid',
+             'search_base':'ou=people,o=Fermilab,o=CO,dc=cilogon,dc=org',
+             'search_attributes':['isMemberOf','sn','cn','voPersonID'],
+             'rename' :{'isMemberOf':'is_member_of'},
+             'type':'ldap',
+             'ldap_name':'voPersonExternalID',
+             'username':'uid=oa4mp_user,ou=system,o=Fermilab,o=CO,dc=cilogon,dc=org'
+           }
+             */
+        QDLStem renames = null;
+        if (arg.containsKey(CS_LDAP_RENAME)) {
+            renames = (QDLStem) arg.get(CS_LDAP_RENAME);
+        }
+        Collection lists = null;
+        if (arg.containsKey(CS_LDAP_LISTS)) {
+            QDLStem listNames = (QDLStem) arg.get(CS_LDAP_LISTS);
+            lists = listNames.values();
+        } else {
+            lists = new ArrayList();
+        }
+
+        Collection groups;
+        if (arg.containsKey(CS_LDAP_GROUP_NAMES)) {
+            QDLStem groupStem = (QDLStem) arg.get(CS_LDAP_GROUP_NAMES);
+            groups = groupStem.values();
+        } else {
+            groups = new ArrayList();
+        }
+
+        if (arg.containsKey(CS_LDAP_SEARCH_ATTRIBUTES)) {
+            // no attribute means they are getting everything. Let them.
+            QDLStem searchAttr = (QDLStem) arg.get(CS_LDAP_SEARCH_ATTRIBUTES);
+            Map<String, LDAPConfigurationUtil.AttributeEntry> attrs = new HashMap<>();
+
+            for (Object key : searchAttr.keySet()) {
+                String attrName = String.valueOf(searchAttr.get(key));
+                boolean isGroup = groups.contains(attrName);
+                boolean isList = lists.contains(attrName);
+                if (isList && isGroup) {
+                    throw new IllegalArgumentException("You cannot have a \"" + attrName + "\" be both a group and a list. ");
+                }
+                String rename = attrName;
+                if (renames != null) {
+                    if (renames.containsKey(attrName)) {
+                        rename = renames.getString(attrName);
+                    }
+                }
+                LDAPConfigurationUtil.AttributeEntry attributeEntry =
+                        new LDAPConfigurationUtil.AttributeEntry(attrName, rename, isList, isGroup);
+                attrs.put(attrName, attributeEntry);
+            }
+            if (!attrs.isEmpty()) {
+                ldapCfg.setSearchAttributes(attrs);
+            }
+        }
+
+    }
+
+    @Override
+    public QDLStem toQDL() {
+        QDLStem stem = super.toQDL();
+        LDAPConfigurationUtil cUtil = new LDAPConfigurationUtil();
+        stem.put(CS_DEFAULT_TYPE, CS_TYPE_LDAP);
+
+        LDAPConfiguration cfg2 = (LDAPConfiguration) getConfiguration();
+        stem.put(CS_LDAP_SEARCH_NAME, cfg2.getSearchNameKey());
+        stem.put(CS_LDAP_SERVER_ADDRESS, cfg2.getServer());
+        stem.put(CS_LDAP_SEARCH_BASE, cfg2.getSearchBase()); // Fixes CIL-1328
+        stem.put(CS_LDAP_CONTEXT_NAME, cfg2.getContextName());
+        stem.put(CS_LDAP_ADDITIONAL_FILTER, cfg2.getAdditionalFilter());
+        stem.put(CS_LDAP_PORT, new Long(cfg2.getPort()));
+        stem.put(CS_LDAP_AUTHZ_TYPE, cUtil.getAuthName(cfg2.getAuthType()));
+        stem.put(CS_LDAP_SEARCH_FILTER_ATTRIBUTE, cfg2.getSearchFilterAttribute());
+        if (cfg2.hasSearchScope()) {
+            stem.put(CS_LDAP_SEARCH_SCOPE, cfg2.getSearchScope());
+        }
+        if (cfg2.getAuthType() == LDAPConfigurationUtil.LDAP_AUTH_SIMPLE_KEY) {
+            stem.put(CS_LDAP_PASSWORD, cfg2.getPassword());
+            stem.put(CS_LDAP_SECURITY_PRINCIPAL, cfg2.getSecurityPrincipal());
+        }
+
+        if (cfg2.getSearchAttributes() != null && !cfg2.getSearchAttributes().isEmpty()) {
+            List<Object> groups = new ArrayList<>();
+            List<Object> names = new ArrayList<>();
+            List<Object> isList = new ArrayList<>();
+            QDLStem renames = new QDLStem();
+            for (String key : cfg2.getSearchAttributes().keySet()) {
+                LDAPConfigurationUtil.AttributeEntry attributeEntry = cfg2.getSearchAttributes().get(key);
+                names.add(attributeEntry.sourceName);
+                if (attributeEntry.targetName != null && !attributeEntry.targetName.equals(attributeEntry.sourceName)) {
+                    renames.put(attributeEntry.sourceName, attributeEntry.targetName);
+                }
+                if (attributeEntry.isGroup) {
+                    groups.add(attributeEntry.sourceName);
+                }
+                if (attributeEntry.isList) {
+                    isList.add(attributeEntry.sourceName);
+                }
+                QDLStem nameStem = new QDLStem();
+                nameStem.addList(names);
+                stem.put(CS_LDAP_SEARCH_ATTRIBUTES, nameStem);
+
+                if (groups.size() != 0) {
+                    QDLStem groupStem = new QDLStem();
+                    groupStem.addList(groups);
+                    stem.put(CS_LDAP_GROUP_NAMES, groupStem);
+                }
+                if (isList.size() != 0) {
+                    QDLStem listStem = new QDLStem();
+                    listStem.addList(isList);
+                    stem.put(CS_LDAP_LISTS, listStem);
+                }
+                if (renames.size() != 0) {
+                    stem.put(CS_LDAP_RENAME, renames);
+                }
+            }
+
+        }
+        return stem;
+    }
 }

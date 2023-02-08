@@ -22,6 +22,7 @@ import java.util.List;
 import static edu.uiuc.ncsa.qdl.variables.QDLStem.STEM_INDEX_MARKER;
 
 /**
+ * QDLFunction to convert claims to a stem. For use in the OA4MP QDL module.
  * <p>Created by Jeff Gaynor<br>
  * on 2/10/20 at  10:18 AM
  */
@@ -36,6 +37,15 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
     @Override
     public int[] getArgCount() {
         return new int[]{2};
+    }
+
+    ConfigtoCS configtoCS = null;
+
+    protected ConfigtoCS getConfigToCS() {
+        if (configtoCS == null) {
+            configtoCS = new ConfigtoCS();
+        }
+        return configtoCS;
     }
 
     @Override
@@ -79,7 +89,7 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
         if (state instanceof OA2State) {
             oa2State = (OA2State) state;
         }
-        BasicClaimsSourceImpl basicClaimsSource = (BasicClaimsSourceImpl) ConfigtoCS.convert(arg, oa2State == null ? null : oa2State.getOa2se());
+        BasicClaimsSourceImpl basicClaimsSource = (BasicClaimsSourceImpl) getConfigToCS().convert(arg, oa2State == null ? null : oa2State.getOa2se());
         OA2ServiceTransaction t = new OA2ServiceTransaction((Identifier) null);
         t.setUsername(username);
         JSONObject claims = new JSONObject();
@@ -98,7 +108,7 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
         }
         DebugUtil.setIsEnabled(true);
         DebugUtil.setDebugLevel(DebugUtil.DEBUG_LEVEL_TRACE);
-        NCSALDAPClaimSource ncsaldapClaimSource = (NCSALDAPClaimSource) ConfigtoCS.convert(arg, (oa2State == null ? null : oa2State.getOa2se()));
+        NCSALDAPClaimSource ncsaldapClaimSource = (NCSALDAPClaimSource) getConfigToCS().convert(arg, (oa2State == null ? null : oa2State.getOa2se()));
         OA2ServiceTransaction t = new OA2ServiceTransaction((Identifier) null);
         t.setUsername(username);
         JSONObject protoClaims = new JSONObject();
@@ -115,7 +125,7 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
         if (state instanceof OA2State) {
             oa2State = (OA2State) state;
         }
-        HTTPHeaderClaimsSource httpHeaderClaimsSource = (HTTPHeaderClaimsSource) ConfigtoCS.convert(arg, oa2State == null ? null : oa2State.getOa2se());
+        HTTPHeaderClaimsSource httpHeaderClaimsSource = (HTTPHeaderClaimsSource) getConfigToCS().convert(arg, oa2State == null ? null : oa2State.getOa2se());
 
         OA2ServiceTransaction t = new OA2ServiceTransaction((Identifier) null);
         t.setUsername(username);
@@ -143,7 +153,7 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
         if (state instanceof OA2State) {
             oa2State = (OA2State) state;
         }
-        LDAPClaimsSource ldapClaimsSource = (LDAPClaimsSource) ConfigtoCS.convert(arg, oa2State == null ? null : oa2State.getOa2se());
+        LDAPClaimsSource ldapClaimsSource = (LDAPClaimsSource) getConfigToCS().convert(arg, oa2State == null ? null : oa2State.getOa2se());
         OA2ServiceTransaction t = new OA2ServiceTransaction((Identifier) null);
         t.setUsername(username);
         JSONObject protoClaims = new JSONObject();
@@ -248,7 +258,7 @@ get_claims(cfg., 'dweitzel2@unl.edu')
         if (rawJSON == null) {
             throw new IllegalStateException("neither a path to the claims nor a stem of claims has been given");
         }
-        FSClaimSource fsClaimSource = (FSClaimSource) ConfigtoCS.convert(arg, oa2State, oa2State == null ? null : oa2State.getOa2se());
+        FSClaimSource fsClaimSource = (FSClaimSource) getConfigToCS().convert(arg, oa2State, oa2State == null ? null : oa2State.getOa2se());
         fsClaimSource.setRawJSON(rawJSON);
         OA2ServiceTransaction t = new OA2ServiceTransaction((Identifier) null);
         t.setUsername(username);

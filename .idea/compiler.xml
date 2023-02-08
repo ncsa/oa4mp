@@ -27,7 +27,6 @@
         <module name="oa4mp-client-api" />
         <module name="oa4mp-website" />
         <module name="oauth2" />
-        <module name="oa4mp-clc" />
         <module name="oa4mp-client-test" />
         <module name="oa4mp-webapp" />
         <module name="oa4mp-qdl" />
@@ -38,8 +37,8 @@
         <module name="oa4mp-client-oauth2" />
         <module name="oa4mp-server-test-oauth2" />
         <module name="client" />
-        <module name="oa4mp-skin" />
         <module name="myproxy-website" />
+        <module name="oa4mp-skin" />
         <module name="oa4mp-client-webapp" />
       </profile>
     </annotationProcessing>

@@ -346,6 +346,17 @@
             to true though, public clients will be required to use it or will be denied access.
         </td>
     </tr>
+    <tr id="rtGracePeriod">
+        <td style="vertical-align: top;">rtGracePeriod</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">-1</td>
+        <td style="vertical-align: top;">For 0 ≤ values, this sets the lifetime in seconds of the refresh token on refresh.
+            If the value is 0, this invalidates the token immediately. A value of -1 means to simply let
+            the tokens age with their current lifetimes. Each client may have this set as well which will
+            override the server setting. The client default is to use whatever the server has configured.<br/>
+            See note below on units.
+        </td>
+    </tr>
     <tr id="safe_gc">
         <td style="vertical-align: top;">safe_gc</td>
         <td style="vertical-align: top;">N</td>
@@ -418,8 +429,11 @@ specified. So this is a perfectly acceptable snipped from a configuration file:<
 <p>Note that, in order to maintain backwards compatibility, the assumption is that all of these <i>without</i>
 units are in <b>seconds</b>. Blanks before and after units are allowed. Acceptable units are</p>
 <ul>
-    <li>"sec.", "sec", "s.", "s" or no units for seconds</li>
-    <li>"ms.", "ms" for milliseconds</li>
+    <li>"ms.", "ms" for milliseconds, e.g. "1000 ms."</li>
+    <li>"sec.", "sec", "s.", "s" for seconds, e.g., "300 sec"</li>
+    <li>"min.", "min", "mins.", "mins" for minutes, e.g. "20 min."</li>
+    <li>"hr.", "hr", "hrs.", "hrs" for hours, "e.g. 2 hrs."</li>
+    <li>"day", "days" for days, e.g. "1 day", "10 days"</li>
 </ul>
 
 <h2>Notes</h2>

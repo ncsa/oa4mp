@@ -479,7 +479,7 @@ When a new version is deployed, here is the testing order
      Has the original NCSA functor configuration on it. Many installs use this.
      Claims isMemberOf is a structure.
      exec phase: access, refresh, exchange
-     check claims after each phase to be sure something is returned.
+     check claims after each phase to be sure something is eturned.
      refresh will update claims, exchange does not.
 
   -- dev:/test/ncsa_qdl

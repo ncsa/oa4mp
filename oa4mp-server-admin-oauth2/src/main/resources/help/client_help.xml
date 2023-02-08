@@ -506,7 +506,27 @@ forward_scopes_to_proxy is false:
 See also: proxy_request_scopes]]>
     </body>
     </entry>
+    <entry id="rtGracePeriod">
+    <body>
+    <![CDATA[Property. Integer, -1 (disabled)
+This determines the refrehs token grace period. When a token is refreshed, there are
+various policies that may be applied. For values ≥ 0, this sets the actual number
+of milliseconds that this remains valid. A value of zero, therefore, invalidates tokens
+immediately. Negative values are used for more general polices.
+This variable is used for them:
 
+Value  Description
+------+----------------------------------------------------------------
+  -2  | (default) Used in client configurations only, this means to
+      | use the server's value.
+------+----------------------------------------------------------------
+  -1  | Disabled. Tokens age out with whatever they have
+      | configured.
+------+----------------------------------------------------------------
+  ≤ 0 | The actual valid lifetime in milliseconds. If zero, this
+      | effectively invalidates the token immediately.]]>
+    </body>
+    </entry>
     <!--
 at_lifetime           description           extended_attributes   maxATLifetime         public_client         strict_scopes
 callback_uri          df_interval           extends_provisioners  maxRTLifetime         public_key

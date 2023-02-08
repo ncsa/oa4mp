@@ -129,8 +129,8 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
     public static String REFRESH_TOKEN_GRACE_PERIOD_TAG = "rtGracePeriod";
     public static long REFRESH_TOKEN_GRACE_PERIOD_DEFAULT = 6*3600*1000L; // 6 hours
     public static long REFRESH_TOKEN_GRACE_PERIOD_DISABLED = -1L;
-    public static long REFRESH_TOKEN_GRACE_PERIOD_NOT_CONFIGURED = -2L;
-    public static long REFRESH_TOKEN_GRACE_PERIOD_USE_SERVER_DEFAULT = -3L;
+    public static long REFRESH_TOKEN_GRACE_PERIOD_USE_SERVER_DEFAULT = -2L;
+    public static long REFRESH_TOKEN_GRACE_PERIOD_NOT_CONFIGURED = -3L;
 
     //This is divisible by 3 and greater than 256,
     // so when it is base64 encoded there will be no extra characters:
