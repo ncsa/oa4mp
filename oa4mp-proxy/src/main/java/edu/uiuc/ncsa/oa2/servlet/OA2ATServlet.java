@@ -482,7 +482,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
          */
 
         if (t == null) {
-            debugger.trace(this, "transaction not found from credentials for client \"" + client.getIdentifierString() + "\", attempting to get transaction from the token itself");
+            debugger.trace(this, "transaction not found from credentials for client \""
+                    + client.getIdentifierString() + "\", attempting to get transaction from the token itself");
 
             switch (subjectTokenType) {
                 case RFC8693Constants.ACCESS_TOKEN_TYPE:
@@ -490,7 +491,11 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                     break;
                 case RFC8693Constants.REFRESH_TOKEN_TYPE:
                     RefreshTokenStore rts = (RefreshTokenStore) getTransactionStore();
-                    t = rts.get(refreshToken);
+                    try {
+                        t = rts.get(refreshToken);
+                    }catch(TransactionNotFoundException transactionNotFoundException){
+                        // fine. Look in the TX store later.
+                    }
                     break;
             }
             if (t != null) {
@@ -572,7 +577,12 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         if (t == null) {
             // if there is no such transaction found, then this is probably from a previous exchange. Go find it
             try {
-                t = OA2TokenUtils.getTransactionFromTX(oa2se, accessToken, debugger);
+                if(accessToken != null){
+                    t = OA2TokenUtils.getTransactionFromTX(oa2se, accessToken, debugger);
+                }
+                if(refreshToken != null){
+                    t = OA2TokenUtils.getTransactionFromTX(oa2se, refreshToken, debugger);
+                }
             } catch (OA2GeneralError oa2GeneralError) {
                 if (!(debugger instanceof ClientDebugUtil)) {
                     // last ditch effort to tell us what client is doing this.
@@ -1260,10 +1270,13 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
 
             }
         } catch (TransactionNotFoundException e) {
-            String message = "The refresh token \"" + oldRT.getToken() + "\" for client " + client.getIdentifierString() + " is not expired, but also was not found.";
-            debugger.info(this, message);
-            throw new OA2ATException(OA2Errors.INVALID_TOKEN, "The token \"" + oldRT.getToken() + "\" could not be associated with a pending flow",
-                    HttpStatus.SC_BAD_REQUEST, null);
+                t = OA2TokenUtils.getTransactionFromTX(oa2SE, oldRT, debugger);
+            if(t == null) {
+                String message = "The refresh token \"" + oldRT.getToken() + "\" for client " + client.getIdentifierString() + " is not expired, but also was not found.";
+                debugger.info(this, message);
+                throw new OA2ATException(OA2Errors.INVALID_TOKEN, "The token \"" + oldRT.getToken() + "\" could not be associated with a pending flow",
+                        HttpStatus.SC_BAD_REQUEST, null);
+            }
         }
         XMLMap backup = GenericStoreUtils.toXML(getTransactionStore(), t);
         if (debugger instanceof ClientDebugUtil) {

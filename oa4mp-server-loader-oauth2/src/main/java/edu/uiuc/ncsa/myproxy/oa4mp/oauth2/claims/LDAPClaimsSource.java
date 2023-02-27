@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.GroupHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.NCSAGroupHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.UnsupportedScopeException;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSourceConfiguration;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.LDAPConfiguration;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.LDAPConfigurationUtil;
 import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
@@ -41,12 +42,15 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
 
     public LDAPClaimsSource() {
     }
+
     public LDAPClaimsSource(QDLStem stem) {
         super(stem);
-      }
+    }
+
     public LDAPClaimsSource(QDLStem stem, OA2SE oa2SE) {
-         super(stem, oa2SE);
-       }
+        super(stem, oa2SE);
+    }
+
     public LDAPClaimsSource(LDAPConfiguration ldapConfiguration, MyLoggingFacade myLogger) {
         super();
         if (ldapConfiguration == null) {
@@ -658,9 +662,9 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
 
     @Override
     public void fromQDL(QDLStem arg) {
-        super.fromQDL(arg);
         LDAPConfiguration ldapCfg = new LDAPConfiguration();
         setConfiguration(ldapCfg);
+        super.fromQDL(arg);
         LDAPConfigurationUtil cUtil = new LDAPConfigurationUtil();
         ldapCfg.setSearchNameKey(arg.getString(CS_LDAP_SEARCH_NAME));
         ldapCfg.setServer(arg.getString(CS_LDAP_SERVER_ADDRESS));
@@ -825,5 +829,17 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
 
         }
         return stem;
+    }
+
+    /**
+     * Lazy initialization since it is assumed that this is needed to populate this from JSON or QDL.
+     * @return
+     */
+    @Override
+    public ClaimSourceConfiguration getConfiguration() {
+        if (configuration == null) {
+            configuration = new LDAPConfiguration();
+        }
+        return configuration;
     }
 }

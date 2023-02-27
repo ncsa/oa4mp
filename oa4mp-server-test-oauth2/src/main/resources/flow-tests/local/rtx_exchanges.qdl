@@ -1,0 +1,33 @@
+#! /usr/bin/env -S qdl-run
+
+/*
+   Tests the client with an old configuration and does repeated refresh and token
+   exchanges. This mimicks pretty rugged usages and checks that even over long
+   chains of refreshes and exchanges the endpoints continue to work.
+*/
+
+path := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests';
+if[path∉script_path()][script_path(path ~ script_path());];
+
+cfg.'id'  := 'localhost:scitokens'; // name of the configuration, not the id
+cfg.'idp'  := 'Github';
+cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';
+cfg.'description' :=  'Test multiple exchanges.';
+cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token endpoint
+user_id := 'http://cilogon.org/serverT/users/21340363';
+params.'authz' :=  {'scope': 'read: x.y: x.z write:'}; // initial request is query
+params.'token' :=  {'scope': 'read:/foo read:/home/' + user_id  + ' x.y:/abc/def/pqr write:/data/' + user_id + '/cluster/node47'};
+
+params.'exchange' :=  {'scope': 'read:/home/'+user_id  + // read
+                                ' write:/home/'+user_id + // write -- wrong, not granted
+                                ' read:/public/lsst/' + user_id + // ok
+                                ' x.y:/abc/def/pqr' + // works since it add component to path
+                                ' x.y:/abc/defpqr'}; // not granted since the path is wrong
+rc := script_load('driver.qdl', cfg., params.);
+tokens. := clc#access();
+while[i∈[;10]][
+ target := 0==mod(i, 3)?'-at':'-rt';
+ clc#exchange(target);
+];
+
+say('multiple exchanges: ok');

@@ -146,7 +146,7 @@ public abstract class StemConverter<V extends Identifiable> extends MapConverter
 
             for (Object s : c) {
                 if (s != null) {
-                    target.listAppend(s.toString());
+                    target.listAdd(s.toString());
                 }
             }
             stem.put(key + QDLStem.STEM_INDEX_MARKER, target);

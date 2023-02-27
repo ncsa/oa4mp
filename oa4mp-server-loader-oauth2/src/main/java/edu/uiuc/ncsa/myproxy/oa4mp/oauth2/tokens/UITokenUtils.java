@@ -25,9 +25,9 @@ import static edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims.JWT_ID;
  */
 public class UITokenUtils {
     /**
-     * Given the a string of some token (unknown format, e.g. from a header or
-     * passed in as a a parameter) return an access token.<br/><br/>
-     * <b>Note</b> this does not verify the token if its a JWT! This is because one usage
+     * Given a string of some token (unknown format, e.g. from a header or
+     * passed in as a parameter) return an access token.<br/><br/>
+     * <b>Note</b> this does not verify the token if it's a JWT! This is because one usage
      * pattern for {@link edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo.VirtualOrganization} is to get the token,
      * find the transaction, read the client, then determine the VO and check the keys.
      * This call lets you bootstrap that process.
@@ -41,7 +41,7 @@ public class UITokenUtils {
             return new AccessTokenImpl(URI.create(TokenUtils.b32DecodeToken(rawAT)));
         }
         try {
-            // see if its a JWT
+            // see if it's a JWT
             JSONObject[] sciTokenJWT = JWTUtil2.readJWT(rawAT); // cannot verify now
             JSONObject sciToken = sciTokenJWT[JWTUtil2.PAYLOAD_INDEX];
             if (sciToken.containsKey(JWT_ID)) {
@@ -65,7 +65,7 @@ public class UITokenUtils {
             return new RefreshTokenImpl(URI.create(TokenUtils.b32DecodeToken(rawRT)));
         }
         try {
-            // see if its a JWT
+            // see if it's a JWT
             JSONObject[] sciTokenJWT = JWTUtil2.readJWT(rawRT); // cannot verify now
             JSONObject sciToken = sciTokenJWT[JWTUtil2.PAYLOAD_INDEX];
             if (sciToken.containsKey(JWT_ID)) {

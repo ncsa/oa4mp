@@ -81,6 +81,9 @@ public class BasicClaimsSourceImpl implements ClaimSource {
 
     @Override
     public ClaimSourceConfiguration getConfiguration() {
+        if(configuration == null){
+            configuration = new ClaimSourceConfiguration();
+        }
         return configuration;
     }
 

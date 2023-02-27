@@ -70,8 +70,6 @@ define[test(tokens., expected_scopes., user_id)][
 
 rc := script_load('driver.qdl', cfg., params.);
 tokens. := clc#access();
-say(display(tokens.'access_token'));
-say(display(tokens.'refresh_token'));
 test(tokens., expected_token_scopes., user_id);
 issued_at := claims().'iat';
 tokens. := refresh();

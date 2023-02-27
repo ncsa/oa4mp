@@ -3,7 +3,14 @@
 // will be found.
 path := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests';
 script_path(path ~ script_path());
-
+say('**** Flow test suite for OA4MP. ****');
+say('This will do several local tests for various modes of operation.');
+say('In each case, read carefully what is on the screen and do what it says.');
+say('Have your browser handy, since you will need to log in with the requested IDP repeatedly. ');
+say('This suite does take a bit to run, but it is quite a thorough test. If testing for an OA4MP release,');
+say('all tests MUST pass');
+say('There are also client management tests in the cm-tests directory to run.');
+say('****\n');
 test.:=(path + '/local/') + ['cil1550.qdl',
                              'file_claims.qdl',
                              'fnal-0.qdl',
@@ -13,14 +20,17 @@ test.:=(path + '/local/') + ['cil1550.qdl',
                              'no_config.qdl',
                              'test-template.qdl',
                              'prototype.qdl',
+                             'rtx_refreshes.qdl',
+                             'rtx_exchanges.qdl',
+                             'rtx.qdl',
                              'scitokens.qdl',
                              'scitokens2.qdl',
                              'test_ncsa.qdl',
                              'test_qdl.qdl',
                              'vo_test.qdl'];
-say('Running all tests. Remember to follow the instructions to repeatedly login using the specified IDP.');
 counter.'pass' := 0;
 counter.'fail' := 0;
+failures. := [];
 while[x∈test.][
 try[
   script_load(x);
@@ -30,9 +40,13 @@ try[
      say('error running script ' + x);
      say('error message:' + error_message);
     counter.'fail' += 1;
+    failures. := failures. ~ x;
   ];
 ];
 
 say(counter.'pass' + ' passed');
 say(counter.'fail' + ' failed');
-say('total tests run =' + (counter.'pass' + counter.'fail'));
+say('total tests run: ' + (counter.'pass' + counter.'fail'));
+if[0 < size(failures.)][
+  say('failed tests = ' + to_string(failures.));
+];

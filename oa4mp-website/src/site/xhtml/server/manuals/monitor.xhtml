@@ -21,14 +21,10 @@
     <a href="../../client/index.html">configuring a client</a> still works.
 </p>
 
-<p>To get a functional monitor, you
-    get the <a href="http://svn.code.sf.net/p/cilogon/code/tags/latest/server/oa4mp-monitor.jar">oa4mp-monitor.jar</a>
-    and the
-    <a href="http://svn.code.sf.net/p/cilogon/code/tags/latest/server/oa4mp-monitor">oa4mp-monitor script</a>.
-    For  <span style="background-color: #ff6600;">OAuth 2.0</span> you would get
-    <a href="http://svn.code.sf.net/p/cilogon/code/tags/latest/server/oa2-monitor.jar">oa2-monitor.jar</a>
-    with the script at <a href="http://svn.code.sf.net/p/cilogon/code/tags/latest/server/oa2-monitor">oa2-monitor</a>
-    The default setup is like any other <a href="http://grid.ncsa.illinois.edu/myproxy/oauth/server/manuals/cli.html">command
+<p>To get a functional monitor, you  would get
+    <a href="https://github.com/ncsa/OA4MP/releases/latest/download/oa2-monitor.jar">oa2-monitor.jar</a>
+    with the script at <a href="https://github.com/ncsa/OA4MP/releases/latest/download/oa2-monitor">oa2-monitor</a>
+    The default setup is like any other <a href="../manuals/cli.html">command
         line tool</a>
     with an identical directory layout and it will try to use the configuration found in the default location
     of <code>/opt/oa4mp/etc/admin-cfg.xml</code>.
@@ -38,50 +34,18 @@
     Steps to set up a monitor are
 
     1. Register it with a server
-    <a href="http://grid.ncsa.illinois.edu/myproxy/oauth/client/manuals/registering-with-a-server.html">OAuth 1.0a based servers</a>
-    or, <a href="http://grid.ncsa.illinois.edu/myproxy/oauth/client/manuals/registering-with-an-oauth2-server.html">
+    <a href="../../client/manuals/registering-with-a-server.html">OAuth 1.0a based servers</a>
+    or, <a href="../../client/manuals/registering-with-an-oauth2-server.html">
     <span style="background-color: #ff6600;">OAuth 2.0</span> based servers. </a>
     be sure to follow any and all instructions in given since the two mehtods of registration are different.
     <br/><br/>
     2. Write a configuration file. This should have
-    <a href="http://grid.ncsa.illinois.edu/myproxy/oauth/server/configuration/server-email.html">mail configured</a>.
-    A sample OAuth 1.0a configuration would be
-</p>
-<pre>
-&lt;config&gt;
-   &lt;client name="my-monitor"&gt;
-      &lt;id&gt;myproxy:oa4mp,2012:/your/id/goes/here&lt;/id&gt;
-      &lt;serviceUri&gt;http://your.server.org/oauth/&lt;/serviceUri&gt;
-      &lt;callbackUri&gt;https://your.server.org/client/ready&lt;/callbackUri&gt;
-      &lt;lifetime&gt;864000&lt;/lifetime&gt;
-      &lt;publicKeyFile&gt;/path/to/public-key.pem&lt;/publicKeyFile&gt;
-      &lt;privateKeyFile&gt;/path/to/private-key.pem&lt;/privateKeyFile&gt;
-      &lt;mail enabled="true"
-            useSSL="true"
-            username="your-username"
-            password="your password"
-            debug="false"
-            server="your.mail.server"
-            recipients="email-address.of.recipient"&gt;
-         &lt;messageTemplate&gt;/path/to/monitor-message.template&lt;/messageTemplate&gt;
-         &lt;subjectTemplate&gt;/path/to/monitor-subject.template&lt;/subjectTemplate&gt;
-       &lt;/mail&gt;
-       &lt;logging
-            logFileName="/path/to/logs/oa4mp-monitor.xml"
-            logName="oa4mp"
-            logSize="100000"
-            logFileCount="2"
-            debug="true"/&gt;
-   &lt;/client&gt;
-&lt;/config&gt;
-</pre>
+    <a href="../configuration/server-email.html">mail configured</a>.
 
 <p>
-    A quick comment about the callback: the server will not get far enough in the delegation request to
-    actually every use this, however, a url that
-    has https as its protocol is a requirement from the server. For <span style="background-color: #ff6600;">OAuth 2.0</span>
-    based servers, the callback supplied <b>must</b> match one of the ones given at registration time or the initial
-    request will be rejected.
+    A quick comment about the callback: The callback supplied <b>must</b> match one of the ones given at
+    registration time or the initial request will be rejected. The comparison is done as strings as per the specification,
+    so logically equivalent callbacks (such as having parameters switched) will fail.
 
     3. Run it once from the command line to see if it works by using the oa4mp-monitor script.
     <br/><br/>

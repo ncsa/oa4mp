@@ -33,7 +33,7 @@ public class TemplateSubsitutionQDLUtil implements QDLFunction {
         QDLStem arg = null;
         if(objects[0] instanceof String){
             arg = new QDLStem();
-            arg.listAppend(objects[0]);
+            arg.listAdd(objects[0]);
         }else if(objects[0] instanceof QDLStem){
             arg = (QDLStem) objects[0];
         }

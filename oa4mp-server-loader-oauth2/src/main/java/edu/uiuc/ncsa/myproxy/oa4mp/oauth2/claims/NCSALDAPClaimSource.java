@@ -25,10 +25,12 @@ public class NCSALDAPClaimSource extends LDAPClaimsSource {
     }
     public NCSALDAPClaimSource(QDLStem stem) {
         super(stem);
+        init();
     }
 
     public NCSALDAPClaimSource(QDLStem stem, OA2SE oa2SE) {
          super(stem, oa2SE);
+         init();
      }
     /**
      * NOTE that his uses the search filter attribute == the name of the claim to look up and

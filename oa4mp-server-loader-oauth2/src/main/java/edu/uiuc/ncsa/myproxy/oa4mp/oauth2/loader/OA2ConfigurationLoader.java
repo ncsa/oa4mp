@@ -813,7 +813,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         if (rtGracePeriod == REFRESH_TOKEN_GRACE_PERIOD_NOT_CONFIGURED) {
             String x = getFirstAttribute(cn, REFRESH_TOKEN_GRACE_PERIOD_TAG);
             if (isTrivial(x)) {
-                rtGracePeriod = REFRESH_TOKEN_GRACE_PERIOD_DISABLED;
+                rtGracePeriod = REFRESH_TOKEN_GRACE_PERIOD_DEFAULT; // set the grace period to be the default
             } else {
                 try {
                     rtGracePeriod = ConfigUtil.getValueSecsOrMillis(x, true);

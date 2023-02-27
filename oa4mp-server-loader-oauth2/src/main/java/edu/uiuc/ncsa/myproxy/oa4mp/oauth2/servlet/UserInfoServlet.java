@@ -41,11 +41,23 @@ public class UserInfoServlet extends BearerTokenServlet {
     protected void doIt(HttpServletRequest request, HttpServletResponse response) throws Throwable {
         // The access token is sent in the authorization header and should look like
         // Bearer oa4mp:...
-        AccessTokenImpl at = UITokenUtils.getAT(getRawAT(request));
+        AccessTokenImpl at = null;
+        try {
+             at = UITokenUtils.getAT(getRawAT(request));
+        }catch(Throwable t){
+            // CIL-1638 as per spec if complete garbage is given for the AT, add header and set status
+            // This blows up before there is any change to start handling the error in another way.
+            response.setHeader("WWW-Authenticate", "Bearer realm=\"oa4mp\", error=\"invalid_token\"");
+            response.setStatus(HttpStatus.SC_UNAUTHORIZED);
+            return;
+        }
         TokenManagerServlet.State state = new TokenManagerServlet.State();
         OA2ServiceTransaction transaction = findTransaction(at, state);
         // Fix for CIL-1124
         if(!transaction.isAccessTokenValid()){
+            // CIL-1638, https://www.rfc-editor.org/rfc/rfc6750 Errors relating to the bearer token require this header.
+            response.setHeader("WWW-Authenticate", "Bearer realm=\"oa4mp\", error=\"invalid_token\"");
+
             throw new OA2RedirectableError(OA2Errors.ACCESS_DENIED,
                      "access denied", HttpStatus.SC_UNAUTHORIZED,
                      transaction.getRequestState(),

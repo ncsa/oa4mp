@@ -434,7 +434,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
             }
             if (txr.hasResources()) {
                 for (URI uri : txr.getResource()) {
-                    txRes.listAppend(uri.toString());
+                    txRes.listAdd(uri.toString());
                 }
             }
         }

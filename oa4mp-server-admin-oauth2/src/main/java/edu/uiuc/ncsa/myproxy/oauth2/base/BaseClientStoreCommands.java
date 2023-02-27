@@ -626,6 +626,10 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
         String hash = DigestUtils.sha1Hex(secret);
         client.setSecret(hash);
         getStore().save(client);
+        if(-1 < secret.indexOf(" ")){
+            // If there are blanks, put quotes around it.
+            secret = "\"" + secret + "\"";
+        }
         say("password : " + secret);
         say("    hash : " + hash);
 

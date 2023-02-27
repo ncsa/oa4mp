@@ -1,0 +1,52 @@
+#! /usr/bin/env -S qdl-run
+
+/*
+   Tests the client with an old configuration and does repeated refresh and token
+   exchanges. This mimicks pretty rugged usages and checks that even over long
+   chains of refreshes and exchanges the endpoints continue to work.
+*/
+
+path := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests';
+if[path∉script_path()][script_path(path ~ script_path());];
+
+cfg.'id'  := 'localhost:scitokens'; // name of the configuration, not the id
+cfg.'idp'  := 'Github';
+cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';
+cfg.'description' :=  'Test multiple exchanges and refreshes.';
+cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token endpoint
+user_id := 'http://cilogon.org/serverT/users/21340363';
+
+/*cfg.'id'  := 'localhost:cil1550'; // name of the configuration, not the id
+cfg.'idp'  := 'NCSA';
+cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';
+cfg.'description' :=  'Test with Tiger Dev Functor script. This tests that the claim source serialization works.';
+cfg.'flow_type' := 'uri'; */// Note to use df you need to set param for the token endpoint
+
+rc := script_load('driver.qdl', cfg.);
+tokens. := clc#access();
+// This emulates a service that is running for a long time and does several exchanges followed by a refresh now
+// and then to get user information.
+clc#refresh();
+clc#refresh();
+clc#refresh();
+clc#refresh();
+clc#exchange();
+clc#exchange();
+clc#exchange();
+clc#exchange();
+clc#exchange();
+clc#exchange();
+clc#exchange('-rt');
+clc#refresh();
+clc#exchange();
+clc#exchange('-rt'); 
+clc#exchange();
+clc#exchange('-rt');
+clc#exchange('-rt');
+clc#exchange('-rt');
+clc#refresh();
+clc#exchange();
+clc#exchange();
+clc#refresh();
+
+say('multiple exchange and refresh: ok');

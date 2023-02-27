@@ -78,7 +78,7 @@ public class PermissionStoreFacade extends StoreFacade {
 
             QDLStem stem = new QDLStem();
             for (Identifier id : ids) {
-                stem.listAppend(id.toString());
+                stem.listAdd(id.toString());
             }
             return stem;
         }
@@ -114,7 +114,7 @@ public class PermissionStoreFacade extends StoreFacade {
 
             QDLStem stem = new QDLStem();
             for (Identifier id : ids) {
-                stem.listAppend(id.toString());
+                stem.listAdd(id.toString());
             }
             return stem;
         }

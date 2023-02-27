@@ -87,9 +87,23 @@ public class OA2TokenUtils {
 
         OA2ServiceTransaction t;
         t = (OA2ServiceTransaction) oa2se.getTransactionStore().get(accessToken);
+        if (t == null) {
+            t = getTransactionFromTX(oa2se, accessToken.getJti(), debugger);
+        }
 
 
-        if (t != null) {
+        if (t == null) {
+            if (debugger instanceof ClientDebugUtil) {
+                // CIL-1088. Don't fill up log with error message, print out small error message
+                // when no transaction found with any client id. This lets us
+                // track down malfunctioning clients and inform their owners.
+                ClientDebugUtil clientDebugUtil = (ClientDebugUtil) debugger;
+                oa2se.getMyLogger().info("client " + clientDebugUtil.getClient().getIdentifierString() + ",  transaction not found for \"" + accessToken + "\"");
+            }
+            debugger.trace(OA2TokenUtils.class, "Transaction not found for \"" + accessToken.getJti() + "\"");
+            throw new OA2ATException(OA2Errors.INVALID_GRANT, "invalid access token");
+
+        } else {
             // Must present a valid token to get one.
             if (!t.isAccessTokenValid()) {
                 debugger.info(OA2TokenUtils.class, "Access token invalid: " + t.summary());
@@ -143,6 +157,14 @@ public class OA2TokenUtils {
             t = zzz.get(refreshToken);
         } catch (TransactionNotFoundException tnfx) {
             // No such token found for the refresh token.
+            // check the RTX store
+            t = getTransactionFromTX(oa2SE, refreshToken.getJti(), debugger);
+        } catch (Throwable tt) {
+            // This is serious. It means that there was a problem getting the transaction vs. the transaction did not exist.
+            debugger.error(OA2TokenUtils.class, "error getting refresh token:" + refreshToken.getJti() + " message:" + tt.getMessage());
+            throw new OA2ATException(OA2Errors.INVALID_GRANT, "invalid refresh token");
+        }
+        if (t == null) {
             if (debugger instanceof ClientDebugUtil) {
                 // CIL-1088. Don't fill up log with error message, print out small error message
                 // when no transaction found with any client id. This lets us
@@ -152,12 +174,8 @@ public class OA2TokenUtils {
             }
             debugger.trace(OA2TokenUtils.class, "Transaction not found for \"" + refreshToken.getJti() + "\"");
             throw new OA2ATException(OA2Errors.INVALID_GRANT, "invalid refresh token");
-        } catch (Throwable tt) {
-            // This is serious. It means that there was a problem getting the transaction vs. the transaction did not exist.
-            debugger.error(OA2TokenUtils.class, "error getting refresh token:" + refreshToken.getJti() + " message:" + tt.getMessage());
-            throw new OA2ATException(OA2Errors.INVALID_GRANT, "invalid refresh token");
-        }
-        if (t != null) {
+
+        } else {
             // Must present a valid token to get one.
             if (!t.isRefreshTokenValid()) {
                 //MyProxyDelegationServlet.createDebugger(t.getOA2Client()).trace(OA2TokenUtils.class, "invalid refresh token \"" + refreshToken.getJti() + "\"");
@@ -197,7 +215,7 @@ public class OA2TokenUtils {
         return getTransactionFromTX(oa2se, refreshToken.getJti(), debugger);
     }
 
-    protected static OA2ServiceTransaction getTransactionFromTX(OA2SE oa2se, URI jti, MetaDebugUtil debugger) throws IOException {
+    protected static OA2ServiceTransaction getTransactionFromTX(OA2SE oa2se, URI jti, MetaDebugUtil debugger) {
         TXRecord txRecord = (TXRecord) oa2se.getTxStore().get(BasicIdentifier.newID(jti));
         if (txRecord == null) {
             if (debugger == null) {

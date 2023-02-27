@@ -41,7 +41,11 @@ say('*** LIGO -- got a robot');
        robot_name := robots.0 - robot_caput;
 say('*** LIGO -- name =' + robot_name);
        if[
-        'Services:Robots:' + robot_name + ':SciTokens:authorized' ∈ attributes.'isMemberOf'
+/*
+          Check for membership of "gw-astronomy:KAGRA-LIGO:Robots:<robot-name>:SciTokens:authorized" (in gw-astronomy LDAP)
+              in addition to "Services:Robots:<robot-name>:SciTokens:authorized" (in LIGO LDAP).
+*/      true ∈ ([ 'gw-astronomy:KAGRA-LIGO:Robots:' + robot_name + ':SciTokens:authorized',
+        'Services:Robots:' + robot_name + ':SciTokens:authorized'] ∈ attributes.'isMemberOf')
        ][
 say('*** LIGO -- in robots group');
                   moniker := robot_name + '@ligo.org';

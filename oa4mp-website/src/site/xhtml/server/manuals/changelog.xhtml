@@ -10,8 +10,25 @@
 <body class="composite">
 <!--#include virtual="../../header.html" -->
 <p>Changes to the OA4MP server by version.</p>
+<h2>5.2.9</h2>
+<p>Release date 2023-03-07</p>
+<ul>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-1266">CIL-1266</a>: Allow grace period on refresh.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-1379">CIL-1379</a>: Revision of documentation for using self-signed cert with Tomcat 9+.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-1604">CIL-1604</a>: Incorporate various fixes from the RCAuth group.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-1608">CIL-1608</a>: Store the id token in the client's asset, rather than forcing the client to reget it.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-1625">CIL-1625</a>: Expired auth grant giving wrong error message.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-1629">CIL-1629</a>: Allow more units in configuration: hours and days are now supported.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-1639">CIL-1639</a>: Edge case that the user info endpoint was
+        not returning the right status code or header if a completely bogus bearer token was used.</li>
+    <li><a href="https://github.com/ncsa/qdl/issues/6">QDL Issue 6</a>: Document command line switches.</li>
+    <li><a href="https://github.com/ncsa/qdl/issues/8">QDL Issue 8</a>: Add a fork function. This is not permitted in server mode.</li>
+    <li><a href="https://github.com/ncsa/qdl/issues/9">QDL Issue 9</a>: Add a sleep(ms) function. Mostly this is an iad to testing.</li>
+    <li><a href="https://github.com/ncsa/qdl/issues/10">QDL Issue 10</a>: add optional module supporting various formats such as XML, YAML, HOCON.</li>
+
+</ul>
 <h2>5.2.8.3</h2>
-<p>Release date 2022-11-04</p>
+<p>Release date 2023-02-07</p>
 <ul>
     <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-627">CIL-627</a>: Migrate to Java 11, split off MyProxy code.</li>
     <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-630">CIL-630</a>: Retire CILogon archived user table.</li>

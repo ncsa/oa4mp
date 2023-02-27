@@ -444,6 +444,13 @@ but does not update the client.
 
 See also: password, create_hash]]>
     </body>
+    <example>
+        <![CDATA[Resetting the password to a specific one:
+
+  clients> reset_secret -new "how much wood can a woodchuck chuck"
+  password : "how much wood can a woodchuck chuck"
+      hash : c8ef09e75a086203af876d3ba5c6cd7ac25091c1]]>
+    </example>
     </entry>
 
     <entry id="about">

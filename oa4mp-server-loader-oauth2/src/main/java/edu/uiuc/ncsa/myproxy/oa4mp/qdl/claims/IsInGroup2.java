@@ -65,7 +65,7 @@ public class IsInGroup2 implements QDLFunction {
         boolean isScalar = objects[0] instanceof String;
         if (isScalar) {
             groupNames = new QDLStem();
-            groupNames.listAppend(objects[0]);
+            groupNames.listAdd(objects[0]);
 
         } else {
             groupNames = (QDLStem) objects[0];

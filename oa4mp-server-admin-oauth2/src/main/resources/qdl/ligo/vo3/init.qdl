@@ -79,6 +79,14 @@ is_igwn := script_args()==1?script_args(0)=='igwn':false;
 
     if[is_igwn][
     // These are documented in https://git.ligo.org/computing/igwnscitokenscopes/-/blob/main/SciTokenScopes.json
+    /*
+
+    Don't require use of the LIGO IdP. Query LDAP LDAP and gw-astronomy LDAP for the uid, since the user may be in either LDAP.
+    Check for membership of "gw-astronomy:KAGRA-LIGO:Robots:<robot-name>:SciTokens:authorized" (in gw-astronomy LDAP)
+       in addition to "Services:Robots:<robot-name>:SciTokens:authorized" (in LIGO LDAP).
+    The corresponding Robot entry will still always be in LIGO LDAP with "ou=keytab,ou=robot,dc=ligo,dc=org" searchbase.
+  */
+
 
                                                   all_audience. := ['ANY'];
                             ζ.'gw-astronomy:KAGRA-LIGO:members' := ['read:/frames','dqsegdb.read', 'gracedb.read'];
