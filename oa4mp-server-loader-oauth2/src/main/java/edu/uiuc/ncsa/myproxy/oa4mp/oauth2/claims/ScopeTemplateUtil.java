@@ -180,7 +180,7 @@ public class ScopeTemplateUtil {
             }
 
         } catch (Throwable t) {
-            t.printStackTrace();
+            // CIL-1646 do NOT just print a stack trace here!
             return null;
         }
         if (!isQuery) {
