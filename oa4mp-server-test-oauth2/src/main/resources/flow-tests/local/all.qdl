@@ -47,6 +47,10 @@ try[
 say(counter.'pass' + ' passed');
 say(counter.'fail' + ' failed');
 say('total tests run: ' + (counter.'pass' + counter.'fail'));
+// hand back a nice list
 if[0 < size(failures.)][
-  say('failed tests = ' + to_string(failures.));
+  say('failed tests :' );
+  while[x ∈ failures.][
+     say('   ' + x);
+  ];
 ];

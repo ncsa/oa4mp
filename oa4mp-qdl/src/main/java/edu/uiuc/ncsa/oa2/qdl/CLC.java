@@ -151,20 +151,16 @@ public class CLC implements QDLModuleMetaClass {
         public Object evaluate(Object[] objects, State state) {
             QDLStem g = new QDLStem();
             try {
-//                if (objects.length == 0) {
                 clcCommands.grant(argsToInputLine(getName(), objects));
-                //              }
-/*
-                if (objects.length == 1) {
-                    clcCommands.grant(new InputLine(DUMMY_ARG + " " + objects[0]));
-                }
-
-*/
-                g.fromJSON(clcCommands.getGrant().toJSON());
             } catch (Exception e) {
                 state.getLogger().error("error getting grant", e);
                 handleException(e);
             }
+            if(clcCommands.getGrant() == null){
+                throw new QDLException("unable to get grant");
+            }
+            g.fromJSON(clcCommands.getGrant().toJSON());
+
             return g;
         }
 

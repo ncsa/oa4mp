@@ -45,6 +45,18 @@ flow_ok := 1;
     out :=  scan('authorization URI is in clipboard. Login, copy callback uri to clipboard. Hit any key when done, q to abort.');
     flow_ok := out=='q'?-1:0;
     if[flow_ok != 0][return(flow_ok);];
-     grant();
+    grant();
+/*    while[true][
+    try[
+       grant();
+       out :=  scan('put callback uri in clipboard and hit any key when done, q to abort.');
+       flow_ok := out=='q'?-1:0;
+       if[flow_ok != 0][return(flow_ok);];
+       return(flow_ok);
+     ]catch[
+      say('uh-oh that didn\'t work:' + error_message);
+     ];  //end catch
+     ]; // end while */
    ]; //end auth code flow
-return(flow_ok);
+    return(flow_ok);
+
