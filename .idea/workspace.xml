@@ -12,6 +12,11 @@
   <component name="ChangeListManager">
     <list default="true" id="eb414374-02ed-40a4-9689-d382715049b9" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-qdl/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-qdl/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/cm/oidc_cm/OIDCCMServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/cm/oidc_cm/OIDCCMServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-test-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-test-oauth2/buildNumber.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -275,7 +280,7 @@
       <updated>1675711590313</updated>
       <workItem from="1675711591797" duration="35967000" />
       <workItem from="1675946561261" duration="37648000" />
-      <workItem from="1677181831620" duration="35019000" />
+      <workItem from="1677181831620" duration="43092000" />
     </task>
     <task id="LOCAL-00001" summary="Migrated a bunch of static utilities into classes.">
       <created>1675892170361</created>
@@ -298,7 +303,35 @@
       <option name="project" value="LOCAL" />
       <updated>1677611359363</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="5.2.9.0 checkin">
+      <created>1677614384737</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1677614384737</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Typo in html fixed.">
+      <created>1677618847954</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1677618847955</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Typo in html fixed.">
+      <created>1677619328769</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1677619328769</updated>
+    </task>
+    <task id="LOCAL-00007" summary="CIL-1646">
+      <created>1677624558367</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1677624558367</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -312,7 +345,10 @@
     <MESSAGE value="Migrated a bunch of static utilities into classes." />
     <MESSAGE value="CIL-1389 (updated documentation) and CIL-1266 testing improvements. Addressed a few niggling point." />
     <MESSAGE value="Last minute tweak to CLC (for testing, not server) and test scripts for more robust error recovery." />
-    <option name="LAST_COMMIT_MESSAGE" value="Last minute tweak to CLC (for testing, not server) and test scripts for more robust error recovery." />
+    <MESSAGE value="5.2.9.0 checkin" />
+    <MESSAGE value="Typo in html fixed." />
+    <MESSAGE value="CIL-1646" />
+    <option name="LAST_COMMIT_MESSAGE" value="CIL-1646" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
