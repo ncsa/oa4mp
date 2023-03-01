@@ -787,6 +787,8 @@ public class OIDCCMServlet extends EnvServlet {
         getOA2SE().getClientApprovalStore().save(approval);
         // Github 84 https://github.com/ncsa/OA4MP/issues/84
         writeCreateOK(httpServletResponse, jsonResp);
+        // CIL-1597: CILogon is required to return SC_OK, not SC_CREATED
+        // writeOK(httpServletResponse, jsonResp);
     }
 
     private void writeOK(HttpServletResponse httpServletResponse, JSON resp) throws IOException {
