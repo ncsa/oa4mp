@@ -6,7 +6,6 @@ import edu.uiuc.ncsa.oa4mp.delegation.common.storage.TransactionStore;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.SystemEvaluator;
-import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
 import edu.uiuc.ncsa.qdl.expressions.Dyad;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
@@ -17,7 +16,6 @@ import edu.uiuc.ncsa.qdl.variables.QDLNull;
 import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
-import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.*;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.util.configuration.ConfigUtil;
@@ -101,16 +99,16 @@ public class StoreFacade implements QDLModuleMetaClass {
         }
     }
 
-    protected void init(String configFile, String cfgName) {
-        try {
+    protected void init(String configFile, String cfgName) throws Throwable {
+//        try {
             setConfigurationNode(ConfigUtil.findConfiguration(configFile, cfgName, "service"));
-        } catch (Exception x) {
+  /*      } catch (Exception x) {
             if (x instanceof RuntimeException) {
                 throw (RuntimeException) x;
             }
             throw new GeneralException("Error initializing client management:" + x.getMessage(), x);
         }
-        initCalled = true;
+  */      initCalled = true;
     }
 
 
@@ -145,7 +143,7 @@ public class StoreFacade implements QDLModuleMetaClass {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public Object evaluate(Object[] objects, State state) throws Throwable {
             boolean verboseOn = false;
             if (objects.length == 1) {
                 if (!(objects[0] instanceof QDLStem)) {
@@ -221,7 +219,7 @@ public class StoreFacade implements QDLModuleMetaClass {
         }
     }
 
-    protected void doSetup(boolean verboseOn) {
+    protected void doSetup(boolean verboseOn) throws Throwable {
         if (isTrivial(file) || isTrivial(cfgName) || isTrivial(storeType)) {
             // case is that init is not called. This should be benign at this point.
             return;
@@ -240,18 +238,11 @@ public class StoreFacade implements QDLModuleMetaClass {
             System.setOut(out);
             System.setErr(err);
         }
-        try {
             setStoreAccessor(createAccessor(storeType));
-        } catch (Exception x) {
-            if (x instanceof RuntimeException) {
-                throw (RuntimeException) x;
-            }
-            // If loading the store blows up,
-            throw new QDLException("Error loading store: for file " + file + ", config " + cfgName + ", type " + storeType);
-        }
+
         if (storeAccessor == null) {
             // If there is no such store.
-            throw new QDLException("unsupported type for store '" + storeType + "': config file =" + file + ", config name= " + cfgName);
+            throw new RuntimeException("unsupported type for store '" + storeType + "': config file =" + file + ", config name= " + cfgName);
         }
     }
 
@@ -290,7 +281,7 @@ public class StoreFacade implements QDLModuleMetaClass {
                 storeAccessor.setMapConverter(new TXRStemMC(getEnvironment().getTxStore().getMapConverter(), getEnvironment().getClientStore()));
                 break;
             default:
-                throw new QDLException("unsupported store '" + storeType + "'");
+                throw new IllegalArgumentException("unsupported store '" + storeType + "'");
 
         }
         return storeAccessor;
@@ -314,12 +305,12 @@ public class StoreFacade implements QDLModuleMetaClass {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public Object evaluate(Object[] objects, State state){
             if (objects.length != 1) {
-                throw new IllegalArgumentException("Error: " + getName() + " requires a single argument.");
+                throw new IllegalArgumentException(getName() + " requires a single argument.");
             }
             if (!(objects[0] instanceof QDLStem)) {
-                throw new IllegalArgumentException("Error: " + getName() + " requires a stem argument.");
+                throw new IllegalArgumentException(getName() + " requires a stem argument.");
             }
             QDLStem stem = (QDLStem) objects[0];
             if (stem.isEmpty()) {
@@ -332,6 +323,7 @@ public class StoreFacade implements QDLModuleMetaClass {
             QDLStem out = new QDLStem();
             for (Object key : stem.keySet()) {
                 try {
+                    // Skip items that fail, replacing them with nulls
                     out.putLongOrString(key, getStoreAccessor().toXML((QDLStem) stem.get(key)));
                 } catch (Throwable t) {
                     getLogger().warn("Could not convert object to XML:" + t.getMessage(), t);
@@ -464,18 +456,13 @@ public class StoreFacade implements QDLModuleMetaClass {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public Object evaluate(Object[] objects, State state) throws Throwable{
             checkInit();
-            try {
                 QDLStem QDLStem = getStoreAccessor().get(BasicIdentifier.newID(objects[0].toString()));
                 if (QDLStem.isEmpty()) {
                     return QDLNull.getInstance();
                 }
                 return QDLStem;
-            } catch (Throwable t) {
-                t.printStackTrace();
-                throw new QDLException("Error: Could not find the object with id \"" + objects[0].toString() + "\"");
-            }
         }
 
         @Override
@@ -632,11 +619,7 @@ public class StoreFacade implements QDLModuleMetaClass {
                     throw new IllegalArgumentException("The first argument of " + SIZE_NAME + ", if present, must be a boolean.");
                 }
             }
-            try {
                 return getStoreAccessor().size(includeVersions);
-            } catch (Exception e) {
-                throw new QDLException("Error: COuld not determine the size of the store:" + e.getMessage(), e);
-            }
         }
 
 
@@ -733,11 +716,7 @@ public class StoreFacade implements QDLModuleMetaClass {
                 throw new IllegalArgumentException("Error: argument must be a string for " + REMOVE_NAME);
             }
 
-            try {
                 return getStoreAccessor().remove(BasicIdentifier.newID(id));
-            } catch (Throwable e) {
-                throw new QDLException("Error: Could not remove object with id " + objects[0] + ":" + e.getMessage());
-            }
         }
 
 
@@ -1145,12 +1124,7 @@ public class StoreFacade implements QDLModuleMetaClass {
         if (!(obj instanceof String)) {
             return null;
         }
-        try {
             return BasicIdentifier.newID(URI.create(obj.toString()));
-        } catch (Throwable t) {
-            logger.warn("Could not make identifier for '" + obj + "'", t);
-        }
-        return null;
     }
 
     protected String VERSION_RESTORE_NAME = "v_restore";

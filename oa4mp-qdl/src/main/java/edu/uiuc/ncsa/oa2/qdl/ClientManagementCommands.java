@@ -5,13 +5,11 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2ConfigurationLoader;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientConverter;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval;
-import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
 import edu.uiuc.ncsa.qdl.extensions.QDLModuleMetaClass;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.security.core.Identifier;
-import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
@@ -70,16 +68,8 @@ public class ClientManagementCommands implements QDLModuleMetaClass {
         }
     }
 
-    protected void init(String configFile, String cfgName) {
-
-        try {
+    protected void init(String configFile, String cfgName) throws Throwable {
             setConfigurationNode(ConfigUtil.findConfiguration(configFile, cfgName, "service"));
-        } catch (Exception x) {
-            if (x instanceof RuntimeException) {
-                throw (RuntimeException) x;
-            }
-            throw new GeneralException("Error initializing client management:" + x.getMessage(), x);
-        }
         initCalled = true;
     }
 
@@ -102,7 +92,7 @@ public class ClientManagementCommands implements QDLModuleMetaClass {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public Object evaluate(Object[] objects, State state) throws Throwable {
             init(objects[0].toString(), objects[1].toString());
             return true;
         }
@@ -132,14 +122,16 @@ public class ClientManagementCommands implements QDLModuleMetaClass {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public Object evaluate(Object[] objects, State state) throws Throwable {
             checkInit();
-            try {
+//            try {
                 OA2Client client = (OA2Client) getEnvironment().getClientStore().get(BasicIdentifier.newID(objects[0].toString()));
                 return toStem(client);
+/*
             } catch (Throwable t) {
                 throw new QDLException("Error: Could not find the client with id \"" + objects[0].toString() + "\"");
             }
+*/
         }
 
 
@@ -189,7 +181,7 @@ public class ClientManagementCommands implements QDLModuleMetaClass {
         //  client. := cm#read('${id}')
         // cm#save(client.)
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public Object evaluate(Object[] objects, State state) throws Throwable{
             checkInit();
             if (!(objects[0] instanceof QDLStem)) {
                 throw new IllegalArgumentException("Error: The argument must be a stem variable");
@@ -202,7 +194,7 @@ public class ClientManagementCommands implements QDLModuleMetaClass {
 
             JSONObject json = (JSONObject) jj;
             // So reverse the process from the read function
-            try {
+            //try {
                 JSONObject output = new JSONObject();
                 //      output.put("cfg", json.getJSONObject("cfg"));
                 //     json.remove("cfg");
@@ -210,12 +202,12 @@ public class ClientManagementCommands implements QDLModuleMetaClass {
                 OA2ClientConverter converter = (OA2ClientConverter) getEnvironment().getClientStore().getMapConverter();
                 OA2Client client = converter.fromJSON(output);
                 getEnvironment().getClientStore().save(client);
-            } catch (Throwable t) {
+            /*} catch (Throwable t) {
                 if (t instanceof RuntimeException) {
                     throw (RuntimeException) t;
                 }
                 throw new QDLException("Error: could not save the client:" + t.getMessage(), t);
-            }
+            }*/
             return Boolean.TRUE;
         }
 
@@ -243,22 +235,22 @@ public class ClientManagementCommands implements QDLModuleMetaClass {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public Object evaluate(Object[] objects, State state) throws Throwable{
             checkInit();
             String key = objects[0].toString();
             String regex = objects[1].toString();
             int index = 0;
             QDLStem output = new QDLStem();
 
-            try {
+           // try {
                 List<OA2Client> clients = getEnvironment().getClientStore().search(key, regex, true);
                 // make it in to a list
                 for (OA2Client c : clients) {
                     output.put(index++ + ".", toStem(c));
                 }
-            } catch (Exception e) {
+            /*} catch (Exception e) {
                 e.printStackTrace();
-            }
+            }*/
             return output;
 
         }
@@ -287,13 +279,13 @@ public class ClientManagementCommands implements QDLModuleMetaClass {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public Object evaluate(Object[] objects, State state) throws Throwable{
             checkInit();
-            try {
+        //    try {
                 return getEnvironment().getClientStore().size();
-            } catch (Exception e) {
+        /*    } catch (Exception e) {
                 throw new QDLException("Error: COuld not determine the size of the store:" + e.getMessage(), e);
-            }
+            }*/
         }
 
 
@@ -320,15 +312,15 @@ public class ClientManagementCommands implements QDLModuleMetaClass {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public Object evaluate(Object[] objects, State state) throws Throwable{
             checkInit();
-            try {
+//            try {
                 Identifier id = BasicIdentifier.newID(objects[0].toString());
                 getEnvironment().getClientStore().remove(id);
-            } catch (Throwable e) {
+  /*          } catch (Throwable e) {
                 throw new QDLException("Error: Could not remove object with id " + objects[0] + ":" + e.getMessage());
             }
-            return Boolean.TRUE;
+  */          return Boolean.TRUE;
         }
 
 
@@ -355,15 +347,15 @@ public class ClientManagementCommands implements QDLModuleMetaClass {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public Object evaluate(Object[] objects, State state) throws Throwable{
             checkInit();
             OA2ClientConverter cc = null;
-            try {
+//            try {
                 cc = (OA2ClientConverter) getEnvironment().getClientStore().getMapConverter();
-            } catch (Exception e) {
+  /*          } catch (Exception e) {
                 e.printStackTrace();
             }
-            List<Object> x = new ArrayList<>();
+  */          List<Object> x = new ArrayList<>();
             x.addAll(cc.getKeys().allKeys());
             QDLStem QDLStem = new QDLStem();
             QDLStem.addList(x);
@@ -397,7 +389,7 @@ public class ClientManagementCommands implements QDLModuleMetaClass {
         //  q. := cm#search('client_id', '.*23.*')
         //   cm#approve(q.0.client_id)
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public Object evaluate(Object[] objects, State state) throws Throwable{
             checkInit();
 
             Identifier id = BasicIdentifier.newID(objects[0].toString());
@@ -409,7 +401,7 @@ public class ClientManagementCommands implements QDLModuleMetaClass {
                 }
                 toApprove = (Boolean) objects[1];
             }
-            try {
+    //        try {
 
                 Boolean isApproved = getEnvironment().getClientApprovalStore().isApproved(id);
                 if (objects.length == 1) {
@@ -426,10 +418,10 @@ public class ClientManagementCommands implements QDLModuleMetaClass {
                 }
                 getEnvironment().getClientApprovalStore().save(approval);
                 return isApproved;
-            } catch (Exception e) {
+     /*       } catch (Exception e) {
                 e.printStackTrace();
             }
-            return Boolean.FALSE;
+            return Boolean.FALSE; */
         }
 
 

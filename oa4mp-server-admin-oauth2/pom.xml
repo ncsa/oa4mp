@@ -21,11 +21,11 @@
             <version>5.2-SNAPSHOT</version>
         </dependency>
 
-        <dependency>
+<!--        <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>oa4mp-clc</artifactId>
             <version>5.2-SNAPSHOT</version>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>util</artifactId>

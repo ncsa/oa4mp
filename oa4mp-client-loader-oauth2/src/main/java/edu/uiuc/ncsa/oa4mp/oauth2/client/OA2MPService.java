@@ -280,8 +280,11 @@ public class OA2MPService extends OA4MPService {
     }
 
     public RTResponse refresh(String assetID, Map additionalParameters) {
-        OA2Asset asset = (OA2Asset) getAssetStore().get(assetID);
-        if (asset == null) return null;
+        OA2Asset asset = getAsset2(assetID);
+        //if (asset == null) return null;
+        if (asset == null) {
+            throw new NoSuchAssetException("Asset with id \"" + assetID + "\" not found.");
+        }
         DS2 ds2 = (DS2) getEnvironment().getDelegationService();
         RTRequest rtRequest = new RTRequest(getEnvironment().getClient(), additionalParameters);
         rtRequest.setAccessToken(asset.getAccessToken());
@@ -325,12 +328,15 @@ public class OA2MPService extends OA4MPService {
      * @return
      */
     public OA2Asset getCert(String id) {
-        OA2Asset OA2Asset = (OA2Asset) getAssetStore().get(id);
-        AssetResponse assetResponse = getCert(OA2Asset.getAccessToken().getToken(), null);
-        OA2Asset.setCertificates(assetResponse.getX509Certificates());
-        OA2Asset.setUsername(assetResponse.getUsername());
-        getAssetStore().save(OA2Asset);
-        return OA2Asset;
+        OA2Asset asset = getAsset2(id);
+        if(asset == null){
+            throw new NoSuchAssetException("Asset \""+ id + "\" not found");
+        }
+        AssetResponse assetResponse = getCert(asset.getAccessToken().getToken(), null);
+        asset.setCertificates(assetResponse.getX509Certificates());
+        asset.setUsername(assetResponse.getUsername());
+        getAssetStore().save(asset);
+        return asset;
     }
 
     /*

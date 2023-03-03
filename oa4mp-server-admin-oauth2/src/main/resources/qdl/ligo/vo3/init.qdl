@@ -16,7 +16,7 @@
    {"tokens": {"access": {
      "qdl":  {
       "args":["igwn"],
-      "load": "ligo/vo/at.qdl",
+      "load": "ligo/vo3/at.qdl",
       "xmd": {"exec_phase":   [
        "post_token",
        "post_exchange",
@@ -43,19 +43,14 @@ for Older LIGO (just no igwn arg is sent)
 
 */
 
-     all_audience. := ['ANY', 'LIGO', 'segments.ligo.org'];
-       robot_caput := 'igwn.robot:'; // marker in scopes for robots
-access_token.'ver' := 'scitoken:2.0';
-is_igwn := script_args()==1?script_args(0)=='igwn':false;
+       all_audience. := ['ANY', 'LIGO', 'segments.ligo.org'];
+         robot_caput := 'igwn.robot:'; // marker in scopes for robots
+  access_token.'ver' := 'scitoken:2.0';
+  is_igwn := script_args()==1?script_args(0)=='igwn':false;
+  err(x,y)->raise_error(x,oa4mp_error,{'error_type':y});
 
- if[
-       !is_defined(claims.'eppn')
-   ]then[
-           sys_err.ok := false;
-      sys_err.message := 'Missing EPPN. Cannot determine scopes.';
-   sys_err.error_type := 'invalid_request';
-      return();
- ];
+   if[!is_defined(claims.'eppn')]
+     [err('Missing EPPN. Cannot determine scopes.', 'invalid_request');];
  /*
    New authZ policies as per https://docs.google.com/presentation/d/1WbfUwAE6xTVeC2ZhKKHTQF0_6deKa14ieErRz5pD77M/edit#slide=id.g1677b86136f_0_16
 
@@ -105,7 +100,7 @@ is_igwn := script_args()==1?script_args(0)=='igwn':false;
                   ζ.'Communities:LSCVirgoLIGOGroupMembers' := ['read:/DQSegDB' ,'read:/frames', 'read:/GraceDB','write:/GraceDB'];   //CIL-1345
       ζ.'Services:XRootD:SciTokens:read-frames:authorized' := ['read:/frames']; //CIL-1415
      ζ.'Services:XRootD:SciTokens:write-frames:authorized' := ['write:/frames']; //CIL-1414,
-    ];
+    ]; // end else
 
  //       get_permissions(γ.) -> reduce(@~,ζ\(γ\*\name));
       get_permissions(γ.) -> ~values(mask(ζ., in_group2(keys(ζ.),γ.)));
@@ -115,29 +110,11 @@ is_igwn := script_args()==1?script_args(0)=='igwn':false;
 
          robots. := ~mask(scopes., 0 == starts_with(scopes., robot_caput));
 say('*** LIGO -- robots = ' + to_string(robots.));
-          if[
-             1 < size(robots.)
-          ][
-                    sys_err.ok := false;
-               sys_err.message := 'too many robots (' + size(robots.) +')';
-            sys_err.error_type := 'access_denied';
-               return([]);
-          ];
+    if[1 < size(robots.)]
+      [err('too many robots (' + size(robots.) +')','access_denied');];
 
-          is_robot := 1 == size(robots.);
+    is_robot := 1 == size(robots.);
 
-         if[
-              is_robot][
-          if[
-            claims.'idp' != idp.'ligo'
-            ][
-                    sys_err.ok := false;
-               sys_err.message := 'IDP must be ligo, not ' + claims.'idp';
-            sys_err.error_type := 'access_denied';
-               return();
-             ];
-          ];
-   // Audience setup
    // If there is no audience, use all_audience. Otherwise check if there is an override in tx_audience and use that.
     requested_audience. := (size(tx_audience.) == 0)?(size(audience.)==0?all_audience.:audience.):tx_audience.;
 

@@ -1,0 +1,53 @@
+/*
+    Access token support for Jefferson Lab. Typical configuration for the client
+    is
+tokens {
+    access {
+        qdl {
+            load="bnl/v2/access.qdl"
+            xmd {
+                "exec_phase"=[
+                    "post_token",
+                    "post_refresh",
+                    "post_exchange"
+                ]
+            }
+        }
+        type=wlcg
+    }
+}
+*/
+//script_load('bnal/acl.qdl');
+
+
+     DEBUG := true; // set false everywhere but on my test server.
+        γ := 'CO:COU:experiment_sphenix:members:active'; // group
+ // Robert Hancock's uid.
+user := DEBUG?'http://cilogon.org/serverA/users/1774626':claims.sub;
+claims.'eppn' := 'bob@bnl.gov';
+results. := script_load('bnl/v2/get_user.qdl', user); // user == claims.sub
+
+if[
+   	 !is_defined(results.isMemberOf) // indicates something is wrong with their LDAP (?)
+  ][
+  raise_error('no group memberships found.', oa4mp_error, {'error_type' :'access_denied'});
+];
+
+ say('*** BNL result of query =' + to_string(results.));
+
+if[ γ ∉ results.isMemberOf][
+   raise_error('no group memberships found.', oa4mp_error,{'error_type' :'access_denied'});
+];
+say('yo!');
+ a. := (size(tx_audience.) == 0)?audience.:tx_audience.;
+ s. := (size(tx_scopes.) == 0)?scopes.:tx_scopes.;
+ say('s. == ' + to_string(s.));
+ say('a. == ' + to_string(a.));
+ say(to_string(access_control.));
+ //~mask(s., 0<=starts_with( s., ['storage.','compute.']))
+ // strip aff all that start with RHS args, omit duplicates, turn in to space-delimited string.
+ access_token.'scope' := detokenize(unique(~mask(s., 0<=starts_with( s., ['storage.','compute.']))), ' ', 2);
+ access_token.'aud' := size(a.)==0?access_control.client_id:a.;
+ access_token.'iss' := size(a.)==0?'https://cilogon.org/bnlsdcc':a.;
+ access_token.'sub' := hash(claims.'eppn');
+

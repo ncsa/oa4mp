@@ -22,7 +22,7 @@ while[x∈ids.][
    tokens. := clc#access();
    save_to := save_path+'/' +encode(x, 32) + '.xml';
    try[
-   rm(save_to);     // get rid of it if it is there so user is not repeatedly prompted.
+     rm(save_to);     // get rid of it if it is there so user is not repeatedly prompted.
    ]catch[
    // ok if it doesn't exist.
    ];

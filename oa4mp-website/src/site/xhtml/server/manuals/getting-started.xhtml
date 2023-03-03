@@ -18,16 +18,12 @@
 
 <h2>Prerequisites</h2>
 <ul>
-    <li>Tomcat 7 or above. This will not work with Tomcat 6 or lower because of internal changes to Java.
-    (In particular, the way JSP is handled.)</li>
+    <li>Tomcat 9 or above. This will not work with Tomcat 8 or lower because of internal changes to Java.
     <li> SSL should be configured and enabled. Either in Apache (if you are deploying Tomcat as pass through) or
         in Tomcat directly. Note that if you do enable SSL in tomcat, you must un-comment the
         security constraint block in the web.xml deployment descriptor after you deploy the war.
     </li>
-    <li>Java 1.8. <strong>Note:</strong> Open JDK is <em>not</em> supported. Only the Oracle/Sun JVM is
-        supported. Note especially that Oracle/Sun Java 1.7 or earlier will not work.
-        This is because of changes to their security APIs.
-    </li>
+    <li>Java 1.11. Higher versions of Java (like Java 17) won't work.</li>
     <li>Some form of persistent storage. This may be a file system, MySQL or PostgreSQL.</li>
     <li>Java mail. This must be configured regardless if notifications are set. Read <a
             title="OAuth for MyProxy: Email Notifications"

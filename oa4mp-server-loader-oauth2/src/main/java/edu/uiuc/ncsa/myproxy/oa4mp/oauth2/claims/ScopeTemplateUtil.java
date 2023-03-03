@@ -180,7 +180,6 @@ public class ScopeTemplateUtil {
             }
 
         } catch (Throwable t) {
-            t.printStackTrace();
             return null;
         }
         if (!isQuery) {

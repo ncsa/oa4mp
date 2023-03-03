@@ -10,16 +10,14 @@ import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenUtils;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims;
 import edu.uiuc.ncsa.qdl.exceptions.BadArgException;
 import edu.uiuc.ncsa.qdl.exceptions.MissingArgException;
-import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
 import edu.uiuc.ncsa.qdl.extensions.QDLModuleMetaClass;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.QDLList;
-import edu.uiuc.ncsa.qdl.variables.QDLNull;
 import edu.uiuc.ncsa.qdl.variables.QDLStem;
+import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.DateUtils;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
-import edu.uiuc.ncsa.security.servlet.ServiceClientHTTPException;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import net.sf.json.JSONObject;
 
@@ -67,8 +65,9 @@ public class CLC implements QDLModuleMetaClass {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public Object evaluate(Object[] objects, State state) throws Throwable {
             try {
+                DebugUtil.setEnabled(true);
                 clcCommands = new OA2CLCCommands(true, state.getLogger(), new OA2CommandLineClient(state.getLogger()));
                 // note that the order of the arguments swaps.
                 clcCommands.load(new InputLine(DUMMY_ARG + " " + objects[1].toString() + "  " + objects[0].toString()));
@@ -80,7 +79,7 @@ public class CLC implements QDLModuleMetaClass {
                 if (DebugUtil.isEnabled()) {
                     e.printStackTrace();
                 }
-                return false;
+                throw e;
             }
             return true;
         }
@@ -110,17 +109,17 @@ public class CLC implements QDLModuleMetaClass {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public Object evaluate(Object[] objects, State state) throws Throwable{
             QDLStem claims = new QDLStem();
             if (objects.length == 0) {
-                try {
+//                try {
                     JSONObject jsonObject = clcCommands.getClaims();
                     claims.fromJSON(jsonObject);
-                } catch (Exception e) {
-                    throw new QDLException(getName() + " could not get the claims:'" + e.getMessage() + "'");
+  /*              } catch (Exception e) {
+                    throw new GeneralException(getName() + " could not get the claims:'" + e.getMessage() + "'");
 
                 }
-            }
+  */          }
             return claims;
         }
 
@@ -148,19 +147,13 @@ public class CLC implements QDLModuleMetaClass {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public Object evaluate(Object[] objects, State state) throws Throwable{
             QDLStem g = new QDLStem();
-            try {
                 clcCommands.grant(argsToInputLine(getName(), objects));
-            } catch (Exception e) {
-                state.getLogger().error("error getting grant", e);
-                handleException(e);
-            }
             if(clcCommands.getGrant() == null){
-                throw new QDLException("unable to get grant");
+                throw new GeneralException("unable to get grant");
             }
             g.fromJSON(clcCommands.getGrant().toJSON());
-
             return g;
         }
 
@@ -194,7 +187,7 @@ public class CLC implements QDLModuleMetaClass {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public Object evaluate(Object[] objects, State state) throws Throwable {
             checkInit();
             String args = DUMMY_ARG;
             if (objects.length == 1) {
@@ -206,12 +199,13 @@ public class CLC implements QDLModuleMetaClass {
                     throw new IllegalArgumentException(getName() + " requires a boolean argument");
                 }
             }
-            try {
                 clcCommands.access(new InputLine(args));
+/*
             } catch (Exception e) {
                 state.getLogger().error("error getting access token", e);
                 handleException(e);
             }
+*/
             return getTokens();
         }
 
@@ -239,17 +233,17 @@ public class CLC implements QDLModuleMetaClass {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public Object evaluate(Object[] objects, State state) throws Throwable{
             checkInit();
-            try {
+        //    try {
                 clcCommands.uri(argsToInputLine(getName(), objects));
                 return clcCommands.getCurrentURI().toString();
-            } catch (Exception e) {
+         /*   } catch (Exception e) {
+                e.printStackTrace();
                 if (DebugUtil.isEnabled()) {
-                    e.printStackTrace();
                 }
-            }
-            return QDLNull.getInstance();
+            }*/
+         //   return QDLNull.getInstance();
         }
 
         @Override
@@ -275,13 +269,13 @@ public class CLC implements QDLModuleMetaClass {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public Object evaluate(Object[] objects, State state) throws Throwable{
             checkInit();
-            try {
+          //  try {
                 clcCommands.refresh(argsToInputLine(getName(), objects));
-            } catch (Exception e) {
+           /* } catch (Exception e) {
                 handleException(e);
-            }
+            }*/
             return getTokens();
         }
 
@@ -308,14 +302,14 @@ public class CLC implements QDLModuleMetaClass {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public Object evaluate(Object[] objects, State state) throws Throwable {
             checkInit();
-            try {
+//            try {
                 clcCommands.exchange(argsToInputLine(getName(), objects));
-            } catch (Exception e) {
+  /*          } catch (Exception e) {
                 handleException(e);
             }
-            return getTokens();
+  */          return getTokens();
         }
 
         @Override
@@ -359,18 +353,14 @@ public class CLC implements QDLModuleMetaClass {
         return new InputLine(strings);
     }
 
-    protected void handleException(Throwable t) throws QDLException {
+    protected void handleException(Throwable t)  {
         if (DebugUtil.isEnabled()) {
             t.printStackTrace();
         }
-        if (t instanceof ServiceClientHTTPException) {
-            ServiceClientHTTPException serviceClientHTTPException = (ServiceClientHTTPException) t;
-            throw new QDLException(serviceClientHTTPException.getContent());
-        }
-        if (t instanceof QDLException) {
-            throw (QDLException) t;
-        }
-        throw new QDLException(t.getMessage(), t);
+         if(t instanceof RuntimeException){
+             throw (RuntimeException)t;
+         }
+        throw new GeneralException(t.getMessage(), t);
     }
 
     protected String REVOKE_NAME = "revoke";
@@ -387,19 +377,19 @@ public class CLC implements QDLModuleMetaClass {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public Object evaluate(Object[] objects, State state) throws Throwable{
             checkInit();
-            try {
+//            try {
                 clcCommands.revoke(argsToInputLine(getName(), objects));
                 return Boolean.TRUE;
-            } catch (Exception e) {
+  /*          } catch (Exception e) {
 
                 if (DebugUtil.isEnabled()) {
                     e.printStackTrace();
                 }
             }
             return Boolean.FALSE;
-        }
+  */      }
 
         @Override
         public List<String> getDocumentation(int argCount) {
@@ -421,22 +411,22 @@ public class CLC implements QDLModuleMetaClass {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public Object evaluate(Object[] objects, State state) throws Throwable {
             checkInit();
             QDLStem QDLStem = new QDLStem();
-            try {
+//            try {
                 clcCommands.df(argsToInputLine(getName(), objects));
                 QDLStem.fromJSON(clcCommands.getDfResponse());
-            } catch (Exception e) {
+  /*          } catch (Exception e) {
                 handleException(e);
             }
-            return QDLStem;
+  */          return QDLStem;
         }
 
         @Override
         public List<String> getDocumentation(int argCount) {
             List<String> doxx = new ArrayList<>();
-            doxx.add(getName() + " initialte the device flow. If possible, the user code is copied to the clipboard.");
+            doxx.add(getName() + " initiate the device flow. If possible, the user code is copied to the clipboard.");
             doxx.add(checkInitMessage);
             return doxx;
         }
@@ -456,16 +446,16 @@ public class CLC implements QDLModuleMetaClass {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public Object evaluate(Object[] objects, State state) throws Throwable{
             checkInit();
             QDLStem QDLStem = new QDLStem();
-            try {
+//            try {
                 clcCommands.introspect(argsToInputLine(getName(), objects));
                 QDLStem.fromJSON(clcCommands.getIntrospectResponse());
-            } catch (Exception e) {
+  /*          } catch (Exception e) {
                 handleException(e);
             }
-            return QDLStem;
+  */          return QDLStem;
         }
 
         @Override
@@ -491,16 +481,16 @@ public class CLC implements QDLModuleMetaClass {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public Object evaluate(Object[] objects, State state) throws Throwable{
             checkInit();
             QDLStem out = new QDLStem();
-            try {
+//            try {
                 clcCommands.user_info(argsToInputLine(getName(), objects));
                 out.fromJSON(clcCommands.getClaims());
-            } catch (Exception e) {
+  /*          } catch (Exception e) {
                 handleException(e);
             }
-            return out;
+  */          return out;
         }
 
         @Override
@@ -554,22 +544,22 @@ public class CLC implements QDLModuleMetaClass {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public Object evaluate(Object[] objects, State state) throws Throwable {
             String args = DUMMY_ARG + " " + objects[0];
             if (objects.length == 2) {
                 args = args + " -m " + objects[1];
             }
             checkInit();
-            try {
+//            try {
                 clcCommands.write(new InputLine(args));
                 return Boolean.TRUE;
-            } catch (Exception e) {
+  /*          } catch (Exception e) {
                 if (DebugUtil.isEnabled()) {
                     e.printStackTrace();
                 }
             }
             return Boolean.FALSE;
-        }
+  */      }
 
         @Override
         public List<String> getDocumentation(int argCount) {
@@ -602,17 +592,17 @@ public class CLC implements QDLModuleMetaClass {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
-            try {
+        public Object evaluate(Object[] objects, State state) throws Throwable{
+//            try {
                 clcCommands = new OA2CLCCommands(true, state.getLogger(), new OA2CommandLineClient(state.getLogger()));
                 clcCommands.read(argsToInputLine(getName(), objects));
                 initCalled = true;
                 return Boolean.TRUE;
-            } catch (Throwable e) {
+  /*          } catch (Throwable e) {
                 e.printStackTrace();
             }
             return Boolean.FALSE;
-        }
+  */      }
 
         @Override
         public List<String> getDocumentation(int argCount) {
@@ -638,14 +628,14 @@ public class CLC implements QDLModuleMetaClass {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public Object evaluate(Object[] objects, State state) throws Throwable{
             if (objects.length == 0) {
-                try {
+//                try {
                     clcCommands.clear(new InputLine(), true);
-                } catch (Exception e) {
+  /*              } catch (Exception e) {
 
                 }
-            }
+  */          }
             return Boolean.TRUE;
         }
 

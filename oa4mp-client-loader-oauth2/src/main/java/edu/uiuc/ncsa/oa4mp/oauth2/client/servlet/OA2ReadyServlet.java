@@ -54,7 +54,7 @@ public class OA2ReadyServlet extends ClientServlet {
                     request.getParameter(OA2Constants.STATE));
         }
         // Get the cert itself. The server itself does a redirect using the callback to this servlet
-        // (so it is the portal that actually is invoking this method after the authorization
+        // (so it is the server that actually is invoking this method after the authorization
         // step.) The token and verifier are peeled off and used
         // to complete the request.
         info("2.a.0 Getting token and verifier.");
@@ -132,7 +132,6 @@ public class OA2ReadyServlet extends ClientServlet {
                     assetResponse = oa2MPService.getCert(asset, atResponse2);
                 } catch (Throwable t) {
                     info("2.b.1 Error getting cert: " + t.getMessage());
-
                     gotCertX = true;
                     certXMessage = t.getMessage();
                 }

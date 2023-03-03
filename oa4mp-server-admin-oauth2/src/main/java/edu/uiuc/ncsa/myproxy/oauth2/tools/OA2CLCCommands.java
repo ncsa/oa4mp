@@ -1181,7 +1181,10 @@ public class OA2CLCCommands extends CommonCommands {
         lastException = null;
         try {
             RTResponse rtResponse = getService().refresh(dummyAsset.getIdentifier().toString(), refreshParameters);
-            dummyAsset = (OA2Asset) getCe().getAssetStore().get(dummyAsset.getIdentifier().toString());
+            OA2Asset z = (OA2Asset) getCe().getAssetStore().get(dummyAsset.getIdentifier().toString());
+            if(z != null && dummyAsset.getIssuedAt().getTime() < z.getIssuedAt().getTime()){
+                dummyAsset = z;
+            }
             // Have to update the AT reponse here every time or no token state is preserved.
             currentATResponse = new ATResponse2(dummyAsset.getAccessToken(), dummyAsset.getRefreshToken());
             currentATResponse.setParameters(rtResponse.getParameters());
@@ -1431,6 +1434,11 @@ public class OA2CLCCommands extends CommonCommands {
         dummyAsset = new OA2Asset(null);
         if (json.containsKey(ASSET_KEY)) {
             dummyAsset.fromJSON(json.getJSONObject(ASSET_KEY));
+            if(!getCe().getAssetStore().containsKey(dummyAsset.getIdentifier())){
+                // put it back. Really long-term serializations can have these go away
+                // and the OA2Service looks for all assets in the store.
+                getCe().getAssetStore().save(dummyAsset);
+            }
             if (!loadStoredConfig) {
                 // Must give the asset a new id or the state of the provisioning client
                 // will not be distinct and you will get very bizarre errors from the server

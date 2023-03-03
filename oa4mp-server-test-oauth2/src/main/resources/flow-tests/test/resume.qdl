@@ -15,11 +15,12 @@ while[
   x ∈ ids.
   ][
    try[
+       say('reading ' + x);
        clc#read(save_path + '/' + encode(x, 32) + '.xml');
        tokens. := clc#refresh();
        tokens. := clc#exchange();
        tokens. := clc#exchange('-rt');
-       say('check ok for ' + x);
+       say('   check ok');
      ]catch[
        say('check failed for ' + x + ': ' + error_message);
   ];

@@ -49,10 +49,13 @@ say('*** LIGO get_attributes, user=' + user);
 if[
       size(groups.) == 0
   ]then[
+  raise_error('Missing group information. Cannot determine scopes.', oa4mp_error,{'error_type':'access_denied'});
+/*
           sys_err.ok := false;
      sys_err.message := 'Missing group information. Cannot determine scopes.';
   sys_err.error_type := 'access_denied';
      return([]);
+*/
 ];
 
             response. := ligo_response.;

@@ -1,19 +1,18 @@
 package edu.uiuc.ncsa.oa2.qdl.storage;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2TransactionKeys;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
-import edu.uiuc.ncsa.qdl.exceptions.QDLException;
-import edu.uiuc.ncsa.qdl.variables.QDLStem;
-import edu.uiuc.ncsa.security.core.Identifier;
-import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
-import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.MyX509Certificates;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AccessTokenImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AuthorizationGrantImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.RefreshTokenImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.VerifierImpl;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
+import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.util.crypto.CertUtil;
 import net.sf.json.JSONObject;
@@ -205,7 +204,7 @@ public class TransactionStemMC<V extends OA2ServiceTransaction> extends StemConv
             try {
                 stem.put(kk().cert(), myCert.getX509CertificatesPEM());
             } catch (CertificateEncodingException e) {
-                throw new QDLException("Error: could not encode certificate", e);
+                throw new IllegalArgumentException("Error: could not encode certificate", e);
             }
 
         }
