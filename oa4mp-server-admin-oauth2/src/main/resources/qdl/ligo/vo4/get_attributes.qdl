@@ -1,0 +1,62 @@
+/*
+ ldapsearch \
+  -LLL \
+  -H ldaps://ldap.cilogon.org \
+  -x \
+  -b 'ou=people,o=KAGRA-LIGO,o=CO,dc=gwastronomy-data,dc=cgca,dc=uwm,dc=edu'
+  '(eduPersonPrincipalName=duncan.meacher@shibbi.pki.itc.u-tokyo.ac.jp)'
+
+
+ ldapsearch -LLL -H ldaps://ldap.cilogon.org  -x  -b 'ou=people,o=KAGRA-LIGO,o=CO,dc=gwastronomy-data,dc=cgca,dc=uwm,dc=edu'  '(eduPersonPrincipalName=duncan.meacher@shibbi.pki.itc.u-tokyo.ac.jp)'
+ */
+
+     ini. := file_read('/home/ncsa/dev/csd/config/ini/ligo-ldap.ini',2).'ligo_prod';
+     //ini. := file_read('vfs#/scripts/ligo/ldap.ini',2).'ligo';
+     user := script_args(0); // This is actually the EPPN for the user.
+say('*** LIGO get_attributes, user=' + user);
+           kagra_cfg.'address' := 'ldap.cilogon.org';
+              kagra_cfg.'port' := 636;
+        kagra_cfg.'claim_name' := 'uid';
+              kagra_cfg.'type' := 'ldap';
+       kagra_cfg.'search_base' := 'ou=people,o=KAGRA-LIGO,o=CO,dc=gwastronomy-data,dc=cgca,dc=uwm,dc=edu';
+         kagra_cfg.'ldap_name' := 'eduPersonPrincipalName';
+             kagra_cfg.groups. := ['isMemberOf'];
+  kagra_cfg.search_attributes. := ['isMemberOf','uid'];
+         kagra_cfg.'auth_type' := 'none';
+     kagra_cfg.'fail_on_error' := true;';
+               kagra_response. := get_claims(create_source(kagra_cfg.), user);
+             say('kagra_response.==' + to_string(kagra_response., true));
+            groups. :=  is_defined(kagra_response.'isMemberOf')?kagra_response.'isMemberOf':[];
+
+            ligo_cfg.'address' := ini.'address';
+               ligo_cfg.'port' := 636;
+         ligo_cfg.'claim_name' := 'uid';
+               ligo_cfg.'type' := 'ldap';
+        ligo_cfg.'search_base' := 'ou=people,dc=ligo,dc=org';
+          ligo_cfg.'ldap_name' := 'uid';
+              ligo_cfg.groups. := ['isMemberOf'];
+   ligo_cfg.search_attributes. := ['isMemberOf', 'uin', 'uid'];
+          ligo_cfg.'auth_type' := 'simple';
+           ligo_cfg.'username' := ini.'username';
+           ligo_cfg.'password' := ini.'password';
+      ligo_cfg.'fail_on_error' := true;
+                ligo_response. := get_claims(create_source(ligo_cfg.), head(user, '@'));
+                   say('ligo_response.==' + to_string(ligo_response., true));
+
+             // now we integrate the responses.
+             groups. := groups. ~ (is_defined(ligo_response.'isMemberOf')?ligo_response.'isMemberOf':[]);
+
+if[
+      size(groups.) == 0
+  ]then[
+  raise_error('Missing group information. Cannot determine scopes.', oa4mp_error,{'error_type':'access_denied'});
+];
+
+            response. := ligo_response.;
+    response.'isMemberOf' := groups.;
+
+     if[is_defined(ligo_response.'uid')][response.'uid' := ligo_response.'uid';];
+     if[is_defined(ligo_response.'uin')][response.'uin' := ligo_response.'uin';];
+say('*** LIGO access.qdl returns ' + to_string(response.));
+return(response.);
+

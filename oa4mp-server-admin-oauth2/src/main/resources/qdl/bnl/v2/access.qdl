@@ -17,7 +17,7 @@ tokens {
     }
 }
 */
-//script_load('bnal/acl.qdl');
+//script_load('bnl/acl.qdl');
 
 
      DEBUG := true; // set false everywhere but on my test server.

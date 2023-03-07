@@ -8,12 +8,6 @@
 s := '';
 
 if[
-     claims.idp != 'https://login.ligo.org/idp/shibboleth'
-][
-     return();
-];
-
-if[
       !is_defined(claims.isMemberOf.)
   ]then[
      sys_err.ok := false;

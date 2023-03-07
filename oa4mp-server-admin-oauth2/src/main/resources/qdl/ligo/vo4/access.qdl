@@ -1,7 +1,7 @@
 /*
 {"tokens": {"access": {
  "qdl":  {
-  "load": "ligo/vo/at.qdl", // main driver script.
+  "load": "ligo/vo4/at.qdl", // main driver script.
   "xmd": {"exec_phase":   [
    "post_token",
    "post_exchange",
@@ -15,52 +15,30 @@
 */
 
 
-// get current allowed scopes based on group memberships
-  attributes. := script_load('ligo/vo3/get_attributes.qdl', claims.'eppn');
-    sys_err.ok?null:return();
+  attributes. := script_load('ligo/vo4/get_attributes.qdl', claims.'eppn');
 
 say('*** LIGO -- got a attributes ' + input_form(attributes.));
 
-
-/*
- If the uid value from the LIGO EPPN (e.g., "jim.basney" from "jim.basney@ligo.org") is a member
- of the "Services:Robots:<robot-name>:SciTokens:authorized"
- (e.g., "Services:Robots:ligorobot:SciTokens:authorized") group in ldap.ligo.org,
- then set "sub":"<robot-name>@ligo.org"
- (e.g., "ligorobot@ligo.org") and apply the LIGO authorization rules on the
- remaining requested scopes. For example, if "ligorobot@ligo.org"
- is a member of "Services:XRootD:SciTokens:write-frames:authorized" then it
- may receive a SciToken with the "write:/frames" scope.
-*/
    permissions. := null;
-   robot_name := null;
-  if[
-     is_robot
-   ][
+     robot_name := null;
+  if[is_robot]
+    [
 say('*** LIGO -- got a robot');
        robot_name := robots.0 - robot_caput;
 say('*** LIGO -- name =' + robot_name);
-       if[
-/*
-          Check for membership of "gw-astronomy:KAGRA-LIGO:Robots:<robot-name>:SciTokens:authorized" (in gw-astronomy LDAP)
-              in addition to "Services:Robots:<robot-name>:SciTokens:authorized" (in LIGO LDAP).
-*/      true ∈ ([ 'gw-astronomy:KAGRA-LIGO:Robots:' + robot_name + ':SciTokens:authorized',
-        'Services:Robots:' + robot_name + ':SciTokens:authorized'] ∈ attributes.'isMemberOf')
+       if[true ∈ ([ 'gw-astronomy:KAGRA-LIGO:Robots:' + robot_name + ':SciTokens:authorized',
+                    'Services:Robots:' + robot_name + ':SciTokens:authorized'] ∈ attributes.'isMemberOf')
        ][
 say('*** LIGO -- in robots group');
                   moniker := robot_name + '@ligo.org';
        access_token.'sub' :=   claims.'sub' := moniker ;
-            r_attributes. := script_load('ligo/vo3/get_attributes.qdl', moniker);
+            r_attributes. := script_load('ligo/vo4/get_attributes.qdl', moniker);
              permissions. := get_permissions(r_attributes.'isMemberOf');
-             attributes. := r_attributes.; // use robot attributes instead now.
-        ]else[
+              attributes. := r_attributes.; // use robot attributes instead now.
+       ]else[
 say('*** LIGO -- not in robots group');
-           // they request a robot but do not have permission to do so. Raise an error
-               sys_err.ok := false;
-          sys_err.message := 'you do not have permission to use the robot named "' + robot_name + '"';
-       sys_err.error_type := 'access_denied';
-         return();
-        ];
+          err('you do not have permission to use the robot named "' + robot_name + '"','access_denied');
+       ];
     ]else[
             permissions. := get_permissions(attributes.'isMemberOf');
       access_token.'sub' := claims.'sub' := claims.'eppn';
@@ -85,7 +63,8 @@ say('*** LIGO -- permissions' + to_string(permissions.));
    Tidy up id token aka claims.
 */
 claims.'uid' := is_defined(attributes.'uid')?attributes.'uid':claims.'eppn';
-if[is_defined(attributes.'uin')][claims.'uin' := attributes.'uin';];
+if[is_defined(attributes.'uin')]
+  [claims.'uin' := attributes.'uin';];
 
 
  say('*** LIGO: final access token = ' + to_string(access_token.));
