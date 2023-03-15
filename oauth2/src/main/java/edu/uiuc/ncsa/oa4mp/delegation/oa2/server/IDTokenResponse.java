@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.oa4mp.delegation.oa2.server;
 
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken;
@@ -137,7 +138,9 @@ public abstract class IDTokenResponse extends IResponse2 {
             } else {
                 m.put(REFRESH_TOKEN, getRefreshToken().getToken()); // don't encode JWTs
             }
-
+            // CIL-1655
+            m.put("refresh_token_" + EXPIRES_IN, refreshToken.getLifetime()/1000);
+            m.put("refresh_token_" + OA2Claims.ISSUED_AT, refreshToken.getIssuedAt()/1000);
         }
         if (!getSupportedScopes().isEmpty()) {
             // construct the scope response.

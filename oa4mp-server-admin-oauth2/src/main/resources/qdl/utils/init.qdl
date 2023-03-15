@@ -21,3 +21,18 @@ idp.syngenta := 'https://sts.windows.net/06219a4a-a835-44d5-afaf-3926343bfb89/';
 
          VOP := 'voPersonExternalID';
          EPE := 'eduPersonEntitlement';
+/*
+   Darned useful utilities
+*/
+  err(x,y)->raise_error(x,oa4mp_error,{'error_type':y}); // short version of error.
+  // Raise an error with a custom error uri. This has specific type and such so that CILogon's PHP
+  // layer can recognize it and process it. Just supply the redirect uri.
+  err_uri(message, redirect_uri) ->raise_error(message,
+                                 oa4mp_error,
+                                 {      'error_type' : 'qdl_error',
+                                  'custom_error_uri' : redirect_uri,
+                                            'status' : 302
+                                  });
+  // The next couple are for custom debugging output. Note that they include the client id.
+  SS(x,y)->say('*** ' + x + '[' + access_control.client_id + ']:' + to_string(y));
+  SS(x)->SS('QDL', x);

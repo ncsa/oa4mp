@@ -4,7 +4,7 @@
 tokens {
     access {
         qdl {
-            load="bnl/v2/access.qdl"
+            load="bnl/sphenix/v2/access.qdl"
             xmd {
                 "exec_phase"=[
                     "post_token",
@@ -18,6 +18,8 @@ tokens {
 }
 */
 //script_load('bnl/acl.qdl');
+  err(x,y)->raise_error(x,oa4mp_error,{'error_type':y});
+  SS(x)->say('*** BNL[' + access_control.client_id + ']:' + to_string(x));
 
 
      DEBUG := true; // set false everywhere but on my test server.

@@ -279,7 +279,11 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
             scriptRuntimeException.setCode(errorCode);
             scriptRuntimeException.setErrorURI(errorURI);
             scriptRuntimeException.setCustomErrorURI(customErrorURI);
-            scriptRuntimeException.setHttpStatus(httpStatus);
+            if(httpStatus == -1 && customErrorURI != null){
+                scriptRuntimeException.setHttpStatus(HttpStatus.SC_MOVED_TEMPORARILY); // force the redirect
+            }else{
+                scriptRuntimeException.setHttpStatus(httpStatus);
+            }
             scriptRuntimeException.setRequestedType(requestedType);
             throw scriptRuntimeException;
         }

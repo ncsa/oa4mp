@@ -1,4 +1,4 @@
-Tests for test.cilogon.org
+Long term tests for test.cilogon.org
 
 There are tests for checking if an upgrade is compatible with flows.
 Flows are started and their state is stashed. This emulates the case

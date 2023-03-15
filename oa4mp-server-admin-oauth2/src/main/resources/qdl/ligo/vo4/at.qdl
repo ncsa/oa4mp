@@ -1,0 +1,18 @@
+/*
+  Driver script for all post token, refresh and exchange
+*/
+  SS(x)->say('*** IGWN[' + access_control.client_id + ']:' + to_string(x));
+script_load('ligo/acl.qdl');
+script_load('utils/init.qdl'); // bunch of constants.
+is_igwn := 'igwn' ∈ args();
+script_load('ligo/vo4/init.qdl', is_igwn);
+sys_err.ok?null:return(); // if something went wrong in init.qdl, return.
+
+SS('*** IGWN setting is_igwn');
+//claims.'eppn':= 'jeffrey.gaynor@ligo.org'; // debugging only
+
+   if[
+      exec_phase ∈ ['post_token', 'post_refresh', 'post_exchange']
+    ][
+      script_load('ligo/vo4/access.qdl');
+   ];

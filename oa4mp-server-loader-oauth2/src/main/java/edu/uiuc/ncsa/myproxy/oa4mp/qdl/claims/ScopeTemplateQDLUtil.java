@@ -8,6 +8,7 @@ import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.QDLList;
+import edu.uiuc.ncsa.qdl.variables.QDLNull;
 import edu.uiuc.ncsa.qdl.variables.QDLStem;
 
 import java.util.ArrayList;
@@ -39,6 +40,11 @@ public class ScopeTemplateQDLUtil {
             if (objects.length != 3) {
                 throw new IllegalArgumentException(getName() + " requires 3 arguments");
             }
+            if(objects[0] == null || objects[0] == QDLNull.getInstance()){
+                // no computed scopes
+                return new QDLStem(); // no computed scopes means nothing to return.
+            }
+
             if(objects[0] instanceof QDLList){
                 if(((QDLList)objects[0]).isEmpty()){
                     return new QDLStem();

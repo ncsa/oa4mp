@@ -25,6 +25,7 @@ say('*** LIGO get_attributes, user=' + user);
          kagra_cfg.'auth_type' := 'none';
      kagra_cfg.'fail_on_error' := true;';
                kagra_response. := get_claims(create_source(kagra_cfg.), user);
+               if[size(kagra_response.) != 0][kagra_response.'uid' := user;];
              say('kagra_response.==' + to_string(kagra_response., true));
             groups. :=  is_defined(kagra_response.'isMemberOf')?kagra_response.'isMemberOf':[];
 
@@ -41,6 +42,7 @@ say('*** LIGO get_attributes, user=' + user);
            ligo_cfg.'password' := ini.'password';
       ligo_cfg.'fail_on_error' := true;
                 ligo_response. := get_claims(create_source(ligo_cfg.), head(user, '@'));
+                if[size(ligo_response.) != 0][ligo_response.'uid' := head(user, '@');];
                    say('ligo_response.==' + to_string(ligo_response., true));
 
              // now we integrate the responses.
@@ -60,8 +62,9 @@ if[
 
             response. := ligo_response.;
     response.'isMemberOf' := groups.;
-
-     if[is_defined(ligo_response.'uid')][response.'uid' := ligo_response.'uid';];
+     response.'uid' := is_defined(kagra_response.'uid')?kagra_response.'uid':ligo_response.'uid';
+//     if[is_defined(kagra_response.'uid')][response.'uid' := kagra_response.'uid';];
+//     if[is_defined(ligo_response.'uid')][response.'uid' := ligo_response.'uid';];
      if[is_defined(ligo_response.'uin')][response.'uin' := ligo_response.'uin';];
 say('*** LIGO access.qdl returns ' + to_string(response.));
 return(response.);

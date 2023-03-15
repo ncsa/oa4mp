@@ -17,26 +17,26 @@
 
   attributes. := script_load('ligo/vo4/get_attributes.qdl', claims.'eppn');
 
-say('*** LIGO -- got a attributes ' + input_form(attributes.));
+SS('*** LIGO -- got a attributes ' + input_form(attributes.));
 
    permissions. := null;
      robot_name := null;
   if[is_robot]
     [
-say('*** LIGO -- got a robot');
+SS('*** LIGO -- got a robot');
        robot_name := robots.0 - robot_caput;
-say('*** LIGO -- name =' + robot_name);
+SS('*** LIGO -- name =' + robot_name);
        if[true ∈ ([ 'gw-astronomy:KAGRA-LIGO:Robots:' + robot_name + ':SciTokens:authorized',
                     'Services:Robots:' + robot_name + ':SciTokens:authorized'] ∈ attributes.'isMemberOf')
        ][
-say('*** LIGO -- in robots group');
+SS('*** LIGO -- in robots group');
                   moniker := robot_name + '@ligo.org';
        access_token.'sub' :=   claims.'sub' := moniker ;
             r_attributes. := script_load('ligo/vo4/get_attributes.qdl', moniker);
              permissions. := get_permissions(r_attributes.'isMemberOf');
               attributes. := r_attributes.; // use robot attributes instead now.
        ]else[
-say('*** LIGO -- not in robots group');
+SS('*** LIGO -- not in robots group');
           err('you do not have permission to use the robot named "' + robot_name + '"','access_denied');
        ];
     ]else[
@@ -47,13 +47,14 @@ say('*** LIGO -- not in robots group');
 
   // Scope processing. Return only permissions requested.
 //permissions. :=    ~values(mask(ζ., in_group2(keys(ζ.),(attributes.'isMemberOf'))));
-say('*** LIGO -- permissions' + to_string(permissions.));
+SS('*** LIGO -- permissions' + to_string(permissions.));
+SS('*** LIGO -- requested scopes' + to_string(requested_scopes.));
 permissions. := reduce(@~,ζ\((attributes.'isMemberOf')\*\name));
 
 permissions. := resolve_templates(permissions., requested_scopes., exec_phase=='post_token');
 //         permissions. := ~mask(permissions., permissions. ∈ requested_scopes.);
 
-say('*** LIGO -- permissions' + to_string(permissions.));
+SS('*** LIGO -- permissions after templates:' + to_string(permissions.));
  access_token.'scope' := detokenize(unique(permissions.), ' ', 2); // turn in to string, omit duplications, trailing space
 
 // Audience processing.
@@ -67,5 +68,5 @@ if[is_defined(attributes.'uin')]
   [claims.'uin' := attributes.'uin';];
 
 
- say('*** LIGO: final access token = ' + to_string(access_token.));
- say('*** LIGO: final claims  = ' + to_string(claims.));
+ SS('*** LIGO: final access token = ' + to_string(access_token.));
+ SS('*** LIGO: final claims  = ' + to_string(claims.));

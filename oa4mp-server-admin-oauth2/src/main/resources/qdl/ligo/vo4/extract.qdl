@@ -1,0 +1,37 @@
+#! /usr/bin/env -S qdl-run
+/*
+  QDL script to extract the latest IGWN permissions. Since this is in a JSON file and
+  quite substantial, this should be regotten everytime:
+
+  https://git.ligo.org/computing/igwnscitokenscopes/-/blob/main/SciTokenScopes.json
+
+  (You'll need to log in with LIGO credentials and replace igwn_file since getting directly does not work.)
+  The output is the ζ values for the init.qdl file.  You can either cut and paste the single stem definition
+  or the individual formatted statements (which are a lot more readable).
+
+*/
+igwn_file := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-admin-oauth2/src/main/resources/qdl/ligo/vo4/scitokens-scopes.json';
+igwn. := from_json(file_read(igwn_file));
+q. := igwn\Issuers\0\Services\*\Scopes; // Dig through all the cruft to the actual entries.
+p. := q\*\*\ScopeName; // permissions
+n. := q\*\*\ScopeGroups\*\isMemberOf; // names associated with the permissions
+z. := null;
+
+while[x∈indices(p.)]
+  // Take size(n.x) copies of the permission, change the names
+  // the ⊗~ turns each element into a list rather than a scalar.
+  do [temp.:=⊗~∀[rename_keys(n(size(n.x), [p.x]),n.x)];
+     while[for_keys(kk, temp.)]                  // Loop through to make sure that the output is
+        do[  if [∃z.kk]                          // constructed correctly.
+           then [z.kk := (z.kk)~temp.kk;]
+           else [z.kk:= temp.kk;];
+       ];
+    ];
+ say('ζ. ≔ ' + input_form(z.) + ';');
+ say('\n*** or *** \n');
+  
+ while[for_keys(x, z.)]
+   do [caput := 'ζ.' + input_form(x);
+       caput :=  ((65 - size(caput))*' ')+ caput; // justifies on the ≔ sign
+       say(caput + ' ≔ ' + input_form(z.x) + ';');
+     ];

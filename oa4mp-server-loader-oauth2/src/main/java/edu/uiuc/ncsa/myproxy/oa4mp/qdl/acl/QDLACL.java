@@ -63,7 +63,11 @@ public class QDLACL implements QDLModuleMetaClass {
 
     public static String ADD_TO_ACL_NAME = "acl_add";
 
-    protected Boolean acceptOrReject(Object[] objects, State state, String name, boolean accept) {
+    protected Boolean acceptOrReject(Object[] objects,
+                                     State state,
+                                     String name,
+                                     boolean accept // accept or reject refers to which method invoked this: add or blacklist
+    ) {
         if (!(state instanceof OA2State)) {
             throw new IllegalArgumentException("Error: This requires an OA2State object.");
         }

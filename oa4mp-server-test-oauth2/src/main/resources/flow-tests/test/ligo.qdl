@@ -1,0 +1,87 @@
+#! /usr/bin/env -S qdl-run
+
+/*
+   Tests the client with LIGO configuration
+   created: 2023-03-15T20:18:26.265Z
+   Client config (on test.cilogon.org)
+
+{"tokens": {"access": {
+    "qdl":  {
+     "args": ["igwn"],
+     "load": "ligo/vo4/at.qdl",
+     "xmd": {"exec_phase":   [
+      "post_token",
+      "post_exchange",
+      "post_refresh"
+     ]}
+    },
+    "type": "sci_token"
+   }}}
+
+
+*/
+path := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests';
+if[path∉script_path()][script_path(path ~ script_path());];
+
+cfg.'id'  := 'test:jeff/ligo';
+cfg.'idp'  := 'LIGO';
+cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';
+cfg.'description' :=  'Test basic configuration for LIGO';
+cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token endpoint
+user_id := 'http://cilogon.org/serverT/users/21340363'; // id from Github on test.cilogon.org
+params.'authz' :=  {'scope': 'read:/frames'}; // initial request
+
+rc := script_load('driver.qdl', cfg., params.);
+tokens. := clc#access();
+at. := tokens.'access_token'.'jwt';
+rt. := tokens.'refresh_token';
+idt.:= claims();
+⊨ idt.'sub' ≡ 'jeffrey.gaynor@ligo.org' : 'wrong ID token subject';
+⊨ idt.'iss' ≡ 'https://test.cilogon.org/ligo'; // Check it's in VO
+⊨ idt.'aud' ≡ 'test:jeff/ligo';
+⊨ idt.'uid' ≡ 'jeffrey.gaynor'; // uid must not have trailing domain or LIGO's credmon will lose track
+
+⊨ at.'sub' ≡ 'jeffrey.gaynor@ligo.org' : 'wrong AT subject';
+⊨ at.'aud' ≡ 'ANY' : 'wrong AT audience';
+⊨ at.'scope' ≡ 'read:/frames' : 'wrong AT scope';
+⊨ at.'iss' ≡ 'https://test.cilogon.org/ligo' : 'wrong AT sissuer';
+
+say('basic LIGO test ok');
+/*
+  JWT access token:{
+ "sub": "jeffrey.gaynor@ligo.org",
+ "aud": "ANY",
+ "ver": "scitoken:2.0",
+ "nbf": 1678912432,
+ "scope": "read:/frames",
+ "iss": "https://test.cilogon.org/ligo",
+ "exp": 1678913337,
+ "iat": 1678912437,
+ "jti": "https://test.cilogon.org/oauth2/175693d3d84e28a4022e9b6106103b16?type=accessToken&ts=1678912442824&version=v2.0&lifetime=900000"
+}
+
+
+
+  "sub": "jeffrey.gaynor@ligo.org",
+  "idp_name": "LIGO Scientific Collaboration",
+  "eppn": "jeffrey.gaynor@ligo.org",
+  "ou": "People",
+  "cert_subject_dn": "/DC=org/DC=cilogon/C=US/O=LIGO/CN=Jeffrey Gaynor jeffrey.gaynor@ligo.org",
+  "iss": "https://test.cilogon.org/ligo",
+  "given_name": "Jeffrey",
+  "nonce": "QK5tFmjrOoJIEosX-7y0vJjkNPzARHFodAJMDW7zaFU",
+  "acr": "https://refeds.org/profile/sfa",
+  "aud": "test:jeff/ligo",
+  "uid": "jeffrey.gaynor",
+  "pairwise_id": "DLXYPSPLINUMVKFUYBK5UAV7UO5NWKGG@ligo.org",
+  "idp": "https://login.ligo.org/idp/shibboleth",
+  "auth_time": 1678911294,
+  "name": "Jeffrey Gaynor",
+  "exp": 1678913337,
+  "family_name": "Gaynor",
+  "iat": 1678912437,
+  "email": "jeffrey.gaynor@ligo.org",
+  "jti": "https://test.cilogon.org/oauth2/idToken/42f2d167400414ba741345c6caf5d05a/1678912437032"
+}
+
+*/

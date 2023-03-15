@@ -1,0 +1,90 @@
+#! /usr/bin/env -S qdl-run
+
+/*
+   Tests the client with LIGO configuration but passes in a robot scope
+   created: 2023-03-15T20:18:26.265Z
+   Client config (on test.cilogon.org)
+
+{"tokens": {"access": {
+    "qdl":  {
+     "args": ["igwn"],
+     "load": "ligo/vo4/at.qdl",
+     "xmd": {"exec_phase":   [
+      "post_token",
+      "post_exchange",
+      "post_refresh"
+     ]}
+    },
+    "type": "sci_token"
+   }}}
+
+
+*/
+path := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests';
+if[path∉script_path()][script_path(path ~ script_path());];
+
+cfg.'id'  := 'test:jeff/ligo';
+cfg.'idp'  := 'LIGO';
+cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';
+cfg.'description' :=  'Test basic configuration for LIGO';
+cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token endpoint
+user_id := 'http://cilogon.org/serverT/users/21340363'; // id from Github on test.cilogon.org
+params.'authz' :=  {'scope': 'scitokentesting.read scitokentesting.write igwn.robot:ligorobottesting'}; // initial request
+
+rc := script_load('driver.qdl', cfg., params.);
+tokens. := clc#access();
+
+at. := tokens.'access_token'.'jwt';
+rt. := tokens.'refresh_token';
+idt.:= claims();
+⊨ idt.'sub' ≡ 'ligorobottesting@ligo.org' : 'wrong ID token subject';
+⊨ idt.'iss' ≡ 'https://test.cilogon.org/ligo'; // Check it's in VO
+⊨ idt.'aud' ≡ 'test:jeff/ligo';
+⊨ idt.'uid' ≡ 'ligorobottesting'; // uid must not have trailing domain or LIGO's credmon will lose track
+⊨ idt.'eppn' ≡ 'jeffrey.gaynor@ligo.org'; // eppn should be the same as the person requesting the robot
+
+⊨ at.'sub' ≡ 'ligorobottesting@ligo.org' : 'wrong AT subject';
+⊨ at.'aud' ≡ 'ANY' : 'wrong AT audience';
+⊨ 'scitokentesting.write'< at.'scope' &&  'scitokentesting.read' < at.'scope' : 'wrong AT scope';
+⊨ at.'iss' ≡ 'https://test.cilogon.org/ligo' : 'wrong AT sissuer';
+
+say('LIGO robot test ok');
+/*
+
+ JWT access token:{
+ "sub": "ligorobottesting@ligo.org",
+ "aud": "ANY",
+ "ver": "scitoken:2.0",
+ "nbf": 1678913696,
+ "scope": "scitokentesting.write scitokentesting.read",
+ "iss": "https://test.cilogon.org/ligo",
+ "exp": 1678914601,
+ "iat": 1678913701,
+ "jti": "https://test.cilogon.org/oauth2/6c6b09e0e1213eb96a8c12cc54edbcf9?type=accessToken&ts=1678913708335&version=v2.0&lifetime=900000"
+}
+
+
+{
+  "sub": "ligorobottesting@ligo.org",
+  "idp_name": "LIGO Scientific Collaboration",
+  "eppn": "jeffrey.gaynor@ligo.org",
+  "ou": "People",
+  "cert_subject_dn": "/DC=org/DC=cilogon/C=US/O=LIGO/CN=Jeffrey Gaynor jeffrey.gaynor@ligo.org",
+  "iss": "https://test.cilogon.org/ligo",
+  "given_name": "Jeffrey",
+  "nonce": "lZNE2Uf9b5w32Y1XC9HXjOs1uFBEBAEZMtViFgSSDHw",
+  "acr": "https://refeds.org/profile/sfa",
+  "aud": "test:jeff/ligo",
+  "uid": "ligorobottesting",
+  "pairwise_id": "DLXYPSPLINUMVKFUYBK5UAV7UO5NWKGG@ligo.org",
+  "idp": "https://login.ligo.org/idp/shibboleth",
+  "auth_time": 1678911294,
+  "name": "Jeffrey Gaynor",
+  "exp": 1678914601,
+  "family_name": "Gaynor",
+  "iat": 1678913701,
+  "email": "jeffrey.gaynor@ligo.org",
+  "jti": "https://test.cilogon.org/oauth2/idToken/13b5ef7cf2a74e16dc45fae8b20fd31/1678913701435"
+}
+
+*/
