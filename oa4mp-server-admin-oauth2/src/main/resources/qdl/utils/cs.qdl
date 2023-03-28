@@ -1,0 +1,24 @@
+#! /usr/bin/env -S qdl-run
+/*
+  Script to check every file in the invocation directory for syntax.
+  Or, failing that, the directory of the argumemnt
+  this will print out the file name and failure plus a success count.
+ */
+ // test with arg /home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests/local
+root_dir ≔ size(args())≠1?info().'user'.'invocation_dir':args().0;
+root_dir ≔ root_dir + ('.*/'=~root_dir?'':'/');
+files. ≔ dir(root_dir);
+i ≔0;
+while[x ∈ files.]
+  do[
+      if['.*[mq]dl'=~x] // check modules and QDL scripts
+        then[
+              y≔ file_read(root_dir + x);
+              message ≔ check_syntax(y);
+               if[size(message) ≡ 0]
+             then[i++;]
+             else[ say('failed syntax check for ' +  x + ':\n  ' + message);];
+           ]; //end if
+
+   ];// end while
+ say(i + ' files ok'  );

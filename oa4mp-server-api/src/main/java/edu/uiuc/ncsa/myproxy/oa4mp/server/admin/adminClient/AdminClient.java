@@ -1,10 +1,11 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient;
 
-import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.BaseClient;
+import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.util.crypto.KeyUtil;
 import net.sf.json.JSONObject;
 
+import java.net.URI;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
@@ -232,4 +233,42 @@ public class AdminClient extends BaseClient {
     public void setListUsersInOtherClients(boolean listUserInOtherClients) {
         this.listUserInOtherClients = listUserInOtherClients;
     }
+
+    public boolean isAllowCustomIDs() {
+        return allowCustomIDs;
+    }
+
+    public void setAllowCustomIDs(boolean allowCustomIDs) {
+        this.allowCustomIDs = allowCustomIDs;
+    }
+
+    public boolean isGenerateIDs() {
+        return generateIDs;
+    }
+
+    public void setGenerateIDs(boolean generateIDs) {
+        this.generateIDs = generateIDs;
+    }
+
+    public URI getIdHead() {
+        return idHead;
+    }
+
+    public void setIdHead(URI idHead) {
+        this.idHead = idHead;
+    }
+
+    boolean allowCustomIDs = false;
+    boolean generateIDs = false;
+    URI idHead = null;
+
+    public boolean isUseTimestampInIDs() {
+        return useTimestampInIDs;
+    }
+
+    public void setUseTimestampInIDs(boolean useTimestampInIDs) {
+        this.useTimestampInIDs = useTimestampInIDs;
+    }
+
+    boolean useTimestampInIDs = true;
 }

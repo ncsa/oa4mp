@@ -29,9 +29,18 @@ while[x∈indices(p.)]
     ];
  say('ζ. ≔ ' + input_form(z.) + ';');
  say('\n*** or *** \n');
-  
+
+ out. :=[];
  while[for_keys(x, z.)]
    do [caput := 'ζ.' + input_form(x);
        caput :=  ((65 - size(caput))*' ')+ caput; // justifies on the ≔ sign
-       say(caput + ' ≔ ' + input_form(z.x) + ';');
+       //say(caput + ' ≔ ' + input_form(z.x) + ';');
+       out. := out. ~ (caput + ' ≔ ' + input_form(z.x) + ';');
      ];
+out. := sort(out.);
+// finally, print
+  while[x ∈ out.]
+  do[
+    say(x);
+  ];
+  say('\n' + size(out.) + ' entries created');

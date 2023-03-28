@@ -4,8 +4,11 @@
 export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
 OA4MP_ROOT=/home/ncsa/dev/ncsa-git/oa4mp
 
-WEBSITE_ROOT=$OA4MP_ROOT/docs
-cd $WEBSITE_ROOT/pdf
+#WEBSITE_ROOT=$OA4MP_ROOT/docs
+#cd $WEBSITE_ROOT/pdf
+# OLD location for now so the website updates
+GITHUB_ROOT=/home/ncsa/dev/ncsa-git/cilogon.github.io.git/qdl/docs
+cd $GITHUB_ROOT/pdf
 
 echo "converting docs to PDF"
 

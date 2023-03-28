@@ -30,6 +30,8 @@ cfg.'description' :=  'Test basic configuration for LIGO';
 cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token endpoint
 user_id := 'http://cilogon.org/serverT/users/21340363'; // id from Github on test.cilogon.org
 params.'authz' :=  {'scope': 'read:/frames'}; // initial request
+params.'token' :=  {'scope': 'write:/frames', 'audience':'ALL'}; // initial request
+params.'exchange' :=  {'scope': 'read:/frames'}; // initial request
 
 rc := script_load('driver.qdl', cfg., params.);
 tokens. := clc#access();

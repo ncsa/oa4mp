@@ -8,6 +8,8 @@ import edu.uiuc.ncsa.security.storage.data.ConversionMap;
 import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
 import net.sf.json.JSONObject;
 
+import java.net.URI;
+
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 10/20/16 at  1:17 PM
@@ -38,6 +40,12 @@ public class AdminClientConverter<V extends AdminClient> extends BaseClientConve
         v.setVirtualOrganization(BasicIdentifier.newID(getJsonUtil().getJSONValueString(json, getACK().voURI())));
         v.setMaxClients(getJsonUtil().getJSONValueInt(json, getACK().maxClients()));
         v.setAllowQDL(getJsonUtil().getJSONValueBoolean(json, getACK().allowQDL()));
+        v.setGenerateIDs(getJsonUtil().getJSONValueBoolean(json, getACK().generateIDs()));
+        v.setUseTimestampInIDs(getJsonUtil().getJSONValueBoolean(json, getACK().useTimestampsInIds()));
+        v.setAllowCustomIDs(getJsonUtil().getJSONValueBoolean(json, getACK().allowCustomIDs()));
+        if(getJsonUtil().hasKey(json,getACK().idHead())){
+             v.setIdHead(URI.create(getJsonUtil().getJSONValueString(json,getACK().idHead())));
+        }
         JSONObject config = (JSONObject) getJsonUtil().getJSONValue(json, getACK().config());
         if (config != null) {
             v.setConfig(config);
@@ -56,6 +64,22 @@ public class AdminClientConverter<V extends AdminClient> extends BaseClientConve
         }
 
         value.setIssuer(map.getString(getACK().issuer()));
+        if (map.containsKey(getACK().allowCustomIDs())) {
+            // older clients won't have this, so don't force the issue.
+            value.setAllowCustomIDs(map.getBoolean(getACK().allowCustomIDs()));
+        }
+        if (map.containsKey(getACK().generateIDs())) {
+            // older clients won't have this, so don't force the issue.
+            value.setGenerateIDs(map.getBoolean(getACK().generateIDs()));
+        }
+        if (map.containsKey(getACK().useTimestampsInIds())) {
+             // older clients won't have this, so don't force the issue.
+             value.setUseTimestampInIDs(map.getBoolean(getACK().useTimestampsInIds()));
+         }
+        if (map.containsKey(getACK().idHead()) && map.get(getACK().idHead())!=null) {
+            // older clients won't have this, so don't force the issue.
+            value.setIdHead(URI.create(map.getString(getACK().idHead())));
+        }
         if (map.containsKey(getACK().allowQDL())) {
             // older clients won't have this, so don't force the issue.
             value.setAllowQDL(map.getBoolean(getACK().allowQDL()));
@@ -100,6 +124,12 @@ public class AdminClientConverter<V extends AdminClient> extends BaseClientConve
         if (client.getVirtualOrganization() != null) {
             getJsonUtil().setJSONValue(json, getACK().voURI(), client.getVirtualOrganization().toString());
         }
+        getJsonUtil().setJSONValue(json, getACK().allowCustomIDs(), client.isAllowCustomIDs());
+        getJsonUtil().setJSONValue(json, getACK().generateIDs(), client.isGenerateIDs());
+        getJsonUtil().setJSONValue(json, getACK().useTimestampsInIds(), client.isUseTimestampInIDs());
+        if(client.getIdHead()!=null){
+            getJsonUtil().setJSONValue(json, getACK().idHead(), client.getIdHead().toString());
+        }
         getJsonUtil().setJSONValue(json, getACK().issuer(), client.getIssuer());
         getJsonUtil().setJSONValue(json, getACK().maxClients(), client.getMaxClients());
         getJsonUtil().setJSONValue(json, getACK().allowQDL(), client.isAllowQDL());
@@ -119,7 +149,12 @@ public class AdminClientConverter<V extends AdminClient> extends BaseClientConve
         map.put(getACK().maxClients(), client.getMaxClients());
         map.put(getACK().allowQDL(), client.isAllowQDL());
         map.put(getACK().allowQDLCodeBlocks(), client.allowQDLCodeBlocks());
-
+        map.put(getACK().generateIDs(), client.isGenerateIDs());
+        map.put(getACK().allowCustomIDs(), client.isAllowCustomIDs());
+        map.put(getACK().useTimestampsInIds(), client.isUseTimestampInIDs());
+        if(client.getIdHead()!=null){
+            map.put(getACK().idHead(), client.getIdHead().toString());
+        }
         map.put(getACK().notifyOnNewClientCreate(), client.isNotifyOnNewClientCreate());
         map.put(getACK().listUsers(), client.isListUsers());
         map.put(getACK().listUsersInOtherClients(), client.isListUsersInOtherClients());

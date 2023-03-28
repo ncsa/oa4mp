@@ -54,7 +54,7 @@
     // The following are created with the extract.qdl script and pasted here.
     // It's the only way to be sure the policy document is actually processed right,
     // since doing it manually is a real error-prone chore.
-                              ζ.'gw-astronomy:KAGRA-LIGO:members' ≔ ['read:/frames','dqsegdb.read','gracedb.read'];
+                              ζ.'gw-astronomy:KAGRA-LIGO:members' ≔ ['read:/frames','dqsegdb.read','gracedb.read','gwdatafind.read'];
                ζ.'Services:WLCG:SciTokens:scopes:read:authorized' ≔ ['compute.read'];
              ζ.'Services:WLCG:SciTokens:scopes:cancel:authorized' ≔ ['compute.cancel'];
              ζ.'Services:WLCG:SciTokens:scopes:create:authorized' ≔ ['compute.create'];

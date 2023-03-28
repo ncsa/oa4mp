@@ -90,6 +90,9 @@
         Drop this jar (typically named mail.jar) into your <code>$CATALINA_HOME/lib</code>
         directory.
     </li>
+    <li>Possibly get the <a href="https://jar-download.com/artifacts/javax.activation/activation">javax.activation</a> framework jar.
+    This might be needed if you are getting errors sending email messages acessing the javax.activation.DataHandler class. Put it into the above Tomcat lib
+    directory.</li>
     <li>Add the following line right before the closing tag of the <code>$CATALINA_HOME/conf/context.xml</code>
         file:
     </li>

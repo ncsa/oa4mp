@@ -18,6 +18,10 @@ public class AdminClientKeys extends BaseClientKeys {
     String allowQDLCodeBlocks = "allow_qdl_code_blocks";
 
     String config = "config";
+    String allowCustomIDs = "allow_custom_ids";
+    String generateIDs = "generate_ids";
+    String useTimestampsInIDs = "use_timestamps_in_ids";
+    String idStart = "id_start";
     String issuer = "issuer";
     String maxClients = "max_clients";
     String notifyOnNewClientCreate="new_client_notify";
@@ -33,6 +37,23 @@ public class AdminClientKeys extends BaseClientKeys {
     public String allowQDLCodeBlocks(String... x) {
            if (0 < x.length) allowQDLCodeBlocks = x[0];
            return allowQDLCodeBlocks;
+       }
+    public String useTimestampsInIds(String... x) {
+           if (0 < x.length) useTimestampsInIDs = x[0];
+           return useTimestampsInIDs;
+       }
+
+    public String allowCustomIDs(String... x) {
+           if (0 < x.length) allowCustomIDs = x[0];
+           return allowCustomIDs;
+       }
+    public String idHead(String... x) {
+           if (0 < x.length) idStart = x[0];
+           return idStart;
+       }
+    public String generateIDs(String... x) {
+           if (0 < x.length) generateIDs = x[0];
+           return generateIDs;
        }
     public String listUsersInOtherClients(String... x) {
         if (0 < x.length) listUsersInOtherClients= x[0];
@@ -87,6 +108,10 @@ public class AdminClientKeys extends BaseClientKeys {
         allKeys.add(notifyOnNewClientCreate());
         allKeys.add(listUsers());
         allKeys.add(listUsersInOtherClients());
+        allKeys.add(idHead());
+        allKeys.add(allowCustomIDs());
+        allKeys.add(generateIDs());
+        allKeys.add(useTimestampsInIds());
         return allKeys;
     }
 }

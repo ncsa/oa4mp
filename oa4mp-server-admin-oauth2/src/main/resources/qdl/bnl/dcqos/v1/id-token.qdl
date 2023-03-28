@@ -1,0 +1,72 @@
+/*
+Policy:
+Use WLCG tokens
+Refresh token 8,000,000 seconds - opaque string ok.
+Tokens can only be obtained by COPeople in group CO:COU:experiment_atlas:members:active
+Audience for access token should be set to “https://dcqosdoor.usatlas.bnl.gov”
+Can request any scope subset of openid, email, profile, org.cilogon.userinfo, storage.create:/ storage.read:/, storage.modify:/ (because the fine-grained scopes are managed in Vault initially.)
+Access token subject should be md5hash of OIDC client ID.
+Set access token lifetime to 1 hour.
+Users that are denied authorization at the issuer should be redirected to the help page located at https://www.sdcc.bnl.gov/registry-login-error.php
+The following get parameters should be sent
+error
+Same as would normally go to client callback uri
+error_description
+Same as would normally go to client callback uri
+serviceid
+“dcqos”
+The allowed IDP list for this client should only include:
+Brookhaven National Laboratory
+Brookhaven National Laboratory - SDCC.BNL.GOV
+
+ tokens{
+  identity{
+      type=identity
+      issuer="https://test.cilogon.org/bnlsdcc"
+     qdl{
+        load="bnl/dcqos/v1/id-token.qdl"
+         xmd={exec_phase="post_auth"}
+       }// end qdl
+     } //end identity token
+     access{
+        type=wlcg
+        issuer="https://test.cilogon.org/bnlsdcc"
+        audience="https://dcqosdoor.usatlas.bnl.gov"
+        lifetime=3600000
+        qdl{
+           load="bnl/dcqos/v1/access.qdl"
+           xmd={exec_phase=["post_token","pst_refresh","post_exchange"]}
+        } //end QDL
+     } // end access token
+   } //end tokens
+
+
+Set acces token lifetime to 3600 sec. in configuration and refresh token lifetime to 8000000 sec.
+*/
+//script_load('bnl/acl.qdl');
+script_load('utils/init.qdl'); // set up stuff
+
+          γ := 'CO:COU:experiment_atlas:members:active'; // group
+
+     DEBUG := true; // set false everywhere but on my test server.
+ // Robert Hancock's uid.
+  if [DEBUG]
+then [
+      claims.'eppn':='hancock@bnl.gov';
+      claims.'sub' := 'http://cilogon.org/serverA/users/1774626';
+                 γ := 'CO:members:active'; // group that always works, testing only!
+     ];
+
+             user := claims.'sub';
+         results. := script_load('bnl/matter_most/v1/get_user.qdl', user); // user == claims.sub
+  if [!is_defined(results.'isMemberOf')] // indicates something is wrong with their LDAP (?)
+then [ err('no group memberships found.', 'access_denied');];
+
+  if [γ ∉ results.'isMemberOf']
+then [uri :='https://www.sdcc.bnl.gov/registry-login-error.php'+
+            '?error=access_denied' +
+            '&error_description=' + encode('user not in group',1) +
+            '&serviceid=dcqos';
+    err_uri('user not in group',uri);
+    ];
+

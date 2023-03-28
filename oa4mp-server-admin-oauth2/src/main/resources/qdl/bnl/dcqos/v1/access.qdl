@@ -1,0 +1,26 @@
+/*
+{"tokens": {"access": {
+ "qdl":  {
+  "load": "bnl/dcqos/v1/access.qdl",
+  "xmd": {"exec_phase":   [
+   "post_token",
+   "post_exchange",
+   "post_refresh"
+  ]}
+ },
+ "type": "wlcg",
+ "audience": "https://dcqosdoor.usatlas.bnl.gov",
+ "lifetime":3600000,
+ "issuer":"https://test.cilogon.org/bnlsdcc"
+}}}
+
+Set access token lifetime to 3600 sec. in configuration and refresh token lifetime to 8000000 sec.
+*/
+//script_load('bnl/acl.qdl');
+script_load('utils/init.qdl'); // set up stuff
+      allowed_scopes. := ['storage.create:/', 'storage.read:/', 'storage.modify:/'];
+                   s. := (size(tx_scopes.) == 0)?scopes.:tx_scopes.;
+                 out. := ~mask(s., reduce(⊗∨,⊗<∀[allowed_scopes., s.])) ;
+               //out. := ~mask(s., reduce(@||,for_each(@<, allowed_scopes., s.)));
+ access_token.'scope' := detokenize(unique(out.), ' ', 2);
+   access_token.'sub' := hash(access_control.client_id);

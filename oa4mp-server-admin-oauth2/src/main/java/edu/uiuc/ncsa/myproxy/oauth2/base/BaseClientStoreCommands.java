@@ -471,6 +471,7 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
         // Have to take into account if the result set is for a set of approvals.
         if (inputLine.hasArg(RS_SHOW_KEY)) {
             String name = inputLine.getLastArg();
+
             if (isCARS(name)) {
                 clientApprovalStoreCommands.rs(inputLine);
                 return;
@@ -478,6 +479,7 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
         }
         if (inputLine.hasArg(RS_CLEAR_KEY)) {
             clientApprovalStoreCommands.setResultSets(new HashMap());
+            inputLine.removeSwitch(RS_CLEAR_KEY);
         }
         if (inputLine.hasArg(RS_REMOVE_KEY)) {
             String name = inputLine.getLastArg();
@@ -489,6 +491,7 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
         if (inputLine.hasArg(RS_LIST_INFO_KEY)) {
             // List lists all things, so no test about where the rs is stored.
             clientApprovalStoreCommands.rs(inputLine);
+            inputLine.removeSwitch(RS_LIST_INFO_KEY);
         }
         super.rs(inputLine);
     }

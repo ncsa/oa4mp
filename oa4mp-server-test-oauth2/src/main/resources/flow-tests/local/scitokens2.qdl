@@ -3,34 +3,45 @@
 /*
    Tests the client with scitokens configuration AND QDL claim sources
    Client config 2022-11-09
-{"tokens": {
-   "access":  {
-    "audience": "https://localhost/fermilab",
-    "lifetime": 300000,
-       "qdl":   {
-        "load": "ui-test/process.qdl",
-        "xmd": {"exec_phase":    [
-         "post_token",
-         "post_refresh",
-         "post_user_info"
-        ]}
-       }
-    "templates": [  {
-     "aud": "https://localhost/fermilab",
-     "paths":    [
-          {"op": "read", "path": "/home/${sub}"},
-          {"op": "x.y","path": "/abc/def"},
-          {"op": "write","path": "/data/${sub}/cluster"}
-     ]
-    }],
-    "type": "scitoken"
-   },
-   "refresh":  {
-    "audience": "https://localhost/test",
-    "lifetime": 900000,
-    "type": "refresh"
-   }
-  }}
+{
+	"tokens": {
+		"access": {
+			"audience": "https://localhost/fermilab",
+			"lifetime": 300000,
+			"qdl": {
+				"load": "ui-test/process.qdl",
+				"xmd": {
+					"exec_phase": [
+						"post_token",
+						"post_refresh",
+						"post_user_info"
+					]
+				}
+			},
+		"templates": [{
+			"aud": "https://localhost/fermilab",
+			"paths": [{
+					"op": "read",
+					"path": "/home/${sub}"
+				},
+				{
+					"op": "x.y",
+					"path": "/abc/def"
+				},
+				{
+					"op": "write",
+					"path": "/data/${sub}/cluster"
+				}
+			]
+		}],
+		"type": "scitoken"
+	},
+	"refresh": {
+		"audience": "https://localhost/test",
+		"lifetime": 900000,
+		"type": "refresh"
+	}
+}}
 
 */
 path := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests';

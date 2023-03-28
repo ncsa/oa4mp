@@ -30,6 +30,10 @@ public class AdminClientTable extends BaseClientTable {
         getColumnDescriptor().add(new ColumnDescriptorEntry(ak().allowQDL(), Types.BOOLEAN));
         getColumnDescriptor().add(new ColumnDescriptorEntry(ak().notifyOnNewClientCreate(), Types.BOOLEAN));
         getColumnDescriptor().add(new ColumnDescriptorEntry(ak().listUsers(), Types.BOOLEAN));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(ak().generateIDs(), Types.BOOLEAN));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(ak().allowCustomIDs(), Types.BOOLEAN));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(ak().useTimestampsInIds(), Types.BOOLEAN));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(ak().idHead(), Types.LONGVARCHAR));
         getColumnDescriptor().add(new ColumnDescriptorEntry(ak().listUsersInOtherClients(), Types.BOOLEAN));
         getColumnDescriptor().add(new ColumnDescriptorEntry(ak().creationTS(), Types.TIMESTAMP));
     }

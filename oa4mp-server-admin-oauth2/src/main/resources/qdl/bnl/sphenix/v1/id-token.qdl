@@ -1,0 +1,64 @@
+/*
+    Access token support for Brookhaven Lab. Typical configuration for the client
+    is
+
+{
+  "tokens": {
+    "access": {
+      "audience": "https://dcqosdoor.usatlas.bnl.gov",
+      "lifetime": 3600000,
+      "qdl": {
+        "load": "bnl/sphenix/v1/access.qdl",
+        "xmd": {
+          "exec_phase": [
+            "post_token",
+            "post_refresh",
+            "post_exchange"
+          ]
+        }
+      },
+      "type": "wlcg",
+      "issuer": "https://test.cilogon.org/bnlsdcc"
+    },
+    "identity": {
+      "qdl": {
+        "load": "bnl/sphenix/v1/id-token.qdl",
+        "xmd": {
+          "exec_phase": "post_auth"
+        }
+      },
+      "type": "identity",
+      "issuer": "https://test.cilogon.org/bnlsdcc"
+    }
+  }
+}
+*/
+//script_load('bnl/acl.qdl');
+script_load('utils/init.qdl'); // set up stuff
+
+     DEBUG := true; // set false everywhere but on my test server.
+ // Robert Hancock's uid.
+  if [DEBUG]
+then [
+      claims.'eppn':='hancock@bnl.gov';
+      claims.'sub' := 'http://cilogon.org/serverA/users/1774626';
+     ];
+
+       γ := 'CO:COU:experiment_sphenix:members:active'; // group
+results. := script_load('bnl/sphenix/v1/get_user.qdl', claims.'sub'); // user == claims.sub
+
+if[
+    !is_defined(results.isMemberOf) // indicates something is wrong with their LDAP (?)
+  ][
+    raise_error('no group memberships found.', oa4mp_error, {'error_type' :'access_denied'});
+];
+
+SS('BNL', 'result of query =' + to_string(results.));
+
+  if [γ ∉ results.'isMemberOf']
+then [uri :='https://www.sdcc.bnl.gov/registry-login-error.php'+
+            '?error=access_denied' +
+            '&error_description=' + encode('user not in group',1) +
+            '&serviceid=harvester-sphnxpro';
+    err_uri('user not in group',uri);
+    ];

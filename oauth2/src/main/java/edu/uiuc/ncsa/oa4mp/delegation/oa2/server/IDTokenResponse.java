@@ -139,7 +139,7 @@ public abstract class IDTokenResponse extends IResponse2 {
                 m.put(REFRESH_TOKEN, getRefreshToken().getToken()); // don't encode JWTs
             }
             // CIL-1655
-            m.put("refresh_token_" + EXPIRES_IN, refreshToken.getLifetime()/1000);
+            m.put("refresh_token_lifetime", refreshToken.getLifetime()/1000);
             m.put("refresh_token_" + OA2Claims.ISSUED_AT, refreshToken.getIssuedAt()/1000);
         }
         if (!getSupportedScopes().isEmpty()) {

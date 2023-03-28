@@ -7,6 +7,8 @@ import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import net.sf.json.JSONObject;
 
+import java.net.URI;
+
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 12/23/20 at  6:21 AM
@@ -65,8 +67,19 @@ public class AdminClientStemMC<V extends AdminClient> extends StemConverter<V> {
         if (stem.containsKey(kk().listUsersInOtherClients())) {
             v.setListUsersInOtherClients(stem.getBoolean(kk().listUsersInOtherClients()));
         }
+        if (stem.containsKey(kk().allowCustomIDs())) {
+             v.setAllowCustomIDs(stem.getBoolean(kk().allowCustomIDs()));
+         }
+        if (stem.containsKey(kk().useTimestampsInIds())) {
+               v.setUseTimestampInIDs(stem.getBoolean(kk().useTimestampsInIds()));
+           }
 
-
+        if (stem.containsKey(kk().generateIDs())) {
+             v.setGenerateIDs(stem.getBoolean(kk().generateIDs()));
+         }
+        if (stem.containsKey(kk().idHead())) {
+             v.setIdHead(URI.create(stem.getString(kk().idHead())));
+         }
         if (isStringKeyOK(stem, kk().config())) {
             v.setConfig(JSONObject.fromObject(stem.getString(kk().config())));
         }
@@ -100,6 +113,12 @@ public class AdminClientStemMC<V extends AdminClient> extends StemConverter<V> {
         setNonNullStemValue(stem, kk().secret(), v.getSecret());
 
         stem.put(kk().allowQDL(), v.isAllowQDL());
+        stem.put(kk().generateIDs(), v.isGenerateIDs());
+        stem.put(kk().useTimestampsInIds(), v.isUseTimestampInIDs());
+        stem.put(kk().allowCustomIDs(), v.isAllowCustomIDs());
+        if(v.getIdHead() != null){
+            stem.put(kk().idHead(), v.getIdHead().toString());
+        }
         stem.put(kk().listUsers(), v.isListUsers());
         stem.put(kk().listUsersInOtherClients(), v.isListUsersInOtherClients());
         setNonNullStemValue(stem, kk().config(), v.getConfig().toString());

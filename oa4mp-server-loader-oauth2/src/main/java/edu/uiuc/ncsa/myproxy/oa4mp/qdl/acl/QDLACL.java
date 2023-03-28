@@ -32,7 +32,7 @@ import java.util.List;
 public class QDLACL implements QDLModuleMetaClass {
 
 
-    public static String ACL_REJECT_NAME = "acl_reject";
+    public static String ACL_REJECT_NAME = "acl_blacklist";
 
     public class ACLReject implements QDLFunction {
         @Override
@@ -55,8 +55,9 @@ public class QDLACL implements QDLModuleMetaClass {
 
         public List<String> getDocumentation(int argCount) {
             List<String> doxx = new ArrayList<>();
-            doxx.add(getName() + "(id | id.) block for this object or objects. AKA blacklist them.");
-
+            doxx.add(getName() + "(id | id.{,fail_on_bad_ids}) block access for this object or objects, AKA blacklist them.");
+            doxx.add("if fail_on_bad_ids is true, then check each id to ensure it is valid and if not, throw an  exception.");
+            doxx.add("   fail_on_bad_ids default is false.");
             return null;
         }
     }
@@ -72,7 +73,7 @@ public class QDLACL implements QDLModuleMetaClass {
             throw new IllegalArgumentException("Error: This requires an OA2State object.");
         }
         OA2State oa2State = (OA2State) state;
-        if (objects.length != 1) {
+        if (objects.length == 0) {
             throw new IllegalArgumentException("Error: " + name + " requires an argument");
         }
         List<Object> ids;
@@ -88,32 +89,64 @@ public class QDLACL implements QDLModuleMetaClass {
                 throw new IllegalArgumentException("Error: " + name + " requires a string or stem as its argument");
 
         }
+        // Fix CIL-1668
+        boolean failOnBadIds = false;
+        if (objects.length == 2) {
+            if (!(objects[1] instanceof Boolean)) {
+                throw new IllegalArgumentException("Error: " + name + " requires a boolean as its second argument");
+            }
+            failOnBadIds = (Boolean) objects[1];
+        }
+        ArrayList<String> badIds = new ArrayList<>();
         for (Object id : ids) {
             Identifier identifier;
+            if (!(id instanceof String)) {
+                throw new IllegalArgumentException("Error: '" + id + "' is not a valid identifier");
+            }
             try {
-                if (!(id instanceof String)) {
-                    throw new IllegalArgumentException("Error: '" + id + "' is not a valid identifier");
-                }
                 URI uri = URI.create((String) id);
                 identifier = BasicIdentifier.newID(uri);
-                boolean isClientID = oa2State.getOa2se().getClientStore().containsKey(identifier);
-                boolean isAdminID = oa2State.getOa2se().getAdminClientStore().containsKey(identifier);
-                if (isAdminID && isClientID) {
-                    throw new NFWException("Error: There is a regular client and an admin client with the same id '" + identifier.toString() + "'");
-                }
-                if (!isAdminID && !isClientID) {
-                    throw new QDLIllegalAccessException("Error: There is a no such client with id '" + identifier.toString() + "'. Access denied.");
-                }
-                if (accept) {
-                    oa2State.getAclList().add(identifier);
-                } else {
-                    oa2State.getAclBlackList().add(identifier);
-                }
-
             } catch (Throwable t) {
-                throw new IllegalArgumentException("Error: " + name + " requires a valid identifier");
+                if (failOnBadIds) {
+                    throw new IllegalArgumentException("Error: " + name + " requires a valid identifier");
+                } else {
+                    badIds.add(id.toString());
+                    continue;
+                }
+                // can get exception here from bad id
             }
-
+            boolean isClientID = oa2State.getOa2se().getClientStore().containsKey(identifier);
+            boolean isAdminID = oa2State.getOa2se().getAdminClientStore().containsKey(identifier);
+            if (isAdminID && isClientID) {
+                throw new NFWException("Error: There is a regular client and an admin client with the same id '" + identifier.toString() + "'");
+            }
+            if (!isAdminID && !isClientID) {
+                if (failOnBadIds) {
+                    throw new QDLIllegalAccessException("Error: There is a no such client with id '" + identifier.toString() + "'. Access denied.");
+                } else {
+                    badIds.add(identifier.toString());
+                }
+            }
+            if (accept) {
+                oa2State.getAclList().add(identifier);
+            } else {
+                oa2State.getAclBlackList().add(identifier);
+            }
+        }
+        if (0 < badIds.size()) {
+            StringBuilder sb = new StringBuilder(badIds.size() + 2);
+            sb.append("[");
+            boolean firstLoop = true;
+            for (String s : badIds) {
+                if (firstLoop) {
+                    firstLoop = false;
+                    sb.append(s);
+                } else {
+                    sb.append(", " + s);
+                }
+            }
+            sb.append("]");
+            oa2State.getOa2se().getMyLogger().warn("failed to add the following IDs to the ACLs :" + sb);
         }
 
         return Boolean.TRUE;
@@ -140,9 +173,11 @@ public class QDLACL implements QDLModuleMetaClass {
         @Override
         public List<String> getDocumentation(int argCount) {
             List<String> doxx = new ArrayList<>();
-            doxx.add(getName() + "(id | id.) add to the access control list for this object");
+            doxx.add(getName() + "(id | id.{,fail_on_bad_ids}) add to the access control list for this object");
             if (argCount == 1) {
                 doxx.add("Accepts either a string or a list of them.");
+                doxx.add("if fail_on_bad_ids is true, then check each id to ensure it is valid and if not, throw an  exception.");
+                doxx.add("   fail_on_bad_ids default is false.");
                 doxx.add("This sets the admin_id or client_id. If an admin id, then any client has access ");
                 doxx.add("to this object. If a client id, then precisely that client is allowed");
             }

@@ -183,6 +183,50 @@ Administrative clients manage other clients. They may create and configure them
 via the client management endpoint.]]>
     </body>
     </entry>
+    <entry id="allow_custom_ids">
+    <body>
+    <![CDATA[Property. Boolean
+Allows this admin client to request custom identifiers when creating new clients.
+If this is set true, then in the create request for the client, supplying
+the client_id will set that as the id of the new client, if possible. Note
+that it is possible the client id may be in use, in which case, the request
+will fail.
+
+See also: generate_ids, id_start]]>
+    </body>
+    </entry>
+    <entry id="generate_ids">
+    <body>
+    <![CDATA[Property. Boolean.
+If true AND allow_custom_ids is true, then the system will take the value of id_start
+and generate a random id from that.
+
+See also: allow_custom_ids, id_start ]]>
+    </body>
+<example>
+<![CDATA[E.g.
+If the id_start is 'bnl:/client_id' then issuing a new client request with no specified
+client_id will result in an identifier of the form
+'bnl:/client_id/XXXXXXX/TS'
+where XXXXXXX is some completely random string and TS is the timestamp in milliseconds
+that the id was minted.
+]]>
+</example>
+</entry>
+<entry id="id_start">
+<body>
+<![CDATA[Property. String.
+The start of custom IDs. This can be anything but should result in a valid URI
+when all is said and done (so no illegal characters). These usually are of the form
+institution:other_stuff/client_id
+
+E.g. If your institution was Big State University and your research group
+was Physics a plausible id_start would be
+bsu:physics:/client_id
+]]>
+</body>
+</entry>
+
 </html>
     <!--
 

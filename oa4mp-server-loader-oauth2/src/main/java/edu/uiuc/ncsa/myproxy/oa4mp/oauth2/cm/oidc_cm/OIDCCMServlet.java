@@ -39,6 +39,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.sql.SQLException;
 import java.util.*;
@@ -187,7 +188,7 @@ public class OIDCCMServlet extends EnvServlet {
     protected String formatIdentifiable(Store store, Identifiable identifiable) {
         XMLMap map = new XMLMap();
         store.getXMLConverter().toMap(identifiable, map);
-        if(identifiable instanceof OA2Client){
+        if (identifiable instanceof OA2Client) {
             OA2ClientConverter cc = (OA2ClientConverter) store.getXMLConverter();
             map.remove(cc.getCK2().secret()); // Remove the secret from the email!
         }
@@ -268,7 +269,7 @@ public class OIDCCMServlet extends EnvServlet {
         if (client.isPublicClient()) {
             json.put(TOKEN_ENDPOINT_AUTH_METHOD, TOKEN_ENDPOINT_AUTH_NONE);
         }
-        if (0 < client.getRtLifetime() ) {
+        if (0 < client.getRtLifetime()) {
             // Stored in ms., sent/received in sec. Convert to seconds.
             json.put(REFRESH_LIFETIME, client.getRtLifetime() / 1000);
         } else {
@@ -300,9 +301,9 @@ public class OIDCCMServlet extends EnvServlet {
         json.put(clientKeys.extendsProvisioners(), client.isExtendsProvisioners());
         json.put(clientKeys.ersatzClient(), client.isErsatzClient());
         //CIL-1321 inheritance
-        if(client.hasPrototypes()){
+        if (client.hasPrototypes()) {
             JSONArray jsonArray = new JSONArray();
-            for(Identifier id : client.getPrototypes()){
+            for (Identifier id : client.getPrototypes()) {
                 jsonArray.add(id.toString());
             }
             json.put(clientKeys.prototypes(), jsonArray);
@@ -513,6 +514,7 @@ public class OIDCCMServlet extends EnvServlet {
             // this fails we can just back out.
             OA2Client newClient = (OA2Client) getOA2SE().getClientStore().create();
             boolean generateNewSecret = false;
+
             if (jsonRequest.containsKey(CLIENT_SECRET)) {
                 // then we have to check this is a valid client. If this is missing, then
                 // we are being requested to generate a new secret.
@@ -689,6 +691,7 @@ public class OIDCCMServlet extends EnvServlet {
         debugger.trace(this, "Starting to process " + httpServletRequest.getMethod());
         // Now that we have the admin client (so we can do this request), we read the payload:
         JSON rawJSON = getPayload(httpServletRequest, debugger);
+
         if ((!isAnonymous) && adminClient.getMaxClients() < getOA2SE().getPermissionStore().getClientCount(adminClient.getIdentifier())) {
             debugger.info(this, "Error: Max client count of " + adminClient.getMaxClients() + " exceeded.");
             throw new GeneralException("Error: Max client count of " + adminClient.getMaxClients() + " exceeded.");
@@ -698,6 +701,7 @@ public class OIDCCMServlet extends EnvServlet {
             debugger.info(this, "Error: Got a JSON array rather than a request:" + rawJSON);
             throw new IllegalArgumentException("Error: incorrect argument. Not a valid JSON request");
         }
+        JSONObject jsonRequest = (JSONObject) rawJSON; // now we know it is a JSON Object
         OA2Client template = null;
         template = (OA2Client) getOA2SE().getClientStore().create();
         if (cm7591Config.template != null) {
@@ -711,13 +715,13 @@ public class OIDCCMServlet extends EnvServlet {
         // strings expect them back as strings, not JSON arrays. Return them in the format sent.
         boolean returnStringScopes = false;
         try {
-            ((JSONObject)rawJSON).getJSONArray(SCOPE);
+            jsonRequest.getJSONArray(SCOPE);
             returnStringScopes = false;
         } catch (JSONException jse) {
             returnStringScopes = true;
         }
 
-        OA2Client newClient = processRegistrationRequest((JSONObject) rawJSON, adminClient, isAnonymous, httpServletResponse, template);
+        OA2Client newClient = processRegistrationRequest(jsonRequest, adminClient, isAnonymous, httpServletResponse, template);
         if (isAnonymous) {
             // All anonymous requests send a notification.
             fireMessage(isAnonymous, getOA2SE(), defaultReplacements(httpServletRequest, adminClient, newClient));
@@ -729,7 +733,35 @@ public class OIDCCMServlet extends EnvServlet {
         }
 
         JSONObject jsonResp = new JSONObject(); // The response object.
-        jsonResp.put(CLIENT_ID, newClient.getIdentifierString());
+        String newID = newClient.getIdentifierString(); // default, random id with default configured head.
+        // CIL-1671
+        if (jsonRequest.containsKey(CLIENT_ID)) {
+            if (adminClient != null && adminClient.isAllowCustomIDs()) {
+                 newID = jsonRequest.getString(CLIENT_ID);
+            }
+        } else {
+            // other case is that there is no explicit request, but the admin wants
+            // us to generate the ids.
+            if (adminClient != null && adminClient.isAllowCustomIDs() && adminClient.isGenerateIDs()) {
+                if(adminClient.getIdHead() == null){
+                    // at this point, not setting still results in a random client ID
+                    warn(adminClient.getIdentifierString() + " requested generate client id but there is no id head set");
+                }else {
+                    byte[] u = new byte[16];
+                    secureRandom.nextBytes(u);
+                    BigInteger bi = new BigInteger(u);
+                    bi = bi.abs(); // since negative random integers occur.
+                    String uniquePart = bi.toString(16) ;
+                    if(adminClient.isUseTimestampInIDs()){
+                        uniquePart = uniquePart + "/" + System.currentTimeMillis();
+                    }
+                    newID = adminClient.getIdHead().toString();
+                    newID = newID + (newID.endsWith("/") ? "" : "/") + uniquePart;
+                }
+            }
+        }
+        newClient.setIdentifier(BasicIdentifier.newID(newID));
+        jsonResp.put(CLIENT_ID, newID);
         if (!StringUtils.isTrivial(newClient.getSecret())) {
 
             jsonResp.put(CLIENT_SECRET, newClient.getSecret());
@@ -747,12 +779,12 @@ public class OIDCCMServlet extends EnvServlet {
         jsonResp.put(OIDCCMConstants.REGISTRATION_CLIENT_URI, registrationURI + "?" + OA2Constants.CLIENT_ID + "=" + newClient.getIdentifierString());
         // oidc-client expects the scopes which we may return.
         if (returnStringScopes) {
-                  jsonResp.put(SCOPE, String.join(" ", newClient.getScopes()));
-              } else {
-                  JSONArray xxx = new JSONArray();
-                  xxx.addAll(newClient.getScopes())        ;
-                  jsonResp.put(SCOPE, xxx);
-              }
+            jsonResp.put(SCOPE, String.join(" ", newClient.getScopes()));
+        } else {
+            JSONArray xxx = new JSONArray();
+            xxx.addAll(newClient.getScopes());
+            jsonResp.put(SCOPE, xxx);
+        }
         debugger.trace(this, "saving this client");
         getOA2SE().getClientStore().save(newClient);
 
@@ -789,12 +821,15 @@ public class OIDCCMServlet extends EnvServlet {
         writeCreateOK(httpServletResponse, jsonResp);
     }
 
+    protected SecureRandom secureRandom = new SecureRandom();
+
     private void writeOK(HttpServletResponse httpServletResponse, JSON resp) throws IOException {
         httpServletResponse.setStatus(HttpStatus.SC_OK);
         httpServletResponse.setContentType("application/json");
         httpServletResponse.getWriter().println(resp.toString());
         httpServletResponse.getWriter().flush(); // commit it
     }
+
     private void writeCreateOK(HttpServletResponse httpServletResponse, JSON resp) throws IOException {
         // write first since after flush(), no updates work and the status is set as SC_OK, regardless.
         httpServletResponse.setStatus(HttpStatus.SC_CREATED);
@@ -984,7 +1019,7 @@ public class OIDCCMServlet extends EnvServlet {
                             HttpStatus.SC_BAD_REQUEST, null);
                 }
                 if (1 < newScopes.size()) {
-                    if(!unique.contains(OA2Scopes.SCOPE_OFFLINE_ACCESS)){
+                    if (!unique.contains(OA2Scopes.SCOPE_OFFLINE_ACCESS)) {
                         throw new OA2GeneralError(OA2Errors.INVALID_REQUEST_OBJECT,
                                 "cannot increase scopes on a public client.",
                                 HttpStatus.SC_BAD_REQUEST, null);
@@ -1031,32 +1066,32 @@ public class OIDCCMServlet extends EnvServlet {
             }
             JSONObject jsonObject = jsonRequest.getJSONObject("cfg");
             // CIL-889 fix
-            if(isAnonymous){
-                if(jsonRequest.getString("cfg").toLowerCase().contains("qdl")){
+            if (isAnonymous) {
+                if (jsonRequest.getString("cfg").toLowerCase().contains("qdl")) {
                     // Pretty draconian test -- any tag for QDL gets booted.
                     throw new OA2GeneralError(OA2Errors.INVALID_REQUEST_OBJECT,
-                              "QDL scripting is not allowed for this client.",
-                              HttpStatus.SC_BAD_REQUEST, null);
-                  }
-            }
-            if(adminClient.isAllowQDL()){
-                // CIL-1031
-                if(adminClient.allowQDLCodeBlocks()){
-                   if(jsonRequest.getString("cfg").contains("qdl") && jsonRequest.getString("cfg").contains("qdl")){
-                       if(jsonRequest.getString("cfg").contains("\"code\"")){
-                           throw new OA2GeneralError(OA2Errors.INVALID_REQUEST_OBJECT,
-                                     "QDL code blocks are not allowed for this client.",
-                                     HttpStatus.SC_BAD_REQUEST, null);
-                       }
-                   }
+                            "QDL scripting is not allowed for this client.",
+                            HttpStatus.SC_BAD_REQUEST, null);
                 }
-            }else{
-                if(jsonRequest.getString("cfg").toLowerCase().contains("qdl")){
+            }
+            if (adminClient.isAllowQDL()) {
+                // CIL-1031
+                if (adminClient.allowQDLCodeBlocks()) {
+                    if (jsonRequest.getString("cfg").contains("qdl") && jsonRequest.getString("cfg").contains("qdl")) {
+                        if (jsonRequest.getString("cfg").contains("\"code\"")) {
+                            throw new OA2GeneralError(OA2Errors.INVALID_REQUEST_OBJECT,
+                                    "QDL code blocks are not allowed for this client.",
+                                    HttpStatus.SC_BAD_REQUEST, null);
+                        }
+                    }
+                }
+            } else {
+                if (jsonRequest.getString("cfg").toLowerCase().contains("qdl")) {
                     // Pretty draconian test -- any tag for QDL gets booted.
                     throw new OA2GeneralError(OA2Errors.INVALID_REQUEST_OBJECT,
-                              "QDL scripting is not allowed for this client.",
-                              HttpStatus.SC_BAD_REQUEST, null);
-                  }
+                            "QDL scripting is not allowed for this client.",
+                            HttpStatus.SC_BAD_REQUEST, null);
+                }
             }
             jsonRequest.remove("cfg");
             client.setConfig(jsonObject);
@@ -1078,20 +1113,20 @@ public class OIDCCMServlet extends EnvServlet {
             jsonRequest.remove(ACCESS_TOKEN_LIFETIME);
         }
         // Remember that for updates (via PUT) there is no anonymous mode.
-        if(!isAnonymous){
-            if(jsonRequest.containsKey(clientKeys.prototypes())){
+        if (!isAnonymous) {
+            if (jsonRequest.containsKey(clientKeys.prototypes())) {
                 JSONArray jsonArray = jsonRequest.getJSONArray(clientKeys.prototypes());
                 List<Identifier> prototypes = new ArrayList<>();
-                for(int i = 0; i < jsonArray.size(); i++){
+                for (int i = 0; i < jsonArray.size(); i++) {
                     prototypes.add(BasicIdentifier.newID(jsonArray.getString(i)));
                 }
                 client.setPrototypes(prototypes);
             }
 
-            if(jsonRequest.containsKey(clientKeys.extendsProvisioners())){
+            if (jsonRequest.containsKey(clientKeys.extendsProvisioners())) {
                 client.setExtendsProvisioners(jsonRequest.getBoolean(clientKeys.extendsProvisioners()));
             }
-            if(jsonRequest.containsKey(clientKeys.ersatzClient())){
+            if (jsonRequest.containsKey(clientKeys.ersatzClient())) {
                 client.setErsatzClient(jsonRequest.getBoolean(clientKeys.ersatzClient()));
             }
             if (jsonRequest.containsKey(STRICT_SCOPES)) {
@@ -1103,20 +1138,20 @@ public class OIDCCMServlet extends EnvServlet {
                 jsonRequest.remove(SKIP_SERVER_SCRIPTS);
             }
             // CIL-1221
-            if(jsonRequest.containsKey(PROXY_CLAIMS_LIST)){
+            if (jsonRequest.containsKey(PROXY_CLAIMS_LIST)) {
                 client.setProxyClaimsList(jsonRequest.getJSONArray(PROXY_CLAIMS_LIST));
                 jsonRequest.remove(PROXY_CLAIMS_LIST);
             }
-            if(jsonRequest.containsKey(FORWARD_REQUEST_SCOPES_TO_PROXY)){
+            if (jsonRequest.containsKey(FORWARD_REQUEST_SCOPES_TO_PROXY)) {
                 client.setForwardScopesToProxy(jsonRequest.getBoolean(FORWARD_REQUEST_SCOPES_TO_PROXY));
                 jsonRequest.remove(FORWARD_REQUEST_SCOPES_TO_PROXY);
             }
-            if(jsonRequest.containsKey(PROXY_REQUEST_SCOPES)){
+            if (jsonRequest.containsKey(PROXY_REQUEST_SCOPES)) {
                 client.setProxyRequestScopes(jsonRequest.getJSONArray(PROXY_REQUEST_SCOPES));
                 jsonRequest.remove(PROXY_REQUEST_SCOPES);
             }
         }
-        if(jsonRequest.containsKey(DESCRIPTION)){
+        if (jsonRequest.containsKey(DESCRIPTION)) {
             client.setDescription(jsonRequest.getString(DESCRIPTION));
             jsonRequest.remove(DESCRIPTION);
         }
@@ -1141,7 +1176,7 @@ public class OIDCCMServlet extends EnvServlet {
     protected void handleResponseTypes(OA2Client client, JSONObject jsonRequest, OA2ClientKeys keys) {
         if (jsonRequest.containsKey(RESPONSE_TYPES)) {
             JSONArray responseTypes = toJA(jsonRequest, RESPONSE_TYPES);
-            if(!responseTypes.isEmpty()){
+            if (!responseTypes.isEmpty()) {
                 // oidc-agent sends an empty list. Don't have it bomb later.
                 if (!responseTypes.contains(OA2Constants.RESPONSE_TYPE_CODE)) {
                     throw new OA2GeneralError(OA2Errors.UNSUPPORTED_RESPONSE_TYPE,
@@ -1281,9 +1316,9 @@ public class OIDCCMServlet extends EnvServlet {
 
     //CIL-607
     protected void fireMessage(boolean isAnonymous, OA2SE oa2SE, HashMap<String, String> replacements) {
-        if(isAnonymous) {
+        if (isAnonymous) {
             oa2SE.getMailUtil().sendMessage(anonSubjectTemplate, anonMessageTemplate, replacements, oa2SE.getNotifyACEventEmailAddresses());
-        }else{
+        } else {
             oa2SE.getMailUtil().sendMessage(subjectTemplate, messageTemplate, replacements, oa2SE.getNotifyACEventEmailAddresses());
         }
     }

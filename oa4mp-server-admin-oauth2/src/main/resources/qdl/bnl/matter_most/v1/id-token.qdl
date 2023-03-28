@@ -39,15 +39,17 @@ tokens {
 script_load('utils/init.qdl'); // set up stuff
 
 
-user := claims.sub;
-SS('BNL-MM','starting id-token for user =' + user);
-
      DEBUG := true; // set false everywhere but on my test server.
  // Robert Hancock's uid.
   if [DEBUG]
-then [claims.'eppn':='bob@bnl.gov';
-              user := 'http://cilogon.org/serverA/users/1774626';
+then [
+      claims.'eppn':='hancock@bnl.gov';
+      claims.'sub' := 'http://cilogon.org/serverA/users/1774626';
      ];
+
+user := claims.sub;
+SS('BNL-MM','starting id-token for user =' + user);
+
 
        γ := 'MattermostUsers'; // group
 results. := script_load('bnl/matter_most/v1/get_user.qdl', user); // user == claims.sub
@@ -57,13 +59,12 @@ results. := script_load('bnl/matter_most/v1/get_user.qdl', user); // user == cla
 then [ err('no group memberships found.', 'access_denied');];
 
   if [γ ∉ results.'isMemberOf']
-then [raise_error('user not in group',
-                   oa4mp_error,
-                   {      'error_type' : 'access_denied',
-                    'custom_error_uri' : 'https://www.sdcc.bnl.gov/attempt-failed-mattermost',
-                              'status' : 302
-                    });
-     ];
+then [uri :='https://www.sdcc.bnl.gov/attempt-failed-mattermost'+
+            '?error=access_denied' +
+            '&error_description=' + encode('user not in group',1) +
+            '&serviceid=mattermost';
+    err_uri('user not in group',uri);
+    ];
 
           claims.'sub' := results.'sdccid';
    claims.'isMemberOf' := results.'isMemberOf';

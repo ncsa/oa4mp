@@ -89,7 +89,7 @@ is_igwn := script_args()==1?script_args(0)=='igwn':false;
 
 
                                                   all_audience. := ['ANY'];
-                            ζ.'gw-astronomy:KAGRA-LIGO:members' := ['read:/frames','dqsegdb.read', 'gracedb.read'];
+                            ζ.'gw-astronomy:KAGRA-LIGO:members' := ['read:/frames','dqsegdb.read', 'gracedb.read','gwdatafind.read'];
           ζ.'Services:Compute:SciTokens:scopes:read:authorized' := ['compute.read'];
           ζ.'Services:DQSegDB:SciTokens:scopes:read:authorized' := ['dqsegdb.read','gracedb.read'];
         ζ.'Services:Compute:SciTokens:scopes:cancel:authorized' := ['compute.cancel'];
