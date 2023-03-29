@@ -1,9 +1,9 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo;
 
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.monitored.MonitoredFileStore;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
-import edu.uiuc.ncsa.security.storage.FileStore;
 import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
@@ -15,7 +15,7 @@ import java.util.List;
  * <p>Created by Jeff Gaynor<br>
  * on 12/14/20 at  9:02 AM
  */
-public class VOFileStore<V extends VirtualOrganization> extends FileStore<V> implements VOStore<V> {
+public class VOFileStore<V extends VirtualOrganization> extends MonitoredFileStore<V> implements VOStore<V> {
     public VOFileStore(File storeDirectory,
                        File indexDirectory,
                        IdentifiableProvider<V> identifiableProvider,

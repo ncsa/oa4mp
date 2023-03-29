@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.oa4mp.delegation.common.storage;
 
-import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
+import edu.uiuc.ncsa.security.storage.data.MonitoredKeys;
 
 import java.util.List;
 
@@ -8,11 +8,9 @@ import java.util.List;
  * <p>Created by Jeff Gaynor<br>
  * on 10/20/16 at  12:57 PM
  */
-public class BaseClientKeys extends SerializationKeys {
-    String creationTS = "creation_ts";
+public class BaseClientKeys extends MonitoredKeys {
     String debugOn = "debug_on";
     String email = "email";
-    String lastModifiedTS = "last_modified_ts";
     String name = "name";
     String secret = "oauth_client_pubkey";
 
@@ -32,6 +30,7 @@ public class BaseClientKeys extends SerializationKeys {
         return email;
     }
 
+/*
     public String creationTS(String... x) {
          if (0 < x.length) creationTS = x[0];
          return creationTS;
@@ -41,6 +40,7 @@ public class BaseClientKeys extends SerializationKeys {
          if (0 < x.length) lastModifiedTS = x[0];
          return lastModifiedTS;
      }
+*/
 
 
     public String secret(String... x) {

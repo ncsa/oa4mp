@@ -30,6 +30,7 @@ import edu.uiuc.ncsa.security.core.util.DebugConstants;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
+import edu.uiuc.ncsa.security.storage.events.LastAccessedThread;
 import edu.uiuc.ncsa.security.util.pkcs.KeyPairPopulationThread;
 
 import javax.servlet.http.HttpServletRequest;
@@ -81,7 +82,7 @@ public abstract class MyProxyDelegationServlet extends EnvServlet implements Tra
     public static Cleanup<String, BasicTransaction> transactionCleanup;
 
     public static Cleanup<Identifier, CachedObject> myproxyConnectionCleanup = null;
-
+    public static LastAccessedThread lastAccessedThread = null;
 
     public static Cache getMyproxyConnectionCache() {
         if (myproxyConnectionCache == null) {
@@ -154,6 +155,9 @@ public abstract class MyProxyDelegationServlet extends EnvServlet implements Tra
         }
         if (kpt != null) {
             kpt.setStopThread(true);
+        }
+        if(lastAccessedThread != null){
+            lastAccessedThread.setStopThread(true);
         }
     }
 

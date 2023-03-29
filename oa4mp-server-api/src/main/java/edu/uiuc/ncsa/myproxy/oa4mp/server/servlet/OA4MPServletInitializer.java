@@ -17,6 +17,7 @@ import edu.uiuc.ncsa.security.servlet.AbstractServlet;
 import edu.uiuc.ncsa.security.servlet.ExceptionHandler;
 import edu.uiuc.ncsa.security.servlet.Initialization;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
+import edu.uiuc.ncsa.security.storage.events.LastAccessedThread;
 import edu.uiuc.ncsa.security.util.mail.MailUtil;
 import edu.uiuc.ncsa.security.util.pkcs.KeyPairPopulationThread;
 
@@ -162,10 +163,9 @@ public class OA4MPServletInitializer implements Initialization {
             lc.setStore(env.getTransactionStore());
             lc.addRetentionPolicy(new ValidTimestampPolicy());
             MyProxyDelegationServlet.transactionCleanup = lc; // set it in the servlet
-            // Part of migration away from OAuth 1.0a. Do not start this here
-            //     transactionCleanup.start();
-            //     logger.info("Starting transaction store cleanup thread");
+
         }
+
         Cleanup<Identifier, CachedObject> myproxyConnectionCleanup = MyProxyDelegationServlet.myproxyConnectionCleanup;
         int i = 0;
 

@@ -12,6 +12,9 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.SATFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.OA4MPServletInitializer;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.NewClientNotifier;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl.ClientConverter;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSourceFactory;
 import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.functions.FStack;
@@ -23,10 +26,10 @@ import edu.uiuc.ncsa.qdl.variables.VStack;
 import edu.uiuc.ncsa.security.core.cache.LockingCleanup;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl.ClientConverter;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSourceFactory;
 import edu.uiuc.ncsa.security.servlet.ExceptionHandler;
+import edu.uiuc.ncsa.security.storage.ListeningStoreInterface;
+import edu.uiuc.ncsa.security.storage.events.LastAccessedEventListener;
+import edu.uiuc.ncsa.security.storage.events.LastAccessedThread;
 import edu.uiuc.ncsa.security.util.mail.MailUtil;
 
 import javax.servlet.ServletException;
@@ -64,19 +67,31 @@ public class OA2ServletInitializer extends OA4MPServletInitializer {
         DebugUtil.setInstance(oa2SE.getDebugger()); // sets global debugger.
         DebugUtil.setPrintTS(oa2SE.isPrintTSInDebug());
         // Let the older myproxy connection clean up use alarms.
-         if(MyProxyDelegationServlet.myproxyConnectionCleanup != null){
-             if(oa2SE.hasCleanupAlarms()){
-                 MyProxyDelegationServlet.myproxyConnectionCleanup.setAlarms(oa2SE.getCleanupAlarms());
-             }else{
-                 MyProxyDelegationServlet.myproxyConnectionCleanup.setCleanupInterval(oa2SE.getCleanupInterval());
-             }
-         }
+        if (MyProxyDelegationServlet.myproxyConnectionCleanup != null) {
+            if (oa2SE.hasCleanupAlarms()) {
+                MyProxyDelegationServlet.myproxyConnectionCleanup.setAlarms(oa2SE.getCleanupAlarms());
+            } else {
+                MyProxyDelegationServlet.myproxyConnectionCleanup.setCleanupInterval(oa2SE.getCleanupInterval());
+            }
+        }
+        if (oa2SE.isMonitorEnabled() && MyProxyDelegationServlet.lastAccessedThread == null) {
+            // Note that the event listener cannot be in the same thread as the updater since they whole
+            // system freezes for every item update. 
+            LastAccessedEventListener lastAccessedEventListener = new LastAccessedEventListener();
+            LastAccessedThread lastAccessedThread = new LastAccessedThread("last accessed monitor", oa2SE.getMyLogger(), lastAccessedEventListener);
+            addMonitoredStores(oa2SE, lastAccessedEventListener);
+            lastAccessedThread.setCleanupInterval(oa2SE.getCleanupInterval());
+            lastAccessedThread.setAlarms(oa2SE.getMonitorAlarms());
+            lastAccessedThread.setStopThread(false);
+            lastAccessedThread.start();
+            //       oa2SE.getVOStore();
+        }
         if (oa2SE.isRefreshTokenEnabled()) {
             MyProxyDelegationServlet.transactionCleanup.getRetentionPolicies().clear(); // We need a different set of policies than the original one.
-            if(oa2SE.hasCleanupAlarms()){
+            if (oa2SE.hasCleanupAlarms()) {
                 MyProxyDelegationServlet.transactionCleanup.setAlarms(oa2SE.getCleanupAlarms());
                 DebugUtil.trace(this, "setting transaction cleanup alarms " + oa2SE.getCleanupAlarms());
-            } else{
+            } else {
                 MyProxyDelegationServlet.transactionCleanup.setCleanupInterval(oa2SE.getCleanupInterval());
                 DebugUtil.trace(this, "setting transaction cleanup interval to " + oa2SE.getCleanupInterval() + " ms.");
             }
@@ -97,11 +112,11 @@ public class OA2ServletInitializer extends OA4MPServletInitializer {
         if (txRecordCleanup == null) {
             LockingCleanup lc = new LockingCleanup(getEnvironment().getMyLogger(), "TX record cleanup");
             //txRecordCleanup = new Cleanup<>(getEnvironment().getMyLogger(), "TX record cleanup");
-              lc.setStore(oa2SE.getTxStore());
-            if(oa2SE.hasCleanupAlarms()){
+            lc.setStore(oa2SE.getTxStore());
+            if (oa2SE.hasCleanupAlarms()) {
                 lc.setAlarms(oa2SE.getCleanupAlarms());
                 DebugUtil.trace(this, "setting tx record cleanup alarms to " + oa2SE.getCleanupAlarms());
-            } else{
+            } else {
                 lc.setCleanupInterval(oa2SE.getCleanupInterval());
                 DebugUtil.trace(this, "setting tx record cleanup interval to " + oa2SE.getCleanupInterval() + " ms.");
             }
@@ -140,5 +155,9 @@ public class OA2ServletInitializer extends OA4MPServletInitializer {
             }
         });
     }
-
+    protected void addMonitoredStores(OA2SE oa2SE, LastAccessedEventListener lastAccessedEventListener){
+        ((ListeningStoreInterface) oa2SE.getClientStore()).addLastAccessedEventListener(lastAccessedEventListener);
+        ((ListeningStoreInterface) oa2SE.getAdminClientStore()).addLastAccessedEventListener(lastAccessedEventListener);
+        ((ListeningStoreInterface) oa2SE.getVOStore()).addLastAccessedEventListener(lastAccessedEventListener);
+    }
 }

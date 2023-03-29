@@ -89,7 +89,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
                  String issuer,
                  boolean utilServletEnabled,
                  boolean oidcEnabled,
-               //  Provider<JSONStore> jsonStoreProvider,
+                 //  Provider<JSONStore> jsonStoreProvider,
                  CMConfigs cmConfigs,
                  OA2QDLEnvironment qdlEnvironment,
                  boolean rfc8693Enabled,
@@ -105,6 +105,9 @@ public class OA2SE extends ServiceEnvironmentImpl {
                  boolean rfc7636Required,
                  boolean demoModeEnabled,
                  long rtGracePeriod,
+                 boolean isMonitorEnabled,
+                 long monitorInterval,
+                 Collection<LocalTime> monitorAlarms,
                  MetaDebugUtil debugger) {
 
         super(logger,
@@ -130,7 +133,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
         if (0 < atLifetime) {
             this.accessTokenLifetime = atLifetime;
         }
-         this.maxAuthorizationGrantLifetime = maxAGLifetime;
+        this.maxAuthorizationGrantLifetime = maxAGLifetime;
         if (clientSecretLength < 0) {
             throw new MyConfigurationException("Error: The client secret length (=" + clientSecretLength + ") is invalid. It must be a positive integer.");
         }
@@ -157,7 +160,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.acs = acs;
         this.utilServletEnabled = utilServletEnabled;
         this.oidcEnabled = oidcEnabled;
-   //     this.jsonStoreProvider = jsonStoreProvider;
+        //     this.jsonStoreProvider = jsonStoreProvider;
         this.cmConfigs = cmConfigs;
         this.qdlEnvironment = qdlEnvironment;
         this.rfc8693Enabled = rfc8693Enabled;
@@ -180,7 +183,38 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.debugger = debugger;
         this.cleanupAlarms = cleanupAlarms;
         this.rtGracePeriod = rtGracePeriod;
+        this.monitorInterval = monitorInterval;
+        this.monitorAlarms = monitorAlarms;
+        this.monitorEnabled = isMonitorEnabled;
     }
+
+    public boolean isMonitorEnabled() {
+        return monitorEnabled;
+    }
+
+    public void setMonitorEnabled(boolean monitorEnabled) {
+        this.monitorEnabled = monitorEnabled;
+    }
+
+    public long getMonitorInterval() {
+        return monitorInterval;
+    }
+
+    public void setMonitorInterval(long monitorInterval) {
+        this.monitorInterval = monitorInterval;
+    }
+
+    public Collection<LocalTime> getMonitorAlarms() {
+        return monitorAlarms;
+    }
+
+    public void setMonitorAlarms(Collection<LocalTime> monitorAlarms) {
+        this.monitorAlarms = monitorAlarms;
+    }
+
+    boolean monitorEnabled;
+    long monitorInterval;
+    Collection<LocalTime> monitorAlarms;
 
     public boolean isCleanupLockingEnabled() {
         return cleanupLockingEnabled;
@@ -197,8 +231,9 @@ public class OA2SE extends ServiceEnvironmentImpl {
     }
 
     Collection<LocalTime> cleanupAlarms;
-    public boolean hasCleanupAlarms(){
-        return cleanupAlarms!= null && (!cleanupAlarms.isEmpty());
+
+    public boolean hasCleanupAlarms() {
+        return cleanupAlarms != null && (!cleanupAlarms.isEmpty());
     }
 
     public MetaDebugUtil getDebugger() {
@@ -238,6 +273,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
     }
 
     RFC8628ServletConfig rfc8628ServletConfig;
+
     public boolean isPrintTSInDebug() {
         return printTSInDebug;
     }
@@ -576,9 +612,9 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.rtGracePeriod = rtGracePeriod;
     }
 
-    long rtGracePeriod = -1L ;
+    long rtGracePeriod = -1L;
 
-    public boolean isRTGracePeriodEnabled(){
+    public boolean isRTGracePeriodEnabled() {
         return rtGracePeriod == OA2ConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_DISABLED;
     }
 }

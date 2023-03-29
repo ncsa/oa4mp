@@ -1,14 +1,14 @@
 package edu.uiuc.ncsa.oa4mp.delegation.server.storage.impl;
 
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApprovalStore;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl.ClientConverter;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.monitored.MonitoredMemoryStore;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApprovalStore;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.XMLConverter;
 import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
-import edu.uiuc.ncsa.security.storage.MemoryStore;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
 import java.util.Date;
@@ -18,7 +18,8 @@ import java.util.List;
  * <p>Created by Jeff Gaynor<br>
  * on 1/18/12 at  11:12 AM
  */
-public  class ClientMemoryStore<V extends Client> extends MemoryStore<V> implements ClientStore<V> {
+//public  class ClientMemoryStore<V extends Client> extends MemoryStore<V> implements ClientStore<V> {
+public  class ClientMemoryStore<V extends Client> extends MonitoredMemoryStore<V> implements ClientStore<V> {
     @Override
     public List<V> getMostRecent(int n, List<String> attributes) {
         return GenericStoreUtils.getMostRecent(this, n, attributes);

@@ -1,11 +1,11 @@
 package edu.uiuc.ncsa.oa4mp.delegation.server.storage.impl;
 
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.monitored.MonitoredFileStore;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApprovalStore;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.IdentifiableProviderImpl;
-import edu.uiuc.ncsa.security.storage.FileStore;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
 import java.io.File;
@@ -17,7 +17,8 @@ import java.util.List;
  * <p>Created by Jeff Gaynor<br>
  * on 11/3/11 at  3:40 PM
  */
-public abstract class FSClientStore<V extends Client> extends FileStore<V> implements ClientStore<V> {
+//public abstract class FSClientStore<V extends Client> extends FileStore<V> implements ClientStore<V> {
+public abstract class FSClientStore<V extends Client> extends MonitoredFileStore<V> implements ClientStore<V> {
     protected FSClientStore(File storeDirectory, File indexDirectory, IdentifiableProviderImpl<V> idp,MapConverter<V> cp,
                             boolean removeEmptyFiles) {
         super(storeDirectory, indexDirectory, idp, cp, removeEmptyFiles);

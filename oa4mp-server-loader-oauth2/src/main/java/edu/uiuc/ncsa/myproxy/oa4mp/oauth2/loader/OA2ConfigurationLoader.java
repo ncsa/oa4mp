@@ -105,6 +105,9 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
     public static final String CLEANUP_ALARMS_TAG = "cleanupAlarms";
     public static final String CLEANUP_LOCKING_ENABLED = "cleanupLockingEnabled";
 
+    public static final String MONITOR_ENABLED = "enableMonitor";
+    public static final String MONITOR_INTERVAL = "monitorInterval";
+    public static final String MONITOR_ALARMS = "monitorAlarms";
     public static final String RFC7636_REQUIRED_TAG = "rfc7636Required";
     public static final String DEMO_MODE_TAG = "demoModeEnabled";
     public static final String QDL_CONFIG_NAME_ATTR = "qdlConfigName";
@@ -127,7 +130,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
     public static long MAX_AUTHORIZATION_GRANT_LIFETIME_DEFAULT = 2 * AUTHORIZATION_GRANT_LIFETIME_DEFAULT; // 30 minutes
 
     public static String REFRESH_TOKEN_GRACE_PERIOD_TAG = "rtGracePeriod";
-    public static long REFRESH_TOKEN_GRACE_PERIOD_DEFAULT = 6*3600*1000L; // 6 hours
+    public static long REFRESH_TOKEN_GRACE_PERIOD_DEFAULT = 6 * 3600 * 1000L; // 6 hours
     public static long REFRESH_TOKEN_GRACE_PERIOD_DISABLED = -1L;
     public static long REFRESH_TOKEN_GRACE_PERIOD_USE_SERVER_DEFAULT = -2L;
     public static long REFRESH_TOKEN_GRACE_PERIOD_NOT_CONFIGURED = -3L;
@@ -138,6 +141,8 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
 
     public static long CLEANUP_INTERVAL_DEFAULT = 30 * 60 * 1000L; // 30 minutes
     public static boolean CLEANUP_LOCKING_ENABLED_DEFAULT = false; // Don't lock tables by default
+    public static boolean MONITOR_ENABLED_DEFAULT = false; // Don't lock tables by default
+    public static long MONITOR_INTERVAL_DEFAULT = 120 * 60 * 1000L; // 2 hours minutes
 
     public OA2ConfigurationLoader(ConfigurationNode node) {
         super(node);
@@ -201,11 +206,14 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     isRFC8628Enabled(),
                     isprintTSInDebug(),
                     getCleanupInterval(),
-                    getAlarms(),
+                    getCleanupAlarms(),
                     isNotifyACEventEmailAddresses(),
                     isRFC7636Required(),
                     isDemoModeEnabled(),
                     getRTGracePeriod(),
+                    isMonitorEnabled(),
+                    getMonitorInterval(),
+                    getMonitorAlarms(),
                     getDebugger()
             );
 
@@ -220,28 +228,43 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
 
     RFC8628ServletConfig rfc8628ServletConfig = null;
 
-    Collection<LocalTime> alarms = null;
+    Collection<LocalTime> cleanupAlarms = null;
+    Collection<LocalTime> monitorAlarms = null;
 
-    public Collection<LocalTime> getAlarms() {
-        if (alarms == null) {
-            String raw = getFirstAttribute(cn, CLEANUP_ALARMS_TAG);
-            alarms = new TreeSet<>();  // sorts them.
-            if (!StringUtils.isTrivial(raw)) {
-                String[] ta = raw.split(",");
-                // get all the times that parse correctly
-                for (String time : ta) {
-                    try {
-                        alarms.add(LocalTime.parse(time.trim()));
-                    } catch (Throwable t) {
-                        loggerProvider.get().warn("cannot parse alarm date \"" + ta + "\"");
-                        // do nothing
-                    }
+    public Collection<LocalTime> getAlarms(String tag) {
+        Collection<LocalTime> alarms;
+        String raw = getFirstAttribute(cn, tag);
+        alarms = new TreeSet<>();  // sorts them.
+        if (!StringUtils.isTrivial(raw)) {
+            String[] ta = raw.split(",");
+            // get all the times that parse correctly
+            for (String time : ta) {
+                try {
+                    alarms.add(LocalTime.parse(time.trim()));
+                } catch (Throwable t) {
+                    loggerProvider.get().warn("cannot parse alarm date \"" + ta + "\"");
+                    // do nothing
                 }
             }
-
-            DebugUtil.trace(this, CLEANUP_ALARMS_TAG + " found: " + alarms);
         }
+
+        DebugUtil.trace(this, tag + " found: " + alarms);
         return alarms;
+    }
+
+
+    public Collection<LocalTime> getMonitorAlarms() {
+        if (monitorAlarms == null) {
+            monitorAlarms = getAlarms(MONITOR_ALARMS);
+        }
+        return monitorAlarms;
+    }
+
+    public Collection<LocalTime> getCleanupAlarms() {
+        if (cleanupAlarms == null) {
+            cleanupAlarms = getAlarms(CLEANUP_ALARMS_TAG);
+        }
+        return cleanupAlarms;
     }
 
     public RFC8628ServletConfig getRFC8628ServletConfig() {
@@ -408,11 +431,11 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
     }
 
     public String getQdlConfigurationName() {
-        if(qdlConfigurationName == null){
+        if (qdlConfigurationName == null) {
             String raw = getFirstAttribute(cn, QDL_CONFIG_NAME_ATTR);
-            if(StringUtils.isTrivial(raw)){
+            if (StringUtils.isTrivial(raw)) {
                 qdlConfigurationName = QDL_DEFAULT_CONFIGURATION_NAME;
-            }else{
+            } else {
                 qdlConfigurationName = raw;
             }
         }
@@ -425,43 +448,79 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
 
     public long getCleanupInterval() {
         if (cleanupInterval < 0) {
-            try {
-
-                String raw = getFirstAttribute(cn, CLEANUP_INTERVAL_TAG);
-                if (StringUtils.isTrivial(raw)) {
-                    cleanupInterval = CLEANUP_INTERVAL_DEFAULT;
-                } else {
-                    cleanupInterval = ConfigUtil.getValueSecsOrMillis(raw, true);
-                }
-            } catch (Throwable t) {
-                // use default which is to do safe garbage collection.
-                // We let this be null to trigger pulling the value, if any, out of
-                // the configuration
-                cleanupInterval = CLEANUP_INTERVAL_DEFAULT;
-            }
-            DebugUtil.trace(this, CLEANUP_INTERVAL_TAG + " set to " + cleanupInterval);
+            cleanupInterval = getInterval(CLEANUP_INTERVAL_TAG, CLEANUP_INTERVAL_DEFAULT);
         }
         return cleanupInterval;
     }
-     Boolean cleanupLockingEnabled = null;
+
+    long monitorInterval = -1L;
+
+    public long getMonitorInterval() {
+        if (monitorInterval < 0) {
+            monitorInterval = getInterval(MONITOR_INTERVAL, MONITOR_INTERVAL_DEFAULT);
+        }
+        return monitorInterval;
+    }
+
+    public long getInterval(String tag, long defaultInterval) {
+        long interval = defaultInterval;
+        try {
+
+            String raw = getFirstAttribute(cn, tag);
+            if (StringUtils.isTrivial(raw)) {
+                interval = CLEANUP_INTERVAL_DEFAULT;
+            } else {
+                interval = ConfigUtil.getValueSecsOrMillis(raw, true);
+            }
+        } catch (Throwable t) {
+            // use default which is to do safe garbage collection.
+            // We let this be null to trigger pulling the value, if any, out of
+            // the configuration
+            interval = CLEANUP_INTERVAL_DEFAULT;
+        }
+        DebugUtil.trace(this, tag + " set to " + interval);
+        return interval;
+    }
+
+    Boolean cleanupLockingEnabled = null;
 
     public Boolean isCleanupLockingEnabled() {
-            if (cleanupLockingEnabled == null) {
+        if (cleanupLockingEnabled == null) {
 
-                    String raw = getFirstAttribute(cn, CLEANUP_LOCKING_ENABLED);
-                    if (StringUtils.isTrivial(raw)) {
-                        cleanupLockingEnabled = CLEANUP_LOCKING_ENABLED_DEFAULT;
-                    } else {
-                        try{
-                            cleanupLockingEnabled = Boolean.parseBoolean(raw);
-                        }catch (Throwable t){
-                            cleanupLockingEnabled = CLEANUP_LOCKING_ENABLED_DEFAULT;
-                        }
-                    }
-                DebugUtil.trace(this, CLEANUP_LOCKING_ENABLED + " set to " + cleanupLockingEnabled);
+            String raw = getFirstAttribute(cn, CLEANUP_LOCKING_ENABLED);
+            if (StringUtils.isTrivial(raw)) {
+                cleanupLockingEnabled = CLEANUP_LOCKING_ENABLED_DEFAULT;
+            } else {
+                try {
+                    cleanupLockingEnabled = Boolean.parseBoolean(raw);
+                } catch (Throwable t) {
+                    cleanupLockingEnabled = CLEANUP_LOCKING_ENABLED_DEFAULT;
+                }
             }
-            return cleanupLockingEnabled;
+            DebugUtil.trace(this, CLEANUP_LOCKING_ENABLED + " set to " + cleanupLockingEnabled);
         }
+        return cleanupLockingEnabled;
+    }
+
+    Boolean monitorEnabled = null;
+
+    public Boolean isMonitorEnabled() {
+        if (monitorEnabled == null) {
+            String raw = getFirstAttribute(cn, MONITOR_ENABLED);
+            if (StringUtils.isTrivial(raw)) {
+                monitorEnabled = MONITOR_ENABLED_DEFAULT;
+            } else {
+                try {
+                    monitorEnabled = Boolean.parseBoolean(raw);
+                } catch (Throwable t) {
+                    monitorEnabled = MONITOR_ENABLED_DEFAULT;
+                }
+            }
+            DebugUtil.trace(this, MONITOR_ENABLED + " set to " + monitorEnabled);
+
+        }
+        return monitorEnabled;
+    }
 
     public boolean isSafeGC() {
         if (safeGC == null) {
@@ -716,7 +775,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     keys = JSONWebKeyUtil.fromJSON(new File(path));
                     info("loaded JSON web keys from file \"" + path + "\"");
                 }
-            }else{
+            } else {
                 keys = JSONWebKeyUtil.fromJSON(json);
                 info("loaded JSON web keys directly from configuration");
             }

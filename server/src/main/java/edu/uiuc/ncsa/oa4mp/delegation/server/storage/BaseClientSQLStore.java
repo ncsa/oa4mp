@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.oa4mp.delegation.server.storage;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.BaseClient;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.BaseClientKeys;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.ClientApprovalKeys;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.monitored.MonitoredSQLStore;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
@@ -25,7 +26,8 @@ import java.util.List;
  * <p>Created by Jeff Gaynor<br>
  * on 8/6/21 at  2:44 PM
  */
-public abstract class BaseClientSQLStore<V extends BaseClient> extends SQLStore<V> implements BaseClientStore<V>  {
+//public abstract class BaseClientSQLStore<V extends BaseClient> extends SQLStore<V> implements BaseClientStore<V>  {
+public abstract class BaseClientSQLStore<V extends BaseClient> extends MonitoredSQLStore<V> implements BaseClientStore<V>  {
 
     public BaseClientSQLStore(ConnectionPool connectionPool,
                               Table table,

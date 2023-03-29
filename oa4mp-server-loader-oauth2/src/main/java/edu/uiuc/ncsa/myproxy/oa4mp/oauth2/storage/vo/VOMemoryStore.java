@@ -1,9 +1,9 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo;
 
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.monitored.MonitoredMemoryStore;
 import edu.uiuc.ncsa.security.core.XMLConverter;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
-import edu.uiuc.ncsa.security.storage.MemoryStore;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
 import java.util.HashMap;
@@ -14,7 +14,7 @@ import java.util.Map;
  * <p>Created by Jeff Gaynor<br>
  * on 12/14/20 at  10:37 AM
  */
-public class VOMemoryStore<V extends VirtualOrganization> extends MemoryStore<V> implements VOStore<V> {
+public class VOMemoryStore<V extends VirtualOrganization> extends MonitoredMemoryStore<V> implements VOStore<V> {
     public VOMemoryStore(VOProvider<V> identifiableProvider,
                          VOConverter<V> converter) {
         super(identifiableProvider);
