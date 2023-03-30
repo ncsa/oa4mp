@@ -1,9 +1,8 @@
 package edu.uiuc.ncsa.oa4mp.delegation.common.storage;
 
-import edu.uiuc.ncsa.security.core.DateComparable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.DateUtils;
-import edu.uiuc.ncsa.security.core.util.IdentifiableImpl;
+import edu.uiuc.ncsa.security.storage.data.Monitored;
 
 import java.util.Date;
 
@@ -13,7 +12,8 @@ import static edu.uiuc.ncsa.security.core.util.BeanUtils.checkEquals;
  * <p>Created by Jeff Gaynor<br>
  * on 5/12/16 at  4:32 PM
  */
-public class BaseClient extends IdentifiableImpl implements DateComparable {
+//public class BaseClient extends IdentifiableImpl implements DateComparable {
+public class BaseClient extends Monitored {
 
     public BaseClient(Identifier identifier) {
         super(identifier);

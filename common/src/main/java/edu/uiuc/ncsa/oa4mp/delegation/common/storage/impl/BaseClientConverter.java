@@ -6,9 +6,7 @@ import edu.uiuc.ncsa.security.core.util.Iso8601;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.BaseClient;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.BaseClientKeys;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.JSONUtil;
-import edu.uiuc.ncsa.security.storage.data.ConversionMap;
-import edu.uiuc.ncsa.security.storage.data.MapConverter;
-import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
+import edu.uiuc.ncsa.security.storage.data.*;
 import net.sf.json.JSONObject;
 
 import java.text.ParseException;
@@ -17,7 +15,7 @@ import java.text.ParseException;
  * <p>Created by Jeff Gaynor<br>
  * on 10/20/16 at  12:58 PM
  */
-public abstract class BaseClientConverter<V extends BaseClient> extends MapConverter<V> {
+public abstract class BaseClientConverter<V extends BaseClient> extends MonitoredConverter<V> {
     public abstract String getJSONComponentName();
 
     public JSONUtil getJsonUtil() {
@@ -29,7 +27,7 @@ public abstract class BaseClientConverter<V extends BaseClient> extends MapConve
 
     JSONUtil jsonUtil;
 
-    public BaseClientConverter(SerializationKeys keys, IdentifiableProvider<V> provider) {
+    public BaseClientConverter(BaseClientKeys keys, IdentifiableProvider<V> provider) {
         super(keys, provider);
     }
 

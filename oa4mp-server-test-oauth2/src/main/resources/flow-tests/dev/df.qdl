@@ -14,6 +14,8 @@ cfg.'description' :=  'Test basic device flow on DEV.';
 cfg.'flow_type' := 'df'; 
 
 rc := script_load('driver.qdl', cfg.);
+if[rc!='ok'][return(rc);];
+
 tokens. := clc#access();
 at. := tokens.'access_token';
 rt. := tokens.'refresh_token';

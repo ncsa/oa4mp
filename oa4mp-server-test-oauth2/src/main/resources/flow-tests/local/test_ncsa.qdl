@@ -23,6 +23,8 @@ cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';
 cfg.'description' :=  'Basic NCSA test using default QDL script. START VPN or this hangs!';
 cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token endpoint
 rc := script_load('driver.qdl', cfg.);
+if[rc!='ok'][return(rc);];
+
 tokens. := clc#access();
 claims. := claims();
 ⊨ tokens.'access_token'.'lifetime' == 1009000 : 'wrong access token lifetime';

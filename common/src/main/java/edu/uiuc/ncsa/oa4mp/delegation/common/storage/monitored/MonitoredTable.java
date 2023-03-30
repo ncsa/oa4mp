@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnDescriptorEntry;
 import edu.uiuc.ncsa.security.storage.sql.internals.Table;
 
+import static java.sql.Types.BIGINT;
 import static java.sql.Types.TIMESTAMP;
 
 /**
@@ -21,7 +22,7 @@ public class MonitoredTable extends Table {
     }
     public void createColumnDescriptors(){
         super.createColumnDescriptors();
-        getColumnDescriptor().add(new ColumnDescriptorEntry(getKeys().lastAccessed(), TIMESTAMP, false, false));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(getKeys().lastAccessed(), BIGINT, false, false));
         getColumnDescriptor().add(new ColumnDescriptorEntry(getKeys().lastModifiedTS(), TIMESTAMP, false, false));
         getColumnDescriptor().add(new ColumnDescriptorEntry(getKeys().creationTS(), TIMESTAMP, false, false));
     }

@@ -1,10 +1,9 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo;
 
 import edu.uiuc.ncsa.qdl.xml.XMLUtils;
-import edu.uiuc.ncsa.security.core.DateComparable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
-import edu.uiuc.ncsa.security.core.util.IdentifiableImpl;
+import edu.uiuc.ncsa.security.storage.data.Monitored;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import net.sf.json.JSONObject;
@@ -28,17 +27,14 @@ import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
  * <p>Created by Jeff Gaynor<br>
  * on 2/16/21 at  6:59 AM
  */
-public class VirtualOrganization extends IdentifiableImpl implements DateComparable {
-    @Override
-    public Date getCreationTS() {
-        return new Date(getCreated());
-    }
+//public class VirtualOrganization extends IdentifiableImpl implements DateComparable {
+public class VirtualOrganization extends Monitored {
+
 
     public VirtualOrganization(Identifier identifier) {
         super(identifier);
     }
 
-    long created = System.currentTimeMillis();
     String defaultKeyID;
     String discoveryPath;
     String issuer;
@@ -53,7 +49,6 @@ public class VirtualOrganization extends IdentifiableImpl implements DateCompara
 
     String atIssuer;
     JSONWebKeys jsonWebKeys;
-    long lastModified = System.currentTimeMillis();
     String title;
     boolean valid = true;
 
@@ -66,6 +61,9 @@ public class VirtualOrganization extends IdentifiableImpl implements DateCompara
         this.valid = valid;
     }
 
+/*
+    long lastModified = System.currentTimeMillis();
+        long created = System.currentTimeMillis();
 
     public long getCreated() {
         return created;
@@ -74,6 +72,14 @@ public class VirtualOrganization extends IdentifiableImpl implements DateCompara
     public void setCreated(long created) {
         this.created = created;
     }
+        public long getLastModified() {
+        return lastModified;
+    }
+
+    public void setLastModified(long lastModified) {
+        this.lastModified = lastModified;
+    }
+*/
 
     public String getDefaultKeyID() {
         return defaultKeyID;
@@ -110,13 +116,7 @@ public class VirtualOrganization extends IdentifiableImpl implements DateCompara
         this.jsonWebKeys = jsonWebKeys;
     }
 
-    public long getLastModified() {
-        return lastModified;
-    }
 
-    public void setLastModified(long lastModified) {
-        this.lastModified = lastModified;
-    }
 
     public String getTitle() {
         return title;
@@ -129,8 +129,9 @@ public class VirtualOrganization extends IdentifiableImpl implements DateCompara
     public void toXML(XMLStreamWriter xsw) throws XMLStreamException {
         xsw.writeStartElement(VO_ENTRY);
         xsw.writeAttribute(ID_ATTR, getIdentifierString());
-        xsw.writeAttribute(VO_CREATED, Long.toString(created));
-        xsw.writeAttribute(VO_LAST_MODIFIED, Long.toString(lastModified));
+        xsw.writeAttribute(VO_CREATED, Long.toString(getCreationTS().getTime()));
+        xsw.writeAttribute(VO_LAST_MODIFIED, Long.toString(getLastModifiedTS().getTime()));
+        xsw.writeAttribute(VO_LAST_ACCESSED, Long.toString(getLastAccessed().getTime()));
         xsw.writeAttribute(IS_VALID_ATTR, Boolean.toString(valid));
         if (!isTrivial(issuer)) {
             xsw.writeAttribute(ISSUER, issuer);
@@ -199,11 +200,13 @@ public class VirtualOrganization extends IdentifiableImpl implements DateCompara
                     setIdentifier(BasicIdentifier.newID(v));
                     break;
                 case VO_CREATED:
-                    created = Long.parseLong(v);
+                    setCreationTS( new Date(Long.parseLong(v)));
                     break;
                 case VO_LAST_MODIFIED:
-                    lastModified = Long.parseLong(v);
+                    setLastModifiedTS(new Date(Long.parseLong(v)));
                     break;
+                case VO_LAST_ACCESSED:
+                    setLastAccessed(new Date(Long.parseLong(v)));
                 case IS_VALID_ATTR:
                     break;
                 case ISSUER:
@@ -224,12 +227,13 @@ public class VirtualOrganization extends IdentifiableImpl implements DateCompara
     @Override
     public String toString() {
         return "VirtualOrganization{" +
-                "created=" + created +
+                "created=" + getCreationTS() +
                 ", defaultKeyID='" + defaultKeyID + '\'' +
                 ", discoveryPath='" + discoveryPath + '\'' +
                 ", issuer='" + issuer + '\'' +
                 ", atIssuer='" + atIssuer + '\'' +
-                ", lastModified=" + lastModified +
+                ", lastModified=" + getLastModifiedTS() +
+                ", lastAccessed=" + getLastAccessed() +
                 ", title='" + title + '\'' +
                 ", valid=" + valid +
                 '}';

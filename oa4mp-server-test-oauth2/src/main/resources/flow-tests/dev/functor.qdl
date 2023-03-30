@@ -13,6 +13,8 @@ cfg.'description' :=  'Test old functor claims processing. Critical regression t
 cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token endpoint
 
 rc := script_load('/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests/driver.qdl', cfg.);
+if[rc!='ok'][return(rc);];
+
 tokens. := clc#access();
 
 tokens. := refresh();

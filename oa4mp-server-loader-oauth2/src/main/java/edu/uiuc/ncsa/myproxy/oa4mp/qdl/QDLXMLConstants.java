@@ -27,6 +27,7 @@ public interface QDLXMLConstants extends XMLConstants {
     String VO_DEFAULT_KEY = "default_key";
     String VO_TITLE = "title";
     String VO_LAST_MODIFIED = "last_modified_at";
+    String VO_LAST_ACCESSED = "last_accessed_at";
     String VO_CREATED = "created_at";
     String VO_DISCOVERY_PATH = "discovery_path";
     // use issuer and id_attr from above

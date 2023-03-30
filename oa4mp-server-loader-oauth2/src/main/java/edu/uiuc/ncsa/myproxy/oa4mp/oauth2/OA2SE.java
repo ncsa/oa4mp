@@ -213,8 +213,8 @@ public class OA2SE extends ServiceEnvironmentImpl {
     }
 
     boolean monitorEnabled;
-    long monitorInterval;
-    Collection<LocalTime> monitorAlarms;
+    long monitorInterval = -1L;
+    Collection<LocalTime> monitorAlarms = null;
 
     public boolean isCleanupLockingEnabled() {
         return cleanupLockingEnabled;
@@ -265,7 +265,12 @@ public class OA2SE extends ServiceEnvironmentImpl {
         return cleanupInterval;
     }
 
-
+    public boolean hasMonitorAlarams(){
+        return monitorAlarms != null && !monitorAlarms.isEmpty();
+    }
+    public boolean hasMonitorInterval(){
+        return 0 < monitorInterval;
+    }
     long cleanupInterval = -1;
 
     public RFC8628ServletConfig getRfc8628ServletConfig() {

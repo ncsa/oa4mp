@@ -34,8 +34,9 @@ flow_ok := 1;
     ][
      say('Flow: device');
      clc#df();
-    out := scan('verfication URI is in clipboard. Login, then hit any key when done, q to abort.');
-    flow_ok := out=='q'?-1:0;
+    out := scan('verfication URI is in clipboard. Login, then hit any key when done, q to abort, s to skip.');
+    flow_ok := size(trim(out))==0?'ok':out;
+    if[flow_ok != 'ok'][return(flow_ok);];
     ]; // end device flow
   if[
      cfg.'flow_type' == 'uri'
@@ -43,19 +44,18 @@ flow_ok := 1;
      say('Flow: auth code');
      clc#uri(); // puts it in the clipboard.
      say('authorization URI is in the clipboard. Please log in.');
-    while[
-     true
-      ][
+    while[true]
+       do[
          try[
-           out :=  scan('copy the callback uri to clipboard and hit any key when done or q to abort.');
-           flow_ok := out=='q'?-1:0;
-           if[flow_ok != 0][return(flow_ok);];
+           out :=  scan('copy the callback uri to clipboard and hit any key when done or q to abort, s to skip.');
+           flow_ok := size(trim(out))==0?'ok':out;
+           if[flow_ok != 'ok'][return(flow_ok);];
            grant();
            return(flow_ok);
           ]catch[
              say('uh-oh that didn\'t work, try again:' + error_message);
           ];  //end catch
-     ]; // end while
+      ]; // end while
    ]; //end auth code flow
     return(flow_ok);
 

@@ -34,6 +34,8 @@ params.'token' :=  {'scope': 'write:/frames', 'audience':'ALL'}; // initial requ
 params.'exchange' :=  {'scope': 'read:/frames'}; // initial request
 
 rc := script_load('driver.qdl', cfg., params.);
+if[rc!='ok'][return(rc);];
+
 tokens. := clc#access();
 at. := tokens.'access_token'.'jwt';
 rt. := tokens.'refresh_token';

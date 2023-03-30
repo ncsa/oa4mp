@@ -45,6 +45,7 @@ cfg.'flow_type' := 'uri'; // Don't run DF since this requires the post_auth phas
 user_id := 'http://cilogon.org/serverT/users/21340363';
 
 rc := script_load('driver.qdl', cfg.);
+if[rc!='ok'][return(rc);];
 ⊨ rc == 0: (rc==-1?'user aborted':'there was an error initiating the flow');
 tokens. := clc#access();
 claims. := claims();

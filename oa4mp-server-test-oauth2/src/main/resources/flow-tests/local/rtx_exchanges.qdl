@@ -24,6 +24,8 @@ params.'exchange' :=  {'scope': 'read:/home/'+user_id  + // read
                                 ' x.y:/abc/def/pqr' + // works since it add component to path
                                 ' x.y:/abc/defpqr'}; // not granted since the path is wrong
 rc := script_load('driver.qdl', cfg., params.);
+if[rc!='ok'][return(rc);];
+
 tokens. := clc#access();
 while[i∈[;10]][
  target := 0==mod(i, 3)?'-at':'-rt';

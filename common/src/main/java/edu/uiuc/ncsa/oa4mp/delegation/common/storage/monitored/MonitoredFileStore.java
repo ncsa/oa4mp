@@ -53,18 +53,27 @@ public abstract class MonitoredFileStore<V extends Identifiable> extends FileSto
     }
 
     @Override
-    public void fireLastAccessedEvent(Identifier identifier) {
-        listeningStore.fireLastAccessedEvent(identifier);
+    public void fireLastAccessedEvent(ListeningStoreInterface store, Identifier identifier) {
+        listeningStore.fireLastAccessedEvent(store, identifier);
+    }
+    @Override
+    public boolean isMonitorEnabled() {
+        return listeningStore.isMonitorEnabled();
     }
 
     @Override
+
+    public void setMonitorEnabled(boolean x) {
+        listeningStore.setMonitorEnabled(x);
+    }
+    @Override
     public void lastAccessUpdate(IDMap idMap) {
         for (Identifier id : idMap.keySet()) {
-            Date lastAccessed = idMap.get(id);
+            long lastAccessed = idMap.get(id);
             V v = super.get(id); // use super or a last accessed time event gets fired.
             Monitored monitored = (Monitored)v;
-            if(monitored.getLastAccessedDate().before(lastAccessed)){
-                ((Monitored) v).setLastAccessedDate(lastAccessed);
+            if(monitored.getLastAccessed().getTime()<lastAccessed){
+                ((Monitored) v).setLastAccessed(new Date(lastAccessed));
                 save(v);
             }
         }
@@ -73,7 +82,7 @@ public abstract class MonitoredFileStore<V extends Identifiable> extends FileSto
     @Override
     public V get(Object key) {
         V v = super.get(key);
-        listeningStore.fireLastAccessedEvent((Identifier) key);
+        listeningStore.fireLastAccessedEvent(this,(Identifier) key);
         return v;
     }
 }

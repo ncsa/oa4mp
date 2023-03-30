@@ -1,11 +1,10 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient;
 
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl.BaseClientConverter;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl.BaseClientConverter;
 import edu.uiuc.ncsa.security.storage.data.ConversionMap;
-import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
 import net.sf.json.JSONObject;
 
 import java.net.URI;
@@ -20,7 +19,7 @@ public class AdminClientConverter<V extends AdminClient> extends BaseClientConve
         return "admin";
     }
 
-    public AdminClientConverter(SerializationKeys keys, IdentifiableProvider<V> provider) {
+    public AdminClientConverter(AdminClientKeys keys, IdentifiableProvider<V> provider) {
         super(keys, provider);
     }
     // At this point no need to override to/from map.

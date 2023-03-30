@@ -16,7 +16,7 @@ params.'token' := {
    };
 params.'exchange':={'scope':'read:/home/jeff write:/data/jeff/cluster x.y:/abc/def/ghi'};
 rc := script_load('driver.qdl', args().0, params.);
-⊨ rc == 0: (rc==-1?'user aborted':'there was an error initiating the flow');
+if[rc!='ok'][return(rc);];
 
 tokens. := clc#access();
 

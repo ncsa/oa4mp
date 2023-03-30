@@ -17,6 +17,8 @@ cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token 
 user_id := 'http://cilogon.org/serverT/users/21340363';
 
 rc := script_load('driver.qdl', cfg.);
+if[rc!='ok'][return(rc);];
+
 tokens. := clc#access();
 // This emulates a service that is running for a long time and does several exchanges followed by a refresh now
 // and then to get user information.

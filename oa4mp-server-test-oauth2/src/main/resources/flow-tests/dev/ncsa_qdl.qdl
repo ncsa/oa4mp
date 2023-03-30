@@ -13,6 +13,8 @@ cfg.'description' :=  'Test standard NCSA claims processing using QDL. Critical 
 cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token endpoint
 
 rc := script_load('driver.qdl', cfg.);
+if[rc!='ok'][return(rc);];
+
 tokens. := clc#access();
 claims. := claims();
 

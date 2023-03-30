@@ -56,6 +56,8 @@ params.'exchange' :=  {'scope': 'read:/home/'+user_id  + // read
                                 ' x.y:/abc/defpqr'}; // not granted since the path is wrong
 
 rc := script_load('driver.qdl', cfg., params.);
+if[rc!='ok'][return(rc);];
+
 tokens. := clc#access();
 at. := tokens.'access_token'.'jwt';
 rt. := tokens.'refresh_token'.'jwt';

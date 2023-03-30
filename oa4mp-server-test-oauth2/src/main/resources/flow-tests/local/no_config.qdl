@@ -14,6 +14,8 @@ cfg.'description' :=  'Test with no configuration -- most basic test. (Uses Derb
 cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token endpoint
 
 rc := script_load('driver.qdl', cfg.);
+if[rc!='ok'][return(rc);];
+
 tokens. := clc#access();
 ⊨ tokens.'access_token'.'lifetime' == 1009000 : 'wrong access token lifetime';
 ⊨ tokens.'refresh_token'.'lifetime' == 950400000 : 'wrong refresh token lifetime';

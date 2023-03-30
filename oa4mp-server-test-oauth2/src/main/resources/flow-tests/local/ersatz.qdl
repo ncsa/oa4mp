@@ -24,6 +24,8 @@ params.'token' := {
    };
 params.'exchange':={'scope':'read:/home/jeff write:/data/jeff/cluster x.y:/abc/def/ghi'};
 rc := script_load('driver.qdl', cfg., params.);
+if[rc!='ok'][return(rc);];
+
 tokens. := clc#access();
 // Save this, reload saved configuration.
 original_claims. := claims();

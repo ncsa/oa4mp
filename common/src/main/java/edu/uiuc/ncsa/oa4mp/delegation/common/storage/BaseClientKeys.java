@@ -30,18 +30,6 @@ public class BaseClientKeys extends MonitoredKeys {
         return email;
     }
 
-/*
-    public String creationTS(String... x) {
-         if (0 < x.length) creationTS = x[0];
-         return creationTS;
-     }
-
-    public String lastModifiedTS(String... x) {
-         if (0 < x.length) lastModifiedTS = x[0];
-         return lastModifiedTS;
-     }
-*/
-
 
     public String secret(String... x) {
         if (0 < x.length) secret = x[0];
@@ -53,9 +41,7 @@ public class BaseClientKeys extends MonitoredKeys {
         List<String> allKeys = super.allKeys();
         allKeys.add(name());
         allKeys.add(email());
-        allKeys.add(creationTS());
         allKeys.add(secret());
-        allKeys.add(lastModifiedTS());
         allKeys.add(debugOn());
         return allKeys;
     }

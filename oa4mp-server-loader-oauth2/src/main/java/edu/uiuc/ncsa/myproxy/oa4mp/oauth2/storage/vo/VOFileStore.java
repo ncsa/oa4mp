@@ -9,6 +9,7 @@ import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -52,7 +53,7 @@ public class VOFileStore<V extends VirtualOrganization> extends MonitoredFileSto
 
     @Override
     public void realSave(boolean checkExists, V t) {
-        t.setLastModified(System.currentTimeMillis());
+        t.setLastModifiedTS(new Date());
         super.realSave(checkExists, t);
         try {
             if (!StringUtils.isTrivial(t.getDiscoveryPath())) {

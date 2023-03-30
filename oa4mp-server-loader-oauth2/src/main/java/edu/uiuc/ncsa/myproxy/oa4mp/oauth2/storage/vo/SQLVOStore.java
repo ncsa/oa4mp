@@ -13,6 +13,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Date;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -61,19 +62,19 @@ public class SQLVOStore<V extends VirtualOrganization> extends MonitoredSQLStore
 
     @Override
     public void save(V value) {
-        value.setLastModified(System.currentTimeMillis());
+        value.setLastModifiedTS(new Date());
         super.save(value);
     }
 
     @Override
     public void update(V value) {
-        value.setLastModified(System.currentTimeMillis());
+        value.setLastModifiedTS(new Date());
         super.update(value);
     }
 
     @Override
     public String getCreationTSField() {
-        return ((VOSerializationKeys)getMapConverter().getKeys()).created();
+        return ((VOSerializationKeys)getMapConverter().getKeys()).creationTS();
     }
 }
 

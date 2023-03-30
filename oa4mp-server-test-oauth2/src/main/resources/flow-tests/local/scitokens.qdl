@@ -69,6 +69,8 @@ define[test(tokens., expected_scopes., user_id)][
 ];
 
 rc := script_load('driver.qdl', cfg., params.);
+if[rc!='ok'][return(rc);];
+
 tokens. := clc#access();
 test(tokens., expected_token_scopes., user_id);
 issued_at := claims().'iat';

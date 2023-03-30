@@ -232,10 +232,10 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
     Collection<LocalTime> monitorAlarms = null;
 
     public Collection<LocalTime> getAlarms(String tag) {
-        Collection<LocalTime> alarms;
+        Collection<LocalTime> alarms = null;
         String raw = getFirstAttribute(cn, tag);
-        alarms = new TreeSet<>();  // sorts them.
         if (!StringUtils.isTrivial(raw)) {
+            alarms = new TreeSet<>();  // sorts them.
             String[] ta = raw.split(",");
             // get all the times that parse correctly
             for (String time : ta) {
@@ -246,9 +246,8 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     // do nothing
                 }
             }
+            DebugUtil.trace(this, tag + " found: " + alarms);
         }
-
-        DebugUtil.trace(this, tag + " found: " + alarms);
         return alarms;
     }
 

@@ -14,6 +14,7 @@ cfg.'description' :=  'Test with Tiger Dev Functor script. This tests that the c
 cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token endpoint
 
 rc := script_load('driver.qdl', cfg.);
+if[rc!='ok'][return(rc);];
 tokens. := clc#access();
 ⊨ tokens.'access_token'.'lifetime' == 900000 : 'wrong access token lifetime';
 ⊨ tokens.'refresh_token'.'lifetime' == 2592000000 : 'wrong refresh token lifetime';

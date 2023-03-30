@@ -1,0 +1,61 @@
+#! /usr/bin/env -S qdl-run
+// If you want to run an indivdual test, add the next two lines to it or none of the utilities
+// will be found.
+path := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests';
+script_path(path ~ script_path());
+test. := args().0;
+say('**** Flow test suite for OA4MP. ****');
+say('This will do several local tests for various modes of operation.');
+say('In each case, read carefully what is on the screen and do what it says.');
+say('Have your browser handy, since you will need to log in with the requested IDP repeatedly. ');
+say('This suite does take a bit to run, but it is quite a thorough test. If testing for an OA4MP release,');
+say('all tests MUST pass');
+say('There are also client management tests in the cm-tests directory to run.');
+say('****\n');
+/*test.:=(path + '/local/') + ['cil1550.qdl',
+                             'file_claims.qdl',
+                             'fnal-0.qdl',
+                             'fnal-1.qdl',
+                             'fnal-2.qdl',
+                             'fnal-3.qdl',
+                             'no_config.qdl',
+                             'test-template.qdl',
+                             'prototype.qdl',
+                             'rtx_refreshes.qdl',
+                             'rtx_exchanges.qdl',
+                             'rtx.qdl',
+                             'scitokens.qdl',
+                             'scitokens2.qdl',
+                             'test_ncsa.qdl',
+                             'test_qdl.qdl',
+                             'vo_test.qdl'];*/
+counter.'pass' := 0;
+counter.'fail' := 0;
+counter.'skipped' := 0;
+failures. := [];
+while[x∈test.][
+try[
+  rc := script_load(x);
+  if[rc == 'q'][break();]; // exit app
+  if[rc=='s'][counter.'skipped'+=1;continue();]; // skip this test
+  say(''); // blank line for clean display.
+  counter.'pass' += 1;
+  ]catch[
+     say('error running script ' + x);
+     say('error message:' + error_message);
+    counter.'fail' += 1;
+    failures. := failures. ~ x;
+  ];
+];
+
+say(counter.'pass' + ' passed');
+say(counter.'fail' + ' failed');
+say(counter.'skipped' + ' skipped');
+say('total tests run: ' + reduce(@+, counter.));
+// hand back a nice list
+if[0 < size(failures.)][
+  say('failed tests :' );
+  while[x ∈ failures.][
+     say('   ' + x);
+  ];
+];

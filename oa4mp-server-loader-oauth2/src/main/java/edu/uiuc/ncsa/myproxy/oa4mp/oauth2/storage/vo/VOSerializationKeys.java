@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo;
 
-import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
+import edu.uiuc.ncsa.security.storage.data.MonitoredKeys;
 
 import java.util.List;
 
@@ -8,32 +8,38 @@ import java.util.List;
  * <p>Created by Jeff Gaynor<br>
  * on 2/16/21 at  8:52 AM
  */
-public class VOSerializationKeys extends SerializationKeys {
+//public class VOSerializationKeys extends SerializationKeys {
+public class VOSerializationKeys extends MonitoredKeys {
+
     public VOSerializationKeys() {
         identifier("vo_id"); // sets the default identifier for this
+        // Changing this to extend MonitoredKeys requires that we change these
+        // or existing stuff breaks.
+        lastModifiedTS("last_modified");
+        creationTS("created");
     }
 
 
     String atIssuer = "at_issuer";
-    String created = "created";
+  //  String created = "created";
     String defaultKeyID = "default_key_id";
     String discoveryPath = "discovery_path";
     String issuer = "issuer";
     String jsonWebKeys = "json_web_keys";
-    String lastModified = "last_modified";
+ //   String lastModified = "last_modified";
     String title = "title";
     String valid = "valid";
 
     @Override
     public List<String> allKeys() {
         List<String> all = super.allKeys();
-        all.add(created());
+    //    all.add(creationTS());
         all.add(defaultKeyID());
         all.add(discoveryPath());
         all.add(issuer());
         all.add(atIssuer());
         all.add(jsonWebKeys());
-        all.add(lastModified());
+    //    all.add(lastModifiedTS());
         all.add(title());
         all.add(valid());
         return all;
@@ -44,10 +50,10 @@ public class VOSerializationKeys extends SerializationKeys {
         return atIssuer;
     }
 
-    public String created(String... x) {
+/*    public String creationTS(String... x) {
         if (0 < x.length) created = x[0];
         return created;
-    }
+    }*/
 
     public String defaultKeyID(String... x) {
         if (0 < x.length) defaultKeyID = x[0];
@@ -69,10 +75,10 @@ public class VOSerializationKeys extends SerializationKeys {
         return jsonWebKeys;
     }
 
-    public String lastModified(String... x) {
+ /*   public String lastModifiedTS(String... x) {
         if (0 < x.length) lastModified = x[0];
         return lastModified;
-    }
+    }*/
 
     public String title(String... x) {
         if (0 < x.length) title = x[0];

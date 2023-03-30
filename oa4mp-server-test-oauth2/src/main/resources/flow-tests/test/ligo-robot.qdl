@@ -32,6 +32,8 @@ user_id := 'http://cilogon.org/serverT/users/21340363'; // id from Github on tes
 params.'authz' :=  {'scope': 'scitokentesting.read scitokentesting.write igwn.robot:ligorobottesting'}; // initial request
 
 rc := script_load('driver.qdl', cfg., params.);
+if[rc!='ok'][return(rc);];
+
 tokens. := clc#access();
 
 at. := tokens.'access_token'.'jwt';

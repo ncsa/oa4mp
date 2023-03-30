@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.oa4mp.delegation.common.storage.monitored;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.storage.AbstractListeningStore;
 import edu.uiuc.ncsa.security.storage.ListeningStoreInterface;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
@@ -15,7 +16,10 @@ import edu.uiuc.ncsa.security.storage.sql.SQLStore;
 import edu.uiuc.ncsa.security.storage.sql.internals.Table;
 
 import javax.inject.Provider;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 import java.util.UUID;
 
@@ -55,28 +59,60 @@ public abstract class MonitoredSQLStore<V extends Identifiable> extends SQLStore
     }
 
     @Override
-    public void fireLastAccessedEvent(Identifier identifier) {
-        listeningStore.fireLastAccessedEvent(identifier);
+    public void fireLastAccessedEvent(ListeningStoreInterface store, Identifier identifier) {
+        listeningStore.fireLastAccessedEvent(store, identifier);
+    }
+
+    @Override
+    public boolean isMonitorEnabled() {
+        return listeningStore.isMonitorEnabled();
+    }
+
+    @Override
+
+    public void setMonitorEnabled(boolean x) {
+        listeningStore.setMonitorEnabled(x);
     }
 
     @Override
     public void lastAccessUpdate(IDMap idMap) {
         MonitoredKeys keys = (MonitoredKeys) getMapConverter().getKeys();
         String sql = "update " + getTable().getFQTablename() + " set " + keys.lastAccessed() + "=?" +
-                " where " + keys.identifier() + "=? AND " + keys.lastAccessed() + "<?";
+                " where (" + keys.identifier() + " LIKE ?) AND (" + keys.lastAccessed() + " IS NULL OR " + keys.lastAccessed() + "<?)";
         ConnectionRecord cr = getConnection();
         Connection c = cr.connection;
         try {
             PreparedStatement pStmt = c.prepareStatement(sql);
             for (Identifier id : idMap.keySet()) {
-                java.sql.Date sqlDate = new Date(idMap.get(id).getTime());
-                pStmt.setDate(1, sqlDate);
+                pStmt.setLong(1, idMap.get(id));
                 pStmt.setString(2, id.toString());
-                pStmt.setDate(3, sqlDate);
+                pStmt.setLong(3, idMap.get(id));
                 pStmt.addBatch();
 
             }
             int[] affectedRecords = pStmt.executeBatch();
+            long success = 0;
+            long noInfo = 0;
+            long failed = 0;
+            for(int i =0; i < affectedRecords.length; i++){
+                int current = affectedRecords[i];
+                switch(current){
+                    case Statement.SUCCESS_NO_INFO:
+                        noInfo++;
+                        break;
+                        case Statement.EXECUTE_FAILED:
+                            failed++;
+                            break;
+                    default:
+                        success += current;
+                        break;
+                }
+            }
+            DebugUtil.trace(this, "updated last_accessed:" +
+                    "\n   attempted : " + affectedRecords.length +
+                    "\n          ok : " + success +
+                    "\n ok, no info : " + noInfo +
+                    "\n      failed : " + failed);
             releaseConnection(cr);
 
         } catch (SQLException sqlException) {
@@ -90,7 +126,7 @@ public abstract class MonitoredSQLStore<V extends Identifiable> extends SQLStore
     @Override
     public V get(Object o) {
         V v = super.get(o);
-        listeningStore.fireLastAccessedEvent((Identifier) o);
+        listeningStore.fireLastAccessedEvent(this, (Identifier) o);
         return v;
     }
 }

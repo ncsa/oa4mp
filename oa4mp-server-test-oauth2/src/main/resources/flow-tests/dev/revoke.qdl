@@ -12,6 +12,8 @@ cfg.'description' :=  'Test revocation and introspection machinery for a client.
 cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token endpoint
 
 rc := script_load('driver.qdl', cfg.);
+if[rc!='ok'][return(rc);];
+
 tokens. := clc#access();
 
 ⊨ introspect().'active':'access token not active';

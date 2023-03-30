@@ -11,7 +11,8 @@ cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token 
 params.'authz' :=  {'scope': 'wlcg.capabilityset:/fermilab wlcg.capabilityset:/dune'};
 cfg.'description' :=  'Test FNAL with multiple scopes -- fails';
 rc := script_load('driver.qdl', cfg., params.);
-⊨ rc == 0: (rc==-1?'user aborted':'there was an error initiating the flow');
+if[rc!='ok'][return(rc);];
+
 tokens. := null;
 try[
   tokens. := access(); // fails.

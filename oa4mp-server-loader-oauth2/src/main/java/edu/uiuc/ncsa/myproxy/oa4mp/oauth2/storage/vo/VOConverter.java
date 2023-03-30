@@ -8,6 +8,8 @@ import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 
+import java.util.Date;
+
 import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 
 /**
@@ -26,8 +28,10 @@ public class VOConverter<V extends VirtualOrganization> extends MapConverter<V> 
     @Override
     public V fromMap(ConversionMap<String, Object> map, V v) {
         V vo = super.fromMap(map, v);
-        vo.setCreated(map.getLong(vok().created()));
-        vo.setLastModified(map.getLong(vok().lastModified()));
+
+        vo.setCreationTS(new Date(map.getLong(vok().creationTS())));
+        vo.setLastModifiedTS(new Date(map.getLong(vok().lastModifiedTS())));
+        vo.setLastAccessed(new Date(map.getLong(vok().lastAccessed())));
         vo.setValid(map.getBoolean(vok().valid()));
 
         if (map.containsKey(vok().issuer()) && !isTrivial(map.getString(vok().issuer()))) {
@@ -62,8 +66,9 @@ public class VOConverter<V extends VirtualOrganization> extends MapConverter<V> 
     public void toMap(V value, ConversionMap<String, Object> data) {
         super.toMap(value, data);
         data.put(vok().valid(), value.isValid());
-        data.put(vok().created(), value.getCreated());
-        data.put(vok().lastModified(), value.getLastModified());
+        data.put(vok().creationTS(), value.getCreationTS());
+        data.put(vok().lastModifiedTS(), value.getLastModifiedTS());
+        data.put(vok().lastAccessed(), value.getLastAccessed().getTime());
         if(!isTrivial(value.getIssuer())){
             data.put(vok().issuer(), value.getIssuer());
         }

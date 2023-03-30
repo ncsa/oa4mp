@@ -8,12 +8,4 @@ test.:=(path + '/dev/') + ['df.qdl',
                            'no_config.qdl',
                            'revoke.qdl',
                            'vo_1.qdl'];
-say('Running all tests. Remember to follow the instructions to repeatedly login using the specified IDP.');
-while[x∈test.][
-try[
-  script_load(x);
-  ]catch[
-     say('error running script ' + x);
-     say('error message:' + error_message);
-  ];
-];
+script_load('runner.qdl', test.);

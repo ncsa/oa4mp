@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,14 +61,14 @@ public class VOMemoryStore<V extends VirtualOrganization> extends MonitoredMemor
 
     @Override
     public void save(V value) {
-        value.setLastModified(System.currentTimeMillis());
+        value.setLastModifiedTS(new Date());
         super.save(value);
         updateIndices(value);
     }
 
     @Override
     public void update(V value) {
-        value.setLastModified(System.currentTimeMillis());
+        value.setLastModifiedTS(new Date());
         super.update(value);
         updateIndices(value);
     }

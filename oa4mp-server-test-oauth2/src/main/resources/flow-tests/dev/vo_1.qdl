@@ -13,6 +13,8 @@ cfg.'description' :=  'Basic VO test.';
 cfg.'flow_type' := 'df'; // Note to use df you need to set param for the token endpoint
 
 rc := script_load('driver.qdl', cfg.);
+if[rc!='ok'][return(rc);];
+
 tokens. := clc#access();
 at. := tokens.'access_token'.'jwt';
 ⊨ is_defined(tokens.'refresh_token') : 'Missing refresh token';

@@ -1,10 +1,9 @@
 package edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl;
 
-import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.ClientKeys;
+import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.storage.data.ConversionMap;
-import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
 import net.sf.json.JSONObject;
 
 /**
@@ -21,7 +20,7 @@ public class ClientConverter<V extends Client> extends BaseClientConverter<V> {
         this(new ClientKeys(), identifiableProvider);
     }
 
-    public ClientConverter(SerializationKeys keys, IdentifiableProvider<V> identifiableProvider) {
+    public ClientConverter(ClientKeys keys, IdentifiableProvider<V> identifiableProvider) {
         super(keys, identifiableProvider);
     }
 
