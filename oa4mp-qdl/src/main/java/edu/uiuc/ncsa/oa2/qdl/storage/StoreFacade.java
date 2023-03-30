@@ -61,7 +61,7 @@ public class StoreFacade implements QDLModuleMetaClass {
 
     transient MyLoggingFacade logger = null;
     transient ConfigurationNode configurationNode;
-    transient OA2SE environment = null;
+    transient protected OA2SE environment = null;
 
 
     public ConfigurationLoader<? extends AbstractEnvironment> getLoader() {

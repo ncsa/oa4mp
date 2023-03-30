@@ -393,7 +393,11 @@ When a new version is deployed, here is the testing order
      (Caveat -- this client needs to be recreated by copying the df test client configuration
       for OA4MP and tweaking it. This is because a database crash lost the client configuration.)
 
-     a client for testing the device flow against the CILogon server
+     a client for testing the device flow against the CILogon server. You have to load the client
+     from the right config file, e.g. in the oa2-client app:
+
+     load localhost:test/df /home/ncsa/dev/csd/config/client-cil-oa2.xml
+
      This will require doing the DBService calls manually (that's part of the test).
      In the CLC load the configuration and type
      df
@@ -404,7 +408,8 @@ When a new version is deployed, here is the testing order
 
      /home/ncsa/dev/ncsa-git/cilogon/cilogon-admin/src/main/scripts
 
-     Set the username in the transaction directly (takes place of CILogon backend calls):
+     Set the username (the unique identifier in the user database, e.,g. http://cilogon.org/serverT/users/153791)
+     in the transaction directly (takes place of CILogon backend calls):
      ./set-user.qdl USER_CODE username
 
      Manually approve the user code:
