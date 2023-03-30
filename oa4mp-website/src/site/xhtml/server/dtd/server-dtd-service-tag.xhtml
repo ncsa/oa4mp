@@ -246,6 +246,43 @@
             See note below on units.
         </td>
     </tr>
+    <tr id="enableMonitor">
+        <td style="vertical-align: top;">enableMonitor</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">false</td>
+        <td style="vertical-align: top;">Enable monitoring of access to clients, admin clients, virtual organizations
+            and (in CILogon) users. This will start a thread that will update the objects either
+            at intervals (monitorInterval) or at given set times (monitorAlarms). The reason for this
+            is that very high traffic servers should not hammer storage for every access. What this feature
+            does is buffer the accesses and make a single update per object.
+        </td>
+    </tr>
+    <tr id="monitorInterval">
+        <td style="vertical-align: top;">monitorInterval</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">2 hours</td>
+        <td style="vertical-align: top;">How often should the monitor thread run. </td>
+    </tr>
+    <tr id="monitorAlarms">
+        <td style="vertical-align: top;">monitorAlarms</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">N/A</td>
+        <td style="vertical-align: top;">Comma delimited list of times of the form hh:mm:ss.
+        Times are on a 24 hour clock and fractions of seconds are ignored.
+        Monitoring will happen daily at these times.
+        Note that alarms have right of way in that if you define alarms
+        and a monitorInterval, the alarms will be done. If you do not want alarms,
+        omit this entry. <br/><br/>
+        E.g.<br/>
+        monitorAlarms="06:00:00, 18:30:00"<br/><br/>
+        Would have updates run daily at 6:00 am and 6:30 pm.</td>
+    </tr>
+
+    <!--
+                 enableMonitor="true"
+             monitorInterval="60 sec"
+             monitorAlarms="09:30:00, 09:00:00, 16:00:00,  12:00:00"
+    -->
     <tr id="name">
         <td style="vertical-align: top;">name</td>
         <td style="vertical-align: top;">N</td>
