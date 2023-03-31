@@ -105,7 +105,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
     public static final String CLEANUP_ALARMS_TAG = "cleanupAlarms";
     public static final String CLEANUP_LOCKING_ENABLED = "cleanupLockingEnabled";
 
-    public static final String MONITOR_ENABLED = "enableMonitor";
+    public static final String MONITOR_ENABLED = "monitorEnable";
     public static final String MONITOR_INTERVAL = "monitorInterval";
     public static final String MONITOR_ALARMS = "monitorAlarms";
     public static final String RFC7636_REQUIRED_TAG = "rfc7636Required";

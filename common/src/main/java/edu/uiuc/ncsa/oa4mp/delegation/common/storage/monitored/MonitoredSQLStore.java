@@ -73,12 +73,12 @@ public abstract class MonitoredSQLStore<V extends Identifiable> extends SQLStore
     public void setMonitorEnabled(boolean x) {
         listeningStore.setMonitorEnabled(x);
     }
-
+     boolean DEEP_DEBUG = false;
     @Override
     public void lastAccessUpdate(IDMap idMap) {
         MonitoredKeys keys = (MonitoredKeys) getMapConverter().getKeys();
         String sql = "update " + getTable().getFQTablename() + " set " + keys.lastAccessed() + "=?" +
-                " where (" + keys.identifier() + " LIKE ?) AND (" + keys.lastAccessed() + " IS NULL OR " + keys.lastAccessed() + "<?)";
+                " where (" + keys.identifier() + " =?) AND (" + keys.lastAccessed() + " IS NULL OR " + keys.lastAccessed() + "<?)";
         ConnectionRecord cr = getConnection();
         Connection c = cr.connection;
         try {
@@ -88,12 +88,15 @@ public abstract class MonitoredSQLStore<V extends Identifiable> extends SQLStore
                 pStmt.setString(2, id.toString());
                 pStmt.setLong(3, idMap.get(id));
                 pStmt.addBatch();
-
+                if(DEEP_DEBUG){
+                    System.out.println("MonitoredSQLStore: updating id=" + id + ", access time=" + idMap.get(id));
+                }
             }
             int[] affectedRecords = pStmt.executeBatch();
             long success = 0;
             long noInfo = 0;
             long failed = 0;
+            long unknown = 0;
             for(int i =0; i < affectedRecords.length; i++){
                 int current = affectedRecords[i];
                 switch(current){
@@ -104,7 +107,11 @@ public abstract class MonitoredSQLStore<V extends Identifiable> extends SQLStore
                             failed++;
                             break;
                     default:
-                        success += current;
+                        if(current<0){
+                            unknown += current;
+                        }else {
+                            success += current;
+                        }
                         break;
                 }
             }
@@ -112,6 +119,7 @@ public abstract class MonitoredSQLStore<V extends Identifiable> extends SQLStore
                     "\n   attempted : " + affectedRecords.length +
                     "\n          ok : " + success +
                     "\n ok, no info : " + noInfo +
+                    "\n     unknown : " + unknown +
                     "\n      failed : " + failed);
             releaseConnection(cr);
 

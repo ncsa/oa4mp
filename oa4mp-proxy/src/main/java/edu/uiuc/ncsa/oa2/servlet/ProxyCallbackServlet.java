@@ -99,6 +99,17 @@ public class ProxyCallbackServlet extends OA2AuthorizationServer {
         JWTRunner jwtRunner = new JWTRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2SE, t, resolvedClient.getConfig()));
         OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, t, resolvedClient, request);
         XMLMap backup = GenericStoreUtils.toXML(getTransactionStore(), t);
+        /*
+        CIL-1278 -- support goes here. These are scripts run by the server to
+                    emulate CILogons getUser and setTransaction calls. This allows OA4MP to have
+                    user support without explicitly having to store/manage users.
+                    Code below is boilerplate to be used as a reference.
+        if (!client.isSkipServerScripts() && oa2SE.getQDLEnvironment().hasServerScripts()) {
+            ServerQDLScriptHandlerConfig qdlScriptHandlerConfig = new ServerQDLScriptHandlerConfig(oa2SE, transaction, atTX, req);
+            ServerQDLScriptHandler qdlScriptHandler = new ServerQDLScriptHandler(qdlScriptHandlerConfig);
+            jwtRunner.addHandler(qdlScriptHandler);
+        }        }
+         */
         try {
             jwtRunner.doAuthClaims();
         } catch (Throwable throwable) {

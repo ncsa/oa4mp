@@ -49,13 +49,6 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
 
     protected static String scopesToString(OA2ServiceTransaction t) {
         return scopesToString(t.getScopes());
-/*
-        String scopeString = "";
-        for (String x : t.getScopes()) {
-            scopeString =  scopeString + x + " ";
-        }
-        return scopeString.trim(); // don't return trailing blank(s)
-*/
     }
 
     protected static String scopesToString(Collection<String> listOfScopes) {
