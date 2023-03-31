@@ -5,7 +5,7 @@
     <parent>
         <artifactId>oa4mp</artifactId>
         <groupId>edu.uiuc.ncsa.myproxy</groupId>
-        <version>5.2-SNAPSHOT</version>
+        <version>5.3-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -21,7 +21,7 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>common</artifactId>
-            <version>5.2-SNAPSHOT</version>
+            <version>5.3-SNAPSHOT</version>
         </dependency>
 
         <dependency>
@@ -33,7 +33,7 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>storage</artifactId>
-            <version>5.2-SNAPSHOT</version>
+            <version>5.3-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
