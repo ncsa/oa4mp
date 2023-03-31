@@ -10,6 +10,25 @@
 <body class="composite">
 <!--#include virtual="../../header.html" -->
 <p>Changes to the OA4MP server by version.</p>
+<h2>5.3.0</h2>
+<p>Release date 2023-04-11</p>
+<ul>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-1069">CIL-1069</a>: Emails are sent ontheir own thread now.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-1638">CIL-1638</a>: Missing header in user info endpoint response.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-1655">CIL-1655</a>: added refresh_token_lifetime and refresh_token_iat to
+        refresh endpoint repsonse. These are not standard, but sufficiently many places do it now (and it's a really good idea)
+        so we will too. If there is ever a standard for this, we will support it.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-1667">CIL-1667</a>: The openid scope now will have the acr (authentication
+        class reference) returned if present.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-1668">CIL-1668</a>: QDL acl_add function will not throw an exception if the
+        added identifier is invalid, it will merely log it. Optionally, it may be requested to fail hard  and fast with a flag.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-1671">CIL-1671</a>: Admin clients, if approved to do so, may either mint
+        identifiers in their own namespace or request specific identifiers.</li>
+    <li><a href="https://jira.ncsa.illinois.edu/browse/CIL-1677">CIL-1677</a>: Monitor last accessed times for various objects.
+    This includes clients, admin clients, virtual organizations and (in CILogon) users. This permits tracking across time.
+    As the system ages and scales up, being able to track which objects are in use is becoming critical.</li>
+    <li></li>
+</ul>
 <h2>5.2.9</h2>
 <p>Release date 2023-03-07</p>
 <ul>

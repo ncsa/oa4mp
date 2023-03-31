@@ -11,15 +11,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="eb414374-02ed-40a4-9689-d382715049b9" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/common/storage/monitored/MonitoredSQLStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/common/storage/monitored/MonitoredSQLStore.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-proxy/src/main/java/edu/uiuc/ncsa/oa2/servlet/OA2AuthorizationServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-proxy/src/main/java/edu/uiuc/ncsa/oa2/servlet/OA2AuthorizationServer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-proxy/src/main/java/edu/uiuc/ncsa/oa2/servlet/ProxyCallbackServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-proxy/src/main/java/edu/uiuc/ncsa/oa2/servlet/ProxyCallbackServlet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-qdl/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-qdl/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/loader/OA2ConfigurationLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/loader/OA2ConfigurationLoader.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-test-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-test-oauth2/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-website/src/site/xhtml/server/dtd/server-dtd-service-tag.xhtml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-website/src/site/xhtml/server/dtd/server-dtd-service-tag.xhtml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/cm/oidc_cm/OIDCCMServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/cm/oidc_cm/OIDCCMServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-website/src/site/xhtml/server/manuals/changelog.xhtml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-website/src/site/xhtml/server/manuals/changelog.xhtml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,6 +30,11 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="5.3.0" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="LogFilters">
