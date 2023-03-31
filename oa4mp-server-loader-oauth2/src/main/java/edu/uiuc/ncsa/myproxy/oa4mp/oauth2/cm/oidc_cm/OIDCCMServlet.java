@@ -818,7 +818,8 @@ public class OIDCCMServlet extends EnvServlet {
         }
         getOA2SE().getClientApprovalStore().save(approval);
         // Github 84 https://github.com/ncsa/OA4MP/issues/84
-        writeCreateOK(httpServletResponse, jsonResp);
+        //writeCreateOK(httpServletResponse, jsonResp);
+        writeOK(httpServletResponse, jsonResp);
     }
 
     protected SecureRandom secureRandom = new SecureRandom();

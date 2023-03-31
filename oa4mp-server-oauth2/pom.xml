@@ -7,7 +7,7 @@
     <parent>
         <groupId>edu.uiuc.ncsa.myproxy</groupId>
         <artifactId>oa4mp</artifactId>
-        <version>5.2-SNAPSHOT</version>
+        <version>5.3.0</version>
     </parent>
 
     <artifactId>oa4mp-server-oauth2</artifactId>
@@ -22,7 +22,7 @@
  <!--       <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>oa4mp-webapp</artifactId>
-            <version>5.2-SNAPSHOT</version>
+            <version>5.3.0</version>
             <type>war</type>
             <scope>runtime</scope>
         </dependency>-->
@@ -34,50 +34,50 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>oa4mp-server-api</artifactId>
-            <version>5.2-SNAPSHOT</version>
+            <version>5.3.0</version>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>oa4mp-proxy</artifactId>
-            <version>5.2-SNAPSHOT</version>
+            <version>5.3.0</version>
         </dependency>
         
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>core</artifactId>
-            <version>5.2-SNAPSHOT</version>
+            <version>5.3.0</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>common</artifactId>
-            <version>5.2-SNAPSHOT</version>
+            <version>5.3.0</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>util</artifactId>
-            <version>5.2-SNAPSHOT</version>
+            <version>5.3.0</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
 <!--        <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>servlet</artifactId>
-            <version>5.2-SNAPSHOT</version>
+            <version>5.3.0</version>
         </dependency>-->
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>myproxy-logon</artifactId>
-            <version>5.2-SNAPSHOT</version>
+            <version>5.3.0</version>
         </dependency>
 
 <!--        <dependency>
             <artifactId>qdl-sas</artifactId>
             <groupId>edu.uiuc.ncsa.qdl</groupId>
-            <version>1.4-QDL-SNAPSHOT</version>
+            <version>1.5.0</version>
          </dependency>-->
         <dependency>
             <groupId>mysql</groupId>
