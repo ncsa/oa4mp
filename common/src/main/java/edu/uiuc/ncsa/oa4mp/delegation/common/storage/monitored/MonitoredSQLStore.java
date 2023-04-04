@@ -77,6 +77,8 @@ public abstract class MonitoredSQLStore<V extends Identifiable> extends SQLStore
     @Override
     public void lastAccessUpdate(IDMap idMap) {
         MonitoredKeys keys = (MonitoredKeys) getMapConverter().getKeys();
+        // Note that prepared statement like "= ?" (with a space!) will not prepare correctly!
+        // They seem to have the space embedded in the argument. Always use "=?"
         String sql = "update " + getTable().getFQTablename() + " set " + keys.lastAccessed() + "=?" +
                 " where (" + keys.identifier() + " =?) AND (" + keys.lastAccessed() + " IS NULL OR " + keys.lastAccessed() + "<?)";
         ConnectionRecord cr = getConnection();

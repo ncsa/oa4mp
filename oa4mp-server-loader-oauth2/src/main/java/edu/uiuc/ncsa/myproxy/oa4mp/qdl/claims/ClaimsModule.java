@@ -14,17 +14,18 @@ import java.util.List;
  * <p>Created by Jeff Gaynor<br>
  * on 2/10/20 at  5:49 AM
  */
-public class OA2Module extends JavaModule {
-    public OA2Module() {
+public class ClaimsModule extends JavaModule {
+    public ClaimsModule() {
     }
 
-    protected OA2Module(URI namespace, String alias) {
+    protected ClaimsModule(URI namespace, String alias) {
         super(namespace, alias);
     }
     public static final String NAMESPACE ="oa2:/qdl/oidc/claims";
     @Override
     public Module newInstance(State state) {
-        OA2Module oa2Module = new OA2Module(URI.create(NAMESPACE), "claims");
+        ClaimsModule claimsModule = new ClaimsModule(URI.create(NAMESPACE), "claims");
+
         ArrayList<QDLFunction> funcs = new ArrayList<>();
         funcs.add(new ClaimsSourceGetter());
         funcs.add(new CreateSourceConfig());
@@ -37,12 +38,12 @@ public class OA2Module extends JavaModule {
         funcs.add(qdlUtil.new QueryScopes());
         funcs.add(qdlUtil.new ToScopeString());
         funcs.add(new TemplateSubsitutionQDLUtil());
-        oa2Module.addFunctions(funcs);
+        claimsModule.addFunctions(funcs);
         if (state != null) {
-            oa2Module.init(state);
+            claimsModule.init(state);
         }
-        setupModule(oa2Module);
-        return oa2Module;
+        setupModule(claimsModule);
+        return claimsModule;
     }
         List<String> descr = new ArrayList<>();
     @Override

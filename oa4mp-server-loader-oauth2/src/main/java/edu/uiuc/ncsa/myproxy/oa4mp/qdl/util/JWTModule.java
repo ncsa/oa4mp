@@ -40,10 +40,9 @@ public class JWTModule extends JavaModule {
     @Override
     public Module newInstance(State state) {
         JWTModule jwtModule = new JWTModule(URI.create(NAMESPACE), "jwt");
+
         JWTCommands jwtCommands = new JWTCommands(null);
-        if (state != null) {
-            jwtCommands.setLogger(state.getLogger());
-        }
+
         jwtModule.jwtCommands = jwtCommands;
         funcs = new ArrayList<>();
         funcs.add(jwtCommands.new CreateJWK());

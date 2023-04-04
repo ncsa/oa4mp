@@ -24,9 +24,9 @@ Downloads
 
 * OAuth 2.0 (OpenID Connect)
 
-        * {{{https://github.com/ncsa/OA4MP/releases/tag/5.2.0}oauth2-server-latest.war}} (Version 5.2.0)
+        * {{{https://github.com/ncsa/OA4MP/releases/latest}oauth2.war}} (5.3-SNAPSHOT)
 
-        * {{{https://github.com/ncsa/OA4MP/releases/tag/5.2.0}oauth2-client-latest.war}} (Version 5.2.0)
+        * {{{https://github.com/ncsa/OA4MP/releases/latest}client.war}} (5.3-SNAPSHOT)
 
 
 
@@ -40,6 +40,15 @@ Documentation
 
         *{{{./server/manuals/install-walkthrough.html}Server Installation Walk-Through}}
 
+OA4MP Extensions to {{{http://qdl-lang.org}QDL}}
+
+    *{{{./docs/pdf/qdl_server_scripts.pdf}Introduction to writing server-side scripts with QDL}}
+
+    *{{{./docs/pdf/creating_claim_sources2.pdf}Creating claims in server scripting.}}
+
+    *{{{./docs/pdf/claim_source_examples.pdf}Examples for creating claim sources.}}
+
+    *{{{./docs/pdf/token_handler_configuration.pdf}Configuring token handlers.}}
 
 Related Resources
 

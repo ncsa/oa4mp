@@ -408,12 +408,15 @@ When a new version is deployed, here is the testing order
 
      /home/ncsa/dev/ncsa-git/cilogon/cilogon-admin/src/main/scripts
 
-     Set the username (the unique identifier in the user database, e.,g. http://cilogon.org/serverT/users/153791)
+     Set the user_uid (the unique identifier in the user database, e.,g. http://cilogon.org/serverT/users/153791)
      in the transaction directly (takes place of CILogon backend calls):
-     ./set-user.qdl USER_CODE username
+     ./set-user.qdl USER_CODE user_uid
 
      Manually approve the user code:
      ./approve.qdl USER_CODE
+
+     If you want to touch a user record to test for monitoring last access time, use
+     ./get_user.qdl user_uid
 
      B. Use Terry's scripts
      1. This should respond with a user code, Call it USER_CODE. Paste into this and run it
@@ -603,7 +606,7 @@ TO DO:
          it doesn't just always hand back everything).
        The following test for various things like scope reduction
 
-       set_param -a scope "read: write: igwn.robot:ligorobot"
+       set_param -a scope "read: write: igwn.robot:ligorobottesting scitokentesting.read"
        set_param -r scope "read:/DQSegDB write:/DQSegDB"
        set_param -x scope "read:/DQSegDB/foo write:/DQSegDB read:/frames/bar"
        AT:

@@ -50,12 +50,13 @@ SS('*** LIGO -- not in robots group');
 SS('*** LIGO -- permissions' + to_string(permissions.));
 SS('*** LIGO -- requested scopes' + to_string(requested_scopes.));
 permissions. := reduce(@~,ζ\((attributes.'isMemberOf')\*\name));
+claims.'uid' := attributes.'uid';
+permissions. := template_substitution(permissions., claims.); // substitute templates like ${uid}
 
 permissions. := resolve_templates(permissions., requested_scopes., exec_phase=='post_token');
 //         permissions. := ~mask(permissions., permissions. ∈ requested_scopes.);
 
 SS('*** LIGO -- permissions after templates:' + to_string(permissions.));
- access_token.'scope' := detokenize(unique(permissions.), ' ', 2); // turn in to string, omit duplications, trailing space
 
 // Audience processing.
     access_token.'aud' := requested_audience.;
@@ -63,10 +64,11 @@ SS('*** LIGO -- permissions after templates:' + to_string(permissions.));
 /*
    Tidy up id token aka claims.
 */
-claims.'uid' := is_defined(attributes.'uid')?attributes.'uid':claims.'eppn';
 if[is_defined(attributes.'uin')]
   [claims.'uin' := attributes.'uin';];
  access_token.'uid' := claims.'uid'; // CIL-1681
+ //     xi. := resolve_templates(at_claims.EPE., tx_scopes., false); // resolves any scopes explicitly granted to user
+  access_token.'scope' := detokenize(unique(permissions.), ' ', 2); // turn in to string, omit duplications, trailing space
 
  SS('*** LIGO: final access token = ' + to_string(access_token.));
  SS('*** LIGO: final claims  = ' + to_string(claims.));

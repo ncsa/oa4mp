@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting;
 import edu.uiuc.ncsa.qdl.config.ModuleConfig;
 import edu.uiuc.ncsa.qdl.config.QDLEnvironment;
 import edu.uiuc.ncsa.qdl.config.VFSConfig;
+import edu.uiuc.ncsa.qdl.state.LibLoader;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.util.cli.editing.Editors;
 import edu.uiuc.ncsa.security.util.scripting.ScriptSet;
@@ -50,8 +51,9 @@ public class OA2QDLEnvironment extends QDLEnvironment {
                              boolean assertionsOn,
                              String saveDir,
                              boolean allowOverwriteBaseFunctions,
-                             ScriptSet serverScripts) {
-        super(myLogger, cfgFile, name, isEnabled, isServerModeOn, isRestrictedIO, numericDigits, bootScript, wsHomeDir, wsEnv, echoModeOn, prettyPrint, verboseOn, compressionOn, showBanner, vfsConfigs, moduleConfigs, scriptPath, modulePath, libPath, debugLevel, autosaveOn, autosaveInterval, autosaveMessagesOn, useExternalEditor, externalEditorPath, qdlEditors, enableLibrarySupport, assertionsOn, saveDir, allowOverwriteBaseFunctions);
+                             ScriptSet serverScripts,
+                             LibLoader libLoader) {
+        super(myLogger, cfgFile, name, isEnabled, isServerModeOn, isRestrictedIO, numericDigits, bootScript, wsHomeDir, wsEnv, echoModeOn, prettyPrint, verboseOn, compressionOn, showBanner, vfsConfigs, moduleConfigs, scriptPath, modulePath, libPath, debugLevel, autosaveOn, autosaveInterval, autosaveMessagesOn, useExternalEditor, externalEditorPath, qdlEditors, enableLibrarySupport, assertionsOn, saveDir, allowOverwriteBaseFunctions,libLoader);
         if (serverScripts != null && !serverScripts.isEmpty()) {
             this.serverScripts = serverScripts;
         }

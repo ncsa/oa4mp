@@ -32,6 +32,7 @@ public class AccessControlModule extends JavaModule {
         funcs.add(qdlacl.new ACLReject());
         funcs.add(qdlacl.new CheckACL());
         accessControlModule.addFunctions(funcs);
+
         setupModule(accessControlModule);
         return accessControlModule;
     }
