@@ -7,7 +7,7 @@ OA4MP_ROOT=/home/ncsa/dev/ncsa-git/oa4mp
 #WEBSITE_ROOT=$OA4MP_ROOT/docs
 #cd $WEBSITE_ROOT/pdf
 # OLD location for now so the website updates
-GITHUB_ROOT=/home/ncsa/dev/ncsa-git/oa4mp-doc/docs
+GITHUB_ROOT=/home/ncsa/dev/ncsa-git/oa4mp/docs
 cd $GITHUB_ROOT/pdf
 
 echo "converting docs to PDF"
@@ -20,10 +20,10 @@ echo "done converting PDFs"
 
 # ===============
 cd $OA4MP_ROOT
-mvn javadoc:javadoc
-cp -r $OA4MP_ROOT/language/target/site/apidocs/* $GITHUB_ROOT/apidocs
+mvn javadoc:aggregate
 cd $OA4MP_ROOT/oa4mp-website
 mvn clean site
 # Note the source directory in the next command has no apidocs subdirectory, so this overlays
 # without overwriting.
+cp -r $OA4MP_ROOT/target/site/* $GITHUB_ROOT
 cp -r $OA4MP_ROOT/oa4mp-website/target/site/* $GITHUB_ROOT

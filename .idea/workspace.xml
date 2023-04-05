@@ -11,36 +11,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="eb414374-02ed-40a4-9689-d382715049b9" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/oa4mp-qdl/src/main/java/edu/uiuc/ncsa/oa2/qdl/CLCLoader.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/oa4mp-qdl/src/main/java/edu/uiuc/ncsa/oa2/qdl/CMLoader.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/oa4mp-qdl/src/main/java/edu/uiuc/ncsa/oa2/qdl/OA2LibLoader2.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/qdl/ligo/vo4/scitokens-scopes2.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/qdl/OA2LibLoader.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/qdl/acl/ACLoader.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/qdl/claims/ClaimsLoader.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/qdl/util/JWTLoader.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/oa4mp-website/make-website2.sh" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/common/storage/monitored/MonitoredSQLStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/common/storage/monitored/MonitoredSQLStore.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-clc/pom.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-qdl/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-qdl/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-qdl/src/main/java/edu/uiuc/ncsa/oa2/qdl/ClientManagementModule.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-qdl/src/main/java/edu/uiuc/ncsa/oa2/qdl/ClientManagementModule.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-qdl/src/main/java/edu/uiuc/ncsa/oa2/qdl/storage/StoreAccessModule.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-qdl/src/main/java/edu/uiuc/ncsa/oa2/qdl/storage/StoreAccessModule.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/qdl/ligo/vo4/access.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/qdl/ligo/vo4/access.qdl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/qdl/ligo/vo4/extract.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/qdl/ligo/vo4/extract.qdl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/qdl/ligo/vo4/init.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/qdl/ligo/vo4/init.qdl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/testing/testing-readme.txt" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/src/main/resources/testing/testing-readme.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/qdl/OA2QDLLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/qdl/OA2QDLLoader.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/qdl/acl/AccessControlModule.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/qdl/acl/AccessControlModule.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/qdl/claims/OA2Module.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/qdl/claims/ClaimsModule.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/qdl/claims/TokenHandlerModule.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/qdl/claims/TokenHandlerModule.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/qdl/scripting/OA2QDLConfigurationLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/qdl/scripting/OA2QDLConfigurationLoader.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/qdl/scripting/OA2QDLEnvironment.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/qdl/scripting/OA2QDLEnvironment.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/qdl/util/JWTModule.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/qdl/util/JWTModule.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-qdl/src/main/docs/claim_source_examples.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/qdl/OA2LibLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/qdl/OA2LibLoader.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-test-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-test-oauth2/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-test-oauth2/src/main/resources/flow-tests/test/ligo-robot.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-test-oauth2/src/main/resources/flow-tests/test/ligo-robot.qdl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-website/src/site/apt/index.apt" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-website/src/site/apt/index.apt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-website/make-website2.sh" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-website/make-website2.sh" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -317,7 +294,7 @@
       <workItem from="1677181831620" duration="33264000" />
       <workItem from="1679599166366" duration="83126000" />
       <workItem from="1680272326954" duration="9000000" />
-      <workItem from="1680299621593" duration="28327000" />
+      <workItem from="1680299621593" duration="36020000" />
     </task>
     <task id="LOCAL-00001" summary="Migrated a bunch of static utilities into classes.">
       <created>1675892170361</created>
@@ -396,7 +373,21 @@
       <option name="project" value="LOCAL" />
       <updated>1680299087590</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="Added LibLoader implementation for QDL. Getting website javadoc to build sanely.">
+      <created>1680645158923</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1680645158923</updated>
+    </task>
+    <task id="LOCAL-00013" summary="Maven build improvements">
+      <created>1680735148832</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1680735148832</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -407,6 +398,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="OFFER_MOVE_TO_ANOTHER_CHANGELIST_ON_PARTIAL_COMMIT" value="true" />
+    <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
+    <option name="CHECK_NEW_TODO" value="false" />
     <MESSAGE value="Migrated a bunch of static utilities into classes." />
     <MESSAGE value="CIL-1389 (updated documentation) and CIL-1266 testing improvements. Addressed a few niggling point." />
     <MESSAGE value="Git hub fixes for QDL #15 (quit using QDLException). Script updates for BNL and LIGO. Fixed documentation." />
@@ -418,7 +411,9 @@
     <MESSAGE value="Changed visibility on an internal variable." />
     <MESSAGE value="CIL-1677 documentation." />
     <MESSAGE value="Snapshot version bumped to 5.3" />
-    <option name="LAST_COMMIT_MESSAGE" value="Snapshot version bumped to 5.3" />
+    <MESSAGE value="Added LibLoader implementation for QDL. Getting website javadoc to build sanely." />
+    <MESSAGE value="Maven build improvements" />
+    <option name="LAST_COMMIT_MESSAGE" value="Maven build improvements" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
