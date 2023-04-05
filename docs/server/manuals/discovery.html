@@ -1,0 +1,258 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+
+
+
+
+
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>OAuth for MyProxy</title>
+    <style type="text/css" media="all">
+        @import url("../../css/oa4mp-custom.css");
+        @import url("../../css/oa4mp-theme.css");
+        @import url("../../css/site.css");
+    </style>
+    <link rel="stylesheet" href="../../css/print.css" type="text/css" media="print"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    </head>
+<body class="composite">
+<div id="banner">
+                        <a href="http://www.ncsa.illinois.edu/" id="bannerLeft"  >
+        
+                                                                    <img src="../../css/images/ncsalogo_sm-2.gif" alt="NCSA"/>
+        
+                </a>
+                                    <a href="http://grid.ncsa.illinois.edu/myproxy/" id="bannerRight"  >
+        
+                                                                    <img src="../../css/images/MyProxyWide.gif" alt="MyProxy"/>
+        
+                </a>
+                <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="breadcrumbs">
+            
+    
+
+    
+        
+                        
+    
+        
+                    <div class="xleft">
+            Last Published: 2023-04-05
+                                </div>
+                <div class="xright">            
+    
+
+    
+        
+                        
+    
+        
+                         Version: 5.3-SNAPSHOT
+            </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="leftColumn">
+    <div id="navcolumn">
+                
+    
+
+    
+        
+                        
+    
+        
+                               <h5>OAuth for MyProxy</h5>
+                        <ul>
+                    
+    <li class="none">
+                        <a href="../../server/index.html">Overview</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../server/index.html">Server</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../client/index.html">Client</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../apidocs/index.html">api docs</a>
+            </li>
+              </ul>
+                            <h5>Project Documentation</h5>
+                        <ul>
+                    
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-info.html">Project Information</a>
+                        </li>
+              
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-reports.html">Project Reports</a>
+                        </li>
+              </ul>
+                                               <a href="http://maven.apache.org/" title="Built by Maven"
+           class="poweredBy">
+            <img class="poweredBy"
+                 alt="Built by Maven"
+                 src="http://maven.apache.org/images/logos/maven-feather.png"
+                 width="90"
+                 height="30"
+                 border="1"/>
+        </a>
+                           
+    
+
+    
+        
+                        
+    
+        
+        </div>
+</div>
+<div id="bodyColumn">
+    <div id="contentBox">
+        
+
+
+
+<section>
+<h2><a name="The_Discovery_Service"></a>The Discovery Service</h2>
+
+<p>OA4MP (for OIDC) supports the .well-known endpoint, as per <a class="externalLink" href="https://tools.ietf.org/html/rfc5785">RFC 5785</a>
+    and <a class="externalLink" href="https://openid.net/specs/openid-connect-discovery-1_0.html">OIDC discovery</a>.
+It should be noted that each instance of OA4MP will have its own location for this which corresponds
+to that instance. This allows for multiple services in a single domain.</p>
+
+<p>You may also use the discovery service to get the public signing keys. This is at the certs endpoint.
+</p>
+
+<section>
+<h3><a name="Example"></a>Example</h3>
+
+<p>If OA4MP is hosted at https://services.bigstate.edu/oauth2, then the discovery page is at
+https://services.bigstate.edu/oauth2/.well-known/openid-configuration and will return a JSON
+object such as </p>
+
+<div>
+<pre>
+    {
+     &quot;authorization_endpoint&quot;: &quot;https://services.bigstate.edu/oauth2/authorize&quot;,
+     &quot;registration_endpoint&quot;: &quot;https://services.bigstate.edu/oauth2/register&quot;,
+     &quot;token_endpoint&quot;: &quot;https://services.bigstate.edu/oauth2/token&quot;,
+     &quot;userinfo_endpoint&quot;: &quot;https://services.bigstate.edu/oauth2/userinfo&quot;,
+     &quot;issuer&quot;: &quot;https://services.bigstate.edu/oauth2&quot;,
+     &quot;token_endpoint_auth_methods_supported&quot;: [&quot;client_secret_post&quot;],
+     &quot;subject_types_supported&quot;: [&quot;public&quot;],
+     &quot;scopes_supported&quot;:  [
+      &quot;email&quot;,
+      &quot;edu.uiuc.ncsa.myproxy.getcert&quot;,
+      &quot;openid&quot;,
+      &quot;profile&quot;,
+      &quot;org.cilogon.userinfo&quot;
+     ],
+     &quot;response_types_supported&quot;:  [
+      &quot;code&quot;,
+      &quot;token&quot;,
+      &quot;id_token&quot;
+     ],
+     &quot;claims_supported&quot;:  [
+      &quot;sub&quot;,
+      &quot;aud&quot;,
+      &quot;iss&quot;,
+      &quot;exp&quot;,
+      &quot;iat&quot;,
+      &quot;email&quot;
+     ],
+     &quot;id_token_signing_alg_values_supported&quot;:  [
+      &quot;RS256&quot;,
+      &quot;RS512&quot;
+     ],
+     &quot;jwks_uri&quot;: &quot;https://services.bigstate.edu/oauth2/certs&quot;
+    }
+</pre></div>
+
+<p>Clients will parse this and use bits of the information (such as which signing algorithms are supported
+and the location of the public keys). There may be some variation, of course, depending on the server's exact
+configuration.</p>
+</section><section>
+<h3><a name="Getting_the_signing_keys"></a>Getting the signing keys</h3>
+
+
+<p>This would live at jwks_uri address from the discovery service, so you can go to
+https://services.bigstate.edu/oauth2/certs from the above example
+and this will return a JSON WebKey object:
+</p>
+
+<div>
+<pre>
+ {&quot;keys&quot;: [
+   {
+   &quot;n&quot;: &quot;4x7MbZyiKgD5xnEUOlPugxlUzLdNhbCXJqvrgRNj8w-O2hoHbnbJoA8rppco86LZ1W7WIIeOixw2YncKu5kISxq7lzMa_RNYOghkbeJzhs1PB_rUVkuZyySuLK9I2Q_2nfzlggVgn32JXiGR-u3ZqClGODJ8nh5m-H3eGR7-es2A3abQ4BydXbnAbFTTXMMk0C2w1eM5wgp15ZifdP6zfWkwsTpBYU80dRU1NpyZ2hryBtj6CS2sRKY9U09v-B0WlUL6m9RTDlxeQLwoz89XCe02zAftkTcAEQP56zs8SpUYQX_rVNtdI5KyMiOG8qbuYSt17GYynUB18zgc7sTzQ&quot;,
+   &quot;e&quot;: &quot;AQAB&quot;,
+   &quot;alg&quot;: &quot;RS512&quot;,
+   &quot;kid&quot;: &quot;asdwer34df&quot;,
+   &quot;use&quot;: &quot;sig&quot;,
+   &quot;kty&quot;: &quot;RSA&quot;
+  },
+   {
+   &quot;n&quot;: &quot;JFsi9rKTZXkiuXBBX2xt4KQx6AgtjzwUkGHNWFEFIpTs2UiRhtTVLNDAU1ocP512uFPb6iQMe6sIdzxntF_bbstHWEtxLsJmqEgObcniI3jcSDtlnxSNuZUUCtNg1jvxxDSOx4yGtTJgQ8JIqhzrDErCG7rqi-gth2oMLtGHtJji9urMuUch42iRI-YoQ7FkFxGlHYZM23U00h0WKilXB5n-zXgoNZC_ALzhKG5dpZh8BsVC_yTrYAP1cCx8kmie8p7Z9V1U42yHiPxSNkIPuLlpXr4xmWLyD7jVm7ppQVQjWjxNlSBrAzjpYF7BMxWd0k8oJnou_1Pa9uK9z396BQ&quot;,
+   &quot;e&quot;: &quot;AQAB&quot;,
+   &quot;alg&quot;: &quot;RS256&quot;,
+   &quot;kid&quot;: &quot;9k0HPG3moXENne&quot;,
+   &quot;use&quot;: &quot;sig&quot;,
+   &quot;kty&quot;: &quot;RSA&quot;
+  }
+ ]}
+</pre></div>
+
+</section></section>
+
+    </div>
+</div>
+<div class="clear">
+    <hr/>
+</div>
+<div id="footer">
+    <div class="xright">&#169;    
+                    2023
+        
+                    
+    
+
+    
+        
+                        
+    
+        
+    </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+</body>
+</html>
+

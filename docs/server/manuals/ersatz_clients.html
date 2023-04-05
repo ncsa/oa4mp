@@ -1,0 +1,280 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+
+
+
+
+
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>OAuth for MyProxy</title>
+    <style type="text/css" media="all">
+        @import url("../../css/oa4mp-custom.css");
+        @import url("../../css/oa4mp-theme.css");
+        @import url("../../css/site.css");
+    </style>
+    <link rel="stylesheet" href="../../css/print.css" type="text/css" media="print"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    </head>
+<body class="composite">
+<div id="banner">
+                        <a href="http://www.ncsa.illinois.edu/" id="bannerLeft"  >
+        
+                                                                    <img src="../../css/images/ncsalogo_sm-2.gif" alt="NCSA"/>
+        
+                </a>
+                                    <a href="http://grid.ncsa.illinois.edu/myproxy/" id="bannerRight"  >
+        
+                                                                    <img src="../../css/images/MyProxyWide.gif" alt="MyProxy"/>
+        
+                </a>
+                <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="breadcrumbs">
+            
+    
+
+    
+        
+                        
+    
+        
+                    <div class="xleft">
+            Last Published: 2023-04-05
+                                </div>
+                <div class="xright">            
+    
+
+    
+        
+                        
+    
+        
+                         Version: 5.3-SNAPSHOT
+            </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="leftColumn">
+    <div id="navcolumn">
+                
+    
+
+    
+        
+                        
+    
+        
+                               <h5>OAuth for MyProxy</h5>
+                        <ul>
+                    
+    <li class="none">
+                        <a href="../../server/index.html">Overview</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../server/index.html">Server</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../client/index.html">Client</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../apidocs/index.html">api docs</a>
+            </li>
+              </ul>
+                            <h5>Project Documentation</h5>
+                        <ul>
+                    
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-info.html">Project Information</a>
+                        </li>
+              
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-reports.html">Project Reports</a>
+                        </li>
+              </ul>
+                                               <a href="http://maven.apache.org/" title="Built by Maven"
+           class="poweredBy">
+            <img class="poweredBy"
+                 alt="Built by Maven"
+                 src="http://maven.apache.org/images/logos/maven-feather.png"
+                 width="90"
+                 height="30"
+                 border="1"/>
+        </a>
+                           
+    
+
+    
+        
+                        
+    
+        
+        </div>
+</div>
+<div id="bodyColumn">
+    <div id="contentBox">
+        
+
+
+
+
+<h1>Ersatz Clients</h1>
+<section>
+<h2><a name="Introduction"></a>Introduction</h2>
+
+<p>The ability for a client to take over the flow that another has initiated is
+referred to as <i>substitution</i> and clients that are specifically tasked with
+this as referred to as <i>ersatz clients</i>. We use the cognated word
+&#x1d570;&#x1d597;s&#x1d586;&#x1d599;&#x1d59f; (which just means substitute in German) because words like delegate,
+impersonate, substitute etc. are so overloaded in English that discourse
+is getting hard -- more time is spent on what the word means in context than anything
+else. An ersatz client has a very specific, narrow definition
+and there should be few if any conflicts with other nomenclature.</p>
+<section>
+<h3><a name="Definition_of_an_ersatz_client"></a>Definition of an ersatz client</h3>
+
+<p>An <i>ersatz client</i> in OA4MP is a specific type of
+client which may substitute for another in a flow. A client that starts a flow is called
+the <i>provisioning client.</i> A provisioning client is just a standard client
+in OA4MP and may be confidential or public. If A is the provisioning client and &#x3b1; is an ersatz client
+we say write A &#x227b; &#x3b1; and refer to &quot;A provisions &#x3b1;&quot; or that &quot;&#x3b1; can substitute for A&quot;. &#x227a; 	&#x227b;  </p>
+
+<ul>
+    
+<li>All substitution relations are explicit and must be set.</li>
+    
+<li>Ersatz clients cannot start a flow and can only be used at the token exchange (RFC 8693) endpoint.</li>
+    
+<li>Ersatz clients are restricted in their scopes to whatever the provisioning client has and may only downscope.</li>
+    
+<li>If A &#x227b; &#x3b1;, then &#x3b1; inherits the configuration (lifetimes, scripts etc.) from A unless explicitly overridden.</li>
+    
+<li>These may be chained as A &#x227b; &#x3b1; &#x227b; &#x3b2; &#x227b; &#x3b3; ... which connotes an inheritance chain for abilities, not necessarily a custodial chain.</li>
+    
+<li>&#x227b; is not an ordering relationship! It is perfectly acceptable to have a multiple provisioning
+    clients, A, B, C and set A &#x227b; &#x3b1;, B &#x227b; &#x3b1;, C &#x227b; &#x3b1;.  This is because these relations are set by security policies which
+    may be quite arbitrary.</li>
+    
+<li>it is perfectly acceptable to have multiple ersatz clients, so A &#x227b; &#x3b1;, A &#x227b; &#x3b2;, A &#x227b; &#x3b3;.</li>
+</ul>
+</section></section><section>
+<h2><a name="Relationship_to"></a>Relationship to </h2>
+
+<p><a class="externalLink" href="https://datatracker.ietf.org/doc/html/rfc8693">The token exchange specification</a> has
+a section on impersonation and delegation semantics. It states <i>in toto</i> </p>
+
+
+<blockquote> When principal A impersonates principal B, A is given all the rights
+   that B has within some defined rights context and is
+   indistinguishable from B in that context.  Thus, when principal A
+   impersonates principal B, then insofar as any entity receiving such a
+   token is concerned, they are actually dealing with B.  It is true
+   that some members of the identity system might have awareness that
+   impersonation is going on, but it is not a requirement.  For all
+   intents and purposes, when A is impersonating B, A is B within the
+   context of the rights authorized by the token.  A's ability to
+   impersonate B could be limited in scope or time, or even with a one-
+   time-use restriction, whether via the contents of the token or an
+   out-of-band mechanism.</blockquote>
+
+
+<p>What this means is that our substitutions are a form of impersonation and that
+the trust relations are made out of band. Why not call this impersonation? Because
+other OAuth systems are free to implement this any way they want and we want to be clear
+exactly how we do it. </p>
+</section><section>
+<h2><a name="Where_do_they_live.3F"></a>Where do they live?</h2>
+
+<p>Ersatz clients are administered by an admin client just like any other and may be
+created like any other. Since they may inherit from the provisioning client, there is really
+not much of a need to do more than create it with credentials and flag it as an ersatz client.</p>
+</section><section>
+<h2><a name="Using_them"></a>Using them</h2>
+
+<p>Normally if A &#x227b; &#x3b1;, then A starts the flow and in the token exchange, &#x3b1; presents the
+access or refresh token to the exchange endpoint. If &#x3b1; is presented for the first time,
+the flow forks. Note that A cannot resume the flow for &#x3b1; after this point and they become
+independent, meaning that if A provisions &#x3b1; with an access token, &#x3c4;, then &#x3b1; exchanges it for &#x3c4;',
+A cannot use &#x3c4;'. On the other hand, if A &#x227b; &#x3b2; as well then A may provision &#x3b2; with &#x3c4; too.</p>
+
+<p>While there may be chains of substitution, such as A &#x227b; &#x3b1; &#x227b; &#x3b2; &#x227b; &#x3b3;, you must present the final
+ersatz client, &#x3b3; here. In other words, the endpoints of chains determine how the substitution is made</p>
+<section>
+<h3><a name="Why_would_you_want_intermediate_ersatz_clients.3F"></a>Why would you want intermediate ersatz clients?</h3>
+
+<p>If you have a very large and complex set of substitutions, you may stream line the flow. Let
+us say that you have provisioning clients A, B, C, D and (say these provision with some logic
+centered on IDPs or perhaps the hosting institution)
+you need to have finer grained control. An ersatz client &#x3be; with a specific script
+(say allowing Lab X) could be used as A &#x227b; &#x3be; &#x227b; &#x3b1; and B &#x227b; &#x3be; &#x227b; &#x3b2;, (say &#x3b1; and &#x3b2; are used by specific groups
+within Lab X) so that &#x3b1; and &#x3b2; have consistent behavior but can add their own logic. </p>
+</section></section><section>
+<h2><a name="Inheritance_and_provisioning"></a>Inheritance and provisioning</h2>
+
+<p>
+    Clients in OA4MP may set <i>prototypes</i> which are other clients from which they
+    inherit configuration. There may be multiple prototypes (effectively yielding
+    multiple inheritance). Note well that the order you set determines resolution. So if
+    you have 2 prototype clients A and B (in that order) that means that the values of B
+    override the values in A. The values of the base client override all others. This means that
+    you can have a client that is little more than an id and secret which inherits everything
+    else from its prototype, or just sets a single attribute even.
+</p>
+
+<p>
+    Since provisioning clients can form a prototype hierarchy, there is an attribute for clients
+    named<b>extendsProvisioners</b> and this means that the provisioners should be used as the
+    prototype hierarchy. This is a very common pattern. If you set this and specify prototypes,
+    then provisioning clients are used first, followed by all specifically set prototypes.
+</p>
+
+
+</section>
+
+    </div>
+</div>
+<div class="clear">
+    <hr/>
+</div>
+<div id="footer">
+    <div class="xright">&#169;    
+                    2023
+        
+                    
+    
+
+    
+        
+                        
+    
+        
+    </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+</body>
+</html>
+

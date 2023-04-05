@@ -1,0 +1,305 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+
+
+
+
+
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>OAuth for MyProxy</title>
+    <style type="text/css" media="all">
+        @import url("../../css/oa4mp-custom.css");
+        @import url("../../css/oa4mp-theme.css");
+        @import url("../../css/site.css");
+    </style>
+    <link rel="stylesheet" href="../../css/print.css" type="text/css" media="print"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    </head>
+<body class="composite">
+<div id="banner">
+                        <a href="http://www.ncsa.illinois.edu/" id="bannerLeft"  >
+        
+                                                                    <img src="../../css/images/ncsalogo_sm-2.gif" alt="NCSA"/>
+        
+                </a>
+                                    <a href="http://grid.ncsa.illinois.edu/myproxy/" id="bannerRight"  >
+        
+                                                                    <img src="../../css/images/MyProxyWide.gif" alt="MyProxy"/>
+        
+                </a>
+                <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="breadcrumbs">
+            
+    
+
+    
+        
+                        
+    
+        
+                    <div class="xleft">
+            Last Published: 2023-04-05
+                                </div>
+                <div class="xright">            
+    
+
+    
+        
+                        
+    
+        
+                         Version: 5.3-SNAPSHOT
+            </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="leftColumn">
+    <div id="navcolumn">
+                
+    
+
+    
+        
+                        
+    
+        
+                               <h5>OAuth for MyProxy</h5>
+                        <ul>
+                    
+    <li class="none">
+                        <a href="../../server/index.html">Overview</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../server/index.html">Server</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../client/index.html">Client</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../apidocs/index.html">api docs</a>
+            </li>
+              </ul>
+                            <h5>Project Documentation</h5>
+                        <ul>
+                    
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-info.html">Project Information</a>
+                        </li>
+              
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-reports.html">Project Reports</a>
+                        </li>
+              </ul>
+                                               <a href="http://maven.apache.org/" title="Built by Maven"
+           class="poweredBy">
+            <img class="poweredBy"
+                 alt="Built by Maven"
+                 src="http://maven.apache.org/images/logos/maven-feather.png"
+                 width="90"
+                 height="30"
+                 border="1"/>
+        </a>
+                           
+    
+
+    
+        
+                        
+    
+        
+        </div>
+</div>
+<div id="bodyColumn">
+    <div id="contentBox">
+        
+
+
+
+
+
+<h1>The Token Information Endpoint</h1>
+
+<p>
+    Token management is a necessity. OA4MP allows for an admin to query
+    what tokens are currently in use by a user. This is done at the token
+    endpoint by using a specific grant and the response includes all
+    outstanding tokens of this user for every client that the
+    admin administers.
+
+</p>
+<section>
+<h2><a name="The_Request"></a>The Request</h2>
+
+<p> An admin client makes a request to the
+    authorization server's token endpoint using the extension grant type
+    mechanism defined in Section 4.5 of <a class="externalLink" href="https://datatracker.ietf.org/doc/html/rfc6749#section-4.5">RFC 6749</a>.
+
+    <br />Client authentication server is done using basic authorization.
+    The request is made using either HTTP GET (preferred on philosophical
+    grounds) or HTTP POST. The parameters are
+</p>
+
+<ul>
+    
+<li><b>grant_type</b> (Required) must be urn:oa4mp:params:oauth:grant-type:token-info</li>
+    
+<li><b>access_token</b> OR <b>refresh_token</b> (Required) and the value is resp. any (valid) access token
+        or refresh token.
+    </li>
+</ul>
+</section><section>
+<h2><a name="The_Response"></a>The Response</h2>
+
+<p>
+    If the request is valid and meets all policy and other criteria of
+    the authorization server, the successful token response has character
+    set of &quot;UTF-8&quot;, a media type of &quot;application/json&quot; and an HTTP 200
+    status code.
+</p>
+
+
+<ul>
+    
+<li><b>user_uid</b> the unique id of the user</li>
+    
+<li><b>clients</b> a JSON array of</li>
+</ul>
+
+
+<p>The structure of the clients array is best described as follows.</p>
+
+<div>
+<pre>
+    {&quot;clients&quot;:[CLIENT+],
+     &quot;user_uid&quot;:USER_ID}
+
+    CLIENT:
+    {&quot;client_id&quot;:CLIENT_ID,
+     &quot;transactions&quot; : [TRANSACTION+]}
+
+    TRANSACTION:
+     {&quot;code&quot;: AUTH_GRANT,
+      &quot;tokens&quot;:[{&quot;access_token&quot;|&quot;refresh_token&quot;:TOKEN}+]
+
+    TOKEN:
+    {&quot;is_valid&quot;:BOOLEAN,
+    &quot;lifetime&quot;:LONG,
+    &quot;issued_at&quot;:LONG,
+    &quot;jti&quot;:TOKEN_ID,
+    &quot;token&quot;:JWT
+    }
+
+     USER_UID: String
+    CLIENT_ID: String
+   AUTH_GRANT: String
+     TOKEN_ID: String
+          JWT: JSON Web Token
+
+</pre></div>
+<section>
+<h3><a name="Response_example"></a>Response example</h3>
+
+<div>
+<pre>
+    HTTP/1.1 200 OK
+    Content-Type: application/json
+    Cache-Control: no-cache, no-store
+
+    {
+      &quot;clients&quot;: [
+        {
+          &quot;transactions&quot;: [
+            {
+              &quot;code&quot;: &quot;https://localhost:9443/oauth2/262005d0f72e0803828c0a098e87d1b1?type=authzGrant&amp;ts=1654791488268&amp;version=v2.0&amp;lifetime=750000&quot;,
+              &quot;tokens&quot;: [
+                {
+                  &quot;access_token&quot;: {
+                    &quot;is_valid&quot;: true,
+                    &quot;lifetime&quot;: 300000,
+                    &quot;issued_at&quot;: 1654791499644,
+                    &quot;jti&quot;: &quot;https://localhost:9443/oauth2/468cfbff8cbe412393dd34d62ca2dc28?type=accessToken&amp;ts=1654791499644&amp;version=v2.0&amp;lifetime=300000&quot;,
+                    &quot;token&quot;: &quot;eyJ0eXAiOiJKV1QiLCJraWQiOiIyOTc4RkY1NDhBNTVBNzM5NTAyRTNCQzY0QTU4RTJCMiIsImFsZyI6IlJTMjU2In0.eyJ3bGNnLnZlciI6IjEuMCIsImF1ZCI6Imh0dHBzOi8vbG9jYWxob3N0L2Zlcm1pbGFiIiwibXlfYXRfY2xhaW0iOiJteV9hdF9jbGFpbSIsIm5iZiI6MTY1NDc5MTQ4NywiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo5NDQzL2N1c3RvbS9pc3N1ZXIiLCJleHAiOjE2NTQ3OTE3OTIsImlhdCI6MTY1NDc5MTQ5MiwianRpIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6OTQ0My9vYXV0aDIvNDY4Y2ZiZmY4Y2JlNDEyMzkzZGQzNGQ2MmNhMmRjMjg_dHlwZT1hY2Nlc3NUb2tlbiZ0cz0xNjU0NzkxNDk5NjQ0JnZlcnNpb249djIuMCZsaWZldGltZT0zMDAwMDAiLCJzY29wZSI6InJlYWQ6L2hvbWUvaHR0cDovL2NpbG9nb24ub3JnL3NlcnZlclQvdXNlcnMvMjEzNDAzNjMgd3JpdGU6L2RhdGEvaHR0cDovL2NpbG9nb24ub3JnL3NlcnZlclQvdXNlcnMvMjEzNDAzNjMvY2x1c3RlciB4Lnk6L2FiYy9kZWYiLCJzdWIiOiJodHRwOi8vY2lsb2dvbi5vcmcvc2VydmVyVC91c2Vycy8yMTM0MDM2MyJ9.j9wK9EkNy19oKNKPqP0uGxuFB7il4Ddoq2gWlrt1Mk_oISDMOnVnzGn35HjGP2XuNDIjrVIRE3D5JyylEw_CL19_sXlNqEmNnyCq4Um4fuGZ5d0evpA0n_G2v8U59fEZf98I1WJ0KsMB2L5SJOXJzMce9Pvt5DC56He8GruFt3IkSEq6d1J1kwCGymyul_izmXUlQ5XMs2r5EeinERElkmPaB2jsj56H5TLrbet_7Z8nk5Ds3DGT59OtfhRGc_HRaRGG6x2J0imHgn4JvyPPgR80nX3yoGmmw5gU3HvEbrqG39XjFzSwnWqQv-XiaRZspjzy5Ns7_-v5oeczXZYAsA&quot;
+                  },
+                  &quot;refresh_token&quot;: {
+                    &quot;is_valid&quot;: true,
+                    &quot;lifetime&quot;: 900000,
+                    &quot;issued_at&quot;: 1654791499644,
+                    &quot;jti&quot;: &quot;https://localhost:9443/oauth2/5040b30aaa66b0889284738917de4ae?type=refreshToken&amp;ts=1654791499644&amp;version=v2.0&amp;lifetime=900000&quot;,
+                    &quot;token&quot;: &quot;eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJhdWQiOiJodHRwczovL2xvY2FsaG9zdC90ZXN0IiwibmJmIjoxNjU0NzkxNDg3LCJteV9ydF9jbGFpbSI6Im15X3J0X2NsYWltIiwiZXhwIjoxNjU0NzkyMzkyLCJpYXQiOjE2NTQ3OTE0OTIsImp0aSI6Imh0dHBzOi8vbG9jYWxob3N0Ojk0NDMvb2F1dGgyLzUwNDBiMzBhYWE2NmIwODg5Mjg0NzM4OTE3ZGU0YWU_dHlwZT1yZWZyZXNoVG9rZW4mdHM9MTY1NDc5MTQ5OTY0NCZ2ZXJzaW9uPXYyLjAmbGlmZXRpbWU9OTAwMDAwIn0.&quot;
+                  }
+                }
+              ]
+            },
+    &quot;user_uid&quot;: &quot;http://cilogon.org/serverT/users/21340363&quot;
+    }
+</pre></div>
+</section><section>
+<h3><a name="Caveat"></a>Caveat</h3>
+
+<p>If the user has been extremely active and has a lot of tokens, this may be a truly massive
+    listing. It is best assume that and pipe it someplace safe. It is also possible to get missing tokens.
+    This means that the user started a flow and either has abandoned it, or not come back yet to
+    finish it.</p>
+
+</section></section><section>
+<h2><a name="Listing_other_clients"></a>Listing other clients</h2>
+
+<p>
+    Admin clients <i>may</i> be allowed to list the user in other clients, meaning, if they
+    have been granted the privilege, this call will return every token for this user
+    regardless of which clients the user has used. Default is to restrict tokens to those
+    clients that the admin owns.
+</p>
+
+
+</section>
+
+    </div>
+</div>
+<div class="clear">
+    <hr/>
+</div>
+<div id="footer">
+    <div class="xright">&#169;    
+                    2023
+        
+                    
+    
+
+    
+        
+                        
+    
+        
+    </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+</body>
+</html>
+

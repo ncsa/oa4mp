@@ -1,0 +1,218 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+
+
+
+
+
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>OAuth for MyProxy</title>
+    <style type="text/css" media="all">
+        @import url("../../css/oa4mp-custom.css");
+        @import url("../../css/oa4mp-theme.css");
+        @import url("../../css/site.css");
+    </style>
+    <link rel="stylesheet" href="../../css/print.css" type="text/css" media="print"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    </head>
+<body class="composite">
+<div id="banner">
+                        <a href="http://www.ncsa.illinois.edu/" id="bannerLeft"  >
+        
+                                                                    <img src="../../css/images/ncsalogo_sm-2.gif" alt="NCSA"/>
+        
+                </a>
+                                    <a href="http://grid.ncsa.illinois.edu/myproxy/" id="bannerRight"  >
+        
+                                                                    <img src="../../css/images/MyProxyWide.gif" alt="MyProxy"/>
+        
+                </a>
+                <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="breadcrumbs">
+            
+    
+
+    
+        
+                        
+    
+        
+                    <div class="xleft">
+            Last Published: 2023-04-05
+                                </div>
+                <div class="xright">            
+    
+
+    
+        
+                        
+    
+        
+                         Version: 5.3-SNAPSHOT
+            </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="leftColumn">
+    <div id="navcolumn">
+                
+    
+
+    
+        
+                        
+    
+        
+                               <h5>OAuth for MyProxy</h5>
+                        <ul>
+                    
+    <li class="none">
+                        <a href="../../server/index.html">Overview</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../server/index.html">Server</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../client/index.html">Client</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../apidocs/index.html">api docs</a>
+            </li>
+              </ul>
+                            <h5>Project Documentation</h5>
+                        <ul>
+                    
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-info.html">Project Information</a>
+                        </li>
+              
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-reports.html">Project Reports</a>
+                        </li>
+              </ul>
+                                               <a href="http://maven.apache.org/" title="Built by Maven"
+           class="poweredBy">
+            <img class="poweredBy"
+                 alt="Built by Maven"
+                 src="http://maven.apache.org/images/logos/maven-feather.png"
+                 width="90"
+                 height="30"
+                 border="1"/>
+        </a>
+                           
+    
+
+    
+        
+                        
+    
+        
+        </div>
+</div>
+<div id="bodyColumn">
+    <div id="contentBox">
+        
+
+
+
+
+
+<p>
+    A monitor is simply a client which executes the initial call to an OA4MP server. This works solely
+    from the command line -- no web server is needed. This is exactly the analog of the ping command
+    in that it shows the server up and active. Since a full test of the lifecycle requires that the client
+    be able to accept callbacks i.e. be running a web server,
+    it is not possible to test more than the first call. The intent of the monitor is
+    not to show that everything about
+    <a href="../../client/index.html">configuring a client</a> still works.
+</p>
+
+
+<p>To get a functional monitor, you  would get
+    <a class="externalLink" href="https://github.com/ncsa/OA4MP/releases/latest/download/oa2-monitor.jar">oa2-monitor.jar</a>
+    with the script at <a class="externalLink" href="https://github.com/ncsa/OA4MP/releases/latest/download/oa2-monitor">oa2-monitor</a>
+    The default setup is like any other <a href="../manuals/cli.html">command
+        line tool</a>
+    with an identical directory layout and it will try to use the configuration found in the default location
+    of /opt/oa4mp/etc/admin-cfg.xml.
+</p>
+
+
+<p>Steps to set up a monitor are </p>
+
+    
+<ol style="list-style-type: decimal">
+        
+<li> Register it with a server <br />
+    <a href="../../client/manuals/registering-with-an-oauth2-server.html">
+    <span style="background-color: #ff6600;">OAuth 2.0</span> based servers. </a></li>
+
+    
+<li> Write a configuration file. This should have
+    <a href="../configuration/server-email.html">mail configured</a>.
+    </li>
+    </ol>
+
+<p>
+    A quick comment about the callback: The callback supplied <b>must</b> match one of the ones given at
+    registration time or the initial request will be rejected. The comparison is done as strings as per the specification,
+    so logically equivalent callbacks (such as having parameters switched) will fail.
+
+    3. Run it once from the command line to see if it works by using the oa4mp-monitor script.
+    <br /><br />
+    4. Setup a chron job or use monit or whatever tool you prefer to invoke oa4mp-server at some specific interval,
+    e.g. every 5 minutes. The monitor will send an email notification whenever an attempt to contact the server fails.
+</p>
+
+
+
+
+    </div>
+</div>
+<div class="clear">
+    <hr/>
+</div>
+<div id="footer">
+    <div class="xright">&#169;    
+                    2023
+        
+                    
+    
+
+    
+        
+                        
+    
+        
+    </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+</body>
+</html>
+

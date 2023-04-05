@@ -1,0 +1,457 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+
+
+
+
+
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>OAuth for MyProxy</title>
+    <style type="text/css" media="all">
+        @import url("../../css/oa4mp-custom.css");
+        @import url("../../css/oa4mp-theme.css");
+        @import url("../../css/site.css");
+    </style>
+    <link rel="stylesheet" href="../../css/print.css" type="text/css" media="print"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    </head>
+<body class="composite">
+<div id="banner">
+                        <a href="http://www.ncsa.illinois.edu/" id="bannerLeft"  >
+        
+                                                                    <img src="../../css/images/ncsalogo_sm-2.gif" alt="NCSA"/>
+        
+                </a>
+                                    <a href="http://grid.ncsa.illinois.edu/myproxy/" id="bannerRight"  >
+        
+                                                                    <img src="../../css/images/MyProxyWide.gif" alt="MyProxy"/>
+        
+                </a>
+                <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="breadcrumbs">
+            
+    
+
+    
+        
+                        
+    
+        
+                    <div class="xleft">
+            Last Published: 2023-04-05
+                                </div>
+                <div class="xright">            
+    
+
+    
+        
+                        
+    
+        
+                         Version: 5.3-SNAPSHOT
+            </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="leftColumn">
+    <div id="navcolumn">
+                
+    
+
+    
+        
+                        
+    
+        
+                               <h5>OAuth for MyProxy</h5>
+                        <ul>
+                    
+    <li class="none">
+                        <a href="../../server/index.html">Overview</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../server/index.html">Server</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../client/index.html">Client</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../apidocs/index.html">api docs</a>
+            </li>
+              </ul>
+                            <h5>Project Documentation</h5>
+                        <ul>
+                    
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-info.html">Project Information</a>
+                        </li>
+              
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-reports.html">Project Reports</a>
+                        </li>
+              </ul>
+                                               <a href="http://maven.apache.org/" title="Built by Maven"
+           class="poweredBy">
+            <img class="poweredBy"
+                 alt="Built by Maven"
+                 src="http://maven.apache.org/images/logos/maven-feather.png"
+                 width="90"
+                 height="30"
+                 border="1"/>
+        </a>
+                           
+    
+
+    
+        
+                        
+    
+        
+        </div>
+</div>
+<div id="bodyColumn">
+    <div id="contentBox">
+        
+
+
+
+
+<h1>Email Notifications</h1>
+
+
+<p>The service can be configured to send email notifications on certain events. This requires that a mail server be
+    specified with a user, password and other connection information as well as templates for messages.</p>
+
+<table class="bodyTable" style="text-align: left; width: 1157px; height: 165px;" border="1" cellspacing="2" cellpadding="2">
+    <tbody>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">Attribute</td>
+        
+<td style="vertical-align: top;">Required?</td>
+        
+<td style="vertical-align: top;">Default</td>
+        
+<td style="vertical-align: top;">Description</td>
+    </tr>
+    
+<tr class="b">
+        
+<td style="vertical-align: top;">enabled</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;">false</td>
+        
+<td style="vertical-align: top;">enable email notifications.</td>
+    </tr>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">password</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;">N/A</td>
+        
+<td style="vertical-align: top;">The password of the user when authenticating with the server</td>
+    </tr>
+    
+<tr class="b">
+        
+<td style="vertical-align: top;">port</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;">25 if no SSL, 465 if SSL.</td>
+        
+<td style="vertical-align: top;">The port to use. If omitted standard ports will be used.</td>
+    </tr>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">recipients</td>
+        
+<td style="vertical-align: top;">Y</td>
+        
+<td style="vertical-align: top;">N/A</td>
+        
+<td style="vertical-align: top;">A semi-colon (;) separated list of recipients.</td>
+    </tr>
+    
+<tr class="b">
+        
+<td style="vertical-align: top;">server</td>
+        
+<td style="vertical-align: top;">Y</td>
+        
+<td style="vertical-align: top;">N/A</td>
+        
+<td style="vertical-align: top;">The server to use.</td>
+    </tr>
+
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">starttls</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;">false</td>
+        
+<td style="vertical-align: top;">
+            
+<p>Some servers (e.g., gmail) require sending a STARTTLS command in addition to the usual commands.
+                If you get an error involving this, set this flag to &quot;true&quot;.</p>
+        </td>
+    </tr>
+    
+<tr class="b">
+        
+<td style="vertical-align: top;">useSSL</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;">false</td>
+        
+<td style="vertical-align: top;">Connect to the server via ssl. Implictly sets the port to the standard
+            default.
+        </td>
+    </tr>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">username</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;">N/A</td>
+        
+<td style="vertical-align: top;">The name of the user when authenticating with the server.</td>
+    </tr>
+    </tbody>
+</table>
+<section>
+<h2></h2>
+
+</section><section>
+<h2><a name="Configuring_Tomcat"></a>Configuring Tomcat</h2>
+
+
+<p>In order to use email notifications with Tomcat, you must globally enable email. This is a <i>feature</i> of Tomcat
+    and can't easily be changed. Fortunately, this is really easy. </p>
+
+<ol style="list-style-type: decimal">
+    
+<li>Download the latest version of java mail from <a class="externalLink" href="http://www.oracle.com/technetwork/java/javamail/index-138643.html" title="java mail api jar ">here</a>.
+        Drop this jar (typically named mail.jar) into your $CATALINA_HOME/lib
+        directory.
+    </li>
+    
+<li>Possibly get the <a class="externalLink" href="https://jar-download.com/artifacts/javax.activation/activation">javax.activation</a> framework jar.
+    This might be needed if you are getting errors sending email messages acessing the javax.activation.DataHandler class. Put it into the above Tomcat lib
+    directory.</li>
+    
+<li>Add the following line right before the closing tag of the $CATALINA_HOME/conf/context.xml
+        file:
+    </li>
+</ol>
+
+<div>
+<pre> &lt;Resource name=&quot;mail/Session&quot; type=&quot;javax.mail.Session&quot; auth=&quot;Container&quot;/&gt;</pre></div>
+
+<p><b><i><br />Note you must configure Tomcat even if you are not using email notifications.</i></b></p>
+
+
+<p>This is, again, because Tomcat does this globally and there is no way to just have local
+    application control of it. </p>
+</section><section>
+<h2><a name="Note_about_upgrading_from_Java_8_to_another_version."></a>Note about upgrading from Java 8 to another version. </h2>
+
+<p>After Java 8, certain classes in the Java activation framework were removed from the standard distribution.
+Much as the requirement that the Java Mail jar has to be deployed globally in Tomcat, you must add in the
+    <a class="externalLink" href="https://mvnrepository.com/artifact/javax.activation/javax.activation-api/1.2.0">activation framework java</a></p>
+<section>
+<h3><a name="Example_1._Using_SSL"></a>Example 1. Using SSL</h3>
+
+
+<p>This example will set up notifications using SMTP over SSL. Templates (see below) are specified for the message and
+    subject line.</p>
+
+<div>
+<pre>
+&lt;config&gt;
+   &lt;server name=&quot;default&quot;&gt;
+      &lt;mail
+         enabled=&quot;true&quot;
+         useSSL=&quot;false&quot;
+         password=&quot;mairzy-doats&quot;
+                debug=&quot;false&quot;
+      	 server=&quot;smtp.super-secure-server.net&quot;
+         recipients=&quot;admin@chem.bigstate.edu&quot;&gt;
+         &lt;messageTemplate&gt;/var/www/config/oa4mp-message.template&lt;/messageTemplate&gt;
+         &lt;subjectTemplate&gt;/var/www/config/os4mp-subject.template&lt;/subjectTemplate&gt;
+      &lt;/mail&gt;
+      &lt;!-- rest of configuration &gt;
+   &lt;\server&gt;
+&lt;\config&gt;
+</pre></div>
+</section></section><section>
+<h2><a name="Templates"></a>Templates</h2>
+
+
+<p>A <span style="font-style: italic;"><span style="font-weight: bold;">template</span></span> is a text file that has
+    tokens of the form ${key} which will be replaced by system supplied values. This allows you customize notifications
+    and include current information from the server. The default information every service notification gets is</p>
+
+<table class="bodyTable" style="text-align: left; width: 100%;" border="1" cellspacing="2" cellpadding="2">
+    <tbody>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">Key</td>
+        
+<td style="vertical-align: top;">Description</td>
+    </tr>
+    
+<tr class="b">
+        
+<td style="vertical-align: top;">name</td>
+        
+<td style="vertical-align: top;">The name supplied by the client</td>
+    </tr>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">email</td>
+        
+<td style="vertical-align: top;">the contact email address for the client</td>
+    </tr>
+    
+<tr class="b">
+        
+<td style="vertical-align: top;">homeUri</td>
+        
+<td style="vertical-align: top;">the home URI supplied by the client</td>
+    </tr>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">failureUri</td>
+        
+<td style="vertical-align: top;">the failure URI supplied by the client</td>
+    </tr>
+    
+<tr class="b">
+        
+<td style="vertical-align: top;">creationTime</td>
+        
+<td style="vertical-align: top;">the time of the requiest</td>
+    </tr>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">identifier</td>
+        
+<td style="vertical-align: top;">the identifier generated by the system for the client</td>
+    </tr>
+    
+<tr class="b">
+        
+<td style="vertical-align: top;">publicKey</td>
+        
+<td style="vertical-align: top;">the public key supplied by the client</td>
+    </tr>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">host</td>
+        
+<td style="vertical-align: top;">The canonical host name of the server that received the request.</td>
+    </tr>
+    </tbody>
+</table>
+Any line in a template file that starts with a &quot;#&quot; will be ignored.
+<section>
+<h3><a name="The_message_template"></a>The message template</h3>
+
+
+<p>This template will be used as the body of every notification. A sample is below.</p>
+
+<div>
+<pre>
+# A sample template
+A client has requested approval on ${host}.
+
+Name: ${name}
+Contact email: ${email}
+Home uri: ${homeUri}
+Failure uri:${failureUri}
+Creation time: ${creationTime}
+Generated identifier: ${identifier}
+
+If you approve this request, you should send a notice
+to the contact email and include the generated identifier.</pre></div>
+
+</section><section>
+<h3><a name="The_subject_template"></a>The subject template</h3>
+
+
+<p>This template will be used as the subject of every notification. A sample is below.</p>
+
+<div>
+<pre>Client approval request received for &quot;${name}&quot; on ${host}</pre></div>
+
+
+</section></section>
+
+    </div>
+</div>
+<div class="clear">
+    <hr/>
+</div>
+<div id="footer">
+    <div class="xright">&#169;    
+                    2023
+        
+                    
+    
+
+    
+        
+                        
+    
+        
+    </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+</body>
+</html>
+

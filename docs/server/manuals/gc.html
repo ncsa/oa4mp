@@ -1,0 +1,264 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+
+
+
+
+
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>OAuth for MyProxy</title>
+    <style type="text/css" media="all">
+        @import url("../../css/oa4mp-custom.css");
+        @import url("../../css/oa4mp-theme.css");
+        @import url("../../css/site.css");
+    </style>
+    <link rel="stylesheet" href="../../css/print.css" type="text/css" media="print"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    </head>
+<body class="composite">
+<div id="banner">
+                        <a href="http://www.ncsa.illinois.edu/" id="bannerLeft"  >
+        
+                                                                    <img src="../../css/images/ncsalogo_sm-2.gif" alt="NCSA"/>
+        
+                </a>
+                                    <a href="http://grid.ncsa.illinois.edu/myproxy/" id="bannerRight"  >
+        
+                                                                    <img src="../../css/images/MyProxyWide.gif" alt="MyProxy"/>
+        
+                </a>
+                <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="breadcrumbs">
+            
+    
+
+    
+        
+                        
+    
+        
+                    <div class="xleft">
+            Last Published: 2023-04-05
+                                </div>
+                <div class="xright">            
+    
+
+    
+        
+                        
+    
+        
+                         Version: 5.3-SNAPSHOT
+            </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="leftColumn">
+    <div id="navcolumn">
+                
+    
+
+    
+        
+                        
+    
+        
+                               <h5>OAuth for MyProxy</h5>
+                        <ul>
+                    
+    <li class="none">
+                        <a href="../../server/index.html">Overview</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../server/index.html">Server</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../client/index.html">Client</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../apidocs/index.html">api docs</a>
+            </li>
+              </ul>
+                            <h5>Project Documentation</h5>
+                        <ul>
+                    
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-info.html">Project Information</a>
+                        </li>
+              
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-reports.html">Project Reports</a>
+                        </li>
+              </ul>
+                                               <a href="http://maven.apache.org/" title="Built by Maven"
+           class="poweredBy">
+            <img class="poweredBy"
+                 alt="Built by Maven"
+                 src="http://maven.apache.org/images/logos/maven-feather.png"
+                 width="90"
+                 height="30"
+                 border="1"/>
+        </a>
+                           
+    
+
+    
+        
+                        
+    
+        
+        </div>
+</div>
+<div id="bodyColumn">
+    <div id="contentBox">
+        
+
+
+
+<h1>&gt;Garbage Collection from the command line</h1>
+<section>
+<h2><a name="What_is_Garbage_Collection.3F"></a>What is Garbage Collection?</h2>
+    
+<p>As OA4MP runs and services requests, transactions and exchange records are created and managed.
+    These are automatically checked periodically for validity and expiration. If they have expired,
+    they will be removed from the system automatically. This is known as <b><i>garbage collection</i></b>.</p>
+
+</section><section>
+<h2><a name="Anatomy_of_tokens"></a>Anatomy of tokens</h2>
+
+<p>Every OA4MP identifier contains information about itself. A typical token would be the following:</p>
+
+
+<div>
+<pre>https://test.cilogon.org/oauth2/429ad35ac99ab5bf8c7383e7499191e4?type=accessToken&amp;ts=1668697283098&amp;version=v2.0&amp;lifetime=900000</pre></div>
+
+
+<p>This has various parts.</p>
+
+<ol style="list-style-type: decimal">
+    
+<li><b>https://test.cilogon.org/oauth2</b> -- this is the address of the service.</li>
+    
+<li><b>429ad35ac99ab5bf8c7383e7499191e4</b> -- a unique identifier for this token</li>
+    
+<li><b>type=accessToken</b> -- the type of token</li>
+    
+<li><b>ts=1668697283098</b> -- the unique timestamp in ms</li>
+    
+<li><b>version=v2.0</b> -- the version of this token</li>
+    
+<li><b>lifetime=900000</b> -- the lifetime in ms</li>
+</ol>
+
+<p>Note that in compound tokens, such as any JWT (JSON Web Token) there is always a unique identifier.
+The identifier will be an OA4MP token.</p>
+
+</section><section>
+<h2><a name="How_to_forge_a_token"></a>How to forge a token</h2>
+
+<p>You can't. These tokens exist for a prescribed time and must match exactly as strings once created. If the system
+does not have a record of a given token, it will reject it. In this way, tokens are unique.</p>
+
+</section><section>
+<h2><a name="How_is_Garbage_Collection_done.3F"></a>How is Garbage Collection done?</h2>
+
+<p>Normally you configure it to either work with an interval pause (e.g. Every 4 hours) or
+can set alarms so that the system will wake up and do garbage collection.</p>
+
+</section><section>
+<h2><a name="Manual_intervention"></a>Manual intervention</h2>
+
+<p>It is possible to do this
+manually for various reasons. There are tools to let you manage it. </p>
+
+
+<p>Assuming you have a functional command line (CLI, see the <a href="cli.html">CLI blurb</a>,
+you may invoke it from the transactions component. Here are the commands and what they do</p>
+<section>
+<h3><a name="gc_check"></a>gc_check</h3>
+
+<p>Check if the current item would get garbage collected.</p>
+gc_check [id|index] = check if the transaction would get garbage collected
+                       in the current environment.
+
+</section><section>
+<h3><a name="gc_run"></a>gc_run</h3>
+
+<p>Run the garbage collector or test what would get garbage collected. This will print out
+a list of ids to the console that were removed. Alternately, it allows you to pipe these
+to a file.</p>
+gc_run [-safe_gc address] [-test]  [-file output_file]  [-size] - run garbage collection on the transaction store
+-safe_gc - if present, run in safe mode so that only those transactions in the
+        correct scheme and host will be garbage collected
+-test - if present, only test which would be garbage collected
+-size - if present, print  number of transactions found
+-file file - writes the ids to the output file.
+E.g.
+gc_run -safe_gc https://cilogon.org
+would only remove transactions that start with https://cilogon.org
+
+The default is to apply garbage collection to every entry in the transaction store
+</section><section>
+<h3><a name="gc_lock"></a>gc_lock</h3>
+
+<p>Lock or unlock the stores. If locking is enabled (in the configuration) then stores will
+be locked during GC. By <i>locked</i> we mean that a special record is written and no
+GC is allowed to the store until it is removed. Since a lock may remain in certain cases
+this allows you to set or remove locks. It also allows you to display alarms for locking.</p>
+gc_lock [-rm | ? | -alarms]
+-set [T|TX|all] - lock the transaction and TX stores
+-rm [T|TX|all] - remove given locks
+? - report if stores are locked.
+-alarms - show configured alarms
+
+</section></section>
+
+    </div>
+</div>
+<div class="clear">
+    <hr/>
+</div>
+<div id="footer">
+    <div class="xright">&#169;    
+                    2023
+        
+                    
+    
+
+    
+        
+                        
+    
+        
+    </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+</body>
+</html>
+

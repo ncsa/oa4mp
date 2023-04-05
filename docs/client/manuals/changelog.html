@@ -1,0 +1,371 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+
+
+
+
+
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>OAuth for MyProxy</title>
+    <style type="text/css" media="all">
+        @import url("../../css/oa4mp-custom.css");
+        @import url("../../css/oa4mp-theme.css");
+        @import url("../../css/site.css");
+    </style>
+    <link rel="stylesheet" href="../../css/print.css" type="text/css" media="print"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    </head>
+<body class="composite">
+<div id="banner">
+                        <a href="http://www.ncsa.illinois.edu/" id="bannerLeft"  >
+        
+                                                                    <img src="../../css/images/ncsalogo_sm-2.gif" alt="NCSA"/>
+        
+                </a>
+                                    <a href="http://grid.ncsa.illinois.edu/myproxy/" id="bannerRight"  >
+        
+                                                                    <img src="../../css/images/MyProxyWide.gif" alt="MyProxy"/>
+        
+                </a>
+                <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="breadcrumbs">
+            
+    
+
+    
+        
+                        
+    
+        
+                    <div class="xleft">
+            Last Published: 2023-04-05
+                                </div>
+                <div class="xright">            
+    
+
+    
+        
+                        
+    
+        
+                         Version: 5.3-SNAPSHOT
+            </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="leftColumn">
+    <div id="navcolumn">
+                
+    
+
+    
+        
+                        
+    
+        
+                               <h5>OAuth for MyProxy</h5>
+                        <ul>
+                    
+    <li class="none">
+                        <a href="../../server/index.html">Overview</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../server/index.html">Server</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../client/index.html">Client</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../apidocs/index.html">api docs</a>
+            </li>
+              </ul>
+                            <h5>Project Documentation</h5>
+                        <ul>
+                    
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-info.html">Project Information</a>
+                        </li>
+              
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-reports.html">Project Reports</a>
+                        </li>
+              </ul>
+                                               <a href="http://maven.apache.org/" title="Built by Maven"
+           class="poweredBy">
+            <img class="poweredBy"
+                 alt="Built by Maven"
+                 src="http://maven.apache.org/images/logos/maven-feather.png"
+                 width="90"
+                 height="30"
+                 border="1"/>
+        </a>
+                           
+    
+
+    
+        
+                        
+    
+        
+        </div>
+</div>
+<div id="bodyColumn">
+    <div id="contentBox">
+        
+
+
+
+
+
+<h1>Client change log</h1>
+
+
+<p>Here is the log for changes to the OA4MP client.</p>
+
+<section>
+<h2><a name="a5.2.9"></a>5.2.9</h2>
+
+<ul>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1608">CIL-1608</a>: Store the current id token in the client asset.</li>
+</ul>
+
+</section><section>
+<h2><a name="a4.1"></a>4.1</h2>
+
+<ul>
+    
+<li>Added a ew configuration option for <b>OIDCEnabled</b>. If set to true then OIDC is
+    enabled for this client. The default is true. </li>
+</ul>
+
+</section><section>
+<h2><a name="a3.4"></a>3.4</h2>
+
+<ul>
+    
+<li>OAUTH-216: Secret key block displayed on OIDC test client page. </li>
+</ul>
+<section><section>
+<h4><a name="a3.4_Release_notes"></a>3.4 Release notes</h4>
+
+<p>As of version 3.4, all ID tokens for new OIDC clients will be signed. Older clients will still be issued
+    unsigned tokens. If you have an older client, you should upgrade it as soon as is practical and notify
+    the server administrators to start issuing your client signed tokens, since unsigned tokens should be
+    rejected by the new client.
+</p>
+
+</section></section></section><section>
+<h2><a name="a3.3"></a>3.3</h2>
+
+<ul>
+    
+<li>OAUTH-213: Allow for configuration of TLS version in configuration.</li>
+    
+<li>OAUTH-212: Updating dependencies for OAUTH-207 caused teh Apache base 64 codec to upgrade. This changed its behavior and broke
+    interoperability with several cryptographic tools (e.g. OpenSSL).</li>
+    
+<li>OAUTH-207: Update maven dependency versions.</li>
+</ul>
+</section><section>
+<h2><a name="a3.2"></a>3.2</h2>
+
+<ul>
+    
+<li>OAUTH-185: Support for custom scopes and additional claims.</li>
+    
+<li>OAUTH-186: Improved error handling and validation in client registration form.</li>
+    
+<li>OAUTH-188: Fixed broken links in the getting-started page.</li>
+    
+<li>CIL-216: Updated documentation for registration and clarified what the refresh token lifetime field means.</li>
+</ul>
+
+</section><section>
+<h2><a name="a3.1.1"></a>3.1.1</h2>
+
+<ul>
+    
+<li>OAUTH-178: document setting endpoints in the configuration.</li>
+</ul>
+
+</section><section>
+<h2><a name="a3.0"></a>3.0</h2>
+
+<ul>
+    
+<li>OAUTH-167: Change keypair default lifetime to 0.</li>
+    
+<li></li>
+</ul>
+
+</section><section>
+<h2><a name="a1.2"></a>1.2</h2>
+
+<ul>
+    
+<li>Updated documentation to accurately reflect OAuth 2 client registration process.</li>
+    
+<li>OAUTH-150: Added support to configuration for secret element.</li>
+</ul>
+
+</section><section>
+<h2><a name="a1.1.3"></a>1.1.3</h2>
+
+<ul>
+    
+<li>OAUTH-142: Clients can now specify how often to generate a keypair to be used in generating
+    certification requests. Until now, every such request was generated using a fresh keypair. However,
+    if clients are put under very heavy load generating such keypairs can slow response times drastically.
+    It is now configurable how often to re-generate the keypair. The option of setting it to zero
+    will cause a new keypair to be generated every time, as per previous versions. The default is to regenerate
+    the keypair once every 24 hours which should be adequate for all installations.</li>
+    
+<li>OAUTH-145, OAUTH-146: Session cross-over bug. If a user started to get a certificate repeatedly but
+    did not finish, then JSP would create a new JSESSIONID for each attempt. Subsequent attempts might
+    have returned an incorrect session (browser dependant) which may or may not be valid. This gave extremely intermittent
+    failures that were hard to reproduce. </li>
+    
+<li>OAUTH-147: Potential cleanup thread failure with a filestore. If a filestore is used and one of the
+    files is corrupted (e.g. due to a system crash at the time of writing it) then the cleanup thread
+    would fail to start. Now such corrupted files are simply logged in catalina.out and ignored otherwise.</li>
+    
+<li>OAUTH-148: Maria DB support is now implemented.</li>
+</ul>
+
+</section><section>
+<h2><a name="a1.1.2"></a>1.1.2</h2>
+
+<ul>
+    
+<li>OAUTH-128: Java SNI (Server Name Indication) is supported in Java 7 (required for this release of OA4MP)
+    but the underlying Apache SSL libraries did not support it. These have been upgraded.</li>
+    
+<li>OAUTH-135: Failure in authentication were not displaying the correct message. They should route the user
+       back to the login page for another attempt. </li>
+    
+<li>OAUTH-137: Documentation for cert lifetime configuration parameter was incorrect and the default of zero
+    has been changed to 12 hours.</li>
+</ul>
+
+
+</section><section>
+<h2><a name="a1.1.1"></a>1.1.1</h2>
+
+<ul>
+    
+<li>Added an FAQ section to the website.</li>
+    
+<li>OAUTH-105:Added support for file includes to configuration files.</li>
+    
+<li>OAUTH-105: Added checks to prevent cycles in aliases and files </li>
+    
+<li>OAUTH-107: An exception is thrown on the client side if the protocol is not https. The fixes a low-level OAuth
+    bug that would happen if the server redirected from http to https.</li>
+    
+<li>OAUTH-110: All clients may now specify a keystore (or more) to use when connecting to an OA4MP server.</li>
+</ul>
+</section><section>
+<h2><a name="a1.1"></a>1.1</h2>
+
+<ul>
+    
+<li>Added support to make showing redirect optional for clients.</li>
+    
+<li>Added ability to specify pages in the client servlet via configuration. There are three of them. A general error
+        page, a page showing the successful completion of getting a cert and finally a page
+        where the redirect -- if showing the redirct page is enabled -- is located.
+        All of these are paths relative to the web app itself.
+    </li>
+</ul>
+
+</section><section>
+<h2><a name="a1.0.7"></a>1.0.7</h2>
+Added support to make using log 4j optional. It had been disabled that interfered with some installations.
+
+</section><section>
+<h2><a name="a1.0.6"></a>1.0.6</h2>
+
+<ul>
+    
+<li>Fixed OAUTH-77: Added the ability to override the callback URI on a per request basis</li>
+    
+<li>Storage support, either via the file system or a database which allows for persistent
+        storage so that delegated credentials may be used in other applications.
+    </li>
+    
+<li>Improved handling of errors</li>
+    
+<li>Version number is printed at each server startup.</li>
+    
+<li>Added support for automatically cleaning up the asset store</li>
+    
+<li>Many documentation updates to 1.0.6.</li>
+    
+<li>Added signatures for the lastest downloadable war.</li>
+</ul>
+
+</section><section>
+<h2><a name="a1.0.5"></a>1.0.5</h2>
+
+<ul>
+    
+<li>The sample client now shows the generated private key on the redirect page.</li>
+    
+<li>Due to limited proxy support being added in the 1.0.5 server, the client now can display a complete certificate
+        chain rather than a single cert.
+    </li>
+</ul>
+
+
+</section>
+
+    </div>
+</div>
+<div class="clear">
+    <hr/>
+</div>
+<div id="footer">
+    <div class="xright">&#169;    
+                    2023
+        
+                    
+    
+
+    
+        
+                        
+    
+        
+    </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+</body>
+</html>
+

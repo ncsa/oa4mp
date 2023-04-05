@@ -1,0 +1,553 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+
+
+
+
+
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>OAuth for MyProxy</title>
+    <style type="text/css" media="all">
+        @import url("../../css/oa4mp-custom.css");
+        @import url("../../css/oa4mp-theme.css");
+        @import url("../../css/site.css");
+    </style>
+    <link rel="stylesheet" href="../../css/print.css" type="text/css" media="print"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    </head>
+<body class="composite">
+<div id="banner">
+                        <a href="http://www.ncsa.illinois.edu/" id="bannerLeft"  >
+        
+                                                                    <img src="../../css/images/ncsalogo_sm-2.gif" alt="NCSA"/>
+        
+                </a>
+                                    <a href="http://grid.ncsa.illinois.edu/myproxy/" id="bannerRight"  >
+        
+                                                                    <img src="../../css/images/MyProxyWide.gif" alt="MyProxy"/>
+        
+                </a>
+                <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="breadcrumbs">
+            
+    
+
+    
+        
+                        
+    
+        
+                    <div class="xleft">
+            Last Published: 2023-04-05
+                                </div>
+                <div class="xright">            
+    
+
+    
+        
+                        
+    
+        
+                         Version: 5.3-SNAPSHOT
+            </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="leftColumn">
+    <div id="navcolumn">
+                
+    
+
+    
+        
+                        
+    
+        
+                               <h5>OAuth for MyProxy</h5>
+                        <ul>
+                    
+    <li class="none">
+                        <a href="../../server/index.html">Overview</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../server/index.html">Server</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../client/index.html">Client</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../apidocs/index.html">api docs</a>
+            </li>
+              </ul>
+                            <h5>Project Documentation</h5>
+                        <ul>
+                    
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-info.html">Project Information</a>
+                        </li>
+              
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-reports.html">Project Reports</a>
+                        </li>
+              </ul>
+                                               <a href="http://maven.apache.org/" title="Built by Maven"
+           class="poweredBy">
+            <img class="poweredBy"
+                 alt="Built by Maven"
+                 src="http://maven.apache.org/images/logos/maven-feather.png"
+                 width="90"
+                 height="30"
+                 border="1"/>
+        </a>
+                           
+    
+
+    
+        
+                        
+    
+        
+        </div>
+</div>
+<div id="bodyColumn">
+    <div id="contentBox">
+        
+
+
+
+<section>
+<h2><a name="OAuth_for_MyProxy:_MySQL_Configuration"></a>OAuth for MyProxy: MySQL Configuration</h2>
+
+
+<p>Scope: client and server, all versions.</p>
+
+<p>This configures a <a class="externalLink" href="http://db.apache.org/derby/">Apache Derby</a> store.
+    Derby is a lightweight relational database written in Java. It is quite easy to set up and run and is
+    full-featured, with support for standard SQL. It is much less work than one of the big databases (e.g. MySQL)
+    to maintain.
+</p>
+
+<p>
+    Generally the schema, tablename and such use the default. Any option prefixed with a * in the table will
+    have its default used. Note that there may be many  stores for a configuration if each of them, <i>e.g.</i>
+    requires different connection information.</p>
+
+<table class="bodyTable" style="text-align: left; width: 100%;" border="1" cellspacing="2" cellpadding="2">
+    <tbody>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">Attribute</td>
+        
+<td style="vertical-align: top;">Required?</td>
+        
+<td style="vertical-align: top;">Default</td>
+        
+<td style="vertical-align: top;">Description</td>
+    </tr>
+    
+<tr class="b">
+        
+<td style="vertical-align: top;">username</td>
+        
+<td style="vertical-align: top;">Y</td>
+        
+<td style="vertical-align: top;">N/A</td>
+        
+<td style="vertical-align: top;">The name of the user to use</td>
+    </tr>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">password</td>
+        
+<td style="vertical-align: top;">Y</td>
+        
+<td style="vertical-align: top;">N/A</td>
+        
+<td style="vertical-align: top;">The password for the user</td>
+    </tr>
+    
+<tr class="b">
+        
+<td style="vertical-align: top;">bootPassword</td>
+        
+<td style="vertical-align: top;">Y</td>
+        
+<td style="vertical-align: top;">N/A</td>
+        
+<td style="vertical-align: top;">The password to unlock the database.</td>
+    </tr>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">driver</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;">current</td>
+        
+<td style="vertical-align: top;">The JDBC driver</td>
+    </tr>
+    
+<tr class="b">
+        
+<td style="vertical-align: top;">database</td>
+        
+<td style="vertical-align: top;">Y</td>
+        
+<td style="vertical-align: top;">N/A</td>
+        
+<td style="vertical-align: top;">The path to the database.</td>
+    </tr>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">schema</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;"></td>
+        
+<td style="vertical-align: top;">The schema for the database</td>
+    </tr>
+    
+<tr class="b">
+           
+<td style="vertical-align: top;">parameters</td>
+           
+<td style="vertical-align: top;">N</td>
+           
+<td style="vertical-align: top;">(none)</td>
+           
+<td style="vertical-align: top;">An optional extra set of parameters to pass to the JDBC driver. This is of the form
+               key0=value0&amp;key1=value1&amp;key2=value2... Note that each key/value pair is separated with an ampersand.
+               Note that OA4MP does all connections using UTF8 so that parameter is always added.
+           </td>
+       </tr>
+    </tbody>
+</table>
+
+<p><br /> The content of the store is specified in one of the content tags.</p>
+
+
+<p>If you are installing Derby, you need to get the tools from their website (unless you
+have some form of package manager) and install that. There are
+<a class="externalLink" href="https://github.com/ncsa/OA4MP/blob/master/oa4mp-server-admin-oauth2/src/main/resources/oauth2-derby.sql">install
+    instructions</a> for settig up your system. </p>
+</section><section>
+<h2><a name="Setting_up_a_Derby_database"></a>Setting up a Derby database</h2>
+
+<p>
+    This comment section tells how to set up an Apache Derby database to
+    work with OA4MP.
+</p>
+
+<p>
+     Create the directory to where you want derby to create the database.
+     This directory should be empty, since Derby will create everything on your
+     behalf -- and might refuse to do anything if the directory has content.
+     Make the following substitutions below:
+ </p>
+
+<table class="bodyTable" style="text-align: left; width: 100%;" border="1" cellspacing="2" cellpadding="2">
+    <tbody>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">Attribute</td>
+        
+<td style="vertical-align: top;">Description</td>
+    </tr>
+    
+<tr class="b">
+        
+<td style="vertical-align: top;">DB_NAME</td>
+        
+<td style="vertical-align: top;">the entire path to this database</td>
+    </tr>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">DB_PASSWORD</td>
+        
+<td style="vertical-align: top;">password to the database</td>
+    </tr>
+    
+<tr class="b">
+        
+<td style="vertical-align: top;">USER_NAME</td>
+        
+<td style="vertical-align: top;">name of the user (created below)</td>
+    </tr>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">USER_PASSWORD</td>
+        
+<td style="vertical-align: top;">password for user</td>
+    </tr>
+    
+<tr class="b">
+        
+<td style="vertical-align: top;">SCHEMA</td>
+        
+<td style="vertical-align: top;">schema for the database</td>
+    </tr>
+
+    </tbody>
+</table>
+     <section>
+<h3><a name="Note_1"></a>Note 1</h3>
+
+<p>   If you want your database to live in</p>
+
+<div>
+<pre>
+         /opt/oauth2/var/derby/oa4mp
+</pre></div>
+
+<p>you would create</p>
+
+<div>
+<pre>
+    /opt/oauth2/var/derby
+</pre></div>
+
+
+<p>with nothing in it and the DB_NAME is then</p>
+
+<div>
+<pre>
+    /opt/oauth2/var/derby/oa4mp
+</pre></div>
+
+<p>I.e., the last directory in this path is what Derby creates.</p>
+</section><section>
+<h3><a name="Note_2"></a>Note 2</h3>
+
+<p>
+     In Derby, the database lives in a directory. This means that unless
+     certain precautions are taken, it is completely insecure. The setup below
+     mitigates this.
+</p>
+
+<ol style="list-style-type: decimal">
+    
+<li>Puts a password on the entire database so it cannot be read from the disk</li>
+    
+<li>Sets a user and password to access the database. These are stored in the database,
+        hence step 1 to lock the whole thing down.</li>
+    
+<li>All database access from OA4MP is via the so-called embedded driver, so
+        no network traffic is needed.</li>
+</ol>
+
+</section></section><section>
+<h2><a name="One-time_install_instructions"></a>One-time install instructions</h2>
+
+<p>
+    Install derby, probably with a package manager like synaptic or yum. <br /><br />
+    Start derby with
+</p>
+
+<div>
+<pre>
+  ij
+</pre></div>
+
+<p>
+     Then issue the following commands. This sets up the database and will create the user above
+     (Note that the user name and password are set as properties, so do substitute).
+     Even though the user does not exist yet, you must  connect with the
+     user name so that they are the owner of the database.
+</p>
+
+<div>
+<pre>
+  connect 'jdbc:derby:DB_NAME;create=true;dataEncryption=true;bootPassword=DB_PASSWORD;user=USER_NAME';
+  call syscs_util.syscs_set_database_property('derby.connection.requireAuthentication', 'true');
+  call syscs_util.syscs_set_database_property('derby.authentication.provider', 'BUILTIN');
+  call syscs_util.syscs_set_database_property('derby.user.USER_NAME', 'USER_PASSWORD');
+  call syscs_util.syscs_set_database_property('derby.database.propertiesOnly', 'true');
+  call syscs_util.syscs_set_database_property('derby.database.sqlAuthorization', 'true');
+</pre></div>
+
+<section>
+<h3><a name="Optional_test"></a>Optional test</h3>
+
+<p>If you want be sure it works, create the schema as follows:</p>
+
+<div>
+<pre>
+  create schema oauth2;
+  show schemas;
+</pre></div>
+
+
+<p>     And a bunch of schemas will be displayed, including oauth2. This means everything
+     worked. You don't need to issue the create schema command below.
+</p>
+
+<p>
+     At this point, exit Derby. Initial setup is done. You must connect again as the user
+     that runs this because creating the tables below will automatically assign the
+     current user as the table owner, so no other permissions (which can get complicated)
+     are needed.
+</p>
+
+<div>
+<pre>
+  exit;
+</pre></div>
+     
+<p>Now connect to it with the following from the command line after restarting ij:</p>
+
+
+<div>
+<pre>
+  connect 'jdbc:derby:DB_NAME;user=USER_NAME;password=USER_PASSWORD;bootPassword=DB_PASSWORD';
+</pre></div>
+     
+<p>and either paste in the rest of this file OR just run the whole thing from inside ij</p>
+
+
+<div>
+<pre>
+    run '/full/path/to/oauth2-derby.qdl';
+</pre></div>
+
+<p>At this point, your database is ready for use.</p>
+
+</section></section><section>
+<h2><a name="Example"></a>Example</h2>
+
+<p>
+    Let us say that you set up your Derby database with the following information
+
+</p>
+
+<table class="bodyTable" style="text-align: left; width: 100%;" border="1" cellspacing="2" cellpadding="2">
+    <tbody>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">Attribute</td>
+        
+<td style="vertical-align: top;">Description</td>
+    </tr>
+    
+<tr class="b">
+        
+<td style="vertical-align: top;">DB_NAME</td>
+        
+<td style="vertical-align: top;">/opt/oa2/var/storage/my_db</td>
+    </tr>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">DB_PASSWORD</td>
+        
+<td style="vertical-align: top;">mairzy_doats</td>
+    </tr>
+    
+<tr class="b">
+        
+<td style="vertical-align: top;">USER_NAME</td>
+        
+<td style="vertical-align: top;">oa4mp</td>
+    </tr>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">USER_PASSWORD</td>
+        
+<td style="vertical-align: top;">dozey_doats</td>
+    </tr>
+    
+<tr class="b">
+        
+<td style="vertical-align: top;">SCHEMA</td>
+        
+<td style="vertical-align: top;">oauth2</td>
+    </tr>
+
+    </tbody>
+</table>
+
+
+<p>
+    Then the configuration of the derby element for all stores would be
+</p>
+
+<div>
+<pre>
+    &lt;derby username=&quot;oa4mp&quot;
+           password=&quot;dozey_doats&quot;
+           bootPassword=&quot;mairzy_doats&quot;
+           database=&quot;opt/oa2/var/storage/my_db&quot;
+           schema=&quot;oauth2&quot;&gt;
+        &lt;transactions/&gt;
+        &lt;clients/&gt;
+        &lt;clientApprovals/&gt;
+        &lt;permissions/&gt;
+        &lt;adminClients/&gt;
+        &lt;txStore/&gt;
+        &lt;voStore/&gt;
+    &lt;/derby&gt;
+
+</pre></div>
+
+
+
+</section>
+
+    </div>
+</div>
+<div class="clear">
+    <hr/>
+</div>
+<div id="footer">
+    <div class="xright">&#169;    
+                    2023
+        
+                    
+    
+
+    
+        
+                        
+    
+        
+    </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+</body>
+</html>
+

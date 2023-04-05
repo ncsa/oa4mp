@@ -1,0 +1,248 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+
+
+
+
+
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>OAuth for MyProxy</title>
+    <style type="text/css" media="all">
+        @import url("../../css/oa4mp-custom.css");
+        @import url("../../css/oa4mp-theme.css");
+        @import url("../../css/site.css");
+    </style>
+    <link rel="stylesheet" href="../../css/print.css" type="text/css" media="print"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    </head>
+<body class="composite">
+<div id="banner">
+                        <a href="http://www.ncsa.illinois.edu/" id="bannerLeft"  >
+        
+                                                                    <img src="../../css/images/ncsalogo_sm-2.gif" alt="NCSA"/>
+        
+                </a>
+                                    <a href="http://grid.ncsa.illinois.edu/myproxy/" id="bannerRight"  >
+        
+                                                                    <img src="../../css/images/MyProxyWide.gif" alt="MyProxy"/>
+        
+                </a>
+                <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="breadcrumbs">
+            
+    
+
+    
+        
+                        
+    
+        
+                    <div class="xleft">
+            Last Published: 2023-04-05
+                                </div>
+                <div class="xright">            
+    
+
+    
+        
+                        
+    
+        
+                         Version: 5.3-SNAPSHOT
+            </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="leftColumn">
+    <div id="navcolumn">
+                
+    
+
+    
+        
+                        
+    
+        
+                               <h5>OAuth for MyProxy</h5>
+                        <ul>
+                    
+    <li class="none">
+                        <a href="../../server/index.html">Overview</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../server/index.html">Server</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../client/index.html">Client</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../apidocs/index.html">api docs</a>
+            </li>
+              </ul>
+                            <h5>Project Documentation</h5>
+                        <ul>
+                    
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-info.html">Project Information</a>
+                        </li>
+              
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-reports.html">Project Reports</a>
+                        </li>
+              </ul>
+                                               <a href="http://maven.apache.org/" title="Built by Maven"
+           class="poweredBy">
+            <img class="poweredBy"
+                 alt="Built by Maven"
+                 src="http://maven.apache.org/images/logos/maven-feather.png"
+                 width="90"
+                 height="30"
+                 border="1"/>
+        </a>
+                           
+    
+
+    
+        
+                        
+    
+        
+        </div>
+</div>
+<div id="bodyColumn">
+    <div id="contentBox">
+        
+
+
+
+
+
+<h1>Server-wide client configurations</h1>
+
+<p>There are times that practically all of the clients for a server use the same policies. OA4MP allows for specifying
+QDL scripts to be run for various phases.</p>
+<section>
+<h2><a name="Example"></a>Example</h2>
+
+<p>OA4MP is to be run as a token issuer. This means that auto register is enabled (so anyone/anything may register a
+public client and it is immediately approved). The security at that point is that the login prevents unwanted
+access (<a href="using-proxies.html">proxies</a> to a secure service such as CILogon are a great idea.)
+Each user then has some set of access rights granted based on, e.g., a lookup of their user name in LDAP.
+Since the identical configuration will be used for each and every client, it would be a very bad idea to
+boilerplate the code into each and every configuration, just set it in the server configuration.</p>
+</section><section>
+<h2><a name="Basic_structure"></a>Basic structure</h2>                                    
+
+<p>These scripts reside inside the server &lt;qdl&gt; element. The basic format is</p>
+
+<div>
+<pre>
+    &lt;qdl&gt;
+    &lt;!-- bunch of configuration for QDL to run --&gt;
+    &lt;scripts&gt;
+      &lt;script&gt;
+        &lt;!-- standard QDL JSON element, exactly like a client script  --&gt;
+      &lt;/script&gt;
+    &lt;scripts&gt;
+    &lt;!-- As many script elements as you need. --&gt;
+    &lt;/scripts&gt;
+    &lt;/qdl&gt;
+</pre></div>
+
+<p>Note that server scripts may contain code blocks if you just need a line or two of QDL.
+and conform to the <a class="externalLink" href="https://cilogon.github.io/qdl/docs/qdl_server_scripts.pdf">scripting syntax.</a></p>
+<section>
+<h3><a name="An_example"></a>An example</h3>
+
+<p>Here the first script is run only in the post_token phase and explicitly sets a couple of claims.
+It also prints out a debug message saying it is running. The second one loads a test script
+(and since this runs inside QDL, the script path is used to resolve it). It is only run in the pre_auth
+phase. The token_type means that the machinery used is the access token, hence access and refresh tokens
+are availble and changes to them will be saved.</p>
+
+<div>
+<pre>
+    &lt;scripts&gt;
+       &lt;script&gt;
+       {&quot;qdl&quot;:{&quot;code&quot;:[
+              &quot;x:='my_custom_claim';&quot;,
+              &quot;say('*** IN SERVER SCRIPT');&quot;,
+              &quot;claims.'my_claim':=x;&quot;,
+              &quot;access_token.'my_at_claim':='my_at_claim';&quot;,
+              &quot;refresh_token.'my_rt_claim':='my_rt_claim';&quot;
+            ],
+
+         &quot;xmd&quot;:{&quot;exec_phase&quot;:&quot;post_token&quot;}}}
+       &lt;/script&gt;
+
+       &lt;script&gt;
+        {&quot;qdl&quot;:
+           {
+            &quot;load&quot;:&quot;test.qdl&quot;,
+            &quot;xmd&quot;:{&quot;exec_phase&quot;:&quot;pre_auth&quot;,&quot;token_type&quot;:&quot;access&quot;},
+            &quot;args&quot;:[4,true,{&quot;server&quot;:&quot;localhost&quot;,&quot;port&quot;:443}]
+           }
+        }
+       &lt;/script&gt;
+    &lt;/scripts&gt;
+
+</pre></div>
+</section></section><section>
+<h2><a name="Relationship_to_client_scripts"></a>Relationship to client scripts</h2>
+
+<p>Generally all server scripts are run first, then client scripts. Clients, however,
+may opt to set the attribute skip_server_scripts (also settable using the client
+management API), thereby not processing any server hooks.</p>
+
+
+</section>
+
+    </div>
+</div>
+<div class="clear">
+    <hr/>
+</div>
+<div id="footer">
+    <div class="xright">&#169;    
+                    2023
+        
+                    
+    
+
+    
+        
+                        
+    
+        
+    </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+</body>
+</html>
+

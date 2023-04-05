@@ -1,0 +1,360 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+
+
+
+
+
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>OAuth for MyProxy</title>
+    <style type="text/css" media="all">
+        @import url("../../css/oa4mp-custom.css");
+        @import url("../../css/oa4mp-theme.css");
+        @import url("../../css/site.css");
+    </style>
+    <link rel="stylesheet" href="../../css/print.css" type="text/css" media="print"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    </head>
+<body class="composite">
+<div id="banner">
+                        <a href="http://www.ncsa.illinois.edu/" id="bannerLeft"  >
+        
+                                                                    <img src="../../css/images/ncsalogo_sm-2.gif" alt="NCSA"/>
+        
+                </a>
+                                    <a href="http://grid.ncsa.illinois.edu/myproxy/" id="bannerRight"  >
+        
+                                                                    <img src="../../css/images/MyProxyWide.gif" alt="MyProxy"/>
+        
+                </a>
+                <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="breadcrumbs">
+            
+    
+
+    
+        
+                        
+    
+        
+                    <div class="xleft">
+            Last Published: 2023-04-05
+                                </div>
+                <div class="xright">            
+    
+
+    
+        
+                        
+    
+        
+                         Version: 5.3-SNAPSHOT
+            </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="leftColumn">
+    <div id="navcolumn">
+                
+    
+
+    
+        
+                        
+    
+        
+                               <h5>OAuth for MyProxy</h5>
+                        <ul>
+                    
+    <li class="none">
+                        <a href="../../server/index.html">Overview</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../server/index.html">Server</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../client/index.html">Client</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../apidocs/index.html">api docs</a>
+            </li>
+              </ul>
+                            <h5>Project Documentation</h5>
+                        <ul>
+                    
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-info.html">Project Information</a>
+                        </li>
+              
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-reports.html">Project Reports</a>
+                        </li>
+              </ul>
+                                               <a href="http://maven.apache.org/" title="Built by Maven"
+           class="poweredBy">
+            <img class="poweredBy"
+                 alt="Built by Maven"
+                 src="http://maven.apache.org/images/logos/maven-feather.png"
+                 width="90"
+                 height="30"
+                 border="1"/>
+        </a>
+                           
+    
+
+    
+        
+                        
+    
+        
+        </div>
+</div>
+<div id="bodyColumn">
+    <div id="contentBox">
+        
+
+
+
+ <h1>This has been deprecated in favor of new <a href="../manuals/cli.html">command line tools</a>. At some point it will be removed.</h1>
+
+<h1>Manually Approving a Client</h1>
+
+
+<p>There may be times when you need to manage approval for a client. Initially, clients do not have access approved. It
+    may also be the case someday that a client&#x2019;s security is compromised and you need to disallow all actions with it.
+    This section describes how to manually change the approval of a client. In the initial release of OAuth for MyProxy,
+    there are two methods for approving client request. The first is to use a command line tool that is supplied, the
+    second which only works for mysql-backed stores that directly accesses the database. Administrators are strongly
+    encouraged, if possible, to configure email notifications in all cases.</p>
+
+<section>
+<h2><a name="Using_the_CLI_.28command_line_interface.29"></a>Using the CLI (command line interface)</h2>
+
+
+<p>The CLI allows an administrator to approve or disapprove a client from a the command line, independent of whether the
+    server is running. The two methods are directly, in which the CLI accesses the store and updates it and indirectly,
+    in which the CLI deposits a request that the server picks up. In the indirect case, the server polls a given
+    directory. This is transparent and is taken from the server's configuration. The CLI works with all stores.</p>
+
+</section><section>
+<h2><a name="Sample_sessions"></a>Sample sessions</h2>
+
+
+<p>The easiest way to run the CLI is to check out the module oa4mp-server-api (see the <a href="../manuals/getting-started.html" title="Getting started with the OAuth for MyProxy Server">getting
+    started</a> page for how to download it) from svn and build it, then start it from the command line. The build
+    creates <i>two</i> jars, <span style="font-family: arial,helvetica,sans-serif;">oa4mp-approver.jar</span>, which
+    is the actual program, and <span style="font-family: arial,helvetica,sans-serif;">oa4mp-server-api-xxx.jar</span>
+    which is the current build. As with all command line java programs, you need to set the class path
+    (<b>Note</b>: This code currently lives in the main trunk of svn. Make sure you have the correct copy. Two
+    samples should suffice. Note that maven will generate its usual informational messages which I am omitting.</p>
+
+
+<p>Running the jar. There is currently one way to get a jar:</p>
+
+<ul>
+    
+<li>download the source code and run it from within maven</li>
+</ul>
+
+<p><span style="font-family: courier new,courier; font-size: smaller;">&gt; mvn clean install -P approver<br /></span>
+</p>
+
+
+<p><span style="font-family: courier new,courier; font-size: smaller;">&gt; cd target </span></p>
+
+
+<p><span style="font-family: courier new,courier; font-size: smaller;">&gt; java -jar oa4mp-approver.jar -cfg /home/ncsa/dev/csd/config/oa4mp-server.xml  -name in-memory</span>
+</p>
+
+
+<p> This points it to the server config file, <span style="font-family: arial,helvetica,sans-serif;">oa4mp-server.xml</span> and the tells it to invoke the named
+    configuration in that file called <span style="font-family: arial,helvetica,sans-serif;">in-memory</span>. In this
+    case, the configuration file points to a memory store, there will not be any approvals found. You should see the
+    following scroll past:</p>
+
+
+
+<p><span style="font-family: courier new,courier; font-size: smaller;">logging to file /home/ncsa/dev/main/ncsa-security-all/myproxy/oa4mp-server-api/log.xml</span>
+</p>
+
+
+<p style="font-family: courier new,courier; font-size: smaller;"><span style="font-family: courier new,courier; font-size: smaller;">(No entries found. You will need to manually enter the id.)</span><br /><span style="font-family: courier new,courier; font-size: smaller;">Enter the number of the client to approve or disapprove, OR, enter an id, starting with a /</span><br /><span style="color: #3366ff;"><b><span style="font-family: courier new,courier; font-size: smaller;">/myproxy:oa4mp,2012:/client/77be5883050848c7bb45484cb8567c8e</span></b></span><br /><span style="font-family: courier new,courier; font-size: smaller;">Enter your approver name:</span><br /><span style="color: #3366ff;"><b><span style="font-family: courier new,courier; font-size: smaller;">jeff</span></b></span><br /><span style="font-family: courier new,courier; font-size: smaller;">Enter Approve or Deny (A/D)</span><br /><span style="color: #3366ff;"><b><span style="font-family: courier new,courier; font-size: smaller;">A</span></b></span><br /><span style="font-family: courier new,courier; font-size: smaller;">Commit changes? (y/n)</span><br /><span style="color: #3366ff;"><b><span style="font-family: courier new,courier; font-size: smaller;">y</span></b></span></p>
+
+
+<p>My responses are in bold-faced. The server <b><i>must</i></b> have polling configured or the approval
+    will never be found.</p>
+
+<section>
+<h3><a name="Example_against_a_file_store."></a>Example against a file store.</h3>
+
+<div>
+<pre>
+&gt; java -cp oa4mp-server-api-1.0.6.jar -jar oa4mp-approver.jar -cfg /home/ncsa/dev/csd/config/oa4mp-server.xml  -name filestore
+logging to file /home/ncsa/dev/main/ncsa-security-all/myproxy/oa4mp-server-api/log.xml
+
+0. (D) myproxy:oa4mp,2012:/client/3af1b61bae834e9e373bbd774535ef43
+1. (A) myproxy:oa4mp,2012:/client/77be5883050848c7bb45484cb8567c8e
+2. (A) myproxy:oa4mp,2012:/client/2ed8e10c4932b284de9fd3d8bdcfc830
+3. (A) myproxy:oa4mp,2012:/client/29d1d2b95a29848f77b22b0af129b611
+Enter the number of the client to approve or disapprove, OR, enter an id, starting with a /
+<b>0</b>
+Enter your approver name:
+<b>jeff</b>
+Enter Approve or Deny (A/D)
+<b>A</b>
+Commit changes? (y/n)
+<b>y</b>
+</pre></div>
+
+<p>This lists all the approvals in the store and indicates with an A or D if the request has been approved or
+    disapproved. Entering the line number (these are printed on the left) will select the record. You may approve an
+    pending request or disapprove it. Selecting y at the end commits the changes. This also works for any SQL-backed
+    store as well.</p>
+
+
+</section><section>
+<h3><a name="Enabling_polling_on_the_service."></a>Enabling polling on the service.</h3>
+
+
+<p>To allow for client approval polling in the service, you need to set a polling directory and, if desired a polling
+    interval (default is 60000 ms or 1 minute.) What is polling? simply put, for stores where there is no way to
+    directly notify the server of approvals (such as a memory or file store),
+    polling tells the server to check for new approvals at a
+    given interval in a specific location. This does, however, work for any configured storage method including SQL stores,
+    so this mechanism can be used generally.
+    Attributes are set in the server configuration file.
+    For instance, here is a server configuration with polling enabled and email notifications off:</p>
+
+
+<div>
+<pre>
+&lt;config&gt;
+   &lt;server
+        pollingDirectory=&quot;/var/www/config/polling&quot;
+        pollingInterval=&quot;5000&quot;/&gt;
+   &lt;-- bunch of other stuff --&gt;
+&lt;/config&gt;
+</pre></div>
+
+
+<p>which stores all transactions, request and approvals in memory and specifies a MyProxy server other than localhost.
+    The server polls the directory every 5 seconds, (which is very often indeed.) You should have the <i>same</i>
+    polling directory specified for the CLI and the server. The CLI puts the approvals there, and the server
+    eventually reads them.</p>
+
+
+<p>If no polling directory is given, then polling is disabled.</p>
+
+</section><section>
+<h3><a name="Another_method.2C_suitable_for_testing_servers_only"></a>Another method, suitable for testing servers only</h3>
+
+
+<p>This consists of replacing the RegistrationServlet in the web.xml file with the AutoRegistrationServlet. The effect
+    is to <b><i>automatically approve</i></b> every client request. This is an inherently insecure system
+    but is of great use when debugging a server deploy. Administrators should feel free to use this but simply revert to
+    the standard servlet when deployment ready.</p>
+
+</section></section><section>
+<h2><a name="Direct_approval_for_Maria_DB_and_MySQL_stores."></a>Direct approval for Maria DB and MySQL stores.</h2>
+
+
+<p>The steps for manually toggling the approval bit in the either Maria DB or MySQL stores are as follows.</p>
+
+<ul>
+    
+<li>Log onto a machine that can access Maria DB or MySQL</li>
+</ul>
+
+<p style="padding-left: 60px;">Note:Both Maria DB and MySQL allows access per host and localhost access should work but any
+    other should not unless specifically configured to do so.</p>
+
+<ul>
+    
+<li>Log in as the approver (the default username in the install script is oa4mp-approver) to the databasse on the machine
+        where the database resides:
+    </li>
+</ul>
+
+<div>
+<pre style="padding-left: 60px;">mysql -u oa4mp-approver -p oauth</pre></div>
+
+<p style="padding-left: 60px;">Note:This sets you to use the oauth database and will prompt your for the
+    approver&#x2019;s password.</p>
+
+<ul>
+    
+<li>Update the client&#x2019;s database entry:</li>
+</ul>
+
+<div>
+<pre style="padding-left: 30px;">UPDATE client_approvals set approved=true where oauth_consumer_key=&#x2019;myproxy:oa4mp,2012:/client/274ab37ef365b7c384a003bc7&#x2019;;</pre></div>
+
+<p>Note the single quotes around the id. You should also identify yourself as the approver (usually this is just you
+    email address):</p>
+
+<div>
+<pre>UPDATE client_approvals set approver=&#x2019;your.name@whatever.org&#x2019; where oauth_consumer_key=&#x2019;myproxy:oa4mp,2012:/client/274ab37ef365b7c384a003bc7&#x2019;;</pre></div>
+
+<p>In a similar way, you could set the approved flag to false and disallow the client from any future actions. You can
+    check that the update took by issuing</p>
+
+<div>
+<pre>select * from client_approvals;</pre></div>
+
+<p>This will display everything in the database. You could also restrict it to the single entry by issuing</p>
+
+<div>
+<pre>select * from client_approvals where oauth_consumer_key=&#x2019;myproxy:oa4mp,2012:/client/274ab37ef365b7c384a003bc7&#x2019;;</pre></div>
+
+
+</section>
+
+    </div>
+</div>
+<div class="clear">
+    <hr/>
+</div>
+<div id="footer">
+    <div class="xright">&#169;    
+                    2023
+        
+                    
+    
+
+    
+        
+                        
+    
+        
+    </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+</body>
+</html>
+

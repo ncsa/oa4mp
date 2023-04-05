@@ -1,0 +1,252 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+
+
+
+
+
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>OAuth for MyProxy</title>
+    <style type="text/css" media="all">
+        @import url("../../css/oa4mp-custom.css");
+        @import url("../../css/oa4mp-theme.css");
+        @import url("../../css/site.css");
+    </style>
+    <link rel="stylesheet" href="../../css/print.css" type="text/css" media="print"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    </head>
+<body class="composite">
+<div id="banner">
+                        <a href="http://www.ncsa.illinois.edu/" id="bannerLeft"  >
+        
+                                                                    <img src="../../css/images/ncsalogo_sm-2.gif" alt="NCSA"/>
+        
+                </a>
+                                    <a href="http://grid.ncsa.illinois.edu/myproxy/" id="bannerRight"  >
+        
+                                                                    <img src="../../css/images/MyProxyWide.gif" alt="MyProxy"/>
+        
+                </a>
+                <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="breadcrumbs">
+            
+    
+
+    
+        
+                        
+    
+        
+                    <div class="xleft">
+            Last Published: 2023-04-05
+                                </div>
+                <div class="xright">            
+    
+
+    
+        
+                        
+    
+        
+                         Version: 5.3-SNAPSHOT
+            </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="leftColumn">
+    <div id="navcolumn">
+                
+    
+
+    
+        
+                        
+    
+        
+                               <h5>OAuth for MyProxy</h5>
+                        <ul>
+                    
+    <li class="none">
+                        <a href="../../server/index.html">Overview</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../server/index.html">Server</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../client/index.html">Client</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../apidocs/index.html">api docs</a>
+            </li>
+              </ul>
+                            <h5>Project Documentation</h5>
+                        <ul>
+                    
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-info.html">Project Information</a>
+                        </li>
+              
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-reports.html">Project Reports</a>
+                        </li>
+              </ul>
+                                               <a href="http://maven.apache.org/" title="Built by Maven"
+           class="poweredBy">
+            <img class="poweredBy"
+                 alt="Built by Maven"
+                 src="http://maven.apache.org/images/logos/maven-feather.png"
+                 width="90"
+                 height="30"
+                 border="1"/>
+        </a>
+                           
+    
+
+    
+        
+                        
+    
+        
+        </div>
+</div>
+<div id="bodyColumn">
+    <div id="contentBox">
+        
+
+
+
+
+<h1>Overview</h1>
+
+
+<p>Welcome to OAuth for MyProxy! This describes the client software for the OAuth for MyProxy service. It allows clients
+    to request certificates and users to securely authorize them using the OAuth delegation protocol.</p>
+
+<section>
+<h2><a name="Prerequisites"></a>Prerequisites</h2>
+
+<ul>
+    
+<li>Tomcat 9 or above. SSL should be configured and enabled. Tomcat 8 will no longer work with the
+    compiler version of Java (11 or above) we are using.</li>
+    
+<li>Java <b>1.9</b> or above. Note that versions previous
+    to Java 1.7 will not work due to internal changes by Sun to their security APIs.</li>
+    
+<li>(Optional) Maven 3.3+ or higher (only if building from the source)</li>
+    
+<li>(Optional) Apache 2, configured to work with Tomcat.</li>
+</ul>
+</section><section>
+<h2><a name="Getting_and_deploying_from_the_war."></a>Getting and deploying from the war.</h2>
+
+
+<p>You may most easily a bare-bones version for testing by downloading the current reference war:</p>
+
+
+<p><a class="externalLink" href="https://github.com/ncsa/OA4MP/releases/latest/client2.war" title="OA4MP client war">client2.war</a>
+     <br /></br>
+      <a class="externalLink" href="https://github.com/ncsa/OA4MP/releases/latest/client2.war.asc" title="PGP signature file">(PGP signature)</a>
+</p>
+
+For many cases, this is all you need to do.
+
+
+<p>Save this and deploy it to Tomcat. You may do this in several ways such as dropping the war into the
+    $CATALINA_HOME/webapps directory. The system will not work until you have configured it then registered with an
+    OA4MP server though.</p>
+
+</section><section>
+<h2><a name="Using_the_Maven_Repository"></a>Using the Maven Repository</h2>
+Fortunately, OA4MP is hosted on the public Sonatype maven repository so that using the code simply requires you
+add the right dependencies. There is no need to configure any repositories. Generally it is suggested that you
+use the pre-compiled war.
+
+<section>
+<h3><a name="Getting_and_building_the_source"></a>Getting and building the source</h3>
+If you need/want to customize the basic package, you would download the source from
+<a class="externalLink" href="https://github.com/ncsa/OA4MP" title="oa4mp sources">Git Hub</a>
+This will resolve the correct dependencies. Build the module you want by issuing
+
+<div>
+<pre>mvn clean install</pre></div>
+and you should end up with a deployable war.
+
+
+<p>If you decide to write your own OA4MP webapp, you should use the following module:</p>
+
+<div>
+<pre>
+    &lt;dependency&gt;
+        &lt;artifactId&gt;oa4mp-client-oauth2&lt;/artifactId&gt;
+        &lt;groupId&gt;edu.uiuc.ncsa.myproxy&lt;/groupId&gt;
+        &lt;version&gt;5.3-SNAPSHOT&lt;/version&gt;
+    &lt;/dependency&gt;
+</pre></div>
+
+
+</section></section><section>
+<h2><a name="Deploying_to_Apache"></a>Deploying to Apache</h2>
+
+
+<p>If you need to deploy this to Apache, you need to add the following to the <span style="font-family: courier new,courier;">proxy_ajp.conf</span> file (which, e.g., lives under <span style="font-family: courier new,courier;">/etc/httpd/conf.d</span> or perhaps <span style="font-family: courier new,courier;">/etc/apache2/conf.d</span> in most unix distributions):</p>
+
+<div>
+<pre>ProxyPass /client/simple ajp://localhost:8009/client/simple</pre></div>
+
+<p><b>Note:</b>In the WEB-INF/web.xml file there is a section called
+        <b>security-constraint</b>, which controls access to the webapp using Tomcat's SSL. This will conflict with access via Apache,
+    so comment that section out if you are deploying to Apache. It is only needed in stand-alone Tomcat deployments.</p>
+
+
+</section>
+
+    </div>
+</div>
+<div class="clear">
+    <hr/>
+</div>
+<div id="footer">
+    <div class="xright">&#169;    
+                    2023
+        
+                    
+    
+
+    
+        
+                        
+    
+        
+    </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+</body>
+</html>
+

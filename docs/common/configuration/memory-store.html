@@ -1,0 +1,251 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+
+
+
+
+
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>OAuth for MyProxy</title>
+    <style type="text/css" media="all">
+        @import url("../../css/oa4mp-custom.css");
+        @import url("../../css/oa4mp-theme.css");
+        @import url("../../css/site.css");
+    </style>
+    <link rel="stylesheet" href="../../css/print.css" type="text/css" media="print"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    </head>
+<body class="composite">
+<div id="banner">
+                        <a href="http://www.ncsa.illinois.edu/" id="bannerLeft"  >
+        
+                                                                    <img src="../../css/images/ncsalogo_sm-2.gif" alt="NCSA"/>
+        
+                </a>
+                                    <a href="http://grid.ncsa.illinois.edu/myproxy/" id="bannerRight"  >
+        
+                                                                    <img src="../../css/images/MyProxyWide.gif" alt="MyProxy"/>
+        
+                </a>
+                <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="breadcrumbs">
+            
+    
+
+    
+        
+                        
+    
+        
+                    <div class="xleft">
+            Last Published: 2023-04-05
+                                </div>
+                <div class="xright">            
+    
+
+    
+        
+                        
+    
+        
+                         Version: 5.3-SNAPSHOT
+            </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="leftColumn">
+    <div id="navcolumn">
+                
+    
+
+    
+        
+                        
+    
+        
+                               <h5>OAuth for MyProxy</h5>
+                        <ul>
+                    
+    <li class="none">
+                        <a href="../../server/index.html">Overview</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../server/index.html">Server</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../client/index.html">Client</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../apidocs/index.html">api docs</a>
+            </li>
+              </ul>
+                            <h5>Project Documentation</h5>
+                        <ul>
+                    
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-info.html">Project Information</a>
+                        </li>
+              
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-reports.html">Project Reports</a>
+                        </li>
+              </ul>
+                                               <a href="http://maven.apache.org/" title="Built by Maven"
+           class="poweredBy">
+            <img class="poweredBy"
+                 alt="Built by Maven"
+                 src="http://maven.apache.org/images/logos/maven-feather.png"
+                 width="90"
+                 height="30"
+                 border="1"/>
+        </a>
+                           
+    
+
+    
+        
+                        
+    
+        
+        </div>
+</div>
+<div id="bodyColumn">
+    <div id="contentBox">
+        
+
+
+
+<section>
+<h2><a name="The_Memory_Store_Configuration."></a>The Memory Store Configuration.</h2>
+
+
+<p>Scope: client and server, all versions.</p>
+
+<p>This will persist items in system memory. This is extremely useful in cases where long-term storage is not required
+    or for a quick testing environment.</p>
+
+<section>
+<h3><a name="A_Server_Example"></a>A Server Example</h3>
+
+
+<p>There are no attributes to configure. A very minimalist example of a server configuration would be</p>
+
+<div>
+<pre>
+&lt;config&gt;
+    &lt;service name=&quot;default-cfg&quot;&gt;
+    &lt;myproxy host=&quot;myproxy.teragrid.org&quot; port=&quot;7514&quot;/&gt;
+    &lt;/service&gt;
+&lt;/config&gt;
+</pre></div>
+
+
+<p>Would point to a service on localhost and use the given MyProxy service. All information would be stored in memory,
+    and there is no mail notifications enabled, so this is not useful for production, but would allow for a very quick
+    setup and test.</p>
+
+</section><section>
+<h3><a name="A_Client_Example"></a>A Client Example</h3>
+
+An example for a client where assets are to be kept in memory would be
+
+<div>
+<pre>
+&lt;config&gt;
+    &lt;client name=&quot;my-cfg&quot;&gt;
+       &lt;memoryStore&gt;
+          &lt;<a href="client/dtd/asset-store.html">assetStore</a>/&gt;
+       &lt;/memoryStore&gt;
+       &lt;!-- other stuff --&gt;
+    &lt;/client&gt;
+&lt;/config&gt;
+</pre></div>
+
+
+</section><section>
+<h3><a name="Default_Memory_Storage"></a>Default Memory Storage</h3>
+
+
+<p>This is enabled, which means that if a component does not have explicit storage of some sort declared, a memory store
+    will be used. If you wish to disable this feature, you may do so by setting the following flag in your
+    configuration:</p>
+
+For servers:
+
+<div>
+<pre>
+    &lt;config&gt;
+    &lt;service name=&quot;my-config&quot;
+            disableDefaultStores=&quot;true&quot;
+    &gt;
+</pre></div>
+
+<br />etc...
+
+For Clients
+
+
+<div>
+<pre>
+    &lt;config&gt;
+    &lt;client name=&quot;my-config&quot;
+            disableDefaultStores=&quot;true&quot;
+    &gt;
+</pre></div>
+
+
+<p>It is generally advisable to disable this feature in production environments since if there is a missing storage
+    configuration an error will be generated. If you wish to use a memory store, simply configure one explicity.</p>
+
+
+</section></section>
+
+    </div>
+</div>
+<div class="clear">
+    <hr/>
+</div>
+<div id="footer">
+    <div class="xright">&#169;    
+                    2023
+        
+                    
+    
+
+    
+        
+                        
+    
+        
+    </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+</body>
+</html>
+

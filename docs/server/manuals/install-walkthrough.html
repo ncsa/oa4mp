@@ -1,0 +1,391 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+
+
+
+
+
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>OAuth for MyProxy</title>
+    <style type="text/css" media="all">
+        @import url("../../css/oa4mp-custom.css");
+        @import url("../../css/oa4mp-theme.css");
+        @import url("../../css/site.css");
+    </style>
+    <link rel="stylesheet" href="../../css/print.css" type="text/css" media="print"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    </head>
+<body class="composite">
+<div id="banner">
+                        <a href="http://www.ncsa.illinois.edu/" id="bannerLeft"  >
+        
+                                                                    <img src="../../css/images/ncsalogo_sm-2.gif" alt="NCSA"/>
+        
+                </a>
+                                    <a href="http://grid.ncsa.illinois.edu/myproxy/" id="bannerRight"  >
+        
+                                                                    <img src="../../css/images/MyProxyWide.gif" alt="MyProxy"/>
+        
+                </a>
+                <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="breadcrumbs">
+            
+    
+
+    
+        
+                        
+    
+        
+                    <div class="xleft">
+            Last Published: 2023-04-05
+                                </div>
+                <div class="xright">            
+    
+
+    
+        
+                        
+    
+        
+                         Version: 5.3-SNAPSHOT
+            </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="leftColumn">
+    <div id="navcolumn">
+                
+    
+
+    
+        
+                        
+    
+        
+                               <h5>OAuth for MyProxy</h5>
+                        <ul>
+                    
+    <li class="none">
+                        <a href="../../server/index.html">Overview</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../server/index.html">Server</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../client/index.html">Client</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../apidocs/index.html">api docs</a>
+            </li>
+              </ul>
+                            <h5>Project Documentation</h5>
+                        <ul>
+                    
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-info.html">Project Information</a>
+                        </li>
+              
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-reports.html">Project Reports</a>
+                        </li>
+              </ul>
+                                               <a href="http://maven.apache.org/" title="Built by Maven"
+           class="poweredBy">
+            <img class="poweredBy"
+                 alt="Built by Maven"
+                 src="http://maven.apache.org/images/logos/maven-feather.png"
+                 width="90"
+                 height="30"
+                 border="1"/>
+        </a>
+                           
+    
+
+    
+        
+                        
+    
+        
+        </div>
+</div>
+<div id="bodyColumn">
+    <div id="contentBox">
+        
+
+
+
+
+<section>
+<h2><a name="Oauth2.2FOIDC_Server_Setup"></a>Oauth2/OIDC Server Setup</h2>
+
+
+<p>Deploy the server webapp:</p>
+
+<div>
+<pre>$ cd $CATALINA_HOME/webapps
+$ curl -sO <a class="externalLink" href="https://github.com/ncsa/OA4MP/releases/latest/download/oauth2.war">https://github.com/ncsa/OA4MP/releases/latest/download/oauth2.war</a>
+</pre></div>
+
+
+<p>Next, <a href="../configuration/config-index.html">configure the server</a>.</p>
+
+<div>
+<pre>$ vi $CATALINA_HOME/conf/web.xml # add oa4mp:server.config.file parameter
+$ tail -9 $CATALINA_HOME/conf/web.xml
+&lt;context-param&gt;
+    &lt;param-name&gt;oa4mp:oauth2.server.config.file&lt;/param-name&gt;
+    &lt;param-value&gt;/Users/username/oa4mp/server2-cfg.xml&lt;/param-value&gt;
+&lt;/context-param&gt;
+
+&lt;context-param&gt;
+    &lt;param-name&gt;oa4mp:oauth2.server.config.name&lt;/param-name&gt;
+    &lt;param-value&gt;server2-config&lt;/param-value&gt;
+&lt;/context-param&gt;
+&lt;/web-app&gt;
+$ mkdir -p ~/oa4mp/storage
+$ vi ~/oa4mp/server-cfg.xml # set myproxy-server hostname, fileStore path, mail config
+$ cat ~/oa4mp/server-cfg.xml # OAuth server on localhost, myproxy-server on myproxy.example.edu
+&lt;config&gt;
+&lt;service address=&quot;https://localhost:8443/oauth2&quot; name=&quot;server2-config&quot;&gt;
+
+&lt;fileStore path=&quot;/users/username/oa4mp/storage2&quot;&gt;
+  &lt;clients/&gt;
+  &lt;clientApprovals/&gt;
+&lt;/fileStore&gt;
+&lt;myproxy host=&quot;myproxy.example.edu&quot; port=&quot;7512&quot;/&gt;
+&lt;mail enabled=&quot;true&quot;
+      server=&quot;smtp.example.edu&quot;
+      username=&quot;username@example.edu&quot;
+      recipients=&quot;username@example.edu&quot;&gt;
+  &lt;messageTemplate&gt;/Users/username/oa4mp/message.txt&lt;/messageTemplate&gt;
+  &lt;subjectTemplate&gt;/Users/username/oa4mp/subject.txt&lt;/subjectTemplate&gt;
+&lt;/mail&gt;
+&lt;/service&gt;
+&lt;/config&gt;
+$ vi ~/oa4mp/message.txt
+$ cat ~/oa4mp/message.txt
+# A sample template
+A client has requested approval.
+
+Name: ${name}
+Contact email: ${email}
+Home uri: ${homeUri}
+Failure uri:${failureUri}
+Creation time: ${creationTime}
+Generated identifier: ${identifier}
+
+If you approve this request, you should send a notice
+to the contact email and include the generated identifier.
+$ vi ~/oa4mp/subject.txt
+$ cat ~/oa4mp/subject.txt
+Client approval request received for ${name}
+$ $CATALINA_HOME/bin/startup.sh # start up the server
+</pre></div>
+</section><section>
+<h2><a name="Oauth2.2FOIDC_Client_Setup"></a>Oauth2/OIDC Client Setup</h2>
+
+
+
+<p>Next, <a href="../../client/manuals/registering-with-an-oauth2-server.html">registering the client</a>
+    You must submit the web form at <a class="externalLink" href="https://localhost:8443/oauth2/register">https://localhost:8443/oauth2/register</a>
+    (or whatever the address is goign to be) to register the client and get both a client ID and client secret.</p>
+
+
+<p>Next, <a href="../../client/configuration/index.html">configure the client</a>.
+    You must preserve botht he client ID and client secret in the configuration file.
+    Note that the client secret is a single string. Do not add any line breaks or spaces
+    and be aware that some browsers will add these when you copy the secret to the clipboard.
+    A typical example configuration might be
+</p>
+
+<div>
+<pre>$ vi $CATALINA_HOME/conf/web.xml # add oa4mp:client.config.file parameter
+$ tail -5 $CATALINA_HOME/conf/web.xml
+&lt;config&gt;
+&lt;client name=&quot;client2-config&quot;&gt;
+   &lt;callbackUri&gt;https://localhost:8443/client2/ready&lt;/callbackUri&gt;
+   &lt;secret&gt;DMfidLiDbA1SfH9in_QoI9tfa48HmOW18ubcOLTPHgMtrJ5G8PnNuq0hQB3E6daRXwSqe9V6O14C7jRwI7KkoM2VSCfTmGrcRJQTRL&lt;/secret&gt;
+   &lt;serviceUri&gt;https://localhost:8443/oauth2&lt;/serviceUri&gt;
+   &lt;authorizeUri&gt;https://localhost:8443/oauth2/authorize&lt;/authorizeUri&gt;
+   &lt;id&gt;myproxy:oa4mp,2012:/client/21653006d3ffb1344480e06e97207578&lt;/id&gt;
+   &lt;showRedirectPage&gt;true&lt;/showRedirectPage&gt;
+&lt;/client&gt;
+&lt;/config&gt;
+</pre></div>
+Note that the last option for <a href="../../client/manuals/parameters.html">showRedirectPage</a> will pause the
+control immediately after
+the first call to the server and display a url for where the client would normally be redirected and
+the user's private key. This is good for testing but should not be used in production servers.
+The default is never to show this page, so simply removing this element will allow for the redirect
+immediately.
+
+<p>Restart Tomcat so the new client configuration takes effect:</p>
+
+<div>
+<pre>$ $CATALINA_HOME/bin/shutdown.sh
+$ $CATALINA_HOME/bin/startup.sh
+</pre></div>
+</section><section>
+<h2><a name="Oauth2.2FOIDC_Client_Approval"></a>Oauth2/OIDC Client Approval</h2>
+
+
+<p>Next we need to <a href="../manuals/cli.html">approve the client
+    registration request with the command-line tool</a>:</p>
+
+<div>
+<pre>$ cd ~/oa4mp
+$ curl -sO <a class="externalLink" href="https://github.com/ncsa/OA4MP/releases/latest/download/oa2-cli.jar">https://github.com/ncsa/OA4MP/releases/latest/download/oa2-cli.jar</a>
+$ curl -sO <a class="externalLink" href="https://github.com/ncsa/OA4MP/releases/latest/download/oa2-cli">https://github.com/ncsa/OA4MP/releases/latest/download/oa2-cli</a>
+</pre></div>
+
+<p>You will probably need to edit oa2-cli to make the paths work on your system.
+    You will also need to either create a config file or point it at the server config
+    file that you are already using. We recommend the latter.</p>
+
+
+<p>
+    Edit oa2-cli to point to the right paths for the config file and jar, and make sure
+    that the permission is set to executable. Run the tool, passing in the name of the
+    configuration as a parameter (&quot;server2-config&quot; in the example).</p>
+
+<div>
+<pre>
+$ ./oa2-cli server2-config
+oa2 &gt;use clients
+clients &gt;ls
+  0. (N) myproxy:oa4mp,2012:/client_id/600019ae306de2049a701144df34ccd3 (Test428)
+  clients &gt;approve 0
+    approver[(null)]:admin
+    approve this[n]:y
+    save this approval record [y/n]?y
+    approval saved
+  clients &gt;exit
+  oa2 &gt;exit
+</pre></div>
+
+<p>Deploy the client webapp:</p>
+
+<div>
+<pre>$ cd $CATALINA_HOME/webapps
+$ curl -sO <a class="externalLink" href="https://github.com/ncsa/OA4MP/releases/latest/download/client2.jar">https://github.com/ncsa/OA4MP/releases/latest/download/client2.jar</a>
+</pre></div>
+</section><section>
+<h2><a name="All_Done.21"></a>All Done!</h2>
+
+
+<p>If everything went well, the example OAuth for MyProxy client should be running at <a class="externalLink" href="https://localhost:8443/client2/">https://localhost:8443/client2/</a>.</p>
+
+
+</section><section>
+<h2><a name="Running_Without_CATALINA_OPTS.2C_self-signed_cert"></a>Running Without CATALINA_OPTS, self-signed cert</h2>
+This walkthrough will get you up to speed in a hurry. Should you wish to run the server locally regularly, you will
+need to configure the Tomcat SSL connector. You must generate your certificates and add them as well to your trust store.
+Here is a sample:
+
+<div>
+<pre>
+    &lt;Connector port=&quot;9443&quot;
+                protocol=&quot;HTTP/1.1&quot;
+                SSLEnabled=&quot;true&quot;
+                maxThreads=&quot;150&quot;
+                scheme=&quot;https&quot;
+                secure=&quot;true&quot;
+            URIEncoding=&quot;UTF-8&quot;
+
+                keystoreFile=&quot;${user.home}/certs/localhost-2020.jks&quot;
+                keystorePass=&quot;XXXXX&quot;
+                keystoreType=&quot;JKS&quot;
+                truststoreFile=&quot;${user.home}/dev/csd/config/ncsa-cacerts&quot;
+                truststorePass=&quot;YYYYY&quot;
+                truststoreType=&quot;JKS&quot;
+                clientAuth=&quot;false&quot; sslProtocol=&quot;TLS&quot; /&gt;
+
+</pre></div>
+
+
+<p>For the client, you should set atServerDN=&quot;localhost&quot; in the client tag, e.g.</p>
+
+<div>
+<pre>
+    &lt;client name=&quot;client2-config&quot; atServerDN=&quot;localhost&quot;&gt;
+</pre></div>
+
+
+<p>you should simply add a keystore section to your client configuration (works with
+    all versions of OA4MP) as described <a href="../../common/configuration/keystore.html">here</a>. E.g.
+</p>
+
+<div>
+<pre>
+    &lt;ssl debug=&quot;false&quot;
+         useJavaTrustStore=&quot;true&quot;&gt;
+        &lt;trustStore&gt;
+            &lt;path&gt;/home/ncsa/certs/localhost-2020.jks&lt;/path&gt;
+            &lt;password&gt;&lt;![CDATA[XXXXX]]&gt;&lt;/password&gt;
+            &lt;type&gt;JKS&lt;/type&gt;
+            &lt;certDN&gt;&lt;![CDATA[CN=localhost]]&gt;&lt;/certDN&gt;
+        &lt;/trustStore&gt;
+    &lt;/ssl&gt;
+</pre></div>
+
+<p>This walkthrough assumes unix (CentOS, Unbuntu server). If you wish to try this under Windows or some other
+    more exotic version of unix (such as Solaris) you should bee aware that setting the
+    certs in CATALINA_OPTS will not be read without more tinkering with the
+    Tomcat startup scripts. In that case the easiest thing to do is to
+    simply add a keystore section to your client configuration.</p>
+
+
+
+
+</section>
+
+    </div>
+</div>
+<div class="clear">
+    <hr/>
+</div>
+<div id="footer">
+    <div class="xright">&#169;    
+                    2023
+        
+                    
+    
+
+    
+        
+                        
+    
+        
+    </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+</body>
+</html>
+

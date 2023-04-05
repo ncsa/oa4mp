@@ -1,0 +1,257 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+
+
+
+
+
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>OAuth for MyProxy</title>
+    <style type="text/css" media="all">
+        @import url("../../css/oa4mp-custom.css");
+        @import url("../../css/oa4mp-theme.css");
+        @import url("../../css/site.css");
+    </style>
+    <link rel="stylesheet" href="../../css/print.css" type="text/css" media="print"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    </head>
+<body class="composite">
+<div id="banner">
+                        <a href="http://www.ncsa.illinois.edu/" id="bannerLeft"  >
+        
+                                                                    <img src="../../css/images/ncsalogo_sm-2.gif" alt="NCSA"/>
+        
+                </a>
+                                    <a href="http://grid.ncsa.illinois.edu/myproxy/" id="bannerRight"  >
+        
+                                                                    <img src="../../css/images/MyProxyWide.gif" alt="MyProxy"/>
+        
+                </a>
+                <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="breadcrumbs">
+            
+    
+
+    
+        
+                        
+    
+        
+                    <div class="xleft">
+            Last Published: 2023-04-05
+                                </div>
+                <div class="xright">            
+    
+
+    
+        
+                        
+    
+        
+                         Version: 5.3-SNAPSHOT
+            </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="leftColumn">
+    <div id="navcolumn">
+                
+    
+
+    
+        
+                        
+    
+        
+                               <h5>OAuth for MyProxy</h5>
+                        <ul>
+                    
+    <li class="none">
+                        <a href="../../server/index.html">Overview</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../server/index.html">Server</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../client/index.html">Client</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../apidocs/index.html">api docs</a>
+            </li>
+              </ul>
+                            <h5>Project Documentation</h5>
+                        <ul>
+                    
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-info.html">Project Information</a>
+                        </li>
+              
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-reports.html">Project Reports</a>
+                        </li>
+              </ul>
+                                               <a href="http://maven.apache.org/" title="Built by Maven"
+           class="poweredBy">
+            <img class="poweredBy"
+                 alt="Built by Maven"
+                 src="http://maven.apache.org/images/logos/maven-feather.png"
+                 width="90"
+                 height="30"
+                 border="1"/>
+        </a>
+                           
+    
+
+    
+        
+                        
+    
+        
+        </div>
+</div>
+<div id="bodyColumn">
+    <div id="contentBox">
+        
+
+
+
+<h1>Using a self-signed cert in Tomcat</h1>
+
+<p>A pretty common scenario is to set up a test server and client and getting a cert from a third party
+can be expensive and time-consuming. You can, of course, sign your own cert. Be aware that this will
+restrict others unless they make an exception in their browser when connecting to your site. It
+is not reccomended for production server, but is awfully handy for testing.</p>
+
+<p>Why do this? The OAuth exchange happens in <b>two</b> stages. First, the user comes in with a browser.
+At that point the user must accept an exception if your Tomcat has a self-signed cert. Once the user
+log in, a redirect is made to the client, which fires up its own SSL connection and has only a basic set
+of certs available. Anything else (the analog of the exception in the browser) must be manually configured.
+The practical problem with that is that Java has a very bad way to do it, either by restricting the JVM
+to using your cert only or requiring you to manufacture your own version of a trust store. This is the reason
+that there is a way to set this in the client configuration.</p>
+<section>
+<h2><a name="Creating_a_self-signed_cert"></a>Creating a self-signed cert</h2>
+
+<p>It is pretty easy to create on of these. The easiest path is probably to use the Java keytool and issue
+the following command:</p>
+
+<div>
+<pre>
+    keytool -genkey -keyalg RSA -alias selfsigned -keystore localhost-keystore.jks -storepass password -validity 365 -keysize 2048
+</pre></div>
+
+<p>where you set the name of the keystore and the password (with the -storepass flag). The validity refers to the
+number of days, so this will create a cert that is valid for a year. You would then need to fill in some prompts
+that will be given to you. This is all quite straightforward. These are all for making the CN (Common Name).
+One tip is to just hit return and use the same password for the keystore as for the cert. You can then check that
+    it worked by issuing</p>
+
+<div>
+<pre>
+    keytool -list -storepass password -keystore localhost-keystore.jks
+</pre></div>
+
+</section><section>
+<h2><a name="Setting_the_keystore_in_Tomcat."></a>Setting the keystore in Tomcat.</h2>
+
+<p>I assume you are using just Tomcat and have created a JKS (Java Keystore) that contains your cert for your server. Add an &lt;ssl&gt; block to your
+    client configuration that points to this store, so if you have something like this in the Tomcat server.xml file:</p>
+
+<div>
+<pre>
+    &lt;Connector port=&quot;9443&quot;
+               protocol=&quot;HTTP/1.1&quot;
+               SSLEnabled=&quot;true&quot;
+               maxThreads=&quot;150&quot;
+               scheme=&quot;https&quot;
+               secure=&quot;true&quot;
+               URIEncoding=&quot;UTF-8&quot;
+               keystoreFile=&quot;${user.home}/certs/localhost-keystore.jks&quot;
+               keystorePass=&quot;your_password&quot;
+               keystoreType=&quot;JKS&quot;
+               clientAuth=&quot;false&quot; sslProtocol=&quot;TLS &gt;
+</pre></div>
+
+<p>It is also possible to set a trust store here. Normally the truststore (set of trusted certs) that is the default
+one shipped with your version of Java is more than sufficient.</p>
+</section><section>
+<h2><a name="Using_the_certs_with_your_OA4MP_client"></a>Using the certs with your OA4MP client</h2>
+
+
+<p>In your client configuration you would just point to this same keystore:</p>
+
+<div>
+<pre>
+&lt;client name=&quot;your-client-config-name&quot;
+      &lt;!-- other stuff!!--&gt;
+     &gt;
+     &lt;ssl useJavaTrustStore=&quot;true&quot;&gt;
+        &lt;trustStore&gt;
+           &lt;path&gt;/home/ncsa/certs/localhost-keystore.jks&lt;/path&gt;
+           &lt;password&gt;&lt;![CDATA[your_password]]&gt;&lt;/password&gt;
+           &lt;type&gt;JKS&lt;/type&gt;
+        &lt;/trustStore&gt;
+      &lt;/ssl&gt;
+   &lt;!-- more stuff --&gt;
+&lt;/client&gt;
+</pre></div>
+
+<p>
+That should do it. I prefer to put passwords in a CDATA tag since that means you can use special characters
+and not have to worry about them. There is an older way to do this in OA4MP that is still supported
+which is inferior because the password is an attribute and this prevented many passwords from being used.
+You can also use a PKCS12 store if you have that. In that case, the type is PKCS12.
+</p>
+
+
+</section>
+
+    </div>
+</div>
+<div class="clear">
+    <hr/>
+</div>
+<div id="footer">
+    <div class="xright">&#169;    
+                    2023
+        
+                    
+    
+
+    
+        
+                        
+    
+        
+    </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+</body>
+</html>
+

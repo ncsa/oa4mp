@@ -1,0 +1,298 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+
+
+
+
+
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>OAuth for MyProxy</title>
+    <style type="text/css" media="all">
+        @import url("../../css/oa4mp-custom.css");
+        @import url("../../css/oa4mp-theme.css");
+        @import url("../../css/site.css");
+    </style>
+    <link rel="stylesheet" href="../../css/print.css" type="text/css" media="print"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    </head>
+<body class="composite">
+<div id="banner">
+                        <a href="http://www.ncsa.illinois.edu/" id="bannerLeft"  >
+        
+                                                                    <img src="../../css/images/ncsalogo_sm-2.gif" alt="NCSA"/>
+        
+                </a>
+                                    <a href="http://grid.ncsa.illinois.edu/myproxy/" id="bannerRight"  >
+        
+                                                                    <img src="../../css/images/MyProxyWide.gif" alt="MyProxy"/>
+        
+                </a>
+                <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="breadcrumbs">
+            
+    
+
+    
+        
+                        
+    
+        
+                    <div class="xleft">
+            Last Published: 2023-04-05
+                                </div>
+                <div class="xright">            
+    
+
+    
+        
+                        
+    
+        
+                         Version: 5.3-SNAPSHOT
+            </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="leftColumn">
+    <div id="navcolumn">
+                
+    
+
+    
+        
+                        
+    
+        
+                               <h5>OAuth for MyProxy</h5>
+                        <ul>
+                    
+    <li class="none">
+                        <a href="../../server/index.html">Overview</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../server/index.html">Server</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../client/index.html">Client</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../apidocs/index.html">api docs</a>
+            </li>
+              </ul>
+                            <h5>Project Documentation</h5>
+                        <ul>
+                    
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-info.html">Project Information</a>
+                        </li>
+              
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-reports.html">Project Reports</a>
+                        </li>
+              </ul>
+                                               <a href="http://maven.apache.org/" title="Built by Maven"
+           class="poweredBy">
+            <img class="poweredBy"
+                 alt="Built by Maven"
+                 src="http://maven.apache.org/images/logos/maven-feather.png"
+                 width="90"
+                 height="30"
+                 border="1"/>
+        </a>
+                           
+    
+
+    
+        
+                        
+    
+        
+        </div>
+</div>
+<div id="bodyColumn">
+    <div id="contentBox">
+        
+
+
+
+
+<section>
+<h2><a name="Signing_for_OIDC"></a>Signing for OIDC</h2>
+
+
+<p>
+    ID tokens are signed as per the <a class="externalLink" href="https://tools.ietf.org/html/rfc7517">JSON Web Key</a> specification.
+    This requires that the server supply public information about its keys so that clients may validate them.
+    The well-known page for the service will give the location of the web key file in the jwks_uri entry.
+    Generally you merely need to set this up on the server and clients will validate the signatures that
+    your server creates. The configuration entry is:
+</p>
+
+
+
+<table class="bodyTable" style="text-align: left; width: 50%;" border="1" cellspacing="2" cellpadding="2">
+    <tbody>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">Name</td>
+        
+<td style="vertical-align: top;">Required</td>
+        
+<td style="vertical-align: top;">Default</td>
+        
+<td style="vertical-align: top;"></td>
+    </tr>
+    
+<tr class="b">
+        
+<td style="vertical-align: top;">path</td>
+        
+<td style="vertical-align: top;">Y</td>
+        
+<td style="vertical-align: top;">(none)</td>
+        
+<td style="vertical-align: top;">The full path to the JSON web key file. This is probably best done within
+            CDATA tags to ensure that special characters such as blanks and slashes, are interpreted correctly.
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<p>
+    There is one  attribute and that is defaultKeyID which tells which
+    key should be used for signing. If you have a single key, then that will
+    be used as the default, otherwise you must specify the default key or there
+    will be an error at boot.
+</p>
+
+<section>
+<h3><a name="An_example_configuration"></a>An example configuration</h3>
+
+<div>
+<pre>
+&lt;service name=&quot;myInstall&quot;&gt;
+    &lt;!-- other stuff --&gt;
+    &lt;JSONWebKey
+        defaultKeyID=&quot;E80281A5CD86D1288B15A9D868586B9B&quot;&gt;
+        &lt;path&gt;/var/www/config/keys.jwks&lt;/path&gt;
+    &lt;/JSONWebKey&gt;
+&lt;/service&gt;
+</pre></div>
+
+<p>
+    This sets the path to the file keys.jwks in the given directory. This file contains
+    multiple keys, so if you do not set the defaultKeyID, an error will
+    be generated on server startup. Within that file is an entry that has a unique
+    key identifier (&quot;kid&quot;):
+</p>
+
+<div>
+<pre>
+{&quot;keys&quot;: [
+      {
+      &quot;n&quot;: &quot;AIptVWe86psnN3Vr4ovJZF0T0oBqlDMrpX2JcJ3g8UQ5NZG8Fugb5FD8aB6jXU98AS3IIi8ORCVsSb7lUvdFrHoZuOQ74rXrStIBSeXySOv_kSC4gJltMU2ld9sXUVbvLulFLSRoIttstacy8EZ8ULM5PaeNUuiVNQW5weQOWig0xuNhS_5nkn1ujarNitCWhI_RmGAdRjL3uJxahKqm2ZRvxnEO6ajFfb7j13HJuzw9bkGkDVY6LZRbPCCZq57geEwmbgjMN6F3m6CUSvbkvIgqqVzm7GEDlk8J4Jer8tavJ_lkiQ3J1q-CoYr38UFx4Q3s&quot;,
+      &quot;e&quot;: &quot;AQAB&quot;,
+      &quot;alg&quot;: &quot;RS384&quot;,
+      &quot;kid&quot;: &quot;E80281A5CD86D1288B15A9D868586B9B&quot;,
+      &quot;use&quot;: &quot;sig&quot;,
+      &quot;kty&quot;: &quot;RSA&quot;,
+      &quot;d&quot;: &quot;NuCDNB37r8iLPtynMh2D0TZzg_88hG9KyXKjhM1zZuGVNtidwbfD0oMDgrVfXEgBmMC98bEuob7H1iPl371wd9EjCOb2EVyeWHLhnoIl_y0SgmYmAj0Ki8NST2TApwUdzjUwj4SikFOdJmap5UZMUBuMfgqJtSAHixnrcDGlvh0nwt66axV5GEA6gT_gXx0V8JsGRvU5zxMVn8-0Nfeo53ao4sVqO8lwsinPgeEuDpaoTvbNtlGpw5CeYtveZpPgIgYATr6_ke8UNalax8py2zmHyswHX3CzEEuguJUfKEeHBeIyECsfRdM2z6CsDGI-a4fe-VzudYDVMUQ&quot;
+      }]
+}
+</pre></div>
+
+<p>There may be several other entries in the file which is why the key identifier is needed. In this case, every ID
+    token will
+    be signed with the RSA key using 384 bits. (Note this example should not be used anywhere. Please see the next
+    section for how
+    to generate keys properly.) Clients may request other strengths which the server may or may not honor.
+    Only the RSA signing algorithm is supported by OA4MP.</p>
+
+</section><section>
+<h3><a name="Creating_a_set_of_keys_at_the_command_line"></a>Creating a set of keys at the command line</h3>
+
+
+<p>The supplied command line tool (oa2-cli in the /opt/oa2/bin directory)
+    has the ability to create a set of key. OA4MP will support RSA signing
+    at 256, 384 and 512 bits. Using the command line tool will create keys for each of these.
+    To use this, you will need to start the tool then use keys:</p>
+
+<div>
+<pre>
+    oa2&gt;use keys
+    keys&gt;create
+      Give the file path[]:/var/www/config/keys.jwks
+      create a new set of JSON web keys?[y/n]y
+      JSONweb keys written
+      Done!
+    keys&gt;exit
+    exiting ...
+</pre></div>
+
+<p>
+    In this example, you use signing and invoke the create call. This prompts you for the full path (including
+    the file name) and then verifies that you want to create the keys. Note that if you specify an existing file,
+    you will be asked if you want to overwrite it. The resulting file will be in JSON web key format and ready for use.
+    You must specify this file for the server to use.
+</p>
+
+
+<p>You should be sure that this file is put somewhere that is not public on your system and that the permissions
+    allows tomcat to access it (usually this means at least that the grouop should be set to &quot;tomcat&quot; on unix installs.
+    It should also be read only for all access.
+</p>
+
+
+
+</section></section>
+
+    </div>
+</div>
+<div class="clear">
+    <hr/>
+</div>
+<div id="footer">
+    <div class="xright">&#169;    
+                    2023
+        
+                    
+    
+
+    
+        
+                        
+    
+        
+    </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+</body>
+</html>
+

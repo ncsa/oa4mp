@@ -1,0 +1,312 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+
+
+
+
+
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>OAuth for MyProxy</title>
+    <style type="text/css" media="all">
+        @import url("../../css/oa4mp-custom.css");
+        @import url("../../css/oa4mp-theme.css");
+        @import url("../../css/site.css");
+    </style>
+    <link rel="stylesheet" href="../../css/print.css" type="text/css" media="print"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    </head>
+<body class="composite">
+<div id="banner">
+                        <a href="http://www.ncsa.illinois.edu/" id="bannerLeft"  >
+        
+                                                                    <img src="../../css/images/ncsalogo_sm-2.gif" alt="NCSA"/>
+        
+                </a>
+                                    <a href="http://grid.ncsa.illinois.edu/myproxy/" id="bannerRight"  >
+        
+                                                                    <img src="../../css/images/MyProxyWide.gif" alt="MyProxy"/>
+        
+                </a>
+                <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="breadcrumbs">
+            
+    
+
+    
+        
+                        
+    
+        
+                    <div class="xleft">
+            Last Published: 2023-04-05
+                                </div>
+                <div class="xright">            
+    
+
+    
+        
+                        
+    
+        
+                         Version: 5.3-SNAPSHOT
+            </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="leftColumn">
+    <div id="navcolumn">
+                
+    
+
+    
+        
+                        
+    
+        
+                               <h5>OAuth for MyProxy</h5>
+                        <ul>
+                    
+    <li class="none">
+                        <a href="../../server/index.html">Overview</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../server/index.html">Server</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../client/index.html">Client</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../apidocs/index.html">api docs</a>
+            </li>
+              </ul>
+                            <h5>Project Documentation</h5>
+                        <ul>
+                    
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-info.html">Project Information</a>
+                        </li>
+              
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-reports.html">Project Reports</a>
+                        </li>
+              </ul>
+                                               <a href="http://maven.apache.org/" title="Built by Maven"
+           class="poweredBy">
+            <img class="poweredBy"
+                 alt="Built by Maven"
+                 src="http://maven.apache.org/images/logos/maven-feather.png"
+                 width="90"
+                 height="30"
+                 border="1"/>
+        </a>
+                           
+    
+
+    
+        
+                        
+    
+        
+        </div>
+</div>
+<div id="bodyColumn">
+    <div id="contentBox">
+        
+
+
+
+<section>
+<h2><a name="Scopes"></a>Scopes</h2>
+
+
+<p>Scope of this document: for clients <span style="background-color: #ff6600;">OAuth 2/OIDC</span> only.</p>
+
+
+<p> OA4MP supports the scope parameter for servers. Unfortunately, <i>scope</i>
+    has been completely overused and has acquired several meanings. Essentially, the <b>scope</b>
+    parameter is a request for so-called <i>claims</i>. In the id token, the claims
+    are simply bits of user metadata (email, first name, etc.).
+    </p>
+
+<p>
+    The id token is a JWT (JSON Web Token) which has a header (signing information),
+    payload (a base 64 encoded JSON object), and signature, plus a system
+    for verifying the signature. Historically, since this could be trusted by
+    checking with the server if it had been altered, people started using it as a type of access
+    token. That's both a good and bad idea, since it is not really designed for granting access
+    to things, but, yes, it can be verified.
+    At this point, all the tokens an OAuth 2 server could create (authorization, access, refresh)
+    started to mutate into JWTs. This is a good thing. OA4MP lets you do this, it also will
+    issue old style opaque tokens.
+</p>
+
+<p>
+    <i>A note about old style tokens in OA4MP.</i> These are unforgeable and unique (unlike many OAuth servers
+    where they are indeed just random strings). If you do not want/need JWTs for your service, there
+    is no need to have them.
+</p>
+
+<p>
+    How to request information inside these other tokens? Everyone has settled on putting these requests
+    into the scope parameter. This of course gets messy trying to keep straight what people want
+    to request, but we have to deal with that.
+    (Another attempts was to create essentially an entire request language per
+    claim in the <b>claim</b> parameter, but that turned into a mess and most servers don't support that.)
+    I am relating this history because people who are new to this often have a devil of a time figuring
+    out why the scope parameter does what it does.
+</p>
+
+</section><section>
+<h2><a name="The_basic_supported_scopes_in_OA4MP_are"></a>The basic supported scopes in OA4MP are </h2>
+
+<ul>
+    
+<li>openid - (optional) treat the request as OIDC, meaning an id token is created and at the least will
+                 contain the <i>sub</i> claim for the user.</li>
+    
+<li>email - returns the user's email address, if available.</li>
+    
+<li>profile - returns information about the user's profile</li>
+    
+<li>org.cilogon.userinfo - This returns all enabled information about the user from the service and allows
+    access to the user information endpoint. </li>
+    
+<li>edu.uiuc.ncsa.myproxy.getcert - the server returns a certificate from the getCert endpoint.
+        If the client omits this, then attempts to get
+        a certificate will be rejected. However, requests to the user info endpoint will still be processed.
+    </li>
+    
+<li>offline_access - (optional) some clients send this when requesting a refresh token. If
+    it is included, the <b>prompt</b> parameter must be set to <i>consent</i> (this is just the spec.)
+    Note that OA4MP clients are simply configured to issue refresh tokens or not,
+    so this parameter is ignored. It cannot, for instance, be used to force the server to issue refresh tokens.</li>
+</ul>
+
+
+
+</section><section>
+<h2><a name="Passing_in_scopes_in_an_OA4MP_client"></a>Passing in scopes in an OA4MP client</h2>
+
+<p>If you areusing the supplied OA4MP clients, the configuration allows you to set statically
+    which scopes are requested as follows. The top-level tag is the scopes
+    tag and that in turn contains scope tags. These scope tags contain a single scope and
+    supports a single attribute:
+</p>
+
+
+<table class="bodyTable" style="text-align: left; width: 100%;" border="1" cellspacing="2" cellpadding="2">
+    <tbody>
+    
+<tr class="a">
+         
+<td style="vertical-align: top;">Name</td>
+         
+<td style="vertical-align: top;">Required</td>
+         
+<td style="vertical-align: top;">Default</td>
+         
+<td style="vertical-align: top;">Description</td>
+     </tr>
+    
+<tr class="b">
+        
+<td style="vertical-align: top;">enabled</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;">true</td>
+        
+<td style="vertical-align: top;">Enable or disable this scope.</td>
+    </tr>
+    </tbody>
+</table>
+
+
+<p>
+    The default behavior is that no scopes are requested unless explicitly in the list.
+    Any other scopes that are specified are added to the
+    list.  Specifying a scope on the client that is unknown to a server will make the request
+    fail, unless the client has special permission (e.g. it supports SciTokens or WLCG access tokens
+    and needs to pass in scopes for those too).
+</p>
+
+<p>
+    Sometimes, it is necessary to disable a scope. For instance, a specialized instance that only issues certificates
+    against a refresh token should never return any user information. This is the purpose of the enabled flag.
+</p>
+
+<section>
+<h3><a name="Final_caveat"></a>Final caveat</h3>
+
+
+<p>The standard OA4MP client sends along only the scope parameter in the initial request. The token and token exchange
+endpoints do allow for other scope parameters to be sent, but that is not supported in the most basic client.</p>
+
+</section><section>
+<h3><a name="A_Client_Example"></a>A Client Example</h3>
+
+<div>
+<pre>
+&lt;config&gt;
+   &lt;client name=&quot;my-cfg&quot;&gt;
+    &lt;scopes&gt;
+        &lt;scope&gt;custom.scope&lt;/scope&gt;
+    &lt;/scopes&gt;
+        &lt;!-- other stuff.. --&gt;
+&lt;/config&gt;
+</pre></div>
+The client will include the custom scope in requests to the server. If this is omitted, then the scope is not added
+and whatever claims that are associated with this scope will not be made.
+
+
+</section></section>
+
+    </div>
+</div>
+<div class="clear">
+    <hr/>
+</div>
+<div id="footer">
+    <div class="xright">&#169;    
+                    2023
+        
+                    
+    
+
+    
+        
+                        
+    
+        
+    </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+</body>
+</html>
+

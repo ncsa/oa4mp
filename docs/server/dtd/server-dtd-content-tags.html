@@ -1,0 +1,334 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+
+
+
+
+
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>OAuth for MyProxy</title>
+    <style type="text/css" media="all">
+        @import url("../../css/oa4mp-custom.css");
+        @import url("../../css/oa4mp-theme.css");
+        @import url("../../css/site.css");
+    </style>
+    <link rel="stylesheet" href="../../css/print.css" type="text/css" media="print"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    </head>
+<body class="composite">
+<div id="banner">
+                        <a href="http://www.ncsa.illinois.edu/" id="bannerLeft"  >
+        
+                                                                    <img src="../../css/images/ncsalogo_sm-2.gif" alt="NCSA"/>
+        
+                </a>
+                                    <a href="http://grid.ncsa.illinois.edu/myproxy/" id="bannerRight"  >
+        
+                                                                    <img src="../../css/images/MyProxyWide.gif" alt="MyProxy"/>
+        
+                </a>
+                <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="breadcrumbs">
+            
+    
+
+    
+        
+                        
+    
+        
+                    <div class="xleft">
+            Last Published: 2023-04-05
+                                </div>
+                <div class="xright">            
+    
+
+    
+        
+                        
+    
+        
+                         Version: 5.3-SNAPSHOT
+            </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="leftColumn">
+    <div id="navcolumn">
+                
+    
+
+    
+        
+                        
+    
+        
+                               <h5>OAuth for MyProxy</h5>
+                        <ul>
+                    
+    <li class="none">
+                        <a href="../../server/index.html">Overview</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../server/index.html">Server</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../client/index.html">Client</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../apidocs/index.html">api docs</a>
+            </li>
+              </ul>
+                            <h5>Project Documentation</h5>
+                        <ul>
+                    
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-info.html">Project Information</a>
+                        </li>
+              
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-reports.html">Project Reports</a>
+                        </li>
+              </ul>
+                                               <a href="http://maven.apache.org/" title="Built by Maven"
+           class="poweredBy">
+            <img class="poweredBy"
+                 alt="Built by Maven"
+                 src="http://maven.apache.org/images/logos/maven-feather.png"
+                 width="90"
+                 height="30"
+                 border="1"/>
+        </a>
+                           
+    
+
+    
+        
+                        
+    
+        
+        </div>
+</div>
+<div id="bodyColumn">
+    <div id="contentBox">
+        
+
+
+
+
+<section>
+<h2><a name="Content_Tags."></a>Content Tags.</h2>
+
+<p>The content tags (these are <b>not</b> attributes to a tag) specify what is retained
+    in a store. These are</p>
+
+<table class="bodyTable" style="text-align: left; width: 1148px; height: 165px;" border="1" cellspacing="2" cellpadding="2">
+    <tbody>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">Name</td>
+        
+<td style="vertical-align: top;">Description</td>
+        
+<td style="vertical-align: top;">Tag</td>
+    </tr>
+    
+<tr class="b">
+        
+<td style="vertical-align: top;">adminClients</td>
+        
+<td style="vertical-align: top;">Administrative client store. If the client management endpoint is active, you must have one of these.</td>
+        
+<td style="vertical-align: top;">&lt;adminClients/&gt;</td>
+    </tr>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">client</td>
+        
+<td style="vertical-align: top;">Registered clients that the service knows about. These should be persisted</td>
+        
+<td style="vertical-align: top;">&lt;clients/&gt;</td>
+    </tr>
+    
+<tr class="b">
+        
+<td style="vertical-align: top;">clientApprovals</td>
+        
+<td style="vertical-align: top;">Approvals for clients. These should be persisted.</td>
+        
+<td style="vertical-align: top;">&lt;clientApprovals/&gt;</td>
+    </tr>
+
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">permissions</td>
+        
+<td style="vertical-align: top;">Various permissions, such as  admin clients have granted to clients they have created or
+            are granted to admin clients by the system.</td>
+        
+<td style="vertical-align: top;">&lt;permissions/&gt;</td>
+    </tr>
+    
+<tr class="b">
+        
+<td style="vertical-align: top;">transactions</td>
+        
+<td style="vertical-align: top;">Transactions that are pending. These are generally short-lived and should not
+            be persisted for extended periods.
+        </td>
+        
+<td style="vertical-align: top;">&lt;transactions/&gt;</td>
+    </tr>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">txStore</td>
+        
+<td style="vertical-align: top;"><b>T</b>oken e<b>X</b>change token store. Every token that is exchanged is stored here.
+        If you have enabled the token exchange endpoint, you must specify a txStore.</td>
+        
+<td style="vertical-align: top;">&lt;txStore/&gt;</td>
+    </tr>
+    
+<tr class="b">
+        
+        
+<td style="vertical-align: top;">voStore</td>
+        
+<td style="vertical-align: top;"><b>V</b>irtual <b>O</b>rganiztion store. Virtual organizations are now
+        available. These allow an admin to create and manage a separate set of issuers etc.
+        for a given group of users.</td>
+        
+<td style="vertical-align: top;">&lt;voStore/&gt;</td>
+    </tr>
+    </tbody>
+</table>
+
+<p>There is one optional attribute associated with any content tag and this is &quot;tablename&quot;. In cases where the
+    underlying store is an SQL store, you may use this to specify the table name, overriding the default. This attribute
+    is ignored by other stores.</p>
+
+</section><section>
+<h2><a name="Database_scripts"></a>Database scripts</h2>
+
+<p>These are stored in github on the release page. If you are going to set up database support, then you need to set
+up your database(s) accordingly. OA4MP is happy having several store sources, but only one store is active (so you can have
+a few file stores, mysql and postgres instances but only a single client store, single transactions store, etc. </p>
+
+<ul>
+    
+<li><a class="externalLink" href="https://github.com/ncsa/OA4MP/releases/download/5.3-SNAPSHOT/oauth2-mariadb.sql">maria DB</a></li>
+    
+<li><a class="externalLink" href="https://github.com/ncsa/OA4MP/releases/download/5.3-SNAPSHOT/oauth2-mysql.sql">mysql</a></li>
+    
+<li><a class="externalLink" href="https://github.com/ncsa/OA4MP/releases/download/5.3-SNAPSHOT/oauth2-pg.sql">postges</a></li>
+</ul>
+
+<p>If you are using CILogon (which is an extension of OA4MP that has user support, among other things) then
+the corresponding scripts are at</p>
+
+<ul>
+    
+<li><a class="externalLink" href="https://github.com/cilogon/cilogon-java/releases/download/5.3-SNAPSHOT/cilogon-oa2-mariadb.sql">maria DB</a></li>
+    
+<li><a class="externalLink" href="https://github.com/cilogon/cilogon-java/releases/download/5.3-SNAPSHOT/cilogon-oa2-mysql.sql">mysql</a></li>
+    
+<li><a class="externalLink" href="https://github.com/cilogon/cilogon-java/releases/download/5.3-SNAPSHOT/cilogon-oa2-postgres.sql">postgres</a></li>
+</ul>
+
+<p>It is highly advisable that you carefully read what is there. These scripts are mostly ready to install but do
+need some configuration and set up (such as installation of the database(s), creating users that will access the databases, etc.)</p>
+<section>
+<h3><a name="Example_1."></a>Example 1.</h3>
+
+
+<p>This puts the client approvals in a <a href="../../configuration/file-store.html">file store</a></p>
+
+<div>
+<pre>
+&lt;config&gt;
+   &lt;service address=&quot;localhost&quot;&gt;
+      &lt;fileStore path=&quot;/var/www/store&quot;&gt;
+         &lt;clientApprovals/&gt;
+      &lt;/fileStore&gt;
+   &lt;/service&gt;
+&lt;/config&gt;
+</pre></div>
+</section><section>
+<h3><a name="Example_2."></a>Example 2.</h3>
+
+
+<p>Specifying the table name:</p>
+
+<div>
+<pre>
+&lt;service name=&quot;postgres-config&quot;
+         disableDefaultStores=&quot;true&quot;&gt;
+    &lt;postgresql username=&quot;bob&quot; password=&quot;mairzydoats&quot;  schema=&quot;math&quot; database=&quot;oa4mp&quot;&gt;
+       &lt;transactions tablename=&quot;transaction2&quot;/&gt;
+       &lt;clients tablename=&quot;gateways&quot;/&gt;
+       &lt;clientApprovals/&gt;
+    &lt;/postgresql&gt;
+    &lt;!-- other stuff --&gt;
+&lt;/service&gt;
+</pre></div>
+
+<p>In this example, the default stores are disabled, so if there is some issue with the database configuration, memory
+    stores won't be used, but starting the server will fail. Two of the tables have been created by the administrator
+    with names different than in the default setup.</p>
+
+
+</section></section>
+
+    </div>
+</div>
+<div class="clear">
+    <hr/>
+</div>
+<div id="footer">
+    <div class="xright">&#169;    
+                    2023
+        
+                    
+    
+
+    
+        
+                        
+    
+        
+    </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+</body>
+</html>
+

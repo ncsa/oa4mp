@@ -1,0 +1,283 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+
+
+
+
+
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>OAuth for MyProxy</title>
+    <style type="text/css" media="all">
+        @import url("../../css/oa4mp-custom.css");
+        @import url("../../css/oa4mp-theme.css");
+        @import url("../../css/site.css");
+    </style>
+    <link rel="stylesheet" href="../../css/print.css" type="text/css" media="print"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    </head>
+<body class="composite">
+<div id="banner">
+                        <a href="http://www.ncsa.illinois.edu/" id="bannerLeft"  >
+        
+                                                                    <img src="../../css/images/ncsalogo_sm-2.gif" alt="NCSA"/>
+        
+                </a>
+                                    <a href="http://grid.ncsa.illinois.edu/myproxy/" id="bannerRight"  >
+        
+                                                                    <img src="../../css/images/MyProxyWide.gif" alt="MyProxy"/>
+        
+                </a>
+                <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="breadcrumbs">
+            
+    
+
+    
+        
+                        
+    
+        
+                    <div class="xleft">
+            Last Published: 2023-04-05
+                                </div>
+                <div class="xright">            
+    
+
+    
+        
+                        
+    
+        
+                         Version: 5.3-SNAPSHOT
+            </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="leftColumn">
+    <div id="navcolumn">
+                
+    
+
+    
+        
+                        
+    
+        
+                               <h5>OAuth for MyProxy</h5>
+                        <ul>
+                    
+    <li class="none">
+                        <a href="../../server/index.html">Overview</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../server/index.html">Server</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../client/index.html">Client</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../apidocs/index.html">api docs</a>
+            </li>
+              </ul>
+                            <h5>Project Documentation</h5>
+                        <ul>
+                    
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-info.html">Project Information</a>
+                        </li>
+              
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-reports.html">Project Reports</a>
+                        </li>
+              </ul>
+                                               <a href="http://maven.apache.org/" title="Built by Maven"
+           class="poweredBy">
+            <img class="poweredBy"
+                 alt="Built by Maven"
+                 src="http://maven.apache.org/images/logos/maven-feather.png"
+                 width="90"
+                 height="30"
+                 border="1"/>
+        </a>
+                           
+    
+
+    
+        
+                        
+    
+        
+        </div>
+</div>
+<div id="bodyColumn">
+    <div id="contentBox">
+        
+
+
+
+
+<section>
+<h2><a name="Introduction"></a>Introduction</h2>
+
+<p>
+   The authorization module for OA4MP can be replaced by various means, such as using Tomcat's built in
+    management. However, this means that you will need to have separate logins that you manage for each
+    user. Another option is using a <i>proxy</i> service. This is an OIDC service that allows for logins.
+    Your OA4MP can simply forward all requested scopes to that service (including the device flow) and use the
+    service, allowing your users to effectively log in there. In short, it allows some other service to
+    do all your user management.
+</p>
+
+</section><section>
+<h2><a name="How_does_this_do_it.3F"></a>How does this do it?</h2>
+
+<p>
+    You need to register a client with the proxy service (henceforth known as <b>the proxy</b>), then enable
+    using proxies in your server configuration (see below). Since the service is a client of the proxy,
+    you need to enable the callback servlet and register that as the callback.
+</p>
+
+<section>
+<h3><a name="Configuring_the_server"></a>Configuring the server</h3>
+<section>
+<h4><a name="The_Tomcat_deployment_descriptor_.28web.xml.29"></a>The Tomcat deployment descriptor (web.xml)</h4>
+
+<p>
+    There is an included web.xml file, called <b>proxy.xml</b> that has a complete setup.
+    Copy that over your web.xml file. The major point is that it enables the
+    callback servlet (with endpoint <b>ready</b>) at
+</p>
+
+<div>
+<pre>/oauth2/ready</pre></div>
+
+<p>and when you are registering your client with the proxy, you need to set this callback to </p>
+
+<div>
+<pre>https://host:port/oauth2/ready</pre></div>
+
+<p>in a standard install. Key points are that https should be available, and that your server
+    should be at host:port. The proxy must be able to contact your callback endpoint securely,
+    so self-signed certs hould be avoided unless you have a specific agreement with the proxy.</p>
+
+</section><section>
+<h4><a name="The_server_configuration_proper"></a>The server configuration proper</h4>
+
+<p>
+    You need to have using the proxy enabled within the <b>authorizationServlet</b>
+    tag and set the configuration file as well as the name of the configuration for the client.
+    Remember that this file is the configuration for a complete OAuth 2 client. If you need to,
+    read up on the <a class="externalLink" href="https://cilogon.github.io/oa4mp/client/configuration/index.html">client configuration</a>
+    file syntax. A very typical entry in the server configuration file would be
+</p>
+
+<div>
+<pre>
+    &lt;authorizationServlet useProxy=&quot;true&quot;
+                          cfgFile=&quot;/opt/oa4mp/etc/client.xml&quot;
+                          cfgName=&quot;cilogon-proxy&quot;
+                        /&gt;
+</pre></div>
+
+</section></section></section><section>
+<h2><a name="Using_the_results"></a>Using the results</h2>
+
+<p>
+    When your service contacts the proxy, a complete exchange is done including getting any
+    claims from the proxy. This means that these are available for your service to harvest.
+    The system will always set the subject to the subject returned by the proxy. You may
+    configure a list of other claims from the proxy to be returned. This is done in the
+    proxy_claims_list property of the client. The options there are
+</p>
+
+<ul>
+    
+<li>* = (an asterisk) pass along all claims</li>
+    
+<li>[claim0,claim1,...] = list of specific claims. Note that putting * in this list
+    will simply return all claims.<b>except</b> audience, issuer, issued at, expiration
+    because these must come from the current server, not the proxy (or any consumer of the
+    id token must reject it.)</li>
+</ul>
+
+<p>
+    So if the proxy returns the following claims
+</p>
+
+<div>
+<pre>
+    {&quot;sub&quot;:&quot;user_123&quot;,
+     &quot;idp&quot;:&quot;https:shibboleth.big_state.edu&quot;,
+     &quot;is_member_of&quot;:[&quot;admin&quot;,&quot;all-users&quot;,&quot;admin-phys&quot;]
+    }
+</pre></div>
+
+<p>
+    Then at the least the server returns the &quot;sub&quot; claim. If you set the client's
+    proxy_claims_list
+    to do so, you may also return the idp or is_member_of claim.  If you set
+    the proxy_claims_list to be &quot;*&quot; then all relevant the claims will be passed along.
+</p>
+
+</section><section>
+<h2><a name="Configuring_your_clients"></a>Configuring your clients</h2>
+
+<p>Each client may be configured to request specific scopes from the proxy. These are in the
+attribute <b>proxy_request_scopes</b>. An empty list means to request no scopes. A list
+that contains an asterisk (&quot;*&quot;) means to request all configured scopes. If there is an
+asterisk anywhere on the list, all are requested. It is also possible that the client
+should simply forward scopes in the user request. In that case, set the attribute
+<b>forward_scopes_to_proxy</b> to true. If this flag is true, then any list of scopes
+you have will be ignored.</p>
+
+</section>
+
+    </div>
+</div>
+<div class="clear">
+    <hr/>
+</div>
+<div id="footer">
+    <div class="xright">&#169;    
+                    2023
+        
+                    
+    
+
+    
+        
+                        
+    
+        
+    </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+</body>
+</html>
+

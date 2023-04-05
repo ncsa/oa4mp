@@ -1,0 +1,274 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+
+
+
+
+
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>OAuth for MyProxy</title>
+    <style type="text/css" media="all">
+        @import url("../../css/oa4mp-custom.css");
+        @import url("../../css/oa4mp-theme.css");
+        @import url("../../css/site.css");
+    </style>
+    <link rel="stylesheet" href="../../css/print.css" type="text/css" media="print"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    </head>
+<body class="composite">
+<div id="banner">
+                        <a href="http://www.ncsa.illinois.edu/" id="bannerLeft"  >
+        
+                                                                    <img src="../../css/images/ncsalogo_sm-2.gif" alt="NCSA"/>
+        
+                </a>
+                                    <a href="http://grid.ncsa.illinois.edu/myproxy/" id="bannerRight"  >
+        
+                                                                    <img src="../../css/images/MyProxyWide.gif" alt="MyProxy"/>
+        
+                </a>
+                <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="breadcrumbs">
+            
+    
+
+    
+        
+                        
+    
+        
+                    <div class="xleft">
+            Last Published: 2023-04-05
+                                </div>
+                <div class="xright">            
+    
+
+    
+        
+                        
+    
+        
+                         Version: 5.3-SNAPSHOT
+            </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="leftColumn">
+    <div id="navcolumn">
+                
+    
+
+    
+        
+                        
+    
+        
+                               <h5>OAuth for MyProxy</h5>
+                        <ul>
+                    
+    <li class="none">
+                        <a href="../../server/index.html">Overview</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../server/index.html">Server</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../client/index.html">Client</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../apidocs/index.html">api docs</a>
+            </li>
+              </ul>
+                            <h5>Project Documentation</h5>
+                        <ul>
+                    
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-info.html">Project Information</a>
+                        </li>
+              
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-reports.html">Project Reports</a>
+                        </li>
+              </ul>
+                                               <a href="http://maven.apache.org/" title="Built by Maven"
+           class="poweredBy">
+            <img class="poweredBy"
+                 alt="Built by Maven"
+                 src="http://maven.apache.org/images/logos/maven-feather.png"
+                 width="90"
+                 height="30"
+                 border="1"/>
+        </a>
+                           
+    
+
+    
+        
+                        
+    
+        
+        </div>
+</div>
+<div id="bodyColumn">
+    <div id="contentBox">
+        
+
+
+
+
+<section>
+<h2><a name="Username_Transformations"></a>Username Transformations</h2>
+
+As of version 1.1.1, OA4MP has a facility for transforming the username sent to
+the MyProxy server. This functionality is similar for the OAuth 2.0 version as well.
+This is a special
+feature that is only needed in specific cases, such as in a Shibboleth environment. What happens
+is that immediately before the call to a MyProxy server, a single method is invoked (which you write)
+that takes the HTTP request and the current username. The returned value is the username which will
+be sent to MyProxy. In the case of Shibboleth, the username will also contain information from the headers.
+
+
+<section>
+<h3><a name="Configuration"></a>Configuration</h3>
+In order to use your class, you must extend the class loader and point your
+installation to that. This consists of four steps.
+
+
+<ol style="list-style-type: decimal">
+    
+<li><i>Either</i> implement the <a href="../../apidocs/edu/uiuc/ncsa/security/servlet/UsernameTransformer.html">UsernameTransformer</a>
+    interface, or extend the <a href="../../apidocs/edu/uiuc/ncsa/security/servlet/TrivialUsernameTransformer.html">TrivialUsernameTransformer</a></li>
+    
+<li>Extend <a href="../../apidocs/edu/uiuc/ncsa/myproxy/oa4mp/loader/OA4MPConfigurationLoader.html">OA4MPConfigurationLoader</a>
+    and override <a href="../../apidocs/edu/uiuc/ncsa/myproxy/oa4mp/server/servlet/ServerConfigurationLoader.html#createInstance">createInstance</a>,
+    e.g.
+    
+<div>
+<pre>
+        public class MyLoader&lt;T extends ServiceEnvironmentImpl&gt; extends OA4MPConfigurationLoader&lt;T&gt;{
+            public MyLoader(ConfigurationNode node){
+                 super.node();
+            }
+
+             @Override
+             public T createInstance(){
+                T = super.createInstance();
+                MyTransformer mine; // Say your implementation is called MyTransformer
+                // create your transformer
+                t.setUsernameTransfomer(mine);
+                return T;
+             }
+        }
+    </pre></div></li>
+    
+<li>Extend the <a href="../../apidocs/edu/uiuc/ncsa/myproxy/oa4mp/loader/OA4MPBootstrapper.html">OA4MPBootstrapper</a>
+        to point to this, e.g.:
+    
+<div>
+<pre>
+        public class MyBootstrapper extends OA4MPBootstrapper{
+        @Override
+          public ConfigurationLoader getConfigurationLoader(ConfigurationNode node) throws MyConfigurationException {
+              return new MyLoader(node);
+          }
+        }
+    </pre></div></li>
+    
+<li>In your web.xml file, Point Tomcat at your bootstrapper:
+    
+<div>
+<pre>
+        &lt;listener&gt;
+           &lt;listener-class&gt;path.to.MyBootstrapper&lt;/listener-class&gt;
+        &lt;/listener&gt;
+    </pre></div>
+    </li>
+</ol>
+
+It was decided to put this in the service environment rather than have some on-the-fly class loading system, since
+you then may have a considerably more complex class if needed (e.g. one that might have to farm out processes to
+the operating system at certain points).
+
+
+</section></section><section>
+<h2><a name="Maven_Dependencies"></a>Maven Dependencies</h2>
+This section discusses what maven dependencies you need and what your project should ultimately look like.
+First and foremost, the dependencies that are required to roll a version of OA4MP are
+
+<div>
+<pre>
+    &lt;dependency&gt;
+              &lt;groupId&gt;edu.uiuc.ncsa.myproxy&lt;/groupId&gt;
+              &lt;artifactId&gt;oa4mp-webapp&lt;/artifactId&gt;
+              &lt;version&gt;4.3&lt;/version&gt;
+              &lt;type&gt;war&lt;/type&gt;
+              &lt;scope&gt;runtime&lt;/scope&gt;
+          &lt;/dependency&gt;
+          &lt;dependency&gt;
+              &lt;groupId&gt;edu.uiuc.ncsa.myproxy&lt;/groupId&gt;
+              &lt;artifactId&gt;oa4mp-server-api&lt;/artifactId&gt;
+              &lt;version&gt;4.3&lt;/version&gt;
+          &lt;/dependency&gt;
+</pre></div>
+
+<ul>
+    
+<li>oa4mp-webapp contains the JSP needed for the server.</li>
+    
+<li>oa4mp-server-api contains the actual java code.</li>
+</ul>
+Write your code and all you need is this in your maven pom.xml and a web.xml file in your src/main/java/webapps/WEB-INF
+directory.
+
+
+</section>
+
+    </div>
+</div>
+<div class="clear">
+    <hr/>
+</div>
+<div id="footer">
+    <div class="xright">&#169;    
+                    2023
+        
+                    
+    
+
+    
+        
+                        
+    
+        
+    </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+</body>
+</html>
+

@@ -1,0 +1,982 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+
+
+
+
+
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>OAuth for MyProxy</title>
+    <style type="text/css" media="all">
+        @import url("../../css/oa4mp-custom.css");
+        @import url("../../css/oa4mp-theme.css");
+        @import url("../../css/site.css");
+    </style>
+    <link rel="stylesheet" href="../../css/print.css" type="text/css" media="print"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    </head>
+<body class="composite">
+<div id="banner">
+                        <a href="http://www.ncsa.illinois.edu/" id="bannerLeft"  >
+        
+                                                                    <img src="../../css/images/ncsalogo_sm-2.gif" alt="NCSA"/>
+        
+                </a>
+                                    <a href="http://grid.ncsa.illinois.edu/myproxy/" id="bannerRight"  >
+        
+                                                                    <img src="../../css/images/MyProxyWide.gif" alt="MyProxy"/>
+        
+                </a>
+                <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="breadcrumbs">
+            
+    
+
+    
+        
+                        
+    
+        
+                    <div class="xleft">
+            Last Published: 2023-04-05
+                                </div>
+                <div class="xright">            
+    
+
+    
+        
+                        
+    
+        
+                         Version: 5.3-SNAPSHOT
+            </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="leftColumn">
+    <div id="navcolumn">
+                
+    
+
+    
+        
+                        
+    
+        
+                               <h5>OAuth for MyProxy</h5>
+                        <ul>
+                    
+    <li class="none">
+                        <a href="../../server/index.html">Overview</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../server/index.html">Server</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../client/index.html">Client</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../apidocs/index.html">api docs</a>
+            </li>
+              </ul>
+                            <h5>Project Documentation</h5>
+                        <ul>
+                    
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-info.html">Project Information</a>
+                        </li>
+              
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-reports.html">Project Reports</a>
+                        </li>
+              </ul>
+                                               <a href="http://maven.apache.org/" title="Built by Maven"
+           class="poweredBy">
+            <img class="poweredBy"
+                 alt="Built by Maven"
+                 src="http://maven.apache.org/images/logos/maven-feather.png"
+                 width="90"
+                 height="30"
+                 border="1"/>
+        </a>
+                           
+    
+
+    
+        
+                        
+    
+        
+        </div>
+</div>
+<div id="bodyColumn">
+    <div id="contentBox">
+        
+
+
+
+<h1>Command line tools for OA4MP</h1>
+
+These are a set of programs that are accessible from a CLI
+(command line interface)  allow
+an administrator to do CRUD (Create, Read, Update and Delete) operations on client
+records and approvals. There is also the option to copy a store completely from one
+store to another.
+
+<section>
+<h2><a name="Getting_the_tools"></a>Getting the tools</h2>
+
+
+<p>The latest version of the Oauth 2.0 command line tool is available at
+<a class="externalLink" href="https://github.com/ncsa/OA4MP/releases/latest/oa2-cli.jar">oa2-cli.jar</a>
+You should also get the script that runs this too,
+<a class="externalLink" href="https://github.com/ncsa/OA4MP/releases/latest/oa2-cli">oa2-cli</a>
+</p>
+</section><section>
+<h2><a name="Configuration"></a>Configuration</h2>
+The tool uses a standard configuration file exactly like the server. Indeed, you can just
+point the tool at the server configuration file. You will need to supply the name of
+the configuration in the file you want to use. Aliases can be quite handy here. Given the abilities of
+the CLI to do quick copies of the store, it pays to have a backup (file) store configured and
+occasionally simple copy the active store to that. There are many possible uses. It is assumed that
+the tools are installed in a location called $OA4MP_HOME. Normally the default for this is
+<br /><br />
+OAuth 1.0a: OA4MP_HOME=/opt/oa4mp
+<br /><br />
+OAuth 2.0: OA4MP_HOME=opt/oa2
+
+<b>Note that we will be discussing the OA4MP tools rather than the OA2 tools in what follows.
+    Everything here works the same if you replace oa4mp-* by oa2-*</b>
+
+<p>The assumption of the script is that files are in the following directory structure</p>
+
+<ul>
+    
+<li>$OA4MP_HOME/etc/admin-cfg.xml - the configuration file</li>
+    
+<li>$OA4MP_HOME/lib/oa4mp-cli.jar - the jar containing the CLI</li>
+    
+<li>$OA4MP_HOME/bin/oa4mp-cli - the script for running this. Be sure it is set to be executable.</li>
+</ul>
+The default name of the configuration is assumed to be &quot;default&quot; (no quotes). If you invoke the script with
+no arguments it will use this and the above configuration file.
+
+</section><section>
+<h2><a name="Running_the_CLI"></a>Running the CLI</h2>
+Invocation from the command line is usually done with the supplied shell script, oa4mp-cli. The
+invocation syntax is <br />
+
+
+<div>
+<pre>oa4mp-cli [configName configFile]</pre></div>
+
+You should run this as root and might need to set the script to be
+executable if it is not. If you give neither arguments then defaults are used. Invoke with the argument  &quot;--help&quot;
+for more information. If you give one argument it is assumed to be the configuration name
+in the default configuration file.
+</section><section>
+<h2><a name="Command_line_options_for_the_jar."></a>Command line options for the jar.</h2>
+You should run this from the script, but if you want or need to specify
+invoke the jar directly, the invocation options they are listed here.
+
+<table class="bodyTable" style="text-align: left; width: 1157px; height: 165px;" border="1" cellspacing="2" cellpadding="2">
+    <tbody>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">Argument</td>
+        
+<td style="vertical-align: top;">Value required?</td>
+        
+<td style="vertical-align: top;">Required?</td>
+        
+<td style="vertical-align: top;">Description</td>
+    </tr>
+    
+<tr class="b">
+        
+<td style="vertical-align: top;">-cfg</td>
+        
+<td style="vertical-align: top;">Y</td>
+        
+<td style="vertical-align: top;">Y</td>
+        
+<td style="vertical-align: top;">The full path to the configuration file.</td>
+    </tr>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">-name</td>
+        
+<td style="vertical-align: top;">F</td>
+        
+<td style="vertical-align: top;">F</td>
+        
+<td style="vertical-align: top;">The name of the configuration within the file. If there is a single configuration
+            in the file, then no name is needed. If there are multiple configurations you must specify which one to use. </td>
+    </tr>
+    
+<tr class="b">
+        
+<td style="vertical-align: top;">-log</td>
+        
+<td style="vertical-align: top;">F</td>
+        
+<td style="vertical-align: top;">F</td>
+        
+<td style="vertical-align: top;">The full path log file. If this is not specified then a file named &quot;log.xml&quot;
+        is dumped into the invocation directory.</td>
+    </tr>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">-use</td>
+        
+<td style="vertical-align: top;">F</td>
+        
+<td style="vertical-align: top;">F</td>
+        
+<td style="vertical-align: top;">Specify the component to use. Rather than loading the whole CLI then <b>use</b>-ing
+        a components (such as clients) you may simply specify that here.</td>
+    </tr>
+    
+<tr class="b">
+        
+<td style="vertical-align: top;">-v</td>
+        
+<td style="vertical-align: top;">F</td>
+        
+<td style="vertical-align: top;">F</td>
+        
+<td style="vertical-align: top;">No argument. Turns on verbose logging so that much more information is dumped
+        onto the console. This is useful for debugging or just if you want to see what it is up to.</td>
+    </tr>
+</tbody>
+</table>
+
+<div>
+<pre>
+    java -jar oa4mp-cli.jar -cfg /path/to/cfg.xml -name myConfig -log /path/to/mylog.xml -use approvals
+</pre></div>
+This would load the configuration named &quot;myConfig&quot; from the given file, write the log to a file called
+&quot;mylog.xml&quot; and bring up the approvals component.
+
+</section><section>
+<h2><a name="Help.21"></a>Help!</h2>
+
+<p>For every command you may add the switch --help and you will get
+the most up to date information on the topic available. The interactive help (as it
+is called) is always up to date. E.g. if you are using transactions and want to
+view the help for the <b>ls</b> command:</p>
+
+<div>
+<pre>
+    transactions&gt; ls --help
+    ls [-l  | -v | -E] | [-key key | -keys array] id
+      Usage: Lists information about the contents of the store, an entry and
+         individual values of the entry.
+      When listing multiple entries, tools will use the most numbers from the most recent call to this.
+      A line listing is tabular and will shorten entries that are too long, ending them with ...
+      A verbose command will format every bit of every entry within the margins.
+      Note: The argument idiom '-key key_name' may be replaced with '&gt;key_name' as a shorthand
+    E.g.
+      ls -l  -E
+      Prints out the line form of *every* object in this store. This may be simply huge
+    E.g.
+      ls
+      Prints out the short form of *every* object in this store. This may also be huge.
+      If you are using this to find things, you probably want to look at the search command
+    E.g.
+      ls -l  /foo:bar
+      Prints a line format for the entry with id foo:bar
+    E.g.
+      ls -v /foo:bar
+      prints out a verbose listing of the entry with id foo:bar.
+    E.g.
+      ls -key id /foo:bar
+      &gt;   foo:bar
+      Prints out the id property for the object with identifier foo:bar
+
+      You may also supply a list of keys in an array of the form [key0,key1,...].
+    E.g.
+      ls -keys [id,callback_uris,create_ts] /foo:bar
+      would print the id, callback_uri and create_ts properties for the object with id
+      foo:bar.
+
+  See also list_keys, search, archive
+    For transaction stores, you may also specify listing by using the access token or refresh token:
+    ls [-at | -rt token]
+    Note that other switches, such as -v work as well.
+</pre></div>
+
+<p>
+    You see that this contains the command line switches, various examples, specific switchs (<b>-at</b>)
+    only found in the transactions component and a <i>See also</i> block the point you at related
+    or useful other commands.
+</p>
+
+</section><section>
+<h2><a name="Meta_commands"></a>Meta commands</h2>
+
+<p>There are commands to do tasks and there are <i>meta-commands</i> that control how the
+CLI itself operates. These are prefixed with a backslash <b>/</b>. E.g. to quit a component,
+issue</p>
+
+<div>
+<pre>/q</pre></div>
+
+<p>A full listing of meta commands is done with the ?:</p>
+
+<div>
+<pre>/?</pre></div>
+
+<p>Extremely use meta-commands are a command history, executing a command in another component
+with out switching from the current one, saving you command history (useful if you want
+to use a set of commands as a basis for some scripting). To list the commands available for
+the admin component, you would issue</p>
+
+<div>
+<pre>
+admin&gt;/commands
+    approve          copy             deserialize      get_id           ls               rm               set_env          status_search
+    approver_search  count_clients    echo             link             print_env        rs               set_id           unlink
+     .
+     . (more commands)
+     .
+</pre></div>
+<section>
+<h3><a name="An_example_of_using_the_.2F.2F_command"></a>An example of using the // command</h3>
+
+<p>One specific meta command that is quite useful is the <b>//</b> which will execute a
+command for another component.For example, if you are working with transactions
+and want to check how many there are then see how many token exchanges there are,
+you would do this:</p>
+
+<div>
+<pre>
+    transactions&gt;size
+        Current store has 10 entries (excluding versions).
+    transactions&gt;//tokens size
+        Current store has 3 entries (excluding versions).
+</pre></div>
+
+<p>Here the <b>//</b> tells the CLI to take the token component then the rest of the line
+(in this case just the size command) is passed to the component. Note that no argument
+will just change to that component and exiting it will return to you the original component.</p>
+
+</section></section><section>
+<h2><a name="Running_the_tool"></a>Running the tool</h2>
+The CLI consists of utilities for each component that can be used. Once invoked you will see
+the startup banner and prompt:
+
+<div>
+<pre>
+[mybox bin]# ./oa4mp-cli
+**********************************************************
+* OA4MP CLI (Command Line Interpreter)                   *
+* Version 5.3-SNAPSHOT                                          *
+* By Jeff Gaynor  NCSA                                   *
+*  (National Center for Supercomputing Applications)     *
+*                                                        *
+* type 'help' for a list of commands                     *
+*      'exit' or 'quit' to end this session.             *
+**********************************************************
+oa2&gt;
+</pre></div>
+If you type &quot;--help&quot; You will get
+
+<div>
+<pre>
+oa2&gt;--help
+
+Here are the commands available:
+use
+load
+To get more information on a command type
+
+command --help
+</pre></div>
+Basic supported commands are
+
+<ul>
+  
+<li>use - specify a component to use.</li>
+    
+<li>load configName [configFile] - load the given named configuration from the current config file. Specify the config file
+    if you need a different one. </li>
+</ul>
+
+To see the help for, say, the use command you would issue
+
+<div>
+<pre>
+   oa2&gt;use --help
+    Choose the component you wish to use.
+    you specify the component as use + name. Supported components are
+    clients - edit client records
+    approvals - edit client approval records
+    copy - copy an entire store.
+    keys - create a set of signing keys.
+    permissions - basic permission management.
+    admins - create or manage administrative clients.
+    parser - write/debug scripts from the command line.
+    tokens - manage tokens created in the token exchange endpoint
+    vo - manage virtual organizations
+ e.g.
+
+ use clients
+
+ will call up the client management component.
+ Type 'exit' or /q when you wish to exit the component and return to the main menu
+ --&gt; and /h prints your command history, /r runs the last command
+</pre></div>
+
+Each of these components; <a href="cli.html#clients">clients</a>,
+<a href="cli.html#approvals">approvals</a>
+and <a href="cli.html#copy">copy</a> is described in detail below. But first, a few preliminary notions.
+
+</section><section>
+<h2><a name="Index_vs._Unique_ID"></a>Index vs. Unique ID</h2>
+Since most objects have unique identifiers, you can specify these are arguments at any time it makes
+sense to do so by prefixing the id with a forward slash, &quot;/&quot;. If there is a list of objects, you can also specify
+the index on the list as the target of the operation. The <b>ls</b> command will  list everything in the
+active component.
+
+<p>
+After you issue an ls (no arguments) you will
+see a complete list of items in the store. These are numbered on the right hand side. This is the
+item's <b>index</b>. You may then specify the index directly. E.g. to print out a long version of the item
+with index 4 issue<br /><br />
+ls 4
+<br /><br />
+Typically you will know the unique identifier for an item and you can enter this if you escape it with a forward
+slash (/). To give the long listing of an object with unique identifier myproxy:oa4mp,2012:/client/a4b78549990
+you would issue<br /><br />
+ls /myproxy:oa4mp,2012:/client/a4b78549990
+<br /><br />
+Note that since there is no canonical ordering of objects in a store, you should always issue an
+ls before using the index. It is generally always safer to use the unique identifier.
+
+</p>
+<section>
+<h3><a name="Setting_a_default_id"></a>Setting a default id</h3>
+
+<p>If you are working on a single item in the store, you may sinple set a default id to be used for all
+operations with the </p>
+
+<div>
+<pre>
+    set_id id
+</pre></div>
+
+<p>command. Related is the <b>get_id</b> to display the current id and the <b>clear_id</b>
+to clear it. If you have an default id set, you do not need to specify one.</p>
+
+<div>
+<pre>
+    oa2&gt;set_id foo:bar/34456
+    oa2&gt;ls -l
+  name : My test thing
+    id : foo:bar/34456
+</pre></div>
+
+<p>In this case, the details (long form) for the listing of the object are displayed. Had you issued</p>
+
+<div>
+<pre>
+    ls -l /fnord:46456
+</pre></div>
+
+<p>The long form for this object would be displayed, since the final argument overrides the default. </p>
+
+</section><section>
+<h3><a name="Options_supported_in_each_storage_tool."></a>Options supported in each storage tool.</h3>
+
+<ul>
+    
+<li><a href="cli.html#size">size</a> - number of entries in the current component.</li>
+    
+<li><a href="cli.html#ls">ls [index | /uniqueId]</a> - list all items or the details of a given item</li>
+    
+<li><a href="cli.html#update">update [index | /uniqueId]</a> - edit the item</li>
+    
+<li><a href="cli.html#rm">rm [index | /uniqueId]</a> - remove an entry</li>
+    
+<li><a href="cli.html#create">create [uniqueId]</a> - create a new entry with the optional id.</li>
+    
+<li><a href="cli.html#serialize">serialize [-file path] uniqueId</a> - serialize, i.e. store the object in XML format to the file. Omitting the file dumps it to the command line</li>
+    
+<li><a href="cli.html#deserialize">deserialize [-new] -file path</a> - deserialize i.e. read in the object from a file. The -new flag tells whether the object is new or not. If new and the id is in use, the operation will fail.</li>
+</ul>
+
+Each of these in turn will be discussed in detail.
+
+
+<h1>Common commands for all storage components.</h1>
+<section>
+<h4><a name="Getting_The_Number_Of_Objects_In_a_Component."></a><a name="size">Getting The Number Of Objects In a Component.</a></h4>
+This will print the number of elements in the current storage component. <br />
+<i>Example.</i> For showing the number of clients in a store
+you would have something like the following
+
+<div>
+<pre>
+oa2&gt;use clients
+  clients &gt;size
+    Current store has 22 entries
+  clients &gt;exit
+exiting ...
+oa2&gt;
+</pre></div>
+
+</section><section>
+<h4><a name="Listing_Object_or_Details_of_an_Object."></a><a name="ls">Listing Object or Details of an Object.</a></h4>
+
+<div>
+<pre>
+    ls [-l | -E | -v] | [-key key] | [-keys [key1,key2,...] ] [id]
+</pre></div>
+
+<p>This lists every element in the current component. The default is to sort by
+the given identifier, except clients which are sorted by creation date. At this point,
+sorting behavior cannot be changed. The default format is the <i>short form</i>
+    where the identifier and a little information is shown. This is for quick perusal.
+No argument prints out everything in the store.
+Giving the optional index or unique identifier will
+    print a listing of the object. Here are the command line switches that control how
+    much is printed:</p>&gt;
+
+<ul>
+    
+<li>-l = line form of the listing. This means that entries longer than a line are truncated.</li>
+    
+<li>-E = (default) list <b><i>ALL</i></b> the elements in the store. Default is short form</li>
+    
+<li>-v = verbose form of the listing. Entries longer than a line will be wrapped.</li>
+</ul>
+<i>Example.</i> Listing a specific object by unique identifier
+
+<div>
+<pre>
+oa4mp &gt;use approvals
+  approvals &gt;ls
+    0. (?) myproxy:oa4mp,2012:/adminClient/1105e0486abc6cab6d2450893d9394f6/1586446927641 by &quot;junit&quot; on 2020-04-09 10:42:08.0
+    1. (?) myproxy:oa4mp,2012:/adminClient/11daaae5d58ec7e5ba6bb88189fc3bb8/1586446926819 by &quot;junit&quot; on 2020-04-09 10:42:07.0
+    2. (?) myproxy:oa4mp,2012:/adminClient/131d41a607efa5be7cd611f56d1060c6/1581113647370 by &quot;junit&quot; on 2020-02-07 16:14:07.0
+    3. (?) myproxy:oa4mp,2012:/adminClient/1332c1e8775d827e66e77c5c4c47d23f/1581513221096 by &quot;junit&quot; on 2020-02-12 07:13:41.0
+  approvals &gt;
+</pre></div>
+
+<p>By default (no arguments) it prints out the short form of every item in the store. This is the same
+    as using the -E option.
+    To now print out the details on number 2:</p>&gt;
+
+<div>
+<pre>
+    approvals &gt;ls -l 2
+    approval_ts : 2020-02-07 16:14:07.0
+       approved : true
+       approver : junit
+      client_id : myproxy:oa4mp,2012:/adminClient/131d41a607efa5be7cd611f56d1060c6/1581113647370
+     public_key : k0CPPSzW0Wv5lIZWnEX5yEAOjJTZn838wSrwa-Wh6xF4Vvi4MnBJ7eQuz0QLorDoKYtLEW6LV-u7sC...
+         status : none</pre></div>
+We could have done the exact same thing by simply using the unique identifier:
+
+<div>
+<pre>
+    approvals&gt;ls -l /myproxy:oa4mp,2012:/adminClient/131d41a607efa5be7cd611f56d1060c6/1581113647370
+</pre></div>
+And finally, here is what a verbose version looks like for a client (we set the id first so we don't have
+to keep typing it in.)
+
+<div>
+<pre>
+  clients&gt; set_id oa4mp:/client_id/52d39e92ab5347c880fa19f3b9cb4204
+  clients&gt; ls -v
+    callback_uri : [&quot;https://client.example.org/callback&quot;,&quot;https://client.example.org/callback2&quot;]
+             cfg : {&quot;new&quot;:
+                      &quot;config&quot;}
+       client_id : oa4mp:/client_id/52d39e92ab5347c880fa19f3b9cb4204
+     creation_ts : 2020-05-04 13:47:41.0
+last_modified_ts : 2020-05-04 13:48:21.0
+            name : New Test name
+   proxy_limited : false
+   public_client : true
+      public_key : ZOq88bMz4wIxYDbqfPPSzW0Wv5lIZWnEX5yE
+     rt_lifetime : 0
+          scopes : [&quot;openid&quot;]
+     sign_tokens : true
+     approved by : my:adminclient/42
+</pre></div>
+</section></section><section>
+<h3><a name="Other_forms_of_ls"></a>Other forms of ls</h3>
+
+<p>You may also print out a single key with the -key switch and the name of the key (list_keys will
+list what's available). You may also make a custom listing by specifying which keys you want to display. Using
+the above example with the id already set:</p>
+
+<div>
+<pre>
+    clients&gt;ls -key cfg
+   cfg:
+ {&quot;new&quot;: &quot;config&quot;}
+</pre></div>
+and to list the name, creation time and refresh token lifetime:
+
+<div>
+<pre>
+    clients&gt;ls -keys [name,creation_ts,rt_lifetime]
+   creation_ts : 2020-05-04 13:47:41.0
+          name : New Test name
+   rt_lifetime : 0
+</pre></div>
+
+<p>One last note is that the keys are always sorted in any listing and the default for single keys is the verbose form.</p>
+
+<section>
+<h4><a name="Updating_.28aka_Editing.29_Objects."></a><a name="update">Updating (aka Editing) Objects.</a></h4>
+
+<div>
+<pre>
+    update [-key k [-value v]] [-keys [k0,k1,...] [id]
+</pre></div>
+This will let you update or edit an existing object or the properties in one.
+If you supply no argument except an id, you will be sequentially prompted for <i>every</i>
+property of the object.
+The general function is shown below. Current object
+values are shown in [ ]'s and simply hitting return will preserve the current value.
+<br />
+<i>Example.</i> Edit a client record. In this case we want to make this client use limited proxies.
+
+<div>
+<pre>
+    clients &gt;set_id testScheme:oa4md,2018:/client_id/79d0237f26f56ee831b033b7eec5865d
+    clients &gt;ls -l
+        callback_uri : [&quot;https:/baz.foo.edu/client2/7Vgs2kO-sF4/ready1&quot;,&quot;https:/baz.foo.edu/client2/7Vgs2kO-sF4/ready2&quot;]
+                 cfg : {&quot;version&quot;:&quot;aOfSNXcKu7VU3qPqc_lnvQ&quot;}
+           client_id : testScheme:oa4md,2018:/client_id/79d0237f26f56ee831b033b7eec5865d
+         creation_ts : 2020-04-10 08:42:33.0
+               email : bob@7Vgs2kO-sF4.foo.bar
+           error_url : https://baz.foo.edu/home/7Vgs2kO-sF4/error
+            home_url : https://baz.foo.edu/7Vgs2kO-sF4/home
+    last_modified_ts : 2020-04-10 08:42:33.0
+                ldap : [{&quot;ldap&quot;:{&quot;id&quot;:&quot;&quot;,&quot;name&quot;:&quot;&quot;,&quot;enabled&quot;:false,&quot;failOnError&quot;:false,&quot;notifyOnFail&quot;:false,&quot;address&quot;:&quot;foo.bar.edu&quot;,&quot;port&quot;:-...
+                name : Test client 7Vgs2kO-sF4
+       proxy_limited : false
+       public_client : false
+          public_key : t37mvHp25SkDRQqZ1mx74TiC4qIn_TRtgh5PA9P8VcTORzfJD1cKngU9yiXHMjdTNqYbaoa8vfyNWx0LfQ652A
+         rt_lifetime : 456767875477
+              scopes : [&quot;openid&quot;,&quot;email&quot;,&quot;profile&quot;,&quot;org.cilogon.userinfo&quot;]
+         sign_tokens : true
+    clients &gt;
+</pre></div>
+
+<p>Let's change the name:</p>
+
+<div>
+<pre>
+    update -key name -value &quot;My other test client&quot;
+</pre></div>
+
+<p>and let's look at the value directly</p>
+
+<div>
+<pre>
+    clients&gt;ls -key name
+    My other test client
+</pre></div>
+
+<p>You can also update several properties at once by nassing in a list:</p>
+
+<div>
+<pre>
+    clients&gt;update -keys [sign_tokens,name]
+</pre></div>
+
+<p>and you will be prompted in turn for each.</p>
+
+</section><section>
+<h4><a name="Creating_a_new_object"></a><a name="create">Creating a new object</a></h4>
+To create a new object, you must supply a unique identifier. This does not need to be escaped with a /.
+Once created, you will be given the option of editing it.   You may enter any valid identifier
+as long as it is a valid URI<br />
+<i>Example.</i> Crreating a new admin client. This will create a new admin
+client with a specified identifier.
+If no identifier were supplied a random one would have been created.
+
+<div>
+<pre>
+    admins&gt;create my:new:client
+    Created object with id &quot;my:new:client&quot;
+</pre></div>
+The object already exists in the store by this point. We will be given the option to edit it
+(equivalent to issuing the update command against its unique id):
+
+<div>
+<pre>
+      edit [y/n]?y
+    Update the values. A return accepts the existing or default value in []'s
+      enter the identifier[my:new:client]:
+</pre></div>
+
+<p>and you will be prompted for several more bits of information.
+Now the completed, new client is displayed and we are prompted if we want to keep the changes.
+Rather than drag you through each update, here is the finished client.</p>
+
+<div>
+<pre>
+    here is the complete client:
+          admin_id : foo:bar
+       creation_ts : Thu Apr 23 17:19:36 CDT 2020
+             email : bob@foo.bar
+  last_modified_ts : 2020-04-23 17:19:36.752
+       max_clients : 50
+              name : My client
+            secret : 126a1356375daf2951e4c8660a098f7264579853
+    save [y/n]?y
+    client updated.
+
+</pre></div>
+</section><section>
+<h4><a name="Removing_Objects_From_the_Store."></a><a name="rm">Removing Objects From the Store.</a></h4>
+
+<div>
+<pre>
+    rm [-key k] [id]
+</pre></div>
+
+<p>This will remove <i>either</i>  the value in a property <b>or</b> the entire client.
+If you specify a key, only thatproperty will be affected. If you specify the id of an object,
+you will be prompted to continue.</p>
+
+<p> <i>Removing an object.</i> This will remove the object completely from the store. In the case of clients you
+do not need to remove the corresponding approval -- it will be done automatically. However, if you remove
+the approval record then the client is in effect unapproved until you re-approve it. To remove an admin client
+    would look like the next
+</p>&gt;
+<i>Example.</i> Removing an object by id
+
+<div>
+<pre>
+    admins&gt;rm /myproxy:oa4mp,2012:/adminClient/13be753b6e816c801e212f0f1cff9d81/1587161772297
+      Are you sure you want to remove this client(y/n)[n]:y
+    Done. object with id = myproxy:oa4mp,2012:/adminClient/13be753b6e816c801e212f0f1cff9d81/1587161772297 has been removed from the store.
+      Removing approval record
+      Done. Client approval with id = myproxy:oa4mp,2012:/adminClient/13be753b6e816c801e212f0f1cff9d81/1587161772297 has been removed from the store</pre></div>
+
+<p><b>Note</b> The remove command will happily remove objects by index, but remember that the indices of all
+other objects change, so best practice is to only remove by identifier.</p>
+
+<p>Finally, to remove a value, if we had th following value</p>
+
+<div>
+<pre>
+    admins&gt;ls -key vo
+    https://myorg.bigstate.edu
+</pre></div>
+
+<p>we could removed it by issuing</p>
+
+<div>
+<pre>
+    admins&gt;rm -key vo
+</pre></div>
+
+<p>Note that unlike for properties there is no prompt.</p>
+
+</section><section>
+<h4><a name="Storing_objects_on_disk"></a><a name="serialize">Storing objects on disk</a></h4>
+
+<div>
+<pre>
+    serialize [-file path] [id]
+</pre></div>
+
+<p>A common enough task is to want to do a considerable amount of editing which the direct CLI is not so well suited for, e.g.
+twiddling extensive lists of callbacks. This is always component specific, so
+    you  must use a comnponent for this to be available.  You may serialize any object to disk in XML format, edit it with
+any standard text editor and then simply read it back in with the deserialize command. The basic syntax is</p>
+In this case, the index is as per any other component. The file is optional in the sense that if it is omitted, the result
+will be dumped at the command line. The file will be overwritten, so make sure you have it right.  <br />
+<i>Example.</i> Serializing a client.
+
+<div>
+<pre>
+    cli&gt; use clients
+      clients&gt; serialize -file /path/to/my/client.xml /client:sdfsdf:erg98540j034/456eythw456
+    done!
+</pre></div>
+Firing up a text editor shows the file which starts to look like this:
+
+<div>
+<pre>
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
+    &lt;!DOCTYPE properties SYSTEM &quot;http://java.sun.com/dtd/properties.dtd&quot;&gt;
+    &lt;properties&gt;
+    &lt;entry key=&quot;name&quot;&gt;Updated Test client 42&lt;/entry&gt;
+    &lt;entry key=&quot;sign_tokens&quot;&gt;true&lt;/entry&gt;
+    &lt;entry key=&quot;creation_ts&quot;&gt;2018-06-28T13:06:28.000Z&lt;/entry&gt;
+    &lt;entry key=&quot;public_key&quot;&gt;j75OY1FoPf1AzW5v9KDqTkxrslD1VQhQ5wdVfqUu7pO7SRoMtEwRXqBdFFtNfwmX0Z4l4vbiVRYpq9zGtoMKYw&lt;/entry&gt;
+    &lt;entry key=&quot;rt_lifetime&quot;&gt;456767875477&lt;/entry&gt;
+    &lt;entry key=&quot;public_client&quot;&gt;false&lt;/entry&gt;
+    &lt;entry key=&quot;client_id&quot;&gt;testScheme:oa4md,2018:/client_id/756a9e899981a4cf93f97f40a9da345a&lt;/entry&gt;
+    &lt;entry key=&quot;home_url&quot;&gt;https://baz.foo.edu/H2w3GevCrOU/home&lt;/entry&gt;
+    &lt;entry key=&quot;cfg&quot;&gt;{
+      &quot;config&quot;: &quot;updated by converter from old LDAP entry&quot;,
+      &quot;claims&quot;: {
+        &quot;sourceConfig&quot;: [
+          {
+     ... lots more
+</pre></div>
+Note that the format is very simple. A key is given (you cannot change these) and then the value is given as the contents
+of the element.
+
+</section><section>
+<h4><a name="Reading_objects_from_disk"></a><a name="deserialize">Reading objects from disk</a></h4>
+
+<div>
+<pre>
+    deserialize [-new] -file path
+</pre></div>
+
+<p>This will read an object from a file. This argument is required.
+    This is always component specific, so
+    you  must use a comnponent for this to be available. You may specify it as being new, which will also tell the system to create
+a new identifier for it or it will reject the object if an existing identifier exists. <b><i>NOTE:</i></b> This will
+replace the object, not just update a few attributes. This means that if you just want change the value of an
+attribute, you have to do it manually.</p>
+<i>Example</i> Deserializing a file
+
+<div>
+<pre>
+    clients&gt; deserialize -file /path/to/my/file
+    done!
+</pre></div>
+
+<p>This will take the given file and replace the contents. A not uncommon use is to serialize a file, edit it and issue
+deserialization commands against it repeatedly as you debug it.</p>
+
+
+<h1>Invoking the components.</h1>
+
+</section></section></section><section>
+<h2><a name="Clients"></a><a name="clients">Clients</a></h2>
+Invoke as
+
+<div>
+<pre>oa2&gt; use clients</pre></div>
+Operations allowed in addition to the standard ones are
+
+<ul>
+    
+<li>
+        approve [index | /uniqueID]
+    </li>
+    
+<li>create_hash [string | -file path]</li>
+</ul>
+The first will prompt you for the information needed to make a new approval for the client with the given id.
+The second is used to create a hash for a secret that you supply. This is
+needed for OAuth2/OIDC clients since we store a hash and not the secret. You may either specify a file containing
+the secret or type in manually at the command line.
+
+<section>
+<h3><a name="An_example_for_setting_the_password"></a>An example for setting the password</h3>
+
+<p>This sets the password for the client with id foo:/bar. Thanks to historical reasons,
+    the secret has the key public_key. Its current secret is
+    7fd560c4169d4ed6cf08acc87d54aed28b6b92ac</p>
+
+<div>
+<pre>
+clients&gt;create_hash &quot;my secret password&quot;
+ creating hash of my secret password
+  ca90213b8b911f48a180abf8002934658bf63828
+clients&gt;update -key public_key /foo:/bar
+Enter new value for public_key [7fd560c4169d4ed6cf08acc87d54aed28b6b92ac]:ca90213b8b911f48a180abf8002934658bf63828
+clients&gt;
+</pre></div>
+
+<p>If you list the client, you will see the updated secret.</p>
+
+</section></section><section>
+<h2><a name="Approvals"></a><a name="approvals">Approvals</a></h2>
+Invoke as
+
+<div>
+<pre>oa2&gt; use approvals</pre></div>
+ There are no extra options beyond the standard ones, however, the create command
+takes the unique id of the client record you are going to approve. Once created, you may enter the
+approval information directly.
+
+</section><section>
+<h2><a name="Copy"></a><a name="copy">Copy</a></h2>
+Invoke as
+
+<div>
+<pre>oa2&gt;use copy</pre></div>
+Supported operation is
+
+<ul>
+    
+<li>cp source target [-verify] - copy source to target optionally verifying</li>
+</ul>
+This works over the entire store. It has a single command that will allow you to make a copy
+of one store (the source) that completely replaces another (the target). This is destructive, meaning
+that the every object in the target is deleted, so no merge takes place. If the -verify option is used
+then the two stores are compared once the copy has been completed. Note that this can be very time consuming
+for a large store! However, if there is any question it is at times very useful.
+
+
+
+</section>
+
+    </div>
+</div>
+<div class="clear">
+    <hr/>
+</div>
+<div id="footer">
+    <div class="xright">&#169;    
+                    2023
+        
+                    
+    
+
+    
+        
+                        
+    
+        
+    </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+</body>
+</html>
+

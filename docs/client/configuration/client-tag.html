@@ -1,0 +1,290 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+
+
+
+
+
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>OAuth for MyProxy</title>
+    <style type="text/css" media="all">
+        @import url("../../css/oa4mp-custom.css");
+        @import url("../../css/oa4mp-theme.css");
+        @import url("../../css/site.css");
+    </style>
+    <link rel="stylesheet" href="../../css/print.css" type="text/css" media="print"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    </head>
+<body class="composite">
+<div id="banner">
+                        <a href="http://www.ncsa.illinois.edu/" id="bannerLeft"  >
+        
+                                                                    <img src="../../css/images/ncsalogo_sm-2.gif" alt="NCSA"/>
+        
+                </a>
+                                    <a href="http://grid.ncsa.illinois.edu/myproxy/" id="bannerRight"  >
+        
+                                                                    <img src="../../css/images/MyProxyWide.gif" alt="MyProxy"/>
+        
+                </a>
+                <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="breadcrumbs">
+            
+    
+
+    
+        
+                        
+    
+        
+                    <div class="xleft">
+            Last Published: 2023-04-05
+                                </div>
+                <div class="xright">            
+    
+
+    
+        
+                        
+    
+        
+                         Version: 5.3-SNAPSHOT
+            </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="leftColumn">
+    <div id="navcolumn">
+                
+    
+
+    
+        
+                        
+    
+        
+                               <h5>OAuth for MyProxy</h5>
+                        <ul>
+                    
+    <li class="none">
+                        <a href="../../server/index.html">Overview</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../server/index.html">Server</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../client/index.html">Client</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../apidocs/index.html">api docs</a>
+            </li>
+              </ul>
+                            <h5>Project Documentation</h5>
+                        <ul>
+                    
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-info.html">Project Information</a>
+                        </li>
+              
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-reports.html">Project Reports</a>
+                        </li>
+              </ul>
+                                               <a href="http://maven.apache.org/" title="Built by Maven"
+           class="poweredBy">
+            <img class="poweredBy"
+                 alt="Built by Maven"
+                 src="http://maven.apache.org/images/logos/maven-feather.png"
+                 width="90"
+                 height="30"
+                 border="1"/>
+        </a>
+                           
+    
+
+    
+        
+                        
+    
+        
+        </div>
+</div>
+<div id="bodyColumn">
+    <div id="contentBox">
+        
+
+
+
+
+<section>
+<h2><a name="The_Client_Tag."></a>The Client Tag.</h2>
+
+
+<p>This is the top-level tag for a client configuration. There may be several of these in a single configuration
+    file, all given different names.</p>
+
+<table class="bodyTable" style="text-align: left; width: 100%;" border="1" cellspacing="2" cellpadding="2">
+    <tbody>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">Attribute</td>
+        
+<td style="vertical-align: top;">Required?</td>
+        
+<td style="vertical-align: top;">Default</td>
+        
+<td style="vertical-align: top;">Description</td>
+    </tr>
+    
+<tr class="b">
+        
+<td style="vertical-align: top;">name</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;">(none)</td>
+        
+<td style="vertical-align: top;">An arbitrary name for this configuration. Multiple configurations in a file are
+            supported.
+        </td>
+    </tr>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">version</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;">latest</td>
+        
+<td style="vertical-align: top;">The version of the configuration file. If omitted, the most current is used.
+        </td>
+    </tr>
+    
+<tr class="b">
+        
+<td style="vertical-align: top;">debug</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;">&quot;warn&quot;</td>
+        
+<td style="vertical-align: top;">Enable debugging for this service. This will be written to the Tomcat logs and
+            might be rather verbose. Use it only if you need it. The levels supported are (in order of
+            increasin verbosity) &quot;off&quot;, &quot;info&quot;, &quot;warn&quot;, &quot;error&quot;, &quot;severe&quot;, &quot;trace&quot;. Setting debug to
+            &quot;trace&quot; will dump out virtually everything and give a running account of the operation of the
+            service. This may be very, very large.
+        </td>
+    </tr>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">disableDefaultStores</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;">false</td>
+        
+<td style="vertical-align: top;">The default behavior is to default
+            to using a memory store if no other store is explicitly set. If set to true, this will make the server throw
+            an exception if there is no store configured.
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<p>The <span style="font-weight: bold;">name</span> can be anything. The name of the configuration to use may be
+    specified in the deployment descriptor (web.xml) file. If there is a single configuration in the file, that will be
+    used. If there are multiple configurations and no name is specified, an exception is raised.</p>
+
+<section>
+<h3><a name="Example_1."></a>Example 1.</h3>
+
+<div>
+<pre>
+&lt;config&gt;
+   &lt;client&gt;
+      &lt;!-- more stuff --&gt;
+   &lt;/client&gt;
+&lt;/config&gt;
+</pre></div>
+
+<p>There is a single configuration (so no name is needed) and every configuration default as per the table above
+    will be used. However, the server address and other items must be configured or this will not work.</p>
+
+</section><section>
+<h3><a name="Example_2."></a>Example 2.</h3>
+
+<div>
+<pre>
+&lt;config&gt;
+   &lt;client name=&quot;organic-test&quot;
+       debug=&quot;true&quot;&gt;
+       &lt;!-- more stuff --&gt;
+   &lt;/client&gt;
+   &lt;client name=&quot;organic&quot;
+       debug=&quot;false&quot;
+       disableDefaultStores=&quot;true&quot;&gt;
+       &lt;!-- more stuff --&gt;
+   &lt;/client&gt;
+&lt;/config&gt;
+</pre></div>
+
+<p>In this situation there are two client configurations, one for production <i>organic</i> and one for
+    testing <i>organic-test</i>. The production server has turned off debugging and is configured so if
+    storage is not explicitly created, an exception will be thrown. The test server will create in-memory stores
+    as needed and all debugging is enabled.</p>
+
+
+</section></section>
+
+    </div>
+</div>
+<div class="clear">
+    <hr/>
+</div>
+<div id="footer">
+    <div class="xright">&#169;    
+                    2023
+        
+                    
+    
+
+    
+        
+                        
+    
+        
+    </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+</body>
+</html>
+

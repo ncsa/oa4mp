@@ -1,0 +1,347 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+
+
+
+
+
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>OAuth for MyProxy</title>
+    <style type="text/css" media="all">
+        @import url("../../css/oa4mp-custom.css");
+        @import url("../../css/oa4mp-theme.css");
+        @import url("../../css/site.css");
+    </style>
+    <link rel="stylesheet" href="../../css/print.css" type="text/css" media="print"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    </head>
+<body class="composite">
+<div id="banner">
+                        <a href="http://www.ncsa.illinois.edu/" id="bannerLeft"  >
+        
+                                                                    <img src="../../css/images/ncsalogo_sm-2.gif" alt="NCSA"/>
+        
+                </a>
+                                    <a href="http://grid.ncsa.illinois.edu/myproxy/" id="bannerRight"  >
+        
+                                                                    <img src="../../css/images/MyProxyWide.gif" alt="MyProxy"/>
+        
+                </a>
+                <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="breadcrumbs">
+            
+    
+
+    
+        
+                        
+    
+        
+                    <div class="xleft">
+            Last Published: 2023-04-05
+                                </div>
+                <div class="xright">            
+    
+
+    
+        
+                        
+    
+        
+                         Version: 5.3-SNAPSHOT
+            </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="leftColumn">
+    <div id="navcolumn">
+                
+    
+
+    
+        
+                        
+    
+        
+                               <h5>OAuth for MyProxy</h5>
+                        <ul>
+                    
+    <li class="none">
+                        <a href="../../server/index.html">Overview</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../server/index.html">Server</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../client/index.html">Client</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../apidocs/index.html">api docs</a>
+            </li>
+              </ul>
+                            <h5>Project Documentation</h5>
+                        <ul>
+                    
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-info.html">Project Information</a>
+                        </li>
+              
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-reports.html">Project Reports</a>
+                        </li>
+              </ul>
+                                               <a href="http://maven.apache.org/" title="Built by Maven"
+           class="poweredBy">
+            <img class="poweredBy"
+                 alt="Built by Maven"
+                 src="http://maven.apache.org/images/logos/maven-feather.png"
+                 width="90"
+                 height="30"
+                 border="1"/>
+        </a>
+                           
+    
+
+    
+        
+                        
+    
+        
+        </div>
+</div>
+<div id="bodyColumn">
+    <div id="contentBox">
+        
+
+
+
+
+<section>
+<h2><a name="Using_the_Dynamic_Client_Registration_and_management_Servlet"></a>Using the Dynamic Client Registration and management Servlet</h2>
+
+
+<p>
+    There are two parts to the client management. They are RFC 7951, which
+    relates to creating a new client dynamically and RFC 7592 which
+    extends that to allow for managing clients with get, update or deletion.
+</p>
+
+<p>
+    There is also a native facility for oa4mp that can be used. This is kept
+    mostly for legacy purposes and can be ignored. This came in to existence
+    well before the RFC's were written and rather very similar. Generally
+    unless you have clients that are using it, ignore it.
+</p>
+
+<p>
+    All of the api elements below live in the clientManagement element of the
+    server configuration. Note that if you omit that element, the defaults
+    are used and the endpoint is active.
+</p>
+
+
+
+<table class="bodyTable" border="2">
+    <tbody>
+    
+<tr class="a">
+        
+<td>Attribute</td>
+        
+<td>Required?</td>
+        
+<td>Default</td>
+        
+<td>Description</td>
+    </tr>
+    
+<tr class="b">
+        
+<td>anonymousOK</td>
+        
+<td>N</td>
+        
+<td>false</td>
+        
+<td>(RFC 7591 protocol only). Allow posts to create a new client. These will not be approved automatically.</td>
+    </tr>
+    
+<tr class="a">
+        
+<td>autoApprove</td>
+        
+<td>N</td>
+        
+<td>false</td>
+        
+<td>(RFC 7591 protocol only.) Whether or not to automatically approve anonymous requests. This <b><i>may</i></b>
+            be required
+            in highly automated systems with severely restricted access. Generally though setting
+            it true is a terrible idea and a security risk.
+        </td>
+    </tr>
+    
+<tr class="b">
+        
+<td>autoApproverName</td>
+        
+<td>N</td>
+        
+<td>auto-approved</td>
+        
+<td>(RFC 7591 protocol only.) <b><i>If</i></b> auto approve is set to true,
+            this will be the name of the approver in the client approval store.
+        </td>
+    </tr>
+    
+<tr class="a">
+         
+<td>enabled</td>
+         
+<td>N</td>
+         
+<td>true</td>
+         
+<td>whether or not to enable this api.</td>
+     </tr>
+    
+<tr class="b">
+        
+<td>endpoint</td>
+        
+<td>N</td>
+        
+<td>oidc-cm</td>
+        
+<td>The endpoint in this service. If your has address https://www.foo.bar/oauth2, then not
+        specifying this means that the endpoint would be constructed as https://foo.bar/oauth2/oidc-cm</td>
+    </tr>
+    
+<tr class="a">
+        
+<td>protocol</td>
+        
+<td>Y</td>
+        
+<td>-</td>
+        
+<td>The protocol for this endpoint, one of rfc7951, rfc7952 or oa4mp.</td>
+    </tr>
+    
+<tr class="b">
+        
+<td>template</td>
+        
+<td>N</td>
+        
+<td>-</td>
+        
+<td>(RFC 7591 protocol only) The id of a configured client which is to be used as a template. This means that create
+        requests will create an copy of this client and use any arguments as overrides. This allows
+        you to have a uniform registration for all clients (e.g. all of your clients use the device flow,
+        are auto-approved,     
+        and need identical configurations). This only applies to the rfc 7951 api. You would need
+        to create this client (tip: never approve it) in the CLI before setting this.</td>
+    </tr>
+    
+<tr class="a">
+        
+<td>url</td>
+        
+<td>N</td>
+        
+<td>-</td>
+        
+<td>If you want to completely specify an endpoint not, e.g., on this server, you must give the complete url.
+        For instance, if you wanted a to have https://clients.foo.bar instead. </td>
+    </tr>
+    </tbody>
+</table>
+
+<section>
+<h3><a name="An_Example"></a>An Example</h3>
+
+
+<div>
+<pre>
+    &lt;clientManagement&gt;
+        &lt;api protocol=&quot;rfc7951&quot;
+         enabled=&quot;true&quot;
+         url=&quot;https://clients.foo.bar&quot;
+         anonymousOK=&quot;true&quot;
+         template=&quot;template:/client/generic&quot; /&gt;
+        &lt;api protocol=&quot;rfc7952&quot; enabled=&quot;true&quot; endpoint=&quot;oidc-cm&quot; /&gt;
+        &lt;api protocol=&quot;oa4mp&quot; enabled=&quot;false&quot;  /&gt;
+    &lt;/clientManagement&gt;
+</pre></div>
+ 
+<p>
+     Note that omitting a protocol means that the component will be enabled with the defaults. Therefore
+     you must explicitly disable things you do not want.
+ </p>
+</section><section>
+<h3><a name="Disabling_all_client_management"></a>Disabling all client management</h3>
+
+<p>
+    If you don't want any sort of dynamic client registration, simply disable everything as follows:
+</p>
+
+<div>
+<pre>
+    &lt;clientManagement enabled=&quot;false&quot;&gt;
+</pre></div>
+
+<p>Any other attributes will be ignored, so you can just turn it on or off.</p>
+
+
+</section></section>
+
+    </div>
+</div>
+<div class="clear">
+    <hr/>
+</div>
+<div id="footer">
+    <div class="xright">&#169;    
+                    2023
+        
+                    
+    
+
+    
+        
+                        
+    
+        
+    </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+</body>
+</html>
+

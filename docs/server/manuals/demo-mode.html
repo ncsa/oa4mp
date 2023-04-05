@@ -1,0 +1,243 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+
+
+
+
+
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>OAuth for MyProxy</title>
+    <style type="text/css" media="all">
+        @import url("../../css/oa4mp-custom.css");
+        @import url("../../css/oa4mp-theme.css");
+        @import url("../../css/site.css");
+    </style>
+    <link rel="stylesheet" href="../../css/print.css" type="text/css" media="print"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    </head>
+<body class="composite">
+<div id="banner">
+                        <a href="http://www.ncsa.illinois.edu/" id="bannerLeft"  >
+        
+                                                                    <img src="../../css/images/ncsalogo_sm-2.gif" alt="NCSA"/>
+        
+                </a>
+                                    <a href="http://grid.ncsa.illinois.edu/myproxy/" id="bannerRight"  >
+        
+                                                                    <img src="../../css/images/MyProxyWide.gif" alt="MyProxy"/>
+        
+                </a>
+                <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="breadcrumbs">
+            
+    
+
+    
+        
+                        
+    
+        
+                    <div class="xleft">
+            Last Published: 2023-04-05
+                                </div>
+                <div class="xright">            
+    
+
+    
+        
+                        
+    
+        
+                         Version: 5.3-SNAPSHOT
+            </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="leftColumn">
+    <div id="navcolumn">
+                
+    
+
+    
+        
+                        
+    
+        
+                               <h5>OAuth for MyProxy</h5>
+                        <ul>
+                    
+    <li class="none">
+                        <a href="../../server/index.html">Overview</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../server/index.html">Server</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../client/index.html">Client</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../apidocs/index.html">api docs</a>
+            </li>
+              </ul>
+                            <h5>Project Documentation</h5>
+                        <ul>
+                    
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-info.html">Project Information</a>
+                        </li>
+              
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-reports.html">Project Reports</a>
+                        </li>
+              </ul>
+                                               <a href="http://maven.apache.org/" title="Built by Maven"
+           class="poweredBy">
+            <img class="poweredBy"
+                 alt="Built by Maven"
+                 src="http://maven.apache.org/images/logos/maven-feather.png"
+                 width="90"
+                 height="30"
+                 border="1"/>
+        </a>
+                           
+    
+
+    
+        
+                        
+    
+        
+        </div>
+</div>
+<div id="bodyColumn">
+    <div id="contentBox">
+        
+
+
+
+
+<section>
+<h2><a name="Introduction"></a>Introduction</h2>
+
+<p>
+    The intent with demo mode is to set up OA4MP with a minimal but usable system for evaluation.
+    This is done by setting the service tag attribute of <b>demoModeEnabled</b> to true.
+    You will need to make sure that Tomcat is set up correctly for this.
+</p>
+
+</section><section>
+<h2><a name="What_does_this_do.3F"></a>What does this do?</h2>
+
+<p>
+    Normally OA4MP needs to have some authorization mechanism, such as replacing the authorize
+    endpoint completely (e.g. CILogon) or perhaps enabling Tomcat's native logins to operate.
+    Many organizations as of this writing have been using X509 certificates for years and are
+    interesting in migrating to JWT signed tokens, which OA4MP handles with aplomb. But
+    this is potentially a very large structural change to an organization and needs to be evaluated and
+    tested.
+</p>
+
+<p>
+    The problem for a quick demo then is finding all the users (and there may be many, many in an organization)
+    that want to test this. Signing them up may be a daunting task. Enabling demo mode, however, allows an admin
+    to set policies for the tokens and lets users use both authorization code flow and device code flow. The user
+    will be prompted for user name and password, but the password is ignored and the entire purpose of the username is
+    to set the subject for any tokens issued.
+</p>
+
+
+<p>
+    The effect of configuring this (as per below) will be that the standard authorization code flow
+    works as expected, and the device code flow will too <i>except</i> that the user must go to the
+    webpage and type in the user code (rather than use the link that has it embedded.)
+</p>
+
+<p>
+    Again it should be stressed that this demo mode is not for production, but mostly to let administrators easily set up
+    a system and have many testers use the system to see how information flows in it. For production, options are then
+    to either enable Tomcat's authorization or simply replace OA4MP's entire authorization module either with your own
+    or with the CILogon proxy.
+</p>
+
+<section>
+<h3><a name="Tomcat_configuration"></a>Tomcat configuration</h3>
+
+<p>Tomcat is configured as if this were a standalone OA4MP install but without configuring the
+    <a href="../manuals/remote-user.html">remote user</a> machinery. You need to comment out any
+    password protection for the web pages and instead simply require transport of SSL as follows
+</p>
+
+<div>
+<pre>
+
+    &lt;security-constraint&gt;
+        &lt;web-resource-collection&gt;
+            &lt;web-resource-name&gt;portalSecurity&lt;/web-resource-name&gt;
+            &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
+            &lt;http-method&gt;GET&lt;/http-method&gt;
+            &lt;http-method&gt;POST&lt;/http-method&gt;
+        &lt;/web-resource-collection&gt;
+        &lt;user-data-constraint&gt;
+            &lt;transport-guarantee&gt;CONFIDENTIAL&lt;/transport-guarantee&gt;
+        &lt;/user-data-constraint&gt;
+    &lt;/security-constraint&gt;
+</pre></div>
+
+</section><section>
+<h3><a name="Server_configuration"></a>Server configuration</h3>
+
+<p>The <b>demoModeEnabled</b> attribute in the server tag must be set to true.</p>
+
+
+
+</section></section>
+
+    </div>
+</div>
+<div class="clear">
+    <hr/>
+</div>
+<div id="footer">
+    <div class="xright">&#169;    
+                    2023
+        
+                    
+    
+
+    
+        
+                        
+    
+        
+    </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+</body>
+</html>
+

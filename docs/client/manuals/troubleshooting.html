@@ -1,0 +1,210 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+
+
+
+
+
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>OAuth for MyProxy</title>
+    <style type="text/css" media="all">
+        @import url("../../css/oa4mp-custom.css");
+        @import url("../../css/oa4mp-theme.css");
+        @import url("../../css/site.css");
+    </style>
+    <link rel="stylesheet" href="../../css/print.css" type="text/css" media="print"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    </head>
+<body class="composite">
+<div id="banner">
+                        <a href="http://www.ncsa.illinois.edu/" id="bannerLeft"  >
+        
+                                                                    <img src="../../css/images/ncsalogo_sm-2.gif" alt="NCSA"/>
+        
+                </a>
+                                    <a href="http://grid.ncsa.illinois.edu/myproxy/" id="bannerRight"  >
+        
+                                                                    <img src="../../css/images/MyProxyWide.gif" alt="MyProxy"/>
+        
+                </a>
+                <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="breadcrumbs">
+            
+    
+
+    
+        
+                        
+    
+        
+                    <div class="xleft">
+            Last Published: 2023-04-05
+                                </div>
+                <div class="xright">            
+    
+
+    
+        
+                        
+    
+        
+                         Version: 5.3-SNAPSHOT
+            </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="leftColumn">
+    <div id="navcolumn">
+                
+    
+
+    
+        
+                        
+    
+        
+                               <h5>OAuth for MyProxy</h5>
+                        <ul>
+                    
+    <li class="none">
+                        <a href="../../server/index.html">Overview</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../server/index.html">Server</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../client/index.html">Client</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../apidocs/index.html">api docs</a>
+            </li>
+              </ul>
+                            <h5>Project Documentation</h5>
+                        <ul>
+                    
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-info.html">Project Information</a>
+                        </li>
+              
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-reports.html">Project Reports</a>
+                        </li>
+              </ul>
+                                               <a href="http://maven.apache.org/" title="Built by Maven"
+           class="poweredBy">
+            <img class="poweredBy"
+                 alt="Built by Maven"
+                 src="http://maven.apache.org/images/logos/maven-feather.png"
+                 width="90"
+                 height="30"
+                 border="1"/>
+        </a>
+                           
+    
+
+    
+        
+                        
+    
+        
+        </div>
+</div>
+<div id="bodyColumn">
+    <div id="contentBox">
+        
+
+
+
+<section>
+<h2><a name="Troubleshooting"></a>Troubleshooting</h2>
+This guide has many of the most common problems people encounter when trying to install or configure a
+client.
+
+<ul>
+    
+<li><a href="#password-issue">Why isn't my password for MyProxy working. Nothing has changed.</a>
+    </li>
+    
+<li>
+        <a href="#ssl-issue">I get a host unverified exception trying to connect to the server.</a>
+    </li>
+    
+<li>
+        <a href="#connection-refused">I get a connection refused exception trying to connect to the server.</a>
+    </li>
+</ul>
+<section><section><section>
+<h5><a name="Why_isn.27t_my_password_for_MyProxy_working._Nothing_has_changed."></a><a name="password-issue" id="password-issue">Why isn't my password for MyProxy working. Nothing has changed.</a></h5>
+PAM (&quot;pluggable authentication module&quot;) authentication challenge issue.
+Certain authentication methods (such as Two Factor)
+sometimes require a random challenge be answered. MyProxy does not support these challenges. As such,
+you must log in elsewhere and answer the challenge there before you can log in with MyProxy. This
+is documented <a class="externalLink" href="http://grid.ncsa.illinois.edu/myproxy/pam.html#limitations">here</a>.
+
+</section><section>
+<h5><a name="I_get_a_host_unverified_exception_trying_to_connect_to_the_server."></a><a name="ssl-issue" id="ssl-issue">I get a host unverified exception trying to connect to the server.</a></h5>
+Host verification is enforced. If a server's name does not match exactly then SSL
+will reject the attempt to connect.This means that the server's certificate is incorrect and the issue lies
+at their end.
+
+</section><section>
+<h5><a name="I_get_a_connection_refused_exception_trying_to_connect_to_the_server."></a><a name="connection-refused" id="connection-refused">I get a connection refused exception trying to connect to the server.</a></h5>
+&quot;Connection refused&quot; means that your client is not trusted by the server.
+This might be because of several issues, but it all boils down to one thing: your client does not have a certificate
+that the server trusts. If the server has a self-signed cert, then the server administrators must make the client
+aware of this and issue certs appropriately.
+once the client has a certificate, specify it for the client using the <a href="../../common/configuration/keystore.html">keystore</a>
+configuration.
+
+
+</section></section></section></section>
+
+    </div>
+</div>
+<div class="clear">
+    <hr/>
+</div>
+<div id="footer">
+    <div class="xright">&#169;    
+                    2023
+        
+                    
+    
+
+    
+        
+                        
+    
+        
+    </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+</body>
+</html>
+

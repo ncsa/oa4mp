@@ -1,0 +1,311 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+
+
+
+
+
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>OAuth for MyProxy</title>
+    <style type="text/css" media="all">
+        @import url("../../css/oa4mp-custom.css");
+        @import url("../../css/oa4mp-theme.css");
+        @import url("../../css/site.css");
+    </style>
+    <link rel="stylesheet" href="../../css/print.css" type="text/css" media="print"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    </head>
+<body class="composite">
+<div id="banner">
+                        <a href="http://www.ncsa.illinois.edu/" id="bannerLeft"  >
+        
+                                                                    <img src="../../css/images/ncsalogo_sm-2.gif" alt="NCSA"/>
+        
+                </a>
+                                    <a href="http://grid.ncsa.illinois.edu/myproxy/" id="bannerRight"  >
+        
+                                                                    <img src="../../css/images/MyProxyWide.gif" alt="MyProxy"/>
+        
+                </a>
+                <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="breadcrumbs">
+            
+    
+
+    
+        
+                        
+    
+        
+                    <div class="xleft">
+            Last Published: 2023-04-05
+                                </div>
+                <div class="xright">            
+    
+
+    
+        
+                        
+    
+        
+                         Version: 5.3-SNAPSHOT
+            </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="leftColumn">
+    <div id="navcolumn">
+                
+    
+
+    
+        
+                        
+    
+        
+                               <h5>OAuth for MyProxy</h5>
+                        <ul>
+                    
+    <li class="none">
+                        <a href="../../server/index.html">Overview</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../server/index.html">Server</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../client/index.html">Client</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../apidocs/index.html">api docs</a>
+            </li>
+              </ul>
+                            <h5>Project Documentation</h5>
+                        <ul>
+                    
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-info.html">Project Information</a>
+                        </li>
+              
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-reports.html">Project Reports</a>
+                        </li>
+              </ul>
+                                               <a href="http://maven.apache.org/" title="Built by Maven"
+           class="poweredBy">
+            <img class="poweredBy"
+                 alt="Built by Maven"
+                 src="http://maven.apache.org/images/logos/maven-feather.png"
+                 width="90"
+                 height="30"
+                 border="1"/>
+        </a>
+                           
+    
+
+    
+        
+                        
+    
+        
+        </div>
+</div>
+<div id="bodyColumn">
+    <div id="contentBox">
+        
+
+
+
+
+
+<section>
+<h2><a name="Client_API_Reference"></a>Client API Reference</h2>
+
+
+<p>Clients wishing to access an OA4MP server directly can do so using the supplied programming API. This document
+    outlines the steps needed and discusses how to accomplish this.</p>
+
+<section>
+<h3><a name="Accessing_the_Client_API_via_Maven"></a>Accessing the Client API via Maven</h3>
+
+
+<p>The only supported method for including the client API in your project is via maven. This is supported by most every
+    IDE and works well from the command line too. Simply include the following dependency in your project pom:</p>
+<section><section>
+<h5><a name="OAuth_1.0a"></a>OAuth 1.0a</h5>
+
+<div>
+<pre>
+&lt;dependency&gt;
+   &lt;groupId&gt;edu.uiuc.ncsa.myproxy&lt;/groupId&gt;
+   &lt;artifactId&gt;oa4mp-client-oauth1&lt;/artifactId&gt;
+   &lt;version&gt;5.3-SNAPSHOT&lt;/version&gt;
+&lt;/dependency&gt;
+</pre></div>
+</section><section>
+<h5><a name="OAuth_2.0"></a>OAuth 2.0</h5>
+
+<div>
+<pre>
+&lt;dependency&gt;
+   &lt;groupId&gt;edu.uiuc.ncsa.myproxy&lt;/groupId&gt;
+   &lt;artifactId&gt;oa4mp-client-oauth2&lt;/artifactId&gt;
+   &lt;version&gt;5.3-SNAPSHOT&lt;/version&gt;
+&lt;/dependency&gt;
+</pre></div>
+
+OA4MP is hosted in the Sonatype repository, so specifying the dependency should be sufficient.
+
+<p>All references should be resolved at build time.</p>
+
+</section></section></section></section><section>
+<h2><a name="The_Basic_Client_API"></a>The Basic Client API</h2>
+
+
+<p>The major class that you will need is an instance of
+    edu.uiuc.ncsa.myproxy.oa4mp.client.OA4MPService.java
+    This has precisely two basic calls:</p>
+
+<div>
+<pre>
+public OA4MPResponse requestCert();
+public AssetResponse getCert(String tempToken, String verifier)
+</pre></div>
+
+
+<p>The first generates a public/private keypair and certificate request. The OA4MPResponse object contains the URI to
+    which to redirect
+    the user and the generated private key. You <b>must</b> redirect the user to the given URI since this is
+    where s/he will authenticate with the MyProxy server.</p>
+
+
+<p>Once the user has finished, the server does a callback to the uri you specify. It will contain parameters in the
+    request for the temp token and verifier. You must pass these to the method. The OA4MPService instance will then
+    complete the rest of the OAuth protocol and get the certificate. The AssetResponse contains the username,
+    <i>i.e.</i> the name the user used to authenticate and the X509 certificate itself.</p>
+
+<section>
+<h3><a name="A_Basic_Example"></a>A Basic Example</h3>
+
+To use the service, you must create a ClientEnvironment object. This is certainly do-able manually,
+but it is much better to use one of the ClientEnvironmentUtil's load methods. Here is an example.
+
+<div>
+<pre>
+ClientEnvironment ce = ClientEnvironmentUtil.load(&quot;/path/to/file&quot;, &quot;my-cfg&quot;);
+OA4MPService service = new OA4MPService(ce);
+OA4MPResponse response = service.requestCert();
+</pre></div>
+
+<p>Later, once the user has authenticated and the callback has been invoked, the identifier, access token and
+    verifier need to be used:</p>
+
+<div>
+<pre>
+ClientEnvironment ce = ClientEnvironmentUtil.load(&quot;/path/to/file&quot;, &quot;my-cfg&quot;);
+OA4MPService service = new OA4MPService(ce);
+String accessToken; // from  the callback URL
+String verifier;   // from  the callback URL
+AssetResponse assetResponse = service.getCert(accessToken, verifier);
+</pre></div>
+
+</section></section><section>
+<h2><a name="a.22OAuth_2_extensions"></a>&quot;<span style="color: #ff6600;">OAuth 2</span> extensions</h2>
+For OAuth 2 support, there are two more API calls possible to support the specification. This
+being Java you need to instantiate the class
+<a href="../../apidocs/edu/uiuc/ncsa/oa4mp/oauth2/client/OA2MPService.html">edu.uiuc.ncsa.oa4mp.oauth2.client.OA2MPService</a>
+which extends the above OA4MPService class above. There are two <i>additional</i> calls
+
+<ul>
+    
+<li>refresh(String identifier)</li>
+    
+<li>getUserInfo(String identifier)</li>
+</ul>
+You can read up detailed examples of how to use these in the <a href="oa2-refresh-tokens.html">user info
+    and refresh token</a>
+document.
+
+</section><section>
+<h2><a name="The_Asset_Store_API"></a>The Asset Store API</h2>
+
+There are two other calls in the API that will tell the service to use the asset store. Note that these will
+fail if there is no such store enabled. You must supply a unique identifier which is a URI. The associated
+asset may then be recovered with this key. Typically this identifier
+is stored in the user's browser as a cookie and retrieved on during the callback.
+
+<section>
+<h3><a name="A_simple_example"></a>A simple example</h3>
+
+<div>
+<pre>
+ClientEnvironment ce; // as per above.
+OA4MPService service = new OA4MPService(ce);
+Identifier id = BasicIdentifier.newID(&quot;my:test:uri/1&quot;);
+OA4MPResponse response = service.requestCert(id);
+</pre></div>
+
+<p>At this point, the first exchange with the server is done and an asset with
+    the given id has been created in the store. After callback when you have the
+    accessToken and the verifier you can finish the exchange
+    and get the asset:</p>
+
+<div>
+<pre>
+String accessToken;
+String verifier;
+// other values as per the previous example
+AssetResponse response = service.getCert(accessToken, verifier, id);
+Asset asset = ce.getAssetStore().get(id);
+</pre></div>
+
+</section></section>
+
+    </div>
+</div>
+<div class="clear">
+    <hr/>
+</div>
+<div id="footer">
+    <div class="xright">&#169;    
+                    2023
+        
+                    
+    
+
+    
+        
+                        
+    
+        
+    </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+</body>
+</html>
+

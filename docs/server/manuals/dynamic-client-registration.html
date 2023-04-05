@@ -1,0 +1,668 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+
+
+
+
+
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>OAuth for MyProxy</title>
+    <style type="text/css" media="all">
+        @import url("../../css/oa4mp-custom.css");
+        @import url("../../css/oa4mp-theme.css");
+        @import url("../../css/site.css");
+    </style>
+    <link rel="stylesheet" href="../../css/print.css" type="text/css" media="print"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    </head>
+<body class="composite">
+<div id="banner">
+                        <a href="http://www.ncsa.illinois.edu/" id="bannerLeft"  >
+        
+                                                                    <img src="../../css/images/ncsalogo_sm-2.gif" alt="NCSA"/>
+        
+                </a>
+                                    <a href="http://grid.ncsa.illinois.edu/myproxy/" id="bannerRight"  >
+        
+                                                                    <img src="../../css/images/MyProxyWide.gif" alt="MyProxy"/>
+        
+                </a>
+                <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="breadcrumbs">
+            
+    
+
+    
+        
+                        
+    
+        
+                    <div class="xleft">
+            Last Published: 2023-04-05
+                                </div>
+                <div class="xright">            
+    
+
+    
+        
+                        
+    
+        
+                         Version: 5.3-SNAPSHOT
+            </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="leftColumn">
+    <div id="navcolumn">
+                
+    
+
+    
+        
+                        
+    
+        
+                               <h5>OAuth for MyProxy</h5>
+                        <ul>
+                    
+    <li class="none">
+                        <a href="../../server/index.html">Overview</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../server/index.html">Server</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../client/index.html">Client</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../apidocs/index.html">api docs</a>
+            </li>
+              </ul>
+                            <h5>Project Documentation</h5>
+                        <ul>
+                    
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-info.html">Project Information</a>
+                        </li>
+              
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-reports.html">Project Reports</a>
+                        </li>
+              </ul>
+                                               <a href="http://maven.apache.org/" title="Built by Maven"
+           class="poweredBy">
+            <img class="poweredBy"
+                 alt="Built by Maven"
+                 src="http://maven.apache.org/images/logos/maven-feather.png"
+                 width="90"
+                 height="30"
+                 border="1"/>
+        </a>
+                           
+    
+
+    
+        
+                        
+    
+        
+        </div>
+</div>
+<div id="bodyColumn">
+    <div id="contentBox">
+        
+
+
+
+<h1>Dynamic Client Registration</h1>
+
+<p>The <a class="externalLink" href="https://openid.net/specs/openid-connect-registration-1_0.html">dynamic client registration</a>
+    specification
+    is supported in OA4MP as of version 4.2. This means that a trusted administrative client can dynamically
+    create regular clients for use with an OA4MP system. If you have not done so already, you should
+    read the section on
+    <a href="administrative-clients.html">administrative clients </a>.
+</p>
+
+<p><b>Note:</b> When we refer to a client we mean an OAuth 2 client and otherwise any other will be qualified such
+    as &quot;admin client&quot;.</p>
+
+<section>
+<h2><a name="How.27s_it_work.3F"></a>How's it work?</h2>
+
+<p>
+    If you are not an administrator and just need a client, you can go
+    to the registration endpoint of the service or use an anonymous registration (see below).
+    Your request will then be seen by the site adminstrator(s)
+    and once approved, you will be notified. OA4MP allows
+    for an administration client that is trusted (after vetting, of course) who
+    must manage several OAuth clients to do so without having to resort to the usual vetting process.
+</p>
+<section>
+<h3><a name="How_to_become_an_admin"></a>How to become an admin</h3>
+
+<p>You must register an administrative client as per <a href="administrative-clients.html">here</a>.</p>
+
+</section><section>
+<h3><a name="Implemented_specifications_here."></a>Implemented specifications here.</h3>
+
+
+<p>The two specifications that are behind this are <a class="externalLink" href="https://tools.ietf.org/html/rfc7591">RFC 7591</a>
+    and <a class="externalLink" href="https://tools.ietf.org/html/rfc7592">RFC 7592</a>. The flow is that you register an
+    administrative client. This is initially not approved and any operation you try will fail
+    with a message to that effect. We get an notification and once the admin client is approved,
+    it may be used. All calls then create regular (not admin!) clients for use with OA4MP.
+</p>
+
+
+<p>The RFCs specify a REST-ful API for clients, so that</p>
+
+
+<ul>
+    
+<li><b>POST</b> creates a new client</li>
+    
+<li><b>GET</b> lists what the server knows about this client</li>
+    
+<li><b>PUT</b> will update the client</li>
+    
+<li><b>DELETE</b> will remove the client and all of its information from the server</li>
+</ul>
+
+</section><section>
+<h3><a name="Getting_A_List_Of_Clients"></a>Getting A List Of Clients</h3>
+
+<p>
+    OA4MP does have one nice little extension for querying clients.
+    If you do a GET with no client id, then a list of all client ids and names
+    known to this admin will be returned.</p>
+
+</section><section>
+<h3><a name="The_toolkit"></a>The toolkit</h3>
+
+<p>Included with the latest release on <a class="externalLink" href="https://github.com/ncsa/OA4MP">GitHub</a>
+    are a suite of associated command line scripts in oidc-cm-scripts.tar aka the <b><i>toolkit</i></b>
+    which contains a complete but minimal functional toolkit. There are basic scripts for each
+    method as well as several examples for using each.</p>
+
+
+<p>To dynamically register a client you need to make a call to the supported service
+    endpoint, typically ../oauth2/oidc-cm with the appropriate HTTP method
+    and payload. The specification should not be repeated here but the toolkit has a tutorial
+    and many examples. There is also a very detailed
+    <a class="externalLink" href="https://github.com/ncsa/OA4MP/blob/master/oa4mp-server-admin-oauth2/src/main/scripts/oidc-cm-scripts/readme.txt">readme.txt</a>
+    in the toolkit.</p>
+
+</section><section>
+<h3><a name="Parameters_specific_to_OA4MP"></a>Parameters specific to OA4MP</h3>
+
+<p>OA4MP allows you to specify several client properties that it uses which are not in the specification.
+    These are listed below in a table</p>
+
+<p>Note that all of these are subject to server policies. You may request an outlandish refresh token
+    lifetime, e.g., but if server policy restricts it, then the server will make the final determination.
+</p>
+
+</section></section><section>
+<h2><a name="Anonymous_registration"></a>Anonymous registration</h2>
+
+<p>An <b><i>anonymous registration</i></b> is simply creating a standard client without an associated admin client.
+    In other words
+    it is pretty much exactly like creating a basic client using the registration endpoint, although
+    various OA4MP attributes are available that are not at the registration endpoint. This still
+    restricts certain things you can configure, such as the cfg attribute.
+    (Remember that an admin client has a vetted trust relationship with the server,
+    so it has much wider latitude to create a standard client.)</p>
+
+</section><section>
+<h2><a name="Public_clients"></a>Public clients</h2>
+
+<p>A <b><i>public client</i></b> is a standard client that is allowed only the user metadata openid scope
+    (so not the org.cilogon.userinfo scope, e.g.). The primary function of a public client is to
+    answer if the user has logged in to the system. If the client is anonymous, that is the only scope allowed.
+    If the client is managed, it is possible the admin may allow other scopes for access tokens as well.</p>
+
+
+<h1>Legal Request Attributes</h1>
+</section><section>
+<h2><a name="Standard_attributes"></a>Standard attributes</h2>
+
+<table border="0" class="bodyTable"><caption>Valid values</caption>
+    
+    
+<tr class="a">
+        
+<th>Parameter</th>
+        
+<th>Required?</th>
+        
+<th>Values</th>
+        
+<th>Comments</th>
+    </tr>
+
+    
+<tr class="b" align="left" valign="top">
+        
+<td>callback_uri</td>
+        
+<td>Y</td>
+        
+<td>A JSON array of callback uris.</td>
+        
+<td>You must have at least one callback uri. Note that the OAuth spec. requires that this be checked
+            <i>as a string</i> against requests to the server that include it. No checking is done to resolve the
+            address,
+            so it is a bad idea to, e.g. have a raw IP address. By the same token, you can include parameters and such,
+            but if they vary at all in the requests, then the request will be rejected. If you need to have some form of
+            state management for each request, you should send the
+            <a class="externalLink" href="https://openid.net/specs/openid-connect-core-1_0.html#ImplicitAuthRequest">state parameter</a>
+            in the initial request. This is
+            guaranteed to be returned to you unchanged as a parameter in the callback.
+        </td>
+    </tr>
+    
+<tr class="a" align="left" valign="top">
+        
+<td>contacts</td>
+        
+<td>N</td>
+        
+<td>A list or string</td>
+        
+<td>This should contain the valid email for a <b>person</b> to contact in case there is an issue with the
+            client. You should assume that if you are going to be contacted at this address it will only be
+            because of some dire issue. Supplying a generic institutional email is useless.
+            The spec. allows for multiples but we only support a single (at this writing) so only the first will be
+            used if a list is sent.
+        </td>
+    </tr>
+    
+<tr class="b" align="left" valign="top">
+        
+<td>grant_type</td>
+        
+<td>N</td>
+        
+<td>Either a JSON array of blank delimited list which may contain
+            <br />authorization_code (default),
+            <br />refresh_token
+            <br />urn:ietf:params:grant_type:token_exchange (for token exchange)
+        </td>
+        
+<td>If omitted, the assumption is authorization_code. If the refresh token lifetime (rt_lifetime) is specified,
+            then
+            refresh_token is added to the list of accepted grants.
+        </td>
+    </tr>
+    
+<tr class="a" align="left" valign="top">
+        
+<td>name</td>
+        
+<td>Y</td>
+        
+<td>The human-readable name for this client, to be displayed on the consent screen.</td>
+        
+<td>Note that the RFC's do not require this, but OA4MP does.</td>
+    </tr>
+    
+<tr class="b" align="left" valign="top">
+        
+<td>response_type</td>
+        
+<td>N</td>
+        
+<td>code (default), id_token.</td>
+        
+<td>Response types the client <i>may</i> support. If a requested response_type is not on this list, it should be
+            rejected.
+            Note that the initial request always must have the type &quot;code.&quot; The others are used at other points
+            and sent along in those requests, e.g. getting a refresh token requires you send &quot;refresh_token&quot; to the
+            token endpoint.
+        </td>
+    </tr>
+    
+<tr class="a" align="left" valign="top">
+        
+<td>scope</td>
+        
+<td>N</td>
+        
+<td>Either a JSON array or blank delimited list of scopes</td>
+        
+<td>If you wish to use OIDC, you must at least supply a scope of openid. All supported scopes
+            are <br />
+            
+<ul>
+                
+<li>openid</li>
+                
+<li>email</li>
+                
+<li>profile</li>
+                
+<li>org.cilogon.userinfo</li>
+                
+<li>edu.uiuc.ncsa.myproxy.getcert</li>
+            </ul>
+            Note that
+            the getcert scope requires you be able to get X509 certs via a MyProxy server, so only specify that if
+            the service supports X509 certs and you really need it.
+            <br /><b>Public clients:</b> Only openid scope is allowed and attempts to change the scopes will result in
+            an error. It is not possible to change a public client to a confidential client. You must
+            register a new client instead (This is due to our policies regarding creation of client secrets.).
+        </td>
+    </tr>
+</table>
+
+</section><section>
+<h2><a name="OA4MP_specific_attributes"></a>OA4MP specific attributes</h2>
+
+<p>In the table below are attributes that are specific to OA4MP and may be sent as well.
+    In particular, note the <b>Anon?</b> column which if <b>Y</b> means than an anonymous client
+    can set this.</p>
+
+<table border="0" class="bodyTable"><caption>Valid values</caption>
+    
+    
+<tr class="a">
+        
+<th>Parameter</th>
+        
+<th>Required?</th>
+        
+<th>Default</th>
+        
+<th>Anon?</th>
+        
+<th>Values</th>
+        
+<th>Comments</th>
+    </tr>
+    
+<tr class="b" align="left" valign="top">
+        
+<td>at_lifetime</td>
+        
+<td>N</td>
+        
+<td>-1</td>
+        
+<td>Y</td>
+        
+<td>Integer (in seconds)</td>
+        
+<td>This sets the access token lifetime for all subsequent access tokens. Note
+            that is <i>must be less than or equal to the server's default</i>. You should only set this if
+            you have a specific need for it an knowledge of what values will work. The default means to use
+            the server default.
+        </td>
+    </tr>
+    
+<tr class="a" align="left" valign="top">
+        
+<td>description</td>
+        
+<td>N</td>
+        
+<td>--</td>
+        
+<td>Y</td>
+        
+<td>String</td>
+        
+<td>This is an opaque string that contains a description of this client. It may or
+            may not be human-readable, so &quot;Jeff's test client&quot; is fine as is &quot;42-1455-35:4566-255&quot;
+            if that helps your admin client manage these.
+        </td>
+    </tr>
+    
+<tr class="b" align="left" valign="top">
+        
+<td>ersatz_client</td>
+        
+<td>N</td>
+        
+<td>false</td>
+        
+<td>N</td>
+        
+<td>Boolean</td>
+        
+<td>If this client can be used as an <a href="ersatz_clients.html">ersatz client</a>.
+        </td>
+    </tr>
+    
+<tr class="a" align="left" valign="top">
+        
+<td>extends_provisioners</td>
+        
+<td>N</td>
+        
+<td>false</td>
+        
+<td>N</td>
+        
+<td>Boolean</td>
+        
+<td>The clients that provision this may be used as prototypes as well. Set this
+            <b>true</b> if you want this (ersatz) client to inherit the settings of its
+            provisioners. See <a href="ersatz_clients.html">ersatz clients</a> for more.
+        </td>
+    </tr>
+    
+<tr class="b" align="left" valign="top">
+        
+<td>cfg</td>
+        
+<td>N</td>
+        
+<td>--</td>
+        
+<td>Y</td>
+        
+<td>JSON object</td>
+        
+<td>This is a configuration that includes scripting for getting and processing
+            additional claims. The admin client <b><i>must</i></b> have been approved to allow QDL
+            if that will be used, otherwise only standard handlers may be configured.
+            Generally you do not need to set this unless you have a very, very specific requirement. If you
+            send attributes that do not fall within the spec., they will be put in this object for you.
+            Generally if you do not know you need it and know what it does, you can safely ignore it.<br />
+            <b>Public clients:</b>This parameter is not supported and will result in the rejection of any request.
+        </td>
+    </tr>
+    
+<tr class="a" align="left" valign="top">
+        
+<td>forward_scopes_to_proxy</td>
+        
+<td>N</td>
+        
+<td>false</td>
+        
+<td>N</td>
+        
+<td>Boolean</td>
+        
+<td>For servers that use a proxy to handle authorization, you may forward the scopes in the
+            user's request to the proxy server. Generally this is not needed except in special cases
+            and it overrides the proxy_request_scopes attribute.
+            See <a href="using-proxies.html">using proxies</a> for more information.
+        </td>
+    </tr>
+    
+<tr class="b" align="left" valign="top">
+        
+<td>prototypes</td>
+        
+<td>N</td>
+        
+<td>--</td>
+        
+<td>N</td>
+        
+<td>List of client identifiers</td>
+        
+<td>Any client may inherit the configuration of other clients. If set, then the list of
+            client identifiers is used in sequence. See <a href="client-prototypes.html">prototypes</a> for more.
+        </td>
+    </tr>
+    
+<tr class="a" align="left" valign="top">
+        
+<td>proxy_claims_list</td>
+        
+<td>N</td>
+        
+<td>--</td>
+        
+<td>N</td>
+        
+<td>List of claims</td>
+        
+<td>For servers that use a proxy to handle authorization. These are the claims from the
+            proxy server that are to be asserted in the id token. See <a href="using-proxies.html">using proxies</a>
+            for more information.<br /><br />
+            Note that this is sent in the request to dynamic registration endpoint as a standard JSON array of strings
+        </td>
+    </tr>
+    
+<tr class="b" align="left" valign="top">
+        
+<td>proxy_request_scopes</td>
+        
+<td>N</td>
+        
+<td>[*]</td>
+        
+<td>N</td>
+        
+<td>List of claims</td>
+        
+<td>This is ignored if forward_scopes_to_proxy is set to true.
+            For servers that use a proxy to handle authorization, there is a list of claims this client
+            will request from the proxy server. The default is all claims, but you may restrict it to
+            a subset (e.g. if the proxy server allows all claims but the current client is public,
+            you may wish to restrict requests to the openid scope only.) Alternately,
+            the client can simply use the claims in its request.<br /><br />
+            The default (*) means to send all configured scopes. Note that if this is empty, <i>no</i>
+            scopes will be sent to the proxy server (quite possible in a basic OAuth 2 use case).
+            If See <a href="using-proxies.html">using proxies</a> for more information.<br /><br />
+            Note that this is sent in the request to dynamic registration endpoint as a standard JSON array of strings
+        </td>
+    </tr>
+    
+<tr class="a" align="left" valign="top">
+        
+<td>rt_lifetime</td>
+        
+<td>N</td>
+        
+<td>-1</td>
+        
+<td>Y</td>
+        
+<td>Integer (in seconds)</td>
+        
+<td>If you request a grant_type of refresh_token, this specifies the maximum lifetime,
+            in seconds, that
+            it will be valid. Normally this is set for a very long time, as in weeks if not months. If this is omitted
+            or set to 0 (zero) then no refresh tokens will be created. The default value means to use whatever the
+            server deefaults are.
+        </td>
+    </tr>
+    
+<tr class="b" align="left" valign="top">
+        
+<td>skip_server_scripts</td>
+        
+<td>N</td>
+        
+<td>false</td>
+        
+<td>Y</td>
+        
+<td>Boolean</td>
+        
+<td>Servers may have system-wide scripts that are configured. Setting this true will skip those.
+        </td>
+    </tr>
+    
+<tr class="a" align="left" valign="top">
+        
+<td>strict_scopes</td>
+        
+<td>N</td>
+        
+<td>true</td>
+        
+<td>N</td>
+        
+<td>true</td>
+        
+<td>If set to <b>true</b> (default) only scopes explicitly
+            set at registration will be allowed. Note that any unrecognized scopes
+            in the initial request will cause the request to be rejected.
+            If set to <b>true</b> you may send anything as a scope
+            and allowed scopes will be processed, unknown scopes will be passed along for later processing
+            and if not used, simply ignored.
+            In the case that the access tokens is a JWT (such as SciTokens or WLCG tokens) set this
+            false since the access token scopes would be passed in.
+        </td>
+    </tr>
+</table>
+
+</section>
+
+    </div>
+</div>
+<div class="clear">
+    <hr/>
+</div>
+<div id="footer">
+    <div class="xright">&#169;    
+                    2023
+        
+                    
+    
+
+    
+        
+                        
+    
+        
+    </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+</body>
+</html>
+

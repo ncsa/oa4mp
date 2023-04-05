@@ -1,0 +1,283 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+
+
+
+
+
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>OAuth for MyProxy</title>
+    <style type="text/css" media="all">
+        @import url("../../css/oa4mp-custom.css");
+        @import url("../../css/oa4mp-theme.css");
+        @import url("../../css/site.css");
+    </style>
+    <link rel="stylesheet" href="../../css/print.css" type="text/css" media="print"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    </head>
+<body class="composite">
+<div id="banner">
+                        <a href="http://www.ncsa.illinois.edu/" id="bannerLeft"  >
+        
+                                                                    <img src="../../css/images/ncsalogo_sm-2.gif" alt="NCSA"/>
+        
+                </a>
+                                    <a href="http://grid.ncsa.illinois.edu/myproxy/" id="bannerRight"  >
+        
+                                                                    <img src="../../css/images/MyProxyWide.gif" alt="MyProxy"/>
+        
+                </a>
+                <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="breadcrumbs">
+            
+    
+
+    
+        
+                        
+    
+        
+                    <div class="xleft">
+            Last Published: 2023-04-05
+                                </div>
+                <div class="xright">            
+    
+
+    
+        
+                        
+    
+        
+                         Version: 5.3-SNAPSHOT
+            </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="leftColumn">
+    <div id="navcolumn">
+                
+    
+
+    
+        
+                        
+    
+        
+                               <h5>OAuth for MyProxy</h5>
+                        <ul>
+                    
+    <li class="none">
+                        <a href="../../server/index.html">Overview</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../server/index.html">Server</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../client/index.html">Client</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../apidocs/index.html">api docs</a>
+            </li>
+              </ul>
+                            <h5>Project Documentation</h5>
+                        <ul>
+                    
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-info.html">Project Information</a>
+                        </li>
+              
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-reports.html">Project Reports</a>
+                        </li>
+              </ul>
+                                               <a href="http://maven.apache.org/" title="Built by Maven"
+           class="poweredBy">
+            <img class="poweredBy"
+                 alt="Built by Maven"
+                 src="http://maven.apache.org/images/logos/maven-feather.png"
+                 width="90"
+                 height="30"
+                 border="1"/>
+        </a>
+                           
+    
+
+    
+        
+                        
+    
+        
+        </div>
+</div>
+<div id="bodyColumn">
+    <div id="contentBox">
+        
+
+
+
+
+<section>
+<h2><a name="The_Server_Configuration_File."></a>The Server Configuration File.</h2>
+This contains a few examples of server configurations. You should read the main
+<a href="../../common/configuration/configuration-files.html">configuration document</a>
+first.
+<section>
+<h3><a name="Example._Specifying_an_OAuth_2.0_configuration."></a>Example. Specifying an OAuth 2.0 configuration.</h3>
+
+<p>E.g. Let us say you have the following configuration:</p>
+
+<div>
+<pre>
+&lt;config&gt;
+    &lt;service name=&quot;<span style="background-color: #ff6600;">my-config</span>&quot;&gt;
+    &lt;!-- lots of other stuff --&gt;
+    &lt;/service&gt;
+&lt;/config&gt;
+</pre></div>
+
+<p>You would need to put the following into your web.xml file:</p>
+
+
+<div>
+<pre>
+&lt;context-param&gt;
+    &lt;param-name&gt;oa4mp:oauth2.server.config.file&lt;/param-name&gt;
+    &lt;param-value&gt;/path/to/cfg.xml&lt;/param-value&gt;
+&lt;/context-param&gt;
+</pre></div>
+
+<div>
+<pre>
+&lt;context-param&gt;
+    &lt;param-name&gt;oa4mp:oauth2.server.config.name&lt;/param-name&gt;
+    &lt;param-value&gt;<span style="background-color: #ff6600;">my-config</span>&lt;/param-value&gt;
+&lt;/context-param&gt;
+</pre></div>
+
+
+
+</section><section>
+<h3><a name="An_alias_example."></a>An alias example.</h3>
+
+
+<p>You may also have several configurations within a file and specify an <i>alias</i> or alternate name. This allows
+    you to very easily switch configurations, keep old ones or have test configurations. To specify a configuration as
+    an alias, you need to specify the name and alias tags:</p>
+
+<div>
+<pre>
+&lt;config&gt;
+    &lt;service name=&quot;default&quot; alias=&quot;new-config&quot;/&gt;
+    &lt;service name=&quot;new-config&quot;&gt;
+       &lt;!-- whole bunch of stuff for the actual configuration --&gt;
+    &lt;/service&gt;
+
+    &lt;service name=&quot;mysql-5.0.2&quot;&gt;
+       &lt;!-- complete configuration here --&gt;
+    &lt;/service&gt;
+&lt;/config&gt;
+</pre></div>
+
+<p>In the example above, the service would be configured to always use &quot;default&quot; but the configuration is aliased to map
+    this to &quot;new-config&quot;. A typical use might be that the service is trying to migrate from mysql 5.0.2 and wants to
+    preserve the old configuration so as to back out as needed. Again, you may have any number of aliases and aliases are
+    transitive, so an alias can refer to another alias and so forth and these will be resolved down the chain.
+    </p>
+
+</section><section>
+<h3><a name="Including_other_configuration_files."></a>Including other configuration files.</h3>
+There is now (as of OA4MP 1.1) the ability to include other configuration files. Note that
+
+</section><section>
+<h3><a name="An_example._Two_configuration_files."></a>An example. Two configuration files.</h3>
+Reworking the above example, this is completely equivalent to
+
+<div>
+<pre>
+&lt;config&gt;
+    &lt;service name=&quot;default&quot; alias=&quot;new-config&quot;/&gt;
+    &lt;file include=&quot;/path/to/server-cfg.xml&quot;/&gt;
+&lt;/config&gt;
+</pre></div>
+and the file /path/to/server-cfg.xml is below:
+
+<div>
+<pre>
+&lt;config&gt;
+    &lt;service name=&quot;new-config&quot;&gt;
+       &lt;!-- whole bunch of stuff for the actual configuration --&gt;
+    &lt;/service&gt;
+
+    &lt;service name=&quot;mysql-5.0.2&quot;&gt;
+       &lt;!-- complete configuration here --&gt;
+    &lt;/service&gt;
+&lt;/config&gt;
+</pre></div>
+
+You only need refer to the first file in your deployment descriptor. The second (and any others) will be loaded
+for you.
+
+
+<p>A really great use of this is specifying an administrative configuration. This lets you point to your
+    main configuration as well as have other specialized configurations (such a file store for backing up a database,
+    monitoring clients, etc.) You need only have a single server configuration file and refer to that.</p>
+
+
+<p>Another use of configuration files is if you are running multiple versions of OA4MP. For instance, have
+    a file for OAuth 1.0a-based configuration and one for OAuth2 - based ones. Then have a file that refers to
+    these with aliases for the currently active configurations.</p>
+
+
+
+
+</section></section>
+
+    </div>
+</div>
+<div class="clear">
+    <hr/>
+</div>
+<div id="footer">
+    <div class="xright">&#169;    
+                    2023
+        
+                    
+    
+
+    
+        
+                        
+    
+        
+    </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+</body>
+</html>
+

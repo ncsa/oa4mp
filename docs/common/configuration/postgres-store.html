@@ -1,0 +1,431 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+
+
+
+
+
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>OAuth for MyProxy</title>
+    <style type="text/css" media="all">
+        @import url("../../css/oa4mp-custom.css");
+        @import url("../../css/oa4mp-theme.css");
+        @import url("../../css/site.css");
+    </style>
+    <link rel="stylesheet" href="../../css/print.css" type="text/css" media="print"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    </head>
+<body class="composite">
+<div id="banner">
+                        <a href="http://www.ncsa.illinois.edu/" id="bannerLeft"  >
+        
+                                                                    <img src="../../css/images/ncsalogo_sm-2.gif" alt="NCSA"/>
+        
+                </a>
+                                    <a href="http://grid.ncsa.illinois.edu/myproxy/" id="bannerRight"  >
+        
+                                                                    <img src="../../css/images/MyProxyWide.gif" alt="MyProxy"/>
+        
+                </a>
+                <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="breadcrumbs">
+            
+    
+
+    
+        
+                        
+    
+        
+                    <div class="xleft">
+            Last Published: 2023-04-05
+                                </div>
+                <div class="xright">            
+    
+
+    
+        
+                        
+    
+        
+                         Version: 5.3-SNAPSHOT
+            </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="leftColumn">
+    <div id="navcolumn">
+                
+    
+
+    
+        
+                        
+    
+        
+                               <h5>OAuth for MyProxy</h5>
+                        <ul>
+                    
+    <li class="none">
+                        <a href="../../server/index.html">Overview</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../server/index.html">Server</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../client/index.html">Client</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../apidocs/index.html">api docs</a>
+            </li>
+              </ul>
+                            <h5>Project Documentation</h5>
+                        <ul>
+                    
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-info.html">Project Information</a>
+                        </li>
+              
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-reports.html">Project Reports</a>
+                        </li>
+              </ul>
+                                               <a href="http://maven.apache.org/" title="Built by Maven"
+           class="poweredBy">
+            <img class="poweredBy"
+                 alt="Built by Maven"
+                 src="http://maven.apache.org/images/logos/maven-feather.png"
+                 width="90"
+                 height="30"
+                 border="1"/>
+        </a>
+                           
+    
+
+    
+        
+                        
+    
+        
+        </div>
+</div>
+<div id="bodyColumn">
+    <div id="contentBox">
+        
+
+
+
+<section>
+<h2><a name="The_PostgreSQL_Configuration"></a>The PostgreSQL Configuration</h2>
+
+
+<p>Scope: client and server, all versions.</p>
+
+
+<p>This configures a <a class="externalLink" href="http://www.postgresql.org">PostgreSQL</a> store. There are several options, but most of
+    them are optional. See the document on setting up the database and follow the instructions there before trying to
+    connect with it. Note that there may be many stores for a configuration if each of them, <i>e.g.</i>
+    requires different connection information.</p>
+
+<table class="bodyTable" style="text-align: left; width: 100%;" border="1" cellspacing="2" cellpadding="2">
+    <tbody>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">Attribute</td>
+        
+<td style="vertical-align: top;">Required?</td>
+        
+<td style="vertical-align: top;">Default</td>
+        
+<td style="vertical-align: top;">Description</td>
+    </tr>
+    
+<tr class="b">
+        
+<td style="vertical-align: top;">username</td>
+        
+<td style="vertical-align: top;">Y</td>
+        
+<td style="vertical-align: top;">N/A</td>
+        
+<td style="vertical-align: top;">The name of the user to use</td>
+    </tr>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">password</td>
+        
+<td style="vertical-align: top;">Y</td>
+        
+<td style="vertical-align: top;">N/A</td>
+        
+<td style="vertical-align: top;">The password for the user</td>
+    </tr>
+    
+<tr class="b">
+        
+<td style="vertical-align: top;">host</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;">localhost</td>
+        
+<td style="vertical-align: top;">The host. (localhost)</td>
+    </tr>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">port</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;">5432</td>
+        
+<td style="vertical-align: top;">The port for the connection.</td>
+    </tr>
+    
+<tr class="b">
+        
+<td style="vertical-align: top;">driver</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;">org.postgresql.Driver</td>
+        
+<td style="vertical-align: top;">The JDBC driver (current)</td>
+    </tr>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">database</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;"><span style="font-style: italic;">spec</span></td>
+        
+<td style="vertical-align: top;">The name of the database.</td>
+    </tr>
+    
+<tr class="b">
+        
+<td style="vertical-align: top;">schema</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;"><span style="font-style: italic;">spec</span></td>
+        
+<td style="vertical-align: top;">The schema for the database</td>
+    </tr>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">tablename</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;"><span style="font-style: italic;">spec</span></td>
+        
+<td style="vertical-align: top;">The name of the table for this.</td>
+    </tr>
+    
+<tr class="b">
+        
+<td style="vertical-align: top;">prefix</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;">(none)</td>
+        
+<td style="vertical-align: top;">An optional prefix for the table.</td>
+    </tr>
+    
+<tr class="a">
+           
+<td style="vertical-align: top;">parameters</td>
+           
+<td style="vertical-align: top;">N</td>
+           
+<td style="vertical-align: top;">(none)</td>
+           
+<td style="vertical-align: top;">An optional extra set of parameters to pass to the JDBC driver. This is of the form
+               key0=value0&amp;key1=value1&amp;key2=value2... Note that each key/value pair is separated with an ampersand.
+               Note that OA4MP does all connections using UTF8 so that parameter is always added.
+           </td>
+       </tr>
+    
+<tr class="b">
+          
+<td style="vertical-align: top;">useSSL</td>
+          
+<td style="vertical-align: top;">N</td>
+          
+<td style="vertical-align: top;">false</td>
+          
+<td style="vertical-align: top;">Try to connect to the database using SSL support. This presumes you
+          have configured the database to use SSL.</td>
+      </tr>
+    </tbody>
+</table>
+
+<p><br /> The <span style="font-style: italic;">spec</span> refers to the specification. Defaults are given there and
+    applied.</p>
+
+
+</section><section>
+<h2><a name="Getting_install_scripts."></a>Getting install scripts.</h2>
+The latest installation scripts for all versions are listed here:
+
+<ul>
+    
+<li><a class="externalLink" href="http://svn.code.sf.net/p/cilogon/code/tags/latest/server/pg.sql">OA4MP server install script</a></li>
+    
+<li><a class="externalLink" href="http://svn.code.sf.net/p/cilogon/code/tags/latest/server/oauth2-pg.sql">OA4MP OAuth2 server install script</a></li>
+    
+<li><a class="externalLink" href="http://svn.code.sf.net/p/cilogon/code/tags/latest/client/postgres.sql">OA4MP client install script</a></li>
+    
+<li><a class="externalLink" href="http://svn.code.sf.net/p/cilogon/code/tags/latest/client/client-postgres.sql">OA4MP OAuth2 client install script</a></li>
+</ul>
+
+You may just cut and paste them from the file into the command line interface or execute them as scripts. Be sure to
+read the comments since you may want to customize them to fit your installation.
+<section>
+<h3><a name="Example_1._Simple_as_it_gets."></a>Example 1. Simple as it gets.</h3>
+
+<div>
+<pre>
+&lt;config&gt;
+   &lt;server address=&quot;http://localhost/oauth&quot;&gt;
+      &lt;postgresql username=&quot;foo&quot; password=&quot;bar&quot; useSSL=&quot;true&quot;&gt;
+           &lt;transactions/&gt;
+           &lt;clients/&gt;
+           &lt;clientApprovals/&gt;
+      &lt;/postgresql&gt;
+   &lt;/server&gt;
+&lt;config&gt;
+</pre></div>
+
+<p>Dumps everything into postgresql, uses the defaults for myproxy and disables mail notifications. Note that all the
+    defaults for schemas &amp;c. are used. Also notice that the connection will run over SSL.</p>
+
+</section><section>
+<h3><a name="Example_2._Multiple_stores."></a>Example 2. Multiple stores.</h3>
+
+
+<p>In this case, there are multiple users who need specific access to stores.</p>
+
+<div>
+<pre>
+&lt;config&gt;
+   &lt;server address=&quot;https://localhost/oauth&quot;&gt;
+      &lt;postgresql username=&quot;client-admin&quot; password=&quot;changeme&quot;&gt;
+         &lt;clients/&gt;
+      &lt;/postgresql&gt;
+      &lt;postgresql usernname=&quot;approver-admin&quot; password=&quot;changeme2&quot;&gt;
+         &lt;clientApprovals/&gt;
+      &lt;/postgresql&gt;
+      &lt;!-- other configuration as needed --&gt;
+   &lt;/server&gt;
+&lt;/config&gt;
+</pre></div>
+
+<p>This will put the clients and approvals under two different accounts, neither of which requires SSL. The default MyProxy server is used. Since no
+    store for the transactions are specified, they will reside in memory only.</p>
+
+
+<p>Example 3. A really fancy one.</p>
+
+
+<p>if you needed to specify a great deal of specific information about a table, here is how you would do it:</p>
+
+<div>
+<pre>
+&lt;postgresql username=&quot;foo&quot;
+   password=&quot;bar&quot;
+   driver=&quot;org.postgresql.Driver&quot;
+   port=&quot;4771&quot;
+   schema=&quot;atmos&quot;
+   database=&quot;oauth&quot;
+   tablename=&quot;trans&quot;
+   prefix=&quot;ocd&quot;&gt;
+     &lt;transactions/&gt;
+&lt;/postgresql&gt;
+</pre></div>
+
+<p>This specifies a (very) non-standard port for PostgreSQL as well as specific information about the database, schema
+    and tablename. This looks in the database named oauth for the table atmos.ocd_trans and puts
+    all transactions there.</p>
+</section></section><section>
+<h2><a name="A_Client_Example"></a>A Client Example</h2>
+
+<p>In the next example, a fully functional PostgreSQL client asset store is configured.</p>
+
+<div>
+<pre>
+&lt;config&gt;
+    &lt;client name=&quot;my-cfg&quot;&gt;
+       &lt;postgresql username=&quot;fionna&quot;
+          password=&quot;sekret&quot;
+          schema=&quot;oa4mp&quot;
+          database=&quot;client&quot;&gt;
+          &lt;<a href="client/dtd/asset-store.html">assetStore</a>/&gt;
+       &lt;/postgresql&gt;
+       &lt;!-- other stuff --&gt;
+    &lt;/client&gt;
+&lt;/config&gt;
+</pre></div>
+This stores the assets in the schema named &quot;oa4mp&quot; in the database named &quot;client&quot; and in the default table
+named &quot;assets&quot;
+
+
+</section>
+
+    </div>
+</div>
+<div class="clear">
+    <hr/>
+</div>
+<div id="footer">
+    <div class="xright">&#169;    
+                    2023
+        
+                    
+    
+
+    
+        
+                        
+    
+        
+    </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+</body>
+</html>
+

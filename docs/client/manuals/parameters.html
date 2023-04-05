@@ -1,0 +1,452 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+
+
+
+
+
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>OAuth for MyProxy</title>
+    <style type="text/css" media="all">
+        @import url("../../css/oa4mp-custom.css");
+        @import url("../../css/oa4mp-theme.css");
+        @import url("../../css/site.css");
+    </style>
+    <link rel="stylesheet" href="../../css/print.css" type="text/css" media="print"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    </head>
+<body class="composite">
+<div id="banner">
+                        <a href="http://www.ncsa.illinois.edu/" id="bannerLeft"  >
+        
+                                                                    <img src="../../css/images/ncsalogo_sm-2.gif" alt="NCSA"/>
+        
+                </a>
+                                    <a href="http://grid.ncsa.illinois.edu/myproxy/" id="bannerRight"  >
+        
+                                                                    <img src="../../css/images/MyProxyWide.gif" alt="MyProxy"/>
+        
+                </a>
+                <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="breadcrumbs">
+            
+    
+
+    
+        
+                        
+    
+        
+                    <div class="xleft">
+            Last Published: 2023-04-05
+                                </div>
+                <div class="xright">            
+    
+
+    
+        
+                        
+    
+        
+                         Version: 5.3-SNAPSHOT
+            </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="leftColumn">
+    <div id="navcolumn">
+                
+    
+
+    
+        
+                        
+    
+        
+                               <h5>OAuth for MyProxy</h5>
+                        <ul>
+                    
+    <li class="none">
+                        <a href="../../server/index.html">Overview</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../server/index.html">Server</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../client/index.html">Client</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../apidocs/index.html">api docs</a>
+            </li>
+              </ul>
+                            <h5>Project Documentation</h5>
+                        <ul>
+                    
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-info.html">Project Information</a>
+                        </li>
+              
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-reports.html">Project Reports</a>
+                        </li>
+              </ul>
+                                               <a href="http://maven.apache.org/" title="Built by Maven"
+           class="poweredBy">
+            <img class="poweredBy"
+                 alt="Built by Maven"
+                 src="http://maven.apache.org/images/logos/maven-feather.png"
+                 width="90"
+                 height="30"
+                 border="1"/>
+        </a>
+                           
+    
+
+    
+        
+                        
+    
+        
+        </div>
+</div>
+<div id="bodyColumn">
+    <div id="contentBox">
+        
+
+
+
+
+<section>
+<h2><a name="Client_Configuration_Parameters."></a>Client Configuration Parameters.</h2>
+
+
+<p><a name="tags" id="tags">These are values that the client needs to supply to identify itself.</a> These are</p>
+
+
+<table class="bodyTable" style="text-align: left; width: 100%;" border="1" cellspacing="2" cellpadding="2">
+    <tbody>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;"></td>
+        
+<td style="vertical-align: top;">Required?</td>
+        
+<td style="vertical-align: top;">Default</td>
+        
+<td style="vertical-align: top;">Description</td>
+    </tr>
+    
+<tr class="b">
+        
+<td style="vertical-align: top;">accessTokenUri</td>
+        
+<td style="vertical-align: top;">Y</td>
+        
+<td style="vertical-align: top;">ServiceUri + /token</td>
+        
+<td style="vertical-align: top;">
+            The address which the client should use for getting
+            the access token. Normally
+            this is constructed from the serviceUri and should only be set explicitly by the server administrator
+            if needed.
+        </td>
+    </tr>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">assetUri</td>
+        
+<td style="vertical-align: top;">Y</td>
+        
+<td style="vertical-align: top;">ServiceUri + /getcert</td>
+        
+<td style="vertical-align: top;">The address
+            from which the client will get the certificate. Normally
+            this is constructed from the serviceUri and should only be set explicitly by the server administrator
+            if needed.
+        </td>
+    </tr>
+    
+<tr class="b">
+        
+<td style="vertical-align: top;">authorizeUri</td>
+        
+<td style="vertical-align: top;">Y</td>
+        
+<td style="vertical-align: top;">ServiceUri + /authorize</td>
+        
+<td style="vertical-align: top;">The address
+            which the client should use for authorization. Normally
+            this is constructed from the serviceUri and should only be set explicitly by the server administrator
+            if needed.
+        </td>
+    </tr>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">callbackUri</td>
+        
+<td style="vertical-align: top;">Y</td>
+        
+<td style="vertical-align: top;">N/A</td>
+        
+<td style="vertical-align: top;">The redirect address to which the user is sent after authorization.
+            Note that this can be reset at runtime before the call is made, should you want to customize it per user.
+        </td>
+    </tr>
+    
+<tr class="b">
+        
+<td style="vertical-align: top;">deviceAuthorizationUri</td>
+        
+<td style="vertical-align: top;">Y</td>
+        
+<td style="vertical-align: top;">ServiceUri + /device_authorization</td>
+        
+<td style="vertical-align: top;">The address
+            which the client should use for initiating the device authorization flow (RFC 8628). Normally
+            this is constructed from the serviceUri and should only be set explicitly by the server administrator
+            if needed.
+        </td>
+    </tr>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">enableAssetCleanup</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;">false</td>
+        
+<td style="vertical-align: top;">Whether the service will automatically remove old assets in the store.</td>
+    </tr>
+    
+<tr class="b">
+        
+<td style="vertical-align: top;">id</td>
+        
+<td style="vertical-align: top;">Y</td>
+        
+<td style="vertical-align: top;">N/A</td>
+        
+<td style="vertical-align: top;">The unique identifier generated by the server during the registration
+            process.
+        </td>
+    </tr>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">keypairLifetime</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;">0</td>
+        
+<td style="vertical-align: top;">The maximum age, in seconds, for the client-side generated keypair
+            to be cached. Keypair caching reduces key generation load on heavily used clients by re-using
+            a keypair across OAuth sessions. This functionality should only be used if the keypair remains
+            secured in the OAuth client and is not externally exposed. It affects the
+            keypair used to generate certificate requests and is not the same as the OAuth keypair
+            created at registration. Setting the value to zero forces the client to generate a new keypair with
+            each request. This keypair is stored in the asset for the request.
+        </td>
+    </tr>
+    
+<tr class="b">
+        
+<td style="vertical-align: top;">lifetime</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;">43200</td>
+        
+<td style="vertical-align: top;">The requested lifetime in seconds this certificate should last. The service
+            will always apply its own policies to any request. The default is 12 hours.
+        </td>
+    </tr>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">maxAssetLifetime</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;">2592000 (one calendar month in seconds)</td>
+        
+<td style="vertical-align: top;">The maximum age, in seconds, that an asset may be in the store. This only
+            applies if the cleanup facility is enabled and the OAuth version is 1.0a. In the
+            <span style="background-color: #ff6600;">OAuth 2.0</span> version
+            this is ignored, since cleanup of old assets is determined by the lifetime of the refresh token.
+        </td>
+    </tr>
+
+
+    
+<tr class="b">
+        
+<td style="vertical-align: top;">secret</td>
+        
+<td style="vertical-align: top;">Y</td>
+        
+<td style="vertical-align: top;">N/A</td>
+        
+<td style="vertical-align: top;">The
+            secret that is given to the client at registration. This should be cut and pasted with no blanks or other
+            characters into the configuration file. Note that the server does not store this! It will only store
+            a hash of it so if you lose it, you must re-register.
+        </td>
+    </tr>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">serviceUri</td>
+        
+<td style="vertical-align: top;">Y</td>
+        
+<td style="vertical-align: top;">N/A</td>
+        
+<td style="vertical-align: top;">The address of the service this client uses.</td>
+    </tr>
+    
+<tr class="b">
+        
+<td style="vertical-align: top;">showRedirectPage</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;">false</td>
+        
+<td style="vertical-align: top;">Whether to pause the exchange to show a page containing the redirect URL
+            and the private key. Set this to <b>true</b> to enable. Generally this is rather useful in debugging but
+            should not be enabled in production systems. Note that this only applies to OAuth 1.0a since the protocol
+            under <span style="background-color: #ff6600;">OAuth 2.0</span> is different.
+        </td>
+    </tr>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">skin</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;">N/A</td>
+        
+<td style="vertical-align: top;">The skin that the site will display for this client. This lets OA4MP servers
+            mimic the look and feel of the client site. You should contact the server administration to set this up
+            with you if you are interested.
+        </td>
+    </tr>
+    
+<tr class="b">
+         
+<td style="vertical-align: top;">userInfoUri</td>
+         
+<td style="vertical-align: top;">Y</td>
+         
+<td style="vertical-align: top;">ServiceUri + /userinfo</td>
+         
+<td style="vertical-align: top;">The address
+             from which the client will get user information. Normally
+             this is constructed from the serviceUri and should only be set explicitly by the server administrator
+             if needed.
+         </td>
+     </tr>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">wellKnownUri</td>
+        
+<td style="vertical-align: top;">Y</td>
+        
+<td style="vertical-align: top;">N/A</td>
+        
+<td style="vertical-align: top;">The address of the well-known page for the server.</td>
+    </tr>
+    </tbody>
+</table>
+
+<p>If any of the required parameters are omitted, then an exception will be raised. The certificate lifetime may be
+    omitted. If present, it will be processed in accordance with the service's cert lifetime policies and there is no
+    requirement that the requested lifetime be honored.</p>
+
+<section>
+<h3><a name="Example._A_standard_client_configuration."></a>Example. A standard client configuration.</h3>
+
+<div>
+<pre>
+&lt;config&gt;
+   &lt;client&gt;
+      &lt;callbackUri&gt;http://client.example.org/client2/ready&lt;/callbackUri&gt;
+      &lt;secret&gt;bwM9YgIMM4oMeOTZdJLyp8shgfuzrwWHxS401pEx8w2_BOk5ip46zJL_bsTj2bU5iuS7QsiGmze44pA2k3MhYuPGOkSSMpUEkpXI9KZqY_OVGOI8B3JYj8q0ZWP80hkmshwzYQiHOz5IJW7KZpMOQSKVG5lbmP0_iSwPim74WwH9akuc_3pocIntA5OfVtRKl0LCAz1WkXUSbF5sH6-xx8SWPJvaU0rc95jmxXqUxib3iXwYgheo1yyrvK4RHsStppZD9RmcwgyhLxvgUDap-23tm&lt;/secret&gt;
+      &lt;serviceUri&gt;https://server.example.org/oauth2&lt;/serviceUri&gt;
+      &lt;id&gt;myproxy:delegation,2011:/client/c43d987fedbf7c3258973fdedc8&lt;/id&gt;
+      &lt;<a href="storage.html">fileStore</a> path=&quot;/path/to/asset/store/&quot;&gt;
+          &lt;assetStore/&gt;
+      &lt;/fileStore&gt;
+      &lt;enableAssetCleanup&gt;true&lt;/enableAssetCleanup&gt;
+   &lt;/client&gt;
+&lt;/config&gt;
+</pre></div>
+
+<p>
+    The secret that is sent to the server is put in without linebreaks. The keypair lifetime is omitted which means that
+    the client will take the default (currently a new keypair will be generated once every 24 hours.)
+    There is no maxAssetLifetime parameter here since that is not needed in OAuth 2.0-based clients. However, asset
+    cleanup is still enabled.
+</p>
+
+
+
+
+</section></section>
+
+    </div>
+</div>
+<div class="clear">
+    <hr/>
+</div>
+<div id="footer">
+    <div class="xright">&#169;    
+                    2023
+        
+                    
+    
+
+    
+        
+                        
+    
+        
+    </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+</body>
+</html>
+

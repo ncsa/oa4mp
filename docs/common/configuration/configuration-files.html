@@ -1,0 +1,367 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+
+
+
+
+
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>OAuth for MyProxy</title>
+    <style type="text/css" media="all">
+        @import url("../../css/oa4mp-custom.css");
+        @import url("../../css/oa4mp-theme.css");
+        @import url("../../css/site.css");
+    </style>
+    <link rel="stylesheet" href="../../css/print.css" type="text/css" media="print"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    </head>
+<body class="composite">
+<div id="banner">
+                        <a href="http://www.ncsa.illinois.edu/" id="bannerLeft"  >
+        
+                                                                    <img src="../../css/images/ncsalogo_sm-2.gif" alt="NCSA"/>
+        
+                </a>
+                                    <a href="http://grid.ncsa.illinois.edu/myproxy/" id="bannerRight"  >
+        
+                                                                    <img src="../../css/images/MyProxyWide.gif" alt="MyProxy"/>
+        
+                </a>
+                <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="breadcrumbs">
+            
+    
+
+    
+        
+                        
+    
+        
+                    <div class="xleft">
+            Last Published: 2023-04-05
+                                </div>
+                <div class="xright">            
+    
+
+    
+        
+                        
+    
+        
+                         Version: 5.3-SNAPSHOT
+            </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="leftColumn">
+    <div id="navcolumn">
+                
+    
+
+    
+        
+                        
+    
+        
+                               <h5>OAuth for MyProxy</h5>
+                        <ul>
+                    
+    <li class="none">
+                        <a href="../../server/index.html">Overview</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../server/index.html">Server</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../client/index.html">Client</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../apidocs/index.html">api docs</a>
+            </li>
+              </ul>
+                            <h5>Project Documentation</h5>
+                        <ul>
+                    
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-info.html">Project Information</a>
+                        </li>
+              
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-reports.html">Project Reports</a>
+                        </li>
+              </ul>
+                                               <a href="http://maven.apache.org/" title="Built by Maven"
+           class="poweredBy">
+            <img class="poweredBy"
+                 alt="Built by Maven"
+                 src="http://maven.apache.org/images/logos/maven-feather.png"
+                 width="90"
+                 height="30"
+                 border="1"/>
+        </a>
+                           
+    
+
+    
+        
+                        
+    
+        
+        </div>
+</div>
+<div id="bodyColumn">
+    <div id="contentBox">
+        
+
+
+
+
+<section>
+<h2><a name="Configuration_files_and_how_they_work"></a>Configuration files and how they work</h2>
+
+
+<p>All configurations, both client and server work the same. This article documents their commonalities.
+    Features are:</p>
+
+<ul>
+    
+<li>XML-based</li>
+    
+<li>Multiple named configurations supported in a given file</li>
+    
+<li>Multiple types of storage may be specified</li>
+    
+<li>Aliases for configurations are allowed.</li>
+    
+<li>Other configuration files may be included (as of OA4MP 1.1)</li>
+</ul>
+
+<p><b>Comment:</b> ALL tag names are case sensitive in the configuration file -- as per the XML spec,
+    so &quot;fileStore&quot; works, but &quot;filestore&quot; would not, for instance.</p>
+
+
+<section>
+<h3><a name="Parameters_or.2C_how_the_system_finds_its_files"></a>Parameters or, how the system finds its files</h3>
+
+
+<p>There are two things that determine which configuration to use, the file in which it resides and the name
+    of the configuration in that file. These will henceforth be referred to as the <b><i>file parameter</i></b>
+    and <b><i>name parameter</i></b>. To specify parameters you have two options:
+</p>
+    
+<ol style="list-style-type: decimal">
+        
+<li>Specify them as context parameters in the web.xml file for Tomcat.</li>
+        
+<li>Specify them as command line arguments to the JVM (prepend &quot;-D&quot;). This is much less common.</li>
+    </ol>
+
+
+<p><b>Tip:</b> It is a very good idea to put your context parameters in the server web.xml (should be
+    located at $CATALINA_HOME/conf/web.xml.) This will allow you to swap out/upgrade versions of
+    OA4MP without having to touch any configuration -- just drop a new version of the war into the right
+    place and restart the server to get an upgrade.
+</p>
+
+
+<p> Clients and servers as well as different versions of
+    OA4MP have different parameters. The specific of those will be documented elsewhere. However, here
+    is the definitive list for reference</p>
+
+
+<table class="bodyTable" border="1">
+    
+<tr class="a">
+        
+<th>Component</th>
+        
+<th>Parameter</th>
+        
+<th>Value</th>
+    </tr>
+    
+<tr class="b">
+        
+<th rowspan="2">client</th>
+        
+<td>file</td>
+        
+<td>oa4mp:oauth2.client.config.file</td>
+    </tr>
+    
+<tr class="a">
+        
+<td>name</td>
+        
+<td>oa4mp:oauth2.client.config.name</td>
+    </tr>
+    
+<tr class="b">
+        
+<th rowspan="2">server</th>
+        
+<td>file</td>
+        
+<td>oa4mp:oauth2.server.config.file</td>
+    </tr>
+    
+<tr class="a">
+        
+<td>name</td>
+        
+<td>oa4mp:oauth2.server.config.name</td>
+    </tr>
+</table>
+<section>
+<h4><a name="A_server_example."></a>A server example.</h4>
+This how the the file and name parameters would be specified in the web.xml file:
+
+<div>
+<pre>
+&lt;context-param&gt;
+    &lt;param-name&gt;oa4mp:oauth2.server.config.file&lt;/param-name&gt;
+    &lt;param-value&gt;/path/to/cfg.xml&lt;/param-value&gt;
+&lt;/context-param&gt;
+
+&lt;context-param&gt;
+    &lt;param-name&gt;oa4mp:oauth2.server.config.name&lt;/param-name&gt;
+    &lt;param-value&gt;default&lt;/param-value&gt;
+&lt;/context-param&gt;
+</pre></div>
+
+
+<p>in this case the server configuration file at /path/to/cfg.xml would be loaded, searched and the configuration
+named &quot;default&quot; would be loaded. For a given version and component, use the appropriate parameter from the table above.</p>
+
+
+</section></section><section>
+<h3><a name="Aliases"></a>Aliases</h3>
+An <b><i>alias</i></b> is a reference to another named configuration. They are completely analogous to
+file links in unix. Only resolves an alias if it is specifically used. It will also throw an exception
+if a <b>cycle</b> is detected. By that we mean a chain of aliases that resolves to itself. So if
+A refers to B as an alias, and B refers to A, then an exception will occur and
+no configuration will be loaded.
+<section>
+<h4><a name="A_client_example_using_aliases"></a>A client example using aliases</h4>
+in this example, the name parameter is &quot;default&quot;. Inside the configuration file though, there are a couple of
+configurations possible. For instance a production instance and one for debugging. All you would need to switch your
+entire installation is to change what the alias points to here (rather than messing around in Tomcat) and restarting the
+server.
+
+<div>
+<pre>
+&lt;config&gt;
+    &lt;client name=&quot;default&quot; alias=&quot;postgres-cfg&quot;/&gt;
+    &lt;client name=&quot;postgres-cfg&quot;&gt;
+        &lt;!-- lots of stuff --&gt;
+    &lt;/client&gt;
+    &lt;client name=&quot;debug-cfg&quot;&gt;
+        &lt;!-- lots of other stuff --&gt;
+    &lt;/client&gt;
+&lt;/config&gt;
+</pre></div>
+
+</section></section><section>
+<h3><a name="Included_files."></a>Included files.</h3>
+Configuration files may now be included in other configuration files. Note that
+
+<ul>
+    
+<li>the other files must be completely correct syntactically. So no snippets.</li>
+    
+<li>there is no limit on the number of files that may be included and referenced files can reference other files.
+    </li>
+    
+<li>all files are ingested first into what is essentially one large configuration internally. Hierarchies of
+        configurations
+        will not be understood. What distinguishes configurations is their name. If two configurations with the same
+        name are encountered, the result will be unpredictable.
+    </li>
+    
+<li>aliases are resolved after loading. This allows you to keep you aliases in any included file and they will be
+        resolved.
+    </li>
+    
+<li>referenced files are loaded exactly once. So if file A refers to file B which refers to A, Both A and B will
+        load but no recursion will take place. An informational message will be written to the logs if this happens.
+        This is not considered a fatal condition.
+    </li>
+</ul>
+<section>
+<h4><a name="A_client_example_of_using_files."></a>A client example of using files.</h4>
+Reworking the above alias example, this is completely equivalent to
+
+<div>
+<pre>
+&lt;config&gt;
+     &lt;file include=&quot;/path/to/file.xml&quot;/&gt;
+     &lt;client name=&quot;default&quot; alias=&quot;postgres-cfg&quot;/&gt;
+&lt;/config&gt;
+</pre></div>
+and the next file, which is /path/to/file.xml in toto is
+
+<div>
+<pre>
+&lt;config&gt;
+    &lt;client name=&quot;postgres-cfg&quot;&gt;
+        &lt;!-- lots of stuff --&gt;
+    &lt;/client&gt;
+    &lt;client name=&quot;debug-cfg&quot;&gt;
+        &lt;!-- lots of other stuff --&gt;
+    &lt;/client&gt;
+&lt;/config&gt;
+</pre></div>
+Refer to the first file in your deployment. The second will be loaded for you automatically.
+
+
+</section></section></section>
+
+    </div>
+</div>
+<div class="clear">
+    <hr/>
+</div>
+<div id="footer">
+    <div class="xright">&#169;    
+                    2023
+        
+                    
+    
+
+    
+        
+                        
+    
+        
+    </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+</body>
+</html>
+

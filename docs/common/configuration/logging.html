@@ -1,0 +1,333 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+
+
+
+
+
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>OAuth for MyProxy</title>
+    <style type="text/css" media="all">
+        @import url("../../css/oa4mp-custom.css");
+        @import url("../../css/oa4mp-theme.css");
+        @import url("../../css/site.css");
+    </style>
+    <link rel="stylesheet" href="../../css/print.css" type="text/css" media="print"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    </head>
+<body class="composite">
+<div id="banner">
+                        <a href="http://www.ncsa.illinois.edu/" id="bannerLeft"  >
+        
+                                                                    <img src="../../css/images/ncsalogo_sm-2.gif" alt="NCSA"/>
+        
+                </a>
+                                    <a href="http://grid.ncsa.illinois.edu/myproxy/" id="bannerRight"  >
+        
+                                                                    <img src="../../css/images/MyProxyWide.gif" alt="MyProxy"/>
+        
+                </a>
+                <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="breadcrumbs">
+            
+    
+
+    
+        
+                        
+    
+        
+                    <div class="xleft">
+            Last Published: 2023-04-05
+                                </div>
+                <div class="xright">            
+    
+
+    
+        
+                        
+    
+        
+                         Version: 5.3-SNAPSHOT
+            </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="leftColumn">
+    <div id="navcolumn">
+                
+    
+
+    
+        
+                        
+    
+        
+                               <h5>OAuth for MyProxy</h5>
+                        <ul>
+                    
+    <li class="none">
+                        <a href="../../server/index.html">Overview</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../server/index.html">Server</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../client/index.html">Client</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../apidocs/index.html">api docs</a>
+            </li>
+              </ul>
+                            <h5>Project Documentation</h5>
+                        <ul>
+                    
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-info.html">Project Information</a>
+                        </li>
+              
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-reports.html">Project Reports</a>
+                        </li>
+              </ul>
+                                               <a href="http://maven.apache.org/" title="Built by Maven"
+           class="poweredBy">
+            <img class="poweredBy"
+                 alt="Built by Maven"
+                 src="http://maven.apache.org/images/logos/maven-feather.png"
+                 width="90"
+                 height="30"
+                 border="1"/>
+        </a>
+                           
+    
+
+    
+        
+                        
+    
+        
+        </div>
+</div>
+<div id="bodyColumn">
+    <div id="contentBox">
+        
+
+
+
+<section>
+<h2><a name="Logging"></a>Logging</h2>
+
+
+<p>Scope: client and server, all versions.</p>
+
+
+<table class="bodyTable" border="2">
+    <tbody>
+    
+<tr class="a">
+        
+<td>Attribute</td>
+        
+<td>Required?</td>
+        
+<td>Default</td>
+        
+<td>Description</td>
+    </tr>
+    
+<tr class="b">
+        
+<td>logFileName</td>
+        
+<td>N</td>
+        
+<td>logging.xml</td>
+        
+<td>The default file is deposited in the invocation directory. If the entire path is given, that will be used.
+            NOTE: the path must exist or logging will fail to initialize. I.e., no paths are created.
+        </td>
+    </tr>
+    
+<tr class="a">
+        
+<td>logName</td>
+        
+<td>N</td>
+        
+<td>&quot;oa4mp&quot;</td>
+        
+<td>The name prepended to each entry in the log file. This is especially useful if several instances of oa4mp
+            are running and you wish to pipe the log messages to a single location.
+        </td>
+    </tr>
+    
+<tr class="b">
+        
+<td>logSize</td>
+        
+<td>N</td>
+        
+<td>0</td>
+        
+<td>The maximum size of the file before the system rolls it over. If rotating files is enabled (by setting the
+            logFileCount greater than 1), then logs are rotated. Otherwise, the log file is simply over-written
+        </td>
+    </tr>
+    
+<tr class="a">
+        
+<td>logFileCount</td>
+        
+<td>N</td>
+        
+<td>1</td>
+        
+<td>The total number of files to have in the rotation. If the count it less than or equal to 1, then only a
+            single log file is maintained.
+        </td>
+    </tr>
+    
+<tr class="b">
+        
+<td>disableLog4j</td>
+        
+<td></td>
+        
+<td>true</td>
+        
+<td>Disable log4j. If you are using log 4 java then set this to &quot;false&quot;. Since there are potential conflicts
+            with log4j the default is to set this to &quot;true&quot;.
+        </td>
+    </tr>
+    
+<tr class="a">
+        
+<td>debug</td>
+        
+<td>N</td>
+        
+<td>&quot;warn&quot;</td>
+        
+<td>Enable system-wide debugging. This is equivalent to setting the debug attribute in the service tag.
+            See the note there for details.
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<p>Note that not specifying a log file will still cause one to be created. If you are enabling rotation of log files, be
+    advised that the name will be interpreted according to Java's logging standard. This means specifying a log file
+    like &quot;/var/www/logs/mylog.log&quot; would create a sequence of files named mylog.log.0, mylog.log.1, ... with the first
+    of these (*.0) being the current log.</p>
+
+<section>
+<h3><a name="Server_Example."></a>Server Example.</h3>
+
+<div>
+<pre>
+&lt;config&gt;
+    &lt;service name=&quot;my-config&quot;&gt;
+       &lt;logging
+          logFileName=&quot;/var/www/log/oa4mp.xml&quot;
+          logName=&quot;oa4mp&quot;
+          logSize=&quot;1000000&quot;
+          logFileCount=&quot;2&quot;
+          debug=&quot;true&quot;/&gt;
+    &lt;!-- rest of config --&gt;
+    &lt;/service&gt;
+ &lt;/config&gt;
+</pre></div>
+
+<p>In this example the log files named &quot;oa4mp.xml.*&quot; are created in the directory &quot;/var/www/log&quot;.
+    The maximum size of a single file is 100000 and there will be 2 files in the rotation, numbered 0
+    (active) and 1. In this case, debugging is enabled for the application.
+    All log entries are prepended with the label &quot;oa4mp&quot;, so that if multiple applications use the same
+    log file, the entries are qualified.</p>
+
+</section><section>
+<h3><a name="Client_Example"></a>Client Example</h3>
+
+<div>
+<pre>
+&lt;config&gt;
+    &lt;client name=&quot;client-config&quot;&gt;
+       &lt;logging
+          logFileName=&quot;/var/www/log/oa4mp.xml&quot;
+          logName=&quot;oa4mp&quot;
+          logSize=&quot;1000000&quot;
+          logFileCount=&quot;2&quot;
+          debug=&quot;true&quot;/&gt;
+    &lt;!-- rest of config --&gt;
+    &lt;/client &gt;
+ &lt;/config&gt;
+</pre></div>
+
+Ditto the description above.
+
+</section><section>
+<h3><a name="Logging_is_not_working_at_all._Why.3F"></a>Logging is not working at all. Why?</h3>
+
+<p>
+    If you have configured logging and are getting no output, a common reason for this is having a
+    global logging properties file, typically in ${catalina.base}/conf/logging.properties,
+    which overrides the web app settings. A less common issue (and far more maddening) can arise when
+    using Log4j and a properties file in an included library (i.e. embedded in a jar file)
+    overrides your logging properties. This
+    can be hard to track down but a good trick is to diasble log 4 java and see if that helps. The
+    worst offender in this category are some third party libraries in Globus
+    for enabling limited proxy support,  and log 4 java might not be usable in those cases.
+</p>
+
+
+</section></section>
+
+    </div>
+</div>
+<div class="clear">
+    <hr/>
+</div>
+<div id="footer">
+    <div class="xright">&#169;    
+                    2023
+        
+                    
+    
+
+    
+        
+                        
+    
+        
+    </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+</body>
+</html>
+

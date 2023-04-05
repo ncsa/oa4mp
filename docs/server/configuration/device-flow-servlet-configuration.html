@@ -1,0 +1,336 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+
+
+
+
+
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>OAuth for MyProxy</title>
+    <style type="text/css" media="all">
+        @import url("../../css/oa4mp-custom.css");
+        @import url("../../css/oa4mp-theme.css");
+        @import url("../../css/site.css");
+    </style>
+    <link rel="stylesheet" href="../../css/print.css" type="text/css" media="print"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    </head>
+<body class="composite">
+<div id="banner">
+                        <a href="http://www.ncsa.illinois.edu/" id="bannerLeft"  >
+        
+                                                                    <img src="../../css/images/ncsalogo_sm-2.gif" alt="NCSA"/>
+        
+                </a>
+                                    <a href="http://grid.ncsa.illinois.edu/myproxy/" id="bannerRight"  >
+        
+                                                                    <img src="../../css/images/MyProxyWide.gif" alt="MyProxy"/>
+        
+                </a>
+                <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="breadcrumbs">
+            
+    
+
+    
+        
+                        
+    
+        
+                    <div class="xleft">
+            Last Published: 2023-04-05
+                                </div>
+                <div class="xright">            
+    
+
+    
+        
+                        
+    
+        
+                         Version: 5.3-SNAPSHOT
+            </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="leftColumn">
+    <div id="navcolumn">
+                
+    
+
+    
+        
+                        
+    
+        
+                               <h5>OAuth for MyProxy</h5>
+                        <ul>
+                    
+    <li class="none">
+                        <a href="../../server/index.html">Overview</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../server/index.html">Server</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../client/index.html">Client</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../apidocs/index.html">api docs</a>
+            </li>
+              </ul>
+                            <h5>Project Documentation</h5>
+                        <ul>
+                    
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-info.html">Project Information</a>
+                        </li>
+              
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-reports.html">Project Reports</a>
+                        </li>
+              </ul>
+                                               <a href="http://maven.apache.org/" title="Built by Maven"
+           class="poweredBy">
+            <img class="poweredBy"
+                 alt="Built by Maven"
+                 src="http://maven.apache.org/images/logos/maven-feather.png"
+                 width="90"
+                 height="30"
+                 border="1"/>
+        </a>
+                           
+    
+
+    
+        
+                        
+    
+        
+        </div>
+</div>
+<div id="bodyColumn">
+    <div id="contentBox">
+        
+
+
+
+
+<section>
+<h2><a name="Using_the_Device_Flow_Servlet"></a>Using the Device Flow Servlet</h2>
+
+
+<p>
+    If you wish to enable the device flow (RFC 8628) then you should configure
+    the servlet. You may either set a flag in the server tag to enable it,
+    which means to simply accept all defaults, or you may (and probably should)
+    properly configure it. All of these attributes live in the deviceFlowServlet
+    element of the configuration.
+</p>
+
+
+<table class="bodyTable" border="2">
+    <tbody>
+    
+<tr class="a">
+        
+<td>Attribute</td>
+        
+<td>Required?</td>
+        
+<td>Default</td>
+        
+<td>Description</td>
+    </tr>
+    
+<tr class="b">
+
+        
+<td>verificationURI</td>
+        
+<td>N</td>
+        
+<td>server + /device</td>
+        
+<td>The endpoint where the user goes to <b><i>use</i></b> their code.
+        </td>
+    </tr>
+    
+<tr class="a">
+         
+<td>authorizationURI</td>
+         
+<td>N</td>
+         
+<td>server + /device_authorization</td>
+         
+<td>The endpoint where the user goes to <b><i>get</i></b> a code.
+         </td>
+     </tr>
+    
+<tr class="b">
+        
+<td>interval</td>
+        
+<td>N</td>
+        
+<td>5</td>
+        
+<td>Value (default is seconds, though you can specify units for sec or ms if you like)
+            that a user must wait between attempts to verify their code.
+            This is enforced after the first attempt, which may be done immediately.
+        </td>
+    </tr>
+    
+<tr class="a">
+        
+<td>lifetime</td>
+        
+<td>N</td>
+        
+<td>current server default for authorization grant lifetimes</td>
+        
+<td>Value (default is seconds, though you can specify units for sec or ms if you like)
+            for the number of seconds that a request to this service is valid. This will be
+            the lifetime of the authorization grant for this request. Note that if this is
+            not set, the server-wide default for authorization grants is used. It may also
+            be set on a per client basis, which supercedes all other values.
+        </td>
+    </tr>
+
+    
+<tr class="b">
+        
+<td>codeChars</td>
+        
+<td>N</td>
+        
+<td>234679CDFGHJKLMNPQRTVWXZ</td>
+        
+<td>A sequence of unique characters. These will be used to construct user codes and aside from
+            the separator, only these are allowed.
+        </td>
+    </tr>
+    
+<tr class="a">
+        
+<td>codeLength</td>
+        
+<td>N</td>
+        
+<td>9</td>
+        
+<td>The number of characters (without separator) in a user code. An example with
+            the default would be Q7D-XXR-P37, so there are 9 actual characters.
+            The user is allowed to type these back with or without the separator.
+        </td>
+    </tr>
+    
+<tr class="b">
+        
+<td>codeSeparator</td>
+        
+<td>N</td>
+        
+<td>- (hyphen)</td>
+        
+<td>A character that is inserted between periods (see below) in the user code.</td>
+    </tr>
+    
+<tr class="a">
+        
+<td>codePeriodLength</td>
+        
+<td>N</td>
+        
+<td>3</td>
+        
+<td>The number of characters of the code grouped together. For instance if the
+            characters for the code are ABC123DEF456, then (with the default separator)
+            
+<div>
+<pre>
+                code period = 3 ==&gt; ABC-123-DEF-456
+                code period = 4 ==&gt; ABC1-23DE-F456
+                code period = 5 ==&gt; ABC12-3DEF4-56
+            </pre></div>
+            The aim of the code period length is to allow the user to visually group
+            characters together, rather than simply trying to grok a long string.
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<section>
+<h3><a name="An_Example"></a>An Example</h3>
+This has all of the defaults in a configuration
+
+<div>
+<pre>
+    &lt;deviceFlowServlet
+        authorizationURI=&quot;https://dev.cilogon.org/device_authorization&quot;
+        verificationURI=&quot;https://dev.cilogon.org/device&quot;
+        interval=&quot;5 sec.&quot;
+        lifetime=&quot;1200 sec.&quot;
+        codeChars=&quot;234679CDFGHJKLMNPQRTVWXZ&quot;
+        codeLength=&quot;9&quot;
+        codeSeparator=&quot;-&quot;
+        codePeriodLength=&quot;3&quot;
+    /&gt;
+</pre></div>
+Note that if this is omitted, then there is no device flow enabled. If you want
+to use just the defaults for everything, you can use the rfc8628Enabled attribute
+(set to true) in the server tag instead. You should have one or the other, not both.
+
+
+</section></section>
+
+    </div>
+</div>
+<div class="clear">
+    <hr/>
+</div>
+<div id="footer">
+    <div class="xright">&#169;    
+                    2023
+        
+                    
+    
+
+    
+        
+                        
+    
+        
+    </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+</body>
+</html>
+

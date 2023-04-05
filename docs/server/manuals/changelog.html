@@ -1,0 +1,1606 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+
+
+
+
+
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>OAuth for MyProxy</title>
+    <style type="text/css" media="all">
+        @import url("../../css/oa4mp-custom.css");
+        @import url("../../css/oa4mp-theme.css");
+        @import url("../../css/site.css");
+    </style>
+    <link rel="stylesheet" href="../../css/print.css" type="text/css" media="print"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    </head>
+<body class="composite">
+<div id="banner">
+                        <a href="http://www.ncsa.illinois.edu/" id="bannerLeft"  >
+        
+                                                                    <img src="../../css/images/ncsalogo_sm-2.gif" alt="NCSA"/>
+        
+                </a>
+                                    <a href="http://grid.ncsa.illinois.edu/myproxy/" id="bannerRight"  >
+        
+                                                                    <img src="../../css/images/MyProxyWide.gif" alt="MyProxy"/>
+        
+                </a>
+                <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="breadcrumbs">
+            
+    
+
+    
+        
+                        
+    
+        
+                    <div class="xleft">
+            Last Published: 2023-04-05
+                                </div>
+                <div class="xright">            
+    
+
+    
+        
+                        
+    
+        
+                         Version: 5.3-SNAPSHOT
+            </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="leftColumn">
+    <div id="navcolumn">
+                
+    
+
+    
+        
+                        
+    
+        
+                               <h5>OAuth for MyProxy</h5>
+                        <ul>
+                    
+    <li class="none">
+                        <a href="../../server/index.html">Overview</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../server/index.html">Server</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../client/index.html">Client</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../apidocs/index.html">api docs</a>
+            </li>
+              </ul>
+                            <h5>Project Documentation</h5>
+                        <ul>
+                    
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-info.html">Project Information</a>
+                        </li>
+              
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-reports.html">Project Reports</a>
+                        </li>
+              </ul>
+                                               <a href="http://maven.apache.org/" title="Built by Maven"
+           class="poweredBy">
+            <img class="poweredBy"
+                 alt="Built by Maven"
+                 src="http://maven.apache.org/images/logos/maven-feather.png"
+                 width="90"
+                 height="30"
+                 border="1"/>
+        </a>
+                           
+    
+
+    
+        
+                        
+    
+        
+        </div>
+</div>
+<div id="bodyColumn">
+    <div id="contentBox">
+        
+
+
+
+<p>Changes to the OA4MP server by version.</p>
+<section>
+<h2><a name="a5.3.0"></a>5.3.0</h2>
+
+<p>Release date 2023-04-11</p>
+
+<ul>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1069">CIL-1069</a>: Emails are sent ontheir own thread now.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1638">CIL-1638</a>: Missing header in user info endpoint response.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1655">CIL-1655</a>: added refresh_token_lifetime and refresh_token_iat to
+        refresh endpoint repsonse. These are not standard, but sufficiently many places do it now (and it's a really good idea)
+        so we will too. If there is ever a standard for this, we will support it.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1667">CIL-1667</a>: The openid scope now will have the acr (authentication
+        class reference) returned if present.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1668">CIL-1668</a>: QDL acl_add function will not throw an exception if the
+        added identifier is invalid, it will merely log it. Optionally, it may be requested to fail hard  and fast with a flag.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1671">CIL-1671</a>: Admin clients, if approved to do so, may either mint
+        identifiers in their own namespace or request specific identifiers.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1677">CIL-1677</a>: Monitor last accessed times for various objects.
+    This includes clients, admin clients, virtual organizations and (in CILogon) users. This permits tracking across time.
+    As the system ages and scales up, being able to track which objects are in use is becoming critical.</li>
+    
+<li></li>
+</ul>
+</section><section>
+<h2><a name="a5.2.9"></a>5.2.9</h2>
+
+<p>Release date 2023-03-07</p>
+
+<ul>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1266">CIL-1266</a>: Allow grace period on refresh.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1379">CIL-1379</a>: Revision of documentation for using self-signed cert with Tomcat 9+.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1604">CIL-1604</a>: Incorporate various fixes from the RCAuth group.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1608">CIL-1608</a>: Store the id token in the client's asset, rather than forcing the client to reget it.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1625">CIL-1625</a>: Expired auth grant giving wrong error message.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1629">CIL-1629</a>: Allow more units in configuration: hours and days are now supported.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1639">CIL-1639</a>: Edge case that the user info endpoint was
+        not returning the right status code or header if a completely bogus bearer token was used.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1640">CIL-1640</a>: Errant debug stack trace too chatty.</li>
+    
+<li><a class="externalLink" href="https://github.com/ncsa/qdl/issues/6">QDL Issue 6</a>: Document command line switches.</li>
+    
+<li><a class="externalLink" href="https://github.com/ncsa/qdl/issues/8">QDL Issue 8</a>: Add a fork function. This is not permitted in server mode.</li>
+    
+<li><a class="externalLink" href="https://github.com/ncsa/qdl/issues/9">QDL Issue 9</a>: Add a sleep(ms) function. Mostly this is an iad to testing.</li>
+    
+<li><a class="externalLink" href="https://github.com/ncsa/qdl/issues/10">QDL Issue 10</a>: add optional module supporting various formats such as XML, YAML, HOCON.</li>
+
+</ul>
+</section><section>
+<h2><a name="a5.2.8.3"></a>5.2.8.3</h2>
+
+<p>Release date 2023-02-07</p>
+
+<ul>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-627">CIL-627</a>: Migrate to Java 11, split off MyProxy code.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-630">CIL-630</a>: Retire CILogon archived user table.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-869">CIL-869</a>:  Documentation for dynamic client registration additional attributes.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1014">CIL-1014</a>: Explicit creation of memory stores does not work.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1088">CIL-1088</a>: Compact logging of expired access or refresh token.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1178">CIL-1178</a>: Shorter LDAP timeouts. These were set to 10 seconds, but since OA4MP was
+        running Java 8, a known bug there prevented this from being effective. As of this release, it should work.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1327">CIL-1327</a>: NCSA QDl scripts should be invoked in post_userinfo
+        but not post_exchange phases.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1330">CIL-1330</a>: Related to CIL-1342.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1339">CIL-1339</a>: Simple configuration for clients using a QDL
+        <a href="driver-config.html">driver script.</a></li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1342">CIL-1342</a>: Custom redirects added in cases of error. QDL supports
+    throwing an basic error now, a specific OAuth 2 error and a CILogon specific error in the course of running
+        server scripts.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1346">CIL-1346</a>: Certain returned errors in CILogon were not OAuth 2 compliant.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1347">CIL-1347</a>: Side effect of CIL-1348.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1348">CIL-1348</a>: Debug print for clients with custom short IDs did not work right,
+        resulting in an error rather than a log entry.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1354">CIL-1354</a>: Remove OAuth 1 references from documentation.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1366">CIL-1366</a>: exec_phase post_all was not working.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1388">CIL-1388</a>: CILogon did not get custom error uri in DBService layer.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1419">CIL-1419</a>: Proxy client sending extra scopes. It should request the exact same
+    scopes the user has granted.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1423">CIL-1423</a>: metadata tag is officially ignored any place in a client
+        cfg element. This allows management of clients by external systems (e.g. COManage) to insert their own accounting information.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1426">CIL-1426</a>: XRAS client errors. This was, in fact, a manisfestation of
+        a provisioning error from COManage.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1464">CIL-1464</a>: Disable clipboard use by Command Line Client when used
+        as a proxy.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1490">CIL-1490</a>: Scope matching for templates was too simple-minded, assuming every scope was
+    a uri or ignored. With scopes like compute.modify, better matching is needed.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1493">CIL-1493</a>: Remove non standard cid claim in SciTokens.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1498">CIL-1498</a>: is_defined failing on stem elements in QDL.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1507">CIL-1507</a>: Simplify setting cfg attribute in the CLI.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1518">CIL-1518</a>: (CILogon specific) raising error results in default status of -1 if not explicitly set.
+        Return QDL error status as default.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1536">CIL-1536</a>: Modernize interface between token exchange and QDL.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1538">CIL-1538</a>: Preserve debug_on flag in client when using the REST API.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1541">CIL-1541</a>: Multiple scripts in a token handler only have very first one run.
+        Run all in sequence.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1550">CIL-1550</a>: Java serialization issue with OA4MP managed claim sources. Fix is
+    to quit using java serialization completely.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1553">CIL-1553</a>: Allows specifying subtree search scope in QDL.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1553">CIL-1556</a>: Improved online documentation to the CLI.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1582">CIL-1582</a>: Really badly formed post to token endpoint should return status of 400.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1584">CIL-1584</a>: Improve handling of scopes sent to proxy server.</li>
+    
+<li><a class="externalLink" href="https://github.com/ncsa/OA4MP/issues/44">OA4MP issue 44</a>: Dynamic query of clients is documented <a href="dynamic-client-registration.html">here</a>.</li>
+    
+<li><a class="externalLink" href="https://github.com/ncsa/OA4MP/issues/81">OA4MP issue 81</a>: Clients that upload a string of scopes to the CM endpoint should get back a string, not a JSON array.</li>
+    
+<li><a class="externalLink" href="https://github.com/ncsa/OA4MP/issues/84">OA4MP issue 84</a>: Client Management API should return code 201 not 200 on create.
+        <b>Note: </b> CILogon still returns 200.</li>
+    
+<li><a class="externalLink" href="https://github.com/ncsa/OA4MP/issues/84">OA4MP issue 85</a>: Improve RFC 7591 compliance.</li>
+    
+<li><a class="externalLink" href="https://github.com/ncsa/qdl/issues/1">QDL issue 1</a>: starts_with not processing sparse lists.</li>
+    
+<li><a class="externalLink" href="https://github.com/ncsa/qdl/issues/2">QDL issue 2</a>: diff function for stems added.</li>
+    
+<li><a class="externalLink" href="https://github.com/ncsa/qdl/issues/3">QDL issue 3</a>: args() added to replace script_args().</li>
+    
+<li><a class="externalLink" href="https://github.com/ncsa/qdl/issues/4">QDL issue 4</a>: allows stem called state. to be returned with raise_error().</li>
+    
+<li><a class="externalLink" href="https://github.com/ncsa/qdl/issues/5">QDL issue 5</a>: Input form of empty stem is incorrect.</li>
+
+</ul>
+
+<p>Note that QDL issues now have a new system for tracking them directly and hence start with 1.</p>
+
+</section><section>
+<h2><a name="a5.2.7"></a>5.2.7</h2>
+
+<p>Release date 2022-07-18</p>
+
+<ul>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1081">CIL-1081</a>: <a href="ersatz_clients.html">Ersatz clients.</a></li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1278">CIL-1277</a>: Server-wide <a href="client-prototypes.html">client configuratioins.</a></li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1288">CIL-1288</a>: Bad example in CLI search documentation.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1296">CIL-1296</a>: Allow for arbitrary LDAP search filters. See
+    documentation <a class="externalLink" href="https://cilogon.github.io/qdl/docs/creating_claim_sources2.pdf">here</a> (last example)</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1301">CIL-1301</a>: Added inclusive pre_all, post_all phases for QDL
+        scripts. post_all means the script would be called at post_auth, post_token, post_refresh, post_exchange and post_user_info.
+        This allows for letting the script decide what to do.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1302">CIL-1302</a>: Set default that QDL code blocks are rejected in client configurations.
+        For admin clients to upload raw QDL, they must be granted explicit permission.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1306">CIL-1306</a>: LDAP error messages should be more informative.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1307">CIL-1307</a>: Null pointer returned rather than useful message if bad parameters in
+        a code challenge are passed. Return something informative.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1308">CIL-1308</a>: Do not do any initialization with the email system if it is disabled.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1310">CIL-1310</a>: CILogon CLI can now compute the DN for a certificate at the command line.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1312">CIL-1312</a>: Discovery servlet should return response modes and all grant types.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1313">CIL-1313</a>: QDL module loading bug. Java modules were prevented from
+        loading in server mode.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1318">CIL-1318</a>: JDBC drivers updates for MariaDB and MySQL are not compatible.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1319">CIL-1319</a>: Bump mysql connector version.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1321">CIL-1321</a>: Inheritance of client configurations via
+        <a href="client-prototypes.html">prototypes.</a></li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1324">CIL-1324</a>: OA4MP should log better errors for missing QDL scripts</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1328">CIL-1328</a>: OA4MP not running user metadata refresh consistently in user info endpoint</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1332">CIL-1332</a>: QDL error codes for CILogon database service</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1333">CIL-1333</a>: Client configurations with arrays of configurations not read right. Regression from previous versions of OA4MP.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1334">CIL-1334</a>: Support for error uris in QDL's scripting sys_err. See <a class="externalLink" href="https://cilogon.github.io/qdl/docs/qdl_server_scripts.pdf">server scripts</a>.</li>
+
+</ul>
+
+</section><section>
+<h2><a name="a5.2.6"></a>5.2.6</h2>
+
+<p>Release date 2022-05-10</p>
+
+<ul>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1221">CIL-1221</a>:Add proxy_claims_list attributes support
+    to the client management endpoint.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1225">CIL-1225</a>:Prevent mail util from throwing an exception
+    in certain cases if mail has been completely disabled.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1253">CIL-1253</a>:introspect endpoint should not
+    require token_type_hint.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1267">CIL-1267</a>:fail_on_error inLDAP configurations
+        not getting passed along consistently.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1268">CIL-1268</a>: More graceful recovery from certain types
+        of errors. If, for instance, a client's LDAP is misconfigured, token operations (such as refresh) will fail, but
+    can be resumed rather than invalidating the flow.</li>
+
+</ul>
+
+</section><section>
+<h2><a name="a5.2.5"></a>5.2.5</h2>
+
+<p>Release date 2022-03-29</p>
+
+<ul>
+    
+<li><a class="externalLink" href="https://github.com/ncsa/OA4MP/issues/44">issue #44</a>: Document querying client management endpoint for all clients
+        associated with a given admin client.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-771">CIL-771</a>: (experimental) <a href="token-info.html">token info endpoint</a>.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-869">CIL-869</a>: Documented extra parameters for the
+        <a href="../manuals/dynamic-client-registration.html">dynamic client registration endpoint.</a></li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1145">CIL-1145</a>: All references to log 4 java have been removed.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1146">CIL-1146</a>: Client server proxying has been implemented. Read up on it
+    <a href="../manuals/using-proxies.html">here</a></li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1166">CIL-1166</a>: Python library interoperability issue,</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1184">CIL-1184</a>: Wrong entry in listing the cleanup interval property in the server properties table.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1187">CIL-1187</a>: Errors in setTransactionState should be more descriptive</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1193">CIL-1193</a>: Support for CRT (Chinese Remainder Theorem) when
+        generating public/private key pairs.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1206">CIL-1206</a>: QDL state serialization bug involving whitespace for token exchange
+    records.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1208">CIL-1208</a>: Dependabot alerts for PostGreSQL version. Does not impact us,
+    but there is no update to the version they require for Java 8 libraries.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1211">CIL-1211</a>: Garbage collection race condition. If a user starts an auth flow, their
+    code is invalid until they log in. If the garbage collector runs between the time the flow starts and they finish their login, the transaction
+    will have been garbage collected.</li>
+</ul>
+
+</section><section>
+<h2><a name="a5.2.4"></a>5.2.4</h2>
+
+<p>Release date 2022-02-01</p>
+
+<ul>
+    
+<li><a class="externalLink" href="https://github.com/ncsa/OA4MP/issues/16">issue #16</a>: Remove GPG signing for maven.</li>
+    
+<li><a class="externalLink" href="https://github.com/ncsa/OA4MP/issues/17">issue #17</a>: Fix scope documentation.</li>
+    
+<li><a class="externalLink" href="https://github.com/ncsa/OA4MP/issues/40">issue #40</a>:Dynamic registration for oidc-agent</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1088">CIL-1088</a>: Better log message in case of an invalid refresh token.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1112">CIL-1112</a>: Support for generic access tokens as per <a class="externalLink" href="https://www.rfc-editor.org/rfc/rfc9068">RFC 9068</a></li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1117">CIL-1117</a>: XML bug in Corretto workaround.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1122">CIL-1122</a>: Garbage collect abandoned flows. </li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1124">CIL-1124</a>: Userinfo endpoint should reject revoked tokens.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1132">CIL-1132</a>: Allow &quot;ANY&quot; scope (as a special value that is a string) in SciTokens.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1137">CIL-1137</a>: ID tokens unique identifier is not asserted as &quot;jti&quot; not as &quot;token_id.&quot;</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1148">CIL-1147</a>: remove all references to log for java (log4j).</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1148">CIL-1148</a>: Update list of stores in the documentation.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1153">CIL-1153</a>: removed and deprecated old unused flie store configuration</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1159">CIL-1159</a>: Better handling of missing attributes in dynamic client registration</li>
+</ul>
+
+
+</section><section>
+<h2><a name="a5.2.3"></a>5.2.3</h2>
+
+<p>Release Date 2021-11-02</p>
+
+<ul>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1101">CIL-1101</a>: Allow device flow as explicit type in dynamic client registration.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1102">CIL-1102</a>: device code is now base 32 encoded in device flow</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1104">CIL-1104</a>: Require openid scope for user info endpoint.</li>
+</ul>
+
+</section><section>
+<h2><a name="a5.2.2"></a>5.2.2</h2>
+
+<p>Release Date 2021-09-28</p>
+
+<ul>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1041">CIL-1041</a>: Per client lifetime and interval for device flow.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1058">CIL-1058</a>: Database versions updated.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1061">CIL-1061</a>: PKCE support.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1067">CIL-1067</a>: A JSON Webkey store with a single entry does not
+        require a default ID to be set.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1072">CIL-1072</a>: Consistent update of ID token timestamps.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1074">CIL-1074</a>: Independent QDL server mode logging.</li>
+</ul>
+
+</section><section>
+<h2><a name="a5.2.1"></a>5.2.1</h2>
+
+<p>Release Date 2021-08-31</p>
+
+<ul>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1029">CIL-1057</a>: Derby support added.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1051">CIL-1051</a>: Track device flow transactions better in database.</li>
+</ul>
+
+</section><section>
+<h2><a name="a5.2.0"></a>5.2.0</h2>
+
+<p>Release date 2021-08-03</p>
+
+<ul>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1029">CIL-1029</a>: Check RFC 8725 for JWT best
+    practices. By and large we follow them.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1030">CIL-1030</a>: CILogon specific. Too many
+    serial strings are made. </li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1035">CIL-1035</a>: Clients with refresh tokens disabled
+    are getting long-lived entries in the transaction table. There should be nothing there for them.</li>
+</ul>
+By and large the major innovation in 5.2.0 and above is support for RFC 8628 -- the device flow.
+
+</section><section>
+<h2><a name="a5.1.4"></a>5.1.4</h2>
+
+<p>Release date 2021-07-14</p>
+
+<ul>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-961">CIL-961</a>: Reduced scopes supported in token exchange.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-971">CIL-971</a>: Token exchange does not update returned token id for compound refresh tokens.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-974">CIL-974</a>: Complete VO support for refresh and token exchange endpoints.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-980">CIL980</a>: Support for RFC 8707, the audience and resource standard.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-998">CIL-998</a>: WLCG groups supported.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1002">CIL-1002</a>: logging per client supported.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1012">CIL-1012</a>: offline_access scope supported.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-1019">CIL-1019</a>: preferred_username claim asserted if found for
+       profile scope.</li>
+</ul>
+ </section><section>
+<h2><a name="a5.1.3"></a>5.1.3</h2>
+
+<p>Release date 2021-06-10</p>
+
+<ul>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-958">CIL-958</a>: CIlogon now asserts the cilogon_uid claim, which is
+        a shortened version of the unique identifier.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-962">CIL-962</a>: Support for WLCG wlcg.credkey claim.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-971">CIL-971</a>: In certain cases, token exchange does not update the actual token.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-974">CIL-974</a>: User info endpoint needs to ensure correct signing keys are used for custom issuers.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-976">CIL-976</a>: Discovery paths for custom issuers need to be resolved better.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-980">CIL-980</a>: RFC 8707 is supported</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-985">CIL-985</a>: Errant cast in revocation servlet caused unrecoverable error.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-986">CIL-986</a>: Support for custom token issuers in
+    the introspection and revocation endpoints.</li>
+</ul>
+</section><section>
+<h2><a name="a5.1"></a>5.1</h2>
+
+<p>Release date 2021-04-14</p>
+
+<ul>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-697">CIL-697</a>: Improve error messages to include a description.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-708">CIL-708</a>: review of token exchange endpoint.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-824">CIL-824</a>: Making all demo clients at CILogon distinct.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-833">CIL-833</a>: Better enforcement of response_type.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-841">CIL-841</a>: Fix returned claims for NCSA client.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-843">CIL-843</a>: Some NCSA clients require a flat list for the isMemberOf claim, some require a JSON object
+        that has group ids. Amend QDL script to accept a parameter to set this.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-845">CIL-845</a>: Allow basic versioning of objects in stores (clients, users, admin clients) with the CLI.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-848">CIL-848</a>: Add access control to QDL scripts on server based on client/admin id.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-855">CIL-855</a>: Review and set policy for unrecognized scopes.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-871">CIL-871</a>: OA4MP rejects wildcards in callbacks everywhere, both at registration
+        and using the client management API.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-872">CIL-872</a>: OA4MP servers will now, by default, only garbage collect tokens that they have created.
+    There is a new server configuration flag to have all expired tokens removed too.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-882">CIL-882</a>: Expired or invalid refresh tokens return an error of invalid_grant, not invalid_token.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-884">CIL-884</a>: Client Management API allows updating public clients <i>except</i> for changing a public
+    client to a confidential one -- that would require a new secret and secrets are only created at registration.
+    Therefore, you must register a new client if you need a confidential one.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-889">CIL-889</a>: Admin clients may now have a flag set that will allow them to reference QDL scripts. If this
+    is disabled (default) any configuration with a QDL block will be rejected.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-892">CIL-892</a>: Missing documentation for the client well known URI tag. This can be found
+    <a class="externalLink" href="https://cilogon.github.io/oa4mp/client/dtd/dtd-file.html">here</a>. </li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-906">CIL-906</a>: In id tokens, the auth_time claim must be a number. It was being returned as a string.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-911">CIL-911</a>: Return the state parameter with errors consistently.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-915">CIL-915</a>: Review and update the scopes documentation for clients.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-917">CIL-917</a>: Improved client registration templates to include more information.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-922">CIL-922</a>: Base 32 encode all non-JWT tokens. This is because some libraries (in PHP)
+    were unable to reliably url encode the new tokens. Base 32 tokens are case insensitive to boot.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-931">CIL-931</a>: The client management API needs to return strict_scopes when GETting a client.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-936">CIL-936</a>: Public clients were being rejected for access tokens.</li>
+</ul>
+
+</section><section>
+<h2><a name="a5.0"></a>5.0</h2>
+
+<p>Release date 2020-09-30</p>
+
+<ul>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-675">CIL-675</a>,
+        <a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-631">CIL-631:</a>:SciTokens/WLCG support.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-696">CIL-696</a>: Code management. Bottom line is that the wars and jars are huge because we have dependencies that use IBM's international character support.
+        Actual OA4MP code runs at about 7% or less of what is in a given war or jar.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-708">CIL-708</a>,
+        <a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-689">CIL-689</a>: Verify RFC 8693 (token exchange endpoint) compliance.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-720">CIL-720</a>: Update dynamic client registration webpage to list required parameters.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-725">CIL-725</a>: (RFC 7592) Allow admin clients to set the scopes of clients they administer.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-729">CIL-729</a>: Limited support for ISO 6429. This affects command line clients and utilities only.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-737">CIL-737</a>: Allow for prompt = select_login. Henceforth we accept all standard prompts except &quot;none&quot; and
+        &quot;consent&quot;.
+    </li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-738">CIL-738</a>: Implement subset of
+        <a class="externalLink" href="https://tools.ietf.org/html/rfc7662">RFC 7662</a>, the token introspection endpoint.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-739">CIL-739</a>: Restrict to absolute URIs callbacks only.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-836">CIL-836</a>, <a class="externalLink" href="https://github.com/ncsa/OA4MP/issues/19">GitHub #19</a> : Make <a class="externalLink" href="https://cilogon.github.io/qdl/index.html">QDL</a> support official.</li>
+    
+<li><a class="externalLink" href="https://jira.ncsa.illinois.edu/browse/CIL-850">CIL-850</a> Error in reading old configuration by new configuration.</li>
+</ul>
+
+</section><section>
+<h2><a name="a4.4.4"></a>4.4.4</h2>
+
+<p>Release date 2020-06-22</p>
+
+<ul>
+    
+<li>CIL-733: (RFC 7591/7592) token_endpoint_auth_method missing on GET</li>
+    
+<li>CIL-734: (RFC 7591/7592) client metadate returned inside cfg object</li>
+    
+<li>CIL-735: (RFC 7591/7592) cannot delete cfg object</li>
+</ul>
+
+</section><section>
+<h2><a name="a4.4.3"></a>4.4.3</h2>
+
+<p>Release date 2020-05-29</p>
+
+<ul>
+    
+<li>CIL-683: CLI should update issuer for admin clients when asked to do so.</li>
+    
+<li>CIL-684: Admin clients should have max_clients settable from CLI.</li>
+    
+<li>CIL-685: CLI should ask for confirmation when deleting objects.</li>
+    
+<li>CIL-701: Incorrect grant type should return status code of 400.</li>
+</ul>
+
+
+</section><section>
+<h2><a name="a4.4.1"></a>4.4.1</h2>
+
+<p>Release date 2020-04-23.</p>
+
+
+<ul>
+    
+<li><a class="externalLink" href="https://github.com/ncsa/OA4MP/issues/5">Github issue 5</a>: Support <a class="externalLink" href="https://openid.net/specs/oauth-v2-multiple-response-types-1_0.html#ResponseModes">multiple response
+        modes</a>
+        I.e., the callback may optionally have its authorization response parameters encoded as a fragment, not a query.
+    </li>
+    
+<li><a class="externalLink" href="https://github.com/ncsa/OA4MP/issues/8">Github issue 8</a>: support for public clients</li>
+    
+<li><a class="externalLink" href="https://github.com/ncsa/OA4MP/issues/13">Github issue 13</a>, CIL-646: Implement <a class="externalLink" href="https://tools.ietf.org/html/rfc7009.">rfc 7009</a>
+        for token revocation.
+    </li>
+    
+<li><a class="externalLink" href="https://github.com/ncsa/OA4MP/issues/15">Github issue 15</a>: OA4MP may be turned in to an OIDC
+        compliant
+        service by setting the <a href="server/dtd/server-dtd-service-tag.html">OIDCEnabled flag</a></li>
+    
+<li><a class="externalLink" href="https://github.com/ncsa/OA4MP/issues/19">Github issue 19</a>:Added QDL support.</li>
+    
+<li>CIL-525: More refresh token tests</li>
+    
+<li>CIL-540:(CIlogon only) Relax requirements for user attributes. as long as a user is only requesting a scope
+        of openid (so no certs or extended information such as groups) and has an idp and an identifier CILogon will
+        accept
+        the user.
+    </li>
+    
+<li>CIL-639:Allow users to specify roles. In particular now, OA4MP will accept certain scoped additional request
+        parameters
+        and, depending on the client, act upon them.
+    </li>
+    
+<li>CIL-646: Support token introspection. There is now an /introspect endpoint available. First cut is very, very
+        basic and merely allows for a client to query if a given access token is valid. Since we are moving to
+        self-describing
+        tokens it is unclear if we should support the other operations which are basically reading the token back to a
+        service.
+    </li>
+    
+<li>CIL-648: Recheck claims at token refresh. There is also scripting support now for this.</li>
+    
+<li>CIL-649: Support pairwise id and subject id (in CILogon).</li>
+    
+<li>CIL-666: Command Line Interface improvements. Please see the <a href="cli.html">cli manual</a> for details.</li>
+    
+<li>CIL-695: issuing the rm command in the CLI should prompt.</li>
+    
+<li>CIL-693: Claim sources created via introspection need to have their state injected.</li>
+</ul>
+
+</section><section>
+<h2><a name="a4.3"></a>4.3</h2>
+
+<p>Release date 2019-11-20.</p>
+
+
+<ul>
+    
+<li>CIL-352: CILogon previous subject issue. In some cases in CILogon, the country should be US and is not archived
+        this way when updating.
+        This really is just a minor annoyance.
+    </li>
+    
+<li>CIL-493: Extra scopes that have not been approved for a client are ignored, as per the spec.</li>
+    
+<li>CIL-503: Creating a new user results in a serial string with the same index.</li>
+    
+<li>CIL-518: Remove zero length files. This now has a flag to enable/disable this in the configuration.
+        It is only an issue if a server is using file storage. Look at the file store documentation to learn more.
+    </li>
+    
+<li>CIL-525: Added a file-based claim source in addition to claim sources from LDAP, headers and such. This allows
+        server
+        to manage either all their claims or have a repository for very specific ones.
+    </li>
+    
+<li>CIL-566: Fire email for admin client registration. <b>NOTE:</b> the reason this failed at one point was because
+        of an upgrade from Java 8 to Java 11. Please
+        see the email configuration documentation for the details of getting this to work. Basically you need to include
+        on more file.
+    </li>
+    
+<li>CIL-567: Support for RFC 7592, updating and removing client information.</li>
+    
+<li>CIL-570: Better return codes when creating a transaction fails.</li>
+    
+<li>CIL-575: List of failure codes from create transaction failure.</li>
+    
+<li>CIL-576: The CLI should use the same logic as the registration form for callback URLs. This means allowing for
+        calls to http://localhost, e.g.
+    </li>
+    
+<li>CIL-579: Last modified date added to all clients. When a client is saved, this is updated. Note that this will
+        update database tables autoamtically.
+    </li>
+    
+<li>CIL-586: return list of scopes if different from what is requested. As per the spec. if a client requests a set
+        of scopes
+        but the server does not honor any of them, a list of what the server will honor is returned.
+    </li>
+    
+<li>CIL-609: remove blank lines in callback uri list when registering a new client.</li>
+    
+<li>CIL-612: Limit number of OAuth clients than an admin can register.</li>
+    
+<li></li>
+</ul>
+
+<p>Other things to note in this release is the the CLI now supports setting environment variables both in a
+    file (either a Java properties file or a JSON object in a file) and from the command line. </p>
+
+</section><section>
+<h2><a name="a4.2"></a>4.2</h2>
+
+<p>Release date 2019-05-15.</p>
+
+
+<ul>
+    
+<li>Added support for turning on/off OIDC abilities in the configuration file with the OIDCEnabled flag.</li>
+    
+<li>CIL-467:Eliminate init endpoint (this was very specific to CILogon).</li>
+    
+<li>CIL-490: Added a check box on the client registration form to allow marking a client as public. Note that
+        this will automatically set the scopes to only &quot;openid&quot;.
+    </li>
+    
+<li>CIL-506: Support for the OAuth dynamic client registration specification is added.</li>
+    
+<li>CIL-515:demo client will now show the id token and information about it</li>
+    
+<li>CIL-532: eduPersonEntitlement support. Generally all additional attributes that Shibboleth sends are now
+        returned as claims unless specifically omitted.
+    </li>
+    
+<li>CIL-535: configuration snippets are now stored and may be accessed generally in other client configurationd.
+        This allows for the practical inheritance of configurations.
+    </li>
+    
+<li>CIL-545:Accept a wider range of redirects during client registration.
+        Redirect URIs may be to any domain if the scheme is https. If the scheme is http then only redirects to
+        localhost
+        or a reserved private range such as 192.168.x.x are allowed. If the scheme is not http or https, any domain is
+        allowed.
+        This last feature is needed for mobile device support.
+    </li>
+</ul>
+
+</section><section>
+<h2><a name="a4.1.1"></a>4.1.1</h2>
+
+<p>Release date 2018-10-29.</p>
+
+
+<ul>
+    
+<li>CIL-476: Allow for setting reply-to header in email notifications</li>
+    
+<li>CIL-491: Public clients get a trivial ID token when they get an access token. This allows certain services
+        like kubernetes to check the timestamps and the ID token.
+    </li>
+    
+<li>CIL-499: Check that certain claims are present before returning them. This prevents an unruly script
+        from creating an unsuable claims object.
+    </li>
+    
+<li>CIL-501: CLI displays multiple attributes when fully listing a client.</li>
+    
+<li>CIL-505: (in the DB service) Return a better error message if a request times out.</li>
+    
+<li>CIL-508: CLI should be able to list all clients for a given admin. In the admin module, this is the
+        list_clients command.
+    </li>
+    
+<li>CIL-512: Support for LIGO Robot DNs added</li>
+    
+<li>CIL-513: HTTP headers claim source should be configurable to ignore certain returned claims, since in a proxying
+        situation, these may be for the proxy, not for the requesting client.
+    </li>
+    
+<li>CIL-517: Requests to the service using POST should be refused unless the encoding is only form URL.</li>
+    
+<li>CIL-519: Client Management should return an uploaded cfg object when querying the client's attributes.</li>
+</ul>
+
+</section><section>
+<h2><a name="a4.0.1"></a>4.0.1</h2>
+
+<p>
+    This is a major upgrade and rewrite of the OA4MP system and is the result of a great deal of feedback and
+    experience.
+</p>
+
+<ul>
+    
+<li>CIL-332: Error esponses should be JSON format with HHTP status 400.</li>
+    
+<li>CIL-365: Setting scope = org.cilogon.userinfo should return an oidc claim if there is one.</li>
+    
+<li>CIL-408: OAuth 1 command line client should not look for admin client stores on startup.</li>
+    
+<li>CIL-417: Set subject claim to EPPN in certain cases</li>
+    
+<li>CIL-422: Restrict access based on group membership.</li>
+    
+<li>CIL-425: More flexible scope handling</li>
+    
+<li>CIL-435: Return group number with group information</li>
+    
+<li>CIL-436: LSST isMemberOf validation endpoint. See the doc <a class="externalLink" href="https://docs.google.com/document/d/1iwnNDZ0l0nNrqCaB41vjLb_tQRjtJUe8xpf469oT84o/edit#">here</a></li>
+    
+<li>CIL-443: CILogon isMemberOf should parse the NCSA's LDAP information into a standard format</li>
+    
+<li>CIL-448: Odd claims from surge. This requires checking eppn by domain and restricting access accordingly.</li>
+    
+<li>CIL-460: Admin service rejects attempts by clients to update themselves.</li>
+    
+<li>CIL-462: Get acr claim and return in id token</li>
+    
+<li>CIL-464: Allow for customizing identifier scheme via configuration.</li>
+    
+<li>CIL-467: Eliminate init endpoint for OIDC version.</li>
+    
+<li>CIL-477: Set voPersonExternalID. This may be done with server-side scripting now.</li>
+    
+<li>CIL-479: Issue isMemberOf claim based on IDP and SAML attributes.</li>
+    
+<li>CIL-494: Allow public clients to access user information endpoint. The response is trivial since they are only
+        allowed the openid scope.
+    </li>
+    
+<li>CIL-498: After error on cleitn registration page, no scopes displayed.</li>
+    
+<li>github #10: Allow CLI to edit scopes</li>
+    
+<li>Support for <a class="externalLink" href="https://docs.google.com/document/d/14Q4DHU_u9GaVvVFQNHDpWTB33vRTYuN8yBpytzNq4O8/edit#heading=h.q4bop06zsrb9">functors</a>
+        in client configurations.
+    </li>
+</ul>
+
+
+<p>Many updates, including the introduction of functor-based scripting. There is also a document relating to CIL-436 and
+    a <a class="externalLink" href="https://docs.google.com/document/d/1iwnNDZ0l0nNrqCaB41vjLb_tQRjtJUe8xpf469oT84o/edit">JWT token parsing
+        endpoint</a>.
+    The major change is allowing for a full scripting language to configure client behaviors. This is what effectively
+    solved
+    most of the above issues.
+</p>
+
+<p>The command line interface (CLI) now supports exporting and importing records from a file with the serialize and
+    deserialize
+    commands. For SQL stores, there is also a new search function that allows for limited but very useful searches. Most
+    of the unit
+    tests have been improved or rewritten.</p>
+</section><section>
+<h2><a name="a3.5.1"></a>3.5.1</h2>
+
+<ul>
+    
+<li>CIL-430: Credentials sent in authorization header are to be URL encoded.</li>
+    
+<li></li>
+</ul>
+
+</section><section>
+<h2><a name="a3.5"></a>3.5</h2>
+
+<p>Release date 2017-11-29.</p>
+
+<ul>
+    
+<li>Support for public clients.</li>
+    
+<li>CIL-409: Missing cert request in OIDC getcert call causes empty certificate to be returned.</li>
+    
+<li>CIL-414: Bug prevented accurately counting number of pending approvals.</li>
+    
+<li>CIL-426: Send admins an email when there are too many pending approvals.</li>
+    
+<li>CIL-427: Improve handling of approvals so that unapproved, pending and revoked approvals can be tracked.</li>
+</ul>
+<section><section>
+<h4><a name="Release_Notes"></a>Release Notes</h4>
+
+
+<p>Public clients are supported. It is assumed that the identifier is published publicly so that, for instance
+    a user can get a refresh token and then access tokens. No secret is needed to use a public client, however
+    access by a public client is severely restricted, almost exclusively to the openid scope for a user.</p>
+
+</section></section></section><section>
+<h2><a name="a3.4"></a>3.4</h2>
+
+<p>Release date 2017-08-28.</p>
+
+<ul>
+    
+<li>OAUTH-203: Clients may request supported scopes at registration time.</li>
+    
+<li>OAUTH-212: PEM encodings broken by change to Apache base 64 codec.</li>
+    
+<li>OAUTH-213: Make TLS version configurable in the SSL configuration.</li>
+    
+<li>OAUTH-217: Added discovery, in a server/.well-known/openid_configuration.</li>
+    
+<li>CIL-339: EPTID mismatch handled as a separate case.</li>
+    
+<li>CIL-344: Client management API created. Sample scripts created as well.</li>
+    
+<li>CIL-356: Clients may have individual LDAP configurations.</li>
+    
+<li>CIL-371: added claim for cert_subject_dn to be returned for the org.cilogon.userinfo scope.</li>
+    
+<li>CIL-378: Clients with same creation timestamp are not all displayed in CLI.</li>
+    
+<li>CIL-388: Server wars now include more meta information in the META-INF/MANIFEST.MF file about the build.</li>
+    
+<li>CIL-396: More client information in email notification at registration for OIDC clients.</li>
+    
+<li>CIL-404: Errors in the getCert servlet should throw an exception.</li>
+    
+<li>CIL-405: Default for all new clients at registration is to enable ID token signing.</li>
+    
+<li>Java object serialization issue: Updated dependencies on Apache commons-collections to 3.2.2.</li>
+    
+<li>Removed legacy unused Java object serialization from backend file store.</li>
+</ul>
+<section><section>
+<h4><a name="a3.4_Release_notes"></a>3.4 Release notes</h4>
+
+
+<p>
+    Note that in this release of OA4MP there are two new tables that are required if the server uses SQL -based storage.
+    One for admin clients and another for permissions. If the user (i.e., as defined in the configuration file that
+    accesses the data) has create permission in the database, then the tables will be automatically created. If not,
+    then
+    you must create them manually using one of the scripts found <a class="externalLink" href="https://github.com/ncsa/OA4MP/tree/master/oa4mp-server-admin-oauth2/src/main/resources">
+    here</a>.
+</p>
+
+
+<p>You must also create signing keys for OIDC. This is done with the
+    <a class="externalLink" href="http://grid.ncsa.illinois.edu/myproxy/oauth/server/configuration/signing.html">command line tool</a></p>
+
+
+<p>Signing of ID tokens is now the default on the server. However, since older clients may not support this, the default
+    is to
+    <b>disable</b> signing of ID tokens for all clients. Older OA4MP clients will break if signing is enabled and they
+    are
+    at an earlier version (3.3 and before). Also, some installations of the <a class="externalLink" href="https://github.com/pingidentity/mod_auth_openidc">mod_auth_openidc</a>
+    client that cache the .well-known file have been known to break when talking to a 3.4 server. Please upgrade the
+    .well-known file to
+    the latest version on the server.</p>
+
+
+</section></section></section><section>
+<h2><a name="a3.3"></a>3.3</h2>
+
+<p>Release date 2016-09-22.</p>
+
+
+<ul>
+    
+<li>CIL-252: Scope handler which queries LDAP for user attributes.</li>
+    
+<li>CIL-264: Document examples using the cURL command.</li>
+    
+<li>CIL-268: Added sample OA4MP OIDC configuration to web documentation.</li>
+    
+<li>CIL-273: LDAP support for OA4MP.</li>
+    
+<li>CIL-286: Failed client registration not cleaned up.</li>
+    
+<li>CIL-299: &quot;Max retries exceeded&quot; message from MariaDB connection pool. This was because the
+        method in question was only partially synchronized.
+    </li>
+    
+<li>CIL-309: Refresh token fixes and improvements.</li>
+    
+<li>CIL-312: Null pointer exception when parsing URIs. The built-in parser for URIs is rather stupid in certain
+        cases
+        and would throw an NPE when parsing. This is now being handled better to prevent this.
+    </li>
+    
+<li>CIL-317: exception setting transaction state if use waits to finish exchange until after initial grant has
+        expired and garbage collected.
+    </li>
+    
+<li>CIL-319: Indicate in DN if the user is from and InCommon or eduGain IDP.</li>
+    
+<li>CIL-320: DB Service fix to get information to resolve CIL-319.</li>
+    
+<li>CIL-324: Attempting to send many email notifications at once causes failures.</li>
+    
+<li>CIL-359: ID tokens must be signed by the server.</li>
+    
+<li>OAUTH-189: Invalid nonce causes reloadof authorization page to fail.</li>
+    
+<li>OAUTH-191: Defer connecting to MyProxy until the getCert call, if possible.</li>
+    
+<li>OAUTH-194: OIDC token endpoint should return error with status of 400.</li>
+    
+<li>OAUTH-196: Documentation needs updating after file name change internally.</li>
+    
+<li>OAUTH-197: Testing from the command line documentation shows sending the secret to the authorization endpoint,
+        which
+        is not in the specification.
+    </li>
+    
+<li>OAUTH-198: Pass the HTTPServletRequest to the basic scope handler. This allows implementors more flexibility.
+    </li>
+    
+<li>OAUTH-199: Pass HttpServlet request to custom scope handlers.</li>
+    
+<li>OAUTH-200: Connection pooling does not clean out stale connections.</li>
+    
+<li>OAUTH-201: Username incorrectly flagged as the primary key for the asset table, causing and error on updates.
+    </li>
+    
+<li>OAUTH-202: Tomcat 6 is not supported for this release of OA4MP. You must have at least version 7 or higher.</li>
+    
+<li>OAUTH-206: Refresh token lifetime limited. A logic bug made the lifetime of refresh tokens decrease on refresh,
+        eventually yielding invalid refresh tokens. All refresh tokens now are valid for the full requested time.
+    </li>
+    
+<li>OAUTH-208: Remove dependeny on one-jar plug in for building executable jars, since it is no longer supported.
+    </li>
+    
+<li>OAUTH-209: Remove dependency on Google Code's maven repository.</li>
+    
+<li>OAUTH-215: default secret key length for new OIDC clients set to 512 bytes.</li>
+    
+<li>Added new <a href="test-client.html">command line
+        client</a> for testing purposes.
+    </li>
+</ul>
+</section><section>
+<h2><a name="a3.2.1"></a>3.2.1</h2>
+
+<p>Release date 2016-01-28.</p>
+
+
+<ul>
+    
+<li>CIL-101: (reopened with an additional parameter for the overloaded myproxy username)</li>
+    
+<li>CIL-210: Return CILogon specific claims fromthe getUserInfo endpoint.</li>
+    
+<li>CIL-211: New attributes for the user, affiliation, display name and organizational unit.</li>
+    
+<li>CIL-227: Refresh token lifetimes should be ignored if not enabled on the server.</li>
+    
+<li>CIL-231: EPPN and EPTID no longer omitted from X509v3 extension.</li>
+    
+<li>CIL-234: Fermi National Lab specific distinguished names, along with a configuration option for the server to
+        disable generation of these.
+    </li>
+    
+<li>CIL-240: update for items from command line not working.</li>
+    
+<li>CIL-257: Unwanted serial string changes on user updates</li>
+    
+<li>CIL-258: Allow OGS CA to omit versio number from certification requests since MyProxy accepts these.</li>
+    
+<li>CIL-260: Allow for restoring archived users from command line.</li>
+    
+<li>OAUTH-184:Additional claims returned from the getToken endpoint.</li>
+    
+<li>OAUTH-192: Enabling use of the remote user header from an external authorization module could allow a user to
+        change their name.
+    </li>
+    
+<li>OAUTH-193: Empty responses to cert request.</li>
+</ul>
+
+</section><section>
+<h2><a name="a3.2"></a>3.2</h2>
+
+<p>Release date 2015-09-14.</p>
+
+<ul>
+    
+<li>OAUTH-181: Updated server walkthrough.</li>
+    
+<li>OAUTH-183: Update documentation for using remote user.</li>
+    
+<li>OAUTH-184: Plugin capability for additional IODC claims.</li>
+    
+<li>OAUTH-185: Support for custom scopes and additional claims.</li>
+    
+<li>OAUTH-188: Fixed broken links in the getting-started page.</li>
+    
+<li>CIL-194: Searching for MyProxy servers in CILogon now uses standard OA4MP libraries.</li>
+    
+<li>CIL-196: ServerDN option in configuration now can be over-ridden in the MyProxy tag.</li>
+    
+<li>CIL-197: Propagating MyProxy changes to CILogon.</li>
+    
+<li>Added PKCS 7 encoding support to the certificate utility</li>
+</ul>
+</section><section>
+<h2><a name="a3.1.1"></a>3.1.1</h2>
+
+<p>Released 2015-08-18</p>
+
+<ul>
+    
+<li>OAUTH-180: Support OIDC servers that do not use a nonce.</li>
+    
+<li>CIL-101: Add setTransaction state call.</li>
+    
+<li>CIL-136: Documenting the OAuth 2.0 authorize<b>d</b> servlet.</li>
+    
+<li>CIL-141: Improve pinging servers</li>
+    
+<li>CIL-170, CIL-171: Missing log4j properties restored.</li>
+    
+<li>CIL-172: Multiple LIGO IdPs supported.</li>
+    
+<li>CIL-173: Fix handling of incorrect password.</li>
+</ul>
+
+</section><section>
+<h2><a name="a3.1.0"></a>3.1.0</h2>
+
+<p>Release date 2015-08-15.</p>
+
+<ul>
+    
+<li>CIL-194: CILogon server only returns cert from last Myproxy server</li>
+    
+<li>CIL-196: server DN override in myproxy configuration not read.</li>
+</ul>
+</section><section>
+<h2><a name="a3.1"></a>3.1</h2>
+
+<p>Release date 2015-06-18</p>
+
+<ul>
+    
+<li>OAUTH-179: Updated apache http client libraries to 4.4.1 since previous version had
+        <a class="externalLink" href="https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-3577">an SSL server hostname validation
+            vulnerability:</a></li>
+    
+<li>CIL-169: Mail notifications failing.</li>
+</ul>
+
+</section><section>
+<h2><a name="a3.0"></a>3.0</h2>
+
+<p>Release date 2015-04-08.</p>
+
+
+<ul>
+    
+<li><b>Java 8 support</b>: Due to internal changes to Java, this release requires Java 8 and will not work with
+        previous versions of Java.
+    </li>
+    
+<li>OAUTH-164: Support for id_tokens in OAuth 2 module</li>
+    
+<li>OAUTH-165: Passing the skin parameter in with the initial request.</li>
+    
+<li>OAUTH-168: Making OA4MP for OAuth 2.0 spec. compliant.</li>
+    
+<li>OAUTH-169: Removed &quot;error url&quot; from the OAuth 2 registration page</li>
+    
+<li>OAUTH-170: Typo in online documentation. Examples had tags corrected to &lt;service&gt;</li>
+    
+<li>OAUTH-171: MyProxy Logon now supports setting the socket timeout.</li>
+    
+<li>OAUTH-172: Expose MyProxy socket timeout in OA4MP configuration.</li>
+    
+<li>OAUTH-173: Improved error message on session timeout.</li>
+    
+<li>OAUTH-174: Error handling in OAuth 2 component.</li>
+    
+<li>OAUTH-175: Possible concurrency issue with MariaDB connections.</li>
+    
+<li>OAUTH-176: Specify DN (distinguished name) for MyProxy server(s).</li>
+    
+<li>OAUTH-177: Documentation for the new server DN option.</li>
+</ul>
+
+</section><section>
+<h2><a name="a1.3"></a>1.3</h2>
+
+<ul>
+    
+<li>OAUTH-162: Client secret must be sent on access token request but not on authorization request.</li>
+    
+<li>OAUTH-163: State must be returned in OAuth 2 component with authorization response callback.</li>
+</ul>
+</section><section>
+<h2><a name="a1.2.1"></a>1.2.1</h2>
+
+<p>Release date 2014-04-11.</p>
+
+
+<ul>
+    
+<li>OAUTH-127: MyProxyLogon website updated to point to current release.</li>
+    
+<li>OAUTH-129: Sorting entries with the the CLI <b>ls</b> command. Before there was no sorting,
+        now it is done by client ID or date, where applicable.
+    </li>
+    
+<li>OAUTH-134: Updating documentation on how to run a monitor.</li>
+    
+<li>OAUTH-154: Removed possible redundant/conflicting maven dependencies.</li>
+    
+<li>OAUTH-156: Turn off default logging for MyProxyLogon. This permits use of the MyProxyLogon
+        module as a library without getting logging messages to the console (the previous default).
+    </li>
+    
+<li>OAUTH-157: Client registration page not saving client secret under OAuth 1.0a protocol.</li>
+    
+<li>OAUTH-158: Updated links on generic client registration page to current documentation.</li>
+    
+<li>OAUTH-159: Update documentation for this release.</li>
+    
+<li>OAUTH-160: Regularize and improve version reporting at component (CLI, client, server) startup.</li>
+</ul>
+
+</section><section>
+<h2><a name="a1.2"></a>1.2</h2>
+
+<p>Release date 2014-10-29.</p>
+
+
+<ul>
+    
+<li>OAUTH-131: Improved client registration for OAuth 2 servers.</li>
+    
+<li>OAUTH-149: Remove support for MyProxyLogon to use SSL version 3. (This mitigates the POODLE attack.)</li>
+    
+<li>OAUTH-152: Do not show detailed MyProxy error message if authorization fails.</li>
+    
+<li>OAUTH-153: Improved logging for MyProxy errors and successes.</li>
+    
+<li>OAUTH-155: Updated documentation to explain new OAuth 2 client registration process.</li>
+</ul>
+
+</section><section>
+<h2><a name="a1.1.3"></a>1.1.3</h2>
+
+<p>Release date 2014-09-30.</p>
+
+
+<ul>
+    
+<li>OAUTH-139: CLI might return an incorrect list of items after several updates.</li>
+    
+<li>OAUTH-140: MyProxy component didn't quite log completely to the configured log file.</li>
+    
+<li>OAUTH-141: Improved client/server walkthough. This is documentation that permits an administrator
+        to deploy both a client and server locally with a self-signed cert for testing purposes.
+    </li>
+    
+<li>OAUTH-143: Enabling the Globus DN option should have had better documentation pointing at the
+        server requirements for JGlobus.
+    </li>
+    
+<li>OAUTH-144: Jetty version was incorrect, causing certain build issues. This was standardized on version
+        6.1.26 to ensure consistent builds.
+    </li>
+    
+<li>OAUTH-147: Potential cleanup thread failure with a filestore. If a filestore is used and one of the
+        files is corrupted (e.g. due to a system crash at the time of writing it) then the cleanup thread
+        would fail to start. Now such corrupted files are simply logged in catalina.out and ignored otherwise.
+    </li>
+    
+<li>OAUTH-148: Maria DB support added.</li>
+
+</ul>
+
+</section><section>
+<h2><a name="a1.1.2"></a>1.1.2</h2>
+
+<p>Release date 2014-07-31.</p>
+
+
+<ul>
+    
+<li>OAUTH-112: Servlet initialization is injected now, decoupling it more from Tomcat startup.</li>
+    
+<li>OAUTH-113: MyProxy does not handle PAM challenges. The documentation has been updated with a link to the
+        appropriate page
+        on the MyProxy website where this is discussed.
+    </li>
+    
+<li>OAUTH-117: Server install walkthrough updated and improved to reflect changes (in particular, it now makes us of
+        the resolution of OAUTH-110).
+    </li>
+    
+<li>OAUTH-118. Build error in maven caused OAuth2 command line tools to issue an NPE in certain cases.</li>
+    
+<li>OAUTH-119: Loading objects into the CLI that do not have identifiers caused an NPE. This could only arise really
+        if someone directly edited an entry in a text editor (e.g. if the installation was backed by a filestore). In
+        that
+        case it would not be possible to load any objects from that store into the CLI, preventing editing of them.
+    </li>
+    
+<li>OAUTH-120: The new <b>-component</b> flag allows an administrator to start the CLI with the named component as
+        an
+        argument. E.g. rather than start the CLI and use the approval component, just issue<br />
+        ./oa4mp-cli -component approvals<br />
+    </li>
+    
+<li>OAUTH-125: &quot;About&quot; and &quot;Overview&quot; links on website were broken.</li>
+    
+<li>OAUTH-126: Website now lists the version number with the &quot;latest&quot; link.</li>
+    
+<li>OAUTH-130: Documentation amended to clarify which version of OA4MP (based on OAuth 1.0a or OAuth 2.0)
+        to use.
+    </li>
+    
+<li>OAUTH-133: Configuration option to convert standard DN to (legacy) Globus identifiers. This is mostly
+        useful for installations that have been using Globus for a very long time.
+    </li>
+    
+<li>OAUTH-135: Failure in authentication were not displaying the correct message. They should route the user
+        back to the login page for another attempt.
+    </li>
+</ul>
+
+
+</section><section>
+<h2><a name="a1.1.1"></a>1.1.1</h2>
+
+<ul>
+    
+<li>OAUTH-105:Added support for file includes to configuration files.</li>
+    
+<li>OAUTH-105: Added checks to prevent cycles in aliases and files</li>
+    
+<li>OAUTH-106: Adding fully qualified host name to client approval notifications.</li>
+</ul>
+
+</section><section>
+<h2><a name="a1.1"></a>1.1</h2>
+
+<ul>
+    
+<li>OAUTH-47 Now supports building with maven 3.0+ There was an issue with earlier an pom version
+        that prevented this.
+    </li>
+    
+<li>Support for OAuth 2 protocol. This includes full server and client support as well as
+        various supported stores (mysql, postgres, files) and admin tools.
+    </li>
+    
+<li>OAUTH-94: Fix for passthrough of Shibboleth attributes.
+        A <a href="Username-transformations.html">username transformation</a> interface has been
+        created.
+        This will be invoked immediately before the call to MyProxy.
+        Users that wish to customize this may do so by implementing the interface and setting it in the environment
+        at server startup.
+    </li>
+    
+<li>OAUTH-96: Check for a bad PKCS10 CSR (missing version number which must be set to 0) created by pyOpenSSL is
+        now in place and an informative message is now
+        issued. Earlier the Bouncy Castle code allowed for this, Sun does not.
+    </li>
+    
+<li>OAUTH-99: Old documentation at Science Gateway Security site removed. Everything is redirected to this site
+        now.
+    </li>
+    
+<li>OAUTH-102: No username returned with cert in certain cases. Fixed.</li>
+</ul>
+
+</section><section>
+<h2><a name="a1.0.7"></a>1.0.7</h2>
+
+<p>Release date 2013-08-16.</p>
+
+<ul>
+    
+<li>Added support to make using log 4j optional. It had been disabled which interfered with some installations.</li>
+    
+<li>Fixed bug OAUTH-90.</li>
+    
+<li>Fixed bug OAUTH-94. This adds a configuration option to
+        <a href="authorization-header.html">return the DN</a> of the user's cert as the username.
+    </li>
+    
+<li>All new command line tools that allow for managing clients and approvals.</li>
+    
+<li>Changed client index page to be more up to date.</li>
+    
+<li><b>Removed</b> all explicit references to Bouncy Castle. This should prevent future jar pollution from
+        incompatible versions. JGlobus still uses this though....<br />
+    </li>
+    
+<li>Set mysql and postgres jars to be provided rather than included in the release so that projects that
+        need only a single type of storage are not required to install both of these.
+    </li>
+</ul>
+
+</section><section>
+<h2><a name="a1.0.6"></a>1.0.6</h2>
+
+<p>Release date 2012-08-31</p>
+
+<ul>
+    
+<li>Version number is now printed to the console whenever the server starts up.</li>
+    
+<li>Support for authentication using the REMOTE_USER (or any other) header.</li>
+    
+<li>Improved error handling on the server, especially in cases where the MyProxyLogon client encounters a runtime
+        exception.
+    </li>
+    
+<li>OAUTH-80: errors resulting from JGlobus broken build will be resolved by their conforming to standard maven
+        practices
+    </li>
+    
+<li>Fix for OAUTH-83 documentation error in configuring mail addresses</li>
+    
+<li>OAUTH-84 failure to return a complete certificate chain from MyProxy in a certain case</li>
+    
+<li>OAUTH-85 failure to configure logging could result in an error. Default is to dump everything into the tomcat
+        logs.
+    </li>
+    
+<li>Use of new JGlobus release 2.0.5.</li>
+    
+<li>Bouncy Castle version set to 1.43 to support JGlobus release 2.0.5.</li>
+    
+<li>Added signatures for the lastest downloadable war.</li>
+</ul>
+</section><section>
+<h2><a name="a1.0.5"></a>1.0.5</h2>
+
+<ul>
+    
+<li>Support for limited proxy generation. Allows the server to generate a public/private keypair and issue a limited
+        proxy. The result is a certificate chain.
+    </li>
+    
+<li>Deny HTTP header. This sets the HTTP header to &quot;deny&quot; which prevents clickjacking attacks.</li>
+    
+<li>Added logging support. Standard Java logging is now available and configurable.</li>
+    
+<li>Default MyProxy server on localhost. If no MyProxy server is specified, one is assumed to be running on
+        localhost.
+    </li>
+    
+<li>Improved admin tools. In particular, improved the CLI to give more readable messages.</li>
+    
+<li>Improved SQL install scripts.</li>
+    
+<li>Links in the documentation to the latest versions of these scripts.</li>
+    
+<li>More and better documentation.</li>
+</ul>
+
+
+</section>
+
+    </div>
+</div>
+<div class="clear">
+    <hr/>
+</div>
+<div id="footer">
+    <div class="xright">&#169;    
+                    2023
+        
+                    
+    
+
+    
+        
+                        
+    
+        
+    </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+</body>
+</html>
+

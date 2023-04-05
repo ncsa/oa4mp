@@ -1,0 +1,410 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+
+
+
+
+
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>OAuth for MyProxy</title>
+    <style type="text/css" media="all">
+        @import url("../../css/oa4mp-custom.css");
+        @import url("../../css/oa4mp-theme.css");
+        @import url("../../css/site.css");
+    </style>
+    <link rel="stylesheet" href="../../css/print.css" type="text/css" media="print"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    </head>
+<body class="composite">
+<div id="banner">
+                        <a href="http://www.ncsa.illinois.edu/" id="bannerLeft"  >
+        
+                                                                    <img src="../../css/images/ncsalogo_sm-2.gif" alt="NCSA"/>
+        
+                </a>
+                                    <a href="http://grid.ncsa.illinois.edu/myproxy/" id="bannerRight"  >
+        
+                                                                    <img src="../../css/images/MyProxyWide.gif" alt="MyProxy"/>
+        
+                </a>
+                <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="breadcrumbs">
+            
+    
+
+    
+        
+                        
+    
+        
+                    <div class="xleft">
+            Last Published: 2023-04-05
+                                </div>
+                <div class="xright">            
+    
+
+    
+        
+                        
+    
+        
+                         Version: 5.3-SNAPSHOT
+            </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="leftColumn">
+    <div id="navcolumn">
+                
+    
+
+    
+        
+                        
+    
+        
+                               <h5>OAuth for MyProxy</h5>
+                        <ul>
+                    
+    <li class="none">
+                        <a href="../../server/index.html">Overview</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../server/index.html">Server</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../client/index.html">Client</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../apidocs/index.html">api docs</a>
+            </li>
+              </ul>
+                            <h5>Project Documentation</h5>
+                        <ul>
+                    
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-info.html">Project Information</a>
+                        </li>
+              
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-reports.html">Project Reports</a>
+                        </li>
+              </ul>
+                                               <a href="http://maven.apache.org/" title="Built by Maven"
+           class="poweredBy">
+            <img class="poweredBy"
+                 alt="Built by Maven"
+                 src="http://maven.apache.org/images/logos/maven-feather.png"
+                 width="90"
+                 height="30"
+                 border="1"/>
+        </a>
+                           
+    
+
+    
+        
+                        
+    
+        
+        </div>
+</div>
+<div id="bodyColumn">
+    <div id="contentBox">
+        
+
+
+
+
+<section>
+<h2><a name="The_MyProxy_Configuration"></a>The MyProxy Configuration</h2>
+
+
+<p>This tag contains the MyProxy server configuration information.</p>
+
+<table class="bodyTable" style="text-align: left; width: 50%;" border="1" cellspacing="2" cellpadding="2">
+    <tbody>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">Name</td>
+        
+<td style="vertical-align: top;">Required</td>
+        
+<td style="vertical-align: top;">Default</td>
+        
+<td style="vertical-align: top;"></td>
+    </tr>
+    
+<tr class="b">
+        
+<td style="vertical-align: top;">host</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;">localhost</td>
+        
+<td style="vertical-align: top;">The host on which the MyProxy service resides.</td>
+    </tr>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">port</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;">7512</td>
+        
+<td style="vertical-align: top;">The port of the service</td>
+    </tr>
+
+    
+<tr class="b">
+          
+<td style="vertical-align: top;">serverDN</td>
+          
+<td style="vertical-align: top;">N</td>
+          
+<td style="vertical-align: top;">(none)</td>
+          
+<td style="vertical-align: top;">A server DN (distinguished name) to be used when checking the name returned by a MyProxy server
+          <b>Note:</b> this may also be set globally for all MyProxy instances in the service tag. Note that setting this in a
+          MyProxy element will over-ride the global setting. If you are looking to set the DN of the certificate for
+          the client, look at the entry for the <a href="../../common/configuration/ssl.html">trust store.</a> </td>
+      </tr>
+    
+<tr class="a">
+          
+<td style="vertical-align: top;">socketTimeout</td>
+          
+<td style="vertical-align: top;">N</td>
+          
+<td style="vertical-align: top;">0</td>
+          
+<td style="vertical-align: top;">The timeout for the connection, in ms.</td>
+      </tr>
+    </tbody>
+</table>
+
+<p>Multiple MyProxy servers may be specified. These will be tried until one that is available is found. If none are
+    available, then an exception will be thrown.</p>
+
+<section>
+<h3><a name="Getting_the_trusted_Roots"></a>Getting the trusted Roots</h3>
+
+
+<p>The OAuth for MyProxy server acts as a front-end to an existing <a class="externalLink" href="http://myproxy.ncsa.uiuc.edu/" target="_blank">MyProxy</a> server. The OAuth
+    server can run on the same system as the MyProxy server or they can run on separate systems. To connect securely to
+    the MyProxy server, the OAuth for MyProxy install must include a trusted CA certificates directory (in /etc/grid-security/certificates
+    or $HOME/.globus/certificates). Since we're installing as a regular system user, we use the myproxy-get-trustroots
+    command to create our $HOME/.globus/certificates directory.
+    Alternatively, you can manually setup a $HOME/.globus/certificates directory using a CA distribution
+    from <a class="externalLink" href="https://dist.eugridpma.info/distribution/igtf/current/">IGTF</a> or <a class="externalLink" href="https://www.xsede.org/security">XSEDE</a> or another trusted source. You will have to do this anyway
+    if your platform does not have a myproxy client available.</p>
+
+<div>
+<pre>
+$ myproxy-get-trustroots -s myproxy.ncsa.uiuc.edu
+Bootstrapping MyProxy server root of trust.
+New trusted MyProxy server: /C=US/O=National Center for Supercomputing Applications/OU=Services/CN=myproxy.ncsa.uiuc.edu
+New trusted CA (9b95bbf2.0): /C=US/O=National Center for Supercomputing Applications/OU=Certificate Authorities/CN=CACL
+Trust roots have been installed in /Users/jbasney/.globus/certificates/.
+</pre></div>
+
+</section><section>
+<h3><a name="Example_1."></a>Example 1.</h3>
+
+
+<p>Omitting the tag means to accept the defaults. So all of these are equivalent:</p>
+
+<div>
+<pre>
+(no tag)
+&lt;myproxy/&gt;
+&lt;myproxy host=&quot;localhost&quot; port=&quot;7512&quot;/&gt;
+</pre></div>
+</section><section>
+<h3><a name="Example_2._Specifying_a_host_and_port"></a>Example 2. Specifying a host and port</h3>
+
+<div>
+<pre>
+&lt;config&gt;
+    &lt;service  name=&quot;my-server&quot;&gt;
+       &lt;myproxy host=&quot;myproxy.teragrid.org&quot; port=&quot;1234&quot; socketTimeout=20000/&gt;
+       &lt;!-- more configuration --&gt;
+    &lt;/service&gt;
+&lt;/config&gt;
+</pre></div>
+
+<p>Use the host at myproxy.teragrid.org with the port 1234 (instead of the default) with a timeout of 20000 ms. for the connection.
+If the MyProxy server does not respond withing 20000 ms, the attempt will end.</p>
+
+</section><section>
+<h3><a name="Example_3._Multiple_servers"></a>Example 3. Multiple servers</h3>
+
+<div>
+<pre>
+&lt;config&gt;
+    &lt;service  name=&quot;my-server&quot;&gt;
+       &lt;myproxy host=&quot;myproxy.bigstate.edu&quot; port=&quot;9352&quot;/&gt;
+       &lt;myproxy host=&quot;myproxy.xsede.org&quot;
+       serverDN=&quot;CN=myproxy.xsede.org,OU=IGTF Server,OU=UIUC - NCSA,O=University of Illinois,L=Urbana,ST=IL,C=US,DC=incommon,DC=org&quot;
+    /&gt;
+       &lt;myproxy host=&quot;myproxy.teragrid.org&quot;/&gt;
+       &lt;!-- more configuration --&gt;
+    &lt;/service&gt;
+&lt;/config&gt;
+
+</pre></div>
+
+<p>Use the myproxy server at myproxy.bigstate.edu with the non-standard port. If that fails, there are two other backup
+    MyProxy servers to try. An exception is only raised if <b>all</b> of these fail and only the last failure
+    is returned.<br />
+    <b>Note:</b> Listing any MyProxy servers means that localhost will not be tried unless explicitly added. <br />
+    <b>Note:</b> the server DN in this case will be applied to the myproxy.xsede.org server. In that case, there may be
+several servers that actually handle the request and any of them may respond. The server name is checked using a reverse
+DNS lookup, so this the common name (CN) in this DN must match that. </p>
+
+</section></section><section>
+<h2><a name="Levels_of_Assurance"></a>Levels of Assurance</h2>
+
+The MyProxy configuration allows you to specify multiple <i>levels of assurance</i>. A good discussion of them
+as they are used in OA4MP can be found under the <a class="externalLink" href="http://ca.cilogon.org/loa">CILogon</a> site. These are
+elements
+(there may be multiple) within the MyProxy element and support two properties:
+
+
+<table class="bodyTable" style="text-align: left; width: 50%;" border="1" cellspacing="2" cellpadding="2">
+    <tbody>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">Name</td>
+        
+<td style="vertical-align: top;">Required</td>
+        
+<td style="vertical-align: top;">Default</td>
+        
+<td style="vertical-align: top;"></td>
+    </tr>
+    
+<tr class="b">
+        
+<td style="vertical-align: top;">name</td>
+        
+<td style="vertical-align: top;">Y</td>
+        
+<td style="vertical-align: top;">-</td>
+        
+<td style="vertical-align: top;">The name assigned to this level of assurance.</td>
+    </tr>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">port</td>
+        
+<td style="vertical-align: top;">Y</td>
+        
+<td style="vertical-align: top;">-</td>
+        
+<td style="vertical-align: top;">The port of the service</td>
+    </tr>
+    </tbody>
+</table>
+
+See the example in the next section for a use of this.
+
+</section><section>
+<h2><a name="Using_MyProxy_with_a_Client_Certificate"></a>Using MyProxy with a Client Certificate</h2>
+MyProxy may also be used by an OA4MP server with a client certificate (remember that the OA4MP
+server in this case is a client of the MyProxy server to help keep this straight).
+This means that rather than sending the username and
+password to the MyProxy Server, there is a trust relationship so that only the username need be supplied. Of course,
+setting this up with a MyProxy server requires issuing a client certificate so it not trivial. In this case,
+the <a href="../../common/configuration/keystore.html">keystore</a> that the OA4MP server must use will be required. It is an
+additional element within the myproxy
+element.
+
+
+<section>
+<h3><a name="An_Example"></a>An Example</h3>
+
+Consider the following server configuration with the given MyProxy configuration:
+
+<div>
+<pre>
+&lt;config&gt;
+   &lt;service  name=&quot;my-server&quot;&gt;
+       &lt;myproxy host=&quot;myproxy.bigstate.edu&quot; port=&quot;7512&quot;&gt;
+             &lt;loa name=&quot;openid&quot; port=&quot;7516&quot;/&gt;
+             &lt;loa name=&quot;http://incommonfederation.org/assurance/silver&quot; port=&quot;7514&quot;/&gt;
+             &lt;keystore path=&quot;/var/www/config/hostcred.p12&quot;
+                       type=&quot;pkcs12&quot;
+                       password=&quot;my-weird-password&quot;
+                       factory=&quot;SunX509&quot;
+                       useJavaKeystore=&quot;true&quot;/&gt;
+       &lt;/myproxy&gt;
+       &lt;!-- lots more configuration --&gt;
+   &lt;/service&gt;
+&lt;/config&gt;
+</pre></div>
+
+In this case, there is a basic Myproxy server residing at port 7512 on the machine myproxy.bigstate.edu. This same
+server
+also supports two additional levels of assurance. A custom keystore which contains the client certificate MyProxy
+accepts
+is also configured.
+
+
+</section></section>
+
+
+    </div>
+</div>
+<div class="clear">
+    <hr/>
+</div>
+<div id="footer">
+    <div class="xright">&#169;    
+                    2023
+        
+                    
+    
+
+    
+        
+                        
+    
+        
+    </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+</body>
+</html>
+

@@ -1,0 +1,559 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+
+
+
+
+
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>OAuth for MyProxy</title>
+    <style type="text/css" media="all">
+        @import url("../../css/oa4mp-custom.css");
+        @import url("../../css/oa4mp-theme.css");
+        @import url("../../css/site.css");
+    </style>
+    <link rel="stylesheet" href="../../css/print.css" type="text/css" media="print"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    </head>
+<body class="composite">
+<div id="banner">
+                        <a href="http://www.ncsa.illinois.edu/" id="bannerLeft"  >
+        
+                                                                    <img src="../../css/images/ncsalogo_sm-2.gif" alt="NCSA"/>
+        
+                </a>
+                                    <a href="http://grid.ncsa.illinois.edu/myproxy/" id="bannerRight"  >
+        
+                                                                    <img src="../../css/images/MyProxyWide.gif" alt="MyProxy"/>
+        
+                </a>
+                <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="breadcrumbs">
+            
+    
+
+    
+        
+                        
+    
+        
+                    <div class="xleft">
+            Last Published: 2023-04-05
+                                </div>
+                <div class="xright">            
+    
+
+    
+        
+                        
+    
+        
+                         Version: 5.3-SNAPSHOT
+            </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="leftColumn">
+    <div id="navcolumn">
+                
+    
+
+    
+        
+                        
+    
+        
+                               <h5>OAuth for MyProxy</h5>
+                        <ul>
+                    
+    <li class="none">
+                        <a href="../../server/index.html">Overview</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../server/index.html">Server</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../client/index.html">Client</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../apidocs/index.html">api docs</a>
+            </li>
+              </ul>
+                            <h5>Project Documentation</h5>
+                        <ul>
+                    
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-info.html">Project Information</a>
+                        </li>
+              
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-reports.html">Project Reports</a>
+                        </li>
+              </ul>
+                                               <a href="http://maven.apache.org/" title="Built by Maven"
+           class="poweredBy">
+            <img class="poweredBy"
+                 alt="Built by Maven"
+                 src="http://maven.apache.org/images/logos/maven-feather.png"
+                 width="90"
+                 height="30"
+                 border="1"/>
+        </a>
+                           
+    
+
+    
+        
+                        
+    
+        
+        </div>
+</div>
+<div id="bodyColumn">
+    <div id="contentBox">
+        
+
+
+
+
+<p>This page contains the annotated DTD for the service configuration file. To see what something does, click on it.
+    For a note generally on how to use configurations, look <a href="../../server/configuration/server-configuration-file.html">here</a>.</p>
+
+
+
+<p><b>NOTES:</b> This is for a configuration file and the tag names are case sensitive,
+    so &lt;filestore&gt; and &lt;fileStore&gt; are not the same! Also, note the color
+    of <span style="background-color: #ff6600;">OAuth 2</span> only
+    options!
+</p>
+
+<div>
+<pre>
+&lt;!ELEMENT <a href="../configuration/server-configuration-file.html">config</a> (<a href="server-dtd-service-tag.html">service</a>)*&gt;
+&lt;!ELEMENT <a href="server-dtd-service-tag.html">service</a> (<a href="../configuration/server-myproxy.html">myproxy</a>|
+      <a href="../../common/configuration/mysql-store.html">mysql</a>|
+      <a href="../../common/configuration/mariadb-store.html">mariadb</a>|
+      <a href="../../common/configuration/postgres-store.html">postgresql</a>|
+      <a href="../../common/configuration/derby-store.html">apache derby</a>|
+      <a href="../../common/configuration/file-store.html">fileStore</a>|<a href="../../common/configuration/memory-store.html">memoryStore</a>|
+      <a href="../configuration/server-email.html">mail</a>|
+      <a href="../../common/configuration/scopes.html">scopes</a>|
+      <a href="../configuration/server-messages.html">messages</a>|
+      <a href="../../common/configuration/logging.html">logging</a>|
+      <a href="../configuration/client_management-configuration.html">clientManagement</a>|
+      <a href="../configuration/authorization-servlet-configuration.html">authorizationServlet</a>|
+      <a href="../configuration/device-flow-servlet-configuration.html">deviceFlowServlet</a>|
+      <a href="../configuration/qdl-config.html">QDL</a>|
+      <span style="background-color: #ff6600;"><a href="server/configuration/ldap.html">ldap</a></span>|
+      <span style="background-color: #ff6600;"><a href="server/configuration/signing.html">JSONWebKey</a></span>
+    )*&gt;
+&lt;!ATTLIST <a href="server-dtd-service-tag.html">service</a>
+    <a href="server-dtd-service-tag.html#address">address</a> CDATA #IMPLIED
+    <a href="server-dtd-service-tag.html#accessTokenLifetime">accessTokenLifetime</a>
+    <a href="server-dtd-service-tag.html#authorizationGrantLifetime">authorizationGrantLifetime</a>
+    <span style="background-color: #ff6600;"><a href="server-dtd-service-tag.html#clientSecretLength">clientSecretLength</a></span> CDATA #IMPLIED
+    <a href="server-dtd-service-tag.html#debug">debug</a> CDATA #IMPLIED
+    <a href="server-dtd-service-tag.html#defaultAccessTokenLifetime">defaultAccessTokenLifetime</a> CDATA #IMPLIED
+    <a href="server-dtd-service-tag.html#defaultIDTokenLifetime">defaultIDTokenLifetime</a> CDATA #IMPLIED
+    <a href="server-dtd-service-tag.html#disableDefaultStores">disableDefaultStores</a> CDATA #IMPLIED
+    <a href="server-dtd-service-tag.html#enableDeviceFlow">enableDeviceFlow</a> CDATA #IMPLIED
+    <a href="server-dtd-service-tag.html#enableTokenExchange">enableTokenExchange</a> CDATA #IMPLIED
+    <a href="server-dtd-service-tag.html#enableTwoFactorSupport">enableTwoFactorSupport</a> CDATA #IMPLIED
+    <a href="server-dtd-service-tag.html#issuer">issuer</a> CDATA #IMPLIED
+    <a href="server-dtd-service-tag.html#maxAuthorizationGrantLifetime">maxAuthorizationGrantLifetime</a> CDATA #IMPLIED
+    <a href="server-dtd-service-tag.html#maxAccessTokenLifetime">maxAccessTokenLifetime</a> CDATA #IMPLIED
+    <a href="server-dtd-service-tag.html#maxAllowedNewClientRequests">maxAllowedNewClientRequests</a> CDATA #IMPLIED
+    <a href="server-dtd-service-tag.html#maxClientRefreshTokenLifetime">maxClientRefreshTokenLifetime</a> CDATA #IMPLIED
+    <a href="server-dtd-service-tag.html#maxIDTokenLifetime">maxIDTokenLifetime</a> CDATA #IMPLIED
+    <a href="server-dtd-service-tag.html#maxRefreshTokenLifetime">maxRefreshTokenLifetime</a> CDATA #IMPLIED
+    <a href="server-dtd-service-tag.html#name">name</a> CDATA #IMPLIED
+    <a href="server-dtd-service-tag.html#OIDCEnabled">OIDCEnabled</a> CDATA #IMPLIED
+    <a href="server-dtd-service-tag.html#pingable">pingable</a> CDATA #IMPLIED
+    <a href="server-dtd-service-tag.html#rfc7636Required">rfc7636Required</a> CDATA #IMPLIED
+    <a href="server-dtd-service-tag.html#pollingDirectory">pollingDirectory</a> CDATA #IMPLIED
+    <a href="server-dtd-service-tag.html#pollingInterval">pollingInterval</a> CDATA #IMPLIED
+    <a href="server-dtd-service-tag.html#cleanupInterval">cleanupInterval</a> CDATA #IMPLIED
+    <a href="server-dtd-service-tag.html#cleanupAlarms">cleanupAlarms</a> CDATA #IMPLIED
+    <span style="background-color: #ff6600;"><a href="server-dtd-service-tag.html#refreshTokenEnabled">refreshTokenEnabled</a></span> CDATA #IMPLIED
+    <span style="background-color: #ff6600;"><a href="server-dtd-service-tag.html#refreshTokenLifetime">refreshTokenLifetime</a></span> CDATA #IMPLIED
+    <a href="server-dtd-service-tag.html#safe_gc">safe_gc</a> CDATA #IMPLIED
+    <a href="server-dtd-service-tag.html#scheme">scheme</a> CDATA #IMPLIED
+    <a href="server-dtd-service-tag.html#schemeSpecificPart">schemeSpecificPart</a> CDATA #IMPLIED
+    <a href="server-dtd-service-tag.html#serverDN">serverDN</a> CDATA #IMPLIED
+    <a href="server-dtd-service-tag.html#version">version</a> CDATA #IMPLIED&gt;
+&lt;!ELEMENT <a href="../configuration/server-messages.html">messages (retryMessage)</a>*&gt;
+&lt;!ELEMENT <a href="../configuration/server-messages.html">retryMessage (#PCDATA)</a>&gt;
+&lt;!ELEMENT <a href="../configuration/server-myproxy.html">myproxy</a> (<a href="../../common/configuration/keystore.html">keystore</a>|
+    <a href="../../common/configuration/ssl.html">ssl</a>)&gt;
+&lt;!ATTLIST <a href="../configuration/server-myproxy.html">myproxy</a>
+    host CDATA #REQUIRED
+    port CDATA #REQUIRED
+    socketTimeout CDATA #IMPLIED
+    serverDN CDATA #IMPLIED&gt;
+&lt;!ELEMENT <a href="../../common/configuration/keystore.html">keystore</a> (assetStore)*&gt;
+&lt;!ATTLIST <a href="../../common/configuration/keystore.html">keystore</a>
+    path CDATA #REQUIRED
+    password CDATA #REQUIRED
+    type CDATA #REQUIRED
+    factory CDATA #REQUIRED
+    useJavaKeystore CDATA #IMPLIED&gt;
+&lt;!ELEMENT <a href="server-dtd-content-tags.html">clients</a>&gt;
+&lt;!ELEMENT <a href="server-dtd-content-tags.html">clientApprovals</a>&gt;
+&lt;!ELEMENT <a href="server-dtd-content-tags.html">transactions</a>&gt;
+&lt;!ELEMENT <a href="server-dtd-content-tags.html">permissions</a>&gt;
+&lt;!ELEMENT <a href="server-dtd-content-tags.html">adminClients</a>&gt;
+&lt;!ELEMENT <a href="server-dtd-content-tags.html">txStore</a>&gt;
+&lt;!ELEMENT <a href="server-dtd-content-tags.html">voStore</a>&gt;
+&lt;!ATTLIST clients
+    tablename CDATA #IMPLED&gt;
+&lt;!ATTLIST clientApprovals
+    tablename CDATA #IMPLIED&gt;
+&lt;!ATTLIST transactions
+    tablename CDATA #IMPLIED&gt;
+  &lt;!ATTLIST permissions
+      tablename CDATA #IMPLED&gt;
+  &lt;!ATTLIST adminClients
+      tablename #IMPLED&gt;
+  &lt;!ATTLIST txStore
+       tablename CDATA #IMPLED&gt;
+  &lt;!ATTLIST voStore
+      tablename CDATA #IMPLED&gt;
+
+&lt;!ELEMENT memoryStore (clients|clientApprovals|transactions|permissions|adminClients|txStore|voStore)*&gt;
+    &lt;!ELEMENT <a href="../../common/configuration/file-store.html">fileStore</a> (clients|clientApprovals|transactions|permissions|adminClients|txStore|voStore)*&gt;
+&lt;!ATTLIST <a href="../../common/configuration/file-store.html">fileStore</a>
+    dataPath CDATA #IMPLIED
+    indexPath CDATA #IMPLIED
+    path CDATA #IMPLIED&gt;
+&lt;!ELEMENT <a href="../../common/configuration/mysql-store.html">mysql</a> (clients|clientApprovals|transactions|permissions|adminClients|txStore|voStore)*&gt;
+&lt;!ATTLIST <a href="../../common/configuration/mysql-store.html">mysql</a>
+    password CDATA #REQUIRED
+    port CDATA #IMPLIED
+    host CDATA #IMPLIED
+    username CDATA #REQUIRED
+    schema CDATA #IMPLIED
+    database CDATA #IMPLIED
+    tablename CDATA #IMPLIED
+    tablePrefix CDATA #IMPLIED
+    driver CDATA #IMPLIED&gt;
+    &lt;!ELEMENT <a href="../../common/configuration/derby-store.html">derby</a> (clients|clientApprovals|transactions|permissions|adminClients|txStore|voStore)*&gt;
+    &lt;!ATTLIST <a href="../../common/configuration/derby-store.html">derby</a>
+        password CDATA #REQUIRED
+        username CDATA #REQUIRED
+        bootPassword CDATA #REQIRED
+        database CDATA #REQUIRED
+        schema CDATA #IMPLIED&gt;
+&lt;!ELEMENT <a href="../../common/configuration/mariadb-store.html">mariadb</a> (clients|clientApprovals|transactions|permissions|adminClients|txStore|voStore)*&gt;
+&lt;!ATTLIST <a href="../../common/configuration/mariadb-store.html">mariadb</a>
+    password CDATA #REQUIRED
+    port CDATA #IMPLIED
+    host CDATA #IMPLIED
+    username CDATA #REQUIRED
+    schema CDATA #IMPLIED
+    database CDATA #IMPLIED
+    tablename CDATA #IMPLIED
+    tablePrefix CDATA #IMPLIED
+    driver CDATA #IMPLIED&gt;
+&lt;!ELEMENT <a href="../../common/configuration/postgres-store.html">postgresql</a> (clients|clientApprovals|transactions|permissions|adminClients|txStore|voStore)*&gt;
+&lt;!ATTLIST <a href="../../common/configuration/postgres-store.html">postgresql</a>
+    username CDATA #REQUIRED
+    password CDATA #REQUIRED
+    port CDATA #IMPLIED
+    schema CDATA #IMPLIED
+    database CDATA #IMPLIED
+    tablename CDATA #IMPLIED
+    tablePrefix CDATA #IMPLIED
+    driver CDATA #IMPLIED&gt;
+&lt;!ELEMENT <a href="../configuration/ldap.html">ldap</a>(address|port|password|principal|searchBase|searchAttributes|ssl)*
+&lt;!ELEMENT ldap (address|port|password|principal|searchBase|searchAttributes|<a href="../../common/configuration/keystore.html">ssl</a>)*&gt;
+&lt;!ATTLIST ldap
+        enabled CDATA #REQUIRED&gt;
+&lt;!ELEMENT address (#PCDATA)&gt;
+&lt;!ELEMENT port (#PCDATA)&gt;
+&lt;!ELEMENT password (#PCDATA)&gt;
+&lt;!ELEMENT principal (#PCDATA)&gt;
+&lt;!ELEMENT searchBase (#PCDATA)&gt;
+&lt;!ELEMENT searchAttributes (attribute)*&gt;
+&lt;!ELEMENT attribute (#PCDATA)&gt;
+    &lt;!ELEMENT<a href="../../common/configuration/ssl.html">ssl</a>(trustStore|keystore)*
+        debug CDATA #IMPLIED
+        tlsVersion CDATA #REQUIRED
+        useJavaTrustStore CDATA #IMPLIED&gt;
+&lt;!ELEMENT trustStore (path|password|type)*&gt;
+&lt;!ELEMENT path (#PCDATA)&gt;
+&lt;!ELEMENT password (#PCDATA)&gt;
+&lt;!ELEMENT type (#PCDATA)&gt;
+&lt;!ELEMENT keyStore (path|password|factory|type)*&gt;
+&lt;!ELEMENT path (#PCDATA)&gt;
+&lt;!ELEMENT password (#PCDATA)&gt;
+&lt;!ELEMENT factory (#PCDATA)&gt;
+&lt;!ELEMENT type (#PCDATA)&gt;
+&lt;!ELEMENT <a href="../../common/configuration/logging.html">logging</a>
+&lt;!ATTLIST logFileName CDATA #REQUIRED
+    logName CDATA #IMPLIED
+    logSize CDATA #IMPLIED
+    logFileCount CDATA #IMPLIED
+    debug CDATA #IMPLIED&gt;
+&lt;!ELEMENT messageTemplate (#PCDATA)&gt;
+&lt;!ELEMENT subjectTemplate (#PCDATA)&gt;
+&lt;!ELEMENT <a href="../configuration/authorization-servlet-configuration.html">authorizationServlet</a> (#PCDATA)&gt;
+&lt;!ATTLIST
+     useHeader CDATA #IMPLIED
+     requireHeader CDATA #IMPLIED
+     headerFieldName CDATA #IMPLIED
+     returnDNAsUsername CDATA #IMPLIED
+     verifyUsername CDATA #IMPLIED
+     showLogon CDATA #IMPLIED&gt;
+&lt;!ELEMENT <a href="../configuration/device-flow-servlet-configuration.html">deviceFlowServlet</a> (#PCDATA)&gt;
+&lt;!ATTLIST
+     verificationURI CDATA #IMPLIED
+     interval CDATA #IMPLIED
+     codeChars CDATA #IMPLIED
+     codeLength CDATA #IMPLIED
+     codeSeparator CDATA #IMPLIED
+     codePeriodLength CDATA #IMPLIED&gt;
+&lt;!ELEMENT <a href="../configuration/client_management-configuration.html">clientManagement</a> (api)*&gt;
+&lt;!ATTLIST
+     enabled CDATA #IMPLIED&gt;
+&lt;!ELEMENT api (#PCDATA)&gt;
+&lt;!ATTLIST
+     enabled CDATA #IMPLIED
+     protocol CDATA #REQUIRED
+     endpoint CDATA #IMPLIED
+     url CDATA #IMPLIED
+     anonymousOK CDATA #IMPLIED
+     template CDATA #IMPLIED
+     autoApprove CDATA #IMPLIED
+     autoApproverName CDATA #IMPLIED&gt;
+&lt;!ELEMENT mail (messageTemplate|subjectTemplate)*&gt;
+&lt;!ATTLIST <a href="../configuration/server-email.html">mail</a>
+    enabled CDATA #IMPLIED
+    useSSL CDATA #IMPLIED
+    starttls CDATA #IMPLIED
+    username CDATA #IMPLIED
+    password CDATA #IMPLIED
+    debug CDATA #IMPLIED
+    server CDATA #IMPLIED
+    port CDATA #IMPLIED
+    recipents CDATA #IMPLIED&gt;
+&lt;!ELEMENT <a href="../configuration/signing.html">JSONWebKey</a> (path)&gt;
+&lt;!ATTLIST
+    defaultKeyID CDATA #IMPLIED&gt;
+&lt;!ELEMENT path (#PCDATA)&gt;
+&lt;!ELEMENT <a href="../../common/configuration/scopes.html">scopes</a>(scope)&gt;
+&lt;!ELEMENT <a href="../../common/configuration/scopes.html">scope</a>(#PCDATA)&gt;
+&lt;!ATTLIST <a href="../../common/configuration/scopes.html">scope</a>
+     enabled CDATA #IMPLIED&gt;
+]&gt;
+</pre></div>
+
+<p>A few examples</p>
+
+<section><section>
+<h3><a name="Example_1._A_quick_.26_dirty_configuration_for_debugging.2Fevaluation."></a>Example 1. A quick &amp; dirty configuration for debugging/evaluation.</h3>
+
+
+<p>Drop the war from the website into your Tomcat webapps directory, then put this into a file called cfg.xml and drop
+    it into the WEB-INF directory. This will</p>
+
+<ul>
+    
+<li>put everything (client entries, approvals, transactions) into a memory store, so there will be no persistence
+        between service restarts,
+    </li>
+    
+<li>not enable email notifications,</li>
+    
+<li>Turn on debugging to see everything. This might be quite verbose at times.</li>
+    
+<li>assume that MyProxy is on localhost at port 7512. The assumption is that it is deployed as &quot;oauth&quot; locally in
+        Tomcat. It will, however, allow for testing the entire lifecycle and allowing for very simple evaluation.
+    </li>
+</ul>
+
+<div>
+<pre>
+&lt;config&gt;
+   <a href="server-dtd-service-tag.html">service</a> address=&quot;http://localhost/oauth&quot;
+            debug=&quot;true&quot;/&gt;
+&lt;/config&gt;
+</pre></div>
+
+<p>This is very simple and easy to get up and running. This does not give a usable configuration though, since there
+    is no way to store or approve clients since they live only in memory. This useful to show that your installation is
+    correct and that the configuration file itself can be found. Note that on redeploys the cfg.xml file might get
+    over-written. See the <a href="server/configuration/server-configuration-file.html">configuration</a> page for how to specify an
+    alternate location.</p>
+
+</section><section>
+<h3><a name="Example_2._Stashing_everything_in_a_file_store."></a>Example 2. Stashing everything in a file store.</h3>
+
+
+<p>This will store all items into the local file system and use the specified myproxy server.</p>
+
+<div>
+<pre>
+&lt;<a href="../configuration/server-configuration-file.html">config</a>&gt;
+   &lt;<a href="server-dtd-service-tag.html">service</a> address=&quot;https://www.bigstate.edu/oauth/&quot;&gt;
+        &lt;<a href="../configuration/server-myproxy.html">myproxy</a> host=&quot;myproxy.teragrid.org&quot;
+                 port=&quot;7512&quot;/&gt;
+        &lt;fileStore path=&quot;/var/www/store&quot;&gt;
+        &lt;transactions/&gt;
+        &lt;clients/&gt;
+        &lt;clientApprovals/&gt;
+   &lt;/fileStore&gt;
+   &lt;/service&gt;
+&lt;/config&gt;
+</pre></div>
+</section><section>
+<h3><a name="Example_3._Enabling_email_notifications."></a>Example 3. Enabling email notifications.</h3>
+
+
+<p>Same as example 2, but with email notifications enabled. This will send out a message whenever a new client registers
+    itself so that an approver will know to review to application.</p>
+
+<div>
+<pre>
+&lt;config&gt;
+   &lt;<a href="../dtd/server-dtd-service-tag.html">service</a> address=&quot;https://www.bigstate.edu/oauth/&quot;&gt;
+        &lt;<a href="../configuration/server-myproxy.html">myproxy</a> host=&quot;myproxy.teragrid.org&quot; port=&quot;7514&quot;/&gt;
+        &lt;fileStore path=&quot;/var/www/store&quot;&gt;
+        &lt;transactions/&gt;
+        &lt;clients/&gt;
+        &lt;clientApprovals/&gt;
+   &lt;/fileStore&gt;
+   &lt;<a href="../configuration/server-email.html">mail</a>
+        enabled=&quot;true&quot;
+        useSSL=&quot;true&quot;
+        username=&quot;admin@bigstate.edu&quot;
+        password=&quot;www&quot;
+        server=&quot;fnord.foo.baz&quot;
+        recipents=&quot;approvals@bigstate.edu;admin@bigstate.edu&quot;&gt;
+       &lt;messageTemplate&gt;/var/www/config/message.txt&lt;/messageTemplate&gt;
+       &lt;subjectTemplate&gt;/var/www/config/subject.txt&lt;/subjectTemplate&gt;
+    &lt;/mail&gt;
+    &lt;logging logFileName=&quot;/var/log/tomcat6/oa4mp.xml&quot;
+             logName=&quot;oa4mp&quot;
+             logSize=&quot;100000&quot;
+             logFileCount=&quot;2&quot;
+             debug=&quot;true/&gt;
+      &lt;/service&gt;
+&lt;/config&gt;
+</pre></div>
+
+<p>This will enable email, use ssl and login in as the given username. Note that there are two recipients in the
+    (comma-separated) list. A message and subject template are specified.</p>
+
+</section><section>
+<h3><a name="Example_4._Using_up_a_database"></a>Example 4. Using up a database</h3>
+
+
+<p>In this example, different accounts are required for each component. To keep the size down, no email notifications
+    are enabled here and MyProxy is assumed to be running on localhost.</p>
+
+<div>
+<pre>
+&lt;config&gt;
+  &lt;service name=&quot;my-config&quot;&gt;
+     &lt;mysql host=&quot;my.secret.host.org&quot; username=&quot;xup-portal&quot; password=&quot;bar&quot;&gt;
+       &lt;transactions/&gt;
+     &lt;/mysql&gt;
+     &lt;mysql username=&quot;xup-client&quot; password=&quot;bar&quot;&gt;
+         &lt;clients/&gt;
+     &lt;/mysql&gt;
+     &lt;mysql username=&quot;xup-approver&quot; password=&quot;bar&quot;&gt;
+         &lt;clientApprovals/&gt;
+     &lt;/mysql&gt;
+ &lt;/service&gt;
+&lt;/config&gt;
+</pre></div>
+</section><section>
+<h3><a name="Example_5._Mixed_storage."></a>Example 5. Mixed storage.</h3>
+
+
+<p>Several different types of storage are mixed in the next example. This is just to show how it is done.</p>
+
+<div>
+<pre>
+&lt;config&gt;
+  &lt;<a href="server-dtd-service-tag.html">service</a> name=&quot;my fancy configuration&quot;
+         version=&quot;1.0&quot;
+         address=&quot;https://research.bigstate.edu/oauth&quot;&gt;
+      &lt;<a href="../configuration/server-myproxy.html">myproxy</a> host=&quot;myproxy.bigstate.edu&quot;
+          port=&quot;7512&quot;/&gt;
+      &lt;<a href="../../common/configuration/mysql-store.html">mysql</a> username=&quot;foo&quot;
+          password=&quot;bar&quot;&gt;
+         &lt;<a href="server-dtd-content-tags.html">clients</a>/&gt;
+      &lt;/mysql&gt;
+      &lt;<a href="../../common/configuration/file-store.html">fileStore</a>  path=&quot;/path/to/store&quot;&gt;
+         &lt;<a href="server-dtd-content-tags.html">clientApprovals</a>/&gt;
+      &lt;/fileStore&gt;
+      &lt;<a href="../../common/configuration/memory-store.html">memoryStore</a>&gt;
+         &lt;transactions/&gt;
+      &lt;/memoryStore&gt;
+      &lt;<a href="../configuration/server-email.html">mail</a> enabled=&quot;true&quot;
+         useSSL=&quot;true&quot;
+         username=&quot;qqq&quot;
+         password=&quot;www&quot;
+         server=&quot;fnord.foo.baz&quot;
+         port=&quot;3321&quot;
+         recipents=&quot;tom;dick;harry&quot;&gt;
+         &lt;messageTemplate&gt;/var/www/config/message.txt&lt;/messageTemplate&gt;
+         &lt;subjectTemplate&gt;/var/www/config/subject.txt&lt;/subjectTemplate&gt;
+      &lt;/mail&gt;
+ &lt;/service&gt;
+&lt;/config&gt;
+</pre></div>
+
+
+</section></section>
+
+    </div>
+</div>
+<div class="clear">
+    <hr/>
+</div>
+<div id="footer">
+    <div class="xright">&#169;    
+                    2023
+        
+                    
+    
+
+    
+        
+                        
+    
+        
+    </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+</body>
+</html>
+

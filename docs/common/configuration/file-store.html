@@ -1,0 +1,275 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+
+
+
+
+
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>OAuth for MyProxy</title>
+    <style type="text/css" media="all">
+        @import url("../../css/oa4mp-custom.css");
+        @import url("../../css/oa4mp-theme.css");
+        @import url("../../css/site.css");
+    </style>
+    <link rel="stylesheet" href="../../css/print.css" type="text/css" media="print"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    </head>
+<body class="composite">
+<div id="banner">
+                        <a href="http://www.ncsa.illinois.edu/" id="bannerLeft"  >
+        
+                                                                    <img src="../../css/images/ncsalogo_sm-2.gif" alt="NCSA"/>
+        
+                </a>
+                                    <a href="http://grid.ncsa.illinois.edu/myproxy/" id="bannerRight"  >
+        
+                                                                    <img src="../../css/images/MyProxyWide.gif" alt="MyProxy"/>
+        
+                </a>
+                <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="breadcrumbs">
+            
+    
+
+    
+        
+                        
+    
+        
+                    <div class="xleft">
+            Last Published: 2023-04-05
+                                </div>
+                <div class="xright">            
+    
+
+    
+        
+                        
+    
+        
+                         Version: 5.3-SNAPSHOT
+            </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="leftColumn">
+    <div id="navcolumn">
+                
+    
+
+    
+        
+                        
+    
+        
+                               <h5>OAuth for MyProxy</h5>
+                        <ul>
+                    
+    <li class="none">
+                        <a href="../../server/index.html">Overview</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../server/index.html">Server</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../client/index.html">Client</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../apidocs/index.html">api docs</a>
+            </li>
+              </ul>
+                            <h5>Project Documentation</h5>
+                        <ul>
+                    
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-info.html">Project Information</a>
+                        </li>
+              
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-reports.html">Project Reports</a>
+                        </li>
+              </ul>
+                                               <a href="http://maven.apache.org/" title="Built by Maven"
+           class="poweredBy">
+            <img class="poweredBy"
+                 alt="Built by Maven"
+                 src="http://maven.apache.org/images/logos/maven-feather.png"
+                 width="90"
+                 height="30"
+                 border="1"/>
+        </a>
+                           
+    
+
+    
+        
+                        
+    
+        
+        </div>
+</div>
+<div id="bodyColumn">
+    <div id="contentBox">
+        
+
+
+
+<section>
+<h2><a name="The_File_Store_Configuration."></a>The File Store Configuration.</h2>
+
+<p>Scope: client and server, all versions.</p>
+
+
+<p>A file store will persist items in a local file system. It requires either</p>
+
+<ul>
+    
+<li>A single directory under which any required directories will be created, or</li>
+    
+<li>two directories, a data directory and an index directory</li>
+</ul>
+
+In both cases the system will manage these in the sense that they will be created as needed along with
+any needed subdirectories.
+
+
+<table class="bodyTable" style="text-align: left; width: 100%;" border="1" cellspacing="2" cellpadding="2">
+    <tbody>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">path</td>
+        
+<td style="vertical-align: top;">Single top-level directory. Any required subdirectories will be made under this
+            one.
+        </td>
+    </tr>
+
+    
+<tr class="b">
+           
+<td style="vertical-align: top;">removeEmptyFiles</td>
+           
+<td style="vertical-align: top;">Remove any empty files in the store. The default is <b>true</b> meaning that empty files will
+           be deleted if found in the file store. </td>
+       </tr>
+    </tbody>
+
+</table>
+
+<p>
+    You <b>must</b> specify  the <span style="font-weight: bold;">path</span>. The effect will be to create (and manage)
+    directories for each store.
+</p>
+
+
+<p>A file-based store system is a great, easy way to set up your storage. It require nothing more than the correct
+    permissions. Remember though that you should do the usual administrative tasks of backing it up as needed and
+    protecting it from prying eyes since it will contain sensitive information. Both clients and servers support file stores.</p>
+</section><section>
+<h2><a name="Server_examples"></a>Server examples</h2>
+<section>
+<h3><a name="Example_1."></a>Example 1.</h3>
+
+
+<div>
+<pre>
+&lt;service name=&quot;default&quot; address=&quot;https://myservice.org:8443/oauth&quot;&gt;
+   &lt;fileStore path=&quot;/var/www/storage&quot;&gt;
+      &lt;transactions/&gt;
+      &lt;clients/&gt;
+      &lt;clientApprovals/&gt;
+   &lt;/fileStore&gt;
+&lt;/service&gt;
+</pre></div>
+
+<p>This sets up a fully functioning service with local storage and using the default MyProxy service. This
+would create the following:</p>
+
+<ul>
+    
+<li>/var/www/storage/transactions/dataPath</li>
+    
+<li>/var/www/storage/transactions/indexPath</li>
+    
+<li>/var/www/storage/clients/dataPath</li>
+    
+<li>/var/www/storage/clients/indexPath</li>
+    
+<li>/var/www/storage/clientApprovals/dataPath</li>
+    
+<li>/var/www/storage/clientApprovals/indexPath</li>
+</ul>
+
+</section></section><section>
+<h2><a name="A_client_example"></a>A client example</h2>
+<section>
+<h3><a name="Using_a_file_store_in_a_client"></a>Using a file store in a client</h3>
+A client file store can be applied to
+
+<div>
+<pre>
+&lt;config&gt;
+   &lt;client name=&quot;my-cfg&quot;&gt;
+        &lt;fileStore path=&quot;/var/www/client/storage&quot;
+                 removeEmptyFiles=&quot;false&quot;&gt;
+          &lt;<a href="../../client/dtd/asset-store.html">assetStore</a>&gt;
+        &lt;/fileStore&gt;
+        &lt;!-- other stuff --&gt;
+&lt;/config&gt;
+</pre></div>
+This makes the asset store in the given directory. This will not remove empty files in the archive when it finds them.
+
+
+</section></section>
+
+    </div>
+</div>
+<div class="clear">
+    <hr/>
+</div>
+<div id="footer">
+    <div class="xright">&#169;    
+                    2023
+        
+                    
+    
+
+    
+        
+                        
+    
+        
+    </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+</body>
+</html>
+

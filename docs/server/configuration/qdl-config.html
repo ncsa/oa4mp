@@ -1,0 +1,247 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+
+
+
+
+
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>OAuth for MyProxy</title>
+    <style type="text/css" media="all">
+        @import url("../../css/oa4mp-custom.css");
+        @import url("../../css/oa4mp-theme.css");
+        @import url("../../css/site.css");
+    </style>
+    <link rel="stylesheet" href="../../css/print.css" type="text/css" media="print"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    </head>
+<body class="composite">
+<div id="banner">
+                        <a href="http://www.ncsa.illinois.edu/" id="bannerLeft"  >
+        
+                                                                    <img src="../../css/images/ncsalogo_sm-2.gif" alt="NCSA"/>
+        
+                </a>
+                                    <a href="http://grid.ncsa.illinois.edu/myproxy/" id="bannerRight"  >
+        
+                                                                    <img src="../../css/images/MyProxyWide.gif" alt="MyProxy"/>
+        
+                </a>
+                <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="breadcrumbs">
+            
+    
+
+    
+        
+                        
+    
+        
+                    <div class="xleft">
+            Last Published: 2023-04-05
+                                </div>
+                <div class="xright">            
+    
+
+    
+        
+                        
+    
+        
+                         Version: 5.3-SNAPSHOT
+            </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="leftColumn">
+    <div id="navcolumn">
+                
+    
+
+    
+        
+                        
+    
+        
+                               <h5>OAuth for MyProxy</h5>
+                        <ul>
+                    
+    <li class="none">
+                        <a href="../../server/index.html">Overview</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../server/index.html">Server</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../client/index.html">Client</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../apidocs/index.html">api docs</a>
+            </li>
+              </ul>
+                            <h5>Project Documentation</h5>
+                        <ul>
+                    
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-info.html">Project Information</a>
+                        </li>
+              
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-reports.html">Project Reports</a>
+                        </li>
+              </ul>
+                                               <a href="http://maven.apache.org/" title="Built by Maven"
+           class="poweredBy">
+            <img class="poweredBy"
+                 alt="Built by Maven"
+                 src="http://maven.apache.org/images/logos/maven-feather.png"
+                 width="90"
+                 height="30"
+                 border="1"/>
+        </a>
+                           
+    
+
+    
+        
+                        
+    
+        
+        </div>
+</div>
+<div id="bodyColumn">
+    <div id="contentBox">
+        
+
+
+
+<h1>Configuring QDL.</h1>
+
+<p>A great place to start is in the base system's configuration
+    <a class="externalLink" href="https://cilogon.github.io/qdl/docs/qdl_configuration.pdf">documentation</a>.
+All of that is supported as well as extensions specific to OA4MP, which are documented here.</p>
+
+<table class="bodyTable" style="text-align: left; width: 1148px; height: 165px;" border="1" cellspacing="2" cellpadding="2">
+    <tbody>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">Name</td>
+        
+<td style="vertical-align: top;">Default</td>
+        
+<td style="vertical-align: top;">Description</td>
+    </tr>
+    
+<tr class="b">
+        
+<td style="vertical-align: top;">strict_acls</td>
+        
+<td style="vertical-align: top;">false</td>
+        
+<td style="vertical-align: top;">Enabled/disable enforcing strict access control for scripts.
+        If this is set true, then every script must have permission granted to execute.</td>
+    </tr>
+    </tbody>
+</table>
+<section>
+<h2><a name="Server_mode_and_restricted_IO"></a>Server mode and restricted IO</h2>
+
+<p>In the standard QDL configuration there are two parameters that bear special mention here.</p>
+
+<ul>
+    
+<li><b>server_mode</b>: limits various operations to the underlying OS, such as file reads and writes.</li>
+    
+<li><b>restricted_io</b>: Allows printing (when false) and logging. </li>
+</ul>
+
+<p></p>
+</section><section>
+<h2><a name="Naming"></a>Naming</h2>
+
+<p>If there is a single configuration, that may be named anything you like and it
+will be used. If there are multiple configurations, then you should set the
+attribute for <b>qdlConfigName</b> to be whatever the active configuration is.
+If it is omitted, the default name of <b>qdl-default</b> will be used.</p>
+</section><section>
+<h2><a name="Server_scripts"></a>Server scripts</h2>
+
+<p>You may also have scripts specified in the QDL configuration. These are
+JSON objects. (Is it ugly to have JSON inside XML? Sure. But it's consistent
+with client configurations. <i>shrug.</i>) </p>
+<section>
+<h3><a name="Purpose"></a>Purpose</h3>
+
+<p>There are many reasons to have them.</p>
+
+<ul>
+    
+<li><b>Asserting claims for all clients.</b> There is no </li>
+    
+<li><b>Administrative tasks</b> such as regularizing all the returned claims.</li>
+</ul>
+</section><section>
+<h3><a name="Lifecycle"></a>Lifecycle</h3>
+
+<p>If you give a script a specific exec_phase, the server scripts are run before any
+other scripts. This may take a bit of planning. If you want to so something in the
+post_auth phase after all clients have run their handlers, then you should
+actually set the script for the pre_token phase to run before any other processing
+in the next round.</p>
+</section><section>
+<h3><a name="Clients_may_opt_out"></a>Clients may opt out</h3>
+
+<p>Clients may skip server scripts if their <b>skipServerScripts</b> flag is
+set.</p>
+</section></section>
+
+    </div>
+</div>
+<div class="clear">
+    <hr/>
+</div>
+<div id="footer">
+    <div class="xright">&#169;    
+                    2023
+        
+                    
+    
+
+    
+        
+                        
+    
+        
+    </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+</body>
+</html>
+

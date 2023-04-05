@@ -1,0 +1,322 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+
+
+
+
+
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>OAuth for MyProxy</title>
+    <style type="text/css" media="all">
+        @import url("../../css/oa4mp-custom.css");
+        @import url("../../css/oa4mp-theme.css");
+        @import url("../../css/site.css");
+    </style>
+    <link rel="stylesheet" href="../../css/print.css" type="text/css" media="print"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    </head>
+<body class="composite">
+<div id="banner">
+                        <a href="http://www.ncsa.illinois.edu/" id="bannerLeft"  >
+        
+                                                                    <img src="../../css/images/ncsalogo_sm-2.gif" alt="NCSA"/>
+        
+                </a>
+                                    <a href="http://grid.ncsa.illinois.edu/myproxy/" id="bannerRight"  >
+        
+                                                                    <img src="../../css/images/MyProxyWide.gif" alt="MyProxy"/>
+        
+                </a>
+                <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="breadcrumbs">
+            
+    
+
+    
+        
+                        
+    
+        
+                    <div class="xleft">
+            Last Published: 2023-04-05
+                                </div>
+                <div class="xright">            
+    
+
+    
+        
+                        
+    
+        
+                         Version: 5.3-SNAPSHOT
+            </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="leftColumn">
+    <div id="navcolumn">
+                
+    
+
+    
+        
+                        
+    
+        
+                               <h5>OAuth for MyProxy</h5>
+                        <ul>
+                    
+    <li class="none">
+                        <a href="../../server/index.html">Overview</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../server/index.html">Server</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../client/index.html">Client</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../apidocs/index.html">api docs</a>
+            </li>
+              </ul>
+                            <h5>Project Documentation</h5>
+                        <ul>
+                    
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-info.html">Project Information</a>
+                        </li>
+              
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-reports.html">Project Reports</a>
+                        </li>
+              </ul>
+                                               <a href="http://maven.apache.org/" title="Built by Maven"
+           class="poweredBy">
+            <img class="poweredBy"
+                 alt="Built by Maven"
+                 src="http://maven.apache.org/images/logos/maven-feather.png"
+                 width="90"
+                 height="30"
+                 border="1"/>
+        </a>
+                           
+    
+
+    
+        
+                        
+    
+        
+        </div>
+</div>
+<div id="bodyColumn">
+    <div id="contentBox">
+        
+
+
+
+<h1>How tokens have their validity determined.</h1>
+
+<p>There are various ways that the lifetime (or expiration time) of a given token can
+be determined. The tokens types are</p>
+
+<ul>
+    
+<li><b>Authorization grants.</b> These are created in the first exchange with the server.
+    These are generally not configurable by a client and are relatively short-lived,
+    in the order of minutes.  These are exchanged for access tokens</li>
+    
+<li><b>Access Tokens.</b> These are generated from the token endpoint of the service
+    and are exchanged for the authorization grant. These may be of various formats such as
+    SciTokens or the built-in generic URI format.</li>
+</ul>
+
+<p>Note on tokens and such. The server creates identifiers in its internal format which is designed to make it
+globally unique, hence it is tied to the service itself. A typical grant for instance may be</p>
+
+<div>
+<pre>
+    https://oa4mp.bigstate.edu:9443/oauth2/781ae055ce3ba811b05b8c9522a09d31?type=authzGrant&amp;ts=1610837891182&amp;version=v2.0&amp;lifetime=12345000
+</pre></div>
+
+<p>You may have the urge to feed that to a browser, but it is not an address, it is simply a unique string with semantics.</p>
+
+<p><b>Note:</b> such unique strings are indeed checks as strings, so they must not be altered in any way. Sending
+back the above example as </p>
+
+<div>
+<pre>
+    https://oa4mp.bigstate.edu:9443/oauth2/781ae055ce3ba811b05b8c9522a09d31?type=authzGrant&amp;version=v2.0&amp;lifetime=12345000ts=1610837891182&amp;
+</pre></div>
+
+<p>with some of the arguments permuted (perfectly acceptable if this were an address) will result in an error. Part of
+this requirement is to prevent forged tokens or replay attacks, so it will be enfroced. Generally just pass along the tokens
+as they are.</p>
+
+<section>
+<h2><a name="Server_settings"></a>Server settings</h2>
+
+<p>On the server, there are <i>maximum</i> values allowed. This means that no matter what any other request
+tries to do, the server will enforce these limits. </p>
+
+<p>The server will also apply <i>default</i> values if nothing else is specified. Typically these are
+half what the maximum is, though administrators are free to set their own policies. Therefore, there
+is no need to specify defaults per se, except in refresh tokens, where a value of zero is taken to
+mean that no refresh tokens should be created.</p>
+
+</section><section>
+<h2><a name="Client_configurations"></a>Client configurations</h2>
+
+<p>Clients may have their access and refresh token lifetimes specified. These are again applied for </p>
+<section>
+<h3><a name="The_client_configuration"></a>The client configuration</h3>
+
+<p>The configuration for a client has two properties, <b>at_lifetime</b> in milliseconds, which sets the default
+access token lifetime for every client and <b>rt_lifetime</b> in milliseconds which is the value for
+every refresh token. These may be overridden in, for example, the initial request or by scripting.
+Even though they may be set to values, they are limited to the server maximum. </p>
+
+<p>If you are administering your clients via the client management API, these may be set there.</p>
+
+<p>A note on lifetime and policies. Access tokens allow for access to resources and as such should
+be limited in their lifetime -- you very probably do not want an access token with a lifetime of a year
+(the server default is 900 sec or 15 minutes). Refresh tokens are used to get access tokens and can
+have a much longer lifetime, in the order of weeks or months. Typically you stash the refresh token
+until you need an access token, then get an access token.</p>
+
+<p>OIDC servers allow for an id token with various bits of user information in it. These are signed JWTs
+   (JSON Web Token) and include both the access token and refresh token.
+   The actual use of one is showing that the user successfully authenticated to the
+   service. A common (and poor use) of them though is as a &quot;poor man's&quot; access token, because, as per the spec.,
+   the lifetime of the id token is the same as the lifetime of the access token, and the id token can be verified
+    against the issuing server, so its contents can be trusted. This cannot be condemned
+   enough and you should not do it. There are formats of access tokens that are designed to be
+   self-describing, such as SciTokens or WLCG tokens (both supported in OA4MP) so please use one of these
+   instead.</p>
+
+</section><section>
+<h3><a name="At_the_initial_request."></a>At the initial request.</h3>
+
+<p>The initial request to the service may ask for either and access token lifetime (<b>at_lifetime</b>)
+or a refresh token lifetime, <b>rt_lifetime</b>. These are typically in milliseconds, though you may
+specify units for seconds or ms explicitly. E.g., this might be part of your POST to the service</p>
+
+<div>
+<pre>
+...&amp;at_lifetime=1500 sec.&amp;rt_lifetime=25000000&amp;...
+</pre></div>
+
+<p>In this case, the client is requesting that access tokens have a lifetime of 1500 seconds and
+refresh tokens have one of 25000000 milliseconds. The rt_lifetime could have also been specified as
+<i>25000000 ms.</i> or <i>25000 sec.</i></p>
+
+<p>Again, clients may request just about anything, but server policies will be enforced at all times,
+so the actual lifetimes determined by the system may well be different. The only place these requests
+will be honored is in the initial request. Any other time they are ignored (such as in the
+token exchange).</p>
+
+</section><section>
+<h3><a name="Token_configurations"></a>Token configurations</h3>
+
+<p>Clients that need complex token configuration may specify lifetimes as parameters of the
+token (this is stored in the clients <b>cfg</b> field. Example <b>cfg</b> entry for a client</p>
+
+<div>
+<pre>
+    {&quot;tokens&quot;: {
+        &quot;access&quot;:  {
+            &quot;audience&quot;: &quot;https://wlcg.cern.ch/jwt/v1/any&quot;,
+            &quot;issuer&quot;: &quot;https://test.cilogon.org&quot;,
+            &quot;lifetime&quot;: 750019,
+            &quot;type&quot;: &quot;wlcg&quot;
+         }
+      }
+    }
+</pre></div>
+
+<p>In this case, a WLCG token will be created with the given audience and issuer. Note
+that in this case, the lifetime <b><i>must</i></b> be in milliseconds and units are
+not allowed (since it is in JSON format as an long integer).</p>
+
+</section><section>
+<h3><a name="Scripting"></a>Scripting</h3>
+
+<p>Inside scripts, which are specified in the token configuration if needed,
+    the lifetime may be set to anything. Refer to QDL documentation for scripting
+and how to do it. Again, server maxima are always enforced no matter what the values are set to.</p>
+
+
+<h1>How do these all relate?</h1>
+
+<p>The steps are</p>
+
+<ol style="list-style-type: decimal">
+    
+<li>The maximum allowed lifetime is taken from the server configuration. </li>
+    
+<li>The  lifetime is taken from the client configuration. This is the initial value of the <i>computed lifetime</i>.</li>
+    
+<li>Token configurations are checked for lifetimes. If present, the minimum of this
+        and computed lifetime is taken.</li>
+    
+<li>Requested values are checked. If there was an explicit request for a lifetime, the
+    minimum of that and the computed lifetime is taken.</li>
+    
+<li>Scripts <i>may</i> determine lifetimes independent of the computed lifetime and set this. We stress
+    <i>may</i> because this is an exceptional circumstance and does nto occur often.</li>
+    
+<li>Finally, the minimum of the computed lifetime and the computed maximum is taken. This is the
+    final value.</li>
+</ol>
+
+</section></section>
+
+    </div>
+</div>
+<div class="clear">
+    <hr/>
+</div>
+<div id="footer">
+    <div class="xright">&#169;    
+                    2023
+        
+                    
+    
+
+    
+        
+                        
+    
+        
+    </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+</body>
+</html>
+
