@@ -10,16 +10,30 @@
         <version>5.3-SNAPSHOT</version>
     </parent>
 
-    <artifactId>server-test</artifactId>
-    <name>OAuth for MyProxy server tests.</name>
-    <packaging>jar</packaging>
+    <artifactId>proxy</artifactId>
+    <name>proxy support for OA4MP</name>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <additionalparam>-Xdoclint:none</additionalparam>
+        <maven.javadoc.skip>true</maven.javadoc.skip>
+    </properties>
     <dependencies>
-
+        <dependency>
+            <groupId>jstl</groupId>
+            <artifactId>jstl</artifactId>
+            <version>1.2</version>
+        </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
-            <artifactId>server</artifactId>
+            <artifactId>server-admin</artifactId>
             <version>5.3-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>edu.uiuc.ncsa.myproxy</groupId>
+            <artifactId>server-loader</artifactId>
+            <version>5.3-SNAPSHOT</version>
+        </dependency>
+
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>core</artifactId>
@@ -34,6 +48,21 @@
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>edu.uiuc.ncsa.myproxy</groupId>
+            <artifactId>oa4mp-server-test</artifactId>
+            <version>5.3-SNAPSHOT</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>edu.uiuc.ncsa.myproxy</groupId>
+            <artifactId>oauth2</artifactId>
+            <version>5.3-SNAPSHOT</version>
+        </dependency>
+
+
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>util</artifactId>
@@ -46,18 +75,35 @@
             <artifactId>servlet</artifactId>
             <version>5.3-SNAPSHOT</version>
         </dependency>
-
-        <dependency>
-            <groupId>edu.uiuc.ncsa.myproxy</groupId>
-            <artifactId>server-api</artifactId>
-            <version>5.3-SNAPSHOT</version>
-        </dependency>
-
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>myproxy-logon</artifactId>
             <version>5.3-SNAPSHOT</version>
         </dependency>
+
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.30</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.derby/derby -->
+        <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derby</artifactId>
+            <version>10.14.2.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.4.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+            <version>3.0.8</version>
+        </dependency>
+
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
@@ -67,35 +113,29 @@
     </dependencies>
 
     <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>2.3.2</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>test-jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+<!--        <plugins>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.14.1</version>
+                <version>3.0.0-M7</version>
                 <configuration>
                     <excludes>
                         <exclude>**/*Test.java</exclude>
-                        <exclude>**/Test*.java</exclude>
-                        <exclude>**/*Suite.java</exclude>
                     </excludes>
+                    <includes>
+                        <include>**/*Suite.java</include>
+                    </includes>
                     <forkCount>1</forkCount>
                     <reuseForks>false</reuseForks>
-                </configuration>
-            </plugin>
-
-        </plugins>
+         	    </configuration>
+	    </plugin>
+        </plugins>-->
+         <resources>	    
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
     </build>
-
 </project>

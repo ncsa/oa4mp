@@ -18,8 +18,9 @@
   </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="FrameworkDetectionExcludesConfiguration">
-    <file type="web" url="file://$PROJECT_DIR$/oa4mp-client-oauth2" />
-    <file type="web" url="file://$PROJECT_DIR$/oa4mp-client-webapp" />
+    <file url="file://$PROJECT_DIR$/client-oauth2/overlays" />
+    <file type="web" url="file://$PROJECT_DIR$/client-oauth2" />
+    <file type="web" url="file://$PROJECT_DIR$/client-webapp" />
     <file type="web" url="file://$PROJECT_DIR$/oa4mp-server-oauth2" />
     <file type="web" url="file://$PROJECT_DIR$/oa4mp-webapp" />
   </component>

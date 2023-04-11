@@ -1,9 +1,0 @@
-/*
-   QDL script to create access tokens for a general SciAuth install.
-   It is assumed that the templates reside in a JSON file.
-*/
-
-cfg. := new_template('file');
-cfg.'claim_key' := 'eppn';
-cfg.'file_path' := 'vfs#/path/to/file';
-at_claims. := get_claims(create_source(cfg., claims.eppn));

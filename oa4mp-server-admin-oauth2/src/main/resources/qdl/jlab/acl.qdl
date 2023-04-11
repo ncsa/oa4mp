@@ -1,3 +1,0 @@
- acl_add('cilogon:/adminClient/jlab/jlab');
- acl_add('cilogon:/adminClient/jlab/eic');
- acl_check();

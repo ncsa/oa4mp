@@ -1,3 +1,0 @@
- acl_add('localhost:test/fnal');
- acl_add('fnal:dwd-7');
- acl_check();

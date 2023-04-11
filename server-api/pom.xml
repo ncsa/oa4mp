@@ -10,11 +10,21 @@
         <version>5.3-SNAPSHOT</version>
     </parent>
 
-    <artifactId>server-test</artifactId>
-    <name>OAuth for MyProxy server tests.</name>
+    <artifactId>server-api</artifactId>
+    <name>OAuth for MyProxy server API.</name>
     <packaging>jar</packaging>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <additionalparam>-Xdoclint:none</additionalparam>
+        <maven.javadoc.skip>true</maven.javadoc.skip>
+    </properties>
     <dependencies>
-
+        <dependency>
+            <groupId>org.jglobus</groupId>
+            <version>2.1.0</version>
+            <artifactId>jsse</artifactId>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>server</artifactId>
@@ -35,6 +45,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>net.sf.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>2.0</version>
+        </dependency>
+        <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>util</artifactId>
             <version>5.3-SNAPSHOT</version>
@@ -46,11 +61,11 @@
             <artifactId>servlet</artifactId>
             <version>5.3-SNAPSHOT</version>
         </dependency>
-
         <dependency>
-            <groupId>edu.uiuc.ncsa.myproxy</groupId>
-            <artifactId>server-api</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <groupId>net.sf.json-lib</groupId>
+            <artifactId>json-lib</artifactId>
+            <version>2.4</version>
+            <classifier>jdk15</classifier>
         </dependency>
 
         <dependency>
@@ -58,44 +73,26 @@
             <artifactId>myproxy-logon</artifactId>
             <version>5.3-SNAPSHOT</version>
         </dependency>
+
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
          <!--   <version>2.5</version>
             <scope>provided</scope>-->
         </dependency>
+        <dependency>
+            <groupId>org.jglobus</groupId>
+            <version>2.0.4</version>
+            <artifactId>JGlobus-Core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>edu.uiuc.ncsa.myproxy</groupId>
+            <artifactId>client-loader-oauth2</artifactId>
+            <version>5.3-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>2.3.2</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>test-jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.14.1</version>
-                <configuration>
-                    <excludes>
-                        <exclude>**/*Test.java</exclude>
-                        <exclude>**/Test*.java</exclude>
-                        <exclude>**/*Suite.java</exclude>
-                    </excludes>
-                    <forkCount>1</forkCount>
-                    <reuseForks>false</reuseForks>
-                </configuration>
-            </plugin>
-
-        </plugins>
-    </build>
 
 </project>

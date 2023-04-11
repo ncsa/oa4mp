@@ -10,22 +10,38 @@
         <version>5.3-SNAPSHOT</version>
     </parent>
 
-    <artifactId>server-test</artifactId>
-    <name>OAuth for MyProxy server tests.</name>
-    <packaging>jar</packaging>
+    <artifactId>client-oauth2</artifactId>
+    <name>OAuth 2/Open ID Connect support for the client</name>
+    <packaging>war</packaging>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <additionalparam>-Xdoclint:none</additionalparam>
+        <maven.javadoc.skip>true</maven.javadoc.skip>
+    </properties>
     <dependencies>
-
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
-            <artifactId>server</artifactId>
+            <artifactId>client-webapp</artifactId>
             <version>5.3-SNAPSHOT</version>
+            <type>war</type>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
-            <groupId>edu.uiuc.ncsa.security</groupId>
-            <artifactId>core</artifactId>
+            <groupId>edu.uiuc.ncsa.myproxy</groupId>
+            <artifactId>client-test</artifactId>
             <version>5.3-SNAPSHOT</version>
             <type>test-jar</type>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>edu.uiuc.ncsa.myproxy</groupId>
+            <artifactId>client-api</artifactId>
+            <version>5.3-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>edu.uiuc.ncsa.myproxy</groupId>
+            <artifactId>client-loader-oauth2</artifactId>
+            <version>5.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
@@ -34,6 +50,20 @@
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+            <version>2.7.3</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>edu.uiuc.ncsa.security</groupId>
+            <artifactId>core</artifactId>
+            <version>5.3-SNAPSHOT</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>util</artifactId>
@@ -47,55 +77,44 @@
             <version>5.3-SNAPSHOT</version>
         </dependency>
 
-        <dependency>
-            <groupId>edu.uiuc.ncsa.myproxy</groupId>
-            <artifactId>server-api</artifactId>
-            <version>5.3-SNAPSHOT</version>
-        </dependency>
 
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>myproxy-logon</artifactId>
             <version>5.3-SNAPSHOT</version>
         </dependency>
+
+
+        <dependency>
+            <groupId>edu.uiuc.ncsa.myproxy</groupId>
+            <artifactId>oauth2</artifactId>
+            <version>5.3-SNAPSHOT</version>
+        </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
-         <!--   <version>2.5</version>
+           <!-- <version>2.5</version>
             <scope>provided</scope>-->
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>2.3.2</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>test-jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.14.1</version>
+                <version>3.0.0-M7</version>
                 <configuration>
                     <excludes>
                         <exclude>**/*Test.java</exclude>
-                        <exclude>**/Test*.java</exclude>
                         <exclude>**/*Suite.java</exclude>
                     </excludes>
                     <forkCount>1</forkCount>
                     <reuseForks>false</reuseForks>
                 </configuration>
             </plugin>
-
         </plugins>
+        <finalName>client2</finalName>
     </build>
-
 </project>

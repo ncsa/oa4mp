@@ -1,0 +1,30 @@
+#! /usr/bin/env -S qdl-run
+path := '/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests/cm-tests/';
+script_path(path ~ script_path());
+
+test.:= path + ['cm-basic.qdl',
+                'cm-extra.qdl',
+                'cm-public.qdl',
+                'cm-update.qdl',
+                'anon-public.qdl',
+                'anon-basic.qdl',
+                'anon-cfg.qdl',
+                'anon-extra.qdl',
+                'cm-cleanup.qdl'];
+say('Running all tests. ');
+counter.'pass' := 0;
+counter.'fail' := 0;
+while[x∈test.][
+try[
+  script_load(x);
+  counter.'pass' += 1;
+  ]catch[
+     say('error running script ' + x);
+     say('error message:' + error_message);
+    counter.'fail' += 1;
+  ];
+];
+
+say(counter.'pass' + ' passed');
+say(counter.'fail' + ' failed');
+say('total tests run = ' + (counter.'pass' + counter.'fail'));

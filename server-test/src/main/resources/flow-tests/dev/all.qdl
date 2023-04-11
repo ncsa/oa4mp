@@ -1,0 +1,11 @@
+#! /usr/bin/env -S qdl-run
+path := '/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests';
+script_path(path ~ script_path());
+
+test.:=(path + '/dev/') + ['df.qdl',
+                           'functor.qdl',
+                           'ncsa_qdl.qdl',
+                           'no_config.qdl',
+                           'revoke.qdl',
+                           'vo_1.qdl'];
+script_load('runner.qdl', test.);

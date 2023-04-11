@@ -19,27 +19,27 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="server" />
-        <module name="oa4mp-proxy" />
-        <module name="oa4mp-client-loader-oauth2" />
-        <module name="oa4mp-server-api" />
+        <module name="website" />
         <module name="oa4mp-server-oauth2" />
         <module name="myproxy-logon" />
-        <module name="oa4mp-client-api" />
-        <module name="oa4mp-website" />
+        <module name="server-api" />
+        <module name="server-loader" />
         <module name="oauth2" />
-        <module name="oa4mp-client-test" />
+        <module name="client-loader-oauth2" />
+        <module name="client-test" />
+        <module name="proxy" />
+        <module name="server-admin" />
         <module name="oa4mp-webapp" />
-        <module name="oa4mp-qdl" />
         <module name="common" />
+        <module name="server-test" />
         <module name="oa4mp-server-test" />
-        <module name="oa4mp-server-admin-oauth2" />
-        <module name="oa4mp-server-loader-oauth2" />
-        <module name="oa4mp-client-oauth2" />
-        <module name="oa4mp-server-test-oauth2" />
+        <module name="client-webapp" />
+        <module name="qdl" />
         <module name="client" />
+        <module name="client-oauth2" />
         <module name="myproxy-website" />
         <module name="oa4mp-skin" />
-        <module name="oa4mp-client-webapp" />
+        <module name="client-api" />
       </profile>
     </annotationProcessing>
   </component>

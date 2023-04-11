@@ -10,22 +10,17 @@
         <version>5.3-SNAPSHOT</version>
     </parent>
 
-    <artifactId>oa4mp-server-oauth2</artifactId>
-    <name>OAuth 2 webapp</name>
-    <packaging>war</packaging>
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <additionalparam>-Xdoclint:none</additionalparam>
-        <maven.javadoc.skip>true</maven.javadoc.skip>
-    </properties>
+    <artifactId>server-test</artifactId>
+    <name>OAuth 2/Open ID Connect tests</name>
+    <packaging>jar</packaging>
     <dependencies>
- <!--       <dependency>
+        <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>oa4mp-webapp</artifactId>
             <version>5.3-SNAPSHOT</version>
             <type>war</type>
             <scope>runtime</scope>
-        </dependency>-->
+        </dependency>
         <dependency>
             <groupId>jstl</groupId>
             <artifactId>jstl</artifactId>
@@ -36,12 +31,16 @@
             <artifactId>server-api</artifactId>
             <version>5.3-SNAPSHOT</version>
         </dependency>
-        <dependency>
+<!--        <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
-            <artifactId>proxy</artifactId>
+            <artifactId>oa4mp-server-loader-oauth2</artifactId>
             <version>5.3-SNAPSHOT</version>
-        </dependency>
-        
+        </dependency>-->
+        <dependency>
+                <groupId>edu.uiuc.ncsa.myproxy</groupId>
+                <artifactId>oauth2</artifactId>
+                <version>5.3-SNAPSHOT</version>
+            </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>core</artifactId>
@@ -56,6 +55,20 @@
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>edu.uiuc.ncsa.myproxy</groupId>
+            <artifactId>server-test</artifactId>
+            <version>5.3-SNAPSHOT</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+  <!--      <dependency>
+            <groupId>edu.uiuc.ncsa.myproxy</groupId>
+            <artifactId>oauth2</artifactId>
+            <version>5.3-SNAPSHOT</version>
+        </dependency>-->
+
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>util</artifactId>
@@ -63,22 +76,18 @@
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
-<!--        <dependency>
+        <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>servlet</artifactId>
             <version>5.3-SNAPSHOT</version>
-        </dependency>-->
+        </dependency>
+
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>myproxy-logon</artifactId>
             <version>5.3-SNAPSHOT</version>
         </dependency>
 
-<!--        <dependency>
-            <artifactId>qdl-sas</artifactId>
-            <groupId>edu.uiuc.ncsa.qdl</groupId>
-            <version>1.5-QDL-SNAPSHOT</version>
-         </dependency>-->
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
@@ -100,14 +109,54 @@
             <groupId>org.mariadb.jdbc</groupId>
             <artifactId>mariadb-java-client</artifactId>
             <version>3.0.8</version>
+            <scope>provided</scope>
         </dependency>
 
+<!--        <dependency>
+            <groupId>edu.uiuc.ncsa.security.delegation</groupId>
+            <artifactId>ncsa-security-oauth-1.0a</artifactId>
+            <version>5.3-SNAPSHOT</version>
+        </dependency>-->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
-        <!--    <version>2.5</version>
+         <!--   <version>2.5</version>
             <scope>provided</scope>-->
         </dependency>
+        <dependency>
+            <groupId>edu.uiuc.ncsa.myproxy</groupId>
+            <artifactId>server-loader</artifactId>
+            <version>5.3-SNAPSHOT</version>
+        </dependency>
+<!--
+        <dependency>
+            <groupId>edu.uiuc.ncsa.security</groupId>
+            <artifactId>ncsa-qdl</artifactId>
+            <version>1.5-QDL-SNAPSHOT</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+-->
+        <dependency>
+            <groupId>edu.uiuc.ncsa.qdl</groupId>
+            <artifactId>tests</artifactId>
+            <version>1.5-QDL-SNAPSHOT</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+
+<!--        <dependency>
+            <groupId>edu.uiuc.ncsa.security</groupId>
+            <artifactId>ncsa-qdl</artifactId>
+            <version>1.5-QDL-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>edu.uiuc.ncsa.security</groupId>
+            <artifactId>ncsa-qdl</artifactId>
+            <version>1.5-QDL-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>-->
     </dependencies>
 
     <build>
@@ -130,37 +179,15 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <version>3.3.2</version>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.3.2</version>
                 <executions>
                     <execution>
-                        <inherited>true</inherited>
-                        <phase>package</phase>
                         <goals>
-                            <goal>war</goal>
+                            <goal>test-jar</goal>
                         </goals>
-                        <configuration>
-                            <attachClasses>true</attachClasses>
-                        </configuration>
                     </execution>
                 </executions>
-
-                <configuration>
-
-                    <archive>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                        </manifest>
-                        <manifestEntries>
-                            <application-version>${project.version}</application-version>
-                            <application-name>${project.name}</application-name>
-                            <build-time>${timestamp}</build-time>
-                            <implementation-version>${project.version}</implementation-version>
-                            <implementation-build>${buildNumber}</implementation-build>
-                        </manifestEntries>
-                    </archive>
-
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>

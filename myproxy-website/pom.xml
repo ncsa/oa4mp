@@ -1,11 +1,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <!--
-          NOTE: THIS MUST BE BUILT WITH MAVEN 2. To convert this to a maven 3 project will be
-          quite painful and since it is for internal use only, probably not worth it at this point.
-          Do NOT have the parent of this be the top-level project or it will
-          prevent javadoc creation.
+    <!-- Deprecated! We don't do this anymore and the build has been largely disabled. Removing it from
+    the build will take an audit to be sure.
           -->
     <groupId>edu.uiuc.ncsa.myproxy</groupId>
     <!-- The version number reflects the currently released project. -->
@@ -20,6 +17,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+<!--
     <licenses>
         <license>
             <name>Apache license</name>
@@ -46,7 +44,9 @@
             <email>jbasney@illinois.edu</email>
         </developer>
     </developers>
+-->
 
+<!--
     <mailingLists>
         <mailingList>
             <name>MyProxy User List</name>
@@ -58,8 +58,9 @@
         </mailingList>
     </mailingLists>
 
+-->
 
-    <distributionManagement>
+ <!--   <distributionManagement>
         <repository>
             <id>sonatype-nexus-staging</id>
             <name>sonatype</name>
@@ -72,7 +73,7 @@
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
             <uniqueVersion>false</uniqueVersion>
         </snapshotRepository>
-    </distributionManagement>
+    </distributionManagement>-->
     <dependencies>
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
@@ -81,6 +82,7 @@
         </dependency>
     
     </dependencies>
+<!--
     <reporting>
         <plugins>
             <plugin>
@@ -102,7 +104,7 @@
                 <version>3.0.0</version>
                 <reportSets>
                     <reportSet>
-                        <reports><!-- select reports -->
+                        <reports>&lt;!&ndash; select reports &ndash;&gt;
                             <report>index</report>
                             <report>dependencies</report>
                             <report>project-team</report>
@@ -126,6 +128,8 @@
             </plugin>
         </plugins>
     </reporting>
+-->
+<!--
     <build>
         <plugins>
             <plugin>
@@ -170,4 +174,5 @@
             </plugin>
         </plugins>
     </build>
+-->
 </project>
