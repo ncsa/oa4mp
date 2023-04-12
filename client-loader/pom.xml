@@ -10,7 +10,7 @@
         <version>5.3-SNAPSHOT</version>
     </parent>
 
-    <artifactId>client-loader-oauth2</artifactId>
+    <artifactId>client-loader</artifactId>
     <name>OAuth 2/Open ID Connect support for the client</name>
     <packaging>jar</packaging>
     <properties>

@@ -356,7 +356,7 @@ public class QDLJSONConfigUtil implements ScriptingConstants {
 
     protected static void testLoadDir() {
         try {
-            String directory = "/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-qdl/src/main/resources/scripts";
+            String directory = "/home/ncsa/dev/ncsa-git/oa4mp/qdl/src/main/resources/scripts";
             JSONObject j = readDir(directory);
             JSONObject jsonObject = new JSONObject();
 

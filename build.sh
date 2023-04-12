@@ -17,7 +17,7 @@ SVN_ROOT=/home/ncsa/dev/ncsa-git
 OA4MP_ROOT=$SVN_ROOT/oa4mp
 OA4MP_CLIENT_DEPLOY=$DEPLOY_ROOT/client
 OA4MP_SERVER_DEPLOY=$DEPLOY_ROOT/server
-OA2_TOOLS=$OA4MP_ROOT/oa4mp-server-admin-oauth2
+OA2_TOOLS=$OA4MP_ROOT/server-admin
 
 cd $OA4MP_ROOT
 mvn clean install
@@ -47,11 +47,11 @@ cd $OA2_TOOLS/src/main/scripts
 cp * $OA4MP_SERVER_DEPLOY
 
 
-cd $OA4MP_ROOT/oa4mp-qdl
+cd $OA4MP_ROOT/qdl
 mvn -P qdl package
 mv target/oa2-qdl-jar-with-dependencies.jar target/qdl.jar
 #/home/ncsa/dev/ncsa-git/qdl/language/src/main/scripts/create_installer.sh /home/ncsa/dev/ncsa-git/oa4mp/oa4mp-qdl /home/ncsa/dev/temp-deploy/oa2-qdl oa2-qdl-installer.jar
-/home/ncsa/dev/ncsa-git/qdl/language/src/main/scripts/create_installer.sh $OA4MP_ROOT/oa4mp-qdl $DEPLOY_ROOT/oa2-qdl oa2-qdl-installer.jar
+/home/ncsa/dev/ncsa-git/qdl/language/src/main/scripts/create_installer.sh $OA4MP_ROOT/qdl $DEPLOY_ROOT/oa2-qdl oa2-qdl-installer.jar
 
 
 # Update local QDL install with the latest and greatest

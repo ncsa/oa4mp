@@ -25,13 +25,13 @@
         <module name="server-api" />
         <module name="server-loader" />
         <module name="oauth2" />
-        <module name="client-loader-oauth2" />
         <module name="client-test" />
         <module name="proxy" />
         <module name="server-admin" />
         <module name="oa4mp-webapp" />
         <module name="common" />
         <module name="server-test" />
+        <module name="client-loader" />
         <module name="oa4mp-server-test" />
         <module name="client-webapp" />
         <module name="qdl" />

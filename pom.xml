@@ -106,7 +106,7 @@
         <module>server-loader</module>
         <module>oa4mp-server-oauth2</module>
         <module>client-api</module>
-        <module>client-loader-oauth2</module>
+        <module>client-loader</module>
         <module>client-oauth2</module>
         <module>server-admin</module>
         <module>client-webapp</module>

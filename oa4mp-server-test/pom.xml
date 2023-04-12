@@ -10,7 +10,7 @@
         <version>5.3-SNAPSHOT</version>
     </parent>
 
-    <artifactId>server-test</artifactId>
+    <artifactId>oa4mp-server-test</artifactId>
     <name>OAuth for MyProxy server tests.</name>
     <packaging>jar</packaging>
     <dependencies>

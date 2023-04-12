@@ -3,8 +3,8 @@
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/client-api/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/client-api/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/client-loader-oauth2/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/client-loader-oauth2/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/client-loader/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/client-loader/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/client-oauth2/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/client-oauth2/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/client-test/src/main/java" charset="UTF-8" />
