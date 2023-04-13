@@ -29,9 +29,9 @@
 <p>You may most easily a bare-bones version for testing by downloading the current reference war:</p>
 
 <p><a title="OA4MP client war"
-      href="https://github.com/ncsa/OA4MP/releases/latest/client2.war">client2.war</a>
+      href="https://github.com/ncsa/oa4mp/releases/latest/client2.war">client2.war</a>
      <br></br>
-      <a title="PGP signature file" href="https://github.com/ncsa/OA4MP/releases/latest/client2.war.asc">(PGP signature)</a>
+      <a title="PGP signature file" href="https://github.com/ncsa/oa4mp/releases/latest/client2.war.asc">(PGP signature)</a>
 </p>
 
 For many cases, this is all you need to do.
@@ -40,14 +40,9 @@ For many cases, this is all you need to do.
     $CATALINA_HOME/webapps directory. The system will not work until you have configured it then registered with an
     OA4MP server though.</p>
 
-<h2>Using the Maven Repository</h2>
-Fortunately, OA4MP is hosted on the public Sonatype maven repository so that using the code simply requires you
-add the right dependencies. There is no need to configure any repositories. Generally it is suggested that you
-use the pre-compiled war.
-
 <h3>Getting and building the source</h3>
 If you need/want to customize the basic package, you would download the source from
-<a title="oa4mp sources" href="https://github.com/ncsa/OA4MP">Git Hub</a>
+<a title="oa4mp sources" href="https://github.com/ncsa/oa4mp">Git Hub</a>
 This will resolve the correct dependencies. Build the module you want by issuing
 <pre>mvn clean install</pre>
 and you should end up with a deployable war.

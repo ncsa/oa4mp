@@ -711,7 +711,7 @@ public class OIDCCMServlet extends EnvServlet {
             template.setIdentifier(newID);
             template.setCreationTS(createTS);
         }
-        // https://github.com/ncsa/OA4MP/pull/85 -- clients (such as a few in GoLang) that upload scopes as
+        // https://github.com/ncsa/oa4mp/pull/85 -- clients (such as a few in GoLang) that upload scopes as
         // strings expect them back as strings, not JSON arrays. Return them in the format sent.
         boolean returnStringScopes = false;
         try {
@@ -799,7 +799,7 @@ public class OIDCCMServlet extends EnvServlet {
         debugger.trace(this, "Setting approval record for this client");
         ClientApproval approval = new ClientApproval(newClient.getIdentifier());
         approval.setApprovalTimestamp(new Date());
-        // https://github.com/ncsa/OA4MP/pull/81
+        // https://github.com/ncsa/oa4mp/pull/81
         if (isAnonymous) {
             if (cm7591Config.autoApprove) {
                 approval.setApprover(cm7591Config.autoApproverName);
@@ -817,7 +817,7 @@ public class OIDCCMServlet extends EnvServlet {
             approval.setStatus(ClientApproval.Status.APPROVED);
         }
         getOA2SE().getClientApprovalStore().save(approval);
-        // Github 84 https://github.com/ncsa/OA4MP/issues/84
+        // Github 84 https://github.com/ncsa/oa4mp/issues/84
         // Also this is CIL-1597
         writeCreateOK(httpServletResponse, jsonResp);
       //  writeOK(httpServletResponse, jsonResp);

@@ -348,7 +348,7 @@ public class ClientUtils {
         }
         // The scopes the client wants:
 
-        // Fixes github issue 8, support for public clients: https://github.com/ncsa/OA4MP/issues/8
+        // Fixes github issue 8, support for public clients: https://github.com/ncsa/oa4mp/issues/8
         if (oa2Client.isPublicClient()) {
             if (!oa2Client.getScopes().contains(OA2Scopes.SCOPE_OPENID)) {
                 throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST,

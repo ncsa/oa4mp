@@ -1,40 +1,23 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<project name="MyProxy">
-     <!--
-        Placeholder for getting maven to generate the website.
-     -->
- <!--   <bannerLeft>
-        <name>Maven</name>
-        <src>http://maven.apache.org/images/apache-maven-project.png</src>
-        <href>http://maven.apache.org/</href>
-    </bannerLeft>-->
+<project name="OA4MP">
     <bannerLeft>
-         <name>NCSA</name>
-         <src>css/images/ncsalogo_sm-2.gif</src>
-         <href>http://www.ncsa.illinois.edu/</href>
-         <height>40</height>
-     </bannerLeft>
-   <!-- <bannerRight>
-        <src>http://maven.apache.org/images/maven-small.gif</src>
-    </bannerRight>-->
+        <name>NCSA</name>
+        <src>css/images/ncsalogo_sm-2.gif</src>
+        <href>http://www.ncsa.illinois.edu/</href>
+    </bannerLeft>
     <bannerRight>
-        <name>MyProxy</name>
-        <src>css/images/MyProxyWide.gif</src>
-        <href>http://grid.ncsa.illinois.edu/myproxy/</href>
-        <height>40</height>
-       </bannerRight>
+        <name>OA4MP</name>
+        <src>css/images/oa4mp-logo-small-2.png</src>
+        <href>https://ncsa.github.io/oa4mp/</href>
+    </bannerRight>
     <version position="right"/>
     <skin>
-      <groupId>edu.uiuc.ncsa.maven.skin</groupId>
-      <artifactId>oa4mp-skin</artifactId>
-      <version>5.3-SNAPSHOT</version>
+        <groupId>edu.uiuc.ncsa.maven.skin</groupId>
+        <artifactId>oa4mp-skin</artifactId>
+        <version>5.3-SNAPSHOT</version>
     </skin>
-    <custom>
-
-    </custom>
-
     <body>
-        <menu name="OAuth for MyProxy">
+        <menu name="OA4MP">
             <item name="Overview" href="server/index.html"/>
             <item name="Server" href="server/index.html"/>
             <item name="Client" href="client/index.html"/>

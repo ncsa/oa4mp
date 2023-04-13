@@ -20,33 +20,6 @@
     </properties>
     <name>Top level OA4MP</name>
     <description>Top level OAuth client and server code for MyProxy</description>
-    <!--
-    <url>http://grid.ncsa.illinois.edu/myproxy/oauth</url>
-    <licenses>
-        <license>
-            <name>Apache license</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
-    <scm>
-        <developerConnection>scm:svn:https://jeff92@svn.code.sf.net/p/cilogon/code/trunk/edu.uiuc.ncsa/myproxy
-        </developerConnection>
-        <connection>scm:svn:https://jeff92@svn.code.sf.net/p/cilogon/code/trunk/edu.uiuc.ncsa/myproxy</connection>
-        <url>scm:svn:https://jeff92@svn.code.sf.net/p/cilogon/code/trunk/edu.uiuc.ncsa/myproxy</url>
-    </scm>
-    <developers>
-        <developer>
-            <name>Jeff Gaynor</name>
-            <email>gaynor@illinois.edu</email>
-        </developer>
-    </developers>
-
-    <issueManagement>
-        <system>Jira</system>
-        <url>https://gateways.atlassian.net/browse/OAUTH</url>
-    </issueManagement>
-       -->
     <licenses>
           <license>
               <name>Apache license</name>
@@ -55,13 +28,13 @@
           </license>
       </licenses>
       <scm>
-          <developerConnection>scm:git:https://github.com/ncsa/OA4MP.git</developerConnection>
-          <connection>scm:git:https://github.com/ncsa/OA4MP.git</connection>
-          <url>https://github.com/ncsa/OA4MP</url>
+          <developerConnection>scm:git:https://github.com/ncsa/oa4mp.git</developerConnection>
+          <connection>scm:git:https://github.com/ncsa/oa4mp.git</connection>
+          <url>https://github.com/ncsa/oa4mp</url>
       </scm>
       <issueManagement>
           <system>GitHub</system>
-          <url>https://github.com/ncsa/OA4MP/issues</url>
+          <url>https://github.com/ncsa/oa4mp/issues</url>
       </issueManagement>
       <developers>
           <developer>
@@ -176,20 +149,14 @@
                     </execution>
                 </executions>
             </plugin>
-           <!-- <plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.4.0</version>
-                <executions>
-                    <execution>
-                        <id>aggregate</id>
-                        <goals>
-                            <goal>aggregate</goal>
-                        </goals>
-                        <phase>site</phase>
-                    </execution>
-                </executions>
-            </plugin>-->
+                <version>3.5.0</version>
+<!--                <configuration>
+                    <includeDependencySources>true</includeDependencySources>
+                </configuration>-->
+            </plugin>
 
             <plugin>
                 <groupId>org.mortbay.jetty</groupId>
@@ -199,31 +166,4 @@
 
         </plugins>
     </build>
-  <!--  <reporting>
-           <plugins>
-               <plugin>
-                   <groupId>org.apache.maven.plugins</groupId>
-                   <artifactId>maven-javadoc-plugin</artifactId>
-                   <version>3.4.0</version>
-                   <configuration>
-                       <outputDirectory>${project.build.directory}/docs/apidocs</outputDirectory>
-                   </configuration>
-                   <reportSets>
-                       <reportSet>
-                           <id>aggregate</id>
-                           <inherited>false</inherited>
-                           <reports>
-                               <report>aggregate</report>
-                           </reports>
-                       </reportSet>
-                       <reportSet>
-                           <id>default</id>
-                           <reports>
-                               <report>javadoc</report>
-                           </reports>
-                       </reportSet>
-                   </reportSets>
-               </plugin>
-           </plugins>
-       </reporting>-->
 </project>

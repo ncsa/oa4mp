@@ -55,10 +55,10 @@
 <p>You may most easily a bare-bones version for testing by downloading the current reference war:</p>
 
 <p><a title="OA4MP service war"
-      href="https://github.com/ncsa/OA4MP/releases/latest/oauth.war">oauth-server-latest.war</a>
+      href="https://github.com/ncsa/oa4mp/releases/latest/oauth.war">oauth-server-latest.war</a>
     <br></br>
     <a title="PGP signature"
-       href="https://github.com/ncsa/OA4MP/releases/latest/oauth.war.asc">(PGP signature)</a>
+       href="https://github.com/ncsa/oa4mp/releases/latest/oauth.war.asc">(PGP signature)</a>
 </p>
 
 <p>Download this, read to <a title="Server Configuration Reference Manual"
@@ -66,14 +66,10 @@
     the deployment</a>, and deploy it to Tomcat. The war, as delivered, cannot be run.You must do some minimal
     configuration at least before deploying it. </p>
 
-<h2>Using the Maven Repository</h2>
-Fortunately, OA4MP is hosted on the public Sonatype maven repository so that using the code simply requires you
-add the right dependencies. There is no need to configure any repositories. Generally it is suggested that you
-use the pre-compiled war.
 
 <h3>Getting and building the source</h3>
 If you need/want to customize the basic package, you would download it from
-<a title="oa4mp sources" href="https://github.com/ncsa/OA4MP">Git Hub</a> at
+<a title="oa4mp sources" href="https://github.com/ncsa/oa4mp">Git Hub</a> at
 the current release (4.3).
 This has the correct dependencies in it. Build it by issuing
 <pre>mvn clean install</pre>
@@ -117,7 +113,7 @@ and you should end up with a deployable war.
 <h3>MySQL</h3>
 
 <p>In order to use MySQL for persistent storage, you must run the supplied script,
-    <a title="mysql.sql install script" href="https://github.com/ncsa/OA4MP/releases/latest/mysql.sql">mysql.sql</a>
+    <a title="mysql.sql install script" href="https://github.com/ncsa/oa4mp/releases/latest/mysql.sql">mysql.sql</a>
     to create all of the tables and users before your first use.</p>
 <pre><code>mysql -u username -p &lt; <code>/path/to/file/mysql.sql</code></code></pre>
 <p>(the username is an account (<em>root</em>, e.g.) which has sufficient privileges to create other users) which will
@@ -130,7 +126,7 @@ and you should end up with a deployable war.
 
 <p>Most Unix distros have this database installed by default. There is a specific script, <a
         title="PostGreSQL install script"
-        href="https://github.com/ncsa/OA4MP/releases/latest/pg.sql">pg.sql</a>, that will
+        href="https://github.com/ncsa/oa4mp/releases/latest/pg.sql">pg.sql</a>, that will
     create all the tables. All you should need to do is set the passwords near the top of the file. Then you would need
     to log in to the command line psql tool as the user postgres (this is the super user) and from that prompt issue</p>
 <pre>\i /path/to/file/pg.sql</pre>

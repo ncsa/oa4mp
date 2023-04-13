@@ -29,9 +29,9 @@
                                                                     <img src="../../css/images/ncsalogo_sm-2.gif" alt="NCSA"/>
         
                 </a>
-                                    <a href="http://grid.ncsa.illinois.edu/myproxy/" id="bannerRight"  >
+                                    <a href="https://ncsa.github.io/oa4mp/" id="bannerRight"  >
         
-                                                                    <img src="../../css/images/MyProxyWide.gif" alt="MyProxy"/>
+                                                                    <img src="../../css/images/oa4mp-logo-small-2.png" alt="OA4MP"/>
         
                 </a>
                 <div class="clear">
@@ -48,7 +48,7 @@
     
         
                     <div class="xleft">
-            Last Published: 2023-04-12
+            Last Published: 2023-04-13
                                 </div>
                 <div class="xright">            
     
@@ -74,7 +74,7 @@
                         
     
         
-                               <h5>OAuth for MyProxy</h5>
+                               <h5>OA4MP</h5>
                         <ul>
                     
     <li class="none">
@@ -195,9 +195,9 @@
 <p>You may most easily a bare-bones version for testing by downloading the current reference war:</p>
 
 
-<p><a class="externalLink" href="https://github.com/ncsa/OA4MP/releases/latest/oauth.war" title="OA4MP service war">oauth-server-latest.war</a>
+<p><a class="externalLink" href="https://github.com/ncsa/oa4mp/releases/latest/oauth.war" title="OA4MP service war">oauth-server-latest.war</a>
     <br /></br>
-    <a class="externalLink" href="https://github.com/ncsa/OA4MP/releases/latest/oauth.war.asc" title="PGP signature">(PGP signature)</a>
+    <a class="externalLink" href="https://github.com/ncsa/oa4mp/releases/latest/oauth.war.asc" title="PGP signature">(PGP signature)</a>
 </p>
 
 
@@ -205,16 +205,11 @@
     the deployment</a>, and deploy it to Tomcat. The war, as delivered, cannot be run.You must do some minimal
     configuration at least before deploying it. </p>
 
-</section><section>
-<h2><a name="Using_the_Maven_Repository"></a>Using the Maven Repository</h2>
-Fortunately, OA4MP is hosted on the public Sonatype maven repository so that using the code simply requires you
-add the right dependencies. There is no need to configure any repositories. Generally it is suggested that you
-use the pre-compiled war.
 
 <section>
 <h3><a name="Getting_and_building_the_source"></a>Getting and building the source</h3>
 If you need/want to customize the basic package, you would download it from
-<a class="externalLink" href="https://github.com/ncsa/OA4MP" title="oa4mp sources">Git Hub</a> at
+<a class="externalLink" href="https://github.com/ncsa/oa4mp" title="oa4mp sources">Git Hub</a> at
 the current release (4.3).
 This has the correct dependencies in it. Build it by issuing
 
@@ -283,7 +278,7 @@ and you should end up with a deployable war.
 
 
 <p>In order to use MySQL for persistent storage, you must run the supplied script,
-    <a class="externalLink" href="https://github.com/ncsa/OA4MP/releases/latest/mysql.sql" title="mysql.sql install script">mysql.sql</a>
+    <a class="externalLink" href="https://github.com/ncsa/oa4mp/releases/latest/mysql.sql" title="mysql.sql install script">mysql.sql</a>
     to create all of the tables and users before your first use.</p>
 
 <div>
@@ -299,7 +294,7 @@ and you should end up with a deployable war.
 <h3><a name="PostgreSQL"></a>PostgreSQL</h3>
 
 
-<p>Most Unix distros have this database installed by default. There is a specific script, <a class="externalLink" href="https://github.com/ncsa/OA4MP/releases/latest/pg.sql" title="PostGreSQL install script">pg.sql</a>, that will
+<p>Most Unix distros have this database installed by default. There is a specific script, <a class="externalLink" href="https://github.com/ncsa/oa4mp/releases/latest/pg.sql" title="PostGreSQL install script">pg.sql</a>, that will
     create all the tables. All you should need to do is set the passwords near the top of the file. Then you would need
     to log in to the command line psql tool as the user postgres (this is the super user) and from that prompt issue</p>
 

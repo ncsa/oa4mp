@@ -64,7 +64,7 @@ public class ProxyUtils {
         AbstractAuthorizationServlet.MyHttpServletResponseWrapper wrapper = new AbstractAuthorizationServlet.MyHttpServletResponseWrapper(response);
         // set the specific scopes.
         //InputLine inputLine = new InputLine("set_param", OA2CLCCommands.SHORT_REQ_PARAM_SWITCH, OA2Constants.SCOPE, scopesToString(t));
-        // Github#86 https://github.com/ncsa/OA4MP/issues/86 request max configured scopes.
+        // Github#86 https://github.com/ncsa/oa4mp/issues/86 request max configured scopes.
         /*OA2Client oa2Client = t.getOA2Client();
         Set<String> requestScopes = new HashSet<>();
         requestScopes.addAll(clcCommands.getCe().getScopes());
@@ -111,7 +111,7 @@ public class ProxyUtils {
 
 
         //InputLine inputLine = new InputLine("set_param", OA2CLCCommands.SHORT_REQ_PARAM_SWITCH, OA2Constants.SCOPE, scopesToString(t));
-        // Github#86 https://github.com/ncsa/OA4MP/issues/86 request max configured scopes.
+        // Github#86 https://github.com/ncsa/oa4mp/issues/86 request max configured scopes.
 /*
         OA2Client oa2Client = t.getOA2Client();
         HashSet<String> requestScopes = new HashSet<>();
