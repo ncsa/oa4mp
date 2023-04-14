@@ -170,7 +170,7 @@
 
                     <dependency>
                         <groupId>edu.uiuc.ncsa.maven.skin</groupId>
-                        <artifactId>oa4mp-skin</artifactId>
+                        <artifactId>skin</artifactId>
                         <version>5.3-SNAPSHOT</version>
                     </dependency>
                 </dependencies>

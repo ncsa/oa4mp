@@ -23,8 +23,6 @@
     <file url="file://$PROJECT_DIR$/oa4mp-server-oauth2/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-server-test/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-server-test/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/oa4mp-skin/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/oa4mp-skin/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-webapp/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oa4mp-webapp/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oauth2/src/main/java" charset="UTF-8" />
@@ -43,6 +41,8 @@
     <file url="file://$PROJECT_DIR$/server-test/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/server/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/server/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/skin/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/skin/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/website/src/main/java" charset="UTF-8" />

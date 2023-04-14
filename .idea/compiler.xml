@@ -23,6 +23,7 @@
         <module name="oa4mp-server-oauth2" />
         <module name="myproxy-logon" />
         <module name="server-api" />
+        <module name="skin" />
         <module name="server-loader" />
         <module name="oauth2" />
         <module name="client-test" />
@@ -38,7 +39,6 @@
         <module name="client" />
         <module name="client-oauth2" />
         <module name="myproxy-website" />
-        <module name="oa4mp-skin" />
         <module name="client-api" />
       </profile>
     </annotationProcessing>

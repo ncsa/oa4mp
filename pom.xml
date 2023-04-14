@@ -88,7 +88,7 @@
         <module>proxy</module>
         <module>website</module>
         <module>server-test</module>
-        <module>oa4mp-skin</module>
+        <module>skin</module>
         <module>myproxy-website</module>
         <module>qdl</module>
         <module>common</module>
