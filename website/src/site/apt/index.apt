@@ -18,41 +18,39 @@ OAuth for Many People
 
 Downloads
 
-* OAuth 2.0 (OpenID Connect)
+    * {{{https://github.com/ncsa/oa4mp/releases/latest}oauth2.war}} (5.3-SNAPSHOT)
 
-        * {{{https://github.com/ncsa/oa4mp/releases/latest}oauth2.war}} (5.3-SNAPSHOT)
-
-        * {{{https://github.com/ncsa/oa4mp/releases/latest}client.war}} (5.3-SNAPSHOT)
+    * {{{https://github.com/ncsa/oa4mp/releases/latest}client.war}} (5.3-SNAPSHOT)
 
 
 Documentation
 
-        *{{{./server/index.html}Server}}
+    *{{{./server/index.html}Server}}
 
-        *{{{./client/index.html}Client}}
+    *{{{./client/index.html}Client}}
 
-        *{{{https://docs.google.com/a/cilogon.org/document/d/1cs3peO9FxA81KN-1RC6Z-auEFIwRbJpZ-SFuKbQzS50/edit?usp=sharing} OIDC Protocol Specification}}
+    *{{{https://docs.google.com/a/cilogon.org/document/d/1cs3peO9FxA81KN-1RC6Z-auEFIwRbJpZ-SFuKbQzS50/edit?usp=sharing} OIDC Protocol Specification}}
 
-        *{{{./server/manuals/install-walkthrough.html}Server Installation Walk-Through}}
+    *{{{./server/manuals/install-walkthrough.html}Server Installation Walk-Through}}
 
 OA4MP Extensions to {{{http://ncsa.github.io/qdl/}QDL}}
 
-        *{{{./docs/pdf/qdl_server_scripts.pdf}Introduction to writing server-side scripts with QDL}}
+    *{{{./docs/pdf/qdl_server_scripts.pdf}Introduction to writing server-side scripts with QDL}}
 
-        *{{{./docs/pdf/creating_claim_sources2.pdf}Creating claims in server scripting.}}
+    *{{{./docs/pdf/creating_claim_sources2.pdf}Creating claims in server scripting.}}
 
-        *{{{./docs/pdf/claim_source_examples.pdf}Examples for creating claim sources.}}
+    *{{{./docs/pdf/claim_source_examples.pdf}Examples for creating claim sources.}}
 
-        *{{{./docs/pdf/token_handler_configuration.pdf}Configuring token handlers.}}
+    *{{{./docs/pdf/token_handler_configuration.pdf}Configuring token handlers.}}
 
 Related Resources
 
-        * {{{https://www.cilogon.org/oidc}CILogon OIDC page}} Be sure to read here to get the correct endpoints for
-        your client if you are using CILogon.
+     * {{{https://www.cilogon.org/oidc}CILogon OIDC page}} Be sure to read here to get the correct endpoints for
+     your client if you are using CILogon.
 
-        * {{{http://grid.ncsa.illinois.edu/myproxy}MyProxy}}
+     * {{{http://grid.ncsa.illinois.edu/myproxy}MyProxy}}
 
-        * {{{https://ncsa.github.io/security-lib}NCSA's secutiry libraries}}
+     * {{{https://ncsa.github.io/security-lib}NCSA's secutiry libraries}}
 
-        * {{{http://grid.ncsa.illinois.edu/myproxy/pam.html#limitations}PAM Authentication issues with MyProxy. Read this if your MyProxy authentication suddenly quits working}}
+     * {{{http://grid.ncsa.illinois.edu/myproxy/pam.html#limitations}PAM Authentication issues with MyProxy. Read this if your MyProxy authentication suddenly quits working}}
 

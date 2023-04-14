@@ -11,33 +11,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="eb414374-02ed-40a4-9689-d382715049b9" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server-admin/src/main/resources/qdl/ligo/vo4/scitokens-scopes3.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-skin/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/skin/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-skin/src/main/resources/META-INF/maven/site.vm" beforeDir="false" afterPath="$PROJECT_DIR$/skin/src/main/resources/META-INF/maven/site.vm" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-skin/src/main/resources/css/images/I.gif" beforeDir="false" afterPath="$PROJECT_DIR$/skin/src/main/resources/css/images/I.gif" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-skin/src/main/resources/css/images/MyProxyWide.gif" beforeDir="false" afterPath="$PROJECT_DIR$/skin/src/main/resources/css/images/MyProxyWide.gif" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-skin/src/main/resources/css/images/external.png" beforeDir="false" afterPath="$PROJECT_DIR$/skin/src/main/resources/css/images/external.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-skin/src/main/resources/css/images/icon_error_sml.gif" beforeDir="false" afterPath="$PROJECT_DIR$/skin/src/main/resources/css/images/icon_error_sml.gif" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-skin/src/main/resources/css/images/icon_info_sml.gif" beforeDir="false" afterPath="$PROJECT_DIR$/skin/src/main/resources/css/images/icon_info_sml.gif" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-skin/src/main/resources/css/images/icon_success_sml.gif" beforeDir="false" afterPath="$PROJECT_DIR$/skin/src/main/resources/css/images/icon_success_sml.gif" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-skin/src/main/resources/css/images/icon_warning_sml.gif" beforeDir="false" afterPath="$PROJECT_DIR$/skin/src/main/resources/css/images/icon_warning_sml.gif" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-skin/src/main/resources/css/images/logos/maven-feather.png" beforeDir="false" afterPath="$PROJECT_DIR$/skin/src/main/resources/css/images/logos/maven-feather.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-skin/src/main/resources/css/images/ncsalogo_sm-2.gif" beforeDir="false" afterPath="$PROJECT_DIR$/skin/src/main/resources/css/images/ncsalogo_sm-2.gif" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-skin/src/main/resources/css/images/ncsalogo_sm.gif" beforeDir="false" afterPath="$PROJECT_DIR$/skin/src/main/resources/css/images/ncsalogo_sm.gif" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-skin/src/main/resources/css/images/newwindow.png" beforeDir="false" afterPath="$PROJECT_DIR$/skin/src/main/resources/css/images/newwindow.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-skin/src/main/resources/css/images/oa4mp-logo-small-2.png" beforeDir="false" afterPath="$PROJECT_DIR$/skin/src/main/resources/css/images/oa4mp-logo-small-2.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-skin/src/main/resources/css/images/oa4mp-logo-small-2.xcf" beforeDir="false" afterPath="$PROJECT_DIR$/skin/src/main/resources/css/images/oa4mp-logo-small-2.xcf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-skin/src/main/resources/css/images/oa4mp-logo-small.png" beforeDir="false" afterPath="$PROJECT_DIR$/skin/src/main/resources/css/images/oa4mp-logo-small.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-skin/src/main/resources/css/images/oa4mp-logo.png" beforeDir="false" afterPath="$PROJECT_DIR$/skin/src/main/resources/css/images/oa4mp-logo.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-skin/src/main/resources/css/oa4mp-custom.css" beforeDir="false" afterPath="$PROJECT_DIR$/skin/src/main/resources/css/oa4mp-custom.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-skin/src/main/resources/css/oa4mp-theme.css" beforeDir="false" afterPath="$PROJECT_DIR$/skin/src/main/resources/css/oa4mp-theme.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-skin/src/main/resources/css/print.css" beforeDir="false" afterPath="$PROJECT_DIR$/skin/src/main/resources/css/print.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-skin/src/main/resources/css/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/skin/src/main/resources/css/style.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/qdl/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/resources/qdl/ligo/vo4/extract.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/resources/qdl/ligo/vo4/extract.qdl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/resources/qdl/ligo/vo4/init.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/resources/qdl/ligo/vo4/init.qdl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/qdl/scripting/OA2QDLEnvironment.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/qdl/scripting/OA2QDLEnvironment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-test/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/buildNumber.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/website/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/website/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/website/src/site/site.xml" beforeDir="false" afterPath="$PROJECT_DIR$/website/src/site/site.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/website/src/site/apt/index.apt" beforeDir="false" afterPath="$PROJECT_DIR$/website/src/site/apt/index.apt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -318,7 +301,7 @@
       <workItem from="1680795008170" duration="3871000" />
       <workItem from="1680868723426" duration="1387000" />
       <workItem from="1680895479158" duration="1047000" />
-      <workItem from="1681146206952" duration="61800000" />
+      <workItem from="1681146206952" duration="70206000" />
     </task>
     <task id="LOCAL-00001" summary="Migrated a bunch of static utilities into classes.">
       <created>1675892170361</created>
@@ -467,7 +450,28 @@
       <option name="project" value="LOCAL" />
       <updated>1681421038486</updated>
     </task>
-    <option name="localTasksCounter" value="22" />
+    <task id="LOCAL-00022" summary="Website update. Style sheets, logo (new!) etc.">
+      <created>1681487990769</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1681487990770</updated>
+    </task>
+    <task id="LOCAL-00023" summary="Website update. Style sheets, logo (new!) etc.">
+      <created>1681498800846</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1681498800846</updated>
+    </task>
+    <task id="LOCAL-00024" summary="Website update. Style sheets, logo (new!) etc.">
+      <created>1681499843861</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1681499843861</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
