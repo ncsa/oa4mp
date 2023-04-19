@@ -1,0 +1,30 @@
+{
+  "api": {
+    "subject": {
+      "admin": {
+        "admin_id": "ADMIN_ID",
+        "secret": "ADMIN_SECRET"
+      }
+    },
+    "action": {
+      "type": "client",
+      "method": "create"
+    },
+    "content": {
+      "callback_uri": [
+        "https://a.b.c/client/ready1",
+        "https://a.b.c/client/ready2"
+      ],
+      "cfg":{"version":"test-version"},
+      "scopes": [
+        "openid",
+        "profile",
+        "email"
+      ],
+      "home_url": "https://a.b.c/client",
+      "proxy_limited": true,
+      "name": "CM test client"
+    }
+  },
+  "comment": "This example shows how to create a completely new client. Note that the admin will automatically be granted management access."
+}

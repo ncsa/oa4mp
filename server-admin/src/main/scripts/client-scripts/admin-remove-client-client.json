@@ -1,0 +1,16 @@
+{
+  "api": {
+    "subject": {
+      "admin": {
+        "admin_id": "ADMIN_ID",
+        "secret": "ADMIN_SECRET"
+      }
+    },
+    "action": {
+      "type": "client",
+      "method": "remove"
+    },
+    "object": {"client": {"client_id": "CLIENT_ID"}}
+  },
+  "comment": "This example shows how to completely remove a client and all references to it. Note this cannot be undone."
+}
