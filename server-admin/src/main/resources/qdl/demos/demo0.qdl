@@ -1,0 +1,34 @@
+/*
+   The configuration scripts for demo0.cilogon.org. This lives on test.cilogon.org.
+*/
+
+/*
+    Client configuration:
+
+   tokens{
+    identity{
+    type=identity
+    qdl{
+        load="demos/demo0.qdl"
+        xmd={exec_phase=pre_auth}
+      }// end qdl
+    } //end identity token
+    access{
+       type=access_token
+       qdl{
+          load="demos/demo0-at.qdl"
+          xmd:{exec_phase:["post_token","post_refresh"]}
+       } //end QDL
+     } // end access token
+  } //end tokens
+
+*/
+idps.ncsa := 'https://idp.ncsa.illinois.edu/idp/shibboleth';
+idps.fnal := 'https://idp.fnal.gov/idp/shibboleth';
+idps.ligo := 'https://login.ligo.org/idp/shibboleth';
+
+switch[
+  if[claims.idp == idps.ncsa][script_load('ncsa/ncsa-default.qdl');];
+  if[claims.idp == idps.fnal][script_load('fnal/fnal.qdl');];
+  if[claims.idp == idps.ligo][script_load('ligo/ligo.qdl');];
+]; //end switch

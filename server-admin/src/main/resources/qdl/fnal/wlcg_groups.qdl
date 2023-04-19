@@ -1,0 +1,58 @@
+/*
+    Given a set of scopes and a set of all the groups for a user, return the groups
+    that fit the request as per p.17 of the spec:
+
+    https://indico.cern.ch/event/769180/contributions/3563095/attachments/1908176/3152124/WLCG_Common_JWT_Profiles.pdf
+
+    arguments are
+    0th - the scopes that the user is requesting.
+    1st = the list of all groups the user is a member of
+    returns: The wlcg - specified groups.
+
+    Author: Jeff Gaynor
+   Created: 2021-06-18T21:36:17.458Z
+
+*/
+        scopes. ≔  script_args(0);
+  found_groups. ≔  script_args(1);
+  say(to_string(scopes.));
+  say(to_string(found_groups.));
+              w ≔  'wlcg.groups';
+          caput ≔  w + ':'; // head of WLCG requested group.
+  group_scopes. ≔  mask(scopes., ¯1 < starts_with(scopes., [w])); // get things that start with w
+    say(to_string(group_scopes.));
+    //if[(w∉group_scopes.) && size(group_scopes.) ≡ 0][return([]);]; // no requested wlcg groups.
+  //        has_w ≔  w ∈ group_scopes.;  // check if single scope of wlcg.groups is passed in
+          has_w ≔  reduce(@∨, group_scopes. ≡ w);  // check if single scope of wlcg.groups is passed in
+          has_w ≔  has_w ≡ null ? false:has_w; // if group_scopes is gobbledy-gook, has_w may be null. Fix it.
+  group_scopes. ≔  mask(group_scopes., group_scopes. ≠ w); // whack it off if it is there,
+
+  if[(¬has_w) && size(group_scopes.) ≡ 0][return([]);]; // no requested wlcg groups.
+
+  group_scopes. ≔  ~group_scopes. - caput;
+
+  if[
+      size(group_scopes.) ≤ 0
+   ][
+      return(~mask(found_groups., found_groups. ≠ w));
+  ];
+
+  return(~mask(group_scopes., has_value(group_scopes., found_groups.)));
+/*
+   Test:
+     g. := ['wlcg.groups', '/cms/uscms', '/cms/ALARM','/cms/users']
+     w  := 'wlcg.groups'
+     s. := 'openid' ~ 'email' ~ 'profile' ~ 'wlcg.groups:/cms/uscms'.
+     ss := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-admin-oauth2/src/main/resources/qdl/fnal/wlcg_groups.qdl';
+
+     script_run(ss, s., g.); // request a subset
+[/cms/uscms]
+
+     script_run(ss, [w], g.); // request all of them
+[/cms/uscms,/cms/ALARM,/cms/users]
+
+     s. := ['openid','profile','email','org.cilogon.userinfo','wlcg.capabilityset:/fermilab','wlcg.groups:/fermilab']
+     g. := ['/cms/uscms', '/fermilab']
+
+
+*/
