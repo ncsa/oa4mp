@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2ATException;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Errors;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.ScriptRuntimeException;
 import edu.uiuc.ncsa.qdl.exceptions.AssertionException;
+import edu.uiuc.ncsa.qdl.exceptions.ParsingException;
 import edu.uiuc.ncsa.qdl.exceptions.QDLExceptionWithTrace;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
@@ -97,6 +98,20 @@ public class OA2ServletUtils {
             } else {
                 atException = new OA2ATException(sre.getRequestedType(), sre.getMessage(), sre.getHttpStatus(), sre.getErrorURI(), transaction.getRequestState());
             }
+        }
+        if(exception instanceof ParsingException){
+            ParsingException parsingException=(ParsingException)exception;
+            String msg;
+            if(parsingException.hasScriptName()){
+                msg = "error parsing script '" + parsingException.getScriptName() + "' ";
+            }else{
+                msg = "parser error " ;
+            }
+            msg = msg + "at line # " + parsingException.getLineNumber() +
+                                    ", char=" + parsingException.getEndCharacterPosition();
+            debugger.trace(OA2ServletUtils.class, msg, exception);
+            // This will get wrapped in an OA2ATException below, but parsing errors should have a note in the logs
+            // since we have to track these down as QDL errors.
         }
         if (exception instanceof IllegalAccessException) {
             // Most generic exception possible.

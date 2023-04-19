@@ -5,6 +5,8 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironment;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.util.cli.*;
 
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,16 +22,18 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl implements C
     public String PARSER_COMMAND = "parser";
     public String TRANSACTION_COMMAND = "transactions";
 
- protected   List<String> components = new ArrayList<>();
-    protected void init(){
-        if(components.isEmpty()){
-             components.add(CLIENTS);
-             components.add(CLIENT_APPROVALS);
-             components.add(COPY);
-             components.add(PARSER_COMMAND);
-             components.add(TRANSACTION_COMMAND);
+    protected List<String> components = new ArrayList<>();
+
+    protected void init() {
+        if (components.isEmpty()) {
+            components.add(CLIENTS);
+            components.add(CLIENT_APPROVALS);
+            components.add(COPY);
+            components.add(PARSER_COMMAND);
+            components.add(TRANSACTION_COMMAND);
         }
     }
+
     @Override
     public List<String> listComponents() {
         return components;
@@ -61,7 +65,25 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl implements C
             say("Warning: no configuration file specified. type in 'load --help' to see how to load one.");
             return;
         }
+        boolean printStartup = false;
+        for (String arg : args) {
+            if (arg.equals("-v")) {
+                printStartup = true;
+                break;
+            }
+        }
+        if (printStartup) {
+            initialize(); // No logging so a there might be a bunch of stuff that gets spit out.
+            return;
+        }
+        // pipe startup messages to dev null:
+        PrintStream out = System.out;
+        PrintStream err = System.err;
+        System.setOut(new PrintStream(OutputStream.nullOutputStream()));
+        System.setErr(new PrintStream(OutputStream.nullOutputStream()));
         initialize();
+        System.setOut(out);
+        System.setErr(err);
     }
 
 
@@ -90,7 +112,7 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl implements C
         if (inputLine.hasArg(PARSER_COMMAND)) {
             commands = getNewParserCommands();
         }*/
-        if(inputLine.hasArg(TRANSACTION_COMMAND)){
+        if (inputLine.hasArg(TRANSACTION_COMMAND)) {
             commands = getTransactionCommands();
         }
         if (commands != null) {
@@ -108,6 +130,7 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl implements C
      * Either switch to another component or (if there are arguments) simply run the
      * single command and return. Note that each component has stored state, so
      * these will be run with whatever is in that state.
+     *
      * @param inputLine
      * @param commands
      * @return
@@ -118,10 +141,10 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl implements C
         CLIDriver cli = new CLIDriver(commands);
         cli.setEnv(getGlobalEnv());
         cli.setComponentManager(this);
-        if(switchComponent){
+        if (switchComponent) {
             inputLine.removeArgAt(0); // removes original arg ("use")
             cli.execute(inputLine.removeArgAt(0)); // removes components before executing
-        }else {
+        } else {
             cli.start();
         }
         return true;
@@ -131,7 +154,7 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl implements C
     protected boolean hasComponent(String componentName) {
         return componentName.equals(CLIENTS) ||
                 componentName.equals(CLIENT_APPROVALS) ||
-                componentName.equals(COPY)||
+                componentName.equals(COPY) ||
                 componentName.equals(PARSER_COMMAND);
     }
 
@@ -156,7 +179,7 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl implements C
         }
     }
 
-    public abstract ParserCommands getNewParserCommands() throws Throwable ;
+    public abstract ParserCommands getNewParserCommands() throws Throwable;
 
     protected boolean executeComponent() throws Throwable {
         if (hasOption(USE_COMPONENT_OPTION, USE_COMPONENT_LONG_OPTION)) {
@@ -181,7 +204,7 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl implements C
         say(CLIENTS + " - edit client records");
         say(CLIENT_APPROVALS + " - edit client approval records\n");
         say(COPY + " - copy an entire store.\n");
-        say(PARSER_COMMAND+ " - debug/use/try out the parser for scripting.\n");
+        say(PARSER_COMMAND + " - debug/use/try out the parser for scripting.\n");
         say("e.g.\n\nuse " + CLIENTS + "\n\nwill call up the client management component.");
         say("Type 'exit' or /q when you wish to exit the component and return to the main menu");
     }

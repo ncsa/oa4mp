@@ -1,0 +1,25 @@
+# This is a test file for my local xsede portal test system...
+An OIDC client has requested approval on ${host}.
+
+If you approve this request, you should send a notice
+to the contact email and include the generated identifier.
+Please review all of the information below prior to approval.
+
+Generated identifier: ${identifier}
+Creation time: ${creationTime}
+
+
+Name: ${name}
+Contact email: ${email}
+Home uri: ${homeUri}
+Requested Scopes: ${scopes}
+Callbacks:
+${callback}
+
+
+Refresh tokens enabled?: ${refreshEnabled}
+Refresh token Lifetime?: ${refreshLifetime}
+Issuer: ${issuer}
+Sign tokens? ${signTokens}
+Is Proxy Limited?: ${limitedProxy}
+

@@ -59,7 +59,7 @@ public class JWKCLI extends ConfigurableCommandsImpl {
     }
 
     @Override
-    public void print_help(InputLine inputLine) throws Exception{
+    public void print_help() throws Exception{
     say("Need to write help.");
     }
 

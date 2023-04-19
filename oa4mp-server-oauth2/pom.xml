@@ -19,13 +19,7 @@
         <maven.javadoc.skip>true</maven.javadoc.skip>
     </properties>
     <dependencies>
- <!--       <dependency>
-            <groupId>edu.uiuc.ncsa.myproxy</groupId>
-            <artifactId>oa4mp-webapp</artifactId>
-            <version>5.3-SNAPSHOT</version>
-            <type>war</type>
-            <scope>runtime</scope>
-        </dependency>-->
+
         <dependency>
             <groupId>jstl</groupId>
             <artifactId>jstl</artifactId>
@@ -41,7 +35,7 @@
             <artifactId>proxy</artifactId>
             <version>5.3-SNAPSHOT</version>
         </dependency>
-        
+
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>core</artifactId>
@@ -63,22 +57,12 @@
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
-<!--        <dependency>
-            <groupId>edu.uiuc.ncsa.security</groupId>
-            <artifactId>servlet</artifactId>
-            <version>5.3-SNAPSHOT</version>
-        </dependency>-->
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>myproxy-logon</artifactId>
             <version>5.3-SNAPSHOT</version>
         </dependency>
 
-<!--        <dependency>
-            <artifactId>qdl-sas</artifactId>
-            <groupId>edu.uiuc.ncsa.qdl</groupId>
-            <version>1.5-QDL-SNAPSHOT</version>
-         </dependency>-->
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
@@ -105,8 +89,8 @@
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
-        <!--    <version>2.5</version>
-            <scope>provided</scope>-->
+            <!--    <version>2.5</version>
+                <scope>provided</scope>-->
         </dependency>
     </dependencies>
 

@@ -18,10 +18,22 @@
     </skin>
     <body>
         <menu name="OA4MP">
-            <item name="Overview" href="server/index.html"/>
             <item name="Server" href="server/index.html"/>
             <item name="Client" href="client/index.html"/>
             <item name="api docs" href="apidocs/index.html"/>
+        </menu>
+        <menu name="Supported Specifications">
+            <item href="https://www.rfc-editor.org/rfc/rfc6749" name="RFC 6749"/>  <!--  OAuth 2 -->
+            <item href="https://openid.net/specs/openid-connect-core-1_0.html" name="OIDC"/>
+            <item href="https://openid.net/specs/openid-connect-discovery-1_0.html" name="OIDC Discovery"/>
+            <item href="https://www.rfc-editor.org/rfc/rfc7009" name="RFC 7009"/> <!--Token revocation"/>-->
+            <item href="https://www.rfc-editor.org/rfc/rfc7591" name="RFC 7591"/> <!--Dynamic client registration protocol"/>-->
+            <item href="https://www.rfc-editor.org/rfc/rfc7592" name="RFC 7592"/> <!--Dynamic client management protocol"/>-->
+            <item href="https://www.rfc-editor.org/rfc/rfc7636" name="RFC 7636"/> <!--Proof key for code exchange"/>-->
+            <item href="https://www.rfc-editor.org/rfc/rfc7662" name="RFC 7662"/> <!--Token introspection"/>-->
+            <item href="https://www.rfc-editor.org/rfc/rfc8628" name="RFC 8628"/> <!--Device flow"/>-->
+            <item href="https://www.rfc-editor.org/rfc/rfc8693" name="RFC 8693"/> <!--Token exchange"/>-->
+            <item href="https://www.rfc-editor.org/rfc/rfc9068" name="RFC 9068"/> <!--JWTs for web access tokens"/>-->
         </menu>
         <menu ref="reports"/>
     </body>

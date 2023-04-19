@@ -65,7 +65,7 @@ import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
  */
 public class OA2CLCCommands extends CommonCommands {
     public String getPrompt() {
-         return "client>";
+         return "clc>";
      }
 
     public OA2ClientEnvironment getCe() {

@@ -4,8 +4,7 @@
 # local installs of these tools, so I have the latest version after each build
 
 QDL_LOCAL_INSTALL=/home/ncsa/apps/qdl
-OA2_LOCAL_INSTALL=/home/ncsa/apps/oa2
-OA2_LOCAL_INSTALL=/home/ncsa/apps/oa2
+OA2_LOCAL_INSTALL=/home/ncsa/apps/oa4mp
 
 export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
 DEPLOY_ROOT=/home/ncsa/dev/temp-deploy
@@ -37,8 +36,8 @@ mvn -P client package
 mvn -P jwt package
 cd $OA2_TOOLS/target
 
-cp oa2-cli-jar-with-dependencies.jar $OA4MP_SERVER_DEPLOY/oa2-cli.jar
-cp oa2-client-jar-with-dependencies.jar $OA4MP_SERVER_DEPLOY/oa2-client.jar
+cp cli-jar-with-dependencies.jar $OA4MP_SERVER_DEPLOY/cli.jar
+cp clc-jar-with-dependencies.jar $OA4MP_SERVER_DEPLOY/clc.jar
 cp jwt-jar-with-dependencies.jar $OA4MP_SERVER_DEPLOY/jwt.jar
 
 cd $OA2_TOOLS/src/main/resources
@@ -50,7 +49,6 @@ cp * $OA4MP_SERVER_DEPLOY
 cd $OA4MP_ROOT/qdl
 mvn -P qdl package
 mv target/oa2-qdl-jar-with-dependencies.jar target/qdl.jar
-#/home/ncsa/dev/ncsa-git/qdl/language/src/main/scripts/create_installer.sh /home/ncsa/dev/ncsa-git/oa4mp/oa4mp-qdl /home/ncsa/dev/temp-deploy/oa2-qdl oa2-qdl-installer.jar
 /home/ncsa/dev/ncsa-git/qdl/language/src/main/scripts/create_installer.sh $OA4MP_ROOT/qdl $DEPLOY_ROOT/oa2-qdl oa2-qdl-installer.jar
 
 
@@ -63,10 +61,10 @@ cp /home/ncsa/dev/temp-deploy/oa2-qdl/lib/build-info.txt $QDL_LOCAL_INSTALL/lib
 cd $OA4MP_SERVER_DEPLOY
 
 # OA2 client and cli deploy to local system
-cp oa2-cli.jar $OA2_LOCAL_INSTALL/lib
-cp oa2-client.jar $OA2_LOCAL_INSTALL/lib
+cp cli.jar $OA2_LOCAL_INSTALL/lib
+cp clc.jar $OA2_LOCAL_INSTALL/lib
 
 # Set up local install of cli and client.
 
-cp $OA4MP_SERVER_DEPLOY/oa2-cli.jar $OA2_LOCAL_INSTALL/lib
-cp $OA4MP_SERVER_DEPLOY/oa2-client.jar $OA2_LOCAL_INSTALL/lib
+cp $OA4MP_SERVER_DEPLOY/cli.jar $OA2_LOCAL_INSTALL/lib
+cp $OA4MP_SERVER_DEPLOY/clc.jar $OA2_LOCAL_INSTALL/lib

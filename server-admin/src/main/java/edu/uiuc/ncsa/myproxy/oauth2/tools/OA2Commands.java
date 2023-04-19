@@ -45,7 +45,7 @@ public class OA2Commands extends BaseCommands {
 
     @Override
     public String getPrompt() {
-        return "oa2>";
+        return "oa4mp>";
     }
 
     @Override
@@ -54,7 +54,7 @@ public class OA2Commands extends BaseCommands {
     }
 
     @Override
-    public void print_help(InputLine inputLine) throws Exception {
+    public void print_help() throws Exception {
         say("Need to write help");
     }
 
@@ -86,33 +86,52 @@ public class OA2Commands extends BaseCommands {
         say("you specify the component as use + name. Supported components are");
         say(CLIENTS + " - edit client records");
         say(CLIENT_APPROVALS + " - edit client approval records");
-    //    say(COPY + " - copy an entire store.");
-    //    say(KEYS + " - create a set of signing keys.");
         say(PERMISSIONS + " - basic permission management.");
         say(ADMINS + " - create or manage administrative clients.");
-    //    say(PARSER_COMMAND + " - write/debug scripts from the command line.");
         say(TOKENS + " - manage tokens created in the token exchange endpoint");
         say(VIRTUAL_ORGANIZATION + " - manage virtual organizations");
-//        say(JSON + " - enter JSON snippets to be used by the system in client configurations.\n");
         say("e.g.\n\nuse " + CLIENTS + "\n\nwill call up the client management component.");
         say("Type 'exit' or /q when you wish to exit the component and return to the main menu");
         say(" --> and /h prints your command history, /r runs the last command");
 
     }
+    public static String BANNER ="                                                              \n" +
+                    "  .g8\"\"8q.      db                 `7MMM.     ,MMF'`7MM\"\"\"Mq. \n" +
+                    ".dP'    `YM.   ;MM:                  MMMb    dPMM    MM   `MM.\n" +
+                    "dM'      `MM  ,V^MM.         ,AM     M YM   ,M MM    MM   ,M9 \n" +
+                    "MM        MM ,M  `MM        AVMM     M  Mb  M' MM    MMmmdM9  \n" +
+                    "MM.      ,MP AbmmmqMA     ,W' MM     M  YM.P'  MM    MM       \n" +
+                    "`Mb.    ,dP'A'     VML  ,W'   MM     M  `YM'   MM    MM       \n" +
+                    "  `\"bmmd\"'.AMA.   .AMMA.AmmmmmMMmm .JML. `'  .JMML..JMML.     \n" +
+                    "                              MM                              \n" +
+                    "                              MM                             ";
 
+    public static String BANNER2=
+            "___________________________________________________\n"+
+            "___oooo_______ooo_________ooo_ooo_____ooo_ooooooo__\n" +
+            "_oo____oo___oo___oo_____oo_oo_oooo___oooo_oo____oo_\n" +
+            "oo______oo_oo_____oo__oo___oo_oo_oo_oo_oo_oo____oo_\n" +
+            "oo______oo_ooooooooo_oooooooo_oo__ooo__oo_oooooo___\n" +
+            "_oo____oo__oo_____oo_______oo_oo_______oo_oo_______\n" +
+            "___oooo____oo_____oo_______oo_oo_______oo_oo_______\n" +
+            "___________________________________________________\n";
     @Override
     public void about() {
+        about(true, true);
+    }
+    public void about(boolean showBanner, boolean showHeader) {
         int width = 60;
         String stars = StringUtils.rightPad("", width + 1, "*");
-        say(stars);
-        say(padLineWithBlanks("* OA4MP2 OAuth 2/OIDC CLI (Command Line Interpreter)", width) + "*");
-        say(padLineWithBlanks("* Version " + LoggingConfigLoader.VERSION_NUMBER, width) + "*");
-        say(padLineWithBlanks("* By Jeff Gaynor  NCSA", width) + "*");
-        say(padLineWithBlanks("*  (National Center for Supercomputing Applications)", width) + "*");
-        say(padLineWithBlanks("*", width) + "*");
-        say(padLineWithBlanks("* type 'help' for a list of commands", width) + "*");
-        say(padLineWithBlanks("*      'exit' or 'quit' to end this session.", width) + "*");
-        say(stars);
+        if(showBanner){say(BANNER);}
+        if(showHeader) {
+            say(stars);
+            say(padLineWithBlanks("* OA4MP CLI (Command Line Interpreter)", width) + "*");
+            say(padLineWithBlanks("* Version " + LoggingConfigLoader.VERSION_NUMBER, width) + "*");
+            say(padLineWithBlanks("* By Jeff Gaynor  NCSA", width) + "*");
+            say(padLineWithBlanks("* type 'help' for a list of commands", width) + "*");
+            say(padLineWithBlanks("*      'exit', 'quit' or '/q' to end this session.", width) + "*");
+            say(stars);
+        }
     }
 
     OA2ClientCommands oa2ClientCommands = null;

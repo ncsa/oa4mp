@@ -36,7 +36,7 @@ say(to_string('*** user_info dir = ' + to_string(dir('vfs#/scripts/'))));
    ╚══════════════════════════════════════════════════════════════════════════════╝
 
 */
-cfg.file_path := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-admin-oauth2/src/main/resources/qdl/ui-test/ui-test.json';
+cfg.file_path := '/home/ncsa/dev/ncsa-git/oa4mp/server-admin/src/main/resources/qdl/ui-test/ui-test.json';
 cfg.'claim_key' := 'eppn'; 
 claims.'eppn' := 'jgaynor@foo.bar'; // set it for testing later. Use GitHub for IDP so this can be set here.
 say('claims.eppn set');

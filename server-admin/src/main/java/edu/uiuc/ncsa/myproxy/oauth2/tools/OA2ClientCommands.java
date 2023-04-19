@@ -65,8 +65,8 @@ public class OA2ClientCommands extends ClientStoreCommands {
     Collection<String> supportedScopes = null;
 
     @Override
-    public void print_help(InputLine inputLine) throws Exception {
-        super.print_help(inputLine);
+    public void print_help() throws Exception {
+        super.print_help();
         say("-- Client specific commands:");
         sayi("cb = manage the callbacks directly");
     }

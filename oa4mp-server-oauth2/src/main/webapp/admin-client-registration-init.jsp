@@ -3,7 +3,7 @@
 
 <html>
 <head>
-    <title>MyProxy Delegation Administrative Client Registration Page</title>
+    <title>OA4MP Administrative Client Registration Page</title>
 </head>
 <body>
 <form action="${actionToTake}" method="post">

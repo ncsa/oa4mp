@@ -1,6 +1,6 @@
    ------
    Title
-   OAuth for MyProxy
+   OA4MP - OAuth for Many People
    ------
    Author
    Jim Basney, Jeff Gaynor
@@ -25,23 +25,20 @@ Downloads
 
 Documentation
 
-    *{{{./server/index.html}Server}}
+    *{{{./server/index.html}Server}} Documentation for the server.
 
-    *{{{./client/index.html}Client}}
+    *{{{./client/index.html}Client}} Documentation for the client.
 
-    *{{{https://docs.google.com/a/cilogon.org/document/d/1cs3peO9FxA81KN-1RC6Z-auEFIwRbJpZ-SFuKbQzS50/edit?usp=sharing} OIDC Protocol Specification}}
 
-    *{{{./server/manuals/install-walkthrough.html}Server Installation Walk-Through}}
+OA4MP Extensions to {{{https://qdl-lang.org/}QDL}}
 
-OA4MP Extensions to {{{http://ncsa.github.io/qdl/}QDL}}
+    *{{{./pdf/creating_claim_sources2.pdf}Creating claims in server scripting.}}
 
-    *{{{./docs/pdf/qdl_server_scripts.pdf}Introduction to writing server-side scripts with QDL}}
+    *{{{./pdf/claim_source_examples.pdf}Examples for creating claim sources.}}
 
-    *{{{./docs/pdf/creating_claim_sources2.pdf}Creating claims in server scripting.}}
+    *{{{./pdf/token_handler_configuration.pdf}Configuring token handlers.}}
 
-    *{{{./docs/pdf/claim_source_examples.pdf}Examples for creating claim sources.}}
-
-    *{{{./docs/pdf/token_handler_configuration.pdf}Configuring token handlers.}}
+    *{{{./pdf/qdl_oa4mp_store_access.pdf}Accessing OA4MP stores via QDL.}}
 
 Related Resources
 
@@ -50,7 +47,9 @@ Related Resources
 
      * {{{http://grid.ncsa.illinois.edu/myproxy}MyProxy}}
 
-     * {{{https://ncsa.github.io/security-lib}NCSA's secutiry libraries}}
+     * {{{https://ncsa.github.io/security-lib}NCSA's securitry libraries}}
+
+     *{{{https://ncsa.github.io/crypto-java8/}NCSA Java 8 Cryptographic Library}}
 
      * {{{http://grid.ncsa.illinois.edu/myproxy/pam.html#limitations}PAM Authentication issues with MyProxy. Read this if your MyProxy authentication suddenly quits working}}
 

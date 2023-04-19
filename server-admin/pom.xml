@@ -97,7 +97,7 @@
                             <descriptorRefs>
                                 <descriptorRef>jar-with-dependencies</descriptorRef>
                             </descriptorRefs>
-                            <finalName>oa2-cli</finalName>
+                            <finalName>cli</finalName>
 
                         </configuration>
                         <executions>
@@ -133,7 +133,7 @@
                             <descriptorRefs>
                                 <descriptorRef>jar-with-dependencies</descriptorRef>
                             </descriptorRefs>
-                            <finalName>oa2-client</finalName>
+                            <finalName>clc</finalName>
                         </configuration>
                         <executions>
                             <execution>

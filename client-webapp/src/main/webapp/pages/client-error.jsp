@@ -8,19 +8,31 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
-<head><title>Simple client error page</title></head>
+<link rel="stylesheet" type="text/css" media="all"
+      href="static/oa4mp.css"/>
+<head><title>OA4MP Sample Client Error Page</title></head>
 <body>
-<H2>There was a problem getting the cert.</H2>
+<body>
+<div id="topimgfill">
+    <div id="topimg"/>
+</div>
 
-Check the server logs...
+<br clear="all"/>
 
-<form name="input" action="${action}" method="get"/>
-<input type="submit" value="Return to client"/>
-</form>
+<div class="main">
+
+    <H2>There was a problem getting the cert.</H2>
+
+    Check the server logs...
+
+    <form name="input" action="${action}" method="get"/>
+    <input type="submit" value="Return to client"/>
+    </form>
 
 
-<br><br> The message received was: <br>
-<pre>${message}</pre>
-<br><br>Underlying cause:${cause}
+    <br><br> The message received was: <br>
+    <pre>${message}</pre>
+    <br><br>Underlying cause:${cause}
+</div>
 </body>
 </html>
