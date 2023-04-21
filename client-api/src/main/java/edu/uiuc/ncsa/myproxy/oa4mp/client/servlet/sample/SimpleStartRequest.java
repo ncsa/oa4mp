@@ -57,6 +57,8 @@ public class SimpleStartRequest extends ClientServlet {
 
             return;
         }
+        logOK( request); // CIL-1722
+
         response.sendRedirect(gtwResp.getRedirect().toString());
     }
 

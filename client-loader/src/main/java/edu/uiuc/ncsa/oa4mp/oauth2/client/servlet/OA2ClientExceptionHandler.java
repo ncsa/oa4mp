@@ -6,6 +6,8 @@ import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2RedirectableError;
+import edu.uiuc.ncsa.security.servlet.AbstractServlet;
+import edu.uiuc.ncsa.security.servlet.ExceptionHandlerThingie;
 import edu.uiuc.ncsa.security.servlet.JSPUtil;
 import edu.uiuc.ncsa.security.servlet.ServiceClientHTTPException;
 
@@ -28,8 +30,16 @@ public class OA2ClientExceptionHandler extends ClientExceptionHandler {
     }
 
     @Override
-    public void handleException(Throwable t, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    public void handleException(ExceptionHandlerThingie xh) throws IOException, ServletException {
+        Throwable t = xh.throwable;
+        HttpServletRequest request = xh.request;
+        HttpServletResponse response = xh.response;
         int status = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+        if(getLogger()!=null){
+            String message = "error(" + AbstractServlet.getRequestIPAddress(request) + "):\"" + t.getMessage() + "\"";
+                getLogger().warn(message);
+        }
+
         if (t instanceof OA2RedirectableError) {
             getLogger().info("get a standard error with a redirect");
             OA2RedirectableError oa2RedirectableError = (OA2RedirectableError) t;

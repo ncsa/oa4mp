@@ -1,2 +1,5 @@
 say('seq 1');
+say('debug level =' + debug());
+debug(1,'This should not print');
+debug(3,'seq 1 debug test ok');
 claims.'seq1' := args().0.'isMemberOf'; // returns 'is_member_of'

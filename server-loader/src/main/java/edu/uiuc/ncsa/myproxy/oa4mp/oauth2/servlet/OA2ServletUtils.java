@@ -75,7 +75,8 @@ public class OA2ServletUtils {
             atException = new OA2ATException(OA2Errors.INVALID_REQUEST,
                     message,
                     HttpStatus.SC_BAD_REQUEST,
-                    transaction.getRequestState());
+                    transaction.getRequestState(),
+                    transaction.getClient());
         }
         if (exception instanceof AssertionException) {
             // they passed a bad argument to a QDL script
@@ -83,7 +84,8 @@ public class OA2ServletUtils {
             atException = new OA2ATException(OA2Errors.INVALID_REQUEST,
                     message,
                     HttpStatus.SC_BAD_REQUEST,
-                    transaction.getRequestState());
+                    transaction.getRequestState(),
+                    transaction.getClient());
         }
 
         if (exception instanceof ScriptRuntimeException) {
@@ -94,9 +96,18 @@ public class OA2ServletUtils {
             message = "script runtime exception: \"" + sre.getMessage() + "\"";
             // message in the exception should be exactly what the script threw, but we add a note about its origin.
             if (sre.getErrorURI() == null) {
-                atException = new OA2ATException(sre.getRequestedType(), sre.getMessage(), sre.getHttpStatus(), transaction.getRequestState());
+                atException = new OA2ATException(sre.getRequestedType(),
+                        sre.getMessage(),
+                        sre.getHttpStatus(),
+                        transaction.getRequestState(),
+                        transaction.getClient());
             } else {
-                atException = new OA2ATException(sre.getRequestedType(), sre.getMessage(), sre.getHttpStatus(), sre.getErrorURI(), transaction.getRequestState());
+                atException = new OA2ATException(sre.getRequestedType(),
+                        sre.getMessage(),
+                        sre.getHttpStatus(),
+                        sre.getErrorURI(),
+                        transaction.getRequestState(),
+                        transaction.getClient());
             }
         }
         if(exception instanceof ParsingException){
@@ -120,7 +131,8 @@ public class OA2ServletUtils {
             message = "illegal access exception \"" + exception.getMessage() + "\"";
             atException = new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
                     "access denied",
-                    transaction.getRequestState());
+                    transaction.getRequestState(),
+                    transaction.getClient());
         }
         // Everything else.
         if (atException == null) {
@@ -129,7 +141,8 @@ public class OA2ServletUtils {
             atException = new OA2ATException(OA2Errors.INVALID_REQUEST,
                     message,
                     HttpStatus.SC_BAD_REQUEST,
-                    transaction.getRequestState());
+                    transaction.getRequestState(),
+                    transaction.getClient());
 
         }
 

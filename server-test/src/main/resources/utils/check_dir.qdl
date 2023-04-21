@@ -1,0 +1,31 @@
+#! /usr/bin/env -S qdl-run
+
+/*
+   A file to check a directory and its sub-directories for syntax errors.
+   When to run: After a QDL lexer/parser change against the release scripts
+   Why to run: It is possible that changes may break parsing. Always checks
+*/
+root_dir := args().0; // Where to start
+root_dir := root_dir + ('.*/'=~root_dir?'':'/');
+ dirs(x.)->'.*/'=~x.⌆x.; // gets all the files in a list that are directories
+files(x.)->(!'.*/'=~x.)⌆x.; // gets all the files in a list that are not directories
+
+all_files. := dir(root_dir);
+dir_list. := dirs(all_files.);
+file_list. := files(all_files.);
+debug(1);
+debug(1,'starting to process ' + root_dir);
+while[f ∈ file_list.]
+  do[
+     current_file := root_dir + f;
+     if['.*\\.qdl'=~ current_file]
+      then[
+        try[check_syntax(file_read(root_dir+f));]
+        catch[say('error in \'' + current_file + '\':' + error_message);];
+      ];
+  ]; //end while
+// Run against all the dirs.
+while[d∈dir_list.]
+   do[
+       script_run('./check_dir.qdl', root_dir + d);
+     ]; //end while

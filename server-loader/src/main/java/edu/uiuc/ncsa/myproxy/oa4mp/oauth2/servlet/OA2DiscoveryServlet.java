@@ -179,6 +179,7 @@ public class OA2DiscoveryServlet extends DiscoveryServlet {
         printWriter.write(out);
         printWriter.close();
         printWriter.flush();
+        logOK(httpServletRequest); //CIL-1722
     }
 
     public static String getIssuer(HttpServletRequest request) {

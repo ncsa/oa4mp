@@ -21,6 +21,7 @@ import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.ScriptRuntimeException;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.UII2;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.UIIRequest2;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.UIIResponse2;
+import edu.uiuc.ncsa.security.servlet.AbstractServlet;
 import net.sf.json.JSONObject;
 import org.apache.http.HttpStatus;
 
@@ -104,15 +105,21 @@ public class UserInfoServlet extends BearerTokenServlet {
             jwtRunner.doUserInfo();
         } catch (AssertionException assertionError) {
             debugger.trace(this, "assertion exception \"" + assertionError.getMessage() + "\"");
-            throw new OA2ATException(OA2Errors.INVALID_REQUEST, assertionError.getMessage(), HttpStatus.SC_BAD_REQUEST, transaction.getRequestState());
+            throw new OA2ATException(OA2Errors.INVALID_REQUEST,
+                    assertionError.getMessage(),
+                    HttpStatus.SC_BAD_REQUEST,
+                    transaction.getRequestState(),
+                    transaction.getClient());
         } catch (ScriptRuntimeException sre) {
             // Client threw an exception.
             debugger.trace(this, "script runtime exception \"" + sre.getMessage() + "\"");
-            throw new OA2ATException(sre.getRequestedType(), sre.getMessage(), sre.getHttpStatus(), transaction.getRequestState());
+            throw new OA2ATException(sre.getRequestedType(), sre.getMessage(), sre.getHttpStatus(), transaction.getRequestState(),
+                    transaction.getClient());
         } catch (IllegalAccessException iax) {
             throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
                     "access denied",
-                    transaction.getRequestState());
+                    transaction.getRequestState(),
+                    transaction.getClient());
         } catch (Throwable throwable) {
             debugger.trace(this, "Unable to update claims on token refresh", throwable);
             debugger.warn(this, "Unable to update claims on token refresh: \"" + throwable.getMessage() + "\"");
@@ -131,6 +138,8 @@ public class UserInfoServlet extends BearerTokenServlet {
         getTransactionStore().save(transaction);
         uiresp.getUserInfo().getMap().putAll(stripClaims(transaction.getUserMetaData()));
         uiresp.write(response);
+        info(getClass().getSimpleName() + ":request ok(" + AbstractServlet.getRequestIPAddress(request) + ")");
+
     }
 
     /**

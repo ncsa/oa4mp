@@ -218,6 +218,7 @@ public abstract class AbstractRegistrationServlet extends MyProxyDelegationServl
 
 
             request.setAttribute("retryMessage", r.getMessage());
+            logOK(request); //CIL-1722
 
             JSPUtil.fwd(request, response, getInitPage());
         } catch (Throwable t) {

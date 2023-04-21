@@ -106,7 +106,7 @@ public abstract class MultiAuthServlet extends MyProxyDelegationServlet {
                 adminClient =  getAdminClient(paramID);
             } else {
                 if (!paramID.equals(headerID)) {
-                    throw new OA2ATException(OA2Errors.INVALID_REQUEST, "too many client identifiers");
+                    throw new OA2ATException(OA2Errors.INVALID_REQUEST, "too many client identifiers", adminClient);
                 }
                 adminClient =  getAdminClient(headerID); // doesn't matter which id we use since they are equal.
             }

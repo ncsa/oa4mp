@@ -271,7 +271,7 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
                         "invalid scope: no open id scope",
                         HttpStatus.SC_UNAUTHORIZED,
                         t.getRequestState(),
-                        t.getCallback());
+                        t.getCallback(),t.getClient());
 
             }
             if(t.getOA2Client().getScopes().contains(OA2Scopes.SCOPE_OPENID) && !t.getScopes().contains(OA2Scopes.SCOPE_OPENID)){
@@ -279,7 +279,7 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
                         "invalid scope: no open id scope",
                         HttpStatus.SC_UNAUTHORIZED,
                         t.getRequestState(),
-                        t.getCallback());
+                        t.getCallback(),t.getClient());
 
             }
 

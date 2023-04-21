@@ -21,7 +21,7 @@
          robot_caput := 'igwn.robot:'; // marker in scopes for robots
   access_token.'ver' := 'scitoken:2.0';
 
- SS('IGWN', script_args() =' + to_string(script_args(-1)));
+ SS('IGWN', script_args()  + '=' + to_string(script_args(-1)));
  // is_igwn := script_args()==1?script_args(0)=='igwn':false;
  SS('IGWN','is_igwn=='+ is_igwn);
 

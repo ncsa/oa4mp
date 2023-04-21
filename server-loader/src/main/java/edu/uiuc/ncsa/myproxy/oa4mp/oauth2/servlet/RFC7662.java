@@ -3,13 +3,13 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
-import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2GeneralError;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.RFC8693Constants;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims;
+import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import net.sf.json.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
@@ -72,6 +72,8 @@ public class RFC7662 extends TokenManagerServlet {
             debugger.trace(this, "token is " + (jsonObject.getBoolean(ACTIVE)?"":"not") + " active");
 
             writeOK(resp, jsonObject);
+            logOK(req); //CIL-1722
+
             return;
         }
 
@@ -80,9 +82,7 @@ public class RFC7662 extends TokenManagerServlet {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put(ACTIVE, false);
         writeOK(resp, jsonObject);
-        return;
-
-
+        logOK(req); //CIL-1722
     }
 
     /**

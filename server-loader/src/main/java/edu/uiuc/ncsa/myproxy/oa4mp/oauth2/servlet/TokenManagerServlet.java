@@ -105,7 +105,7 @@ public abstract class TokenManagerServlet extends BearerTokenServlet implements 
             throw new OA2GeneralError(OA2Errors.UNAUTHORIZED_CLIENT,
                     "Unauthorized client",
                     HttpStatus.SC_UNAUTHORIZED,
-                    null);
+                    null, client);// This compares the requsting client and the stored to see if they match
         }
         debugger.trace(this, "introspection endpoint basic auth ok.");
         return state;

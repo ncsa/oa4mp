@@ -1,5 +1,7 @@
 package edu.uiuc.ncsa.oa4mp.delegation.oa2;
 
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.BaseClient;
+
 import java.net.URI;
 
 /**
@@ -32,6 +34,14 @@ public class OA2RedirectableError extends OA2GeneralError {
         this.callback = callback;
     }
 
+    public OA2RedirectableError(String error,
+                                   String description,
+                                   int httpStatus,
+                                   String state,
+                                   URI callback,
+                                BaseClient client) {
+           this(error, description, httpStatus, state, callback);
+       }
 
     public OA2RedirectableError(String error, String description, int httpStatus, String state) {
         super("error: "+error+" (description: "+description+")");
@@ -39,6 +49,12 @@ public class OA2RedirectableError extends OA2GeneralError {
         this.description = description;
         this.state = state;
         this.httpStatus = httpStatus;
+    }
+
+    public OA2RedirectableError(String error, String description, int httpStatus, String state, BaseClient client) {
+        this(error,description,httpStatus,state);
+        this.client=client;
+
     }
 
 

@@ -53,6 +53,8 @@ public class RFC7009 extends TokenManagerServlet {
             // if the token does not exist, return an OK == whatever it was they sent is
             // revoked.
             resp.setStatus(HttpStatus.SC_OK);
+            logOK(req); // CIL-1722
+
             return;
         }
 
@@ -88,8 +90,8 @@ public class RFC7009 extends TokenManagerServlet {
         }
         oa2SE.getTransactionStore().save(state.transaction);
         resp.setStatus(HttpStatus.SC_OK);
-        return;
-    }
+        logOK(req); //CIL-1722
+        }
 
 
     protected boolean checkToken(OA2Client requestingClient, String token) {
@@ -102,7 +104,7 @@ public class RFC7009 extends TokenManagerServlet {
                 throw new OA2GeneralError(OA2Errors.UNAUTHORIZED_CLIENT,
                         "Unauthorized client",
                         HttpStatus.SC_UNAUTHORIZED,
-                        null);
+                        null, requestingClient);
             }
             oa2SE.getTransactionStore().remove(t.getIdentifier());
             return true;

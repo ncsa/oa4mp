@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.oa4mp.delegation.oa2;
 
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.BaseClient;
 import org.apache.http.HttpStatus;
 
 import java.net.URI;
@@ -29,7 +30,11 @@ public class OA2ATException extends OA2GeneralError {
      * @param description
      */
     public OA2ATException(String error, String description) {
-        this(error,description,null);
+        this(error,description,(String)null);
+    }
+    public OA2ATException(String error, String description, BaseClient client) {
+        this(error, description);
+        this.client = client;
     }
 
     /**
@@ -42,6 +47,9 @@ public class OA2ATException extends OA2GeneralError {
     public OA2ATException(String error, String description,  String state) {
         super(error, description, HttpStatus.SC_BAD_REQUEST, state);
     }
+    public OA2ATException(String error, String description,  String state, BaseClient client) {
+        super(error, description, HttpStatus.SC_BAD_REQUEST, state, client);
+    }
 
     /**
      * Most general exception if something more exotic than error + description + bad request is needed.
@@ -53,10 +61,19 @@ public class OA2ATException extends OA2GeneralError {
     public OA2ATException(String error, String description, int httpStatus, String state) {
         super(error, description, httpStatus, state);
     }
+    public OA2ATException(String error, String description, int httpStatus, String state, BaseClient client) {
+       this(error, description, httpStatus, state);
+       this.client = client;
+    }
+
     public OA2ATException(String error, String description, int httpStatus, URI errorURI, String state) {
          super(error, description, httpStatus, state);
          this.errorURI = errorURI;
      }
+    public OA2ATException(String error, String description, int httpStatus, URI errorURI, String state, BaseClient client) {
+       this(error, description, httpStatus, errorURI, state);
+       this.client = client;
+    }
 
     @Override
     public String toString() {
@@ -66,6 +83,7 @@ public class OA2ATException extends OA2GeneralError {
                 ", description='" + description + '\'' +
                 ", errorURI='" + errorURI + "\'" +
                 ", state='" + state + '\'' +
+                ", client='" + (hasClient()?"(none)":getClient().getIdentifierString()) + '\'' +
                 '}';
     }
 

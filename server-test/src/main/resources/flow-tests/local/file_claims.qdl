@@ -30,11 +30,11 @@
 
 */
 
-path := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests';
+path := '/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests';
 if[path∉script_path()][script_path(path ~ script_path());];
 
-original_file := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-admin-oauth2/src/main/resources/qdl/ui-test/test-claims.json';
-claims_file := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-admin-oauth2/src/main/resources/qdl/ui-test/ui-test.json';
+original_file := '/home/ncsa/dev/ncsa-git/oa4mp/server-admin/src/main/resources/qdl/ui-test/test-claims.json';
+claims_file := '/home/ncsa/dev/ncsa-git/oa4mp/server-admin/src/main/resources/qdl/ui-test/ui-test.json';
 file_write(claims_file, file_read(original_file)); // initialize it
 
 cfg.'id'  := 'localhost:test/user_info'; // name of the configuration, not the id

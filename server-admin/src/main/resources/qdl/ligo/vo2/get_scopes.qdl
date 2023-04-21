@@ -23,7 +23,7 @@
              kagra_cfg.groups. := ['isMemberOf'];
   kagra_cfg.search_attributes. := ['isMemberOf'];
          kagra_cfg.'auth_type' := 'none';
-     kagra_cfg.'fail_on_error' := true;';
+     kagra_cfg.'fail_on_error' := true;
                kagra_response. := get_claims(create_source(kagra_cfg.), user);
             γ. :=  is_defined(kagra_response.'isMemberOf')?kagra_response.'isMemberOf':[];
              say('kagra_response.==' + kagra_response.);

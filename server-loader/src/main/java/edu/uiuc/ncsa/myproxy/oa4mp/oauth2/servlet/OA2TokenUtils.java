@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransac
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo.VirtualOrganization;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.ClientDebugUtil;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.BaseClient;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AccessTokenImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.RefreshTokenImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenUtils;
@@ -81,7 +82,7 @@ public class OA2TokenUtils {
             throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
                     "invalid access token",
                     HttpStatus.SC_BAD_REQUEST,
-                    null);
+                    null, (debugger instanceof ClientDebugUtil?((ClientDebugUtil)debugger).getClient():null));
         }
         debugger.trace(OA2TokenUtils.class, "access token from subject token = " + accessToken);
 
@@ -109,13 +110,15 @@ public class OA2TokenUtils {
                 debugger.info(OA2TokenUtils.class, "Access token invalid: " + t.summary());
                 throw new OA2ATException(OA2Errors.INVALID_TOKEN,
                         "token invalid",
-                        t.getRequestState());
+                        t.getRequestState(),
+                        t.getClient());
             }
             if (accessToken.isExpired()) {
                 debugger.info(OA2TokenUtils.class, "Access token expired: " + t.summary());
                 throw new OA2ATException(OA2Errors.INVALID_TOKEN,
                         "token expired",
-                        t.getRequestState());
+                        t.getRequestState(),
+                        t.getClient());
             }
         }
         return accessToken;
@@ -151,7 +154,7 @@ public class OA2TokenUtils {
                     null);
         }
         debugger.trace(OA2TokenUtils.class, "refresh token from subject token = " + refreshToken);
-        OA2ServiceTransaction t;
+        OA2ServiceTransaction t=null;
         try {
             RefreshTokenStore zzz = (RefreshTokenStore) oa2SE.getTransactionStore(); // better to get a class cast exception here
             t = zzz.get(refreshToken);
@@ -162,18 +165,21 @@ public class OA2TokenUtils {
         } catch (Throwable tt) {
             // This is serious. It means that there was a problem getting the transaction vs. the transaction did not exist.
             debugger.error(OA2TokenUtils.class, "error getting refresh token:" + refreshToken.getJti() + " message:" + tt.getMessage());
-            throw new OA2ATException(OA2Errors.INVALID_GRANT, "invalid refresh token");
+            throw new OA2ATException(OA2Errors.INVALID_GRANT, "invalid refresh token", (t== null?(BaseClient)null:t.getClient()));
         }
         if (t == null) {
+            BaseClient ccc = null;
             if (debugger instanceof ClientDebugUtil) {
+
                 // CIL-1088. Don't fill up log with error message, print out small error message
                 // when no transaction found with any client id. This lets us
                 // track down malfunctioning clients and inform their owners.
                 ClientDebugUtil clientDebugUtil = (ClientDebugUtil) debugger;
+                ccc = clientDebugUtil.getClient();
                 oa2SE.getMyLogger().info("client " + clientDebugUtil.getClient().getIdentifierString() + ",  transaction not found for \"" + refreshToken + "\"");
             }
             debugger.trace(OA2TokenUtils.class, "Transaction not found for \"" + refreshToken.getJti() + "\"");
-            throw new OA2ATException(OA2Errors.INVALID_GRANT, "invalid refresh token");
+            throw new OA2ATException(OA2Errors.INVALID_GRANT, "invalid refresh token",ccc==null?(BaseClient)null:ccc);
 
         } else {
             // Must present a valid token to get one.
@@ -183,7 +189,8 @@ public class OA2TokenUtils {
 
                 throw new OA2ATException(OA2Errors.INVALID_GRANT,
                         "invalid refresh token",
-                        t.getRequestState());
+                        t.getRequestState(),
+                        t.getClient());
             }
             // we wait until here to check if it is expired, since we want to return the correct
             // type of error with the state of the transaction.
@@ -192,7 +199,8 @@ public class OA2TokenUtils {
                 debugger.info(OA2TokenUtils.class, "Refresh token expired: " + t.summary());
                 throw new OA2ATException(OA2Errors.INVALID_GRANT,
                         "expired refresh token",
-                        t.getRequestState());
+                        t.getRequestState(),
+                        t.getClient());
             }
         }
         return refreshToken;
@@ -234,7 +242,7 @@ public class OA2TokenUtils {
             }
             throw new OA2ATException(OA2Errors.INVALID_TOKEN,
                     "invalid token",
-                    null);
+                    (String)null);
         }
         if (txRecord.getExpiresAt() < System.currentTimeMillis()) {
             if (debugger != null) {
@@ -242,7 +250,7 @@ public class OA2TokenUtils {
             }
             throw new OA2ATException(OA2Errors.INVALID_TOKEN,
                     "token expired",
-                    null);
+                    (String)null);
         }
         return (OA2ServiceTransaction) oa2se.getTransactionStore().get(txRecord.getParentID());
     }

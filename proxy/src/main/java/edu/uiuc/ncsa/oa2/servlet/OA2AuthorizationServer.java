@@ -104,7 +104,7 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
             }
         }
         super.doIt(request, response);
-
+        logOK(request); //CIL-1722
     }
 
 

@@ -335,13 +335,14 @@ public class OA2AuthorizedServletUtil {
                         null);
             }
         }
+        OA2ServiceTransaction t = null;
+
         try {
 
             ufStore = (UsernameFindable) servlet.getTransactionStore();
             List<? extends OA2ServiceTransaction> list = ufStore.getByUsername(username);
 
             if (!list.isEmpty()) {
-                OA2ServiceTransaction t = null;
                 // Then there is a transaction, so the user authenticated successfully some place.
                 // No guarantees though that they didn't log in under another identity, so this
                 // is not the best (though it is what the spec wants which does not take into
@@ -356,7 +357,8 @@ public class OA2AuthorizedServletUtil {
                                 "Incorrect aud parameter in the ID token. This request is not supported on this server",
                                 HttpStatus.SC_BAD_REQUEST,
                                 t.getRequestState(),
-                                t.getCallback());
+                                t.getCallback(),
+                                t.getClient());
                     }
                 } else {
                     // The client that is associated with this user must be supplied.
@@ -364,7 +366,8 @@ public class OA2AuthorizedServletUtil {
                             "No aud parameter in the ID token. This request is not supported on this server",
                             HttpStatus.SC_BAD_REQUEST,
                             t.getRequestState(),
-                            t.getCallback());
+                            t.getCallback(),
+                    t.getClient());
                 }
                 httpServletResponse.setStatus(HttpStatus.SC_OK);
                 // The spec does not state that anything is returned, just a positive response.
@@ -381,7 +384,7 @@ public class OA2AuthorizedServletUtil {
         throw new OA2GeneralError(OA2Errors.LOGIN_REQUIRED,
                 "Login required.",
                 HttpStatus.SC_UNAUTHORIZED,
-                null);
+                null, t==null?null:t.getClient());
 
     }
 
@@ -454,7 +457,8 @@ public class OA2AuthorizedServletUtil {
                         "Only " + DISPLAY + "=" + DISPLAY_PAGE + " is supported",
                         HttpStatus.SC_BAD_REQUEST,
                         st.getRequestState(),
-                        st.getCallback());
+                        st.getCallback(),
+                        st.getClient());
             }
         }
 
@@ -637,13 +641,14 @@ public class OA2AuthorizedServletUtil {
                         throw new OA2GeneralError(OA2Errors.INVALID_TARGET,
                                 "Only absolute uris are allowed",
                                 HttpStatus.SC_BAD_REQUEST,
-                                t.getRequestState());
+                                t.getRequestState(),
+                                t.getClient());
                     }
                     if (!StringUtils.isTrivial(uri.getFragment())) {
                         throw new OA2GeneralError(OA2Errors.INVALID_TARGET,
                                 "Fragments are not allowed",
                                 HttpStatus.SC_BAD_REQUEST,
-                                t.getRequestState());
+                                t.getRequestState(), t.getClient());
                     }
                 } catch (Throwable throwable) {
                     // skip it
@@ -682,7 +687,8 @@ public class OA2AuthorizedServletUtil {
                 throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
                         "missing audience request",
                         HttpStatus.SC_BAD_REQUEST,
-                        t.getRequestState());
+                        t.getRequestState(),
+                        t.getClient());
             }
         }
         // One of these may be empty.

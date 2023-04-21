@@ -24,7 +24,7 @@ SS('*** LIGO get_attributes, user=' + user);
              kagra_cfg.groups. := ['isMemberOf'];
   kagra_cfg.search_attributes. := ['isMemberOf','uid'];
          kagra_cfg.'auth_type' := 'none';
-     kagra_cfg.'fail_on_error' := true;';
+     kagra_cfg.'fail_on_error' := true;
                kagra_response. := get_claims(create_source(kagra_cfg.), user);
              SS('kagra_response.==' + to_string(kagra_response., true));
             groups. :=  is_defined(kagra_response.'isMemberOf')?kagra_response.'isMemberOf':[];

@@ -4,9 +4,9 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.ManagerFacade;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.ResponseSerializer;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.EnvServlet;
+import edu.uiuc.ncsa.oa4mp.delegation.common.services.Response;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
-import edu.uiuc.ncsa.oa4mp.delegation.common.services.Response;
 import net.sf.json.JSON;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
@@ -21,6 +21,7 @@ import java.sql.SQLException;
 
 /**
  * The client management servlet.
+ * @deprecated This has been replaced by RFC 7591 and 7592 complient servlet. See {@link edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.oidc_cm.OIDCCMServlet}
  * <p>Created by Jeff Gaynor<br>
  * on 10/6/16 at  11:41 AM
  */
@@ -64,8 +65,10 @@ public class ClientServlet extends EnvServlet {
                 throw new ServletException("Error: Unsupported encoding of \"" + httpServletRequest.getContentType() + "\" for body of POST. Request rejected.");
             }
             doIt(httpServletRequest, httpServletResponse);
+            logOK(httpServletRequest); // CIL-1722
+
         } catch (Throwable t) {
-            handleException(t, httpServletRequest, httpServletResponse);
+            handleException(new OA2ExceptionHandlerThingie(t, httpServletRequest, httpServletResponse, null));
         }
     }
 
@@ -99,7 +102,7 @@ public class ClientServlet extends EnvServlet {
                 Response response = getClientManager().process((JSONObject) rawJSON);
                 getResponseSerializer().serialize(response, httpServletResponse);
         }catch(Throwable t){
-            handleException(t, httpServletRequest, httpServletResponse);
+            handleException(new OA2ExceptionHandlerThingie(t, httpServletRequest, httpServletResponse, null));
         }
     }
 

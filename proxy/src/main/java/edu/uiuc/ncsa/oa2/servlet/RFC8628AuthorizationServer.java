@@ -1,23 +1,23 @@
 package edu.uiuc.ncsa.oa2.servlet;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8628Constants2;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8628State;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RFC8628Store;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractAuthorizationServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.EnvServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.PresentationState;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.ClientDebugUtil;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2ATException;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Errors;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2GeneralError;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2ATException;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Errors;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2GeneralError;
 import edu.uiuc.ncsa.security.servlet.JSPUtil;
 import edu.uiuc.ncsa.security.servlet.PresentableState;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
@@ -157,6 +157,8 @@ public class RFC8628AuthorizationServer extends EnvServlet {
                     DebugUtil.trace(this, " starting with PS response committed #6?" + pendingState.getResponse().isCommitted());
                     processRequest(request, pendingState, true);
                  //   JSPUtil.fwd(request, response, getOkPage());
+                    logOK(request); // CIL-1722
+
                     return;
 
                 } catch (GeneralSecurityException t) {
@@ -217,7 +219,7 @@ public class RFC8628AuthorizationServer extends EnvServlet {
                                 throw t;
                             }
                             throw new OA2ATException("internal_error", t.getMessage(),
-                                    HttpStatus.SC_BAD_REQUEST, null);
+                                    HttpStatus.SC_BAD_REQUEST, trans.getRequestState(), trans.getClient());
                             
                         }
                         return;
@@ -343,10 +345,12 @@ public class RFC8628AuthorizationServer extends EnvServlet {
             throw new UnknownUserCodeException("unknown user code", userCode);
         }
         if (trans.getAuthorizationGrant().isExpired()) {
-            throw new OA2ATException(OA2Errors.INVALID_GRANT, "expired grant", HttpStatus.SC_BAD_REQUEST, null);
+            throw new OA2ATException(OA2Errors.INVALID_GRANT, "expired grant", HttpStatus.SC_BAD_REQUEST, null,
+                    trans.getClient());
         }
         if (!trans.isAuthGrantValid()) {
-            throw new OA2ATException(OA2Errors.INVALID_GRANT, "grant is invalid", HttpStatus.SC_BAD_REQUEST, null);
+            throw new OA2ATException(OA2Errors.INVALID_GRANT, "grant is invalid", HttpStatus.SC_BAD_REQUEST, null,
+                    trans.getClient());
         }
         MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(trans.getOA2Client());
         if(debugger instanceof ClientDebugUtil){
@@ -356,7 +360,8 @@ public class RFC8628AuthorizationServer extends EnvServlet {
         if (!trans.isRFC8628Request()) {
             //So there is such a grant but somehow this is not a valid rfc 8628 request. Should not happen, but if someone edited
             // the transaction itself and made a mistake, it could, in which case the state of the request itself is questionable.
-            throw new OA2ATException(OA2Errors.INVALID_REQUEST, "invalid request", HttpStatus.SC_BAD_REQUEST, null);
+            throw new OA2ATException(OA2Errors.INVALID_REQUEST, "invalid request", HttpStatus.SC_BAD_REQUEST, null,
+                    trans.getClient());
         }
         if (getServiceEnvironment().getAuthorizationServletConfig().isUseProxy()) {
             // If this is a proxy, forward the user to do the login. we have to have gotten the transaction
@@ -370,7 +375,7 @@ public class RFC8628AuthorizationServer extends EnvServlet {
                     throw t;
                 }
                 throw new OA2ATException("internal_error", t.getMessage(),
-                        HttpStatus.SC_BAD_REQUEST, null);
+                        HttpStatus.SC_BAD_REQUEST, null, trans.getClient());
 
             }
         }

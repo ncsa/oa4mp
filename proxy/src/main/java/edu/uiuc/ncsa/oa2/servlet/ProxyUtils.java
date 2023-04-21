@@ -291,7 +291,7 @@ public class ProxyUtils {
         JSONObject content = JSONObject.fromObject(serviceClientHTTPException.getContent());
         throw new OA2ATException(content.getString(OA2Constants.ERROR),
                 content.getString(OA2Constants.ERROR_DESCRIPTION),
-                serviceClientHTTPException.getStatus(), t.getRequestState());
+                serviceClientHTTPException.getStatus(), t.getRequestState(), t.getClient());
 
     }
 

@@ -13,6 +13,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.List;
 import java.util.Vector;
+import java.util.logging.Level;
 
 import static edu.uiuc.ncsa.security.util.cli.CommonCommands.BATCH_FILE_MODE_FLAG;
 import static edu.uiuc.ncsa.security.util.cli.CommonCommands.BATCH_MODE_FLAG;
@@ -156,7 +157,7 @@ public class JWKCLI extends ConfigurableCommandsImpl {
 
             String logFileName = argLine.getNextArgFor("-log");
             LoggerProvider loggerProvider = new LoggerProvider(logFileName,
-                    "JWKUtil logger", 1, 1000000, false, isVerbose, false);
+                    "JWKUtil logger", 1, 1000000, true,true, Level.INFO);
             myLoggingFacade = loggerProvider.get(); // if verbose
             argLine.removeSwitchAndValue("-log"); // This should never be passed as an argument!
         }

@@ -238,7 +238,7 @@ public class ClientUtils {
             } else {
                 throw new OA2GeneralError(OA2Errors.UNAUTHORIZED_CLIENT,
                         "missing secret",
-                        HttpStatus.SC_UNAUTHORIZED, null);
+                        HttpStatus.SC_UNAUTHORIZED, null, client);
             }
         }
         if (StringUtils.isTrivial(client.getSecret())) {
@@ -249,11 +249,11 @@ public class ClientUtils {
             // purposes gets an NPE here. Tell them when they use their client next rather
             // than blowing up with an NPE.
             if (isAT) {
-                throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT, "client has no configured secret", null);
+                throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT, "client has no configured secret", (String)null);
             } else {
                 throw new OA2GeneralError(OA2Errors.UNAUTHORIZED_CLIENT,
                         "client has no configured secret.",
-                        HttpStatus.SC_UNAUTHORIZED, null);
+                        HttpStatus.SC_UNAUTHORIZED, null, client);
             }
         }
 
@@ -261,11 +261,11 @@ public class ClientUtils {
             debugger.trace(ClientUtils.class, "verifyClientSecret: bad secret, throwing exception.");
             if (isAT) {
                 throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
-                        "incorrect secret");
+                        "incorrect secret", client);
             } else {
                 throw new OA2GeneralError(OA2Errors.UNAUTHORIZED_CLIENT,
                         "incorrect secret",
-                        HttpStatus.SC_UNAUTHORIZED, null);
+                        HttpStatus.SC_UNAUTHORIZED, null, client);
             }
         }
         debugger.trace(ClientUtils.class, "verifyClientSecret: secret ok.");
@@ -341,7 +341,7 @@ public class ClientUtils {
                             "Missing scopes parameter.",
                             HttpStatus.SC_BAD_REQUEST,
                             st.getRequestState(),
-                            st.getCallback());
+                            st.getCallback(), oa2Client);
                 }
                 return requestedScopes;
             }
@@ -355,7 +355,7 @@ public class ClientUtils {
                         "The " + OA2Scopes.SCOPE_OPENID + " scope is missing from the request.",
                         HttpStatus.SC_BAD_REQUEST,
                         st.getRequestState(),
-                        st.getCallback());
+                        st.getCallback(), oa2Client);
             }
             // only allowed scope, regardless of what is requested.
             // This also covers the case of a client made with a full set of scopes, then
@@ -382,7 +382,7 @@ public class ClientUtils {
                         "Unrecognized scope \"" + x + "\"",
                         HttpStatus.SC_BAD_REQUEST,
                         st.getRequestState(),
-                        st.getCallback());
+                        st.getCallback(), oa2Client);
             }
             if (x.equals(OA2Scopes.SCOPE_OPENID)) hasOpenIDScope = true;
             requestedScopes.add(x);
@@ -394,7 +394,7 @@ public class ClientUtils {
                         "The " + OA2Scopes.SCOPE_OPENID + " scope is missing from the request.",
                         HttpStatus.SC_BAD_REQUEST,
                         st.getRequestState(),
-                        st.getCallback());
+                        st.getCallback(), oa2Client);
         }
         st.setScopes(requestedScopes);
         if (oa2Client.useStrictScopes()) {

@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.LDAPException;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractAuthorizationServlet;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.BaseClient;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.*;
 import edu.uiuc.ncsa.oa4mp.delegation.server.ExceptionWrapper;
 import edu.uiuc.ncsa.oa4mp.delegation.server.UnapprovedClientException;
@@ -10,7 +11,9 @@ import edu.uiuc.ncsa.security.core.exceptions.MissingContentException;
 import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.servlet.AbstractServlet;
 import edu.uiuc.ncsa.security.servlet.ExceptionHandler;
+import edu.uiuc.ncsa.security.servlet.ExceptionHandlerThingie;
 import net.sf.json.JSONObject;
 import org.apache.http.HttpStatus;
 
@@ -38,8 +41,28 @@ public class OA2ExceptionHandler implements ExceptionHandler {
         this.logger = logger;
     }
 
+    protected void warn(String x){
+        if(getLogger()!=null){
+            getLogger().warn(x);
+        }else{
+            System.err.println(x); // really bad, but not a lot we can do.
+        }
+    }
     @Override
-    public void handleException(Throwable t, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    public void handleException(ExceptionHandlerThingie xh) throws IOException, ServletException {
+        Throwable t = xh.throwable;
+        HttpServletRequest request = xh.request;
+        HttpServletResponse response = xh.response;
+        BaseClient baseClient=null;
+        if(t instanceof OA2GeneralError){
+            if(((OA2GeneralError)t).hasClient()){
+                baseClient = ((OA2GeneralError)t).getClient();
+            }
+        }else{
+            if(((OA2ExceptionHandlerThingie) xh).hasClient()){
+                baseClient = ((OA2ExceptionHandlerThingie) xh).client;
+            }
+        }
    //     ServletDebugUtil.trace(this, "Error", t);
         if (t instanceof QDLExceptionWithTrace) {
             if (t.getCause() != null) {
@@ -47,7 +70,13 @@ public class OA2ExceptionHandler implements ExceptionHandler {
             }
 
         }
-
+        String message="";
+        if(baseClient!=null){
+               message = "[" + baseClient.getIdentifierString() + "]";
+        }
+        String address = AbstractServlet.getRequestIPAddress(xh.request);
+        message = message + "<" + address + "> error: " + t.getMessage();
+         warn(message); // Fixes CIL-1722
         if(t instanceof MissingContentException){
             // CIL-1582
             t = new OA2GeneralError(OA2Errors.SERVER_ERROR, t.getMessage(), HttpStatus.SC_BAD_REQUEST, null);

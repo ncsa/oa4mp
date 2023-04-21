@@ -3,6 +3,13 @@ package edu.uiuc.ncsa.oa4mp.oauth2.client.servlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.client.AssetResponse;
 import edu.uiuc.ncsa.myproxy.oa4mp.client.ClientEnvironment;
 import edu.uiuc.ncsa.myproxy.oa4mp.client.servlet.ClientServlet;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.AuthorizationGrant;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AuthorizationGrantImpl;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.*;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.client.ATResponse2;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.client.ATServer2;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.JWTUtil2;
 import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2Asset;
 import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2ClientEnvironment;
 import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2MPService;
@@ -12,19 +19,12 @@ import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.core.util.TokenUtil;
-import edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken;
-import edu.uiuc.ncsa.oa4mp.delegation.common.token.AuthorizationGrant;
-import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AuthorizationGrantImpl;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.*;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.client.ATResponse2;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.client.ATServer2;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.JWTUtil2;
 import edu.uiuc.ncsa.security.servlet.JSPUtil;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
-import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
-import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import edu.uiuc.ncsa.security.util.crypto.CertUtil;
 import edu.uiuc.ncsa.security.util.crypto.KeyUtil;
+import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
+import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import net.sf.json.JSONObject;
 import net.sf.json.util.JSONUtils;
 import org.apache.commons.codec.binary.Base64;
@@ -212,6 +212,8 @@ public class OA2ReadyServlet extends ClientServlet {
 
 
         response.setCharacterEncoding("UTF-8");
+        logOK( request); // CIL-1722
+
         JSPUtil.fwd(request, response, getCE().getSuccessPagePath());
         return;
     }

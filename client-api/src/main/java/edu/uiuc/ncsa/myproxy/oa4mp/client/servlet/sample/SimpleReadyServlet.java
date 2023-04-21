@@ -80,6 +80,8 @@ public class SimpleReadyServlet extends ClientServlet {
         }
         request.setAttribute("action", contextPath);
         info("2.a. Completely finished with delegation.");
+        logOK(request); //CIL-1722
+
         JSPUtil.fwd(request, response, getCE().getSuccessPagePath());
         return;
     }

@@ -19,14 +19,6 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionsStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.IssuerTransactionState;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.ClientDebugUtil;
-import edu.uiuc.ncsa.security.core.Identifier;
-import edu.uiuc.ncsa.security.core.exceptions.NFWException;
-import edu.uiuc.ncsa.security.core.exceptions.TransactionNotFoundException;
-import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;
-import edu.uiuc.ncsa.security.core.util.*;
-import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
-import edu.uiuc.ncsa.oa4mp.delegation.server.request.ATRequest;
-import edu.uiuc.ncsa.oa4mp.delegation.server.request.IssuerResponse;
 import edu.uiuc.ncsa.oa4mp.delegation.common.servlet.TransactionState;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.TransactionStore;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken;
@@ -38,6 +30,14 @@ import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.JWTRunner;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.JWTUtil2;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.*;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims;
+import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
+import edu.uiuc.ncsa.oa4mp.delegation.server.request.ATRequest;
+import edu.uiuc.ncsa.oa4mp.delegation.server.request.IssuerResponse;
+import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.exceptions.NFWException;
+import edu.uiuc.ncsa.security.core.exceptions.TransactionNotFoundException;
+import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;
+import edu.uiuc.ncsa.security.core.util.*;
 import edu.uiuc.ncsa.security.servlet.ServiceClientHTTPException;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
@@ -359,7 +359,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         }
 
         json.put("clients", clientArray);
-        // Look up by client id and user name(s).
+        // Look up by client id and username(s).
         // This means searching for transactions and snooping through TX records too. Only return valid
         // tokens.
         response.setContentType("application/json;charset=UTF-8");
@@ -510,7 +510,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                     debugger.trace(this, "client is not managed, any place");
                     throw new OA2GeneralError(OA2Errors.UNAUTHORIZED_CLIENT,
                             "no substitutions allowed for unmanaged clients",
-                            HttpStatus.SC_UNAUTHORIZED, null);
+                            HttpStatus.SC_UNAUTHORIZED, null, t.getClient());
                 }
                 if (1 < adminIDS.size()) {
                     // So if there is a client managed by multiple admins, we don't just switch
@@ -520,7 +520,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                     debugger.trace(this, "multiple admins for client " + client.getIdentifierString());
                     throw new OA2GeneralError(OA2Errors.UNAUTHORIZED_CLIENT,
                             "multiple administrators for a managed client is not allowed",
-                            HttpStatus.SC_UNAUTHORIZED, null);
+                            HttpStatus.SC_UNAUTHORIZED, null, t.getClient());
                 }
 
                 Permission p = pStore.getErsatzChain(adminIDS.get(0), t.getOA2Client().getIdentifier(), client.getIdentifier());
@@ -530,7 +530,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                     debugger.trace(this, "client \"" + client.getIdentifier() + "\" does not have permission to sub for \"" + t.getOA2Client().getIdentifier() + "\".");
                     throw new OA2GeneralError(OA2Errors.UNAUTHORIZED_CLIENT,
                             "client does not have permission to substitute, access denied",
-                            HttpStatus.SC_UNAUTHORIZED, null);
+                            HttpStatus.SC_UNAUTHORIZED, null, t.getClient());
 
                 }
                 // now we can clone the transaction
@@ -559,7 +559,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
 
                     throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
                             ucx.getMessage(), HttpStatus.SC_INTERNAL_SERVER_ERROR,
-                            t.getRequestState());
+                            t.getRequestState(),
+                            t.getClient());
                 }
                 t2.setProvisioningClientID(t.getOA2Client().getIdentifier()); // So we can find it later
                 t2.setProvisioningAdminID(adminIDS.get(0));
@@ -595,7 +596,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         if (t == null) {
             // Still null. Ain't one no place. Bail.
             info("No pending transactions found anywhere for client \"" + client.getIdentifierString() + "\".");
-            throw new OA2ATException(OA2Errors.INVALID_GRANT, "no pending transaction found.");
+            throw new OA2ATException(OA2Errors.INVALID_GRANT, "no pending transaction found.", client);
         }
         if (client.isErsatzClient() && !client.isReadOnly()) {
             // Gotten this far and there is an ersatz client. Read only is a good as "has been resolved"
@@ -609,7 +610,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 debugger.trace(this, "No ersatz client found");
                 throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
                         ucx.getMessage(), HttpStatus.SC_INTERNAL_SERVER_ERROR,
-                        t.getRequestState());
+                        t.getRequestState(),
+                        t.getClient());
             }
         }
 
@@ -622,7 +624,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             debugger.trace(this, "Flow denied");
             throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
                     "token exchange access denied",
-                    t.getRequestState());
+                    t.getRequestState(),
+                    t.getClient());
         }
         debugger.trace(this, "client is " + client);
         /*
@@ -893,6 +896,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             throw new OA2ATException(OA2Errors.INVALID_REQUEST, "missing grant type");
         }
         if (executeByGrant(grantType, request, response)) {
+            logOK( request); // CIL-1722
             return;
         }
         warn("Error: grant type +\"" + grantType + "\" was not recognized. Request rejected.");

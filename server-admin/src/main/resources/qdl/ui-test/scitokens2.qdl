@@ -23,5 +23,5 @@ if[
   'bgsu-astronomy:xrootd:read-frames' ∈ at_claims.'isMemberOf'
   ][
    computed_scopes. := computed_scopes.~ 'read:"/home/' + at_claims.'username';
-  ;]
+  ];
 

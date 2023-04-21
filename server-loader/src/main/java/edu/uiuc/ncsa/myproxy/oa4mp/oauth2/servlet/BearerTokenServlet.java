@@ -47,19 +47,20 @@ public abstract class BearerTokenServlet extends MyProxyDelegationServlet {
                            HttpStatus.SC_UNAUTHORIZED,
                            null);
                }
+               transaction = (OA2ServiceTransaction) getTransactionStore().get(oldTXR.getParentID());
+
                if (!oldTXR.isValid()) {
                    throw new OA2GeneralError(OA2Errors.INVALID_TOKEN,
                            "The token is not valid",
                            HttpStatus.SC_UNAUTHORIZED,
-                           null);
+                           null, transaction==null?null:transaction.getClient());
                }
                if (oldTXR.getExpiresAt() < System.currentTimeMillis()) {
                    throw new OA2GeneralError(OA2Errors.INVALID_TOKEN,
                            "The token has expired",
                            HttpStatus.SC_UNAUTHORIZED,
-                           null);
+                           null, transaction==null?null:transaction.getClient());
                }
-               transaction = (OA2ServiceTransaction) getTransactionStore().get(oldTXR.getParentID());
                state.txRecord = oldTXR;
                state.transaction = transaction;
            }else{
@@ -95,7 +96,7 @@ public abstract class BearerTokenServlet extends MyProxyDelegationServlet {
                    throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
                                                "invalid access token",
                                                HttpStatus.SC_BAD_REQUEST,
-                                               null);
+                                               null, transaction.getClient());
                }
            }
            // Check expiration after verifying it since some of the state of the transaction is returned
@@ -105,7 +106,8 @@ public abstract class BearerTokenServlet extends MyProxyDelegationServlet {
                        "expired token.",
                        HttpStatus.SC_BAD_REQUEST,
                        transaction.getRequestState(),
-                       transaction.getCallback());
+                       transaction.getCallback(),
+                       transaction.getClient());
 
            }
            

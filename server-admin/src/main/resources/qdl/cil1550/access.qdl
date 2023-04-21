@@ -19,7 +19,7 @@
              cfg.groups. := ['isMemberOf'];
   cfg.search_attributes. := ['isMemberOf'];
          cfg.'auth_type' := 'none';
-     cfg.'fail_on_error' := true;';
+     cfg.'fail_on_error' := true;
           cfg.'username' := 'uid=oa4mp_user,ou=system,o=OSG,o=CO,dc=cilogon,dc=org';
           cfg.'password' := 'T1inQ7e0iMLQf53mYGmR';
                response. := get_claims(create_source(cfg.), user);

@@ -73,7 +73,7 @@ public class OA2ClientUtils {
             throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
                     "client has not registered any callback URIs",
                     HttpStatus.SC_BAD_REQUEST,
-                    null);
+                    null, oa2Client);
         }
         for (String uri : oa2Client.getCallbackURIs()) {
             if (uri.equals(redirect)) {
@@ -89,7 +89,7 @@ public class OA2ClientUtils {
             throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
                     "The given " + OA2Constants.REDIRECT_URI + " is not valid for this client.",
                     HttpStatus.SC_BAD_REQUEST,
-                    null);
+                    null, oa2Client);
         }
     }
 

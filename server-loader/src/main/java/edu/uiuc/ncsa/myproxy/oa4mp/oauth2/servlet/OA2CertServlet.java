@@ -172,21 +172,21 @@ public class OA2CertServlet extends ACS2 {
             throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
                     "public clients not supported for this operation",
                     HttpStatus.SC_BAD_REQUEST,
-                    null
+                    null, client
             );
         }
         if (rawSecret == null) {
             throw new OA2GeneralError(OA2Errors.UNAUTHORIZED_CLIENT,
                     "no secret, request refused.",
                     HttpStatus.SC_UNAUTHORIZED,
-                    null
+                    null, client
             );
         }
         if (!client.getSecret().equals(DigestUtils.sha1Hex(rawSecret))) {
             throw new OA2GeneralError(OA2Errors.UNAUTHORIZED_CLIENT,
                     "incorrect secret, request refused.",
                     HttpStatus.SC_UNAUTHORIZED,
-                    null
+                    null, client
             );
         }
         return client;
@@ -209,7 +209,8 @@ public class OA2CertServlet extends ACS2 {
             throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
                     "Certificate request is not in scope.",
                     HttpStatus.SC_BAD_REQUEST,
-                    t.getRequestState());
+                    t.getRequestState(),
+                    t.getClient());
         }
 
 
@@ -217,7 +218,8 @@ public class OA2CertServlet extends ACS2 {
             throw new OA2GeneralError(OA2Errors.INVALID_TOKEN,
                     "invalid token",
                     HttpStatus.SC_BAD_REQUEST,
-                    t.getRequestState()
+                    t.getRequestState(),
+                    t.getClient()
             );
 
         }
@@ -230,7 +232,7 @@ public class OA2CertServlet extends ACS2 {
             throw new OA2GeneralError(OA2Errors.INVALID_TOKEN,
                     "expired token",
                     HttpStatus.SC_BAD_REQUEST,
-                    t.getRequestState()
+                    t.getRequestState(), t.getClient()
             );
 
         }
@@ -258,7 +260,7 @@ public class OA2CertServlet extends ACS2 {
             throw new OA2GeneralError(OA2Errors.ACCESS_DENIED,
                     "access denied",
                     HttpStatus.SC_UNAUTHORIZED,
-                    st.getRequestState());
+                    st.getRequestState(), st.getClient());
         }
         OA2SE oa2SE = (OA2SE) getServiceEnvironment();
         if (!oa2SE.isTwoFactorSupportEnabled()) {
@@ -271,7 +273,7 @@ public class OA2CertServlet extends ACS2 {
                 throw new OA2GeneralError(OA2Errors.SERVER_ERROR,
                         "No cached my proxy object with identifier " + st.getIdentifierString(),
                         HttpStatus.SC_SERVICE_UNAVAILABLE,
-                        st.getRequestState());
+                        st.getRequestState(), st.getClient());
             }
             MPSingleConnectionProvider.MyProxyLogonConnection mpc = (MPSingleConnectionProvider.MyProxyLogonConnection) getMyproxyConnectionCache().get(st.getIdentifier()).getValue();
             // First pass will be a MyMyProxyLogon object that allows completing the logon.

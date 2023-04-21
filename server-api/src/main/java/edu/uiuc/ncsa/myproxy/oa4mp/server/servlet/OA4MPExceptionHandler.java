@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.security.core.util.HostUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.oa4mp.delegation.server.UnapprovedClientException;
 import edu.uiuc.ncsa.security.servlet.ExceptionHandler;
+import edu.uiuc.ncsa.security.servlet.ExceptionHandlerThingie;
 import edu.uiuc.ncsa.security.servlet.JSPUtil;
 
 import javax.security.auth.login.FailedLoginException;
@@ -35,8 +36,12 @@ public class OA4MPExceptionHandler implements ExceptionHandler {
     }
 
     @Override
-    public void handleException(Throwable t, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        if((t instanceof NullPointerException)){
+    public void handleException(ExceptionHandlerThingie xh) throws IOException, ServletException {
+        Throwable t = xh.throwable;
+        HttpServletRequest request = xh.request;
+        HttpServletResponse response = xh.response;
+
+        if ((t instanceof NullPointerException)) {
             getLogger().error("Null pointer", t);
             throw new GeneralException("Error: Null pointer encountered.");
         }

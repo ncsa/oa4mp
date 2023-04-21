@@ -229,7 +229,7 @@ When a new version is deployed, here is the testing order
      So that you can use pretty much any IDP
   -- localhost:test/qdl
      Any IDP
-     This has 3 sequential scripts in /home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-admin-oauth2/src/main/resources/qdl
+     This has 3 sequential scripts in /home/ncsa/dev/ncsa-git/oa4mp/server-admin/src/main/resources/qdl
      /seq0.qdl, /seq1.qdl, /seq2.qdl each of which is configured with its own set of arguments,
      which print out stuff to the log (have to test logging works)
      and puts in claims based on the arguments.
@@ -376,7 +376,7 @@ When a new version is deployed, here is the testing order
      * any IDP (tested mostly with GitHub)
      * use uri not device flow, since the setup happens in the pre-auth QDL script
      * the file
-         /home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-admin-oauth2/src/main/resources/qdl/ui-test/test-claims.json
+         /home/ncsa/dev/ncsa-git/oa4mp/server-admin/src/main/resources/qdl/ui-test/test-claims.json
        contains the claims under the user jgaynor@foo.bar. Twiddle these. The test consists of getting
        the claims and two in this file, isMemberOf and test_claim with be asserted.
      Test:

@@ -1,26 +1,26 @@
 package edu.uiuc.ncsa.oa2.servlet;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.*;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RFC8628Store;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.ClientDebugUtil;
-import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;
-import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
-import edu.uiuc.ncsa.security.core.util.DebugUtil;
-import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
-import edu.uiuc.ncsa.security.core.util.StringUtils;
-import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
-import edu.uiuc.ncsa.oa4mp.delegation.server.request.AGResponse;
-import edu.uiuc.ncsa.oa4mp.delegation.server.request.IssuerResponse;
 import edu.uiuc.ncsa.oa4mp.delegation.common.servlet.TransactionState;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AuthorizationGrantImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenUtils;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.*;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.AGRequest2;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.RFC8628Constants;
+import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
+import edu.uiuc.ncsa.oa4mp.delegation.server.request.AGResponse;
+import edu.uiuc.ncsa.oa4mp.delegation.server.request.IssuerResponse;
+import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;
+import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
+import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.util.configuration.ConfigUtil;
 import net.sf.json.JSONObject;
@@ -88,7 +88,7 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
                 throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
                         "incorrect password",
                         HttpStatus.SC_BAD_REQUEST,
-                        null);
+                        null, client);
             }
         }
         MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(client);
@@ -129,7 +129,7 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
                 throw new OA2ATException(redirectableError.getError(),
                         redirectableError.getDescription(),
                         HttpStatus.SC_BAD_REQUEST,
-                        redirectableError.getState());
+                        redirectableError.getState(), t.getClient());
             }
 
         }
@@ -157,7 +157,7 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
             }
             if (!gotUserCode) {
                 ServletDebugUtil.error(this, "Could not get an unused user code after " + userCodeAttemptCount + " attempts.");
-                throw new OA2ATException(OA2Errors.SERVER_ERROR, "could not create new user code", HttpStatus.SC_BAD_REQUEST, null);
+                throw new OA2ATException(OA2Errors.SERVER_ERROR, "could not create new user code", HttpStatus.SC_BAD_REQUEST, null, t.getClient());
             }
             rfc8628State.lifetime = lifetime;
             if (0 < client.getDfInterval()) {
@@ -195,7 +195,7 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
         resp.getWriter().flush();
         resp.getWriter().close();
         resp.setStatus(HttpStatus.SC_OK);
-
+        logOK(req); // CIL-1722
     }
 
     protected String getClientSecret(HttpServletRequest request) {

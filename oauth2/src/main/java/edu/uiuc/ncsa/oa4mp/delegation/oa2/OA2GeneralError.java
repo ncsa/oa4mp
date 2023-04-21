@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.oa4mp.delegation.oa2;
 
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.BaseClient;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 
 /**
@@ -22,14 +23,29 @@ public class OA2GeneralError extends GeneralException {
                 + " (status: " + error.getHttpStatus()
                 + ", description: "
                 + error.getDescription()
-                +  (error.getState()==null?"":", state:" + error.getState())
+                + (error.getState() == null ? "" : ", state:" + error.getState())
                 + ")");
 
         setDescription(error.getDescription());
         setError(error.getError());
         setHttpStatus(error.getHttpStatus());
         setState(error.getState());
+        setClient(error.getClient());
     }
+
+    public boolean hasClient() {
+        return client != null;
+    }
+
+    public BaseClient getClient() {
+        return client;
+    }
+
+    public void setClient(BaseClient client) {
+        this.client = client;
+    }
+
+    protected BaseClient client;
 
     public OA2GeneralError(Throwable cause) {
         super(cause);
@@ -38,6 +54,7 @@ public class OA2GeneralError extends GeneralException {
     public OA2GeneralError() {
 
     }
+
     public OA2GeneralError(String message) {
         super(message);
     }
@@ -50,16 +67,27 @@ public class OA2GeneralError extends GeneralException {
                            String description,
                            int httpStatus,
                            String state) {
-        super("error: " + error + " (status: " + httpStatus + ", description: " + description +  (state==null?"":", state:" + state) + ")");
+        super("error: " + error + " (status: " + httpStatus + ", description: " + description + (state == null ? "" : ", state:" + state) + ")");
         setValues(error, description, httpStatus, state);
     }
 
-    public void setValues(String error, String description, int httpStatus, String state){
+    public OA2GeneralError(String error,
+                           String description,
+                           int httpStatus,
+                           String state,
+                           BaseClient client) {
+        this(error, description, httpStatus, state);
+        this.client = client;
+
+    }
+
+    public void setValues(String error, String description, int httpStatus, String state) {
         this.description = description;
         this.error = error;
         this.httpStatus = httpStatus;
         this.state = state;
     }
+
 
     public int getHttpStatus() {
         return httpStatus;

@@ -151,10 +151,10 @@ public class OA2ClaimsUtil implements ScriptingConstants {
     protected void checkRequiredScopes(OA2ServiceTransaction t) throws Throwable {
         if (oa2se.isOIDCEnabled()) {
             if (t.getOA2Client().isPublicClient() && !t.getScopes().contains(OA2Scopes.SCOPE_OPENID)) {
-                throw new OA2GeneralError(OA2Errors.INVALID_SCOPE, "invalid scope: no open id scope", HttpStatus.SC_UNAUTHORIZED, null);
+                throw new OA2GeneralError(OA2Errors.INVALID_SCOPE, "invalid scope: no open id scope", HttpStatus.SC_UNAUTHORIZED, null,t.getClient());
             }
             if (t.getOA2Client().getScopes().contains(OA2Scopes.SCOPE_OPENID) && !t.getScopes().contains(OA2Scopes.SCOPE_OPENID)) {
-                throw new OA2GeneralError(OA2Errors.INVALID_SCOPE, "invalid scope: no open id scope", HttpStatus.SC_UNAUTHORIZED, null);
+                throw new OA2GeneralError(OA2Errors.INVALID_SCOPE, "invalid scope: no open id scope", HttpStatus.SC_UNAUTHORIZED, null, t.getClient());
             }
         } else {
             // no scopes are possible in certain OAuth 2 cases.
@@ -335,7 +335,7 @@ public class OA2ClaimsUtil implements ScriptingConstants {
                         transaction.setUserMetaData(claims);
                         transaction.setFlowStates(flowStates);
                         oa2se.getTransactionStore().save(transaction);
-                        throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "access denied", HttpStatus.SC_UNAUTHORIZED, null);
+                        throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "access denied", HttpStatus.SC_UNAUTHORIZED, null, transaction.getOA2Client());
                     }
                     dbg(this, "user info for claim source #" + claimSource + " = " + claims.toString(1));
                 }
@@ -388,7 +388,7 @@ public class OA2ClaimsUtil implements ScriptingConstants {
         FlowStates2 flowStates = transaction.getFlowStates();
         // save everything up to this point since there are no guarantees that processing will continue:
         if (!flowStates.acceptRequests) {
-            throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "access denied", HttpStatus.SC_UNAUTHORIZED, null);
+            throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "access denied", HttpStatus.SC_UNAUTHORIZED, null, transaction.getOA2Client());
         }
         OA2Client client = getOA2Client();
 
@@ -446,7 +446,7 @@ public class OA2ClaimsUtil implements ScriptingConstants {
         // This is the first place we can check. If they are not allowed to make further requests, an access denied exception is thrown.
         if (!flowStates.acceptRequests) {
             dbg(this, "Access denied for user name = " + transaction.getUsername());
-            throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "access denied", HttpStatus.SC_UNAUTHORIZED, null);
+            throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "access denied", HttpStatus.SC_UNAUTHORIZED, null, transaction.getOA2Client());
         }
         return transaction.getUserMetaData();
     }
