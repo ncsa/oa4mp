@@ -24,6 +24,9 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl implements C
 
     protected List<String> components = new ArrayList<>();
 
+    protected boolean showHeader = true;
+    protected boolean showLogo = true;
+
     protected void init() {
         if (components.isEmpty()) {
             components.add(CLIENTS);
@@ -58,19 +61,40 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl implements C
         return OA4MPConfigTags.COMPONENT;
     }
 
-
+        protected  String logoName = "times";
+    /**
+     * command line arguments are <br>
+     * <ul>
+     *     <li>-noLogo - do not show logo</li>
+     *     <li>-noHeader - do not show splash screen with author, version </li>
+     *     <li>-v = do not suppress startup messages. A lot of 3rd party software spits stuff out
+     *     and it is normally hidden. This prints it all out.</li>
+     *     <li>-silent = same as -noLogo and -noHeader</li>
+     *     <li>-logo name = use the named logo. Standard are Times, Roman (like Times but bigger),
+     *     OS2 - groovy font, Fraktur - Old German Font or Plain = barebones sans-serif,
+     *     None = none (same as -noLogo).
+     *     Times is the default.</li>
+     * </ul>
+     * @param args
+     * @throws Exception
+     */
     protected void start(String[] args) throws Exception {
+        InputLine inputLine = new InputLine(args);
+        showLogo = !inputLine.hasArg("-noLogo");
+        showHeader = !inputLine.hasArg("-noHeader");
+        if(inputLine.hasArg("-silent")){
+            showHeader = false;
+            showLogo = false;
+        }
+        boolean printStartup = inputLine.hasArg("-v");
+        if(inputLine.hasArg("-logo")){
+               logoName = inputLine.getNextArgFor("-logo").toLowerCase();
+        }
+
         about();
         if (!getOptions(args)) {
             say("Warning: no configuration file specified. type in 'load --help' to see how to load one.");
             return;
-        }
-        boolean printStartup = false;
-        for (String arg : args) {
-            if (arg.equals("-v")) {
-                printStartup = true;
-                break;
-            }
         }
         if (printStartup) {
             initialize(); // No logging so a there might be a bunch of stuff that gets spit out.

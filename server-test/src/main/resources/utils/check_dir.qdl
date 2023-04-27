@@ -13,8 +13,8 @@ files(x.)->(!'.*/'=~x.)⌆x.; // gets all the files in a list that are not direc
 all_files. := dir(root_dir);
 dir_list. := dirs(all_files.);
 file_list. := files(all_files.);
-debug(1);
-debug(1,'starting to process ' + root_dir);
+debugger(1);
+debugger(1,'starting to process ' + root_dir + ' for ' + script_name());
 while[f ∈ file_list.]
   do[
      current_file := root_dir + f;

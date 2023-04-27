@@ -61,7 +61,8 @@ public class OA2QDLConfigurationLoader<T extends OA2QDLEnvironment> extends QDLC
                 getSaveDir(),
                 isOverwriteBaseFunctionsOn(),
                 getServerScriptSet(),
-                getLibLoader());
+                getLibLoader(),
+                useLogo());
     }
 
     public static String SCRIPTS_TAG = "scripts";

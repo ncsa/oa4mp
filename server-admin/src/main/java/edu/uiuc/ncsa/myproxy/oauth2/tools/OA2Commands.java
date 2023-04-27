@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.myproxy.oauth2.tools;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.functor.claims.OA2FunctorFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2ConfigurationLoader;
+import edu.uiuc.ncsa.myproxy.oauth2.Banners;
 import edu.uiuc.ncsa.myproxy.oauth2.base.BaseCommands;
 import edu.uiuc.ncsa.myproxy.oauth2.base.ClientStoreCommands;
 import edu.uiuc.ncsa.myproxy.oauth2.base.CopyCommands;
@@ -95,34 +96,24 @@ public class OA2Commands extends BaseCommands {
         say(" --> and /h prints your command history, /r runs the last command");
 
     }
-    public static String BANNER ="                                                              \n" +
-                    "  .g8\"\"8q.      db                 `7MMM.     ,MMF'`7MM\"\"\"Mq. \n" +
-                    ".dP'    `YM.   ;MM:                  MMMb    dPMM    MM   `MM.\n" +
-                    "dM'      `MM  ,V^MM.         ,AM     M YM   ,M MM    MM   ,M9 \n" +
-                    "MM        MM ,M  `MM        AVMM     M  Mb  M' MM    MMmmdM9  \n" +
-                    "MM.      ,MP AbmmmqMA     ,W' MM     M  YM.P'  MM    MM       \n" +
-                    "`Mb.    ,dP'A'     VML  ,W'   MM     M  `YM'   MM    MM       \n" +
-                    "  `\"bmmd\"'.AMA.   .AMMA.AmmmmmMMmm .JML. `'  .JMML..JMML.     \n" +
-                    "                              MM                              \n" +
-                    "                              MM                             ";
 
-    public static String BANNER2=
-            "___________________________________________________\n"+
-            "___oooo_______ooo_________ooo_ooo_____ooo_ooooooo__\n" +
-            "_oo____oo___oo___oo_____oo_oo_oooo___oooo_oo____oo_\n" +
-            "oo______oo_oo_____oo__oo___oo_oo_oo_oo_oo_oo____oo_\n" +
-            "oo______oo_ooooooooo_oooooooo_oo__ooo__oo_oooooo___\n" +
-            "_oo____oo__oo_____oo_______oo_oo_______oo_oo_______\n" +
-            "___oooo____oo_____oo_______oo_oo_______oo_oo_______\n" +
-            "___________________________________________________\n";
+
     @Override
     public void about() {
-        about(true, true);
+        about(showLogo, showHeader);
     }
     public void about(boolean showBanner, boolean showHeader) {
         int width = 60;
+        String banner=Banners.TIMES; // default
+        if(logoName.equals("roman")) banner = Banners.ROMAN;
+        if(logoName.equals("os2")) banner = Banners.OS2;
+        if(logoName.equals("times")) banner = Banners.TIMES;
+        if(logoName.equals("fraktur")) banner = Banners.FRAKTUR;
+        if(logoName.equals("plain")) banner = Banners.PLAIN;
+        if(logoName.equals("none")) {showBanner = false;}
+
         String stars = StringUtils.rightPad("", width + 1, "*");
-        if(showBanner){say(BANNER);}
+        if(showBanner){say(banner);}
         if(showHeader) {
             say(stars);
             say(padLineWithBlanks("* OA4MP CLI (Command Line Interpreter)", width) + "*");

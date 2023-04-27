@@ -53,7 +53,8 @@ public class OA2QDLEnvironment extends QDLEnvironment {
                              String saveDir,
                              boolean allowOverwriteBaseFunctions,
                              ScriptSet serverScripts,
-                             LibLoader libLoader) {
+                             LibLoader libLoader,
+                             String logo) {
         super(myLogger,
                 cfgFile,
                 name,
@@ -86,7 +87,7 @@ public class OA2QDLEnvironment extends QDLEnvironment {
                 saveDir,
                 allowOverwriteBaseFunctions,
                 libLoader,
-                false); // don't let anyone start in ANSI mode on the server since it will screw up logging.
+                false, logo); // don't let anyone start in ANSI mode on the server since it will screw up logging.
         if (serverScripts != null && !serverScripts.isEmpty()) {
             this.serverScripts = serverScripts;
         }
