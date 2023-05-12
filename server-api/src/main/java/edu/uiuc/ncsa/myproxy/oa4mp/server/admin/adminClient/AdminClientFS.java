@@ -1,9 +1,11 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient;
 
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.uuc.UUCConfiguration;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApprovalStore;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.impl.GenericClientStoreUtils;
+import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.storage.FileStore;
 import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
@@ -58,5 +60,10 @@ public class AdminClientFS<V extends AdminClient> extends FileStore<V> implement
     @Override
     public List<V> getMostRecent(int n, List<String> attributes) {
         return GenericStoreUtils.getMostRecent(this, n, attributes);
+    }
+
+    @Override
+    public UUCResponse unusedClientCleanup(UUCConfiguration uucConfiguration) {
+        throw new NotImplementedException();
     }
 }

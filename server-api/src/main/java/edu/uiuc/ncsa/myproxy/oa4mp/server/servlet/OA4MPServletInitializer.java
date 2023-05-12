@@ -17,7 +17,6 @@ import edu.uiuc.ncsa.security.servlet.AbstractServlet;
 import edu.uiuc.ncsa.security.servlet.ExceptionHandler;
 import edu.uiuc.ncsa.security.servlet.Initialization;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
-import edu.uiuc.ncsa.security.storage.events.LastAccessedThread;
 import edu.uiuc.ncsa.security.util.mail.MailUtil;
 import edu.uiuc.ncsa.security.util.pkcs.KeyPairPopulationThread;
 
@@ -157,8 +156,6 @@ public class OA4MPServletInitializer implements Initialization {
 
         if (MyProxyDelegationServlet.transactionCleanup == null) {
             LockingCleanup lc = new LockingCleanup<>(logger, "transaction cleanup");
-
-
             lc.setStopThread(false);
             lc.setStore(env.getTransactionStore());
             lc.addRetentionPolicy(new ValidTimestampPolicy());
@@ -192,8 +189,8 @@ public class OA4MPServletInitializer implements Initialization {
             };
             MyProxyDelegationServlet.myproxyConnectionCleanup = myproxyConnectionCleanup; // set it in the servlet
             // Set the cleanup interval much higher than the default (1 minute). We don't service
-            // MyProxy requests much any more, so it can be set a lot lower.
-            MyProxyDelegationServlet.myproxyConnectionCleanup.setCleanupInterval(6 * 60 * 1000L);
+            // MyProxy requests much anymore, so it can be set a lot lower.
+            MyProxyDelegationServlet.myproxyConnectionCleanup.setCleanupInterval(6 * 3600 * 1000L);
             DebugUtil.trace(this, "setting MyProxy connection cleanup interval to 6 hours.");
             myproxyConnectionCleanup.setStopThread(false);
             Cache myproxyConnectionCache = MyProxyDelegationServlet.myproxyConnectionCache;

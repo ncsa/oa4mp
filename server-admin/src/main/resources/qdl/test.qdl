@@ -24,7 +24,8 @@
 
 
 */
-
+// Note in test mode, the server mode flag is set to false so we can look at
+// the output.
 say('*** QDL test script');
 z.'sub' := 'foo';
 z.'baz' := 'bar';

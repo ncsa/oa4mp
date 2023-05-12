@@ -2,10 +2,12 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.ClaimSourceFactoryImpl;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.MultiAuthServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2ExceptionHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.TokenExchangeRecordRetentionPolicy;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RefreshTokenRetentionPolicy;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RefreshTokenStore;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.uuc.UUCThread;
 import edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.OA2State;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientStoreProviders;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.SATFactory;
@@ -90,6 +92,17 @@ public class OA2ServletInitializer extends OA4MPServletInitializer {
             }
             lastAccessedThread.setStopThread(false);
             lastAccessedThread.start();
+        }
+        if(oa2SE.getUucConfiguration().enabled && MultiAuthServlet.uucThread == null){
+            UUCThread uucThread = new UUCThread("Unused client cleanup thread",
+                    oa2SE.getMyLogger(),
+                    oa2SE.getClientStore(),
+                    oa2SE.getUucConfiguration());
+             uucThread.setCleanupInterval(oa2SE.getUucConfiguration().interval);
+             uucThread.setAlarms(oa2SE.getUucConfiguration().alarms);
+             uucThread.setStopThread(false);
+            MultiAuthServlet.uucThread = uucThread;
+            uucThread.start();
         }
         if (oa2SE.isRefreshTokenEnabled()) {
             MyProxyDelegationServlet.transactionCleanup.getRetentionPolicies().clear(); // We need a different set of policies than the original one.

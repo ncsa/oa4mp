@@ -534,6 +534,13 @@ Value  Description
       | effectively invalidates the token immediately.]]>
     </body>
     </entry>
+    <entry id="uuc">
+    <body>
+    <![CDATA[The Unused Client cleanup facility. The system can be configured so that
+unused clients (meaning those never accessed or those only accessed before or between certain dates)
+will be automatically removed. This facility allows you to run this directly from the command line.]]>
+    </body>
+    </entry>
     <!--
 at_lifetime           description           extended_attributes   maxATLifetime         public_client         strict_scopes
 callback_uri          df_interval           extends_provisioners  maxRTLifetime         public_key

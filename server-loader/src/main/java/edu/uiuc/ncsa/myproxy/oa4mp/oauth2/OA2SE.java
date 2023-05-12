@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.BasicClaimsSourceImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.CMConfigs;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2ConfigurationLoader;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8628ServletConfig;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.uuc.UUCConfiguration;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo.VOStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo.VirtualOrganization;
@@ -108,7 +109,8 @@ public class OA2SE extends ServiceEnvironmentImpl {
                  boolean isMonitorEnabled,
                  long monitorInterval,
                  Collection<LocalTime> monitorAlarms,
-                 MetaDebugUtil debugger) {
+                 MetaDebugUtil debugger,
+                 UUCConfiguration uucConfiguration) {
 
         super(logger,
                 mfp,
@@ -186,7 +188,14 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.monitorInterval = monitorInterval;
         this.monitorAlarms = monitorAlarms;
         this.monitorEnabled = isMonitorEnabled;
+        this.uucConfiguration = uucConfiguration;
     }
+
+    public UUCConfiguration getUucConfiguration() {
+        return uucConfiguration;
+    }
+
+    UUCConfiguration uucConfiguration;
 
     public boolean isMonitorEnabled() {
         return monitorEnabled;

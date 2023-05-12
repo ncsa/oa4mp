@@ -1,16 +1,17 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.uuc.UUCThread;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2ATException;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Errors;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2ATException;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Errors;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 
 import javax.servlet.http.HttpServletRequest;
@@ -38,6 +39,12 @@ public abstract class MultiAuthServlet extends MyProxyDelegationServlet {
        * @param request
        * @return
        */
+    /**
+     * This should be in the {@link MyProxyDelegationServlet}, but that would have to be moved
+     * and refactored. It stays here for now.
+     */
+      public static UUCThread uucThread = null;
+
       @Override
       public Client getClient(HttpServletRequest request) {
           // Check is this is in the headers. If not, fall through to checking parameters.

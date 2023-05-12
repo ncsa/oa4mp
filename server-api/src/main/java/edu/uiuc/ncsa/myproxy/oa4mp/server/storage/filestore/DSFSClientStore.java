@@ -1,5 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.server.storage.filestore;
 
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.impl.GenericClientStoreUtils;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.uuc.UUCConfiguration;
 import edu.uiuc.ncsa.security.core.util.IdentifiableProviderImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.impl.FSClientStore;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
@@ -32,5 +34,10 @@ public class DSFSClientStore extends FSClientStore<Client> {
     @Override
     public List<Client> getMostRecent(int n, List<String> attributes) {
         return GenericStoreUtils.getMostRecent(this, n, attributes);
+    }
+
+    @Override
+    public UUCResponse unusedClientCleanup(UUCConfiguration uucConfiguration) {
+        return GenericClientStoreUtils.unusedClientCleanup(this, uucConfiguration);
     }
 }

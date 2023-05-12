@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Monitoring access times</title>
+    <!--#include virtual="../../head.html" -->
+</head>
+
+<body class="composite">
+<!--#include virtual="../../header.html" -->
+   <h1>Last accessed time monitoring.</h1>
+<p>Various stored objects in OA4MP such as clients, admin clients, ersatz clients and virtual organizations
+will have their access times logged and updated. Given the nature of the server, this is done
+by keeping a running log of these accesses and periodically doing a batch update on persistent
+storage. This keeps the server load to a minimum, since a typical use pattern is that a client
+is accessed very often at the beginning of a flow then may go a very long time (say awaiting an exchange)
+before being accessed again. Caching all of the intial accesses into a single call is a much less
+impactful way of doign it.</p>
+<h2>How does it work?</h2>
+<p>
+    The <a href="../dtd/server-dtd-service-tag.html">server tag</a> contains three attributes,
+    <a href="../dtd/server-dtd-service-tag.html#enableMonitor">enableMonitor</a>,
+    <a href="../dtd/server-dtd-service-tag.html#monitorInterval">monitorInterval</a> and
+    <a href="../dtd/server-dtd-service-tag.html#monitorAlarms">monitorAlarms</a> that control
+    the behavior. You must enable this component to use it, then either set an interval so that the monitor
+    wakes up every interval and runs, or you set specific alarms to run. Alarms are given preferences,
+    so if you set both, you will get alarms. A plus with alarms is that you can schedule them to run
+    when you know server load is low.
+</p>
+<h2>How to use this information</h2>
+<p>You may look at the last accessed time for the object in the CLI. If it has been accessed,
+   then it will have the property last_accessed. You can use this to schedule <a href="./unused-client-cleanup.html">unsed client cleanup</a>s
+   with various parameters for standard clients.
+   This unused client cleanup is also available in the CLI,</p>
+<!--#include virtual="../../footer.html" -->
+</body>
+</html>

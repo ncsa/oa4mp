@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl.ClientConverter;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.monitored.MonitoredMemoryStore;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApprovalStore;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.uuc.UUCConfiguration;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.XMLConverter;
@@ -52,5 +53,10 @@ public  class ClientMemoryStore<V extends Client> extends MonitoredMemoryStore<V
     @Override
     public List<Identifier> getByApprover(String approver, ClientApprovalStore clientApprovalStore) {
         return GenericClientStoreUtils.getByApprover(this, approver, clientApprovalStore);
+    }
+
+    @Override
+    public UUCResponse unusedClientCleanup(UUCConfiguration uucConfiguration) {
+        return GenericClientStoreUtils.unusedClientCleanup(this, uucConfiguration);
     }
 }

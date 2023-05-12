@@ -10,10 +10,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.ClientManagementConstants;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.json.JSONStoreProviders;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.json.MultiJSONStoreProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8628ServletConfig;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientConverter;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientMemoryStore;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientProvider;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientSQLStoreProvider;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.*;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.*;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.*;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo.*;
@@ -56,6 +53,7 @@ import edu.uiuc.ncsa.oa4mp.delegation.server.issuers.ATIssuer;
 import edu.uiuc.ncsa.oa4mp.delegation.server.issuers.PAIssuer;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApprovalStore;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.uuc.UUCConfiguration;
 import edu.uiuc.ncsa.qdl.config.QDLConfigurationConstants;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.Identifier;
@@ -63,10 +61,7 @@ import edu.uiuc.ncsa.security.core.configuration.Configurations;
 import edu.uiuc.ncsa.security.core.configuration.provider.CfgEvent;
 import edu.uiuc.ncsa.security.core.configuration.provider.TypedProvider;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
-import edu.uiuc.ncsa.security.core.util.DebugUtil;
-import edu.uiuc.ncsa.security.core.util.IdentifierProvider;
-import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.core.util.StringUtils;
+import edu.uiuc.ncsa.security.core.util.*;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
@@ -79,11 +74,9 @@ import org.apache.commons.configuration.tree.ConfigurationNode;
 import javax.inject.Provider;
 import java.io.File;
 import java.net.URI;
+import java.text.ParseException;
 import java.time.LocalTime;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.TreeSet;
+import java.util.*;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.OA4MPIdentifierProvider.TRANSACTION_ID;
 import static edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2ConfigTags.ACCESS_TOKEN_LIFETIME;
@@ -108,6 +101,22 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
     public static final String MONITOR_ENABLED = "monitorEnable";
     public static final String MONITOR_INTERVAL = "monitorInterval";
     public static final String MONITOR_ALARMS = "monitorAlarms";
+
+    public static final String UUC_TAG = "unusedClientCleanup";
+    public static final String UUC_ENABLED = "enabled";
+    public static final String UUC_TEST_MODE_ON = "testModeOn";
+    public static final String UUC_INTERVAL = "interval";
+    public static final String UUC_ALARMS = "alarms";
+    public static final String UUC_GRACE_PERIOD = "gracePeriod";
+    public static final String UUC_DELETE_VERSION_FLAG = "deleteVersions";
+    public static final String UUC_LAST_ACCESSED = "lastAccessed";
+    public static final String UUC_LAST_ACCESSED_AFTER = "lastAccessedAfter";
+    public static final String UUC_LAST_ACCESSED_NEVER = "never";
+    public static final String UUC_WHITELIST = "whitelist";
+    public static final String UUC_BLACKLIST = "blacklist";
+    public static final String UUC_LIST_ITEM = "clientID";
+    public static final String UUC_LIST_REGEX = "regex";
+
     public static final String RFC7636_REQUIRED_TAG = "rfc7636Required";
     public static final String DEMO_MODE_TAG = "demoModeEnabled";
     public static final String QDL_CONFIG_NAME_ATTR = "qdlConfigName";
@@ -141,7 +150,10 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
 
     public static long CLEANUP_INTERVAL_DEFAULT = 30 * 60 * 1000L; // 30 minutes
     public static boolean CLEANUP_LOCKING_ENABLED_DEFAULT = false; // Don't lock tables by default
-    public static boolean MONITOR_ENABLED_DEFAULT = false; // Don't lock tables by default
+    public static boolean MONITOR_ENABLED_DEFAULT = false; // Don't enabled monitoring by default
+    public static boolean UUC_ENABLED_DEFAULT = false; // Don't just clean up clients
+    public static long UUC_INTERVAL_DEFAULT = 6*60 * 60 * 1000L; // 6 hours minutes
+    public static long UUC_GRACE_PERIOD_DEFAULT = 6*60 * 60 * 1000L; // 6 hours minutes
     public static long MONITOR_INTERVAL_DEFAULT = 120 * 60 * 1000L; // 2 hours minutes
 
     public OA2ConfigurationLoader(ConfigurationNode node) {
@@ -214,7 +226,8 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     isMonitorEnabled(),
                     getMonitorInterval(),
                     getMonitorAlarms(),
-                    getDebugger()
+                    getDebugger(),
+                    getUucConfiguration()
             );
 
             if (getClaimSource() instanceof BasicClaimsSourceImpl) {
@@ -231,9 +244,15 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
     Collection<LocalTime> cleanupAlarms = null;
     Collection<LocalTime> monitorAlarms = null;
 
-    public Collection<LocalTime> getAlarms(String tag) {
+    /**
+     * Get alarms that are in a given tag. returns null if no alarms are set
+     * @param node
+     * @param tag
+     * @return
+     */
+    public Collection<LocalTime> getAlarms(ConfigurationNode node, String tag) {
         Collection<LocalTime> alarms = null;
-        String raw = getFirstAttribute(cn, tag);
+        String raw = getFirstAttribute(node, tag);
         if (!StringUtils.isTrivial(raw)) {
             alarms = new TreeSet<>();  // sorts them.
             String[] ta = raw.split(",");
@@ -249,6 +268,16 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
             DebugUtil.trace(this, tag + " found: " + alarms);
         }
         return alarms;
+
+    }
+
+    /**
+     * Get alarms that are in the main service tag.
+     * @param tag
+     * @return
+     */
+    public Collection<LocalTime> getAlarms(String tag) {
+        return getAlarms(cn, tag);
     }
 
 
@@ -459,7 +488,102 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
             monitorInterval = getInterval(MONITOR_INTERVAL, MONITOR_INTERVAL_DEFAULT);
         }
         return monitorInterval;
+
     }
+
+    UUCConfiguration uucConfiguration = null;
+    public UUCConfiguration getUucConfiguration(){
+        if(uucConfiguration == null){
+            uucConfiguration = new UUCConfiguration();
+
+            ConfigurationNode node = getFirstNode(cn, UUC_TAG);
+            if(node == null){
+                uucConfiguration.enabled = false;
+                return uucConfiguration;
+            }
+            uucConfiguration.enabled = getFirstBooleanValue(node, UUC_ENABLED, false);
+            // If this is disabled, allow it to be loaded anyway. That way it may also be run
+            // from the CLI.
+            String raw = getFirstAttribute(node, UUC_GRACE_PERIOD);
+            if (StringUtils.isTrivial(raw)) {
+                uucConfiguration.gracePeriod = UUC_GRACE_PERIOD_DEFAULT;
+            } else {
+                uucConfiguration.gracePeriod = ConfigUtil.getValueSecsOrMillis(raw, true);
+            }
+             raw = getFirstAttribute(node, UUC_INTERVAL);
+            if (StringUtils.isTrivial(raw)) {
+                uucConfiguration.interval = UUC_INTERVAL_DEFAULT;
+            } else {
+                uucConfiguration.interval = ConfigUtil.getValueSecsOrMillis(raw, true);
+            }
+
+            uucConfiguration.deleteVersions = Configurations.getFirstBooleanValue(node, UUC_DELETE_VERSION_FLAG, false);
+            uucConfiguration.testMode = Configurations.getFirstBooleanValue(node, UUC_TEST_MODE_ON, false);
+            uucConfiguration.alarms = getAlarms(node, UUC_ALARMS);
+            String x = Configurations.getFirstAttribute(node, UUC_LAST_ACCESSED);
+            if(StringUtils.isTrivial(x) || x.equalsIgnoreCase(UUC_LAST_ACCESSED_NEVER)){
+                uucConfiguration.lastAccessed = -1L;
+            }else{
+                try {
+                    uucConfiguration.lastAccessed = Iso8601.string2Date(x).getTimeInMillis();
+                    if(uucConfiguration.lastAccessed<0L){
+                        throw new IllegalArgumentException("error processing last access date for unused client cleanup. Illegal date '" + x + "'");
+                    }
+                } catch (ParseException e) {
+                    warn("unable to interpret date "+x+" for last accessed in unused client cleanup. Cleanup disabled!!.\n" +
+                            "parsing failed at position " + e.getErrorOffset() + ": '" + e.getMessage() + "'");;
+                    uucConfiguration.enabled = false;
+                    if(DebugUtil.isEnabled()) {
+                        e.printStackTrace();
+                    }
+                    return uucConfiguration;
+                }
+            }
+             x = Configurations.getFirstAttribute(node, UUC_LAST_ACCESSED_AFTER);
+            if(!StringUtils.isTrivial(x)){
+                // only do something if you need to. No default for this attribute
+                try{
+                    uucConfiguration.lastAccessedAfter = Iso8601.string2Date(x).getTimeInMillis();
+                }catch(ParseException e){
+                    warn("unable to interpret date "+x+" for last accessed after in unused client cleanup. Cleanup disabled!!.\n" +
+                            "parsing failed at position " + e.getErrorOffset() + ": '" + e.getMessage() + "'");;
+                    uucConfiguration.enabled = false;
+                    if(DebugUtil.isEnabled()) {
+                        e.printStackTrace();
+                    }
+                    return uucConfiguration;
+                }
+            }
+            ConfigurationNode whiteListNode = getFirstNode(node, UUC_WHITELIST);
+            List[] outList = processUUCList(whiteListNode);
+            uucConfiguration.whiteList = outList[0];
+            uucConfiguration.whitelistRegex = outList[1];
+            ConfigurationNode blackListNode = getFirstNode(node, UUC_BLACKLIST);
+            outList = processUUCList(blackListNode);
+            uucConfiguration.blacklist = outList[0];
+            uucConfiguration.blacklistRegex = outList[1];
+        }
+        return uucConfiguration;
+    }
+     protected List[] processUUCList(ConfigurationNode node){
+        List<ConfigurationNode> kids = node.getChildren(UUC_LIST_ITEM);
+        List<Identifier> ids = null;
+        List<String> regex = null;
+        if(kids !=null && !kids.isEmpty()){
+            ids = new ArrayList<>();
+            for(ConfigurationNode kidNode : kids){
+                 ids.add(BasicIdentifier.newID(kidNode.getValue().toString()));
+            }
+        }
+         List<ConfigurationNode> kidRegex = node.getChildren(UUC_LIST_REGEX);
+         if(kidRegex !=null && !kidRegex.isEmpty()){
+                regex = new ArrayList<>();
+                for(ConfigurationNode kidNode : kidRegex){
+                    regex.add(kidNode.getValue().toString());
+                }
+         }
+        return new List[]{ids, regex};
+     }
 
     public long getInterval(String tag, long defaultInterval) {
         long interval = defaultInterval;
@@ -500,6 +624,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         }
         return cleanupLockingEnabled;
     }
+
 
     Boolean monitorEnabled = null;
 

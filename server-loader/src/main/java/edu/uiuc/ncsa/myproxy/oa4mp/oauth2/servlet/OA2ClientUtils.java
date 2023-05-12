@@ -319,6 +319,7 @@ public class OA2ClientUtils {
         debugger.trace(OA2ClientUtils.class, "Setting up handlers");
         //OA2Client client = (OA2Client) transaction.getClient();
         // Allow a client to skip any server scripts on a case by case basis.
+        // Also solves CIL-1278, since every runner calls this method.
         if (!client.isSkipServerScripts() && oa2SE.getQDLEnvironment().hasServerScripts()) {
             ServerQDLScriptHandlerConfig qdlScriptHandlerConfig = new ServerQDLScriptHandlerConfig(oa2SE, transaction, atTX, req);
             ServerQDLScriptHandler qdlScriptHandler = new ServerQDLScriptHandler(qdlScriptHandlerConfig);

@@ -6,6 +6,8 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientKeys;
 import edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.QDLJSONConfigUtil;
 import edu.uiuc.ncsa.myproxy.oauth2.base.ClientApprovalStoreCommands;
 import edu.uiuc.ncsa.myproxy.oauth2.base.ClientStoreCommands;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.BaseClientStore;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.uuc.UUCConfiguration;
 import edu.uiuc.ncsa.qdl.scripting.JSONScriptUtil;
 import edu.uiuc.ncsa.qdl.scripting.Scripts;
 import edu.uiuc.ncsa.security.core.Identifiable;
@@ -15,7 +17,9 @@ import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.LDAPConfigurationUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.XMLMap;
+import edu.uiuc.ncsa.security.util.cli.BasicIO;
 import edu.uiuc.ncsa.security.util.cli.CLIDriver;
+import edu.uiuc.ncsa.security.util.cli.FormatUtil;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import edu.uiuc.ncsa.security.util.scripting.ScriptSet;
 import edu.uiuc.ncsa.security.util.scripting.ScriptingConstants;
@@ -39,10 +43,19 @@ public class OA2ClientCommands extends ClientStoreCommands {
     public OA2ClientCommands(MyLoggingFacade logger,
                              String defaultIndent,
                              Store clientStore,
-                             ClientApprovalStoreCommands clientApprovalStoreCommands) throws Throwable{
+                             ClientApprovalStoreCommands clientApprovalStoreCommands) throws Throwable {
         super(logger, defaultIndent, clientStore, clientApprovalStoreCommands);
     }
 
+    public UUCConfiguration getUucConfiguration() {
+        return uucConfiguration;
+    }
+
+    public void setUucConfiguration(UUCConfiguration uucConfiguration) {
+        this.uucConfiguration = uucConfiguration;
+    }
+
+    UUCConfiguration uucConfiguration;
 
     public boolean isRefreshTokensEnabled() {
         return refreshTokensEnabled;
@@ -190,14 +203,14 @@ public class OA2ClientCommands extends ClientStoreCommands {
      */
     @Override
     public void extraUpdates(Identifiable identifiable) throws IOException {
-        OA2ClientKeys keys = (OA2ClientKeys)getMapConverter().getKeys();
+        OA2ClientKeys keys = (OA2ClientKeys) getMapConverter().getKeys();
         OA2Client client = (OA2Client) identifiable;
         String secret = client.getSecret();
         String input;
         boolean askForSecret = true;
 
         while (askForSecret) {
-            input = getPropertyHelp(keys.secret(),"enter a new secret or return to skip.", secret);
+            input = getPropertyHelp(keys.secret(), "enter a new secret or return to skip.", secret);
             if (isEmpty(input)) {
                 sayi("Nothing entered. Client secret entry skipped.");
                 break;
@@ -216,7 +229,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
             // so at this point the server actually allows for refresh tokens
             String NONE = "none";
             String rtString = oa2Client.isRTLifetimeEnabled() ? Long.toString(oa2Client.getRtLifetime() / 1000) : NONE;
-            String rawLifetime = getPropertyHelp(keys.rtLifetime(),"enter the refresh lifetime in sec.", rtString);
+            String rawLifetime = getPropertyHelp(keys.rtLifetime(), "enter the refresh lifetime in sec.", rtString);
 
             if (rawLifetime == null || rawLifetime.length() == 0 || rawLifetime.toLowerCase().equals(NONE)) {
                 oa2Client.setRtLifetime(0);
@@ -229,7 +242,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
             }
         }
         boolean publicClient = oa2Client.isPublicClient();
-        String rawPC = getPropertyHelp(keys.publicClient(),"is this client public?", Boolean.toString(publicClient));
+        String rawPC = getPropertyHelp(keys.publicClient(), "is this client public?", Boolean.toString(publicClient));
         if (rawPC != null && rawPC.toLowerCase().equalsIgnoreCase("y") || rawPC.toLowerCase().equalsIgnoreCase("yes")) {
             rawPC = "true";
         }
@@ -240,12 +253,12 @@ public class OA2ClientCommands extends ClientStoreCommands {
             sayi("Sorry, but unable to parse the response of \"" + rawPC + "\". No change.");
         }
 
-        String issuer = getPropertyHelp(keys.issuer(),"enter the issuer (optional)", oa2Client.getIssuer());
+        String issuer = getPropertyHelp(keys.issuer(), "enter the issuer (optional)", oa2Client.getIssuer());
         if (!isEmpty(issuer)) {
             oa2Client.setIssuer(issuer);
         }
 
-        String signTokens = getPropertyHelp(keys.signTokens(),"Enable ID token signing (true/false)?", Boolean.toString(oa2Client.isSignTokens()));
+        String signTokens = getPropertyHelp(keys.signTokens(), "Enable ID token signing (true/false)?", Boolean.toString(oa2Client.isSignTokens()));
         if (!isEmpty(signTokens)) {
             try {
                 oa2Client.setSignTokens(Boolean.parseBoolean(signTokens));
@@ -297,7 +310,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
                 }
             }
         }
-        String uris = getPropertyHelp(keys.callbackUri(),"enter a comma separated list of callback uris. These must start with https or they will be ignored.", currentUris);
+        String uris = getPropertyHelp(keys.callbackUri(), "enter a comma separated list of callback uris. These must start with https or they will be ignored.", currentUris);
 
         if (!StringUtils.isTrivial(uris)) {
             StringTokenizer stringTokenizer = new StringTokenizer(uris, ",");
@@ -343,7 +356,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
 
         }
         // CIL-1507 simplify cfg entry
-        boolean doCfg = getPropertyHelp(keys.cfg(),"Edit the " + keys.cfg() + " (as JSON)? (y/n)", "n").equalsIgnoreCase("y");
+        boolean doCfg = getPropertyHelp(keys.cfg(), "Edit the " + keys.cfg() + " (as JSON)? (y/n)", "n").equalsIgnoreCase("y");
         if (doCfg) {
             JSONObject newConfig = inputJSON(client.getConfig(), "client configuration");
             if (newConfig != null) {
@@ -413,7 +426,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
                     CLIDriver driver = new CLIDriver(qdlcliCommands);
                     driver.start();
                     result = QDLJSONConfigUtil.scriptSetToJSON(qdlcliCommands.getScriptSet());
-                }catch(Throwable t){
+                } catch (Throwable t) {
                     say("failed to start QDL CLI. This is deprecated too...");
                 }
                 break;
@@ -665,5 +678,65 @@ public class OA2ClientCommands extends ClientStoreCommands {
         super.bootstrap();
         getHelpUtil().load("/help/client_help.xml");
     }
+     public static String UUC_FLAG_TEST = "-test";
+     public static String UUC_FLAG_CFG = "-cfg";
+     public static String UUC_FLAG_FOUND = "-found";
+     public static String UUC_FLAG_ENABLE = "-enable";
+    public void uuc(InputLine inputLine) throws Throwable {
+        if (showHelp(inputLine)) {
+            say("uuc [" +
+                    UUC_FLAG_TEST + " on|true|off|false] ["+
+                    UUC_FLAG_CFG +"] ["+
+                    UUC_FLAG_FOUND + "] [" +
+                    UUC_FLAG_ENABLE + "] = unused client cleanup. Run the client cleanup for this store");
+            say(UUC_FLAG_TEST +" = (optional) turn on or off test mode. In test mode, the clients to delete");
+            say("        are simply printed, not actually deleted.");
+            say(UUC_FLAG_CFG + " = simply prints out the configuration, if any.");
+            say(UUC_FLAG_FOUND+" = should the list of client ids that were found.");
+            say(UUC_FLAG_ENABLE+" = manually enable this if it is disabled.");
+            say("\nOne use pattern is to put the configuration into the server configuration file and only");
+            say("run it manually in the CLI. In that case, set it to disabled and enable it here.");
+            say("This will not run disabled configurations.");
+            FormatUtil.printFormatListHelp(new BasicIO(), inputLine);
+            return;
+        }
+        if(inputLine.hasArg(UUC_FLAG_CFG)){
+            if(getUucConfiguration() == null){
+                say("no config");
+                return;
+            }
+            say(getUucConfiguration().toString(true));
+            return;
+        }
+        boolean showFound = inputLine.hasArg(UUC_FLAG_FOUND);
+        if (getUucConfiguration() == null) {
+            say("UUC configuration not found");
+            return;
+        }
+        getUucConfiguration().enabled = inputLine.hasArg(UUC_FLAG_ENABLE);
+        inputLine.removeSwitch(UUC_FLAG_ENABLE);
+        if (!getUucConfiguration().enabled) {
+            say("UUC configuration not enabled. ");
+            return;
+        }
+        if (inputLine.hasArg(UUC_FLAG_TEST)) {
+            String arg = inputLine.getNextArgFor(UUC_FLAG_TEST);
+            if (arg.equalsIgnoreCase("on") || arg.equalsIgnoreCase("true")) {
+                getUucConfiguration().testMode = true;
+            }
+            if (arg.equalsIgnoreCase("off") || arg.equalsIgnoreCase("false")) {
+                getUucConfiguration().testMode = false;
+            }
 
+            inputLine.removeSwitchAndValue(UUC_FLAG_TEST);
+        }
+        BaseClientStore clientStore = (BaseClientStore) getStore();
+        BaseClientStore.UUCResponse response = clientStore.unusedClientCleanup(getUucConfiguration());
+        say("Stats are " + response);
+        if(showFound){
+            say("found ids are:");
+            FormatUtil.formatList(inputLine, response.found);
+        }
+        say("There were "+ response.found.size() + " clients found to remove");
+    }
 }
