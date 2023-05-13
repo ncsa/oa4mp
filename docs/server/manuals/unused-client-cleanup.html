@@ -1,0 +1,423 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+
+
+
+
+
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>OAuth for MyProxy</title>
+    <style type="text/css" media="all">
+        @import url("../../css/oa4mp-custom.css");
+        @import url("../../css/oa4mp-theme.css");
+        @import url("../../css/site.css");
+    </style>
+    <link rel="stylesheet" href="../../css/print.css" type="text/css" media="print"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    </head>
+<body class="composite">
+<div id="banner">
+                        <a href="http://www.ncsa.illinois.edu/" id="bannerLeft"  >
+        
+                                                                    <img src="../../css/images/ncsalogo_sm-2.gif" alt="NCSA"/>
+        
+                </a>
+                                    <a href="https://ncsa.github.io/oa4mp/" id="bannerRight"  >
+        
+                                                                    <img src="../../css/images/oa4mp-logo-small-2.png" alt="OA4MP"/>
+        
+                </a>
+                <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="breadcrumbs">
+            
+    
+
+    
+        
+                        
+    
+        
+                    <div class="xleft">
+            Last Published: 2023-05-13
+                                </div>
+                <div class="xright">            
+    
+
+    
+        
+                        
+    
+        
+                         Version: 5.3-SNAPSHOT
+            </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="leftColumn">
+    <div id="navcolumn">
+                
+    
+
+    
+        
+                        
+    
+        
+                               <h5>OA4MP</h5>
+                        <ul>
+                    
+    <li class="none">
+                        <a href="../../server/index.html">Server</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../client/index.html">Client</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../apidocs/index.html">api docs</a>
+            </li>
+              </ul>
+                            <h5>Supported Specifications</h5>
+                        <ul>
+                    
+    <li class="none">
+                        <a href="https://www.rfc-editor.org/rfc/rfc6749" class="externalLink">RFC 6749</a>
+            </li>
+              
+    <li class="none">
+                        <a href="https://openid.net/specs/openid-connect-core-1_0.html" class="externalLink">OIDC</a>
+            </li>
+              
+    <li class="none">
+                        <a href="https://openid.net/specs/openid-connect-discovery-1_0.html" class="externalLink">OIDC Discovery</a>
+            </li>
+              
+    <li class="none">
+                        <a href="https://www.rfc-editor.org/rfc/rfc7009" class="externalLink">RFC 7009</a>
+            </li>
+              
+    <li class="none">
+                        <a href="https://www.rfc-editor.org/rfc/rfc7591" class="externalLink">RFC 7591</a>
+            </li>
+              
+    <li class="none">
+                        <a href="https://www.rfc-editor.org/rfc/rfc7592" class="externalLink">RFC 7592</a>
+            </li>
+              
+    <li class="none">
+                        <a href="https://www.rfc-editor.org/rfc/rfc7636" class="externalLink">RFC 7636</a>
+            </li>
+              
+    <li class="none">
+                        <a href="https://www.rfc-editor.org/rfc/rfc7662" class="externalLink">RFC 7662</a>
+            </li>
+              
+    <li class="none">
+                        <a href="https://www.rfc-editor.org/rfc/rfc8628" class="externalLink">RFC 8628</a>
+            </li>
+              
+    <li class="none">
+                        <a href="https://www.rfc-editor.org/rfc/rfc8693" class="externalLink">RFC 8693</a>
+            </li>
+              
+    <li class="none">
+                        <a href="https://www.rfc-editor.org/rfc/rfc9068" class="externalLink">RFC 9068</a>
+            </li>
+              </ul>
+                            <h5>Project Documentation</h5>
+                        <ul>
+                    
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-info.html">Project Information</a>
+                        </li>
+              
+                            
+                                        
+                            
+            <li class="collapsed">
+                        <a href="../../project-reports.html">Project Reports</a>
+                        </li>
+              </ul>
+                                               <a href="http://maven.apache.org/" title="Built by Maven"
+           class="poweredBy">
+            <img class="poweredBy"
+                 alt="Built by Maven"
+                 src="http://maven.apache.org/images/logos/maven-feather.png"
+                 width="90"
+                 height="30"
+                 border="1"/>
+        </a>
+                           
+    
+
+    
+        
+                        
+    
+        
+        </div>
+</div>
+<div id="bodyColumn">
+    <div id="contentBox">
+        
+
+
+
+
+<h1>Removing unused clients</h1>
+
+<p>There are many cases where automatic removal of clients is desireable. For
+instance, if OA4MP is configured to be a standalone issuer, it may permit
+only public clients and auto-approve them on registration. A common case though
+is that a user registers a client and then never actually uses it. This causes
+a massive accumulation of clients in the store and no easy way to remove them.
+</p>
+
+<p>What can it do?</p>
+
+<ul>
+    
+<li>Supports whitelist by client ID and regex. Any client on the
+    whitelist is never removed. This lets you retain certain clients
+    (such as templates, or testing clients) that are rarely accessed but
+    need to stay.</li>
+    
+<li>Supports blacklist by client ID and regex. Any client
+    on the blacklist is always removed. This allows, for instance, an
+    adminstrator to make single use temporary clients with specific ids
+    and have them removed.</li>
+    
+<li>Clients may be removed if they have never been used or if their use date
+    is before or is between cutoff dates. </li>
+    
+<li>Versioned clients may optionally be processed as well. Remember though that versioned
+    clients are accessed much less frequently (if ever) than active clients, so it
+    is quite likely setting this to true will remove more of them than you would like.</li>
+    
+<li>May optionally be run on a thread either at intervals or by alarms.</li>
+    
+<li>The CLI may be used to run this as well. Some administrators prefer to
+    only run this manually.</li>
+</ul>
+<section>
+<h2><a name="The_XML_configuration."></a>The XML configuration.</h2>
+
+<table class="bodyTable" style="text-align: left; width: 100%;" border="1" cellspacing="2" cellpadding="2">
+    <tbody>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">Attribute</td>
+        
+<td style="vertical-align: top;">Required?</td>
+        
+<td style="vertical-align: top;">Default</td>
+        
+<td style="vertical-align: top;">Description</td>
+    </tr>
+    
+<tr class="b" id="alarms">
+        
+<td style="vertical-align: top;">notifyACEmailAddresses</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;">false</td>
+        
+<td style="vertical-align: top;">Comma delimited list of times of the form hh:mm:ss.
+            Times are on a 24 hour clock and fractions of seconds are ignored.
+            Monitoring will happen daily at these times. These have right of way over
+            setting an interval.
+        </td>
+    </tr>
+    
+<tr class="a" id="deleteVersions">
+        
+<td style="vertical-align: top;">deleteVersions</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;">false</td>
+        
+<td style="vertical-align: top;">If true, then versions of clients are also removed if they match the
+            criteria of the configuration.
+        </td>
+    </tr>
+    
+<tr class="b" id="enabled">
+        
+<td style="vertical-align: top;">enabled</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;">false</td>
+        
+<td style="vertical-align: top;">Whether or not to enable this. If disabled, then the thread on the server
+            will not be run. In the CLI you can override this and run the cleanup manually.
+        </td>
+    </tr>
+    
+<tr class="a" id="interval">
+        
+<td style="vertical-align: top;">interval</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;">false</td>
+        
+<td style="vertical-align: top;">The length of time for the thread to sleep between looking for unused clients.
+            You may set this or set the alarms.
+            See <a class="externalLink" href="https://oa4mp.org/server/dtd/server-dtd-service-tag.html">A note on time and units</a>
+        </td>
+    </tr>
+
+    
+<tr class="b" id="gracePeriod">
+        
+<td style="vertical-align: top;">gracePeriod</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;">6 hours</td>
+        
+<td style="vertical-align: top;">Specifies that time an unused client may be on the system before getting
+            removed. Default is in seconds, but you can specify any standard unit.
+            E.g. If this is 3600 (one hour), then unused clients
+            that were created/modified more than 3600 seconds ago are removed.
+            See <a class="externalLink" href="https://oa4mp.org/server/dtd/server-dtd-service-tag.html">A note on time and units</a>
+        </td>
+    </tr>
+    
+<tr class="a" id="testModeOn">
+        
+<td style="vertical-align: top;">testModeOn</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;">false</td>
+        
+<td style="vertical-align: top;">A boolean. If set to true, then no actual deletes are done.
+            In the CLI you can print out the client ids that would have been removed.
+        </td>
+    </tr>
+
+    </tbody>
+</table>
+
+<p>The whitelist and blacklist configurations have the same set of internal tags:</p>
+
+<table class="bodyTable" style="text-align: left; width: 100%;" border="1" cellspacing="2" cellpadding="2">
+    <tbody>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">Attribute</td>
+        
+<td style="vertical-align: top;">Required?</td>
+        
+<td style="vertical-align: top;">Default</td>
+        
+<td style="vertical-align: top;">Description</td>
+    </tr>
+    
+<tr class="b" id="clientID">
+        
+<td style="vertical-align: top;">clientID</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;">N/A</td>
+        
+<td style="vertical-align: top;">The client identifier.
+        </td>
+    </tr>
+    
+<tr class="a" id="regex">
+        
+<td style="vertical-align: top;">regex</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;">N/a</td>
+        
+<td style="vertical-align: top;">A regular expression.
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+</section><section>
+<h2><a name="Typical_example_configurations"></a>Typical example configurations</h2>
+
+<div>
+<pre>
+    &lt;unusedClientCleanup gracePeriod=&quot;6 hr&quot;
+                         deleteVersions=&quot;false&quot;
+                         enabled=&quot;true&quot;
+                         interval=&quot;4 hr&quot;&gt;
+        &lt;whitelist&gt;
+           &lt;clientID&gt;template:/basic&lt;/clientID&gt;
+           &lt;clientID&gt;template:/cern&lt;/clientID&gt;
+           &lt;regex&gt;^localhost.*&lt;/regex&gt;
+           &lt;regex&gt;.*comanage.*&lt;/regex&gt;
+        &lt;/whitelist&gt;
+        &lt;blacklist&gt;
+           &lt;clientID&gt;dev:/registration/test/42&lt;/clientID&gt;
+           &lt;regex&gt;^test.*&lt;/regex&gt;
+        &lt;/blacklist&gt;
+    &lt;/unusedClientCleanup&gt;
+</pre></div>
+
+<p>
+    In this example, every 4 hours the thread wakes up and checks. If a client has been
+    created and not used within the grace period (6 hours) then it is removed. Versions
+    are ignored. There is a white list consisting  of a few specific clients (such as templates
+    for creating other clients), any client id that starts with localhost and any client
+    for comanage. The blacklist removes a specific client (used for testing the registration
+    endpoint only) as well as any client id's that start with test.
+</p>
+
+</section>
+
+    </div>
+</div>
+<div class="clear">
+    <hr/>
+</div>
+<div id="footer">
+    <div class="xright">&#169;    
+                    2023
+        
+                    
+    
+
+    
+        
+                        
+    
+        
+    </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+</body>
+</html>
+

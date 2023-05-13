@@ -48,7 +48,7 @@
     
         
                     <div class="xleft">
-            Last Published: 2023-04-27
+            Last Published: 2023-05-13
                                 </div>
                 <div class="xright">            
     
@@ -185,7 +185,13 @@
 <h1>Server-wide client configurations</h1>
 
 <p>There are times that practically all of the clients for a server use the same policies. OA4MP allows for specifying
-QDL scripts to be run for various phases.</p>
+QDL scripts to be run for various phases. This simply adds a <b>scripts</b> elements to the standard
+<a href="../configuration/qdl-config.html">QDL configuration</a></p>
+
+
+<p>One possible use of this would be to add a layer of user management so you could intercept every call
+and perform user specific tasks (such as linking user accounts). </p>
+
 <section>
 <h2><a name="Example"></a>Example</h2>
 

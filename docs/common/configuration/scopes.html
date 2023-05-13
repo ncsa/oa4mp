@@ -1,0 +1,412 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+
+
+
+
+
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>OAuth for MyProxy</title>
+    <style type="text/css" media="all">
+        @import url("../../css/oa4mp-custom.css");
+        @import url("../../css/oa4mp-theme.css");
+        @import url("../../css/site.css");
+    </style>
+    <link rel="stylesheet" href="../../css/print.css" type="text/css" media="print"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    </head>
+<body class="composite">
+<div id="banner">
+                        <a href="http://www.ncsa.illinois.edu/" id="bannerLeft"  >
+        
+                                                                    <img src="../../css/images/ncsalogo_sm-2.gif" alt="NCSA"/>
+        
+                </a>
+                                    <a href="https://ncsa.github.io/oa4mp/" id="bannerRight"  >
+        
+                                                                    <img src="../../css/images/oa4mp-logo-small-2.png" alt="OA4MP"/>
+        
+                </a>
+                <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="breadcrumbs">
+            
+    
+
+    
+        
+                        
+    
+        
+                    <div class="xleft">
+            Last Published: 2023-05-13
+                                </div>
+                <div class="xright">            
+    
+
+    
+        
+                        
+    
+        
+                         Version: 5.3-SNAPSHOT
+            </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="leftColumn">
+    <div id="navcolumn">
+                
+    
+
+    
+        
+                        
+    
+        
+                               <h5>OA4MP</h5>
+                        <ul>
+                    
+    <li class="none">
+                        <a href="../../server/index.html">Server</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../client/index.html">Client</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../apidocs/index.html">api docs</a>
+            </li>
+              </ul>
+                            <h5>Supported Specifications</h5>
+                        <ul>
+                    
+    <li class="none">
+                        <a href="https://www.rfc-editor.org/rfc/rfc6749" class="externalLink">RFC 6749</a>
+            </li>
+              
+    <li class="none">
+                        <a href="https://openid.net/specs/openid-connect-core-1_0.html" class="externalLink">OIDC</a>
+            </li>
+              
+    <li class="none">
+                        <a href="https://openid.net/specs/openid-connect-discovery-1_0.html" class="externalLink">OIDC Discovery</a>
+            </li>
+              
+    <li class="none">
+                        <a href="https://www.rfc-editor.org/rfc/rfc7009" class="externalLink">RFC 7009</a>
+            </li>
+              
+    <li class="none">
+                        <a href="https://www.rfc-editor.org/rfc/rfc7591" class="externalLink">RFC 7591</a>
+            </li>
+              
+    <li class="none">
+                        <a href="https://www.rfc-editor.org/rfc/rfc7592" class="externalLink">RFC 7592</a>
+            </li>
+              
+    <li class="none">
+                        <a href="https://www.rfc-editor.org/rfc/rfc7636" class="externalLink">RFC 7636</a>
+            </li>
+              
+    <li class="none">
+                        <a href="https://www.rfc-editor.org/rfc/rfc7662" class="externalLink">RFC 7662</a>
+            </li>
+              
+    <li class="none">
+                        <a href="https://www.rfc-editor.org/rfc/rfc8628" class="externalLink">RFC 8628</a>
+            </li>
+              
+    <li class="none">
+                        <a href="https://www.rfc-editor.org/rfc/rfc8693" class="externalLink">RFC 8693</a>
+            </li>
+              
+    <li class="none">
+                        <a href="https://www.rfc-editor.org/rfc/rfc9068" class="externalLink">RFC 9068</a>
+            </li>
+              </ul>
+                            <h5>Project Documentation</h5>
+                        <ul>
+                    
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-info.html">Project Information</a>
+                        </li>
+              
+                            
+                                        
+                            
+            <li class="collapsed">
+                        <a href="../../project-reports.html">Project Reports</a>
+                        </li>
+              </ul>
+                                               <a href="http://maven.apache.org/" title="Built by Maven"
+           class="poweredBy">
+            <img class="poweredBy"
+                 alt="Built by Maven"
+                 src="http://maven.apache.org/images/logos/maven-feather.png"
+                 width="90"
+                 height="30"
+                 border="1"/>
+        </a>
+                           
+    
+
+    
+        
+                        
+    
+        
+        </div>
+</div>
+<div id="bodyColumn">
+    <div id="contentBox">
+        
+
+
+
+<section>
+<h2><a name="Scopes"></a>Scopes</h2>
+
+
+
+<p> OA4MP supports the scope parameter for servers. Unfortunately, <i>scope</i>
+    has been completely overused and has acquired several meanings. To be completely clear,
+    <b>scopes</b> are requests that ask for certain claims to be asserted in various tokens.</p>
+
+<ul>
+    
+<li>requests for user meta data (e.g. <b>email</b>, <b>profile</b>, etc. These are
+        returned in the ID token</li>
+    
+<li>requests for permissions to access resources, e.g. <b>storage.read:/public/physics/muon</b>
+    and are returned in the access token.</li>
+</ul>
+
+<p>Remember that, unhelpfully, if you send in a scope request, the resulting claim is asserted
+using the scope tag again. This completely confuses many people since the request and response look
+the same. It's the specification though, so we get to live with it.</p>
+
+
+<p>
+    The id token is a JWT (JSON Web Token) which has a header (signing information),
+    payload (a base 64 encoded JSON object), and signature, plus a system
+    for verifying the signature. Historically, since this could be trusted by
+    checking with the server if it had been altered, people started using it as a type of access
+    token. That's both a good and bad idea, since it is not really designed for granting access
+    to things, but, yes, it can be verified.
+    At this point, all the tokens an OAuth 2 server could create (authorization, access, refresh)
+    started to mutate into JWTs. This is a good thing. OA4MP lets you do this, it also will
+    issue old style opaque tokens.
+</p>
+
+<p>
+    <i>A note about native tokens in OA4MP.</i> These are unforgeable, self-describing and unique
+    (unlike many OAuth servers where they are indeed just random strings). Here is an example of one:</p>
+
+<div>
+<pre>
+    https://cilogon.org/oauth2/6c41b109f62d6776976bc23816e97f5a?type=refreshToken&amp;ts=1683061597117&amp;version=v2.0&amp;lifetime=500000000
+</pre></div>
+    
+<p>If you do not want/need JWTs for your service, you will get these. If you do get JWTs, these native
+    tokens will be used as the <b>jti</b> unique identifier.
+</p>
+
+<p>
+    This sure is messy you think. Is there another way to request scopes? Sort of. Another attempts was to
+    create essentially an entire request language per
+    claim in the <b>claim</b> parameter, but that turned into such a mess and most servers don't support that.
+    OA4MP most certainly does not mostly since the requests are even hard to write.
+    I am relating this history because people who are new to this often have a devil of a time figuring
+    out why the scope parameter does what it does.
+</p>
+
+</section><section>
+<h2><a name="The_basic_supported_scopes_in_OA4MP_are"></a>The basic supported scopes in OA4MP are </h2>
+
+<ul>
+    
+<li>openid - (optional) treat the request as OIDC, meaning an id token is created and at the least will
+                 contain the <i>sub</i> claim for the user.</li>
+    
+<li>email - returns the user's email address, if available.</li>
+    
+<li>profile - returns information about the user's profile</li>
+    
+<li>org.cilogon.userinfo - This returns all enabled information about the user from the service and allows
+    access to the user information endpoint. </li>
+    
+<li>edu.uiuc.ncsa.myproxy.getcert - <span style="background-color: #ff6600;">(deprecated!)</span>
+        the server returns a certificate from the getCert endpoint.
+        If the client omits this, then attempts to get
+        a certificate will be rejected. However, requests to the user info endpoint will still be processed.
+    </li>
+    
+<li>offline_access - (optional) some clients send this when requesting a refresh token. If
+    it is included, the <b>prompt</b> parameter must be set to <i>consent</i> (this is just the spec.)
+    Note that OA4MP clients are simply configured to issue refresh tokens or not,
+    so this parameter is ignored. It cannot, for instance, be used to force the server to issue refresh tokens.</li>
+</ul>
+
+<p><b><i>Nota Bene:</i></b> Clients on the server (as opposed to free standing clients)
+    by default are configured with the <b>strict_scopes</b> set to true.
+    What that means is that any scope not in its configured scope list will raise an error.
+    This is done since clients that typically need a handful of specific scopes should be alerted if
+    an unknown scope is requested. The spec says that  unknown scopes may be ignored and that is
+    common enough for most OAuth 2 servers, but our experience is that the vast majority of times
+    there is a typo in the scope (so requesting emaile not email) and it is far better that the request fail
+    initially so it can be fixed rather than have a mystery that the email claim is not asserted.
+</p>
+
+<p>If you need a lot of flexibility in setting claims (such as for SciTokens or WLCG token requests
+that are asserted in the access token, set the <b>strict_scopes</b> to false. You can pass in anything
+at that point and the more standard OAuth 2 behvaior of just ignoring anything unknown will be in effect.</p>
+
+</section><section>
+<h2><a name="Setting_scopes_in_the_configuration"></a>Setting scopes in the configuration</h2>
+
+<p>The configuration allows you to set statically
+    which scopes are requested as follows. This is in both the client configuration, where it is used to
+    construct the request with the given scopes, and the server configuration, where it sets a fixed
+    list of scopes that will be strictly honored (by default). The top-level tag is the scopes
+    tag and that in turn contains scope tags. These scope tags contain a single scope and
+    supports a single attribute:
+</p>
+
+
+<table class="bodyTable" style="text-align: left; width: 100%;" border="1" cellspacing="2" cellpadding="2">
+    <tbody>
+    
+<tr class="a">
+         
+<td style="vertical-align: top;">Name</td>
+         
+<td style="vertical-align: top;">Required</td>
+         
+<td style="vertical-align: top;">Default</td>
+         
+<td style="vertical-align: top;">Description</td>
+     </tr>
+    
+<tr class="b">
+        
+<td style="vertical-align: top;">enabled</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;">true</td>
+        
+<td style="vertical-align: top;">Enable or disable this scope.</td>
+    </tr>
+    </tbody>
+</table>
+
+</section><section>
+<h2><a name="A_client_example"></a>A client example</h2>
+
+<div>
+<pre>
+&lt;config&gt;
+   &lt;client name=&quot;my-cfg&quot;&gt;
+    &lt;scopes&gt;
+        &lt;scope&gt;custom.scope&lt;/scope&gt;
+    &lt;/scopes&gt;
+        &lt;!-- other stuff.. --&gt;
+    &lt;client&gt;
+&lt;/config&gt;
+</pre></div>
+
+<p>The client will include <b>custom.scope</b> in requests to the server <i>in addition to the standard scopes</i>.
+   The default OA4MP client behavior is to request all the standard scopes (exception offline_access). Additions
+   to the scopes element are therefore additive. To disallow a scope, disable it:</p>
+
+<div>
+<pre>
+    &lt;config&gt;
+       &lt;client name=&quot;my-cfg&quot;&gt;
+        &lt;scopes&gt;
+            &lt;scope enabled=&quot;false&quot;&gt;edu.uiuc.ncsa.myproxy.getcert&lt;/scope&gt;
+        &lt;/scopes&gt;
+            &lt;!-- other stuff.. --&gt;
+        &lt;client&gt;
+    &lt;/config&gt;
+
+</pre></div>
+
+<p>This would omit the getcert scope, but request all the other scopes.</p>
+
+</section><section>
+<h2><a name="A_server_example"></a>A server example</h2>
+
+<div>
+<pre>
+&lt;config&gt;
+   &lt;server name=&quot;my-server&quot;&gt;
+    &lt;scopes&gt;
+    &lt;scope enabled=&quot;false&quot;&gt;edu.uiuc.ncsa.myproxy.getcert&lt;/scope&gt;
+    &lt;scope&gt;my.custom.scope&lt;/scope&gt;
+    &lt;/scopes&gt;
+        &lt;!-- other stuff.. --&gt;
+    &lt;/server&gt;
+&lt;/config&gt;
+</pre></div>
+
+<p>In this case, in the registration page, the custom scope of <b>my.custom.scope</b> would be presented
+as an option, but the getcert scope would not. These scopes would then be added to the client's configuration
+so that requests with <b>my.custom.scope</b> would be accepted. Of course, some form of processing to
+do somethign with that scope is needed, e.g. QDL scripting.</p>
+
+
+<section>
+<h3><a name="Final_caveat_for_OA4MP_clients"></a>Final caveat for OA4MP clients</h3>
+
+
+<p>The standard OA4MP client sends along only the scope parameter in the initial request. You may also
+    send along scopes in the token, refresh and exchange phases but you need to customize to do that.
+</p>
+
+
+
+</section></section>
+
+    </div>
+</div>
+<div class="clear">
+    <hr/>
+</div>
+<div id="footer">
+    <div class="xright">&#169;    
+                    2023
+        
+                    
+    
+
+    
+        
+                        
+    
+        
+    </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+</body>
+</html>
+

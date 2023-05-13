@@ -1,0 +1,240 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+
+
+
+
+
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>OAuth for MyProxy</title>
+    <style type="text/css" media="all">
+        @import url("../../css/oa4mp-custom.css");
+        @import url("../../css/oa4mp-theme.css");
+        @import url("../../css/site.css");
+    </style>
+    <link rel="stylesheet" href="../../css/print.css" type="text/css" media="print"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    </head>
+<body class="composite">
+<div id="banner">
+                        <a href="http://www.ncsa.illinois.edu/" id="bannerLeft"  >
+        
+                                                                    <img src="../../css/images/ncsalogo_sm-2.gif" alt="NCSA"/>
+        
+                </a>
+                                    <a href="https://ncsa.github.io/oa4mp/" id="bannerRight"  >
+        
+                                                                    <img src="../../css/images/oa4mp-logo-small-2.png" alt="OA4MP"/>
+        
+                </a>
+                <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="breadcrumbs">
+            
+    
+
+    
+        
+                        
+    
+        
+                    <div class="xleft">
+            Last Published: 2023-05-13
+                                </div>
+                <div class="xright">            
+    
+
+    
+        
+                        
+    
+        
+                         Version: 5.3-SNAPSHOT
+            </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="leftColumn">
+    <div id="navcolumn">
+                
+    
+
+    
+        
+                        
+    
+        
+                               <h5>OA4MP</h5>
+                        <ul>
+                    
+    <li class="none">
+                        <a href="../../server/index.html">Server</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../client/index.html">Client</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../apidocs/index.html">api docs</a>
+            </li>
+              </ul>
+                            <h5>Supported Specifications</h5>
+                        <ul>
+                    
+    <li class="none">
+                        <a href="https://www.rfc-editor.org/rfc/rfc6749" class="externalLink">RFC 6749</a>
+            </li>
+              
+    <li class="none">
+                        <a href="https://openid.net/specs/openid-connect-core-1_0.html" class="externalLink">OIDC</a>
+            </li>
+              
+    <li class="none">
+                        <a href="https://openid.net/specs/openid-connect-discovery-1_0.html" class="externalLink">OIDC Discovery</a>
+            </li>
+              
+    <li class="none">
+                        <a href="https://www.rfc-editor.org/rfc/rfc7009" class="externalLink">RFC 7009</a>
+            </li>
+              
+    <li class="none">
+                        <a href="https://www.rfc-editor.org/rfc/rfc7591" class="externalLink">RFC 7591</a>
+            </li>
+              
+    <li class="none">
+                        <a href="https://www.rfc-editor.org/rfc/rfc7592" class="externalLink">RFC 7592</a>
+            </li>
+              
+    <li class="none">
+                        <a href="https://www.rfc-editor.org/rfc/rfc7636" class="externalLink">RFC 7636</a>
+            </li>
+              
+    <li class="none">
+                        <a href="https://www.rfc-editor.org/rfc/rfc7662" class="externalLink">RFC 7662</a>
+            </li>
+              
+    <li class="none">
+                        <a href="https://www.rfc-editor.org/rfc/rfc8628" class="externalLink">RFC 8628</a>
+            </li>
+              
+    <li class="none">
+                        <a href="https://www.rfc-editor.org/rfc/rfc8693" class="externalLink">RFC 8693</a>
+            </li>
+              
+    <li class="none">
+                        <a href="https://www.rfc-editor.org/rfc/rfc9068" class="externalLink">RFC 9068</a>
+            </li>
+              </ul>
+                            <h5>Project Documentation</h5>
+                        <ul>
+                    
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-info.html">Project Information</a>
+                        </li>
+              
+                            
+                                        
+                            
+            <li class="collapsed">
+                        <a href="../../project-reports.html">Project Reports</a>
+                        </li>
+              </ul>
+                                               <a href="http://maven.apache.org/" title="Built by Maven"
+           class="poweredBy">
+            <img class="poweredBy"
+                 alt="Built by Maven"
+                 src="http://maven.apache.org/images/logos/maven-feather.png"
+                 width="90"
+                 height="30"
+                 border="1"/>
+        </a>
+                           
+    
+
+    
+        
+                        
+    
+        
+        </div>
+</div>
+<div id="bodyColumn">
+    <div id="contentBox">
+        
+
+
+
+
+   <h1>Last accessed time monitoring.</h1>
+
+<p>Various stored objects in OA4MP such as clients, admin clients, ersatz clients and virtual organizations
+will have their access times logged and updated. Given the nature of the server, this is done
+by keeping a running log of these accesses and periodically doing a batch update on persistent
+storage. This keeps the server load to a minimum, since a typical use pattern is that a client
+is accessed very often at the beginning of a flow then may go a very long time (say awaiting an exchange)
+before being accessed again. Caching all of the intial accesses into a single call is a much less
+impactful way of doign it.</p>
+<section>
+<h2><a name="How_does_it_work.3F"></a>How does it work?</h2>
+
+<p>
+    The <a href="../dtd/server-dtd-service-tag.html">server tag</a> contains three attributes,
+    <a href="../dtd/server-dtd-service-tag.html#enableMonitor">enableMonitor</a>,
+    <a href="../dtd/server-dtd-service-tag.html#monitorInterval">monitorInterval</a> and
+    <a href="../dtd/server-dtd-service-tag.html#monitorAlarms">monitorAlarms</a> that control
+    the behavior. You must enable this component to use it, then either set an interval so that the monitor
+    wakes up every interval and runs, or you set specific alarms to run. Alarms are given preferences,
+    so if you set both, you will get alarms. A plus with alarms is that you can schedule them to run
+    when you know server load is low.
+</p>
+</section><section>
+<h2><a name="How_to_use_this_information"></a>How to use this information</h2>
+
+<p>You may look at the last accessed time for the object in the CLI. If it has been accessed,
+   then it will have the property last_accessed. You can use this to schedule <a href="./unused-client-cleanup.html">unsed client cleanup</a>s
+   with various parameters for standard clients.
+   This unused client cleanup is also available in the CLI,</p>
+
+</section>
+
+    </div>
+</div>
+<div class="clear">
+    <hr/>
+</div>
+<div id="footer">
+    <div class="xright">&#169;    
+                    2023
+        
+                    
+    
+
+    
+        
+                        
+    
+        
+    </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+</body>
+</html>
+
