@@ -11,11 +11,11 @@ import java.util.List;
 /**
  * Typical configuration example:
  * <pre>
- *  &lt;unusedClientConfigurations expiration="6 hr"
- *                              alarms="6:00"
- *                              deleteVersions="false"
- *                              enabled="true"
- *                              interval="1 hr"&gt;
+ *  &lt;unusedClientCleanup gracePeriod="6 hr"
+ *                                 alarms="6:00"
+ *                                 deleteVersions="false"
+ *                                 enabled="true"
+ *                                 interval="1 hr"&gt;
  *      &lt;whitelist&gt;
  *         &lt;clientID&gt;id...&lt;/clientID&gt;
  *         &lt;clientID&gt;id...&lt;/clientID&gt;
@@ -27,7 +27,7 @@ import java.util.List;
  *         &lt;clientID&gt;id...&lt;/clientID&gt;
  *         &lt;regex&gt;^template.*&lt;/regex&gt;
  *      &lt;/blacklist&gt;
- *  &lt;/unusedClientConfigurations&gt;
+ *  &lt;/unusedClientCleanup&gt;
  * </pre>
  * <p>Created by Jeff Gaynor<br>
  * on 5/11/23 at  6:43 AM

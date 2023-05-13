@@ -41,7 +41,7 @@ the same. It's the specification though, so we get to live with it.</p>
     <i>A note about native tokens in OA4MP.</i> These are unforgeable, self-describing and unique
     (unlike many OAuth servers where they are indeed just random strings). Here is an example of one:</p>
 <pre>
-    https://cilogon.org/oauth2/6c41b109f62d6776976bc23816e97f5a?type=refreshToken&ts=1683061597117&version=v2.0&lifetime=500000000
+    https://cilogon.org/oauth2/6c41b109f62d6776976bc23816e97f5a?type=refreshToken&amp;ts=1683061597117&amp;version=v2.0&amp;lifetime=500000000
 </pre>
     <p>If you do not want/need JWTs for your service, you will get these. If you do get JWTs, these native
     tokens will be used as the <b>jti</b> unique identifier.
