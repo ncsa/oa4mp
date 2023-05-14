@@ -133,7 +133,7 @@ public class UUCConfiguration {
         return "UUCConfiguration{" +
                 (prettyPrint ? "\n   " : "") + "enabled=" + enabled +
                 (prettyPrint ? "\n   " : "") + "lastAccessed=" + (lastAccessed==null?"never": Iso8601.date2String(lastAccessed)) +
-                (prettyPrint ? ",\n   " : "") + "expiration=" + gracePeriod +
+                (prettyPrint ? ",\n   " : "") + "gracePeriod=" + gracePeriod +
                 (prettyPrint ? ",\n   " : "") + "interval=" + interval +
                 (prettyPrint ? ",\n   " : "") + "testMode=" + testMode +
                 (prettyPrint ? ",\n   " : "") + "alarms=" + alarms +
