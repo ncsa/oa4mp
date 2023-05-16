@@ -1,0 +1,105 @@
+<?xml version="1.0"?>
+<faqs xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="https://maven.apache.org/FML/1.0"
+      xsi:schemaLocation="https://maven.apache.org/FML/1.0 https://maven.apache.org/xsd/fml-1.0.xsd"
+      id="General FAQ">
+    <part id="General">
+        <faq id="what is oa4mp">
+            <question>What is OA4MP?
+            </question>
+            <answer>OA4MP stands for "Open Authorization for Many People" (formerly "Open Authorization for MyProxy")
+                and is an implementation of the OAuth 2 specification
+            </answer>
+        </faq>
+        <faq id="what libraries are used?">
+            <question>What libraries does it use?</question>
+            <answer>OA4MP predates the OAuth 2 specification and was initially a native
+                OAuth 1.0a implementation. As such, it came into existence independently of
+                any other implementations. It requires no other implementations. Moreover, it
+                is quite mature and has been in production since roughly 2011 and supports most
+                standard major protocols.
+            </answer>
+        </faq>
+        <faq id="client library support">
+            <question>My client is using library X in language Y. Will it work with OA4MP?</question>
+            <answer>Oh yes. At current writing, in one project alone (CILogon) we have over
+                1500 registered clients of various implementations. If your client complies with
+                standards (even some rather odd ones) it's a good bet it works with OA4MP just
+                fine.
+            </answer>
+        </faq>
+        <faq id="Are JWTs supported?">
+            <question>Are JWTs (Java Web Tokens) supported?</question>
+            <answer>Yes. Which means
+                <a href="https://www.rfc-editor.org/rfc/rfc7019">JWTs</a>
+                and their <a href="https://www.rfc-editor.org/rfc/rfc8725">best practices</a>.
+                Not what you meant? A very common misconception is that JWTs (which is a format
+                for tokens) are the same thing as access or identity tokens. OA4MP will happily
+                issue tokens in various format with various specifications, such as SciTokens,
+                WLCG tokens and <a href="https://www.rfc-editor.org/rfc/rfc9068">basic</a>.
+            </answer>
+        </faq>
+        <faq id="value added">
+            <question>Ther are tons of OAuth and OIDC servers. What does OA4MP offer?</question>
+            <answer>
+                <p>OA4MP offers a very long and distinguished service life -- it is very well
+                    tested and has performed well for over a decade. It also supports a huge number of
+                    specifications, so if there are rarely issues with any clients. Finally, it provides
+                    a very elegant way to extend the service with an external scripting language,
+                    <a href="https://qdl-lang.org">QDL</a>
+                </p>
+                <p>A typical real world use is a large national scientific lab that has dozens of specialized
+                    clients for various research projects. (See the policy example below).
+                    There are token issuance policies for the institution
+                    as well as very specific requirement for interoperations. These policies are implemented in
+                    QDL which runs on OA4MP.
+                </p>
+            </answer>
+        </faq>
+        <faq id="Policy example">
+            <question>What sorts of policies might an OA4MP server implements</question>
+            <answer>
+                <p>This is taken from one of our customers. A user may authenticate with
+                    and of a certain number of IDPs (Identity Providers). For some of these that are affiliates,
+                    user information is searched in an external source (a private LDAP) and the user
+                    is verified in that way. This is the institutional policy for access by
+                    non-members. This permits institutions to collaborate on projects without, say, having to issue
+                    temporary logins for external members.
+                </p>
+                <p>Now we move on to policies for a client. (So a client in practice might
+                    be for a specific research grant and allow access to the resources for that.)
+                    Policies about what set of scopes with specific requests for access tokens
+                    and identity information are honored. (Again, if users are at different institutions,
+                    there may be different policies on what personal information may be disclosed.)
+                    These typically require look ups in a database or LDAP.
+                    Policies can be
+                    applied based on other group memberships of the user. (E.g. a user that requests read access
+                    to a MySQL database must be in the mysql-access group). It is possible to have extremely complex,
+                    tailored policies that allow rigorous and exacting enforcement for each client. This forces
+                    sane and coherant policies across multiple institutions.
+                </p>
+            </answer>
+        </faq>
+        <faq id="History">
+            <question>Where did OA4MP come from?</question>
+            <answer>The original version was written as part of <a href="https://www.cilogon.org">CILogon</a>,
+                the <a href="https://www.ncsa.illinois.edu/">NCSA</a>'s venerable platform for integrated
+                identity and access management in the Sciences. When it started (ca. 2010), there
+                were no tokens, simply X.509 certificates. A very evil but common practice was that
+                researchers would have to give their credentials (username and password) to institutions
+                to run scientific computing jobs on their behalf. This cannot be condemned highly enough
+                from a security perspective. CILogon offered (and still does) an excellent solution.
+                OA4MP is all of the Open Authorization machinery for CIlogon.
+                As time progressed, it became clear that tokens should replace X.509 certificates for various
+                reasons and OA4MP did as well. The major users of certificates have migrated to tokens and
+                OA4MP has, as ever, been on the cutting edge for adding support.
+            </answer>
+        </faq>
+
+    </part>
+</faqs>
+        <!--
+   <faq id="">
+       <question></question>
+       <answer></answer>
+   </faq>
+        -->

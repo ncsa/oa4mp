@@ -6,15 +6,15 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientKeys;
 import edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.QDLJSONConfigUtil;
 import edu.uiuc.ncsa.myproxy.oauth2.base.ClientApprovalStoreCommands;
 import edu.uiuc.ncsa.myproxy.oauth2.base.ClientStoreCommands;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.LDAPConfigurationUtil;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.BaseClientStore;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.uuc.UUCConfiguration;
 import edu.uiuc.ncsa.qdl.scripting.JSONScriptUtil;
 import edu.uiuc.ncsa.qdl.scripting.Scripts;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.LDAPConfigurationUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.XMLMap;
 import edu.uiuc.ncsa.security.util.cli.BasicIO;
@@ -713,10 +713,14 @@ public class OA2ClientCommands extends ClientStoreCommands {
             say("UUC configuration not found");
             return;
         }
-        getUucConfiguration().enabled = inputLine.hasArg(UUC_FLAG_ENABLE);
-        inputLine.removeSwitch(UUC_FLAG_ENABLE);
-        if (!getUucConfiguration().enabled) {
-            say("UUC configuration not enabled. ");
+        if(inputLine.hasArg(UUC_FLAG_ENABLE)){
+            getUucConfiguration().enabled = inputLine.hasArg(UUC_FLAG_ENABLE);
+            inputLine.removeSwitch(UUC_FLAG_ENABLE);
+            say("UUC configuration" + (getUucConfiguration().enabled?"enabled":"disabled") +" . ");
+            return;
+        }
+        if(!getUucConfiguration().enabled){
+            say("configuration disabled");
             return;
         }
         if (inputLine.hasArg(UUC_FLAG_TEST)) {

@@ -33,6 +33,7 @@ import java.util.List;
  * on 5/11/23 at  6:43 AM
  */
 public class UUCConfiguration {
+    public static final long UUC_LAST_ACCESSED_NEVER_VALUE = -1L;
     public boolean enabled;
     public long gracePeriod;
     public long interval;
@@ -89,7 +90,7 @@ public class UUCConfiguration {
     public Long lastAccessed = null;
 
     public boolean unusedClientsOnly(){
-        return lastAccessed == null;
+        return lastAccessed == null || lastAccessed == UUC_LAST_ACCESSED_NEVER_VALUE;
     }
 
     public Long lastAccessedAfter = null;
