@@ -4,10 +4,13 @@ script_load('init.qdl');
 
 payload. := from_json(file_read(ini.'payloads' + 'create.json'));
 resp. := http#post(payload.);
+logger(2,'creating basic client');
 ⊨ resp.'status'.'code' == 201 : 'incorrect returned status of ' + resp.'status'.'code';
+logger(2,'got client id=' + resp.'content'.'client_id');
+⊨ ini.'caput' < resp.'content'.'client_id' : 'failed to get custom generated client id';
 r. := http#get({'client_id':resp.'content'.'client_id'});
 // r. now contains the uploaded client
 script_load('cm-compare.qdl', r.'content', payload., {'application_type', 'token_endpoint_auth_method'});
 r. := http#delete({'client_id':resp.'content'.'client_id'});
-say('ok: Admin creation of basic client');
+logger(2,say('ok: Admin creation of basic client'));
 

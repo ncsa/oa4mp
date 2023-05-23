@@ -522,7 +522,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
             uucConfiguration.alarms = getAlarms(node, UUC_ALARMS);
             String x = Configurations.getFirstAttribute(node, UUC_LAST_ACCESSED);
             if(StringUtils.isTrivial(x) || x.equalsIgnoreCase(UUC_LAST_ACCESSED_NEVER)){
-                uucConfiguration.lastAccessed = -1L;
+                uucConfiguration.lastAccessed = UUCConfiguration.UUC_LAST_ACCESSED_NEVER_VALUE;
             }else{
                 try {
                     uucConfiguration.lastAccessed = Iso8601.string2Date(x).getTimeInMillis();

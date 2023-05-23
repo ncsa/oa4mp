@@ -11,11 +11,11 @@ import java.util.List;
 /**
  * Typical configuration example:
  * <pre>
- *  &lt;unusedClientConfigurations expiration="6 hr"
- *                              alarms="6:00"
- *                              deleteVersions="false"
- *                              enabled="true"
- *                              interval="1 hr"&gt;
+ *  &lt;unusedClientCleanup gracePeriod="6 hr"
+ *                                 alarms="6:00"
+ *                                 deleteVersions="false"
+ *                                 enabled="true"
+ *                                 interval="1 hr"&gt;
  *      &lt;whitelist&gt;
  *         &lt;clientID&gt;id...&lt;/clientID&gt;
  *         &lt;clientID&gt;id...&lt;/clientID&gt;
@@ -27,12 +27,13 @@ import java.util.List;
  *         &lt;clientID&gt;id...&lt;/clientID&gt;
  *         &lt;regex&gt;^template.*&lt;/regex&gt;
  *      &lt;/blacklist&gt;
- *  &lt;/unusedClientConfigurations&gt;
+ *  &lt;/unusedClientCleanup&gt;
  * </pre>
  * <p>Created by Jeff Gaynor<br>
  * on 5/11/23 at  6:43 AM
  */
 public class UUCConfiguration {
+    public static final long UUC_LAST_ACCESSED_NEVER_VALUE = -1L;
     public boolean enabled;
     public long gracePeriod;
     public long interval;
@@ -89,7 +90,7 @@ public class UUCConfiguration {
     public Long lastAccessed = null;
 
     public boolean unusedClientsOnly(){
-        return lastAccessed == null;
+        return lastAccessed == null || lastAccessed == UUC_LAST_ACCESSED_NEVER_VALUE;
     }
 
     public Long lastAccessedAfter = null;
@@ -133,7 +134,7 @@ public class UUCConfiguration {
         return "UUCConfiguration{" +
                 (prettyPrint ? "\n   " : "") + "enabled=" + enabled +
                 (prettyPrint ? "\n   " : "") + "lastAccessed=" + (lastAccessed==null?"never": Iso8601.date2String(lastAccessed)) +
-                (prettyPrint ? ",\n   " : "") + "expiration=" + gracePeriod +
+                (prettyPrint ? ",\n   " : "") + "gracePeriod=" + gracePeriod +
                 (prettyPrint ? ",\n   " : "") + "interval=" + interval +
                 (prettyPrint ? ",\n   " : "") + "testMode=" + testMode +
                 (prettyPrint ? ",\n   " : "") + "alarms=" + alarms +

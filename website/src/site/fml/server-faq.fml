@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<faqs xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="https://maven.apache.org/FML/1.0"
+      xsi:schemaLocation="https://maven.apache.org/FML/1.0 https://maven.apache.org/xsd/fml-1.0.xsd"
+      id="General FAQ">
+    <part id="General">
+        <faq id="admin clients">
+            <question>What is an admin client?</question>
+            <answer>OA4MP has a concept of administrative clients. These are clients that may
+                create, approve, etc., standard OAuth clients. Why have these? Institutions frequently
+                need to manage groups of clients. Say, a large national laboratory uses clients to
+                manage access to resources for many research projects. The point is that the
+                administrative client has the trust relationship that allows it to manage these.
+            </answer>
+        </faq>
+        <faq id="creating an admin client">
+            <question>How to I create and admin client?</question>
+            <answer>There is a separate administrative client registration page (typically at
+                host://oauth2/admin-register). Alternately, you can create one at the command
+                line in teh CLI.
+            </answer>
+        </faq>
+        <faq id="what is the CLI">
+            <question>What is the CLI?</question>
+            <answer>The OA4MP CLI (Command Lien Interface) is a character-mode application
+                that allows wide-ranging administrative abilities to an OA4MP server. These include low
+                level actions such as adding, aditing or removing clients, creating virtual organizations
+                manually runnign garbage collection. Note that there is a complete reference available
+                from within the CLI, so if you are running it, you should certainly be able to
+                get help.
+            </answer>
+        </faq>
+        <faq id="VOs">
+            <question>What is a VO?</question>
+            <answer>VO (short for Virtual Organization) creates a set of keys and
+                a specified issuer for an organization. This is useful inside a larger
+                organization, E.g. your university has clients but your department needs
+                a specific issuer for various projects.
+                These are relatively easy to create and work mostly seamlessly.
+            </answer>
+        </faq>
+    </part>
+</faqs>

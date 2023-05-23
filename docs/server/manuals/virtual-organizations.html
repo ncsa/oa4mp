@@ -1,0 +1,238 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+
+
+
+
+
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>OAuth for MyProxy</title>
+    <style type="text/css" media="all">
+        @import url("../../css/oa4mp-custom.css");
+        @import url("../../css/oa4mp-theme.css");
+        @import url("../../css/site.css");
+    </style>
+    <link rel="stylesheet" href="../../css/print.css" type="text/css" media="print"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    </head>
+<body class="composite">
+<div id="banner">
+                        <a href="http://www.ncsa.illinois.edu/" id="bannerLeft"  >
+        
+                                                                    <img src="../../css/images/ncsalogo_sm-2.gif" alt="NCSA"/>
+        
+                </a>
+                                    <a href="https://ncsa.github.io/oa4mp/" id="bannerRight"  >
+        
+                                                                    <img src="../../css/images/oa4mp-logo-small-2.png" alt="OA4MP"/>
+        
+                </a>
+                <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="breadcrumbs">
+            
+    
+
+    
+        
+                        
+    
+        
+                    <div class="xleft">
+            Last Published: 2023-05-19
+                                </div>
+                <div class="xright">            
+    
+
+    
+        
+                        
+    
+        
+                         Version: 5.3-SNAPSHOT
+            </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="leftColumn">
+    <div id="navcolumn">
+                
+    
+
+    
+        
+                        
+    
+        
+                               <h5>OA4MP</h5>
+                        <ul>
+                    
+    <li class="none">
+                        <a href="../../oa4mp-faq.html">FAQ</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../server/index.html">Server</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../client/index.html">Client</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../common/configuration/supported-specifications.html">Supported specs</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../apidocs/index.html">api docs</a>
+            </li>
+              </ul>
+                            <h5>Project Documentation</h5>
+                        <ul>
+                    
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-info.html">Project Information</a>
+                        </li>
+              
+                            
+                                        
+                            
+            <li class="collapsed">
+                        <a href="../../project-reports.html">Project Reports</a>
+                        </li>
+              </ul>
+                                               <a href="http://maven.apache.org/" title="Built by Maven"
+           class="poweredBy">
+            <img class="poweredBy"
+                 alt="Built by Maven"
+                 src="http://maven.apache.org/images/logos/maven-feather.png"
+                 width="90"
+                 height="30"
+                 border="1"/>
+        </a>
+                           
+    
+
+    
+        
+                        
+    
+        
+        </div>
+</div>
+<div id="bodyColumn">
+    <div id="contentBox">
+        
+
+
+
+<h1>Introduction</h1>
+
+<p>
+    A <b><i>virtual organization</i></b> in OA4MP is an abstract model of a
+    dedicated organization's issuer. It provides unique signing keys, an
+    issuer, well-known endpoint and other essentials.
+</p>
+<section>
+<h2><a name="Who_uses_them.3F"></a>Who uses them?</h2>
+
+<p>
+    The standard way is that an administrative client joins the VO. At that point,
+    every standard client that it manages is in the VO and will have all the
+    necessary changes done to its tokens automatically. Note that if yo have existing
+    clients and add them to a VO, they must be made aware of it as well as an consumers
+    of their tokens, since the issuer will change.
+</p>
+</section><section>
+<h2><a name="Creating_a_VO"></a>Creating a VO</h2>
+
+<p>
+    This is done with the CLI. Use the vo component. Issue a <b>create</b> command and follow the
+    instructions. There are a few items to note:</p>
+
+<ul>
+    
+<li>You may set the id token issuer as the <b>issuer</b> property and the issuer asserted
+    in access tokens with the <b>at_issuer</b>. Frequently these are not the same.</li>
+    
+<li>This will generate a set of keys for you if you want or it will use a pre-existing set.
+        If you want to use a pre-existing set, make sure that they exist. You will be prompted for
+        a path to them.
+    </li>
+    
+<li>
+        The id for the VO is vo_id. In the admin client there are properties for
+        <b>vo</b> and <b>vo_uri</b>. In an earlier version, these
+        were different. They should always be the same and identical to the vo_id.
+    </li>
+</ul>
+
+<p>
+    Inside the vo component, help is available. Use it! So you may issue <b>/help</b> at any time
+    and get a list of all the properties. This facility is also available during object creation.
+    This means that as you are prompted for each property,
+    you can issue <b>/help</b> as the value and the help for that will be printed. E.g. if
+    you are prompted for the name you could issue
+</p>
+
+<div>
+<pre>
+ enter the name[(null)]:/help
+ Property: String. (--)
+ The human-readable name for this client. This is displayed on the consent
+ screen, so it really should make sense to the user and they know exactly what they are
+ consenting too.
+ enter the name[(null)]:
+</pre></div>
+
+<p>
+    So the help is printed, then you are prompted again for the value of the name.
+</p>
+</section><section>
+<h2><a name="Using_a_VO"></a>Using a VO</h2>
+
+<p>
+    Admin clients are en
+</p>
+</section>
+
+    </div>
+</div>
+<div class="clear">
+    <hr/>
+</div>
+<div id="footer">
+    <div class="xright">&#169;    
+                    2023
+        
+                    
+    
+
+    
+        
+                        
+    
+        
+    </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+</body>
+</html>
+
