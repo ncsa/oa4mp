@@ -29,10 +29,8 @@
 
 
 */
-
 path := '/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests';
 if[path∉script_path()][script_path(path ~ script_path());];
-
 original_file := '/home/ncsa/dev/ncsa-git/oa4mp/server-admin/src/main/resources/qdl/ui-test/test-claims.json';
 claims_file := '/home/ncsa/dev/ncsa-git/oa4mp/server-admin/src/main/resources/qdl/ui-test/ui-test.json';
 file_write(claims_file, file_read(original_file)); // initialize it
@@ -45,8 +43,9 @@ cfg.'flow_type' := 'uri'; // Don't run DF since this requires the post_auth phas
 user_id := 'http://cilogon.org/serverT/users/21340363';
 
 rc := script_load('driver.qdl', cfg.);
+say('rc=' + rc);
 if[rc!='ok'][return(rc);];
-⊨ rc == 0: (rc==-1?'user aborted':'there was an error initiating the flow');
+//⊨ rc == 0: (rc==-1?'user aborted':'there was an error initiating the flow');
 tokens. := clc#access();
 claims. := claims();
 ⊨ reduce(@∧, [1282,1097,1363] ∈ claims.'isMemberOf'\*\'id') : 'incorrect group id number(s):' + to_string(claims.'isMemberOf'\*\'id');

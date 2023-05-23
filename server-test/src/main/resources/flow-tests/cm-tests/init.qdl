@@ -2,7 +2,6 @@ q := module_load('edu.uiuc.ncsa.qdl.extensions.http.QDLHTTPLoader','java');
 q := module_import(q);
 bearer_token(id, secret)-> encode(encode(id,1) + ':' + encode(secret,1)); // bearer token
 ini. := file_read('/home/ncsa/dev/csd/config/ini/cm-test.ini',2).'cm';
-
 http#host(ini.'address') ;
 h. := {'Authorization': 'Bearer ' + bearer_token(ini.'id', ini.'secret'),
        'Content-Type':'application/json; charset=UTF-8'};

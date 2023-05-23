@@ -12,6 +12,8 @@ resp. := http#post(payload.);
 ⊨ reduce(@∧, resp.'content'.'scope' ∈ payload.'scope') : 'incorrect scopes, got ' + resp.'content'.'scope';
 
 client_id := resp.'content'.'client_id';
+⊨ !(ini.'caput' < client_id) : 'got a custom generated client id for anonymous client';
+
 try[
   r. := http#get({'client_id':client_id});
   ⊨ false : 'was able to get anonymous client';
@@ -33,4 +35,4 @@ try[
 ]catch[
   say('there was a problem deleting the client with id ' + client_id);
 ];
-say('ok: Anonymous basic client test');
+logger(2,say('ok: Anonymous basic client test'));

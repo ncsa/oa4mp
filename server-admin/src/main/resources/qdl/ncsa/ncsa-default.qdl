@@ -19,10 +19,11 @@
   } //end tokens
 
 */
-DEBUG := debugger==1;
+DEBUG := debugger().'level'==1;
+say('debugger=' + to_string(debugger()));
 debugger(1, 'first debug message');
 is_defined(proxy_claims.)?say('*** proxy_claims'+to_string(proxy_claims.)):say('*** NO PROXY CLAIMS');
-log_entry('log message');
+logger('log message');
 // Debug stuff --  enable if running on my dev box. Should not be in store.
 if[DEBUG][
   say('In debug = ON');
@@ -30,8 +31,8 @@ if[DEBUG][
   claims.eppn := 'jgaynor@illinois.edu';
   claims.debug := 'debugging mode on.';
 ]; //end debugging hack
-say('at top');
-say('script arg count =' + script_args());
+debugger('at top');
+debugger('script arg count =' + script_args());
 
 script_load('utils/init.qdl');
 
@@ -41,14 +42,14 @@ if[
      exec_phase == 'pre_auth'
 ]then[
      cfg. := new_template('ncsa');
-     say('*** NCSA claims=' + to_string(claims.,1));
+     debugger('*** NCSA claims=' + to_string(claims.,1));
      claims.uid := head(claims.eppn, '@'); // set search key
      claim_sources. := claim_sources. ~ [create_source(cfg.)]; // add it to any claims
-     say('*** NCSA set claim_sources. # ' + size(claim_sources.));
-     say('*** NCSA updated claims=' + to_string(claims., 1));
+     debugger('*** NCSA set claim_sources. # ' + size(claim_sources.));
+     debugger('*** NCSA updated claims=' + to_string(claims., 1));
 ]; //end if
 
- say('*** ncsa-default claims=' + to_string(claims.,1));
+ debugger('*** ncsa-default claims=' + to_string(claims.,1));
  if[exec_phase ∉ ['post_token', 'post_refresh', 'post_user_info']][return();];
  if[0==script_args()][return();]; // do not process claims
 
