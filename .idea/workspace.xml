@@ -10,7 +10,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="eb414374-02ed-40a4-9689-d382715049b9" name="Changes" comment="More updates to documentation." />
+    <list default="true" id="eb414374-02ed-40a4-9689-d382715049b9" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -520,7 +522,14 @@
       <option name="project" value="LOCAL" />
       <updated>1684523792409</updated>
     </task>
-    <option name="localTasksCounter" value="29" />
+    <task id="LOCAL-00029" summary="delete test">
+      <created>1684856424248</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1684856424248</updated>
+    </task>
+    <option name="localTasksCounter" value="30" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -532,7 +541,6 @@
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="Migrated a bunch of static utilities into classes." />
     <MESSAGE value="CIL-1389 (updated documentation) and CIL-1266 testing improvements. Addressed a few niggling point." />
     <MESSAGE value="Git hub fixes for QDL #15 (quit using QDLException). Script updates for BNL and LIGO. Fixed documentation." />
     <MESSAGE value="tweaked various QDL scripts." />
@@ -557,7 +565,8 @@
     <MESSAGE value="Weirdly, a bunch of files seem to have removed themselves from GIT. Recommitting." />
     <MESSAGE value="Issue with master. Creating new branch to make sure nothing gets lost." />
     <MESSAGE value="More updates to documentation." />
-    <option name="LAST_COMMIT_MESSAGE" value="More updates to documentation." />
+    <MESSAGE value="delete test" />
+    <option name="LAST_COMMIT_MESSAGE" value="delete test" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
