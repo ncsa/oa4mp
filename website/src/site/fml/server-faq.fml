@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
-<faqs xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="https://maven.apache.org/FML/1.0"
-      xsi:schemaLocation="https://maven.apache.org/FML/1.0 https://maven.apache.org/xsd/fml-1.0.xsd"
+<faqs xmlns="http://maven.apache.org/FML/1.0.1"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/FML/1.0.1 https://maven.apache.org/xsd/fml-1.0.1.xsd"
       id="General FAQ">
     <part id="General">
         <faq id="admin clients">
@@ -16,17 +17,23 @@
             <question>How to I create and admin client?</question>
             <answer>There is a separate administrative client registration page (typically at
                 host://oauth2/admin-register). Alternately, you can create one at the command
-                line in teh CLI.
+                line in the CLI.
             </answer>
         </faq>
         <faq id="what is the CLI">
             <question>What is the CLI?</question>
-            <answer>The OA4MP CLI (Command Lien Interface) is a character-mode application
+            <answer>The OA4MP CLI (Command Line Interface) is a character-mode application
                 that allows wide-ranging administrative abilities to an OA4MP server. These include low
                 level actions such as adding, aditing or removing clients, creating virtual organizations
-                manually runnign garbage collection. Note that there is a complete reference available
+                manually running garbage collection. Note that there is a complete reference available
                 from within the CLI, so if you are running it, you should certainly be able to
                 get help.
+            </answer>
+        </faq>
+        <faq id="help in CLI">
+            <question>OK. I'm in the CLI, how do I get help?</question>
+            <answer>If you want help on a topic, type <br/>
+                /help topic<br/>
             </answer>
         </faq>
         <faq id="VOs">
@@ -35,7 +42,8 @@
                 a specified issuer for an organization. This is useful inside a larger
                 organization, E.g. your university has clients but your department needs
                 a specific issuer for various projects.
-                These are relatively easy to create and work mostly seamlessly.
+                These are relatively easy to create and work mostly seamlessly. Among other things
+                a specific well-known page with all of the signing keys will be created and deployed.
             </answer>
         </faq>
     </part>

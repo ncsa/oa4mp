@@ -90,82 +90,11 @@
             </li>
               
     <li class="none">
+                        <a href="common/configuration/supported-specifications.html">Supported specification</a>
+            </li>
+              
+    <li class="none">
                         <a href="apidocs/index.html">api docs</a>
-            </li>
-              </ul>
-                            <h5>Supported Specifications</h5>
-                        <ul>
-                    
-    <li class="none">
-                        <a href="https://www.rfc-editor.org/rfc/rfc6749" class="externalLink">RFC 6749</a>
-            </li>
-              
-    <li class="none">
-                        <a href="https://openid.net/specs/openid-connect-core-1_0.html" class="externalLink">OIDC</a>
-            </li>
-              
-    <li class="none">
-                        <a href="https://openid.net/specs/openid-connect-discovery-1_0.html" class="externalLink">OIDC Discovery</a>
-            </li>
-              
-    <li class="none">
-                        <a href="https://www.rfc-editor.org/rfc/rfc6750" class="externalLink">RFC 6750</a>
-            </li>
-              
-    <li class="none">
-                        <a href="https://www.rfc-editor.org/rfc/rfc7009" class="externalLink">RFC 7009</a>
-            </li>
-              
-    <li class="none">
-                        <a href="https://www.rfc-editor.org/rfc/rfc7015" class="externalLink">RFC 7015</a>
-            </li>
-              
-    <li class="none">
-                        <a href="https://www.rfc-editor.org/rfc/rfc7017" class="externalLink">RFC 7017</a>
-            </li>
-              
-    <li class="none">
-                        <a href="https://www.rfc-editor.org/rfc/rfc7019" class="externalLink">RFC 7019</a>
-            </li>
-              
-    <li class="none">
-                        <a href="https://www.rfc-editor.org/rfc/rfc7591" class="externalLink">RFC 7591</a>
-            </li>
-              
-    <li class="none">
-                        <a href="https://www.rfc-editor.org/rfc/rfc7592" class="externalLink">RFC 7592</a>
-            </li>
-              
-    <li class="none">
-                        <a href="https://www.rfc-editor.org/rfc/rfc7636" class="externalLink">RFC 7636</a>
-            </li>
-              
-    <li class="none">
-                        <a href="https://www.rfc-editor.org/rfc/rfc7662" class="externalLink">RFC 7662</a>
-            </li>
-              
-    <li class="none">
-                        <a href="https://www.rfc-editor.org/rfc/rfc8259" class="externalLink">RFC 8259</a>
-            </li>
-              
-    <li class="none">
-                        <a href="https://www.rfc-editor.org/rfc/rfc8414" class="externalLink">RFC 8414</a>
-            </li>
-              
-    <li class="none">
-                        <a href="https://www.rfc-editor.org/rfc/rfc8628" class="externalLink">RFC 8628</a>
-            </li>
-              
-    <li class="none">
-                        <a href="https://www.rfc-editor.org/rfc/rfc8693" class="externalLink">RFC 8693</a>
-            </li>
-              
-    <li class="none">
-                        <a href="https://www.rfc-editor.org/rfc/rfc8725" class="externalLink">RFC 8725</a>
-            </li>
-              
-    <li class="none">
-                        <a href="https://www.rfc-editor.org/rfc/rfc9068" class="externalLink">RFC 9068</a>
             </li>
               </ul>
                             <h5>Project Documentation</h5>
@@ -214,6 +143,7 @@
 <li><a href="#admin_clients">What is an admin client?</a></li>
 <li><a href="#creating_an_admin_client">How to I create and admin client?</a></li>
 <li><a href="#what_is_the_CLI">What is the CLI?</a></li>
+<li><a href="#help_in_CLI">OK. I'm in the CLI, how do I get help?</a></li>
 <li><a href="#VOs">What is a VO?</a></li></ol></section>
 <dl>
 <dt><a name="admin_clients">What is an admin client?</a></dt>
@@ -227,16 +157,21 @@
 <dt><a name="creating_an_admin_client">How to I create and admin client?</a></dt>
 <dd>There is a separate administrative client registration page (typically at
                 host://oauth2/admin-register). Alternately, you can create one at the command
-                line in teh CLI.
+                line in the CLI.
             
 <p align="right"><a href="#top">[top]</a></p><hr /></dd>
 <dt><a name="what_is_the_CLI">What is the CLI?</a></dt>
-<dd>The OA4MP CLI (Command Lien Interface) is a character-mode application
+<dd>The OA4MP CLI (Command Line Interface) is a character-mode application
                 that allows wide-ranging administrative abilities to an OA4MP server. These include low
                 level actions such as adding, aditing or removing clients, creating virtual organizations
-                manually runnign garbage collection. Note that there is a complete reference available
+                manually running garbage collection. Note that there is a complete reference available
                 from within the CLI, so if you are running it, you should certainly be able to
                 get help.
+            
+<p align="right"><a href="#top">[top]</a></p><hr /></dd>
+<dt><a name="help_in_CLI">OK. I'm in the CLI, how do I get help?</a></dt>
+<dd>If you want help on a topic, type <br /></br>
+                /help topic<br /></br>
             
 <p align="right"><a href="#top">[top]</a></p><hr /></dd>
 <dt><a name="VOs">What is a VO?</a></dt>
@@ -244,7 +179,8 @@
                 a specified issuer for an organization. This is useful inside a larger
                 organization, E.g. your university has clients but your department needs
                 a specific issuer for various projects.
-                These are relatively easy to create and work mostly seamlessly.
+                These are relatively easy to create and work mostly seamlessly. Among other things
+                a specific well-known page with all of the signing keys will be created and deployed.
             
 <p align="right"><a href="#top">[top]</a></p></dd></dl>
     </div>

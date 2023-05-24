@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
-<faqs xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="https://maven.apache.org/FML/1.0"
-      xsi:schemaLocation="https://maven.apache.org/FML/1.0 https://maven.apache.org/xsd/fml-1.0.xsd"
+<faqs xmlns="http://maven.apache.org/FML/1.0.1"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/FML/1.0.1 https://maven.apache.org/xsd/fml-1.0.1.xsd"
       id="General FAQ">
     <part id="General">
         <faq id="what is oa4mp">
@@ -10,19 +11,36 @@
                 and is an implementation of the OAuth 2 specification
             </answer>
         </faq>
+        <faq id="History">
+            <question>Where did OA4MP come from?</question>
+            <answer>The original version was written as part of <a href="https://www.cilogon.org">CILogon</a>,
+                the <a href="https://www.ncsa.illinois.edu/">NCSA</a>'s venerable platform for integrated
+                identity and access management in the Sciences. When it started (ca. 2010), there
+                were no tokens, simply X.509 certificates. A very evil but common practice was that
+                researchers would have to give their credentials (username and password) to institutions
+                to run scientific computing jobs on their behalf. This cannot be condemned highly enough
+                from a security perspective. CILogon offered (and still does) an excellent solution.
+                OA4MP is the Open Authorization machinery for CIlogon.
+                As time passed, it became clear that tokens should replace X.509 certificates for various
+                reasons and OA4MP did as well. The major users of certificates have migrated to tokens and
+                OA4MP has, as ever, been on the cutting edge for adding support.
+            </answer>
+        </faq>
         <faq id="what libraries are used?">
             <question>What libraries does it use?</question>
             <answer>OA4MP predates the OAuth 2 specification and was initially a native
                 OAuth 1.0a implementation. As such, it came into existence independently of
                 any other implementations. It requires no other implementations. Moreover, it
                 is quite mature and has been in production since roughly 2011 and supports most
-                standard major protocols.
+                <a href="common/configuration/supported-specifications.html">standard major protocols</a>.
             </answer>
         </faq>
         <faq id="client library support">
             <question>My client is using library X in language Y. Will it work with OA4MP?</question>
-            <answer>Oh yes. At current writing, in one project alone (CILogon) we have over
-                1500 registered clients of various implementations. If your client complies with
+            <answer>Very probably yes. At current writing, in one project alone (CILogon) we have over
+                1900 registered clients of various implementations (Python, Go, PHP, C++,
+                JavaScript, Ruby, ...)
+                If your client complies with
                 standards (even some rather odd ones) it's a good bet it works with OA4MP just
                 fine.
             </answer>
@@ -43,12 +61,17 @@
             <answer>
                 <p>OA4MP offers a very long and distinguished service life -- it is very well
                     tested and has performed well for over a decade. It also supports a huge number of
-                    specifications, so if there are rarely issues with any clients. Finally, it provides
+                    <a href="common/configuration/supported-specifications.html">specifications</a>,
+                    so there are rarely issues with any clients. Finally, it provides
                     a very elegant way to extend the service with an external scripting language,
                     <a href="https://qdl-lang.org">QDL</a>
                 </p>
+                <p>It is deployed as the backbone for <a href="https://cilogon.org">CILogon</a>
+                where it has as of this writing (5/24/2023), over 1900 registered clients from various platforms
+                and nearly 248k registered logons.</p>
                 <p>A typical real world use is a large national scientific lab that has dozens of specialized
-                    clients for various research projects. (See the policy example below).
+                    clients for various research projects, each of which has several
+                    users. (See the policy example below).
                     There are token issuance policies for the institution
                     as well as very specific requirement for interoperations. These policies are implemented in
                     QDL which runs on OA4MP.
@@ -59,7 +82,7 @@
             <question>What sorts of policies might an OA4MP server implements</question>
             <answer>
                 <p>This is taken from one of our customers. A user may authenticate with
-                    and of a certain number of IDPs (Identity Providers). For some of these that are affiliates,
+                    any of a certain number of IDPs (Identity Providers). For some of these that are affiliates,
                     user information is searched in an external source (a private LDAP) and the user
                     is verified in that way. This is the institutional policy for access by
                     non-members. This permits institutions to collaborate on projects without, say, having to issue
@@ -75,25 +98,23 @@
                     applied based on other group memberships of the user. (E.g. a user that requests read access
                     to a MySQL database must be in the mysql-access group). It is possible to have extremely complex,
                     tailored policies that allow rigorous and exacting enforcement for each client. This forces
-                    sane and coherant policies across multiple institutions.
+                    sane and coherent policies across multiple institutions.
                 </p>
             </answer>
         </faq>
-        <faq id="History">
-            <question>Where did OA4MP come from?</question>
-            <answer>The original version was written as part of <a href="https://www.cilogon.org">CILogon</a>,
-                the <a href="https://www.ncsa.illinois.edu/">NCSA</a>'s venerable platform for integrated
-                identity and access management in the Sciences. When it started (ca. 2010), there
-                were no tokens, simply X.509 certificates. A very evil but common practice was that
-                researchers would have to give their credentials (username and password) to institutions
-                to run scientific computing jobs on their behalf. This cannot be condemned highly enough
-                from a security perspective. CILogon offered (and still does) an excellent solution.
-                OA4MP is all of the Open Authorization machinery for CIlogon.
-                As time progressed, it became clear that tokens should replace X.509 certificates for various
-                reasons and OA4MP did as well. The major users of certificates have migrated to tokens and
-                OA4MP has, as ever, been on the cutting edge for adding support.
-            </answer>
-        </faq>
+       <faq id="offline_access scope supported">
+           <question>Does OA4MP support the offline_access scope?</question>
+           <answer>Jein (= yes and no, as the Germans say). offline_access is used to request
+           a refresh token. OA4MP does indeed support refresh tokens, however,
+           this is set as a policy for the client, so that takes precedence.
+           If you supply the offline_access scope it is effectively ignored
+           in favor of the configuration. You cannot, say, force a client to issue
+           refresh tokens when its policy prevents that. In practice, if your
+           client uses offline_access, just let it do what it normally does and
+           OA4MP will do the right thing. If you think you should be getting a
+           refresh token and aren't, that implies your client needs to update
+           its configuration.</answer>
+       </faq>
 
     </part>
 </faqs>
