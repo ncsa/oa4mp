@@ -322,7 +322,7 @@ public class ClientConfigurationTest extends TestBase {
 
     @Test
     public void testNewScripting() throws Exception {
-        File testFile = new File("/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-admin-oauth2/src/main/resources/script-test.json");
+        File testFile = new File("/home/ncsa/dev/ncsa-git/oa4mp/server-admin/src/main/resources/script-test.json");
         if (!testFile.exists()) {
             System.out.println("Could not find test file for scripting. Skipping test...");
             return;
