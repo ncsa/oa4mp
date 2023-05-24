@@ -6,7 +6,7 @@
           -->
     <groupId>edu.uiuc.ncsa.myproxy</groupId>
     <!-- The version number reflects the currently released project. -->
-    <version>5.3-SNAPSHOT</version>
+    <version>5.3.1</version>
 
     <artifactId>myproxy-website</artifactId>
     <packaging>jar</packaging>
@@ -78,7 +78,7 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>myproxy-logon</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.3.1</version>
         </dependency>
     
     </dependencies>
@@ -140,7 +140,7 @@
                     <dependency>
                         <groupId>edu.uiuc.ncsa.maven.skin</groupId>
                         <artifactId>oa4mp-skin</artifactId>
-                        <version>5.3-SNAPSHOT</version>
+                        <version>5.3.1</version>
                     </dependency>
                 </dependencies>
             </plugin>
