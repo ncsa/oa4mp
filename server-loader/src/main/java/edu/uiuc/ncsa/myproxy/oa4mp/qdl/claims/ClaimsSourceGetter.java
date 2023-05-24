@@ -273,7 +273,7 @@ get_claims(cfg., 'dweitzel2@unl.edu')
     protected static void testFS() {
         QDLStem mystem = new QDLStem();
         mystem.put(CS_DEFAULT_TYPE, CS_TYPE_FILE);
-        mystem.put(CS_FILE_FILE_PATH, "/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/test-claims.json");
+        mystem.put(CS_FILE_FILE_PATH, "/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/test-claims.json");
         CreateSourceConfig csc = new CreateSourceConfig();
         QDLStem out = (QDLStem) csc.evaluate(new Object[]{mystem}, null);
         System.out.println(out.toJSON().toString(2));

@@ -1,5 +1,5 @@
 #! /usr/bin/env -S qdl-run
-path := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests';
+path := '/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests';
 if[path∉script_path()][script_path(path ~ script_path());];
 
 /* Next should be set in the main.qdl script.*/

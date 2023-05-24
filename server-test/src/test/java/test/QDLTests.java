@@ -112,7 +112,7 @@ public class QDLTests extends AbstractQDLTester {
         OA2State state = (OA2State) getTestUtils().getNewState();
         StringBuffer script = new StringBuffer();
         // tests absolute path, not in server mode.
-        String testClaimsFile = "/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/test-claims.json";
+        String testClaimsFile = "/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/test-claims.json";
         addLine(script, "module_load('edu.uiuc.ncsa.myproxy.oa4mp.qdl.OA2QDLLoader', 'java');");
         addLine(script, "module_import('oa2:/qdl/oidc/claims');");
         addLine(script, "cfg. := new_template('file');");

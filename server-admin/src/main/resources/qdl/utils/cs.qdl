@@ -4,7 +4,7 @@
   Or, failing that, the directory of the argumemnt
   this will print out the file name and failure plus a success count.
  */
- // test with arg /home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests/local
+ // test with arg /home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests/local
 root_dir ≔ size(args())≠1?info().'user'.'invocation_dir':args().0;
 root_dir ≔ root_dir + ('.*/'=~root_dir?'':'/');
 files. ≔ dir(root_dir);

@@ -6,7 +6,7 @@
    chains of refreshes and exchanges the endpoints continue to work.
 */
 
-path := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests';
+path := '/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests';
 if[path∉script_path()][script_path(path ~ script_path());];
 
 cfg.'id'  := 'localhost:scitokens'; // name of the configuration, not the id

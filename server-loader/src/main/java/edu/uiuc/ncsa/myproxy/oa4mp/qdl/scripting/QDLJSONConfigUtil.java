@@ -323,7 +323,7 @@ public class QDLJSONConfigUtil implements ScriptingConstants {
 
         StringBuffer script = new StringBuffer();
         script.append("f. := new_template('file');\n");
-        script.append("f.file_path := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/test-claims.json';\n");
+        script.append("f.file_path := '/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/test-claims.json';\n");
         script.append("claim_sources.0. := create_source(f.);\n");
         XProperties xp = new XProperties();
         xp.put(EXEC_PHASE, SRE_EXEC_INIT);

@@ -14,7 +14,7 @@
        "type": "identity"
       }}}
 */
-path := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests';
+path := '/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests';
 if[path∉script_path()][script_path(path ~ script_path());];
 
 cfg.'id'  := 'localhost:test/ncsa'; // name of the configuration, not the id
@@ -27,10 +27,11 @@ if[rc!='ok'][return(rc);];
 
 tokens. := clc#access();
 claims. := claims();
+say('claims=' + to_string(claims.));
 ⊨ tokens.'access_token'.'lifetime' == 1009000 : 'wrong access token lifetime';
 ⊨ tokens.'refresh_token'.'lifetime' == 950400000 : 'wrong refresh token lifetime';
 ⊨ claims.'aud' == cfg.'id' : 'wrong audience';  // Audience is a little different than usual.
-⊨ claims.'eppn' == 'jgaynor@illinois.edu' : 'wrong eppn';
+⊨ claims.'eppn' == 'jgaynor@ncsa.illinois.edu' : 'wrong eppn';
 ⊨ claims.'isMemberOf' << List : 'isMemberOf claim is not a simple list';
 ⊨ claims.'isMemberOf'.0 << String  : ' isMemberOf should be a list';
 issued_at := claims.'iat'; // store for future use.

@@ -1,4 +1,4 @@
-root:= '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests/';
+root:= '/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests/';
 config_file := '/home/ncsa/dev/csd/config/client-oa2.xml';
 // Names of scripts to run.
 test_list. := root +  [

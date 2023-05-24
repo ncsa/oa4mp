@@ -4,7 +4,7 @@
    Tests the client with no configuration
 
 */
-path := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests';
+path := '/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests';
 if[path∉script_path()][script_path(path ~ script_path());];
 cfg.'id'  := 'dev:test/functor';
 cfg.'idp'  := 'GitHub';
@@ -12,7 +12,7 @@ cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';
 cfg.'description' :=  'Test old functor claims processing. Critical regression test.';
 cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token endpoint
 
-rc := script_load('/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests/driver.qdl', cfg.);
+rc := script_load('/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests/driver.qdl', cfg.);
 if[rc!='ok'][return(rc);];
 
 tokens. := clc#access();

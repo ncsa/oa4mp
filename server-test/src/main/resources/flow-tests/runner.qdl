@@ -1,7 +1,7 @@
 #! /usr/bin/env -S qdl-run
 // If you want to run an indivdual test, add the next two lines to it or none of the utilities
 // will be found.
-path := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests';
+path := '/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests';
 script_path(path ~ script_path());
 test. := args().0;
 say('**** Flow test suite for OA4MP. ****');

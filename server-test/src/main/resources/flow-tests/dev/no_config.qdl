@@ -4,7 +4,7 @@
    Tests the client with no configuration
 
 */
- path := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/flow-tests';
+ path := '/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests';
  if[path∉script_path()][script_path(path ~ script_path());];
 cfg.'id'  := 'dev:test/no_cfg';
 cfg.'idp'  := 'ANY';

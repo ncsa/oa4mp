@@ -131,7 +131,7 @@ public class OA2ParserTest extends FunctorParserTest {
 
     @Test
     public void testVOPersonScript() throws Exception {
-        String fileName = "/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-test-oauth2/src/main/resources/vop-test.cmd";
+        String fileName = "/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/vop-test.cmd";
         FileReader fileReader = new FileReader(fileName);
             Map<String, Object> claims = createClaims();
             JFunctorFactory functorFactory = createFunctorFactory(claims);
