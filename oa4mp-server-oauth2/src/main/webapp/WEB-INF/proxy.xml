@@ -10,7 +10,7 @@
          Example file for using a proxy.
 
           Be sure you have the correct authorizationServlet element in your server configuration.
-         See https://cilogon.github.io/oa4mp/server/configuration/authorization-servlet-configuration.html
+         See https://oa4mp.org/server/configuration/authorization-servlet-configuration.html
     -->
     <servlet>
         <servlet-name>discovery</servlet-name>

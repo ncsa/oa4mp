@@ -19,6 +19,7 @@
   } //end tokens
 
 */
+debugger(1);
 DEBUG := debugger().'level'==1;
 say('debugger=' + to_string(debugger()));
 debugger(1, 'first debug message');

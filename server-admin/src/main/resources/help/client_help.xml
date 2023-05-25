@@ -76,7 +76,7 @@ parameters are shuffled.]]>
 The configuration element for this client. Note that this controls all
 scripting. The system will look for very specific format, detailed in
 
-https://cilogon.github.io/qdl/docs/token_handler_configuration.pdf]]>
+https://qdl-lang.org/pdf/token_handler_configuration.pdf]]>
        </body>
     </entry>
     <entry id="creation_ts">

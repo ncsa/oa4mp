@@ -15,4 +15,4 @@ for science gateways. Initially deployed in 2011, it is a mature, stable and ext
 
 ## Docs
 
-https://cilogon.github.io/oa4mp/
+https://oa4mp.org
