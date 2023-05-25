@@ -59,7 +59,7 @@ public class OA2ExceptionHandler implements ExceptionHandler {
                 baseClient = ((OA2GeneralError)t).getClient();
             }
         }else{
-            if(((OA2ExceptionHandlerThingie) xh).hasClient()){
+            if((xh instanceof OA2ExceptionHandlerThingie) && ((OA2ExceptionHandlerThingie) xh).hasClient()){
                 baseClient = ((OA2ExceptionHandlerThingie) xh).client;
             }
         }
