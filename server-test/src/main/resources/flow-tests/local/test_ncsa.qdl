@@ -27,7 +27,6 @@ if[rc!='ok'][return(rc);];
 
 tokens. := clc#access();
 claims. := claims();
-say('claims=' + to_string(claims.));
 ⊨ tokens.'access_token'.'lifetime' == 1009000 : 'wrong access token lifetime';
 ⊨ tokens.'refresh_token'.'lifetime' == 950400000 : 'wrong refresh token lifetime';
 ⊨ claims.'aud' == cfg.'id' : 'wrong audience';  // Audience is a little different than usual.

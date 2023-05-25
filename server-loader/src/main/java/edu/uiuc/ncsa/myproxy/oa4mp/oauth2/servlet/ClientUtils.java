@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.StringTokenizer;
 
-import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2AuthorizedServletUtil.intersection;
 import static edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet.getServiceEnvironment;
 import static edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants.SCOPE;
 
@@ -377,7 +376,8 @@ public class ClientUtils {
                 // Basically just always ignore it.
                 continue;
             }
-            if (oa2Client.useStrictScopes() && !OA2Scopes.ScopeUtil.hasScope(x)) {
+            // CIL-1732 Policy clarification. Strict means either in the approved server list or in the configured client list.
+            if (oa2Client.useStrictScopes() && !OA2Scopes.ScopeUtil.hasScope(x) && !oa2Client.getScopes().contains(x)) {
                 throw new OA2RedirectableError(OA2Errors.INVALID_SCOPE,
                         "Unrecognized scope \"" + x + "\"",
                         HttpStatus.SC_BAD_REQUEST,
@@ -397,13 +397,14 @@ public class ClientUtils {
                         st.getCallback(), oa2Client);
         }
         st.setScopes(requestedScopes);
-        if (oa2Client.useStrictScopes()) {
+/*        if (oa2Client.useStrictScopes()) {
             Collection<String> storedClientScopes = oa2Client.getScopes();
             requestedScopes = intersection(OA2Scopes.ScopeUtil.getScopes(), intersection(requestedScopes, storedClientScopes));
             debugger.trace(ClientUtils.class, ".resolveScopes: strict scopes after resolution=" + requestedScopes);
         } else {
             debugger.trace(ClientUtils.class, ".resolveScopes: non-strict scopes =" + requestedScopes);
-        }
+        }*/
+        debugger.trace(ClientUtils.class, ".resolveScopes: " + (oa2Client.useStrictScopes()?"":"non-") + "strict scopes after resolution=" + requestedScopes);
         return requestedScopes;
 
     }

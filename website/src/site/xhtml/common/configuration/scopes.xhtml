@@ -142,13 +142,13 @@ at that point and the more standard OAuth 2 behvaior of just ignoring anything u
 <h2>A server example</h2>
 <pre>
 &lt;config&gt;
-   &lt;server name="my-server"&gt;
+   &lt;service name="my-server"&gt;
     &lt;scopes&gt;
     &lt;scope enabled="false"&gt;edu.uiuc.ncsa.myproxy.getcert&lt;/scope&gt;
     &lt;scope&gt;my.custom.scope&lt;/scope&gt;
     &lt;/scopes&gt;
         &lt;!-- other stuff.. --&gt;
-    &lt;/server&gt;
+    &lt;/service&gt;
 &lt;/config&gt;
 </pre>
 <p>In this case, in the registration page, the custom scope of <b>my.custom.scope</b> would be presented
