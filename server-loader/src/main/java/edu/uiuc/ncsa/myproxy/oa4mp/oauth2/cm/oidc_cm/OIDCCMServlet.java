@@ -825,7 +825,7 @@ public class OIDCCMServlet extends EnvServlet {
         writeCreateOK(httpServletResponse, jsonResp);
         logOK(httpServletRequest); // CIL-1722
 
-        //  writeOK(httpServletResponse, jsonResp);
+       //  writeOK(httpServletResponse, jsonResp);
     }
 
     protected SecureRandom secureRandom = new SecureRandom();
