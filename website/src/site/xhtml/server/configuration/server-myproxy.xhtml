@@ -44,11 +44,23 @@
           the client, look at the entry for the <a href="../../common/configuration/ssl.html">trust store.</a> </td>
       </tr>
     <tr>
-          <td style="vertical-align: top;">socketTimeout</td>
+          <td style="vertical-align: top;">    <tr>
+                  <td style="vertical-align: top;">port</td>
+                  <td style="vertical-align: top;">N</td>
+                  <td style="vertical-align: top;">7512</td>
+                  <td style="vertical-align: top;">The port of the service</td>
+              </tr></td>
           <td style="vertical-align: top;">N</td>
           <td style="vertical-align: top;">0</td>
           <td style="vertical-align: top;">The timeout for the connection, in ms.</td>
       </tr>
+    <tr>
+        <td style="vertical-align: top;">useProxy</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">false</td>
+        <td style="vertical-align: top;"><b>If</b> you have configured a proxy for authorization, you may also use it
+        to get certificates from the proxy. </td>
+    </tr>
     </tbody>
 </table>
 <p>Multiple MyProxy servers may be specified. These will be tried until one that is available is found. If none are

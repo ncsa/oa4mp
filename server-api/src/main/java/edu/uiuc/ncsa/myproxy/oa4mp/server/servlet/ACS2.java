@@ -40,6 +40,7 @@ public abstract class ACS2 extends CRServlet {
         info("6.a. Starting to process cert request");
         AccessToken accessToken = getAccessToken(httpServletRequest);
         ServiceTransaction serviceTransaction = (ServiceTransaction) getTransactionStore().get(accessToken);
+
         XMLMap backup = GenericStoreUtils.toXML(getTransactionStore(), serviceTransaction);
         PARequest paRequest = new PARequest(httpServletRequest, serviceTransaction);
         String statusString = "client = " + paRequest.getClient().getIdentifier();

@@ -26,6 +26,7 @@ import net.sf.json.JSONObject;
 import javax.servlet.http.HttpServletResponse;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.security.cert.X509Certificate;
 import java.util.*;
 
 import static edu.uiuc.ncsa.oa2.servlet.OA2AuthorizationServer.scopesToString;
@@ -367,7 +368,7 @@ public class ProxyUtils {
      * When we say above to forward everything allowed, we mean that the policies for scopes are applied
      * to the request as per usual (e.g. a public client with strict scopes on cannot even
      * make a request with extra scopes). On top of this, even if the client requests forwarding, the proxy itself
-     * may restrict scopes and is free to reject them. 
+     * may restrict scopes and is free to reject them.
      *
      * @param t
      * @param clcCommands
@@ -382,9 +383,9 @@ public class ProxyUtils {
         }
         Set<String> requestScopes = new HashSet<>();
         requestScopes.addAll(clcCommands.getCe().getScopes());
-        if(oa2Client.hasRequestScopes()){
+        if (oa2Client.hasRequestScopes()) {
 
-            if(oa2Client.getProxyRequestScopes().contains("*")){
+            if (oa2Client.getProxyRequestScopes().contains("*")) {
                 // Asks for all scopes.
                 return clcCommands.getCe().getScopes();
             }
@@ -394,4 +395,9 @@ public class ProxyUtils {
     }
 
     public static final String NO_PROXY_SCOPES = "--";
+
+    public static X509Certificate[] getCerts(OA2SE oa2SE, OA2ServiceTransaction t) throws Throwable {
+        OA2CLCCommands clc = getCLC(oa2SE, t);
+        return clc.getX509Certificates();
+    }
 }

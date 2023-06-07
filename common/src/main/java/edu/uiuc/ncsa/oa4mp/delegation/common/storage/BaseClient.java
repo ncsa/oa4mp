@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.oa4mp.delegation.common.storage;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.DateUtils;
 import edu.uiuc.ncsa.security.storage.data.Monitored;
+import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 
 import java.util.Date;
 
@@ -12,7 +13,6 @@ import static edu.uiuc.ncsa.security.core.util.BeanUtils.checkEquals;
  * <p>Created by Jeff Gaynor<br>
  * on 5/12/16 at  4:32 PM
  */
-//public class BaseClient extends IdentifiableImpl implements DateComparable {
 public class BaseClient extends Monitored {
 
     public BaseClient(Identifier identifier) {
@@ -31,6 +31,33 @@ public class BaseClient extends Monitored {
         c.setEmail(getEmail());
         c.setName(getName());
         c.setSecret(getSecret());
+        c.setKid(getKid());
+        c.setJWKS(getJWKS());
+    }
+
+    String kid;
+    JSONWebKeys jwks;
+
+    public String getKid() {
+        return kid;
+    }
+
+    public void setKid(String kid) {
+        this.kid = kid;
+    }
+
+    public JSONWebKeys getJWKS() {
+        return jwks;
+    }
+
+    public void setJWKS(JSONWebKeys jwks) {
+        this.jwks = jwks;
+    }
+    public boolean hasKID(){
+        return kid!=null && kid.length()!=0;
+    }
+    public boolean hasJWKS(){
+        return jwks!=null;
     }
 
     public String getSecret() {
@@ -101,6 +128,8 @@ public class BaseClient extends Monitored {
         return getClass().getSimpleName() + "[name=\"" + getName() +
                 "\", id=\"" + getIdentifierString() +
                 "\", email=\"" + getEmail() +
+                "\", kid=\"" + (hasKID()?getKid():"(none)") +
+                "\", jwks=\"" + (hasJWKS()?getJWKS():"(none)") +
                 "\", secret=" + (getSecret() == null ? "(none)" : getSecret().substring(0, 25)) +
                 "]";
     }

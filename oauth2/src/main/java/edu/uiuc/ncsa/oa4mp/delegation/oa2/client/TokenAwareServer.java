@@ -10,6 +10,7 @@ import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import net.sf.json.JSONObject;
 
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 
 import static edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants.*;
@@ -33,11 +34,13 @@ public abstract class TokenAwareServer extends ASImpl {
 
     public TokenAwareServer(ServiceClient serviceClient,
                             String wellKnown,
-                            boolean oidcEnabled) {
+                            boolean oidcEnabled
+                            ) {
         super(serviceClient.host());
         this.serviceClient = serviceClient;
         this.wellKnown = wellKnown;
         this.oidcEnabled = oidcEnabled;
+        this.tokenEndpoint = serviceClient.host();
     }
 
     String wellKnown = null;
@@ -77,6 +80,14 @@ public abstract class TokenAwareServer extends ASImpl {
         return jsonObject;
     }
 
+    /**
+     * Takees the response JSON object that contains the ID token and the
+     * request and checks that it is a valid ID Token for this client.
+     * Result is the actual ID token (also a JSON Object).
+     * @param jsonObject
+     * @param atRequest
+     * @return
+     */
     protected JSONObject getAndCheckIDToken(JSONObject jsonObject, BasicRequest atRequest) {
         if (!oidcEnabled) {
             return new JSONObject();
@@ -126,4 +137,14 @@ public abstract class TokenAwareServer extends ASImpl {
         }
         return claims;
     }
+
+    public URI getTokenEndpoint() {
+        return tokenEndpoint;
+    }
+
+    public void setTokenEndpoint(URI tokenEndpoint) {
+        this.tokenEndpoint = tokenEndpoint;
+    }
+
+    URI tokenEndpoint;
 }

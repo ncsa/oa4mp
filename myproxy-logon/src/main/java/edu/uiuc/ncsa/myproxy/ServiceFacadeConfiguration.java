@@ -27,7 +27,19 @@ public class ServiceFacadeConfiguration {
         this.socketTimeout = socketTimeout;
         this.serverDN = serverDN;
     }
+    public ServiceFacadeConfiguration(boolean useProxy) {
+        this.useProxy = useProxy;
+    }
 
+    public boolean isUseProxy() {
+        return useProxy;
+    }
+
+    public void setUseProxy(boolean useProxy) {
+        this.useProxy = useProxy;
+    }
+
+    boolean useProxy = false;
     /**
      * Constructor for the case that no serverDN is specified. in that case, the trust manager will simply verify the
      * server DN found from the server cert.

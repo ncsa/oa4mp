@@ -109,19 +109,21 @@ public class ATServer2 extends TokenAwareServer implements ATServer {
             m.put(REDIRECT_URI, params.get(REDIRECT_URI));
         }
 
-        String clientID = atRequest.getClient().getIdentifierString();
-        String clientSecret = atRequest.getClient().getSecret();
-        if (!useBasicAuth) {
-            // using HTTP Basic Authorization, do not send the credentials along in the map.
-            // Use the appropriate call below.
-            m.put(CLIENT_ID, clientID);
-            m.put(CLIENT_SECRET, clientSecret);
-        }
+
         String response = null;
-        if (useBasicAuth) {
-            response = getServiceClient().doGet(m, clientID, clientSecret);
+        if (atRequest.getClient().hasJWKS()) {
+            response = RFC7523Utils.doPost(getServiceClient(), atRequest.getClient(), getTokenEndpoint(), m);
         } else {
-            response = getServiceClient().doGet(m);
+            String clientID = atRequest.getClient().getIdentifierString();
+            String clientSecret = atRequest.getClient().getSecret();
+
+            if (useBasicAuth) {
+                response = getServiceClient().doGet(m, clientID, clientSecret);
+            } else {
+                m.put(CLIENT_ID, clientID);
+                m.put(CLIENT_SECRET, clientSecret);
+                response = getServiceClient().doGet(m);
+            }
         }
         JSONObject jsonObject = getAndCheckResponse(response);
         if (!jsonObject.containsKey(ACCESS_TOKEN)) {

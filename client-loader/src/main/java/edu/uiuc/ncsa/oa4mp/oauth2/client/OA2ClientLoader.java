@@ -18,10 +18,14 @@ import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2ConfigurationLoaderUtils;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2TokenForge;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.client.*;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
+import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
+import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
 import javax.inject.Provider;
+import java.io.File;
 import java.net.URI;
 import java.util.Collection;
 import java.util.HashMap;
@@ -103,6 +107,8 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
                     getRedirectPagePath(),
                     getSuccessPagePath(),
                     getSecret(),
+                    getKID(),
+                    getKeys(),
                     getScopes(),
                     getWellKnownURI(),
                     isOIDCEnabled(),
@@ -165,189 +171,258 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
                 ServletDebugUtil.trace(this, "setting " + ClientXMLTags.SHOW_ID_TOKEN + " to " + showIDToken);
             }
         }
-            return showIDToken;
-        }
-
-        Boolean oidcEnabled = null;
-
-        public boolean isOIDCEnabled () {
-            if (oidcEnabled == null) {
-                oidcEnabled = Boolean.TRUE; // default
-                String content = getCfgValue(ClientXMLTags.OIDC_ENABLED);
-                if (content == null || content.isEmpty()) {
-                    // use default
-                    return oidcEnabled;
-                }
-                try {
-                    oidcEnabled = Boolean.parseBoolean(content);
-                } catch (Throwable t) {
-                    // do nothing. Rock on
-                    warn("Unable to parse " + ClientXMLTags.OIDC_ENABLED + " element content of \"" + content + "\". Using default of true.");
-                }
-            }
-            return oidcEnabled;
-        }
-
-        @Override
-        protected Provider<AssetStore> getAssetStoreProvider () {
-            if (assetStoreProvider == null) {
-                MultiAssetStoreProvider masp = new MultiAssetStoreProvider(cn, isDefaultStoreDisabled(), loggerProvider.get());
-                OA2AssetSerializationKeys keys = new OA2AssetSerializationKeys();
-                OA2AssetConverter assetConverter = new OA2AssetConverter(keys, getAssetProvider());
-                assetStoreProvider = masp;
-                masp.addListener(new FSAssetStoreProvider(cn, getAssetProvider(), assetConverter));
-                masp.addListener(new OA2SQLAssetStoreProvider(cn, ClientXMLTags.POSTGRESQL_STORE, getPgConnectionPoolProvider(),
-                        getAssetProvider(), assetConverter));
-                masp.addListener(new OA2SQLAssetStoreProvider(cn, ClientXMLTags.DERBY_STORE, getDerbyConnectionPoolProvider(),
-                        getAssetProvider(), assetConverter));
-                masp.addListener(new OA2SQLAssetStoreProvider(cn, ClientXMLTags.MYSQL_STORE, getMySQLConnectionPoolProvider(),
-                        getAssetProvider(), assetConverter));
-                masp.addListener(new OA2SQLAssetStoreProvider(cn, ClientXMLTags.MARIADB_STORE, getMariaDBConnectionPoolProvider(),
-                        getAssetProvider(), assetConverter));
-                // and a memory store, So only if one is requested it is available.
-                masp.addListener(new TypedProvider<MemoryAssetStore>(cn, ClientXMLTags.MEMORY_STORE, ClientXMLTags.ASSET_STORE) {
-                    @Override
-                    public Object componentFound(CfgEvent configurationEvent) {
-                        if (checkEvent(configurationEvent)) {
-                            return get();
-                        }
-                        return null;
-                    }
-
-                    @Override
-                    public MemoryAssetStore get() {
-                        return new MemoryAssetStore(getAssetProvider());
-                    }
-                });
-            }
-            return assetStoreProvider;
-        }
-
-        protected String getErrorPagePath () {
-            return getCfgValue(ClientXMLTags.ERROR_PAGE_PATH);
-        }
-
-        protected String getSecret () {
-            return getCfgValue(ClientXMLTags.SECRET_KEY);
-        }
-
-
-        protected String getSuccessPagePath () {
-            return getCfgValue(ClientXMLTags.SUCCESS_PAGE_PATH);
-        }
-
-        protected String getRedirectPagePath () {
-            return getCfgValue(ClientXMLTags.REDIRECT_PAGE_PATH);
-        }
-
-
-        protected boolean isShowRedirectPage () {
-            String temp = getCfgValue(ClientXMLTags.SHOW_REDIRECT_PAGE);
-            if (temp == null || temp.length() == 0) return false;
-            return Boolean.parseBoolean(getCfgValue(ClientXMLTags.SHOW_REDIRECT_PAGE));
-
-        }
-
-        @Override
-        public T createInstance () {
-
-            Provider<TokenForge> tokenForgeProvider = new Provider<TokenForge>() {
-                @Override
-                public TokenForge get() {
-                    return new OA2TokenForge(getId());
-                }
-            };
-
-            Provider<Client> clientProvider = new Provider<Client>() {
-                @Override
-                public Client get() {
-                    return new Client(BasicIdentifier.newID(getId()));
-                }
-            };
-
-            // sets constants specific to this protocol.
-            HashMap<String, String> constants = new HashMap<String, String>();
-            constants.put(CALLBACK_URI_KEY, OA2Constants.REDIRECT_URI);
-            constants.put(ClientEnvironment.FORM_ENCODING, OA2Constants.FORM_ENCODING);
-            // https://github.com/rcauth-eu/OA4MP/commit/a94a86fbe654a80a552ddb0255cbadb5d8e8fb72 remove spurious constants.put
-            //constants.put(ClientEnvironment.TOKEN, OA2Constants.ACCESS_TOKEN);
-            constants.put(ClientEnvironment.TOKEN, OA2Constants.AUTHORIZATION_CODE);
-            // no verifier in this protocol.
-            T t = createInstance(tokenForgeProvider, clientProvider, constants);
-            t.setDebugOn(DebugUtil.isEnabled());
-            return t;
-        }
-
-
-        Boolean useBasicAuth = null;
-
-        /**
-         * For calls the client makes to the service, use HTTP Basic Authorization rather than passing in the
-         * credentials as parameters. Both should be supported, but some other services might only allow for this.
-         * This feature is (probably) unused and should be removed at some point.
-         * @deprecated
-         * @return
-         */
-        public Boolean isUseBasicAuth () {
-            if (useBasicAuth == null) {
-                try {
-                    useBasicAuth = Boolean.parseBoolean(getCfgValue(ClientXMLTags.USE_HTTP_BASIC_AUTHORIZATIION));
-                } catch (Throwable t) {
-                    useBasicAuth = Boolean.FALSE;
-                }
-            }
-            return useBasicAuth;
-        }
-
-        public void setUseBasicAuth (Boolean useBasicAuth){
-            this.useBasicAuth = useBasicAuth;
-        }
-
-        @Override
-        protected Provider<DelegationService> getDSP () {
-            if (dsp == null) {
-                dsp = new Provider<DelegationService>() {
-                    @Override
-                    public DelegationService get() {
-                        return new DS2(new AGServer2(createServiceClient(getAuthzURI())), // as per spec, request for AG comes through authz endpoint.
-                                new ATServer2(createServiceClient(getAccessTokenURI()),
-                                        getWellKnownURI(),
-                                        isOIDCEnabled(),
-                                        getMaxAssetLifetime(),
-                                        isUseBasicAuth()),
-                                new PAServer2(createServiceClient(getAssetURI())),
-                                new UIServer2(createServiceClient(getUIURI())),
-                                new RTServer2(createServiceClient(getAccessTokenURI()), getWellKnownURI(), isOIDCEnabled()), // as per spec, refresh token server is at same endpoint as access token server.
-                                new RFC7009Server2(createServiceClient(getRFC7009Endpoint()), getWellKnownURI(), isOIDCEnabled()),
-                                new RFC7662Server2(createServiceClient(getRFC7662Endpoint()), getWellKnownURI(), isOIDCEnabled())
-                        );
-                    }
-                };
-            }
-            return dsp;
-        }
-
-        protected URI getUIURI () {
-            return createServiceURI(getCfgValue(ClientXMLTags.USER_INFO_URI), getCfgValue(ClientXMLTags.BASE_URI), USER_INFO_ENDPOINT);
-        }
-        protected URI getDeviceAuthorizationURI () {
-            return createServiceURI(getCfgValue(DEVICE_AUTHORIZATION_URI), getCfgValue(ClientXMLTags.BASE_URI), DEVICE_AUTHORIZATION_ENDPOINT);
-        }
-        protected URI getRFC7009Endpoint () {
-            return createServiceURI(getCfgValue(REVOCATION_URI), getBaseURI(), REVOCATION_ENDPOINT);
-        }
-
-        protected URI getRFC7662Endpoint () {
-            return createServiceURI(getCfgValue(INTROSPECTION_URI), getBaseURI(), INTROSPECTION_ENDPOINT);
-        }
-
-        protected URI getAuthzURI () {
-            return createServiceURI(getCfgValue(ClientXMLTags.AUTHORIZE_TOKEN_URI), getCfgValue(ClientXMLTags.BASE_URI), AUTHORIZE_ENDPOINT);
-        }
-
-
-        @Override
-        public HashMap<String, String> getConstants () {
-            throw new NotImplementedException("Error: This method is not implemented.");
-        }
+        return showIDToken;
     }
+
+    Boolean oidcEnabled = null;
+
+    public boolean isOIDCEnabled() {
+        if (oidcEnabled == null) {
+            oidcEnabled = Boolean.TRUE; // default
+            String content = getCfgValue(ClientXMLTags.OIDC_ENABLED);
+            if (content == null || content.isEmpty()) {
+                // use default
+                return oidcEnabled;
+            }
+            try {
+                oidcEnabled = Boolean.parseBoolean(content);
+            } catch (Throwable t) {
+                // do nothing. Rock on
+                warn("Unable to parse " + ClientXMLTags.OIDC_ENABLED + " element content of \"" + content + "\". Using default of true.");
+            }
+        }
+        return oidcEnabled;
+    }
+
+    @Override
+    protected Provider<AssetStore> getAssetStoreProvider() {
+        if (assetStoreProvider == null) {
+            MultiAssetStoreProvider masp = new MultiAssetStoreProvider(cn, isDefaultStoreDisabled(), loggerProvider.get());
+            OA2AssetSerializationKeys keys = new OA2AssetSerializationKeys();
+            OA2AssetConverter assetConverter = new OA2AssetConverter(keys, getAssetProvider());
+            assetStoreProvider = masp;
+            masp.addListener(new FSAssetStoreProvider(cn, getAssetProvider(), assetConverter));
+            masp.addListener(new OA2SQLAssetStoreProvider(cn, ClientXMLTags.POSTGRESQL_STORE, getPgConnectionPoolProvider(),
+                    getAssetProvider(), assetConverter));
+            masp.addListener(new OA2SQLAssetStoreProvider(cn, ClientXMLTags.DERBY_STORE, getDerbyConnectionPoolProvider(),
+                    getAssetProvider(), assetConverter));
+            masp.addListener(new OA2SQLAssetStoreProvider(cn, ClientXMLTags.MYSQL_STORE, getMySQLConnectionPoolProvider(),
+                    getAssetProvider(), assetConverter));
+            masp.addListener(new OA2SQLAssetStoreProvider(cn, ClientXMLTags.MARIADB_STORE, getMariaDBConnectionPoolProvider(),
+                    getAssetProvider(), assetConverter));
+            // and a memory store, So only if one is requested it is available.
+            masp.addListener(new TypedProvider<MemoryAssetStore>(cn, ClientXMLTags.MEMORY_STORE, ClientXMLTags.ASSET_STORE) {
+                @Override
+                public Object componentFound(CfgEvent configurationEvent) {
+                    if (checkEvent(configurationEvent)) {
+                        return get();
+                    }
+                    return null;
+                }
+
+                @Override
+                public MemoryAssetStore get() {
+                    return new MemoryAssetStore(getAssetProvider());
+                }
+            });
+        }
+        return assetStoreProvider;
+    }
+
+    protected String getErrorPagePath() {
+        return getCfgValue(ClientXMLTags.ERROR_PAGE_PATH);
+    }
+
+    protected String getSecret() {
+        return getCfgValue(ClientXMLTags.SECRET_KEY);
+    }
+
+    protected String getKID() {
+        return getCfgValue(JWK_KEY_ID);
+    }
+
+    /**
+     * Check if there is a JWK specified as a file
+     *
+     * @return
+     */
+    protected JSONWebKeys getKeysFromFile() {
+        String fname = getCfgValue(JWKS_FILE);
+        if (StringUtils.isTrivial(fname)) {
+            return null;
+        }
+        try {
+            return JSONWebKeyUtil.fromJSON(new File(fname));
+        } catch (Throwable t) {
+            if (debugger.isEnabled()) {
+                t.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Check if there is JWK specified directly (as a string of JSON) in the configuration.
+     *
+     * @return
+     */
+    protected JSONWebKeys getKeysFromString() {
+        String raw = getCfgValue(JWKS);
+        if (StringUtils.isTrivial(raw)) {
+            return null;
+        }
+        try {
+            return JSONWebKeyUtil.fromJSON(raw);
+        } catch (Throwable t) {
+            if (debugger.isEnabled()) {
+                t.printStackTrace();
+            }
+        }
+        return null;
+
+    }
+
+    JSONWebKeys jwks = null;
+
+    protected JSONWebKeys getKeys() {
+        if (jwks == null) {
+            jwks = getKeysFromFile();
+            if (jwks == null) {
+                jwks = getKeysFromString();
+            }else{
+                JSONWebKeys jwks2 = getKeysFromString(); // check file for integrity
+                if(jwks2!=null){
+                    throw new GeneralException("two JWKs specified in the configuration. Only one is allowed");
+                }
+            }
+        }
+        return jwks;
+    }
+
+    protected boolean hasJWKS() {
+        return getKeys() != null;
+    }
+
+    protected String getSuccessPagePath() {
+        return getCfgValue(ClientXMLTags.SUCCESS_PAGE_PATH);
+    }
+
+    protected String getRedirectPagePath() {
+        return getCfgValue(ClientXMLTags.REDIRECT_PAGE_PATH);
+    }
+
+
+    protected boolean isShowRedirectPage() {
+        String temp = getCfgValue(ClientXMLTags.SHOW_REDIRECT_PAGE);
+        if (temp == null || temp.length() == 0) return false;
+        return Boolean.parseBoolean(getCfgValue(ClientXMLTags.SHOW_REDIRECT_PAGE));
+
+    }
+
+    @Override
+    public T createInstance() {
+
+        Provider<TokenForge> tokenForgeProvider = new Provider<TokenForge>() {
+            @Override
+            public TokenForge get() {
+                return new OA2TokenForge(getId());
+            }
+        };
+
+        Provider<Client> clientProvider = new Provider<Client>() {
+            @Override
+            public Client get() {
+                return new Client(BasicIdentifier.newID(getId()));
+            }
+        };
+
+        // sets constants specific to this protocol.
+        HashMap<String, String> constants = new HashMap<String, String>();
+        constants.put(CALLBACK_URI_KEY, OA2Constants.REDIRECT_URI);
+        constants.put(ClientEnvironment.FORM_ENCODING, OA2Constants.FORM_ENCODING);
+        // https://github.com/rcauth-eu/OA4MP/commit/a94a86fbe654a80a552ddb0255cbadb5d8e8fb72 remove spurious constants.put
+        //constants.put(ClientEnvironment.TOKEN, OA2Constants.ACCESS_TOKEN);
+        constants.put(ClientEnvironment.TOKEN, OA2Constants.AUTHORIZATION_CODE);
+        // no verifier in this protocol.
+        T t = createInstance(tokenForgeProvider, clientProvider, constants);
+        t.setDebugOn(DebugUtil.isEnabled());
+        return t;
+    }
+
+
+    Boolean useBasicAuth = null;
+
+    /**
+     * For calls the client makes to the service, use HTTP Basic Authorization rather than passing in the
+     * credentials as parameters. Both should be supported, but some other services might only allow for this.
+     * This feature is (probably) unused and should be removed at some point.
+     *
+     * @return
+     * @deprecated
+     */
+    public Boolean isUseBasicAuth() {
+        if (useBasicAuth == null) {
+            try {
+                useBasicAuth = Boolean.parseBoolean(getCfgValue(ClientXMLTags.USE_HTTP_BASIC_AUTHORIZATIION));
+            } catch (Throwable t) {
+                useBasicAuth = Boolean.FALSE;
+            }
+        }
+        return useBasicAuth;
+    }
+
+    public void setUseBasicAuth(Boolean useBasicAuth) {
+        this.useBasicAuth = useBasicAuth;
+    }
+
+    @Override
+    protected Provider<DelegationService> getDSP() {
+        if (dsp == null) {
+            dsp = new Provider<DelegationService>() {
+                @Override
+                public DelegationService get() {
+                    return new DS2(new AGServer2(createServiceClient(getAuthzURI())), // as per spec, request for AG comes through authz endpoint.
+                            new ATServer2(createServiceClient(getAccessTokenURI()),
+                                    getWellKnownURI(),
+                                    isOIDCEnabled(),
+                                    getMaxAssetLifetime(),
+                                    isUseBasicAuth()),
+                            new PAServer2(createServiceClient(getAssetURI())),
+                            new UIServer2(createServiceClient(getUIURI())),
+                            new RTServer2(createServiceClient(getAccessTokenURI()), getWellKnownURI(), isOIDCEnabled()), // as per spec, refresh token server is at same endpoint as access token server.
+                            new RFC7009Server2(createServiceClient(getRFC7009Endpoint()), getWellKnownURI(), isOIDCEnabled()),
+                            new RFC7662Server2(createServiceClient(getRFC7662Endpoint()), getWellKnownURI(), isOIDCEnabled()),
+                            new RFC7523Server(createServiceClient(getAccessTokenURI()), getWellKnownURI(), isOIDCEnabled())
+                    );
+                }
+            };
+        }
+        return dsp;
+    }
+
+    protected URI getUIURI() {
+        return createServiceURI(getCfgValue(ClientXMLTags.USER_INFO_URI), getCfgValue(ClientXMLTags.BASE_URI), USER_INFO_ENDPOINT);
+    }
+
+    protected URI getDeviceAuthorizationURI() {
+        return createServiceURI(getCfgValue(DEVICE_AUTHORIZATION_URI), getCfgValue(ClientXMLTags.BASE_URI), DEVICE_AUTHORIZATION_ENDPOINT);
+    }
+
+    protected URI getRFC7009Endpoint() {
+        return createServiceURI(getCfgValue(REVOCATION_URI), getBaseURI(), REVOCATION_ENDPOINT);
+    }
+
+    protected URI getRFC7662Endpoint() {
+        return createServiceURI(getCfgValue(INTROSPECTION_URI), getBaseURI(), INTROSPECTION_ENDPOINT);
+    }
+
+    protected URI getAuthzURI() {
+        return createServiceURI(getCfgValue(ClientXMLTags.AUTHORIZE_TOKEN_URI), getCfgValue(ClientXMLTags.BASE_URI), AUTHORIZE_ENDPOINT);
+    }
+
+
+    @Override
+    public HashMap<String, String> getConstants() {
+        throw new NotImplementedException("Error: This method is not implemented.");
+    }
+}

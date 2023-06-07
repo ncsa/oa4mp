@@ -1,14 +1,15 @@
 package edu.uiuc.ncsa.oa4mp.delegation.oa2.client;
 
-import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.oa4mp.delegation.client.request.RTRequest;
 import edu.uiuc.ncsa.oa4mp.delegation.client.request.RTResponse;
 import edu.uiuc.ncsa.oa4mp.delegation.client.server.RTServer;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.RefreshToken;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AccessTokenImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.RefreshTokenImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants;
+import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.servlet.ServiceClient;
 import net.sf.json.JSONObject;
 
@@ -59,10 +60,16 @@ public class RTServer2 extends TokenAwareServer implements RTServer {
         HashMap map = new HashMap();
         map.put(OA2Constants.GRANT_TYPE, OA2Constants.REFRESH_TOKEN);
         map.put(OA2Constants.REFRESH_TOKEN, rtRequest.getRefreshToken().getToken());
-        map.put(OA2Constants.CLIENT_ID, rtRequest.getClient().getIdentifierString());
-        map.put(OA2Constants.CLIENT_SECRET, rtRequest.getClient().getSecret());
         map.putAll(rtRequest.getParameters());
-        String response = getServiceClient().doGet(map);
+        Client client = rtRequest.getClient();
+        String response;
+        if(client.hasJWKS()){
+              response = RFC7523Utils.doPost(getServiceClient(), client, getTokenEndpoint(), map);
+        }else {
+            map.put(OA2Constants.CLIENT_ID, client.getIdentifierString());
+            map.put(OA2Constants.CLIENT_SECRET, client.getSecret());
+            response = getServiceClient().doGet(map);
+        }
         return response;
     }
 

@@ -90,7 +90,6 @@ public class OA2SE extends ServiceEnvironmentImpl {
                  String issuer,
                  boolean utilServletEnabled,
                  boolean oidcEnabled,
-                 //  Provider<JSONStore> jsonStoreProvider,
                  CMConfigs cmConfigs,
                  OA2QDLEnvironment qdlEnvironment,
                  boolean rfc8693Enabled,
@@ -631,4 +630,14 @@ public class OA2SE extends ServiceEnvironmentImpl {
     public boolean isRTGracePeriodEnabled() {
         return rtGracePeriod == OA2ConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_DISABLED;
     }
+
+    public boolean isUseProxyForCerts() {
+        return useProxyForCerts;
+    }
+
+    public void setUseProxyForCerts(boolean useProxyForCerts) {
+        this.useProxyForCerts = useProxyForCerts;
+    }
+
+    boolean useProxyForCerts = false;
 }

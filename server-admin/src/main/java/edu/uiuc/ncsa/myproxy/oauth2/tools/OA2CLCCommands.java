@@ -45,6 +45,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.*;
 
@@ -65,8 +66,8 @@ import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
  */
 public class OA2CLCCommands extends CommonCommands {
     public String getPrompt() {
-         return "clc>";
-     }
+        return "clc>";
+    }
 
     public OA2ClientEnvironment getCe() {
         return ce;
@@ -77,9 +78,10 @@ public class OA2CLCCommands extends CommonCommands {
     }
 
     protected OA2ClientEnvironment ce;
+
     @Override
     public void bootstrap() throws Throwable {
-       // no op
+        // no op
     }
 
     @Override
@@ -248,7 +250,7 @@ public class OA2CLCCommands extends CommonCommands {
             deviceFlowCallback = dfResponse.getString(RFC8628Constants2.VERIFICATION_URI);
             String uriComplete = dfResponse.getString(RFC8628Constants2.VERIFICATION_URI_COMPLETE);
             say("please go to: " + deviceFlowCallback);
-            if ( uriComplete != null){
+            if (uriComplete != null) {
                 say("          or: " + uriComplete);
             }
             userCode = dfResponse.getString(RFC8628Constants2.USER_CODE);
@@ -258,9 +260,9 @@ public class OA2CLCCommands extends CommonCommands {
             long dfExpiresIn = dfResponse.getLong(RFC8628Constants2.EXPIRES_IN);
             exp.setTime(exp.getTime() + dfExpiresIn * 1000);
             say("code valid until " + exp + " (" + dfExpiresIn + " sec.)");
-            if(uriComplete == null){
+            if (uriComplete == null) {
                 copyToClipboard(userCode, "user code copied to clipboard");
-            } else{
+            } else {
                 copyToClipboard(uriComplete, "verification uri copied to clipboard");
             }
             isDeviceFlow = true;
@@ -676,6 +678,25 @@ public class OA2CLCCommands extends CommonCommands {
         say("File \"" + file.getAbsolutePath() + "\" saved successfully.");
     }
 
+    /**
+     * Return the certificate(s) as a single PEM-encoded string.
+     *
+     * @return
+     */
+    public String getX509CertificateString() {
+        return CertUtil.toPEM(getX509Certificates());
+
+    }
+
+    public X509Certificate[] getX509Certificates() {
+        return assetResponse.getX509Certificates();
+    }
+
+    public boolean hasX509Certificates() {
+        if (assetResponse == null) return false;
+        return assetResponse.getX509Certificates() != null;
+    }
+
     String rawIdToken = null;
 
     protected void showRawTokenHelp() {
@@ -900,14 +921,14 @@ public class OA2CLCCommands extends CommonCommands {
         return currentATResponse.getRefreshToken().getToken();
     }
 
-    public void setAT(AccessTokenImpl at){
-        if(currentATResponse != null){
+    public void setAT(AccessTokenImpl at) {
+        if (currentATResponse != null) {
             currentATResponse.setAccessToken(at);
         }
     }
 
-    public void setRT(RefreshTokenImpl rt){
-        if(currentATResponse != null){
+    public void setRT(RefreshTokenImpl rt) {
+        if (currentATResponse != null) {
             currentATResponse.setRefreshToken(rt);
         }
     }
@@ -964,7 +985,6 @@ public class OA2CLCCommands extends CommonCommands {
         }
         say("X509Certs:");
         say(CertUtil.toPEM(assetResponse.getX509Certificates()));
-
     }
 
     public static final String NO_VERIFY_JWT = "-no_verify";
@@ -1182,7 +1202,7 @@ public class OA2CLCCommands extends CommonCommands {
         try {
             RTResponse rtResponse = getService().refresh(dummyAsset.getIdentifier().toString(), refreshParameters);
             OA2Asset z = (OA2Asset) getCe().getAssetStore().get(dummyAsset.getIdentifier().toString());
-            if(z != null && dummyAsset.getIssuedAt().getTime() < z.getIssuedAt().getTime()){
+            if (z != null && dummyAsset.getIssuedAt().getTime() < z.getIssuedAt().getTime()) {
                 dummyAsset = z;
             }
             // Have to update the AT reponse here every time or no token state is preserved.
@@ -1434,7 +1454,7 @@ public class OA2CLCCommands extends CommonCommands {
         dummyAsset = new OA2Asset(null);
         if (json.containsKey(ASSET_KEY)) {
             dummyAsset.fromJSON(json.getJSONObject(ASSET_KEY));
-            if(!getCe().getAssetStore().containsKey(dummyAsset.getIdentifier())){
+            if (!getCe().getAssetStore().containsKey(dummyAsset.getIdentifier())) {
                 // put it back. Really long-term serializations can have these go away
                 // and the OA2Service looks for all assets in the store.
                 getCe().getAssetStore().save(dummyAsset);
@@ -1971,5 +1991,18 @@ public class OA2CLCCommands extends CommonCommands {
         get_user_info(inputLine);
     }
 
+    public void rfc7523(InputLine inputLine) throws Exception {
+        if (showHelp(inputLine)) {
+            say("rfc7523 - make and RFC 7523 request to the service.");
+            say("This is compliant with section 2.1, and is in effect an authorization grant.");
+
+            return;
+        }
+        JSONObject jsonObject = getService().rfc7523(getDummyAsset());
+        if (isPrintOuput()) {
+               printTokens(inputLine.hasArg(NO_VERIFY_JWT), true);
+           }
+
+    }
 
 }

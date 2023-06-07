@@ -200,12 +200,7 @@ public class CLC implements QDLModuleMetaClass {
                 }
             }
                 clcCommands.access(new InputLine(args));
-/*
-            } catch (Exception e) {
-                state.getLogger().error("error getting access token", e);
-                handleException(e);
-            }
-*/
+
             return getTokens();
         }
 
@@ -218,6 +213,41 @@ public class CLC implements QDLModuleMetaClass {
             return doxx;
         }
     }
+
+    protected String GET_CERT_NAME = "get_cert";
+    public class GetCert implements QDLFunction{
+        @Override
+        public String getName() {
+            return GET_CERT_NAME;
+        }
+
+        @Override
+        public int[] getArgCount() {
+            return new int[]{0};
+        }
+
+        @Override
+        public Object evaluate(Object[] objects, State state) throws Throwable {
+            clcCommands.get_cert(argsToInputLine(getName(), objects));
+            if(clcCommands.hasX509Certificates()){
+                return clcCommands.getX509CertificateString();
+            }
+            return "";
+        }
+
+        List<String> dd = new ArrayList<>();
+
+        @Override
+        public List<String> getDocumentation(int argCount) {
+            if(dd.isEmpty()){
+                 dd.add(getName() + "() - get a certificate (chain).");
+                 dd.add("Note that the client must be configured with the correct getcert scope and the");
+                 dd.add("server must support MyProxy.");
+            }
+            return dd;
+        }
+    }
+
 
     protected String URI_NAME = "uri";
 
@@ -235,15 +265,8 @@ public class CLC implements QDLModuleMetaClass {
         @Override
         public Object evaluate(Object[] objects, State state) throws Throwable{
             checkInit();
-        //    try {
                 clcCommands.uri(argsToInputLine(getName(), objects));
                 return clcCommands.getCurrentURI().toString();
-         /*   } catch (Exception e) {
-                e.printStackTrace();
-                if (DebugUtil.isEnabled()) {
-                }
-            }*/
-         //   return QDLNull.getInstance();
         }
 
         @Override

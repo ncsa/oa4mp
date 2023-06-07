@@ -7,6 +7,8 @@ import edu.uiuc.ncsa.oa4mp.delegation.common.services.Server;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AccessTokenImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.RefreshTokenImpl;
 
+import java.net.URI;
+
 /**
  * Note that since this uses bearer tokens, the access token must always be supplied.
  * <p>Created by Jeff Gaynor<br>
@@ -43,4 +45,14 @@ public class RFC7662Request extends BasicRequest{
     public void setRefreshToken(RefreshTokenImpl refreshToken) {
         this.refreshToken = refreshToken;
     }
+
+    public URI getTokenEndpoint() {
+        return tokenEndpoint;
+    }
+
+    public void setTokenEndpoint(URI tokenEndpoint) {
+        this.tokenEndpoint = tokenEndpoint;
+    }
+
+    URI tokenEndpoint = null;
  }

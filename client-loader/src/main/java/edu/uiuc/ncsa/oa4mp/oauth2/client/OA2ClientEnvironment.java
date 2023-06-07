@@ -3,13 +3,14 @@ package edu.uiuc.ncsa.oa4mp.oauth2.client;
 import edu.uiuc.ncsa.myproxy.oa4mp.client.ClientEnvironment;
 import edu.uiuc.ncsa.myproxy.oa4mp.client.storage.AssetProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.client.storage.AssetStore;
-import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
-import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
-import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.oa4mp.delegation.client.DelegationService;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.TokenForge;
+import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
+import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
+import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
+import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 
 import javax.inject.Provider;
 import java.net.URI;
@@ -83,6 +84,8 @@ public class OA2ClientEnvironment extends ClientEnvironment {
                                 String redirectPagePath,
                                 String successPagePath,
                                 String secret,
+                                String kid,
+                                JSONWebKeys jwks,
                                 Collection<String> scopes,
                                 String wellKnownURI,
                                 boolean oidcEnabled,
@@ -125,7 +128,37 @@ public class OA2ClientEnvironment extends ClientEnvironment {
         this.additionalParameters = additionalParameters;
         this.deviceAuthorizationUri = deviceAuthorizationUri;
         this.metaDebugUtil = metaDebugUtil;
+        this.kid = kid;
+        this.jwks = jwks;
     }
+
+    public boolean hasJWKS() {
+        return jwks != null;
+    }
+
+    public boolean hasKID() {
+        return kid != null && kid.length() != 0;
+    }
+
+    String kid;
+
+    public String getKid() {
+        return kid;
+    }
+
+    public void setKid(String kid) {
+        this.kid = kid;
+    }
+
+    public JSONWebKeys getJWKS() {
+        return jwks;
+    }
+
+    public void setJWKS(JSONWebKeys jwks) {
+        this.jwks = jwks;
+    }
+
+    JSONWebKeys jwks;
 
     public URI getDeviceAuthorizationUri() {
         return deviceAuthorizationUri;
@@ -186,6 +219,8 @@ public class OA2ClientEnvironment extends ClientEnvironment {
     public Client getClient() {
         if (client == null) {
             client = cp.get();
+            client.setJWKS(getJWKS()); // RFC 7523 support
+            client.setKid(getKid());
             client.setIdentifier(new BasicIdentifier(getClientId()));
             client.setSecret(secret);
         }

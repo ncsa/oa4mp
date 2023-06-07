@@ -176,6 +176,7 @@ public abstract class IDTokenResponse extends IResponse2 {
 
         response.setContentType("application/json;charset=UTF-8");
         response.setCharacterEncoding("UTF-8");
+        System.err.println(response.getHeaderNames());
         Writer osw = response.getWriter();
         json.write(osw);
         osw.flush();

@@ -5,7 +5,8 @@ import edu.uiuc.ncsa.oa4mp.delegation.common.storage.monitored.MonitoredTable;
 import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnDescriptorEntry;
 
-import static java.sql.Types.*;
+import static java.sql.Types.BOOLEAN;
+import static java.sql.Types.LONGVARCHAR;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -16,14 +17,18 @@ public  class BaseClientTable extends MonitoredTable {
         super(keys, schema, tablenamePrefix, tablename);
     }
 
-    protected BaseClientKeys getBKK(){
-        return (BaseClientKeys)keys;
+    @Override
+    protected BaseClientKeys getKeys() {
+        return (BaseClientKeys) super.getKeys();
     }
+
     @Override
        public void createColumnDescriptors() {
         super.createColumnDescriptors();
-        getColumnDescriptor().add(new ColumnDescriptorEntry(getBKK().secret(), LONGVARCHAR));
-        getColumnDescriptor().add(new ColumnDescriptorEntry(getBKK().debugOn(), BOOLEAN));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(getKeys().secret(), LONGVARCHAR));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(getKeys().debugOn(), BOOLEAN));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(getKeys().kid(), LONGVARCHAR)); // RFC 7523 support.
+        getColumnDescriptor().add(new ColumnDescriptorEntry(getKeys().jwks(), LONGVARCHAR)); // RFC 7523 support
     }
 
 

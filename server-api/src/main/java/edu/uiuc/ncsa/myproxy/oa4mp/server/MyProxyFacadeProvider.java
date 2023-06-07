@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.myproxy.ServiceFacadeConfiguration;
 import edu.uiuc.ncsa.security.core.configuration.Configurations;
 import edu.uiuc.ncsa.security.core.configuration.provider.CfgEvent;
 import edu.uiuc.ncsa.security.core.configuration.provider.HierarchicalConfigProvider;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.util.ssl.SSLConfigurationUtil;
 import edu.uiuc.ncsa.security.util.ssl.SSLKeystoreConfiguration;
 import org.apache.commons.configuration.tree.ConfigurationNode;
@@ -49,11 +50,20 @@ public class MyProxyFacadeProvider extends HierarchicalConfigProvider<MyProxySer
         }
         int port = 7512; //start with default port.
         long socketTimeout = 0L; // start with default
+        SSLKeystoreConfiguration sslKeystoreConfiguration = SSLConfigurationUtil.getSSLConfiguration(null, getConfig());
         if (getConfig() == null) {
             // No configuration, so use the defaults.
             sfc = new ServiceFacadeConfiguration(localhostname, port, socketTimeout, loas, serverDN);
             //   return new MyProxyServiceFacade(sfc);
         } else {
+            String rawUseProxy = getAttribute(MYPROXY_USE_PROXY);
+            if (!StringUtils.isTrivial(rawUseProxy)) {
+                boolean useProxy = getBooleanAttribute(MYPROXY_USE_PROXY);
+                if (useProxy) {
+                    // If true, short circuit whole thing and return.
+                    return new MyProxyServiceFacade(new ServiceFacadeConfiguration(true), sslKeystoreConfiguration);
+                }
+            }
             serverDN = getAttribute(MYPROXY_SERVER_DN);
             if (serverDN == null && hasDefaultServerDN()) {
                 serverDN = getDefaultServerDN();
@@ -86,7 +96,6 @@ public class MyProxyFacadeProvider extends HierarchicalConfigProvider<MyProxySer
         }
         // Unless there is something very exotic about your setup, a basic configuration that
         // points to the standard keystore available in java should be more than sufficient.
-        SSLKeystoreConfiguration sslKeystoreConfiguration = SSLConfigurationUtil.getSSLConfiguration(null, getConfig());
         return new MyProxyServiceFacade(sfc, sslKeystoreConfiguration);
     }
 
@@ -100,6 +109,7 @@ public class MyProxyFacadeProvider extends HierarchicalConfigProvider<MyProxySer
 
     /**
      * Default constructor for no default server DN.
+     *
      * @param config
      */
     public MyProxyFacadeProvider(ConfigurationNode config) {
@@ -112,6 +122,7 @@ public class MyProxyFacadeProvider extends HierarchicalConfigProvider<MyProxySer
 
     /**
      * A default server DN to be used in cases where the MyProxy server's cert may contain this as an
+     *
      * @return
      */
     public String getDefaultServerDN() {

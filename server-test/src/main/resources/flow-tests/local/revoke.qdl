@@ -5,8 +5,10 @@
 */
 path := '/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests';
 if[path∉script_path()][script_path(path ~ script_path());];
-cfg.'id'  := 'dev:test/no_cfg';
-cfg.'idp'  := 'NCSA';
+/*cfg.'id'  := 'dev:test/no_cfg';
+cfg.'idp'  := 'NCSA';*/
+cfg.'id'  := 'localhost:test/no_cfg';
+cfg.'idp'  := 'ANY';
 cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';
 cfg.'description' :=  'Test revocation and introspection machinery for a client.';
 cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token endpoint
@@ -15,24 +17,26 @@ rc := script_load('driver.qdl', cfg.);
 if[rc!='ok'][return(rc);];
 
 tokens. := clc#access();
-⊨     ⊨ '---BEGIN CERTIFICATE-----'<clc#get_cert() : 'could not get a cert';
-
+⊨ introspect().'active':'access token not active';
 ⊨ introspect().'active':'access token not active';
 ⊨ introspect('-rt').'active':'refresh token not active';
 ⊨ revoke():'token not revoked';
 ⊨ !introspect().'active' : 'AT is not active';
 
 try[
-  exchange();
+ // exchange();
+ clc#refresh();
   ⊨ false : 'token should be invalid.';
 ]catch[
   say('caught TX exception');
 ];
 
-exchange('-at', '-x'); // Get a new access token for later before we invalidate the refresh token
+//exchange('-at', '-x'); // Get a new access token for later before we invalidate the refresh token
+clc#refresh();
 say('at exchange w/rt ok');
 // RT tests
-tokens. := exchange('-rt');
+//tokens. := exchange('-rt');
+clc#refresh();
 say('rt exchange ok:' + to_string(tokens.'refresh_token'));
 ⊨ introspect('-rt').'active':'refresh token not active';
 say('1');
@@ -42,14 +46,15 @@ say('2');
 ⊨ !introspect('-rt').'active':'refresh token not active';
 say('3');
 try[
-  exchange('-rt');
+  refresh();//exchange('-rt');
   ⊨ false : 'token should be invalid.';
 ]catch[
  say('caught TX  exception');
 ];
 say('4');
 
- exchange('-at'); // can still get an access token
+// exchange('-at'); // can still get an access token
+clc#refresh();
  say('5');
 
 ⊨ introspect().'active':'access token not active';

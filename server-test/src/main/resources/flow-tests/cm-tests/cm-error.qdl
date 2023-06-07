@@ -1,0 +1,23 @@
+#! /usr/bin/env -S qdl-run
+
+/*
+   Tests that an initial call to the service with bad credentials results in a JSON
+   response. This is a regression test for https://github.com/ncsa/oa4mp/issues/100
+   since very early failures would not return JSON.
+
+   This is independent of the rest of the test since it has to be wrong.
+*/
+
+q := module_load('edu.uiuc.ncsa.qdl.extensions.http.QDLHTTPLoader','java');
+q := module_import(q);
+bearer_token(id, secret)-> encode(encode(id,1) + ':' + encode(secret,1)); // bearer token
+ini. := file_read('/home/ncsa/dev/csd/config/ini/cm-test.ini',2).'cm';
+http#host(ini.'address') ;
+// Test is that there is a valid admin client ID, but the password is wrong.
+h. := {'Authorization': 'Bearer ' + bearer_token(ini.'id', 'bad secret'),
+       'Content-Type':'application/json; charset=UTF-8'};
+http#headers(h.);
+http#open(true); // localhost has self-signed cert, so don't check.
+payload. := from_json(file_read(ini.'payloads' + 'create.json'));
+resp. := http#post(payload.); // should fail
+say('resp' + to_string(resp.));

@@ -619,11 +619,14 @@ public class OA2AuthorizedServletUtil {
      *
      * @param state
      */
-    public void figureOutAudienceAndResource(TransactionState state) {
-        OA2ServiceTransaction t = (OA2ServiceTransaction) state.getTransaction();
+    public  void figureOutAudienceAndResource(TransactionState state) {
+        figureOutAudienceAndResource((OA2ServiceTransaction) state.getTransaction(),
+                state.getRequest().getParameterValues(RFC8693Constants.RESOURCE),
+                state.getRequest().getParameterValues(RFC8693Constants.AUDIENCE));
+    }
+    public static void figureOutAudienceAndResource(OA2ServiceTransaction t, String[] rawResource,
+                                                    String[] rawAudience) {
 
-        String[] rawResource = state.getRequest().getParameterValues(RFC8693Constants.RESOURCE);
-        String[] rawAudience = state.getRequest().getParameterValues(RFC8693Constants.AUDIENCE);
 
         if (rawResource == null && rawAudience == null) {
             // implies there is no such parameters.

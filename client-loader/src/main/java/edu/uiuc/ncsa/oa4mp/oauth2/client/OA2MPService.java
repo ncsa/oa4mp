@@ -20,6 +20,7 @@ import edu.uiuc.ncsa.oa4mp.delegation.oa2.UserInfo;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.client.ATResponse2;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.client.ATServer2;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.client.DS2;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.client.RFC7523Utils;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.JWTUtil2;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.InvalidNonceException;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims;
@@ -208,6 +209,7 @@ public class OA2MPService extends OA4MPService {
         return processAtRequest(asset, dar);
     }
 
+
     private ATResponse2 processAtRequest(OA2Asset asset, DelegatedAssetRequest dar) {
         ATResponse2 atResponse2 = (ATResponse2) getEnvironment().getDelegationService().getAT(dar);
         asset.setIssuedAt((Date) atResponse2.getParameters().get(OA2Claims.ISSUED_AT));
@@ -216,6 +218,7 @@ public class OA2MPService extends OA4MPService {
             throw new InvalidNonceException("Unknown nonce.");
         }
         NonceHerder.removeNonce((String) atResponse2.getParameters().get(NONCE)); // prevent replay attacks.
+
 
         asset.setAccessToken((AccessTokenImpl) atResponse2.getAccessToken());
         asset.setRefreshToken(atResponse2.getRefreshToken());
@@ -293,9 +296,9 @@ public class OA2MPService extends OA4MPService {
         asset.setAccessToken((AccessTokenImpl) rtResponse.getAccessToken());
         asset.setRefreshToken(rtResponse.getRefreshToken());
         Object idToken = rtResponse.getParameters().get(OA2Constants.ID_TOKEN);
-         if (idToken != null) {
-             asset.setIdToken((JSONObject) idToken);
-         }
+        if (idToken != null) {
+            asset.setIdToken((JSONObject) idToken);
+        }
         getAssetStore().remove(asset.getIdentifier()); // clear out
         getAssetStore().save(asset);
         return rtResponse;
@@ -329,8 +332,8 @@ public class OA2MPService extends OA4MPService {
      */
     public OA2Asset getCert(String id) {
         OA2Asset asset = getAsset2(id);
-        if(asset == null){
-            throw new NoSuchAssetException("Asset \""+ id + "\" not found");
+        if (asset == null) {
+            throw new NoSuchAssetException("Asset \"" + id + "\" not found");
         }
         AssetResponse assetResponse = getCert(asset.getAccessToken().getToken(), null);
         asset.setCertificates(assetResponse.getX509Certificates());
@@ -410,7 +413,14 @@ public class OA2MPService extends OA4MPService {
         }
         parameterMap.put(OA2Constants.GRANT_TYPE, GRANT_TYPE_TOKEN_EXCHANGE);
         Client client = getEnvironment().getClient();
-        String rawResponse = serviceClient.doGet(parameterMap, client.getIdentifierString(), client.getSecret());
+        OA2ClientEnvironment oa2ClientEnvironment = (OA2ClientEnvironment) getEnvironment();
+        String rawResponse;
+        if (oa2ClientEnvironment.hasJWKS()) {
+            rawResponse = RFC7523Utils.doPost(serviceClient, client, oa2ClientEnvironment.getAccessTokenUri(), parameterMap);
+        } else {
+
+            rawResponse = serviceClient.doGet(parameterMap, client.getIdentifierString(), client.getSecret());
+        }
 
         DebugUtil.trace(this, "raw response = " + rawResponse);
         JSONObject json = JSONObject.fromObject(rawResponse);
@@ -499,5 +509,53 @@ public class OA2MPService extends OA4MPService {
         request.setClient(getEnvironment().getClient());
         DS2 ds2 = (DS2) getEnvironment().getDelegationService();
         return ds2.rfc7662(request).getResponse();
+    }
+
+    public JSONObject rfc7523(OA2Asset asset) {
+        RFC7523Request request = new RFC7523Request();
+        DS2 ds2 = (DS2) getEnvironment().getDelegationService();
+        RFC7523Response response = ds2.rfc7523(request);
+        JSONObject json = response.getResponse();
+        asset.setIssuedAt((Date) json.get(OA2Claims.ISSUED_AT));
+        asset.setUsername((String) json.get(OA2Claims.SUBJECT));
+        if (json.containsKey(NONCE) && !NonceHerder.hasNonce((String) json.get(NONCE))) {
+            throw new InvalidNonceException("Unknown nonce.");
+        }
+        NonceHerder.removeNonce((String) json.get(NONCE)); // prevent replay attacks.
+        if (!json.containsKey(ACCESS_TOKEN)) {
+            throw new IllegalArgumentException("Error: No access token found in server response");
+        }
+        AccessTokenImpl at = new AccessTokenImpl(URI.create(json.getString(ACCESS_TOKEN)));
+        asset.setAccessToken(at);
+        RefreshTokenImpl rt = null;
+        if (json.containsKey(REFRESH_TOKEN)) {
+            // the refresh token is optional, so if it is missing then there is nothing to do.
+            rt = new RefreshTokenImpl(URI.create(json.getString(REFRESH_TOKEN)));
+            asset.setRefreshToken(rt);
+        }
+        Object idToken = response.getIdToken();
+        if (idToken != null) {
+            asset.setIdToken((JSONObject) idToken);
+        }
+        getAssetStore().save(asset);
+
+/*
+      asset.setIssuedAt((Date) atResponse2.getParameters().get(OA2Claims.ISSUED_AT));
+        asset.setUsername((String) atResponse2.getParameters().get(OA2Claims.SUBJECT));
+        if (atResponse2.getParameters().containsKey(NONCE) && !NonceHerder.hasNonce((String) atResponse2.getParameters().get(NONCE))) {
+            throw new InvalidNonceException("Unknown nonce.");
+        }
+        NonceHerder.removeNonce((String) atResponse2.getParameters().get(NONCE)); // prevent replay attacks.
+
+        asset.setAccessToken((AccessTokenImpl) atResponse2.getAccessToken());
+        asset.setRefreshToken(atResponse2.getRefreshToken());
+        Object idToken = atResponse2.getParameters().get(OA2Constants.ID_TOKEN);
+        if (idToken != null) {
+            asset.setIdToken((JSONObject) idToken);
+        }
+        getAssetStore().save(asset);
+        return atResponse2;
+ */
+        return response.getResponse();
     }
 }

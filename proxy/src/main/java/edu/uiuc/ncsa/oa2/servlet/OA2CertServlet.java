@@ -1,7 +1,8 @@
-package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
+package edu.uiuc.ncsa.oa2.servlet;
 
 import edu.uiuc.ncsa.myproxy.MPSingleConnectionProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2HeaderUtils;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.ACS2;
@@ -256,6 +257,8 @@ public class OA2CertServlet extends ACS2 {
         }
 */
         OA2ServiceTransaction st = (OA2ServiceTransaction) trans;
+
+
         if (!st.getFlowStates().acceptRequests || !st.getFlowStates().getCert) {
             throw new OA2GeneralError(OA2Errors.ACCESS_DENIED,
                     "access denied",
@@ -263,6 +266,14 @@ public class OA2CertServlet extends ACS2 {
                     st.getRequestState(), st.getClient());
         }
         OA2SE oa2SE = (OA2SE) getServiceEnvironment();
+/*        if(oa2SE.isUseProxyForCerts()){
+            if(st.getProxyState() == null){
+                throw new NFWException("No proxy configured.");
+            }   else{
+               st.setProtectedAsset(new MyX509Certificates(ProxyUtils.getCerts(oa2SE, st)));
+               return;
+            }
+        }*/
         if (!oa2SE.isTwoFactorSupportEnabled()) {
             checkMPConnection(st);
         } else {

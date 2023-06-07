@@ -60,7 +60,7 @@
 
     <servlet>
         <servlet-name>getCert</servlet-name>
-        <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2CertServlet</servlet-class>
+        <servlet-class>edu.uiuc.ncsa.oa2.servlet.OA2CertServlet</servlet-class>
 
     </servlet>
     <servlet-mapping>

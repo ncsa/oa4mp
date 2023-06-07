@@ -32,14 +32,16 @@ public class DS2 extends DelegationService {
                UIServer2 uiServer,
                RTServer rtServer,
                RFC7009Server rfc7009Server,
-               RFC7662Server rfc7662Server) {
+               RFC7662Server rfc7662Server,
+               RFC7523Server rfc7523Server) {
         super(agServer, atServer, paServer);
         this.uiServer = uiServer;
         this.rtServer = rtServer;
         this.rfc7009Server = rfc7009Server;
         this.rfc7662Server = rfc7662Server;
+        this.rfc7523Server = rfc7523Server;
     }
-
+    RFC7523Server rfc7523Server;
     RTServer rtServer;
 
     /**
@@ -82,6 +84,9 @@ public class DS2 extends DelegationService {
         return getRfc7662Server().processRFC7662Request(request);
     }
 
+    public RFC7523Response rfc7523(RFC7523Request request){
+       return rfc7523Server.processRFC7523Request(request);
+    }
     @Override
     public DelegationResponse processDelegationRequest(DelegationRequest delegationRequest) {
         DelegationResponse delResp = new DelegationResponse(null);

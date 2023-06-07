@@ -73,6 +73,15 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
     @Override
     public void preprocess(TransactionState state) throws Throwable {
         super.preprocess(state);
+        /*
+        As per https://datatracker.ietf.org/doc/html/rfc6749#section-5.1
+
+         The authorization server MUST include the HTTP "Cache-Control"
+         response header field [RFC2616] with a value of "no-store" in any
+         response containing tokens, credentials, or other sensitive
+         information, as well as the "Pragma" response header field [RFC2616]
+         with a value of "no-cache".
+         */
         state.getResponse().setHeader("Cache-Control", "no-store");
         state.getResponse().setHeader("Pragma", "no-cache");
 
@@ -124,9 +133,15 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             doTokenInfo(request, response);
             return true;
         }
-        OA2Client client = (OA2Client) getClient(request);
-        OA2SE oa2SE = (OA2SE) MyProxyDelegationServlet.getServiceEnvironment();
 
+        OA2SE oa2SE = (OA2SE) MyProxyDelegationServlet.getServiceEnvironment();
+        if (grantType.equals(RFC7523Constants.GRANT_TYPE_JWT_BEARER)) {
+            // If the client is doing an RFC 7523 grant, then it must authorize accordingly.
+            OA2Client oa2Client = OA2HeaderUtils.getAndVerifyRFC7523Client(request, (OA2SE) getServiceEnvironment());
+            doRFC7523(request, response, oa2Client);
+            return true;
+        }
+        OA2Client client = (OA2Client) getClient(request);
         // In all other cases, the client credentials must be sent.
         if (client == null) {
             warn("executeByGrant encountered a null client");
@@ -137,7 +152,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         debugger.trace(this, "starting execute by grant, grant = \"" + grantType + "\"");
         OA2Client resolvedClient = OA2ClientUtils.resolvePrototypes(oa2SE, client);
         if (!resolvedClient.isPublicClient()) {
-            verifyClientSecret(resolvedClient, getClientSecret(request));
+            verifyClient(resolvedClient, request, true);
+            //verifyClientSecret(resolvedClient, getClientSecret(request));
         }
         if (grantType.equals(RFC8693Constants.GRANT_TYPE_TOKEN_EXCHANGE)) {
             if (!oa2SE.isRfc8693Enabled()) {
@@ -170,7 +186,100 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             writeATResponse(response, state);
             return true;
         }
+
         return false;
+    }
+
+
+    protected void doRFC7523(HttpServletRequest request, HttpServletResponse response, OA2Client client) throws Throwable {
+        JSONObject jsonRequest = null;
+        try {
+            jsonRequest = JSONObject.fromObject(request.getParameter(RFC7523Constants.ASSERTION));
+
+        } catch (Throwable t) {
+            throw new OA2ATException(OA2Errors.INVALID_REQUEST, "invalid json assertion");
+        }
+        if (!jsonRequest.containsKey(OA2Claims.ISSUER)) {
+            throw new OA2ATException(OA2Errors.INVALID_REQUEST, "missing issuer");
+        }
+        if (!client.getIdentifierString().equals(jsonRequest.getString(OA2Claims.ISSUER))) {
+            throw new OA2ATException(OA2Errors.INVALID_REQUEST, "invalid issuer");
+        }
+        if (jsonRequest.containsKey(OA2Claims.SUBJECT)) {
+            throw new OA2ATException(OA2Errors.INVALID_REQUEST, "missing subject");
+        }
+        if (System.currentTimeMillis() < jsonRequest.getLong(OA2Claims.EXPIRATION) * 1000L) {
+            throw new OA2ATException(OA2Errors.INVALID_REQUEST, "expired assertion token");
+
+        }
+        String state = jsonRequest.getString(OA2Constants.STATE);
+        String nonce = jsonRequest.getString(OA2Constants.NONCE);
+
+        OA2ServiceTransaction serviceTransaction = (OA2ServiceTransaction) getOA2SE().getTransactionStore().create();
+        serviceTransaction.setRequestState(state);
+        serviceTransaction.setNonce(nonce);
+        serviceTransaction.setClient(client);
+        serviceTransaction.setUsername(jsonRequest.getString((OA2Claims.SUBJECT)));
+        try {
+            serviceTransaction.setScopes(ClientUtils.resolveScopes(request, serviceTransaction, client, true, false));
+        } catch (OA2RedirectableError redirectableError) {
+            throw new OA2ATException(OA2Errors.INVALID_SCOPE,
+                    "unable to determine scopes",
+                    HttpStatus.SC_BAD_REQUEST,
+                    state, client);
+        }
+        serviceTransaction.setAccessTokenLifetime(ClientUtils.computeATLifetime(serviceTransaction, client, getOA2SE()));
+
+        if (client.isRTLifetimeEnabled()) {
+            serviceTransaction.setRefreshTokenLifetime(ClientUtils.computeRefreshLifetime(serviceTransaction, client, getOA2SE()));
+        } else {
+            serviceTransaction.setRefreshTokenLifetime(0L);
+        }
+        try {
+            String[] rawResource = extractArray(jsonRequest, RFC8693Constants.RESOURCE);
+            String[] rawAudience = extractArray(jsonRequest, RFC8693Constants.AUDIENCE);
+            OA2AuthorizedServletUtil.figureOutAudienceAndResource(serviceTransaction, rawResource, rawAudience);
+        } catch (OA2GeneralError ge) {
+            throw new OA2ATException(ge.getError(), ge.getDescription(), ge.getHttpStatus(), state, client);
+        }
+        ATRequest atRequest = getATRequest(request, serviceTransaction, client);
+        ATIResponse2 atiResponse2 = (ATIResponse2) getATI().process(atRequest);
+        serviceTransaction.setAccessToken(atiResponse2.getAccessToken());
+        serviceTransaction.setAccessTokenValid(true);
+        if (client.isRTLifetimeEnabled()) {
+            serviceTransaction.setRefreshToken(atiResponse2.getRefreshToken());
+            serviceTransaction.setRefreshTokenValid(true);
+        } else {
+            serviceTransaction.setRefreshTokenValid(false);
+        }
+
+        getOA2SE().getTransactionStore().save(serviceTransaction);
+
+        // Almost ready to rock and roll. Need the issuer transaction state, then do a standard AT
+        // This, among other things, runs QDL scripts.
+        IssuerTransactionState issuerTransactionState = new IssuerTransactionState(request, response, new HashMap<>(),
+                serviceTransaction, new XMLMap(), atiResponse2);
+        issuerTransactionState = doAT(issuerTransactionState, client);
+        writeATResponse(response, issuerTransactionState);
+    }
+
+    private static String[] extractArray(JSONObject jsonRequest, String key) {
+        String[] raw;
+        if (jsonRequest.containsKey(key)) {
+            Object obj = jsonRequest.get(key); // Either a single element or JSON array
+            if (obj instanceof JSONArray) {
+                JSONArray array = (JSONArray) obj;
+                raw = new String[array.size()];
+                for (int i = 0; i < array.size(); i++) {
+                    raw[i] = array.getString(i);
+                }
+            } else {
+                raw = new String[]{(String) obj};
+            }
+        } else {
+            raw = new String[]{};
+        }
+        return raw;
     }
 
     /**
@@ -493,7 +602,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                     RefreshTokenStore rts = (RefreshTokenStore) getTransactionStore();
                     try {
                         t = rts.get(refreshToken);
-                    }catch(TransactionNotFoundException transactionNotFoundException){
+                    } catch (TransactionNotFoundException transactionNotFoundException) {
                         // fine. Look in the TX store later.
                     }
                     break;
@@ -578,10 +687,10 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         if (t == null) {
             // if there is no such transaction found, then this is probably from a previous exchange. Go find it
             try {
-                if(accessToken != null){
+                if (accessToken != null) {
                     t = OA2TokenUtils.getTransactionFromTX(oa2se, accessToken, debugger);
                 }
-                if(refreshToken != null){
+                if (refreshToken != null) {
                     t = OA2TokenUtils.getTransactionFromTX(oa2se, refreshToken, debugger);
                 }
             } catch (OA2GeneralError oa2GeneralError) {
@@ -896,7 +1005,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             throw new OA2ATException(OA2Errors.INVALID_REQUEST, "missing grant type");
         }
         if (executeByGrant(grantType, request, response)) {
-            logOK( request); // CIL-1722
+            logOK(request); // CIL-1722
             return;
         }
         warn("Error: grant type +\"" + grantType + "\" was not recognized. Request rejected.");
@@ -1072,7 +1181,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         /* *************** */
 
         if (client.isRTLifetimeEnabled()) {
-           st2.setRefreshToken(atResponse.getRefreshToken()); // ditto. Might be null.
+            st2.setRefreshToken(atResponse.getRefreshToken()); // ditto. Might be null.
         } else {
             st2.setRefreshToken(null);
             st2.setRefreshTokenLifetime(0L);
@@ -1193,7 +1302,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         if (client.isRTLifetimeEnabled() && oa2SE.isRefreshTokenEnabled()) {
             RefreshTokenImpl rt = tokenResponse.getRefreshToken();
             // rt is used as a key in the database. If the refresh token is  JWT, it will be used as the jti.
-            if(!isTokenExchange) {
+            if (!isTokenExchange) {
                 st2.setRefreshToken(rt);
                 st2.setRefreshTokenValid(true);
             }
@@ -1274,8 +1383,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
 
             }
         } catch (TransactionNotFoundException e) {
-                t = OA2TokenUtils.getTransactionFromTX(oa2SE, oldRT, debugger);
-            if(t == null) {
+            t = OA2TokenUtils.getTransactionFromTX(oa2SE, oldRT, debugger);
+            if (t == null) {
                 String message = "The refresh token \"" + oldRT.getToken() + "\" for client " + client.getIdentifierString() + " is not expired, but also was not found.";
                 debugger.info(this, message);
                 throw new OA2ATException(OA2Errors.INVALID_TOKEN, "The token \"" + oldRT.getToken() + "\" could not be associated with a pending flow",
@@ -1350,7 +1459,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             // If this is non-negative, then it has been configured. Not configured = let everything expire normally.
             txRT.setExpiresAt(System.currentTimeMillis() + oa2SE.getRtGracePeriod());
             txRT.setValid(0 != oa2SE.getRtGracePeriod()); // Valid if non-zero
-        }else{
+        } else {
             RefreshTokenImpl rt = (RefreshTokenImpl) t.getRefreshToken();
             txRT.setExpiresAt(rt.getIssuedAt() + t.getRefreshTokenLifetime()); // use what it has.
         }
@@ -1602,7 +1711,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         long now = System.currentTimeMillis();
         String rawSecret = getClientSecret(request);
         if (!client.isPublicClient()) {
-            verifyClientSecret(client, rawSecret);
+            verifyClient(client, request );
+            //verifyClientSecret(client, rawSecret);
         }
         String deviceCode = request.getParameter(RFC8628Constants.DEVICE_CODE);
         if (StringUtils.isTrivial(deviceCode)) {

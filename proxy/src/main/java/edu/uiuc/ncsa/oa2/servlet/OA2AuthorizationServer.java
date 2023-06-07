@@ -22,6 +22,7 @@ import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.servlet.PresentableState;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -54,10 +55,11 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
     protected static String scopesToString(Collection<String> listOfScopes) {
         String scopeString = "";
         for (String x : listOfScopes) {
-            scopeString =  scopeString + x + " ";
+            scopeString = scopeString + x + " ";
         }
         return scopeString.trim(); // don't return trailing blank(s)
     }
+
     @Override
     protected void setClientRequestAttributes(AuthorizedState aState) {
         super.setClientRequestAttributes(aState);
@@ -78,30 +80,35 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
 
         Map<String, String> map = getFirstParameters(request);
 
-        if (map.containsKey(OA2Constants.RESPONSE_TYPE)) {
-            // Means this is an initial request. Pass it along to the init util to
-            // unscramble it.
-            MyHttpServletResponseWrapper wrapper = new MyHttpServletResponseWrapper(response);
-            OA2AuthorizedServletUtil init = getInitUtil();
+        if (!map.containsKey(OA2Constants.RESPONSE_TYPE)) {
+            // As per both OIDC and OAuth 2 spec., this is required. OIDC compliance requires state is returned.
+            throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
+                    "missing response_type",
+                    HttpStatus.SC_BAD_REQUEST,
+                    (map.containsKey(OA2Constants.STATE) ? map.get(OA2Constants.STATE) : ""));
+        }
+        // Means this is an initial request. Pass it along to the init util to
+        // unscramble it.
+        MyHttpServletResponseWrapper wrapper = new MyHttpServletResponseWrapper(response);
+        OA2AuthorizedServletUtil init = getInitUtil();
 //              JSPUtil.fwd(request, wrapper, AUTHORIZED_ENDPOINT);
-            init.doDelegation(request, wrapper);
-            if (wrapper.isExceptionEncountered()) {
-                throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, wrapper.toString(), wrapper.getStatus(),
-                        getFirstParameterValue(request, OA2Constants.STATE));
-            } // something happened someplace else and the exception was handled.
-            String content = wrapper.toString();
-            // issue now is that the nonce was registered in the init servlet (as it should be for OA1)
-            // and now it will be rejected ever more.
-            JSONObject j = JSONObject.fromObject(content);
-            String code = j.get("code").toString();
-            String state = j.get("state").toString();
-            // Fix RCAuth https://github.com/rcauth-eu/OA4MP/commit/d052e0a64fe527adb7636fe146179ffbac472380
-            if(code != null) {
-                request.setAttribute("code", code);
-            }
-            if(state != null) {
-                request.setAttribute("state", state);
-            }
+        init.doDelegation(request, wrapper);
+        if (wrapper.isExceptionEncountered()) {
+            throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, wrapper.toString(), wrapper.getStatus(),
+                    getFirstParameterValue(request, OA2Constants.STATE));
+        } // something happened someplace else and the exception was handled.
+        String content = wrapper.toString();
+        // issue now is that the nonce was registered in the init servlet (as it should be for OA1)
+        // and now it will be rejected ever more.
+        JSONObject j = JSONObject.fromObject(content);
+        String code = j.get("code").toString();
+        String state = j.get("state").toString();
+        // Fix RCAuth https://github.com/rcauth-eu/OA4MP/commit/d052e0a64fe527adb7636fe146179ffbac472380
+        if (code != null) {
+            request.setAttribute("code", code);
+        }
+        if (state != null) {
+            request.setAttribute("state", state);
         }
         super.doIt(request, response);
         logOK(request); //CIL-1722

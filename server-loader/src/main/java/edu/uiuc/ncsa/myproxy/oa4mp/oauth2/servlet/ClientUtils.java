@@ -271,6 +271,11 @@ public class ClientUtils {
 
     }
 
+    public static void verifyClient(OA2Client client, HttpServletRequest request, boolean isAT) {
+
+
+    }
+
     /**
      * This either peels the secret off the parameter list if it is there or from the headers. It
      * merely returns the raw string that is the secret. No checking against a client is done.

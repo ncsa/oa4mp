@@ -22,6 +22,7 @@ public interface OA4MPConfigTags extends StorageConfigurationTags, MailConfigura
     String MYPROXY = "myproxy";
     String MYPROXY_PORT = "port";
     String MYPROXY_SOCKET_TIMEOUT = "socketTimeout";
+    String MYPROXY_USE_PROXY = "useProxy";
     String MYPROXY_HOST = "host";
     String MYPROXY_LOA = "loa";
     String MYPROXY_LOA_NAME = "name";

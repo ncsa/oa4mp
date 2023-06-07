@@ -147,7 +147,7 @@ public class RefreshTokenRetentionPolicy extends SafeGCRetentionPolicy {
             // the transaction will never get garbage collected.
             if (st2.getClient()!=null && st2.getClient().isDebugOn()) {
                 MetaDebugUtil debugUtil = MyProxyDelegationServlet.createDebugger(st2.getOA2Client());
-                String msg = (new Date(System.currentTimeMillis())) + ": ***Removing token " + token + " with time out " + timeout;
+                String msg = (new Date(System.currentTimeMillis())) + ": ***Removing token " + token + " with time out " + timeout + " for client " + st2.getClient().getIdentifierString();
                 debugUtil.trace(this, msg);
             }
             trace("tx store parent count: 0, returning false (do NOT retain it) ");

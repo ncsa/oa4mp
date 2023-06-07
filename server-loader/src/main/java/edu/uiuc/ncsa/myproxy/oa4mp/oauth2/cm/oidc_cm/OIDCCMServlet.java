@@ -19,11 +19,13 @@ import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Errors;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2GeneralError;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Scopes;
 import edu.uiuc.ncsa.oa4mp.delegation.server.UnapprovedClientException;
+import edu.uiuc.ncsa.oa4mp.delegation.server.WrongPasswordException;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
@@ -94,18 +96,20 @@ public class OIDCCMServlet extends EnvServlet {
     @Override
     public void doGet(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws ServletException, IOException {
         //      printAllParameters(httpServletRequest);
-        if (!(getOA2SE().getCmConfigs().hasRFC7592Config() && getOA2SE().getCmConfigs().getRFC7592Config().enabled) && getOA2SE().getCmConfigs().isEnabled()) {
-            throw new IllegalAccessError("Error: RFC 7592 not supported on this server. Request rejected.");
-        }
-        CM7591Config cm7591Config = getOA2SE().getCmConfigs().getRFC7591Config();
 
-        if (doPing(httpServletRequest, httpServletResponse)) return;
-        if (!getOA2SE().getCmConfigs().hasRFC7592Config()) {
-            throw new IllegalAccessError("Error: RFC 7592 not supported on this server. Request rejected.");
-        }
 
-        boolean isAnonymous = false;  // Meaning that a client is trying to get information
         try {
+            if (!(getOA2SE().getCmConfigs().hasRFC7592Config() && getOA2SE().getCmConfigs().getRFC7592Config().enabled) && getOA2SE().getCmConfigs().isEnabled()) {
+                throw new IllegalAccessError("Error: RFC 7592 not supported on this server. Request rejected.");
+            }
+            CM7591Config cm7591Config = getOA2SE().getCmConfigs().getRFC7591Config();
+
+            if (doPing(httpServletRequest, httpServletResponse)) return;
+            if (!getOA2SE().getCmConfigs().hasRFC7592Config()) {
+                throw new IllegalAccessError("Error: RFC 7592 not supported on this server. Request rejected.");
+            }
+
+            boolean isAnonymous = false;  // Meaning that a client is trying to get information
             AdminClient adminClient = null;
             try {
                 adminClient = getAndCheckAdminClient(httpServletRequest); // Need this to verify admin client.
@@ -343,12 +347,13 @@ public class OIDCCMServlet extends EnvServlet {
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         //     printAllParameters(req);
-        if (!(getOA2SE().getCmConfigs().hasRFC7592Config() && getOA2SE().getCmConfigs().getRFC7592Config().enabled) && getOA2SE().getCmConfigs().isEnabled()) {
-            throw new IllegalAccessError("Error: RFC 7592 not supported on this server. Request rejected.");
-        }
 
 
         try {
+            if (!(getOA2SE().getCmConfigs().hasRFC7592Config() && getOA2SE().getCmConfigs().getRFC7592Config().enabled) && getOA2SE().getCmConfigs().isEnabled()) {
+                throw new IllegalAccessError("Error: RFC 7592 not supported on this server. Request rejected.");
+            }
+
             AdminClient adminClient = getAndCheckAdminClient(req);
             MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(adminClient);
             String rawID = req.getParameter(OA2Constants.CLIENT_ID);
@@ -428,12 +433,13 @@ public class OIDCCMServlet extends EnvServlet {
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         //   printAllParameters(req);
-        if (!(getOA2SE().getCmConfigs().hasRFC7592Config() && getOA2SE().getCmConfigs().getRFC7592Config().enabled) && getOA2SE().getCmConfigs().isEnabled()) {
-            throw new IllegalAccessError("Error: RFC 7592 not supported on this server. Request rejected.");
-        }
         AdminClient adminClient = null;
         OA2Client client = null;
         try {
+            if (!(getOA2SE().getCmConfigs().hasRFC7592Config() && getOA2SE().getCmConfigs().getRFC7592Config().enabled) && getOA2SE().getCmConfigs().isEnabled()) {
+                throw new IllegalAccessError("Error: RFC 7592 not supported on this server. Request rejected.");
+            }
+
             adminClient = getAndCheckAdminClient(req);
             MetaDebugUtil adminDebugger = MyProxyDelegationServlet.createDebugger(adminClient);
             client = getClient(req);
@@ -569,11 +575,12 @@ public class OIDCCMServlet extends EnvServlet {
 
     @Override
     public void doPost(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws ServletException, IOException {
-        if (!(getOA2SE().getCmConfigs().hasRFC7591Config() && getOA2SE().getCmConfigs().getRFC7591Config().enabled) && getOA2SE().getCmConfigs().isEnabled()) {
-            throw new IllegalAccessError("Error: RFC 7591 not supported on this server. Request rejected.");
-        }
+
 
         try {
+            if (!(getOA2SE().getCmConfigs().hasRFC7591Config() && getOA2SE().getCmConfigs().getRFC7591Config().enabled) && getOA2SE().getCmConfigs().isEnabled()) {
+                throw new IllegalAccessError("Error: RFC 7591 not supported on this server. Request rejected.");
+            }
             // The super class rejects anything that does not have an encoding type of
             // application/x-www-form-urlencoded
             // We want this servlet to understand only application/json, so we
@@ -619,22 +626,22 @@ public class OIDCCMServlet extends EnvServlet {
         // need to verify that this is an admin client.
         Identifier acID = BasicIdentifier.newID(credentials[OA2HeaderUtils.ID_INDEX]);
         if (!getOA2SE().getAdminClientStore().containsKey(acID)) {
-            throw new GeneralException("Error: the given id of \"" + acID + "\" is not recognized as an admin client.");
+            throw new UnknownClientException("Error: the given id of \"" + acID + "\" is not recognized as an admin client.");
         }
         AdminClient adminClient = getOA2SE().getAdminClientStore().get(acID);
         MetaDebugUtil adminDebugger = MyProxyDelegationServlet.createDebugger(adminClient);
         String adminSecret = credentials[OA2HeaderUtils.SECRET_INDEX];
         if (adminSecret == null || adminSecret.isEmpty()) {
-            throw new GeneralException("Error: missing secret.");
+            throw new WrongPasswordException("Error: missing secret.");
         }
         if (!getOA2SE().getClientApprovalStore().isApproved(acID)) {
             adminDebugger.trace(this, "Admin client \"" + acID + "\" is not approved.");
-            throw new GeneralException("error: This admin client has not been approved.");
+            throw new UnapprovedClientException("error: This admin client has not been approved.", null);
         }
         String hashedSecret = DigestUtils.sha1Hex(adminSecret);
         if (!adminClient.getSecret().equals(hashedSecret)) {
             adminDebugger.trace(this, "Admin client \"" + acID + "\" and secret do not match.");
-            throw new GeneralException("error: client and secret do not match");
+            throw new WrongPasswordException("error: client and secret do not match");
         }
         return adminClient;
     }
@@ -671,7 +678,16 @@ public class OIDCCMServlet extends EnvServlet {
     Note that this is only called in the doPost method.
      */
     @Override
+
     protected void doIt(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Throwable {
+        try {
+            doIt2(httpServletRequest, httpServletResponse);
+        } catch (Throwable t) {
+            handleException(new ExceptionHandlerThingie(t, httpServletRequest, httpServletResponse));
+        }
+    }
+
+    protected void doIt2(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Throwable {
         if (!getOA2SE().getCmConfigs().isEnabled()) {
             throw new ServletException("unsupported service");
         }
@@ -680,7 +696,7 @@ public class OIDCCMServlet extends EnvServlet {
         AdminClient adminClient = null;
         try {
             adminClient = getAndCheckAdminClient(httpServletRequest);
-        } catch (Throwable ge) {
+        } catch (UnknownClientException ge) {
 
             if (!cm7591Config.anonymousOK) {
                 DebugUtil.trace(this, "anonymous mode not enabled, exception thrown.");
@@ -825,8 +841,9 @@ public class OIDCCMServlet extends EnvServlet {
         //writeCreateOK(httpServletResponse, jsonResp);
         logOK(httpServletRequest); // CIL-1722
 
-          writeOK(httpServletResponse, jsonResp);
+        writeOK(httpServletResponse, jsonResp);
     }
+
 
     protected SecureRandom secureRandom = new SecureRandom();
 
@@ -926,7 +943,7 @@ public class OIDCCMServlet extends EnvServlet {
                 throw new OA2GeneralError(
                         OA2Errors.INVALID_REQUEST,
                         "Error: wildcards not allows in redirect uri \"" + z + "\" ",
-                        HttpStatus.SC_BAD_REQUEST, null,client);
+                        HttpStatus.SC_BAD_REQUEST, null, client);
             }
         }
         client.setCallbackURIs(redirectURIs);
@@ -937,7 +954,7 @@ public class OIDCCMServlet extends EnvServlet {
                     OA2Errors.INVALID_REQUEST,
                     "Error: no client name",
                     HttpStatus.SC_BAD_REQUEST,
-                    null,client);
+                    null, client);
         }
         client.setName(jsonRequest.getString(OIDCCMConstants.CLIENT_NAME));
         jsonRequest.remove(OIDCCMConstants.CLIENT_NAME);
