@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.oa4mp.delegation.oa2;
 
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.BaseClient;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.BaseClient;
 
 import java.net.URI;
 

@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.oa4mp.delegation.server;
 
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl.BasicTransactionProvider;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions.BasicTransactionProvider;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.IdentifierProvider;
 

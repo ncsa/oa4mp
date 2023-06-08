@@ -6,7 +6,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractRegistrationServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.NewClientEvent;
 import edu.uiuc.ncsa.security.core.exceptions.RetryException;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.Client;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Scopes;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.LDAPConfiguration;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.LDAPConfigurationUtil;

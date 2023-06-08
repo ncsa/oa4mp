@@ -1,7 +1,5 @@
-package edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl;
+package edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients;
 
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.ClientKeys;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.storage.data.ConversionMap;
 import net.sf.json.JSONObject;
@@ -35,6 +33,9 @@ public class ClientConverter<V extends Client> extends BaseClientConverter<V> {
         value.setHomeUri(map.getString(getCK().homeURL()));
         value.setErrorUri(map.getString(getCK().errorURL()));
         value.setProxyLimited(map.getBoolean(getCK().proxyLimited()));
+        if(map.containsKey(getCK().rfc7523Client())) {
+            value.setServiceClient(map.getBoolean(getCK().rfc7523Client()));
+        }
         return value;
     }
 
@@ -44,6 +45,7 @@ public class ClientConverter<V extends Client> extends BaseClientConverter<V> {
         map.put(getCK().homeURL(), client.getHomeUri());
         map.put(getCK().errorURL(), client.getErrorUri());
         map.put(getCK().proxyLimited(), client.isProxyLimited());
+        map.put(getCK().rfc7523Client(), client.isServiceClient());
     }
 
     @Override
@@ -52,7 +54,7 @@ public class ClientConverter<V extends Client> extends BaseClientConverter<V> {
         v.setHomeUri(getJsonUtil().getJSONValueString(json,getCK().homeURL()));
         v.setErrorUri(getJsonUtil().getJSONValueString(json,getCK().errorURL()));
         v.setProxyLimited(getJsonUtil().getJSONValueBoolean(json,getCK().proxyLimited()));
-
+        v.setServiceClient(getJsonUtil().getJSONValueBoolean(json, getCK().rfc7523Client()));
         return v;
     }
 
@@ -62,5 +64,6 @@ public class ClientConverter<V extends Client> extends BaseClientConverter<V> {
         getJsonUtil().setJSONValue(json, getCK().homeURL(), v.getHomeUri());
         getJsonUtil().setJSONValue(json, getCK().errorURL(), v.getErrorUri());
         getJsonUtil().setJSONValue(json, getCK().proxyLimited(), v.isProxyLimited());
+        getJsonUtil().setJSONValue(json, getCK().rfc7523Client(), v.isServiceClient());
     }
 }

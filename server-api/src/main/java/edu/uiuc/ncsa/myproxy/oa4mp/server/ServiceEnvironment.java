@@ -4,7 +4,7 @@ import edu.uiuc.ncsa.myproxy.MyProxyServiceFacade;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AuthorizationServletConfig;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.Client;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.TransactionStore;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.TokenForge;
 import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;

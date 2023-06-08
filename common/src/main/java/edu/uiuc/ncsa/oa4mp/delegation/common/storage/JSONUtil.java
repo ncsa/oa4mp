@@ -51,6 +51,12 @@ This method sets or gets one of the components from the JSON object
         return json.getJSONObject(getComponentName()).containsKey(key);
     }
 
+    /**
+     * get a boolean value. Returns <code>false</code> if no such value.
+     * @param json
+     * @param key
+     * @return
+     */
     public boolean getJSONValueBoolean(JSONObject json, String key) {
         if (!hasKey(json, key)) return false;
         return json.getJSONObject(getComponentName()).getBoolean(key);

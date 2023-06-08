@@ -2,7 +2,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.server.util;
 
 import edu.uiuc.ncsa.security.core.util.IdentifiableProviderImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.ClientApprovalKeys;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.ClientApprovalKeys;
 import edu.uiuc.ncsa.security.storage.data.ConversionMap;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.data.SerializationKeys;

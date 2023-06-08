@@ -4,7 +4,7 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.IdentifiableProviderImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.impl.FSClientApprovalStore;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.ClientApprovalKeys;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.ClientApprovalKeys;
 import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 

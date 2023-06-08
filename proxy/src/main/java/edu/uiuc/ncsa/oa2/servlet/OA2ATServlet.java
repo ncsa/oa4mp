@@ -58,6 +58,9 @@ import java.io.Writer;
 import java.net.URI;
 import java.util.*;
 
+import static edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants.NONCE;
+import static edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants.STATE;
+
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 10/3/13 at  2:03 PM
@@ -104,7 +107,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             // response to prevent replay attacks.
             // Here is where we put the information from the session for generating claims in the id_token
             if (st.getNonce() != null && 0 < st.getNonce().length()) {
-                p.put(OA2Constants.NONCE, st.getNonce());
+                p.put(NONCE, st.getNonce());
             }
         }
 
@@ -138,6 +141,9 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         if (grantType.equals(RFC7523Constants.GRANT_TYPE_JWT_BEARER)) {
             // If the client is doing an RFC 7523 grant, then it must authorize accordingly.
             OA2Client oa2Client = OA2HeaderUtils.getAndVerifyRFC7523Client(request, (OA2SE) getServiceEnvironment());
+            if (!oa2Client.isServiceClient()) {
+                throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT, "client not authorized to do RFC7523 requests");
+            }
             doRFC7523(request, response, oa2Client);
             return true;
         }
@@ -190,14 +196,30 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         return false;
     }
 
-
+    /**
+     * Processes a request from a service client. This allows for getting tokens from a trusted
+     * client directly from the token endpoint by sending in the authorization grant request
+     * directly.
+     *
+     * @param request
+     * @param response
+     * @param client
+     * @throws Throwable
+     */
     protected void doRFC7523(HttpServletRequest request, HttpServletResponse response, OA2Client client) throws Throwable {
         JSONObject jsonRequest = null;
         try {
-            jsonRequest = JSONObject.fromObject(request.getParameter(RFC7523Constants.ASSERTION));
+            String raw = request.getParameter(RFC7523Constants.ASSERTION);
+            if (StringUtils.isTrivial(raw)) {
+                throw new OA2ATException(OA2Errors.INVALID_REQUEST, "missing json assertion");
+            }
+            jsonRequest = JWTUtil2.verifyAndReadJWT(raw, client.getJWKS());
+
+        } catch (IllegalArgumentException iax) {
+            throw new OA2ATException(OA2Errors.INVALID_REQUEST, "invalid JWT:"); // Not a JWT
 
         } catch (Throwable t) {
-            throw new OA2ATException(OA2Errors.INVALID_REQUEST, "invalid json assertion");
+            throw new OA2ATException(OA2Errors.INVALID_REQUEST, "invalid json assertion:" + t.getMessage()); // Something is wrong with the JWT --
         }
         if (!jsonRequest.containsKey(OA2Claims.ISSUER)) {
             throw new OA2ATException(OA2Errors.INVALID_REQUEST, "missing issuer");
@@ -205,23 +227,41 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         if (!client.getIdentifierString().equals(jsonRequest.getString(OA2Claims.ISSUER))) {
             throw new OA2ATException(OA2Errors.INVALID_REQUEST, "invalid issuer");
         }
-        if (jsonRequest.containsKey(OA2Claims.SUBJECT)) {
+        if (!jsonRequest.containsKey(OA2Claims.SUBJECT)) {
             throw new OA2ATException(OA2Errors.INVALID_REQUEST, "missing subject");
         }
-        if (System.currentTimeMillis() < jsonRequest.getLong(OA2Claims.EXPIRATION) * 1000L) {
+        if (jsonRequest.getLong(OA2Claims.EXPIRATION) * 1000L < System.currentTimeMillis()) {
             throw new OA2ATException(OA2Errors.INVALID_REQUEST, "expired assertion token");
-
         }
-        String state = jsonRequest.getString(OA2Constants.STATE);
-        String nonce = jsonRequest.getString(OA2Constants.NONCE);
+        Collection<String> scopes;
+        if (jsonRequest.containsKey(OA2Constants.SCOPE)) {
+            Object ss = jsonRequest.get(OA2Constants.SCOPE);
+            if (ss instanceof JSONArray) {
+                scopes = (JSONArray) ss;
+            } else {
+                scopes = new ArrayList<>();
+                scopes.add(ss.toString());
+            }
+        }else{
+            scopes = new ArrayList<>();
+        }
+        String state = jsonRequest.containsKey(STATE) ? jsonRequest.getString(STATE) : null;
+        String nonce = jsonRequest.containsKey(NONCE) ? jsonRequest.getString(NONCE) : null;
 
         OA2ServiceTransaction serviceTransaction = (OA2ServiceTransaction) getOA2SE().getTransactionStore().create();
         serviceTransaction.setRequestState(state);
         serviceTransaction.setNonce(nonce);
         serviceTransaction.setClient(client);
         serviceTransaction.setUsername(jsonRequest.getString((OA2Claims.SUBJECT)));
+        JSONObject claims = new JSONObject();
+        claims.put(OA2Claims.SUBJECT, serviceTransaction.getUsername());
+        serviceTransaction.setUserMetaData(claims); // set this so it exists for later.
         try {
-            serviceTransaction.setScopes(ClientUtils.resolveScopes(request, serviceTransaction, client, true, false));
+            serviceTransaction.setScopes(ClientUtils.resolveScopes(request,
+                    serviceTransaction,
+                    client,
+                    scopes,
+                    true, false));
         } catch (OA2RedirectableError redirectableError) {
             throw new OA2ATException(OA2Errors.INVALID_SCOPE,
                     "unable to determine scopes",
@@ -260,6 +300,16 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         IssuerTransactionState issuerTransactionState = new IssuerTransactionState(request, response, new HashMap<>(),
                 serviceTransaction, new XMLMap(), atiResponse2);
         issuerTransactionState = doAT(issuerTransactionState, client);
+        // Now, get the right signing key
+        VirtualOrganization vo = getOA2SE().getVO(client.getIdentifier());
+        JSONWebKey key = null;
+        if (vo != null && vo.getJsonWebKeys() != null) {
+            key = vo.getJsonWebKeys().get(vo.getDefaultKeyID());
+        } else {
+            key = getOA2SE().getJsonWebKeys().getDefault();
+        }
+        ATIResponse2 atResponse = (ATIResponse2) issuerTransactionState.getIssuerResponse();
+        atResponse.setJsonWebKey(key);
         writeATResponse(response, issuerTransactionState);
     }
 
@@ -1558,6 +1608,12 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
     }
 
     protected void rollback(XMLMap backup, TXRecord txRecord) throws IOException {
+        if (backup.isEmpty()) {
+            // there are a few cases (such as an RFC 7523 request where the transaction does not exist) where
+            // we do not want a rollback.
+            DebugUtil.trace(this, "no backup available");
+            return;
+        }
         GenericStoreUtils.fromXMLAndSave(getTransactionStore(), backup);
         if (txRecord != null) {
             getOA2SE().getTxStore().remove(txRecord.getIdentifier());
@@ -1711,7 +1767,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         long now = System.currentTimeMillis();
         String rawSecret = getClientSecret(request);
         if (!client.isPublicClient()) {
-            verifyClient(client, request );
+            verifyClient(client, request);
             //verifyClientSecret(client, rawSecret);
         }
         String deviceCode = request.getParameter(RFC8628Constants.DEVICE_CODE);

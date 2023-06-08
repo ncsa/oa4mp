@@ -4,8 +4,8 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.OA4MPServiceTransaction;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.TransactionStore;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl.TransactionMemoryStore;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl.TransactionStoreProvider;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions.TransactionMemoryStore;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions.TransactionStoreProvider;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
 /**

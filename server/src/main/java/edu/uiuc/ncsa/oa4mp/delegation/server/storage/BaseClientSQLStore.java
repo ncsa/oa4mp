@@ -1,8 +1,8 @@
 package edu.uiuc.ncsa.oa4mp.delegation.server.storage;
 
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.BaseClient;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.BaseClientKeys;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.ClientApprovalKeys;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.BaseClient;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.BaseClientKeys;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.ClientApprovalKeys;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.monitored.MonitoredSQLStore;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.uuc.UUCConfiguration;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.uuc.UUCRetentionPolicy;

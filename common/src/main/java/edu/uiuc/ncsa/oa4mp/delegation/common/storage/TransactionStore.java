@@ -2,7 +2,7 @@ package edu.uiuc.ncsa.oa4mp.delegation.common.storage;
 
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl.BasicTransaction;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions.BasicTransaction;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.AuthorizationGrant;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.Verifier;

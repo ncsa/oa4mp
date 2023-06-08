@@ -117,8 +117,8 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <!-- ======== START OF CLASS DATA ======== -->
 <main role="main">
 <div class="header">
-<div class="subTitle"><span class="packageLabelInType">Package</span>&nbsp;<a href="package-summary.html">edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl</a></div>
-<h2 title="Class TransactionCache" class="title">Class TransactionCache&lt;V extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</h2>
+<div class="subTitle"><span class="packageLabelInType">Package</span>&nbsp;<a href="package-summary.html">edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions</a></div>
+<h2 title="Class TransactionCache" class="title">Class TransactionCache&lt;V extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</h2>
 </div>
 <div class="contentContainer">
 <ul class="inheritance">
@@ -128,7 +128,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li>edu.uiuc.ncsa.security.core.cache.CachedMapFacade&lt;V&gt;</li>
 <li>
 <ul class="inheritance">
-<li>edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl.TransactionCache&lt;V&gt;</li>
+<li>edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions.TransactionCache&lt;V&gt;</li>
 </ul>
 </li>
 </ul>
@@ -142,7 +142,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <dd><code><a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.storage">TransactionStore</a>&lt;V&gt;</code>, <code>edu.uiuc.ncsa.security.core.Store&lt;V&gt;</code>, <code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&lt;edu.uiuc.ncsa.security.core.Identifier,&#8203;V&gt;</code></dd>
 </dl>
 <hr>
-<pre>public class <span class="typeNameLabel">TransactionCache&lt;V extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</span>
+<pre>public class <span class="typeNameLabel">TransactionCache&lt;V extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</span>
 extends edu.uiuc.ncsa.security.core.cache.CachedMapFacade&lt;V&gt;
 implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.storage">TransactionStore</a>&lt;V&gt;</pre>
 <div class="block">A cache. Set the backing store if you have one, otherwise this works perfectly well as an
@@ -175,7 +175,7 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code>static class&nbsp;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="TransactionCache.TransactionIndices.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">TransactionCache.TransactionIndices</a>&lt;<a href="TransactionCache.TransactionIndices.html" title="type parameter in TransactionCache.TransactionIndices">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</span></code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="TransactionCache.TransactionIndices.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">TransactionCache.TransactionIndices</a>&lt;<a href="TransactionCache.TransactionIndices.html" title="type parameter in TransactionCache.TransactionIndices">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</span></code></th>
 <td class="colLast">
 <div class="block">The indices for a transaction store.</div>
 </td>
@@ -342,7 +342,7 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i18" class="altColor">
-<td class="colFirst"><code><a href="TransactionCache.TransactionIndices.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">TransactionCache.TransactionIndices</a></code></td>
+<td class="colFirst"><code><a href="TransactionCache.TransactionIndices.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">TransactionCache.TransactionIndices</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getTransactionIndices()">getTransactionIndices</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -393,8 +393,8 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i28" class="altColor">
-<td class="colFirst"><code><a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#remove(edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl.BasicTransaction)">remove</a></span>&#8203;(<a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&nbsp;t)</code></th>
+<td class="colFirst"><code><a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a></code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#remove(edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl.BasicTransaction)">remove</a></span>&#8203;(<a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&nbsp;t)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i29" class="rowColor">
@@ -403,7 +403,7 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i30" class="altColor">
-<td class="colFirst"><code><a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a></code></td>
+<td class="colFirst"><code><a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#remove(java.net.URI)">remove</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/net/URI.html?is-external=true" title="class or interface in java.net" class="externalLink">URI</a>&nbsp;identifier)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -470,7 +470,7 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 </tr>
 <tr id="i41" class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#update(edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl.BasicTransaction)">update</a></span>&#8203;(<a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&nbsp;t)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#update(edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl.BasicTransaction)">update</a></span>&#8203;(<a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&nbsp;t)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i42" class="altColor">
@@ -554,7 +554,7 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
                              <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/List.html?is-external=true" title="class or interface in java.util" class="externalLink">List</a>&lt;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&gt;&nbsp;attributes)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code>getMostRecent</code>&nbsp;in interface&nbsp;<code>edu.uiuc.ncsa.security.core.Store&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code>getMostRecent</code>&nbsp;in interface&nbsp;<code>edu.uiuc.ncsa.security.core.Store&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -576,7 +576,7 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <pre class="methodSignature">public&nbsp;edu.uiuc.ncsa.security.core.XMLConverter&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a>&gt;&nbsp;getXMLConverter()</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code>getXMLConverter</code>&nbsp;in interface&nbsp;<code>edu.uiuc.ncsa.security.core.Store&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code>getXMLConverter</code>&nbsp;in interface&nbsp;<code>edu.uiuc.ncsa.security.core.Store&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -586,7 +586,7 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <ul class="blockList">
 <li class="blockList">
 <h4>getTransactionIndices</h4>
-<pre class="methodSignature">public&nbsp;<a href="TransactionCache.TransactionIndices.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">TransactionCache.TransactionIndices</a>&nbsp;getTransactionIndices()</pre>
+<pre class="methodSignature">public&nbsp;<a href="TransactionCache.TransactionIndices.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">TransactionCache.TransactionIndices</a>&nbsp;getTransactionIndices()</pre>
 </li>
 </ul>
 <a id="getEnvironment()">
@@ -672,7 +672,7 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <pre class="methodSignature">public&nbsp;int&nbsp;size&#8203;(boolean&nbsp;includeVersions)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code>size</code>&nbsp;in interface&nbsp;<code>edu.uiuc.ncsa.security.core.Store&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code>size</code>&nbsp;in interface&nbsp;<code>edu.uiuc.ncsa.security.core.Store&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -685,7 +685,7 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <pre class="methodSignature">public&nbsp;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/List.html?is-external=true" title="class or interface in java.util" class="externalLink">List</a>&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a>&gt;&nbsp;getAll()</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code>getAll</code>&nbsp;in interface&nbsp;<code>edu.uiuc.ncsa.security.core.Store&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code>getAll</code>&nbsp;in interface&nbsp;<code>edu.uiuc.ncsa.security.core.Store&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -695,10 +695,10 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <ul class="blockList">
 <li class="blockList">
 <h4>update</h4>
-<pre class="methodSignature">public&nbsp;void&nbsp;update&#8203;(<a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&nbsp;t)</pre>
+<pre class="methodSignature">public&nbsp;void&nbsp;update&#8203;(<a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&nbsp;t)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code>update</code>&nbsp;in interface&nbsp;<code>edu.uiuc.ncsa.security.core.Store&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code>update</code>&nbsp;in interface&nbsp;<code>edu.uiuc.ncsa.security.core.Store&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -728,7 +728,7 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <pre class="methodSignature">public&nbsp;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a>&nbsp;get&#8203;(<a href="../../token/AuthorizationGrant.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.token">AuthorizationGrant</a>&nbsp;tempCred)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../TransactionStore.html#get(edu.uiuc.ncsa.oa4mp.delegation.common.token.AuthorizationGrant)">get</a></code>&nbsp;in interface&nbsp;<code><a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.storage">TransactionStore</a>&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code><a href="../TransactionStore.html#get(edu.uiuc.ncsa.oa4mp.delegation.common.token.AuthorizationGrant)">get</a></code>&nbsp;in interface&nbsp;<code><a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.storage">TransactionStore</a>&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -741,7 +741,7 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <pre class="methodSignature">public&nbsp;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a>&nbsp;get&#8203;(<a href="../../token/AccessToken.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.token">AccessToken</a>&nbsp;accessToken)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../TransactionStore.html#get(edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken)">get</a></code>&nbsp;in interface&nbsp;<code><a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.storage">TransactionStore</a>&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code><a href="../TransactionStore.html#get(edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken)">get</a></code>&nbsp;in interface&nbsp;<code><a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.storage">TransactionStore</a>&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -754,7 +754,7 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <pre class="methodSignature">public&nbsp;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a>&nbsp;get&#8203;(<a href="../../token/Verifier.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.token">Verifier</a>&nbsp;verifier)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../TransactionStore.html#get(edu.uiuc.ncsa.oa4mp.delegation.common.token.Verifier)">get</a></code>&nbsp;in interface&nbsp;<code><a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.storage">TransactionStore</a>&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code><a href="../TransactionStore.html#get(edu.uiuc.ncsa.oa4mp.delegation.common.token.Verifier)">get</a></code>&nbsp;in interface&nbsp;<code><a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.storage">TransactionStore</a>&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -767,9 +767,9 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <pre class="methodSignature">public&nbsp;int&nbsp;size()</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true#size()" title="class or interface in java.util" class="externalLink">size</a></code>&nbsp;in interface&nbsp;<code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&lt;edu.uiuc.ncsa.security.core.Identifier,&#8203;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true#size()" title="class or interface in java.util" class="externalLink">size</a></code>&nbsp;in interface&nbsp;<code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&lt;edu.uiuc.ncsa.security.core.Identifier,&#8203;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code>size</code>&nbsp;in class&nbsp;<code>edu.uiuc.ncsa.security.core.cache.CachedMapFacade&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code>size</code>&nbsp;in class&nbsp;<code>edu.uiuc.ncsa.security.core.cache.CachedMapFacade&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -782,9 +782,9 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <pre class="methodSignature">public&nbsp;boolean&nbsp;isEmpty()</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true#isEmpty()" title="class or interface in java.util" class="externalLink">isEmpty</a></code>&nbsp;in interface&nbsp;<code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&lt;edu.uiuc.ncsa.security.core.Identifier,&#8203;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true#isEmpty()" title="class or interface in java.util" class="externalLink">isEmpty</a></code>&nbsp;in interface&nbsp;<code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&lt;edu.uiuc.ncsa.security.core.Identifier,&#8203;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code>isEmpty</code>&nbsp;in class&nbsp;<code>edu.uiuc.ncsa.security.core.cache.CachedMapFacade&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code>isEmpty</code>&nbsp;in class&nbsp;<code>edu.uiuc.ncsa.security.core.cache.CachedMapFacade&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -797,9 +797,9 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <pre class="methodSignature">public&nbsp;boolean&nbsp;containsKey&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Object.html?is-external=true" title="class or interface in java.lang" class="externalLink">Object</a>&nbsp;key)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true#containsKey(java.lang.Object)" title="class or interface in java.util" class="externalLink">containsKey</a></code>&nbsp;in interface&nbsp;<code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&lt;edu.uiuc.ncsa.security.core.Identifier,&#8203;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true#containsKey(java.lang.Object)" title="class or interface in java.util" class="externalLink">containsKey</a></code>&nbsp;in interface&nbsp;<code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&lt;edu.uiuc.ncsa.security.core.Identifier,&#8203;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code>containsKey</code>&nbsp;in class&nbsp;<code>edu.uiuc.ncsa.security.core.cache.CachedMapFacade&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code>containsKey</code>&nbsp;in class&nbsp;<code>edu.uiuc.ncsa.security.core.cache.CachedMapFacade&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -812,9 +812,9 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <pre class="methodSignature">public&nbsp;boolean&nbsp;containsValue&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Object.html?is-external=true" title="class or interface in java.lang" class="externalLink">Object</a>&nbsp;value)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true#containsValue(java.lang.Object)" title="class or interface in java.util" class="externalLink">containsValue</a></code>&nbsp;in interface&nbsp;<code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&lt;edu.uiuc.ncsa.security.core.Identifier,&#8203;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true#containsValue(java.lang.Object)" title="class or interface in java.util" class="externalLink">containsValue</a></code>&nbsp;in interface&nbsp;<code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&lt;edu.uiuc.ncsa.security.core.Identifier,&#8203;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code>containsValue</code>&nbsp;in class&nbsp;<code>edu.uiuc.ncsa.security.core.cache.CachedMapFacade&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code>containsValue</code>&nbsp;in class&nbsp;<code>edu.uiuc.ncsa.security.core.cache.CachedMapFacade&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -827,9 +827,9 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <pre class="methodSignature">public&nbsp;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a>&nbsp;get&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Object.html?is-external=true" title="class or interface in java.lang" class="externalLink">Object</a>&nbsp;key)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true#get(java.lang.Object)" title="class or interface in java.util" class="externalLink">get</a></code>&nbsp;in interface&nbsp;<code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&lt;edu.uiuc.ncsa.security.core.Identifier,&#8203;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true#get(java.lang.Object)" title="class or interface in java.util" class="externalLink">get</a></code>&nbsp;in interface&nbsp;<code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&lt;edu.uiuc.ncsa.security.core.Identifier,&#8203;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code>get</code>&nbsp;in class&nbsp;<code>edu.uiuc.ncsa.security.core.cache.CachedMapFacade&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code>get</code>&nbsp;in class&nbsp;<code>edu.uiuc.ncsa.security.core.cache.CachedMapFacade&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -839,7 +839,7 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <ul class="blockList">
 <li class="blockList">
 <h4>remove</h4>
-<pre class="methodSignature">public&nbsp;<a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&nbsp;remove&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/net/URI.html?is-external=true" title="class or interface in java.net" class="externalLink">URI</a>&nbsp;identifier)</pre>
+<pre class="methodSignature">public&nbsp;<a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&nbsp;remove&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/net/URI.html?is-external=true" title="class or interface in java.net" class="externalLink">URI</a>&nbsp;identifier)</pre>
 </li>
 </ul>
 <a id="create()">
@@ -851,7 +851,7 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <pre class="methodSignature">public&nbsp;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a>&nbsp;create()</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code>create</code>&nbsp;in interface&nbsp;<code>edu.uiuc.ncsa.security.core.Store&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code>create</code>&nbsp;in interface&nbsp;<code>edu.uiuc.ncsa.security.core.Store&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -867,9 +867,9 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
              <a href="TransactionCache.html" title="type parameter in TransactionCache">V</a>&nbsp;value)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true#put(K,V)" title="class or interface in java.util" class="externalLink">put</a></code>&nbsp;in interface&nbsp;<code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&lt;edu.uiuc.ncsa.security.core.Identifier,&#8203;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true#put(K,V)" title="class or interface in java.util" class="externalLink">put</a></code>&nbsp;in interface&nbsp;<code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&lt;edu.uiuc.ncsa.security.core.Identifier,&#8203;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code>put</code>&nbsp;in class&nbsp;<code>edu.uiuc.ncsa.security.core.cache.CachedMapFacade&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code>put</code>&nbsp;in class&nbsp;<code>edu.uiuc.ncsa.security.core.cache.CachedMapFacade&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -882,9 +882,9 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <pre class="methodSignature">public&nbsp;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a>&nbsp;remove&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Object.html?is-external=true" title="class or interface in java.lang" class="externalLink">Object</a>&nbsp;key)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true#remove(java.lang.Object)" title="class or interface in java.util" class="externalLink">remove</a></code>&nbsp;in interface&nbsp;<code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&lt;edu.uiuc.ncsa.security.core.Identifier,&#8203;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true#remove(java.lang.Object)" title="class or interface in java.util" class="externalLink">remove</a></code>&nbsp;in interface&nbsp;<code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&lt;edu.uiuc.ncsa.security.core.Identifier,&#8203;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code>remove</code>&nbsp;in class&nbsp;<code>edu.uiuc.ncsa.security.core.cache.CachedMapFacade&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code>remove</code>&nbsp;in class&nbsp;<code>edu.uiuc.ncsa.security.core.cache.CachedMapFacade&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -897,9 +897,9 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <pre class="methodSignature">public&nbsp;void&nbsp;putAll&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&nbsp;m)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true#putAll(java.util.Map)" title="class or interface in java.util" class="externalLink">putAll</a></code>&nbsp;in interface&nbsp;<code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&lt;edu.uiuc.ncsa.security.core.Identifier,&#8203;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true#putAll(java.util.Map)" title="class or interface in java.util" class="externalLink">putAll</a></code>&nbsp;in interface&nbsp;<code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&lt;edu.uiuc.ncsa.security.core.Identifier,&#8203;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code>putAll</code>&nbsp;in class&nbsp;<code>edu.uiuc.ncsa.security.core.cache.CachedMapFacade&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code>putAll</code>&nbsp;in class&nbsp;<code>edu.uiuc.ncsa.security.core.cache.CachedMapFacade&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -912,9 +912,9 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <pre class="methodSignature">public&nbsp;void&nbsp;clear()</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true#clear()" title="class or interface in java.util" class="externalLink">clear</a></code>&nbsp;in interface&nbsp;<code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&lt;edu.uiuc.ncsa.security.core.Identifier,&#8203;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true#clear()" title="class or interface in java.util" class="externalLink">clear</a></code>&nbsp;in interface&nbsp;<code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&lt;edu.uiuc.ncsa.security.core.Identifier,&#8203;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code>clear</code>&nbsp;in class&nbsp;<code>edu.uiuc.ncsa.security.core.cache.CachedMapFacade&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code>clear</code>&nbsp;in class&nbsp;<code>edu.uiuc.ncsa.security.core.cache.CachedMapFacade&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -927,9 +927,9 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <pre class="methodSignature">public&nbsp;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Set.html?is-external=true" title="class or interface in java.util" class="externalLink">Set</a>&lt;edu.uiuc.ncsa.security.core.Identifier&gt;&nbsp;keySet()</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true#keySet()" title="class or interface in java.util" class="externalLink">keySet</a></code>&nbsp;in interface&nbsp;<code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&lt;edu.uiuc.ncsa.security.core.Identifier,&#8203;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true#keySet()" title="class or interface in java.util" class="externalLink">keySet</a></code>&nbsp;in interface&nbsp;<code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&lt;edu.uiuc.ncsa.security.core.Identifier,&#8203;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code>keySet</code>&nbsp;in class&nbsp;<code>edu.uiuc.ncsa.security.core.cache.CachedMapFacade&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code>keySet</code>&nbsp;in class&nbsp;<code>edu.uiuc.ncsa.security.core.cache.CachedMapFacade&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -942,9 +942,9 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <pre class="methodSignature">public&nbsp;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Collection.html?is-external=true" title="class or interface in java.util" class="externalLink">Collection</a>&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a>&gt;&nbsp;values()</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true#values()" title="class or interface in java.util" class="externalLink">values</a></code>&nbsp;in interface&nbsp;<code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&lt;edu.uiuc.ncsa.security.core.Identifier,&#8203;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true#values()" title="class or interface in java.util" class="externalLink">values</a></code>&nbsp;in interface&nbsp;<code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&lt;edu.uiuc.ncsa.security.core.Identifier,&#8203;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code>values</code>&nbsp;in class&nbsp;<code>edu.uiuc.ncsa.security.core.cache.CachedMapFacade&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code>values</code>&nbsp;in class&nbsp;<code>edu.uiuc.ncsa.security.core.cache.CachedMapFacade&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -957,9 +957,9 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <pre class="methodSignature">public&nbsp;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Set.html?is-external=true" title="class or interface in java.util" class="externalLink">Set</a>&lt;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.Entry.html?is-external=true" title="class or interface in java.util" class="externalLink">Map.Entry</a>&lt;edu.uiuc.ncsa.security.core.Identifier,&#8203;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a>&gt;&gt;&nbsp;entrySet()</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true#entrySet()" title="class or interface in java.util" class="externalLink">entrySet</a></code>&nbsp;in interface&nbsp;<code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&lt;edu.uiuc.ncsa.security.core.Identifier,&#8203;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true#entrySet()" title="class or interface in java.util" class="externalLink">entrySet</a></code>&nbsp;in interface&nbsp;<code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&lt;edu.uiuc.ncsa.security.core.Identifier,&#8203;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code>entrySet</code>&nbsp;in class&nbsp;<code>edu.uiuc.ncsa.security.core.cache.CachedMapFacade&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code>entrySet</code>&nbsp;in class&nbsp;<code>edu.uiuc.ncsa.security.core.cache.CachedMapFacade&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -974,7 +974,7 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <pre class="methodSignature">public&nbsp;void&nbsp;save&#8203;(<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a>&nbsp;t)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code>save</code>&nbsp;in interface&nbsp;<code>edu.uiuc.ncsa.security.core.Store&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code>save</code>&nbsp;in interface&nbsp;<code>edu.uiuc.ncsa.security.core.Store&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -984,7 +984,7 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <ul class="blockList">
 <li class="blockList">
 <h4>remove</h4>
-<pre class="methodSignature">public&nbsp;<a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&nbsp;remove&#8203;(<a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&nbsp;t)</pre>
+<pre class="methodSignature">public&nbsp;<a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&nbsp;remove&#8203;(<a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&nbsp;t)</pre>
 </li>
 </ul>
 <a id="register(edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl.BasicTransaction)">
@@ -998,7 +998,7 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <pre class="methodSignature">public&nbsp;void&nbsp;register&#8203;(<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a>&nbsp;transaction)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code>register</code>&nbsp;in interface&nbsp;<code>edu.uiuc.ncsa.security.core.Store&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code>register</code>&nbsp;in interface&nbsp;<code>edu.uiuc.ncsa.security.core.Store&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -1026,7 +1026,7 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
                       boolean&nbsp;isRegEx)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code>search</code>&nbsp;in interface&nbsp;<code>edu.uiuc.ncsa.security.core.Store&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code>search</code>&nbsp;in interface&nbsp;<code>edu.uiuc.ncsa.security.core.Store&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -1042,7 +1042,7 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
                       <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/List.html?is-external=true" title="class or interface in java.util" class="externalLink">List</a>&lt;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&gt;&nbsp;attr)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code>search</code>&nbsp;in interface&nbsp;<code>edu.uiuc.ncsa.security.core.Store&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code>search</code>&nbsp;in interface&nbsp;<code>edu.uiuc.ncsa.security.core.Store&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -1061,7 +1061,7 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
                       <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Date.html?is-external=true" title="class or interface in java.util" class="externalLink">Date</a>&nbsp;after)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code>search</code>&nbsp;in interface&nbsp;<code>edu.uiuc.ncsa.security.core.Store&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code>search</code>&nbsp;in interface&nbsp;<code>edu.uiuc.ncsa.security.core.Store&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -1074,7 +1074,7 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <pre class="methodSignature">public&nbsp;edu.uiuc.ncsa.security.storage.data.MapConverter&nbsp;getMapConverter()</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../TransactionStore.html#getMapConverter()">getMapConverter</a></code>&nbsp;in interface&nbsp;<code><a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.storage">TransactionStore</a>&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code><a href="../TransactionStore.html#getMapConverter()">getMapConverter</a></code>&nbsp;in interface&nbsp;<code><a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.storage">TransactionStore</a>&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -1087,7 +1087,7 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <pre class="methodSignature">public&nbsp;boolean&nbsp;remove&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/List.html?is-external=true" title="class or interface in java.util" class="externalLink">List</a>&lt;edu.uiuc.ncsa.security.core.Identifiable&gt;&nbsp;objects)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code>remove</code>&nbsp;in interface&nbsp;<code>edu.uiuc.ncsa.security.core.Store&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code>remove</code>&nbsp;in interface&nbsp;<code>edu.uiuc.ncsa.security.core.Store&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -1100,7 +1100,7 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <pre class="methodSignature">public&nbsp;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a>&nbsp;getByProxyID&#8203;(edu.uiuc.ncsa.security.core.Identifier&nbsp;proxyID)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../TransactionStore.html#getByProxyID(edu.uiuc.ncsa.security.core.Identifier)">getByProxyID</a></code>&nbsp;in interface&nbsp;<code><a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.storage">TransactionStore</a>&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code><a href="../TransactionStore.html#getByProxyID(edu.uiuc.ncsa.security.core.Identifier)">getByProxyID</a></code>&nbsp;in interface&nbsp;<code><a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.storage">TransactionStore</a>&lt;<a href="TransactionCache.html" title="type parameter in TransactionCache">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>

@@ -117,8 +117,8 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <!-- ======== START OF CLASS DATA ======== -->
 <main role="main">
 <div class="header">
-<div class="subTitle"><span class="packageLabelInType">Package</span>&nbsp;<a href="package-summary.html">edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl</a></div>
-<h2 title="Class FSTransactionStore" class="title">Class FSTransactionStore&lt;V extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</h2>
+<div class="subTitle"><span class="packageLabelInType">Package</span>&nbsp;<a href="package-summary.html">edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions</a></div>
+<h2 title="Class FSTransactionStore" class="title">Class FSTransactionStore&lt;V extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</h2>
 </div>
 <div class="contentContainer">
 <ul class="inheritance">
@@ -131,7 +131,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li>edu.uiuc.ncsa.security.storage.FileStore&lt;V&gt;</li>
 <li>
 <ul class="inheritance">
-<li>edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl.FSTransactionStore&lt;V&gt;</li>
+<li>edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions.FSTransactionStore&lt;V&gt;</li>
 </ul>
 </li>
 </ul>
@@ -147,7 +147,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <dd><code><a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.storage">TransactionStore</a>&lt;V&gt;</code>, <code>edu.uiuc.ncsa.security.core.Store&lt;V&gt;</code>, <code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&lt;edu.uiuc.ncsa.security.core.Identifier,&#8203;V&gt;</code></dd>
 </dl>
 <hr>
-<pre>public abstract class <span class="typeNameLabel">FSTransactionStore&lt;V extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</span>
+<pre>public abstract class <span class="typeNameLabel">FSTransactionStore&lt;V extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</span>
 extends edu.uiuc.ncsa.security.storage.FileStore&lt;V&gt;
 implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.storage">TransactionStore</a>&lt;V&gt;</pre>
 <div class="block">Implementation of a transaction store backed by the file system.
@@ -434,7 +434,7 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
  authorization grant.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code>realSave</code>&nbsp;in class&nbsp;<code>edu.uiuc.ncsa.security.storage.FileStore&lt;<a href="FSTransactionStore.html" title="type parameter in FSTransactionStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code>realSave</code>&nbsp;in class&nbsp;<code>edu.uiuc.ncsa.security.storage.FileStore&lt;<a href="FSTransactionStore.html" title="type parameter in FSTransactionStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>checkExists</code> - </dd>
 <dd><code>t</code> - </dd>
@@ -452,7 +452,7 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <pre class="methodSignature">public&nbsp;<a href="FSTransactionStore.html" title="type parameter in FSTransactionStore">V</a>&nbsp;realRemove&#8203;(<a href="FSTransactionStore.html" title="type parameter in FSTransactionStore">V</a>&nbsp;thingie)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code>realRemove</code>&nbsp;in class&nbsp;<code>edu.uiuc.ncsa.security.storage.FileStore&lt;<a href="FSTransactionStore.html" title="type parameter in FSTransactionStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code>realRemove</code>&nbsp;in class&nbsp;<code>edu.uiuc.ncsa.security.storage.FileStore&lt;<a href="FSTransactionStore.html" title="type parameter in FSTransactionStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -465,7 +465,7 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <pre class="methodSignature">public&nbsp;<a href="FSTransactionStore.html" title="type parameter in FSTransactionStore">V</a>&nbsp;get&#8203;(<a href="../../token/AuthorizationGrant.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.token">AuthorizationGrant</a>&nbsp;authorizationGrant)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../TransactionStore.html#get(edu.uiuc.ncsa.oa4mp.delegation.common.token.AuthorizationGrant)">get</a></code>&nbsp;in interface&nbsp;<code><a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.storage">TransactionStore</a>&lt;<a href="FSTransactionStore.html" title="type parameter in FSTransactionStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code><a href="../TransactionStore.html#get(edu.uiuc.ncsa.oa4mp.delegation.common.token.AuthorizationGrant)">get</a></code>&nbsp;in interface&nbsp;<code><a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.storage">TransactionStore</a>&lt;<a href="FSTransactionStore.html" title="type parameter in FSTransactionStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -478,7 +478,7 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <pre class="methodSignature">public&nbsp;<a href="FSTransactionStore.html" title="type parameter in FSTransactionStore">V</a>&nbsp;get&#8203;(<a href="../../token/AccessToken.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.token">AccessToken</a>&nbsp;accessToken)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../TransactionStore.html#get(edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken)">get</a></code>&nbsp;in interface&nbsp;<code><a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.storage">TransactionStore</a>&lt;<a href="FSTransactionStore.html" title="type parameter in FSTransactionStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code><a href="../TransactionStore.html#get(edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken)">get</a></code>&nbsp;in interface&nbsp;<code><a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.storage">TransactionStore</a>&lt;<a href="FSTransactionStore.html" title="type parameter in FSTransactionStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -491,7 +491,7 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <pre class="methodSignature">public&nbsp;<a href="FSTransactionStore.html" title="type parameter in FSTransactionStore">V</a>&nbsp;get&#8203;(<a href="../../token/Verifier.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.token">Verifier</a>&nbsp;verifier)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../TransactionStore.html#get(edu.uiuc.ncsa.oa4mp.delegation.common.token.Verifier)">get</a></code>&nbsp;in interface&nbsp;<code><a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.storage">TransactionStore</a>&lt;<a href="FSTransactionStore.html" title="type parameter in FSTransactionStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code><a href="../TransactionStore.html#get(edu.uiuc.ncsa.oa4mp.delegation.common.token.Verifier)">get</a></code>&nbsp;in interface&nbsp;<code><a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.storage">TransactionStore</a>&lt;<a href="FSTransactionStore.html" title="type parameter in FSTransactionStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -504,9 +504,9 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <pre class="methodSignature">public&nbsp;edu.uiuc.ncsa.security.storage.data.MapConverter&nbsp;getMapConverter()</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../TransactionStore.html#getMapConverter()">getMapConverter</a></code>&nbsp;in interface&nbsp;<code><a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.storage">TransactionStore</a>&lt;<a href="FSTransactionStore.html" title="type parameter in FSTransactionStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code><a href="../TransactionStore.html#getMapConverter()">getMapConverter</a></code>&nbsp;in interface&nbsp;<code><a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.storage">TransactionStore</a>&lt;<a href="FSTransactionStore.html" title="type parameter in FSTransactionStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code>getMapConverter</code>&nbsp;in class&nbsp;<code>edu.uiuc.ncsa.security.storage.FileStore&lt;<a href="FSTransactionStore.html" title="type parameter in FSTransactionStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code>getMapConverter</code>&nbsp;in class&nbsp;<code>edu.uiuc.ncsa.security.storage.FileStore&lt;<a href="FSTransactionStore.html" title="type parameter in FSTransactionStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>

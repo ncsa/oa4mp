@@ -10,6 +10,7 @@ import edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.Token;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.*;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.JWTUtil;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.NonceHerder;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.UserInfo;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.client.ATResponse2;
@@ -30,6 +31,7 @@ import edu.uiuc.ncsa.security.util.cli.HelpUtil;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import edu.uiuc.ncsa.security.util.crypto.CertUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
 
@@ -708,7 +710,7 @@ public class OA2CLCCommands extends CommonCommands {
     }
 
     public void show_raw_id_token(InputLine inputLine) throws Exception {
-        if (grant == null || showHelp(inputLine)) {
+        if (showHelp(inputLine)) {
             showRawTokenHelp();
             return;
         }
@@ -731,7 +733,7 @@ public class OA2CLCCommands extends CommonCommands {
     }
 
     public void claims(InputLine inputLine) throws Exception {
-        if (grant == null || showHelp(inputLine)) {
+        if ( showHelp(inputLine)) {
             showClaimsHelp();
             return;
         }
@@ -1990,18 +1992,43 @@ public class OA2CLCCommands extends CommonCommands {
     public void user_info(InputLine inputLine) throws Exception {
         get_user_info(inputLine);
     }
-
+    public String USERNAME_FLAG = "-user" ;
     public void rfc7523(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
-            say("rfc7523 - make and RFC 7523 request to the service.");
+            say("rfc7523 [" + USERNAME_FLAG + "user_name]- make and RFC 7523 request to the service.");
             say("This is compliant with section 2.1, and is in effect an authorization grant.");
-
+            say(USERNAME_FLAG + " - if present, set the subject of the request (hence the username) to this,");
+            say("   If missing, the default subject will be the client ID.");
             return;
         }
-        JSONObject jsonObject = getService().rfc7523(getDummyAsset());
+        if (getCe() == null) {
+            say("Oops! No configuration has been loaded.");
+            return;
+        }
+        String username = null;
+        if(inputLine.hasArg(USERNAME_FLAG)){
+            username = inputLine.getNextArgFor(USERNAME_FLAG);
+            inputLine.removeSwitchAndValue(USERNAME_FLAG);
+        }
+        clear(inputLine, false); // start by clearing everything but current parameters,
+        dummyAsset = (OA2Asset) getCe().getAssetStore().create();
+        Map parameters = new HashMap();
+        JSONArray array = new JSONArray();
+        array.addAll(getCe().getScopes());
+        parameters.put(SCOPE, array);
+        parameters.put(REDIRECT_URI, getCe().getCallback().toString());
+        parameters.put(NONCE, NonceHerder.createNonce());
+        if(username != null){
+            parameters.put(OA2Claims.SUBJECT, username);
+        }  else{
+            parameters.put(OA2Claims.SUBJECT, getCe().getClient().getIdentifierString());
+        }
+        JSONObject jsonObject = getService().rfc7523(getDummyAsset(), parameters);
+        rawIdToken = jsonObject.getString(ID_TOKEN);
+        claims = JWTUtil.readJWT(rawIdToken)[1]; // just read it.
         if (isPrintOuput()) {
-               printTokens(inputLine.hasArg(NO_VERIFY_JWT), true);
-           }
+            printTokens(inputLine.hasArg(NO_VERIFY_JWT), true);
+        }
 
     }
 

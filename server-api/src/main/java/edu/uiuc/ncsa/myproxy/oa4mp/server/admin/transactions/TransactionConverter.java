@@ -7,7 +7,7 @@ import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.support.ServiceTransactionConverter;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.Client;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.MyX509Certificates;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.TokenForge;
 import edu.uiuc.ncsa.security.storage.data.ConversionMap;

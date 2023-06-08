@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.oa4mp.delegation.server;
 
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.BaseClient;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.BaseClient;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.Client;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 
 /**

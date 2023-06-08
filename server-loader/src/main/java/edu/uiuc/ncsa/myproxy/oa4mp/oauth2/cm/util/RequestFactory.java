@@ -14,7 +14,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions.*;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.types.*;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.BaseClient;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.BaseClient;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;

@@ -33,8 +33,8 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.storage.filestore.DSFSClientStoreProvi
 import edu.uiuc.ncsa.myproxy.oa4mp.server.storage.sql.provider.DSSQLClientApprovalStoreProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.ClientApprovalMemoryStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.ClientApproverConverter;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.ClientApprovalKeys;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.Client;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.ClientApprovalKeys;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.TransactionStore;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.TokenForge;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2ConfigurationLoaderUtils;

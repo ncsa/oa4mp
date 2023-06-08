@@ -4,11 +4,12 @@ import edu.uiuc.ncsa.myproxy.oa4mp.client.storage.AssetProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.client.storage.AssetStore;
 import edu.uiuc.ncsa.oa4mp.delegation.client.AbstractClientEnvironment;
 import edu.uiuc.ncsa.oa4mp.delegation.client.DelegationService;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.Client;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.TokenForge;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 
 import javax.inject.Provider;
 import java.net.URI;
@@ -61,7 +62,9 @@ public class ClientEnvironment extends AbstractClientEnvironment {
                              boolean showRedirectPage,
                              String errorPagePath,
                              String redirectPagePath,
-                             String successPagePath
+                             String successPagePath,
+                             String keyID,
+                             JSONWebKeys jwks
     ) {
         this.accessTokenUri = accessTokenUri;
         this.authorizationUri = authorizationUri;
@@ -80,9 +83,37 @@ public class ClientEnvironment extends AbstractClientEnvironment {
         if(errorPagePath != null){this.errorPagePath = errorPagePath;}
         if(successPagePath != null){this.successPagePath = successPagePath;}
         if(redirectPagePath != null){this.redirectPagePath = redirectPagePath;}
+        this.kid = keyID;
+        this.jwks = jwks;
     }
 
+    public boolean hasJWKS() {
+        return jwks != null;
+    }
 
+    public boolean hasKID() {
+        return kid != null && kid.length() != 0;
+    }
+
+    String kid;
+
+    public String getKid() {
+        return kid;
+    }
+
+    public void setKid(String kid) {
+        this.kid = kid;
+    }
+
+    public JSONWebKeys getJWKS() {
+        return jwks;
+    }
+
+    public void setJWKS(JSONWebKeys jwks) {
+        this.jwks = jwks;
+    }
+
+    JSONWebKeys jwks;
     AssetStore assetStore;
 
     /**
@@ -136,7 +167,9 @@ public class ClientEnvironment extends AbstractClientEnvironment {
             boolean showRedirectPage,
             String errorPagePath,
             String redirectPagePath,
-            String successPagePath
+            String successPagePath,
+            String kid,
+            JSONWebKeys jwks
     ) {
 
         super(logger, constants);
@@ -162,7 +195,8 @@ public class ClientEnvironment extends AbstractClientEnvironment {
         if(errorPagePath != null){this.errorPagePath = errorPagePath;}
         if(successPagePath != null){this.successPagePath = successPagePath;}
         if(redirectPagePath != null){this.redirectPagePath = redirectPagePath;}
-
+        this.kid = kid;
+        this.jwks = jwks;
     }
 
 

@@ -541,6 +541,37 @@ unused clients (meaning those never accessed or those only accessed before or be
 will be automatically removed. This facility allows you to run this directly from the command line.]]>
     </body>
     </entry>
+    <entry id="jwks">
+    <body>
+    <![CDATA[Public signing keys for RFC 7523 compliance. If these are present, then the client
+may use them for authorization. If a client has JSON web keys, then these will be used
+in preference to, say, a secret (if there is one). If there is a single key, then that will
+be used for signature verification.
+
+Tip: To set this property in the CLI, get the keys and place them in a file, then
+     use the -file parameter for the update command, e.g.
+
+oa4mp>update >jwks -file /home/root/temp/new-keys.json]]>
+    </body>
+    </entry>
+    <entry id="rfc7523_client">
+    <body>
+    <![CDATA[Property. Boolean. False.
+If true, then this client may use RFC 7523 to issue an authorization grant to the token
+endpoint, getting back access, id and refresh tokens. Note that this completely replaces
+the intial leg of OAuth and in effect the client states that the login was ok.
+
+The main use of this is for so-called service clients. That is to say, services that
+require tokens for their operation, but are dedicated and have "no user serviceable parts."
+Typically, there is a single "user" for this client (such as a robot).
+This requires a trust relationship
+before setting this property true. Note that part of the specification is that the client
+must use its key to authenticate as well as sign its grant request.
+
+See also: https://datatracker.ietf.org/doc/html/rfc7523#section-2.1 ]]>
+    </body>
+    </entry>
+
     <!--
 at_lifetime           description           extended_attributes   maxATLifetime         public_client         strict_scopes
 callback_uri          df_interval           extends_provisioners  maxRTLifetime         public_key

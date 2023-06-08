@@ -117,8 +117,8 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <!-- ======== START OF CLASS DATA ======== -->
 <main role="main">
 <div class="header">
-<div class="subTitle"><span class="packageLabelInType">Package</span>&nbsp;<a href="package-summary.html">edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl</a></div>
-<h2 title="Class SQLBaseTransactionStore" class="title">Class SQLBaseTransactionStore&lt;V extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</h2>
+<div class="subTitle"><span class="packageLabelInType">Package</span>&nbsp;<a href="package-summary.html">edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions</a></div>
+<h2 title="Class SQLBaseTransactionStore" class="title">Class SQLBaseTransactionStore&lt;V extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</h2>
 </div>
 <div class="contentContainer">
 <ul class="inheritance">
@@ -131,7 +131,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li>edu.uiuc.ncsa.security.storage.sql.SQLStore&lt;V&gt;</li>
 <li>
 <ul class="inheritance">
-<li>edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl.SQLBaseTransactionStore&lt;V&gt;</li>
+<li>edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions.SQLBaseTransactionStore&lt;V&gt;</li>
 </ul>
 </li>
 </ul>
@@ -151,7 +151,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <dd><code><a href="../../../server/storage/SQLServiceTransactionStore.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.server.storage">SQLServiceTransactionStore</a></code></dd>
 </dl>
 <hr>
-<pre>public abstract class <span class="typeNameLabel">SQLBaseTransactionStore&lt;V extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</span>
+<pre>public abstract class <span class="typeNameLabel">SQLBaseTransactionStore&lt;V extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</span>
 extends edu.uiuc.ncsa.security.storage.sql.SQLStore&lt;V&gt;
 implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.storage">TransactionStore</a>&lt;V&gt;</pre>
 <div class="block">Generic SQL implementation. This is SQL:2003 compliant and should work with most major
@@ -289,7 +289,7 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 </td>
 </tr>
 <tr id="i5" class="rowColor">
-<td class="colFirst"><code><a href="BasicTransactionTable.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransactionTable</a></code></td>
+<td class="colFirst"><code><a href="BasicTransactionTable.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransactionTable</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getTransactionTable()">getTransactionTable</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -400,7 +400,7 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <ul class="blockList">
 <li class="blockList">
 <h4>getTransactionTable</h4>
-<pre class="methodSignature">public&nbsp;<a href="BasicTransactionTable.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransactionTable</a>&nbsp;getTransactionTable()</pre>
+<pre class="methodSignature">public&nbsp;<a href="BasicTransactionTable.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransactionTable</a>&nbsp;getTransactionTable()</pre>
 </li>
 </ul>
 <a id="getTransaction(java.lang.String,java.lang.String)">
@@ -430,7 +430,7 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <pre class="methodSignature">public&nbsp;<a href="SQLBaseTransactionStore.html" title="type parameter in SQLBaseTransactionStore">V</a>&nbsp;get&#8203;(<a href="../../token/AuthorizationGrant.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.token">AuthorizationGrant</a>&nbsp;tempCred)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../TransactionStore.html#get(edu.uiuc.ncsa.oa4mp.delegation.common.token.AuthorizationGrant)">get</a></code>&nbsp;in interface&nbsp;<code><a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.storage">TransactionStore</a>&lt;<a href="SQLBaseTransactionStore.html" title="type parameter in SQLBaseTransactionStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code><a href="../TransactionStore.html#get(edu.uiuc.ncsa.oa4mp.delegation.common.token.AuthorizationGrant)">get</a></code>&nbsp;in interface&nbsp;<code><a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.storage">TransactionStore</a>&lt;<a href="SQLBaseTransactionStore.html" title="type parameter in SQLBaseTransactionStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -443,7 +443,7 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <pre class="methodSignature">public&nbsp;<a href="SQLBaseTransactionStore.html" title="type parameter in SQLBaseTransactionStore">V</a>&nbsp;get&#8203;(<a href="../../token/AccessToken.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.token">AccessToken</a>&nbsp;accessToken)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../TransactionStore.html#get(edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken)">get</a></code>&nbsp;in interface&nbsp;<code><a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.storage">TransactionStore</a>&lt;<a href="SQLBaseTransactionStore.html" title="type parameter in SQLBaseTransactionStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code><a href="../TransactionStore.html#get(edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken)">get</a></code>&nbsp;in interface&nbsp;<code><a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.storage">TransactionStore</a>&lt;<a href="SQLBaseTransactionStore.html" title="type parameter in SQLBaseTransactionStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -456,7 +456,7 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <pre class="methodSignature">public&nbsp;<a href="SQLBaseTransactionStore.html" title="type parameter in SQLBaseTransactionStore">V</a>&nbsp;get&#8203;(<a href="../../token/Verifier.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.token">Verifier</a>&nbsp;verifier)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../TransactionStore.html#get(edu.uiuc.ncsa.oa4mp.delegation.common.token.Verifier)">get</a></code>&nbsp;in interface&nbsp;<code><a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.storage">TransactionStore</a>&lt;<a href="SQLBaseTransactionStore.html" title="type parameter in SQLBaseTransactionStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code><a href="../TransactionStore.html#get(edu.uiuc.ncsa.oa4mp.delegation.common.token.Verifier)">get</a></code>&nbsp;in interface&nbsp;<code><a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.storage">TransactionStore</a>&lt;<a href="SQLBaseTransactionStore.html" title="type parameter in SQLBaseTransactionStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -469,7 +469,7 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <pre class="methodSignature">public&nbsp;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;getCreationTSField()</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code>getCreationTSField</code>&nbsp;in class&nbsp;<code>edu.uiuc.ncsa.security.storage.sql.SQLStore&lt;<a href="SQLBaseTransactionStore.html" title="type parameter in SQLBaseTransactionStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code>getCreationTSField</code>&nbsp;in class&nbsp;<code>edu.uiuc.ncsa.security.storage.sql.SQLStore&lt;<a href="SQLBaseTransactionStore.html" title="type parameter in SQLBaseTransactionStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>

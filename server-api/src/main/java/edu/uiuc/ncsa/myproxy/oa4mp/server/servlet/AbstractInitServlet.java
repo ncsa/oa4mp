@@ -5,7 +5,7 @@ import edu.uiuc.ncsa.oa4mp.delegation.server.UnapprovedClientException;
 import edu.uiuc.ncsa.oa4mp.delegation.server.request.AGRequest;
 import edu.uiuc.ncsa.oa4mp.delegation.server.request.AGResponse;
 import edu.uiuc.ncsa.oa4mp.delegation.common.servlet.TransactionState;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.Client;
 import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
 import edu.uiuc.ncsa.security.storage.XMLMap;
 

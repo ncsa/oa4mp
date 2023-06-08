@@ -117,7 +117,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <!-- ======== START OF CLASS DATA ======== -->
 <main role="main">
 <div class="header">
-<div class="subTitle"><span class="packageLabelInType">Package</span>&nbsp;<a href="package-summary.html">edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl</a></div>
+<div class="subTitle"><span class="packageLabelInType">Package</span>&nbsp;<a href="package-summary.html">edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions</a></div>
 <h2 title="Class ClientConverter" class="title">Class ClientConverter&lt;V extends <a href="../Client.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage">Client</a>&gt;</h2>
 </div>
 <div class="contentContainer">
@@ -131,10 +131,10 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li>edu.uiuc.ncsa.security.storage.data.MonitoredConverter&lt;V&gt;</li>
 <li>
 <ul class="inheritance">
-<li><a href="BaseClientConverter.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl.BaseClientConverter</a>&lt;V&gt;</li>
+<li><a href="BaseClientConverter.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.BaseClientConverter</a>&lt;V&gt;</li>
 <li>
 <ul class="inheritance">
-<li>edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl.ClientConverter&lt;V&gt;</li>
+<li>edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.ClientConverter&lt;V&gt;</li>
 </ul>
 </li>
 </ul>
@@ -153,7 +153,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </dl>
 <hr>
 <pre>public class <span class="typeNameLabel">ClientConverter&lt;V extends <a href="../Client.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage">Client</a>&gt;</span>
-extends <a href="BaseClientConverter.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BaseClientConverter</a>&lt;V&gt;</pre>
+extends <a href="BaseClientConverter.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BaseClientConverter</a>&lt;V&gt;</pre>
 <div class="block"><p>Created by Jeff Gaynor<br>
  on 4/13/12 at  3:48 PM</div>
 </li>
@@ -193,7 +193,7 @@ extends <a href="BaseClientConverter.html" title="class in edu.uiuc.ncsa.oa4mp.d
 <th class="colLast" scope="col">Description</th>
 </tr>
 <tr class="altColor">
-<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(edu.uiuc.ncsa.oa4mp.delegation.common.storage.ClientKeys,edu.uiuc.ncsa.security.core.IdentifiableProvider)">ClientConverter</a></span>&#8203;(<a href="../ClientKeys.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage">ClientKeys</a>&nbsp;keys,
+<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.ClientKeys,edu.uiuc.ncsa.security.core.IdentifiableProvider)">ClientConverter</a></span>&#8203;(<a href="../ClientKeys.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage">ClientKeys</a>&nbsp;keys,
                edu.uiuc.ncsa.security.core.IdentifiableProvider&lt;<a href="ClientConverter.html" title="type parameter in ClientConverter">V</a>&gt;&nbsp;identifiableProvider)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -254,10 +254,10 @@ extends <a href="BaseClientConverter.html" title="class in edu.uiuc.ncsa.oa4mp.d
 </tr>
 </table>
 <ul class="blockList">
-<li class="blockList"><a id="methods.inherited.from.class.edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl.BaseClientConverter">
+<li class="blockList"><a id="methods.inherited.from.class.edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.BaseClientConverter">
 <!--   -->
 </a>
-<h3>Methods inherited from class&nbsp;edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl.<a href="BaseClientConverter.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BaseClientConverter</a></h3>
+<h3>Methods inherited from class&nbsp;edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions.<a href="BaseClientConverter.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BaseClientConverter</a></h3>
 <code><a href="BaseClientConverter.html#getBKK()">getBKK</a>, <a href="BaseClientConverter.html#getJsonUtil()">getJsonUtil</a></code></li>
 </ul>
 <ul class="blockList">
@@ -306,7 +306,7 @@ extends <a href="BaseClientConverter.html" title="class in edu.uiuc.ncsa.oa4mp.d
 <pre>public&nbsp;ClientConverter&#8203;(edu.uiuc.ncsa.security.core.IdentifiableProvider&lt;<a href="ClientConverter.html" title="type parameter in ClientConverter">V</a>&gt;&nbsp;identifiableProvider)</pre>
 </li>
 </ul>
-<a id="&lt;init&gt;(edu.uiuc.ncsa.oa4mp.delegation.common.storage.ClientKeys,edu.uiuc.ncsa.security.core.IdentifiableProvider)">
+<a id="&lt;init&gt;(edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.ClientKeys,edu.uiuc.ncsa.security.core.IdentifiableProvider)">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -335,7 +335,7 @@ extends <a href="BaseClientConverter.html" title="class in edu.uiuc.ncsa.oa4mp.d
 <pre class="methodSignature">public&nbsp;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;getJSONComponentName()</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="BaseClientConverter.html#getJSONComponentName()">getJSONComponentName</a></code>&nbsp;in class&nbsp;<code><a href="BaseClientConverter.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BaseClientConverter</a>&lt;<a href="ClientConverter.html" title="type parameter in ClientConverter">V</a> extends <a href="../Client.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage">Client</a>&gt;</code></dd>
+<dd><code><a href="BaseClientConverter.html#getJSONComponentName()">getJSONComponentName</a></code>&nbsp;in class&nbsp;<code><a href="BaseClientConverter.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BaseClientConverter</a>&lt;<a href="ClientConverter.html" title="type parameter in ClientConverter">V</a> extends <a href="../Client.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage">Client</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -348,7 +348,7 @@ extends <a href="BaseClientConverter.html" title="class in edu.uiuc.ncsa.oa4mp.d
 <pre class="methodSignature">protected&nbsp;<a href="../ClientKeys.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage">ClientKeys</a>&nbsp;getCK()</pre>
 </li>
 </ul>
-<a id="fromMap(edu.uiuc.ncsa.security.storage.data.ConversionMap,edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client)">
+<a id="fromMap(edu.uiuc.ncsa.security.storage.data.ConversionMap,edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.Client)">
 <!--   -->
 </a><a id="fromMap(edu.uiuc.ncsa.security.storage.data.ConversionMap,V)">
 <!--   -->
@@ -360,11 +360,11 @@ extends <a href="BaseClientConverter.html" title="class in edu.uiuc.ncsa.oa4mp.d
                  <a href="ClientConverter.html" title="type parameter in ClientConverter">V</a>&nbsp;v)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code><a href="BaseClientConverter.html#fromMap(edu.uiuc.ncsa.security.storage.data.ConversionMap,V)">fromMap</a></code>&nbsp;in class&nbsp;<code><a href="BaseClientConverter.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BaseClientConverter</a>&lt;<a href="ClientConverter.html" title="type parameter in ClientConverter">V</a> extends <a href="../Client.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage">Client</a>&gt;</code></dd>
+<dd><code><a href="BaseClientConverter.html#fromMap(edu.uiuc.ncsa.security.storage.data.ConversionMap,V)">fromMap</a></code>&nbsp;in class&nbsp;<code><a href="BaseClientConverter.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BaseClientConverter</a>&lt;<a href="ClientConverter.html" title="type parameter in ClientConverter">V</a> extends <a href="../Client.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage">Client</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
-<a id="toMap(edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client,edu.uiuc.ncsa.security.storage.data.ConversionMap)">
+<a id="toMap(edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.Client,edu.uiuc.ncsa.security.storage.data.ConversionMap)">
 <!--   -->
 </a><a id="toMap(V,edu.uiuc.ncsa.security.storage.data.ConversionMap)">
 <!--   -->
@@ -376,7 +376,7 @@ extends <a href="BaseClientConverter.html" title="class in edu.uiuc.ncsa.oa4mp.d
                   edu.uiuc.ncsa.security.storage.data.ConversionMap&lt;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>,&#8203;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Object.html?is-external=true" title="class or interface in java.lang" class="externalLink">Object</a>&gt;&nbsp;map)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code><a href="BaseClientConverter.html#toMap(V,edu.uiuc.ncsa.security.storage.data.ConversionMap)">toMap</a></code>&nbsp;in class&nbsp;<code><a href="BaseClientConverter.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BaseClientConverter</a>&lt;<a href="ClientConverter.html" title="type parameter in ClientConverter">V</a> extends <a href="../Client.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage">Client</a>&gt;</code></dd>
+<dd><code><a href="BaseClientConverter.html#toMap(V,edu.uiuc.ncsa.security.storage.data.ConversionMap)">toMap</a></code>&nbsp;in class&nbsp;<code><a href="BaseClientConverter.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BaseClientConverter</a>&lt;<a href="ClientConverter.html" title="type parameter in ClientConverter">V</a> extends <a href="../Client.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage">Client</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -389,11 +389,11 @@ extends <a href="BaseClientConverter.html" title="class in edu.uiuc.ncsa.oa4mp.d
 <pre class="methodSignature">public&nbsp;<a href="ClientConverter.html" title="type parameter in ClientConverter">V</a>&nbsp;fromJSON&#8203;(net.sf.json.JSONObject&nbsp;json)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code><a href="BaseClientConverter.html#fromJSON(net.sf.json.JSONObject)">fromJSON</a></code>&nbsp;in class&nbsp;<code><a href="BaseClientConverter.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BaseClientConverter</a>&lt;<a href="ClientConverter.html" title="type parameter in ClientConverter">V</a> extends <a href="../Client.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage">Client</a>&gt;</code></dd>
+<dd><code><a href="BaseClientConverter.html#fromJSON(net.sf.json.JSONObject)">fromJSON</a></code>&nbsp;in class&nbsp;<code><a href="BaseClientConverter.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BaseClientConverter</a>&lt;<a href="ClientConverter.html" title="type parameter in ClientConverter">V</a> extends <a href="../Client.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage">Client</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
-<a id="toJSON(edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client,net.sf.json.JSONObject)">
+<a id="toJSON(edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.Client,net.sf.json.JSONObject)">
 <!--   -->
 </a><a id="toJSON(V,net.sf.json.JSONObject)">
 <!--   -->
@@ -405,7 +405,7 @@ extends <a href="BaseClientConverter.html" title="class in edu.uiuc.ncsa.oa4mp.d
                    net.sf.json.JSONObject&nbsp;json)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code><a href="BaseClientConverter.html#toJSON(V,net.sf.json.JSONObject)">toJSON</a></code>&nbsp;in class&nbsp;<code><a href="BaseClientConverter.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BaseClientConverter</a>&lt;<a href="ClientConverter.html" title="type parameter in ClientConverter">V</a> extends <a href="../Client.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage">Client</a>&gt;</code></dd>
+<dd><code><a href="BaseClientConverter.html#toJSON(V,net.sf.json.JSONObject)">toJSON</a></code>&nbsp;in class&nbsp;<code><a href="BaseClientConverter.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BaseClientConverter</a>&lt;<a href="ClientConverter.html" title="type parameter in ClientConverter">V</a> extends <a href="../Client.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage">Client</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>

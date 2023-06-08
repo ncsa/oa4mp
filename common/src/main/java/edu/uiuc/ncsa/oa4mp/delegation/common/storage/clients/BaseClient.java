@@ -1,4 +1,4 @@
-package edu.uiuc.ncsa.oa4mp.delegation.common.storage;
+package edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients;
 
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.DateUtils;
@@ -31,20 +31,12 @@ public class BaseClient extends Monitored {
         c.setEmail(getEmail());
         c.setName(getName());
         c.setSecret(getSecret());
-        c.setKid(getKid());
         c.setJWKS(getJWKS());
     }
 
-    String kid;
     JSONWebKeys jwks;
 
-    public String getKid() {
-        return kid;
-    }
 
-    public void setKid(String kid) {
-        this.kid = kid;
-    }
 
     public JSONWebKeys getJWKS() {
         return jwks;
@@ -52,9 +44,6 @@ public class BaseClient extends Monitored {
 
     public void setJWKS(JSONWebKeys jwks) {
         this.jwks = jwks;
-    }
-    public boolean hasKID(){
-        return kid!=null && kid.length()!=0;
     }
     public boolean hasJWKS(){
         return jwks!=null;
@@ -128,7 +117,6 @@ public class BaseClient extends Monitored {
         return getClass().getSimpleName() + "[name=\"" + getName() +
                 "\", id=\"" + getIdentifierString() +
                 "\", email=\"" + getEmail() +
-                "\", kid=\"" + (hasKID()?getKid():"(none)") +
                 "\", jwks=\"" + (hasJWKS()?getJWKS():"(none)") +
                 "\", secret=" + (getSecret() == null ? "(none)" : getSecret().substring(0, 25)) +
                 "]";

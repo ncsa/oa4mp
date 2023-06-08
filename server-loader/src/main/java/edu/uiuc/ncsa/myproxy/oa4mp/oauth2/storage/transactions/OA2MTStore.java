@@ -5,7 +5,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.TokenInfoRecord;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.TokenInfoRecordMap;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.Identifier;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl.TransactionMemoryStore;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions.TransactionMemoryStore;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.RefreshToken;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AccessTokenImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.RefreshTokenImpl;

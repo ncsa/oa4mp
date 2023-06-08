@@ -16,10 +16,15 @@ public class RFC7523Server extends TokenAwareServer implements RFC7523Constants 
     }
 
     public RFC7523Response processRFC7523Request(RFC7523Request request) {
-        String response = RFC7523Utils.doPost(getServiceClient(), request.getClient(), getTokenEndpoint(), request.getParameters());
+        String response = RFC7523Utils.doTokenRequest(getServiceClient(),
+                request.getClient(),
+                getTokenEndpoint(),
+                request.getKeyID(),
+                request.getParameters());
 
         RFC7523Response rfc7523Response = new RFC7523Response();
         rfc7523Response.setResponse(JSONObject.fromObject(response)); // contains access token and refresh token.
+
         // This checks the ID token and verifies it. Use this, not the raw ID token in the response.
         rfc7523Response.setIdToken(getAndCheckIDToken(rfc7523Response.getResponse(), request));
         return rfc7523Response;

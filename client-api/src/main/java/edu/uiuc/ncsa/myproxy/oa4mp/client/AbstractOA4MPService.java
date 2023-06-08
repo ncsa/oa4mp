@@ -290,6 +290,7 @@ public abstract class AbstractOA4MPService {
         DelegatedAssetRequest dar = new DelegatedAssetRequest();
         dar.setAuthorizationGrant(ag);
         dar.setClient(getEnvironment().getClient());
+        dar.setKeyID(getEnvironment().getKid());
         dar.setVerifier(v);
         dar.setParameters(getATParameters(asset, ag, v));
 

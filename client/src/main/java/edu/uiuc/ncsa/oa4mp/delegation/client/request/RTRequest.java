@@ -3,7 +3,7 @@ package edu.uiuc.ncsa.oa4mp.delegation.client.request;
 import edu.uiuc.ncsa.oa4mp.delegation.client.server.RTServer;
 import edu.uiuc.ncsa.oa4mp.delegation.common.services.Response;
 import edu.uiuc.ncsa.oa4mp.delegation.common.services.Server;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.Client;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.RefreshToken;
 
@@ -14,8 +14,8 @@ import java.util.Map;
  * on 2/24/14 at  11:19 AM
  */
 public class RTRequest extends BasicRequest {
-    public RTRequest(Client client, Map<String, String> parameters) {
-        super(client, parameters);
+    public RTRequest(Client client, String kid, Map<String, String> parameters) {
+        super(client, parameters, kid);
     }
 
     public RTRequest() {

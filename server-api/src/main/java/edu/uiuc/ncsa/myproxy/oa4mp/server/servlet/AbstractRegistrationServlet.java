@@ -7,8 +7,8 @@ import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.oa4mp.delegation.server.request.IssuerResponse;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.oa4mp.delegation.common.servlet.TransactionState;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.BaseClient;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.BaseClient;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.Client;
 import edu.uiuc.ncsa.security.servlet.*;
 
 import javax.servlet.ServletException;

@@ -5,7 +5,7 @@ import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.Client;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.AuthorizationGrant;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.RefreshToken;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.TokenForge;

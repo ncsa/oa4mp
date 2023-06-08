@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.server.storage.sql.table;
 
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.ClientKeys;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.ClientKeys;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnDescriptorEntry;
 
 import static java.sql.Types.*;
@@ -32,5 +32,6 @@ public class ClientStoreTable extends BaseClientTable {
         getColumnDescriptor().add(new ColumnDescriptorEntry(ct().errorURL(), LONGVARCHAR));
         getColumnDescriptor().add(new ColumnDescriptorEntry(ct().email(), LONGVARCHAR));
         getColumnDescriptor().add(new ColumnDescriptorEntry(ct().proxyLimited(), BOOLEAN));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(ct().rfc7523Client(), BOOLEAN));
     }
 }

@@ -5,7 +5,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.client.AssetResponse;
 import edu.uiuc.ncsa.myproxy.oa4mp.client.ClientEnvironment;
 import edu.uiuc.ncsa.myproxy.oa4mp.client.OA4MPService;
 import edu.uiuc.ncsa.oa4mp.delegation.client.request.*;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.Client;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.AuthorizationGrant;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.MyX509Certificates;
@@ -148,6 +148,7 @@ public class OA2MPService extends OA4MPService {
         dar.setRfc8628(true);
         dar.setAuthorizationGrant(new AuthorizationGrantImpl(URI.create(deviceCode)));
         dar.setClient(getEnvironment().getClient());
+        dar.setKeyID(getEnvironment().getKid());
         Map<String, String> map = new HashMap<>();
         map.putAll(additionalParameters);
         dar.setParameters(map);
@@ -201,6 +202,7 @@ public class OA2MPService extends OA4MPService {
         DelegatedAssetRequest dar = new DelegatedAssetRequest();
         dar.setAuthorizationGrant(ag);
         dar.setClient(getEnvironment().getClient());
+        dar.setKeyID(getEnvironment().getKid());
         Map<String, String> m1 = getATParameters(asset, ag, null);
         if (additionalParameters != null) {
             m1.putAll(additionalParameters);
@@ -289,7 +291,7 @@ public class OA2MPService extends OA4MPService {
             throw new NoSuchAssetException("Asset with id \"" + assetID + "\" not found.");
         }
         DS2 ds2 = (DS2) getEnvironment().getDelegationService();
-        RTRequest rtRequest = new RTRequest(getEnvironment().getClient(), additionalParameters);
+        RTRequest rtRequest = new RTRequest(getEnvironment().getClient(), getEnvironment().getKid(), additionalParameters);
         rtRequest.setAccessToken(asset.getAccessToken());
         rtRequest.setRefreshToken(asset.getRefreshToken());
         RTResponse rtResponse = ds2.refresh(rtRequest);
@@ -416,7 +418,11 @@ public class OA2MPService extends OA4MPService {
         OA2ClientEnvironment oa2ClientEnvironment = (OA2ClientEnvironment) getEnvironment();
         String rawResponse;
         if (oa2ClientEnvironment.hasJWKS()) {
-            rawResponse = RFC7523Utils.doPost(serviceClient, client, oa2ClientEnvironment.getAccessTokenUri(), parameterMap);
+            rawResponse = RFC7523Utils.doPost(serviceClient,
+                    client,
+                    oa2ClientEnvironment.getAccessTokenUri(),
+                    oa2ClientEnvironment.getKid(),
+                    parameterMap);
         } else {
 
             rawResponse = serviceClient.doGet(parameterMap, client.getIdentifierString(), client.getSecret());
@@ -507,12 +513,16 @@ public class OA2MPService extends OA4MPService {
             request.setAccessToken(asset.getAccessToken());
         }
         request.setClient(getEnvironment().getClient());
+        request.setKeyID(getEnvironment().getKid());
         DS2 ds2 = (DS2) getEnvironment().getDelegationService();
         return ds2.rfc7662(request).getResponse();
     }
 
-    public JSONObject rfc7523(OA2Asset asset) {
+    public JSONObject rfc7523(OA2Asset asset, Map parameters) {
         RFC7523Request request = new RFC7523Request();
+        request.setKeyID(getEnvironment().getKid());
+        request.setClient(getEnvironment().getClient());
+        request.setParameters(parameters);;
         DS2 ds2 = (DS2) getEnvironment().getDelegationService();
         RFC7523Response response = ds2.rfc7523(request);
         JSONObject json = response.getResponse();

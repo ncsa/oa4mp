@@ -12,7 +12,7 @@ import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.oa4mp.delegation.client.DelegationService;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.Client;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.TokenForge;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2ConfigurationLoaderUtils;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants;

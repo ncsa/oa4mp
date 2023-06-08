@@ -628,7 +628,7 @@ public class OA2AuthorizedServletUtil {
                                                     String[] rawAudience) {
 
 
-        if (rawResource == null && rawAudience == null) {
+        if (rawResource == null && rawAudience == null || (rawResource.length == 0 && rawAudience.length == 0)) {
             // implies there is no such parameters.
             return; // nothing to do.
         }

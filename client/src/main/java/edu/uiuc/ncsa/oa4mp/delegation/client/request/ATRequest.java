@@ -25,6 +25,7 @@ public class ATRequest extends BasicRequest {
         setAuthorizationGrant(dar.getAuthorizationGrant());
         setClient(dar.getClient());
         setParameters(dar.getParameters());
+        setKeyID(dar.getKeyID());
     }
 
     /**

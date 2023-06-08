@@ -1,7 +1,5 @@
-package edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl;
+package edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients;
 
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.BaseClient;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.BaseClientKeys;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.JSONUtil;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
@@ -49,9 +47,6 @@ public abstract class BaseClientConverter<V extends BaseClient> extends Monitore
         value.setLastModifiedTS(map.getDate(getBKK().lastModifiedTS()));
         value.setEmail(map.getString(getBKK().email()));
         value.setDebugOn(map.getBoolean(getBKK().debugOn()));
-        if (map.containsKey(getBKK().kid()) && map.get(getBKK().kid())!=null) {
-            value.setKid(map.getString(getBKK().kid()));
-        }
         // database may report this as being null. Do not propagate it along.
         if (map.containsKey(getBKK().jwks()) && map.get(getBKK().jwks())!=null) {
             try {
@@ -83,9 +78,6 @@ public abstract class BaseClientConverter<V extends BaseClient> extends Monitore
             // Webkeys are stored as a serialized JSON string.
             map.put(getBKK().jwks(), JSONWebKeyUtil.toJSON(client.getJWKS()).toString());
         }
-        if (client.hasKID()) {
-            map.put(getBKK().kid(), client.getKid());
-        }
     }
 
     public V fromJSON(JSONObject json) {
@@ -96,9 +88,6 @@ public abstract class BaseClientConverter<V extends BaseClient> extends Monitore
         v.setEmail(getJsonUtil().getJSONValueString(json, getBKK().email()));
         v.setDebugOn(getJsonUtil().getJSONValueBoolean(json, getBKK().debugOn()));
         String rawDate = getJsonUtil().getJSONValueString(json, getBKK().creationTS());
-        if (json.containsKey(getBKK().kid())) {
-            v.setKid(getJsonUtil().getJSONValueString(json, getBKK().kid()));
-        }
         if (json.containsKey(getBKK().jwks())) {
             try {
                 v.setJWKS(JSONWebKeyUtil.fromJSON((JSONObject) getJsonUtil().getJSONValue(json, getBKK().jwks())));
@@ -143,9 +132,6 @@ public abstract class BaseClientConverter<V extends BaseClient> extends Monitore
         getJsonUtil().setJSONValue(json, getBKK().name(), client.getName());
         getJsonUtil().setJSONValue(json, getBKK().secret(), client.getSecret());
         getJsonUtil().setJSONValue(json, getBKK().debugOn(), client.isDebugOn());
-        if (client.hasKID()) {
-            getJsonUtil().setJSONValue(json, getBKK().kid(), client.getKid());
-        }
         if (client.hasJWKS()) {
             // Stash JWKS as JSON. May revisit this decision later if it does not work for some reason.
             getJsonUtil().setJSONValue(json, getBKK().jwks(), JSONWebKeyUtil.toJSON(client.getJWKS()));

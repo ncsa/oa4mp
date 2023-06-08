@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp;
 
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.Client;
 import edu.uiuc.ncsa.security.util.TestBase;
 
 /**

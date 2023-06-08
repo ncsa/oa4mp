@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.oa4mp.delegation.server.storage.support;
 
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl.BasicTransactionKeys;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions.BasicTransactionKeys;
 
 import java.util.List;
 

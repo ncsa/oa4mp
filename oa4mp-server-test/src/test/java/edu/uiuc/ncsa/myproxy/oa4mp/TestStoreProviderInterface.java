@@ -9,9 +9,9 @@ import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApprovalStore;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.Client;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.TransactionStore;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl.BasicTransaction;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions.BasicTransaction;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.TokenForge;
 
 /**

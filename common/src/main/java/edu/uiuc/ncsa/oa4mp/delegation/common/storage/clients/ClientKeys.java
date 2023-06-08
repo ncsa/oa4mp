@@ -1,4 +1,4 @@
-package edu.uiuc.ncsa.oa4mp.delegation.common.storage;
+package edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients;
 
 import java.util.List;
 
@@ -14,6 +14,14 @@ public class ClientKeys extends BaseClientKeys {
     String errorURL = "error_url";
     String homeURL = "home_url";
     String proxyLimited = "proxy_limited";
+
+    String rfc7523Client = "rfc7523_client";
+
+    public String rfc7523Client(String... x) {
+        if (0 < x.length) rfc7523Client = x[0];
+        return rfc7523Client;
+    }
+
 
     public String proxyLimited(String... x) {
         if (0 < x.length) proxyLimited = x[0];
@@ -37,6 +45,7 @@ public class ClientKeys extends BaseClientKeys {
         allKeys.add(proxyLimited());
         allKeys.add(homeURL());
         allKeys.add(errorURL());
+        allKeys.add(rfc7523Client());
         return allKeys;
     }
 }

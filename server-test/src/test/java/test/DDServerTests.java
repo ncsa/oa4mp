@@ -16,8 +16,8 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.OA4MPIdentifierProv
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl.BaseClientConverter;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.Client;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.BaseClientConverter;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Scopes;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.LDAPConfiguration;
 import junit.framework.TestCase;

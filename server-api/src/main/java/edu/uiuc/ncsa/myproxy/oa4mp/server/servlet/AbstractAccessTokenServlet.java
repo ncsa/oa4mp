@@ -6,7 +6,7 @@ import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.oa4mp.delegation.server.request.ATRequest;
 import edu.uiuc.ncsa.oa4mp.delegation.server.request.ATResponse;
 import edu.uiuc.ncsa.oa4mp.delegation.common.servlet.TransactionState;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.Client;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.AuthorizationGrant;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.Verifier;
 import edu.uiuc.ncsa.security.storage.GenericStoreUtils;

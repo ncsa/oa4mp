@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oauth2.base;
 
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.ClientApprovalKeys;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.ClientApprovalKeys;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;

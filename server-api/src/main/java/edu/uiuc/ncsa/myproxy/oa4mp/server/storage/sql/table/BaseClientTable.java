@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.server.storage.sql.table;
 
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.BaseClientKeys;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.BaseClientKeys;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.monitored.MonitoredTable;
 import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnDescriptorEntry;
@@ -27,7 +27,6 @@ public  class BaseClientTable extends MonitoredTable {
         super.createColumnDescriptors();
         getColumnDescriptor().add(new ColumnDescriptorEntry(getKeys().secret(), LONGVARCHAR));
         getColumnDescriptor().add(new ColumnDescriptorEntry(getKeys().debugOn(), BOOLEAN));
-        getColumnDescriptor().add(new ColumnDescriptorEntry(getKeys().kid(), LONGVARCHAR)); // RFC 7523 support.
         getColumnDescriptor().add(new ColumnDescriptorEntry(getKeys().jwks(), LONGVARCHAR)); // RFC 7523 support
     }
 

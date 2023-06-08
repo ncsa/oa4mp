@@ -3,7 +3,7 @@ package edu.uiuc.ncsa.oa4mp.delegation.oa2.client;
 import edu.uiuc.ncsa.oa4mp.delegation.client.request.RFC7662Request;
 import edu.uiuc.ncsa.oa4mp.delegation.client.request.RFC7662Response;
 import edu.uiuc.ncsa.oa4mp.delegation.client.server.RFC7662Server;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.Client;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.RFC7662Constants;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.servlet.ServiceClient;
@@ -42,7 +42,11 @@ public class RFC7662Server2 extends TokenAwareServer implements RFC7662Server, R
             parameters.put(TOKEN, token);
             // Have to use basic authorization if no bearer token.
             if(client.hasJWKS()){
-                out = RFC7523Utils.doPost(getServiceClient(), request.getClient(), request.getTokenEndpoint(), parameters);
+                out = RFC7523Utils.doPost(getServiceClient(),
+                        request.getClient(),
+                        request.getTokenEndpoint(),
+                        request.getKeyID(),
+                        parameters);
             } else{
                 out = getServiceClient().doPost(parameters, request.getClient().getIdentifierString(),request.getClient().getSecret());
             }

@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.BaseClient;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.BaseClient;
 import edu.uiuc.ncsa.security.servlet.ExceptionHandlerThingie;
 
 import javax.servlet.http.HttpServletRequest;

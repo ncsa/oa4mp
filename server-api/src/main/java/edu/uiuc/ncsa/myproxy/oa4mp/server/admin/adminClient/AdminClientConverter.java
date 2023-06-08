@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient;
 
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl.BaseClientConverter;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.BaseClientConverter;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;

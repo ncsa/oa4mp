@@ -7,7 +7,7 @@ import edu.uiuc.ncsa.oa4mp.delegation.client.server.PAServer;
 import edu.uiuc.ncsa.oa4mp.delegation.common.services.Request;
 import edu.uiuc.ncsa.oa4mp.delegation.common.services.Response;
 import edu.uiuc.ncsa.oa4mp.delegation.common.services.Server;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.Client;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.AuthorizationGrant;
 
 import java.net.URI;

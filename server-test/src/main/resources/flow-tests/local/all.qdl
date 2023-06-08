@@ -7,10 +7,6 @@ script_path(path ~ script_path());
 test.:=(path + '/local/') + ['test_qdl.qdl',
                              'cil1550.qdl',
                              'file_claims.qdl',
-                             'fnal-0.qdl',
-                             'fnal-1.qdl',
-                             'fnal-2.qdl',
-                             'fnal-3.qdl',
                              'no_config.qdl',
                              'revoke.qdl',
                              'test-template.qdl',
@@ -21,5 +17,9 @@ test.:=(path + '/local/') + ['test_qdl.qdl',
                              'scitokens.qdl',
                              'scitokens2.qdl',
                              'test_ncsa.qdl',
-                             'vo_test.qdl'];
+                             'vo_test.qdl',
+                             'fnal-0.qdl',
+                             'fnal-1.qdl',
+                             'fnal-2.qdl',
+                             'fnal-3.qdl',];
 script_load('runner.qdl', test.);

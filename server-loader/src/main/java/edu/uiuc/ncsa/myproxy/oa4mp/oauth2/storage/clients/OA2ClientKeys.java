@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients;
 
 
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.ClientKeys;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.ClientKeys;
 
 import java.util.List;
 

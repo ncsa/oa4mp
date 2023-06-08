@@ -40,7 +40,7 @@ public class ClientParameterTest extends TestCase {
                     c.getTokenForge(),
                     null,
                     true,
-                     null,null,null// debug mode is to show redirect page.
+                     null,null,null, null, null// debug mode is to show redirect page.
                     );
         }
     }

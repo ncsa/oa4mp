@@ -5,7 +5,7 @@ import edu.uiuc.ncsa.oa4mp.delegation.client.request.PARequest;
 import edu.uiuc.ncsa.oa4mp.delegation.client.request.PAResponse;
 import edu.uiuc.ncsa.oa4mp.delegation.client.server.PAServer;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.Client;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.MyX509Certificates;
 import edu.uiuc.ncsa.security.servlet.ServiceClient;

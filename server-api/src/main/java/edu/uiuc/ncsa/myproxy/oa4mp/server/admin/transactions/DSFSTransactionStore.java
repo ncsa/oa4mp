@@ -4,7 +4,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.OA4MPServiceTransaction;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl.FSTransactionStore;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions.FSTransactionStore;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.TokenForge;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 

@@ -2,7 +2,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.LDAPException;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractAuthorizationServlet;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.BaseClient;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.BaseClient;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.*;
 import edu.uiuc.ncsa.oa4mp.delegation.server.ExceptionWrapper;
 import edu.uiuc.ncsa.oa4mp.delegation.server.UnapprovedClientException;

@@ -1,8 +1,8 @@
 package edu.uiuc.ncsa.oa4mp.delegation.server;
 
 
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl.BasicTransaction;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.Client;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions.BasicTransaction;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.util.crypto.MyPKCS10CertRequest;

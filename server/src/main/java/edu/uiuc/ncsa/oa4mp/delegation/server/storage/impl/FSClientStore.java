@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.oa4mp.delegation.server.storage.impl;
 
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.Client;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.monitored.MonitoredFileStore;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApprovalStore;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;

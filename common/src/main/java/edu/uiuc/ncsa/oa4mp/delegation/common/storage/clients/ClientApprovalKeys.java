@@ -1,4 +1,4 @@
-package edu.uiuc.ncsa.oa4mp.delegation.common.storage;
+package edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients;
 
 import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
 

@@ -1,4 +1,4 @@
-package edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl;
+package edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions;
 
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.TransactionStore;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken;

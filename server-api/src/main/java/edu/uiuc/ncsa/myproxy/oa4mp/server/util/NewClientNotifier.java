@@ -1,8 +1,8 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.server.util;
 
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.BaseClient;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.BaseClient;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.Client;
 import edu.uiuc.ncsa.security.servlet.Notifier;
 import edu.uiuc.ncsa.security.util.mail.MailUtil;
 

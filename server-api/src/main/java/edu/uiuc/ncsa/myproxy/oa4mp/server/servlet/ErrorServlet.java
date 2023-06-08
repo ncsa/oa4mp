@@ -4,7 +4,7 @@ import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.oa4mp.delegation.server.request.IssuerResponse;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.Client;
 import edu.uiuc.ncsa.security.servlet.JSPUtil;
 import org.apache.commons.codec.binary.Base64;
 

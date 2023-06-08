@@ -1,4 +1,4 @@
-package edu.uiuc.ncsa.oa4mp.delegation.common.storage;
+package edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients;
 
 import edu.uiuc.ncsa.security.storage.data.MonitoredKeys;
 
@@ -14,7 +14,6 @@ public class BaseClientKeys extends MonitoredKeys {
     String name = "name";
     String secret = "oauth_client_pubkey";
     String jwks = "jwks";
-    String kid = "kid";
 
     public String name(String... x) {
         if (0 < x.length) name = x[0];
@@ -24,11 +23,6 @@ public class BaseClientKeys extends MonitoredKeys {
     public String jwks(String... x) {
         if (0 < x.length) jwks = x[0];
         return jwks;
-    }
-
-    public String kid(String... x) {
-        if (0 < x.length) kid = x[0];
-        return kid;
     }
 
 
@@ -56,7 +50,6 @@ public class BaseClientKeys extends MonitoredKeys {
         allKeys.add(secret());
         allKeys.add(debugOn());
         allKeys.add(jwks());
-        allKeys.add(kid());
         return allKeys;
     }
 }

@@ -4,7 +4,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.client.ClientEnvironment;
 import edu.uiuc.ncsa.myproxy.oa4mp.client.storage.AssetProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.client.storage.AssetStore;
 import edu.uiuc.ncsa.oa4mp.delegation.client.DelegationService;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.Client;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.TokenForge;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
@@ -42,7 +42,9 @@ public class OA2ClientEnvironment extends ClientEnvironment {
                                 boolean showIDToken,
                                 boolean useBasicAuth,
                                 URI deviceAuthorizationUri,
-                                MetaDebugUtil metaDebugUtil) {
+                                MetaDebugUtil metaDebugUtil,
+                                String kid,
+                                JSONWebKeys jwks) {
         super(accessTokenUri,
                 authorizationUri,
                 callback,
@@ -53,7 +55,8 @@ public class OA2ClientEnvironment extends ClientEnvironment {
                 resourceServerUri,
                 tokenForge,
                 assetStore, showRedirectPage,
-                errorPagePath, redirectPagePath, successPagePath);
+                errorPagePath, redirectPagePath, successPagePath,
+                kid, jwks);
         ServletDebugUtil.trace(this, "oidcEnabled?" + oidcEnabled);
         this.oidcEnabled = oidcEnabled;
         this.showIDToken = showIDToken;
@@ -117,7 +120,9 @@ public class OA2ClientEnvironment extends ClientEnvironment {
                 showRedirectPage,
                 errorPagePath,
                 redirectPagePath,
-                successPagePath
+                successPagePath,
+                kid,
+                jwks
         );
         this.secret = secret;
         this.scopes = scopes;
@@ -128,37 +133,9 @@ public class OA2ClientEnvironment extends ClientEnvironment {
         this.additionalParameters = additionalParameters;
         this.deviceAuthorizationUri = deviceAuthorizationUri;
         this.metaDebugUtil = metaDebugUtil;
-        this.kid = kid;
-        this.jwks = jwks;
     }
 
-    public boolean hasJWKS() {
-        return jwks != null;
-    }
 
-    public boolean hasKID() {
-        return kid != null && kid.length() != 0;
-    }
-
-    String kid;
-
-    public String getKid() {
-        return kid;
-    }
-
-    public void setKid(String kid) {
-        this.kid = kid;
-    }
-
-    public JSONWebKeys getJWKS() {
-        return jwks;
-    }
-
-    public void setJWKS(JSONWebKeys jwks) {
-        this.jwks = jwks;
-    }
-
-    JSONWebKeys jwks;
 
     public URI getDeviceAuthorizationUri() {
         return deviceAuthorizationUri;
@@ -220,7 +197,6 @@ public class OA2ClientEnvironment extends ClientEnvironment {
         if (client == null) {
             client = cp.get();
             client.setJWKS(getJWKS()); // RFC 7523 support
-            client.setKid(getKid());
             client.setIdentifier(new BasicIdentifier(getClientId()));
             client.setSecret(secret);
         }

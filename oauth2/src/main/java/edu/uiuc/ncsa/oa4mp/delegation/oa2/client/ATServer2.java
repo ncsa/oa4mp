@@ -112,7 +112,11 @@ public class ATServer2 extends TokenAwareServer implements ATServer {
 
         String response = null;
         if (atRequest.getClient().hasJWKS()) {
-            response = RFC7523Utils.doPost(getServiceClient(), atRequest.getClient(), getTokenEndpoint(), m);
+            response = RFC7523Utils.doPost(getServiceClient(),
+                    atRequest.getClient(),
+                    getTokenEndpoint(),
+                    atRequest.getKeyID(),
+                    m);
         } else {
             String clientID = atRequest.getClient().getIdentifierString();
             String clientSecret = atRequest.getClient().getSecret();

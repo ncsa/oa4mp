@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.oa4mp.delegation.oa2.client;
 
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.Client;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.NonceHerder;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.JWTUtil2;
@@ -35,12 +35,13 @@ public class RFC7523Utils implements RFC7523Constants {
     public static String doPost(ServiceClient serviceClient,
                                 Client oa2Client,
                                 URI accessTokenEndpoint,
+                                String keyID,
                                 Map parameters) {
         try {
 
             Map<String, Object> map = new HashMap<>();
             map.putAll(parameters);
-            JSONWebKey key = findKey(oa2Client);
+            JSONWebKey key = findKey(oa2Client, keyID);
             if (key == null) {
                 throw new IllegalStateException("Client \"" + oa2Client.getIdentifierString() + "\" key not found.");
             }
@@ -105,13 +106,12 @@ public class RFC7523Utils implements RFC7523Constants {
         return json;
     }
 
-    protected static JSONWebKey findKey(Client client) {
+    protected static JSONWebKey findKey(Client client, String kid) {
         if (!client.hasJWKS()) {
             throw new IllegalStateException("Client \"" + client.getIdentifierString() + "\" is missing JSON Web Keys.");
         }
         JSONWebKeys jwks = client.getJWKS();
         JSONWebKey key = null;
-        String kid = client.getKid();
         if (jwks.size() == 1) {
             key = jwks.getDefault();
         } else {
@@ -134,16 +134,18 @@ public class RFC7523Utils implements RFC7523Constants {
     public static String doTokenRequest(ServiceClient serviceClient,
                                       Client client,
                                       URI tokenEndpoint,
-                                      Map<String, Object> parameters) {
+                                      String kid,
+                                      Map parameters) {
         JSONObject authGrant = createBasicJWT(client);
         authGrant.putAll(parameters); // this sets the contents of the authorization grant.
-        JSONWebKey key = findKey(client);
+        JSONWebKey key = findKey(client, kid);
         if (key == null) {
             throw new IllegalStateException("Client \"" + client.getIdentifierString() + "\" key not found.");
         }
 
         // This will be sent to the post method and is used to construct that
         JSONObject request = createBasicJWT(client);
+        request.putAll(parameters);
         request.put(OA2Constants.GRANT_TYPE, GRANT_TYPE_JWT_BEARER);
         try {
             request.put(ASSERTION, JWTUtil2.createJWT(authGrant, key));
@@ -156,6 +158,6 @@ public class RFC7523Utils implements RFC7523Constants {
             }
             throw new GeneralException("Token request error for client \"" + client.getIdentifierString() + "\"", t);
         }
-        return doPost(serviceClient, client, tokenEndpoint, new HashMap<>());
+        return doPost(serviceClient, client, tokenEndpoint, kid, request);
     }
 }

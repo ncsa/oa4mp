@@ -2,7 +2,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.server.servlet;
 
 import edu.uiuc.ncsa.oa4mp.delegation.server.request.IssuerResponse;
 import edu.uiuc.ncsa.oa4mp.delegation.common.servlet.TransactionState;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl.BasicTransaction;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions.BasicTransaction;
 import edu.uiuc.ncsa.security.storage.XMLMap;
 
 import javax.servlet.http.HttpServletRequest;

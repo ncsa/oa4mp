@@ -138,7 +138,7 @@ extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/ja
 <div class="block">Used by the delegation servlet, this allows a programmer to intercept and process the HTTP
  request and response. The <a href="#getParameters()"><code>getParameters()</code></a> call returns the parsed parameters from
  the request. The <a href="#getTransaction()"><code>getTransaction()</code></a> returns the current transaction (which will
- probably have to be cast to an appropriate subclass of <a href="../storage/impl/BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl"><code>BasicTransaction</code></a> to be useful.
+ probably have to be cast to an appropriate subclass of <a href="../storage/impl/BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions"><code>BasicTransaction</code></a> to be useful.
  Save any changes to the transaction you make. Generally avoid touching the response's
  output stream.
  <p>Created by Jeff Gaynor<br>
@@ -184,7 +184,7 @@ extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/ja
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="altColor">
-<td class="colFirst"><code>protected <a href="../storage/impl/BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a></code></td>
+<td class="colFirst"><code>protected <a href="../storage/impl/BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#transaction">transaction</a></span></code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -209,7 +209,7 @@ extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/ja
 <th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(javax.servlet.http.HttpServletRequest,javax.servlet.http.HttpServletResponse,java.util.Map,edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl.BasicTransaction,edu.uiuc.ncsa.security.storage.XMLMap)">TransactionState</a></span>&#8203;(javax.servlet.http.HttpServletRequest&nbsp;request,
                 javax.servlet.http.HttpServletResponse&nbsp;response,
                 <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>,&#8203;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&gt;&nbsp;parameters,
-                <a href="../storage/impl/BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&nbsp;transaction,
+                <a href="../storage/impl/BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&nbsp;transaction,
                 edu.uiuc.ncsa.security.storage.XMLMap&nbsp;backup)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -254,7 +254,7 @@ extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/ja
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i4" class="altColor">
-<td class="colFirst"><code><a href="../storage/impl/BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a></code></td>
+<td class="colFirst"><code><a href="../storage/impl/BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getTransaction()">getTransaction</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -321,7 +321,7 @@ extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/ja
 <ul class="blockList">
 <li class="blockList">
 <h4>transaction</h4>
-<pre>protected&nbsp;<a href="../storage/impl/BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a> transaction</pre>
+<pre>protected&nbsp;<a href="../storage/impl/BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a> transaction</pre>
 </li>
 </ul>
 <a id="parameters">
@@ -361,7 +361,7 @@ extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/ja
 <pre>public&nbsp;TransactionState&#8203;(javax.servlet.http.HttpServletRequest&nbsp;request,
                         javax.servlet.http.HttpServletResponse&nbsp;response,
                         <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>,&#8203;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&gt;&nbsp;parameters,
-                        <a href="../storage/impl/BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&nbsp;transaction,
+                        <a href="../storage/impl/BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&nbsp;transaction,
                         edu.uiuc.ncsa.security.storage.XMLMap&nbsp;backup)</pre>
 </li>
 </ul>
@@ -408,7 +408,7 @@ extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/ja
 <ul class="blockList">
 <li class="blockList">
 <h4>getTransaction</h4>
-<pre class="methodSignature">public&nbsp;<a href="../storage/impl/BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&nbsp;getTransaction()</pre>
+<pre class="methodSignature">public&nbsp;<a href="../storage/impl/BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&nbsp;getTransaction()</pre>
 </li>
 </ul>
 <a id="isRfc8628()">

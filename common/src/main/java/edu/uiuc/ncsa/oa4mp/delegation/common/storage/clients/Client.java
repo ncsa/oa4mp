@@ -1,4 +1,4 @@
-package edu.uiuc.ncsa.oa4mp.delegation.common.storage;
+package edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients;
 
 
 import edu.uiuc.ncsa.security.core.Identifier;
@@ -28,6 +28,7 @@ public class Client extends BaseClient {
         c.setErrorUri(getErrorUri());
         c.setHomeUri(getHomeUri());
         c.setProxyLimited(isProxyLimited());
+        c.setServiceClient(isServiceClient());
     }
 
     public boolean isProxyLimited() {
@@ -74,7 +75,22 @@ public class Client extends BaseClient {
         return true;
     }
 
+    /**
+     * A service client is one that is permitted to use the flow outlined in RFC 7523, viz.,
+     * it may request authorization grants directly from the token endpoint without any
+     * authorization. This is typically used by a service and has a dedicated single
+     * "user."
+     * @return
+     */
+    public boolean isServiceClient() {
+        return serviceClient;
+    }
 
+    public void setServiceClient(boolean serviceClient) {
+        this.serviceClient = serviceClient;
+    }
+
+    boolean serviceClient = false;
     @Override
     public String toString() {
         return getClass().getSimpleName() + "[name=\"" + getName() +
@@ -82,6 +98,7 @@ public class Client extends BaseClient {
                 "\", homeUri=\"" + getHomeUri() +
                 "\", errorUri=\"" + getErrorUri() +
                 "\", email=\"" + getEmail() +
+                "\", serviceClient=\"" + isServiceClient() +
                 "\", secret=" + (getSecret()==null?"(none)":getSecret().substring(0,Math.min(25, getSecret().length()))) +
                 "\", proxy limited=" + isProxyLimited() +
                 "]";

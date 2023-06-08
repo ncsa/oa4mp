@@ -6,8 +6,12 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientKeys;
 import edu.uiuc.ncsa.qdl.variables.QDLList;
 import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
+import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
+import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -73,6 +77,22 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
         }
         if (isStringKeyOK(stem, kk().secret())) {
             v.setSecret(stem.getString(kk().secret()));
+        }
+        if(stem.containsKey(kk().rfc7523Client())){
+             v.setServiceClient(stem.getBoolean(kk().rfc7523Client()));
+        }
+
+        if(stem.containsKey(kk().jwks())){
+            try {
+                JSONWebKeys jwks = JSONWebKeyUtil.fromJSON(stem.getStem(kk().jwks()).toJSON());
+                v.setJWKS(jwks);
+            } catch (Throwable e) {
+               if(DebugUtil.isEnabled()){ e.printStackTrace();}
+               if(e instanceof RuntimeException){
+                   throw (RuntimeException)e;
+               }
+               throw new GeneralException("could not convert to JSON web key.", e);
+            }
         }
         // 9 attributes
         /* Alphabetical list of OA2 client attributes. (18 of these)
@@ -220,11 +240,17 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
         setNonNullStemValue(stem, kk().email(), v.getEmail());
         setNonNullStemValue(stem, kk().name(), v.getName());
         setNonNullStemValue(stem, kk().creationTS(), v.getCreationTS().getTime());
-        // 5
+        if(v.hasJWKS()) {
+            QDLStem ss = new QDLStem();
+            ss.fromJSON(JSONWebKeyUtil.toJSON(v.getJWKS()));
+            setNonNullStemValue(stem, kk().jwks(), ss);
+        }
+        // 6
         setNonNullStemValue(stem, kk().lastModifiedTS(), v.getLastModifiedTS().getTime());
         setNonNullStemValue(stem, kk().homeURL(), v.getHomeUri());
         setNonNullStemValue(stem, kk().errorURL(), v.getErrorUri());
         setNonNullStemValue(stem, kk().proxyLimited(), v.isProxyLimited());
+        setNonNullStemValue(stem, kk().rfc7523Client(), v.isServiceClient());
         setNonNullStemValue(stem, kk().extendsProvisioners(), v.isExtendsProvisioners());
         // 10 attributes
 

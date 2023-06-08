@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.oa4mp.delegation.common.servlet;
 
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl.BasicTransaction;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions.BasicTransaction;
 import edu.uiuc.ncsa.security.storage.XMLMap;
 
 import javax.servlet.http.HttpServletRequest;

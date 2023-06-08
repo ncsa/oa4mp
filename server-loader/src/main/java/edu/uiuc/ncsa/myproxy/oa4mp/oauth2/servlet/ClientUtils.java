@@ -60,7 +60,7 @@ public class ClientUtils {
     server default 97
      */
     public static long computeATLifetime(OA2ServiceTransaction st2, OA2Client client, OA2SE oa2SE) {
-     return computeATLifetimeOLD(st2, client, oa2SE);
+        return computeATLifetimeOLD(st2, client, oa2SE);
     }
 
     protected static long computeATLifetimeOLD(OA2ServiceTransaction st2, OA2Client client, OA2SE oa2SE) {
@@ -105,15 +105,15 @@ public class ClientUtils {
             throw new NFWException("Internal error: the server-wide default for the access token lifetime has not been set.");
         }
         OA2Client client = (OA2Client) st2.getClient();
-        if(0<client.getMaxATLifetime()){
+        if (0 < client.getMaxATLifetime()) {
             st2.setMaxATLifetime(Math.min(client.getMaxATLifetime(), oa2SE.getMaxATLifetime())); // absolute max allowed on this server for this request
-        }else{
+        } else {
             st2.setMaxATLifetime(oa2SE.getMaxATLifetime()); // absolute max allowed on this server for this request
         }
 
         long lifetime = -1L;
         if (0 < client.getAtLifetime()) {
-            lifetime = Math.min(st2.getMaxAtLifetime(),client.getAtLifetime());
+            lifetime = Math.min(st2.getMaxAtLifetime(), client.getAtLifetime());
         } else {
             lifetime = Math.min(st2.getMaxAtLifetime(), OA2ConfigurationLoader.ACCESS_TOKEN_LIFETIME_DEFAULT);
         }
@@ -145,79 +145,80 @@ public class ClientUtils {
     }
 
     public static long computeRefreshLifetimeOLD(OA2ServiceTransaction st2, OA2SE oa2SE) {
- //        OA2SE oa2SE = (OA2SE) getServiceEnvironment();
-         if (!oa2SE.isRefreshTokenEnabled()) {
-             throw new NFWException("Internal error: Refresh tokens are disabled for this server.");
-         }
-         if (oa2SE.getMaxRTLifetime() <= 0) {
-             throw new NFWException("Internal error: Either refresh tokens are disabled for this server, or the server-wide default for the refresh token lifetime has not been set.");
-         }
-         long lifetime = -1L;
+        //        OA2SE oa2SE = (OA2SE) getServiceEnvironment();
+        if (!oa2SE.isRefreshTokenEnabled()) {
+            throw new NFWException("Internal error: Refresh tokens are disabled for this server.");
+        }
+        if (oa2SE.getMaxRTLifetime() <= 0) {
+            throw new NFWException("Internal error: Either refresh tokens are disabled for this server, or the server-wide default for the refresh token lifetime has not been set.");
+        }
+        long lifetime = -1L;
 
-         OA2Client client = (OA2Client) st2.getClient();
-         if (0 < client.getRtLifetime()) {
-             lifetime = Math.min(oa2SE.getMaxRTLifetime(), client.getRtLifetime());
-         }else{
-             lifetime = OA2ConfigurationLoader.REFRESH_TOKEN_LIFETIME_DEFAULT;
-         }
-         st2.setMaxRTLifetime(lifetime);// absolute max allowed on this server for this request
+        OA2Client client = (OA2Client) st2.getClient();
+        if (0 < client.getRtLifetime()) {
+            lifetime = Math.min(oa2SE.getMaxRTLifetime(), client.getRtLifetime());
+        } else {
+            lifetime = OA2ConfigurationLoader.REFRESH_TOKEN_LIFETIME_DEFAULT;
+        }
+        st2.setMaxRTLifetime(lifetime);// absolute max allowed on this server for this request
 
-         if (client.hasRefreshTokenConfig()) {
-             if (0 < client.getRefreshTokensConfig().getLifetime()) {
-                 lifetime = Math.min(client.getRefreshTokensConfig().getLifetime(), lifetime);
-             }
-         }
-         if (0 < st2.getRequestedRTLifetime()) {
-             // IF they specified a refresh token lifetime in the request, take the minimum of that
-             // and whatever they client is allowed.
-             lifetime = Math.min(st2.getRequestedRTLifetime(), lifetime);
-         }
+        if (client.hasRefreshTokenConfig()) {
+            if (0 < client.getRefreshTokensConfig().getLifetime()) {
+                lifetime = Math.min(client.getRefreshTokensConfig().getLifetime(), lifetime);
+            }
+        }
+        if (0 < st2.getRequestedRTLifetime()) {
+            // IF they specified a refresh token lifetime in the request, take the minimum of that
+            // and whatever they client is allowed.
+            lifetime = Math.min(st2.getRequestedRTLifetime(), lifetime);
+        }
 
-         return lifetime;
-     }
+        return lifetime;
+    }
 
     public static long computeRefreshLifetimeNEW(OA2ServiceTransaction st2, OA2Client client, OA2SE oa2SE) {
- //        OA2SE oa2SE = (OA2SE) getServiceEnvironment();
-         if (!oa2SE.isRefreshTokenEnabled()) {
-             throw new NFWException("Internal error: Refresh tokens are disabled for this server.");
-         }
-         if (oa2SE.getMaxRTLifetime() <= 0) {
-             throw new NFWException("Internal error: Either refresh tokens are disabled for this server, or the server-wide default for the refresh token lifetime has not been set.");
-         }
+        //        OA2SE oa2SE = (OA2SE) getServiceEnvironment();
+        if (!oa2SE.isRefreshTokenEnabled()) {
+            throw new NFWException("Internal error: Refresh tokens are disabled for this server.");
+        }
+        if (oa2SE.getMaxRTLifetime() <= 0) {
+            throw new NFWException("Internal error: Either refresh tokens are disabled for this server, or the server-wide default for the refresh token lifetime has not been set.");
+        }
 
 
-         //OA2Client client = (OA2Client) st2.getClient();
-         if(!client.isRTLifetimeEnabled()){
-             throw new GeneralException("refresh tokens are not enabled for this client");
-         }
+        //OA2Client client = (OA2Client) st2.getClient();
+        if (!client.isRTLifetimeEnabled()) {
+            throw new GeneralException("refresh tokens are not enabled for this client");
+        }
 
-         if(0<client.getMaxRTLifetime()){
-             st2.setMaxRTLifetime(Math.min(oa2SE.getMaxRTLifetime(), client.getMaxRTLifetime()));
-         }else{
-             st2.setMaxRTLifetime(oa2SE.getMaxRTLifetime());
-         }
+        if (0 < client.getMaxRTLifetime()) {
+            st2.setMaxRTLifetime(Math.min(oa2SE.getMaxRTLifetime(), client.getMaxRTLifetime()));
+        } else {
+            st2.setMaxRTLifetime(oa2SE.getMaxRTLifetime());
+        }
 
         long lifetime = -1L; // just to get started
 
-         if (0 < client.getRtLifetime()) {
-             // Always check against the server max, since that may change without warning and you do not
-             // want to issue tokens that exceed it.
-             lifetime = Math.min(st2.getMaxRtLifetime(), client.getRtLifetime());
-         }else{
-             lifetime = Math.min(st2.getMaxRtLifetime(), OA2ConfigurationLoader.REFRESH_TOKEN_LIFETIME_DEFAULT);
-         }
+        if (0 < client.getRtLifetime()) {
+            // Always check against the server max, since that may change without warning and you do not
+            // want to issue tokens that exceed it.
+            lifetime = Math.min(st2.getMaxRtLifetime(), client.getRtLifetime());
+        } else {
+            lifetime = Math.min(st2.getMaxRtLifetime(), OA2ConfigurationLoader.REFRESH_TOKEN_LIFETIME_DEFAULT);
+        }
 
-         if (client.hasRefreshTokenConfig()) {
-             if (0 < client.getRefreshTokensConfig().getLifetime()) {
-                 lifetime = Math.min(st2.getMaxRtLifetime(), client.getRefreshTokensConfig().getLifetime());
-             }
-         }
-         if (0 < st2.getRequestedRTLifetime()) {
-             lifetime = Math.min(st2.getMaxRtLifetime(), st2.getRequestedRTLifetime());
-         }
-         // AND QDL scripts can just reset it directly.
-         return lifetime;
-     }
+        if (client.hasRefreshTokenConfig()) {
+            if (0 < client.getRefreshTokensConfig().getLifetime()) {
+                lifetime = Math.min(st2.getMaxRtLifetime(), client.getRefreshTokensConfig().getLifetime());
+            }
+        }
+        if (0 < st2.getRequestedRTLifetime()) {
+            lifetime = Math.min(st2.getMaxRtLifetime(), st2.getRequestedRTLifetime());
+        }
+        // AND QDL scripts can just reset it directly.
+        return lifetime;
+    }
+
     /**
      * This verifies secrets only call if the client has a secret (e.g. do not call this
      * if the client is public). This is because it will do various checks in the assumption
@@ -248,7 +249,7 @@ public class ClientUtils {
             // purposes gets an NPE here. Tell them when they use their client next rather
             // than blowing up with an NPE.
             if (isAT) {
-                throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT, "client has no configured secret", (String)null);
+                throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT, "client has no configured secret", (String) null);
             } else {
                 throw new OA2GeneralError(OA2Errors.UNAUTHORIZED_CLIENT,
                         "client has no configured secret.",
@@ -316,13 +317,34 @@ public class ClientUtils {
         return resolveScopes(transactionState, oa2Client, false, isRFC8628);
     }
 
-    public static Collection<String> resolveScopes(HttpServletRequest request, OA2ServiceTransaction st, OA2Client oa2Client, boolean isNew, boolean isRFC8628) {
+    public static Collection<String> resolveScopes(HttpServletRequest request,
+                                                   OA2ServiceTransaction st,
+                                                   OA2Client oa2Client,
+                                                   boolean isNew,
+                                                   boolean isRFC8628) {
         String rawScopes = request.getParameter(SCOPE);
-        if(StringUtils.isTrivial(rawScopes) ){
+        Collection<String> passedInScopes = new ArrayList<>();
+        StringTokenizer stringTokenizer = new StringTokenizer(rawScopes);
+        while (stringTokenizer.hasMoreTokens()) {
+            passedInScopes.add(stringTokenizer.nextToken());
+        }
+        return resolveScopes(request, st, oa2Client, passedInScopes, isNew, isRFC8628);
+    }
+
+    public static Collection<String> resolveScopes(HttpServletRequest request,
+                                                   OA2ServiceTransaction st,
+                                                   OA2Client oa2Client,
+                                                   Collection passedInScopes,
+                                                   boolean isNew,
+                                                   boolean isRFC8628) {
+
+        Collection<String> requestedScopes = new ArrayList<>();
+
+        if (passedInScopes.isEmpty()) {
             // It is possible that there are no scopes set for this client at all, e.g.
             // a pure OAuth 2 client that only later will use scopes to exclusively
             // request access token scopes.
-            return new ArrayList<>();
+            return requestedScopes;
         }
         MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(st.getOA2Client());
         /*
@@ -332,24 +354,22 @@ public class ClientUtils {
         debugger.trace(ClientUtils.class, ".resolveScopes: server scopes=" + ((OA2SE) getServiceEnvironment()).getScopes());
         debugger.trace(ClientUtils.class, ".resolveScopes: user validated scopes=" + st.getValidatedScopes());
         */
-        Collection<String> requestedScopes = new ArrayList<>();
 
-        if (StringUtils.isTrivial(rawScopes)) {
-            if (isRFC8628) {
-                // It is not an error if this is the RFC8628 servlet. Just return an empty list
-                return new ArrayList<>();
-            } else {
-                // It is possible that there are no scopes at all for a pure OAuth 2 client.
-                if (!oa2Client.getScopes().isEmpty()) {
-                    throw new OA2RedirectableError(OA2Errors.INVALID_SCOPE,
-                            "Missing scopes parameter.",
-                            HttpStatus.SC_BAD_REQUEST,
-                            st.getRequestState(),
-                            st.getCallback(), oa2Client);
-                }
-                return requestedScopes;
+/*        if (isRFC8628) {
+            // It is never an error to have no scopes if this is the RFC8628 servlet, since there is no way
+            // to pass them in during the initial request. Just return an empty list
+            return requestedScopes;
+        } else {
+            // It is possible that there are no scopes at all for a pure OAuth 2 client.
+            if (!oa2Client.getScopes().isEmpty()) {
+                throw new OA2RedirectableError(OA2Errors.INVALID_SCOPE,
+                        "Missing scopes parameter.",
+                        HttpStatus.SC_BAD_REQUEST,
+                        st.getRequestState(),
+                        st.getCallback(), oa2Client);
             }
-        }
+        //    return requestedScopes;
+        }*/
         // The scopes the client wants:
 
         // Fixes github issue 8, support for public clients: https://github.com/ncsa/oa4mp/issues/8
@@ -371,10 +391,10 @@ public class ClientUtils {
         }
         // The scopes that minimally are allowed. Permissions scopes are never in this list.
 
-        StringTokenizer stringTokenizer = new StringTokenizer(rawScopes);
+        //StringTokenizer stringTokenizer = new StringTokenizer(rawScopes);
         boolean hasOpenIDScope = false;
-        while (stringTokenizer.hasMoreTokens()) {
-            String x = stringTokenizer.nextToken();
+        for (Object y : passedInScopes) {
+            String x = y.toString();
             // CIL-1012 offline_access. Some clients end this along, but it has no effect.
             // Basically if get it, we don't want to throw an error.
             if (x.equals(OA2Scopes.SCOPE_OFFLINE_ACCESS)) {
@@ -402,17 +422,12 @@ public class ClientUtils {
                         st.getCallback(), oa2Client);
         }
         st.setScopes(requestedScopes);
-/*        if (oa2Client.useStrictScopes()) {
-            Collection<String> storedClientScopes = oa2Client.getScopes();
-            requestedScopes = intersection(OA2Scopes.ScopeUtil.getScopes(), intersection(requestedScopes, storedClientScopes));
-            debugger.trace(ClientUtils.class, ".resolveScopes: strict scopes after resolution=" + requestedScopes);
-        } else {
-            debugger.trace(ClientUtils.class, ".resolveScopes: non-strict scopes =" + requestedScopes);
-        }*/
-        debugger.trace(ClientUtils.class, ".resolveScopes: " + (oa2Client.useStrictScopes()?"":"non-") + "strict scopes after resolution=" + requestedScopes);
+
+        debugger.trace(ClientUtils.class, ".resolveScopes: " + (oa2Client.useStrictScopes() ? "" : "non-") + "strict scopes after resolution=" + requestedScopes);
         return requestedScopes;
 
     }
+
     public static Collection<String> resolveScopes(TransactionState transactionState, OA2Client oa2Client, boolean isNew, boolean isRFC8628) {
         // Next 2 parameters are so error messages can be reasonably constructed, naught else
         return resolveScopes(transactionState.getRequest(), (OA2ServiceTransaction) transactionState.getTransaction(), oa2Client, isNew, isRFC8628);

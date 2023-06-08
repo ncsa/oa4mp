@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.oa4mp.delegation.server.storage.support;
 
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl.BasicTransactionTable;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions.BasicTransactionTable;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnDescriptorEntry;
 
 import static java.sql.Types.*;

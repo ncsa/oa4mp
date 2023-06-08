@@ -3,7 +3,7 @@ package edu.uiuc.ncsa.oa4mp.delegation.oa2.client;
 import edu.uiuc.ncsa.oa4mp.delegation.client.request.RTRequest;
 import edu.uiuc.ncsa.oa4mp.delegation.client.request.RTResponse;
 import edu.uiuc.ncsa.oa4mp.delegation.client.server.RTServer;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.Client;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.Client;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.RefreshToken;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AccessTokenImpl;
@@ -64,7 +64,7 @@ public class RTServer2 extends TokenAwareServer implements RTServer {
         Client client = rtRequest.getClient();
         String response;
         if(client.hasJWKS()){
-              response = RFC7523Utils.doPost(getServiceClient(), client, getTokenEndpoint(), map);
+              response = RFC7523Utils.doPost(getServiceClient(), client, getTokenEndpoint(), rtRequest.getKeyID(),map);
         }else {
             map.put(OA2Constants.CLIENT_ID, client.getIdentifierString());
             map.put(OA2Constants.CLIENT_SECRET, client.getSecret());

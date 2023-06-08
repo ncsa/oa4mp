@@ -117,8 +117,8 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <!-- ======== START OF CLASS DATA ======== -->
 <main role="main">
 <div class="header">
-<div class="subTitle"><span class="packageLabelInType">Package</span>&nbsp;<a href="package-summary.html">edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl</a></div>
-<h2 title="Class TransactionMemoryStore" class="title">Class TransactionMemoryStore&lt;V extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</h2>
+<div class="subTitle"><span class="packageLabelInType">Package</span>&nbsp;<a href="package-summary.html">edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions</a></div>
+<h2 title="Class TransactionMemoryStore" class="title">Class TransactionMemoryStore&lt;V extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</h2>
 </div>
 <div class="contentContainer">
 <ul class="inheritance">
@@ -134,7 +134,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li>edu.uiuc.ncsa.security.storage.MemoryStore&lt;V&gt;</li>
 <li>
 <ul class="inheritance">
-<li>edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl.TransactionMemoryStore&lt;V&gt;</li>
+<li>edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions.TransactionMemoryStore&lt;V&gt;</li>
 </ul>
 </li>
 </ul>
@@ -152,7 +152,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <dd><code><a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.storage">TransactionStore</a>&lt;V&gt;</code>, <code>edu.uiuc.ncsa.security.core.Store&lt;V&gt;</code>, <code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/io/Serializable.html?is-external=true" title="class or interface in java.io" class="externalLink">Serializable</a></code>, <code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Cloneable.html?is-external=true" title="class or interface in java.lang" class="externalLink">Cloneable</a></code>, <code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&lt;edu.uiuc.ncsa.security.core.Identifier,&#8203;V&gt;</code></dd>
 </dl>
 <hr>
-<pre>public class <span class="typeNameLabel">TransactionMemoryStore&lt;V extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</span>
+<pre>public class <span class="typeNameLabel">TransactionMemoryStore&lt;V extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</span>
 extends edu.uiuc.ncsa.security.storage.MemoryStore&lt;V&gt;
 implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.storage">TransactionStore</a>&lt;V&gt;</pre>
 <div class="block">In-memory transaction storage. This does nto persist between server restarts.
@@ -184,7 +184,7 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code>protected class&nbsp;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="TransactionMemoryStore.TokenIndex.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">TransactionMemoryStore.TokenIndex</a></span></code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="TransactionMemoryStore.TokenIndex.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">TransactionMemoryStore.TokenIndex</a></span></code></th>
 <td class="colLast">
 <div class="block">Used internally to track transactions by an identifier (such as a verifier).</div>
 </td>
@@ -299,12 +299,12 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i5" class="rowColor">
-<td class="colFirst"><code><a href="TransactionMemoryStore.TokenIndex.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">TransactionMemoryStore.TokenIndex</a></code></td>
+<td class="colFirst"><code><a href="TransactionMemoryStore.TokenIndex.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">TransactionMemoryStore.TokenIndex</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getAgIndex()">getAgIndex</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i6" class="altColor">
-<td class="colFirst"><code><a href="TransactionMemoryStore.TokenIndex.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">TransactionMemoryStore.TokenIndex</a></code></td>
+<td class="colFirst"><code><a href="TransactionMemoryStore.TokenIndex.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">TransactionMemoryStore.TokenIndex</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getAtIndex()">getAtIndex</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -325,12 +325,12 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i10" class="altColor">
-<td class="colFirst"><code><a href="TransactionMemoryStore.TokenIndex.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">TransactionMemoryStore.TokenIndex</a></code></td>
+<td class="colFirst"><code><a href="TransactionMemoryStore.TokenIndex.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">TransactionMemoryStore.TokenIndex</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getProxyIDIndex()">getProxyIDIndex</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i11" class="rowColor">
-<td class="colFirst"><code><a href="TransactionMemoryStore.TokenIndex.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">TransactionMemoryStore.TokenIndex</a></code></td>
+<td class="colFirst"><code><a href="TransactionMemoryStore.TokenIndex.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">TransactionMemoryStore.TokenIndex</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getvIndex()">getvIndex</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -469,7 +469,7 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
                              <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/List.html?is-external=true" title="class or interface in java.util" class="externalLink">List</a>&lt;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&gt;&nbsp;attributes)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code>getMostRecent</code>&nbsp;in interface&nbsp;<code>edu.uiuc.ncsa.security.core.Store&lt;<a href="TransactionMemoryStore.html" title="type parameter in TransactionMemoryStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code>getMostRecent</code>&nbsp;in interface&nbsp;<code>edu.uiuc.ncsa.security.core.Store&lt;<a href="TransactionMemoryStore.html" title="type parameter in TransactionMemoryStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -479,7 +479,7 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <ul class="blockList">
 <li class="blockList">
 <h4>getAgIndex</h4>
-<pre class="methodSignature">public&nbsp;<a href="TransactionMemoryStore.TokenIndex.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">TransactionMemoryStore.TokenIndex</a>&nbsp;getAgIndex()</pre>
+<pre class="methodSignature">public&nbsp;<a href="TransactionMemoryStore.TokenIndex.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">TransactionMemoryStore.TokenIndex</a>&nbsp;getAgIndex()</pre>
 </li>
 </ul>
 <a id="getAtIndex()">
@@ -488,7 +488,7 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <ul class="blockList">
 <li class="blockList">
 <h4>getAtIndex</h4>
-<pre class="methodSignature">public&nbsp;<a href="TransactionMemoryStore.TokenIndex.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">TransactionMemoryStore.TokenIndex</a>&nbsp;getAtIndex()</pre>
+<pre class="methodSignature">public&nbsp;<a href="TransactionMemoryStore.TokenIndex.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">TransactionMemoryStore.TokenIndex</a>&nbsp;getAtIndex()</pre>
 </li>
 </ul>
 <a id="getProxyIDIndex()">
@@ -497,7 +497,7 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <ul class="blockList">
 <li class="blockList">
 <h4>getProxyIDIndex</h4>
-<pre class="methodSignature">public&nbsp;<a href="TransactionMemoryStore.TokenIndex.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">TransactionMemoryStore.TokenIndex</a>&nbsp;getProxyIDIndex()</pre>
+<pre class="methodSignature">public&nbsp;<a href="TransactionMemoryStore.TokenIndex.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">TransactionMemoryStore.TokenIndex</a>&nbsp;getProxyIDIndex()</pre>
 </li>
 </ul>
 <a id="getvIndex()">
@@ -506,7 +506,7 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <ul class="blockList">
 <li class="blockList">
 <h4>getvIndex</h4>
-<pre class="methodSignature">public&nbsp;<a href="TransactionMemoryStore.TokenIndex.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">TransactionMemoryStore.TokenIndex</a>&nbsp;getvIndex()</pre>
+<pre class="methodSignature">public&nbsp;<a href="TransactionMemoryStore.TokenIndex.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">TransactionMemoryStore.TokenIndex</a>&nbsp;getvIndex()</pre>
 </li>
 </ul>
 <a id="get(edu.uiuc.ncsa.oa4mp.delegation.common.token.AuthorizationGrant)">
@@ -518,7 +518,7 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <pre class="methodSignature">public&nbsp;<a href="TransactionMemoryStore.html" title="type parameter in TransactionMemoryStore">V</a>&nbsp;get&#8203;(<a href="../../token/AuthorizationGrant.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.token">AuthorizationGrant</a>&nbsp;authorizationGrant)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../TransactionStore.html#get(edu.uiuc.ncsa.oa4mp.delegation.common.token.AuthorizationGrant)">get</a></code>&nbsp;in interface&nbsp;<code><a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.storage">TransactionStore</a>&lt;<a href="TransactionMemoryStore.html" title="type parameter in TransactionMemoryStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code><a href="../TransactionStore.html#get(edu.uiuc.ncsa.oa4mp.delegation.common.token.AuthorizationGrant)">get</a></code>&nbsp;in interface&nbsp;<code><a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.storage">TransactionStore</a>&lt;<a href="TransactionMemoryStore.html" title="type parameter in TransactionMemoryStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -531,7 +531,7 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <pre class="methodSignature">public&nbsp;<a href="TransactionMemoryStore.html" title="type parameter in TransactionMemoryStore">V</a>&nbsp;get&#8203;(<a href="../../token/AccessToken.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.token">AccessToken</a>&nbsp;accessToken)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../TransactionStore.html#get(edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken)">get</a></code>&nbsp;in interface&nbsp;<code><a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.storage">TransactionStore</a>&lt;<a href="TransactionMemoryStore.html" title="type parameter in TransactionMemoryStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code><a href="../TransactionStore.html#get(edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken)">get</a></code>&nbsp;in interface&nbsp;<code><a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.storage">TransactionStore</a>&lt;<a href="TransactionMemoryStore.html" title="type parameter in TransactionMemoryStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -544,7 +544,7 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <pre class="methodSignature">public&nbsp;<a href="TransactionMemoryStore.html" title="type parameter in TransactionMemoryStore">V</a>&nbsp;getByProxyID&#8203;(edu.uiuc.ncsa.security.core.Identifier&nbsp;proxyID)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../TransactionStore.html#getByProxyID(edu.uiuc.ncsa.security.core.Identifier)">getByProxyID</a></code>&nbsp;in interface&nbsp;<code><a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.storage">TransactionStore</a>&lt;<a href="TransactionMemoryStore.html" title="type parameter in TransactionMemoryStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code><a href="../TransactionStore.html#getByProxyID(edu.uiuc.ncsa.security.core.Identifier)">getByProxyID</a></code>&nbsp;in interface&nbsp;<code><a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.storage">TransactionStore</a>&lt;<a href="TransactionMemoryStore.html" title="type parameter in TransactionMemoryStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -557,7 +557,7 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <pre class="methodSignature">public&nbsp;<a href="TransactionMemoryStore.html" title="type parameter in TransactionMemoryStore">V</a>&nbsp;get&#8203;(<a href="../../token/Verifier.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.token">Verifier</a>&nbsp;verifier)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../TransactionStore.html#get(edu.uiuc.ncsa.oa4mp.delegation.common.token.Verifier)">get</a></code>&nbsp;in interface&nbsp;<code><a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.storage">TransactionStore</a>&lt;<a href="TransactionMemoryStore.html" title="type parameter in TransactionMemoryStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code><a href="../TransactionStore.html#get(edu.uiuc.ncsa.oa4mp.delegation.common.token.Verifier)">get</a></code>&nbsp;in interface&nbsp;<code><a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.storage">TransactionStore</a>&lt;<a href="TransactionMemoryStore.html" title="type parameter in TransactionMemoryStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -588,9 +588,9 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <pre class="methodSignature">public&nbsp;void&nbsp;register&#8203;(<a href="TransactionMemoryStore.html" title="type parameter in TransactionMemoryStore">V</a>&nbsp;value)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code>register</code>&nbsp;in interface&nbsp;<code>edu.uiuc.ncsa.security.core.Store&lt;<a href="TransactionMemoryStore.html" title="type parameter in TransactionMemoryStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code>register</code>&nbsp;in interface&nbsp;<code>edu.uiuc.ncsa.security.core.Store&lt;<a href="TransactionMemoryStore.html" title="type parameter in TransactionMemoryStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code>register</code>&nbsp;in class&nbsp;<code>edu.uiuc.ncsa.security.storage.MemoryStore&lt;<a href="TransactionMemoryStore.html" title="type parameter in TransactionMemoryStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code>register</code>&nbsp;in class&nbsp;<code>edu.uiuc.ncsa.security.storage.MemoryStore&lt;<a href="TransactionMemoryStore.html" title="type parameter in TransactionMemoryStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -605,9 +605,9 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <pre class="methodSignature">public&nbsp;void&nbsp;save&#8203;(<a href="TransactionMemoryStore.html" title="type parameter in TransactionMemoryStore">V</a>&nbsp;value)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code>save</code>&nbsp;in interface&nbsp;<code>edu.uiuc.ncsa.security.core.Store&lt;<a href="TransactionMemoryStore.html" title="type parameter in TransactionMemoryStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code>save</code>&nbsp;in interface&nbsp;<code>edu.uiuc.ncsa.security.core.Store&lt;<a href="TransactionMemoryStore.html" title="type parameter in TransactionMemoryStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code>save</code>&nbsp;in class&nbsp;<code>edu.uiuc.ncsa.security.storage.MemoryStore&lt;<a href="TransactionMemoryStore.html" title="type parameter in TransactionMemoryStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code>save</code>&nbsp;in class&nbsp;<code>edu.uiuc.ncsa.security.storage.MemoryStore&lt;<a href="TransactionMemoryStore.html" title="type parameter in TransactionMemoryStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -622,9 +622,9 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <pre class="methodSignature">public&nbsp;void&nbsp;update&#8203;(<a href="TransactionMemoryStore.html" title="type parameter in TransactionMemoryStore">V</a>&nbsp;value)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code>update</code>&nbsp;in interface&nbsp;<code>edu.uiuc.ncsa.security.core.Store&lt;<a href="TransactionMemoryStore.html" title="type parameter in TransactionMemoryStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code>update</code>&nbsp;in interface&nbsp;<code>edu.uiuc.ncsa.security.core.Store&lt;<a href="TransactionMemoryStore.html" title="type parameter in TransactionMemoryStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code>update</code>&nbsp;in class&nbsp;<code>edu.uiuc.ncsa.security.storage.MemoryStore&lt;<a href="TransactionMemoryStore.html" title="type parameter in TransactionMemoryStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code>update</code>&nbsp;in class&nbsp;<code>edu.uiuc.ncsa.security.storage.MemoryStore&lt;<a href="TransactionMemoryStore.html" title="type parameter in TransactionMemoryStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -637,9 +637,9 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <pre class="methodSignature">public&nbsp;void&nbsp;clear()</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true#clear()" title="class or interface in java.util" class="externalLink">clear</a></code>&nbsp;in interface&nbsp;<code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&lt;edu.uiuc.ncsa.security.core.Identifier,&#8203;<a href="TransactionMemoryStore.html" title="type parameter in TransactionMemoryStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true#clear()" title="class or interface in java.util" class="externalLink">clear</a></code>&nbsp;in interface&nbsp;<code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&lt;edu.uiuc.ncsa.security.core.Identifier,&#8203;<a href="TransactionMemoryStore.html" title="type parameter in TransactionMemoryStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/HashMap.html?is-external=true#clear()" title="class or interface in java.util" class="externalLink">clear</a></code>&nbsp;in class&nbsp;<code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/HashMap.html?is-external=true" title="class or interface in java.util" class="externalLink">HashMap</a>&lt;edu.uiuc.ncsa.security.core.Identifier,&#8203;<a href="TransactionMemoryStore.html" title="type parameter in TransactionMemoryStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/HashMap.html?is-external=true#clear()" title="class or interface in java.util" class="externalLink">clear</a></code>&nbsp;in class&nbsp;<code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/HashMap.html?is-external=true" title="class or interface in java.util" class="externalLink">HashMap</a>&lt;edu.uiuc.ncsa.security.core.Identifier,&#8203;<a href="TransactionMemoryStore.html" title="type parameter in TransactionMemoryStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -677,9 +677,9 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <pre class="methodSignature">public&nbsp;<a href="TransactionMemoryStore.html" title="type parameter in TransactionMemoryStore">V</a>&nbsp;remove&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Object.html?is-external=true" title="class or interface in java.lang" class="externalLink">Object</a>&nbsp;key)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true#remove(java.lang.Object)" title="class or interface in java.util" class="externalLink">remove</a></code>&nbsp;in interface&nbsp;<code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&lt;edu.uiuc.ncsa.security.core.Identifier,&#8203;<a href="TransactionMemoryStore.html" title="type parameter in TransactionMemoryStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true#remove(java.lang.Object)" title="class or interface in java.util" class="externalLink">remove</a></code>&nbsp;in interface&nbsp;<code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&lt;edu.uiuc.ncsa.security.core.Identifier,&#8203;<a href="TransactionMemoryStore.html" title="type parameter in TransactionMemoryStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/HashMap.html?is-external=true#remove(java.lang.Object)" title="class or interface in java.util" class="externalLink">remove</a></code>&nbsp;in class&nbsp;<code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/HashMap.html?is-external=true" title="class or interface in java.util" class="externalLink">HashMap</a>&lt;edu.uiuc.ncsa.security.core.Identifier,&#8203;<a href="TransactionMemoryStore.html" title="type parameter in TransactionMemoryStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/HashMap.html?is-external=true#remove(java.lang.Object)" title="class or interface in java.util" class="externalLink">remove</a></code>&nbsp;in class&nbsp;<code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/HashMap.html?is-external=true" title="class or interface in java.util" class="externalLink">HashMap</a>&lt;edu.uiuc.ncsa.security.core.Identifier,&#8203;<a href="TransactionMemoryStore.html" title="type parameter in TransactionMemoryStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -692,7 +692,7 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <pre class="methodSignature">public&nbsp;edu.uiuc.ncsa.security.core.XMLConverter&lt;<a href="TransactionMemoryStore.html" title="type parameter in TransactionMemoryStore">V</a>&gt;&nbsp;getXMLConverter()</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code>getXMLConverter</code>&nbsp;in interface&nbsp;<code>edu.uiuc.ncsa.security.core.Store&lt;<a href="TransactionMemoryStore.html" title="type parameter in TransactionMemoryStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code>getXMLConverter</code>&nbsp;in interface&nbsp;<code>edu.uiuc.ncsa.security.core.Store&lt;<a href="TransactionMemoryStore.html" title="type parameter in TransactionMemoryStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -705,9 +705,9 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
 <pre class="methodSignature">public&nbsp;edu.uiuc.ncsa.security.storage.data.MapConverter&nbsp;getMapConverter()</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../TransactionStore.html#getMapConverter()">getMapConverter</a></code>&nbsp;in interface&nbsp;<code><a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.storage">TransactionStore</a>&lt;<a href="TransactionMemoryStore.html" title="type parameter in TransactionMemoryStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code><a href="../TransactionStore.html#getMapConverter()">getMapConverter</a></code>&nbsp;in interface&nbsp;<code><a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.storage">TransactionStore</a>&lt;<a href="TransactionMemoryStore.html" title="type parameter in TransactionMemoryStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code>getMapConverter</code>&nbsp;in class&nbsp;<code>edu.uiuc.ncsa.security.storage.MemoryStore&lt;<a href="TransactionMemoryStore.html" title="type parameter in TransactionMemoryStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code>getMapConverter</code>&nbsp;in class&nbsp;<code>edu.uiuc.ncsa.security.storage.MemoryStore&lt;<a href="TransactionMemoryStore.html" title="type parameter in TransactionMemoryStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -723,9 +723,9 @@ implements <a href="../TransactionStore.html" title="interface in edu.uiuc.ncsa.
                       <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/List.html?is-external=true" title="class or interface in java.util" class="externalLink">List</a>&lt;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&gt;&nbsp;attr)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code>search</code>&nbsp;in interface&nbsp;<code>edu.uiuc.ncsa.security.core.Store&lt;<a href="TransactionMemoryStore.html" title="type parameter in TransactionMemoryStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code>search</code>&nbsp;in interface&nbsp;<code>edu.uiuc.ncsa.security.core.Store&lt;<a href="TransactionMemoryStore.html" title="type parameter in TransactionMemoryStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code>search</code>&nbsp;in class&nbsp;<code>edu.uiuc.ncsa.security.storage.MemoryStore&lt;<a href="TransactionMemoryStore.html" title="type parameter in TransactionMemoryStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code>search</code>&nbsp;in class&nbsp;<code>edu.uiuc.ncsa.security.storage.MemoryStore&lt;<a href="TransactionMemoryStore.html" title="type parameter in TransactionMemoryStore">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>

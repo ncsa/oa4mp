@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.oa4mp.delegation.server.storage.support;
 
 import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl.BasicTransactionConverter;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions.BasicTransactionConverter;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.TokenForge;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.storage.data.ConversionMap;

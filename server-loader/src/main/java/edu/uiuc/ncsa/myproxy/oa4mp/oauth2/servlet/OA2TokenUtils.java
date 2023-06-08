@@ -7,7 +7,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransac
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo.VirtualOrganization;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.ClientDebugUtil;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.BaseClient;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.BaseClient;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AccessTokenImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.RefreshTokenImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenUtils;

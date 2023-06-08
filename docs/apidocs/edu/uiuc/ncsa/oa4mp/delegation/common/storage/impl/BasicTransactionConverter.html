@@ -117,8 +117,8 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <!-- ======== START OF CLASS DATA ======== -->
 <main role="main">
 <div class="header">
-<div class="subTitle"><span class="packageLabelInType">Package</span>&nbsp;<a href="package-summary.html">edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl</a></div>
-<h2 title="Class BasicTransactionConverter" class="title">Class BasicTransactionConverter&lt;V extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</h2>
+<div class="subTitle"><span class="packageLabelInType">Package</span>&nbsp;<a href="package-summary.html">edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions</a></div>
+<h2 title="Class BasicTransactionConverter" class="title">Class BasicTransactionConverter&lt;V extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</h2>
 </div>
 <div class="contentContainer">
 <ul class="inheritance">
@@ -128,7 +128,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li>edu.uiuc.ncsa.security.storage.data.MapConverter&lt;V&gt;</li>
 <li>
 <ul class="inheritance">
-<li>edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl.BasicTransactionConverter&lt;V&gt;</li>
+<li>edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions.BasicTransactionConverter&lt;V&gt;</li>
 </ul>
 </li>
 </ul>
@@ -146,7 +146,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <dd><code><a href="../../../server/storage/support/ServiceTransactionConverter.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.server.storage.support">ServiceTransactionConverter</a></code></dd>
 </dl>
 <hr>
-<pre>public class <span class="typeNameLabel">BasicTransactionConverter&lt;V extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</span>
+<pre>public class <span class="typeNameLabel">BasicTransactionConverter&lt;V extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</span>
 extends edu.uiuc.ncsa.security.storage.data.MapConverter&lt;V&gt;</pre>
 <div class="block">A map converter bridging the gap between the interface and the backing store.
  <p>Created by Jeff Gaynor<br>
@@ -236,7 +236,7 @@ extends edu.uiuc.ncsa.security.storage.data.MapConverter&lt;V&gt;</pre>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i1" class="rowColor">
-<td class="colFirst"><code>protected <a href="BasicTransactionKeys.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransactionKeys</a></code></td>
+<td class="colFirst"><code>protected <a href="BasicTransactionKeys.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransactionKeys</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getBTKeys()">getBTKeys</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -347,7 +347,7 @@ extends edu.uiuc.ncsa.security.storage.data.MapConverter&lt;V&gt;</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>getBTKeys</h4>
-<pre class="methodSignature">protected&nbsp;<a href="BasicTransactionKeys.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransactionKeys</a>&nbsp;getBTKeys()</pre>
+<pre class="methodSignature">protected&nbsp;<a href="BasicTransactionKeys.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransactionKeys</a>&nbsp;getBTKeys()</pre>
 </li>
 </ul>
 <a id="fromMap(edu.uiuc.ncsa.security.storage.data.ConversionMap,edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl.BasicTransaction)">
@@ -362,7 +362,7 @@ extends edu.uiuc.ncsa.security.storage.data.MapConverter&lt;V&gt;</pre>
                  <a href="BasicTransactionConverter.html" title="type parameter in BasicTransactionConverter">V</a>&nbsp;v)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code>fromMap</code>&nbsp;in class&nbsp;<code>edu.uiuc.ncsa.security.storage.data.MapConverter&lt;<a href="BasicTransactionConverter.html" title="type parameter in BasicTransactionConverter">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code>fromMap</code>&nbsp;in class&nbsp;<code>edu.uiuc.ncsa.security.storage.data.MapConverter&lt;<a href="BasicTransactionConverter.html" title="type parameter in BasicTransactionConverter">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -378,7 +378,7 @@ extends edu.uiuc.ncsa.security.storage.data.MapConverter&lt;V&gt;</pre>
                   edu.uiuc.ncsa.security.storage.data.ConversionMap&lt;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>,&#8203;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Object.html?is-external=true" title="class or interface in java.lang" class="externalLink">Object</a>&gt;&nbsp;data)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code>toMap</code>&nbsp;in class&nbsp;<code>edu.uiuc.ncsa.security.storage.data.MapConverter&lt;<a href="BasicTransactionConverter.html" title="type parameter in BasicTransactionConverter">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.impl">BasicTransaction</a>&gt;</code></dd>
+<dd><code>toMap</code>&nbsp;in class&nbsp;<code>edu.uiuc.ncsa.security.storage.data.MapConverter&lt;<a href="BasicTransactionConverter.html" title="type parameter in BasicTransactionConverter">V</a> extends <a href="BasicTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions">BasicTransaction</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>

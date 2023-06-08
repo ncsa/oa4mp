@@ -4,7 +4,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.ClientApprovalProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.OA4MPConfigTags;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.storage.sql.SQLClientApprovalStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.storage.sql.table.ClientApprovalTable;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.ClientApprovalKeys;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.ClientApprovalKeys;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPoolProvider;

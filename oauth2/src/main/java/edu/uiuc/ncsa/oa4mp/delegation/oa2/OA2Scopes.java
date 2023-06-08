@@ -16,6 +16,7 @@ public interface OA2Scopes {
     String SCOPE_PROFILE = "profile";
     String EDU_PERSON_ORC_ID = "eduPersonOrcid";
     String SCOPE_CILOGON_INFO = "org.cilogon.userinfo";
+    String SCOPE_USER_INFO = "org.oa4mp.userinfo";
     // CIL-771
     String SCOPE_CILOGON_TOKEN_MANAGER = "org.cilogon.tokenmanager ";
 
