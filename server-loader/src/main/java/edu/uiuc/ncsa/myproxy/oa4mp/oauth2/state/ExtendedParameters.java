@@ -107,6 +107,10 @@ public class ExtendedParameters {
      * @return
      */
     public JSONObject snoopParameters(Map<String, String[]> pmap) {
+        if(pmap instanceof JSONObject){
+            // JSONObject is a type of map, so Java does not allow for a separate function. Have to convert it here...
+            pmap = convertToParameterMap((JSONObject) pmap);
+        }
         JSONObject cilogonEntry = null;
         JSONObject oa4mpEntry = null;
         for (String key : pmap.keySet()) {
@@ -142,8 +146,29 @@ public class ExtendedParameters {
             return new JSONObject();
         }
         return entry;
-
     }
+    protected Map<String, String[]> convertToParameterMap(JSONObject json) {
+        Map<String, String[]> pmap = new HashMap<>();// low budget solution is to just convert it.
+        for(Object kk : json.keySet()){
+            String key = kk.toString(); // poor man's cast...
+            if (!isExtendedAttribute(key)) {
+                continue;
+            }
+            Object value = json.get(kk);
+            if(value instanceof JSONArray){
+                JSONArray array = (JSONArray) value;
+                String[] x = new String[array.size()];
+                for(int i = 0; i < array.size(); i++){
+                    x[i] = array.getString(i);
+                }
+                pmap.put(key, x);
+            }else{
+                pmap.put(key, new String[]{value.toString()});
+            }
+        }
+        return pmap;
+    }
+
 
     protected void flattenJSON(String namespace, JSONObject cilogonEntry, JSONObject j) {
         JSONObject jo = j.getJSONObject(namespace);

@@ -91,15 +91,19 @@ public class OA2ConfigurationLoaderUtils extends ConfigUtil {
      * Each block has an <code>enabled</code> flag so you can turn these off and on without removing them.
      *
      * @param cn
+     * @param isLoadAll if true, load all of the default scopes. Configuration then turns them off.
      * @return
      */
     public static Collection<String> getScopes(ConfigurationNode cn) {
         //   if (scopes == null) {
         Collection<String> scopes = new HashSet<>(); // keep the elements unique
+        // Fix https://github.com/ncsa/oa4mp/issues/103
         // First thing is to take all the basic scopes supported and include them.
-        for (String s : OA2Scopes.basicScopes) {
-            scopes.add(s);
-        }
+/*
+            for (String s : OA2Scopes.basicScopes) {
+                scopes.add(s);
+            }
+*/
         if (0 < cn.getChildrenCount(SCOPES)) {
             // Then we have some scopes
             ConfigurationNode node = Configurations.getFirstNode(cn, SCOPES);

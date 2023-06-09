@@ -18,13 +18,13 @@ public interface OA2Scopes {
     String SCOPE_CILOGON_INFO = "org.cilogon.userinfo";
     String SCOPE_USER_INFO = "org.oa4mp.userinfo";
     // CIL-771
-    String SCOPE_CILOGON_TOKEN_MANAGER = "org.cilogon.tokenmanager ";
+    String SCOPE_TOKEN_MANAGER = "org.oa4mp.tokenmanager ";
 
 
     /**
      * These are the basic scopes supported by the OA4MP OIDC protocol.
      */
-    String[] basicScopes = {SCOPE_EMAIL,SCOPE_MYPROXY, SCOPE_CILOGON_INFO, SCOPE_OPENID, SCOPE_PROFILE};
+    String[] basicScopes = {SCOPE_EMAIL,SCOPE_MYPROXY, SCOPE_USER_INFO, SCOPE_CILOGON_INFO, SCOPE_OPENID, SCOPE_PROFILE};
     String[] nonPublicScopes = {SCOPE_EMAIL,SCOPE_MYPROXY, SCOPE_CILOGON_INFO, SCOPE_PROFILE};
 
 

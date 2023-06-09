@@ -1,0 +1,50 @@
+#! /usr/bin/env -S qdl-run
+
+/*
+   Tests running a sequence of QDL scripts on the server.
+   Note that this also tests extended attribute support, which is
+   enabled in the CLI (using the ea_support command). This should return
+   a string of two values that can be parsed. 
+*/
+path := '/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests';
+if[path∉script_path()][script_path(path ~ script_path());];
+
+cfg.'id'  := 'ashigaru:command.line2';
+cfg.'idp'  := 'ANY';
+cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';
+cfg.'description' :=  'RFC7523 auth grant test. This will not do authorization, but get the token directly';
+cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token endpoint
+params. ≔ {'sub':'jeff', 'oa4mp:/tokens/access/lifetime':1000000,'oa4mp:/roles':'admin,all-user'};
+clc#init(cfg.'file', cfg.'id');
+tokens. := clc#rfc7523(params.);
+say('tokens=' + to_string(tokens.));
+claims. := clc#claims();
+say('claims=' + to_string(claims.));
+
+
+⊨ tokens.'access_token'.'lifetime' ≡ 900000 : 'wrong access token lifetime';
+⊨ tokens.'refresh_token'.'lifetime' ≡ 1000000000 : 'wrong refresh token lifetime';
+⊨ claims.'seq0' ≡ 636 : 'wrong seq 0 value';
+⊨ claims.'roles'.0 ≡ 'admin,all-user' : 'wrong extended attribute value';
+⊨ claims.'seq0_phase' ≡ 'post_token' : 'wrong seq0_phase value';
+⊨ claims.'seq1' ≡ 'is_member_of' : 'wrong seq 1 value';
+⊨ claims.'seq2' ≡ 'seq 2 passed post_token' : 'wrong seq 2 value';
+
+old_claims. := claims.;
+say(1);
+tokens. := clc#refresh();
+say(2);
+claims. := clc#claims();
+say(3);
+say(to_string(claims.));
+say(4);
+⊨ tokens.'access_token'.'lifetime' ≡ 900000 : 'wrong access token lifetime';
+⊨ tokens.'refresh_token'.'lifetime' ≡ 1000000000 : 'wrong refresh token lifetime';
+⊨ claims.'seq0' ≡ 636 : 'wrong seq 0 value';
+⊨ claims.'seq0_phase' ≡ 'post_refresh' : 'wrong seq0_phase value';
+⊨ claims.'seq1' ≡ 'is_member_of' : 'wrong seq 1 value';
+⊨ claims.'seq2' ≡ 'seq 2 passed post_refresh' : 'wrong seq 2 value';
+⊨ claims.'roles'.0 ≡ 'admin,all-user' : 'wrong extended attribute value';
+
+// No exchange at this point since that does nothing to the claims.
+say('RFC7523 auth grant test: ok');

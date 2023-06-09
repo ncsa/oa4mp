@@ -46,17 +46,25 @@ public class OA2RegistrationServlet extends AbstractRegistrationServlet {
         return (OA2SE) getServiceEnvironment();
     }
 
+    protected Collection<String> getDisplayScopes() {
+        Collection<String> displayScopes = new HashSet<>();
+        for (String x : OA2Scopes.basicScopes) {
+            displayScopes.add(x);
+        }
+        displayScopes.addAll(getOA2SE().getScopes());
+        if (!displayScopes.contains(OA2Scopes.SCOPE_OFFLINE_ACCESS)) {
+            displayScopes.add(OA2Scopes.SCOPE_OFFLINE_ACCESS);
+        }
+        return displayScopes;
+    }
+
     @Override
     public void prepare(PresentableState state) throws Throwable {
         super.prepare(state);
         HttpServletRequest request = state.getRequest();
 
         if (state.getState() == INITIAL_STATE) {
-            Collection<String> displayScopes = new HashSet<>();
-            displayScopes.addAll(getOA2SE().getScopes());
-            if(!displayScopes.contains(OA2Scopes.SCOPE_OFFLINE_ACCESS)){
-                displayScopes.add(OA2Scopes.SCOPE_OFFLINE_ACCESS);
-            }
+            Collection<String> displayScopes = getDisplayScopes();
             String[] scopes = new String[displayScopes.size()];
             displayScopes.toArray(scopes);
             request.setAttribute(SCOPES_NAME, scopes);
@@ -130,7 +138,7 @@ public class OA2RegistrationServlet extends AbstractRegistrationServlet {
                     // do nix...
                     rtLifetimeOK = false;
                 }
-                if (!rtLifetimeOK) {                                                                    
+                if (!rtLifetimeOK) {
                     info("Client requested illegal value for refresh token lifetime at registration of \"" + rawRTLifetime + "\"");
                 }
             }
@@ -195,7 +203,7 @@ public class OA2RegistrationServlet extends AbstractRegistrationServlet {
         OA2Client client = (OA2Client) setupNewClient(request, response);
 
         if (fireClientEvents) {
-            fireNewClientEvent(new NewClientEvent(this,client));
+            fireNewClientEvent(new NewClientEvent(this, client));
         }
         return client;
     }

@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.oa2.servlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2ConfigurationLoader;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.*;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ExtendedParameters;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ScriptRuntimeEngineFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RefreshTokenStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.TokenInfoRecord;
@@ -253,6 +254,14 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         serviceTransaction.setNonce(nonce);
         serviceTransaction.setClient(client);
         serviceTransaction.setUsername(jsonRequest.getString((OA2Claims.SUBJECT)));
+        if (client.hasExtendedAttributeSupport()) {
+             ExtendedParameters xp = new ExtendedParameters();
+             // Take the parameters and parse them into configuration objects,
+             JSONObject extAttr = xp.snoopParameters(jsonRequest);
+             if (extAttr != null && !extAttr.isEmpty()) {
+                 serviceTransaction.setExtendedAttributes(extAttr);
+             }
+         }
         JSONObject claims = new JSONObject();
         claims.put(OA2Claims.SUBJECT, serviceTransaction.getUsername());
         serviceTransaction.setUserMetaData(claims); // set this so it exists for later.

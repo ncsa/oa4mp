@@ -1993,6 +1993,20 @@ public class OA2CLCCommands extends CommonCommands {
         get_user_info(inputLine);
     }
     public String USERNAME_FLAG = "-user" ;
+    public JSONObject rfc7523(Map parameters) throws Exception {
+        clear(new InputLine(), false); // start by clearing everything but current parameters,
+        dummyAsset = (OA2Asset) getCe().getAssetStore().create();
+        JSONArray array = new JSONArray();
+        array.addAll(getCe().getScopes());
+        if(!parameters.containsKey(SCOPE)){parameters.put(SCOPE, array);}
+        if(!parameters.containsKey(REDIRECT_URI)){parameters.put(REDIRECT_URI, getCe().getCallback().toString());}
+        if(!parameters.containsKey(NONCE)){parameters.put(NONCE, NonceHerder.createNonce());}
+        if(!parameters.containsKey(OA2Claims.SUBJECT)){parameters.put(OA2Claims.SUBJECT, getCe().getClient().getIdentifierString());}
+        JSONObject jsonObject = getService().rfc7523(getDummyAsset(), parameters);
+        rawIdToken = jsonObject.getString(ID_TOKEN);
+        claims = JWTUtil.readJWT(rawIdToken)[1]; // just read it.
+        return jsonObject;
+    }
     public void rfc7523(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
             say("rfc7523 [" + USERNAME_FLAG + "user_name]- make and RFC 7523 request to the service.");
@@ -2005,27 +2019,14 @@ public class OA2CLCCommands extends CommonCommands {
             say("Oops! No configuration has been loaded.");
             return;
         }
+        Map parameters = new HashMap();
         String username = null;
         if(inputLine.hasArg(USERNAME_FLAG)){
             username = inputLine.getNextArgFor(USERNAME_FLAG);
             inputLine.removeSwitchAndValue(USERNAME_FLAG);
+            parameters.put(SCOPE, username);
         }
-        clear(inputLine, false); // start by clearing everything but current parameters,
-        dummyAsset = (OA2Asset) getCe().getAssetStore().create();
-        Map parameters = new HashMap();
-        JSONArray array = new JSONArray();
-        array.addAll(getCe().getScopes());
-        parameters.put(SCOPE, array);
-        parameters.put(REDIRECT_URI, getCe().getCallback().toString());
-        parameters.put(NONCE, NonceHerder.createNonce());
-        if(username != null){
-            parameters.put(OA2Claims.SUBJECT, username);
-        }  else{
-            parameters.put(OA2Claims.SUBJECT, getCe().getClient().getIdentifierString());
-        }
-        JSONObject jsonObject = getService().rfc7523(getDummyAsset(), parameters);
-        rawIdToken = jsonObject.getString(ID_TOKEN);
-        claims = JWTUtil.readJWT(rawIdToken)[1]; // just read it.
+        rfc7523(parameters);
         if (isPrintOuput()) {
             printTokens(inputLine.hasArg(NO_VERIFY_JWT), true);
         }

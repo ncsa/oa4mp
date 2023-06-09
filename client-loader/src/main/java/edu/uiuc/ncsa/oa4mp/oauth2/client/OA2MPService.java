@@ -526,7 +526,6 @@ public class OA2MPService extends OA4MPService {
         DS2 ds2 = (DS2) getEnvironment().getDelegationService();
         RFC7523Response response = ds2.rfc7523(request);
         JSONObject json = response.getResponse();
-        asset.setIssuedAt((Date) json.get(OA2Claims.ISSUED_AT));
         asset.setUsername((String) json.get(OA2Claims.SUBJECT));
         if (json.containsKey(NONCE) && !NonceHerder.hasNonce((String) json.get(NONCE))) {
             throw new InvalidNonceException("Unknown nonce.");
@@ -536,6 +535,8 @@ public class OA2MPService extends OA4MPService {
             throw new IllegalArgumentException("Error: No access token found in server response");
         }
         AccessTokenImpl at = new AccessTokenImpl(URI.create(json.getString(ACCESS_TOKEN)));
+        asset.setIssuedAt(new Date(at.getIssuedAt()));
+
         asset.setAccessToken(at);
         RefreshTokenImpl rt = null;
         if (json.containsKey(REFRESH_TOKEN)) {

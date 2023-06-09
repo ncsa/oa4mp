@@ -327,12 +327,8 @@ public class CLC implements QDLModuleMetaClass {
         @Override
         public Object evaluate(Object[] objects, State state) throws Throwable {
             checkInit();
-//            try {
-                clcCommands.exchange(argsToInputLine(getName(), objects));
-  /*          } catch (Exception e) {
-                handleException(e);
-            }
-  */          return getTokens();
+            clcCommands.exchange(argsToInputLine(getName(), objects));
+            return getTokens();
         }
 
         @Override
@@ -437,13 +433,9 @@ public class CLC implements QDLModuleMetaClass {
         public Object evaluate(Object[] objects, State state) throws Throwable {
             checkInit();
             QDLStem QDLStem = new QDLStem();
-//            try {
-                clcCommands.df(argsToInputLine(getName(), objects));
-                QDLStem.fromJSON(clcCommands.getDfResponse());
-  /*          } catch (Exception e) {
-                handleException(e);
-            }
-  */          return QDLStem;
+            clcCommands.df(argsToInputLine(getName(), objects));
+            QDLStem.fromJSON(clcCommands.getDfResponse());
+            return QDLStem;
         }
 
         @Override
@@ -469,16 +461,12 @@ public class CLC implements QDLModuleMetaClass {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) throws Throwable{
+        public Object evaluate(Object[] objects, State state) throws Throwable {
             checkInit();
             QDLStem QDLStem = new QDLStem();
-//            try {
-                clcCommands.introspect(argsToInputLine(getName(), objects));
-                QDLStem.fromJSON(clcCommands.getIntrospectResponse());
-  /*          } catch (Exception e) {
-                handleException(e);
-            }
-  */          return QDLStem;
+            clcCommands.introspect(argsToInputLine(getName(), objects));
+            QDLStem.fromJSON(clcCommands.getIntrospectResponse());
+            return QDLStem;
         }
 
         @Override
@@ -504,16 +492,12 @@ public class CLC implements QDLModuleMetaClass {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) throws Throwable{
+        public Object evaluate(Object[] objects, State state) throws Throwable {
             checkInit();
             QDLStem out = new QDLStem();
-//            try {
-                clcCommands.user_info(argsToInputLine(getName(), objects));
-                out.fromJSON(clcCommands.getClaims());
-  /*          } catch (Exception e) {
-                handleException(e);
-            }
-  */          return out;
+            clcCommands.user_info(argsToInputLine(getName(), objects));
+            out.fromJSON(clcCommands.getClaims());
+            return out;
         }
 
         @Override
@@ -573,16 +557,9 @@ public class CLC implements QDLModuleMetaClass {
                 args = args + " -m " + objects[1];
             }
             checkInit();
-//            try {
-                clcCommands.write(new InputLine(args));
-                return Boolean.TRUE;
-  /*          } catch (Exception e) {
-                if (DebugUtil.isEnabled()) {
-                    e.printStackTrace();
-                }
-            }
-            return Boolean.FALSE;
-  */      }
+            clcCommands.write(new InputLine(args));
+            return Boolean.TRUE;
+        }
 
         @Override
         public List<String> getDocumentation(int argCount) {
@@ -615,17 +592,12 @@ public class CLC implements QDLModuleMetaClass {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) throws Throwable{
-//            try {
-                clcCommands = new OA2CLCCommands(true, state.getLogger(), new OA2CommandLineClient(state.getLogger()));
-                clcCommands.read(argsToInputLine(getName(), objects));
-                initCalled = true;
-                return Boolean.TRUE;
-  /*          } catch (Throwable e) {
-                e.printStackTrace();
-            }
-            return Boolean.FALSE;
-  */      }
+        public Object evaluate(Object[] objects, State state) throws Throwable {
+            clcCommands = new OA2CLCCommands(true, state.getLogger(), new OA2CommandLineClient(state.getLogger()));
+            clcCommands.read(argsToInputLine(getName(), objects));
+            initCalled = true;
+            return Boolean.TRUE;
+        }
 
         @Override
         public List<String> getDocumentation(int argCount) {
@@ -651,14 +623,10 @@ public class CLC implements QDLModuleMetaClass {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) throws Throwable{
+        public Object evaluate(Object[] objects, State state) throws Throwable {
             if (objects.length == 0) {
-//                try {
-                    clcCommands.clear(new InputLine(), true);
-  /*              } catch (Exception e) {
-
-                }
-  */          }
+                clcCommands.clear(new InputLine(), true);
+            }
             return Boolean.TRUE;
         }
 
@@ -1064,6 +1032,67 @@ public class CLC implements QDLModuleMetaClass {
                 dd.add("if you set the token, the previous one is returned.");
 
             }
+            return dd;
+        }
+    }
+    public static String RFC7523_NAME = "rfc7523";
+    public class RFC7523 implements QDLFunction{
+        @Override
+        public String getName() {
+            return RFC7523_NAME;
+        }
+
+        @Override
+        public int[] getArgCount() {
+            return new int[]{0, 1};
+        }
+
+        @Override
+        public Object evaluate(Object[] objects, State state) throws Throwable {
+            checkInit();
+            Map parameters = new HashMap();
+            if(objects.length == 1){
+                if(objects[0] instanceof String){
+                    parameters.put(OA2Claims.SUBJECT, objects[0]);
+                }else{
+                    if(objects[0] instanceof QDLStem){
+                        QDLStem stem = (QDLStem) objects[0];
+                          for(Object key : stem.keySet()){
+                              Object value = stem.get(key);
+                              parameters.put(key, value);
+                          }
+                    }else{
+                        throw new IllegalArgumentException("unknown argument type for " + getName());
+                    }
+                }
+            }
+                clcCommands.rfc7523(parameters);
+
+            return getTokens();        }
+
+        @Override
+        public List<String> getDocumentation(int argCount) {
+            List<String> dd = new ArrayList<>();
+            switch (argCount){
+                case 0:
+                    dd.add(getName() + "() - issue grant request using default, 'username' is the client ID");
+                    dd.add("E.g.");
+                    dd.add(getName()+"()");
+                    dd.add("Sends a basic request with no additional parameters. Returns the tokens and claims");
+                    break;
+                case 1:
+                    dd.add(getName()+"(username | arg.) - issue grant request using the username or the entries of arg.");
+                    dd.add("   The keys and values of arg. are sent as parameters, so be sure that values are strings.");
+                    dd.add("\nE.g. with parameters");
+                    dd.add(getName() + "('igwn-robot@bigstate.edu')");
+                    dd.add("Sends request with the user name (as the subject of the request token). This is used on the");
+                    dd.add("service as if the user logged in with the given name, so all e.g. QDL scripts will run against that name.");
+                    dd.add("\nE.g.");
+                    dd.add(getName() + "('sub':'bob@bigstate.edu','lifetime':1000000)");
+                    dd.add("sends the request with the given user name and the parameter (in this case, requesting a certificate lifetime).");
+                    break;
+            }
+
             return dd;
         }
     }
