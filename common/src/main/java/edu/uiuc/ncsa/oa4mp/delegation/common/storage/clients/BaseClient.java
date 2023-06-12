@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.security.core.util.DateUtils;
 import edu.uiuc.ncsa.security.storage.data.Monitored;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 
+import java.net.URI;
 import java.util.Date;
 
 import static edu.uiuc.ncsa.security.core.util.BeanUtils.checkEquals;
@@ -32,11 +33,24 @@ public class BaseClient extends Monitored {
         c.setName(getName());
         c.setSecret(getSecret());
         c.setJWKS(getJWKS());
+        c.setJwksURI(getJwksURI());
     }
 
     JSONWebKeys jwks;
 
+    public URI getJwksURI() {
+        return jwksURI;
+    }
 
+    public void setJwksURI(URI jwksURI) {
+        this.jwksURI = jwksURI;
+    }
+
+    public boolean hasJWKSURI() {
+        return jwksURI != null;
+    }
+
+    URI jwksURI;
 
     public JSONWebKeys getJWKS() {
         return jwks;
@@ -45,8 +59,9 @@ public class BaseClient extends Monitored {
     public void setJWKS(JSONWebKeys jwks) {
         this.jwks = jwks;
     }
-    public boolean hasJWKS(){
-        return jwks!=null;
+
+    public boolean hasJWKS() {
+        return jwks != null;
     }
 
     public String getSecret() {
@@ -106,6 +121,7 @@ public class BaseClient extends Monitored {
         BaseClient c = (BaseClient) obj;
         if (!checkEquals(getSecret(), c.getSecret())) return false;
         if (!checkEquals(getName(), c.getName())) return false;
+        if (!checkEquals(getJwksURI(), c.getJwksURI())) return false;
         if (!checkEquals(getEmail(), c.getEmail())) return false;
         if (!DateUtils.equals(getCreationTS(), c.getCreationTS())) return false;
         return true;
@@ -117,7 +133,8 @@ public class BaseClient extends Monitored {
         return getClass().getSimpleName() + "[name=\"" + getName() +
                 "\", id=\"" + getIdentifierString() +
                 "\", email=\"" + getEmail() +
-                "\", jwks=\"" + (hasJWKS()?getJWKS():"(none)") +
+                "\", jwks=\"" + (hasJWKS() ? getJWKS() : "(none)") +
+                "\", jwksURI=\"" + (hasJWKS() ? getJwksURI() : "(none)") +
                 "\", secret=" + (getSecret() == null ? "(none)" : getSecret().substring(0, 25)) +
                 "]";
     }

@@ -14,7 +14,7 @@ cfg.'idp'  := 'ANY';
 cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';
 cfg.'description' :=  'Test chained QDL scripts in a single handler.';
 cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token endpoint
-params.'a' := {'oa4mp:/tokens/access/lifetime':1000000,'oa4mp:/roles':'admin,all-user'};
+params.'a' := {'org.oa4mp:/tokens/access/lifetime':1000000,'org.oa4mp:/roles':'admin,all-user'};
 rc := script_load('driver.qdl', cfg., params.);
 if[rc!='ok'][return(rc);];
 

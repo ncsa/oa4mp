@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Service Clients (RFC7523)</title>
+</head>
+<body class="composite">
+<h1>What is a service client?</h1>
+<p>A <i>service client</i> is a specialized OA4MP client that complies with
+<a href="https://datatracker.ietf.org/doc/html/rfc7523#section-2.1">section 2.1 of
+RFC7523</a>. This means that it is allowed to directly issue a token request without authentication.
+<b><i>However</i></b>, this implies a trust relationship and requires vetting.
+</p>
+<h2>Why?</h2>
+<p>As computing switches to token-based trust models and leaves behind X.509 certificates,
+services still need to be able to identify themselves and there need to be trust relationships
+in effect. Before, a server would have an X.509 certificate to prove who or what it was and now
+it needs a signed token. Requiring a service (and its human administrator) to go through an OAuth
+flow every time, say, a server restarts,
+is an intolerable burden on a system. Therefore, the trust is agreed upon separately with
+a service client. Typically, a service client has a single user and restricts which users
+can be recognized. Public/private keys must be generated and all authentication is
+key-based. Once all is in place, the service simply issues a grant request (which is in JSON and
+also signed with the private key) to the
+token endpoint, signed with its keys, and gets tokens back.</p>
+
+<h1>Authentication generally</h1>
+<p>As per the spec., <a href="https://datatracker.ietf.org/doc/html/rfc7523#section-2.2">section 2.2</a>,
+a service client must use client authentication. This is in addition to it signing its grant request.
+</p>
+<h1>The JSON request</h1>
+<p>This request replaces the authorization grant request from OAuth.
+<a href="https://datatracker.ietf.org/doc/html/rfc7523#section-2.1">Section 2.1 of
+    RFC7523</a> lists the requirements. Note that the subject is effectively the
+    username. The list of allowed users may be restricted by setting it in the server's client
+    configuration. In addition, you may include the following parameters:</p>
+<table style="text-align: left; width: 100%;" border="1" cellspacing="2" cellpadding="2">
+    <tbody>
+    <tr>
+        <td style="vertical-align: top;">Attribute</td>
+        <td style="vertical-align: top;">Required?</td>
+        <td style="vertical-align: top;">Default</td>
+        <td style="vertical-align: top;">Description</td>
+    </tr>
+    <tr id="at_lifetime">
+        <td style="vertical-align: top;">at_lifetime</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">--</td>
+        <td style="vertical-align: top;">Request time for the access token to be valid. Note this is subject to
+            server restrictions. See note below about times.
+        </td>
+    </tr>
+    <tr id="audience">
+        <td style="vertical-align: top;">audience</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">--</td>
+        <td style="vertical-align: top;">A single string  or multiple values. These are compliant with RFC 8693 (token exchange).</td>
+    </tr>
+    <tr id="extended_attributes">
+        <td style="vertical-align: top;">extended attributes</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">--</td>
+        <td style="vertical-align: top;">Any OA4MP <a href="extended-attributes.html">extended attributes</a>.</td>
+    </tr>
+    <tr id="resource">
+        <td style="vertical-align: top;">resource</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">--</td>
+        <td style="vertical-align: top;">A single URI  or multiple values. These are compliant with RFC 8693 (token exchange).</td>
+    </tr>
+    <tr id="rt_lifetime">
+        <td style="vertical-align: top;">rt_lifetime</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">--</td>
+        <td style="vertical-align: top;">Request time for the refresh token to be valid. Note this is subject to
+            server restrictions. See note below about times.
+        </td>
+    </tr>
+    <tr id="scope">
+        <td style="vertical-align: top;">scope</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">--</td>
+        <td style="vertical-align: top;">A single scope or array of scopes.</td>
+    </tr>
+    </tbody>
+</table>
+<h2>About times</h2>
+<p>Note that the assumption is that all of these <i>without</i>
+units are in <b>seconds</b>. Blanks before and after units are allowed. Acceptable units are</p>
+<ul>
+    <li>"ms.", "ms" for milliseconds, e.g. "1000 ms."</li>
+    <li>"sec.", "sec", "s.", "s" for seconds, e.g., "300 sec"</li>
+    <li>"min.", "min", "mins.", "mins" for minutes, e.g. "20 min."</li>
+    <li>"hr.", "hr", "hrs.", "hrs" for hours, "e.g. 2 hrs."</li>
+    <li>"day", "days" for days, e.g. "1 day", "10 days"</li>
+</ul>
+<h2>Example</h2>
+<p>A typical JSON request would be</p>
+<pre>
+    {
+      "iss": "ashigaru:command.line2",
+      "sub": "jeff",
+      "jti": "ashigaru:command.line2:/rfc7523/GmGUmD4J0JZH1oAkqNgkeTpWpqklq2HCJi38SuUNV-U",
+      "exp": 1686595091,
+      "iat": 1686594191,
+      "scope":   [
+        "org.cilogon.userinfo",
+        "openid",
+        "profile",
+        "email"
+      ],
+      "oa4mp:/roles": "admin,all-user",
+      "oa4mp:/tokens/access/lifetime": 1000000,
+      "redirect_uri": "https://oauth.bigstate.edu/client2/ready",
+      "nonce": "1yv5JQ5sElsxDHTcObWhJGBp6uy0i4VwMgV4vCHou1I"
+    }
+</pre>
+<p>Note that this would be turned into the payload of a JWT and signed with the client's private
+key before being sent to the server.</p>
+</body>
+</html>

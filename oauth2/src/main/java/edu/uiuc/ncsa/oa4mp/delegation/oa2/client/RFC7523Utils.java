@@ -99,7 +99,7 @@ public class RFC7523Utils implements RFC7523Constants {
 
         json.put(OA2Claims.ISSUER, clientid);
         json.put(OA2Claims.SUBJECT, clientid);
-        json.put(OA2Claims.JWT_ID, (clientid.endsWith("/") ? "" : "/") + "rfc7523/" + NonceHerder.createNonce());
+        json.put(OA2Claims.JWT_ID, clientid + (clientid.endsWith("/") ? "" : "/") + "rfc7523/" + NonceHerder.createNonce());
         // All times are in seconds, so divide by 1000
         json.put(OA2Claims.EXPIRATION, (System.currentTimeMillis() + DEFAULT_LIFETIME)/1000);// 15 minutes lifetime
         json.put(OA2Claims.ISSUED_AT, System.currentTimeMillis()/1000);
@@ -138,6 +138,7 @@ public class RFC7523Utils implements RFC7523Constants {
                                       Map parameters) {
         JSONObject authGrant = createBasicJWT(client);
         authGrant.putAll(parameters); // this sets the contents of the authorization grant.
+        System.out.println("JSON GRANT REQUEST\n\n" + authGrant.toString(2));
         JSONWebKey key = findKey(client, kid);
         if (key == null) {
             throw new IllegalStateException("Client \"" + client.getIdentifierString() + "\" key not found.");

@@ -81,7 +81,9 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
         if(stem.containsKey(kk().rfc7523Client())){
              v.setServiceClient(stem.getBoolean(kk().rfc7523Client()));
         }
-
+        if(stem.containsKey(kk().rfc7523ClientUsers())){
+           v.setServiceClientUsers(toList(stem, kk().rfc7523ClientUsers()));
+        }
         if(stem.containsKey(kk().jwks())){
             try {
                 JSONWebKeys jwks = JSONWebKeyUtil.fromJSON(stem.getStem(kk().jwks()).toJSON());
@@ -251,6 +253,7 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
         setNonNullStemValue(stem, kk().errorURL(), v.getErrorUri());
         setNonNullStemValue(stem, kk().proxyLimited(), v.isProxyLimited());
         setNonNullStemValue(stem, kk().rfc7523Client(), v.isServiceClient());
+        fromList(v.getServiceClientUsers(), stem, kk().rfc7523ClientUsers());
         setNonNullStemValue(stem, kk().extendsProvisioners(), v.isExtendsProvisioners());
         // 10 attributes
 
@@ -268,6 +271,7 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
         if (v.getProxyRequestScopes() != null && !v.getProxyRequestScopes().isEmpty()) {
             fromList(v.getProxyRequestScopes(), stem, kk().proxyRequestScopes());
         }
+
         if (v.getConfig() != null && !v.getConfig().isEmpty()) {
             QDLStem cfg = new QDLStem();
             cfg.fromJSON(v.getConfig());

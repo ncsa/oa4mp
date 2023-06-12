@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>OA4MP extended attributes</title>
+</head>
+
+<body class="composite">
+<h1>OA4MP extended attributes</h1>
+<p>These are namespace-qualified parameters that may be sent in any leg
+of the OAuth flow. They are of the form</p>
+<pre>
+    org.oa4mp:X=Y
+</pre>
+<p>Where x is a name or a path and Y is the intended value. You may multiple values. Note
+the policy for sending these: They simply replace what is there or add it if nothing
+was there. It is therefore best to send them in the initial request and be done with it.</p>
+<h2>What do they do?</h2>
+<p>They allow for a namespace-qualified way to send specific parameters to an OA4MP server's
+policy engine (i.e., QDL). Now, none of them are directly used by OA4MP, so if your scripts
+do not use them, they are ignored.
+They are made available to QDL in the <b><code>xas.</code></b> stem.</p>
+<h2>Example</h2>
+<p>Let us say you made the following request to the authorization end point:</p>
+<pre>
+    https://phys.bigstate.edu/oauth2/authorize?org.oa4mp:/tokens/access/lifetime=1000000&org.oa4mp:/roles=admin,all-user&scope=openid profile email... (truncated)
+</pre>
+<p>
+    This means that in the QDL environment you would have an <b>xas.</b> (extended attributes) stem of
+</p>
+<pre>
+    {org.oa4mp:{/tokens/access/lifetime:1000000},{/roles:admin,all-use}}
+</pre>
+<p>available for use with your policy.</p>
+<h2>Example of multiple values</h2>
+<p>If your request had the following values in it</p>
+<pre>
+    https://phys.bigstate.edu/oauth2/authorize?&org.oa4mp:/roles=admin&org.oa4mp:/roles=all-user&org.oa4mp:/roles=jira-user&... (truncated)
+</pre>
+<p>You would then get an <b>xas.</b> stem with</p>
+<pre>
+    {org.oa4mp:   {
+        /roles:[admin,all-user,jira-user]
+        }
+    }
+</pre>
+<p>I.e. unlike the first example where the roles are treated as a single string, in the second they
+are treated as individual entries.</p>
+</body>
+</html>

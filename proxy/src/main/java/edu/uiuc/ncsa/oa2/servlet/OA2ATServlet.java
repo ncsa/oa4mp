@@ -44,6 +44,7 @@ import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
 import edu.uiuc.ncsa.security.storage.XMLMap;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnMap;
+import edu.uiuc.ncsa.security.util.configuration.ConfigUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import net.sf.json.JSONArray;
@@ -214,8 +215,15 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             if (StringUtils.isTrivial(raw)) {
                 throw new OA2ATException(OA2Errors.INVALID_REQUEST, "missing json assertion");
             }
-            jsonRequest = JWTUtil2.verifyAndReadJWT(raw, client.getJWKS());
-
+            if(client.hasJWKS()) {
+                jsonRequest = JWTUtil2.verifyAndReadJWT(raw, client.getJWKS());
+            }else{
+                if(client.hasJWKSURI()){
+                    jsonRequest = JWTUtil2.verifyAndReadJWT(raw, client.getJwksURI());
+                }else{
+                    throw new OA2ATException(OA2Errors.INVALID_REQUEST, "missing JSON web key. Cannot verify signature."); // Not a JWT
+                }
+            }
         } catch (IllegalArgumentException iax) {
             throw new OA2ATException(OA2Errors.INVALID_REQUEST, "invalid JWT:"); // Not a JWT
 
@@ -243,7 +251,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 scopes = new ArrayList<>();
                 scopes.add(ss.toString());
             }
-        }else{
+        } else {
             scopes = new ArrayList<>();
         }
         String state = jsonRequest.containsKey(STATE) ? jsonRequest.getString(STATE) : null;
@@ -253,15 +261,24 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         serviceTransaction.setRequestState(state);
         serviceTransaction.setNonce(nonce);
         serviceTransaction.setClient(client);
-        serviceTransaction.setUsername(jsonRequest.getString((OA2Claims.SUBJECT)));
+        String user = jsonRequest.getString(OA2Claims.SUBJECT);
+        if(client.getServiceClientUsers().contains("*")){
+            serviceTransaction.setUsername(user);
+        }else{
+            if(client.getServiceClientUsers().contains(user)){
+                serviceTransaction.setUsername(user);
+            }else{
+                throw new OA2ATException(OA2Errors.INVALID_REQUEST, "user \"" + user + "\" does not have permission");
+            }
+        }
         if (client.hasExtendedAttributeSupport()) {
-             ExtendedParameters xp = new ExtendedParameters();
-             // Take the parameters and parse them into configuration objects,
-             JSONObject extAttr = xp.snoopParameters(jsonRequest);
-             if (extAttr != null && !extAttr.isEmpty()) {
-                 serviceTransaction.setExtendedAttributes(extAttr);
-             }
-         }
+            ExtendedParameters xp = new ExtendedParameters();
+            // Take the parameters and parse them into configuration objects,
+            JSONObject extAttr = xp.snoopParameters(jsonRequest);
+            if (extAttr != null && !extAttr.isEmpty()) {
+                serviceTransaction.setExtendedAttributes(extAttr);
+            }
+        }
         JSONObject claims = new JSONObject();
         claims.put(OA2Claims.SUBJECT, serviceTransaction.getUsername());
         serviceTransaction.setUserMetaData(claims); // set this so it exists for later.
@@ -277,9 +294,35 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                     HttpStatus.SC_BAD_REQUEST,
                     state, client);
         }
-        serviceTransaction.setAccessTokenLifetime(ClientUtils.computeATLifetime(serviceTransaction, client, getOA2SE()));
+        if (jsonRequest.containsKey(OA2Constants.ACCESS_TOKEN_LIFETIME)) {
+            String rawATLifetime = jsonRequest.getString(OA2Constants.ACCESS_TOKEN_LIFETIME);
+            try {
+                long at = ConfigUtil.getValueSecsOrMillis(rawATLifetime);
+                //               long at = Long.parseLong(rawATLifetime);
+                serviceTransaction.setRequestedATLifetime(at);
+            } catch (Throwable t) {
+                getServiceEnvironment().info("Could not set request access token lifetime to \"" + rawATLifetime
+                        + "\" for client " + client.getIdentifierString());
+                // do nothing.
+            }
+        }
 
+        serviceTransaction.setAccessTokenLifetime(ClientUtils.computeATLifetime(serviceTransaction, client, getOA2SE()));
+        if(jsonRequest.containsKey(OA2Constants.REFRESH_LIFETIME)){
+            String rawRTLifetime = jsonRequest.getString(OA2Constants.REFRESH_LIFETIME);
+            try {
+                long at = ConfigUtil.getValueSecsOrMillis(rawRTLifetime);
+                //               long at = Long.parseLong(rawATLifetime);
+                serviceTransaction.setRequestedRTLifetime(at);
+            } catch (Throwable t) {
+                getServiceEnvironment().info("Could not set request refresh token lifetime to \"" + rawRTLifetime
+                        + "\" for client " + client.getIdentifierString());
+                // do nothing.
+            }
+
+        }
         if (client.isRTLifetimeEnabled()) {
+
             serviceTransaction.setRefreshTokenLifetime(ClientUtils.computeRefreshLifetime(serviceTransaction, client, getOA2SE()));
         } else {
             serviceTransaction.setRefreshTokenLifetime(0L);
@@ -802,6 +845,14 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
            service and swap them willy nilly.
          */
         XMLMap tBackup = GenericStoreUtils.toXML(getTransactionStore(), t);
+        if (client.hasExtendedAttributeSupport()) {
+                ExtendedParameters xp = new ExtendedParameters();
+                // Take the parameters and parse them into configuration objects,
+                JSONObject extAttr = xp.snoopParameters(request.getParameterMap());
+                if (extAttr != null && !extAttr.isEmpty()) {
+                    t.setExtendedAttributes(extAttr);
+                }
+            }
         // In practice exactly one of these is active at any given time
         TXRecord newIDTX = null;
         TXRecord newATTX = null;
@@ -1466,6 +1517,14 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                     "The refresh token is no longer valid.",
                     t.getRequestState());
         }
+        if (client.hasExtendedAttributeSupport()) {
+                ExtendedParameters xp = new ExtendedParameters();
+                // Take the parameters and parse them into configuration objects,
+                JSONObject extAttr = xp.snoopParameters(request.getParameterMap());
+                if (extAttr != null && !extAttr.isEmpty()) {
+                    t.setExtendedAttributes(extAttr);
+                }
+            }
         AccessTokenImpl at = (AccessTokenImpl) t.getAccessToken();
         debugger.trace(this, "old access token = " + at.getToken());
         List<String> scopes = convertToList(request, OA2Constants.SCOPE);
@@ -1842,6 +1901,14 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                     HttpStatus.SC_UNAUTHORIZED, null);
         }
         checkSentScopes(request, response, transaction);
+        if (client.hasExtendedAttributeSupport()) {
+                ExtendedParameters xp = new ExtendedParameters();
+                // Take the parameters and parse them into configuration objects,
+                JSONObject extAttr = xp.snoopParameters(request.getParameterMap());
+                if (extAttr != null && !extAttr.isEmpty()) {
+                    transaction.setExtendedAttributes(extAttr);
+                }
+            }
         // Logic is simple. If proxy, farm it out to the proxy and it works or doesn't.
         // otherwise, manage all the state for retries.
         if (getOA2SE().getAuthorizationServletConfig().isUseProxy()) {

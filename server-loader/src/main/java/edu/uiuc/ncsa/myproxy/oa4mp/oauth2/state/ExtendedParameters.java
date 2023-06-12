@@ -14,8 +14,8 @@ import java.util.Map;
  * on 2/18/20 at  7:14 AM
  */
 public class ExtendedParameters {
-    public static String CILOGON_NS = "cilogon";
-    public static String OA4MP_NS = "oa4mp";
+    public static String CILOGON_NS = "org.cilogon";
+    public static String OA4MP_NS = "org.oa4mp";
     public static String PREFIX_DELIMITER = ":";
     public static String EXTENDED_ATTRIBUTES_KEY = "extendedAttributes";
     public static String[] NS_LIST = new String[]{CILOGON_NS, OA4MP_NS};
@@ -192,6 +192,9 @@ public class ExtendedParameters {
         QDLStem QDLStem = new QDLStem();
         QDLStem.fromJSON(jsonObject);
         System.out.println(QDLStem.toString(2));
+        System.out.println("***");
+        System.out.println(QDLStem.get(OA4MP_NS));
+        System.out.println(QDLStem.getStem(OA4MP_NS).get("/roles/"));
         // Now an integrity check for the existing configuration.
         JSONObject jsonObject2 = (JSONObject) JSONSerializer.toJSON(rawJ);
         JSONObject cmExtra = (JSONObject) JSONSerializer.toJSON(cmextra);

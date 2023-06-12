@@ -67,6 +67,7 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         }else{
             otherV.setProxyRequestScopes(jsonArrayToCollection(map, getCK2().proxyRequestScopes()));
         }
+
         if (map.get(getCK2().audience()) != null) {
             otherV.setAudience(jsonArrayToCollection(map, getCK2().audience()));
         }
@@ -224,26 +225,6 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
     }
 
     LDAPConfigurationUtil ldapConfigurationUtil;
-
-  /*  protected Collection<LDAPConfiguration> mapToLDAPS(ConversionMap<String, Object> map, String key) {
-        JSONObject json = new JSONObject();
-        JSON j = JSONSerializer.toJSON(map.get(key));
-        json.put("ldap", j);
-
-        return getLdapConfigurationUtil().fromJSON(j);
-    }*/
-
-    protected Collection<String> jsonArrayToCollection(ConversionMap<String, Object> map, String key) {
-        JSONArray json;
-        try {
-            json = (JSONArray) JSONSerializer.toJSON(map.get(key));
-        } catch (Throwable t) {
-            t.printStackTrace();
-            throw t;
-        }
-        Collection<String> zzz = (Collection<String>) JSONSerializer.toJava(json);
-        return zzz;
-    }
 
 
     @Override
@@ -437,6 +418,7 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         getJsonUtil().setJSONValue(json, getCK2().maxATLifetime(), client.getMaxATLifetime());
         getJsonUtil().setJSONValue(json, getCK2().maxRTLifetime(), client.getMaxRTLifetime());
         getJsonUtil().setJSONValue(json, getCK2().forwardScopesToProxy(), client.isForwardScopesToProxy());
+        getJsonUtil().setJSONValue(json, getCK2().proxyRequestScopes(), client.getProxyRequestScopes());
 
         JSONArray callbacks = new JSONArray();
         Collection<String> callbackList = client.getCallbackURIs();

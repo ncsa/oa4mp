@@ -33,6 +33,7 @@ import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.servlet.ExceptionHandlerThingie;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.storage.XMLMap;
+import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
 import net.sf.json.*;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -44,7 +45,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.net.URI;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.security.spec.InvalidKeySpecException;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -71,6 +75,8 @@ public class OIDCCMServlet extends EnvServlet {
     public static final String PROXY_CLAIMS_LIST = "proxy_claims_list";
     public static final String FORWARD_REQUEST_SCOPES_TO_PROXY = "forward_scopes_to_proxy";
     public static final String PROXY_REQUEST_SCOPES = "proxy_request_scopes";
+    public static final String IS_SERVICE_CLIENT = "is_service_client";
+    public static final String SERVICE_CLIENT_USERS = "service_client_users";
 
     @Override
     public void storeUpdates() throws IOException, SQLException {
@@ -258,7 +264,13 @@ public class OIDCCMServlet extends EnvServlet {
         JSONArray cbs = new JSONArray();
         cbs.addAll(client.getCallbackURIs());
         json.put(OIDCCMConstants.REDIRECT_URIS, cbs);
-
+        if (client.hasJWKSURI()) {
+            json.put(JWKS_URI, client.getJwksURI().toString());
+        }
+        if (client.hasJWKS()) {
+            JSONObject jwks = JSONWebKeyUtil.toJSON(client.getJWKS());
+            json.put(JWKS, jwks);
+        }
         if (client.getGrantTypes().isEmpty()) {
             /*JSONArray grants = new JSONArray();
             grants.add(OA2Constants.GRANT_TYPE_AUTHORIZATION_CODE);
@@ -302,6 +314,10 @@ public class OIDCCMServlet extends EnvServlet {
         json.put(PROXY_CLAIMS_LIST, client.getProxyClaimsList());
         json.put(FORWARD_REQUEST_SCOPES_TO_PROXY, client.isForwardScopesToProxy());
         json.put(PROXY_REQUEST_SCOPES, client.getProxyRequestScopes());
+        json.put(IS_SERVICE_CLIENT, client.isServiceClient());
+        JSONArray array = new JSONArray();
+        array.addAll(client.getServiceClientUsers());
+        json.put(SERVICE_CLIENT_USERS, array);
         json.put("email", client.getEmail());
         OA2ClientKeys clientKeys = (OA2ClientKeys) getOA2SE().getClientStore().getMapConverter().getKeys();
         json.put(clientKeys.extendsProvisioners(), client.isExtendsProvisioners());
@@ -1173,6 +1189,34 @@ public class OIDCCMServlet extends EnvServlet {
             if (jsonRequest.containsKey(PROXY_REQUEST_SCOPES)) {
                 client.setProxyRequestScopes(jsonRequest.getJSONArray(PROXY_REQUEST_SCOPES));
                 jsonRequest.remove(PROXY_REQUEST_SCOPES);
+            }
+            if (jsonRequest.containsKey(IS_SERVICE_CLIENT)) {
+                client.setServiceClient(jsonRequest.getBoolean(IS_SERVICE_CLIENT));
+                jsonRequest.remove(IS_SERVICE_CLIENT);
+            }
+            if(jsonRequest.containsKey(SERVICE_CLIENT_USERS)){
+                client.setServiceClientUsers(jsonRequest.getJSONArray(SERVICE_CLIENT_USERS));
+                jsonRequest.remove(SERVICE_CLIENT_USERS);
+            }
+            if (jsonRequest.containsKey(JWKS_URI)) {
+                client.setJwksURI(URI.create(jsonRequest.getString(JWKS_URI)));
+                jsonRequest.remove(JWKS_URI);
+            }
+            if (jsonRequest.containsKey(JWKS)) {
+                try {
+                    client.setJWKS(JSONWebKeyUtil.fromJSON(jsonRequest.getString(JWKS)));
+                } catch (NoSuchAlgorithmException e) {
+                    throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
+                            "JWKS error, no such algorithm",
+                            HttpStatus.SC_BAD_REQUEST,
+                            null, client);
+                } catch (InvalidKeySpecException e) {
+                    throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
+                            "JWKS error, invalid key spec.",
+                            HttpStatus.SC_BAD_REQUEST,
+                            null, client);
+                }
+                jsonRequest.remove(JWKS);
             }
         }
         if (jsonRequest.containsKey(DESCRIPTION)) {

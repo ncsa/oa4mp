@@ -14,6 +14,7 @@ public class BaseClientKeys extends MonitoredKeys {
     String name = "name";
     String secret = "oauth_client_pubkey";
     String jwks = "jwks";
+    String jwksURI = "jwks_uri";
 
     public String name(String... x) {
         if (0 < x.length) name = x[0];
@@ -24,7 +25,10 @@ public class BaseClientKeys extends MonitoredKeys {
         if (0 < x.length) jwks = x[0];
         return jwks;
     }
-
+    public String jwksURI(String... x) {
+          if (0 < x.length) jwksURI = x[0];
+          return jwksURI;
+      }
 
     public String debugOn(String... x) {
         if (0 < x.length) debugOn = x[0];
@@ -50,6 +54,7 @@ public class BaseClientKeys extends MonitoredKeys {
         allKeys.add(secret());
         allKeys.add(debugOn());
         allKeys.add(jwks());
+        allKeys.add(jwksURI());
         return allKeys;
     }
 }

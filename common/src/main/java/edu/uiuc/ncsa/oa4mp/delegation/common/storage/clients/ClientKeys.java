@@ -16,13 +16,17 @@ public class ClientKeys extends BaseClientKeys {
     String proxyLimited = "proxy_limited";
 
     String rfc7523Client = "rfc7523_client";
+    String rfc7523ClientUsers = "rfc7523_client_users";
 
     public String rfc7523Client(String... x) {
         if (0 < x.length) rfc7523Client = x[0];
         return rfc7523Client;
     }
 
-
+    public String rfc7523ClientUsers(String... x) {
+        if (0 < x.length) rfc7523ClientUsers = x[0];
+        return rfc7523ClientUsers;
+    }
     public String proxyLimited(String... x) {
         if (0 < x.length) proxyLimited = x[0];
         return proxyLimited;
@@ -46,6 +50,7 @@ public class ClientKeys extends BaseClientKeys {
         allKeys.add(homeURL());
         allKeys.add(errorURL());
         allKeys.add(rfc7523Client());
+        allKeys.add(rfc7523ClientUsers());
         return allKeys;
     }
 }

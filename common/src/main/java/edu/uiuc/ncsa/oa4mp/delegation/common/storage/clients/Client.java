@@ -3,6 +3,9 @@ package edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients;
 
 import edu.uiuc.ncsa.security.core.Identifier;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import static edu.uiuc.ncsa.security.core.util.BeanUtils.checkEquals;
 
 /**
@@ -91,6 +94,28 @@ public class Client extends BaseClient {
     }
 
     boolean serviceClient = false;
+
+    public Collection<String> getServiceClientUsers() {
+        if(serviceClientUsers == null){
+            serviceClientUsers = new ArrayList<>();
+            serviceClientUsers.add("*"); // default is to accept everyone.
+        }
+        return serviceClientUsers;
+    }
+
+    public void setServiceClientUsers(Collection<String> serviceClientUsers) {
+        this.serviceClientUsers = serviceClientUsers;
+    }
+
+    Collection<String> serviceClientUsers = null;
+
+    /**
+     * Mostly this is for use by converters so we know when we are setting this to a default.
+     * @return
+     */
+    public boolean hasServiceClientUsers(){
+        return serviceClientUsers!=null;
+    }
     @Override
     public String toString() {
         return getClass().getSimpleName() + "[name=\"" + getName() +
