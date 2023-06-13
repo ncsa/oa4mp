@@ -227,11 +227,12 @@ public class OA2DiscoveryServlet extends DiscoveryServlet {
             json.put(DEVICE_AUTHORIZATION_ENDPOINT, oa2SE.getRfc8628ServletConfig().deviceAuthorizationEndpoint);
         }
 
-        json.put("token_endpoint_auth_methods_supported", null);
-
         JSONArray tokenEndpointAuthSupported = new JSONArray();
         tokenEndpointAuthSupported.add("client_secret_post");
         tokenEndpointAuthSupported.add("client_secret_basic");
+        tokenEndpointAuthSupported.add("private_key_jwt"); // For RFC 7523 support
+        // DO we need "client_secret_jwt" as well?
+        // NO! This is used by OIDC if the server issues the client a key. OA4MP does not issue keys.
         json.put("token_endpoint_auth_methods_supported", tokenEndpointAuthSupported);
         JSONArray subjectTypes = new JSONArray();
         subjectTypes.add("public");

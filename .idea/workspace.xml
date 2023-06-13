@@ -11,32 +11,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="eb414374-02ed-40a4-9689-d382715049b9" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/website/src/site/xhtml/server/manuals/extended-attributes.xhtml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/website/src/site/xhtml/server/manuals/rfc7523-clients.xhtml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-loader/src/main/java/edu/uiuc/ncsa/oa4mp/oauth2/client/OA2ClientEnvironment.java" beforeDir="false" afterPath="$PROJECT_DIR$/client-loader/src/main/java/edu/uiuc/ncsa/oa4mp/oauth2/client/OA2ClientEnvironment.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/common/storage/clients/BaseClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/common/storage/clients/BaseClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/common/storage/clients/BaseClientConverter.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/common/storage/clients/BaseClientConverter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/common/storage/clients/BaseClientKeys.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/common/storage/clients/BaseClientKeys.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/common/storage/clients/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/common/storage/clients/Client.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/common/storage/clients/ClientConverter.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/common/storage/clients/ClientConverter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/common/storage/clients/ClientKeys.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/common/storage/clients/ClientKeys.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oauth2/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/oa2/client/RFC7523Utils.java" beforeDir="false" afterPath="$PROJECT_DIR$/oauth2/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/oa2/client/RFC7523Utils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/proxy/src/main/java/edu/uiuc/ncsa/oa2/servlet/OA2ATServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/proxy/src/main/java/edu/uiuc/ncsa/oa2/servlet/OA2ATServlet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qdl/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qdl/src/main/java/edu/uiuc/ncsa/oa2/qdl/storage/ClientStemMC.java" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/src/main/java/edu/uiuc/ncsa/oa2/qdl/storage/ClientStemMC.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/resources/qdl/seq0.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/resources/qdl/seq0.qdl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/storage/sql/table/ClientStoreTable.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/storage/sql/table/ClientStoreTable.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/cm/oidc_cm/OIDCCMServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/cm/oidc_cm/OIDCCMServlet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/state/ExtendedParameters.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/state/ExtendedParameters.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/storage/clients/OA2ClientConverter.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/storage/clients/OA2ClientConverter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-test/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/local/rfc7523-authn.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/local/rfc7523-authn.qdl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/local/rfc7523-grant.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/local/rfc7523-grant.qdl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/local/test_qdl.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/local/test_qdl.qdl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/website/src/site/xhtml/server/index.xhtml" beforeDir="false" afterPath="$PROJECT_DIR$/website/src/site/xhtml/server/index.xhtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/website/src/site/xhtml/server/manuals/dynamic-client-registration.xhtml" beforeDir="false" afterPath="$PROJECT_DIR$/website/src/site/xhtml/server/manuals/dynamic-client-registration.xhtml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/servlet/OA2DiscoveryServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/servlet/OA2DiscoveryServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/website/src/site/xhtml/common/configuration/supported-specifications.xhtml" beforeDir="false" afterPath="$PROJECT_DIR$/website/src/site/xhtml/common/configuration/supported-specifications.xhtml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -94,23 +71,23 @@
     <option name="showMembers" value="true" />
     <option name="showModules" value="false" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "last_opened_file_path": "/home/ncsa/dev/ncsa-git/oa4mp/website/src/site/xhtml/server/manuals",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Libraries",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.5883041",
-    "settings.editor.selected.configurable": "vcs.Git"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/ncsa/dev/ncsa-git/oa4mp/website/src/site/xhtml/server/manuals&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Libraries&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.5883041&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;vcs.Git&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/website/src/site/xhtml/server/manuals" />
@@ -390,7 +367,8 @@
       <workItem from="1684857080807" duration="90000" />
       <workItem from="1684857202015" duration="17109000" />
       <workItem from="1685554392734" duration="122985000" />
-      <workItem from="1686572017787" duration="15380000" />
+      <workItem from="1686572017787" duration="15556000" />
+      <workItem from="1686667584329" duration="4917000" />
     </task>
     <task id="LOCAL-00001" summary="Migrated a bunch of static utilities into classes.">
       <created>1675892170361</created>
@@ -637,7 +615,14 @@
       <option name="project" value="LOCAL" />
       <updated>1686348147276</updated>
     </task>
-    <option name="localTasksCounter" value="36" />
+    <task id="LOCAL-00036" summary="Check in before travel. Mostly documentation and tests.">
+      <created>1686595803250</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1686595803250</updated>
+    </task>
+    <option name="localTasksCounter" value="37" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -649,7 +634,6 @@
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="CIL-1677 Redux. Improved flow tests." />
     <MESSAGE value="Changed visibility on an internal variable." />
     <MESSAGE value="CIL-1677 documentation." />
     <MESSAGE value="Snapshot version bumped to 5.3" />
@@ -674,7 +658,8 @@
     <MESSAGE value="RFC 7523 support https://github.com/ncsa/oa4mp/issues/101" />
     <MESSAGE value="RFC 7523 support https://github.com/ncsa/oa4mp/issues/101, Section 2.1. Moved a group of misplaced classes." />
     <MESSAGE value="RFC 7523 support https://github.com/ncsa/oa4mp/issues/101, Section 2.1. Moved a group of misplaced classes. Part 2" />
-    <option name="LAST_COMMIT_MESSAGE" value="RFC 7523 support https://github.com/ncsa/oa4mp/issues/101, Section 2.1. Moved a group of misplaced classes. Part 2" />
+    <MESSAGE value="Check in before travel. Mostly documentation and tests." />
+    <option name="LAST_COMMIT_MESSAGE" value="Check in before travel. Mostly documentation and tests." />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
