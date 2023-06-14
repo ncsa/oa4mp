@@ -1,0 +1,50 @@
+#! /usr/bin/env -S qdl-run
+
+/*
+   Tests the client with no configuration
+*/
+
+path := '/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests';
+if[path∉script_path()][script_path(path ~ script_path());];
+
+cfg.'id'  := 'localhost:test/rfc9068'; // name of the configuration, not the id
+cfg.'idp'  := 'GitHub';
+cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';
+cfg.'description' :=  'RFC9068 access token test.';
+cfg.'flow_type' := 'uri';
+// As per RFC spec., passing in the resource parameters should have it echoed back as the audience below.
+params.'a' := {'resource':'https://test/rfc9068/aud'};
+
+rc := script_load('driver.qdl', cfg., params.);
+if[rc!='ok'][return(rc);];
+tokens. := clc#access();
+at. := tokens.'access_token'.'jwt'; // actual token
+rt. := tokens.'refresh_token'.'jwt';
+⊨ tokens.'access_token'.'lifetime' == 300000 : 'wrong access token lifetime';
+⊨ tokens.'refresh_token'.'lifetime' == 900000 : 'wrong refresh token lifetime';
+⊨ at.'aud' == params.'a'.'resource' : 'wrong audience';  // Audience is a little different than usual.
+⊨ at.'client_id' == 'localhost:test/rfc9086';  // wrong client_id.
+⊨ ∃at.'exp' : 'missing expiration';
+⊨ ∃at.'iat' : 'missing issued at';
+⊨ ∃at.'iss' : 'missing issuer';
+⊨ ∃at.'jti' : 'missing access token jti';
+⊨ ∃rt.'jti' : 'missing refresh token jti';
+⊨ rt.'aud'== 'https://localhost/rfc9086' : 'wrong audience for refresh token';
+
+tokens. := clc#refresh();
+// repeat test from above. This is being harried and should be fixed.
+at. := tokens.'access_token'.'jwt'; // actual token
+rt. := tokens.'refresh_token'.'jwt';
+⊨ tokens.'access_token'.'lifetime' == 300000 : 'wrong access token lifetime';
+⊨ tokens.'refresh_token'.'lifetime' == 900000 : 'wrong refresh token lifetime';
+⊨ at.'aud' == params.'a'.'resource' : 'wrong audience';  // Audience is a little different than usual.
+⊨ at.'client_id' == 'localhost:test/rfc9086';  // wrong client_id.
+⊨ ∃at.'exp' : 'missing expiration';
+⊨ ∃at.'iat' : 'missing issued at';
+⊨ ∃at.'iss' : 'missing issuer';
+⊨ ∃at.'jti' : 'missing access token jti';
+⊨ ∃rt.'jti' : 'missing refresh token jti';
+⊨ rt.'aud'== 'https://localhost/rfc9086' : 'wrong audience for refresh token';
+
+
+say('RFC 9068 test: ok');

@@ -62,11 +62,27 @@ public class OA2QDLConfigurationLoader<T extends OA2QDLEnvironment> extends QDLC
                 isOverwriteBaseFunctionsOn(),
                 getServerScriptSet(),
                 getLibLoader(),
-                useLogo());
+                useLogo(),
+                isSkipBadModulesOnLoad());
+    }
+
+    Boolean skipBadModulesOnLoad = null;
+
+    private boolean isSkipBadModulesOnLoad() {
+        if (skipBadModulesOnLoad == null) {
+            String x = getNodeValue(cn, SKIP_BAD_MODULES_TAG);
+            if (x == null) {
+                skipBadModulesOnLoad = false;
+            } else {
+                skipBadModulesOnLoad = x.equalsIgnoreCase("true");
+            }
+        }
+        return skipBadModulesOnLoad;
     }
 
     public static String SCRIPTS_TAG = "scripts";
     public static String SCRIPT_TAG = "script";
+    public static String SKIP_BAD_MODULES_TAG = "skipBadModulesOnLoad";
 
     protected String getWSEnvFile() {
         ConfigurationNode node = getFirstNode(cn, WS_TAG);
@@ -75,7 +91,7 @@ public class OA2QDLConfigurationLoader<T extends OA2QDLEnvironment> extends QDLC
 
     public ScriptSet getServerScriptSet() {
         ConfigurationNode node = getFirstNode(cn, SCRIPTS_TAG);
-        if(node == null){
+        if (node == null) {
             // no scripts.
             return null;
         }
@@ -87,7 +103,7 @@ public class OA2QDLConfigurationLoader<T extends OA2QDLEnvironment> extends QDLC
 
         for (ConfigurationNode scriptNode : scripts) {
             String rawJSON = (String) scriptNode.getValue();
-            if(rawJSON !=null && !rawJSON.trim().isEmpty()) {
+            if (rawJSON != null && !rawJSON.trim().isEmpty()) {
                 // skip empty tags
                 allScripts.add(JSONObject.fromObject(rawJSON));
             }

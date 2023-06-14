@@ -207,7 +207,8 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
             try {
                 WorkspaceCommands workspaceCommands = new WorkspaceCommands();
                 workspaceCommands.setDebugOn(true);
-                workspaceCommands.fromXML(xer, false);
+
+                workspaceCommands.fromXML(xer, getQE().isSkipBadModulesOnLoad());
                 state = (OA2State) workspaceCommands.getInterpreter().getState();
             } catch (Throwable t) {
                 // That didn't work. Try it in old format.

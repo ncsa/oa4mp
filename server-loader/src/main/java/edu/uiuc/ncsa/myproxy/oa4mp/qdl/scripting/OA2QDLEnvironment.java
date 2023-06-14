@@ -54,7 +54,8 @@ public class OA2QDLEnvironment extends QDLEnvironment {
                              boolean allowOverwriteBaseFunctions,
                              ScriptSet serverScripts,
                              LibLoader libLoader,
-                             String logo) {
+                             String logo,
+                             boolean skipBadModulesOnLoad) {
         super(myLogger,
                 cfgFile,
                 name,
@@ -87,12 +88,23 @@ public class OA2QDLEnvironment extends QDLEnvironment {
                 saveDir,
                 allowOverwriteBaseFunctions,
                 libLoader,
-                false, logo); // don't let anyone start in ANSI mode on the server since it will screw up logging.
+                false,
+                logo); // don't let anyone start in ANSI mode on the server since it will screw up logging.
         if (serverScripts != null && !serverScripts.isEmpty()) {
             this.serverScripts = serverScripts;
         }
+        this.skipBadModulesOnLoad = skipBadModulesOnLoad;
     }
 
+    public boolean isSkipBadModulesOnLoad() {
+        return skipBadModulesOnLoad;
+    }
+
+    public void setSkipBadModulesOnLoad(boolean skipBadModulesOnLoad) {
+        this.skipBadModulesOnLoad = skipBadModulesOnLoad;
+    }
+
+    boolean skipBadModulesOnLoad = false;
     public boolean hasServerScripts(){
         return serverScripts != null && !serverScripts.isEmpty();
     }

@@ -380,6 +380,7 @@ public class OA2ClientUtils {
                     break;
                 case RFC9068Constants.RFC9068_TAG:
                 case RFC9068Constants.RFC9068_TAG2:
+                case RFC9068Constants.HEADER_TYPE:
                     sth = new RFC9068ATHandler(st);
                     debugger.trace(OA2ClientUtils.class, "RFC 9068 access token handler created");
                     break;
