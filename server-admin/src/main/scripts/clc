@@ -8,13 +8,13 @@
 OA4MP_ROOT=/opt/oa2
 DEFAULT_CONFIG=$OA4MP_ROOT/etc/admin-cfg.xml
 DEFAULT_TARGET=client
-clientJar=$OA4MP_ROOT/lib/oa2-client.jar
-logFile=$OA4MP_ROOT/var/log/oa2-client.log
+clientJar=$OA4MP_ROOT/lib/clc.jar
+logFile=$OA4MP_ROOT/var/log/clc.log
 
 # End of user serviceable parts.
 
 if [[  "$1" = "--help" || $# -gt 2 ]];then
-  echo "oa2-client [configName configFile"]
+  echo "clc [configName configFile"]
   echo "Start the OAuth 2 forMyProxy command line client with the"
   echo "given configuration name in the given configuration file (full path)."
   echo "No arguments means to use the config named '$DEFAULT_TARGET' in the file  '$DEFAULT_CONFIG'"

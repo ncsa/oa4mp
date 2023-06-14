@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/oa4mp-clc/oa4mp-clc.iml" filepath="$PROJECT_DIR$/oa4mp-clc/oa4mp-clc.iml" />
+      <module fileurl="file://$PROJECT_DIR$/oa4mp-client-api/oa4mp-client-api.iml" filepath="$PROJECT_DIR$/oa4mp-client-api/oa4mp-client-api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/oa4mp-client-loader-oauth2/oa4mp-client-loader-oauth2.iml" filepath="$PROJECT_DIR$/oa4mp-client-loader-oauth2/oa4mp-client-loader-oauth2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/oa4mp-client-oauth2/oa4mp-client-oauth2.iml" filepath="$PROJECT_DIR$/oa4mp-client-oauth2/oa4mp-client-oauth2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/oa4mp-client-test/oa4mp-client-test.iml" filepath="$PROJECT_DIR$/oa4mp-client-test/oa4mp-client-test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/oa4mp-client-webapp/oa4mp-client-webapp.iml" filepath="$PROJECT_DIR$/oa4mp-client-webapp/oa4mp-client-webapp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/oa4mp-proxy/oa4mp-proxy.iml" filepath="$PROJECT_DIR$/oa4mp-proxy/oa4mp-proxy.iml" />
+      <module fileurl="file://$PROJECT_DIR$/oa4mp-qdl/oa4mp-qdl.iml" filepath="$PROJECT_DIR$/oa4mp-qdl/oa4mp-qdl.iml" />
+      <module fileurl="file://$PROJECT_DIR$/oa4mp-server-admin-oauth2/oa4mp-server-admin-oauth2.iml" filepath="$PROJECT_DIR$/oa4mp-server-admin-oauth2/oa4mp-server-admin-oauth2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/oa4mp-server-api/oa4mp-server-api.iml" filepath="$PROJECT_DIR$/oa4mp-server-api/oa4mp-server-api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/oa4mp-server-loader-oauth2/oa4mp-server-loader-oauth2.iml" filepath="$PROJECT_DIR$/oa4mp-server-loader-oauth2/oa4mp-server-loader-oauth2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/oa4mp-server-test-oauth2/oa4mp-server-test-oauth2.iml" filepath="$PROJECT_DIR$/oa4mp-server-test-oauth2/oa4mp-server-test-oauth2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/oa4mp-skin/oa4mp-skin.iml" filepath="$PROJECT_DIR$/oa4mp-skin/oa4mp-skin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/oa4mp-website/oa4mp-website.iml" filepath="$PROJECT_DIR$/oa4mp-website/oa4mp-website.iml" />
+    </modules>
+  </component>
+</project>

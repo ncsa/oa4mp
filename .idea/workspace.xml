@@ -11,9 +11,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="eb414374-02ed-40a4-9689-d382715049b9" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/servlet/OA2DiscoveryServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/servlet/OA2DiscoveryServlet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/website/src/site/xhtml/common/configuration/supported-specifications.xhtml" beforeDir="false" afterPath="$PROJECT_DIR$/website/src/site/xhtml/common/configuration/supported-specifications.xhtml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/scripts/oa2-cli" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/scripts/cli" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/scripts/oa2-client" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/scripts/clc" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -35,7 +36,7 @@
     <option name="PUSH_AUTO_UPDATE" value="true" />
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="5.3.1" />
+        <entry key="$PROJECT_DIR$" value="5.2.8.2" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -75,6 +76,7 @@
   &quot;keyToString&quot;: {
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
     &quot;last_opened_file_path&quot;: &quot;/home/ncsa/dev/ncsa-git/oa4mp/website/src/site/xhtml/server/manuals&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
@@ -310,9 +312,11 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.ExtendedParameters" />
         <item itemvalue="Application.CLC" />
         <item itemvalue="Application.JWTUtil2" />
+        <item itemvalue="Application.ExtendedParameters" />
+        <item itemvalue="Application.ExtendedParameters" />
+        <item itemvalue="Application.CLC" />
       </list>
     </recent_temporary>
   </component>
@@ -369,6 +373,7 @@
       <workItem from="1685554392734" duration="122985000" />
       <workItem from="1686572017787" duration="15556000" />
       <workItem from="1686667584329" duration="4917000" />
+      <workItem from="1686748096811" duration="424000" />
     </task>
     <task id="LOCAL-00001" summary="Migrated a bunch of static utilities into classes.">
       <created>1675892170361</created>
