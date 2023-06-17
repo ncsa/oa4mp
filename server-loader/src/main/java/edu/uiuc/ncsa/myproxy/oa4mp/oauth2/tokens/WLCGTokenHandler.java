@@ -3,9 +3,10 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.AbstractAccessTokenHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.PayloadHandlerConfigImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
-import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2ATException;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Errors;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.RFC9068Constants;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import net.sf.json.JSONObject;
 
 import static edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants.SCOPE;
@@ -33,7 +34,10 @@ public class WLCGTokenHandler extends AbstractAccessTokenHandler implements WLCG
         if (transaction.getUserMetaData() != null && transaction.getUserMetaData().containsKey("eppn")) {
             atData.put(SUBJECT, transaction.getUserMetaData().getString("eppn"));
         }
-
+       if(getClaims().containsKey(RFC9068Constants.AUTHENTICATION_CLASS_REFERENCE)){
+           atData.put(RFC9068Constants.AUTHENTICATION_CLASS_REFERENCE, getClaims().get(RFC9068Constants.AUTHENTICATION_CLASS_REFERENCE));
+       }
+       atData.put("auth_time", transaction.getAuthTime().getTime()/1000);
         if (getATConfig().getAudience().isEmpty()) {
             atData.put(AUDIENCE, DEFAULT_AUDIENCE);
         } else {

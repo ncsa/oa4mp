@@ -19,6 +19,7 @@ import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.DateUtils;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import java.net.URI;
@@ -1059,7 +1060,18 @@ public class CLC implements QDLModuleMetaClass {
                         QDLStem stem = (QDLStem) objects[0];
                           for(Object key : stem.keySet()){
                               Object value = stem.get(key);
-                              parameters.put(key, value);
+                              if(value instanceof QDLStem){
+                                  QDLStem qdlStem = (QDLStem) value;
+                                  if(qdlStem.isList()){
+                                      JSONArray array = new JSONArray();
+                                      array.addAll(qdlStem.getQDLList());
+                                      parameters.put(key, array);
+                                  } else{
+                                      throw new IllegalArgumentException("General stems are not supported as values, just lists");
+                                  }
+                              }else {
+                                  parameters.put(key, value);
+                              }
                           }
                     }else{
                         throw new IllegalArgumentException("unknown argument type for " + getName());

@@ -42,10 +42,22 @@ fnal-2          Test the FNAL policy with multiple CS fails (only one allowed)
                 access and refresh tokens are created.
 *prototype      Test that inheritance from another client (same as in command_line2)
                 works. This loads the client then runs the test for the other client.
+*rfc7523-authn  Checks RFC 7523, viz., that authorization for the client with a key works
+*rfc7523-grant  Checks RFC 7523 grant mechanism: A call to the token endpoint with a signed
+                JWT works as a flow. This is the so-called "service client" in OA4MP
+*rfc9068        Checks that the JWT token format for an access token is implemented right.
+*rtx            Checks that a large sequence of interleved refreshes and exchanges works right
+                and that the server keeps straight which tokens are which. Basically puts
+                the other two similar tests together.
+*rtx_exchanges  Checks that the server keeps straight the state of a ton of exchanges
+*rtx_refreshes  Checks that the server keeps straight the state of a ton of refreshes
 *scitokens      Basic Scitoken handler test.
+*scitokens2     Scitoken handler test that invokes QDl scripts.
 *test_ncsa      The standard NCSA QDL script. All clients that may have users in the NCSA
                 will invoke this script to process the users, so this is used all over the
                 place.
 *test_qdl       Basic test for QDL. This has multiple scripts invoked in a handler, so this
                 also tests if they are invoked correctly.
+*vo_test        Runs a bunch of tests against the VO deployed locally, showing that the
+                issuer and signing keys all work right.
 

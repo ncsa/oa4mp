@@ -7,6 +7,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -118,6 +119,42 @@ public class AuthorizationTemplates extends HashMap<String, AuthorizationTemplat
         return true;
     }
 
+    /**
+     * Get All the capabilities for the given audience.
+     * @param audience
+     * @return
+     */
+    public Collection<String> getCapabilities(String audience) {
+        Collection<String> out = new ArrayList<>();
+        AuthorizationTemplate at = get(audience);
+        for (AuthorizationPath ap : at.getPaths()) {
+            if (!ap.hasPath()) {
+                out.add(ap.getOperation());
+            }
+        }
+        return out;
+    }
+
+    /**
+     * Get the capabilities requested for the audience.
+     * @param audience
+     * @param requested
+     * @return
+     */
+    public Collection<String> getCapabilities(String audience, Collection<String> requested) {
+        Collection<String> out = new ArrayList<>();
+        AuthorizationTemplate at = get(audience);
+        for (AuthorizationPath ap : at.getPaths()) {
+            if (!ap.hasPath()) {
+                String cap = ap.getOperation();
+                if(requested.contains(cap)) {
+                    out.add(cap);
+                }
+            }
+        }
+        return out;
+    }
+
     public static void main(String[] args) {
         List<AuthorizationPath> paths = new ArrayList<>();
         paths.add(new AuthorizationPath(SciTokenConstants.OPERATION_READ, "/home/${sub}"));
@@ -126,14 +163,19 @@ public class AuthorizationTemplates extends HashMap<String, AuthorizationTemplat
         AuthorizationTemplate template = new AuthorizationTemplate("https://foo.bigstate.edu", paths);
         AuthorizationTemplates authorizationTemplates = new AuthorizationTemplates();
         authorizationTemplates.put(template);
+        System.out.println(authorizationTemplates.toJSON().toString(1));
         // And another one
         paths = new ArrayList<>();
-        paths.add(new AuthorizationPath(SciTokenConstants.OPERATION_READ, "/home/${eppn}/${sub}"));
-        paths.add(new AuthorizationPath(SciTokenConstants.OPERATION_EXECUTE, "/home/${memberOf}/ingest.sh"));
+        paths.add(new AuthorizationPath(WLCGConstants.STORAGE_CREATE, "/home/${eppn}/${sub}"));
+        paths.add(new AuthorizationPath(WLCGConstants.STORAGE_READ, "/home/${memberOf}/ingest.sh"));
+        // Capabilities
+        paths.add(new AuthorizationPath(WLCGConstants.COMPUTE_CREATE));
+        paths.add(new AuthorizationPath(WLCGConstants.COMPUTE_MODIFY));
         template = new AuthorizationTemplate("https://bar.bigstate.edu", paths);
         authorizationTemplates.put(template);
-
         System.out.println(authorizationTemplates.toJSON().toString(1));
+        System.out.println("capabilities:" + authorizationTemplates.getCapabilities("https://bar.bigstate.edu"));
+
         QDLStem stem = new QDLStem();
         stem.fromJSON(authorizationTemplates.toJSON());
         System.out.println(stem.toString(1));

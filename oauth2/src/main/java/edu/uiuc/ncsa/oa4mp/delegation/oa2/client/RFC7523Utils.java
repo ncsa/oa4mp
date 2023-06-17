@@ -138,7 +138,6 @@ public class RFC7523Utils implements RFC7523Constants {
                                       Map parameters) {
         JSONObject authGrant = createBasicJWT(client);
         authGrant.putAll(parameters); // this sets the contents of the authorization grant.
-        System.out.println("JSON GRANT REQUEST\n\n" + authGrant.toString(2));
         JSONWebKey key = findKey(client, kid);
         if (key == null) {
             throw new IllegalStateException("Client \"" + client.getIdentifierString() + "\" key not found.");

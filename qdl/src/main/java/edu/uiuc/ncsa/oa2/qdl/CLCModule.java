@@ -61,7 +61,11 @@ public class CLCModule extends JavaModule {
     public List<String> getDescription() {
         if (descr.isEmpty()) {
             descr.add("Module for the CLC (command line client). This allows you to do OAuth from QDL.");
-
+            descr.add("Among other features, you can send multiple parameters as lists, e.g.");
+            descr.add(" params. :=      {'org.oa4mp:/roles' : 'admin,all-user',       // sends as a string\n" +
+                    "                   'org.oa4mp:/roles2' : ['admin2','all-user2'], // sends as a list of strings\n" +
+                    "   'org.oa4mp:/tokens/access/lifetime' : 1000000,                // sends an integer\n" +
+                    "                                 'sub' : 'jeff'}");
         }
         return descr;
     }

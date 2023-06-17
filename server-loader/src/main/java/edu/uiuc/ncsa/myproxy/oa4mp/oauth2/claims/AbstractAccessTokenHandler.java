@@ -204,14 +204,15 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
         Collection<String> actualScopes;
         TXRecord txRecord = getPhCfg().getTxRecord();
         // Have to split the computed scopes into their uri and non-uri types.
+        // Non-uris we are going to call capabilities, like in the WLCG spec since it is descriptive
         // E.g. if a scope is like compute.cancel it should not be processed as a template later.
         // Take them out here. Have to avoid concurrent modification exception, so stash them
-        Collection<String> relativeScopes = new ArrayList<>();
+        Collection<String> requestedCapabilities = new ArrayList<>();
 
 
         Collection<String> requestedScopes = (txRecord != null && txRecord.hasScopes()) ? txRecord.getScopes() : transaction.getScopes();
         Collection<String> badRequests = new ArrayList<>();
-        Collection<String> relativeRequests = new ArrayList<>();
+        Collection<String> foundCapabilities = new ArrayList<>();
         /*
          * And for the next bit, if a capability is allowed like compute.submit
          * and the user tries to overload it to, e.g. compute.submit:/etc/certs
@@ -221,7 +222,7 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
         for (String x : computedScopes) {
             if (!x.contains(":")) {
                 if (requestedScopes.contains(x)) {
-                    relativeRequests.add(x);
+                    foundCapabilities.add(x);
                 } else {
                     for (String bad : requestedScopes) {
                         if (bad.startsWith(x + ":")) {
@@ -229,11 +230,11 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
                         }
                     }
                 }
-                relativeScopes.add(x);
+                requestedCapabilities.add(x);
             }
 
         }
-        computedScopes.removeAll(relativeScopes);
+        computedScopes.removeAll(requestedCapabilities);
         requestedScopes.remove(badRequests);
 
         /*
@@ -246,9 +247,14 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
         actualScopes = doCompareTemplates(computedScopes,
                 requestedScopes,
                 isQuery);
+/*
+        for (String aud : requestedAudience) {
 
-
-        actualScopes.addAll(relativeRequests); // add back in relative computed scopes.
+            actualScopes.addAll(    templates.getCapabilities(aud, relativeScopes));
+        }
+*/
+        actualScopes.addAll(foundCapabilities); // add back in relative computed scopes.
+        //actualScopes.addAll(relativeScopes); // add back in relative computed scopes.
         // now we convert to a scope string.
         String s = "";
         boolean firstPass = true;

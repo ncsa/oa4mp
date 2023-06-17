@@ -10,41 +10,36 @@ if[path∉script_path()][script_path(path ~ script_path());];
 cfg.'id'  := 'localhost:test/rfc9068'; // name of the configuration, not the id
 cfg.'idp'  := 'GitHub';
 cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';
-cfg.'description' :=  'RFC9068 access token test.';
+cfg.'description' :=  'RFC9068 access token test. This checks the format of this token';
 cfg.'flow_type' := 'uri';
 // As per RFC spec., passing in the resource parameters should have it echoed back as the audience below.
 params.'a' := {'resource':'https://test/rfc9068/aud'};
-
 rc := script_load('driver.qdl', cfg., params.);
 if[rc!='ok'][return(rc);];
+
+define[test(access_token., refresh_token., params.)]
+  body[
+        at. := access_token.'jwt'; // actual token
+        rt. := refresh_token.'jwt';
+        ⊨ access_token.'lifetime' == 300000 : 'wrong access token lifetime';
+        ⊨ refresh_token.'lifetime' == 900000 : 'wrong refresh token lifetime';
+        ⊨ at.'aud' == params.'a'.'resource' : 'wrong audience';  // Audience is a little different than usual.
+        ⊨ at.'client_id' == 'localhost:test/rfc9086';  // wrong client_id.
+        ⊨ ∃at.'exp' : 'missing expiration';
+        ⊨ ∃at.'iat' : 'missing issued at';
+        ⊨ ∃at.'iss' : 'missing issuer';
+        ⊨ ∃at.'jti' : 'missing access token jti';
+        ⊨ ∃rt.'jti' : 'missing refresh token jti';
+        ⊨ rt.'aud'== 'https://localhost/rfc9086' : 'wrong audience for refresh token';
+      ];
+
 tokens. := clc#access();
-at. := tokens.'access_token'.'jwt'; // actual token
-rt. := tokens.'refresh_token'.'jwt';
-⊨ tokens.'access_token'.'lifetime' == 300000 : 'wrong access token lifetime';
-⊨ tokens.'refresh_token'.'lifetime' == 900000 : 'wrong refresh token lifetime';
-⊨ at.'aud' == params.'a'.'resource' : 'wrong audience';  // Audience is a little different than usual.
-⊨ at.'client_id' == 'localhost:test/rfc9086';  // wrong client_id.
-⊨ ∃at.'exp' : 'missing expiration';
-⊨ ∃at.'iat' : 'missing issued at';
-⊨ ∃at.'iss' : 'missing issuer';
-⊨ ∃at.'jti' : 'missing access token jti';
-⊨ ∃rt.'jti' : 'missing refresh token jti';
-⊨ rt.'aud'== 'https://localhost/rfc9086' : 'wrong audience for refresh token';
+test(tokens.'access_token', tokens.'refresh_token', params.);
 
 tokens. := clc#refresh();
-// repeat test from above. This is being harried and should be fixed.
-at. := tokens.'access_token'.'jwt'; // actual token
-rt. := tokens.'refresh_token'.'jwt';
-⊨ tokens.'access_token'.'lifetime' == 300000 : 'wrong access token lifetime';
-⊨ tokens.'refresh_token'.'lifetime' == 900000 : 'wrong refresh token lifetime';
-⊨ at.'aud' == params.'a'.'resource' : 'wrong audience';  // Audience is a little different than usual.
-⊨ at.'client_id' == 'localhost:test/rfc9086';  // wrong client_id.
-⊨ ∃at.'exp' : 'missing expiration';
-⊨ ∃at.'iat' : 'missing issued at';
-⊨ ∃at.'iss' : 'missing issuer';
-⊨ ∃at.'jti' : 'missing access token jti';
-⊨ ∃rt.'jti' : 'missing refresh token jti';
-⊨ rt.'aud'== 'https://localhost/rfc9086' : 'wrong audience for refresh token';
-
-
+test(tokens.'access_token', tokens.'refresh_token', params.);
+// Need to get a new access token, then a new refresh token each, then test.
+t1. := clc#exchange();
+t2. := clc#exchange('-rt');
+test(t1.'access_token', t2.'refresh_token', params.);
 say('RFC 9068 test: ok');

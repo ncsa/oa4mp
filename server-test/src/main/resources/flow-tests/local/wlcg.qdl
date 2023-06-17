@@ -1,0 +1,106 @@
+#! /usr/bin/env -S qdl-run
+
+/*
+   Tests the client with scitokens configuratioin
+   Client config 2022-11-09
+{"tokens": {
+ "access":  {
+  "audience": "https://wlcg.cern.ch/jwt/v1/any",
+  "lifetime": 300000,
+  "templates": [  {
+   "aud": "https://wlcg.cern.ch/jwt/v1/any",
+   "paths":    [
+       {"op": "storage.read","path": "/home/${sub}"},
+       {"op": "compute.create"},
+       {"op": "compute.modify"},
+       {"op": "x.y","path": "/abc/def"},
+       {"op": "storage.write","path": "/data/${sub}/cluster"}
+   ]
+  }],
+  "type": "wlcg"
+ },
+ "refresh":  {
+  "audience": "https://wlcg.cern.ch/jwt/v1/any",
+  "lifetime": 900000,
+  "type": "refresh"
+ }
+}}
+
+
+*/
+path := '/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests';
+if[path∉script_path()][script_path(path ~ script_path());];
+
+cfg.'id'  := 'localhost:wlcg'; // name of the configuration, not the id
+cfg.'idp'  := 'NCSA';
+cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';
+cfg.'description' :=  'Test basic configuration for WLCG tokens, no scripting.';
+cfg.'flow_type' := 'df'; // Note to use df you need to set param for the token endpoint
+//user_id := 'http://cilogon.org/serverT/users/21340363'; // id from Github on test.cilogon.org
+user_id := 'http://cilogon.org/serverT/users/173048'; // id from NCSA IDP on test.cilogon.org
+
+params.'token' :=  {'scope': 'storage.read:/foo storage.read:/home/' + user_id  +
+                             ' x.y:/abc/def/pqr' +
+                             ' storage.write:/data/' + user_id + '/cluster/node47 ' +
+                             ' compute.read' +
+                             ' compute.modify'};
+                             // Only has compute.create, compute.modify
+expected_token_scopes. :=  ['storage.read:/home/' + user_id ,
+                            'x.y:/abc/def/pqr',
+                            'storage.write:/data/' + user_id + '/cluster/node47',
+                            'compute.modify'];
+params.'exchange' :=  {'scope': 'storage.read:/home/'+user_id  + // granted
+                                ' storage.write:/home/'+user_id + // denied -- wrong path
+                                ' storage.read:/home/lsst/' + user_id + // denied -- not in original request
+                                ' x.y:/abc/def/pqr/foo' + // granted
+                                ' x.y:/abc/defpqr' + // denied since not a sub-scope
+                                ' compute.create compute.cancel'}; // only compute.create
+
+expected_exchange_scopes. := ['storage.read:/home/' + user_id, // read
+                              'x.y:/abc/def/pqr/foo',  // works since it add component to path
+                              'compute.create'];
+
+define[test(tokens., claims., expected_scopes., user_id)][
+    // Define the tests to run after access and refresh.
+/*
+    say('claims:\n' + print(claims.));
+    say('at:\n'+print(tokens.'access_token'.'jwt'));
+    say('rt:\n'+print(tokens.'refresh_token'.'jwt'));
+*/
+    issuer := 'https://localhost:9443/oauth2';
+    at. := tokens.'access_token'.'jwt';
+    s. := tokenize(at.'scope', ' ');
+    rt. := tokens.'refresh_token'.'jwt';
+    ⊨ tokens.'access_token'.'lifetime' - 300000 < 2000 : 'wrong access token lifetime';
+    ⊨ ∃at.'wlcg.ver' : 'missing WLCG version';
+    ⊨ ∃at.'iat' : 'missing iat claim';
+    ⊨ ∃at.'exp' : 'missing exp claim';
+    ⊨ at.'wlcg.ver' ≡ '1.0' : 'wrong WLCG version';
+    ⊨ at.'sub' ≡ ((∃claims.'eppn')?claims.'eppn':user_id) : 'wrong AT subject'; // OA4MP policy is to return the eppn if present.
+    ⊨ at.'iss' ≡ issuer : 'wrong AT issuer';
+    ⊨ at.'aud' ≡ 'https://wlcg.cern.ch/jwt/v1/any' : 'wrong AT audience';
+    ⊨ rt.'aud' ≡ 'https://wlcg.cern.ch/jwt/v1/any' : 'wrong RT audience';
+    ⊨ tokens.'refresh_token'.'lifetime' - 900000 < 2000 : 'wrong refresh token lifetime';
+    ⊨ reduce(@∧, expected_scopes. ∈ s.) : 'incorrect AT scopes';
+];
+
+rc := script_load('driver.qdl', cfg., params.);
+if[rc!='ok'][return(rc);];
+
+tokens. := clc#access();
+claims. := clc#claims();
+
+test(tokens., claims., expected_token_scopes., user_id);
+say(1);
+issued_at := claims().'iat';
+tokens. := clc#refresh();
+claims. := clc#claims();
+⊨ issued_at <= claims().'iat' : 'ID token not updated';
+test(tokens., claims., expected_token_scopes., user_id);
+
+tokens. := clc#exchange();
+claims. := clc#claims();
+⊨ issued_at <= claims().'iat' : 'ID token not updated';
+test(tokens., claims., expected_exchange_scopes., user_id);
+
+say('WLCG test: ok');

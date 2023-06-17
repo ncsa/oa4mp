@@ -2,7 +2,7 @@
  Creates everything for the OA4MP = OAuth for MyProxy PostgreSQL server database.
  AFTER YOU HAVE (at the least) EDITED THE PASSWORD BELOW, pipe it into postgres by issuing
 
- \i /path/to/oauth2-pg.sql
+ \i /path/to/oa4mp-pg.sql
 
  in the psql client or just cut and paste it into the client directly.
 
