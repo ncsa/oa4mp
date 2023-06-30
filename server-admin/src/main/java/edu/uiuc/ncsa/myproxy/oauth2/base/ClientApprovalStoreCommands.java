@@ -102,6 +102,7 @@ public class ClientApprovalStoreCommands extends StoreCommands2 {
         say("This is the simple case of approving a client.");
         say("If you need to set the status to something other than 'approved',");
         say("use the set_status command.");
+        say("Some components may prompt you for changes to the client as well.");
         say("Syntax:\n");
         say("approve [id | number]\n");
         say("The approval record will be for that client");
@@ -178,12 +179,15 @@ public class ClientApprovalStoreCommands extends StoreCommands2 {
         say("done!");
     }
 
-    public void approve(ClientApproval ca) throws IOException {
-        info("Starting approval for id=" + ca.getIdentifierString());
-        ca.setApprover(getInput("approver", ca.getApprover()));
-        //ca.setApproved(isOk(getInput("approve this", ca.isApproved() ? "y" : "n")));
-
+    /**
+     *
+     * @param ca
+     * @return true if saved.
+     * @throws IOException
+     */
+    public boolean approve(ClientApproval ca) throws IOException {
         boolean isapproved = isOk(getInput("set approved?", ca.isApproved() ? "y" : "n"));
+        ca.setApprover(getInput("approver", ca.getApprover()));
         if (isapproved) {
             ca.setApproved(true);
             ca.setStatus(ClientApproval.Status.APPROVED);
@@ -208,10 +212,11 @@ public class ClientApprovalStoreCommands extends StoreCommands2 {
             getStore().save(ca);
             sayi("approval saved");
             info("Approval for id = " + ca.getIdentifierString() + " saved");
-            return;
+            return true;
         }
         sayi("approval was not saved.");
         info("Approval cancelled for id=" + ca.getIdentifierString());
+        return false;
     }
 
     protected void show(boolean showApproved, String regex) throws Exception {

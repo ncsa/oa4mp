@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientKeys;
 import edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.QDLJSONConfigUtil;
 import edu.uiuc.ncsa.myproxy.oauth2.base.ClientApprovalStoreCommands;
 import edu.uiuc.ncsa.myproxy.oauth2.base.ClientStoreCommands;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.BaseClient;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.LDAPConfigurationUtil;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.BaseClientStore;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
@@ -742,5 +743,12 @@ public class OA2ClientCommands extends ClientStoreCommands {
             FormatUtil.formatList(inputLine, response.found);
         }
         say("There were "+ response.found.size() + " clients found to remove");
+    }
+
+    @Override
+    protected BaseClient approvalMods(InputLine inputLine, BaseClient client) throws IOException {
+        OA2Client oa2Client = (OA2Client) client;
+        oa2Client.setStrictscopes("y".equals(getInput("strict scopes?(y/n)", oa2Client.useStrictScopes()?"y":"n")));
+        return oa2Client;
     }
 }

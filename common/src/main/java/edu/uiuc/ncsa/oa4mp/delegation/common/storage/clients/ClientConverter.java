@@ -64,7 +64,7 @@ public class ClientConverter<V extends Client> extends BaseClientConverter<V> {
         } else {
             JSONArray jsonArray = new JSONArray();
             jsonArray.add("*");
-            map.put(getCK().rfc7523ClientUsers(), jsonArray);
+            map.put(getCK().rfc7523ClientUsers(), jsonArray.toString());
         }
     }
 

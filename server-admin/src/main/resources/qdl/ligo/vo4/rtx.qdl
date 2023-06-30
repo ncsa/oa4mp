@@ -1,21 +1,10 @@
-/*
-    Refresh and token exchange if there is anything to do.
-*/
-
+say(debugger(1));
    if [!is_defined(claims.'eppn')]
  then [err('Missing EPPN. Cannot determine scopes.', 'invalid_request');];
-
-// Audience processing
  requested_audience. := (size(tx_audience.) == 0)?audience.:tx_audience.;
    access_token.aud. := (size(requested_audience.) == 0)?all_audience.:requested_audience.;
-
-// Scope processing
-    allowed_scopes. := script_load('ligo/vo4/get_attributes.qdl', claims.'eppn');
-   // sys_err.ok?null:return(); // check for error and propagate if needed.
-
-  requested_scopes. := (0 < size(tx_scopes.))?tx_scopes.:scopes.;
-
-   if [0 < size(requested_scopes.)]
- then [allowed_scopes. := mask(allowed_scopes., allowed_scopes. ∈ requested_scopes.);];
-
- access_token.scope := detokenize(unique(allowed_scopes.), ' ', 2); // turn in to string, omit duplications, trailing space
+   requested_scopes. := (0 < size(tx_scopes.))?tx_scopes.:scopes.;
+        permissions. := resolve_templates(original_scopes., requested_scopes., false); // Only grant scopes already granted
+ requested_audience. := (size(tx_audience.) == 0)?(size(audience.)==0?all_audience.:audience.):tx_audience.;
+  access_token.'aud' := requested_audience.;
+  access_token.scope := detokenize(unique(permissions.), ' '); // turn in to string, omit duplications, trailing space

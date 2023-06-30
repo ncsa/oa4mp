@@ -1915,7 +1915,11 @@ public class OA2CLCCommands extends CommonCommands {
         }
     }
 
-    String shortSwitchBlurb = "Short values of switches are allowed: " + SHORT_REQ_PARAM_SWITCH + " | " + SHORT_TOKEN_PARAM_SWITCH + " | " + SHORT_EXCHANGE_PARAM_SWITCH;
+    String shortSwitchBlurb = "Short values of switches are allowed: " +
+            SHORT_REQ_PARAM_SWITCH + " | " +
+            SHORT_TOKEN_PARAM_SWITCH + " | " +
+            SHORT_REFRESH_PARAM_SWITCH +" | " +
+            SHORT_EXCHANGE_PARAM_SWITCH;
 
     public void rm_param(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {

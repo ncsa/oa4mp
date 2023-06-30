@@ -1,0 +1,2 @@
+ acl_add('cilogon:/adminClient/fts/test');
+ acl_check();

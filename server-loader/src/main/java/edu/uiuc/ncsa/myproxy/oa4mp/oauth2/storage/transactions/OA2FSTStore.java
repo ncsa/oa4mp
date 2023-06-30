@@ -4,13 +4,13 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8628State;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.TokenInfoRecord;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.TokenInfoRecordMap;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.DSFSTransactionStore;
-import edu.uiuc.ncsa.security.core.IdentifiableProvider;
-import edu.uiuc.ncsa.security.core.Identifier;
-import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.RefreshToken;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.TokenForge;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AccessTokenImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.RefreshTokenImpl;
+import edu.uiuc.ncsa.security.core.IdentifiableProvider;
+import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import org.apache.commons.codec.digest.DigestUtils;
 
@@ -156,7 +156,8 @@ public class OA2FSTStore<V extends OA2ServiceTransaction> extends DSFSTransactio
     public V getByProxyID(Identifier proxyID) {
         for (Identifier id : keySet()) {
             V transaction = get(id);
-            if (transaction != null && transaction.getProxyId().equals(id)) {
+            // Fix for https://github.com/ncsa/oa4mp/issues/110 check the passed in ID and return if matches.
+            if (transaction != null && proxyID.toString().equals(transaction.getProxyId())) {
                 return transaction;
             }
         }

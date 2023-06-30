@@ -16,9 +16,10 @@ public interface OA2Scopes {
     String SCOPE_PROFILE = "profile";
     String EDU_PERSON_ORC_ID = "eduPersonOrcid";
     String SCOPE_CILOGON_INFO = "org.cilogon.userinfo";
-    String SCOPE_USER_INFO = "org.oa4mp.userinfo";
+    // fix for https://github.com/ncsa/oa4mp/issues/112
+    String SCOPE_USER_INFO = "org.oa4mp:userinfo";
     // CIL-771
-    String SCOPE_TOKEN_MANAGER = "org.oa4mp.tokenmanager ";
+    String SCOPE_TOKEN_MANAGER = "org.oa4mp:tokenmanager ";
 
 
     /**

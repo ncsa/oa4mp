@@ -33,7 +33,8 @@ public class Permission extends IdentifiableImpl {
     /**
      * The chain (i.e. list) of ersatz clients. Note that this does not contain the
      * provisioning client, so if A ≻ α ≻ β ≻ γ , the A is the provisioning client
-     * and the returned result is the list of ids [α, β, γ]
+     * and the returned result is the list of ids [α, β, γ]. Note that γ is the final
+     * ersatz client.
      * @return
      */
     public List<Identifier> getErsatzChain() {

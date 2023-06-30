@@ -304,11 +304,14 @@ public class BasicClaimsSourceImpl implements ClaimSource {
 
     @Override
     public void fromQDL(QDLStem stem) {
+
         if (stem.containsKey(CS_DEFAULT_ID)) getConfiguration().setId(stem.getString(CS_DEFAULT_ID));
         if (stem.containsKey(CS_DEFAULT_FAIL_ON_ERROR)) getConfiguration().setFailOnError(stem.getBoolean(CS_DEFAULT_FAIL_ON_ERROR));
         if (stem.containsKey(CS_DEFAULT_NOTIFY_ON_FAIL)) getConfiguration().setNotifyOnFail(stem.getBoolean(CS_DEFAULT_NOTIFY_ON_FAIL));
         if (stem.containsKey(CS_DEFAULT_IS_ENABLED)) getConfiguration().setEnabled(stem.getBoolean(CS_DEFAULT_IS_ENABLED));
         if (stem.containsKey(CS_DEFAULT_NAME)) getConfiguration().setName(stem.getString(CS_DEFAULT_NAME));
+        if (stem.containsKey(CS_LDAP_RETRY_COUNT)) {getConfiguration().setRetryCount(Math.toIntExact(stem.getLong(CS_LDAP_RETRY_COUNT)));}
+        if (stem.containsKey(CS_LDAP_MAX_RETRY_SLEEP)) {getConfiguration().setMaxWait(stem.getLong(CS_LDAP_MAX_RETRY_SLEEP));}
     }
 
     @Override
@@ -320,6 +323,8 @@ public class BasicClaimsSourceImpl implements ClaimSource {
         stem.put(CS_DEFAULT_IS_ENABLED, getConfiguration().isEnabled());
         stem.put(CS_DEFAULT_NOTIFY_ON_FAIL, getConfiguration().isNotifyOnFail());
         stem.put(CS_DEFAULT_NAME, getConfiguration().getName());
+        stem.put(CS_LDAP_RETRY_COUNT, (long)getConfiguration().getRetryCount());
+        stem.put(CS_LDAP_MAX_RETRY_SLEEP, getConfiguration().getMaxWait());
         return stem;
     }
 }

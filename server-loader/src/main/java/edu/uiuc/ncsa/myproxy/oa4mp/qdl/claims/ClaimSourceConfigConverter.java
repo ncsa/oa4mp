@@ -182,6 +182,7 @@ public class ClaimSourceConfigConverter implements CSConstants {
                 if(arg.containsKey(CS_LDAP_SEARCH_SCOPE)){
                     ldapCfg.setSearchScope(arg.getString(CS_LDAP_SEARCH_SCOPE));
                 }
+
                 if (arg.containsKey(CS_DEFAULT_IS_ENABLED)) {
                     ldapCfg.setEnabled(arg.getBoolean(CS_DEFAULT_IS_ENABLED));
                 } else {
@@ -296,6 +297,8 @@ public class ClaimSourceConfigConverter implements CSConstants {
         if (arg.containsKey(CS_DEFAULT_NOTIFY_ON_FAIL)) cfg.setNotifyOnFail(arg.getBoolean(CS_DEFAULT_NOTIFY_ON_FAIL));
         if (arg.containsKey(CS_DEFAULT_IS_ENABLED)) cfg.setEnabled(arg.getBoolean(CS_DEFAULT_IS_ENABLED));
         if (arg.containsKey(CS_DEFAULT_NAME)) cfg.setName(arg.getString(CS_DEFAULT_NAME));
+        if(arg.containsKey(CS_LDAP_MAX_RETRY_SLEEP)){cfg.setMaxWait(arg.getLong(CS_LDAP_MAX_RETRY_SLEEP));}
+        if(arg.containsKey(CS_LDAP_RETRY_COUNT)){cfg.setRetryCount(Math.toIntExact(arg.getLong(CS_LDAP_RETRY_COUNT)));}
     }
 
     protected static void setDefaultsInStem(ClaimSourceConfiguration cfg, QDLStem arg) {
@@ -304,5 +307,8 @@ public class ClaimSourceConfigConverter implements CSConstants {
         arg.put(CS_DEFAULT_IS_ENABLED, cfg.isEnabled());
         arg.put(CS_DEFAULT_NOTIFY_ON_FAIL, cfg.isNotifyOnFail());
         arg.put(CS_DEFAULT_NAME, cfg.getName());
+        arg.put(CS_LDAP_RETRY_COUNT, (long)cfg.getRetryCount());
+        arg.put(CS_LDAP_MAX_RETRY_SLEEP, cfg.getMaxWait());
+
     }
 }

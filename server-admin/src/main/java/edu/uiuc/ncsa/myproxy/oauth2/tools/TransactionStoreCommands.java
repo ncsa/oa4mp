@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransac
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.TokenExchangeRecordRetentionPolicy;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RefreshTokenRetentionPolicy;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RefreshTokenStore;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2TStoreInterface;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXStore;
 import edu.uiuc.ncsa.myproxy.oauth2.base.StoreCommands2;
@@ -436,6 +437,27 @@ public class TransactionStoreCommands extends StoreCommands2 {
             Identifier parentID = txRecord.getParentID();
             serviceTransaction = (OA2ServiceTransaction) getStore().get(parentID);
         }
+        if (serviceTransaction == null) {
+            say("no transaction found");
+            return;
+        }
+
+        format(serviceTransaction);
+    }
+
+    public void get_by_proxy_id(InputLine inputLine) throws Exception {
+        if (showHelp(inputLine)) {
+            say("get_by_proxy_id proxy_id - get a transaction by its proxy_id");
+            return;
+        }
+        if(!(getStore() instanceof OA2TStoreInterface)){
+            say("wrong store type");
+            return;
+        }
+        OA2TStoreInterface tStoreInterface =(OA2TStoreInterface) getStore();
+        String proxyID = inputLine.getLastArg();
+        OA2ServiceTransaction serviceTransaction = tStoreInterface.getByProxyID(BasicIdentifier.newID(proxyID));
+
         if (serviceTransaction == null) {
             say("no transaction found");
             return;

@@ -26,10 +26,10 @@
 <body>
 <!-- <form action="/oauth/register" method="post"> -->
 <form action="${actionToTake}" method="post">
-    <h2>Welcome to the MyProxy Delegation Service Client Registration Page</h2>
+    <h2>Welcome to the OA4MP Client Registration Page</h2>
 
     <p>This page allows you to register your client with the
-        MyProxy delegation service that supports the OAuth 1.0a protocol.
+        OA4MP service that supports the OAuth 1.0a protocol.
         To get your client approved,
         please fill out the form below. Your request will be evaluated for approval. For more information,
         please make sure you read the

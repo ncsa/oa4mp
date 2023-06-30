@@ -7,10 +7,10 @@
 </head>
 <body>
 <form action="${actionToTake}" method="post">
-    <h2>Welcome to the MyProxy Delegation Service Client Registration Page</h2>
+    <h2>Welcome to the OA44MP Client Registration Page</h2>
 
-    <p>This page allows you to register your client with the
-        MyProxy delegation service that supports the OIDC/OAuth 2. To get your client approved,
+    <p>This page allows you to register your client with OA4MP.
+        To get your client approved,
         please fill out the form below. Your request will be evaluated for approval. For more information,
         please make sure you read the
         <a href="http://grid.ncsa.illinois.edu/myproxy/oauth/client/manuals/registering-with-an-oauth2-server.xhtml"
@@ -59,6 +59,13 @@
         <tr>
             <td>Issuer (optional):</td>
             <td><input type="text" size="25" name="${issuer}" value="${issuerValue}"/></td>
+        </tr>
+        <tr>
+            <td>Public Key (optional):</td>
+            <td>
+                       <textarea id="${clientPublicKey}" rows="20" cols="80"
+                                 name="${clientPublicKey}">${clientPublicKeyValue}</textarea>
+            </td>
         </tr>
         <tr>
             <td></td>

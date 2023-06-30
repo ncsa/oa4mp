@@ -123,4 +123,21 @@ public class AuthorizationServletConfig {
     public boolean isUseHeader() {
         return useHeader;
     }
+
+    @Override
+    public String toString() {
+        return "AuthorizationServletConfig{" +
+                "useProxy=" + useProxy +
+                ", cfgFile='" + cfgFile + '\'' +
+                ", cfgName='" + cfgName + '\'' +
+                ", showLogon=" + showLogon +
+                ", verifyUsername=" + verifyUsername +
+                ", useHeader=" + useHeader +
+                ", requireHeader=" + requireHeader +
+                ", headerFieldName='" + headerFieldName + '\'' +
+                ", returnDnAsUsername=" + returnDnAsUsername +
+                ", authorizationURI='" + authorizationURI + '\'' +
+                ", convertDNToGlobusID=" + convertDNToGlobusID +
+                '}';
+    }
 }

@@ -748,7 +748,7 @@ public class CLC implements QDLModuleMetaClass {
     protected static final String PARAM_FLAG_REFRESH_SHORT = "r";
 
     protected static final String PARAM_FLAG_EXCHANGE = "exchange";
-    protected static final String PARAM_FLAG_EXCHANGE_SHORT = "e";
+    protected static final String PARAM_FLAG_EXCHANGE_SHORT = "x";
 
     public class SetParam implements QDLFunction {
         @Override

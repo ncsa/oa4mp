@@ -4,13 +4,18 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractRegistrationServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.NewClientEvent;
-import edu.uiuc.ncsa.security.core.exceptions.RetryException;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.Client;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Scopes;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.LDAPConfiguration;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.LDAPConfigurationUtil;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval;
+import edu.uiuc.ncsa.security.core.exceptions.RetryException;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.servlet.PresentableState;
+import edu.uiuc.ncsa.security.util.crypto.KeyUtil;
+import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
+import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
+import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import net.sf.json.JSON;
 import net.sf.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
@@ -22,10 +27,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URI;
+import java.security.PublicKey;
 import java.security.SecureRandom;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedList;
+import java.security.interfaces.RSAPublicKey;
+import java.util.*;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -48,14 +53,16 @@ public class OA2RegistrationServlet extends AbstractRegistrationServlet {
 
     protected Collection<String> getDisplayScopes() {
         Collection<String> displayScopes = new HashSet<>();
-        for (String x : OA2Scopes.basicScopes) {
+/*        for (String x : OA2Scopes.basicScopes) {
             displayScopes.add(x);
-        }
+        }*/
         displayScopes.addAll(getOA2SE().getScopes());
         if (!displayScopes.contains(OA2Scopes.SCOPE_OFFLINE_ACCESS)) {
             displayScopes.add(OA2Scopes.SCOPE_OFFLINE_ACCESS);
         }
-        return displayScopes;
+        TreeSet<String> d = new TreeSet<>();
+        d.addAll(displayScopes);
+        return d; // unique-fies them since we can get repeats
     }
 
     @Override
@@ -161,14 +168,51 @@ public class OA2RegistrationServlet extends AbstractRegistrationServlet {
         if (client.isPublicClient()) {
             client.setSecret("(no secret)");
         } else {
-            // Now generate the client secret. We generate this here:
-            byte[] bytes = new byte[getOA2SE().getClientSecretLength()];
-            random.nextBytes(bytes);
-            String secret64 = Base64.encodeBase64URLSafeString(bytes);
-            // we have to return this to the client registration ok page and store a hash of it internally
-            // so we don't have a copy of it any place but the client.
-            // After this is displayed the secret is actually hashed and stored.
-            client.setSecret(secret64);
+            // https://github.com/ncsa/oa4mp/issues/111
+            String publicKey = getParameter(request, CLIENT_PUBLIC_KEY);
+            if (StringUtils.isTrivial(publicKey)) {
+                // Now generate the client secret. We generate this here:
+                byte[] bytes = new byte[getOA2SE().getClientSecretLength()];
+                random.nextBytes(bytes);
+                String secret64 = Base64.encodeBase64URLSafeString(bytes);
+                // we have to return this to the client registration ok page and store a hash of it internally
+                // so we don't have a copy of it any place but the client.
+                // After this is displayed the secret is actually hashed and stored.
+                client.setSecret(secret64);
+            } else {
+                client.setSecret("(no secret)");
+                JSONWebKeys jsonWebKeys;
+                boolean gotKey = false;
+                try {
+                    PublicKey publicKey1 = KeyUtil.fromX509PEM(publicKey);
+                    // create the key
+                    JSONWebKey jsonWebKey = new JSONWebKey();
+                    jsonWebKey.publicKey = publicKey1;
+                    Random random = new Random();
+                    byte[] bytes = new byte[8];
+                    random.nextBytes(bytes);
+                    if (publicKey1 instanceof RSAPublicKey) {
+                        jsonWebKey.type = "RSA";
+                    } else {
+                        throw new ClientRegistrationRetryException("The public key is not a supported type. Only RSA keys are supported.", null, client);
+                    }
+                    jsonWebKey.id = Base64.encodeBase64URLSafeString(bytes);
+                    jsonWebKey.use = "sig";
+                    jsonWebKey.algorithm = "RS256";
+                    jsonWebKeys = new JSONWebKeys(jsonWebKey.id);
+                    jsonWebKeys.put(jsonWebKey);
+                    gotKey = true;
+                } catch (Throwable t) {
+                    try {
+                        publicKey = publicKey.replace("\n", " "); // deserializer chokes on returns
+                        publicKey = publicKey.replace("\r", " "); // deserializer chokes on returns
+                        jsonWebKeys = JSONWebKeyUtil.fromJSON(publicKey);
+                    } catch (Throwable tt) {
+                        throw new ClientRegistrationRetryException("The public key could not be parsed as PKCS or JWK.", null, client);
+                    }
+                }
+                client.setJWKS(jsonWebKeys);
+            }
         }
 
         LinkedList<String> uris = OA2ClientUtils.createCallbacksForWebUI(client, rawCBs);

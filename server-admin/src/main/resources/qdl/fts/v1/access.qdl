@@ -1,0 +1,50 @@
+/*
+  Do the access (very first) phase here. In this phase, the information is gotten from LDAP
+  for the capability set and all capabilities are returned (this is a query) along
+  with any extras.
+*/
+block[
+    theta. := []~mask(scopes. , -1 < starts_with(scopes., CS_HEAD)); //requested capability sets
+    trace('FNAL', 'CS_HEAD ==' + to_string(CS_HEAD));
+    trace('FNAL', 'scopes. ==' + to_string(scopes.));
+    trace('FNAL', 'theta. == ' + to_string(theta.));
+      if[0 == size(theta.)] // no requested capabilities
+    then[err('No requested capabilities.', 'access_denied');];
+
+      if[1 < size(theta.)]        // Only one capability set at most is allowed.
+    then[err('Multiple capabilities not allowed','access_denied')];
+
+    if[!has_value(theta.0, at_claims.EPE.)] // make sure that the requested scope is in the claim
+    then[err('User does not have access to this capability set.','access_denied')];
+
+    xi. := resolve_templates(at_claims.EPE., scopes., true);  // first pass, get explicitly allowed scopes
+
+    ccc := theta.0 - CS_HEAD;
+    record. :=  script_load('fnal/new/get_service.qdl',  ccc+'@fnal.gov');
+         // Check that the user does indeed have access to this capability set.
+
+    trace('FNAL', 'record =' + to_string(record.));
+    xi. := mask(xi., xi. != theta.0); // remove capability set from returned scopes.
+    trace('FNAL', 'xi after CS remove =' + to_string(xi.));
+
+    if[
+       	0 < size(record.)
+      ][
+        if[is_defined(record.VOPAUID)][claims.vault_uid := record.VOPAUID;];
+        if[is_defined(record.EPPN)][access_token.sub := record.EPPN;];
+        if[
+             is_defined(record.EPE.)
+          ][
+             // do any substitutions in the templates.
+             s_rec. := template_substitution(record.EPE., claims.);
+             trace('FNAL','eta. post subst =' + to_string(s_rec.));
+             // Get any specific overrides.
+             eta. := resolve_templates(s_rec., scopes., true);
+             trace('FNAL', 'eta. =' + to_string(eta.));
+             xi. := xi. ~ eta. ~ s_rec.; // duplicates ok here, removed later
+         ]; // no capabilites means do nothing.
+      ];
+
+   access_token.scope := detokenize(unique(xi.), ' ', 2); // turn in to string, omit duplications, trailing space
+   if[is_defined(record.EPPN)][access_token.sub := record.EPPN;];  // ⍝
+];

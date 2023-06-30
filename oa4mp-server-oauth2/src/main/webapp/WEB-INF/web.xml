@@ -119,7 +119,7 @@
         <url-pattern>/register</url-pattern>
     </servlet-mapping>
 
-    <servlet>
+<!--    <servlet>
         <servlet-name>client</servlet-name>
         <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.ClientServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
@@ -127,7 +127,7 @@
     <servlet-mapping>
         <servlet-name>client</servlet-name>
         <url-pattern>/clients</url-pattern>
-    </servlet-mapping>
+    </servlet-mapping>-->
 
     <servlet>
         <servlet-name>userInfo</servlet-name>
@@ -157,7 +157,6 @@
          <servlet-name>introspect</servlet-name>
          <url-pattern>/introspect</url-pattern>
      </servlet-mapping>
-<!--
     <servlet-mapping>
         <servlet-name>sas</servlet-name>
         <url-pattern>/sas/*</url-pattern>
@@ -166,7 +165,7 @@
         <servlet-name>sas</servlet-name>
         <servlet-class>edu.uiuc.ncsa.qdl.sas.QDLSASServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
-    </servlet>-->
+    </servlet>
     <!--
       The next section should be uncommented if you are running this as a standalone service under Tomcat.
       This forces all network traffic to run over SSL.  If you are running this under Apache, then you should

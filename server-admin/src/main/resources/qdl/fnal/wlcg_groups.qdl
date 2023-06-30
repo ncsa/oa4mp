@@ -12,6 +12,15 @@
     Author: Jeff Gaynor
    Created: 2021-06-18T21:36:17.458Z
 
+   Arg #0 is the key. This may accept
+     (a) simply wlcg.groups in which case all groups are returned
+     (b) A list of them in the scopes, e.g. wlcg.groups:/cms/uscms wlcg.groups:/cms/ALARM in which
+         case a list (in order requested) is returned.
+
+   Typically arg #1 is the isMemberOf claims, though it can be from other sources. The spec says that
+   groups are (only) returned in the access token, so unless there is a policy to return them in the
+   identity token as well, make sure you only hand back one copy.
+
 */
         scopes. ≔  script_args(0);
   found_groups. ≔  script_args(1);
@@ -21,21 +30,18 @@
           caput ≔  w + ':'; // head of WLCG requested group.
   group_scopes. ≔  mask(scopes., ¯1 < starts_with(scopes., [w])); // get things that start with w
     say(to_string(group_scopes.));
-    //if[(w∉group_scopes.) && size(group_scopes.) ≡ 0][return([]);]; // no requested wlcg groups.
-  //        has_w ≔  w ∈ group_scopes.;  // check if single scope of wlcg.groups is passed in
+
           has_w ≔  reduce(@∨, group_scopes. ≡ w);  // check if single scope of wlcg.groups is passed in
           has_w ≔  has_w ≡ null ? false:has_w; // if group_scopes is gobbledy-gook, has_w may be null. Fix it.
   group_scopes. ≔  mask(group_scopes., group_scopes. ≠ w); // whack it off if it is there,
 
-  if[(¬has_w) && size(group_scopes.) ≡ 0][return([]);]; // no requested wlcg groups.
+    if[(¬has_w) && size(group_scopes.) ≡ 0]
+  then[return([]);]; // no requested wlcg groups.
 
   group_scopes. ≔  ~group_scopes. - caput;
 
-  if[
-      size(group_scopes.) ≤ 0
-   ][
-      return(~mask(found_groups., found_groups. ≠ w));
-  ];
+    if[size(group_scopes.) ≤ 0]
+  then[return(~mask(found_groups., found_groups. ≠ w));];
 
   return(~mask(group_scopes., has_value(group_scopes., found_groups.)));
 /*

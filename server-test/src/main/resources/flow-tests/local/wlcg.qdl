@@ -1,8 +1,8 @@
 #! /usr/bin/env -S qdl-run
 
 /*
-   Tests the client with scitokens configuratioin
-   Client config 2022-11-09
+   Tests the client with WLCG configuration
+   Client config 2023-06-16
 {"tokens": {
  "access":  {
   "audience": "https://wlcg.cern.ch/jwt/v1/any",
@@ -26,6 +26,9 @@
  }
 }}
 
+Look at the specification at
+
+https://indico.cern.ch/event/769180/contributions/3563095/attachments/1908176/3152124/WLCG_Common_JWT_Profiles.pdf
 
 */
 path := '/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests';
@@ -75,10 +78,15 @@ define[test(tokens., claims., expected_scopes., user_id)][
     ⊨ ∃at.'wlcg.ver' : 'missing WLCG version';
     ⊨ ∃at.'iat' : 'missing iat claim';
     ⊨ ∃at.'exp' : 'missing exp claim';
+    ⊨ ∃at.'aud' : 'missing aud claim';
+    ⊨ ∃at.'iss' : 'missing iss claim';
+    ⊨ ∃at.'jti' : 'missing jti claim';
+    ⊨ ∃at.'sub' : 'missing sub claim';
     ⊨ at.'wlcg.ver' ≡ '1.0' : 'wrong WLCG version';
     ⊨ at.'sub' ≡ ((∃claims.'eppn')?claims.'eppn':user_id) : 'wrong AT subject'; // OA4MP policy is to return the eppn if present.
     ⊨ at.'iss' ≡ issuer : 'wrong AT issuer';
     ⊨ at.'aud' ≡ 'https://wlcg.cern.ch/jwt/v1/any' : 'wrong AT audience';
+    // We are setting the RT to be a JWT because it is a common use case.
     ⊨ rt.'aud' ≡ 'https://wlcg.cern.ch/jwt/v1/any' : 'wrong RT audience';
     ⊨ tokens.'refresh_token'.'lifetime' - 900000 < 2000 : 'wrong refresh token lifetime';
     ⊨ reduce(@∧, expected_scopes. ∈ s.) : 'incorrect AT scopes';

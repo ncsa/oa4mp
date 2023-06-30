@@ -8,6 +8,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionList;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionsStore;
 import edu.uiuc.ncsa.myproxy.oauth2.base.BaseClientStoreCommands;
 import edu.uiuc.ncsa.myproxy.oauth2.base.ClientApprovalStoreCommands;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.BaseClient;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.security.core.Identifiable;
@@ -207,7 +208,9 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
         }
         for (Identifier id : admins) {
             AdminClient adminClient = (AdminClient) getStore().get(id);
-            say(format(adminClient, (ClientApproval) getClientApprovalStore().get(adminClient.getIdentifier())));
+            if (adminClient != null) { // if there are dead ids in the store, don't bomb with an NPE.
+                say(format(adminClient, (ClientApproval) getClientApprovalStore().get(adminClient.getIdentifier())));
+            }
         }
         say(admins.size() + " admin clients");
 
@@ -465,5 +468,13 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
     public void bootstrap() throws Throwable {
         super.bootstrap();
         getHelpUtil().load("/help/admin_help.xml");
+    }
+
+    @Override
+    protected BaseClient approvalMods(InputLine inputLine, BaseClient client) throws IOException{
+        // Fix https://github.com/ncsa/oa4mp/issues/109
+        AdminClient adminClient = (AdminClient)  client;
+        adminClient.setAllowQDL("y".equals(getInput("Allow QDL in scripts?(y/n)", adminClient.isAllowQDL()?"y":"n")));
+        return adminClient;
     }
 }

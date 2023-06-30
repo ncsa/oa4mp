@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Scopes;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
@@ -28,7 +29,7 @@ import static edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse.RC_NOT_RUN
  * <p>Created by Jeff Gaynor<br>
  * on 4/21/20 at  5:00 PM
  */
-public abstract class AbstractPayloadHandler implements PayloadHandler {
+public abstract class AbstractPayloadHandler implements PayloadHandler, OA2Scopes {
     protected OA2ServiceTransaction transaction;
     protected OA2SE oa2se;
     protected JSONObject claims;

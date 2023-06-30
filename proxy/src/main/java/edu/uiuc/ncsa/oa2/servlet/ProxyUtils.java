@@ -220,6 +220,10 @@ public class ProxyUtils {
      */
     protected static OA2CLCCommands createCLC(OA2SE oa2SE, OA2ServiceTransaction t) throws Throwable {
         AuthorizationServletConfig asc = oa2SE.getAuthorizationServletConfig();
+        if(t.getClient().isDebugOn()){
+            oa2SE.getMyLogger().debug("authz servlet config = " + asc);
+        }
+
         // next line is where the CLC is first created in the flow, so can't call getCLC
         OA2CLCCommands clcCommands = new OA2CLCCommands(true, oa2SE.getMyLogger(), new OA2CommandLineClient(oa2SE.getMyLogger()));
         clcCommands.setUseClipboard(false); // Don't put stuff in the clipboard.

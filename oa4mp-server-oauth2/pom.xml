@@ -81,6 +81,11 @@
             <version>42.4.3</version>
         </dependency>
         <dependency>
+            <groupId>edu.uiuc.ncsa.qdl</groupId>
+            <artifactId>sas</artifactId>
+            <version>1.5-QDL-SNAPSHOT</version>
+        </dependency>
+        <dependency>
             <groupId>org.mariadb.jdbc</groupId>
             <artifactId>mariadb-java-client</artifactId>
             <version>3.0.8</version>

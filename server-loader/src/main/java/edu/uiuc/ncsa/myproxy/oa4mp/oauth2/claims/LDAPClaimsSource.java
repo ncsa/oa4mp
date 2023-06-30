@@ -295,21 +295,32 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
     public LdapContext createConnection(MetaDebugUtil debugger) {
         // Set up the environment for creating the initial context
         StringTokenizer stringTokenizer = new StringTokenizer(getLDAPCfg().getServer(), ",");
-        Throwable lastException;
 
         DirContext dirContext = null;
-        while (stringTokenizer.hasMoreTokens()) {
-            try {
-                currentServerAddress = stringTokenizer.nextToken();
-                dirContext = new InitialDirContext(createEnv(currentServerAddress, getLDAPCfg()));
-                debugger.trace(this, "Found LDAP server for address=\"" + currentServerAddress + "\"");
-                return (LdapContext) dirContext.lookup(getLDAPCfg().getSearchBase());
-
-            } catch (Throwable e) {
-                // Do nothing. Allow for errors.
-                debugger.trace(this, "failed to get any LDAP directory context", e);
-
+        // Fix https://github.com/ncsa/oa4mp/issues/113
+        int retryCount = Math.max(1, getLDAPCfg().getRetryCount()); // make sure it trips once
+        for(int i = 0; i < retryCount; i++){
+            while (stringTokenizer.hasMoreTokens()) {
+                try {
+                    currentServerAddress = stringTokenizer.nextToken().trim(); // chop out extra blanks!
+                    dirContext = new InitialDirContext(createEnv(currentServerAddress, getLDAPCfg()));
+                    debugger.trace(this, "Found LDAP server for address=\"" + currentServerAddress + "\"");
+                    return (LdapContext) dirContext.lookup(getLDAPCfg().getSearchBase());
+                } catch (Throwable e) {
+                    // Do nothing. Allow for errors.
+                    debugger.trace(this, "failed to get any LDAP directory context, count # " + i, e);
+                }
             }
+           if(0 < getLDAPCfg().getMaxWait()){
+               try {
+                   Thread.currentThread().sleep(getLDAPCfg().getMaxWait());
+               } catch (InterruptedException e) {
+                   if(DebugUtil.isEnabled()) {
+                       e.printStackTrace();
+                   }
+                   info("sleep in " + getClass().getSimpleName() + " + interrupted:" + e.getMessage());
+               }
+           }
         }
         return null;
     }
@@ -674,6 +685,8 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
         if (arg.containsKey(CS_LDAP_SEARCH_SCOPE)) {
             ldapCfg.setSearchScope(arg.getString(CS_LDAP_SEARCH_SCOPE));
         }
+
+
         if (arg.containsKey(CS_DEFAULT_IS_ENABLED)) {
             ldapCfg.setEnabled(arg.getBoolean(CS_DEFAULT_IS_ENABLED));
         } else {
@@ -786,6 +799,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
         if (cfg2.hasSearchScope()) {
             stem.put(CS_LDAP_SEARCH_SCOPE, cfg2.getSearchScope());
         }
+
         if (cfg2.getAuthType() == LDAPConfigurationUtil.LDAP_AUTH_SIMPLE_KEY) {
             stem.put(CS_LDAP_PASSWORD, cfg2.getPassword());
             stem.put(CS_LDAP_SECURITY_PRINCIPAL, cfg2.getSecurityPrincipal());

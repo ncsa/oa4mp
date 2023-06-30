@@ -16,39 +16,27 @@
     }}}
 
 */
- SS('IGWN','starting init.');
+
+
+ trace('IGWN','starting init.');
        all_audience. := ['ANY', 'LIGO', 'segments.ligo.org'];
          robot_caput := 'igwn.robot:'; // marker in scopes for robots
   access_token.'ver' := 'scitoken:2.0';
 
- SS('IGWN', script_args()  + '=' + to_string(script_args(-1)));
+ trace('IGWN', script_args()  + '=' + to_string(script_args(-1)));
  // is_igwn := script_args()==1?script_args(0)=='igwn':false;
- SS('IGWN','is_igwn=='+ is_igwn);
+ trace('IGWN','is_igwn=='+ is_igwn);
 
    if [!is_defined(claims.'eppn')]
  then [err('Missing EPPN. Cannot determine scopes.', 'invalid_request');];
- /*
-   New authZ policies as per https://docs.google.com/presentation/d/1WbfUwAE6xTVeC2ZhKKHTQF0_6deKa14ieErRz5pD77M/edit#slide=id.g1677b86136f_0_16
-
-  scope (old)       scope (new)         group(s)
-  read:/frames      read:/frames        Communities:LSCVirgoLIGOGroupMembers
-                    gwdatafind.read     gw-astronomy:KAGRA-LIGO:members
-  write:/frames     write:/frames       Services:XRootD:SciTokens:write-frames:authorized
-  query:/DQSegDB    dqsegdb.read        Communities:LSCVirgoLIGOGroupMembers
-                                        gw-astronomy:KAGRA-LIGO:members
-  insert:/DQSegDB   dqsegdb.create      Communities:LVC:SegDB:SegDBWriter
-  read:/GraceDB     gracedb.read        Communities:LSCVirgoLIGOGroupMembers
-                                        gw-astronomy:KAGRA-LIGO:members
-  write:/GraceDB    N/A                 N/A (managed via service ACLs)
-
- */
-          ζ.'Services:OSGPilotTest:SciTokens:scope_create' := ['scope_create'];
+           ζ.'Services:OSGPilotTest:SciTokens:scope_create' := ['scope_create'];
         ζ.'Services:OSGPilotTest:SciTokens:compute_create' := ['compute_create'];
         ζ.'Services:OSGPilotTest:SciTokens:compute_cancel' := ['compute_cancel'];
         ζ.'Services:OSGPilotTest:SciTokens:compute_modify' := ['compute_modify'];
           ζ.'Services:OSGPilotTest:SciTokens:compute_read' := ['compute_read'];
 
-    if[is_igwn][
+    if[is_igwn]
+  then[
     // These are documented in https://git.ligo.org/computing/igwnscitokenscopes/-/blob/main/SciTokenScopes.json
                                                   all_audience. := ['ANY'];
     // The following are created with the extract.qdl script and pasted here.
@@ -76,19 +64,17 @@
     ζ.'Services:SciTokenTesting:SciTokens:scopes:read:authorized' ≔ ['scitokentesting.read'];
    ζ.'Services:SciTokenTesting:SciTokens:scopes:write:authorized' ≔ ['scitokentesting.write'];
 
+    ]
+   else[
+                              ζ.'gw-astronomy:KAGRA-LIGO:members' := ['read:/GraceDB', 'read:/frames','write:/GraceDB']; //CIL-1345, CIL-1427
+                            ζ.'Communities:LVC:SegDB:SegDBWriter' := ['write:/DQSegDB'];
+                         ζ.'Communities:LSCVirgoLIGOGroupMembers' := ['read:/DQSegDB' ,'read:/frames', 'read:/GraceDB','write:/GraceDB'];   //CIL-1345
+             ζ.'Services:XRootD:SciTokens:read-frames:authorized' := ['read:/frames']; //CIL-1415
+            ζ.'Services:XRootD:SciTokens:write-frames:authorized' := ['write:/frames']; //CIL-1414,
+    ]; // end else
 
-    ]else[
-                  ζ.'Communities:LSCVirgoLIGOGroupMembers' := ['read:/DQSegDB' ,'read:/frames', 'read:/GraceDB','write:/GraceDB'];   //CIL-1345
-                     ζ.'Communities:LVC:SegDB:SegDBWriter' := ['write:/DQSegDB'];
-                       ζ.'gw-astronomy:KAGRA-LIGO:members' := ['read:/GraceDB', 'read:/frames','write:/GraceDB']; //CIL-1345, CIL-1427
-     ζ.'Services:XRootD:SciTokens:write-frames:authorized' := ['write:/frames']; //CIL-1414,
-      ζ.'Services:XRootD:SciTokens:read-frames:authorized' := ['read:/frames']; //CIL-1415
-    ];
         get_permissions(γ.) -> reduce(@~,ζ\(γ\*\name));
- //     get_permissions(γ.) -> ~values(mask(ζ., in_group2(keys(ζ.),γ.)));
-
          robots. := ~mask(scopes., 0 == starts_with(scopes., robot_caput));
-SS('*** LIGO -- robots = ' + to_string(robots.));
       if [1 < size(robots.)]
     then [err('too many robots (' + size(robots.) +')','access_denied');];
 
@@ -99,4 +85,3 @@ SS('*** LIGO -- robots = ' + to_string(robots.));
 
      // Scope setup.
     requested_scopes. := (0 < size(tx_scopes.))?tx_scopes.:scopes.;
-

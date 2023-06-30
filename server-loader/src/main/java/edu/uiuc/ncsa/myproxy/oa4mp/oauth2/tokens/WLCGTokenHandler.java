@@ -29,15 +29,25 @@ public class WLCGTokenHandler extends AbstractAccessTokenHandler implements WLCG
     public void setAccountingInformation() {
         super.setAccountingInformation();
         JSONObject atData = getAtData();
-
+        // NOTE: wlcg.groups are not processed here since the source for them is not
+        // canonical, i.e., they may come from any of a number of sources so there is
+        // just no way to know a priori what to use. 
+        // See P. 17 https://indico.cern.ch/event/769180/contributions/3563095/attachments/1908176/3152124/WLCG_Common_JWT_Profiles.pdf
+        // These are therefore normally done in QDL.
         atData.put(WLCG_VERSION_TAG, WLCG_VERSION_1_0);
+        // We set the subject to the EPPN if it is present.
         if (transaction.getUserMetaData() != null && transaction.getUserMetaData().containsKey("eppn")) {
             atData.put(SUBJECT, transaction.getUserMetaData().getString("eppn"));
         }
-       if(getClaims().containsKey(RFC9068Constants.AUTHENTICATION_CLASS_REFERENCE)){
-           atData.put(RFC9068Constants.AUTHENTICATION_CLASS_REFERENCE, getClaims().get(RFC9068Constants.AUTHENTICATION_CLASS_REFERENCE));
-       }
-       atData.put("auth_time", transaction.getAuthTime().getTime()/1000);
+        // WLCG also supports a few constants from the 9068 spec.
+        if (getClaims().containsKey(RFC9068Constants.AUTHENTICATION_CLASS_REFERENCE)) {
+            atData.put(RFC9068Constants.AUTHENTICATION_CLASS_REFERENCE, getClaims().get(RFC9068Constants.AUTHENTICATION_CLASS_REFERENCE));
+        }
+        atData.put(RFC9068Constants.AUTHENTICATION_TIME, transaction.getAuthTime().getTime() / 1000);
+        // Some IDPS might also include this. Send it along if present.
+        if (getClaims().containsKey(EDUPERSON_ASSURANCE)) {
+            atData.put(EDUPERSON_ASSURANCE, getClaims().get(EDUPERSON_ASSURANCE));
+        }
         if (getATConfig().getAudience().isEmpty()) {
             atData.put(AUDIENCE, DEFAULT_AUDIENCE);
         } else {

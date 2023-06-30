@@ -1,9 +1,9 @@
 package edu.uiuc.ncsa.myproxy.oauth2.tools;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionKeys;
-import edu.uiuc.ncsa.myproxy.oauth2.base.StoreCommands2;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.Permission;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionKeys;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionsStore;
+import edu.uiuc.ncsa.myproxy.oauth2.base.StoreCommands2;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
@@ -92,20 +92,6 @@ public class OA2PermissionCommands extends StoreCommands2 {
         return false;
     }
 
-/*    @Override
-    protected void longFormat(Identifiable identifiable) {
-        Permission p = (Permission) identifiable;
-        sayi("client id=" + p.getClientID());
-        sayi("admin id=" + p.getAdminID());
-        sayi("can approve?=" + p.isApprove());
-        sayi("can read?=" + p.isRead());
-        sayi("can write?=" + p.isWrite());
-        sayi("can delete?=" + p.isDelete());
-        sayi("can create?=" + p.isCreate());
-
-    }*/
-
-
 
     protected void removeEntry(Identifiable identifiable, JSONObject json) {
         HashMap<String, Object> map = new HashMap();
@@ -125,4 +111,6 @@ public class OA2PermissionCommands extends StoreCommands2 {
         super.bootstrap();
         getHelpUtil().load("/help/permission_help.xml");
     }
+
+
 }

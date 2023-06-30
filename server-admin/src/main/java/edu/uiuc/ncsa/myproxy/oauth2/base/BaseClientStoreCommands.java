@@ -309,6 +309,8 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
         }
 
         BaseClient client = (BaseClient) findItem(inputLine);
+        // Fix https://github.com/ncsa/oa4mp/issues/109
+        client = approvalMods(inputLine, client);
         ClientApproval ca = null;
         if (getClientApprovalStore().containsKey(client.getIdentifier())) {
             ca = (ClientApproval) getClientApprovalStore().get(client.getIdentifier());
@@ -317,10 +319,22 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
             ca.setIdentifier(client.getIdentifier());
         }
         // now we have the right approval record for this identifier
-        clientApprovalStoreCommands.approve(ca);
-
+        if(clientApprovalStoreCommands.approve(ca)){
+            getStore().save(client); // if they approve it, save any changes made in approvalMods
+        }
     }
 
+    /**
+     * If there are modifications to the client before saving its approval (e.g.
+     * admin clients should be prompted for QDL policy) put it here.
+     *
+     * @param inputLine
+     * @param client
+     * @return
+     */
+    protected BaseClient approvalMods(InputLine inputLine, BaseClient client) throws IOException {
+        return client;
+    }
 
     @Override
     protected void rmCleanup(Identifiable x) {
@@ -629,7 +643,7 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
         String hash = DigestUtils.sha1Hex(secret);
         client.setSecret(hash);
         getStore().save(client);
-        if(-1 < secret.indexOf(" ")){
+        if (-1 < secret.indexOf(" ")) {
             // If there are blanks, put quotes around it.
             secret = "\"" + secret + "\"";
         }

@@ -245,4 +245,31 @@ public class ClaimSourceConfiguration implements Serializable {
                 ", omitList=" + omitList +
                 '}';
     }
+
+    int retryCount = 1;
+    long maxWait = 0L;
+
+    /**
+     * How many times to retry connecting.
+     * @return
+     */
+    public int getRetryCount() {
+        return retryCount;
+    }
+
+    public void setRetryCount(int retryCount) {
+        this.retryCount = retryCount;
+    }
+
+    /**
+     * How long to sleep between connection retries in LDAP
+     * @return
+     */
+    public long getMaxWait() {
+        return maxWait;
+    }
+
+    public void setMaxWait(long maxWait) {
+        this.maxWait = maxWait;
+    }
 }

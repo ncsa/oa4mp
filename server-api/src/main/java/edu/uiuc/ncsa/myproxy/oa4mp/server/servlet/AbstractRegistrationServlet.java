@@ -2,13 +2,13 @@ package edu.uiuc.ncsa.myproxy.oa4mp.server.servlet;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.NewClientEvent;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.NewClientListener;
-import edu.uiuc.ncsa.security.core.exceptions.RetryException;
-import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
-import edu.uiuc.ncsa.oa4mp.delegation.server.request.IssuerResponse;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.oa4mp.delegation.common.servlet.TransactionState;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.BaseClient;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.Client;
+import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
+import edu.uiuc.ncsa.oa4mp.delegation.server.request.IssuerResponse;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval;
+import edu.uiuc.ncsa.security.core.exceptions.RetryException;
 import edu.uiuc.ncsa.security.servlet.*;
 
 import javax.servlet.ServletException;
@@ -70,11 +70,12 @@ public abstract class AbstractRegistrationServlet extends MyProxyDelegationServl
                 request.setAttribute(CLIENT_EMAIL, CLIENT_EMAIL);
                 request.setAttribute(CLIENT_PROXY_LIMITED, CLIENT_PROXY_LIMITED);
                 request.setAttribute(CLIENT_IS_PUBLIC, CLIENT_IS_PUBLIC);
+                request.setAttribute(CLIENT_PUBLIC_KEY, CLIENT_PUBLIC_KEY);
 
 
                 request.setAttribute(CLIENT_ACTION_KEY, CLIENT_ACTION_KEY);
                 request.setAttribute(CLIENT_ACTION_REQUEST_VALUE, CLIENT_ACTION_REQUEST_VALUE);
-                System.out.println("context path = " + request.getContextPath() + ", servlet path =" + request.getServletPath() + ", request utl = " + request.getRequestURL()); 
+                System.out.println("context path = " + request.getContextPath() + ", servlet path =" + request.getServletPath() + ", request utl = " + request.getRequestURL());
                 request.setAttribute("actionToTake", request.getContextPath() + request.getServletPath());
                 break;
             case REQUEST_STATE:
@@ -90,7 +91,8 @@ public abstract class AbstractRegistrationServlet extends MyProxyDelegationServl
      * The page to display to the client for the initial request.
      */
     public static String INIT_PAGE = "/registration-init.jsp";
-    protected String getInitPage(){
+
+    protected String getInitPage() {
         return INIT_PAGE;
     }
 
@@ -98,7 +100,8 @@ public abstract class AbstractRegistrationServlet extends MyProxyDelegationServl
      * The name of a JSP page to display in  case of errors. The default is "registration-error.jsp".
      */
     public static String ERROR_PAGE = "/registration-error.jsp";
-    protected String getErrorPage(){
+
+    protected String getErrorPage() {
         return ERROR_PAGE;
     }
 
@@ -107,7 +110,8 @@ public abstract class AbstractRegistrationServlet extends MyProxyDelegationServl
      */
 
     public static String OK_PAGE = "/registration-ok.jsp";
-    protected String getOKPage(){
+
+    protected String getOKPage() {
         return OK_PAGE;
     }
 
@@ -230,9 +234,10 @@ public abstract class AbstractRegistrationServlet extends MyProxyDelegationServl
         }
     }
 
-    protected void save(BaseClient client){
-        getServiceEnvironment().getClientStore().save((Client)client);
+    protected void save(BaseClient client) {
+        getServiceEnvironment().getClientStore().save((Client) client);
     }
+
     /**
      * Sets the parameters from the request so they can be passed back.
      *
@@ -273,7 +278,6 @@ public abstract class AbstractRegistrationServlet extends MyProxyDelegationServl
     protected String emailPattern = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$";
 
 
-
     protected BaseClient setupNewClient(HttpServletRequest request, HttpServletResponse response) throws Throwable {
         // Assumption is that the request is in good order and we just have to pull stuff off it.
         Client client = getServiceEnvironment().getClientStore().create();
@@ -293,8 +297,10 @@ public abstract class AbstractRegistrationServlet extends MyProxyDelegationServl
 
         //client.setProxyLimited(getBooleanParam(request, CLIENT_PROXY_LIMITED));
         //https://github.com/rcauth-eu/OA4MP/commit/4d80fe4969d487719a35cda1faa8d603340b19b3
-        String limitedChecked=getParameter(request, CLIENT_PROXY_LIMITED);
-         client.setProxyLimited(limitedChecked != null && limitedChecked.equals("on"));
+        String limitedChecked = getParameter(request, CLIENT_PROXY_LIMITED);
+        client.setProxyLimited(limitedChecked != null && limitedChecked.equals("on"));
+
+
 
         getServiceEnvironment().getClientStore().save(client);
         info("Adding approval record for client=" + client.getIdentifierString());

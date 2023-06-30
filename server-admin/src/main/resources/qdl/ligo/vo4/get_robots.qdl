@@ -11,10 +11,11 @@
  */
    SS(x)->say(x);
      ini. := file_read('/home/ncsa/dev/csd/config/ini/ligo-ldap.ini',2).'ligo_prod';
-     SS(to_string(ini.));
+     trace(to_string(ini.));
      //ini. := file_read('vfs#/scripts/ligo/ldap.ini',2).'ligo';
      user := args().0; // This is actually the EPPN for the user.
-     SS('user'+user);
+       uid := head(user, '@');
+     trace('user'+user);
 
             ligo_cfg.'address' := ini.'address';
                ligo_cfg.'port' := 636;
@@ -32,13 +33,9 @@
                 ligo_response. := get_claims(create_source(ligo_cfg.), user);
                    SS('ligo_response.==' + to_string(ligo_response., true));
 
+  if [size(ligo_response.'isMemberOf') == 0]
+then [err('Missing group information. Cannot determine scopes.','access_denied');];
 
-if[
-      size(ligo_response.'isMemberOf') == 0
-  ]then[
-    raise_error('Missing group information. Cannot determine scopes.', oa4mp_error,{'error_type':'access_denied;'});
-];
-
-SS('*** LIGO access.qdl returns ' + to_string(ligo_response.));
+ligo_response.'uid':=uid;
 return(ligo_response.);
 

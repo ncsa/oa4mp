@@ -5,12 +5,12 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo.VirtualOrganization;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
-import edu.uiuc.ncsa.security.core.Identifier;
-import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.*;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.IDTokenHandlerInterface;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSource;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims;
+import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRunRequest;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse;
 import net.sf.json.JSONObject;
@@ -20,11 +20,11 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 
-import static edu.uiuc.ncsa.security.core.util.DebugUtil.trace;
-import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 import static edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants.AUTHORIZATION_TIME;
 import static edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants.NONCE;
 import static edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims.*;
+import static edu.uiuc.ncsa.security.core.util.DebugUtil.trace;
+import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 import static edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse.RC_NOT_RUN;
 import static edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse.RC_OK;
 import static edu.uiuc.ncsa.security.util.scripting.ScriptingConstants.*;
@@ -51,10 +51,10 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
         // So in order
         VirtualOrganization vo = oa2se.getVO(transaction.getClient().getIdentifier());
         DebugUtil.trace(this, "vo = " + vo);
-        if(vo != null){
+        if (vo != null) {
             issuer = vo.getIssuer();
             // if issuer set, return it.
-            if(!isTrivial(issuer)) {
+            if (!isTrivial(issuer)) {
                 return;
             }
         }
@@ -98,9 +98,9 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
         // It is possible that the claims are already somewhat populated. Only initialize
         // claims that have not been set.
         setClaimIfNeeded(claims, ISSUER, issuer);
-        setClaimIfNeeded(claims,OA2Claims.SUBJECT, transaction.getUsername());
+        setClaimIfNeeded(claims, OA2Claims.SUBJECT, transaction.getUsername());
 
-        setClaimIfNeeded(claims,AUDIENCE, transaction.getClient().getIdentifierString());
+        setClaimIfNeeded(claims, AUDIENCE, transaction.getClient().getIdentifierString());
         setClaimIfNeeded(claims, OA2Constants.ID_TOKEN_IDENTIFIER, ((OA2TokenForge) oa2se.getTokenForge()).getIDToken().getToken());
         // now set all the timestamps and such.
         setAccountingInformation();
@@ -125,7 +125,7 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
     }
 
     private void setClaimIfNeeded(JSONObject claims, String claimName, Object claimValue) {
-        if(!claims.containsKey(claimName)) {
+        if (!claims.containsKey(claimName)) {
             claims.put(claimName, claimValue);
         }
     }
@@ -232,29 +232,126 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
     @Override
     public void finish(String execPhase) throws Throwable {
         // only required one by the spec. and only if the server is OIDC.
+
+        if (oa2se.isOIDCEnabled()) {
+            checkClaim(getClaims(), SUBJECT); // checks they requested it and it exists. Throws exception if not
+        }
+
+        if (transaction.getScopes().contains(OA2Scopes.SCOPE_CILOGON_INFO) || !((OA2Client) transaction.getClient()).useStrictScopes()) {
+            permissiveFinish(execPhase);
+            return;
+        }
+        restrictiveFinish(execPhase);
+    }
+
+    /**
+     * Restrictive finish = user must explicitly request things and will be limited to them.
+     * The model here is that the claim source gets whatever, but the results are filtered
+     * to a restricted subset.
+     * @param execPhase
+     * @throws Throwable
+     */
+    protected void restrictiveFinish(String execPhase) throws Throwable {
+        JSONObject finalClaims = new JSONObject();
+        JSONObject c = new JSONObject();
+        c.putAll(getClaims());
+        // These are to present in every ID token.
+        String[] requiredClaims = new String[]{ISSUER,AUDIENCE,EXPIRATION,ISSUED_AT,JWT_ID,NONCE,AUTHORIZATION_TIME};
+        for(String r : requiredClaims){
+            setCurrentClaim(c, finalClaims, r);
+        }
+        // As per OIDC spec, if present MUST contain the identifier for the client
+        finalClaims.put(AUTHORIZED_PARTY,transaction.getClient().getIdentifierString());
+        if (transaction.getScopes().contains(OA2Scopes.SCOPE_OPENID)) {
+            setCurrentClaim(c, finalClaims, SUBJECT);
+            setCurrentClaim(c, finalClaims, AUTHENTICATION_CLASS_REFERENCE);
+            setCurrentClaim(c, finalClaims, AUTHENTICATION_METHOD_REFERENCE);
+        }
+        // CIL-1411 -- remove any claims not specifically requested by the user.
+        // We need this here since a policy set  may add claims that the user
+        // did not request.
+        if (transaction.getScopes().contains(SCOPE_EMAIL)) {
+            setCurrentClaim(c, finalClaims, EMAIL);
+            setCurrentClaim(c, finalClaims, EMAIL_VERIFIED); // we usually don't do this though.
+        }
+        if (transaction.getScopes().contains(SCOPE_PHONE)) {
+            setCurrentClaim(c, finalClaims, PHONE_NUMBER);
+            setCurrentClaim(c, finalClaims, PHONE_NUMBER_VERIFIED);
+        }
+
+        if (transaction.getScopes().contains(OA2Scopes.SCOPE_PROFILE)) {
+            setCurrentClaim(c, finalClaims, NAME);
+            setCurrentClaim(c, finalClaims, GIVEN_NAME);
+            setCurrentClaim(c, finalClaims, FAMILY_NAME);
+            setCurrentClaim(c, finalClaims, PREFERRED_USERNAME);
+        }
+        if (transaction.getScopes().contains(OA2Scopes.SCOPE_ADDRESS)) {
+            setCurrentClaim(c, finalClaims, ADDRESS);
+        }
+
+        // these are things that may be returned as user information
+        // Fix for https://github.com/ncsa/oa4mp/issues/112
+        if (transaction.getScopes().contains(OA2Scopes.SCOPE_USER_INFO)) {
+            setCurrentClaim(c, finalClaims, IDP);
+            setCurrentClaim(c, finalClaims, IDP_NAME);
+            setCurrentClaim(c, finalClaims, EPPN);
+            setCurrentClaim(c, finalClaims, EPTID);
+            setCurrentClaim(c, finalClaims, PAIRWISE_ID);
+            setCurrentClaim(c, finalClaims, SUBJECT_ID);
+            setCurrentClaim(c, finalClaims, OIDC);
+            setCurrentClaim(c, finalClaims, OPENID);
+            setCurrentClaim(c, finalClaims, OU);
+            setCurrentClaim(c, finalClaims, AFFILIATION);
+            setCurrentClaim(c, finalClaims, IS_MEMBER_OF);
+        }
+        transaction.setUserMetaData(finalClaims);
+    }
+
+    /**
+     * Permissive finish = whittle down certain claims that are not explicit, and
+     * pass back everythign else. This is needed for scripting where claims may
+     * be simply added. If a client is set to strict scopes, adding claims in a script
+     * will have them stripped off.
+     * CILogon uses this by default since the scopes they get come from SAML assertions
+     * @param execPhase
+     * @throws Throwable
+     */
+    protected void permissiveFinish(String execPhase) throws Throwable {
+        // only required one by the spec. and only if the server is OIDC.
         if (oa2se.isOIDCEnabled()) {
             checkClaim(getClaims(), SUBJECT);
         }
         // CIL-1411 -- remove any claims not specifically requested by the user.
         // We need this here since a policy set  may add claims that the user
         // did not request.
-        if(!transaction.getScopes().contains(OA2Scopes.SCOPE_EMAIL)){
+        if (!transaction.getScopes().contains(OA2Scopes.SCOPE_EMAIL)) {
             getClaims().remove(EMAIL);
+            getClaims().remove(EMAIL_VERIFIED);
         }
-        if(!transaction.getScopes().contains(OA2Scopes.SCOPE_PROFILE)){
-                    getClaims().remove(NAME);
-                    getClaims().remove(GIVEN_NAME);
-                    getClaims().remove(FAMILY_NAME);
-                    getClaims().remove(PREFERRED_USERNAME);
-                }
+        if (!transaction.getScopes().contains(SCOPE_PHONE)) {
+            getClaims().remove(PHONE_NUMBER);
+            getClaims().remove(PHONE_NUMBER_VERIFIED);
+        }
+        if (!transaction.getScopes().contains(OA2Scopes.SCOPE_PROFILE)) {
+            getClaims().remove(NAME);
+            getClaims().remove(GIVEN_NAME);
+            getClaims().remove(FAMILY_NAME);
+            getClaims().remove(PREFERRED_USERNAME);
+        }
+
+        // everything else gets passed back.
+    }
+
+    protected void setCurrentClaim(JSONObject currentClaims, JSONObject finalClaims, String key) {
+        if (currentClaims.containsKey(key) && currentClaims.get(key) != null) {
+            finalClaims.put(key, currentClaims.get(key));
+        }
     }
 
     @Override
     public void saveState() throws Throwable {
 
     }
-
-
 
 
     /**
@@ -265,27 +362,34 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
      * @throws Throwable
      */
     protected void checkRequiredScopes(OA2ServiceTransaction t) throws Throwable {
-        if(oa2se.isOIDCEnabled()){
-            if(t.getOA2Client().isPublicClient() && !t.getScopes().contains(OA2Scopes.SCOPE_OPENID)){
+        if (oa2se.isOIDCEnabled()) {
+            if (t.getOA2Client().isPublicClient() && !t.getScopes().contains(OA2Scopes.SCOPE_OPENID)) {
                 throw new OA2RedirectableError(OA2Errors.INVALID_SCOPE,
                         "invalid scope: no open id scope",
                         HttpStatus.SC_UNAUTHORIZED,
                         t.getRequestState(),
-                        t.getCallback(),t.getClient());
+                        t.getCallback(), t.getClient());
 
             }
-            if(t.getOA2Client().getScopes().contains(OA2Scopes.SCOPE_OPENID) && !t.getScopes().contains(OA2Scopes.SCOPE_OPENID)){
+            if (t.getOA2Client().getScopes().contains(OA2Scopes.SCOPE_OPENID) && !t.getScopes().contains(OA2Scopes.SCOPE_OPENID)) {
                 throw new OA2RedirectableError(OA2Errors.INVALID_SCOPE,
                         "invalid scope: no open id scope",
                         HttpStatus.SC_UNAUTHORIZED,
                         t.getRequestState(),
-                        t.getCallback(),t.getClient());
+                        t.getCallback(), t.getClient());
 
             }
 
         }
     }
 
+    /**
+     * Enforces that the claim exists in the claims argument. This is mostly
+     * used for the openid scope. An error is raised if ths claim is missing.
+     *
+     * @param claims
+     * @param claimKey
+     */
     protected void checkClaim(JSONObject claims, String claimKey) {
         if (claims.containsKey(claimKey)) {
             if (isEmpty(claims.getString(claimKey))) {

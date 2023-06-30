@@ -19,4 +19,6 @@ public interface WLCGConstants {
     String WLCG_TAG = "wlcg";
     String WLCG_VERSION_TAG = "wlcg.ver";
     String WLCG_VERSION_1_0 = "1.0";
+
+    String EDUPERSON_ASSURANCE= "eduperson_assurance";
 }

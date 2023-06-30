@@ -263,5 +263,4 @@ public class LDAPConfiguration extends JSONClaimSourceConfig {
         return true;
     }
 
-
 }

@@ -11,12 +11,29 @@ public interface OA2Claims {
      */
     public static String SUBJECT = "sub";
     public static String AUDIENCE = "aud";
+    public static String AUTHORIZED_PARTY = "azp";
     public static String RESOURCE = "resource"; // RFC8707
     public static String EXPIRATION = "exp";
     public static String ISSUED_AT = "iat";
     public static String NOT_VALID_BEFORE = "nbf";
     public static final String JWT_ID = "jti";
     public static final String AUTH_TIME = "auth_time";
+
+
+    String IDP = "idp";
+    String IDP_NAME = "idp_name";
+    String EPPN = "eppn";
+    String EPTID = "eptid";
+    String OPENID = "openid";
+    String OIDC = "oidc";
+    String PAIRWISE_ID = "pairwise_id";
+    String SUBJECT_ID = "subject_id";
+    String OU = "ou";
+    String AFFILIATION = "affiliation";
+    String AUTHENTICATION_CONTEXT_CLASS_REFERENCE = "acr";
+    String CERT_SUBJECT_DN = "cert_subject_dn";
+    String AUTHENTICATION_CLASS_REFERENCE = "acr";
+    String AUTHENTICATION_METHOD_REFERENCE = "amr";
 
     /**
      * OA4MP specific claim for group memberships that may come from e.g. LDAP.

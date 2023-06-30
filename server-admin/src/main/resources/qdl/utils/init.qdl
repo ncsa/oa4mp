@@ -34,5 +34,7 @@ idp.syngenta := 'https://sts.windows.net/06219a4a-a835-44d5-afaf-3926343bfb89/';
                                             'status' : 302
                                   });
   // The next couple are for custom debugging output. Note that they include the client id if possible.
-  SS(x,y)->say('*** ' + x + (is_defined(access_control.)?('[' + access_control.client_id + ']:'):':') + to_string(y));
-  SS(x)->SS('QDL', x);
+//  SS(x,y)->say('*** ' + x + (is_defined(access_control.)?('[' + access_control.client_id + ']:'):':') + to_string(y));
+//  SS(x)->SS('QDL', x);
+  trace(x,y)->debugger(1, '*** ' + x + (is_defined(access_control.)?('[' + access_control.client_id + ']:'):':') + to_string(y));
+  trace(x)->trace('QDL', x);

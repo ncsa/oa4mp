@@ -1,18 +1,16 @@
 /*
   Driver script for all post token, refresh and exchange
 */
-  SS(x)->say('*** IGWN[' + access_control.client_id + ']:' + to_string(x));
+debugger(1);
 script_load('ligo/acl.qdl');
 script_load('utils/init.qdl'); // bunch of constants.
 is_igwn := 'igwn' ∈ args();
 script_load('ligo/vo4/init.qdl', is_igwn);
 sys_err.ok?null:return(); // if something went wrong in init.qdl, return.
-
-SS('*** IGWN setting is_igwn');
-//claims.'eppn':= 'jeffrey.gaynor@ligo.org'; // debugging only
-
-   if[
-      exec_phase ∈ ['post_token', 'post_refresh', 'post_exchange']
-    ][
-      script_load('ligo/vo4/access.qdl');
-   ];
+// Fix https://jira.ncsa.illinois.edu/browse/CIL-1784 Set the original scopes before conditionals
+// original_scopes = scopes granted from the initial request.
+original_scopes. := (∃original_scopes.)?original_scopes.:null;
+  if [exec_phase == 'post_token']
+then [script_load('ligo/vo4/access.qdl');];
+  if [exec_phase ∈ ['post_refresh', 'post_exchange']]
+then [script_load('ligo/vo4/rtx.qdl');];

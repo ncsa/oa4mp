@@ -687,7 +687,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
          */
         /*
         Topography of the store. Auth grants (called temp_token for historical reasons) are
-        unique identifiers. If there are for aflow with AG == A, then the new flow has
+        unique identifiers. If there are for a flow with AG == A, then the new flow has
         AG A&eid=hash where the has is a hash of the ersatz client ID (ensuring that the identifier
         is unique and not too long to hit database limits for primary keys). Access tokens
         and refresh tokens, however, are NOT unique in the database
@@ -1593,13 +1593,15 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             txAT.setAudience(audience);
             txAT.setResource(resources);
         }
+        getOA2SE().getTxStore().save(txAT);
+        getOA2SE().getTxStore().save(txRT);
 
 //        getTransactionStore().save(t); // make sure all components can find this directly
         debugger.trace(this, "set new access token = " + rtiResponse.getAccessToken().getToken());
 
         // JWTRunner jwtRunner = new JWTRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2SE, t, txAT, t.getOA2Client().getConfig()));
         // OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, t, client, txAT, request);
-        JWTRunner jwtRunner = new JWTRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2SE, t, null, t.getOA2Client().getConfig()));
+        JWTRunner jwtRunner = new JWTRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2SE, t, txAT, t.getOA2Client().getConfig()));
         OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, t, client, request);
 
         try {

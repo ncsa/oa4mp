@@ -1,74 +1,44 @@
-/*
-{"tokens": {"access": {
- "qdl":  {
-  "load": "ligo/vo4/at.qdl", // main driver script.
-  "xmd": {"exec_phase":   [
-   "post_token",
-   "post_exchange",
-   "post_refresh"
-  ]}
- },
- "type": "sci_token"
-}}}
-
-   Sets up the access token in the initial pass.
-*/
-
-
-  attributes. := script_load('ligo/vo4/get_attributes.qdl', claims.'eppn');
-
-SS('*** LIGO -- got a attributes ' + input_form(attributes.));
+attributes. := script_load('ligo/vo4/get_attributes.qdl', claims.'eppn');
 
    permissions. := null;
      robot_name := null;
-  if[is_robot]
-    [
-SS('*** LIGO -- got a robot');
-       robot_name := robots.0 - robot_caput;
-SS('*** LIGO -- name =' + robot_name);
-       if[true ∈ ([ 'gw-astronomy:KAGRA-LIGO:Robots:' + robot_name + ':SciTokens:authorized',
-                    'Services:Robots:' + robot_name + ':SciTokens:authorized'] ∈ attributes.'isMemberOf')
-       ][
-SS('*** LIGO -- in robots group');
-                  moniker := robot_name + '@ligo.org';
-       access_token.'sub' :=   claims.'sub' := moniker ;
-            r_attributes. := script_load('ligo/vo4/get_attributes.qdl', moniker);
-             permissions. := get_permissions(r_attributes.'isMemberOf');
-              attributes. := r_attributes.; // use robot attributes instead now.
-       ]else[
-SS('*** LIGO -- not in robots group');
-          err('you do not have permission to use the robot named "' + robot_name + '"','access_denied');
-       ];
-    ]else[
+   if[is_robot]
+then [
+             robot_name := robots.0 - robot_caput;
+      robot_test_names. := [ 'gw-astronomy:KAGRA-LIGO:Robots:' + robot_name + ':SciTokens:authorized',
+                          'Services:Robots:' + robot_name + ':SciTokens:authorized'];
+      r_test.:=robot_test_names. ∈ attributes\'isMemberOf'\*\'name';
+        if [true ∈ r_test.]
+      then [
+                       moniker := robot_name + '@ligo.org';
+            access_token.'sub' :=   claims.'sub' := moniker ;
+                 r_attributes. := script_load('ligo/vo4/get_robots.qdl', moniker);
+                  permissions. := get_permissions(r_attributes.'isMemberOf');
+                   attributes. := r_attributes.; // use robot attributes instead now.
+            ]
+       else [err('you do not have permission to use the robot named "' + robot_name + '"','access_denied');];
+       ]
+    else [
             permissions. := get_permissions(attributes.'isMemberOf');
       access_token.'sub' := claims.'sub' := claims.'eppn';
    ]; // end robots
 
-
-  // Scope processing. Return only permissions requested.
-//permissions. :=    ~values(mask(ζ., in_group2(keys(ζ.),(attributes.'isMemberOf'))));
-SS('*** LIGO -- permissions' + to_string(permissions.));
-SS('*** LIGO -- requested scopes' + to_string(requested_scopes.));
-permissions. := reduce(@~,ζ\((attributes.'isMemberOf')\*\name));
-claims.'uid' := attributes.'uid';
-permissions. := template_substitution(permissions., claims.); // substitute templates like ${uid}
+ //permissions. := reduce(@~,ζ\((attributes.'isMemberOf')\*\name));
+ claims.'uid' := attributes.'uid';
+ permissions. := template_substitution(permissions., claims.); // substitute templates like ${uid}
 
 permissions. := resolve_templates(permissions., requested_scopes., exec_phase=='post_token');
-//         permissions. := ~mask(permissions., permissions. ∈ requested_scopes.);
-
-SS('*** LIGO -- permissions after templates:' + to_string(permissions.));
-
-// Audience processing.
-    access_token.'aud' := requested_audience.;
+access_token.'aud' := requested_audience.;
 
 /*
    Tidy up id token aka claims.
 */
-if[is_defined(attributes.'uin')]
-  [claims.'uin' := attributes.'uin';];
- access_token.'uid' := claims.'uid'; // CIL-1681
- //     xi. := resolve_templates(at_claims.EPE., tx_scopes., false); // resolves any scopes explicitly granted to user
-  access_token.'scope' := detokenize(unique(permissions.), ' ', 2); // turn in to string, omit duplications, trailing space
-
- SS('*** LIGO: final access token = ' + to_string(access_token.));
- SS('*** LIGO: final claims  = ' + to_string(claims.));
+  if [!is_defined(attributes.'uid')]
+then [err('missing uid','access_denied');];
+//claims.'uid' := attributes.'uid';
+access_token.'uid':=claims.'uid'; // CIL-1681
+  if [is_defined(attributes.'uin')]
+then [claims.'uin' := attributes.'uin';];
+ access_token.'scope' := detokenize(unique(permissions.), ' '); // turn in to string, omit duplications, trailing space
+ trace('in access.qdl, permissions = ' + print(permissions.));
+ original_scopes.. := permissions.; // the original scopes
