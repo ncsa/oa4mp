@@ -45,6 +45,16 @@
         <td>(RFC 7591 protocol only). Allow posts to create a new client. These will not be approved automatically.</td>
     </tr>
     <tr>
+        <td>anonymousAllowedDomains</td>
+        <td>N</td>
+        <td>*</td>
+        <td>(RFC 7591 protocol only). If anonymous registrations are allowed, then you may specify which are permitted
+        to make requests. This is a comma-separate list of hosts. The default is a "*" meaning
+        that if not set, all hosts are allowed to make anonymous requests.<br/><br/>
+        E.g. anonymousAllowedDomains="localhost, ligo.bgsu.edu"
+        </td>
+    </tr>
+    <tr>
         <td>autoApprove</td>
         <td>N</td>
         <td>false</td>
@@ -53,6 +63,15 @@
             in highly automated systems with severely restricted access. Generally though setting
             it <code>true</code> is a terrible idea and a security risk.
         </td>
+    </tr>
+
+    <tr>
+        <td>autoApproveAllowedDomains</td>
+        <td>N</td>
+        <td>*</td>
+        <td>(RFC 7591 protocol only). If auto approval is enabled, then you may specify which are permitted
+        to make requests. This is a comma-separate list of hosts. The default is a "*" meaning
+        that if not set, all requests are auto approved.</td>
     </tr>
     <tr>
         <td>autoApproverName</td>

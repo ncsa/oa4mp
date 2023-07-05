@@ -458,4 +458,5 @@ public class ClientEnvironment extends AbstractClientEnvironment {
     protected String errorPagePath="/pages/client-error.jsp";
     protected String successPagePath="/pages/client-success.jsp";
     protected String redirectPagePath="/pages/client-show-redirect.jsp";
+
 }

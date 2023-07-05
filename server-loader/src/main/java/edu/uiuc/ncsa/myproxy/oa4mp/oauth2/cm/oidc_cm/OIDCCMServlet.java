@@ -299,7 +299,12 @@ public class OIDCCMServlet extends EnvServlet {
         } else {
             json.put(ACCESS_TOKEN_LIFETIME, 0L);
         }
-
+        if (client.hasJWKS()) {
+            json.put(JWKS, JSONWebKeyUtil.toJSON(client.getJWKS()));
+        }
+        if (client.hasJWKSURI()) {
+            json.put(JWKS_URI, client.getJwksURI().toString());
+        }
         JSONArray scopes = new JSONArray();
         scopes.addAll(client.getScopes());
         json.put(OA2Constants.SCOPE, scopes);
@@ -707,16 +712,21 @@ public class OIDCCMServlet extends EnvServlet {
         if (!getOA2SE().getCmConfigs().isEnabled()) {
             throw new ServletException("unsupported service");
         }
+        printAllParameters(httpServletRequest);
         CM7591Config cm7591Config = getOA2SE().getCmConfigs().getRFC7591Config();
         boolean isAnonymous = false;
+        String host = httpServletRequest.getRemoteHost();
         AdminClient adminClient = null;
         try {
             adminClient = getAndCheckAdminClient(httpServletRequest);
-        } catch (UnknownClientException ge) {
+        } catch (IllegalArgumentException | UnknownClientException ge) {
 
             if (!cm7591Config.anonymousOK) {
                 DebugUtil.trace(this, "anonymous mode not enabled, exception thrown.");
                 throw ge;
+            }
+            if (!cm7591Config.checkAnonymousDomain(host)) {
+                throw new GeneralException("Anonymous client access restricted for domain " + host + ".");
             }
             DebugUtil.trace(this, "anonymous ok");
             isAnonymous = true;
@@ -836,15 +846,13 @@ public class OIDCCMServlet extends EnvServlet {
         approval.setApprovalTimestamp(new Date());
         // https://github.com/ncsa/oa4mp/pull/81
         if (isAnonymous) {
-            if (cm7591Config.autoApprove) {
+            if (cm7591Config.autoApprove && cm7591Config.checkAutoApproveDomain(host)) {
                 approval.setApprover(cm7591Config.autoApproverName);
                 approval.setApproved(true);
                 approval.setStatus(ClientApproval.Status.APPROVED);
-
             } else {
                 approval.setApproved(false);
                 approval.setStatus(ClientApproval.Status.PENDING);
-
             }
         } else {
             approval.setApprover(adminClient.getIdentifierString());
@@ -854,10 +862,10 @@ public class OIDCCMServlet extends EnvServlet {
         getOA2SE().getClientApprovalStore().save(approval);
         // Github 84 https://github.com/ncsa/oa4mp/issues/84
         // Also this is CIL-1597
-        //writeCreateOK(httpServletResponse, jsonResp);
+        writeCreateOK(httpServletResponse, jsonResp);
         logOK(httpServletRequest); // CIL-1722
 
-        writeOK(httpServletResponse, jsonResp);
+        //writeOK(httpServletResponse, jsonResp);
     }
 
 
@@ -986,33 +994,33 @@ public class OIDCCMServlet extends EnvServlet {
 
 
         if (jsonRequest.containsKey(TOKEN_ENDPOINT_AUTH_METHOD)) {
-            // not required, but if present, we support exactly two nontrivial options.
-            JSONArray jsonArray = toJA(jsonRequest, TOKEN_ENDPOINT_AUTH_METHOD);
+            // not required, but if present, we support exactly three nontrivial options.
+            String authMethod = jsonRequest.getString(TOKEN_ENDPOINT_AUTH_METHOD);
             boolean gotSupportedAuthMethod = false;
-            if (jsonArray.contains(OA2Constants.TOKEN_ENDPOINT_AUTH_NONE)) {
-                if (newClient) {
-                    gotSupportedAuthMethod = true;
-                    client.setPublicClient(true);
-
-                } else {
-                    if (client.isPublicClient()) {
-                        // CIL-884.
-                        // do nothing -- let them udpdate everything else but
-                        // their confidentiality status.
+            switch (authMethod) {
+                case OA2Constants.TOKEN_ENDPOINT_AUTH_NONE:
+                    if (newClient) {
                         gotSupportedAuthMethod = true;
+                        client.setPublicClient(true);
 
                     } else {
-                        // Don't let admins change client confidential --> public
-                        throw new OA2GeneralError(OA2Errors.INVALID_REQUEST_OBJECT,
-                                "cannot change from a confidential to a public client",
-                                HttpStatus.SC_BAD_REQUEST, null, client);
+                        if (client.isPublicClient()) {
+                            // CIL-884.
+                            // do nothing -- let them udpdate everything else but
+                            // their confidentiality status.
+                            gotSupportedAuthMethod = true;
 
+                        } else {
+                            // Don't let admins change client confidential --> public
+                            throw new OA2GeneralError(OA2Errors.INVALID_REQUEST_OBJECT,
+                                    "cannot change from a confidential to a public client",
+                                    HttpStatus.SC_BAD_REQUEST, null, client);
+
+                        }
                     }
-                }
-            } else {
-
-                if (jsonArray.contains(OA2Constants.TOKEN_ENDPOINT_AUTH_POST) ||
-                        jsonArray.contains(OA2Constants.TOKEN_ENDPOINT_AUTH_BASIC)) {
+                    break;
+                case TOKEN_ENDPOINT_AUTH_BASIC:
+                case TOKEN_ENDPOINT_AUTH_POST:
                     if (!newClient && client.isPublicClient()) {
                         // Only if this is already true do we throw an exception.
                         // This means it was public (=no secret) and now they want
@@ -1026,12 +1034,39 @@ public class OIDCCMServlet extends EnvServlet {
                     gotSupportedAuthMethod = true;
                     client.setPublicClient(false);
                     client.setSignTokens(true); // always for us.
-                }
-
+                    break;
+                case TOKEN_ENDPOINT_AUTH_PRIVATE_KEY:
+                    // either they supply us with the keys or a URI that points to them
+                    if (jsonRequest.containsKey(JWKS_URI)) {
+                        client.setJwksURI(URI.create(jsonRequest.getString(JWKS_URI)));
+                        jsonRequest.remove(JWKS_URI);
+                        gotSupportedAuthMethod = true;
+                    }
+                    if (jsonRequest.containsKey(JWKS)) {
+                        client.setSecret(null);
+                        try {
+                            client.setJWKS(JSONWebKeyUtil.fromJSON(jsonRequest.getJSONObject(JWKS)));
+                        } catch (NoSuchAlgorithmException e) {
+                            throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
+                                    "JWKS error, no such algorithm",
+                                    HttpStatus.SC_BAD_REQUEST,
+                                    null, client);
+                        } catch (InvalidKeySpecException e) {
+                            throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
+                                    "JWKS error, invalid key spec.",
+                                    HttpStatus.SC_BAD_REQUEST,
+                                    null, client);
+                        }
+                        jsonRequest.remove(JWKS);
+                        gotSupportedAuthMethod = true;
+                    }
+                    break;
+                default:
+                    gotSupportedAuthMethod = false;
             }
             if (!gotSupportedAuthMethod) {
                 throw new OA2GeneralError(OA2Errors.INVALID_REQUEST_OBJECT,
-                        "unsupported token endpoint authorization method",
+                        "unsupported token endpoint authorization method \"" + authMethod + "\"",
                         HttpStatus.SC_BAD_REQUEST, null, client);
             }
             jsonRequest.remove(TOKEN_ENDPOINT_AUTH_METHOD);
@@ -1095,6 +1130,8 @@ public class OIDCCMServlet extends EnvServlet {
             }
             jsonRequest.remove(OIDCCMConstants.CONTACTS);
         }
+
+
         //CIL-703
 
         if (jsonRequest.containsKey("cfg")) {
@@ -1105,6 +1142,7 @@ public class OIDCCMServlet extends EnvServlet {
 
             }
             JSONObject jsonObject = jsonRequest.getJSONObject("cfg");
+
             // CIL-889 fix
             if (isAnonymous) {
                 if (jsonRequest.getString("cfg").toLowerCase().contains("qdl")) {
@@ -1194,30 +1232,11 @@ public class OIDCCMServlet extends EnvServlet {
                 client.setServiceClient(jsonRequest.getBoolean(IS_SERVICE_CLIENT));
                 jsonRequest.remove(IS_SERVICE_CLIENT);
             }
-            if(jsonRequest.containsKey(SERVICE_CLIENT_USERS)){
+            if (jsonRequest.containsKey(SERVICE_CLIENT_USERS)) {
                 client.setServiceClientUsers(jsonRequest.getJSONArray(SERVICE_CLIENT_USERS));
                 jsonRequest.remove(SERVICE_CLIENT_USERS);
             }
-            if (jsonRequest.containsKey(JWKS_URI)) {
-                client.setJwksURI(URI.create(jsonRequest.getString(JWKS_URI)));
-                jsonRequest.remove(JWKS_URI);
-            }
-            if (jsonRequest.containsKey(JWKS)) {
-                try {
-                    client.setJWKS(JSONWebKeyUtil.fromJSON(jsonRequest.getString(JWKS)));
-                } catch (NoSuchAlgorithmException e) {
-                    throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
-                            "JWKS error, no such algorithm",
-                            HttpStatus.SC_BAD_REQUEST,
-                            null, client);
-                } catch (InvalidKeySpecException e) {
-                    throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
-                            "JWKS error, invalid key spec.",
-                            HttpStatus.SC_BAD_REQUEST,
-                            null, client);
-                }
-                jsonRequest.remove(JWKS);
-            }
+
         }
         if (jsonRequest.containsKey(DESCRIPTION)) {
             client.setDescription(jsonRequest.getString(DESCRIPTION));

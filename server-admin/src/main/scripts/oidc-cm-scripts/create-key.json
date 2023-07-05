@@ -1,0 +1,26 @@
+{
+  "comment": "Create a client by uploading a public key",
+  "application_type": "web",
+  "redirect_uris": [
+    "https://client.example.org/callback",
+    "https://client.example.org/callback2"
+  ],
+  "client_name": "Example",
+  "scope": ["openid", "email", "profile", "org.oa4mp:userinfo"],
+  "token_endpoint_auth_method": "private_key_jwt",
+  "jwks":   {"keys": [ {
+      "n": "AILU5Jj08E--QtiTl-We11Sddk4VFoZ12NshacvwrYzhnTAqlIUuMvraq54XOSmEagffqIJMcFPbqDkqw_lrfMRYkiIsxg5RIRIhZ6HngNI1dJylY4s5L7WdsPP-RLgM6D4bbrhbhRb0BFjBBksRZqhBq1RKysuaO7HP_QL3QImNCg2EK7S3Cn1Vfdq2OWsNCSFLHzZclrG9H2Jf_GF9cmvEa8mbsLD5jMRbIJg005_hWSqvnyvyHsXsM5Xos7yreAQ3K3YePmJTr1vnwWsmg98LHsCjGHjJoXxspEYV0dIdDopyqGdJm-TwtDKCFX5Fnzq8LpG_boWowYIXxyGgO9M",
+      "e": "AQAB",
+      "alg": "RS256",
+      "kid": "EC9FCFCB3716AC4C2279DF42EC98CABF",
+      "use": "sig",
+      "kty": "RSA",
+      "d": "ZGJPSCFgJf95MM4GVXQMCmuLM5wwnVjc3D4F_CoeL6OIxUVWkd2B1kJkPbfZ70YfSQ1OMTPPWDiJGdv7ZGwZ3lmLPteV27RaKJwi9PI5QJEteWfZOiDVv4dQF9Z4CbQ1mjnYOXJXauYuU58_YefnGaDRgaqlcZVUyjkpC9aE2USaowIoOtOEpFzCfPDYLwon_7RZv73VyIOCUbw8DrQe1ShRYhcpUIq0Qt9UMiqr5LlTUeGGbvzL5Zm8IxEONFlZJ-6UJDkD7wKsDZpyhUCV8uTCLpENV54-cdS6mb4x0mwYcLyzCSp3ZMftaN3NHpxOmeSw1XgLqg77WVH2dFibuQ"
+    }]},
+  "request_uris": [
+    "https://client.example.org/rf.txt#qpXaRLh_n93TTR9F252ValdatUQvQiJi5BDub2BeznA"
+  ],
+  "at_lifetime":1009,
+  "rt_lifetime":1000000,
+  "strict_scopes":false
+}

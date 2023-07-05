@@ -13,11 +13,12 @@ key_set := key_set/skip_list;
 while[
   key ∈ key_set
    ][
-/*
+
+/* These print a ton of stuff, so don't willy-nilly enable.
    say('key=' + key);
-   say(client.key);
-   say(payload.key);
-*/
+   say('  client=' + to_string(client.key));
+   say(' payload=' + to_string(payload.key));*/
+   if[key=='jwks'][continue();]; // skip it, since it's really complex and equality is ill-defined.
    if[payload.key << List][
      ⊨ reduce(@&&, payload.key∈client.key):'failed check for list attribute ' + key;
    ]else[

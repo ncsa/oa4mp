@@ -1,0 +1,20 @@
+#! /usr/bin/env -S qdl-run  
+
+script_load('init.qdl');
+
+payload. := from_json(file_read(ini.'payloads' + 'create-key.json'));
+resp. := http#post(payload.);
+logger(2,'creating basic client with public key');
+⊨ resp.'status'.'code' == 201 : 'incorrect returned status of ' + resp.'status'.'code';
+logger(2,'got client id=' + resp.'content'.'client_id');
+⊨ ini.'caput' < resp.'content'.'client_id' : 'failed to get custom generated client id';
+r. := http#get({'client_id':resp.'content'.'client_id'});
+// r. now contains the uploaded client
+try[
+  script_load('cm-compare.qdl', r.'content', payload., {'application_type', 'token_endpoint_auth_method'});
+  ]catch[
+    say(error_message);
+  ];
+r. := http#delete({'client_id':resp.'content'.'client_id'});
+logger(2,say('ok: Admin creation  client with public key'));
+

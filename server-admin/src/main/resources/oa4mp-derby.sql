@@ -84,6 +84,9 @@ run '/full/path/to/oauth2-derby.qdl';
 
    At this point, your database is ready for use.
 
+  If you need to see what columns a table has use the describe command, e.g.
+
+   describe oauth2.clients;
 
 */
 

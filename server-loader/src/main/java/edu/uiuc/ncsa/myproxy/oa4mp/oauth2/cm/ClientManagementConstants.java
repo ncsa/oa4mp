@@ -43,6 +43,7 @@ public interface ClientManagementConstants {
      * it true is a terrible idea and a security risk.
      */
     public String RFC_7591_AUTO_APPROVE = "autoApprove";
+    public String RFC_7591_AUTO_APPROVE_ALLOWED_DOMAINS = "autoApproveAllowedDomains";
 
     public String RFC_7591_AUTO_APPROVER_NAME = "autoApproverName";
     /**
@@ -51,6 +52,7 @@ public interface ClientManagementConstants {
      * client  will result.
      */
     public String RFC_7591_ANONYMOUS_OK = "anonymousOK";
+    public String RFC_7591_ANONYMOUS_ALLOWED_DOMAINS = "anonymousAllowedDomains";
 
     /**
      * If the protocol is to be derived from the server address, just set the endpoint,

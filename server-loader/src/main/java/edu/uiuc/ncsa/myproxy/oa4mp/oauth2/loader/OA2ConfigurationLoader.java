@@ -815,6 +815,32 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                                 getFirstAttribute(sn, ClientManagementConstants.RFC_7591_AUTO_APPROVE),
                                 getFirstAttribute(sn, ClientManagementConstants.RFC_7591_AUTO_APPROVER_NAME)
                         );
+                        if(cfg instanceof CM7591Config){
+                            CM7591Config ccc = (CM7591Config) cfg;
+                            String allowed = getFirstAttribute(sn, ClientManagementConstants.RFC_7591_AUTO_APPROVE_ALLOWED_DOMAINS);
+                            if(ccc.autoApprove ){
+                                if(allowed == null){
+                                    ccc.getAllowedAutoApproveDomains().add("*"); // default
+                                } else{
+                                   StringTokenizer st = new StringTokenizer(allowed, ",");
+                                   while(st.hasMoreTokens()){
+                                       ccc.getAllowedAutoApproveDomains().add(st.nextToken().trim());
+                                   }
+                                }
+                            }
+                             allowed = getFirstAttribute(sn, ClientManagementConstants.RFC_7591_ANONYMOUS_ALLOWED_DOMAINS);
+                             if(ccc.anonymousOK){
+                                 if(allowed == null){
+                                    ccc.getAllowedAnonymousDomains().add("*");
+                                 }else{
+                                     StringTokenizer st = new StringTokenizer(allowed, ",");
+                                     while(st.hasMoreTokens()){
+                                         ccc.getAllowedAnonymousDomains().add(st.nextToken().trim());
+                                     }
+                                 }
+                             }
+
+                        }
                         cmConfigs.put(cfg);
                     } catch (Throwable t) {
                         ServletDebugUtil.warn(this, "error loading client management api entry \"" + t.getMessage() + "\"");
@@ -832,6 +858,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
             if (!cmConfigs.hasRFC7592Config()) {
                 cmConfigs.put(defaultCMConfigs.getRFC7592Config());
             }
+            // Now figure out auto approve, anonyumous domains
             if (!cmConfigs.hasRFC7591Config()) {
                 cmConfigs.put(defaultCMConfigs.getRFC7591Config());
             }

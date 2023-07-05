@@ -1,1 +1,1 @@
-{"client_id":"oa4mp:/client_id/6dcc258243700a10e7052e1f3ac23c2a","registration_client_uri":"https://localhost:9443/oauth2/oidc-cm?client_id=oa4mp:/client_id/6dcc258243700a10e7052e1f3ac23c2a","scope":["openid"]}
+{"client_id":"oa4mp:/client_id/76b5463b94253bd1bd68f0875cd5b6a7","registration_client_uri":"https://localhost:9443/oauth2/oidc-cm?client_id=oa4mp:/client_id/76b5463b94253bd1bd68f0875cd5b6a7","scope":["openid","profile","org.oa4mp:userinfo","email"]}

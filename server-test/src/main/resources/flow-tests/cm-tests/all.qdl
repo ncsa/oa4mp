@@ -2,6 +2,7 @@
 path := '/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests/cm-tests/';
 script_path(path ~ script_path());
 test.:= path + ['cm-basic.qdl',
+                'cm-private-key.qdl',
                 'cm-extra.qdl',
                 'cm-public.qdl',
                 'cm-update.qdl',
