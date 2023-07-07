@@ -49,6 +49,23 @@ public class CLC implements QDLModuleMetaClass {
         return result;
     }
 
+    /**
+     * For a stem with the keys access_token and refresh-token, set the current token
+     *
+     * @param newTokens
+     * @return
+     */
+    protected void setTokens(QDLStem newTokens) {
+        if (newTokens.containsKey("access_token")) {
+            QDLStem at = newTokens.getStem("access_token");
+            clcCommands.getDummyAsset().setAccessToken(stemToAT(at));
+        }
+        if (newTokens.containsKey("refresh_token")) {
+            QDLStem at = newTokens.getStem("refresh_token");
+            clcCommands.getDummyAsset().setRefreshToken(stemToRT(at));
+        }
+    }
+
     protected String DUMMY_ARG = "dummy"; // when creating input lines, need dummy arg for method name
     protected String INIT_NAME = "init";
 
@@ -110,17 +127,18 @@ public class CLC implements QDLModuleMetaClass {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) throws Throwable{
+        public Object evaluate(Object[] objects, State state) throws Throwable {
             QDLStem claims = new QDLStem();
             if (objects.length == 0) {
 //                try {
-                    JSONObject jsonObject = clcCommands.getClaims();
-                    claims.fromJSON(jsonObject);
+                JSONObject jsonObject = clcCommands.getClaims();
+                claims.fromJSON(jsonObject);
   /*              } catch (Exception e) {
                     throw new GeneralException(getName() + " could not get the claims:'" + e.getMessage() + "'");
 
                 }
-  */          }
+  */
+            }
             return claims;
         }
 
@@ -148,10 +166,10 @@ public class CLC implements QDLModuleMetaClass {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) throws Throwable{
+        public Object evaluate(Object[] objects, State state) throws Throwable {
             QDLStem g = new QDLStem();
-                clcCommands.grant(argsToInputLine(getName(), objects));
-            if(clcCommands.getGrant() == null){
+            clcCommands.grant(argsToInputLine(getName(), objects));
+            if (clcCommands.getGrant() == null) {
                 throw new GeneralException("unable to get grant");
             }
             g.fromJSON(clcCommands.getGrant().toJSON());
@@ -200,7 +218,7 @@ public class CLC implements QDLModuleMetaClass {
                     throw new IllegalArgumentException(getName() + " requires a boolean argument");
                 }
             }
-                clcCommands.access(new InputLine(args));
+            clcCommands.access(new InputLine(args));
 
             return getTokens();
         }
@@ -216,7 +234,8 @@ public class CLC implements QDLModuleMetaClass {
     }
 
     protected String GET_CERT_NAME = "get_cert";
-    public class GetCert implements QDLFunction{
+
+    public class GetCert implements QDLFunction {
         @Override
         public String getName() {
             return GET_CERT_NAME;
@@ -230,7 +249,7 @@ public class CLC implements QDLModuleMetaClass {
         @Override
         public Object evaluate(Object[] objects, State state) throws Throwable {
             clcCommands.get_cert(argsToInputLine(getName(), objects));
-            if(clcCommands.hasX509Certificates()){
+            if (clcCommands.hasX509Certificates()) {
                 return clcCommands.getX509CertificateString();
             }
             return "";
@@ -240,10 +259,10 @@ public class CLC implements QDLModuleMetaClass {
 
         @Override
         public List<String> getDocumentation(int argCount) {
-            if(dd.isEmpty()){
-                 dd.add(getName() + "() - get a certificate (chain).");
-                 dd.add("Note that the client must be configured with the correct getcert scope and the");
-                 dd.add("server must support MyProxy.");
+            if (dd.isEmpty()) {
+                dd.add(getName() + "() - get a certificate (chain).");
+                dd.add("Note that the client must be configured with the correct getcert scope and the");
+                dd.add("server must support MyProxy.");
             }
             return dd;
         }
@@ -264,10 +283,10 @@ public class CLC implements QDLModuleMetaClass {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) throws Throwable{
+        public Object evaluate(Object[] objects, State state) throws Throwable {
             checkInit();
-                clcCommands.uri(argsToInputLine(getName(), objects));
-                return clcCommands.getCurrentURI().toString();
+            clcCommands.uri(argsToInputLine(getName(), objects));
+            return clcCommands.getCurrentURI().toString();
         }
 
         @Override
@@ -293,10 +312,10 @@ public class CLC implements QDLModuleMetaClass {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) throws Throwable{
+        public Object evaluate(Object[] objects, State state) throws Throwable {
             checkInit();
-          //  try {
-                clcCommands.refresh(argsToInputLine(getName(), objects));
+            //  try {
+            clcCommands.refresh(argsToInputLine(getName(), objects));
            /* } catch (Exception e) {
                 handleException(e);
             }*/
@@ -373,13 +392,13 @@ public class CLC implements QDLModuleMetaClass {
         return new InputLine(strings);
     }
 
-    protected void handleException(Throwable t)  {
+    protected void handleException(Throwable t) {
         if (DebugUtil.isEnabled()) {
             t.printStackTrace();
         }
-         if(t instanceof RuntimeException){
-             throw (RuntimeException)t;
-         }
+        if (t instanceof RuntimeException) {
+            throw (RuntimeException) t;
+        }
         throw new GeneralException(t.getMessage(), t);
     }
 
@@ -397,11 +416,11 @@ public class CLC implements QDLModuleMetaClass {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) throws Throwable{
-            checkInit();
+        public Object evaluate(Object[] objects, State state) throws Throwable {
+           checkInit();
 //            try {
-                clcCommands.revoke(argsToInputLine(getName(), objects));
-                return Boolean.TRUE;
+            clcCommands.revoke(argsToInputLine(getName(), objects));
+            return Boolean.TRUE;
   /*          } catch (Exception e) {
 
                 if (DebugUtil.isEnabled()) {
@@ -409,7 +428,8 @@ public class CLC implements QDLModuleMetaClass {
                 }
             }
             return Boolean.FALSE;
-  */      }
+  */
+        }
 
         @Override
         public List<String> getDocumentation(int argCount) {
@@ -520,19 +540,40 @@ public class CLC implements QDLModuleMetaClass {
 
         @Override
         public int[] getArgCount() {
-            return new int[]{0};
+            return new int[]{0,1};
         }
 
         @Override
         public Object evaluate(Object[] objects, State state) {
             checkInit();
-            return getTokens();
+            if(objects.length == 0) {
+                return getTokens();
+            }
+            if(!(objects[0] instanceof QDLStem)){
+               throw new IllegalArgumentException("the argument to " + getName() + " must be a stem");
+            }
+            setTokens((QDLStem) objects[0]);
+            return Boolean.TRUE;
         }
 
         @Override
         public List<String> getDocumentation(int argCount) {
             List<String> doxx = new ArrayList<>();
-            doxx.add(getName() + " initialte the device flow. If possible, the user code is copied to the clipboard.");
+            if(argCount == 0) {
+                doxx.add(getName() + "() - return the current tokens.");
+            }
+            if(argCount == 1){
+                doxx.add(getName() + "(new_tokens.) - set the current access and refresh tokens");
+                doxx.add("Note that the stem has keys access_token and refresh_token and these entries");
+                doxx.add("are identical to the values returned by various calls. The output is true if successful.");
+            }
+            doxx.add("note that "+getName() + "("+ getName() + ") will set the tokens to the current tokens.");
+            doxx.add("so this shows what the argument can be. A common construct is along the lines of");
+            doxx.add("E.g.");
+            doxx.add("old. := " + getName() + "();");
+            doxx.add("//// Do a bunch of other stuff, like refreshes, exchanges and invalidate tokens");
+            doxx.add(getName() + "(old.)");
+            doxx.add("Sets the tokens to the value so you can resume your flow with them.");
             doxx.add(checkInitMessage);
             return doxx;
         }
@@ -915,10 +956,10 @@ public class CLC implements QDLModuleMetaClass {
           ts : 1675711109000
      */
     protected AccessTokenImpl stemToAT(QDLStem stem) {
-        if(stem.containsKey("jwt")){
-                    return new AccessTokenImpl(stem.getString("raw_token"), URI.create(stem.getString("jti")));
-                }
-                 return new AccessTokenImpl(stem.getString("raw_token"), URI.create(stem.getString("jti")));
+        if (stem.containsKey("jwt")) {
+            return new AccessTokenImpl(stem.getString("raw_token"), URI.create(stem.getString("jti")));
+        }
+        return new AccessTokenImpl(stem.getString("raw_token"), URI.create(stem.getString("jti")));
     }
 
     /*
@@ -941,10 +982,10 @@ public class CLC implements QDLModuleMetaClass {
           ts : 1675711109000
      */
     protected RefreshTokenImpl stemToRT(QDLStem stem) {
-        if(stem.containsKey("jwt")){
+        if (stem.containsKey("jwt")) {
             return new RefreshTokenImpl(stem.getString("raw_token"), URI.create(stem.getString("jti")));
         }
-         return new RefreshTokenImpl(stem.getString("raw_token"), URI.create(stem.getString("jti")));
+        return new RefreshTokenImpl(stem.getString("raw_token"), URI.create(stem.getString("jti")));
     }
 
     public static String ACCESS_TOKEN_ACCESSOR = "at";
@@ -1036,8 +1077,10 @@ public class CLC implements QDLModuleMetaClass {
             return dd;
         }
     }
+
     public static String RFC7523_NAME = "rfc7523";
-    public class RFC7523 implements QDLFunction{
+
+    public class RFC7523 implements QDLFunction {
         @Override
         public String getName() {
             return RFC7523_NAME;
@@ -1052,48 +1095,49 @@ public class CLC implements QDLModuleMetaClass {
         public Object evaluate(Object[] objects, State state) throws Throwable {
             checkInit();
             Map parameters = new HashMap();
-            if(objects.length == 1){
-                if(objects[0] instanceof String){
+            if (objects.length == 1) {
+                if (objects[0] instanceof String) {
                     parameters.put(OA2Claims.SUBJECT, objects[0]);
-                }else{
-                    if(objects[0] instanceof QDLStem){
+                } else {
+                    if (objects[0] instanceof QDLStem) {
                         QDLStem stem = (QDLStem) objects[0];
-                          for(Object key : stem.keySet()){
-                              Object value = stem.get(key);
-                              if(value instanceof QDLStem){
-                                  QDLStem qdlStem = (QDLStem) value;
-                                  if(qdlStem.isList()){
-                                      JSONArray array = new JSONArray();
-                                      array.addAll(qdlStem.getQDLList());
-                                      parameters.put(key, array);
-                                  } else{
-                                      throw new IllegalArgumentException("General stems are not supported as values, just lists");
-                                  }
-                              }else {
-                                  parameters.put(key, value);
-                              }
-                          }
-                    }else{
+                        for (Object key : stem.keySet()) {
+                            Object value = stem.get(key);
+                            if (value instanceof QDLStem) {
+                                QDLStem qdlStem = (QDLStem) value;
+                                if (qdlStem.isList()) {
+                                    JSONArray array = new JSONArray();
+                                    array.addAll(qdlStem.getQDLList());
+                                    parameters.put(key, array);
+                                } else {
+                                    throw new IllegalArgumentException("General stems are not supported as values, just lists");
+                                }
+                            } else {
+                                parameters.put(key, value);
+                            }
+                        }
+                    } else {
                         throw new IllegalArgumentException("unknown argument type for " + getName());
                     }
                 }
             }
-                clcCommands.rfc7523(parameters);
+            clcCommands.rfc7523(parameters);
 
-            return getTokens();        }
+            return getTokens();
+        }
 
         @Override
         public List<String> getDocumentation(int argCount) {
             List<String> dd = new ArrayList<>();
-            switch (argCount){
+            switch (argCount) {
                 case 0:
                     dd.add(getName() + "() - issue grant request using default, 'username' is the client ID");
                     dd.add("E.g.");
-                    dd.add(getName()+"()");
+                    dd.add(getName() + "()");
                     dd.add("Sends a basic request with no additional parameters. Returns the tokens and claims");
                     break;
                 case 1:
-                    dd.add(getName()+"(username | arg.) - issue grant request using the username or the entries of arg.");
+                    dd.add(getName() + "(username | arg.) - issue grant request using the username or the entries of arg.");
                     dd.add("   The keys and values of arg. are sent as parameters, so be sure that values are strings.");
                     dd.add("\nE.g. with parameters");
                     dd.add(getName() + "('igwn-robot@bigstate.edu')");

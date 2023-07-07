@@ -32,19 +32,29 @@ public class RFC7009 extends TokenManagerServlet {
         // Reminder: The next calls check that the requesting client is the same as the
         // one in the transaction, thus preventing hijacking.
         try {
-            if (!OA2HeaderUtils.getAuthHeader(req, OA2HeaderUtils.BASIC_HEADER).isEmpty()) {
-                state = checkBasic(req);
+            if (isRFC7523Client(req)) {
+                // fixes https://github.com/ncsa/oa4mp/issues/115
+                state = check7523(req);
             } else {
-                state = checkBearer(req);
-                // The previous call uses the bearer token (which is an access token) to recover the transactions
-                // and any corresponding TXRecord. If this is for a refresh token, that has to be tracked down.
-                if (!state.isAT && state.transaction != null) {
-                    List<? extends TXRecord> records = oa2SE.getTxStore().getByParentID(state.transaction.getIdentifier());
-                    for (TXRecord txRecord : records) {
-                        if (txRecord.getIdentifierString().equals(state.refreshToken.getJti().toString())) {
-                            state.txRecord = txRecord;
-                            break;
-                        }
+                if (!OA2HeaderUtils.getAuthHeader(req, OA2HeaderUtils.BASIC_HEADER).isEmpty()) {
+                    state = checkBasic(req);
+                } else {
+                    state = checkBearer(req);
+                }
+            }
+            if (state == null) {
+                resp.setStatus(HttpStatus.SC_OK);
+                logOK(req); // CIL-1722
+                return;
+            }
+            // The previous call uses the bearer token (which is an access token) to recover the transactions
+            // and any corresponding TXRecord. If this is for a refresh token, that has to be tracked down.
+            if (!state.isAT && state.transaction != null) {
+                List<? extends TXRecord> records = oa2SE.getTxStore().getByParentID(state.transaction.getIdentifier());
+                for (TXRecord txRecord : records) {
+                    if (txRecord.getIdentifierString().equals(state.refreshToken.getJti().toString())) {
+                        state.txRecord = txRecord;
+                        break;
                     }
                 }
             }
@@ -54,9 +64,9 @@ public class RFC7009 extends TokenManagerServlet {
             // revoked.
             resp.setStatus(HttpStatus.SC_OK);
             logOK(req); // CIL-1722
-
             return;
         }
+
 
         // By this point the state object has the original transaction and request information in it,
         // plus it has the TX record if there is one.
@@ -65,8 +75,8 @@ public class RFC7009 extends TokenManagerServlet {
         if (state.txRecord != null) {
             state.txRecord.setValid(false);
             oa2SE.getTxStore().save(state.txRecord);
-            if(!state.isAT){
-                if(state.transaction.getRefreshToken().getJti().toString().equals(state.txRecord.getIdentifierString())){
+            if (!state.isAT) {
+                if (state.transaction.getRefreshToken().getJti().toString().equals(state.txRecord.getIdentifierString())) {
                     // Then there is a redundant record. Make sure both are marked.
                     // This can happen in very complex cases of multiple refreshes and exchanges, so just check here
                     // once and for all.
@@ -91,7 +101,7 @@ public class RFC7009 extends TokenManagerServlet {
         oa2SE.getTransactionStore().save(state.transaction);
         resp.setStatus(HttpStatus.SC_OK);
         logOK(req); //CIL-1722
-        }
+    }
 
 
     protected boolean checkToken(OA2Client requestingClient, String token) {

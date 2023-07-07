@@ -30,7 +30,7 @@ claims. := claims();
 ⊨ tokens.'access_token'.'lifetime' == 1009000 : 'wrong access token lifetime';
 ⊨ tokens.'refresh_token'.'lifetime' == 950400000 : 'wrong refresh token lifetime';
 ⊨ claims.'aud' == cfg.'id' : 'wrong audience';  // Audience is a little different than usual.
-⊨ claims.'eppn' == 'jgaynor@ncsa.illinois.edu' : 'wrong eppn';
+⊨ claims.'eppn' == 'jgaynor@illinois.edu' : 'wrong eppn';
 ⊨ claims.'isMemberOf' << List : 'isMemberOf claim is not a simple list';
 ⊨ claims.'isMemberOf'.0 << String  : ' isMemberOf should be a list';
 issued_at := claims.'iat'; // store for future use.

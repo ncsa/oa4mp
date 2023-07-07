@@ -2,62 +2,83 @@
 
 /*
    Tests the revocation (and introspection) machinery for a client.
+   This creates a flow, then
 */
 path := '/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests';
 if[path∉script_path()][script_path(path ~ script_path());];
-/*cfg.'id'  := 'dev:test/no_cfg';
-cfg.'idp'  := 'NCSA';*/
+// script_path('/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests:vfs#/scripts/:vfs#/mysql/:vfs#/pt/temp:vfs#/pt');
+/*
 cfg.'id'  := 'localhost:test/no_cfg';
 cfg.'idp'  := 'ANY';
 cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';
-cfg.'description' :=  'Test revocation and introspection machinery for a client.';
-cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token endpoint
-
+cfg.'description' :=  'Test revocation and introspection machinery for a client. (uses Derby)';
+cfg.'flow_type' := 'df';
 rc := script_load('driver.qdl', cfg.);
 if[rc!='ok'][return(rc);];
-
 tokens. := clc#access();
-⊨ introspect().'active':'access token not active';
-⊨ introspect().'active':'access token not active';
-⊨ introspect('-rt').'active':'refresh token not active';
-⊨ revoke():'token not revoked';
-⊨ !introspect().'active' : 'AT is not active';
+*/
 
+cfg.'id'  := 'ashigaru:command.line2';
+cfg.'idp'  := 'ANY';
+cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';
+cfg.'description' :=  'RFC7523 auth grant test. This will not do authorization, but get the token directly';
+cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token endpoint
+params. ≔ {'sub':'jeff',
+           'org.oa4mp:/tokens/access/lifetime':1000000,
+           'org.oa4mp:/roles':'admin,all-user',
+           'org.oa4mp:/roles2':['admin2','all-user2']};
+clc#init(cfg.'file', cfg.'id');
+tokens. := clc#rfc7523(params.);
+
+rc := false;
+⊨ clc#introspect('-at').'active':'access token not active';
+⊨ clc#introspect('-rt').'active':'refresh token not active';
+// Trick. Keep the original tokens so you can restart the flow -- emulates
+// someone having older tokens that haven't aged.
+// Make sure server is not set to revoke everything asap in refresh endpoint
+// or this will fail.
+new_tokens. := clc#refresh();
+⊨ clc#revoke('-at'):'token not revoked';
+⊨ !clc#introspect('-at').'active' : 'AT is still active';
+⊨ clc#introspect('-rt').'active' : 'RT is not active (and should be)';
 try[
- // exchange();
  clc#refresh();
-  ⊨ false : 'token should be invalid.';
+ rc := true;
 ]catch[
-  say('caught TX exception');
+  say('error 1:' + error_message);
 ];
 
-//exchange('-at', '-x'); // Get a new access token for later before we invalidate the refresh token
-clc#refresh();
-say('at exchange w/rt ok');
-// RT tests
-//tokens. := exchange('-rt');
-clc#refresh();
-say('rt exchange ok:' + to_string(tokens.'refresh_token'));
-⊨ introspect('-rt').'active':'refresh token not active';
-say('1');
-
-⊨ revoke('-rt'): 'refresh token not revoked';
-say('2');
-⊨ !introspect('-rt').'active':'refresh token not active';
-say('3');
 try[
-  refresh();//exchange('-rt');
-  ⊨ false : 'token should be invalid.';
+ clc#exchange();
+ rc := true;
 ]catch[
- say('caught TX  exception');
+  say('error2:' + error_message);
 ];
-say('4');
 
-// exchange('-at'); // can still get an access token
+// Now reset to the original tokens and check you can start over
+clc#tokens(tokens.);
+⊨ introspect('-at').'active':'access token not active after state reset';
+⊨ introspect('-rt').'active':'refresh token not active after state reset';
+
 clc#refresh();
- say('5');
-
-⊨ introspect().'active':'access token not active';
-     say('6');
+// RT tests
+tt1. := exchange('-rt'); // refresh_token has new RT
+tt2. := exchange('-at', '-x'); // access_token has new RT
+tokens.'access_token' := tt2.'access_token';
+tokens.'refresh_token' := tt1.'refresh_token';
+clc#tokens(tokens.);
+⊨ introspect('-rt').'active':'refresh token not active';
+⊨ introspect('-at').'active':'access token not active';
+⊨ revoke('-rt'): 'refresh token not revoked';
+⊨ revoke('-at'): 'access token not revoked';
+⊨ !introspect('-rt').'active':'revoked refresh token active';
+⊨ !introspect('-at').'active':'revoked access token active';
+rc := true;
+try[
+  refresh();
+  rc := false;
+]catch[
+ ];
+⊨ rc:'was able to refresh with invalid tokens';
 
 say('ok');

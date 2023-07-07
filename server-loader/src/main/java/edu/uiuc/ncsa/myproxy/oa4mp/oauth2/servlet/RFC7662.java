@@ -25,16 +25,22 @@ public class RFC7662 extends TokenManagerServlet {
 
     @Override
     protected void doIt(HttpServletRequest req, HttpServletResponse resp) throws Throwable {
+        printAllParameters(req);
         State state;
         TokenImpl token;
         try {
-            if (!OA2HeaderUtils.getAuthHeader(req, OA2HeaderUtils.BASIC_HEADER).isEmpty()) {
-                state = checkBasic(req);
+            if (isRFC7523Client(req)) {
+                // fixes https://github.com/ncsa/oa4mp/issues/115
+                state = check7523(req);
             } else {
-                state = checkBearer(req);
+                if (!OA2HeaderUtils.getAuthHeader(req, OA2HeaderUtils.BASIC_HEADER).isEmpty()) {
+                    state = checkBasic(req);
+                } else {
+                    state = checkBearer(req);
+                }
             }
         } catch (OA2GeneralError x) {
-            info("Got exception checking bearer/basic header:" + x.getMessage() );
+            info("Got exception checking bearer/basic header:" + x.getMessage());
 
             // This means that the token supplied does not exist (usually) or it is not really
             // a valid token. This servlet is not to throw exceptions except in very narrow cases
@@ -53,7 +59,7 @@ public class RFC7662 extends TokenManagerServlet {
             if (jsonObject.getBoolean(ACTIVE)) {
                 populateResponse(state, jsonObject);
             }
-            debugger.trace(this, "token is " + (jsonObject.getBoolean(ACTIVE)?"":"not") + " active");
+            debugger.trace(this, "token is " + (jsonObject.getBoolean(ACTIVE) ? "" : "not") + " active");
             writeOK(resp, jsonObject);
             return;
         }
@@ -69,7 +75,7 @@ public class RFC7662 extends TokenManagerServlet {
             if (jsonObject.getBoolean(ACTIVE)) {
                 populateResponse(state, jsonObject);
             }
-            debugger.trace(this, "token is " + (jsonObject.getBoolean(ACTIVE)?"":"not") + " active");
+            debugger.trace(this, "token is " + (jsonObject.getBoolean(ACTIVE) ? "" : "not") + " active");
 
             writeOK(resp, jsonObject);
             logOK(req); //CIL-1722

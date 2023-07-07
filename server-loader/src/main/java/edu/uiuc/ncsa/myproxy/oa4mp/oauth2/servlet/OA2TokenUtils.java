@@ -87,9 +87,19 @@ public class OA2TokenUtils {
         debugger.trace(OA2TokenUtils.class, "access token from subject token = " + accessToken);
 
         OA2ServiceTransaction t;
+        boolean isAtValid = false;
+        boolean isATExpired = true;
         t = (OA2ServiceTransaction) oa2se.getTransactionStore().get(accessToken);
         if (t == null) {
             t = getTransactionFromTX(oa2se, accessToken.getJti(), debugger);
+            if(t!=null){
+                TXRecord txRecord = (TXRecord) oa2se.getTxStore().get(BasicIdentifier.newID(accessToken.getJti()));
+                isAtValid = txRecord.isValid();
+                isATExpired = txRecord.getExpiresAt() < System.currentTimeMillis();
+            }
+        }else{
+            isAtValid = t.isAccessTokenValid();
+            isATExpired = accessToken.isExpired();
         }
 
 
@@ -106,14 +116,15 @@ public class OA2TokenUtils {
 
         } else {
             // Must present a valid token to get one.
-            if (!t.isAccessTokenValid()) {
+            //if (!t.isAccessTokenValid()) {
+            if (!isAtValid) {
                 debugger.info(OA2TokenUtils.class, "Access token invalid: " + t.summary());
                 throw new OA2ATException(OA2Errors.INVALID_TOKEN,
                         "token invalid",
                         t.getRequestState(),
                         t.getClient());
             }
-            if (accessToken.isExpired()) {
+            if (isATExpired) {
                 debugger.info(OA2TokenUtils.class, "Access token expired: " + t.summary());
                 throw new OA2ATException(OA2Errors.INVALID_TOKEN,
                         "token expired",
@@ -155,13 +166,20 @@ public class OA2TokenUtils {
         }
         debugger.trace(OA2TokenUtils.class, "refresh token from subject token = " + refreshToken);
         OA2ServiceTransaction t=null;
+        boolean isRTValid = false;
+        boolean isRTExpired = true;
         try {
             RefreshTokenStore zzz = (RefreshTokenStore) oa2SE.getTransactionStore(); // better to get a class cast exception here
             t = zzz.get(refreshToken);
+            isRTValid = t.isRefreshTokenValid();
+            isRTExpired = refreshToken.isExpired();
         } catch (TransactionNotFoundException tnfx) {
             // No such token found for the refresh token.
             // check the RTX store
             t = getTransactionFromTX(oa2SE, refreshToken.getJti(), debugger);
+            TXRecord txRecord = (TXRecord) oa2SE.getTxStore().get(BasicIdentifier.newID(refreshToken.getJti()));
+            isRTValid = txRecord.isValid();
+            isRTExpired = txRecord.getExpiresAt() < System.currentTimeMillis();
         } catch (Throwable tt) {
             // This is serious. It means that there was a problem getting the transaction vs. the transaction did not exist.
             debugger.error(OA2TokenUtils.class, "error getting refresh token:" + refreshToken.getJti() + " message:" + tt.getMessage());
@@ -182,8 +200,9 @@ public class OA2TokenUtils {
             throw new OA2ATException(OA2Errors.INVALID_GRANT, "invalid refresh token",ccc==null?(BaseClient)null:ccc);
 
         } else {
+
             // Must present a valid token to get one.
-            if (!t.isRefreshTokenValid()) {
+            if (!isRTValid) {
                 //MyProxyDelegationServlet.createDebugger(t.getOA2Client()).trace(OA2TokenUtils.class, "invalid refresh token \"" + refreshToken.getJti() + "\"");
                 debugger.info(OA2TokenUtils.class, "Refresh token invalid: " + t.summary());
 
@@ -194,7 +213,7 @@ public class OA2TokenUtils {
             }
             // we wait until here to check if it is expired, since we want to return the correct
             // type of error with the state of the transaction.
-            if (refreshToken.isExpired()) {
+            if (isRTExpired) {
 //                MyProxyDelegationServlet.createDebugger(t.getOA2Client()).trace(OA2TokenUtils.class, "expired refresh token \"" + refreshToken.getJti() + "\"");
                 debugger.info(OA2TokenUtils.class, "Refresh token expired: " + t.summary());
                 throw new OA2ATException(OA2Errors.INVALID_GRANT,

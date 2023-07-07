@@ -7,9 +7,11 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.UITokenUtils;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.RFC7523Constants;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
+import edu.uiuc.ncsa.security.core.exceptions.TransactionNotFoundException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
@@ -91,7 +93,28 @@ public abstract class TokenManagerServlet extends BearerTokenServlet implements 
         AccessTokenImpl at = null;
         RefreshTokenImpl rt = null;
         client = verifyClient(req, "Basic");// all that matters is it passes muster
-        MetaDebugUtil debugger =         MyProxyDelegationServlet.createDebugger(client);
+        return getState(req, state, oa2SE, client);
+    }
+
+    protected boolean isRFC7523Client(HttpServletRequest req) {
+        System.out.println(getClass().getSimpleName() + ": " + req.getParameter(RFC7523Constants.CILENT_ASSERTION_TYPE));
+        if (req.getParameter(RFC7523Constants.CILENT_ASSERTION_TYPE) != null &&
+                req.getParameter(RFC7523Constants.CILENT_ASSERTION_TYPE).equals(RFC7523Constants.ASSERTION_JWT_BEARER)) {
+            return true;
+        }
+        return false;
+    }
+
+    protected State check7523(HttpServletRequest req) throws Throwable {
+        State state = new State();
+        OA2SE oa2SE = (OA2SE) getServiceEnvironment();
+        OA2Client oa2Client = OA2HeaderUtils.getAndVerifyRFC7523Client(req, (OA2SE) getServiceEnvironment());
+        return getState(req, state, oa2SE, oa2Client);
+    }
+
+    private State getState(HttpServletRequest req, State state, OA2SE oa2SE, OA2Client client) {
+        OA2ServiceTransaction transaction;
+        MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(client);
 
         JSONWebKeys keys = OA2TokenUtils.getKeys(oa2SE, client);
         String token = req.getParameter(TOKEN);
@@ -121,7 +144,7 @@ public abstract class TokenManagerServlet extends BearerTokenServlet implements 
                 rt = OA2TokenUtils.getRT(token, oa2SE, keys, debugger);
 
             } catch (Throwable t) {
-                at = OA2TokenUtils.getAT(token, oa2SE, keys,debugger);
+                at = OA2TokenUtils.getAT(token, oa2SE, keys, debugger);
             }
         } else {
             switch (tokenTypeHint) {
@@ -129,7 +152,7 @@ public abstract class TokenManagerServlet extends BearerTokenServlet implements 
                     at = OA2TokenUtils.getAT(token, oa2SE, keys, debugger);
                     break;
                 case TYPE_REFRESH_TOKEN:
-                    rt = OA2TokenUtils.getRT(token, oa2SE, keys,debugger);
+                    rt = OA2TokenUtils.getRT(token, oa2SE, keys, debugger);
                     break;
                 default:
                     // as per spec, throw the only exception this servlet is allowed
@@ -141,6 +164,7 @@ public abstract class TokenManagerServlet extends BearerTokenServlet implements 
             }
         }
         OA2ServiceTransaction transaction = null;
+        TXRecord txr = null;
         if (at == null && rt == null) {
             throw new NFWException("could not determine token type");
         }
@@ -148,26 +172,36 @@ public abstract class TokenManagerServlet extends BearerTokenServlet implements 
         if (at != null) {
             state.accessToken = at;
             state.isAT = true;
-            transaction = (OA2ServiceTransaction) oa2SE.getTransactionStore().get(at);
+            try {
+                transaction = (OA2ServiceTransaction) oa2SE.getTransactionStore().get(at);
+            } catch (TransactionNotFoundException t) {
+                txr = (TXRecord) oa2SE.getTxStore().get(BasicIdentifier.newID(at.getJti()));
+                transaction = (OA2ServiceTransaction) oa2SE.getTransactionStore().get(txr.getParentID());
+                state.txRecord = txr;
+            }
 
         }
         if (rt != null) {
             state.refreshToken = rt;
             state.isAT = false;
-            transaction = ((RefreshTokenStore) oa2SE.getTransactionStore()).get(rt);
+            try {
+                transaction = ((RefreshTokenStore) oa2SE.getTransactionStore()).get(rt);
+            } catch (TransactionNotFoundException transactionNotFoundException) {
+                // Just means this is probably in the TX store.
+                txr = (TXRecord) oa2SE.getTxStore().get(BasicIdentifier.newID(rt.getJti()));
+                transaction = (OA2ServiceTransaction) oa2SE.getTransactionStore().get(txr.getParentID());
+                state.txRecord = txr;
+            }
         }
 
         if (transaction == null) {
-            TXRecord txr = (TXRecord) oa2SE.getTxStore().get(BasicIdentifier.newID(at.getJti()));
-            if (txr == null) {
-                throw new OA2GeneralError(
-                        OA2Errors.INVALID_TOKEN,
-                        "invalid token",
-                        HttpStatus.SC_BAD_REQUEST,
-                        null);
-            }
-            transaction = (OA2ServiceTransaction) oa2SE.getTransactionStore().get(txr.getParentID());
-            state.txRecord = txr;
+            //if (txr == null) {
+            throw new OA2GeneralError(
+                    OA2Errors.INVALID_TOKEN,
+                    "invalid token",
+                    HttpStatus.SC_BAD_REQUEST,
+                    null);
+            //}
         }
         return transaction;
     }
@@ -226,9 +260,9 @@ public abstract class TokenManagerServlet extends BearerTokenServlet implements 
         if (StringUtils.isTrivial(tokenTypeHint)) {
             // Fix CIL-1253.
             try {
-                refreshToken = OA2TokenUtils.getRT(token, oa2SE, keys,debugger);
+                refreshToken = OA2TokenUtils.getRT(token, oa2SE, keys, debugger);
             } catch (Throwable t) {
-                accessToken = OA2TokenUtils.getAT(token, oa2SE, keys,debugger);
+                accessToken = OA2TokenUtils.getAT(token, oa2SE, keys, debugger);
             }
         } else {
             switch (tokenTypeHint) {
@@ -236,7 +270,7 @@ public abstract class TokenManagerServlet extends BearerTokenServlet implements 
                     accessToken = OA2TokenUtils.getAT(token, oa2SE, keys, debugger);
                     break;
                 case TYPE_REFRESH_TOKEN:
-                    refreshToken = OA2TokenUtils.getRT(token, oa2SE, keys,debugger);
+                    refreshToken = OA2TokenUtils.getRT(token, oa2SE, keys, debugger);
                     break;
                 default:
                     // as per spec, throw the only exception this servlet is allowed

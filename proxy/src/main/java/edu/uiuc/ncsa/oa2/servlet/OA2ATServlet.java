@@ -1568,24 +1568,40 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         txAT.setTokenType(RFC8693Constants.ACCESS_TOKEN_TYPE);
         txAT.setParentID(t.getIdentifier());
         txAT.setIdentifier(BasicIdentifier.newID(t.getAccessToken().getToken()));
-        txAT.setExpiresAt(t.getAccessToken().getIssuedAt() + t.getAccessTokenLifetime());
+        long actualATExpiration = t.getAccessToken().getIssuedAt() + t.getAccessTokenLifetime();
+        txAT.setExpiresAt(actualATExpiration);
+//        txAT.setValid(true); // Do not invalidate access tokens. Let them age naturally.
+        txAT.setValid(0 != oa2SE.getRtGracePeriod()); // Zero means invalidate
+
+/*
+        if (0 <= oa2SE.getRtGracePeriod()) {
+            // If this is non-negative, then it has been configured. Not configured = let everything expire normally.
+            txAT.setExpiresAt(Math.min(actualATExpiration, System.currentTimeMillis() + oa2SE.getRtGracePeriod()));
+            txAT.setValid(0 != oa2SE.getRtGracePeriod()); // Valid if non-zero
+        } else {
+            txAT.setExpiresAt(actualATExpiration);
+        }
+*/
 
         TXRecord txRT = (TXRecord) oa2SE.getTxStore().create();
         txRT.setTokenType(RFC8693Constants.REFRESH_TOKEN_TYPE);
         txRT.setParentID(t.getIdentifier());
         txRT.setIdentifier(BasicIdentifier.newID(t.getRefreshToken().getToken()));
+        txRT.setValid(0 != oa2SE.getRtGracePeriod()); // Zero means invalidate
+        long actualRTExpiration = t.getRefreshToken().getIssuedAt() + t.getRefreshTokenLifetime();
+
         if (0 <= oa2SE.getRtGracePeriod()) {
             // If this is non-negative, then it has been configured. Not configured = let everything expire normally.
-            txRT.setExpiresAt(System.currentTimeMillis() + oa2SE.getRtGracePeriod());
-            txRT.setValid(0 != oa2SE.getRtGracePeriod()); // Valid if non-zero
+            txRT.setExpiresAt(Math.min(actualRTExpiration, System.currentTimeMillis() + oa2SE.getRtGracePeriod()));
         } else {
-            RefreshTokenImpl rt = (RefreshTokenImpl) t.getRefreshToken();
-            txRT.setExpiresAt(rt.getIssuedAt() + t.getRefreshTokenLifetime()); // use what it has.
+            txRT.setExpiresAt(actualRTExpiration); // use what it has.
         }
         // Make sure everything that needs it is updated.
         t.setAccessToken(rtiResponse.getAccessToken());
+        t.setAccessTokenValid(true);
         t.getATData().put(OA2Claims.JWT_ID, rtiResponse.getAccessToken().getToken());
         t.setRefreshToken(rtiResponse.getRefreshToken());
+        t.setRefreshTokenValid(true);
         t.getRTData().put(OA2Claims.JWT_ID, rtiResponse.getRefreshToken().getToken());
 
         if (!scopes.isEmpty() || !audience.isEmpty() || !resources.isEmpty()) {

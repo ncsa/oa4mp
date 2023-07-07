@@ -762,7 +762,7 @@ public class OA2CLCCommands extends CommonCommands {
     }
 
     public void revoke(InputLine inputLine) throws Exception {
-        if (grant == null || showHelp(inputLine)) {
+        if (showHelp(inputLine)) {
             showRevokeHelp();
             return;
         }
@@ -777,7 +777,7 @@ public class OA2CLCCommands extends CommonCommands {
     }
 
     public void introspect(InputLine inputLine) throws Exception {
-        if (grant == null || showHelp(inputLine)) {
+        if (showHelp(inputLine)) {
             showIntrospectHelp();
             return;
         }
@@ -813,7 +813,7 @@ public class OA2CLCCommands extends CommonCommands {
     }
 
     public void get_at(InputLine inputLine) throws Exception {
-        if (grant == null || showHelp(inputLine)) {
+        if (showHelp(inputLine)) {
             getATHelp();
             return;
         }

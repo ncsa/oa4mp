@@ -14,7 +14,10 @@ cfg.'idp'  := 'ANY';
 cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';
 cfg.'description' :=  'RFC7523 auth grant test. This will not do authorization, but get the token directly';
 cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token endpoint
-params. ≔ {'sub':'jeff', 'org.oa4mp:/tokens/access/lifetime':1000000,'org.oa4mp:/roles':'admin,all-user','org.oa4mp:/roles2':['admin2','all-user2']};
+params. ≔ {'sub':'jeff',
+           'org.oa4mp:/tokens/access/lifetime':1000000,
+           'org.oa4mp:/roles':'admin,all-user',
+           'org.oa4mp:/roles2':['admin2','all-user2']};
 clc#init(cfg.'file', cfg.'id');
 define[test(tokens., claims., phase)]
  body[

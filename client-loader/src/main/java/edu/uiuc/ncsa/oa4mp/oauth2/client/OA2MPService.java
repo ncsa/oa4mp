@@ -488,7 +488,9 @@ public class OA2MPService extends OA4MPService {
         // always set the access token since it is used to create the bearer token
         // in the request
         request.setAccessToken(dummyAsset.getAccessToken());
-
+        request.setClient(getEnvironment().getClient());
+        request.setKeyID(getEnvironment().getKid());
+        request.setTokenEndpoint(getEnvironment().getAccessTokenUri());
         if (revokeRT) {
             request.setRefreshToken(dummyAsset.getRefreshToken());
         }
@@ -514,6 +516,7 @@ public class OA2MPService extends OA4MPService {
         }
         request.setClient(getEnvironment().getClient());
         request.setKeyID(getEnvironment().getKid());
+        request.setTokenEndpoint(getEnvironment().getAccessTokenUri());
         DS2 ds2 = (DS2) getEnvironment().getDelegationService();
         return ds2.rfc7662(request).getResponse();
     }
