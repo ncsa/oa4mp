@@ -1,7 +1,7 @@
 /*
   Driver script for all post token, refresh and exchange
 */
-debugger(1);
+//debugger(1);
 script_load('ligo/acl.qdl');
 script_load('utils/init.qdl'); // bunch of constants.
 is_igwn := 'igwn' ∈ args();

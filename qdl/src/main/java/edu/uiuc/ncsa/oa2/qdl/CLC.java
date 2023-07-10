@@ -130,14 +130,8 @@ public class CLC implements QDLModuleMetaClass {
         public Object evaluate(Object[] objects, State state) throws Throwable {
             QDLStem claims = new QDLStem();
             if (objects.length == 0) {
-//                try {
                 JSONObject jsonObject = clcCommands.getClaims();
                 claims.fromJSON(jsonObject);
-  /*              } catch (Exception e) {
-                    throw new GeneralException(getName() + " could not get the claims:'" + e.getMessage() + "'");
-
-                }
-  */
             }
             return claims;
         }
@@ -314,11 +308,7 @@ public class CLC implements QDLModuleMetaClass {
         @Override
         public Object evaluate(Object[] objects, State state) throws Throwable {
             checkInit();
-            //  try {
             clcCommands.refresh(argsToInputLine(getName(), objects));
-           /* } catch (Exception e) {
-                handleException(e);
-            }*/
             return getTokens();
         }
 
@@ -418,17 +408,8 @@ public class CLC implements QDLModuleMetaClass {
         @Override
         public Object evaluate(Object[] objects, State state) throws Throwable {
            checkInit();
-//            try {
             clcCommands.revoke(argsToInputLine(getName(), objects));
             return Boolean.TRUE;
-  /*          } catch (Exception e) {
-
-                if (DebugUtil.isEnabled()) {
-                    e.printStackTrace();
-                }
-            }
-            return Boolean.FALSE;
-  */
         }
 
         @Override

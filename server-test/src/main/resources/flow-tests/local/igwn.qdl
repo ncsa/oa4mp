@@ -32,5 +32,4 @@ tokens. := clc#refresh();
 ⊨ scope_check(['gracedb.read'], tokens.'access_token'.'jwt') : 'wrong at scope(2)';
 tokens. := clc#exchange();
 ⊨ scope_check(['read:/frames', 'dqsegdb.read'], tokens.'access_token'.'jwt') : 'wrong at scope(3)';
-
 say('IGWN configuration: ok');

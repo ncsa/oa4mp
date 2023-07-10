@@ -69,10 +69,11 @@ public class OA2QDLConfigurationLoader<T extends OA2QDLEnvironment> extends QDLC
     Boolean skipBadModulesOnLoad = null;
 
     private boolean isSkipBadModulesOnLoad() {
+        // Fix CIL-1772
         if (skipBadModulesOnLoad == null) {
             String x = getNodeValue(cn, SKIP_BAD_MODULES_TAG);
             if (x == null) {
-                skipBadModulesOnLoad = false;
+                skipBadModulesOnLoad = true; // default
             } else {
                 skipBadModulesOnLoad = x.equalsIgnoreCase("true");
             }

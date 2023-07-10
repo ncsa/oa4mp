@@ -1,4 +1,4 @@
-say(debugger(1));
+//say(debugger(1));
    if [!is_defined(claims.'eppn')]
  then [err('Missing EPPN. Cannot determine scopes.', 'invalid_request');];
  requested_audience. := (size(tx_audience.) == 0)?audience.:tx_audience.;
