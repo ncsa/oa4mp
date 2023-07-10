@@ -1,0 +1,232 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+
+
+
+
+
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>OAuth for MyProxy</title>
+    <style type="text/css" media="all">
+        @import url("../../css/oa4mp-custom.css");
+        @import url("../../css/oa4mp-theme.css");
+        @import url("../../css/site.css");
+    </style>
+    <link rel="stylesheet" href="../../css/print.css" type="text/css" media="print"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    </head>
+<body class="composite">
+<div id="banner">
+                        <a href="http://www.ncsa.illinois.edu/" id="bannerLeft"  >
+        
+                                                                    <img src="../../css/images/ncsalogo_sm-2.gif" alt="NCSA"/>
+        
+                </a>
+                                    <a href="https://ncsa.github.io/oa4mp/" id="bannerRight"  >
+        
+                                                                    <img src="../../css/images/oa4mp-logo-small-2.png" alt="OA4MP"/>
+        
+                </a>
+                <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="breadcrumbs">
+            
+    
+
+    
+        
+                        
+    
+        
+                    <div class="xleft">
+            Last Published: 2023-07-10
+                                </div>
+                <div class="xright">            
+    
+
+    
+        
+                        
+    
+        
+                         Version: 5.3.2
+            </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="leftColumn">
+    <div id="navcolumn">
+                
+    
+
+    
+        
+                        
+    
+        
+                               <h5>OA4MP</h5>
+                        <ul>
+                    
+    <li class="none">
+                        <a href="../../oa4mp-faq.html">FAQ</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../server/index.html">Server</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../client/index.html">Client</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../common/configuration/supported-specifications.html">Supported specification</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../apidocs/index.html">api docs</a>
+            </li>
+              </ul>
+                            <h5>Project Documentation</h5>
+                        <ul>
+                    
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-info.html">Project Information</a>
+                        </li>
+              
+                            
+                                        
+                            
+            <li class="collapsed">
+                        <a href="../../project-reports.html">Project Reports</a>
+                        </li>
+              </ul>
+                                               <a href="http://maven.apache.org/" title="Built by Maven"
+           class="poweredBy">
+            <img class="poweredBy"
+                 alt="Built by Maven"
+                 src="http://maven.apache.org/images/logos/maven-feather.png"
+                 width="90"
+                 height="30"
+                 border="1"/>
+        </a>
+                           
+    
+
+    
+        
+                        
+    
+        
+        </div>
+</div>
+<div id="bodyColumn">
+    <div id="contentBox">
+        
+
+
+
+<h1>OA4MP extended attributes</h1>
+
+<p>These are namespace-qualified parameters that may be sent in any leg
+of the OAuth flow. They are of the form</p>
+
+<div>
+<pre>
+    org.oa4mp:X=Y
+</pre></div>
+
+<p>Where x is a name or a path and Y is the intended value. You may multiple values. Note
+the policy for sending these: They simply replace what is there or add it if nothing
+was there. It is therefore best to send them in the initial request and be done with it.</p>
+<section>
+<h2><a name="What_do_they_do.3F"></a>What do they do?</h2>
+
+<p>They allow for a namespace-qualified way to send specific parameters to an OA4MP server's
+policy engine (i.e., QDL). Now, none of them are directly used by OA4MP, so if your scripts
+do not use them, they are ignored.
+They are made available to QDL in the <b>xas.</b> stem.</p>
+</section><section>
+<h2><a name="Example"></a>Example</h2>
+
+<p>Let us say you made the following request to the authorization end point:</p>
+
+<div>
+<pre>
+    https://phys.bigstate.edu/oauth2/authorize?org.oa4mp:/tokens/access/lifetime=1000000&amp;org.oa4mp:/roles=admin,all-user&amp;scope=openid... (truncated)
+</pre></div>
+
+<p>
+    This means that in the QDL environment you would have an <b>xas.</b> (extended attributes) stem of
+</p>
+
+<div>
+<pre>
+    {org.oa4mp:{/tokens/access/lifetime:1000000},{/roles:admin,all-use}}
+</pre></div>
+
+<p>available for use with your policy.</p>
+</section><section>
+<h2><a name="Example_of_multiple_values"></a>Example of multiple values</h2>
+
+<p>If your request had the following values in it</p>
+
+<div>
+<pre>
+    https://phys.bigstate.edu/oauth2/authorize?&amp;org.oa4mp:/roles=admin&amp;org.oa4mp:/roles=all-user&amp;org.oa4mp:/roles=jira-user&amp;... (truncated)
+</pre></div>
+
+<p>You would then get an <b>xas.</b> stem with</p>
+
+<div>
+<pre>
+    {org.oa4mp:   {
+        /roles:[admin,all-user,jira-user]
+        }
+    }
+</pre></div>
+
+<p>I.e. unlike the first example where the roles are treated as a single string, in the second they
+are treated as individual entries.</p>
+</section>
+
+    </div>
+</div>
+<div class="clear">
+    <hr/>
+</div>
+<div id="footer">
+    <div class="xright">&#169;    
+                    2023
+        
+                    
+    
+
+    
+        
+                        
+    
+        
+    </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+</body>
+</html>
+
