@@ -7,8 +7,9 @@ edu.uiuc.ncsa.oa4mp.delegation.client.server
 edu.uiuc.ncsa.oa4mp.delegation.common.services
 edu.uiuc.ncsa.oa4mp.delegation.common.servlet
 edu.uiuc.ncsa.oa4mp.delegation.common.storage
-edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions
+edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients
 edu.uiuc.ncsa.oa4mp.delegation.common.storage.monitored
+edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions
 edu.uiuc.ncsa.oa4mp.delegation.common.token
 edu.uiuc.ncsa.oa4mp.delegation.common.token.impl
 edu.uiuc.ncsa.oa4mp.delegation.oa2
