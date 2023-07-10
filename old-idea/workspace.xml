@@ -926,17 +926,17 @@
           <option name="timeStamp" value="35" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/ncsa-qdl/1.5-QDL-SNAPSHOT/ncsa-qdl-1.5-QDL-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/qdl/expressions/ModuleExpression.java</url>
+          <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/ncsa-qdl/1.5.2/ncsa-qdl-1.5.2-sources.jar!/edu/uiuc/ncsa/qdl/expressions/ModuleExpression.java</url>
           <line>40</line>
           <option name="timeStamp" value="36" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/ncsa-qdl/1.5-QDL-SNAPSHOT/ncsa-qdl-1.5-QDL-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/qdl/workspace/WorkspaceCommands.java</url>
+          <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/ncsa-qdl/1.5.2/ncsa-qdl-1.5.2-sources.jar!/edu/uiuc/ncsa/qdl/workspace/WorkspaceCommands.java</url>
           <line>5390</line>
           <option name="timeStamp" value="41" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/ncsa-qdl/1.5-QDL-SNAPSHOT/ncsa-qdl-1.5-QDL-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/qdl/module/Module.java</url>
+          <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/ncsa-qdl/1.5.2/ncsa-qdl-1.5.2-sources.jar!/edu/uiuc/ncsa/qdl/module/Module.java</url>
           <line>338</line>
           <option name="timeStamp" value="50" />
         </line-breakpoint>
@@ -971,7 +971,7 @@
           <option name="timeStamp" value="188" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/ncsa-security-core/5.3-SNAPSHOT/ncsa-security-core-5.3-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/core/util/AbstractEnvironment.java</url>
+          <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/ncsa-security-core/5.3.2/ncsa-security-core-5.3.2-sources.jar!/edu/uiuc/ncsa/security/core/util/AbstractEnvironment.java</url>
           <line>78</line>
           <option name="timeStamp" value="194" />
         </line-breakpoint>
@@ -986,12 +986,12 @@
           <option name="timeStamp" value="216" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/ncsa-qdl/1.5-QDL-SNAPSHOT/ncsa-qdl-1.5-QDL-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/qdl/workspace/WorkspaceCommands.java</url>
+          <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/ncsa-qdl/1.5.2/ncsa-qdl-1.5.2-sources.jar!/edu/uiuc/ncsa/qdl/workspace/WorkspaceCommands.java</url>
           <line>4149</line>
           <option name="timeStamp" value="218" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/ncsa-qdl/1.5-QDL-SNAPSHOT/ncsa-qdl-1.5-QDL-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/qdl/workspace/WorkspaceCommands.java</url>
+          <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/ncsa-qdl/1.5.2/ncsa-qdl-1.5.2-sources.jar!/edu/uiuc/ncsa/qdl/workspace/WorkspaceCommands.java</url>
           <line>4026</line>
           <option name="timeStamp" value="219" />
         </line-breakpoint>
@@ -1006,7 +1006,7 @@
           <option name="timeStamp" value="261" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/ncsa-qdl/1.5-QDL-SNAPSHOT/ncsa-qdl-1.5-QDL-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/qdl/scripting/Scripts.java</url>
+          <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/ncsa-qdl/1.5.2/ncsa-qdl-1.5.2-sources.jar!/edu/uiuc/ncsa/qdl/scripting/Scripts.java</url>
           <line>138</line>
           <option name="timeStamp" value="275" />
         </line-breakpoint>
@@ -1076,7 +1076,7 @@
           <option name="timeStamp" value="407" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/delegation/ncsa-security-oauth-2.0/5.3-SNAPSHOT/ncsa-security-oauth-2.0-5.3-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/oauth_2_0/jwt/JWTRunner.java</url>
+          <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/delegation/ncsa-security-oauth-2.0/5.3.2/ncsa-security-oauth-2.0-5.3.2-sources.jar!/edu/uiuc/ncsa/security/oauth_2_0/jwt/JWTRunner.java</url>
           <line>154</line>
           <option name="timeStamp" value="411" />
         </line-breakpoint>
