@@ -15,7 +15,7 @@ if[DEBUG][
 ]; // end debug block
 
 //⊨ claims.idp ==  'https://idp.fnal.gov/idp/shibboleth' : 'unsupported IDP \'' + claims.idp + '\'';
-
+debugger(1);
 if[
      exec_phase == 'post_token'
  ][

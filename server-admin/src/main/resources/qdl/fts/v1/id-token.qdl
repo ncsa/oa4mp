@@ -2,8 +2,13 @@
    QDL script for getting the id token claims set up.
    NOTE: setting ID token claims in another handler won't get them picked up.
    updated:
+
+
 */
 
+script_load('utils/init.qdl'); // set up stuff
+ debugger(1);
+ say(to_string(claims.));
 if[
      exec_phase == 'post_token'
  ][
@@ -12,6 +17,7 @@ if[
    ][
            vault_uid := 'wlcg.credkey';
     claims.vault_uid := head(claims.eppn,'@');
+          claims.uid := head(claims.eppn,'@');
   ]; // end if
 
 ];

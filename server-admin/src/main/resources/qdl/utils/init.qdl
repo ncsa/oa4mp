@@ -38,3 +38,16 @@ idp.syngenta := 'https://sts.windows.net/06219a4a-a835-44d5-afaf-3926343bfb89/';
 //  SS(x)->SS('QDL', x);
   trace(x,y)->debugger(1, '*** ' + x + (is_defined(access_control.)?('[' + access_control.client_id + ']:'):':') + to_string(y));
   trace(x)->trace('QDL', x);
+
+  define[to_uuid(x)]
+  body[
+        === convert a string to a uuid by creating the md5  hash algorithm.
+        if[var_type(x) == 4]
+        then[
+            h. := hash(x, 'md5');
+            return(substring(h.,0,8)+'-'+substring(h.,8,4) + '-' + substring(h.,12,4)+'-' + substring(h.,16,4) + '-' + substring(h.,20,12));
+         ];
+
+        h := hash(x, 'md5');
+        return(substring(h,0,8)+'-'+substring(h,8,4) + '-' + substring(h,12,4)+'-' + substring(h,16,4) + '-' + substring(h,20,12));
+      ];

@@ -133,7 +133,8 @@ public class OA2Commands extends BaseCommands {
             oa2ClientCommands = new OA2ClientCommands(getMyLogger(),
                     "  ",
                     getServiceEnvironment().getClientStore(),
-                    getNewClientApprovalStoreCommands());
+                    getNewClientApprovalStoreCommands(),
+                    getOA2SE().getPermissionStore());
             oa2ClientCommands.setRefreshTokensEnabled(getOA2SE().isRefreshTokenEnabled());
             oa2ClientCommands.setSupportedScopes(getOA2SE().getScopes());
             oa2ClientCommands.setUucConfiguration(getOA2SE().getUucConfiguration());

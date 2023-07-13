@@ -1,0 +1,74 @@
+/*
+   For processing capabilites in the refresh or token exchange phases. Here the original
+   capability set is used from the access token request, but the requests generally are
+   for subset of the full set of capabilities.
+*/
+block[
+    // Only one capability set at most is allowed.
+     // At this point in the code there is no CS ever passed
+     // (as per Dave on 6/27/2021), hence we must recover any from
+     // the original scope request.
+     // 3/20/2022 -- Oopsie! Dave switched to using another client which *always* sends the capability
+     // set every time. Remove it if present since these would normally be removed in the access.qdl script.
+     tx_scopes. := ~mask(tx_scopes., starts_with(tx_scopes., CS_HEAD)!= 0) ;
+     tx_scopes. := ~mask(tx_scopes., starts_with(tx_scopes., 'wlcg.groups:')!= 0) ;
+     xi. := resolve_templates(at_claims.EPE., tx_scopes., false); // resolves any scopes explicitly granted to user
+
+     trace('FTS','rtx xi. =' + to_string(xi.));
+
+     cs. := []~mask(scopes., -1 < starts_with(scopes., CS_HEAD));
+     if[
+         1 == size(cs.)
+     ][
+       	 trace('FTS','rtx got ' + CS + ': ' + input_form(cs.));
+
+          //record. :=  script_load('fts/v1/get_service.qdl',  (cs.0-CS_HEAD)+'@fnal.gov');
+          record. := {EPE:['storage.read:/dune',
+                           'storage.create:/dune/scratch/users/${uid}',
+                           'compute.read',
+                           'compute.cancel',
+                           'compute.modify',
+                           'compute.create',
+                           'storage.read:/dune/resilient/jobsub_stage',
+                           'storage.create:/dune/resilient/jobsub_stage',
+                           'storage.create:/fermigrid/jobsub/jobs']};
+
+         trace('FTS','rtx record =' + to_string(record.));
+         if[
+              0 < size(record.)
+         ][
+              if[is_defined(record.VOPAUID)]
+            then[claims.vault_uid := record.VOPAUID;];
+              if[is_defined(record.EPPN)]
+            then[access_token.sub := record.EPPN;];
+              if[is_defined(record.EPE.)]
+            then[
+                  is_uri(x)->is_defined(to_uri(x).scheme);
+                  // do any substitutions in the templates.
+                  s_rec. := template_substitution(record.EPE., claims.); // use s_rec not record.EPE now
+                  trace('FTS','rtx s_rec. post subst =' + to_string(s_rec.));
+                  uq_. := []~mask(s_rec., !for_each(@is_uri, s_rec.)); // unqualified names
+                  say('FTS','rtx uq_. =' + to_string(uq_.));
+                  // CIL-1736
+                    if[0 < size(uq_.)]
+                  then[
+                       uq_. := mask(uq_.,reduce(@||, for_each(@==, tx_scopes., uq_.)));
+                       trace('FTS','rtx uq_. after reduce =' + to_string(uq_.));
+                      ];
+                  // Get any specific overrides.
+                  eta. := resolve_templates(s_rec., tx_scopes., false);
+                  say('FTS' ,'rtx eta. =' + to_string(eta.));
+                   xi. := xi. ~ eta. ~ uq_.; // duplicates ok here, removed later
+              ]; // end if LDAP has entries for CS.
+         ]; // end if something in LDAP to process
+     ]; // end if capabilities are requested.
+
+      trace('FTS','rtx final xi =' + to_string(xi.));
+
+      access_token.scope := detokenize(unique(xi.), ' ', 2); // turn in to string, omit duplications, trailing space
+        trace('FTS','rtx access token = \'' + access_token.scope + '\'');
+
+       if[is_defined(record.EPPN)]
+     then[access_token.sub := to_uuid(record.EPPN);];
+
+];

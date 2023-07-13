@@ -1,0 +1,54 @@
+/*
+    Gets the service record. Note that we put this in a block since we need
+    to load this to get all the LDAP machinery but do not want any of the
+    state to end up in the main program.
+
+       args are
+       0 - username  - for ldap access
+       1 - password  - for ldap access
+       2 - user eppn to get from ldap
+*/
+/*
+    09-05-2022 update on production:
+    * add EPPN to get_user.qdl
+    * add single lines in access, at and rtx.
+    look for \u235d ⍝
+*/
+
+/*
+block[
+            // ini. := file_read('vfs#/scripts/fnal/ldap.ini',2).'dev';
+            ini. := file_read('/home/ncsa/dev/csd/config/ini/fnal-ldap.ini',2).'prod';
+            say(to_string(ini.));
+                      service_cfg. := new_template('ldap');
+             service_cfg.auth_type := 'simple';
+               //service_cfg.address := 'ldap-test.cilogon.org';
+               service_cfg.address := ini.'server';
+                  service_cfg.port := 636;
+            service_cfg.claim_name := 'uid';
+           //service_cfg.search_base := 'ou=services,o=Fermilab,o=CO,dc=dev,dc=fnal,dc=gov';
+           service_cfg.search_base := ini.'service_search_base';
+         service_cfg.fail_on_error := true;
+                  service_cfg.type := 'ldap';
+             service_cfg.ldap_name := 'voPersonExternalID';
+    service_cfg.search_attributes. :=  [EPPN, EPE, VOPAUID];
+              service_cfg.username := ini.'name';
+              service_cfg.password := ini.'pwd';
+
+    return(get_claims(create_source(service_cfg.), script_args(0)));
+];
+*/
+      block[
+               record. := {EPE:['storage.read:/dune',
+                                 'storage.create:/dune/scratch/users/${uid}',
+                                 'compute.read',
+                                 'compute.cancel',
+                                 'compute.modify',
+                                 'compute.create',
+                                 'storage.read:/dune/resilient/jobsub_stage',
+                                 'storage.create:/dune/resilient/jobsub_stage',
+                                 'storage.create:/fermigrid/jobsub/jobs']};
+        say('returning record.='+to_string(record.));
+        say('is defined = ' + (∃record.EPE.));
+        return(record.);
+      ];

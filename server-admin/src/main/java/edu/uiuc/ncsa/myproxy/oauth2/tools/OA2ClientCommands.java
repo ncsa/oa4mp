@@ -4,6 +4,9 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2ClientUtils;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientKeys;
 import edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.QDLJSONConfigUtil;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.Permission;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionList;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionsStore;
 import edu.uiuc.ncsa.myproxy.oauth2.base.ClientApprovalStoreCommands;
 import edu.uiuc.ncsa.myproxy.oauth2.base.ClientStoreCommands;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.BaseClient;
@@ -14,7 +17,9 @@ import edu.uiuc.ncsa.oa4mp.delegation.server.storage.uuc.UUCConfiguration;
 import edu.uiuc.ncsa.qdl.scripting.JSONScriptUtil;
 import edu.uiuc.ncsa.qdl.scripting.Scripts;
 import edu.uiuc.ncsa.security.core.Identifiable;
+import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
+import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.XMLMap;
@@ -44,9 +49,21 @@ public class OA2ClientCommands extends ClientStoreCommands {
     public OA2ClientCommands(MyLoggingFacade logger,
                              String defaultIndent,
                              Store clientStore,
-                             ClientApprovalStoreCommands clientApprovalStoreCommands) throws Throwable {
+                             ClientApprovalStoreCommands clientApprovalStoreCommands,
+                             PermissionsStore permissionsStore) throws Throwable {
         super(logger, defaultIndent, clientStore, clientApprovalStoreCommands);
+        setPermissionsStore(permissionsStore);
     }
+
+    public PermissionsStore getPermissionsStore() {
+        return permissionsStore;
+    }
+
+    public void setPermissionsStore(PermissionsStore permissionsStore) {
+        this.permissionsStore = permissionsStore;
+    }
+
+    PermissionsStore permissionsStore;
 
     public UUCConfiguration getUucConfiguration() {
         return uucConfiguration;
@@ -679,30 +696,32 @@ public class OA2ClientCommands extends ClientStoreCommands {
         super.bootstrap();
         getHelpUtil().load("/help/client_help.xml");
     }
-     public static String UUC_FLAG_TEST = "-test";
-     public static String UUC_FLAG_CFG = "-cfg";
-     public static String UUC_FLAG_FOUND = "-found";
-     public static String UUC_FLAG_ENABLE = "-enable";
+
+    public static String UUC_FLAG_TEST = "-test";
+    public static String UUC_FLAG_CFG = "-cfg";
+    public static String UUC_FLAG_FOUND = "-found";
+    public static String UUC_FLAG_ENABLE = "-enable";
+
     public void uuc(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
             say("uuc [" +
-                    UUC_FLAG_TEST + " on|true|off|false] ["+
-                    UUC_FLAG_CFG +"] ["+
+                    UUC_FLAG_TEST + " on|true|off|false] [" +
+                    UUC_FLAG_CFG + "] [" +
                     UUC_FLAG_FOUND + "] [" +
                     UUC_FLAG_ENABLE + "] = unused client cleanup. Run the client cleanup for this store");
-            say(UUC_FLAG_TEST +" = (optional) turn on or off test mode. In test mode, the clients to delete");
+            say(UUC_FLAG_TEST + " = (optional) turn on or off test mode. In test mode, the clients to delete");
             say("        are simply printed, not actually deleted.");
             say(UUC_FLAG_CFG + " = simply prints out the configuration, if any.");
-            say(UUC_FLAG_FOUND+" = should the list of client ids that were found.");
-            say(UUC_FLAG_ENABLE+" = manually enable this if it is disabled.");
+            say(UUC_FLAG_FOUND + " = should the list of client ids that were found.");
+            say(UUC_FLAG_ENABLE + " = manually enable this if it is disabled.");
             say("\nOne use pattern is to put the configuration into the server configuration file and only");
             say("run it manually in the CLI. In that case, set it to disabled and enable it here.");
             say("This will not run disabled configurations.");
             FormatUtil.printFormatListHelp(new BasicIO(), inputLine);
             return;
         }
-        if(inputLine.hasArg(UUC_FLAG_CFG)){
-            if(getUucConfiguration() == null){
+        if (inputLine.hasArg(UUC_FLAG_CFG)) {
+            if (getUucConfiguration() == null) {
                 say("no config");
                 return;
             }
@@ -714,13 +733,13 @@ public class OA2ClientCommands extends ClientStoreCommands {
             say("UUC configuration not found");
             return;
         }
-        if(inputLine.hasArg(UUC_FLAG_ENABLE)){
+        if (inputLine.hasArg(UUC_FLAG_ENABLE)) {
             getUucConfiguration().enabled = inputLine.hasArg(UUC_FLAG_ENABLE);
             inputLine.removeSwitch(UUC_FLAG_ENABLE);
-            say("UUC configuration" + (getUucConfiguration().enabled?"enabled":"disabled") +" . ");
+            say("UUC configuration" + (getUucConfiguration().enabled ? "enabled" : "disabled") + " . ");
             return;
         }
-        if(!getUucConfiguration().enabled){
+        if (!getUucConfiguration().enabled) {
             say("configuration disabled");
             return;
         }
@@ -738,17 +757,232 @@ public class OA2ClientCommands extends ClientStoreCommands {
         BaseClientStore clientStore = (BaseClientStore) getStore();
         BaseClientStore.UUCResponse response = clientStore.unusedClientCleanup(getUucConfiguration());
         say("Stats are " + response);
-        if(showFound){
+        if (showFound) {
             say("found ids are:");
             FormatUtil.formatList(inputLine, response.found);
         }
-        say("There were "+ response.found.size() + " clients found to remove");
+        say("There were " + response.found.size() + " clients found to remove");
     }
 
     @Override
     protected BaseClient approvalMods(InputLine inputLine, BaseClient client) throws IOException {
         OA2Client oa2Client = (OA2Client) client;
-        oa2Client.setStrictscopes("y".equals(getInput("strict scopes?(y/n)", oa2Client.useStrictScopes()?"y":"n")));
+        oa2Client.setStrictscopes("y".equals(getInput("strict scopes?(y/n)", oa2Client.useStrictScopes() ? "y" : "n")));
         return oa2Client;
+    }
+
+    public static String E_CREATE_FLAG = "-create";
+    public static String E_LINK_FLAG = "-link";
+    public static String E_LIST_FLAG = "-list";
+    public static String E_UNLINK_FLAG = "-unlink";
+
+    protected void showErsatzHelp() {
+        say("ersatz [" + E_CREATE_FLAG + " | " + E_LINK_FLAG + " | " + E_LIST_FLAG + " | " + E_UNLINK_FLAG + "] - operations on ersatz clients.");
+        say(E_CREATE_FLAG + " [client_id] - create a new ersatz client with many defaults");
+        say(E_LINK_FLAG + " ersatz_id | [e0,e1,...] [client_id]- link an existing ersatz client to the current one");
+        say(E_LIST_FLAG + " [client_id] - list all of the ersatz clients for the current client");
+        say(E_UNLINK_FLAG + " ersatz_id | [e0,e1,...]  [client_id] - unlink the ersatz client from this client. It does not do anything to the ersatz client.");
+        say();
+        say("Note that listing the ersatz clients lists the chains of them, so a typical output might be");
+        say("client_id_1");
+        say("  client_id_2");
+        say("    client_id_3");
+        say("client_id_1");
+        say("  client_id_1a");
+        say("    client_id_5");
+        say("which means that for this client the chains are client_id_1->client_id_2->client_id_3 and ");
+        say("client_is_1->client_id_1a->client_id_5.");
+        say("Note that indenting sets off the chain, no indents means there is simply the client without others");
+        say("Note that the " + E_LINK_FLAG + " and " + E_UNLINK_FLAG + " commands take either a single ersatz id");
+        say("or an ordered chain (as a  list) of them. Note that if linking, each ersatz client will be added to the");
+        say("admin's client list.");
+    }
+
+    public void ersatz(InputLine inputLine) throws Throwable {
+        if (showHelp(inputLine)) {
+            showErsatzHelp();
+            return;
+        }
+        boolean linkClient = inputLine.hasArg(E_LINK_FLAG);
+        List<Identifier> linkList = null;
+        if (linkClient) {
+            if (inputLine.hasArgList(E_LINK_FLAG)) {
+                List<String> rawIDs = inputLine.getArgList(E_LINK_FLAG);
+                linkList = new ArrayList<>();
+                for (String s : rawIDs) {
+                    linkList.add(BasicIdentifier.newID(s));
+                }
+            } else {
+                linkList = new ArrayList<>();
+                linkList.add(BasicIdentifier.newID(inputLine.getNextArgFor(E_LINK_FLAG)));
+            }
+            inputLine.removeSwitch(E_LINK_FLAG);
+        }
+        boolean unlinkClient = inputLine.hasArg(E_UNLINK_FLAG);
+        if (linkClient && unlinkClient) {
+            say("you cannot both link and unlink a client at the same time");
+            return;
+        }
+        if (unlinkClient) {
+            if (inputLine.hasArgList(E_UNLINK_FLAG)) {
+                List<String> rawIDs = inputLine.getArgList(E_UNLINK_FLAG);
+                linkList = new ArrayList<>();
+                for (String s : rawIDs) {
+                    linkList.add(BasicIdentifier.newID(s));
+                }
+            } else {
+                linkList = new ArrayList<>();
+                linkList.add(BasicIdentifier.newID(inputLine.getNextArgFor(E_UNLINK_FLAG)));
+            }
+            inputLine.removeSwitch(E_UNLINK_FLAG);
+        }
+        boolean createClient = inputLine.hasArg(E_CREATE_FLAG);
+        inputLine.removeSwitch(E_CREATE_FLAG);
+        if (createClient) {
+            // set redundant switches correctly
+            linkClient = false;
+            unlinkClient = false;
+        }
+        boolean listClients = inputLine.hasArg(E_LIST_FLAG);
+        inputLine.removeSwitch(E_LIST_FLAG);
+        if (listClients) {
+            OA2Client client = (OA2Client) findItem(inputLine);
+            if (client == null) {
+                say("no such client");
+                return;
+            }
+            String ersatzId = inputLine.getLastArg();
+            List<Identifier> admins = getPermissionsStore().getAdmins(client.getIdentifier());
+            if (1 < admins.size()) {
+                say("ambiguous case: too many admins for this client. Cannot tell which to link to");
+                return;
+            }
+            if (admins.size() == 1) {
+                PermissionList pList = getPermissionsStore().getErsatzChains(admins.get(0), client.getIdentifier());
+                for (Permission permission : pList) {
+                    if (permission.canSubstitute()) {
+                        List<Identifier> eChain = permission.getErsatzChain();
+                        int indent = 0;
+                        for (Identifier ee : eChain) {
+                            say(StringUtils.getBlanks(2 * indent++) + ee);
+                        }
+                    }
+                    say();
+                }
+            }
+            if (admins.size() == 0) {
+                say("no admin client  is an unsupported case");
+                return;
+            }
+            return;
+        }
+        if (createClient) {
+            OA2Client provisioner = (OA2Client) findItem(inputLine);
+            OA2Client createdClient = (OA2Client) create(ERSATZ_CREATE_MAGIC_NUMBER);
+            linkList = new ArrayList<>();
+            linkList.add(createdClient.getIdentifier());
+            linkErsatz(provisioner, linkList);
+            return;
+        }
+        if (linkClient) {
+            OA2Client provisioner = (OA2Client) findItem(inputLine);
+
+            linkErsatz(provisioner, linkList);
+            say("done!");
+            return;
+        }
+
+        if (unlinkClient) {
+            OA2Client provisioner = (OA2Client) findItem(inputLine);
+            unlinkErsatz(provisioner, linkList);
+            say("done!");
+            return;
+        }
+        say("unknown/missing option");
+    }
+
+    protected void linkErsatz(OA2Client provisioner, List<Identifier> ersatz) {
+        List<Identifier> admins = getPermissionsStore().getAdmins(provisioner.getIdentifier());
+        if (admins.size() == 1) {
+            for(Identifier id : ersatz) {
+                // Check that the ersatz clients are administered by this admin and, if not
+                // set them to be so.
+                PermissionList pList = getPermissionsStore().get(admins.get(0), id);
+                if(pList.isEmpty()){
+                    Permission newErsatzPermission = (Permission) getPermissionsStore().create();
+                    newErsatzPermission.setAdminID(admins.get(0));
+                    newErsatzPermission.setClientID(id);
+                    newErsatzPermission.setApprove(true);
+                    newErsatzPermission.setCreate(true);
+                    newErsatzPermission.setDelete(true);
+                    newErsatzPermission.setRead(true);
+                    newErsatzPermission.setWrite(true);
+                    getPermissionsStore().save(newErsatzPermission);
+                }
+            }
+            PermissionList permissions = getPermissionsStore().getErsatzChains(admins.get(0), provisioner.getIdentifier());
+            if (!hasEChain(permissions, ersatz)) {
+                Permission p = (Permission) getPermissionsStore().create();
+                p.setAdminID(admins.get(0));
+                p.setClientID(provisioner.getIdentifier());
+                p.setSubstitute(true);
+                p.setErsatzChain(ersatz);
+                getPermissionsStore().save(p);
+            }
+        }
+        say("zero or multiple admins not supported at this time.");
+    }
+
+    protected boolean hasEChain(PermissionList permissions, List<Identifier> echain) {
+        for (Permission p : permissions) {
+            if (p.canSubstitute()) {
+                List<Identifier> eChain = p.getErsatzChain();
+                if (eChain.size() != eChain.size()) {
+                    continue;
+                }
+                for (int i = 0; i < eChain.size(); i++) {
+                    if (!eChain.get(i).equals(eChain.get(i))) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    protected void unlinkErsatz(OA2Client provisioner, List<Identifier> ersatz) {
+        List<Identifier> admins = getPermissionsStore().getAdmins(provisioner.getIdentifier());
+        if (admins.size() == 1) {
+            PermissionList permissions = getPermissionsStore().getErsatzChains(admins.get(0), provisioner.getIdentifier());
+            for (Permission p : permissions) {
+                List<Identifier> eChain = p.getErsatzChain();
+                if (eChain.size() == ersatz.size()) {
+                    boolean notFound = true;
+                    for (int i = 0; i < eChain.size(); i++) {
+                        if (!eChain.get(i).equals(ersatz.get(i))) {
+                            notFound = false;
+                            break;
+                        }
+                    }
+                    if (notFound) {
+                        getPermissionsStore().remove(p.getIdentifier());
+                    }
+                }
+            }
+            say("done with unlink");
+        }
+        say("zero or multiple admins not supported at this time.");
+    }
+
+    public static final int ERSATZ_CREATE_MAGIC_NUMBER = 1;
+
+    @Override
+    protected Identifiable additionalCreation(Identifiable identifiable, int magicNumber) {
+        OA2Client client = (OA2Client) identifiable;
+        if (magicNumber == ERSATZ_CREATE_MAGIC_NUMBER) {
+            client.setErsatzClient(true);
+            client.setExtendsProvisioners(isOk("extends the provisioners?"));
+        }
+        return client;
     }
 }

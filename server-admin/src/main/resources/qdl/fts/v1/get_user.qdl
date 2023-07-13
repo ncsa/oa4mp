@@ -1,0 +1,37 @@
+/*
+   Gets the user record
+   args are
+   0 - username  - for ldap access
+   1 - password  - for ldap access
+   2 - user eppn to get from ldap
+ */
+/*
+block[
+            // ini. := file_read('vfs#/scripts/fnal/ldap.ini',2).'dev';
+            ini. := file_read('/home/ncsa/dev/csd/config/ini/fnal-ldap.ini',2).'prod';
+                say(to_string(ini.));
+                   fnal_cfg. := new_template('ldap');
+              fnal_cfg.auth_type := 'simple';
+                //fnal_cfg.address := 'ldap-test.cilogon.org';
+                fnal_cfg.address := ini.'server';
+                   fnal_cfg.port := 636;
+             fnal_cfg.claim_name := 'uid';
+          fnal_cfg.fail_on_error := true;
+            //fnal_cfg.search_base := 'ou=people,o=Fermilab,o=CO,dc=dev,dc=fnal,dc=gov';
+            fnal_cfg.search_base := ini.'user_search_base';
+                   fnal_cfg.type := 'ldap';
+              fnal_cfg.ldap_name := 'voPersonExternalID';
+     fnal_cfg.search_attributes. :=  [EPPN,EPE,IS_MEMBER_OF];
+               fnal_cfg.username := ini.'name';
+               fnal_cfg.password := ini.'pwd';
+
+      return(get_claims(create_source(fnal_cfg.), script_args(0)));
+];
+*/
+
+block[
+       at_claims. := {EPE:['wlcg.capabilityset:/duneana','wlcg.capabilityset:/dunepro'],
+                      EPPN:claims.'eppn',
+                      IS_MEMBER_OF : ['/wlcg','/wlcg/xfers']};
+     return(at_claims.);
+     ];

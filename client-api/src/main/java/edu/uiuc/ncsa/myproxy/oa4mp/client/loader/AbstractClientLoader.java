@@ -221,14 +221,14 @@ public abstract class AbstractClientLoader<T extends ClientEnvironment> extends 
     protected void checkProtocol(String b) {
         if(b == null) return;
         if (!b.toLowerCase().startsWith("https")) {
-            throw new IllegalArgumentException("Error: the base uri must be https. You have \"" + b + "\"");
+            throw new IllegalArgumentException("Error: the " + ClientXMLTags.BASE_URI + " must be https. You have \"" + b + "\"");
         }
     }
 
     protected String getBaseURI() {
         String b = getCfgValue(ClientXMLTags.BASE_URI);
         if (b == null || b.length() == 0) {
-            throw new IllegalArgumentException("Error: no base uri specified in the configuration file");
+            throw new IllegalArgumentException("Error: no " + ClientXMLTags.BASE_URI + " specified in the configuration file");
         }
         checkProtocol(b);
         return b;

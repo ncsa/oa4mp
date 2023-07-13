@@ -7,7 +7,7 @@
  // test with arg /home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests/local
 root_dir ≔ size(args())≠1?info().'user'.'invocation_dir':args().0;
 root_dir ≔ root_dir + ('.*/'=~root_dir?'':'/');
-files. ≔ dir(root_dir);
+files. ≔ dir(root_dir);     
 i ≔0;
 while[x ∈ files.]
   do[
